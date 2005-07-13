@@ -1,0 +1,258 @@
+======================
+Database API reference
+======================
+
+XXX INTRO HERE XXX
+
+Throughout this reference, I'll be referring to the following Poll application::
+
+    class Poll(meta.Model):
+        module_name = 'polls'
+        verbose_name = 'poll'
+        db_table = 'polls'
+        fields = (
+            meta.SlugField('slug', 'slug', unique_for_month='pub_date'),
+            meta.CharField('question', 'question', maxlength=255),
+            meta.DateTimeField('pub_date', 'date published'),
+            meta.DateTimeField('expire_date', 'expiration date'),
+        )
+
+    class Choice(meta.Model):
+        module_name = 'choices'
+        verbose_name = 'choice'
+        db_table = 'poll_choices'
+        fields = (
+            meta.IntegerField('poll_id', 'poll', rel=meta.ManyToOne(Poll, 'poll', 'id',
+                edit_inline=True, edit_inline_type=meta.TABULAR, num_in_admin=10,
+                min_num_in_admin=5)),
+            meta.CharField('choice', 'choice', maxlength=255, core=True),
+            meta.IntegerField('votes', 'votes', editable=False, default=0),
+        )
+
+Basic lookup functions
+======================
+
+Each model exposes three basic functions for lookups: ``get_object``,
+``get_list``, and ``get_count``.  These functions all take the same arguments,
+but ``get_object`` assumes that only a single record will be returned (and
+raises an exception if that's not true), ``get_count`` simple returns a count of
+objects matched by the lookup, and ``get_list`` returns the entire list.
+
+Field lookups
+=============
+
+Basic field lookups take the form ``field__lookuptype`` (that's a
+double-underscore). For example::
+
+    polls.get_list(pub_date__lte=datetime.datetime.now())
+
+translates (roughly) into the following SQL:
+
+    SELECT * FROM polls WHERE pub_date < NOW();
+
+The DB API supports the following lookup types:
+
+    ==========  ==============================================================
+    Type        Description
+    ==========  ==============================================================
+    exact       Exact match: ``polls.get_object(id__exact=14)``
+    iexact      Case-insensitive exact match:
+                ``polls.get_list(slug__iexact="foo")`` matches a slug of ``foo``,
+                ``FOO``, ``fOo``, etc.
+    contains    Case-sensitive contains test:
+                ``polls.get_list(question__contains="spam")`` returns all polls
+                that contain "spam" in the question.
+    icontains   Case-insensitive contains
+    gt          Greater than: ``polls.get_list(id__gt=4)``
+    gte         Greater than or equal to
+    lt          Less than
+    lte         Less than or equal to
+    startswith  Case-sensitive starts-with:
+                ``polls.get_list(question_startswith="Would")``
+    endswith    Case-sensitive ends-with
+    range       Range test:
+                ``polls.get_list(pub_date__range=(start_date, end_date)``
+                returns all polls with a pub_date between ``start_date``
+                and ``end_date`` (inclusive).
+    year        For date/datetime fields, exact year match:
+                ``polls.get_count(pub_date__year=2005)``.
+    month       For date/datetime fields, exact month match.
+    day         For date/datetime fields, exact day match.
+    isnull      True/False; does is IF NULL/IF NOT NULL lookup:
+                ``polls.get_list(expire_date__isnull=True)``.
+    ==========  ==============================================================
+
+Multiple lookups are of course allowed, and are translated as "ands"::
+
+    polls.get_list(
+        pub_date__year=2005,
+        pub_date__month=1,
+        question__startswith="Would",
+    )
+
+retrieves all polls published in Jan. 2005 whose question starts with "Would."
+
+"Or" lookups are also possible::
+
+    XXX FIXME XXX
+
+Ordering
+========
+
+The results are automatically ordered by the ordering tuple given by the
+``ordering`` key in the model, but the ordering may be explicitly
+provided by the ``order_by`` argument to a lookup::
+
+    polls.get_list(
+        pub_date__year=2005,
+        pub_date__month=1,
+        order_by=(("pub_date", "DESC"), ("question", "ASC")),
+    )
+
+The result set above will be ordered by ``pub_date`` (descending), then
+by ``question`` (ascending).  Just like in models, the ``order_by`` clause
+is a list of ordering tuples where the first element is the field and the
+second is "ASC" or "DESC" to order ascending or descending.  You may also
+use the tuple ``(None, "RANDOM")`` to order the result set randomly.
+
+Relationships (joins)
+=====================
+
+Joins may implicitly be performed by following relationships:
+``choices.get_list(poll__slug__exact="eggs")`` fetches a list of ``Choice``
+objects where the associated ``Poll`` has a slug of ``eggs``.  Multiple levels
+of joins are allowed.
+
+Given an instance of an object, related objects can be looked up directly using
+connivence functions, for example, if ``poll`` is a ``Poll`` instance,
+``poll.get_choice_list()`` will return a list of all associated choices (astute
+readers will note that this is the same as
+``choices.get_list(poll_id__exact=poll.id)``, except clearer).
+
+Each type of relationship creates a set of methods on each object in the
+relationship.  These created methods go both ways, so objects that are
+"related-to" need not explicitly define reverse relationships; that happens
+automatically.
+
+One-to-one relations
+--------------------
+
+Each object in a one-to-one relationship will have a ``get_relatedobject()``
+method. For example::
+
+    class Place(meta.Model):
+        ...
+        fields = (
+            ...
+        )
+
+    class Restaurant(meta.Model):
+        ...
+        fields = (
+            meta.IntegerField('id', 'ID', primary_key=True,
+                rel=meta.OneToOne(places.Place, 'place', 'id')),
+            ...
+        )
+
+In the above example, each ``Place`` will have a ``get_restaurant()`` method,
+and each ``Restaurant`` will have a ``get_place()`` method.
+
+Many-to-one relations
+---------------------
+
+In each many-to-one relationship the related object will have a
+``get_relatedobject()`` method, and the related-to object will have
+``get_relatedobject()``, ``get_relatedobject_list()``, and
+``get_relatedobject_count()`` methods (the same as the module-level
+``get_object()``, ``get_list()``, and ``get_count()`` methods).
+
+Thus, for the ``Poll`` example at the top, ``Choice`` objects will have a
+``get_poll()`` method, and ``Poll`` objects will have ``get_choice()``,
+``get_choice_list()``, and ``get_choice_count()`` functions.
+
+Many-to-many relations
+----------------------
+
+Many-to-many relations result in the same set of methods as `Many-to-one relations`_,
+except that the ``get_relatedobjects()`` function on the related object will
+return a list of instances instead of a single instance.  So, if the relationship
+between ``Poll`` and ``Choice`` was many-to-many, ``choice.get_polls()`` would
+return a list.
+
+Relationships across applications
+---------------------------------
+
+If a relation spans applications -- if ``Place`` was had a ManyToOne relation to
+a ``geo.City`` object, for example -- the name of the other application will be
+added to the method, i.e. ``place.get_geo_city()`` and
+``city.get_places_place_list()``.
+
+Selecting related objects
+-------------------------
+
+Relations are the bread and butter of databases, so there's an option to "follow"
+all relationships and pre-fill them in a simple cache so that later calls to
+objects with a one-to-many relationship don't have to hit the database.  If you pass
+``select_related=True`` to a lookup, this pre-caching of relationships will be performed.
+This results in (sometimes much) larger queries, but it means that later use of
+relationships is much faster.
+
+For example, using the Poll and Choice models from above, if you do the following::
+
+    c = choices.get_object(id__exact=5, select_related=True)
+
+Then subsequent calls to ``c.get_poll()`` won't hit the database.
+
+Limiting selected rows
+======================
+
+The ``limit``, ``offset``, and ``distinct`` keywords can be used to control
+which rows are returned.  Both ``limit`` and ``offset`` should be integers which
+will be directly passed to the SQL ``LIMIT``/``OFFSET`` commands.
+
+If ``distinct`` is True, only distinct rows will be returned (this is equivalent
+to a ``SELECT DISTINCT`` SQL clause).
+
+Other lookup options
+====================
+
+There are a few other ways of more directly controlling the generated SQL
+for the lookup.  Note that by definition these extra lookups may not be
+portable to different database engines (since you're explicitly writing
+SQL code) and should be avoided where ever possible.:
+
+``params``
+----------
+
+All the extra-SQL params described below may use standard Python string
+formatting codes to indicate parameters that the database engine will
+automatically quote.  The ``params`` argument can contain any extra
+parameters to be substituted.
+
+``select``
+----------
+
+The ``select`` keyword allows you to select extra fields.  This should be a
+dict mapping field names to a SQL clause to use for that field.  For example::
+
+    polls.get_list(
+        select={
+            'choice_count' : 'SELECT COUNT(*) FROM choices WHERE poll_id = polls.id'
+        }
+    )
+
+Each of the resulting ``Poll`` objects will have an extra ``choice_count`` with
+a count of associated ``Choice`` objects.  Note that the parenthesis required by
+most database engines around sub-selects are not required in Django's ``select``
+clauses.
+
+``where`` / ``tables``
+----------------------
+
+If you need to explicitly pass extra ``WHERE`` clauses -- perhaps to perform
+non-explicit joins -- use the ``where`` keyword..  If you need to
+join other tables into your query, you can pass their names to ``tables``.
+
+Creating new objects
+====================
+
