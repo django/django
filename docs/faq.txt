@@ -1,0 +1,49 @@
+==========
+Django FAQ
+==========
+
+The admin site is ugly!  How can I change it?
+---------------------------------------------
+
+We think it's very purty, but if you don't agree you can modify the admin site's
+presentation by editing the CSS stylesheet and/or associated image files.  The 
+site is built using semantic HTML, so any changes you'd like to make should be
+possible by editing the CSS stylesheet.  We've got a `guide to the CSS used 
+in the admin`_ to get you started.
+
+.. _`guide to the CSS used in the admin`: http://www.djangoproject.com/FIXME/
+
+How do you pronounce "Django"?
+------------------------------
+
+According to Wikipedia_, "Django is pronounced **zhane**-go (with a long 'a')."
+
+.. _Wikipedia: http://en.wikipedia.org/wiki/Django_Reinhardt
+
+Is Django stable?
+-----------------
+
+We've been using Django for almost two years.  Sites built on Django have
+weathered traffic spikes of over one million hits an hour, and at least
+one slashdotting.  Yes; it's quite stable.
+
+Who's behind this?
+------------------
+
+`Adrian Holovaty`_
+    XXX
+    
+`Simon Willison`_
+    XXX
+
+`Jacob Kaplan-Moss`_
+    XXX
+
+`Wilson Miner`_.
+    XXX
+    
+.. _`Adrian Holovaty`: http://www.holovaty.com/
+.. _`Simon Willison`: http://simon.incutio.com/
+.. _`Jacob Kaplan-Moss`: http://www.jacobian.org/
+.. _`Wilson Miner`: http://www.wilsonminer.com/live/
+
