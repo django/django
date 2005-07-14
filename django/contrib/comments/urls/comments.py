@@ -1,6 +1,6 @@
 from django.conf.urls.defaults import *
 
-urlpatterns = patterns('django.contrib.comments.comments',
+urlpatterns = patterns('django.contrib.comments.views',
     (r'^post/$', 'comments.post_comment'),
     (r'^postfree/$', 'comments.post_free_comment'),
     (r'^posted/$', 'comments.comment_was_posted'),
