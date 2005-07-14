@@ -1,6 +1,6 @@
 from django.core import meta
 
-__all__ = ['auth', 'comments', 'core']
+__all__ = ['auth', 'core']
 
 # Alter this package's __path__ variable so that calling code can import models
 # from "django.models" even though the model code doesn't physically live
