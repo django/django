@@ -25,7 +25,7 @@ class PermLookupDict:
     def __init__(self, user, module_name):
         self.user, self.module_name = user, module_name
     def __repr__(self):
-        return str(self.user.get_permissions())
+        return str(self.user.get_permission_list())
     def __getitem__(self, perm_name):
         return self.user.has_perm("%s.%s" % (self.module_name, perm_name))
     def __nonzero__(self):

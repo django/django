@@ -517,10 +517,10 @@ class ModelBase(type):
 
         for f in opts.many_to_many:
             # Add "get_thingie" methods for many-to-many related objects.
-            # EXAMPLES: Poll.get_sites(), Story.get_bylines()
+            # EXAMPLES: Poll.get_site_list(), Story.get_byline_list()
             func = curry(method_get_many_to_many, f)
             func.__doc__ = "Returns a list of associated `%s.%s` objects." % (f.rel.to.app_label, f.rel.to.module_name)
-            attrs['get_%s' % f.name] = func
+            attrs['get_%s_list' % f.rel.name] = func
             # Add "set_thingie" methods for many-to-many related objects.
             # EXAMPLES: Poll.set_sites(), Story.set_bylines()
             func = curry(method_set_many_to_many, f)
@@ -809,7 +809,7 @@ def method_get_many_to_one(field_with_rel, self):
     return getattr(self, cache_var)
 
 # Handles getting many-to-many related objects.
-# Example: Poll.get_sites()
+# Example: Poll.get_site_list()
 def method_get_many_to_many(field_with_rel, self):
     rel = field_with_rel.rel.to
     cache_var = '_%s_cache' % field_with_rel.name
@@ -2064,7 +2064,7 @@ class ManyToManyField(Field):
     def __init__(self, to, **kwargs):
         kwargs['name'] = kwargs.get('name', to._meta.module_name)
         kwargs['verbose_name'] = kwargs.get('verbose_name', to._meta.verbose_name_plural)
-        kwargs['rel'] = ManyToMany(to, to._meta.object_name.lower() + '_id',
+        kwargs['rel'] = ManyToMany(to, to._meta.object_name.lower(),
             num_in_admin=kwargs.pop('num_in_admin', 0),
             related_name=kwargs.pop('related_name', None),
             filter_interface=kwargs.pop('filter_interface', None),

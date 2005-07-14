@@ -897,7 +897,7 @@ def change_stage(request, app_label, module_name, object_id):
             new_data.update(_get_flattened_data(f, getattr(obj, f.name)))
         for f in opts.many_to_many:
             if not f.rel.edit_inline:
-                new_data[f.name] = [i.id for i in getattr(obj, 'get_%s' % f.name)()]
+                new_data[f.name] = [i.id for i in getattr(obj, 'get_%s_list' % f.rel.name)()]
         for rel_obj, rel_field in inline_related_objects:
             var_name = rel_obj.object_name.lower()
             for i, rel_instance in enumerate(getattr(obj, 'get_%s_list' % opts.get_rel_object_method_name(rel_obj, rel_field))()):
@@ -906,7 +906,7 @@ def change_stage(request, app_label, module_name, object_id):
                         for k, v in _get_flattened_data(f, getattr(rel_instance, f.name)).items():
                             new_data['%s.%d.%s' % (var_name, i, k)] = v
                 for f in rel_obj.many_to_many:
-                    new_data['%s.%d.%s' % (var_name, i, f.name)] = [j.id for j in getattr(rel_instance, 'get_%s' % f.name)()]
+                    new_data['%s.%d.%s' % (var_name, i, f.name)] = [j.id for j in getattr(rel_instance, 'get_%s_list' % f.rel.name)()]
 
         # If the object has ordered objects on its admin page, get the existing
         # order and flatten it into a comma-separated list of IDs.

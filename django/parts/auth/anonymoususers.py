@@ -3,7 +3,7 @@ Anonymous users
 """
 
 class AnonymousUser:
-    
+
     def __init__(self):
         pass
 
@@ -22,13 +22,13 @@ class AnonymousUser:
     def check_password(self, raw_password):
         raise NotImplementedError
 
-    def get_groups(self):
+    def get_group_list(self):
         return []
 
     def set_groups(self, group_id_list):
         raise NotImplementedError
 
-    def get_permissions(self):
+    def get_permission_list(self):
         return []
 
     def set_permissions(self, permission_id_list):

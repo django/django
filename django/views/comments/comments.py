@@ -108,7 +108,7 @@ class PublicCommentManipulator(AuthenticationForm):
             message = 'This comment was posted by a user who has posted fewer than %s comments:\n\n%s' % \
                 (COMMENTS_FIRST_FEW, c.get_as_text())
             mail_managers("Comment posted by rookie user", message)
-        if COMMENTS_SKETCHY_USERS_GROUP and COMMENTS_SKETCHY_USERS_GROUP in [g.id for g in self.user_cache.get_groups()]:
+        if COMMENTS_SKETCHY_USERS_GROUP and COMMENTS_SKETCHY_USERS_GROUP in [g.id for g in self.user_cache.get_group_list()]:
             message = 'This comment was posted by a sketchy user:\n\n%s' % c.get_as_text()
             mail_managers("Comment posted by sketchy user (%s)" % self.user_cache.username, c.get_as_text())
         return c

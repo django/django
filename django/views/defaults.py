@@ -14,8 +14,8 @@ def shortcut(request, content_type_id, object_id):
     if not hasattr(obj, 'get_absolute_url'):
         raise Http404, "%s objects don't have get_absolute_url() methods" % content_type.name
     object_domain = None
-    if hasattr(obj, 'get_sites'):
-        site_list = obj.get_sites()
+    if hasattr(obj, 'get_site_list'):
+        site_list = obj.get_site_list()
         if site_list:
             object_domain = site_list[0].domain
     elif hasattr(obj, 'get_site'):

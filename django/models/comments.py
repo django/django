@@ -152,7 +152,7 @@ class Comment(meta.Model):
         from django.conf.settings import COMMENTS_MODERATORS_GROUP
         if user.is_superuser:
             return True
-        for g in user.get_groups():
+        for g in user.get_group_list():
             if g.id == COMMENTS_MODERATORS_GROUP:
                 return True
         return False
