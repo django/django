@@ -197,7 +197,7 @@ For example, using the Poll and Choice models from above, if you do the followin
 Then subsequent calls to ``c.get_poll()`` won't hit the database.
 
 Note that ``select_related`` follows foreign keys as far as possible. If you have the
-following models...
+following models::
 
     class Poll(meta.Model):
         ...
@@ -214,8 +214,8 @@ following models...
             ...
         )
 
-...then a call to ``singlevotes.get_object(id__exact=4, select_related=True)`` will
-cache the related choice *and* the related poll.
+then a call to ``singlevotes.get_object(id__exact=4, select_related=True)`` will
+cache the related choice *and* the related poll::
 
     >>> sv = singlevotes.get_object(id__exact=4, select_related=True)
     >>> c = sv.get_choice()        # Doesn't hit the database.
@@ -290,3 +290,4 @@ For example::
 Creating new objects
 ====================
 
+...
