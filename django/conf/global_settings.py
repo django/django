@@ -12,8 +12,9 @@ DEBUG = False
 # Whether to use the "Etag" header. This saves bandwidth but slows down performance.
 USE_ETAGS = False
 
-# people who get code error notifications
-ADMINS = (('Adrian Holovaty','aholovaty@ljworld.com'), ('Jacob Kaplan-Moss', 'jacob@lawrence.com'))
+# People who get code error notifications.
+# In the format (('Full Name', 'email@domain.com'), ('Full Name', 'anotheremail@domain.com'))
+ADMINS = ()
 
 # These IP addresses:
 #   * See debug comments, when DEBUG is true
