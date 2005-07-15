@@ -141,8 +141,7 @@ method. For example::
     class Restaurant(meta.Model):
         ...
         fields = (
-            meta.IntegerField('id', 'ID', primary_key=True,
-                rel=meta.OneToOne(places.Place, 'place', 'id')),
+            meta.OneToOneField(places.Place),
             ...
         )
 
@@ -294,7 +293,7 @@ For example::
 Changing objects
 ================
 
-Once you've retrieved an object from the database using any of the above 
+Once you've retrieved an object from the database using any of the above
 options, changing it is extremely easy.  Make changes directly to the
 objects fields, then call the object's ``save()`` method::
 

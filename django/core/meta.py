@@ -2076,6 +2076,23 @@ class ManyToManyField(Field):
         choices = self.get_choices(include_blank=False)
         return [curry(formfields.SelectMultipleField, size=min(max(len(choices), 5), 15), choices=choices)]
 
+class OneToOneField(IntegerField):
+    def __init__(self, to, to_field=None, rel_name=None, **kwargs):
+        kwargs['name'] = kwargs.get('name', 'id')
+        kwargs['verbose_name'] = kwargs.get('verbose_name', 'ID')
+        to_field = to_field or to._meta.pk.name
+        rel_name = rel_name or to._meta.object_name.lower()
+        kwargs['rel'] = OneToOne(to, rel_name, to_field,
+            num_in_admin=kwargs.pop('num_in_admin', 0),
+            edit_inline=kwargs.pop('edit_inline', False),
+            edit_inline_type=kwargs.pop('edit_inline_type', STACKED),
+            related_name=kwargs.pop('related_name', None),
+            limit_choices_to=kwargs.pop('limit_choices_to', None),
+            lookup_overrides=kwargs.pop('lookup_overrides', None),
+            raw_id_admin=kwargs.pop('raw_id_admin', False))
+        kwargs['primary_key'] = True
+        IntegerField.__init__(self, **kwargs)
+
 ####################
 # RELATIONSHIPS    #
 ####################
