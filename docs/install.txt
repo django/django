@@ -49,7 +49,9 @@ Installing the development version
 2. ``svn co http://code.djangoproject.com/svn/django/trunk/ django_src``
 3. Symlink ``django_src/django`` so that ``django`` is within your Python
    ``site-packages`` directory:
+
    ``ln -s django_src/django /usr/lib/python2.3/site-packages/django``
+
    Change ``python2.3`` to match your current Python version.
 
 When you want to update your code, just run the command ``svn update`` from
