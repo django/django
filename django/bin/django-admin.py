@@ -1,4 +1,4 @@
-#!/usr/bin/python2.3
+#!/usr/bin/env python
 from django.core import db, meta
 import django
 import os, re, sys
