@@ -194,7 +194,7 @@ Here are some tips for working with inheritance:
       for the entire site, a set of mid-level templates for each section of
       the site, and then the individual templates for each page.  This
       maximizes code reuse, and makes it easier to add items to shared 
-		content areas (like section-wide navigation).
+      content areas (like section-wide navigation).
       
     * If you need to get the content of the block from the parent template,
       the ``{{ block.super }}`` variable will do the trick.  This is useful
