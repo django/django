@@ -10,14 +10,14 @@ It's easy either way.
 Installing the official version
 ===============================
 
-1. Download the tarball of the latest official version from our ``download page``_.
+1. Download the tarball of the latest official version from our `download page`_.
 2. ``cd django-1.0.0.tar.gz``
 3. ``python setup.py install``
 
 Installing the development version
 ==================================
 
-1. Make sure you have ``Subversion``_ installed.
+1. Make sure you have Subversion_ installed.
 2. ``svn co http://code.djangoproject.com/svn/django/trunk/ django_src``
 3. Symlink ``django_src/django`` so that ``django`` is within your Python
    ``site-packages`` directory:
@@ -27,4 +27,5 @@ Installing the development version
 When you want to update your code, just run the command ``svn update`` from
 within the ``django_src`` directory.
 
-.. _`Subversion`: http://subversion.tigris.org/
+.. _`download page`: http://www.djangorproject.com/download/
+.. _Subversion: http://subversion.tigris.org/
