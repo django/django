@@ -305,9 +305,9 @@ Field Types
     ``ForeignKey`` fields take a large number of options for defining how the 
     relationship should work:
     
-    ======================   ===================================================
+    =======================  ============================================================
     Option                   Description
-    ======================   ===================================================
+    =======================  ============================================================
     ``edit_inline``          If ``True``, this related object is edited 
                              "inline" on the related object's page.  This means
                              that the object will not have its own admin 
@@ -415,7 +415,7 @@ Field Types
                              is to.  This is almost always ``id``, but if the
                              PK on the other object is named something 
                              different, this is how to indicate that.
-    ======================   ===================================================
+    =======================  ============================================================
 
 .. _`Database API reference`: http://www.djangoproject.com/documentation/db_api/    
         
