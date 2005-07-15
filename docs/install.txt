@@ -57,5 +57,5 @@ Installing the development version
 When you want to update your code, just run the command ``svn update`` from
 within the ``django_src`` directory.
 
-.. _`download page`: http://www.djangorproject.com/download/
+.. _`download page`: http://www.djangoproject.com/download/
 .. _Subversion: http://subversion.tigris.org/
