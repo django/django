@@ -2068,7 +2068,6 @@ class ManyToManyField(Field):
             num_in_admin=kwargs.pop('num_in_admin', 0),
             related_name=kwargs.pop('related_name', None),
             filter_interface=kwargs.pop('filter_interface', None),
-            get_choices_from=kwargs.pop('get_choices_from', None),
             limit_choices_to=kwargs.pop('limit_choices_to', None))
         Field.__init__(self, **kwargs)
 
@@ -2124,11 +2123,11 @@ class ManyToOne:
 
 class ManyToMany:
     def __init__(self, to, name, num_in_admin=0, related_name=None,
-        filter_interface=None, get_choices_from=None, limit_choices_to=None):
+        filter_interface=None, limit_choices_to=None):
         self.to, self.name = to._meta, name
         self.num_in_admin = num_in_admin
         self.related_name = related_name
-        self.filter_interface, self.get_choices_from = filter_interface, get_choices_from
+        self.filter_interface = filter_interface
         self.limit_choices_to = limit_choices_to or {}
         self.edit_inline = False
 
