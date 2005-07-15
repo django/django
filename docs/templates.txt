@@ -21,7 +21,8 @@ To actually be useful, a template will contain **variables**, which get replaced
 with values from the database when the template is evaluated, and **tags**,
 which control the logic of the template.
 
-Below is a minimal template that I'll be using to illustrate the parts of a template throughout this introduction::
+Below is a minimal template that I'll be using to illustrate the parts of a
+template throughout this introduction::
 
     {% extends base_generic %}
     
@@ -47,7 +48,7 @@ Variables look like this: ``{{ variable }}``.  When the template engine
 encounters a variable, it evaluates that variable and replaces the variable with
 the result.  Many variables will be structures with named attributes; you can
 "drill down" into these structures with dots (``.``), so in the above example ``
-{{ section.title }}`` will be replaces with the ``title`` attribute of the
+{{ section.title }}`` will be replaced with the ``title`` attribute of the
 ``section`` object.
 
 If you use a variable that doesn't exist, it will be silently ignored; the
@@ -61,7 +62,7 @@ Variables may be modified before being displayed by **filters**.
 What's a filter?
 ================
 
-Filters look like this: ``{{ name|lower }}``.  This display the value of the
+Filters look like this: ``{{ name|lower }}``.  This displays the value of the
 ``{{ name }}`` variable after being filtered through the ``lower`` filter which,
 as you might have guessed, lowercases the text passed through it.
 
