@@ -21,10 +21,10 @@ To actually be useful, a template will contain **variables**, which get replaced
 with values from the database when the template is evaluated, and **tags**,
 which control the logic of the template.
 
-Below is a minimal template that I'll be using to illustrate the parts of a
-template throughout this introduction::
+Below is a minimal template that illustrates the basic parts of a
+template. Each element will be explained later in this document.::
 
-    {% extends base_generic %}
+    {% extends "base_generic" %}
     
     {% block title %}{{ section.title }}{% endblock %}
     
@@ -47,8 +47,8 @@ What's a variable?
 Variables look like this: ``{{ variable }}``.  When the template engine
 encounters a variable, it evaluates that variable and replaces the variable with
 the result.  Many variables will be structures with named attributes; you can
-"drill down" into these structures with dots (``.``), so in the above example ``
-{{ section.title }}`` will be replaced with the ``title`` attribute of the
+"drill down" into these structures with dots (``.``), so in the above example 
+``{{ section.title }}`` will be replaced with the ``title`` attribute of the
 ``section`` object.
 
 If you use a variable that doesn't exist, it will be silently ignored; the
@@ -68,10 +68,9 @@ as you might have guessed, lowercases the text passed through it.
 
 We use the pipe character to apply filters to emphasize the analogy with filters
 on a water pipe: text enters one side, has some operation performed on it, and
-"flows" out the other side.  Stretching the analogy to the breaking point,
-filters may be "chained"; the output of one filter applied to the next: ``{{
-text|escape|linebreaks }}`` is a common idiom for escaping text contents and
-then converting line breaks to ``<p>`` tags.
+"flows" out the other side.  Filters may be "chained"; the output of one filter 
+applied to the next: ``{{ text|escape|linebreaks }}`` is a common idiom for 
+escaping text contents and then converting line breaks to ``<p>`` tags.
 
 Certain filters take arguments; a filter argument looks like this: ``{{
 bio|truncatewords:"30" }}``.  This will display the first 30 words of the
@@ -120,34 +119,36 @@ It's easiest to understand template inheritance by starting with an example::
     </body>
     
 This template, which we'll call ``base.html`` defines a simple HTML skeleton
-document that you might use for a simple two-column page.  Since this template
-won't actually be used directly, I've used the ``{% block %}`` tag to define the
-three blocks that child templates will fill in.  All that the ``block`` tag does
-is to signal to the template engine that a child template may override those
-portions of the template.
+document that you might use for a simple two-column page.  This template
+won't actually be used directly on any pages, but other "child" templates will 
+extend it and fill in the empty blocks with content. 
+
+I've used the ``{% block %}`` tag to define the three blocks that child templates 
+will fill in.  All that the ``block`` tag does is to signal to the template engine 
+that a child template may override those portions of the template.
 
 To use this template, I might define a child template as follows::
 
     {% extends "base" %}
     
-    {% block title %}My Amazing Blog{% endblock %}
+     {% block title %}My Amazing Blog{% endblock %}
     
-    {% block content %}
+     {% block content %}
     
-    {% for entry in blog_entries %}
-        <h2>{{ entry.title }}</h2>
-        <p>{{ entry.body }}</p>
-    {% endfor %}
+     {% for entry in blog_entries %} <h2>{{ entry.title }}</h2> <p>{{ entry.body
+    }}</p> {% endfor %}
     
-    {% endblock %}
+     {% endblock %}
     
 The ``{% extends %}`` tag is the key here; it tells the template engine that
-this template "extends" another template.  When this template is evaluated, the
-first step the template engine will perform is to locate the parent template --
-in this case, "base" (note the dropping of the ".html" extension).  At that
-point, the template engine will notice the three blocks in ``base.html``, and
-replace those blocks with the contents of the child template.  Depending on the
-value of ``blog_entries``, the output might look like::
+this template "extends" another template. When this template is evaluated,
+the first step the template engine will perform is to locate the parent
+template -- in this case, "base" (note the dropping of the ".html"
+extension).
+
+At that point, the template engine will notice the three blocks in
+``base.html``, and replace those blocks with the contents of the child template.
+Depending on the value of ``blog_entries``, the output might look like::
 
     <html>
     <head>
@@ -192,8 +193,8 @@ Here are some tips for working with inheritance:
     * We often prefer to use three-level inheritance: a single base template
       for the entire site, a set of mid-level templates for each section of
       the site, and then the individual templates for each page.  This
-      maximizes code reuse, and makes adding items to places like the 
-      section-wide navigation possible.
+      maximizes code reuse, and makes it easier to add items to shared 
+		content areas (like section-wide navigation).
       
     * If you need to get the content of the block from the parent template,
       the ``{{ block.super }}`` variable will do the trick.  This is useful
@@ -204,39 +205,40 @@ Using the built-in reference
 ============================
 
 Since Django can be used to develop any sort of site, the tags, filters, and
-variables available will be different depending on the application.  To make it
-simple to figure out what's available in a given site your admin interface
-has a complete reference of all the template goodies available to you.
+variables available will be different depending on the application. To make it
+simple to figure out what's available in a given site, the admin interface has a
+complete reference of all the template goodies available to that site.
 
 This documentation is integrated into the administration interface for your
-sites and is divided into 4 sections: tags, filters, models, and views.  The
-tags and filters sections describe all the built-in tags (in fact, the tag and
-filter references below come directly from those pages) as well as any custom
-tag or filter libraries available.
+sites and is divided into 4 sections: tags, filters, models, and views.
 
-The views page is perhaps the most valuable.  Each URL in your site has a
+The **tags** and **filters** sections describe all the built-in tags (in fact,
+the tag and filter references below come directly from those pages) as well as
+any custom tag or filter libraries available.
+
+The **views** page is perhaps the most valuable.  Each URL in your site has a
 separate entry here, and clicking on a URL will show you:
 
     * The name of the view function that generates that view.
     * A short description of what the view does.
-    * The **context**, or each variable available in the view.
+    * The **context**, or a list of variables available in the view.
     * The name of the template or templates that are used for that view.
-    
-The documentation page also has a bookmarklet that you can use to jump from any
-page to the documentation page for that view.
 
-Since most of Django revolves around database objects, the "models" section of
-the documentation page describes each type of object in the system along with all
-the fields available on that object.
+Each view documentation page also has a bookmarklet that you can use to jump
+from any page to the documentation page for that view.
 
-Take together, the documentation pages should tell you every tag, filter,
+Since most of Django revolves around database objects, the **models** section of
+the documentation page describes each type of object in the system along with
+all the fields available on that object.
+
+Taken together, the documentation pages should tell you every tag, filter,
 variable and object available to you in a given template.
 
 Custom tag and filter libraries
 ===============================
 
 As mentioned above, certain applications will provide custom tag and filter
-libraries.  To use them, use the ``{% load %}`` tag::
+libraries. To access them in a template, use the ``{% load %}`` tag::
 
     {% load comments %}
     
@@ -251,8 +253,8 @@ Built-in tag and filter reference
 
 For those without an admin site available, the reference for the stock tags and
 filters follows.  Since Django is highly customizable, the documentation
-references in your admin should be considered the final word on these
-tags/filters.
+references in your admin should be considered the final word on what
+tags and filters are available and their functions.
 
 Built-in tag reference
 ----------------------
@@ -604,7 +606,7 @@ Built-in filter reference
 ``ljust``
     Left-aligns the value in a field of a given width
     
-    Argument: field size
+    **Argument:** field size
     
 ``lower``
     Converts a string into all lowercase
@@ -631,7 +633,7 @@ Built-in filter reference
 ``rjust``
     Right-aligns the value in a field of a given width
     
-    Argument: field size
+    **Argument:** field size
     
 ``slice``
     Returns a slice of the list.
@@ -666,7 +668,7 @@ Built-in filter reference
 ``truncatewords``
     Truncates a string after a certain number of words
     
-    Argument: Number of words to truncate after
+    **Argument:** Number of words to truncate after
     
 ``unordered_list``
     Recursively takes a self-nested list and returns an HTML unordered list --
@@ -700,7 +702,7 @@ Built-in filter reference
 ``urlizetrunc``
     Converts URLs into clickable links, truncating URLs to the given character limit
     
-    Argument: Length to truncate URLs to.
+    **Argument:** Length to truncate URLs to.
     
 ``wordcount``
     Returns the number of words
@@ -708,7 +710,7 @@ Built-in filter reference
 ``wordwrap``
     Wraps words at specified line length
     
-    Argument: number of words to wrap the text at.
+    **Argument:** number of words to wrap the text at.
     
 ``yesno``
     Given a string mapping values for true, false and (optionally) None,
@@ -721,5 +723,5 @@ Built-in filter reference
     ``False``   ``"yeah,no,maybe"``     ``no``
     ``None``    ``"yeah,no,maybe"``     ``maybe``
     ``None``    ``"yeah,no"``           ``"no"`` (converts None to False
-                                        if no mapping for None is given.
+                                        if no mapping for None is given)
     ==========  ======================  ==================================
