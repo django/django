@@ -6,7 +6,7 @@ from django import templatetags
 from django.conf import settings
 from django.models.core import sites
 from django.views.decorators.cache import cache_page
-from django.core.extensions import CMSContext as Context
+from django.core.extensions import DjangoContext as Context
 from django.core.exceptions import Http404, ViewDoesNotExist
 from django.utils.httpwrappers import HttpResponse, HttpResponseRedirect
 from django.core import template, template_loader, defaulttags, defaultfilters, urlresolvers
@@ -14,18 +14,18 @@ try:
     from django.parts.admin import doc
 except ImportError:
     doc = None
-    
+
 # Exclude methods starting with these strings from documentation
 MODEL_METHODS_EXCLUDE = ('_', 'add_', 'delete', 'save', 'set_')
 
 def doc_index(request):
     if not doc:
         return missing_docutils_page(request)
-        
+
     t = template_loader.get_template('doc/index')
     c = Context(request, {})
     return HttpResponse(t.render(c))
-    
+
 def bookmarklets(request):
     t = template_loader.get_template('doc/bookmarklets')
     c = Context(request, {
@@ -36,10 +36,10 @@ def bookmarklets(request):
 def template_tag_index(request):
     if not doc:
         return missing_docutils_page(request)
-        
-    # We have to jump through some hoops with registered_tags to make sure 
+
+    # We have to jump through some hoops with registered_tags to make sure
     # they don't get messed up by loading outside tagsets
-    saved_tagset = template.registered_tags.copy(), template.registered_filters.copy()      
+    saved_tagset = template.registered_tags.copy(), template.registered_filters.copy()
     load_all_installed_template_libraries()
 
     # Gather docs
@@ -76,8 +76,8 @@ template_tag_index = cache_page(template_tag_index, 15*60)
 def template_filter_index(request):
     if not doc:
         return missing_docutils_page(request)
-        
-    saved_tagset = template.registered_tags.copy(), template.registered_filters.copy()      
+
+    saved_tagset = template.registered_tags.copy(), template.registered_filters.copy()
     load_all_installed_template_libraries()
 
     filters = []
@@ -191,7 +191,7 @@ def model_detail(request, model):
     except ImportError:
         raise Http404
     opts = model.Klass._meta
-    
+
     # Gather fields/field descriptions
     fields = []
     for field in opts.fields:
@@ -251,7 +251,7 @@ def load_all_installed_template_libraries():
                 reload(mod)
             except ImportError:
                 pass
-                
+
 def get_return_data_type(func_name):
     """Return a somewhat-helpful data type given a function name"""
     if func_name.startswith('get_'):
@@ -292,13 +292,13 @@ DATA_TYPE_MAPPING = {
     'XMLField'                  : 'XML text',
 }
 
-def get_readable_field_data_type(field):    
+def get_readable_field_data_type(field):
     return DATA_TYPE_MAPPING[field.__class__.__name__] % field.__dict__
 
 def extract_views_from_urlpatterns(urlpatterns, base=''):
     """
     Return a list of views from a list of urlpatterns.
-    
+
     Each object in the returned list is a two-tuple: (view_func, regex)
     """
     views = []

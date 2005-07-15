@@ -1,7 +1,7 @@
 from django.core import formfields, template_loader, validators
 from django.core.mail import mail_admins, mail_managers
 from django.core.exceptions import Http404, ObjectDoesNotExist
-from django.core.extensions import CMSContext as Context
+from django.core.extensions import DjangoContext as Context
 from django.models.auth import sessions
 from django.models.comments import comments, freecomments
 from django.models.core import contenttypes

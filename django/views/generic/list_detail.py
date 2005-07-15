@@ -2,7 +2,7 @@ from django import models
 from django.core import template_loader
 from django.utils.httpwrappers import HttpResponse
 from django.core.xheaders import populate_xheaders
-from django.core.extensions import CMSContext as Context
+from django.core.extensions import DjangoContext as Context
 from django.core.paginator import ObjectPaginator, InvalidPage
 from django.core.exceptions import Http404, ObjectDoesNotExist
 

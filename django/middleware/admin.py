@@ -1,6 +1,6 @@
 from django.utils import httpwrappers
 from django.core import template_loader
-from django.core.extensions import CMSContext as Context
+from django.core.extensions import DjangoContext as Context
 from django.models.auth import sessions, users
 from django.views.registration import passwords
 import base64, md5

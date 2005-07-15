@@ -1,6 +1,6 @@
 from django.core import template_loader
 from django.core.exceptions import Http404, ObjectDoesNotExist
-from django.core.extensions import CMSContext as Context
+from django.core.extensions import DjangoContext as Context
 from django.models.core import sites
 from django.utils import httpwrappers
 

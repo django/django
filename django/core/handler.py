@@ -77,8 +77,8 @@ class CoreHandler:
 
     def get_request(self, req):
         "Returns an HttpRequest object for the given mod_python req object"
-        from django.core.extensions import CMSRequest
-        return CMSRequest(req)
+        from django.core.extensions import DjangoRequest
+        return DjangoRequest(req)
 
     def get_response(self, path, request):
         "Returns an HttpResponse object for the given HttpRequest"

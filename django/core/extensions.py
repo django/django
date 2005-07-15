@@ -1,13 +1,15 @@
-"Specialized Context and ModPythonRequest classes for our CMS. Use these!"
+"Specialized Context and ModPythonRequest classes for Django. Use these!"
 
 from django.core.template import Context
 from django.utils.httpwrappers import ModPythonRequest
 from django.conf.settings import DEBUG, INTERNAL_IPS
 from pprint import pformat
 
-class CMSContext(Context):
-    """This subclass of template.Context automatically populates 'user' and
-    'messages' in the context. Use this."""
+class DjangoContext(Context):
+    """
+    This subclass of template.Context automatically populates 'user' and
+    'messages' in the context.
+    """
     def __init__(self, request, dict={}):
         Context.__init__(self, dict)
         self['user'] = request.user
@@ -37,13 +39,13 @@ class PermWrapper:
     def __getitem__(self, module_name):
         return PermLookupDict(self.user, module_name)
 
-class CMSRequest(ModPythonRequest):
-    "A special version of ModPythonRequest with support for CMS sessions"
+class DjangoRequest(ModPythonRequest):
+    "A special version of ModPythonRequest with support for Django sessions."
     def __init__(self, req):
         ModPythonRequest.__init__(self, req)
 
     def __repr__(self):
-        return '<CMSRequest\npath:%s,\nGET:%s,\nPOST:%s,\nCOOKIES:%s,\nMETA:%s,\nuser:%s>' % \
+        return '<DjangoRequest\npath:%s,\nGET:%s,\nPOST:%s,\nCOOKIES:%s,\nMETA:%s,\nuser:%s>' % \
             (self.path, pformat(self.GET), pformat(self.POST), pformat(self.COOKIES),
             pformat(self.META), pformat(self.user))
 
@@ -77,3 +79,7 @@ class CMSRequest(ModPythonRequest):
 
     session = property(_get_session, _set_session)
     user = property(_get_user, _set_user)
+
+# For legacy purposes.
+CMSContext = DjangoContext
+CMSRequest = DjangoRequest

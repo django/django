@@ -1,6 +1,6 @@
 from django.core import template_loader
 from django.core.exceptions import Http404
-from django.core.extensions import CMSContext as Context
+from django.core.extensions import DjangoContext as Context
 from django.models.core import flatfiles
 from django.utils.httpwrappers import HttpResponse
 from django.conf.settings import SITE_ID

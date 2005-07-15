@@ -2,7 +2,7 @@
 
 from django.core import formfields, meta, template_loader
 from django.core.exceptions import Http404, ObjectDoesNotExist, PermissionDenied
-from django.core.extensions import CMSContext as Context
+from django.core.extensions import DjangoContext as Context
 from django.models.auth import log
 from django.utils.html import strip_tags
 from django.utils.httpwrappers import HttpResponse, HttpResponseRedirect

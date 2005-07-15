@@ -1,5 +1,5 @@
 from django.core import formfields, template_loader, validators
-from django.core.extensions import CMSContext as Context
+from django.core.extensions import DjangoContext as Context
 from django.models.auth import users
 from django.views.decorators.auth import login_required
 from django.utils.httpwrappers import HttpResponse, HttpResponseRedirect

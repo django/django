@@ -1,6 +1,6 @@
 from django.core import formfields, template_loader, validators
 from django.core import template
-from django.core.extensions import CMSContext as Context
+from django.core.extensions import DjangoContext as Context
 from django.utils.httpwrappers import HttpResponse
 from django.models.core import sites
 from django.conf import settings

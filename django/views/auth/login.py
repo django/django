@@ -1,6 +1,6 @@
 from django.parts.auth.formfields import AuthenticationForm
 from django.core import formfields, template_loader
-from django.core.extensions import CMSContext as Context
+from django.core.extensions import DjangoContext as Context
 from django.models.auth import sessions
 from django.models.core import sites
 from django.utils.httpwrappers import HttpResponse, HttpResponseRedirect

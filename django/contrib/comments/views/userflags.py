@@ -1,5 +1,5 @@
 from django.core import template_loader
-from django.core.extensions import CMSContext as Context
+from django.core.extensions import DjangoContext as Context
 from django.core.exceptions import Http404
 from django.models.comments import comments, moderatordeletions, userflags
 from django.views.decorators.auth import login_required
