@@ -1,6 +1,6 @@
-===============
-Django overview
-===============
+==================
+Django at a glance
+==================
 
 Because Django was developed in a fast-paced newsroom environment, it was
 designed to make common Web-development tasks fast and easy. Here's an informal
@@ -17,7 +17,7 @@ Design your model
 =================
 
 Start by describing your database layout in Python code. Django's data-model API
-offers many rich ways of representing your models — so far, it's been
+offers many rich ways of representing your models -- so far, it's been
 solving two years' worth of database-schema problems. Here's a quick example::
 
     class Reporter(meta.Model):
@@ -127,7 +127,7 @@ A dynamic admin interface: It's not just scaffolding -- it's the whole house
 ============================================================================
 
 Once your models are defined, Django can automatically create an administrative
-interface — a Web site that lets authenticated users add, change and
+interface -- a Web site that lets authenticated users add, change and
 delete objects. It's as easy as adding an extra admin attribute to your model
 classes::
 
@@ -183,9 +183,9 @@ requested URL. (If none of them matches, Django calls a special 404 view.) This
 is blazingly fast, because the regular expressions are compiled at load time.
 
 Once one of the regexes matches, Django imports and calls the given view, which
-is a simple Python function. Each view gets passed a request object —
+is a simple Python function. Each view gets passed a request object --
 which contains request metadata and lets you access GET and POST data as simple
-dictionaries — and the values captured in the regex, via keyword
+dictionaries -- and the values captured in the regex, via keyword
 arguments.
 
 For example, if a user requested the URL "/articles/2005/05/39323/", Django
@@ -282,14 +282,14 @@ Here's what the "base" template might look like::
 
 Simplistically, it defines the look-and-feel of the site (with the site's logo),
 and provides "holes" for child templates to fill. This makes a site redesign as
-easy as changing a single file — the base template.
+easy as changing a single file -- the base template.
 
 Note that you don't have to use Django's template system if you prefer another
 system. While Django's template system is particularly well-integrated with
 Django's model layer, nothing forces you to use it. For that matter, you don't
 have to use Django's API, either. You can use another database abstraction
 layer, you can read XML files, you can read files off disk, or anything you
-want. Each piece of Django — models, views, templates — is decoupled
+want. Each piece of Django -- models, views, templates -- is decoupled
 from the next.
 
 This is just the surface
@@ -301,7 +301,7 @@ features:
     * A caching framework that integrates with memcached or other backends.
     * An RSS framework that makes creating RSS feeds as easy as writing a 
       small Python class.
-    * More sexy automatically-generated admin features — this overview barely
+    * More sexy automatically-generated admin features -- this overview barely
       scratched the surface
 
 The next obvious steps are for you to download Django, read the documentation
