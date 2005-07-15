@@ -127,7 +127,7 @@ def get_sql_delete(mod):
             else:
                 output.append("DROP TABLE %s_%s;" % (opts.db_table, f.name))
     output.append("DELETE FROM packages WHERE label = '%s';" % mod._MODELS[0]._meta.app_label)
-    return output
+    return output[::-1] # Reverse it, to deal with table dependencies.
 get_sql_delete.help_doc = "Prints the DROP TABLE SQL statements for the given app(s)."
 get_sql_delete.args = APP_ARGS
 
@@ -339,17 +339,6 @@ def startapp(app_name, directory):
     project_dir = os.path.normpath(os.path.join(directory, '../'))
     project_name = os.path.basename(project_dir)
     _start_helper('app', app_name, directory, project_name)
-    settings_file = os.path.join(project_dir, 'settings/main.py')
-    if os.path.exists(settings_file):
-        try:
-            settings_contents = open(settings_file, 'r').read()
-            fp = open(settings_file, 'w')
-        except IOError:
-            pass
-        else:
-            settings_contents = re.sub(r'(?s)\b(INSTALLED_APPS\s*=\s*\()(.*?)\)', "\\1\n    '%s',\\2)" % app_name, settings_contents)
-            fp.write(settings_contents)
-            fp.close()
 startapp.help_doc = "Creates a Django app directory structure for the given app name in the current directory."
 startapp.args = "[appname]"
 
