@@ -95,7 +95,7 @@ The admin interface
 ===================
 
 The dynamically-generated admin site is ugly! How can I change it?
----------------------------------------------
+------------------------------------------------------------------
 
 We think it's very purty, but if you don't agree, you can modify the admin site's
 presentation by editing the CSS stylesheet and/or associated image files. The
