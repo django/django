@@ -1,6 +1,6 @@
 # Django settings for {{ app_name }} project.
 
-DEBUG = False
+DEBUG = True
 
 ADMINS = (
     # ('Your Name', 'your_email@domain.com'),
