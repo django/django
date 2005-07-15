@@ -14,8 +14,13 @@ concept to public launch.  Django was designed to not only allow us to
 build Web applications quickly, but to allow us to build them right.
 
 Django would not be possible without a whole host of open-source projects --
-Apache, Python, and PostgreSQL to name a few -- and we're thrilled to be
+`Apache`_, `Python`_, and `PostgreSQL`_ to name a few -- and we're thrilled to be
 able to give something back to the open-source community.
+
+.. _Apache: http://httpd.apache.org/
+.. _Python: http://www.python.org/
+.. _PostgreSQL: http://www.postgresql.org/
+
 
 What does "Django" mean, and how do you pronounce it?
 -----------------------------------------------------
