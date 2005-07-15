@@ -1,4 +1,4 @@
-# Django settings for {{ app_name }} project.
+# Django settings for {{ project_name }} project.
 
 DEBUG = True
 
