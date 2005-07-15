@@ -2,7 +2,11 @@
 Database API reference
 ======================
 
-XXX INTRO HERE XXX
+Once you've created your `data models`_, you'll need to lookup data from the
+database.  This document explains the database abstraction API derived from the
+models, and how to create, retrieve, and update objects.
+
+.. _`data models`: http://www.djangoproject.com/documentation/model_api/
 
 Throughout this reference, we'll refer to the following Poll application::
 
@@ -286,6 +290,18 @@ For example::
 ...translates (roughly) into the following SQL:
 
     SELECT * FROM polls_polls WHERE question LIKE 'Who%' AND id IN (3, 4, 5, 20);
+
+Changing objects
+================
+
+Once you've retrieved an object from the database using any of the above 
+options, changing it is extremely easy.  Make changes directly to the
+objects fields, then call the object's ``save()`` method::
+
+    >>> p = polls.get_object(id__exact=15)
+    >>> p.slug = "new_slug"
+    >>> p.pub_date = datetime.datetime.now()
+    >>> p.save()
 
 Creating new objects
 ====================

@@ -2,16 +2,20 @@
 Django FAQ
 ==========
 
-The admin site is ugly!  How can I change it?
----------------------------------------------
+General questions
+=================
 
-We think it's very purty, but if you don't agree you can modify the admin site's
-presentation by editing the CSS stylesheet and/or associated image files.  The 
-site is built using semantic HTML, so any changes you'd like to make should be
-possible by editing the CSS stylesheet.  We've got a `guide to the CSS used 
-in the admin`_ to get you started.
+Why does this project exist?
+----------------------------
 
-.. _`guide to the CSS used in the admin`: http://www.djangoproject.com/FIXME/
+Django grew from a very practical need: in our fast-paced newsroom, we often
+have only a matter of hours to take a complicated web application from
+concept to public launch.  Django was designed to not only allow us to
+build web applications quickly, but to allow us to build them right.
+
+Django would not be possible without a whole host of open-source projects --
+Apache, Python, and PostgresSQL to name a few -- and we're thrilled to be
+able to give something back to the open source community.
 
 How do you pronounce "Django"?
 ------------------------------
@@ -27,23 +31,66 @@ We've been using Django for almost two years.  Sites built on Django have
 weathered traffic spikes of over one million hits an hour, and at least
 one slashdotting.  Yes; it's quite stable.
 
+Does Django scale?
+------------------
+
+Yes.  Compared to development time, hardware is cheap, and so Django is
+designed to take advantage of as much hardware as you can throw at it.
+Django ships with clean separation of the database layer from the 
+application layer and a simple yet powerful `cache framework`_.
+
+.. _`cache framework`: http://www.djangoproject.com/documentation/cache/
+
 Who's behind this?
 ------------------
 
 `Adrian Holovaty`_
-    XXX
-    
+    Adrian is a gypsy-jazz virtuoso, an amateur Beatles historian and a proud
+    Chicagoan. He's also a pretty decent programmer, with a knack for whipping
+    data into shape and putting it to work for the good of his fellow man.
+    Adrian is the lead developer at World Online and the man behind the code at
+    chicagocrime.org.
+
 `Simon Willison`_
     XXX
 
 `Jacob Kaplan-Moss`_
-    XXX
+    Jacob is a whipper-snapper from California who spends equal time coding and
+    cooking. He does Web development for World Online and actively hacks on
+    various cool side projects. He's contributed to the Python-ObjC bindings and
+    was the first guy to figure out how to write Tivo apps in Python. Lately
+    he's been messing with Python on the PSP.
 
-`Wilson Miner`_.
-    XXX
-    
+`Wilson Miner`_
+    Wilson's design-fu makes us all look like rock stars. When not sneaking
+    into apartment complex swimming pools  he is the Commercial Development
+    Director for World Online, which means he makes the money that pays all our
+    paychecks.  
+        
 .. _`Adrian Holovaty`: http://www.holovaty.com/
 .. _`Simon Willison`: http://simon.incutio.com/
 .. _`Jacob Kaplan-Moss`: http://www.jacobian.org/
 .. _`Wilson Miner`: http://www.wilsonminer.com/live/
+
+Using Django
+============
+
+How do I get started?
+---------------------
+
+...
+
+The admin interface
+===================
+
+The admin site is ugly!  How can I change it?
+---------------------------------------------
+
+We think it's very purty, but if you don't agree you can modify the admin site's
+presentation by editing the CSS stylesheet and/or associated image files.  The 
+site is built using semantic HTML, so any changes you'd like to make should be
+possible by editing the CSS stylesheet.  We've got a `guide to the CSS used 
+in the admin`_ to get you started.
+
+.. _`guide to the CSS used in the admin`: http://www.djangoproject.com/documentation/admin_css/
 

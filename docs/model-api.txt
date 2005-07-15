@@ -2,141 +2,117 @@
 Model reference
 ===============
 
-XXX INTRO XXX
+Django's models are the bread and butter of the framework.  There's a huge 
+array of options available to you when defining your data models; this 
+document explains all of them.
 
 Options for models
 ==================
 
-A list of all possible options for a model object follows.  Although there's a wide
-array of possible options, only ``fields`` is required.
+A list of all possible options for a model object follows.  Although there's a
+wide array of possible options, only ``fields`` is required.
 
 ``admin``
----------
-
-A ``meta.Admin`` object; see `Admin options`_.  If this field isn't given,
-the object will not have an admin interface.
-
+    A ``meta.Admin`` object; see `Admin options`_.  If this field isn't given,
+    the object will not have an admin interface.
+    
 ``db_table``
-------------
-
-The name of the database table to use for the module::
-
-    db_table = "pizza_orders"
+    The name of the database table to use for the module::
     
-If not given, this will use ``app_label + '_' + module_name``.
-
+        db_table = "pizza_orders"
+        
+    If not given, this will use ``app_label + '_' + module_name``.
+    
 ``exceptions``
---------------
-
-Names of extra exception subclasses to include in the generated module.
-These exceptions are available from instance methods and from module-level
-methods::
+    Names of extra exception subclasses to include in the generated module.
+    These exceptions are available from instance methods and from module-level
+    methods::
+        
+        exceptions = ("DisgustingToppingsException", "BurntCrust")
     
-    exceptions = ("DisgustingToppingsException", "BurntCrust")
-
 ``fields``
-----------
-
-A list of field objects; see `Field objects`_.  For example::
-
-    fields = (
-        meta.CharField('customer_name', 'customer name', maxlength=15),
-        meta.BooleanField('use_extra_cheese', 'use extra cheese'),
-        meta.IntegerField('customer_type', 'customer type', choices=CUSTOMER_TYPE_CHOICES),
-        ...
-    )
+    A list of field objects; see `Field objects`_.  For example::
     
+        fields = (
+            meta.CharField('customer_name', 'customer name', maxlength=15),
+            meta.BooleanField('use_extra_cheese', 'use extra cheese'),
+            meta.IntegerField('customer_type', 'customer type', choices=CUSTOMER_TYPE_CHOICES),
+            ...
+        )
+        
 ``get_latest_by``
------------------
-
-The name of a date or datetime field; if given, the module will have a
-``get_latest()`` function which fetches the "latest" object in terms of
-that field::
-
-    get_latest_by = "order_date"
-
+    The name of a date or datetime field; if given, the module will have a
+    ``get_latest()`` function which fetches the "latest" object in terms of
+    that field::
+    
+        get_latest_by = "order_date"
+    
 ``module_constants``
---------------------
-
-A dict of name/values to use as extra module-level constants::
-
-    module_constants = {
-        'MEAT_TYPE_PEPPERONI' : 1,
-        'MEAT_TYPE_SAUSAGE' : 2,
-    }
-
+    A dict of name/values to use as extra module-level constants::
+    
+        module_constants = {
+            'MEAT_TYPE_PEPPERONI' : 1,
+            'MEAT_TYPE_SAUSAGE' : 2,
+        }
+    
 ``module_name``
----------------
-
-The name of the module::
-
-    module_name = "pizza_orders"
+    The name of the module::
     
-If not given this will use a lowercased version of the class name.
-
+        module_name = "pizza_orders"
+        
+    If not given this will use a lowercased version of the class name.
+    
 ``order_with_respect_to``
--------------------------
-
-Marks this object as "orderable" with respect to the given field.  This is
-almost always used with related objects to allow them to be ordered with
-respect to a parent object.  For example, if a ``PizzaToppping`` relates to
-a ``Pizza`` object, you might use::
-
-    order_with_respect_to = 'pizza_id'
-
-to allow the toppings to be ordered with respect to the associated pizza.
-
+    Marks this object as "orderable" with respect to the given field.  This is
+    almost always used with related objects to allow them to be ordered with
+    respect to a parent object.  For example, if a ``PizzaToppping`` relates to
+    a ``Pizza`` object, you might use::
+    
+        order_with_respect_to = 'pizza_id'
+    
+    to allow the toppings to be ordered with respect to the associated pizza.
+    
 ``ordering``
-------------
-
-The default ordering for tho object::
-
-    ordering = (('order_date', 'DESC'),)
+    The default ordering for tho object::
     
-This is a tuple of 2-tuples; each 2-tuple is ``(field_name, ordering_type)``
-where ordering_type is either ``"ASC"`` or ``"DESC"``.  You may also use the
-magic ``(None, "RANDOM")`` ordering tuple for random ordering.
-
+        ordering = (('order_date', 'DESC'),)
+        
+    This is a tuple of 2-tuples; each 2-tuple is ``(field_name, ordering_type)``
+    where ordering_type is either ``"ASC"`` or ``"DESC"``.  You may also use the
+    magic ``(None, "RANDOM")`` ordering tuple for random ordering.
+    
 ``permissions``
----------------
-
-Extra permissions to enter into the permissions table when creating this
-object.  A add, delete, and change permission is automatically created for
-each object; this option specifies extra permissions::
-
-    permissions = (("may_delivier_pizzas", "Can deliver pizzas"),)
+    Extra permissions to enter into the permissions table when creating this
+    object.  A add, delete, and change permission is automatically created for
+    each object; this option specifies extra permissions::
     
-This is a list of 2-tuples of 
-``(permission_code, human_readable_permission_name)``.
-
+        permissions = (("may_delivier_pizzas", "Can deliver pizzas"),)
+        
+    This is a list of 2-tuples of 
+    ``(permission_code, human_readable_permission_name)``.
+    
 ``unique_together``
--------------------
-
-Sets of field names that, taken together, must be unique::
-
-    unique_together = (("driver_id", "restaurant_id"),)
+    Sets of field names that, taken together, must be unique::
     
-This is a list of lists of fields that must be unique when considered
-together.
-
+        unique_together = (("driver_id", "restaurant_id"),)
+        
+    This is a list of lists of fields that must be unique when considered
+    together.
+    
 ``verbose_name``
-----------------
-
-A human-readable name for the object, singular::
-
-    verbose_name = "pizza"
-
-If not given, this will use a munged version of the class name:
-``CamelCase`` becomes ``camel case``.
-
+    A human-readable name for the object, singular::
+    
+        verbose_name = "pizza"
+    
+    If not given, this will use a munged version of the class name:
+    ``CamelCase`` becomes ``camel case``.
+    
 ``verbose_name_plural``
------------------------
-
-The plural name for the object::
-
-    verbose_name_plural = "stories"
-
-If not given, ``verbose_name + "s"`` will automatically be used.
+    The plural name for the object::
+    
+        verbose_name_plural = "stories"
+    
+    If not given, ``verbose_name + "s"`` will automatically be used.
     
 Field objects
 =============
@@ -249,256 +225,91 @@ options that are common to all field types.  These options are:
 
 Field Types
 -----------
-
+    
 ``AutoField``
-`````````````
-
-An ``IntegerField`` that automatically increments.  You usually won't need to
-use this directly; a primary key field will automatically be added to your 
-model if you don't specify otherwise.  That automatically added field is::
-
-    meta.AutoField('id', 'ID', primary_key=True)
-
+    An ``IntegerField`` that automatically increments.  You usually won't need to
+    use this directly; a primary key field will automatically be added to your 
+    model if you don't specify otherwise.  That automatically added field is::
+    
+        meta.AutoField('id', 'ID', primary_key=True)
+    
 ``BooleanField``
-````````````````
-
-A true/false field.
-
+    A true/false field.
+    
 ``CharField``
-`````````````
-
-A text field. These are displayed in the admin as single-line text inputs, so 
-for large amounts of text use a ``TextField``.
-
-``CharField``s have an extra required argument: ``maxlength``; the maximum 
-length (in characters) of the field.
-
+    A text field. These are displayed in the admin as single-line text inputs, so 
+    for large amounts of text use a ``TextField``.
+    
+    ``CharField``s have an extra required argument: ``maxlength``; the maximum 
+    length (in characters) of the field.
+    
 ``CommaSeparatedIntegerField``
-``````````````````````````````
-
-A field of integers separated by commas.
-
+    A field of integers separated by commas.
+    
 ``DateField``
-`````````````
-
-A, um, date field.  Has a few extra optional options:
-
-    ======================  ===================================================
-    Option                  Description
-    ======================  ===================================================
-    ``auto_now``            Automatically set the field to now every time the
-                            object is saved.  Useful for "last-modified"
-                            timestamps.
-                            
-    ``auto_now_add``        Automatically set the field to now when the object
-                            is first created.  Useful for creation timestamps.
-    ======================  ===================================================
-
+    A, um, date field.  Has a few extra optional options:
+    
+        ======================  ===================================================
+        Option                  Description
+        ======================  ===================================================
+        ``auto_now``            Automatically set the field to now every time the
+                                object is saved.  Useful for "last-modified"
+                                timestamps.
+                                
+        ``auto_now_add``        Automatically set the field to now when the object
+                                is first created.  Useful for creation timestamps.
+        ======================  ===================================================
+    
 ``DateTimeField``
-`````````````````
-
-A date and time field.  Takes the same extra options as ``DateField``.
-
-
+    A date and time field.  Takes the same extra options as ``DateField``.
+    
+    
 ``EmailField``
-``````````````
-
-A ``CharField`` that checks that the value is a valid email address.  Because
-validating email addresses can be tricky, this is a pretty loose test.
-
+    A ``CharField`` that checks that the value is a valid email address.  Because
+    validating email addresses can be tricky, this is a pretty loose test.
+    
 ``FileField``
-`````````````
-
-A file-upload field.  Takes on additional option, ``upload_to`` which is
-a path to upload the file to.  This path may contain `strftime formatting`_
-which will be replaced by the date/time of the file upload (so that uploaded
-files don't fill up the given directory).
-
-.. _`strftime formatting`: http://docs.python.org/lib/module-time.html#l2h-1941
-
+    A file-upload field.  Takes on additional option, ``upload_to`` which is
+    a path to upload the file to.  This path may contain `strftime formatting`_
+    which will be replaced by the date/time of the file upload (so that uploaded
+    files don't fill up the given directory).
+    
+    .. _`strftime formatting`: http://docs.python.org/lib/module-time.html#l2h-1941
+    
 ``FloatField``
-``````````````
-
-A floating-point number.  Has two additional required options:
-
-    ======================  ===================================================
-    Option                  Description
-    ======================  ===================================================
-    ``max_digits``          The maximum number of digits allowed in the number.
+    A floating-point number.  Has two additional required options:
     
-    ``decimal_places``      The number of decimal places to store with the
-                            number
-    ======================  ===================================================
-
-For example, to store numbers up to 999 with a resolution of 2 decimal places,
-you'd use::
-
-    meta.FloatField(..., max_digits=5, decimal_places=2)
-
-And to store numbers up to one million with a resolution of 10 decimal places::
-
-    meta.FloatField(..., max_digits=19, decimal_places=10)
-
+        ======================  ===================================================
+        Option                  Description
+        ======================  ===================================================
+        ``max_digits``          The maximum number of digits allowed in the number.
+        
+        ``decimal_places``      The number of decimal places to store with the
+                                number
+        ======================  ===================================================
+    
+    For example, to store numbers up to 999 with a resolution of 2 decimal places,
+    you'd use::
+    
+        meta.FloatField(..., max_digits=5, decimal_places=2)
+    
+    And to store numbers up to one million with a resolution of 10 decimal places::
+    
+        meta.FloatField(..., max_digits=19, decimal_places=10)
+    
 ``ForeignKey``
-``````````````
-
-A many-to-one relationship to the primary key in another object.  So, to give a
-``Topping`` object a many-to-one relationship to ``Pizza`` (i.e. there are 
-many toppings on a pizza)::
-
-    meta.ForeignKey(Pizza)
+    A many-to-one relationship to the primary key in another object.  So, to give a
+    ``Topping`` object a many-to-one relationship to ``Pizza`` (i.e. there are 
+    many toppings on a pizza)::
     
-This is equivalent to (but much clearer than)::
-
-    meta.IntegerField('pizza_id', 'pizza', rel=meta.ManyToOne(Pizza, 'pizza', 'id'))
+        meta.ForeignKey(Pizza)
+                
+    ``ForeignKey`` fields take a large number of options for defining how the 
+    relationship should work:
     
-``ForeignKey`` fields take all the arguments of ``ManyToOne`` relations (see
-Relationships_, below for what those arguments are), plus the following extra
-options:
-
-    ======================  ===================================================
-    Option                  Description
-    ======================  ===================================================
-    ``to_field``            The field on the related object that the relation
-                            is to.  This is almost always ``id``, but if the
-                            PK on the other object is named something 
-                            different, this is how to indicate that.
-                            
-    ``rel_name``            The name of the relation.  In the above exmaple,
-                            this would default to 'pizza' (so that the 
-                            ``Toppings`` object would have a ``get_pizza()``
-                            function; if you set ``rel_name`` to "pie", then
-                            the function would be called ``get_pie()`` and the
-                            field name would be ``pie_id``.
-    ======================  ===================================================
-
-    
-``ImageField``
-``````````````
-
-Like a ``FieldField``, but validates that the uploaded object is a valid 
-image.  Has two extra optional arguments, ``height_field`` and ``width_field``
-which, if set, will be auto-populated with the height and width of the image.
-
-``IntegerField``
-````````````````
-
-An integer, surprisingly.
-
-``IPAddressField``
-``````````````````
-
-An IP address, in string format (i.e. "24.124.1.30").
-
-``ManyToManyField``
-```````````````````
-
-XXX document once Adrian reworks this XXX
-
-``NullBooleanField``
-````````````````````
-
-Like a ``BooleanField``, but allows ``NULL`` as one of the options.  Use this
-instead of a ``BooleanField`` with ``null=True`` .
-
-``PhoneNumberField``
-````````````````````
-
-Validates that the value is a valid phone number.
-
-``PositiveIntegerField``
-````````````````````````
-
-Like an ``IntegerField``, but must be positive.
-
-``PositiveSmallIntegerField``
-`````````````````````````````
-
-Like a ``PositiveIntegerField``, but only allows values below 32767.
-
-
-``SlugField``
-`````````````
-
-A "slug" suitable for parts of a URL; only allows alpha-numeric characters and
-underscores.  
-
-Implies ``maxlength=50`` and ``db_index=True``.
-
-Accepts an extra option, ``prepopulate_from`` which is a list of fields from
-which to auto-populate the slug.
-
-``SmallIntegerField``
-`````````````````````
-
-Like an ``IntegerField``, but must be between -32768 and 32767.
-
-``TextField``
-`````````````
-
-A large text field (``<textarea>`` in HTML).
-
-``TimeField``
-`````````````
-
-A time.  Accepts the same auto-population options as ``DateField`` and
-``DateTimeField``.
-
-``URLField``
-````````````
-
-A field for a URL.  If the ``verify_exists`` option is ``True``, the URL given
-will be checked for existence (i.e. actually loads and doesn't give a 404 
-response).
-
-``USStateField``
-````````````````
-
-A US state.
-
-``XMLField``
-````````````
-
-A field containing XML.  Takes one required argument, ``schema_path`` which
-is the path to a RelaxNG_ scheme against which to validate the field.
-
-.. _RelaxNG: http://www.relaxng.org/
-
-Relationships
-=============
-
-The ``rel`` option for a field marks that field as being a relationship to
-another object.  For the most common cases, using ``ForeignKey`` or
-``ManyToManyField`` is best; these "shortcuts" encapsulate best practices
-in database design (i.e. using integer foreign keys into another table's
-primary key).  If you do need to explicitly create a relation, these relation
-objects should be used as the value of the ``rel`` attribute.  Also, all
-the options for ``ManyToOne`` are allowed as options for ``ForeignKey``, 
-and the same goes for ``ManyToMany`` and ``ManyToManyField``.
-
-``ManyToOne``
--------------
-
-Signifies a many-to-one relation: if a ``Pizza`` can have many ``Topping``s,
-then the ``Topping`` object should have a ``ManyToOne`` relation to ``Pizza``.
-
-The three positional arguments to ``ManyToMany`` are:
-
-    * The class to relate to (i.e. ``Pizza`` or ``core.Site``).
-    
-    * The name of the relation (i.e. ``pizza``, or ``site``); this is used in
-      the generated functions for managing that relationship (i.e. 
-      ``get_pizza`` and ``get_site``).
-      
-    * The name of the field the relationship "points" to.  In most cases this
-      will be "id", but if the other object's PK isn't named "id", this
-      must match the PK field name.
-      
-The keyword arguments accepted by ``ManyToOne`` are:
-
-    =======================  ==================================================
+    ======================   ===================================================
     Option                   Description
-    =======================  ==================================================
+    ======================   ===================================================
     ``edit_inline``          If ``True``, this related object is edited 
                              "inline" on the related object's page.  This means
                              that the object will not have its own admin 
@@ -511,7 +322,7 @@ The keyword arguments accepted by ``ManyToOne`` are:
                              ``meta.STACKED``.
                              
     ``limit_choices_to``     A dictionary of lookup arguments and values (see
-                             the `Dictionary API reference`_) to limit choices
+                             the `Database API reference`_) to limit choices
                              of this object to.  Use this along with 
                              ``meta.LazyDate`` to limit choices of objects
                              by date, for example::
@@ -523,8 +334,6 @@ The keyword arguments accepted by ``ManyToOne`` are:
                              chosen.
                              
                              Not compatible with ``edit_inline``.
-    
-    ``lookup_overrides``     XXX FIXME XXX
     
     ``max_num_in_admin``     For inline-edited objects, this is the maximum
                              number of related objects to display in the admin.
@@ -556,6 +365,13 @@ The keyword arguments accepted by ``ManyToOne`` are:
                              rows to make a menu practical.
                              
                              Not used with ``edit_inline``.
+                             
+    ``rel_name``             The name of the relation.  In the above exmaple,
+                             this would default to 'pizza' (so that the 
+                             ``Toppings`` object would have a ``get_pizza()``
+                             function; if you set ``rel_name`` to "pie", then
+                             the function would be called ``get_pie()`` and the
+                             field name would be ``pie_id``.
     
     ``related_name``         The name to use for the relation from the related
                              object back to this one.  For example, when if
@@ -596,37 +412,74 @@ The keyword arguments accepted by ``ManyToOne`` are:
                              which would give the category objects methods 
                              named ``get_primary_story_list()`` and 
                              ``get_secondary_story_list()``.
+                             
+    ``to_field``             The field on the related object that the relation
+                             is to.  This is almost always ``id``, but if the
+                             PK on the other object is named something 
+                             different, this is how to indicate that.
     =======================  ==================================================
 
-.. _`Dictionary API reference`: http://www.djangoproject.com/FIXME/
-
-``ManyToMany``
---------------
-
-XXX will this still exist given the changes to ManyToManyField? XXX
-
-``OneToOne``
-------------
-
-Signifies a one-to-one relationship.  This is most useful on the primary key
-of an object when that object "extends" another object in some way.  
-
-For example, if you are building a database of "places", you would build pretty
-standard stuff like address, phone number, etc. in the database.  If you then
-wanted to build a database of restaurants on top of the places, instead of
-repeating yourself and replicating those fields in the restaurants object, you
-could make ``Restaurant`` have a ``OneToOne`` relation to ``Place`` (since
-a restaurant "is-a" place).
-
-This has a few repercussions in the admin interface:
-
-    * No selection interface is displayed on ``Restaurant`` pages; there will
-      be one (and only one) ``Restaurant`` for each place.
-      
-    * On the ``Restaurant`` change list, every single ``Place`` -- weather it
-      has an associated ``Restaurant`` or not -- will be displayed.  Adding
-      a ``Restaurant`` to a ``Place`` just means filling out the required
-      ``Restaurant`` fields.
+.. _`Database API reference`: http://www.djangoproject.com/documentation/db_api/    
+        
+``ImageField``
+    Like a ``FieldField``, but validates that the uploaded object is a valid 
+    image.  Has two extra optional arguments, ``height_field`` and ``width_field``
+    which, if set, will be auto-populated with the height and width of the image.
+    
+``IntegerField``
+    An integer, surprisingly.
+    
+``IPAddressField``
+    An IP address, in string format (i.e. "24.124.1.30").
+    
+``ManyToManyField``
+    XXX document once Adrian reworks this XXX
+    
+``NullBooleanField``
+    Like a ``BooleanField``, but allows ``NULL`` as one of the options.  Use this
+    instead of a ``BooleanField`` with ``null=True`` .
+    
+``PhoneNumberField``
+    Validates that the value is a valid phone number.
+    
+``PositiveIntegerField``
+    Like an ``IntegerField``, but must be positive.
+    
+``PositiveSmallIntegerField``
+    Like a ``PositiveIntegerField``, but only allows values below 32767.
+    
+``SlugField``
+    A "slug" suitable for parts of a URL; only allows alpha-numeric characters and
+    underscores.  
+    
+    Implies ``maxlength=50`` and ``db_index=True``.
+    
+    Accepts an extra option, ``prepopulate_from`` which is a list of fields from
+    which to auto-populate the slug.
+    
+``SmallIntegerField``
+    Like an ``IntegerField``, but must be between -32768 and 32767.
+    
+``TextField``
+    A large text field (``<textarea>`` in HTML).
+    
+``TimeField``
+    A time.  Accepts the same auto-population options as ``DateField`` and
+    ``DateTimeField``.
+    
+``URLField``
+    A field for a URL.  If the ``verify_exists`` option is ``True``, the URL given
+    will be checked for existence (i.e. actually loads and doesn't give a 404 
+    response).
+    
+``USStateField``
+    A US state.
+    
+``XMLField``
+    A field containing XML.  Takes one required argument, ``schema_path`` which
+    is the path to a RelaxNG_ scheme against which to validate the field.
+    
+    .. _RelaxNG: http://www.relaxng.org/
 
 Admin options
 =============
@@ -635,126 +488,108 @@ The ``admin`` field in the model tells Django how to construct the admin
 interface for the object.  The field is an instance of the ``meta.Admin`` 
 object, which has the following options (of which only ``fields`` is required):
 
-``date_hierarchy``
-------------------
-
-To allow filtering of objects in the admin by date, set ``date_hierarchy``
-to the name of the field to filter by::
-
-    date_hierarchy = 'order_date'
-
+``date_hierarchy``    
+    To allow filtering of objects in the admin by date, set ``date_hierarchy``
+    to the name of the field to filter by::
+    
+        date_hierarchy = 'order_date'
+    
 ``fields``
-----------
-
-A list of fieldsets to display on the admin page.  Each fieldset is a 2-tuple:
-``(name, field_options)``.  The ``name`` is a string to name the field set,
-and ``field_options`` is a dictionary of information about the fields to be 
-displayed in that fieldset.  This dictionary has the following keys:
-
-    ``fields``
-        A tuple of field names to display in this fieldset.  To display
-        multiple fields on the same line, wrap those fields in their
-        own tuple.
-        
-        This key is required in the dict.
-        
-    ``classes``
-        Extra CSS classes to apply to the fieldset.  This is a simple
-        string; you can apply multiple classes by separating them with
-        spaces.
-        
-        Two useful classes defined by the default stylesheet are ``collapse``
-        and ``wide``.  Fieldsets with the ``collapse`` style will be 
-        initially collapsed in the admin and replaced with a small "click
-        to expand" link.  Fieldsets with the ``wide`` style will be given
-        extra horizontal space.
+    A list of fieldsets to display on the admin page.  Each fieldset is a 2-tuple:
+    ``(name, field_options)``.  The ``name`` is a string to name the field set,
+    and ``field_options`` is a dictionary of information about the fields to be 
+    displayed in that fieldset.  This dictionary has the following keys:
+    
+        ``fields``
+            A tuple of field names to display in this fieldset.  To display
+            multiple fields on the same line, wrap those fields in their
+            own tuple.
             
-For example (taken from the ``core.flatfiles`` model)::
-
-    fields = (
-        (None, {
-            'fields': ('url', 'title', 'content', 'sites')
-        }),
-        ('Advanced options', {
-            'classes': 'collapse', 
-            'fields' : ('enable_comments', 'registration_required', 'template_name')
-        }),
-    ),
+            This key is required in the dict.
+            
+        ``classes``
+            Extra CSS classes to apply to the fieldset.  This is a simple
+            string; you can apply multiple classes by separating them with
+            spaces.
+            
+            Two useful classes defined by the default stylesheet are ``collapse``
+            and ``wide``.  Fieldsets with the ``collapse`` style will be 
+            initially collapsed in the admin and replaced with a small "click
+            to expand" link.  Fieldsets with the ``wide`` style will be given
+            extra horizontal space.
+                
+    For example (taken from the ``core.flatfiles`` model)::
     
-results in an admin that looks like:
-
-    .. image:: images/flatfiles_admin.png
+        fields = (
+            (None, {
+                'fields': ('url', 'title', 'content', 'sites')
+            }),
+            ('Advanced options', {
+                'classes': 'collapse', 
+                'fields' : ('enable_comments', 'registration_required', 'template_name')
+            }),
+        ),
         
+    results in an admin that looks like:
+    
+        .. image:: http://media.djangoproject.com/img/doc/flatfiles_admin.png
+            
 ``js``
-------
-
-Extra JavaScript files to link into the admin screen.  This can be used to
-tweak a given type of admin page in JS or to provide "quick links" to fill
-in default values for certain fields.
-
+    Extra JavaScript files to link into the admin screen.  This can be used to
+    tweak a given type of admin page in JS or to provide "quick links" to fill
+    in default values for certain fields.
+    
 ``list_display``
-----------------
-
-List of fields to display on the list page in the admin.
-
-There are a few special cases that do other things besides displaying the
-contents of the given fields:
-
-    * If the field given has a relationship, that relationship is 
-      followed and the ``repr()`` of the related object is displayed.
-      
-    * If the field is a ``BooleanField``, a "on" or "off" icon will
-      be displayed instead of ``True`` or ``False``.
-      
-    * If the field name given does not exist, a function of the model
-      will be searched for and called if present.  This function
-      should have a ``short_description`` attribute that will be
-      used as the header for the field.
-      
-See the exmaple below.
-
+    List of fields to display on the list page in the admin.
+    
+    There are a few special cases that do other things besides displaying the
+    contents of the given fields:
+    
+        * If the field given has a relationship, that relationship is 
+          followed and the ``repr()`` of the related object is displayed.
+          
+        * If the field is a ``BooleanField``, a "on" or "off" icon will
+          be displayed instead of ``True`` or ``False``.
+          
+        * If the field name given does not exist, a function of the model
+          will be searched for and called if present.  This function
+          should have a ``short_description`` attribute that will be
+          used as the header for the field.
+          
+    See the exmaple below.
+    
 ``list_filter``
----------------
-
-List of fields to filter by.  Each field should either be a ``BooleanField``
-or else a field with a ``ManyToOne`` relation.
-
-An example of how ``list_display`` and ``list_filter`` work (taken from
-the ``auth.user`` model)::
-
-    list_display = ('username', 'email', 'first_name', 'last_name', 'is_staff'),
-    list_filter = ('is_staff', 'is_superuser'),
+    List of fields to filter by.  Each field should either be a ``BooleanField``
+    or else a field with a ``ManyToOne`` relation.
     
-results in a admin that looks like:
-
-    .. image:: images/users_changelist.png
+    An example of how ``list_display`` and ``list_filter`` work (taken from
+    the ``auth.user`` model)::
     
-(This example also has ``search_fields`` defined; see below).
-
+        list_display = ('username', 'email', 'first_name', 'last_name', 'is_staff'),
+        list_filter = ('is_staff', 'is_superuser'),
+        
+    results in a admin that looks like:
+    
+        .. image:: http://media.djangoproject.com/img/doc/users_changelist.png
+        
+    (This example also has ``search_fields`` defined; see below).
+    
 ``ordering``
-------------
-
-An ordering tuple (see the `Options for models`_, above) that gives a 
-different ordering for the admin change list.  If not given, the 
-model's default ordering will be used.
-
+    An ordering tuple (see the `Options for models`_, above) that gives a 
+    different ordering for the admin change list.  If not given, the 
+    model's default ordering will be used.
+    
 ``save_as``
------------
-
-Enables a "save as" feature on object pages.  Normally, objects have
-three save options: "Save", "Save and continue editing", and "Save
-and add another".   If ``save_as`` is ``True``, "Save and add another"
-will be replaced by a "Save as" button.
-
+    Enables a "save as" feature on object pages.  Normally, objects have
+    three save options: "Save", "Save and continue editing", and "Save
+    and add another".   If ``save_as`` is ``True``, "Save and add another"
+    will be replaced by a "Save as" button.
+    
 ``save_on_top``
----------------
-
-If this option is ``True``, object pages will have the save buttons
-across the top as well as at the bottom of the page.
-
+    If this option is ``True``, object pages will have the save buttons
+    across the top as well as at the bottom of the page.
+    
 ``search_fields``
------------------
-
-A list of fields to provide a text search for.  These fields should,
-obviously, be some kind of text field.
-
+    A list of fields to provide a text search for.  These fields should,
+    obviously, be some kind of text field.
+    

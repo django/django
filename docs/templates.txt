@@ -204,7 +204,8 @@ Using the built-in reference
 
 Since Django can be used to develop any sort of site, the tags, filters, and
 variables available will be different depending on the application.  To make it
-simple to figure out what's available in a given site.
+simple to figure out what's available in a given site your admin interface
+has a complete reference of all the template goodies available to you.
 
 This documentation is integrated into the administration interface for your
 sites and is divided into 4 sections: tags, filters, models, and views.  The
@@ -255,550 +256,469 @@ tags/filters.
 Built-in tag reference
 ----------------------
 
-block
-`````
-
-Define a block that can be overridden by child templates.  See `Template
-inheritance`_ for more information.
-
-comment
-```````
-
-Ignore everything between ``{% comment %}`` and ``{% endcomment %}``
-
-cycle
-`````
-
-Cycle among the given strings each time this tag is encountered.
-
-Within a loop, cycles among the given strings each time through
-the loop::
-
-    {% for o in some_list %}
-        <tr class="{% cycle row1,row2 %}">
-            ...
-        </tr>
-    {% endfor %}
-
-Outside of a loop, give the values a unique name the first time you call it,
-then use that name each successive time through::
-
-        <tr class="{% cycle row1,row2,row3 as rowcolors %}">...</tr>
-        <tr class="{% cycle rowcolors %}">...</tr>
-        <tr class="{% cycle rowcolors %}">...</tr>
-
-You can use any number of values, separated by commas. Make sure not to put
-spaces between the values -- only commas.
-
-debug
-`````
-
-Output a whole load of debugging information, including the current context and
-imported modules.
-
-extends
-```````
-
-Signal that this template extends a parent template.
-
-This tag may be used in two ways: ``{% extends "base" %}`` (with quotes) uses
-the literal value "base" as the name of the parent template to extend, or ``{%
-extends variable %}`` uses the value of ``variable`` as the name of the parent
-template to extend.
-
-See `Template inheritance`_ for more information.
-
-filter
-``````
-
-Filter the contents of the blog through variable filters.
-
-Filters can also be piped through each other, and they can have arguments --
-just like in variable syntax.
-
-Sample usage::
-
-    {% filter escape|lower %}
-        This text will be HTML-escaped, and will appear in all lowercase.
-    {% endfilter %}
-
-firstof
-```````
-
-Outputs the first variable passed that is not False.  Outputs nothing if all the
-passed variables are False.
-
-Sample usage::
-
-    {% firstof var1 var2 var3 %}
+``block``
+    Define a block that can be overridden by child templates.  See `Template
+    inheritance`_ for more information.
     
-This is equivalent to::
-
-    {% if var1 %}
-        {{ var1 }}
-    {% else %}{% if var2 %}
-        {{ var2 }}
-    {% else %}{% if var3 %}
-        {{ var3 }}
-    {% endif %}{% endif %}{% endif %}
+``comment``
+    Ignore everything between ``{% comment %}`` and ``{% endcomment %}``
     
-but obviously much cleaner!
-
-for
-```
-
-Loop over each item in an array.  For example, to display a list of athletes
-given ``athlete_list``::
-
-    <ul>
-    {% for athlete in athlete_list %}
-        <li>{{ athlete.name }}</li>
-    {% endfor %}
-    </ul>
-
-You can also loop over a list in reverse by using ``{% for obj in list reversed %}``.
-
-The for loop sets a number of variables available within the loop:
-
-    ==========================  ================================================
-    Variable                    Description
-    ==========================  ================================================
-    ``forloop.counter``         The current iteration of the loop (1-indexed)
-    ``forloop.counter0``        The current iteration of the loop (0-indexed)
-    ``forloop.first``           True if this is the first time through the loop
-    ``forloop.last``            True if this is the last time through the loop
-    ``forloop.parentloop``      For nested loops, this is the loop "above" the
-                                current one
-    ==========================  ================================================
-
-if
-``
-
-The ``{% if %}`` tag evaluates a variable, and if that variable is "true" (i.e.
-exists, is not empty, and is not a false boolean value) the contents of the
-block are output::
-
-    {% if athlete_list %}
-        Number of athletes: {{ athlete_list|count }}
-    {% else %}
-        No athletes.
-    {% endif %}
-
-In the above, if ``athlete_list`` is not empty, the number of athletes will be
-displayed by the ``{{ athlete_list|count }}`` variable.
-
-As you can see, the ``if`` tag can take an option ``{% else %}`` clause that
-will be displayed if the test fails.
-
-``if`` tags may use ``or`` or ``not`` to test a number of variables or to negate
-a given variable::
-
-    {% if not athlete_list %}
-        There are no athletes.
-    {% endif %}
+``cycle``
+    Cycle among the given strings each time this tag is encountered.
     
-    {% if athlete_list or coach_list %}
-        There are some athletes or some coaches.
-    {% endif %}
+    Within a loop, cycles among the given strings each time through
+    the loop::
     
-    {% if not athlete_list or coach_list %}
-        There are no athletes or there are some coaches (OK, so 
-        writing English translations of boolean logic sounds 
-        stupid; it's not my fault).
-    {% endif %}
-
-For simplicity, ``if`` tags do not allow ``and`` clauses; use nested ``if`` 
-tags instead::
-
-    {% if athlete_list %}
-        {% if coach_list %}
-            Number of athletes: {{ athlete_list|count }}.
-            Number of coaches: {{ coach_list|count }}.
-        {% endif %}
-    {% endif %}
-
-ifchanged
-`````````
-
-Check if a value has changed from the last iteration of a loop.
-
-The 'ifchanged' block tag is used within a loop. It checks its own rendered
-contents against its previous state and only displays its content if the value
-has changed::
-
-    <h1>Archive for {{ year }}</h1>
-
-    {% for date in days %}
-    {% ifchanged %}<h3>{{ date|date:"F" }}</h3>{% endifchanged %}
-    <a href="{{ date|date:"M/d"|lower }}/">{{ date|date:"j" }}</a>
-    {% endfor %}
-
-ifnotequal
-``````````
-
-Output the contents of the block if the two arguments do not equal each other.
-
-Example::
-
-    {% ifnotequal user.id_ comment.user_id %}
-        ...
-    {% endifnotequal %}
-
-load
-````
-
-Load a custom template tag set.
-
-See `Custom tag and filter libraries`_ for more information.
-
-now
-```
-
-Display the date, formatted according to the given string.
-
-Uses the same format as PHP's ``date()`` function; see http://php.net/date
-for all the possible values.
-
-Sample usage::
-
-    It is {% now "jS F Y H:i" %}
-
-regroup
-```````
-
-Regroup a list of alike objects by a common attribute.
-
-This complex tag is best illustrated by use of an example:  say that ``people``
-is a list of ``Person`` objects that have ``first_name``, ``last_name``, and
-``gender`` attributes, and you'd like to display a list that looks like:
-
-    * Male:
-        * George Bush
-        * Bill Clinton
-    * Female:
-        * Margaret Thatcher
-        * Colendeeza Rice
-    * Unknown:
-        * Janet Reno
-
-The following snippet of template code would accomplish this dubious task::
-
-    {% regroup people by gender as grouped %}
-    <ul>
-    {% for group in grouped %}
-        <li>{{ group.grouper }}
+        {% for o in some_list %}
+            <tr class="{% cycle row1,row2 %}">
+                ...
+            </tr>
+        {% endfor %}
+    
+    Outside of a loop, give the values a unique name the first time you call it,
+    then use that name each successive time through::
+    
+            <tr class="{% cycle row1,row2,row3 as rowcolors %}">...</tr>
+            <tr class="{% cycle rowcolors %}">...</tr>
+            <tr class="{% cycle rowcolors %}">...</tr>
+    
+    You can use any number of values, separated by commas. Make sure not to put
+    spaces between the values -- only commas.
+    
+``debug``
+    Output a whole load of debugging information, including the current context and
+    imported modules.
+    
+``extends``
+    Signal that this template extends a parent template.
+    
+    This tag may be used in two ways: ``{% extends "base" %}`` (with quotes) uses
+    the literal value "base" as the name of the parent template to extend, or ``{%
+    extends variable %}`` uses the value of ``variable`` as the name of the parent
+    template to extend.
+    
+    See `Template inheritance`_ for more information.
+    
+``filter``
+    Filter the contents of the blog through variable filters.
+    
+    Filters can also be piped through each other, and they can have arguments --
+    just like in variable syntax.
+    
+    Sample usage::
+    
+        {% filter escape|lower %}
+            This text will be HTML-escaped, and will appear in all lowercase.
+        {% endfilter %}
+    
+``firstof``
+    Outputs the first variable passed that is not False.  Outputs nothing if all the
+    passed variables are False.
+    
+    Sample usage::
+    
+        {% firstof var1 var2 var3 %}
+        
+    This is equivalent to::
+    
+        {% if var1 %}
+            {{ var1 }}
+        {% else %}{% if var2 %}
+            {{ var2 }}
+        {% else %}{% if var3 %}
+            {{ var3 }}
+        {% endif %}{% endif %}{% endif %}
+        
+    but obviously much cleaner!
+    
+``for``
+    Loop over each item in an array.  For example, to display a list of athletes
+    given ``athlete_list``::
+    
         <ul>
-            {% for item in group.list %}
-            <li>{{ item }}</li>
-            {% endfor %}
+        {% for athlete in athlete_list %}
+            <li>{{ athlete.name }}</li>
+        {% endfor %}
         </ul>
-    {% endfor %}
-    </ul>
-
-As you can see, ``{% regroup %}`` populates a variable with a list of objects
-with ``grouper`` and ``list`` attributes.  ``grouper`` contains the item that
-was grouped by; ``list`` contains the list of objects that share that
-``grouper``.  In this case, ``grouper`` would be ``Male``, ``Female`` and
-``Unknown``, and ``list`` is the list of people with those genders.
-
-Note that ``{% regroup %}`` does not work when the list to be grouped is not
-sorted by the key you are grouping by!  This means that if your list of people
-was not sorted by gender, you'd need to make sure it is sorted before using it,
-i.e.::
-
-    {% regroup people|dictsort:"gender" by gender as grouped %}
-
-ssi
-```
-
-Output the contents of a given file into the page.
-
-Like a simple "include" tag, the ``ssi`` tag includes the contents
-of another file -- which must be specified using an absolute page --
-in the current page::
-
-    {% ssi /home/html/ljworld.com/includes/right_generic.html %}
-
-If the optional "parsed" parameter is given, the contents of the included
-file are evaluated as template code, with the current context::
-
-    {% ssi /home/html/ljworld.com/includes/right_generic.html parsed %}
-
-templatetag
-```````````
-
-Output one of the bits used to compose template tags.
-
-Since the template system has no concept of "escaping", to display one of the
-bits used in template tags, you must use the ``{% templatetag %}`` tag.
-
-The argument tells which template bit to output:
-
-    ==================  =======
-    Argument            Outputs
-    ==================  =======
-    ``openblock``       ``{%``
-    ``closeblock``      ``%}``
-    ``openvariable``    ``{{``
-    ``closevariable``   ``}}``
-    ==================  =======
-
-widthratio
-``````````
-
-For creating bar charts and such, this tag calculates the ratio of a given value
-to a maximum value, and then applies that ratio to a constant.
-
-For example::
-
-    <img src='bar.gif' height='10' width='{% widthratio this_value max_value 100 %}' />
-
-Above, if ``this_value`` is 175 and ``max_value`` is 200, the the image in the
-above example will be 88 pixels wide (because 175/200 = .875; .875 * 100 = 87.5
-which is rounded up to 88).
+    
+    You can also loop over a list in reverse by using ``{% for obj in list reversed %}``.
+    
+    The for loop sets a number of variables available within the loop:
+    
+        ==========================  ================================================
+        Variable                    Description
+        ==========================  ================================================
+        ``forloop.counter``         The current iteration of the loop (1-indexed)
+        ``forloop.counter0``        The current iteration of the loop (0-indexed)
+        ``forloop.first``           True if this is the first time through the loop
+        ``forloop.last``            True if this is the last time through the loop
+        ``forloop.parentloop``      For nested loops, this is the loop "above" the
+                                    current one
+        ==========================  ================================================
+    
+``if``
+    The ``{% if %}`` tag evaluates a variable, and if that variable is "true" (i.e.
+    exists, is not empty, and is not a false boolean value) the contents of the
+    block are output::
+    
+        {% if athlete_list %}
+            Number of athletes: {{ athlete_list|count }}
+        {% else %}
+            No athletes.
+        {% endif %}
+    
+    In the above, if ``athlete_list`` is not empty, the number of athletes will be
+    displayed by the ``{{ athlete_list|count }}`` variable.
+    
+    As you can see, the ``if`` tag can take an option ``{% else %}`` clause that
+    will be displayed if the test fails.
+    
+    ``if`` tags may use ``or`` or ``not`` to test a number of variables or to negate
+    a given variable::
+    
+        {% if not athlete_list %}
+            There are no athletes.
+        {% endif %}
+        
+        {% if athlete_list or coach_list %}
+            There are some athletes or some coaches.
+        {% endif %}
+        
+        {% if not athlete_list or coach_list %}
+            There are no athletes or there are some coaches (OK, so 
+            writing English translations of boolean logic sounds 
+            stupid; it's not my fault).
+        {% endif %}
+    
+    For simplicity, ``if`` tags do not allow ``and`` clauses; use nested ``if`` 
+    tags instead::
+    
+        {% if athlete_list %}
+            {% if coach_list %}
+                Number of athletes: {{ athlete_list|count }}.
+                Number of coaches: {{ coach_list|count }}.
+            {% endif %}
+        {% endif %}
+    
+``ifchanged``
+    Check if a value has changed from the last iteration of a loop.
+    
+    The 'ifchanged' block tag is used within a loop. It checks its own rendered
+    contents against its previous state and only displays its content if the value
+    has changed::
+    
+        <h1>Archive for {{ year }}</h1>
+    
+        {% for date in days %}
+        {% ifchanged %}<h3>{{ date|date:"F" }}</h3>{% endifchanged %}
+        <a href="{{ date|date:"M/d"|lower }}/">{{ date|date:"j" }}</a>
+        {% endfor %}
+    
+``ifnotequal``
+    Output the contents of the block if the two arguments do not equal each other.
+    
+    Example::
+    
+        {% ifnotequal user.id_ comment.user_id %}
+            ...
+        {% endifnotequal %}
+    
+``load``
+    Load a custom template tag set.
+    
+    See `Custom tag and filter libraries`_ for more information.
+    
+``now``
+    Display the date, formatted according to the given string.
+    
+    Uses the same format as PHP's ``date()`` function; see http://php.net/date
+    for all the possible values.
+    
+    Sample usage::
+    
+        It is {% now "jS F Y H:i" %}
+    
+``regroup``
+    Regroup a list of alike objects by a common attribute.
+    
+    This complex tag is best illustrated by use of an example:  say that ``people``
+    is a list of ``Person`` objects that have ``first_name``, ``last_name``, and
+    ``gender`` attributes, and you'd like to display a list that looks like:
+    
+        * Male:
+            * George Bush
+            * Bill Clinton
+        * Female:
+            * Margaret Thatcher
+            * Colendeeza Rice
+        * Unknown:
+            * Janet Reno
+    
+    The following snippet of template code would accomplish this dubious task::
+    
+        {% regroup people by gender as grouped %}
+        <ul>
+        {% for group in grouped %}
+            <li>{{ group.grouper }}
+            <ul>
+                {% for item in group.list %}
+                <li>{{ item }}</li>
+                {% endfor %}
+            </ul>
+        {% endfor %}
+        </ul>
+    
+    As you can see, ``{% regroup %}`` populates a variable with a list of objects
+    with ``grouper`` and ``list`` attributes.  ``grouper`` contains the item that
+    was grouped by; ``list`` contains the list of objects that share that
+    ``grouper``.  In this case, ``grouper`` would be ``Male``, ``Female`` and
+    ``Unknown``, and ``list`` is the list of people with those genders.
+    
+    Note that ``{% regroup %}`` does not work when the list to be grouped is not
+    sorted by the key you are grouping by!  This means that if your list of people
+    was not sorted by gender, you'd need to make sure it is sorted before using it,
+    i.e.::
+    
+        {% regroup people|dictsort:"gender" by gender as grouped %}
+    
+``ssi``
+    Output the contents of a given file into the page.
+    
+    Like a simple "include" tag, the ``ssi`` tag includes the contents
+    of another file -- which must be specified using an absolute page --
+    in the current page::
+    
+        {% ssi /home/html/ljworld.com/includes/right_generic.html %}
+    
+    If the optional "parsed" parameter is given, the contents of the included
+    file are evaluated as template code, with the current context::
+    
+        {% ssi /home/html/ljworld.com/includes/right_generic.html parsed %}
+    
+``templatetag``
+    Output one of the bits used to compose template tags.
+    
+    Since the template system has no concept of "escaping", to display one of the
+    bits used in template tags, you must use the ``{% templatetag %}`` tag.
+    
+    The argument tells which template bit to output:
+    
+        ==================  =======
+        Argument            Outputs
+        ==================  =======
+        ``openblock``       ``{%``
+        ``closeblock``      ``%}``
+        ``openvariable``    ``{{``
+        ``closevariable``   ``}}``
+        ==================  =======
+    
+``widthratio``
+    For creating bar charts and such, this tag calculates the ratio of a given value
+    to a maximum value, and then applies that ratio to a constant.
+    
+    For example::
+    
+        <img src='bar.gif' height='10' width='{% widthratio this_value max_value 100 %}' />
+    
+    Above, if ``this_value`` is 175 and ``max_value`` is 200, the the image in the
+    above example will be 88 pixels wide (because 175/200 = .875; .875 * 100 = 87.5
+    which is rounded up to 88).
 
 Built-in filter reference
 -------------------------
 
-add
-```
-Adds the arg to the value
-
-addslashes
-``````````
-Adds slashes - useful for passing strings to JavaScript, for example.
-
-capfirst
-````````
-Capitalizes the first character of the value
-
-center
-``````
-Centers the value in a field of a given width
-
-cut
-```
-Removes all values of arg from the given string
-
-date
-````
-Formats a date according to the given format (same as the now_ tag)
-
-default
-```````
-If value is unavailable, use given default
-
-dictsort
-````````
-Takes a list of dicts, returns that list sorted by the property given in the
-argument.
-
-dictsortreversed
-````````````````
-Takes a list of dicts, returns that list sorted in reverse order by the property
-given in the argument.
-
-divisibleby
-```````````
-Returns true if the value is divisible by the argument
-
-escape
-``````
-Escapes a string's HTML
-
-filesizeformat
-``````````````
-Format the value like a 'human-readable' file size (i.e. 13 KB, 4.1 MB, 102
-bytes, etc).
-
-first
-`````
-Returns the first item in a list
-
-fix_ampersands
-``````````````
-Replaces ampersands with ``&amp;`` entities
-
-floatformat
-```````````
-Displays a floating point number as 34.2 (with one decimal places) - but
-only if there's a point to be displayed
-
-get_digit
-`````````
-Given a whole number, returns the requested digit of it, where 1 is the
-right-most digit, 2 is the second-right-most digit, etc. Returns the
-original value for invalid input (if input or argument is not an integer,
-or if argument is less than 1). Otherwise, output is always an integer.
-
-join
-````
-Joins a list with a string, like Python's ``str.join(list)``
-
-length
-``````
-Returns the length of the value - useful for lists
-
-length_is
-`````````
-Returns a boolean of whether the value's length is the argument
-
-linebreaks
-``````````
-Converts newlines into <p> and <br />s
-
-linebreaksbr
-````````````
-Converts newlines into <br />s
-
-linenumbers
-```````````
-Displays text with line numbers
-
-ljust
-`````
-Left-aligns the value in a field of a given width
-
-Argument: field size
-
-lower
-`````
-Converts a string into all lowercase
-
-make_list
-`````````
-Returns the value turned into a list. For an integer, it's a list of
-digits. For a string, it's a list of characters.
-
-phone2numeric
-`````````````
-Takes a phone number and converts it in to its numerical equivalent
-
-pluralize
-`````````
-Returns 's' if the value is not 1, for '1 vote' vs. '2 votes'
-
-pprint
-``````
-A wrapper around pprint.pprint -- for debugging, really
-
-random
-``````
-Returns a random item from the list
-
-removetags
-```````````
-Removes a space separated list of [X]HTML tags from the output
-
-rjust
-`````
-Right-aligns the value in a field of a given width
-
-Argument: field size
-
-slice
-`````
-Returns a slice of the list.
-
-Uses the same syntax as Python's list slicing; see
-http://diveintopython.org/native_data_types/lists.html#odbchelper.list.slice
-for an introduction.
-
-slugify
-```````
-Converts to lowercase, removes non-alpha chars and converts spaces to hyphens
-
-stringformat
-````````````
-Formats the variable according to the argument, a string formatting specifier.
-This specifier uses Python string formating syntax, with the exception that
-the leading "%" is dropped.
-
-See http://docs.python.org/lib/typesseq-strings.html for documentation
-of Python string formatting
-
-striptags
-`````````
-Strips all [X]HTML tags
-
-time
-````
-Formats a time according to the given format (same as the now_ tag).
-
-timesince
-`````````
-Formats a date as the time since that date (i.e. "4 days, 6 hours")
-
-title
-`````
-Converts a string into titlecase
-
-truncatewords
-`````````````
-Truncates a string after a certain number of words
-
-Argument: Number of words to truncate after
-
-unordered_list
-``````````````
-Recursively takes a self-nested list and returns an HTML unordered list --
-WITHOUT opening and closing <ul> tags.
-
-The list is assumed to be in the proper format. For example, if ``var`` contains
-``['States', [['Kansas', [['Lawrence', []], ['Topeka', []]]], ['Illinois', []]]]``,
-then ``{{ var|unordered_list }}`` would return::
-
-    <li>States
-    <ul>
-            <li>Kansas
-            <ul>
-                    <li>Lawrence</li>
-                    <li>Topeka</li>
-            </ul>
-            </li>
-            <li>Illinois</li>
-    </ul>
-    </li>
-
-upper
-`````
-Converts a string into all uppercase
-
-urlencode
-`````````
-Escapes a value for use in a URL
-
-urlize
-``````
-Converts URLs in plain text into clickable links
-
-urlizetrunc
-```````````
-Converts URLs into clickable links, truncating URLs to the given character limit
-
-Argument: Length to truncate URLs to.
-
-wordcount
-`````````
-Returns the number of words
-
-wordwrap
-````````
-Wraps words at specified line length
-
-Argument: number of words to wrap the text at.
-
-yesno
-`````
-Given a string mapping values for true, false and (optionally) None,
-returns one of those strings according to the value:
-
-==========  ======================  ==================================
-Value       Argument                Outputs
-==========  ======================  ==================================
-``True``    ``"yeah,no,maybe"``     ``yeah``
-``False``   ``"yeah,no,maybe"``     ``no``
-``None``    ``"yeah,no,maybe"``     ``maybe``
-``None``    ``"yeah,no"``           ``"no"`` (converts None to False
-                                    if no mapping for None is given.
-==========  ======================  ==================================
+``add``
+    Adds the arg to the value
+    
+``addslashes``
+    Adds slashes - useful for passing strings to JavaScript, for example.
+    
+``capfirst``
+    Capitalizes the first character of the value
+    
+``center``
+    Centers the value in a field of a given width
+    
+``cut``
+    Removes all values of arg from the given string
+    
+``date``
+    Formats a date according to the given format (same as the now_ tag)
+    
+``default``
+    If value is unavailable, use given default
+    
+``dictsort``
+    Takes a list of dicts, returns that list sorted by the property given in the
+    argument.
+    
+``dictsortreversed``
+    Takes a list of dicts, returns that list sorted in reverse order by the property
+    given in the argument.
+    
+``divisibleby``
+    Returns true if the value is divisible by the argument
+    
+``escape``
+    Escapes a string's HTML
+    
+``filesizeformat``
+    Format the value like a 'human-readable' file size (i.e. 13 KB, 4.1 MB, 102
+    bytes, etc).
+    
+``first``
+    Returns the first item in a list
+    
+``fix_ampersands``
+    Replaces ampersands with ``&amp;`` entities
+    
+``floatformat``
+    Displays a floating point number as 34.2 (with one decimal places) - but
+    only if there's a point to be displayed
+    
+``get_digit``
+    Given a whole number, returns the requested digit of it, where 1 is the
+    right-most digit, 2 is the second-right-most digit, etc. Returns the
+    original value for invalid input (if input or argument is not an integer,
+    or if argument is less than 1). Otherwise, output is always an integer.
+    
+``join``
+    Joins a list with a string, like Python's ``str.join(list)``
+    
+``length``
+    Returns the length of the value - useful for lists
+    
+``length_is``
+    Returns a boolean of whether the value's length is the argument
+    
+``linebreaks``
+    Converts newlines into <p> and <br />s
+    
+``linebreaksbr``
+    Converts newlines into <br />s
+    
+``linenumbers``
+    Displays text with line numbers
+    
+``ljust``
+    Left-aligns the value in a field of a given width
+    
+    Argument: field size
+    
+``lower``
+    Converts a string into all lowercase
+    
+``make_list``
+    Returns the value turned into a list. For an integer, it's a list of
+    digits. For a string, it's a list of characters.
+    
+``phone2numeric``
+    Takes a phone number and converts it in to its numerical equivalent
+    
+``pluralize``
+    Returns 's' if the value is not 1, for '1 vote' vs. '2 votes'
+    
+``pprint``
+    A wrapper around pprint.pprint -- for debugging, really
+    
+``random``
+    Returns a random item from the list
+    
+``removetags``
+    Removes a space separated list of [X]HTML tags from the output
+    
+``rjust``
+    Right-aligns the value in a field of a given width
+    
+    Argument: field size
+    
+``slice``
+    Returns a slice of the list.
+    
+    Uses the same syntax as Python's list slicing; see
+    http://diveintopython.org/native_data_types/lists.html#odbchelper.list.slice
+    for an introduction.
+    
+``slugify``
+    Converts to lowercase, removes non-alpha chars and converts spaces to hyphens
+    
+``stringformat``
+    Formats the variable according to the argument, a string formatting specifier.
+    This specifier uses Python string formating syntax, with the exception that
+    the leading "%" is dropped.
+    
+    See http://docs.python.org/lib/typesseq-strings.html for documentation
+    of Python string formatting
+    
+``striptags``
+    Strips all [X]HTML tags
+    
+``time``
+    Formats a time according to the given format (same as the now_ tag).
+    
+``timesince``
+    Formats a date as the time since that date (i.e. "4 days, 6 hours")
+    
+``title``
+    Converts a string into titlecase
+    
+``truncatewords``
+    Truncates a string after a certain number of words
+    
+    Argument: Number of words to truncate after
+    
+``unordered_list``
+    Recursively takes a self-nested list and returns an HTML unordered list --
+    WITHOUT opening and closing <ul> tags.
+    
+    The list is assumed to be in the proper format. For example, if ``var`` contains
+    ``['States', [['Kansas', [['Lawrence', []], ['Topeka', []]]], ['Illinois', []]]]``,
+    then ``{{ var|unordered_list }}`` would return::
+    
+        <li>States
+        <ul>
+                <li>Kansas
+                <ul>
+                        <li>Lawrence</li>
+                        <li>Topeka</li>
+                </ul>
+                </li>
+                <li>Illinois</li>
+        </ul>
+        </li>
+    
+``upper``
+    Converts a string into all uppercase
+    
+``urlencode``
+    Escapes a value for use in a URL
+    
+``urlize``
+    Converts URLs in plain text into clickable links
+    
+``urlizetrunc``
+    Converts URLs into clickable links, truncating URLs to the given character limit
+    
+    Argument: Length to truncate URLs to.
+    
+``wordcount``
+    Returns the number of words
+    
+``wordwrap``
+    Wraps words at specified line length
+    
+    Argument: number of words to wrap the text at.
+    
+``yesno``
+    Given a string mapping values for true, false and (optionally) None,
+    returns one of those strings according to the value:
+    
+    ==========  ======================  ==================================
+    Value       Argument                Outputs
+    ==========  ======================  ==================================
+    ``True``    ``"yeah,no,maybe"``     ``yeah``
+    ``False``   ``"yeah,no,maybe"``     ``no``
+    ``None``    ``"yeah,no,maybe"``     ``maybe``
+    ``None``    ``"yeah,no"``           ``"no"`` (converts None to False
+                                        if no mapping for None is given.
+    ==========  ======================  ==================================
