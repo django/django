@@ -1,6 +1,4 @@
-"""
-Use this for e-mailing
-"""
+# Use this module for e-mailing.
 
 from django.conf.settings import DEFAULT_FROM_EMAIL, EMAIL_HOST
 from email.MIMEText import MIMEText
@@ -43,9 +41,9 @@ def send_mass_mail(datatuple, fail_silently=False):
 def mail_admins(subject, message, fail_silently=False):
     "Sends a message to the admins, as defined by the ADMINS constant in settings.py."
     from django.conf.settings import ADMINS, SERVER_EMAIL
-    send_mail('[CMS] ' + subject, message, SERVER_EMAIL, [a[1] for a in ADMINS], fail_silently)
+    send_mail('[Django] ' + subject, message, SERVER_EMAIL, [a[1] for a in ADMINS], fail_silently)
 
 def mail_managers(subject, message, fail_silently=False):
     "Sends a message to the managers, as defined by the MANAGERS constant in settings.py"
     from django.conf.settings import MANAGERS, SERVER_EMAIL
-    send_mail('[CMS] ' + subject, message, SERVER_EMAIL, [a[1] for a in MANAGERS], fail_silently)
+    send_mail('[Django] ' + subject, message, SERVER_EMAIL, [a[1] for a in MANAGERS], fail_silently)
