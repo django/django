@@ -133,9 +133,9 @@ General field options
 Each type of field takes a different set of options, but there are some
 options that are common to all field types.  These options are:
 
-    ======================  ===================================================
+    ======================  ==================================================================
     Option                  Description
-    ======================  ===================================================
+    ======================  ==================================================================
     ``blank``               If ``True``, the field is allowed to be blank.  
                             Note that this is different from ``null`` in that
                             string fields will store the empty string instead of
@@ -161,9 +161,9 @@ options that are common to all field types.  These options are:
                             readable name for the option.
                             
     ``core``                For objects that are edited inline to a related
-                            object (see Relationships_).  If all "core" fields
-                            in an inline-edited object are cleared, the 
-                            object will be considered to be deleted.
+                            object.  If all "core" fields in an inline-edited
+                            object are cleared, the object will be considered to
+                            be deleted.
                             
                             It is an error to have an inline-editable
                             relation without at least one core field.
@@ -197,8 +197,6 @@ options that are common to all field types.  These options are:
                             for the choices instead of the standard options
                             menu interface.
     
-    ``rel``                 The field's relation; see Relationships_.
-    
     ``unique``              If ``True`` this field must be unique throughout
                             the table.
     
@@ -219,7 +217,7 @@ options that are common to all field types.  These options are:
     ``validator_list``      A list of extra validators to apply to the field.
                             See the `Form fields guide`_ for information about
                             validators.
-    ======================  ===================================================
+    ======================  ==================================================================
 
 .. _`Form fields guide`: http://www.djangoproject.com/FIXME/
 
