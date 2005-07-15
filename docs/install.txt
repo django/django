@@ -23,8 +23,14 @@ If you plan to use Django's database API functionality, you'll need to
 make sure a database server is running. Django works with PostgreSQL_
 (recommended) or MySQL_.
 
+Additionally, you'll need to make sure your Python database bindings are
+installed. If you're using PostgreSQL, you'll need the psycopg_
+package. If you're using MySQL, you'll need MySQLdb_.
+
 .. _PostgreSQL: http://www.postgresql.org/
 .. _MySQL: http://www.mysql.com/
+.. _psycopg: http://initd.org/projects/psycopg1
+.. _MySQLdb_: http://sourceforge.net/projects/mysql-python
 
 Install the Django code
 =======================
