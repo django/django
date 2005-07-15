@@ -180,8 +180,6 @@ options that are common to all field types.  These options are:
     
     ``null``                If ``True`` empty values in the field will be 
                             stored as ``NULL`` in the database.  
-                            
-                            XXX does null imply blank? XXX
         
     ``primary_key``         If ``True`` this field is the primary key for the
                             table.  You only need to use this if you don't want
@@ -302,8 +300,8 @@ Field Types
     
         meta.ForeignKey(Pizza)
                 
-    ``ForeignKey`` fields take a large number of options for defining how the 
-    relationship should work:
+    ``ForeignKey`` fields take a large number of extra options for defining how
+    the relationship should work:
     
     =======================  ============================================================
     Option                   Description
@@ -364,7 +362,7 @@ Field Types
                              
                              Not used with ``edit_inline``.
                              
-    ``rel_name``             The name of the relation.  In the above exmaple,
+    ``rel_name``             The name of the relation.  In the above example,
                              this would default to 'pizza' (so that the 
                              ``Toppings`` object would have a ``get_pizza()``
                              function; if you set ``rel_name`` to "pie", then
@@ -431,12 +429,60 @@ Field Types
     An IP address, in string format (i.e. "24.124.1.30").
     
 ``ManyToManyField``
-    XXX document once Adrian reworks this XXX
+    A many-to-many relation to another object.  For example (taken from the
+    ``core.flatfiles`` object::
     
+        class FlatFile(meta.Model):
+            fields = (
+                ...
+                meta.ManyToManyField(Site),
+            )
+    
+    Many-to-many relations are a bit different from other fields.  First, they
+    aren't actually a field per se since they use a intermediary join table.
+    Second, they don't take any of the same options as the rest of the fields,
+    the only options taken are:
+    
+    =======================  ============================================================
+    Option                   Description
+    =======================  ============================================================
+    ``related_name``         See the description of ``related_name`` in 
+                             ``ManyToOneField``, above.
+                             
+    ``filter_interface``     Use a nifty unobtrusive Javascript "filter" interface 
+                             instead of the usability-challenged ``<select multiple>``.
+                             The value should be ``meta.HORIZONTAL`` or ``meta.VERTICAL``
+                             (i.e. should the interface be stacked horizontally or
+                             vertically).
+                             
+    ``limit_choices_to``     See the description under ``ManyToOneField``, above.
+    =======================  ============================================================
+
 ``NullBooleanField``
     Like a ``BooleanField``, but allows ``NULL`` as one of the options.  Use this
     instead of a ``BooleanField`` with ``null=True`` .
     
+``OneToOneField``
+    Signifies a one-to-one relationship.  This is most useful on the primary key
+    of an object when that object "extends" another object in some way.  
+    
+    For example, if you are building a database of "places", you would build pretty
+    standard stuff like address, phone number, etc. in the database.  If you then
+    wanted to build a database of restaurants on top of the places, instead of
+    repeating yourself and replicating those fields in the restaurants object, you
+    could make ``Restaurant`` have a ``OneToOneField`` to ``Place`` (since
+    a restaurant "is-a" place).  This ``OneToOneField`` will actually replace
+    the primary key ``id`` field (since one-to-one relations share the same
+    primary key), and has a few in the admin interface:
+    
+        * No selection interface is displayed on ``Restaurant`` pages; there will
+          be one (and only one) ``Restaurant`` for each place.
+          
+        * On the ``Restaurant`` change list, every single ``Place`` -- weather it
+          has an associated ``Restaurant`` or not -- will be displayed.  Adding
+          a ``Restaurant`` to a ``Place`` just means filling out the required
+          ``Restaurant`` fields.
+
 ``PhoneNumberField``
     Validates that the value is a valid phone number.
     
@@ -573,21 +619,113 @@ object, which has the following options (of which only ``fields`` is required):
     (This example also has ``search_fields`` defined; see below).
     
 ``ordering``
-    An ordering tuple (see the `Options for models`_, above) that gives a 
-    different ordering for the admin change list.  If not given, the 
-    model's default ordering will be used.
+    An ordering tuple (see the `Options for models`_, above) that gives a
+    different ordering for the admin change list.  If not given, the model's
+    default ordering will be used.
     
 ``save_as``
-    Enables a "save as" feature on object pages.  Normally, objects have
-    three save options: "Save", "Save and continue editing", and "Save
-    and add another".   If ``save_as`` is ``True``, "Save and add another"
-    will be replaced by a "Save as" button.
+    Enables a "save as" feature on object pages.  Normally, objects have three
+    save options: "Save", "Save and continue editing", and "Save and add
+    another".   If ``save_as`` is ``True``, "Save and add another" will be
+    replaced by a "Save as" button.
     
 ``save_on_top``
-    If this option is ``True``, object pages will have the save buttons
-    across the top as well as at the bottom of the page.
+    If this option is ``True``, object pages will have the save buttons across
+    the top as well as at the bottom of the page.
     
 ``search_fields``
     A list of fields to provide a text search for.  These fields should,
     obviously, be some kind of text field.
+    
+Model methods
+=============
+
+There are a number of methods you can define on model objects to control the
+object's behavior.  First, any methods you define will be available as methods
+of object instances.  For example::
+
+    class Pizza(meta.Model):
+        fields = (
+            ...
+        )  
+        
+        def is_disgusting(self):
+            return "anchovices" in [topping.name for topping in self.get_topping_list()]
+               
+Now, every ``Pizza`` object will have a ``is_disgusting()`` method.  
+
+There are a few object methods that have special meaning:
+
+``__repr__``
+    Django uses ``repr(obj)`` in a number of places, the most notable as the
+    value inserted into a template when it displays an object.  Thus, you should
+    return a nice, human-readable string for the object's ``__repr__``.
+    
+``get_absolute_url``
+    If an object defines a ``get_absolute_url`` method, it is used   to
+    associate a URL with an object.  For example:
+    
+        def get_absolute_url(self):
+            return "/pizzas/%i/" % self.id
+            
+    The most useful place this is used is in the admin interface; if an object
+    defines ``get_absolute_url`` then the object detail page will have a "View
+    on site" link that will jump you directly to the object's public view.
+    
+``_pre_save``
+    This method will be called just before the object is saved into the
+    database; you can use it to (for example) calculate aggregate values from
+    other fields before the object is saved.
+    
+``_post_save``
+    Called just after the object is saved to the database.  This could be used
+    to update other tables, update cached information, etc.
+    
+Module-level methods
+--------------------
+
+Since each data class in effect turns into a module, there are times you'll want
+to write methods that live in that module.  Any model method that begins with
+"_module_" is turned into a module-level method::
+
+    class Pizza(meta.Model):
+        fields = (
+            ...
+        )
+        
+        def _module_get_pizzas_to_deliver():
+            return get_list(delivered__exact=False)
+            
+This will make the top-level ``pizzas`` module have a ``get_pizzas_to_deliver()``
+method::
+
+    >>> from django.models.pizza_hut import pizzas
+    >>> pizzas.get_pizzas_to_deliver()
+    [ ... ]
+    
+Note that the scope of these methods is modified to be the same has the module
+scope (so that's how the raw ``get_list`` works).
+
+Manipulator methods
+-------------------
+
+Similarly, you can add methods to the object's manipulators (see the formfields
+documentation for more on manipulators) by defining methods that being with
+"_manipulator_".  This is most useful for providing custom validators for certain
+fields since manipulators automatically call any method that begins with
+"validate"::
+
+    class Pizza(meta.Model):
+        fields = (
+            ...
+        )
+        
+        def _manipulator_validate_customer_id(self, field_data, all_data):
+            from django.core import validators
+            from django.conf.settings import BAD_CUSTOMER_IDS
+            
+            if int(field_data) in BAD_CUSTOMER_IDS:
+                raise validators.ValidationError("We don't deliver to this customer")
+                
+
     

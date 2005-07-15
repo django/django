@@ -66,12 +66,12 @@ Lawrence, Kansas, USA.
     `chicagocrime.org`_.
 
 `Simon Willison`_
-    Simon is a well-respected Web developer from England. He had a one-year stint
-    at World Online, during which time he and Adrian developed Django from scratch.
-    He's enthusiastic, he's passionate about best practices in Web development, and
-    he really likes squirrels. Probably to a fault. He went back to England to
-    finish his degree and is poised to continue doing big, exciting things on the Web.
-    Read his weblog at `simon.incutio.com`_.
+    Simon is a well-respected Web developer from England. He had a one-year
+    stint at World Online, during which time he and Adrian developed Django from
+    scratch. He's enthusiastic, he's passionate about best practices in Web
+    development, and he really likes squirrels. Probably to a fault. He went
+    back to England to finish his degree and is poised to continue doing big,
+    exciting things on the Web. Read his weblog at `simon.incutio.com`_.
 
 `Jacob Kaplan-Moss`_
     Jacob is a whipper-snapper from California who spends equal time coding and
@@ -102,17 +102,35 @@ How do I get started?
 
 We're working on this documentation as you read this.
 
+What are Django's prerequisites?
+--------------------------------
+
+Django requires Python_ 2.3 or later, Apache2_, and mod_python_.  You'll
+also need a database engine; PostgreSQL_ is recommended, and MySQL_ is
+supported.
+
+We're currently working on expanding those options: WSGI_ support is in the
+works (which will allow Django to run under CGI, FCGI, etc.), as is support for
+a number of other database backends.
+
+.. _Python: http://www.python.org/
+.. _Apache2: http://httpd.apache.org/
+.. _mod_python: http://www.modpython.org/
+.. _PostgreSQL: http://www.postgresql.org/
+.. _MySQL: http://www.mysql.com/
+.. _WSGI: http://www.python.org/peps/pep-0333.html
+
 The admin interface
 ===================
 
 The dynamically-generated admin site is ugly! How can I change it?
 ------------------------------------------------------------------
 
-We think it's very purty, but if you don't agree, you can modify the admin site's
-presentation by editing the CSS stylesheet and/or associated image files. The
-site is built using semantic HTML, so any changes you'd like to make should be
-possible by editing the CSS stylesheet. We've got a `guide to the CSS used
-in the admin`_ to get you started.
+We think it's very purty, but if you don't agree, you can modify the admin
+site's presentation by editing the CSS stylesheet and/or associated image files.
+The site is built using semantic HTML, so any changes you'd like to make should
+be possible by editing the CSS stylesheet. We've got a `guide to the CSS used in
+the admin`_ to get you started.
 
 .. _`guide to the CSS used in the admin`: http://www.djangoproject.com/documentation/admin_css/
 

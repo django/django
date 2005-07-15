@@ -305,4 +305,44 @@ objects fields, then call the object's ``save()`` method::
 Creating new objects
 ====================
 
-...
+Creating new objects (i.e. ``INSERT``) is done by creating new instances
+of objects then calling save() on them::
+
+    >>> p = polls.Poll(id=None, 
+    ...                slug="eggs",
+    ...                question="How do you like your eggs?",
+    ...                pub_date=datetime.datetime.now(),
+    ...                expire_date=some_future_date)
+    >>> p.save()
+    
+Calling ``save()`` on an object with an id if ``None`` signifies to
+Django that the object is new and should be inserted.
+
+Related objects (i.e. ``Choices``) are created using convience functions::
+
+    >>> p.add_choice(choice="Over easy", votes=0)
+    >>> p.add_choice(choice="Scrambled", votes=0)
+    >>> p.add_choice(choice="Fertilized", votes=0)
+    >>> p.add_choice(choice="Poached", votes=0)
+    >>> p.get_choice_count()
+    4
+    
+Each of those ``add_choice`` methods is equivilent to (except obviously much
+simpler than)::
+
+    >>> c = polls.Choice(id=None,
+    ...                  poll_id=p.id,
+    ...                  choice="Over easy",
+    ...                  votes=0)
+    >>> c.save()
+    
+Note that when using the `add_foo()`` methods, you do not give any value
+for the ``id`` field, nor do you give a value for the field that stores 
+the relation (``poll_id`` in this case).
+
+Deleting objects
+================
+
+Just cause we're crazy like that, the delete method is named ``delete()``.
+Yeah, you never know what we're going to do next.
+
