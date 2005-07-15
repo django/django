@@ -318,6 +318,8 @@ def _start_helper(app_or_project, name, directory, other_name=''):
             if subdir.startswith('.'):
                 del subdirs[i]
         for f in files:
+            if f.endswith('.pyc'):
+                continue
             fp_old = open(os.path.join(d, f), 'r')
             fp_new = open(os.path.join(top_dir, relative_dir, f.replace('%s_name' % app_or_project, name)), 'w')
             fp_new.write(fp_old.read().replace('{{ %s_name }}' % app_or_project, name).replace('{{ %s_name }}' % other, other_name))
