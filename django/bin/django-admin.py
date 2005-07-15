@@ -127,6 +127,7 @@ def get_sql_delete(mod):
             else:
                 output.append("DROP TABLE %s_%s;" % (opts.db_table, f.name))
     output.append("DELETE FROM packages WHERE label = '%s';" % mod._MODELS[0]._meta.app_label)
+    output.append("DELETE from content_types WHERE package = '%s';" % mod._MODELS[0]._meta.app_label)
     return output[::-1] # Reverse it, to deal with table dependencies.
 get_sql_delete.help_doc = "Prints the DROP TABLE SQL statements for the given app(s)."
 get_sql_delete.args = APP_ARGS
