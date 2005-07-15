@@ -133,9 +133,9 @@ General field options
 Each type of field takes a different set of options, but there are some
 options that are common to all field types.  These options are:
 
-    ======================  ==================================================================
+    ======================  ===================================================
     Option                  Description
-    ======================  ==================================================================
+    ======================  ===================================================
     ``blank``               If ``True``, the field is allowed to be blank.  
                             Note that this is different from ``null`` in that
                             string fields will store the empty string instead of
@@ -217,7 +217,7 @@ options that are common to all field types.  These options are:
     ``validator_list``      A list of extra validators to apply to the field.
                             See the `Form fields guide`_ for information about
                             validators.
-    ======================  ==================================================================
+    ======================  ===================================================
 
 .. _`Form fields guide`: http://www.djangoproject.com/FIXME/
 
@@ -415,7 +415,7 @@ Field Types
                              is to.  This is almost always ``id``, but if the
                              PK on the other object is named something 
                              different, this is how to indicate that.
-    =======================  ==================================================
+    ======================   ===================================================
 
 .. _`Database API reference`: http://www.djangoproject.com/documentation/db_api/    
         

@@ -543,7 +543,7 @@ Built-in filter reference
     Removes all values of arg from the given string
     
 ``date``
-    Formats a date according to the given format (same as the now_ tag)
+    Formats a date according to the given format (same as the ``now`` tag)
     
 ``default``
     If value is unavailable, use given default
@@ -654,7 +654,7 @@ Built-in filter reference
     Strips all [X]HTML tags
     
 ``time``
-    Formats a time according to the given format (same as the now_ tag).
+    Formats a time according to the given format (same as the ``now`` tag).
     
 ``timesince``
     Formats a date as the time since that date (i.e. "4 days, 6 hours")
