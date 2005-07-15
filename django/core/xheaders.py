@@ -1,10 +1,10 @@
 """
-Some pages in our CMS are served up with custom HTTP headers containing useful
-information about those pages -- namely, the contenttype and object ID.
+Pages in Django can are served up with custom HTTP headers containing useful
+information about those pages -- namely, the content type and object ID.
 
 This module contains utility functions for retrieving and doing interesting
 things with these special "X-Headers" (so called because the HTTP spec demands
-that custom headers are prefxed with "X-".)
+that custom headers are prefxed with "X-").
 
 Next time you're at slashdot.org, watch out for X-Fry and X-Bender. :)
 """

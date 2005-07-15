@@ -1,4 +1,4 @@
-"Global CMS exceptions"
+"Global Django exceptions"
 
 from django.core.template import SilentVariableFailure
 
