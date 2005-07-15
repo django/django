@@ -687,6 +687,9 @@ class ModelBase(type):
 class Model:
     __metaclass__ = ModelBase
 
+    def __repr__(self):
+        return '<%s object>' % self.__class__.__name__
+
 ############################################
 # HELPER FUNCTIONS (CURRIED MODEL METHODS) #
 ############################################
