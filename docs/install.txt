@@ -2,20 +2,48 @@
 How to install Django
 =====================
 
+This document will get you up and running with Django.
+
+Install Apache and mod_python
+=============================
+
+Currently, Django runs on Apache_ with `mod_python`_, although we're planning
+full WSGI support, which means Django will run on a variety of server
+platforms.
+
+Make sure you have Apache installed, with the mod_python module activated.
+
+.. _Apache: http://httpd.apache.org/
+.. _mod_python: http://www.modpython.org/
+
+Get your database running
+=========================
+
+If you plan to use Django's database API functionality, you'll need to
+make sure a database server is running. Django works with PostgreSQL_
+(recommended) or MySQL_.
+
+.. _PostgreSQL: http://www.postgresql.org/
+.. _MySQL: http://www.mysql.com/
+
+Install the Django code
+=======================
+
 Installation instructions are slightly different depending on whether you're
 using the latest official version or the latest development version.
 
 It's easy either way.
 
 Installing the official version
-===============================
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 1. Download the tarball of the latest official version from our `download page`_.
-2. ``cd django-1.0.0.tar.gz``
-3. ``python setup.py install``
+2. ``tar xzvf django-1.0.0.tar.gz``
+3. ``cd django-1.0.0``
+4. ``python setup.py install``
 
 Installing the development version
-==================================
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 1. Make sure you have Subversion_ installed.
 2. ``svn co http://code.djangoproject.com/svn/django/trunk/ django_src``
