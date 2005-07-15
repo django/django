@@ -10,10 +10,11 @@ MANAGERS = ADMINS
 
 LANGUAGE_CODE = 'en-us'
 
-DATABASE_ENGINE = 'postgresql' # Either 'postgresql' or 'mysql'.
+DATABASE_ENGINE = 'postgresql' # 'postgresql' or 'mysql'
 DATABASE_NAME = ''
 DATABASE_USER = ''
-DATABASE_HOST = '' # Set to empty string for localhost.
+DATABASE_PASSWORD = ''
+DATABASE_HOST = ''             # Set to empty string for localhost
 
 # Absolute path to the directory that holds media.
 # Example: "/home/media/media.lawrence.com/"
