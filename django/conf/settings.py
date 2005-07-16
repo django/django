@@ -18,15 +18,20 @@ for setting in dir(global_settings):
     if setting == setting.upper():
         setattr(me, setting, getattr(global_settings, setting))
 
-# try to load DJANGO_SETTINGS_MODULE 
+# try to load DJANGO_SETTINGS_MODULE
 try:
-    mod = __import__(os.environ['DJANGO_SETTINGS_MODULE'], '', '', [''])
-except (KeyError, ImportError, ValueError):
-    pass
-else:
-    for setting in dir(mod):
-        if setting == setting.upper():
-            setattr(me, setting, getattr(mod, setting))
+    me.SETTINGS_MODULE = os.environ["DJANGO_SETTINGS_MODULE"]
+except KeyError:
+    raise EnvironmentError("Environemnt variable DJANGO_SETTINGS_MODULE is undefined."
+
+try:
+    mod = __import__(me.SETTINGS_MODULE, '', '', [''])
+except ImportError, e:
+    raise EnvironmentError("Could not import DJANGO_SETTINGS_MODULE '%s' (is it on sys.path?): %s" % (me.SETTINGS_MODULE, e)
+
+for setting in dir(mod):
+    if setting == setting.upper():
+        setattr(me, setting, getattr(mod, setting))
 
 # save DJANGO_SETTINGS_MODULE in case anyone in the future cares
 me.SETTINGS_MODULE = os.environ.get('DJANGO_SETTINGS_MODULE', '')
