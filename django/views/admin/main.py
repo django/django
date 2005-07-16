@@ -99,12 +99,15 @@ def change_list(request, app_label, module_name):
     if params.has_key(PAGE_VAR):
         del params[PAGE_VAR]
     # For ordering, first check the "ordering" parameter in the admin options,
-    # then check the object's default ordering. Finally, look for manually-
-    # specified ordering from the query string.
+    # then check the object's default ordering. If neither of those exist,
+    # order descending by ID by default. Finally, look for manually-specified
+    # ordering from the query string.
     if lookup_opts.admin.ordering is not None:
         order_field, order_type = lookup_opts.admin.ordering
-    else:
+    elif lookup_opts.ordering:
         order_field, order_type = lookup_opts.ordering[0]
+    else:
+        order_field, order_type = lookup_opts.pk.name, 'DESC'
     if params.has_key(ORDER_VAR):
         try:
             order_key = int(params[ORDER_VAR])
