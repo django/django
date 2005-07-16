@@ -100,17 +100,16 @@ Django appears to be a MVC framework, but you call the Controller the "view", an
 That's because Django isn't strictly a MVC framework.  We don't really believe in
 any capital-M Methodologies; we do what "feels" right.  If you squint the right
 way, you can call Django's ORM the "Model", the view functions the "View", and
-the API automatically generated from the models the "Controller" -- but not
-really.
+the dynamically-generated API the "Controller" -- but not really.
 
-So although we've been strongly influenced by MVC -- especially in the
-separation of data from logic department -- we've also strayed from the path
+So, although we've been strongly influenced by MVC -- especially in the
+separation-of-data-from-logic department -- we've also strayed from the path
 where it makes sense.
 
 Do you have any of those nifty "screencast" things?
 ---------------------------------------------------
 
-They're in the works -- it's amazing how much time those things take!  Stay tuned...
+They're in the works. It's amazing how much time those things take!  Stay tuned...
 
 Installation questions
 ======================
@@ -123,7 +122,7 @@ How do I get started?
     #. Walk through the tutorial_.
     #. Check out the rest of the documentation_, and ask questions if you
        run into trouble.
-       
+
 .. _`Download the code`: http://www.djangoproject.com/download/
 .. _`installation guide`: http://www.djangoproject.com/documentation/install/
 .. _tutorial:  http://www.djangoproject.com/documentation/tutorial1/
@@ -137,12 +136,13 @@ Just run the ``ex_setup.py`` script in the Django distribution.
 What are Django's prerequisites?
 --------------------------------
 
-Django requires Python_ 2.3 or later, Apache2_, and mod_python_.  You'll
-also need a database engine; PostgreSQL_ is recommended, and MySQL_ is
+Django requires Python_ 2.3 or later, `Apache 2`_, and mod_python_.
+
+You'll also need a database engine. PostgreSQL_ is recommended, and MySQL_ is
 supported.
 
 .. _Python: http://www.python.org/
-.. _Apache2: http://httpd.apache.org/
+.. _Apache 2: http://httpd.apache.org/
 .. _mod_python: http://www.modpython.org/
 .. _PostgreSQL: http://www.postgresql.org/
 .. _MySQL: http://www.mysql.com/
@@ -155,8 +155,8 @@ How do I install mod_python on Windows?
     * For Python 2.3, grab mod_python from http://www.mod_python.org/, the read
       `Running mod_python on Apache on Windows2000`_.
 
-    * Also try this (not windows-specific) `guide to getting mod_python working`_.
-      
+    * Also try this (not Windows-specific) `guide to getting mod_python working`_.
+
 .. _`guide to mod_python & Python 2.3`: http://www.lehuen.com/nicolas/index.php/2005/02/21/39-win32-build-of-mod_python-314-for-python-24
 .. _`Running mod_python on Apache on Windows2000`: http://groups-beta.google.com/group/comp.lang.python/msg/139af8c83a5a9d4f
 .. _`guide to getting mod_python working`: http://www.dscpl.com.au/articles/modpython-001.html
@@ -166,16 +166,16 @@ How do I install mod_python on Windows?
 Do I have to use mod_python?
 ----------------------------
 
-In the first release, yes.  However, WSGI_ support (which will let Django run
-under FCGI, SCGI, medusa, etc.) is in the works; stay tuned!
+In the first release, yes. However, WSGI_ support (which will let Django run
+under FCGI, SCGI, medusa, etc.) is in the works. Stay tuned!
 
 .. _WSGI: http://www.python.org/peps/pep-0333.html
 
 Will Django run under shared hosting (like TextDrive or Dreamhost)?
 -------------------------------------------------------------------
 
-Right now, no, unless you can get your host to install mod_python.  However, as
-the previous question says, WSGI support is coming!.
+Right now, no, unless you can get your host to install mod_python. However, as
+the previous answer says, WSGI support is coming!
 
 Using Django
 ============
@@ -187,27 +187,27 @@ Make sure that:
 
     * The environment variable DJANGO_SETTINGS_MODULE is set to a fully-qualified
       Python module (i.e. "mysite.settings.main").
-    
+
     * Said module is on ``sys.path`` (``import mysite.settings.main`` should work).
-    
+
     * The module doesn't contain syntax errors (of course).
-    
+
     * If you're using mod_python but *not* using Django's request handler,
       you'll need to work around a mod_python bug related to the use of
       ``SetEnv``; before you import anything from Django you'll need to do
       the following::
-      
+
             os.environ.update(req.subprocess_env)
-            
+
       (where ``req`` is the mod_python request object).
-      
-I can't stand your template language; do I have to use it?
+
+I can't stand your template language. Do I have to use it?
 ----------------------------------------------------------
 
 We happen to think our template engine is the best thing since chunky bacon,
-but we recognize that choosing a template language runs close to religion.  
+but we recognize that choosing a template language runs close to religion.
 There's nothing about Django that requires using the template language, so
-if you're attached to ZPT, Cheetah, or whatever, feel free to use those. 
+if you're attached to ZPT, Cheetah, or whatever, feel free to use those.
 
 The admin interface
 ===================
