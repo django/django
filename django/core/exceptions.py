@@ -24,3 +24,7 @@ class ViewDoesNotExist(Exception):
 class MiddlewareNotUsed(Exception):
     "This middleware is not used in this server configuration"
     pass
+
+class ImproperlyConfigured(Exception):
+    "Django is somehow improperly configured"
+    pass

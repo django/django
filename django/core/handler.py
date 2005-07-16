@@ -5,9 +5,6 @@ from django.utils import httpwrappers
 # settings) until after CoreHandler has been called; otherwise os.environ
 # won't be set up correctly (with respect to settings).
 
-class ImproperlyConfigured(Exception):
-    pass
-
 class CoreHandler:
 
     def __init__(self):
@@ -57,11 +54,11 @@ class CoreHandler:
             try:
                 mod = __import__(mw_module, '', '', [''])
             except ImportError, e:
-                raise ImproperlyConfigured, 'Error importing middleware %s: "%s"' % (mw_module, e)
+                raise exceptions.ImproperlyConfigured, 'Error importing middleware %s: "%s"' % (mw_module, e)
             try:
                 mw_class = getattr(mod, mw_classname)
             except AttributeError:
-                raise ImproperlyConfigured, 'Middleware module "%s" does not define a "%s" class' % (mw_module, mw_classname)
+                raise exceptions.ImproperlyConfigured, 'Middleware module "%s" does not define a "%s" class' % (mw_module, mw_classname)
 
             try:
                 mw_instance = mw_class()
