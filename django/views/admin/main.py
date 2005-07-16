@@ -7,6 +7,7 @@ from django.models.auth import log
 from django.utils.html import strip_tags
 from django.utils.httpwrappers import HttpResponse, HttpResponseRedirect
 from django.utils.text import get_text_list
+from django.conf.settings import ADMIN_MEDIA_PREFIX
 import operator
 
 # Text to display within changelist table cells if the value is blank.
@@ -276,7 +277,7 @@ def change_list(request, app_label, module_name):
     # Search form.
     if lookup_opts.admin.search_fields:
         raw_template.append('<div id="toolbar">\n<form id="changelist-search" action="" method="get">\n')
-        raw_template.append('<label><img src="/m/img/admin/icon_searchbox.png" /></label> ')
+        raw_template.append('<label><img src="%simg/admin/icon_searchbox.png" /></label> ' % ADMIN_MEDIA_PREFIX)
         raw_template.append('<input type="text" size="40" name="%s" value="%s" id="searchbar" /> ' % \
             (SEARCH_VAR, escape(query)))
         raw_template.append('<input type="submit" value="Go" /> ')
@@ -407,7 +408,7 @@ def change_list(request, app_label, module_name):
                     # Booleans are special: We use images.
                     elif isinstance(f, meta.BooleanField) or isinstance(f, meta.NullBooleanField):
                         BOOLEAN_MAPPING = {True: 'yes', False: 'no', None: 'unknown'}
-                        result_repr = '<img src="/m/img/admin/icon-%s.gif" alt="%s" />' % (BOOLEAN_MAPPING[field_val], field_val)
+                        result_repr = '<img src="%simg/admin/icon-%s.gif" alt="%s" />' % (ADMIN_MEDIA_PREFIX, BOOLEAN_MAPPING[field_val], field_val)
                     # ImageFields are special: Use a thumbnail.
                     elif isinstance(f, meta.ImageField):
                         from django.parts.media.photos import get_thumbnail_url
@@ -536,15 +537,15 @@ def _get_template(opts, app_label, add=False, change=False, show_delete=False, f
     t.append('{% block extrahead %}')
 
     # Put in any necessary JavaScript imports.
-    javascript_imports = ['/m/js/core.js', '/m/js/admin/RelatedObjectLookups.js']
+    javascript_imports = ['%sjs/core.js' % ADMIN_MEDIA_PREFIX, '%sjs/admin/RelatedObjectLookups.js' % ADMIN_MEDIA_PREFIX]
     if 'collapse' in ' '.join([f[1].get('classes', '') for f in opts.admin.fields]):
-        javascript_imports.append('/m/js/admin/CollapsedFieldsets.js')
+        javascript_imports.append('%sjs/admin/CollapsedFieldsets.js' % ADMIN_MEDIA_PREFIX)
     if auto_populated_fields:
-        javascript_imports.append('/m/js/urlify.js')
+        javascript_imports.append('%sjs/urlify.js' % ADMIN_MEDIA_PREFIX)
     if opts.has_field_type(meta.DateTimeField) or opts.has_field_type(meta.TimeField) or opts.has_field_type(meta.DateField):
-        javascript_imports.extend(['/m/js/calendar.js', '/m/js/admin/DateTimeShortcuts.js'])
+        javascript_imports.extend(['%sjs/calendar.js' % ADMIN_MEDIA_PREFIX, '%sjs/admin/DateTimeShortcuts.js' % ADMIN_MEDIA_PREFIX])
     if ordered_objects:
-        javascript_imports.extend(['/m/js/getElementsBySelector.js', '/m/js/dom-drag.js', '/m/js/admin/ordering.js'])
+        javascript_imports.extend(['%sjs/getElementsBySelector.js' % ADMIN_MEDIA_PREFIX, '%sjs/dom-drag.js' % ADMIN_MEDIA_PREFIX, '%sjs/admin/ordering.js' % ADMIN_MEDIA_PREFIX])
     if opts.admin.js:
         javascript_imports.extend(opts.admin.js)
     for _, options in opts.admin.fields:
@@ -552,7 +553,7 @@ def _get_template(opts, app_label, add=False, change=False, show_delete=False, f
             for field_list in options['fields']:
                 for f in field_list:
                     if f.rel and isinstance(f, meta.ManyToManyField) and f.rel.filter_interface:
-                        javascript_imports.extend(['/m/js/SelectBox.js', '/m/js/SelectFilter2.js'])
+                        javascript_imports.extend(['%sjs/SelectBox.js' % ADMIN_MEDIA_PREFIX, '%sjs/SelectFilter2.js' % ADMIN_MEDIA_PREFIX])
                         raise StopIteration
         except StopIteration:
             break
@@ -737,7 +738,7 @@ def _get_admin_field_form_widget(field, name_prefix, rel, add, change):
     if use_raw_id_admin(field):
         t.append(' <a href="../../../%s/%s/" class="related-lookup" id="lookup_%s" onclick="return showRelatedObjectLookupPopup(this);">' % \
                     (field.rel.to.app_label, field.rel.to.module_name, field_id))
-        t.append('<img src="/m/img/admin/selector-search.gif" width="16" height="16" alt="Lookup" /></a>')
+        t.append('<img src="%simg/admin/selector-search.gif" width="16" height="16" alt="Lookup" /></a>' % ADMIN_MEDIA_PREFIX)
     # fields with relationships to editable objects get an "add another" link,
     # but only if the field doesn't have raw_admin ('cause in that case they get
     # the "add" button in the popup)
@@ -745,7 +746,7 @@ def _get_admin_field_form_widget(field, name_prefix, rel, add, change):
         t.append('{%% if perms.%s.%s %%}' % (field.rel.to.app_label, field.rel.to.get_add_permission()))
         t.append(' <a href="../../../%s/%s/add/" class="add-another" id="add_%s" onclick="return showAddAnotherPopup(this);">' % \
                     (field.rel.to.app_label, field.rel.to.module_name, field_id))
-        t.append('<img src="/m/img/admin/icon_addlink.gif" width="10" height="10" alt="Add Another" /></a>')
+        t.append('<img src="%simg/admin/icon_addlink.gif" width="10" height="10" alt="Add Another" /></a>' % ADMIN_MEDIA_PREFIX)
         t.append('{% endif %}')
     return ''.join(t)
 

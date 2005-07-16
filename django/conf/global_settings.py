@@ -54,6 +54,11 @@ AUTH_SESSION_COOKIE = 'rizzo'
 # List of locations of the template source files, in search order.
 TEMPLATE_DIRS = ()
 
+# URL prefix for admin media -- CSS, JavaScript and images. Make sure to use a
+# trailing slash.
+# Examples: "http://foo.com/media/", "/media/".
+ADMIN_MEDIA_PREFIX = '/media/'
+
 # Default e-mail address to use for various automated correspondence from
 # the site managers.
 DEFAULT_FROM_EMAIL = 'webmaster@localhost'
