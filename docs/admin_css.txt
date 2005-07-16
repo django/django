@@ -1,6 +1,6 @@
-======================
-Django Admin CSS Guide
-======================
+======================================
+Customizing the Django admin interface
+======================================
 
 Django's dynamic admin interface gives you a fully-functional admin for free
 with no hand-coding required. The dynamic admin is designed to be
