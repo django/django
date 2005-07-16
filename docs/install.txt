@@ -63,7 +63,7 @@ Installing the development version
 3. Symlink ``django_src/django`` so that ``django`` is within your Python
    ``site-packages`` directory:
 
-   ``ln -s django_src/django /usr/lib/python2.3/site-packages/django``
+   ``ln -s `pwd`/django_src/django /usr/lib/python2.3/site-packages/django``
 
    (In the above line, change ``python2.3`` to match your current Python version.)
 
