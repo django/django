@@ -4,13 +4,17 @@ Tutorial: Writing your first Django app
 
 Let's learn by example.
 
-Throughout this documentation, we'll walk you through the creation of a simple
-Web poll application.
+Throughout this tutorial, we'll walk you through the creation of a simple Web
+poll application.
 
 It'll consist of two parts:
 
 * A public site that lets people vote in polls and view poll results.
 * An admin site that lets you add, change and delete polls behind the scenes.
+
+We'll assume you have `Django installed`_ already.
+
+.. _`Django installed`: http://www.djangoproject.com/documentation/install/
 
 Initial setup
 =============
