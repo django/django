@@ -22,12 +22,12 @@ for setting in dir(global_settings):
 try:
     me.SETTINGS_MODULE = os.environ["DJANGO_SETTINGS_MODULE"]
 except KeyError:
-    raise EnvironmentError("Environemnt variable DJANGO_SETTINGS_MODULE is undefined."
+    raise EnvironmentError, "Environemnt variable DJANGO_SETTINGS_MODULE is undefined."
 
 try:
     mod = __import__(me.SETTINGS_MODULE, '', '', [''])
 except ImportError, e:
-    raise EnvironmentError("Could not import DJANGO_SETTINGS_MODULE '%s' (is it on sys.path?): %s" % (me.SETTINGS_MODULE, e)
+    raise EnvironmentError, "Could not import DJANGO_SETTINGS_MODULE '%s' (is it on sys.path?): %s" % (me.SETTINGS_MODULE, e)
 
 for setting in dir(mod):
     if setting == setting.upper():
