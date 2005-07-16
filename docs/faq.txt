@@ -97,8 +97,8 @@ Lawrence, Kansas, USA.
 Django appears to be a MVC framework, but you call the Controller the "view", and the View the "template". How come you don't use the standard names?
 -----------------------------------------------------------------------------------------------------------------------------------------------------
 
-That's because Django isn't strictly a MVC framework.  We don't really belive in
-any capital-M Methodoligies; we do what "feels" right.  If you squint the right
+That's because Django isn't strictly a MVC framework.  We don't really believe in
+any capital-M Methodologies; we do what "feels" right.  If you squint the right
 way, you can call Django's ORM the "Model", the view functions the "View", and
 the API automatically generated from the models the "Controller" -- but not
 really.
@@ -152,7 +152,7 @@ How do I install mod_python on Windows?
 
     * If you are running Python 2.4, check out this `guide to mod_python & Python 2.3`_.
 
-    * For Python 2.3, grab mod_python from http://ww.mod_python.org/, the read
+    * For Python 2.3, grab mod_python from http://www.mod_python.org/, the read
       `Running mod_python on Apache on Windows2000`_.
 
     * Also try this (not windows-specific) `guide to getting mod_python working`_.
@@ -175,14 +175,17 @@ Will Django run under shared hosting (like TextDrive or Dreamhost)?
 -------------------------------------------------------------------
 
 Right now, no, unless you can get your host to install mod_python.  However, as
-the previous question says, WSGI support is comming!.
+the previous question says, WSGI support is coming!.
+
+Using Django
+============
 
 Why do I get an error about importing DJANGO_SETTINGS_MODULE?
 -------------------------------------------------------------
 
 Make sure that:
 
-    * The environment variable DJANGO_SETTINGS_MODULE is set to a fully-qualifed
+    * The environment variable DJANGO_SETTINGS_MODULE is set to a fully-qualified
       Python module (i.e. "mysite.settings.main").
     
     * Said module is on ``sys.path`` (``import mysite.settings.main`` should work).
@@ -197,6 +200,14 @@ Make sure that:
             os.environ.update(req.subprocess_env)
             
       (where ``req`` is the mod_python request object).
+      
+I can't stand your template language; do I have to use it?
+----------------------------------------------------------
+
+We happen to think our template engine is the best thing since chunky bacon,
+but we recognize that choosing a template language runs close to religion.  
+There's nothing about Django that requires using the template language, so
+if you're attached to ZPT, Cheetah, or whatever, feel free to use those. 
 
 The admin interface
 ===================

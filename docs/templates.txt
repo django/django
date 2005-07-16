@@ -97,7 +97,9 @@ your site and defines **blocks** that child templates can override.
 
 It's easiest to understand template inheritance by starting with an example::
 
-    <html>
+    <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+    <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
     <head>
         <link rel="stylesheet" href="style.css" />
         <title>{% block title %}My Amazing Site{% endblock %}</title>
@@ -150,7 +152,9 @@ At that point, the template engine will notice the three blocks in
 ``base.html``, and replace those blocks with the contents of the child template.
 Depending on the value of ``blog_entries``, the output might look like::
 
-    <html>
+    <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+    <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
     <head>
         <link rel="stylesheet" href="style.css" />
         <title>My Amazing Blog</title>
@@ -172,6 +176,8 @@ Depending on the value of ``blog_entries``, the output might look like::
             <p>This is my second entry.</p>
         </div>
     </body>
+
+
 
 Note that since the child template did not define the ``sidebar`` block, the
 value from the parent template is used instead.
