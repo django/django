@@ -36,7 +36,7 @@ class User(meta.Model):
         meta.CharField('first_name', 'first name', maxlength=30, blank=True),
         meta.CharField('last_name', 'last name', maxlength=30, blank=True),
         meta.EmailField('email', 'e-mail address', blank=True),
-        meta.CharField('password_md5', 'password', maxlength=32),
+        meta.CharField('password_md5', 'password', maxlength=32, help_text="Use an MD5 hash -- not the raw password."),
         meta.BooleanField('is_staff', 'staff status',
             help_text="Designates whether the user can log into this admin site."),
         meta.BooleanField('is_active', 'active', default=True),
