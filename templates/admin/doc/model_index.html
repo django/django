@@ -1,0 +1,44 @@
+{% extends "base_site" %}
+
+{% block coltype %}colSM{% endblock %}
+
+{% block breadcrumbs %}<div class="breadcrumbs"><a href="/">Home</a> &rsaquo; <a href="/doc/">Documentation</a> &rsaquo; Models</div>{% endblock %}
+
+{% block title %}Models{% endblock %}
+
+{% block content %}
+
+<h1>Models Documentation</h1>
+
+<div id="content-main">
+{% regroup models|dictsort:"module" by module as grouped_models %}
+{% for group in grouped_models %}
+<div class="module">
+<h2 id='{{ group.grouper }}'>{{ group.grouper }}</h2>
+
+<table class="xfull">
+{% for model in group.list %}
+<tr>
+<th><a href="{{ model.name }}/">{{ model.class }}</a></th>
+</tr>
+{% endfor %}
+</table>
+</div>
+{% endfor %}
+
+</div>
+{% endblock %}
+
+{% block sidebar %}
+<div id="content-related" class="sidebar">
+<div class="module">
+<h2>Model Groups Quick List</h2>
+<ul>
+{% regroup models|dictsort:"module" by module as grouped_models %}
+{% for group in grouped_models %}
+    <li><a href="#{{ group.grouper }}">{{ group.grouper }}</a></li>
+{% endfor %}
+</ul>
+</div>
+</div>
+{% endblock %}

@@ -1,0 +1,51 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xml:lang="en">
+<head>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<title>{% block title %}{% endblock %}</title>
+<link rel="stylesheet" type="text/css" href="{% block stylesheet %}/m/css/base.css{% endblock %}" />
+{% block extrastyle %}{% endblock %}
+{% block extrahead %}{% endblock %}
+</head>
+
+<body class="{% if is_popup %}popup {% endif %}{% block bodyclass %}{% endblock %}">
+
+<!-- Container -->
+<div id="container">
+
+    {% if not is_popup %}
+    <!-- Header -->
+    <div id="header">
+        <div id="branding">
+        {% block branding %}{% endblock %}
+        </div>
+        {% if not user.is_anonymous %}
+        <div id="user-tools">Welcome, <strong>{% if user.first_name %}{{ user.first_name }}{% else %}{{ user.username }}{% endif %}</strong>. <br /><a href="/password_change/">Change password</a> / <a href="/logout/">Logout</a></div>
+        {% endif %}
+        {% block nav-global %}{% endblock %}
+        <br class="clear" />
+    </div>
+    <!-- END Header -->
+    {% block breadcrumbs %}<div class="breadcrumbs"><a href="/">Home</a>{% if title %} &rsaquo; {{ title }}{% endif %}</div>{% endblock %}
+    {% endif %}
+
+        {% if messages %}
+        <ul class="messagelist">{% for message in messages %}<li>{{ message }}</li>{% endfor %}</ul>
+        {% endif %}
+
+    <!-- Content -->
+    <div id="content" class="{% block coltype %}colM{% endblock %}">
+        {% block pretitle %}{% endblock %}
+        {% if title %}<h1>{{ title }}</h1>{% endif %}
+        {% block content %}{{ content }}{% endblock %}
+        {% block sidebar %}{% endblock %}
+        <br class="clear" />
+    </div>
+    <!-- END Content -->
+
+    <div id="footer"></div>
+</div>
+<!-- END Container -->
+
+</body>
+</html>

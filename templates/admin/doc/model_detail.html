@@ -1,0 +1,46 @@
+{% extends "base_site" %}
+
+{% block extrahead %}
+
+{{ block.super }}
+
+<style type="text/css">
+
+.module table { width:100%; }
+
+</style>
+
+{% endblock %}
+
+{% block breadcrumbs %}<div class="breadcrumbs"><a href="/">Home</a> &rsaquo; <a href="/doc/">Documentation</a> &rsaquo; <a href="/doc/models/">Models</a> &rsaquo; {{ name }}</div>{% endblock %}
+
+{% block title %}Model: {{ name }}{% endblock %}
+
+{% block content %}
+<div id="content-main">
+<h1>{{ summary }}</h1>
+
+<div class="module">
+<table class="model">
+<thead>
+<tr>
+    <th>Field</th>
+    <th>Type</th>
+    <th>Description</th>
+</tr>
+</thead>
+<tbody>
+{% for field in fields|dictsort:"name" %}
+<tr>
+    <td>{{ field.name }}</td>
+    <td>{{ field.data_type }}</td>
+    <td>{{ field.verbose|default:"" }}{% if field.help_text %} - {{ field.help_text }}{% endif %}</td>
+</tr>
+{% endfor %}
+</tbody>
+</table>
+</div>
+
+<p class="small"><a href="../">&lsaquo; Back to Models Documentation</p>
+</div>
+{% endblock %}
