@@ -273,7 +273,7 @@ Here's what the "base" template might look like::
 
     <html>
     <head>
-        <title>{% block title %}</title>
+        <title>{% block title %}{% endblock %}</title>
     </head>
     <body>
         <img src="sitelogo.gif" alt="Logo" />
