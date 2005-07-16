@@ -1,0 +1,368 @@
+=======================================
+Tutorial: Writing your first Django app
+=======================================
+
+Let's learn by example.
+
+Throughout this documentation, we'll walk you through the creation of a simple
+Web poll application.
+
+It'll consist of two parts:
+
+* A public site that lets people vote in polls and view poll results.
+* An admin site that lets you add, change and delete polls behind the scenes.
+
+Initial setup
+=============
+
+If this is your first time using Django, you'll have to take care of some
+initial setup.
+
+Run the command ``django-admin.py startproject myproject``. That'll create a
+``myproject`` directory in your current directory.
+
+(``django-admin.py`` should be on your path if you installed Django via
+its setup.py utility. If it's not on your path, you can find it in
+``site-packages/django/bin``; consider symlinking to it from some place
+on your path, such as /usr/local/bin.)
+
+A project is a collection of settings for an instance of Django -- including
+database configuration, Django-specific options and application-specific
+settings. Let's look at what ``startproject`` created::
+
+    $ cd myproject/
+    $ ls
+    apps/  __init__.py  settings/
+    $ ls settings/
+    __init__.py  admin.py  main.py
+    # ls apps/
+    __init__.py
+
+First, edit ``myproject/settings/main.py``. It's a normal Python module with
+module-level variables representing Django settings. Edit the file and change
+these settings to match your database's connection parameters::
+
+* ``DATABASE_ENGINE`` -- Either 'postgresql' or 'mysql'. More coming soon.
+* ``DATABASE_NAME`` -- The name of your database.
+* ``DATABASE_USER`` -- Your database username.
+* ``DATABASE_PASSWORD`` -- Your database password.
+* ``DATABASE_HOST`` -- The host your database is on. Just leave this as an
+  empty string if your database server is on the same physical machine
+  (localhost).
+
+Once you've done that, you need to tell Django which settings module you're
+currently using. Do that by setting an environment variable,
+``DJANGO_SETTINGS_MODULE``::
+
+    export DJANGO_SETTINGS_MODULE='myproject.settings.main'
+
+Note this path is in Python package syntax. Your project has to be somewhere on
+your `Python path`_ -- so that the Python statement ``import myproject.settings.main``
+works. Throughout Django, you'll be referring to your projects and apps via
+Python package syntax.
+
+Then run the following command:
+
+    django-admin.py init
+
+If you don't see any errors, you know it worked. That command initialized your
+database with Django's core database tables. If you're interested, run the
+PostgreSQL or MySQL command-line client and type "\dt" (PostgreSQL) or
+"SHOW TABLES" (MySQL) to display the tables.
+
+Now you're set to start doing work. You won't have to take care of this boring
+administrative stuff again.
+
+:: _Python path: http://docs.python.org/tut/node8.html#SECTION008110000000000000000
+
+Creating models
+===============
+
+``cd`` into the ``myproject/apps`` directory and type this command:
+
+    django-admin.py startapp polls
+
+That'll create a directory structure like this:
+
+    polls/
+        __init__.py
+        models/
+            __init__.py
+            polls.py
+        urls/
+            __init__.py
+            polls.py
+        views/
+            __init__.py
+
+This directory structure will house the poll application.
+
+The first step in writing a database Web app in Django is to define your models
+-- essentially, your database layout, with additional metadata.
+
+    PHILOSOPHY: A model is the single, definitive source of data about your
+    data. It contains the essential fields and behaviors of the data you're
+    storing. Django follows the `DRY Principle`_. The goal is to define your
+    data model in one place and automatically derive things from it.
+
+In our simple poll app, we'll create two models: polls and choices. A poll has
+a question, a publication date and an expiration date. A choice has two fields:
+the text of the choice and a vote tally. Each choice is associated with a poll.
+
+Edit the ``polls/models/polls.py`` file so that it looks like this:
+
+    from django.core import meta
+
+    class Poll(meta.Model):
+        fields = (
+            meta.CharField('question', 'question', maxlength=200),
+            meta.DateTimeField('pub_date', 'date published'),
+        )
+
+    class Choice(meta.Model):
+        fields = (
+            meta.ForeignKey(Poll),
+            meta.CharField('choice', 'choice', maxlength=200),
+            meta.IntegerField('votes', 'votes'),
+        )
+
+The code is straightforward. Each model is represented by a class that
+subclasses ``django.core.meta.Model``. Each model has a single class variable,
+``fields``, which is a tuple of database fields in the model.
+
+Each field is represented by an instance of a ``meta.*Field`` class -- e.g.,
+``meta.CharField`` for character fields and ``meta.DateTimeField`` for
+datetimes. This tells Django what type of data each field holds.
+
+The first argument to each ``Field`` call is the field's name, in
+machine-friendly format. You'll use this value in your Python code, and your
+database will use it as the column name.
+
+The second argument is the field's human-readable name. That's used in a couple
+of introspective parts of Django, and it doubles as documentation.
+
+Some ``meta.*Field`` classes have additional required elements.
+``meta.CharField``, for example, requires that you give it a ``maxlength``.
+That's used not only in the database schema, but in validation, as we'll soon
+see.
+
+Finally, note a relationship is defined, using ``meta.ForeignKey``. That tells
+Django each Choice is related to a single Poll. Django supports all the common
+database relationships: many-to-ones, many-to-manys and one-to-ones.
+
+.. _DRY Principle: http://c2.com/cgi/wiki?DontRepeatYourself
+
+Activating models
+=================
+
+That small bit of model code gives Django a lot of information. With it, Django
+is able to:
+
+* Create a database schema (``CREATE TABLE`` statements) for this app.
+* Create a Python API for accessing Poll and Choice objects.
+
+But first we need to tell our project that the ``polls`` app is installed.
+
+    PHILOSOPHY: Django apps are "pluggable": You can use an app in multiple
+    projects, and you can distribute apps, because they're not tied to a given
+    Django installation.
+
+Edit the myproject/settings/main.py file again, and change the ``INSTALLED_APPS``
+setting to include the string "myproject.apps.polls". So it'll look like this::
+
+    INSTALLED_APPS = (
+        'myproject.apps.polls',
+    )
+
+(Don't forget the trailing comma because of Python's rules about single-value
+tuples.)
+
+Now Django knows myproject includes the polls app. Let's run another command:
+
+    django-admin.py sql polls
+
+You should see the following (the CREATE TABLE SQL statements for the polls app):
+
+    BEGIN;
+    CREATE TABLE polls_polls (
+        id serial NOT NULL PRIMARY KEY,
+        question varchar(200) NOT NULL,
+        pub_date timestamp with time zone NOT NULL
+    );
+    CREATE TABLE polls_choices (
+        id serial NOT NULL PRIMARY KEY,
+        poll_id integer NOT NULL REFERENCES polls_polls (id),
+        choice varchar(200) NOT NULL,
+        votes integer NOT NULL
+    );
+    COMMIT;
+
+Note the following:
+
+* Table names are automatically generated by combining the name of the app
+  (polls) with a plural version of the object name (polls and choices).
+* Primary keys (IDs) are added automatically. (You can override this behavior.)
+* The foreign key relationship is made explicit by a ``REFERENCES`` statement.
+* It's tailored to the database you're using, so database-specific field types
+  such as ``auto_increment`` (MySQL) vs. ``serial`` (PostgreSQL) are handled
+  for you automatically. The author of this tutorial runs PostgreSQL, so the
+  example output is in PostgreSQL syntax.
+
+If you're interested, also run the following commands:
+
+* ``django-admin.py sqlinitialdata polls`` -- Outputs the initial-data inserts
+  required for Django's admin framework.
+* ``django-admin.py sqlclear polls`` -- Outputs the ``DROP TABLE`` statements
+  for this app.
+* ``django-admin.py sqlindexes polls`` -- Outputs the ``CREATE INDEX``
+  statements for this app.
+* ``django-admin.py sqlall polls`` -- A combination of 'sql' and
+  'sqlinitialdata'.
+
+Looking at the output of those commands can help you understand what's actually
+happening under the hood.
+
+Now, run this command:
+
+    django-admin.py install polls
+
+That command automatically creates the database tables for the polls app.
+Behind the scenes, all it does is take the output of
+``django-admin.py sqlall polls`` and execute it in the database pointed-to by
+your Django settings file.
+
+Playing with the API
+====================
+
+Now open the Python interactive shell, and play around with the free Python API
+Django gives you::
+
+    # Modules are dynamically created within django.models.
+    # Their names are plural versions of the model class names.
+    >>> from django.models.polls import polls, choices
+
+    # No polls are in the system yet.
+    >>> polls.get_list()
+    []
+
+    # Create a new Poll.
+    >>> from datetime import datetime
+    >>> p = polls.Poll(id=None, question="What's up?", pub_date=datetime.now())
+
+    # Save the object into the database. You have to call save() explicitly.
+    >>> p.save()
+
+    # Now it has an ID.
+    >>> p.id
+    1
+
+    # Access database columns via Python attributes.
+    >>> p.question
+    "What's up?"
+    >>> p.pub_date
+    datetime.datetime(2005, 7, 15, 12, 00, 53)
+
+    # Change values by changing the attributes, then calling save().
+    >>> p.pub_date = datetime(2005, 4, 1, 0, 0)
+    >>> p.save()
+
+    # get_list() displays all the polls in the database.
+    >>> polls.get_list()
+    [<Poll object>]
+
+Wait a minute. ``<Poll object>`` is, utterly, an unhelpful representation of
+this object. Let's fix that by editing the polls model and adding a
+``__repr__()`` method to both ``Poll`` and ``Choice``::
+
+    class Poll(meta.Model):
+        # ...
+        def __repr__(self):
+            return self.question
+
+    class Choice(meta.Model):
+        # ...
+        def __repr__(self):
+            return self.choice
+
+It's important to add ``__repr__()`` methods to your models, not only for your
+own sanity when dealing with the interactive prompt, but also because objects'
+representations are used throughout Django's automatically-generated admin.
+
+Note these are normal Python methods. Let's add a custom method, just for
+demonstration::
+
+    class Poll(meta.Model):
+        # ...
+        def was_published_today(self):
+            return self.pub_date.date() == datetime.date.today()
+
+Note ``import datetime`` wasn't necessary. Each model method has access to
+a handful of commonly-used variables for convenience, including the
+``datetime`` module from the Python standard library.
+
+Let's jump back into the Python interactive shell::
+
+    >>> from django.models.polls import polls, choices
+    # Make sure our __repr__() addition worked.
+    >>> polls.get_list()
+    [What's up?]
+
+    # Django provides a rich database lookup API that's entirely driven by
+    # keyword arguments.
+    >>> polls.get_object(id__exact=1)
+    What's up
+    >>> polls.get_object(question__startswith='What')
+    What's up
+    >>> polls.get_object(pub_date__year=2005)
+    What's up
+    >>> polls.get_object(id__exact=2)
+    Traceback (most recent call last):
+        ...
+    django.models.polls.PollDoesNotExist: Poll does not exist for {'id__exact': 2}
+    >>> polls.get_list(question__startswith='What')
+    [What's up]
+
+    # Give the Poll a couple of Choices. Each one of these method calls does an
+    # INSERT statement behind the scenes and returns the new Choice object.
+    >>> p = polls.get_object(id__exact=1)
+    >>> p.add_choice(choice='Not much', votes=0)
+    Not much
+    >>> p.add_choice(choice='The sky', votes=0)
+    The sky
+    >>> c = p.add_choice(choice='Just hacking again', votes=0)
+
+    # Choice objects have API access to their related Poll objects.
+    >>> c.get_poll()
+    What's up
+
+    # And vice versa: Poll objects get access to Choice objects.
+    >>> p.get_choice_list()
+    [Not much, The sky, Just hacking again]
+    >>> p.get_choice_count()
+    3
+
+    # The API automatically follows relationships as far as you need.
+    # Use double underscores to separate relationships.
+    # This works as many levels deep as you want. There's no limit.
+    # Find all Choices for any poll whose pub_date is in 2005.
+    >>> choices.get_list(poll__pub_date__year=2005)
+    [Not much, The sky, Just hacking again]
+
+    # Let's delete one of the choices. Use delete() for that.
+    >>> c = p.get_choice(choice__startswith='Just hacking')
+    >>> c.delete()
+
+For full details on the database API, see our `Database API reference`_.
+
+.. _Database API reference: http://www.djangoproject.com/documentation/db_api/
+
+Coming soon
+===========
+
+The tutorial ends here for the time being. But check back within 48 hours for
+more:
+
+* Using the dynamically-generated admin site
+* Writing public-facing apps
+* Using the cache framework
+* Using the RSS framework
