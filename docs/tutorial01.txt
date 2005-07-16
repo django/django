@@ -54,6 +54,10 @@ these settings to match your database's connection parameters:
   empty string if your database server is on the same physical machine
   (localhost).
 
+(Make sure you've created a database within PostgreSQL or MySQL by this point.
+Do that with "``CREATE DATABASE database_name;``" within your database's
+interactive prompt.)
+
 Once you've done that, you need to tell Django which settings module you're
 currently using. Do that by setting an environment variable,
 ``DJANGO_SETTINGS_MODULE``::
