@@ -24,10 +24,10 @@ solving two years' worth of database-schema problems. Here's a quick example::
         fields = (
             meta.CharField('full_name', "reporter's full name", maxlength=70),
         )
-    
+
         def __repr__(self):
             return self.full_name
-    
+
     class Article(meta.Model):
         fields = (
             meta.DateTimeField('pub_date', 'publication date'),
@@ -35,7 +35,7 @@ solving two years' worth of database-schema problems. Here's a quick example::
             meta.TextField('article', 'article'),
             meta.ForeignKey(Reporter),
         )
-    
+
         def __repr__(self):
             return self.headline
 
@@ -58,29 +58,29 @@ is created on the fly: No code generation necessary::
     # Modules are dynamically created within django.models.
     # Their names are plural versions of the model class names.
     >>> from django.models.news import reporters, articles
-    
+
     # No reporters are in the system yet.
     >>> reporters.get_list()
     []
-    
+
     # Create a new Reporter.
     >>> r = reporters.Reporter(id=None, full_name='John Smith')
-    
+
     # Save the object into the database. You have to call save() explicitly.
     >>> r.save()
-    
+
     # Now it has an ID.
     >>> r.id
     1
-    
+
     # Now the new reporter is in the database.
     >>> reporters.get_list()
     [John Smith]
-    
+
     # Fields are represented as attributes on the Python object.
     >>> r.full_name
     'John Smith'
-    
+
     # Django provides a rich database lookup API that's entirely driven by keyword arguments.
     >>> reporters.get_object(id__exact=1)
     John Smith
@@ -91,35 +91,35 @@ is created on the fly: No code generation necessary::
     >>> reporters.get_object(id__exact=2)
     Traceback (most recent call last):
         ...
-    django.models.polls.ReporterDoesNotExist: Reporter does not exist for {'id__exact': 2}
-    
+    django.models.news.ReporterDoesNotExist: Reporter does not exist for {'id__exact': 2}
+
     # Create an article.
     >>> from datetime import datetime
     >>> a = articles.Article(id=None, pub_date=datetime.now(), headline='Django is cool', article='Yeah.', reporter_id=1)
     >>> a.save()
-    
+
     # Now the article is in the database.
     >>> articles.get_list()
     [Django is cool]
-    
+
     # Article objects get API access to related Reporter objects.
     >>> r = a.get_reporter()
     >>> r.full_name
     'John Smith'
-    
+
     # And vice versa: Reporter objects get API access to Article objects.
     >>> r.get_article_list()
     [Django is cool]
-    
+
     # The API follows relationships as far as you need.
     # Find all articles by a reporter whose name starts with "John".
     >>> articles.get_list(reporter__full_name__startswith="John")
     [Django is cool]
-    
+
     # Change an object by altering its attributes and calling save().
     >>> r.full_name = 'Billy Goat'
     >>> r.save()
-    
+
     # Delete an object with delete().
     >>> r.delete()
 
@@ -167,7 +167,7 @@ To design URLs for an app, you create a Python module. For the above
 Reporter/Article example, here's what that might look like::
 
     from django.conf.urls.defaults import *
-    
+
     urlpatterns = patterns('',
         (r'^/articles/(?P\d{4})/$',                   'myproject.news.views.articles.year_archive'),
         (r'^/articles/(?P\d{4})/(?P\d{2})/$',         'myproject.news.views.articles.month_archive'),
@@ -205,7 +205,7 @@ and renders the template with the retrieved data. Here's an example view for
 article_detail from above::
 
     from django.models.news import articles
-    
+
     def article_detail(request, year, month, article_id):
         # Use the Django API to find an object matching the URL criteria.
         try:
@@ -235,9 +235,9 @@ Let's say the ``news/article_detail`` template was found. Here's what that might
 look like::
 
     {% extends "base" %}
-    
+
     {% block title %}{{ article.headline }}{% endblock %}
-    
+
     {% block content %}
     <h1>{{ article.headline }}</h1>
     <p>By {{ article.get_reporter.full_name }}</p>
@@ -270,7 +270,7 @@ template has to define only what's unique to that template.
 
 Here's what the "base" template might look like::
 
-    
+
     <html>
     <head>
         <title>{% block title %}</title>
@@ -300,7 +300,7 @@ This has been only a quick overview of Django's functionality. Some more useful
 features:
 
     * A caching framework that integrates with memcached or other backends.
-    * An RSS framework that makes creating RSS feeds as easy as writing a 
+    * An RSS framework that makes creating RSS feeds as easy as writing a
       small Python class.
     * More sexy automatically-generated admin features -- this overview barely
       scratched the surface
