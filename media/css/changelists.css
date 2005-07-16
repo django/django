@@ -1,0 +1,59 @@
+/* 
+    ______________________________
+    WORLD ONLINE PUBLISHING SYSTEM 
+    Admin Changelist Styles
+    
+    Extends global.css
+    
+    by World Online, Copyright 2004
+    
+    645 New Hampshire
+    Lawrence, KS 66044
+    
+    webmaster@ljworld.com
+    
+*/
+
+#changelist {position:relative; width:100%;}
+#changelist table {width:100%;}
+.change-list .filtered table { border-right:1px solid #ddd; }
+.change-list .filtered {min-height:400px; _height:400px;}
+.change-list .filtered {background:white url(../img/admin/changelist-bg.gif) top right repeat-y !important;}
+.change-list .filtered table, .filtered .paginator, .filtered #toolbar, .filtered div.xfull {margin-right:160px !important; width:auto !important; }
+.change-list .filtered table tbody th {padding-right:10px;}
+#changelist .toplinks {border-bottom:1px solid #ccc !important;}
+#changelist .paginator { color:#666; border-top:1px solid #eee; border-bottom:1px solid #eee; background:white url(../img/admin/nav-bg.gif) 0 180% repeat-x; overflow:hidden;}
+.change-list .filtered .paginator { border-right:1px solid #ddd; }
+
+/*  CHANGELIST TABLES  */
+
+#changelist table thead th {white-space:nowrap;}
+#changelist table tbody td {border-left: 1px solid #ddd;}
+#changelist table tfoot {color: #666;}
+
+/*  TOOLBAR  */
+
+#changelist #toolbar {padding:3px; border-bottom:1px solid #ddd; background:#e1e1e1 url(../img/admin/nav-bg.gif) top left repeat-x; color:#666;}
+#changelist #toolbar form input {font-size:11px; padding:1px 2px;}
+#changelist #toolbar form #searchbar {padding:2px;}
+#changelist #changelist-search img {vertical-align:middle;}
+
+/*  FILTER COLUMN  */
+
+#changelist-filter {position:absolute; top:0; right:0; z-index:1000; width:160px; border-left:1px solid #ddd; background:#efefef; margin:0;}
+#changelist-filter h2 {font-size:11px; padding:2px 5px; border-bottom:1px solid #ddd;}
+#changelist-filter h3 {font-size:12px; margin-bottom:0;}
+#changelist-filter ul {padding-left:0;margin-left:10px;_margin-right:-10px;}
+#changelist-filter li {list-style-type:none; margin-left:0; padding-left:0;}
+#changelist-filter a {color:#999;}
+#changelist-filter a:hover {color:#036;}
+#changelist-filter li.selected {border-left:5px solid #ccc; padding-left:5px;margin-left:-10px;}
+#changelist-filter li.selected a {color:#5b80b2 !important;}
+
+/*  DATE DRILLDOWN  */
+
+.change-list ul.toplinks {display:block; background:white url(../img/admin/nav-bg-reverse.gif) 0 -10px repeat-x; border-top:1px solid white; float:left;  padding:0 !important;  margin:0 !important; width:100%;}
+.change-list ul.toplinks li {float: left; width: 9em; padding:3px 6px; font-weight: bold; list-style-type:none;}
+.change-list ul.toplinks .date-back a {color:#999;}
+.change-list ul.toplinks .date-back a:hover {color:#036;}
+
