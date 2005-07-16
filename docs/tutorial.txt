@@ -40,13 +40,13 @@ settings. Let's look at what ``startproject`` created::
 
 First, edit ``myproject/settings/main.py``. It's a normal Python module with
 module-level variables representing Django settings. Edit the file and change
-these settings to match your database's connection parameters::
+these settings to match your database's connection parameters:
 
 * ``DATABASE_ENGINE`` -- Either 'postgresql' or 'mysql'. More coming soon.
 * ``DATABASE_NAME`` -- The name of your database.
 * ``DATABASE_USER`` -- Your database username.
 * ``DATABASE_PASSWORD`` -- Your database password.
-* ``DATABASE_HOST`` -- The host your database is on. Just leave this as an
+* ``DATABASE_HOST`` -- The host your database is on. Leave this as an
   empty string if your database server is on the same physical machine
   (localhost).
 
@@ -61,28 +61,28 @@ your `Python path`_ -- so that the Python statement ``import myproject.settings.
 works. Throughout Django, you'll be referring to your projects and apps via
 Python package syntax.
 
-Then run the following command:
+Then run the following command::
 
     django-admin.py init
 
 If you don't see any errors, you know it worked. That command initialized your
 database with Django's core database tables. If you're interested, run the
-PostgreSQL or MySQL command-line client and type "\dt" (PostgreSQL) or
-"SHOW TABLES" (MySQL) to display the tables.
+PostgreSQL or MySQL command-line client and type "\\dt" (PostgreSQL) or
+"SHOW TABLES;" (MySQL) to display the tables.
 
 Now you're set to start doing work. You won't have to take care of this boring
 administrative stuff again.
 
-:: _Python path: http://docs.python.org/tut/node8.html#SECTION008110000000000000000
+.. _`Python path`: http://docs.python.org/tut/node8.html#SECTION008110000000000000000
 
 Creating models
 ===============
 
-``cd`` into the ``myproject/apps`` directory and type this command:
+Change into the ``myproject/apps`` directory and type this command::
 
     django-admin.py startapp polls
 
-That'll create a directory structure like this:
+That'll create a directory structure like this::
 
     polls/
         __init__.py
@@ -100,16 +100,16 @@ This directory structure will house the poll application.
 The first step in writing a database Web app in Django is to define your models
 -- essentially, your database layout, with additional metadata.
 
-    PHILOSOPHY: A model is the single, definitive source of data about your
-    data. It contains the essential fields and behaviors of the data you're
-    storing. Django follows the `DRY Principle`_. The goal is to define your
-    data model in one place and automatically derive things from it.
+   PHILOSOPHY: A model is the single, definitive source of data about your
+   data. It contains the essential fields and behaviors of the data you're
+   storing. Django follows the `DRY Principle`_. The goal is to define your
+   data model in one place and automatically derive things from it.
 
 In our simple poll app, we'll create two models: polls and choices. A poll has
 a question, a publication date and an expiration date. A choice has two fields:
 the text of the choice and a vote tally. Each choice is associated with a poll.
 
-Edit the ``polls/models/polls.py`` file so that it looks like this:
+Edit the ``polls/models/polls.py`` file so that it looks like this::
 
     from django.core import meta
 
@@ -159,13 +159,13 @@ That small bit of model code gives Django a lot of information. With it, Django
 is able to:
 
 * Create a database schema (``CREATE TABLE`` statements) for this app.
-* Create a Python API for accessing Poll and Choice objects.
+* Create a Python database-access API for accessing Poll and Choice objects.
 
 But first we need to tell our project that the ``polls`` app is installed.
 
-    PHILOSOPHY: Django apps are "pluggable": You can use an app in multiple
-    projects, and you can distribute apps, because they're not tied to a given
-    Django installation.
+   PHILOSOPHY: Django apps are "pluggable": You can use an app in multiple
+   projects, and you can distribute apps, because they're not tied to a given
+   Django installation.
 
 Edit the myproject/settings/main.py file again, and change the ``INSTALLED_APPS``
 setting to include the string "myproject.apps.polls". So it'll look like this::
@@ -177,11 +177,11 @@ setting to include the string "myproject.apps.polls". So it'll look like this::
 (Don't forget the trailing comma because of Python's rules about single-value
 tuples.)
 
-Now Django knows myproject includes the polls app. Let's run another command:
+Now Django knows myproject includes the polls app. Let's run another command::
 
     django-admin.py sql polls
 
-You should see the following (the CREATE TABLE SQL statements for the polls app):
+You should see the following (the CREATE TABLE SQL statements for the polls app)::
 
     BEGIN;
     CREATE TABLE polls_polls (
@@ -200,8 +200,9 @@ You should see the following (the CREATE TABLE SQL statements for the polls app)
 Note the following:
 
 * Table names are automatically generated by combining the name of the app
-  (polls) with a plural version of the object name (polls and choices).
-* Primary keys (IDs) are added automatically. (You can override this behavior.)
+  (polls) with a plural version of the object name (polls and choices). (You
+  can override this behavior.)
+* Primary keys (IDs) are added automatically. (You can override this, too.)
 * The foreign key relationship is made explicit by a ``REFERENCES`` statement.
 * It's tailored to the database you're using, so database-specific field types
   such as ``auto_increment`` (MySQL) vs. ``serial`` (PostgreSQL) are handled
@@ -222,7 +223,7 @@ If you're interested, also run the following commands:
 Looking at the output of those commands can help you understand what's actually
 happening under the hood.
 
-Now, run this command:
+Now, run this command::
 
     django-admin.py install polls
 
@@ -318,9 +319,14 @@ Let's jump back into the Python interactive shell::
     >>> polls.get_object(id__exact=2)
     Traceback (most recent call last):
         ...
-    django.models.polls.PollDoesNotExist: Poll does not exist for {'id__exact': 2}
+    PollDoesNotExist: Poll does not exist for {'id__exact': 2}
     >>> polls.get_list(question__startswith='What')
     [What's up]
+
+    # Make sure our custom method worked.
+    >>> p = polls.get_object(id__exact=1)
+    >>> p.was_published_today()
+    False
 
     # Give the Poll a couple of Choices. Each one of these method calls does an
     # INSERT statement behind the scenes and returns the new Choice object.
@@ -360,7 +366,7 @@ Coming soon
 ===========
 
 The tutorial ends here for the time being. But check back within 48 hours for
-more:
+the next installments:
 
 * Using the dynamically-generated admin site
 * Writing public-facing apps
