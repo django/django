@@ -26,6 +26,8 @@ MEDIA_ROOT = ''
 # Example: "http://media.lawrence.com"
 MEDIA_URL = ''
 
+ROOT_URLCONF = '{{ project_name }}.settings.urls.main'
+
 TEMPLATE_DIRS = (
     # Put strings here, like "/home/html/django_templates".
 )
