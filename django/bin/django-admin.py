@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-from django.core import db, meta
 import django
 import os, re, sys
 
@@ -45,6 +44,7 @@ def _is_valid_dir_name(s):
 
 def get_sql_create(mod):
     "Returns a list of the CREATE TABLE SQL statements for the given module."
+    from django.core import db, meta
     final_output = []
     for klass in mod._MODELS:
         opts = klass._meta
@@ -104,6 +104,7 @@ get_sql_create.args = APP_ARGS
 
 def get_sql_delete(mod):
     "Returns a list of the DROP TABLE SQL statements for the given module."
+    from django.core import db
     try:
         cursor = db.db.cursor()
     except:
@@ -166,6 +167,7 @@ get_sql_initial_data.args = APP_ARGS
 
 def get_sql_sequence_reset(mod):
     "Returns a list of the SQL statements to reset PostgreSQL sequences for the given module."
+    from django.core import meta
     output = []
     for klass in mod._MODELS:
         for f in klass._meta.fields:
@@ -196,6 +198,7 @@ get_sql_all.args = APP_ARGS
 
 def database_check(mod):
     "Checks that everything is properly installed in the database for the given module."
+    from django.core import db
     cursor = db.db.cursor()
     app_label = mod._MODELS[0]._meta.app_label
 
@@ -247,6 +250,7 @@ database_check.args = APP_ARGS
 
 def get_admin_index(mod):
     "Returns admin-index template snippet (in list form) for the given module."
+    from django.core import meta
     output = []
     app_label = mod._MODELS[0]._meta.app_label
     output.append('{%% if perms.%s %%}' % app_label)
@@ -268,6 +272,7 @@ get_admin_index.args = APP_ARGS
 
 def init():
     "Initializes the database with auth and core."
+    from django.core import db, meta
     auth = meta.get_app('auth')
     core = meta.get_app('core')
     try:
@@ -284,6 +289,7 @@ init.args = ''
 
 def install(mod):
     "Executes the equivalent of 'get_sql_all' in the current database."
+    from django.core import db
     sql_list = get_sql_all(mod)
     try:
         cursor = db.db.cursor()
@@ -400,8 +406,10 @@ if __name__ == "__main__":
         ACTION_MAPPING[action](name, os.getcwd())
         sys.exit(0)
     elif action == 'dbcheck':
+        from django.core import meta
         mod_list = meta.get_all_installed_modules()
     else:
+        from django.core import meta
         try:
             mod_list = [meta.get_app(app_label) for app_label in sys.argv[2:]]
         except ImportError, e:
