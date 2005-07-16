@@ -6,6 +6,24 @@
 {% block content %}
 <div id="content-main">
 
+{% load adminapplist %}
+
+{% get_admin_app_list as app_list %}
+{% for app in app_list %}
+    <div class="module">
+    <h2>{{ app.name }}</h2>
+    <table>
+    {% for model in app.models %}
+        <tr>
+            <th><a href="{{ model.admin_url }}">{{ model.name }}</a></th>
+            <td class="x50"><a href="{{ model.admin_url }}add/" class="addlink">Add</a></td>
+            <td class="x75"><a href="{{ model.admin_url }}" class="changelink">Change</a></td>
+        </tr>
+    {% endfor %}
+    </table>
+    </div>
+{% endfor %}
+
 </div>
 {% endblock %}
 
