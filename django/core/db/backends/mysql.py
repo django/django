@@ -35,10 +35,11 @@ class DatabaseWrapper:
         return self.connection.cursor()
 
     def commit(self):
-        pass
+        self.connection.commit()
 
     def rollback(self):
-        pass
+        if self.connection:
+            self.connection.rollback()
 
     def close(self):
         if self.connection is not None:
