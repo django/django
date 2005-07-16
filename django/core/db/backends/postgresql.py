@@ -62,7 +62,10 @@ def get_last_insert_id(cursor, table_name, pk_name):
 # Register these custom typecasts, because Django expects dates/times to be
 # in Python's native (standard-library) datetime/time format, whereas psycopg
 # use mx.DateTime by default.
-Database.register_type(Database.new_type((1082,), "DATE", typecasts.typecast_date))
+try:
+    Database.register_type(Database.new_type((1082,), "DATE", typecasts.typecast_date))
+except AttributeError:
+    raise Exception, "You appear to be using Psycopg version 2, which isn't supported yet, because it's still in beta. Use psycopg version 1 instead: http://initd.org/projects/psycopg1"
 Database.register_type(Database.new_type((1083,1266), "TIME", typecasts.typecast_time))
 Database.register_type(Database.new_type((1114,1184), "TIMESTAMP", typecasts.typecast_timestamp))
 Database.register_type(Database.new_type((16,), "BOOLEAN", typecasts.typecast_boolean))
