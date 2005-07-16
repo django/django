@@ -13,7 +13,10 @@ MODULE_TEMPLATE = '''    {%% if perms.%(app)s.%(addperm)s or perms.%(app)s.%(cha
 
 APP_ARGS = '[app app ...]'
 
+# Use django.__path__[0] because we don't know which directory django into
+# which has been installed.
 PROJECT_TEMPLATE_DIR = django.__path__[0] + '/conf/%s_template'
+ADMIN_TEMPLATE_DIR = django.__path__[0] + '/conf/admin_templates'
 
 def _get_packages_insert(app_label):
     return "INSERT INTO packages (label, name) VALUES ('%s', '%s');" % (app_label, app_label)
@@ -331,6 +334,14 @@ def _start_helper(app_or_project, name, directory, other_name=''):
 def startproject(project_name, directory):
     "Creates a Django project for the given project_name in the given directory."
     _start_helper('project', project_name, directory)
+    # Populate TEMPLATE_DIRS for the admin templates, based on where Django is
+    # installed.
+    settings_file = os.path.join(directory, project_name, 'settings/admin.py')
+    settings_contents = open(settings_file, 'r').read()
+    fp = open(settings_file, 'w')
+    settings_contents = re.sub(r'(?s)\b(TEMPLATE_DIRS\s*=\s*\()(.*?)\)', "\\1\n    '%s',\\2)" % ADMIN_TEMPLATE_DIR, settings_contents)
+    fp.write(settings_contents)
+    fp.close()
 startproject.help_doc = "Creates a Django project directory structure for the given project name in the current directory."
 startproject.args = "[projectname]"
 
