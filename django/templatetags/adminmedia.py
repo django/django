@@ -12,7 +12,6 @@ def admin_media_prefix(parser, token):
     """
     {% admin_media_prefix %}
     """
-    bits = token.contents.split()
     return AdminMediaPrefixNode()
 
 template.register_tag('admin_media_prefix', admin_media_prefix)
