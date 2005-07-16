@@ -1049,7 +1049,7 @@ def delete_stage(request, app_label, module_name, object_id):
 
     # Populate deleted_objects, a data structure of all related objects that
     # will also be deleted.
-    deleted_objects = ['%s: <a href="../../%s/">%r</a>' % (meta.capfirst(opts.verbose_name), object_id, obj), []]
+    deleted_objects = ['%s: <a href="../../%s/">%s</a>' % (meta.capfirst(opts.verbose_name), object_id, strip_tags(repr(obj))), []]
     perms_needed = sets.Set()
     _get_deleted_objects(deleted_objects, perms_needed, request.user, obj, opts, 1)
 
