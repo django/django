@@ -7,14 +7,20 @@ This document will get you up and running with Django.
 Install Apache and mod_python
 =============================
 
-Currently, Django runs on Apache_ with `mod_python`_, although we're planning
-full WSGI support, which means Django will run on a variety of server
-platforms.
+Currently, Django runs on Apache_ with `mod_python`_. mod_python is similar to
+mod_perl -- it embeds Python within Apache and loads Python code into memory
+when the server starts. Code stays in memory throughout the life of an Apache
+process, which leads to significant performance gains over CGI.
 
-Make sure you have Apache installed, with the mod_python module activated.
+If you can't use mod_python for some reason, fear not: We're planning full WSGI_
+support, which means Django will run on a variety of server platforms.
+
+For the time being, make sure you have Apache installed, with the mod_python
+module activated.
 
 .. _Apache: http://httpd.apache.org/
 .. _mod_python: http://www.modpython.org/
+.. _WSGI: http://www.python.org/peps/pep-0333.html
 
 Get your database running
 =========================
