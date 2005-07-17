@@ -20,11 +20,11 @@
 #changelist table {width:100%;}
 .change-list .filtered table { border-right:1px solid #ddd; }
 .change-list .filtered {min-height:400px; _height:400px;}
-.change-list .filtered {background:white url(../img/changelist-bg.gif) top right repeat-y !important;}
+.change-list .filtered {background:white url(../img/admin/changelist-bg.gif) top right repeat-y !important;}
 .change-list .filtered table, .filtered .paginator, .filtered #toolbar, .filtered div.xfull {margin-right:160px !important; width:auto !important; }
 .change-list .filtered table tbody th {padding-right:10px;}
 #changelist .toplinks {border-bottom:1px solid #ccc !important;}
-#changelist .paginator { color:#666; border-top:1px solid #eee; border-bottom:1px solid #eee; background:white url(../img/nav-bg.gif) 0 180% repeat-x; overflow:hidden;}
+#changelist .paginator { color:#666; border-top:1px solid #eee; border-bottom:1px solid #eee; background:white url(../img/admin/nav-bg.gif) 0 180% repeat-x; overflow:hidden;}
 .change-list .filtered .paginator { border-right:1px solid #ddd; }
 
 /*  CHANGELIST TABLES  */
@@ -35,7 +35,7 @@
 
 /*  TOOLBAR  */
 
-#changelist #toolbar {padding:3px; border-bottom:1px solid #ddd; background:#e1e1e1 url(../img/nav-bg.gif) top left repeat-x; color:#666;}
+#changelist #toolbar {padding:3px; border-bottom:1px solid #ddd; background:#e1e1e1 url(../img/admin/nav-bg.gif) top left repeat-x; color:#666;}
 #changelist #toolbar form input {font-size:11px; padding:1px 2px;}
 #changelist #toolbar form #searchbar {padding:2px;}
 #changelist #changelist-search img {vertical-align:middle;}
@@ -54,7 +54,7 @@
 
 /*  DATE DRILLDOWN  */
 
-.change-list ul.toplinks {display:block; background:white url(../img/nav-bg-reverse.gif) 0 -10px repeat-x; border-top:1px solid white; float:left;  padding:0 !important;  margin:0 !important; width:100%;}
+.change-list ul.toplinks {display:block; background:white url(../img/admin/nav-bg-reverse.gif) 0 -10px repeat-x; border-top:1px solid white; float:left;  padding:0 !important;  margin:0 !important; width:100%;}
 .change-list ul.toplinks li {float: left; width: 9em; padding:3px 6px; font-weight: bold; list-style-type:none;}
 .change-list ul.toplinks .date-back a {color:#999;}
 .change-list ul.toplinks .date-back a:hover {color:#036;}
