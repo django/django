@@ -219,7 +219,9 @@ The login cookie isn't being set correctly, because the domain of the cookie
 sent out by Django doesn't match the domain in your browser. Try these two
 things:
 
-* Set the ``REGISTRATION_COOKIE_DOMAIN`` setting to match your domain.
+* Set the ``REGISTRATION_COOKIE_DOMAIN`` setting to match your domain. For
+  example, if you're going to "http://www.mysite.com/admin/" in your browser,
+  set ``REGISTRATION_COOKIE_DOMAIN = 'www.mysite.com'``.
 * Some browsers (Firefox?) don't like to accept cookies from domains that don't
   have dots in them. If you're running the admin site on "localhost" or another
   domain that doesn't have a dot in it, try going to "localhost.localdomain" or
