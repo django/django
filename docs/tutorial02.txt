@@ -345,6 +345,95 @@ in a more compact, table-based format:
 .. image:: http://media.djangoproject.com/img/doc/tutorial/admin12.png
    :alt: Add poll page now has more compact choices
 
+Customize the admin change list
+===============================
+
+Now that the Poll admin page is looking good, let's make some tweaks to the
+"change list" page -- the one that displays all the polls in the system.
+
+Here's what it looks like at this point:
+
+.. image:: http://media.djangoproject.com/img/doc/tutorial/admin04t.png
+   :alt: Polls change list page
+   :target: http://media.djangoproject.com/img/doc/tutorial/admin04.png
+
+By default, Django displays the ``repr()`` of each object. But it'd be more
+helpful if we could display individual fields. To do that, use the
+``list_display`` option, which is a tuple of field names to display, as columns,
+on the change list page for the object::
+
+    class Poll(meta.Model):
+        # ...
+        admin = meta.Admin(
+            fields = (
+                (None, {'fields': ('question', 'pub_date')}),
+            ),
+            list_display = ('question', 'pub_date'),
+        )
+
+Just for good measure, let's also include the ``was_published_today`` custom
+method from Tutorial 1::
+
+    list_display = ('question', 'pub_date', 'was_published_today'),
+
+Now the poll change list page looks like this:
+
+.. image:: http://media.djangoproject.com/img/doc/tutorial/admin13t.png
+   :alt: Polls change list page, updated
+   :target: http://media.djangoproject.com/img/doc/tutorial/admin13.png
+
+You can click on the column headers to sort by those values -- except in the
+case of the ``was_published_today`` header, because sorting by the output of
+an arbitrary method is not supported. Also note that the column header for
+``was_published_today`` is, by default, the name of the method. But you can
+change that by giving that method a ``short_description`` attribute::
+
+    def was_published_today(self):
+        return self.pub_date.date() == datetime.date.today()
+    was_published_today.short_description = 'Was published today'
+
+
+Let's add another improvement to the Poll change list page: Filters. Add the
+following line to ``Poll.admin``:
+
+    list_filter = ('pub_date', )
+
+That adds a "Filter" sidebar that lets people filter the change list by the
+``pub_date`` field:
+
+.. image:: http://media.djangoproject.com/img/doc/tutorial/admin14t.png
+   :alt: Polls change list page, updated
+   :target: http://media.djangoproject.com/img/doc/tutorial/admin14.png
+
+The type of filter displayed depends on the type of field you're filtering on.
+Because ``pub_date`` is a DateTimeField, Django knows to give the default
+filter options for DateTimeFields: "Any date," "Today," "Past 7 days,"
+"This month," "This year." Explore using ``list_filter`` on other types of
+fields.
+
+This is shaping up well. Finally, let's add some search capability:
+
+    search_fields = ('question', )
+
+That adds a search box at the top of the change list. When somebody enters
+search terms, Django will search the ``question`` field. You can use as many
+fields as you'd like -- although because it uses a LIKE query behind the
+scenes, keep it reasonable to mind your database performance.
+
+Finally, because Poll objects have dates, it'd be convenient to be able to
+drill down by date. Add this line::
+
+    date_hierarchy = 'pub_date',
+
+That adds hierarchical navigation, by date, to the top of the change list page.
+At top level, it displays all available years. Then it drills down to months
+and, ultimately, days.
+
+Now's also a good time to note that change lists give you free pagination. The
+default is to display 50 items per page. Change-list pagination, search boxes,
+filters, date-hierarchies and column-header-ordering all work together like you
+think they should.
+
 More
 ====
 
