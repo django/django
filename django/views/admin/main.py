@@ -280,7 +280,7 @@ def change_list(request, app_label, module_name):
     # Search form.
     if lookup_opts.admin.search_fields:
         raw_template.append('<div id="toolbar">\n<form id="changelist-search" action="" method="get">\n')
-        raw_template.append('<label><img src="%simg/admin/icon_searchbox.png" /></label> ' % ADMIN_MEDIA_PREFIX)
+        raw_template.append('<label><img src="%simg/icon_searchbox.png" /></label> ' % ADMIN_MEDIA_PREFIX)
         raw_template.append('<input type="text" size="40" name="%s" value="%s" id="searchbar" /> ' % \
             (SEARCH_VAR, escape(query)))
         raw_template.append('<input type="submit" value="Go" /> ')
