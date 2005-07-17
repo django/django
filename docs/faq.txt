@@ -209,8 +209,28 @@ but we recognize that choosing a template language runs close to religion.
 There's nothing about Django that requires using the template language, so
 if you're attached to ZPT, Cheetah, or whatever, feel free to use those.
 
-The admin interface
-===================
+The admin site
+==============
+
+I can't log in. When I enter a valid username and password, it just brings up the login page again, with no error messages.
+---------------------------------------------------------------------------------------------------------------------------
+
+The login cookie isn't being set correctly, because the domain of the cookie
+sent out by Django doesn't match the domain in your browser. Try these two
+things:
+
+* Set the ``REGISTRATION_COOKIE_DOMAIN`` setting to match your domain.
+* Some browsers (Firefox?) don't like to accept cookies from domains that don't
+  have dots in them. If you're running the admin site on "localhost" or another
+  domain that doesn't have a dot in it, try going to "localhost.localdomain" or
+  "127.0.0.1". And set ``REGISTRATION_COOKIE_DOMAIN`` accordingly.
+
+I can't log in. When I enter a valid username and password, it brings up the login page again, with a "Please enter a correct username and password" error.
+-----------------------------------------------------------------------------------------------------------------------------------------------------------
+
+If you're sure your username and password are correct, make sure your user
+account has ``is_active`` and ``is_staff`` set to True. The admin site only
+allows access to users with those two fields both set to True.
 
 The dynamically-generated admin site is ugly! How can I change it?
 ------------------------------------------------------------------
