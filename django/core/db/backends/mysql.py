@@ -64,7 +64,20 @@ def get_last_insert_id(cursor, table_name, pk_name):
 
 def get_date_extract_sql(lookup_type, table_name):
     # lookup_type is 'year', 'month', 'day'
+    # http://dev.mysql.com/doc/mysql/en/date-and-time-functions.html
     return "EXTRACT(%s FROM %s)" % (lookup_type.upper(), table_name)
+
+def get_date_trunc_sql(lookup_type, field_name):
+    # lookup_type is 'year', 'month', 'day'
+    # http://dev.mysql.com/doc/mysql/en/date-and-time-functions.html
+    # MySQL doesn't support DATE_TRUNC, so we fake it by subtracting intervals.
+    # If you know of a better way to do this, please file a Django ticket.
+    subtractions = ["interval (DATE_FORMAT(%s, '%%%%s')) second - interval (DATE_FORMAT(%s, '%%%%i')) minute - interval (DATE_FORMAT(%s, '%%%%H')) hour" % (field_name, field_name, field_name)]
+    if lookup_type in ('year', 'month'):
+        subtractions.append(" - interval (DATE_FORMAT(%s, '%%%%e')-1) day" % field_name)
+    if lookup_type == 'year':
+        subtractions.append(" - interval (DATE_FORMAT(%s, '%%%%m')-1) month" % field_name)
+    return "(%s - %s)" % (field_name, ''.join(subtractions))
 
 OPERATOR_MAPPING = {
     'exact': '=',

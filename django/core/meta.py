@@ -1264,6 +1264,7 @@ def function_get_latest(opts, klass, does_not_exist_exception, **kwargs):
     return function_get_object(opts, klass, does_not_exist_exception, **kwargs)
 
 def function_get_date_list(opts, field, *args, **kwargs):
+    from django.core.db.typecasts import typecast_timestamp
     kind = args and args[0] or kwargs['kind']
     assert kind in ("month", "year", "day"), "'kind' must be one of 'year', 'month' or 'day'."
     order = 'ASC'
@@ -1275,10 +1276,13 @@ def function_get_date_list(opts, field, *args, **kwargs):
     if field.null:
         kwargs.setdefault('where', []).append('%s.%s IS NOT NULL' % (opts.db_table, field.name))
     select, sql, params = function_get_sql_clause(opts, **kwargs)
-    sql = "SELECT DATE_TRUNC(%%s, %s.%s) %s GROUP BY 1 ORDER BY 1 %s" % (opts.db_table, field.name, sql, order)
+    sql = 'SELECT %s %s GROUP BY 1 ORDER BY 1' % (db.get_date_trunc_sql(kind, '%s.%s' % (opts.db_table, field.name)), sql)
     cursor = db.db.cursor()
-    cursor.execute(sql, [kind] + params)
-    return [row[0] for row in cursor.fetchall()]
+    cursor.execute(sql, params)
+    # We have to manually run typecast_timestamp(str()) on the results, because
+    # MySQL doesn't automatically cast the result of date functions as datetime
+    # objects -- MySQL returns the values as strings, instead.
+    return [typecast_timestamp(str(row[0])) for row in cursor.fetchall()]
 
 ###################################
 # HELPER FUNCTIONS (MANIPULATORS) #

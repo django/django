@@ -29,5 +29,6 @@ dictfetchall = dbmod.dictfetchall
 dictfetchall = dbmod.dictfetchall
 get_last_insert_id = dbmod.get_last_insert_id
 get_date_extract_sql = dbmod.get_date_extract_sql
+get_date_trunc_sql = dbmod.get_date_trunc_sql
 OPERATOR_MAPPING = dbmod.OPERATOR_MAPPING
 DATA_TYPES = dbmod.DATA_TYPES

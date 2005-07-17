@@ -63,7 +63,13 @@ def get_last_insert_id(cursor, table_name, pk_name):
 
 def get_date_extract_sql(lookup_type, table_name):
     # lookup_type is 'year', 'month', 'day'
+    # http://www.postgresql.org/docs/8.0/static/functions-datetime.html#FUNCTIONS-DATETIME-EXTRACT
     return "EXTRACT('%s' FROM %s)" % (lookup_type, table_name)
+
+def get_date_trunc_sql(lookup_type, field_name):
+    # lookup_type is 'year', 'month', 'day'
+    # http://www.postgresql.org/docs/8.0/static/functions-datetime.html#FUNCTIONS-DATETIME-TRUNC
+    return "DATE_TRUNC('%s', %s)" % (lookup_type, field_name)
 
 # Register these custom typecasts, because Django expects dates/times to be
 # in Python's native (standard-library) datetime/time format, whereas psycopg
