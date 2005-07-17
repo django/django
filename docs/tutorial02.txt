@@ -1,0 +1,258 @@
+=====================================
+Writing your first Django app, part 2
+=====================================
+
+By Adrian Holovaty <holovaty@gmail.com>
+
+This tutorial begins where `Tutorial 1`_ left off. We're continuing the Web-poll
+application and will focus on Django's automatically-generated admin site.
+
+.. _Tutorial 1: http://www.djangoproject.com/documentation/tutorial1/
+
+Philosophy
+==========
+
+Generating admin sites for your staff or clients to add, change and delete
+content is tedious work that doesn't require much creativity. For that reason,
+Django entirely automates creation of admin interfaces for models.
+
+Django was written in a newsroom environment, with a very clear separation
+between "content publishers" and the "public" site. Site managers use the
+system to add news stories, events, sports scores, etc., and that content is
+displayed on the public site. Django solves the problem of creating a unified
+interface for site administrators to edit content.
+
+The admin isn't necessarily intended to be used by site visitors; it's for site
+managers.
+
+Expose the admin media files
+============================
+
+Django's admin is intended to be fully functional and good looking. For that
+reason, Django ships with admin media files -- CSS, JavaScript and images --
+that comprise the admin's design. To set up a Django admin instance, the first
+thing to do is put those media files online somewhere.
+
+(Note: Although Django ships with a default design for its admin site, you can
+change it however you'd like. The admin uses Django's own template system and
+is powered -- surprise, surprise -- by Django itself, so it is completely
+customizable.)
+
+The files are in the ``media`` directory of the Django distribution. To
+"activate" them, copy that directory under a Web document root somewhere, so
+that you can access them via the Web.
+
+Be careful not to put your Python source code under the Web document root. Just
+do the media files.
+
+Then, tell Django where you put them, via ``ADMIN_MEDIA_PREFIX`` in the
+``myproject.settings.admin`` settings file. Examples::
+
+    # You can leave off the domain if they're on the same domain as your admin
+    # site will be.
+    ADMIN_MEDIA_PREFIX = '/adminmedia/'
+
+    # Otherwise, use the fully-qualified domain.
+    ADMIN_MEDIA_PREFIX = 'http://www.foo.com/adminmedia/'
+
+Make sure to include a trailing slash.
+
+Hook into mod_python
+====================
+
+Now let's take the opportunity to hook Django into Apache/mod_python. Edit your
+``httpd.conf`` file and add this::
+
+    <Location "/admin/">
+        SetHandler python-program
+        PythonHandler django.core.handler
+        SetEnv DJANGO_SETTINGS_MODULE myproject.settings.admin
+    </Location>
+
+This tells Apache: "Use mod_python for any URL at or under '/admin/', using the
+Django mod_python handler." It also passes the value of ``DJANGO_SETTINGS_MODULE``,
+so mod_python knows which project to use. Note that we're passing the path to
+the ``admin`` settings, not the ``main`` settings. That's because this is the
+admin site, which has slightly different settings.
+
+You can also add directives such as ``PythonAutoReload Off`` for performance.
+See the `mod_python documentation`_ for a full list of options.
+
+When you've done that, restart Apache and go to /admin/ on your domain. You
+should see the admin's login screen:
+
+.. image:: http://media.djangoproject.com/img/doc/tutorial/admin01.png
+   :alt: Django admin login screen
+
+.. _mod_python documentation: http://modpython.org/live/current/doc-html/directives.html
+
+Create a user account
+=====================
+
+We can't log in, though, because we haven't created an admin user account yet.
+Drop into the Python interactive interpreter and type this::
+
+    # The function django.models.auth.users.create_user() creates a new user
+    # and returns the new auth.User object.
+    # Don't use 'username' and 'password'. Those are just examples.
+    >>> from django.models.auth import users
+    >>> u = users.create_user('username', 'your_email@domain.com', 'password')
+
+    # But we're not done. We need to explicitly set is_staff and is_active to
+    # allow this user to access the admin. Might as well make it a superuser,
+    # too.
+    u.is_staff = True
+    u.is_active = True
+    u.is_superuser = True
+
+    # Remember, call the save() method to save changes.
+    u.save()
+
+Enter the admin site
+====================
+
+Now, try logging in. If the login worked, you should see the Django admin index
+page:
+
+.. image:: http://media.djangoproject.com/img/doc/tutorial/admin02t.png
+   :alt: Django admin index page
+   :target: http://media.djangoproject.com/img/doc/tutorial/admin02.png
+
+By default, you should see four types of editable content: groups, users,
+redirects and flat files. These are core features Django ships with by default.
+
+Make the poll app modifiable in the admin
+=========================================
+
+But where's our poll app? It's not displayed on the admin index page.
+
+Just one thing to do: We need to specify in the ``polls.Poll`` model that Poll
+objects have an admin interface. Edit the ``myproject/apps/polls/models/polls.py``
+file and make the following change to add an ``admin`` attribute::
+
+    class Poll(meta.Model):
+        fields = (
+            # ...
+        )
+        admin = meta.Admin(
+            fields = (
+                (None, {'fields': ('question', 'pub_date')}),
+            ),
+        )
+
+Reload the Django admin index page. Note that you might have to restart Apache,
+depending on your Apache settings. Because mod_python saves code in memory for
+performance, Python code changes generally aren't reflected until Apache
+restarts. One way around this is to set ``MaxRequestsPerChild 1`` in your
+httpd.conf to force Apache to reload everything for each request. But don't do
+that on a production server, or we'll revoke your Django privileges.
+
+Explore the free admin functionality
+====================================
+
+Now that ``Poll`` has the ``admin`` attribute, Django knows that it should be
+displayed on the admin index page:
+
+.. image:: http://media.djangoproject.com/img/doc/tutorial/admin03t.png
+   :alt: Django admin index page, now with polls displayed
+   :target: http://media.djangoproject.com/img/doc/tutorial/admin03.png
+
+Click "Polls." Now you're at the "change list" page for polls. This page
+displays all the polls in the database and lets you choose one to change it.
+There's the "What's up?" poll we created in the first tutorial:
+
+.. image:: http://media.djangoproject.com/img/doc/tutorial/admin04t.png
+   :alt: Polls change list page
+   :target: http://media.djangoproject.com/img/doc/tutorial/admin04.png
+
+Click the "What's up?" poll to edit it:
+
+.. image:: http://media.djangoproject.com/img/doc/tutorial/admin05t.png
+   :alt: Editing form for poll object
+   :target: http://media.djangoproject.com/img/doc/tutorial/admin05.png
+
+Things to note here:
+
+* The form is automatically generated from the Poll model.
+* The different model field types (``meta.DateTimeField``, ``meta.CharField``)
+  correspond to the appropriate HTML input widget. Each type of field knows
+  how to display itself in the Django admin.
+* ``DateTimeField``s get free JavaScript shortcuts. Dates get a "Today"
+  shortcut and calendar popup, and times get a "Now" shortcut and a convenient
+  popup that lists commonly entered times.
+* The bottom part of the page gives you a couple of options:
+  * Save -- Saves changes and returns to the changelist page for this type of
+    object.
+  * Save and continue editing -- Saves changes and reloads the admin page for
+    this object.
+  * Save and add another -- Saves changes and loads a new, blank form for this
+    type of object.
+  * Delete -- Displays a delete confirmation page.
+
+Change the "Date published" by clicking the "Today" and "Now" shortcuts. Then
+click "Save and continue editing." Then click "History" in the upper right.
+You'll see a page listing all changes made to this object via the Django admin,
+with the timestamp and username of the person who made the change:
+
+.. image:: http://media.djangoproject.com/img/doc/tutorial/admin06t.png
+   :alt: History page for poll object
+   :target: http://media.djangoproject.com/img/doc/tutorial/admin06.png
+
+Customize the admin form
+========================
+
+Take a few minutes to marvel at all the code you didn't have to write.
+
+Let's customize this a bit. We can reorder the fields by changing the
+order of the field names in the ``admin`` attribute of the model::
+
+        admin = meta.Admin(
+            fields = (
+                (None, {'fields': ('pub_date', 'question')}),
+            ),
+        )
+
+That made the "Publication date" show up first instead of second:
+
+.. image:: http://media.djangoproject.com/img/doc/tutorial/admin07.png
+   :alt: Fields have been reordered
+
+This isn't impressive with only two fields, but for admin forms with dozens
+of fields, choosing an intuitive order is an important usability detail.
+
+And speaking of forms with dozens of fields, you might want to split the form
+up into fieldsets::
+
+        admin = meta.Admin(
+            fields = (
+                (None, {'fields': ('question',)}),
+                ('Date information', {'fields': ('pub_date',)}),
+            ),
+        )
+
+The first element of each tuple in ``fields`` is the title of the fieldset.
+Here's what our form looks like now:
+
+.. image:: http://media.djangoproject.com/img/doc/tutorial/admin08t.png
+   :alt: Form has fieldsets now
+   :target: http://media.djangoproject.com/img/doc/tutorial/admin08.png
+
+You can assign arbitrary HTML classes to each fieldset. Django provides a
+``"collapse"`` class that displays a particular fieldset initially collapsed.
+This is useful when you have a long form that contains a number of fields that
+aren't commonly used::
+
+        admin = meta.Admin(
+            fields = (
+                (None, {'fields': ('question',)}),
+                ('Date information', {'fields': ('pub_date',), 'classes': 'collapse'}),
+            ),
+        )
+
+.. image:: http://media.djangoproject.com/img/doc/tutorial/admin09.png
+   :alt: Fieldset is initially collapsed
+
+Customize the admin change list
+===============================
+
+There's much more to come. This document is not finished.
