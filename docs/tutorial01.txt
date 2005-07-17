@@ -93,7 +93,7 @@ Now you're set to start doing work. You won't have to take care of this boring
 administrative stuff again.
 
 .. _`Python path`: http://docs.python.org/tut/node8.html#SECTION008110000000000000000
-.. _Django;s ticket system: http://code.djangoproject.com/report/1
+.. _Django's ticket system: http://code.djangoproject.com/report/1
 
 Creating models
 ===============
