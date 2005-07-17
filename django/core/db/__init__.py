@@ -15,7 +15,11 @@ let us do that.
 
 from django.conf.settings import DATABASE_ENGINE
 
-dbmod = __import__('django.core.db.backends.%s' % DATABASE_ENGINE, '', '', [''])
+try:
+    dbmod = __import__('django.core.db.backends.%s' % DATABASE_ENGINE, '', '', [''])
+except ImportError:
+    from django.core.exceptions import ImproperlyConfigured
+    raise ImproperlyConfigured, "Your DATABASE_ENGINE setting, %r, is invalid. Is it spelled correctly?" % DATABASE_ENGINE
 
 DatabaseError = dbmod.DatabaseError
 db = dbmod.DatabaseWrapper()
