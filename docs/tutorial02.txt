@@ -259,7 +259,93 @@ aren't commonly used::
 .. image:: http://media.djangoproject.com/img/doc/tutorial/admin09.png
    :alt: Fieldset is initially collapsed
 
-Customize the admin change list
-===============================
+Adding related objects
+======================
+
+OK, we have our Poll admin page. But a ``Poll`` has multiple ``Choices``, and the admin
+page doesn't display choices.
+
+Yet.
+
+In this case, there are two ways to solve this problem. The first is to give
+the ``Choice`` model its own ``admin`` attribute, just as we did with ``Poll``.
+Here's what that would look like::
+
+    class Choice(meta.Model):
+        # ...
+        admin = meta.Admin(
+            fields = (
+                (None, {'fields': ('poll_id', 'choice', 'votes')}),
+            ),
+        )
+
+(Note that we used "poll_id" to refer to the ``ForeignKey(Poll)`` field. The
+field name is automatically calculated from the model's class name, lowercased,
+plus '_id'.)
+
+Now "Choices" is an available option in the Django admin. The "Add choice" form
+looks like this::
+
+.. image:: http://media.djangoproject.com/img/doc/tutorial/admin10.png
+   :alt: Choice admin page
+
+In that form, the "Poll" field is a select box containing every poll in the
+database. In our case, only one poll exists at this point.
+
+Also note the "Add Another" link next to "Poll." Every object with a ForeignKey
+relationship to another gets this for free. When you click "Add Another," you'll
+get a popup window with the "Add poll" form. If you add a poll in that window
+and click "Save," Django will save the poll to the database and dynamically add
+it as the selected choice on the "Add choice" form you're looking at.
+
+But, really, this is an inefficient way of adding Choice objects to the system.
+It'd be better if you could add a bunch of Choices directly when you create the
+Poll object. Let's make that happen.
+
+Remove the ``admin`` for the Choice model. Then, edit the ``ForeignKey(Poll)``
+field like so::
+
+    meta.ForeignKey(Poll, edit_inline=True, num_in_admin=3),
+
+This tells Django: "Choice objects are edited on the Poll admin page. By
+default, provide enough fields for 3 Choices."
+
+Then change the other fields in ``Choice`` to give them ``core=True``::
+
+    meta.CharField('choice', 'choice', maxlength=200, core=True),
+    meta.IntegerField('votes', 'votes', core=True),
+
+This tells Django: "When you edit a Choice on the Poll admin page, the 'choice'
+and 'votes' fields are required. The presence of at least one of them signifies
+the addition of a new Choice object, and clearing at least one of them
+signifies the deletion of that existing Choice object."
+
+Load the "Add poll" page to see how that looks:
+
+.. image:: http://media.djangoproject.com/img/doc/tutorial/admin11t.png
+   :alt: Add poll page now has choices on it
+   :target: http://media.djangoproject.com/img/doc/tutorial/admin11.png
+
+It works like this: There are three slots for related Choices -- as specified
+by ``num_in_admin`` -- but each time you come back to the "Change" page for an
+already-created object, you get one extra slot. (This means there's no
+hard-coded limit on how many related objects can be added.) If you wanted space
+for three extra Choices each time you changed the poll, you'd use
+``num_extra_on_change=3``.
+
+One small problem, though. It takes a lot of screen space to display all the
+fields for entering related Choice objects. For that reason, Django offers an
+alternate way of displaying inline related objects::
+
+    meta.ForeignKey(Poll, edit_inline=True, num_in_admin=3, edit_inline_type=meta.TABULAR),
+
+With that ``edit_inline_type=meta.TABULAR``, the related objects are displayed
+in a more compact, table-based format:
+
+.. image:: http://media.djangoproject.com/img/doc/tutorial/admin12.png
+   :alt: Add poll page now has more compact choices
+
+More
+====
 
 There's much more to come. This document is not finished.
