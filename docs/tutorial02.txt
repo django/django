@@ -177,17 +177,19 @@ Things to note here:
 * The different model field types (``meta.DateTimeField``, ``meta.CharField``)
   correspond to the appropriate HTML input widget. Each type of field knows
   how to display itself in the Django admin.
-* ``DateTimeField``s get free JavaScript shortcuts. Dates get a "Today"
+* Each ``DateTimeField`` gets free JavaScript shortcuts. Dates get a "Today"
   shortcut and calendar popup, and times get a "Now" shortcut and a convenient
   popup that lists commonly entered times.
-* The bottom part of the page gives you a couple of options:
-  * Save -- Saves changes and returns to the changelist page for this type of
-    object.
-  * Save and continue editing -- Saves changes and reloads the admin page for
-    this object.
-  * Save and add another -- Saves changes and loads a new, blank form for this
-    type of object.
-  * Delete -- Displays a delete confirmation page.
+
+The bottom part of the page gives you a couple of options:
+
+* Save -- Saves changes and returns to the change-list page for this type of
+  object.
+* Save and continue editing -- Saves changes and reloads the admin page for
+  this object.
+* Save and add another -- Saves changes and loads a new, blank form for this
+  type of object.
+* Delete -- Displays a delete confirmation page.
 
 Change the "Date published" by clicking the "Today" and "Now" shortcuts. Then
 click "Save and continue editing." Then click "History" in the upper right.
