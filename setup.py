@@ -12,5 +12,8 @@ setup(
     description = 'A high-level Python Web framework that encourages rapid development and clean, pragmatic design.',
     license = 'BSD',
     packages = find_packages(),
+    package_data = {
+        'django.conf': ['admin_templates/*.html', 'admin_templates/doc/*.html'],
+    },
     scripts = ['django/bin/django-admin.py'],
 )
