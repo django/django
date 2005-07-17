@@ -116,8 +116,8 @@ The first step in writing a database Web app in Django is to define your models
    data model in one place and automatically derive things from it.
 
 In our simple poll app, we'll create two models: polls and choices. A poll has
-a question, a publication date and an expiration date. A choice has two fields:
-the text of the choice and a vote tally. Each choice is associated with a poll.
+a question and a publication date. A choice has two fields: the text of the
+choice and a vote tally. Each choice is associated with a poll.
 
 Edit the ``polls/models/polls.py`` file so that it looks like this::
 
