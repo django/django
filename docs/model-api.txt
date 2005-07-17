@@ -2,123 +2,124 @@
 Model reference
 ===============
 
-Django's models are the bread and butter of the framework.  There's a huge 
-array of options available to you when defining your data models; this 
-document explains all of them.
+Django's models are the bread and butter of the framework.  There's a huge
+array of options available to you when defining your data models. This
+document explains them.
 
 Options for models
 ==================
 
-A list of all possible options for a model object follows.  Although there's a
-wide array of possible options, only ``fields`` is required.
+A list of all possible options for a model object follows. Although there's a
+wide array of options, only ``fields`` is required.
 
 ``admin``
     A ``meta.Admin`` object; see `Admin options`_.  If this field isn't given,
     the object will not have an admin interface.
-    
+
 ``db_table``
     The name of the database table to use for the module::
-    
+
         db_table = "pizza_orders"
-        
-    If not given, this will use ``app_label + '_' + module_name``.
-    
+
+    If this isn't given, Django will use ``app_label + '_' + module_name``.
+
 ``exceptions``
     Names of extra exception subclasses to include in the generated module.
     These exceptions are available from instance methods and from module-level
     methods::
-        
+
         exceptions = ("DisgustingToppingsException", "BurntCrust")
-    
+
 ``fields``
-    A list of field objects; see `Field objects`_.  For example::
-    
+    A list of field objects. See `Field objects`_. For example::
+
         fields = (
             meta.CharField('customer_name', 'customer name', maxlength=15),
             meta.BooleanField('use_extra_cheese', 'use extra cheese'),
             meta.IntegerField('customer_type', 'customer type', choices=CUSTOMER_TYPE_CHOICES),
             ...
         )
-        
+
 ``get_latest_by``
-    The name of a date or datetime field; if given, the module will have a
-    ``get_latest()`` function which fetches the "latest" object in terms of
-    that field::
-    
+    The name of a ``DateField`` or ``DateTimeField``; if given, the module will
+    have a ``get_latest()`` function that fetches the "latest" object according
+    to that field::
+
         get_latest_by = "order_date"
-    
+
 ``module_constants``
-    A dict of name/values to use as extra module-level constants::
-    
+    A dictionary of names/values to use as extra module-level constants::
+
         module_constants = {
             'MEAT_TYPE_PEPPERONI' : 1,
             'MEAT_TYPE_SAUSAGE' : 2,
         }
-    
+
 ``module_name``
     The name of the module::
-    
+
         module_name = "pizza_orders"
-        
-    If not given this will use a lowercased version of the class name.
-    
+
+    If this isn't given, Django will use a lowercased version of the class
+    name, plus "s".
+
 ``order_with_respect_to``
     Marks this object as "orderable" with respect to the given field.  This is
     almost always used with related objects to allow them to be ordered with
     respect to a parent object.  For example, if a ``PizzaToppping`` relates to
     a ``Pizza`` object, you might use::
-    
+
         order_with_respect_to = 'pizza_id'
-    
+
     to allow the toppings to be ordered with respect to the associated pizza.
-    
+
 ``ordering``
-    The default ordering for tho object::
-    
+    The default ordering for the object, for use by ``get_list`` and the admin::
+
         ordering = (('order_date', 'DESC'),)
-        
-    This is a tuple of 2-tuples; each 2-tuple is ``(field_name, ordering_type)``
-    where ordering_type is either ``"ASC"`` or ``"DESC"``.  You may also use the
-    magic ``(None, "RANDOM")`` ordering tuple for random ordering.
-    
+
+    This is a tuple of 2-tuples. Each 2-tuple is ``(field_name, ordering_type)``
+    where ordering_type is either ``"ASC"`` or ``"DESC"``.  You can also use the
+    ``(None, "RANDOM")`` for random ordering.
+
 ``permissions``
     Extra permissions to enter into the permissions table when creating this
-    object.  A add, delete, and change permission is automatically created for
-    each object; this option specifies extra permissions::
-    
-        permissions = (("may_delivier_pizzas", "Can deliver pizzas"),)
-        
-    This is a list of 2-tuples of 
+    object. A add, delete, and change permission is automatically created for
+    each object. This option specifies extra permissions::
+
+        permissions = (("can_delivier_pizzas", "Can deliver pizzas"),)
+
+    This is a list of 2-tuples of
     ``(permission_code, human_readable_permission_name)``.
-    
+
 ``unique_together``
     Sets of field names that, taken together, must be unique::
-    
+
         unique_together = (("driver_id", "restaurant_id"),)
-        
+
     This is a list of lists of fields that must be unique when considered
-    together.
-    
+    together. It's used in the Django admin.
+
 ``verbose_name``
     A human-readable name for the object, singular::
-    
+
         verbose_name = "pizza"
-    
-    If not given, this will use a munged version of the class name:
+
+    If this isn't given, Django will use a munged version of the class name:
     ``CamelCase`` becomes ``camel case``.
-    
+
 ``verbose_name_plural``
     The plural name for the object::
-    
+
         verbose_name_plural = "stories"
-    
-    If not given, ``verbose_name + "s"`` will automatically be used.
-    
+
+    If this isn't given, Django will use ``verbose_name + "s"``.
+
 Field objects
 =============
 
 The list of fields is the most important part of a data model.  Each item in
-the ``fields`` list is an instance of a ``meta.Field`` subclass, and maps to
+the ``fields`` list is an instance of a ``meta.Field`` subclass and maps to
 a database field.
 
 All field objects -- except for ``ForeignKey`` and ``ManyToManyField`` (see
@@ -130,24 +131,25 @@ contain spaces, punctuation, etc.
 General field options
 ---------------------
 
-Each type of field takes a different set of options, but there are some
-options that are common to all field types.  These options are:
+Each type of field takes a different set of options, but some options are
+common to all field types. These options are:
 
     ======================  ===================================================
     Option                  Description
     ======================  ===================================================
-    ``blank``               If ``True``, the field is allowed to be blank.  
+    ``blank``               If ``True``, the field is allowed to be blank.
                             Note that this is different from ``null`` in that
                             string fields will store the empty string instead of
-                            ``NULL`` internally; this means that to create a
+                            ``NULL`` internally. This means that to create a
                             field that stores nulls you must pass ``blank=True``
-                            and ``null=True`` .
-    
-    ``choices``             A list of 2-tuples to use as choices for this 
-                            field.If this is given, instead of the standard
-                            field a option menu will be used, limiting choices
-                            to the choices given.  A choices list looks like::
-                        
+                            and ``null=True``.
+
+    ``choices``             A list of 2-tuples to use as choices for this
+                            field. If this is given, Django's admin will use a
+                            select box instead of the standard text field and
+                            will limit choices to the choices given.  A choices
+                            list looks like::
+
                                 YEAR_IN_SCHOOL_CHOICES = (
                                     ('FR', 'Freshman'),
                                     ('SO', 'Sophomore'),
@@ -155,317 +157,322 @@ options that are common to all field types.  These options are:
                                     ('SR', 'Senior'),
                                     ('GR', 'Graduate'),
                                 )
-                            
+
                             The first element in each tuple is the actual value
-                            to be stored; the second element is the human
-                            readable name for the option.
-                            
+                            to be stored. The second element is the
+                            human-readable name for the option.
+
     ``core``                For objects that are edited inline to a related
                             object.  If all "core" fields in an inline-edited
                             object are cleared, the object will be considered to
                             be deleted.
-                            
+
                             It is an error to have an inline-editable
                             relation without at least one core field.
-    
+
     ``db_index``            If ``True``, the SQL generator will create a database
                             index on this field.
-    
+
     ``default``             The default value for the field.
-    
-    ``editable``            ``True`` by default, if set to ``False`` the field
-                            will not be editable in the admin.
-    
-    ``help_text``           Extra "help" text to be displayed with the field.
-    
-    ``null``                If ``True`` empty values in the field will be 
-                            stored as ``NULL`` in the database.  
-        
-    ``primary_key``         If ``True`` this field is the primary key for the
-                            table.  You only need to use this if you don't want
+
+    ``editable``            ``True`` by default. If this is set to ``False``,
+                            the field will not be editable in the admin.
+
+    ``help_text``           Extra "help" text to be displayed under the field
+                            on the object's admin form.
+
+    ``null``                If ``True``, empty values in the field will be
+                            stored as ``NULL`` in the database.
+
+    ``primary_key``         If ``True``, this field is the primary key for the
+                            table. You only need to use this if you don't want
                             the standard "id" field created and used as the
                             primary key.
-                            
+
                             Implies ``blank=False``, ``null=False``, and
-                            ``unique=True``.  Only one primary key is allowed
-                            on each object.
-    
-    ``radio_admin``         If ``choices`` is given, or if the field is a 
-                            ManyToOne relation, use a radio button interface
-                            for the choices instead of the standard options
-                            menu interface.
-    
-    ``unique``              If ``True`` this field must be unique throughout
-                            the table.
-    
-    ``unique_for_date``     Set this to the name of a ``DateField`` or 
+                            ``unique=True``. Only one primary key is allowed
+                            on an object.
+
+    ``radio_admin``         If ``choices`` is given, or if the field is a
+                            ManyToOne relation, use a radio-button interface
+                            for the choices instead of the standard select-box
+                            interface.
+
+    ``unique``              If ``True``, this field must be unique throughout
+                            the table. This is enforced at the database level
+                            and at the Django admin-form level.
+
+    ``unique_for_date``     Set this to the name of a ``DateField`` or
                             ``DateTimeField`` to require that this field
-                            be unique for the value of the date field.  That
-                            is, if you have a field, ``title`` that has 
+                            be unique for the value of the date field. For
+                            example, if you have a field ``title`` that has
                             ``unique_for_date="pub_date"``, then it is an
                             error to have two rows with the same ``title``
                             and the same ``pub_date``.
-    
+
     ``unique_for_month``    Like ``unique_for_date``, but requires the field
                             to be unique with respect to the month.
-    
-    ``unique_for_year``     Like ``unique_for_date`` and ``unique_for_month``
-                            but, well, you get the idea.
-    
-    ``validator_list``      A list of extra validators to apply to the field.
-                            See the `Form fields guide`_ for information about
-                            validators.
-    ======================  ===================================================
 
-.. _`Form fields guide`: http://www.djangoproject.com/FIXME/
+    ``unique_for_year``     Like ``unique_for_date`` and ``unique_for_month``.
+
+    ``validator_list``      A list of extra validators to apply to the field.
+    ======================  ===================================================
 
 Field Types
 -----------
-    
+
 ``AutoField``
-    An ``IntegerField`` that automatically increments.  You usually won't need to
-    use this directly; a primary key field will automatically be added to your 
-    model if you don't specify otherwise.  That automatically added field is::
-    
+    An ``IntegerField`` that automatically increments. You usually won't need to
+    use this directly; a primary key field will automatically be added to your
+    model if you don't specify otherwise. That automatically-added field is::
+
         meta.AutoField('id', 'ID', primary_key=True)
-    
+
 ``BooleanField``
     A true/false field.
-    
+
 ``CharField``
-    A text field. These are displayed in the admin as single-line text inputs, so 
-    for large amounts of text use a ``TextField``.
-    
-    ``CharField``s have an extra required argument: ``maxlength``; the maximum 
-    length (in characters) of the field.
-    
+    A text field. These are displayed in the admin as single-line text inputs, so
+    for large amounts of text, use a ``TextField``.
+
+    ``CharField``s have an extra required argument: ``maxlength``, the maximum
+    length (in characters) of the field. The maxlength is enforced at the database
+    level and in Django's admin validation.
+
 ``CommaSeparatedIntegerField``
     A field of integers separated by commas.
-    
+
 ``DateField``
-    A, um, date field.  Has a few extra optional options:
-    
+    A date field. Has a few extra optional options:
+
         ======================  ===================================================
         Option                  Description
         ======================  ===================================================
         ``auto_now``            Automatically set the field to now every time the
-                                object is saved.  Useful for "last-modified"
+                                object is saved. Useful for "last-modified"
                                 timestamps.
-                                
+
         ``auto_now_add``        Automatically set the field to now when the object
-                                is first created.  Useful for creation timestamps.
+                                is first created.  Useful for creation of
+                                timestamps.
         ======================  ===================================================
-    
+
 ``DateTimeField``
     A date and time field.  Takes the same extra options as ``DateField``.
-    
-    
+
 ``EmailField``
-    A ``CharField`` that checks that the value is a valid email address.  Because
-    validating email addresses can be tricky, this is a pretty loose test.
-    
+    A ``CharField`` that checks that the value is a valid e-mail address.
+    Because validating e-mail addresses can be tricky, this is a pretty loose
+    test.
+
 ``FileField``
-    A file-upload field.  Takes on additional option, ``upload_to`` which is
-    a path to upload the file to.  This path may contain `strftime formatting`_
-    which will be replaced by the date/time of the file upload (so that uploaded
-    files don't fill up the given directory).
-    
+    A file-upload field.  Takes an additional option, ``upload_to``, which is
+    a local filesystem path to upload the file to. This path may contain
+    `strftime formatting`_, which will be replaced by the date/time of the file
+    upload (so that uploaded files don't fill up the given directory).
+
     .. _`strftime formatting`: http://docs.python.org/lib/module-time.html#l2h-1941
-    
+
 ``FloatField``
-    A floating-point number.  Has two additional required options:
-    
+    A floating-point number. Has two additional required options:
+
         ======================  ===================================================
         Option                  Description
         ======================  ===================================================
         ``max_digits``          The maximum number of digits allowed in the number.
-        
+
         ``decimal_places``      The number of decimal places to store with the
                                 number
         ======================  ===================================================
-    
+
     For example, to store numbers up to 999 with a resolution of 2 decimal places,
     you'd use::
-    
+
         meta.FloatField(..., max_digits=5, decimal_places=2)
-    
+
     And to store numbers up to one million with a resolution of 10 decimal places::
-    
+
         meta.FloatField(..., max_digits=19, decimal_places=10)
-    
+
 ``ForeignKey``
-    A many-to-one relationship to the primary key in another object.  So, to give a
-    ``Topping`` object a many-to-one relationship to ``Pizza`` (i.e. there are 
+    A many-to-one relationship to the primary key in another object. So, to give a
+    ``Topping`` object a many-to-one relationship to ``Pizza`` (i.e. there are
     many toppings on a pizza)::
-    
+
         meta.ForeignKey(Pizza)
-                
+
     ``ForeignKey`` fields take a large number of extra options for defining how
     the relationship should work:
-    
+
     =======================  ============================================================
     Option                   Description
     =======================  ============================================================
-    ``edit_inline``          If ``True``, this related object is edited 
-                             "inline" on the related object's page.  This means
-                             that the object will not have its own admin 
-                             interface.  
-                             
-    ``edit_inline_type``     This is either ``meta.TABULAR`` or 
-                             ``meta.STACKED`` and controls weather the inline
+    ``edit_inline``          If ``True``, this related object is edited
+                             "inline" on the related object's page. This means
+                             that the object will not have its own admin
+                             interface.
+
+    ``edit_inline_type``     This is either ``meta.TABULAR`` or
+                             ``meta.STACKED`` and controls whether the inline
                              editable objects are displayed as a table or as
-                             a "stack" of fieldsets.  Defaults to 
+                             a "stack" of fieldsets.  Defaults to
                              ``meta.STACKED``.
-                             
+
     ``limit_choices_to``     A dictionary of lookup arguments and values (see
-                             the `Database API reference`_) to limit choices
-                             of this object to.  Use this along with 
-                             ``meta.LazyDate`` to limit choices of objects
-                             by date, for example::
-                             
+                             the `Database API reference`_) that limit the
+                             available admin choices for this object. Use this
+                             with ``meta.LazyDate`` to limit choices of objects
+                             by date. For example::
+
                                 limit_choices_to = {'pub_date__lte' : meta.LazyDate()}
-                                
+
                              only allows the choice of related objects with a
                              ``pub_date`` before the current date/time to be
                              chosen.
-                             
+
                              Not compatible with ``edit_inline``.
-    
+
     ``max_num_in_admin``     For inline-edited objects, this is the maximum
                              number of related objects to display in the admin.
-                             Thus, if a pizza could only have up to 10 
+                             Thus, if a pizza could only have up to 10
                              toppings, ``max_num_in_admin=10`` would ensure
                              that a user never enters more than 10 toppings.
-                             
+
                              Note that this doesn't ensure more than 10 related
-                             toppings ever get created.
-    
+                             toppings ever get created. It just controls the
+                             interface.
+
     ``min_num_in_admin``     The minimum number of related objects displayed in
-                             the admin.  Normally, at the creation stage
+                             the admin. Normally, at the creation stage,
                              ``num_in_admin`` inline objects are shown, and at
-                             the edit stage ``num_extra_on_change`` objects are
-                             shown in addition to all pre-existing related
-                             objects.  However, no fewer than
+                             the edit stage ``num_extra_on_change`` blank
+                             objects are shown in addition to all pre-existing
+                             related objects.  However, no fewer than
                              ``min_num_in_admin`` related objects will ever be
                              displayed.
-    
-    ``num_extra_on_change``  The number of extra blank related object fields to
+
+    ``num_extra_on_change``  The number of extra blank related-object fields to
                              show at the change stage.
-    
+
     ``num_in_admin``         The default number of inline objects to display
                              on the object page at the add stage.
-    
+
     ``raw_id_admin``         Only display a field for the integer to be entered
-                             instead of a drop-down menu.  This is useful when
+                             instead of a drop-down menu. This is useful when
                              related to an object type that will have too many
-                             rows to make a menu practical.
-                             
+                             rows to make a select box practical.
+
                              Not used with ``edit_inline``.
-                             
-    ``rel_name``             The name of the relation.  In the above example,
-                             this would default to 'pizza' (so that the 
+
+    ``rel_name``             The name of the relation. In the above example,
+                             this would default to 'pizza' (so that the
                              ``Toppings`` object would have a ``get_pizza()``
-                             function; if you set ``rel_name`` to "pie", then
+                             function. If you set ``rel_name`` to "pie", then
                              the function would be called ``get_pie()`` and the
                              field name would be ``pie_id``.
-    
+
     ``related_name``         The name to use for the relation from the related
                              object back to this one.  For example, when if
                              ``Topping`` has this field::
-                             
+
                                     meta.ForeignKey(Pizza)
-                                    
+
                              the ``related_name`` will be "topping" (taken from
                              the class name which will in turn give ``Pizza``
-                             methods like ``get_topping_list()`` and 
-                             ``get_topping_count()``.  
-                             
+                             methods like ``get_topping_list()`` and
+                             ``get_topping_count()``.
+
                              If you instead were to use::
-                             
+
                                     meta.ForeignKey(Pizza, related_name="munchie")
-                                    
+
                              then the methods would be called
                              ``get_munchie_list()``, ``get_munchie_count()``,
                              etc.
-                             
+
                              This is only really useful when you have a single
                              object that relates to the same object more than
                              once.  For example, if a ``Story`` object has both
-                             ``primary_category`` and ``secondary_category``  
+                             ``primary_category`` and ``secondary_category``
                              fields, to make sure that the category objects
                              have the correct methods, you'd use fields like::
-                             
+
                                     ...
                                     meta.ForeignKey(Category, name="primary_category_id",
                                                     rel_name="primary_category",
                                                     related_name="primary_story"),
-                                                    
+
                                     meta.ForeignKey(Category, name="secondary_category_id",
                                                     rel_name="secondary_category",
                                                     related_name="secondary_story"),
                                     ...
-                                
-                             which would give the category objects methods 
-                             named ``get_primary_story_list()`` and 
+
+                             which would give the category objects methods
+                             named ``get_primary_story_list()`` and
                              ``get_secondary_story_list()``.
-                             
+
     ``to_field``             The field on the related object that the relation
-                             is to.  This is almost always ``id``, but if the
-                             PK on the other object is named something 
+                             is to. This is almost always ``id``, but if the
+                             primary key on the other object is named something
                              different, this is how to indicate that.
     =======================  ============================================================
 
-.. _`Database API reference`: http://www.djangoproject.com/documentation/db_api/    
-        
+.. _`Database API reference`: http://www.djangoproject.com/documentation/db_api/
+
 ``ImageField``
-    Like a ``FieldField``, but validates that the uploaded object is a valid 
-    image.  Has two extra optional arguments, ``height_field`` and ``width_field``
+    Like a ``FieldField``, but validates that the uploaded object is a valid
+    image. Has two extra optional arguments, ``height_field`` and ``width_field``
     which, if set, will be auto-populated with the height and width of the image.
-    
+
+    Requires the `Python Imaging Library`_.
+
+    .. _Python Imaging Library: http://www.pythonware.com/products/pil/
+
 ``IntegerField``
-    An integer, surprisingly.
-    
+    An integer.
+
 ``IPAddressField``
     An IP address, in string format (i.e. "24.124.1.30").
-    
+
 ``ManyToManyField``
     A many-to-many relation to another object.  For example (taken from the
     ``core.flatfiles`` object::
-    
+
         class FlatFile(meta.Model):
             fields = (
                 ...
                 meta.ManyToManyField(Site),
             )
-    
+
     Many-to-many relations are a bit different from other fields.  First, they
-    aren't actually a field per se since they use a intermediary join table.
-    Second, they don't take any of the same options as the rest of the fields,
-    the only options taken are:
-    
+    aren't actually a field per se, because they use a intermediary join table.
+    Second, they don't take any of the same options as the rest of the fields.
+    The only options taken are:
+
     =======================  ============================================================
     Option                   Description
     =======================  ============================================================
-    ``related_name``         See the description of ``related_name`` in 
+    ``related_name``         See the description of ``related_name`` in
                              ``ManyToOneField``, above.
-                             
-    ``filter_interface``     Use a nifty unobtrusive Javascript "filter" interface 
-                             instead of the usability-challenged ``<select multiple>``.
-                             The value should be ``meta.HORIZONTAL`` or ``meta.VERTICAL``
-                             (i.e. should the interface be stacked horizontally or
+
+    ``filter_interface``     Use a nifty unobtrusive Javascript "filter" interface
+                             instead of the usability-challenged ``<select multiple>``
+                             in the admin form for this object. The value should be
+                             ``meta.HORIZONTAL`` or ``meta.VERTICAL`` (i.e.
+                             should the interface be stacked horizontally or
                              vertically).
-                             
+
     ``limit_choices_to``     See the description under ``ManyToOneField``, above.
     =======================  ============================================================
 
 ``NullBooleanField``
     Like a ``BooleanField``, but allows ``NULL`` as one of the options.  Use this
-    instead of a ``BooleanField`` with ``null=True`` .
-    
+    instead of a ``BooleanField`` with ``null=True``.
+
 ``OneToOneField``
     Signifies a one-to-one relationship.  This is most useful on the primary key
-    of an object when that object "extends" another object in some way.  
-    
+    of an object when that object "extends" another object in some way.
+
     For example, if you are building a database of "places", you would build pretty
     standard stuff like address, phone number, etc. in the database.  If you then
     wanted to build a database of restaurants on top of the places, instead of
@@ -474,237 +481,246 @@ Field Types
     a restaurant "is-a" place).  This ``OneToOneField`` will actually replace
     the primary key ``id`` field (since one-to-one relations share the same
     primary key), and has a few in the admin interface:
-    
+
         * No selection interface is displayed on ``Restaurant`` pages; there will
           be one (and only one) ``Restaurant`` for each place.
-          
+
         * On the ``Restaurant`` change list, every single ``Place`` -- weather it
-          has an associated ``Restaurant`` or not -- will be displayed.  Adding
+          has an associated ``Restaurant`` or not -- will be displayed. Adding
           a ``Restaurant`` to a ``Place`` just means filling out the required
           ``Restaurant`` fields.
 
 ``PhoneNumberField``
     Validates that the value is a valid phone number.
-    
+
 ``PositiveIntegerField``
     Like an ``IntegerField``, but must be positive.
-    
+
 ``PositiveSmallIntegerField``
-    Like a ``PositiveIntegerField``, but only allows values below 32767.
-    
+    Like a ``PositiveIntegerField``, but only allows values under a certain
+    (database-dependent) point.
+
 ``SlugField``
-    A "slug" suitable for parts of a URL; only allows alpha-numeric characters and
-    underscores.  
-    
+    A "slug," suitable for parts of a URL. Only allows alphanumeric characters
+    and underscores.
+
     Implies ``maxlength=50`` and ``db_index=True``.
-    
-    Accepts an extra option, ``prepopulate_from`` which is a list of fields from
-    which to auto-populate the slug.
-    
+
+    Accepts an extra option, ``prepopulate_from``, which is a list of fields
+    from which to auto-populate the slug, via JavaScript, in the object's admin
+    form.
+
 ``SmallIntegerField``
-    Like an ``IntegerField``, but must be between -32768 and 32767.
-    
+    Like an ``IntegerField``, but only allows values under a certain
+    (database-dependent) point.
+
 ``TextField``
     A large text field (``<textarea>`` in HTML).
-    
+
 ``TimeField``
-    A time.  Accepts the same auto-population options as ``DateField`` and
+    A time. Accepts the same auto-population options as ``DateField`` and
     ``DateTimeField``.
-    
+
 ``URLField``
-    A field for a URL.  If the ``verify_exists`` option is ``True``, the URL given
-    will be checked for existence (i.e. actually loads and doesn't give a 404 
-    response).
-    
+    A field for a URL.  If the ``verify_exists`` option is ``True`` (default),
+    the URL given will be checked for existence (i.e., the URL actually loads
+    and doesn't give a 404 response).
+
 ``USStateField``
-    A US state.
-    
+    A two-letter U.S. state abbreviation.
+
 ``XMLField``
-    A field containing XML.  Takes one required argument, ``schema_path`` which
-    is the path to a RelaxNG_ scheme against which to validate the field.
-    
+    A field containing XML. Takes one required argument, ``schema_path``, which
+    is the filesystem path to a RelaxNG_ schema against which to validate the
+    field.
+
     .. _RelaxNG: http://www.relaxng.org/
 
 Admin options
 =============
 
 The ``admin`` field in the model tells Django how to construct the admin
-interface for the object.  The field is an instance of the ``meta.Admin`` 
+interface for the object.  The field is an instance of the ``meta.Admin``
 object, which has the following options (of which only ``fields`` is required):
 
-``date_hierarchy``    
+``date_hierarchy``
     To allow filtering of objects in the admin by date, set ``date_hierarchy``
     to the name of the field to filter by::
-    
+
         date_hierarchy = 'order_date'
-    
+
 ``fields``
     A list of fieldsets to display on the admin page.  Each fieldset is a 2-tuple:
     ``(name, field_options)``.  The ``name`` is a string to name the field set,
-    and ``field_options`` is a dictionary of information about the fields to be 
-    displayed in that fieldset.  This dictionary has the following keys:
-    
+    and ``field_options`` is a dictionary of information about the fields to be
+    displayed in that fieldset. This dictionary has the following keys:
+
         ``fields``
-            A tuple of field names to display in this fieldset.  To display
+            A tuple of field names to display in this fieldset. To display
             multiple fields on the same line, wrap those fields in their
             own tuple.
-            
+
             This key is required in the dict.
-            
+
         ``classes``
-            Extra CSS classes to apply to the fieldset.  This is a simple
-            string; you can apply multiple classes by separating them with
+            Extra CSS classes to apply to the fieldset. This is a simple
+            string. You can apply multiple classes by separating them with
             spaces.
-            
-            Two useful classes defined by the default stylesheet are ``collapse``
-            and ``wide``.  Fieldsets with the ``collapse`` style will be 
-            initially collapsed in the admin and replaced with a small "click
-            to expand" link.  Fieldsets with the ``wide`` style will be given
-            extra horizontal space.
-                
+
+            Two useful classes defined by the default stylesheet are
+            ``collapse`` and ``wide``.  Fieldsets with the ``collapse`` style
+            will be initially collapsed in the admin and replaced with a small
+            "click to expand" link.  Fieldsets with the ``wide`` style will be
+            given extra horizontal space.
+
     For example (taken from the ``core.flatfiles`` model)::
-    
+
         fields = (
             (None, {
                 'fields': ('url', 'title', 'content', 'sites')
             }),
             ('Advanced options', {
-                'classes': 'collapse', 
+                'classes': 'collapse',
                 'fields' : ('enable_comments', 'registration_required', 'template_name')
             }),
         ),
-        
+
     results in an admin that looks like:
-    
+
         .. image:: http://media.djangoproject.com/img/doc/flatfiles_admin.png
-            
+
 ``js``
-    Extra JavaScript files to link into the admin screen.  This can be used to
-    tweak a given type of admin page in JS or to provide "quick links" to fill
-    in default values for certain fields.
-    
+    A list of strings representing URLs of JavaScript files to link into the
+    admin screen. This can be used to tweak a given type of admin page in JS or
+    to provide "quick links" to fill in default values for certain fields.
+
 ``list_display``
     List of fields to display on the list page in the admin.
-    
+
     There are a few special cases that do other things besides displaying the
     contents of the given fields:
-    
-        * If the field given has a relationship, that relationship is 
+
+        * If the field given has a relationship, that relationship is
           followed and the ``repr()`` of the related object is displayed.
-          
+
         * If the field is a ``BooleanField``, a "on" or "off" icon will
           be displayed instead of ``True`` or ``False``.
-          
-        * If the field name given does not exist, a function of the model
-          will be searched for and called if present.  This function
-          should have a ``short_description`` attribute that will be
-          used as the header for the field.
-          
-    See the exmaple below.
-    
+
+        * If the field name is a method of the model, it'll be called, and the
+          output will be displayed. This method should have a
+          ``short_description`` function attribute, for use as the header for
+          the field.
+
+    See the example below.
+
 ``list_filter``
-    List of fields to filter by.  Each field should either be a ``BooleanField``
+    List of fields to filter by. Each field should either be a ``BooleanField``
     or else a field with a ``ManyToOne`` relation.
-    
-    An example of how ``list_display`` and ``list_filter`` work (taken from
-    the ``auth.user`` model)::
-    
+
+    Here's an example of how ``list_display`` and ``list_filter`` work (taken
+    from the ``auth.user`` model)::
+
         list_display = ('username', 'email', 'first_name', 'last_name', 'is_staff'),
         list_filter = ('is_staff', 'is_superuser'),
-        
-    results in a admin that looks like:
-    
+
+    This results in a admin that looks like:
+
         .. image:: http://media.djangoproject.com/img/doc/users_changelist.png
-        
+
     (This example also has ``search_fields`` defined; see below).
-    
+
 ``ordering``
     An ordering tuple (see the `Options for models`_, above) that gives a
-    different ordering for the admin change list.  If not given, the model's
-    default ordering will be used.
-    
+    different ordering for the admin change list. If this isn't given, the
+    model's default ordering will be used.
+
 ``save_as``
     Enables a "save as" feature on object pages.  Normally, objects have three
     save options: "Save", "Save and continue editing", and "Save and add
-    another".   If ``save_as`` is ``True``, "Save and add another" will be
+    another". If ``save_as`` is ``True``, "Save and add another" will be
     replaced by a "Save as" button.
-    
+
+    "Save as" means the object will be saved as a new object (with a new ID),
+    rather than the old object.
+
 ``save_on_top``
     If this option is ``True``, object pages will have the save buttons across
     the top as well as at the bottom of the page.
-    
+
 ``search_fields``
-    A list of fields to provide a text search for.  These fields should,
-    obviously, be some kind of text field.
-    
+    A list of field names to provide a text search for. These fields should,
+    obviously, be some kind of text field, such as ``CharField`` or
+    ``TextField``.
+
 Model methods
 =============
 
 There are a number of methods you can define on model objects to control the
 object's behavior.  First, any methods you define will be available as methods
-of object instances.  For example::
-
-    class Pizza(meta.Model):
-        fields = (
-            ...
-        )  
-        
-        def is_disgusting(self):
-            return "anchovices" in [topping.name for topping in self.get_topping_list()]
-               
-Now, every ``Pizza`` object will have a ``is_disgusting()`` method.  
-
-There are a few object methods that have special meaning:
-
-``__repr__``
-    Django uses ``repr(obj)`` in a number of places, the most notable as the
-    value inserted into a template when it displays an object.  Thus, you should
-    return a nice, human-readable string for the object's ``__repr__``.
-    
-``get_absolute_url``
-    If an object defines a ``get_absolute_url`` method, it is used   to
-    associate a URL with an object.  For example:
-    
-        def get_absolute_url(self):
-            return "/pizzas/%i/" % self.id
-            
-    The most useful place this is used is in the admin interface; if an object
-    defines ``get_absolute_url`` then the object detail page will have a "View
-    on site" link that will jump you directly to the object's public view.
-    
-``_pre_save``
-    This method will be called just before the object is saved into the
-    database; you can use it to (for example) calculate aggregate values from
-    other fields before the object is saved.
-    
-``_post_save``
-    Called just after the object is saved to the database.  This could be used
-    to update other tables, update cached information, etc.
-    
-Module-level methods
---------------------
-
-Since each data class in effect turns into a module, there are times you'll want
-to write methods that live in that module.  Any model method that begins with
-"_module_" is turned into a module-level method::
+of object instances. For example::
 
     class Pizza(meta.Model):
         fields = (
             ...
         )
-        
+
+        def is_disgusting(self):
+            return "anchovies" in [topping.name for topping in self.get_topping_list()]
+
+Now, every ``Pizza`` object will have a ``is_disgusting()`` method.
+
+There are a few object methods that have special meaning:
+
+``__repr__``
+    Django uses ``repr(obj)`` in a number of places, most notably as the value
+    inserted into a template when it displays an object.  Thus, you should
+    return a nice, human-readable string for the object's ``__repr__``.
+
+``get_absolute_url``
+    If an object defines a ``get_absolute_url`` method, it is used to
+    associate a URL with an object. For example:
+
+        def get_absolute_url(self):
+            return "/pizzas/%i/" % self.id
+
+    The most useful place this is used is in the admin interface. If an object
+    defines ``get_absolute_url``, the object detail page will have a "View on
+    site" link that will jump you directly to the object's public view.
+
+``_pre_save``
+    This method is called just before an object is saved to the database. For
+    example, you can use it to calculate aggregate values from other fields
+    before the object is saved.
+
+``_post_save``
+    This method is called just after the object is saved to the database. This
+    could be used to update other tables, update cached information, etc.
+
+Module-level methods
+--------------------
+
+Since each data class effectively turns into a "magic" Python module under
+``django.models``, there are times you'll want to write methods that live in
+that module.  Any model method that begins with "_module_" is turned into a
+module-level function::
+
+    class Pizza(meta.Model):
+        fields = (
+            ...
+        )
+
         def _module_get_pizzas_to_deliver():
             return get_list(delivered__exact=False)
-            
+
 This will make the top-level ``pizzas`` module have a ``get_pizzas_to_deliver()``
 method::
 
     >>> from django.models.pizza_hut import pizzas
     >>> pizzas.get_pizzas_to_deliver()
     [ ... ]
-    
-Note that the scope of these methods is modified to be the same has the module
-scope (so that's how the raw ``get_list`` works).
+
+Note that the scope of these methods is modified to be the same as the module
+scope.
 
 Manipulator methods
 -------------------
@@ -712,20 +728,17 @@ Manipulator methods
 Similarly, you can add methods to the object's manipulators (see the formfields
 documentation for more on manipulators) by defining methods that being with
 "_manipulator_".  This is most useful for providing custom validators for certain
-fields since manipulators automatically call any method that begins with
+fields because manipulators automatically call any method that begins with
 "validate"::
 
     class Pizza(meta.Model):
         fields = (
             ...
         )
-        
+
         def _manipulator_validate_customer_id(self, field_data, all_data):
             from django.core import validators
             from django.conf.settings import BAD_CUSTOMER_IDS
-            
+
             if int(field_data) in BAD_CUSTOMER_IDS:
                 raise validators.ValidationError("We don't deliver to this customer")
-                
-
-    
