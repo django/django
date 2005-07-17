@@ -111,8 +111,11 @@ Drop into the Python interactive interpreter and type this::
 Enter the admin site
 ====================
 
-Now, try logging in. If the login worked, you should see the Django admin index
-page:
+Now, try logging in.
+
+If it didn't work, read the `"I can't log in" questions`_ in the FAQ.
+
+If it worked, you should see the Django admin index page:
 
 .. image:: http://media.djangoproject.com/img/doc/tutorial/admin02t.png
    :alt: Django admin index page
@@ -120,6 +123,8 @@ page:
 
 By default, you should see four types of editable content: groups, users,
 redirects and flat files. These are core features Django ships with by default.
+
+.. _"I can't log in" questions: http://www.djangoproject.com/documentation/faq/#the-admin-site
 
 Make the poll app modifiable in the admin
 =========================================
