@@ -284,7 +284,7 @@ field name is automatically calculated from the model's class name, lowercased,
 plus '_id'.)
 
 Now "Choices" is an available option in the Django admin. The "Add choice" form
-looks like this::
+looks like this:
 
 .. image:: http://media.djangoproject.com/img/doc/tutorial/admin10.png
    :alt: Choice admin page
