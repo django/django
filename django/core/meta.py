@@ -894,12 +894,8 @@ def method_set_related_many_to_many(rel_opts, rel_field, self, id_list):
     this_id = getattr(self, self._meta.pk.name)
     cursor = db.db.cursor()
     cursor.execute("DELETE FROM %s WHERE %s_id = %%s" % (m2m_table, rel.object_name.lower()), [this_id])
-    if rel_field.rel.orderable:
-        sql = "INSERT INTO %s (%s_id, %s_id, _order) VALUES (%%s, %%s, %%s)" % (m2m_table, rel.object_name.lower(), rel_opts.object_name.lower())
-        cursor.executemany(sql, [(this_id, j, i) for i, j in enumerate(id_list)])
-    else:
-        sql = "INSERT INTO %s (%s_id, %s_id) VALUES (%%s, %%s)" % (m2m_table, rel.object_name.lower(), rel_opts.object_name.lower())
-        cursor.executemany(sql, [(this_id, i) for i in id_list])
+    sql = "INSERT INTO %s (%s_id, %s_id) VALUES (%%s, %%s)" % (m2m_table, rel.object_name.lower(), rel_opts.object_name.lower())
+    cursor.executemany(sql, [(this_id, i) for i in id_list])
     db.db.commit()
 
 # ORDERING METHODS #########################
