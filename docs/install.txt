@@ -31,7 +31,7 @@ make sure a database server is running. Django works with PostgreSQL_
 
 Note that MySQL support is a recent development, and Django hasn't been
 comprehensively tested with that database. If you find any bugs in Django's
-MySQL bindings, please file them in `Django's ticket system`_ so we can fix them
+MySQL bindings, please file them in the `Django ticket system`_ so we can fix them
 immediately.
 
 
@@ -42,7 +42,7 @@ MySQL, you'll need MySQLdb_.
 
 .. _PostgreSQL: http://www.postgresql.org/
 .. _MySQL: http://www.mysql.com/
-.. _`Django's ticket system: http://code.djangoproject.com/report/1
+.. _`Django ticket system: http://code.djangoproject.com/report/1
 .. _psycopg: http://initd.org/projects/psycopg1
 .. _MySQLdb: http://sourceforge.net/projects/mysql-python
 
