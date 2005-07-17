@@ -411,14 +411,14 @@ filter options for DateTimeFields: "Any date," "Today," "Past 7 days,"
 "This month," "This year." Explore using ``list_filter`` on other types of
 fields.
 
-This is shaping up well. Finally, let's add some search capability::
+This is shaping up well. Let's add some search capability::
 
     search_fields = ('question', )
 
 That adds a search box at the top of the change list. When somebody enters
 search terms, Django will search the ``question`` field. You can use as many
 fields as you'd like -- although because it uses a LIKE query behind the
-scenes, keep it reasonable to mind your database performance.
+scenes, keep it reasonable, to keep your database happy.
 
 Finally, because Poll objects have dates, it'd be convenient to be able to
 drill down by date. Add this line::
