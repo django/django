@@ -282,8 +282,11 @@ class LogEntry(meta.Model):
         return self.get_content_type().get_object_for_this_type(id__exact=self.object_id)
 
     def get_admin_url(self):
-        "Returns the admin URL to edit the object represented by this log entry"
-        return "/%s/%s/%s/" % (self.get_content_type().package, self.get_content_type().python_module_name, self.object_id)
+        """
+        Returns the admin URL to edit the object represented by this log entry.
+        This is relative to the Django admin index page.
+        """
+        return "%s/%s/%s/" % (self.get_content_type().package, self.get_content_type().python_module_name, self.object_id)
 
     def _module_log_action(user_id, content_type_id, object_id, object_repr, action_flag, change_message=''):
         e = LogEntry(None, None, user_id, content_type_id, object_id, object_repr[:200], action_flag, change_message)
