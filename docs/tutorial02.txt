@@ -434,7 +434,69 @@ default is to display 50 items per page. Change-list pagination, search boxes,
 filters, date-hierarchies and column-header-ordering all work together like you
 think they should.
 
-More
-====
+Customize the admin look and feel
+=================================
 
-There's much more to come. This document is not finished.
+Clearly having "Django administration" and "mysite.com" at the top of each
+admin page is ridiculous. It's just placeholder text.
+
+That's easy to change, though, using Django's template system.
+
+Open your admin settings file and look at the ``TEMPLATE_DIRS`` setting.
+``TEMPLATE_DIRS`` is a tuple of filesystem directories to check when loading
+Django templates. It's a search path.
+
+The ``django-admin.py startproject`` command automatically prepopulated
+this setting with the location of Django's default admin templates, according
+to where you have Django installed. But let's add an extra line to
+``TEMPLATE_DIRS`` so that it checks a custom directory first, before checking
+the default admin template directory::
+
+    TEMPLATE_DIRS = (
+        "/home/mytemplates/admin",
+        "/usr/lib/python2.3/site-packages/django/conf/admin_templates",
+    )
+
+Now copy the template ``base_site.html`` from within the default Django admin
+template directory, into ``/home/mytemplates/admin`` (or wherever you're
+putting your custom admin templates). Edit the file and replace the generic
+Django stuff with your own site's name as you see fit.
+
+Note that any of Django's default admin templates can be overridden. To
+override a template, just do the same thing you did with ``base_site.html`` --
+copy it from the default directory into your custom directory, and make
+changes.
+
+Customize the admin index page
+==============================
+
+On a similar note, you might want to customize the look and feel of the Django
+admin index page.
+
+By default, it displays all available apps, according to your ``INSTALLED_APPS``
+setting. But the order in which it displays things is random, and you may want
+to make significant changes to the layout. After all, the index is probably the
+most important page of the admin, and it should be easy to use.
+
+The template to customize is ``index.html``. (Do the same as with
+``base_site.html`` in the previous section -- copy it from the default directory
+to your custom template directory.) Edit the file, and you'll see it uses a
+template tag called ``{% get_admin_app_list as app_list %}``. That's the magic
+that retrieves every installed Django app. Instead of using that, you can
+hard-code links to object-specific admin pages in whatever way you think is
+best.
+
+Django offers another shortcut in this department. Run the command
+``django-admin.py adminindex polls`` to get a chunk of template code for
+inclusion in the admin index template. It's a useful starting point.
+
+Coming soon
+===========
+
+The tutorial ends here for the time being. But check back within 48 hours for
+the next installments:
+
+* Writing public-facing apps
+* Using the cache framework
+* Using the RSS framework
+* Using the comments framework

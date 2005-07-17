@@ -1,6 +1,8 @@
-=======================================
-Tutorial: Writing your first Django app
-=======================================
+=====================================
+Writing your first Django app, part 1
+=====================================
+
+By Adrian Holovaty <holovaty@gmail.com>
 
 Let's learn by example.
 
@@ -368,15 +370,8 @@ Let's jump back into the Python interactive shell::
 
 For full details on the database API, see our `Database API reference`_.
 
+When you're comfortable with the API, read `part 2 of this tutorial`_ to get
+Django's automatic admin working.
+
 .. _Database API reference: http://www.djangoproject.com/documentation/db_api/
-
-Coming soon
-===========
-
-The tutorial ends here for the time being. But check back within 48 hours for
-the next installments:
-
-* Using the dynamically-generated admin site
-* Writing public-facing apps
-* Using the cache framework
-* Using the RSS framework
+.. _part 2 of this tutorial: http://www.djangoproject.com/documentation/tutorial2/
