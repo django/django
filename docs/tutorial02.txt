@@ -394,7 +394,7 @@ change that by giving that method a ``short_description`` attribute::
 
 
 Let's add another improvement to the Poll change list page: Filters. Add the
-following line to ``Poll.admin``:
+following line to ``Poll.admin``::
 
     list_filter = ('pub_date', )
 
@@ -411,7 +411,7 @@ filter options for DateTimeFields: "Any date," "Today," "Past 7 days,"
 "This month," "This year." Explore using ``list_filter`` on other types of
 fields.
 
-This is shaping up well. Finally, let's add some search capability:
+This is shaping up well. Finally, let's add some search capability::
 
     search_fields = ('question', )
 
