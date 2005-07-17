@@ -62,9 +62,13 @@ interactive prompt.)
 
 Once you've done that, you need to tell Django which settings module you're
 currently using. Do that by setting an environment variable,
-``DJANGO_SETTINGS_MODULE``::
+``DJANGO_SETTINGS_MODULE``. Here's how you do that in the Bash shell on Unix::
 
-    export DJANGO_SETTINGS_MODULE='myproject.settings.main'
+    export DJANGO_SETTINGS_MODULE=myproject.settings.main
+
+On Windows, you'd use ``set`` instead::
+
+    set DJANGO_SETTINGS_MODULE=myproject.settings.main
 
 Note this path is in Python package syntax. Your project has to be somewhere on
 your `Python path`_ -- so that the Python statement ``import myproject.settings.main``
