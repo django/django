@@ -105,6 +105,7 @@ DATA_TYPES = {
     'IPAddressField':    'inet',
     'ManyToManyField':   None,
     'NullBooleanField':  'boolean',
+    'OneToOneField':     'integer',
     'PhoneNumberField':  'varchar(20)',
     'PositiveIntegerField': 'integer CHECK (%(name)s >= 0)',
     'PositiveSmallIntegerField': 'smallint CHECK (%(name)s >= 0)',

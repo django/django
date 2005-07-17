@@ -95,6 +95,7 @@ DATA_TYPES = {
     'IPAddressField':    'char(15)',
     'ManyToManyField':   None,
     'NullBooleanField':  'bool',
+    'OneToOneField':     'integer',
     'PhoneNumberField':  'varchar(20)',
     'PositiveIntegerField': 'integer UNSIGNED',
     'PositiveSmallIntegerField': 'smallint UNSIGNED',
