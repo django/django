@@ -61,6 +61,10 @@ def get_last_insert_id(cursor, table_name, pk_name):
     cursor.execute("SELECT CURRVAL('%s_%s_seq')" % (table_name, pk_name))
     return cursor.fetchone()[0]
 
+def get_date_extract_sql(lookup_type, table_name):
+    # lookup_type is 'year', 'month', 'day'
+    return "EXTRACT('%s' FROM %s)" % (lookup_type, table_name)
+
 # Register these custom typecasts, because Django expects dates/times to be
 # in Python's native (standard-library) datetime/time format, whereas psycopg
 # use mx.DateTime by default.

@@ -1006,7 +1006,7 @@ def _get_where_clause(lookup_type, table_prefix, field_name, value):
     if lookup_type in ('range', 'year'):
         return '%s%s BETWEEN %%s AND %%s' % (table_prefix, field_name)
     elif lookup_type in ('month', 'day'):
-        return "EXTRACT('%s' FROM %s%s) = %%s" % (lookup_type, table_prefix, field_name)
+        return "%s = %%s" % db.get_date_extract_sql(lookup_type, table_prefix + field_name)
     elif lookup_type == 'isnull':
         return "%s%s IS %sNULL" % (table_prefix, field_name, (not value and 'NOT ' or ''))
     raise TypeError, "Got invalid lookup_type: %s" % repr(lookup_type)
