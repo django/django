@@ -29,6 +29,12 @@ If you plan to use Django's database API functionality, you'll need to
 make sure a database server is running. Django works with PostgreSQL_
 (recommended) or MySQL_.
 
+Note that MySQL support is a recent development, and Django hasn't been
+comprehensively tested with that database. If you find any bugs in Django's
+MySQL bindings, please file them in `Django's ticket system`_ so we can fix them
+immediately.
+
+
 Additionally, you'll need to make sure your Python database bindings are
 installed. If you're using PostgreSQL, you'll need the psycopg_
 package (version 1 -- not version 2, which is still in beta). If you're using
@@ -36,6 +42,7 @@ MySQL, you'll need MySQLdb_.
 
 .. _PostgreSQL: http://www.postgresql.org/
 .. _MySQL: http://www.mysql.com/
+.. _`Django's ticket system: http://code.djangoproject.com/report/1
 .. _psycopg: http://initd.org/projects/psycopg1
 .. _MySQLdb: http://sourceforge.net/projects/mysql-python
 

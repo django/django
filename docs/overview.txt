@@ -44,8 +44,8 @@ Install it
 
 Next, run the Django command-line utility. It'll create the database tables for
 you automatically, in the database specified in your Django settings. Django
-works with PostgreSQL and MySQL, although other database adapters are on the
-way::
+works best with PostgreSQL, although we've recently added beta MySQL
+support and other database adapters are on the way::
 
     django-admin.py install news
 

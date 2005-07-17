@@ -60,6 +60,11 @@ these settings to match your database's connection parameters:
 Do that with "``CREATE DATABASE database_name;``" within your database's
 interactive prompt.)
 
+Also, note that MySQL support is a recent development, and Django hasn't been
+comprehensively tested with that database. If you find any bugs in Django's
+MySQL bindings, please file them in `Django's ticket system`_ so we can fix them
+immediately.
+
 Once you've done that, you need to tell Django which settings module you're
 currently using. Do that by setting an environment variable,
 ``DJANGO_SETTINGS_MODULE``. Here's how you do that in the Bash shell on Unix::
@@ -88,6 +93,7 @@ Now you're set to start doing work. You won't have to take care of this boring
 administrative stuff again.
 
 .. _`Python path`: http://docs.python.org/tut/node8.html#SECTION008110000000000000000
+.. _`Django's ticket system: http://code.djangoproject.com/report/1
 
 Creating models
 ===============
