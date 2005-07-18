@@ -40,8 +40,10 @@ settings. Let's look at what ``startproject`` created::
     $ ls
     apps/  __init__.py  settings/
     $ ls settings/
+    __init__.py  admin.py  main.py  urls/
+    $ ls settings/urls/
     __init__.py  admin.py  main.py
-    # ls apps/
+    $ ls apps/
     __init__.py
 
 First, edit ``myproject/settings/main.py``. It's a normal Python module with
