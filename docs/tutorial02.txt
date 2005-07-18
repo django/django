@@ -44,6 +44,9 @@ want to change the server's port, pass it as a command-line argument::
 
     django-admin.py runserver 8080
 
+DON'T use this server in anything resembling a production environment. It's
+intended only for use while developing.
+
 Now, open a Web browser and go to "/admin/" on your domain. You should see the
 admin's login screen:
 
