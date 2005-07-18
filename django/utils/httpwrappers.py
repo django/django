@@ -40,7 +40,7 @@ class ModPythonRequest(HttpRequest):
     def _load_post_and_files(self):
         "Populates self._post and self._files"
         if self._req.headers_in.has_key('content-type') and self._req.headers_in['content-type'].startswith('multipart'):
-            self._post, self._files = parse_file_upload(self._req)
+            self._post, self._files = parse_file_upload(self._req.headers_in, self._req.read())
         else:
             self._post, self._files = QueryDict(self._req.read()), datastructures.MultiValueDict()
 
@@ -112,12 +112,12 @@ class ModPythonRequest(HttpRequest):
     META = property(_get_meta)
     REQUEST = property(_get_request)
 
-def parse_file_upload(req):
-    "Returns a tuple of (POST MultiValueDict, FILES MultiValueDict), given a mod_python req object"
+def parse_file_upload(header_dict, post_data):
+    "Returns a tuple of (POST MultiValueDict, FILES MultiValueDict)"
     import email, email.Message
     from cgi import parse_header
-    raw_message = '\r\n'.join(['%s:%s' % pair for pair in req.headers_in.items()])
-    raw_message += '\r\n\r\n' + req.read()
+    raw_message = '\r\n'.join(['%s:%s' % pair for pair in header_dict.items()])
+    raw_message += '\r\n\r\n' + post_data
     msg = email.message_from_string(raw_message)
     POST = datastructures.MultiValueDict()
     FILES = datastructures.MultiValueDict()
