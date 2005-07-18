@@ -131,11 +131,11 @@ contain spaces, punctuation, etc.
 General field options
 ---------------------
 
-Each type of field takes a different set of options, but some options are
-common to all field types. These options are:
+Each type of field takes a different set of arguments, but some arguments are
+common to all field types. These arguments are:
 
     ======================  ===================================================
-    Option                  Description
+    Argument                Description
     ======================  ===================================================
     ``blank``               If ``True``, the field is allowed to be blank.
                             Note that this is different from ``null`` in that
@@ -240,13 +240,14 @@ Field Types
     level and in Django's admin validation.
 
 ``CommaSeparatedIntegerField``
-    A field of integers separated by commas.
+    A field of integers separated by commas. As in ``CharField``s, the
+    ``maxlength`` argument is required.
 
 ``DateField``
-    A date field. Has a few extra optional options:
+    A date field. Has a few extra optional arguments:
 
         ======================  ===================================================
-        Option                  Description
+        Argument                Description
         ======================  ===================================================
         ``auto_now``            Automatically set the field to now every time the
                                 object is saved. Useful for "last-modified"
@@ -274,10 +275,10 @@ Field Types
     .. _`strftime formatting`: http://docs.python.org/lib/module-time.html#l2h-1941
 
 ``FloatField``
-    A floating-point number. Has two additional required options:
+    A floating-point number. Has two required arguments:
 
         ======================  ===================================================
-        Option                  Description
+        Argument                Description
         ======================  ===================================================
         ``max_digits``          The maximum number of digits allowed in the number.
 
@@ -301,11 +302,11 @@ Field Types
 
         meta.ForeignKey(Pizza)
 
-    ``ForeignKey`` fields take a large number of extra options for defining how
-    the relationship should work:
+    ``ForeignKey`` fields take a large number of extra arguments for defining how
+    the relationship should work. All are optional:
 
     =======================  ============================================================
-    Option                   Description
+    Argument                 Description
     =======================  ============================================================
     ``edit_inline``          If ``True``, this related object is edited
                              "inline" on the related object's page. This means
@@ -447,10 +448,10 @@ Field Types
     Many-to-many relations are a bit different from other fields.  First, they
     aren't actually a field per se, because they use a intermediary join table.
     Second, they don't take any of the same options as the rest of the fields.
-    The only options taken are:
+    The only arguments taken are:
 
     =======================  ============================================================
-    Option                   Description
+    Argument                 Description
     =======================  ============================================================
     ``related_name``         See the description of ``related_name`` in
                              ``ManyToOneField``, above.
