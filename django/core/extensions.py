@@ -1,9 +1,7 @@
-"Specialized Context and ModPythonRequest classes for Django. Use these!"
+# Specialized template classes for Django, decoupled from the basic template system.
 
 from django.core.template import Context
-from django.utils.httpwrappers import ModPythonRequest
 from django.conf.settings import DEBUG, INTERNAL_IPS
-from pprint import pformat
 
 class DjangoContext(Context):
     """
