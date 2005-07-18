@@ -362,6 +362,30 @@ def startapp(app_name, directory):
 startapp.help_doc = "Creates a Django app directory structure for the given app name in the current directory."
 startapp.args = "[appname]"
 
+def runserver(port):
+    "Starts a lightweight Web server for development."
+    from django.core.servers.basehttp import run, WSGIServerException
+    from django.core.handlers.wsgi import WSGIHandler
+    if not port.isdigit():
+        sys.stderr.write("Error: %r is not a valid port number.\n" % port)
+        sys.exit(1)
+    print "Starting server on port %s. Go to http://127.0.0.1:%s/ for Django." % (port, port)
+    try:
+        run(int(port), WSGIHandler())
+    except WSGIServerException, e:
+        # Use helpful error messages instead of ugly tracebacks.
+        ERRORS = {
+            13: "You don't have permission to access that port.",
+            98: "That port is already in use.",
+        }
+        try:
+            error_text = ERRORS[e.args[0].args[0]]
+        except (AttributeError, KeyError):
+            error_text = str(e)
+        sys.stderr.write("Error: %s\n" % error_text)
+        sys.exit(1)
+runserver.args = '[optional port number]'
+
 def usage():
     sys.stderr.write("Usage: %s [action]\n" % sys.argv[0])
 
@@ -376,6 +400,7 @@ def usage():
 ACTION_MAPPING = {
     'adminindex': get_admin_index,
 #     'dbcheck': database_check,
+    'runserver': runserver,
     'sql': get_sql_create,
     'sqlall': get_sql_all,
     'sqlclear': get_sql_delete,
@@ -406,6 +431,12 @@ if __name__ == "__main__":
             usage()
         ACTION_MAPPING[action](name, os.getcwd())
         sys.exit(0)
+    elif action == 'runserver':
+        if len(sys.argv) < 3:
+            port = '8000'
+        else:
+            port = sys.argv[2]
+        ACTION_MAPPING[action](port)
     elif action == 'dbcheck':
         from django.core import meta
         mod_list = meta.get_all_installed_modules()
