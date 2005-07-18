@@ -106,3 +106,13 @@ def phone2numeric(phone):
          's': '7', 'r': '7', 'u': '8', 't': '8', 'w': '9', 'v': '8',
          'y': '9', 'x': '9'}.get(m.group(0).lower())
     return letters.sub(char2number, phone)
+
+# From http://www.xhaus.com/alan/python/httpcomp.html#gzip
+# Used with permission.
+def compress_string(s):
+    import cStringIO, gzip
+    zbuf = cStringIO.StringIO()
+    zfile = gzip.GzipFile(mode='wb', compresslevel=6, fileobj=zbuf)
+    zfile.write(s)
+    zfile.close()
+    return zbuf.getvalue()

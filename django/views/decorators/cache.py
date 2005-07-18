@@ -1,15 +1,7 @@
 from django.core.cache import cache
 from django.utils.httpwrappers import HttpResponseNotModified
-import cStringIO, datetime, gzip, md5
-
-# From http://www.xhaus.com/alan/python/httpcomp.html#gzip
-# Used with permission.
-def compress_string(s):
-    zbuf = cStringIO.StringIO()
-    zfile = gzip.GzipFile(mode='wb', compresslevel=6, fileobj=zbuf)
-    zfile.write(s)
-    zfile.close()
-    return zbuf.getvalue()
+from django.utils.text import compress_string
+import datetime, md5
 
 def cache_page(view_func, cache_timeout, key_prefix=''):
     """
@@ -21,7 +13,7 @@ def cache_page(view_func, cache_timeout, key_prefix=''):
     variable. Use key_prefix if your Django setup has multiple sites that
     use cache; otherwise the cache for one site would affect the other. A good
     example of key_prefix is to use sites.get_current().domain, because that's
-    unique across all CMS instances on a particular server.
+    unique across all Django instances on a particular server.
     """
     def _check_cache(request, *args, **kwargs):
         try:
