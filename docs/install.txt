@@ -74,6 +74,8 @@ Installing the development version
 
    (In the above line, change ``python2.3`` to match your current Python version.)
 
+You don't have to run ``python setup.py install``.
+
 When you want to update your code, just run the command ``svn update`` from
 within the ``django_src`` directory.
 
