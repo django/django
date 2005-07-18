@@ -2,10 +2,10 @@ import os
 from django.utils import httpwrappers
 
 # NOTE: do *not* import settings (or any module which eventually imports
-# settings) until after CoreHandler has been called; otherwise os.environ
+# settings) until after ModPythonHandler has been called; otherwise os.environ
 # won't be set up correctly (with respect to settings).
 
-class CoreHandler:
+class ModPythonHandler:
 
     def __init__(self):
         self._request_middleware = self._view_middleware = self._response_middleware = None
@@ -147,4 +147,4 @@ class CoreHandler:
         return '\n'.join(traceback.format_exception(*sys.exc_info()))
 
 def handler(req):
-    return CoreHandler()(req)
+    return ModPythonHandler()(req)
