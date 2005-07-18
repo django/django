@@ -266,11 +266,11 @@ class ModPythonHandler:
 def populate_apache_request(http_response, mod_python_req):
     "Populates the mod_python request object with an HttpResponse"
     mod_python_req.content_type = http_response['Content-Type'] or httpwrappers.DEFAULT_MIME_TYPE
-    del http_response['Content-Type']
     if http_response.cookies:
         mod_python_req.headers_out['Set-Cookie'] = http_response.cookies.output(header='')
     for key, value in http_response.headers.items():
-        mod_python_req.headers_out[key] = value
+        if key != 'Content-Type':
+            mod_python_req.headers_out[key] = value
     mod_python_req.status = http_response.status_code
     mod_python_req.write(http_response.get_content_as_string('utf-8'))
 
