@@ -443,7 +443,7 @@ think they should.
 Customize the admin look and feel
 =================================
 
-Clearly having "Django administration" and "mysite.com" at the top of each
+Clearly having "Django administration" and "example.com" at the top of each
 admin page is ridiculous. It's just placeholder text.
 
 That's easy to change, though, using Django's template system.
