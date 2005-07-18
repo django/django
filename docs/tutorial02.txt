@@ -25,78 +25,36 @@ interface for site administrators to edit content.
 The admin isn't necessarily intended to be used by site visitors; it's for site
 managers.
 
-Expose the admin media files
+Start the development server
 ============================
 
-Django's admin is intended to be fully functional and good looking. For that
-reason, Django ships with admin media files -- CSS, JavaScript and images --
-that comprise the admin's design. To set up a Django admin instance, the first
-thing to do is put those media files online somewhere.
+To make things easy, Django comes with a pure-Python Web server that builds on
+the BaseHTTPServer included in Python's standard library. Let's start the
+server and explore the admin site. First, set the ``DJANGO_SETTINGS_MODULE``
+environment variable to the location of your admin settings::
 
-(Note: Although Django ships with a default design for its admin site, you can
-change it however you'd like. The admin uses Django's own template system and
-is powered -- surprise, surprise -- by Django itself, so it is completely
-customizable.)
+    export DJANGO_SETTINGS_MODULE=myproject.settings.admin
 
-The files are in the ``media`` directory of the Django distribution. To
-"activate" them, copy that directory under a Web document root somewhere, so
-that you can access them via the Web.
+Then, run this command to start the server::
 
-Be careful not to put your Python source code under the Web document root. Just
-do the media files.
+    django-admin.py runserver
 
-Then, tell Django where you put them, via ``ADMIN_MEDIA_PREFIX`` in the
-``myproject.settings.admin`` settings file. Examples::
+It'll start a Web server running locally -- on port 8000, by default. If you
+want to change the server's port, pass it as a command-line argument::
 
-    # You can leave off the domain if they're on the same domain as your admin
-    # site will be.
-    ADMIN_MEDIA_PREFIX = '/adminmedia/'
+    django-admin.py runserver 8080
 
-    # Otherwise, use the fully-qualified domain.
-    ADMIN_MEDIA_PREFIX = 'http://www.foo.com/adminmedia/'
-
-Make sure to include a trailing slash.
-
-Hook into mod_python
-====================
-
-Now let's take the opportunity to hook Django into Apache/mod_python. Edit your
-``httpd.conf`` file and add this::
-
-    <Location "/admin/">
-        SetHandler python-program
-        PythonHandler django.core.handlers.modpython
-        SetEnv DJANGO_SETTINGS_MODULE myproject.settings.admin
-        PythonDebug On
-    </Location>
-
-This tells Apache: "Use mod_python for any URL at or under '/admin/', using the
-Django mod_python handler." It also passes the value of ``DJANGO_SETTINGS_MODULE``,
-so mod_python knows which project to use. Note that we're passing the path to
-the ``admin`` settings, not the ``main`` settings. That's because this is the
-admin site, which has slightly different settings.
-
-Also, if you've manually altered your ``PYTHONPATH`` to put your project on it,
-you'll need to tell mod_python::
-
-    PythonPath "['/path/to/project'] + sys.path"
-
-You can also add directives such as ``PythonAutoReload Off`` for performance.
-See the `mod_python documentation`_ for a full list of options.
-
-When you've done that, restart Apache and go to /admin/ on your domain. You
-should see the admin's login screen:
+Now, open a Web browser and go to "/admin/" on your domain. You should see the
+admin's login screen:
 
 .. image:: http://media.djangoproject.com/img/doc/tutorial/admin01.png
    :alt: Django admin login screen
 
-.. _mod_python documentation: http://modpython.org/live/current/doc-html/directives.html
-
 Create a user account
 =====================
 
-We can't log in, though, because we haven't created an admin user account yet.
-Drop into the Python interactive interpreter and type this::
+You can't log in, though, because you haven't created an admin user account
+yet. Drop into the Python interactive interpreter and type this::
 
     # The function django.models.auth.users.create_user() creates a new user
     # and returns the new auth.User object.
@@ -151,12 +109,9 @@ file and make the following change to add an ``admin`` attribute::
             ),
         )
 
-Reload the Django admin index page. Note that you might have to restart Apache,
-depending on your Apache settings. Because mod_python saves code in memory for
-performance, Python code changes generally aren't reflected until Apache
-restarts. One way around this is to set ``MaxRequestsPerChild 1`` in your
-httpd.conf to force Apache to reload everything for each request. But don't do
-that on a production server, or we'll revoke your Django privileges.
+Restart your development Web server, and reload the Django admin page. You'll
+have to restart the server each time you make a change to Python code -- but
+we're working on changing that.
 
 Explore the free admin functionality
 ====================================

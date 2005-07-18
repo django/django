@@ -21,7 +21,6 @@ able to give something back to the open-source community.
 .. _Python: http://www.python.org/
 .. _PostgreSQL: http://www.postgresql.org/
 
-
 What does "Django" mean, and how do you pronounce it?
 -----------------------------------------------------
 
@@ -97,8 +96,8 @@ Lawrence, Kansas, USA.
 Django appears to be a MVC framework, but you call the Controller the "view", and the View the "template". How come you don't use the standard names?
 -----------------------------------------------------------------------------------------------------------------------------------------------------
 
-That's because Django isn't strictly a MVC framework.  We don't really believe in
-any capital-M Methodologies; we do what "feels" right.  If you squint the right
+That's because Django isn't strictly a MVC framework. We don't really believe in
+any capital-M Methodologies; we do what "feels" right. If you squint the right
 way, you can call Django's ORM the "Model", the view functions the "View", and
 the dynamically-generated API the "Controller" -- but not really.
 
@@ -109,7 +108,7 @@ where it makes sense.
 Do you have any of those nifty "screencast" things?
 ---------------------------------------------------
 
-They're in the works. It's amazing how much time those things take!  Stay tuned...
+They're in the works. It's amazing how much time those things take! Stay tuned...
 
 Installation questions
 ======================
@@ -120,13 +119,14 @@ How do I get started?
     #. `Download the code`_.
     #. Install Django (read the `installation guide`_).
     #. Walk through the tutorial_.
-    #. Check out the rest of the documentation_, and ask questions if you
+    #. Check out the rest of the documentation_, and `ask questions`_ if you
        run into trouble.
 
 .. _`Download the code`: http://www.djangoproject.com/download/
 .. _`installation guide`: http://www.djangoproject.com/documentation/install/
 .. _tutorial:  http://www.djangoproject.com/documentation/tutorial1/
 .. _documentation: http://www.djangoproject.com/documentation/
+.. _ask questions: http://www.djangoproject.com/community/
 
 How do I fix the "install a later version of setuptools" error?
 ---------------------------------------------------------------
@@ -136,7 +136,13 @@ Just run the ``ex_setup.py`` script in the Django distribution.
 What are Django's prerequisites?
 --------------------------------
 
-Django requires Python_ 2.3 or later, `Apache 2`_, and mod_python_.
+Django requires Python_ 2.3 or later.
+
+For a development environment -- if you just want to experiment with Django --
+you don't need to have a separate Web server installed; Django comes with its
+own lightweight development server. For a production environment, we recommend
+`Apache 2`_ and mod_python_, although Django follows the WSGI_ spec, which
+means it can run on a variety of server platforms.
 
 You'll also need a database engine. PostgreSQL_ is recommended, and MySQL_ is
 supported.
@@ -144,18 +150,32 @@ supported.
 .. _Python: http://www.python.org/
 .. _Apache 2: http://httpd.apache.org/
 .. _mod_python: http://www.modpython.org/
+.. _WSGI: http://www.python.org/peps/pep-0333.html
 .. _PostgreSQL: http://www.postgresql.org/
 .. _MySQL: http://www.mysql.com/
+
+Do I have to use mod_python?
+----------------------------
+
+Not if you just want to play around and develop things on your local computer.
+Django comes with its own Web server, and things should Just Work.
+
+For production use, though, we recommend mod_python. The Django developers have
+been running it on mod_python for about two years, and it's quite stable.
+
+However, if you don't want to use mod_python, you can use a different server,
+as long as that server has WSGI_ hooks. More information on alternate server
+arrangements is forthcoming.
+
+.. _WSGI: http://www.python.org/peps/pep-0333.html
 
 How do I install mod_python on Windows?
 ---------------------------------------
 
-    * If you are running Python 2.4, check out this `guide to mod_python & Python 2.3`_.
-
-    * For Python 2.3, grab mod_python from http://www.mod_python.org/, the read
-      `Running mod_python on Apache on Windows2000`_.
-
-    * Also try this (not Windows-specific) `guide to getting mod_python working`_.
+* For Python 2.4, check out this `guide to mod_python & Python 2.3`_.
+* For Python 2.3, grab mod_python from http://www.mod_python.org/ and read
+  `Running mod_python on Apache on Windows2000`_.
+* Also, try this (not Windows-specific) `guide to getting mod_python working`_.
 
 .. _`guide to mod_python & Python 2.3`: http://www.lehuen.com/nicolas/index.php/2005/02/21/39-win32-build-of-mod_python-314-for-python-24
 .. _`Running mod_python on Apache on Windows2000`: http://groups-beta.google.com/group/comp.lang.python/msg/139af8c83a5a9d4f
@@ -163,19 +183,12 @@ How do I install mod_python on Windows?
 
 (Thanks to deelan for this info.)
 
-Do I have to use mod_python?
-----------------------------
-
-In the first release, yes. However, WSGI_ support (which will let Django run
-under FCGI, SCGI, medusa, etc.) is in the works. Stay tuned!
-
-.. _WSGI: http://www.python.org/peps/pep-0333.html
-
 Will Django run under shared hosting (like TextDrive or Dreamhost)?
 -------------------------------------------------------------------
 
 Right now, no, unless you can get your host to install mod_python. However, as
-the previous answer says, WSGI support is coming!
+the community starts to use Django's WSGI bindings with other Web servers, this
+will probably be possible sooner rather than later.
 
 Using Django
 ============
@@ -244,4 +257,3 @@ be possible by editing the CSS stylesheet. We've got a `guide to the CSS used in
 the admin`_ to get you started.
 
 .. _`guide to the CSS used in the admin`: http://www.djangoproject.com/documentation/admin_css/
-
