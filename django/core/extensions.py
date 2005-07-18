@@ -79,7 +79,3 @@ class DjangoRequest(ModPythonRequest):
 
     session = property(_get_session, _set_session)
     user = property(_get_user, _set_user)
-
-# For legacy purposes.
-CMSContext = DjangoContext
-CMSRequest = DjangoRequest
