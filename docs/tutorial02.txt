@@ -65,7 +65,7 @@ Now let's take the opportunity to hook Django into Apache/mod_python. Edit your
 
     <Location "/admin/">
         SetHandler python-program
-        PythonHandler django.core.handler
+        PythonHandler django.core.handlers.modpython
         SetEnv DJANGO_SETTINGS_MODULE myproject.settings.admin
         PythonDebug On
     </Location>
