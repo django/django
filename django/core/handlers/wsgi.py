@@ -240,3 +240,45 @@ class WSGIHandler:
         "Helper function to return the traceback as a string"
         import sys, traceback
         return '\n'.join(traceback.format_exception(*sys.exc_info()))
+
+class AdminMediaHandler:
+    """
+    WSGI middleware that intercepts calls to the admin media directory, as
+    defined by the ADMIN_MEDIA_PREFIX setting, and serves those images.
+    Use this ONLY LOCALLY, for development! This hasn't been tested for
+    security and is not super efficient.
+    """
+    def __init__(self, application):
+        from django.conf import settings
+        import django
+        self.application = application
+        self.media_dir = django.__path__[0] + '/conf/admin_templates'
+        self.media_url = settings.ADMIN_MEDIA_PREFIX
+
+    def __call__(self, environ, start_response):
+        import os.path
+
+        # Ignore requests that aren't under ADMIN_MEDIA_PREFIX.
+        if not environ['PATH_INFO'].startswith(self.media_url):
+            return self.application(environ, start_response)
+
+        # Find the admin file and serve it up, if it exists and is readable.
+        file_path = os.path.join(self.media_dir, environ['PATH_INFO'][1:])
+        if not os.path.exists(file_path):
+            status = '404 NOT FOUND'
+            headers = {'Content-type': 'text/plain'}
+            output = ['Page not found: %s' % file_path]
+        else:
+            try:
+                fp = open(file_path, 'r')
+            except IOError:
+                status = '401 UNAUTHORIZED'
+                headers = {'Content-type': 'text/plain'}
+                output = ['Permission denied: %s' % file_path]
+            else:
+                status = '200 OK'
+                headers = {}
+                output = [fp.read()]
+                fp.close()
+        start_response(status, headers.items())
+        return output

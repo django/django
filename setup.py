@@ -13,7 +13,10 @@ setup(
     license = 'BSD',
     packages = find_packages(),
     package_data = {
-        'django.conf': ['admin_templates/*.html', 'admin_templates/doc/*.html'],
+        'django.conf': ['admin_templates/*.html', 'admin_templates/doc/*.html',
+                        'admin_media/css/*.css', 'admin_media/img/admin/*.gif',
+                        'admin_media/img/admin/*.png', 'admin_media/js/*.js',
+                        'admin_media/js/admin/*js'],
     },
     scripts = ['django/bin/django-admin.py'],
 )
