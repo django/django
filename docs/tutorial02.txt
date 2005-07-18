@@ -67,6 +67,7 @@ Now let's take the opportunity to hook Django into Apache/mod_python. Edit your
         SetHandler python-program
         PythonHandler django.core.handler
         SetEnv DJANGO_SETTINGS_MODULE myproject.settings.admin
+        PythonDebug On
     </Location>
 
 This tells Apache: "Use mod_python for any URL at or under '/admin/', using the
@@ -74,6 +75,11 @@ Django mod_python handler." It also passes the value of ``DJANGO_SETTINGS_MODULE
 so mod_python knows which project to use. Note that we're passing the path to
 the ``admin`` settings, not the ``main`` settings. That's because this is the
 admin site, which has slightly different settings.
+
+Also, if you've manually altered your ``PYTHONPATH`` to put your project on it,
+you'll need to tell mod_python::
+
+    PythonPath "['/path/to/project'] + sys.path"
 
 You can also add directives such as ``PythonAutoReload Off`` for performance.
 See the `mod_python documentation`_ for a full list of options.
