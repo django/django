@@ -252,18 +252,21 @@ class AdminMediaHandler:
         from django.conf import settings
         import django
         self.application = application
-        self.media_dir = django.__path__[0] + '/conf/admin_templates'
+        self.media_dir = django.__path__[0] + '/conf/admin_media'
         self.media_url = settings.ADMIN_MEDIA_PREFIX
 
     def __call__(self, environ, start_response):
         import os.path
 
-        # Ignore requests that aren't under ADMIN_MEDIA_PREFIX.
-        if not environ['PATH_INFO'].startswith(self.media_url):
+        # Ignore requests that aren't under ADMIN_MEDIA_PREFIX. Also ignore
+        # all requests if ADMIN_MEDIA_PREFIX isn't a relative URL.
+        if self.media_url.startswith('http://') or self.media_url.startswith('https://') \
+            or not environ['PATH_INFO'].startswith(self.media_url):
             return self.application(environ, start_response)
 
         # Find the admin file and serve it up, if it exists and is readable.
-        file_path = os.path.join(self.media_dir, environ['PATH_INFO'][1:])
+        relative_url = environ['PATH_INFO'][len(self.media_url):]
+        file_path = os.path.join(self.media_dir, relative_url)
         if not os.path.exists(file_path):
             status = '404 NOT FOUND'
             headers = {'Content-type': 'text/plain'}
