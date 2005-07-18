@@ -18,14 +18,14 @@ class CoreHandler:
         # that use settings now can work
         from django.conf import settings
         from django.core import db
-        from django.core.extensions import DjangoRequest
+        from django.utils.httpwrappers import ModPythonRequest
 
         # if we need to set up middleware, now that settings works we can do it now.
         if self._request_middleware is None:
             self.load_middleware()
 
         try:
-            request = DjangoRequest(req)
+            request = ModPythonRequest(req)
             response = self.get_response(req.uri, request)
         finally:
             db.db.close()

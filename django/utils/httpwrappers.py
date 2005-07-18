@@ -30,9 +30,9 @@ class ModPythonRequest(HttpRequest):
         self.path = req.uri
 
     def __repr__(self):
-        return '<ModPythonRequest\nGET:%s,\nPOST:%s,\nCOOKIES:%s,\nMETA:%s>' % \
-            (pformat(self.GET), pformat(self.POST), pformat(self.COOKIES),
-            pformat(self.META))
+        return '<ModPythonRequest\npath:%s,\nGET:%s,\nPOST:%s,\nCOOKIES:%s,\nMETA:%s,\nuser:%s>' % \
+            (self.path, pformat(self.GET), pformat(self.POST), pformat(self.COOKIES),
+            pformat(self.META), pformat(self.user))
 
     def get_full_path(self):
         return '%s%s' % (self.path, self._req.args and ('?' + self._req.args) or '')
@@ -105,12 +105,42 @@ class ModPythonRequest(HttpRequest):
                 self._meta[key] = value
         return self._meta
 
+    def _load_session_and_user(self):
+        from django.models.auth import sessions
+        from django.conf.settings import AUTH_SESSION_COOKIE
+        session_cookie = self.COOKIES.get(AUTH_SESSION_COOKIE, '')
+        try:
+            self._session = sessions.get_session_from_cookie(session_cookie)
+            self._user = self._session.get_user()
+        except sessions.SessionDoesNotExist:
+            from django.parts.auth import anonymoususers
+            self._session = None
+            self._user = anonymoususers.AnonymousUser()
+
+    def _get_session(self):
+        if not hasattr(self, '_session'):
+            self._load_session_and_user()
+        return self._session
+
+    def _set_session(self, session):
+        self._session = session
+
+    def _get_user(self):
+        if not hasattr(self, '_user'):
+            self._load_session_and_user()
+        return self._user
+
+    def _set_user(self, user):
+        self._user = user
+
     GET = property(_get_get, _set_get)
     POST = property(_get_post, _set_post)
     COOKIES = property(_get_cookies, _set_cookies)
     FILES = property(_get_files)
     META = property(_get_meta)
     REQUEST = property(_get_request)
+    session = property(_get_session, _set_session)
+    user = property(_get_user, _set_user)
 
 def parse_file_upload(header_dict, post_data):
     "Returns a tuple of (POST MultiValueDict, FILES MultiValueDict)"
