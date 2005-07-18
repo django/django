@@ -275,6 +275,7 @@ DATA_TYPE_MAPPING = {
     'EmailField'                : 'E-mail address',
     'FileField'                 : 'File path',
     'FloatField'                : 'Decimal number',
+    'ForeignKey'                : 'Integer',
     'ImageField'                : 'File path',
     'IntegerField'              : 'Integer',
     'IPAddressField'            : 'IP address',
@@ -293,6 +294,9 @@ DATA_TYPE_MAPPING = {
 }
 
 def get_readable_field_data_type(field):
+    # ForeignKey is a special case. Use the field type of the relation.
+    if field.__class__.__name__ == 'ForeignKey':
+        field = field.rel.get_related_field()
     return DATA_TYPE_MAPPING[field.__class__.__name__] % field.__dict__
 
 def extract_views_from_urlpatterns(urlpatterns, base=''):
