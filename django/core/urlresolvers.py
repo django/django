@@ -82,7 +82,7 @@ class RegexURLResolver:
             if match:
                 return match
         # None of the regexes matched, so raise a 404.
-        raise Http404, "Tried all URL patterns but didn't find a match for %s" % app_path
+        raise Http404, "Tried all URL patterns but didn't find a match for %r" % app_path
 
 class Error404Resolver:
     def __init__(self, callback):
