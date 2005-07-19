@@ -198,7 +198,7 @@ So let's use Django's template system to separate the design from Python::
 That code loads the template called "polls/index" and passes it a context. The
 context is a dictionary mapping template variable names to Python objects.
 
-Reload the page. Now you'll see an error:
+Reload the page. Now you'll see an error::
 
     TemplateDoesNotExist: Your TEMPLATE_DIRS settings is empty. Change it to point to at least one template directory.
 
