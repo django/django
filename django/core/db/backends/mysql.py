@@ -46,17 +46,26 @@ class DatabaseWrapper:
             self.connection.close()
             self.connection = None
 
+def _dict_helper(desc, row):
+    "Returns a dictionary for the given cursor.description and result row."
+    return dict([(desc[col[0]][0], col[1]) for col in enumerate(row)])
+
 def dictfetchone(cursor):
     "Returns a row from the cursor as a dict"
-    raise NotImplementedError
+    row = cursor.fetchone()
+    if not row:
+        return None
+    return _dict_helper(cursor.description, row)
 
 def dictfetchmany(cursor, number):
     "Returns a certain number of rows from a cursor as a dict"
-    raise NotImplementedError
+    desc = cursor.description
+    return [_dict_helper(desc, row) for row in cursor.fetchmany(number)]
 
 def dictfetchall(cursor):
     "Returns all rows from a cursor as a dict"
-    raise NotImplementedError
+    desc = cursor.description
+    return [_dict_helper(desc, row) for row in cursor.fetchall()]
 
 def get_last_insert_id(cursor, table_name, pk_name):
     cursor.execute("SELECT LAST_INSERT_ID()")
