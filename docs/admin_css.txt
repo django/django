@@ -177,7 +177,7 @@ with class ``form-row``. If the field in the row is required, a class of
 Labels
 ------
 
-Each form ``label`` and field should be enclosed in a header ``h4``. Any
-explanation or help text should follow this ``h4`` in a ``p`` with class
-``.help``. Form labels should always precede the field, except in the case
-of checkboxes and radio buttons, where the ``input`` should come first.
+Form labels should always precede the field, except in the case
+of checkboxes and radio buttons, where the ``input`` should come first. Any
+explanation or help text should follow the ``label`` in a ``p`` with class
+``.help``. 
