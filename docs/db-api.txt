@@ -49,43 +49,43 @@ translates (roughly) into the following SQL:
 
 The DB API supports the following lookup types:
 
-    ==========  ==============================================================
-    Type        Description
-    ==========  ==============================================================
-    exact       Exact match: ``polls.get_object(id__exact=14)``.
-    iexact      Case-insensitive exact match:
-                ``polls.get_list(slug__iexact="foo")`` matches a slug of ``foo``,
-                ``FOO``, ``fOo``, etc.
-    contains    Case-sensitive containment test:
-                ``polls.get_list(question__contains="spam")`` returns all polls
-                that contain "spam" in the question. (PostgreSQL only. MySQL
-                doesn't support case-sensitive LIKE statements; ``contains``
-                will act like ``icontains`` for MySQL.)
-    icontains   Case-insensitive containment test.
-    gt          Greater than: ``polls.get_list(id__gt=4)``.
-    gte         Greater than or equal to.
-    lt          Less than.
-    lte         Less than or equal to.
-    startswith  Case-sensitive starts-with:
-                ``polls.get_list(question_startswith="Would")``. (PostgreSQL
-                only. MySQL doesn't support case-sensitive LIKE statements;
-                ``startswith`` will act like ``istartswith`` for MySQL.)
-    endswith    Case-sensitive ends-with. (PostgreSQL only. MySQL doesn't
-                support case-sensitive LIKE statements; ``endswith`` will act
-                like ``iendswith`` for MySQL.)
-    istartswith Case-insensitive starts-with.
-    iendswith   Case-insensitive ends-with.
-    range       Range test:
-                ``polls.get_list(pub_date__range=(start_date, end_date))``
-                returns all polls with a pub_date between ``start_date``
-                and ``end_date`` (inclusive).
-    year        For date/datetime fields, exact year match:
-                ``polls.get_count(pub_date__year=2005)``.
-    month       For date/datetime fields, exact month match.
-    day         For date/datetime fields, exact day match.
-    isnull      True/False; does is IF NULL/IF NOT NULL lookup:
-                ``polls.get_list(expire_date__isnull=True)``.
-    ==========  ==============================================================
+    ===========  ==============================================================
+    Type         Description
+    ===========  ==============================================================
+    exact        Exact match: ``polls.get_object(id__exact=14)``.
+    iexact       Case-insensitive exact match:
+                 ``polls.get_list(slug__iexact="foo")`` matches a slug of
+                 ``foo``, ``FOO``, ``fOo``, etc.
+    contains     Case-sensitive containment test:
+                 ``polls.get_list(question__contains="spam")`` returns all polls
+                 that contain "spam" in the question. (PostgreSQL only. MySQL
+                 doesn't support case-sensitive LIKE statements; ``contains``
+                 will act like ``icontains`` for MySQL.)
+    icontains    Case-insensitive containment test.
+    gt           Greater than: ``polls.get_list(id__gt=4)``.
+    gte          Greater than or equal to.
+    lt           Less than.
+    lte          Less than or equal to.
+    startswith   Case-sensitive starts-with:
+                 ``polls.get_list(question_startswith="Would")``. (PostgreSQL
+                 only. MySQL doesn't support case-sensitive LIKE statements;
+                 ``startswith`` will act like ``istartswith`` for MySQL.)
+    endswith     Case-sensitive ends-with. (PostgreSQL only. MySQL doesn't
+                 support case-sensitive LIKE statements; ``endswith`` will act
+                 like ``iendswith`` for MySQL.)
+    istartswith  Case-insensitive starts-with.
+    iendswith    Case-insensitive ends-with.
+    range        Range test:
+                 ``polls.get_list(pub_date__range=(start_date, end_date))``
+                 returns all polls with a pub_date between ``start_date``
+                 and ``end_date`` (inclusive).
+    year         For date/datetime fields, exact year match:
+                 ``polls.get_count(pub_date__year=2005)``.
+    month        For date/datetime fields, exact month match.
+    day          For date/datetime fields, exact day match.
+    isnull       True/False; does is IF NULL/IF NOT NULL lookup:
+                 ``polls.get_list(expire_date__isnull=True)``.
+    ===========  ==============================================================
 
 Multiple lookups are allowed, of course, and are translated as "AND"s::
 
