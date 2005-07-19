@@ -2,7 +2,7 @@
 Settings and configuration for Django.
 
 Values will be read from the module specified by the DJANGO_SETTINGS_MODULE environment
-variable, and then from django.conf.global_settings; see the global settings file for 
+variable, and then from django.conf.global_settings; see the global settings file for
 a list of all possible variables.
 """
 
@@ -10,7 +10,7 @@ import os
 import sys
 from django.conf import global_settings
 
-# get a reference to this module (why isn't there a __module__ magic var?) 
+# get a reference to this module (why isn't there a __module__ magic var?)
 me = sys.modules[__name__]
 
 # update this dict from global settings (but only for ALL_CAPS settings)
@@ -22,7 +22,7 @@ for setting in dir(global_settings):
 try:
     me.SETTINGS_MODULE = os.environ["DJANGO_SETTINGS_MODULE"]
 except KeyError:
-    raise EnvironmentError, "Environemnt variable DJANGO_SETTINGS_MODULE is undefined."
+    raise EnvironmentError, "Environment variable DJANGO_SETTINGS_MODULE is undefined."
 
 try:
     mod = __import__(me.SETTINGS_MODULE, '', '', [''])
@@ -35,7 +35,7 @@ for setting in dir(mod):
 
 # save DJANGO_SETTINGS_MODULE in case anyone in the future cares
 me.SETTINGS_MODULE = os.environ.get('DJANGO_SETTINGS_MODULE', '')
-    
+
 # move the time zone info into os.environ
 os.environ['TZ'] = me.TIME_ZONE
 
