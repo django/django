@@ -20,7 +20,7 @@
         {% block branding %}{% endblock %}
         </div>
         {% if not user.is_anonymous %}
-        <div id="user-tools">Welcome, <strong>{% if user.first_name %}{{ user.first_name }}{% else %}{{ user.username }}{% endif %}</strong>. <br /><a href="/password_change/">Change password</a> / <a href="/logout/">Logout</a></div>
+        <div id="user-tools">Welcome, <strong>{% if user.first_name %}{{ user.first_name }}{% else %}{{ user.username }}{% endif %}</strong>. <br />{% block userlinks %}{% comment %}<a href="/admin/password_change/">Change password</a> / {% endcomment %}<a href="/admin/logout/">Log out</a>{% endblock %}</div>
         {% endif %}
         {% block nav-global %}{% endblock %}
         <br class="clear" />
