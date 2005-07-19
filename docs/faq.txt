@@ -222,6 +222,26 @@ but we recognize that choosing a template language runs close to religion.
 There's nothing about Django that requires using the template language, so
 if you're attached to ZPT, Cheetah, or whatever, feel free to use those.
 
+The database API
+================
+
+How can I see the raw SQL queries Django is running?
+----------------------------------------------------
+
+Make sure your Django ``DEBUG`` setting is set to ``True``. Then, just do
+this::
+
+    >>> from django.core.db import db
+    >>> db.queries
+    [{'sql': 'SELECT polls_polls.id,polls_polls.question,polls_polls.pub_date FROM polls_polls',
+    'time': '0.002'}]
+
+``db.queries`` is only available if ``DEBUG`` is ``True``. It's a list of
+dictionaries in order of query execution. Each dictionary has the following::
+
+    ``sql`` -- The raw SQL statement
+    ``time`` -- How long the statement took to execute, in seconds.
+
 The admin site
 ==============
 
