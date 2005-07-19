@@ -23,7 +23,7 @@ application, you might have the following views:
 * Day-based archive page -- displays all entries in the given day
 * Comment action -- handles posting comments to a given entry
 
-In our poll application, we'll have the following three views:
+In our poll application, we'll have the following four views:
 
 * Poll "archive" page -- displays the latest few polls
 * Poll "detail" page -- displays a poll question, with no results but with a form to vote
