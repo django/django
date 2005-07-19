@@ -59,7 +59,7 @@ def get_sql_create(mod):
                 if rel_field.__class__.__name__ == 'AutoField':
                     data_type = 'IntegerField'
                 else:
-                    rel_field.__class__.__name__
+                    data_type = rel_field.__class__.__name__
             else:
                 rel_field = f
                 data_type = f.__class__.__name__
