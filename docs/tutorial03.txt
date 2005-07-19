@@ -172,7 +172,8 @@ publication date::
     from django.utils.httpwrappers import HttpResponse
 
     def index(request):
-        latest_poll_list = polls.get_list(order_by=[('pub_date', 'DESC')], limit=5)
+        latest_poll_list = polls.get_list(order_by=[('pub_date', 'DESC')],
+            limit=5)
         output = ', '.join([p.question for p in latest_poll_list])
         return HttpResponse(output)
 
@@ -186,7 +187,8 @@ So let's use Django's template system to separate the design from Python::
     from django.utils.httpwrappers import HttpResponse
 
     def index(request):
-        latest_poll_list = polls.get_list(order_by=[('pub_date', 'DESC')], limit=5)
+        latest_poll_list = polls.get_list(order_by=[('pub_date', 'DESC')],
+            limit=5)
         t = template_loader.get_template('polls/index')
         c = Context(request, {
             'latest_poll_list': latest_poll_list,
