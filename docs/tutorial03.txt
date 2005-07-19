@@ -122,7 +122,8 @@ Then, fire up the Django development Web server, as we also did in Tutorial 2::
 Now go to "http://localhost:8000/polls/" on your domain in your Web browser.
 You should get a Python traceback with the following error message::
 
-    ViewDoesNotExist: myproject.polls.views.polls.index
+    ViewDoesNotExist: Tried myproject.apps.polls.views.polls.index.
+    Error was: 'module' object has no attribute 'index'
 
 Try "/polls/23/", "/polls/23/results/" and "/polls/23/vote/". The error
 messages should tell you which view Django tried (and failed to find, because
@@ -200,7 +201,8 @@ context is a dictionary mapping template variable names to Python objects.
 
 Reload the page. Now you'll see an error::
 
-    TemplateDoesNotExist: Your TEMPLATE_DIRS settings is empty. Change it to point to at least one template directory.
+    TemplateDoesNotExist: Your TEMPLATE_DIRS settings is empty.
+    Change it to point to at least one template directory.
 
 Ah. There's no template yet. First, create a directory, somewhere on your
 filesystem, whose contents Django can access. (Django runs as whatever user
