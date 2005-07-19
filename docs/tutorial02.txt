@@ -116,6 +116,9 @@ Restart your development Web server, and reload the Django admin page. You'll
 have to restart the server each time you make a change to Python code -- but
 we're working on changing that.
 
+You can stop the development server by hitting CONTROL-C (Unix) or CTRL-BREAK
+(Windows).
+
 Explore the free admin functionality
 ====================================
 
