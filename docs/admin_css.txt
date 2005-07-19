@@ -20,6 +20,9 @@ group in a box and applies certain styles to the elements within. An ``h2``
 within a ``div.module`` will align to the top of the ``div`` as a header for the
 whole group.
 
+.. image:: http://media.djangoproject.com/img/doc/admincss/module.gif
+   :alt: Example use of module class on admin homepage
+
 Column Types
 ============
 
@@ -138,8 +141,11 @@ additional class on the ``a`` for that tool. These are ``.addlink`` and
 Example from a changelist page::
 
     <ul class="object-tools">
-	  <li><a href="/stories/add/" class="addlink">Add story</a></li>
+	  <li><a href="/stories/add/" class="addlink">Add redirect</a></li>
 	 </ul>
+	
+.. image:: http://media.djangoproject.com/img/doc/admincss/objecttools_01.gif
+   :alt: Object tools on a changelist page
 
 and from a form page::
 
@@ -147,6 +153,9 @@ and from a form page::
      <li><a href="/history/303/152383/">History</a></li>
      <li><a href="/r/303/152383/" class="viewsitelink">View on site</a></li>
     </ul>
+
+.. image:: http://media.djangoproject.com/img/doc/admincss/objecttools_02.gif
+   :alt: Object tools on a form page
 
 Form Styles
 ===========
@@ -172,7 +181,10 @@ Form Rows
 
 Each row of the form (within the ``fieldset``) should be enclosed in a ``div``
 with class ``form-row``. If the field in the row is required, a class of
-``required`` should also be added to the ``form-row div``.
+``required`` should also be added to the ``div.form-row``.
+
+.. image:: http://media.djangoproject.com/img/doc/admincss/formrow.gif
+   :alt: Example use of form-row class
 
 Labels
 ------
