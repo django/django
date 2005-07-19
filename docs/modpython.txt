@@ -38,6 +38,10 @@ on it, you'll need to tell mod_python::
 You can also add directives such as ``PythonAutoReload Off`` for performance.
 See the `mod_python documentation`_ for a full list of options.
 
+Note that you should set ``PythonDebug Off`` on a production server. If you
+leave ``PythonDebug On``, your users would see ugly (and revealing) Python
+tracebacks if something goes wrong within mod_python.
+
 Restart Apache, and any request to /mysite/ or below will be served by Django.
 Note that Django's URLconfs won't trim the "/mysite/" -- they get passed the
 full URL.
