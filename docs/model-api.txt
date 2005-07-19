@@ -505,8 +505,9 @@ Field Types
     (database-dependent) point.
 
 ``SlugField``
-    A "slug," suitable for parts of a URL. Only allows alphanumeric characters
-    and underscores.
+    "Slug" is a newspaper term. A slug is a short label for something,
+    containing only letters, numbers and underscores. They're generally used in
+    URLs.
 
     Implies ``maxlength=50`` and ``db_index=True``.
 
