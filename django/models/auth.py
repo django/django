@@ -232,7 +232,7 @@ class Session(meta.Model):
         user.save()
         session = create_session(user_id)
         key, value = session.get_cookie()
-        cookie_domain = REGISTRATION_COOKIE_DOMAIN or request.META['SERVER_NAME']
+        cookie_domain = REGISTRATION_COOKIE_DOMAIN or None
         response.set_cookie(key, value, domain=cookie_domain)
 
 class Message(meta.Model):
