@@ -18,8 +18,15 @@ from django.conf.settings import DATABASE_ENGINE
 try:
     dbmod = __import__('django.core.db.backends.%s' % DATABASE_ENGINE, '', '', [''])
 except ImportError:
+    # The database backend wasn't found. Display a helpful error message
+    # listing all possible database backends.
     from django.core.exceptions import ImproperlyConfigured
-    raise ImproperlyConfigured, "Your DATABASE_ENGINE setting, %r, is invalid. Is it spelled correctly?" % DATABASE_ENGINE
+    import os
+    backend_dir = os.path.join(__path__[0], 'backends')
+    available_backends = [f[:-3] for f in os.listdir(backend_dir) if f.endswith('.py') and not f.startswith('__init__')]
+    available_backends.sort()
+    raise ImproperlyConfigured, "Your DATABASE_ENGINE setting, %r, is invalid. Is it spelled correctly? Available options are: %s" % \
+        (DATABASE_ENGINE, ', '.join(map(repr, available_backends)))
 
 DatabaseError = dbmod.DatabaseError
 db = dbmod.DatabaseWrapper()
