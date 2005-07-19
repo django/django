@@ -307,7 +307,7 @@ The template system uses dot-lookup syntax to access variable attributes. In
 the example of ``{{ poll.question }}``, first Django does a dictionary lookup
 on the object ``poll``. Failing that, it tries attribute lookup -- which works,
 in this case. If attribute lookup had failed, it would've tried calling the
-method ``choice()`` on the poll object.
+method ``question()`` on the poll object.
 
 Method-calling happens in the ``{% for %}`` loop: ``poll.get_choice_list`` is
 interpreted as the Python code ``poll.get_choice_list()``, which returns a list
