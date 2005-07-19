@@ -29,9 +29,16 @@ try:
 except ImportError, e:
     raise EnvironmentError, "Could not import DJANGO_SETTINGS_MODULE '%s' (is it on sys.path?): %s" % (me.SETTINGS_MODULE, e)
 
+# Settings that should be converted into tuples if they're mistakenly entered
+# as strings.
+tuple_settings = ("INSTALLED_APPS", "TEMPLATE_DIRS")
+
 for setting in dir(mod):
     if setting == setting.upper():
-        setattr(me, setting, getattr(mod, setting))
+        setting_value = getattr(mod, setting)
+        if setting in tuple_settings and type(setting_value) == str:
+            setting_value = (setting_value,) # In case the user forgot the comma.
+        setattr(me, setting, setting_value)
 
 # save DJANGO_SETTINGS_MODULE in case anyone in the future cares
 me.SETTINGS_MODULE = os.environ.get('DJANGO_SETTINGS_MODULE', '')
