@@ -76,11 +76,11 @@ this::
 This is worth a review. When somebody requests a page from your Web site --
 say, "/polls/23/", Django will load this Python module, because it's pointed to
 by the ``ROOT_URLCONF`` setting. It finds the variable named ``urlpatterns``
-and traverses the regular expressions. When it finds a regular expression that
-matches -- ``r'^polls/(?P<poll_id>\d+)/$'`` -- it loads the associated Python
-package/module: ``myproject.polls.views.polls.detail``. That corresponds to the
-function ``detail()`` in ``myproject/polls/views/polls.py``. Finally, it calls
-that ``detail()`` function like so::
+and traverses the regular expressions in order. When it finds a regular
+expression that matches -- ``r'^polls/(?P<poll_id>\d+)/$'`` -- it loads the
+associated Python package/module: ``myproject.polls.views.polls.detail``. That
+corresponds to the function ``detail()`` in ``myproject/polls/views/polls.py``.
+Finally, it calls that ``detail()`` function like so::
 
     detail(request=<HttpRequest object>, poll_id=23)
 
