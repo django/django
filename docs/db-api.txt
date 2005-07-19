@@ -52,21 +52,29 @@ The DB API supports the following lookup types:
     ==========  ==============================================================
     Type        Description
     ==========  ==============================================================
-    exact       Exact match: ``polls.get_object(id__exact=14)``
+    exact       Exact match: ``polls.get_object(id__exact=14)``.
     iexact      Case-insensitive exact match:
                 ``polls.get_list(slug__iexact="foo")`` matches a slug of ``foo``,
                 ``FOO``, ``fOo``, etc.
     contains    Case-sensitive containment test:
                 ``polls.get_list(question__contains="spam")`` returns all polls
-                that contain "spam" in the question.
-    icontains   Case-insensitive containment test
-    gt          Greater than: ``polls.get_list(id__gt=4)``
-    gte         Greater than or equal to
-    lt          Less than
-    lte         Less than or equal to
+                that contain "spam" in the question. (PostgreSQL only. MySQL
+                doesn't support case-sensitive LIKE statements; ``contains``
+                will act like ``icontains`` for MySQL.)
+    icontains   Case-insensitive containment test.
+    gt          Greater than: ``polls.get_list(id__gt=4)``.
+    gte         Greater than or equal to.
+    lt          Less than.
+    lte         Less than or equal to.
     startswith  Case-sensitive starts-with:
-                ``polls.get_list(question_startswith="Would")``
-    endswith    Case-sensitive ends-with
+                ``polls.get_list(question_startswith="Would")``. (PostgreSQL
+                only. MySQL doesn't support case-sensitive LIKE statements;
+                ``startswith`` will act like ``istartswith`` for MySQL.)
+    endswith    Case-sensitive ends-with. (PostgreSQL only. MySQL doesn't
+                support case-sensitive LIKE statements; ``endswith`` will act
+                like ``iendswith`` for MySQL.)
+    istartswith Case-insensitive starts-with.
+    iendswith   Case-insensitive ends-with.
     range       Range test:
                 ``polls.get_list(pub_date__range=(start_date, end_date))``
                 returns all polls with a pub_date between ``start_date``
@@ -308,13 +316,13 @@ Creating new objects
 Creating new objects (i.e. ``INSERT``) is done by creating new instances
 of objects then calling save() on them::
 
-    >>> p = polls.Poll(id=None, 
+    >>> p = polls.Poll(id=None,
     ...                slug="eggs",
     ...                question="How do you like your eggs?",
     ...                pub_date=datetime.datetime.now(),
     ...                expire_date=some_future_date)
     >>> p.save()
-    
+
 Calling ``save()`` on an object with an id if ``None`` signifies to
 Django that the object is new and should be inserted.
 
@@ -326,7 +334,7 @@ Related objects (i.e. ``Choices``) are created using convience functions::
     >>> p.add_choice(choice="Poached", votes=0)
     >>> p.get_choice_count()
     4
-    
+
 Each of those ``add_choice`` methods is equivilent to (except obviously much
 simpler than)::
 
@@ -335,9 +343,9 @@ simpler than)::
     ...                  choice="Over easy",
     ...                  votes=0)
     >>> c.save()
-    
+
 Note that when using the `add_foo()`` methods, you do not give any value
-for the ``id`` field, nor do you give a value for the field that stores 
+for the ``id`` field, nor do you give a value for the field that stores
 the relation (``poll_id`` in this case).
 
 Deleting objects

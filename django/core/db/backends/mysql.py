@@ -99,7 +99,9 @@ OPERATOR_MAPPING = {
     'lt': '<',
     'lte': '<=',
     'startswith': 'LIKE',
-    'endswith': 'LIKE'
+    'endswith': 'LIKE',
+    'istartswith': 'ILIKE',
+    'iendswith': 'ILIKE',
 }
 
 # This dictionary maps Field objects to their associated MySQL column
