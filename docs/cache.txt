@@ -4,81 +4,120 @@ Django's cache framework
 
 So, you got slashdotted.  Now what?
 
-Django's cache framework gives you two methods of caching dynamic pages in
-memory or in a database: you can automatically cache the entire page, or you can manually
-cache only the pieces that are difficult to produce.
+Django's cache framework gives you three methods of caching dynamic pages in
+memory or in a database. You can cache the output of entire pages, you can
+cache only the pieces that are difficult to produce, or you can cache your
+entire site.
 
 Setting up the cache
 ====================
 
 The cache framework is split into a set of "backends" that provide different
-methods of caching data.  There's a simple single-process memory cache 
-(mostly useful as a fallback), a database-backed cache, and a memcached_
-backend (by far the fastest option if you've got the RAM).
+methods of caching data. There's a simple single-process memory cache (mostly
+useful as a fallback), a database-backed cache, and a memcached_ backend (by
+far the fastest option if you've got the RAM).
 
 Before using the cache, you'll need to tell Django which cache backend you'd
-like to use; do this by setting the ``CACHE_BACKEND`` in your settings file.
+like to use. Do this by setting the ``CACHE_BACKEND`` in your settings file.
 
-The CACHE_BACKEND setting is a quasi-URI; examples are:
+The CACHE_BACKEND setting is a quasi-URI. Examples::
 
     ==============================  ===========================================
     CACHE_BACKEND                   Explanation
     ==============================  ===========================================
-    memcached://127.0.0.1:11211/    A memcached backend; the server is running 
+    memcached://127.0.0.1:11211/    A memcached backend; the server is running
                                     on localhost port 11211.
-                                    
-    db://tablename/                 A database backend (the db backend uses 
+
+    db://tablename/                 A database backend (the db backend uses
                                     the same database/username as the rest of
                                     the CMS, so only a table name is needed.)
-                                    
+
     simple:///                      A simple single-process memory cache; you
                                     probably don't want to use this except for
-                                    testing. Note that this cache backend is 
+                                    testing. Note that this cache backend is
                                     NOT threadsafe!
     ==============================  ===========================================
 
-All caches may take arguments; these are given in query-string style.  Valid
+All caches may take arguments -- they're given in query-string style.  Valid
 arguments are:
 
-    timeout         
-        Default timeout, in seconds, to use for the cache.  Defaults
-        to 5 minutes (300 seconds).
-                
-    max_entries     
+    timeout
+        Default timeout, in seconds, to use for the cache. Defaults to 5
+        minutes (300 seconds).
+
+    max_entries
         For the simple and database backends, the maximum number of entries
         allowed in the cache before it is cleaned.  Defaults to 300.
-                
-    cull_percentage 
-        The percentage of entries that are culled when max_entries is reached. 
+
+    cull_percentage
+        The percentage of entries that are culled when max_entries is reached.
         The actual percentage is 1/cull_percentage, so set cull_percentage=3 to
         cull 1/3 of the entries when max_entries is reached.
-        
+
         A value of 0 for cull_percentage means that the entire cache will be
-        dumped when max_entries is reached.  This makes culling *much* faster
+        dumped when max_entries is reached. This makes culling *much* faster
         at the expense of more cache misses.
-                
+
 For example::
 
     DB_CACHE = "memcached://127.0.0.1:11211/?timeout=60"
     DB_CACHE = "db://tablename/?timeout=120&max_entries=500&cull_percentage=4"
-    
-Invalid arguments are silently ignored, as are invalid values of known 
+
+Invalid arguments are silently ignored, as are invalid values of known
 arguments.
+
+The per-site cache
+==================
+
+Once the cache is set up, the simplest way to use the cache is to simply
+cache your entire site. Just add ``django.middleware.cache.CacheMiddleware``
+to your ``MIDDLEWARE_CLASSES`` setting, as in this example::
+
+    MIDDLEWARE_CLASSES = (
+        "django.middleware.common.CommonMiddleware",
+        "django.middleware.cache.CacheMiddleware",
+    )
+
+Then, add the following three required settings::
+
+* ``CACHE_MIDDLEWARE_SECONDS`` -- The number of seconds each page should be
+  cached.
+* ``CACHE_MIDDLEWARE_KEY_PREFIX`` -- If the cache is shared across multiple
+  sites using the same Django installation, set this to the name of the site,
+  or some other string that is unique to this Django instance, to prevent key
+  collisions. Use an empty string if you don't care.
+* ``CACHE_MIDDLEWARE_GZIP`` -- Either ``True`` or ``False``. If this is
+  enabled, Django will gzip all content for users whose browsers support gzip
+  encoding. Using gzip adds a level of overhead to page requests, but the
+  overhead generally is cancelled out by the fact that gzipped pages are stored
+  in the cache. That means subsequent requests won't have the overhead of
+  zipping, and the cache will hold more pages because each one is smaller.
+
+Pages with GET or POST parameters won't be cached.
+
+The cache middleware also makes a few more optimizations:
+
+* Sets and deals with ``ETag`` headers.
+* Sets the ``Content-Length`` header.
+* Sets the ``Last-Modified`` header to the current date/time when a fresh
+  (uncached) version of the page is requested.
+
+It doesn't matter where in the middleware stack you put the cache middleware.
 
 The per-page cache
 ==================
 
-Once the cache is set up, the simplest way to use the cache is to simply
-cache entire view functions.  ``django.views.decorators.cache`` defines
-a ``cache_page`` decorator that will automatically cache the view's response
-for you.  Using it couldn't be easier::
+A more granular way to use the caching framework is by caching the output of
+individual views. ``django.views.decorators.cache`` defines a ``cache_page``
+decorator that will automatically cache the view's response for you. It's easy
+to use::
 
     from django.views.decorators.cache import cache_page
-    
+
     def slashdot_this(request):
         ...
-   
-    slashdot_this = cache_page(slashdot_this, 60 * 15):
+
+    slashdot_this = cache_page(slashdot_this, 60 * 15)
 
 Or, using Python 2.4's decorator syntax::
 
@@ -86,54 +125,54 @@ Or, using Python 2.4's decorator syntax::
     def slashdot_this(request):
         ...
 
-This will cache the result of that view for 15 minutes (the cache timeout is
-in seconds).
+This will cache the result of that view for 15 minutes. (The cache timeout is
+in seconds.)
 
 The low-level cache API
 =======================
 
 There are times, however, that caching an entire rendered page doesn't gain
-you very much.  We often find that we only need to cache a list of object IDs
-from an intensive database query, for example.  In cases like these, you
-can use the cache API to store objects in the cache with any level of 
-granularity you like.
+you very much. The Django developers have found it's only necessary to cache a
+list of object IDs from an intensive database query, for example. In cases like
+these, you can use the cache API to store objects in the cache with any level
+of granularity you like.
 
-The cache API is almost shockingly simple::
+The cache API is simple::
 
     # the cache module exports a cache object that's automatically
     # created from the CACHE_BACKEND setting
     >>> from django.core.cache import cache
-    
+
     # The basic interface is set(key, value, timeout_seconds) and get(key)
     >>> cache.set('my_key', 'hello, world!', 30)
     >>> cache.get('my_key')
     'hello, world!'
-    
-    # (wait 30 seconds...)
+
+    # (Wait 30 seconds...)
     >>> cache.get('my_key')
     None
-    
-    # get can take a default argument
+
+    # get() can take a default argument
     >>> cache.get('my_key', 'has_expired')
     'has_expired'
-    
-    # there's also a get_many interface that only hits the cache once
-    # also, note that the timeout argument is optional and defaults
-    # to what you've given in the settings file.
+
+    # There's also a get_many() interface that only hits the cache once.
+    # Also, note that the timeout argument is optional and defaults to what
+    # you've given in the settings file.
     >>> cache.set('a', 1)
     >>> cache.set('b', 2)
     >>> cache.set('c', 3)
+
+    # get_many() returns a dictionary with all the keys you asked for that
+    # actually exist in the cache (and haven't expired).
     >>> cache.get_many(['a', 'b', 'c'])
     {'a': 1, 'b': 2, 'c': 3}
-    # get_many returns a dict with all the keys you asked for that
-    # actually exist in the cache (and haven't expired)
-    
-    # there's also a way to explicitly delete keys
+
+    # There's also a way to delete keys explicitly.
     >>> cache.delete('a')
-    
-Really, that's the entire API!  There's very few restrictions on what you can
+
+Really, that's the entire API! There are very few restrictions on what you can
 use the cache for; you can store any object in the cache that can be pickled
 safely, although keys must be strings.
 
 .. _memcached: http://www.danga.com/memcached/
-
