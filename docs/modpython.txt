@@ -11,6 +11,9 @@ when the server starts. Code stays in memory throughout the life of an Apache
 process, which leads to significant performance gains over other server
 arrangements.
 
+Basic configuration
+===================
+
 To configure Django with mod_python, first make sure you have Apache installed,
 with the mod_python module activated.
 
@@ -59,6 +62,15 @@ Here's a template for an admin configuration::
     </Location>
 
 The only thing different here is the ``DJANGO_SETTINGS_MODULE``.
+
+Running a development server with mod_python
+============================================
+
+If you use mod_python for your development server, you can avoid the hassle of
+having to restart the server each time you make code changes. Just set
+``MaxRequestsPerChild 1`` in your ``httpd.conf`` file to force Apache to reload
+everything for each request. But don't do that on a production server, or we'll
+revoke your Django privileges.
 
 .. _mod_perl: http://perl.apache.org/
 .. _mod_python documentation: http://modpython.org/live/current/doc-html/directives.html
