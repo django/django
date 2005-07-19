@@ -38,8 +38,8 @@ class RegexURLPattern:
         mod_name, func_name = get_mod_func(self.callback)
         try:
             return getattr(__import__(mod_name, '', '', ['']), func_name)
-        except (ImportError, AttributeError):
-            raise ViewDoesNotExist, self.callback
+        except (ImportError, AttributeError), e:
+            raise ViewDoesNotExist, "Tried %s. Error was: %s" % (self.callback, str(e))
 
 class RegexURLMultiplePattern:
     def __init__(self, regex, urlconf_module):
@@ -92,5 +92,5 @@ class Error404Resolver:
         mod_name, func_name = get_mod_func(self.callback)
         try:
             return getattr(__import__(mod_name, '', '', ['']), func_name), {}
-        except (ImportError, AttributeError):
-            raise ViewDoesNotExist, self.callback
+        except (ImportError, AttributeError), e:
+            raise ViewDoesNotExist, "Tried %s. Error was: %s" % (self.callback, str(e))
