@@ -123,7 +123,7 @@ Now go to "http://localhost:8000/polls/" on your domain in your Web browser.
 You should get a Python traceback with the following error message::
 
     ViewDoesNotExist: Tried myproject.apps.polls.views.polls.index.
-    Error was: 'module' object has no attribute 'index'
+    No module named polls
 
 Try "/polls/23/", "/polls/23/results/" and "/polls/23/vote/". The error
 messages should tell you which view Django tried (and failed to find, because
