@@ -2,7 +2,7 @@
 How to use Django with mod_python
 =================================
 
-Apache/mod_python currently is the preferred server setup for using Django on a
+Apache/mod_python currently is the preferred setup for using Django on a
 production server.
 
 mod_python, available at http://www.modpython.org/ , is similar to mod_perl: It
