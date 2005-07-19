@@ -457,15 +457,8 @@ inclusion in the admin index template. It's a useful starting point.
 For full details on customizing the look and feel of the Django admin site in
 general, see the `Django admin CSS guide`_.
 
+When you're comfortable with the admin site, read `part 3 of this tutorial`_ to
+start working on public poll views.
+
 .. _Django admin CSS guide: http://www.djangoproject.com/documentation/admin_css/
-
-Coming soon
-===========
-
-The tutorial ends here for the time being. But check back within 48 hours for
-the next installments:
-
-* Writing public-facing apps
-* Using the cache framework
-* Using the RSS framework
-* Using the comments framework
+.. _part 3 of this tutorial: http://www.djangoproject.com/documentation/tutorial3/
