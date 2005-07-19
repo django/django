@@ -34,9 +34,9 @@ wide array of options, only ``fields`` is required.
     A list of field objects. See `Field objects`_. For example::
 
         fields = (
-            meta.CharField('customer_name', 'customer name', maxlength=15),
-            meta.BooleanField('use_extra_cheese', 'use extra cheese'),
-            meta.IntegerField('customer_type', 'customer type', choices=CUSTOMER_TYPE_CHOICES),
+            meta.CharField('customer_name', maxlength=15),
+            meta.BooleanField('use_extra_cheese'),
+            meta.IntegerField('customer_type', choices=CUSTOMER_TYPE_CHOICES),
             ...
         )
 
@@ -123,10 +123,13 @@ the ``fields`` list is an instance of a ``meta.Field`` subclass and maps to
 a database field.
 
 All field objects -- except for ``ForeignKey`` and ``ManyToManyField`` (see
-below) -- take two positional arguments and a number of keyword arguments.
-The positional arguments are the field name and the human-readable name.  The
-field name must be a valid Python identifier, but the human-readable name can
-contain spaces, punctuation, etc.
+below) -- require the field's machine-readable name as the first positional
+argument. This must be a valid Python identifier -- no spaces, punctuation,
+etc., are allowed.
+
+The second positional argument, a human-readable name, is optional. If the
+human-readable name isn't given, Django will use the machine-readable name,
+coverting underscores to spaces.
 
 General field options
 ---------------------
@@ -226,7 +229,7 @@ Field Types
     use this directly; a primary key field will automatically be added to your
     model if you don't specify otherwise. That automatically-added field is::
 
-        meta.AutoField('id', 'ID', primary_key=True)
+        meta.AutoField('id', primary_key=True)
 
 ``BooleanField``
     A true/false field.

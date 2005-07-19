@@ -1564,13 +1564,14 @@ class Field(object):
     # database level.
     empty_strings_allowed = True
 
-    def __init__(self, name, verbose_name, primary_key=False,
+    def __init__(self, name, verbose_name=None, primary_key=False,
         maxlength=None, unique=False, blank=False, null=False, db_index=None,
         core=False, rel=None, default=NOT_PROVIDED, editable=True,
         prepopulate_from=None, unique_for_date=None, unique_for_month=None,
         unique_for_year=None, validator_list=None, choices=None, radio_admin=None,
         help_text=''):
-        self.name, self.verbose_name = name, verbose_name
+        self.name = name
+        self.verbose_name = verbose_name or name.replace('_', ' ')
         self.primary_key = primary_key
         self.maxlength, self.unique = maxlength, unique
         self.blank, self.null = blank, null
@@ -1767,9 +1768,9 @@ class AutoField(Field):
         return Field.get_manipulator_new_data(self, new_data, rel)
 
 class BooleanField(Field):
-    def __init__(self, name, verbose_name, **kwargs):
+    def __init__(self, *args, **kwargs):
         kwargs['blank'] = True
-        Field.__init__(self, name, verbose_name, **kwargs)
+        Field.__init__(self, *args, **kwargs)
 
     def get_manipulator_field_objs(self):
         return [formfields.CheckboxField]
@@ -1784,7 +1785,7 @@ class CommaSeparatedIntegerField(CharField):
 
 class DateField(Field):
     empty_strings_allowed = False
-    def __init__(self, name, verbose_name, auto_now=False, auto_now_add=False, **kwargs):
+    def __init__(self, name, verbose_name=None, auto_now=False, auto_now_add=False, **kwargs):
         self.auto_now, self.auto_now_add = auto_now, auto_now_add
         if auto_now or auto_now_add:
             kwargs['editable'] = False
@@ -1840,7 +1841,7 @@ class EmailField(Field):
         return [formfields.EmailField]
 
 class FileField(Field):
-    def __init__(self, name, verbose_name, upload_to='', **kwargs):
+    def __init__(self, name, verbose_name=None, upload_to='', **kwargs):
         self.upload_to = upload_to
         Field.__init__(self, name, verbose_name, **kwargs)
 
@@ -1905,7 +1906,7 @@ class FileField(Field):
 
 class FloatField(Field):
     empty_strings_allowed = False
-    def __init__(self, name, verbose_name, max_digits, decimal_places, **kwargs):
+    def __init__(self, name, verbose_name=None, max_digits=None, decimal_places=None, **kwargs):
         self.max_digits, self.decimal_places = max_digits, decimal_places
         Field.__init__(self, name, verbose_name, **kwargs)
 
@@ -1913,7 +1914,7 @@ class FloatField(Field):
         return [curry(formfields.FloatField, max_digits=self.max_digits, decimal_places=self.decimal_places)]
 
 class ImageField(FileField):
-    def __init__(self, name, verbose_name, width_field=None, height_field=None, **kwargs):
+    def __init__(self, name, verbose_name=None, width_field=None, height_field=None, **kwargs):
         self.width_field, self.height_field = width_field, height_field
         FileField.__init__(self, name, verbose_name, **kwargs)
 
@@ -1938,17 +1939,17 @@ class IntegerField(Field):
         return [formfields.IntegerField]
 
 class IPAddressField(Field):
-    def __init__(self, name, verbose_name, **kwargs):
+    def __init__(self, *args, **kwargs):
         kwargs['maxlength'] = 15
-        Field.__init__(self, name, verbose_name, **kwargs)
+        Field.__init__(self, *args, **kwargs)
 
     def get_manipulator_field_objs(self):
         return [formfields.IPAddressField]
 
 class NullBooleanField(Field):
-    def __init__(self, name, verbose_name, **kwargs):
+    def __init__(self, *args, **kwargs):
         kwargs['null'] = True
-        Field.__init__(self, name, verbose_name, **kwargs)
+        Field.__init__(self, *args, **kwargs)
 
     def get_manipulator_field_objs(self):
         return [formfields.NullBooleanField]
@@ -1966,13 +1967,13 @@ class PositiveSmallIntegerField(IntegerField):
         return [formfields.PositiveSmallIntegerField]
 
 class SlugField(Field):
-    def __init__(self, name, verbose_name, **kwargs):
+    def __init__(self, *args, **kwargs):
         kwargs['maxlength'] = 50
         kwargs.setdefault('validator_list', []).append(validators.isAlphaNumeric)
         # Set db_index=True unless it's been set manually.
         if not kwargs.has_key('db_index'):
             kwargs['db_index'] = True
-        Field.__init__(self, name, verbose_name, **kwargs)
+        Field.__init__(self, *args, **kwargs)
 
     def get_manipulator_field_objs(self):
         return [formfields.TextField]
@@ -1987,7 +1988,7 @@ class TextField(Field):
 
 class TimeField(Field):
     empty_strings_allowed = False
-    def __init__(self, name, verbose_name, auto_now=False, auto_now_add=False, **kwargs):
+    def __init__(self, name, verbose_name=None, auto_now=False, auto_now_add=False, **kwargs):
         self.auto_now, self.auto_now_add  = auto_now, auto_now_add
         if auto_now or auto_now_add:
             kwargs['editable'] = False
@@ -2014,7 +2015,7 @@ class TimeField(Field):
         return [formfields.TimeField]
 
 class URLField(Field):
-    def __init__(self, name, verbose_name, verify_exists=True, **kwargs):
+    def __init__(self, name, verbose_name=None, verify_exists=True, **kwargs):
         if verify_exists:
             kwargs.setdefault('validator_list', []).append(validators.isExistingURL)
         Field.__init__(self, name, verbose_name, **kwargs)
@@ -2027,7 +2028,7 @@ class USStateField(Field):
         return [formfields.USStateField]
 
 class XMLField(Field):
-    def __init__(self, name, verbose_name, schema_path, **kwargs):
+    def __init__(self, name, verbose_name=None, schema_path=None, **kwargs):
         self.schema_path = schema_path
         Field.__init__(self, name, verbose_name, **kwargs)
 

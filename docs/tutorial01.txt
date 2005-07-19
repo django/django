@@ -137,15 +137,15 @@ Edit the ``polls/models/polls.py`` file so that it looks like this::
 
     class Poll(meta.Model):
         fields = (
-            meta.CharField('question', 'question', maxlength=200),
+            meta.CharField('question', maxlength=200),
             meta.DateTimeField('pub_date', 'date published'),
         )
 
     class Choice(meta.Model):
         fields = (
             meta.ForeignKey(Poll),
-            meta.CharField('choice', 'choice', maxlength=200),
-            meta.IntegerField('votes', 'votes'),
+            meta.CharField('choice', maxlength=200),
+            meta.IntegerField('votes'),
         )
 
 The code is straightforward. Each model is represented by a class that
@@ -160,8 +160,12 @@ The first argument to each ``Field`` call is the field's name, in
 machine-friendly format. You'll use this value in your Python code, and your
 database will use it as the column name.
 
-The second argument is the field's human-readable name. That's used in a couple
-of introspective parts of Django, and it doubles as documentation.
+The second, optional, argument is the field's human-readable name. That's used
+in a couple of introspective parts of Django, and it doubles as documentation.
+If this field isn't provided, Django will use the machine-readable name. In
+this example, we've only defined a human-readable name for ``Poll.pub_date``.
+For all other fields in this model, the field's machine-readable name will
+suffice as its human-readable name.
 
 Some ``meta.*Field`` classes have additional required elements.
 ``meta.CharField``, for example, requires that you give it a ``maxlength``.

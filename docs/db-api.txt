@@ -12,18 +12,18 @@ Throughout this reference, we'll refer to the following Poll application::
 
     class Poll(meta.Model):
         fields = (
-            meta.SlugField('slug', 'slug', unique_for_month='pub_date'),
-            meta.CharField('question', 'question', maxlength=255),
-            meta.DateTimeField('pub_date', 'date published'),
-            meta.DateTimeField('expire_date', 'expiration date'),
+            meta.SlugField('slug', unique_for_month='pub_date'),
+            meta.CharField('question', maxlength=255),
+            meta.DateTimeField('pub_date'),
+            meta.DateTimeField('expire_date'),
         )
 
     class Choice(meta.Model):
         fields = (
             meta.ForeignKey(Poll, edit_inline=True, edit_inline_type=meta.TABULAR,
                 num_in_admin=10, min_num_in_admin=5),
-            meta.CharField('choice', 'choice', maxlength=255, core=True),
-            meta.IntegerField('votes', 'votes', editable=False, default=0),
+            meta.CharField('choice', maxlength=255, core=True),
+            meta.IntegerField('votes', editable=False, default=0),
         )
 
 Basic lookup functions
@@ -351,6 +351,4 @@ the relation (``poll_id`` in this case).
 Deleting objects
 ================
 
-Just cause we're crazy like that, the delete method is named ``delete()``.
-Yeah, you never know what we're going to do next.
-
+The delete method, conveniently, is named ``delete()``.

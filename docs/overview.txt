@@ -22,7 +22,7 @@ solving two years' worth of database-schema problems. Here's a quick example::
 
     class Reporter(meta.Model):
         fields = (
-            meta.CharField('full_name', "reporter's full name", maxlength=70),
+            meta.CharField('full_name', maxlength=70),
         )
 
         def __repr__(self):
@@ -30,9 +30,9 @@ solving two years' worth of database-schema problems. Here's a quick example::
 
     class Article(meta.Model):
         fields = (
-            meta.DateTimeField('pub_date', 'publication date'),
-            meta.CharField('headline', 'headline', maxlength=200),
-            meta.TextField('article', 'article'),
+            meta.DateTimeField('pub_date'),
+            meta.CharField('headline', maxlength=200),
+            meta.TextField('article'),
             meta.ForeignKey(Reporter),
         )
 
@@ -133,9 +133,9 @@ classes::
 
     class Article(meta.Model):
         fields = (
-            meta.DateTimeField('pub_date', 'publication date'),
-            meta.CharField('headline', 'headline', maxlength=200),
-            meta.TextField('article', 'article'),
+            meta.DateTimeField('pub_date'),
+            meta.CharField('headline', maxlength=200),
+            meta.TextField('article'),
             meta.ForeignKey(Reporter),
         )
         admin = meta.Admin(
@@ -302,7 +302,11 @@ features:
     * An RSS framework that makes creating RSS feeds as easy as writing a
       small Python class.
     * More sexy automatically-generated admin features -- this overview barely
-      scratched the surface
+      scratched the surface.
 
-The next obvious steps are for you to download Django, read the documentation
-and join the community. Thanks for your interest!
+The next obvious steps are for you to `download Django`_, read `the tutorial`_
+and join `the community`_. Thanks for your interest!
+
+.. _download Django: http://www.djangoproject.com/documentation/
+.. _the tutorial: http://www.djangoproject.com/documentation/tutorial1/
+.. _the community: http://www.djangoproject.com/community/
