@@ -1,0 +1,41 @@
+=================================
+How to use Django with mod_python
+=================================
+
+Apache/mod_python currently is the preferred server setup for using Django on a
+production server.
+
+mod_python, available at http://www.modpython.org/ , is similar to mod_perl: It
+embeds Python within Apache and loads Python code into memory when the server
+starts. Code stays in memory throughout the life of an Apache process, which
+leads to significant performance gains over other server arrangements.
+
+To configure Django with mod_python, first make sure you have Apache installed,
+with the mod_python module activated.
+
+Then edit your ``httpd.conf`` file and add the following::
+
+    <Location "/mysite/">
+        SetHandler python-program
+        PythonHandler django.core.handlers.modpython
+        SetEnv DJANGO_SETTINGS_MODULE myproject.settings.main
+        PythonDebug On
+    </Location>
+
+...and replace ``myproject.settings.main`` with the path to your settings file,
+in dotted-package syntax.
+
+Restart Apache, and any request to /mysite/ or below will be served by Django.
+Note that Django's URLconfs won't trim the "/mysite/" -- they get passed the
+full URL.
+
+Here's a template for an admin configuration::
+
+    <Location "/admin/">
+        SetHandler python-program
+        PythonHandler django.core.handlers.modpython
+        SetEnv DJANGO_SETTINGS_MODULE myproject.settings.admin
+        PythonDebug On
+    </Location>
+
+The only thing different here is the ``DJANGO_SETTINGS_MODULE``.
