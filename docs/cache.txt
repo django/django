@@ -78,7 +78,7 @@ to your ``MIDDLEWARE_CLASSES`` setting, as in this example::
         "django.middleware.cache.CacheMiddleware",
     )
 
-Then, add the following three required settings::
+Then, add the following three required settings:
 
 * ``CACHE_MIDDLEWARE_SECONDS`` -- The number of seconds each page should be
   cached.
