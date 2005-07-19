@@ -91,7 +91,7 @@ a keyword argument to the view function.
 Because the URL patterns are regular expressions, there really is no limit on
 what you can do with them. And there's no need to add URL cruft such as
 ``.php`` -- unless you have a sick sense of humor, in which case you can do
-something like this:
+something like this::
 
     (r'^polls/latest\.php$', 'myproject.apps.polls.views.polls.index'),
 
