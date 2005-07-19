@@ -5,10 +5,11 @@ How to use Django with mod_python
 Apache/mod_python currently is the preferred setup for using Django on a
 production server.
 
-mod_python, available at http://www.modpython.org/ , is similar to mod_perl: It
-embeds Python within Apache and loads Python code into memory when the server
-starts. Code stays in memory throughout the life of an Apache process, which
-leads to significant performance gains over other server arrangements.
+mod_python, available at http://www.modpython.org/ , is similar to
+`mod_perl`_ : It embeds Python within Apache and loads Python code into memory
+when the server starts. Code stays in memory throughout the life of an Apache
+process, which leads to significant performance gains over other server
+arrangements.
 
 To configure Django with mod_python, first make sure you have Apache installed,
 with the mod_python module activated.
@@ -25,9 +26,24 @@ Then edit your ``httpd.conf`` file and add the following::
 ...and replace ``myproject.settings.main`` with the path to your settings file,
 in dotted-package syntax.
 
+This tells Apache: "Use mod_python for any URL at or under '/mysite/', using the
+Django mod_python handler." It passes the value of ``DJANGO_SETTINGS_MODULE``
+so mod_python knows which settings to use.
+
+Also, if you've manually altered your ``PYTHONPATH`` to put your Django project
+on it, you'll need to tell mod_python::
+
+    PythonPath "['/path/to/project'] + sys.path"
+
+You can also add directives such as ``PythonAutoReload Off`` for performance.
+See the `mod_python documentation`_ for a full list of options.
+
 Restart Apache, and any request to /mysite/ or below will be served by Django.
 Note that Django's URLconfs won't trim the "/mysite/" -- they get passed the
 full URL.
+
+When deploying Django sites on mod_python, you'll need to restart Apache each
+time you make changes to your Python code.
 
 Here's a template for an admin configuration::
 
@@ -39,3 +55,6 @@ Here's a template for an admin configuration::
     </Location>
 
 The only thing different here is the ``DJANGO_SETTINGS_MODULE``.
+
+.. _mod_perl: http://perl.apache.org/
+.. _mod_python documentation: http://modpython.org/live/current/doc-html/directives.html
