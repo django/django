@@ -249,8 +249,9 @@ If you're interested, also run the following commands:
 
 * ``django-admin.py sqlinitialdata polls`` -- Outputs the initial-data inserts
   required for Django's admin framework.
-* ``django-admin.py sqlclear polls`` -- Outputs the ``DROP TABLE`` statements
-  for this app.
+* ``django-admin.py sqlclear polls`` -- Outputs the necessary ``DROP TABLE``
+  statements for this app, according to which tables already exist in your
+  database (if any).
 * ``django-admin.py sqlindexes polls`` -- Outputs the ``CREATE INDEX``
   statements for this app.
 * ``django-admin.py sqlall polls`` -- A combination of 'sql' and
