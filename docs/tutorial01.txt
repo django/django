@@ -197,7 +197,7 @@ is able to:
 
 But first we need to tell our project that the ``polls`` app is installed.
 
-.. adminition:: Philosophy
+.. admonition:: Philosophy
 
    Django apps are "pluggable": You can use an app in multiple
    projects, and you can distribute apps, because they're not tied to a given
