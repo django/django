@@ -304,6 +304,11 @@ Field Types
     many toppings on a pizza)::
 
         meta.ForeignKey(Pizza)
+        
+    .. admonition:: Note
+        
+        To create a recursive relationship, use a ``ForeignKey`` that relates
+        to ``"self"`` (i.e. ``meta.ForeignKey("self")``).
 
     ``ForeignKey`` fields take a large number of extra arguments for defining how
     the relationship should work. All are optional:
