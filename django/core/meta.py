@@ -2049,10 +2049,11 @@ class ForeignKey(Field):
         return [formfields.IntegerField]
 
 class ManyToManyField(Field):
-    def __init__(self, to, **kwargs):
+    def __init__(self, to, rel_name=None, **kwargs):
         kwargs['name'] = kwargs.get('name', to._meta.module_name)
         kwargs['verbose_name'] = kwargs.get('verbose_name', to._meta.verbose_name_plural)
-        kwargs['rel'] = ManyToMany(to, to._meta.object_name.lower(),
+        rel_name = rel_name or to._meta.object_name.lower()
+        kwargs['rel'] = ManyToMany(to, rel_name,
             num_in_admin=kwargs.pop('num_in_admin', 0),
             related_name=kwargs.pop('related_name', None),
             filter_interface=kwargs.pop('filter_interface', None),

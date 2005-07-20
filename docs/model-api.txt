@@ -455,12 +455,17 @@ Field Types
 
     Many-to-many relations are a bit different from other fields.  First, they
     aren't actually a field per se, because they use a intermediary join table.
-    Second, they don't take any of the same options as the rest of the fields.
-    The only arguments taken are:
+    Second, they don't take the same options as the rest of the fields. The
+    only arguments taken are:
 
     =======================  ============================================================
     Argument                 Description
     =======================  ============================================================
+    ``rel_name``             Use this if you have more than one
+                             ``ManyToOneField`` s in the same model that relate
+                             to the same model. Django will use ``rel_name`` in
+                             the generated API.
+
     ``related_name``         See the description of ``related_name`` in
                              ``ManyToOneField``, above.
 
@@ -471,7 +476,19 @@ Field Types
                              should the interface be stacked horizontally or
                              vertically).
 
-    ``limit_choices_to``     See the description under ``ManyToOneField``, above.
+    ``limit_choices_to``     See the description under ``ManyToOneField`` above.
+
+    ``name``                 An alphanumeric name for the relationship. If this
+                             isn't provided, Django uses the ``module_name`` of
+                             the related object.
+
+                             This is only really useful when you have a single
+                             object that relates to the same object more than
+                             once.
+
+    ``verbose_name``         A human-readable name for the object, singular. If
+                             this isn't provided, Django uses the
+                             ``verbose_name`` for the related object.
     =======================  ============================================================
 
 ``NullBooleanField``
