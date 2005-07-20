@@ -322,7 +322,7 @@ class DoGetCommentList:
         tokens = token.contents.split()
         # Now tokens is a list like this:
         # ['get_comment_list', 'for', 'lcom.eventtimes', 'event.id', 'as', 'comment_list']
-        if 6 <= len(tokens) <= 7:
+        if not 6 <= len(tokens) <= 7:
             raise template.TemplateSyntaxError, "%s block tag requires 5 or 6 arguments" % self.tag_name
         if tokens[1] != 'for':
             raise template.TemplateSyntaxError, "Second argument in '%s' tag must be 'for'" % self.tag_name
