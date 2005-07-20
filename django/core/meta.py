@@ -179,23 +179,7 @@ class Options:
         else:
             self.order_with_respect_to = None
         self.module_constants = module_constants or {}
-        # Alter the admin attribute so that the 'fields' members are lists of
-        # field objects -- not lists of field names.
-        if admin:
-            # Be sure to use admin.copy(), because otherwise we'll be editing a
-            # reference of admin, which will in turn affect the copy in
-            # self._orig_init_args.
-            self.admin = admin.copy()
-            for fieldset in self.admin.fields:
-                admin_fields = []
-                for field_name_or_list in fieldset[1]['fields']:
-                    if isinstance(field_name_or_list, basestring):
-                        admin_fields.append([self.get_field(field_name_or_list)])
-                    else:
-                        admin_fields.append([self.get_field(field_name) for field_name in field_name_or_list])
-                fieldset[1]['fields'] = admin_fields
-        else:
-            self.admin = None
+        self.admin = admin
 
         # Calculate one_to_one_field.
         self.one_to_one_field = None
@@ -508,6 +492,9 @@ class ModelBase(type):
             # RECURSIVE_RELATIONSHIP_CONSTANT, create that relationship formally.
             if f.rel and f.rel.to == RECURSIVE_RELATIONSHIP_CONSTANT:
                 f.rel.to = opts
+                f.name = (f.rel.name or f.rel.to.object_name.lower()) + '_' + f.rel.to.pk.name
+                f.verbose_name = f.verbose_name or f.rel.to.verbose_name
+                f.rel.field_name = f.rel.field_name or f.rel.to.pk.name
             # Add "get_thingie" methods for many-to-one related objects.
             # EXAMPLES: Choice.get_poll(), Story.get_dateline()
             if isinstance(f.rel, ManyToOne):
@@ -2041,8 +2028,9 @@ class ForeignKey(Field):
         try:
             to_name = to._meta.object_name.lower()
         except AttributeError: # to._meta doesn't exist, so it must be RECURSIVE_RELATIONSHIP_CONSTANT
-            kwargs['name'] = kwargs['name']
-            kwargs['verbose_name'] = kwargs['verbose_name']
+            assert to == 'self', "ForeignKey(%r) is invalid. First parameter to ForeignKey must be either a model or the string %r" % (to, RECURSIVE_RELATIONSHIP_CONSTANT)
+            kwargs['name'] = ''
+            kwargs['verbose_name'] = kwargs.get('verbose_name', '')
         else:
             to_field = to_field or to._meta.pk.name
             kwargs['name'] = kwargs.get('name', to_name + '_id')
@@ -2158,5 +2146,19 @@ class Admin:
         self.search_fields = search_fields or []
         self.save_on_top = save_on_top
 
-    def copy(self):
-        return copy.deepcopy(self)
+    def get_field_objs(self, opts):
+        # Returns self.fields, except with fields as Field objects instead of
+        # field names.
+        new_fieldset_list = []
+        for fieldset in self.fields:
+            new_fieldset = [fieldset[0], {}]
+            new_fieldset[1].update(fieldset[1])
+            admin_fields = []
+            for field_name_or_list in fieldset[1]['fields']:
+                if isinstance(field_name_or_list, basestring):
+                    admin_fields.append([opts.get_field(field_name_or_list)])
+                else:
+                    admin_fields.append([opts.get_field(field_name) for field_name in field_name_or_list])
+            new_fieldset[1]['fields'] = admin_fields
+            new_fieldset_list.append(new_fieldset)
+        return new_fieldset_list

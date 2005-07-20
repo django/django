@@ -51,7 +51,7 @@ def get_sql_create(mod):
         table_output = []
         for f in opts.fields:
             if isinstance(f, meta.ForeignKey):
-                rel_field = f.rel.to.get_field(f.rel.field_name)
+                rel_field = f.rel.get_related_field()
                 # If the foreign key points to an AutoField, the foreign key
                 # should be an IntegerField, not an AutoField. Otherwise, the
                 # foreign key should be the same type of field as the field

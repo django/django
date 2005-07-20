@@ -551,7 +551,7 @@ def _get_template(opts, app_label, add=False, change=False, show_delete=False, f
         javascript_imports.extend(['%sjs/getElementsBySelector.js' % ADMIN_MEDIA_PREFIX, '%sjs/dom-drag.js' % ADMIN_MEDIA_PREFIX, '%sjs/admin/ordering.js' % ADMIN_MEDIA_PREFIX])
     if opts.admin.js:
         javascript_imports.extend(opts.admin.js)
-    for _, options in opts.admin.fields:
+    for _, options in opts.admin.get_field_objs(opts):
         try:
             for field_list in options['fields']:
                 for f in field_list:
@@ -589,7 +589,7 @@ def _get_template(opts, app_label, add=False, change=False, show_delete=False, f
     if opts.admin.save_on_top:
         t.extend(_get_submit_row_template(opts, app_label, add, change, show_delete, ordered_objects))
     t.append('{% if form.error_dict %}<p class="errornote">Please correct the error{{ form.error_dict.items|pluralize }} below.</p>{% endif %}\n')
-    for fieldset_name, options in opts.admin.fields:
+    for fieldset_name, options in opts.admin.get_field_objs(opts):
         t.append('<fieldset class="module aligned %s">\n\n' % options.get('classes', ''))
         if fieldset_name:
             t.append('<h2>%s</h2>\n' % fieldset_name)
@@ -671,7 +671,7 @@ def _get_template(opts, app_label, add=False, change=False, show_delete=False, f
     if add:
         # Add focus to the first field on the form, if this is an "add" form.
         t.append('<script type="text/javascript">document.getElementById("id_%s").focus();</script>' % \
-            opts.admin.fields[0][1]['fields'][0][0].get_manipulator_field_names('')[0])
+            opts.admin.get_field_objs(opts)[0][1]['fields'][0][0].get_manipulator_field_names('')[0])
     if auto_populated_fields:
         t.append('<script type="text/javascript">')
         for field in auto_populated_fields:
