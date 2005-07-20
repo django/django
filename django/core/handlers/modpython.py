@@ -235,7 +235,11 @@ class ModPythonHandler:
                 return self.get_technical_error_response()
             else:
                 subject = 'Coding error (%s IP)' % (request.META['REMOTE_ADDR'] in INTERNAL_IPS and 'internal' or 'EXTERNAL')
-                message = "%s\n\n%s" % (self._get_traceback(), request)
+                try:
+                    request_repr = repr(request)
+                except:
+                    request_repr = "Request repr() unavailable"
+                message = "%s\n\n%s" % (self._get_traceback(), request_repr)
                 mail_admins(subject, message, fail_silently=True)
                 return self.get_friendly_error_response(request, conf_module)
 
