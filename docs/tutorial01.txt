@@ -128,7 +128,9 @@ This directory structure will house the poll application.
 The first step in writing a database Web app in Django is to define your models
 -- essentially, your database layout, with additional metadata.
 
-   PHILOSOPHY: A model is the single, definitive source of data about your
+.. admonition:: Philosophy
+   
+   A model is the single, definitive source of data about your
    data. It contains the essential fields and behaviors of the data you're
    storing. Django follows the `DRY Principle`_. The goal is to define your
    data model in one place and automatically derive things from it.
@@ -195,7 +197,9 @@ is able to:
 
 But first we need to tell our project that the ``polls`` app is installed.
 
-   PHILOSOPHY: Django apps are "pluggable": You can use an app in multiple
+.. adminition:: Philosophy
+
+   Django apps are "pluggable": You can use an app in multiple
    projects, and you can distribute apps, because they're not tied to a given
    Django installation.
 

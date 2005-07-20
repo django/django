@@ -9,21 +9,20 @@ application and will focus on Django's automatically-generated admin site.
 
 .. _Tutorial 1: http://www.djangoproject.com/documentation/tutorial1/
 
-Philosophy
-==========
-
-Generating admin sites for your staff or clients to add, change and delete
-content is tedious work that doesn't require much creativity. For that reason,
-Django entirely automates creation of admin interfaces for models.
-
-Django was written in a newsroom environment, with a very clear separation
-between "content publishers" and the "public" site. Site managers use the
-system to add news stories, events, sports scores, etc., and that content is
-displayed on the public site. Django solves the problem of creating a unified
-interface for site administrators to edit content.
-
-The admin isn't necessarily intended to be used by site visitors; it's for site
-managers.
+.. admonition:: Philosophy
+    
+    Generating admin sites for your staff or clients to add, change and delete
+    content is tedious work that doesn't require much creativity. For that reason,
+    Django entirely automates creation of admin interfaces for models.
+    
+    Django was written in a newsroom environment, with a very clear separation
+    between "content publishers" and the "public" site. Site managers use the
+    system to add news stories, events, sports scores, etc., and that content is
+    displayed on the public site. Django solves the problem of creating a unified
+    interface for site administrators to edit content.
+    
+    The admin isn't necessarily intended to be used by site visitors; it's for site
+    managers.
 
 Start the development server
 ============================
