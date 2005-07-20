@@ -41,7 +41,7 @@ class DjangoOptionParser(OptionParser):
         sys.exit(1)
 
 def print_error(msg, cmd):
-    sys.stderr.write("Error: %s\nRun %s --help for help." % (msg, cmd))
+    sys.stderr.write('Error: %s\nRun "%s --help" for help.\n' % (msg, cmd))
     sys.exit(1)
 
 def main():
@@ -60,9 +60,9 @@ def main():
     try:
         action = args[0]
     except IndexError:
-        print_error("An 'action' is required.")
+        print_error("An action is required.", sys.argv[0])
     if not ACTION_MAPPING.has_key(action):
-        print_error("Your 'action' was invalid.")
+        print_error("Your action, %r, was invalid." % action, sys.argv[0])
     if action == 'init':
         ACTION_MAPPING[action]()
     elif action in ('startapp', 'startproject'):
