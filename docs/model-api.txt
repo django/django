@@ -429,7 +429,7 @@ Field Types
 .. _`Database API reference`: http://www.djangoproject.com/documentation/db_api/
 
 ``ImageField``
-    Like a ``FieldField``, but validates that the uploaded object is a valid
+    Like a ``FileField``, but validates that the uploaded object is a valid
     image. Has two extra optional arguments, ``height_field`` and ``width_field``
     which, if set, will be auto-populated with the height and width of the image.
 
