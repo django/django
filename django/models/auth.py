@@ -213,8 +213,7 @@ class Session(meta.Model):
             raise SessionDoesNotExist
         session_md5, tamper_check = session_cookie_string[:32], session_cookie_string[32:]
         if md5.new(session_md5 + SECRET_KEY + 'auth').hexdigest() != tamper_check:
-            from django.core.exceptions import SuspiciousOperation
-            raise SuspiciousOperation, "User may have tampered with session cookie."
+            raise SessionDoesNotExist
         return get_object(session_md5__exact=session_md5, select_related=True)
 
     def _module_destroy_all_sessions(user_id):
