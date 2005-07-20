@@ -113,11 +113,9 @@ Write your first view
 Well, we haven't created any views yet -- we just have the URLconf. But let's
 make sure Django is following the URLconf properly.
 
-Set your ``DJANGO_SETTINGS_MODULE`` environment variable to your main settings
-(``myproject.settings.main``), as we did with the admin settings in Tutorial 2.
-Then, fire up the Django development Web server, as we also did in Tutorial 2::
+Fire up the Django development Web server, as we did in Tutorial 2::
 
-    django-admin.py runserver
+    django-admin.py runserver --settings="myproject.settings.admin"
 
 Now go to "http://localhost:8000/polls/" on your domain in your Web browser.
 You should get a Python traceback with the following error message::

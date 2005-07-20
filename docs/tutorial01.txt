@@ -27,7 +27,7 @@ initial setup.
 Run the command ``django-admin.py startproject myproject``. That'll create a
 ``myproject`` directory in your current directory.
 
-(``django-admin.py`` should be on your path if you installed Django via
+(``django-admin.py`` should be on your system path if you installed Django via
 its setup.py utility. If it's not on your path, you can find it in
 ``site-packages/django/bin``; consider symlinking to it from some place
 on your path, such as /usr/local/bin.)
@@ -67,9 +67,20 @@ comprehensively tested with that database. If you find any bugs in Django's
 MySQL bindings, please file them in `Django's ticket system`_ so we can fix them
 immediately.
 
-Once you've done that, you need to tell Django which settings module you're
-currently using. Do that by setting an environment variable,
-``DJANGO_SETTINGS_MODULE``. Here's how you do that in the Bash shell on Unix::
+Now, take a second to make sure ``myproject`` is on your Python path. You
+can do this by copying ``myproject`` to Python's ``site-packages`` directory,
+or you can do it by altering the ``PYTHONPATH`` environment variable. See the
+`Python path documentation`_ for more information.
+
+Run the following command::
+
+    django-admin.py init --settings='myproject.settings.main'
+
+The ``django-admin.py`` utility generally needs to know which settings module
+you're using. Here, we're doing that by specifying ``settings=`` on the command
+line, but that can get tedious. If you don't want to type ``settings=`` each
+time, you can set the ``DJANGO_SETTINGS_MODULE`` environment variable. Here's
+how you do that in the Bash shell on Unix::
 
     export DJANGO_SETTINGS_MODULE=myproject.settings.main
 
@@ -77,24 +88,15 @@ On Windows, you'd use ``set`` instead::
 
     set DJANGO_SETTINGS_MODULE=myproject.settings.main
 
-Note this path is in Python package syntax. Your project has to be somewhere on
-your `Python path`_ -- so that the Python statement ``import myproject.settings.main``
-works. Throughout Django, you'll be referring to your projects and apps via
-Python package syntax.
-
-Then run the following command::
-
-    django-admin.py init
-
-If you don't see any errors, you know it worked. That command initialized your
-database with Django's core database tables. If you're interested, run the
-PostgreSQL or MySQL command-line client and type "\\dt" (PostgreSQL) or
-"SHOW TABLES;" (MySQL) to display the tables.
+If you don't see any errors after running ``django-admin.py init``, you know it
+worked. That command initialized your database with Django's core database
+tables. If you're interested, run the PostgreSQL or MySQL command-line client
+and type "\\dt" (PostgreSQL) or "SHOW TABLES;" (MySQL) to display the tables.
 
 Now you're set to start doing work. You won't have to take care of this boring
 administrative stuff again.
 
-.. _`Python path`: http://docs.python.org/tut/node8.html#SECTION008110000000000000000
+.. _`Python path documentation`: http://docs.python.org/tut/node8.html#SECTION008110000000000000000
 .. _Django's ticket system: http://code.djangoproject.com/report/1
 
 Creating models
@@ -103,6 +105,10 @@ Creating models
 Change into the ``myproject/apps`` directory and type this command::
 
     django-admin.py startapp polls
+
+(From now on, this tutorial will leave out the ``--settings`` parameter and
+will assume you've either set your ``DJANGO_SETTINGS_MODULE`` environment
+variable or included the ``--settings`` option in your call to the command.)
 
 That'll create a directory structure like this::
 

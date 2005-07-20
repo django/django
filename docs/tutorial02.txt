@@ -30,19 +30,16 @@ Start the development server
 
 To make things easy, Django comes with a pure-Python Web server that builds on
 the BaseHTTPServer included in Python's standard library. Let's start the
-server and explore the admin site. First, set the ``DJANGO_SETTINGS_MODULE``
-environment variable to the location of your admin settings::
+server and explore the admin site.
 
-    export DJANGO_SETTINGS_MODULE=myproject.settings.admin
+Just run the following command to start the server::
 
-Then, run this command to start the server::
-
-    django-admin.py runserver
+    django-admin.py runserver --settings="myproject.settings.admin"
 
 It'll start a Web server running locally -- on port 8000, by default. If you
 want to change the server's port, pass it as a command-line argument::
 
-    django-admin.py runserver 8080
+    django-admin.py runserver 8080 --settings="myproject.settings.admin"
 
 DON'T use this server in anything resembling a production environment. It's
 intended only for use while developing.
