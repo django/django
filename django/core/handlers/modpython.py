@@ -258,9 +258,9 @@ class ModPythonHandler:
         Returns an HttpResponse that displays a TECHNICAL error message for a
         fundamental database or coding error.
         """
-        error_string = "<pre>There's been an error:\n\n%s</pre>" % self._get_traceback()
+        error_string = "There's been an error:\n\n%s" % self._get_traceback()
         responseClass = is404 and httpwrappers.HttpResponseNotFound or httpwrappers.HttpResponseServerError
-        return responseClass(error_string)
+        return responseClass(error_string, mimetype='text/plain')
 
     def _get_traceback(self):
         "Helper function to return the traceback as a string"
