@@ -375,10 +375,12 @@ def runserver(port):
     "Starts a lightweight Web server for development."
     from django.core.servers.basehttp import run, WSGIServerException
     from django.core.handlers.wsgi import AdminMediaHandler, WSGIHandler
+    from django.conf.settings import SETTINGS_MODULE
     if not port.isdigit():
         sys.stderr.write("Error: %r is not a valid port number.\n" % port)
         sys.exit(1)
-    print "Starting server on port %s. Go to http://127.0.0.1:%s/ for Django." % (port, port)
+    print "Starting server on port %s with settings module %r." % (port, SETTINGS_MODULE)
+    print "Go to http://127.0.0.1:%s/ for Django." % port
     try:
         run(int(port), AdminMediaHandler(WSGIHandler()))
     except WSGIServerException, e:
