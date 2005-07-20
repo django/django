@@ -1614,10 +1614,6 @@ class Field(object):
             return []
         raise TypeError, "Field has invalid lookup: %s" % lookup_type
 
-    def get_m2m_db_table(self, original_opts):
-        "Returns the name of the DB table for this field's relationship."
-        return '%s_%s' % (original_opts.db_table, self.name)
-
     def has_default(self):
         "Returns a boolean of whether this field has a default value."
         return self.default != NOT_PROVIDED
@@ -2066,6 +2062,10 @@ class ManyToManyField(Field):
     def get_manipulator_field_objs(self):
         choices = self.get_choices(include_blank=False)
         return [curry(formfields.SelectMultipleField, size=min(max(len(choices), 5), 15), choices=choices)]
+
+    def get_m2m_db_table(self, original_opts):
+        "Returns the name of the many-to-many 'join' table."
+        return '%s_%s' % (original_opts.db_table, self.name)
 
 class OneToOneField(IntegerField):
     def __init__(self, to, to_field=None, rel_name=None, **kwargs):

@@ -91,7 +91,7 @@ def get_sql_create(mod):
     for klass in mod._MODELS:
         opts = klass._meta
         for f in opts.many_to_many:
-            table_output = ['CREATE TABLE %s_%s (' % (opts.db_table, f.name)]
+            table_output = ['CREATE TABLE %s (' % f.get_m2m_db_table(opts)]
             table_output.append('    id %s NOT NULL PRIMARY KEY,' % db.DATA_TYPES['AutoField'])
             table_output.append('    %s_id %s NOT NULL REFERENCES %s (%s),' % \
                 (opts.object_name.lower(), db.DATA_TYPES['IntegerField'], opts.db_table, opts.pk.name))
@@ -127,11 +127,11 @@ def get_sql_delete(mod):
         for f in opts.many_to_many:
             try:
                 if cursor is not None:
-                    cursor.execute("SELECT 1 FROM %s_%s LIMIT 1" % (opts.db_table, f.name))
+                    cursor.execute("SELECT 1 FROM %s LIMIT 1" % f.get_m2m_db_table(opts))
             except:
                 pass
             else:
-                output.append("DROP TABLE %s_%s;" % (opts.db_table, f.name))
+                output.append("DROP TABLE %s;" % f.get_m2m_db_table(opts))
     output.append("DELETE FROM packages WHERE label = '%s';" % mod._MODELS[0]._meta.app_label)
     output.append("DELETE FROM auth_permissions WHERE package = '%s';" % mod._MODELS[0]._meta.app_label)
     output.append("DELETE FROM content_types WHERE package = '%s';" % mod._MODELS[0]._meta.app_label)
