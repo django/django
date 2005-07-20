@@ -5,9 +5,7 @@ from django.models.auth import sessions, users
 from django.views.registration import passwords
 import base64, md5
 import cPickle as pickle
-
-# secret used in pickled data to guard against tampering
-TAMPER_SECRET = '09VJWE9_RIZZO_j0jwfe09j'
+from django.conf.settings import SECRET_KEY
 
 ERROR_MESSAGE = "Please enter a correct username and password. Note that both fields are case-sensitive."
 
@@ -108,13 +106,13 @@ class AdminUserRequired:
 
 def encode_post_data(post_data):
     pickled = pickle.dumps(post_data)
-    pickled_md5 = md5.new(pickled + TAMPER_SECRET).hexdigest()
+    pickled_md5 = md5.new(pickled + SECRET_KEY).hexdigest()
     return base64.encodestring(pickled + pickled_md5)
 
 def decode_post_data(encoded_data):
     encoded_data = base64.decodestring(encoded_data)
     pickled, tamper_check = encoded_data[:-32], encoded_data[-32:]
-    if md5.new(pickled + TAMPER_SECRET).hexdigest() != tamper_check:
+    if md5.new(pickled + SECRET_KEY).hexdigest() != tamper_check:
         from django.core.exceptions import SuspiciousOperation
         raise SuspiciousOperation, "User may have tampered with session cookie."
     return pickle.loads(pickled)

@@ -182,10 +182,6 @@ class Session(meta.Model):
         meta.DateTimeField('start_time', 'start time', auto_now=True),
     )
     module_constants = {
-        # Used for providing pseudo-entropy in creating random session strings.
-        'SESSION_SALT': 'ijw2f3_MUPPET_avo#*5)(*',
-        # Secret used in cookie to guard against cookie tampering.
-        'TAMPER_SECRET': 'lj908_PIGGY_j0vajeawej-092j3f',
         'TEST_COOKIE_NAME': 'testcookie',
         'TEST_COOKIE_VALUE': 'worked',
     }
@@ -195,26 +191,28 @@ class Session(meta.Model):
 
     def get_cookie(self):
         "Returns a tuple of the cookie name and value for this session."
+        from django.conf.settings import AUTH_SESSION_COOKIE, SECRET_KEY
         import md5
-        from django.conf.settings import AUTH_SESSION_COOKIE
-        return AUTH_SESSION_COOKIE, self.session_md5 + md5.new(self.session_md5 + TAMPER_SECRET).hexdigest()
+        return AUTH_SESSION_COOKIE, self.session_md5 + md5.new(self.session_md5 + SECRET_KEY + 'auth').hexdigest()
 
     def _module_create_session(user_id):
         "Registers a session and returns the session_md5."
+        from django.conf.settings import SECRET_KEY
         import md5, random, sys
         # The random module is seeded when this Apache child is created.
-        # Use person_id and SESSION_SALT as added salt.
-        session_md5 = md5.new(str(random.randint(user_id, sys.maxint - 1)) + SESSION_SALT).hexdigest()
+        # Use person_id and SECRET_KEY as added salt.
+        session_md5 = md5.new(str(random.randint(user_id, sys.maxint - 1)) + SECRET_KEY).hexdigest()
         s = Session(None, user_id, session_md5, None)
         s.save()
         return s
 
     def _module_get_session_from_cookie(session_cookie_string):
+        from django.conf.settings import SECRET_KEY
         import md5
         if not session_cookie_string:
             raise SessionDoesNotExist
         session_md5, tamper_check = session_cookie_string[:32], session_cookie_string[32:]
-        if md5.new(session_md5 + TAMPER_SECRET).hexdigest() != tamper_check:
+        if md5.new(session_md5 + SECRET_KEY + 'auth').hexdigest() != tamper_check:
             raise SuspiciousOperation, "User may have tampered with session cookie."
         return get_object(session_md5__exact=session_md5, select_related=True)
 

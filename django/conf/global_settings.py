@@ -96,6 +96,11 @@ ADMIN_FOR = []
 IGNORABLE_404_STARTS = ('/cgi-bin/', '/_vti_bin', '/_vti_inf')
 IGNORABLE_404_ENDS = ('mail.pl', 'mailform.pl', 'mail.cgi', 'mailform.cgi', 'favicon.ico', '.php')
 
+# A secret key for this particular Django installation. Used in secret-key
+# hashing algorithms. Set this in your settings, or Django will complain
+# loudly.
+SECRET_KEY = ''
+
 ##############
 # MIDDLEWARE #
 ##############

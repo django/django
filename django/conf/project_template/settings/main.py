@@ -26,6 +26,9 @@ MEDIA_ROOT = ''
 # Example: "http://media.lawrence.com"
 MEDIA_URL = ''
 
+# Make this unique, and don't share it with anybody.
+SECRET_KEY = ''
+
 ROOT_URLCONF = '{{ project_name }}.settings.urls.main'
 
 TEMPLATE_DIRS = (

@@ -340,13 +340,22 @@ def _start_helper(app_or_project, name, directory, other_name=''):
 
 def startproject(project_name, directory):
     "Creates a Django project for the given project_name in the given directory."
+    from whrandom import choice
     _start_helper('project', project_name, directory)
     # Populate TEMPLATE_DIRS for the admin templates, based on where Django is
     # installed.
-    settings_file = os.path.join(directory, project_name, 'settings/admin.py')
-    settings_contents = open(settings_file, 'r').read()
-    fp = open(settings_file, 'w')
+    admin_settings_file = os.path.join(directory, project_name, 'settings/admin.py')
+    settings_contents = open(admin_settings_file, 'r').read()
+    fp = open(admin_settings_file, 'w')
     settings_contents = re.sub(r'(?s)\b(TEMPLATE_DIRS\s*=\s*\()(.*?)\)', "\\1\n    '%s',\\2)" % ADMIN_TEMPLATE_DIR, settings_contents)
+    fp.write(settings_contents)
+    fp.close()
+    # Create a random SECRET_KEY hash, and put it in the main settings.
+    main_settings_file = os.path.join(directory, project_name, 'settings/main.py')
+    settings_contents = open(main_settings_file, 'r').read()
+    fp = open(main_settings_file, 'w')
+    secret_key = ''.join([choice('abcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*(-_=+)') for i in range(50)])
+    settings_contents = re.sub(r"(?<=SECRET_KEY = ')'", secret_key + "'", settings_contents)
     fp.write(settings_contents)
     fp.close()
 startproject.help_doc = "Creates a Django project directory structure for the given project name in the current directory."

@@ -31,9 +31,6 @@ class Comment(meta.Model):
         meta.ForeignKey(core.Site),
     )
     module_constants = {
-        # used as shared secret between comment form and comment-posting script
-        'COMMENT_SALT': 'ijw2f3_MRS_PIGGY_LOVES_KERMIT_avo#*5vv0(23j)(*',
-
         # min. and max. allowed dimensions for photo resizing (in pixels)
         'MIN_PHOTO_DIMENSION': 5,
         'MAX_PHOTO_DIMENSION': 1000,
@@ -123,8 +120,9 @@ class Comment(meta.Model):
         'pa,ra') and target (something like 'lcom.eventtimes:5157'). Used to
         validate that submitted form options have not been tampered-with.
         """
+        from django.conf.settings import SECRET_KEY
         import md5
-        return md5.new(options + photo_options + rating_options + target + COMMENT_SALT).hexdigest()
+        return md5.new(options + photo_options + rating_options + target + SECRET_KEY).hexdigest()
 
     def _module_get_rating_options(rating_string):
         """
