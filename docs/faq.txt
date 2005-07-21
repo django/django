@@ -172,10 +172,11 @@ arrangements is forthcoming.
 How do I install mod_python on Windows?
 ---------------------------------------
 
-* For Python 2.4, check out this `guide to mod_python & Python 2.3`_.
-* For Python 2.3, grab mod_python from http://www.mod_python.org/ and read
-  `Running mod_python on Apache on Windows2000`_.
-* Also, try this (not Windows-specific) `guide to getting mod_python working`_.
+    * For Python 2.4, check out this `guide to mod_python & Python 2.3`_.
+    * For Python 2.3, grab mod_python from http://www.modpython.org/ and read
+      `Running mod_python on Apache on Windows2000`_.
+    * Also, try this (not Windows-specific) `guide to getting mod_python 
+      working`_.
 
 .. _`guide to mod_python & Python 2.3`: http://www.lehuen.com/nicolas/index.php/2005/02/21/39-win32-build-of-mod_python-314-for-python-24
 .. _`Running mod_python on Apache on Windows2000`: http://groups-beta.google.com/group/comp.lang.python/msg/139af8c83a5a9d4f
@@ -252,13 +253,17 @@ The login cookie isn't being set correctly, because the domain of the cookie
 sent out by Django doesn't match the domain in your browser. Try these two
 things:
 
-* Set the ``REGISTRATION_COOKIE_DOMAIN`` setting to match your domain. For
-  example, if you're going to "http://www.mysite.com/admin/" in your browser,
-  set ``REGISTRATION_COOKIE_DOMAIN = 'www.mysite.com'``.
-* Some browsers (Firefox?) don't like to accept cookies from domains that don't
-  have dots in them. If you're running the admin site on "localhost" or another
-  domain that doesn't have a dot in it, try going to "localhost.localdomain" or
-  "127.0.0.1". And set ``REGISTRATION_COOKIE_DOMAIN`` accordingly.
+    * Set the ``REGISTRATION_COOKIE_DOMAIN`` setting in your admin config file
+      to match your domain. For example, if you're going to
+      "http://www.mysite.com/admin/" in your browser, in
+      "myproject.settings.admin" you should set ``REGISTRATION_COOKIE_DOMAIN =
+      'www.mysite.com'``.
+      
+    * Some browsers (Firefox?) don't like to accept cookies from domains that
+      don't have dots in them. If you're running the admin site on "localhost"
+      or another domain that doesn't have a dot in it, try going to
+      "localhost.localdomain" or "127.0.0.1". And set
+      ``REGISTRATION_COOKIE_DOMAIN`` accordingly.
 
 I can't log in. When I enter a valid username and password, it brings up the login page again, with a "Please enter a correct username and password" error.
 -----------------------------------------------------------------------------------------------------------------------------------------------------------
