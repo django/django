@@ -1,1 +1,12 @@
-This is a stub; please complete me
+Django is a high-level Python Web framework that encourages rapid development
+and clean, pragmatic design.
+
+Thanks for downloading it.
+
+All documentation is in the "docs" directory. Docs are updated rigorously. If
+you find any problems in the docs, or think they should be clarified in any
+way, please take 30 seconds to fill out a ticket here:
+
+http://code.djangoproject.com/newticket
+
+Install instructions are in the INSTALL file.

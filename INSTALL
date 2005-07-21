@@ -1,1 +1,7 @@
-This is a stub; please complete me
+Thanks for downloading Django.
+
+To install it, make sure you have Python 2.3+ installed. Then run this command:
+
+python2.3 setup.py install
+
+For more detailed instructions, see docs/install.txt.
