@@ -64,6 +64,8 @@ It's easy either way.
 Installing the official version
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+There IS no official version yet. But once there is, here's how it'll work:
+
 1. Download the tarball of the latest official version from our `download page`_.
 2. ``tar xzvf django-1.0.0.tar.gz``
 3. ``cd django-1.0.0``
