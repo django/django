@@ -63,6 +63,31 @@ Here's a template for an admin configuration::
 
 The only thing different here is the ``DJANGO_SETTINGS_MODULE``.
 
+Multiple Django installations on the same Apache
+================================================
+
+It's entirely possible to run multiple Django installations on the same Apache
+instance. Just use ``VirtualHost`` for that, like so::
+
+    NameVirtualHost *
+
+    <VirtualHost *>
+        ServerName www.example.com
+        # ...
+        SetEnv DJANGO_SETTINGS_MODULE myproject.settings.main
+    </VirtualHost>
+
+    <VirtualHost *>
+        ServerName admin.example.com
+        # ...
+        SetEnv DJANGO_SETTINGS_MODULE myproject.settings.admin
+    </VirtualHost>
+
+Don't put two Django installations within the same ``VirtualHost``. Due to the
+way mod_python caches code in memory, your two Django installations will
+conflict. If you can think of a way to solve this problem, please file a ticket
+in our ticket system.
+
 Running a development server with mod_python
 ============================================
 
