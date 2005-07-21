@@ -74,7 +74,7 @@ or you can do it by altering the ``PYTHONPATH`` environment variable. See the
 
 Run the following command::
 
-    django-admin.py init --settings='myproject.settings.main'
+    django-admin.py init --settings=myproject.settings.main
 
 The ``django-admin.py`` utility generally needs to know which settings module
 you're using. Here, we're doing that by specifying ``settings=`` on the command
