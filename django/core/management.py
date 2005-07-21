@@ -419,27 +419,30 @@ def runserver(port):
     "Starts a lightweight Web server for development."
     from django.core.servers.basehttp import run, WSGIServerException
     from django.core.handlers.wsgi import AdminMediaHandler, WSGIHandler
-    from django.conf.settings import SETTINGS_MODULE
     if not port.isdigit():
         sys.stderr.write("Error: %r is not a valid port number.\n" % port)
         sys.exit(1)
-    print "Starting server on port %s with settings module %r." % (port, SETTINGS_MODULE)
-    print "Go to http://127.0.0.1:%s/ for Django." % port
-    print "Quit the server with CONTROL-C (Unix) or CTRL-BREAK (Windows)."
-    try:
-        run(int(port), AdminMediaHandler(WSGIHandler()))
-    except WSGIServerException, e:
-        # Use helpful error messages instead of ugly tracebacks.
-        ERRORS = {
-            13: "You don't have permission to access that port.",
-            98: "That port is already in use.",
-        }
+    def inner_run():
+        from django.conf.settings import SETTINGS_MODULE
+        print "Starting server on port %s with settings module %r." % (port, SETTINGS_MODULE)
+        print "Go to http://127.0.0.1:%s/ for Django." % port
+        print "Quit the server with CONTROL-C (Unix) or CTRL-BREAK (Windows)."
         try:
-            error_text = ERRORS[e.args[0].args[0]]
-        except (AttributeError, KeyError):
-            error_text = str(e)
-        sys.stderr.write("Error: %s\n" % error_text)
-        sys.exit(1)
-    except KeyboardInterrupt:
-        sys.exit(0)
+            run(int(port), AdminMediaHandler(WSGIHandler()))
+        except WSGIServerException, e:
+            # Use helpful error messages instead of ugly tracebacks.
+            ERRORS = {
+                13: "You don't have permission to access that port.",
+                98: "That port is already in use.",
+            }
+            try:
+                error_text = ERRORS[e.args[0].args[0]]
+            except (AttributeError, KeyError):
+                error_text = str(e)
+            sys.stderr.write("Error: %s\n" % error_text)
+            sys.exit(1)
+        except KeyboardInterrupt:
+            sys.exit(0)
+    from django.utils import autoreload
+    autoreload.main(inner_run)
 runserver.args = '[optional port number]'
