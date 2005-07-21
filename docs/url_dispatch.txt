@@ -21,7 +21,6 @@ Here's the example from that overview::
     urlpatterns = patterns('',
         (r'^/articles/(?P<year>\d{4})/$', 'myproject.news.views.articles.year_archive'),
         (r'^/articles/(?P<year>\d{4})/(?P<month>\d{2})/$', 'myproject.news.views.articles.month_archive'),
-        (r'^/articles/(?P<year>\d{4})/(?P<month>\d{2})/$', 'myproject.news.views.articles.month_archive'),
         (r'^/articles/(?P<year>\d{4})/(?P<month>\d{2})/(?P<day>\d+)/$', 'myproject.news.views.articles.article_detail'),
     )
 
@@ -33,9 +32,14 @@ above example could be written more concisely as::
     urlpatterns = patterns('myproject.news.views.articles',
         (r'^/articles/(?P<year>\d{4})/$', 'year_archive'),
         (r'^/articles/(?P<year>\d{4})/(?P<month>\d{2})/$', 'month_archive'),
-        (r'^/articles/(?P<year>\d{4})/(?P<month>\d{2})/$', 'month_archive'),
         (r'^/articles/(?P<year>\d{4})/(?P<month>\d{2})/(?P<day>\d+)/$', 'article_detail'),
     )
+
+.. admonition:: Note
+
+    More precisely, the actual view function use is ``prefix + "." +
+    function_name``; that is, the trailing "dot" does not need to be put in the
+    prefix.  Django: saving you time, one keystroke at a time.
 
 Including other URLconfs
 ========================
