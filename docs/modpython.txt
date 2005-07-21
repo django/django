@@ -83,10 +83,25 @@ instance. Just use ``VirtualHost`` for that, like so::
         SetEnv DJANGO_SETTINGS_MODULE myproject.settings.admin
     </VirtualHost>
 
-Don't put two Django installations within the same ``VirtualHost``. Due to the
-way mod_python caches code in memory, your two Django installations will
-conflict. If you can think of a way to solve this problem, please file a ticket
-in our ticket system.
+If you need to put two Django installations within the same ``VirtualHost``,
+you'll see problems due to the way mod_python caches code in memory.  To fix
+this problem, you'll need to use the ``PythonInterpreter`` directive to give
+different ``<Location>``s seperate interpreters::
+
+    <VirtualHost *>
+        ServerName www.example.com
+        # ...
+        <Location "/something">
+            SetEnv DJANGO_SETTINGS_MODULE myproject.settings.main
+            PythonInterpreter myproject_main
+        </Location>
+        
+        <Location "/admin">
+            SetEnv DJANGO_SETTINGS_MODULE myproject.settings.admin
+            PythonInterpreter myproject_admin
+        </Location>
+    </VirtualHost>
+
 
 Running a development server with mod_python
 ============================================
