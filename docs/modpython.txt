@@ -74,3 +74,31 @@ revoke your Django privileges.
 
 .. _mod_perl: http://perl.apache.org/
 .. _mod_python documentation: http://modpython.org/live/current/doc-html/directives.html
+
+Serving media files
+===================
+
+Django doesn't serve media files itself. It'd be inefficient to flow media
+files through a (relatively) complex framework when much, much more well-tuned
+solutions are better.
+
+We recommend using a separate Web server for serving media. Here are some good
+choices:
+
+* lighttpd_
+* TUX_
+* A stripped-down version of Apache_
+
+If, however, you have no option but to serve media files on the same Apache
+``VirtualHost`` as Django, here's how you can turn off mod_python for a
+particular part of the site::
+
+    <Location "/media/">
+        SetHandler None
+    </Location>
+
+Just change ``Location`` to the root URL of your media files.
+
+.. _lighttpd: http://www.lighttpd.net/
+.. _TUX: http://en.wikipedia.org/wiki/TUX_web_server
+.. _Apache: http://httpd.apache.org/
