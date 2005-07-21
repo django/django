@@ -373,6 +373,48 @@ def startapp(app_name, directory):
 startapp.help_doc = "Creates a Django app directory structure for the given app name in the current directory."
 startapp.args = "[appname]"
 
+def createsuperuser():
+    "Creates a superuser account."
+    from django.core import validators
+    from django.models.auth import users
+    import getpass
+    try:
+        while 1:
+            username = raw_input('Username (only letters, digits and underscores): ')
+            if not username.isalnum():
+                sys.stderr.write("Error: That username is invalid.\n")
+                continue
+            try:
+                users.get_object(username__exact=username)
+            except users.UserDoesNotExist:
+                break
+            else:
+                sys.stderr.write("Error: That username is already taken.\n")
+        while 1:
+            email = raw_input('E-mail address: ')
+            try:
+                validators.isValidEmail(email, None)
+            except validators.ValidationError:
+                sys.stderr.write("Error: That e-mail address is invalid.\n")
+            else:
+                break
+        while 1:
+            password = getpass.getpass()
+            password2 = getpass.getpass('Password (again): ')
+            if password == password2:
+                break
+            sys.stderr.write("Error: Your passwords didn't match.\n")
+    except KeyboardInterrupt:
+        sys.stderr.write("\nOperation cancelled.\n")
+        sys.exit(1)
+    u = users.create_user(username, email, password)
+    u.is_staff = True
+    u.is_active = True
+    u.is_superuser = True
+    u.save()
+    print "User created successfully."
+createsuperuser.args = ''
+
 def runserver(port):
     "Starts a lightweight Web server for development."
     from django.core.servers.basehttp import run, WSGIServerException

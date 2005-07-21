@@ -5,6 +5,7 @@ import os, sys
 
 ACTION_MAPPING = {
     'adminindex': management.get_admin_index,
+    'createsuperuser': management.createsuperuser,
 #     'dbcheck': management.database_check,
     'runserver': management.runserver,
     'sql': management.get_sql_create,
@@ -63,7 +64,7 @@ def main():
         print_error("An action is required.", sys.argv[0])
     if not ACTION_MAPPING.has_key(action):
         print_error("Your action, %r, was invalid." % action, sys.argv[0])
-    if action == 'init':
+    if action in ('createsuperuser', 'init'):
         ACTION_MAPPING[action]()
     elif action in ('startapp', 'startproject'):
         try:

@@ -10,19 +10,31 @@ application and will focus on Django's automatically-generated admin site.
 .. _Tutorial 1: http://www.djangoproject.com/documentation/tutorial1/
 
 .. admonition:: Philosophy
-    
+
     Generating admin sites for your staff or clients to add, change and delete
     content is tedious work that doesn't require much creativity. For that reason,
     Django entirely automates creation of admin interfaces for models.
-    
+
     Django was written in a newsroom environment, with a very clear separation
     between "content publishers" and the "public" site. Site managers use the
     system to add news stories, events, sports scores, etc., and that content is
     displayed on the public site. Django solves the problem of creating a unified
     interface for site administrators to edit content.
-    
+
     The admin isn't necessarily intended to be used by site visitors; it's for site
     managers.
+
+Create a user account
+=====================
+
+Run the following command to create a superuser account for your admin site::
+
+    django-admin.py createsuperuser --settings="myproject.settings.main"
+
+(Note: You can use either "myproject.settings.main" or "myproject.settings.admin"
+here. They both reference the same database.)
+
+The script will prompt you for a username, e-mail address and password (twice).
 
 Start the development server
 ============================
@@ -48,28 +60,6 @@ admin's login screen:
 
 .. image:: http://media.djangoproject.com/img/doc/tutorial/admin01.png
    :alt: Django admin login screen
-
-Create a user account
-=====================
-
-You can't log in, though, because you haven't created an admin user account
-yet. Drop into the Python interactive interpreter and type this::
-
-    # The function django.models.auth.users.create_user() creates a new user
-    # and returns the new auth.User object.
-    # Don't use 'username' and 'password'. Those are just examples.
-    >>> from django.models.auth import users
-    >>> u = users.create_user('username', 'your_email@domain.com', 'password')
-
-    # But we're not done. We need to explicitly set is_staff and is_active to
-    # allow this user to access the admin. Might as well make it a superuser,
-    # too.
-    u.is_staff = True
-    u.is_active = True
-    u.is_superuser = True
-
-    # Remember, call the save() method to save changes.
-    u.save()
 
 Enter the admin site
 ====================
