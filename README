@@ -1,20 +1,20 @@
 Django is a high-level Python Web framework that encourages rapid development
 and clean, pragmatic design.
 
-All documentation is in the "docs" directory and online at 
+All documentation is in the "docs" directory and online at
 http://www.djangoproject.com/documentation/.  If you're just getting started,
-here's a good order to read the docs:
+here's how we recommend you read the docs:
 
-    * First, read doc/install.txt for instructions on installing Django.
-    
-    * Next, work through the tutorials in order (doc/tutorial01.txt,
-      doc/tutorial02.txt, etc.).
-      
-    * If you want to set up an actual deployment server, read doc/modpython.txt
+    * First, read docs/install.txt for instructions on installing Django.
+
+    * Next, work through the tutorials in order (docs/tutorial01.txt,
+      docs/tutorial02.txt, etc.).
+
+    * If you want to set up an actual deployment server, read docs/modpython.txt
       for instructions on running Django under mod_python.
 
-    * The rest of the documentation is of the reference-manual variety;
-      read it -- and the FAQ -- as you run into problems.
+    * The rest of the documentation is of the reference-manual variety.
+      Read it -- and the FAQ -- as you run into problems.
 
 Docs are updated rigorously. If you find any problems in the docs, or think they
 should be clarified in any way, please take 30 seconds to fill out a ticket
@@ -24,12 +24,12 @@ http://code.djangoproject.com/newticket
 
 To get more help:
 
-    * Join the #django channel on irc.freenode.net; lots of helpful
-      people hang out there (read the archives at http://loglibrary.com/179).
-      
-    * Join the django-users mailing list or read the archives at
+    * Join the #django channel on irc.freenode.net. Lots of helpful people
+      hang out there. Read the archives at http://loglibrary.com/179 .
+
+    * Join the django-users mailing list, or read the archives, at
       http://groups-beta.google.com/group/django-users.
-      
+
 To contribute to Django:
 
     * Check out http://www.djangoproject.com/community/ for information
