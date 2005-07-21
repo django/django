@@ -342,7 +342,7 @@ def _start_helper(app_or_project, name, directory, other_name=''):
 
 def startproject(project_name, directory):
     "Creates a Django project for the given project_name in the given directory."
-    from whrandom import choice
+    from random import choice
     _start_helper('project', project_name, directory)
     # Populate TEMPLATE_DIRS for the admin templates, based on where Django is
     # installed.

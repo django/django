@@ -172,7 +172,7 @@ class User(meta.Model):
         "Generates a random password with the given length and given allowed_chars"
         # Note that default value of allowed_chars does not have "I" or letters
         # that look like it -- just to avoid confusion.
-        from whrandom import choice
+        from random import choice
         return ''.join([choice(allowed_chars) for i in range(length)])
 
 class Session(meta.Model):
