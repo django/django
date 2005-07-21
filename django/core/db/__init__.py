@@ -25,8 +25,8 @@ except ImportError, exc:
     backend_dir = os.path.join(__path__[0], 'backends')
     available_backends = [f[:-3] for f in os.listdir(backend_dir) if f.endswith('.py') and not f.startswith('__init__')]
     available_backends.sort()
-    raise ImproperlyConfigured, "Could not load database backend: %s. Is DATABASE_ENGINE (currently, %r) spelled correctly? Available options are: %s" % (exc, DATABASE_ENGINE, ", ".join(map(repr, available_backends)))
-        #(DATABASE_ENGINE, ', '.join(map(repr, available_backends)))k
+    raise ImproperlyConfigured, "Could not load database backend: %s. Is your DATABASE_ENGINE setting (currently, %r) spelled correctly? Available options are: %s" % \
+        (exc, DATABASE_ENGINE, ", ".join(map(repr, available_backends)))
 
 DatabaseError = dbmod.DatabaseError
 db = dbmod.DatabaseWrapper()
