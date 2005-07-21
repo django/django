@@ -135,8 +135,8 @@ and put the following Python code in it::
     def index(request):
         return HttpResponse("Hello, world. You're at the poll index.")
 
-This is the simplest view possible. Restart your development server and go to
-"/polls/". You should see your text.
+This is the simplest view possible. Go to "/polls/" in your browser, and you
+should see your text.
 
 Now add the following view. It's slightly different, because it takes an
 argument (which, remember, is passed in from whatever was captured by the
@@ -229,9 +229,8 @@ Put the following code in that template::
         <p>No polls are available.</p>
     {% endif %}
 
-Templates are read from disk at each page request, so you don't have to restart
-the server to see changes. Load the page in your Web browser, and you should
-see a bulleted-list containing the "What's up" poll from Tutorial 1.
+Load the page in your Web browser, and you should see a bulleted-list
+containing the "What's up" poll from Tutorial 1.
 
 Raising 404
 ===========

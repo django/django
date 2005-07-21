@@ -94,12 +94,8 @@ file and make the following change to add an ``admin`` attribute::
         )
         admin = meta.Admin()
 
-Restart your development Web server, and reload the Django admin page. You'll
-have to restart the server each time you make a change to Python code -- but
-we're working on changing that.
-
-You can stop the development server by hitting CONTROL-C (Unix) or CTRL-BREAK
-(Windows).
+Now reload the Django admin page to see your changes. Note that you don't have
+to restart the development server -- it auto-reloads code.
 
 Explore the free admin functionality
 ====================================
