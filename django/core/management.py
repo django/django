@@ -425,6 +425,7 @@ def runserver(port):
         sys.exit(1)
     print "Starting server on port %s with settings module %r." % (port, SETTINGS_MODULE)
     print "Go to http://127.0.0.1:%s/ for Django." % port
+    print "Quit the server with CONTROL-C (Unix) or CTRL-BREAK (Windows)."
     try:
         run(int(port), AdminMediaHandler(WSGIHandler()))
     except WSGIServerException, e:
@@ -439,4 +440,6 @@ def runserver(port):
             error_text = str(e)
         sys.stderr.write("Error: %s\n" % error_text)
         sys.exit(1)
+    except KeyboardInterrupt:
+        sys.exit(0)
 runserver.args = '[optional port number]'
