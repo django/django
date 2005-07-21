@@ -534,6 +534,7 @@ def _get_submit_row_template(opts, app_label, add, change, show_delete, ordered_
     return t
 
 def _get_template(opts, app_label, add=False, change=False, show_delete=False, form_url=''):
+    admin_field_objs = opts.admin.get_field_objs(opts)
     ordered_objects = opts.get_ordered_objects()[:]
     auto_populated_fields = [f for f in opts.fields if f.prepopulate_from]
     t = ['{% extends "base_site" %}\n']
@@ -541,8 +542,6 @@ def _get_template(opts, app_label, add=False, change=False, show_delete=False, f
 
     # Put in any necessary JavaScript imports.
     javascript_imports = ['%sjs/core.js' % ADMIN_MEDIA_PREFIX, '%sjs/admin/RelatedObjectLookups.js' % ADMIN_MEDIA_PREFIX]
-    if 'collapse' in ' '.join([f[1].get('classes', '') for f in opts.admin.fields]):
-        javascript_imports.append('%sjs/admin/CollapsedFieldsets.js' % ADMIN_MEDIA_PREFIX)
     if auto_populated_fields:
         javascript_imports.append('%sjs/urlify.js' % ADMIN_MEDIA_PREFIX)
     if opts.has_field_type(meta.DateTimeField) or opts.has_field_type(meta.TimeField) or opts.has_field_type(meta.DateField):
@@ -551,7 +550,11 @@ def _get_template(opts, app_label, add=False, change=False, show_delete=False, f
         javascript_imports.extend(['%sjs/getElementsBySelector.js' % ADMIN_MEDIA_PREFIX, '%sjs/dom-drag.js' % ADMIN_MEDIA_PREFIX, '%sjs/admin/ordering.js' % ADMIN_MEDIA_PREFIX])
     if opts.admin.js:
         javascript_imports.extend(opts.admin.js)
-    for _, options in opts.admin.get_field_objs(opts):
+    seen_collapse = False
+    for _, options in admin_field_objs:
+        if not seen_collapse and 'collapse' in options.get('classes', ''):
+            seen_collapse = True
+            javascript_imports.append('%sjs/admin/CollapsedFieldsets.js' % ADMIN_MEDIA_PREFIX)
         try:
             for field_list in options['fields']:
                 for f in field_list:
@@ -589,7 +592,7 @@ def _get_template(opts, app_label, add=False, change=False, show_delete=False, f
     if opts.admin.save_on_top:
         t.extend(_get_submit_row_template(opts, app_label, add, change, show_delete, ordered_objects))
     t.append('{% if form.error_dict %}<p class="errornote">Please correct the error{{ form.error_dict.items|pluralize }} below.</p>{% endif %}\n')
-    for fieldset_name, options in opts.admin.get_field_objs(opts):
+    for fieldset_name, options in admin_field_objs:
         t.append('<fieldset class="module aligned %s">\n\n' % options.get('classes', ''))
         if fieldset_name:
             t.append('<h2>%s</h2>\n' % fieldset_name)
@@ -671,7 +674,7 @@ def _get_template(opts, app_label, add=False, change=False, show_delete=False, f
     if add:
         # Add focus to the first field on the form, if this is an "add" form.
         t.append('<script type="text/javascript">document.getElementById("id_%s").focus();</script>' % \
-            opts.admin.get_field_objs(opts)[0][1]['fields'][0][0].get_manipulator_field_names('')[0])
+            admin_field_objs[0][1]['fields'][0][0].get_manipulator_field_names('')[0])
     if auto_populated_fields:
         t.append('<script type="text/javascript">')
         for field in auto_populated_fields:
