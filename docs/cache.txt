@@ -20,7 +20,8 @@ far the fastest option if you've got the RAM).
 Before using the cache, you'll need to tell Django which cache backend you'd
 like to use. Do this by setting the ``CACHE_BACKEND`` in your settings file.
 
-The CACHE_BACKEND setting is a quasi-URI. Examples::
+The CACHE_BACKEND setting is a "fake" URI (really an unregistered scheme). 
+Examples:
 
     ==============================  ===========================================
     CACHE_BACKEND                   Explanation

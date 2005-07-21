@@ -278,7 +278,7 @@ Field Types
     .. _`strftime formatting`: http://docs.python.org/lib/module-time.html#l2h-1941
 
 ``FloatField``
-    A floating-point number. Has two required arguments:
+    A floating-point number. Has two **required** arguments:
 
         ======================  ===================================================
         Argument                Description

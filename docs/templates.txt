@@ -40,6 +40,14 @@ template. Each element will be explained later in this document.::
     <p>{{ story.tease|truncatewords:"100" }}</p>
     {% endfor %}
     {% endblock %}
+    
+.. admonition:: Philosophy
+
+    Why use a text-based template instead of an XML-based one (like Zope's 
+    TAL)?  We wanted Django's template language to be usable for more than
+    just XML/HTML templates -- at the Journal-World we use it for emails, 
+    Javascript, CSV -- you can use the template language for any text-based
+    format.
 
 What's a variable?
 ==================
@@ -198,7 +206,7 @@ Here are some tips for working with inheritance:
 
     * We often prefer to use three-level inheritance: a single base template
       for the entire site, a set of mid-level templates for each section of
-      the site, and then the individual templates for each page.  This
+      the site, and then the individual templates for each view.  This
       maximizes code reuse, and makes it easier to add items to shared
       content areas (like section-wide navigation).
 
