@@ -13,7 +13,7 @@ class DjangoContext(Context):
         self['user'] = request.user
         self['messages'] = request.user.get_and_delete_messages()
         self['perms'] = PermWrapper(request.user)
-        if DEBUG and request.META['REMOTE_ADDR'] in INTERNAL_IPS:
+        if DEBUG and request.META.get('REMOTE_ADDR') in INTERNAL_IPS:
             self['debug'] = True
             from django.core import db
             self['sql_queries'] = db.db.queries
