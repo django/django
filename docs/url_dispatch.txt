@@ -37,9 +37,8 @@ above example could be written more concisely as::
 
 .. admonition:: Note
 
-    More precisely, the actual view function use is ``prefix + "." +
-    function_name``; that is, the trailing "dot" does not need to be put in the
-    prefix.  Django: saving you time, one keystroke at a time.
+    More precisely, the actual view function used is ``prefix + "." +
+    function_name``. The trailing "dot" does not need to be put in the prefix.
 
 Including other URLconfs
 ========================
