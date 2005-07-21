@@ -86,7 +86,7 @@ instance. Just use ``VirtualHost`` for that, like so::
 If you need to put two Django installations within the same ``VirtualHost``
 you'll see problems due to the way mod_python caches code in memory.  To fix
 this problem, you'll need to use the ``PythonInterpreter`` directive to give
-different ``<Location>``s seperate interpreters::
+different ``<Location>`` directives seperate interpreters::
 
     <VirtualHost *>
         ServerName www.example.com
