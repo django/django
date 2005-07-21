@@ -188,7 +188,7 @@ def object_detail(request, year, month, day, app_label, module_name, date_field,
             the object to be detailed
     """
     try:
-        date = datetime.date(*time.strptime(year+month+day, '%Y%b%d')[:3])
+        date = datetime.datetime(*time.strptime(year+month+day, '%Y%b%d')[:3])
     except ValueError:
         raise Http404
     mod = get_module(app_label, module_name)
