@@ -304,9 +304,9 @@ Field Types
     many toppings on a pizza)::
 
         meta.ForeignKey(Pizza)
-        
+
     .. admonition:: Note
-        
+
         To create a recursive relationship, use a ``ForeignKey`` that relates
         to ``"self"`` (i.e. ``meta.ForeignKey("self")``).
 
@@ -568,7 +568,7 @@ Admin options
 
 The ``admin`` field in the model tells Django how to construct the admin
 interface for the object.  The field is an instance of the ``meta.Admin``
-object, which has the following options (of which only ``fields`` is required):
+object, which has the following options. All are optional.
 
 ``date_hierarchy``
     To allow filtering of objects in the admin by date, set ``date_hierarchy``
@@ -615,6 +615,11 @@ object, which has the following options (of which only ``fields`` is required):
     results in an admin that looks like:
 
         .. image:: http://media.djangoproject.com/img/doc/flatfiles_admin.png
+
+    If ``fields`` isn't given but a model does define ``admin`` as a
+    ``meta.Admin`` object, Django will default to displaying each field that
+    isn't an ``AutoField`` and has ``editable=True``, in a single fieldset, in
+    the same order as the ``fields`` in the model.
 
 ``js``
     A list of strings representing URLs of JavaScript files to link into the

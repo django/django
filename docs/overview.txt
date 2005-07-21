@@ -138,15 +138,7 @@ classes::
             meta.TextField('article'),
             meta.ForeignKey(Reporter),
         )
-        admin = meta.Admin(
-            fields = (
-                (None, {'fields': ('headline', 'article')}),
-                ('Extra stuff', {'fields': ('pub_date', 'reporter_id')}),
-            ),
-        )
-
-The ``admin.fields`` defines the layout of your admin form. Each element in the
-fields tuple corresponds to a ``<fieldset>`` in the form.
+        admin = meta.Admin()
 
 The philosophy here is that your site is edited by a staff, or a client, or
 maybe just you -- and you don't want to have to deal with creating backend

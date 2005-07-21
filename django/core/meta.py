@@ -2136,7 +2136,7 @@ class OneToOne(ManyToOne):
         self.raw_id_admin = raw_id_admin
 
 class Admin:
-    def __init__(self, fields, js=None, list_display=None, list_filter=None, date_hierarchy=None,
+    def __init__(self, fields=None, js=None, list_display=None, list_filter=None, date_hierarchy=None,
         save_as=False, ordering=None, search_fields=None, save_on_top=False):
         self.fields = fields
         self.js = js or []
@@ -2148,10 +2148,17 @@ class Admin:
         self.save_on_top = save_on_top
 
     def get_field_objs(self, opts):
-        # Returns self.fields, except with fields as Field objects instead of
-        # field names.
+        """
+        Returns self.fields, except with fields as Field objects instead of
+        field names. If self.fields is None, defaults to putting every
+        non-AutoField field with editable=True in a single fieldset.
+        """
+        if self.fields is None:
+            field_struct = ((None, {'fields': [f.name for f in opts.fields + opts.many_to_many if f.editable and not isinstance(f, AutoField)]}),)
+        else:
+            field_struct = self.fields
         new_fieldset_list = []
-        for fieldset in self.fields:
+        for fieldset in field_struct:
             new_fieldset = [fieldset[0], {}]
             new_fieldset[1].update(fieldset[1])
             admin_fields = []

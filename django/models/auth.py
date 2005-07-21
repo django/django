@@ -20,9 +20,6 @@ class Group(meta.Model):
     )
     ordering = (('name', 'ASC'),)
     admin = meta.Admin(
-        fields = (
-            (None, {'fields': ('name', 'permissions')}),
-        ),
         search_fields = ('name',),
     )
 

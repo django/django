@@ -65,9 +65,6 @@ class Redirect(meta.Model):
     unique_together=(('site_id', 'old_path'),)
     ordering = (('old_path', 'ASC'),)
     admin = meta.Admin(
-        fields = (
-            (None, {'fields': ('site_id', 'old_path', 'new_path')}),
-        ),
         list_display = ('__repr__',),
         list_filter = ('site_id',),
         search_fields = ('old_path', 'new_path'),

@@ -92,11 +92,7 @@ file and make the following change to add an ``admin`` attribute::
         fields = (
             # ...
         )
-        admin = meta.Admin(
-            fields = (
-                (None, {'fields': ('question', 'pub_date')}),
-            ),
-        )
+        admin = meta.Admin()
 
 Restart your development Web server, and reload the Django admin page. You'll
 have to restart the server each time you make a change to Python code -- but
@@ -163,8 +159,8 @@ Customize the admin form
 
 Take a few minutes to marvel at all the code you didn't have to write.
 
-Let's customize this a bit. We can reorder the fields by changing the
-order of the field names in the ``admin`` attribute of the model::
+Let's customize this a bit. We can reorder the fields by explicitly adding a
+``fields`` parameter to ``meta.Admin``::
 
         admin = meta.Admin(
             fields = (
@@ -226,15 +222,7 @@ Here's what that would look like::
 
     class Choice(meta.Model):
         # ...
-        admin = meta.Admin(
-            fields = (
-                (None, {'fields': ('poll_id', 'choice', 'votes')}),
-            ),
-        )
-
-(Note that we used "poll_id" to refer to the ``ForeignKey(Poll)`` field. The
-field name is automatically calculated from the model's class name, lowercased,
-plus '_id'.)
+        admin = meta.Admin()
 
 Now "Choices" is an available option in the Django admin. The "Add choice" form
 looks like this:
@@ -318,9 +306,6 @@ on the change list page for the object::
     class Poll(meta.Model):
         # ...
         admin = meta.Admin(
-            fields = (
-                (None, {'fields': ('question', 'pub_date')}),
-            ),
             list_display = ('question', 'pub_date'),
         )
 
