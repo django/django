@@ -9,28 +9,31 @@ application and will focus on creating the public interface -- "views."
 
 .. _Tutorial 2: http://www.djangoproject.com/documentation/tutorial2/
 
-Philosophy
-==========
+.. admonition:: Philosophy
 
-A view is a "type" of Web page in your Django application that generally serves
-a specific function and has a specific template. For example, in a weblog
-application, you might have the following views:
-
-* Blog homepage -- displays the latest few entries
-* Entry "detail" page -- permalink page for a single entry
-* Year-based archive page -- displays all months with entries in the given year
-* Month-based archive page -- displays all days with entries in the given month
-* Day-based archive page -- displays all entries in the given day
-* Comment action -- handles posting comments to a given entry
-
-In our poll application, we'll have the following four views:
-
-* Poll "archive" page -- displays the latest few polls
-* Poll "detail" page -- displays a poll question, with no results but with a form to vote
-* Poll "results" page -- displays results for a particular poll
-* Vote action -- handles voting for a particular choice in a particular poll
-
-In Django, each view is represented by a simple Python function.
+    A view is a "type" of Web page in your Django application that generally
+    serves a specific function and has a specific template. For example, in a
+    weblog application, you might have the following views:
+    
+        * Blog homepage -- displays the latest few entries.
+        * Entry "detail" page -- permalink page for a single entry.
+        * Year-based archive page -- displays all months with entries in the 
+          given year.
+        * Month-based archive page -- displays all days with entries in the 
+          given month.
+        * Day-based archive page -- displays all entries in the given day.
+        * Comment action -- handles posting comments to a given entry.
+    
+    In our poll application, we'll have the following four views:
+    
+        * Poll "archive" page -- displays the latest few polls.
+        * Poll "detail" page -- displays a poll question, with no results but
+          with a form to vote.
+        * Poll "results" page -- displays results for a particular poll.
+        * Vote action -- handles voting for a particular choice in a particular
+          poll.
+    
+    In Django, each view is represented by a simple Python function.
 
 Design your URLs
 ================
@@ -115,7 +118,7 @@ make sure Django is following the URLconf properly.
 
 Fire up the Django development Web server, as we did in Tutorial 2::
 
-    django-admin.py runserver --settings="myproject.settings.admin"
+    django-admin.py runserver --settings="myproject.settings.main"
 
 Now go to "http://localhost:8000/polls/" on your domain in your Web browser.
 You should get a Python traceback with the following error message::
@@ -273,12 +276,14 @@ in ``django/conf/urls/defaults.py``, ``handler404`` is set to
 
 Two more things to note about 404 views:
 
-* The 404 view is also called if Django doesn't find a match after checking
-  every regular expression in the URLconf.
-* If you don't define your own 404 view -- and simply use the default, which is
-  recommended -- you still have one obligation: To create a ``404.html``
-  template in the root of your template directory. The default 404 view will
-  use that template for all 404 errors.
+    * The 404 view is also called if Django doesn't find a match after checking
+      every regular expression in the URLconf.
+    * If you don't define your own 404 view -- and simply use the default, 
+      which is recommended -- you still have one obligation: To create a
+      ``404.html`` template in the root of your template directory. The default
+      404 view will use that template for all 404 errors.
+    * If ``DEBUG`` is set to ``True`` (in your settings module) then your 404
+      view will never be used, and the traceback will be displayed instead.
 
 Write a 500 (server error) view
 ===============================
@@ -407,9 +412,9 @@ Coming soon
 The tutorial ends here for the time being. But check back within 48 hours for
 the next installments:
 
-* Advanced view features: Form processing
-* Using the RSS framework
-* Using the cache framework
-* Using the comments framework
-* Advanced admin features: Permissions
-* Advanced admin features: Custom JavaScript
+    * Advanced view features: Form processing
+    * Using the RSS framework
+    * Using the cache framework
+    * Using the comments framework
+    * Advanced admin features: Permissions
+    * Advanced admin features: Custom JavaScript
