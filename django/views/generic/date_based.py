@@ -27,7 +27,7 @@ def archive_index(request, app_label, module_name, date_field, num_latest=15, te
     if num_latest:
         lookup_kwargs.update({
             'limit': num_latest,
-            'order_by': ((date_field, 'DESC'),),
+            'order_by': ('-' + date_field,),
         })
         latest = mod.get_list(**lookup_kwargs)
     else:

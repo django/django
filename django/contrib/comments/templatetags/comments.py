@@ -148,7 +148,7 @@ class CommentListNode(template.Node):
             'content_type__python_module_name__exact': self.module,
             'site_id__exact': SITE_ID,
             'select_related': True,
-            'order_by': (('submit_date', self.ordering),),
+            'order_by': (self.ordering + 'submit_date',),
         }
         if not self.free and COMMENTS_BANNED_USERS_GROUP:
             kwargs['select'] = {'is_hidden': 'user_id IN (SELECT user_id FROM auth_users_groups WHERE group_id = %s)' % COMMENTS_BANNED_USERS_GROUP}
@@ -170,16 +170,16 @@ class CommentListNode(template.Node):
 
 class DoCommentForm:
     """
-    Displays a comment form for the given params. 
-    
+    Displays a comment form for the given params.
+
     Syntax::
-    
+
         {% comment_form for [pkg].[py_module_name] [context_var_containing_obj_id] with [list of options] %}
-    
+
     Example usage::
-    
+
         {% comment_form for lcom.eventtimes event.id with is_public yes photos_optional thumbs,200,400 ratings_optional scale:1-5|first_option|second_option %}
-    
+
     ``[context_var_containing_obj_id]`` can be a hard-coded integer or a variable containing the ID.
     """
     def __init__(self, free, tag_name):
@@ -246,18 +246,18 @@ class DoCommentCount:
     """
     Gets comment count for the given params and populates the template context
     with a variable containing that value, whose name is defined by the 'as'
-    clause. 
-    
+    clause.
+
     Syntax::
-        
+
         {% get_comment_count for [pkg].[py_module_name] [context_var_containing_obj_id] as [varname]  %}
-    
+
     Example usage::
-    
+
         {% get_comment_count for lcom.eventtimes event.id as comment_count %}
-        
+
     Note: ``[context_var_containing_obj_id]`` can also be a hard-coded integer, like this::
-    
+
         {% get_comment_count for lcom.eventtimes 23 as comment_count %}
     """
     def __init__(self, free, tag_name):
@@ -297,22 +297,22 @@ class DoGetCommentList:
     Gets comments for the given params and populates the template context with a
     special comment_package variable, whose name is defined by the ``as``
     clause.
-    
+
     Syntax::
-    
+
         {% get_comment_list for [pkg].[py_module_name] [context_var_containing_obj_id] as [varname] (reversed) %}
-    
+
     Example usage::
-    
+
         {% get_comment_list for lcom.eventtimes event.id as comment_list %}
-    
+
     Note: ``[context_var_containing_obj_id]`` can also be a hard-coded integer, like this::
-    
+
         {% get_comment_list for lcom.eventtimes 23 as comment_list %}
-        
-    To get a list of comments in reverse order -- that is, most recent first -- 
+
+    To get a list of comments in reverse order -- that is, most recent first --
     pass ``reversed`` as the last param::
-    
+
         {% get_comment_list for lcom.eventtimes event.id as comment_list reversed %}
     """
     def __init__(self, free, tag_name):
@@ -348,9 +348,9 @@ class DoGetCommentList:
         if len(tokens) == 7:
             if tokens[6] != 'reversed':
                 raise template.TemplateSyntaxError, "Final argument in '%s' must be 'reversed' if given" % self.tag_name
-            ordering = "DESC"
+            ordering = "-"
         else:
-            ordering = "ASC"
+            ordering = ""
         return CommentListNode(package, module, var_name, obj_id, tokens[5], self.free, ordering)
 
 # registration comments

@@ -8,7 +8,7 @@ class Permission(meta.Model):
         meta.CharField('codename', 'code name', maxlength=100),
     )
     unique_together = (('package', 'codename'),)
-    ordering = (('package', 'ASC'), ('codename', 'ASC'))
+    ordering = ('package', 'codename')
 
     def __repr__(self):
         return "%s | %s" % (self.package, self.name)
@@ -18,7 +18,7 @@ class Group(meta.Model):
         meta.CharField('name', 'name', maxlength=80, unique=True),
         meta.ManyToManyField(Permission, blank=True, filter_interface=meta.HORIZONTAL),
     )
-    ordering = (('name', 'ASC'),)
+    ordering = ('name',)
     admin = meta.Admin(
         search_fields = ('name',),
     )
@@ -44,7 +44,7 @@ class User(meta.Model):
             help_text="In addition to the permissions manually assigned, this user will also get all permissions granted to each group he/she is in."),
         meta.ManyToManyField(Permission, name='user_permissions', blank=True, filter_interface=meta.HORIZONTAL),
     )
-    ordering = (('username', 'ASC'),)
+    ordering = ('username',)
     exceptions = ('SiteProfileNotAvailable',)
     admin = meta.Admin(
         fields = (
@@ -253,7 +253,7 @@ class LogEntry(meta.Model):
         meta.PositiveSmallIntegerField('action_flag', 'action flag'),
         meta.TextField('change_message', 'change message', blank=True),
     )
-    ordering = (('action_time', 'DESC'),)
+    ordering = ('-action_time',)
     module_constants = {
         'ADDITION': 1,
         'CHANGE': 2,

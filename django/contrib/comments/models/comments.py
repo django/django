@@ -42,7 +42,7 @@ class Comment(meta.Model):
         'RATINGS_OPTIONAL': 'ra',
         'IS_PUBLIC': 'ip',
     }
-    ordering = (('submit_date', 'DESC'),)
+    ordering = ('-submit_date',)
     admin = meta.Admin(
         fields = (
             (None, {'fields': ('content_type_id', 'object_id', 'site_id')}),
@@ -170,7 +170,7 @@ class FreeComment(meta.Model):
         meta.BooleanField('approved', 'approved by staff'),
         meta.ForeignKey(core.Site),
     )
-    ordering = (('submit_date', 'DESC'),)
+    ordering = ('-submit_date',)
     admin = meta.Admin(
         fields = (
             (None, {'fields': ('content_type_id', 'object_id', 'site_id')}),

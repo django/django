@@ -52,6 +52,36 @@ prep_for_like_query = lambda x: str(x).replace("%", "\%").replace("_", "\_")
 # returns the <ul> class for a given radio_admin value
 get_ul_class = lambda x: 'radiolist%s' % ((x == HORIZONTAL) and ' inline' or '')
 
+# Django currently supports two forms of ordering.
+# Form 1 (deprecated) example:
+#     order_by=(('pub_date', 'DESC'), ('headline', 'ASC'), (None, 'RANDOM'))
+# Form 2 (new-style) example:
+#     order_by=('-pub_date', 'headline', '?')
+# Form 1 is deprecated and will no longer be supported for Django's first
+# official release. The following code converts from Form 1 to Form 2.
+
+LEGACY_ORDERING_MAPPING = {'ASC': '_', 'DESC': '-_', 'RANDOM': '?'}
+
+def handle_legacy_orderlist(order_list):
+    if not order_list or isinstance(order_list[0], basestring):
+        return order_list
+    else:
+#         import warnings
+        new_order_list = [LEGACY_ORDERING_MAPPING[j.upper()].replace('_', str(i)) for i, j in order_list]
+#         warnings.warn("%r ordering syntax is deprecated. Use %r instead." % (order_list, new_order_list), DeprecationWarning)
+        return new_order_list
+
+def orderlist2sql(order_list, prefix=''):
+    output = []
+    for f in handle_legacy_orderlist(order_list):
+        if f.startswith('-'):
+            output.append('%s%s DESC' % (prefix, f[1:]))
+        elif f == '?':
+            output.append('RANDOM()')
+        else:
+            output.append('%s%s ASC' % (prefix, f))
+    return ', '.join(output)
+
 def curry(*args, **kwargs):
     def _curried(*moreargs, **morekwargs):
         return args[0](*(args[1:]+moreargs), **dict(kwargs.items() + morekwargs.items()))
@@ -175,7 +205,7 @@ class Options:
         self.get_latest_by = get_latest_by
         if order_with_respect_to:
             self.order_with_respect_to = self.get_field(order_with_respect_to)
-            self.ordering = (('_order', 'ASC'),)
+            self.ordering = ('_order',)
         else:
             self.order_with_respect_to = None
         self.module_constants = module_constants or {}
@@ -231,7 +261,7 @@ class Options:
         "Returns the full 'ORDER BY' clause for this object, according to self.ordering."
         if not self.ordering: return ''
         pre = table_prefix and (table_prefix + '.') or ''
-        return 'ORDER BY ' + ','.join(['%s%s %s' % (pre, f, order) for f, order in self.ordering])
+        return 'ORDER BY ' + orderlist2sql(self.ordering, pre)
 
     def get_add_permission(self):
         return 'add_%s' % self.object_name.lower()
@@ -770,7 +800,7 @@ def method_delete(opts, self):
 
 def method_get_next_in_order(opts, order_field, self):
     if not hasattr(self, '_next_in_order_cache'):
-        self._next_in_order_cache = opts.get_model_module().get_object(order_by=(('_order', 'ASC'),),
+        self._next_in_order_cache = opts.get_model_module().get_object(order_by=('_order',),
             where=['_order > (SELECT _order FROM %s WHERE %s=%%s)' % (opts.db_table, opts.pk.name),
                 '%s=%%s' % order_field.name], limit=1,
             params=[getattr(self, opts.pk.name), getattr(self, order_field.name)])
@@ -778,7 +808,7 @@ def method_get_next_in_order(opts, order_field, self):
 
 def method_get_previous_in_order(opts, order_field, self):
     if not hasattr(self, '_previous_in_order_cache'):
-        self._previous_in_order_cache = opts.get_model_module().get_object(order_by=(('_order', 'DESC'),),
+        self._previous_in_order_cache = opts.get_model_module().get_object(order_by=('-_order',),
             where=['_order < (SELECT _order FROM %s WHERE %s=%%s)' % (opts.db_table, opts.pk.name),
                 '%s=%%s' % order_field.name], limit=1,
             params=[getattr(self, opts.pk.name), getattr(self, order_field.name)])
@@ -908,7 +938,7 @@ def method_get_order(ordered_obj, self):
 def method_get_next_or_previous(get_object_func, field, is_next, self, **kwargs):
     kwargs.setdefault('where', []).append('%s %s %%s' % (field.name, (is_next and '>' or '<')))
     kwargs.setdefault('params', []).append(str(getattr(self, field.name)))
-    kwargs['order_by'] = ((field.name, (is_next and 'ASC' or 'DESC')),)
+    kwargs['order_by'] = [(not is_next and '-' or '') + field.name]
     kwargs['limit'] = 1
     return get_object_func(**kwargs)
 
@@ -1216,16 +1246,20 @@ def function_get_sql_clause(opts, **kwargs):
 
     # ORDER BY clause
     order_by = []
-    for i, j in kwargs.get('order_by', opts.ordering):
-        if j == "RANDOM":
-            order_by.append("RANDOM()")
+    for f in handle_legacy_orderlist(kwargs.get('order_by', opts.ordering)):
+        if f == '?': # Special case.
+            order_by.append('RANDOM()')
         else:
-            # Append the database table as a column prefix if it wasn't given,
+            # Use the database table as a column prefix if it wasn't given,
             # and if the requested column isn't a custom SELECT.
-            if "." not in i and i not in [k[0] for k in kwargs.get('select', [])]:
-                order_by.append("%s.%s %s" % (opts.db_table, i, j))
+            if "." not in f and f not in [k[0] for k in kwargs.get('select', [])]:
+                table_prefix = opts.db_table + '.'
             else:
-                order_by.append("%s %s" % (i, j))
+                table_prefix = ''
+            if f.startswith('-'):
+                order_by.append('%s%s DESC' % (table_prefix, f[1:]))
+            else:
+                order_by.append('%s%s ASC' % (table_prefix, f))
     order_by = ", ".join(order_by)
 
     # LIMIT and OFFSET clauses
@@ -1246,7 +1280,7 @@ def function_get_in_bulk(opts, klass, *args, **kwargs):
     return dict([(o.id, o) for o in obj_list])
 
 def function_get_latest(opts, klass, does_not_exist_exception, **kwargs):
-    kwargs['order_by'] = ((opts.get_latest_by, "DESC"),)
+    kwargs['order_by'] = ('-' + opts.get_latest_by,)
     kwargs['limit'] = 1
     return function_get_object(opts, klass, does_not_exist_exception, **kwargs)
 

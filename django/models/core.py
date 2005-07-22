@@ -6,7 +6,7 @@ class Site(meta.Model):
         meta.CharField('domain', 'domain name', maxlength=100),
         meta.CharField('name', 'display name', maxlength=50),
     )
-    ordering = (('domain', 'ASC'),)
+    ordering = ('domain',)
 
     def __repr__(self):
         return self.domain
@@ -22,7 +22,7 @@ class Package(meta.Model):
         meta.CharField('label', 'label', maxlength=20, primary_key=True),
         meta.CharField('name', 'name', maxlength=30, unique=True),
     )
-    ordering = (('name', 'ASC'),)
+    ordering = ('name',)
 
     def __repr__(self):
         return self.name
@@ -34,7 +34,7 @@ class ContentType(meta.Model):
         meta.ForeignKey(Package, name='package'),
         meta.CharField('python_module_name', 'Python module name', maxlength=50),
     )
-    ordering = (('package', 'ASC'), ('name', 'ASC'),)
+    ordering = ('package', 'name')
     unique_together = (('package', 'python_module_name'),)
 
     def __repr__(self):
@@ -63,7 +63,7 @@ class Redirect(meta.Model):
             help_text="This can be either an absolute path (as above) or a full URL starting with 'http://'."),
     )
     unique_together=(('site_id', 'old_path'),)
-    ordering = (('old_path', 'ASC'),)
+    ordering = ('old_path',)
     admin = meta.Admin(
         list_display = ('__repr__',),
         list_filter = ('site_id',),
@@ -87,7 +87,7 @@ class FlatFile(meta.Model):
             help_text="If this is checked, only logged-in users will be able to view the page."),
         meta.ManyToManyField(Site),
     )
-    ordering = (('url', 'ASC'),)
+    ordering = ('url',)
     admin = meta.Admin(
         fields = (
             (None, {'fields': ('url', 'title', 'content', 'sites')}),

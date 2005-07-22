@@ -94,12 +94,15 @@ def change_list(request, app_label, module_name):
     # then check the object's default ordering. If neither of those exist,
     # order descending by ID by default. Finally, look for manually-specified
     # ordering from the query string.
-    if lookup_opts.admin.ordering is not None:
-        order_field, order_type = lookup_opts.admin.ordering
-    elif lookup_opts.ordering:
-        order_field, order_type = lookup_opts.ordering[0]
+    ordering = lookup_opts.admin.ordering or lookup_opts.ordering or ('-' + lookup_opts.pk.name)
+
+    # Normalize it to new-style ordering.
+    ordering = meta.handle_legacy_orderlist(ordering)
+
+    if ordering[0].startswith('-'):
+        order_field, order_type = ordering[0][1:], 'DESC'
     else:
-        order_field, order_type = lookup_opts.pk.name, 'DESC'
+        order_field, order_type = ordering[0], 'ASC'
     if params.has_key(ORDER_VAR):
         try:
             try:
@@ -1071,7 +1074,7 @@ def delete_stage(request, app_label, module_name, object_id):
 def history(request, app_label, module_name, object_id):
     mod, opts = _get_mod_opts(app_label, module_name)
     action_list = log.get_list(object_id__exact=object_id, content_type_id__exact=opts.get_content_type_id(),
-        order_by=(("action_time", "ASC"),), select_related=True)
+        order_by=("action_time",), select_related=True)
     # If no history was found, see whether this object even exists.
     try:
         obj = mod.get_object(id__exact=object_id)
