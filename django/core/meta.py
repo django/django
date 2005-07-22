@@ -66,9 +66,9 @@ def handle_legacy_orderlist(order_list):
     if not order_list or isinstance(order_list[0], basestring):
         return order_list
     else:
-#         import warnings
+        import warnings
         new_order_list = [LEGACY_ORDERING_MAPPING[j.upper()].replace('_', str(i)) for i, j in order_list]
-#         warnings.warn("%r ordering syntax is deprecated. Use %r instead." % (order_list, new_order_list), DeprecationWarning)
+        warnings.warn("%r ordering syntax is deprecated. Use %r instead." % (order_list, new_order_list), DeprecationWarning)
         return new_order_list
 
 def orderlist2sql(order_list, prefix=''):
