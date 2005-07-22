@@ -74,7 +74,7 @@ var DateTimeShortcuts = {
         quickElement("a", quickElement("li", time_list, ""), "Noon", "href", "javascript:DateTimeShortcuts.handleClockQuicklink(" + num + ", '12:00');")
         
         cancel_p = quickElement('p', clock_box, '', 'class', 'calendar-cancel');
-        quickElement('a', cancel_p, 'Cancel', 'href', 'javascript:DateTimeShortcuts.dismissCalendar(' + num + ');');
+        quickElement('a', cancel_p, 'Cancel', 'href', 'javascript:DateTimeShortcuts.dismissClock(' + num + ');');
     },
     
     openClock: function(num) {
