@@ -60,8 +60,8 @@ class ObjectPaginator:
     def _get_hits(self):
         if self._hits is None:
             order_args = copy(self.args)
-            if order_args.has_key('ordering_tuple'):
-                del order_args['ordering_tuple']
+            if order_args.has_key('order_by'):
+                del order_args['order_by']
             if order_args.has_key('select_related'):
                 del order_args['select_related']
             self._hits = getattr(self.module, self.count_method)(**order_args)
