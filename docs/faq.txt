@@ -144,8 +144,8 @@ own lightweight development server. For a production environment, we recommend
 `Apache 2`_ and mod_python_, although Django follows the WSGI_ spec, which
 means it can run on a variety of server platforms.
 
-You'll also need a database engine. PostgreSQL_ is recommended, and MySQL_ is
-supported.
+You'll also need a database engine. PostgreSQL_ is recommended, and MySQL_
+and `SQLite 3`_ are supported.
 
 .. _Python: http://www.python.org/
 .. _Apache 2: http://httpd.apache.org/
@@ -153,6 +153,7 @@ supported.
 .. _WSGI: http://www.python.org/peps/pep-0333.html
 .. _PostgreSQL: http://www.postgresql.org/
 .. _MySQL: http://www.mysql.com/
+.. _`SQLite 3`: http://www.sqlite.org/
 
 Do I have to use mod_python?
 ----------------------------

@@ -10,11 +10,11 @@ MANAGERS = ADMINS
 
 LANGUAGE_CODE = 'en-us'
 
-DATABASE_ENGINE = 'postgresql' # 'postgresql' or 'mysql'
-DATABASE_NAME = ''
-DATABASE_USER = ''
-DATABASE_PASSWORD = ''
-DATABASE_HOST = ''             # Set to empty string for localhost
+DATABASE_ENGINE = 'postgresql' # 'postgresql', 'mysql', or 'sqlite'
+DATABASE_NAME = ''             # or path to database file if using sqlite 
+DATABASE_USER = ''             # not used with sqlite
+DATABASE_PASSWORD = ''         # not used with sqlite
+DATABASE_HOST = ''             # Set to empty string for localhost; not used with sqlite
 
 SITE_ID = 1
 
