@@ -3,7 +3,7 @@ from django.conf.settings import INSTALLED_APPS
 
 urlpatterns = (
     ('^/?$', 'django.views.admin.main.index'),
-    ('^logout/$', 'django.views.admin.main.logout'),
+    ('^logout/$', 'django.views.auth.login.logout'),
     ('^password_change/$', 'django.views.registration.passwords.password_change'),
     ('^password_change/done/$', 'django.views.registration.passwords.password_change_done'),
     ('^template_validator/$', 'django.views.admin.template.template_validator'),

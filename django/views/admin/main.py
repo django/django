@@ -50,14 +50,6 @@ def index(request):
     c = Context(request, {'title': 'Site administration'})
     return HttpResponse(t.render(c))
 
-def logout(request):
-    request.session.delete()
-    t = template_loader.get_template('logged_out')
-    c = Context(request, {
-        'title': "You're logged out",
-    })
-    return HttpResponse(t.render(c))
-
 def change_list(request, app_label, module_name):
     from django.core import paginator
     from django.utils import dateformat
