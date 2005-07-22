@@ -1,6 +1,12 @@
 from django.utils import datastructures, httpwrappers
 from pprint import pformat
 
+STATUS_CODE_TEXT = {
+    200: 'OK',
+    404: 'NOT FOUND',
+    500: 'INTERNAL SERVER ERROR',
+}
+
 class WSGIRequest(httpwrappers.HttpRequest):
     def __init__(self, environ):
         self.environ = environ
@@ -121,7 +127,11 @@ class WSGIHandler:
         for middleware_method in self._response_middleware:
             response = middleware_method(request, response)
 
-        status = str(response.status_code) + ' ' # TODO: Extra space here is a hack.
+        try:
+            status_text = STATUS_CODE_TEXT[response.status_code]
+        except KeyError:
+            status_text = 'UNKNOWN STATUS CODE'
+        status = '%s %s' % (response.status_code, status_text)
         response_headers = response.headers
         if response.cookies:
             response_headers['Set-Cookie'] = response.cookies.output(header='')
