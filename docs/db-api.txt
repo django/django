@@ -107,14 +107,15 @@ provided by the ``order_by`` argument to a lookup::
     polls.get_list(
         pub_date__year=2005,
         pub_date__month=1,
-        order_by=(("pub_date", "DESC"), ("question", "ASC")),
+        order_by=('-pub_date', 'question'),
     )
 
-The result set above will be ordered by ``pub_date`` (descending), then
-by ``question`` (ascending).  Just like in models, the ``order_by`` clause
-is a list of ordering tuples where the first element is the field and the
-second is "ASC" (ascending) or "DESC" (descending).  You can also
-use the tuple ``(None, "RANDOM")`` to order the result set randomly.
+The result set above will be ordered by ``pub_date`` descending, then
+by ``question`` ascending. The negative sign in front of "-pub_date" indicates
+descending order. Ascending order is implied. To order randomly, use "?", like
+so::
+
+    polls.get_list(order_by=['?'])
 
 Relationships (joins)
 =====================

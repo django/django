@@ -76,11 +76,11 @@ wide array of options, only ``fields`` is required.
 ``ordering``
     The default ordering for the object, for use by ``get_list`` and the admin::
 
-        ordering = (('order_date', 'DESC'),)
+        ordering = ['-order_date']
 
-    This is a tuple of 2-tuples. Each 2-tuple is ``(field_name, ordering_type)``
-    where ordering_type is either ``"ASC"`` or ``"DESC"``.  You can also use the
-    ``(None, "RANDOM")`` for random ordering.
+    This is a tuple or list of strings. Each string is a field name with an
+    optional "-" (indicating descending order). Or, you can use the string "?"
+    to order randomly.
 
 ``permissions``
     Extra permissions to enter into the permissions table when creating this
@@ -662,7 +662,7 @@ object, which has the following options. All are optional.
     (This example also has ``search_fields`` defined; see below).
 
 ``ordering``
-    An ordering tuple (see the `Options for models`_, above) that gives a
+    A list or tuple (see the `Options for models`_, above) that gives a
     different ordering for the admin change list. If this isn't given, the
     model's default ordering will be used.
 

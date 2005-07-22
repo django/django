@@ -14,25 +14,25 @@ application and will focus on creating the public interface -- "views."
     A view is a "type" of Web page in your Django application that generally
     serves a specific function and has a specific template. For example, in a
     weblog application, you might have the following views:
-    
+
         * Blog homepage -- displays the latest few entries.
         * Entry "detail" page -- permalink page for a single entry.
-        * Year-based archive page -- displays all months with entries in the 
+        * Year-based archive page -- displays all months with entries in the
           given year.
-        * Month-based archive page -- displays all days with entries in the 
+        * Month-based archive page -- displays all days with entries in the
           given month.
         * Day-based archive page -- displays all entries in the given day.
         * Comment action -- handles posting comments to a given entry.
-    
+
     In our poll application, we'll have the following four views:
-    
+
         * Poll "archive" page -- displays the latest few polls.
         * Poll "detail" page -- displays a poll question, with no results but
           with a form to vote.
         * Poll "results" page -- displays results for a particular poll.
         * Vote action -- handles voting for a particular choice in a particular
           poll.
-    
+
     In Django, each view is represented by a simple Python function.
 
 Design your URLs
@@ -174,8 +174,7 @@ publication date::
     from django.utils.httpwrappers import HttpResponse
 
     def index(request):
-        latest_poll_list = polls.get_list(order_by=[('pub_date', 'DESC')],
-            limit=5)
+        latest_poll_list = polls.get_list(order_by=['-pub_date'], limit=5)
         output = ', '.join([p.question for p in latest_poll_list])
         return HttpResponse(output)
 
@@ -189,8 +188,7 @@ So let's use Django's template system to separate the design from Python::
     from django.utils.httpwrappers import HttpResponse
 
     def index(request):
-        latest_poll_list = polls.get_list(order_by=[('pub_date', 'DESC')],
-            limit=5)
+        latest_poll_list = polls.get_list(order_by=['-pub_date'], limit=5)
         t = template_loader.get_template('polls/index')
         c = Context(request, {
             'latest_poll_list': latest_poll_list,
@@ -278,7 +276,7 @@ Two more things to note about 404 views:
 
     * The 404 view is also called if Django doesn't find a match after checking
       every regular expression in the URLconf.
-    * If you don't define your own 404 view -- and simply use the default, 
+    * If you don't define your own 404 view -- and simply use the default,
       which is recommended -- you still have one obligation: To create a
       ``404.html`` template in the root of your template directory. The default
       404 view will use that template for all 404 errors.
