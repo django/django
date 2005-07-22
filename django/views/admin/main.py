@@ -102,9 +102,8 @@ def change_list(request, app_label, module_name):
         order_field, order_type = lookup_opts.pk.name, 'DESC'
     if params.has_key(ORDER_VAR):
         try:
-            order_key = int(params[ORDER_VAR])
             try:
-                f = lookup_opts.get_field(lookup_opts.admin.list_display[order_key])
+                f = lookup_opts.get_field(lookup_opts.admin.list_display[int(params[ORDER_VAR])])
             except meta.FieldDoesNotExist:
                 pass
             else:
