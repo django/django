@@ -39,7 +39,7 @@ SERVER_EMAIL = 'root@localhost'
 SEND_BROKEN_LINK_EMAILS = True
 
 # Database connection info.
-DATABASE_ENGINE = 'postgresql' # 'postgresql' or 'mysql'
+DATABASE_ENGINE = 'postgresql' # 'postgresql', 'mysql', or 'sqlite3'.
 DATABASE_NAME = ''
 DATABASE_USER = ''
 DATABASE_PASSWORD = ''
