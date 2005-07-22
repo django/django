@@ -94,7 +94,7 @@ def change_list(request, app_label, module_name):
     # then check the object's default ordering. If neither of those exist,
     # order descending by ID by default. Finally, look for manually-specified
     # ordering from the query string.
-    ordering = lookup_opts.admin.ordering or lookup_opts.ordering or ('-' + lookup_opts.pk.name)
+    ordering = lookup_opts.admin.ordering or lookup_opts.ordering or ['-' + lookup_opts.pk.name]
 
     # Normalize it to new-style ordering.
     ordering = meta.handle_legacy_orderlist(ordering)
@@ -140,7 +140,7 @@ def change_list(request, app_label, module_name):
             if isinstance(f.rel, meta.ManyToOne):
                 lookup_params['select_related'] = True
                 break
-    lookup_params['order_by'] = ((lookup_order_field, order_type),)
+    lookup_params['order_by'] = ((order_type == 'DESC' and '-' or '') + lookup_order_field,)
     if lookup_opts.admin.search_fields and query:
         or_queries = []
         for bit in query.split():
