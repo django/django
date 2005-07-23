@@ -1077,7 +1077,7 @@ def history(request, app_label, module_name, object_id):
         order_by=("action_time",), select_related=True)
     # If no history was found, see whether this object even exists.
     try:
-        obj = mod.get_object(id__exact=object_id)
+        obj = mod.get_object(**{'%s__exact' % opts.pk.name: object_id})
     except ObjectDoesNotExist:
         raise Http404
     t = template_loader.get_template('admin_object_history')
