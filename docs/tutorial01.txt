@@ -95,7 +95,7 @@ On Windows, you'd use ``set`` instead::
 If you don't see any errors after running ``django-admin.py init``, you know it
 worked. That command initialized your database with Django's core database
 tables. If you're interested, run the command-line client for your database and
-type ``\\dt`` (PostgreSQL), ``SHOW TABLES;`` (MySQL), or ``.schema`` (SQLite) to
+type ``\dt`` (PostgreSQL), ``SHOW TABLES;`` (MySQL), or ``.schema`` (SQLite) to
 display the tables.
 
 Now you're set to start doing work. You won't have to take care of this boring
