@@ -6,7 +6,8 @@ from django.core.extensions import DjangoContext as Context
 from django.core.paginator import ObjectPaginator, InvalidPage
 from django.core.exceptions import Http404, ObjectDoesNotExist
 
-def object_list(request, app_label, module_name, paginate_by=None, allow_empty=False, template_name=None, extra_lookup_kwargs={}, extra_context=None):
+def object_list(request, app_label, module_name, paginate_by=None, allow_empty=False, 
+                template_name=None, extra_lookup_kwargs={}, extra_context=None):
     """
     Generic list of objects.
 
@@ -67,7 +68,9 @@ def object_list(request, app_label, module_name, paginate_by=None, allow_empty=F
     t = template_loader.get_template(template_name)
     return HttpResponse(t.render(c))
 
-def object_detail(request, app_label, module_name, object_id=None, slug=None, slug_field=None, template_name=None, template_name_field=None, extra_lookup_kwargs={}, extra_context=None):
+def object_detail(request, app_label, module_name, object_id=None, slug=None, 
+                  slug_field=None, template_name=None, template_name_field=None, 
+                  extra_lookup_kwargs={}, extra_context=None):
     """
     Generic list of objects.
 

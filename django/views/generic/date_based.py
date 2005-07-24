@@ -6,7 +6,8 @@ from django.models import get_module
 from django.utils.httpwrappers import HttpResponse
 import datetime, time
 
-def archive_index(request, app_label, module_name, date_field, num_latest=15, template_name=None, extra_lookup_kwargs={}, extra_context=None):
+def archive_index(request, app_label, module_name, date_field, num_latest=15, 
+                  template_name=None, extra_lookup_kwargs={}, extra_context=None):
     """
     Generic top-level archive of date-based objects.
 
@@ -44,7 +45,8 @@ def archive_index(request, app_label, module_name, date_field, num_latest=15, te
         c.update(extra_context)
     return HttpResponse(t.render(c))
 
-def archive_year(request, year, app_label, module_name, date_field, template_name=None, extra_lookup_kwargs={}, extra_context=None):
+def archive_year(request, year, app_label, module_name, date_field, 
+                 template_name=None, extra_lookup_kwargs={}, extra_context=None):
     """
     Generic yearly archive view.
 
@@ -76,7 +78,8 @@ def archive_year(request, year, app_label, module_name, date_field, template_nam
         c.update(extra_context)
     return HttpResponse(t.render(c))
 
-def archive_month(request, year, month, app_label, module_name, date_field, template_name=None, extra_lookup_kwargs={}, extra_context=None):
+def archive_month(request, year, month, app_label, module_name, date_field, 
+                  template_name=None, extra_lookup_kwargs={}, extra_context=None):
     """
     Generic monthly archive view.
 
@@ -122,7 +125,9 @@ def archive_month(request, year, month, app_label, module_name, date_field, temp
         c.update(extra_context)
     return HttpResponse(t.render(c))
 
-def archive_day(request, year, month, day, app_label, module_name, date_field, template_name=None, extra_lookup_kwargs={}, extra_context=None, allow_empty=False):
+def archive_day(request, year, month, day, app_label, module_name, date_field, 
+                template_name=None, extra_lookup_kwargs={}, extra_context=None, 
+                allow_empty=False):
     """
     Generic daily archive view.
 
@@ -178,7 +183,9 @@ def archive_today(request, **kwargs):
     })
     return archive_day(request, **kwargs)
 
-def object_detail(request, year, month, day, app_label, module_name, date_field, object_id=None, slug=None, slug_field=None, template_name=None, extra_lookup_kwargs={}, extra_context=None):
+def object_detail(request, year, month, day, app_label, module_name, date_field, 
+                  object_id=None, slug=None, slug_field=None, template_name=None, 
+                  template_name_field=None, extra_lookup_kwargs={}, extra_context=None):
     """
     Generic detail view from year/month/day/slug or year/month/day/id structure.
 
@@ -212,7 +219,11 @@ def object_detail(request, year, month, day, app_label, module_name, date_field,
         raise Http404("%s.%s does not exist for %s" % (app_label, module_name, lookup_kwargs))
     if not template_name:
         template_name = "%s/%s_detail" % (app_label, module_name)
-    t = template_loader.get_template(template_name)
+    if template_name_field:
+        template_name_list = [getattr(object, template_name_field), template_name]
+        t = template_loader.select_template(template_name_list)
+    else:
+        t = template_loader.get_template(template_name)
     c = Context(request, {
         'object': object,
     })
