@@ -101,9 +101,21 @@ any capital-M Methodologies; we do what "feels" right. If you squint the right
 way, you can call Django's ORM the "Model", the view functions the "View", and
 the dynamically-generated API the "Controller" -- but not really.
 
+In fact, you might say that Django is a "MTV" framework -- that is, Model,
+Template, and View make much more sense to us.
+
 So, although we've been strongly influenced by MVC -- especially in the
 separation-of-data-from-logic department -- we've also strayed from the path
 where it makes sense.
+
+<Framework X> does <feature Y> -- why doesn't Django?
+-----------------------------------------------------
+
+We're well aware that there are other awesome web frameworks out there, and
+we're not adverse to borrowing ideas where appropriate.  However, Django was
+developed precisely because we were unhappy with the status quo, so please be
+aware that "because <Framework X>" does it is not going to be sufficient reason
+to add a given feature to Django.
 
 Do you have any of those nifty "screencast" things?
 ---------------------------------------------------
@@ -223,6 +235,28 @@ We happen to think our template engine is the best thing since chunky bacon,
 but we recognize that choosing a template language runs close to religion.
 There's nothing about Django that requires using the template language, so
 if you're attached to ZPT, Cheetah, or whatever, feel free to use those.
+
+How do I use image and file fields?
+-----------------------------------
+
+Using a ``FileField`` or an ``ImageField`` in a model takes a few steps:
+
+    #. In your settings file, define ``MEDIA_ROOT`` as the full path to
+       a directory where you'd like Django to store uploaded files (for
+       performance these files are not stored in the database).  Define
+       ``MEDIA_URL`` as the base public URL of that directory.  Make
+       sure that this directory is writable by the web user.
+       
+    #. Add the ``FileField`` or ``ImageField`` to your model, making sure
+       to define the ``upload_to`` option to tell Django what subdirectory
+       of ``MEDIA_ROOT`` to upload files to.
+       
+    #. All that will be stored in your database is a path to the file 
+       (relative to ``MEDIA_ROOT``).  You'll must likely want to use
+       the convenience ``get_<fieldname>_url`` function provided by 
+       Django (that is, if your ``ImageField`` is called ``mug_shot``,
+       you can get the absolute URL to your image in a template with
+       ``{{ object.get_mug_shot_url }}``.
 
 The database API
 ================
