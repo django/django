@@ -85,7 +85,8 @@ def archive_year(request, year, app_label, module_name, date_field,
     return HttpResponse(t.render(c))
 
 def archive_month(request, year, month, app_label, module_name, date_field, 
-                  template_name=None, extra_lookup_kwargs={}, extra_context={}):
+                  use_numeric_months=False, template_name=None, 
+                  extra_lookup_kwargs={}, extra_context={}):
     """
     Generic monthly archive view.
 
@@ -96,10 +97,17 @@ def archive_month(request, year, month, app_label, module_name, date_field,
         object_list:
             list of objects published in the given month
     """
-    try:
-        date = datetime.date(*time.strptime(year+month, '%Y%b')[:3])
-    except ValueError:
-        raise Http404
+    if use_numeric_months:
+        try:
+            date = datetime.date(int(year), int(month), 1)
+        except (ValueError, TypeError):
+            raise Http404
+    else:
+        try:
+            date = datetime.date(*time.strptime(year+month, '%Y%b')[:3])
+        except ValueError:
+            raise Http404
+            
     mod = get_module(app_label, module_name)
     now = datetime.datetime.now()
     # Calculate first and last day of month, for use in a date-range lookup.
@@ -114,7 +122,7 @@ def archive_month(request, year, month, app_label, module_name, date_field,
             break
     lookup_kwargs = {'%s__range' % date_field: (first_day, last_day)}
     # Only bother to check current date if the month isn't in the past.
-    if date >= now:
+    if last_day >= now.date():
         lookup_kwargs['%s__lte' % date_field] = now
     lookup_kwargs.update(extra_lookup_kwargs)
     object_list = mod.get_list(**lookup_kwargs)
@@ -135,8 +143,8 @@ def archive_month(request, year, month, app_label, module_name, date_field,
     return HttpResponse(t.render(c))
 
 def archive_day(request, year, month, day, app_label, module_name, date_field, 
-                template_name=None, extra_lookup_kwargs={}, extra_context={}, 
-                allow_empty=False):
+                use_numeric_months=False, template_name=None, extra_lookup_kwargs={}, 
+                extra_context={}, allow_empty=False):
     """
     Generic daily archive view.
 
@@ -151,17 +159,24 @@ def archive_day(request, year, month, day, app_label, module_name, date_field,
         next_day
             (datetime) the next day, or None if the current day is today
     """
-    try:
-        date = datetime.date(*time.strptime(year+month+day, '%Y%b%d')[:3])
-    except ValueError:
-        raise Http404
+    if use_numeric_months:
+        try:
+            date = datetime.date(int(year), int(month), int(day))
+        except (ValueError, TypeError):
+            raise Http404
+    else:    
+        try:
+            date = datetime.date(*time.strptime(year+month+day, '%Y%b%d')[:3])
+        except ValueError:
+            raise Http404
+
     mod = get_module(app_label, module_name)
     now = datetime.datetime.now()
     lookup_kwargs = {
         '%s__range' % date_field: (datetime.datetime.combine(date, datetime.time.min), datetime.datetime.combine(date, datetime.time.max)),
     }
     # Only bother to check current date if the date isn't in the past.
-    if date >= now:
+    if date >= now.date():
         lookup_kwargs['%s__lte' % date_field] = now
     lookup_kwargs.update(extra_lookup_kwargs)
     object_list = mod.get_list(**lookup_kwargs)
@@ -196,8 +211,9 @@ def archive_today(request, **kwargs):
     return archive_day(request, **kwargs)
 
 def object_detail(request, year, month, day, app_label, module_name, date_field, 
-                  object_id=None, slug=None, slug_field=None, template_name=None, 
-                  template_name_field=None, extra_lookup_kwargs={}, extra_context={}):
+                  use_numeric_months=False, object_id=None, slug=None, slug_field=None, 
+                  template_name=None, template_name_field=None, extra_lookup_kwargs={}, 
+                  extra_context={}):
     """
     Generic detail view from year/month/day/slug or year/month/day/id structure.
 
@@ -206,17 +222,24 @@ def object_detail(request, year, month, day, app_label, module_name, date_field,
         object:
             the object to be detailed
     """
-    try:
-        date = datetime.datetime(*time.strptime(year+month+day, '%Y%b%d')[:3])
-    except ValueError:
-        raise Http404
+    if use_numeric_months:
+        try:
+            date = datetime.date(int(year), int(month), int(day))
+        except (ValueError, TypeError):
+            raise Http404
+    else:    
+        try:
+            date = datetime.date(*time.strptime(year+month+day, '%Y%b%d')[:3])
+        except ValueError:
+            raise Http404
+
     mod = get_module(app_label, module_name)
     now = datetime.datetime.now()
     lookup_kwargs = {
         '%s__range' % date_field: (datetime.datetime.combine(date, datetime.time.min), datetime.datetime.combine(date, datetime.time.max)),
     }
     # Only bother to check current date if the date isn't in the past.
-    if date >= now:
+    if date >= now.date():
         lookup_kwargs['%s__lte' % date_field] = now
     if object_id:
         lookup_kwargs['%s__exact' % mod.Klass._meta.pk.name] = object_id

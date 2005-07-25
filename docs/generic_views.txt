@@ -126,7 +126,10 @@ The date-based generic functions are:
 
 ``archive_month``
     Monthly archive. Requires that ``year`` and ``month`` arguments be given.
-
+    You may pass the additional option ``use_numeric_months`` if you'd like to
+    use URLs that use numbers instead of names for months (i.e. ``/2005/01/15/``
+    instead of ``/2005/jan/15/``.
+    
     Uses the template ``app_label/module_name__archive_month`` by default.
 
     Has the following template context:
