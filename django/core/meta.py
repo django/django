@@ -976,7 +976,7 @@ def method_save_file(field, self, filename, raw_contents):
 
     # Write the file to disk.
     setattr(self, field.name, filename)
-    fp = open(getattr(self, 'get_%s_filename' % field.name)(), 'w')
+    fp = open(getattr(self, 'get_%s_filename' % field.name)(), 'wb')
     fp.write(raw_contents)
     fp.close()
 
