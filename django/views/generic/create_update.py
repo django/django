@@ -8,7 +8,7 @@ from django.utils.httpwrappers import HttpResponse, HttpResponseRedirect
 from django.core.exceptions import Http404, ObjectDoesNotExist, ImproperlyConfigured
 
 def create_object(request, app_label, module_name, template_name=None, 
-                 extra_context=None, post_save_redirect=None, login_required=False):
+                 extra_context={}, post_save_redirect=None, login_required=False):
     """
     Generic object-creation function.
     
@@ -57,13 +57,16 @@ def create_object(request, app_label, module_name, template_name=None,
     c = Context(request, {
         'form' : form,
     })
-    if extra_context:
-        c.update(extra_context)
+    for key, value in extra_context.items():
+        if callable(value):
+            c[key] = value()
+        else:   
+            c[key] = value
     return HttpResponse(t.render(c))
 
 def update_object(request, app_label, module_name, object_id=None, slug=None, 
                   slug_field=None, template_name=None, extra_lookup_kwargs={}, 
-                  extra_context=None, post_save_redirect=None, login_required=False):
+                  extra_context={}, post_save_redirect=None, login_required=False):
     """
     Generic object-update function.
 
@@ -125,15 +128,18 @@ def update_object(request, app_label, module_name, object_id=None, slug=None,
         'form' : form,
         'object' : object,
     })
-    if extra_context:
-        c.update(extra_context)
+    for key, value in extra_context.items():
+        if callable(value):
+            c[key] = value()
+        else:   
+            c[key] = value
     response = HttpResponse(t.render(c))
     populate_xheaders(request, response, app_label, module_name, getattr(object, object._meta.pk.name))
     return response
 
 def delete_object(request, app_label, module_name, post_delete_redirect, 
                   object_id=None, slug=None, slug_field=None, template_name=None, 
-                  extra_lookup_kwargs={}, extra_context=None, login_required=False):
+                  extra_lookup_kwargs={}, extra_context={}, login_required=False):
     """
     Generic object-delete function.
     
@@ -177,8 +183,11 @@ def delete_object(request, app_label, module_name, post_delete_redirect,
         c = Context(request, {
             'object' : object,
         })
-        if extra_context:
-            c.update(extra_context)
+        for key, value in extra_context.items():
+            if callable(value):
+                c[key] = value()
+            else:   
+                c[key] = value
         response = HttpResponse(t.render(c))
         populate_xheaders(request, response, app_label, module_name, getattr(object, object._meta.pk.name))
         return response

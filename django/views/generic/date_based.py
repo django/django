@@ -7,7 +7,7 @@ from django.utils.httpwrappers import HttpResponse
 import datetime, time
 
 def archive_index(request, app_label, module_name, date_field, num_latest=15, 
-                  template_name=None, extra_lookup_kwargs={}, extra_context=None):
+                  template_name=None, extra_lookup_kwargs={}, extra_context={}):
     """
     Generic top-level archive of date-based objects.
 
@@ -41,12 +41,15 @@ def archive_index(request, app_label, module_name, date_field, num_latest=15,
         'date_list' : date_list,
         'latest' : latest,
     })
-    if extra_context:
-        c.update(extra_context)
+    for key, value in extra_context.items():
+        if callable(value):
+            c[key] = value()
+        else:   
+            c[key] = value
     return HttpResponse(t.render(c))
 
 def archive_year(request, year, app_label, module_name, date_field, 
-                 template_name=None, extra_lookup_kwargs={}, extra_context=None):
+                 template_name=None, extra_lookup_kwargs={}, extra_context={}):
     """
     Generic yearly archive view.
 
@@ -74,12 +77,15 @@ def archive_year(request, year, app_label, module_name, date_field,
         'date_list': date_list,
         'year': year,
     })
-    if extra_context:
-        c.update(extra_context)
+    for key, value in extra_context.items():
+        if callable(value):
+            c[key] = value()
+        else:   
+            c[key] = value
     return HttpResponse(t.render(c))
 
 def archive_month(request, year, month, app_label, module_name, date_field, 
-                  template_name=None, extra_lookup_kwargs={}, extra_context=None):
+                  template_name=None, extra_lookup_kwargs={}, extra_context={}):
     """
     Generic monthly archive view.
 
@@ -121,12 +127,15 @@ def archive_month(request, year, month, app_label, module_name, date_field,
         'object_list': object_list,
         'month': date,
     })
-    if extra_context:
-        c.update(extra_context)
+    for key, value in extra_context.items():
+        if callable(value):
+            c[key] = value()
+        else:   
+            c[key] = value
     return HttpResponse(t.render(c))
 
 def archive_day(request, year, month, day, app_label, module_name, date_field, 
-                template_name=None, extra_lookup_kwargs={}, extra_context=None, 
+                template_name=None, extra_lookup_kwargs={}, extra_context={}, 
                 allow_empty=False):
     """
     Generic daily archive view.
@@ -167,8 +176,11 @@ def archive_day(request, year, month, day, app_label, module_name, date_field,
         'previous_day': date - datetime.timedelta(days=1),
         'next_day': (date < datetime.date.today()) and (date + datetime.timedelta(days=1)) or None,
     })
-    if extra_context:
-        c.update(extra_context)
+    for key, value in extra_context.items():
+        if callable(value):
+            c[key] = value()
+        else:   
+            c[key] = value
     return HttpResponse(t.render(c))
 
 def archive_today(request, **kwargs):
@@ -185,7 +197,7 @@ def archive_today(request, **kwargs):
 
 def object_detail(request, year, month, day, app_label, module_name, date_field, 
                   object_id=None, slug=None, slug_field=None, template_name=None, 
-                  template_name_field=None, extra_lookup_kwargs={}, extra_context=None):
+                  template_name_field=None, extra_lookup_kwargs={}, extra_context={}):
     """
     Generic detail view from year/month/day/slug or year/month/day/id structure.
 
@@ -227,8 +239,11 @@ def object_detail(request, year, month, day, app_label, module_name, date_field,
     c = Context(request, {
         'object': object,
     })
-    if extra_context:
-        c.update(extra_context)
+    for key, value in extra_context.items():
+        if callable(value):
+            c[key] = value()
+        else:   
+            c[key] = value
     response = HttpResponse(t.render(c))
     populate_xheaders(request, response, app_label, module_name, getattr(object, object._meta.pk.name))
     return response

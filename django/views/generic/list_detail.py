@@ -7,7 +7,7 @@ from django.core.paginator import ObjectPaginator, InvalidPage
 from django.core.exceptions import Http404, ObjectDoesNotExist
 
 def object_list(request, app_label, module_name, paginate_by=None, allow_empty=False, 
-                template_name=None, extra_lookup_kwargs={}, extra_context=None):
+                template_name=None, extra_lookup_kwargs={}, extra_context={}):
     """
     Generic list of objects.
 
@@ -61,8 +61,11 @@ def object_list(request, app_label, module_name, paginate_by=None, allow_empty=F
         })
     if len(object_list) == 0 and not allow_empty:
         raise Http404
-    if extra_context:
-        c.update(extra_context)
+    for key, value in extra_context.items():
+        if callable(value):
+            c[key] = value()
+        else:   
+            c[key] = value
     if not template_name:
         template_name = "%s/%s_list" % (app_label, module_name)
     t = template_loader.get_template(template_name)
@@ -70,7 +73,7 @@ def object_list(request, app_label, module_name, paginate_by=None, allow_empty=F
 
 def object_detail(request, app_label, module_name, object_id=None, slug=None, 
                   slug_field=None, template_name=None, template_name_field=None, 
-                  extra_lookup_kwargs={}, extra_context=None):
+                  extra_lookup_kwargs={}, extra_context={}):
     """
     Generic list of objects.
 
@@ -102,8 +105,11 @@ def object_detail(request, app_label, module_name, object_id=None, slug=None,
     c = Context(request, {
         'object' : object,
     })
-    if extra_context:
-        c.update(extra_context)
+    for key, value in extra_context.items():
+        if callable(value):
+            c[key] = value()
+        else:   
+            c[key] = value
     response = HttpResponse(t.render(c))
     populate_xheaders(request, response, app_label, module_name, getattr(object, object._meta.pk.name))
     return response
