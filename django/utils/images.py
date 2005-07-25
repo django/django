@@ -9,7 +9,7 @@ import ImageFile
 def get_image_dimensions(path):
     """Returns the (width, height) of an image at a given path."""
     p = ImageFile.Parser()
-    fp = open(path)
+    fp = open(path, 'rb')
     while 1:
         data = fp.read(1024)
         if not data:
