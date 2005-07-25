@@ -56,7 +56,7 @@ class FormatStylePlaceholderCursor(Database.Cursor):
         return Database.Cursor.execute(self, query, params)
         
     def executemany(self, query, params=[]):
-        query = self.convert_query(query, len(params))
+        query = self.convert_query(query, len(params[0]))
         return Database.Cursor.executemany(self, query, params)
         
     def convert_query(self, query, num_params):
