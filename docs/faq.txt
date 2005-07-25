@@ -111,8 +111,8 @@ where it makes sense.
 <Framework X> does <feature Y> -- why doesn't Django?
 -----------------------------------------------------
 
-We're well aware that there are other awesome web frameworks out there, and
-we're not adverse to borrowing ideas where appropriate.  However, Django was
+We're well aware that there are other awesome Web frameworks out there, and
+we're not adverse to borrowing ideas where appropriate. However, Django was
 developed precisely because we were unhappy with the status quo, so please be
 aware that "because <Framework X>" does it is not going to be sufficient reason
 to add a given feature to Django.
@@ -188,7 +188,7 @@ How do I install mod_python on Windows?
     * For Python 2.4, check out this `guide to mod_python & Python 2.3`_.
     * For Python 2.3, grab mod_python from http://www.modpython.org/ and read
       `Running mod_python on Apache on Windows2000`_.
-    * Also, try this (not Windows-specific) `guide to getting mod_python 
+    * Also, try this (not Windows-specific) `guide to getting mod_python
       working`_.
 
 .. _`guide to mod_python & Python 2.3`: http://www.lehuen.com/nicolas/index.php/2005/02/21/39-win32-build-of-mod_python-314-for-python-24
@@ -242,20 +242,20 @@ How do I use image and file fields?
 Using a ``FileField`` or an ``ImageField`` in a model takes a few steps:
 
     #. In your settings file, define ``MEDIA_ROOT`` as the full path to
-       a directory where you'd like Django to store uploaded files (for
-       performance these files are not stored in the database).  Define
-       ``MEDIA_URL`` as the base public URL of that directory.  Make
-       sure that this directory is writable by the web user.
-       
+       a directory where you'd like Django to store uploaded files. (For
+       performance, these files are not stored in the database.) Define
+       ``MEDIA_URL`` as the base public URL of that directory. Make sure that
+       this directory is writable by the Web server's user account.
+
     #. Add the ``FileField`` or ``ImageField`` to your model, making sure
-       to define the ``upload_to`` option to tell Django what subdirectory
-       of ``MEDIA_ROOT`` to upload files to.
-       
-    #. All that will be stored in your database is a path to the file 
-       (relative to ``MEDIA_ROOT``).  You'll must likely want to use
-       the convenience ``get_<fieldname>_url`` function provided by 
-       Django (that is, if your ``ImageField`` is called ``mug_shot``,
-       you can get the absolute URL to your image in a template with
+       to define the ``upload_to`` option to tell Django to which subdirectory
+       of ``MEDIA_ROOT`` it should upload files.
+
+    #. All that will be stored in your database is a path to the file
+       (relative to ``MEDIA_ROOT``). You'll must likely want to use the
+       convenience ``get_<fieldname>_url`` function provided by Django. For
+       example, if your ``ImageField`` is called ``mug_shot``, you can get the
+       absolute URL to your image in a template with
        ``{{ object.get_mug_shot_url }}``.
 
 The database API
@@ -293,7 +293,7 @@ things:
       "http://www.mysite.com/admin/" in your browser, in
       "myproject.settings.admin" you should set ``REGISTRATION_COOKIE_DOMAIN =
       'www.mysite.com'``.
-      
+
     * Some browsers (Firefox?) don't like to accept cookies from domains that
       don't have dots in them. If you're running the admin site on "localhost"
       or another domain that doesn't have a dot in it, try going to
