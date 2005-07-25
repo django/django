@@ -2,20 +2,20 @@
 Using generic views
 ===================
 
-Writing web applications can often be monotonous as we repeat certain patterns
-again and again.  In Django, the most common of these patterns have been abstracted into
-"generic views" that let you quickly provide common views of object without actually
-needing to write any views.
+Writing Web applications can be monotonous, because we repeat certain patterns
+again and again. In Django, the most common of these patterns have been
+abstracted into "generic views" that let you quickly provide common views of
+an object without actually needing to write any views.
 
 Django's generic views contain the following:
 
-    * A set of views for doing list/detail interfaces (for example, 
+    * A set of views for doing list/detail interfaces (for example,
       Django's `documentation index`_ and `detail pages`_).
-      
+
     * A set of views for year/month/day archive pages and associated
       detail and "latest" pages (for example, the Django weblog's year_,
       month_, day_, detail_, and latest_ pages).
-      
+
     * A set of views for creating, editing, and deleting objects.
 
 .. _`documentation index`: http://www.djangoproject.com/documentation/
@@ -25,20 +25,20 @@ Django's generic views contain the following:
 .. _day: http://www.djangoproject.com/weblog/2005/jul/20/
 .. _detail: http://www.djangoproject.com/weblog/2005/jul/20/autoreload/
 .. _latest: http://www.djangoproject.com/weblog/
-    
-All of these views are used  by creating configuration dictionaries in
-your urlconfig files and passing those dicts as the third member of the
-urlconf tuple.  For example, here's the urlconf for the simple weblog
-app that drives the blog on djangoproject.com::
+
+All of these views are used by creating configuration dictionaries in
+your URLconf files and passing those dictionaries as the third member of the
+URLconf tuple. For example, here's the URLconf for the simple weblog app that
+drives the blog on djangoproject.com::
 
     from django.conf.urls.defaults import *
-    
+
     info_dict = {
-        'app_label':   'blog',
+        'app_label': 'blog',
         'module_name': 'entries',
-        'date_field':  'pub_date',
+        'date_field': 'pub_date',
     }
-    
+
     urlpatterns = patterns('django.views.generic.date_based',
        (r'^(?P<year>\d{4})/(?P<month>[a-z]{3})/(?P<day>\w{1,2})/(?P<slug>\w+)/$', 'object_detail', dict(info_dict, slug_field='slug')),
        (r'^(?P<year>\d{4})/(?P<month>[a-z]{3})/(?P<day>\w{1,2})/$',               'archive_day',   info_dict),
@@ -47,48 +47,50 @@ app that drives the blog on djangoproject.com::
        (r'^/?$',                                                                  'archive_index', info_dict),
     )
 
-As you can see, this urlconf defines a few options in ``info_dict`` that tell
+As you can see, this URLconf defines a few options in ``info_dict`` that tell
 the generic view which model to use (``blog.entries`` in this case), as well as
 some extra information.
 
-Documentation of each generic view follows along with a list of all keyword arguments
-that a generic view expects.  Remember that as in the example above, arguments may
-either come from the URL pattern (as ``month``, ``day``, ``year``, etc. do above) or
-from the additional information dict (as for ``app_label``, ``module_name``, etc.).
+Documentation of each generic view follows, along with a list of all keyword
+arguments that a generic view expects. Remember that as in the example above,
+arguments may either come from the URL pattern (as ``month``, ``day``,
+``year``, etc. do above) or from the additional-information dictionary (as for
+``app_label``, ``module_name``, etc.).
 
 All the generic views that follow require the ``app_label`` and ``module_name`` keys.
 These values are easiest to explain through example::
-    
+
     >>> from django.models.blog import entries
-    
-In the above line, ``blog`` is the ``app_label`` (this is the name of the file that
-holds all your model definitions) and ``entries`` is the ``module_name`` (this is
-either a pluralized, lowercased version of the model class name or the value of
-the ``module_name`` option of your model).  In the docs below, these keys will not
-be repeated, but each generic view requires them.
+
+In the above line, ``blog`` is the ``app_label`` (the name of the file that
+holds all your model definitions) and ``entries`` is the ``module_name``
+(either a pluralized, lowercased version of the model class name, or the value
+of the ``module_name`` option of your model). In the docs below, these keys
+will not be repeated, but each generic view requires them.
 
 Using date-based generic views
 ==============================
 
 Date-based generic views (in the module ``django.views.generic.date_based``)
-export six functions for dealing with date-based data.  Besides ``app_label``
-and ``module_name``, all date-based generic views require that the ``date_field``
-argument to passed to them; this is the name of the field that stores the date
-the objects should key off of.
+feature six functions for dealing with date-based data. Besides ``app_label``
+and ``module_name``, all date-based generic views require that the
+``date_field`` argument be passed to them. This is the name of the field that
+stores the date the objects should key off of.
 
-Additional, all date-based generic views have the following optional arguments:
+Additionally, all date-based generic views have the following optional
+arguments:
 
     =======================  ==================================================
     Argument                 Description
     =======================  ==================================================
-    ``template_name``        Override the default template name used for the
+    ``template_name``        Overrides the default template name used for the
                              view.
-                             
+
     ``extra_lookup_kwargs``  A dictionary of extra lookup parameters (see
                              the `database API docs`_).
-                             
-    ``extra_context``        A dict of extra data to put into the template's
-                             context.
+
+    ``extra_context``        A dictionary of extra data to put into the
+                             template's context.
     =======================  ==================================================
 
 .. _`database API docs`: http://www.djangoproject.com/documentation/db_api/
@@ -96,99 +98,99 @@ Additional, all date-based generic views have the following optional arguments:
 The date-based generic functions are:
 
 ``archive_index``
-    A top-level index page showing the "latest" objects.  Has an optional argument,
-    ``num_latest`` which is the number of items to display on the page (defaults
-    to 15).
-    
+    A top-level index page showing the "latest" objects. Has an optional
+    argument, ``num_latest``, which is the number of items to display on the
+    page (defaults to 15).
+
     Uses the template ``app_label/module_name_archive`` by default.
-    
+
     Has the following template context:
-    
+
         ``date_list``
             List of years with objects
         ``latest``
             Latest objects by date
 
 ``archive_year``
-    Yearly archive.  Requires that the ``year`` argument be present in the URL
+    Yearly archive. Requires that the ``year`` argument be present in the URL
     pattern.
-    
+
     Uses the template ``app_label/module_name__archive_year`` by default.
-    
+
     Has the following template context:
 
         ``date_list``
-            List of months in this year with objects
+            List of months in the given year with objects
         ``year``
-            This year
-            
+            The given year (an integer)
+
 ``archive_month``
-    Monthly archive; requires that ``year`` and ``month`` arguments be given.
-    
+    Monthly archive. Requires that ``year`` and ``month`` arguments be given.
+
     Uses the template ``app_label/module_name__archive_month`` by default.
-    
+
     Has the following template context:
 
         ``month``
-            (datetime object) this month
+            The given month (a datetime.datetime object)
         ``object_list``
-            list of objects published in the given month
+            List of objects published in the given month
 
 ``archive_day``
-    Daily archive; requires that ``year``, ``month``, and ``day`` arguments
-    be given.
-    
+    Daily archive. Requires that ``year``, ``month``, and ``day`` arguments be
+    given.
+
     Uses the template ``app_label/module_name__archive_day`` by default.
 
     Has the following template context:
-    
-        ``object_list``
-            list of objects published this day
-        ``day``
-            (datetime) the day
-        ``previous_day``
-            (datetime) the previous day
-        ``next_day``
-            (datetime) the next day, or None if the current day is today
 
+        ``object_list``
+            List of objects published this day
+        ``day``
+            The given day (a datetime.datetime object)
+        ``previous_day``
+            The previous day (a datetime.datetime object)
+        ``next_day``
+            The next day (a datetime.datetime object), or None if the given
+            day is today
 
 ``archive_today``
-    List of objects for today; exactly the same as ``archive_day``, except
-    that the year/month/day arguments are not given and today's date is
-    used instead.
-    
+    List of objects for today. Exactly the same as ``archive_day``, except
+    the year/month/day arguments are not given, and today's date is used
+    instead.
+
 ``object_detail``
-    Individual object page; requires ``year``/``month``/``day`` arguments like
-    ``archive_day``.  This function can be used with two types of URLs: either
+    Individual object page. Requires ``year``/``month``/``day`` arguments like
+    ``archive_day``. This function can be used with two types of URLs: either
     ``/year/month/day/slug/`` or ``/year/month/day/object_id/``.
-    
+
     If you're using the slug-style URLs, you'll need to have a ``slug`` item in
-    your urlconf, and you'll need to pass a ``slug_field`` key in your info
-    dict to indicate the name of the slug field.
-    
-    If your using the object_id-style URLs, you'll just need to have the URL
-    pattern have an ``object_id`` field.
-    
+    your URLconf, and you'll need to pass a ``slug_field`` key in your info
+    dictionary to indicate the name of the slug field.
+
+    If your using the object_id-style URLs, you'll just need to give the URL
+    pattern an ``object_id`` field.
+
     You can also pass the ``template_name_field`` argument to indicate that the
     the object stores the name of its template in a field on the object itself.
-    
+
 Using list/detail generic views
 ===============================
 
-The list-detail generic views (in the ``django.views.generic.list_detail`` module)
-are similar to the data-based ones, except the list-detail views simply have two
-views: a list of objects, and an individual object page.
+The list-detail generic views (in the ``django.views.generic.list_detail``
+module) are similar to the data-based ones, except the list-detail views simply
+have two views: a list of objects, and an individual object page.
 
-All these views take the same three optional arguments as the date-based ones do
+All these views take the same three optional arguments as the date-based ones
 (and they obviously do not accept or require the date field argument).
 
 Individual views are:
 
 ``object_list``
     List of objects.
-    
+
     Takes the following optional arguments:
-        
+
         =======================  =================================================
         Argument                 Description
         =======================  =================================================
@@ -196,106 +198,108 @@ Individual views are:
                                  objects with ``paginate_by`` objects per page.
                                  The view will expect a ``page`` GET param with
                                  the (zero-indexed) page number.
-                                 
-        ``allow_empty``          If ``False`` and there are no objects to display
+
+        ``allow_empty``          If ``False`` and there are no objects to display,
                                  the view will raise a 404 instead of displaying
-                                 an empty index page.
+                                 an empty index page. ``False`` is default.
         =======================  =================================================
 
     Uses the template ``app_label/module_name__list`` by default.
-    
+
     Has the following template context:
 
         ``object_list``
-            list of objects
+            List of objects
         ``is_paginated``
-            are the results paginated?
-            
+            Are the results paginated? Either True or False
+
     If the results are paginated, the context will have some extra variables:
-    
+
         ``results_per_page``
-            number of objects per page
+            Number of objects per page
         ``has_next``
-            is there a next page?
+            Is there a next page?
         ``has_previous``
-            is there a prev page?
+            Is there a previous page?
         ``page``
-            the current page
+            The current page number
         ``next``
-            the next page
+            The next page number
         ``previous``
-            the previous page
+            The previous page
         ``pages``
-            number of pages, total
+            Number of pages total
 
 ``object_detail``
-    Object detail page.  This works like and takes the same arguments as
-    the date-based ``object_detail`` above, except this one obviously
+    Object detail page. This works like and takes the same arguments as
+    the date-based ``object_detail`` above, except this one, obviously,
     does not take the year/month/day arguments.
-    
+
 Using create/update/delete generic views
 ========================================
 
 The ``django.views.generic.create_update`` module contains a set of functions
-for creating, editing, and deleting objects.  These views take the same global
-arguments as the above sets of generic views; they also have a
+for creating, editing and deleting objects. These views take the same global
+arguments as the above sets of generic views. They also have a
 ``login_required`` argument which, if ``True``, requires the user to be logged
-in to have access to the page (``login_required`` defaults to ``False``).
-    
+in to have access to the page. (``login_required`` defaults to ``False``.)
+
 The create/update/delete views are:
 
 ``create_object``
-    Create a new object.  Has an extra optional argument, ``post_save_redirect``,
-    which is a URL that the view will redirect to after saving the object
-    (defaults to ``object.get_absolute_url()``).
-    
-    ``post_save_redirect`` may contain dictionary string formatting which will
-    be interpolated against the object's dict (so you could use
-    ``post_save_redirect="/polls/%(slug)s/"``, for example).
-    
-    Uses the template ``app_label/module_name__form`` by default (this is the
-    same template as the ``update_object`` view below; your template can tell
-    the different by the presence or absence of ``{{ object }}`` in the context.
-    
+    Create a new object. Has an extra optional argument, ``post_save_redirect``,
+    which is a URL to which the view will redirect after saving the object.
+    It defaults to ``object.get_absolute_url()``.
+
+    ``post_save_redirect`` may contain dictionary string formatting, which will
+    be interpolated against the object's field attributes. For example, you
+    could use ``post_save_redirect="/polls/%(slug)s/"``.
+
+    Uses the template ``app_label/module_name__form`` by default. This is the
+    same template as the ``update_object`` view below. Your template can tell
+    the different by the presence or absence of ``{{ object }}`` in the
+    context.
+
     Has the following template context:
 
         form
-            the form wrapper for the object
-            
+            The form wrapper for the object
+
     .. admonition:: Note
-    
+
         See the `manipulator and formfield documentation`_ for more information
         about using form wrappers in templates.
 
 .. _`manipulator and formfield documentation`: http://www.djangoproject.com/documentation/forms/
 
 ``update_object``
-    Edit an existing object.  Has the same extra slug/ID parameters as
-    ``list_detail.object_detail`` does (see above), and the same ``post_save_redirect``
-    as ``create_object`` does.
+    Edit an existing object. Has the same extra slug/ID parameters as
+    ``list_detail.object_detail`` does (see above), and the same
+    ``post_save_redirect`` as ``create_object`` does.
 
     Uses the template ``app_label/module_name__form`` by default.
-    
+
     Has the following template context:
 
         form
-            the form wrapper for the object
+            The form wrapper for the object
         object
-            the original object being edited
+            The original object being edited
 
 ``delete_object``
-    Delete an existing object.  The given object will only actually be deleted if 
-    the request method is POST; if this view is fetched with GET it will display
-    a confirmation page that should contain a form that POSTs to the same URL.
-    
-    You must provide the ``post_delete_redirect`` argument to this function so
+    Delete an existing object. The given object will only actually be deleted
+    if the request method is POST. If this view is fetched with GET, it will
+    display a confirmation page that should contain a form that POSTs to the
+    same URL.
+
+    You must provide the ``post_delete_redirect`` argument to this function, so
     that the view knows where to go after the object is deleted.
-    
-    If fetched with GET, uses the template
-    ``app_label/module_name_s_confirm_delete`` by default (uses no template if
-    POSTed; simply deletes the object).
-    
+
+    If fetched with GET, it uses the template
+    ``app_label/module_name_s_confirm_delete`` by default. It uses no template
+    if POSTed -- it simply deletes the object and redirects.
+
     Has the following template context:
-    
+
         object
-            the object about to be deleted
+            The object about to be deleted
