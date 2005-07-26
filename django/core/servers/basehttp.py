@@ -530,6 +530,12 @@ class WSGIServer(HTTPServer):
 
 class WSGIRequestHandler(BaseHTTPRequestHandler):
     server_version = "WSGIServer/" + __version__
+
+    def __init__(self, *args, **kwargs):
+        from django.conf.settings import ADMIN_MEDIA_PREFIX
+        self.admin_media_prefix = ADMIN_MEDIA_PREFIX
+        BaseHTTPRequestHandler.__init__(self, *args, **kwargs)
+
     def get_environ(self):
         env = self.server.base_environ.copy()
         env['SERVER_PROTOCOL'] = self.request_version
@@ -578,6 +584,12 @@ class WSGIRequestHandler(BaseHTTPRequestHandler):
         handler = ServerHandler(self.rfile, self.wfile, self.get_stderr(), self.get_environ())
         handler.request_handler = self      # backpointer for logging
         handler.run(self.server.get_app())
+
+    def log_message(self, format, *args):
+        # Don't bother logging requests for admin images or the favicon.
+        if self.path.startswith(self.admin_media_prefix) or self.path == '/favicon.ico':
+            return
+        sys.stderr.write("[%s] %s\n" % (self.log_date_time_string(), format % args))
 
 def run(port, wsgi_handler):
     server_address = ('', port)
