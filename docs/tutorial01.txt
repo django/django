@@ -284,8 +284,9 @@ your Django settings file.
 Playing with the API
 ====================
 
-Now open the Python interactive shell, and play around with the free Python API
-Django gives you::
+Now, make sure your DJANGO_SETTINGS_MODULE environment variable is set (as
+explained above), and open the Python interactive shell to play around with the
+free Python API Django gives you::
 
     # Modules are dynamically created within django.models.
     # Their names are plural versions of the model class names.
