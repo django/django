@@ -1020,7 +1020,9 @@ def _get_where_clause(lookup_type, table_prefix, field_name, value):
         return '%s%s %s %%s' % (table_prefix, field_name, db.OPERATOR_MAPPING[lookup_type])
     except KeyError:
         pass
-    if lookup_type in ('range', 'year'):
+    if lookup_type == 'in':
+        return '%s%s IN (%s)' % (table_prefix, field_name, ','.join(['%s' for v in value]))
+    elif lookup_type in ('range', 'year'):
         return '%s%s BETWEEN %%s AND %%s' % (table_prefix, field_name)
     elif lookup_type in ('month', 'day'):
         return "%s = %%s" % db.get_date_extract_sql(lookup_type, table_prefix + field_name)
@@ -1635,7 +1637,7 @@ class Field(object):
         "Returns field's value prepared for database lookup."
         if lookup_type in ('exact', 'gt', 'gte', 'lt', 'lte', 'ne', 'month', 'day'):
             return [value]
-        elif lookup_type == 'range':
+        elif lookup_type in ('range', 'in'):
             return value
         elif lookup_type == 'year':
             return ['%s-01-01' % value, '%s-12-31' % value]
