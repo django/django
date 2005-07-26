@@ -1047,27 +1047,6 @@ def _get_cached_row(opts, row, index_start):
             setattr(obj, f.rel.get_cache_name(), rel_obj)
     return obj, index_end
 
-def function_get_list(opts, klass, **kwargs):
-    # kwargs['select'] is a dictionary, and dictionaries' key order is
-    # undefined, so we convert it to a list of tuples internally.
-    kwargs['select'] = kwargs.get('select', {}).items()
-
-    cursor = db.db.cursor()
-    select, sql, params = function_get_sql_clause(opts, **kwargs)
-    cursor.execute("SELECT " + (kwargs.get('distinct') and "DISTINCT " or "") + ",".join(select) + sql, params)
-    obj_list = []
-    fill_cache = kwargs.get('select_related')
-    index_end = len(opts.fields)
-    for row in cursor.fetchall():
-        if fill_cache:
-            obj, index_end = _get_cached_row(opts, row, 0)
-        else:
-            obj = klass(*row[:index_end])
-        for i, k in enumerate(kwargs['select']):
-            setattr(obj, k[0], row[index_end+i])
-        obj_list.append(obj)
-    return obj_list
-
 def function_get_iterator(opts, klass, **kwargs):
     # kwargs['select'] is a dictionary, and dictionaries' key order is
     # undefined, so we convert it to a list of tuples internally.
@@ -1090,6 +1069,9 @@ def function_get_iterator(opts, klass, **kwargs):
             for i, k in enumerate(kwargs['select']):
                 setattr(obj, k[0], row[index_end+i])
             yield obj
+
+def function_get_list(opts, klass, **kwargs):
+    return list(function_get_iterator(opts, klass, **kwargs))
 
 def function_get_count(opts, **kwargs):
     kwargs['order_by'] = []
