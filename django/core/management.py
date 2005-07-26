@@ -16,8 +16,8 @@ APP_ARGS = '[app app ...]'
 
 # Use django.__path__[0] because we don't know which directory django into
 # which has been installed.
-PROJECT_TEMPLATE_DIR = django.__path__[0] + '/conf/%s_template'
-ADMIN_TEMPLATE_DIR = django.__path__[0] + '/conf/admin_templates'
+PROJECT_TEMPLATE_DIR = os.path.join(django.__path__[0], 'conf/%s_template')
+ADMIN_TEMPLATE_DIR = os.path.join(django.__path__[0], 'conf/admin_templates')
 
 def _get_packages_insert(app_label):
     return "INSERT INTO packages (label, name) VALUES ('%s', '%s');" % (app_label, app_label)
