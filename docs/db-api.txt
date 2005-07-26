@@ -66,6 +66,7 @@ The DB API supports the following lookup types:
     gte          Greater than or equal to.
     lt           Less than.
     lte          Less than or equal to.
+    ne           Not equal to.
     startswith   Case-sensitive starts-with:
                  ``polls.get_list(question_startswith="Would")``. (PostgreSQL
                  only. MySQL doesn't support case-sensitive LIKE statements;
