@@ -6,7 +6,7 @@ from django.models import get_module
 from django.utils.httpwrappers import HttpResponse
 import datetime, time
 
-def archive_index(request, app_label, module_name, date_field, num_latest=15, 
+def archive_index(request, app_label, module_name, date_field, num_latest=15,
                   template_name=None, extra_lookup_kwargs={}, extra_context={}):
     """
     Generic top-level archive of date-based objects.
@@ -44,11 +44,11 @@ def archive_index(request, app_label, module_name, date_field, num_latest=15,
     for key, value in extra_context.items():
         if callable(value):
             c[key] = value()
-        else:   
+        else:
             c[key] = value
     return HttpResponse(t.render(c))
 
-def archive_year(request, year, app_label, module_name, date_field, 
+def archive_year(request, year, app_label, module_name, date_field,
                  template_name=None, extra_lookup_kwargs={}, extra_context={}):
     """
     Generic yearly archive view.
@@ -80,13 +80,13 @@ def archive_year(request, year, app_label, module_name, date_field,
     for key, value in extra_context.items():
         if callable(value):
             c[key] = value()
-        else:   
+        else:
             c[key] = value
     return HttpResponse(t.render(c))
 
-def archive_month(request, year, month, app_label, module_name, date_field, 
-                  use_numeric_months=False, template_name=None, 
-                  extra_lookup_kwargs={}, extra_context={}):
+def archive_month(request, year, month, app_label, module_name, date_field,
+                  month_format='%b', template_name=None, extra_lookup_kwargs={},
+                  extra_context={}):
     """
     Generic monthly archive view.
 
@@ -97,17 +97,11 @@ def archive_month(request, year, month, app_label, module_name, date_field,
         object_list:
             list of objects published in the given month
     """
-    if use_numeric_months:
-        try:
-            date = datetime.date(int(year), int(month), 1)
-        except (ValueError, TypeError):
-            raise Http404
-    else:
-        try:
-            date = datetime.date(*time.strptime(year+month, '%Y%b')[:3])
-        except ValueError:
-            raise Http404
-            
+    try:
+        date = datetime.date(*time.strptime(year+month, '%Y'+month_format)[:3])
+    except ValueError:
+        raise Http404
+
     mod = get_module(app_label, module_name)
     now = datetime.datetime.now()
     # Calculate first and last day of month, for use in a date-range lookup.
@@ -138,13 +132,13 @@ def archive_month(request, year, month, app_label, module_name, date_field,
     for key, value in extra_context.items():
         if callable(value):
             c[key] = value()
-        else:   
+        else:
             c[key] = value
     return HttpResponse(t.render(c))
 
-def archive_day(request, year, month, day, app_label, module_name, date_field, 
-                use_numeric_months=False, template_name=None, extra_lookup_kwargs={}, 
-                extra_context={}, allow_empty=False):
+def archive_day(request, year, month, day, app_label, module_name, date_field,
+                month_format='%b', day_format='%d', template_name=None,
+                extra_lookup_kwargs={}, extra_context={}, allow_empty=False):
     """
     Generic daily archive view.
 
@@ -159,16 +153,10 @@ def archive_day(request, year, month, day, app_label, module_name, date_field,
         next_day
             (datetime) the next day, or None if the current day is today
     """
-    if use_numeric_months:
-        try:
-            date = datetime.date(int(year), int(month), int(day))
-        except (ValueError, TypeError):
-            raise Http404
-    else:    
-        try:
-            date = datetime.date(*time.strptime(year+month+day, '%Y%b%d')[:3])
-        except ValueError:
-            raise Http404
+    try:
+        date = datetime.date(*time.strptime(year+month+day, '%Y'+month_format+day_format)[:3])
+    except ValueError:
+        raise Http404
 
     mod = get_module(app_label, module_name)
     now = datetime.datetime.now()
@@ -194,7 +182,7 @@ def archive_day(request, year, month, day, app_label, module_name, date_field,
     for key, value in extra_context.items():
         if callable(value):
             c[key] = value()
-        else:   
+        else:
             c[key] = value
     return HttpResponse(t.render(c))
 
@@ -210,10 +198,10 @@ def archive_today(request, **kwargs):
     })
     return archive_day(request, **kwargs)
 
-def object_detail(request, year, month, day, app_label, module_name, date_field, 
-                  use_numeric_months=False, object_id=None, slug=None, slug_field=None, 
-                  template_name=None, template_name_field=None, extra_lookup_kwargs={}, 
-                  extra_context={}):
+def object_detail(request, year, month, day, app_label, module_name, date_field,
+                  month_format='%b', day_format='%d', object_id=None, slug=None,
+                  slug_field=None, template_name=None, template_name_field=None,
+                  extra_lookup_kwargs={}, extra_context={}):
     """
     Generic detail view from year/month/day/slug or year/month/day/id structure.
 
@@ -222,16 +210,10 @@ def object_detail(request, year, month, day, app_label, module_name, date_field,
         object:
             the object to be detailed
     """
-    if use_numeric_months:
-        try:
-            date = datetime.date(int(year), int(month), int(day))
-        except (ValueError, TypeError):
-            raise Http404
-    else:    
-        try:
-            date = datetime.date(*time.strptime(year+month+day, '%Y%b%d')[:3])
-        except ValueError:
-            raise Http404
+    try:
+        date = datetime.date(*time.strptime(year+month+day, '%Y'+month_format+day_format)[:3])
+    except ValueError:
+        raise Http404
 
     mod = get_module(app_label, module_name)
     now = datetime.datetime.now()
@@ -265,7 +247,7 @@ def object_detail(request, year, month, day, app_label, module_name, date_field,
     for key, value in extra_context.items():
         if callable(value):
             c[key] = value()
-        else:   
+        else:
             c[key] = value
     response = HttpResponse(t.render(c))
     populate_xheaders(request, response, app_label, module_name, getattr(object, object._meta.pk.name))

@@ -126,10 +126,14 @@ The date-based generic functions are:
 
 ``archive_month``
     Monthly archive. Requires that ``year`` and ``month`` arguments be given.
-    You may pass the additional option ``use_numeric_months`` if you'd like to
-    use URLs that use numbers instead of names for months (i.e. ``/2005/01/15/``
-    instead of ``/2005/jan/15/``.
-    
+    You can pass the additional option ``month_format`` if you'd like to change
+    the way months are specified in the URL.
+
+    ``month_format`` is a format string in the same syntax accepted by Python's
+    ``time.strftime``. (See the `strftime docs`_.) It's set to ``"%b"`` by
+    default, which is a three-letter month abbreviation. To change it to use
+    numbers, use ``"%m"``.
+
     Uses the template ``app_label/module_name__archive_month`` by default.
 
     Has the following template context:
@@ -142,6 +146,10 @@ The date-based generic functions are:
 ``archive_day``
     Daily archive. Requires that ``year``, ``month``, and ``day`` arguments be
     given.
+
+    As in ``archive_month``, you can pass an optional ``month_format``. You can
+    also pass ``day_format``, which defaults to ``"%d"`` (day of the month as a
+    decimal number, 1-31).
 
     Uses the template ``app_label/module_name__archive_day`` by default.
 
@@ -176,6 +184,11 @@ The date-based generic functions are:
 
     You can also pass the ``template_name_field`` argument to indicate that the
     the object stores the name of its template in a field on the object itself.
+
+    As in ``archive_day``, ``object_detail`` takes optional ``month_format``
+    and ``day_format`` parameters.
+
+.. _strftime docs: http://www.python.org/doc/current/lib/module-time.html#l2h-1941
 
 Using list/detail generic views
 ===============================
