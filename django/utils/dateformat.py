@@ -293,7 +293,7 @@ class TimeFormat:
             return 'noon'
         return '%s %s' % (self.f(), self.a())
 
-    def s(self, s):
+    def s(self):
         "Seconds; i.e. '00' to '59'"
         return '%02d' % self.time.second
 
