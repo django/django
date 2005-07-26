@@ -119,7 +119,7 @@ def get_sql_delete(mod):
                 cursor.execute("SELECT 1 FROM %s LIMIT 1" % klass._meta.db_table)
         except:
             # The table doesn't exist, so it doesn't need to be dropped.
-            pass
+            db.db.rollback()
         else:
             output.append("DROP TABLE %s;" % klass._meta.db_table)
     for klass in mod._MODELS:
@@ -129,7 +129,7 @@ def get_sql_delete(mod):
                 if cursor is not None:
                     cursor.execute("SELECT 1 FROM %s LIMIT 1" % f.get_m2m_db_table(opts))
             except:
-                pass
+                db.db.rollback()
             else:
                 output.append("DROP TABLE %s;" % f.get_m2m_db_table(opts))
 
