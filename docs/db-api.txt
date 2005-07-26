@@ -97,6 +97,19 @@ Multiple lookups are allowed, of course, and are translated as "AND"s::
 
 ...retrieves all polls published in January 2005 that have a question starting with "Would."
 
+For convenience, there's a ``pk`` lookup type, which translates into
+``(primary_key)__exact``. In the polls example, these two statements are
+equivalent::
+
+    polls.get_object(id__exact=3)
+    polls.get_object(pk=3)
+
+``pk`` lookups also work across joins. In the polls example, these two
+statements are equivalent::
+
+    choices.get_list(poll__id__exact=3)
+    choices.get_list(poll__pk=3)
+
 Ordering
 ========
 

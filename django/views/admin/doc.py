@@ -1,6 +1,3 @@
-import os
-import re
-import inspect
 from django.core import meta
 from django import templatetags
 from django.conf import settings
@@ -14,6 +11,7 @@ try:
     from django.parts.admin import doc
 except ImportError:
     doc = None
+import inspect, os, re
 
 # Exclude methods starting with these strings from documentation
 MODEL_METHODS_EXCLUDE = ('_', 'add_', 'delete', 'save', 'set_')
@@ -128,7 +126,7 @@ def view_index(request):
                 'module' : func.__module__,
                 'title'  : title,
                 'site_id': settings_mod.SITE_ID,
-                'site'   : sites.get_object(id__exact=settings_mod.SITE_ID),
+                'site'   : sites.get_object(pk=settings_mod.SITE_ID),
                 'url'    : simplify_regex(regex),
             })
     t = template_loader.get_template('doc/view_index')

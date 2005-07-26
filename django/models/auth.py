@@ -222,7 +222,7 @@ class Session(meta.Model):
         "Sets the necessary cookie in the given HttpResponse object, also updates last login time for user."
         from django.models.auth import users
         from django.conf.settings import REGISTRATION_COOKIE_DOMAIN
-        user = users.get_object(id__exact=user_id)
+        user = users.get_object(pk=user_id)
         user.last_login = datetime.datetime.now()
         user.save()
         session = create_session(user_id)
@@ -274,7 +274,7 @@ class LogEntry(meta.Model):
 
     def get_edited_object(self):
         "Returns the edited object represented by this log entry"
-        return self.get_content_type().get_object_for_this_type(id__exact=self.object_id)
+        return self.get_content_type().get_object_for_this_type(pk=self.object_id)
 
     def get_admin_url(self):
         """

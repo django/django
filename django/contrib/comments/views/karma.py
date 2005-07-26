@@ -19,14 +19,14 @@ def vote(request, comment_id, vote):
     if request.user.is_anonymous():
         raise Http404, "Anonymous users cannot vote"
     try:
-        comment = comments.get_object(id__exact=comment_id)
+        comment = comments.get_object(pk=comment_id)
     except comments.CommentDoesNotExist:
         raise Http404, "Invalid comment ID"
     if comment.user_id == request.user.id:
         raise Http404, "No voting for yourself"
     karma.vote(request.user.id, comment_id, rating)
     # Reload comment to ensure we have up to date karma count
-    comment = comments.get_object(id__exact=comment_id)
+    comment = comments.get_object(pk=comment_id)
     t = template_loader.get_template('comments/karma_vote_accepted')
     c = Context(request, {
         'comment': comment

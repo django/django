@@ -242,7 +242,7 @@ for a given poll. Here's the view::
     from django.core.exceptions import Http404
     def detail(request, poll_id):
         try:
-            p = polls.get_object(id__exact=poll_id)
+            p = polls.get_object(pk=poll_id)
         except polls.PollDoesNotExist:
             raise Http404
         t = template_loader.get_template('polls/detail')

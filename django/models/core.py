@@ -14,7 +14,7 @@ class Site(meta.Model):
     def _module_get_current():
         "Returns the current site, according to the SITE_ID constant."
         from django.conf.settings import SITE_ID
-        return get_object(id__exact=SITE_ID)
+        return get_object(pk=SITE_ID)
 
 class Package(meta.Model):
     db_table = 'packages'

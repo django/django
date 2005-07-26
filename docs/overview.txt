@@ -93,6 +93,12 @@ is created on the fly: No code generation necessary::
         ...
     django.models.news.ReporterDoesNotExist: Reporter does not exist for {'id__exact': 2}
 
+    # Lookup by a primary key is the most common case, so Django provides a
+    # shortcut for primary-key exact lookups.
+    # The following is identical to reporters.get_object(id__exact=1).
+    >>> reporters.get_object(pk=1)
+    John Smith
+
     # Create an article.
     >>> from datetime import datetime
     >>> a = articles.Article(id=None, pub_date=datetime.now(), headline='Django is cool', article='Yeah.', reporter_id=1)
@@ -200,7 +206,7 @@ article_detail from above::
     def article_detail(request, year, month, article_id):
         # Use the Django API to find an object matching the URL criteria.
         try:
-            a = articles.get_object(pub_date__year=year, pub_date__month=month, id__exact=article_id)
+            a = articles.get_object(pub_date__year=year, pub_date__month=month, pk=article_id)
         except articles.ArticleDoesNotExist:
             raise Http404
         t = template_loader.get_template('news/article_detail')

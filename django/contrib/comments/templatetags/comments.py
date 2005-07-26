@@ -80,7 +80,7 @@ class CommentFormNode(template.Node):
             # We only have to do this validation if obj_id_lookup_var is provided,
             # because do_comment_form() validates hard-coded object IDs.
             try:
-                self.content_type.get_object_for_this_type(id__exact=self.obj_id)
+                self.content_type.get_object_for_this_type(pk=self.obj_id)
             except ObjectDoesNotExist:
                 context['display_form'] = False
             else:
@@ -203,7 +203,7 @@ class DoCommentForm:
         if tokens[3].isdigit():
             obj_id = tokens[3]
             try: # ensure the object ID is valid
-                content_type.get_object_for_this_type(id__exact=obj_id)
+                content_type.get_object_for_this_type(pk=obj_id)
             except ObjectDoesNotExist:
                 raise template.TemplateSyntaxError, "'%s' tag refers to %s object with ID %s, which doesn't exist" % (self.tag_name, content_type.name, obj_id)
         else:
@@ -283,7 +283,7 @@ class DoCommentCount:
         if tokens[3].isdigit():
             obj_id = tokens[3]
             try: # ensure the object ID is valid
-                content_type.get_object_for_this_type(id__exact=obj_id)
+                content_type.get_object_for_this_type(pk=obj_id)
             except ObjectDoesNotExist:
                 raise template.TemplateSyntaxError, "'%s' tag refers to %s object with ID %s, which doesn't exist" % (self.tag_name, content_type.name, obj_id)
         else:
@@ -338,7 +338,7 @@ class DoGetCommentList:
         if tokens[3].isdigit():
             obj_id = tokens[3]
             try: # ensure the object ID is valid
-                content_type.get_object_for_this_type(id__exact=obj_id)
+                content_type.get_object_for_this_type(pk=obj_id)
             except ObjectDoesNotExist:
                 raise template.TemplateSyntaxError, "'%s' tag refers to %s object with ID %s, which doesn't exist" % (self.tag_name, content_type.name, obj_id)
         else:

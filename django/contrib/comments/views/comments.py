@@ -197,7 +197,7 @@ def post_comment(request):
         rating_range, rating_choices = [], []
     content_type_id, object_id = target.split(':') # target is something like '52:5157'
     try:
-        obj = contenttypes.get_object(id__exact=content_type_id).get_object_for_this_type(id__exact=object_id)
+        obj = contenttypes.get_object(pk=content_type_id).get_object_for_this_type(pk=object_id)
     except ObjectDoesNotExist:
         raise Http404, "The comment form had an invalid 'target' parameter -- the object ID was invalid"
     option_list = options.split(',') # options is something like 'pa,ra'
@@ -284,9 +284,9 @@ def post_free_comment(request):
     if comments.get_security_hash(options, '', '', target) != security_hash:
         raise Http404, "Somebody tampered with the comment form (security violation)"
     content_type_id, object_id = target.split(':') # target is something like '52:5157'
-    content_type = contenttypes.get_object(id__exact=content_type_id)
+    content_type = contenttypes.get_object(pk=content_type_id)
     try:
-        obj = content_type.get_object_for_this_type(id__exact=object_id)
+        obj = content_type.get_object_for_this_type(pk=object_id)
     except ObjectDoesNotExist:
         raise Http404, "The comment form had an invalid 'target' parameter -- the object ID was invalid"
     option_list = options.split(',')
@@ -336,8 +336,8 @@ def comment_was_posted(request):
     if request.GET.has_key('c'):
         content_type_id, object_id = request.GET['c'].split(':')
         try:
-            content_type = contenttypes.get_object(id__exact=content_type_id)
-            obj = content_type.get_object_for_this_type(id__exact=object_id)
+            content_type = contenttypes.get_object(pk=content_type_id)
+            obj = content_type.get_object_for_this_type(pk=object_id)
         except ObjectDoesNotExist:
             pass
     t = template_loader.get_template('comments/posted')

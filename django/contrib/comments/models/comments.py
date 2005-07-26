@@ -78,7 +78,7 @@ class Comment(meta.Model):
         """
         from django.core.exceptions import ObjectDoesNotExist
         try:
-            return self.get_content_type().get_object_for_this_type(id__exact=self.object_id)
+            return self.get_content_type().get_object_for_this_type(pk=self.object_id)
         except ObjectDoesNotExist:
             return None
 
@@ -193,7 +193,7 @@ class FreeComment(meta.Model):
         """
         from django.core.exceptions import ObjectDoesNotExist
         try:
-            return self.get_content_type().get_object_for_this_type(id__exact=self.object_id)
+            return self.get_content_type().get_object_for_this_type(pk=self.object_id)
         except ObjectDoesNotExist:
             return None
 

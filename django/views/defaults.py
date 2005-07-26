@@ -7,8 +7,8 @@ from django.utils import httpwrappers
 def shortcut(request, content_type_id, object_id):
     from django.models.core import contenttypes
     try:
-        content_type = contenttypes.get_object(id__exact=content_type_id)
-        obj = content_type.get_object_for_this_type(id__exact=object_id)
+        content_type = contenttypes.get_object(pk=content_type_id)
+        obj = content_type.get_object_for_this_type(pk=object_id)
     except ObjectDoesNotExist:
         raise Http404, "Content type %s object %s doesn't exist" % (content_type_id, object_id)
     if not hasattr(obj, 'get_absolute_url'):

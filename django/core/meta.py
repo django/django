@@ -1146,6 +1146,9 @@ def _parse_lookup(kwarg_items, opts, table_count=0):
                 params.extend(params2)
             continue
         lookup_list = kwarg.split(LOOKUP_SEPARATOR)
+        # pk="value" is shorthand for (primary key)__exact="value"
+        if lookup_list[-1] == 'pk':
+            lookup_list = lookup_list[:-1] + [opts.pk.name, 'exact']
         if len(lookup_list) == 1:
             _throw_bad_kwarg_error(kwarg)
         lookup_type = lookup_list.pop()
