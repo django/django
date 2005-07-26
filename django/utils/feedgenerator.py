@@ -1,9 +1,6 @@
 """
 Syndication feed generation library -- used for generating RSS, etc.
 
-By Adrian Holovaty
-Released under the Python license
-
 Sample usage:
 
 >>> feed = feedgenerator.Rss201rev2Feed(
@@ -89,7 +86,7 @@ class RssFeed(SyndicationFeed):
             self.writeRssItem(handler, item)
         self.endChannelElement(handler)
         self.endRssElement(handler)
-        
+
     def writeRssElement(self, handler):
         "Adds the <rss> element to handler, taking care of versioning, etc."
         raise NotImplementedError
