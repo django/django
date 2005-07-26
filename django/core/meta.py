@@ -1645,9 +1645,9 @@ class Field(object):
             return ["%%%s%%" % prep_for_like_query(value)]
         elif lookup_type == 'iexact':
             return [prep_for_like_query(value)]
-        elif lookup_type == 'startswith':
+        elif lookup_type in ('startswith', 'istartswith'):
             return ["%s%%" % prep_for_like_query(value)]
-        elif lookup_type == 'endswith':
+        elif lookup_type in ('endswith', 'iendswith'):
             return ["%%%s" % prep_for_like_query(value)]
         elif lookup_type == 'isnull':
             return []
