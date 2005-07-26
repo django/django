@@ -330,7 +330,7 @@ change that by giving that method a ``short_description`` attribute::
 Let's add another improvement to the Poll change list page: Filters. Add the
 following line to ``Poll.admin``::
 
-    list_filter = ('pub_date', )
+    list_filter = ['pub_date'],
 
 That adds a "Filter" sidebar that lets people filter the change list by the
 ``pub_date`` field:
@@ -347,7 +347,7 @@ fields.
 
 This is shaping up well. Let's add some search capability::
 
-    search_fields = ('question', )
+    search_fields = ['question'],
 
 That adds a search box at the top of the change list. When somebody enters
 search terms, Django will search the ``question`` field. You can use as many
