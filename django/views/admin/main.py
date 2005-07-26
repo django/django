@@ -79,6 +79,9 @@ def change_list(request, app_label, module_name):
     if opts.one_to_one_field:
         lookup_mod = opts.one_to_one_field.rel.to.get_model_module()
         lookup_opts = lookup_mod.Klass._meta
+        # If lookup_opts doesn't have admin set, give it the default meta.Admin().
+        if not lookup_opts.admin:
+            lookup_opts.admin = meta.Admin()
 
     # Get search parameters from the query string.
     try:
