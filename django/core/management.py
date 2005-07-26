@@ -132,9 +132,20 @@ def get_sql_delete(mod):
                 pass
             else:
                 output.append("DROP TABLE %s;" % f.get_m2m_db_table(opts))
-    output.append("DELETE FROM packages WHERE label = '%s';" % mod._MODELS[0]._meta.app_label)
-    output.append("DELETE FROM auth_permissions WHERE package = '%s';" % mod._MODELS[0]._meta.app_label)
-    output.append("DELETE FROM content_types WHERE package = '%s';" % mod._MODELS[0]._meta.app_label)
+
+    app_label = mod._MODELS[0]._meta.app_label
+
+    # Delete from packages, auth_permissions, content_types.
+    output.append("DELETE FROM packages WHERE label = '%s';" % app_label)
+    output.append("DELETE FROM auth_permissions WHERE package = '%s';" % app_label)
+    output.append("DELETE FROM content_types WHERE package = '%s';" % app_label)
+
+    # Delete from the admin log.
+    if cursor is not None:
+        cursor.execute("SELECT id FROM content_types WHERE package = %s", [app_label])
+        for row in cursor.fetchall():
+            output.append("DELETE FROM auth_admin_log WHERE content_type_id = %s;" % row[0])
+
     return output[::-1] # Reverse it, to deal with table dependencies.
 get_sql_delete.help_doc = "Prints the DROP TABLE SQL statements for the given app(s)."
 get_sql_delete.args = APP_ARGS
