@@ -3,6 +3,7 @@ from django.core import template_loader
 from django.core.extensions import DjangoContext as Context
 from django.models.auth import sessions, users
 from django.views.registration import passwords
+from django.views.auth.login import logout
 import base64, md5
 import cPickle as pickle
 from django.conf.settings import SECRET_KEY
@@ -26,8 +27,9 @@ class AdminUserRequired:
 
         # If this is the password reset view, we don't want to require login
         # Otherwise the password reset would need its own entry in the httpd
-        # conf, which is a little uglier than this.
-        if view_func == passwords.password_reset or view_func == passwords.password_reset_done:
+        # conf, which is a little uglier than this. Same goes for the logout
+        # view.
+        if view_func in (passwords.password_reset, passwords.password_reset_done, logout):
             return
 
         # Check for a logged in, valid user
