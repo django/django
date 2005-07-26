@@ -401,9 +401,13 @@ def createsuperuser():
         while 1:
             password = getpass.getpass()
             password2 = getpass.getpass('Password (again): ')
-            if password == password2:
-                break
-            sys.stderr.write("Error: Your passwords didn't match.\n")
+            if password != password2:
+                sys.stderr.write("Error: Your passwords didn't match.\n")
+                continue
+            if password.strip() == '':
+                sys.stderr.write("Error: Blank passwords aren't allowed.\n")
+                continue
+            break
     except KeyboardInterrupt:
         sys.stderr.write("\nOperation cancelled.\n")
         sys.exit(1)
