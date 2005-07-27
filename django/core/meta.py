@@ -522,7 +522,7 @@ class ModelBase(type):
             # RECURSIVE_RELATIONSHIP_CONSTANT, create that relationship formally.
             if f.rel and f.rel.to == RECURSIVE_RELATIONSHIP_CONSTANT:
                 f.rel.to = opts
-                f.name = (f.rel.name or f.rel.to.object_name.lower()) + '_' + f.rel.to.pk.name
+                f.name = f.name or ((f.rel.name or f.rel.to.object_name.lower()) + '_' + f.rel.to.pk.name)
                 f.verbose_name = f.verbose_name or f.rel.to.verbose_name
                 f.rel.field_name = f.rel.field_name or f.rel.to.pk.name
             # Add "get_thingie" methods for many-to-one related objects.
@@ -2046,7 +2046,7 @@ class ForeignKey(Field):
             to_name = to._meta.object_name.lower()
         except AttributeError: # to._meta doesn't exist, so it must be RECURSIVE_RELATIONSHIP_CONSTANT
             assert to == 'self', "ForeignKey(%r) is invalid. First parameter to ForeignKey must be either a model or the string %r" % (to, RECURSIVE_RELATIONSHIP_CONSTANT)
-            kwargs['name'] = ''
+            kwargs['name'] = kwargs.get('name', '')
             kwargs['verbose_name'] = kwargs.get('verbose_name', '')
         else:
             to_field = to_field or to._meta.pk.name
