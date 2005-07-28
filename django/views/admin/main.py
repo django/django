@@ -103,9 +103,9 @@ def change_list(request, app_label, module_name):
     ordering = meta.handle_legacy_orderlist(ordering)
 
     if ordering[0].startswith('-'):
-        order_field, order_type = ordering[0][1:], 'DESC'
+        order_field, order_type = ordering[0][1:], 'desc'
     else:
-        order_field, order_type = ordering[0], 'ASC'
+        order_field, order_type = ordering[0], 'asc'
     if params.has_key(ORDER_VAR):
         try:
             try:
@@ -143,7 +143,8 @@ def change_list(request, app_label, module_name):
             if isinstance(f.rel, meta.ManyToOne):
                 lookup_params['select_related'] = True
                 break
-    lookup_params['order_by'] = ((order_type == 'DESC' and '-' or '') + lookup_order_field,)
+    lookup_params['order_by'] = ((order_type == 'desc' and '-' or '') + lookup_order_field,)
+    assert False, lookup_params['order_by']
     if lookup_opts.admin.search_fields and query:
         or_queries = []
         for bit in query.split():
