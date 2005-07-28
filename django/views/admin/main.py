@@ -144,7 +144,6 @@ def change_list(request, app_label, module_name):
                 lookup_params['select_related'] = True
                 break
     lookup_params['order_by'] = ((order_type == 'desc' and '-' or '') + lookup_order_field,)
-    assert False, lookup_params['order_by']
     if lookup_opts.admin.search_fields and query:
         or_queries = []
         for bit in query.split():
