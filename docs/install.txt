@@ -31,12 +31,12 @@ Get your database running
 
 If you plan to use Django's database API functionality, you'll need to
 make sure a database server is running. Django works with PostgreSQL_
-(recommended) or MySQL_.
+(recommended), MySQL_ and SQLite_.
 
-Note that MySQL support is a recent development, and Django hasn't been
-comprehensively tested with that database. If you find any bugs in Django's
-MySQL bindings, please file them in `Django's ticket system`_ so we can fix them
-immediately.
+Note that support for MySQL and SQLite is a recent development, and Django
+hasn't been comprehensively tested in those environments. If you find any bugs
+in Django's MySQL or SQLite bindings, please file them in
+`Django's ticket system`_ so we can fix them immediately.
 
 Additionally, you'll need to make sure your Python database bindings are
 installed.
@@ -45,6 +45,7 @@ installed.
   not version 2, which is still in beta). If you're on Windows, check out the
   unofficial `compiled Windows version`_.
 * If you're using MySQL, you'll need MySQLdb_.
+* If you're using SQLite, you'll need pysqlite_. Use version 2.0.3 or higher.
 
 .. _PostgreSQL: http://www.postgresql.org/
 .. _MySQL: http://www.mysql.com/
@@ -52,6 +53,8 @@ installed.
 .. _psycopg: http://initd.org/projects/psycopg1
 .. _compiled Windows version: http://stickpeople.com/projects/python/win-psycopg/
 .. _MySQLdb: http://sourceforge.net/projects/mysql-python
+.. _SQLite: http://www.sqlite.org/
+.. _pysqlite: http://initd.org/tracker/pysqlite
 
 Install the Django code
 =======================
