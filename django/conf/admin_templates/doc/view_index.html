@@ -2,20 +2,15 @@
 
 {% block coltype %}colSM{% endblock %}
 
-{% block breadcrumbs %}<div class="breadcrumbs"><a href="/">Home</a> &rsaquo; <a href="/doc/">Documentation</a> &rsaquo; Views</div>{% endblock %}
+{% block breadcrumbs %}<div class="breadcrumbs"><a href="../../">Home</a> &rsaquo; <a href="../">Documentation</a> &rsaquo; Views</div>{% endblock %}
 
 {% block title %}Views{% endblock %}
 
-
 {% block content %}
-
-
 
 <h1>View documentation</h1>
 
-
 <div id="content-main">
-
 
 {% regroup views|dictsort:"site_id" by site as views_by_site %}
 {% for site_views in views_by_site %}
@@ -33,7 +28,6 @@
 {% endfor %}
 
 </div>
-
 
 {% endblock %}
 
