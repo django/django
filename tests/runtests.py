@@ -46,7 +46,7 @@ class TestRunner:
     def run_tests(self):
         from django.conf import settings
         from django.core.db import db
-        from django.core import management
+        from django.core import management, meta
 
         # Manually set INSTALLED_APPS to point to the test app.
         settings.INSTALLED_APPS = (APP_NAME,)
@@ -89,7 +89,7 @@ class TestRunner:
         for model_name in test_models:
             self.output(1, "%s model: Importing" % model_name)
             try:
-                mod = __import__(APP_NAME + '.models.' + model_name, '', '', [''])
+                mod = meta.get_app(model_name)
             except Exception, e:
                 log_error(model_name, "Error while importing", ''.join(traceback.format_exception(*sys.exc_info())[1:]))
                 continue
