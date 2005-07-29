@@ -1,0 +1,66 @@
+"""
+5. Many-to-many relationships
+
+To define a many-to-many relationship, use ManyToManyField().
+
+In this example, an article can be published in multiple publications,
+and a publication has multiple articles.
+"""
+
+from django.core import meta
+
+class Publication(meta.Model):
+    fields = (
+        meta.CharField('title', maxlength=30),
+    )
+
+    def __repr__(self):
+        return self.title
+
+class Article(meta.Model):
+    fields = (
+        meta.CharField('headline', maxlength=100),
+        meta.ManyToManyField(Publication),
+    )
+
+    def __repr__(self):
+        return self.headline
+
+API_TESTS = """
+# Create a couple of Publications.
+>>> p1 = publications.Publication(id=None, title='The Python Journal')
+>>> p1.save()
+>>> p2 = publications.Publication(id=None, title='Science News')
+>>> p2.save()
+
+# Create an Article.
+>>> a1 = articles.Article(id=None, headline='Django lets you build Web apps easily')
+>>> a1.save()
+
+# Associate the Article with one Publication. set_publications() returns a
+# boolean, representing whether any records were added or deleted.
+>>> a1.set_publications([p1.id])
+True
+
+# If we set it again, it'll return False, because the list of Publications
+# hasn't changed.
+>>> a1.set_publications([p1.id])
+False
+
+# Create another Article, and set it to appear in both Publications.
+>>> a2 = articles.Article(id=None, headline='NASA uses Python')
+>>> a2.save()
+>>> a2.set_publications([p1.id, p2.id])
+True
+>>> a2.set_publications([p1.id])
+True
+>>> a2.set_publications([p1.id, p2.id])
+True
+
+# Article objects have access to their related Publication objects.
+>>> a1.get_publication_list()
+[The Python Journal]
+>>> a2.get_publication_list()
+[The Python Journal, Science News]
+
+"""
