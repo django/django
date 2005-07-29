@@ -65,4 +65,9 @@ ArticleDoesNotExist: Article does not exist for {'id__exact': 2}
 >>> articles.get_object(pk=1)
 <Article object>
 
+# Model instances of the same type and same ID are considered equal.
+>>> a = articles.get_object(pk=1)
+>>> b = articles.get_object(pk=1)
+>>> a == b
+True
 """
