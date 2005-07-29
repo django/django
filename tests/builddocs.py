@@ -22,7 +22,7 @@ MODEL_DOC_TEMPLATE = """
 {% for model in models %}
 <h3>{{ model.name }} objects have the following methods:</h3>
 <ul>
-{% for method in model.methods %}<li><span class="pre">{{ method }}()</span></li>
+{% for method in model.methods %}<li><tt class="docutils literal"><span class="pre">{{ method }}()</span></tt></li>
 {% endfor %}</ul>
 {% endfor %}
 
