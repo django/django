@@ -15,10 +15,10 @@ MODEL_DOC_TEMPLATE = """
 {{ blurb }}
 
 <h2>Model source code</h2>
-<pre>{{ model_source }}</pre>
+<pre class="literal-block">{{ model_source }}</pre>
 
 <h2>Sample API usage</h2>
-<pre>{{ api_usage }}</pre>
+<pre class="literal-block">{{ api_usage }}</pre>
 </div>
 """
 
