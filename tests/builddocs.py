@@ -17,6 +17,15 @@ MODEL_DOC_TEMPLATE = """
 <h2>Model source code</h2>
 <pre class="literal-block">{{ model_source }}</pre>
 
+<h2>API reference</h2>
+
+{% for model in models %}
+<h3>{{ model.name }} objects have the following methods:</h3>
+<ul>
+{% for method in model.methods %}<li><span class="pre">{{ method }}()</span></li>
+{% endfor %}</ul>
+{% endfor %}
+
 <h2>Sample API usage</h2>
 <pre class="literal-block">{{ api_usage }}</pre>
 </div>
@@ -45,6 +54,13 @@ def make_docs_from_model_tests(output_dir):
         model_source = model_source.replace('""""""\n', '\n')
         model_source = model_source.replace('API_TESTS = ', '')
         model_source = model_source.strip()
+
+        models = []
+        for m in mod._MODELS:
+            models.append({
+                'name': m._meta.object_name,
+                'methods': [method for method in dir(m) if not method.startswith('_')],
+            })
 
         # Run this through the template system.
         t = template.Template(MODEL_DOC_TEMPLATE)
