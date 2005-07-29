@@ -51,24 +51,29 @@ class TestRunner:
         # Manually set INSTALLED_APPS to point to the test app.
         settings.INSTALLED_APPS = (APP_NAME,)
 
-        # Create the test database and connect to it. We need autocommit() because
-        # PostgreSQL doesn't allow CREATE DATABASE statements within transactions.
-        cursor = db.cursor()
-        try:
-            db.connection.autocommit()
-        except AttributeError:
-            pass
-        self.output(1, "Creating test database")
-        try:
-            cursor.execute("CREATE DATABASE %s" % TEST_DATABASE_NAME)
-        except:
-            confirm = raw_input("The test database, %s, already exists. Type 'yes' to delete it, or 'no' to cancel: " % TEST_DATABASE_NAME)
-            if confirm == 'yes':
-                cursor.execute("DROP DATABASE %s" % TEST_DATABASE_NAME)
+        # If we're using SQLite, it's more convient to test against an in-memory database
+        if settings.DATABASE_ENGINE == "sqlite3":
+            global TEST_DATABASE_NAME
+            TEST_DATABASE_NAME = ":memory:"
+        else:     
+            # Create the test database and connect to it. We need autocommit() because
+            # PostgreSQL doesn't allow CREATE DATABASE statements within transactions.
+            cursor = db.cursor()
+            try:
+                db.connection.autocommit()
+            except AttributeError:
+                pass
+            self.output(1, "Creating test database")
+            try:
                 cursor.execute("CREATE DATABASE %s" % TEST_DATABASE_NAME)
-            else:
-                print "Tests cancelled."
-                return
+            except:
+                confirm = raw_input("The test database, %s, already exists. Type 'yes' to delete it, or 'no' to cancel: " % TEST_DATABASE_NAME)
+                if confirm == 'yes':
+                    cursor.execute("DROP DATABASE %s" % TEST_DATABASE_NAME)
+                    cursor.execute("CREATE DATABASE %s" % TEST_DATABASE_NAME)
+                else:
+                    print "Tests cancelled."
+                    return
         db.close()
         old_database_name = settings.DATABASE_NAME
         settings.DATABASE_NAME = TEST_DATABASE_NAME
@@ -101,20 +106,22 @@ class TestRunner:
             self.output(1, "%s model: Running tests" % model_name)
             runner.run(dtest, clear_globs=True, out=sys.stdout.write)
 
-        # Remove the test database, to clean up after ourselves. Connect to the
-        # previous database (not the test database) to do so, because it's not
-        # allowed to delete a database while being connected to it.
-        db.close()
-        settings.DATABASE_NAME = old_database_name
-        cursor = db.cursor()
-        self.output(1, "Deleting test database")
-        try:
-            db.connection.autocommit()
-        except AttributeError:
-            pass
-        else:
-            time.sleep(1) # To avoid "database is being accessed by other users" errors.
-        cursor.execute("DROP DATABASE %s" % TEST_DATABASE_NAME)
+        # Unless we're using SQLite, remove the test database, to clean up after
+        # ourselves. Connect to the previous database (not the test database) 
+        # to do so, because it's not allowed to delete a database while being 
+        # connected to it.
+        if settings.DATABASE_ENGINE != "sqlite3":
+            db.close()
+            settings.DATABASE_NAME = old_database_name
+            cursor = db.cursor()
+            self.output(1, "Deleting test database")
+            try:
+                db.connection.autocommit()
+            except AttributeError:
+                pass
+            else:
+                time.sleep(1) # To avoid "database is being accessed by other users" errors.
+            cursor.execute("DROP DATABASE %s" % TEST_DATABASE_NAME)
 
         # Display output.
         if error_list:
