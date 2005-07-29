@@ -68,4 +68,6 @@ Jane Doe
 This is a test
 >>> w2.get_article()
 This is a test
+>>> r1.get_writer_list()
+[John Smith (Main writer)]
 """
