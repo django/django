@@ -21,8 +21,16 @@ def typecast_timestamp(s): # does NOT store time zone information
     # "2005-07-29 09:56:00-05"
     if not s: return None
     d, t = s.split()
-    if t[-3] in ('-', '+'):
-        t = t[:-3] # Remove the time-zone information, if it exists.
+    # Extract timezone information, if it exists. Currently we just throw
+    # it away, but in the future we may make use of it.
+    if '-' in t:
+        t, tz = t.split('-', 1)
+        tz = '-' + tz
+    elif '+' in t:
+        t, tz = t.split('+', 1)
+        tz = '+' + tz
+    else:
+        tz = ''
     dates = d.split('-')
     times = t.split(':')
     seconds = times[2]
