@@ -17,6 +17,11 @@ def log_error(model_name, title, description):
         'description': description,
     })
 
+MODEL_DIR = os.path.join(os.path.dirname(__file__), APP_NAME, 'models')
+
+def get_test_models():
+    return [f[:-3] for f in os.listdir(MODEL_DIR) if f.endswith('.py') and not f.startswith('__init__')]
+
 class DjangoDoctestRunner(doctest.DocTestRunner):
     def __init__(self, verbosity_level, *args, **kwargs):
         self.verbosity_level = verbosity_level
@@ -51,13 +56,15 @@ class TestRunner:
         # Manually set INSTALLED_APPS to point to the test app.
         settings.INSTALLED_APPS = (APP_NAME,)
 
-        # If we're using SQLite, it's more convient to test against an in-memory database
+        # If we're using SQLite, it's more convenient to test against an
+        # in-memory database.
         if settings.DATABASE_ENGINE == "sqlite3":
             global TEST_DATABASE_NAME
             TEST_DATABASE_NAME = ":memory:"
-        else:     
-            # Create the test database and connect to it. We need autocommit() because
-            # PostgreSQL doesn't allow CREATE DATABASE statements within transactions.
+        else:
+            # Create the test database and connect to it. We need autocommit()
+            # because PostgreSQL doesn't allow CREATE DATABASE statements
+            # within transactions.
             cursor = db.cursor()
             try:
                 db.connection.autocommit()
@@ -83,10 +90,8 @@ class TestRunner:
         self.output(1, "Initializing test database")
         management.init()
 
-        # Run the tests for each model within APP_NAME/models.
-        model_dir = os.path.join(os.path.dirname(__file__), APP_NAME, 'models')
-        test_models = [f[:-3] for f in os.listdir(model_dir) if f.endswith('.py') and not f.startswith('__init__')]
-        for model_name in test_models:
+        # Run the tests for each test model.
+        for model_name in get_test_models():
             self.output(1, "%s model: Importing" % model_name)
             try:
                 mod = meta.get_app(model_name)
@@ -106,9 +111,9 @@ class TestRunner:
             self.output(1, "%s model: Running tests" % model_name)
             runner.run(dtest, clear_globs=True, out=sys.stdout.write)
 
-        # Unless we're using SQLite, remove the test database, to clean up after
-        # ourselves. Connect to the previous database (not the test database) 
-        # to do so, because it's not allowed to delete a database while being 
+        # Unless we're using SQLite, remove the test database to clean up after
+        # ourselves. Connect to the previous database (not the test database)
+        # to do so, because it's not allowed to delete a database while being
         # connected to it.
         if settings.DATABASE_ENGINE != "sqlite3":
             db.close()

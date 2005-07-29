@@ -1,6 +1,7 @@
 """
 7. The lookup API
 
+This demonstrates features of the database API.
 """
 
 from django.core import meta
