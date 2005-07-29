@@ -34,6 +34,7 @@ def make_docs_from_model_tests(output_dir):
         # Clean up the title and blurb.
         title, blurb = mod.__doc__.strip().split('\n', 1)
         blurb = '<p>%s</p>' % blurb.strip().replace('\n\n', '</p><p>')
+        blurb = re.sub(r'``(.*?)``', '<tt class="docutils literal"><span class="pre">\\1</span></tt>', blurb)
         api_usage = mod.API_TESTS
 
         # Get the source code of the model, without the docstring or the
