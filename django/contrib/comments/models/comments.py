@@ -186,6 +186,9 @@ class FreeComment(meta.Model):
     def __repr__(self):
         return "%s: %s..." % (self.person_name, self.comment[:100])
 
+    def get_absolute_url(self):
+        return self.get_content_object().get_absolute_url() + "#c" + str(self.id)
+
     def get_content_object(self):
         """
         Returns the object that this comment is a comment on. Returns None if
