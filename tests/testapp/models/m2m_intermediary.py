@@ -4,9 +4,10 @@
 For many-to-many relationships that need extra fields on the intermediary
 table, use an intermediary model.
 
-In this example, an article can have multiple reporters, and each
-article-reporter combination (a "Writer") has a "position" field, which
-specifies the reporter's position for the given article (e.g. "Staff writer").
+In this example, an ``Article`` can have multiple ``Reporter``s, and each
+``Article``-``Reporter`` combination (a ``Writer``) has a ``position`` field,
+which specifies the ``Reporter``'s position for the given article (e.g. "Staff
+writer").
 """
 
 from django.core import meta
