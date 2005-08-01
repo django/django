@@ -54,10 +54,10 @@ class Article(meta.Model):
 
 API_TESTS = """
 # Create a couple of Articles.
->>> from datetime import datetime
->>> a = articles.Article(id=None, headline='Area man programs in Python', pub_date=datetime(2005, 7, 27))
+>>> from datetime import date
+>>> a = articles.Article(id=None, headline='Area man programs in Python', pub_date=date(2005, 7, 27))
 >>> a.save()
->>> b = articles.Article(id=None, headline='Beatles reunite', pub_date=datetime(2005, 7, 27))
+>>> b = articles.Article(id=None, headline='Beatles reunite', pub_date=date(2005, 7, 27))
 >>> b.save()
 
 # Test the custom methods.
