@@ -36,7 +36,7 @@ MANAGERS = ADMINS
 SERVER_EMAIL = 'root@localhost'
 
 # Whether to send broken-link e-mails.
-SEND_BROKEN_LINK_EMAILS = True
+SEND_BROKEN_LINK_EMAILS = False
 
 # Database connection info.
 DATABASE_ENGINE = 'postgresql' # 'postgresql', 'mysql', or 'sqlite3'.
