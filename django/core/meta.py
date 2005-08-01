@@ -720,14 +720,13 @@ class Model:
 # CORE METHODS #############################
 
 def method_init(opts, self, *args, **kwargs):
+    if kwargs:
+        for f in opts.fields:
+            setattr(self, f.name, kwargs.pop(f.name, f.get_default()))
+        if kwargs:
+            raise TypeError, "'%s' is an invalid keyword argument for this function" % kwargs.keys()[0]
     for i, arg in enumerate(args):
         setattr(self, opts.fields[i].name, arg)
-    for k, v in kwargs.items():
-        try:
-            opts.get_field(k, many_to_many=False)
-        except FieldDoesNotExist:
-            raise TypeError, "'%s' is an invalid keyword argument for this function" % k
-        setattr(self, k, v)
 
 def method_eq(opts, self, other):
     return isinstance(other, self.__class__) and getattr(self, opts.pk.name) == getattr(other, opts.pk.name)

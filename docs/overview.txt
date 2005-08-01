@@ -64,7 +64,7 @@ is created on the fly: No code generation necessary::
     []
 
     # Create a new Reporter.
-    >>> r = reporters.Reporter(id=None, full_name='John Smith')
+    >>> r = reporters.Reporter(full_name='John Smith')
 
     # Save the object into the database. You have to call save() explicitly.
     >>> r.save()
@@ -101,7 +101,7 @@ is created on the fly: No code generation necessary::
 
     # Create an article.
     >>> from datetime import datetime
-    >>> a = articles.Article(id=None, pub_date=datetime.now(), headline='Django is cool', article='Yeah.', reporter_id=1)
+    >>> a = articles.Article(pub_date=datetime.now(), headline='Django is cool', article='Yeah.', reporter_id=1)
     >>> a.save()
 
     # Now the article is in the database.

@@ -333,8 +333,7 @@ Creating new objects
 Creating new objects (i.e. ``INSERT``) is done by creating new instances
 of objects then calling save() on them::
 
-    >>> p = polls.Poll(id=None,
-    ...                slug="eggs",
+    >>> p = polls.Poll(slug="eggs",
     ...                question="How do you like your eggs?",
     ...                pub_date=datetime.datetime.now(),
     ...                expire_date=some_future_date)
@@ -355,8 +354,7 @@ Related objects (i.e. ``Choices``) are created using convience functions::
 Each of those ``add_choice`` methods is equivilent to (except obviously much
 simpler than)::
 
-    >>> c = polls.Choice(id=None,
-    ...                  poll_id=p.id,
+    >>> c = polls.Choice(poll_id=p.id,
     ...                  choice="Over easy",
     ...                  votes=0)
     >>> c.save()

@@ -298,7 +298,7 @@ free Python API Django gives you::
 
     # Create a new Poll.
     >>> from datetime import datetime
-    >>> p = polls.Poll(id=None, question="What's up?", pub_date=datetime.now())
+    >>> p = polls.Poll(question="What's up?", pub_date=datetime.now())
 
     # Save the object into the database. You have to call save() explicitly.
     >>> p.save()
