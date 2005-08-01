@@ -16,6 +16,14 @@ Database.register_converter("datetime", typecasts.typecast_timestamp)
 
 # Database wrapper ############################################################
 
+def utf8rowFactory(cursor, row):
+    def utf8(s):
+        if type(s) == unicode:
+            return s.encode("utf-8")
+        else:
+            return s
+    return [utf8(r) for r in row]
+
 class DatabaseWrapper:
     def __init__(self):
         self.connection = None
@@ -28,9 +36,12 @@ class DatabaseWrapper:
             # register extract and date_trun functions
             self.connection.create_function("django_extract", 2, _sqlite_extract)
             self.connection.create_function("django_date_trunc", 2, _sqlite_date_trunc)
+        cursor = self.connection.cursor(factory=SQLiteCursorWrapper)
+        cursor.row_factory = utf8rowFactory
         if DEBUG:
-            return base.CursorDebugWrapper(FormatStylePlaceholderCursor(self.connection), self)
-        return FormatStylePlaceholderCursor(self.connection)
+            return base.CursorDebugWrapper(cursor, self)
+        else:
+            return cursor
 
     def commit(self):
         self.connection.commit()
@@ -44,7 +55,7 @@ class DatabaseWrapper:
             self.connection.close()
             self.connection = None
 
-class FormatStylePlaceholderCursor(Database.Cursor):
+class SQLiteCursorWrapper(Database.Cursor):
     """
     Django uses "format" style placeholders, but pysqlite2 uses "qmark" style.
     This fixes it -- but note that if you want to use a literal "%s" in a query,
