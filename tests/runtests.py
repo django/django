@@ -8,12 +8,13 @@ import os, sys, time, traceback
 import doctest
 
 APP_NAME = 'testapp'
+OTHER_TESTS_DIR = "othertests"
 TEST_DATABASE_NAME = 'django_test_db'
 
 error_list = []
 def log_error(model_name, title, description):
     error_list.append({
-        'title': "%r model: %s" % (model_name, title),
+        'title': "%r module: %s" % (model_name, title),
         'description': description,
     })
 
@@ -91,6 +92,7 @@ class TestRunner:
         management.init()
 
         # Run the tests for each test model.
+        self.output(1, "Running app tests")
         for model_name in get_test_models():
             self.output(1, "%s model: Importing" % model_name)
             try:
@@ -110,7 +112,32 @@ class TestRunner:
             runner = DjangoDoctestRunner(verbosity_level=verbosity_level, verbose=False)
             self.output(1, "%s model: Running tests" % model_name)
             runner.run(dtest, clear_globs=True, out=sys.stdout.write)
-
+            
+        # Run the non-model tests in the other tests dir
+        self.output(1, "Running other tests")
+        other_tests_dir = os.path.join(os.path.dirname(__file__), OTHER_TESTS_DIR)
+        test_modules = [f[:-3] for f in os.listdir(other_tests_dir) if f.endswith('.py') and not f.startswith('__init__')]
+        for module in test_modules:
+            self.output(1, "%s module: Importing" % module)
+            try:
+                mod = __import__("othertests." + module, '', '', [''])
+            except Exception, e:
+                log_error(module, "Error while importing", ''.join(traceback.format_exception(*sys.exc_info())[1:]))
+                continue
+            if mod.__doc__:
+                p = doctest.DocTestParser()
+                dtest = p.get_doctest(mod.__doc__, mod.__dict__, module, None, None)
+                runner = DjangoDoctestRunner(verbosity_level=verbosity_level, verbose=False)
+                self.output(1, "%s module: runing tests" % module)
+                runner.run(dtest, clear_globs=True, out=sys.stdout.write)
+            if hasattr(mod, "run_tests") and callable(mod.run_tests):
+                self.output(1, "%s module: runing tests" % module)
+                try:
+                    mod.run_tests(verbosity_level)
+                except Exception, e:
+                    log_error(module, "Exception running tests", ''.join(traceback.format_exception(*sys.exc_info())[1:]))
+                    continue
+            
         # Unless we're using SQLite, remove the test database to clean up after
         # ourselves. Connect to the previous database (not the test database)
         # to do so, because it's not allowed to delete a database while being
