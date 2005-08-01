@@ -169,7 +169,6 @@ Reporter/Article example, here's what that might look like::
     urlpatterns = patterns('',
         (r'^/articles/(?P<year>\d{4})/$', 'myproject.news.views.articles.year_archive'),
         (r'^/articles/(?P<year>\d{4})/(?P<month>\d{2})/$', 'myproject.news.views.articles.month_archive'),
-        (r'^/articles/(?P<year>\d{4})/(?P<month>\d{2})/$', 'myproject.news.views.articles.month_archive'),
         (r'^/articles/(?P<year>\d{4})/(?P<month>\d{2})/(?P<day>\d+)/$', 'myproject.news.views.articles.article_detail'),
     )
 
