@@ -35,6 +35,8 @@ application and will focus on creating the public interface -- "views."
 
     In Django, each view is represented by a simple Python function.
 
+
+
 Design your URLs
 ================
 
@@ -119,6 +121,11 @@ make sure Django is following the URLconf properly.
 Fire up the Django development Web server, as we did in Tutorial 2::
 
     django-admin.py runserver --settings="myproject.settings.main"
+
+(If you're coming here straight from Tutorial 2, note that we're now running
+the server with ``--settings=myproject.settings.main`` instead of
+``--settings=myproject.settings.admin``. You'll need to restart the server to
+change the ``settings`` parameter.)
 
 Now go to "http://localhost:8000/polls/" on your domain in your Web browser.
 You should get a Python traceback with the following error message::
