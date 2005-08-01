@@ -44,7 +44,7 @@ COMMENT_FORM = '''
 
 FREE_COMMENT_FORM = '''
 {% if display_form %}
-<form enctype="multipart/form-data" action="/comments/postfree/" method="post">
+<form action="/comments/postfree/" method="post">
 <p>Your name: <input type="text" id="id_person_name" name="person_name" /></p>
 <p>Comment:<br /><textarea name="comment" id="id_comment" rows="10" cols="60"></textarea></p>
 <input type="hidden" name="options" value="{{ options }}" />
