@@ -1,9 +1,9 @@
 """
 10. One-to-one relationships
 
-To define a many-to-one relationship, use OneToOneField().
+To define a many-to-one relationship, use ``OneToOneField()``.
 
-In this example, a Place optionally can be a Restaurant.
+In this example, a ``Place`` optionally can be a ``Restaurant``.
 """
 
 from django.core import meta
