@@ -272,7 +272,7 @@ That takes care of setting ``handler404`` in the current module. As you can see
 in ``django/conf/urls/defaults.py``, ``handler404`` is set to
 ``'django.views.defaults.page_not_found'`` by default.
 
-Two more things to note about 404 views:
+Three more things to note about 404 views:
 
     * The 404 view is also called if Django doesn't find a match after checking
       every regular expression in the URLconf.
