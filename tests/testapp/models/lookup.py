@@ -58,6 +58,26 @@ Article 4
 >>> articles.get_in_bulk([1000])
 {}
 
+# get_values() is just like get_list(), except it returns a list of
+# dictionaries instead of object instances -- and you can specify which fields
+# you want to retrieve.
+>>> articles.get_values(fields=['headline'])
+[{'headline': 'Article 4'}, {'headline': 'Article 2'}, {'headline': 'Article 3'}, {'headline': 'Article 1'}]
+>>> articles.get_values(pub_date__exact=datetime(2005, 7, 27), fields=['id'])
+[{'id': 2}, {'id': 3}]
+>>> articles.get_values(fields=['id', 'headline']) == [{'id': 4, 'headline': 'Article 4'}, {'id': 2, 'headline': 'Article 2'}, {'id': 3, 'headline': 'Article 3'}, {'id': 1, 'headline': 'Article 1'}]
+True
+
+# get_values_iterator() is just like get_values(), but it's a generator.
+>>> for d in articles.get_values_iterator(fields=['id', 'headline']):
+...     i = d.items()
+...     i.sort()
+...     i
+[('headline', 'Article 4'), ('id', 4)]
+[('headline', 'Article 2'), ('id', 2)]
+[('headline', 'Article 3'), ('id', 3)]
+[('headline', 'Article 1'), ('id', 1)]
+
 # Every DateField and DateTimeField creates get_next_by_FOO() and
 # get_previous_by_FOO() methods.
 >>> a3.get_next_by_pub_date()

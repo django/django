@@ -562,6 +562,12 @@ class ModelBase(type):
         new_mod.get_iterator = curry(function_get_iterator, opts, new_class)
         new_mod.get_iterator.__doc__ = "Returns an iterator of %s objects matching the given parameters." % name
 
+        new_mod.get_values = curry(function_get_values, opts, new_class)
+        new_mod.get_values.__doc__ = "Returns a list of dictionaries matching the given parameters."
+
+        new_mod.get_values_iterator = curry(function_get_values_iterator, opts, new_class)
+        new_mod.get_values_iterator.__doc__ = "Returns an iterator of dictionaries matching the given parameters."
+
         new_mod.get_count = curry(function_get_count, opts)
         new_mod.get_count.__doc__ = "Returns the number of %s objects matching the given parameters." % name
 
@@ -1083,6 +1089,31 @@ def function_get_count(opts, **kwargs):
     cursor.execute("SELECT COUNT(*)" + sql, params)
     return cursor.fetchone()[0]
 
+def function_get_values_iterator(opts, klass, **kwargs):
+    # select_related and select aren't supported in get_values().
+    kwargs['select_related'] = False
+    kwargs['select'] = {}
+
+    # 'fields' is a list of field names to fetch.
+    try:
+        fields = kwargs.pop('fields')
+    except KeyError: # Default to all fields.
+        fields = [f.name for f in opts.fields]
+
+    cursor = db.db.cursor()
+    _, sql, params = function_get_sql_clause(opts, **kwargs)
+    select = ['%s.%s' % (opts.db_table, f) for f in fields]
+    cursor.execute("SELECT " + (kwargs.get('distinct') and "DISTINCT " or "") + ",".join(select) + sql, params)
+    while 1:
+        rows = cursor.fetchmany(GET_ITERATOR_CHUNK_SIZE)
+        if not rows:
+            raise StopIteration
+        for row in rows:
+            yield dict(zip(fields, row))
+
+def function_get_values(opts, klass, **kwargs):
+    return list(function_get_values_iterator(opts, klass, **kwargs))
+
 def _fill_table_cache(opts, select, tables, where, old_prefix, cache_tables_seen):
     """
     Helper function that recursively populates the select, tables and where (in
@@ -1228,7 +1259,7 @@ def function_get_sql_clause(opts, **kwargs):
         _fill_table_cache(opts, select, tables, where, opts.db_table, [opts.db_table])
 
     # Add any additional SELECTs passed in via kwargs.
-    if kwargs.get('select', False):
+    if kwargs.get('select'):
         select.extend(['(%s) AS %s' % (s[1], s[0]) for s in kwargs['select']])
 
     # ORDER BY clause
