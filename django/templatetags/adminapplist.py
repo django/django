@@ -6,10 +6,11 @@ class AdminApplistNode(template.Node):
 
     def render(self, context):
         from django.core import meta
+        from django.utils.text import capfirst
         app_list = []
         for app in meta.get_installed_model_modules():
             app_label = app.__name__[app.__name__.rindex('.')+1:]
-            model_list = [{'name': meta.capfirst(m._meta.verbose_name_plural),
+            model_list = [{'name': capfirst(m._meta.verbose_name_plural),
                             'admin_url': '%s/%s/' % (app_label, m._meta.module_name)} \
                             for m in app._MODELS if m._meta.admin]
             if model_list:

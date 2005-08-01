@@ -6,7 +6,7 @@ from django.core.extensions import DjangoContext as Context
 from django.models.auth import log
 from django.utils.html import strip_tags
 from django.utils.httpwrappers import HttpResponse, HttpResponseRedirect
-from django.utils.text import get_text_list
+from django.utils.text import capfirst, get_text_list
 from django.conf.settings import ADMIN_MEDIA_PREFIX
 import operator
 
@@ -266,7 +266,7 @@ def change_list(request, app_label, module_name):
     raw_template = ['{% extends "base_site" %}\n']
     raw_template.append('{% block bodyclass %}change-list{% endblock %}\n')
     if not is_popup:
-        raw_template.append('{%% block breadcrumbs %%}<div class="breadcrumbs"><a href="../../">Home</a> &rsaquo; %s</div>{%% endblock %%}\n' % meta.capfirst(opts.verbose_name_plural))
+        raw_template.append('{%% block breadcrumbs %%}<div class="breadcrumbs"><a href="../../">Home</a> &rsaquo; %s</div>{%% endblock %%}\n' % capfirst(opts.verbose_name_plural))
     raw_template.append('{% block coltype %}flex{% endblock %}')
     raw_template.append('{% block content %}\n')
     raw_template.append('<div id="content-main">\n')
@@ -356,10 +356,10 @@ def change_list(request, app_label, module_name):
                     except AttributeError:
                         header = func.__name__
                 # Non-field list_display values don't get ordering capability.
-                raw_template.append('<th>%s</th>' % meta.capfirst(header))
+                raw_template.append('<th>%s</th>' % capfirst(header))
             else:
                 if isinstance(f.rel, meta.ManyToOne) and f.null:
-                    raw_template.append('<th>%s</th>' % meta.capfirst(f.verbose_name))
+                    raw_template.append('<th>%s</th>' % capfirst(f.verbose_name))
                 else:
                     th_classes = []
                     new_order_type = 'asc'
@@ -369,7 +369,7 @@ def change_list(request, app_label, module_name):
                     raw_template.append('<th%s><a href="%s">%s</a></th>' % \
                         ((th_classes and ' class="%s"' % ' '.join(th_classes) or ''),
                         get_query_string(params, {ORDER_VAR: i, ORDER_TYPE_VAR: new_order_type}),
-                        meta.capfirst(f.verbose_name)))
+                        capfirst(f.verbose_name)))
         raw_template.append('</tr>\n</thead>\n')
         # Result rows.
         pk = lookup_opts.pk.name
@@ -572,7 +572,7 @@ def _get_template(opts, app_label, add=False, change=False, show_delete=False, f
     t.append('{%% block bodyclass %%}%s-%s change-form{%% endblock %%}\n' % (app_label, opts.object_name.lower()))
     breadcrumb_title = add and "Add %s" % opts.verbose_name or '{{ original|striptags|truncatewords:"18" }}'
     t.append('{%% block breadcrumbs %%}{%% if not is_popup %%}<div class="breadcrumbs"><a href="../../../">Home</a> &rsaquo; <a href="../">%s</a> &rsaquo; %s</div>{%% endif %%}{%% endblock %%}\n' % \
-        (meta.capfirst(opts.verbose_name_plural), breadcrumb_title))
+        (capfirst(opts.verbose_name_plural), breadcrumb_title))
     t.append('{% block content %}<div id="content-main">\n')
     if change:
         t.append('{% if not is_popup %}')
@@ -613,12 +613,12 @@ def _get_template(opts, app_label, add=False, change=False, show_delete=False, f
         if change and hasattr(rel_obj, 'get_absolute_url'):
             view_on_site = '{%% if %s.original %%}<a href="/r/{{ %s.content_type_id }}/{{ %s.original.id }}/">View on site</a>{%% endif %%}' % (var_name, var_name, var_name)
         if rel_field.rel.edit_inline_type == meta.TABULAR:
-            t.append('<h2>%s</h2>\n<table>\n' % meta.capfirst(rel_obj.verbose_name_plural))
+            t.append('<h2>%s</h2>\n<table>\n' % capfirst(rel_obj.verbose_name_plural))
             t.append('<thead><tr>')
             for f in field_list:
                 if isinstance(f, meta.AutoField):
                     continue
-                t.append('<th%s>%s</th>' % (f.blank and ' class="optional"' or '', meta.capfirst(f.verbose_name)))
+                t.append('<th%s>%s</th>' % (f.blank and ' class="optional"' or '', capfirst(f.verbose_name)))
             t.append('</tr></thead>\n')
             t.append('{%% for %s in form.%s %%}\n' % (var_name, rel_obj.module_name))
             if change:
@@ -656,7 +656,7 @@ def _get_template(opts, app_label, add=False, change=False, show_delete=False, f
             t.append('{% endfor %}\n')
         else: # edit_inline_type == STACKED
             t.append('{%% for %s in form.%s %%}' % (var_name, rel_obj.module_name))
-            t.append('<h2>%s #{{ forloop.counter }}</h2>' % meta.capfirst(rel_obj.verbose_name))
+            t.append('<h2>%s #{{ forloop.counter }}</h2>' % capfirst(rel_obj.verbose_name))
             if view_on_site:
                 t.append('<p>%s</p>' % view_on_site)
             for f in field_list:
@@ -710,14 +710,14 @@ def _get_admin_field(field_list, name_prefix, rel, add, change):
         # the *left* of the label.
         if isinstance(field, meta.BooleanField):
             t.append(_get_admin_field_form_widget(field, name_prefix, rel, add, change))
-            t.append(' <label for="%s" class="vCheckboxLabel">%s</label>' % (label_name, meta.capfirst(field.verbose_name)))
+            t.append(' <label for="%s" class="vCheckboxLabel">%s</label>' % (label_name, capfirst(field.verbose_name)))
         else:
             class_names = []
             if not field.blank:
                 class_names.append('required')
             if i > 0:
                 class_names.append('inline')
-            t.append('<label for="%s"%s>%s:</label> ' % (label_name, class_names and ' class="%s"' % ' '.join(class_names) or '', meta.capfirst(field.verbose_name)))
+            t.append('<label for="%s"%s>%s:</label> ' % (label_name, class_names and ' class="%s"' % ' '.join(class_names) or '', capfirst(field.verbose_name)))
             t.append(_get_admin_field_form_widget(field, name_prefix, rel, add, change))
         if change and use_raw_id_admin(field):
             obj_repr = '%soriginal.get_%s|truncatewords:"14"' % (rel and name_prefix or '', field.rel.name)
@@ -991,11 +991,11 @@ def _get_deleted_objects(deleted_objects, perms_needed, user, obj, opts, current
                 if rel_field.rel.edit_inline or not rel_opts.admin:
                     # Don't display link to edit, because it either has no
                     # admin or is edited inline.
-                    nh(deleted_objects, current_depth, ['%s: %r' % (meta.capfirst(rel_opts.verbose_name), sub_obj), []])
+                    nh(deleted_objects, current_depth, ['%s: %r' % (capfirst(rel_opts.verbose_name), sub_obj), []])
                 else:
                     # Display a link to the admin page.
                     nh(deleted_objects, current_depth, ['%s: <a href="../../../../%s/%s/%s/">%r</a>' % \
-                        (meta.capfirst(rel_opts.verbose_name), rel_opts.app_label, rel_opts.module_name,
+                        (capfirst(rel_opts.verbose_name), rel_opts.app_label, rel_opts.module_name,
                         getattr(sub_obj, rel_opts.pk.name), sub_obj), []])
                 _get_deleted_objects(deleted_objects, perms_needed, user, sub_obj, rel_opts, current_depth+2)
         else:
@@ -1005,11 +1005,11 @@ def _get_deleted_objects(deleted_objects, perms_needed, user, obj, opts, current
                 if rel_field.rel.edit_inline or not rel_opts.admin:
                     # Don't display link to edit, because it either has no
                     # admin or is edited inline.
-                    nh(deleted_objects, current_depth, ['%s: %s' % (meta.capfirst(rel_opts.verbose_name), strip_tags(repr(sub_obj))), []])
+                    nh(deleted_objects, current_depth, ['%s: %s' % (capfirst(rel_opts.verbose_name), strip_tags(repr(sub_obj))), []])
                 else:
                     # Display a link to the admin page.
                     nh(deleted_objects, current_depth, ['%s: <a href="../../../../%s/%s/%s/">%s</a>' % \
-                        (meta.capfirst(rel_opts.verbose_name), rel_opts.app_label, rel_opts.module_name, sub_obj.id, strip_tags(repr(sub_obj))), []])
+                        (capfirst(rel_opts.verbose_name), rel_opts.app_label, rel_opts.module_name, sub_obj.id, strip_tags(repr(sub_obj))), []])
                 _get_deleted_objects(deleted_objects, perms_needed, user, sub_obj, rel_opts, current_depth+2)
             # If there were related objects, and the user doesn't have
             # permission to delete them, add the missing perm to perms_needed.
@@ -1053,7 +1053,7 @@ def delete_stage(request, app_label, module_name, object_id):
 
     # Populate deleted_objects, a data structure of all related objects that
     # will also be deleted.
-    deleted_objects = ['%s: <a href="../../%s/">%s</a>' % (meta.capfirst(opts.verbose_name), object_id, strip_tags(repr(obj))), []]
+    deleted_objects = ['%s: <a href="../../%s/">%s</a>' % (capfirst(opts.verbose_name), object_id, strip_tags(repr(obj))), []]
     perms_needed = sets.Set()
     _get_deleted_objects(deleted_objects, perms_needed, request.user, obj, opts, 1)
 
@@ -1088,7 +1088,7 @@ def history(request, app_label, module_name, object_id):
     c = Context(request, {
         'title': 'Change history: %r' % obj,
         'action_list': action_list,
-        'module_name': meta.capfirst(opts.verbose_name_plural),
+        'module_name': capfirst(opts.verbose_name_plural),
         'object': obj,
     })
     return HttpResponse(t.render(c), mimetype='text/html; charset=utf-8')

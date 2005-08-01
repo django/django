@@ -264,7 +264,7 @@ database_check.args = APP_ARGS
 
 def get_admin_index(mod):
     "Returns admin-index template snippet (in list form) for the given module."
-    from django.core import meta
+    from django.utils.text import capfirst
     output = []
     app_label = mod._MODELS[0]._meta.app_label
     output.append('{%% if perms.%s %%}' % app_label)
@@ -274,7 +274,7 @@ def get_admin_index(mod):
             output.append(MODULE_TEMPLATE % {
                 'app': app_label,
                 'mod': klass._meta.module_name,
-                'name': meta.capfirst(klass._meta.verbose_name_plural),
+                'name': capfirst(klass._meta.verbose_name_plural),
                 'addperm': klass._meta.get_add_permission(),
                 'changeperm': klass._meta.get_change_permission(),
             })

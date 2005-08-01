@@ -1,5 +1,8 @@
 import re
 
+# Capitalizes the first letter of a string.
+capfirst = lambda x: x and x[0].upper() + x[1:]
+
 def wrap(text, width):
     """
     A word-wrap function that preserves existing line breaks and most spaces in
