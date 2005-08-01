@@ -278,6 +278,17 @@ dictionaries in order of query execution. Each dictionary has the following::
     ``sql`` -- The raw SQL statement
     ``time`` -- How long the statement took to execute, in seconds.
 
+Can I use Django with a pre-existing database?
+----------------------------------------------
+
+Yes. For the time being, you can write models that describe your
+already-existing database layout, and just point Django at your database.
+
+We also plan to make this even easier: Soon, Django will be able to introspect
+your database and generate models from it. See `Ticket 90`_.
+
+.. _`Ticket 90`: http://code.djangoproject.com/ticket/90
+
 The admin site
 ==============
 
