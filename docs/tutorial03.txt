@@ -118,7 +118,7 @@ Write your first view
 Well, we haven't created any views yet -- we just have the URLconf. But let's
 make sure Django is following the URLconf properly.
 
-Fire up the Django development Web server, as we did in Tutorial 2::
+Fire up the Django development Web server::
 
     django-admin.py runserver --settings="myproject.settings.main"
 
