@@ -48,6 +48,8 @@ class Article(meta.Model):
             FROM custom_methods_articles
             WHERE pub_date = %s
                 AND id != %s""", [str(self.pub_date), self.id])
+        # The asterisk in "Article(*row)" tells Python to expand the list into
+        # positional arguments to Article().
         return [Article(*row) for row in cursor.fetchall()]
 
 API_TESTS = """
