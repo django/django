@@ -2,7 +2,6 @@ from django.core import meta
 from django import templatetags
 from django.conf import settings
 from django.models.core import sites
-from django.views.decorators.cache import cache_page
 from django.core.extensions import DjangoContext as Context
 from django.core.exceptions import Http404, ViewDoesNotExist
 from django.utils.httpwrappers import HttpResponse, HttpResponseRedirect
@@ -32,6 +31,8 @@ def bookmarklets(request):
     return HttpResponse(t.render(c))
 
 def template_tag_index(request):
+    import sys
+
     if not doc:
         return missing_docutils_page(request)
 
@@ -69,7 +70,6 @@ def template_tag_index(request):
         'tags' : tags,
     })
     return HttpResponse(t.render(c))
-template_tag_index = cache_page(template_tag_index, 15*60)
 
 def template_filter_index(request):
     if not doc:
@@ -106,7 +106,6 @@ def template_filter_index(request):
         'filters' : filters,
     })
     return HttpResponse(t.render(c))
-template_filter_index = cache_page(template_filter_index, 15*60)
 
 def view_index(request):
     if not doc:
@@ -118,13 +117,9 @@ def view_index(request):
         urlconf = __import__(settings_mod.ROOT_URLCONF, '', '', [''])
         view_functions = extract_views_from_urlpatterns(urlconf.urlpatterns)
         for (func, regex) in view_functions:
-            title, body, metadata = doc.parse_docstring(func.__doc__)
-            if title:
-                title = doc.parse_rst(title, 'view', 'view:' + func.__name__)
             views.append({
                 'name'   : func.__name__,
                 'module' : func.__module__,
-                'title'  : title,
                 'site_id': settings_mod.SITE_ID,
                 'site'   : sites.get_object(pk=settings_mod.SITE_ID),
                 'url'    : simplify_regex(regex),
@@ -134,7 +129,6 @@ def view_index(request):
         'views' : views,
     })
     return HttpResponse(t.render(c))
-view_index = cache_page(view_index, 15*60)
 
 def view_detail(request, view):
     if not doc:
@@ -151,7 +145,7 @@ def view_detail(request, view):
     if body:
         body = doc.parse_rst(body, 'view', 'view:' + view)
     for key in metadata:
-        metadata[key] = doc.parse_rst(metadata[key], 'view', 'view:' + view)
+        metadata[key] = doc.parse_rst(metadata[key], 'model', 'view:' + view)
     t = template_loader.get_template('doc/view_detail')
     c = Context(request, {
         'name'      : view,

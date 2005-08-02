@@ -67,6 +67,8 @@ code, pre { font-family:"Bitstream Vera Sans Mono", Monaco, "Courier New", Couri
 pre.literal-block { margin:10px; background:#eee; padding:6px 8px; }
 code strong	{ color:#930; }
 hr { clear:both; color:#eee; background-color:#eee; height:1px; border:none; margin:0; padding:0; font-size:1px; line-height:1px; }
+div.system-message { background: #ffc; margin: 10px; padding: 6px 8px; font-size: .8em; }
+div.system-message p.system-message-title { padding:4px 5px 4px 25px; margin:0; color:red;background:#ffc url(../img/admin/icon_error.gif) 5px .3em no-repeat; }
 
 /*  PAGE STRUCTURE  */
 

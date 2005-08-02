@@ -470,7 +470,9 @@ def do_if(parser, token):
     """
     The ``{% if %}`` tag evaluates a variable, and if that variable is "true"
     (i.e. exists, is not empty, and is not a false boolean value) the contents
-    of the block are output::
+    of the block are output:
+    
+    ::
     
         {% if althlete_list %}
             Number of athletes: {{ althete_list|count }}
@@ -481,7 +483,7 @@ def do_if(parser, token):
     In the above, if ``athlete_list`` is not empty, the number of athletes will
     be displayed by the ``{{ athlete_list|count }}`` variable.
 
-    As you can see, the ``if`` tag can take an option ``{% else %} clause that
+    As you can see, the ``if`` tag can take an option ``{% else %}`` clause that
     will be displayed if the test fails.
 
     ``if`` tags may use ``or`` or ``not`` to test a number of variables or to
@@ -501,8 +503,8 @@ def do_if(parser, token):
             stupid; it's not my fault).
         {% endif %}
     
-    For simplicity, ``if`` tags do not allow ``and`` clauses; use nested ``if``s
-    instead::
+    For simplicity, ``if`` tags do not allow ``and`` clauses; use nested ``if``
+    tags instead::
     
         {% if athlete_list %}
             {% if coach_list %}

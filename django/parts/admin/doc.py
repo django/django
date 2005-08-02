@@ -8,18 +8,7 @@ from email.Errors import HeaderParseError
 import docutils.core
 import docutils.nodes
 import docutils.parsers.rst.roles
-
-#
-# reST roles
-#
-ROLES = {
-    # role name,    base role url (in the admin)
-    'model'    : '/doc/models/%s/',
-    'view'     : '/doc/views/%s/',
-    'template' : '/doc/templates/%s/',
-    'filter'   : '/doc/filters/#%s',
-    'tag'      : '/doc/tags/#%s',
-}
+from urlparse import urljoin
 
 def trim_docstring(docstring):
     """
@@ -60,31 +49,43 @@ def parse_docstring(docstring):
                 body = "\n\n".join(parts[1:])
     return title, body, metadata
 
-def parse_rst(text, default_reference_context, thing_being_parsed=None):
+def parse_rst(text, default_reference_context, thing_being_parsed=None, link_base='../..'):
     """
     Convert the string from reST to an XHTML fragment.
     """
     overrides = {
-        'input_encoding' : 'unicode',
         'doctitle_xform' : True,
         'inital_header_level' : 3,
+        "default_reference_context" : default_reference_context,
+        "link_base" : link_base,
     }
     if thing_being_parsed:
         thing_being_parsed = "<%s>" % thing_being_parsed
     parts = docutils.core.publish_parts(text, source_path=thing_being_parsed,
                 destination_path=None, writer_name='html',
-                settings_overrides={'default_reference_context' : default_reference_context})
+                settings_overrides=overrides)
     return parts['fragment']
+
+#
+# reST roles
+#
+ROLES = {
+    'model'    : '%s/models/%s/',
+    'view'     : '%s/views/%s/',
+    'template' : '%s/templates/%s/',
+    'filter'   : '%s/filters/#%s',
+    'tag'      : '%s/tags/#%s',
+}
 
 def create_reference_role(rolename, urlbase):
     def _role(name, rawtext, text, lineno, inliner, options={}, content=[]):
-        node = docutils.nodes.reference(rawtext, text, refuri=(urlbase % text), **options)
+        node = docutils.nodes.reference(rawtext, text, refuri=(urlbase % (inliner.document.settings.link_base, text)), **options)
         return [node], []
     docutils.parsers.rst.roles.register_canonical_role(rolename, _role)
 
 def default_reference_role(name, rawtext, text, lineno, inliner, options={}, content=[]):
     context = inliner.document.settings.default_reference_context
-    node = docutils.nodes.reference(rawtext, text, refuri=(ROLES[context] % text), **options)
+    node = docutils.nodes.reference(rawtext, text, refuri=(ROLES[context] % (inliner.document.settings.link_base, text)), **options)
     return [node], []
 docutils.parsers.rst.roles.register_canonical_role('cmsreference', default_reference_role)
 docutils.parsers.rst.roles.DEFAULT_INTERPRETED_ROLE = 'cmsreference'

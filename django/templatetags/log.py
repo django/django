@@ -17,14 +17,20 @@ class AdminLogNode(template.Node):
 class DoGetAdminLog:
     """
     Populates a template variable with the admin log for the given criteria.
-    Usage:
+    
+    Usage::
+    
         {% get_admin_log [limit] as [varname] for_user [context_var_containing_user_obj] %}
-    Examples:
+        
+    Examples::
+        
         {% get_admin_log 10 as admin_log for_user 23 %}
         {% get_admin_log 10 as admin_log for_user user %}
         {% get_admin_log 10 as admin_log %}
-    Note that [context_var_containing_user_obj] can be a hard-coded integer (user ID) or the
-    name of a template context variable containing the user object whose ID you want.
+    
+    Note that ``context_var_containing_user_obj`` can be a hard-coded integer
+    (user ID) or the name of a template context variable containing the user
+    object whose ID you want.
     """
     def __init__(self, tag_name):
         self.tag_name = tag_name
