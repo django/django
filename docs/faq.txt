@@ -64,6 +64,8 @@ Lawrence, Kansas, USA.
     Adrian is the lead developer at World Online and the man behind the code at
     `chicagocrime.org`_. He lives in Chicago.
 
+    On IRC, Adrian goes by ``adrian_h``.
+
 `Simon Willison`_
     Simon is a well-respected Web developer from England. He had a one-year
     internship at World Online, during which time he and Adrian developed
@@ -72,6 +74,8 @@ Lawrence, Kansas, USA.
     fault. He went back to university to finish his degree and is poised to
     continue doing big, exciting things on the Web. He lives in England.
 
+    On IRC, Simon goes by ``SimonW``.
+
 `Jacob Kaplan-Moss`_
     Jacob is a whipper-snapper from California who spends equal time coding and
     cooking. He does Web development for World Online and actively hacks on
@@ -79,11 +83,15 @@ Lawrence, Kansas, USA.
     was the first guy to figure out how to write Tivo apps in Python. Lately
     he's been messing with Python on the PSP. He lives in Lawrence, Kansas.
 
+    On IRC, Jacob goes by ``jacobkm``.
+
 `Wilson Miner`_
     Wilson's design-fu makes us all look like rock stars. When not sneaking
-    into apartment complex swimming pools  he is the Commercial Development
+    into apartment complex swimming pools, he's the Commercial Development
     Director for World Online, which means he makes the money that pays all our
     paychecks. He lives in Lawrence, Kansas.
+
+    On IRC, Wilson goes by ``wilsonian``.
 
 .. _`World Online`: http://code.djangoproject.com/wiki/WorldOnline
 .. _`Adrian Holovaty`: http://www.holovaty.com/
