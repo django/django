@@ -225,7 +225,9 @@ class LoadNode(template.Node):
         self.taglib = taglib
 
     def load_taglib(taglib):
-        return __import__("django.templatetags.%s" % taglib.split('.')[-1], '', '', [''])
+        mod = __import__("django.templatetags.%s" % taglib.split('.')[-1], '', '', [''])
+        reload(mod)
+        return mod
     load_taglib = staticmethod(load_taglib)
 
     def render(self, context):
