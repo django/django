@@ -112,6 +112,9 @@ def _sqlite_date_trunc(lookup_type, dt):
 def get_table_list(cursor):
     raise NotImplementedError
 
+def get_relations(cursor, table_name):
+    raise NotImplementedError
+
 # Operators and fields ########################################################
 
 OPERATOR_MAPPING = {

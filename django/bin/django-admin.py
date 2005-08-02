@@ -76,7 +76,7 @@ def main():
             for line in ACTION_MAPPING[action](param):
                 print line
         except NotImplementedError:
-            sys.stderr.write("Error: %r isn't supported for the currently selected database backend." % action)
+            sys.stderr.write("Error: %r isn't supported for the currently selected database backend.\n" % action)
             sys.exit(1)
     elif action in ('startapp', 'startproject'):
         try:

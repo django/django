@@ -73,6 +73,9 @@ def get_table_list(cursor):
     cursor.execute("SHOW TABLES")
     return [row[0] for row in cursor.fetchall()]
 
+def get_relations(cursor, table_name):
+    raise NotImplementedError
+
 OPERATOR_MAPPING = {
     'exact': '=',
     'iexact': 'LIKE',

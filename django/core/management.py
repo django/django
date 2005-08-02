@@ -434,22 +434,40 @@ def inspectdb(db_name):
     "Generator that introspects the tables in the given database name and returns a Django model, one line at a time."
     from django.core import db
     from django.conf import settings
+
+    def table2model(table_name):
+        object_name = table_name.title().replace('_', '')
+        return object_name.endswith('s') and object_name[:-1] or object_name
+
     settings.DATABASE_NAME = db_name
     cursor = db.db.cursor()
+    yield "# This is an auto-generated Django model module."
+    yield "# You'll have to do the following manually to clean this up:"
+    yield "#     * Rearrange models' order"
+    yield "#     * Add primary_key=True to one field in each model."
+    yield "# Feel free to rename the models, but don't rename db_table values or field names."
+    yield ''
     yield 'from django.core import meta'
     yield ''
     for table_name in db.get_table_list(cursor):
-        object_name = table_name.title().replace('_', '')
-        object_name = object_name.endswith('s') and object_name[:-1] or object_name
-        yield 'class %s(meta.Model):' % object_name
+        yield 'class %s(meta.Model):' % table2model(table_name)
         yield '    db_table = %r' % table_name
         yield '    fields = ('
+        try:
+            relations = db.get_relations(cursor, table_name)
+        except NotImplementedError:
+            relations = {}
         cursor.execute("SELECT * FROM %s LIMIT 1" % table_name)
-        for row in cursor.description:
-            field_type = db.DATA_TYPES_REVERSE[row[1]]
-            field_desc = 'meta.%s(%r' % (field_type, row[0])
-            if field_type == 'CharField':
-                field_desc += ', maxlength=%s' % (row[3])
+        for i, row in enumerate(cursor.description):
+            if relations.has_key(i):
+                rel = relations[i]
+                rel_to = rel[1] == table_name and "'self'" or table2model(rel[1])
+                field_desc = 'meta.ForeignKey(%s, name=%r' % (rel_to, row[0])
+            else:
+                field_type = db.DATA_TYPES_REVERSE[row[1]]
+                field_desc = 'meta.%s(%r' % (field_type, row[0])
+                if field_type == 'CharField':
+                    field_desc += ', maxlength=%s' % (row[3])
             yield '        %s),' % field_desc
         yield '    )'
         yield ''
