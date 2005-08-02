@@ -171,7 +171,6 @@ var DateTimeShortcuts = {
     
     dismissCalendar: function(num) {
         document.getElementById(DateTimeShortcuts.calendarDivName1+num).style.display = 'none';
-        window.onclick = null;
     },
     
     drawPrev: function(num) {
@@ -196,7 +195,7 @@ var DateTimeShortcuts = {
     cancelEventPropagation: function(e) {
         if (!e) var e = window.event;
         e.cancelBubble = true;
-        if (e.stripPropagation) e.stopPropagation();
+        if (e.stopPropagation) e.stopPropagation();
     }
     
 }
