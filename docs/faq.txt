@@ -208,9 +208,9 @@ How do I install mod_python on Windows?
 Will Django run under shared hosting (like TextDrive or Dreamhost)?
 -------------------------------------------------------------------
 
-Right now, no, unless you can get your host to install mod_python. However, as
-the community starts to use Django's WSGI bindings with other Web servers, this
-will probably be possible sooner rather than later.
+See our `Django-friendly Web hosts`_ page.
+
+.. _`Django-friendly Web hosts`: http://code.djangoproject.com/wiki/DjangoFriendlyWebHosts
 
 Using Django
 ============
@@ -289,11 +289,12 @@ dictionaries in order of query execution. Each dictionary has the following::
 Can I use Django with a pre-existing database?
 ----------------------------------------------
 
-Yes. For the time being, you can write models that describe your
-already-existing database layout, and just point Django at your database.
+Yes. You have two options:
 
-We also plan to make this even easier: Soon, Django will be able to introspect
-your database and generate models from it. See `Ticket 90`_.
+    * Write models that describe your already-existing database layout, and
+      just point Django at your database.
+    * Use the alpha ``django-admin.py inspectdb`` function to automatically
+      create models by introspecting a given database. See `Ticket 90`_.
 
 .. _`Ticket 90`: http://code.djangoproject.com/ticket/90
 
