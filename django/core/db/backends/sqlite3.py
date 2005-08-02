@@ -61,15 +61,15 @@ class SQLiteCursorWrapper(Database.Cursor):
     This fixes it -- but note that if you want to use a literal "%s" in a query,
     you'll need to use "%%s" (which I belive is true of other wrappers as well).
     """
-    
+
     def execute(self, query, params=[]):
         query = self.convert_query(query, len(params))
         return Database.Cursor.execute(self, query, params)
-        
+
     def executemany(self, query, params=[]):
         query = self.convert_query(query, len(params[0]))
         return Database.Cursor.executemany(self, query, params)
-        
+
     def convert_query(self, query, num_params):
         # XXX this seems too simple to be correct... is this right?
         return query % tuple("?" * num_params)
@@ -78,10 +78,10 @@ class SQLiteCursorWrapper(Database.Cursor):
 
 def get_last_insert_id(cursor, table_name, pk_name):
     return cursor.lastrowid
-    
+
 def get_date_extract_sql(lookup_type, table_name):
     # lookup_type is 'year', 'month', 'day'
-    # sqlite doesn't support extract, so we fake it with the user-defined 
+    # sqlite doesn't support extract, so we fake it with the user-defined
     # function _sqlite_extract that's registered in connect(), above.
     return 'django_extract("%s", %s)' % (lookup_type.lower(), table_name)
 
@@ -109,8 +109,11 @@ def _sqlite_date_trunc(lookup_type, dt):
     elif lookup_type == 'day':
         return "%i-%02i-%02i 00:00:00" % (dt.year, dt.month, dt.day)
 
+def get_table_list(cursor):
+    raise NotImplementedError
+
 # Operators and fields ########################################################
-        
+
 OPERATOR_MAPPING = {
     'exact':        '=',
     'iexact':       'LIKE',
@@ -127,7 +130,7 @@ OPERATOR_MAPPING = {
     'iendswith':    'LIKE',
 }
 
-# SQLite doesn't actually support most of these types, but it "does the right 
+# SQLite doesn't actually support most of these types, but it "does the right
 # thing" given more verbose field definitions, so leave them as is so that
 # schema inspection is more useful.
 DATA_TYPES = {
@@ -157,3 +160,5 @@ DATA_TYPES = {
     'USStateField':                 'varchar(2)',
     'XMLField':                     'text',
 }
+
+DATA_TYPES_REVERSE = {}

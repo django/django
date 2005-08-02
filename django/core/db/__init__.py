@@ -37,5 +37,7 @@ dictfetchall = dbmod.dictfetchall
 get_last_insert_id = dbmod.get_last_insert_id
 get_date_extract_sql = dbmod.get_date_extract_sql
 get_date_trunc_sql = dbmod.get_date_trunc_sql
+get_table_list = dbmod.get_table_list
 OPERATOR_MAPPING = dbmod.OPERATOR_MAPPING
 DATA_TYPES = dbmod.DATA_TYPES
+DATA_TYPES_REVERSE = dbmod.DATA_TYPES_REVERSE

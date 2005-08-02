@@ -68,6 +68,11 @@ def get_date_trunc_sql(lookup_type, field_name):
         subtractions.append(" - interval (DATE_FORMAT(%s, '%%%%m')-1) month" % field_name)
     return "(%s - %s)" % (field_name, ''.join(subtractions))
 
+def get_table_list(cursor):
+    "Returns a list of table names in the current database."
+    cursor.execute("SHOW TABLES")
+    return [row[0] for row in cursor.fetchall()]
+
 OPERATOR_MAPPING = {
     'exact': '=',
     'iexact': 'LIKE',
@@ -114,4 +119,24 @@ DATA_TYPES = {
     'URLField':          'varchar(200)',
     'USStateField':      'varchar(2)',
     'XMLField':          'text',
+}
+
+DATA_TYPES_REVERSE = {
+    FIELD_TYPE.BLOB: 'TextField',
+    FIELD_TYPE.CHAR: 'CharField',
+    FIELD_TYPE.DECIMAL: 'FloatField',
+    FIELD_TYPE.DATE: 'DateField',
+    FIELD_TYPE.DATETIME: 'DateTimeField',
+    FIELD_TYPE.DOUBLE: 'FloatField',
+    FIELD_TYPE.FLOAT: 'FloatField',
+    FIELD_TYPE.INT24: 'IntegerField',
+    FIELD_TYPE.LONG: 'IntegerField',
+    FIELD_TYPE.LONGLONG: 'IntegerField',
+    FIELD_TYPE.SHORT: 'IntegerField',
+    FIELD_TYPE.STRING: 'TextField',
+    FIELD_TYPE.TIMESTAMP: 'DateTimeField',
+    FIELD_TYPE.TINY_BLOB: 'TextField',
+    FIELD_TYPE.MEDIUM_BLOB: 'TextField',
+    FIELD_TYPE.LONG_BLOB: 'TextField',
+    FIELD_TYPE.VAR_STRING: 'CharField',
 }

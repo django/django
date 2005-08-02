@@ -7,6 +7,7 @@ ACTION_MAPPING = {
     'adminindex': management.get_admin_index,
     'createsuperuser': management.createsuperuser,
 #     'dbcheck': management.database_check,
+    'inspectdb': management.inspectdb,
     'runserver': management.runserver,
     'sql': management.get_sql_create,
     'sqlall': management.get_sql_all,
@@ -66,6 +67,17 @@ def main():
         print_error("Your action, %r, was invalid." % action, sys.argv[0])
     if action in ('createsuperuser', 'init'):
         ACTION_MAPPING[action]()
+    elif action == 'inspectdb':
+        try:
+            param = args[1]
+        except IndexError:
+            parser.print_usage_and_exit()
+        try:
+            for line in ACTION_MAPPING[action](param):
+                print line
+        except NotImplementedError:
+            sys.stderr.write("Error: %r isn't supported for the currently selected database backend." % action)
+            sys.exit(1)
     elif action in ('startapp', 'startproject'):
         try:
             name = args[1]

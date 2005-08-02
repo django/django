@@ -430,6 +430,32 @@ def createsuperuser():
     print "User created successfully."
 createsuperuser.args = ''
 
+def inspectdb(db_name):
+    "Generator that introspects the tables in the given database name and returns a Django model, one line at a time."
+    from django.core import db
+    from django.conf import settings
+    settings.DATABASE_NAME = db_name
+    cursor = db.db.cursor()
+    yield 'from django.core import meta'
+    yield ''
+    for table_name in db.get_table_list(cursor):
+        object_name = table_name.title().replace('_', '')
+        object_name = object_name.endswith('s') and object_name[:-1] or object_name
+        yield 'class %s(meta.Model):' % object_name
+        yield '    db_table = %r' % table_name
+        yield '    fields = ('
+        cursor.execute("SELECT * FROM %s LIMIT 1" % table_name)
+        for row in cursor.description:
+            field_type = db.DATA_TYPES_REVERSE[row[1]]
+            field_desc = 'meta.%s(%r' % (field_type, row[0])
+            if field_type == 'CharField':
+                field_desc += ', maxlength=%s' % (row[3])
+            yield '        %s),' % field_desc
+        yield '    )'
+        yield ''
+inspectdb.help_doc = "Introspects the database tables in the given database and outputs a Django model module."
+inspectdb.args = "[dbname]"
+
 def runserver(port):
     "Starts a lightweight Web server for development."
     from django.core.servers.basehttp import run, WSGIServerException

@@ -71,6 +71,17 @@ def get_date_trunc_sql(lookup_type, field_name):
     # http://www.postgresql.org/docs/8.0/static/functions-datetime.html#FUNCTIONS-DATETIME-TRUNC
     return "DATE_TRUNC('%s', %s)" % (lookup_type, field_name)
 
+def get_table_list(cursor):
+    "Returns a list of table names in the current database."
+    cursor.execute("""
+        SELECT c.relname
+        FROM pg_catalog.pg_class c
+        LEFT JOIN pg_catalog.pg_namespace n ON n.oid = c.relnamespace
+        WHERE c.relkind IN ('r', 'v', '')
+            AND n.nspname NOT IN ('pg_catalog', 'pg_toast')
+            AND pg_catalog.pg_table_is_visible(c.oid)""")
+    return [row[0] for row in cursor.fetchall()]
+
 # Register these custom typecasts, because Django expects dates/times to be
 # in Python's native (standard-library) datetime/time format, whereas psycopg
 # use mx.DateTime by default.
@@ -128,4 +139,20 @@ DATA_TYPES = {
     'URLField':          'varchar(200)',
     'USStateField':      'varchar(2)',
     'XMLField':          'text',
+}
+
+# Maps type codes to Django Field types.
+DATA_TYPES_REVERSE = {
+    16: 'BooleanField',
+    21: 'SmallIntegerField',
+    23: 'IntegerField',
+    25: 'TextField',
+    869: 'IPAddressField',
+    1043: 'CharField',
+    1082: 'DateField',
+    1083: 'TimeField',
+    1114: 'DateTimeField',
+    1184: 'DateTimeField',
+    1266: 'TimeField',
+    1700: 'FloatField',
 }
