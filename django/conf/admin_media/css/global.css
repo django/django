@@ -228,10 +228,9 @@ form .wide p.help { padding-left:38px; }
 /*  COLLAPSED FIELDSETS  */
 
 fieldset.collapsed * { display:none; }
-fieldset.collapsed h2, fieldset.collapsed .collapse-toggle  { display:block !important; }
+fieldset.collapsed h2, fieldset.collapsed { display:block !important; }
+fieldset.collapsed .collapse-toggle { display: inline !important; }
 fieldset.collapsed h2 { background-image:url(../img/admin/nav-bg.gif); background-position:bottom left; color:#999; }
-fieldset.collapsed .collapse-toggle { padding:3px 5px !important; background:#efefef; }
-fieldset.collapsed .collapse-toggle a { display:inline !important; }
 
 /* MESSAGES & ERRORS  */
 

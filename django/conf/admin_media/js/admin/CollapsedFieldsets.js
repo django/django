@@ -1,5 +1,6 @@
 // Finds all fieldsets with class="collapse", collapses them, and gives each
-// one a "Show foo" link that uncollapses it.
+// one a "Show" link that uncollapses it. The "Show" link becomes a "Hide"
+// link when the fieldset is visible.
 
 function findForm(node) {
 	// returns the node of the form containing the given node
@@ -16,35 +17,25 @@ var CollapsedFieldsets = {
 	init: function() {
 		var fieldsets = document.getElementsByTagName('fieldset');
 		var collapsed_seen = false;
-		for (var i=0; i<fieldsets.length; i++) {
-			var fs = fieldsets[i];
+		for (var i = 0, fs; fs = fieldsets[i]; i++) {
 			// Collapse this fieldset if it has the correct class, and if it
 			// doesn't have any errors. (Collapsing shouldn't apply in the case
 			// of error messages.)
 			if (fs.className.match(CollapsedFieldsets.collapse_re) && !CollapsedFieldsets.fieldset_has_errors(fs)) {
-
 				collapsed_seen = true;
-
 				// Give it an additional class, used by CSS to hide it.
 				fs.className += ' ' + CollapsedFieldsets.collapsed_class;
-
-				// Get plural verbose name of object.
-				var verbose_name = fs.getElementsByTagName('h2')[0].innerHTML;
-
-				// <div class="form-row collapse-toggle" id="fieldsetcollapser1">
-				// <a href="javascript:toggleDisplay;">Show section priorities&hellip;</a>
-				// </div>
-				var div = document.createElement('div');
-
-				// Give it a hook so we can remove it later.
-				div.id = 'fieldsetcollapser' + i;
-
-				div.className = 'form-row collapse-toggle'; // CSS hook
+				// (<a id="fieldsetcollapser3" class="collapse-toggle" href="#">Show</a>)
 				var collapse_link = document.createElement('a');
-				collapse_link.setAttribute('href', 'javascript:CollapsedFieldsets.display(' + i + ');');
-				collapse_link.appendChild(document.createTextNode('Show ' + verbose_name));
-				div.appendChild(collapse_link);
-				fs.appendChild(div);
+				collapse_link.className = 'collapse-toggle';
+				collapse_link.id = 'fieldsetcollapser' + i;
+				collapse_link.onclick = new Function('CollapsedFieldsets.show('+i+'); return false;');
+				collapse_link.href = '#';
+				collapse_link.innerHTML = 'Show';
+				var h2 = fs.getElementsByTagName('h2')[0];
+				h2.appendChild(document.createTextNode(' ('));
+				h2.appendChild(collapse_link);
+				h2.appendChild(document.createTextNode(')'));
 			}
 		}
 		if (collapsed_seen) {
@@ -62,18 +53,30 @@ var CollapsedFieldsets = {
 		}
 		return false;
 	},
-	display: function(fieldset_index) {
+	show: function(fieldset_index) {
 		var fs = document.getElementsByTagName('fieldset')[fieldset_index];
 		// Remove the class name that causes the "display: none".
 		fs.className = fs.className.replace(CollapsedFieldsets.collapsed_re, '');
-		// Remove the "Show foo" link.
-		fs.removeChild(document.getElementById('fieldsetcollapser' + fieldset_index));
+		// Toggle the "Show" link to a "Hide" link
+		var collapse_link = document.getElementById('fieldsetcollapser' + fieldset_index);
+		collapse_link.onclick = new Function('CollapsedFieldsets.hide('+fieldset_index+'); return false;');
+		collapse_link.innerHTML = 'Hide';
 	},
+	hide: function(fieldset_index) {
+		var fs = document.getElementsByTagName('fieldset')[fieldset_index];
+		// Add the class name that causes the "display: none".
+		fs.className += ' ' + CollapsedFieldsets.collapsed_class;
+		// Toggle the "Hide" link to a "Show" link
+		var collapse_link = document.getElementById('fieldsetcollapser' + fieldset_index);
+        collapse_link.onclick = new Function('CollapsedFieldsets.show('+fieldset_index+'); return false;');
+		collapse_link.innerHTML = 'Show';
+	},
+	
 	uncollapse_all: function() {
 		var fieldsets = document.getElementsByTagName('fieldset');
 		for (var i=0; i<fieldsets.length; i++) {
 			if (fieldsets[i].className.match(CollapsedFieldsets.collapsed_re)) {
-				CollapsedFieldsets.display(i);
+				CollapsedFieldsets.show(i);
 			}
 		}
 	}
