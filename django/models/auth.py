@@ -3,9 +3,9 @@ from django.models import core
 
 class Permission(meta.Model):
     fields = (
-        meta.CharField('name', 'name', maxlength=50),
+        meta.CharField('name', maxlength=50),
         meta.ForeignKey(core.Package, name='package'),
-        meta.CharField('codename', 'code name', maxlength=100),
+        meta.CharField('codename', maxlength=100),
     )
     unique_together = (('package', 'codename'),)
     ordering = ('package', 'codename')
@@ -15,7 +15,7 @@ class Permission(meta.Model):
 
 class Group(meta.Model):
     fields = (
-        meta.CharField('name', 'name', maxlength=80, unique=True),
+        meta.CharField('name', maxlength=80, unique=True),
         meta.ManyToManyField(Permission, blank=True, filter_interface=meta.HORIZONTAL),
     )
     ordering = ('name',)
@@ -28,18 +28,18 @@ class Group(meta.Model):
 
 class User(meta.Model):
     fields = (
-        meta.CharField('username', 'username', maxlength=30, unique=True,
+        meta.CharField('username', maxlength=30, unique=True,
             validator_list=[validators.isAlphaNumeric]),
-        meta.CharField('first_name', 'first name', maxlength=30, blank=True),
-        meta.CharField('last_name', 'last name', maxlength=30, blank=True),
+        meta.CharField('first_name', maxlength=30, blank=True),
+        meta.CharField('last_name', maxlength=30, blank=True),
         meta.EmailField('email', 'e-mail address', blank=True),
         meta.CharField('password_md5', 'password', maxlength=32, help_text="Use an MD5 hash -- not the raw password."),
         meta.BooleanField('is_staff', 'staff status',
             help_text="Designates whether the user can log into this admin site."),
         meta.BooleanField('is_active', 'active', default=True),
         meta.BooleanField('is_superuser', 'superuser status'),
-        meta.DateTimeField('last_login', 'last login', default=meta.LazyDate()),
-        meta.DateTimeField('date_joined', 'date joined', default=meta.LazyDate()),
+        meta.DateTimeField('last_login', default=meta.LazyDate()),
+        meta.DateTimeField('date_joined', default=meta.LazyDate()),
         meta.ManyToManyField(Group, blank=True,
             help_text="In addition to the permissions manually assigned, this user will also get all permissions granted to each group he/she is in."),
         meta.ManyToManyField(Permission, name='user_permissions', blank=True, filter_interface=meta.HORIZONTAL),
@@ -175,8 +175,8 @@ class User(meta.Model):
 class Session(meta.Model):
     fields = (
         meta.ForeignKey(User),
-        meta.CharField('session_md5', 'session MD5 hash', maxlength=32),
-        meta.DateTimeField('start_time', 'start time', auto_now=True),
+        meta.CharField('session_md5', maxlength=32),
+        meta.DateTimeField('start_time', auto_now=True),
     )
     module_constants = {
         'TEST_COOKIE_NAME': 'testcookie',
@@ -233,7 +233,7 @@ class Session(meta.Model):
 class Message(meta.Model):
     fields = (
         meta.ForeignKey(User),
-        meta.TextField('message', 'message'),
+        meta.TextField('message'),
     )
 
     def __repr__(self):
@@ -244,13 +244,13 @@ class LogEntry(meta.Model):
     verbose_name_plural = 'log entries'
     db_table = 'auth_admin_log'
     fields = (
-        meta.DateTimeField('action_time', 'action time', auto_now=True),
+        meta.DateTimeField('action_time', auto_now=True),
         meta.ForeignKey(User),
         meta.ForeignKey(core.ContentType, name='content_type_id', rel_name='content_type', blank=True, null=True),
-        meta.IntegerField('object_id', 'object ID', blank=True, null=True),
-        meta.CharField('object_repr', 'object representation', maxlength=200),
-        meta.PositiveSmallIntegerField('action_flag', 'action flag'),
-        meta.TextField('change_message', 'change message', blank=True),
+        meta.IntegerField('object_id', blank=True, null=True),
+        meta.CharField('object_repr', maxlength=200),
+        meta.PositiveSmallIntegerField('action_flag'),
+        meta.TextField('change_message', blank=True),
     )
     ordering = ('-action_time',)
     module_constants = {

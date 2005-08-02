@@ -19,8 +19,8 @@ class Site(meta.Model):
 class Package(meta.Model):
     db_table = 'packages'
     fields = (
-        meta.CharField('label', 'label', maxlength=20, primary_key=True),
-        meta.CharField('name', 'name', maxlength=30, unique=True),
+        meta.CharField('label', maxlength=20, primary_key=True),
+        meta.CharField('name', maxlength=30, unique=True),
     )
     ordering = ('name',)
 
@@ -30,9 +30,9 @@ class Package(meta.Model):
 class ContentType(meta.Model):
     db_table = 'content_types'
     fields = (
-        meta.CharField('name', 'name', maxlength=100),
+        meta.CharField('name', maxlength=100),
         meta.ForeignKey(Package, name='package'),
-        meta.CharField('python_module_name', 'Python module name', maxlength=50),
+        meta.CharField('python_module_name', maxlength=50),
     )
     ordering = ('package', 'name')
     unique_together = (('package', 'python_module_name'),)
@@ -78,12 +78,12 @@ class FlatFile(meta.Model):
     fields = (
         meta.CharField('url', 'URL', maxlength=100, validator_list=[validators.isAlphaNumericURL],
             help_text="Example: '/about/contact/'. Make sure to have leading and trailing slashes."),
-        meta.CharField('title', 'title', maxlength=200),
-        meta.TextField('content', 'content', help_text="Full HTML is allowed."),
-        meta.BooleanField('enable_comments', 'enable comments'),
-        meta.CharField('template_name', 'template name', maxlength=70, blank=True,
+        meta.CharField('title', maxlength=200),
+        meta.TextField('content', help_text="Full HTML is allowed."),
+        meta.BooleanField('enable_comments'),
+        meta.CharField('template_name', maxlength=70, blank=True,
             help_text="Example: 'flatfiles/contact_page'. If this isn't provided, the system will use 'flatfiles/default'."),
-        meta.BooleanField('registration_required', 'registration required',
+        meta.BooleanField('registration_required',
             help_text="If this is checked, only logged-in users will be able to view the page."),
         meta.ManyToManyField(Site),
     )
