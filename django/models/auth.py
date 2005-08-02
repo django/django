@@ -232,7 +232,6 @@ class Session(meta.Model):
 
 class Message(meta.Model):
     fields = (
-        meta.AutoField('id', 'ID', primary_key=True),
         meta.ForeignKey(User),
         meta.TextField('message', 'message'),
     )
