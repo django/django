@@ -18,6 +18,8 @@ urlpatterns = (
     ('^doc/views/(?P<view>[^/]+)/$', 'django.views.admin.doc.view_detail'),
     ('^doc/models/$', 'django.views.admin.doc.model_index'),
     ('^doc/models/(?P<model>[^/]+)/$', 'django.views.admin.doc.model_detail'),
+#    ('^doc/templates/$', 'django.views.admin.doc.template_index'),
+    ('^doc/templates/(?P<template>.*)/$', 'django.views.admin.doc.template_detail'),
 )
 
 if 'ellington.events' in INSTALLED_APPS:

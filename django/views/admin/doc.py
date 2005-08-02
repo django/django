@@ -218,6 +218,27 @@ def model_detail(request, model):
     })
     return HttpResponse(t.render(c))
 
+def template_detail(request, template):
+    templates = []
+    for site_settings_module in settings.ADMIN_FOR:
+        settings_mod = __import__(site_settings_module, '', '', [''])
+        for dir in settings_mod.TEMPLATE_DIRS:
+            template_file = os.path.join(dir, "%s.html" % template)
+            templates.append({
+                'file'      : template_file,
+                'exists'    : os.path.exists(template_file),
+                'contents'  : lambda: os.path.exists(template_file) and open(template_file).read() or '',
+                'site_id'   : settings_mod.SITE_ID,
+                'site'      : sites.get_object(pk=settings_mod.SITE_ID),
+                'order'     : list(settings_mod.TEMPLATE_DIRS).index(dir),
+            })
+    t = template_loader.get_template('doc/template_detail')
+    c = Context(request, {
+        'name'      : template,
+        'templates' : templates,
+    })
+    return HttpResponse(t.render(c))
+        
 ####################
 # Helper functions #
 ####################
