@@ -100,7 +100,13 @@ def get_installed_model_modules(core_models=None):
         _installed_modules_cache.append(__import__('django.models.%s' % submodule, '', '', ['']))
     for m in get_installed_models():
         for submodule in getattr(m, '__all__', []):
-            _installed_modules_cache.append(__import__('django.models.%s' % submodule, '', '', ['']))
+            mod = __import__('django.models.%s' % submodule, '', '', [''])
+            try:
+                mod._MODELS
+            except AttributeError:
+                pass # Skip model modules that don't actually have models in them.
+            else:
+                _installed_modules_cache.append(mod)
     return _installed_modules_cache
 
 class LazyDate:
