@@ -1,7 +1,7 @@
 """
 10. One-to-one relationships
 
-To define a many-to-one relationship, use ``OneToOneField()``.
+To define a one-to-one relationship, use ``OneToOneField()``.
 
 In this example, a ``Place`` optionally can be a ``Restaurant``.
 """
