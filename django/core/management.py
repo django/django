@@ -464,7 +464,12 @@ def inspectdb(db_name):
                 rel_to = rel[1] == table_name and "'self'" or table2model(rel[1])
                 field_desc = 'meta.ForeignKey(%s, name=%r' % (rel_to, row[0])
             else:
-                field_type = db.DATA_TYPES_REVERSE[row[1]]
+                try:
+                    field_type = db.DATA_TYPES_REVERSE[row[1]]
+                except KeyError:
+                    field_type = 'TextField'
+                    yield "        # The model-creator script used TextField by default, because"
+                    yield "        # it couldn't recognize your field type."
                 field_desc = 'meta.%s(%r' % (field_type, row[0])
                 if field_type == 'CharField':
                     field_desc += ', maxlength=%s' % (row[3])
