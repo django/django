@@ -766,7 +766,8 @@ def add_stage(request, app_label, module_name, show_delete=False, form_url='', p
         if not errors and not request.POST.has_key("_preview"):
             manipulator.do_html2python(new_data)
             new_object = manipulator.save(new_data)
-            log.log_action(request.user.id, opts.get_content_type_id(), getattr(new_object, opts.pk.name), repr(new_object), log.ADDITION)
+            pk_value = getattr(new_object, opts.pk.name)
+            log.log_action(request.user.id, opts.get_content_type_id(), pk_value, repr(new_object), log.ADDITION)
             msg = 'The %s "%s" was added successfully.' % (opts.verbose_name, new_object)
             # Here, we distinguish between different save types by checking for
             # the presence of keys in request.POST.
@@ -774,11 +775,10 @@ def add_stage(request, app_label, module_name, show_delete=False, form_url='', p
                 request.user.add_message("%s You may edit it again below." % msg)
                 if request.POST.has_key("_popup"):
                     post_url_continue += "?_popup=1"
-                return HttpResponseRedirect(post_url_continue % new_object.id)
+                return HttpResponseRedirect(post_url_continue % pk_value)
             if request.POST.has_key("_popup"):
                 return HttpResponse('<script type="text/javascript">opener.dismissAddAnotherPopup(window, %s, "%s");</script>' % \
-                    (getattr(new_object, opts.pk.name), repr(new_object).replace('"', '\\"')),
-                    mimetype='text/html; charset=utf-8')
+                    (pk_value, repr(new_object).replace('"', '\\"')), mimetype='text/html; charset=utf-8')
             elif request.POST.has_key("_addanother"):
                 request.user.add_message("%s You may add another %s below." % (msg, opts.verbose_name))
                 return HttpResponseRedirect(request.path)
@@ -862,6 +862,7 @@ def change_stage(request, app_label, module_name, object_id):
         if not errors and not request.POST.has_key("_preview"):
             manipulator.do_html2python(new_data)
             new_object = manipulator.save(new_data)
+            pk_value = getattr(new_object, opts.pk.name)
 
             # Construct the change message.
             change_message = []
@@ -875,7 +876,7 @@ def change_stage(request, app_label, module_name, object_id):
             if not change_message:
                 change_message = 'No fields changed.'
 
-            log.log_action(request.user.id, opts.get_content_type_id(), getattr(new_object, opts.pk.name), repr(new_object), log.CHANGE, change_message)
+            log.log_action(request.user.id, opts.get_content_type_id(), pk_value, repr(new_object), log.CHANGE, change_message)
             msg = 'The %s "%s" was changed successfully.' % (opts.verbose_name, new_object)
             if request.POST.has_key("_continue"):
                 request.user.add_message("%s You may edit it again below." % msg)
@@ -885,7 +886,7 @@ def change_stage(request, app_label, module_name, object_id):
                     return HttpResponseRedirect(request.path)
             elif request.POST.has_key("_saveasnew"):
                 request.user.add_message('The %s "%s" was added successfully. You may edit it again below.' % (opts.verbose_name, new_object))
-                return HttpResponseRedirect("../%s/" % new_object.id)
+                return HttpResponseRedirect("../%s/" % pk_value)
             elif request.POST.has_key("_addanother"):
                 request.user.add_message("%s You may add another %s below." % (msg, opts.verbose_name))
                 return HttpResponseRedirect("../add/")
