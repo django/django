@@ -344,7 +344,30 @@ class MatchesRegularExpression:
 
     def __call__(self, field_data, all_data):
         if not self.regexp.match(field_data):
-            raise validators.ValidationError(self.error_message)
+            raise ValidationError(self.error_message)
+
+class AnyValidator:
+    """
+    This validator tries all given validators. If any one of them succeeds,
+    validation passes. If none of them succeeds, the given message is thrown
+    as a validation error. The message is rather unspecific, so it's best to
+    specify one on instantiation.
+    """
+    def __init__(self, validator_list=[], error_message="This field is invalid."):
+        self.validator_list = validator_list
+        self.error_message = error_message
+        for v in validator_list:
+            if hasattr(v, 'always_test'):
+                self.always_test = True
+
+    def __call__(self, field_data, all_data):
+        for v in self.validator_list:
+            try:
+                v(field_data, all_data)
+                return
+            except ValidationError, e:
+                pass
+        raise ValidationError(self.error_message)
 
 class URLMimeTypeCheck:
     "Checks that the provided URL points to a document with a listed mime type"
