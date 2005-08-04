@@ -446,6 +446,9 @@ def inspectdb(db_name):
     yield "#     * Rearrange models' order"
     yield "#     * Add primary_key=True to one field in each model."
     yield "# Feel free to rename the models, but don't rename db_table values or field names."
+    yield "#"
+    yield "# Also note: You'll have to insert the output of 'django-admin.py sqlinitialdata [appname]'"
+    yield "# into your database."
     yield ''
     yield 'from django.core import meta'
     yield ''
