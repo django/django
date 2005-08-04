@@ -462,12 +462,12 @@ Field Types
     Argument                 Description
     =======================  ============================================================
     ``rel_name``             Use this if you have more than one
-                             ``ManyToOneField`` s in the same model that relate
+                             ``ForeignKey``  in the same model that relate
                              to the same model. Django will use ``rel_name`` in
                              the generated API.
 
     ``related_name``         See the description of ``related_name`` in
-                             ``ManyToOneField``, above.
+                             ``ForeignKey``, above.
 
     ``filter_interface``     Use a nifty unobtrusive Javascript "filter" interface
                              instead of the usability-challenged ``<select multiple>``
@@ -476,7 +476,7 @@ Field Types
                              should the interface be stacked horizontally or
                              vertically).
 
-    ``limit_choices_to``     See the description under ``ManyToOneField`` above.
+    ``limit_choices_to``     See the description under ``ForeignKey`` above.
 
     ``name``                 An alphanumeric name for the relationship. If this
                              isn't provided, Django uses the ``module_name`` of
