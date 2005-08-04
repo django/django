@@ -211,9 +211,8 @@ class AlwaysMatchesOtherField:
             raise ValidationError, self.error_message
 
 class RequiredIfOtherFieldNotGiven:
-    def __init__(self, other_field_name, error_message=None):
-        self.other = other_field_name
-        self.error_message = error_message or "Please enter something for at least one field."
+    def __init__(self, other_field_name, error_message="Please enter something for at least one field."):
+        self.other, self.error_message = other_field_name, error_message
         self.always_test = True
 
     def __call__(self, field_data, all_data):
@@ -222,8 +221,7 @@ class RequiredIfOtherFieldNotGiven:
 
 class RequiredIfOtherFieldsGiven:
     def __init__(self, other_field_names, error_message="Please enter both fields or leave them both empty."):
-        self.other = other_field_names
-        self.error_message = error_message
+        self.other, self.error_message = other_field_names, error_message
         self.always_test = True
 
     def __call__(self, field_data, all_data):
