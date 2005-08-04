@@ -333,6 +333,19 @@ class HasAllowableSize:
         if self.max_size is not None and len(field_data['content']) > self.max_size:
             raise ValidationError, self.max_error_message
 
+class MatchesRegularExpression:
+    """
+    Checks that the field matches the given regular-expression. The regex
+    should be in string format, not already compiled.
+    """
+    def __init__(self, regexp, error_message="The format for this field is wrong."):
+        self.regexp = re.compile(regexp)
+        self.error_message = error_message
+
+    def __call__(self, field_data, all_data):
+        if not self.regexp.match(field_data):
+            raise validators.ValidationError(self.error_message)
+
 class URLMimeTypeCheck:
     "Checks that the provided URL points to a document with a listed mime type"
     class CouldNotRetrieve(ValidationError):
