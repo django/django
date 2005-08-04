@@ -210,6 +210,17 @@ class AlwaysMatchesOtherField:
         if field_data != all_data[self.other]:
             raise ValidationError, self.error_message
 
+class ValidateIfOtherFieldEquals:
+    def __init__(self, other_field, other_value, validator_list):
+        self.other_field, self.other_value = other_field, other_value
+        self.validator_list = validator_list
+        self.always_test = True
+
+    def __call__(self, field_data, all_data):
+        if all_data.has_key(self.other_field) and all_data[self.other_field] == self.other_value:
+            for v in self.validator_list:
+                v(field_data, all_data)
+
 class RequiredIfOtherFieldNotGiven:
     def __init__(self, other_field_name, error_message="Please enter something for at least one field."):
         self.other, self.error_message = other_field_name, error_message
