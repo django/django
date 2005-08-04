@@ -210,16 +210,6 @@ class AlwaysMatchesOtherField:
         if field_data != all_data[self.other]:
             raise ValidationError, self.error_message
 
-class RequiredIfOtherFieldGiven:
-    def __init__(self, other_field_name, error_message=None):
-        self.other = other_field_name
-        self.error_message = error_message or "Please enter both fields or leave them both empty."
-        self.always_test = True
-
-    def __call__(self, field_data, all_data):
-        if all_data[self.other] and not field_data:
-            raise ValidationError, self.error_message
-
 class RequiredIfOtherFieldNotGiven:
     def __init__(self, other_field_name, error_message=None):
         self.other = other_field_name
@@ -231,16 +221,20 @@ class RequiredIfOtherFieldNotGiven:
             raise ValidationError, self.error_message
 
 class RequiredIfOtherFieldsGiven:
-    "Like RequiredIfOtherFieldGiven, but takes a list of required field names instead of a single field name"
-    def __init__(self, other_field_names, error_message=None):
+    def __init__(self, other_field_names, error_message="Please enter both fields or leave them both empty."):
         self.other = other_field_names
-        self.error_message = error_message or "Please enter both fields or leave them both empty."
+        self.error_message = error_message
         self.always_test = True
 
     def __call__(self, field_data, all_data):
         for field in self.other:
-            if all_data.has_key(field) and all_data[field] and not field_data:
+            if all_data.get(field) and not field_data:
                 raise ValidationError, self.error_message
+
+class RequiredIfOtherFieldGiven(RequiredIfOtherFieldsGiven):
+    "Like RequiredIfOtherFieldsGiven, but takes a single field name instead of a list."
+    def __init__(self, other_field_name, error_message="Please enter both fields or leave them both empty."):
+        RequiredIfOtherFieldsGiven.__init__(self, [other_field_name], error_message)
 
 class RequiredIfOtherFieldEquals:
     def __init__(self, other_field, other_value, error_message=None):
