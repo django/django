@@ -237,7 +237,7 @@ class RequiredIfOtherFieldsGiven:
 
     def __call__(self, field_data, all_data):
         for field in self.other:
-            if all_data.get(field) and not field_data:
+            if all_data.get(field, False) and not field_data:
                 raise ValidationError, self.error_message
 
 class RequiredIfOtherFieldGiven(RequiredIfOtherFieldsGiven):
