@@ -122,9 +122,6 @@ That'll create a directory structure like this::
         models/
             __init__.py
             polls.py
-        urls/
-            __init__.py
-            polls.py
         views/
             __init__.py
 

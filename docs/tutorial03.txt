@@ -369,9 +369,10 @@ We've been editing the URLs in ``myproject/settings/urls/main.py``, but the
 URL design of an app is specific to the app, not to the Django installation --
 so let's move the URLs within the app directory.
 
-Just copy the file ``myproject/settings/urls/main.py`` to
-``myproject/apps/polls/urls/polls.py``, which had already been created, as a
-stub, by ``django-admin.py startapp``.
+Create a directory ``myproject/apps/polls/urls/``, and put a blank file called
+``__init__.py`` into it. (The ``__init__.py`` file is necessary for Python to
+treat the directory as a package.) Then copy the file
+``myproject/settings/urls/main.py`` to ``myproject/apps/polls/urls/polls.py``.
 
 Then, change ``myproject/settings/urls/main.py`` to remove the poll-specific
 URLs and insert an ``include()``::
