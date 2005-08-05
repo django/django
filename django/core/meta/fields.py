@@ -532,7 +532,7 @@ class ForeignKey(Field):
             kwargs['verbose_name'] = kwargs.get('verbose_name', to._meta.verbose_name)
             rel_name = rel_name or to_name
         kwargs['rel'] = ManyToOne(to, rel_name, to_field,
-            num_in_admin=kwargs.pop('num_in_admin', 0),
+            num_in_admin=kwargs.pop('num_in_admin', 3),
             min_num_in_admin=kwargs.pop('min_num_in_admin', None),
             max_num_in_admin=kwargs.pop('max_num_in_admin', None),
             num_extra_on_change=kwargs.pop('num_extra_on_change', 1),
@@ -585,7 +585,7 @@ class OneToOneField(IntegerField):
         IntegerField.__init__(self, **kwargs)
 
 class ManyToOne:
-    def __init__(self, to, name, field_name, num_in_admin=0, min_num_in_admin=None,
+    def __init__(self, to, name, field_name, num_in_admin=3, min_num_in_admin=None,
         max_num_in_admin=None, num_extra_on_change=1, edit_inline=False, edit_inline_type=STACKED,
         related_name=None, limit_choices_to=None, lookup_overrides=None, raw_id_admin=False):
         try:
