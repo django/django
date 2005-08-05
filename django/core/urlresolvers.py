@@ -10,6 +10,9 @@ a string) and returns a tuple in this format:
 from django.core.exceptions import Http404, ViewDoesNotExist
 import re
 
+class Resolver404(Http404):
+    pass
+
 def get_mod_func(callback):
     # Converts 'django.views.news.stories.story_detail' to
     # ['django.views.news.stories', 'story_detail']
@@ -52,15 +55,20 @@ class RegexURLResolver:
         self.urlconf_name = urlconf_name
 
     def resolve(self, path):
+        tried = []
         match = self.regex.search(path)
         if match:
             new_path = path[match.end():]
             for pattern in self.url_patterns:
-                sub_match = pattern.resolve(new_path)
-                if sub_match:
-                    return sub_match
-            # None of the regexes matched, so raise a 404.
-            raise Http404, "Tried all URL patterns but didn't find a match for %r" % path
+                try:
+                    sub_match = pattern.resolve(new_path)
+                except Resolver404, e:
+                    tried.extend([(pattern.regex.pattern + '   ' + t) for t in e.args[0]['tried']])
+                else:
+                    if sub_match:
+                        return sub_match
+                    tried.append(pattern.regex.pattern)
+            raise Resolver404, {'tried': tried, 'path': new_path}
 
     def _get_urlconf_module(self):
         self.urlconf_module = __import__(self.urlconf_name, '', '', [''])
