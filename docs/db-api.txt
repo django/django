@@ -43,7 +43,7 @@ double-underscore). For example::
 
     polls.get_list(pub_date__lte=datetime.datetime.now())
 
-translates (roughly) into the following SQL:
+translates (roughly) into the following SQL::
 
     SELECT * FROM polls_polls WHERE pub_date < NOW();
 
