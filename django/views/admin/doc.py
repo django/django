@@ -238,7 +238,7 @@ def template_detail(request, template):
         'templates' : templates,
     })
     return HttpResponse(t.render(c))
-        
+
 ####################
 # Helper functions #
 ####################
@@ -325,8 +325,8 @@ def extract_views_from_urlpatterns(urlpatterns, base=''):
                 views.append((p.get_callback(), base + p.regex.pattern))
             except ViewDoesNotExist:
                 continue
-        elif hasattr(p, 'get_url_patterns'):
-            views.extend(extract_views_from_urlpatterns(p.get_url_patterns(), base + p.regex.pattern))
+        elif hasattr(p, '_get_url_patterns'):
+            views.extend(extract_views_from_urlpatterns(p.url_patterns, base + p.regex.pattern))
         else:
             raise TypeError, "%s does not appear to be a urlpattern object" % p
     return views
