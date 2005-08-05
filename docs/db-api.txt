@@ -47,6 +47,12 @@ translates (roughly) into the following SQL:
 
     SELECT * FROM polls_polls WHERE pub_date < NOW();
 
+.. admonition:: How this is possible
+
+   Python has the ability to define functions that accept arbitrary name-value
+   arguments whose names and values are evaluated at run time. For more
+   information, see `Keyword Arguments`_ in the official Python tutorial.
+
 The DB API supports the following lookup types:
 
     ===========  ==============================================================
@@ -112,6 +118,8 @@ statements are equivalent::
 
     choices.get_list(poll__id__exact=3)
     choices.get_list(poll__pk=3)
+
+.. _`Keyword Arguments`: http://docs.python.org/tut/node6.html#SECTION006720000000000000000
 
 Ordering
 ========
