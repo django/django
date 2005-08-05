@@ -415,8 +415,8 @@ All the poll app cares about is its relative URLs, not its absolute URLs.
 Coming soon
 ===========
 
-The tutorial ends here for the time being. But check back within 48 hours for
-the next installments:
+The tutorial ends here for the time being. But check back soon for the next
+installments:
 
     * Advanced view features: Form processing
     * Using the RSS framework
