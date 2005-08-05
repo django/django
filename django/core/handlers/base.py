@@ -51,8 +51,7 @@ class BaseHandler:
             if response:
                 return response
 
-        conf_module = __import__(ROOT_URLCONF, '', '', [''])
-        resolver = urlresolvers.RegexURLResolver(conf_module.urlpatterns)
+        resolver = urlresolvers.RegexURLResolver(r'^/', ROOT_URLCONF)
         try:
             callback, param_dict = resolver.resolve(path)
             # Apply view middleware
@@ -65,8 +64,7 @@ class BaseHandler:
             if DEBUG:
                 return self.get_technical_error_response(is404=True)
             else:
-                resolver = urlresolvers.Error404Resolver(conf_module.handler404)
-                callback, param_dict = resolver.resolve()
+                callback, param_dict = resolver.resolve404()
                 return callback(request, **param_dict)
         except db.DatabaseError:
             db.db.rollback()
@@ -76,7 +74,7 @@ class BaseHandler:
                 subject = 'Database error (%s IP)' % (request.META['REMOTE_ADDR'] in INTERNAL_IPS and 'internal' or 'EXTERNAL')
                 message = "%s\n\n%s" % (self._get_traceback(), request)
                 mail_admins(subject, message, fail_silently=True)
-                return self.get_friendly_error_response(request, conf_module)
+                return self.get_friendly_error_response(request, resolver)
         except exceptions.PermissionDenied:
             return httpwrappers.HttpResponseForbidden('<h1>Permission denied</h1>')
         except: # Handle everything else, including SuspiciousOperation, etc.
@@ -90,16 +88,15 @@ class BaseHandler:
                     request_repr = "Request repr() unavailable"
                 message = "%s\n\n%s" % (self._get_traceback(), request_repr)
                 mail_admins(subject, message, fail_silently=True)
-                return self.get_friendly_error_response(request, conf_module)
+                return self.get_friendly_error_response(request, resolver)
 
-    def get_friendly_error_response(self, request, conf_module):
+    def get_friendly_error_response(self, request, resolver):
         """
         Returns an HttpResponse that displays a PUBLIC error message for a
         fundamental database or coding error.
         """
         from django.core import urlresolvers
-        resolver = urlresolvers.Error404Resolver(conf_module.handler500)
-        callback, param_dict = resolver.resolve()
+        callback, param_dict = resolver.resolve500()
         return callback(request, **param_dict)
 
     def get_technical_error_response(self, is404=False):
