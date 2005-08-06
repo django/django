@@ -230,7 +230,7 @@ def change_list(request, app_label, module_name):
             elif isinstance(f, meta.DateField):
                 today = datetime.date.today()
                 one_week_ago = today - datetime.timedelta(days=7)
-                field_generic = '%s__' % field_name
+                field_generic = '%s__' % f.name
                 filter_template.append('<h3>By %s:</h3><ul>\n' % f.verbose_name)
                 date_params = dict([(k, v) for k, v in params.items() if k.startswith(field_generic)])
                 today_str = isinstance(f, meta.DateTimeField) and today.strftime('%Y-%m-%d 23:59:59') or today.strftime('%Y-%m-%d')
