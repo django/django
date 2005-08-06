@@ -942,7 +942,7 @@ def change_stage(request, app_label, module_name, object_id):
                 if f.editable and f != rel_field:
                     for field_name in f.get_manipulator_field_names(''):
                         full_field_name = '%s.%d.%s' % (var_name, i, field_name)
-                        collection[field_name] = formfields.FormFieldWrapper(manipulator[full_field_name], new_data.get(full_field_name, ''), errors.get(full_field_name, []))
+                        collection[field_name] = formfields.FormFieldWrapper(manipulator[full_field_name], new_data.get(full_field_name, f.get_default()), errors.get(full_field_name, []))
             wrapper.append(formfields.FormFieldCollection(collection))
         setattr(form, rel_opts.module_name, wrapper)
         if rel_opts.order_with_respect_to and rel_opts.order_with_respect_to.rel and rel_opts.order_with_respect_to.rel.to == opts:
