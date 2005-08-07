@@ -391,6 +391,9 @@ the default admin template directory::
         "/usr/lib/python2.3/site-packages/django/conf/admin_templates",
     )
 
+Again, note that you should edit the admin settings file, not the main settings
+file. That's because we're dealing with admin-site templates.
+
 Now copy the template ``base_site.html`` from within the default Django admin
 template directory, into ``/home/mytemplates/admin`` (or wherever you're
 putting your custom admin templates). Edit the file and replace the generic
