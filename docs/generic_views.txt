@@ -193,12 +193,13 @@ The date-based generic functions are:
 Using list/detail generic views
 ===============================
 
-The list-detail generic views (in the ``django.views.generic.list_detail``
-module) are similar to the data-based ones, except the list-detail views simply
-have two views: a list of objects, and an individual object page.
+The list-detail generic-view framework (in the
+``django.views.generic.list_detail`` module) is similar to the date-based one,
+except the former simply has two views: a list of objects and an individual
+object page.
 
 All these views take the same three optional arguments as the date-based ones
-(and they obviously do not accept or require the date field argument).
+-- and, clearly, they don't accept the ``date_field`` argument.
 
 Individual views are:
 

@@ -6,7 +6,7 @@ from django.core.extensions import DjangoContext as Context
 from django.core.paginator import ObjectPaginator, InvalidPage
 from django.core.exceptions import Http404, ObjectDoesNotExist
 
-def object_list(request, app_label, module_name, paginate_by=None, allow_empty=False, 
+def object_list(request, app_label, module_name, paginate_by=None, allow_empty=False,
                 template_name=None, extra_lookup_kwargs={}, extra_context={}):
     """
     Generic list of objects.
@@ -64,28 +64,28 @@ def object_list(request, app_label, module_name, paginate_by=None, allow_empty=F
     for key, value in extra_context.items():
         if callable(value):
             c[key] = value()
-        else:   
+        else:
             c[key] = value
     if not template_name:
         template_name = "%s/%s_list" % (app_label, module_name)
     t = template_loader.get_template(template_name)
     return HttpResponse(t.render(c))
 
-def object_detail(request, app_label, module_name, object_id=None, slug=None, 
-                  slug_field=None, template_name=None, template_name_field=None, 
+def object_detail(request, app_label, module_name, object_id=None, slug=None,
+                  slug_field=None, template_name=None, template_name_field=None,
                   extra_lookup_kwargs={}, extra_context={}):
     """
     Generic list of objects.
 
-    Templates: ``<app_label>/<module_name>_list``
+    Templates: ``<app_label>/<module_name>_detail``
     Context:
         object
-            the object (whoa!)
+            the object
     """
     mod = models.get_module(app_label, module_name)
     lookup_kwargs = {}
     if object_id:
-        lookup_kwargs['%s__exact' % mod.Klass._meta.pk.name] = object_id
+        lookup_kwargs['pk'] = object_id
     elif slug and slug_field:
         lookup_kwargs['%s__exact' % slug_field] = slug
     else:
@@ -108,7 +108,7 @@ def object_detail(request, app_label, module_name, object_id=None, slug=None,
     for key, value in extra_context.items():
         if callable(value):
             c[key] = value()
-        else:   
+        else:
             c[key] = value
     response = HttpResponse(t.render(c))
     populate_xheaders(request, response, app_label, module_name, getattr(object, object._meta.pk.name))
