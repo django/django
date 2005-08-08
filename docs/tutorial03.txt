@@ -9,33 +9,32 @@ application and will focus on creating the public interface -- "views."
 
 .. _Tutorial 2: http://www.djangoproject.com/documentation/tutorial2/
 
-.. admonition:: Philosophy
+Philosophy
+==========
 
-    A view is a "type" of Web page in your Django application that generally
-    serves a specific function and has a specific template. For example, in a
-    weblog application, you might have the following views:
+A view is a "type" of Web page in your Django application that generally serves
+a specific function and has a specific template. For example, in a weblog
+application, you might have the following views:
 
-        * Blog homepage -- displays the latest few entries.
-        * Entry "detail" page -- permalink page for a single entry.
-        * Year-based archive page -- displays all months with entries in the
-          given year.
-        * Month-based archive page -- displays all days with entries in the
-          given month.
-        * Day-based archive page -- displays all entries in the given day.
-        * Comment action -- handles posting comments to a given entry.
+    * Blog homepage -- displays the latest few entries.
+    * Entry "detail" page -- permalink page for a single entry.
+    * Year-based archive page -- displays all months with entries in the
+        given year.
+    * Month-based archive page -- displays all days with entries in the
+        given month.
+    * Day-based archive page -- displays all entries in the given day.
+    * Comment action -- handles posting comments to a given entry.
 
-    In our poll application, we'll have the following four views:
+In our poll application, we'll have the following four views:
 
-        * Poll "archive" page -- displays the latest few polls.
-        * Poll "detail" page -- displays a poll question, with no results but
-          with a form to vote.
-        * Poll "results" page -- displays results for a particular poll.
-        * Vote action -- handles voting for a particular choice in a particular
-          poll.
+    * Poll "archive" page -- displays the latest few polls.
+    * Poll "detail" page -- displays a poll question, with no results but
+        with a form to vote.
+    * Poll "results" page -- displays results for a particular poll.
+    * Vote action -- handles voting for a particular choice in a particular
+        poll.
 
-    In Django, each view is represented by a simple Python function.
-
-
+In Django, each view is represented by a simple Python function.
 
 Design your URLs
 ================
@@ -130,8 +129,8 @@ change the ``settings`` parameter.)
 Now go to "http://localhost:8000/polls/" on your domain in your Web browser.
 You should get a Python traceback with the following error message::
 
-    ViewDoesNotExist: Tried myproject.apps.polls.views.polls.index.
-    No module named polls
+    ViewDoesNotExist: Could not import myproject.apps.polls.views.polls. Error
+    was: No module named polls
 
 Try "/polls/23/", "/polls/23/results/" and "/polls/23/vote/". The error
 messages should tell you which view Django tried (and failed to find, because
@@ -378,8 +377,6 @@ Then, change ``myproject/settings/urls/main.py`` to remove the poll-specific
 URLs and insert an ``include()``::
 
     (r'^polls/', include('myproject.apps.polls.urls.polls')),
-
-Notes:
 
 ``include()``, simply, references another URLconf. Note that the regular
 expression doesn't have a ``$`` (end-of-string match character) but has the
