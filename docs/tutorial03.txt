@@ -409,15 +409,7 @@ other URL root, and the app will still work.
 
 All the poll app cares about is its relative URLs, not its absolute URLs.
 
-Coming soon
-===========
+When you're comfortable with writing views, read `part 4 of this tutorial`_ to
+learn about simple form processing and generic views.
 
-The tutorial ends here for the time being. But check back soon for the next
-installments:
-
-    * Advanced view features: Form processing
-    * Using the RSS framework
-    * Using the cache framework
-    * Using the comments framework
-    * Advanced admin features: Permissions
-    * Advanced admin features: Custom JavaScript
+.. _part 4 of this tutorial: http://www.djangoproject.com/documentation/tutorial4/

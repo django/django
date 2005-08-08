@@ -1,0 +1,250 @@
+=====================================
+Writing your first Django app, part 4
+=====================================
+
+By Adrian Holovaty <holovaty@gmail.com>
+
+This tutorial begins where `Tutorial 3`_ left off. We're continuing the Web-poll
+application and will focus on simple form processing and cutting down our code.
+
+Write a simple form
+===================
+
+Let's update our poll detail template from the last tutorial, so that the
+template contains an HTML ``<form>`` element::
+
+    <h1>{{ poll.question }}</h1>
+
+    {% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
+
+    <form action="/polls/{{ poll.id }}/vote/" method="post">
+    {% for choice in poll.get_choice_list %}
+        <input type="radio" name="choice" id="choice{{ forloop.counter }}" value="{{ choice.id }}" />
+        <label for="choice{{ forloop.counter }}">{{ choice.choice }}</label><br />
+    {% endfor %}
+    <input type="submit" value="Vote" />
+    </form>
+
+A quick rundown:
+
+    * The above template displays a radio button for each poll choice. The
+      ``value`` of each radio button is the associated poll choice's ID. The
+      ``name`` of each radio button is ``"choice"``. That means, when somebody
+      selects one of the radio buttons and submits the form, it'll send the
+      POST data ``choice=3``. This is HTML Forms 101.
+
+    * We set the form's ``action`` to ``/polls/{{ poll.id }}/vote/``, and we
+      set ``method="post"``. Using ``method="post"`` (as opposed to
+      ``method="get"``) is very important, because the act of submitting this
+      form will alter data server-side. Whenever you create a form that alters
+      data server-side, use ``method="post"``. This tip isn't specific to
+      Django; it's just good Web development practice.
+
+Now, let's create a Django view that handles the submitted data and does
+something with it. Remember, in `Tutorial 3`_, we create a URLconf that
+included this line::
+
+    (r'^polls/(?P<poll_id>\d+)/vote/$', 'myproject.apps.polls.views.polls.vote'),
+
+So let's create a ``vote()`` function in ``myproject/apps/polls/views/polls.py``::
+
+    from django.core import template_loader
+    from django.core.extensions import DjangoContext as Context
+    from django.models.polls import choices, polls
+    from django.utils.httpwrappers import HttpResponse, HttpResponseRedirect
+    from django.core.exceptions import Http404
+
+    def vote(request, poll_id):
+        try:
+            p = polls.get_object(pk=poll_id)
+        except polls.PollDoesNotExist:
+            raise Http404
+        try:
+            selected_choice = p.get_choice(pk=request.POST['choice'])
+        except (KeyError, choices.ChoiceDoesNotExist):
+            # Redisplay the poll voting form.
+            t = template_loader.get_template('polls/detail')
+            c = Context(request, {
+                'poll': p,
+                'error_message': "You didn't select a choice.",
+            })
+            return HttpResponse(t.render(c))
+        else:
+            selected_choice.votes += 1
+            selected_choice.save()
+            # Always return an HttpResponseRedirect after successfully dealing
+            # with POST data. This prevents data from being posted twice if a
+            # user hits the Back button.
+            return HttpResponseRedirect('/polls/%s/results/' % p.id)
+
+This code includes a few things we haven't covered yet in this tutorial:
+
+    * ``request.POST`` is a dictionary-like object that lets you access
+      submitted data by key name. In this case, ``request.POST['choice']``
+      returns the ID of the selected choice, as a string. ``request.POST``
+      values are always strings.
+
+      Note that Django also provides ``request.GET`` for accessing GET data
+      in the same way -- but we're explicitly using ``request.POST`` in our
+      code, to ensure that data is only altered via a POST call.
+
+    * ``request.POST['choice']`` will raise ``KeyError`` if ``choice`` wasn't
+      provided in POST data. The above code checks for ``KeyError`` and
+      redisplays the poll form with an error message if ``choice`` isn't given.
+
+    * After incrementing the choice count, the code returns an
+      ``HttpResponseRedirect`` rather than a normal ``HttpResponse``.
+      ``HttpResponseRedirect`` takes a single argument: the URL to which the
+      user will be redirected. You should leave off the "http://" and domain
+      name if you can. That helps your app become portable across domains.
+
+      As the Python comment above points out, you should always return an
+      ``HttpResponseRedirect`` after successfully dealing with POST data. This
+      tip isn't specific to Django; it's just good Web development practice.
+
+After somebody votes in a poll, the ``vote()`` view redirects to the results
+page for the poll. Let's write that view::
+
+    def results(request, poll_id):
+        try:
+            p = polls.get_object(pk=poll_id)
+        except polls.PollDoesNotExist:
+            raise Http404
+        t = template_loader.get_template('polls/results')
+        c = Context(request, {
+            'poll': p,
+        })
+        return HttpResponse(t.render(c))
+
+This is almost exactly the same as the ``detail()`` view from `Tutorial 3`_.
+The only difference is the template name. We'll fix this redundancy later.
+
+Now, create a ``results.html`` template::
+
+    <h1>{{ poll.question }}</h1>
+
+    <ul>
+    {% for choice in poll.get_choice_list %}
+        <li>{{ choice.choice }} -- {{ choice.votes }} vote{{ choice.votes|pluralize }}</li>
+    {% endfor %}
+    </ul>
+
+And edit the ``detail.html`` template to add this snippet toward the top of the
+page somewhere::
+
+    {% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
+
+Now, go to ``/polls/1/`` in your browser and vote in the poll. You should see a
+results page that gets updated each time you vote. If you submit the form
+without having chosen a choice, you should see the error message.
+
+Use generic views: Less code is better
+======================================
+
+The ``detail()`` (from `Tutorial 3`_) and ``results()`` views are stupidly
+simple -- and, as mentioned above, redundant. The ``index()`` view (also from
+Tutorial 3), which displays a list of polls, is similar.
+
+These views represent a common case of basic Web development: getting data from
+the database according to a parameter passed in the URL, loading a template and
+returning the rendered template. Because this is so common, Django provides a
+shortcut, called the "generic views" system.
+
+Generic views abstract common patterns to the point where you don't even need
+to write Python code to write an app.
+
+Let's convert our poll app to use the generic views system, so we can delete a
+bunch of our own code. We'll just have to take a few steps to make the
+conversion.
+
+.. admonition:: Why the code-shuffle?
+
+    Generally, when writing a Django app, you'll evaluate whether generic views
+    are a good fit for your problem, and you'll use them from the beginning,
+    rather than refactoring your code halfway through. But this tutorial
+    intentionally has focused on writing the views "the hard way" until now, to
+    focus on core concepts.
+
+    You should know basic math before you start using a calculator.
+
+First, open the polls.py URLconf. It looks like this, according to the tutorial
+so far::
+
+    from django.conf.urls.defaults import *
+
+    urlpatterns = patterns('myproject.apps.polls.views.polls',
+        (r'^$', 'index'),
+        (r'^(?P<poll_id>\d+)/$', 'detail'),
+        (r'^(?P<poll_id>\d+)/results/$', 'results'),
+        (r'^(?P<poll_id>\d+)/vote/$', 'vote'),
+    )
+
+Change it like so::
+
+    from django.conf.urls.defaults import *
+
+    info_dict = {
+        'app_label': 'polls',
+        'module_name': 'polls',
+    }
+
+    urlpatterns = patterns('',
+        (r'^$', 'django.views.generic.list_detail.object_list', info_dict),
+        (r'^(?P<object_id>\d+)/$', 'django.views.generic.list_detail.object_detail', info_dict),
+        (r'^(?P<object_id>\d+)/results/$', 'django.views.generic.list_detail.object_detail', dict(info_dict, template_name='polls/results')),
+        (r'^(?P<poll_id>\d+)/vote/$', 'myproject.apps.polls.views.polls.vote'),
+    )
+
+We're using two generic views here: ``object_list`` and ``object_detail``.
+Respectively, those two views abstract the concepts of "display a list of
+objects" and "display a detail page for a particular type of object."
+
+    * Each generic view needs to know which ``app_label`` and ``module_name``
+      it's acting on. Thus, we've defined ``info_dict``, a dictionary that's
+      passed to each of the generic views via the third parameter to the URL
+      tuples.
+
+    * The ``object_detail`` generic view expects that the ID value captured
+      from the URL is called ``"object_id"``, so we've changed ``poll_id`` to
+      ``object_id`` for the generic views.
+
+By default, the ``object_detail`` generic view uses a template called
+``<app_label>/<module_name>_detail``. In our case, it'll use the template
+``"polls/polls_detail"``. Thus, rename your ``polls/detail.html`` template to
+``polls/polls_detail``, and change the ``template_loader.get_template()`` line
+in ``vote()``.
+
+Similarly, the ``object_list`` generic view uses a template called
+``<app_label>/<module_name>_detail``. Thus, rename ``polls/index.html`` to
+``polls/polls_list.html``.
+
+Because we have more than one entry in the URLconf that uses ``object_detail``
+for the polls app, we manually specify a template name for the results view:
+``template_name='polls/results'``. Otherwise, both views would use the same
+template. Note that we use ``dict()`` to return an altered dictionary in place.
+
+The generic views pass ``object`` and ``object_list`` to their templates, so
+change your templates so that ``latest_poll_list`` becomes ``object_list`` and
+``poll`` becomes ``object``.
+
+Finally, you can delete the ``index()``, ``detail()`` and ``results()`` views
+from ``polls/views/polls.py``. We don't need them anymore.
+
+For full details on generic views, see the `generic views documentation`_.
+
+.. _generic views documentation: http://www.djangoproject.com/documentation/generic_views/
+
+Coming soon
+===========
+
+The tutorial ends here for the time being. But check back soon for the next
+installments:
+
+    * Advanced form processing
+    * Using the RSS framework
+    * Using the cache framework
+    * Using the comments framework
+    * Advanced admin features: Permissions
+    * Advanced admin features: Custom JavaScript
+
+.. _Tutorial 3: http://www.djangoproject.com/documentation/tutorial3/
