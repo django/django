@@ -19,9 +19,9 @@ application, you might have the following views:
     * Blog homepage -- displays the latest few entries.
     * Entry "detail" page -- permalink page for a single entry.
     * Year-based archive page -- displays all months with entries in the
-        given year.
+      given year.
     * Month-based archive page -- displays all days with entries in the
-        given month.
+      given month.
     * Day-based archive page -- displays all entries in the given day.
     * Comment action -- handles posting comments to a given entry.
 
@@ -29,10 +29,10 @@ In our poll application, we'll have the following four views:
 
     * Poll "archive" page -- displays the latest few polls.
     * Poll "detail" page -- displays a poll question, with no results but
-        with a form to vote.
+      with a form to vote.
     * Poll "results" page -- displays results for a particular poll.
     * Vote action -- handles voting for a particular choice in a particular
-        poll.
+      poll.
 
 In Django, each view is represented by a simple Python function.
 
