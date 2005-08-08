@@ -756,6 +756,9 @@ def method_save(opts, self):
 
 def method_delete(opts, self):
     assert getattr(self, opts.pk.name) is not None, "%r can't be deleted because it doesn't have an ID."
+    # Run any pre-delete hooks.
+    if hasattr(self, '_pre_delete'):
+        self._pre_delete()
     cursor = db.db.cursor()
     for rel_opts, rel_field in opts.get_all_related_objects():
         rel_opts_name = opts.get_rel_object_method_name(rel_opts, rel_field)
@@ -782,6 +785,9 @@ def method_delete(opts, self):
             # delete it from the filesystem.
             if os.path.exists(file_name) and not opts.get_model_module().get_list(**{'%s__exact' % f.name: getattr(self, f.name)}):
                 os.remove(file_name)
+    # Run any post-delete hooks.
+    if hasattr(self, '_post_delete'):
+        self._post_delete()
 
 def method_get_next_in_order(opts, order_field, self):
     if not hasattr(self, '_next_in_order_cache'):
