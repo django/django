@@ -728,6 +728,12 @@ There are a few object methods that have special meaning:
     This method is called just after the object is saved to the database. This
     could be used to update other tables, update cached information, etc.
 
+``_pre_delete``
+    Like ``_pre_save``, but for deletion.
+
+``_post_delete``
+    Like ``_post_save``, but for deletion.
+
 Module-level methods
 --------------------
 
