@@ -40,12 +40,12 @@ template. Each element will be explained later in this document.::
     <p>{{ story.tease|truncatewords:"100" }}</p>
     {% endfor %}
     {% endblock %}
-    
+
 .. admonition:: Philosophy
 
-    Why use a text-based template instead of an XML-based one (like Zope's 
+    Why use a text-based template instead of an XML-based one (like Zope's
     TAL)?  We wanted Django's template language to be usable for more than
-    just XML/HTML templates -- at the Journal-World we use it for emails, 
+    just XML/HTML templates -- at the Journal-World we use it for emails,
     Javascript, CSV -- you can use the template language for any text-based
     format.
 
@@ -469,7 +469,7 @@ Built-in tag reference
             * Margaret Thatcher
             * Colendeeza Rice
         * Unknown:
-            * Janet Reno
+            * Pat Smith
 
     The following snippet of template code would accomplish this dubious task::
 
