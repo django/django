@@ -69,4 +69,11 @@ True
 >>> p1.get_article_list(order_by=['headline'])
 [Django lets you build Web apps easily, NASA uses Python]
 
+# If we delete an article, its publication won't be able to access it.
+>>> a2.delete()
+>>> articles.get_list()
+[Django lets you build Web apps easily]
+>>> p1.get_article_list(order_by=['headline'])
+[Django lets you build Web apps easily]
+
 """
