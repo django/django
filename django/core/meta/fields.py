@@ -15,7 +15,7 @@ HORIZONTAL, VERTICAL = 1, 2
 BLANK_CHOICE_DASH = [("", "---------")]
 BLANK_CHOICE_NONE = [("", "None")]
 
-# Values for Relation.edit_inline_type.
+# Values for Relation.edit_inline.
 TABULAR, STACKED = 1, 2
 
 RECURSIVE_RELATIONSHIP_CONSTANT = 'self'
@@ -531,13 +531,18 @@ class ForeignKey(Field):
             kwargs['name'] = kwargs.get('name', to_name + '_id')
             kwargs['verbose_name'] = kwargs.get('verbose_name', to._meta.verbose_name)
             rel_name = rel_name or to_name
+
+        if kwargs.has_key('edit_inline_type'):
+            import warnings
+            warnings.warn("edit_inline_type is deprecated. Use edit_inline instead.")
+            kwargs['edit_inline'] = kwargs.pop('edit_inline_type')
+
         kwargs['rel'] = ManyToOne(to, rel_name, to_field,
             num_in_admin=kwargs.pop('num_in_admin', 3),
             min_num_in_admin=kwargs.pop('min_num_in_admin', None),
             max_num_in_admin=kwargs.pop('max_num_in_admin', None),
             num_extra_on_change=kwargs.pop('num_extra_on_change', 1),
             edit_inline=kwargs.pop('edit_inline', False),
-            edit_inline_type=kwargs.pop('edit_inline_type', STACKED),
             related_name=kwargs.pop('related_name', None),
             limit_choices_to=kwargs.pop('limit_choices_to', None),
             lookup_overrides=kwargs.pop('lookup_overrides', None),
@@ -573,10 +578,15 @@ class OneToOneField(IntegerField):
         kwargs['verbose_name'] = kwargs.get('verbose_name', 'ID')
         to_field = to_field or to._meta.pk.name
         rel_name = rel_name or to._meta.object_name.lower()
+
+        if kwargs.has_key('edit_inline_type'):
+            import warnings
+            warnings.warn("edit_inline_type is deprecated. Use edit_inline instead.")
+            kwargs['edit_inline'] = kwargs.pop('edit_inline_type')
+
         kwargs['rel'] = OneToOne(to, rel_name, to_field,
             num_in_admin=kwargs.pop('num_in_admin', 0),
             edit_inline=kwargs.pop('edit_inline', False),
-            edit_inline_type=kwargs.pop('edit_inline_type', STACKED),
             related_name=kwargs.pop('related_name', None),
             limit_choices_to=kwargs.pop('limit_choices_to', None),
             lookup_overrides=kwargs.pop('lookup_overrides', None),
@@ -586,7 +596,7 @@ class OneToOneField(IntegerField):
 
 class ManyToOne:
     def __init__(self, to, name, field_name, num_in_admin=3, min_num_in_admin=None,
-        max_num_in_admin=None, num_extra_on_change=1, edit_inline=False, edit_inline_type=STACKED,
+        max_num_in_admin=None, num_extra_on_change=1, edit_inline=False,
         related_name=None, limit_choices_to=None, lookup_overrides=None, raw_id_admin=False):
         try:
             self.to = to._meta
@@ -596,8 +606,7 @@ class ManyToOne:
         self.name, self.field_name = name, field_name
         self.num_in_admin, self.edit_inline = num_in_admin, edit_inline
         self.min_num_in_admin, self.max_num_in_admin = min_num_in_admin, max_num_in_admin
-        self.num_extra_on_change = num_extra_on_change
-        self.edit_inline_type, self.related_name = edit_inline_type, related_name
+        self.num_extra_on_change, self.related_name = num_extra_on_change, related_name
         self.limit_choices_to = limit_choices_to or {}
         self.lookup_overrides = lookup_overrides or {}
         self.raw_id_admin = raw_id_admin
@@ -621,11 +630,11 @@ class ManyToMany:
 
 class OneToOne(ManyToOne):
     def __init__(self, to, name, field_name, num_in_admin=0, edit_inline=False,
-        edit_inline_type=STACKED, related_name=None, limit_choices_to=None, lookup_overrides=None,
+        related_name=None, limit_choices_to=None, lookup_overrides=None,
         raw_id_admin=False):
         self.to, self.name, self.field_name = to._meta, name, field_name
         self.num_in_admin, self.edit_inline = num_in_admin, edit_inline
-        self.edit_inline_type, self.related_name = edit_inline_type, related_name
+        self.related_name = related_name
         self.limit_choices_to = limit_choices_to or {}
         self.lookup_overrides = lookup_overrides or {}
         self.raw_id_admin = raw_id_admin

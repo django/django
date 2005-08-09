@@ -20,7 +20,7 @@ Throughout this reference, we'll refer to the following Poll application::
 
     class Choice(meta.Model):
         fields = (
-            meta.ForeignKey(Poll, edit_inline=True, edit_inline_type=meta.TABULAR,
+            meta.ForeignKey(Poll, edit_inline=meta.TABULAR,
                 num_in_admin=10, min_num_in_admin=5),
             meta.CharField('choice', maxlength=255, core=True),
             meta.IntegerField('votes', editable=False, default=0),

@@ -291,7 +291,7 @@ class Options:
                 # relationship we're adding.
                 link_field = copy.copy(core.RelatedLink._meta.get_field('object_id'))
                 link_field.rel = ManyToOne(self.get_model_module().Klass, 'related_links', 'id',
-                    num_in_admin=3, min_num_in_admin=3, edit_inline=True, edit_inline_type=TABULAR,
+                    num_in_admin=3, min_num_in_admin=3, edit_inline=TABULAR,
                     lookup_overrides={
                         'content_type__package__label__exact': self.app_label,
                         'content_type__python_module_name__exact': self.module_name

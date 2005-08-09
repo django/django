@@ -242,7 +242,7 @@ Poll object. Let's make that happen.
 Remove the ``admin`` for the Choice model. Then, edit the ``ForeignKey(Poll)``
 field like so::
 
-    meta.ForeignKey(Poll, edit_inline=True, num_in_admin=3),
+    meta.ForeignKey(Poll, edit_inline=meta.STACKED, num_in_admin=3),
 
 This tells Django: "Choice objects are edited on the Poll admin page. By
 default, provide enough fields for 3 Choices."
@@ -274,10 +274,10 @@ One small problem, though. It takes a lot of screen space to display all the
 fields for entering related Choice objects. For that reason, Django offers an
 alternate way of displaying inline related objects::
 
-    meta.ForeignKey(Poll, edit_inline=True, num_in_admin=3, edit_inline_type=meta.TABULAR),
+    meta.ForeignKey(Poll, edit_inline=meta.TABULAR, num_in_admin=3),
 
-With that ``edit_inline_type=meta.TABULAR``, the related objects are displayed
-in a more compact, table-based format:
+With that ``edit_inline=meta.TABULAR`` (instead of ``meta.STACKED``), the
+related objects are displayed in a more compact, table-based format:
 
 .. image:: http://media.djangoproject.com/img/doc/tutorial/admin12.png
    :alt: Add poll page now has more compact choices

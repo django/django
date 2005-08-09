@@ -316,16 +316,13 @@ Field Types
     =======================  ============================================================
     Argument                 Description
     =======================  ============================================================
-    ``edit_inline``          If ``True``, this related object is edited
+    ``edit_inline``          If not ``False``, this related object is edited
                              "inline" on the related object's page. This means
                              that the object will not have its own admin
-                             interface.
-
-    ``edit_inline_type``     This is either ``meta.TABULAR`` or
-                             ``meta.STACKED`` and controls whether the inline
-                             editable objects are displayed as a table or as
-                             a "stack" of fieldsets.  Defaults to
-                             ``meta.STACKED``.
+                             interface. Use either ``meta.TABULAR`` or ``meta.STACKED``,
+                             which, respectively, designate whether the inline-editable
+                             objects are displayed as a table or as a "stack" of
+                             fieldsets.
 
     ``limit_choices_to``     A dictionary of lookup arguments and values (see
                              the `Database API reference`_) that limit the

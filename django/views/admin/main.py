@@ -608,11 +608,11 @@ def _get_template(opts, app_label, add=False, change=False, show_delete=False, f
     for rel_obj, rel_field in opts.get_inline_related_objects():
         var_name = rel_obj.object_name.lower()
         field_list = [f for f in rel_obj.fields + rel_obj.many_to_many if f.editable and f != rel_field]
-        t.append('<fieldset class="module%s">\n' % ((rel_field.rel.edit_inline_type != meta.TABULAR) and ' aligned' or ''))
+        t.append('<fieldset class="module%s">\n' % ((rel_field.rel.edit_inline != meta.TABULAR) and ' aligned' or ''))
         view_on_site = ''
         if change and hasattr(rel_obj, 'get_absolute_url'):
             view_on_site = '{%% if %s.original %%}<a href="/r/{{ %s.content_type_id }}/{{ %s.original.id }}/">View on site</a>{%% endif %%}' % (var_name, var_name, var_name)
-        if rel_field.rel.edit_inline_type == meta.TABULAR:
+        if rel_field.rel.edit_inline == meta.TABULAR:
             t.append('<h2>%s</h2>\n<table>\n' % capfirst(rel_obj.verbose_name_plural))
             t.append('<thead><tr>')
             for f in field_list:
@@ -654,7 +654,7 @@ def _get_template(opts, app_label, add=False, change=False, show_delete=False, f
             t.append('{%% for %s in form.%s %%}\n' % (var_name, rel_obj.module_name))
             t.extend(hidden_fields)
             t.append('{% endfor %}\n')
-        else: # edit_inline_type == STACKED
+        else: # edit_inline == STACKED
             t.append('{%% for %s in form.%s %%}' % (var_name, rel_obj.module_name))
             t.append('<h2>%s #{{ forloop.counter }}</h2>' % capfirst(rel_obj.verbose_name))
             if view_on_site:
