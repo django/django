@@ -111,8 +111,13 @@ class TestRunner:
             # has side effects on doctest TestRunner class.
             runner = DjangoDoctestRunner(verbosity_level=verbosity_level, verbose=False)
             self.output(1, "%s model: Running tests" % model_name)
-            runner.run(dtest, clear_globs=True, out=sys.stdout.write)
-            
+            try:
+                runner.run(dtest, clear_globs=True, out=sys.stdout.write)
+            finally:
+                # Rollback, in case of database errors. Otherwise they'd have
+                # side effects on other tests.
+                db.rollback()
+
         # Run the non-model tests in the other tests dir
         self.output(1, "Running other tests")
         other_tests_dir = os.path.join(os.path.dirname(__file__), OTHER_TESTS_DIR)
@@ -137,7 +142,7 @@ class TestRunner:
                 except Exception, e:
                     log_error(module, "Exception running tests", ''.join(traceback.format_exception(*sys.exc_info())[1:]))
                     continue
-            
+
         # Unless we're using SQLite, remove the test database to clean up after
         # ourselves. Connect to the previous database (not the test database)
         # to do so, because it's not allowed to delete a database while being
