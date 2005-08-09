@@ -1,6 +1,5 @@
 """
-This is the CMS common templating system, shared among all CMS modules that
-require control over output.
+This is the Django template system.
 
 How it works:
 
