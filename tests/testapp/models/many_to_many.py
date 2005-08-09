@@ -63,4 +63,10 @@ True
 >>> a2.get_publication_list()
 [The Python Journal, Science News]
 
+# Publication objects have access to their related Article objects.
+>>> p2.get_article_list()
+[NASA uses Python]
+>>> p1.get_article_list(order_by=['headline'])
+[Django lets you build Web apps easily, NASA uses Python]
+
 """
