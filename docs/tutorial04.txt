@@ -129,11 +129,6 @@ Now, create a ``results.html`` template::
     {% endfor %}
     </ul>
 
-And edit the ``detail.html`` template to add this snippet toward the top of the
-page somewhere::
-
-    {% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
-
 Now, go to ``/polls/1/`` in your browser and vote in the poll. You should see a
 results page that gets updated each time you vote. If you submit the form
 without having chosen a choice, you should see the error message.
