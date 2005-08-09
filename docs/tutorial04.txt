@@ -215,7 +215,7 @@ By default, the ``object_detail`` generic view uses a template called
 in ``vote()``.
 
 Similarly, the ``object_list`` generic view uses a template called
-``<app_label>/<module_name>_detail``. Thus, rename ``polls/index.html`` to
+``<app_label>/<module_name>_list``. Thus, rename ``polls/index.html`` to
 ``polls/polls_list.html``.
 
 Because we have more than one entry in the URLconf that uses ``object_detail``
