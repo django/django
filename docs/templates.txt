@@ -3,9 +3,9 @@ The Django template language
 ============================
 
 Django's template language is designed to strike a balance between power and
-ease; it's designed to feel comfortable to those used to working with HTML.  If
-you have any exposure to other text-based template languages like Smarty_ or
-CheetahTemplate_, you should feel right at home with Django's templates.
+ease. It's designed to feel comfortable to those used to working with HTML. If
+you have any exposure to other text-based template languages, such as Smarty_
+or CheetahTemplate_, you should feel right at home with Django's templates.
 
 .. _Smarty: http://smarty.php.net/
 .. _CheetahTemplate: http://www.cheetahtemplate.org/
@@ -13,16 +13,15 @@ CheetahTemplate_, you should feel right at home with Django's templates.
 What's a template?
 ==================
 
-A template is simply a text file.  All Django templates by convention have
-".html" extensions, but they can actually generate any text-based format (HTML,
-XML, CSV, etc.).
+A template is simply a text file. All Django templates, by convention, have
+".html" extensions, but they can generate any text-based format (HTML, XML,
+CSV, etc.).
 
-To actually be useful, a template will contain **variables**, which get replaced
-with values from the database when the template is evaluated, and **tags**,
-which control the logic of the template.
+A template contains **variables**, which get replaced with values when the
+template is evaluated, and **tags**, which control the logic of the template.
 
-Below is a minimal template that illustrates the basic parts of a
-template. Each element will be explained later in this document.::
+Below is a minimal template that illustrates a few basics. Each element will be
+explained later in this document.::
 
     {% extends "base_generic" %}
 
@@ -44,64 +43,77 @@ template. Each element will be explained later in this document.::
 .. admonition:: Philosophy
 
     Why use a text-based template instead of an XML-based one (like Zope's
-    TAL)?  We wanted Django's template language to be usable for more than
-    just XML/HTML templates -- at the Journal-World we use it for emails,
-    Javascript, CSV -- you can use the template language for any text-based
+    TAL)? We wanted Django's template language to be usable for more than
+    just XML/HTML templates. At World Online, we use it for e-mails,
+    Javascript and CSV. You can use the template language for any text-based
     format.
 
 What's a variable?
 ==================
 
-Variables look like this: ``{{ variable }}``.  When the template engine
-encounters a variable, it evaluates that variable and replaces the variable with
-the result.  Many variables will be structures with named attributes; you can
-"drill down" into these structures with dots (``.``), so in the above example
-``{{ section.title }}`` will be replaced with the ``title`` attribute of the
-``section`` object.
+Variables look like this: ``{{ variable }}``. When the template engine
+encounters a variable, it evaluates that variable and replaces it with the
+result.
 
-If you use a variable that doesn't exist, it will be silently ignored; the
+Use a dot (``.``) to access attributes of a variable.
+
+.. admonition:: Behind the scenes
+
+    Technically, when the template system encounters a dot, it tries the
+    following lookups, in this order:
+
+        * Dictionary lookup
+        * Attribute lookup
+        * Method call
+        * List-index lookup
+
+In the above example, ``{{ section.title }}`` will be replaced with the
+``title`` attribute of the ``section`` object.
+
+If you use a variable that doesn't exist, it will be silently ignored. The
 variable will be replaced by nothingness.
 
 See `Using the built-in reference`_, below, for help on finding what variables
 are available in a given template.
 
-Variables may be modified before being displayed by **filters**.
+You can modify variables for display by using **filters**.
 
 What's a filter?
 ================
 
-Filters look like this: ``{{ name|lower }}``.  This displays the value of the
-``{{ name }}`` variable after being filtered through the ``lower`` filter which,
-as you might have guessed, lowercases the text passed through it.
+Filters look like this: ``{{ name|lower }}``. This displays the value of the
+``{{ name }}`` variable after being filtered through the ``lower`` filter,
+which converts text to lowercase. Use a pipe (``|``) to apply a filter.
 
-We use the pipe character to apply filters to emphasize the analogy with filters
-on a water pipe: text enters one side, has some operation performed on it, and
-"flows" out the other side.  Filters may be "chained"; the output of one filter
-applied to the next: ``{{ text|escape|linebreaks }}`` is a common idiom for
-escaping text contents and then converting line breaks to ``<p>`` tags.
+Filters can be "chained." The output of one filter applied to the next:
+``{{ text|escape|linebreaks }}`` is a common idiom for escaping text contents
+and then converting line breaks to ``<p>`` tags.
 
-Certain filters take arguments; a filter argument looks like this: ``{{
-bio|truncatewords:"30" }}``.  This will display the first 30 words of the
-``bio`` variable.  Filter arguments always are in double quotes.
+Certain filters take arguments. A filter argument looks like this:
+``{{ bio|truncatewords:"30" }}``. This will display the first 30 words of the
+``bio`` variable. Filter arguments always are in double quotes.
 
 The `Built-in filter reference`_ below describes all the built-in filters.
 
 What's a tag?
 =============
 
-Tags look like this: ``{% tag %}``.  Tags are much more complex than variables:
-some create text in the output; some control flow by performing loops, or logic;
+Tags look like this: ``{% tag %}``. Tags are more complex than variables: Some
+create text in the output, some control flow by performing loops or logic, and
 some load external information into the template to be used by later variables.
 
-Some tags are "block" tags with matching beginning and ending tags (i.e. ``{% tag %} ... tag contents ... {% endtag %}``.  The `Built-in tag reference`_ below describes all the built-in tags.
+Some tags require beginning and ending tags (i.e.
+``{% tag %} ... tag contents ... {% endtag %}``). The `Built-in tag reference`_
+below describes all the built-in tags. You can create your own tags, if you
+know how to write Python code.
 
-Template Inheritance
+Template inheritance
 ====================
 
 The most powerful -- and thus the most complex -- part of Django's template
-engine is template inheritance.  In a nutshell, template inheritance allows you
-to build a base "skeleton" template that contains all the common elements of
-your site and defines **blocks** that child templates can override.
+engine is template inheritance. Template inheritance allows you to build a base
+"skeleton" template that contains all the common elements of your site and
+defines **blocks** that child templates can override.
 
 It's easiest to understand template inheritance by starting with an example::
 
@@ -110,7 +122,7 @@ It's easiest to understand template inheritance by starting with an example::
     <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
     <head>
         <link rel="stylesheet" href="style.css" />
-        <title>{% block title %}My Amazing Site{% endblock %}</title>
+        <title>{% block title %}My amazing site{% endblock %}</title>
     </head>
 
     <body>
@@ -128,36 +140,34 @@ It's easiest to understand template inheritance by starting with an example::
         </div>
     </body>
 
-This template, which we'll call ``base.html`` defines a simple HTML skeleton
-document that you might use for a simple two-column page.  This template
-won't actually be used directly on any pages, but other "child" templates will
-extend it and fill in the empty blocks with content.
+This template, which we'll call ``base.html``, defines a simple HTML skeleton
+document that you might use for a simple two-column page. It's the job of
+"child" templates to fill the empty blocks with content.
 
-I've used the ``{% block %}`` tag to define the three blocks that child templates
-will fill in.  All that the ``block`` tag does is to signal to the template engine
-that a child template may override those portions of the template.
+In this example, the ``{% block %}`` tag defines three blocks that child
+templates can fill in. All the ``block`` tag does is to tell the template
+engine that a child template may override those portions of the template.
 
-To use this template, I might define a child template as follows::
+A child template might look like this::
 
     {% extends "base" %}
 
-     {% block title %}My Amazing Blog{% endblock %}
+    {% block title %}My amazing blog{% endblock %}
 
-     {% block content %}
+    {% block content %}
+    {% for entry in blog_entries %}
+        <h2>{{ entry.title }}</h2>
+        <p>{{ entry.body }}</p>
+    {% endfor %}
+    {% endblock %}
 
-     {% for entry in blog_entries %} <h2>{{ entry.title }}</h2> <p>{{ entry.body
-    }}</p> {% endfor %}
-
-     {% endblock %}
-
-The ``{% extends %}`` tag is the key here; it tells the template engine that
-this template "extends" another template. When this template is evaluated,
-the first step the template engine will perform is to locate the parent
-template -- in this case, "base" (note the dropping of the ".html"
-extension).
+The ``{% extends %}`` tag is the key here. It tells the template engine that
+this template "extends" another template. When the template system evaluates
+this template, first it locates the parent -- in this case, "base" (note the
+lack of an ".html" extension in the ``{% extends %}`` tag).
 
 At that point, the template engine will notice the three blocks in
-``base.html``, and replace those blocks with the contents of the child template.
+``base.html`` and replace those blocks with the contents of the child template.
 Depending on the value of ``blog_entries``, the output might look like::
 
     <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
@@ -165,7 +175,7 @@ Depending on the value of ``blog_entries``, the output might look like::
     <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
     <head>
         <link rel="stylesheet" href="style.css" />
-        <title>My Amazing Blog</title>
+        <title>My amazing blog</title>
     </head>
 
     <body>
@@ -185,53 +195,52 @@ Depending on the value of ``blog_entries``, the output might look like::
         </div>
     </body>
 
+Note that since the child template didn't define the ``sidebar`` block, the
+value from the parent template is used instead. Content within a ``{% block %}``
+tag in a parent template is always used as a fallback.
 
-
-Note that since the child template did not define the ``sidebar`` block, the
-value from the parent template is used instead.
-
-Template inheritance does not have to be only single-level; multi-level
-inheritance is possible, and indeed, quite useful.
+Template inheritance isn't limited to a single level. Multi-level inheritance
+is possible and, indeed, quite useful.
 
 Here are some tips for working with inheritance:
 
-    * More ``{% block %}`` tags in your base templates are better.  Remember,
-      child templates do not have to define all parent blocks, so you can
-      fill in reasonable defaults in a number of blocks, then only define
-      the ones you need later on.
+    * More ``{% block %}`` tags in your base templates are better. Remember,
+      child templates don't have to define all parent blocks, so you can fill
+      in reasonable defaults in a number of blocks, then only define the ones
+      you need later.
 
-    * If you find yourself reproducing the same content in a number of
-      documents, it probably means you should move that content to a
-      new ``{% block %}`` in a parent template.
+    * If you find yourself duplicating content in a number of templates, it
+      probably means you should move that content to a ``{% block %}`` in a
+      parent template.
 
-    * We often prefer to use three-level inheritance: a single base template
-      for the entire site, a set of mid-level templates for each section of
-      the site, and then the individual templates for each view.  This
-      maximizes code reuse, and makes it easier to add items to shared
-      content areas (like section-wide navigation).
+    * The recommended template layout is to use three levels: a single base
+      template for the entire site, a set of mid-level templates for each
+      section of the site, and then the individual templates for each view.
+      This maximizes code reuse and makes it easier to add items to shared
+      content areas (such as section-wide navigation).
 
     * If you need to get the content of the block from the parent template,
-      the ``{{ block.super }}`` variable will do the trick.  This is useful
+      the ``{{ block.super }}`` variable will do the trick. This is useful
       if you want to add to the contents of a parent block instead of
       completely overriding it.
 
 Using the built-in reference
 ============================
 
-Since Django can be used to develop any sort of site, the tags, filters, and
-variables available will be different depending on the application. To make it
-simple to figure out what's available in a given site, the admin interface has a
+Because Django can be used to develop any sort of site, the tags, filters and
+variables available are different depending on the application. To make it
+easy to figure out what's available in a given site, the admin interface has a
 complete reference of all the template goodies available to that site.
 
-This documentation is integrated into the administration interface for your
-sites and is divided into 4 sections: tags, filters, models, and views.
+The reference is integrated into the administration interface for your site(s)
+and is divided into 4 sections: tags, filters, models, and views.
 
 The **tags** and **filters** sections describe all the built-in tags (in fact,
 the tag and filter references below come directly from those pages) as well as
 any custom tag or filter libraries available.
 
-The **views** page is perhaps the most valuable.  Each URL in your site has a
-separate entry here, and clicking on a URL will show you:
+The **views** page is the most valuable. Each URL in your site has a separate
+entry here, and clicking on a URL will show you:
 
     * The name of the view function that generates that view.
     * A short description of what the view does.
@@ -241,9 +250,9 @@ separate entry here, and clicking on a URL will show you:
 Each view documentation page also has a bookmarklet that you can use to jump
 from any page to the documentation page for that view.
 
-Since most of Django revolves around database objects, the **models** section of
-the documentation page describes each type of object in the system along with
-all the fields available on that object.
+Because Django generally revolves around database objects, the **models**
+section of the documentation page describes each type of object in the system
+along with all the fields available on that object.
 
 Taken together, the documentation pages should tell you every tag, filter,
 variable and object available to you in a given template.
@@ -251,30 +260,30 @@ variable and object available to you in a given template.
 Custom tag and filter libraries
 ===============================
 
-As mentioned above, certain applications will provide custom tag and filter
-libraries. To access them in a template, use the ``{% load %}`` tag::
+Certain applications provide custom tag and filter libraries. To access them in
+a template, use the ``{% load %}`` tag::
 
     {% load comments %}
 
     {% comment_form for blogs.entries entry.id with is_public yes %}
 
 In the above, the ``load`` tag loads the ``comments`` tag library, which then
-makes the ``comment_form`` tag available for use.  Consult the documentation
+makes the ``comment_form`` tag available for use. Consult the documentation
 area in your admin to find the list of custom libraries in your installation.
 
 Built-in tag and filter reference
 =================================
 
-For those without an admin site available, the reference for the stock tags and
-filters follows.  Since Django is highly customizable, the documentation
-references in your admin should be considered the final word on what
-tags and filters are available and their functions.
+For those without an admin site available, reference for the stock tags and
+filters follows. Because Django is highly customizable, the reference in your
+admin should be considered the final word on what tags and filters are
+available, and what they do.
 
 Built-in tag reference
 ----------------------
 
 ``block``
-    Define a block that can be overridden by child templates.  See `Template
+    Define a block that can be overridden by child templates. See `Template
     inheritance`_ for more information.
 
 ``comment``
@@ -467,7 +476,7 @@ Built-in tag reference
             * Bill Clinton
         * Female:
             * Margaret Thatcher
-            * Colendeeza Rice
+            * Condoleezza Rice
         * Unknown:
             * Pat Smith
 
