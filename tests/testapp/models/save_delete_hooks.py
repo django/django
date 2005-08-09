@@ -1,5 +1,5 @@
 """
-13. Adding hooks before/after saving and deleting.
+13. Adding hooks before/after saving and deleting
 
 Django provides hooks for executing arbitrary code around ``save()`` and
 ``delete()``. Just add any of the following methods to your model:
