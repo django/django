@@ -1,0 +1,146 @@
+===========================
+The django-admin.py utility
+===========================
+
+``django-admin.py`` is Django's command-line utility for administrative tasks.
+This document outlines all it can do.
+
+The ``django-admin.py`` script should be on your system path if you installed
+Django via its setup.py utility. If it's not on your path, you can find it in
+``site-packages/django/bin`` within your Python installation. Consider
+symlinking to it from some place on your path, such as ``/usr/local/bin``.
+
+Usage
+=====
+
+``django-admin.py action [options]``
+
+``action`` should be one of the actions listed in this document. ``options``,
+which is optional, should be zero or more of the options listed in this
+document.
+
+Run ``django-admin.py --help`` to display a help message that includes a terse
+list of all available ``action``s and ``option``s.
+
+Most ``action``s take a list of "app"s. An "app," in this case, is the name of
+a file containing Django models. For example, if you have a model module called
+``myproject/apps/polls/pollmodels.py``, the "app" in this case would be
+``"pollmodels"``.
+
+Available actions
+=================
+
+adminindex [app app ...]
+------------------------
+
+Prints the admin-index template snippet for the given app(s).
+
+Use admin-index template snippets if you want to customize the look and feel of
+your admin's index page. See `Tutorial 2`_ for more information.
+
+.. _Tutorial 2: http://www.djangoproject.com/documentation/tutorial2/
+
+createsuperuser
+---------------
+
+Creates a superuser account interactively. It asks you for a username, e-mail
+address and password.
+
+init
+----
+
+Initializes the database with the tables and data Django needs by default.
+Specifically, these are the database tables from the ``auth`` and ``core``
+models.
+
+inspectdb [dbname]
+------------------
+
+Introspects the database tables in the given database and outputs a Django
+model module to standard output.
+
+Use this if you have a legacy database with which you'd like to use Django.
+The script will inspect the database and create a model for each table within
+it.
+
+This feature is meant as a shortcut, not as definitive model generation. After
+you run it, you'll want to look over the generated models yourself to make
+customizations. In particular, you'll need to do this:
+
+    * Rearrange models' order, so that models that refer to other models are
+      ordered properly.
+    * Add primary_key=True to one field in each model. The ``inspectdb``
+      doesn't yet introspect primary keys.
+
+install [app app ...]
+---------------------
+
+Executes the equivalent of ``sqlall`` for the given app(s).
+
+runserver [optional port number]
+--------------------------------
+
+Starts a lightweight development Web server on the local machine. By default,
+the server runs on port 8000. You can pass in a port number explicitly.
+
+If you run this script as a user with normal privileges (recommended), you
+might not have access to start a port on a low port number. Low port numbers
+are reserved for superusers (root).
+
+DO NOT USE THIS SERVER IN A PRODUCTION SETTING.
+
+The development server automatically reloads Python code for each request, as
+needed. You don't need to restart the server for code changes to take effect.
+
+You can run as many servers as you want, as long as they're on separate ports.
+Just execute ``django-admin.py runserver`` more than once.
+
+sql [app app ...]
+-----------------
+
+Prints the CREATE TABLE SQL statements for the given app(s).
+
+sqlall [app app ...]
+--------------------
+
+Prints the CREATE TABLE and initial-data SQL statements for the given app(s).
+
+sqlclear [app app ...]
+----------------------
+
+Prints the DROP TABLE SQL statements for the given app(s).
+
+sqlindexes [app app ...]
+------------------------
+
+Prints the CREATE INDEX SQL statements for the given app(s).
+
+sqlinitialdata [app app ...]
+----------------------------
+
+Prints the initial INSERT SQL statements for the given app(s).
+
+sqlreset [app app ...]
+----------------------
+
+Prints the DROP TABLE SQL, then the CREATE TABLE SQL, for the given app(s).
+
+sqlsequencereset [app app ...]
+------------------------------
+
+Prints the SQL statements for resetting PostgreSQL sequences for the given
+app(s).
+
+See http://simon.incutio.com/archive/2004/04/21/postgres for more information.
+
+startapp [appname]
+------------------
+
+Creates a Django app directory structure for the given app name in the current
+directory.
+
+startproject [projectname]
+--------------------------
+
+Creates a Django project directory structure for the given project name in the
+current directory.
