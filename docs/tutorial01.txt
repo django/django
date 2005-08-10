@@ -278,6 +278,11 @@ Behind the scenes, all it does is take the output of
 ``django-admin.py sqlall polls`` and execute it in the database pointed-to by
 your Django settings file.
 
+Read the `django-admin.py documentation`_ for full information on what this
+utility can do.
+
+.. _django-admin.py documentation: http://www.djangoproject.com/documentation/django_admin/
+
 Playing with the API
 ====================
 
