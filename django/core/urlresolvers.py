@@ -47,7 +47,7 @@ class RegexURLPattern:
         except AttributeError, e:
             raise ViewDoesNotExist, "Tried %s in module %s. Error was: %s" % (func_name, mod_name, str(e))
 
-class RegexURLResolver:
+class RegexURLResolver(object):
     def __init__(self, regex, urlconf_name):
         # regex is a string representing a regular expression.
         # urlconf_name is a string representing the module containing urlconfs.
@@ -59,7 +59,7 @@ class RegexURLResolver:
         match = self.regex.search(path)
         if match:
             new_path = path[match.end():]
-            for pattern in self.url_patterns:
+            for pattern in self.urlconf_module.urlpatterns:
                 try:
                     sub_match = pattern.resolve(new_path)
                 except Resolver404, e:
@@ -71,14 +71,12 @@ class RegexURLResolver:
             raise Resolver404, {'tried': tried, 'path': new_path}
 
     def _get_urlconf_module(self):
-        self.urlconf_module = __import__(self.urlconf_name, '', '', [''])
-        return self.urlconf_module
+        try:
+            return self._urlconf_module
+        except AttributeError:
+            self._urlconf_module = __import__(self.urlconf_name, '', '', [''])
+            return self._urlconf_module
     urlconf_module = property(_get_urlconf_module)
-
-    def _get_url_patterns(self):
-        self.url_patterns = self.urlconf_module.urlpatterns
-        return self.url_patterns
-    url_patterns = property(_get_url_patterns)
 
     def _resolve_special(self, view_type):
         callback = getattr(self.urlconf_module, 'handler%s' % view_type)
