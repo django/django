@@ -597,7 +597,7 @@ def _get_template(opts, app_label, add=False, change=False, show_delete=False, f
             t.append(_get_admin_field(field_list, 'form.', False, add, change))
             for f in field_list:
                 if f.rel and isinstance(f, meta.ManyToManyField) and f.rel.filter_interface:
-                    t.append('<script type="text/javascript">addEvent(window, "load", function(e) { SelectFilter.init("id_%s", "%s", %s); });</script>\n' % (f.name, f.verbose_name, f.rel.filter_interface-1))
+                    t.append('<script type="text/javascript">addEvent(window, "load", function(e) { SelectFilter.init("id_%s", "%s", %s, %r); });</script>\n' % (f.name, f.verbose_name, f.rel.filter_interface-1, ADMIN_MEDIA_PREFIX))
         t.append('</fieldset>\n')
     if ordered_objects and change:
         t.append('<fieldset class="module"><h2>Ordering</h2>')

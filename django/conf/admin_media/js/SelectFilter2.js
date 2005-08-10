@@ -15,7 +15,7 @@ function findForm(node) {
 }
 
 var SelectFilter = {
-    init: function(field_id, field_name, is_stacked) {
+    init: function(field_id, field_name, is_stacked, admin_media_prefix) {
         var from_box = document.getElementById(field_id);
         from_box.id += '_from'; // change its ID
         from_box.className = 'filtered';
@@ -36,7 +36,7 @@ var SelectFilter = {
         quickElement('h2', selector_available, 'Available ' + field_name);
         var filter_p = quickElement('p', selector_available, '');
         filter_p.className = 'selector-filter';
-        quickElement('img', filter_p, '', 'src', 'http://media.ljworld.com/img/admin/selector-search.gif');
+        quickElement('img', filter_p, '', 'src', admin_media_prefix + 'img/admin/selector-search.gif');
         filter_p.appendChild(document.createTextNode(' '));
         var filter_input = quickElement('input', filter_p, '', 'type', 'text');
         filter_input.id = field_id + '_input';
@@ -58,7 +58,7 @@ var SelectFilter = {
         quickElement('h2', selector_chosen, 'Chosen ' + field_name);
         var selector_filter = quickElement('p', selector_chosen, 'Select your choice(s) and click ');
         selector_filter.className = 'selector-filter';
-        quickElement('img', selector_filter, '', 'src', 'http://media.ljworld.com/img/admin/selector-add.gif', 'alt', 'Add');
+        quickElement('img', selector_filter, '', 'src', admin_media_prefix + 'img/admin/selector-add.gif', 'alt', 'Add');
         var to_box = quickElement('select', selector_chosen, '', 'id', field_id + '_to', 'multiple', 'multiple', 'size', from_box.size, 'name', from_box.getAttribute('name'));
         to_box.className = 'filtered';
         var clear_all = quickElement('a', selector_chosen, 'Clear all', 'href', 'javascript: (function() { SelectBox.move_all("' + field_id + '_to", "' + field_id + '_from");})()');
