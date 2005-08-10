@@ -51,7 +51,6 @@ var SelectBox = {
     },
     add_to_cache: function(id, option) {
         SelectBox.cache[id].push({ value: option.value, text: option.text, displayed: 1 });
-//         SelectBox.sort(id) // Commented out for performance. Can this be deleted?
     },
     cache_contains: function(id, value) {
         // Check if an item is contained in the cache

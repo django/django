@@ -3,23 +3,8 @@ SelectFilter2 - Turns a multiple-select box into a filter interface.
 
 Different than SelectFilter because this is coupled to the admin framework.
 
-Requires SelectBox.js and addevent.js.
+Requires core.js, SelectBox.js and addevent.js.
 */
-
-// quickElement(tagType, parentReference, textInChildNode, [, attribute, attributeValue ...]);
-function quickElement() {
-    var obj = document.createElement(arguments[0]);
-    if (arguments[2] != '' && arguments[2] != null) {
-        var textNode = document.createTextNode(arguments[2]);
-        obj.appendChild(textNode);
-    }
-    var len = arguments.length;
-    for (var i = 3; i < len; i += 2) {
-        obj.setAttribute(arguments[i], arguments[i+1]);
-    }
-    arguments[1].appendChild(obj);
-    return obj;
-}
 
 function findForm(node) {
     // returns the node of the form containing the given node
