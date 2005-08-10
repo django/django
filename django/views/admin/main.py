@@ -719,6 +719,8 @@ def _get_admin_field(field_list, name_prefix, rel, add, change):
                 class_names.append('inline')
             t.append('<label for="%s"%s>%s:</label> ' % (label_name, class_names and ' class="%s"' % ' '.join(class_names) or '', capfirst(field.verbose_name)))
             t.append(_get_admin_field_form_widget(field, name_prefix, rel, add, change))
+        if change and field.primary_key:
+            t.append('{{ %soriginal.%s }}' % ((rel and name_prefix or ''), field.name))
         if change and use_raw_id_admin(field):
             obj_repr = '%soriginal.get_%s|truncatewords:"14"' % (rel and name_prefix or '', field.rel.name)
             t.append('{%% if %s %%}&nbsp;<strong>{{ %s }}</strong>{%% endif %%}' % (obj_repr, obj_repr))

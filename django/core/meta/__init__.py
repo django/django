@@ -1338,7 +1338,7 @@ def manipulator_init(opts, add, change, self, obj_key=None):
         assert obj_key is not None, "ChangeManipulator.__init__() must be passed obj_key parameter."
         self.obj_key = obj_key
         try:
-            self.original_object = opts.get_model_module().get_object(**{'%s__exact' % opts.pk.name: obj_key})
+            self.original_object = opts.get_model_module().get_object(pk=obj_key)
         except ObjectDoesNotExist:
             # If the object doesn't exist, this might be a manipulator for a
             # one-to-one related object that hasn't created its subobject yet.
@@ -1358,7 +1358,7 @@ def manipulator_init(opts, add, change, self, obj_key=None):
                 raise
     self.fields = []
     for f in opts.fields + opts.many_to_many:
-        if f.editable and (not f.rel or not f.rel.edit_inline):
+        if f.editable and not (f.primary_key and change) and (not f.rel or not f.rel.edit_inline):
             self.fields.extend(f.get_manipulator_fields(opts, self, change))
 
     # Add fields for related objects.

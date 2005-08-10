@@ -179,7 +179,7 @@ class Field(object):
             params['validator_list'].append(getattr(manipulator, 'isUnique%sFor%s' % (self.name, self.unique_for_month)))
         if self.unique_for_year:
             params['validator_list'].append(getattr(manipulator, 'isUnique%sFor%s' % (self.name, self.unique_for_year)))
-        if self.unique:
+        if self.unique or (self.primary_key and not rel):
             params['validator_list'].append(curry(manipulator_validator_unique, self, opts, manipulator))
 
         # Only add is_required=True if the field cannot be blank. Primary keys

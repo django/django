@@ -247,7 +247,7 @@ class LogEntry(meta.Model):
         meta.DateTimeField('action_time', auto_now=True),
         meta.ForeignKey(User),
         meta.ForeignKey(core.ContentType, name='content_type_id', rel_name='content_type', blank=True, null=True),
-        meta.IntegerField('object_id', blank=True, null=True),
+        meta.TextField('object_id', blank=True, null=True),
         meta.CharField('object_repr', maxlength=200),
         meta.PositiveSmallIntegerField('action_flag'),
         meta.TextField('change_message', blank=True),
