@@ -208,6 +208,14 @@ class Options:
         if self.pk is None:
             self.fields.insert(0, AutoField('id', 'ID', primary_key=True))
             self.pk = self.fields[0]
+        # Cache whether this has an AutoField.
+        self.has_auto_field = False
+        for f in self.fields:
+            is_auto = isinstance(f, AutoField)
+            if is_auto and self.has_auto_field:
+                raise AssertionError, "A model can't have more than one AutoField."
+            elif is_auto:
+                self.has_auto_field = True
 
     def __repr__(self):
         return '<Options for %s>' % self.module_name
@@ -717,37 +725,27 @@ def method_save(opts, self):
         self._pre_save()
     non_pks = [f for f in opts.fields if not f.primary_key]
     cursor = db.db.cursor()
-    add = not bool(getattr(self, opts.pk.name))
-    for f in non_pks:
-        f.pre_save(self, getattr(self, f.name), add)
-    db_values = [f.get_db_prep_save(getattr(self, f.name)) for f in non_pks]
-    # OneToOne objects are a special case because there's no AutoField, and the
-    # primary key field is set manually.
-    if isinstance(opts.pk.rel, OneToOne):
-        cursor.execute("UPDATE %s SET %s WHERE %s=%%s" % \
-            (opts.db_table, ','.join(['%s=%%s' % f.name for f in non_pks]),
-            opts.pk.name), db_values + [getattr(self, opts.pk.name)])
-        if cursor.rowcount == 0: # If nothing was updated, add the record.
-            field_names = [f.name for f in opts.fields]
-            placeholders = ['%s'] * len(field_names)
-            cursor.execute("INSERT INTO %s (%s) VALUES (%s)" % \
-                (opts.db_table, ','.join(field_names), ','.join(placeholders)),
-                [f.get_db_prep_save(getattr(self, f.name)) for f in opts.fields])
-    else:
-        if not add:
-            cursor.execute("UPDATE %s SET %s WHERE %s=%%s" % \
-                (opts.db_table, ','.join(['%s=%%s' % f.name for f in non_pks]),
-                opts.pk.name), db_values + [getattr(self, opts.pk.name)])
-        else:
-            field_names = [f.name for f in non_pks]
-            placeholders = ['%s'] * len(field_names)
-            if opts.order_with_respect_to:
-                field_names.append('_order')
-                placeholders.append('(SELECT COUNT(*) FROM %s WHERE %s = %%s)' % \
-                    (opts.db_table, opts.order_with_respect_to.name))
-                db_values.append(getattr(self, opts.order_with_respect_to.name))
-            cursor.execute("INSERT INTO %s (%s) VALUES (%s)" % \
-                (opts.db_table, ','.join(field_names), ','.join(placeholders)), db_values)
+
+    # First, try an UPDATE. If that doesn't update anything, do an INSERT.
+    pk_set = bool(getattr(self, opts.pk.name))
+    if pk_set:
+        db_values = [f.get_db_prep_save(f.pre_save(getattr(self, f.name), False)) for f in non_pks]
+        cursor.execute("UPDATE %s SET %s WHERE %s=%%s" % (opts.db_table,
+            ','.join(['%s=%%s' % f.name for f in non_pks]), opts.pk.name),
+            db_values + [getattr(self, opts.pk.name)])
+    if not pk_set or cursor.rowcount == 0:
+        field_names = [f.name for f in opts.fields if not isinstance(f, AutoField)]
+        placeholders = ['%s'] * len(field_names)
+        db_values = [f.get_db_prep_save(f.pre_save(getattr(self, f.name), True)) for f in opts.fields if not isinstance(f, AutoField)]
+        if opts.order_with_respect_to:
+            field_names.append('_order')
+            # TODO: This assumes the database supports subqueries.
+            placeholders.append('(SELECT COUNT(*) FROM %s WHERE %s = %%s)' % \
+                (opts.db_table, opts.order_with_respect_to.name))
+            db_values.append(getattr(self, opts.order_with_respect_to.name))
+        cursor.execute("INSERT INTO %s (%s) VALUES (%s)" % (opts.db_table,
+            ','.join(field_names), ','.join(placeholders)), db_values)
+        if opts.has_auto_field:
             setattr(self, opts.pk.name, db.get_last_insert_id(cursor, opts.db_table, opts.pk.name))
     db.db.commit()
     # Run any post-save hooks.

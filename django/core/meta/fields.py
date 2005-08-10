@@ -82,12 +82,9 @@ class Field(object):
         else:
             self.db_index = db_index
 
-    def pre_save(self, obj, value, add):
-        """
-        Hook for altering the object obj based on the value of this field and
-        and on the add/change status.
-        """
-        pass
+    def pre_save(self, value, add):
+        "Returns field's value just before saving."
+        return value
 
     def get_db_prep_save(self, value):
         "Returns field's value prepared for saving into a database."
@@ -236,6 +233,10 @@ class Field(object):
 
 class AutoField(Field):
     empty_strings_allowed = False
+    def __init__(self, *args, **kwargs):
+        assert kwargs.get('primary_key', False) is True, "%ss must have primary_key=True." % self.__class__.__name__
+        Field.__init__(self, *args, **kwargs)
+
     def get_manipulator_fields(self, opts, manipulator, change, name_prefix='', rel=False):
         if not rel:
             return [] # Don't add a FormField unless it's in a related context.
@@ -280,9 +281,10 @@ class DateField(Field):
             value = str(value)
         return Field.get_db_prep_lookup(self, lookup_type, value)
 
-    def pre_save(self, obj, value, add):
+    def pre_save(self, value, add):
         if self.auto_now or (self.auto_now_add and add):
-            setattr(obj, self.name, datetime.datetime.now())
+            return datetime.datetime.now()
+        return value
 
     def get_db_prep_save(self, value):
         # Casts dates into string format for entry into database.
@@ -483,9 +485,10 @@ class TimeField(Field):
             value = str(value)
         return Field.get_db_prep_lookup(self, lookup_type, value)
 
-    def pre_save(self, obj, value, add):
+    def pre_save(self, value, add):
         if self.auto_now or (self.auto_now_add and add):
-            setattr(obj, self.name, datetime.datetime.now().time())
+            return datetime.datetime.now().time()
+        return value
 
     def get_db_prep_save(self, value):
         # Casts dates into string format for entry into database.
