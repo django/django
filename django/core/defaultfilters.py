@@ -54,15 +54,15 @@ def make_list(value, _):
 
 def slugify(value, _):
     "Converts to lowercase, removes non-alpha chars and converts spaces to hyphens"
-    value = re.sub('[^\w\s]', '', value).strip().lower()
+    value = re.sub('[^\w\s-]', '', value).strip().lower()
     return re.sub('\s+', '-', value)
-    
+
 def stringformat(value, arg):
     """
     Formats the variable according to the argument, a string formatting specifier.
     This specifier uses Python string formating syntax, with the exception that
     the leading "%" is dropped.
-    
+
     See http://docs.python.org/lib/typesseq-strings.html for documentation
     of Python string formatting
     """
