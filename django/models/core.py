@@ -75,6 +75,7 @@ class Redirect(meta.Model):
 
 class FlatFile(meta.Model):
     db_table = 'flatfiles'
+    verbose_name = 'flat page'
     fields = (
         meta.CharField('url', 'URL', maxlength=100, validator_list=[validators.isAlphaNumericURL],
             help_text="Example: '/about/contact/'. Make sure to have leading and trailing slashes."),
