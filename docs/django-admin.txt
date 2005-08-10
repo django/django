@@ -22,7 +22,7 @@ document.
 Run ``django-admin.py --help`` to display a help message that includes a terse
 list of all available actions and options.
 
-Most ``action``s take a list of "app"s. An "app," in this case, is the name of
+Most actions take a list of "app"s. An "app," in this case, is the name of
 a file containing Django models. For example, if you have a model module called
 ``myproject/apps/polls/pollmodels.py``, the "app" in this case would be
 ``"pollmodels"``.
