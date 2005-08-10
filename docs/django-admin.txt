@@ -72,6 +72,9 @@ customizations. In particular, you'll need to do this:
     * Add primary_key=True to one field in each model. The ``inspectdb``
       doesn't yet introspect primary keys.
 
+``inspectdb`` only works with PostgreSQL and MySQL. Foreign-key detection only
+works in PostgreSQL.
+
 install [app app ...]
 ---------------------
 
