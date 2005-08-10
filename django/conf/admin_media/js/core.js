@@ -64,7 +64,7 @@ if (!xmlhttp && typeof XMLHttpRequest != 'undefined') {
 
 // ----------------------------------------------------------------------------
 // Find-position functions by PPK
-// See http://www.xs4all.nl/~ppk/js/index.html?/~ppk/js/findpos.html
+// See http://www.quirksmode.org/js/findpos.html
 // ----------------------------------------------------------------------------
 function findPosX(obj) {
     var curleft = 0;
