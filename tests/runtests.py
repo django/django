@@ -54,6 +54,8 @@ class TestRunner:
         from django.core.db import db
         from django.core import management, meta
 
+        self.output(0, "Running tests with database %r" % settings.DATABASE_ENGINE)
+
         # Manually set INSTALLED_APPS to point to the test app.
         settings.INSTALLED_APPS = (APP_NAME,)
 
@@ -176,9 +178,13 @@ if __name__ == "__main__":
     parser = OptionParser()
     parser.add_option('-v', help='How verbose should the output be? Choices are 0, 1 and 2, where 2 is most verbose. Default is 0.',
         type='choice', choices=['0', '1', '2'])
+    parser.add_option('--settings',
+        help='Python path to settings module, e.g. "myproject.settings.main". If this isn\'t provided, the DJANGO_SETTINGS_MODULE environment variable will be used.')
     options, args = parser.parse_args()
     verbosity_level = 0
     if options.v:
         verbosity_level = int(options.v)
+    if options.settings:
+        os.environ['DJANGO_SETTINGS_MODULE'] = options.settings
     t = TestRunner(verbosity_level)
     t.run_tests()
