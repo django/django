@@ -29,6 +29,7 @@ class WSGIRequest(httpwrappers.HttpRequest):
             post_data = self.environ['wsgi.input'].read(int(self.environ["CONTENT_LENGTH"]))
             if self.environ.get('CONTENT_TYPE', '').startswith('multipart'):
                 header_dict = dict([(k, v) for k, v in self.environ.items() if k.startswith('HTTP_')])
+                header_dict['Content-Type'] = self.environ.get('CONTENT_TYPE', '')
                 self._post, self._files = httpwrappers.parse_file_upload(header_dict, post_data)
             else:
                 self._post, self._files = httpwrappers.QueryDict(post_data), datastructures.MultiValueDict()
