@@ -775,6 +775,9 @@ def method_delete(opts, self):
     for rel_opts, rel_field in opts.get_all_related_many_to_many_objects():
         cursor.execute("DELETE FROM %s WHERE %s_id=%%s" % (rel_field.get_m2m_db_table(rel_opts),
             self._meta.object_name.lower()), [getattr(self, opts.pk.name)])
+    for f in opts.many_to_many:
+        cursor.execute("DELETE FROM %s WHERE %s_id=%%s" % (f.get_m2m_db_table(opts), self._meta.object_name.lower()),
+            [getattr(self, opts.pk.name)])
     cursor.execute("DELETE FROM %s WHERE %s=%%s" % (opts.db_table, opts.pk.name), [getattr(self, opts.pk.name)])
     db.db.commit()
     setattr(self, opts.pk.name, None)
