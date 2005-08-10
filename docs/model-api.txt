@@ -87,7 +87,7 @@ wide array of options, only ``fields`` is required.
     object. A add, delete, and change permission is automatically created for
     each object. This option specifies extra permissions::
 
-        permissions = (("can_delivier_pizzas", "Can deliver pizzas"),)
+        permissions = (("can_deliver_pizzas", "Can deliver pizzas"),)
 
     This is a list of 2-tuples of
     ``(permission_code, human_readable_permission_name)``.
