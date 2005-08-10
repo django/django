@@ -720,7 +720,7 @@ def method_save(opts, self):
     add = not bool(getattr(self, opts.pk.name))
     for f in non_pks:
         f.pre_save(self, getattr(self, f.name), add)
-    db_values = [f.get_db_prep_save(getattr(self, f.name), add) for f in non_pks]
+    db_values = [f.get_db_prep_save(getattr(self, f.name)) for f in non_pks]
     # OneToOne objects are a special case because there's no AutoField, and the
     # primary key field is set manually.
     if isinstance(opts.pk.rel, OneToOne):
@@ -732,7 +732,7 @@ def method_save(opts, self):
             placeholders = ['%s'] * len(field_names)
             cursor.execute("INSERT INTO %s (%s) VALUES (%s)" % \
                 (opts.db_table, ','.join(field_names), ','.join(placeholders)),
-                [f.get_db_prep_save(getattr(self, f.name), add=True) for f in opts.fields])
+                [f.get_db_prep_save(getattr(self, f.name)) for f in opts.fields])
     else:
         if not add:
             cursor.execute("UPDATE %s SET %s WHERE %s=%%s" % \

@@ -89,7 +89,7 @@ class Field(object):
         """
         pass
 
-    def get_db_prep_save(self, value, add):
+    def get_db_prep_save(self, value):
         "Returns field's value prepared for saving into a database."
         return value
 
@@ -284,21 +284,21 @@ class DateField(Field):
         if self.auto_now or (self.auto_now_add and add):
             setattr(obj, self.name, datetime.datetime.now())
 
-    def get_db_prep_save(self, value, add):
+    def get_db_prep_save(self, value):
         # Casts dates into string format for entry into database.
         if value is not None:
             value = value.strftime('%Y-%m-%d')
-        return Field.get_db_prep_save(self, value, add)
+        return Field.get_db_prep_save(self, value)
 
     def get_manipulator_field_objs(self):
         return [formfields.DateField]
 
 class DateTimeField(DateField):
-    def get_db_prep_save(self, value, add):
+    def get_db_prep_save(self, value):
         # Casts dates into string format for entry into database.
         if value is not None:
             value = value.strftime('%Y-%m-%d %H:%M:%S')
-        return Field.get_db_prep_save(self, value, add)
+        return Field.get_db_prep_save(self, value)
 
     def get_manipulator_field_objs(self):
         return [formfields.DateField, formfields.TimeField]
@@ -487,11 +487,11 @@ class TimeField(Field):
         if self.auto_now or (self.auto_now_add and add):
             setattr(obj, self.name, datetime.datetime.now().time())
 
-    def get_db_prep_save(self, value, add):
+    def get_db_prep_save(self, value):
         # Casts dates into string format for entry into database.
         if value is not None:
             value = value.strftime('%H:%M:%S')
-        return Field.get_db_prep_save(self, value, add)
+        return Field.get_db_prep_save(self, value)
 
     def get_manipulator_field_objs(self):
         return [formfields.TimeField]
