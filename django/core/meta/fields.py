@@ -82,10 +82,10 @@ class Field(object):
         else:
             self.db_index = db_index
 
-    def pre_save_add(self, obj, value):
+    def pre_save(self, obj, value, add):
         """
-        Hook for altering the object obj based on the value of this field,
-        during the add stage.
+        Hook for altering the object obj based on the value of this field and
+        and on the add/change status.
         """
         pass
 
@@ -280,8 +280,8 @@ class DateField(Field):
             value = str(value)
         return Field.get_db_prep_lookup(self, lookup_type, value)
 
-    def pre_save_add(self, obj, value):
-        if self.auto_now or self.auto_now_add:
+    def pre_save(self, obj, value, add):
+        if self.auto_now or (self.auto_now_add and add):
             setattr(obj, self.name, datetime.datetime.now())
 
     def get_db_prep_save(self, value):
@@ -483,8 +483,8 @@ class TimeField(Field):
             value = str(value)
         return Field.get_db_prep_lookup(self, lookup_type, value)
 
-    def pre_save_add(self, obj, value):
-        if self.auto_now or self.auto_now_add:
+    def pre_save(self, obj, value, add):
+        if self.auto_now or (self.auto_now_add and add):
             setattr(obj, self.name, datetime.datetime.now().time())
 
     def get_db_prep_save(self, value):

@@ -718,9 +718,8 @@ def method_save(opts, self):
     non_pks = [f for f in opts.fields if not f.primary_key]
     cursor = db.db.cursor()
     add = not bool(getattr(self, opts.pk.name))
-    if add:
-        for f in non_pks:
-            f.pre_save_add(self, getattr(self, f.name))
+    for f in non_pks:
+        f.pre_save(self, getattr(self, f.name), add)
     db_values = [f.get_db_prep_save(getattr(self, f.name)) for f in non_pks]
     # OneToOne objects are a special case because there's no AutoField, and the
     # primary key field is set manually.
