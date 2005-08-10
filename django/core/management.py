@@ -321,6 +321,7 @@ The full error: %s\n""" % \
         db.db.rollback()
         sys.exit(1)
     db.db.commit()
+install.help_doc = "Executes ``sqlall`` for the given app(s) in the current database."
 install.args = APP_ARGS
 
 def _start_helper(app_or_project, name, directory, other_name=''):
