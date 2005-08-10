@@ -9,7 +9,6 @@ from django.core.db.dicthelpers import *
 import MySQLdb as Database
 from MySQLdb.converters import conversions
 from MySQLdb.constants import FIELD_TYPE
-from _mysql_exceptions import NotSupportedError
 import types
 
 DatabaseError = Database.DatabaseError
@@ -43,7 +42,7 @@ class DatabaseWrapper:
         if self.connection:
             try:
                 self.connection.rollback()
-            except NotSupportedError:
+            except Database.NotSupportedError:
                 pass
 
     def close(self):
