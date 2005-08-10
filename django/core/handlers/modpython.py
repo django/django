@@ -23,9 +23,9 @@ class ModPythonRequest(httpwrappers.HttpRequest):
     def _load_post_and_files(self):
         "Populates self._post and self._files"
         if self._req.headers_in.has_key('content-type') and self._req.headers_in['content-type'].startswith('multipart'):
-            self._post, self._files = httpwrappers.parse_file_upload(self._req.headers_in, self._req.read())
+            self._post, self._files = httpwrappers.parse_file_upload(self._req.headers_in, self.raw_post_data)
         else:
-            self._post, self._files = httpwrappers.QueryDict(self._req.read()), datastructures.MultiValueDict()
+            self._post, self._files = httpwrappers.QueryDict(self.raw_post_data), datastructures.MultiValueDict()
 
     def _get_request(self):
         if not hasattr(self, '_request'):
@@ -88,6 +88,13 @@ class ModPythonRequest(httpwrappers.HttpRequest):
                 self._meta[key] = value
         return self._meta
 
+    def _get_raw_post_data(self):
+        try:
+            return self._raw_post_data
+        except AttributeError:
+            self._raw_post_data = self._req.read()
+            return self._raw_post_data
+
     def _load_session_and_user(self):
         from django.models.auth import sessions
         from django.conf.settings import AUTH_SESSION_COOKIE
@@ -122,6 +129,7 @@ class ModPythonRequest(httpwrappers.HttpRequest):
     FILES = property(_get_files)
     META = property(_get_meta)
     REQUEST = property(_get_request)
+    raw_post_data = property(_get_raw_post_data)
     session = property(_get_session, _set_session)
     user = property(_get_user, _set_user)
 

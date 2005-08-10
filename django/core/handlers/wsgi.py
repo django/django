@@ -26,13 +26,12 @@ class WSGIRequest(httpwrappers.HttpRequest):
     def _load_post_and_files(self):
         # Populates self._post and self._files
         if self.environ['REQUEST_METHOD'] == 'POST':
-            post_data = self.environ['wsgi.input'].read(int(self.environ["CONTENT_LENGTH"]))
             if self.environ.get('CONTENT_TYPE', '').startswith('multipart'):
                 header_dict = dict([(k, v) for k, v in self.environ.items() if k.startswith('HTTP_')])
                 header_dict['Content-Type'] = self.environ.get('CONTENT_TYPE', '')
-                self._post, self._files = httpwrappers.parse_file_upload(header_dict, post_data)
+                self._post, self._files = httpwrappers.parse_file_upload(header_dict, self.raw_post_data)
             else:
-                self._post, self._files = httpwrappers.QueryDict(post_data), datastructures.MultiValueDict()
+                self._post, self._files = httpwrappers.QueryDict(self.raw_post_data), datastructures.MultiValueDict()
         else:
             self._post, self._files = httpwrappers.QueryDict(''), datastructures.MultiValueDict()
 
@@ -70,6 +69,13 @@ class WSGIRequest(httpwrappers.HttpRequest):
             self._load_post_and_files()
         return self._files
 
+    def _get_raw_post_data(self):
+        try:
+            return self._raw_post_data
+        except AttributeError:
+            self._raw_post_data = self.environ['wsgi.input'].read(int(self.environ["CONTENT_LENGTH"]))
+            return self._raw_post_data
+
     def _load_session_and_user(self):
         from django.models.auth import sessions
         from django.conf.settings import AUTH_SESSION_COOKIE
@@ -103,6 +109,7 @@ class WSGIRequest(httpwrappers.HttpRequest):
     COOKIES = property(_get_cookies, _set_cookies)
     FILES = property(_get_files)
     REQUEST = property(_get_request)
+    raw_post_data = property(_get_raw_post_data)
     session = property(_get_session, _set_session)
     user = property(_get_user, _set_user)
 
