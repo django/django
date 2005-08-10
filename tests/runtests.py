@@ -27,6 +27,7 @@ class DjangoDoctestRunner(doctest.DocTestRunner):
     def __init__(self, verbosity_level, *args, **kwargs):
         self.verbosity_level = verbosity_level
         doctest.DocTestRunner.__init__(self, *args, **kwargs)
+        self._checker = DjangoDoctestOutputChecker()
 
     def report_start(self, out, test, example):
         if self.verbosity_level > 1:
@@ -40,6 +41,16 @@ class DjangoDoctestRunner(doctest.DocTestRunner):
         tb = ''.join(traceback.format_exception(*exc_info)[1:])
         log_error(test.name, "API test raised an exception",
             "Code: %r\nLine: %s\nException: %s" % (example.source.strip(), example.lineno, tb))
+            
+class DjangoDoctestOutputChecker(doctest.OutputChecker):
+    def check_output(self, want, got, optionflags):
+        ok = doctest.OutputChecker.check_output(self, want, got, optionflags)
+        if not ok and (want.strip().endswith("L") or got.strip().endswith("L")):
+            try:
+                return long(want.strip()) == long(got.strip())
+            except ValueError:
+                return False
+        return ok
 
 class TestRunner:
     def __init__(self, verbosity_level=0):
