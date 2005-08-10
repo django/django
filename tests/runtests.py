@@ -28,6 +28,7 @@ class DjangoDoctestRunner(doctest.DocTestRunner):
         self.verbosity_level = verbosity_level
         doctest.DocTestRunner.__init__(self, *args, **kwargs)
         self._checker = DjangoDoctestOutputChecker()
+        self.optionflags = doctest.ELLIPSIS
 
     def report_start(self, out, test, example):
         if self.verbosity_level > 1:
