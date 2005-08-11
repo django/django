@@ -235,15 +235,15 @@ Field Types
     A true/false field.
 
 ``CharField``
-    A text field. These are displayed in the admin as single-line text inputs, so
-    for large amounts of text, use a ``TextField``.
+    A text field. These are displayed in the admin as single-line text inputs.
+    For large amounts of text, use ``TextField``.
 
-    ``CharField``s have an extra required argument: ``maxlength``, the maximum
+    ``CharField`` has an extra required argument: ``maxlength``, the maximum
     length (in characters) of the field. The maxlength is enforced at the database
     level and in Django's admin validation.
 
 ``CommaSeparatedIntegerField``
-    A field of integers separated by commas. As in ``CharField``s, the
+    A field of integers separated by commas. As in ``CharField``, the
     ``maxlength`` argument is required.
 
 ``DateField``
