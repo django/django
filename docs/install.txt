@@ -17,6 +17,9 @@ the life of an Apache process, which leads to significant performance gains
 over other server arrangements. Make sure you have Apache installed, with the
 mod_python module activated.
 
+See `How to use Django with mod_python`_ for information on how to configure
+mod_python once you have it installed.
+
 If you can't use mod_python for some reason, fear not: Django follows the WSGI_
 spec, which allows it to run on a variety of server platforms. As people
 experiment with different server platforms, we'll update this document to
@@ -25,6 +28,7 @@ give specific installation instructions for each platform.
 .. _Apache: http://httpd.apache.org/
 .. _mod_python: http://www.modpython.org/
 .. _WSGI: http://www.python.org/peps/pep-0333.html
+.. _How to use Django with mod_python: http://www.djangoproject.com/documentation/modpython/
 
 Get your database running
 =========================
