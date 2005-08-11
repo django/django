@@ -5,7 +5,7 @@ import datetime
 ###############################################
 
 def typecast_date(s):
-    return s and datetime.date(*map(int, s.split('-'))) # returns None if s is null
+    return s and datetime.date(*map(int, s.split('-'))) or None # returns None if s is null
 
 def typecast_time(s): # does NOT store time zone information
     if not s: return None
@@ -14,7 +14,7 @@ def typecast_time(s): # does NOT store time zone information
         seconds, microseconds = seconds.split('.')
     else:
         microseconds = '0'
-    return datetime.time(int(hour), int(minutes), int(seconds), int(microseconds))
+    return datetime.time(int(hour), int(minutes), int(seconds), int(float('.'+microseconds) * 1000000))
 
 def typecast_timestamp(s): # does NOT store time zone information
     # "2005-07-29 15:48:00.590358-05"
@@ -39,10 +39,11 @@ def typecast_timestamp(s): # does NOT store time zone information
     else:
         microseconds = '0'
     return datetime.datetime(int(dates[0]), int(dates[1]), int(dates[2]),
-        int(times[0]), int(times[1]), int(seconds), int(microseconds))
+        int(times[0]), int(times[1]), int(seconds), int(float('.'+microseconds) * 1000000))
 
 def typecast_boolean(s):
     if s is None: return None
+    if not s: return False
     return str(s)[0].lower() == 't'
 
 ###############################################

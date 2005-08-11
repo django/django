@@ -120,4 +120,39 @@ TypeError: 'foo' is an invalid keyword argument for this function
 >>> a6.save()
 >>> a6.headline
 'Default headline'
+
+# For DateTimeFields, Django saves as much precision (in seconds) as you
+# give it.
+>>> a7 = articles.Article(headline='Article 7', pub_date=datetime(2005, 7, 31, 12, 30))
+>>> a7.save()
+>>> articles.get_object(id__exact=7).pub_date
+datetime.datetime(2005, 7, 31, 12, 30)
+
+>>> a8 = articles.Article(headline='Article 8', pub_date=datetime(2005, 7, 31, 12, 30, 45))
+>>> a8.save()
+>>> articles.get_object(id__exact=8).pub_date
+datetime.datetime(2005, 7, 31, 12, 30, 45)
+"""
+
+from django.conf import settings
+
+building_docs = getattr(settings, 'BUILDING_DOCS', False)
+
+if building_docs or settings.DATABASE_ENGINE == 'postgresql':
+    API_TESTS += """
+# In PostgreSQL, microsecond-level precision is available.
+>>> a9 = articles.Article(headline='Article 9', pub_date=datetime(2005, 7, 31, 12, 30, 45, 180))
+>>> a9.save()
+>>> articles.get_object(id__exact=9).pub_date
+datetime.datetime(2005, 7, 31, 12, 30, 45, 180)
+"""
+
+if building_docs or settings.DATABASE_ENGINE == 'mysql':
+    API_TESTS += """
+# In MySQL, microsecond-level precision isn't available. You'll lose
+# microsecond-level precision once the data is saved.
+>>> a9 = articles.Article(headline='Article 9', pub_date=datetime(2005, 7, 31, 12, 30, 45, 180))
+>>> a9.save()
+>>> articles.get_object(id__exact=9).pub_date
+datetime.datetime(2005, 7, 31, 12, 30, 45)
 """

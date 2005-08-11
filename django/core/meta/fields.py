@@ -299,7 +299,7 @@ class DateTimeField(DateField):
     def get_db_prep_save(self, value):
         # Casts dates into string format for entry into database.
         if value is not None:
-            value = value.strftime('%Y-%m-%d %H:%M:%S')
+            value = str(value)
         return Field.get_db_prep_save(self, value)
 
     def get_manipulator_field_objs(self):
@@ -493,7 +493,7 @@ class TimeField(Field):
     def get_db_prep_save(self, value):
         # Casts dates into string format for entry into database.
         if value is not None:
-            value = value.strftime('%H:%M:%S')
+            value = str(value)
         return Field.get_db_prep_save(self, value)
 
     def get_manipulator_field_objs(self):
