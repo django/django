@@ -18,7 +18,7 @@ def create_object(request, app_label, module_name, template_name=None,
             the form wrapper for the object
     """
     if login_required and request.user.is_anonymous():
-        return redirect_to_login(request)
+        return redirect_to_login(request.path)
         
     mod = models.get_module(app_label, module_name)
     manipulator = mod.AddManipulator()
@@ -78,7 +78,7 @@ def update_object(request, app_label, module_name, object_id=None, slug=None,
             the original object being edited
     """
     if login_required and request.user.is_anonymous():
-        return redirect_to_login(request)
+        return redirect_to_login(request.path)
 
     mod = models.get_module(app_label, module_name)
     
@@ -153,7 +153,7 @@ def delete_object(request, app_label, module_name, post_delete_redirect,
             the original object being deleted
     """
     if login_required and request.user.is_anonymous():
-        return redirect_to_login(request)
+        return redirect_to_login(request.path)
 
     mod = models.get_module(app_label, module_name)
     
