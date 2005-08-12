@@ -485,8 +485,8 @@ inspectdb.args = "[dbname]"
 
 def runserver(port):
     "Starts a lightweight Web server for development."
-    from django.core.servers.basehttp import run, WSGIServerException
-    from django.core.handlers.wsgi import AdminMediaHandler, WSGIHandler
+    from django.core.servers.basehttp import run, AdminMediaHandler, WSGIServerException
+    from django.core.handlers.wsgi import WSGIHandler
     if not port.isdigit():
         sys.stderr.write("Error: %r is not a valid port number.\n" % port)
         sys.exit(1)
