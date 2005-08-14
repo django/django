@@ -9,6 +9,7 @@ from django.core.db.dicthelpers import *
 import MySQLdb as Database
 from MySQLdb.converters import conversions
 from MySQLdb.constants import FIELD_TYPE
+from MySQLdb.cursors import CursorNW # Ignores MySQL warnings.
 import types
 
 DatabaseError = Database.DatabaseError
@@ -30,7 +31,8 @@ class DatabaseWrapper:
         from django.conf.settings import DATABASE_USER, DATABASE_NAME, DATABASE_HOST, DATABASE_PASSWORD, DEBUG
         if self.connection is None:
             self.connection = Database.connect(user=DATABASE_USER, db=DATABASE_NAME,
-                passwd=DATABASE_PASSWORD, host=DATABASE_HOST, conv=django_conversions)
+                passwd=DATABASE_PASSWORD, host=DATABASE_HOST, conv=django_conversions,
+                cursorclass=CursorNW)
         if DEBUG:
             return base.CursorDebugWrapper(self.connection.cursor(), self)
         return self.connection.cursor()
