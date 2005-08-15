@@ -77,7 +77,10 @@ these settings to match your database's connection parameters:
 Now, take a second to make sure ``myproject`` is on your Python path. You
 can do this by copying ``myproject`` to Python's ``site-packages`` directory,
 or you can do it by altering the ``PYTHONPATH`` environment variable. See the
-`Python path documentation`_ for more information.
+`Python path documentation`_ for more information. If you opt to set the
+``PYTHONPATH`` environment variable, note that you'll need to set it to the
+*parent* directory of ``myproject``. (You can test this by typing
+"import myproject" into the Python interactive prompt.)
 
 Run the following command::
 
