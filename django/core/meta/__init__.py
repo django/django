@@ -464,6 +464,7 @@ class ModelBase(type):
         for k, v in attrs.items():
             if k in ('__module__', '__init__', '_overrides', '__doc__'):
                 continue # Skip the important stuff.
+            assert callable(v), "%r is an invalid model parameter." % k
             # Give the function a function attribute "custom" to designate that
             # it's a custom function/method.
             v.custom = True
