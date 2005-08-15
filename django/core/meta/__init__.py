@@ -735,7 +735,7 @@ def method_save(opts, self):
         # Determine whether a record with the primary key already exists.
         cursor.execute("SELECT 1 FROM %s WHERE %s=%%s LIMIT 1" % (opts.db_table, opts.pk.name), [pk_val])
         # If it does already exist, do an UPDATE.
-        if cursor.rowcount > 0:
+        if cursor.fetchone():
             db_values = [f.get_db_prep_save(f.pre_save(getattr(self, f.name), False)) for f in non_pks]
             cursor.execute("UPDATE %s SET %s WHERE %s=%%s" % (opts.db_table,
                 ','.join(['%s=%%s' % f.name for f in non_pks]), opts.pk.name),
