@@ -7,7 +7,9 @@ ACTION_MAPPING = {
     'adminindex': management.get_admin_index,
     'createsuperuser': management.createsuperuser,
 #     'dbcheck': management.database_check,
+    'init': management.init,
     'inspectdb': management.inspectdb,
+    'install': management.install,
     'runserver': management.runserver,
     'sql': management.get_sql_create,
     'sqlall': management.get_sql_all,
@@ -18,8 +20,7 @@ ACTION_MAPPING = {
     'sqlsequencereset': management.get_sql_sequence_reset,
     'startapp': management.startapp,
     'startproject': management.startproject,
-    'init': management.init,
-    'install': management.install,
+    'validate': management.validate,
 }
 
 NO_SQL_TRANSACTION = ('adminindex', 'dbcheck', 'install', 'sqlindexes')
@@ -65,7 +66,7 @@ def main():
         print_error("An action is required.", sys.argv[0])
     if not ACTION_MAPPING.has_key(action):
         print_error("Your action, %r, was invalid." % action, sys.argv[0])
-    if action in ('createsuperuser', 'init'):
+    if action in ('createsuperuser', 'init', 'validate'):
         ACTION_MAPPING[action]()
     elif action == 'inspectdb':
         try:

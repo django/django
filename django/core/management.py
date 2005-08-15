@@ -483,6 +483,58 @@ def inspectdb(db_name):
 inspectdb.help_doc = "Introspects the database tables in the given database and outputs a Django model module."
 inspectdb.args = "[dbname]"
 
+class ModelErrorCollection:
+    def __init__(self, outfile=sys.stdout):
+        self.errors = []
+        self.outfile = outfile
+
+    def add(self, opts, error):
+        self.errors.append((opts, error))
+        self.outfile.write("%s.%s: %s\n" % (opts.module_name, opts.object_name, error))
+
+def validate():
+    "Validates all installed models."
+    from django.core import meta
+    e = ModelErrorCollection()
+    module_list = meta.get_installed_model_modules()
+    for module in module_list:
+        for mod in module._MODELS:
+            opts = mod._meta
+
+            # Do field-specific validation.
+            for f in opts.fields:
+                if isinstance(f, meta.CharField) and f.maxlength in (None, 0):
+                    e.add(opts, '"%s" field: CharFields require a "maxlength" attribute.' % f.name)
+
+            # Check admin attribute.
+            if opts.admin is not None and not isinstance(opts.admin, meta.Admin):
+                e.add(opts, '"admin" attribute, if given, must be set to a meta.Admin() instance.')
+
+            # Check ordering attribute.
+            if opts.ordering:
+                for field_name in opts.ordering:
+                    if field_name == '?': continue
+                    if field_name.startswith('-'):
+                        field_name = field_name[1:]
+                    try:
+                        opts.get_field(field_name, many_to_many=False)
+                    except meta.FieldDoesNotExist:
+                        e.add(opts, '"ordering" refers to "%s", a field that doesn\'t exist.' % field_name)
+
+            # Check core=True, if needed.
+            for rel_opts, rel_field in opts.get_inline_related_objects():
+                try:
+                    for f in rel_opts.fields:
+                        if f.core:
+                            raise StopIteration
+                    e.add(rel_opts, "At least one field in %s should have core=True, because it's being edited inline by %s.%s." % (rel_opts.object_name, opts.module_name, opts.object_name))
+                except StopIteration:
+                    pass
+
+    num_errors = len(e.errors)
+    print '%s error%s found.' % (num_errors, num_errors != 1 and 's' or '')
+validate.args = ''
+
 def runserver(port):
     "Starts a lightweight Web server for development."
     from django.core.servers.basehttp import run, AdminMediaHandler, WSGIServerException
@@ -492,7 +544,9 @@ def runserver(port):
         sys.exit(1)
     def inner_run():
         from django.conf.settings import SETTINGS_MODULE
-        print "Starting server on port %s with settings module %r." % (port, SETTINGS_MODULE)
+        print "Validating models..."
+        validate()
+        print "\nStarting server on port %s with settings module %r." % (port, SETTINGS_MODULE)
         print "Go to http://127.0.0.1:%s/ for Django." % port
         print "Quit the server with CONTROL-C (Unix) or CTRL-BREAK (Windows)."
         try:
