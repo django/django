@@ -728,13 +728,21 @@ def method_save(opts, self):
     cursor = db.db.cursor()
 
     # First, try an UPDATE. If that doesn't update anything, do an INSERT.
-    pk_set = bool(getattr(self, opts.pk.name))
+    pk_val = getattr(self, opts.pk.name)
+    pk_set = bool(pk_val)
+    record_exists = True
     if pk_set:
-        db_values = [f.get_db_prep_save(f.pre_save(getattr(self, f.name), False)) for f in non_pks]
-        cursor.execute("UPDATE %s SET %s WHERE %s=%%s" % (opts.db_table,
-            ','.join(['%s=%%s' % f.name for f in non_pks]), opts.pk.name),
-            db_values + [getattr(self, opts.pk.name)])
-    if not pk_set or cursor.rowcount == 0:
+        # Determine whether a record with the primary key already exists.
+        cursor.execute("SELECT 1 FROM %s WHERE %s=%%s LIMIT 1" % (opts.db_table, opts.pk.name), [pk_val])
+        # If it does already exist, do an UPDATE.
+        if cursor.rowcount > 0:
+            db_values = [f.get_db_prep_save(f.pre_save(getattr(self, f.name), False)) for f in non_pks]
+            cursor.execute("UPDATE %s SET %s WHERE %s=%%s" % (opts.db_table,
+                ','.join(['%s=%%s' % f.name for f in non_pks]), opts.pk.name),
+                db_values + [pk_val])
+        else:
+            record_exists = False
+    if not pk_set or not record_exists:
         field_names = [f.name for f in opts.fields if not isinstance(f, AutoField)]
         placeholders = ['%s'] * len(field_names)
         db_values = [f.get_db_prep_save(f.pre_save(getattr(self, f.name), True)) for f in opts.fields if not isinstance(f, AutoField)]
