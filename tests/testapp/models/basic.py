@@ -132,6 +132,17 @@ datetime.datetime(2005, 7, 31, 12, 30)
 >>> a8.save()
 >>> articles.get_object(id__exact=8).pub_date
 datetime.datetime(2005, 7, 31, 12, 30, 45)
+>>> a8.id
+8L
+
+# Saving an object again shouldn't create a new object -- it just saves the old one.
+>>> a8.save()
+>>> a8.id
+8L
+>>> a8.headline = 'Updated article 8'
+>>> a8.save()
+>>> a8.id
+8L
 """
 
 from django.conf import settings
