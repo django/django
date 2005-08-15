@@ -533,8 +533,8 @@ Field Types
     Accepts an extra option, ``prepopulate_from``, which is a list of fields
     from which to auto-populate the slug, via JavaScript, in the object's admin
     form::
-        
-        meta.SlugField("slug", prepopulate_from=("pre_name", "name"),
+
+        meta.SlugField("slug", prepopulate_from=("pre_name", "name")),
 
 ``SmallIntegerField``
     Like an ``IntegerField``, but only allows values under a certain
