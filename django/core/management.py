@@ -361,7 +361,7 @@ def startproject(project_name, directory):
     admin_settings_file = os.path.join(directory, project_name, 'settings/admin.py')
     settings_contents = open(admin_settings_file, 'r').read()
     fp = open(admin_settings_file, 'w')
-    settings_contents = re.sub(r'(?s)\b(TEMPLATE_DIRS\s*=\s*\()(.*?)\)', "\\1\n    '%s',\\2)" % ADMIN_TEMPLATE_DIR, settings_contents)
+    settings_contents = re.sub(r'(?s)\b(TEMPLATE_DIRS\s*=\s*\()(.*?)\)', "\\1\n    r%r,\\2)" % ADMIN_TEMPLATE_DIR, settings_contents)
     fp.write(settings_contents)
     fp.close()
     # Create a random SECRET_KEY hash, and put it in the main settings.
