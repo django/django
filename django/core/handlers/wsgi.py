@@ -138,9 +138,9 @@ class WSGIHandler(BaseHandler):
         except KeyError:
             status_text = 'UNKNOWN STATUS CODE'
         status = '%s %s' % (response.status_code, status_text)
-        response_headers = response.headers
-        if response.cookies:
-            response_headers['Set-Cookie'] = response.cookies.output(header='')
+        response_headers = response.headers.items()
+        for c in response.cookies.values():
+            response_headers.append(('Set-Cookie', c.output(header='')))
         output = [response.get_content_as_string('utf-8')]
-        start_response(status, response_headers.items())
+        start_response(status, response_headers)
         return output
