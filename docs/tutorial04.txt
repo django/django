@@ -206,8 +206,8 @@ objects" and "display a detail page for a particular type of object."
 By default, the ``object_detail`` generic view uses a template called
 ``<app_label>/<module_name>_detail``. In our case, it'll use the template
 ``"polls/polls_detail"``. Thus, rename your ``polls/detail.html`` template to
-``polls/polls_detail``, and change the ``template_loader.get_template()`` line
-in ``vote()``.
+``polls/polls_detail.html``, and change the ``template_loader.get_template()``
+line in ``vote()``.
 
 Similarly, the ``object_list`` generic view uses a template called
 ``<app_label>/<module_name>_list``. Thus, rename ``polls/index.html`` to
