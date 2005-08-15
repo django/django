@@ -387,9 +387,9 @@ def do_firstof(parser, token):
     Sample usage::
 
         {% firstof var1 var2 var3 %}
-        
+
     This is equivalent to::
-    
+
         {% if var1 %}
             {{ var1 }}
         {% else %}{% if var2 %}
@@ -397,7 +397,7 @@ def do_firstof(parser, token):
         {% else %}{% if var3 %}
             {{ var3 }}
         {% endif %}{% endif %}{% endif %}
-        
+
     but obviously much cleaner!
     """
     bits = token.contents.split()[1:]
@@ -471,15 +471,15 @@ def do_if(parser, token):
     The ``{% if %}`` tag evaluates a variable, and if that variable is "true"
     (i.e. exists, is not empty, and is not a false boolean value) the contents
     of the block are output:
-    
+
     ::
-    
+
         {% if althlete_list %}
             Number of athletes: {{ althete_list|count }}
         {% else %}
             No athletes.
         {% endif %}
-        
+
     In the above, if ``athlete_list`` is not empty, the number of athletes will
     be displayed by the ``{{ athlete_list|count }}`` variable.
 
@@ -488,24 +488,24 @@ def do_if(parser, token):
 
     ``if`` tags may use ``or`` or ``not`` to test a number of variables or to
     negate a given variable::
-    
+
         {% if not athlete_list %}
             There are no athletes.
         {% endif %}
-        
+
         {% if athlete_list or coach_list %}
             There are some athletes or some coaches.
         {% endif %}
-        
+
         {% if not athlete_list or coach_list %}
-            There are no athletes or there are some coaches (OK, so 
-            writing English translations of boolean logic sounds 
+            There are no athletes or there are some coaches (OK, so
+            writing English translations of boolean logic sounds
             stupid; it's not my fault).
         {% endif %}
-    
+
     For simplicity, ``if`` tags do not allow ``and`` clauses; use nested ``if``
     tags instead::
-    
+
         {% if athlete_list %}
             {% if coach_list %}
                 Number of athletes: {{ athlete_list|count }}.
@@ -637,7 +637,7 @@ def do_regroup(parser, token):
             * Margaret Thatcher
             * Colendeeza Rice
         * Unknown:
-            * Janet Reno
+            * Pat Smith
 
     The following snippet of template code would accomplish this dubious task::
 
