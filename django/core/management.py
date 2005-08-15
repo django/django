@@ -544,8 +544,6 @@ def runserver(port):
         sys.exit(1)
     def inner_run():
         from django.conf.settings import SETTINGS_MODULE
-        print "Validating models..."
-        validate()
         print "\nStarting server on port %s with settings module %r." % (port, SETTINGS_MODULE)
         print "Go to http://127.0.0.1:%s/ for Django." % port
         print "Quit the server with CONTROL-C (Unix) or CTRL-BREAK (Windows)."
