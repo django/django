@@ -148,6 +148,12 @@ startproject [projectname]
 Creates a Django project directory structure for the given project name in the
 current directory.
 
+validate
+--------
+
+Validates all installed models (according to the ``INSTALLED_APPS`` setting)
+and prints validation errors to standard output.
+
 Available options
 =================
 
