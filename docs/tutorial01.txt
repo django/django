@@ -36,15 +36,18 @@ A project is a collection of settings for an instance of Django -- including
 database configuration, Django-specific options and application-specific
 settings. Let's look at what ``startproject`` created::
 
-    $ cd myproject/
-    $ ls
-    apps/  __init__.py  settings/
-    $ ls settings/
-    __init__.py  admin.py  main.py  urls/
-    $ ls settings/urls/
-    __init__.py  admin.py  main.py
-    $ ls apps/
-    __init__.py
+    myproject/
+        __init__.py
+        apps/
+            __init__.py
+        settings/
+            __init__.py
+            admin.py
+            main.py
+            urls/
+                __init__.py
+                admin.py
+                main.py
 
 First, edit ``myproject/settings/main.py``. It's a normal Python module with
 module-level variables representing Django settings. Edit the file and change
