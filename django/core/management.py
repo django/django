@@ -506,6 +506,13 @@ def validate():
             for f in opts.fields:
                 if isinstance(f, meta.CharField) and f.maxlength in (None, 0):
                     e.add(opts, '"%s" field: CharFields require a "maxlength" attribute.' % f.name)
+                if f.choices:
+                    if not type(f.choices) in (tuple, list):
+                        e.add(opts, '"%s" field: "choices" should be either a tuple or list.' % f.name)
+                    else:
+                        for c in f.choices:
+                            if not type(c) in (tuple, list) or len(c) != 2:
+                                e.add(opts, '"%s" field: "choices" should be a sequence of two-tuples.' % f.name)
 
             # Check admin attribute.
             if opts.admin is not None and not isinstance(opts.admin, meta.Admin):
