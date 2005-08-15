@@ -299,6 +299,10 @@ class DateTimeField(DateField):
     def get_db_prep_save(self, value):
         # Casts dates into string format for entry into database.
         if value is not None:
+            # MySQL will throw a warning if microseconds are given, because it
+            # doesn't support microseconds.
+            if settings.DATABASE_ENGINE == 'mysql':
+                value = value.replace(microsecond=0)
             value = str(value)
         return Field.get_db_prep_save(self, value)
 
@@ -493,6 +497,10 @@ class TimeField(Field):
     def get_db_prep_save(self, value):
         # Casts dates into string format for entry into database.
         if value is not None:
+            # MySQL will throw a warning if microseconds are given, because it
+            # doesn't support microseconds.
+            if settings.DATABASE_ENGINE == 'mysql':
+                value = value.replace(microsecond=0)
             value = str(value)
         return Field.get_db_prep_save(self, value)
 
