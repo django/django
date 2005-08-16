@@ -22,7 +22,7 @@ def login(request):
     else:
         errors = {}
     response = HttpResponse()
-    response.session.set_test_cookie()
+    request.session.set_test_cookie()
     t = template_loader.get_template('registration/login')
     c = Context(request, {
         'form': formfields.FormWrapper(manipulator, request.POST, errors),
