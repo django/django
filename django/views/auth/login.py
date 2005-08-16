@@ -35,7 +35,7 @@ def login(request):
     return response
 
 def logout(request):
-    "Logs out the user and displays 'You are logged you' message."
+    "Logs out the user and displays 'You are logged out' message."
     if request.session:
         # Do a redirect to this page until the session has been cleared.
         response = HttpResponseRedirect(request.path)
