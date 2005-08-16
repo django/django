@@ -587,11 +587,11 @@ class ManyToManyField(Field):
         else:
             choices = self.get_choices(include_blank=False)
             return [curry(formfields.SelectMultipleField, size=min(max(len(choices), 5), 15), choices=choices)]
-            
+
     def get_m2m_db_table(self, original_opts):
         "Returns the name of the many-to-many 'join' table."
         return '%s_%s' % (original_opts.db_table, self.name)
-       
+
     def isValidIDList(self, field_data, all_data):
         "Validates that the value is a valid list of foreign keys"
         mod = self.rel.to.get_model_module()
@@ -603,9 +603,11 @@ class ManyToManyField(Field):
         objects = mod.get_in_bulk(pks)
         if len(objects) != len(pks):
             badkeys = [k for k in pks if k not in objects]
-            raise validators.ValidationError, "Please enter valid %s IDs (the value%s %r %s invalid)" % \
-                (self.verbose_name, len(badkeys) > 1 and 's' or '', len(badkeys) == 1 and badkeys[0] or tuple(badkeys), len(badkeys) == 1 and "is" or "are")
-    
+            raise validators.ValidationError, "Please enter valid %s IDs. The value%s %r %s invalid." % \
+                (self.verbose_name, len(badkeys) > 1 and 's' or '',
+                len(badkeys) == 1 and badkeys[0] or tuple(badkeys),
+                len(badkeys) == 1 and "is" or "are")
+
 class OneToOneField(IntegerField):
     def __init__(self, to, to_field=None, rel_name=None, **kwargs):
         kwargs['name'] = kwargs.get('name', 'id')
