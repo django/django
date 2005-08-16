@@ -29,6 +29,11 @@ MEDIA_URL = ''
 # Make this unique, and don't share it with anybody.
 SECRET_KEY = ''
 
+MIDDLEWARE_CLASSES = (
+    "django.middleware.common.CommonMiddleware",
+    "django.middleware.doc.XViewMiddleware",
+)
+
 ROOT_URLCONF = '{{ project_name }}.settings.urls.main'
 
 TEMPLATE_DIRS = (
