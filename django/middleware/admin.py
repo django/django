@@ -1,7 +1,7 @@
 from django.utils import httpwrappers
 from django.core import template_loader
 from django.core.extensions import DjangoContext as Context
-from django.models.auth import sessions, users
+from django.models.auth import users
 from django.views.registration import passwords
 from django.views.auth.login import logout
 import base64, md5
@@ -29,14 +29,17 @@ class AdminUserRequired:
         # Otherwise the password reset would need its own entry in the httpd
         # conf, which is a little uglier than this. Same goes for the logout
         # view.
+
         if view_func in (passwords.password_reset, passwords.password_reset_done, logout):
             return
+
+        assert hasattr(request, 'session'), "The admin requires session middleware to be installed. Edit your MIDDLEWARE_CLASSES setting to insert 'django.middleware.sessions.SessionMiddleware' before %r." % self.__class__.__name__
 
         # Check for a logged in, valid user
         if self.user_is_valid(request.user):
             return
 
-        # If this isn't alreay the login page, display it
+        # If this isn't already the login page, display it
         if not request.POST.has_key('this_is_the_login_form'):
             if request.POST:
                 message = "Please log in again, because your session has expired. "\
@@ -64,18 +67,16 @@ class AdminUserRequired:
         # The user data is correct; log in the user in and continue
         else:
             if self.authenticate_user(user, request.POST.get('password', '')):
+                request.session[users.SESSION_KEY] = user.id
                 if request.POST.has_key('post_data'):
                     post_data = decode_post_data(request.POST['post_data'])
                     if post_data and not post_data.has_key('this_is_the_login_form'):
                         # overwrite request.POST with the saved post_data, and continue
                         request.POST = post_data
                         request.user = user
-                        request.session = sessions.create_session(user.id)
                         return
                     else:
-                        response = httpwrappers.HttpResponseRedirect(request.path)
-                        sessions.start_web_session(user.id, request, response)
-                        return response
+                        return httpwrappers.HttpResponseRedirect(request.path)
             else:
                 return self.display_login_form(request, ERROR_MESSAGE)
 

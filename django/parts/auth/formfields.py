@@ -1,4 +1,4 @@
-from django.models.auth import sessions, users
+from django.models.auth import users
 from django.core import formfields, validators
 
 class AuthenticationForm(formfields.Manipulator):
@@ -23,7 +23,7 @@ class AuthenticationForm(formfields.Manipulator):
         self.user_cache = None
 
     def hasCookiesEnabled(self, field_data, all_data):
-        if self.request and (not self.request.COOKIES.has_key(sessions.TEST_COOKIE_NAME) or self.request.COOKIES[sessions.TEST_COOKIE_NAME] != sessions.TEST_COOKIE_VALUE):
+        if self.request and not self.request.test_cookie_worked():
             raise validators.ValidationError, "Your Web browser doesn't appear to have cookies enabled. Cookies are required for logging in."
 
     def isValidUser(self, field_data, all_data):

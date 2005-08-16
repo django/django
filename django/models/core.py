@@ -103,3 +103,57 @@ class FlatFile(meta.Model):
 
     def get_absolute_url(self):
         return self.url
+
+import base64, md5, random, sys
+import cPickle as pickle
+
+class Session(meta.Model):
+    fields = (
+        meta.CharField('session_key', maxlength=40, primary_key=True),
+        meta.TextField('session_data'),
+        meta.DateTimeField('expire_date'),
+    )
+    module_constants = {
+        'base64': base64,
+        'md5': md5,
+        'pickle': pickle,
+        'random': random,
+        'sys': sys,
+    }
+
+    def get_decoded(self):
+        from django.conf.settings import SECRET_KEY
+        encoded_data = base64.decodestring(self.session_data)
+        pickled, tamper_check = encoded_data[:-32], encoded_data[-32:]
+        if md5.new(pickled + SECRET_KEY).hexdigest() != tamper_check:
+            from django.core.exceptions import SuspiciousOperation
+            raise SuspiciousOperation, "User tampered with session cookie."
+        return pickle.loads(pickled)
+
+    def _module_encode(session_dict):
+        "Returns the given session dictionary pickled and encoded as a string."
+        from django.conf.settings import SECRET_KEY
+        pickled = pickle.dumps(session_dict)
+        pickled_md5 = md5.new(pickled + SECRET_KEY).hexdigest()
+        return base64.encodestring(pickled + pickled_md5)
+
+    def _module_get_new_session_key():
+        "Returns session key that isn't being used."
+        from django.conf.settings import SECRET_KEY
+        # The random module is seeded when this Apache child is created.
+        # Use person_id and SECRET_KEY as added salt.
+        while 1:
+            session_key = md5.new(str(random.randint(0, sys.maxint - 1)) + SECRET_KEY).hexdigest()
+            try:
+                get_object(session_key__exact=session_key)
+            except SessionDoesNotExist:
+                break
+        return session_key
+
+    def _module_save(session_key, session_dict, expire_date):
+        s = Session(session_key, encode(session_dict), expire_date)
+        if session_dict:
+            s.save()
+        else:
+            s.delete() # Clear sessions with no data.
+        return s

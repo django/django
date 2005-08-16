@@ -2,7 +2,7 @@ from django.core import formfields, template_loader, validators
 from django.core.mail import mail_admins, mail_managers
 from django.core.exceptions import Http404, ObjectDoesNotExist
 from django.core.extensions import DjangoContext as Context
-from django.models.auth import sessions
+from django.models.auth import users
 from django.models.comments import comments, freecomments
 from django.models.core import contenttypes
 from django.parts.auth.formfields import AuthenticationForm
@@ -215,7 +215,7 @@ def post_comment(request):
     # If user gave correct username/password and wasn't already logged in, log them in
     # so they don't have to enter a username/password again.
     if manipulator.get_user() and new_data.has_key('password') and manipulator.get_user().check_password(new_data['password']):
-        sessions.start_web_session(manipulator.get_user_id(), request, response)
+        request.session[users.SESSION_KEY] = manipulator.get_user_id()
     if errors or request.POST.has_key('preview'):
         class CommentFormWrapper(formfields.FormWrapper):
             def __init__(self, manipulator, new_data, errors, rating_choices):

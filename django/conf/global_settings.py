@@ -48,9 +48,6 @@ DATABASE_HOST = ''             # Set to empty string for localhost
 # Host for sending e-mail.
 EMAIL_HOST = 'localhost'
 
-# Name of the session cookie. This can be whatever you want.
-AUTH_SESSION_COOKIE = 'rizzo'
-
 # List of locations of the template source files, in search order.
 TEMPLATE_DIRS = ()
 
@@ -113,6 +110,14 @@ MIDDLEWARE_CLASSES = (
     "django.middleware.doc.XViewMiddleware",
 )
 
+############
+# SESSIONS #
+############
+
+SESSION_COOKIE_NAME = 'hotclub'           # Cookie name. This can be whatever you want.
+SESSION_COOKIE_AGE = 60 * 60 * 24 * 7 * 2 # Age of cookie, in seconds (default: 2 weeks).
+SESSION_COOKIE_DOMAIN = None              # A string like ".lawrence.com", or None for standard domain cookie.
+
 #########
 # CACHE #
 #########
@@ -120,9 +125,6 @@ MIDDLEWARE_CLASSES = (
 # The cache backend to use.  See the docstring in django.core.cache for the
 # possible values.
 CACHE_BACKEND = 'simple://'
-
-# Set to a string like ".lawrence.com", or None for a standard domain cookie.
-REGISTRATION_COOKIE_DOMAIN = None
 
 ####################
 # COMMENTS         #

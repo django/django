@@ -44,6 +44,9 @@ class User(meta.Model):
             help_text="In addition to the permissions manually assigned, this user will also get all permissions granted to each group he/she is in."),
         meta.ManyToManyField(Permission, name='user_permissions', blank=True, filter_interface=meta.HORIZONTAL),
     )
+    module_constants = {
+        'SESSION_KEY': '_auth_user_id',
+    }
     ordering = ('username',)
     exceptions = ('SiteProfileNotAvailable',)
     admin = meta.Admin(
@@ -171,64 +174,6 @@ class User(meta.Model):
         # that look like it -- just to avoid confusion.
         from random import choice
         return ''.join([choice(allowed_chars) for i in range(length)])
-
-class Session(meta.Model):
-    fields = (
-        meta.ForeignKey(User),
-        meta.CharField('session_md5', maxlength=32),
-        meta.DateTimeField('start_time', auto_now=True),
-    )
-    module_constants = {
-        'TEST_COOKIE_NAME': 'testcookie',
-        'TEST_COOKIE_VALUE': 'worked',
-    }
-
-    def __repr__(self):
-        return "session started at %s" % self.start_time
-
-    def get_cookie(self):
-        "Returns a tuple of the cookie name and value for this session."
-        from django.conf.settings import AUTH_SESSION_COOKIE, SECRET_KEY
-        import md5
-        return AUTH_SESSION_COOKIE, self.session_md5 + md5.new(self.session_md5 + SECRET_KEY + 'auth').hexdigest()
-
-    def _module_create_session(user_id):
-        "Registers a session and returns the session_md5."
-        from django.conf.settings import SECRET_KEY
-        import md5, random, sys
-        # The random module is seeded when this Apache child is created.
-        # Use person_id and SECRET_KEY as added salt.
-        session_md5 = md5.new(str(random.randint(user_id, sys.maxint - 1)) + SECRET_KEY).hexdigest()
-        s = Session(None, user_id, session_md5, None)
-        s.save()
-        return s
-
-    def _module_get_session_from_cookie(session_cookie_string):
-        from django.conf.settings import SECRET_KEY
-        import md5
-        if not session_cookie_string:
-            raise SessionDoesNotExist
-        session_md5, tamper_check = session_cookie_string[:32], session_cookie_string[32:]
-        if md5.new(session_md5 + SECRET_KEY + 'auth').hexdigest() != tamper_check:
-            raise SessionDoesNotExist
-        return get_object(session_md5__exact=session_md5, select_related=True)
-
-    def _module_destroy_all_sessions(user_id):
-        "Destroys all sessions for a user, logging out all computers."
-        for session in get_list(user_id__exact=user_id):
-            session.delete()
-
-    def _module_start_web_session(user_id, request, response):
-        "Sets the necessary cookie in the given HttpResponse object, also updates last login time for user."
-        from django.models.auth import users
-        from django.conf.settings import REGISTRATION_COOKIE_DOMAIN
-        user = users.get_object(pk=user_id)
-        user.last_login = datetime.datetime.now()
-        user.save()
-        session = create_session(user_id)
-        key, value = session.get_cookie()
-        cookie_domain = REGISTRATION_COOKIE_DOMAIN or None
-        response.set_cookie(key, value, domain=cookie_domain)
 
 class Message(meta.Model):
     fields = (
