@@ -9,7 +9,12 @@ function showRelatedObjectLookupPopup(triggeringLink) {
 }
 
 function dismissRelatedLookupPopup(win, chosenId) {
-    document.getElementById(win.name).value = chosenId;
+    var elem = document.getElementById(win.name);
+    if (elem.className.indexOf('vCommaSeparatedIntegerField') != -1 && elem.value) {
+        elem.value += ',' + chosenId;
+    } else {
+        document.getElementById(win.name).value = chosenId;
+    }
     win.close();
 }
 

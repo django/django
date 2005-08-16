@@ -510,7 +510,7 @@ def _get_flattened_data(field, val):
     else:
         return {field.name: val}
 
-use_raw_id_admin = lambda field: isinstance(field.rel, meta.ManyToOne) and field.rel.raw_id_admin
+use_raw_id_admin = lambda field: isinstance(field.rel, (meta.ManyToOne, meta.ManyToMany)) and field.rel.raw_id_admin
 
 def _get_submit_row_template(opts, app_label, add, change, show_delete, ordered_objects):
     t = ['<div class="submit-row">']
@@ -722,8 +722,13 @@ def _get_admin_field(field_list, name_prefix, rel, add, change):
         if change and field.primary_key:
             t.append('{{ %soriginal.%s }}' % ((rel and name_prefix or ''), field.name))
         if change and use_raw_id_admin(field):
-            obj_repr = '%soriginal.get_%s|truncatewords:"14"' % (rel and name_prefix or '', field.rel.name)
-            t.append('{%% if %s %%}&nbsp;<strong>{{ %s }}</strong>{%% endif %%}' % (obj_repr, obj_repr))
+            if isinstance(field.rel, meta.ManyToOne):
+                if_bit = '%soriginal.get_%s' % (rel and name_prefix or '', field.rel.name)
+                obj_repr = if_bit + '|truncatewords:"14"'
+            elif isinstance(field.rel, meta.ManyToMany):
+                if_bit = '%soriginal.get_%s_list' % (rel and name_prefix or '', field.rel.name)
+                obj_repr = if_bit + '|join:", "|truncatewords:"14"'
+            t.append('{%% if %s %%}&nbsp;<strong>{{ %s }}</strong>{%% endif %%}' % (if_bit, obj_repr))
         if field.help_text:
             t.append('<p class="help">%s</p>\n' % field.help_text)
     t.append('</div>\n\n')
@@ -766,6 +771,9 @@ def add_stage(request, app_label, module_name, show_delete=False, form_url='', p
             new_data.update(request.FILES)
         errors = manipulator.get_validation_errors(new_data)
         if not errors and not request.POST.has_key("_preview"):
+            for f in opts.many_to_many:
+                if f.rel.raw_id_admin:
+                    new_data.setlist(f.name, new_data[f.name].split(","))
             manipulator.do_html2python(new_data)
             new_object = manipulator.save(new_data)
             pk_value = getattr(new_object, opts.pk.name)
@@ -804,7 +812,7 @@ def add_stage(request, app_label, module_name, show_delete=False, form_url='', p
         # In required many-to-many fields with only one available choice,
         # select that one available choice.
         for f in opts.many_to_many:
-            if not f.blank and not f.rel.edit_inline and len(manipulator[f.name].choices) == 1:
+            if not f.blank and not f.rel.edit_inline and not f.rel.raw_id_admin and len(manipulator[f.name].choices) == 1:
                 new_data[f.name] = [manipulator[f.name].choices[0][0]]
         # Add default data for related objects.
         for rel_opts, rel_field in opts.get_inline_related_objects():
@@ -855,13 +863,18 @@ def change_stage(request, app_label, module_name, object_id):
         manipulator = mod.ChangeManipulator(object_id)
     except ObjectDoesNotExist:
         raise Http404
+
     inline_related_objects = opts.get_inline_related_objects()
     if request.POST:
         new_data = request.POST.copy()
         if opts.has_field_type(meta.FileField):
             new_data.update(request.FILES)
+
         errors = manipulator.get_validation_errors(new_data)
         if not errors and not request.POST.has_key("_preview"):
+            for f in opts.many_to_many:
+                if f.rel.raw_id_admin:
+                    new_data.setlist(f.name, new_data[f.name].split(","))
             manipulator.do_html2python(new_data)
             new_object = manipulator.save(new_data)
             pk_value = getattr(new_object, opts.pk.name)
@@ -904,7 +917,9 @@ def change_stage(request, app_label, module_name, object_id):
         for f in opts.fields:
             new_data.update(_get_flattened_data(f, getattr(obj, f.name)))
         for f in opts.many_to_many:
-            if not f.rel.edit_inline:
+            if f.rel.raw_id_admin:
+                new_data[f.name] = ",".join([str(i.id) for i in getattr(obj, 'get_%s_list' % f.rel.name)()])
+            elif not f.rel.edit_inline:
                 new_data[f.name] = [i.id for i in getattr(obj, 'get_%s_list' % f.rel.name)()]
         for rel_obj, rel_field in inline_related_objects:
             var_name = rel_obj.object_name.lower()

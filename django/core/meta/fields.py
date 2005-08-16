@@ -71,7 +71,10 @@ class Field(object):
         self.radio_admin = radio_admin
         self.help_text = help_text
         if rel and isinstance(rel, ManyToMany):
-            self.help_text += ' Hold down "Control", or "Command" on a Mac, to select more than one.'
+            if rel.raw_id_admin:
+                self.help_text += ' Separate multiple IDs with commas.'
+            else:
+                self.help_text += ' Hold down "Control", or "Command" on a Mac, to select more than one.'
 
         # Set db_index to True if the field has a relationship and doesn't explicitly set db_index.
         if db_index is None:
@@ -572,17 +575,37 @@ class ManyToManyField(Field):
             num_in_admin=kwargs.pop('num_in_admin', 0),
             related_name=kwargs.pop('related_name', None),
             filter_interface=kwargs.pop('filter_interface', None),
-            limit_choices_to=kwargs.pop('limit_choices_to', None))
+            limit_choices_to=kwargs.pop('limit_choices_to', None),
+            raw_id_admin=kwargs.pop('raw_id_admin', False))
+        if kwargs["rel"].raw_id_admin:
+            kwargs.setdefault("validator_list", []).append(self.isValidIDList)
         Field.__init__(self, **kwargs)
 
     def get_manipulator_field_objs(self):
-        choices = self.get_choices(include_blank=False)
-        return [curry(formfields.SelectMultipleField, size=min(max(len(choices), 5), 15), choices=choices)]
-
+        if self.rel.raw_id_admin:
+            return [formfields.CommaSeparatedIntegerField]
+        else:
+            choices = self.get_choices(include_blank=False)
+            return [curry(formfields.SelectMultipleField, size=min(max(len(choices), 5), 15), choices=choices)]
+            
     def get_m2m_db_table(self, original_opts):
         "Returns the name of the many-to-many 'join' table."
         return '%s_%s' % (original_opts.db_table, self.name)
-
+       
+    def isValidIDList(self, field_data, all_data):
+        "Validates that the value is a valid list of foreign keys"
+        mod = self.rel.to.get_model_module()
+        try:
+            pks = map(int, field_data.split(','))
+        except ValueError:
+            # the CommaSeparatedIntegerField validator will catch this error
+            return
+        objects = mod.get_in_bulk(pks)
+        if len(objects) != len(pks):
+            badkeys = [k for k in pks if k not in objects]
+            raise validators.ValidationError, "Please enter valid %s IDs (the value%s %r %s invalid)" % \
+                (self.verbose_name, len(badkeys) > 1 and 's' or '', len(badkeys) == 1 and badkeys[0] or tuple(badkeys), len(badkeys) == 1 and "is" or "are")
+    
 class OneToOneField(IntegerField):
     def __init__(self, to, to_field=None, rel_name=None, **kwargs):
         kwargs['name'] = kwargs.get('name', 'id')
@@ -631,13 +654,15 @@ class ManyToOne:
 
 class ManyToMany:
     def __init__(self, to, name, num_in_admin=0, related_name=None,
-        filter_interface=None, limit_choices_to=None):
+        filter_interface=None, limit_choices_to=None, raw_id_admin=False):
         self.to, self.name = to._meta, name
         self.num_in_admin = num_in_admin
         self.related_name = related_name
         self.filter_interface = filter_interface
         self.limit_choices_to = limit_choices_to or {}
         self.edit_inline = False
+        self.raw_id_admin = raw_id_admin
+        assert not (self.raw_id_admin and self.filter_interface), "ManyToMany relationships may not use both raw_id_admin and filter_interface"
 
 class OneToOne(ManyToOne):
     def __init__(self, to, name, field_name, num_in_admin=0, edit_inline=False,
