@@ -23,7 +23,7 @@ class AuthenticationForm(formfields.Manipulator):
         self.user_cache = None
 
     def hasCookiesEnabled(self, field_data, all_data):
-        if self.request and not self.request.test_cookie_worked():
+        if self.request and not self.request.session.test_cookie_worked():
             raise validators.ValidationError, "Your Web browser doesn't appear to have cookies enabled. Cookies are required for logging in."
 
     def isValidUser(self, field_data, all_data):
