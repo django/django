@@ -98,7 +98,4 @@ def _is_ignorable_404(uri):
     for end in settings.IGNORABLE_404_ENDS:
         if uri.endswith(end):
             return True
-    if '_files' in uri:
-        # URI is probably from a locally-saved copy of the page.
-        return True
     return False
