@@ -313,7 +313,7 @@ The create/update/delete views are:
     that the view knows where to go after the object is deleted.
 
     If fetched with GET, it uses the template
-    ``app_label/module_name_s_confirm_delete`` by default. It uses no template
+    ``app_label/module_name_confirm_delete`` by default. It uses no template
     if POSTed -- it simply deletes the object and redirects.
 
     Has the following template context:
