@@ -302,6 +302,7 @@ on the change list page for the object::
     class Poll(meta.Model):
         # ...
         admin = meta.Admin(
+            # ...
             list_display = ('question', 'pub_date'),
         )
 
@@ -342,8 +343,7 @@ That adds a "Filter" sidebar that lets people filter the change list by the
 The type of filter displayed depends on the type of field you're filtering on.
 Because ``pub_date`` is a DateTimeField, Django knows to give the default
 filter options for DateTimeFields: "Any date," "Today," "Past 7 days,"
-"This month," "This year." Explore using ``list_filter`` on other types of
-fields.
+"This month," "This year."
 
 This is shaping up well. Let's add some search capability::
 
