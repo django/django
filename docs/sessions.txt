@@ -1,0 +1,155 @@
+===================
+How to use sessions
+===================
+
+Django provides full support for anonymous sessions. The session framework lets
+you store and retrieve arbitrary data on a per-site-visitor basis. It stores
+data on the server side and abstracts the sending and receiving of cookies.
+Cookies contain a session ID -- not the data itself.
+
+Enabling sessions
+=================
+
+Session functionality is enabled by default.
+
+You can turn session functionality on and off by editing the
+``MIDDLEWARE_CLASSES`` setting. To activate sessions, make sure
+``MIDDLEWARE_CLASSES`` contains ``"django.middleware.sessions.SessionMiddleware"``.
+
+If you're dealing with an admin site, make sure the ``SessionMiddleware`` line
+appears before the ``AdminUserRequired`` line. (The middleware classes are
+applied in order, and the admin middleware requires that the session middleware
+come first.)
+
+If you don't want to use sessions, you might as well remove the
+``SessionMiddleware`` line from ``MIDDLEWARE_CLASSES``. It'll save you a small
+bit of overhead.
+
+Using sessions in views
+=======================
+
+Each ``HttpRequest`` object -- the first argument to any Django view function --
+has a ``session`` attribute, which is a dictionary-like object. You can read
+it and write to it.
+
+It implements the following standard dictionary methods:
+
+    * ``__getitem__(key)``
+      Example: ``fav_color = request.session['fav_color']``
+
+    * ``__setitem__(key, value)``
+      Example: ``request.session['fav_color'] = 'blue'``
+
+    * ``__delitem__(key)``
+      Example: ``del request.session['fav_color']``
+
+    * ``get(key, default=None)``
+      Example: ``fav_color = request.session.get('fav_color', 'red')``
+
+It also has these two methods:
+
+    * ``set_test_cookie()``
+      Sets a test cookie to determine whether the user's browser supports
+      cookies. Due to the way cookies work, you won't be able to test this
+      until the user's next page request. See "Setting test cookies" below for
+      more information.
+
+    * ``test_cookie_worked()``
+      Returns either ``True`` or ``False``, depending on whether the user's
+      browser accepted the test cookie. Due to the way cookies work, you'll
+      have to call ``set_test_cookie()`` on a previous, separate page request.
+      See "Setting test cookies" below for more information.
+
+You can edit ``request.session`` at any point in your view. You can edit it
+multiple times.
+
+Examples
+--------
+
+This simplistic view sets a ``has_commented`` variable to ``True`` after a user
+posts a comment. It doesn't let a user post a comment more than once::
+
+    def post_comment(request, new_comment):
+        if request.session.get('has_commented', False):
+            return HttpResponse("You've already commented.")
+        c = comments.Comment(comment=new_comment)
+        c.save()
+        request.session['has_commented'] = True
+        return HttpResponse('Thanks for your comment!')
+
+This simplistic view logs a user in::
+
+    def login(request):
+        u = users.get_object(username__exact=request.POST['username'])
+        if u.check_password(request.POST['password']):
+            request.session['user_id'] = u.id
+            return HttpResponse("You're logged in.")
+        else:
+            return HttpResponse("Your username and password didn't match.")
+
+...And this one logs a user out, according to ``login()`` above::
+
+    def logout(request):
+        try:
+            del request.session['user_id']
+        except KeyError:
+            pass
+        return HttpResponse("You're logged out.")
+
+Setting test cookies
+====================
+
+As a convenience, Django provides an easy way to test whether the user's
+browser accepts cookies. Just call ``request.session.set_test_cookie()`` in a
+view, and call ``request.session.test_cookie_worked()`` in a subsequent view --
+not in the same view call.
+
+This awkward split between ``set_test_cookie()`` and ``test_cookie_worked()``
+is necessary due to the way cookies work. When you set a cookie, you can't
+actually tell whether a browser accepted it until the browser's next request.
+
+Here's a typical usage example::
+
+    def login(request):
+        if request.POST:
+            if request.session.test_cookie_worked():
+                return HttpResponse("You're logged in.")
+            else:
+                return HttpResponse("Please enable cookies and try again.")
+        request.session.set_test_cookie()
+        t = template_loader.get_template("foo/login_form")
+        c = Context(request)
+        return HttpResponse(t.render(c))
+
+Using sessions out of views
+===========================
+
+Internally, each session is just a normal Django model. The ``Session`` model
+is defined in ``django/models/core.py``. Because it's a normal model, you can
+access sessions using the normal Django database API::
+
+    >>> from django.models.core import sessions
+    >>> s = sessions.get_object(pk='2b1189a188b44ad18c35e113ac6ceead')
+    >>> s.expire_date
+    datetime.datetime(2005, 8, 20, 13, 35, 12)
+
+Note that you'll need to call ``get_decoded()`` to get the session dictionary.
+This is necessary because the dictionary is stored in an encoded format::
+
+    >>> s.session_data
+    'KGRwMQpTJ19hdXRoX3VzZXJfaWQnCnAyCkkxCnMuMTExY2ZjODI2Yj...'
+    >>> s.get_decoded()
+    {'user_id': 42}
+
+Technical details
+=================
+
+    * The session dictionary should accept any pickleable Python object. See
+      `the pickle module`_ for more information.
+
+    * Session data is stored in a database table named ``core_sessions`` .
+
+    * Django only sends a cookie if it needs to. If you don't set any session
+      data, it won't send a session cookie.
+
+.. _`the pickle module`: http://www.python.org/doc/current/lib/module-pickle.html
