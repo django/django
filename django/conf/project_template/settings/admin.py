@@ -7,6 +7,7 @@ TEMPLATE_DIRS = (
 )
 ROOT_URLCONF = '{{ project_name }}.settings.urls.admin'
 MIDDLEWARE_CLASSES = (
+    'django.middleware.sessions.SessionMiddleware',
     'django.middleware.admin.AdminUserRequired',
     'django.middleware.common.CommonMiddleware',
 )
