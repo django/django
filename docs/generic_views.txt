@@ -221,7 +221,7 @@ Individual views are:
                                  an empty index page. ``False`` is default.
         =======================  =================================================
 
-    Uses the template ``app_label/module_name__list`` by default.
+    Uses the template ``app_label/module_name_list`` by default.
 
     Has the following template context:
 
