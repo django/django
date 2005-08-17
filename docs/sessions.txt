@@ -63,6 +63,18 @@ It also has these two methods:
 You can edit ``request.session`` at any point in your view. You can edit it
 multiple times.
 
+Session object guidelines
+-------------------------
+
+    * Use normal Python strings as dictionary keys on ``request.session``. This
+      is more of a convention than a hard-and-fast rule.
+
+    * Session dictionary keys that begin with an underscore are reserved for
+      internal use by Django.
+
+    * Don't override ``request.session`` with a new object, and don't access or
+      set its attributes. Use it like a Python dictionary.
+
 Examples
 --------
 
