@@ -30,7 +30,7 @@ def manipulator_valid_rel_key(f, self, field_data, all_data):
     "Validates that the value is a valid foreign key"
     mod = f.rel.to.get_model_module()
     try:
-        mod.get_object(**{'id__iexact': field_data})
+        mod.get_object(pk=field_data)
     except ObjectDoesNotExist:
         raise validators.ValidationError, "Please enter a valid %s." % f.verbose_name
 
