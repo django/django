@@ -48,6 +48,11 @@ class AdminUserRequired:
                 message = ""
             return self.display_login_form(request, message)
 
+        # Check that the user accepts cookies.
+        if not request.session.test_cookie_worked():
+            message = "Looks like your browser isn't configured to accept cookies. Please enable cookies, reload this page, and try again."
+            return self.display_login_form(request, message)
+
         # Check the password
         username = request.POST.get('username', '')
         try:
@@ -81,6 +86,7 @@ class AdminUserRequired:
                 return self.display_login_form(request, ERROR_MESSAGE)
 
     def display_login_form(self, request, error_message=''):
+        request.session.set_test_cookie()
         if request.POST and request.POST.has_key('post_data'):
             # User has failed login BUT has previously saved 'post_data'
             post_data = request.POST['post_data']
