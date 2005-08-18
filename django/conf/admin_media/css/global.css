@@ -42,7 +42,6 @@ a img { border:none; }
 
 p, ol, ul, dl { margin:.2em 0 .8em 0; font-size:12px; }
 p { padding:0; line-height:140%; }
-
 h1,h2,h3,h4,h5 { font-weight:bold; }
 h1 { font-size:18px; color:#666; padding:0 6px 0 0; margin:0 0 .2em 0; }
 h2 { font-size:16px; margin:1em 0 .5em 0; }
@@ -50,7 +49,6 @@ h2.subhead { font-weight:normal;margin-top:0; }
 h3 { font-size:14px; margin:.8em 0 .3em 0; color:#666; font-weight:bold; }
 h4 { font-size:12px; margin:1em 0 .8em 0; padding-bottom:3px; }
 h5 { font-size:10px; margin:1.5em 0 .5em 0; color:#666; text-transform:uppercase; letter-spacing:1px; }
-
 ul li { list-style-type:square; padding:1px 0; }
 ul.plainlist { margin-left:0 !important; }
 ul.plainlist li { list-style-type:none; }
@@ -58,10 +56,8 @@ li ul { margin-bottom:0; }
 li, dt, dd { font-size:11px; line-height:14px; }
 dt { font-weight:bold; margin-top:4px; }
 dd { margin-left:0; }
-
 form { margin:0; padding:0; }
 fieldset { margin:0; padding:0; }
-
 blockquote { font-size:11px; color:#777; margin-left:2px; padding-left:10px; border-left:5px solid #ddd; }
 code, pre { font-family:"Bitstream Vera Sans Mono", Monaco, "Courier New", Courier, monospace; background:inherit; color:#666; font-size:11px; }
 pre.literal-block { margin:10px; background:#eee; padding:6px 8px; }
@@ -158,9 +154,8 @@ table thead th.descending a { background:url(../img/admin/arrow-up.gif) right .4
 .module p, .module ul, .module h3, .module h4, .module dl, .module pre { padding-left:10px; padding-right:10px; }
 .module blockquote { margin-left:12px; }
 .module ul, .module ol { margin-left:1.5em; }
-.module h2,  .module caption { margin:0; padding:2px 5px 3px 5px; font-size:11px; text-align:left; font-weight:bold; color:#666; }
+.module h2,  .module caption { margin:0; padding:2px 5px 3px 5px; font-size:11px; text-align:left; background:#7CA0C7 url(../img/admin/default-bg.gif) left top repeat-x; color:white; font-weight:bold; }
 .module caption	{ border:1px solid #ccc; border-bottom:none; }
-.module h2, .module caption	{ background:#7CA0C7 url(../img/admin/default-bg.gif) top left repeat-x; color:white; }
 .module h3 { margin-top:.6em; }
 #content-related .module h2	{ background:#eee url(../img/admin/nav-bg.gif) bottom left repeat-x; color:#666; }
 #content-main .verbose .actionlist { float:right; font-size:10px; width:17em; position:relative; top:-1.6em; margin:0 8px; }
@@ -179,12 +174,13 @@ input[type=checkbox], input[type=radio] { border:none; }
 
 /*  FORM BUTTONS  */
 
-input[type=submit], input[type=button], .submit-row input { background:white url(../img/admin/nav-bg.gif) bottom repeat-x; }
+input[type=submit], input[type=button], .submit-row input { background:white url(../img/admin/nav-bg.gif) bottom repeat-x; padding:3px; }
 input[type=submit]:active, input[type=button]:active { background-image:url(../img/admin/nav-bg-reverse.gif); background-position:top; }
-input[type=submit].default, .submit-row input.default { border:2px solid #5b80b2; padding:3px; background:white url(../img/admin/default-bg.gif) bottom repeat-x; font-weight:bold; color:white; }
+input[type=submit].default, .submit-row input.default { border:2px solid #5b80b2; background:#7CA0C7 url(../img/admin/default-bg.gif) bottom repeat-x; font-weight:bold; color:white; }
 input[type=submit].default:active { background-image:url(../img/admin/default-bg-reverse.gif); background-position:top; }
 .submit-row { padding:5px 7px; text-align:right; background:#ffc; border:1px solid #ccc; margin:5px 0; }
 .submit-row input { margin:0 0 0 5px; }
+.submit-row .float-left { padding-top:.1em; }
 
 /*  FORM ROWS  */
 
@@ -232,7 +228,8 @@ form .wide p.help { padding-left:38px; }
 fieldset.collapsed * { display:none; }
 fieldset.collapsed h2, fieldset.collapsed { display:block !important; }
 fieldset.collapsed .collapse-toggle { display: inline !important; }
-fieldset.collapsed h2 { background-image:url(../img/admin/nav-bg.gif); background-position:bottom left; color:#999; }
+fieldset.collapse h2 a.collapse-toggle { color:#ffc; }
+fieldset.collapse h2 a.collapse-toggle:hover { text-decoration:underline; }
 
 /* MESSAGES & ERRORS  */
 
