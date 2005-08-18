@@ -69,7 +69,7 @@ customizations. In particular, you'll need to do this:
 
     * Rearrange models' order, so that models that refer to other models are
       ordered properly.
-    * Add primary_key=True to one field in each model. The ``inspectdb``
+    * Add ``primary_key=True`` to one field in each model. The ``inspectdb``
       doesn't yet introspect primary keys.
 
 ``inspectdb`` only works with PostgreSQL and MySQL. Foreign-key detection only

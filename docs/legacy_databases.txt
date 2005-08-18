@@ -1,0 +1,94 @@
+==================================
+Integrating with a legacy database
+==================================
+
+While Django is best suited for developing new applications, it's quite
+possible to integrate it into legacy databases. Django includes a couple of
+utilities to automate as much of this process as possible.
+
+This document assumes you know the Django basics, as covered in the official
+tutorial.
+
+Give Django your database parameters
+====================================
+
+You'll need to tell Django what your database connection parameters are, and
+what the name of the database is. Do that by editing these settings in your
+settings file:
+
+    * ``DATABASE_ENGINE``
+    * ``DATABASE_USER``
+    * ``DATABASE_PASSWORD``
+    * ``DATABASE_NAME``
+    * ``DATABASE_HOST``
+
+For more information on these settings see `Tutorial 1`_.
+
+.. _Tutorial 1: http://www.djangoproject.com/documentation/tutorial1/
+
+Auto-generate the models
+========================
+
+Django comes with a utility that can create models by introspecting an existing
+database. You can view the output by running this command::
+
+    django-admin.py inspectdb [databasename] --settings=path.to.settings
+
+...where "[databasename]" is the name of your database.
+
+Save this as a file by using standard Unix output redirection::
+
+    django-admin.py inspectdb [databasename] --settings=path.to.settings > appname.py
+
+This feature is meant as a shortcut, not as definitive model generation. See
+the `django-admin.py documentation`_ for more information.
+
+Once you've cleaned up the model, put the module in the ``models`` directory of
+your app, and add it to your ``INSTALLED_APPS`` setting.
+
+.. _django-admin.py documentation: http://www.djangoproject.com/documentation/django_admin/
+
+Install the core Django tables
+==============================
+
+Next, run the ``django-admin.py init`` command to install Django's core tables
+in your database::
+
+    django-admin.py init --settings=path.to.settings
+
+This won't work if your database already contains tables that have any of the
+following names:
+
+    * ``sites``
+    * ``packages``
+    * ``content_types``
+    * ``redirects``
+    * ``flatfiles``
+    * ``core_sessions``
+    * ``flatfiles_sites``
+    * ``auth_permissions``
+    * ``auth_groups``
+    * ``auth_users``
+    * ``auth_messages``
+    * ``auth_admin_log``
+    * ``auth_groups_permissions``
+    * ``auth_users_groups``
+    * ``auth_users_user_permissions``
+
+If that's the case, try renaming one of your tables to resolve naming
+conflicts. Currently, there's no way of customizing the names of Django's
+database tables without editing Django's source code itself.
+
+Install metadata about your app
+===============================
+
+Django has a couple of database tables that contain metadata about your apps.
+You'll need to execute the SQL output by this command::
+
+    django-admin.py sqlinitialdata [appname] --settings=path.to.settings
+
+See whether it worked
+=====================
+
+That's it. Try accessing your data via the Django database API, and try editing
+objects via Django's admin site.
