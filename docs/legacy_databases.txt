@@ -6,8 +6,10 @@ While Django is best suited for developing new applications, it's quite
 possible to integrate it into legacy databases. Django includes a couple of
 utilities to automate as much of this process as possible.
 
-This document assumes you know the Django basics, as covered in the official
-tutorial.
+This document assumes you know the Django basics, as covered in the
+`official tutorial`_.
+
+.. _official tutorial: http://www.djangoproject.com/documentation/tutorial1/
 
 Give Django your database parameters
 ====================================
