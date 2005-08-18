@@ -64,7 +64,7 @@ class BaseHandler:
             response = callback(request, **param_dict)
 
             # Complain if the view returned None (a common error).
-            if not response:
+            if response is None:
                 raise ValueError, "The view %s.%s didn't return an HttpResponse object." % (callback.__module__, callback.func_name)
 
             return response
