@@ -44,6 +44,9 @@ class SessionWrapper(object):
                     self._session_cache = s.get_decoded()
                 except sessions.SessionDoesNotExist:
                     self._session_cache = {}
+                    # Set the session_key to None to force creation of a new
+                    # key, for extra security.
+                    self.session_key = None
             return self._session_cache
 
     _session = property(_get_session)
