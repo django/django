@@ -54,12 +54,20 @@ class BaseHandler:
         resolver = urlresolvers.RegexURLResolver(r'^/', ROOT_URLCONF)
         try:
             callback, param_dict = resolver.resolve(path)
+
             # Apply view middleware
             for middleware_method in self._view_middleware:
                 response = middleware_method(request, callback, param_dict)
                 if response:
                     return response
-            return callback(request, **param_dict)
+
+            response = callback(request, **param_dict)
+
+            # Complain if the view returned None (a common error).
+            if not response:
+                raise ValueError, "The view %s.%s didn't return an HttpResponse object." % (callback.__module__, callback.func_name)
+
+            return response
         except exceptions.Http404, e:
             if DEBUG:
                 return self.get_technical_error_response(is404=True, exception=e)
