@@ -1,6 +1,7 @@
 "Default variable filters"
 
-import template, re, random
+import template, re
+import random as random_module
 
 ###################
 # STRINGS         #
@@ -232,7 +233,7 @@ def length_is(value, arg):
 
 def random(value, _):
     "Returns a random item from the list"
-    return random.choice(value)
+    return random_module.choice(value)
 
 def slice_(value, arg):
     """
