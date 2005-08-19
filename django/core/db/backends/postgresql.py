@@ -71,6 +71,12 @@ def get_date_trunc_sql(lookup_type, field_name):
     # http://www.postgresql.org/docs/8.0/static/functions-datetime.html#FUNCTIONS-DATETIME-TRUNC
     return "DATE_TRUNC('%s', %s)" % (lookup_type, field_name)
 
+def get_limit_offset_sql(limit, offset=None):
+    sql = "LIMIT %s" % limit
+    if offset and offset != 0:
+        sql += " OFFSET %s" % offset
+    return sql
+
 def get_table_list(cursor):
     "Returns a list of table names in the current database."
     cursor.execute("""

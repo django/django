@@ -71,6 +71,12 @@ def get_date_trunc_sql(lookup_type, field_name):
         subtractions.append(" - interval (DATE_FORMAT(%s, '%%%%m')-1) month" % field_name)
     return "(%s - %s)" % (field_name, ''.join(subtractions))
 
+def get_limit_offset_sql(limit, offset=None):
+    sql = "LIMIT "
+    if offset and offset != 0:
+        sql += "%s," % offset
+    return sql + str(limit)
+
 def get_table_list(cursor):
     "Returns a list of table names in the current database."
     cursor.execute("SHOW TABLES")

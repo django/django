@@ -97,6 +97,12 @@ def get_date_trunc_sql(lookup_type, field_name):
     # sqlite doesn't support DATE_TRUNC, so we fake it as above.
     return 'django_date_trunc("%s", %s)' % (lookup_type.lower(), field_name)
 
+def get_limit_offset_sql(limit, offset=None):
+    sql = "LIMIT %s" % limit
+    if offset and offset != 0:
+        sql += " OFFSET %s" % offset
+    return sql
+
 def _sqlite_date_trunc(lookup_type, dt):
     try:
         dt = typecasts.typecast_timestamp(dt)

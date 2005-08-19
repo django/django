@@ -1277,10 +1277,9 @@ def function_get_sql_clause(opts, **kwargs):
 
     # LIMIT and OFFSET clauses
     if kwargs.get('limit') is not None:
-        limit_sql = " LIMIT %s " % kwargs['limit']
-        if kwargs.get('offset') is not None and kwargs['offset'] != 0:
-            limit_sql += "OFFSET %s " % kwargs['offset']
+        limit_sql = " %s " % db.get_limit_offset_sql(kwargs['limit'], kwargs.get('offset'))
     else:
+        assert kwargs.get('offset') is None, "'offset' is not allowed without 'limit'"
         limit_sql = ""
 
     return select, " FROM " + ",".join(tables) + (where and " WHERE " + " AND ".join(where) or "") + (order_by and " ORDER BY " + order_by or "") + limit_sql, params
