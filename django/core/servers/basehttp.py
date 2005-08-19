@@ -636,8 +636,8 @@ class AdminMediaHandler:
         start_response(status, headers.items())
         return output
 
-def run(port, wsgi_handler):
-    server_address = ('', port)
+def run(addr, port, wsgi_handler):
+    server_address = (addr, port)
     httpd = WSGIServer(server_address, WSGIRequestHandler)
     httpd.set_app(wsgi_handler)
     httpd.serve_forever()

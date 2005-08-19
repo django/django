@@ -543,10 +543,12 @@ def validate():
     print '%s error%s found.' % (num_errors, num_errors != 1 and 's' or '')
 validate.args = ''
 
-def runserver(port):
+def runserver(addr, port):
     "Starts a lightweight Web server for development."
     from django.core.servers.basehttp import run, AdminMediaHandler, WSGIServerException
     from django.core.handlers.wsgi import WSGIHandler
+    if not addr:
+        addr = '127.0.0.1'
     if not port.isdigit():
         sys.stderr.write("Error: %r is not a valid port number.\n" % port)
         sys.exit(1)
@@ -555,15 +557,16 @@ def runserver(port):
         print "Validating models..."
         validate()
         print "\nStarting server on port %s with settings module %r." % (port, SETTINGS_MODULE)
-        print "Go to http://127.0.0.1:%s/ for Django." % port
+        print "Go to http://%s:%s/ for Django." % (addr, port)
         print "Quit the server with CONTROL-C (Unix) or CTRL-BREAK (Windows)."
         try:
-            run(int(port), AdminMediaHandler(WSGIHandler()))
+            run(addr, int(port), AdminMediaHandler(WSGIHandler()))
         except WSGIServerException, e:
             # Use helpful error messages instead of ugly tracebacks.
             ERRORS = {
                 13: "You don't have permission to access that port.",
                 98: "That port is already in use.",
+                99: "That IP address can't be assigned-to.",
             }
             try:
                 error_text = ERRORS[e.args[0].args[0]]
@@ -575,4 +578,4 @@ def runserver(port):
             sys.exit(0)
     from django.utils import autoreload
     autoreload.main(inner_run)
-runserver.args = '[optional port number]'
+runserver.args = '[optional port number, or ipaddr:port]'

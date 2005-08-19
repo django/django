@@ -87,10 +87,14 @@ def main():
         ACTION_MAPPING[action](name, os.getcwd())
     elif action == 'runserver':
         if len(args) < 2:
+            addr = ''
             port = '8000'
         else:
-            port = args[1]
-        ACTION_MAPPING[action](port)
+            try:
+                addr, port = args[1].split(':')
+            except ValueError:
+                addr, port = '', args[1]
+        ACTION_MAPPING[action](addr, port)
     else:
         from django.core import meta
         if action == 'dbcheck':

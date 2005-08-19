@@ -80,11 +80,12 @@ install [app app ...]
 
 Executes the equivalent of ``sqlall`` for the given app(s).
 
-runserver [optional port number]
---------------------------------
+runserver [optional port number, or ipaddr:port]
+------------------------------------------------
 
 Starts a lightweight development Web server on the local machine. By default,
-the server runs on port 8000. You can pass in a port number explicitly.
+the server runs on port 8000 on the IP address 127.0.0.1. You can pass in an
+IP address and port number explicitly.
 
 If you run this script as a user with normal privileges (recommended), you
 might not have access to start a port on a low port number. Low port numbers
@@ -102,6 +103,17 @@ them to standard output, but it won't stop the server.
 
 You can run as many servers as you want, as long as they're on separate ports.
 Just execute ``django-admin.py runserver`` more than once.
+
+Examples:
+~~~~~~~~~
+
+Port 7000 on IP address 127.0.0.1::
+
+    django-admin.py runserver 7000
+
+Port 7000 on IP address 1.2.3.4::
+
+    django-admin.py runserver 1.2.3.4:7000
 
 sql [app app ...]
 -----------------
