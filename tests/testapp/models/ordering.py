@@ -48,4 +48,12 @@ API_TESTS = """
 [Article 1, Article 2, Article 3, Article 4]
 >>> articles.get_list(order_by=['pub_date', '-headline'])
 [Article 1, Article 3, Article 2, Article 4]
+
+# Use the "limit" parameter to limit the results.
+>>> articles.get_list(order_by=['headline'], limit=2)
+[Article 1, Article 2]
+
+# Use the "offset" parameter with "limit" to offset the result list.
+>>> articles.get_list(order_by=['headline'], offset=1, limit=2)
+[Article 2, Article 3]
 """
