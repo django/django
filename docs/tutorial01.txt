@@ -240,6 +240,8 @@ Now Django knows myproject includes the polls app. Let's run another command::
 
     django-admin.py sql polls
 
+(Note that it doesn't matter which directory you're in when you run this command.)
+
 You should see the following (the CREATE TABLE SQL statements for the polls app)::
 
     BEGIN;
