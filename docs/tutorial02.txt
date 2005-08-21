@@ -254,8 +254,8 @@ Then change the other fields in ``Choice`` to give them ``core=True``::
 
 This tells Django: "When you edit a Choice on the Poll admin page, the 'choice'
 and 'votes' fields are required. The presence of at least one of them signifies
-the addition of a new Choice object, and clearing at least one of them
-signifies the deletion of that existing Choice object."
+the addition of a new Choice object, and clearing both of them signifies the
+deletion of that existing Choice object."
 
 Load the "Add poll" page to see how that looks:
 
