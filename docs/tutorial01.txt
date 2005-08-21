@@ -345,8 +345,9 @@ free Python API Django gives you::
     [<Poll object>]
 
 Wait a minute. ``<Poll object>`` is, utterly, an unhelpful representation of
-this object. Let's fix that by editing the polls model and adding a
-``__repr__()`` method to both ``Poll`` and ``Choice``::
+this object. Let's fix that by editing the polls model
+(in the ``polls/models/polls.py`` file) and adding a ``__repr__()`` method to
+both ``Poll`` and ``Choice``::
 
     class Poll(meta.Model):
         # ...
