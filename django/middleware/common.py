@@ -22,9 +22,6 @@ class CommonMiddleware:
 
         - Flat files: for 404 responses, a flat file matching the given path
           will be looked up and used if found.
-
-    You probably want the CommonMiddleware object to the first entry in your
-    MIDDLEWARE_CLASSES setting;
     """
 
     def process_request(self, request):

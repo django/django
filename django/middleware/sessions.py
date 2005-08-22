@@ -52,7 +52,7 @@ class SessionWrapper(object):
     _session = property(_get_session)
 
 class SessionMiddleware:
-    def process_view(self, request, view_func, param_dict):
+    def process_request(self, request):
         request.session = SessionWrapper(request.COOKIES.get(SESSION_COOKIE_NAME, None))
 
     def process_response(self, request, response):
