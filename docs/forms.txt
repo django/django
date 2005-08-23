@@ -15,7 +15,7 @@ code. It is, and this document explains how the framework works.
         needing to do more than simple creation/updating.
 
 We'll take a top-down approach to examining Django's form validation framework,
-becuase much of the time you won't need to use the lower-level APIs. Throughout
+because much of the time you won't need to use the lower-level APIs. Throughout
 this document, we'll be working with the following model, a "place" object::
 
     PLACE_TYPES = (
