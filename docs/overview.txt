@@ -21,20 +21,16 @@ offers many rich ways of representing your models -- so far, it's been
 solving two years' worth of database-schema problems. Here's a quick example::
 
     class Reporter(meta.Model):
-        fields = (
-            meta.CharField('full_name', maxlength=70),
-        )
+        full_name = meta.CharField(maxlength=70)
 
         def __repr__(self):
             return self.full_name
 
     class Article(meta.Model):
-        fields = (
-            meta.DateTimeField('pub_date'),
-            meta.CharField('headline', maxlength=200),
-            meta.TextField('article'),
-            meta.ForeignKey(Reporter),
-        )
+        pub_date = meta.DateTimeField('pub_date')
+        headline = meta.CharField('headline', maxlength=200)
+        article = meta.TextField('article')
+        reporter = meta.ForeignKey(Reporter)
 
         def __repr__(self):
             return self.headline
@@ -134,17 +130,16 @@ A dynamic admin interface: It's not just scaffolding -- it's the whole house
 
 Once your models are defined, Django can automatically create an administrative
 interface -- a Web site that lets authenticated users add, change and
-delete objects. It's as easy as adding an extra admin attribute to your model
-classes::
+delete objects. It's as easy as adding an extra ``admin`` attribute to your
+model classes::
 
     class Article(meta.Model):
-        fields = (
-            meta.DateTimeField('pub_date'),
-            meta.CharField('headline', maxlength=200),
-            meta.TextField('article'),
-            meta.ForeignKey(Reporter),
-        )
-        admin = meta.Admin()
+        pub_date = meta.DateTimeField('pub_date')
+        headline = meta.CharField('headline', maxlength=200)
+        article = meta.TextField('article')
+        reporter = meta.ForeignKey(Reporter)
+        class META:
+            admin = meta.Admin()
 
 The philosophy here is that your site is edited by a staff, or a client, or
 maybe just you -- and you don't want to have to deal with creating backend

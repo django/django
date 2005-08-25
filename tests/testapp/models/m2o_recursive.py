@@ -7,29 +7,25 @@ To define a many-to-one relationship between a model and itself, use
 In this example, a ``Category`` is related to itself. That is, each
 ``Category`` has a parent ``Category``.
 
-Because of this recursive relationship, we need to tell Django what the
-relationships should be called. Set ``rel_name`` for this, and set
-``related_name`` to designate what the reverse relationship is called.
+Set ``related_name`` to designate what the reverse relationship is called.
 """
 
 from django.core import meta
 
 class Category(meta.Model):
-    module_name = 'categories'
-    fields = (
-        meta.CharField('name', maxlength=20),
-        meta.ForeignKey('self', null=True,
-            rel_name='parent', related_name='child'),
-    )
+    name = meta.CharField(maxlength=20)
+    parent = meta.ForeignKey('self', null=True, related_name='child')
+    class META:
+        module_name = 'categories'
 
     def __repr__(self):
         return self.name
 
 API_TESTS = """
 # Create a few Category objects.
->>> r = categories.Category(id=None, name='Root category', parent_id=None)
+>>> r = categories.Category(id=None, name='Root category', parent=None)
 >>> r.save()
->>> c = categories.Category(id=None, name='Child category', parent_id=r.id)
+>>> c = categories.Category(id=None, name='Child category', parent=r)
 >>> c.save()
 
 >>> r.get_child_list()

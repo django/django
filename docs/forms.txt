@@ -26,14 +26,14 @@ this document, we'll be working with the following model, a "place" object::
     )
 
     class Place(meta.Model):
-        fields = (
-            meta.CharField('name', maxlength=100),
-            meta.CharField('address', maxlength=100, blank=True),
-            meta.CharField('city', maxlength=50, blank=True),
-            meta.USStateField('state'),
-            meta.CharField('zip_code', maxlength=5, blank=True),
-            meta.IntegerField('place_type', choices=PLACE_TYPES)
-        )
+        name = meta.CharField(maxlength=100),
+        address = meta.CharField(maxlength=100, blank=True),
+        city = meta.CharField(maxlength=50, blank=True),
+        state = meta.USStateField(),
+        zip_code = meta.CharField(maxlength=5, blank=True),
+        place_type = meta.IntegerField(choices=PLACE_TYPES)
+        class META:
+            admin = meta.Admin()
 
         def __repr__(self):
             return self.name

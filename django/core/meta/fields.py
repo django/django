@@ -40,7 +40,7 @@ def manipulator_validator_unique(f, opts, self, field_data, all_data):
         old_obj = opts.get_model_module().get_object(**{'%s__exact' % f.name: field_data})
     except ObjectDoesNotExist:
         return
-    if hasattr(self, 'original_object') and getattr(self.original_object, opts.pk.name) == getattr(old_obj, opts.pk.name):
+    if hasattr(self, 'original_object') and getattr(self.original_object, opts.pk.column) == getattr(old_obj, opts.pk.column):
         return
     raise validators.ValidationError, "%s with this %s already exists." % (capfirst(opts.verbose_name), f.verbose_name)
 
@@ -50,14 +50,17 @@ class Field(object):
     # database level.
     empty_strings_allowed = True
 
-    def __init__(self, name, verbose_name=None, primary_key=False,
+    # Tracks each time a Field instance is created. Used to retain order.
+    creation_counter = 0
+
+    def __init__(self, verbose_name=None, name=None, primary_key=False,
         maxlength=None, unique=False, blank=False, null=False, db_index=None,
         core=False, rel=None, default=NOT_PROVIDED, editable=True,
         prepopulate_from=None, unique_for_date=None, unique_for_month=None,
         unique_for_year=None, validator_list=None, choices=None, radio_admin=None,
-        help_text=''):
+        help_text='', db_column=None):
         self.name = name
-        self.verbose_name = verbose_name or name.replace('_', ' ')
+        self.verbose_name = verbose_name or (name and name.replace('_', ' '))
         self.primary_key = primary_key
         self.maxlength, self.unique = maxlength, unique
         self.blank, self.null = blank, null
@@ -70,6 +73,7 @@ class Field(object):
         self.choices = choices or []
         self.radio_admin = radio_admin
         self.help_text = help_text
+        self.db_column = db_column
         if rel and isinstance(rel, ManyToMany):
             if rel.raw_id_admin:
                 self.help_text += ' Separate multiple IDs with commas.'
@@ -84,6 +88,27 @@ class Field(object):
                 self.db_index = False
         else:
             self.db_index = db_index
+
+        # Increase the creation counter, and save our local copy.
+        self.creation_counter = Field.creation_counter
+        Field.creation_counter += 1
+
+        # Set the name of the database column.
+        self.column = self.get_db_column()
+
+    def set_name(self, name):
+        self.name = name
+        self.verbose_name = self.verbose_name or name.replace('_', ' ')
+        self.column = self.get_db_column()
+
+    def get_db_column(self):
+        if self.db_column: return self.db_column
+        if isinstance(self.rel, ManyToOne):
+            return '%s_id' % self.name
+        return self.name
+
+    def get_cache_name(self):
+        return '_%s_cache' % self.name
 
     def pre_save(self, value, add):
         "Returns field's value just before saving."
@@ -232,7 +257,7 @@ class Field(object):
         if self.choices:
             return first_choice + list(self.choices)
         rel_obj = self.rel.to
-        return first_choice + [(getattr(x, rel_obj.pk.name), repr(x)) for x in rel_obj.get_model_module().get_list(**self.rel.limit_choices_to)]
+        return first_choice + [(getattr(x, rel_obj.pk.column), repr(x)) for x in rel_obj.get_model_module().get_list(**self.rel.limit_choices_to)]
 
 class AutoField(Field):
     empty_strings_allowed = False
@@ -271,11 +296,11 @@ class CommaSeparatedIntegerField(CharField):
 
 class DateField(Field):
     empty_strings_allowed = False
-    def __init__(self, name, verbose_name=None, auto_now=False, auto_now_add=False, **kwargs):
+    def __init__(self, verbose_name=None, name=None, auto_now=False, auto_now_add=False, **kwargs):
         self.auto_now, self.auto_now_add = auto_now, auto_now_add
         if auto_now or auto_now_add:
             kwargs['editable'] = False
-        Field.__init__(self, name, verbose_name, **kwargs)
+        Field.__init__(self, verbose_name, name, **kwargs)
 
     def get_db_prep_lookup(self, lookup_type, value):
         if lookup_type == 'range':
@@ -332,9 +357,9 @@ class EmailField(Field):
         return [formfields.EmailField]
 
 class FileField(Field):
-    def __init__(self, name, verbose_name=None, upload_to='', **kwargs):
+    def __init__(self, verbose_name=None, name=None, upload_to='', **kwargs):
         self.upload_to = upload_to
-        Field.__init__(self, name, verbose_name, **kwargs)
+        Field.__init__(self, verbose_name, name, **kwargs)
 
     def get_manipulator_fields(self, opts, manipulator, change, name_prefix='', rel=False):
         field_list = Field.get_manipulator_fields(self, opts, manipulator, change, name_prefix, rel)
@@ -397,17 +422,17 @@ class FileField(Field):
 
 class FloatField(Field):
     empty_strings_allowed = False
-    def __init__(self, name, verbose_name=None, max_digits=None, decimal_places=None, **kwargs):
+    def __init__(self, verbose_name=None, name=None, max_digits=None, decimal_places=None, **kwargs):
         self.max_digits, self.decimal_places = max_digits, decimal_places
-        Field.__init__(self, name, verbose_name, **kwargs)
+        Field.__init__(self, verbose_name, name, **kwargs)
 
     def get_manipulator_field_objs(self):
         return [curry(formfields.FloatField, max_digits=self.max_digits, decimal_places=self.decimal_places)]
 
 class ImageField(FileField):
-    def __init__(self, name, verbose_name=None, width_field=None, height_field=None, **kwargs):
+    def __init__(self, verbose_name=None, name=None, width_field=None, height_field=None, **kwargs):
         self.width_field, self.height_field = width_field, height_field
-        FileField.__init__(self, name, verbose_name, **kwargs)
+        FileField.__init__(self, verbose_name, name, **kwargs)
 
     def get_manipulator_field_objs(self):
         return [formfields.ImageUploadField, formfields.HiddenField]
@@ -479,11 +504,11 @@ class TextField(Field):
 
 class TimeField(Field):
     empty_strings_allowed = False
-    def __init__(self, name, verbose_name=None, auto_now=False, auto_now_add=False, **kwargs):
+    def __init__(self, verbose_name=None, name=None, auto_now=False, auto_now_add=False, **kwargs):
         self.auto_now, self.auto_now_add  = auto_now, auto_now_add
         if auto_now or auto_now_add:
             kwargs['editable'] = False
-        Field.__init__(self, name, verbose_name, **kwargs)
+        Field.__init__(self, verbose_name, name, **kwargs)
 
     def get_db_prep_lookup(self, lookup_type, value):
         if lookup_type == 'range':
@@ -511,10 +536,10 @@ class TimeField(Field):
         return [formfields.TimeField]
 
 class URLField(Field):
-    def __init__(self, name, verbose_name=None, verify_exists=True, **kwargs):
+    def __init__(self, verbose_name=None, name=None, verify_exists=True, **kwargs):
         if verify_exists:
             kwargs.setdefault('validator_list', []).append(validators.isExistingURL)
-        Field.__init__(self, name, verbose_name, **kwargs)
+        Field.__init__(self, verbose_name, name, **kwargs)
 
     def get_manipulator_field_objs(self):
         return [formfields.URLField]
@@ -524,34 +549,31 @@ class USStateField(Field):
         return [formfields.USStateField]
 
 class XMLField(Field):
-    def __init__(self, name, verbose_name=None, schema_path=None, **kwargs):
+    def __init__(self, verbose_name=None, name=None, schema_path=None, **kwargs):
         self.schema_path = schema_path
-        Field.__init__(self, name, verbose_name, **kwargs)
+        Field.__init__(self, verbose_name, name, **kwargs)
 
     def get_manipulator_field_objs(self):
         return [curry(formfields.XMLLargeTextField, schema_path=self.schema_path)]
 
 class ForeignKey(Field):
     empty_strings_allowed = False
-    def __init__(self, to, to_field=None, rel_name=None, **kwargs):
+    def __init__(self, to, to_field=None, **kwargs):
         try:
             to_name = to._meta.object_name.lower()
         except AttributeError: # to._meta doesn't exist, so it must be RECURSIVE_RELATIONSHIP_CONSTANT
             assert to == 'self', "ForeignKey(%r) is invalid. First parameter to ForeignKey must be either a model or the string %r" % (to, RECURSIVE_RELATIONSHIP_CONSTANT)
-            kwargs['name'] = kwargs.get('name', '')
             kwargs['verbose_name'] = kwargs.get('verbose_name', '')
         else:
             to_field = to_field or to._meta.pk.name
-            kwargs['name'] = kwargs.get('name', to_name + '_id')
             kwargs['verbose_name'] = kwargs.get('verbose_name', to._meta.verbose_name)
-            rel_name = rel_name or to_name
 
         if kwargs.has_key('edit_inline_type'):
             import warnings
             warnings.warn("edit_inline_type is deprecated. Use edit_inline instead.")
             kwargs['edit_inline'] = kwargs.pop('edit_inline_type')
 
-        kwargs['rel'] = ManyToOne(to, rel_name, to_field,
+        kwargs['rel'] = ManyToOne(to, to_field,
             num_in_admin=kwargs.pop('num_in_admin', 3),
             min_num_in_admin=kwargs.pop('min_num_in_admin', None),
             max_num_in_admin=kwargs.pop('max_num_in_admin', None),
@@ -567,11 +589,9 @@ class ForeignKey(Field):
         return [formfields.IntegerField]
 
 class ManyToManyField(Field):
-    def __init__(self, to, rel_name=None, **kwargs):
-        kwargs['name'] = kwargs.get('name', to._meta.module_name)
+    def __init__(self, to, **kwargs):
         kwargs['verbose_name'] = kwargs.get('verbose_name', to._meta.verbose_name_plural)
-        rel_name = rel_name or to._meta.object_name.lower()
-        kwargs['rel'] = ManyToMany(to, rel_name,
+        kwargs['rel'] = ManyToMany(to, kwargs.pop('singular', None),
             num_in_admin=kwargs.pop('num_in_admin', 0),
             related_name=kwargs.pop('related_name', None),
             filter_interface=kwargs.pop('filter_interface', None),
@@ -609,18 +629,16 @@ class ManyToManyField(Field):
                 len(badkeys) == 1 and "is" or "are")
 
 class OneToOneField(IntegerField):
-    def __init__(self, to, to_field=None, rel_name=None, **kwargs):
-        kwargs['name'] = kwargs.get('name', 'id')
+    def __init__(self, to, to_field=None, **kwargs):
         kwargs['verbose_name'] = kwargs.get('verbose_name', 'ID')
         to_field = to_field or to._meta.pk.name
-        rel_name = rel_name or to._meta.object_name.lower()
 
         if kwargs.has_key('edit_inline_type'):
             import warnings
             warnings.warn("edit_inline_type is deprecated. Use edit_inline instead.")
             kwargs['edit_inline'] = kwargs.pop('edit_inline_type')
 
-        kwargs['rel'] = OneToOne(to, rel_name, to_field,
+        kwargs['rel'] = OneToOne(to, to_field,
             num_in_admin=kwargs.pop('num_in_admin', 0),
             edit_inline=kwargs.pop('edit_inline', False),
             related_name=kwargs.pop('related_name', None),
@@ -631,7 +649,7 @@ class OneToOneField(IntegerField):
         IntegerField.__init__(self, **kwargs)
 
 class ManyToOne:
-    def __init__(self, to, name, field_name, num_in_admin=3, min_num_in_admin=None,
+    def __init__(self, to, field_name, num_in_admin=3, min_num_in_admin=None,
         max_num_in_admin=None, num_extra_on_change=1, edit_inline=False,
         related_name=None, limit_choices_to=None, lookup_overrides=None, raw_id_admin=False):
         try:
@@ -639,7 +657,7 @@ class ManyToOne:
         except AttributeError: # to._meta doesn't exist, so it must be RECURSIVE_RELATIONSHIP_CONSTANT
             assert to == RECURSIVE_RELATIONSHIP_CONSTANT, "'to' must be either a model or the string '%s'" % RECURSIVE_RELATIONSHIP_CONSTANT
             self.to = to
-        self.name, self.field_name = name, field_name
+        self.field_name = field_name
         self.num_in_admin, self.edit_inline = num_in_admin, edit_inline
         self.min_num_in_admin, self.max_num_in_admin = min_num_in_admin, max_num_in_admin
         self.num_extra_on_change, self.related_name = num_extra_on_change, related_name
@@ -647,17 +665,15 @@ class ManyToOne:
         self.lookup_overrides = lookup_overrides or {}
         self.raw_id_admin = raw_id_admin
 
-    def get_cache_name(self):
-        return '_%s_cache' % self.name
-
     def get_related_field(self):
         "Returns the Field in the 'to' object to which this relationship is tied."
         return self.to.get_field(self.field_name)
 
 class ManyToMany:
-    def __init__(self, to, name, num_in_admin=0, related_name=None,
+    def __init__(self, to, singular=None, num_in_admin=0, related_name=None,
         filter_interface=None, limit_choices_to=None, raw_id_admin=False):
-        self.to, self.name = to._meta, name
+        self.to = to._meta
+        self.singular = singular or to._meta.object_name.lower()
         self.num_in_admin = num_in_admin
         self.related_name = related_name
         self.filter_interface = filter_interface
@@ -667,10 +683,10 @@ class ManyToMany:
         assert not (self.raw_id_admin and self.filter_interface), "ManyToMany relationships may not use both raw_id_admin and filter_interface"
 
 class OneToOne(ManyToOne):
-    def __init__(self, to, name, field_name, num_in_admin=0, edit_inline=False,
+    def __init__(self, to, field_name, num_in_admin=0, edit_inline=False,
         related_name=None, limit_choices_to=None, lookup_overrides=None,
         raw_id_admin=False):
-        self.to, self.name, self.field_name = to._meta, name, field_name
+        self.to, self.field_name = to._meta, field_name
         self.num_in_admin, self.edit_inline = num_in_admin, edit_inline
         self.related_name = related_name
         self.limit_choices_to = limit_choices_to or {}

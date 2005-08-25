@@ -50,15 +50,21 @@ def handle_legacy_orderlist(order_list):
         warnings.warn("%r ordering syntax is deprecated. Use %r instead." % (order_list, new_order_list), DeprecationWarning)
         return new_order_list
 
-def orderlist2sql(order_list, prefix=''):
+def orderfield2column(f, opts):
+    try:
+        return opts.get_field(f, False).column
+    except FieldDoesNotExist:
+        return f
+
+def orderlist2sql(order_list, opts, prefix=''):
     output = []
     for f in handle_legacy_orderlist(order_list):
         if f.startswith('-'):
-            output.append('%s%s DESC' % (prefix, f[1:]))
+            output.append('%s%s DESC' % (prefix, orderfield2column(f[1:], opts)))
         elif f == '?':
             output.append('RANDOM()')
         else:
-            output.append('%s%s ASC' % (prefix, f))
+            output.append('%s%s ASC' % (prefix, orderfield2column(f, opts)))
     return ', '.join(output)
 
 def get_module(app_label, module_name):
@@ -206,7 +212,7 @@ class Options:
         # If a primary_key field hasn't been specified, add an
         # auto-incrementing primary-key ID field automatically.
         if self.pk is None:
-            self.fields.insert(0, AutoField('id', 'ID', primary_key=True))
+            self.fields.insert(0, AutoField(name='id', verbose_name='ID', primary_key=True))
             self.pk = self.fields[0]
         # Cache whether this has an AutoField.
         self.has_auto_field = False
@@ -249,7 +255,7 @@ class Options:
         "Returns the full 'ORDER BY' clause for this object, according to self.ordering."
         if not self.ordering: return ''
         pre = table_prefix and (table_prefix + '.') or ''
-        return 'ORDER BY ' + orderlist2sql(self.ordering, pre)
+        return 'ORDER BY ' + orderlist2sql(self.ordering, self, pre)
 
     def get_add_permission(self):
         return 'add_%s' % self.object_name.lower()
@@ -298,7 +304,7 @@ class Options:
                 # subsequently loaded object with related links will override this
                 # relationship we're adding.
                 link_field = copy.copy(core.RelatedLink._meta.get_field('object_id'))
-                link_field.rel = ManyToOne(self.get_model_module().Klass, 'related_links', 'id',
+                link_field.rel = ManyToOne(self.get_model_module().Klass, 'id',
                     num_in_admin=3, min_num_in_admin=3, edit_inline=TABULAR,
                     lookup_overrides={
                         'content_type__package__label__exact': self.app_label,
@@ -386,34 +392,48 @@ class ModelBase(type):
         if not bases:
             return type.__new__(cls, name, bases, attrs)
 
-        # If this model is a subclass of another Model, create an Options
+        try:
+            meta_attrs = attrs.pop('META').__dict__
+            del meta_attrs['__module__']
+            del meta_attrs['__doc__']
+        except KeyError:
+            meta_attrs = {}
+
+        # Gather all attributes that are Field instances.
+        fields = []
+        for obj_name, obj in attrs.items():
+            if isinstance(obj, Field):
+                obj.set_name(obj_name)
+                fields.append(obj)
+                del attrs[obj_name]
+
+        # Sort the fields in the order that they were created. The
+        # "creation_counter" is needed because metaclasses don't preserve the
+        # attribute order.
+        fields.sort(lambda x, y: x.creation_counter - y.creation_counter)
+
+        # If this model is a subclass of another model, create an Options
         # object by first copying the base class's _meta and then updating it
         # with the overrides from this class.
         replaces_module = None
         if bases[0] != Model:
-            if not attrs.has_key('fields'):
-                attrs['fields'] = list(bases[0]._meta._orig_init_args['fields'][:])
-            if attrs.has_key('ignore_fields'):
-                ignore_fields = attrs.pop('ignore_fields')
-                new_fields = []
-                for i, f in enumerate(attrs['fields']):
-                    if f.name not in ignore_fields:
-                        new_fields.append(f)
-                attrs['fields'] = new_fields
-            if attrs.has_key('add_fields'):
-                attrs['fields'].extend(attrs.pop('add_fields'))
-            if attrs.has_key('replaces_module'):
+            field_names = [f.name for f in fields]
+            remove_fields = meta_attrs.pop('remove_fields', [])
+            for f in bases[0]._meta._orig_init_args['fields']:
+                if f.name not in field_names and f.name not in remove_fields:
+                    fields.insert(0, f)
+            if meta_attrs.has_key('replaces_module'):
                 # Set the replaces_module variable for now. We can't actually
                 # do anything with it yet, because the module hasn't yet been
                 # created.
-                replaces_module = attrs.pop('replaces_module').split('.')
+                replaces_module = meta_attrs.pop('replaces_module').split('.')
             # Pass any Options overrides to the base's Options instance, and
             # simultaneously remove them from attrs. When this is done, attrs
             # will be a dictionary of custom methods, plus __module__.
-            meta_overrides = {}
-            for k, v in attrs.items():
+            meta_overrides = {'fields': fields}
+            for k, v in meta_attrs.items():
                 if not callable(v) and k != '__module__':
-                    meta_overrides[k] = attrs.pop(k)
+                    meta_overrides[k] = meta_attrs.pop(k)
             opts = bases[0]._meta.copy(**meta_overrides)
             opts.object_name = name
             del meta_overrides
@@ -422,27 +442,30 @@ class ModelBase(type):
                 # If the module_name wasn't given, use the class name
                 # in lowercase, plus a trailing "s" -- a poor-man's
                 # pluralization.
-                module_name = attrs.pop('module_name', name.lower() + 's'),
+                module_name = meta_attrs.pop('module_name', name.lower() + 's'),
                 # If the verbose_name wasn't given, use the class name,
                 # converted from InitialCaps to "lowercase with spaces".
-                verbose_name = attrs.pop('verbose_name',
+                verbose_name = meta_attrs.pop('verbose_name',
                     re.sub('([A-Z])', ' \\1', name).lower().strip()),
-                verbose_name_plural = attrs.pop('verbose_name_plural', ''),
-                db_table = attrs.pop('db_table', ''),
-                fields = attrs.pop('fields'),
-                ordering = attrs.pop('ordering', None),
-                unique_together = attrs.pop('unique_together', None),
-                admin = attrs.pop('admin', None),
-                has_related_links = attrs.pop('has_related_links', False),
-                where_constraints = attrs.pop('where_constraints', None),
+                verbose_name_plural = meta_attrs.pop('verbose_name_plural', ''),
+                db_table = meta_attrs.pop('db_table', ''),
+                fields = fields,
+                ordering = meta_attrs.pop('ordering', None),
+                unique_together = meta_attrs.pop('unique_together', None),
+                admin = meta_attrs.pop('admin', None),
+                has_related_links = meta_attrs.pop('has_related_links', False),
+                where_constraints = meta_attrs.pop('where_constraints', None),
                 object_name = name,
-                app_label = attrs.pop('app_label', None),
-                exceptions = attrs.pop('exceptions', None),
-                permissions = attrs.pop('permissions', None),
-                get_latest_by = attrs.pop('get_latest_by', None),
-                order_with_respect_to = attrs.pop('order_with_respect_to', None),
-                module_constants = attrs.pop('module_constants', None),
+                app_label = meta_attrs.pop('app_label', None),
+                exceptions = meta_attrs.pop('exceptions', None),
+                permissions = meta_attrs.pop('permissions', None),
+                get_latest_by = meta_attrs.pop('get_latest_by', None),
+                order_with_respect_to = meta_attrs.pop('order_with_respect_to', None),
+                module_constants = meta_attrs.pop('module_constants', None),
             )
+
+        if meta_attrs != {}:
+            raise TypeError, "'class META' got invalid attribute(s): %s" % ','.join(meta_attrs.keys())
 
         # Dynamically create the module that will contain this class and its
         # associated helper functions.
@@ -511,7 +534,7 @@ class ModelBase(type):
             # RECURSIVE_RELATIONSHIP_CONSTANT, create that relationship formally.
             if f.rel and f.rel.to == RECURSIVE_RELATIONSHIP_CONSTANT:
                 f.rel.to = opts
-                f.name = f.name or ((f.rel.name or f.rel.to.object_name.lower()) + '_' + f.rel.to.pk.name)
+                f.name = f.name or (f.rel.to.object_name.lower() + '_' + f.rel.to.pk.name)
                 f.verbose_name = f.verbose_name or f.rel.to.verbose_name
                 f.rel.field_name = f.rel.field_name or f.rel.to.pk.name
             # Add "get_thingie" methods for many-to-one related objects.
@@ -519,14 +542,14 @@ class ModelBase(type):
             if isinstance(f.rel, ManyToOne):
                 func = curry(method_get_many_to_one, f)
                 func.__doc__ = "Returns the associated `%s.%s` object." % (f.rel.to.app_label, f.rel.to.module_name)
-                attrs['get_%s' % f.rel.name] = func
+                attrs['get_%s' % f.name] = func
 
         for f in opts.many_to_many:
             # Add "get_thingie" methods for many-to-many related objects.
             # EXAMPLES: Poll.get_site_list(), Story.get_byline_list()
             func = curry(method_get_many_to_many, f)
             func.__doc__ = "Returns a list of associated `%s.%s` objects." % (f.rel.to.app_label, f.rel.to.module_name)
-            attrs['get_%s_list' % f.rel.name] = func
+            attrs['get_%s_list' % f.rel.singular] = func
             # Add "set_thingie" methods for many-to-many related objects.
             # EXAMPLES: Poll.set_sites(), Story.set_bylines()
             func = curry(method_set_many_to_many, f)
@@ -711,14 +734,36 @@ class Model:
 def method_init(opts, self, *args, **kwargs):
     if kwargs:
         for f in opts.fields:
-            setattr(self, f.name, kwargs.pop(f.name, f.get_default()))
+            if isinstance(f.rel, ManyToOne):
+                try:
+                    # Assume object instance was passed in.
+                    rel_obj = kwargs.pop(f.name)
+                except KeyError:
+                    try:
+                        # Object instance wasn't passed in -- must be an ID.
+                        val = kwargs.pop(f.column)
+                    except KeyError:
+                        val = f.get_default()
+                else:
+                    # Special case: You can pass in "None" for related objects if it's allowed.
+                    if rel_obj is None and f.null:
+                        val = None
+                    else:
+                        try:
+                            val = getattr(rel_obj, f.rel.field_name)
+                        except AttributeError:
+                            raise TypeError, "Invalid value: %r should be a %s instance, not a %s" % (f.name, f.rel.to, type(rel_obj))
+                setattr(self, f.column, val)
+            else:
+                val = kwargs.pop(f.name, f.get_default())
+                setattr(self, f.name, val)
         if kwargs:
             raise TypeError, "'%s' is an invalid keyword argument for this function" % kwargs.keys()[0]
     for i, arg in enumerate(args):
-        setattr(self, opts.fields[i].name, arg)
+        setattr(self, opts.fields[i].column, arg)
 
 def method_eq(opts, self, other):
-    return isinstance(other, self.__class__) and getattr(self, opts.pk.name) == getattr(other, opts.pk.name)
+    return isinstance(other, self.__class__) and getattr(self, opts.pk.column) == getattr(other, opts.pk.column)
 
 def method_save(opts, self):
     # Run any pre-save hooks.
@@ -728,41 +773,41 @@ def method_save(opts, self):
     cursor = db.db.cursor()
 
     # First, try an UPDATE. If that doesn't update anything, do an INSERT.
-    pk_val = getattr(self, opts.pk.name)
+    pk_val = getattr(self, opts.pk.column)
     pk_set = bool(pk_val)
     record_exists = True
     if pk_set:
         # Determine whether a record with the primary key already exists.
-        cursor.execute("SELECT 1 FROM %s WHERE %s=%%s LIMIT 1" % (opts.db_table, opts.pk.name), [pk_val])
+        cursor.execute("SELECT 1 FROM %s WHERE %s=%%s LIMIT 1" % (opts.db_table, opts.pk.column), [pk_val])
         # If it does already exist, do an UPDATE.
         if cursor.fetchone():
-            db_values = [f.get_db_prep_save(f.pre_save(getattr(self, f.name), False)) for f in non_pks]
+            db_values = [f.get_db_prep_save(f.pre_save(getattr(self, f.column), False)) for f in non_pks]
             cursor.execute("UPDATE %s SET %s WHERE %s=%%s" % (opts.db_table,
-                ','.join(['%s=%%s' % f.name for f in non_pks]), opts.pk.name),
+                ','.join(['%s=%%s' % f.column for f in non_pks]), opts.pk.column),
                 db_values + [pk_val])
         else:
             record_exists = False
     if not pk_set or not record_exists:
-        field_names = [f.name for f in opts.fields if not isinstance(f, AutoField)]
+        field_names = [f.column for f in opts.fields if not isinstance(f, AutoField)]
         placeholders = ['%s'] * len(field_names)
-        db_values = [f.get_db_prep_save(f.pre_save(getattr(self, f.name), True)) for f in opts.fields if not isinstance(f, AutoField)]
+        db_values = [f.get_db_prep_save(f.pre_save(getattr(self, f.column), True)) for f in opts.fields if not isinstance(f, AutoField)]
         if opts.order_with_respect_to:
             field_names.append('_order')
             # TODO: This assumes the database supports subqueries.
             placeholders.append('(SELECT COUNT(*) FROM %s WHERE %s = %%s)' % \
-                (opts.db_table, opts.order_with_respect_to.name))
-            db_values.append(getattr(self, opts.order_with_respect_to.name))
+                (opts.db_table, opts.order_with_respect_to.column))
+            db_values.append(getattr(self, opts.order_with_respect_to.column))
         cursor.execute("INSERT INTO %s (%s) VALUES (%s)" % (opts.db_table,
             ','.join(field_names), ','.join(placeholders)), db_values)
         if opts.has_auto_field:
-            setattr(self, opts.pk.name, db.get_last_insert_id(cursor, opts.db_table, opts.pk.name))
+            setattr(self, opts.pk.column, db.get_last_insert_id(cursor, opts.db_table, opts.pk.column))
     db.db.commit()
     # Run any post-save hooks.
     if hasattr(self, '_post_save'):
         self._post_save()
 
 def method_delete(opts, self):
-    assert getattr(self, opts.pk.name) is not None, "%r can't be deleted because it doesn't have an ID."
+    assert getattr(self, opts.pk.column) is not None, "%r can't be deleted because it doesn't have an ID."
     # Run any pre-delete hooks.
     if hasattr(self, '_pre_delete'):
         self._pre_delete()
@@ -781,15 +826,15 @@ def method_delete(opts, self):
                 sub_obj.delete()
     for rel_opts, rel_field in opts.get_all_related_many_to_many_objects():
         cursor.execute("DELETE FROM %s WHERE %s_id=%%s" % (rel_field.get_m2m_db_table(rel_opts),
-            self._meta.object_name.lower()), [getattr(self, opts.pk.name)])
+            self._meta.object_name.lower()), [getattr(self, opts.pk.column)])
     for f in opts.many_to_many:
         cursor.execute("DELETE FROM %s WHERE %s_id=%%s" % (f.get_m2m_db_table(opts), self._meta.object_name.lower()),
-            [getattr(self, opts.pk.name)])
-    cursor.execute("DELETE FROM %s WHERE %s=%%s" % (opts.db_table, opts.pk.name), [getattr(self, opts.pk.name)])
+            [getattr(self, opts.pk.column)])
+    cursor.execute("DELETE FROM %s WHERE %s=%%s" % (opts.db_table, opts.pk.column), [getattr(self, opts.pk.column)])
     db.db.commit()
-    setattr(self, opts.pk.name, None)
+    setattr(self, opts.pk.column, None)
     for f in opts.fields:
-        if isinstance(f, FileField) and getattr(self, f.name):
+        if isinstance(f, FileField) and getattr(self, f.column):
             file_name = getattr(self, 'get_%s_filename' % f.name)()
             # If the file exists and no other object of this type references it,
             # delete it from the filesystem.
@@ -802,26 +847,26 @@ def method_delete(opts, self):
 def method_get_next_in_order(opts, order_field, self):
     if not hasattr(self, '_next_in_order_cache'):
         self._next_in_order_cache = opts.get_model_module().get_object(order_by=('_order',),
-            where=['_order > (SELECT _order FROM %s WHERE %s=%%s)' % (opts.db_table, opts.pk.name),
-                '%s=%%s' % order_field.name], limit=1,
-            params=[getattr(self, opts.pk.name), getattr(self, order_field.name)])
+            where=['_order > (SELECT _order FROM %s WHERE %s=%%s)' % (opts.db_table, opts.pk.column),
+                '%s=%%s' % order_field.column], limit=1,
+            params=[getattr(self, opts.pk.column), getattr(self, order_field.name)])
     return self._next_in_order_cache
 
 def method_get_previous_in_order(opts, order_field, self):
     if not hasattr(self, '_previous_in_order_cache'):
         self._previous_in_order_cache = opts.get_model_module().get_object(order_by=('-_order',),
-            where=['_order < (SELECT _order FROM %s WHERE %s=%%s)' % (opts.db_table, opts.pk.name),
-                '%s=%%s' % order_field.name], limit=1,
-            params=[getattr(self, opts.pk.name), getattr(self, order_field.name)])
+            where=['_order < (SELECT _order FROM %s WHERE %s=%%s)' % (opts.db_table, opts.pk.column),
+                '%s=%%s' % order_field.column], limit=1,
+            params=[getattr(self, opts.pk.column), getattr(self, order_field.name)])
     return self._previous_in_order_cache
 
 # RELATIONSHIP METHODS #####################
 
 # Example: Story.get_dateline()
 def method_get_many_to_one(field_with_rel, self):
-    cache_var = field_with_rel.rel.get_cache_name()
+    cache_var = field_with_rel.get_cache_name()
     if not hasattr(self, cache_var):
-        val = getattr(self, field_with_rel.name)
+        val = getattr(self, field_with_rel.column)
         mod = field_with_rel.rel.to.get_model_module()
         if val is None:
             raise getattr(mod, '%sDoesNotExist' % field_with_rel.rel.to.object_name)
@@ -837,11 +882,11 @@ def method_get_many_to_many(field_with_rel, self):
     if not hasattr(self, cache_var):
         mod = rel.get_model_module()
         sql = "SELECT %s FROM %s a, %s b WHERE a.%s = b.%s_id AND b.%s_id = %%s %s" % \
-            (','.join(['a.%s' % f.name for f in rel.fields]), rel.db_table,
-            field_with_rel.get_m2m_db_table(self._meta), rel.pk.name,
+            (','.join(['a.%s' % f.column for f in rel.fields]), rel.db_table,
+            field_with_rel.get_m2m_db_table(self._meta), rel.pk.column,
             rel.object_name.lower(), self._meta.object_name.lower(), rel.get_order_sql('a'))
         cursor = db.db.cursor()
-        cursor.execute(sql, [getattr(self, self._meta.pk.name)])
+        cursor.execute(sql, [getattr(self, self._meta.pk.column)])
         setattr(self, cache_var, [getattr(mod, rel.object_name)(*row) for row in cursor.fetchall()])
     return getattr(self, cache_var)
 
@@ -863,7 +908,7 @@ def method_set_many_to_many(rel_field, self, id_list):
     rel = rel_field.rel.to
     m2m_table = rel_field.get_m2m_db_table(self._meta)
     cursor = db.db.cursor()
-    this_id = getattr(self, self._meta.pk.name)
+    this_id = getattr(self, self._meta.pk.column)
     if ids_to_delete:
         sql = "DELETE FROM %s WHERE %s_id = %%s AND %s_id IN (%s)" % (m2m_table, self._meta.object_name.lower(), rel.object_name.lower(), ','.join(map(str, ids_to_delete)))
         cursor.execute(sql, [this_id])
@@ -880,7 +925,7 @@ def method_set_many_to_many(rel_field, self, id_list):
 # Handles related-object retrieval.
 # Examples: Poll.get_choice(), Poll.get_choice_list(), Poll.get_choice_count()
 def method_get_related(method_name, rel_mod, rel_field, self, **kwargs):
-    kwargs['%s__exact' % rel_field.name] = getattr(self, rel_field.rel.field_name)
+    kwargs['%s__%s__exact' % (rel_field.name, rel_field.rel.to.pk.name)] = getattr(self, rel_field.rel.field_name)
     kwargs.update(rel_field.rel.lookup_overrides)
     return getattr(rel_mod, method_name)(**kwargs)
 
@@ -892,7 +937,7 @@ def method_add_related(rel_obj, rel_mod, rel_field, self, *args, **kwargs):
     for f in rel_obj.fields:
         if isinstance(f, AutoField):
             init_kwargs[f.name] = None
-    init_kwargs[rel_field.name] = getattr(self, rel_field.rel.field_name)
+    init_kwargs[rel_field.name] = self
     obj = rel_mod.Klass(**init_kwargs)
     obj.save()
     return obj
@@ -909,7 +954,7 @@ def method_set_related_many_to_many(rel_opts, rel_field, self, id_list):
     id_list = map(int, id_list) # normalize to integers
     rel = rel_field.rel.to
     m2m_table = rel_field.get_m2m_db_table(rel_opts)
-    this_id = getattr(self, self._meta.pk.name)
+    this_id = getattr(self, self._meta.pk.column)
     cursor = db.db.cursor()
     cursor.execute("DELETE FROM %s WHERE %s_id = %%s" % (m2m_table, rel.object_name.lower()), [this_id])
     sql = "INSERT INTO %s (%s_id, %s_id) VALUES (%%s, %%s)" % (m2m_table, rel.object_name.lower(), rel_opts.object_name.lower())
@@ -921,7 +966,7 @@ def method_set_related_many_to_many(rel_opts, rel_field, self, id_list):
 def method_set_order(ordered_obj, self, id_list):
     cursor = db.db.cursor()
     # Example: "UPDATE poll_choices SET _order = %s WHERE poll_id = %s AND id = %s"
-    sql = "UPDATE %s SET _order = %%s WHERE %s = %%s AND %s = %%s" % (ordered_obj.db_table, ordered_obj.order_with_respect_to.name, ordered_obj.pk.name)
+    sql = "UPDATE %s SET _order = %%s WHERE %s = %%s AND %s = %%s" % (ordered_obj.db_table, ordered_obj.order_with_respect_to.column, ordered_obj.pk.column)
     rel_val = getattr(self, ordered_obj.order_with_respect_to.rel.field_name)
     cursor.executemany(sql, [(i, rel_val, j) for i, j in enumerate(id_list)])
     db.db.commit()
@@ -929,7 +974,7 @@ def method_set_order(ordered_obj, self, id_list):
 def method_get_order(ordered_obj, self):
     cursor = db.db.cursor()
     # Example: "SELECT id FROM poll_choices WHERE poll_id = %s ORDER BY _order"
-    sql = "SELECT %s FROM %s WHERE %s = %%s ORDER BY _order" % (ordered_obj.pk.name, ordered_obj.db_table, ordered_obj.order_with_respect_to.name)
+    sql = "SELECT %s FROM %s WHERE %s = %%s ORDER BY _order" % (ordered_obj.pk.column, ordered_obj.db_table, ordered_obj.order_with_respect_to.column)
     rel_val = getattr(self, ordered_obj.order_with_respect_to.rel.field_name)
     cursor.execute(sql, [rel_val])
     return [r[0] for r in cursor.fetchall()]
@@ -937,7 +982,7 @@ def method_get_order(ordered_obj, self):
 # DATE-RELATED METHODS #####################
 
 def method_get_next_or_previous(get_object_func, field, is_next, self, **kwargs):
-    kwargs.setdefault('where', []).append('%s %s %%s' % (field.name, (is_next and '>' or '<')))
+    kwargs.setdefault('where', []).append('%s %s %%s' % (field.column, (is_next and '>' or '<')))
     kwargs.setdefault('params', []).append(str(getattr(self, field.name)))
     kwargs['order_by'] = [(not is_next and '-' or '') + field.name]
     kwargs['limit'] = 1
@@ -1045,7 +1090,7 @@ def _get_cached_row(opts, row, index_start):
     for f in opts.fields:
         if f.rel and not f.null:
             rel_obj, index_end = _get_cached_row(f.rel.to, row, index_end)
-            setattr(obj, f.rel.get_cache_name(), rel_obj)
+            setattr(obj, f.get_cache_name(), rel_obj)
     return obj, index_end
 
 def function_get_iterator(opts, klass, **kwargs):
@@ -1091,9 +1136,9 @@ def function_get_values_iterator(opts, klass, **kwargs):
 
     # 'fields' is a list of field names to fetch.
     try:
-        fields = kwargs.pop('fields')
+        fields = [opts.get_field(f).column for f in kwargs.pop('fields')]
     except KeyError: # Default to all fields.
-        fields = [f.name for f in opts.fields]
+        fields = [f.column for f in opts.fields]
 
     cursor = db.db.cursor()
     _, sql, params = function_get_sql_clause(opts, **kwargs)
@@ -1124,8 +1169,8 @@ def _fill_table_cache(opts, select, tables, where, old_prefix, cache_tables_seen
                 tables.append('%s %s' % (db_table, new_prefix))
                 db_table = new_prefix
             cache_tables_seen.append(db_table)
-            where.append('%s.%s = %s.%s' % (old_prefix, f.name, db_table, f.rel.field_name))
-            select.extend(['%s.%s' % (db_table, f2.name) for f2 in f.rel.to.fields])
+            where.append('%s.%s = %s.%s' % (old_prefix, f.column, db_table, f.rel.get_related_field().column))
+            select.extend(['%s.%s' % (db_table, f2.column) for f2 in f.rel.to.fields])
             _fill_table_cache(f.rel.to, select, tables, where, db_table, cache_tables_seen)
 
 def _throw_bad_kwarg_error(kwarg):
@@ -1158,7 +1203,10 @@ def _parse_lookup(kwarg_items, opts, table_count=0):
         lookup_list = kwarg.split(LOOKUP_SEPARATOR)
         # pk="value" is shorthand for (primary key)__exact="value"
         if lookup_list[-1] == 'pk':
-            lookup_list = lookup_list[:-1] + [opts.pk.name, 'exact']
+            if opts.pk.rel:
+                lookup_list = lookup_list[:-1] + [opts.pk.name, opts.pk.rel.field_name, 'exact']
+            else:
+                lookup_list = lookup_list[:-1] + [opts.pk.name, 'exact']
         if len(lookup_list) == 1:
             _throw_bad_kwarg_error(kwarg)
         lookup_type = lookup_list.pop()
@@ -1184,7 +1232,7 @@ def _parse_lookup(kwarg_items, opts, table_count=0):
                         rel_table_alias = 't%s' % table_count
                         table_count += 1
                         tables.append('%s %s' % (f.get_m2m_db_table(current_opts), rel_table_alias))
-                        join_where.append('%s.%s = %s.%s_id' % (current_table_alias, current_opts.pk.name,
+                        join_where.append('%s.%s = %s.%s_id' % (current_table_alias, current_opts.pk.column,
                             rel_table_alias, current_opts.object_name.lower()))
                         # Optimization: In the case of primary-key lookups, we
                         # don't have to do an extra join.
@@ -1198,32 +1246,39 @@ def _parse_lookup(kwarg_items, opts, table_count=0):
                             new_table_alias = 't%s' % table_count
                             tables.append('%s %s' % (f.rel.to.db_table, new_table_alias))
                             join_where.append('%s.%s_id = %s.%s' % (rel_table_alias, f.rel.to.object_name.lower(),
-                                new_table_alias, f.rel.to.pk.name))
+                                new_table_alias, f.rel.to.pk.column))
                             current_table_alias = new_table_alias
                             param_required = True
                         current_opts = f.rel.to
                         raise StopIteration
                 for f in current_opts.fields:
                     # Try many-to-one relationships...
-                    if f.rel and f.rel.name == current:
+                    if f.rel and f.name == current:
                         # Optimization: In the case of primary-key lookups, we
                         # don't have to do an extra join.
                         if lookup_list and lookup_list[0] == f.rel.to.pk.name and lookup_type == 'exact':
-                            where.append(_get_where_clause(lookup_type, current_table_alias+'.', f.name, kwarg_value))
+                            where.append(_get_where_clause(lookup_type, current_table_alias+'.', f.column, kwarg_value))
                             params.extend(f.get_db_prep_lookup(lookup_type, kwarg_value))
                             lookup_list.pop()
                             param_required = False
+                        # 'isnull' lookups in many-to-one relationships are a special case,
+                        # because we don't want to do a join. We just want to find out
+                        # whether the foreign key field is NULL.
+                        elif lookup_type == 'isnull' and not lookup_list:
+                            where.append(_get_where_clause(lookup_type, current_table_alias+'.', f.column, kwarg_value))
+                            params.extend(f.get_db_prep_lookup(lookup_type, kwarg_value))
                         else:
                             new_table_alias = 't%s' % table_count
                             tables.append('%s %s' % (f.rel.to.db_table, new_table_alias))
-                            join_where.append('%s.%s = %s.%s' % (current_table_alias, f.name, new_table_alias, f.rel.to.pk.name))
+                            join_where.append('%s.%s = %s.%s' % (current_table_alias, f.column, \
+                                new_table_alias, f.rel.to.pk.column))
                             current_table_alias = new_table_alias
                             param_required = True
                         current_opts = f.rel.to
                         raise StopIteration
                     # Try direct field-name lookups...
                     if f.name == current:
-                        where.append(_get_where_clause(lookup_type, current_table_alias+'.', current, kwarg_value))
+                        where.append(_get_where_clause(lookup_type, current_table_alias+'.', f.column, kwarg_value))
                         params.extend(f.get_db_prep_lookup(lookup_type, kwarg_value))
                         param_required = False
                         raise StopIteration
@@ -1235,7 +1290,7 @@ def _parse_lookup(kwarg_items, opts, table_count=0):
     return tables, join_where, where, params, table_count
 
 def function_get_sql_clause(opts, **kwargs):
-    select = ["%s.%s" % (opts.db_table, f.name) for f in opts.fields]
+    select = ["%s.%s" % (opts.db_table, f.column) for f in opts.fields]
     tables = [opts.db_table] + (kwargs.get('tables') and kwargs['tables'][:] or [])
     where = kwargs.get('where') and kwargs['where'][:] or []
     params = kwargs.get('params') and kwargs['params'][:] or []
@@ -1270,9 +1325,9 @@ def function_get_sql_clause(opts, **kwargs):
             else:
                 table_prefix = ''
             if f.startswith('-'):
-                order_by.append('%s%s DESC' % (table_prefix, f[1:]))
+                order_by.append('%s%s DESC' % (table_prefix, orderfield2column(f[1:], opts)))
             else:
-                order_by.append('%s%s ASC' % (table_prefix, f))
+                order_by.append('%s%s ASC' % (table_prefix, orderfield2column(f, opts)))
     order_by = ", ".join(order_by)
 
     # LIMIT and OFFSET clauses
@@ -1307,9 +1362,9 @@ def function_get_date_list(opts, field, *args, **kwargs):
     assert order in ('ASC', 'DESC'), "'order' must be either 'ASC' or 'DESC'"
     kwargs['order_by'] = [] # Clear this because it'll mess things up otherwise.
     if field.null:
-        kwargs.setdefault('where', []).append('%s.%s IS NOT NULL' % (opts.db_table, field.name))
+        kwargs.setdefault('where', []).append('%s.%s IS NOT NULL' % (opts.db_table, field.column))
     select, sql, params = function_get_sql_clause(opts, **kwargs)
-    sql = 'SELECT %s %s GROUP BY 1 ORDER BY 1' % (db.get_date_trunc_sql(kind, '%s.%s' % (opts.db_table, field.name)), sql)
+    sql = 'SELECT %s %s GROUP BY 1 ORDER BY 1' % (db.get_date_trunc_sql(kind, '%s.%s' % (opts.db_table, field.column)), sql)
     cursor = db.db.cursor()
     cursor.execute(sql, params)
     # We have to manually run typecast_timestamp(str()) on the results, because
@@ -1359,8 +1414,8 @@ def manipulator_init(opts, add, change, self, obj_key=None):
                 lookup_kwargs = opts.one_to_one_field.rel.limit_choices_to
                 lookup_kwargs['%s__exact' % opts.one_to_one_field.rel.field_name] = obj_key
                 _ = opts.one_to_one_field.rel.to.get_model_module().get_object(**lookup_kwargs)
-                params = dict([(f.name, f.get_default()) for f in opts.fields])
-                params[opts.pk.name] = obj_key
+                params = dict([(f.column, f.get_default()) for f in opts.fields])
+                params[opts.pk.column] = obj_key
                 self.original_object = opts.get_model_module().Klass(**params)
             else:
                 raise
@@ -1396,9 +1451,9 @@ def manipulator_save(opts, klass, add, change, self, new_data):
         # Fields with auto_now_add are another special case; they should keep
         # their original value in the change stage.
         if change and getattr(f, 'auto_now_add', False):
-            params[f.name] = getattr(self.original_object, f.name)
+            params[f.column] = getattr(self.original_object, f.name)
         else:
-            params[f.name] = f.get_manipulator_new_data(new_data)
+            params[f.column] = f.get_manipulator_new_data(new_data)
 
     if change:
         params[opts.pk.name] = self.obj_key
@@ -1416,7 +1471,7 @@ def manipulator_save(opts, klass, add, change, self, new_data):
     if change:
         self.fields_added, self.fields_changed, self.fields_deleted = [], [], []
         for f in opts.fields:
-            if not f.primary_key and str(getattr(self.original_object, f.name)) != str(getattr(new_object, f.name)):
+            if not f.primary_key and str(getattr(self.original_object, f.column)) != str(getattr(new_object, f.column)):
                 self.fields_changed.append(f.verbose_name)
 
     # Save many-to-many objects. Example: Poll.set_sites()
@@ -1467,15 +1522,15 @@ def manipulator_save(opts, klass, add, change, self, new_data):
                 # case, because they'll be dealt with later.
                 if change and (isinstance(f, FileField) or not f.editable):
                     if rel_new_data.get(rel_opts.pk.name, False) and rel_new_data[rel_opts.pk.name][0]:
-                        params[f.name] = getattr(old_rel_obj, f.name)
+                        params[f.column] = getattr(old_rel_obj, f.column)
                     else:
-                        params[f.name] = f.get_default()
+                        params[f.column] = f.get_default()
                 elif f == rel_field:
-                    params[f.name] = getattr(new_object, rel_field.rel.field_name)
+                    params[f.column] = getattr(new_object, rel_field.rel.field_name)
                 elif add and isinstance(f, AutoField):
-                    params[f.name] = None
+                    params[f.column] = None
                 else:
-                    params[f.name] = f.get_manipulator_new_data(rel_new_data, rel=True)
+                    params[f.column] = f.get_manipulator_new_data(rel_new_data, rel=True)
                 # Related links are a special case, because we have to
                 # manually set the "content_type_id" field.
                 if opts.has_related_links and rel_opts.module_name == 'relatedlinks':
@@ -1501,7 +1556,7 @@ def manipulator_save(opts, klass, add, change, self, new_data):
                         self.fields_added.append('%s "%r"' % (rel_opts.verbose_name, new_rel_obj))
                     else:
                         for f in rel_opts.fields:
-                            if not f.primary_key and f != rel_field and str(getattr(old_rel_obj, f.name)) != str(getattr(new_rel_obj, f.name)):
+                            if not f.primary_key and f != rel_field and str(getattr(old_rel_obj, f.column)) != str(getattr(new_rel_obj, f.column)):
                                 self.fields_changed.append('%s for %s "%r"' % (f.verbose_name, rel_opts.verbose_name, new_rel_obj))
 
                 # Save many-to-many objects.
@@ -1527,20 +1582,26 @@ def manipulator_save(opts, klass, add, change, self, new_data):
 def manipulator_validator_unique_together(field_name_list, opts, self, field_data, all_data):
     from django.utils.text import get_text_list
     field_list = [opts.get_field(field_name) for field_name in field_name_list]
-    kwargs = {'%s__iexact' % field_name_list[0]: field_data}
+    if isinstance(field_list[0].rel, ManyToOne):
+        kwargs = {'%s__%s__iexact' % (field_name_list[0], field_list[0].rel.field_name): field_data}
+    else:
+        kwargs = {'%s__iexact' % field_name_list[0]: field_data}
     for f in field_list[1:]:
-        field_val = all_data.get(f.name, None)
+        field_val = all_data.get(f.column, None)
         if field_val is None:
             # This will be caught by another validator, assuming the field
             # doesn't have blank=True.
             return
-        kwargs['%s__iexact' % f.name] = field_val
+        if isinstance(f.rel, ManyToOne):
+            kwargs['%s__pk' % f.name] = field_val
+        else:
+            kwargs['%s__iexact' % f.name] = field_val
     mod = opts.get_model_module()
     try:
         old_obj = mod.get_object(**kwargs)
     except ObjectDoesNotExist:
         return
-    if hasattr(self, 'original_object') and getattr(self.original_object, opts.pk.name) == getattr(old_obj, opts.pk.name):
+    if hasattr(self, 'original_object') and getattr(self.original_object, opts.pk.column) == getattr(old_obj, opts.pk.column):
         pass
     else:
         raise validators.ValidationError, "%s with this %s already exists for the given %s." % \
@@ -1562,7 +1623,7 @@ def manipulator_validator_unique_for_date(from_field, date_field, opts, lookup_t
     except ObjectDoesNotExist:
         return
     else:
-        if hasattr(self, 'original_object') and getattr(self.original_object, opts.pk.name) == getattr(old_obj, opts.pk.name):
+        if hasattr(self, 'original_object') and getattr(self.original_object, opts.pk.column) == getattr(old_obj, opts.pk.column):
             pass
         else:
             format_string = (lookup_type == 'date') and '%B %d, %Y' or '%B %Y'

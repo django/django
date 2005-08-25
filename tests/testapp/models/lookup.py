@@ -7,11 +7,10 @@ This demonstrates features of the database API.
 from django.core import meta
 
 class Article(meta.Model):
-    fields = (
-        meta.CharField('headline', maxlength=100),
-        meta.DateTimeField('pub_date'),
-    )
-    ordering = ('-pub_date', 'headline')
+    headline = meta.CharField(maxlength=100)
+    pub_date = meta.DateTimeField()
+    class META:
+        ordering = ('-pub_date', 'headline')
 
     def __repr__(self):
         return self.headline

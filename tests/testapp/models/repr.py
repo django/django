@@ -11,10 +11,8 @@ automatically-generated admin.
 from django.core import meta
 
 class Article(meta.Model):
-    fields = (
-        meta.CharField('headline', maxlength=100),
-        meta.DateTimeField('pub_date'),
-    )
+    headline = meta.CharField(maxlength=100)
+    pub_date = meta.DateTimeField()
 
     def __repr__(self):
         return self.headline
@@ -22,7 +20,7 @@ class Article(meta.Model):
 API_TESTS = """
 # Create an Article.
 >>> from datetime import datetime
->>> a = articles.Article(id=None, headline='Area man programs in Python', pub_date=datetime(2005, 7, 28))
+>>> a = articles.Article(headline='Area man programs in Python', pub_date=datetime(2005, 7, 28))
 >>> a.save()
 
 >>> repr(a)

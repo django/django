@@ -11,12 +11,11 @@ fails.
 from django.core import meta
 
 class Employee(meta.Model):
-    fields = (
-        meta.CharField('employee_code', maxlength=10, primary_key=True),
-        meta.CharField('first_name', maxlength=20),
-        meta.CharField('last_name', maxlength=20),
-    )
-    ordering = ('last_name', 'first_name')
+    employee_code = meta.CharField(maxlength=10, primary_key=True)
+    first_name = meta.CharField(maxlength=20)
+    last_name = meta.CharField(maxlength=20)
+    class META:
+        ordering = ('last_name', 'first_name')
 
     def __repr__(self):
         return "%s %s" % (self.first_name, self.last_name)

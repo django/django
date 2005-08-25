@@ -11,11 +11,10 @@ date farthest into the future."
 from django.core import meta
 
 class Article(meta.Model):
-    fields = (
-        meta.CharField('headline', maxlength=100),
-        meta.DateTimeField('pub_date'),
-    )
-    get_latest_by = 'pub_date'
+    headline = meta.CharField(maxlength=100)
+    pub_date = meta.DateTimeField()
+    class META:
+        get_latest_by = 'pub_date'
 
     def __repr__(self):
         return self.headline

@@ -7,10 +7,8 @@ This is a basic model with only two non-primary-key fields.
 from django.core import meta
 
 class Article(meta.Model):
-    fields = (
-        meta.CharField('headline', maxlength=100, default='Default headline'),
-        meta.DateTimeField('pub_date'),
-    )
+    headline = meta.CharField(maxlength=100, default='Default headline')
+    pub_date = meta.DateTimeField()
 
 API_TESTS = """
 # No articles are in the system yet.

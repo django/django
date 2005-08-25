@@ -10,18 +10,14 @@ and a publication has multiple articles.
 from django.core import meta
 
 class Publication(meta.Model):
-    fields = (
-        meta.CharField('title', maxlength=30),
-    )
+    title = meta.CharField(maxlength=30)
 
     def __repr__(self):
         return self.title
 
 class Article(meta.Model):
-    fields = (
-        meta.CharField('headline', maxlength=100),
-        meta.ManyToManyField(Publication),
-    )
+    headline = meta.CharField(maxlength=100)
+    publications = meta.ManyToManyField(Publication)
 
     def __repr__(self):
         return self.headline

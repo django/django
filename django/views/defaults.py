@@ -43,13 +43,13 @@ def page_not_found(request):
     from django.conf.settings import APPEND_SLASH, SITE_ID
     path = request.get_full_path()
     try:
-        r = redirects.get_object(site_id__exact=SITE_ID, old_path__exact=path)
+        r = redirects.get_object(site__id__exact=SITE_ID, old_path__exact=path)
     except redirects.RedirectDoesNotExist:
         r = None
     if r is None and APPEND_SLASH:
         # Try removing the trailing slash.
         try:
-            r = redirects.get_object(site_id__exact=SITE_ID, old_path__exact=path[:path.rfind('/')]+path[path.rfind('/')+1:])
+            r = redirects.get_object(site__id__exact=SITE_ID, old_path__exact=path[:path.rfind('/')]+path[path.rfind('/')+1:])
         except redirects.RedirectDoesNotExist:
             pass
     if r is not None:

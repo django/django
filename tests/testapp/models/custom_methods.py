@@ -23,10 +23,8 @@ namespace as custom methods.
 from django.core import meta
 
 class Article(meta.Model):
-    fields = (
-        meta.CharField('headline', maxlength=100),
-        meta.DateField('pub_date'),
-    )
+    headline = meta.CharField(maxlength=100)
+    pub_date = meta.DateField()
 
     def __repr__(self):
         return self.headline

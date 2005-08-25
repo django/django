@@ -4,36 +4,28 @@
 In this example, a ``Person`` can have a ``mother`` and ``father`` -- both of
 which are other ``Person`` objects.
 
-Because a ``Person`` has multiple relationships to ``Person``, we need to
-distinguish the relationships. Set ``rel_name`` to tell Django what the
-relationship should be called, because ``Person`` has two relationships to the
-same model. Also, set ``related_name`` to designate what the reverse
-relationship is called.
+Set ``related_name`` to designate what the reverse relationship is called.
 """
 
 from django.core import meta
 
 class Person(meta.Model):
-    fields = (
-        meta.CharField('full_name', maxlength=20),
-        meta.ForeignKey('self', null=True, rel_name='mother',
-            related_name='mothers_child'),
-        meta.ForeignKey('self', null=True, rel_name='father',
-            related_name='fathers_child'),
-    )
+    full_name = meta.CharField(maxlength=20)
+    mother = meta.ForeignKey('self', null=True, related_name='mothers_child')
+    father = meta.ForeignKey('self', null=True, related_name='fathers_child')
 
     def __repr__(self):
         return self.full_name
 
 API_TESTS = """
 # Create two Person objects -- the mom and dad in our family.
->>> dad = persons.Person(id=None, full_name='John Smith Senior', mother_id=None, father_id=None)
+>>> dad = persons.Person(full_name='John Smith Senior', mother=None, father=None)
 >>> dad.save()
->>> mom = persons.Person(id=None, full_name='Jane Smith', mother_id=None, father_id=None)
+>>> mom = persons.Person(full_name='Jane Smith', mother=None, father=None)
 >>> mom.save()
 
 # Give mom and dad a kid.
->>> kid = persons.Person(id=None, full_name='John Smith Junior', mother_id=mom.id, father_id=dad.id)
+>>> kid = persons.Person(full_name='John Smith Junior', mother=mom, father=dad)
 >>> kid.save()
 
 >>> kid.get_mother()

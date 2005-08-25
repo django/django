@@ -16,7 +16,7 @@ def flag(request, comment_id):
             the flagged `comments.comments` object
     """
     try:
-        comment = comments.get_object(pk=comment_id, site_id__exact=SITE_ID)
+        comment = comments.get_object(pk=comment_id, site__id__exact=SITE_ID)
     except comments.CommentDoesNotExist:
         raise Http404
     if request.POST:
@@ -31,7 +31,7 @@ flag = login_required(flag)
 
 def flag_done(request, comment_id):
     try:
-        comment = comments.get_object(pk=comment_id, site_id__exact=SITE_ID)
+        comment = comments.get_object(pk=comment_id, site__id__exact=SITE_ID)
     except comments.CommentDoesNotExist:
         raise Http404
     t = template_loader.get_template('comments/flag_done')
@@ -50,7 +50,7 @@ def delete(request, comment_id):
             the flagged `comments.comments` object
     """
     try:
-        comment = comments.get_object(pk=comment_id, site_id__exact=SITE_ID)
+        comment = comments.get_object(pk=comment_id, site__id__exact=SITE_ID)
     except comments.CommentDoesNotExist:
         raise Http404
     if not comments.user_is_moderator(request.user):
@@ -72,7 +72,7 @@ delete = login_required(delete)
 
 def delete_done(request, comment_id):
     try:
-        comment = comments.get_object(pk=comment_id, site_id__exact=SITE_ID)
+        comment = comments.get_object(pk=comment_id, site__id__exact=SITE_ID)
     except comments.CommentDoesNotExist:
         raise Http404
     t = template_loader.get_template('comments/delete_done')

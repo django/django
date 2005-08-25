@@ -1,42 +1,38 @@
 """
 4. Many-to-one relationships
 
-To define a many-to-one relationship, use ForeignKey().
+To define a many-to-one relationship, use ``ForeignKey()`` .
 """
 
 from django.core import meta
 
 class Reporter(meta.Model):
-    fields = (
-        meta.CharField('first_name', maxlength=30),
-        meta.CharField('last_name', maxlength=30),
-    )
+    first_name = meta.CharField(maxlength=30)
+    last_name = meta.CharField(maxlength=30)
 
     def __repr__(self):
         return "%s %s" % (self.first_name, self.last_name)
 
 class Article(meta.Model):
-    fields = (
-        meta.CharField('headline', maxlength=100),
-        meta.DateField('pub_date'),
-        meta.ForeignKey(Reporter),
-    )
+    headline = meta.CharField(maxlength=100)
+    pub_date = meta.DateField()
+    reporter = meta.ForeignKey(Reporter)
 
     def __repr__(self):
         return self.headline
 
 API_TESTS = """
 # Create a Reporter.
->>> r = reporters.Reporter(id=None, first_name='John', last_name='Smith')
+>>> r = reporters.Reporter(first_name='John', last_name='Smith')
 >>> r.save()
 
 # Create an Article.
 >>> from datetime import datetime
->>> a = articles.Article(id=None, headline='This is a test', pub_date=datetime(2005, 7, 27), reporter_id=r.id)
+>>> a = articles.Article(id=None, headline="This is a test", pub_date=datetime(2005, 7, 27), reporter=r)
 >>> a.save()
 
 >>> a.reporter_id
-1L
+1
 
 >>> a.get_reporter()
 John Smith
@@ -47,7 +43,7 @@ John Smith
 ('John', 'Smith')
 
 # Create an Article via the Reporter object.
->>> new_article = r.add_article(headline="John's second story", pub_date=datetime(2005, 7, 28))
+>>> new_article = r.add_article(headline="John's second story", pub_date=datetime(2005, 7, 29))
 >>> new_article
 John's second story
 >>> new_article.reporter_id
@@ -61,7 +57,7 @@ John's second story
 This is a test
 
 >>> r.get_article_count()
-2L
+2
 
 # The API automatically follows relationships as far as you need.
 # Use double underscores to separate relationships.
@@ -70,4 +66,32 @@ This is a test
 >>> articles.get_list(reporter__first_name__exact='John', order_by=['pub_date'])
 [This is a test, John's second story]
 
+# Find all Articles for the Reporter whose ID is 1.
+>>> articles.get_list(reporter__id__exact=1, order_by=['pub_date'])
+[This is a test, John's second story]
+
+# Note you need two underscores between "reporter" and "id" -- not one.
+>>> articles.get_list(reporter_id__exact=1)
+Traceback (most recent call last):
+    ...
+TypeError: got unexpected keyword argument 'reporter_id__exact'
+
+# "pk" shortcut syntax works in a related context, too.
+>>> articles.get_list(reporter__pk=1, order_by=['pub_date'])
+[This is a test, John's second story]
+
+# You can also instantiate an Article by passing
+# the Reporter's ID instead of a Reporter object.
+>>> a3 = articles.Article(id=None, headline="This is a test", pub_date=datetime(2005, 7, 27), reporter_id=r.id)
+>>> a3.save()
+>>> a3.reporter_id
+1
+>>> a3.get_reporter()
+John Smith
+
+# Similarly, the reporter ID can be a string.
+>>> a4 = articles.Article(id=None, headline="This is a test", pub_date=datetime(2005, 7, 27), reporter_id="1")
+>>> a4.save()
+>>> a4.get_reporter()
+John Smith
 """

@@ -6,15 +6,24 @@ Django's models are the bread and butter of the framework.  There's a huge
 array of options available to you when defining your data models. This
 document explains them.
 
-Options for models
-==================
+META options
+============
 
-A list of all possible options for a model object follows. Although there's a
-wide array of options, only ``fields`` is required.
+Give your model metadata by using an inner ``"class META"``, like so::
+
+    class Foo(meta.Model):
+        bar = meta.CharField(maxlength=30)
+        # ...
+        class META:
+            admin = meta.Admin()
+            # ...
+
+Here's a list of all possible ``META`` options. No options are required.
 
 ``admin``
-    A ``meta.Admin`` object; see `Admin options`_.  If this field isn't given,
-    the object will not have an admin interface.
+    A ``meta.Admin`` object; see `Admin options`_. If this field is given, the
+    object will have an admin interface. If it isn't given, the object won't
+    have one.
 
 ``db_table``
     The name of the database table to use for the module::
@@ -29,16 +38,6 @@ wide array of options, only ``fields`` is required.
     methods::
 
         exceptions = ("DisgustingToppingsException", "BurntCrust")
-
-``fields``
-    A list of field objects. See `Field objects`_. For example::
-
-        fields = (
-            meta.CharField('customer_name', maxlength=15),
-            meta.BooleanField('use_extra_cheese'),
-            meta.IntegerField('customer_type', choices=CUSTOMER_TYPE_CHOICES),
-            ...
-        )
 
 ``get_latest_by``
     The name of a ``DateField`` or ``DateTimeField``; if given, the module will
@@ -69,7 +68,7 @@ wide array of options, only ``fields`` is required.
     respect to a parent object.  For example, if a ``PizzaToppping`` relates to
     a ``Pizza`` object, you might use::
 
-        order_with_respect_to = 'pizza_id'
+        order_with_respect_to = 'pizza'
 
     to allow the toppings to be ordered with respect to the associated pizza.
 
@@ -95,7 +94,7 @@ wide array of options, only ``fields`` is required.
 ``unique_together``
     Sets of field names that, taken together, must be unique::
 
-        unique_together = (("driver_id", "restaurant_id"),)
+        unique_together = (("driver", "restaurant"),)
 
     This is a list of lists of fields that must be unique when considered
     together. It's used in the Django admin.
@@ -118,18 +117,14 @@ wide array of options, only ``fields`` is required.
 Field objects
 =============
 
-The list of fields is the most important part of a data model.  Each item in
-the ``fields`` list is an instance of a ``meta.Field`` subclass and maps to
-a database field.
+The list of fields is the most important part of a data model. Each class
+variable in a model, aside from the optional inner ``class META``, should be
+an instance of a ``meta.Field`` subclass.
 
-All field objects -- except for ``ForeignKey`` and ``ManyToManyField`` (see
-below) -- require the field's machine-readable name as the first positional
-argument. This must be a valid Python identifier -- no spaces, punctuation,
-etc., are allowed.
-
-The second positional argument, a human-readable name, is optional. If the
-human-readable name isn't given, Django will use the machine-readable name,
-coverting underscores to spaces.
+Each field type, except for ``ForeignKey``, ``ManyToManyField`` and
+``OneToOneField``, takes an optional first positional argument, a
+human-readable name. If the human-readable name isn't given, Django will use
+the machine-readable name, converting underscores to spaces.
 
 General field options
 ---------------------
@@ -172,6 +167,10 @@ common to all field types. These arguments are:
 
                             It is an error to have an inline-editable
                             relation without at least one core field.
+
+    ``db_column``           The name of the database column to use for this
+                            field. If this isn't given, Django will use the
+                            field's name.
 
     ``db_index``            If ``True``, the SQL generator will create a database
                             index on this field.
@@ -229,7 +228,7 @@ Field Types
     use this directly; a primary key field will automatically be added to your
     model if you don't specify otherwise. That automatically-added field is::
 
-        meta.AutoField('id', primary_key=True)
+        id = meta.AutoField(primary_key=True)
 
 ``BooleanField``
     A true/false field.
@@ -370,13 +369,6 @@ Field Types
 
                              Not used with ``edit_inline``.
 
-    ``rel_name``             The name of the relation. In the above example,
-                             this would default to 'pizza' (so that the
-                             ``Toppings`` object would have a ``get_pizza()``
-                             function. If you set ``rel_name`` to "pie", then
-                             the function would be called ``get_pie()`` and the
-                             field name would be ``pie_id``.
-
     ``related_name``         The name to use for the relation from the related
                              object back to this one.  For example, when if
                              ``Topping`` has this field::
@@ -405,11 +397,9 @@ Field Types
 
                                     ...
                                     meta.ForeignKey(Category, name="primary_category_id",
-                                                    rel_name="primary_category",
                                                     related_name="primary_story"),
 
                                     meta.ForeignKey(Category, name="secondary_category_id",
-                                                    rel_name="secondary_category",
                                                     related_name="secondary_story"),
                                     ...
 
@@ -445,24 +435,18 @@ Field Types
     ``core.flatfiles`` object::
 
         class FlatFile(meta.Model):
-            fields = (
-                ...
-                meta.ManyToManyField(Site),
-            )
+            # ...
+            sites = meta.ManyToManyField(Site)
 
     Many-to-many relations are a bit different from other fields.  First, they
     aren't actually a field per se, because they use a intermediary join table.
     Second, they don't take the same options as the rest of the fields. The
-    only arguments taken are:
+    first position argument is required and should be a model class. Other
+    available arguments, all of which are optional, are:
 
     =======================  ============================================================
     Argument                 Description
     =======================  ============================================================
-    ``rel_name``             Use this if you have more than one
-                             ``ForeignKey``  in the same model that relate
-                             to the same model. Django will use ``rel_name`` in
-                             the generated API.
-
     ``related_name``         See the description of ``related_name`` in
                              ``ForeignKey``, above.
 
@@ -474,14 +458,6 @@ Field Types
                              vertically).
 
     ``limit_choices_to``     See the description under ``ForeignKey`` above.
-
-    ``name``                 An alphanumeric name for the relationship. If this
-                             isn't provided, Django uses the ``module_name`` of
-                             the related object.
-
-                             This is only really useful when you have a single
-                             object that relates to the same object more than
-                             once.
 
     ``verbose_name``         A human-readable name for the object, singular. If
                              this isn't provided, Django uses the
@@ -534,7 +510,7 @@ Field Types
     from which to auto-populate the slug, via JavaScript, in the object's admin
     form::
 
-        meta.SlugField("slug", prepopulate_from=("pre_name", "name")),
+        meta.SlugField(prepopulate_from=("pre_name", "name")),
 
 ``SmallIntegerField``
     Like an ``IntegerField``, but only allows values under a certain
@@ -691,9 +667,7 @@ object's behavior.  First, any methods you define will be available as methods
 of object instances. For example::
 
     class Pizza(meta.Model):
-        fields = (
-            ...
-        )
+        # ...
 
         def is_disgusting(self):
             return "anchovies" in [topping.name for topping in self.get_topping_list()]
@@ -742,9 +716,7 @@ that module.  Any model method that begins with "_module_" is turned into a
 module-level function::
 
     class Pizza(meta.Model):
-        fields = (
-            ...
-        )
+        # ...
 
         def _module_get_pizzas_to_deliver():
             return get_list(delivered__exact=False)
@@ -769,9 +741,7 @@ fields because manipulators automatically call any method that begins with
 "validate"::
 
     class Pizza(meta.Model):
-        fields = (
-            ...
-        )
+        # ...
 
         def _manipulator_validate_customer_id(self, field_data, all_data):
             from django.core import validators

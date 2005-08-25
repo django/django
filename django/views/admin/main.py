@@ -387,12 +387,12 @@ def change_list(request, app_label, module_name):
                     except ObjectDoesNotExist:
                         result_repr = EMPTY_CHANGELIST_VALUE
                 else:
-                    field_val = getattr(result, f.name)
+                    field_val = getattr(result, f.column)
                     # Foreign-key fields are special: Use the repr of the
                     # related object.
                     if isinstance(f.rel, meta.ManyToOne):
                         if field_val is not None:
-                            result_repr = getattr(result, 'get_%s' % f.rel.name)()
+                            result_repr = getattr(result, 'get_%s' % f.name)()
                         else:
                             result_repr = EMPTY_CHANGELIST_VALUE
                     # Dates are special: They're formatted in a certain way.
@@ -723,10 +723,10 @@ def _get_admin_field(field_list, name_prefix, rel, add, change):
             t.append('{{ %soriginal.%s }}' % ((rel and name_prefix or ''), field.name))
         if change and use_raw_id_admin(field):
             if isinstance(field.rel, meta.ManyToOne):
-                if_bit = '%soriginal.get_%s' % (rel and name_prefix or '', field.rel.name)
+                if_bit = '%soriginal.get_%s' % (rel and name_prefix or '', field.name)
                 obj_repr = if_bit + '|truncatewords:"14"'
             elif isinstance(field.rel, meta.ManyToMany):
-                if_bit = '%soriginal.get_%s_list' % (rel and name_prefix or '', field.rel.name)
+                if_bit = '%soriginal.get_%s_list' % (rel and name_prefix or '', field.name)
                 obj_repr = if_bit + '|join:", "|truncatewords:"14"'
             t.append('{%% if %s %%}&nbsp;<strong>{{ %s }}</strong>{%% endif %%}' % (if_bit, obj_repr))
         if field.help_text:
@@ -915,21 +915,21 @@ def change_stage(request, app_label, module_name, object_id):
         new_data = {}
         obj = manipulator.original_object
         for f in opts.fields:
-            new_data.update(_get_flattened_data(f, getattr(obj, f.name)))
+            new_data.update(_get_flattened_data(f, getattr(obj, f.column)))
         for f in opts.many_to_many:
             if f.rel.raw_id_admin:
-                new_data[f.name] = ",".join([str(i.id) for i in getattr(obj, 'get_%s_list' % f.rel.name)()])
+                new_data[f.name] = ",".join([str(i.id) for i in getattr(obj, 'get_%s_list' % f.rel.singular)()])
             elif not f.rel.edit_inline:
-                new_data[f.name] = [i.id for i in getattr(obj, 'get_%s_list' % f.rel.name)()]
+                new_data[f.name] = [i.id for i in getattr(obj, 'get_%s_list' % f.rel.singular)()]
         for rel_obj, rel_field in inline_related_objects:
             var_name = rel_obj.object_name.lower()
             for i, rel_instance in enumerate(getattr(obj, 'get_%s_list' % opts.get_rel_object_method_name(rel_obj, rel_field))()):
                 for f in rel_obj.fields:
                     if f.editable and f != rel_field:
-                        for k, v in _get_flattened_data(f, getattr(rel_instance, f.name)).items():
+                        for k, v in _get_flattened_data(f, getattr(rel_instance, f.column)).items():
                             new_data['%s.%d.%s' % (var_name, i, k)] = v
                 for f in rel_obj.many_to_many:
-                    new_data['%s.%d.%s' % (var_name, i, f.name)] = [j.id for j in getattr(rel_instance, 'get_%s_list' % f.rel.name)()]
+                    new_data['%s.%d.%s' % (var_name, i, f.column)] = [j.id for j in getattr(rel_instance, 'get_%s_list' % f.rel.singular)()]
 
         # If the object has ordered objects on its admin page, get the existing
         # order and flatten it into a comma-separated list of IDs.
@@ -1095,7 +1095,7 @@ def delete_stage(request, app_label, module_name, object_id):
 
 def history(request, app_label, module_name, object_id):
     mod, opts = _get_mod_opts(app_label, module_name)
-    action_list = log.get_list(object_id__exact=object_id, content_type_id__exact=opts.get_content_type_id(),
+    action_list = log.get_list(object_id__exact=object_id, content_type__id__exact=opts.get_content_type_id(),
         order_by=("action_time",), select_related=True)
     # If no history was found, see whether this object even exists.
     try:

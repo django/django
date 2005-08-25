@@ -86,8 +86,8 @@ class PublicCommentManipulator(AuthenticationForm):
     def save(self, new_data):
         today = datetime.date.today()
         c = self.get_comment(new_data)
-        for old in comments.get_list(content_type_id__exact=new_data["content_type_id"],
-            object_id__exact=new_data["object_id"], user_id__exact=self.get_user_id()):
+        for old in comments.get_list(content_type__id__exact=new_data["content_type_id"],
+            object_id__exact=new_data["object_id"], user__id__exact=self.get_user_id()):
             # Check that this comment isn't duplicate. (Sometimes people post
             # comments twice by mistake.) If it is, fail silently by pretending
             # the comment was posted successfully.
@@ -141,7 +141,7 @@ class PublicFreeCommentManipulator(formfields.Manipulator):
         # Check that this comment isn't duplicate. (Sometimes people post
         # comments twice by mistake.) If it is, fail silently by pretending
         # the comment was posted successfully.
-        for old_comment in freecomments.get_list(content_type_id__exact=new_data["content_type_id"],
+        for old_comment in freecomments.get_list(content_type__id__exact=new_data["content_type_id"],
             object_id__exact=new_data["object_id"], person_name__exact=new_data["person_name"],
             submit_date__year=today.year, submit_date__month=today.month,
             submit_date__day=today.day):

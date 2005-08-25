@@ -167,41 +167,36 @@ These concepts are represented by simple Python classes. Edit the
     from django.core import meta
 
     class Poll(meta.Model):
-        fields = (
-            meta.CharField('question', maxlength=200),
-            meta.DateTimeField('pub_date', 'date published'),
-        )
+        question = meta.CharField(maxlength=200)
+        pub_date = meta.DateTimeField('date published')
 
     class Choice(meta.Model):
-        fields = (
-            meta.ForeignKey(Poll),
-            meta.CharField('choice', maxlength=200),
-            meta.IntegerField('votes'),
-        )
+        poll = meta.ForeignKey(Poll)
+        choice = meta.CharField(maxlength=200)
+        votes = meta.IntegerField()
 
 The code is straightforward. Each model is represented by a class that
-subclasses ``django.core.meta.Model``. Each model has a single class variable,
-``fields``, which is a tuple of database fields in the model.
+subclasses ``django.core.meta.Model``. Each model a number of class variables,
+each of which represents a database field in the model.
 
 Each field is represented by an instance of a ``meta.*Field`` class -- e.g.,
 ``meta.CharField`` for character fields and ``meta.DateTimeField`` for
 datetimes. This tells Django what type of data each field holds.
 
-The first argument to each ``Field`` call is the field's name, in
-machine-friendly format. You'll use this value in your Python code, and your
-database will use it as the column name.
+The name of each ``meta.*Field`` instance (e.g. ``question`` or ``pub_date`` )
+is the field's name, in machine-friendly format. You'll use this value in your
+Python code, and your database will use it as the column name.
 
-The second, optional, argument is the field's human-readable name. That's used
-in a couple of introspective parts of Django, and it doubles as documentation.
-If this field isn't provided, Django will use the machine-readable name. In
-this example, we've only defined a human-readable name for ``Poll.pub_date``.
-For all other fields in this model, the field's machine-readable name will
-suffice as its human-readable name.
+You can use an optional first positional argument to a ``Field`` to designate a
+human-readable name. That's used in a couple of introspective parts of Django,
+and it doubles as documentation. If this field isn't provided, Django will use
+the machine-readable name. In this example, we've only defined a human-readable
+name for ``Poll.pub_date``. For all other fields in this model, the field's
+machine-readable name will suffice as its human-readable name.
 
-Some ``meta.*Field`` classes have additional required elements.
-``meta.CharField``, for example, requires that you give it a ``maxlength``.
-That's used not only in the database schema, but in validation, as we'll soon
-see.
+Some ``meta.*Field`` classes have required elements. ``meta.CharField``, for
+example, requires that you give it a ``maxlength``. That's used not only in the
+database schema, but in validation, as we'll soon see.
 
 Finally, note a relationship is defined, using ``meta.ForeignKey``. That tells
 Django each Choice is related to a single Poll. Django supports all the common
@@ -265,6 +260,9 @@ Note the following:
       can override this behavior.)
 
     * Primary keys (IDs) are added automatically. (You can override this, too.)
+
+    * Django appends ``"_id"`` to the foreign key field name, by convention.
+      Yes, you can override this, as well.
 
     * The foreign key relationship is made explicit by a ``REFERENCES`` statement.
 

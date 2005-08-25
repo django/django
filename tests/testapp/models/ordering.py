@@ -16,11 +16,10 @@ undefined -- not random, just undefined.
 from django.core import meta
 
 class Article(meta.Model):
-    fields = (
-        meta.CharField('headline', maxlength=100),
-        meta.DateTimeField('pub_date'),
-    )
-    ordering = ('-pub_date', 'headline')
+    headline = meta.CharField(maxlength=100)
+    pub_date = meta.DateTimeField()
+    class META:
+        ordering = ('-pub_date', 'headline')
 
     def __repr__(self):
         return self.headline
@@ -28,13 +27,13 @@ class Article(meta.Model):
 API_TESTS = """
 # Create a couple of Articles.
 >>> from datetime import datetime
->>> a1 = articles.Article(id=None, headline='Article 1', pub_date=datetime(2005, 7, 26))
+>>> a1 = articles.Article(headline='Article 1', pub_date=datetime(2005, 7, 26))
 >>> a1.save()
->>> a2 = articles.Article(id=None, headline='Article 2', pub_date=datetime(2005, 7, 27))
+>>> a2 = articles.Article(headline='Article 2', pub_date=datetime(2005, 7, 27))
 >>> a2.save()
->>> a3 = articles.Article(id=None, headline='Article 3', pub_date=datetime(2005, 7, 27))
+>>> a3 = articles.Article(headline='Article 3', pub_date=datetime(2005, 7, 27))
 >>> a3.save()
->>> a4 = articles.Article(id=None, headline='Article 4', pub_date=datetime(2005, 7, 28))
+>>> a4 = articles.Article(headline='Article 4', pub_date=datetime(2005, 7, 28))
 >>> a4.save()
 
 # By default, articles.get_list() orders by pub_date descending, then

@@ -291,14 +291,9 @@ dictionaries in order of query execution. Each dictionary has the following::
 Can I use Django with a pre-existing database?
 ----------------------------------------------
 
-Yes. You have two options:
+Yes. See `Integrating with a legacy database`_.
 
-    * Write models that describe your already-existing database layout, and
-      just point Django at your database.
-    * Use the alpha ``django-admin.py inspectdb`` function to automatically
-      create models by introspecting a given database. See `Ticket 90`_.
-
-.. _`Ticket 90`: http://code.djangoproject.com/ticket/90
+.. _`Integrating with a legacy database`: http://www.djangoproject.com/documentation/legacy_databases/
 
 The admin site
 ==============

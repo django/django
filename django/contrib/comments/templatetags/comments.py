@@ -123,7 +123,7 @@ class CommentCountNode(template.Node):
             self.obj_id = template.resolve_variable(self.context_var_name, context)
         comment_count = get_count_function(object_id__exact=self.obj_id,
             content_type__package__label__exact=self.package,
-            content_type__python_module_name__exact=self.module, site_id__exact=SITE_ID)
+            content_type__python_module_name__exact=self.module, site__id__exact=SITE_ID)
         context[self.var_name] = comment_count
         return ''
 
@@ -146,7 +146,7 @@ class CommentListNode(template.Node):
             'object_id__exact': self.obj_id,
             'content_type__package__label__exact': self.package,
             'content_type__python_module_name__exact': self.module,
-            'site_id__exact': SITE_ID,
+            'site__id__exact': SITE_ID,
             'select_related': True,
             'order_by': (self.ordering + 'submit_date',),
         }

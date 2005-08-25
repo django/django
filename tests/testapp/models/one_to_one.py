@@ -9,33 +9,29 @@ In this example, a ``Place`` optionally can be a ``Restaurant``.
 from django.core import meta
 
 class Place(meta.Model):
-    fields = (
-        meta.CharField('name', maxlength=50),
-        meta.CharField('address', maxlength=80),
-    )
+    name = meta.CharField(maxlength=50)
+    address = meta.CharField(maxlength=80)
 
     def __repr__(self):
         return "%s the place" % self.name
 
 class Restaurant(meta.Model):
-    fields = (
-        meta.OneToOneField(Place),
-        meta.BooleanField('serves_hot_dogs'),
-        meta.BooleanField('serves_pizza'),
-    )
+    place = meta.OneToOneField(Place)
+    serves_hot_dogs = meta.BooleanField()
+    serves_pizza = meta.BooleanField()
 
     def __repr__(self):
         return "%s the restaurant" % self.get_place().name
 
 API_TESTS = """
 # Create a couple of Places.
->>> p1 = places.Place(id=None, name='Demon Dogs', address='944 W. Fullerton')
+>>> p1 = places.Place(name='Demon Dogs', address='944 W. Fullerton')
 >>> p1.save()
->>> p2 = places.Place(id=None, name='Ace Hardware', address='1013 N. Ashland')
+>>> p2 = places.Place(name='Ace Hardware', address='1013 N. Ashland')
 >>> p2.save()
 
 # Create a Restaurant. Pass the ID of the "parent" object as this object's ID.
->>> r = restaurants.Restaurant(id=p1.id, serves_hot_dogs=True, serves_pizza=False)
+>>> r = restaurants.Restaurant(place=p1, serves_hot_dogs=True, serves_pizza=False)
 >>> r.save()
 
 # A Restaurant can access its place.
@@ -50,7 +46,7 @@ Demon Dogs the restaurant
 >>> p2.get_restaurant()
 Traceback (most recent call last):
     ...
-RestaurantDoesNotExist: Restaurant does not exist for {'id__exact': ...}
+RestaurantDoesNotExist: Restaurant does not exist for {'place__id__exact': ...}
 
 # restaurants.get_list() just returns the Restaurants, not the Places.
 >>> restaurants.get_list()
@@ -60,4 +56,9 @@ RestaurantDoesNotExist: Restaurant does not exist for {'id__exact': ...}
 # Restaurants.
 >>> places.get_list(order_by=['name'])
 [Ace Hardware the place, Demon Dogs the place]
+
+>>> restaurants.get_object(place__id__exact=1)
+Demon Dogs the restaurant
+>>> restaurants.get_object(pk=1)
+Demon Dogs the restaurant
 """

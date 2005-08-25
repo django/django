@@ -67,7 +67,7 @@ def get_sql_create(mod):
                 data_type = f.__class__.__name__
             col_type = db.DATA_TYPES[data_type]
             if col_type is not None:
-                field_output = [f.name, col_type % rel_field.__dict__]
+                field_output = [f.column, col_type % rel_field.__dict__]
                 field_output.append('%sNULL' % (not f.null and 'NOT ' or ''))
                 if f.unique:
                     field_output.append('UNIQUE')
@@ -75,12 +75,12 @@ def get_sql_create(mod):
                     field_output.append('PRIMARY KEY')
                 if f.rel:
                     field_output.append('REFERENCES %s (%s)' % \
-                        (f.rel.to.db_table, f.rel.to.get_field(f.rel.field_name).name))
+                        (f.rel.to.db_table, f.rel.to.get_field(f.rel.field_name).column))
                 table_output.append(' '.join(field_output))
         if opts.order_with_respect_to:
             table_output.append('_order %s NULL' % db.DATA_TYPES['IntegerField'])
         for field_constraints in opts.unique_together:
-            table_output.append('UNIQUE (%s)' % ", ".join(field_constraints))
+            table_output.append('UNIQUE (%s)' % ", ".join([opts.get_field(f).column for f in field_constraints]))
 
         full_statement = ['CREATE TABLE %s (' % opts.db_table]
         for i, line in enumerate(table_output): # Combine and add commas.
@@ -94,9 +94,9 @@ def get_sql_create(mod):
             table_output = ['CREATE TABLE %s (' % f.get_m2m_db_table(opts)]
             table_output.append('    id %s NOT NULL PRIMARY KEY,' % db.DATA_TYPES['AutoField'])
             table_output.append('    %s_id %s NOT NULL REFERENCES %s (%s),' % \
-                (opts.object_name.lower(), db.DATA_TYPES['IntegerField'], opts.db_table, opts.pk.name))
+                (opts.object_name.lower(), db.DATA_TYPES['IntegerField'], opts.db_table, opts.pk.column))
             table_output.append('    %s_id %s NOT NULL REFERENCES %s (%s),' % \
-                (f.rel.to.object_name.lower(), db.DATA_TYPES['IntegerField'], f.rel.to.db_table, f.rel.to.pk.name))
+                (f.rel.to.object_name.lower(), db.DATA_TYPES['IntegerField'], f.rel.to.db_table, f.rel.to.pk.column))
             table_output.append('    UNIQUE (%s_id, %s_id)' % (opts.object_name.lower(), f.rel.to.object_name.lower()))
             table_output.append(');')
             final_output.append('\n'.join(table_output))
@@ -186,7 +186,7 @@ def get_sql_sequence_reset(mod):
     for klass in mod._MODELS:
         for f in klass._meta.fields:
             if isinstance(f, meta.AutoField):
-                output.append("SELECT setval('%s_%s_seq', (SELECT max(%s) FROM %s));" % (klass._meta.db_table, f.name, f.name, klass._meta.db_table))
+                output.append("SELECT setval('%s_%s_seq', (SELECT max(%s) FROM %s));" % (klass._meta.db_table, f.column, f.column, klass._meta.db_table))
     return output
 get_sql_sequence_reset.help_doc = "Prints the SQL statements for resetting PostgreSQL sequences for the given app(s)."
 get_sql_sequence_reset.args = APP_ARGS
@@ -199,7 +199,7 @@ def get_sql_indexes(mod):
             if f.db_index:
                 unique = f.unique and "UNIQUE " or ""
                 output.append("CREATE %sINDEX %s_%s ON %s (%s);" % \
-                    (unique, klass._meta.db_table, f.name, klass._meta.db_table, f.name))
+                    (unique, klass._meta.db_table, f.column, klass._meta.db_table, f.column))
     return output
 get_sql_indexes.help_doc = "Prints the CREATE INDEX SQL statements for the given app(s)."
 get_sql_indexes.args = APP_ARGS
@@ -490,7 +490,7 @@ class ModelErrorCollection:
 
     def add(self, opts, error):
         self.errors.append((opts, error))
-        self.outfile.write("%s.%s: %s\n" % (opts.module_name, opts.object_name, error))
+        self.outfile.write("%s.%s: %s\n" % (opts.app_label, opts.module_name, error))
 
 def validate():
     "Validates all installed models."
@@ -524,6 +524,8 @@ def validate():
                     if field_name == '?': continue
                     if field_name.startswith('-'):
                         field_name = field_name[1:]
+                    if opts.order_with_respect_to and field_name == '_order':
+                        continue
                     try:
                         opts.get_field(field_name, many_to_many=False)
                     except meta.FieldDoesNotExist:

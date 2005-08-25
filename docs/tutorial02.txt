@@ -89,9 +89,7 @@ objects have an admin interface. Edit the ``myproject/apps/polls/models/polls.py
 file and make the following change to add an ``admin`` attribute::
 
     class Poll(meta.Model):
-        fields = (
-            # ...
-        )
+        # ...
         admin = meta.Admin()
 
 Now reload the Django admin page to see your changes. Note that you don't have
@@ -242,15 +240,15 @@ Poll object. Let's make that happen.
 Remove the ``admin`` for the Choice model. Then, edit the ``ForeignKey(Poll)``
 field like so::
 
-    meta.ForeignKey(Poll, edit_inline=meta.STACKED, num_in_admin=3),
+    poll = meta.ForeignKey(Poll, edit_inline=meta.STACKED, num_in_admin=3)
 
 This tells Django: "Choice objects are edited on the Poll admin page. By
 default, provide enough fields for 3 Choices."
 
 Then change the other fields in ``Choice`` to give them ``core=True``::
 
-    meta.CharField('choice', 'choice', maxlength=200, core=True),
-    meta.IntegerField('votes', 'votes', core=True),
+    choice = meta.CharField(maxlength=200, core=True)
+    votes = meta.IntegerField(core=True)
 
 This tells Django: "When you edit a Choice on the Poll admin page, the 'choice'
 and 'votes' fields are required. The presence of at least one of them signifies
@@ -274,7 +272,7 @@ One small problem, though. It takes a lot of screen space to display all the
 fields for entering related Choice objects. For that reason, Django offers an
 alternate way of displaying inline related objects::
 
-    meta.ForeignKey(Poll, edit_inline=meta.TABULAR, num_in_admin=3),
+    poll = meta.ForeignKey(Poll, edit_inline=meta.TABULAR, num_in_admin=3)
 
 With that ``edit_inline=meta.TABULAR`` (instead of ``meta.STACKED``), the
 related objects are displayed in a more compact, table-based format:

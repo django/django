@@ -13,10 +13,8 @@ Django provides hooks for executing arbitrary code around ``save()`` and
 from django.core import meta
 
 class Person(meta.Model):
-    fields = (
-        meta.CharField('first_name', maxlength=20),
-        meta.CharField('last_name', maxlength=20),
-    )
+    first_name = meta.CharField(maxlength=20)
+    last_name = meta.CharField(maxlength=20)
 
     def __repr__(self):
         return "%s %s" % (self.first_name, self.last_name)

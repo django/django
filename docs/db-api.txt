@@ -11,20 +11,16 @@ models, and how to create, retrieve, and update objects.
 Throughout this reference, we'll refer to the following Poll application::
 
     class Poll(meta.Model):
-        fields = (
-            meta.SlugField('slug', unique_for_month='pub_date'),
-            meta.CharField('question', maxlength=255),
-            meta.DateTimeField('pub_date'),
-            meta.DateTimeField('expire_date'),
-        )
+        slug = meta.SlugField(unique_for_month='pub_date')
+        question = meta.CharField(maxlength=255)
+        pub_date = meta.DateTimeField()
+        expire_date = meta.DateTimeField()
 
     class Choice(meta.Model):
-        fields = (
-            meta.ForeignKey(Poll, edit_inline=meta.TABULAR,
-                num_in_admin=10, min_num_in_admin=5),
-            meta.CharField('choice', maxlength=255, core=True),
-            meta.IntegerField('votes', editable=False, default=0),
-        )
+        poll = meta.ForeignKey(Poll, edit_inline=meta.TABULAR,
+            num_in_admin=10, min_num_in_admin=5)
+        choice = meta.CharField(maxlength=255, core=True)
+        votes = meta.IntegerField(editable=False, default=0)
 
 Basic lookup functions
 ======================
@@ -163,23 +159,18 @@ automatically.
 One-to-one relations
 --------------------
 
-Each object in a one-to-one relationship will have a ``get_relatedobject()``
+Each object in a one-to-one relationship will have a ``get_relatedobjectname()``
 method. For example::
 
     class Place(meta.Model):
-        fields = (
-            ...
-        )
+        # ...
 
     class Restaurant(meta.Model):
-        ...
-        fields = (
-            meta.OneToOneField(places.Place),
-            ...
-        )
+        # ...
+        the_place = meta.OneToOneField(places.Place)
 
 In the above example, each ``Place`` will have a ``get_restaurant()`` method,
-and each ``Restaurant`` will have a ``get_place()`` method.
+and each ``Restaurant`` will have a ``get_theplace()`` method.
 
 Many-to-one relations
 ---------------------
@@ -236,19 +227,15 @@ Note that ``select_related`` follows foreign keys as far as possible. If you hav
 following models::
 
     class Poll(meta.Model):
-        ...
+        # ...
 
     class Choice(meta.Model):
-        fields = (
-            meta.ForeignKey(Poll),
-            ...
-        )
+        # ...
+        poll = meta.ForeignKey(Poll)
 
     class SingleVote(meta.Model):
-        fields = (
-            meta.ForeignKey(Choice),
-            ...
-        )
+        # ...
+        choice = meta.ForeignKey(Choice)
 
 then a call to ``singlevotes.get_object(id__exact=4, select_related=True)`` will
 cache the related choice *and* the related poll::

@@ -2,59 +2,56 @@ from django.core import meta
 from django.models import auth, core
 
 class Comment(meta.Model):
-    db_table = 'comments'
-    fields = (
-        meta.ForeignKey(auth.User, raw_id_admin=True),
-        meta.ForeignKey(core.ContentType, name='content_type_id', rel_name='content_type'),
-        meta.IntegerField('object_id', 'object ID'),
-        meta.CharField('headline', 'headline', maxlength=255, blank=True),
-        meta.TextField('comment', 'comment', maxlength=3000),
-        meta.PositiveSmallIntegerField('rating1', 'rating #1', blank=True, null=True),
-        meta.PositiveSmallIntegerField('rating2', 'rating #2', blank=True, null=True),
-        meta.PositiveSmallIntegerField('rating3', 'rating #3', blank=True, null=True),
-        meta.PositiveSmallIntegerField('rating4', 'rating #4', blank=True, null=True),
-        meta.PositiveSmallIntegerField('rating5', 'rating #5', blank=True, null=True),
-        meta.PositiveSmallIntegerField('rating6', 'rating #6', blank=True, null=True),
-        meta.PositiveSmallIntegerField('rating7', 'rating #7', blank=True, null=True),
-        meta.PositiveSmallIntegerField('rating8', 'rating #8', blank=True, null=True),
-        # This field designates whether to use this row's ratings in
-        # aggregate functions (summaries). We need this because people are
-        # allowed to post multiple review on the same thing, but the system
-        # will only use the latest one (with valid_rating=True) in tallying
-        # the reviews.
-        meta.BooleanField('valid_rating', 'is valid rating'),
-        meta.DateTimeField('submit_date', 'date/time submitted', auto_now_add=True),
-        meta.BooleanField('is_public', 'is public'),
-        meta.IPAddressField('ip_address', 'IP address', blank=True, null=True),
-        meta.BooleanField('is_removed', 'is removed',
-            help_text='Check this box if the comment is inappropriate. A "This comment has been removed" message will be displayed instead.'),
-        meta.ForeignKey(core.Site),
-    )
-    module_constants = {
-        # min. and max. allowed dimensions for photo resizing (in pixels)
-        'MIN_PHOTO_DIMENSION': 5,
-        'MAX_PHOTO_DIMENSION': 1000,
+    user = meta.ForeignKey(auth.User, raw_id_admin=True)
+    content_type = meta.ForeignKey(core.ContentType)
+    object_id = meta.IntegerField('object ID')
+    headline = meta.CharField(maxlength=255, blank=True)
+    comment = meta.TextField(maxlength=3000)
+    rating1 = meta.PositiveSmallIntegerField('rating #1', blank=True, null=True)
+    rating2 = meta.PositiveSmallIntegerField('rating #2', blank=True, null=True)
+    rating3 = meta.PositiveSmallIntegerField('rating #3', blank=True, null=True)
+    rating4 = meta.PositiveSmallIntegerField('rating #4', blank=True, null=True)
+    rating5 = meta.PositiveSmallIntegerField('rating #5', blank=True, null=True)
+    rating6 = meta.PositiveSmallIntegerField('rating #6', blank=True, null=True)
+    rating7 = meta.PositiveSmallIntegerField('rating #7', blank=True, null=True)
+    rating8 = meta.PositiveSmallIntegerField('rating #8', blank=True, null=True)
+    # This field designates whether to use this row's ratings in aggregate
+    # functions (summaries). We need this because people are allowed to post
+    # multiple reviews on the same thing, but the system will only use the
+    # latest one (with valid_rating=True) in tallying the reviews.
+    valid_rating = meta.BooleanField('is valid rating')
+    submit_date = meta.DateTimeField('date/time submitted', auto_now_add=True)
+    is_public = meta.BooleanField()
+    ip_address = meta.IPAddressField('IP address', blank=True, null=True)
+    is_removed = meta.BooleanField(help_text='Check this box if the comment is inappropriate. A "This comment has been removed" message will be displayed instead.')
+    site = meta.ForeignKey(core.Site)
+    class META:
+        db_table = 'comments'
+        module_constants = {
+            # min. and max. allowed dimensions for photo resizing (in pixels)
+            'MIN_PHOTO_DIMENSION': 5,
+            'MAX_PHOTO_DIMENSION': 1000,
 
-        # option codes for comment-form hidden fields
-        'PHOTOS_REQUIRED': 'pr',
-        'PHOTOS_OPTIONAL': 'pa',
-        'RATINGS_REQUIRED': 'rr',
-        'RATINGS_OPTIONAL': 'ra',
-        'IS_PUBLIC': 'ip',
-    }
-    ordering = ('-submit_date',)
-    admin = meta.Admin(
-        fields = (
-            (None, {'fields': ('content_type_id', 'object_id', 'site_id')}),
-            ('Content', {'fields': ('user_id', 'headline', 'comment')}),
-            ('Ratings', {'fields': ('rating1', 'rating2', 'rating3', 'rating4', 'rating5', 'rating6', 'rating7', 'rating8', 'valid_rating')}),
-            ('Meta', {'fields': ('is_public', 'is_removed', 'ip_address')}),
-        ),
-        list_display = ('user_id', 'submit_date', 'content_type_id', 'get_content_object'),
-        list_filter = ('submit_date',),
-        date_hierarchy = 'submit_date',
-        search_fields = ('comment', 'user__username'),
-    )
+            # option codes for comment-form hidden fields
+            'PHOTOS_REQUIRED': 'pr',
+            'PHOTOS_OPTIONAL': 'pa',
+            'RATINGS_REQUIRED': 'rr',
+            'RATINGS_OPTIONAL': 'ra',
+            'IS_PUBLIC': 'ip',
+        }
+        ordering = ('-submit_date',)
+        admin = meta.Admin(
+            fields = (
+                (None, {'fields': ('content_type', 'object_id', 'site')}),
+                ('Content', {'fields': ('user', 'headline', 'comment')}),
+                ('Ratings', {'fields': ('rating1', 'rating2', 'rating3', 'rating4', 'rating5', 'rating6', 'rating7', 'rating8', 'valid_rating')}),
+                ('Meta', {'fields': ('is_public', 'is_removed', 'ip_address')}),
+            ),
+            list_display = ('user', 'submit_date', 'content_type', 'get_content_object'),
+            list_filter = ('submit_date',),
+            date_hierarchy = 'submit_date',
+            search_fields = ('comment', 'user__username'),
+        )
 
     def __repr__(self):
         return "%s: %s..." % (self.get_user().username, self.comment[:100])
@@ -156,32 +153,31 @@ class Comment(meta.Model):
         return False
 
 class FreeComment(meta.Model):
-    "A FreeComment is a comment by a non-registered user"
-    db_table = 'comments_free'
-    fields = (
-        meta.ForeignKey(core.ContentType, name='content_type_id', rel_name='content_type'),
-        meta.IntegerField('object_id', 'object ID'),
-        meta.TextField('comment', 'comment', maxlength=3000),
-        meta.CharField('person_name', "person's name", maxlength=50),
-        meta.DateTimeField('submit_date', 'date/time submitted', auto_now_add=True),
-        meta.BooleanField('is_public', 'is public'),
-        meta.IPAddressField('ip_address', 'IP address'),
-        # TODO: Change this to is_removed, like Comment
-        meta.BooleanField('approved', 'approved by staff'),
-        meta.ForeignKey(core.Site),
-    )
-    ordering = ('-submit_date',)
-    admin = meta.Admin(
-        fields = (
-            (None, {'fields': ('content_type_id', 'object_id', 'site_id')}),
-            ('Content', {'fields': ('person_name', 'comment')}),
-            ('Meta', {'fields': ('submit_date', 'is_public', 'ip_address', 'approved')}),
-        ),
-        list_display = ('person_name', 'submit_date', 'content_type_id', 'get_content_object'),
-        list_filter = ('submit_date',),
-        date_hierarchy = 'submit_date',
-        search_fields = ('comment', 'person_name'),
-    )
+    # A FreeComment is a comment by a non-registered user.
+    content_type = meta.ForeignKey(core.ContentType)
+    object_id = meta.IntegerField('object ID')
+    comment = meta.TextField(maxlength=3000)
+    person_name = meta.CharField("person's name", maxlength=50)
+    submit_date = meta.DateTimeField('date/time submitted', auto_now_add=True)
+    is_public = meta.BooleanField()
+    ip_address = meta.IPAddressField()
+    # TODO: Change this to is_removed, like Comment
+    approved = meta.BooleanField('approved by staff')
+    site = meta.ForeignKey(core.Site)
+    class META:
+        db_table = 'comments_free'
+        ordering = ('-submit_date',)
+        admin = meta.Admin(
+            fields = (
+                (None, {'fields': ('content_type', 'object_id', 'site')}),
+                ('Content', {'fields': ('person_name', 'comment')}),
+                ('Meta', {'fields': ('submit_date', 'is_public', 'ip_address', 'approved')}),
+            ),
+            list_display = ('person_name', 'submit_date', 'content_type', 'get_content_object'),
+            list_filter = ('submit_date',),
+            date_hierarchy = 'submit_date',
+            search_fields = ('comment', 'person_name'),
+        )
 
     def __repr__(self):
         return "%s: %s..." % (self.person_name, self.comment[:100])
@@ -203,26 +199,25 @@ class FreeComment(meta.Model):
     get_content_object.short_description = 'Content object'
 
 class KarmaScore(meta.Model):
-    module_name = 'karma'
-    fields = (
-        meta.ForeignKey(auth.User),
-        meta.ForeignKey(Comment),
-        meta.SmallIntegerField('score', 'score', db_index=True),
-        meta.DateTimeField('scored_date', 'date scored', auto_now=True),
-    )
-    unique_together = (('user_id', 'comment_id'),)
-    module_constants = {
-        # what users get if they don't have any karma
-        'DEFAULT_KARMA': 5,
-        'KARMA_NEEDED_BEFORE_DISPLAYED': 3,
-    }
+    user = meta.ForeignKey(auth.User)
+    comment = meta.ForeignKey(Comment)
+    score = meta.SmallIntegerField(db_index=True)
+    scored_date = meta.DateTimeField(auto_now=True)
+    class META:
+        module_name = 'karma'
+        unique_together = (('user', 'comment'),)
+        module_constants = {
+            # what users get if they don't have any karma
+            'DEFAULT_KARMA': 5,
+            'KARMA_NEEDED_BEFORE_DISPLAYED': 3,
+        }
 
     def __repr__(self):
         return "%d rating by %s" % (self.score, self.get_user())
 
     def _module_vote(user_id, comment_id, score):
         try:
-            karma = get_object(comment_id__exact=comment_id, user_id__exact=user_id)
+            karma = get_object(comment__id__exact=comment_id, user__id__exact=user_id)
         except KarmaScoreDoesNotExist:
             karma = KarmaScore(None, user_id, comment_id, score, datetime.datetime.now())
             karma.save()
@@ -241,13 +236,12 @@ class KarmaScore(meta.Model):
         return int(round((4.5 * score) + 5.5))
 
 class UserFlag(meta.Model):
-    db_table = 'comments_user_flags'
-    fields = (
-        meta.ForeignKey(auth.User),
-        meta.ForeignKey(Comment),
-        meta.DateTimeField('flag_date', 'date flagged', auto_now_add=True),
-    )
-    unique_together = (('user_id', 'comment_id'),)
+    user = meta.ForeignKey(auth.User)
+    comment = meta.ForeignKey(Comment)
+    flag_date = meta.DateTimeField(auto_now_add=True)
+    class META:
+        db_table = 'comments_user_flags'
+        unique_together = (('user', 'comment'),)
 
     def __repr__(self):
         return "Flag by %r" % self.get_user()
@@ -261,7 +255,7 @@ class UserFlag(meta.Model):
         if int(comment.user_id) == int(user.id):
             return # A user can't flag his own comment. Fail silently.
         try:
-            f = get_object(user_id__exact=user.id, comment_id__exact=comment.id)
+            f = get_object(user__id__exact=user.id, comment__id__exact=comment.id)
         except UserFlagDoesNotExist:
             from django.core.mail import mail_managers
             f = UserFlag(None, user.id, comment.id, None)
@@ -270,13 +264,12 @@ class UserFlag(meta.Model):
             f.save()
 
 class ModeratorDeletion(meta.Model):
-    db_table = 'comments_moderator_deletions'
-    fields = (
-        meta.ForeignKey(auth.User, verbose_name='moderator'),
-        meta.ForeignKey(Comment),
-        meta.DateTimeField('deletion_date', 'date deleted', auto_now_add=True),
-    )
-    unique_together = (('user_id', 'comment_id'),)
+    user = meta.ForeignKey(auth.User, verbose_name='moderator')
+    comment = meta.ForeignKey(Comment)
+    deletion_date = meta.DateTimeField(auto_now_add=True)
+    class META:
+        db_table = 'comments_moderator_deletions'
+        unique_together = (('user', 'comment'),)
 
     def __repr__(self):
         return "Moderator deletion by %r" % self.get_user()
