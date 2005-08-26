@@ -947,3 +947,79 @@ method that begins with "validate"::
 
             if int(field_data) in BAD_CUSTOMER_IDS:
                 raise validators.ValidationError, "We don't deliver to this customer."
+
+Using models
+============
+
+Once you've defined a model, you'll need to "enable" it in Django. This section
+explains how Django searches for available models.
+
+Save your models in a normal Python module. Put this module within a package
+called "models", which should itself be a subpackage of some other package on
+your Python path. The ``__init__.py`` in your ``models`` package should contain
+an ``__all__`` variable that is set to a list of all model module names within
+the ``models`` directory.
+
+If this sounds confusing, just use ``django-admin.py startapp`` -- it'll create
+the proper directory structure and ``__init__.py`` files. (See the
+`django-admin.py documentation`_.)
+
+For example, if you save your models in a module called ``mymodels.py``, here's
+a directory layout you might use::
+
+    myapp/
+        __init__.py          # Empty file
+        models/
+            __init__.py      # Contains "__all__ = ['mymodels']"
+            mymodels.py      # Contains your models
+
+Then, you'll have to tell Django that the ``myapp`` application is installed.
+Do this by editing your settings file and adding ``"myapp"`` to the
+``INSTALLED_APPS`` tuple.
+
+Again, if this sounds confusing, use ``django-admin.py startapp`` to take care
+of package creation for you. This documentation exists only to explain how
+Django works.
+
+Once you've added your app to ``INSTALLED_APPS``, you can open a Python
+interactive interpreter and play with your model::
+
+    >>> from django.models.mymodels import pizzas
+    >>> pizzas.get_list()
+
+Note that the import is from ``django.models``, not ``myapp.models``. Django
+creates a "magic" module within ``django.models`` for every installed
+application. Each of those magic modules has a dynamic API. See the
+`database API reference`_ for full information on how to use this API.
+
+.. admonition:: Why is the INSTALLED_APPS setting necessary?
+
+   Model relationships work both ways, and the dynamically-generated Django API
+   creates API lookups in both directions. Thus, for Django to figure out all
+   the other models related to a particular model, it has to know the complete
+   spectrum of installed apps.
+
+.. _django-admin.py documentation`_: http://www.djangoproject.com/documentation/django_admin/
+.. _database API reference`_: http://www.djangoproject.com/documentation/db_api/
+
+Models across files
+===================
+
+It's perfectly OK to relate a model to one from another module. To do this,
+just import the model module at the top of your model module, like so::
+
+    from django.models import core
+
+Then, just refer to the other model class wherever needed. For example::
+
+    class MyModel(meta.Model):
+        # ...
+        sites = meta.ManyToManyField(core.Site)
+
+Models in multiple files
+========================
+
+If you want to have multiple model modules in a ``"models"`` directory, make
+sure you edit ``"models/__init__.py"`` and add the name of your model module
+to the ``__all__`` variable. If your ``models`` package doesn't have your model
+module in ``__all__``, Django won't see any of the models in that module.
