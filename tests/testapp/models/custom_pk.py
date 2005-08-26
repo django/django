@@ -3,9 +3,6 @@
 
 By default, Django adds an ``"id"`` field to each model. But you can override
 this behavior by explicitly adding ``primary_key=True`` to a field.
-
-NOTE: This isn't yet supported. This model exists as a unit test that currently
-fails.
 """
 
 from django.core import meta
