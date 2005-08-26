@@ -396,7 +396,7 @@ be the name of the model, singular. Behind the scenes, Django appends "_id" to
 the field name to create its database column name. But your code should never
 have to deal with the database column name, unless you write custom SQL.
 
-See the ``Many-to-one relationship model example_ for a full example.
+See the `Many-to-one relationship model example`_ for a full example.
 
 .. _Many-to-one relationship model example: http://www.djangoproject.com/documentation/models/many_to_one/
 
@@ -537,7 +537,7 @@ more natural to think about a ``Pizza`` having toppings than a topping being on
 multiple pizzas. The way it's set up above, the ``Pizza`` admin form would let
 users select the toppings.
 
-See the ``Many-to-many relationship model example_ for a full example.
+See the `Many-to-many relationship model example`_ for a full example.
 
 .. _Many-to-many relationship model example: http://www.djangoproject.com/documentation/models/many_to_many/
 
@@ -592,7 +592,7 @@ differences in the admin interface:
       ``Restaurant`` to a ``Place`` just means filling out the required
       ``Restaurant`` fields.
 
-See the ``One-to-one relationship model example_ for a full example.
+See the `One-to-one relationship model example`_ for a full example.
 
 .. _One-to-one relationship model example: http://www.djangoproject.com/documentation/models/one_to_one/
 
@@ -892,7 +892,7 @@ A few object methods have special meaning:
     example, you can use it to calculate aggregate values from other fields
     before the object is saved.
 
-    See ``Adding hooks before/after saving and deleting_ for a full example.
+    See `Adding hooks before/after saving and deleting`_ for a full example.
 
     .. _Adding hooks before/after saving and deleting: http://www.djangoproject.com/documentation/models/save_delete_hooks/
 
