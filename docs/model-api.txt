@@ -871,7 +871,7 @@ A few object methods have special meaning:
 
     See `Adding repr`_ for a full example.
 
-    .. _Adding repr_: http://www.djangoproject.com/documentation/models/repr/
+    .. _Adding repr: http://www.djangoproject.com/documentation/models/repr/
 
 ``get_absolute_url``
     Define a ``get_absolute_url`` method to tell Django how to calculate the
