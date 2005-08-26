@@ -44,7 +44,7 @@ Example::
 For ``ForeignKey``, ``ManyToManyField`` and ``OneToOneField``, use the
 ``verbose_name`` keyword argument::
 
-    poll = meta.ForeignKey(Poll, "the related poll")
+    poll = meta.ForeignKey(Poll, verbose_name="the related poll")
     sites = meta.ManyToManyField(Site, verbose_name="list of sites")
     place = meta.OneToOneField(Place, verbose_name="related place")
 
@@ -962,7 +962,7 @@ the ``models`` directory.
 
 If this sounds confusing, just use ``django-admin.py startapp`` -- it'll create
 the proper directory structure and ``__init__.py`` files. (See the
-`django-admin.py documentation`_.)
+`django-admin.py documentation`_ .)
 
 For example, if you save your models in a module called ``mymodels.py``, here's
 a directory layout you might use::
