@@ -391,7 +391,7 @@ how you'd represent that::
 To create a recursive relationship -- an object that has a many-to-one
 relationship with itself -- use ``meta.ForeignKey("self")``.
 
-The name of a ``ForeignKey`` (``pizza`` in the example above) generally should
+The name of a ``ForeignKey`` (``city`` in the example above) generally should
 be the name of the model, singular. Behind the scenes, Django appends "_id" to
 the field name to create its database column name. But your code should never
 have to deal with the database column name, unless you write custom SQL.
