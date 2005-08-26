@@ -455,30 +455,33 @@ def inspectdb(db_name):
     yield ''
     for table_name in db.get_table_list(cursor):
         yield 'class %s(meta.Model):' % table2model(table_name)
-        yield '    db_table = %r' % table_name
-        yield '    fields = ('
         try:
             relations = db.get_relations(cursor, table_name)
         except NotImplementedError:
             relations = {}
         cursor.execute("SELECT * FROM %s LIMIT 1" % table_name)
         for i, row in enumerate(cursor.description):
+            column_name = row[0]
             if relations.has_key(i):
                 rel = relations[i]
                 rel_to = rel[1] == table_name and "'self'" or table2model(rel[1])
-                field_desc = 'meta.ForeignKey(%s, name=%r' % (rel_to, row[0])
+                if column_name.endswith('_id'):
+                    field_desc = '%s = meta.ForeignKey(%s' % (column_name[:-3], rel_to)
+                else:
+                    field_desc = '%s = meta.ForeignKey(%s, db_column=%r' % (column_name, rel_to, column_name)
             else:
                 try:
                     field_type = db.DATA_TYPES_REVERSE[row[1]]
                 except KeyError:
                     field_type = 'TextField'
-                    yield "        # The model-creator script used TextField by default, because"
-                    yield "        # it couldn't recognize your field type."
-                field_desc = 'meta.%s(%r' % (field_type, row[0])
+                    yield "    # The model-creator script used TextField by default, because"
+                    yield "    # it couldn't recognize your field type."
+                field_desc = '%s = meta.%s(' % (column_name, field_type)
                 if field_type == 'CharField':
-                    field_desc += ', maxlength=%s' % (row[3])
-            yield '        %s),' % field_desc
-        yield '    )'
+                    field_desc += 'maxlength=%s' % (row[3])
+            yield '    %s)' % field_desc
+        yield '    class META:'
+        yield '        db_table = %r' % table_name
         yield ''
 inspectdb.help_doc = "Introspects the database tables in the given database and outputs a Django model module."
 inspectdb.args = "[dbname]"
