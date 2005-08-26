@@ -637,7 +637,7 @@ object, which has the following options. All are optional.
     (This example also has ``search_fields`` defined; see below).
 
 ``ordering``
-    A list or tuple (see the `Options for models`_, above) that gives a
+    A list or tuple (see the `META options`_, above) that gives a
     different ordering for the admin change list. If this isn't given, the
     model's default ordering will be used.
 
