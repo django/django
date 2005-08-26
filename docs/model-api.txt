@@ -869,9 +869,9 @@ A few object methods have special meaning:
 
     Although defining ``__repr__()`` isn't required, it's strongly encouraged.
 
-    See `Adding __repr__()`_ for a full example.
+    See `Adding repr`_ for a full example.
 
-    .. _Adding __repr__()_: http://www.djangoproject.com/documentation/models/repr/
+    .. _Adding repr_: http://www.djangoproject.com/documentation/models/repr/
 
 ``get_absolute_url``
     Define a ``get_absolute_url`` method to tell Django how to calculate the
