@@ -999,8 +999,8 @@ application. Each of those magic modules has a dynamic API. See the
    the other models related to a particular model, it has to know the complete
    spectrum of installed apps.
 
-.. _django-admin.py documentation`_: http://www.djangoproject.com/documentation/django_admin/
-.. _database API reference`_: http://www.djangoproject.com/documentation/db_api/
+.. _`django-admin.py documentation`_: http://www.djangoproject.com/documentation/django_admin/
+.. _`database API reference`_: http://www.djangoproject.com/documentation/db_api/
 
 Models across files
 ===================
