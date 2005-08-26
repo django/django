@@ -196,11 +196,10 @@ def change_list(request, app_label, module_name):
             # Many-to-many or many-to-one filter.
             if f.rel:
                 if isinstance(f, meta.ManyToManyField):
-                    lookup_kwarg = '%s__id__exact' % f.name
                     lookup_title = f.rel.to.verbose_name
                 else:
-                    lookup_kwarg = '%s__exact' % f.name
                     lookup_title = f.verbose_name
+                lookup_kwarg = '%s__id__exact' % f.name
                 lookup_val = request.GET.get(lookup_kwarg, None)
                 lookup_choices = f.rel.to.get_model_module().get_list()
                 if len(lookup_choices) > 1:
