@@ -126,18 +126,21 @@ class IfChangedNode(template.Node):
         else:
             return ''
 
-class IfNotEqualNode(template.Node):
-    def __init__(self, var1, var2, nodelist):
-        self.var1, self.var2, self.nodelist = var1, var2, nodelist
+class IfEqualNode(template.Node):
+    def __init__(self, var1, var2, nodelist_true, nodelist_false, negate):
+        self.var1, self.var2 = var1, var2
+        self.nodelist_true, self.nodelist_false = nodelist_true, nodelist_false
+        self.negate = negate
 
     def __repr__(self):
-        return "<IfNotEqualNode>"
+        return "<IfEqualNode>"
 
     def render(self, context):
-        if template.resolve_variable(self.var1, context) != template.resolve_variable(self.var2, context):
-            return self.nodelist.render(context)
-        else:
-            return ''
+        val1 = template.resolve_variable(self.var1, context)
+        val2 = template.resolve_variable(self.var2, context)
+        if (self.negate and val1 != val2) or (not self.negate and val1 == val2):
+            return self.nodelist_true.render(context)
+        return self.nodelist_false.render(context)
 
 class IfNode(template.Node):
     def __init__(self, boolvars, nodelist_true, nodelist_false):
@@ -449,22 +452,34 @@ def do_for(parser, token):
     parser.delete_first_token()
     return ForNode(loopvar, sequence, reversed, nodelist_loop)
 
-def do_ifnotequal(parser, token):
+def do_ifequal(parser, token, negate):
     """
-    Output the contents of the block if the two arguments do not equal each other.
+    Output the contents of the block if the two arguments equal/don't equal each other.
 
-    Example::
+    Examples::
+
+        {% ifequal user.id comment.user_id %}
+            ...
+        {% endifequal %}
 
         {% ifnotequal user.id comment.user_id %}
+            ...
+        {% else %}
             ...
         {% endifnotequal %}
     """
     bits = token.contents.split()
     if len(bits) != 3:
-        raise template.TemplateSyntaxError, "'ifnotequal' takes two arguments"
-    nodelist = parser.parse(('endifnotequal',))
-    parser.delete_first_token()
-    return IfNotEqualNode(bits[1], bits[2], nodelist)
+        raise template.TemplateSyntaxError, "%r takes two arguments" % bits[0]
+    end_tag = 'end' + bits[0]
+    nodelist_true = parser.parse(('else', end_tag))
+    token = parser.next_token()
+    if token.contents == 'else':
+        nodelist_false = parser.parse((end_tag,))
+        parser.delete_first_token()
+    else:
+        nodelist_false = template.NodeList()
+    return IfEqualNode(bits[1], bits[2], nodelist_true, nodelist_false, negate)
 
 def do_if(parser, token):
     """
@@ -736,7 +751,8 @@ template.register_tag('debug', do_debug)
 template.register_tag('filter', do_filter)
 template.register_tag('firstof', do_firstof)
 template.register_tag('for', do_for)
-template.register_tag('ifnotequal', do_ifnotequal)
+template.register_tag('ifequal', lambda parser, token: do_ifequal(parser, token, False))
+template.register_tag('ifnotequal', lambda parser, token: do_ifequal(parser, token, True))
 template.register_tag('if', do_if)
 template.register_tag('ifchanged', do_ifchanged)
 template.register_tag('regroup', do_regroup)

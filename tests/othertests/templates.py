@@ -4,95 +4,120 @@ from django.core import template, template_loader
 class SomeClass:
     def __init__(self):
         self.otherclass = OtherClass()
-        
+
     def method(self):
         return "SomeClass.method"
-        
+
     def method2(self, o):
         return o
 
 class OtherClass:
     def method(self):
         return "OtherClass.method"
-        
+
 # SYNTAX --
 # 'template_name': ('template contents', 'context dict', 'expected string output' or Exception class)
 TEMPLATE_TESTS = {
 
     ### BASIC SYNTAX ##########################################################
-    
+
     # Plain text should go through the template parser untouched
     'basic-syntax01': ("something cool", {}, "something cool"),
-    
+
     # Variables should be replaced with their value in the current context
     'basic-syntax02': ("{{ headline }}", {'headline':'Success'}, "Success"),
 
     # More than one replacement variable is allowed in a template
     'basic-syntax03': ("{{ first }} --- {{ second }}", {"first" : 1, "second" : 2}, "1 --- 2"),
-    
+
     # Fail silently when a variable is not found in the current context
     'basic-syntax04': ("as{{ missing }}df", {}, "asdf"),
-    
+
     # A variable may not contain more than one word
     'basic-syntax06': ("{{ multi word variable }}", {}, template.TemplateSyntaxError),
-    
+
     # Raise TemplateSyntaxError for empty variable tags
     'basic-syntax07': ("{{ }}",        {}, template.TemplateSyntaxError),
     'basic-syntax08': ("{{        }}", {}, template.TemplateSyntaxError),
-    
+
     # Attribute syntax allows a template to call an object's attribute
     'basic-syntax09': ("{{ var.method }}", {"var": SomeClass()}, "SomeClass.method"),
-    
+
     # Multiple levels of attribute access are allowed
     'basic-syntax10': ("{{ var.otherclass.method }}", {"var": SomeClass()}, "OtherClass.method"),
-    
+
     # Fail silently when a variable's attribute isn't found
     'basic-syntax11': ("{{ var.blech }}", {"var": SomeClass()}, ""),
-    
+
     # Raise TemplateSyntaxError when trying to access a variable beginning with an underscore
     'basic-syntax12': ("{{ var.__dict__ }}", {"var": SomeClass()}, template.TemplateSyntaxError),
-    
+
     # Raise TemplateSyntaxError when trying to access a variable containing an illegal character
     'basic-syntax13': ("{{ va>r }}", {}, template.TemplateSyntaxError),
     'basic-syntax14': ("{{ (var.r) }}", {}, template.TemplateSyntaxError),
     'basic-syntax15': ("{{ sp%am }}", {}, template.TemplateSyntaxError),
     'basic-syntax16': ("{{ eggs! }}", {}, template.TemplateSyntaxError),
     'basic-syntax17': ("{{ moo? }}", {}, template.TemplateSyntaxError),
-    
+
     # Attribute syntax allows a template to call a dictionary key's value
     'basic-syntax18': ("{{ foo.bar }}", {"foo" : {"bar" : "baz"}}, "baz"),
-    
+
     # Fail silently when a variable's dictionary key isn't found
     'basic-syntax19': ("{{ foo.spam }}", {"foo" : {"bar" : "baz"}}, ""),
-    
+
     # Fail silently when accessing a non-simple method
     'basic-syntax20': ("{{ var.method2 }}", {"var": SomeClass()}, ""),
-        
+
     # Basic filter usage
     'basic-syntax21': ("{{ var|upper }}", {"var": "Django is the greatest!"}, "DJANGO IS THE GREATEST!"),
-    
+
     # Chained filters
     'basic-syntax22': ("{{ var|upper|lower }}", {"var": "Django is the greatest!"}, "django is the greatest!"),
-    
+
     # Raise TemplateSyntaxError for space between a variable and filter pipe
     'basic-syntax23': ("{{ var |upper }}", {}, template.TemplateSyntaxError),
-    
+
     # Raise TemplateSyntaxError for space after a filter pipe
     'basic-syntax24': ("{{ var| upper }}", {}, template.TemplateSyntaxError),
-    
+
     # Raise TemplateSyntaxError for a nonexistent filter
     'basic-syntax25': ("{{ var|does_not_exist }}", {}, template.TemplateSyntaxError),
-    
+
     # Raise TemplateSyntaxError when trying to access a filter containing an illegal character
     'basic-syntax26': ("{{ var|fil(ter) }}", {}, template.TemplateSyntaxError),
-    
+
     # Raise TemplateSyntaxError for invalid block tags
     'basic-syntax27': ("{% nothing_to_see_here %}", {}, template.TemplateSyntaxError),
-    
+
     # Raise TemplateSyntaxError for empty block tags
     'basic-syntax28': ("{% %}", {}, template.TemplateSyntaxError),
-    
-    ### INHERITANCE TESTS #####################################################
+
+    ### IF TAG ################################################################
+    'if-tag01': ("{% if foo %}yes{% else %}no{% endif %}", {"foo": True}, "yes"),
+    'if-tag02': ("{% if foo %}yes{% else %}no{% endif %}", {"foo": False}, "no"),
+    'if-tag03': ("{% if foo %}yes{% else %}no{% endif %}", {}, "no"),
+
+    ### COMMENT TAG ###########################################################
+    'comment-tag01': ("{% comment %}this is hidden{% endcomment %}hello", {}, "hello"),
+    'comment-tag02': ("{% comment %}this is hidden{% endcomment %}hello{% comment %}foo{% endcomment %}", {}, "hello"),
+
+    ### FOR TAG ###############################################################
+    'for-tag01': ("{% for val in values %}{{ val }}{% endfor %}", {"values": [1, 2, 3]}, "123"),
+    'for-tag02': ("{% for val in values reversed %}{{ val }}{% endfor %}", {"values": [1, 2, 3]}, "321"),
+
+    ### IFEQUAL TAG ###########################################################
+    'ifequal01': ("{% ifequal a b %}yes{% endifequal %}", {"a": 1, "b": 2}, ""),
+    'ifequal02': ("{% ifequal a b %}yes{% endifequal %}", {"a": 1, "b": 1}, "yes"),
+    'ifequal03': ("{% ifequal a b %}yes{% else %}no{% endifequal %}", {"a": 1, "b": 2}, "no"),
+    'ifequal04': ("{% ifequal a b %}yes{% else %}no{% endifequal %}", {"a": 1, "b": 1}, "yes"),
+
+    ### IFNOTEQUAL TAG ########################################################
+    'ifnotequal01': ("{% ifnotequal a b %}yes{% endifnotequal %}", {"a": 1, "b": 2}, "yes"),
+    'ifnotequal02': ("{% ifnotequal a b %}yes{% endifnotequal %}", {"a": 1, "b": 1}, ""),
+    'ifnotequal03': ("{% ifnotequal a b %}yes{% else %}no{% endifnotequal %}", {"a": 1, "b": 2}, "yes"),
+    'ifnotequal04': ("{% ifnotequal a b %}yes{% else %}no{% endifnotequal %}", {"a": 1, "b": 1}, "no"),
+
+    ### INHERITANCE ###########################################################
 
     # Standard template with no inheritance
     'inheritance01': ("1{% block first %}_{% endblock %}3{% block second %}_{% endblock %}", {}, '1_3_'),
@@ -151,7 +176,7 @@ TEMPLATE_TESTS = {
     # {% load %} tag (within a child template)
     'inheritance19': ("{% extends 'inheritance01' %}{% block first %}{% load testtags %}{% echo 400 %}5678{% endblock %}", {}, '140056783_'),
 
-    ### EXCEPTION TESTS #######################################################
+    ### EXCEPTIONS ############################################################
 
     # Raise exception for invalid template name
     'exception01': ("{% extends 'nonexistent' %}", {}, template.TemplateSyntaxError),
@@ -198,12 +223,12 @@ def run_tests(verbosity=0, standalone=False):
                 print "Template test: %s -- FAILED. Expected %r, got %r" % (name, vals[2], output)
             failed_tests.append(name)
     template_loader.load_template_source = old_template_loader
-    
+
     if failed_tests and not standalone:
         msg = "Template tests %s failed." % failed_tests
         if not verbosity:
             msg += "  Re-run tests with -v1 to see actual failures"
         raise Exception, msg
-    
+
 if __name__ == "__main__":
     run_tests(1, True)
