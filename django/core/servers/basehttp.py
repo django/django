@@ -623,7 +623,7 @@ class AdminMediaHandler:
             output = ['Page not found: %s' % file_path]
         else:
             try:
-                fp = open(file_path, 'r')
+                fp = open(file_path, 'rb')
             except IOError:
                 status = '401 UNAUTHORIZED'
                 headers = {'Content-type': 'text/plain'}
