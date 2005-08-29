@@ -440,6 +440,17 @@ Built-in tag reference
         <a href="{{ date|date:"M/d"|lower }}/">{{ date|date:"j" }}</a>
         {% endfor %}
 
+``ifequal``
+    Output the contents of the block if the two arguments equal each other.
+
+    Example::
+
+        {% ifequal user.id_ comment.user_id %}
+            ...
+        {% endifequal %}
+
+    As in the {% if %} tag, an {% else %} clause is optional.
+
 ``ifnotequal``
     Output the contents of the block if the two arguments do not equal each other.
 
@@ -448,6 +459,8 @@ Built-in tag reference
         {% ifnotequal user.id_ comment.user_id %}
             ...
         {% endifnotequal %}
+
+    As in the {% if %} tag, an {% else %} clause is optional.
 
 ``load``
     Load a custom template tag set.
