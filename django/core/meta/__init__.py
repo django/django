@@ -849,7 +849,7 @@ def method_get_next_in_order(opts, order_field, self):
         self._next_in_order_cache = opts.get_model_module().get_object(order_by=('_order',),
             where=['_order > (SELECT _order FROM %s WHERE %s=%%s)' % (opts.db_table, opts.pk.column),
                 '%s=%%s' % order_field.column], limit=1,
-            params=[getattr(self, opts.pk.column), getattr(self, order_field.name)])
+            params=[getattr(self, opts.pk.column), getattr(self, order_field.column)])
     return self._next_in_order_cache
 
 def method_get_previous_in_order(opts, order_field, self):
@@ -857,7 +857,7 @@ def method_get_previous_in_order(opts, order_field, self):
         self._previous_in_order_cache = opts.get_model_module().get_object(order_by=('-_order',),
             where=['_order < (SELECT _order FROM %s WHERE %s=%%s)' % (opts.db_table, opts.pk.column),
                 '%s=%%s' % order_field.column], limit=1,
-            params=[getattr(self, opts.pk.column), getattr(self, order_field.name)])
+            params=[getattr(self, opts.pk.column), getattr(self, order_field.column)])
     return self._previous_in_order_cache
 
 # RELATIONSHIP METHODS #####################
