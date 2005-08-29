@@ -1613,7 +1613,11 @@ def manipulator_validator_unique_for_date(from_field, date_field, opts, lookup_t
     date_val = formfields.DateField.html2python(date_str)
     if date_val is None:
         return # Date was invalid. This will be caught by another validator.
-    lookup_kwargs = {'%s__iexact' % from_field.name: field_data, '%s__year' % date_field.name: date_val.year}
+    lookup_kwargs = {'%s__year' % date_field.name: date_val.year}
+    if isinstance(from_field.rel, ManyToOne):
+        lookup_kwargs['%s__pk' % from_field.name] = field_data
+    else:
+        lookup_kwargs['%s__iexact' % from_field.name] = field_data
     if lookup_type in ('month', 'date'):
         lookup_kwargs['%s__month' % date_field.name] = date_val.month
     if lookup_type == 'date':
