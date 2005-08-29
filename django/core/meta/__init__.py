@@ -1456,7 +1456,7 @@ def manipulator_save(opts, klass, add, change, self, new_data):
             params[f.column] = f.get_manipulator_new_data(new_data)
 
     if change:
-        params[opts.pk.name] = self.obj_key
+        params[opts.pk.column] = self.obj_key
 
     # First, save the basic object itself.
     new_object = klass(**params)

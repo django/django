@@ -876,7 +876,7 @@ def change_stage(request, app_label, module_name, object_id):
                     new_data.setlist(f.name, new_data[f.name].split(","))
             manipulator.do_html2python(new_data)
             new_object = manipulator.save(new_data)
-            pk_value = getattr(new_object, opts.pk.name)
+            pk_value = getattr(new_object, opts.pk.column)
 
             # Construct the change message.
             change_message = []
