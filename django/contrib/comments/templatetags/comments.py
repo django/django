@@ -128,11 +128,12 @@ class CommentCountNode(template.Node):
         return ''
 
 class CommentListNode(template.Node):
-    def __init__(self, package, module, context_var_name, obj_id, var_name, free, ordering):
+    def __init__(self, package, module, context_var_name, obj_id, var_name, free, ordering, extra_kwargs=None):
         self.package, self.module = package, module
         self.context_var_name, self.obj_id = context_var_name, obj_id
         self.var_name, self.free = var_name, free
         self.ordering = ordering
+        self.extra_kwargs = extra_kwargs or {}
 
     def render(self, context):
         from django.conf.settings import COMMENTS_BANNED_USERS_GROUP, SITE_ID
@@ -150,6 +151,7 @@ class CommentListNode(template.Node):
             'select_related': True,
             'order_by': (self.ordering + 'submit_date',),
         }
+        kwargs.update(self.extra_kwargs)
         if not self.free and COMMENTS_BANNED_USERS_GROUP:
             kwargs['select'] = {'is_hidden': 'user_id IN (SELECT user_id FROM auth_users_groups WHERE group_id = %s)' % COMMENTS_BANNED_USERS_GROUP}
         comment_list = get_list_function(**kwargs)
@@ -182,64 +184,64 @@ class DoCommentForm:
 
     ``[context_var_containing_obj_id]`` can be a hard-coded integer or a variable containing the ID.
     """
-    def __init__(self, free, tag_name):
-        self.free, self.tag_name = free, tag_name
+    def __init__(self, free):
+        self.free = free
 
     def __call__(self, parser, token):
         tokens = token.contents.split()
         if len(tokens) < 4:
-            raise template.TemplateSyntaxError, "'%s' tag requires at least 3 arguments" % self.tag_name
+            raise template.TemplateSyntaxError, "%r tag requires at least 3 arguments" % tokens[0]
         if tokens[1] != 'for':
-            raise template.TemplateSyntaxError, "Second argument in '%s' tag must be 'for'" % self.tag_name
+            raise template.TemplateSyntaxError, "Second argument in %r tag must be 'for'" % tokens[0]
         try:
             package, module = tokens[2].split('.')
         except ValueError: # unpack list of wrong size
-            raise template.TemplateSyntaxError, "Third argument in '%s' tag must be in the format 'package.module'" % self.tag_name
+            raise template.TemplateSyntaxError, "Third argument in %r tag must be in the format 'package.module'" % tokens[0]
         try:
             content_type = contenttypes.get_object(package__label__exact=package, python_module_name__exact=module)
         except contenttypes.ContentTypeDoesNotExist:
-            raise template.TemplateSyntaxError, "'%s' tag has invalid content-type '%s.%s'" % (self.tag_name, package, module)
+            raise template.TemplateSyntaxError, "%r tag has invalid content-type '%s.%s'" % (tokens[0], package, module)
         obj_id_lookup_var, obj_id = None, None
         if tokens[3].isdigit():
             obj_id = tokens[3]
             try: # ensure the object ID is valid
                 content_type.get_object_for_this_type(pk=obj_id)
             except ObjectDoesNotExist:
-                raise template.TemplateSyntaxError, "'%s' tag refers to %s object with ID %s, which doesn't exist" % (self.tag_name, content_type.name, obj_id)
+                raise template.TemplateSyntaxError, "%r tag refers to %s object with ID %s, which doesn't exist" % (tokens[0], content_type.name, obj_id)
         else:
             obj_id_lookup_var = tokens[3]
         kwargs = {}
         if len(tokens) > 4:
             if tokens[4] != 'with':
-                raise template.TemplateSyntaxError, "Fourth argument in '%s' tag must be 'with'" % self.tag_name
+                raise template.TemplateSyntaxError, "Fourth argument in %r tag must be 'with'" % tokens[0]
             for option, args in zip(tokens[5::2], tokens[6::2]):
                 if option in ('photos_optional', 'photos_required') and not self.free:
                     # VALIDATION ##############################################
                     option_list = args.split(',')
                     if len(option_list) % 3 != 0:
-                        raise template.TemplateSyntaxError, "Incorrect number of comma-separated arguments to '%s' tag" % self.tag_name
+                        raise template.TemplateSyntaxError, "Incorrect number of comma-separated arguments to %r tag" % tokens[0]
                     for opt in option_list[::3]:
                         if not opt.isalnum():
-                            raise template.TemplateSyntaxError, "Invalid photo directory name in '%s' tag: '%s'" % (self.tag_name, opt)
+                            raise template.TemplateSyntaxError, "Invalid photo directory name in %r tag: '%s'" % (tokens[0], opt)
                     for opt in option_list[1::3] + option_list[2::3]:
                         if not opt.isdigit() or not (comments.MIN_PHOTO_DIMENSION <= int(opt) <= comments.MAX_PHOTO_DIMENSION):
-                            raise template.TemplateSyntaxError, "Invalid photo dimension in '%s' tag: '%s'. Only values between %s and %s are allowed." % (self.tag_name, opt, comments.MIN_PHOTO_DIMENSION, comments.MAX_PHOTO_DIMENSION)
+                            raise template.TemplateSyntaxError, "Invalid photo dimension in %r tag: '%s'. Only values between %s and %s are allowed." % (tokens[0], opt, comments.MIN_PHOTO_DIMENSION, comments.MAX_PHOTO_DIMENSION)
                     # VALIDATION ENDS #########################################
                     kwargs[option] = True
                     kwargs['photo_options'] = args
                 elif option in ('ratings_optional', 'ratings_required') and not self.free:
                     # VALIDATION ##############################################
                     if 2 < len(args.split('|')) > 9:
-                        raise template.TemplateSyntaxError, "Incorrect number of '%s' options in '%s' tag. Use between 2 and 8." % (option, self.tag_name)
+                        raise template.TemplateSyntaxError, "Incorrect number of '%s' options in %r tag. Use between 2 and 8." % (option, tokens[0])
                     if re.match('^scale:\d+\-\d+\:$', args.split('|')[0]):
-                        raise template.TemplateSyntaxError, "Invalid 'scale' in '%s' tag's '%s' options" % (self.tag_name, option)
+                        raise template.TemplateSyntaxError, "Invalid 'scale' in %r tag's '%s' options" % (tokens[0], option)
                     # VALIDATION ENDS #########################################
                     kwargs[option] = True
                     kwargs['rating_options'] = args
                 elif option in ('is_public'):
                     kwargs[option] = (args == 'true')
                 else:
-                    raise template.TemplateSyntaxError, "'%s' tag got invalid parameter '%s'" % (self.tag_name, option)
+                    raise template.TemplateSyntaxError, "%r tag got invalid parameter '%s'" % (tokens[0], option)
         return CommentFormNode(content_type, obj_id_lookup_var, obj_id, self.free, **kwargs)
 
 class DoCommentCount:
@@ -260,36 +262,36 @@ class DoCommentCount:
 
         {% get_comment_count for lcom.eventtimes 23 as comment_count %}
     """
-    def __init__(self, free, tag_name):
-        self.free, self.tag_name = free, tag_name
+    def __init__(self, free):
+        self.free = free
 
     def __call__(self, parser, token):
         tokens = token.contents.split()
         # Now tokens is a list like this:
         # ['get_comment_list', 'for', 'lcom.eventtimes', 'event.id', 'as', 'comment_list']
         if len(tokens) != 6:
-            raise template.TemplateSyntaxError, "%s block tag requires 5 arguments" % self.tag_name
+            raise template.TemplateSyntaxError, "%r tag requires 5 arguments" % tokens[0]
         if tokens[1] != 'for':
-            raise template.TemplateSyntaxError, "Second argument in '%s' tag must be 'for'" % self.tag_name
+            raise template.TemplateSyntaxError, "Second argument in %r tag must be 'for'" % tokens[0]
         try:
             package, module = tokens[2].split('.')
         except ValueError: # unpack list of wrong size
-            raise template.TemplateSyntaxError, "Third argument in '%s' tag must be in the format 'package.module'" % self.tag_name
+            raise template.TemplateSyntaxError, "Third argument in %r tag must be in the format 'package.module'" % tokens[0]
         try:
             content_type = contenttypes.get_object(package__label__exact=package, python_module_name__exact=module)
         except contenttypes.ContentTypeDoesNotExist:
-            raise template.TemplateSyntaxError, "'%s' tag has invalid content-type '%s.%s'" % (self.tag_name, package, module)
+            raise template.TemplateSyntaxError, "%r tag has invalid content-type '%s.%s'" % (tokens[0], package, module)
         var_name, obj_id = None, None
         if tokens[3].isdigit():
             obj_id = tokens[3]
             try: # ensure the object ID is valid
                 content_type.get_object_for_this_type(pk=obj_id)
             except ObjectDoesNotExist:
-                raise template.TemplateSyntaxError, "'%s' tag refers to %s object with ID %s, which doesn't exist" % (self.tag_name, content_type.name, obj_id)
+                raise template.TemplateSyntaxError, "%r tag refers to %s object with ID %s, which doesn't exist" % (tokens[0], content_type.name, obj_id)
         else:
             var_name = tokens[3]
         if tokens[4] != 'as':
-            raise template.TemplateSyntaxError, "Fourth argument in '%s' must be 'as'" % self.tag_name
+            raise template.TemplateSyntaxError, "Fourth argument in %r must be 'as'" % tokens[0]
         return CommentCountNode(package, module, var_name, obj_id, tokens[5], self.free)
 
 class DoGetCommentList:
@@ -315,49 +317,49 @@ class DoGetCommentList:
 
         {% get_comment_list for lcom.eventtimes event.id as comment_list reversed %}
     """
-    def __init__(self, free, tag_name):
-        self.free, self.tag_name = free, tag_name
+    def __init__(self, free):
+        self.free = free
 
     def __call__(self, parser, token):
         tokens = token.contents.split()
         # Now tokens is a list like this:
         # ['get_comment_list', 'for', 'lcom.eventtimes', 'event.id', 'as', 'comment_list']
-        if not 6 <= len(tokens) <= 7:
-            raise template.TemplateSyntaxError, "%s block tag requires 5 or 6 arguments" % self.tag_name
+        if not len(tokens) in (6, 7):
+            raise template.TemplateSyntaxError, "%r tag requires 5 or 6 arguments" % tokens[0]
         if tokens[1] != 'for':
-            raise template.TemplateSyntaxError, "Second argument in '%s' tag must be 'for'" % self.tag_name
+            raise template.TemplateSyntaxError, "Second argument in %r tag must be 'for'" % tokens[0]
         try:
             package, module = tokens[2].split('.')
         except ValueError: # unpack list of wrong size
-            raise template.TemplateSyntaxError, "Third argument in '%s' tag must be in the format 'package.module'" % self.tag_name
+            raise template.TemplateSyntaxError, "Third argument in %r tag must be in the format 'package.module'" % tokens[0]
         try:
             content_type = contenttypes.get_object(package__label__exact=package, python_module_name__exact=module)
         except contenttypes.ContentTypeDoesNotExist:
-            raise template.TemplateSyntaxError, "'%s' tag has invalid content-type '%s.%s'" % (self.tag_name, package, module)
+            raise template.TemplateSyntaxError, "%r tag has invalid content-type '%s.%s'" % (tokens[0], package, module)
         var_name, obj_id = None, None
         if tokens[3].isdigit():
             obj_id = tokens[3]
             try: # ensure the object ID is valid
                 content_type.get_object_for_this_type(pk=obj_id)
             except ObjectDoesNotExist:
-                raise template.TemplateSyntaxError, "'%s' tag refers to %s object with ID %s, which doesn't exist" % (self.tag_name, content_type.name, obj_id)
+                raise template.TemplateSyntaxError, "%r tag refers to %s object with ID %s, which doesn't exist" % (tokens[0], content_type.name, obj_id)
         else:
             var_name = tokens[3]
         if tokens[4] != 'as':
-            raise template.TemplateSyntaxError, "Fourth argument in '%s' must be 'as'" % self.tag_name
+            raise template.TemplateSyntaxError, "Fourth argument in %r must be 'as'" % tokens[0]
         if len(tokens) == 7:
             if tokens[6] != 'reversed':
-                raise template.TemplateSyntaxError, "Final argument in '%s' must be 'reversed' if given" % self.tag_name
+                raise template.TemplateSyntaxError, "Final argument in %r must be 'reversed' if given" % tokens[0]
             ordering = "-"
         else:
             ordering = ""
         return CommentListNode(package, module, var_name, obj_id, tokens[5], self.free, ordering)
 
 # registration comments
-template.register_tag('get_comment_list',       DoGetCommentList(free=False, tag_name='get_comment_list'))
-template.register_tag('comment_form',           DoCommentForm(free=False, tag_name='comment_form'))
-template.register_tag('get_comment_count',      DoCommentCount(free=False, tag_name='get_comment_count'))
+template.register_tag('get_comment_list', DoGetCommentList(False))
+template.register_tag('comment_form', DoCommentForm(False))
+template.register_tag('get_comment_count', DoCommentCount(False))
 # free comments
-template.register_tag('get_free_comment_list',  DoGetCommentList(free=True, tag_name='get_free_comment_list'))
-template.register_tag('free_comment_form',      DoCommentForm(free=True, tag_name='free_comment_form'))
-template.register_tag('get_free_comment_count', DoCommentCount(free=True, tag_name='get_free_comment_count'))
+template.register_tag('get_free_comment_list', DoGetCommentList(True))
+template.register_tag('free_comment_form', DoCommentForm(True))
+template.register_tag('get_free_comment_count', DoCommentCount(True))
