@@ -775,7 +775,7 @@ def add_stage(request, app_label, module_name, show_delete=False, form_url='', p
                     new_data.setlist(f.name, new_data[f.name].split(","))
             manipulator.do_html2python(new_data)
             new_object = manipulator.save(new_data)
-            pk_value = getattr(new_object, opts.pk.name)
+            pk_value = getattr(new_object, opts.pk.column)
             log.log_action(request.user.id, opts.get_content_type_id(), pk_value, repr(new_object), log.ADDITION)
             msg = 'The %s "%s" was added successfully.' % (opts.verbose_name, new_object)
             # Here, we distinguish between different save types by checking for
@@ -1013,7 +1013,7 @@ def _get_deleted_objects(deleted_objects, perms_needed, user, obj, opts, current
                     # Display a link to the admin page.
                     nh(deleted_objects, current_depth, ['%s: <a href="../../../../%s/%s/%s/">%r</a>' % \
                         (capfirst(rel_opts.verbose_name), rel_opts.app_label, rel_opts.module_name,
-                        getattr(sub_obj, rel_opts.pk.name), sub_obj), []])
+                        getattr(sub_obj, rel_opts.pk.column), sub_obj), []])
                 _get_deleted_objects(deleted_objects, perms_needed, user, sub_obj, rel_opts, current_depth+2)
         else:
             has_related_objs = False
