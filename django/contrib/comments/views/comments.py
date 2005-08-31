@@ -204,7 +204,7 @@ def post_comment(request):
     new_data = request.POST.copy()
     new_data['content_type_id'] = content_type_id
     new_data['object_id'] = object_id
-    new_data['ip_address'] = request.META['REMOTE_ADDR']
+    new_data['ip_address'] = request.META.get('REMOTE_ADDR')
     new_data['is_public'] = comments.IS_PUBLIC in option_list
     response = HttpResponse()
     manipulator = PublicCommentManipulator(request.user,

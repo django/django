@@ -17,6 +17,6 @@ def populate_xheaders(request, response, package, python_module_name, object_id)
     within the INTERNAL_IPS setting.
     """
     from django.conf.settings import INTERNAL_IPS
-    if request.META['REMOTE_ADDR'] in INTERNAL_IPS:
+    if request.META.get('REMOTE_ADDR') in INTERNAL_IPS:
         response['X-Object-Type'] = "%s.%s" % (package, python_module_name)
         response['X-Object-Id'] = str(object_id)

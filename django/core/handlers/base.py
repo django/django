@@ -79,7 +79,7 @@ class BaseHandler:
             if DEBUG:
                 return self.get_technical_error_response()
             else:
-                subject = 'Database error (%s IP): %s' % ((request.META['REMOTE_ADDR'] in INTERNAL_IPS and 'internal' or 'EXTERNAL'), getattr(request, 'path', ''))
+                subject = 'Database error (%s IP): %s' % ((request.META.get('REMOTE_ADDR') in INTERNAL_IPS and 'internal' or 'EXTERNAL'), getattr(request, 'path', ''))
                 message = "%s\n\n%s" % (self._get_traceback(), request)
                 mail_admins(subject, message, fail_silently=True)
                 return self.get_friendly_error_response(request, resolver)
@@ -89,7 +89,7 @@ class BaseHandler:
             if DEBUG:
                 return self.get_technical_error_response()
             else:
-                subject = 'Coding error (%s IP): %s' % ((request.META['REMOTE_ADDR'] in INTERNAL_IPS and 'internal' or 'EXTERNAL'), getattr(request, 'path', ''))
+                subject = 'Coding error (%s IP): %s' % ((request.META.get('REMOTE_ADDR') in INTERNAL_IPS and 'internal' or 'EXTERNAL'), getattr(request, 'path', ''))
                 try:
                     request_repr = repr(request)
                 except:
