@@ -14,13 +14,13 @@ Setting up the cache
 
 The cache framework is split into a set of "backends" that provide different
 methods of caching data. There's a simple single-process memory cache (mostly
-useful as a fallback), a database-backed cache, and a memcached_ backend (by
-far the fastest option if you've got the RAM).
+useful as a fallback) and a memcached_ backend (the fastest option, by far, if
+you've got the RAM).
 
 Before using the cache, you'll need to tell Django which cache backend you'd
 like to use. Do this by setting the ``CACHE_BACKEND`` in your settings file.
 
-The CACHE_BACKEND setting is a "fake" URI (really an unregistered scheme). 
+The CACHE_BACKEND setting is a "fake" URI (really an unregistered scheme).
 Examples:
 
     ==============================  ===========================================
@@ -28,10 +28,6 @@ Examples:
     ==============================  ===========================================
     memcached://127.0.0.1:11211/    A memcached backend; the server is running
                                     on localhost port 11211.
-
-    db://tablename/                 A database backend (the db backend uses
-                                    the same database/username as the rest of
-                                    the CMS, so only a table name is needed.)
 
     simple:///                      A simple single-process memory cache; you
                                     probably don't want to use this except for
@@ -62,7 +58,6 @@ arguments are:
 For example::
 
     DB_CACHE = "memcached://127.0.0.1:11211/?timeout=60"
-    DB_CACHE = "db://tablename/?timeout=120&max_entries=500&cull_percentage=4"
 
 Invalid arguments are silently ignored, as are invalid values of known
 arguments.
@@ -172,8 +167,7 @@ The cache API is simple::
     # There's also a way to delete keys explicitly.
     >>> cache.delete('a')
 
-Really, that's the entire API! There are very few restrictions on what you can
-use the cache for; you can store any object in the cache that can be pickled
-safely, although keys must be strings.
+That's it. The cache has very few restrictions: You can cache any object that
+can be pickled safely, although keys must be strings.
 
 .. _memcached: http://www.danga.com/memcached/
