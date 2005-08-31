@@ -35,7 +35,7 @@ The default admin site has the following ``MIDDLEWARE_CLASSES`` set::
         "django.middleware.common.CommonMiddleware",
     )
 
-Django applies middleware in the order it's defined in `MIDDLEWARE_CLASSES``.
+Django applies middleware in the order it's defined in ``MIDDLEWARE_CLASSES``.
 
 For a regular (i.e., non-admin) Django installation, no middleware is required,
 but it's strongly suggested that you use ``CommonMiddleware``. For a Django
@@ -77,7 +77,7 @@ Available middleware
     * Handles ETags based on the ``USE_ETAGS`` setting. If ``USE_ETAGS`` is set
       to ``True``, Django will calculate an ETag for each request by
       MD5-hashing the page content, and it'll take care of sending
-      ``Not Modified`` responses if possible.
+      ``Not Modified`` responses, if appropriate.
 
     * Handles flat pages. Every time Django encounters a 404 -- either within
       a view or as a result of no URLconfs matching -- it will check the
@@ -110,20 +110,8 @@ request, before Django decides which view to execute.
 ``process_request()`` should return either ``None`` or an ``HttpResponse``
 object. If it returns ``None``, Django will continue processing this request,
 executing any other middleware and, then, the appropriate view. If it returns
-an ``HttpResponse`` object, Django won't bother calling any other middleware or
+an ``HttpResponse`` object, Django won't bother calling ANY other middleware or
 the appropriate view; it'll return that ``HttpResponse``.
-
-process_response
-----------------
-
-Interface: ``process_response(self, request, response)``
-
-``request`` is an ``HttpRequest`` object. ``response`` is the ``HttpResponse``
-object returned by a Django view.
-
-``process_response()`` should return an ``HttpResponse`` object. It could alter
-the given ``response``, or it could create and return a brand-new
-``HttpResponse``.
 
 process_view
 ------------
@@ -139,8 +127,20 @@ that will be passed to the view -- NOT including the first argument (``request``
 return either ``None`` or an ``HttpResponse`` object. If it returns ``None``,
 Django will continue processing this request, executing any other
 ``process_view()`` middleware and, then, the appropriate view. If it returns an
-``HttpResponse`` object, Django won't bother calling any other middleware or
+``HttpResponse`` object, Django won't bother calling ANY other middleware or
 the appropriate view; it'll return that ``HttpResponse``.
+
+process_response
+----------------
+
+Interface: ``process_response(self, request, response)``
+
+``request`` is an ``HttpRequest`` object. ``response`` is the ``HttpResponse``
+object returned by a Django view.
+
+``process_response()`` should return an ``HttpResponse`` object. It could alter
+the given ``response``, or it could create and return a brand-new
+``HttpResponse``.
 
 Guidelines
 ----------
