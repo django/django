@@ -1,0 +1,160 @@
+==========
+Middleware
+==========
+
+Middleware is a framework of hooks into Django's request/response processing.
+It's a light, low-level "plugin" system for globally altering Django's input
+and/or output.
+
+Each middleware component is responsible for doing some specific function. For
+example, Django includes a middleware component, ``XViewMiddleware``, that adds
+an ``"X-View"`` HTTP header to every response to a ``HEAD`` request.
+
+This document explains all middleware components that come with Django, how to
+use them, and how to write your own middleware.
+
+Activating middleware
+=====================
+
+To activate a middleware component, add it to the ``MIDDLEWARE_CLASSES`` list
+in your Django settings. In ``MIDDLEWARE_CLASSES``, each middleware component
+is represented by a string: the full Python path to the middleware's class
+name. For example, here's the default ``MIDDLEWARE_CLASSES`` created by
+``django-admin.py startproject``::
+
+    MIDDLEWARE_CLASSES = (
+        "django.middleware.common.CommonMiddleware",
+        "django.middleware.doc.XViewMiddleware",
+    )
+
+The default admin site has the following ``MIDDLEWARE_CLASSES`` set::
+
+    MIDDLEWARE_CLASSES = (
+        "django.middleware.sessions.SessionMiddleware",
+        "django.middleware.admin.AdminUserRequired",
+        "django.middleware.common.CommonMiddleware",
+    )
+
+Django applies middleware in the order it's defined in `MIDDLEWARE_CLASSES``.
+
+For a regular (i.e., non-admin) Django installation, no middleware is required,
+but it's strongly suggested that you use ``CommonMiddleware``. For a Django
+admin site, ``SessionMiddleware`` and ``AdminUserRequired`` (in that order) are
+required.
+
+Available middleware
+====================
+
+``django.middleware.admin.AdminUserRequired``
+    Limits site access to valid users with the ``is_staff`` flag set. This is
+    required by Django's admin, and this middleware requires ``SessionMiddleware``.
+
+``django.middleware.cache.CacheMiddleware``
+    Enables site-wide cache. If this is enabled, each Django-powered page will be
+    cached for as long as the ``CACHE_MIDDLEWARE_SECONDS`` setting defines. See
+    the `cache documentation`_.
+
+    .. _`cache documentation`: http://www.djangoproject.com/documentation/cache/#the-per-site-cache
+
+``django.middleware.common.CommonMiddleware``
+    Adds a few conveniences for perfectionists:
+
+    * Forbids access to user agents in the ``DISALLOWED_USER_AGENTS`` setting,
+      which should be a list of strings.
+
+    * Performs URL rewriting based on the ``APPEND_SLASH`` and ``PREPEND_WWW``
+      settings. If ``APPEND_SLASH`` is ``True``, URLs that lack a trailing
+      slash will be redirected to the same URL with a trailing slash. If
+      ``PREPEND_WWW`` is ``True``, URLs that lack a leading "www." will be
+      redirected to the same URL with a leading "www."
+
+      Both of these options are meant to normalize URLs. The philosophy is that
+      each URL should exist in one, and only one, place. Technically a URL
+      ``foo.com/bar`` is distinct from ``foo.com/bar/`` -- a search-engine
+      indexer would treat them as separate URLs -- so it's best practice to
+      normalize URLs.
+
+    * Handles ETags based on the ``USE_ETAGS`` setting. If ``USE_ETAGS`` is set
+      to ``True``, Django will calculate an ETag for each request by
+      MD5-hashing the page content, and it'll take care of sending
+      ``Not Modified`` responses if possible.
+
+    * Handles flat pages. Every time Django encounters a 404 -- either within
+      a view or as a result of no URLconfs matching -- it will check the
+      database of flat pages based on the current URL.
+
+``django.middleware.doc.XViewMiddleware``
+    Sends custom ``X-View`` HTTP headers to HEAD requests that come from IP
+    addresses defined in the ``INTERNAL_IPS`` setting. This is used by Django's
+    automatic documentation system.
+
+``django.middleware.sessions.SessionMiddleware``
+    Enables session support. See the `session documentation`_.
+
+    .. _`session documentation`: http://www.djangoproject.com/documentation/sessions/
+
+Writing your own middleware
+===========================
+
+Writing your own middleware is easy. Each middleware component is a single
+Python class that defines one or more of the following methods:
+
+process_request
+---------------
+
+Interface: ``process_request(self, request)``
+
+``request`` is an ``HttpRequest`` object. This method is called on each
+request, before Django decides which view to execute.
+
+``process_request()`` should return either ``None`` or an ``HttpResponse``
+object. If it returns ``None``, Django will continue processing this request,
+executing any other middleware and, then, the appropriate view. If it returns
+an ``HttpResponse`` object, Django won't bother calling any other middleware or
+the appropriate view; it'll return that ``HttpResponse``.
+
+process_response
+----------------
+
+Interface: ``process_response(self, request, response)``
+
+``request`` is an ``HttpRequest`` object. ``response`` is the ``HttpResponse``
+object returned by a Django view.
+
+``process_response()`` should return an ``HttpResponse`` object. It could alter
+the given ``response``, or it could create and return a brand-new
+``HttpResponse``.
+
+process_view
+------------
+
+Interface: ``process_view(self, request, view_func, param_dict)``
+
+``request`` is an ``HttpRequest`` object. ``view_func`` is the Python function
+that Django is about to use. (It's the actual function object, not the name of
+the function as a string.) ``param_dict`` is a dictionary of keyword arguments
+that will be passed to the view -- NOT including the first argument (``request``).
+
+``process_view()`` is called just before Django calls the view. It should
+return either ``None`` or an ``HttpResponse`` object. If it returns ``None``,
+Django will continue processing this request, executing any other
+``process_view()`` middleware and, then, the appropriate view. If it returns an
+``HttpResponse`` object, Django won't bother calling any other middleware or
+the appropriate view; it'll return that ``HttpResponse``.
+
+Guidelines
+----------
+
+    * Middleware classes don't have to subclass anything.
+
+    * The middleware class can live anywhere on your Python path. All Django
+      cares about is that the ``MIDDLEWARE_CLASSES`` setting includes the path
+      to it.
+
+    * Feel free to look at Django's available middleware for examples. The
+      default Django middleware classes are in ``django/middleware/`` in the
+      Django distribution.
+
+    * If you write a middleware component that you think would be useful to
+      other people, contribute to the community! Let us know, and we'll
+      consider adding it to Django.
