@@ -996,7 +996,7 @@ def method_get_file_filename(field, self):
 def method_get_file_url(field, self):
     if getattr(self, field.name): # value is not blank
         import urlparse
-        return urlparse.urljoin(settings.MEDIA_URL, getattr(self, field.name))
+        return urlparse.urljoin(settings.MEDIA_URL, getattr(self, field.name)).replace('\\', '/')
     return ''
 
 def method_get_file_size(field, self):
