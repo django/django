@@ -353,7 +353,8 @@ def get_filters_from_token(token):
 def resolve_variable(path, context):
     """
     Returns the resolved variable, which may contain attribute syntax, within
-    the given context.
+    the given context. The variable may be a hard-coded string (if it begins
+    and ends with single or double quote marks).
 
     >>> c = {'article': {'section':'News'}}
     >>> resolve_variable('article.section', c)
@@ -369,30 +370,33 @@ def resolve_variable(path, context):
 
     (The example assumes VARIABLE_ATTRIBUTE_SEPARATOR is '.')
     """
-    current = context
-    bits = path.split(VARIABLE_ATTRIBUTE_SEPARATOR)
-    while bits:
-        try: # dictionary lookup
-            current = current[bits[0]]
-        except (TypeError, AttributeError, KeyError):
-            try: # attribute lookup
-                current = getattr(current, bits[0])
-                if callable(current):
-                    if getattr(current, 'alters_data', False):
-                        current = ''
-                    else:
-                        try: # method call (assuming no args required)
-                            current = current()
-                        except SilentVariableFailure:
+    if path[0] in ('"', "'") and path[0] == path[-1]:
+        current = path[1:-1]
+    else:
+        current = context
+        bits = path.split(VARIABLE_ATTRIBUTE_SEPARATOR)
+        while bits:
+            try: # dictionary lookup
+                current = current[bits[0]]
+            except (TypeError, AttributeError, KeyError):
+                try: # attribute lookup
+                    current = getattr(current, bits[0])
+                    if callable(current):
+                        if getattr(current, 'alters_data', False):
                             current = ''
-                        except TypeError: # arguments *were* required
-                            current = '' # invalid method call
-            except (TypeError, AttributeError):
-                try: # list-index lookup
-                    current = current[int(bits[0])]
-                except (IndexError, ValueError, KeyError):
-                    raise VariableDoesNotExist, "Failed lookup for key [%s] in %r" % (bits[0], current) # missing attribute
-        del bits[0]
+                        else:
+                            try: # method call (assuming no args required)
+                                current = current()
+                            except SilentVariableFailure:
+                                current = ''
+                            except TypeError: # arguments *were* required
+                                current = '' # invalid method call
+                except (TypeError, AttributeError):
+                    try: # list-index lookup
+                        current = current[int(bits[0])]
+                    except (IndexError, ValueError, KeyError):
+                        raise VariableDoesNotExist, "Failed lookup for key [%s] in %r" % (bits[0], current) # missing attribute
+            del bits[0]
     return current
 
 def resolve_variable_with_filters(var_string, context):
