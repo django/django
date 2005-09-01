@@ -261,7 +261,7 @@ Methods
     header with the given name.
 
 ``set_cookie(key, value='', max_age=None, path='/', domain=None, secure=None)``
-    Sets a cookie. The parameters are the same as in the `Cookie.Morsel`_
+    Sets a cookie. The parameters are the same as in the `cookie Morsel`_
     object in the Python standard library.
 
         * ``max_age`` should be a number of seconds, or ``None`` (default) if
@@ -272,15 +272,13 @@ Methods
           calendars.lawrence.com. Otherwise, a cookie will only be readable by
           the domain that set it.
 
-    .. _`Cookie.Morsel object`: http://www.python.org/doc/current/lib/morsel-objects.html
+    .. _`cookie Morsel`: http://www.python.org/doc/current/lib/morsel-objects.html
 
 ``get_content_as_string(encoding)``
     Returns the content as a Python string, encoding it from a Unicode object
     if necessary.
 
-``write(content)``
-``flush()``
-``tell()``
+``write(content)``, ``flush()`` and ``tell()``
     These methods make an ``HttpResponse`` instance a file-like object.
 
 HttpResponse subclasses
