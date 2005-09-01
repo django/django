@@ -200,21 +200,21 @@ class HttpResponseNotModified(HttpResponse):
         self.status_code = 304
 
 class HttpResponseNotFound(HttpResponse):
-    def __init__(self, content='', mimetype=DEFAULT_MIME_TYPE):
-        HttpResponse.__init__(self, content, mimetype)
+    def __init__(self, *args, **kwargs):
+        HttpResponse.__init__(self, *args, **kwargs)
         self.status_code = 404
 
 class HttpResponseForbidden(HttpResponse):
-    def __init__(self, content='', mimetype=DEFAULT_MIME_TYPE):
-        HttpResponse.__init__(self, content, mimetype)
+    def __init__(self, *args, **kwargs):
+        HttpResponse.__init__(self, *args, **kwargs)
         self.status_code = 403
 
 class HttpResponseGone(HttpResponse):
-    def __init__(self, content='', mimetype=DEFAULT_MIME_TYPE):
-        HttpResponse.__init__(self, content, mimetype)
+    def __init__(self, *args, **kwargs):
+        HttpResponse.__init__(self, *args, **kwargs)
         self.status_code = 410
 
 class HttpResponseServerError(HttpResponse):
-    def __init__(self, content='', mimetype=DEFAULT_MIME_TYPE):
-        HttpResponse.__init__(self, content, mimetype)
+    def __init__(self, *args, **kwargs):
+        HttpResponse.__init__(self, *args, **kwargs)
         self.status_code = 500
