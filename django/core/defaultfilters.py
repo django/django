@@ -368,7 +368,7 @@ def yesno(value, arg):
     try:
         yes, no, maybe = bits
     except ValueError: # unpack list of wrong size (no "maybe" value provided)
-        yes, no, maybe = bits, bits[1], bits[1]
+        yes, no, maybe = bits[0], bits[1], bits[1]
     if value is None:
         return maybe
     if value:
