@@ -85,6 +85,8 @@ class CommentFormNode(template.Node):
                 context['display_form'] = False
             else:
                 context['display_form'] = True
+        else:
+            context['display_form'] = True
         context['target'] = '%s:%s' % (self.content_type.id, self.obj_id)
         options = []
         for var, abbr in (('photos_required', comments.PHOTOS_REQUIRED),
