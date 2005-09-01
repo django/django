@@ -445,22 +445,20 @@ Built-in tag reference
 
     Example::
 
-        {% ifequal user.id_ comment.user_id %}
+        {% ifequal user.id comment.user_id %}
             ...
         {% endifequal %}
 
-    As in the {% if %} tag, an {% else %} clause is optional.
+    As in the ``{% if %}`` tag, an ``{% else %}`` clause is optional.
+
+    The arguments can be hard-coded strings, so the following is valid::
+
+        {% ifequal user.username "adrian" %}
+            ...
+        {% endifequal %}
 
 ``ifnotequal``
-    Output the contents of the block if the two arguments do not equal each other.
-
-    Example::
-
-        {% ifnotequal user.id_ comment.user_id %}
-            ...
-        {% endifnotequal %}
-
-    As in the {% if %} tag, an {% else %} clause is optional.
+    Just like ``ifequal``, except it tests that the two arguments are not equal.
 
 ``load``
     Load a custom template tag set.
@@ -523,14 +521,14 @@ Built-in tag reference
 ``ssi``
     Output the contents of a given file into the page.
 
-    Like a simple "include" tag, the ``ssi`` tag includes the contents
-    of another file -- which must be specified using an absolute page --
-    in the current page::
+    Like a simple "include" tag, ``{% ssi %}`` includes the contents of another
+    file -- which must be specified using an absolute path -- in the current
+    page::
 
         {% ssi /home/html/ljworld.com/includes/right_generic.html %}
 
     If the optional "parsed" parameter is given, the contents of the included
-    file are evaluated as template code, with the current context::
+    file are evaluated as template code, within the current context::
 
         {% ssi /home/html/ljworld.com/includes/right_generic.html parsed %}
 
