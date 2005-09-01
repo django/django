@@ -276,6 +276,11 @@ If you don't care about clearing data, just do this::
 That "psql" assumes you're using PostgreSQL. If you're using MySQL, use the
 appropriate command-line utility, ``mysql``.
 
+``django-admin.py sqlreset`` outputs SQL that clears the app's database
+table(s) and creates new ones. The above command uses a Unix pipe to send the
+SQL directly to the PostgreSQL command-line utility, which accepts SQL as
+input.
+
 If you do care about deleting data, you'll have to execute the ``ALTER TABLE``
 statements manually in your database. That's the way we've always done it,
 because dealing with data is a very sensitive operation that we've wanted to
