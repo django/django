@@ -266,6 +266,23 @@ Using a ``FileField`` or an ``ImageField`` in a model takes a few steps:
        absolute URL to your image in a template with
        ``{{ object.get_mug_shot_url }}``.
 
+If I make changes to a model, how do I update the database?
+-----------------------------------------------------------
+
+If you don't care about clearing data, just do this::
+
+    django-admin.py sqlreset appname | psql dbname
+
+That "psql" assumes you're using PostgreSQL. If you're using MySQL, use the
+appropriate command-line utility, ``mysql``.
+
+If you do care about deleting data, you'll have to execute the ``ALTER TABLE``
+statements manually in your database. That's the way we've always done it,
+because dealing with data is a very sensitive operation that we've wanted to
+avoid automating. That said, there's some work being done to add a
+``django-admin.py updatedb`` command, which would output the necessary
+``ALTER TABLE`` statements, if any.
+
 The database API
 ================
 
