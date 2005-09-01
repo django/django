@@ -61,6 +61,12 @@ admin's login screen:
 .. image:: http://media.djangoproject.com/img/doc/tutorial/admin01.png
    :alt: Django admin login screen
 
+.. admonition:: Note
+
+    If you get an error telling you that the URL 'admin/' didn't match any of
+    your URLconf entries, you most likely used ``myproject.settings.main``
+    instead of ``myproject.settings.admin``.
+
 Enter the admin site
 ====================
 
