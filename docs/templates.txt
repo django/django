@@ -677,7 +677,9 @@ Built-in filter reference
     for an introduction.
 
 ``slugify``
-    Converts to lowercase, removes non-alpha chars and converts spaces to hyphens
+    Converts to lowercase, removes non-word characters (alphanumerics and
+    underscores) and converts spaces to hyphens. Also strips leading and
+    trailing whitespace.
 
 ``stringformat``
     Formats the variable according to the argument, a string formatting specifier.
