@@ -1010,6 +1010,9 @@ just import the model module at the top of your model module, like so::
 
     from django.models import core
 
+Make sure you're importing from ``django.models``, not directly from your model
+module.
+
 Then, just refer to the other model class wherever needed. For example::
 
     class MyModel(meta.Model):
