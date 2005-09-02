@@ -22,18 +22,18 @@ document.
 Run ``django-admin.py --help`` to display a help message that includes a terse
 list of all available actions and options.
 
-Most actions take a list of "app"s. An "app," in this case, is the name of
-a file containing Django models. For example, if you have a model module called
-``myproject/apps/polls/pollmodels.py``, the "app" in this case would be
-``"pollmodels"``.
+Most actions take a list of "modelmodule"s. A "modelmodule," in this case, is
+the name of a file containing Django models. For example, if you have a model
+module called ``myproject/apps/polls/pollmodels.py``, the "modelmodule" in this
+case would be ``"pollmodels"``.
 
 Available actions
 =================
 
-adminindex [app app ...]
+adminindex [modelmodule modelmodule ...]
 ------------------------
 
-Prints the admin-index template snippet for the given app(s).
+Prints the admin-index template snippet for the given model module(s).
 
 Use admin-index template snippets if you want to customize the look and feel of
 your admin's index page. See `Tutorial 2`_ for more information.
@@ -75,10 +75,10 @@ customizations. In particular, you'll need to do this:
 ``inspectdb`` only works with PostgreSQL and MySQL. Foreign-key detection only
 works in PostgreSQL.
 
-install [app app ...]
+install [modelmodule modelmodule ...]
 ---------------------
 
-Executes the equivalent of ``sqlall`` for the given app(s).
+Executes the equivalent of ``sqlall`` for the given model module(s).
 
 runserver [optional port number, or ipaddr:port]
 ------------------------------------------------
@@ -115,41 +115,41 @@ Port 7000 on IP address 1.2.3.4::
 
     django-admin.py runserver 1.2.3.4:7000
 
-sql [app app ...]
+sql [modelmodule modelmodule ...]
 -----------------
 
-Prints the CREATE TABLE SQL statements for the given app(s).
+Prints the CREATE TABLE SQL statements for the given model module(s).
 
-sqlall [app app ...]
+sqlall [modelmodule modelmodule ...]
 --------------------
 
-Prints the CREATE TABLE and initial-data SQL statements for the given app(s).
+Prints the CREATE TABLE and initial-data SQL statements for the given model module(s).
 
-sqlclear [app app ...]
+sqlclear [modelmodule modelmodule ...]
 ----------------------
 
-Prints the DROP TABLE SQL statements for the given app(s).
+Prints the DROP TABLE SQL statements for the given model module(s).
 
-sqlindexes [app app ...]
+sqlindexes [modelmodule modelmodule ...]
 ------------------------
 
-Prints the CREATE INDEX SQL statements for the given app(s).
+Prints the CREATE INDEX SQL statements for the given model module(s).
 
-sqlinitialdata [app app ...]
+sqlinitialdata [modelmodule modelmodule ...]
 ----------------------------
 
-Prints the initial INSERT SQL statements for the given app(s).
+Prints the initial INSERT SQL statements for the given model module(s).
 
-sqlreset [app app ...]
+sqlreset [modelmodule modelmodule ...]
 ----------------------
 
-Prints the DROP TABLE SQL, then the CREATE TABLE SQL, for the given app(s).
+Prints the DROP TABLE SQL, then the CREATE TABLE SQL, for the given model module(s).
 
-sqlsequencereset [app app ...]
+sqlsequencereset [modelmodule modelmodule ...]
 ------------------------------
 
 Prints the SQL statements for resetting PostgreSQL sequences for the given
-app(s).
+model module(s).
 
 See http://simon.incutio.com/archive/2004/04/21/postgres for more information.
 

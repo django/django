@@ -12,7 +12,7 @@ MODULE_TEMPLATE = '''    {%% if perms.%(app)s.%(addperm)s or perms.%(app)s.%(cha
     </tr>
     {%% endif %%}'''
 
-APP_ARGS = '[app app ...]'
+APP_ARGS = '[modelmodule ...]'
 
 # Use django.__path__[0] because we don't know which directory django into
 # which has been installed.
@@ -101,7 +101,7 @@ def get_sql_create(mod):
             table_output.append(');')
             final_output.append('\n'.join(table_output))
     return final_output
-get_sql_create.help_doc = "Prints the CREATE TABLE SQL statements for the given app(s)."
+get_sql_create.help_doc = "Prints the CREATE TABLE SQL statements for the given model module name(s)."
 get_sql_create.args = APP_ARGS
 
 def get_sql_delete(mod):
@@ -147,13 +147,13 @@ def get_sql_delete(mod):
             output.append("DELETE FROM auth_admin_log WHERE content_type_id = %s;" % row[0])
 
     return output[::-1] # Reverse it, to deal with table dependencies.
-get_sql_delete.help_doc = "Prints the DROP TABLE SQL statements for the given app(s)."
+get_sql_delete.help_doc = "Prints the DROP TABLE SQL statements for the given model module name(s)."
 get_sql_delete.args = APP_ARGS
 
 def get_sql_reset(mod):
     "Returns a list of the DROP TABLE SQL, then the CREATE TABLE SQL, for the given module."
     return get_sql_delete(mod) + get_sql_all(mod)
-get_sql_reset.help_doc = "Prints the DROP TABLE SQL, then the CREATE TABLE SQL, for the given app(s)."
+get_sql_reset.help_doc = "Prints the DROP TABLE SQL, then the CREATE TABLE SQL, for the given model module name(s)."
 get_sql_reset.args = APP_ARGS
 
 def get_sql_initial_data(mod):
@@ -176,7 +176,7 @@ def get_sql_initial_data(mod):
         for codename, name in _get_all_permissions(opts):
             output.append(_get_permission_insert(name, codename, opts))
     return output
-get_sql_initial_data.help_doc = "Prints the initial INSERT SQL statements for the given app(s)."
+get_sql_initial_data.help_doc = "Prints the initial INSERT SQL statements for the given model module name(s)."
 get_sql_initial_data.args = APP_ARGS
 
 def get_sql_sequence_reset(mod):
@@ -188,7 +188,7 @@ def get_sql_sequence_reset(mod):
             if isinstance(f, meta.AutoField):
                 output.append("SELECT setval('%s_%s_seq', (SELECT max(%s) FROM %s));" % (klass._meta.db_table, f.column, f.column, klass._meta.db_table))
     return output
-get_sql_sequence_reset.help_doc = "Prints the SQL statements for resetting PostgreSQL sequences for the given app(s)."
+get_sql_sequence_reset.help_doc = "Prints the SQL statements for resetting PostgreSQL sequences for the given model module name(s)."
 get_sql_sequence_reset.args = APP_ARGS
 
 def get_sql_indexes(mod):
@@ -201,13 +201,13 @@ def get_sql_indexes(mod):
                 output.append("CREATE %sINDEX %s_%s ON %s (%s);" % \
                     (unique, klass._meta.db_table, f.column, klass._meta.db_table, f.column))
     return output
-get_sql_indexes.help_doc = "Prints the CREATE INDEX SQL statements for the given app(s)."
+get_sql_indexes.help_doc = "Prints the CREATE INDEX SQL statements for the given model module name(s)."
 get_sql_indexes.args = APP_ARGS
 
 def get_sql_all(mod):
     "Returns a list of CREATE TABLE SQL and initial-data insert for the given module."
     return get_sql_create(mod) + get_sql_initial_data(mod)
-get_sql_all.help_doc = "Prints the CREATE TABLE and initial-data SQL statements for the given app(s)."
+get_sql_all.help_doc = "Prints the CREATE TABLE and initial-data SQL statements for the given model module name(s)."
 get_sql_all.args = APP_ARGS
 
 def database_check(mod):
@@ -259,7 +259,7 @@ def database_check(mod):
         except KeyError:
 #             sys.stderr.write("A content type called '%s.%s' was found in the database but not in the model.\n" % (app_label, row[0]))
             print "DELETE FROM content_types WHERE package='%s' AND python_module_name = '%s';" % (app_label, row[0])
-database_check.help_doc = "Checks that everything is installed in the database for the given app(s) and prints SQL statements if needed."
+database_check.help_doc = "Checks that everything is installed in the database for the given model module name(s) and prints SQL statements if needed."
 database_check.args = APP_ARGS
 
 def get_admin_index(mod):
@@ -281,7 +281,7 @@ def get_admin_index(mod):
     output.append('</table></div>')
     output.append('{% endif %}')
     return output
-get_admin_index.help_doc = "Prints the admin-index template snippet for the given app(s)."
+get_admin_index.help_doc = "Prints the admin-index template snippet for the given model module name(s)."
 get_admin_index.args = APP_ARGS
 
 def init():
@@ -321,7 +321,7 @@ The full error: %s\n""" % \
         db.db.rollback()
         sys.exit(1)
     db.db.commit()
-install.help_doc = "Executes ``sqlall`` for the given app(s) in the current database."
+install.help_doc = "Executes ``sqlall`` for the given model module name(s) in the current database."
 install.args = APP_ARGS
 
 def _start_helper(app_or_project, name, directory, other_name=''):
@@ -376,7 +376,7 @@ startproject.help_doc = "Creates a Django project directory structure for the gi
 startproject.args = "[projectname]"
 
 def startapp(app_name, directory):
-    "Creates a Django app for the given project_name in the given directory."
+    "Creates a Django app for the given app_name in the given directory."
     # Determine the project_name a bit naively -- by looking at the name of
     # the parent directory.
     project_dir = os.path.normpath(os.path.join(directory, '../'))
