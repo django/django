@@ -1,5 +1,6 @@
 from Cookie import SimpleCookie
 from pprint import pformat
+from urllib import urlencode
 import datastructures
 
 DEFAULT_MIME_TYPE = 'text/html'
@@ -116,6 +117,12 @@ class QueryDict(datastructures.MultiValueDict):
     def keys(self):
         self.assert_synchronized()
         return self._keys
+
+    def urlencode(self):
+        output = []
+        for k, list_ in self.data.items():
+            output.extend([urlencode({k: v}) for v in list_])
+        return '&'.join(output)
 
 def parse_cookie(cookie):
     if cookie == '':

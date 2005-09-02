@@ -4,7 +4,6 @@ from django.utils import httpwrappers
 from django.core.mail import mail_managers
 from django.views.core.flatfiles import flat_file
 import md5, os
-from urllib import urlencode
 
 class CommonMiddleware:
     """
@@ -49,7 +48,7 @@ class CommonMiddleware:
             # Redirect
             newurl = "%s://%s%s" % (os.environ.get('HTTPS') == 'on' and 'https' or 'http', new_url[0], new_url[1])
             if request.GET:
-                newurl += '?' + urlencode(request.GET)
+                newurl += '?' + request.GET.urlencode()
             return httpwrappers.HttpResponseRedirect(newurl)
 
         return None

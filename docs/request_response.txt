@@ -115,16 +115,20 @@ Methods
 
     Example: ``"/music/bands/the_beatles/?print=true"``
 
-MultiValueDict objects
-----------------------
+QueryDict objects
+-----------------
 
 In an ``HttpRequest`` object, the ``GET`` and ``POST`` attributes are instances
-of ``django.utils.datastructures.MultiValueDict``. ``MultiValueDict`` is a
-dictionary-like class customized to deal with multiple values for the same key.
-This is necessary because some HTML form elements, notably
-``<select multiple>``, pass multiple values for the same key.
+of ``django.utils.httpwrappers.QueryDict``. ``QueryDict`` is a dictionary-like
+class customized to deal with multiple values for the same key. This is
+necessary because some HTML form elements, notably ``<select multiple>``, pass
+multiple values for the same key.
 
-``MultiValueDict`` implements the following standard dictionary methods:
+``QueryDict`` instances are immutable, unless you create a ``copy()`` of them.
+That means you can't change attributes of ``request.POST`` and ``request.GET``
+directly.
+
+``QueryDict`` implements the following standard dictionary methods:
 
     * ``__repr__()``
 
@@ -141,7 +145,11 @@ This is necessary because some HTML form elements, notably
 
     * ``has_key(key)``
 
-    * ``items()``
+    * ``items()`` -- Just like the standard dictionary ``items()`` method,
+      except this retains the order for values of duplicate keys, if any. For
+      example, if the original query string was ``"a=1&b=2&b=3"``, ``items()``
+      will return ``[("a", ["1"]), ("b", ["2", "3"])]``, where the order of
+      ``["2", "3"]`` is guaranteed, but the order of ``a`` vs. ``b`` isn't.
 
     * ``keys()``
 
@@ -150,7 +158,8 @@ This is necessary because some HTML form elements, notably
 In addition, it has the following methods:
 
     * ``copy()`` -- Returns a copy of the object, using ``copy.deepcopy()``
-      from the Python standard library.
+      from the Python standard library. The copy will be mutable -- that is,
+      you can change its values.
 
     * ``getlist(key)`` -- Returns the data with the requested key, as a Python
       list. Returns an empty list if the key doesn't exist.
@@ -160,6 +169,9 @@ In addition, it has the following methods:
 
     * ``appendlist(key, item)`` -- Appends an item to the internal list
       associated with key.
+
+    * ``urlencode()`` -- Returns a string of the data in query-string format.
+      Example: ``"a=2&b=3&b=5"``.
 
 Examples
 --------
