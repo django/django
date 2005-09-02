@@ -309,7 +309,6 @@ class Options:
                     lookup_overrides={
                         'content_type__package__label__exact': self.app_label,
                         'content_type__python_module_name__exact': self.module_name,
-                        'object_id__id__exact': None,
                     })
                 rel_objs.append((relatedlinks.RelatedLink._meta, link_field))
             self._all_related_objects = rel_objs
@@ -926,7 +925,10 @@ def method_set_many_to_many(rel_field, self, id_list):
 # Handles related-object retrieval.
 # Examples: Poll.get_choice(), Poll.get_choice_list(), Poll.get_choice_count()
 def method_get_related(method_name, rel_mod, rel_field, self, **kwargs):
-    kwargs['%s__%s__exact' % (rel_field.name, rel_field.rel.to.pk.name)] = getattr(self, rel_field.rel.field_name)
+    if self._meta.has_related_links and rel_mod.Klass._meta.module_name == 'relatedlinks':
+        kwargs['object_id__exact'] = getattr(self, rel_field.rel.field_name)
+    else:
+        kwargs['%s__%s__exact' % (rel_field.name, rel_field.rel.to.pk.name)] = getattr(self, rel_field.rel.field_name)
     kwargs.update(rel_field.rel.lookup_overrides)
     return getattr(rel_mod, method_name)(**kwargs)
 
