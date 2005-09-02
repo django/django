@@ -31,7 +31,7 @@ Available actions
 =================
 
 adminindex [modelmodule modelmodule ...]
-------------------------
+----------------------------------------
 
 Prints the admin-index template snippet for the given model module(s).
 
@@ -76,7 +76,7 @@ customizations. In particular, you'll need to do this:
 works in PostgreSQL.
 
 install [modelmodule modelmodule ...]
----------------------
+-------------------------------------
 
 Executes the equivalent of ``sqlall`` for the given model module(s).
 
@@ -116,37 +116,37 @@ Port 7000 on IP address 1.2.3.4::
     django-admin.py runserver 1.2.3.4:7000
 
 sql [modelmodule modelmodule ...]
------------------
+---------------------------------
 
 Prints the CREATE TABLE SQL statements for the given model module(s).
 
 sqlall [modelmodule modelmodule ...]
---------------------
+------------------------------------
 
 Prints the CREATE TABLE and initial-data SQL statements for the given model module(s).
 
 sqlclear [modelmodule modelmodule ...]
-----------------------
+--------------------------------------
 
 Prints the DROP TABLE SQL statements for the given model module(s).
 
 sqlindexes [modelmodule modelmodule ...]
-------------------------
+----------------------------------------
 
 Prints the CREATE INDEX SQL statements for the given model module(s).
 
 sqlinitialdata [modelmodule modelmodule ...]
-----------------------------
+--------------------------------------------
 
 Prints the initial INSERT SQL statements for the given model module(s).
 
 sqlreset [modelmodule modelmodule ...]
-----------------------
+--------------------------------------
 
 Prints the DROP TABLE SQL, then the CREATE TABLE SQL, for the given model module(s).
 
 sqlsequencereset [modelmodule modelmodule ...]
-------------------------------
+----------------------------------------------
 
 Prints the SQL statements for resetting PostgreSQL sequences for the given
 model module(s).
