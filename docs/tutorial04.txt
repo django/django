@@ -102,6 +102,9 @@ This code includes a few things we haven't covered yet in this tutorial:
       ``HttpResponseRedirect`` after successfully dealing with POST data. This
       tip isn't specific to Django; it's just good Web development practice.
 
+As mentioned in Tutorial 3, ``request`` is a ``HTTPRequest`` object. For more
+on ``HTTPRequest`` objects, see the `request and response documentation`_.
+
 After somebody votes in a poll, the ``vote()`` view redirects to the results
 page for the poll. Let's write that view::
 
@@ -132,6 +135,8 @@ Now, create a ``results.html`` template::
 Now, go to ``/polls/1/`` in your browser and vote in the poll. You should see a
 results page that gets updated each time you vote. If you submit the form
 without having chosen a choice, you should see the error message.
+
+.. _request and response documentation: http://www.djangoproject.com/documentation/request_response/
 
 Use generic views: Less code is better
 ======================================
