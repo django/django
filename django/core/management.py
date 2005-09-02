@@ -304,13 +304,24 @@ init.args = ''
 def install(mod):
     "Executes the equivalent of 'get_sql_all' in the current database."
     from django.core import db
+    from cStringIO import StringIO
+    mod_name = mod.__name__[mod.__name__.rindex('.')+1:]
+
+    # First, try validating the models.
+    s = StringIO()
+    num_errors = get_validation_errors(s)
+    if num_errors:
+        sys.stderr.write("Error: %s couldn't be installed, because there were errors in your model:\n" % mod_name)
+        s.seek(0)
+        sys.stderr.write(s.read())
+        sys.exit(1)
     sql_list = get_sql_all(mod)
+
     try:
         cursor = db.db.cursor()
         for sql in sql_list:
             cursor.execute(sql)
     except Exception, e:
-        mod_name = mod.__name__[mod.__name__.rindex('.')+1:]
         sys.stderr.write("""Error: %s couldn't be installed. Possible reasons:
   * The database isn't running or isn't configured correctly.
   * At least one of the database tables already exists.
@@ -495,8 +506,8 @@ class ModelErrorCollection:
         self.errors.append((opts, error))
         self.outfile.write("%s.%s: %s\n" % (opts.app_label, opts.module_name, error))
 
-def validate(outfile=sys.stdout):
-    "Validates all installed models."
+def get_validation_errors(outfile):
+    "Validates all installed models. Writes errors, if any, to outfile. Returns number of errors."
     import django.models
     from django.core import meta
     e = ModelErrorCollection(outfile)
@@ -543,8 +554,11 @@ def validate(outfile=sys.stdout):
                     e.add(rel_opts, "At least one field in %s should have core=True, because it's being edited inline by %s.%s." % (rel_opts.object_name, opts.module_name, opts.object_name))
                 except StopIteration:
                     pass
+    return len(e.errors)
 
-    num_errors = len(e.errors)
+def validate(outfile=sys.stdout):
+    "Validates all installed models."
+    num_errors = get_validation_errors(outfile)
     outfile.write('%s error%s found.\n' % (num_errors, num_errors != 1 and 's' or ''))
 validate.args = ''
 
