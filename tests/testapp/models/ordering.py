@@ -55,4 +55,9 @@ API_TESTS = """
 # Use the "offset" parameter with "limit" to offset the result list.
 >>> articles.get_list(order_by=['headline'], offset=1, limit=2)
 [Article 2, Article 3]
+
+# Use '?' to order randomly. (We're using [...] in the output to indicate we
+# don't know what order the output will be in.
+>>> articles.get_list(order_by=['?'])
+[...]
 """
