@@ -27,9 +27,9 @@ solving two years' worth of database-schema problems. Here's a quick example::
             return self.full_name
 
     class Article(meta.Model):
-        pub_date = meta.DateTimeField('pub_date')
-        headline = meta.CharField('headline', maxlength=200)
-        article = meta.TextField('article')
+        pub_date = meta.DateTimeField)
+        headline = meta.CharField(maxlength=200)
+        article = meta.TextField()
         reporter = meta.ForeignKey(Reporter)
 
         def __repr__(self):
@@ -134,9 +134,9 @@ delete objects. It's as easy as adding an extra ``admin`` attribute to your
 model classes::
 
     class Article(meta.Model):
-        pub_date = meta.DateTimeField('pub_date')
-        headline = meta.CharField('headline', maxlength=200)
-        article = meta.TextField('article')
+        pub_date = meta.DateTimeField()
+        headline = meta.CharField(maxlength=200)
+        article = meta.TextField()
         reporter = meta.ForeignKey(Reporter)
         class META:
             admin = meta.Admin()
