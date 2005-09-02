@@ -1,4 +1,4 @@
-"Useful HTML utilities suitable for global use by World Online projects."
+"HTML utilities suitable for global use."
 
 import re, string
 
@@ -9,16 +9,16 @@ TRAILING_PUNCTUATION = ['.', ',', ')', '>', '\n', '&gt;']
 # list of possible strings used for bullets in bulleted lists
 DOTS = ['&middot;', '*', '\xe2\x80\xa2', '&#149;', '&bull;', '&#8226;']
 
-UNENCODED_AMPERSANDS_RE = re.compile(r'&(?!(\w+|#\d+);)')
-WORD_SPLIT_RE = re.compile(r'(\s+)')
-PUNCTUATION_RE = re.compile('^(?P<lead>(?:%s)*)(?P<middle>.*?)(?P<trail>(?:%s)*)$' % \
+unencoded_ampersands_re = re.compile(r'&(?!(\w+|#\d+);)')
+word_split_re = re.compile(r'(\s+)')
+punctuation_re = re.compile('^(?P<lead>(?:%s)*)(?P<middle>.*?)(?P<trail>(?:%s)*)$' % \
     ('|'.join([re.escape(p) for p in LEADING_PUNCTUATION]),
     '|'.join([re.escape(p) for p in TRAILING_PUNCTUATION])))
-SIMPLE_EMAIL_RE = re.compile(r'^\S+@[a-zA-Z0-9._-]+\.[a-zA-Z0-9._-]+$')
-LINK_TARGET_ATTRIBUTE = re.compile(r'(<a [^>]*?)target=[^\s>]+')
-HTML_GUNK = re.compile(r'(?:<br clear="all">|<i><\/i>|<b><\/b>|<em><\/em>|<strong><\/strong>|<\/?smallcaps>|<\/?uppercase>)', re.IGNORECASE)
-HARD_CODED_BULLETS = re.compile(r'((?:<p>(?:%s).*?[a-zA-Z].*?</p>\s*)+)' % '|'.join([re.escape(d) for d in DOTS]), re.DOTALL)
-TRAILING_EMPTY_CONTENT = re.compile(r'(?:<p>(?:&nbsp;|\s|<br \/>)*?</p>\s*)+\Z')
+simple_email_re = re.compile(r'^\S+@[a-zA-Z0-9._-]+\.[a-zA-Z0-9._-]+$')
+link_target_attribute_re = re.compile(r'(<a [^>]*?)target=[^\s>]+')
+html_gunk_re = re.compile(r'(?:<br clear="all">|<i><\/i>|<b><\/b>|<em><\/em>|<strong><\/strong>|<\/?smallcaps>|<\/?uppercase>)', re.IGNORECASE)
+hard_coded_bullets_re = re.compile(r'((?:<p>(?:%s).*?[a-zA-Z].*?</p>\s*)+)' % '|'.join([re.escape(d) for d in DOTS]), re.DOTALL)
+trailing_empty_content_re = re.compile(r'(?:<p>(?:&nbsp;|\s|<br \/>)*?</p>\s*)+\Z')
 
 def escape(html):
     "Returns the given HTML with ampersands, quotes and carets encoded"
@@ -43,7 +43,7 @@ def strip_entities(value):
 
 def fix_ampersands(value):
     "Returns the given HTML with all unencoded ampersands encoded correctly"
-    return UNENCODED_AMPERSANDS_RE.sub('&amp;', value)
+    return unencoded_ampersands_re.sub('&amp;', value)
 
 def urlize(text, trim_url_limit=None, nofollow=False):
     """
@@ -57,10 +57,10 @@ def urlize(text, trim_url_limit=None, nofollow=False):
     If nofollow is True, the URLs in link text will get a rel="nofollow" attribute.
     """
     trim_url = lambda x, limit=trim_url_limit: limit is not None and (x[:limit] + (len(x) >=limit and '...' or ''))  or x
-    words = WORD_SPLIT_RE.split(text)
+    words = word_split_re.split(text)
     nofollow_attr = nofollow and ' rel="nofollow"' or ''
     for i, word in enumerate(words):
-        match = PUNCTUATION_RE.match(word)
+        match = punctuation_re.match(word)
         if match:
             lead, middle, trail = match.groups()
             if middle.startswith('www.') or ('@' not in middle and not middle.startswith('http://') and \
@@ -70,7 +70,7 @@ def urlize(text, trim_url_limit=None, nofollow=False):
             if middle.startswith('http://') or middle.startswith('https://'):
                 middle = '<a href="%s"%s>%s</a>' % (middle, nofollow_attr, trim_url(middle))
             if '@' in middle and not middle.startswith('www.') and not ':' in middle \
-                and SIMPLE_EMAIL_RE.match(middle):
+                and simple_email_re.match(middle):
                 middle = '<a href="mailto:%s">%s</a>' % (middle, middle)
             if lead + middle + trail != word:
                 words[i] = lead + middle + trail
@@ -94,17 +94,17 @@ def clean_html(text):
     text = re.sub(r'<(/?)\s*i\s*>', '<\\1em>', text)
     text = fix_ampersands(text)
     # Remove all target="" attributes from <a> tags.
-    text = LINK_TARGET_ATTRIBUTE.sub('\\1', text)
+    text = link_target_attribute_re.sub('\\1', text)
     # Trim stupid HTML such as <br clear="all">.
-    text = HTML_GUNK.sub('', text)
+    text = html_gunk_re.sub('', text)
     # Convert hard-coded bullets into HTML unordered lists.
     def replace_p_tags(match):
         s = match.group().replace('</p>', '</li>')
         for d in DOTS:
             s = s.replace('<p>%s' % d, '<li>')
         return '<ul>\n%s\n</ul>' % s
-    text = HARD_CODED_BULLETS.sub(replace_p_tags, text)
+    text = hard_coded_bullets_re.sub(replace_p_tags, text)
     # Remove stuff like "<p>&nbsp;&nbsp;</p>", but only if it's at the bottom of the text.
-    text = TRAILING_EMPTY_CONTENT.sub('', text)
+    text = trailing_empty_content_re.sub('', text)
     return text
 
