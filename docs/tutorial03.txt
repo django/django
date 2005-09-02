@@ -55,9 +55,11 @@ comparing the requested URL against each regular expression until it finds one
 that matches.
 
 When it finds a match, Django calls the Python callback function, with an
-``HTTPRequest`` request as the first argument, any "captured" values from the
+``HTTPRequest`` object as the first argument, any "captured" values from the
 regular expression as keyword arguments, and, optionally, arbitrary keyword
 arguments from the dictionary (an optional third item in the tuple).
+
+For more on ``HTTPRequest`` objects, see the `request and response documentation`_.
 
 When you ran ``django-admin.py startproject myproject`` at the beginning of
 Tutorial 1, it created a default URLconf in ``myproject/settings/urls/main.py``.
@@ -110,6 +112,7 @@ time the URLconf module is loaded. They're super fast.
 
 .. _Wikipedia's entry: http://en.wikipedia.org/wiki/Regular_expression
 .. _Python documentation: http://www.python.org/doc/current/lib/module-re.html
+.. _request and response documentation: http://www.djangoproject.com/documentation/request_response/
 
 Write your first view
 =====================
