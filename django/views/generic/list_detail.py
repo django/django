@@ -40,12 +40,15 @@ def object_list(request, app_label, module_name, paginate_by=None, allow_empty=F
         try:
             object_list = paginator.get_page(page)
         except InvalidPage:
-            raise Http404
+            if page == 0 and allow_empty:
+                object_list = []
+            else:
+                raise Http404
         page = int(page)
         c = Context(request, {
             'object_list': object_list,
-            'is_paginated' : True,
-            'results_per_page' : paginate_by,
+            'is_paginated': True,
+            'results_per_page': paginate_by,
             'has_next': paginator.has_next_page(page),
             'has_previous': paginator.has_previous_page(page),
             'page': page + 1,
@@ -56,11 +59,11 @@ def object_list(request, app_label, module_name, paginate_by=None, allow_empty=F
     else:
         object_list = mod.get_list(**lookup_kwargs)
         c = Context(request, {
-            'object_list' : object_list,
-            'is_paginated' : False
+            'object_list': object_list,
+            'is_paginated': False
         })
-    if len(object_list) == 0 and not allow_empty:
-        raise Http404
+        if len(object_list) == 0 and not allow_empty:
+            raise Http404
     for key, value in extra_context.items():
         if callable(value):
             c[key] = value()
@@ -103,7 +106,7 @@ def object_detail(request, app_label, module_name, object_id=None, slug=None,
     else:
         t = template_loader.get_template(template_name)
     c = Context(request, {
-        'object' : object,
+        'object': object,
     })
     for key, value in extra_context.items():
         if callable(value):
