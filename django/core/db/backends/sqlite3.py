@@ -103,6 +103,9 @@ def get_limit_offset_sql(limit, offset=None):
         sql += " OFFSET %s" % offset
     return sql
 
+def get_random_function_sql():
+    return "RANDOM()"
+
 def _sqlite_date_trunc(lookup_type, dt):
     try:
         dt = typecasts.typecast_timestamp(dt)

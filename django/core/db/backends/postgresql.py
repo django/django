@@ -77,6 +77,9 @@ def get_limit_offset_sql(limit, offset=None):
         sql += " OFFSET %s" % offset
     return sql
 
+def get_random_function_sql():
+    return "RANDOM()"
+
 def get_table_list(cursor):
     "Returns a list of table names in the current database."
     cursor.execute("""

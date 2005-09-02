@@ -38,6 +38,7 @@ get_last_insert_id = dbmod.get_last_insert_id
 get_date_extract_sql = dbmod.get_date_extract_sql
 get_date_trunc_sql = dbmod.get_date_trunc_sql
 get_limit_offset_sql = dbmod.get_limit_offset_sql
+get_random_function_sql = dbmod.get_random_function_sql
 get_table_list = dbmod.get_table_list
 get_relations = dbmod.get_relations
 OPERATOR_MAPPING = dbmod.OPERATOR_MAPPING

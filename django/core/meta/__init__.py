@@ -62,7 +62,7 @@ def orderlist2sql(order_list, opts, prefix=''):
         if f.startswith('-'):
             output.append('%s%s DESC' % (prefix, orderfield2column(f[1:], opts)))
         elif f == '?':
-            output.append('RANDOM()')
+            output.append(db.get_random_function_sql())
         else:
             output.append('%s%s ASC' % (prefix, orderfield2column(f, opts)))
     return ', '.join(output)
@@ -1319,7 +1319,7 @@ def function_get_sql_clause(opts, **kwargs):
     order_by = []
     for f in handle_legacy_orderlist(kwargs.get('order_by', opts.ordering)):
         if f == '?': # Special case.
-            order_by.append('RANDOM()')
+            order_by.append(db.get_random_function_sql())
         else:
             # Use the database table as a column prefix if it wasn't given,
             # and if the requested column isn't a custom SELECT.
