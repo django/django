@@ -35,7 +35,7 @@ def get_usage():
     available_actions.sort()
     for a in available_actions:
         func = ACTION_MAPPING[a]
-        usage.append("  %s %s-- %s" % (a, func.args, getattr(func, 'help_doc', func.__doc__)))
+        usage.append("  %s %s -- %s" % (a, func.args, getattr(func, 'help_doc', func.__doc__)))
     return '\n'.join(usage)
 
 class DjangoOptionParser(OptionParser):
