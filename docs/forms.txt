@@ -396,7 +396,7 @@ for a "contact" form on a website::
             self.fields = (
                 formfields.EmailField(field_name="from", is_required=True),
                 formfields.TextField(field_name="subject", length=30, maxlength=200, is_required=True),
-                formfields.IntegerField(field_name="urgency", choices=urgency_choices),
+                formfields.SelectField(field_name="urgency", choices=urgency_choices),
                 formfields.LargeTextField(field_name="contents", is_required=True),
             )
 
