@@ -495,11 +495,11 @@ class ModelErrorCollection:
         self.errors.append((opts, error))
         self.outfile.write("%s.%s: %s\n" % (opts.app_label, opts.module_name, error))
 
-def validate():
+def validate(outfile=sys.stdout):
     "Validates all installed models."
     import django.models
     from django.core import meta
-    e = ModelErrorCollection()
+    e = ModelErrorCollection(outfile)
     module_list = meta.get_installed_model_modules()
     for module in module_list:
         for mod in module._MODELS:
@@ -545,7 +545,7 @@ def validate():
                     pass
 
     num_errors = len(e.errors)
-    print '%s error%s found.' % (num_errors, num_errors != 1 and 's' or '')
+    outfile.write('%s error%s found.\n' % (num_errors, num_errors != 1 and 's' or ''))
 validate.args = ''
 
 def runserver(addr, port):
