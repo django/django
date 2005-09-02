@@ -299,18 +299,19 @@ class Options:
                             rel_objs.append((klass._meta, f))
             if self.has_related_links:
                 # Manually add RelatedLink objects, which are a special case.
-                core = get_module('relatedlinks', 'relatedlinks')
+                relatedlinks = get_module('relatedlinks', 'relatedlinks')
                 # Note that the copy() is very important -- otherwise any
                 # subsequently loaded object with related links will override this
                 # relationship we're adding.
-                link_field = copy.copy(core.RelatedLink._meta.get_field('object_id'))
+                link_field = copy.copy(relatedlinks.RelatedLink._meta.get_field('object_id'))
                 link_field.rel = ManyToOne(self.get_model_module().Klass, 'id',
                     num_in_admin=3, min_num_in_admin=3, edit_inline=TABULAR,
                     lookup_overrides={
                         'content_type__package__label__exact': self.app_label,
-                        'content_type__python_module_name__exact': self.module_name
+                        'content_type__python_module_name__exact': self.module_name,
+                        'object_id__id__exact': None,
                     })
-                rel_objs.append((core.RelatedLink._meta, link_field))
+                rel_objs.append((relatedlinks.RelatedLink._meta, link_field))
             self._all_related_objects = rel_objs
             return rel_objs
 
@@ -1532,7 +1533,7 @@ def manipulator_save(opts, klass, add, change, self, new_data):
                 else:
                     params[f.column] = f.get_manipulator_new_data(rel_new_data, rel=True)
                 # Related links are a special case, because we have to
-                # manually set the "content_type_id" field.
+                # manually set the "content_type_id" and "object_id" fields.
                 if opts.has_related_links and rel_opts.module_name == 'relatedlinks':
                     contenttypes_mod = get_module('core', 'contenttypes')
                     params['content_type_id'] = contenttypes_mod.get_object(package__label__exact=opts.app_label, python_module_name__exact=opts.module_name).id
