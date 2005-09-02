@@ -520,6 +520,8 @@ def get_validation_errors(outfile):
             for f in opts.fields:
                 if isinstance(f, meta.CharField) and f.maxlength in (None, 0):
                     e.add(opts, '"%s" field: CharFields require a "maxlength" attribute.' % f.name)
+                if f.prepopulate_from is not None and type(f.prepopulate_from) not in (list, tuple):
+                    e.add(opts, '"%s" field: prepopulate_from should be a list or tuple.' % f.name)
                 if f.choices:
                     if not type(f.choices) in (tuple, list):
                         e.add(opts, '"%s" field: "choices" should be either a tuple or list.' % f.name)
