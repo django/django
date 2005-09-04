@@ -27,7 +27,7 @@ solving two years' worth of database-schema problems. Here's a quick example::
             return self.full_name
 
     class Article(meta.Model):
-        pub_date = meta.DateTimeField)
+        pub_date = meta.DateTimeField()
         headline = meta.CharField(maxlength=200)
         article = meta.TextField()
         reporter = meta.ForeignKey(Reporter)
