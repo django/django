@@ -14,6 +14,7 @@ setup(
     packages = find_packages(),
     package_data = {
         'django.conf': ['admin_templates/*.html', 'admin_templates/doc/*.html',
+                        'admin_templates/registration/*.html',
                         'admin_media/css/*.css', 'admin_media/img/admin/*.gif',
                         'admin_media/img/admin/*.png', 'admin_media/js/*.js',
                         'admin_media/js/admin/*js'],
