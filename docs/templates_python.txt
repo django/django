@@ -1,0 +1,275 @@
+====================================================
+The Django template language: For Python programmers
+====================================================
+
+This document explains the Django template system from a technical
+perspective -- how it works and how to extend it. If you're just looking for
+reference on the language syntax, see
+`The Django template language: For template authors`_.
+
+.. _`The Django template language: For template authors`: http://www.djangoproject.com/documentation/templates/
+
+Basics
+======
+
+A **template** is a text document, or a normal Python string, that is marked-up
+using the Django template language. A template can contain **block tags** or
+**variables**.
+
+A **block tag** is a symbol within a template that does something.
+
+This definition is deliberately vague. For example, a block tag can output
+content, serve as a control structure (an "if" statement or "for" loop), grab
+content from a database or enable access to other template tags.
+
+Block tags are surrounded by ``"{%"`` and ``"%}"``.
+
+Example template with block tags::
+
+    {% if is_logged_in %}Thanks for logging in!{% else %}Please log in.{% endif %}
+
+A **variable** is a symbol within a template that outputs a value.
+
+Block tags are surrounded by ``"{{"`` and ``"}}"``.
+
+Example template with variables::
+
+    My first name is {{ first_name }}. My last name is {{ last_name }}.
+
+A **context** is a "variable name" -> "variable value" mapping that is passed
+to a template.
+
+A template **renders** a context by replacing the variable "holes" with values
+from the context and executing all block tags.
+
+Using the template system
+=========================
+
+Using the template system in Python is a two-step process:
+
+    * First, you compile the raw template code into a ``Template`` object.
+    * Then, you call the ``render()`` method of the ``Template`` object with a
+      given context.
+
+Compiling a string
+------------------
+
+The easiest way to create a ``Template`` object is by instantiating it
+directly. The class lives at ``django.core.template.Template``. The constructor
+takes one argument -- the raw template code::
+
+    >>> from django.core.template import Template
+    >>> t = Template("My name is {{ my_name }}.")
+    >>> print t
+    <django.core.template.Template instance>
+
+.. admonition:: Behind the scenes
+
+    The system only parses your raw template code once -- when you create the
+    ``Template`` object. From then on, it's stored internally as a "node"
+    structure for performance.
+
+    Even the parsing itself is quite fast. Most of the parsing happens via a
+    single call to a single, short, regular expression.
+
+Rending a context
+-----------------
+
+Once you have a compiled ``Template`` object, you can render a context -- or
+multiple contexts -- with it. The ``Context`` class lives at
+``django.core.template.Context``, and the constructor takes one (optional)
+argument: a dictionary mapping variable names to variable values. Call the
+``Template`` object's ``render()`` method with the context to "fill" the
+template::
+
+    >>> from django.core.template import Context, Template
+    >>> t = Template("My name is {{ my_name }}.")
+
+    >>> c = Context({"my_name": "Adrian"})
+    >>> t.render(c)
+    "My name is Adrian."
+
+    >>> c = Context({"my_name": "Dolores"})
+    >>> t.render(c)
+    "My name is Dolores."
+
+Variable names must consist of any letter (A-Z), any digit (0-9), an underscore
+or a dot.
+
+Dots have a special meaning in template rendering. A dot in a variable name
+signifies **lookup**. Specifically, when the template system encounters a dot
+in a variable name, it tries the following lookups, in this order:
+
+    * Dictionary lookup. Example: ``foo["bar"]``
+    * Attribute lookup. Example: ``foo.bar``
+    * Method call. Example: ``foo.bar()``
+    * List-index lookup. Example: ``foo[bar]``
+
+The template system uses the first lookup type that works. It's short-circuit
+logic.
+
+Here are a few examples::
+
+    >>> from django.core.template import Context, Template
+    >>> t = Template("My name is {{ person.first_name }}.")
+    >>> d = {"person": {"first_name": "Joe", "last_name": "Johnson"}}
+    >>> t.render(Context(d))
+    "My name is Joe."
+
+    >>> class PersonClass: pass
+    >>> p = PersonClass()
+    >>> p.first_name = "Ron"
+    >>> p.last_name = "Nasty"
+    >>> t.render(Context({"person": p}))
+    "My name is Ron."
+
+    >>> class PersonClass2:
+    ...     def first_name(self):
+    ...         return "Samantha"
+    >>> p = PersonClass2()
+    >>> t.render(Context({"person": p}))
+    "My name is Samantha."
+
+    >>> t = Template("The first stooge in the list is {{ stooges.0 }}.")
+    >>> c = Context({"stooges": ["Larry", "Curly", "Moe"]})
+    >>> t.render(c)
+    "The first stooge in the list is Larry."
+
+If a variable doesn't exist, the template system fails silently. The variable
+is replaced with an empty string.
+
+    >>> t = Template("My name is {{ my_name }}.")
+    >>> c = Context({"foo": "bar"})
+    >>> t.render(c)
+    "My name is ."
+
+Method lookups are slightly more complex than the other lookup types. Here are
+some things to keep in mind:
+
+    * If, during the method lookup, a method raises an exception, the exception
+      will be propgated, unless the exception subclasses
+      ``django.core.template.SilentVariableFailure``. If the exception
+      subclasses ``SilentVariableFailure``, the variable will render as an
+      empty string. Example::
+
+        >>> t = Template("My name is {{ person.first_name }}.")
+        >>> class PersonClass3:
+        ...     def first_name(self):
+        ...         raise AssertionError, "foo"
+        >>> p = PersonClass3()
+        >>> t.render(Context({"person": p}))
+        Traceback (most recent call last):
+        ...
+        AssertionError: foo
+
+        >>> from django.core.template import SilentVariableFailure
+        >>> class SilentAssertionError(SilentVariableFailure): pass
+        >>> class PersonClass4:
+        ...     def first_name(self):
+        ...         raise SilentAssertionError, "foo"
+        >>> p = PersonClass4()
+        >>> t.render(Context({"person": p}))
+        "My name is ."
+
+    * A method call will only work if the method has no required arguments.
+      Otherwise, the system will move to the next lookup type (list-index
+      lookup).
+
+    * Obviously, some methods have side effects, and it'd be either foolish or
+      a security hole to allow the template system to access them.
+
+      A good example is the ``delete()`` method on each Django model object.
+      The template system shouldn't be allowed to do something like this::
+
+        I will now delete this valuable data. {{ data.delete }}
+
+      To prevent this, set a function attribute ``alters_data`` on the method.
+      The template system won't execute a method if the method has
+      ``alters_data=True`` set. The dynamically-generated ``delete()`` and
+      ``save()`` methods on Django model objects get ``alters_data=True``
+      automatically.
+
+Loading templates
+-----------------
+
+Generally, you'll store templates in files on your filesystem rather than using
+the low-level ``Template`` API yourself. Save templates in a file with an
+".html" extension in a directory specified as a **template directory**.
+
+(The ".html" extension is just a required convention. It doesn't mean templates
+can only contain HTML. They can contain whatever textual content you want.)
+
+The TEMPLATE_DIRS setting
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Tell Django what your template directories are by using the ``TEMPLATE_DIRS``
+setting in your settings file. This should be set to a list or tuple of strings
+that contain full paths to your template directory(ies). Example::
+
+    TEMPLATE_DIRS = (
+        "/home/html/templates/lawrence.com",
+        "/home/html/templates/default",
+    )
+
+The Python API
+~~~~~~~~~~~~~~
+
+Django has two ways to load templates from files:
+
+``django.core.template_loader.get_template(template_name)``
+    ``get_template`` returns the compiled template (a ``Template`` object) for
+    the given name. If the template doesn't exist, it raises
+    ``django.core.template.TemplateDoesNotExist``.
+
+``django.core.template_loader.select_template(template_name_list)``
+    ``select_template`` is just like ``get_template``, except it takes a list
+    of template names. Of the list, it returns the first template that exists.
+
+For example, if you call ``get_template("story_detail")`` and have the above
+``TEMPLATE_DIRS`` setting, here are the files Django will look for, in order:
+
+    * ``/home/html/templates/lawrence.com/story_detail.html``
+    * ``/home/html/templates/default/story_detail.html``
+
+If you call ``select_template(["story_253_detail", "story_detail"])``, here's
+what Django will look for:
+
+    * ``/home/html/templates/lawrence.com/story_253_detail.html``
+    * ``/home/html/templates/default/story_253_detail.html``
+    * ``/home/html/templates/lawrence.com/story_detail.html``
+    * ``/home/html/templates/default/story_detail.html``
+
+When Django finds a template that exists, it stops looking.
+
+.. admonition:: Tip
+
+    You can use ``select_template`` for super-flexible "templatability." For
+    example, if you've written a news story and want some stories to have
+    custom templates, use something like
+    ``select_template(["story_%s_detail" % story.id, "story_detail"])``.
+    That'll allow you to use a custom template for an individual story, with a
+    fallback template for stories that don't have custom templates.
+
+Using subdirectories
+~~~~~~~~~~~~~~~~~~~~
+
+It's possible -- and preferable -- to organize templates in subdirectories of
+the template directory. The convention is to make a subdirectory for each
+Django app, with subdirectories within those subdirectories as needed.
+
+Do this for your own sanity. Storing all templates in the root level of a
+single directory gets messy.
+
+To load a template that's within a subdirectory, just use a slash, like so::
+
+    get_template("news/story_detail")
+
+Extending the template system
+=============================
+
+Writing custom template filters
+-------------------------------
+
+Writing custom template tags
+----------------------------
+

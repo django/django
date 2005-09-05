@@ -1,6 +1,6 @@
-============================
-The Django template language
-============================
+==================================================
+The Django template language: For template authors
+==================================================
 
 Django's template language is designed to strike a balance between power and
 ease. It's designed to feel comfortable to those used to working with HTML. If
@@ -45,7 +45,7 @@ explained later in this document.::
     Why use a text-based template instead of an XML-based one (like Zope's
     TAL)? We wanted Django's template language to be usable for more than
     just XML/HTML templates. At World Online, we use it for e-mails,
-    Javascript and CSV. You can use the template language for any text-based
+    JavaScript and CSV. You can use the template language for any text-based
     format.
 
 What's a variable?
