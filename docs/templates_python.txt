@@ -213,7 +213,7 @@ dictionary syntax::
 
 A ``Context`` object is a stack. That is, you can ``push()`` and ``pop()`` it.
 If you ``pop()`` too much, it'll raise
-``django.core.template.ContextPopException``.
+``django.core.template.ContextPopException``::
 
     >>> c = Context()
     >>> c['foo'] = 'first level'
@@ -258,8 +258,8 @@ instance has the following two extra variables:
     * ``debug`` -- ``True``. You can use this in templates to test whether
       you're in ``DEBUG`` mode.
     * ``sql_queries`` -- A list of ``{'sql': ..., 'time': ...}`` dictionaries,
-      representing every SQL query that has happened so far during the request.
-      The list is in order by query.
+      representing every SQL query that has happened so far during the request
+      and how long it took. The list is in order by query.
 
 Feel free to subclass ``Context`` yourself if you find yourself wanting to give
 each template something "automatically." For instance, if you want to give
@@ -277,8 +277,8 @@ This technique has two caveats:
     * You'll have to remember to use ``TimeContext`` instead of ``Context`` in
       your template-loading code.
 
-    * You'll have to be careful not to set the variable ``current_time`` within
-      your templates. If you do, you'll override the other one.
+    * You'll have to be careful not to set the variable ``current_time`` when
+      you populate this context. If you do, you'll override the other one.
 
 Loading templates
 -----------------
@@ -411,7 +411,7 @@ Custom filters are just Python functions that take two arguments:
 
 Filter functions should always return something. They shouldn't raise
 exceptions. They should fail silently. In case of error, they should return
-either the original input or the empty string -- whichever makes more sense.
+either the original input or an empty string -- whichever makes more sense.
 
 Here's an example filter definition::
 
@@ -428,13 +428,13 @@ definition. Example::
         return value.lower()
 
 When you've written your filter definition, you need to register it, to make it
-available to Django's template language.
+available to Django's template language::
 
     from django.core import template
     template.register_filter('cut', cut, True)
     template.register_filter('lower', lower, False)
 
-``register_filter`` takes three arguments::
+``register_filter`` takes three arguments:
 
     1. The name of the filter -- a string
     2. The Python function
@@ -460,6 +460,7 @@ When Django compiles a template, it splits the raw template text into
 a ``render()`` method. A compiled template is, simply, a list of ``Node``
 objects. When you call ``render()`` on a compiled template object, the template
 calls ``render()`` on each ``Node`` in its node list, with the given context.
+The results are all concatenated together to form the output of the template.
 
 Thus, to define a custom template tag, you specify how the raw template tag is
 converted into a ``Node`` (the compilation function), and what the node's
@@ -576,7 +577,7 @@ you allow template authors to reuse the values that your template tags create.
 To set a variable in the context, just use dictionary assignment on the context
 object in the ``render()`` method. Here's an updated version of
 ``CurrentTimeNode`` that sets a template variable ``current_time`` instead of
-outputting it.
+outputting it::
 
     class CurrentTimeNode2(template.Node):
         def __init__(self, format_string):
