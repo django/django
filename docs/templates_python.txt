@@ -136,7 +136,7 @@ Here are a few examples::
     "The first stooge in the list is Larry."
 
 If a variable doesn't exist, the template system fails silently. The variable
-is replaced with an empty string.
+is replaced with an empty string::
 
     >>> t = Template("My name is {{ my_name }}.")
     >>> c = Context({"foo": "bar"})
@@ -187,7 +187,11 @@ some things to keep in mind:
       The template system won't execute a method if the method has
       ``alters_data=True`` set. The dynamically-generated ``delete()`` and
       ``save()`` methods on Django model objects get ``alters_data=True``
-      automatically.
+      automatically. Example::
+
+        def sensitive_function(self):
+            self.database_record.delete()
+        sensitive_function.alters_data = True
 
 Loading templates
 -----------------
@@ -218,7 +222,7 @@ Django has two ways to load templates from files:
 
 ``django.core.template_loader.get_template(template_name)``
     ``get_template`` returns the compiled template (a ``Template`` object) for
-    the given name. If the template doesn't exist, it raises
+    the template with the given name. If the template doesn't exist, it raises
     ``django.core.template.TemplateDoesNotExist``.
 
 ``django.core.template_loader.select_template(template_name_list)``
