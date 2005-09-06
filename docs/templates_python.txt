@@ -436,9 +436,12 @@ available to Django's template language::
 
 ``register_filter`` takes three arguments:
 
-    1. The name of the filter -- a string
-    2. The Python function
-    3. A boolean, designating whether the filter requires an argument
+    1. The name of the filter -- a string.
+    2. The compilation function -- a Python function (not the name of the
+       function as a string).
+    3. A boolean, designating whether the filter requires an argument. This
+       tells Django's template parser whether to throw ``TemplateSyntaxError``
+       when filter arguments are given (or missing).
 
 The convention is to put all ``register_filter`` calls at the bottom of your
 template-library module.
@@ -563,9 +566,9 @@ Finally, use a ``register_tag`` call, as in ``register_filter`` above. Example::
 
 ``register_tag`` takes two arguments:
 
-    * The name of the template tag -- a string
-    * The compilation function -- a Python function (not the name of the
-      function as a string)
+    1. The name of the template tag -- a string
+    2. The compilation function -- a Python function (not the name of the
+       function as a string)
 
 Setting a variable in the context
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
