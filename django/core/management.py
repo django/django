@@ -286,19 +286,23 @@ get_admin_index.args = APP_ARGS
 
 def init():
     "Initializes the database with auth and core."
-    from django.core import db, meta
-    auth = meta.get_app('auth')
-    core = meta.get_app('core')
     try:
+        from django.core import db, meta
+        auth = meta.get_app('auth')
+        core = meta.get_app('core')
         cursor = db.db.cursor()
         for sql in get_sql_create(core) + get_sql_create(auth) + get_sql_initial_data(core) + get_sql_initial_data(auth):
             cursor.execute(sql)
         cursor.execute("INSERT INTO %s (domain, name) VALUES ('mysite.com', 'My Django site')" % core.Site._meta.db_table)
     except Exception, e:
-        sys.stderr.write("Error: The database couldn't be initialized. Here's the full exception:\n%s\n" % e)
-        db.db.rollback()
+        sys.stderr.write("Error: The database couldn't be initialized.\n%s\n" % e)
+        try:
+            db.db.rollback()
+        except UnboundLocalError:
+            pass
         sys.exit(1)
-    db.db.commit()
+    else:
+        db.db.commit()
 init.args = ''
 
 def install(mod):
