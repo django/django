@@ -72,8 +72,8 @@ takes one argument -- the raw template code::
     Even the parsing itself is quite fast. Most of the parsing happens via a
     single call to a single, short, regular expression.
 
-Rending a context
------------------
+Rendering a context
+-------------------
 
 Once you have a compiled ``Template`` object, you can render a context -- or
 multiple contexts -- with it. The ``Context`` class lives at
