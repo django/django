@@ -30,7 +30,7 @@ Example template with block tags::
 
 A **variable** is a symbol within a template that outputs a value.
 
-Block tags are surrounded by ``"{{"`` and ``"}}"``.
+Variable tags are surrounded by ``"{{"`` and ``"}}"``.
 
 Example template with variables::
 
@@ -147,7 +147,7 @@ Method lookups are slightly more complex than the other lookup types. Here are
 some things to keep in mind:
 
     * If, during the method lookup, a method raises an exception, the exception
-      will be propgated, unless the exception subclasses
+      will be propagated, unless the exception subclasses
       ``django.core.template.SilentVariableFailure``. If the exception
       subclasses ``SilentVariableFailure``, the variable will render as an
       empty string. Example::
