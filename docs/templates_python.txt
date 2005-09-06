@@ -193,6 +193,93 @@ some things to keep in mind:
             self.database_record.delete()
         sensitive_function.alters_data = True
 
+Playing with Context objects
+----------------------------
+
+Most of the time, you'll instantiate ``Context`` objects by passing in a
+fully-populated dictionary to ``Context()``. But you can add and delete items
+from a ``Context`` object once it's been instantiated, too, using standard
+dictionary syntax::
+
+    >>> c = Context({"foo": "bar"})
+    >>> c['foo']
+    'bar'
+    >>> del c['foo']
+    >>> c['foo']
+    ''
+    >>> c['newvariable'] = 'hello'
+    >>> c['newvariable']
+    'hello'
+
+A ``Context`` object is a stack. That is, you can ``push()`` and ``pop()`` it.
+If you ``pop()`` too much, it'll raise
+``django.core.template.ContextPopException``.
+
+    >>> c = Context()
+    >>> c['foo'] = 'first level'
+    >>> c.push()
+    >>> c['foo'] = 'second level'
+    >>> c['foo']
+    'second level'
+    >>> c.pop()
+    >>> c['foo']
+    'first level'
+    >>> c['foo'] = 'overwritten'
+    >>> c['foo']
+    'overwritten'
+    >>> c.pop()
+    Traceback (most recent call last):
+    ...
+    django.core.template.ContextPopException
+
+Using a ``Context`` as a stack comes in handy in some custom template tags, as
+you'll see below.
+
+Subclassing Context: DjangoContext
+----------------------------------
+
+Django comes with a special ``Context`` class,
+``django.core.extensions.DjangoContext``, that acts slightly differently than
+the normal ``django.core.template.Context``. It takes an ``HttpRequest`` object
+as its first argument, and it automatically populates the context with a few
+variables:
+
+    * ``user`` -- An ``auth.User`` instance representing the currently
+      logged-in user (or an ``AnonymousUser`` instance, if the client isn't
+      logged in).
+    * ``messages`` -- A list of ``auth.Message`` objects for the currently
+      logged-in user.
+    * ``perms`` -- An instance of ``django.core.extensions.PermWrapper``,
+      representing the permissions that the currently logged-in user has.
+
+Also, if your ``DEBUG`` setting is set to ``True``, every ``DjangoContext``
+instance has the following two extra variables:
+
+    * ``debug`` -- ``True``. You can use this in templates to test whether
+      you're in ``DEBUG`` mode.
+    * ``sql_queries`` -- A list of ``{'sql': ..., 'time': ...}`` dictionaries,
+      representing every SQL query that has happened so far during the request.
+      The list is in order by query.
+
+Feel free to subclass ``Context`` yourself if you find yourself wanting to give
+each template something "automatically." For instance, if you want to give
+every template automatic access to the current time, use something like this::
+
+    from django.core.template import Context
+    import datetime
+    class TimeContext(template.Context):
+        def __init__(self, *args, **kwargs):
+            Context.__init__(self, *args, **kwargs)
+            self['current_time'] = datetime.datetime.now()
+
+This technique has two caveats:
+
+    * You'll have to remember to use ``TimeContext`` instead of ``Context`` in
+      your template-loading code.
+
+    * You'll have to be careful not to set the variable ``current_time`` within
+      your templates. If you do, you'll override the other one.
+
 Loading templates
 -----------------
 
@@ -271,9 +358,277 @@ To load a template that's within a subdirectory, just use a slash, like so::
 Extending the template system
 =============================
 
+Although the Django template language comes with several default tags and
+filters, you might want to write your own. It's easy to do.
+
+First, create a ``templatetags`` package in the appropriate Django app's
+package. It should be on the same level as ``models``, ``views``, etc. For
+example::
+
+    polls/
+        models/
+        templatetags/
+        views/
+
+Add two files to the ``templatetags`` package: an ``__init__.py`` file and a
+file that will contain your custom tag/filter definitions. The name of the
+latter file is the name you'll use to load the tags later. For example, if your
+custom tags/filters are in a file called ``poll_extras.py``, you'd do the
+following in a template::
+
+    {% load poll_extras %}
+
+The ``{% load %}`` tag looks at your ``INSTALLED_APPS`` setting and only allows
+the loading of template libraries within installed Django apps. This is a
+security feature: It allows you to host Python code for many template libraries
+on a single computer without enabling access to all of them for every Django
+installation.
+
+If you write a template library that isn't tied to any particular models/views,
+it's perfectly OK to have a Django app package that only contains a
+``templatetags`` package.
+
+There's no limit on how many modules you put in the ``templatetags`` package.
+Just keep in mind that a ``{% load %}`` statement will load tags/filters for
+the given Python module name, not the name of the app.
+
+Once you've created that Python module, you'll just have to write a bit of
+Python code, depending on whether you're writing filters or tags.
+
+.. admonition:: Behind the scenes
+
+    For a ton of examples, read the source code for Django's default filters
+    and tags. They're in ``django/core/defaultfilters.py`` and
+    ``django/core/defaulttags.py``, respectively.
+
 Writing custom template filters
 -------------------------------
+
+Custom filters are just Python functions that take two arguments:
+
+    * The value of the variable (input) -- not necessarily a string
+    * The value of the argument -- always a string
+
+Filter functions should always return something. They shouldn't raise
+exceptions. They should fail silently. In case of error, they should return
+either the original input or the empty string -- whichever makes more sense.
+
+Here's an example filter definition::
+
+    def cut(value, arg):
+        "Removes all values of arg from the given string"
+        return value.replace(arg, '')
+
+Most filters don't take arguments. For filters that don't take arguments, the
+convention is to use a single underscore as the second argument to the filter
+definition. Example::
+
+    def lower(value, _):
+        "Converts a string into all lowercase"
+        return value.lower()
+
+When you've written your filter definition, you need to register it, to make it
+available to Django's template language.
+
+    from django.core import template
+    template.register_filter('cut', cut, True)
+    template.register_filter('lower', lower, False)
+
+``register_filter`` takes three arguments::
+
+    1. The name of the filter -- a string
+    2. The Python function
+    3. A boolean, designating whether the filter requires an argument
+
+The convention is to put all ``register_filter`` calls at the bottom of your
+template-library module.
 
 Writing custom template tags
 ----------------------------
 
+Tags are more complex than filters, because tags can do anything.
+
+A quick overview
+~~~~~~~~~~~~~~~~
+
+Above, this document explained that the template system works in a two-step
+process: compiling and rendering. To define a custom template tag, you specify
+how the compilation works and how the rendering works.
+
+When Django compiles a template, it splits the raw template text into
+''nodes''. Each node is an instance of ``django.core.template.Node`` and has
+a ``render()`` method. A compiled template is, simply, a list of ``Node``
+objects. When you call ``render()`` on a compiled template object, the template
+calls ``render()`` on each ``Node`` in its node list, with the given context.
+
+Thus, to define a custom template tag, you specify how the raw template tag is
+converted into a ``Node`` (the compilation function), and what the node's
+``render()`` method does.
+
+Writing the compilation function
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+For each template tag the template parser encounters, it calls a Python
+function with the tag contents and the parser object itself. This function is
+responsible for returning a ``Node`` instance based on the contents of the tag.
+
+By convention, the name of each compilation function should start with ``do_``.
+
+For example, let's write a template tag that displays the current date/time,
+formatted according to a parameter given in the tag, in `strftime syntax`_.
+It's a good idea to decide the tag syntax before anything else. In our case,
+let's say the tag should be used like this::
+
+    <p>The time is {% current_time "%Y-%M-%d %I:%M %p" %}.</p>
+
+.. _`strftime syntax`: http://www.python.org/doc/current/lib/module-time.html#l2h-1941
+
+The parser for this function should grab the parameter and create a ``Node``
+object::
+
+    from django.core import template
+    def do_current_time(parser, token):
+        try:
+            # Splitting by None == splitting by spaces.
+            tag_name, format_string = token.contents.split(None, 1)
+        except ValueError:
+            raise template.TemplateSyntaxError, "%r tag requires an argument" % token.contents[0]
+        if not (format_string[0] == format_string[-1] and format_string[0] in ('"', "'")):
+            raise template.TemplateSyntaxError, "%r tag's argument should be in quotes" % tag_name
+        return CurrentTimeNode(format_string[1:-1])
+
+Notes:
+
+    * ``parser`` is the template parser object. We don't need it in this
+      example.
+
+    * ``token.contents`` is a string of the raw contents of the tag. In our
+      example, it's ``'current_time "%Y-%M-%d %I:%M %p"'``
+
+    * This function raises ``django.core.template.TemplateSyntaxError``, with
+      helpful messages, for any syntax error.
+
+    * The ``TemplateSyntaxError`` exceptions use the ``tag_name`` variable.
+      Don't hard-code the tag's name in your error messages, because that
+      couples the tag's name to your function. ``token.contents.split()[0]``
+      will ''always'' be the name of your tag -- even when the tag has no
+      arguments.
+
+    * The function returns a ``CurrentTimeNode`` with everything the node needs
+      to know about this tag. In this case, it just passes the argument --
+      ``"%Y-%M-%d %I:%M %p"``. The leading and trailing quotes from the
+      template tag are removed in ``format_string[1:-1]``.
+
+    * The parsing is very low-level. The Django developers have experimented
+      with writing small frameworks on top of this parsing system, using
+      techniques such as EBNF grammars, but those experiments made the template
+      engine too slow. It's low-level because that's fastest.
+
+Writing the renderer
+~~~~~~~~~~~~~~~~~~~~
+
+The second step in writing custom tags is to define a ``Node`` subclass that
+has a ``render()`` method.
+
+Continuing the above example, we need to define ``CurrentTimeNode``::
+
+    from django.core import template
+    import datetime
+    class CurrentTimeNode(template.Node):
+        def __init__(self, format_string):
+            self.format_string = format_string
+        def render(self, context):
+            return datetime.datetime.now().strftime(self.format_string)
+
+Notes:
+
+    * ``__init__()`` gets the ``format_string`` from ``do_current_time()``.
+      Always pass any options/parameters/arguments to a ``Node`` via its
+      ``__init__()``.
+
+    * The ``render()`` method is where the work actually happens.
+
+Ultimately, this decoupling of compilation and rendering results in an
+efficient template system, because a template can render multiple context
+without having to be parsed multiple times.
+
+Registering the tag
+~~~~~~~~~~~~~~~~~~~
+
+Finally, use a ``register_tag`` call, as in ``register_filter`` above. Example::
+
+    from django.core import template
+    template.register_tag('cycle', do_cycle)
+
+``register_tag`` takes two arguments:
+
+    * The name of the template tag -- a string
+    * The compilation function -- a Python function (not the name of the
+      function as a string)
+
+Setting a variable in the context
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The above example simply output a value. Generally, it's more flexible if your
+template tags set template variables instead of outputting values. That way,
+you allow template authors to reuse the values that your template tags create.
+
+To set a variable in the context, just use dictionary assignment on the context
+object in the ``render()`` method. Here's an updated version of
+``CurrentTimeNode`` that sets a template variable ``current_time`` instead of
+outputting it.
+
+    class CurrentTimeNode2(template.Node):
+        def __init__(self, format_string):
+            self.format_string = format_string
+        def render(self, context):
+            context['current_time'] = datetime.datetime.now().strftime(self.format_string)
+            return ''
+
+Note that ``render()`` returns the empty string. ``render()`` should always
+return string output. If all the template tag does is set a variable,
+``render()`` should return the empty string.
+
+Here's how you'd use this new version of the tag::
+
+    {% current_time "%Y-%M-%d %I:%M %p" %}<p>The time is {{ current_time }}.</p>
+
+But, there's a naive problem with ``CurrentTimeNode2``: The variable name
+``current_time`` is hard-coded. This means you'll need to make sure your
+template doesn't use ``{{ current_time }}`` anywhere else, because the
+``{% current_time %}`` will blindly overwrite that variable's value. A cleaner
+solution is to make the template tag specify the name of the output variable,
+like so::
+
+    {% get_current_time "%Y-%M-%d %I:%M %p" as my_current_time %}
+    <p>The current time is {{ my_current_time }}.</p>
+
+To do that, you'll need to refactor both the compilation function and ``Node``
+class, like so::
+
+    class CurrentTimeNode3(template.Node):
+        def __init__(self, format_string, var_name):
+            self.format_string = format_string
+            self.var_name = var_name
+        def render(self, context):
+            context[self.var_name] = datetime.datetime.now().strftime(self.format_string)
+            return ''
+
+    import re
+    def do_current_time(parser, token):
+        # This version uses a regular expression to parse tag contents.
+        try:
+            # Splitting by None == splitting by spaces.
+            tag_name, arg = token.contents.split(None, 1)
+        except ValueError:
+            raise template.TemplateSyntaxError, "%r tag requires arguments" % token.contents[0]
+        m = re.search(r'(.*?) as (\w+)', arg)
+        if not m:
+            raise template.TemplateSyntaxError, "%r tag had invalid arguments" % tag_name
+        format_string, var_name = m.groups()
+        if not (format_string[0] == format_string[-1] and format_string[0] in ('"', "'")):
+            raise template.TemplateSyntaxError, "%r tag's argument should be in quotes" % tag_name
+        return CurrentTimeNode3(format_string[1:-1], var_name)
+
+The difference here is that ``do_current_time()`` grabs the format string and
+the variable name, passing both to ``CurrentTimeNode3``.
