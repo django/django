@@ -676,7 +676,7 @@ After ``parser.parse()`` is called, the parser hasn't yet "consumed" the
 ``CommentNode.render()`` simply returns an empty string. Anything between
 ``{% comment %}`` and ``{% endcomment %}`` is ignored.
 
-Parsing unitl another block tag, and saving contents
+Parsing until another block tag, and saving contents
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 In the previous example, ``do_comment()`` discarded everything between
@@ -709,4 +709,5 @@ The only new concept here is the ``self.nodelist.render(context)`` in
 ``UpperNode.render()``.
 
 For more examples of complex rendering, see the source code for ``{% if %}``,
-``{% for %}``, ``{% ifequal %}`` and ``{% ifchanged %}``.
+``{% for %}``, ``{% ifequal %}`` and ``{% ifchanged %}``. They live in
+``django/core/defaulttags.py``.
