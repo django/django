@@ -478,10 +478,10 @@ responsible for returning a ``Node`` instance based on the contents of the tag.
 
 By convention, the name of each compilation function should start with ``do_``.
 
-For example, let's write a template tag that displays the current date/time,
-formatted according to a parameter given in the tag, in `strftime syntax`_.
-It's a good idea to decide the tag syntax before anything else. In our case,
-let's say the tag should be used like this::
+For example, let's write a template tag, ``{% current_time %}``, that displays
+the current date/time, formatted according to a parameter given in the tag, in
+`strftime syntax`_. It's a good idea to decide the tag syntax before anything
+else. In our case, let's say the tag should be used like this::
 
     <p>The time is {% current_time "%Y-%M-%d %I:%M %p" %}.</p>
 
@@ -507,10 +507,11 @@ Notes:
       example.
 
     * ``token.contents`` is a string of the raw contents of the tag. In our
-      example, it's ``'current_time "%Y-%M-%d %I:%M %p"'``
+      example, it's ``'current_time "%Y-%M-%d %I:%M %p"'``.
 
-    * This function raises ``django.core.template.TemplateSyntaxError``, with
-      helpful messages, for any syntax error.
+    * This function is responsible for raising
+      ``django.core.template.TemplateSyntaxError``, with helpful messages, for
+      any syntax error.
 
     * The ``TemplateSyntaxError`` exceptions use the ``tag_name`` variable.
       Don't hard-code the tag's name in your error messages, because that
@@ -552,6 +553,9 @@ Notes:
 
     * The ``render()`` method is where the work actually happens.
 
+    * ``render()`` should never raise ``TemplateSyntaxError`` or any other
+      exception. It should fail silently, just as template filters should.
+
 Ultimately, this decoupling of compilation and rendering results in an
 efficient template system, because a template can render multiple context
 without having to be parsed multiple times.
@@ -566,16 +570,16 @@ Finally, use a ``register_tag`` call, as in ``register_filter`` above. Example::
 
 ``register_tag`` takes two arguments:
 
-    1. The name of the template tag -- a string
+    1. The name of the template tag -- a string.
     2. The compilation function -- a Python function (not the name of the
-       function as a string)
+       function as a string).
 
 Setting a variable in the context
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 The above example simply output a value. Generally, it's more flexible if your
 template tags set template variables instead of outputting values. That way,
-you allow template authors to reuse the values that your template tags create.
+template authors can reuse the values that your template tags create.
 
 To set a variable in the context, just use dictionary assignment on the context
 object in the ``render()`` method. Here's an updated version of
@@ -597,7 +601,7 @@ Here's how you'd use this new version of the tag::
 
     {% current_time "%Y-%M-%d %I:%M %p" %}<p>The time is {{ current_time }}.</p>
 
-But, there's a naive problem with ``CurrentTimeNode2``: The variable name
+But, there's a problem with ``CurrentTimeNode2``: The variable name
 ``current_time`` is hard-coded. This means you'll need to make sure your
 template doesn't use ``{{ current_time }}`` anywhere else, because the
 ``{% current_time %}`` will blindly overwrite that variable's value. A cleaner
@@ -636,3 +640,73 @@ class, like so::
 
 The difference here is that ``do_current_time()`` grabs the format string and
 the variable name, passing both to ``CurrentTimeNode3``.
+
+Parsing until another block tag
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Template tags can work in tandem. For instance, the standard ``{% comment %}``
+tag hides everything until ``{% endcomment %}``. To create a template tag such
+as this, use ``parser.parse()`` in your compilation function.
+
+Here's how the standard ``{% comment %}`` tag is implemented::
+
+    def do_comment(parser, token):
+        nodelist = parser.parse(('endcomment',))
+        parser.delete_first_token()
+        return CommentNode()
+
+    class CommentNode(template.Node):
+        def render(self, context):
+            return ''
+
+``parser.parse()`` takes a tuple of names of block tags ''to parse until''. It
+returns an instance of ``django.core.template.NodeList``, which is a list of
+all ``Node`` objects that the parser encountered ''before'' it encountered
+any of the tags named in the tuple.
+
+In ``"nodelist = parser.parse(('endcomment',))"`` in the above example,
+``nodelist`` is a list of all nodes between the ``{% comment %}`` and
+``{% endcomment %}``, not counting ``{% comment %}`` and ``{% endcomment %}``
+themselves.
+
+After ``parser.parse()`` is called, the parser hasn't yet "consumed" the
+``{% endcomment %}`` tag, so the code needs to explicitly call
+``parser.delete_first_token()``.
+
+``CommentNode.render()`` simply returns an empty string. Anything between
+``{% comment %}`` and ``{% endcomment %}`` is ignored.
+
+Parsing unitl another block tag, and saving contents
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+In the previous example, ``do_comment()`` discarded everything between
+``{% comment %}`` and ``{% endcomment %}``. Instead of doing that, it's
+possible to do something with the code between block tags.
+
+For example, here's a custom template tag, ``{% upper %}``, that capitalizes
+everything between itself and ``{% endupper %}``.
+
+Usage::
+
+    {% upper %}This will appear in uppercase, {{ your_name }}.{% endupper %}
+
+As in the previous example, we'll use ``parser.parse()``. But this time, we
+pass the resulting ``nodelist`` to the ``Node``::
+
+    def do_upper(parser, token):
+        nodelist = parser.parse(('endupper',))
+        parser.delete_first_token()
+        return UpperNode(nodelist)
+
+    class UpperNode(template.Node):
+        def __init__(self, nodelist):
+            self.nodelist = nodelist
+        def render(self, context):
+            output = self.nodelist.render(context)
+            return output.upper()
+
+The only new concept here is the ``self.nodelist.render(context)`` in
+``UpperNode.render()``.
+
+For more examples of complex rendering, see the source code for ``{% if %}``,
+``{% for %}``, ``{% ifequal %}`` and ``{% ifchanged %}``.
