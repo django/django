@@ -92,6 +92,9 @@ TEMPLATE_TESTS = {
     # Raise TemplateSyntaxError for empty block tags
     'basic-syntax28': ("{% %}", {}, template.TemplateSyntaxError),
 
+    # Chained filters, with an argument to the first one
+    'basic-syntax29': ('{{ var|removetags:"b i"|upper|lower }}', {"var": "<b><i>Yes</i></b>"}, "yes"),
+
     ### IF TAG ################################################################
     'if-tag01': ("{% if foo %}yes{% else %}no{% endif %}", {"foo": True}, "yes"),
     'if-tag02': ("{% if foo %}yes{% else %}no{% endif %}", {"foo": False}, "no"),

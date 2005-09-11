@@ -295,13 +295,14 @@ class FilterParser:
             if registered_filters[filter_name][1] == True and arg is None:
                 raise TemplateSyntaxError, "Filter '%s' requires an argument" % filter_name
             if registered_filters[filter_name][1] == False and arg is not None:
-                raise TemplateSyntaxError, "Filter '%s' should not have an argument" % filter_name
+                raise TemplateSyntaxError, "Filter '%s' should not have an argument (argument is %r)" % (filter_name, arg)
             self.filters.append((filter_name, arg))
             if self.current is None:
                 break
 
     def read_filter(self):
         self.current_filter_name = self.read_alphanumeric_token()
+        self.current_filter_arg = None
         # Have we reached the end?
         if self.current is None:
             return (self.current_filter_name, None)
