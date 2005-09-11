@@ -57,7 +57,7 @@ arguments are:
 
 For example::
 
-    DB_CACHE = "memcached://127.0.0.1:11211/?timeout=60"
+    CACHE_BACKEND = "memcached://127.0.0.1:11211/?timeout=60"
 
 Invalid arguments are silently ignored, as are invalid values of known
 arguments.
