@@ -107,7 +107,7 @@ class RssFeed(SyndicationFeed):
         handler.endElement(u"channel")
 
 class RssUserland091Feed(RssFeed):
-    def startRssElement(self, handler):
+    def writeRssElement(self, handler):
         handler.startElement(u"rss", {u"version": u"0.91"})
 
     def writeRssItem(self, handler, item):
