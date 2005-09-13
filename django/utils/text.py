@@ -40,35 +40,6 @@ def get_valid_filename(s):
     s = s.strip().replace(' ', '_')
     return re.sub(r'[^-A-Za-z0-9_.]', '', s)
 
-def fix_microsoft_characters(s):
-    """
-    Converts Microsoft proprietary characters (e.g. smart quotes, em-dashes)
-    to sane characters
-    """
-    # Sources:
-    # http://stsdas.stsci.edu/bps/pythontalk8.html
-    # http://www.waider.ie/hacks/workshop/perl/rss-fetch.pl
-    # http://www.fourmilab.ch/webtools/demoroniser/
-    return s
-    s = s.replace('\x91', "'")
-    s = s.replace('\x92', "'")
-    s = s.replace('\x93', '"')
-    s = s.replace('\x94', '"')
-    s = s.replace('\xd2', '"')
-    s = s.replace('\xd3', '"')
-    s = s.replace('\xd5', "'")
-    s = s.replace('\xad', '--')
-    s = s.replace('\xd0', '--')
-    s = s.replace('\xd1', '--')
-    s = s.replace('\xe2\x80\x98', "'") # weird single quote (open)
-    s = s.replace('\xe2\x80\x99', "'") # weird single quote (close)
-    s = s.replace('\xe2\x80\x9c', '"') # weird double quote (open)
-    s = s.replace('\xe2\x80\x9d', '"') # weird double quote (close)
-    s = s.replace('\xe2\x81\x84', '/')
-    s = s.replace('\xe2\x80\xa6', '...')
-    s = s.replace('\xe2\x80\x94', '--')
-    return s
-
 def get_text_list(list_, last_word='or'):
     """
     >>> get_text_list(['a', 'b', 'c', 'd'])

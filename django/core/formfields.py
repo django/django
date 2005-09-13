@@ -1,7 +1,6 @@
 from django.core import validators
 from django.core.exceptions import PermissionDenied
 from django.utils.html import escape
-from django.utils.text import fix_microsoft_characters
 
 FORM_FIELD_ID_PREFIX = 'id_'
 
@@ -242,8 +241,6 @@ class TextField(FormField):
             self.field_name, self.length, escape(data), maxlength)
 
     def html2python(data):
-        if data:
-            return fix_microsoft_characters(data)
         return data
     html2python = staticmethod(html2python)
 
