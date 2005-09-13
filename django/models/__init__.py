@@ -62,9 +62,9 @@ for mod in modules:
         for rel_opts, rel_field in klass._meta.get_all_related_many_to_many_objects():
             rel_mod = rel_opts.get_model_module()
             rel_obj_name = klass._meta.get_rel_object_method_name(rel_opts, rel_field)
-            setattr(klass, 'get_%s' % rel_obj_name, curry(meta.method_get_related_many_to_many, 'get_object', rel_mod, rel_field))
-            setattr(klass, 'get_%s_count' % rel_obj_name, curry(meta.method_get_related_many_to_many, 'get_count', rel_mod, rel_field))
-            setattr(klass, 'get_%s_list' % rel_obj_name, curry(meta.method_get_related_many_to_many, 'get_list', rel_mod, rel_field))
+            setattr(klass, 'get_%s' % rel_obj_name, curry(meta.method_get_related_many_to_many, 'get_object', klass._meta, rel_mod, rel_field))
+            setattr(klass, 'get_%s_count' % rel_obj_name, curry(meta.method_get_related_many_to_many, 'get_count', klass._meta, rel_mod, rel_field))
+            setattr(klass, 'get_%s_list' % rel_obj_name, curry(meta.method_get_related_many_to_many, 'get_list', klass._meta, rel_mod, rel_field))
             if rel_opts.app_label == klass._meta.app_label:
                 func = curry(meta.method_set_related_many_to_many, rel_opts, rel_field)
                 func.alters_data = True

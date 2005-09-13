@@ -947,8 +947,8 @@ def method_add_related(rel_obj, rel_mod, rel_field, self, *args, **kwargs):
 
 # Handles related many-to-many object retrieval.
 # Examples: Album.get_song(), Album.get_song_list(), Album.get_song_count()
-def method_get_related_many_to_many(method_name, rel_mod, rel_field, self, **kwargs):
-    kwargs['%s__id__exact' % rel_field.name] = self.id
+def method_get_related_many_to_many(method_name, opts, rel_mod, rel_field, self, **kwargs):
+    kwargs['%s__%s__exact' % (rel_field.name, opts.pk.name)] = getattr(self, opts.pk.column)
     return getattr(rel_mod, method_name)(**kwargs)
 
 # Handles setting many-to-many related objects.
