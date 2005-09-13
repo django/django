@@ -62,13 +62,13 @@ def normalize_newlines(text):
 
 def recapitalize(text):
     "Recapitalizes text, placing caps after end-of-sentence punctuation."
-    capwords = 'I Jayhawk Jayhawks Lawrence Kansas KS'.split()
+#     capwords = ()
     text = text.lower()
     capsRE = re.compile(r'(?:^|(?<=[\.\?\!] ))([a-z])')
     text = capsRE.sub(lambda x: x.group(1).upper(), text)
-    for capword in capwords:
-        capwordRE = re.compile(r'\b%s\b' % capword, re.I)
-        text = capwordRE.sub(capword, text)
+#     for capword in capwords:
+#         capwordRE = re.compile(r'\b%s\b' % capword, re.I)
+#         text = capwordRE.sub(capword, text)
     return text
 
 def phone2numeric(phone):
