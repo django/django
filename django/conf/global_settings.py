@@ -51,6 +51,9 @@ EMAIL_HOST = 'localhost'
 # List of locations of the template source files, in search order.
 TEMPLATE_DIRS = ()
 
+# Extension on all templates.
+TEMPLATE_FILE_EXTENSION = '.html'
+
 # URL prefix for admin media -- CSS, JavaScript and images. Make sure to use a
 # trailing slash.
 # Examples: "http://foo.com/media/", "/media/".

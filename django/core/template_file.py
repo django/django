@@ -1,9 +1,7 @@
 "Wrapper for loading templates from files"
-from django.conf.settings import TEMPLATE_DIRS
+from django.conf.settings import TEMPLATE_DIRS, TEMPLATE_FILE_EXTENSION
 from template import TemplateDoesNotExist
 import os
-
-TEMPLATE_FILE_EXTENSION = '.html'
 
 def load_template_source(template_name, template_dirs=None):
     if not template_dirs:
