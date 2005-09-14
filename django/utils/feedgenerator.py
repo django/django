@@ -33,7 +33,7 @@ class SyndicationFeed:
 
     def add_item(self, title, link, description, author_email=None,
         author_name=None, pubdate=None, comments=None, unique_id=None,
-        enclosure=None):
+        enclosure=None, categories=None):
         """
         Adds an item to the feed. All args are expected to be Python Unicode
         objects except pubdate, which is a datetime.datetime object, and
@@ -49,6 +49,7 @@ class SyndicationFeed:
             'comments': comments,
             'unique_id': unique_id,
             'enclosure': enclosure,
+            'categories': categories or [],
         })
 
     def num_items(self):
@@ -142,6 +143,8 @@ class Rss201rev2Feed(RssFeed):
             handler.addQuickElement(u"enclosure", '',
                 {u"url": item['enclosure'].url, u"length": item['enclosure'].length,
                     u"type": item['enclosure'].mime_type})
+        for cat in item['categories']:
+            handler.addQuickElement(u"category", cat, {})
         handler.endElement(u"item")
 
 # This isolates the decision of what the system default is, so calling code can
