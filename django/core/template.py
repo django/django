@@ -122,7 +122,8 @@ def compile_string(template_string):
 
 class Context:
     "A stack container for variable context"
-    def __init__(self, dict={}):
+    def __init__(self, dict=None):
+        dict = dict or {}
         self.dicts = [dict]
 
     def __repr__(self):
