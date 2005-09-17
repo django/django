@@ -8,7 +8,7 @@ class DjangoContext(Context):
     This subclass of template.Context automatically populates 'user' and
     'messages' in the context.
     """
-    def __init__(self, request, dict={}):
+    def __init__(self, request, dict=None):
         Context.__init__(self, dict)
         self['user'] = request.user
         self['messages'] = request.user.get_and_delete_messages()
