@@ -42,7 +42,7 @@ class DjangoDoctestRunner(doctest.DocTestRunner):
         tb = ''.join(traceback.format_exception(*exc_info)[1:])
         log_error(test.name, "API test raised an exception",
             "Code: %r\nLine: %s\nException: %s" % (example.source.strip(), example.lineno, tb))
-            
+
 class DjangoDoctestOutputChecker(doctest.OutputChecker):
     def check_output(self, want, got, optionflags):
         ok = doctest.OutputChecker.check_output(self, want, got, optionflags)
@@ -54,8 +54,9 @@ class DjangoDoctestOutputChecker(doctest.OutputChecker):
         return ok
 
 class TestRunner:
-    def __init__(self, verbosity_level=0):
+    def __init__(self, verbosity_level=0, which_tests=None):
         self.verbosity_level = verbosity_level
+        self.which_tests = which_tests
 
     def output(self, required_level, message):
         if self.verbosity_level > required_level - 1:
@@ -66,10 +67,21 @@ class TestRunner:
         from django.core.db import db
         from django.core import management, meta
 
-        self.output(0, "Running tests with database %r" % settings.DATABASE_ENGINE)
-
         # Manually set INSTALLED_APPS to point to the test app.
         settings.INSTALLED_APPS = (APP_NAME,)
+
+        # Determine which models we're going to test.
+        test_models = get_test_models()
+        if self.which_tests:
+            # Only run the specified tests.
+            bad_models = [m for m in self.which_tests if m not in test_models]
+            if bad_models:
+                sys.stderr.write("Models not found: %s\n" % bad_models)
+                sys.exit(1)
+            else:
+                test_models = self.which_tests
+
+        self.output(0, "Running tests with database %r" % settings.DATABASE_ENGINE)
 
         # If we're using SQLite, it's more convenient to test against an
         # in-memory database.
@@ -107,7 +119,7 @@ class TestRunner:
 
         # Run the tests for each test model.
         self.output(1, "Running app tests")
-        for model_name in get_test_models():
+        for model_name in test_models:
             self.output(1, "%s model: Importing" % model_name)
             try:
                 mod = meta.get_app(model_name)
@@ -132,30 +144,31 @@ class TestRunner:
                 # side effects on other tests.
                 db.rollback()
 
-        # Run the non-model tests in the other tests dir
-        self.output(1, "Running other tests")
-        other_tests_dir = os.path.join(os.path.dirname(__file__), OTHER_TESTS_DIR)
-        test_modules = [f[:-3] for f in os.listdir(other_tests_dir) if f.endswith('.py') and not f.startswith('__init__')]
-        for module in test_modules:
-            self.output(1, "%s module: Importing" % module)
-            try:
-                mod = __import__("othertests." + module, '', '', [''])
-            except Exception, e:
-                log_error(module, "Error while importing", ''.join(traceback.format_exception(*sys.exc_info())[1:]))
-                continue
-            if mod.__doc__:
-                p = doctest.DocTestParser()
-                dtest = p.get_doctest(mod.__doc__, mod.__dict__, module, None, None)
-                runner = DjangoDoctestRunner(verbosity_level=verbosity_level, verbose=False)
-                self.output(1, "%s module: runing tests" % module)
-                runner.run(dtest, clear_globs=True, out=sys.stdout.write)
-            if hasattr(mod, "run_tests") and callable(mod.run_tests):
-                self.output(1, "%s module: runing tests" % module)
+        if not self.which_tests:
+            # Run the non-model tests in the other tests dir
+            self.output(1, "Running other tests")
+            other_tests_dir = os.path.join(os.path.dirname(__file__), OTHER_TESTS_DIR)
+            test_modules = [f[:-3] for f in os.listdir(other_tests_dir) if f.endswith('.py') and not f.startswith('__init__')]
+            for module in test_modules:
+                self.output(1, "%s module: Importing" % module)
                 try:
-                    mod.run_tests(verbosity_level)
+                    mod = __import__("othertests." + module, '', '', [''])
                 except Exception, e:
-                    log_error(module, "Exception running tests", ''.join(traceback.format_exception(*sys.exc_info())[1:]))
+                    log_error(module, "Error while importing", ''.join(traceback.format_exception(*sys.exc_info())[1:]))
                     continue
+                if mod.__doc__:
+                    p = doctest.DocTestParser()
+                    dtest = p.get_doctest(mod.__doc__, mod.__dict__, module, None, None)
+                    runner = DjangoDoctestRunner(verbosity_level=verbosity_level, verbose=False)
+                    self.output(1, "%s module: running tests" % module)
+                    runner.run(dtest, clear_globs=True, out=sys.stdout.write)
+                if hasattr(mod, "run_tests") and callable(mod.run_tests):
+                    self.output(1, "%s module: running tests" % module)
+                    try:
+                        mod.run_tests(verbosity_level)
+                    except Exception, e:
+                        log_error(module, "Exception running tests", ''.join(traceback.format_exception(*sys.exc_info())[1:]))
+                        continue
 
         # Unless we're using SQLite, remove the test database to clean up after
         # ourselves. Connect to the previous database (not the test database)
@@ -176,17 +189,18 @@ class TestRunner:
 
         # Display output.
         if error_list:
-            print "Got %s error%s:" % (len(error_list), len(error_list) != 1 and 's' or '')
             for d in error_list:
                 print
                 print d['title']
                 print "=" * len(d['title'])
                 print d['description']
+            print "%s error%s:" % (len(error_list), len(error_list) != 1 and 's' or '')
         else:
             print "All tests passed."
 
 if __name__ == "__main__":
     from optparse import OptionParser
+    usage = "%prog [options] [model model model ...]"
     parser = OptionParser()
     parser.add_option('-v', help='How verbose should the output be? Choices are 0, 1 and 2, where 2 is most verbose. Default is 0.',
         type='choice', choices=['0', '1', '2'])
@@ -198,5 +212,5 @@ if __name__ == "__main__":
         verbosity_level = int(options.v)
     if options.settings:
         os.environ['DJANGO_SETTINGS_MODULE'] = options.settings
-    t = TestRunner(verbosity_level)
+    t = TestRunner(verbosity_level, args)
     t.run_tests()
