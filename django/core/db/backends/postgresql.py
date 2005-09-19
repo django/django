@@ -17,10 +17,12 @@ class DatabaseWrapper:
     def cursor(self):
         from django.conf.settings import DATABASE_USER, DATABASE_NAME, DATABASE_HOST, DATABASE_PASSWORD, DEBUG, TIME_ZONE
         if self.connection is None:
-            if DATABASE_NAME == '' or DATABASE_USER == '':
+            if DATABASE_NAME == '':
                 from django.core.exceptions import ImproperlyConfigured
-                raise ImproperlyConfigured, "You need to specify both DATABASE_NAME and DATABASE_USER in your Django settings file."
-            conn_string = "user=%s dbname=%s" % (DATABASE_USER, DATABASE_NAME)
+                raise ImproperlyConfigured, "You need to specify DATABASE_NAME in your Django settings file."
+            conn_string = "dbname=%s" % DATABASE_NAME
+            if DATABASE_USER:
+                conn_string = "user=%s %s" % (DATABASE_USER, conn_string)
             if DATABASE_PASSWORD:
                 conn_string += " password=%s" % DATABASE_PASSWORD
             if DATABASE_HOST:
