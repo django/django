@@ -58,11 +58,12 @@ Django was developed at `World Online`_, the Web department of a newspaper in
 Lawrence, Kansas, USA.
 
 `Adrian Holovaty`_
-    Adrian is a gypsy-jazz virtuoso, an amateur Beatles historian and a proud
-    Chicagoan. He's also a pretty decent programmer, with a knack for whipping
-    data into shape and putting it to work for the good of his fellow man.
-    Adrian is the lead developer at World Online and the man behind the code at
-    `chicagocrime.org`_. He lives in Chicago.
+    Adrian is a Web developer with a background in journalism. He was lead
+    developer at World Online for 2.5 years, during which time Django was
+    developed and implemented on World Online's sites. Now he's editor of
+    editorial innovations at washingtonpost.com, and he continues to oversee
+    Django development. He likes playing guitar (Django Reinhardt style) and
+    hacking on side projects such as `chicagocrime.org`_. He lives in Chicago.
 
     On IRC, Adrian goes by ``adrian_h``.
 
