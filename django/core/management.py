@@ -537,8 +537,20 @@ def get_validation_errors(outfile):
                                 e.add(opts, '"%s" field: "choices" should be a sequence of two-tuples.' % f.name)
 
             # Check admin attribute.
-            if opts.admin is not None and not isinstance(opts.admin, meta.Admin):
-                e.add(opts, '"admin" attribute, if given, must be set to a meta.Admin() instance.')
+            if opts.admin is not None:
+                if not isinstance(opts.admin, meta.Admin):
+                    e.add(opts, '"admin" attribute, if given, must be set to a meta.Admin() instance.')
+                else:
+                    for fn in opts.admin.list_display:
+                        try:
+                            f = opts.get_field(fn)
+                        except meta.FieldDoesNotExist:
+                            klass = opts.get_model_module().Klass
+                            if not hasattr(klass, fn) or not callable(getattr(klass, fn)):
+                                e.add(opts, '"admin.list_display" refers to %r, which isn\'t a field or method.' % fn)
+                        else:
+                            if isinstance(f, meta.ManyToManyField):
+                                e.add(opts, '"admin.list_display" doesn\'t support ManyToManyFields (%r).' % fn)
 
             # Check ordering attribute.
             if opts.ordering:
