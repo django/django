@@ -199,7 +199,7 @@ def change_list(request, app_label, module_name):
                     lookup_title = f.rel.to.verbose_name
                 else:
                     lookup_title = f.verbose_name
-                lookup_kwarg = '%s__id__exact' % f.name
+                lookup_kwarg = '%s__%s__exact' % (f.name, f.rel.to.pk.name)
                 lookup_val = request.GET.get(lookup_kwarg, None)
                 lookup_choices = f.rel.to.get_model_module().get_list()
                 if len(lookup_choices) > 1:
@@ -208,9 +208,10 @@ def change_list(request, app_label, module_name):
                         ((lookup_val is None and ' class="selected"' or ''),
                         get_query_string(params, {}, [lookup_kwarg])))
                     for val in lookup_choices:
+                        pk_val = getattr(val, f.rel.to.pk.column)
                         filter_template.append('<li%s><a href="%s">%r</a></li>\n' % \
-                            ((lookup_val == str(val.id) and ' class="selected"' or ''),
-                            get_query_string(params, {lookup_kwarg: val.id}), val))
+                            ((lookup_val == str(pk_val) and ' class="selected"' or ''),
+                            get_query_string(params, {lookup_kwarg: pk_val}), val))
                     filter_template.append('</ul>\n\n')
             # Field with choices.
             elif f.choices:
@@ -916,10 +917,11 @@ def change_stage(request, app_label, module_name, object_id):
         for f in opts.fields:
             new_data.update(_get_flattened_data(f, getattr(obj, f.column)))
         for f in opts.many_to_many:
+            get_list_func = getattr(obj, 'get_%s_list' % f.rel.singular)
             if f.rel.raw_id_admin:
-                new_data[f.name] = ",".join([str(i.id) for i in getattr(obj, 'get_%s_list' % f.rel.singular)()])
+                new_data[f.name] = ",".join([str(getattr(i, f.rel.to.pk.column)) for i in get_list_func()])
             elif not f.rel.edit_inline:
-                new_data[f.name] = [i.id for i in getattr(obj, 'get_%s_list' % f.rel.singular)()]
+                new_data[f.name] = [getattr(i, f.rel.to.pk.column) for i in get_list_func()]
         for rel_obj, rel_field in inline_related_objects:
             var_name = rel_obj.object_name.lower()
             for i, rel_instance in enumerate(getattr(obj, 'get_%s_list' % opts.get_rel_object_method_name(rel_obj, rel_field))()):
