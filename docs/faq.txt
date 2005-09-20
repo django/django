@@ -364,6 +364,16 @@ If you're sure your username and password are correct, make sure your user
 account has ``is_active`` and ``is_staff`` set to True. The admin site only
 allows access to users with those two fields both set to True.
 
+My "list_filter" contains a ManyToManyField, but the filter doesn't display.
+----------------------------------------------------------------------------
+
+Django won't bother displaying the filter for a ManyToManyField if there are
+fewer than two related objects.
+
+For example, if your ``list_filter`` includes ``sites``, and there's only one
+site in your database, it won't display a "Site" filter. In that case,
+filtering by site would be meaningless.
+
 How can I customize the functionality of the admin interface?
 -------------------------------------------------------------
 
