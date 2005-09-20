@@ -786,8 +786,11 @@ object, which takes the following parameters. All are optional.
     There are a few special cases that do other things besides displaying the
     contents of the given fields:
 
-        * If the field given has a relationship, that relationship is
-          followed and the ``repr()`` of the related object is displayed.
+        * If the field given is a ``ForeignKey``, the ``repr()`` of the related
+          object will be displayed.
+
+        * ``ManyToManyField`` fields aren't supported, because that would
+          entail executing a separate SQL statement for each row in the table.
 
         * If the field is a ``BooleanField``, a "on" or "off" icon will
           be displayed instead of ``True`` or ``False``.
@@ -796,6 +799,11 @@ object, which takes the following parameters. All are optional.
           output will be displayed. This method should have a
           ``short_description`` function attribute, for use as the header for
           the field.
+
+        * Use the string ``"__repr__"`` to output the representation of the
+          object, according to your model's ``__repr__()`` function. If you
+          don't define ``list_display``, Django will use the ``__repr__`` by
+          default.
 
     See the example below.
 
