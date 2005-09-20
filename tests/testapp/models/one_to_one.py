@@ -23,6 +23,13 @@ class Restaurant(meta.Model):
     def __repr__(self):
         return "%s the restaurant" % self.get_place().name
 
+class Waiter(meta.Model):
+    restaurant = meta.ForeignKey(Restaurant)
+    name = meta.CharField(maxlength=50)
+
+    def __repr__(self):
+        return "%s the waiter at %s" % (self.name, self.get_restaurant())
+
 API_TESTS = """
 # Create a couple of Places.
 >>> p1 = places.Place(name='Demon Dogs', address='944 W. Fullerton')
@@ -61,4 +68,10 @@ RestaurantDoesNotExist: Restaurant does not exist for {'place__id__exact': ...}
 Demon Dogs the restaurant
 >>> restaurants.get_object(pk=1)
 Demon Dogs the restaurant
+
+# Add a Waiter to the Restaurant.
+>>> w = r.add_waiter(name='Joe')
+>>> w.save()
+>>> w
+Joe the waiter at Demon Dogs the restaurant
 """
