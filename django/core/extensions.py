@@ -9,10 +9,10 @@ def load_and_render(template_name, dictionary=None, context_instance=None):
     dictionary = dictionary or {}
     t = template_loader.get_template(template_name)
     if context_instance:
-        c = context_instance.update(dictionary)
+        context_instance.update(dictionary)
     else:
-        c = Context(dictionary)
-    return HttpResponse(t.render(c))
+        context_instance = Context(dictionary)
+    return HttpResponse(t.render(context_instance))
 
 class DjangoContext(Context):
     """
