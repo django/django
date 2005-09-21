@@ -1,7 +1,16 @@
 # Specialized template classes for Django, decoupled from the basic template system.
 
+from django.core import template_loader
 from django.core.template import Context
 from django.conf.settings import DEBUG, INTERNAL_IPS
+from django.utils.httpwrappers import HttpResponse
+
+def load_and_render(template_name, dictionary=None, context_class=None):
+    dictionary = dictionary or {}
+    context_class = context_class or Context
+    t = template_loader.get_template(template_name)
+    c = context_class(dictionary)
+    return HttpResponse(t.render(c))
 
 class DjangoContext(Context):
     """
