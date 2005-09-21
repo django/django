@@ -5,11 +5,13 @@ from django.core.template import Context
 from django.conf.settings import DEBUG, INTERNAL_IPS
 from django.utils.httpwrappers import HttpResponse
 
-def load_and_render(template_name, dictionary=None, context_class=None):
+def load_and_render(template_name, dictionary=None, context_instance=None):
     dictionary = dictionary or {}
-    context_class = context_class or Context
     t = template_loader.get_template(template_name)
-    c = context_class(dictionary)
+    if context_instance:
+        c = context_instance.update(dictionary)
+    else:
+        c = Context(dictionary)
     return HttpResponse(t.render(c))
 
 class DjangoContext(Context):
