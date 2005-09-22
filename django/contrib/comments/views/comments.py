@@ -1,7 +1,7 @@
 from django.core import formfields, validators
 from django.core.mail import mail_admins, mail_managers
 from django.core.exceptions import Http404, ObjectDoesNotExist
-from django.core.extensions import DjangoContext, load_and_render
+from django.core.extensions import DjangoContext, render_to_response
 from django.models.auth import users
 from django.models.comments import comments, freecomments
 from django.models.core import contenttypes
@@ -227,7 +227,7 @@ def post_comment(request):
                 return field_list
         comment = errors and '' or manipulator.get_comment(new_data)
         comment_form = CommentFormWrapper(manipulator, new_data, errors, rating_choices)
-        return load_and_render('comments/preview', {
+        return render_to_response('comments/preview', {
             'comment': comment,
             'comment_form': comment_form,
             'options': options,
@@ -295,7 +295,7 @@ def post_free_comment(request):
     errors = manipulator.get_validation_errors(new_data)
     if errors or request.POST.has_key('preview'):
         comment = errors and '' or manipulator.get_comment(new_data)
-        return load_and_render('comments/free_preview', {
+        return render_to_response('comments/free_preview', {
             'comment': comment,
             'comment_form': formfields.FormWrapper(manipulator, new_data, errors),
             'options': options,
@@ -332,4 +332,4 @@ def comment_was_posted(request):
             obj = content_type.get_object_for_this_type(pk=object_id)
         except ObjectDoesNotExist:
             pass
-    return load_and_render('comments/posted', {'object': obj}, context_instance=DjangoContext(request))
+    return render_to_response('comments/posted', {'object': obj}, context_instance=DjangoContext(request))

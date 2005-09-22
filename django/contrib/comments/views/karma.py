@@ -1,5 +1,5 @@
 from django.core.exceptions import Http404
-from django.core.extensions import DjangoContext, load_and_render
+from django.core.extensions import DjangoContext, render_to_response
 from django.models.comments import comments, karma
 
 def vote(request, comment_id, vote):
@@ -25,4 +25,4 @@ def vote(request, comment_id, vote):
     karma.vote(request.user.id, comment_id, rating)
     # Reload comment to ensure we have up to date karma count
     comment = comments.get_object(pk=comment_id)
-    return load_and_render('comments/karma_vote_accepted', {'comment': comment}, context_instance=DjangoContext(request))
+    return render_to_response('comments/karma_vote_accepted', {'comment': comment}, context_instance=DjangoContext(request))

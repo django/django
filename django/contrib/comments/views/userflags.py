@@ -1,4 +1,4 @@
-from django.core.extensions import DjangoContext, load_and_render
+from django.core.extensions import DjangoContext, render_to_response
 from django.core.exceptions import Http404
 from django.models.comments import comments, moderatordeletions, userflags
 from django.views.decorators.auth import login_required
@@ -21,7 +21,7 @@ def flag(request, comment_id):
     if request.POST:
         userflags.flag(comment, request.user)
         return HttpResponseRedirect('%sdone/' % request.path)
-    return load_and_render('comments/flag_verify', {'comment': comment}, context_instance=DjangoContext(request))
+    return render_to_response('comments/flag_verify', {'comment': comment}, context_instance=DjangoContext(request))
 flag = login_required(flag)
 
 def flag_done(request, comment_id):
@@ -29,7 +29,7 @@ def flag_done(request, comment_id):
         comment = comments.get_object(pk=comment_id, site__id__exact=SITE_ID)
     except comments.CommentDoesNotExist:
         raise Http404
-    return load_and_render('comments/flag_done', {'comment': comment}, context_instance=DjangoContext(request))
+    return render_to_response('comments/flag_done', {'comment': comment}, context_instance=DjangoContext(request))
 
 def delete(request, comment_id):
     """
@@ -54,7 +54,7 @@ def delete(request, comment_id):
             m = moderatordeletions.ModeratorDeletion(None, request.user.id, comment.id, None)
             m.save()
         return HttpResponseRedirect('%sdone/' % request.path)
-    return load_and_render('comments/delete_verify', {'comment': comment}, context_instance=DjangoContext(request))
+    return render_to_response('comments/delete_verify', {'comment': comment}, context_instance=DjangoContext(request))
 delete = login_required(delete)
 
 def delete_done(request, comment_id):
@@ -62,4 +62,4 @@ def delete_done(request, comment_id):
         comment = comments.get_object(pk=comment_id, site__id__exact=SITE_ID)
     except comments.CommentDoesNotExist:
         raise Http404
-    return load_and_render('comments/delete_done', {'comment': comment}, context_instance=DjangoContext(request))
+    return render_to_response('comments/delete_done', {'comment': comment}, context_instance=DjangoContext(request))

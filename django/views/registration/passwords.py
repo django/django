@@ -1,5 +1,5 @@
 from django.core import formfields, template_loader, validators
-from django.core.extensions import DjangoContext, load_and_render
+from django.core.extensions import DjangoContext, render_to_response
 from django.models.auth import users
 from django.views.decorators.auth import login_required
 from django.utils.httpwrappers import HttpResponseRedirect
@@ -76,11 +76,11 @@ def password_reset(request, is_admin_site=False):
             else:
                 form.save()
             return HttpResponseRedirect('%sdone/' % request.path)
-    return load_and_render('registration/password_reset_form', {'form': formfields.FormWrapper(form, new_data, errors)},
+    return render_to_response('registration/password_reset_form', {'form': formfields.FormWrapper(form, new_data, errors)},
         context_instance=DjangoContext(request))
 
 def password_reset_done(request):
-    return load_and_render('registration/password_reset_done', context_instance=DjangoContext(request))
+    return render_to_response('registration/password_reset_done', context_instance=DjangoContext(request))
 
 def password_change(request):
     new_data, errors = {}, {}
@@ -91,9 +91,9 @@ def password_change(request):
         if not errors:
             form.save(new_data)
             return HttpResponseRedirect('%sdone/' % request.path)
-    return load_and_render('registration/password_change_form', {'form': formfields.FormWrapper(form, new_data, errors)},
+    return render_to_response('registration/password_change_form', {'form': formfields.FormWrapper(form, new_data, errors)},
         context_instance=DjangoContext(request))
 password_change = login_required(password_change)
 
 def password_change_done(request):
-    return load_and_render('registration/password_change_done', context_instance=DjangoContext(request))
+    return render_to_response('registration/password_change_done', context_instance=DjangoContext(request))

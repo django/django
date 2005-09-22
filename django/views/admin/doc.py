@@ -2,7 +2,7 @@ from django.core import meta
 from django import templatetags
 from django.conf import settings
 from django.models.core import sites
-from django.core.extensions import DjangoContext, load_and_render
+from django.core.extensions import DjangoContext, render_to_response
 from django.core.exceptions import Http404, ViewDoesNotExist
 from django.core import template, template_loader, defaulttags, defaultfilters, urlresolvers
 try:
@@ -17,10 +17,10 @@ MODEL_METHODS_EXCLUDE = ('_', 'add_', 'delete', 'save', 'set_')
 def doc_index(request):
     if not doc:
         return missing_docutils_page(request)
-    return load_and_render('doc/index', context_instance=DjangoContext(request))
+    return render_to_response('doc/index', context_instance=DjangoContext(request))
 
 def bookmarklets(request):
-    return load_and_render('doc/bookmarklets', {
+    return render_to_response('doc/bookmarklets', {
         'admin_url' : "%s://%s" % (os.environ.get('HTTPS') == 'on' and 'https' or 'http', request.META['HTTP_HOST']),
     }, context_instance=DjangoContext(request))
 
@@ -59,7 +59,7 @@ def template_tag_index(request):
     # Fix registered_tags
     template.registered_tags, template.registered_filters = saved_tagset
 
-    return load_and_render('doc/template_tag_index', {'tags': tags}, context_instance=DjangoContext(request))
+    return render_to_response('doc/template_tag_index', {'tags': tags}, context_instance=DjangoContext(request))
 
 def template_filter_index(request):
     if not doc:
@@ -91,7 +91,7 @@ def template_filter_index(request):
 
     template.registered_tags, template.registered_filters = saved_tagset
 
-    return load_and_render('doc/template_filter_index', {'filters': filters}, context_instance=DjangoContext(request))
+    return render_to_response('doc/template_filter_index', {'filters': filters}, context_instance=DjangoContext(request))
 
 def view_index(request):
     if not doc:
@@ -110,7 +110,7 @@ def view_index(request):
                 'site'   : sites.get_object(pk=settings_mod.SITE_ID),
                 'url'    : simplify_regex(regex),
             })
-    return load_and_render('doc/view_index', {'views': views}, context_instance=DjangoContext(request))
+    return render_to_response('doc/view_index', {'views': views}, context_instance=DjangoContext(request))
 
 def view_detail(request, view):
     if not doc:
@@ -128,7 +128,7 @@ def view_detail(request, view):
         body = doc.parse_rst(body, 'view', 'view:' + view)
     for key in metadata:
         metadata[key] = doc.parse_rst(metadata[key], 'model', 'view:' + view)
-    return load_and_render('doc/view_detail', {
+    return render_to_response('doc/view_detail', {
         'name': view,
         'summary': title,
         'body': body,
@@ -148,7 +148,7 @@ def model_index(request):
                 'module' : opts.app_label,
                 'class'  : opts.module_name,
             })
-    return load_and_render('doc/model_index', {'models': models}, context_instance=DjangoContext(request))
+    return render_to_response('doc/model_index', {'models': models}, context_instance=DjangoContext(request))
 
 def model_detail(request, model):
     if not doc:
@@ -185,7 +185,7 @@ def model_detail(request, model):
                 'data_type' : get_return_data_type(func_name),
                 'verbose'   : verbose,
             })
-    return load_and_render('doc/model_detail', {
+    return render_to_response('doc/model_detail', {
         'name': '%s.%s' % (opts.app_label, opts.module_name),
         'summary': "Fields on %s objects" % opts.verbose_name,
         'fields': fields,
@@ -205,7 +205,7 @@ def template_detail(request, template):
                 'site'      : sites.get_object(pk=settings_mod.SITE_ID),
                 'order'     : list(settings_mod.TEMPLATE_DIRS).index(dir),
             })
-    return load_and_render('doc/template_detail', {
+    return render_to_response('doc/template_detail', {
         'name': template,
         'templates': templates,
     }, context_instance=DjangoContext(request))
@@ -216,7 +216,7 @@ def template_detail(request, template):
 
 def missing_docutils_page(request):
     """Display an error message for people without docutils"""
-    return load_and_render('doc/missing_docutils')
+    return render_to_response('doc/missing_docutils')
 
 def load_all_installed_template_libraries():
     # Clear out and reload default tags

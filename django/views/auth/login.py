@@ -1,6 +1,6 @@
 from django.parts.auth.formfields import AuthenticationForm
 from django.core import formfields, template_loader
-from django.core.extensions import DjangoContext, load_and_render
+from django.core.extensions import DjangoContext, render_to_response
 from django.models.auth import users
 from django.models.core import sites
 from django.utils.httpwrappers import HttpResponse, HttpResponseRedirect
@@ -22,7 +22,7 @@ def login(request):
     else:
         errors = {}
     request.session.set_test_cookie()
-    return load_and_render('registration/login', {
+    return render_to_response('registration/login', {
         'form': formfields.FormWrapper(manipulator, request.POST, errors),
         REDIRECT_FIELD_NAME: redirect_to,
         'site_name': sites.get_current().name,
@@ -33,7 +33,7 @@ def logout(request, next_page=None):
     try:
         del request.session[users.SESSION_KEY]
     except KeyError:
-        return load_and_render('registration/logged_out', context_instance=DjangoContext(request))
+        return render_to_response('registration/logged_out', context_instance=DjangoContext(request))
     else:
         # Redirect to this page until the session has been cleared.
         return HttpResponseRedirect(next_page or request.path)
