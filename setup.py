@@ -20,4 +20,5 @@ setup(
                         'admin_media/js/admin/*js'],
     },
     scripts = ['django/bin/django-admin.py'],
+    zip_safe = False,
 )
