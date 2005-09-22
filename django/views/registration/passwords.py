@@ -1,8 +1,8 @@
 from django.core import formfields, template_loader, validators
-from django.core.extensions import DjangoContext as Context
+from django.core.extensions import DjangoContext, load_and_render
 from django.models.auth import users
 from django.views.decorators.auth import login_required
-from django.utils.httpwrappers import HttpResponse, HttpResponseRedirect
+from django.utils.httpwrappers import HttpResponseRedirect
 
 class PasswordResetForm(formfields.Manipulator):
     "A form that lets a user request a password reset"
@@ -76,16 +76,11 @@ def password_reset(request, is_admin_site=False):
             else:
                 form.save()
             return HttpResponseRedirect('%sdone/' % request.path)
-    t = template_loader.get_template('registration/password_reset_form')
-    c = Context(request, {
-        'form': formfields.FormWrapper(form, new_data, errors),
-    })
-    return HttpResponse(t.render(c))
+    return load_and_render('registration/password_reset_form', {'form': formfields.FormWrapper(form, new_data, errors)},
+        context_instance=DjangoContext(request))
 
 def password_reset_done(request):
-    t = template_loader.get_template('registration/password_reset_done')
-    c = Context(request, {})
-    return HttpResponse(t.render(c))
+    return load_and_render('registration/password_reset_done', context_instance=DjangoContext(request))
 
 def password_change(request):
     new_data, errors = {}, {}
@@ -96,14 +91,9 @@ def password_change(request):
         if not errors:
             form.save(new_data)
             return HttpResponseRedirect('%sdone/' % request.path)
-    t = template_loader.get_template('registration/password_change_form')
-    c = Context(request, {
-        'form': formfields.FormWrapper(form, new_data, errors),
-    })
-    return HttpResponse(t.render(c))
+    return load_and_render('registration/password_change_form', {'form': formfields.FormWrapper(form, new_data, errors)},
+        context_instance=DjangoContext(request))
 password_change = login_required(password_change)
 
 def password_change_done(request):
-    t = template_loader.get_template('registration/password_change_done')
-    c = Context(request, {})
-    return HttpResponse(t.render(c))
+    return load_and_render('registration/password_change_done', context_instance=DjangoContext(request))
