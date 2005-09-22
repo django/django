@@ -157,6 +157,20 @@ def isValidURL(field_data, all_data):
     if not url_re.search(field_data):
         raise ValidationError, "A valid URL is required."
 
+def isValidHTML(field_data, all_data):
+    import urllib, urllib2
+    try:
+        u = urllib2.urlopen('http://validator.w3.org/check', urllib.urlencode({'fragment': field_data, 'output': 'xml'}))
+    except:
+        # Validator or Internet connection is unavailable. Fail silently.
+        return
+    html_is_valid = (u.headers.get('x-w3c-validator-status', 'Invalid') == 'Valid')
+    if html_is_valid:
+        return
+    from xml.dom.minidom import parseString
+    error_messages = [e.firstChild.wholeText for e in parseString(u.read()).getElementsByTagName('messages')[0].getElementsByTagName('msg')]
+    raise ValidationError, "Valid HTML is required. Specific errors are:\n%s" % "\n".join(error_messages)
+
 def isWellFormedXml(field_data, all_data):
     from xml.dom.minidom import parseString
     try:
