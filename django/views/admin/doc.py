@@ -2,9 +2,8 @@ from django.core import meta
 from django import templatetags
 from django.conf import settings
 from django.models.core import sites
-from django.core.extensions import DjangoContext as Context
+from django.core.extensions import DjangoContext, load_and_render
 from django.core.exceptions import Http404, ViewDoesNotExist
-from django.utils.httpwrappers import HttpResponse, HttpResponseRedirect
 from django.core import template, template_loader, defaulttags, defaultfilters, urlresolvers
 try:
     from django.parts.admin import doc
@@ -18,17 +17,12 @@ MODEL_METHODS_EXCLUDE = ('_', 'add_', 'delete', 'save', 'set_')
 def doc_index(request):
     if not doc:
         return missing_docutils_page(request)
-
-    t = template_loader.get_template('doc/index')
-    c = Context(request, {})
-    return HttpResponse(t.render(c))
+    return load_and_render('doc/index', context_instance=DjangoContext(request))
 
 def bookmarklets(request):
-    t = template_loader.get_template('doc/bookmarklets')
-    c = Context(request, {
+    return load_and_render('doc/bookmarklets', {
         'admin_url' : "%s://%s" % (os.environ.get('HTTPS') == 'on' and 'https' or 'http', request.META['HTTP_HOST']),
-    })
-    return HttpResponse(t.render(c))
+    }, context_instance=DjangoContext(request))
 
 def template_tag_index(request):
     import sys
@@ -65,11 +59,7 @@ def template_tag_index(request):
     # Fix registered_tags
     template.registered_tags, template.registered_filters = saved_tagset
 
-    t = template_loader.get_template('doc/template_tag_index')
-    c = Context(request, {
-        'tags' : tags,
-    })
-    return HttpResponse(t.render(c))
+    return load_and_render('doc/template_tag_index', {'tags': tags}, context_instance=DjangoContext(request))
 
 def template_filter_index(request):
     if not doc:
@@ -101,11 +91,7 @@ def template_filter_index(request):
 
     template.registered_tags, template.registered_filters = saved_tagset
 
-    t = template_loader.get_template('doc/template_filter_index')
-    c = Context(request, {
-        'filters' : filters,
-    })
-    return HttpResponse(t.render(c))
+    return load_and_render('doc/template_filter_index', {'filters': filters}, context_instance=DjangoContext(request))
 
 def view_index(request):
     if not doc:
@@ -124,11 +110,7 @@ def view_index(request):
                 'site'   : sites.get_object(pk=settings_mod.SITE_ID),
                 'url'    : simplify_regex(regex),
             })
-    t = template_loader.get_template('doc/view_index')
-    c = Context(request, {
-        'views' : views,
-    })
-    return HttpResponse(t.render(c))
+    return load_and_render('doc/view_index', {'views': views}, context_instance=DjangoContext(request))
 
 def view_detail(request, view):
     if not doc:
@@ -146,14 +128,12 @@ def view_detail(request, view):
         body = doc.parse_rst(body, 'view', 'view:' + view)
     for key in metadata:
         metadata[key] = doc.parse_rst(metadata[key], 'model', 'view:' + view)
-    t = template_loader.get_template('doc/view_detail')
-    c = Context(request, {
-        'name'      : view,
-        'summary'   : title,
-        'body'      : body,
-        'meta'      : metadata,
-    })
-    return HttpResponse(t.render(c))
+    return load_and_render('doc/view_detail', {
+        'name': view,
+        'summary': title,
+        'body': body,
+        'meta': metadata,
+    }, context_instance=DjangoContext(request))
 
 def model_index(request):
     if not doc:
@@ -168,11 +148,7 @@ def model_index(request):
                 'module' : opts.app_label,
                 'class'  : opts.module_name,
             })
-    t = template_loader.get_template('doc/model_index')
-    c = Context(request, {
-        'models' : models,
-    })
-    return HttpResponse(t.render(c))
+    return load_and_render('doc/model_index', {'models': models}, context_instance=DjangoContext(request))
 
 def model_detail(request, model):
     if not doc:
@@ -209,14 +185,11 @@ def model_detail(request, model):
                 'data_type' : get_return_data_type(func_name),
                 'verbose'   : verbose,
             })
-
-    t = template_loader.get_template('doc/model_detail')
-    c = Context(request, {
-        'name'    : '%s.%s' % (opts.app_label, opts.module_name),
-        'summary' : "Fields on %s objects" % opts.verbose_name,
-        'fields'  : fields,
-    })
-    return HttpResponse(t.render(c))
+    return load_and_render('doc/model_detail', {
+        'name': '%s.%s' % (opts.app_label, opts.module_name),
+        'summary': "Fields on %s objects" % opts.verbose_name,
+        'fields': fields,
+    }, context_instance=DjangoContext(request))
 
 def template_detail(request, template):
     templates = []
@@ -232,12 +205,10 @@ def template_detail(request, template):
                 'site'      : sites.get_object(pk=settings_mod.SITE_ID),
                 'order'     : list(settings_mod.TEMPLATE_DIRS).index(dir),
             })
-    t = template_loader.get_template('doc/template_detail')
-    c = Context(request, {
-        'name'      : template,
-        'templates' : templates,
-    })
-    return HttpResponse(t.render(c))
+    return load_and_render('doc/template_detail', {
+        'name': template,
+        'templates': templates,
+    }, context_instance=DjangoContext(request))
 
 ####################
 # Helper functions #
@@ -245,9 +216,7 @@ def template_detail(request, template):
 
 def missing_docutils_page(request):
     """Display an error message for people without docutils"""
-    t = template_loader.get_template('doc/missing_docutils')
-    c = Context(request, {})
-    return HttpResponse(t.render(c))
+    return load_and_render('doc/missing_docutils')
 
 def load_all_installed_template_libraries():
     # Clear out and reload default tags
