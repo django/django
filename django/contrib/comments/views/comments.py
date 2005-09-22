@@ -1,12 +1,12 @@
-from django.core import formfields, template_loader, validators
+from django.core import formfields, validators
 from django.core.mail import mail_admins, mail_managers
 from django.core.exceptions import Http404, ObjectDoesNotExist
-from django.core.extensions import DjangoContext as Context
+from django.core.extensions import DjangoContext, load_and_render
 from django.models.auth import users
 from django.models.comments import comments, freecomments
 from django.models.core import contenttypes
 from django.parts.auth.formfields import AuthenticationForm
-from django.utils.httpwrappers import HttpResponse, HttpResponseRedirect
+from django.utils.httpwrappers import HttpResponseRedirect
 from django.utils.text import normalize_newlines
 from django.conf.settings import BANNED_IPS, COMMENTS_ALLOW_PROFANITIES, COMMENTS_SKETCHY_USERS_GROUP, COMMENTS_FIRST_FEW, SITE_ID
 import base64, datetime
@@ -206,7 +206,6 @@ def post_comment(request):
     new_data['object_id'] = object_id
     new_data['ip_address'] = request.META.get('REMOTE_ADDR')
     new_data['is_public'] = comments.IS_PUBLIC in option_list
-    response = HttpResponse()
     manipulator = PublicCommentManipulator(request.user,
         ratings_required=comments.RATINGS_REQUIRED in option_list,
         ratings_range=rating_range,
@@ -228,8 +227,7 @@ def post_comment(request):
                 return field_list
         comment = errors and '' or manipulator.get_comment(new_data)
         comment_form = CommentFormWrapper(manipulator, new_data, errors, rating_choices)
-        t = template_loader.get_template('comments/preview')
-        c = Context(request, {
+        return load_and_render('comments/preview', {
             'comment': comment,
             'comment_form': comment_form,
             'options': options,
@@ -240,7 +238,7 @@ def post_comment(request):
             'ratings_required': comments.RATINGS_REQUIRED in option_list,
             'rating_range': rating_range,
             'rating_choices': rating_choices,
-        })
+        }, context_instance=DjangoContext(request))
     elif request.POST.has_key('post'):
         # If the IP is banned, mail the admins, do NOT save the comment, and
         # serve up the "Thanks for posting" page as if the comment WAS posted.
@@ -252,8 +250,6 @@ def post_comment(request):
         return HttpResponseRedirect("/comments/posted/?c=%s:%s" % (content_type_id, object_id))
     else:
         raise Http404, "The comment form didn't provide either 'preview' or 'post'"
-    response.write(t.render(c))
-    return response
 
 def post_free_comment(request):
     """
@@ -295,19 +291,17 @@ def post_free_comment(request):
     new_data['object_id'] = object_id
     new_data['ip_address'] = request.META['REMOTE_ADDR']
     new_data['is_public'] = comments.IS_PUBLIC in option_list
-    response = HttpResponse()
     manipulator = PublicFreeCommentManipulator()
     errors = manipulator.get_validation_errors(new_data)
     if errors or request.POST.has_key('preview'):
         comment = errors and '' or manipulator.get_comment(new_data)
-        t = template_loader.get_template('comments/free_preview')
-        c = Context(request, {
+        return load_and_render('comments/free_preview', {
             'comment': comment,
             'comment_form': formfields.FormWrapper(manipulator, new_data, errors),
             'options': options,
             'target': target,
             'hash': security_hash,
-        })
+        }, context_instance=DjangoContext(request))
     elif request.POST.has_key('post'):
         # If the IP is banned, mail the admins, do NOT save the comment, and
         # serve up the "Thanks for posting" page as if the comment WAS posted.
@@ -320,8 +314,6 @@ def post_free_comment(request):
         return HttpResponseRedirect("/comments/posted/?c=%s:%s" % (content_type_id, object_id))
     else:
         raise Http404, "The comment form didn't provide either 'preview' or 'post'"
-    response.write(t.render(c))
-    return response
 
 def comment_was_posted(request):
     """
@@ -340,8 +332,4 @@ def comment_was_posted(request):
             obj = content_type.get_object_for_this_type(pk=object_id)
         except ObjectDoesNotExist:
             pass
-    t = template_loader.get_template('comments/posted')
-    c = Context(request, {
-        'object': obj,
-    })
-    return HttpResponse(t.render(c))
+    return load_and_render('comments/posted', {'object': obj}, context_instance=DjangoContext(request))
