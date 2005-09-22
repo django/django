@@ -1,6 +1,6 @@
 from django.parts.auth.formfields import AuthenticationForm
 from django.core import formfields, template_loader
-from django.core.extensions import DjangoContext as Context
+from django.core.extensions import DjangoContext, load_and_render
 from django.models.auth import users
 from django.models.core import sites
 from django.utils.httpwrappers import HttpResponse, HttpResponseRedirect
@@ -21,27 +21,21 @@ def login(request):
             return HttpResponseRedirect(redirect_to)
     else:
         errors = {}
-    response = HttpResponse()
     request.session.set_test_cookie()
-    t = template_loader.get_template('registration/login')
-    c = Context(request, {
+    return load_and_render('registration/login', {
         'form': formfields.FormWrapper(manipulator, request.POST, errors),
         REDIRECT_FIELD_NAME: redirect_to,
         'site_name': sites.get_current().name,
-    })
-    response.write(t.render(c))
-    return response
+    }, context_instance=DjangoContext(request))
 
 def logout(request, next_page=None):
     "Logs out the user and displays 'You are logged out' message."
     try:
         del request.session[users.SESSION_KEY]
     except KeyError:
-        t = template_loader.get_template('registration/logged_out')
-        c = Context(request)
-        return HttpResponse(t.render(c))
+        return load_and_render('registration/logged_out', context_instance=DjangoContext(request))
     else:
-        # Do a redirect to this page until the session has been cleared.
+        # Redirect to this page until the session has been cleared.
         return HttpResponseRedirect(next_page or request.path)
 
 def logout_then_login(request):
