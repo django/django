@@ -5,14 +5,10 @@ from django.core.template import Context
 from django.conf.settings import DEBUG, INTERNAL_IPS
 from django.utils.httpwrappers import HttpResponse
 
-def load_and_render(template_name, dictionary=None, context_instance=None):
-    dictionary = dictionary or {}
-    t = template_loader.get_template(template_name)
-    if context_instance:
-        context_instance.update(dictionary)
-    else:
-        context_instance = Context(dictionary)
-    return HttpResponse(t.render(context_instance))
+def render_to_response(*args, **kwargs):
+    return HttpResponse(template_loader.render_to_string(*args, **kwargs))
+
+load_and_render = render_to_response # For backwards compatibility.
 
 class DjangoContext(Context):
     """

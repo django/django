@@ -19,6 +19,19 @@ def get_template_from_string(source):
     """
     return template.Template(source)
 
+def render_to_string(template_name, dictionary=None, context_instance=None):
+    """
+    Loads the given template_name and renders it with the given dictionary as
+    context. Returns a string.
+    """
+    dictionary = dictionary or {}
+    t = get_template(template_name)
+    if context_instance:
+        context_instance.update(dictionary)
+    else:
+        context_instance = template.Context(dictionary)
+    return t.render(context_instance)
+
 def select_template(template_name_list):
     "Given a list of template names, returns the first that can be loaded."
     for template_name in template_name_list:
@@ -119,8 +132,8 @@ def do_block(parser, token):
 def do_extends(parser, token):
     """
     Signal that this template extends a parent template.
-    
-    This tag may be used in two ways: ``{% extends "base" %}`` (with quotes) 
+
+    This tag may be used in two ways: ``{% extends "base" %}`` (with quotes)
     uses the literal value "base" as the name of the parent template to extend,
     or ``{% entends variable %}`` uses the value of ``variable`` as the name
     of the parent template to extend.
