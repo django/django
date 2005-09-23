@@ -1,7 +1,6 @@
 from django.core import formfields, template_loader, validators
 from django.core import template
-from django.core.extensions import DjangoContext as Context
-from django.utils.httpwrappers import HttpResponse
+from django.core.extensions import DjangoContext, render_to_response
 from django.models.core import sites
 from django.conf import settings
 
@@ -22,12 +21,10 @@ def template_validator(request):
         errors = manipulator.get_validation_errors(new_data)
         if not errors:
             request.user.add_message('The template is valid.')
-    t = template_loader.get_template('template_validator')
-    c = Context(request, {
+    return render_to_response('template_validator', {
         'title': 'Template validator',
         'form': formfields.FormWrapper(manipulator, new_data, errors),
-    })
-    return HttpResponse(t.render(c))
+    }, context_instance=DjangoContext(request))
 
 class TemplateValidator(formfields.Manipulator):
     def __init__(self, settings_modules):
