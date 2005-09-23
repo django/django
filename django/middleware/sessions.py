@@ -30,6 +30,9 @@ class SessionWrapper(object):
     def test_cookie_worked(self):
         return self.get(TEST_COOKIE_NAME) == TEST_COOKIE_VALUE
 
+    def delete_test_cookie(self):
+        del self[TEST_COOKIE_NAME]
+
     def _get_session(self):
         # Lazily loads session from storage.
         try:

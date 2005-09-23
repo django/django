@@ -46,7 +46,7 @@ It implements the following standard dictionary methods:
     * ``get(key, default=None)``
       Example: ``fav_color = request.session.get('fav_color', 'red')``
 
-It also has these two methods:
+It also has these three methods:
 
     * ``set_test_cookie()``
       Sets a test cookie to determine whether the user's browser supports
@@ -59,6 +59,9 @@ It also has these two methods:
       browser accepted the test cookie. Due to the way cookies work, you'll
       have to call ``set_test_cookie()`` on a previous, separate page request.
       See "Setting test cookies" below for more information.
+
+    * ``delete_test_cookie()``
+      Deletes the test cookie. Use this to clean up after yourself.
 
 You can edit ``request.session`` at any point in your view. You can edit it
 multiple times.
@@ -120,11 +123,15 @@ This awkward split between ``set_test_cookie()`` and ``test_cookie_worked()``
 is necessary due to the way cookies work. When you set a cookie, you can't
 actually tell whether a browser accepted it until the browser's next request.
 
+It's good practice to use ``delete_test_cookie()`` to clean up after yourself.
+Do this after you've verified that the test cookie worked.
+
 Here's a typical usage example::
 
     def login(request):
         if request.POST:
             if request.session.test_cookie_worked():
+                request.session.delete_test_cookie()
                 return HttpResponse("You're logged in.")
             else:
                 return HttpResponse("Please enable cookies and try again.")

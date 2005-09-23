@@ -81,6 +81,7 @@ class AdminUserRequired:
                         request.user = user
                         return
                     else:
+                        request.session.delete_test_cookie()
                         return httpwrappers.HttpResponseRedirect(request.path)
             else:
                 return self.display_login_form(request, ERROR_MESSAGE)

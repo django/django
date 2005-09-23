@@ -18,6 +18,7 @@ def login(request):
             if not redirect_to or '://' in redirect_to or ' ' in redirect_to:
                 redirect_to = '/accounts/profile/'
             request.session[users.SESSION_KEY] = manipulator.get_user_id()
+            request.session.delete_test_cookie()
             return HttpResponseRedirect(redirect_to)
     else:
         errors = {}
