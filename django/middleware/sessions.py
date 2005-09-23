@@ -66,7 +66,6 @@ class SessionMiddleware:
             session_key = request.session.session_key or sessions.get_new_session_key()
             new_session = sessions.save(session_key, request.session._session,
                 datetime.datetime.now() + datetime.timedelta(seconds=SESSION_COOKIE_AGE))
-            # TODO: Accept variable session length and domain.
             response.set_cookie(SESSION_COOKIE_NAME, session_key,
                 max_age=SESSION_COOKIE_AGE, domain=SESSION_COOKIE_DOMAIN)
         return response
