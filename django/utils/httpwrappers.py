@@ -175,6 +175,12 @@ class HttpResponse:
             if val is not None:
                 self.cookies[key][var.replace('_', '-')] = val
 
+    def delete_cookie(self, key):
+        try:
+            self.cookies[key]['max_age'] = 0
+        except KeyError:
+            pass
+
     def get_content_as_string(self, encoding):
         """
         Returns the content as a string, encoding it from a Unicode object if

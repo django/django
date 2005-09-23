@@ -286,6 +286,10 @@ Methods
 
     .. _`cookie Morsel`: http://www.python.org/doc/current/lib/morsel-objects.html
 
+``delete_cookie(key)``
+    Deletes the cookie with the given key. Fails silently if the key doesn't
+    exist.
+
 ``get_content_as_string(encoding)``
     Returns the content as a Python string, encoding it from a Unicode object
     if necessary.
