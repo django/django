@@ -32,6 +32,10 @@ LANGUAGE_CODE = 'en-us'
 # notifications and other various e-mails.
 MANAGERS = ADMINS
 
+# Default MIME type to use for all HttpResponse objects, if a MIME type
+# isn't manually specified. This is directly used as the Content-Type header.
+DEFAULT_MIME_TYPE = 'text/html; charset=utf-8'
+
 # E-mail address that error messages come from.
 SERVER_EMAIL = 'root@localhost'
 

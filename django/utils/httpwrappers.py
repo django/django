@@ -2,8 +2,7 @@ from Cookie import SimpleCookie
 from pprint import pformat
 from urllib import urlencode
 import datastructures
-
-DEFAULT_MIME_TYPE = 'text/html'
+from django.conf.settings import DEFAULT_MIME_TYPE
 
 class HttpRequest(object): # needs to be new-style class because subclasses define "property"s
     "A basic HTTP request"

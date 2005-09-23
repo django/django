@@ -48,7 +48,7 @@ def get_query_string(original_params, new_params={}, remove=[]):
 def index(request):
     t = template_loader.get_template('index')
     c = Context(request, {'title': 'Site administration'})
-    return HttpResponse(t.render(c), mimetype='text/html; charset=utf-8')
+    return HttpResponse(t.render(c))
 
 def change_list(request, app_label, module_name):
     from django.core import paginator
@@ -491,7 +491,7 @@ def change_list(request, app_label, module_name):
         'title': (is_popup and 'Select %s' % opts.verbose_name or 'Select %s to change' % opts.verbose_name),
         'is_popup': is_popup,
     })
-    return HttpResponse(t.render(c), mimetype='text/html; charset=utf-8')
+    return HttpResponse(t.render(c))
 
 def _get_flattened_data(field, val):
     """
@@ -788,7 +788,7 @@ def add_stage(request, app_label, module_name, show_delete=False, form_url='', p
                 return HttpResponseRedirect(post_url_continue % pk_value)
             if request.POST.has_key("_popup"):
                 return HttpResponse('<script type="text/javascript">opener.dismissAddAnotherPopup(window, %s, "%s");</script>' % \
-                    (pk_value, repr(new_object).replace('"', '\\"')), mimetype='text/html; charset=utf-8')
+                    (pk_value, repr(new_object).replace('"', '\\"')))
             elif request.POST.has_key("_addanother"):
                 request.user.add_message("%s You may add another %s below." % (msg, opts.verbose_name))
                 return HttpResponseRedirect(request.path)
@@ -851,7 +851,7 @@ def add_stage(request, app_label, module_name, show_delete=False, form_url='', p
     raw_template = _get_template(opts, app_label, add=True, show_delete=show_delete, form_url=form_url)
 #     return HttpResponse(raw_template, mimetype='text/plain')
     t = template_loader.get_template_from_string(raw_template)
-    return HttpResponse(t.render(c), mimetype='text/html; charset=utf-8')
+    return HttpResponse(t.render(c))
 
 def change_stage(request, app_label, module_name, object_id):
     mod, opts = _get_mod_opts(app_label, module_name)
@@ -976,7 +976,7 @@ def change_stage(request, app_label, module_name, object_id):
     raw_template = _get_template(opts, app_label, change=True)
 #     return HttpResponse(raw_template, mimetype='text/plain')
     t = template_loader.get_template_from_string(raw_template)
-    return HttpResponse(t.render(c), mimetype='text/html; charset=utf-8')
+    return HttpResponse(t.render(c))
 
 def _nest_help(obj, depth, val):
     current = obj
@@ -1092,7 +1092,7 @@ def delete_stage(request, app_label, module_name, object_id):
         "deleted_objects": deleted_objects,
         "perms_lacking": perms_needed,
     })
-    return HttpResponse(t.render(c), mimetype='text/html; charset=utf-8')
+    return HttpResponse(t.render(c))
 
 def history(request, app_label, module_name, object_id):
     mod, opts = _get_mod_opts(app_label, module_name)
@@ -1110,4 +1110,4 @@ def history(request, app_label, module_name, object_id):
         'module_name': capfirst(opts.verbose_name_plural),
         'object': obj,
     })
-    return HttpResponse(t.render(c), mimetype='text/html; charset=utf-8')
+    return HttpResponse(t.render(c))
