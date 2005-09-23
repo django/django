@@ -4,6 +4,8 @@ from django.models.core import flatfiles
 from django.utils.httpwrappers import HttpResponse
 from django.conf.settings import SITE_ID
 
+DEFAULT_TEMPLATE = 'flatfiles/default'
+
 def flat_file(request, url):
     """
     Flat file view
@@ -23,7 +25,10 @@ def flat_file(request, url):
     if request.user.is_anonymous() and f.registration_required:
         from django.views.auth.login import redirect_to_login
         return redirect_to_login(request.path)
-    t = template_loader.select_template([f.template_name, 'flatfiles/default'])
+    if f.template_name:
+        t = template_loader.select_template((f.template_name, DEFAULT_TEMPLATE))
+    else:
+        t = template_loader.get_template(DEFAULT_TEMPLATE)
     c = DjangoContext(request, {
         'flatfile': f,
     })
