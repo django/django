@@ -687,6 +687,17 @@ class URLField(TextField):
             raise validators.CriticalValidationError, e.messages
 
 class IPAddressField(TextField):
+    def __init__(self, field_name, length=15, maxlength=15, is_required=False, validator_list=[]):
+        validator_list = [self.isValidIPAddress] + validator_list
+        TextField.__init__(self, field_name, length=length, maxlength=maxlength,
+            is_required=is_required, validator_list=validator_list)
+
+    def isValidIPAddress(self, field_data, all_data):
+        try:
+            validators.isValidIPAddress4(field_data, all_data)
+        except validators.ValidationError, e:
+            raise validators.CriticalValidationError, e.messages
+
     def html2python(data):
         return data or None
     html2python = staticmethod(html2python)
