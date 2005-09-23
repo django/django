@@ -3,6 +3,7 @@
 from django.core import formfields, meta, template_loader
 from django.core.exceptions import Http404, ObjectDoesNotExist, PermissionDenied
 from django.core.extensions import DjangoContext as Context
+from django.core.extensions import get_object_or_404, render_to_response
 from django.models.auth import log
 from django.utils.html import strip_tags
 from django.utils.httpwrappers import HttpResponse, HttpResponseRedirect
@@ -46,9 +47,7 @@ def get_query_string(original_params, new_params={}, remove=[]):
     return '?' + '&amp;'.join(['%s=%s' % (k, v) for k, v in p.items()]).replace(' ', '%20')
 
 def index(request):
-    t = template_loader.get_template('index')
-    c = Context(request, {'title': 'Site administration'})
-    return HttpResponse(t.render(c))
+    return render_to_response('index', {'title': 'Site administration'}, context_instance=Context(request))
 
 def change_list(request, app_label, module_name):
     from django.core import paginator
@@ -1065,10 +1064,7 @@ def delete_stage(request, app_label, module_name, object_id):
     mod, opts = _get_mod_opts(app_label, module_name)
     if not request.user.has_perm(app_label + '.' + opts.get_delete_permission()):
         raise PermissionDenied
-    try:
-        obj = mod.get_object(pk=object_id)
-    except ObjectDoesNotExist:
-        raise Http404
+    obj = get_object_or_404(mod, pk=object_id)
 
     # Populate deleted_objects, a data structure of all related objects that
     # will also be deleted.
@@ -1084,30 +1080,23 @@ def delete_stage(request, app_label, module_name, object_id):
         log.log_action(request.user.id, opts.get_content_type_id(), object_id, obj_repr, log.DELETION)
         request.user.add_message('The %s "%s" was deleted successfully.' % (opts.verbose_name, obj_repr))
         return HttpResponseRedirect("../../")
-    t = template_loader.get_template("delete_confirmation_generic")
-    c = Context(request, {
+    return render_to_response('delete_confirmation_generic', {
         "title": "Are you sure?",
         "object_name": opts.verbose_name,
         "object": obj,
         "deleted_objects": deleted_objects,
         "perms_lacking": perms_needed,
-    })
-    return HttpResponse(t.render(c))
+    }, context_instance=Context(request))
 
 def history(request, app_label, module_name, object_id):
     mod, opts = _get_mod_opts(app_label, module_name)
     action_list = log.get_list(object_id__exact=object_id, content_type__id__exact=opts.get_content_type_id(),
         order_by=("action_time",), select_related=True)
     # If no history was found, see whether this object even exists.
-    try:
-        obj = mod.get_object(pk=object_id)
-    except ObjectDoesNotExist:
-        raise Http404
-    t = template_loader.get_template('admin_object_history')
-    c = Context(request, {
+    obj = get_object_or_404(mod, pk=object_id)
+    return render_to_response('admin_object_history', {
         'title': 'Change history: %r' % obj,
         'action_list': action_list,
         'module_name': capfirst(opts.verbose_name_plural),
         'object': obj,
-    })
-    return HttpResponse(t.render(c))
+    }, context_instance=Context(request))
