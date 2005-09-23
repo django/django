@@ -285,7 +285,7 @@ A shortcut: get_object_or_404()
 
 It's a very common idiom to use ``get_object()`` and raise ``Http404`` if the
 object doesn't exist. Django provides a shortcut. Here's the ``detail()`` view,
-rewritten:
+rewritten::
 
     from django.core.extensions import get_object_or_404
     def detail(request, poll_id):
