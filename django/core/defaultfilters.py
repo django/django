@@ -245,19 +245,9 @@ def slice_(value, arg):
     for an introduction.
     """
     try:
-        start, finish = arg.split(':')
-    except ValueError: # unpack list of wrong size
-        return value # fail silently but nicely
-    try:
-        if start and finish:
-            return value[int(start):int(finish)]
-        if start:
-            return value[int(start):]
-        if finish:
-            return value[:int(finish)]
-    except TypeError:
-        pass
-    return value
+        return value[slice(*[x and int(x) or None for x in arg.split(':')])]
+    except (ValueError, TypeError):
+        return value # Fail silently.
 
 def unordered_list(value, _):
     """
