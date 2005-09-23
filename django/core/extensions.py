@@ -1,14 +1,28 @@
-# Specialized template classes for Django, decoupled from the basic template system.
+# This module collects helper functions and classes that "span" multiple levels
+# of MVC. In other words, these functions/classes introduce controlled coupling
+# for convenience's sake.
 
 from django.core import template_loader
+from django.core.exceptions import Http404, ObjectDoesNotExist
 from django.core.template import Context
 from django.conf.settings import DEBUG, INTERNAL_IPS
 from django.utils.httpwrappers import HttpResponse
 
 def render_to_response(*args, **kwargs):
     return HttpResponse(template_loader.render_to_string(*args, **kwargs))
-
 load_and_render = render_to_response # For backwards compatibility.
+
+def get_object_or_404(mod, **kwargs):
+    try:
+        return mod.get_object(**kwargs)
+    except ObjectDoesNotExist:
+        raise Http404
+
+def get_list_or_404(mod, **kwargs):
+    obj_list = mod.get_list(**kwargs)
+    if not obj_list:
+        raise Http404
+    return obj_list
 
 class DjangoContext(Context):
     """
