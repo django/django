@@ -676,6 +676,8 @@ Built-in filter reference
     http://diveintopython.org/native_data_types/lists.html#odbchelper.list.slice
     for an introduction.
 
+    Example: ``{{ some_list|slice:":2" }}``
+
 ``slugify``
     Converts to lowercase, removes non-word characters (alphanumerics and
     underscores) and converts spaces to hyphens. Also strips leading and
