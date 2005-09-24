@@ -129,7 +129,7 @@ DATA_TYPES = {
     'PositiveSmallIntegerField': 'smallint UNSIGNED',
     'SlugField':         'varchar(50)',
     'SmallIntegerField': 'smallint',
-    'TextField':         'text',
+    'TextField':         'longtext',
     'TimeField':         'time',
     'URLField':          'varchar(200)',
     'USStateField':      'varchar(2)',
