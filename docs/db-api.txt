@@ -2,9 +2,9 @@
 Database API reference
 ======================
 
-Once you've created your `data models`_, you'll need to lookup data from the
-database.  This document explains the database abstraction API derived from the
-models, and how to create, retrieve, and update objects.
+Once you've created your `data models`_, you'll need to retrieve data from the
+database. This document explains the database abstraction API derived from the
+models, and how to create, retrieve and update objects.
 
 .. _`data models`: http://www.djangoproject.com/documentation/model_api/
 
@@ -16,20 +16,121 @@ Throughout this reference, we'll refer to the following Poll application::
         pub_date = meta.DateTimeField()
         expire_date = meta.DateTimeField()
 
+        def __repr__(self):
+            return self.question
+
     class Choice(meta.Model):
         poll = meta.ForeignKey(Poll, edit_inline=meta.TABULAR,
             num_in_admin=10, min_num_in_admin=5)
         choice = meta.CharField(maxlength=255, core=True)
         votes = meta.IntegerField(editable=False, default=0)
 
+        def __repr__(self):
+            return self.choice
+
 Basic lookup functions
 ======================
 
-Each model exposes three basic functions for lookups: ``get_object``,
-``get_list``, and ``get_count``.  These functions all take the same arguments,
-but ``get_object`` assumes that only a single record will be returned (and
-raises ``AssertionError`` if that's not true), ``get_count`` simply returns a
-count of objects matched by the lookup, and ``get_list`` returns a list of objects.
+Each model exposes these module-level functions for lookups:
+
+get_object(**kwargs)
+--------------------
+
+Returns the object matching the given lookup parameters, which should be in
+the format described in "Field lookups" below. Raises a module-level
+``*DoesNotExist`` exception if an object wasn't found for the given parameters.
+Raises ``AssertionError`` if more than one object was found.
+
+get_list(**kwargs)
+------------------
+
+Returns a list of objects matching the given lookup parameters, which should be
+in the format described in "Field lookups" below. If no objects match the given
+parameters, it returns an empty list. ``get_list()`` will always return a list.
+
+get_iterator(**kwargs)
+----------------------
+
+Just like ``get_list()``, except it returns an iterator instead of a list. This
+is more efficient for large result sets. This example shows the difference::
+
+    # get_list() loads all objects into memory.
+    for obj in foos.get_list():
+        print repr(obj)
+
+    # get_iterator() only loads a number of objects into memory at a time.
+    for obj in foos.get_iterator():
+        print repr(obj)
+
+get_count(**kwargs)
+-------------------
+
+Returns an integer representing the number of objects in the database matching
+the given lookup parameters, which should be in the format described in
+"Field lookups" below. ``get_count()`` never raises exceptions
+
+Depending on which database you're using (e.g. PostgreSQL vs. MySQL), this may
+return a long integer instead of a normal Python integer.
+
+get_values(**kwargs)
+--------------------
+
+Just like ``get_list()``, except it returns a list of dictionaries instead of
+model-instance objects.
+
+It accepts an optional parameter, ``fields``, which should be a list or tuple
+of field names. If you don't specify ``fields``, each dictionary in the list
+returned by ``get_values()`` will have a key and value for each field in the
+database table. If you specify ``fields``, each dictionary will have only the
+field keys/values for the fields you specify. Here's an example, using the
+``Poll`` model defined above::
+
+    >>> from datetime import datetime
+    >>> p1 = polls.Poll(slug='whatsup', question="What's up?",
+    ...     pub_date=datetime(2005, 2, 20), expire_date=datetime(2005, 3, 20))
+    >>> p1.save()
+    >>> p2 = polls.Poll(slug='name', question="What's your name?",
+    ...     pub_date=datetime(2005, 3, 20), expire_date=datetime(2005, 4, 20))
+    >>> p2.save()
+    >>> polls.get_list()
+    [What's up?, What's your name?]
+    >>> polls.get_values()
+    [{'id': 1, 'slug': 'whatsup', 'question': "What's up?", 'pub_date': datetime.datetime(2005, 2, 20), 'expire_date': datetime.datetime(2005, 3, 20)},
+     {'id': 2, 'slug': 'name', 'question': "What's your name?", 'pub_date': datetime.datetime(2005, 3, 20), 'expire_date': datetime.datetime(2005, 4, 20)}]
+    >>> polls.get_values(fields=['id', 'slug'])
+    [{'id': 1, 'slug': 'whatsup'}, {'id': 2, 'slug': 'name'}]
+
+Use ``get_values()`` when you know you're only going to need a couple of field
+values and you won't need the functionality of a model instance object. It's
+more efficient to select only the fields you need to use.
+
+get_values_iterator(**kwargs)
+-----------------------------
+
+Just like ``get_values()``, except it returns an iterator instead of a list.
+See the section on ``get_iterator()`` above.
+
+get_in_bulk(id_list, **kwargs)
+------------------------------
+
+Takes a list of IDs and returns a dictionary mapping each ID to an instance of
+the object with the given ID. Also takes optional keyword lookup arguments,
+which should be in the format described in "Field lookups" below. Here's an
+example, using the ``Poll`` model defined above::
+
+    >>> from datetime import datetime
+    >>> p1 = polls.Poll(slug='whatsup', question="What's up?",
+    ...     pub_date=datetime(2005, 2, 20), expire_date=datetime(2005, 3, 20))
+    >>> p1.save()
+    >>> p2 = polls.Poll(slug='name', question="What's your name?",
+    ...     pub_date=datetime(2005, 3, 20), expire_date=datetime(2005, 4, 20))
+    >>> p2.save()
+    >>> polls.get_list()
+    [What's up?, What's your name?]
+    >>> polls.get_in_bulk([1])
+    {1: What's up?}
+    >>> polls.get_in_bulk([1, 2])
+    {1: What's up?, 2: What's your name?}
 
 Field lookups
 =============
@@ -114,6 +215,8 @@ statements are equivalent::
 
     choices.get_list(poll__id__exact=3)
     choices.get_list(poll__pk=3)
+
+If you pass an invalid keyword argument, the function will raise ``TypeError``.
 
 .. _`Keyword Arguments`: http://docs.python.org/tut/node6.html#SECTION006720000000000000000
 
@@ -337,7 +440,7 @@ of objects then calling save() on them::
 Calling ``save()`` on an object with an id if ``None`` signifies to
 Django that the object is new and should be inserted.
 
-Related objects (i.e. ``Choices``) are created using convience functions::
+Related objects (e.g. ``Choices``) are created using convenience functions::
 
     >>> p.add_choice(choice="Over easy", votes=0)
     >>> p.add_choice(choice="Scrambled", votes=0)
@@ -346,12 +449,10 @@ Related objects (i.e. ``Choices``) are created using convience functions::
     >>> p.get_choice_count()
     4
 
-Each of those ``add_choice`` methods is equivilent to (except obviously much
+Each of those ``add_choice`` methods is equivalent to (except obviously much
 simpler than)::
 
-    >>> c = polls.Choice(poll_id=p.id,
-    ...                  choice="Over easy",
-    ...                  votes=0)
+    >>> c = polls.Choice(poll_id=p.id, choice="Over easy", votes=0)
     >>> c.save()
 
 Note that when using the `add_foo()`` methods, you do not give any value
@@ -361,4 +462,132 @@ the relation (``poll_id`` in this case).
 Deleting objects
 ================
 
-The delete method, conveniently, is named ``delete()``.
+The delete method, conveniently, is named ``delete()``. This method immediately
+deletes the object and has no return value. Example::
+
+    >>> c.delete()
+
+Extra instance methods
+======================
+
+In addition to ``save()``, ``delete()`` and all of the ``add_*`` and ``get_*``
+related-object methods, a model object might get any or all of the following
+methods:
+
+get_FOO_display()
+-----------------
+
+For every field that has ``choices`` set, the object will have a
+``get_FOO_display()`` method, where ``FOO`` is the name of the field. This
+method returns the "human-readable" value of the field. For example, in the
+following model::
+
+    GENDER_CHOICES = (
+        ('M', 'Male'),
+        ('F', 'Female'),
+    )
+    class Person
+        name = meta.CharField(maxlength=20)
+        gender = meta.CharField(maxlength=1, choices=GENDER_CHOICES)
+
+...each ``Person`` instance will have a ``get_gender_display()`` method. Example::
+
+    >>> p = Person(name='John', gender='M')
+    >>> p.save()
+    >>> p.gender
+    'M'
+    >>> p.get_gender_display()
+    'Male'
+
+get_next_by_FOO(**kwargs) and get_previous_by_FOO(**kwargs)
+-----------------------------------------------------------
+
+For every ``DateField`` and ``DateTimeField`` that does not have ``null=True``,
+the object will have ``get_next_by_FOO()`` and ``get_previous_by_FOO()``
+methods, where ``FOO`` is the name of the field. This returns the next and
+previous object with respect to the date field, raising the appropriate
+``*DoesNotExist`` exception when appropriate.
+
+Both methods accept optional keyword arguments, which should be in the format
+described in "Field lookups" above.
+
+get_FOO_filename()
+------------------
+
+For every ``FileField``, the object will have a ``get_FOO_filename()`` method,
+where ``FOO`` is the name of the field. This returns the full filesystem path
+to the file, according to your ``MEDIA_ROOT`` setting.
+
+Note that ``ImageField`` is technically a subclass of ``FileField``, so every
+model with an ``ImageField`` will also get this method.
+
+get_FOO_url()
+-------------
+
+For every ``FileField``, the object will have a ``get_FOO_filename()`` method,
+where ``FOO`` is the name of the field. This returns the full URL to the file,
+according to your ``MEDIA_URL`` setting. If the value is blank, this method
+returns an empty string.
+
+get_FOO_size()
+--------------
+
+For every ``FileField``, the object will have a ``get_FOO_filename()`` method,
+where ``FOO`` is the name of the field. This returns the size of the file, in
+bytes. (Behind the scenes, it uses ``os.path.getsize``.)
+
+save_FOO_file(filename, raw_contents)
+-------------------------------------
+
+For every ``FileField``, the object will have a ``get_FOO_filename()`` method,
+where ``FOO`` is the name of the field. This saves the given file to the
+filesystem, using the given filename. If a file with the given filename already
+exists, Django adds an underscore to the end of the filename (but before the
+extension) until the filename is available.
+
+get_FOO_height() and get_FOO_width()
+------------------------------------
+
+For every ``ImageField``, the object will have ``get_FOO_height()`` and
+``get_FOO_width()`` methods, where ``FOO`` is the name of the field. This
+returns the height (or width) of the image, as an integer, in pixels.
+
+Extra module functions
+======================
+
+In addition to every function described in "Basic lookup functions" above, a
+model module might get any or all of the following methods:
+
+get_FOO_list(kind, **kwargs)
+----------------------------
+
+For every ``DateField`` and ``DateTimeField``, the model module will have a
+``get_FOO_list()`` function, where ``FOO`` is the name of the field. This
+returns a list of ``datetime.datetime`` objects representing all available
+dates of the given scope, as defined by the ``kind`` argument. ``kind`` should
+be either ``"year"``, ``"month"`` or ``"day"``. Each ``datetime.datetime``
+object in the result list is "truncated" to the given ``type``.
+
+    * ``"year"`` returns a list of all distinct year values for the field.
+    * ``"month"`` returns a list of all distinct year/month values for the field.
+    * ``"day"`` returns a list of all distinct year/month/day values for the field.
+
+Here's an example, using the ``Poll`` model defined above::
+
+    >>> from datetime import datetime
+    >>> p1 = polls.Poll(slug='whatsup', question="What's up?",
+    ...     pub_date=datetime(2005, 2, 20), expire_date=datetime(2005, 3, 20))
+    >>> p1.save()
+    >>> p2 = polls.Poll(slug='name', question="What's your name?",
+    ...     pub_date=datetime(2005, 3, 20), expire_date=datetime(2005, 4, 20))
+    >>> p2.save()
+    >>> polls.get_pub_date_list('year')
+    [datetime.datetime(2005, 1, 1)]
+    >>> polls.get_pub_date_list('month')
+    [datetime.datetime(2005, 2, 1), datetime.datetime(2005, 3, 1)]
+    >>> polls.get_pub_date_list('day')
+    [datetime.datetime(2005, 2, 20), datetime.datetime(2005, 3, 20)]
+
+``get_FOO_list()`` also accepts an optional keyword argument ``order``, which
+should be either ``"ASC"`` or ``"DESC"``. This specifies how to order the
+results. Default is ``"ASC"``.
