@@ -40,6 +40,14 @@ your admin's index page. See `Tutorial 2`_ for more information.
 
 .. _Tutorial 2: http://www.djangoproject.com/documentation/tutorial2/
 
+createcachetable [tablename]
+----------------------------
+
+Creates a cache table named ``tablename`` for use with the database cache
+backend.  See the `cache documentation`_ for more information.
+
+.. _cache documentation: http://www.djangoproject.com/documentation/cache/
+
 createsuperuser
 ---------------
 

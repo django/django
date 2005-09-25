@@ -621,3 +621,35 @@ def runserver(addr, port):
     from django.utils import autoreload
     autoreload.main(inner_run)
 runserver.args = '[optional port number, or ipaddr:port]'
+
+def createcachetable(tablename):
+    "Creates the table needed to use the SQL cache backend"
+    from django.core import db, meta
+    fields = (
+        meta.CharField(name='key', maxlength=255, unique=True, primary_key=True),
+        meta.TextField(name='value'),
+        meta.DateTimeField(name='expires', db_index=True),
+    )
+    table_output = []
+    index_output = []
+    for f in fields:
+        field_output = [f.column, db.DATA_TYPES[f.__class__.__name__] % f.__dict__]
+        field_output.append("%sNULL" % (not f.null and "NOT " or ""))
+        if f.unique:
+            field_output.append("UNIQUE")
+        if f.primary_key:
+            field_output.append("PRIMARY KEY")
+        if f.db_index:
+            unique = f.unique and "UNIQUE " or ""
+            index_output.append("CREATE %sINDEX %s_%s ON %s (%s);" % (unique, tablename, f.column, tablename, f.column))
+        table_output.append(" ".join(field_output))
+    full_statement = ["CREATE TABLE %s (" % tablename]
+    for i, line in enumerate(table_output):
+        full_statement.append('    %s%s' % (line, i < len(table_output)-1 and ',' or ''))
+    full_statement.append(');')
+    curs = db.db.cursor()
+    curs.execute("\n".join(full_statement))
+    for statement in index_output:
+        curs.execute(statement)
+    db.db.commit()
+createcachetable.args = "[tablename]"

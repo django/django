@@ -6,6 +6,7 @@ import os, sys
 ACTION_MAPPING = {
     'adminindex': management.get_admin_index,
     'createsuperuser': management.createsuperuser,
+    'createcachetable' : management.createcachetable,
 #     'dbcheck': management.database_check,
     'init': management.init,
     'inspectdb': management.inspectdb,
@@ -23,7 +24,7 @@ ACTION_MAPPING = {
     'validate': management.validate,
 }
 
-NO_SQL_TRANSACTION = ('adminindex', 'dbcheck', 'install', 'sqlindexes')
+NO_SQL_TRANSACTION = ('adminindex', 'createcachetable', 'dbcheck', 'install', 'sqlindexes')
 
 def get_usage():
     """
@@ -79,6 +80,11 @@ def main():
         except NotImplementedError:
             sys.stderr.write("Error: %r isn't supported for the currently selected database backend.\n" % action)
             sys.exit(1)
+    elif action == 'createcachetable':
+        try:
+            ACTION_MAPPING[action](args[1])
+        except IndexError:
+            parser.print_usage_and_exit()
     elif action in ('startapp', 'startproject'):
         try:
             name = args[1]

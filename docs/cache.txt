@@ -29,10 +29,20 @@ Examples:
     memcached://127.0.0.1:11211/    A memcached backend; the server is running
                                     on localhost port 11211.
 
+    db://tablename/                 A database backend in a table named 
+                                    "tablename". This table should be created
+                                    with "django-admin createcachetable".
+
+    file:///var/tmp/django_cache/   A file-based cache stored in the directory
+                                    /var/tmp/django_cache/.
+
     simple:///                      A simple single-process memory cache; you
                                     probably don't want to use this except for
                                     testing. Note that this cache backend is
                                     NOT threadsafe!
+                                        
+    locmem:///                      A more sophisticaed local memory cache;
+                                    this is multi-process- and thread-safe.
     ==============================  ===========================================
 
 All caches may take arguments -- they're given in query-string style.  Valid

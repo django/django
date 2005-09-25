@@ -15,10 +15,9 @@ The CACHE_BACKEND setting is a quasi-URI; examples are:
     memcached://127.0.0.1:11211/    A memcached backend; the server is running
                                     on localhost port 11211.
 
-    sql://tablename/                A SQL backend.  If you use this backend,
-                                    you must have django.contrib.cache in
-                                    INSTALLED_APPS, and you must have installed
-                                    the tables for django.contrib.cache.
+    db://tablename/                 A database backend in a table named 
+                                    "tablename". This table should be created
+                                    with "django-admin createcachetable".
 
     file:///var/tmp/django_cache/   A file-based cache stored in the directory
                                     /var/tmp/django_cache/.
@@ -55,7 +54,7 @@ arguments are:
 For example:
 
     memcached://127.0.0.1:11211/?timeout=60
-    sql://tablename/?timeout=120&max_entries=500&cull_percentage=4
+    db://tablename/?timeout=120&max_entries=500&cull_percentage=4
 
 Invalid arguments are silently ignored, as are invalid values of known
 arguments.
@@ -350,7 +349,84 @@ class _FileCache(_SimpleCache):
       
     def _key_to_file(self, key):
         return os.path.join(self._dir, urllib.quote_plus(key))
+
+#############
+# SQL cache #
+#############
+
+import base64
+from django.core.db import db
+from datetime import datetime
+
+class _DBCache(_Cache):
+    """SQL cache backend"""
     
+    def __init__(self, table, params):
+        _Cache.__init__(self, params)
+        self._table = table
+        max_entries = params.get('max_entries', 300) 
+        try: 
+            self._max_entries = int(max_entries) 
+        except (ValueError, TypeError): 
+            self._max_entries = 300 
+        cull_frequency = params.get('cull_frequency', 3) 
+        try: 
+            self._cull_frequency = int(cull_frequency) 
+        except (ValueError, TypeError): 
+            self._cull_frequency = 3 
+        
+    def get(self, key, default=None):
+        cursor = db.cursor()
+        cursor.execute("SELECT key, value, expires FROM %s WHERE key = %%s" % self._table, [key])
+        row = cursor.fetchone()
+        if row is None:
+            return default
+        now = datetime.now()
+        if row[2] < now:
+            cursor.execute("DELETE FROM %s WHERE key = %%s" % self._table, [key])
+            db.commit()
+            return default
+        return pickle.loads(base64.decodestring(row[1]))
+        
+    def set(self, key, value, timeout=None):
+        if timeout is None:
+            timeout = self.default_timeout
+        cursor = db.cursor()
+        cursor.execute("SELECT COUNT(*) FROM %s" % self._table)
+        num = cursor.fetchone()[0]
+        now = datetime.now().replace(microsecond=0)
+        exp = datetime.fromtimestamp(time.time() + timeout).replace(microsecond=0)
+        if num > self._max_entries:
+            self._cull(cursor, now)
+        encoded = base64.encodestring(pickle.dumps(value, 2)).strip()
+        cursor.execute("SELECT key FROM %s WHERE key = %%s" % self._table, [key])
+        if cursor.fetchone():
+            cursor.execute("UPDATE %s SET value = %%s, expires = %%s WHERE key = %%s" % self._table, [encoded, str(exp), key])
+        else:
+            cursor.execute("INSERT INTO %s (key, value, expires) VALUES (%%s, %%s, %%s)" % self._table, [key, encoded, str(exp)])
+        db.commit()
+        
+    def delete(self, key):
+        cursor = db.cursor()
+        cursor.execute("DELETE FROM %s WHERE key = %%s" % self._table, [key])
+        db.commit()
+        
+    def has_key(self, key):
+        cursor = db.cursor()
+        cursor.execute("SELECT key FROM %s WHERE key = %%s" % self._table, [key])
+        return cursor.fetchone() is not None
+        
+    def _cull(self, cursor, now):
+        if self._cull_frequency == 0:
+            cursor.execute("DELETE FROM %s" % self._table)
+        else:
+            cursor.execute("DELETE FROM %s WHERE expires < %%s" % self._table, [str(now)])
+            cursor.execute("SELECT COUNT(*) FROM %s" % self._table)
+            num = cursor.fetchone()[0]
+            if num > self._max_entries:
+                cursor.execute("SELECT key FROM %s ORDER BY key LIMIT 1 OFFSET %%s" % self._table, [num / self._cull_frequency])
+                cursor.execute("DELETE FROM %s WHERE key < %%s" % self._table, [cursor.fetchone()[0]])
+        
 ##########################################
 # Read settings and load a cache backend #
 ##########################################
@@ -362,6 +438,7 @@ _BACKENDS = {
     'simple'    : _SimpleCache,
     'locmem'    : _LocMemCache,
     'file'      : _FileCache,
+    'db'        : _DBCache,
 }
 
 def get_cache(backend_uri):
