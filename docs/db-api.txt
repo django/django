@@ -34,7 +34,7 @@ Basic lookup functions
 Each model exposes these module-level functions for lookups:
 
 get_object(\**kwargs)
---------------------
+---------------------
 
 Returns the object matching the given lookup parameters, which should be in
 the format described in "Field lookups" below. Raises a module-level
@@ -42,14 +42,14 @@ the format described in "Field lookups" below. Raises a module-level
 Raises ``AssertionError`` if more than one object was found.
 
 get_list(\**kwargs)
-------------------
+-------------------
 
 Returns a list of objects matching the given lookup parameters, which should be
 in the format described in "Field lookups" below. If no objects match the given
 parameters, it returns an empty list. ``get_list()`` will always return a list.
 
 get_iterator(\**kwargs)
-----------------------
+-----------------------
 
 Just like ``get_list()``, except it returns an iterator instead of a list. This
 is more efficient for large result sets. This example shows the difference::
@@ -63,7 +63,7 @@ is more efficient for large result sets. This example shows the difference::
         print repr(obj)
 
 get_count(\**kwargs)
--------------------
+--------------------
 
 Returns an integer representing the number of objects in the database matching
 the given lookup parameters, which should be in the format described in
@@ -73,7 +73,7 @@ Depending on which database you're using (e.g. PostgreSQL vs. MySQL), this may
 return a long integer instead of a normal Python integer.
 
 get_values(\**kwargs)
---------------------
+---------------------
 
 Just like ``get_list()``, except it returns a list of dictionaries instead of
 model-instance objects.
@@ -105,13 +105,13 @@ values and you won't need the functionality of a model instance object. It's
 more efficient to select only the fields you need to use.
 
 get_values_iterator(\**kwargs)
------------------------------
+------------------------------
 
 Just like ``get_values()``, except it returns an iterator instead of a list.
 See the section on ``get_iterator()`` above.
 
 get_in_bulk(id_list, \**kwargs)
-------------------------------
+-------------------------------
 
 Takes a list of IDs and returns a dictionary mapping each ID to an instance of
 the object with the given ID. Also takes optional keyword lookup arguments,
@@ -500,7 +500,7 @@ following model::
     'Male'
 
 get_next_by_FOO(\**kwargs) and get_previous_by_FOO(\**kwargs)
------------------------------------------------------------
+-------------------------------------------------------------
 
 For every ``DateField`` and ``DateTimeField`` that does not have ``null=True``,
 the object will have ``get_next_by_FOO()`` and ``get_previous_by_FOO()``
@@ -559,7 +559,7 @@ In addition to every function described in "Basic lookup functions" above, a
 model module might get any or all of the following methods:
 
 get_FOO_list(kind, \**kwargs)
-----------------------------
+-----------------------------
 
 For every ``DateField`` and ``DateTimeField``, the model module will have a
 ``get_FOO_list()`` function, where ``FOO`` is the name of the field. This
