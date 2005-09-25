@@ -592,6 +592,10 @@ class ModelBase(type):
             new_mod.get_latest = curry(function_get_latest, opts, new_class, does_not_exist_exception)
 
         for f in opts.fields:
+            if f.choices:
+                # Add "get_thingie_display" method to get human-readable value.
+                func = curry(method_get_display_value, f)
+                setattr(new_class, 'get_%s_display' % f.name, func)
             if isinstance(f, DateField) or isinstance(f, DateTimeField):
                 # Add "get_next_by_thingie" and "get_previous_by_thingie" methods
                 # for all DateFields and DateTimeFields that cannot be null.
@@ -989,6 +993,12 @@ def method_get_next_or_previous(get_object_func, field, is_next, self, **kwargs)
     kwargs['order_by'] = [(not is_next and '-' or '') + field.name]
     kwargs['limit'] = 1
     return get_object_func(**kwargs)
+
+# CHOICE-RELATED METHODS ###################
+
+def method_get_display_value(field, self):
+    value = getattr(self, field.column)
+    return dict(field.choices).get(value, value)
 
 # FILE-RELATED METHODS #####################
 
