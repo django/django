@@ -130,7 +130,8 @@ def change_list(request, app_label, module_name):
     lookup_order_field = order_field
     if isinstance(lookup_opts.get_field(order_field).rel, meta.ManyToOne):
         f = lookup_opts.get_field(order_field)
-        lookup_order_field = '%s.%s' % (f.rel.to.db_table, f.rel.to.ordering[0])
+        rel_ordering = f.rel.to.ordering and f.rel.to.ordering[0] or f.rel.to.pk.column
+        lookup_order_field = '%s.%s' % (f.rel.to.db_table, rel_ordering)
     # Use select_related if one of the list_display options is a field with a
     # relationship.
     for field_name in lookup_opts.admin.list_display:
