@@ -524,6 +524,11 @@ def get_validation_errors(outfile):
                     e.add(opts, '"%s" field: CharFields require a "maxlength" attribute.' % f.name)
                 if isinstance(f, meta.FileField) and not f.upload_to:
                     e.add(opts, '"%s" field: FileFields require an "upload_to" attribute.' % f.name)
+                if isinstance(f, meta.ImageField):
+                    try:
+                        from PIL import Image
+                    except ImportError:
+                        e.add(opts, '"%s" field: To use ImageFields, you need to install the Python Imaging Library. Get it at http://www.pythonware.com/products/pil/ .')
                 if f.prepopulate_from is not None and type(f.prepopulate_from) not in (list, tuple):
                     e.add(opts, '"%s" field: prepopulate_from should be a list or tuple.' % f.name)
                 if f.choices:
