@@ -44,6 +44,11 @@ def _get_contenttype_insert(opts):
 def _is_valid_dir_name(s):
     return bool(re.search(r'^\w+$', s))
 
+# If the foreign key points to an AutoField, the foreign key should be an
+# IntegerField, not an AutoField. Otherwise, the foreign key should be the same
+# type of field as the field to which it points.
+get_rel_data_type = lambda f: (f.__class__.__name__ == 'AutoField') and 'IntegerField' or f.__class__.__name__
+
 def get_sql_create(mod):
     "Returns a list of the CREATE TABLE SQL statements for the given module."
     from django.core import db, meta
@@ -54,14 +59,7 @@ def get_sql_create(mod):
         for f in opts.fields:
             if isinstance(f, meta.ForeignKey):
                 rel_field = f.rel.get_related_field()
-                # If the foreign key points to an AutoField, the foreign key
-                # should be an IntegerField, not an AutoField. Otherwise, the
-                # foreign key should be the same type of field as the field
-                # to which it points.
-                if rel_field.__class__.__name__ == 'AutoField':
-                    data_type = 'IntegerField'
-                else:
-                    data_type = rel_field.__class__.__name__
+                data_type = get_rel_data_type(rel_field)
             else:
                 rel_field = f
                 data_type = f.__class__.__name__
@@ -94,9 +92,9 @@ def get_sql_create(mod):
             table_output = ['CREATE TABLE %s (' % f.get_m2m_db_table(opts)]
             table_output.append('    id %s NOT NULL PRIMARY KEY,' % db.DATA_TYPES['AutoField'])
             table_output.append('    %s_id %s NOT NULL REFERENCES %s (%s),' % \
-                (opts.object_name.lower(), db.DATA_TYPES['IntegerField'], opts.db_table, opts.pk.column))
+                (opts.object_name.lower(), db.DATA_TYPES[get_rel_data_type(opts.pk)] % opts.pk.__dict__, opts.db_table, opts.pk.column))
             table_output.append('    %s_id %s NOT NULL REFERENCES %s (%s),' % \
-                (f.rel.to.object_name.lower(), db.DATA_TYPES['IntegerField'], f.rel.to.db_table, f.rel.to.pk.column))
+                (f.rel.to.object_name.lower(), db.DATA_TYPES[get_rel_data_type(f.rel.to.pk)] % f.rel.to.pk.__dict__, f.rel.to.db_table, f.rel.to.pk.column))
             table_output.append('    UNIQUE (%s_id, %s_id)' % (opts.object_name.lower(), f.rel.to.object_name.lower()))
             table_output.append(');')
             final_output.append('\n'.join(table_output))

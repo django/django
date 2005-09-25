@@ -17,6 +17,16 @@ class Employee(meta.Model):
     def __repr__(self):
         return "%s %s" % (self.first_name, self.last_name)
 
+class Business(meta.Model):
+    name = meta.CharField(maxlength=20, primary_key=True)
+    employees = meta.ManyToManyField(Employee)
+    class META:
+        verbose_name_plural = 'businesses'
+        module_name = 'businesses'
+
+    def __repr__(self):
+        return self.name
+
 API_TESTS = """
 >>> dan = employees.Employee(employee_code='ABC123', first_name='Dan', last_name='Jones')
 >>> dan.save()
@@ -43,4 +53,13 @@ EmployeeDoesNotExist: Employee does not exist for {'pk': 'foo'}
 >>> fran.save()
 >>> employees.get_list(last_name__exact='Jones')
 [Dan Jones, Fran Jones]
+
+>>> b = businesses.Business(name='Sears')
+>>> b.save()
+>>> b.set_employees([dan.employee_code, fran.employee_code])
+True
+>>> b.get_employee_list()
+[Dan Jones, Fran Jones]
+>>> fran.get_business_list()
+[Sears]
 """
