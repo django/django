@@ -15,16 +15,21 @@ The CACHE_BACKEND setting is a quasi-URI; examples are:
     memcached://127.0.0.1:11211/    A memcached backend; the server is running
                                     on localhost port 11211.
 
-    pgsql://tablename/              A pgsql backend (the pgsql backend uses
-                                    the same database/username as the rest of
-                                    the CMS, so only a table name is needed.)
+    sql://tablename/                A SQL backend.  If you use this backend,
+                                    you must have django.contrib.cache in
+                                    INSTALLED_APPS, and you must have installed
+                                    the tables for django.contrib.cache.
 
-    file:///var/tmp/django.cache/      A file-based cache at /var/tmp/django.cache
+    file:///var/tmp/django_cache/   A file-based cache stored in the directory
+                                    /var/tmp/django_cache/.
 
     simple:///                      A simple single-process memory cache; you
                                     probably don't want to use this except for
                                     testing. Note that this cache backend is
                                     NOT threadsafe!
+                                        
+    locmem:///                      A more sophisticaed local memory cache;
+                                    this is multi-process- and thread-safe.
 
 All caches may take arguments; these are given in query-string style.  Valid
 arguments are:
@@ -50,13 +55,10 @@ arguments are:
 For example:
 
     memcached://127.0.0.1:11211/?timeout=60
-    pgsql://tablename/?timeout=120&max_entries=500&cull_percentage=4
+    sql://tablename/?timeout=120&max_entries=500&cull_percentage=4
 
 Invalid arguments are silently ignored, as are invalid values of known
 arguments.
-
-So far, only the memcached and simple backend have been implemented; backends
-using postgres, and file-system storage are planned.
 """
 
 ##############
@@ -181,13 +183,15 @@ class _SimpleCache(_Cache):
 
     def get(self, key, default=None):
         now = time.time()
-        exp = self._expire_info.get(key, now)
-        if exp is not None and exp < now:
+        exp = self._expire_info.get(key)
+        if exp is None:
+            return default
+        elif exp < now:
             del self._cache[key]
             del self._expire_info[key]
             return default
         else:
-            return self._cache.get(key, default)
+            return self._cache[key]
 
     def set(self, key, value, timeout=None):
         if len(self._cache) >= self._max_entries:
@@ -219,6 +223,134 @@ class _SimpleCache(_Cache):
             for k in doomed:
                 self.delete(k)
 
+###############################
+# Thread-safe in-memory cache #
+###############################
+
+try:
+    import cPickle as pickle
+except ImportError:
+    import pickle
+from django.utils.synch import RWLock
+
+class _LocMemCache(_SimpleCache):
+    """Thread-safe in-memory cache"""
+    
+    def __init__(self, host, params):
+        _SimpleCache.__init__(self, host, params)
+        self._lock = RWLock()
+
+    def get(self, key, default=None):
+        should_delete = False
+        self._lock.reader_enters()
+        try:
+            now = time.time()
+            exp = self._expire_info.get(key)
+            if exp is None:
+                return default
+            elif exp < now:
+                should_delete = True
+            else:
+                return self._cache[key]
+        finally:
+            self._lock.reader_leaves()
+        if should_delete:
+            self._lock.writer_enters()
+            try:
+                del self._cache[key]
+                del self._expire_info[key]
+                return default
+            finally:
+                self._lock.writer_leaves()
+                
+    def set(self, key, value, timeout=None):
+        self._lock.writer_enters()
+        try:
+            _SimpleCache.set(self, key, value, timeout)
+        finally:
+            self._lock.writer_leaves()
+            
+    def delete(self, key):
+        self._lock.writer_enters()
+        try:
+            _SimpleCache.delete(self, key)
+        finally:
+            self._lock.writer_leaves()
+
+####################
+# File-based cache #
+####################
+
+import os
+import urllib
+
+class _FileCache(_SimpleCache):
+    """File-based cache"""
+    
+    def __init__(self, dir, params):
+        self._dir = dir
+        if not os.path.exists(self._dir):
+            try:
+                os.makedirs(self._dir)
+            except OSError:
+                raise EnvironmentError, "Cache directory '%s' does not exist and could not be created'" % self._dir
+        _SimpleCache.__init__(self, dir, params)
+        del self._cache
+        del self._expire_info
+        
+    def get(self, key, default=None):
+        fname = self._key_to_file(key)
+        try:
+            f = open(fname, 'rb')
+            exp = pickle.load(f)
+            now = time.time()
+            if exp < now:
+                f.close()
+                os.remove(fname)
+            else:
+                return pickle.load(f)
+        except (IOError, pickle.PickleError):
+            pass
+        return default
+        
+    def set(self, key, value, timeout=None):
+        fname = self._key_to_file(key)
+        if timeout is None:
+            timeout = self.default_timeout
+        filelist = os.listdir(self._dir)
+        if len(filelist) > self._max_entries:
+            self._cull(filelist)
+        try:
+            f = open(fname, 'wb')
+            now = time.time()
+            pickle.dump(now + timeout, f, 2)
+            pickle.dump(value, f, 2)
+        except (IOError, OSError):
+            raise
+            
+    def delete(self, key):
+        try:
+            os.remove(self._key_to_file(key))
+        except (IOError, OSError):
+            pass
+            
+    def has_key(self, key):
+        return os.path.exists(self._key_to_file(key))
+        
+    def _cull(self, filelist):
+        if self.cull_frequency == 0:
+            doomed = filelist
+        else:
+            doomed = [k for (i, k) in enumerate(filelist) if i % self._cull_frequency == 0]
+        for fname in doomed:
+            try:
+                os.remove(os.path.join(self._dir, fname))
+            except (IOError, OSError):
+                pass
+      
+    def _key_to_file(self, key):
+        return os.path.join(self._dir, urllib.quote_plus(key))
+    
 ##########################################
 # Read settings and load a cache backend #
 ##########################################
@@ -228,6 +360,8 @@ from cgi import parse_qsl
 _BACKENDS = {
     'memcached' : _MemcachedCache,
     'simple'    : _SimpleCache,
+    'locmem'    : _LocMemCache,
+    'file'      : _FileCache,
 }
 
 def get_cache(backend_uri):
