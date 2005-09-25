@@ -437,8 +437,8 @@ of objects then calling save() on them::
     ...                expire_date=some_future_date)
     >>> p.save()
 
-Calling ``save()`` on an object with an id if ``None`` signifies to
-Django that the object is new and should be inserted.
+Calling ``save()`` on an object with a primary key whose value is ``None``
+signifies to Django that the object is new and should be inserted.
 
 Related objects (e.g. ``Choices``) are created using convenience functions::
 
