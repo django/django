@@ -9,21 +9,38 @@
 {% load adminapplist %}
 
 {% get_admin_app_list as app_list %}
-{% for app in app_list %}
-    <div class="module">
-    <h2>{{ app.name }}</h2>
-    <table>
-    {% for model in app.models %}
-        <tr>
-            <th><a href="{{ model.admin_url }}">{{ model.name }}</a></th>
-            <td class="x50"><a href="{{ model.admin_url }}add/" class="addlink">Add</a></td>
-            <td class="x75"><a href="{{ model.admin_url }}" class="changelink">Change</a></td>
-        </tr>
-    {% endfor %}
-    </table>
-    </div>
-{% endfor %}
+{% if app_list %}
+    {% for app in app_list %}
+        <div class="module">
+        <h2>{{ app.name }}</h2>
+        <table>
+        {% for model in app.models %}
+            <tr>
+            {% if model.perms.change %}
+                <th><a href="{{ model.admin_url }}">{{ model.name }}</a></th>
+            {% else %}
+                <th>{{ model.name }}</th>
+            {% endif %}
 
+            {% if model.perms.add %}
+                <td class="x50"><a href="{{ model.admin_url }}add/" class="addlink">Add</a></td>
+            {% else %}
+                <td class="x50">&nbsp;</td>
+            {% endif %}
+
+            {% if model.perms.change %}
+                <td class="x75"><a href="{{ model.admin_url }}" class="changelink">Change</a></td>
+            {% else %}
+                <td class="x75">&nbsp;</td>
+            {% endif %}
+            </tr>
+        {% endfor %}
+        </table>
+        </div>
+    {% endfor %}
+{% else %}
+    <p>You don't have permission to edit anything.</p>
+{% endif %}
 </div>
 {% endblock %}
 
