@@ -430,7 +430,7 @@ class ModelBase(type):
             # Pass any Options overrides to the base's Options instance, and
             # simultaneously remove them from attrs. When this is done, attrs
             # will be a dictionary of custom methods, plus __module__.
-            meta_overrides = {'fields': fields}
+            meta_overrides = {'fields': fields, 'module_name': name.lower() + 's'}
             for k, v in meta_attrs.items():
                 if not callable(v) and k != '__module__':
                     meta_overrides[k] = meta_attrs.pop(k)
