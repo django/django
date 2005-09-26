@@ -289,10 +289,7 @@ class _FileCache(_SimpleCache):
     def __init__(self, dir, params):
         self._dir = dir
         if not os.path.exists(self._dir):
-            try:
-                os.makedirs(self._dir)
-            except OSError:
-                raise EnvironmentError, "Cache directory '%s' does not exist and could not be created'" % self._dir
+            self._createdir()
         _SimpleCache.__init__(self, dir, params)
         del self._cache
         del self._expire_info
@@ -316,7 +313,10 @@ class _FileCache(_SimpleCache):
         fname = self._key_to_file(key)
         if timeout is None:
             timeout = self.default_timeout
-        filelist = os.listdir(self._dir)
+        try:
+            filelist = os.listdir(self._dir)
+        except (IOError, OSError):
+            self._createdir()
         if len(filelist) > self._max_entries:
             self._cull(filelist)
         try:
@@ -346,7 +346,13 @@ class _FileCache(_SimpleCache):
                 os.remove(os.path.join(self._dir, fname))
             except (IOError, OSError):
                 pass
-      
+
+    def _createdir(self):    
+        try:
+            os.makedirs(self._dir)
+        except OSError:
+            raise EnvironmentError, "Cache directory '%s' does not exist and could not be created'" % self._dir
+
     def _key_to_file(self, key):
         return os.path.join(self._dir, urllib.quote_plus(key))
 
@@ -355,7 +361,7 @@ class _FileCache(_SimpleCache):
 #############
 
 import base64
-from django.core.db import db
+from django.core.db import db, DatabaseError
 from datetime import datetime
 
 class _DBCache(_Cache):
@@ -400,11 +406,16 @@ class _DBCache(_Cache):
             self._cull(cursor, now)
         encoded = base64.encodestring(pickle.dumps(value, 2)).strip()
         cursor.execute("SELECT cache_key FROM %s WHERE cache_key = %%s" % self._table, [key])
-        if cursor.fetchone():
-            cursor.execute("UPDATE %s SET value = %%s, expires = %%s WHERE cache_key = %%s" % self._table, [encoded, str(exp), key])
+        try:
+            if cursor.fetchone():
+                cursor.execute("UPDATE %s SET value = %%s, expires = %%s WHERE cache_key = %%s" % self._table, [encoded, str(exp), key])
+            else:
+                cursor.execute("INSERT INTO %s (cache_key, value, expires) VALUES (%%s, %%s, %%s)" % self._table, [key, encoded, str(exp)])
+        except DatabaseError:
+            # To be threadsafe, updates/inserts are allowed to fail silently
+            pass
         else:
-            cursor.execute("INSERT INTO %s (cache_key, value, expires) VALUES (%%s, %%s, %%s)" % self._table, [key, encoded, str(exp)])
-        db.commit()
+            db.commit()
         
     def delete(self, key):
         cursor = db.cursor()
