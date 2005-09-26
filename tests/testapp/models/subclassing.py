@@ -54,6 +54,13 @@ class ArticleWithChangedMeta(ArticleWithOrdering):
        module_name = 'subarticles5'
        ordering = ('headline', 'pub_date')
 
+# These two models don't define a module_name.
+class NoModuleNameFirst(Article):
+    section = meta.CharField(maxlength=30)
+
+class NoModuleNameSecond(Article):
+    section = meta.CharField(maxlength=30)
+
 API_TESTS = """
 # No data is in the system yet.
 >>> subarticles1.get_list()
@@ -165,4 +172,9 @@ datetime.date(2005, 8, 22)
 # by headline ASC instead of pub_date DESC.
 >>> subarticles5.get_list()
 [A, B, C]
+
+>>> nomodulenamefirsts.get_list()
+[]
+>>> nomodulenameseconds.get_list()
+[]
 """
