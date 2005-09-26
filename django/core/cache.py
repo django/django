@@ -317,6 +317,7 @@ class _FileCache(_SimpleCache):
             filelist = os.listdir(self._dir)
         except (IOError, OSError):
             self._createdir()
+            filelist = []
         if len(filelist) > self._max_entries:
             self._cull(filelist)
         try:
