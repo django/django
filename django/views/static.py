@@ -13,7 +13,7 @@ def serve(request, path, document_root=None, show_indexes=False):
     
     To use, put a URL pattern like::
         
-        (r'^(?P<path>).*)$', 'django.views.static.serve', {'document_root' : '/path/to/my/files/'})
+        (r'^(?P<path>.*)$', 'django.views.static.serve', {'document_root' : '/path/to/my/files/'})
      
     in your URL conf; you must provide the ``document_root`` param.  You may
     also set ``show_indexes`` to ``True`` if you'd like to serve a basic index
