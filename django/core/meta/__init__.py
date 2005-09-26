@@ -385,6 +385,12 @@ def _reassign_globals(function_dict, extra_globals, namespace):
             new_v.func_globals[k] = func
         new_functions[k] = func
 
+# Calculate the module_name using a poor-man's pluralization.
+get_module_name = lambda class_name: class_name.lower() + 's'
+
+# Calculate the verbose_name by converting from InitialCaps to "lowercase with spaces".
+get_verbose_name = lambda class_name: re.sub('([A-Z])', ' \\1', class_name).lower().strip()
+
 class ModelBase(type):
     "Metaclass for all models"
     def __new__(cls, name, bases, attrs):
@@ -430,7 +436,7 @@ class ModelBase(type):
             # Pass any Options overrides to the base's Options instance, and
             # simultaneously remove them from attrs. When this is done, attrs
             # will be a dictionary of custom methods, plus __module__.
-            meta_overrides = {'fields': fields, 'module_name': name.lower() + 's'}
+            meta_overrides = {'fields': fields, 'module_name': get_module_name(name), 'verbose_name': get_verbose_name(name)}
             for k, v in meta_attrs.items():
                 if not callable(v) and k != '__module__':
                     meta_overrides[k] = meta_attrs.pop(k)
@@ -439,14 +445,10 @@ class ModelBase(type):
             del meta_overrides
         else:
             opts = Options(
-                # If the module_name wasn't given, use the class name
-                # in lowercase, plus a trailing "s" -- a poor-man's
-                # pluralization.
-                module_name = meta_attrs.pop('module_name', name.lower() + 's'),
+                module_name = meta_attrs.pop('module_name', get_module_name(name)),
                 # If the verbose_name wasn't given, use the class name,
                 # converted from InitialCaps to "lowercase with spaces".
-                verbose_name = meta_attrs.pop('verbose_name',
-                    re.sub('([A-Z])', ' \\1', name).lower().strip()),
+                verbose_name = meta_attrs.pop('verbose_name', get_verbose_name(name)),
                 verbose_name_plural = meta_attrs.pop('verbose_name_plural', ''),
                 db_table = meta_attrs.pop('db_table', ''),
                 fields = fields,
