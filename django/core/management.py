@@ -626,7 +626,8 @@ def createcachetable(tablename):
     "Creates the table needed to use the SQL cache backend"
     from django.core import db, meta
     fields = (
-        meta.CharField(name='key', maxlength=255, unique=True, primary_key=True),
+        # "key" is a reserved word in MySQL, so use "cache_key" instead.
+        meta.CharField(name='cache_key', maxlength=255, unique=True, primary_key=True),
         meta.TextField(name='value'),
         meta.DateTimeField(name='expires', db_index=True),
     )

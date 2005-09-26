@@ -377,13 +377,13 @@ class _DBCache(_Cache):
         
     def get(self, key, default=None):
         cursor = db.cursor()
-        cursor.execute("SELECT key, value, expires FROM %s WHERE key = %%s" % self._table, [key])
+        cursor.execute("SELECT cache_key, value, expires FROM %s WHERE cache_key = %%s" % self._table, [key])
         row = cursor.fetchone()
         if row is None:
             return default
         now = datetime.now()
         if row[2] < now:
-            cursor.execute("DELETE FROM %s WHERE key = %%s" % self._table, [key])
+            cursor.execute("DELETE FROM %s WHERE cache_key = %%s" % self._table, [key])
             db.commit()
             return default
         return pickle.loads(base64.decodestring(row[1]))
@@ -399,21 +399,21 @@ class _DBCache(_Cache):
         if num > self._max_entries:
             self._cull(cursor, now)
         encoded = base64.encodestring(pickle.dumps(value, 2)).strip()
-        cursor.execute("SELECT key FROM %s WHERE key = %%s" % self._table, [key])
+        cursor.execute("SELECT cache_key FROM %s WHERE cache_key = %%s" % self._table, [key])
         if cursor.fetchone():
-            cursor.execute("UPDATE %s SET value = %%s, expires = %%s WHERE key = %%s" % self._table, [encoded, str(exp), key])
+            cursor.execute("UPDATE %s SET value = %%s, expires = %%s WHERE cache_key = %%s" % self._table, [encoded, str(exp), key])
         else:
-            cursor.execute("INSERT INTO %s (key, value, expires) VALUES (%%s, %%s, %%s)" % self._table, [key, encoded, str(exp)])
+            cursor.execute("INSERT INTO %s (cache_key, value, expires) VALUES (%%s, %%s, %%s)" % self._table, [key, encoded, str(exp)])
         db.commit()
         
     def delete(self, key):
         cursor = db.cursor()
-        cursor.execute("DELETE FROM %s WHERE key = %%s" % self._table, [key])
+        cursor.execute("DELETE FROM %s WHERE cache_key = %%s" % self._table, [key])
         db.commit()
         
     def has_key(self, key):
         cursor = db.cursor()
-        cursor.execute("SELECT key FROM %s WHERE key = %%s" % self._table, [key])
+        cursor.execute("SELECT cache_key FROM %s WHERE cache_key = %%s" % self._table, [key])
         return cursor.fetchone() is not None
         
     def _cull(self, cursor, now):
@@ -424,8 +424,8 @@ class _DBCache(_Cache):
             cursor.execute("SELECT COUNT(*) FROM %s" % self._table)
             num = cursor.fetchone()[0]
             if num > self._max_entries:
-                cursor.execute("SELECT key FROM %s ORDER BY key LIMIT 1 OFFSET %%s" % self._table, [num / self._cull_frequency])
-                cursor.execute("DELETE FROM %s WHERE key < %%s" % self._table, [cursor.fetchone()[0]])
+                cursor.execute("SELECT cache_key FROM %s ORDER BY cache_key LIMIT 1 OFFSET %%s" % self._table, [num / self._cull_frequency])
+                cursor.execute("DELETE FROM %s WHERE cache_key < %%s" % self._table, [cursor.fetchone()[0]])
         
 ##########################################
 # Read settings and load a cache backend #
