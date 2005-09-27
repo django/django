@@ -67,6 +67,10 @@ ADMIN_MEDIA_PREFIX = '/media/'
 # the site managers.
 DEFAULT_FROM_EMAIL = 'webmaster@localhost'
 
+# Subject-line prefix for email messages send with django.core.mail.mail_admins
+# or ...mail_managers.  Make sure to include the trailing space.
+EMAIL_SUBJECT_PREFIX = '[Django] '
+
 # Whether to append trailing slashes to URLs.
 APPEND_SLASH = True
 
