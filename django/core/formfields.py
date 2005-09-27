@@ -652,7 +652,7 @@ class TimeField(TextField):
             except ValueError: # seconds weren't provided
                 time_tuple = time.strptime(data, '%H:%M')
             return datetime.time(*time_tuple[3:6])
-        except ValueError:
+        except (ValueError, TypeError):
             return None
     html2python = staticmethod(html2python)
 
