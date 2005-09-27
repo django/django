@@ -23,7 +23,7 @@ ip4_re = re.compile(r'^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$')
 phone_re = re.compile(r'^[A-PR-Y0-9]{3}-[A-PR-Y0-9]{3}-[A-PR-Y0-9]{4}$', re.IGNORECASE)
 url_re = re.compile(r'^http://\S+$')
 
-JING = '/usr/bin/jing'
+from django.conf.settings import JING_PATH
 
 class ValidationError(Exception):
     def __init__(self, message):
@@ -435,9 +435,9 @@ class RelaxNGCompact:
         fp = open(filename, 'w')
         fp.write(field_data)
         fp.close()
-        if not os.path.exists(JING):
-            raise Exception, "%s not found!" % JING
-        p = os.popen('%s -c %s %s' % (JING, self.schema_path, filename))
+        if not os.path.exists(JING_PATH):
+            raise Exception, "%s not found!" % JING_PATH
+        p = os.popen('%s -c %s %s' % (JING_PATH, self.schema_path, filename))
         errors = [line.strip() for line in p.readlines()]
         p.close()
         os.unlink(filename)
