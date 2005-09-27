@@ -55,8 +55,8 @@ these settings to match your database's connection parameters:
 
     * ``DATABASE_ENGINE`` -- Either 'postgresql', 'mysql' or 'sqlite3'.
       More coming soon.
-    * ``DATABASE_NAME`` -- The name of your database, or the full path to
-      the database file if using sqlite.
+    * ``DATABASE_NAME`` -- The name of your database, or the full (absolute)
+      path to the database file if you're using sqlite.
     * ``DATABASE_USER`` -- Your database username (not used for sqlite).
     * ``DATABASE_PASSWORD`` -- Your database password (not used for sqlite).
     * ``DATABASE_HOST`` -- The host your database is on. Leave this as an
