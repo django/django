@@ -66,7 +66,7 @@ class RegexURLResolver(object):
                     tried.extend([(pattern.regex.pattern + '   ' + t) for t in e.args[0]['tried']])
                 else:
                     if sub_match:
-                        return sub_match
+                        return sub_match[0], dict(match.groupdict(), **sub_match[1])
                     tried.append(pattern.regex.pattern)
             raise Resolver404, {'tried': tried, 'path': new_path}
 
