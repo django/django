@@ -47,7 +47,7 @@ def _is_valid_dir_name(s):
 # If the foreign key points to an AutoField, the foreign key should be an
 # IntegerField, not an AutoField. Otherwise, the foreign key should be the same
 # type of field as the field to which it points.
-get_rel_data_type = lambda f: (f.__class__.__name__ == 'AutoField') and 'IntegerField' or f.__class__.__name__
+get_rel_data_type = lambda f: (f.get_internal_type() == 'AutoField') and 'IntegerField' or f.get_internal_type()
 
 def get_sql_create(mod):
     "Returns a list of the CREATE TABLE SQL statements for the given module."
@@ -62,7 +62,7 @@ def get_sql_create(mod):
                 data_type = get_rel_data_type(rel_field)
             else:
                 rel_field = f
-                data_type = f.__class__.__name__
+                data_type = f.get_internal_type()
             col_type = db.DATA_TYPES[data_type]
             if col_type is not None:
                 field_output = [f.column, col_type % rel_field.__dict__]
@@ -634,7 +634,7 @@ def createcachetable(tablename):
     table_output = []
     index_output = []
     for f in fields:
-        field_output = [f.column, db.DATA_TYPES[f.__class__.__name__] % f.__dict__]
+        field_output = [f.column, db.DATA_TYPES[f.get_internal_type()] % f.__dict__]
         field_output.append("%sNULL" % (not f.null and "NOT " or ""))
         if f.unique:
             field_output.append("UNIQUE")

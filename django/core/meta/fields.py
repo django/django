@@ -114,6 +114,9 @@ class Field(object):
     def get_cache_name(self):
         return '_%s_cache' % self.name
 
+    def get_internal_type(self):
+        return self.__class__.__name__
+
     def pre_save(self, value, add):
         "Returns field's value just before saving."
         return value
@@ -552,10 +555,13 @@ class USStateField(Field):
     def get_manipulator_field_objs(self):
         return [formfields.USStateField]
 
-class XMLField(Field):
+class XMLField(TextField):
     def __init__(self, verbose_name=None, name=None, schema_path=None, **kwargs):
         self.schema_path = schema_path
         Field.__init__(self, verbose_name, name, **kwargs)
+
+    def get_internal_type(self):
+        return "TextField"
 
     def get_manipulator_field_objs(self):
         return [curry(formfields.XMLLargeTextField, schema_path=self.schema_path)]

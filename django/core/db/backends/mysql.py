@@ -133,7 +133,6 @@ DATA_TYPES = {
     'TimeField':         'time',
     'URLField':          'varchar(200)',
     'USStateField':      'varchar(2)',
-    'XMLField':          'longtext',
 }
 
 DATA_TYPES_REVERSE = {
