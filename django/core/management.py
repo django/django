@@ -163,7 +163,18 @@ def get_sql_initial_data(mod):
     for klass in mod._MODELS:
         opts = klass._meta
         # Add custom SQL, if it's available.
-        sql_file_name = os.path.join(app_dir, opts.module_name + '.sql')
+        from django.core import db
+        
+        # Get the sql file name for the init data for the current database engine
+        db_engine_sql_file_name = os.path.join(app_dir, opts.module_name + '.' + db.DATABASE_ENGINE.lower() +  '.sql')
+
+        # Check if the data specific file exists
+        if os.path.exists(db_engine_sql_file_name):
+            sql_file_name = db_engine_sql_file_name
+        # if the database specific file doesn't exist, use the database agnostic version
+        else:
+            sql_file_name = os.path.join(app_dir, opts.module_name + '.sql')
+
         if os.path.exists(sql_file_name):
             fp = open(sql_file_name, 'r')
             output.append(fp.read())
