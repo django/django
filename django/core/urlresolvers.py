@@ -79,7 +79,7 @@ class RegexURLResolver(object):
     urlconf_module = property(_get_urlconf_module)
 
     def _get_url_patterns(self):
-        return self.urlconf_module.patterns
+        return self.urlconf_module.urlpatterns
     url_patterns = property(_get_url_patterns)
 
     def _resolve_special(self, view_type):
