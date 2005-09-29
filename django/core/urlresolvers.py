@@ -78,6 +78,10 @@ class RegexURLResolver(object):
             return self._urlconf_module
     urlconf_module = property(_get_urlconf_module)
 
+    def _get_url_patterns(self):
+        return self.urlconf_module.patterns
+    url_patterns = property(_get_url_patterns)
+
     def _resolve_special(self, view_type):
         callback = getattr(self.urlconf_module, 'handler%s' % view_type)
         mod_name, func_name = get_mod_func(callback)
