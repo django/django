@@ -22,10 +22,15 @@ def get_template_from_string(source):
 def render_to_string(template_name, dictionary=None, context_instance=None):
     """
     Loads the given template_name and renders it with the given dictionary as
-    context. Returns a string.
+    context. The template_name may be a string to load a single template using
+    get_template, or it may be a tuple to use select_template to find one of
+    the templates in the list.  Returns a string. 
     """
     dictionary = dictionary or {}
-    t = get_template(template_name)
+    if isinstance(template_name, (list, tuple)):
+        t = select_template(template_name)
+    else:
+        t = get_template(template_name)
     if context_instance:
         context_instance.update(dictionary)
     else:
