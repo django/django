@@ -53,7 +53,7 @@ class CriticalValidationError(Exception):
 
 def isAlphaNumeric(field_data, all_data):
     if not alnum_re.search(field_data):
-        raise ValidationError, "This value must contain only letters, numbers and underscores."
+        raise ValidationError, _("This value must contain only letters, numbers and underscores.")
 
 def isAlphaNumericURL(field_data, all_data):
     if not alnumurl_re.search(field_data):

@@ -23,13 +23,13 @@
             {% endif %}
 
             {% if model.perms.add %}
-                <td class="x50"><a href="{{ model.admin_url }}add/" class="addlink">Add</a></td>
+                <td class="x50"><a href="{{ model.admin_url }}add/" class="addlink">{% i18n _('Add') %}</a></td>
             {% else %}
                 <td class="x50">&nbsp;</td>
             {% endif %}
 
             {% if model.perms.change %}
-                <td class="x75"><a href="{{ model.admin_url }}" class="changelink">Change</a></td>
+                <td class="x75"><a href="{{ model.admin_url }}" class="changelink">{% i18n _('Change') %}</a></td>
             {% else %}
                 <td class="x75">&nbsp;</td>
             {% endif %}
@@ -47,12 +47,12 @@
 {% block sidebar %}
 <div id="content-related">
     <div class="module" id="recent-actions-module">
-        <h2>Recent Actions</h2>
-        <h3>My Actions</h3>
+        <h2>{% i18n _('Recent Actions') %}</h2>
+        <h3>{% i18n _('My Actions') %}</h3>
             {% load auth.log %}
             {% get_admin_log 10 as admin_log for_user user %}
             {% if not admin_log %}
-            <p>None available</p>
+            <p>{% i18n _('None available') %}</p>
             {% else %}
             <ul class="actionlist">
             {% for entry in admin_log %}

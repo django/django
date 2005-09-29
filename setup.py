@@ -17,7 +17,7 @@ setup(
                         'admin_templates/registration/*.html',
                         'admin_media/css/*.css', 'admin_media/img/admin/*.gif',
                         'admin_media/img/admin/*.png', 'admin_media/js/*.js',
-                        'admin_media/js/admin/*js'],
+                        'admin_media/js/admin/*js', 'locale/*/*/*.mo'],
     },
     scripts = ['django/bin/django-admin.py'],
     zip_safe = False,

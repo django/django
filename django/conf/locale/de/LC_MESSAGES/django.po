@@ -1,0 +1,51 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2005-09-29 14:11+0200\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=iso-8859-1\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: core/validators.py:56
+msgid "This value must contain only letters, numbers and underscores."
+msgstr "Der Wert darf nur Buchstaben, Ziffern und Unterstriche enthalten."
+
+#: conf/admin_templates/404.html:3 conf/admin_templates/404.html:7
+msgid "Page not found"
+msgstr "Seite nicht gefunden"
+
+#: conf/admin_templates/404.html:9
+msgid "We're sorry, but the requested page could not be found."
+msgstr ""
+"Es tut uns leid, aber die angeforderte Seite kann nicht gefunden werden."
+
+#: conf/admin_templates/index.html:26
+msgid "Add"
+msgstr "Zufügen"
+
+#: conf/admin_templates/index.html:32
+msgid "Change"
+msgstr "Ändern"
+
+#: conf/admin_templates/index.html:50
+msgid "Recent Actions"
+msgstr "Kürzliche Aktionen"
+
+#: conf/admin_templates/index.html:51
+msgid "My Actions"
+msgstr "Meine Aktionen"
+
+#: conf/admin_templates/index.html:55
+msgid "None available"
+msgstr "Keine vorhanden"
+

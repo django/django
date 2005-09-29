@@ -1,7 +1,10 @@
 "Default tags used by the template system, available to all templates."
 
+import re
 import sys
 import template
+
+from django.utils import translation
 
 class CommentNode(template.Node):
     def render(self, context):
@@ -282,6 +285,28 @@ class WidthRatioNode(template.Node):
         except (ValueError, ZeroDivisionError):
             return ''
         return str(int(round(ratio)))
+
+class I18NNode(template.Node):
+
+    def __init__(self, cmd):
+        self.cmd = cmd
+        self.i18n_re = re.compile(r'^\s*_\((.*)\)\s*$')
+
+    def render(self, context):
+        m = self.i18n_re.match(self.cmd)
+        if m:
+            s = m.group(1)
+            if s.startswith("'") and s.endswith("'"):
+                s = s[1:-1]
+            elif s.startswith('"""') and s.endswith('"""'):
+                s = s[3:-3]
+            elif s.startswith('"') and s.endswith('"'):
+                s = s[1:-1]
+            else:
+                raise template.TemplateSyntaxError("i18n must be called as {% i18n _('some message') %}")
+            return translation.gettext(s) % context
+        else:
+            raise template.TemplateSyntaxError("i18n must be called as {% i18n _('some message') %}")
 
 def do_comment(parser, token):
     """
@@ -745,6 +770,22 @@ def do_widthratio(parser, token):
         raise template.TemplateSyntaxError("widthratio final argument must be an integer")
     return WidthRatioNode(this_value_var, max_value_var, max_width)
 
+def do_i18n(parser, token):
+    """
+    translate a given string with the current
+    translation object.
+
+    For example::
+
+        {% i18n _('test') %}
+
+    """
+    args = token.contents.split(' ', 1)
+    if len(args) != 2:
+        raise template.TemplateSyntaxError("'i18n' requires one argument (got %r)" % args)
+
+    return I18NNode(args[1].strip())
+
 template.register_tag('comment', do_comment)
 template.register_tag('cycle', do_cycle)
 template.register_tag('debug', do_debug)
@@ -761,3 +802,5 @@ template.register_tag('load', do_load)
 template.register_tag('now', do_now)
 template.register_tag('templatetag', do_templatetag)
 template.register_tag('widthratio', do_widthratio)
+template.register_tag('i18n', do_i18n)
+
