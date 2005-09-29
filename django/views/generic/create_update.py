@@ -8,7 +8,8 @@ from django.utils.httpwrappers import HttpResponse, HttpResponseRedirect
 from django.core.exceptions import Http404, ObjectDoesNotExist, ImproperlyConfigured
 
 def create_object(request, app_label, module_name, template_name=None, 
-                 extra_context={}, post_save_redirect=None, login_required=False):
+                 template_loader=template_loader, extra_context={}, 
+                 post_save_redirect=None, login_required=False):
     """
     Generic object-creation function.
     
@@ -65,8 +66,9 @@ def create_object(request, app_label, module_name, template_name=None,
     return HttpResponse(t.render(c))
 
 def update_object(request, app_label, module_name, object_id=None, slug=None, 
-                  slug_field=None, template_name=None, extra_lookup_kwargs={}, 
-                  extra_context={}, post_save_redirect=None, login_required=False):
+                  slug_field=None, template_name=None, template_loader=template_loader,
+                  extra_lookup_kwargs={}, extra_context={}, post_save_redirect=None, 
+                  login_required=False):
     """
     Generic object-update function.
 
@@ -139,7 +141,8 @@ def update_object(request, app_label, module_name, object_id=None, slug=None,
 
 def delete_object(request, app_label, module_name, post_delete_redirect, 
                   object_id=None, slug=None, slug_field=None, template_name=None, 
-                  extra_lookup_kwargs={}, extra_context={}, login_required=False):
+                  template_loader=template_loader, extra_lookup_kwargs={}, 
+                  extra_context={}, login_required=False):
     """
     Generic object-delete function.
     
