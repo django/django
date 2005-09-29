@@ -752,7 +752,7 @@ def _get_admin_field_form_widget(field, name_prefix, rel, add, change):
     # fields with relationships to editable objects get an "add another" link,
     # but only if the field doesn't have raw_admin ('cause in that case they get
     # the "add" button in the popup)
-    elif field.rel and isinstance(field.rel, meta.ManyToOne) and field.rel.to.admin:
+    elif field.rel and (isinstance(field.rel, meta.ManyToOne) or isinstance(field.rel, meta.ManyToMany)) and field.rel.to.admin:
         t.append('{%% if perms.%s.%s %%}' % (field.rel.to.app_label, field.rel.to.get_add_permission()))
         t.append(' <a href="../../../%s/%s/add/" class="add-another" id="add_%s" onclick="return showAddAnotherPopup(this);">' % \
                     (field.rel.to.app_label, field.rel.to.module_name, field_id))
