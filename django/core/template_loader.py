@@ -42,31 +42,32 @@ def select_template(template_name_list):
     # If we get here, none of the templates could be loaded
     raise template.TemplateDoesNotExist, ', '.join(template_name_list)
 
-class SuperBlock:
-    "This implements the ability for {{ block.super }} to render the parent block's contents"
-    def __init__(self, context, nodelist):
-        self.context, self.nodelist = context, nodelist
-
-    def super(self):
-        if self.nodelist:
-            return self.nodelist.render(self.context)
-        else:
-            return ''
-
 class BlockNode(template.Node):
-    def __init__(self, name, nodelist):
-        self.name, self.nodelist = name, nodelist
+    def __init__(self, name, nodelist, parent=None):
+        self.name, self.nodelist, self.parent = name, nodelist, parent
 
     def __repr__(self):
         return "<Block Node: %s. Contents: %r>" % (self.name, self.nodelist)
 
     def render(self, context):
         context.push()
-        nodelist = hasattr(self, 'original_node_list') and self.original_node_list or None
-        context['block'] = SuperBlock(context, nodelist)
+        # Save context in case of block.super().
+        self.context = context
+        context['block'] = self
         result = self.nodelist.render(context)
         context.pop()
         return result
+
+    def super(self):
+        if self.parent:
+            return self.parent.render(self.context)
+        return ''
+
+    def add_parent(self, nodelist):
+        if self.parent:
+            self.parent.add_parent(nodelist)
+        else:
+            self.parent = BlockNode(self.name, nodelist)
 
 class ExtendsNode(template.Node):
     def __init__(self, nodelist, parent_name, parent_name_var, template_dirs=None):
@@ -104,8 +105,9 @@ class ExtendsNode(template.Node):
                 if parent_is_child:
                     compiled_parent.nodelist[0].nodelist.append(block_node)
             else:
-                # Save the original nodelist. It's used by BlockNode.
-                parent_block.original_node_list = parent_block.nodelist
+                # Keep any existing parents and add a new one. Used by BlockNode.
+                parent_block.parent = block_node.parent
+                parent_block.add_parent(parent_block.nodelist)
                 parent_block.nodelist = block_node.nodelist
         return compiled_parent.render(context)
 

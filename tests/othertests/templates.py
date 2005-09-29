@@ -185,6 +185,18 @@ TEMPLATE_TESTS = {
     # {% load %} tag (within a child template)
     'inheritance19': ("{% extends 'inheritance01' %}{% block first %}{% load testtags %}{% echo 400 %}5678{% endblock %}", {}, '140056783_'),
 
+    # Two-level inheritance with {{ block.super }}
+    'inheritance20': ("{% extends 'inheritance01' %}{% block first %}{{ block.super }}a{% endblock %}", {}, '1_a3_'),
+
+    # Three-level inheritance with {{ block.super }} from parent
+    'inheritance21': ("{% extends 'inheritance02' %}{% block first %}{{ block.super }}a{% endblock %}", {}, '12a34'),
+
+    # Three-level inheritance with {{ block.super }} from grandparent
+    'inheritance22': ("{% extends 'inheritance04' %}{% block first %}{{ block.super }}a{% endblock %}", {}, '1_a3_'),
+
+    # Three-level inheritance with {{ block.super }} from parent and grandparent
+    'inheritance23': ("{% extends 'inheritance20' %}{% block first %}{{ block.super }}b{% endblock %}", {}, '1_ab3_'),
+
     ### EXCEPTIONS ############################################################
 
     # Raise exception for invalid template name
