@@ -26,7 +26,7 @@ for o, v in opts:
         domain = v
 
 if lang is None or domain is None:
-    print "usage: make-messages.py -l <language> -d <domain>"
+    print "usage: make-messages.py -l <language>"
     sys.exit(1)
 
 basedir = os.path.join(basedir, lang, 'LC_MESSAGES')
