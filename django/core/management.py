@@ -156,29 +156,23 @@ get_sql_reset.args = APP_ARGS
 
 def get_sql_initial_data(mod):
     "Returns a list of the initial INSERT SQL statements for the given module."
+    from django.core import db
     output = []
     app_label = mod._MODELS[0]._meta.app_label
     output.append(_get_packages_insert(app_label))
     app_dir = os.path.normpath(os.path.join(os.path.dirname(mod.__file__), '../sql'))
     for klass in mod._MODELS:
         opts = klass._meta
+
         # Add custom SQL, if it's available.
-        from django.core import db
-        
-        # Get the sql file name for the init data for the current database engine
-        db_engine_sql_file_name = os.path.join(app_dir, opts.module_name + '.' + db.DATABASE_ENGINE.lower() +  '.sql')
+        sql_files = [os.path.join(app_dir, opts.module_name + '.' + db.DATABASE_ENGINE +  '.sql'),
+                     os.path.join(app_dir, opts.module_name + '.sql')]
+        for sql_file in sql_files:
+            if os.path.exists(sql_file):
+                fp = open(sql_file)
+                output.append(fp.read())
+                fp.close()
 
-        # Check if the data specific file exists
-        if os.path.exists(db_engine_sql_file_name):
-            sql_file_name = db_engine_sql_file_name
-        # if the database specific file doesn't exist, use the database agnostic version
-        else:
-            sql_file_name = os.path.join(app_dir, opts.module_name + '.sql')
-
-        if os.path.exists(sql_file_name):
-            fp = open(sql_file_name, 'r')
-            output.append(fp.read())
-            fp.close()
         # Content types.
         output.append(_get_contenttype_insert(opts))
         # Permissions.
