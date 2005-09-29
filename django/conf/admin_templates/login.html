@@ -11,16 +11,16 @@
 <form action="{{ app_path }}" method="post">
 
 <p class="aligned">
-<label for="id_username">Username:</label> <input type="text" name="username" id="id_username" />
+<label for="id_username">{% i18n _('Username:') %}</label> <input type="text" name="username" id="id_username" />
 </p>
 <p class="aligned">
-<label for="id_password">Password:</label> <input type="password" name="password" id="id_password" />
+<label for="id_password">{% i18n _('Password:') %}</label> <input type="password" name="password" id="id_password" />
 <input type="hidden" name="this_is_the_login_form" value="1" />
-<input type="hidden" name="post_data" value="{{ post_data }}" />{% comment %} <span class="help">Have you <a href="/password_reset/">forgotten your password</a>?</span>{% endcomment %}
+<input type="hidden" name="post_data" value="{{ post_data }}" />{% comment %} <span class="help">{% i18n _('Have you <a href="/password_reset/">forgotten your password</a>?') %}</span>{% endcomment %}
 </p>
 
 <div class="aligned ">
-<label>&nbsp;</label><input type="submit" value="Log in" />
+<label>&nbsp;</label><input type="submit" value="{% i18n _('Log in') %}" />
 </div>
 </form>
 

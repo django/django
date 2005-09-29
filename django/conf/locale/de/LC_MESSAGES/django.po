@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2005-09-29 14:11+0200\n"
+"POT-Creation-Date: 2005-09-29 22:07+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -21,31 +21,253 @@ msgid "This value must contain only letters, numbers and underscores."
 msgstr "Der Wert darf nur Buchstaben, Ziffern und Unterstriche enthalten."
 
 #: conf/admin_templates/404.html:3 conf/admin_templates/404.html:7
+#: conf/admin_templates/404.html.py:1 conf/admin_templates/404.html.py:2
 msgid "Page not found"
 msgstr "Seite nicht gefunden"
 
-#: conf/admin_templates/404.html:9
+#: conf/admin_templates/404.html:9 conf/admin_templates/404.html.py:3
 msgid "We're sorry, but the requested page could not be found."
 msgstr ""
 "Es tut uns leid, aber die angeforderte Seite kann nicht gefunden werden."
 
 #: conf/admin_templates/index.html:26
+#: conf/admin_templates/changelist_generic.html:8
+#: conf/admin_templates/changelist_generic.html.py:1
+#: conf/admin_templates/index.html.py:1
 msgid "Add"
 msgstr "Zufügen"
 
-#: conf/admin_templates/index.html:32
+#: conf/admin_templates/index.html:32 conf/admin_templates/index.html.py:2
 msgid "Change"
 msgstr "Ändern"
 
-#: conf/admin_templates/index.html:50
+#: conf/admin_templates/index.html:50 conf/admin_templates/index.html.py:4
 msgid "Recent Actions"
 msgstr "Kürzliche Aktionen"
 
-#: conf/admin_templates/index.html:51
+#: conf/admin_templates/index.html:51 conf/admin_templates/index.html.py:5
 msgid "My Actions"
 msgstr "Meine Aktionen"
 
-#: conf/admin_templates/index.html:55
+#: conf/admin_templates/index.html:55 conf/admin_templates/index.html.py:6
 msgid "None available"
 msgstr "Keine vorhanden"
+
+#: conf/admin_templates/base_site.html:3
+#: conf/admin_templates/base_site.html.py:1
+msgid "Django site admin"
+msgstr "Django Systemverwaltung"
+
+#: conf/admin_templates/base_site.html:6
+#: conf/admin_templates/base_site.html.py:2
+msgid "Django administration"
+msgstr "Django Verwaltung"
+
+#: conf/admin_templates/500.html:5 conf/admin_templates/500.html.py:1
+msgid "Server error (500)"
+msgstr "Serverfehler (500)"
+
+#: conf/admin_templates/500.html:8
+msgid "Server error <em>(500)</em>"
+msgstr "Serverfehler <em>(500)</em>"
+
+#: conf/admin_templates/500.html:9 conf/admin_templates/500.html.py:3
+msgid ""
+"There's been an error. It's been reported to the site administrators via e-"
+"mail and should be fixed shortly. Thanks for your patience."
+msgstr ""
+"Es hat einen Fehler gegeben. Dieser Fehler wurde an die Serververwalter per "
+"eMail weitergegeben und sollte bald behoben sein. Vielen Dank für Ihr "
+"Verständnis."
+
+#: conf/admin_templates/delete_confirmation_generic.html:6
+#: conf/admin_templates/delete_confirmation_generic.html.py:1
+#, python-format
+msgid ""
+"Deleting the %(object_name)s  '%(object)s' would result in deleting related "
+"objects, but your account doesn't have permission to delete the following "
+"types of objects:"
+msgstr ""
+"Die Löschung des %(object_name)s '%(object)s' hätte die Löschung von "
+"abhängigen Daten zur Folge, aber Sie haben nicht die nötigen Rechte um die "
+"folgenden abhängigen Daten zu löschen:"
+
+#: conf/admin_templates/delete_confirmation_generic.html:13
+#: conf/admin_templates/delete_confirmation_generic.html.py:2
+#, python-format
+msgid ""
+"Are you sure you want to delete the %(object_name)s \"%(object)s\"? All of "
+"the following related items will be deleted:"
+msgstr ""
+"Sind Sie sicher, das Sie %(object_name)s \"%(object)s\" löschen wollen? Es "
+"werden zusätzlich die folgenden abhängigen Daten mit gelöscht:"
+
+#: conf/admin_templates/login.html:14 conf/admin_templates/login.html.py:1
+msgid "Username:"
+msgstr "Benutzername:"
+
+#: conf/admin_templates/login.html:17 conf/admin_templates/login.html.py:2
+msgid "Password:"
+msgstr "Passwort:"
+
+#: conf/admin_templates/login.html:19 conf/admin_templates/login.html.py:3
+msgid "Have you <a href=\"/password_reset/\">forgotten your password</a>?"
+msgstr "Haben Sie <a href=\"/password_reset/\">ihr Passwort vergessen</a>?"
+
+#: conf/admin_templates/base.html:22 conf/admin_templates/base.html.py:1
+msgid "Welcome,"
+msgstr "Willkommen,"
+
+#: conf/admin_templates/base.html:22 conf/admin_templates/base.html.py:2
+msgid "Change password"
+msgstr "Passwort ändern"
+
+#: conf/admin_templates/base.html:22 conf/admin_templates/base.html.py:3
+msgid "Log out"
+msgstr "Abmelden"
+
+#: conf/admin_templates/base.html:28 conf/admin_templates/base.html.py:4
+#: conf/admin_templates/registration/password_change_done.html.py:1
+#: conf/admin_templates/registration/password_reset_form.html.py:1
+#: conf/admin_templates/registration/logged_out.html.py:1
+#: conf/admin_templates/registration/password_reset_done.html.py:1
+#: conf/admin_templates/registration/password_change_form.html.py:1
+msgid "Home"
+msgstr "Start"
+
+#: conf/admin_templates/index.html:42 conf/admin_templates/index.html.py:3
+msgid "You don't have permission to edit anything."
+msgstr "Sie haben keine Berechtigung irgendwas zu ändern."
+
+#: conf/admin_templates/changelist_generic.html.py:2
+msgid "Click to change"
+msgstr "Zur Änderung klicken"
+
+#: conf/admin_templates/500.html.py:2
+msgid "Server Error <em>(500)</em>"
+msgstr "Serverfehler <em>(500)</em>"
+
+#: conf/admin_templates/delete_confirmation_generic.html.py:3
+msgid "Yes, I'm sure"
+msgstr "Ja, ich bin sicher"
+
+#: conf/admin_templates/login.html.py:4
+msgid "Log in"
+msgstr "Anmelden"
+
+#: conf/admin_templates/registration/password_change_done.html.py:2
+#: conf/admin_templates/registration/password_change_form.html.py:2
+#: conf/admin_templates/registration/password_change_form.html.py:3
+msgid "Password change"
+msgstr "Kennwort ändern"
+
+#: conf/admin_templates/registration/password_change_done.html.py:3
+#: conf/admin_templates/registration/password_change_done.html.py:4
+msgid "Password change successful"
+msgstr "Erfolgreiche Kennwortänderung"
+
+#: conf/admin_templates/registration/password_change_done.html.py:5
+msgid "Your password was changed."
+msgstr "Ihr Kennwort wurde geändert."
+
+#: conf/admin_templates/registration/password_reset_form.html.py:2
+#: conf/admin_templates/registration/password_reset_form.html.py:3
+#: conf/admin_templates/registration/password_reset_form.html.py:4
+#: conf/admin_templates/registration/password_reset_done.html.py:2
+msgid "Password reset"
+msgstr "Kennwort zurücksetzen"
+
+#: conf/admin_templates/registration/password_reset_form.html.py:5
+msgid ""
+"Forgotten your password? Enter your e-mail address below, and we'll reset "
+"your password and e-mail the new one to you."
+msgstr ""
+"Sie haben Ihr Kennwort vergessen? Geben Sie bitte Ihre eMail-Adresse ein und "
+"wir setzen das Kennwort auf einen neuen Wert und schicken den per eMail an Sie "
+"raus."
+
+#: conf/admin_templates/registration/password_reset_form.html.py:6
+msgid "E-mail address:"
+msgstr "eMail-Adresse:"
+
+#: conf/admin_templates/registration/password_reset_form.html.py:7
+msgid "Reset my password"
+msgstr "Mein Kennwort zurücksetzen"
+
+#: conf/admin_templates/registration/logged_out.html.py:2
+msgid "Thanks for spending some quality time with the Web site today."
+msgstr "Danke, dass Sie eine Weile bei uns waren."
+
+#: conf/admin_templates/registration/logged_out.html.py:3
+msgid "Log in again"
+msgstr "Neu anmelden"
+
+#: conf/admin_templates/registration/password_reset_done.html.py:3
+#: conf/admin_templates/registration/password_reset_done.html.py:4
+msgid "Password reset successful"
+msgstr "Erfolgreich Kennwort zurückgesetzt"
+
+#: conf/admin_templates/registration/password_reset_done.html.py:5
+msgid ""
+"We've e-mailed a new password to the e-mail address you submitted. You "
+"should be receiving it shortly."
+msgstr ""
+"Wir haben Ihnen ein neues Kennwort per eMail zugeschickt an die Adresse, "
+"die Sie uns gegeben haben. Es sollte in Kürze ankommen."
+
+#: conf/admin_templates/registration/password_change_form.html.py:4
+msgid ""
+"Please enter your old password, for security's sake, and then enter your new "
+"password twice so we can verify you typed it in correctly."
+msgstr ""
+"Bitte geben Sie aus Sicherheitsgründen erst Ihr altes Kennwort und darunter "
+"dann zweimal (um sicherzustellen, das Sie es korrekt eingegeben haben) das "
+"neue Kennwort ein."
+
+#: conf/admin_templates/registration/password_change_form.html.py:5
+msgid "Old password:"
+msgstr "altes Kennwort:"
+
+#: conf/admin_templates/registration/password_change_form.html.py:6
+msgid "New password:"
+msgstr "neues Kennwort:"
+
+#: conf/admin_templates/registration/password_change_form.html.py:7
+msgid "Confirm password:"
+msgstr "Kennwortwiederholung:"
+
+#: conf/admin_templates/registration/password_change_form.html.py:8
+msgid "Change my password"
+msgstr "Mein Kennwort ändern"
+
+#: conf/admin_templates/registration/password_reset_email.html.py:1
+msgid "You're receiving this e-mail because you requested a password reset"
+msgstr "Sie erhalten diese Mail, weil Sie ein neues Kennwort"
+
+#: conf/admin_templates/registration/password_reset_email.html.py:2
+#, python-format
+msgid "for your user account at %(site_name)s"
+msgstr "für ihren Benutzer bei %(site_name)s angefordert haben."
+
+#: conf/admin_templates/registration/password_reset_email.html.py:3
+#, python-format
+msgid "Your new password is: %(new_password)s"
+msgstr "Ihr neues Kennwort ist: %(new_password)s"
+
+#: conf/admin_templates/registration/password_reset_email.html.py:4
+msgid "Feel free to change this password by going to this page:"
+msgstr "Sie können das Kennwort auf folgender Seite ändern:"
+
+#: conf/admin_templates/registration/password_reset_email.html.py:5
+msgid "Your username, in case you've forgotten:"
+msgstr "Ihr Benutzername, falls Sie ihn vergessen haben:"
+
+#: conf/admin_templates/registration/password_reset_email.html.py:6
+msgid "Thanks for using our site!"
+msgstr "Vielen Dank, das Sie unsere Seiten benutzen!"
+
+#: conf/admin_templates/registration/password_reset_email.html.py:7
+#, python-format
+msgid "The %(site_name)s team"
+msgstr "Das Team von %(site_name)s"
 

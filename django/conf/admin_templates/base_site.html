@@ -1,9 +1,9 @@
 {% extends "base" %}
 
-{% block title %}{{ title }} | Django site admin{% endblock %}
+{% block title %}{{ title }} | {% i18n _('Django site admin') %}{% endblock %}
 
 {% block branding %}
-<h1 id="site-name">Django administration</h1>
+<h1 id="site-name">{% i18n _('Django administration') %}</h1>
 <h2 id="site-url"><a href="http://www.example.com/">example.com</a></h2>
 {% endblock %}
 
