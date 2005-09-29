@@ -20,16 +20,18 @@ function dismissRelatedLookupPopup(win, chosenId) {
 
 function showAddAnotherPopup(triggeringLink) {
     var name = triggeringLink.id.replace(/^add_/, '');
+    name = name.replace(/\./g, '___');
     var win = window.open(triggeringLink.href + '?_popup=1', name, 'height=500,width=800,resizable=yes,scrollbars=yes');
     win.focus();
     return false;
 }
 
 function dismissAddAnotherPopup(win, newId, newRepr) {
-    var elem = document.getElementById(win.name);
+    var name = win.name.replace(/___/g, '.')
+    var elem = document.getElementById(name);
     if (elem.nodeName == 'SELECT') {
         var o = new Option(newRepr, newId);
-        elem.appendChild(o);
+        elem.options[elem.options.length] = o
         elem.selectedIndex = elem.length - 1;
     } else if (elem.nodeName == 'INPUT') {
         elem.value = newId;
