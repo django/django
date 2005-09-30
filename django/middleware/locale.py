@@ -34,5 +34,7 @@ class LocaleMiddleware:
 
         app = findapp(view_func.__module__)
 
+        request.LANGUAGE_CODE = lang
+
         translation.activate(app, lang)
 
