@@ -16,7 +16,7 @@ BLANK_CHOICE_DASH = [("", "---------")]
 BLANK_CHOICE_NONE = [("", "None")]
 
 # Values for Relation.edit_inline.
-TABULAR, STACKED = 1, 2
+TABULAR, STACKED = "admin_edit_inline_tabular", "admin_edit_inline_stacked"
 
 RECURSIVE_RELATIONSHIP_CONSTANT = 'self'
 
@@ -155,7 +155,7 @@ class Field(object):
             if hasattr(self.default, '__get_value__'):
                 return self.default.__get_value__()
             return self.default
-        if self.null:
+        if not self.empty_strings_allowed or self.null:
             return None
         return ""
 
@@ -163,7 +163,7 @@ class Field(object):
         """
         Returns a list of field names that this object adds to the manipulator.
         """
-        return [name_prefix + self.name]
+        return [name_prefix + self.column]
 
     def get_manipulator_fields(self, opts, manipulator, change, name_prefix='', rel=False):
         """
@@ -177,28 +177,28 @@ class Field(object):
         if self.maxlength and not self.choices: # Don't give SelectFields a maxlength parameter.
             params['maxlength'] = self.maxlength
         if isinstance(self.rel, ManyToOne):
+            params['member_name'] = name_prefix + self.get_db_column()
             if self.rel.raw_id_admin:
                 field_objs = self.get_manipulator_field_objs()
                 params['validator_list'].append(curry(manipulator_valid_rel_key, self, manipulator))
             else:
                 if self.radio_admin:
                     field_objs = [formfields.RadioSelectField]
-                    params['choices'] = self.get_choices(include_blank=self.blank, blank_choice=BLANK_CHOICE_NONE)
                     params['ul_class'] = get_ul_class(self.radio_admin)
                 else:
                     if self.null:
                         field_objs = [formfields.NullSelectField]
                     else:
                         field_objs = [formfields.SelectField]
-                    params['choices'] = self.get_choices()
+                params['choices'] = self.get_choices_default()
         elif self.choices:
             if self.radio_admin:
                 field_objs = [formfields.RadioSelectField]
-                params['choices'] = self.get_choices(include_blank=self.blank, blank_choice=BLANK_CHOICE_NONE)
                 params['ul_class'] = get_ul_class(self.radio_admin)
             else:
                 field_objs = [formfields.SelectField]
-                params['choices'] = self.get_choices()
+             
+            params['choices'] = self.get_choices_default()
         else:
             field_objs = self.get_manipulator_field_objs()
 
@@ -258,14 +258,40 @@ class Field(object):
                 val = None
             return val
 
+
     def get_choices(self, include_blank=True, blank_choice=BLANK_CHOICE_DASH):
         "Returns a list of tuples used as SelectField choices for this field."
+       
         first_choice = include_blank and blank_choice or []
         if self.choices:
             return first_choice + list(self.choices)
         rel_obj = self.rel.to
-        return first_choice + [(getattr(x, rel_obj.pk.column), repr(x)) for x in rel_obj.get_model_module().get_list(**self.rel.limit_choices_to)]
+        choices = first_choice + [(getattr(x, rel_obj.pk.column), repr(x)) for x in rel_obj.get_model_module().get_list(**self.rel.limit_choices_to)]
+ 
+        return choices
 
+
+    def get_choices_default(self):
+        if(self.radio_admin):
+            return self.get_choices(include_blank=self.blank, blank_choice=BLANK_CHOICE_NONE)
+        else:
+            return self.get_choices()
+
+    def _get_val_from_obj(self, obj):
+        if obj:
+           return getattr(obj, self.column) 
+        else: 
+           return self.get_default()
+
+    def flatten_data(self, obj = None):
+         """
+	     Returns a dictionary mapping the field's manipulator field names to its
+	     "flattened" string values for the admin view. Obj is the instance to extract the 
+             values from. 
+	 """
+	 return { self.get_db_column(): self._get_val_from_obj(obj)}
+    	
+ 
 class AutoField(Field):
     empty_strings_allowed = False
     def __init__(self, *args, **kwargs):
@@ -274,7 +300,7 @@ class AutoField(Field):
 
     def get_manipulator_fields(self, opts, manipulator, change, name_prefix='', rel=False):
         if not rel:
-            return [] # Don't add a FormField unless it's in a related context.
+            return [] # Don't add a FormField unless it's in a related change context.
         return Field.get_manipulator_fields(self, opts, manipulator, change, name_prefix, rel)
 
     def get_manipulator_field_objs(self):
@@ -330,6 +356,10 @@ class DateField(Field):
     def get_manipulator_field_objs(self):
         return [formfields.DateField]
 
+    def flatten_data(self, obj = None):
+    	val = self._get_val_from_obj(obj)
+        return {self.get_db_column(): (val is not None and val.strftime("%Y-%m-%d") or '')}
+
 class DateTimeField(DateField):
     def get_db_prep_save(self, value):
         # Casts dates into string format for entry into database.
@@ -358,6 +388,12 @@ class DateTimeField(DateField):
         if d is not None and t is not None:
             return datetime.datetime.combine(d, t)
         return self.get_default()
+
+    def flatten_data(self,obj = None):
+        val = self._get_val_from_obj(obj) 
+    	date_field, time_field = self.get_manipulator_field_names('')
+	return {date_field: (val is not None and val.strftime("%Y-%m-%d") or ''),
+	        time_field: (val is not None and val.strftime("%H:%M:%S") or '')}
 
 class EmailField(Field):
     def get_manipulator_field_objs(self):
@@ -542,6 +578,10 @@ class TimeField(Field):
     def get_manipulator_field_objs(self):
         return [formfields.TimeField]
 
+    def flatten_data(self,obj = None):
+        val = self._get_val_from_obj(obj) 
+    	return {self.get_db_column(): (val is not None and val.strftime("%H:%M:%S") or '')} 
+
 class URLField(Field):
     def __init__(self, verbose_name=None, name=None, verify_exists=True, **kwargs):
         if verify_exists:
@@ -598,6 +638,18 @@ class ForeignKey(Field):
     def get_manipulator_field_objs(self):
         return [formfields.IntegerField]
 
+    def flatten_data(self, obj = None):
+        if not obj: 
+            # In required many-to-one fields with only one available choice,
+            # select that one available choice. Note: We have to check that
+            # the length of choices is *2*, not 1, because SelectFields always
+            # have an initial "blank" value.
+            if not self.blank and not self.rel.raw_id_admin and self.choices:
+               choice_list = self.get_choices_default()
+               if len(choice_list) == 2:
+                  return { self.name : choice_list[1][0] }
+        return Field.flatten_data(self, obj)
+
 class ManyToManyField(Field):
     def __init__(self, to, **kwargs):
         kwargs['verbose_name'] = kwargs.get('verbose_name', to._meta.verbose_name_plural)
@@ -615,8 +667,11 @@ class ManyToManyField(Field):
         if self.rel.raw_id_admin:
             return [formfields.CommaSeparatedIntegerField]
         else:
-            choices = self.get_choices(include_blank=False)
+            choices = self.get_choices_default()
             return [curry(formfields.SelectMultipleField, size=min(max(len(choices), 5), 15), choices=choices)]
+
+    def get_choices_default(self):
+        return Field.get_choices(self, include_blank=False)
 
     def get_m2m_db_table(self, original_opts):
         "Returns the name of the many-to-many 'join' table."
@@ -637,6 +692,25 @@ class ManyToManyField(Field):
                 (self.verbose_name, len(badkeys) > 1 and 's' or '',
                 len(badkeys) == 1 and badkeys[0] or tuple(badkeys),
                 len(badkeys) == 1 and "is" or "are")
+
+    def flatten_data(self, obj = None):
+        new_data = {} 
+        if obj:
+            get_list_func = getattr(obj, 'get_%s_list' % self.rel.singular)
+            instance_ids = [getattr(instance, self.rel.to.pk.column) for instance in get_list_func()]
+            if self.rel.raw_id_admin:
+                 new_data[self.name] = ",".join([str(id) for id in instance_ids])
+            elif not self.rel.edit_inline:
+                 new_data[self.name] = instance_ids 
+        else:
+            # In required many-to-many fields with only one available choice,
+            # select that one available choice.
+            if not self.blank and not self.rel.edit_inline and not self.rel.raw_id_admin and self.choices:
+               choice_list = self.get_choices_default()
+               if len(choice_list) == 1:
+                   new_data[self.name] = [choices_list[0][0]]
+        return new_data
+
 
 class OneToOneField(IntegerField):
     def __init__(self, to, to_field=None, **kwargs):
@@ -720,6 +794,12 @@ class Admin:
         Returns self.fields, except with fields as Field objects instead of
         field names. If self.fields is None, defaults to putting every
         non-AutoField field with editable=True in a single fieldset.
+        
+        returns a list of lists of name, dict 
+        the dict has attribs 'fields' and maybe 'classes'. 
+        fields is a list of subclasses of Field. 
+
+        Return value needs to be encapsulated.
         """
         if self.fields is None:
             field_struct = ((None, {'fields': [f.name for f in opts.fields + opts.many_to_many if f.editable and not isinstance(f, AutoField)]}),)

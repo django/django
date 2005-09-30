@@ -1,0 +1,16 @@
+<fieldset class="module aligned">
+   {% for fcw in form_field_collection_wrapper_list %} 
+      <h2>{{relation.opts.verbose_name|capfirst }}&nbsp;#{{ forloop.counter }}</h2>
+      {% if fcw.show_url %}{% if fcw.obj.original %}
+      <p><a href="/r/{{ fcw.obj.original.content_type_id }}/{{ fcw.obj.original.id }}/">View on site</a></p>
+      {% endif %}{% endif %}
+      {% for bound_field in fcw.bound_fields %}
+         {% if bound_field.not_in_table %}
+            {% field_widget bound_field %}
+         {% else %}
+            {% admin_field_bound bound_field %}
+         {% endif %}
+      {% endfor %}
+    {%endfor%}
+</fieldset>
+

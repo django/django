@@ -1,6 +1,6 @@
 # Generic admin views, with admin templates created dynamically at runtime.
 
-from django.core import formfields, meta, template_loader
+from django.core import formfields, meta, template_loader, template
 from django.core.exceptions import Http404, ObjectDoesNotExist, PermissionDenied
 from django.core.extensions import DjangoContext as Context
 from django.core.extensions import get_object_or_404, render_to_response
@@ -493,23 +493,6 @@ def change_list(request, app_label, module_name):
     })
     return HttpResponse(t.render(c))
 
-def _get_flattened_data(field, val):
-    """
-    Returns a dictionary mapping the field's manipulator field names to its
-    "flattened" string values for the admin view. "val" is an instance of the
-    field's value.
-    """
-    if isinstance(field, meta.DateTimeField):
-        date_field, time_field = field.get_manipulator_field_names('')
-        return {date_field: (val is not None and val.strftime("%Y-%m-%d") or ''),
-                time_field: (val is not None and val.strftime("%H:%M:%S") or '')}
-    elif isinstance(field, meta.DateField):
-        return {field.name: (val is not None and val.strftime("%Y-%m-%d") or '')}
-    elif isinstance(field, meta.TimeField):
-        return {field.name: (val is not None and val.strftime("%H:%M:%S") or '')}
-    else:
-        return {field.name: val}
-
 use_raw_id_admin = lambda field: isinstance(field.rel, (meta.ManyToOne, meta.ManyToMany)) and field.rel.raw_id_admin
 
 def _get_submit_row_template(opts, app_label, add, change, show_delete, ordered_objects):
@@ -529,6 +512,327 @@ def _get_submit_row_template(opts, app_label, add, change, show_delete, ordered_
         (ordered_objects and change and 'onclick="submitOrderForm();"' or ''))
     t.append('</div>\n')
     return t
+
+def get_javascript_imports(opts,auto_populated_fields, ordered_objects, admin_field_objs):
+# Put in any necessary JavaScript imports.
+    js = ['js/core.js', 'js/admin/RelatedObjectLookups.js']
+    if auto_populated_fields:
+        js.append('js/urlify.js')
+    if opts.has_field_type(meta.DateTimeField) or opts.has_field_type(meta.TimeField) or opts.has_field_type(meta.DateField):
+        js.extend(['js/calendar.js', 'js/admin/DateTimeShortcuts.js'])
+    if ordered_objects:
+        js.extend(['js/getElementsBySelector.js', 'js/dom-drag.js' , 'js/admin/ordering.js'])
+    if opts.admin.js:
+        js.extend(opts.admin.js)
+    seen_collapse = False
+    for _, options in admin_field_objs:
+        if not seen_collapse and 'collapse' in options.get('classes', ''):
+            seen_collapse = True
+            js.append('js/admin/CollapsedFieldsets.js' )
+        try:
+            for field_list in options['fields']:
+                for f in field_list:
+                    if f.rel and isinstance(f, meta.ManyToManyField) and f.rel.filter_interface:
+                        js.extend(['js/SelectBox.js' , 'js/SelectFilter2.js'])
+                        raise StopIteration
+        except StopIteration:
+            break
+    return js
+
+class BoundField(object):
+    def __init__(self, field, original, rel, field_mapping):
+        self.field = field
+        self.form_fields = self.resolve_form_fields(field_mapping)
+        self.original = original
+        self.rel = rel
+
+    def resolve_form_fields(self, field_mapping):
+        return [field_mapping[name] for name in self.field.get_manipulator_field_names('')]
+
+    def as_field_list(self):
+        return [self.field]
+
+    def original_value(self):
+        return self.original.__dict__[self.field.name] 
+ 
+class AdminBoundField(BoundField):
+    def __init__(self, field, original, rel, field_mapping):
+        super(AdminBoundField, self).__init__(field,original, rel, field_mapping) 	
+
+        self.element_id = self.form_fields[0].get_id() 
+        self.has_label_first = not isinstance(self.field, meta.BooleanField)
+        self.raw_id_admin = use_raw_id_admin(field)
+        self.is_date_time = isinstance(field, meta.DateTimeField)
+        self.is_file_field = isinstance(field, meta.FileField)
+        self.needs_add_label = field.rel and isinstance(field.rel, meta.ManyToOne) or isinstance(field.rel, meta.ManyToMany) and field.rel.to.admin
+        self.not_in_table = isinstance(self.field, meta.AutoField)
+        self.first = True
+        
+        classes = []
+        if(self.raw_id_admin): 
+            classes.append('nowrap')
+        if max([bool(f.errors()) for f in self.form_fields]):
+            classes.append('error')
+        self.cell_class_attribute = ' '.join(classes)   
+        self._repr_filled = False
+    
+
+       
+    def _fetch_existing_repr(self, func_name):
+        class_dict = self.original.__class__.__dict__
+        func = class_dict.get(func_name)
+        return func(self.original)
+        
+    def _fill_existing_repr(self):
+        if self._repr_filled: 
+            return
+        #HACK
+        if isinstance(self.field.rel, meta.ManyToOne):
+             func_name = 'get_%s' % self.field.name
+             self._repr = self._fetch_existing_repr(func_name)
+	elif isinstance(self.field.rel, meta.ManyToMany):
+	     func_name = 'get_%s_list' % self.field.name 
+             self._repr =  ",".join(self._fetch_existing_repr(func_name))
+        self._repr_filled = True
+             
+    def existing_repr(self):
+        self._fill_existing_repr()
+        return self._repr
+
+    def __repr__(self):
+        return repr(self.__dict__)
+
+    def html_error_list(self):
+        return " ".join([form_field.html_error_list() for form_field in self.form_fields if form_field.errors])        
+
+
+class AdminFieldSet(object):
+    def __init__(self, fieldset_name, options, form, original):
+         self.name = fieldset_name
+	 self.options = options
+         self.bound_field_sets = self.get_bound_field_sets(form, original)
+         self.classes = options.get('classes', '')
+     
+    def __repr__(self):
+     	return "Fieldset:(%s,%s)" % (self.name, self.bound_field_sets)
+
+    def get_bound_field_sets(self, form, original):
+        fields = self.options['fields']
+        bound_field_sets = [ [AdminBoundField(f, original, False, form) for f in field  ] for field in fields]
+        for set in bound_field_sets:
+            first = True 
+            for bound_field in set:
+                bound_field.first = first
+                first = False
+
+        return bound_field_sets
+
+def fill_extra_context(opts, app_label, context, add=False, change=False, show_delete=False, form_url=''):
+    admin_field_objs = opts.admin.get_field_objs(opts)
+    ordered_objects = opts.get_ordered_objects()[:]
+    auto_populated_fields = [f for f in opts.fields if f.prepopulate_from]
+ 
+    javascript_imports = get_javascript_imports(opts,auto_populated_fields, ordered_objects, admin_field_objs);
+    
+    if ordered_objects:
+        coltype = 'colMS'
+    else:
+        coltype = 'colM'
+	
+    has_absolute_url = hasattr(opts.get_model_module().Klass, 'get_absolute_url')
+    
+    form_enc_attrib = opts.has_field_type(meta.FileField) and 'enctype="multipart/form-data" ' or ''
+
+    form = context['form']
+    original = context['original']
+    admin_fieldsets = [AdminFieldSet(name, options, form, original) for name, options in admin_field_objs] 
+    inline_related_objects = opts.get_inline_related_objects_wrapped()
+    
+    ordered_object_names =   ' '.join(['object.%s' % o.pk.name for o in ordered_objects])
+   
+    extra_context = {
+        'add': add, 
+        'change': change, 
+        'admin_field_objs' : admin_field_objs, 
+        'ordered_objects' : ordered_objects, 
+        'auto_populated_fields' : auto_populated_fields,
+        'javascript_imports' : javascript_imports, 
+        'coltype' : coltype, 
+        'has_absolute_url': has_absolute_url, 
+        'form_enc_attrib': form_enc_attrib,
+        'form_url' : form_url, 
+        'admin_fieldsets' : admin_fieldsets, 
+        'inline_related_objects': inline_related_objects,
+        'ordered_object_names' : ordered_object_names, 
+        'content_type_id' : opts.get_content_type_id(),
+        'save_on_top' : opts.admin.save_on_top,
+        'verbose_name_plural': opts.verbose_name_plural, 
+        'save_as': opts.admin.save_as, 
+        'app_label': app_label,
+        'object_name': opts.object_name,
+        'has_delete_permission' : context['perms'][app_label][opts.get_delete_permission()]
+    }
+    
+    context.update(extra_context)   
+   
+   
+def add_stage_new(request, app_label, module_name, show_delete=False, form_url='', post_url='../', post_url_continue='../%s/', object_id_override=None):
+    mod, opts = _get_mod_opts(app_label, module_name)
+    if not request.user.has_perm(app_label + '.' + opts.get_add_permission()):
+        raise PermissionDenied
+    manipulator = mod.AddManipulator()
+    if request.POST:
+        new_data = request.POST.copy()
+        if opts.has_field_type(meta.FileField):
+            new_data.update(request.FILES)
+        errors = manipulator.get_validation_errors(new_data)
+        if not errors and not request.POST.has_key("_preview"):
+            for f in opts.many_to_many:
+                if f.rel.raw_id_admin:
+                    new_data.setlist(f.name, new_data[f.name].split(","))
+            manipulator.do_html2python(new_data)
+            new_object = manipulator.save(new_data)
+            pk_value = getattr(new_object, opts.pk.column)
+            log.log_action(request.user.id, opts.get_content_type_id(), pk_value, repr(new_object), log.ADDITION)
+            msg = 'The %s "%s" was added successfully.' % (opts.verbose_name, new_object)
+            # Here, we distinguish between different save types by checking for
+            # the presence of keys in request.POST.
+            if request.POST.has_key("_continue"):
+                request.user.add_message("%s You may edit it again below." % msg)
+                if request.POST.has_key("_popup"):
+                    post_url_continue += "?_popup=1"
+                return HttpResponseRedirect(post_url_continue % pk_value)
+            if request.POST.has_key("_popup"):
+                return HttpResponse('<script type="text/javascript">opener.dismissAddAnotherPopup(window, %s, "%s");</script>' % \
+                    (pk_value, repr(new_object).replace('"', '\\"')))
+            elif request.POST.has_key("_addanother"):
+                request.user.add_message("%s You may add another %s below." % (msg, opts.verbose_name))
+                return HttpResponseRedirect(request.path)
+            else:
+                request.user.add_message(msg)
+                return HttpResponseRedirect(post_url)
+        if request.POST.has_key("_preview"):
+            manipulator.do_html2python(new_data)
+    else:
+        # Add default data.
+        new_data = manipulator.flatten_data()
+        
+        # Override the defaults with request.GET, if it exists.
+        new_data.update(request.GET)
+        errors = {}
+
+    # Populate the FormWrapper.
+    form = formfields.FormWrapper(manipulator, new_data, errors, edit_inline=True)
+    
+    c = Context(request, {
+        'title': 'Add %s' % opts.verbose_name,
+        'form': form,
+        'is_popup': request.REQUEST.has_key('_popup'),
+    })
+    if object_id_override is not None:
+        c['object_id'] = object_id_override
+    
+    
+    fill_extra_context(opts, app_label, c, change=True)
+   
+    return render_to_response("admin_change_form", context_instance=c) 
+
+
+
+def change_stage_new(request, app_label, module_name, object_id):
+    mod, opts = _get_mod_opts(app_label, module_name)
+    if not request.user.has_perm(app_label + '.' + opts.get_change_permission()):
+        raise PermissionDenied
+    if request.POST and request.POST.has_key("_saveasnew"):
+        return add_stage_new(request, app_label, module_name, form_url='../add/')
+    try:
+        manipulator = mod.ChangeManipulator(object_id)
+    except ObjectDoesNotExist:
+        raise Http404
+
+    inline_related_objects = opts.get_inline_related_objects()
+    if request.POST:
+        new_data = request.POST.copy()
+        if opts.has_field_type(meta.FileField):
+            new_data.update(request.FILES)
+
+        errors = manipulator.get_validation_errors(new_data)
+        if not errors and not request.POST.has_key("_preview"):
+            for f in opts.many_to_many:
+                if f.rel.raw_id_admin:
+                    new_data.setlist(f.name, new_data[f.name].split(","))
+            manipulator.do_html2python(new_data)
+            new_object = manipulator.save(new_data)
+            pk_value = getattr(new_object, opts.pk.column)
+
+            # Construct the change message.
+            change_message = []
+            if manipulator.fields_added:
+                change_message.append('Added %s.' % get_text_list(manipulator.fields_added, 'and'))
+            if manipulator.fields_changed:
+                change_message.append('Changed %s.' % get_text_list(manipulator.fields_changed, 'and'))
+            if manipulator.fields_deleted:
+                change_message.append('Deleted %s.' % get_text_list(manipulator.fields_deleted, 'and'))
+            change_message = ' '.join(change_message)
+            if not change_message:
+                change_message = 'No fields changed.'
+
+            log.log_action(request.user.id, opts.get_content_type_id(), pk_value, repr(new_object), log.CHANGE, change_message)
+            msg = 'The %s "%s" was changed successfully.' % (opts.verbose_name, new_object)
+            if request.POST.has_key("_continue"):
+                request.user.add_message("%s You may edit it again below." % msg)
+                if request.REQUEST.has_key('_popup'):
+                    return HttpResponseRedirect(request.path + "?_popup=1")
+                else:
+                    return HttpResponseRedirect(request.path)
+            elif request.POST.has_key("_saveasnew"):
+                request.user.add_message('The %s "%s" was added successfully. You may edit it again below.' % (opts.verbose_name, new_object))
+                return HttpResponseRedirect("../%s/" % pk_value)
+            elif request.POST.has_key("_addanother"):
+                request.user.add_message("%s You may add another %s below." % (msg, opts.verbose_name))
+                return HttpResponseRedirect("../add/")
+            else:
+                request.user.add_message(msg)
+                return HttpResponseRedirect("../")
+        if request.POST.has_key("_preview"):
+            manipulator.do_html2python(new_data)
+    else:
+        # Populate new_data with a "flattened" version of the current data.
+        new_data = manipulator.flatten_data()
+       
+ 
+        # If the object has ordered objects on its admin page, get the existing
+        # order and flatten it into a comma-separated list of IDs.
+        id_order_list = []
+        for rel_obj in opts.get_ordered_objects():
+            id_order_list.extend(getattr(obj, 'get_%s_order' % rel_obj.object_name.lower())())
+        if id_order_list:
+            new_data['order_'] = ','.join(map(str, id_order_list))
+        errors = {}
+
+    # Populate the FormWrapper.
+    form = formfields.FormWrapper(manipulator, new_data, errors, edit_inline = True)
+    form.original = manipulator.original_object
+    form.order_objects = []
+    
+    for rel_opts, rel_field in inline_related_objects:
+        if rel_opts.order_with_respect_to and rel_opts.order_with_respect_to.rel and rel_opts.order_with_respect_to.rel.to == opts:
+            form.order_objects.extend(orig_list)
+
+    c = Context(request, {
+        'title': 'Change %s' % opts.verbose_name,
+        'form': form,
+        'object_id': object_id,
+        'original': manipulator.original_object,
+        'is_popup' : request.REQUEST.has_key('_popup')
+    })
+
+    fill_extra_context(opts, app_label, c, change=True)
+    
+    #t = template_loader.get_template_from_string(raw_template)
+    
+    return render_to_response('admin_change_form', context_instance=c);
+
 
 def _get_template(opts, app_label, add=False, change=False, show_delete=False, form_url=''):
     admin_field_objs = opts.admin.get_field_objs(opts)
@@ -608,6 +912,7 @@ def _get_template(opts, app_label, add=False, change=False, show_delete=False, f
     for rel_obj, rel_field in opts.get_inline_related_objects():
         var_name = rel_obj.object_name.lower()
         field_list = [f for f in rel_obj.fields + rel_obj.many_to_many if f.editable and f != rel_field]
+
         t.append('<fieldset class="module%s">\n' % ((rel_field.rel.edit_inline != meta.TABULAR) and ' aligned' or ''))
         view_on_site = ''
         if change and hasattr(rel_obj, 'get_absolute_url'):
@@ -680,7 +985,7 @@ def _get_template(opts, app_label, add=False, change=False, show_delete=False, f
             else:
                 t.append('document.getElementById("id_%s").onchange = function() { this._changed = true; };' % field.name)
             for f in field.prepopulate_from:
-                t.append('document.getElementById("id_%s").onkeyup = function() { var e = document.getElementById("id_%s"); if (!e._changed) { e.value = URLify(%s, %s);}};' % \
+                t.append('document.getElementById("id_%s").onkeyup = function() { var e = document.getElementById("id_%s"); if (e._changed) { e.value = URLify(%s, %s);}};' % \
                     (f, field.name, ' + " " + '.join(['document.getElementById("id_%s").value' % g for g in field.prepopulate_from]), field.maxlength))
         t.append('</script>\n')
     if change and ordered_objects:
@@ -802,7 +1107,7 @@ def add_stage(request, app_label, module_name, show_delete=False, form_url='', p
         # Add default data.
         for f in opts.fields:
             if f.has_default():
-                new_data.update(_get_flattened_data(f, f.get_default()))
+                new_data.update( f.flatten_data() )
             # In required many-to-one fields with only one available choice,
             # select that one available choice. Note: We have to check that
             # the length of choices is *2*, not 1, because SelectFields always
@@ -837,7 +1142,9 @@ def add_stage(request, app_label, module_name, show_delete=False, form_url='', p
                 if f.editable and f != rel_field and not isinstance(f, meta.AutoField):
                     for field_name in f.get_manipulator_field_names(''):
                         full_field_name = '%s.%d.%s' % (var_name, i, field_name)
-                        collection[field_name] = formfields.FormFieldWrapper(manipulator[full_field_name], new_data.get(full_field_name, ''), errors.get(full_field_name, []))
+			field = manipulator[full_field_name]
+			data = field.extract_data(new_data)
+                        collection[field_name] = formfields.FormFieldWrapper(field, data, errors.get(full_field_name, []))
             wrapper.append(formfields.FormFieldCollection(collection))
         setattr(form, rel_opts.module_name, wrapper)
 
@@ -849,7 +1156,6 @@ def add_stage(request, app_label, module_name, show_delete=False, form_url='', p
     if object_id_override is not None:
         c['object_id'] = object_id_override
     raw_template = _get_template(opts, app_label, add=True, show_delete=show_delete, form_url=form_url)
-#     return HttpResponse(raw_template, mimetype='text/plain')
     t = template_loader.get_template_from_string(raw_template)
     return HttpResponse(t.render(c))
 
@@ -915,7 +1221,7 @@ def change_stage(request, app_label, module_name, object_id):
         new_data = {}
         obj = manipulator.original_object
         for f in opts.fields:
-            new_data.update(_get_flattened_data(f, getattr(obj, f.column)))
+            new_data.update(f.flatten_data(obj))
         for f in opts.many_to_many:
             get_list_func = getattr(obj, 'get_%s_list' % f.rel.singular)
             if f.rel.raw_id_admin:
@@ -927,7 +1233,7 @@ def change_stage(request, app_label, module_name, object_id):
             for i, rel_instance in enumerate(getattr(obj, 'get_%s_list' % opts.get_rel_object_method_name(rel_obj, rel_field))()):
                 for f in rel_obj.fields:
                     if f.editable and f != rel_field:
-                        for k, v in _get_flattened_data(f, getattr(rel_instance, f.column)).items():
+                        for k, v in f.flatten_data(rel_instance).items():
                             new_data['%s.%d.%s' % (var_name, i, k)] = v
                 for f in rel_obj.many_to_many:
                     new_data['%s.%d.%s' % (var_name, i, f.column)] = [j.id for j in getattr(rel_instance, 'get_%s_list' % f.rel.singular)()]
@@ -960,7 +1266,9 @@ def change_stage(request, app_label, module_name, object_id):
                 if f.editable and f != rel_field:
                     for field_name in f.get_manipulator_field_names(''):
                         full_field_name = '%s.%d.%s' % (var_name, i, field_name)
-                        collection[field_name] = formfields.FormFieldWrapper(manipulator[full_field_name], new_data.get(full_field_name, f.get_default()), errors.get(full_field_name, []))
+			field = manipulator[full_field_name]
+			data = field.extract_data(new_data)
+                        collection[field_name] = formfields.FormFieldWrapper(field, data, errors.get(full_field_name, []))
             wrapper.append(formfields.FormFieldCollection(collection))
         setattr(form, rel_opts.module_name, wrapper)
         if rel_opts.order_with_respect_to and rel_opts.order_with_respect_to.rel and rel_opts.order_with_respect_to.rel.to == opts:

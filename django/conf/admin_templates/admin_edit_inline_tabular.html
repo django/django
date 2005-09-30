@@ -1,0 +1,44 @@
+<fieldset class="module">
+   <h2>{{relation.opts.verbose_name_plural|capfirst}}</h2><table>
+   <thead><tr>
+   {% for fw in field_wrapper_list %}
+      {% if fw.needs_header %}
+         <th{{fw.header_class_attribute}}> {{fw.field.verbose_name|capfirst}}  </th>
+      {% endif %}
+   {% endfor %}
+   {% for fcw in form_field_collection_wrapper_list %} 
+       
+      {% if change %}{% if original_row_needed %}
+         {% if fcw.obj.original %}
+            <tr class="row-label {% cycle row1,row2 %}"><td colspan="{{num_headers}}"><strong>{{ fcw.obj.original }}</strong></tr>
+         {% endif %}
+      {% endif %}{% endif %}
+      {% if fcw.obj.errors %}
+         <tr class="errorlist"><td colspan="{{num_headers}}">
+            {{ fcw.obj.html_combined_error_list }}
+         </tr>
+      {% endif %}
+      <tr class="{% cycle row1,row2 %}">
+      {% for bound_field in fcw.bound_fields %}
+         {% if not bound_field.not_in_table %}
+         <td "{{ bound_field.cell_class_attribute}}"> 
+            {% field_widget bound_field %}
+         </td>
+         {% endif %}
+      {% endfor %}
+      {% if fcw.show_url %}<td>
+         {% if fcw.obj.original %}<a href="/r/{{ fcw.obj.original.content_type_id }}/{{ fcw.obj.original.id }}/">View on site</a>{% endif %} 
+      </td>{% endif %}
+      </tr>
+
+   {% endfor %} </table>
+
+   {% for fcw in form_field_collection_wrapper_list %}
+      {% for bound_field in fcw.bound_fields %}
+         {% if bound_field.not_in_table %}
+            {% field_widget bound_field %}
+         {% endif %}
+      {% endfor %}
+   {% endfor %}
+</fieldset>
+

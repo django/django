@@ -22,7 +22,7 @@ class Manipulator:
         for field in self.fields:
             if field.field_name == field_name:
                 return field
-        raise KeyError, "Field %s not found" % field_name
+        raise KeyError, "Field %s not found\n%s" % (field_name, repr(self.fields)) 
 
     def __delitem__(self, field_name):
         "Deletes the field with the given field name; raises KeyError on failure"
@@ -87,16 +87,12 @@ class Manipulator:
         must happen after validation because html2python functions aren't
         expected to deal with invalid input.
         """
-        for field in self.fields:
-            if new_data.has_key(field.field_name):
-                new_data.setlist(field.field_name,
-                    [field.__class__.html2python(data) for data in new_data.getlist(field.field_name)])
-            else:
-                try:
-                    # individual fields deal with None values themselves
-                    new_data.setlist(field.field_name, [field.__class__.html2python(None)])
-                except EmptyValue:
-                    new_data.setlist(field.field_name, [])
+        """
+	for field in self.fields:
+	"""
+
+	for field in self.fields:
+	    field.convert_post_data(new_data)
 
 class FormWrapper:
     """
@@ -104,24 +100,39 @@ class FormWrapper:
     This allows dictionary-style lookups of formfields. It also handles feeding
     prepopulated data and validation error messages to the formfield objects.
     """
-    def __init__(self, manipulator, data, error_dict):
+    def __init__(self, manipulator, data, error_dict, edit_inline = False):
         self.manipulator, self.data = manipulator, data
         self.error_dict = error_dict
+        self._inline_collections = None
+        self.edit_inline = edit_inline
 
     def __repr__(self):
-        return repr(self.data)
+        return repr(self.__dict__)
 
     def __getitem__(self, key):
         for field in self.manipulator.fields:
             if field.field_name == key:
-                if hasattr(field, 'requires_data_list') and hasattr(self.data, 'getlist'):
-                    data = self.data.getlist(field.field_name)
-                else:
-                    data = self.data.get(field.field_name, None)
-                if data is None:
-                    data = ''
-                return FormFieldWrapper(field, data, self.error_dict.get(field.field_name, []))
+                data = field.extract_data(self.data)
+		return FormFieldWrapper(field, data, self.error_dict.get(field.field_name, []))
+        if self.edit_inline:
+            self.fill_inline_collections() 
+            for inline_collection in self._inline_collections:
+                if inline_collection.name == key:
+                    return inline_collection
+
         raise KeyError
+
+    def fill_inline_collections(self): 
+        if not self._inline_collections:
+            ic = []
+            related_objects = self.manipulator.get_inline_related_objects_wrapped()
+            for rel_obj in related_objects:
+                data = rel_obj.extract_data(self.data)
+                inline_collection = InlineObjectCollection(self.manipulator, rel_obj, data, self.error_dict)
+                ic.append(inline_collection)
+            self._inline_collections = ic
+
+
 
     def has_errors(self):
         return self.error_dict != {}
@@ -135,6 +146,7 @@ class FormFieldWrapper:
     def __str__(self):
         "Renders the field"
         return str(self.formfield.render(self.data))
+            
 
     def __repr__(self):
         return '<FormFieldWrapper for "%s">' % self.formfield.field_name
@@ -155,6 +167,9 @@ class FormFieldWrapper:
         else:
             return ''
 
+    def get_id(self):
+        return  self.formfield.get_id()
+
 class FormFieldCollection(FormFieldWrapper):
     "A utility class that gives the template access to a dict of FormFieldWrappers"
     def __init__(self, formfield_dict):
@@ -174,8 +189,66 @@ class FormFieldCollection(FormFieldWrapper):
         "Returns list of all errors in this collection's formfields"
         errors = []
         for field in self.formfield_dict.values():
-            errors.extend(field.errors())
+            if(hasattr(field, 'errors') ):
+                errors.extend(field.errors())
         return errors
+
+    def has_errors(self):
+        return bool(len(self.errors())) 
+        
+    def html_combined_error_list(self):
+        return ''.join( [ field.html_error_list() for field in self.formfield_dict.values() if hasattr(field, 'errors')])
+
+class InlineObjectCollection:
+    "An object that acts like a list of form field collections."  
+    def __init__(self, parent_manipulator,  rel_obj, data, errors):
+        self.parent_manipulator = parent_manipulator 
+        self.rel_obj = rel_obj
+        self.data = data
+        self.errors = errors
+        self._collections = None   
+        self.name = rel_obj.name
+ 
+    def __len__(self):
+        self.fill() 
+        return self._collections.__len__()
+    
+    def __getitem__(self, k):
+        self.fill()
+        return self._collections.__getitem__(k)
+
+    def __setitem__(self, k, v):
+        self.fill()
+        return self._collections.__setitem__(k,v)
+
+    def __delitem__(self, k):
+        self.fill()
+        return self._collections.__delitem__(k)
+
+    def __iter__(self):
+        self.fill()
+        return self._collections.__iter__()
+
+    def fill(self):
+        if self._collections:
+            return 
+        else:
+            var_name = self.rel_obj.opts.object_name.lower()
+            wrapper = []
+            orig = hasattr(self.parent_manipulator, 'original_object') and self.parent_manipulator.original_object  or None 
+            orig_list = self.rel_obj.get_list(orig)
+            for i, instance in enumerate(orig_list):
+                collection = {'original': instance }
+                for f in self.rel_obj.editable_fields():
+                        for field_name in f.get_manipulator_field_names(''):
+                            full_field_name = '%s.%d.%s' % (var_name, i, field_name)
+                            field = self.parent_manipulator[full_field_name]
+                            data = field.extract_data(self.data)
+                            errors = self.errors.get(full_field_name, [])
+#                           if(errors):raise full_field_name + " " + repr(errors)
+                            collection[field_name] = FormFieldWrapper(field, data, errors)
+                wrapper.append(FormFieldCollection(collection))
+            self._collections = wrapper 
 
 class FormField:
     """Abstract class representing a form field.
@@ -209,6 +282,39 @@ class FormField:
     def render(self, data):
         raise NotImplementedError
 
+    def get_member_name(self):
+        if hasattr(self, 'member_name'):
+            return self.member_name
+    	else:
+            return self.field_name
+
+    def extract_data(self, data_dict):
+	if hasattr(self, 'requires_data_list') and hasattr(data_dict, 'getlist'):
+            data = data_dict.getlist(self.get_member_name())
+        else:
+            data = data_dict.get(self.get_member_name(), None)
+        if data is None:
+            data = ''
+     	self.data_dict = data_dict  
+	return data
+
+    def convert_post_data(self, new_data):
+    	name = self.get_member_name()
+        if new_data.has_key(name):
+	    d = new_data.getlist(name)
+	    #del new_data[self.field_name]
+            new_data.setlist(name,
+                    [self.__class__.html2python(data) 
+	    	     for data in d])
+        else:
+            try:
+               # individual fields deal with None values themselves
+               new_data.setlist(name, [self.__class__.html2python(None)])
+            except EmptyValue:
+               new_data.setlist(name, [])
+
+    def get_id(self):
+        return  FORM_FIELD_ID_PREFIX + self.field_name  
 ####################
 # GENERIC WIDGETS  #
 ####################
@@ -237,7 +343,7 @@ class TextField(FormField):
         if isinstance(data, unicode):
             data = data.encode('utf-8')
         return '<input type="text" id="%s" class="v%s%s" name="%s" size="%s" value="%s" %s/>' % \
-            (FORM_FIELD_ID_PREFIX + self.field_name, self.__class__.__name__, self.is_required and ' required' or '',
+            (self.get_id(), self.__class__.__name__, self.is_required and ' required' or '',
             self.field_name, self.length, escape(data), maxlength)
 
     def html2python(data):
@@ -248,7 +354,7 @@ class PasswordField(TextField):
     def render(self, data):
         # value is always blank because we never want to redisplay it
         return '<input type="password" id="%s" class="v%s%s" name="%s" value="" />' % \
-            (FORM_FIELD_ID_PREFIX + self.field_name, self.__class__.__name__, self.is_required and ' required' or '',
+            (self.get_id(), self.__class__.__name__, self.is_required and ' required' or '',
             self.field_name)
 
 class LargeTextField(TextField):
@@ -266,7 +372,7 @@ class LargeTextField(TextField):
         if isinstance(data, unicode):
             data = data.encode('utf-8')
         return '<textarea id="%s" class="v%s%s" name="%s" rows="%s" cols="%s">%s</textarea>' % \
-            (FORM_FIELD_ID_PREFIX + self.field_name, self.__class__.__name__, self.is_required and ' required' or '',
+            (self.get_id(), self.__class__.__name__, self.is_required and ' required' or '',
             self.field_name, self.rows, self.cols, escape(data))
 
 class HiddenField(FormField):
@@ -276,7 +382,7 @@ class HiddenField(FormField):
 
     def render(self, data):
         return '<input type="hidden" id="%s" name="%s" value="%s" />' % \
-            (FORM_FIELD_ID_PREFIX + self.field_name, self.field_name, escape(data))
+            (self.get_id(), self.field_name, escape(data))
 
 class CheckboxField(FormField):
     def __init__(self, field_name, checked_by_default=False):
@@ -289,7 +395,7 @@ class CheckboxField(FormField):
         if data or (data is '' and self.checked_by_default):
             checked_html = ' checked="checked"'
         return '<input type="checkbox" id="%s" class="v%s" name="%s"%s />' % \
-            (FORM_FIELD_ID_PREFIX + self.field_name, self.__class__.__name__,
+            (self.get_id(), self.__class__.__name__,
             self.field_name, checked_html)
 
     def html2python(data):
@@ -299,18 +405,21 @@ class CheckboxField(FormField):
         return False
     html2python = staticmethod(html2python)
 
+
 class SelectField(FormField):
-    def __init__(self, field_name, choices=[], size=1, is_required=False, validator_list=[]):
+    def __init__(self, field_name, choices=[], size=1, is_required=False, validator_list=[], member_name=None):
         self.field_name = field_name
         # choices is a list of (value, human-readable key) tuples because order matters
         self.choices, self.size, self.is_required = choices, size, is_required
         self.validator_list = [self.isValidChoice] + validator_list
+        if member_name != None:
+            self.member_name = member_name
 
     def render(self, data):
-        output = ['<select id="%s" class="v%s%s" name="%s" size="%s">' % \
-            (FORM_FIELD_ID_PREFIX + self.field_name, self.__class__.__name__, self.is_required and ' required' or '',
-            self.field_name, self.size)]
         str_data = str(data) # normalize to string
+        output = ['<select id="%s" class="v%s%s" name="%s" size="%s">' % \
+            (self.get_id(), self.__class__.__name__, 
+             self.is_required and ' required' or '', self.field_name, self.size)]
         for value, display_name in self.choices:
             selected_html = ''
             if str(value) == str_data:
@@ -334,12 +443,14 @@ class NullSelectField(SelectField):
     html2python = staticmethod(html2python)
 
 class RadioSelectField(FormField):
-    def __init__(self, field_name, choices=[], ul_class='', is_required=False, validator_list=[]):
+    def __init__(self, field_name, choices=[], ul_class='', is_required=False, validator_list=[], member_name=None):
         self.field_name = field_name
         # choices is a list of (value, human-readable key) tuples because order matters
         self.choices, self.is_required = choices, is_required
         self.validator_list = [self.isValidChoice] + validator_list
         self.ul_class = ul_class
+        if member_name != None:
+            self.member_name = member_name
 
     def render(self, data):
         """
@@ -382,9 +493,9 @@ class RadioSelectField(FormField):
                 'value': value,
                 'name': display_name,
                 'field': '<input type="radio" id="%s" name="%s" value="%s"%s/>' % \
-                    (FORM_FIELD_ID_PREFIX + self.field_name + '_' + str(i), self.field_name, value, selected_html),
+                    (self.get_id() + '_' + str(i), self.field_name, value, selected_html),
                 'label': '<label for="%s">%s</label>' % \
-                    (FORM_FIELD_ID_PREFIX + self.field_name + '_' + str(i), display_name),
+                    (self.get_id() + '_' + str(i), display_name),
             })
         return RadioFieldRenderer(datalist, self.ul_class)
 
@@ -414,7 +525,7 @@ class SelectMultipleField(SelectField):
     requires_data_list = True
     def render(self, data):
         output = ['<select id="%s" class="v%s%s" name="%s" size="%s" multiple="multiple">' % \
-            (FORM_FIELD_ID_PREFIX + self.field_name, self.__class__.__name__, self.is_required and ' required' or '',
+            (self.get_id(), self.__class__.__name__, self.is_required and ' required' or '',
             self.field_name, self.size)]
         str_data_list = map(str, data) # normalize to strings
         for value, choice in self.choices:
@@ -469,9 +580,9 @@ class CheckboxSelectMultipleField(SelectMultipleField):
             if str(value) in str_data_list:
                 checked_html = ' checked="checked"'
             field_name = '%s%s' % (self.field_name, value)
-            output.append('<li><input type="checkbox" id="%s%s" class="v%s" name="%s"%s /> <label for="%s%s">%s</label></li>' % \
-                (FORM_FIELD_ID_PREFIX, field_name, self.__class__.__name__, field_name, checked_html,
-                FORM_FIELD_ID_PREFIX, field_name, choice))
+            output.append('<li><input type="checkbox" id="%s" class="v%s" name="%s"%s /> <label for="%s">%s</label></li>' % \
+                (get_id() + value , self.__class__.__name__, field_name, checked_html,
+                get_id() + value, choice))
         output.append('</ul>')
         return '\n'.join(output)
 
@@ -490,7 +601,7 @@ class FileUploadField(FormField):
 
     def render(self, data):
         return '<input type="file" id="%s" class="v%s" name="%s" />' % \
-            (FORM_FIELD_ID_PREFIX + self.field_name, self.__class__.__name__,
+            (self.get_id(), self.__class__.__name__,
             self.field_name)
 
     def html2python(data):

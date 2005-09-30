@@ -146,6 +146,70 @@ class FieldDoesNotExist(Exception):
 class BadKeywordArguments(Exception):
     pass
 
+
+class InlineRelatedObject(object):
+    def __init__(self,parent_opts, opts, field):
+        self.parent_opts = parent_opts
+        self.opts = opts
+        self.field = field
+        self.name = opts.module_name
+
+    def flatten_data(self,obj = None):
+        var_name = self.opts.object_name.lower()
+        new_data = {}
+        rel_instances = self.get_list(obj)
+
+        for i, rel_instance in enumerate(rel_instances):
+            instance_data = {} 
+            for f in self.opts.fields + self.opts.many_to_many:
+                field_data = f.flatten_data(rel_instance)
+                #if hasattr(f, 'editable') and f.editable and f != self.field:
+                for name, value in field_data.items():
+                    instance_data['%s.%d.%s' % (var_name, i, name)] = value
+            new_data.update(instance_data)             
+    
+        return new_data        
+
+    def extract_data(self, data):
+        "Pull out the data meant for inline objects of this class, ie anything starting with our module name"
+        return data # TODO  
+    
+    def get_list(self, parent_instance = None):
+        "Get the list of this type of object from an instance of the parent class"
+        if parent_instance != None:
+            func_name = 'get_%s_list' % self.parent_opts.get_rel_object_method_name(self.opts, self.field)
+            func = getattr(parent_instance, func_name)
+            list = func()
+            
+            count = len(list) + self.field.rel.num_extra_on_change
+            if self.field.rel.min_num_in_admin:
+               count = max(count, self.field.rel.min_num_in_admin)
+            if self.field.rel.max_num_in_admin:
+               count = min(count, self.field.rel.max_num_in_admin)
+       
+            change = count - len(list) 
+            if change > 0:
+                return list + [None for _ in range(change)]
+            if change < 0:
+                return list[:change]
+            else: # Just right
+                return list
+        else:
+            return [None for _ in range(self.field.rel.num_in_admin)]
+
+    
+    def editable_fields(self, wrapping_func = lambda x: x):
+        """Get the fields in this class that should be edited inline.
+        Pass a callable, eg a class, as the second argument to wrap the fields.
+        This can be useful to add extra attributes for use in templates."""
+        
+        return [wrapping_func(f) for f in self.opts.fields + self.opts.many_to_many if f.editable and f != self.field ]
+        
+    def __repr__(self):
+        return "<InlineRelatedObject: %s related to %s>" % ( self.name, self.field.name)      
+
+        
+
 class Options:
     def __init__(self, module_name='', verbose_name='', verbose_name_plural='', db_table='',
         fields=None, ordering=None, unique_together=None, admin=None, has_related_links=False,
@@ -316,6 +380,12 @@ class Options:
 
     def get_inline_related_objects(self):
         return [(a, b) for a, b in self.get_all_related_objects() if b.rel.edit_inline]
+
+    def get_inline_related_objects_wrapped(self):
+        return [InlineRelatedObject(self, opts, field) for opts, field in self.get_all_related_objects() if field.rel.edit_inline]
+
+    def get_data_holders(self):
+        return self.fields + self.many_to_many + self.get_inline_related_objects_wrapped()
 
     def get_all_related_many_to_many_objects(self):
         module_list = get_installed_model_modules()
@@ -594,6 +664,7 @@ class ModelBase(type):
             new_mod.get_latest = curry(function_get_latest, opts, new_class, does_not_exist_exception)
 
         for f in opts.fields:
+            #TODO : change this into a virtual function so that user defined fields will be able to add methods to module or class. 
             if f.choices:
                 # Add "get_thingie_display" method to get human-readable value.
                 func = curry(method_get_display_value, f)
@@ -788,8 +859,14 @@ def method_save(opts, self):
         # If it does already exist, do an UPDATE.
         if cursor.fetchone():
             db_values = [f.get_db_prep_save(f.pre_save(getattr(self, f.column), False)) for f in non_pks]
-            cursor.execute("UPDATE %s SET %s WHERE %s=%%s" % (opts.db_table,
-                ','.join(['%s=%%s' % f.column for f in non_pks]), opts.pk.column),
+	    while 1:
+	    	try:
+		    idx = db_values.index('')
+		    non_pks[idx:idx+1] = []
+		    db_values[idx:idx +1] = []
+                except: break
+	    cursor.execute("UPDATE %s SET %s WHERE %s=%%s" % (opts.db_table, 
+	        ','.join(['%s=%%s' % f.column for f in non_pks]), opts.pk.column),
                 db_values + [pk_val])
         else:
             record_exists = False
@@ -1332,16 +1409,21 @@ def function_get_sql_clause(opts, **kwargs):
         if f == '?': # Special case.
             order_by.append(db.get_random_function_sql())
         else:
+            if f.startswith('-'):
+                col_name = f[1:]
+                order = "DESC"
+            else:
+                col_name = f
+                order = "ASC"
             # Use the database table as a column prefix if it wasn't given,
             # and if the requested column isn't a custom SELECT.
-            if "." not in f and f not in [k[0] for k in kwargs.get('select', [])]:
+            if "." not in col_name and col_name not in [k[0] for k in kwargs.get('select', [])]:
                 table_prefix = opts.db_table + '.'
             else:
                 table_prefix = ''
-            if f.startswith('-'):
-                order_by.append('%s%s DESC' % (table_prefix, orderfield2column(f[1:], opts)))
-            else:
-                order_by.append('%s%s ASC' % (table_prefix, orderfield2column(f, opts)))
+            
+            order_by.append('%s%s %s' % (table_prefix, orderfield2column(col_name, opts), order))
+    
     order_by = ", ".join(order_by)
 
     # LIMIT and OFFSET clauses
@@ -1397,6 +1479,8 @@ def get_manipulator(opts, klass, extra_methods, add=False, change=False):
     man.__module__ = MODEL_PREFIX + '.' + opts.module_name # Set this explicitly, as above.
     man.__init__ = curry(manipulator_init, opts, add, change)
     man.save = curry(manipulator_save, opts, klass, add, change)
+    man.get_inline_related_objects_wrapped = curry(manipulator_get_inline_related_objects_wrapped, opts, klass, add, change)
+    man.flatten_data = curry(manipulator_flatten_data, opts, klass, add, change)
     for field_name_list in opts.unique_together:
         setattr(man, 'isUnique%s' % '_'.join(field_name_list), curry(manipulator_validator_unique_together, field_name_list, opts))
     for f in opts.fields:
@@ -1439,20 +1523,20 @@ def manipulator_init(opts, add, change, self, obj_key=None):
             self.fields.extend(f.get_manipulator_fields(opts, self, change))
 
     # Add fields for related objects.
-    for rel_opts, rel_field in opts.get_inline_related_objects():
+    for obj in opts.get_inline_related_objects_wrapped():
         if change:
-            count = getattr(self.original_object, 'get_%s_count' % opts.get_rel_object_method_name(rel_opts, rel_field))()
-            count += rel_field.rel.num_extra_on_change
-            if rel_field.rel.min_num_in_admin:
-                count = max(count, rel_field.rel.min_num_in_admin)
-            if rel_field.rel.max_num_in_admin:
-                count = min(count, rel_field.rel.max_num_in_admin)
+            count = getattr(self.original_object, 'get_%s_count' % opts.get_rel_object_method_name(obj.opts, obj.field))()
+            count += obj.field.rel.num_extra_on_change
+            if obj.field.rel.min_num_in_admin:
+                count = max(count, obj.field.rel.min_num_in_admin)
+            if obj.field.rel.max_num_in_admin:
+                count = min(count, obj.field.rel.max_num_in_admin)
         else:
-            count = rel_field.rel.num_in_admin
-        for f in rel_opts.fields + rel_opts.many_to_many:
-            if f.editable and f != rel_field and (not f.primary_key or (f.primary_key and change)):
+            count = obj.field.rel.num_in_admin
+        for f in obj.opts.fields + obj.opts.many_to_many:
+            if f.editable and f != obj.field :
                 for i in range(count):
-                    self.fields.extend(f.get_manipulator_fields(rel_opts, self, change, name_prefix='%s.%d.' % (rel_opts.object_name.lower(), i), rel=True))
+                    self.fields.extend(f.get_manipulator_fields(obj.opts, self, change, name_prefix='%s.%d.' % (obj.opts.object_name.lower(), i), rel=True))
 
     # Add field for ordering.
     if change and opts.get_ordered_objects():
@@ -1592,6 +1676,16 @@ def manipulator_save(opts, klass, add, change, self, new_data):
         for rel_opts in opts.get_ordered_objects():
             getattr(new_object, 'set_%s_order' % rel_opts.object_name.lower())(order)
     return new_object
+
+def manipulator_get_inline_related_objects_wrapped(opts, klass, add, change, self):
+    return opts.get_inline_related_objects_wrapped() 
+        
+def manipulator_flatten_data(opts, klass, add, change, self):
+     new_data = {}
+     obj = change and self.original_object or None
+     for f in opts.get_data_holders():
+            new_data.update(f.flatten_data(obj))
+     return new_data
 
 def manipulator_validator_unique_together(field_name_list, opts, self, field_data, all_data):
     from django.utils.text import get_text_list

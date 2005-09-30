@@ -2,6 +2,7 @@
 
 import sys
 import template
+import template_loader
 
 class CommentNode(template.Node):
     def render(self, context):
@@ -222,6 +223,19 @@ class SsiNode(template.Node):
             except template.TemplateSyntaxError:
                 return '' # Fail silently for invalid included templates.
         return output
+
+class IncludeNode(template.Node):
+    def __init__(self, template_path):
+        self.template_path_var = template_path_var
+
+    def render(self, context):
+         try:
+             template_path = template.resolve(self.template_path_var, context)
+             t = template_loader.get_template(template_path)
+             return t.render(context)
+         except:
+             return '' # Fail silently for invalid included templates.
+
 
 class LoadNode(template.Node):
     def __init__(self, taglib):
@@ -600,6 +614,16 @@ def do_ssi(parser, token):
             raise template.TemplateSyntaxError, "Second (optional) argument to %s tag must be 'parsed'" % bits[0]
     return SsiNode(bits[1], parsed)
 
+def do_include(parser, token):
+    """
+    Loads a template using standard resolution mechanisms, and renders it in the current context.     
+    """
+    bits = token.contents.split()
+    parsed = False
+    if len(bits) != 2:
+        raise template.TemplateSyntaxError, "'include' tag takes one argument: the path to the template to be included"
+    return IncludeNode(bits[1])
+
 def do_load(parser, token):
     """
     Load a custom template tag set.
@@ -755,6 +779,7 @@ template.register_tag('ifequal', lambda parser, token: do_ifequal(parser, token,
 template.register_tag('ifnotequal', lambda parser, token: do_ifequal(parser, token, True))
 template.register_tag('if', do_if)
 template.register_tag('ifchanged', do_ifchanged)
+template.register_tag('include', do_include)
 template.register_tag('regroup', do_regroup)
 template.register_tag('ssi', do_ssi)
 template.register_tag('load', do_load)

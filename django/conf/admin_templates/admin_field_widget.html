@@ -1,0 +1,27 @@
+{% if bound_field.is_date_time %}
+   <p class="datetime"> 
+      Date: {{ bound_field.form_fields.0 }}<br />
+      Time: {{ bound_field.form_fields.1 }}
+   </p>
+{% else %}
+    {% if bound_field.is_file_field %}
+        {% if bound_field.original_value %}
+            Currently: <a href="{{ bound_field.original_url }}" > {{ bound_field.original_value }} </a><br />
+            Change: {% output_all bound_field.form_fields %}
+        {% else %}
+            {% output_all bound_field.form_fields %}
+        {% endif %}
+    {% else %}
+        {% output_all bound_field.form_fields %}
+        {% if bound_field.raw_id_admin %}
+            <a href="../../../{{ bound_field.field.rel.to.app_label }}/{{ bound_field.field.rel.to.module_name }}/" class="related-lookup" id="lookup_{{bound_field.element_id}}" onclick="return showRelatedObjectLookupPopup(this);"> <img src="{% admin_media_prefix %}img/admin/selector-search.gif" width="16" height="16" alt="Lookup"></a>
+        {% else  %}
+            {% if bound_field.needs_add_label %}
+            <a href="../../../{{ bound_field.field.rel.to.app_label }}/{{ bound_field.field.rel.to.module_name }}/add/" class="add-another" id="add_{{ bound_field.element_id}}" onclick="return showAddAnotherPopup(this);"> <img src="{% admin_media_prefix %}img/admin/icon_addlink.gif" width="10" height="10" alt="Add Another"/></a>
+            {% endif %}
+        {% endif %}
+    {% endif %}
+{% endif %}
+    
+
+
