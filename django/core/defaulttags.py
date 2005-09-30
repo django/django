@@ -303,7 +303,7 @@ class I18NNode(template.Node):
             elif s.startswith('"') and s.endswith('"'):
                 s = s[1:-1]
             else:
-                raise template.TemplateSyntaxError("i18n must be called as {% i18n _('some message') %}")
+                s = template.resolve_variable_with_filters(s, context)
             return translation.gettext(s) % context
         else:
             raise template.TemplateSyntaxError("i18n must be called as {% i18n _('some message') %}")
