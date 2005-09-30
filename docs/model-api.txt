@@ -248,7 +248,28 @@ Here are all available field types:
     uploaded files don't fill up the given directory).
 
     The admin represents this as an ``<input type="file">`` (a file-upload widget).
+    
+    Using a `FieldField` or an ``ImageField`` (see below) in a model takes a few 
+    steps:
+    
+        1. In your settings file, you'll need to define ``MEDIA_ROOT``as the
+           full path to a directory where you'd like Django to store uploaded
+           files. (For performance, these files are not stored in the database.)
+           Define ``MEDIA_URL`` as the base public URL of that directory. Make
+           sure that this directory is writable by the Web server's user
+           account.
+        
+        2. Add the ``FileField`` or ``ImageField`` to your model, making sure 
+           to define the ``upload_to`` option to tell Django to which
+           subdirectory of ``MEDIA_ROOT`` it should upload files.
 
+        3. All that will be stored in your database is a path to the file
+           (relative to ``MEDIA_ROOT``). You'll must likely want to use the
+           convenience ``get_<fieldname>_url`` function provided by Django. For
+           example, if your ``ImageField`` is called ``mug_shot``, you can get
+           the absolute URL to your image in a template with ``{{
+           object.get_mug_shot_url }}``.
+    
     .. _`strftime formatting`: http://docs.python.org/lib/module-time.html#l2h-1941
 
 ``FloatField``
@@ -281,7 +302,7 @@ Here are all available field types:
     width of the image each time a model instance is saved.
 
     Requires the `Python Imaging Library`_.
-
+    
     .. _Python Imaging Library: http://www.pythonware.com/products/pil/
 
 ``IntegerField``
