@@ -19,7 +19,7 @@ participating in a March Madness contest.
 Install ReportLab
 =================
 
-Download and install the ReportLab library from http://www.reportlab.org/downloads.html
+Download and install the ReportLab library from http://www.reportlab.org/downloads.html.
 The `user guide`_ (not coincidentally, a PDF file) explains how to install it.
 
 Test your installation by importing it in the Python interactive interpreter::
