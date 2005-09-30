@@ -139,6 +139,16 @@ def gettext(message):
         _default = translation('*', settings.LANGUAGE_CODE)
     return _default.gettext(message)
 
+def gettext_noop(message):
+    """
+    This function is used to just mark strings for translation
+    but to not translate them now. This can be used to store
+    strings in global variables that should stay in the base
+    language (because they might be used externally) and will
+    be translated later on.
+    """
+    return message
+
 def get_language_from_request(request):
     """
     analyze the request to find what language the user
