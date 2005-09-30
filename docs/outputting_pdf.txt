@@ -22,9 +22,9 @@ Install ReportLab
 Download and install the ReportLab library from http://www.reportlab.org/downloads.html
 The `user guide`_ (not coincidentally, a PDF file) explains how to install it.
 
-Test your installation by typing this in the Python interactive interpreter::
+Test your installation by importing it in the Python interactive interpreter::
 
-    import reportlab
+    >>> import reportlab
 
 If that command doesn't raise any errors, the installation worked.
 
