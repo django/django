@@ -7,7 +7,7 @@ from django.conf.settings import LANGUAGE_CODE, SETTINGS_MODULE
 
 class FeedConfiguration:
     def __init__(self, slug, title_cb, link_cb, description_cb, get_list_func_cb, get_list_kwargs,
-        param_func=None, param_kwargs_cb=None, get_list_kwargs_cb=None,
+        param_func=None, param_kwargs_cb=None, get_list_kwargs_cb=None, get_pubdate_cb=None,
         enc_url=None, enc_length=None, enc_mime_type=None):
         """
         slug -- Normal Python string. Used to register the feed.
@@ -28,6 +28,9 @@ class FeedConfiguration:
 
         get_list_kwargs_cb -- Function that takes the param and returns a
         dictionary to use in addition to get_list_kwargs (if applicable).
+        
+        get_pubdate_cb -- Function that takes the object and returns a datetime
+        to use as the publication date in the feed.
 
         The three enc_* parameters are strings representing methods or
         attributes to call on a particular item to get its enclosure
@@ -41,6 +44,7 @@ class FeedConfiguration:
         self.get_list_kwargs = get_list_kwargs
         self.param_func, self.param_kwargs_cb = param_func, param_kwargs_cb
         self.get_list_kwargs_cb = get_list_kwargs_cb
+        self.get_pubdate_cb = get_pubdate_cb
         assert (None == enc_url == enc_length == enc_mime_type) or (enc_url is not None and enc_length is not None and enc_mime_type is not None)
         self.enc_url = enc_url
         self.enc_length = enc_length
@@ -95,6 +99,7 @@ class FeedConfiguration:
                 description = description_template.render(Context({'obj': obj, 'site': current_site})).decode('utf-8'),
                 unique_id=link,
                 enclosure=enc,
+                pubdate = self.get_pubdate_cb and self.get_pubdate_cb(obj) or None,
             )
         return f
         
