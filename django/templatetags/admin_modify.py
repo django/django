@@ -1,4 +1,5 @@
 from django.core import template, template_loader, meta
+from django.core.template_loader import render_to_string
 from django.conf.settings import ADMIN_MEDIA_PREFIX
 from django.utils.text import capfirst
 from django.utils.html import escape
@@ -8,42 +9,54 @@ from django.views.admin.main import AdminBoundField
 import re
 
 class IncludeAdminScriptNode(template.Node):
-      def __init__(self, var):
-      	 self.var = var
+    def __init__(self, var):
+        self.var = var
  
-      def render(self, context):
+    def render(self, context):
         resolved = template.resolve_variable(self.var, context)
-     	return '<script type="text/javascript" src="%s%s"></script>' % \
-		(ADMIN_MEDIA_PREFIX, resolved)
+        return '<script type="text/javascript" src="%s%s"></script>' % \
+            (ADMIN_MEDIA_PREFIX, resolved)
           
 class SubmitRowNode(template.Node):
-      def __init__(self):
-          pass
+    def __init__(self):
+        pass
 
-      def render(self, context):
-          change = context['change']
-	  add = context['add']
-	  show_delete = context['show_delete']
-	  ordered_objects = context['ordered_objects']
- 	  save_as = context['save_as']
-	  has_delete_permission = context['has_delete_permission']
-          is_popup = context['is_popup']
+    def render(self, context):        
+        change = context['change']
+	add = context['add']
+	show_delete = context['show_delete']
+	ordered_objects = context['ordered_objects']
+ 	save_as = context['save_as']
+	has_delete_permission = context['has_delete_permission']
+        is_popup = context['is_popup']
 	  
-	  t = ['<div class="submit-row">']
-	  onclick_attrib = ordered_objects and change and 'onclick="submitOrderForm();"' or '' 
+        
+        output = render_to_string('admin_submit_line', {
+	    'onclick_attrib' : (ordered_objects and change 
+                                and 'onclick="submitOrderForm();"' or ''), 
+            'show_delete_link' : (not is_popup and has_delete_permission 
+                                  and (change or show_delete)), 
+            'show_save_as_new' : not is_popup and change and save_as,
+            'show_save_and_add_another': not is_popup and (not save_as or add),
+            'show_save_and_continue': not is_popup,
+            'show_save': True
+          }, context);
+        context.pop() 
+        return output;
+#	  t = ['<div class="submit-row">']
 	  
-	  if not is_popup:
-	  	if has_delete_permission and (change or show_delete):
-	      	   t.append('<p class="float-left"><a href="delete/" class="deletelink">Delete</a></p>')
-	        if change and save_as:
-		   t.append('<input type="submit" value="Save as new" name="_saveasnew" %s/>' %  onclick_attrib)
-                if (not save_as or add):
-		   t.append('<input type="submit" value="Save and add another" name="_addanother" %s/>' %  onclick_attrib)
-	  t.append('<input type="submit" value="Save and continue editing" name="_continue" %s/>' %  onclick_attrib )
-	  t.append('<input type="submit" value="Save" class="default" %s/>' %  onclick_attrib)
-	  t.append('</div>\n')
+#	  if not is_popup:
+#	  	if has_delete_permission and (change or show_delete):
+#	      	   t.append('<p class="float-left"><a href="delete/" class="deletelink">Delete</a></p>')
+#	        if change and save_as:
+#		   t.append('<input type="submit" value="Save as new" name="_saveasnew" %s/>' %  onclick_attrib)
+#                if (not save_as or add):
+#		   t.append('<input type="submit" value="Save and add another" name="_addanother" %s/>' %  onclick_attrib)
+#	        t.append('<input type="submit" value="Save and continue editing" name="_continue" %s/>' %  onclick_attrib )
+#	  t.append('<input type="submit" value="Save" class="default" %s/>' %  onclick_attrib)
+#	  t.append('</div>\n')
 	 
-	  return ''.join(t)
+#	  return ''.join(t)
 
 
 

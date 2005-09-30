@@ -98,6 +98,9 @@ class ForNode(template.Node):
                 # shortcuts for current loop iteration number
                 'counter0': i,
                 'counter': i+1,
+                # reverse counter iteration numbers
+                'revcounter': len_values - i,
+                'revcounter0': len_values - i - 1,
                 # boolean values designating first and last times through loop
                 'first': (i == 0),
                 'last': (i == len_values - 1),
@@ -445,6 +448,10 @@ def do_for(parser, token):
         ==========================  ================================================
         ``forloop.counter``         The current iteration of the loop (1-indexed)
         ``forloop.counter0``        The current iteration of the loop (0-indexed)
+        ``forloop.revcounter``      The number of iterations from the end of the 
+                                    loop (1-indexed)
+        ``forloop.revcounter0``     The number of iterations from the end of the 
+                                    loop (0-indexed)
         ``forloop.first``           True if this is the first time through the loop
         ``forloop.last``            True if this is the last time through the loop
         ``forloop.parentloop``      For nested loops, this is the loop "above" the
