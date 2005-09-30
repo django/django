@@ -686,11 +686,12 @@ def add_stage_new(request, app_label, module_name, show_delete=False, form_url='
         if opts.has_field_type(meta.FileField):
             new_data.update(request.FILES)
         errors = manipulator.get_validation_errors(new_data)
+        manipulator.do_html2python(new_data)
+        
         if not errors and not request.POST.has_key("_preview"):
             for f in opts.many_to_many:
                 if f.rel.raw_id_admin:
                     new_data.setlist(f.name, new_data[f.name].split(","))
-            manipulator.do_html2python(new_data)
             new_object = manipulator.save(new_data)
             pk_value = getattr(new_object, opts.pk.column)
             log.log_action(request.user.id, opts.get_content_type_id(), pk_value, repr(new_object), log.ADDITION)
@@ -711,8 +712,8 @@ def add_stage_new(request, app_label, module_name, show_delete=False, form_url='
             else:
                 request.user.add_message(msg)
                 return HttpResponseRedirect(post_url)
-        if request.POST.has_key("_preview"):
-            manipulator.do_html2python(new_data)
+       # if request.POST.has_key("_preview"):   # Always happens anyway. 
+       #     manipulator.do_html2python(new_data)
     else:
         # Add default data.
         new_data = manipulator.flatten_data()
@@ -757,11 +758,13 @@ def change_stage_new(request, app_label, module_name, object_id):
             new_data.update(request.FILES)
 
         errors = manipulator.get_validation_errors(new_data)
+        
+        manipulator.do_html2python(new_data)
         if not errors and not request.POST.has_key("_preview"):
-            for f in opts.many_to_many:
-                if f.rel.raw_id_admin:
-                    new_data.setlist(f.name, new_data[f.name].split(","))
-            manipulator.do_html2python(new_data)
+        # Now done in commaseparatedint
+        #    for f in opts.many_to_many: 
+        #        if f.rel.raw_id_admin:
+        #            new_data.setlist(f.name, new_data[f.name].split(","))
             new_object = manipulator.save(new_data)
             pk_value = getattr(new_object, opts.pk.column)
 
@@ -794,8 +797,8 @@ def change_stage_new(request, app_label, module_name, object_id):
             else:
                 request.user.add_message(msg)
                 return HttpResponseRedirect("../")
-        if request.POST.has_key("_preview"):
-            manipulator.do_html2python(new_data)
+       # if request.POST.has_key("_preview"):  # always happens
+       #     manipulator.do_html2python(new_data)
     else:
         # Populate new_data with a "flattened" version of the current data.
         new_data = manipulator.flatten_data()

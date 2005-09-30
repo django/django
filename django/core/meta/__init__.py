@@ -859,12 +859,6 @@ def method_save(opts, self):
         # If it does already exist, do an UPDATE.
         if cursor.fetchone():
             db_values = [f.get_db_prep_save(f.pre_save(getattr(self, f.column), False)) for f in non_pks]
-	    while 1:
-	    	try:
-		    idx = db_values.index('')
-		    non_pks[idx:idx+1] = []
-		    db_values[idx:idx +1] = []
-                except: break
 	    cursor.execute("UPDATE %s SET %s WHERE %s=%%s" % (opts.db_table, 
 	        ','.join(['%s=%%s' % f.column for f in non_pks]), opts.pk.column),
                 db_values + [pk_val])

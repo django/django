@@ -300,12 +300,16 @@ class FormField:
 
     def convert_post_data(self, new_data):
     	name = self.get_member_name()
-        if new_data.has_key(name):
-	    d = new_data.getlist(name)
+        if new_data.has_key(self.field_name):
+	    d = new_data.getlist(self.field_name)
 	    #del new_data[self.field_name]
-            new_data.setlist(name,
-                    [self.__class__.html2python(data) 
-	    	     for data in d])
+            try:
+                converted_data = [self.__class__.html2python(data) 
+                                  for data in d]
+            except ValueError:
+                converted_data = d
+            new_data.setlist(name, converted_data)
+         
         else:
             try:
                # individual fields deal with None values themselves
@@ -859,6 +863,9 @@ class CommaSeparatedIntegerField(TextField):
             validators.isCommaSeparatedIntegerList(field_data, all_data)
         except validators.ValidationError, e:
             raise validators.CriticalValidationError, e.messages
+
+    def html2python(data):
+        return data.split(',');
 
 class XMLLargeTextField(LargeTextField):
     """

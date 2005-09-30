@@ -163,7 +163,7 @@ class Field(object):
         """
         Returns a list of field names that this object adds to the manipulator.
         """
-        return [name_prefix + self.column]
+        return [name_prefix + self.name]
 
     def get_manipulator_fields(self, opts, manipulator, change, name_prefix='', rel=False):
         """
@@ -638,6 +638,12 @@ class ForeignKey(Field):
     def get_manipulator_field_objs(self):
         return [formfields.IntegerField]
 
+    def get_db_prep_save(self,value):
+        if value == '':
+            return None
+        else:
+            return int(value)
+    
     def flatten_data(self, obj = None):
         if not obj: 
             # In required many-to-one fields with only one available choice,
