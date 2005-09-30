@@ -137,6 +137,14 @@ So the middleware will iterate over that header, ordered by the preference
 value. The language with the highest preference that is in the django base
 message file directory will be used as the language to present to the user.
 
+Since the middlware discovers the language based on the request, your app
+might need to know what language is selected (if only to show the flag of
+that language). The selected language is stored by the middleware in the
+request as the LANGUAGE_CODE attribute. So with static translation (when
+you don't use the middlware) the language is in settings.LANGUAGE_CODE, while
+with dynamic translations (when you do use the middleware) it's in
+request.LANGUAGE_CODE.
+
 Creating Language Files
 =======================
 
