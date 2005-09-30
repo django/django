@@ -1,0 +1,245 @@
+======================
+How to do translations
+======================
+
+Django has support for internationalization of program strings and template
+content. Translations use the gettext library to produce strings in several
+languages. Here is an overview how translation works with django.
+
+The goal of this howto is to give programmers the needed informations on how
+to use translations in their own projects, on how to add translations to
+django patches and on how to update and create translation files.
+
+Using Translations in Python
+============================
+
+The translation machinery in django uses the standard gettext module that
+comes as part of your Python installation. It does wrap it in it's own
+functions and classes to accomplish all of it's goals, but essentially it's
+just standard gettext machinery.
+
+So to translate strings in your source you have to make use of one of the
+gettext helper functions. There are essentially two ways to make use of them:
+
+- you can use the _() function that is available globally. This function will
+  translate any string value it get's as parameter.
+- you can use django.utils.translation and import gettext or gettext_noop
+  from there. gettext is identical to _()
+
+There is one important thing to know about translations: the system can only
+translate strings it knows about. So to know about those strings you have to
+mark them for translation. That is done by either calling _(), gettext() or
+gettext_noop() on those string constants. You can translate variable values
+or computed values, but the system needs to know those strings beforehand.
+
+The usual way is to build your strings by standard string interpolation and
+to use the gettext functions to do the actual translation of the string
+itself, like so::
+
+   def hello_world(request, name, site):
+       page = _('Hello %(name)s, welcome to %(site)s!') % {
+           'name': name,
+           'site': site,
+       }
+       return page
+
+This short snippet shows one important thing: you shouldn't use the positional
+string interpolation (the one that uses %s and %d) but use the named string
+interpolation (the one that uses %(name)s), instead. The reason is that other
+languages might require a reordering of text.
+
+The other two helper functions are similar in use::
+
+
+   def hello_world(request, name, site):
+       from django.utils.translation import gettext
+       page = gettext('Hello %(name)s, welcome to %(site)s!') % {
+           'name': name,
+           'site': site,
+       }
+       return page
+
+The difference is, you explicitly import them. There are two important
+helpers: gettext and gettext_noop. gettext is just like _() - it will
+translate it's argument. gettext_noop is different in that it does only
+mark a string for inclusion into the message file but doesn't do translation.
+Instead the string is later translated from a variable. This comes up if you
+have constant strings that should be stored in the source language because
+they are exchanged over systems or users - like strings in a database - but
+should be translated at the last possible point in time, when the string
+is presented to the user.
+
+Using Translations in Templates
+===============================
+
+Using translations in the templates is much like in python code. There is
+just a template tag that will allow you to use the same _() helper function
+as with your source::
+
+   <html>
+   <title>{% i18n _('This is the title.') %}</title>
+   <body>
+   <p>{% i18n _('Hello %(name)s, welcome at %(site)s!') %}</p>
+   </body>
+   </html>
+
+This short snippet shows you how to do translations. You can just translate
+strings, but there is one speciality: the strings can contain interpolation
+parts. Those parts are automatically resolved from the template context, just
+as they would be if you had used them in {{ ... }}. But this can only resolve
+variables, not more complex expressions.
+
+To translate a variable value, you can just do {% i18n _(variable) %}. This
+can even include filters like {% i18n _(variable|lower} %}.
+
+How the Language is Discovered
+==============================
+
+Django has a very flexible model of deciding what language is to be used.
+The first line in choice is the LANGUAGE_CODE setting in your config file.
+This is used as the default translation - the last try if none of the other
+translattors find a translation. Actually if youre requirement is just to
+run django with your native language, you only need to set LANGUAGE_CODE
+and that's it - if there is a language file for django for your language.
+
+But with web applications, users come from all over the world. So you don't
+want to have a single translation active, you want to decide what language to
+present to each and every user. This is where the LocaleMiddleware comes
+into the picture. You need to add it to your middleware setting. It should
+be one of the first middlewares installed, but it should come after the
+session middleware - that's because it makes uses of the session data.
+
+So your middleware settings might look like this::
+
+    MIDDLEWARE_CLASSES = (
+       'django.middleware.sessions.SessionMiddleware',
+       'django.middleware.locale.LocaleMiddleware',
+       'django.middleware.admin.AdminUserRequired',
+       'django.middleware.common.CommonMiddleware',
+    )
+
+This activates the LocalMiddlware in your server (in this case it was taken
+from the admin.py settings file).
+
+The LocaleMiddleware allows a selection of the language based on data from
+the request - every user can have her own settings.
+
+The LocaleMiddleware first looks at the session data for the user. If that
+carries a key django_language, it's contents will be used as the language
+code. If the session doesn't contain a language setting, the middleware will
+look at the cookies for a django_language cookie. If that is found, it gives
+the language code. If neither the session nor the cookie carry a language code,
+the middleware will look at the HTTP header Accept-Language. This header is
+sent by your browser and tells the server what languages you prefer. Languages
+are ordered by some choice value - the higher, the more you prefer the language.
+
+So the middleware will iterate over that header, ordered by the preference
+value. The language with the highest preference that is in the django base
+message file directory will be used as the language to present to the user.
+
+Creating Language Files
+=======================
+
+So now you have tagged all your strings for later translation. But you need
+to write the translations themselves. They need to be in a format grokable
+by gettext. You need to update them. You may need to create new ones for new
+languages. This will show you how to do it.
+
+The first step is to create a message file for a new language. This can
+be created with a tool delivered with django. To run it on the django
+source tree (best from a subversion checkout), just go to the django-Directory
+itself. Not the one you checked out, but the one you linked to your
+$PYTHONPATH or the one that's localted somewhere on that path.
+
+That directory includes a subdirectory conf, and that a directory locale. The
+tools to do translations are in the django/bin directory. The first tool
+to use is make-messages.py - this tool will run over the whole source tree
+and pull out all strings marked for translation.
+
+To run it, just do the following::
+
+   bin/make-messages.py -l de
+
+This will create or update the german message file. This file is located
+at conf/locale/de/LC_MESSAGES/django.po - this file can be directly edited
+with your favorite editor. You need to first edit the charset line - search
+for CHARSET and set it to the charset you will use to edit the content. It
+might be that it is utf-8 - if you prefer another encoding, you can use some
+tools like recode or iconv to change the charset of the file and then change
+the charset definition in the file (it's in the Content-Type: line).
+
+Every message in the message file is of the same format. One line is the msgid.
+This is the actual string in the source - you don't change it. The other line
+is msgstr - this is the translation. It starts out empty. You change it.
+
+There is one speciality for long messages: there the first string directly
+after the msgstr (or msgid) is an emtpy string. Then the content itself will
+be written over the next few lines as one string per line. Those strings
+are directly concatenated - don't forget trailing spaces within the strings,
+otherwise they will be tacked together without whitespace!
+
+After you created your message file you need to transform it into some more
+efficient form to read by gettext. This is done with the second tool, that's
+compile-messages.py. This tool just runs over all available .po files and
+turns them into .mo files. Run it as follows::
+
+   bin/compile-messages.py
+
+That's it. You made your first translation. If you now configure your browser
+to request your language, it show up in the admin for example.
+
+Using Translations in Your Own Projects
+=======================================
+
+Of course you want to make use of the translations in your own projects, too.
+This is very simple with django, as django looks in several locations for
+message files. The base path in your django distribution is only the last
+place to look for translations. Before that, django looks first into your
+application directory (actually in the application directory of the view
+function that is about to be called!) for message files. If there is one for
+the selected language, it will be installed. After that django looks into the
+project directory for message files. If there is one for the selected language,
+it will be installed after the app-specific one. And only then comes the
+base translation.
+
+That way you can write applications that bring their own translations with
+them and you can override base translations in your project path if you
+want to do that. Or you can just build a big project out of several apps
+and put all translations into one big project message file. The choice is
+yours. All message file repositories are structured the same. They are:
+
+- $PROJECTPATH/apps/<app>/locale/<language>/LC_MESSAGES/django.(po|mo)
+- $PROJECTPATH/locale/<language>/LC_MESSAGES/django.(po|mo)
+- $PYTHONPATH/django/conf/locale/<language>/LC_MESSAGES/django.(po|mo)
+
+Actually the appliaction doesn't need to be stored below the project path -
+django uses module introspection to find the right place where your application
+is stored. It only needs to be listed in your INSTALLED_APPS setting.
+
+To create message files, you use the same make-messages.py tool as with the
+django message files. You only need to be in the right place - in the directory
+where either the conf/locale (in case of the source tree) or the locale/
+(in case of app messages or project messages) directory are located. And you
+use the same compile-messages.py to produce the binary django.mo files that
+are used by gettext.
+
+Specialities of Django Translation
+==================================
+
+If you know gettext, you might see some specialities with the way django does
+translations. For one, the string domain is allways django. The string domain
+is used to differentiate between different programs that store their stuff
+in a common messagefile library (usually /usr/share/locale/). In our case there
+are django-specific locale libraries and so the domain itself isn't used. We
+could store app message files with different names and put them for example
+in the project library, but decided against this: with message files in the
+application tree, they can more easily be distributed.
+
+Another speciality is that we only use gettext and gettext_noop - that's
+because django uses allways utf-8 strings internally. There isn't much use
+in using ugettext or something like that, as you allways will need to produce
+utf-8 anyway.
+
+And last we don't use xgettext alone and some makefiles but use python
+wrappers around xgettext and msgfmt. That's mostly for convenience.
+
