@@ -50,7 +50,6 @@ languages might require a reordering of text.
 
 The other two helper functions are similar in use::
 
-
    def hello_world(request, name, site):
        from django.utils.translation import gettext
        page = gettext('Hello %(name)s, welcome to %(site)s!') % {
@@ -69,6 +68,16 @@ they are exchanged over systems or users - like strings in a database - but
 should be translated at the last possible point in time, when the string
 is presented to the user.
 
+There is a standard problem with translations, that is pluralization of
+strings. This is done by the standard helper ngettext like so::
+
+    def hello_world(request, count):
+        from django.utils.translation import ngettext
+        page = ngettext('there is %(count)d object', 'there are %(count)d objects', count) % {
+            'count': count,
+        }
+       return page
+
 Using Translations in Templates
 ===============================
 
@@ -80,6 +89,7 @@ as with your source::
    <title>{% i18n _('This is the title.') %}</title>
    <body>
    <p>{% i18n _('Hello %(name)s, welcome at %(site)s!') %}</p>
+   <p>{% i18n ngettext('There is %(count)d file', 'There are %(count)d files', files|count) %}</p>
    </body>
    </html>
 
