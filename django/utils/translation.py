@@ -205,7 +205,7 @@ def get_language_from_request(request):
         globalpath = os.path.join(os.path.dirname(settings.__file__), 'locale')
 
         for lang, order in langs:
-            if os.path.isfile(os.path.join(globalpath, lang, 'LC_MESSAGES', 'django.mo')):
+            if lang == 'en' or os.path.isfile(os.path.join(globalpath, lang, 'LC_MESSAGES', 'django.mo')):
                 _accepted[accept] = lang
                 return lang
     
