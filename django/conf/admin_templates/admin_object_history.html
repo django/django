@@ -1,7 +1,7 @@
 {% extends "base_site" %}
 
 {% block breadcrumbs %}
-<div class="breadcrumbs"><a href="../../../../">Home</a> &rsaquo; <a href="../../">{{ module_name }}</a> &rsaquo; <a href="../">{{ object|truncatewords:"18" }}</a> &rsaquo; History</div>
+<div class="breadcrumbs"><a href="../../../../">{{ _('Home') }}</a> &rsaquo; <a href="../../">{{ module_name }}</a> &rsaquo; <a href="../">{{ object|truncatewords:"18" }}</a> &rsaquo; {{ _('History') }}</div>
 {% endblock %}
 
 {% block content %}
@@ -14,9 +14,9 @@
     <table id="change-history">
         <thead>
         <tr>
-            <th>Date/time</th>
-            <th>User</th>
-            <th>Action</th>
+            <th>{{ _('Date/time') }}</th>
+            <th>{{ _('User') }}</th>
+            <th>{{ _('Action') }}</th>
         </tr>
         </thead>
         <tbody>
@@ -32,7 +32,7 @@
 
 {% else %}
 
-    <p>This object doesn't have a change history. It probably wasn't added via this admin site.</p>
+    <p>{{ _('This object doesn't have a change history. It probably wasn't added via this admin site.') }}</p>
 
 {% endif %}
 

@@ -3,18 +3,18 @@
 {% block content %}
 
 {% if perms_lacking %}
-    <p>{% i18n _("Deleting the %(object_name)s  '%(object)s' would result in deleting related objects, but your account doesn't have permission to delete the following types of objects:") %}</p>
+    <p>{{ _("Deleting the %(object_name)s  '%(object)s' would result in deleting related objects, but your account doesn't have permission to delete the following types of objects:") }}</p>
     <ul>
     {% for obj in perms_lacking %}
         <li>{{ obj }}</li>
     {% endfor %}
     </ul>
 {% else %}
-    <p>{% i18n _('Are you sure you want to delete the %(object_name)s "%(object)s"? All of the following related items will be deleted:') %}</p>
+    <p>{{ _('Are you sure you want to delete the %(object_name)s "%(object)s"? All of the following related items will be deleted:') }}</p>
     <ul>{{ deleted_objects|unordered_list }}</ul>
     <form action="" method="post">
     <input type="hidden" name="post" value="yes" />
-    <input type="submit" value="{% i18n _("Yes, I'm sure") %}" />
+    <input type="submit" value="{{ _("Yes, I'm sure") }}" />
     </form>
 {% endif %}
 

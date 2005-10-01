@@ -19,13 +19,13 @@
         {% block branding %}{% endblock %}
         </div>
         {% if not user.is_anonymous %}
-        <div id="user-tools">{% i18n _('Welcome,') %} <strong>{% if user.first_name %}{{ user.first_name }}{% else %}{{ user.username }}{% endif %}</strong>. <br />{% block userlinks %}<a href="/admin/password_change/">{% i18n _('Change password') %}</a> / <a href="/admin/logout/">{% i18n _('Log out') %}</a>{% endblock %}</div>
+        <div id="user-tools">{{ _('Welcome,') }} <strong>{% if user.first_name %}{{ user.first_name }}{% else %}{{ user.username }}{% endif %}</strong>. <br />{% block userlinks %}<a href="/admin/password_change/">{{ _('Change password') }}</a> / <a href="/admin/logout/">{{ _('Log out') }}</a>{% endblock %}</div>
         {% endif %}
         {% block nav-global %}{% endblock %}
         <br class="clear" />
     </div>
     <!-- END Header -->
-    {% block breadcrumbs %}<div class="breadcrumbs"><a href="/">{% i18n _('Home') %}</a>{% if title %} &rsaquo; {{ title }}{% endif %}</div>{% endblock %}
+    {% block breadcrumbs %}<div class="breadcrumbs"><a href="/">{{ _('Home') }}</a>{% if title %} &rsaquo; {{ title }}{% endif %}</div>{% endblock %}
     {% endif %}
 
         {% if messages %}

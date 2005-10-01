@@ -1,11 +1,11 @@
 {% extends "base_site" %}
 
-{% block title %}{% i18n _('Page not found') %}{% endblock %}
+{% block title %}{{ _('Page not found') }}{% endblock %}
 
 {% block content %}
 
-<h2>{% i18n _('Page not found') %}</h2>
+<h2>{{ _('Page not found') }}</h2>
 
-<p>{% i18n _("We're sorry, but the requested page could not be found.") %}</p>
+<p>{{ _("We're sorry, but the requested page could not be found.") }}</p>
 
 {% endblock %}

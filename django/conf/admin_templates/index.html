@@ -23,13 +23,13 @@
             {% endif %}
 
             {% if model.perms.add %}
-                <td class="x50"><a href="{{ model.admin_url }}add/" class="addlink">{% i18n _('Add') %}</a></td>
+                <td class="x50"><a href="{{ model.admin_url }}add/" class="addlink">{{ _('Add') }}</a></td>
             {% else %}
                 <td class="x50">&nbsp;</td>
             {% endif %}
 
             {% if model.perms.change %}
-                <td class="x75"><a href="{{ model.admin_url }}" class="changelink">{% i18n _('Change') %}</a></td>
+                <td class="x75"><a href="{{ model.admin_url }}" class="changelink">{{ _('Change') }}</a></td>
             {% else %}
                 <td class="x75">&nbsp;</td>
             {% endif %}
@@ -39,7 +39,7 @@
         </div>
     {% endfor %}
 {% else %}
-    <p>{% i18n _("You don't have permission to edit anything.") %}</p>
+    <p>{{ _("You don't have permission to edit anything.") }}</p>
 {% endif %}
 </div>
 {% endblock %}
@@ -47,12 +47,12 @@
 {% block sidebar %}
 <div id="content-related">
     <div class="module" id="recent-actions-module">
-        <h2>{% i18n _('Recent Actions') %}</h2>
-        <h3>{% i18n _('My Actions') %}</h3>
+        <h2>{{ _('Recent Actions') }}</h2>
+        <h3>{{ _('My Actions') }}</h3>
             {% load auth.log %}
             {% get_admin_log 10 as admin_log for_user user %}
             {% if not admin_log %}
-            <p>{% i18n _('None available') %}</p>
+            <p>{{ _('None available') }}</p>
             {% else %}
             <ul class="actionlist">
             {% for entry in admin_log %}

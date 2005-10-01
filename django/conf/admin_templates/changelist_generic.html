@@ -5,7 +5,7 @@
 {% block content %}
 
 {% if not hide_add_link %}
-<ul class="object-tools"><li><a href="/{{ admin_url }}/add/" class="addlink">{% i18n _('Add') %} {{ object_name }}</a></li></ul>
+<ul class="object-tools"><li><a href="/{{ admin_url }}/add/" class="addlink">{{ _('Add') }} {{ object_name }}</a></li></ul>
 {% endif %}
 
 <div id="content-main">
@@ -23,7 +23,7 @@
     {% if changelist %}
     <ul class="changelist">
         {% for obj in changelist %}
-        <li class="{% cycle row1,row2 %}"><a href="/{{ admin_url }}/change/{{ obj.id }}/" title="{% i18n _('Click to change') %}">{{ obj|striptags|escape }}</a></li>
+        <li class="{% cycle row1,row2 %}"><a href="/{{ admin_url }}/change/{{ obj.id }}/" title="{{ _('Click to change') }}">{{ obj|striptags|escape }}</a></li>
         {% endfor %}
     </ul>
     {% endif %}

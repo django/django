@@ -39,7 +39,9 @@ if not os.path.isdir(basedir):
 
 lf = os.path.join(basedir, '%s.po' % domain)
 
-tpl_re = re.compile(r'{%\s+i18n\s+.*?%}')
+tpl_i18n_re = re.compile(r'{%\s+i18n\s+.*?%}')
+tpl_value_re = re.compile(r'{{\s*_\(.*?\)\s*}}')
+tpl_tag_re = re.compile(r"""{%.*_\((?:".*?")|(?:'.*?')\).*%}""")
 
 for (dirpath, dirnames, filenames) in os.walk("."):
     for file in filenames:
@@ -48,7 +50,11 @@ for (dirpath, dirnames, filenames) in os.walk("."):
             if file.endswith('.html'):
                 src = open(os.path.join(dirpath, file), "rb").read()
                 lst = []
-                for match in tpl_re.findall(src):
+                for match in tpl_i18n_re.findall(src):
+                   lst.append(match)
+                for match in tpl_value_re.findall(src):
+                   lst.append(match)
+                for match in tpl_tag_re.findall(src):
                    lst.append(match)
                 open(os.path.join(dirpath, '%s.py' % file), "wb").write('\n'.join(lst))
                 thefile = '%s.py' % file
