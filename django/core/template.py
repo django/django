@@ -418,7 +418,7 @@ def resolve_variable(path, context):
     if path[0]  in ('"', "'") and path[0] == path[-1]:
         current = path[1:-1]
     elif path.startswith('_(') and path.endswith(')') and path[2] in ("'", '"') and path[-2] == path[2]:
-        current = _(path[3:-2])
+        current = _(path[3:-2]) % context
     else:
         current = context
         bits = path.split(VARIABLE_ATTRIBUTE_SEPARATOR)

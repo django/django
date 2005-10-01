@@ -244,6 +244,9 @@ TEMPLATE_TESTS = {
 
     # translation of string without i18n tag
     'i18n11': ('{{ _("blah") }}', {}, "blah"),
+
+    # translation of string without i18n tag but with interpolation
+    'i18n12': ('{{ _("blah%(anton)s") }}', {'anton': 'blubb'}, "blahblubb"),
 }
 
 # This replaces the standard template_loader.
