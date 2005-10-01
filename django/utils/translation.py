@@ -200,7 +200,7 @@ def get_language_from_request(request):
             return (lang, order)
 
         langs = [_parsed(el) for el in accept.split(',')]
-        langs.sort(lambda a,b: cmp(a[1], b[1]))
+        langs.sort(lambda a,b: -1*cmp(a[1], b[1]))
 
         globalpath = os.path.join(os.path.dirname(settings.__file__), 'locale')
 
