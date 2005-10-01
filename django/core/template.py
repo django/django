@@ -254,11 +254,15 @@ class FilterParser:
         self.filters = []
         self.current_filter_name = None
         self.current_filter_arg = None
-        # First read the variable part
-        self.var = self.read_alphanumeric_token()
+        # First read the variable part - decide on wether we need
+        # to parse a string or a variable by peeking into the stream
+        if self.peek_char() in ('_', '"', "'"):
+            self.var = self.read_constant_string_token()
+        else:
+            self.var = self.read_alphanumeric_token()
         if not self.var:
             raise TemplateSyntaxError, "Could not read variable name: '%s'" % self.s
-        if self.var.find(VARIABLE_ATTRIBUTE_SEPARATOR + '_') > -1 or self.var[0] == '_':
+        if self.var.find(VARIABLE_ATTRIBUTE_SEPARATOR + '_') > -1 or (self.var[0] == '_' and not self.var.startswith('_(')):
             raise TemplateSyntaxError, "Variables and attributes may not begin with underscores: '%s'" % self.var
         # Have we reached the end?
         if self.current is None:
@@ -268,12 +272,51 @@ class FilterParser:
         # We have a filter separator; start reading the filters
         self.read_filters()
 
+    def peek_char(self):
+        try:
+            return self.s[self.i+1]
+        except IndexError:
+            return None
+
     def next_char(self):
         self.i = self.i + 1
         try:
             self.current = self.s[self.i]
         except IndexError:
             self.current = None
+
+    def read_constant_string_token(self):
+        """Read a constant string that must be delimited by either "
+        or ' characters. The string is returned with it's delimiters
+        and a possible i18n tag."""
+        val = ''
+        i18n = False
+        qchar = None
+        self.next_char()
+        if self.current == '_':
+            self.next_char()
+            if self.current != '(':
+                raise TemplateSyntaxError, "Bad character (expecting '(') '%s'" % self.current
+            i18n = True
+            val = '_('
+            self.next_char()
+        if not self.current in ('"', "'"):
+            raise TemplateSyntaxError, "Bad character (expecting '\"' or ''') '%s'" % self.current
+        qchar = self.current
+        val += qchar
+        while 1:
+           self.next_char()
+           if self.current == qchar:
+               break
+           val += self.current
+        val += self.current
+        if i18n:
+           self.next_char()
+           if self.current != ')':
+                raise TemplateSyntaxError, "Bad character (expecting ')') '%s'" % self.current
+           val += self.current
+        self.next_char()
+        return val
 
     def read_alphanumeric_token(self):
         """Read a variable name or filter name, which are continuous strings of
@@ -372,8 +415,10 @@ def resolve_variable(path, context):
 
     (The example assumes VARIABLE_ATTRIBUTE_SEPARATOR is '.')
     """
-    if path[0] in ('"', "'") and path[0] == path[-1]:
+    if path[0]  in ('"', "'") and path[0] == path[-1]:
         current = path[1:-1]
+    elif path.startswith('_(') and path.endswith(')') and path[2] in ("'", '"') and path[-2] == path[2]:
+        current = _(path[3:-2])
     else:
         current = context
         bits = path.split(VARIABLE_ATTRIBUTE_SEPARATOR)

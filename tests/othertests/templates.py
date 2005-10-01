@@ -241,6 +241,9 @@ TEMPLATE_TESTS = {
 
     # simple non-translation (only marking) of a string to german
     'i18n10': ('{% i18n gettext_noop("Page not found") %}', {'LANGUAGE_CODE': 'de'}, "Page not found"),
+
+    # translation of string without i18n tag
+    'i18n11': ('{{ _("blah") }}', {}, "blah"),
 }
 
 # This replaces the standard template_loader.

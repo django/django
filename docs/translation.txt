@@ -102,6 +102,20 @@ variables, not more complex expressions.
 To translate a variable value, you can just do {% i18n _(variable) %}. This
 can even include filters like {% i18n _(variable|lower} %}.
 
+There is additional support for i18n string constants for other situations
+as well. All template tags that do variable resolving (with or without filters)
+will accept string constants, too. Those string constants can now be i18n
+strings like this::
+
+   <html>
+   <title>{{ _('This is the title') }}</title>
+   <body>
+   <p>{{ _('Hello World!') }}</p>
+   </body>
+   </html>
+
+This is much shorter, but won't allow you to use gettext_noop or ngettext.
+
 How the Language is Discovered
 ==============================
 
