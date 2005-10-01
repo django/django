@@ -149,6 +149,14 @@ def gettext_noop(message):
     """
     return message
 
+def ngettext(singular, plural, number):
+    """
+    This function returns the translation of either the singular
+    or plural, based on the number.
+    """
+    if number == 1: return gettext(singular)
+    else: return gettext(plural)
+
 def get_language_from_request(request):
     """
     analyze the request to find what language the user

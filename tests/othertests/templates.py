@@ -1,4 +1,5 @@
 from django.core import template, template_loader
+from django.utils.translation import activate, deactivate
 
 # Helper objects for template tests
 class SomeClass:
@@ -210,6 +211,33 @@ TEMPLATE_TESTS = {
 
     # Raise exception for custom tags used in child with {% load %} tag in parent, not in child
     'exception04': ("{% extends 'inheritance17' %}{% block first %}{% echo 400 %}5678{% endblock %}", {}, template.TemplateSyntaxError),
+
+    # simple translation of a string delimited by '
+    'i18n01': ("{% i18n _('xxxyyyxxx') %}", {}, "xxxyyyxxx"),
+
+    # simple translation of a string delimited by "
+    'i18n02': ('{% i18n _("xxxyyyxxx") %}', {}, "xxxyyyxxx"),
+
+    # simple translation of a string delimited by """
+    'i18n03': ('{% i18n _("""xxxyyyxxx""") %}', {}, "xxxyyyxxx"),
+
+    # simple translation of a variable
+    'i18n04': ('{% i18n _(anton) %}', {'anton': 'xxxyyyxxx'}, "xxxyyyxxx"),
+
+    # simple translation of a variable
+    'i18n05': ('{% i18n _(anton|lower) %}', {'anton': 'XXXYYYXXX'}, "xxxyyyxxx"),
+
+    # simple translation of a string with interpolation
+    'i18n05': ('{% i18n _("xxx%(anton)sxxx") %}', {'anton': 'yyy'}, "xxxyyyxxx"),
+
+    # simple translation of a string to german
+    'i18n07': ('{% i18n _("Page not found") %}', {'LANGUAGE_CODE': 'de'}, "Seite nicht gefunden"),
+
+    # translation of singular form
+    'i18n08': ('{% i18n ngettext("singular", "plural", count) %}', {'count': 1}, "singular"),
+
+    # translation of plural form
+    'i18n09': ('{% i18n ngettext("singular", "plural", count) %}', {'count': 2}, "plural"),
 }
 
 # This replaces the standard template_loader.
@@ -225,6 +253,8 @@ def run_tests(verbosity=0, standalone=False):
     tests = TEMPLATE_TESTS.items()
     tests.sort()
     for name, vals in tests:
+        if 'LANGUAGE_CODE' in vals[1]:
+            activate('*', vals[1]['LANGUAGE_CODE'])
         try:
             output = template_loader.get_template(name).render(template.Context(vals[1]))
         except Exception, e:
@@ -236,6 +266,8 @@ def run_tests(verbosity=0, standalone=False):
                     print "Template test: %s -- FAILED. Got %s, exception: %s" % (name, e.__class__, e)
                 failed_tests.append(name)
             continue
+        if 'LANGUAGE_CODE' in vals[1]:
+            deactivate()
         if output == vals[2]:
             if verbosity:
                 print "Template test: %s -- Passed" % name

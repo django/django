@@ -291,22 +291,31 @@ class I18NNode(template.Node):
     def __init__(self, cmd):
         self.cmd = cmd
         self.i18n_re = re.compile(r'^\s*_\((.*)\)\s*$')
+        self.ngettext_re = re.compile(r'''^\s*ngettext\(((?:".+")|(?:'.+')|(?:""".+"""))\s*,\s*((?:".+")|(?:'.+')|(?:""".+"""))\s*,\s*(.*)\)\s*$''')
+
+    def _resolve_var(self, s, context):
+        if s.startswith("'") and s.endswith("'"):
+            s = s[1:-1]
+        elif s.startswith('"""') and s.endswith('"""'):
+            s = s[3:-3]
+        elif s.startswith('"') and s.endswith('"'):
+            s = s[1:-1]
+        else:
+            s = template.resolve_variable_with_filters(s, context)
+        return s
 
     def render(self, context):
         m = self.i18n_re.match(self.cmd)
         if m:
-            s = m.group(1)
-            if s.startswith("'") and s.endswith("'"):
-                s = s[1:-1]
-            elif s.startswith('"""') and s.endswith('"""'):
-                s = s[3:-3]
-            elif s.startswith('"') and s.endswith('"'):
-                s = s[1:-1]
-            else:
-                s = template.resolve_variable_with_filters(s, context)
+            s = self._resolve_var(m.group(1), context)
             return translation.gettext(s) % context
-        else:
-            raise template.TemplateSyntaxError("i18n must be called as {% i18n _('some message') %}")
+        m = self.ngettext_re.match(self.cmd)
+        if m:
+            singular = self._resolve_var(m.group(1), context)
+            plural = self._resolve_var(m.group(2), context)
+            var = template.resolve_variable_with_filters(m.group(3), context)
+            return translation.ngettext(singular, plural, var) % context
+        raise template.TemplateSyntaxError("i18n must be called as {% i18n _('some message') %} or {% i18n ngettext('singular', 'plural', var) %}")
 
 def do_comment(parser, token):
     """
@@ -778,6 +787,7 @@ def do_i18n(parser, token):
     For example::
 
         {% i18n _('test') %}
+        {% i18n ngettext('singular', 'plural', counter) %}
 
     """
     args = token.contents.split(' ', 1)
