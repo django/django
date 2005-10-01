@@ -154,8 +154,15 @@ def ngettext(singular, plural, number):
     This function returns the translation of either the singular
     or plural, based on the number.
     """
-    if number == 1: return gettext(singular)
-    else: return gettext(plural)
+    global _default, _active
+
+    t = _active.get(currentThread(), None)
+    if t is not None:
+        return t.ngettext(singular, plural, number)
+    if _default is None:
+        from django.conf import settings
+        _default = translation('*', settings.LANGUAGE_CODE)
+    return _default.ngettext(singular, plural, number)
 
 def get_language_from_request(request):
     """
