@@ -238,6 +238,9 @@ TEMPLATE_TESTS = {
 
     # translation of plural form
     'i18n09': ('{% i18n ngettext("singular", "plural", count) %}', {'count': 2}, "plural"),
+
+    # simple non-translation (only marking) of a string to german
+    'i18n10': ('{% i18n gettext_noop("Page not found") %}', {'LANGUAGE_CODE': 'de'}, "Page not found"),
 }
 
 # This replaces the standard template_loader.

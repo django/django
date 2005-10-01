@@ -290,7 +290,7 @@ class I18NNode(template.Node):
 
     def __init__(self, cmd):
         self.cmd = cmd
-        self.i18n_re = re.compile(r'^\s*_\((.*)\)\s*$')
+        self.i18n_re = re.compile(r'^\s*(_|gettext|gettext_noop)\((.*)\)\s*$')
         self.ngettext_re = re.compile(r'''^\s*ngettext\(((?:".+")|(?:'.+')|(?:""".+"""))\s*,\s*((?:".+")|(?:'.+')|(?:""".+"""))\s*,\s*(.*)\)\s*$''')
 
     def _resolve_var(self, s, context):
@@ -307,8 +307,14 @@ class I18NNode(template.Node):
     def render(self, context):
         m = self.i18n_re.match(self.cmd)
         if m:
-            s = self._resolve_var(m.group(1), context)
-            return translation.gettext(s) % context
+            f = m.group(1)
+            s = self._resolve_var(m.group(2), context)
+            if f in ('_', 'gettext'):
+                return translation.gettext(s) % context
+            elif f == 'gettext_noop':
+                return translation.gettext_noop(s) % context
+            else:
+                raise template.TemplateSyntaxError("i18n only supports _, gettext, gettext_noop and ngettext as functions, not %s" % f)
         m = self.ngettext_re.match(self.cmd)
         if m:
             singular = self._resolve_var(m.group(1), context)
