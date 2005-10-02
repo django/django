@@ -1,0 +1,307 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2005-10-01 18:22+0200\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=iso-8859-1\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: core/validators.py:56
+msgid "This value must contain only letters, numbers and underscores."
+msgstr "Sono ammessi solo lettere, numeri e caratteri di sottolineaturai."
+
+#: conf/admin_templates/404.html:3 conf/admin_templates/404.html:7
+#: conf/admin_templates/404.html.py:1 conf/admin_templates/404.html.py:2
+msgid "Page not found"
+msgstr "Pagina non trovata"
+
+#: conf/admin_templates/404.html:9 conf/admin_templates/404.html.py:3
+msgid "We're sorry, but the requested page could not be found."
+msgstr "Spiacente, ma la pagina richiesta non esiste."
+
+#: conf/admin_templates/index.html:26
+#: conf/admin_templates/changelist_generic.html:8
+#: conf/admin_templates/changelist_generic.html.py:1
+#: conf/admin_templates/index.html.py:1
+msgid "Add"
+msgstr "Aggiungi"
+
+#: conf/admin_templates/index.html:32 conf/admin_templates/index.html.py:2
+msgid "Change"
+msgstr "Cambia"
+
+#: conf/admin_templates/index.html:50 conf/admin_templates/index.html.py:4
+msgid "Recent Actions"
+msgstr "Azioni Recenti"
+
+#: conf/admin_templates/index.html:51 conf/admin_templates/index.html.py:5
+msgid "My Actions"
+msgstr "Proprie Azioni"
+
+#: conf/admin_templates/index.html:55 conf/admin_templates/index.html.py:6
+msgid "None available"
+msgstr "Nessuna disponibile"
+
+#: conf/admin_templates/base_site.html:3
+#: conf/admin_templates/base_site.html.py:1
+msgid "Django site admin"
+msgstr "Amministrazione sito Django"
+
+#: conf/admin_templates/base_site.html:6
+#: conf/admin_templates/base_site.html.py:2
+msgid "Django administration"
+msgstr "Amministrazione Django"
+
+#: conf/admin_templates/500.html:5 conf/admin_templates/500.html.py:1
+msgid "Server error (500)"
+msgstr "Errore del server (500)"
+
+#: conf/admin_templates/500.html:8
+msgid "Server error <em>(500)</em>"
+msgstr "Errore del server <em>(500)</em>"
+
+#: conf/admin_templates/500.html:9 conf/admin_templates/500.html.py:3
+msgid ""
+"There's been an error. It's been reported to the site administrators via e-"
+"mail and should be fixed shortly. Thanks for your patience."
+msgstr ""
+"C'è stato un errore. E' stato riportato agli amministratori del sito via e-"
+"mail e verrà risolto a breve. Grazie per la vostra pazienza"
+
+#: conf/admin_templates/delete_confirmation_generic.html:6
+#: conf/admin_templates/delete_confirmation_generic.html.py:1
+#, python-format
+msgid ""
+"Deleting the %(object_name)s  '%(object)s' would result in deleting related "
+"objects, but your account doesn't have permission to delete the following "
+"types of objects:"
+msgstr ""
+"La rimozione di %(object_name)s '%(object)s' causerebbe la cancellazione "
+"degli oggetti relazionati, ma il tuo account non ha i permessi per rimuovere "
+"i seguenti tipi di oggetti:"
+
+#: conf/admin_templates/delete_confirmation_generic.html:13
+#: conf/admin_templates/delete_confirmation_generic.html.py:2
+#, python-format
+msgid ""
+"Are you sure you want to delete the %(object_name)s \"%(object)s\"? All of "
+"the following related items will be deleted:"
+msgstr ""
+"Sei sicuro di voler rimuovere %(object_name)s \"%(object)s\"? I seguenti"
+"oggetti relazionati saranno rimossi:"
+
+#: conf/admin_templates/login.html:14 conf/admin_templates/login.html.py:1
+msgid "Username:"
+msgstr "Nome utente:"
+
+#: conf/admin_templates/login.html:17 conf/admin_templates/login.html.py:2
+msgid "Password:"
+msgstr "Password:"
+
+#: conf/admin_templates/login.html:19 conf/admin_templates/login.html.py:3
+msgid "Have you <a href=\"/password_reset/\">forgotten your password</a>?"
+msgstr "Hai <a href=\"/password_reset/\">dimenticato la tua password</a>?"
+
+#: conf/admin_templates/base.html:22 conf/admin_templates/base.html.py:1
+msgid "Welcome,"
+msgstr "Benvenuto,"
+
+#: conf/admin_templates/base.html:22 conf/admin_templates/base.html.py:2
+#: conf/admin_templates/base.html.py:5
+msgid "Change password"
+msgstr "Cambia la password"
+
+#: conf/admin_templates/base.html:22 conf/admin_templates/base.html.py:3
+#: conf/admin_templates/base.html.py:5
+msgid "Log out"
+msgstr "Esci"
+
+#: conf/admin_templates/base.html:28 conf/admin_templates/base.html.py:4
+#: conf/admin_templates/registration/password_change_done.html.py:1
+#: conf/admin_templates/registration/password_reset_form.html.py:1
+#: conf/admin_templates/registration/logged_out.html.py:1
+#: conf/admin_templates/registration/password_reset_done.html.py:1
+#: conf/admin_templates/registration/password_change_form.html.py:1
+#: conf/admin_templates/admin_object_history.html.py:1
+msgid "Home"
+msgstr "Pagina iniziale"
+
+#: conf/admin_templates/index.html:42 conf/admin_templates/index.html.py:3
+msgid "You don't have permission to edit anything."
+msgstr "Non hai i permessi di modificare nulla."
+
+#: conf/admin_templates/changelist_generic.html.py:2
+msgid "Click to change"
+msgstr "Clicca per cambiare"
+
+#: conf/admin_templates/500.html.py:2
+msgid "Server Error <em>(500)</em>"
+msgstr "Errore del Server <em>(500)</em>"
+
+#: conf/admin_templates/delete_confirmation_generic.html.py:3
+msgid "Yes, I'm sure"
+msgstr "Sì, sono sicuro"
+
+#: conf/admin_templates/login.html.py:4
+msgid "Log in"
+msgstr "Accedi"
+
+#: conf/admin_templates/registration/password_change_done.html.py:2
+#: conf/admin_templates/registration/password_change_form.html.py:2
+#: conf/admin_templates/registration/password_change_form.html.py:3
+#: conf/admin_templates/registration/password_change_done.html.py:6
+#: conf/admin_templates/registration/password_change_form.html.py:4
+#: conf/admin_templates/registration/password_change_form.html.py:10
+msgid "Password change"
+msgstr "Cambia la password"
+
+#: conf/admin_templates/registration/password_change_done.html.py:3
+#: conf/admin_templates/registration/password_change_done.html.py:4
+msgid "Password change successful"
+msgstr "La password è stata cambiata con successo"
+
+#: conf/admin_templates/registration/password_change_done.html.py:5
+msgid "Your password was changed."
+msgstr "La tua password è stata cambiata"
+
+#: conf/admin_templates/registration/password_reset_form.html.py:2
+#: conf/admin_templates/registration/password_reset_form.html.py:3
+#: conf/admin_templates/registration/password_reset_form.html.py:4
+#: conf/admin_templates/registration/password_reset_done.html.py:2
+#: conf/admin_templates/registration/password_reset_form.html.py:8
+#: conf/admin_templates/registration/password_reset_form.html.py:9
+#: conf/admin_templates/registration/password_reset_done.html.py:6
+msgid "Password reset"
+msgstr "Resetta la password"
+
+#: conf/admin_templates/registration/password_reset_form.html.py:5
+msgid ""
+"Forgotten your password? Enter your e-mail address below, and we'll reset "
+"your password and e-mail the new one to you."
+msgstr ""
+"Hai dimenticato la tua password? Inserisci il tuo indirizzo e-mail qui sotto, "
+"la tua password sarà resettata e una nuova password ti verrà spedita."
+
+#: conf/admin_templates/registration/password_reset_form.html.py:6
+msgid "E-mail address:"
+msgstr "Indirizzo e-mail:"
+
+#: conf/admin_templates/registration/password_reset_form.html.py:7
+msgid "Reset my password"
+msgstr "Resetta la mia password"
+
+#: conf/admin_templates/registration/logged_out.html.py:2
+msgid "Thanks for spending some quality time with the Web site today."
+msgstr "Grazie per aver speso il tuo tempo prezioso con questo sito."
+
+#: conf/admin_templates/registration/logged_out.html.py:3
+msgid "Log in again"
+msgstr "Accedi di nuovo"
+
+#: conf/admin_templates/registration/password_reset_done.html.py:3
+#: conf/admin_templates/registration/password_reset_done.html.py:4
+msgid "Password reset successful"
+msgstr "Password resettata con successo"
+
+#: conf/admin_templates/registration/password_reset_done.html.py:5
+msgid ""
+"We've e-mailed a new password to the e-mail address you submitted. You "
+"should be receiving it shortly."
+msgstr ""
+"Ti abbiamo inviato la nuova password all'indirizzo e-mail da te selezionato. "
+"Dovresti riceverla a breve."
+
+#: conf/admin_templates/registration/password_change_form.html.py:4
+#: conf/admin_templates/registration/password_change_form.html.py:5
+msgid ""
+"Please enter your old password, for security's sake, and then enter your new "
+"password twice so we can verify you typed it in correctly."
+msgstr ""
+"Inserisci la tua vecchia password, per ragioni di sicurezza, e poi la tua "
+"nuova password due volte per verificare che tu l'abbia scritta correttamente."
+
+#: conf/admin_templates/registration/password_change_form.html.py:5
+#: conf/admin_templates/registration/password_change_form.html.py:6
+msgid "Old password:"
+msgstr "Vecchia password:"
+
+#: conf/admin_templates/registration/password_change_form.html.py:6
+#: conf/admin_templates/registration/password_change_form.html.py:7
+msgid "New password:"
+msgstr "Nuova password:"
+
+#: conf/admin_templates/registration/password_change_form.html.py:7
+#: conf/admin_templates/registration/password_change_form.html.py:8
+msgid "Confirm password:"
+msgstr "Conferma password:"
+
+#: conf/admin_templates/registration/password_change_form.html.py:8
+#: conf/admin_templates/registration/password_change_form.html.py:9
+msgid "Change my password"
+msgstr "Cambia la mia password"
+
+#: conf/admin_templates/registration/password_reset_email.html.py:1
+msgid "You're receiving this e-mail because you requested a password reset"
+msgstr "Hai ricevuto questa e-mail perché hai richesto di resettare la password"
+
+#: conf/admin_templates/registration/password_reset_email.html.py:2
+#, python-format
+msgid "for your user account at %(site_name)s"
+msgstr "per il tuo account utente su %(site_name)s"
+
+#: conf/admin_templates/registration/password_reset_email.html.py:3
+#, python-format
+msgid "Your new password is: %(new_password)s"
+msgstr "La tua nuova password è: %(new_password)s"
+
+#: conf/admin_templates/registration/password_reset_email.html.py:4
+msgid "Feel free to change this password by going to this page:"
+msgstr "Puoi cambiare la tua password su questa pagina:"
+
+#: conf/admin_templates/registration/password_reset_email.html.py:5
+msgid "Your username, in case you've forgotten:"
+msgstr "Il tuo nome utente, in caso tu l'abbia dimenticato:"
+
+#: conf/admin_templates/registration/password_reset_email.html.py:6
+msgid "Thanks for using our site!"
+msgstr "Ti ringraziamo per l'utilizzo del nostro sito!"
+
+#: conf/admin_templates/registration/password_reset_email.html.py:7
+#, python-format
+msgid "The %(site_name)s team"
+msgstr "Il team di %(site_name)s"
+
+#: conf/admin_templates/admin_object_history.html.py:2
+msgid "History"
+msgstr "Storia"
+
+#: conf/admin_templates/admin_object_history.html.py:3
+msgid "Date/time"
+msgstr "Data/ora"
+
+#: conf/admin_templates/admin_object_history.html.py:4
+msgid "User"
+msgstr "Utente"
+
+#: conf/admin_templates/admin_object_history.html.py:5
+msgid "Action"
+msgstr "Azione"
+
+#: conf/admin_templates/admin_object_history.html.py:6
+msgid ""
+"This object doesn't have a change history. It probably wasn't added via this "
+"admin site."
+msgstr ""
+"Questo oggetto non ha cambiamenti storicizzati. Probabilmente non è stato "
+"creato con questo sito amministrativo."
+
