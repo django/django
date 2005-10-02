@@ -1035,10 +1035,9 @@ def method_set_related_many_to_many(rel_opts, rel_field, self, id_list):
     m2m_table = rel_field.get_m2m_db_table(rel_opts)
     this_id = getattr(self, self._meta.pk.column)
     cursor = db.db.cursor()
-    delete_stmt = "DELETE FROM %s WHERE %s_id = %%s" % (m2m_table, rel.object_name.lower())
-    cursor.execute(delete_stmt, [this_id])
-    insert_stmt = "INSERT INTO %s (%s, %s) VALUES (%%s, %%s)" % (m2m_table, rel.pk.column, rel_opts.pk.column)
-    cursor.executemany(insert_stmt, [(this_id, i) for i in id_list])
+    cursor.execute("DELETE FROM %s WHERE %s_id = %%s" % (m2m_table, rel.object_name.lower()), [this_id])
+    sql = "INSERT INTO %s (%s_id, %s_id) VALUES (%%s, %%s)" % (m2m_table, rel.object_name.lower(), rel_opts.object_name.lower())
+    cursor.executemany(sql, [(this_id, i) for i in id_list])
     db.db.commit()
 
 # ORDERING METHODS #########################
@@ -1489,7 +1488,7 @@ def get_manipulator(opts, klass, extra_methods, add=False, change=False):
         setattr(man, k, v)
     return man
 
-def manipulator_init(opts, add, change, self, obj_key=None, follow=None):
+def manipulator_init(opts, add, change, self, obj_key=None):
     if change:
         assert obj_key is not None, "ChangeManipulator.__init__() must be passed obj_key parameter."
         self.obj_key = obj_key
