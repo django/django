@@ -8,6 +8,12 @@ from django.utils.functional import curry
 from django.views.admin.main import AdminBoundField
 import re
 
+word_re = re.compile('[A-Z][a-z]+')
+
+def class_name_to_underscored(name):
+    return '_'.join([ s.lower() for s in word_re.findall(name)[:-1] ])
+
+
 class IncludeAdminScriptNode(template.Node):
     def __init__(self, var):
         self.var = var
@@ -43,23 +49,6 @@ class SubmitRowNode(template.Node):
           }, context);
         context.pop() 
         return output;
-#	  t = ['<div class="submit-row">']
-	  
-#	  if not is_popup:
-#	  	if has_delete_permission and (change or show_delete):
-#	      	   t.append('<p class="float-left"><a href="delete/" class="deletelink">Delete</a></p>')
-#	        if change and save_as:
-#		   t.append('<input type="submit" value="Save as new" name="_saveasnew" %s/>' %  onclick_attrib)
-#                if (not save_as or add):
-#		   t.append('<input type="submit" value="Save and add another" name="_addanother" %s/>' %  onclick_attrib)
-#	        t.append('<input type="submit" value="Save and continue editing" name="_continue" %s/>' %  onclick_attrib )
-#	  t.append('<input type="submit" value="Save" class="default" %s/>' %  onclick_attrib)
-#	  t.append('</div>\n')
-	 
-#	  return ''.join(t)
-
-
-
 
 class AdminFieldBoundNode(template.Node):
     def __init__(self, argument):
@@ -103,19 +92,32 @@ class FieldWidgetNode(template.Node):
         self.bound_field_var = bound_field_var
 
     def render(self, context):
+    
         bound_field = template.resolve_variable(self.bound_field_var, context)
         add = context['add']
         change = context['change']
         
         context.push()
         context['bound_field'] = bound_field
-        t = template_loader.get_template("admin_field_widget")
-        output =  t.render(context)
-        context.pop()
-          
-        return output
-
+        klass = bound_field.field.__class__
+        t = None
+        while klass:
+            try: 
+                field_class_name = klass.__name__
+                template_name = "widget/%s" % \
+                    class_name_to_underscored(field_class_name)
+            
+                t = template_loader.get_template(template_name)
+                break
+            except template.TemplateDoesNotExist: 
+                klass = (len(klass.__bases__) > 0) and klass.__bases__[0] or None
         
+        if t == None:
+            t = template_loader.get_template("widget/default")
+       
+        output = t.render(context)
+        context.pop()
+        return output
 
 class FieldWrapper(object):
     def __init__(self, field ):
@@ -259,9 +261,9 @@ one_arg_tag_nodes = [
     FilterInterfaceScriptMaybeNode,
 ]
 
-word = re.compile('[A-Z][a-z]+')
+
 def register_one_arg_tag(node):
-    tag_name = '_'.join([ s.lower() for s in word.findall(node.__name__)[:-1] ])
+    tag_name = class_name_to_underscored(node.__name__)
     parse_func = curry(do_one_arg_tag, node)
     template.register_tag(tag_name, parse_func)
 

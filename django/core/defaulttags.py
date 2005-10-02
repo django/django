@@ -228,15 +228,17 @@ class SsiNode(template.Node):
         return output
 
 class IncludeNode(template.Node):
-    def __init__(self, template_path):
+    def __init__(self, template_path_var):
         self.template_path_var = template_path_var
 
     def render(self, context):
          try:
-             template_path = template.resolve(self.template_path_var, context)
+             template_path = template.resolve_variable(self.template_path_var, context)
+             print "IncludeNode rendering %s" % template_path 
              t = template_loader.get_template(template_path)
              return t.render(context)
-         except:
+         except Exception, e:
+             print e
              return '' # Fail silently for invalid included templates.
 
 
