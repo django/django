@@ -46,6 +46,9 @@ class DjangoTranslation(gettext_module.GNUTranslations):
     def set_app_and_language(self, app, language):
         self.__app = app
         self.__language = language
+
+    def language(self):
+        return self.__language
     
     def __repr__(self):
         return "<DjangoTranslation app:%s lang:%s>" % (self.__app, self.__language)
@@ -120,6 +123,17 @@ def deactivate():
     """
     del _active[currentThread()]
 
+def get_language():
+    """
+    This function returns the currently selected language.
+    """
+    t = _active.get(currentThread(), None)
+    if t is not None:
+        return t.language()
+    else:
+        from django.conf.settings import LANGUAGE_CODE
+        return LANGUAGE_CODE
+
 def gettext(message):
     """
     This function will be patched into the builtins module to
@@ -171,8 +185,17 @@ def get_language_from_request(request):
     """
     global _accepted
 
+    if request.GET:
+        lang = request.GET.get('django_language', None)
+        if lang is not None:
+            if hasattr(request, 'session'):
+                request.session['django_language'] = lang
+            else:
+                request.set_cookie('django_language', lang)
+            return lang
+
     if hasattr(request, 'session'):
-        lang = getattr(request.session, 'django_language', None)
+        lang = request.session.get('django_language', None)
         if lang is not None:
             return lang
     

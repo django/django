@@ -34,6 +34,12 @@ class DjangoContext(Context):
         self['user'] = request.user
         self['messages'] = request.user.get_and_delete_messages()
         self['perms'] = PermWrapper(request.user)
+        from django.conf import settings
+        self['LANGUAGES'] = settings.LANGUAGES
+        if hasattr(request, 'LANGUAGE_CODE'):
+            self['LANGUAGE_CODE'] = request.LANGUAGE_CODE
+        else:
+            self['LANGUAGE_CODE'] = settings.LANGUAGE_CODE
         if DEBUG and request.META.get('REMOTE_ADDR') in INTERNAL_IPS:
             self['debug'] = True
             from django.core import db

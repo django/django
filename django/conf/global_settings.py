@@ -28,6 +28,16 @@ TIME_ZONE = 'America/Chicago'
 # http://blogs.law.harvard.edu/tech/stories/storyReader$15
 LANGUAGE_CODE = 'en-us'
 
+# Languages we provide translations for out of the base. The
+# language name should be the utf-8 encoded local name for the
+# language.
+LANGUAGES = (
+    ('en-us', 'English'),
+    ('de', 'Deutsch'),
+    ('it', 'Italiano'),
+    ('sr', 'Srpski'),
+)
+
 # Not-necessarily-technical managers of the site. They get broken link
 # notifications and other various e-mails.
 MANAGERS = ADMINS
