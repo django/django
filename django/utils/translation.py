@@ -185,8 +185,8 @@ def get_language_from_request(request):
     """
     global _accepted
 
-    if request.GET:
-        lang = request.GET.get('django_language', None)
+    if request.GET or request.POST:
+        lang = request.GET.get('django_language', None) or request.POST.get('django_language', None)
         if lang is not None:
             if hasattr(request, 'session'):
                 request.session['django_language'] = lang
