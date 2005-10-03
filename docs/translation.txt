@@ -116,6 +116,24 @@ strings like this::
 
 This is much shorter, but won't allow you to use gettext_noop or ngettext.
 
+Sometimes you might want to give the user a selection of languages. This
+can be done by accessing the LANGUAGES variable of a DjangoContext. This
+is a list of tuples where the first element is the language code and the
+second element is the language name (in that language). The code might
+look like this::
+
+    <form method="POST">
+    <select name="django_language">
+    {% for lang in LANGUAGES %}
+    <option value="{{ lang.0 }}">{{ lang.1 }}</option>
+    {% endfor %}
+    </select>
+    </form>
+
+This would jump to the same page you came from and pass the django_language
+variable. This is used in discovery of languages, as described in the next
+chapter.
+
 How the Language is Discovered
 ==============================
 
@@ -148,14 +166,24 @@ from the admin.py settings file).
 The LocaleMiddleware allows a selection of the language based on data from
 the request - every user can have her own settings.
 
-The LocaleMiddleware first looks at the session data for the user. If that
-carries a key django_language, it's contents will be used as the language
-code. If the session doesn't contain a language setting, the middleware will
-look at the cookies for a django_language cookie. If that is found, it gives
-the language code. If neither the session nor the cookie carry a language code,
-the middleware will look at the HTTP header Accept-Language. This header is
-sent by your browser and tells the server what languages you prefer. Languages
-are ordered by some choice value - the higher, the more you prefer the language.
+The first thing the LocaleMiddleware does, is looking at the GET and POST
+data. If it finds a django_language variable there (if both have one, the
+one from GET will succeed), this language will be stored in the session
+(if sessions are used in your site) or in a cookie (if you don't use
+sessions). And it will be the selected langauge, of course. That way
+you can provide simple language switches by creating either a link with
+language (linked from country flags for example) or by giving the user some
+language selector like in the previous chapter.
+
+If neither GET nor POST have django_language, the middleware looks at the
+session data for the user. If that carries a key django_language, it's contents
+will be used as the language code. If the session doesn't contain a language
+setting, the middleware will look at the cookies for a django_language cookie.
+If that is found, it gives the language code. If neither the session nor the
+cookie carry a language code, the middleware will look at the HTTP header
+Accept-Language. This header is sent by your browser and tells the server what
+languages you prefer. Languages are ordered by some choice value - the higher,
+the more you prefer the language.
 
 So the middleware will iterate over that header, ordered by the preference
 value. The language with the highest preference that is in the django base
@@ -167,7 +195,10 @@ that language). The selected language is stored by the middleware in the
 request as the LANGUAGE_CODE attribute. So with static translation (when
 you don't use the middlware) the language is in settings.LANGUAGE_CODE, while
 with dynamic translations (when you do use the middleware) it's in
-request.LANGUAGE_CODE.
+request.LANGUAGE_CODE. And if your application builds on DjangoContext
+instances for template rendering, it will be automatically be available
+as LANGUAGE_CODE in your template (with automatic determination where to
+pull it from).
 
 Creating Language Files
 =======================
@@ -219,6 +250,11 @@ turns them into .mo files. Run it as follows::
 
 That's it. You made your first translation. If you now configure your browser
 to request your language, it show up in the admin for example.
+
+Another thing: please give us the name of your newly created language in that
+native language - so we can add it to the global list of available languages
+that is mirrored in settings.LANGUAGES (and the DjangoContext variable
+LANGUAGES in templates).
 
 Using Translations in Your Own Projects
 =======================================
