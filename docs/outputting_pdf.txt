@@ -7,7 +7,7 @@ This is made possible by the excellent, open-source ReportLab_ Python PDF
 library.
 
 The advantage of generating PDF files dynamically is that you can create
-customzed PDFs for different purposes -- say, for different users or different
+customized PDFs for different purposes -- say, for different users or different
 pieces of content.
 
 For example, Django was used at kusports.com to generate customized,
