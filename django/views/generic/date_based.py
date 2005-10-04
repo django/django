@@ -7,7 +7,8 @@ from django.utils.httpwrappers import HttpResponse
 import datetime, time
 
 def archive_index(request, app_label, module_name, date_field, num_latest=15,
-                  template_name=None, extra_lookup_kwargs={}, extra_context={}):
+                  template_name=None, template_loader=template_loader,
+                  extra_lookup_kwargs={}, extra_context={}):
     """
     Generic top-level archive of date-based objects.
 
@@ -49,7 +50,8 @@ def archive_index(request, app_label, module_name, date_field, num_latest=15,
     return HttpResponse(t.render(c))
 
 def archive_year(request, year, app_label, module_name, date_field,
-                 template_name=None, extra_lookup_kwargs={}, extra_context={}):
+                 template_name=None, template_loader=template_loader,
+                 extra_lookup_kwargs={}, extra_context={}):
     """
     Generic yearly archive view.
 
@@ -85,8 +87,8 @@ def archive_year(request, year, app_label, module_name, date_field,
     return HttpResponse(t.render(c))
 
 def archive_month(request, year, month, app_label, module_name, date_field,
-                  month_format='%b', template_name=None, extra_lookup_kwargs={},
-                  extra_context={}):
+                  month_format='%b', template_name=None, template_loader=template_loader,
+                  extra_lookup_kwargs={}, extra_context={}):
     """
     Generic monthly archive view.
 
@@ -138,7 +140,8 @@ def archive_month(request, year, month, app_label, module_name, date_field,
 
 def archive_day(request, year, month, day, app_label, module_name, date_field,
                 month_format='%b', day_format='%d', template_name=None,
-                extra_lookup_kwargs={}, extra_context={}, allow_empty=False):
+                template_loader=template_loader, extra_lookup_kwargs={}, 
+                extra_context={}, allow_empty=False):
     """
     Generic daily archive view.
 
@@ -201,7 +204,8 @@ def archive_today(request, **kwargs):
 def object_detail(request, year, month, day, app_label, module_name, date_field,
                   month_format='%b', day_format='%d', object_id=None, slug=None,
                   slug_field=None, template_name=None, template_name_field=None,
-                  extra_lookup_kwargs={}, extra_context={}):
+                  template_loader=template_loader, extra_lookup_kwargs={}, 
+                  extra_context={}):
     """
     Generic detail view from year/month/day/slug or year/month/day/id structure.
 

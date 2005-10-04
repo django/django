@@ -524,7 +524,7 @@ model with an ``ImageField`` will also get this method.
 get_FOO_url()
 -------------
 
-For every ``FileField``, the object will have a ``get_FOO_filename()`` method,
+For every ``FileField``, the object will have a ``get_FOO_url()`` method,
 where ``FOO`` is the name of the field. This returns the full URL to the file,
 according to your ``MEDIA_URL`` setting. If the value is blank, this method
 returns an empty string.

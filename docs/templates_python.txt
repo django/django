@@ -267,7 +267,7 @@ every template automatic access to the current time, use something like this::
 
     from django.core.template import Context
     import datetime
-    class TimeContext(template.Context):
+    class TimeContext(Context):
         def __init__(self, *args, **kwargs):
             Context.__init__(self, *args, **kwargs)
             self['current_time'] = datetime.datetime.now()

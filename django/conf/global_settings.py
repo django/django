@@ -120,7 +120,7 @@ IGNORABLE_404_ENDS = ('mail.pl', 'mailform.pl', 'mail.cgi', 'mailform.cgi', 'fav
 SECRET_KEY = ''
 
 # Path to the "jing" executable -- needed to validate XMLFields
-JING_PATH = "/usr/bin/jng"
+JING_PATH = "/usr/bin/jing"
 
 ##############
 # MIDDLEWARE #

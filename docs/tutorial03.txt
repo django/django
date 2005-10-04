@@ -91,8 +91,8 @@ Finally, it calls that ``detail()`` function like so::
     detail(request=<HttpRequest object>, poll_id=23)
 
 The ``poll_id=23`` part comes from ``(?P<poll_id>\d+)``. Using
-``(?<name>pattern)`` "captures" the text matched by ``pattern`` and sends it as
-a keyword argument to the view function.
+``(?P<name>pattern)`` "captures" the text matched by ``pattern`` and sends it
+as a keyword argument to the view function.
 
 Because the URL patterns are regular expressions, there really is no limit on
 what you can do with them. And there's no need to add URL cruft such as

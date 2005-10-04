@@ -1,0 +1,90 @@
+===========================
+Outputting PDFs with Django
+===========================
+
+This document explains how to output PDF files dynamically using Django views.
+This is made possible by the excellent, open-source ReportLab_ Python PDF
+library.
+
+The advantage of generating PDF files dynamically is that you can create
+customized PDFs for different purposes -- say, for different users or different
+pieces of content.
+
+For example, Django was used at kusports.com to generate customized,
+printer-friendly NCAA tournament brackets, as PDF files, for people
+participating in a March Madness contest.
+
+.. _ReportLab: http://www.reportlab.org/rl_toolkit.html
+
+Install ReportLab
+=================
+
+Download and install the ReportLab library from http://www.reportlab.org/downloads.html.
+The `user guide`_ (not coincidentally, a PDF file) explains how to install it.
+
+Test your installation by importing it in the Python interactive interpreter::
+
+    >>> import reportlab
+
+If that command doesn't raise any errors, the installation worked.
+
+.. _user guide: http://www.reportlab.org/rsrc/userguide.pdf
+
+Write your view
+===============
+
+The key to generating PDFs dynamically with Django is that the ReportLab API
+acts on file-like objects, and Django's ``HttpResponse`` objects are file-like
+objects.
+
+.. admonition:: Note
+
+    For more information on ``HttpResponse`` objects, see
+    `Request and response objects`_.
+
+    .. _Request and response objects: http://www.djangoproject.com/documentation/request_response/
+
+Here's a "Hello World" example::
+
+    from reportlab.pdfgen import canvas
+    from django.utils.httpwrappers import HttpResponse
+
+    def some_view(request):
+        # Create the HttpResponse object with the appropriate PDF headers.
+        response = HttpResponse(mimetype='application/pdf')
+        response['Content-Disposition'] = 'attachment; filename=somefilename.pdf'
+
+        # Create the PDF object, using the response object as its "file."
+        p = canvas.Canvas(response)
+
+        # Draw things on the PDF. Here's where the PDF generation happens.
+        # See the ReportLab documentation for the full list of functionality.
+        p.drawString(100, 100, "Hello world.")
+
+        # Close the PDF object cleanly, and we're done.
+        p.showPage()
+        p.save()
+        return response
+
+The code and comments should be self-explanatory, but a few things deserve a
+mention:
+
+    * The response gets a special mimetype, ``application/pdf``. This tells
+      browsers that the document is a PDF file, rather than an HTML file. If
+      you leave this off, browsers will probably interpret the output as HTML,
+      which would result in ugly, scary gobbledygook in the browser window.
+
+    * The response gets an additional ``Content-Disposition`` header, which
+      contains the name of the PDF file. This filename is arbitrary: Call it
+      whatever you want. It'll be used by browsers in the "Save as..."
+      dialogue, etc.
+
+    * Hooking into the ReportLab API is easy: Just pass ``response`` as the
+      first argument to ``canvas.Canvas``. The ``Canvas`` class expects a
+      file-like object, and ``HttpResponse`` objects fit the bill.
+
+    * Note that all subsequent PDF-generation methods are called on the PDF
+      object (in this case, ``p``) -- not on ``response``.
+
+    * Finally, it's important to call ``showPage()`` and ``save()`` on the PDF
+      file.

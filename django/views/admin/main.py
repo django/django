@@ -523,7 +523,7 @@ def _get_submit_row_template(opts, app_label, add, change, show_delete, ordered_
     if not opts.admin.save_as or add:
         t.append('{%% if not is_popup %%}<input type="submit" value="Save and add another" name="_addanother" %s/>{%% endif %%}' % \
             (ordered_objects and change and 'onclick="submitOrderForm();"' or ''))
-    t.append('<input type="submit" value="Save and continue editing" name="_continue" %s/>' % \
+    t.append('{%% if not is_popup %%}<input type="submit" value="Save and continue editing" name="_continue" %s/>{%% endif %%}' % \
         (ordered_objects and change and 'onclick="submitOrderForm();"' or ''))
     t.append('<input type="submit" value="Save" class="default" %s/>' % \
         (ordered_objects and change and 'onclick="submitOrderForm();"' or ''))
