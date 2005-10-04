@@ -68,7 +68,7 @@ def create_object(request, app_label, module_name, template_name=None,
 def update_object(request, app_label, module_name, object_id=None, slug=None, 
                   slug_field=None, template_name=None, template_loader=template_loader,
                   extra_lookup_kwargs={}, extra_context={}, post_save_redirect=None, 
-                  login_required=False):
+                  login_required=False, follow=None):
     """
     Generic object-update function.
 
@@ -98,13 +98,13 @@ def update_object(request, app_label, module_name, object_id=None, slug=None,
     except ObjectDoesNotExist:
         raise Http404("%s.%s does not exist for %s" % (app_label, module_name, lookup_kwargs))
     
-    manipulator = mod.ChangeManipulator(object.id)
+    manipulator = mod.ChangeManipulator(object.id, follow=follow)
     
     if request.POST:
         new_data = request.POST.copy()
         errors = manipulator.get_validation_errors(new_data)
+        manipulator.do_html2python(new_data)
         if not errors:
-            manipulator.do_html2python(new_data)
             manipulator.save(new_data)
             
             if not request.user.is_anonymous():
@@ -120,7 +120,7 @@ def update_object(request, app_label, module_name, object_id=None, slug=None,
     else:
         errors = {}
         # This makes sure the form acurate represents the fields of the place.
-        new_data = object.__dict__
+        new_data = manipulator.flatten_data()
     
     form = formfields.FormWrapper(manipulator, new_data, errors)
     if not template_name:

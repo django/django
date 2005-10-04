@@ -639,11 +639,14 @@ class ForeignKey(Field):
         return [formfields.IntegerField]
 
     def get_db_prep_save(self,value):
-        if value == '':
-            return None
-        else:
-            return int(value)
-    
+       try:
+            if value == '' or None:
+                return None
+            else:
+                return int(value)
+       except Exception, e: 
+            print "name: %s  val: %s" % (self.name, value)         
+
     def flatten_data(self, obj = None):
         if not obj: 
             # In required many-to-one fields with only one available choice,
