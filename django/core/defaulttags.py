@@ -227,6 +227,15 @@ class SsiNode(template.Node):
                 return '' # Fail silently for invalid included templates.
         return output
 
+
+class ConstantIncludeNode(template.Node):
+    def __init__(self, template_path):
+        t = template_loader.get_template(template_path)        
+        self.nodelist = t.nodelist
+
+    def render(self, context):
+        return self.nodelist.render(context)
+
 class IncludeNode(template.Node):
     def __init__(self, template_path_var):
         self.template_path_var = template_path_var
@@ -631,6 +640,10 @@ def do_include(parser, token):
     parsed = False
     if len(bits) != 2:
         raise template.TemplateSyntaxError, "'include' tag takes one argument: the path to the template to be included"
+    
+    path = bits[1]
+    if path[0] in ('"', "'") and path[-1] == path[0]:
+        return ConstantIncludeNode(path[1:-1]) 
     return IncludeNode(bits[1])
 
 def do_load(parser, token):
@@ -648,8 +661,8 @@ def do_load(parser, token):
     # check at compile time that the module can be imported
     try:
         LoadNode.load_taglib(taglib)
-    except ImportError:
-        raise template.TemplateSyntaxError, "'%s' is not a valid tag library" % taglib
+    except ImportError, e:
+        raise template.TemplateSyntaxError, "'%s' is not a valid tag library, %s" % (taglib, e)
     return LoadNode(taglib)
 
 def do_now(parser, token):
