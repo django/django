@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: Django Serbian (latin) translation v1.0\n"
 "Report-Msgid-Bugs-To: Petar Marić <petar.maric@gmail.com>\n"
 "POT-Creation-Date: 2005-10-03 09:35+0200\n"
-"PO-Revision-Date: 2005-10-05 13:56+0100\n"
+"PO-Revision-Date: 2005-10-05 14:39+0100\n"
 "Last-Translator: Petar Marić <petar.maric@gmail.com>\n"
 "Language-Team: Nesh <nesh@studioquatro.co.yu> & Petar <petar.maric@gmail.com>\n"
 "MIME-Version: 1.0\n"
@@ -128,10 +128,9 @@ msgstr "Skorije akcije"
 msgid "My Actions"
 msgstr "Moje akcije"
 
-# Gde se nalazi referenca na ovaj string?
 #: conf/admin_templates/index.html:6
 msgid "None available"
-msgstr ""
+msgstr "Nema dostupnih"
 
 #: conf/admin_templates/login.html:1
 msgid "Username:"
