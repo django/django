@@ -60,9 +60,9 @@ for (dirpath, dirnames, filenames) in os.walk("."):
                 thefile = '%s.py' % file
             if verbose: sys.stdout.write('processing file %s in %s\n' % (file, dirpath))
             if os.path.isfile(lf):
-                cmd = 'xgettext -j -d %s -L Python -p %s %s' % (domain, basedir, os.path.join(dirpath, thefile))
+                cmd = 'xgettext -j -d %s -L Python -p "%s" "%s"' % (domain, basedir, os.path.join(dirpath, thefile))
             else:
-                cmd = 'xgettext -d %s -L Python -p %s %s' % (domain, basedir, os.path.join(dirpath, thefile))
+                cmd = 'xgettext -d %s -L Python -p "%s" "%s"' % (domain, basedir, os.path.join(dirpath, thefile))
             os.system(cmd)
             if thefile != file:
                 os.unlink(os.path.join(dirpath, thefile))
