@@ -572,6 +572,9 @@ object in the result list is "truncated" to the given ``type``.
     * ``"month"`` returns a list of all distinct year/month values for the field.
     * ``"day"`` returns a list of all distinct year/month/day values for the field.
 
+Additional, optional keyword arguments, in the format described in
+"Field lookups" above, are also accepted.
+
 Here's an example, using the ``Poll`` model defined above::
 
     >>> from datetime import datetime
@@ -587,6 +590,8 @@ Here's an example, using the ``Poll`` model defined above::
     [datetime.datetime(2005, 2, 1), datetime.datetime(2005, 3, 1)]
     >>> polls.get_pub_date_list('day')
     [datetime.datetime(2005, 2, 20), datetime.datetime(2005, 3, 20)]
+    >>> polls.get_pub_date_list('day', question__contains='name')
+    [datetime.datetime(2005, 3, 20)]
 
 ``get_FOO_list()`` also accepts an optional keyword argument ``order``, which
 should be either ``"ASC"`` or ``"DESC"``. This specifies how to order the
