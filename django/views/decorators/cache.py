@@ -1,6 +1,7 @@
 from django.core.cache import cache
 from django.utils.httpwrappers import HttpResponseNotModified
 from django.utils.text import compress_string
+from django.conf.settings import DEFAULT_CHARSET
 import datetime, md5
 
 def cache_page(view_func, cache_timeout, key_prefix=''):
@@ -25,7 +26,7 @@ def cache_page(view_func, cache_timeout, key_prefix=''):
         response = cache.get(cache_key, None)
         if response is None:
             response = view_func(request, *args, **kwargs)
-            content = response.get_content_as_string('utf-8')
+            content = response.get_content_as_string(DEFAULT_CHARSET)
             if accepts_gzip:
                 content = compress_string(content)
                 response.content = content

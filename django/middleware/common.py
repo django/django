@@ -54,31 +54,29 @@ class CommonMiddleware:
         return None
 
     def process_response(self, request, response):
-        """
-        Check for a flatfile (for 404s) and calculate the Etag, if needed.
-        """
-
-        # If this was a 404, check for a flat file
+        "Check for a flat page (for 404s) and calculate the Etag, if needed."
         if response.status_code == 404:
-            try:
-                response = flat_file(request, request.path)
-            except exceptions.Http404:
+            if settings.USE_FLAT_PAGES:
+                try:
+                    return flat_file(request, request.path)
+                except exceptions.Http404:
+                    pass
+
+            if settings.SEND_BROKEN_LINK_EMAILS:
                 # If the referrer was from an internal link or a non-search-engine site,
                 # send a note to the managers.
-                if settings.SEND_BROKEN_LINK_EMAILS:
-                    domain = request.META['HTTP_HOST']
-                    referer = request.META.get('HTTP_REFERER', None)
-                    is_internal = referer and (domain in referer)
-                    path = request.get_full_path()
-                    if referer and not _is_ignorable_404(path) and (is_internal or '?' not in referer):
-                        mail_managers("Broken %slink on %s" % ((is_internal and 'INTERNAL ' or ''), domain),
-                            "Referrer: %s\nRequested URL: %s\n" % (referer, request.get_full_path()))
-                # If there's no flatfile we want to return the original 404 response
+                domain = request.META['HTTP_HOST']
+                referer = request.META.get('HTTP_REFERER', None)
+                is_internal = referer and (domain in referer)
+                path = request.get_full_path()
+                if referer and not _is_ignorable_404(path) and (is_internal or '?' not in referer):
+                    mail_managers("Broken %slink on %s" % ((is_internal and 'INTERNAL ' or ''), domain),
+                        "Referrer: %s\nRequested URL: %s\n" % (referer, request.get_full_path()))
                 return response
 
-        # Use ETags, if requested
+        # Use ETags, if requested.
         if settings.USE_ETAGS:
-            etag = md5.new(response.get_content_as_string('utf-8')).hexdigest()
+            etag = md5.new(response.get_content_as_string(settings.DEFAULT_CHARSET)).hexdigest()
             if request.META.get('HTTP_IF_NONE_MATCH') == etag:
                 response = httpwrappers.HttpResponseNotModified()
             else:

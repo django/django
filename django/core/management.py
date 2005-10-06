@@ -549,16 +549,29 @@ def get_validation_errors(outfile):
                 if not isinstance(opts.admin, meta.Admin):
                     e.add(opts, '"admin" attribute, if given, must be set to a meta.Admin() instance.')
                 else:
-                    for fn in opts.admin.list_display:
-                        try:
-                            f = opts.get_field(fn)
-                        except meta.FieldDoesNotExist:
-                            klass = opts.get_model_module().Klass
-                            if not hasattr(klass, fn) or not callable(getattr(klass, fn)):
-                                e.add(opts, '"admin.list_display" refers to %r, which isn\'t a field or method.' % fn)
-                        else:
-                            if isinstance(f, meta.ManyToManyField):
-                                e.add(opts, '"admin.list_display" doesn\'t support ManyToManyFields (%r).' % fn)
+                    # list_display
+                    if not isinstance(opts.admin.list_display, (list, tuple)):
+                        e.add(opts, '"admin.list_display", if given, must be set to a list or tuple.')
+                    else:
+                        for fn in opts.admin.list_display:
+                            try:
+                                f = opts.get_field(fn)
+                            except meta.FieldDoesNotExist:
+                                klass = opts.get_model_module().Klass
+                                if not hasattr(klass, fn) or not callable(getattr(klass, fn)):
+                                    e.add(opts, '"admin.list_display" refers to %r, which isn\'t a field or method.' % fn)
+                            else:
+                                if isinstance(f, meta.ManyToManyField):
+                                    e.add(opts, '"admin.list_display" doesn\'t support ManyToManyFields (%r).' % fn)
+                    # list_filter
+                    if not isinstance(opts.admin.list_filter, (list, tuple)):
+                        e.add(opts, '"admin.list_filter", if given, must be set to a list or tuple.')
+                    else:
+                        for fn in opts.admin.list_filter:
+                            try:
+                                f = opts.get_field(fn)
+                            except meta.FieldDoesNotExist:
+                                e.add(opts, '"admin.list_filter" refers to %r, which isn\'t a field.' % fn)
 
             # Check ordering attribute.
             if opts.ordering:
