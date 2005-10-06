@@ -16,8 +16,8 @@ APP_ARGS = '[modelmodule ...]'
 
 # Use django.__path__[0] because we don't know which directory django into
 # which has been installed.
-PROJECT_TEMPLATE_DIR = os.path.join(django.__path__[0], 'conf/%s_template')
-ADMIN_TEMPLATE_DIR = os.path.join(django.__path__[0], 'conf/admin_templates')
+PROJECT_TEMPLATE_DIR = os.path.join(django.__path__[0], 'conf', '%s_template')
+ADMIN_TEMPLATE_DIR = os.path.join(django.__path__[0], 'conf', 'admin_templates')
 
 def _get_packages_insert(app_label):
     return "INSERT INTO packages (label, name) VALUES ('%s', '%s');" % (app_label, app_label)
@@ -160,7 +160,7 @@ def get_sql_initial_data(mod):
     output = []
     app_label = mod._MODELS[0]._meta.app_label
     output.append(_get_packages_insert(app_label))
-    app_dir = os.path.normpath(os.path.join(os.path.dirname(mod.__file__), '../sql'))
+    app_dir = os.path.normpath(os.path.join(os.path.dirname(mod.__file__), '..', 'sql'))
     for klass in mod._MODELS:
         opts = klass._meta
 
@@ -376,14 +376,14 @@ def startproject(project_name, directory):
     _start_helper('project', project_name, directory)
     # Populate TEMPLATE_DIRS for the admin templates, based on where Django is
     # installed.
-    admin_settings_file = os.path.join(directory, project_name, 'settings/admin.py')
+    admin_settings_file = os.path.join(directory, project_name, 'settings', 'admin.py')
     settings_contents = open(admin_settings_file, 'r').read()
     fp = open(admin_settings_file, 'w')
     settings_contents = re.sub(r'(?s)\b(TEMPLATE_DIRS\s*=\s*\()(.*?)\)', "\\1\n    r%r,\\2)" % ADMIN_TEMPLATE_DIR, settings_contents)
     fp.write(settings_contents)
     fp.close()
     # Create a random SECRET_KEY hash, and put it in the main settings.
-    main_settings_file = os.path.join(directory, project_name, 'settings/main.py')
+    main_settings_file = os.path.join(directory, project_name, 'settings', 'main.py')
     settings_contents = open(main_settings_file, 'r').read()
     fp = open(main_settings_file, 'w')
     secret_key = ''.join([choice('abcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*(-_=+)') for i in range(50)])
@@ -397,7 +397,7 @@ def startapp(app_name, directory):
     "Creates a Django app for the given app_name in the given directory."
     # Determine the project_name a bit naively -- by looking at the name of
     # the parent directory.
-    project_dir = os.path.normpath(os.path.join(directory, '../'))
+    project_dir = os.path.normpath(os.path.join(directory, '..'))
     project_name = os.path.basename(project_dir)
     _start_helper('app', app_name, directory, project_name)
 startapp.help_doc = "Creates a Django app directory structure for the given app name in the current directory."
