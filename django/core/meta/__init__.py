@@ -1332,16 +1332,19 @@ def function_get_sql_clause(opts, **kwargs):
         if f == '?': # Special case.
             order_by.append(db.get_random_function_sql())
         else:
+            if f.startswith('-'):
+                col_name = f[1:]
+                order = "DESC"
+            else:
+                col_name = f
+                order = "ASC"
             # Use the database table as a column prefix if it wasn't given,
             # and if the requested column isn't a custom SELECT.
-            if "." not in f and f not in [k[0] for k in kwargs.get('select', [])]:
+            if "." not in col_name and col_name not in [k[0] for k in kwargs.get('select', [])]:
                 table_prefix = opts.db_table + '.'
             else:
                 table_prefix = ''
-            if f.startswith('-'):
-                order_by.append('%s%s DESC' % (table_prefix, orderfield2column(f[1:], opts)))
-            else:
-                order_by.append('%s%s ASC' % (table_prefix, orderfield2column(f, opts)))
+            order_by.append('%s%s %s' % (table_prefix, orderfield2column(col_name, opts), order))
     order_by = ", ".join(order_by)
 
     # LIMIT and OFFSET clauses
