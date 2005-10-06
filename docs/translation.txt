@@ -304,9 +304,9 @@ in the project library, but decided against this: with message files in the
 application tree, they can more easily be distributed.
 
 Another speciality is that we only use gettext and gettext_noop - that's
-because django uses allways utf-8 strings internally. There isn't much use
-in using ugettext or something like that, as you allways will need to produce
-utf-8 anyway.
+because django uses allways DEFAULT_CHARSET strings internally. There isn't
+much use in using ugettext or something like that, as you allways will need to
+produce utf-8 anyway.
 
 And last we don't use xgettext alone and some makefiles but use python
 wrappers around xgettext and msgfmt. That's mostly for convenience.

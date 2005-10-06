@@ -32,14 +32,15 @@ _accepted = {}
 class DjangoTranslation(gettext_module.GNUTranslations):
     """
     This class sets up the GNUTranslations context with
-    regard to output charset. Django allways uses utf-8
-    as the output charset.
+    regard to output charset. Django uses a defined
+    DEFAULT_CHARSET as the output charset.
     """
 
     def __init__(self, *args, **kw):
+        from django.conf import settings
         gettext_module.GNUTranslations.__init__(self, *args, **kw)
         self.__charset = self.charset()
-        self.set_output_charset('utf-8')
+        self.set_output_charset(settings.DEFAULT_CHARSET)
         self.__app = '?.?.?'
         self.__language = '??'
     
