@@ -53,11 +53,15 @@ def main():
     parser = DjangoOptionParser(get_usage())
     parser.add_option('--settings',
         help='Python path to settings module, e.g. "myproject.settings.main". If this isn\'t provided, the DJANGO_SETTINGS_MODULE environment variable will be used.')
+    parser.add_option('--pythonpath',
+        help='Lets you manually add a directory the Python path, e.g. "/home/djangoprojects/myproject".')
     options, args = parser.parse_args()
 
     # Take care of options.
     if options.settings:
         os.environ['DJANGO_SETTINGS_MODULE'] = options.settings
+    if options.pythonpath:
+        sys.path.insert(0, options.pythonpath)
 
     # Run the appropriate action. Unfortunately, optparse can't handle
     # positional arguments, so this has to parse/validate them.
