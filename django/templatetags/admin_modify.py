@@ -180,7 +180,7 @@ def auto_populated_field_script(auto_pop_fields, change = False):
 
         add_values = ' + " " + '.join(['document.getElementById("id_%s").value' % g for g in field.prepopulate_from])
         for f in field.prepopulate_from:
-            t.append('document.getElementById("id_%s").onkeyup = function() { var e = document.getElementById("id_%s"); if(e._changed) { e.value = URLify(%s, %s);} } ' % (f, field.name, add_values, field.maxlength) )
+            t.append('document.getElementById("id_%s").onkeyup = function() { var e = document.getElementById("id_%s"); if(!e._changed) { e.value = URLify(%s, %s);} } ' % (f, field.name, add_values, field.maxlength) )
 
     return ''.join(t)
 auto_populated_field_script = simple_tag(auto_populated_field_script)

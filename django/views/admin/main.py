@@ -988,7 +988,7 @@ def _get_template(opts, app_label, add=False, change=False, show_delete=False, f
             else:
                 t.append('document.getElementById("id_%s").onchange = function() { this._changed = true; };' % field.name)
             for f in field.prepopulate_from:
-                t.append('document.getElementById("id_%s").onkeyup = function() { var e = document.getElementById("id_%s"); if (e._changed) { e.value = URLify(%s, %s);}};' % \
+                t.append('document.getElementById("id_%s").onkeyup = function() { var e = document.getElementById("id_%s"); if (!e._changed) { e.value = URLify(%s, %s);}};' % \
                     (f, field.name, ' + " " + '.join(['document.getElementById("id_%s").value' % g for g in field.prepopulate_from]), field.maxlength))
         t.append('</script>\n')
     if change and ordered_objects:
