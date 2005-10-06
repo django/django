@@ -76,7 +76,7 @@ class CacheMiddleware:
         Sets the cache, if needed.
         """
         if request._cache_middleware_set_cache:
-            content = response.get_content_as_string('utf-8')
+            content = response.get_content_as_string(settings.DEFAULT_CHARSET)
             if request._cache_middleware_accepts_gzip:
                 content = compress_string(content)
                 response.content = content

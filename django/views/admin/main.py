@@ -431,7 +431,7 @@ def change_list(request, app_label, module_name):
                 if j == 0: # First column is a special case
                     result_id = getattr(result, pk)
                     raw_template.append('<th%s><a href="%s/"%s>%s</a></th>' % \
-                        (row_class, result_id, (is_popup and ' onclick="opener.dismissRelatedLookupPopup(window, %s); return false;"' % result_id or ''), result_repr))
+                        (row_class, result_id, (is_popup and ' onclick="opener.dismissRelatedLookupPopup(window, %r); return false;"' % result_id or ''), result_repr))
                 else:
                     raw_template.append('<td%s>%s</td>' % (row_class, result_repr))
             raw_template.append('</tr>\n')

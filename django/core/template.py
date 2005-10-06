@@ -55,6 +55,7 @@ times with multiple contexts)
 '\n<html>\n\n</html>\n'
 """
 import re
+from django.conf.settings import DEFAULT_CHARSET
 
 __all__ = ('Template','Context','compile_string')
 
@@ -474,7 +475,7 @@ class VariableNode(Node):
         if not isinstance(output, basestring):
             output = str(output)
         elif isinstance(output, unicode):
-            output = output.encode('utf-8')
+            output = output.encode(DEFAULT_CHARSET)
         return output
 
 def register_tag(token_command, callback_function):

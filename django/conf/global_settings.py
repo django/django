@@ -32,9 +32,11 @@ LANGUAGE_CODE = 'en-us'
 # notifications and other various e-mails.
 MANAGERS = ADMINS
 
-# Default MIME type to use for all HttpResponse objects, if a MIME type
-# isn't manually specified. This is directly used as the Content-Type header.
-DEFAULT_MIME_TYPE = 'text/html; charset=utf-8'
+# Default content type and charset to use for all HttpResponse objects, if a
+# MIME type isn't manually specified. These are used to construct the
+# Content-Type header.
+DEFAULT_CONTENT_TYPE = 'text/html'
+DEFAULT_CHARSET = 'utf-8'
 
 # E-mail address that error messages come from.
 SERVER_EMAIL = 'root@localhost'
@@ -99,6 +101,9 @@ ALLOWED_INCLUDE_ROOTS = ()
 # settings modules (in the format 'foo.bar.baz') for which this admin
 # is an admin.
 ADMIN_FOR = []
+
+# Whether to check the flat-pages table as a last resort for all 404 errors.
+USE_FLAT_PAGES = True
 
 # 404s that may be ignored.
 IGNORABLE_404_STARTS = ('/cgi-bin/', '/_vti_bin', '/_vti_inf')
