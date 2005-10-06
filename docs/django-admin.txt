@@ -183,7 +183,7 @@ Available options
 =================
 
 --settings
-==========
+----------
 
 Example usage::
 
@@ -194,7 +194,7 @@ in Python path syntax, e.g. "myproject.settings.main". If this isn't provided,
 ``django-admin.py`` will use the DJANGO_SETTINGS_MODULE environment variable.
 
 --pythonpath
-============
+------------
 
 Example usage::
 
@@ -207,7 +207,7 @@ variable.
 .. _import search path: http://diveintopython.org/getting_to_know_python/everything_is_an_object.html
 
 --help
-======
+------
 
 Displays a help message that includes a terse list of all available actions and
 options.
