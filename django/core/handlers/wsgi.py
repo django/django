@@ -167,6 +167,6 @@ class WSGIHandler(BaseHandler):
         response_headers = response.headers.items()
         for c in response.cookies.values():
             response_headers.append(('Set-Cookie', c.output(header='')))
-        output = [response.get_content_as_string('utf-8')]
+        output = [response.get_content_as_string(settings.DEFAULT_CHARSET)]
         start_response(status, response_headers)
         return output

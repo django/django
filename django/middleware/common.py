@@ -76,7 +76,7 @@ class CommonMiddleware:
 
         # Use ETags, if requested.
         if settings.USE_ETAGS:
-            etag = md5.new(response.get_content_as_string('utf-8')).hexdigest()
+            etag = md5.new(response.get_content_as_string(settings.DEFAULT_CHARSET)).hexdigest()
             if request.META.get('HTTP_IF_NONE_MATCH') == etag:
                 response = httpwrappers.HttpResponseNotModified()
             else:
