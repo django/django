@@ -200,8 +200,11 @@ Example usage::
 
     django-admin.py init --pythonpath='/home/djangoprojects/myproject'
 
-Adds the given filesystem path to the Python path. If this isn't provided,
-``django-admin.py`` will use the ``PYTHONPATH`` environment variable.
+Adds the given filesystem path to the Python `import search path`_. If this
+isn't provided, ``django-admin.py`` will use the ``PYTHONPATH`` environment
+variable.
+
+.. _import search path: http://diveintopython.org/getting_to_know_python/everything_is_an_object.html
 
 --help
 ======
