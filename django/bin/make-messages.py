@@ -73,7 +73,8 @@ for (dirpath, dirnames, filenames) in os.walk("."):
 
 msgs = os.popen('msguniq %s' % potfile, 'r').read()
 open(potfile, 'w').write(msgs)
-msgs = os.popen('msgmerge %s %s' % (pofile, potfile), 'r').read()
+if os.path.exists(pofile):
+    msgs = os.popen('msgmerge %s %s' % (pofile, potfile), 'r').read()
 open(pofile, 'wb').write(msgs)
 os.unlink(potfile)
 
