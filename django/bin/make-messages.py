@@ -37,11 +37,15 @@ basedir = os.path.join(basedir, lang, 'LC_MESSAGES')
 if not os.path.isdir(basedir):
     os.makedirs(basedir)
 
-lf = os.path.join(basedir, '%s.po' % domain)
-
 tpl_i18n_re = re.compile(r'{%\s+i18n\s+.*?%}')
 tpl_value_re = re.compile(r'{{\s*_\(.*?\)\s*}}')
 tpl_tag_re = re.compile(r"""{%.*_\((?:".*?")|(?:'.*?')\).*%}""")
+
+pofile = os.path.join(basedir, '%s.po' % domain)
+potfile = os.path.join(basedir, '%s.pot' % domain)
+
+if os.path.exists(potfile):
+    os.unlink(potfile)
 
 for (dirpath, dirnames, filenames) in os.walk("."):
     for file in filenames:
@@ -59,11 +63,17 @@ for (dirpath, dirnames, filenames) in os.walk("."):
                 open(os.path.join(dirpath, '%s.py' % file), "wb").write('\n'.join(lst))
                 thefile = '%s.py' % file
             if verbose: sys.stdout.write('processing file %s in %s\n' % (file, dirpath))
-            if os.path.isfile(lf):
-                cmd = 'xgettext -j -d %s -L Python -p "%s" "%s"' % (domain, basedir, os.path.join(dirpath, thefile))
-            else:
-                cmd = 'xgettext -d %s -L Python -p "%s" "%s"' % (domain, basedir, os.path.join(dirpath, thefile))
-            os.system(cmd)
+            cmd = 'xgettext %s -d %s -L Python -o - "%s"' % (
+                os.path.exists(potfile) and '--omit-header' or '', domain, os.path.join(dirpath, thefile))
+            msgs = os.popen(cmd, 'r').read()
+            if msgs:
+                open(potfile, 'ab').write(msgs)
             if thefile != file:
                 os.unlink(os.path.join(dirpath, thefile))
+
+msgs = os.popen('msguniq %s' % potfile, 'r').read()
+open(potfile, 'w').write(msgs)
+msgs = os.popen('msgmerge %s %s' % (pofile, potfile), 'r').read()
+open(pofile, 'wb').write(msgs)
+os.unlink(potfile)
 

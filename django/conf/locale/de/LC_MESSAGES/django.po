@@ -6,72 +6,95 @@
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: PACKAGE VERSION\n"
+"Project-Id-Version: Django 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2005-10-01 18:22+0200\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
-"Language-Team: LANGUAGE <LL@li.org>\n"
+"POT-Creation-Date: 2005-10-08 00:07+0200\n"
+"PO-Revision-Date: 2005-10-08 00:03+0200\n"
+"Last-Translator: Georg Bauer <gb@bofh.ms>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=iso-8859-1\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: core/validators.py:56
-msgid "This value must contain only letters, numbers and underscores."
-msgstr "Der Wert darf nur Buchstaben, Ziffern und Unterstriche enthalten."
+#: conf/admin_templates/admin_object_history.html.py:1
+#: conf/admin_templates/base.html.py:4
+#: conf/admin_templates/registration/password_change_done.html.py:1
+#: conf/admin_templates/registration/password_reset_form.html.py:1
+#: conf/admin_templates/registration/logged_out.html.py:1
+#: conf/admin_templates/registration/password_reset_done.html.py:1
+#: conf/admin_templates/registration/password_change_form.html.py:1
+msgid "Home"
+msgstr "Start"
 
-#: conf/admin_templates/404.html:3 conf/admin_templates/404.html:7
-#: conf/admin_templates/404.html.py:1 conf/admin_templates/404.html.py:2
-msgid "Page not found"
-msgstr "Seite nicht gefunden"
+#: conf/admin_templates/admin_object_history.html.py:2
+msgid "History"
+msgstr "Geschichte"
 
-#: conf/admin_templates/404.html:9 conf/admin_templates/404.html.py:3
-msgid "We're sorry, but the requested page could not be found."
+#: conf/admin_templates/admin_object_history.html.py:3
+msgid "Date/time"
+msgstr "Datum/Zeit"
+
+#: conf/admin_templates/admin_object_history.html.py:4
+msgid "User"
+msgstr "Benutzer"
+
+#: conf/admin_templates/admin_object_history.html.py:5
+msgid "Action"
+msgstr "Aktion"
+
+#: conf/admin_templates/admin_object_history.html.py:6
+msgid ""
+"This object doesn't have a change history. It probably wasn't added via this "
+"admin site."
 msgstr ""
-"Es tut uns leid, aber die angeforderte Seite kann nicht gefunden werden."
+"Dieses Objekt hat keine Änderungsgeschichte. Es wurde möglicherweise nicht "
+"über diese Verwaltungsseiten angelegt."
 
-#: conf/admin_templates/index.html:26
-#: conf/admin_templates/changelist_generic.html:8
 #: conf/admin_templates/changelist_generic.html.py:1
 #: conf/admin_templates/index.html.py:1
 msgid "Add"
 msgstr "Zufügen"
 
-#: conf/admin_templates/index.html:32 conf/admin_templates/index.html.py:2
-msgid "Change"
-msgstr "Ändern"
+#: conf/admin_templates/changelist_generic.html.py:2
+msgid "Click to change"
+msgstr "Zur Änderung klicken"
 
-#: conf/admin_templates/index.html:50 conf/admin_templates/index.html.py:4
-msgid "Recent Actions"
-msgstr "Kürzliche Aktionen"
-
-#: conf/admin_templates/index.html:51 conf/admin_templates/index.html.py:5
-msgid "My Actions"
-msgstr "Meine Aktionen"
-
-#: conf/admin_templates/index.html:55 conf/admin_templates/index.html.py:6
-msgid "None available"
-msgstr "Keine vorhanden"
-
-#: conf/admin_templates/base_site.html:3
 #: conf/admin_templates/base_site.html.py:1
 msgid "Django site admin"
 msgstr "Django Systemverwaltung"
 
-#: conf/admin_templates/base_site.html:6
 #: conf/admin_templates/base_site.html.py:2
 msgid "Django administration"
 msgstr "Django Verwaltung"
 
-#: conf/admin_templates/500.html:5 conf/admin_templates/500.html.py:1
+#: conf/admin_templates/index.html.py:2
+msgid "Change"
+msgstr "Ändern"
+
+#: conf/admin_templates/index.html.py:3
+msgid "You don't have permission to edit anything."
+msgstr "Sie haben keine Berechtigung irgendwas zu ändern."
+
+#: conf/admin_templates/index.html.py:4
+msgid "Recent Actions"
+msgstr "Kürzliche Aktionen"
+
+#: conf/admin_templates/index.html.py:5
+msgid "My Actions"
+msgstr "Meine Aktionen"
+
+#: conf/admin_templates/index.html.py:6
+msgid "None available"
+msgstr "Keine vorhanden"
+
+#: conf/admin_templates/500.html.py:1
 msgid "Server error (500)"
 msgstr "Serverfehler (500)"
 
-#: conf/admin_templates/500.html:8
-msgid "Server error <em>(500)</em>"
+#: conf/admin_templates/500.html.py:2
+msgid "Server Error <em>(500)</em>"
 msgstr "Serverfehler <em>(500)</em>"
 
-#: conf/admin_templates/500.html:9 conf/admin_templates/500.html.py:3
+#: conf/admin_templates/500.html.py:3
 msgid ""
 "There's been an error. It's been reported to the site administrators via e-"
 "mail and should be fixed shortly. Thanks for your patience."
@@ -80,7 +103,15 @@ msgstr ""
 "eMail weitergegeben und sollte bald behoben sein. Vielen Dank für Ihr "
 "Verständnis."
 
-#: conf/admin_templates/delete_confirmation_generic.html:6
+#: conf/admin_templates/404.html.py:1 conf/admin_templates/404.html.py:2
+msgid "Page not found"
+msgstr "Seite nicht gefunden"
+
+#: conf/admin_templates/404.html.py:3
+msgid "We're sorry, but the requested page could not be found."
+msgstr ""
+"Es tut uns leid, aber die angeforderte Seite kann nicht gefunden werden."
+
 #: conf/admin_templates/delete_confirmation_generic.html.py:1
 #, python-format
 msgid ""
@@ -92,7 +123,6 @@ msgstr ""
 "abhängigen Daten zur Folge, aber Sie haben nicht die nötigen Rechte um die "
 "folgenden abhängigen Daten zu löschen:"
 
-#: conf/admin_templates/delete_confirmation_generic.html:13
 #: conf/admin_templates/delete_confirmation_generic.html.py:2
 #, python-format
 msgid ""
@@ -102,66 +132,42 @@ msgstr ""
 "Sind Sie sicher, das Sie %(object_name)s \"%(object)s\" löschen wollen? Es "
 "werden zusätzlich die folgenden abhängigen Daten mit gelöscht:"
 
-#: conf/admin_templates/login.html:14 conf/admin_templates/login.html.py:1
-msgid "Username:"
-msgstr "Benutzername:"
-
-#: conf/admin_templates/login.html:17 conf/admin_templates/login.html.py:2
-msgid "Password:"
-msgstr "Passwort:"
-
-#: conf/admin_templates/login.html:19 conf/admin_templates/login.html.py:3
-msgid "Have you <a href=\"/password_reset/\">forgotten your password</a>?"
-msgstr "Haben Sie <a href=\"/password_reset/\">ihr Passwort vergessen</a>?"
-
-#: conf/admin_templates/base.html:22 conf/admin_templates/base.html.py:1
-msgid "Welcome,"
-msgstr "Willkommen,"
-
-#: conf/admin_templates/base.html:22 conf/admin_templates/base.html.py:2
-#: conf/admin_templates/base.html.py:5
-msgid "Change password"
-msgstr "Passwort ändern"
-
-#: conf/admin_templates/base.html:22 conf/admin_templates/base.html.py:3
-#: conf/admin_templates/base.html.py:5
-msgid "Log out"
-msgstr "Abmelden"
-
-#: conf/admin_templates/base.html:28 conf/admin_templates/base.html.py:4
-#: conf/admin_templates/registration/password_change_done.html.py:1
-#: conf/admin_templates/registration/password_reset_form.html.py:1
-#: conf/admin_templates/registration/logged_out.html.py:1
-#: conf/admin_templates/registration/password_reset_done.html.py:1
-#: conf/admin_templates/registration/password_change_form.html.py:1
-#: conf/admin_templates/admin_object_history.html.py:1
-msgid "Home"
-msgstr "Start"
-
-#: conf/admin_templates/index.html:42 conf/admin_templates/index.html.py:3
-msgid "You don't have permission to edit anything."
-msgstr "Sie haben keine Berechtigung irgendwas zu ändern."
-
-#: conf/admin_templates/changelist_generic.html.py:2
-msgid "Click to change"
-msgstr "Zur Änderung klicken"
-
-#: conf/admin_templates/500.html.py:2
-msgid "Server Error <em>(500)</em>"
-msgstr "Serverfehler <em>(500)</em>"
-
 #: conf/admin_templates/delete_confirmation_generic.html.py:3
 msgid "Yes, I'm sure"
 msgstr "Ja, ich bin sicher"
+
+#: conf/admin_templates/login.html.py:1
+msgid "Username:"
+msgstr "Benutzername:"
+
+#: conf/admin_templates/login.html.py:2
+msgid "Password:"
+msgstr "Passwort:"
+
+#: conf/admin_templates/login.html.py:3
+msgid "Have you <a href=\"/password_reset/\">forgotten your password</a>?"
+msgstr "Haben Sie <a href=\"/password_reset/\">ihr Passwort vergessen</a>?"
 
 #: conf/admin_templates/login.html.py:4
 msgid "Log in"
 msgstr "Anmelden"
 
+#: conf/admin_templates/base.html.py:1
+msgid "Welcome,"
+msgstr "Willkommen,"
+
+#: conf/admin_templates/base.html.py:2 conf/admin_templates/base.html.py:5
+msgid "Change password"
+msgstr "Passwort ändern"
+
+#: conf/admin_templates/base.html.py:3 conf/admin_templates/base.html.py:5
+msgid "Log out"
+msgstr "Abmelden"
+
 #: conf/admin_templates/registration/password_change_done.html.py:2
+#: conf/admin_templates/registration/password_change_done.html.py:6
 #: conf/admin_templates/registration/password_change_form.html.py:2
 #: conf/admin_templates/registration/password_change_form.html.py:3
-#: conf/admin_templates/registration/password_change_done.html.py:6
 #: conf/admin_templates/registration/password_change_form.html.py:4
 #: conf/admin_templates/registration/password_change_form.html.py:10
 msgid "Password change"
@@ -179,9 +185,9 @@ msgstr "Ihr Kennwort wurde geändert."
 #: conf/admin_templates/registration/password_reset_form.html.py:2
 #: conf/admin_templates/registration/password_reset_form.html.py:3
 #: conf/admin_templates/registration/password_reset_form.html.py:4
-#: conf/admin_templates/registration/password_reset_done.html.py:2
 #: conf/admin_templates/registration/password_reset_form.html.py:8
 #: conf/admin_templates/registration/password_reset_form.html.py:9
+#: conf/admin_templates/registration/password_reset_done.html.py:2
 #: conf/admin_templates/registration/password_reset_done.html.py:6
 msgid "Password reset"
 msgstr "Kennwort zurücksetzen"
@@ -224,7 +230,6 @@ msgstr ""
 "Wir haben Ihnen ein neues Kennwort per eMail zugeschickt an die Adresse, die "
 "Sie uns gegeben haben. Es sollte in Kürze ankommen."
 
-#: conf/admin_templates/registration/password_change_form.html.py:4
 #: conf/admin_templates/registration/password_change_form.html.py:5
 msgid ""
 "Please enter your old password, for security's sake, and then enter your new "
@@ -234,22 +239,18 @@ msgstr ""
 "dann zweimal (um sicherzustellen, das Sie es korrekt eingegeben haben) das "
 "neue Kennwort ein."
 
-#: conf/admin_templates/registration/password_change_form.html.py:5
 #: conf/admin_templates/registration/password_change_form.html.py:6
 msgid "Old password:"
 msgstr "altes Kennwort:"
 
-#: conf/admin_templates/registration/password_change_form.html.py:6
 #: conf/admin_templates/registration/password_change_form.html.py:7
 msgid "New password:"
 msgstr "neues Kennwort:"
 
-#: conf/admin_templates/registration/password_change_form.html.py:7
 #: conf/admin_templates/registration/password_change_form.html.py:8
 msgid "Confirm password:"
 msgstr "Kennwortwiederholung:"
 
-#: conf/admin_templates/registration/password_change_form.html.py:8
 #: conf/admin_templates/registration/password_change_form.html.py:9
 msgid "Change my password"
 msgstr "Mein Kennwort ändern"
@@ -285,27 +286,6 @@ msgstr "Vielen Dank, das Sie unsere Seiten benutzen!"
 msgid "The %(site_name)s team"
 msgstr "Das Team von %(site_name)s"
 
-#: conf/admin_templates/admin_object_history.html.py:2
-msgid "History"
-msgstr "Geschichte"
-
-#: conf/admin_templates/admin_object_history.html.py:3
-msgid "Date/time"
-msgstr "Datum/Zeit"
-
-#: conf/admin_templates/admin_object_history.html.py:4
-msgid "User"
-msgstr "Benutzer"
-
-#: conf/admin_templates/admin_object_history.html.py:5
-msgid "Action"
-msgstr "Aktion"
-
-#: conf/admin_templates/admin_object_history.html.py:6
-msgid ""
-"This object doesn't have a change history. It probably wasn't added via this "
-"admin site."
-msgstr ""
-"Dieses Objekt hat keine Änderungsgeschichte. Es wurde möglicherweise nicht "
-"über diese Verwaltungsseiten angelegt."
-
+#: core/validators.py:56
+msgid "This value must contain only letters, numbers and underscores."
+msgstr "Der Wert darf nur Buchstaben, Ziffern und Unterstriche enthalten."
