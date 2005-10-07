@@ -21,7 +21,7 @@
       <tr class="{% cycle row1,row2 %}">
       {% for bound_field in fcw.bound_fields %}
          {% if not bound_field.not_in_table %}
-         <td "{{ bound_field.cell_class_attribute}}"> 
+         <td {{bound_field.cell_class_attribute}}> 
             {% field_widget bound_field %}
          </td>
          {% endif %}

@@ -230,11 +230,17 @@ class SsiNode(template.Node):
 
 class ConstantIncludeNode(template.Node):
     def __init__(self, template_path):
-        t = template_loader.get_template(template_path)        
-        self.nodelist = t.nodelist
+        try: 
+            t = template_loader.get_template(template_path)        
+            self.nodelist = t.nodelist
+        except Exception, e:
+            self.nodelist = None
 
     def render(self, context):
-        return self.nodelist.render(context)
+        if self.nodelist:
+            return self.nodelist.render(context)
+        else:
+            return ''
 
 class IncludeNode(template.Node):
     def __init__(self, template_path_var):
@@ -247,7 +253,6 @@ class IncludeNode(template.Node):
              t = template_loader.get_template(template_path)
              return t.render(context)
          except Exception, e:
-             print e
              return '' # Fail silently for invalid included templates.
 
 

@@ -573,7 +573,8 @@ class AdminBoundField(BoundField):
             classes.append('nowrap')
         if max([bool(f.errors()) for f in self.form_fields]):
             classes.append('error')
-        self.cell_class_attribute = ' '.join(classes)   
+        if classes:
+            self.cell_class_attribute = ' class="%s" ' % ' '.join(classes)
         self._repr_filled = False
     
 

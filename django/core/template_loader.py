@@ -1,6 +1,6 @@
 "Wrapper for loading templates from storage of some sort (e.g. files or db)"
 import template
-from template_file import load_template_source
+from template_file import find_template_source
 
 class ExtendsError(Exception):
     pass
@@ -10,14 +10,14 @@ def get_template(template_name):
     Returns a compiled template.Template object for the given template name,
     handling template inheritance recursively.
     """
-    return get_template_from_string(load_template_source(template_name))
+    return get_template_from_string(*find_template_source(template_name))
 
-def get_template_from_string(source):
+def get_template_from_string(source, filename=template.UNKNOWN_SOURCE):
     """
     Returns a compiled template.Template object for the given template code,
     handling template inheritance recursively.
     """
-    return template.Template(source)
+    return template.Template(source, filename)
 
 def render_to_string(template_name, dictionary=None, context_instance=None):
     """
@@ -90,7 +90,7 @@ class ExtendsNode(template.Node):
                 error_msg += " Got this from the %r variable." % self.parent_name_var
             raise template.TemplateSyntaxError, error_msg
         try:
-            return get_template_from_string(load_template_source(parent, self.template_dirs))
+            return get_template_from_string(*find_template_source(parent, self.template_dirs))
         except template.TemplateDoesNotExist:
             raise template.TemplateSyntaxError, "Template %r cannot be extended, because it doesn't exist" % parent
 
@@ -142,7 +142,7 @@ def do_extends(parser, token):
 
     This tag may be used in two ways: ``{% extends "base" %}`` (with quotes)
     uses the literal value "base" as the name of the parent template to extend,
-    or ``{% entends variable %}`` uses the value of ``variable`` as the name
+    or ``{% extends variable %}`` uses the value of ``variable`` as the name
     of the parent template to extend.
     """
     bits = token.contents.split()

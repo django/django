@@ -1,7 +1,7 @@
 <div class="submit-row">
-    {% if show_delete_link %}<p class="float-left"><a href="delete/" class="deletelink">Delete</a></p>{% endif %}
-    {% if show_save_as_new %}<input type="submit" value="Save as new" name="_saveasnew" {{onclick_attrib}}/>{%endif%}
-    {% if show_save_and_add_another %}<input type="submit" value="Save and add another" name="_addanother" {{onclick_attrib}} />{% endif %}
-    {% if show_save_and_continue %}<input type="submit" value="Save and continue editing" name="_continue" {{onclick_attrib}}/>{% endif %}
-    {% if show_save %}<input type="submit" value="Save" class="default" {{onclick_attrib}}/>{% endif %}
+{% if show_delete_link %}<p class="float-left"><a href="delete/" class="deletelink">Delete</a></p>{% endif %}
+{% if show_save_as_new %}<input type="submit" value="Save as new" name="_saveasnew" {{onclick_attrib}}/>{%endif%}
+{% if show_save_and_add_another %}<input type="submit" value="Save and add another" name="_addanother" {{onclick_attrib}} />{% endif %}
+{% if show_save_and_continue %}<input type="submit" value="Save and continue editing" name="_continue" {{onclick_attrib}}/>{% endif %}
+{% if show_save %}<input type="submit" value="Save" class="default" {{onclick_attrib}}/>
 </div>

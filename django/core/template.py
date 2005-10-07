@@ -74,9 +74,17 @@ VARIABLE_TAG_END = '}}'
 
 ALLOWED_VARIABLE_CHARS = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_.'
 
+#What to report as the origin of templates that come from non file sources (eg strings)
+UNKNOWN_SOURCE="<unknown source>"
+
+
+#match starts of lines
+newline_re = re.compile("^", re.M);
+
 # match a variable or block tag and capture the entire tag, including start/end delimiters
 tag_re = re.compile('(%s.*?%s|%s.*?%s)' % (re.escape(BLOCK_TAG_START), re.escape(BLOCK_TAG_END),
                                           re.escape(VARIABLE_TAG_START), re.escape(VARIABLE_TAG_END)))
+
 
 # global dict used by register_tag; maps custom tags to callback functions
 registered_tags = {}
@@ -102,9 +110,9 @@ class SilentVariableFailure(Exception):
     pass
 
 class Template:
-    def __init__(self, template_string):
+    def __init__(self, template_string, filename=UNKNOWN_SOURCE):
         "Compilation stage"
-        self.nodelist = compile_string(template_string)
+        self.nodelist = compile_string(template_string, filename)
 
     def __iter__(self):
         for node in self.nodelist:
@@ -115,9 +123,9 @@ class Template:
         "Display stage -- can be called many times"
         return self.nodelist.render(context)
 
-def compile_string(template_string):
+def compile_string(template_string, filename):
     "Compiles template_string into NodeList ready for rendering"
-    tokens = tokenize(template_string)
+    tokens = tokenize(template_string, filename)
     parser = Parser(tokens)
     return parser.parse()
 
@@ -168,45 +176,70 @@ class Context:
         self.dicts = [other_dict] + self.dicts
 
 class Token:
-    def __init__(self, token_type, contents):
+    def __init__(self, token_type, contents, source):
         "The token_type must be TOKEN_TEXT, TOKEN_VAR or TOKEN_BLOCK"
         self.token_type, self.contents = token_type, contents
+        self.source = source
 
     def __str__(self):
-        return '<%s token: "%s...">' % (
+        return '<%s token: "%s..." from %s, line %d>' % (
             {TOKEN_TEXT:'Text', TOKEN_VAR:'Var', TOKEN_BLOCK:'Block'}[self.token_type],
-            self.contents[:20].replace('\n', '')
+            self.contents[:20].replace('\n', ''), 
+            self.source[0], self.source[1]
             )
 
-def tokenize(template_string):
+
+def tokenize(template_string, filename):
     "Return a list of tokens from a given template_string"
     # remove all empty strings, because the regex has a tendency to add them
-    bits = filter(None, tag_re.split(template_string))
-    return map(create_token, bits)
+    linebreaks = [match.start() for match in newline_re.finditer(template_string)]
+    lastline = len(linebreaks)
+    token_tups = []
+    upto = 0
+    line = 1
+    
+   
+    for match in tag_re.finditer(template_string):
+        start, end = match.span()
+        if start > upto:
+            token_tups.append( (template_string[upto:start], line) )
+            upto = start
+            while linebreaks and line != lastline and linebreaks[line] <= upto:
+                line += 1
+        
+        token_tups.append( (template_string[start:end], line) )
+        upto = end
+        
+        while linebreaks and line != lastline and linebreaks[line] <= upto:
+           line += 1
+ 
+    return [ create_token(tok, (filename, line)) for tok, line in token_tups]
 
-def create_token(token_string):
+def create_token(token_string, source):
     "Convert the given token string into a new Token object and return it"
     if token_string.startswith(VARIABLE_TAG_START):
-        return Token(TOKEN_VAR, token_string[len(VARIABLE_TAG_START):-len(VARIABLE_TAG_END)].strip())
+        return Token(TOKEN_VAR, token_string[len(VARIABLE_TAG_START):-len(VARIABLE_TAG_END)].strip(), source)
     elif token_string.startswith(BLOCK_TAG_START):
-        return Token(TOKEN_BLOCK, token_string[len(BLOCK_TAG_START):-len(BLOCK_TAG_END)].strip())
+        return Token(TOKEN_BLOCK, token_string[len(BLOCK_TAG_START):-len(BLOCK_TAG_END)].strip(), source)
     else:
-        return Token(TOKEN_TEXT, token_string)
+        return Token(TOKEN_TEXT, token_string, source)
+
 
 class Parser:
     def __init__(self, tokens):
         self.tokens = tokens
+        self.command_stack = []
 
     def parse(self, parse_until=[]):
         nodelist = NodeList()
         while self.tokens:
             token = self.next_token()
             if token.token_type == TOKEN_TEXT:
-                nodelist.append(TextNode(token.contents))
+                nodelist.append(TextNode(token.contents), token)
             elif token.token_type == TOKEN_VAR:
                 if not token.contents:
-                    raise TemplateSyntaxError, "Empty variable tag"
-                nodelist.append(VariableNode(token.contents))
+                    raise TemplateSyntaxError, "Empty variable tag at %s, line %d" % (token.source[0], token.source[1])
+                nodelist.append(VariableNode(token.contents), token)
             elif token.token_type == TOKEN_BLOCK:
                 if token.contents in parse_until:
                     # put token back on token list so calling code knows why it terminated
@@ -218,11 +251,16 @@ class Parser:
                     raise TemplateSyntaxError, "Empty block tag"
                 try:
                     # execute callback function for this tag and append resulting node
-                    nodelist.append(registered_tags[command](self, token))
+                    self.command_stack.append( (command, token.source) )
+                    nodelist.append(registered_tags[command](self, token), token)
+                    self.command_stack.pop()
                 except KeyError:
-                    raise TemplateSyntaxError, "Invalid block tag: '%s'" % command
+                    raise TemplateSyntaxError, "Invalid block tag: '%s' at %s, line %d" % (command, token.source[0], token.source[1])
         if parse_until:
-            raise TemplateSyntaxError, "Unclosed tag(s): '%s'" % ', '.join(parse_until)
+            (command, (file,line)) = self.command_stack.pop()
+            msg = "Unclosed tag '%s' starting at %s, line %d. Looking for one of: %s " % \
+                  (command, file, line, ', '.join(parse_until) ) 
+            raise TemplateSyntaxError, msg
         return nodelist
 
     def next_token(self):
@@ -434,6 +472,7 @@ class Node:
         if hasattr(self, 'nodelist'):
             nodes.extend(self.nodelist.get_nodes_by_type(nodetype))
         return nodes
+    
 
 class NodeList(list):
     def render(self, context):
@@ -451,6 +490,11 @@ class NodeList(list):
         for node in self:
             nodes.extend(node.get_nodes_by_type(nodetype))
         return nodes
+    
+    def append(self, node, token = None):
+        if token:
+            node.source = token.source
+        super(NodeList, self).append(node)
 
 class TextNode(Node):
     def __init__(self, s):
