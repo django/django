@@ -94,7 +94,7 @@ class TestRunner:
             # within transactions.
             cursor = db.cursor()
             try:
-                db.connection.autocommit()
+                db.connection.autocommit(1)
             except AttributeError:
                 pass
             self.output(1, "Creating test database")
@@ -180,7 +180,7 @@ class TestRunner:
             cursor = db.cursor()
             self.output(1, "Deleting test database")
             try:
-                db.connection.autocommit()
+                db.connection.autocommit(1)
             except AttributeError:
                 pass
             else:
