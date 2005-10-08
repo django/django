@@ -786,6 +786,93 @@ class OneToOne(ManyToOne):
         self.lookup_overrides = lookup_overrides or {}
         self.raw_id_admin = raw_id_admin
 
+
+
+class BoundField(object):
+    def __init__(self, field, field_mapping, original):
+        self.field = field
+        self.form_fields = self.resolve_form_fields(field_mapping)
+        self.original = original
+
+    def resolve_form_fields(self, field_mapping):
+        return [field_mapping[name] for name in self.field.get_manipulator_field_names('')]
+
+    def as_field_list(self):
+        return [self.field]
+
+    def original_value(self):
+        return self.original.__dict__[self.field.name] 
+
+    def __repr__(self):
+        return "BoundField:(%s, %s)" %( self.field.name, self.form_fields)
+
+class BoundFieldLine(object):
+    def __init__(self, field_line, field_mapping, original, bound_field_class=BoundField):
+        self.bound_fields = [bound_field_class(field, field_mapping, original) for field in field_line]
+    
+    def __iter__(self):
+        for bound_field in self.bound_fields:
+            yield bound_field
+    
+    def __repr__(self):
+        return "%s:(%s)" % (self.__class__.__name__, self.bound_fields)
+    
+    def __len__(self):
+        return len(self.bound_fields)
+    
+class FieldLine(object):
+    def __init__(self, linespec, field_locator_func):
+        if isinstance(linespec, basestring):
+            self.fields = [field_locator_func(linespec)]
+        else:
+            self.fields = [field_locator_func(field_name) for field_name in linespec]
+
+    def bind(self, field_mapping, original, bound_field_line_class=BoundFieldLine):
+        return bound_field_line_class(self, field_mapping, original)
+
+    def __iter__(self):
+        for field in self.fields:
+            yield field
+    
+    def __len__(self):
+        return len(self.fields)    
+    
+class BoundFieldSet(object):
+    def __init__(self, field_set, field_mapping, original, bound_field_line_class=BoundFieldLine):
+        self.name = field_set.name
+        self.classes = field_set.classes
+        self.bound_field_lines = [ field_line.bind(field_mapping,original, bound_field_line_class) 
+                                   for field_line in field_set]
+    def __repr__(self):
+        return "%s:(%s,%s)" % (self.__class__.__name__, self.name, self.bound_field_lines)
+
+    def __iter__(self):
+        for bound_field_line in self.bound_field_lines:
+            yield bound_field_line
+   
+    def __len__(self):
+        return len(self.bound_field_lines)
+   
+class FieldSet(object):
+    def __init__(self, name, classes, field_lines):
+        self.name = name
+        self.field_lines = field_lines
+        self.classes = classes
+        
+    def __repr__(self):
+         return "FieldSet:(%s,%s)" % (self.name, self.field_lines)
+
+    def bind(self, field_mapping, original, bound_field_set_class=BoundFieldSet):
+        return bound_field_set_class(self, field_mapping, original)
+
+    def __iter__(self):
+        for field_line in self.field_lines:
+            yield field_line
+
+    def __len__(self):
+        return len(self.field_lines)
+
+
 class Admin:
     def __init__(self, fields=None, js=None, list_display=None, list_filter=None, date_hierarchy=None,
         save_as=False, ordering=None, search_fields=None, save_on_top=False):
@@ -808,7 +895,7 @@ class Admin:
         the dict has attribs 'fields' and maybe 'classes'. 
         fields is a list of subclasses of Field. 
 
-        Return value needs to be encapsulated.
+        TODO:Return value needs to be encapsulated.
         """
         if self.fields is None:
             field_struct = ((None, {'fields': [f.name for f in opts.fields + opts.many_to_many if f.editable and not isinstance(f, AutoField)]}),)
@@ -827,3 +914,23 @@ class Admin:
             new_fieldset[1]['fields'] = admin_fields
             new_fieldset_list.append(new_fieldset)
         return new_fieldset_list
+    
+    def get_field_sets(self, opts):
+        if self.fields is None:
+            field_struct = ((None, {
+                    'fields': [f.name for f in opts.fields + opts.many_to_many if f.editable and not isinstance(f, AutoField)]
+                    }),)
+        else:
+            field_struct = self.fields
+            
+        
+        new_fieldset_list = []
+        for fieldset in field_struct:
+            name = fieldset[0]
+            fs_options = fieldset[1]
+            classes =  fs_options.get('classes', None)
+            line_specs = fs_options['fields']
+            field_lines = [FieldLine(line_spec, opts.get_field) for line_spec in line_specs]
+            new_fieldset_list.append(FieldSet(name, classes, field_lines) )
+        return new_fieldset_list
+        

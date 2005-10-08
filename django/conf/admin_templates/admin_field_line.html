@@ -1,8 +1,8 @@
-<div class="{{ class_names }}">
+<div class="{{ class_names }}" >
    {% for bound_field in bound_fields %}
       {{ bound_field.html_error_list }} 
    {% endfor %}
-
+   
    {% for bound_field in bound_fields %}
       {% if bound_field.has_label_first %}
          {% field_label bound_field %}
@@ -16,8 +16,8 @@
 
       {% if change %}
       	 {% if bound_field.field.primary_key %}
-	    {{ bound_field.original_value }} 
-	 {% endif %}
+	     {{ bound_field.original_value }} 
+	  {% endif %}
 
 	 {% if bound_field.raw_id_admin %}
 	    {% if bound_field.existing_repr %}
@@ -31,6 +31,6 @@
            {{bound_field.field.help_text}}
 	</p>
       {% endif %}
-   {% endfor %}
 
+   {% endfor %}
 </div>

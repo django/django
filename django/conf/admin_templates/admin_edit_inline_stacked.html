@@ -8,7 +8,7 @@
          {% if bound_field.not_in_table %}
             {% field_widget bound_field %}
          {% else %}
-            {% admin_field_bound bound_field %}
+            {% admin_field_line bound_field %}
          {% endif %}
       {% endfor %}
     {%endfor%}

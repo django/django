@@ -113,6 +113,11 @@ class Template:
     def __init__(self, template_string, filename=UNKNOWN_SOURCE):
         "Compilation stage"
         self.nodelist = compile_string(template_string, filename)
+        from pprint import pprint, pformat
+        print "------------------------"
+        print filename
+        pprint(self.nodelist)
+        print "------------------------"
 
     def __iter__(self):
         for node in self.nodelist:
@@ -212,6 +217,11 @@ def tokenize(template_string, filename):
         
         while linebreaks and line != lastline and linebreaks[line] <= upto:
            line += 1
+    
+    last_bit = template_string[upto:]
+    if len(last_bit):
+        token_tups.append( (last_bit, line) )
+ 
  
     return [ create_token(tok, (filename, line)) for tok, line in token_tups]
 

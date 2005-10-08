@@ -50,16 +50,16 @@
 {% endif %}
 <b>
 </b>
-{% for fieldset in admin_fieldsets %}
-   <fieldset class="module aligned {{ fieldset.classes }}">
-    {% if fieldset.name %}
-   <h2>{{fieldset.name }}</h2> 
+{% for bound_field_set in bound_field_sets %}
+   <fieldset class="module aligned {{ bound_field_set.classes }}">
+    {% if bound_field_set.name %}
+   <h2>{{bound_field_set.name }}</h2> 
     {% endif %}
-    {% for bound_field_set in fieldset.bound_field_sets %}
-        {% for bound_field in bound_field_set %}
-            {% admin_field_bound bound_field %}
+    {% for bound_field_line in bound_field_set %}
+    	{% admin_field_line bound_field_line %}
+        {% for bound_field in bound_field_line %}
             {% filter_interface_script_maybe bound_field %} 
-        {% endfor %} 
+        {% endfor %}
     {% endfor %}
    </fieldset>
 {% endfor %}

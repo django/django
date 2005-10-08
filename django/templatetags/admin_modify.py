@@ -8,6 +8,7 @@ from django.utils.functional import curry
 from django.core.template_decorators import simple_tag, inclusion_tag
 
 from django.views.admin.main import AdminBoundField
+from django.core.meta.fields import BoundField
 import re
 
 word_re = re.compile('[A-Z][a-z]+')
@@ -24,24 +25,24 @@ include_admin_script = simple_tag(include_admin_script)
 
 #@inclusion_tag('admin_submit_line', takes_context=True)
 def submit_row(context):        
-        change = context['change']
-	add = context['add']
-	show_delete = context['show_delete']
-	ordered_objects = context['ordered_objects']
- 	save_as = context['save_as']
-	has_delete_permission = context['has_delete_permission']
-        is_popup = context['is_popup']
-	  
-        return {
-	    'onclick_attrib' : (ordered_objects and change 
-                                and 'onclick="submitOrderForm();"' or ''), 
-            'show_delete_link' : (not is_popup and has_delete_permission 
-                                  and (change or show_delete)), 
-            'show_save_as_new' : not is_popup and change and save_as,
-            'show_save_and_add_another': not is_popup and (not save_as or add),
-            'show_save_and_continue': not is_popup,
-            'show_save': True
-        }
+    change = context['change']
+    add = context['add']
+    show_delete = context['show_delete']
+    ordered_objects = context['ordered_objects']
+    save_as = context['save_as']
+    has_delete_permission = context['has_delete_permission']
+    is_popup = context['is_popup']
+  
+    return {
+        'onclick_attrib' : (ordered_objects and change 
+                            and 'onclick="submitOrderForm();"' or ''), 
+        'show_delete_link' : (not is_popup and has_delete_permission 
+                              and (change or show_delete)), 
+        'show_save_as_new' : not is_popup and change and save_as,
+        'show_save_and_add_another': not is_popup and (not save_as or add),
+        'show_save_and_continue': not is_popup,
+        'show_save': True
+    }
 
 srdec = inclusion_tag('admin_submit_line', takes_context=True)
 submit_row = srdec(submit_row)
@@ -118,10 +119,10 @@ class FieldWrapper(object):
                 and self.field.rel.raw_id_admin
 
 class FormFieldCollectionWrapper(object):
-    def __init__(self, obj, fields):
-        self.obj = obj
+    def __init__(self, field_mapping, fields):
+        self.field_mapping = field_mapping
         self.fields = fields
-        self.bound_fields = [ AdminBoundField(field, obj['original'],  True, self.obj) for field in self.fields ]
+        self.bound_fields = [ AdminBoundField(field, self.field_mapping, field_mapping['original']) for field in self.fields ]
 
     def showurl(self):
         return False
@@ -145,7 +146,6 @@ class EditInlineNode(template.Node):
         context.pop()
         return output
 
-       
     def fill_context(self, relation, add, change, context):
         field_wrapper_list = relation.editable_fields(FieldWrapper)
 
@@ -154,13 +154,12 @@ class EditInlineNode(template.Node):
         form = template.resolve_variable('form', context)
         form_field_collections = form[relation.opts.module_name]
         fields = relation.editable_fields()
-        form_field_collection_wrapper_list = [FormFieldCollectionWrapper(o,fields) for o in form_field_collections] 
+        form_field_collection_wrapper_list = [FormFieldCollectionWrapper(field_mapping ,fields) for field_mapping in form_field_collections] 
    
         context['field_wrapper_list'] = field_wrapper_list
         context['form_field_collection_wrapper_list'] = form_field_collection_wrapper_list 
         context['num_headers'] = len(field_wrapper_list)
         context['original_row_needed'] = max([fw.use_raw_id_admin() for fw in field_wrapper_list]) 
-#        context['name_prefix'] = "%s." % (var_name,)
 
 
 #@simple_tag
@@ -215,13 +214,13 @@ def register_one_arg_tag(node):
 for node in one_arg_tag_nodes:
     register_one_arg_tag(node)    
 
-     
-#@inclusion_tag('admin_field', takes_context=True)
-def admin_field_bound(context, argument_val):
-    if (isinstance(argument_val, list)):
-        bound_fields = argument_val 
+
+#@inclusion_tag('admin_field_line', takes_context=True)
+def admin_field_line(context, argument_val):
+    if (isinstance(argument_val, BoundField)):
+        bound_fields = [argument_val] 
     else:
-        bound_fields = [argument_val]
+        bound_fields = [bf for bf in argument_val]
     add = context['add']
     change = context['change']
    
@@ -236,15 +235,15 @@ def admin_field_bound(context, argument_val):
     if isinstance(bound_fields[0].field, meta.BooleanField):
         class_names.append('checkbox-row')
 
-    return { 
+    return {
         'add' : context['add'],
         'change' : context['change'],
         'bound_fields' :  bound_fields, 
         'class_names' : " ".join(class_names)
-    } 
+    }
 
     
-afbdec = inclusion_tag('admin_field', takes_context=True)    
-admin_field_bound = afbdec(admin_field_bound)
+afbdec = inclusion_tag('admin_field_line', takes_context=True)    
+admin_field_line = afbdec(admin_field_line)
 
 

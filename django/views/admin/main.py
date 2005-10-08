@@ -1,6 +1,7 @@
 # Generic admin views, with admin templates created dynamically at runtime.
 
 from django.core import formfields, meta, template_loader, template
+from django.core.meta.fields import BoundField, BoundFieldLine, BoundFieldSet
 from django.core.exceptions import Http404, ObjectDoesNotExist, PermissionDenied
 from django.core.extensions import DjangoContext as Context
 from django.core.extensions import get_object_or_404, render_to_response
@@ -539,25 +540,10 @@ def get_javascript_imports(opts,auto_populated_fields, ordered_objects, admin_fi
             break
     return js
 
-class BoundField(object):
-    def __init__(self, field, original, rel, field_mapping):
-        self.field = field
-        self.form_fields = self.resolve_form_fields(field_mapping)
-        self.original = original
-        self.rel = rel
 
-    def resolve_form_fields(self, field_mapping):
-        return [field_mapping[name] for name in self.field.get_manipulator_field_names('')]
-
-    def as_field_list(self):
-        return [self.field]
-
-    def original_value(self):
-        return self.original.__dict__[self.field.name] 
- 
 class AdminBoundField(BoundField):
-    def __init__(self, field, original, rel, field_mapping):
-        super(AdminBoundField, self).__init__(field,original, rel, field_mapping) 	
+    def __init__(self, field, field_mapping, original):
+        super(AdminBoundField, self).__init__(field,field_mapping,original) 	
 
         self.element_id = self.form_fields[0].get_id() 
         self.has_label_first = not isinstance(self.field, meta.BooleanField)
@@ -577,8 +563,6 @@ class AdminBoundField(BoundField):
             self.cell_class_attribute = ' class="%s" ' % ' '.join(classes)
         self._repr_filled = False
     
-
-       
     def _fetch_existing_repr(self, func_name):
         class_dict = self.original.__class__.__dict__
         func = class_dict.get(func_name)
@@ -591,9 +575,9 @@ class AdminBoundField(BoundField):
         if isinstance(self.field.rel, meta.ManyToOne):
              func_name = 'get_%s' % self.field.name
              self._repr = self._fetch_existing_repr(func_name)
-	elif isinstance(self.field.rel, meta.ManyToMany):
-	     func_name = 'get_%s_list' % self.field.name 
-             self._repr =  ",".join(self._fetch_existing_repr(func_name))
+        elif isinstance(self.field.rel, meta.ManyToMany):
+            func_name = 'get_%s_list' % self.field.name 
+            self._repr =  ",".join(self._fetch_existing_repr(func_name))
         self._repr_filled = True
              
     def existing_repr(self):
@@ -607,33 +591,24 @@ class AdminBoundField(BoundField):
         return " ".join([form_field.html_error_list() for form_field in self.form_fields if form_field.errors])        
 
 
-class AdminFieldSet(object):
-    def __init__(self, fieldset_name, options, form, original):
-         self.name = fieldset_name
-	 self.options = options
-         self.bound_field_sets = self.get_bound_field_sets(form, original)
-         self.classes = options.get('classes', '')
-     
-    def __repr__(self):
-     	return "Fieldset:(%s,%s)" % (self.name, self.bound_field_sets)
+class AdminBoundFieldLine(BoundFieldLine):
+    def __init__(self, field_line, field_mapping, original):
+        super(AdminBoundFieldLine, self).__init__(field_line, field_mapping, original, AdminBoundField)
+        for bound_field in self:
+            bound_field.first = True
+            break
 
-    def get_bound_field_sets(self, form, original):
-        fields = self.options['fields']
-        bound_field_sets = [ [AdminBoundField(f, original, False, form) for f in field  ] for field in fields]
-        for set in bound_field_sets:
-            first = True 
-            for bound_field in set:
-                bound_field.first = first
-                first = False
-
-        return bound_field_sets
-
+class AdminBoundFieldSet(BoundFieldSet):
+    def __init__(self, field_set, field_mapping, original):
+        super(AdminBoundFieldSet, self).__init__(field_set, field_mapping, original, AdminBoundFieldLine)
+        
+        
 def fill_extra_context(opts, app_label, context, add=False, change=False, show_delete=False, form_url=''):
     admin_field_objs = opts.admin.get_field_objs(opts)
     ordered_objects = opts.get_ordered_objects()[:]
     auto_populated_fields = [f for f in opts.fields if f.prepopulate_from]
  
-    javascript_imports = get_javascript_imports(opts,auto_populated_fields, ordered_objects, admin_field_objs);
+    javascript_imports = get_javascript_imports(opts, auto_populated_fields, ordered_objects, admin_field_objs);
     
     if ordered_objects:
         coltype = 'colMS'
@@ -646,25 +621,26 @@ def fill_extra_context(opts, app_label, context, add=False, change=False, show_d
 
     form = context['form']
     original = context['original']
-    admin_fieldsets = [AdminFieldSet(name, options, form, original) for name, options in admin_field_objs] 
+    bound_field_sets = [field_set.bind(form, original, AdminBoundFieldSet) 
+                        for field_set in opts.admin.get_field_sets(opts)]
+                        
     inline_related_objects = opts.get_inline_related_objects_wrapped()
     
     ordered_object_names =   ' '.join(['object.%s' % o.pk.name for o in ordered_objects])
    
     extra_context = {
         'add': add, 
-        'change': change, 
-        'admin_field_objs' : admin_field_objs, 
+        'change': change,
         'ordered_objects' : ordered_objects, 
+        'ordered_object_names' : ordered_object_names,
         'auto_populated_fields' : auto_populated_fields,
         'javascript_imports' : javascript_imports, 
         'coltype' : coltype, 
         'has_absolute_url': has_absolute_url, 
         'form_enc_attrib': form_enc_attrib,
-        'form_url' : form_url, 
-        'admin_fieldsets' : admin_fieldsets, 
+        'form_url' : form_url,
+        'bound_field_sets' : bound_field_sets,
         'inline_related_objects': inline_related_objects,
-        'ordered_object_names' : ordered_object_names, 
         'content_type_id' : opts.get_content_type_id(),
         'save_on_top' : opts.admin.save_on_top,
         'verbose_name_plural': opts.verbose_name_plural, 
