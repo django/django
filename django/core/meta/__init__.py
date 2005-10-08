@@ -1475,9 +1475,7 @@ def function_get_sql_clause(opts, **kwargs):
                 table_prefix = opts.db_table + '.'
             else:
                 table_prefix = ''
-            
             order_by.append('%s%s %s' % (table_prefix, orderfield2column(col_name, opts), order))
-    
     order_by = ", ".join(order_by)
 
     # LIMIT and OFFSET clauses
