@@ -37,9 +37,28 @@ basedir = os.path.join(basedir, lang, 'LC_MESSAGES')
 if not os.path.isdir(basedir):
     os.makedirs(basedir)
 
-tpl_i18n_re = re.compile(r'{%\s+i18n\s+.*?%}')
-tpl_value_re = re.compile(r'{{\s*_\(.*?\)\s*}}')
-tpl_tag_re = re.compile(r"""{%.*_\((?:".*?")|(?:'.*?')\).*%}""")
+dot_re = re.compile('\S')
+def blank(src):
+    return dot_re.sub('p', src)
+
+def templateize(src):
+    o = []
+    going = 1
+    while going:
+        start = src.find('{')
+        if start >= 0 and src[start+1] in ('{', '%'):
+            o.append(blank(src[:start]))
+            end = src.find(src[start+1] == '{' and '}' or '%', start)
+            if end >= 0:
+                o.append(src[start:end+2])
+                src = src[end+2:]
+            else:
+                o.append(blank(src[start:]))
+                going = 0
+        else:
+            o.append(blank(src))
+            going = 0
+    return ''.join(o)
 
 pofile = os.path.join(basedir, '%s.po' % domain)
 potfile = os.path.join(basedir, '%s.pot' % domain)
@@ -53,19 +72,16 @@ for (dirpath, dirnames, filenames) in os.walk("."):
             thefile = file
             if file.endswith('.html'):
                 src = open(os.path.join(dirpath, file), "rb").read()
-                lst = []
-                for match in tpl_i18n_re.findall(src):
-                   lst.append(match)
-                for match in tpl_value_re.findall(src):
-                   lst.append(match)
-                for match in tpl_tag_re.findall(src):
-                   lst.append(match)
-                open(os.path.join(dirpath, '%s.py' % file), "wb").write('\n'.join(lst))
+                open(os.path.join(dirpath, '%s.py' % file), "wb").write(templateize(src))
                 thefile = '%s.py' % file
             if verbose: sys.stdout.write('processing file %s in %s\n' % (file, dirpath))
             cmd = 'xgettext %s -d %s -L Python -o - "%s"' % (
                 os.path.exists(potfile) and '--omit-header' or '', domain, os.path.join(dirpath, thefile))
             msgs = os.popen(cmd, 'r').read()
+            if thefile != file:
+                old = '#: '+os.path.join(dirpath, thefile)[2:]
+                new = '#: '+os.path.join(dirpath, file)[2:]
+                msgs = msgs.replace(old, new)
             if msgs:
                 open(potfile, 'ab').write(msgs)
             if thefile != file:
