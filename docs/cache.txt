@@ -295,4 +295,4 @@ Put the ``CacheMiddleware`` after any middlewares that might add something to
 the ``Vary`` header. The following middlewares do so:
 
     * ``SessionMiddleware`` adds ``Cookie``
-    * ``GzipMiddleware`` adds ``Accept-Encoding``
+    * ``GZipMiddleware`` adds ``Accept-Encoding``
