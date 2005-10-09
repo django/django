@@ -2,25 +2,27 @@
 Django's cache framework
 ========================
 
-So, you got slashdotted.  Now what?
+So, you got slashdotted_. Now what?
 
 Django's cache framework gives you three methods of caching dynamic pages in
 memory or in a database. You can cache the output of entire pages, you can
 cache only the pieces that are difficult to produce, or you can cache your
 entire site.
 
+.. _slashdotted: http://en.wikipedia.org/wiki/Slashdot_effect
+
 Setting up the cache
 ====================
 
-The cache framework is split into a set of "backends" that provide different
-methods of caching data. There's a simple single-process memory cache (mostly
-useful as a fallback) and a memcached_ backend (the fastest option, by far, if
-you've got the RAM).
+The cache framework allows for different "backends" -- different methods of
+caching data. There's a simple single-process memory cache (mostly useful as a
+fallback) and a memcached_ backend (the fastest option, by far, if you've got
+the RAM).
 
 Before using the cache, you'll need to tell Django which cache backend you'd
 like to use. Do this by setting the ``CACHE_BACKEND`` in your settings file.
 
-The CACHE_BACKEND setting is a "fake" URI (really an unregistered scheme).
+The ``CACHE_BACKEND`` setting is a "fake" URI (really an unregistered scheme).
 Examples:
 
     ==============================  ===========================================
@@ -39,7 +41,7 @@ Examples:
     simple:///                      A simple single-process memory cache; you
                                     probably don't want to use this except for
                                     testing. Note that this cache backend is
-                                    NOT threadsafe!
+                                    NOT thread-safe!
 
     locmem:///                      A more sophisticated local memory cache;
                                     this is multi-process- and thread-safe.
@@ -72,22 +74,24 @@ For example::
 Invalid arguments are silently ignored, as are invalid values of known
 arguments.
 
+.. _memcached: http://www.danga.com/memcached/
+
 The per-site cache
 ==================
 
-Once the cache is set up, the simplest way to use the cache is to simply
-cache your entire site. Just add ``django.middleware.cache.CacheMiddleware``
-to your ``MIDDLEWARE_CLASSES`` setting, as in this example::
+Once the cache is set up, the simplest way to use the cache is to cache your
+entire site. Just add ``django.middleware.cache.CacheMiddleware`` to your
+``MIDDLEWARE_CLASSES`` setting, as in this example::
 
     MIDDLEWARE_CLASSES = (
         "django.middleware.cache.CacheMiddleware",
         "django.middleware.common.CommonMiddleware",
     )
 
-Make sure it's the first entry in ``MIDDLEWARE_CLASSES``. (The order of
-``MIDDLEWARE_CLASSES`` matters.)
+(The order of ``MIDDLEWARE_CLASSES`` matters. See "Order of MIDDLEWARE_CLASSES"
+below.)
 
-Then, add the following three required settings:
+Then, add the following three required settings to your Django settings file:
 
 * ``CACHE_MIDDLEWARE_SECONDS`` -- The number of seconds each page should be
   cached.
@@ -102,16 +106,20 @@ Then, add the following three required settings:
   in the cache. That means subsequent requests won't have the overhead of
   zipping, and the cache will hold more pages because each one is smaller.
 
-Pages with GET or POST parameters won't be cached.
+The cache middleware caches every page that doesn't have GET or POST
+parameters. Additionally, ``CacheMiddleware`` automatically sets a few headers
+in each ``HttpResponse``:
 
-The cache middleware also makes a few more optimizations:
-
-* Sets and deals with ``ETag`` headers.
-* Sets the ``Content-Length`` header.
 * Sets the ``Last-Modified`` header to the current date/time when a fresh
   (uncached) version of the page is requested.
+* Sets the ``Expires`` header to the current date/time plus the defined
+  ``CACHE_MIDDLEWARE_SECONDS``.
+* Sets the ``Cache-Control`` header to give a max age for the page -- again,
+  from the ``CACHE_MIDDLEWARE_SECONDS`` setting.
 
-It doesn't matter where in the middleware stack you put the cache middleware.
+See the `middleware documentation`_ for more on middleware.
+
+.. _`middleware documentation`: http://www.djangoproject.com/documentation/middleware/
 
 The per-page cache
 ==================
@@ -134,25 +142,25 @@ Or, using Python 2.4's decorator syntax::
     def slashdot_this(request):
         ...
 
-This will cache the result of that view for 15 minutes. (The cache timeout is
-in seconds.)
+``cache_page`` takes a single argument: the cache timeout, in seconds. In the
+above example, the result of the ``slashdot_this()`` view will be cached for 15
+minutes.
 
 The low-level cache API
 =======================
 
-There are times, however, that caching an entire rendered page doesn't gain
-you very much. The Django developers have found it's only necessary to cache a
-list of object IDs from an intensive database query, for example. In cases like
-these, you can use the cache API to store objects in the cache with any level
-of granularity you like.
+Sometimes, however, caching an entire rendered page doesn't gain you very much.
+For example, you may find it's only necessary to cache the result of an
+intensive database. In cases like this, you can use the low-level cache API to
+store objects in the cache with any level of granularity you like.
 
 The cache API is simple::
 
-    # the cache module exports a cache object that's automatically
-    # created from the CACHE_BACKEND setting
+    # The cache module exports a cache object that's automatically
+    # created from the CACHE_BACKEND setting.
     >>> from django.core.cache import cache
 
-    # The basic interface is set(key, value, timeout_seconds) and get(key)
+    # The basic interface is set(key, value, timeout_seconds) and get(key).
     >>> cache.set('my_key', 'hello, world!', 30)
     >>> cache.get('my_key')
     'hello, world!'
@@ -161,7 +169,7 @@ The cache API is simple::
     >>> cache.get('my_key')
     None
 
-    # get() can take a default argument
+    # get() can take a default argument.
     >>> cache.get('my_key', 'has_expired')
     'has_expired'
 
@@ -183,4 +191,108 @@ The cache API is simple::
 That's it. The cache has very few restrictions: You can cache any object that
 can be pickled safely, although keys must be strings.
 
-.. _memcached: http://www.danga.com/memcached/
+Controlling cache: Using Vary headers
+=====================================
+
+The Django cache framework works with `HTTP Vary headers`_ to allow developers
+to instruct caching mechanisms to differ their cache contents depending on
+request HTTP headers.
+
+Essentially, the ``Vary`` response HTTP header defines which request headers a
+cache mechanism should take into account when building its cache key.
+
+By default, Django's cache system creates its cache keys using the requested
+path -- e.g., ``"/stories/2005/jun/23/bank_robbed/"``. This means every request
+to that URL will use the same cached version, regardless of user-agent
+differences such as cookies or language preferences.
+
+That's where ``Vary`` comes in.
+
+If your Django-powered page outputs different content based on some difference
+in request headers -- such as a cookie, or language, or user-agent -- you'll
+need to use the ``Vary`` header to tell caching mechanisms that the page output
+depends on those things.
+
+To do this in Django, use the convenient ``vary_on_headers`` view decorator,
+like so::
+
+    from django.views.decorators.vary import vary_on_headers
+
+    # Python 2.3 syntax.
+    def my_view(request):
+        ...
+    my_view = vary_on_headers(my_view, 'User-Agent')
+
+    # Python 2.4 decorator syntax.
+    @vary_on_headers('User-Agent')
+    def my_view(request):
+        ...
+
+In this case, a caching mechanism (such as Django's own cache middleware) will
+cache a separate version of the page for each unique user-agent.
+
+The advantage to using the ``vary_on_headers`` decorator rather than manually
+setting the ``Vary`` header (using something like
+``response['Vary'] = 'user-agent'``) is that the decorator adds to the ``Vary``
+header (which may already exist) rather than setting it from scratch.
+
+Note that you can pass multiple headers to ``vary_on_headers()``:
+
+    @vary_on_headers('User-Agent', 'Cookie')
+    def my_view(request):
+        ...
+
+Because varying on cookie is such a common case, there's a ``vary_on_cookie``
+decorator. These two views are equivalent::
+
+    @vary_on_cookie
+    def my_view(request):
+        ...
+
+    @vary_on_headers('Cookie')
+    def my_view(request):
+        ...
+
+Also note that the headers you pass to ``vary_on_headers`` are not case
+sensitive. ``"User-Agent"`` is the same thing as ``"user-agent"``.
+
+You can also use a helper function, ``patch_vary_headers()``, directly::
+
+    from django.utils.cache import patch_vary_headers
+    def my_view(request):
+        ...
+        response = render_to_response('template_name', context)
+        patch_vary_headers(response, ['Cookie'])
+        return response
+
+``patch_vary_headers`` takes an ``HttpResponse`` instance as its first argument
+and a list/tuple of header names as its second argument.
+
+.. _`HTTP Vary headers`: http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.44
+
+Other optimizations
+===================
+
+Django comes with a few other pieces of middleware that can help optimize your
+apps' performance:
+
+    * ``django.middleware.http.ConditionalGetMiddleware`` adds support for
+      conditional GET. This makes use of ``ETag`` and ``Last-Modified``
+      headers.
+
+    * ``django.middleware.gzip.GZipMiddleware`` compresses content for browsers
+      that understand gzip compression (all modern browsers).
+
+Order of MIDDLEWARE_CLASSES
+===========================
+
+If you use ``CacheMiddleware``, it's important to put it in the right place
+within the ``MIDDLEWARE_CLASSES`` setting, because the cache middleware needs
+to know which headers by which to vary the cache storage. Middleware always
+adds something the ``Vary`` response header when it can.
+
+Put the ``CacheMiddleware`` after any middlewares that might add something to
+the ``Vary`` header. The following middlewares do so:
+
+    * ``SessionMiddleware`` adds ``Cookie``
+    * ``GzipMiddleware`` adds ``Accept-Encoding``

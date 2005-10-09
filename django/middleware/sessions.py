@@ -1,5 +1,6 @@
 from django.conf.settings import SESSION_COOKIE_NAME, SESSION_COOKIE_AGE, SESSION_COOKIE_DOMAIN
 from django.models.core import sessions
+from django.utils.cache import patch_vary_headers
 import datetime
 
 TEST_COOKIE_NAME = 'testcookie'
@@ -61,6 +62,7 @@ class SessionMiddleware:
     def process_response(self, request, response):
         # If request.session was modified, or if response.session was set, save
         # those changes and set a session cookie.
+        patch_vary_headers(response, ('Cookie',))
         try:
             modified = request.session.modified
         except AttributeError:
