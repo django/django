@@ -1,8 +1,8 @@
 """
-This module contains helper functions and decorators for controlling caching.
-It does so by managing the "Vary" header of responses. It includes functions
-to patch the header of response objects directly and decorators that change
-functions to do that header-patching themselves.
+This module contains helper functions for controlling caching. It does so by
+managing the "Vary" header of responses. It includes functions to patch the
+header of response objects directly and decorators that change functions to do
+that header-patching themselves.
 
 For information on the Vary header, see:
 
@@ -63,40 +63,6 @@ def patch_vary_headers(response, newheaders):
         if not newheader.lower() in oldheaders:
             vary.append(newheader)
     response['Vary'] = ', '.join(vary)
-
-def vary_on_headers(*headers):
-    """
-    A view decorator that adds the specified headers to the Vary header of the
-    response. Usage:
-
-       @vary_on_headers('Cookie', 'Accept-language')
-       def index(request):
-           ...
-
-    Note that the header names are not case-sensitive.
-    """
-    def decorator(func):
-        def inner_func(*args, **kwargs):
-            response = func(*args, **kwargs)
-            patch_vary_headers(response, headers)
-            return response
-        return inner_func
-    return decorator
-
-def vary_on_cookie(func):
-    """
-    A view decorator that adds "Cookie" to the Vary header of a response. This
-    indicates that a page's contents depends on cookies. Usage:
-
-        @vary_on_cookie
-        def index(request):
-            ...
-    """
-    def inner_func(*args, **kwargs):
-        response = func(*args, **kwargs)
-        patch_vary_headers(response, ('Cookie',))
-        return response
-    return inner_func
 
 def _generate_cache_key(request, headerlist, key_prefix):
     "Returns a cache key from the headers given in the header list."
