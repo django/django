@@ -1,5 +1,6 @@
 "this is the locale selecting middleware that will look at accept headers"
 
+from django.utils.cache import patch_vary_headers
 from django.utils import translation
 
 # this is a cache that will build a map from modules to applications
@@ -37,4 +38,8 @@ class LocaleMiddleware:
         request.LANGUAGE_CODE = lang
 
         translation.activate(app, lang)
+
+    def process_response(self, request, response):
+        patch_vary_headers(response, ('Accept-Language',))
+        return response
 
