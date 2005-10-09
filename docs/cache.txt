@@ -236,7 +236,7 @@ setting the ``Vary`` header (using something like
 ``response['Vary'] = 'user-agent'``) is that the decorator adds to the ``Vary``
 header (which may already exist) rather than setting it from scratch.
 
-Note that you can pass multiple headers to ``vary_on_headers()``:
+Note that you can pass multiple headers to ``vary_on_headers()``::
 
     @vary_on_headers('User-Agent', 'Cookie')
     def my_view(request):
