@@ -45,53 +45,79 @@ required.
 Available middleware
 ====================
 
-``django.middleware.admin.AdminUserRequired``
-    Limits site access to valid users with the ``is_staff`` flag set. This is
-    required by Django's admin, and this middleware requires ``SessionMiddleware``.
+django.middleware.admin.AdminUserRequired
+-----------------------------------------
 
-``django.middleware.cache.CacheMiddleware``
-    Enables site-wide cache. If this is enabled, each Django-powered page will be
-    cached for as long as the ``CACHE_MIDDLEWARE_SECONDS`` setting defines. See
-    the `cache documentation`_.
+Limits site access to valid users with the ``is_staff`` flag set. This is
+required by Django's admin, and this middleware requires ``SessionMiddleware``.
 
-    .. _`cache documentation`: http://www.djangoproject.com/documentation/cache/#the-per-site-cache
+django.middleware.cache.CacheMiddleware
+---------------------------------------
 
-``django.middleware.common.CommonMiddleware``
-    Adds a few conveniences for perfectionists:
+Enables site-wide cache. If this is enabled, each Django-powered page will be
+cached for as long as the ``CACHE_MIDDLEWARE_SECONDS`` setting defines. See
+the `cache documentation`_.
 
-    * Forbids access to user agents in the ``DISALLOWED_USER_AGENTS`` setting,
-      which should be a list of strings.
+.. _`cache documentation`: http://www.djangoproject.com/documentation/cache/#the-per-site-cache
 
-    * Performs URL rewriting based on the ``APPEND_SLASH`` and ``PREPEND_WWW``
-      settings. If ``APPEND_SLASH`` is ``True``, URLs that lack a trailing
-      slash will be redirected to the same URL with a trailing slash. If
-      ``PREPEND_WWW`` is ``True``, URLs that lack a leading "www." will be
-      redirected to the same URL with a leading "www."
+django.middleware.common.CommonMiddleware
+-----------------------------------------
 
-      Both of these options are meant to normalize URLs. The philosophy is that
-      each URL should exist in one, and only one, place. Technically a URL
-      ``foo.com/bar`` is distinct from ``foo.com/bar/`` -- a search-engine
-      indexer would treat them as separate URLs -- so it's best practice to
-      normalize URLs.
+Adds a few conveniences for perfectionists:
 
-    * Handles ETags based on the ``USE_ETAGS`` setting. If ``USE_ETAGS`` is set
-      to ``True``, Django will calculate an ETag for each request by
-      MD5-hashing the page content, and it'll take care of sending
-      ``Not Modified`` responses, if appropriate.
+* Forbids access to user agents in the ``DISALLOWED_USER_AGENTS`` setting,
+  which should be a list of strings.
 
-    * Handles flat pages. Every time Django encounters a 404 -- either within
-      a view or as a result of no URLconfs matching -- it will check the
-      database of flat pages based on the current URL.
+* Performs URL rewriting based on the ``APPEND_SLASH`` and ``PREPEND_WWW``
+  settings. If ``APPEND_SLASH`` is ``True``, URLs that lack a trailing
+  slash will be redirected to the same URL with a trailing slash. If
+  ``PREPEND_WWW`` is ``True``, URLs that lack a leading "www." will be
+  redirected to the same URL with a leading "www."
 
-``django.middleware.doc.XViewMiddleware``
-    Sends custom ``X-View`` HTTP headers to HEAD requests that come from IP
-    addresses defined in the ``INTERNAL_IPS`` setting. This is used by Django's
-    automatic documentation system.
+  Both of these options are meant to normalize URLs. The philosophy is that
+  each URL should exist in one, and only one, place. Technically a URL
+  ``foo.com/bar`` is distinct from ``foo.com/bar/`` -- a search-engine
+  indexer would treat them as separate URLs -- so it's best practice to
+  normalize URLs.
 
-``django.middleware.sessions.SessionMiddleware``
-    Enables session support. See the `session documentation`_.
+* Handles ETags based on the ``USE_ETAGS`` setting. If ``USE_ETAGS`` is set
+  to ``True``, Django will calculate an ETag for each request by
+  MD5-hashing the page content, and it'll take care of sending
+  ``Not Modified`` responses, if appropriate.
 
-    .. _`session documentation`: http://www.djangoproject.com/documentation/sessions/
+* Handles flat pages. Every time Django encounters a 404 -- either within
+  a view or as a result of no URLconfs matching -- it will check the
+  database of flat pages based on the current URL.
+
+django.middleware.doc.XViewMiddleware
+-------------------------------------
+
+Sends custom ``X-View`` HTTP headers to HEAD requests that come from IP
+addresses defined in the ``INTERNAL_IPS`` setting. This is used by Django's
+automatic documentation system.
+
+django.middleware.gzip.GZipMiddleware
+-------------------------------------
+
+Compresses content for browsers that understand gzip compression (all modern
+browsers).
+
+django.middleware.http.ConditionalGetMiddleware
+-----------------------------------------------
+
+Handles conditional GET operations. If the response has a ``ETag`` or
+``Last-Modified`` header, and the request has ``If-None-Match`` or
+``If-Modified-Since``, the response is replaced by an HttpNotModified.
+
+Also removes the content from any response to a HEAD request and sets the
+``Date`` and ``Content-Length`` response-headers.
+
+django.middleware.sessions.SessionMiddleware
+--------------------------------------------
+
+Enables session support. See the `session documentation`_.
+
+.. _`session documentation`: http://www.djangoproject.com/documentation/sessions/
 
 Writing your own middleware
 ===========================

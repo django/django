@@ -136,6 +136,8 @@ JING_PATH = "/usr/bin/jing"
 # response phase the middleware will be applied in reverse order.
 MIDDLEWARE_CLASSES = (
     "django.middleware.sessions.SessionMiddleware",
+#     "django.middleware.http.ConditionalGetMiddleware",
+#     "django.middleware.gzip.GZipMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.doc.XViewMiddleware",
 )
@@ -155,6 +157,7 @@ SESSION_COOKIE_DOMAIN = None              # A string like ".lawrence.com", or No
 # The cache backend to use.  See the docstring in django.core.cache for the
 # possible values.
 CACHE_BACKEND = 'simple://'
+CACHE_MIDDLEWARE_KEY_PREFIX = ''
 
 ####################
 # COMMENTS         #

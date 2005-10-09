@@ -596,7 +596,11 @@ class ForeignKey(Field):
         Field.__init__(self, **kwargs)
 
     def get_manipulator_field_objs(self):
-        return [formfields.IntegerField]
+        rel_field = self.rel.get_related_field()
+        if self.rel.raw_id_admin and not isinstance(rel_field, AutoField):
+            return rel_field.get_manipulator_field_objs()
+        else:
+            return [formfields.IntegerField]
 
 class ManyToManyField(Field):
     def __init__(self, to, **kwargs):

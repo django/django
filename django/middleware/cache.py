@@ -1,88 +1,70 @@
+import copy
 from django.conf import settings
 from django.core.cache import cache
+from django.utils.cache import get_cache_key, learn_cache_key, patch_response_headers
 from django.utils.httpwrappers import HttpResponseNotModified
-from django.utils.text import compress_string
-import datetime, md5
 
 class CacheMiddleware:
     """
     Cache middleware. If this is enabled, each Django-powered page will be
-    cached for CACHE_MIDDLEWARE_SECONDS seconds. Cache is based on URLs. Pages
-    with GET or POST parameters are not cached.
+    cached for CACHE_MIDDLEWARE_SECONDS seconds. Cache is based on URLs.
 
-    If the cache is shared across multiple sites using the same Django
-    installation, set the CACHE_MIDDLEWARE_KEY_PREFIX to the name of the site,
-    or some other string that is unique to this Django instance, to prevent key
-    collisions.
+    Only parameter-less GET or HEAD-requests with status code 200 are cached.
 
-    This middleware will also make the following optimizations:
+    This middleware expects that a HEAD request is answered with a response
+    exactly like the corresponding GET request.
 
-    * If the CACHE_MIDDLEWARE_GZIP setting is True, the content will be
-      gzipped.
+    When a hit occurs, a shallow copy of the original response object is
+    returned from process_request.
 
-    * ETags will be added, using a simple MD5 hash of the page's content.
+    Pages will be cached based on the contents of the request headers
+    listed in the response's "Vary" header. This means that pages shouldn't
+    change their "Vary" header.
+
+    This middleware also sets ETag, Last-Modified, Expires and Cache-Control
+    headers on the response object.
     """
+    def __init__(self, cache_timeout=None, key_prefix=None):
+        self.cache_timeout = cache_timeout
+        if cache_timeout is None:
+            self.cache_timeout = settings.CACHE_MIDDLEWARE_SECONDS
+        self.key_prefix = key_prefix
+        if key_prefix is None:
+            self.key_prefix = settings.CACHE_MIDDLEWARE_KEY_PREFIX
+
     def process_request(self, request):
-        """
-        Checks whether the page is already cached. If it is, returns the cached
-        version. Also handles ETag stuff.
-        """
-        if request.GET or request.POST:
-            request._cache_middleware_set_cache = False
+        "Checks whether the page is already cached and returns the cached version if available."
+        if not request.META['REQUEST_METHOD'] in ('GET', 'HEAD') or request.GET:
+            request._cache_update_cache = False
             return None # Don't bother checking the cache.
 
-        accept_encoding = ''
-        if settings.CACHE_MIDDLEWARE_GZIP:
-            try:
-                accept_encoding = request.META['HTTP_ACCEPT_ENCODING']
-            except KeyError:
-                pass
-        accepts_gzip = 'gzip' in accept_encoding
-        request._cache_middleware_accepts_gzip = accepts_gzip
-
-        # This uses the same cache_key as views.decorators.cache.cache_page,
-        # so the cache can be shared.
-        cache_key = 'views.decorators.cache.cache_page.%s.%s.%s' % \
-            (settings.CACHE_MIDDLEWARE_KEY_PREFIX, request.path, accepts_gzip)
-        request._cache_middleware_key = cache_key
+        cache_key = get_cache_key(request, self.key_prefix)
+        if cache_key is None:
+            request._cache_update_cache = True
+            return None # No cache information available, need to rebuild.
 
         response = cache.get(cache_key, None)
         if response is None:
-            request._cache_middleware_set_cache = True
-            return None
-        else:
-            request._cache_middleware_set_cache = False
-            # Logic is from http://simon.incutio.com/archive/2003/04/23/conditionalGet
-            try:
-                if_none_match = request.META['HTTP_IF_NONE_MATCH']
-            except KeyError:
-                if_none_match = None
-            try:
-                if_modified_since = request.META['HTTP_IF_MODIFIED_SINCE']
-            except KeyError:
-                if_modified_since = None
-            if if_none_match is None and if_modified_since is None:
-                pass
-            elif if_none_match is not None and response['ETag'] != if_none_match:
-                pass
-            elif if_modified_since is not None and response['Last-Modified'] != if_modified_since:
-                pass
-            else:
-                return HttpResponseNotModified()
-        return response
+            request._cache_update_cache = True
+            return None # No cache information available, need to rebuild.
+
+        request._cache_update_cache = False
+        return copy.copy(response)
 
     def process_response(self, request, response):
-        """
-        Sets the cache, if needed.
-        """
-        if request._cache_middleware_set_cache:
-            content = response.get_content_as_string(settings.DEFAULT_CHARSET)
-            if request._cache_middleware_accepts_gzip:
-                content = compress_string(content)
-                response.content = content
-                response['Content-Encoding'] = 'gzip'
-            response['ETag'] = md5.new(content).hexdigest()
-            response['Content-Length'] = '%d' % len(content)
-            response['Last-Modified'] = datetime.datetime.utcnow().strftime('%a, %d %b %Y %H:%M:%S GMT')
-            cache.set(request._cache_middleware_key, response, settings.CACHE_MIDDLEWARE_SECONDS)
+        "Sets the cache, if needed."
+        if not request._cache_update_cache:
+            # We don't need to update the cache, just return.
+            return response
+        if not request.META['REQUEST_METHOD'] == 'GET':
+            # This is a stronger requirement than above. It is needed
+            # because of interactions between this middleware and the
+            # HTTPMiddleware, which throws the body of a HEAD-request
+            # away before this middleware gets a chance to cache it.
+            return response
+        if not response.status_code == 200:
+            return response
+        patch_response_headers(response, self.cache_timeout)
+        cache_key = learn_cache_key(request, response, self.cache_timeout, self.key_prefix)
+        cache.set(cache_key, response, self.cache_timeout)
         return response

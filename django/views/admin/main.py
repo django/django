@@ -251,7 +251,7 @@ def change_list(request, app_label, module_name):
                 lookup_val = request.GET.get(lookup_kwarg, None)
                 lookup_val2 = request.GET.get(lookup_kwarg2, None)
                 filter_template.append('<h3>By %s:</h3><ul>\n' % f.verbose_name)
-                for k, v in (('All', None), ('Yes', 'True'), ('No', 'False')):
+                for k, v in (('All', None), ('Yes', '1'), ('No', '0')):
                     filter_template.append('<li%s><a href="%s">%s</a></li>\n' % \
                         (((lookup_val == v and not lookup_val2) and ' class="selected"' or ''),
                         get_query_string(params, {lookup_kwarg: v}, [lookup_kwarg2]), k))
