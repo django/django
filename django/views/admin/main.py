@@ -552,7 +552,7 @@ class AdminBoundField(BoundField):
         self.is_file_field = isinstance(field, meta.FileField)
         self.needs_add_label = field.rel and isinstance(field.rel, meta.ManyToOne) or isinstance(field.rel, meta.ManyToMany) and field.rel.to.admin
         self.not_in_table = isinstance(self.field, meta.AutoField)
-        self.first = True
+        self.first = False
         
         classes = []
         if(self.raw_id_admin): 

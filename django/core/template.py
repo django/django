@@ -113,12 +113,7 @@ class Template:
     def __init__(self, template_string, filename=UNKNOWN_SOURCE):
         "Compilation stage"
         self.nodelist = compile_string(template_string, filename)
-        from pprint import pprint, pformat
-        print "------------------------"
-        print filename
-        pprint(self.nodelist)
-        print "------------------------"
-
+       
     def __iter__(self):
         for node in self.nodelist:
             for subnode in node:
@@ -193,36 +188,43 @@ class Token:
             self.source[0], self.source[1]
             )
 
+def find_linebreaks(template_string):
+    for match in newline_re.finditer(template_string):
+        yield match.start()
 
 def tokenize(template_string, filename):
     "Return a list of tokens from a given template_string"
-    # remove all empty strings, because the regex has a tendency to add them
-    linebreaks = [match.start() for match in newline_re.finditer(template_string)]
-    lastline = len(linebreaks)
+    
     token_tups = []
     upto = 0
     line = 1
+    #TODO:Py2.4 generator expression 
+    linebreaks = find_linebreaks(template_string)
+    next_linebreak = linebreaks.next()
+    try:
+        for match in tag_re.finditer(template_string):
+            start, end = match.span()
+            if start > upto:
+                token_tups.append( (template_string[upto:start], line) )
+                upto = start
+                
+                while next_linebreak <= upto:
+                    next_linebreak = linebreaks.next()
+                    line += 1
+            
+            token_tups.append( (template_string[start:end], line) )
+            upto = end
     
-   
-    for match in tag_re.finditer(template_string):
-        start, end = match.span()
-        if start > upto:
-            token_tups.append( (template_string[upto:start], line) )
-            upto = start
-            while linebreaks and line != lastline and linebreaks[line] <= upto:
+            while next_linebreak <= upto:
+                next_linebreak = linebreaks.next()
                 line += 1
-        
-        token_tups.append( (template_string[start:end], line) )
-        upto = end
-        
-        while linebreaks and line != lastline and linebreaks[line] <= upto:
-           line += 1
+    except StopIteration:
+        pass
     
     last_bit = template_string[upto:]
     if len(last_bit):
-        token_tups.append( (last_bit, line) )
- 
- 
+       token_tups.append( (last_bit, line) )
+    
     return [ create_token(tok, (filename, line)) for tok, line in token_tups]
 
 def create_token(token_string, source):
