@@ -246,6 +246,8 @@ Individual views are:
             The previous page
         ``pages``
             Number of pages total
+        ``hits``
+            Total number of objects
 
 ``object_detail``
     Object detail page. This works like and takes the same arguments as

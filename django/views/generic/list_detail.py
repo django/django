@@ -32,6 +32,8 @@ def object_list(request, app_label, module_name, paginate_by=None, allow_empty=F
             the previous page
         pages
             number of pages, total
+        hits
+            number of objects, total
     """
     mod = models.get_module(app_label, module_name)
     lookup_kwargs = extra_lookup_kwargs.copy()
