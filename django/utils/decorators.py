@@ -12,6 +12,10 @@ def decorator_from_middleware(middleware_class):
                 result = middleware.process_request(request)
                 if result is not None:
                     return result
+            if hasattr(middleware, 'process_view'):
+                result = middleware.process_view(request, view_func, **kwargs)
+                if result is not None:
+                    return result
             response = view_func(request, *args, **kwargs)
             if hasattr(middleware, 'process_response'):
                 result = middleware.process_response(request, response)
