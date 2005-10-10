@@ -21,6 +21,32 @@ django_conversions.update({
     FIELD_TYPE.TIME: typecasts.typecast_time,
 })
 
+# This is an extra debug layer over MySQL queries, to display warnings.
+# It's only used when DEBUG=True.
+class MysqlDebugWrapper:
+    def __init__(self, cursor):
+        self.cursor = cursor
+
+    def execute(self, sql, params=()):
+        try:
+            return self.cursor.execute(sql, params)
+        except Database.Warning, w:
+            self.cursor.execute("SHOW WARNINGS")
+            raise Database.Warning, "%s: %s" % (w, self.cursor.fetchall())
+
+    def executemany(self, sql, param_list):
+        try:
+            return self.cursor.executemany(sql, param_list)
+        except Database.Warning:
+            self.cursor.execute("SHOW WARNINGS")
+            raise Database.Warning, "%s: %s" % (w, self.cursor.fetchall())
+
+    def __getattr__(self, attr):
+        if self.__dict__.has_key(attr):
+            return self.__dict__[attr]
+        else:
+            return getattr(self.cursor, attr)
+
 class DatabaseWrapper:
     def __init__(self):
         self.connection = None
@@ -32,7 +58,7 @@ class DatabaseWrapper:
             self.connection = Database.connect(user=DATABASE_USER, db=DATABASE_NAME,
                 passwd=DATABASE_PASSWORD, host=DATABASE_HOST, conv=django_conversions)
         if DEBUG:
-            return base.CursorDebugWrapper(self.connection.cursor(), self)
+            return base.CursorDebugWrapper(MysqlDebugWrapper(self.connection.cursor()), self)
         return self.connection.cursor()
 
     def commit(self):
