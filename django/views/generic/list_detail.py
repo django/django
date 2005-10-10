@@ -56,6 +56,7 @@ def object_list(request, app_label, module_name, paginate_by=None, allow_empty=F
             'next': page + 1,
             'previous': page - 1,
             'pages': paginator.pages,
+            'hits' : paginator.hits,
         })
     else:
         object_list = mod.get_list(**lookup_kwargs)
