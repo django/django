@@ -52,16 +52,18 @@ def field_label(bound_field):
     class_names = []
     if isinstance(bound_field.field, meta.BooleanField):
         class_names.append("vCheckboxLabel")
+        colon = ""
     else:
         if not bound_field.field.blank:
             class_names.append('required')
         if not bound_field.first:
             class_names.append('inline')
+        colon = ":"
     
     class_str = class_names and ' class="%s"' % ' '.join(class_names) or ''
-    return '<label for="%s"%s>%s:</label> ' % \
+    return '<label for="%s"%s>%s%s</label> ' % \
             (bound_field.element_id, class_str, 
-             capfirst(bound_field.field.verbose_name) )
+             capfirst(bound_field.field.verbose_name), colon )
 field_label = simple_tag(field_label)
 
 

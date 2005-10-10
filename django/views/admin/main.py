@@ -711,7 +711,7 @@ def add_stage_new(request, app_label, module_name, show_delete=False, form_url='
         c['object_id'] = object_id_override
     
     
-    fill_extra_context(opts, app_label, c, change=True)
+    fill_extra_context(opts, app_label, c, change=False)
    
     return render_to_response("admin_change_form", context_instance=c) 
 
