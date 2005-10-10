@@ -230,6 +230,7 @@ fieldset.collapsed h2, fieldset.collapsed { display:block !important; }
 fieldset.collapsed .collapse-toggle { display: inline !important; }
 fieldset.collapse h2 a.collapse-toggle { color:#ffc; }
 fieldset.collapse h2 a.collapse-toggle:hover { text-decoration:underline; }
+.hidden { display:none; }
 
 /* MESSAGES & ERRORS  */
 
@@ -348,7 +349,7 @@ p.file-upload { line-height:20px; margin:0; padding:0; color:#666; font-size:11p
 ul.timelist, .timelist li { list-style-type:none; margin:0; padding:0; }
 .timelist a { padding:2px; }
 
-/*  OLD ORDERING WIDGET  */
+/*  ORDERING WIDGET  */
 
 ul#orderthese { padding:0; margin:0; list-style-type:none; }
 ul#orderthese li { list-style-type:none; display:block; padding:0; margin:6px 0; width:214px; background:#f6f6f6; white-space:nowrap; overflow:hidden; }
