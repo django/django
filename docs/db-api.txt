@@ -449,8 +449,7 @@ Related objects (e.g. ``Choices``) are created using convenience functions::
     >>> p.get_choice_count()
     4
 
-Each of those ``add_choice`` methods is equivalent to (except obviously much
-simpler than)::
+Each of those ``add_choice`` methods is equivalent to (but much simpler than)::
 
     >>> c = polls.Choice(poll_id=p.id, choice="Over easy", votes=0)
     >>> c.save()
@@ -458,6 +457,8 @@ simpler than)::
 Note that when using the `add_foo()`` methods, you do not give any value
 for the ``id`` field, nor do you give a value for the field that stores
 the relation (``poll_id`` in this case).
+
+The ``add_FOO()`` method always returns the newly created object.
 
 Deleting objects
 ================
