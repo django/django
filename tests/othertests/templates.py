@@ -251,6 +251,12 @@ TEMPLATE_TESTS = {
 
     # translation of string without i18n tag but with interpolation
     'i18n12': ('{{ _("blah%(anton)s") }}', {'anton': 'blubb'}, "blahblubb"),
+
+    # translation of a variable with a translated filter
+    'i18n13': ('{{ bool|yesno:_("ja,nein") }}', {'bool': True}, 'ja'),
+
+    # translation of a variable with a non-translated filter
+    'i18n14': ('{{ bool|yesno:"ja,nein" }}', {'bool': True}, 'ja'),
 }
 
 # This replaces the standard template_loader.
