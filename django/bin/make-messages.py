@@ -75,7 +75,7 @@ for (dirpath, dirnames, filenames) in os.walk("."):
                 open(os.path.join(dirpath, '%s.py' % file), "wb").write(templateize(src))
                 thefile = '%s.py' % file
             if verbose: sys.stdout.write('processing file %s in %s\n' % (file, dirpath))
-            cmd = 'xgettext %s -d %s -L Python -o - "%s"' % (
+            cmd = 'xgettext %s -d %s -L Python --keyword=gettext_noop -o - "%s"' % (
                 os.path.exists(potfile) and '--omit-header' or '', domain, os.path.join(dirpath, thefile))
             msgs = os.popen(cmd, 'r').read()
             if thefile != file:
