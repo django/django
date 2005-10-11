@@ -95,8 +95,8 @@ The following arguments are available to all field types. All are optional.
             ('GR', 'Graduate'),
         )
 
-        The first element in each tuple is the actual value to be stored. The
-        second element is the human-readable name for the option.
+    The first element in each tuple is the actual value to be stored. The
+    second element is the human-readable name for the option.
 
 ``core``
     For objects that are edited inline to a related object.
