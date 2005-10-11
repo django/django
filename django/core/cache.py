@@ -15,7 +15,7 @@ The CACHE_BACKEND setting is a quasi-URI; examples are:
     memcached://127.0.0.1:11211/    A memcached backend; the server is running
                                     on localhost port 11211.
 
-    db://tablename/                 A database backend in a table named 
+    db://tablename/                 A database backend in a table named
                                     "tablename". This table should be created
                                     with "django-admin createcachetable".
 
@@ -26,7 +26,7 @@ The CACHE_BACKEND setting is a quasi-URI; examples are:
                                     probably don't want to use this except for
                                     testing. Note that this cache backend is
                                     NOT threadsafe!
-                                        
+
     locmem:///                      A more sophisticaed local memory cache;
                                     this is multi-process- and thread-safe.
 
@@ -72,7 +72,6 @@ class InvalidCacheBackendError(Exception):
 ################################
 
 class _Cache:
-
     def __init__(self, params):
         timeout = params.get('timeout', 300)
         try:
@@ -132,8 +131,7 @@ except ImportError:
     _MemcachedCache = None
 else:
     class _MemcachedCache(_Cache):
-        """Memcached cache backend."""
-
+        "Memcached cache backend."
         def __init__(self, server, params):
             _Cache.__init__(self, params)
             self._cache = memcache.Client([server])
@@ -161,8 +159,7 @@ else:
 import time
 
 class _SimpleCache(_Cache):
-    """Simple single-process in-memory cache"""
-
+    "Simple single-process in-memory cache."
     def __init__(self, host, params):
         _Cache.__init__(self, params)
         self._cache = {}
@@ -230,11 +227,11 @@ try:
     import cPickle as pickle
 except ImportError:
     import pickle
+import copy
 from django.utils.synch import RWLock
 
 class _LocMemCache(_SimpleCache):
-    """Thread-safe in-memory cache"""
-    
+    "Thread-safe in-memory cache."
     def __init__(self, host, params):
         _SimpleCache.__init__(self, host, params)
         self._lock = RWLock()
@@ -250,7 +247,7 @@ class _LocMemCache(_SimpleCache):
             elif exp < now:
                 should_delete = True
             else:
-                return self._cache[key]
+                return copy.deepcopy(self._cache[key])
         finally:
             self._lock.reader_leaves()
         if should_delete:
@@ -261,14 +258,14 @@ class _LocMemCache(_SimpleCache):
                 return default
             finally:
                 self._lock.writer_leaves()
-                
+
     def set(self, key, value, timeout=None):
         self._lock.writer_enters()
         try:
             _SimpleCache.set(self, key, value, timeout)
         finally:
             self._lock.writer_leaves()
-            
+
     def delete(self, key):
         self._lock.writer_enters()
         try:
@@ -284,8 +281,7 @@ import os
 import urllib
 
 class _FileCache(_SimpleCache):
-    """File-based cache"""
-    
+    "File-based cache."
     def __init__(self, dir, params):
         self._dir = dir
         if not os.path.exists(self._dir):
@@ -293,7 +289,7 @@ class _FileCache(_SimpleCache):
         _SimpleCache.__init__(self, dir, params)
         del self._cache
         del self._expire_info
-        
+
     def get(self, key, default=None):
         fname = self._key_to_file(key)
         try:
@@ -308,7 +304,7 @@ class _FileCache(_SimpleCache):
         except (IOError, pickle.PickleError):
             pass
         return default
-        
+
     def set(self, key, value, timeout=None):
         fname = self._key_to_file(key)
         if timeout is None:
@@ -327,16 +323,16 @@ class _FileCache(_SimpleCache):
             pickle.dump(value, f, 2)
         except (IOError, OSError):
             raise
-            
+
     def delete(self, key):
         try:
             os.remove(self._key_to_file(key))
         except (IOError, OSError):
             pass
-            
+
     def has_key(self, key):
         return os.path.exists(self._key_to_file(key))
-        
+
     def _cull(self, filelist):
         if self.cull_frequency == 0:
             doomed = filelist
@@ -348,7 +344,7 @@ class _FileCache(_SimpleCache):
             except (IOError, OSError):
                 pass
 
-    def _createdir(self):    
+    def _createdir(self):
         try:
             os.makedirs(self._dir)
         except OSError:
@@ -366,22 +362,21 @@ from django.core.db import db, DatabaseError
 from datetime import datetime
 
 class _DBCache(_Cache):
-    """SQL cache backend"""
-    
+    "SQL cache backend."
     def __init__(self, table, params):
         _Cache.__init__(self, params)
         self._table = table
-        max_entries = params.get('max_entries', 300) 
-        try: 
-            self._max_entries = int(max_entries) 
-        except (ValueError, TypeError): 
-            self._max_entries = 300 
-        cull_frequency = params.get('cull_frequency', 3) 
-        try: 
-            self._cull_frequency = int(cull_frequency) 
-        except (ValueError, TypeError): 
-            self._cull_frequency = 3 
-        
+        max_entries = params.get('max_entries', 300)
+        try:
+            self._max_entries = int(max_entries)
+        except (ValueError, TypeError):
+            self._max_entries = 300
+        cull_frequency = params.get('cull_frequency', 3)
+        try:
+            self._cull_frequency = int(cull_frequency)
+        except (ValueError, TypeError):
+            self._cull_frequency = 3
+
     def get(self, key, default=None):
         cursor = db.cursor()
         cursor.execute("SELECT cache_key, value, expires FROM %s WHERE cache_key = %%s" % self._table, [key])
@@ -394,7 +389,7 @@ class _DBCache(_Cache):
             db.commit()
             return default
         return pickle.loads(base64.decodestring(row[1]))
-        
+
     def set(self, key, value, timeout=None):
         if timeout is None:
             timeout = self.default_timeout
@@ -417,17 +412,17 @@ class _DBCache(_Cache):
             pass
         else:
             db.commit()
-        
+
     def delete(self, key):
         cursor = db.cursor()
         cursor.execute("DELETE FROM %s WHERE cache_key = %%s" % self._table, [key])
         db.commit()
-        
+
     def has_key(self, key):
         cursor = db.cursor()
         cursor.execute("SELECT cache_key FROM %s WHERE cache_key = %%s" % self._table, [key])
         return cursor.fetchone() is not None
-        
+
     def _cull(self, cursor, now):
         if self._cull_frequency == 0:
             cursor.execute("DELETE FROM %s" % self._table)
@@ -438,7 +433,7 @@ class _DBCache(_Cache):
             if num > self._max_entries:
                 cursor.execute("SELECT cache_key FROM %s ORDER BY cache_key LIMIT 1 OFFSET %%s" % self._table, [num / self._cull_frequency])
                 cursor.execute("DELETE FROM %s WHERE cache_key < %%s" % self._table, [cursor.fetchone()[0]])
-        
+
 ##########################################
 # Read settings and load a cache backend #
 ##########################################
