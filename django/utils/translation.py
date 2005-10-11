@@ -119,7 +119,7 @@ def translation(appname, language):
     except IOError: t = gettext_module.NullTranslations()
     _translations[(appname, language)] = t
 
-    parts = appname.split('.')
+    parts = os.environ['DJANGO_SETTINGS_MODULE'].split('.')
     project = __import__(parts[0], {}, {}, [])
 
     projectpath = os.path.join(os.path.dirname(project.__file__), 'locale')
