@@ -276,8 +276,10 @@ want to do that. Or you can just build a big project out of several apps
 and put all translations into one big project message file. The choice is
 yours. All message file repositories are structured the same. They are:
 
-- $PROJECTPATH/apps/<app>/locale/<language>/LC_MESSAGES/django.(po|mo)
+- $APPPATH/locale/<language>/LC_MESSAGES/django.(po|mo)
 - $PROJECTPATH/locale/<language>/LC_MESSAGES/django.(po|mo)
+- all paths listed in LOCALE_PATHS in your settings file are
+  searched in that order for <language>/LC_MESSAGES/django.(po|mo)
 - $PYTHONPATH/django/conf/locale/<language>/LC_MESSAGES/django.(po|mo)
 
 Actually the appliaction doesn't need to be stored below the project path -
