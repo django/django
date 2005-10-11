@@ -33,14 +33,21 @@ class DjangoTranslation(gettext_module.GNUTranslations):
     """
     This class sets up the GNUTranslations context with
     regard to output charset. Django uses a defined
-    DEFAULT_CHARSET as the output charset.
+    DEFAULT_CHARSET as the output charset on Python 2.4 -
+    with Python 2.3, you need to use DjangoTranslation23.
     """
 
     def __init__(self, *args, **kw):
         from django.conf import settings
         gettext_module.GNUTranslations.__init__(self, *args, **kw)
-        self.__charset = self.charset()
-        self.set_output_charset(settings.DEFAULT_CHARSET)
+        # starting with Python 2.4, there is a function to define
+        # the output charset. Before 2.4, the output charset is
+        # identical with the translation file charset.
+        try:
+            self.set_output_charset(settings.DEFAULT_CHARSET)
+        except AttributeError:
+            pass
+        self.django_output_charset = settings.DEFAULT_CHARSET
         self.__app = '?.?.?'
         self.__language = '??'
     
@@ -53,6 +60,31 @@ class DjangoTranslation(gettext_module.GNUTranslations):
     
     def __repr__(self):
         return "<DjangoTranslation app:%s lang:%s>" % (self.__app, self.__language)
+
+
+class DjangoTranslation23(DjangoTranslation):
+
+    """
+    This is a compatibility class that is only used with Python 2.3.
+    The reason is, Python 2.3 doesn't support set_output_charset on
+    translation objects and so needs this wrapper class to make sure
+    that input charsets from translation files are correctly translated
+    to output charsets.
+
+    With a full switch to Python 2.4, this can be removed from the source.
+    """
+
+    def gettext(self, msgid):
+        res = DjangoTranslation.gettext(self, msgid)
+        if self.charset() != self.django_output_charset
+            res = res.decode(self.charset()).encode(self.django_output_charset)
+        return res
+
+    def ngettext(self, msgid1, msgid2, n):
+        res = DjangoTranslation.ngettext(self, msgid1, msgid2, n)
+        if self.charset() != self.django_output_charset:
+            res = res.decode(self.charset()).encode(self.django_output_charset)
+        return res
 
 def translation(appname, language):
     """
@@ -73,10 +105,15 @@ def translation(appname, language):
     
     from django.conf import settings
 
+    # set up the right translation class
+    klass = DjangoTranslation
+    if sys.version_info < (2, 4):
+        klass = DjangoTranslation23
+
     globalpath = os.path.join(os.path.dirname(settings.__file__), 'locale')
 
     try:
-        t = gettext_module.translation('django', globalpath, [language, settings.LANGUAGE_CODE], DjangoTranslation)
+        t = gettext_module.translation('django', globalpath, [language, settings.LANGUAGE_CODE], klass)
         t.set_app_and_language(appname, language)
     except IOError: t = gettext_module.NullTranslations()
     _translations[(appname, language)] = t
@@ -90,7 +127,7 @@ def translation(appname, language):
         projectpath = os.path.join(os.path.dirname(project.__file__), 'locale')
 
         try:
-            t = gettext_module.translation('django', projectpath, [language, settings.LANGUAGE_CODE], DjangoTranslation)
+            t = gettext_module.translation('django', projectpath, [language, settings.LANGUAGE_CODE], klass)
             t.set_app_and_language(appname, language)
         except IOError: t = None
         if t is not None:
@@ -98,7 +135,7 @@ def translation(appname, language):
             _translations[(appname, language)] = t
 
         try:
-            t = gettext_module.translation('django', apppath, [language, settings.LANGUAGE_CODE], DjangoTranslation)
+            t = gettext_module.translation('django', apppath, [language, settings.LANGUAGE_CODE], klass)
             t.set_app_and_language(appname, language)
         except IOError: t = None
         if t is not None:
