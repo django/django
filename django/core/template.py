@@ -363,6 +363,13 @@ class FilterParser:
     def read_arg(self):
         # First read a "
         self.next_char()
+        translated = False
+        if self.current == '_':
+            self.next_char()
+            if self.current != '(':
+                raise TemplateSyntaxError, "Bad character (expecting '(') '%s'" % self.current
+            translated = True
+            self.next_char()
         if self.current != '"':
             raise TemplateSyntaxError, "Bad character (expecting '\"') '%s'" % self.current
         self.escaped = False
@@ -389,6 +396,10 @@ class FilterParser:
             arg += self.current
         # self.current must now be '"'
         self.next_char()
+        if translated:
+            if self.current != ')':
+                raise TemplateSyntaxError, "Bad character (expecting ')') '%s'" % self.current
+            self.next_char()
         return arg
 
 def get_filters_from_token(token):
