@@ -119,6 +119,16 @@ def translation(appname, language):
     except IOError: t = gettext_module.NullTranslations()
     _translations[(appname, language)] = t
 
+    if hasattr(settings, 'LOCALE_PATHS'):
+        for localepath in settings.LOCALE_PATHS:
+            try:
+                t = gettext_module.translation('django', localepath, [language, settings.LANGUAGE_CODE], klass)
+                t.set_app_and_language(appname, language)
+            except IOError: t = None
+            if t is not None:
+                t.add_fallback(_translations[(appname, language)])
+                _translations[(appname, language)] = t
+
     parts = os.environ['DJANGO_SETTINGS_MODULE'].split('.')
     project = __import__(parts[0], {}, {}, [])
 
