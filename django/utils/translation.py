@@ -119,21 +119,23 @@ def translation(appname, language):
     except IOError: t = gettext_module.NullTranslations()
     _translations[(appname, language)] = t
 
+    parts = appname.split('.')
+    project = __import__(parts[0], {}, {}, [])
+
+    projectpath = os.path.join(os.path.dirname(project.__file__), 'locale')
+
+    try:
+        t = gettext_module.translation('django', projectpath, [language, settings.LANGUAGE_CODE], klass)
+        t.set_app_and_language(appname, language)
+    except IOError: t = None
+    if t is not None:
+        t.add_fallback(_translations[(appname, language)])
+        _translations[(appname, language)] = t
+
     if appname != '*':
-        parts = appname.split('.')
-        project = __import__(parts[0], {}, {}, [])
         app = __import__(appname, {}, {}, ['views'])
 
         apppath = os.path.join(os.path.dirname(app.__file__), 'locale')
-        projectpath = os.path.join(os.path.dirname(project.__file__), 'locale')
-
-        try:
-            t = gettext_module.translation('django', projectpath, [language, settings.LANGUAGE_CODE], klass)
-            t.set_app_and_language(appname, language)
-        except IOError: t = None
-        if t is not None:
-            t.add_fallback(_translations[(appname, language)])
-            _translations[(appname, language)] = t
 
         try:
             t = gettext_module.translation('django', apppath, [language, settings.LANGUAGE_CODE], klass)
