@@ -76,7 +76,7 @@ class DjangoTranslation23(DjangoTranslation):
 
     def gettext(self, msgid):
         res = DjangoTranslation.gettext(self, msgid)
-        if self.charset() != self.django_output_charset
+        if self.charset() != self.django_output_charset:
             res = res.decode(self.charset()).encode(self.django_output_charset)
         return res
 
