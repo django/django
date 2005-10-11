@@ -361,7 +361,7 @@ class FilterParser:
         return (self.current_filter_name, self.current_filter_arg)
 
     def read_arg(self):
-        # First read a "
+        # First read a " or a _("
         self.next_char()
         translated = False
         if self.current == '_':
@@ -400,6 +400,7 @@ class FilterParser:
             if self.current != ')':
                 raise TemplateSyntaxError, "Bad character (expecting ')') '%s'" % self.current
             self.next_char()
+            arg = _(arg)
         return arg
 
 def get_filters_from_token(token):
