@@ -1,6 +1,7 @@
 "translation helper functions"
 
 import os
+import sys
 import gettext as gettext_module
 
 try:
