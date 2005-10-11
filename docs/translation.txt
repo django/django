@@ -291,6 +291,22 @@ where either the conf/locale (in case of the source tree) or the locale/
 use the same compile-messages.py to produce the binary django.mo files that
 are used by gettext.
 
+Application message files are a bit complicated to discover - they need the
+i18n middleware to be found. If you don't use the middleware, only the
+django message files and project message files will be processed.
+
+Additionally you should think about how to structure your translation
+files. If your applications should be delivered to other users and should
+be used in other projects, you might want to use app-specific translations.
+But using app-specific translations and project translations could produce
+weird problems with make-messages: make-messages will traverse all directories
+below the current path and so might put message IDs into the project
+message file that are already in application message files. Easiest way
+out is to store applications that are not part of the project (and so carry
+their own translations) outside the project tree. That way make-messages
+on the project level will only translate stuff that is connected to your
+explicit project and not stuff that is distributed independently.
+
 Specialities of Django Translation
 ==================================
 
