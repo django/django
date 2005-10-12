@@ -18,9 +18,6 @@ class LocaleMiddleware:
     def process_view(self, request, view_func, param_dict):
         global _module_to_app
 
-        lang = translation.get_language_from_request(request)
-
-
         def findapp(module):
             app = _module_to_app.get(view_func.__module__, None)
             if app is not None:
@@ -35,9 +32,11 @@ class LocaleMiddleware:
 
         app = findapp(view_func.__module__)
 
-        request.LANGUAGE_CODE = lang
+        lang = translation.get_language_from_request(request)
 
         translation.activate(app, lang)
+
+        request.LANGUAGE_CODE = translation.get_language()
 
     def process_response(self, request, response):
         patch_vary_headers(response, ('Accept-Language',))

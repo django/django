@@ -180,10 +180,14 @@ def get_language():
     """
     t = _active.get(currentThread(), None)
     if t is not None:
-        return t.language()
-    else:
-        from django.conf.settings import LANGUAGE_CODE
-        return LANGUAGE_CODE
+        try:
+            return t.language()
+        except AttributeError:
+            pass
+    # if we don't have a real translation object, we assume
+    # it's the default language.
+    from django.conf.settings import LANGUAGE_CODE
+    return LANGUAGE_CODE
 
 def gettext(message):
     """
@@ -236,26 +240,33 @@ def get_language_from_request(request):
     """
     global _accepted
 
+    from django.conf import settings
+    globalpath = os.path.join(os.path.dirname(settings.__file__), 'locale')
+
     if request.GET or request.POST:
-        lang = request.GET.get('django_language', None) or request.POST.get('django_language', None)
-        if lang is not None:
-            if hasattr(request, 'session'):
-                request.session['django_language'] = lang
-            else:
-                request.set_cookie('django_language', lang)
-            return lang
+        lang_code = request.GET.get('django_language', None) or request.POST.get('django_language', None)
+        if lang_code is not None:
+            lang = gettext_module.find('django', globalpath, [lang_code])
+            if lang is not None:
+                if hasattr(request, 'session'):
+                    request.session['django_language'] = lang_code
+                else:
+                    request.set_cookie('django_language', lang_code)
+                return lang_code
 
     if hasattr(request, 'session'):
-        lang = request.session.get('django_language', None)
+        lang_code = request.session.get('django_language', None)
+        if lang_code is not None:
+            lang = gettext_module.find('django', globalpath, [lang_code])
+            if lang is not None:
+                return lang_code
+    
+    lang_code = request.COOKIES.get('django_language', None)
+    if lang_code is not None:
+        lang = gettext_module.find('django', globalpath, [lang_code])
         if lang is not None:
-            return lang
+            return lang_code
     
-    lang = request.COOKIES.get('django_language', None)
-    if lang is not None:
-        return lang
-    
-    from django.conf import settings
-
     accept = request.META.get('HTTP_ACCEPT_LANGUAGE', None)
     if accept is not None:
 
@@ -279,12 +290,24 @@ def get_language_from_request(request):
         langs = [_parsed(el) for el in accept.split(',')]
         langs.sort(lambda a,b: -1*cmp(a[1], b[1]))
 
-        globalpath = os.path.join(os.path.dirname(settings.__file__), 'locale')
-
         for lang, order in langs:
-            if lang == 'en' or lang.startswith('en_') or gettext_module.find('django', globalpath, [lang]):
+            if lang == 'en' or lang.startswith('en_'):
+                # special casing for language en and derivates, because we don't
+                # have an english language file available, but just fallback
+                # to NullTranslation on those languages (as the source itself
+                # is in english)
                 _accepted[accept] = lang
                 return lang
+            else:
+                langfile = gettext_module.find('django', globalpath, [lang])
+                if langfile:
+                    # reconstruct the actual language from the language
+                    # filename, because otherwise we might incorrectly
+                    # report de_DE if we only have de available, but
+                    # did find de_DE because of language normalization
+                    lang = langfile[len(globalpath):].split('/')[1]
+                    _accepted[accept] = lang
+                    return lang
     
     return settings.LANGUAGE_CODE
 
