@@ -21,14 +21,15 @@ See `How to use Django with mod_python`_ for information on how to configure
 mod_python once you have it installed.
 
 If you can't use mod_python for some reason, fear not: Django follows the WSGI_
-spec, which allows it to run on a variety of server platforms. As people
-experiment with different server platforms, we'll update this document to
-give specific installation instructions for each platform.
+spec, which allows it to run on a variety of server platforms. See the
+`server-arrangements wiki page`_ for specific installation instructions for
+each platform.
 
 .. _Apache: http://httpd.apache.org/
 .. _mod_python: http://www.modpython.org/
 .. _WSGI: http://www.python.org/peps/pep-0333.html
 .. _How to use Django with mod_python: http://www.djangoproject.com/documentation/modpython/
+.. _server-arrangements wiki page: http://code.djangoproject.com/wiki/ServerArrangements
 
 Get your database running
 =========================
@@ -36,11 +37,6 @@ Get your database running
 If you plan to use Django's database API functionality, you'll need to
 make sure a database server is running. Django works with PostgreSQL_
 (recommended), MySQL_ and SQLite_.
-
-Note that support for MySQL and SQLite is a recent development, and Django
-hasn't been comprehensively tested in those environments. If you find any bugs
-in Django's MySQL or SQLite bindings, please file them in
-`Django's ticket system`_ so we can fix them immediately.
 
 Additionally, you'll need to make sure your Python database bindings are
 installed.
