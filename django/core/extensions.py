@@ -37,9 +37,9 @@ class DjangoContext(Context):
         from django.conf import settings
         self['LANGUAGES'] = settings.LANGUAGES
         if hasattr(request, 'LANGUAGE_CODE'):
-            self['LANGUAGE_CODE'] = request.LANGUAGE_CODE
+            self['LANGUAGE_CODE'] = request.LANGUAGE_CODE.replace('_', '-')
         else:
-            self['LANGUAGE_CODE'] = settings.LANGUAGE_CODE
+            self['LANGUAGE_CODE'] = settings.LANGUAGE_CODE.replace('_', '-')
         if DEBUG and request.META.get('REMOTE_ADDR') in INTERNAL_IPS:
             self['debug'] = True
             from django.core import db
