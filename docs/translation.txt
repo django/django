@@ -179,11 +179,18 @@ If neither GET nor POST have django_language, the middleware looks at the
 session data for the user. If that carries a key django_language, it's contents
 will be used as the language code. If the session doesn't contain a language
 setting, the middleware will look at the cookies for a django_language cookie.
-If that is found, it gives the language code. If neither the session nor the
-cookie carry a language code, the middleware will look at the HTTP header
-Accept-Language. This header is sent by your browser and tells the server what
-languages you prefer. Languages are ordered by some choice value - the higher,
-the more you prefer the language.
+If that is found, it gives the language code.
+
+The format for the explicit django_language parameters is allways the
+locale to use - for example it's pt_BR for Brazilian. If a base language
+is available, but the sublanguage specified is not, the base language is used.
+For example if you specify de_AT (Austrian German), but there is only a
+language de available, that language is used.
+
+If neither the session nor the cookie carry a language code, the middleware
+will look at the HTTP header Accept-Language. This header is sent by your
+browser and tells the server what languages you prefer. Languages are ordered
+by some choice value - the higher, the more you prefer the language.
 
 So the middleware will iterate over that header, ordered by the preference
 value. The language with the highest preference that is in the django base
@@ -230,6 +237,9 @@ for CHARSET and set it to the charset you will use to edit the content. It
 might be that it is utf-8 - if you prefer another encoding, you can use some
 tools like recode or iconv to change the charset of the file and then change
 the charset definition in the file (it's in the Content-Type: line).
+
+The language code for storage is in locale format - so it is pt_BR for
+Brazilian or de_AT for Austrian German.
 
 Every message in the message file is of the same format. One line is the msgid.
 This is the actual string in the source - you don't change it. The other line

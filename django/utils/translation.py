@@ -271,6 +271,9 @@ def get_language_from_request(request):
             else:
                 lang = el
                 order = 100
+            if lang.find('-') >= 0:
+                (lang, sublang) = lang.split('-')
+                lang = lang.lower() + '_' + sublang.upper()
             return (lang, order)
 
         langs = [_parsed(el) for el in accept.split(',')]
@@ -279,14 +282,9 @@ def get_language_from_request(request):
         globalpath = os.path.join(os.path.dirname(settings.__file__), 'locale')
 
         for lang, order in langs:
-            if lang == 'en' or os.path.isfile(os.path.join(globalpath, lang, 'LC_MESSAGES', 'django.mo')):
+            if lang == 'en' or lang.startswith('en_') or gettext_module.find('django', globalpath, [lang]):
                 _accepted[accept] = lang
                 return lang
-            elif lang.find('-') >= 0:
-                (lang, sublang) = lang.split('-', 1)
-                if lang == 'en' or os.path.isfile(os.path.join(globalpath, lang, 'LC_MESSAGES', 'django.mo')):
-                    _accepted[accept] = lang
-                    return lang
     
     return settings.LANGUAGE_CODE
 
