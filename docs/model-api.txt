@@ -294,6 +294,7 @@ Here are all available field types:
         ``recursive``           Optional. Either ``True`` or ``False``. Default is
                                 ``False``. Specifies whether all subdirectories of
                                 ``path`` should be included.
+        ======================  ===================================================
 
     Of course, these arguments can be used together.
 
