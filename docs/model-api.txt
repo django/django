@@ -272,6 +272,40 @@ Here are all available field types:
 
     .. _`strftime formatting`: http://docs.python.org/lib/module-time.html#l2h-1941
 
+``FilePathField``
+    A field whose choices are limited to the filenames in a certain directory
+    on the filesystem. Has three special arguments, of which the first is
+    required:
+
+        ======================  ===================================================
+        Argument                Description
+        ======================  ===================================================
+        ``path``                Required. The absolute filesystem path to a
+                                directory from which this ``FilePathField`` should
+                                get its choices. Example: ``"/home/images"``.
+
+        ``match``               Optional. A regular expression, as a string, that
+                                ``FilePathField`` will use to filter filenames.
+                                Note that the regex will be applied to the
+                                base filename, not the full path. Example:
+                                ``"foo.*\.txt^"``, which will match a file called
+                                ``foo23.txt`` but not ``bar.txt`` or ``foo23.gif``.
+
+        ``recursive``           Optional. Either ``True`` or ``False``. Default is
+                                ``False``. Specifies whether all subdirectories of
+                                ``path`` should be included.
+
+    Of course, these arguments can be used together.
+
+    The one potential gotcha is that ``match`` applies to the base filename,
+    not the full path. So, this example::
+
+        FilePathField(path="/home/images", match="foo.*", recursive=True)
+
+    ...will match ``/home/images/foo.gif`` but not ``/home/images/foo/bar.gif``
+    because the ``match`` applies to the base filename (``foo.gif`` and
+    ``bar.gif``).
+
 ``FloatField``
     A floating-point number. Has two **required** arguments:
 

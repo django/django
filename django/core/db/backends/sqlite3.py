@@ -154,6 +154,7 @@ DATA_TYPES = {
     'DateTimeField':                'datetime',
     'EmailField':                   'varchar(75)',
     'FileField':                    'varchar(100)',
+    'FilePathField':                'varchar(100)',
     'FloatField':                   'numeric(%(max_digits)s, %(decimal_places)s)',
     'ImageField':                   'varchar(100)',
     'IntegerField':                 'integer',
