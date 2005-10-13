@@ -427,6 +427,14 @@ class FileField(Field):
         f = os.path.join(self.get_directory_name(), get_valid_filename(os.path.basename(filename)))
         return os.path.normpath(f)
 
+class FilePathField(Field):
+    def __init__(self, verbose_name=None, name=None, path='', match=None, recursive=False, **kwargs):
+        self.path, self.match, self.recursive = path, match, recursive
+        Field.__init__(self, verbose_name, name, **kwargs)
+
+    def get_manipulator_field_objs(self):
+        return [curry(formfields.FilePathField, path=self.path, match=self.match, recursive=self.recursive)]
+
 class FloatField(Field):
     empty_strings_allowed = False
     def __init__(self, verbose_name=None, name=None, max_digits=None, decimal_places=None, **kwargs):
