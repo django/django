@@ -605,6 +605,7 @@ class AdminBoundFieldSet(BoundFieldSet):
         
 def fill_extra_context(opts, app_label, context, add=False, change=False, show_delete=False, form_url=''):
     admin_field_objs = opts.admin.get_field_objs(opts)
+    
     ordered_objects = opts.get_ordered_objects()[:]
     auto_populated_fields = [f for f in opts.fields if f.prepopulate_from]
  
@@ -621,9 +622,13 @@ def fill_extra_context(opts, app_label, context, add=False, change=False, show_d
 
     form = context['form']
     original = context['original']
+    
+    field_sets = opts.admin.get_field_sets(opts)
     bound_field_sets = [field_set.bind(form, original, AdminBoundFieldSet) 
-                        for field_set in opts.admin.get_field_sets(opts)]
-                        
+                        for field_set in field_sets]
+    
+    first_form_field = bound_field_sets[0].bound_field_lines[0].bound_fields[0].form_fields[0];
+                    
     inline_related_objects = opts.get_inline_related_objects_wrapped()
     
     ordered_object_names =   ' '.join(['object.%s' % o.pk.name for o in ordered_objects])
@@ -631,6 +636,7 @@ def fill_extra_context(opts, app_label, context, add=False, change=False, show_d
     extra_context = {
         'add': add, 
         'change': change,
+        'first_form_field_id': first_form_field.get_id(),
         'ordered_objects' : ordered_objects, 
         'ordered_object_names' : ordered_object_names,
         'auto_populated_fields' : auto_populated_fields,
@@ -643,7 +649,8 @@ def fill_extra_context(opts, app_label, context, add=False, change=False, show_d
         'inline_related_objects': inline_related_objects,
         'content_type_id' : opts.get_content_type_id(),
         'save_on_top' : opts.admin.save_on_top,
-        'verbose_name_plural': opts.verbose_name_plural, 
+        'verbose_name_plural': opts.verbose_name_plural,
+        'verbose_name': opts.verbose_name,
         'save_as': opts.admin.save_as, 
         'app_label': app_label,
         'object_name': opts.object_name,
@@ -711,7 +718,7 @@ def add_stage_new(request, app_label, module_name, show_delete=False, form_url='
         c['object_id'] = object_id_override
     
     
-    fill_extra_context(opts, app_label, c, change=False)
+    fill_extra_context(opts, app_label, c, add=True)
    
     return render_to_response("admin_change_form", context_instance=c) 
 

@@ -95,8 +95,8 @@ The following arguments are available to all field types. All are optional.
             ('GR', 'Graduate'),
         )
 
-        The first element in each tuple is the actual value to be stored. The
-        second element is the human-readable name for the option.
+    The first element in each tuple is the actual value to be stored. The
+    second element is the human-readable name for the option.
 
 ``core``
     For objects that are edited inline to a related object.
@@ -248,18 +248,18 @@ Here are all available field types:
     uploaded files don't fill up the given directory).
 
     The admin represents this as an ``<input type="file">`` (a file-upload widget).
-    
-    Using a `FieldField` or an ``ImageField`` (see below) in a model takes a few 
+
+    Using a `FieldField` or an ``ImageField`` (see below) in a model takes a few
     steps:
-    
+
         1. In your settings file, you'll need to define ``MEDIA_ROOT``as the
            full path to a directory where you'd like Django to store uploaded
            files. (For performance, these files are not stored in the database.)
            Define ``MEDIA_URL`` as the base public URL of that directory. Make
            sure that this directory is writable by the Web server's user
            account.
-        
-        2. Add the ``FileField`` or ``ImageField`` to your model, making sure 
+
+        2. Add the ``FileField`` or ``ImageField`` to your model, making sure
            to define the ``upload_to`` option to tell Django to which
            subdirectory of ``MEDIA_ROOT`` it should upload files.
 
@@ -269,8 +269,43 @@ Here are all available field types:
            example, if your ``ImageField`` is called ``mug_shot``, you can get
            the absolute URL to your image in a template with ``{{
            object.get_mug_shot_url }}``.
-    
+
     .. _`strftime formatting`: http://docs.python.org/lib/module-time.html#l2h-1941
+
+``FilePathField``
+    A field whose choices are limited to the filenames in a certain directory
+    on the filesystem. Has three special arguments, of which the first is
+    required:
+
+        ======================  ===================================================
+        Argument                Description
+        ======================  ===================================================
+        ``path``                Required. The absolute filesystem path to a
+                                directory from which this ``FilePathField`` should
+                                get its choices. Example: ``"/home/images"``.
+
+        ``match``               Optional. A regular expression, as a string, that
+                                ``FilePathField`` will use to filter filenames.
+                                Note that the regex will be applied to the
+                                base filename, not the full path. Example:
+                                ``"foo.*\.txt^"``, which will match a file called
+                                ``foo23.txt`` but not ``bar.txt`` or ``foo23.gif``.
+
+        ``recursive``           Optional. Either ``True`` or ``False``. Default is
+                                ``False``. Specifies whether all subdirectories of
+                                ``path`` should be included.
+        ======================  ===================================================
+
+    Of course, these arguments can be used together.
+
+    The one potential gotcha is that ``match`` applies to the base filename,
+    not the full path. So, this example::
+
+        FilePathField(path="/home/images", match="foo.*", recursive=True)
+
+    ...will match ``/home/images/foo.gif`` but not ``/home/images/foo/bar.gif``
+    because the ``match`` applies to the base filename (``foo.gif`` and
+    ``bar.gif``).
 
 ``FloatField``
     A floating-point number. Has two **required** arguments:
@@ -302,7 +337,7 @@ Here are all available field types:
     width of the image each time a model instance is saved.
 
     Requires the `Python Imaging Library`_.
-    
+
     .. _Python Imaging Library: http://www.pythonware.com/products/pil/
 
 ``IntegerField``
@@ -721,7 +756,9 @@ Here's a list of all possible ``META`` options. No options are required. Adding
         unique_together = (("driver", "restaurant"),)
 
     This is a list of lists of fields that must be unique when considered
-    together. It's used in the Django admin.
+    together. It's used in the Django admin and is enforced at the database
+    level (i.e., the appropriate ``UNIQUE`` statements are included in the
+    ``CREATE TABLE`` statement).
 
 ``verbose_name``
     A human-readable name for the object, singular::

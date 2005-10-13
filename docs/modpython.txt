@@ -143,6 +143,9 @@ particular part of the site::
 
 Just change ``Location`` to the root URL of your media files.
 
+Note that the Django development server automagically serves admin media files,
+but this is not the case when you use any other server arrangement.
+
 .. _lighttpd: http://www.lighttpd.net/
 .. _TUX: http://en.wikipedia.org/wiki/TUX_web_server
 .. _Apache: http://httpd.apache.org/

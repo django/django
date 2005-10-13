@@ -8,7 +8,7 @@ from django.utils.functional import curry
 from django.core.template_decorators import simple_tag, inclusion_tag
 
 from django.views.admin.main import AdminBoundField
-from django.core.meta.fields import BoundField
+from django.core.meta.fields import BoundField, Field
 import re
 
 word_re = re.compile('[A-Z][a-z]+')
@@ -24,7 +24,7 @@ include_admin_script = simple_tag(include_admin_script)
 
 
 #@inclusion_tag('admin_submit_line', takes_context=True)
-def submit_row(context):        
+def submit_row(context):
     change = context['change']
     add = context['add']
     show_delete = context['show_delete']
@@ -68,41 +68,43 @@ field_label = simple_tag(field_label)
 
 
 class FieldWidgetNode(template.Node):
+    nodelists = {}
+    default = None
+    
     def __init__(self, bound_field_var):
         self.bound_field_var = bound_field_var
-        self.nodelists = {}
-        t = template_loader.get_template("widget/default")
-        self.default = t.nodelist 
 
+    def get_nodelist(cls, klass):
+        if not cls.nodelists.has_key(klass):
+            try:
+                field_class_name = klass.__name__
+                template_name = "widget/%s" % \
+                    class_name_to_underscored(field_class_name)
+                nodelist = template_loader.get_template(template_name).nodelist
+            except template.TemplateDoesNotExist:
+                super_klass = bool(klass.__bases__) and klass.__bases__[0] or None
+                if super_klass and super_klass != Field:
+                    nodelist = cls.get_nodelist(super_klass)
+                else:
+                    if not cls.default:
+                        cls.default = template_loader.get_template("widget/default").nodelist
+                    nodelist = cls.default
+            
+            cls.nodelists[klass] = nodelist
+            return nodelist
+        else:
+            return cls.nodelists[klass]
+    get_nodelist = classmethod(get_nodelist)       
+            
+            
     def render(self, context):
     
         bound_field = template.resolve_variable(self.bound_field_var, context)
-        add = context['add']
-        change = context['change']
         
         context.push()
         context['bound_field'] = bound_field
-        klass = bound_field.field.__class__
-        if not self.nodelists.has_key(klass):
-            t = None
-            while klass:
-                try: 
-                    field_class_name = klass.__name__
-                    template_name = "widget/%s" % \
-                        class_name_to_underscored(field_class_name)
-                    t = template_loader.get_template(template_name)
-                    break
-                except template.TemplateDoesNotExist: 
-                    klass = bool(klass.__bases__) and klass.__bases__[0] or None
-             
-            if t == None:
-                nodelist = self.default
-            else:           
-                nodelist = t.nodelist
-
-            self.nodelists[klass] = nodelist            
-
-        output = self.nodelists[klass].render(context)
+        
+        output = self.get_nodelist(bound_field.field.__class__).render(context)
         context.pop()
         return output
 

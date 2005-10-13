@@ -232,10 +232,8 @@ class RelatedObject(object):
                 count = min(count, self.field.rel.max_num_in_admin)
         else:
             count = self.field.rel.num_in_admin
-
+            
         fields = []
-        
-
         for i in range(count):
             for f in self.opts.fields + self.opts.many_to_many:
                     if follow.get(f.name, False):
@@ -424,27 +422,20 @@ class Options:
         return [RelatedObject(self, opts, field) for opts, field in self.get_all_related_objects()]
 
     def get_data_holders(self, follow=None):
+        if follow == None :
+            follow = self.get_follow()
         return [f for f in self.fields + self.many_to_many + self.get_all_related_objects_wrapped() if follow.get(f.name, None) ]
 
     def get_follow(self, override=None):
         follow = {}
-        
-        for f in self.fields + self.many_to_many:
+        for f in self.fields + self.many_to_many + self.get_all_related_objects_wrapped():
             if override and override.has_key(f.name):
-                fol = override[f.name]
+                child_override = override[f.name] 
             else:
-                fol = f.editable
+                child_override = None
+            fol = f.get_follow(child_override)
             if fol:
                 follow[f.name] = fol
- 
-        for f in self.get_all_related_objects_wrapped():
-            if override and override.has_key(f.name):
-               fol = f.get_follow(override[f.name])
-            else:
-               fol = f.get_follow(None)
-            if fol:
-                follow[f.name] = fol 
-
         return follow
 
     def get_all_related_many_to_many_objects(self):
@@ -478,6 +469,7 @@ class Options:
         Returns True if this object's admin form has at least one of the given
         field_type (e.g. FileField).
         """
+        #TODO: follow
         if not hasattr(self, '_field_types'):
             self._field_types = {}
         if not self._field_types.has_key(field_type):

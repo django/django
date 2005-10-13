@@ -822,6 +822,29 @@ class IPAddressField(TextField):
 # MISCELLANEOUS    #
 ####################
 
+class FilePathField(SelectField):
+    "A SelectField whose choices are the files in a given directory."
+    def __init__(self, field_name, path, match=None, recursive=False, is_required=False, validator_list=[]):
+        import os
+        if match is not None:
+            import re
+            match_re = re.compile(match)
+        choices = []
+        if recursive:
+            for root, dirs, files in os.walk(path):
+                for f in files:
+                    if match is None or match_re.search(f):
+                        choices.append((os.path.join(path, f), f))
+        else:
+            try:
+                for f in os.listdir(path):
+                    full_file = os.path.join(path, f)
+                    if os.path.isfile(full_file) and (match is None or match_re.search(f)):
+                        choices.append((full_file, f))
+            except OSError:
+                pass
+        SelectField.__init__(self, field_name, choices, 1, is_required, validator_list)
+
 class PhoneNumberField(TextField):
     "A convenience FormField for validating phone numbers (e.g. '630-555-1234')"
     def __init__(self, field_name, is_required=False, validator_list=[]):

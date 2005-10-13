@@ -1,4 +1,3 @@
-import copy
 from django.conf import settings
 from django.core.cache import cache
 from django.utils.cache import get_cache_key, learn_cache_key, patch_response_headers
@@ -49,7 +48,7 @@ class CacheMiddleware:
             return None # No cache information available, need to rebuild.
 
         request._cache_update_cache = False
-        return copy.copy(response)
+        return response
 
     def process_response(self, request, response):
         "Sets the cache, if needed."

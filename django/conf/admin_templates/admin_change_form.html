@@ -2,29 +2,19 @@
 {% load admin_modify %}
 {% load adminmedia %}
 {% block extrahead %}
- 
    {% for js in javascript_imports %}
       {% include_admin_script js %}
    {% endfor %}
-
 {% endblock %}
-
 {% block coltype %}{{ coltype }}{% endblock %}
-
 {% block bodyclass %}{{app_label}}-{{object_name.lower}} change-form{% endblock %}
-
 {% block breadcrumbs %}{% if not is_popup %}
 <div class="breadcrumbs">
      <a href="../../../">Home</a> &rsaquo;
      <a href="../">{{verbose_name_plural|capfirst}}</a> &rsaquo;
-     {% if add %}
-     	Add {{verbose_name}}
-     {% else %}
-        {{original|striptags|truncatewords:"18"}}
-     {% endif %}
+     {% if add %}Add {{verbose_name}}{% else %}{{original|striptags|truncatewords:"18"}}{% endif %}
 </div>
-{% endif %}
-{% endblock %}
+{% endif %}{% endblock %}
 
 {% block content %}<div id="content-main">
 {% if change %}
@@ -82,7 +72,7 @@
 {% submit_row %}
 
 {% if add %}
-   <script type="text/javascript">document.getElementById("id_{{first_field}}").focus();</script>'
+   <script type="text/javascript">document.getElementById("{{first_form_field_id}}").focus();</script>
 {% endif %}
 
 {% if auto_populated_fields %}
