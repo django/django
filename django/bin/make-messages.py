@@ -48,7 +48,7 @@ def templateize(src):
         start = src.find('{')
         if start >= 0 and src[start+1] in ('{', '%'):
             o.append(blank(src[:start]))
-            end = src.find(src[start+1] == '{' and '}' or '%', start)
+            end = src.find(src[start+1] == '{' and '}}' or '%}', start)
             if end >= 0:
                 o.append(src[start:end+2])
                 src = src[end+2:]
