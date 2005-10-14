@@ -376,9 +376,9 @@ Built-in tag reference
         ==========================  ================================================
         ``forloop.counter``         The current iteration of the loop (1-indexed)
         ``forloop.counter0``        The current iteration of the loop (0-indexed)
-        ``forloop.revcounter``      The number of iterations from the end of the 
+        ``forloop.revcounter``      The number of iterations from the end of the
                                     loop (1-indexed)
-        ``forloop.revcounter0``     The number of iterations from the end of the 
+        ``forloop.revcounter0``     The number of iterations from the end of the
                                     loop (0-indexed)
         ``forloop.first``           True if this is the first time through the loop
         ``forloop.last``            True if this is the last time through the loop
@@ -569,25 +569,28 @@ Built-in filter reference
 -------------------------
 
 ``add``
-    Adds the arg to the value
+    Adds the arg to the value.
 
 ``addslashes``
-    Adds slashes - useful for passing strings to JavaScript, for example.
+    Adds slashes. Useful for passing strings to JavaScript, for example.
 
 ``capfirst``
-    Capitalizes the first character of the value
+    Capitalizes the first character of the value.
 
 ``center``
-    Centers the value in a field of a given width
+    Centers the value in a field of a given width.
 
 ``cut``
-    Removes all values of arg from the given string
+    Removes all values of arg from the given string.
 
 ``date``
-    Formats a date according to the given format (same as the ``now`` tag)
+    Formats a date according to the given format (same as the ``now`` tag).
 
 ``default``
-    If value is unavailable, use given default
+    If value is unavailable, use given default.
+
+``default_if_none``
+    If value is ``None``, use given default.
 
 ``dictsort``
     Takes a list of dicts, returns that list sorted by the property given in the
@@ -598,24 +601,24 @@ Built-in filter reference
     given in the argument.
 
 ``divisibleby``
-    Returns true if the value is divisible by the argument
+    Returns true if the value is divisible by the argument.
 
 ``escape``
-    Escapes a string's HTML
+    Escapes a string's HTML.
 
 ``filesizeformat``
     Format the value like a 'human-readable' file size (i.e. 13 KB, 4.1 MB, 102
     bytes, etc).
 
 ``first``
-    Returns the first item in a list
+    Returns the first item in a list.
 
 ``fix_ampersands``
-    Replaces ampersands with ``&amp;`` entities
+    Replaces ampersands with ``&amp;`` entities.
 
 ``floatformat``
     Displays a floating point number as 34.2 (with one decimal places) - but
-    only if there's a point to be displayed
+    only if there's a point to be displayed.
 
 ``get_digit``
     Given a whole number, returns the requested digit of it, where 1 is the
@@ -624,52 +627,52 @@ Built-in filter reference
     or if argument is less than 1). Otherwise, output is always an integer.
 
 ``join``
-    Joins a list with a string, like Python's ``str.join(list)``
+    Joins a list with a string, like Python's ``str.join(list)``.
 
 ``length``
-    Returns the length of the value - useful for lists
+    Returns the length of the value. Useful for lists.
 
 ``length_is``
-    Returns a boolean of whether the value's length is the argument
+    Returns a boolean of whether the value's length is the argument.
 
 ``linebreaks``
-    Converts newlines into <p> and <br />s
+    Converts newlines into ``<p>`` and ``<br />``s.
 
 ``linebreaksbr``
-    Converts newlines into <br />s
+    Converts newlines into ``<br />``s.
 
 ``linenumbers``
-    Displays text with line numbers
+    Displays text with line numbers.
 
 ``ljust``
-    Left-aligns the value in a field of a given width
+    Left-aligns the value in a field of a given width.
 
     **Argument:** field size
 
 ``lower``
-    Converts a string into all lowercase
+    Converts a string into all lowercase.
 
 ``make_list``
     Returns the value turned into a list. For an integer, it's a list of
     digits. For a string, it's a list of characters.
 
 ``phone2numeric``
-    Takes a phone number and converts it in to its numerical equivalent
+    Takes a phone number and converts it in to its numerical equivalent.
 
 ``pluralize``
-    Returns 's' if the value is not 1, for '1 vote' vs. '2 votes'
+    Returns 's' if the value is not 1, for '1 vote' vs. '2 votes'.
 
 ``pprint``
-    A wrapper around pprint.pprint -- for debugging, really
+    A wrapper around pprint.pprint -- for debugging, really.
 
 ``random``
-    Returns a random item from the list
+    Returns a random item from the list.
 
 ``removetags``
-    Removes a space separated list of [X]HTML tags from the output
+    Removes a space separated list of [X]HTML tags from the output.
 
 ``rjust``
-    Right-aligns the value in a field of a given width
+    Right-aligns the value in a field of a given width.
 
     **Argument:** field size
 
@@ -696,19 +699,19 @@ Built-in filter reference
     of Python string formatting
 
 ``striptags``
-    Strips all [X]HTML tags
+    Strips all [X]HTML tags.
 
 ``time``
     Formats a time according to the given format (same as the ``now`` tag).
 
 ``timesince``
-    Formats a date as the time since that date (i.e. "4 days, 6 hours")
+    Formats a date as the time since that date (i.e. "4 days, 6 hours").
 
 ``title``
-    Converts a string into titlecase
+    Converts a string into titlecase.
 
 ``truncatewords``
-    Truncates a string after a certain number of words
+    Truncates a string after a certain number of words.
 
     **Argument:** Number of words to truncate after
 
@@ -733,26 +736,27 @@ Built-in filter reference
         </li>
 
 ``upper``
-    Converts a string into all uppercase
+    Converts a string into all uppercase.
 
 ``urlencode``
-    Escapes a value for use in a URL
+    Escapes a value for use in a URL.
 
 ``urlize``
-    Converts URLs in plain text into clickable links
+    Converts URLs in plain text into clickable links.
 
 ``urlizetrunc``
-    Converts URLs into clickable links, truncating URLs to the given character limit
+    Converts URLs into clickable links, truncating URLs to the given character
+    limit.
 
-    **Argument:** Length to truncate URLs to.
+    **Argument:** Length to truncate URLs to
 
 ``wordcount``
-    Returns the number of words
+    Returns the number of words.
 
 ``wordwrap``
-    Wraps words at specified line length
+    Wraps words at specified line length.
 
-    **Argument:** number of words to wrap the text at.
+    **Argument:** number of words at which to wrap the text
 
 ``yesno``
     Given a string mapping values for true, false and (optionally) None,
