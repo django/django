@@ -1,5 +1,6 @@
-from django.core import formfields, template_loader, validators
+from django.core import formfields, validators
 from django.core.extensions import DjangoContext, render_to_response
+from django.core.template import loader
 from django.models.auth import users
 from django.views.decorators.auth import login_required
 from django.utils.httpwrappers import HttpResponseRedirect
@@ -32,7 +33,7 @@ class PasswordResetForm(formfields.Manipulator):
             domain = current_site.domain
         else:
             site_name = domain = domain_override
-        t = template_loader.get_template('registration/password_reset_email')
+        t = loader.get_template('registration/password_reset_email')
         c = {
             'new_password': new_pass,
             'email': self.user_cache.email,

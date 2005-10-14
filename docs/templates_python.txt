@@ -307,12 +307,12 @@ The Python API
 
 Django has two ways to load templates from files:
 
-``django.core.template_loader.get_template(template_name)``
+``django.core.template.loader.get_template(template_name)``
     ``get_template`` returns the compiled template (a ``Template`` object) for
     the template with the given name. If the template doesn't exist, it raises
     ``django.core.template.TemplateDoesNotExist``.
 
-``django.core.template_loader.select_template(template_name_list)``
+``django.core.template.loader.select_template(template_name_list)``
     ``select_template`` is just like ``get_template``, except it takes a list
     of template names. Of the list, it returns the first template that exists.
 
@@ -398,8 +398,8 @@ Python code, depending on whether you're writing filters or tags.
 .. admonition:: Behind the scenes
 
     For a ton of examples, read the source code for Django's default filters
-    and tags. They're in ``django/core/defaultfilters.py`` and
-    ``django/core/defaulttags.py``, respectively.
+    and tags. They're in ``django/core/template/defaultfilters.py`` and
+    ``django/core/template/defaulttags.py``, respectively.
 
 Writing custom template filters
 -------------------------------
@@ -710,4 +710,4 @@ The only new concept here is the ``self.nodelist.render(context)`` in
 
 For more examples of complex rendering, see the source code for ``{% if %}``,
 ``{% for %}``, ``{% ifequal %}`` and ``{% ifchanged %}``. They live in
-``django/core/defaulttags.py``.
+``django/core/template/defaulttags.py``.

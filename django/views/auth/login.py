@@ -1,5 +1,5 @@
 from django.parts.auth.formfields import AuthenticationForm
-from django.core import formfields, template_loader
+from django.core import formfields
 from django.core.extensions import DjangoContext, render_to_response
 from django.models.auth import users
 from django.models.core import sites

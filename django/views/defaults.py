@@ -1,6 +1,5 @@
-from django.core import template_loader
 from django.core.exceptions import Http404, ObjectDoesNotExist
-from django.core.template import Context
+from django.core.template import Context, loader
 from django.models.core import sites
 from django.utils import httpwrappers
 
@@ -56,7 +55,7 @@ def page_not_found(request):
         if r == '':
             return httpwrappers.HttpResponseGone()
         return httpwrappers.HttpResponseRedirect(r.new_path)
-    t = template_loader.get_template('404')
+    t = loader.get_template('404')
     c = Context()
     return httpwrappers.HttpResponseNotFound(t.render(c))
 
@@ -67,6 +66,6 @@ def server_error(request):
     Templates: `500`
     Context: None
     """
-    t = template_loader.get_template('500')
+    t = loader.get_template('500')
     c = Context()
     return httpwrappers.HttpResponseServerError(t.render(c))

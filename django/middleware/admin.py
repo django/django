@@ -1,6 +1,6 @@
 from django.utils import httpwrappers
-from django.core import template_loader
-from django.core.extensions import DjangoContext as Context
+from django.core.extensions import DjangoContext
+from django.core.extensions import render_to_response
 from django.models.auth import users
 from django.views.registration import passwords
 from django.views.auth.login import logout
@@ -96,14 +96,12 @@ class AdminUserRequired:
             post_data = encode_post_data(request.POST)
         else:
             post_data = encode_post_data({})
-        t = template_loader.get_template(self.get_login_template_name())
-        c = Context(request, {
+        return render_to_response(self.get_login_template_name(), {
             'title': 'Log in',
             'app_path': request.path,
             'post_data': post_data,
             'error_message': error_message
-        })
-        return httpwrappers.HttpResponse(t.render(c))
+        }, context_instance=DjangoContext(request))
 
     def authenticate_user(self, user, password):
         return user.check_password(password) and user.is_staff
