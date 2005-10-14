@@ -1,4 +1,5 @@
-from django.core import template, template_loader
+from django.core import template
+from django.core.template import loader
 from django.utils.translation import activate, deactivate
 
 # Helper objects for template tests
@@ -259,7 +260,7 @@ TEMPLATE_TESTS = {
     'i18n14': ('{{ bool|yesno:"ja,nein" }}', {'bool': True}, 'ja'),
 }
 
-# This replaces the standard template_loader.
+# This replaces the standard template loader.
 def test_template_loader(template_name, template_dirs=None):
     try:
         return TEMPLATE_TESTS[template_name][0]
@@ -267,7 +268,7 @@ def test_template_loader(template_name, template_dirs=None):
         raise template.TemplateDoesNotExist, template_name
 
 def run_tests(verbosity=0, standalone=False):
-    template_loader.load_template_source, old_template_loader = test_template_loader, template_loader.load_template_source
+    loader.load_template_source, old_template_loader = test_template_loader, loader.load_template_source
     failed_tests = []
     tests = TEMPLATE_TESTS.items()
     tests.sort()
@@ -275,7 +276,7 @@ def run_tests(verbosity=0, standalone=False):
         if 'LANGUAGE_CODE' in vals[1]:
             activate('*', vals[1]['LANGUAGE_CODE'])
         try:
-            output = template_loader.get_template(name).render(template.Context(vals[1]))
+            output = loader.get_template(name).render(template.Context(vals[1]))
         except Exception, e:
             if e.__class__ == vals[2]:
                 if verbosity:
@@ -294,7 +295,7 @@ def run_tests(verbosity=0, standalone=False):
             if verbosity:
                 print "Template test: %s -- FAILED. Expected %r, got %r" % (name, vals[2], output)
             failed_tests.append(name)
-    template_loader.load_template_source = old_template_loader
+    loader.load_template_source = old_template_loader
 
     if failed_tests and not standalone:
         msg = "Template tests %s failed." % failed_tests

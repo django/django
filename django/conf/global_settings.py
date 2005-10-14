@@ -59,7 +59,8 @@ DATABASE_ENGINE = 'postgresql' # 'postgresql', 'mysql', or 'sqlite3'.
 DATABASE_NAME = ''
 DATABASE_USER = ''
 DATABASE_PASSWORD = ''
-DATABASE_HOST = ''             # Set to empty string for localhost
+DATABASE_HOST = ''             # Set to empty string for localhost.
+DATABASE_PORT = ''             # Set to empty string for default.
 
 # Host for sending e-mail.
 EMAIL_HOST = 'localhost'

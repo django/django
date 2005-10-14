@@ -1,5 +1,6 @@
-from django.core import formfields, template_loader, validators
+from django.core import formfields, validators
 from django.core import template
+from django.core.template import loader
 from django.core.extensions import DjangoContext, render_to_response
 from django.models.core import sites
 from django.conf import settings
@@ -49,7 +50,7 @@ class TemplateValidator(formfields.Manipulator):
         # so that inheritance works in the site's context, register a new function
         # for "extends" that uses the site's TEMPLATE_DIR instead
         def new_do_extends(parser, token):
-            node = template_loader.do_extends(parser, token)
+            node = loader.do_extends(parser, token)
             node.template_dirs = settings_module.TEMPLATE_DIRS
             return node
         template.register_tag('extends', new_do_extends)
@@ -58,10 +59,10 @@ class TemplateValidator(formfields.Manipulator):
         # making sure to reset the extends function in any case
         error = None
         try:
-            tmpl = template_loader.get_template_from_string(field_data)
+            tmpl = loader.get_template_from_string(field_data)
             tmpl.render(template.Context({}))
         except template.TemplateSyntaxError, e:
             error = e
-        template.register_tag('extends', template_loader.do_extends)
+        template.register_tag('extends', loader.do_extends)
         if error:
             raise validators.ValidationError, e.args

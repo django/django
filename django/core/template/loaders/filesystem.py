@@ -1,4 +1,4 @@
-# Wrapper for loading templates from files
+# Wrapper for loading templates from the filesystem.
 
 from django.conf.settings import TEMPLATE_DIRS, TEMPLATE_FILE_EXTENSION
 from django.core.template import TemplateDoesNotExist

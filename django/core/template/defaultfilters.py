@@ -1,6 +1,7 @@
 "Default variable filters"
 
-import template, re
+from django.core.template import register_filter, resolve_variable
+import re
 import random as random_module
 
 ###################
@@ -196,7 +197,7 @@ def dictsort(value, arg):
     Takes a list of dicts, returns that list sorted by the property given in
     the argument.
     """
-    decorated = [(template.resolve_variable('var.' + arg, {'var' : item}), item) for item in value]
+    decorated = [(resolve_variable('var.' + arg, {'var' : item}), item) for item in value]
     decorated.sort()
     return [item[1] for item in decorated]
 
@@ -205,7 +206,7 @@ def dictsortreversed(value, arg):
     Takes a list of dicts, returns that list sorted in reverse order by the
     property given in the argument.
     """
-    decorated = [(template.resolve_variable('var.' + arg, {'var' : item}), item) for item in value]
+    decorated = [(resolve_variable('var.' + arg, {'var' : item}), item) for item in value]
     decorated.sort()
     decorated.reverse()
     return [item[1] for item in decorated]
@@ -333,6 +334,12 @@ def default(value, arg):
     "If value is unavailable, use given default"
     return value or arg
 
+def default_if_none(value, arg):
+    "If value is None, use given default"
+    if value is None:
+        return arg
+    return value
+
 def divisibleby(value, arg):
     "Returns true if the value is devisible by the argument"
     return int(value) % int(arg) == 0
@@ -408,51 +415,52 @@ def pprint(value, _):
     from pprint import pformat
     return pformat(value)
 
-# Syntax: template.register_filter(name of filter, callback, has_argument)
-template.register_filter('add', add, True)
-template.register_filter('addslashes', addslashes, False)
-template.register_filter('capfirst', capfirst, False)
-template.register_filter('center', center, True)
-template.register_filter('cut', cut, True)
-template.register_filter('date', date, True)
-template.register_filter('default', default, True)
-template.register_filter('dictsort', dictsort, True)
-template.register_filter('dictsortreversed', dictsortreversed, True)
-template.register_filter('divisibleby', divisibleby, True)
-template.register_filter('escape', escape, False)
-template.register_filter('filesizeformat', filesizeformat, False)
-template.register_filter('first', first, False)
-template.register_filter('fix_ampersands', fix_ampersands, False)
-template.register_filter('floatformat', floatformat, False)
-template.register_filter('get_digit', get_digit, True)
-template.register_filter('join', join, True)
-template.register_filter('length', length, False)
-template.register_filter('length_is', length_is, True)
-template.register_filter('linebreaks', linebreaks, False)
-template.register_filter('linebreaksbr', linebreaksbr, False)
-template.register_filter('linenumbers', linenumbers, False)
-template.register_filter('ljust', ljust, True)
-template.register_filter('lower', lower, False)
-template.register_filter('make_list', make_list, False)
-template.register_filter('phone2numeric', phone2numeric, False)
-template.register_filter('pluralize', pluralize, False)
-template.register_filter('pprint', pprint, False)
-template.register_filter('removetags', removetags, True)
-template.register_filter('random', random, False)
-template.register_filter('rjust', rjust, True)
-template.register_filter('slice', slice_, True)
-template.register_filter('slugify', slugify, False)
-template.register_filter('stringformat', stringformat, True)
-template.register_filter('striptags', striptags, False)
-template.register_filter('time', time, True)
-template.register_filter('timesince', timesince, False)
-template.register_filter('title', title, False)
-template.register_filter('truncatewords', truncatewords, True)
-template.register_filter('unordered_list', unordered_list, False)
-template.register_filter('upper', upper, False)
-template.register_filter('urlencode', urlencode, False)
-template.register_filter('urlize', urlize, False)
-template.register_filter('urlizetrunc', urlizetrunc, True)
-template.register_filter('wordcount', wordcount, False)
-template.register_filter('wordwrap', wordwrap, True)
-template.register_filter('yesno', yesno, True)
+# Syntax: register_filter(name of filter, callback, has_argument)
+register_filter('add', add, True)
+register_filter('addslashes', addslashes, False)
+register_filter('capfirst', capfirst, False)
+register_filter('center', center, True)
+register_filter('cut', cut, True)
+register_filter('date', date, True)
+register_filter('default', default, True)
+register_filter('default_if_none', default_if_none, True)
+register_filter('dictsort', dictsort, True)
+register_filter('dictsortreversed', dictsortreversed, True)
+register_filter('divisibleby', divisibleby, True)
+register_filter('escape', escape, False)
+register_filter('filesizeformat', filesizeformat, False)
+register_filter('first', first, False)
+register_filter('fix_ampersands', fix_ampersands, False)
+register_filter('floatformat', floatformat, False)
+register_filter('get_digit', get_digit, True)
+register_filter('join', join, True)
+register_filter('length', length, False)
+register_filter('length_is', length_is, True)
+register_filter('linebreaks', linebreaks, False)
+register_filter('linebreaksbr', linebreaksbr, False)
+register_filter('linenumbers', linenumbers, False)
+register_filter('ljust', ljust, True)
+register_filter('lower', lower, False)
+register_filter('make_list', make_list, False)
+register_filter('phone2numeric', phone2numeric, False)
+register_filter('pluralize', pluralize, False)
+register_filter('pprint', pprint, False)
+register_filter('removetags', removetags, True)
+register_filter('random', random, False)
+register_filter('rjust', rjust, True)
+register_filter('slice', slice_, True)
+register_filter('slugify', slugify, False)
+register_filter('stringformat', stringformat, True)
+register_filter('striptags', striptags, False)
+register_filter('time', time, True)
+register_filter('timesince', timesince, False)
+register_filter('title', title, False)
+register_filter('truncatewords', truncatewords, True)
+register_filter('unordered_list', unordered_list, False)
+register_filter('upper', upper, False)
+register_filter('urlencode', urlencode, False)
+register_filter('urlize', urlize, False)
+register_filter('urlizetrunc', urlizetrunc, True)
+register_filter('wordcount', wordcount, False)
+register_filter('wordwrap', wordwrap, True)
+register_filter('yesno', yesno, True)
