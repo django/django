@@ -42,9 +42,9 @@ def load_template_source(name, dirs=None):
     for loader in template_source_loaders:
         try:
             return loader(name, dirs)
-        except template.TemplateDoesNotExist:
+        except TemplateDoesNotExist:
             pass
-    raise template.TemplateDoesNotExist, name
+    raise TemplateDoesNotExist, name
 
 class ExtendsError(Exception):
     pass
