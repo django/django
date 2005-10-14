@@ -76,16 +76,12 @@ class DjangoTranslation23(DjangoTranslation):
     """
 
     def gettext(self, msgid):
-        res = DjangoTranslation.gettext(self, msgid)
-        if self.charset() != self.django_output_charset:
-            res = res.decode(self.charset()).encode(self.django_output_charset)
-        return res
+        res = self.ugettext(msgid)
+        return res.encode(self.django_output_charset)
 
     def ngettext(self, msgid1, msgid2, n):
-        res = DjangoTranslation.ngettext(self, msgid1, msgid2, n)
-        if self.charset() != self.django_output_charset:
-            res = res.decode(self.charset()).encode(self.django_output_charset)
-        return res
+        res = self.ungettext(msgid1, msgid2, n)
+        return res.encode(self.django_output_charset)
 
 def translation(appname, language):
     """
