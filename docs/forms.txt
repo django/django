@@ -65,9 +65,8 @@ Using the ``AddManipulator``
 We'll start with the ``AddManipulator``.  Here's a very simple view that takes
 POSTed data from the browser and creates a new ``Place`` object::
 
-    from django.core import template_loader
     from django.core.exceptions import Http404
-    from django.core.extensions import DjangoContext as Context
+    from django.core.extensions import render_to_response
     from django.utils.httpwrappers import HttpResponse, HttpResponseRedirect
     from django.models.places import places
     from django.core import formfields
@@ -112,13 +111,7 @@ view with a form that submits to this flawed creation view::
         # Create a FormWrapper object that the template can use. Ignore
         # the last two arguments to FormWrapper for now.
         form = formfields.FormWrapper(places.AddManipulator(), {}, {})
-
-        # Create a template, context and response.
-        t = template_loader.get_template('places/naive_create_form')
-        c = Context(request, {
-            'form': form
-        })
-        return HttpResponse(t.render(c))
+        return render_to_response('places/naive_create_form', {'form': form})
 
 (This view, as well as all the following ones, has the same imports as in the
 first example above.)
@@ -169,11 +162,7 @@ creation view that takes validation into account::
         # Check for validation errors
         errors = manipulator.get_validation_errors(new_data)
         if errors:
-            t = template_loader.get_template('places/errors')
-            c = Context(request, {
-                'errors': errors
-            }
-            return HttpResponse(t.render(c))
+            return render_to_response('places/errors', {'errors': errors})
         else:
             manipulator.do_html2python(request.POST)
             new_place = manipulator.save(request.POST)
@@ -245,11 +234,7 @@ Below is the finished view::
 
         # Create the FormWrapper, template, context, response.
         form = formfields.FormWrapper(manipulator, new_data, errors)
-        t = template_loader.get_template("places/create_form")
-        c = Context(request, {
-            'form': form,
-        })
-        return HttpResponse(t.render(c))
+        return render_to_response('places/create_form', {'form': form})
 
 and here's the ``create_form`` template::
 
@@ -338,12 +323,7 @@ about editing an existing one? It's shockingly similar to creating a new one::
             new_data = place.__dict__
 
         form = formfields.FormWrapper(manipulator, new_data, errors)
-        t = template_loader.get_template("places/edit_form")
-        c = Context(request, {
-            'form': form,
-            'place': place,
-        })
-        return HttpResponse(t.render(c))
+        return render_to_response('places/edit_form', {'form': form, 'place': place})
 
 The only real differences are:
 
@@ -422,11 +402,7 @@ Here's a simple function that might drive the above form::
         else:
             errors = new_data = {}
         form = formfields.FormWrapper(manipulator, new_data, errors)
-        t = template_loader.get_template("contact_form")
-        c = Context(request, {
-            'form': form,
-        })
-        return HttpResponse(t.render(c))
+        return render_to_response('contact_form', {'form': form})
 
 Validators
 ==========

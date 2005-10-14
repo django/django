@@ -5,7 +5,7 @@ from django.utils.text import capfirst
 from django.utils.html import escape
 from django.utils.functional import curry
 
-from django.core.template_decorators import simple_tag, inclusion_tag
+from django.core.template.decorators import simple_tag, inclusion_tag
 
 from django.views.admin.main import AdminBoundField
 from django.core.meta.fields import BoundField, Field

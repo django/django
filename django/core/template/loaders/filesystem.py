@@ -1,12 +1,10 @@
-# Wrapper for loading templates from files
+# Wrapper for loading templates from the filesystem.
 
 from django.conf.settings import TEMPLATE_DIRS, TEMPLATE_FILE_EXTENSION
 from django.core.template import TemplateDoesNotExist
 import os
 
-
-def find_template_source(template_name, template_dirs=None):
-    "Returns a tuple of (template_string, filepath)."
+def load_template_source(template_name, template_dirs=None):
     if not template_dirs:
         template_dirs = TEMPLATE_DIRS
     tried = []
@@ -21,7 +19,4 @@ def find_template_source(template_name, template_dirs=None):
     else:
         error_msg = "Your TEMPLATE_DIRS settings is empty. Change it to point to at least one template directory."
     raise TemplateDoesNotExist, error_msg
-
-
-def load_template_source(template_name, template_dirs=None):
-    return find_template_source(template_name, template_dirs)[0]
+load_template_source.is_usable = True

@@ -4,7 +4,8 @@ from django.conf import settings
 from django.models.core import sites
 from django.core.extensions import DjangoContext, render_to_response
 from django.core.exceptions import Http404, ViewDoesNotExist
-from django.core import template, template_loader, defaulttags, defaultfilters, urlresolvers
+from django.core import template, template_loader, urlresolvers
+from django.core.template import defaulttags, defaultfilters
 try:
     from django.parts.admin import doc
 except ImportError:

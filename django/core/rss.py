@@ -1,6 +1,5 @@
-from django.core import template_loader
 from django.core.exceptions import ObjectDoesNotExist
-from django.core.template import Context
+from django.core.template import Context, loader
 from django.models.core import sites
 from django.utils import feedgenerator
 from django.conf.settings import LANGUAGE_CODE, SETTINGS_MODULE
@@ -28,7 +27,7 @@ class FeedConfiguration:
 
         get_list_kwargs_cb -- Function that takes the param and returns a
         dictionary to use in addition to get_list_kwargs (if applicable).
-        
+
         get_pubdate_cb -- Function that takes the object and returns a datetime
         to use as the publication date in the feed.
 
@@ -49,7 +48,7 @@ class FeedConfiguration:
         self.enc_url = enc_url
         self.enc_length = enc_length
         self.enc_mime_type = enc_mime_type
-        
+
     def get_feed(self, param_slug=None):
         """
         Returns a utils.feedgenerator.DefaultRssFeed object, fully populated,
@@ -64,8 +63,8 @@ class FeedConfiguration:
             param = None
         current_site = sites.get_current()
         f = self._get_feed_generator_object(param)
-        title_template = template_loader.get_template('rss/%s_title' % self.slug)
-        description_template = template_loader.get_template('rss/%s_description' % self.slug)
+        title_template = loader.get_template('rss/%s_title' % self.slug)
+        description_template = loader.get_template('rss/%s_description' % self.slug)
         kwargs = self.get_list_kwargs.copy()
         if param and self.get_list_kwargs_cb:
             kwargs.update(self.get_list_kwargs_cb(param))
@@ -102,7 +101,7 @@ class FeedConfiguration:
                 pubdate = self.get_pubdate_cb and self.get_pubdate_cb(obj) or None,
             )
         return f
-        
+
     def _get_feed_generator_object(self, param):
         current_site = sites.get_current()
         link = self.link_cb(param).decode()

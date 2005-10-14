@@ -191,14 +191,13 @@ There's a problem here, though: The page's design is hard-coded in the view. If
 you want to change the way the page looks, you'll have to edit this Python code.
 So let's use Django's template system to separate the design from Python::
 
-    from django.core import template_loader
-    from django.core.template import Context
+    from django.core.template import Context, loader
     from django.models.polls import polls
     from django.utils.httpwrappers import HttpResponse
 
     def index(request):
         latest_poll_list = polls.get_list(order_by=['-pub_date'], limit=5)
-        t = template_loader.get_template('polls/index')
+        t = loader.get_template('polls/index')
         c = Context({
             'latest_poll_list': latest_poll_list,
         })
@@ -224,7 +223,7 @@ and feel" section of Tutorial 2.
 When you've done that, create a directory ``polls`` in your template directory.
 Within that, create a file called ``index.html``. Django requires that
 templates have ".html" extension. Note that our
-``template_loader.get_template('polls/index')`` code from above maps to
+``loader.get_template('polls/index')`` code from above maps to
 "[template_directory]/polls/index.html" on the filesystem.
 
 Put the following code in that template::
@@ -256,7 +255,7 @@ provides a shortcut. Here's the full ``index()`` view, rewritten::
         latest_poll_list = polls.get_list(order_by=['-pub_date'], limit=5)
         return render_to_response('polls/index', {'latest_poll_list': latest_poll_list})
 
-Note that we no longer need to import ``template_loader``, ``Context`` or
+Note that we no longer need to import ``loader``, ``Context`` or
 ``HttpResponse``.
 
 The ``render_to_response()`` function takes a template name as its first

@@ -1,14 +1,14 @@
 "Default tags used by the template system, available to all templates."
 
+from django.core.template import Node, NodeList, Template, Context, resolve_variable, resolve_variable_with_filters, get_filters_from_token, registered_filters
+from django.core.template import TemplateSyntaxError, VariableDoesNotExist, BLOCK_TAG_START, BLOCK_TAG_END, VARIABLE_TAG_START, VARIABLE_TAG_END, register_tag
 import sys
-import template
-import template_loader
 
-class CommentNode(template.Node):
+class CommentNode(Node):
     def render(self, context):
         return ''
 
-class CycleNode(template.Node):
+class CycleNode(Node):
     def __init__(self, cyclevars):
         self.cyclevars = cyclevars
         self.cyclevars_len = len(cyclevars)
@@ -18,7 +18,7 @@ class CycleNode(template.Node):
         self.counter += 1
         return self.cyclevars[self.counter % self.cyclevars_len]
 
-class DebugNode(template.Node):
+class DebugNode(Node):
     def render(self, context):
         from pprint import pformat
         output = [pformat(val) for val in context]
@@ -26,7 +26,7 @@ class DebugNode(template.Node):
         output.append(pformat(sys.modules))
         return ''.join(output)
 
-class FilterNode(template.Node):
+class FilterNode(Node):
     def __init__(self, filters, nodelist):
         self.filters, self.nodelist = filters, nodelist
 
@@ -34,21 +34,21 @@ class FilterNode(template.Node):
         output = self.nodelist.render(context)
         # apply filters
         for f in self.filters:
-            output = template.registered_filters[f[0]][0](output, f[1])
+            output = registered_filters[f[0]][0](output, f[1])
         return output
 
-class FirstOfNode(template.Node):
+class FirstOfNode(Node):
     def __init__(self, vars):
         self.vars = vars
 
     def render(self, context):
         for var in self.vars:
-            value = template.resolve_variable(var, context)
+            value = resolve_variable(var, context)
             if value:
                 return str(value)
         return ''
 
-class ForNode(template.Node):
+class ForNode(Node):
     def __init__(self, loopvar, sequence, reversed, nodelist_loop):
         self.loopvar, self.sequence = loopvar, sequence
         self.reversed = reversed
@@ -74,15 +74,15 @@ class ForNode(template.Node):
         return nodes
 
     def render(self, context):
-        nodelist = template.NodeList()
+        nodelist = NodeList()
         if context.has_key('forloop'):
             parentloop = context['forloop']
         else:
             parentloop = {}
         context.push()
         try:
-            values = template.resolve_variable_with_filters(self.sequence, context)
-        except template.VariableDoesNotExist:
+            values = resolve_variable_with_filters(self.sequence, context)
+        except VariableDoesNotExist:
             values = []
         if values is None:
             values = []
@@ -112,7 +112,7 @@ class ForNode(template.Node):
         context.pop()
         return nodelist.render(context)
 
-class IfChangedNode(template.Node):
+class IfChangedNode(Node):
     def __init__(self, nodelist):
         self.nodelist = nodelist
         self._last_seen = None
@@ -130,7 +130,7 @@ class IfChangedNode(template.Node):
         else:
             return ''
 
-class IfEqualNode(template.Node):
+class IfEqualNode(Node):
     def __init__(self, var1, var2, nodelist_true, nodelist_false, negate):
         self.var1, self.var2 = var1, var2
         self.nodelist_true, self.nodelist_false = nodelist_true, nodelist_false
@@ -140,13 +140,13 @@ class IfEqualNode(template.Node):
         return "<IfEqualNode>"
 
     def render(self, context):
-        val1 = template.resolve_variable(self.var1, context)
-        val2 = template.resolve_variable(self.var2, context)
+        val1 = resolve_variable(self.var1, context)
+        val2 = resolve_variable(self.var2, context)
         if (self.negate and val1 != val2) or (not self.negate and val1 == val2):
             return self.nodelist_true.render(context)
         return self.nodelist_false.render(context)
 
-class IfNode(template.Node):
+class IfNode(Node):
     def __init__(self, boolvars, nodelist_true, nodelist_false):
         self.boolvars = boolvars
         self.nodelist_true, self.nodelist_false = nodelist_true, nodelist_false
@@ -171,27 +171,27 @@ class IfNode(template.Node):
     def render(self, context):
         for ifnot, boolvar in self.boolvars:
             try:
-                value = template.resolve_variable_with_filters(boolvar, context)
-            except template.VariableDoesNotExist:
+                value = resolve_variable_with_filters(boolvar, context)
+            except VariableDoesNotExist:
                 value = None
             if (value and not ifnot) or (ifnot and not value):
                 return self.nodelist_true.render(context)
         return self.nodelist_false.render(context)
 
-class RegroupNode(template.Node):
+class RegroupNode(Node):
     def __init__(self, target_var, expression, var_name):
         self.target_var, self.expression = target_var, expression
         self.var_name = var_name
 
     def render(self, context):
-        obj_list = template.resolve_variable_with_filters(self.target_var, context)
+        obj_list = resolve_variable_with_filters(self.target_var, context)
         if obj_list == '': # target_var wasn't found in context; fail silently
             context[self.var_name] = []
             return ''
         output = [] # list of dictionaries in the format {'grouper': 'key', 'list': [list of contents]}
         for obj in obj_list:
-            grouper = template.resolve_variable_with_filters('var.%s' % self.expression, \
-                template.Context({'var': obj}))
+            grouper = resolve_variable_with_filters('var.%s' % self.expression, \
+                Context({'var': obj}))
             if output and repr(output[-1]['grouper']) == repr(grouper):
                 output[-1]['list'].append(obj)
             else:
@@ -206,7 +206,7 @@ def include_is_allowed(filepath):
             return True
     return False
 
-class SsiNode(template.Node):
+class SsiNode(Node):
     def __init__(self, filepath, parsed):
         self.filepath, self.parsed = filepath, parsed
 
@@ -221,42 +221,14 @@ class SsiNode(template.Node):
             output = ''
         if self.parsed:
             try:
-                t = template.Template(output)
+                t = Template(output)
                 return t.render(context)
-            except template.TemplateSyntaxError:
+            except TemplateSyntaxError:
                 return '' # Fail silently for invalid included templates.
         return output
 
 
-class ConstantIncludeNode(template.Node):
-    def __init__(self, template_path):
-        try: 
-            t = template_loader.get_template(template_path)        
-            self.nodelist = t.nodelist
-        except Exception, e:
-            self.nodelist = None
-
-    def render(self, context):
-        if self.nodelist:
-            return self.nodelist.render(context)
-        else:
-            return ''
-
-class IncludeNode(template.Node):
-    def __init__(self, template_path_var):
-        self.template_path_var = template_path_var
-
-    def render(self, context):
-         try:
-             template_path = template.resolve_variable(self.template_path_var, context)
-             print "IncludeNode rendering %s" % template_path 
-             t = template_loader.get_template(template_path)
-             return t.render(context)
-         except Exception, e:
-             return '' # Fail silently for invalid included templates.
-
-
-class LoadNode(template.Node):
+class LoadNode(Node):
     def __init__(self, taglib):
         self.taglib = taglib
 
@@ -274,7 +246,7 @@ class LoadNode(template.Node):
             pass # Fail silently for invalid loads.
         return ''
 
-class NowNode(template.Node):
+class NowNode(Node):
     def __init__(self, format_string):
         self.format_string = format_string
 
@@ -284,11 +256,11 @@ class NowNode(template.Node):
         df = DateFormat(datetime.now())
         return df.format(self.format_string)
 
-class TemplateTagNode(template.Node):
-    mapping = {'openblock': template.BLOCK_TAG_START,
-               'closeblock': template.BLOCK_TAG_END,
-               'openvariable': template.VARIABLE_TAG_START,
-               'closevariable': template.VARIABLE_TAG_END}
+class TemplateTagNode(Node):
+    mapping = {'openblock': BLOCK_TAG_START,
+               'closeblock': BLOCK_TAG_END,
+               'openvariable': VARIABLE_TAG_START,
+               'closevariable': VARIABLE_TAG_END}
 
     def __init__(self, tagtype):
         self.tagtype = tagtype
@@ -296,7 +268,7 @@ class TemplateTagNode(template.Node):
     def render(self, context):
         return self.mapping.get(self.tagtype, '')
 
-class WidthRatioNode(template.Node):
+class WidthRatioNode(Node):
     def __init__(self, val_var, max_var, max_width):
         self.val_var = val_var
         self.max_var = max_var
@@ -304,9 +276,9 @@ class WidthRatioNode(template.Node):
 
     def render(self, context):
         try:
-            value = template.resolve_variable_with_filters(self.val_var, context)
-            maxvalue = template.resolve_variable_with_filters(self.max_var, context)
-        except template.VariableDoesNotExist:
+            value = resolve_variable_with_filters(self.val_var, context)
+            maxvalue = resolve_variable_with_filters(self.max_var, context)
+        except VariableDoesNotExist:
             return ''
         try:
             value = float(value)
@@ -360,7 +332,7 @@ def do_cycle(parser, token):
 
     args = token.contents.split()
     if len(args) < 2:
-        raise template.TemplateSyntaxError("'Cycle' statement requires at least two arguments")
+        raise TemplateSyntaxError("'Cycle' statement requires at least two arguments")
 
     elif len(args) == 2 and "," in args[1]:
         # {% cycle a,b,c %}
@@ -371,13 +343,13 @@ def do_cycle(parser, token):
     elif len(args) == 2:
         name = args[1]
         if not parser._namedCycleNodes.has_key(name):
-            raise template.TemplateSyntaxError("Named cycle '%s' does not exist" % name)
+            raise TemplateSyntaxError("Named cycle '%s' does not exist" % name)
         return parser._namedCycleNodes[name]
 
     elif len(args) == 4:
         # {% cycle a,b,c as name %}
         if args[2] != 'as':
-            raise template.TemplateSyntaxError("Second 'cycle' argument must be 'as'")
+            raise TemplateSyntaxError("Second 'cycle' argument must be 'as'")
         cyclevars = [v for v in args[1].split(",") if v]    # split and kill blanks
         name = args[3]
         node = CycleNode(cyclevars)
@@ -389,7 +361,7 @@ def do_cycle(parser, token):
         return node
 
     else:
-        raise template.TemplateSyntaxError("Invalid arguments to 'cycle': %s" % args)
+        raise TemplateSyntaxError("Invalid arguments to 'cycle': %s" % args)
 
 def do_debug(parser, token):
     "Print a whole load of debugging information, including the context and imported modules"
@@ -409,7 +381,7 @@ def do_filter(parser, token):
         {% endfilter %}
     """
     _, rest = token.contents.split(None, 1)
-    _, filters = template.get_filters_from_token('var|%s' % rest)
+    _, filters = get_filters_from_token('var|%s' % rest)
     nodelist = parser.parse(('endfilter',))
     parser.delete_first_token()
     return FilterNode(filters, nodelist)
@@ -438,7 +410,7 @@ def do_firstof(parser, token):
     """
     bits = token.contents.split()[1:]
     if len(bits) < 1:
-        raise template.TemplateSyntaxError, "'firstof' statement requires at least one argument"
+        raise TemplateSyntaxError, "'firstof' statement requires at least one argument"
     return FirstOfNode(bits)
 
 
@@ -464,9 +436,9 @@ def do_for(parser, token):
         ==========================  ================================================
         ``forloop.counter``         The current iteration of the loop (1-indexed)
         ``forloop.counter0``        The current iteration of the loop (0-indexed)
-        ``forloop.revcounter``      The number of iterations from the end of the 
+        ``forloop.revcounter``      The number of iterations from the end of the
                                     loop (1-indexed)
-        ``forloop.revcounter0``     The number of iterations from the end of the 
+        ``forloop.revcounter0``     The number of iterations from the end of the
                                     loop (0-indexed)
         ``forloop.first``           True if this is the first time through the loop
         ``forloop.last``            True if this is the last time through the loop
@@ -477,11 +449,11 @@ def do_for(parser, token):
     """
     bits = token.contents.split()
     if len(bits) == 5 and bits[4] != 'reversed':
-        raise template.TemplateSyntaxError, "'for' statements with five words should end in 'reversed': %s" % token.contents
+        raise TemplateSyntaxError, "'for' statements with five words should end in 'reversed': %s" % token.contents
     if len(bits) not in (4, 5):
-        raise template.TemplateSyntaxError, "'for' statements should have either four or five words: %s" % token.contents
+        raise TemplateSyntaxError, "'for' statements should have either four or five words: %s" % token.contents
     if bits[2] != 'in':
-        raise template.TemplateSyntaxError, "'for' statement must contain 'in' as the second word: %s" % token.contents
+        raise TemplateSyntaxError, "'for' statement must contain 'in' as the second word: %s" % token.contents
     loopvar = bits[1]
     sequence = bits[3]
     reversed = (len(bits) == 5)
@@ -507,7 +479,7 @@ def do_ifequal(parser, token, negate):
     """
     bits = token.contents.split()
     if len(bits) != 3:
-        raise template.TemplateSyntaxError, "%r takes two arguments" % bits[0]
+        raise TemplateSyntaxError, "%r takes two arguments" % bits[0]
     end_tag = 'end' + bits[0]
     nodelist_true = parser.parse(('else', end_tag))
     token = parser.next_token()
@@ -515,7 +487,7 @@ def do_ifequal(parser, token, negate):
         nodelist_false = parser.parse((end_tag,))
         parser.delete_first_token()
     else:
-        nodelist_false = template.NodeList()
+        nodelist_false = NodeList()
     return IfEqualNode(bits[1], bits[2], nodelist_true, nodelist_false, negate)
 
 def do_if(parser, token):
@@ -568,7 +540,7 @@ def do_if(parser, token):
     bits = token.contents.split()
     del bits[0]
     if not bits:
-        raise template.TemplateSyntaxError, "'if' statement requires at least one argument"
+        raise TemplateSyntaxError, "'if' statement requires at least one argument"
     # bits now looks something like this: ['a', 'or', 'not', 'b', 'or', 'c.d']
     boolpairs = ' '.join(bits).split(' or ')
     boolvars = []
@@ -576,7 +548,7 @@ def do_if(parser, token):
         if ' ' in boolpair:
             not_, boolvar = boolpair.split()
             if not_ != 'not':
-                raise template.TemplateSyntaxError, "Expected 'not' in if statement"
+                raise TemplateSyntaxError, "Expected 'not' in if statement"
             boolvars.append((True, boolvar))
         else:
             boolvars.append((False, boolpair))
@@ -586,7 +558,7 @@ def do_if(parser, token):
         nodelist_false = parser.parse(('endif',))
         parser.delete_first_token()
     else:
-        nodelist_false = template.NodeList()
+        nodelist_false = NodeList()
     return IfNode(boolvars, nodelist_true, nodelist_false)
 
 def do_ifchanged(parser, token):
@@ -606,7 +578,7 @@ def do_ifchanged(parser, token):
     """
     bits = token.contents.split()
     if len(bits) != 1:
-        raise template.TemplateSyntaxError, "'ifchanged' tag takes no arguments"
+        raise TemplateSyntaxError, "'ifchanged' tag takes no arguments"
     nodelist = parser.parse(('endifchanged',))
     parser.delete_first_token()
     return IfChangedNode(nodelist)
@@ -629,27 +601,13 @@ def do_ssi(parser, token):
     bits = token.contents.split()
     parsed = False
     if len(bits) not in (2, 3):
-        raise template.TemplateSyntaxError, "'ssi' tag takes one argument: the path to the file to be included"
+        raise TemplateSyntaxError, "'ssi' tag takes one argument: the path to the file to be included"
     if len(bits) == 3:
         if bits[2] == 'parsed':
             parsed = True
         else:
-            raise template.TemplateSyntaxError, "Second (optional) argument to %s tag must be 'parsed'" % bits[0]
+            raise TemplateSyntaxError, "Second (optional) argument to %s tag must be 'parsed'" % bits[0]
     return SsiNode(bits[1], parsed)
-
-def do_include(parser, token):
-    """
-    Loads a template using standard resolution mechanisms, and renders it in the current context.     
-    """
-    bits = token.contents.split()
-    parsed = False
-    if len(bits) != 2:
-        raise template.TemplateSyntaxError, "'include' tag takes one argument: the path to the template to be included"
-    
-    path = bits[1]
-    if path[0] in ('"', "'") and path[-1] == path[0]:
-        return ConstantIncludeNode(path[1:-1]) 
-    return IncludeNode(bits[1])
 
 def do_load(parser, token):
     """
@@ -661,13 +619,13 @@ def do_load(parser, token):
     """
     bits = token.contents.split()
     if len(bits) != 2:
-        raise template.TemplateSyntaxError, "'load' statement takes one argument"
+        raise TemplateSyntaxError, "'load' statement takes one argument"
     taglib = bits[1]
     # check at compile time that the module can be imported
     try:
         LoadNode.load_taglib(taglib)
     except ImportError, e:
-        raise template.TemplateSyntaxError, "'%s' is not a valid tag library, %s" % (taglib, e)
+        raise TemplateSyntaxError, "'%s' is not a valid tag library: %s" % (taglib, e)
     return LoadNode(taglib)
 
 def do_now(parser, token):
@@ -683,7 +641,7 @@ def do_now(parser, token):
     """
     bits = token.contents.split('"')
     if len(bits) != 3:
-        raise template.TemplateSyntaxError, "'now' statement takes one argument"
+        raise TemplateSyntaxError, "'now' statement takes one argument"
     format_string = bits[1]
     return NowNode(format_string)
 
@@ -735,13 +693,13 @@ def do_regroup(parser, token):
     """
     firstbits = token.contents.split(None, 3)
     if len(firstbits) != 4:
-        raise template.TemplateSyntaxError, "'regroup' tag takes five arguments"
+        raise TemplateSyntaxError, "'regroup' tag takes five arguments"
     target_var = firstbits[1]
     if firstbits[2] != 'by':
-        raise template.TemplateSyntaxError, "second argument to 'regroup' tag must be 'by'"
+        raise TemplateSyntaxError, "second argument to 'regroup' tag must be 'by'"
     lastbits_reversed = firstbits[3][::-1].split(None, 2)
     if lastbits_reversed[1][::-1] != 'as':
-        raise template.TemplateSyntaxError, "next-to-last argument to 'regroup' tag must be 'as'"
+        raise TemplateSyntaxError, "next-to-last argument to 'regroup' tag must be 'as'"
     expression = lastbits_reversed[2][::-1]
     var_name = lastbits_reversed[0][::-1]
     return RegroupNode(target_var, expression, var_name)
@@ -766,10 +724,10 @@ def do_templatetag(parser, token):
     """
     bits = token.contents.split()
     if len(bits) != 2:
-        raise template.TemplateSyntaxError, "'templatetag' statement takes one argument"
+        raise TemplateSyntaxError, "'templatetag' statement takes one argument"
     tag = bits[1]
     if not TemplateTagNode.mapping.has_key(tag):
-        raise template.TemplateSyntaxError, "Invalid templatetag argument: '%s'. Must be one of: %s" % \
+        raise TemplateSyntaxError, "Invalid templatetag argument: '%s'. Must be one of: %s" % \
             (tag, TemplateTagNode.mapping.keys())
     return TemplateTagNode(tag)
 
@@ -788,28 +746,27 @@ def do_widthratio(parser, token):
     """
     bits = token.contents.split()
     if len(bits) != 4:
-        raise template.TemplateSyntaxError("widthratio takes three arguments")
+        raise TemplateSyntaxError("widthratio takes three arguments")
     tag, this_value_var, max_value_var, max_width = bits
     try:
         max_width = int(max_width)
     except ValueError:
-        raise template.TemplateSyntaxError("widthratio final argument must be an integer")
+        raise TemplateSyntaxError("widthratio final argument must be an integer")
     return WidthRatioNode(this_value_var, max_value_var, max_width)
 
-template.register_tag('comment', do_comment)
-template.register_tag('cycle', do_cycle)
-template.register_tag('debug', do_debug)
-template.register_tag('filter', do_filter)
-template.register_tag('firstof', do_firstof)
-template.register_tag('for', do_for)
-template.register_tag('ifequal', lambda parser, token: do_ifequal(parser, token, False))
-template.register_tag('ifnotequal', lambda parser, token: do_ifequal(parser, token, True))
-template.register_tag('if', do_if)
-template.register_tag('ifchanged', do_ifchanged)
-template.register_tag('include', do_include)
-template.register_tag('regroup', do_regroup)
-template.register_tag('ssi', do_ssi)
-template.register_tag('load', do_load)
-template.register_tag('now', do_now)
-template.register_tag('templatetag', do_templatetag)
-template.register_tag('widthratio', do_widthratio)
+register_tag('comment', do_comment)
+register_tag('cycle', do_cycle)
+register_tag('debug', do_debug)
+register_tag('filter', do_filter)
+register_tag('firstof', do_firstof)
+register_tag('for', do_for)
+register_tag('ifequal', lambda parser, token: do_ifequal(parser, token, False))
+register_tag('ifnotequal', lambda parser, token: do_ifequal(parser, token, True))
+register_tag('if', do_if)
+register_tag('ifchanged', do_ifchanged)
+register_tag('regroup', do_regroup)
+register_tag('ssi', do_ssi)
+register_tag('load', do_load)
+register_tag('now', do_now)
+register_tag('templatetag', do_templatetag)
+register_tag('widthratio', do_widthratio)
