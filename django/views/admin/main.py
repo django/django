@@ -634,7 +634,7 @@ def fill_extra_context(opts, app_label, context, add=False, change=False, show_d
     ordered_object_names =   ' '.join(['object.%s' % o.pk.name for o in ordered_objects])
    
     extra_context = {
-        'add': add, 
+        'add': add,
         'change': change,
         'first_form_field_id': first_form_field.get_id(),
         'ordered_objects' : ordered_objects, 
@@ -804,6 +804,7 @@ def change_stage_new(request, app_label, module_name, object_id):
     
     for rel_opts, rel_field in inline_related_objects:
         if rel_opts.order_with_respect_to and rel_opts.order_with_respect_to.rel and rel_opts.order_with_respect_to.rel.to == opts:
+            orig_list = getattr(manipulator.original_object, 'get_%s_list' % opts.get_rel_object_method_name(rel_opts, rel_field))()
             form.order_objects.extend(orig_list)
 
     c = Context(request, {

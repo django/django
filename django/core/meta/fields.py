@@ -804,7 +804,6 @@ class OneToOne(ManyToOne):
         self.raw_id_admin = raw_id_admin
 
 
-
 class BoundField(object):
     def __init__(self, field, field_mapping, original):
         self.field = field
@@ -838,7 +837,7 @@ class BoundFieldLine(object):
         return len(self.bound_fields)
     
 class FieldLine(object):
-    def __init__(self, linespec, field_locator_func):
+    def __init__(self, field_locator_func, linespec):
         if isinstance(linespec, basestring):
             self.fields = [field_locator_func(linespec)]
         else:
@@ -871,9 +870,9 @@ class BoundFieldSet(object):
         return len(self.bound_field_lines)
    
 class FieldSet(object):
-    def __init__(self, name, classes, field_lines):
+    def __init__(self, name, classes, field_locator_func, line_specs):
         self.name = name
-        self.field_lines = field_lines
+        self.field_lines = [FieldLine(field_locator_func, line_spec) for line_spec in line_specs]
         self.classes = classes
         
     def __repr__(self):
@@ -947,7 +946,7 @@ class Admin:
             fs_options = fieldset[1]
             classes =  fs_options.get('classes', None)
             line_specs = fs_options['fields']
-            field_lines = [FieldLine(line_spec, opts.get_field) for line_spec in line_specs]
-            new_fieldset_list.append(FieldSet(name, classes, field_lines) )
+            new_fieldset_list.append(FieldSet(name, classes, opts.get_field, line_specs) )
         return new_fieldset_list
-        
+    
+    

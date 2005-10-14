@@ -207,12 +207,18 @@ class RelatedObject(object):
         return [wrapping_func(f) for f in self.opts.fields + self.opts.many_to_many if f.editable and f != self.field ]
       
     def get_follow(self, override=None):
-        if override:
-            over = override.copy()
-        elif self.edit_inline:
-            over = {}
+        if isinstance(override, bool):
+            if override:
+                over = {}
+            else:
+                return None
         else:
-            return None
+            if override:
+                over = override.copy()
+            elif self.edit_inline:
+                over = {}
+            else:
+                return None
         
         over[self.field.name] = False
         return self.opts.get_follow(over)
@@ -1754,7 +1760,7 @@ def manipulator_save(opts, klass, add, change, self, new_data):
     return new_object
 
 def manipulator_get_inline_related_objects_wrapped(opts, klass, add, change, self):
-    return opts.get_inline_related_objects_wrapped() 
+    return opts.get_inline_related_objects_wrapped()
         
 def manipulator_flatten_data(opts, klass, add, change, self):
      new_data = {}

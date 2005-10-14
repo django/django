@@ -15,7 +15,7 @@ class DatabaseWrapper:
         self.queries = []
 
     def cursor(self):
-        from django.conf.settings import DATABASE_USER, DATABASE_NAME, DATABASE_HOST, DATABASE_PASSWORD, DEBUG, TIME_ZONE
+        from django.conf.settings import DATABASE_USER, DATABASE_NAME, DATABASE_HOST, DATABASE_PORT, DATABASE_PASSWORD, DEBUG, TIME_ZONE
         if self.connection is None:
             if DATABASE_NAME == '':
                 from django.core.exceptions import ImproperlyConfigured
@@ -27,6 +27,8 @@ class DatabaseWrapper:
                 conn_string += " password=%s" % DATABASE_PASSWORD
             if DATABASE_HOST:
                 conn_string += " host=%s" % DATABASE_HOST
+            if DATABASE_PORT:
+                conn_string += " port=%s" % DATABASE_PORT
             self.connection = Database.connect(conn_string)
             self.connection.set_isolation_level(1) # make transactions transparent to all cursors
         cursor = self.connection.cursor()

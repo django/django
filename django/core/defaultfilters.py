@@ -333,6 +333,12 @@ def default(value, arg):
     "If value is unavailable, use given default"
     return value or arg
 
+def default_if_none(value, arg):
+    "If value is None, use given default"
+    if value is None:
+        return arg
+    return value
+
 def divisibleby(value, arg):
     "Returns true if the value is devisible by the argument"
     return int(value) % int(arg) == 0

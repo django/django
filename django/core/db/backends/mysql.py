@@ -53,10 +53,18 @@ class DatabaseWrapper:
         self.queries = []
 
     def cursor(self):
-        from django.conf.settings import DATABASE_USER, DATABASE_NAME, DATABASE_HOST, DATABASE_PASSWORD, DEBUG
+        from django.conf.settings import DATABASE_USER, DATABASE_NAME, DATABASE_HOST, DATABASE_PORT, DATABASE_PASSWORD, DEBUG
         if self.connection is None:
-            self.connection = Database.connect(user=DATABASE_USER, db=DATABASE_NAME,
-                passwd=DATABASE_PASSWORD, host=DATABASE_HOST, conv=django_conversions)
+            kwargs = {
+                'user': DATABASE_USER,
+                'db': DATABASE_NAME,
+                'passwd': DATABASE_PASSWORD,
+                'host': DATABASE_HOST,
+                'conv': django_conversions,
+            }
+            if DATABASE_PORT:
+                kwargs['port'] = DATABASE_PORT
+            self.connection = Database.connect(**kwargs)
         if DEBUG:
             return base.CursorDebugWrapper(MysqlDebugWrapper(self.connection.cursor()), self)
         return self.connection.cursor()
