@@ -61,6 +61,14 @@ TEMPLATE_DIRS = ()
 # Extension on all templates.
 TEMPLATE_FILE_EXTENSION = '.html'
 
+# List of callables that know how to import templates from various sources.
+# See the comments in django/core/template/loader.py for interface
+# documentation.
+TEMPLATE_LOADERS = (
+    'django.core.template.loaders.filesystem.load_template_source',
+#     'django.core.template.loaders.eggs.load_template_source',
+)
+
 # URL prefix for admin media -- CSS, JavaScript and images. Make sure to use a
 # trailing slash.
 # Examples: "http://foo.com/media/", "/media/".
