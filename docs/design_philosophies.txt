@@ -208,7 +208,7 @@ The template system intentionally doesn't allow the following:
     * Advanced logic
 
 The goal is not to invent a programming language. The goal is to offer just
-enough programming-esque functionality, such as branching and looping, that are
+enough programming-esque functionality, such as branching and looping, that is
 essential for making presentation-related decisions.
 
 Extensibility
