@@ -1,7 +1,50 @@
-"Wrapper for loading templates from storage of some sort (e.g. files or db)"
+# Wrapper for loading templates from storage of some sort (e.g. filesystem, database).
+#
+# This uses the TEMPLATE_LOADERS setting, which is a list of loaders to use.
+# Each loader is expected to have this interface:
+#
+#    callable(name, dirs=[])
+#
+# name is the template name.
+# dirs is an optional list of directories to search instead of TEMPLATE_DIRS.
+#
+# Each loader should have an "is_usable" attribute set. This is a boolean that
+# specifies whether the loader can be used in this Python installation. Each
+# loader is responsible for setting this when it's initialized.
+#
+# For example, the eggs loader (which is capable of loading templates from
+# Python eggs) sets is_usable to False if the "pkg_resources" module isn't
+# installed, because pkg_resources is necessary to read eggs.
 
+from django.core.exceptions import ImproperlyConfigured
 from django.core.template import Template, Context, Node, TemplateDoesNotExist, TemplateSyntaxError, resolve_variable_with_filters, register_tag
-from django.core.template.loaders.filesystem import load_template_source
+from django.conf.settings import TEMPLATE_LOADERS
+
+template_source_loaders = []
+for path in TEMPLATE_LOADERS:
+    i = path.rfind('.')
+    module, attr = path[:i], path[i+1:]
+    try:
+        mod = __import__(module, globals(), locals(), [attr])
+    except ImportError, e:
+        raise ImproperlyConfigured, 'Error importing template source loader %s: "%s"' % (module, e)
+    try:
+        func = getattr(mod, attr)
+    except AttributeError:
+        raise ImproperlyConfigured, 'Module "%s" does not define a "%s" callable template source loader' % (module, attr)
+    if not func.is_usable:
+        import warnings
+        warnings.warn("Your TEMPLATE_LOADERS setting includes %r, but your Python installation doesn't support that type of template loading. Consider removing that line from TEMPLATE_LOADERS." % path)
+    else:
+        template_source_loaders.append(func)
+
+def load_template_source(name, dirs=None):
+    for loader in template_source_loaders:
+        try:
+            return loader(name, dirs)
+        except TemplateDoesNotExist:
+            pass
+    raise TemplateDoesNotExist, name
 
 class ExtendsError(Exception):
     pass

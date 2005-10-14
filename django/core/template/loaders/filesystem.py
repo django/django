@@ -19,3 +19,4 @@ def load_template_source(template_name, template_dirs=None):
     else:
         error_msg = "Your TEMPLATE_DIRS settings is empty. Change it to point to at least one template directory."
     raise TemplateDoesNotExist, error_msg
+load_template_source.is_usable = True
