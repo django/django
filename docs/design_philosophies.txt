@@ -187,10 +187,10 @@ text.
 Assume designer competence
 --------------------------
 
-The template system shouldn't be designed so that templates are displayed
-nicely in WYSIWYG editors such as Dreamweaver. That is too severe of a
-limitation and wouldn't allow the syntax to be as nice as it is. Django expects
-some level of competence in template authors.
+The template system shouldn't be designed so that templates necessarily are
+displayed nicely in WYSIWYG editors such as Dreamweaver. That is too severe of
+a limitation and wouldn't allow the syntax to be as nice as it is. Django
+expects some level of code competence in template authors.
 
 Treat whitespace obviously
 --------------------------
