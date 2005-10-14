@@ -196,7 +196,8 @@ Treat whitespace obviously
 --------------------------
 
 The template system do magic things with whitespace. If a template includes
-whitespace, the system should treat it as it treats text -- just display it.
+whitespace, the system should treat the whitespace as it treats text -- just
+display it.
 
 Don't invent a programming language
 -----------------------------------
