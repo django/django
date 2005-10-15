@@ -691,7 +691,8 @@ class ModelBase(type):
         new_class = type.__new__(cls, name, bases, attrs)
 
         # Give the class a docstring -- its definition.
-        new_class.__doc__ = "%s.%s(%s)" % (opts.module_name, name, ", ".join([f.name for f in opts.fields]))
+        if new_class.__doc__ is None:
+            new_class.__doc__ = "%s.%s(%s)" % (opts.module_name, name, ", ".join([f.name for f in opts.fields]))
 
         # Create the standard, module-level API helper functions such
         # as get_object() and get_list().

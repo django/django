@@ -217,15 +217,25 @@ TEMPLATE_TESTS = {
     'exception04': ("{% extends 'inheritance17' %}{% block first %}{% echo 400 %}5678{% endblock %}", {}, template.TemplateSyntaxError),
 }
 
+def cutdown(name):
+    global TEMPLATE_TESTS
+    TEMPLATE_TESTS = dict([ (name, TEMPLATE_TESTS[name])]) 
+    print repr(TEMPLATE_TESTS[name])
+
+#cutdown('basic-syntax04') 
+
 # This replaces the standard template loader.
 def test_template_loader(template_name, template_dirs=None):
     try:
-        return TEMPLATE_TESTS[template_name][0]
+        return ( TEMPLATE_TESTS[template_name][0] , "test:%s" % template_name )
     except KeyError:
         raise template.TemplateDoesNotExist, template_name
 
 def run_tests(verbosity=0, standalone=False):
-    loader.load_template_source, old_template_loader = test_template_loader, loader.load_template_source
+    # Register our custom template loader.
+    old_template_loaders = loader.template_source_loaders
+    loader.template_source_loaders = [test_template_loader]
+    
     failed_tests = []
     tests = TEMPLATE_TESTS.items()
     tests.sort()
@@ -248,7 +258,7 @@ def run_tests(verbosity=0, standalone=False):
             if verbosity:
                 print "Template test: %s -- FAILED. Expected %r, got %r" % (name, vals[2], output)
             failed_tests.append(name)
-    loader.load_template_source = old_template_loader
+    loader.template_source_loaders = old_template_loaders
 
     if failed_tests and not standalone:
         msg = "Template tests %s failed." % failed_tests

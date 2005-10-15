@@ -2,7 +2,7 @@ from django.utils import httpwrappers
 
 class BaseHandler:
     def __init__(self):
-        self._request_middleware = self._view_middleware = self._response_middleware = None
+        self._request_middleware = self._view_middleware = self._response_middleware = self._exception_middleware = None
 
     def load_middleware(self):
         """
@@ -15,6 +15,7 @@ class BaseHandler:
         self._request_middleware = []
         self._view_middleware = []
         self._response_middleware = []
+        self._exception_middleware = []
         for middleware_path in settings.MIDDLEWARE_CLASSES:
             dot = middleware_path.rindex('.')
             mw_module, mw_classname = middleware_path[:dot], middleware_path[dot+1:]
@@ -38,6 +39,8 @@ class BaseHandler:
                 self._view_middleware.append(mw_instance.process_view)
             if hasattr(mw_instance, 'process_response'):
                 self._response_middleware.insert(0, mw_instance.process_response)
+            if hasattr(mw_instance, 'process_exception'):
+                self._exception_middleware.insert(0, mw_instance.process_exception)
 
     def get_response(self, path, request):
         "Returns an HttpResponse object for the given HttpRequest"
@@ -61,7 +64,17 @@ class BaseHandler:
                 if response:
                     return response
 
-            response = callback(request, **param_dict)
+            try:
+                response = callback(request, **param_dict)
+            except Exception, e:
+                # If the view raised an exception, run it through exception
+                # middleware, and if the exception middleware returns a
+                # response, use that. Otherwise, reraise the exception.
+                for middleware_method in self._exception_middleware:
+                    response = middleware_method(request, e)
+                    if response:
+                        return response
+                raise e
 
             # Complain if the view returned None (a common error).
             if response is None:

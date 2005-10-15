@@ -190,6 +190,12 @@ class Token:
             {TOKEN_TEXT:'Text', TOKEN_VAR:'Var', TOKEN_BLOCK:'Block'}[self.token_type],
             self.contents[:20].replace('\n', '')
             )
+            
+    def __repr__(self):
+        return '<%s token: "%s">' % (
+            {TOKEN_TEXT:'Text', TOKEN_VAR:'Var', TOKEN_BLOCK:'Block'}[self.token_type],
+            self.contents[:].replace('\n', '')
+            )
 
 class Lexer(object):
     def __init__(self, template_string, filename):
@@ -228,26 +234,34 @@ class DebugLexer(Lexer):
         #TODO:Py2.4 generator expression 
         linebreaks = self.find_linebreaks(self.template_string)
         next_linebreak = linebreaks.next()
-        try:
-            for match in tag_re.finditer(self.template_string):
-                start, end = match.span()
-                if start > upto:
-                    token_tups.append( (self.template_string[upto:start], line) )
-                    upto = start
-                    
-                    while next_linebreak <= upto:
+        
+
+        for match in tag_re.finditer(self.template_string):
+            start, end = match.span()
+            #print "%d:%d --- %s " % (start, end, self.template_string[start:end] )
+            if start > upto:       
+                token_tups.append( (self.template_string[upto:start], line) )
+                upto = start
+                
+                while next_linebreak <= upto:
+                    try: 
                         next_linebreak = linebreaks.next()
                         line += 1
-                
-                token_tups.append( (self.template_string[start:end], line) )
-                upto = end
-        
-                while next_linebreak <= upto:
+                    except StopIteration:
+                        next_linebreak = len(self.template_string)
+                        break
+            
+            token_tups.append( (self.template_string[start:end], line) )
+            upto = end
+    
+            while next_linebreak <= upto:
+                try: 
                     next_linebreak = linebreaks.next()
                     line += 1
-        except StopIteration:
-            pass
-        
+                except StopIteration:
+                    next_linebreak = len(self.template_string)
+                    break
+
         last_bit = self.template_string[upto:]
         if len(last_bit):
            token_tups.append( (last_bit, line) )
@@ -260,10 +274,11 @@ class DebugLexer(Lexer):
         token.source = source
         return token
 
-
+from pprint import pformat
 class Parser(object):
     def __init__(self, tokens):
         self.tokens = tokens
+        #print pformat(self.tokens)
 
     def parse(self, parse_until=[]):
         nodelist = NodeList()
@@ -296,8 +311,11 @@ class Parser(object):
                 self.exit_command();
                 
         if parse_until:
-            self.unclosed_block_tag(token)
+            self.unclosed_block_tag(token, parse_until)
             
+        #print "-------------------------------"
+        #print pformat(nodelist)
+        #print "------------------------------"
         return nodelist
 
     def extend_nodelist(self, nodelist, node, token):
@@ -318,7 +336,7 @@ class Parser(object):
     def invalid_block_tag(self, token, command):
         raise TemplateSyntaxError, "Invalid block tag: %s" % (command)
     
-    def unclosed_block_tag(self, token):
+    def unclosed_block_tag(self, token, parse_until):
         raise TemplateSyntaxError, "Unclosed tags: %s " %  ', '.join(parse_until)
         
     def next_token(self):
@@ -358,7 +376,7 @@ class DebugParser(Parser):
     def invalid_block_tag(self, token, command):
         raise TemplateSyntaxError, "Invalid block tag: '%s' %s" % (command, self.format_source(token.source))
     
-    def unclosed_block_tag(self, token):
+    def unclosed_block_tag(self, token, parse_until):
         (command, (file,line)) = self.command_stack.pop()
         msg = "Unclosed tag '%s' starting at %s, line %d. Looking for one of: %s " % \
               (command, file, line, ', '.join(parse_until) ) 
