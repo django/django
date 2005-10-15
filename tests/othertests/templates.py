@@ -217,12 +217,6 @@ TEMPLATE_TESTS = {
     'exception04': ("{% extends 'inheritance17' %}{% block first %}{% echo 400 %}5678{% endblock %}", {}, template.TemplateSyntaxError),
 }
 
-def cutdown(name):
-    global TEMPLATE_TESTS
-    TEMPLATE_TESTS = dict([ (name, TEMPLATE_TESTS[name])]) 
-    print repr(TEMPLATE_TESTS[name])
-
-#cutdown('basic-syntax04') 
 
 # This replaces the standard template loader.
 def test_template_loader(template_name, template_dirs=None):

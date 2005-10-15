@@ -238,7 +238,6 @@ class DebugLexer(Lexer):
 
         for match in tag_re.finditer(self.template_string):
             start, end = match.span()
-            #print "%d:%d --- %s " % (start, end, self.template_string[start:end] )
             if start > upto:       
                 token_tups.append( (self.template_string[upto:start], line) )
                 upto = start
@@ -274,11 +273,10 @@ class DebugLexer(Lexer):
         token.source = source
         return token
 
-from pprint import pformat
 class Parser(object):
     def __init__(self, tokens):
         self.tokens = tokens
-        #print pformat(self.tokens)
+        
 
     def parse(self, parse_until=[]):
         nodelist = NodeList()
@@ -313,9 +311,6 @@ class Parser(object):
         if parse_until:
             self.unclosed_block_tag(token, parse_until)
             
-        #print "-------------------------------"
-        #print pformat(nodelist)
-        #print "------------------------------"
         return nodelist
 
     def extend_nodelist(self, nodelist, node, token):
