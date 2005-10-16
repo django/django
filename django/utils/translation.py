@@ -4,6 +4,8 @@ import os
 import sys
 import gettext as gettext_module
 
+from django.utils.functional import lazy
+
 try:
     import threading
     hasThreads = True
@@ -228,6 +230,9 @@ def ngettext(singular, plural, number):
         from django.conf import settings
         _default = translation('*', settings.LANGUAGE_CODE)
     return _default.ngettext(singular, plural, number)
+
+gettext_lazy = lazy(gettext, str)
+ngettext_lazy = lazy(ngettext, str)
 
 def get_language_from_request(request):
     """
