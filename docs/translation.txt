@@ -68,6 +68,23 @@ they are exchanged over systems or users - like strings in a database - but
 should be translated at the last possible point in time, when the string
 is presented to the user.
 
+One special case that isn't available in other gettext usages are lazily
+translated strings. This is needed for stuff that you set up in your django
+model files - those messages are stored internally and translated on access, but
+not translated on storage (as that would only take the default language into account).
+To translate a model helptext, do the following::
+
+    from django.utils.translation import gettext_lazy
+
+    class Mything(meta.Model):
+
+        name = meta.CharField('Name', help_text=gettext_lazy('This is the help text'))
+        ...
+
+This way only a lazy reference is stored for the string, not the actual translation.
+The translation itself will be done when the string is used in a string context, like
+template rendering in the admin.
+
 There is a standard problem with translations, that is pluralization of
 strings. This is done by the standard helper ngettext like so::
 
