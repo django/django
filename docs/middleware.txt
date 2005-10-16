@@ -168,6 +168,19 @@ object returned by a Django view.
 the given ``response``, or it could create and return a brand-new
 ``HttpResponse``.
 
+process_exception
+-----------------
+
+Interface: ``process_exception(self, request, exception)``
+
+``request`` is an ``HttpRequest`` object. ``exception`` is an ``Exception``
+object raised by the view function.
+
+Django calls ``process_exception()`` when a view raises an exception.
+``process_exception()`` should return either ``None`` or an ``HttpResponse``
+object. If it returns an ``HttpResponse`` object, the response will be returned
+to the browser. Otherwise, default exception handling kicks in.
+
 Guidelines
 ----------
 
