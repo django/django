@@ -23,8 +23,6 @@
 {% if is_popup %}<input type="hidden" name="_popup" value="1">{% endif %}
 {% if save_on_top %}{% submit_row %}{% endif %}
 {% if form.error_dict %}<p class="errornote">Please correct the error{{ form.error_dict.items|pluralize }} below.</p>{% endif %}
-<b>
-</b>
 {% for bound_field_set in bound_field_sets %}
    <fieldset class="module aligned {{ bound_field_set.classes }}">
     {% if bound_field_set.name %}<h2>{{bound_field_set.name }}</h2>{% endif %}
@@ -46,19 +44,15 @@
    {% endif %}
 {% endif %}
 {% for related_object in inline_related_objects %}{% edit_inline related_object %}{% endfor %}
-
 {% submit_row %}
-
 {% if add %}
    <script type="text/javascript">document.getElementById("{{first_form_field_id}}").focus();</script>
 {% endif %}
-
 {% if auto_populated_fields %}
    <script type="text/javascript">
    {% auto_populated_field_script auto_populated_fields change %} 
    </script>
 {% endif %}
-
 {% if change %}
    {% if ordered_objects %}
       {% if form.order_objects %}<ul id="orderthese">
@@ -69,7 +63,6 @@
 	     {% endfor%}
       {% endif %}
    {% endif %}
-{% endif%}
-</form>
-
+{% endif %}
+</form></div>
 {% endblock %}

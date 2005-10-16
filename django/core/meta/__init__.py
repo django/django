@@ -1610,7 +1610,10 @@ def manipulator_save(opts, klass, add, change, self, new_data):
         if self.follow.get(f.name, None) and not auto_now_add:
             param = f.get_manipulator_new_data(new_data)
         else:
-            param = getattr(self.original_object, f.column)
+            if change:
+                param = getattr(self.original_object, f.column)
+            else:
+                param = f.get_default()
         params[f.column] = param    
     
         # Fields with auto_now_add are another special case; they should keep

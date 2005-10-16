@@ -247,7 +247,6 @@ class DebugLexer(Lexer):
                         next_linebreak = linebreaks.next()
                         line += 1
                     except StopIteration:
-                        next_linebreak = len(self.template_string)
                         break
             
             token_tups.append( (self.template_string[start:end], line) )
@@ -258,7 +257,6 @@ class DebugLexer(Lexer):
                     next_linebreak = linebreaks.next()
                     line += 1
                 except StopIteration:
-                    next_linebreak = len(self.template_string)
                     break
 
         last_bit = self.template_string[upto:]
