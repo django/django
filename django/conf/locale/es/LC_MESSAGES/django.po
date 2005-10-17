@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2005-10-17 16:26+0200\n"
+"POT-Creation-Date: 2005-10-17 20:56+0200\n"
 "PO-Revision-Date: 2005-10-04 20:59GMT\n"
 "Last-Translator: Ricardo Javier Cárdenes Medina <ricardo.cardenes@gmail."
 "com>\n"
@@ -17,54 +17,272 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "X-Generator: KBabel 1.10.2\n"
 
-#: models/core.py:57
+#: models/core.py:5
+msgid "domain name"
+msgstr ""
+
+#: models/core.py:6
+msgid "display name"
+msgstr ""
+
+#: models/core.py:8
+msgid "site"
+msgstr ""
+
+#: models/core.py:9
+msgid "sites"
+msgstr ""
+
+#: models/core.py:22
+msgid "label"
+msgstr ""
+
+#: models/core.py:23 models/core.py:34 models/auth.py:6 models/auth.py:19
+#, fuzzy
+msgid "name"
+msgstr "Usuario:"
+
+#: models/core.py:25
+msgid "package"
+msgstr ""
+
+#: models/core.py:26
+msgid "packages"
+msgstr ""
+
+#: models/core.py:36
+msgid "python module name"
+msgstr ""
+
+#: models/core.py:38
+msgid "content type"
+msgstr ""
+
+#: models/core.py:39
+msgid "content types"
+msgstr ""
+
+#: models/core.py:62
+msgid "redirect from"
+msgstr ""
+
+#: models/core.py:63
 msgid ""
 "This should be an absolute path, excluding the domain name. Example: '/"
 "events/search/'."
 msgstr ""
 
-#: models/core.py:59
+#: models/core.py:64
+msgid "redirect to"
+msgstr ""
+
+#: models/core.py:65
 msgid ""
 "This can be either an absolute path (as above) or a full URL starting with "
 "'http://'."
 msgstr ""
 
-#: models/core.py:74
+#: models/core.py:67
+msgid "redirect"
+msgstr ""
+
+#: models/core.py:68
+msgid "redirects"
+msgstr ""
+
+#: models/core.py:81
+msgid "URL"
+msgstr ""
+
+#: models/core.py:82
 msgid ""
 "Example: '/about/contact/'. Make sure to have leading and trailing slashes."
 msgstr ""
 
-#: models/core.py:79
+#: models/core.py:83
+msgid "title"
+msgstr ""
+
+#: models/core.py:84
+msgid "content"
+msgstr ""
+
+#: models/core.py:85
+msgid "enable comments"
+msgstr ""
+
+#: models/core.py:86
+msgid "template name"
+msgstr ""
+
+#: models/core.py:87
 msgid ""
 "Example: 'flatfiles/contact_page'. If this isn't provided, the system will "
 "use 'flatfiles/default'."
 msgstr ""
 
-#: models/core.py:80
+#: models/core.py:88
+msgid "registration required"
+msgstr ""
+
+#: models/core.py:88
 msgid "If this is checked, only logged-in users will be able to view the page."
 msgstr ""
 
+#: models/core.py:92
+msgid "flat page"
+msgstr ""
+
+#: models/core.py:93
+msgid "flat pages"
+msgstr ""
+
+#: models/core.py:114
+msgid "session key"
+msgstr ""
+
+#: models/core.py:115
+msgid "session data"
+msgstr ""
+
+#: models/core.py:116
+msgid "expire date"
+msgstr ""
+
+#: models/core.py:118
+msgid "session"
+msgstr ""
+
+#: models/core.py:119
+msgid "sessions"
+msgstr ""
+
+#: models/auth.py:8
+msgid "codename"
+msgstr ""
+
+#: models/auth.py:10
+msgid "Permission"
+msgstr ""
+
+#: models/auth.py:11 models/auth.py:58
+msgid "Permissions"
+msgstr ""
+
+#: models/auth.py:22
+msgid "Group"
+msgstr ""
+
+#: models/auth.py:23 models/auth.py:60
+msgid "Groups"
+msgstr ""
+
 #: models/auth.py:33
+#, fuzzy
+msgid "username"
+msgstr "Usuario:"
+
+#: models/auth.py:34
+msgid "first name"
+msgstr ""
+
+#: models/auth.py:35
+msgid "last name"
+msgstr ""
+
+#: models/auth.py:36
+#, fuzzy
+msgid "e-mail address"
+msgstr "Dirección de correo:"
+
+#: models/auth.py:37
+#, fuzzy
+msgid "password"
+msgstr "Clave:"
+
+#: models/auth.py:37
 msgid "Use an MD5 hash -- not the raw password."
 msgstr ""
 
-#: models/auth.py:34
+#: models/auth.py:38
+msgid "staff status"
+msgstr ""
+
+#: models/auth.py:38
 msgid "Designates whether the user can log into this admin site."
 msgstr ""
 
+#: models/auth.py:39
+msgid "active"
+msgstr ""
+
 #: models/auth.py:40
+msgid "superuser status"
+msgstr ""
+
+#: models/auth.py:41
+msgid "last login"
+msgstr ""
+
+#: models/auth.py:42
+msgid "date joined"
+msgstr ""
+
+#: models/auth.py:44
 msgid ""
 "In addition to the permissions manually assigned, this user will also get "
 "all permissions granted to each group he/she is in."
 msgstr ""
 
-#: conf/admin_templates/base_site.html:3
-msgid "Django site admin"
-msgstr "Sitio de administración de Django"
+#: models/auth.py:47 conf/admin_templates/admin_object_history.html:18
+msgid "User"
+msgstr "Usuario"
 
-#: conf/admin_templates/base_site.html:6
-msgid "Django administration"
-msgstr "Administración de Django"
+#: models/auth.py:48
+#, fuzzy
+msgid "Users"
+msgstr "Usuario"
+
+#: models/auth.py:57
+msgid "Personal info"
+msgstr ""
+
+#: models/auth.py:59
+msgid "Important dates"
+msgstr ""
+
+#: models/auth.py:182 models/auth.py:188
+msgid "Message"
+msgstr ""
+
+#: models/auth.py:189
+msgid "Messages"
+msgstr ""
+
+#: models/auth.py:192
+#, fuzzy
+msgid "action time"
+msgstr "Fecha/hora"
+
+#: models/auth.py:195
+msgid "object id"
+msgstr ""
+
+#: models/auth.py:196
+msgid "object repr"
+msgstr ""
+
+#: models/auth.py:197
+msgid "action flag"
+msgstr ""
+
+#: models/auth.py:201
+msgid "log entry"
+msgstr ""
+
+#: models/auth.py:202
+msgid "log entries"
+msgstr ""
 
 #: conf/admin_templates/admin_object_history.html:4
 #: conf/admin_templates/base.html:28
@@ -84,10 +302,6 @@ msgstr "Histórico"
 msgid "Date/time"
 msgstr "Fecha/hora"
 
-#: conf/admin_templates/admin_object_history.html:18
-msgid "User"
-msgstr "Usuario"
-
 #: conf/admin_templates/admin_object_history.html:19
 msgid "Action"
 msgstr "Acción"
@@ -100,54 +314,13 @@ msgstr ""
 "Este objeto no tiene histórico de cambios. Probablemente no fue añadido "
 "usando este sitio de administración."
 
-#: conf/admin_templates/500.html:5
-msgid "Server error (500)"
-msgstr "Error del servidor (500)"
+#: conf/admin_templates/base_site.html:3
+msgid "Django site admin"
+msgstr "Sitio de administración de Django"
 
-#: conf/admin_templates/500.html:8
-msgid "Server Error <em>(500)</em>"
-msgstr "Error de servidor <em>(500)</em>"
-
-#: conf/admin_templates/500.html:9
-msgid ""
-"There's been an error. It's been reported to the site administrators via e-"
-"mail and should be fixed shortly. Thanks for your patience."
-msgstr ""
-"Ha ocurrido un error. Se ha informado a los administradores del sitio "
-"mediante correo electrónico y debería arreglarse en breve. Gracias por su "
-"paciencia"
-
-#: conf/admin_templates/delete_confirmation_generic.html:6
-#, python-format
-msgid ""
-"Deleting the %(object_name)s  '%(object)s' would result in deleting related "
-"objects, but your account doesn't have permission to delete the following "
-"types of objects:"
-msgstr ""
-"Eliminar el %(object_name)s '%(object)s' provocaría la eliminación de "
-"objetos relacionados, pero su cuenta no tiene permiso para borrar los "
-"siguientes tipos de objetos:"
-
-#: conf/admin_templates/delete_confirmation_generic.html:13
-#, python-format
-msgid ""
-"Are you sure you want to delete the %(object_name)s \"%(object)s\"? All of "
-"the following related items will be deleted:"
-msgstr ""
-"¿Está seguro de que quiere borrar los %(object_name)s \"%(object)s\"? Se "
-"borrarán los siguientes objetos relacionados:"
-
-#: conf/admin_templates/delete_confirmation_generic.html:17
-msgid "Yes, I'm sure"
-msgstr "Sí, estoy seguro"
-
-#: conf/admin_templates/404.html:3 conf/admin_templates/404.html.py:7
-msgid "Page not found"
-msgstr "Página no encontrada"
-
-#: conf/admin_templates/404.html:9
-msgid "We're sorry, but the requested page could not be found."
-msgstr "Lo sentimos, pero no se encuentra la página solicitada."
+#: conf/admin_templates/base_site.html:6
+msgid "Django administration"
+msgstr "Administración de Django"
 
 #: conf/admin_templates/index.html:26
 msgid "Add"
@@ -172,6 +345,55 @@ msgstr "Mis acciones"
 #: conf/admin_templates/index.html:55
 msgid "None available"
 msgstr "Ninguno disponible"
+
+#: conf/admin_templates/500.html:5
+msgid "Server error (500)"
+msgstr "Error del servidor (500)"
+
+#: conf/admin_templates/500.html:8
+msgid "Server Error <em>(500)</em>"
+msgstr "Error de servidor <em>(500)</em>"
+
+#: conf/admin_templates/500.html:9
+msgid ""
+"There's been an error. It's been reported to the site administrators via e-"
+"mail and should be fixed shortly. Thanks for your patience."
+msgstr ""
+"Ha ocurrido un error. Se ha informado a los administradores del sitio "
+"mediante correo electrónico y debería arreglarse en breve. Gracias por su "
+"paciencia"
+
+#: conf/admin_templates/404.html:3 conf/admin_templates/404.html.py:7
+msgid "Page not found"
+msgstr "Página no encontrada"
+
+#: conf/admin_templates/404.html:9
+msgid "We're sorry, but the requested page could not be found."
+msgstr "Lo sentimos, pero no se encuentra la página solicitada."
+
+#: conf/admin_templates/delete_confirmation_generic.html:6
+#, python-format
+msgid ""
+"Deleting the %(object_name)s  '%(object)s' would result in deleting related "
+"objects, but your account doesn't have permission to delete the following "
+"types of objects:"
+msgstr ""
+"Eliminar el %(object_name)s '%(object)s' provocaría la eliminación de "
+"objetos relacionados, pero su cuenta no tiene permiso para borrar los "
+"siguientes tipos de objetos:"
+
+#: conf/admin_templates/delete_confirmation_generic.html:13
+#, python-format
+msgid ""
+"Are you sure you want to delete the %(object_name)s \"%(object)s\"? All of "
+"the following related items will be deleted:"
+msgstr ""
+"¿Está seguro de que quiere borrar los %(object_name)s \"%(object)s\"? Se "
+"borrarán los siguientes objetos relacionados:"
+
+#: conf/admin_templates/delete_confirmation_generic.html:17
+msgid "Yes, I'm sure"
+msgstr "Sí, estoy seguro"
 
 #: conf/admin_templates/login.html:14
 msgid "Username:"
@@ -561,6 +783,15 @@ msgstr ""
 msgid ""
 "The \"%(attr)s\" attribute on line %(line)s has an invalid value. (Line "
 "starts with \"%(start)s\".)"
+msgstr ""
+
+#: core/meta/fields.py:95
+msgid " Separate multiple IDs with commas."
+msgstr ""
+
+#: core/meta/fields.py:98
+msgid ""
+" Hold down \"Control\", or \"Command\" on a Mac, to select more than one."
 msgstr ""
 
 #~ msgid "Server error <em>(500)</em>"

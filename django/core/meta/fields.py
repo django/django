@@ -1,8 +1,9 @@
 from django.conf import settings
 from django.core import formfields, validators
 from django.core.exceptions import ObjectDoesNotExist
-from django.utils.functional import curry
+from django.utils.functional import curry, lazy
 from django.utils.text import capfirst
+from django.utils.translation import gettext_lazy
 import datetime, os
 
 # Random entropy string used by "default" param.
@@ -25,6 +26,16 @@ prep_for_like_query = lambda x: str(x).replace("%", "\%").replace("_", "\_")
 
 # returns the <ul> class for a given radio_admin value
 get_ul_class = lambda x: 'radiolist%s' % ((x == HORIZONTAL) and ' inline' or '')
+
+def string_concat(*strings):
+    """"
+    lazy variant of string concatenation, needed for translations that are
+    constructed from multiple parts. Handles lazy strings and non-strings by
+    first turning all arguments to strings, before joining them.
+    """
+    return ''.join([str(el) for el in strings])
+
+string_concat = lazy(string_concat, str)
 
 def manipulator_valid_rel_key(f, self, field_data, all_data):
     "Validates that the value is a valid foreign key"
@@ -80,9 +91,11 @@ class Field(object):
         self.db_column = db_column
         if rel and isinstance(rel, ManyToMany):
             if rel.raw_id_admin:
-                self.help_text += ' Separate multiple IDs with commas.'
+                self.help_text = string_concat(self.help_text,
+                    gettext_lazy(' Separate multiple IDs with commas.'))
             else:
-                self.help_text += ' Hold down "Control", or "Command" on a Mac, to select more than one.'
+                self.help_text = string_concat(self.help_text,
+                    gettext_lazy(' Hold down "Control", or "Command" on a Mac, to select more than one.'))
 
         # Set db_index to True if the field has a relationship and doesn't explicitly set db_index.
         if db_index is None:
