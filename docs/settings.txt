@@ -397,7 +397,7 @@ Default: ``False``
 
 Whether to prepend the "www." subdomain to URLs that don't have it. This is
 only used if ``CommonMiddleware`` is installed (see the `middleware docs`_).
-See also ``PREPEND_WWW``.
+See also ``APPEND_SLASH``.
 
 SECRET_KEY
 ----------
