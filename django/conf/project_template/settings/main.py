@@ -8,7 +8,7 @@ ADMINS = (
 
 MANAGERS = ADMINS
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = 'en_US'
 
 DATABASE_ENGINE = 'postgresql' # 'postgresql', 'mysql', 'sqlite3' or 'ado_mssql'.
 DATABASE_NAME = ''             # Or path to database file if using sqlite3.

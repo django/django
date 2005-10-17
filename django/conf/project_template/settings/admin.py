@@ -10,6 +10,7 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.sessions.SessionMiddleware',
     'django.middleware.admin.AdminUserRequired',
     'django.middleware.common.CommonMiddleware',
+    'django.middleware.locale.LocaleMiddleware',
 )
 
 # URL prefix for admin media -- CSS, JavaScript and images. Make sure to use a
