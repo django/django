@@ -224,6 +224,13 @@ Here are some tips for working with inheritance:
       if you want to add to the contents of a parent block instead of
       completely overriding it.
 
+Finally, note that you can't define multiple ``{% block %}`` tags with the same
+name in the same template. This limitation exists because a block tag works in
+"both" directions. That is, a block tag doesn't just provide a hole to fill --
+it also defines the content that fills the hole in the *parent*. If there were
+two similarly-named ``{% block %}`` tags in a template, that template's parent
+wouldn't know which one of the blocks' content to use.
+
 Using the built-in reference
 ============================
 
