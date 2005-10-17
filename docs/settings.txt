@@ -31,9 +31,9 @@ Designating the settings
 ========================
 
 When you use Django, you have to tell it which settings you're using. Do this
-by using an environment variable, DJANGO_SETTINGS_MODULE.
+by using an environment variable, ``DJANGO_SETTINGS_MODULE``.
 
-The value of DJANGO_SETTINGS_MODULE should be in Python path syntax, e.g.
+The value of ``DJANGO_SETTINGS_MODULE`` should be in Python path syntax, e.g.
 ``"myproject.settings.main"``. Note that the settings module should be on the
 Python `import search path`_.
 
@@ -86,9 +86,12 @@ to. Each setting has a sensible default value. These defaults live in the file
 
 Here's the algorithm Django uses in compiling settings:
 
-    * Load settings from ``default_settings.py``.
+    * Load settings from ``global_settings.py``.
     * Load settings from the specified settings file, overriding the global
       settings as necessary.
+
+Note that a settings file should *not* import from ``global_settings``, because
+that's redundant.
 
 Using settings in Python code
 =============================
@@ -101,7 +104,7 @@ In your Django apps, use settings by importing them from
     if DEBUG:
         # Do something
 
-Note that your code should *not* import from either ``default_settings`` or
+Note that your code should *not* import from either ``global_settings`` or
 your own settings file. ``django.conf.settings`` abstracts the concepts of
 default settings and site-specific settings; it presents a single interface.
 
@@ -346,7 +349,8 @@ JING_PATH
 Default: ``'/usr/bin/jing'``
 
 Path to the "Jing" executable. Jing is a RELAX NG validator, and Django uses it
-to validate ``XMLField``s. See http://www.thaiopensource.com/relaxng/jing.html .
+to validate each ``XMLField`` in your models.
+See http://www.thaiopensource.com/relaxng/jing.html .
 
 LANGUAGE_CODE
 -------------
