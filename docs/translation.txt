@@ -182,7 +182,10 @@ want to have a single translation active, you want to decide what language to
 present to each and every user. This is where the LocaleMiddleware comes
 into the picture. You need to add it to your middleware setting. It should
 be one of the first middlewares installed, but it should come after the
-session middleware - that's because it makes uses of the session data.
+session middleware - that's because it makes uses of the session data. And
+it must be installed before the AdminUserRequired middleware, as that will
+do redirects based on not-logged-in state and so the LocaleMiddleware won't
+ever see the login page (and so not initialize the language correctly).
 
 So your middleware settings might look like this::
 
