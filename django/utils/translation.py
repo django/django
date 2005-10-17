@@ -32,6 +32,22 @@ _default = None
 # run multiple times for one user
 _accepted = {}
 
+def to_locale(language):
+    "turn a language name (en-us) into a locale name (en_US)"
+    p = language.find('-')
+    if p >= 0:
+        return language[:p].lower()+'_'+language[p:].upper()
+    else:
+        return language.lower()
+
+def to_language(locale):
+    "turns a locale name (en_US) into a language name (en-us)"
+    p = locale.find('_')
+    if p >= 0:
+        return locale[:p].lower()+'-'+locale[p:].lower()
+    else:
+        return locale.lower()
+
 class DjangoTranslation(gettext_module.GNUTranslations):
     """
     This class sets up the GNUTranslations context with
@@ -104,6 +120,9 @@ def translation(appname, language):
     
     from django.conf import settings
 
+    default_locale = to_locale(settings.LANGUAGE_CODE)
+    locale = to_locale(language)
+
     # set up the right translation class
     klass = DjangoTranslation
     if sys.version_info < (2, 4):
@@ -112,7 +131,7 @@ def translation(appname, language):
     globalpath = os.path.join(os.path.dirname(settings.__file__), 'locale')
 
     try:
-        t = gettext_module.translation('django', globalpath, [language, settings.LANGUAGE_CODE], klass)
+        t = gettext_module.translation('django', globalpath, [locale, default_locale], klass)
         t.set_app_and_language(appname, language)
     except IOError: t = gettext_module.NullTranslations()
     _translations[(appname, language)] = t
@@ -120,7 +139,7 @@ def translation(appname, language):
     if hasattr(settings, 'LOCALE_PATHS'):
         for localepath in settings.LOCALE_PATHS:
             try:
-                t = gettext_module.translation('django', localepath, [language, settings.LANGUAGE_CODE], klass)
+                t = gettext_module.translation('django', localepath, [locale, default_locale], klass)
                 t.set_app_and_language(appname, language)
             except IOError: t = None
             if t is not None:
@@ -133,7 +152,7 @@ def translation(appname, language):
     projectpath = os.path.join(os.path.dirname(project.__file__), 'locale')
 
     try:
-        t = gettext_module.translation('django', projectpath, [language, settings.LANGUAGE_CODE], klass)
+        t = gettext_module.translation('django', projectpath, [locale, default_locale], klass)
         t.set_app_and_language(appname, language)
     except IOError: t = None
     if t is not None:
@@ -146,7 +165,7 @@ def translation(appname, language):
         apppath = os.path.join(os.path.dirname(app.__file__), 'locale')
 
         try:
-            t = gettext_module.translation('django', apppath, [language, settings.LANGUAGE_CODE], klass)
+            t = gettext_module.translation('django', apppath, [locale, default_locale], klass)
             t.set_app_and_language(appname, language)
         except IOError: t = None
         if t is not None:
@@ -179,7 +198,7 @@ def get_language():
     t = _active.get(currentThread(), None)
     if t is not None:
         try:
-            return t.language()
+            return to_language(t.language())
         except AttributeError:
             pass
     # if we don't have a real translation object, we assume
@@ -247,9 +266,9 @@ def get_language_from_request(request):
     if request.GET or request.POST:
         lang_code = request.GET.get('django_language', None) or request.POST.get('django_language', None)
         if lang_code is not None:
-            if lang_code == 'en' or lang_code.startswith('en_'):
+            if lang_code == 'en' or lang_code.startswith('en-'):
                 return lang_code
-            lang = gettext_module.find('django', globalpath, [lang_code])
+            lang = gettext_module.find('django', globalpath, [to_locale(lang_code)])
             if lang is not None:
                 if hasattr(request, 'session'):
                     request.session['django_language'] = lang_code
@@ -260,17 +279,17 @@ def get_language_from_request(request):
     if hasattr(request, 'session'):
         lang_code = request.session.get('django_language', None)
         if lang_code is not None:
-            if lang_code == 'en' or lang_code.startswith('en_'):
+            if lang_code == 'en' or lang_code.startswith('en-'):
                 return lang_code
-            lang = gettext_module.find('django', globalpath, [lang_code])
+            lang = gettext_module.find('django', globalpath, [to_locale(lang_code)])
             if lang is not None:
                 return lang_code
     
     lang_code = request.COOKIES.get('django_language', None)
     if lang_code is not None:
-        if lang_code == 'en' or lang_code.startswith('en_'):
+        if lang_code == 'en' or lang_code.startswith('en-'):
             return lang_code
-        lang = gettext_module.find('django', globalpath, [lang_code])
+        lang = gettext_module.find('django', globalpath, [to_locale(lang_code)])
         if lang is not None:
             return lang_code
     
@@ -298,7 +317,7 @@ def get_language_from_request(request):
         langs.sort(lambda a,b: -1*cmp(a[1], b[1]))
 
         for lang, order in langs:
-            if lang == 'en' or lang.startswith('en_'):
+            if lang == 'en' or lang.startswith('en-'):
                 # special casing for language en and derivates, because we don't
                 # have an english language file available, but just fallback
                 # to NullTranslation on those languages (as the source itself
@@ -306,14 +325,14 @@ def get_language_from_request(request):
                 _accepted[accept] = lang
                 return lang
             else:
-                langfile = gettext_module.find('django', globalpath, [lang])
+                langfile = gettext_module.find('django', globalpath, [to_locale(lang)])
                 if langfile:
                     # reconstruct the actual language from the language
                     # filename, because otherwise we might incorrectly
                     # report de_DE if we only have de available, but
                     # did find de_DE because of language normalization
                     lang = langfile[len(globalpath):].split('/')[1]
-                    _accepted[accept] = lang
+                    _accepted[accept] = to_language(lang)
                     return lang
     
     return settings.LANGUAGE_CODE
