@@ -10,8 +10,12 @@ def shortcut(request, content_type_id, object_id):
         obj = content_type.get_object_for_this_type(pk=object_id)
     except ObjectDoesNotExist:
         raise Http404, "Content type %s object %s doesn't exist" % (content_type_id, object_id)
-    if not hasattr(obj, 'get_absolute_url'):
+    try:
+        absurl = obj.get_absolute_url()
+    except AttributeError:
         raise Http404, "%s objects don't have get_absolute_url() methods" % content_type.name
+    if absurl.startswith('http://'):
+        return httpwrappers.HttpResponseRedirect(absurl)
     object_domain = None
     if hasattr(obj, 'get_site_list'):
         site_list = obj.get_site_list()
@@ -27,8 +31,8 @@ def shortcut(request, content_type_id, object_id):
     except sites.SiteDoesNotExist:
         pass
     if not object_domain:
-        return httpwrappers.HttpResponseRedirect(obj.get_absolute_url())
-    return httpwrappers.HttpResponseRedirect('http://%s%s' % (object_domain, obj.get_absolute_url()))
+        return httpwrappers.HttpResponseRedirect(absurl)
+    return httpwrappers.HttpResponseRedirect('http://%s%s' % (object_domain, absurl))
 
 def page_not_found(request):
     """
