@@ -112,6 +112,11 @@ them to standard output, but it won't stop the server.
 You can run as many servers as you want, as long as they're on separate ports.
 Just execute ``django-admin.py runserver`` more than once.
 
+Note that the default IP address, 127.0.0.1, is not accessible from other
+machines on your network. To make your development server viewable to other
+machines on the network, use its own IP address (e.g. ``192.168.2.1``) or
+``0.0.0.0``.
+
 Examples:
 ~~~~~~~~~
 
