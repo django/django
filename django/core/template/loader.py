@@ -188,7 +188,7 @@ class IncludeNode(Node):
          try:
              template_path = resolve_variable(self.template_path_var, context)
              print "IncludeNode rendering %s" % template_path
-             t = template_loader.get_template(template_path)
+             t = get_template(template_path)
              return t.render(context)
          except Exception, e:
              return '' # Fail silently for invalid included templates.

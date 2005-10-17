@@ -224,47 +224,28 @@ class DebugLexer(Lexer):
     def find_linebreaks(self, template_string):
         for match in newline_re.finditer(template_string):
             yield match.start()
+        yield len(template_string) + 1
 
     def tokenize(self):
         "Return a list of tokens from a given template_string"
-        
-        token_tups = []
-        upto = 0
-        line = 1
-        #TODO:Py2.4 generator expression 
-        linebreaks = self.find_linebreaks(self.template_string)
-        next_linebreak = linebreaks.next()
-        
-
+        token_tups, upto = [], 0
+        lines = enumerate(self.find_linebreaks(self.template_string))
+        line, next_linebreak = lines.next()
         for match in tag_re.finditer(self.template_string):
+            while next_linebreak <= upto:
+                line, next_linebreak = lines.next()    
             start, end = match.span()
             if start > upto:       
                 token_tups.append( (self.template_string[upto:start], line) )
                 upto = start
-                
                 while next_linebreak <= upto:
-                    try: 
-                        next_linebreak = linebreaks.next()
-                        line += 1
-                    except StopIteration:
-                        break
-            
+                    line, next_linebreak = lines.next()              
             token_tups.append( (self.template_string[start:end], line) )
             upto = end
-    
-            while next_linebreak <= upto:
-                try: 
-                    next_linebreak = linebreaks.next()
-                    line += 1
-                except StopIteration:
-                    break
-
         last_bit = self.template_string[upto:]
-        if len(last_bit):
+        if last_bit:
            token_tups.append( (last_bit, line) )
-        
         return [ self.create_token(tok, (self.filename, line)) for tok, line in token_tups]
-
 
     def create_token(self, token_string, source):
         token = super(DebugLexer, self).create_token(token_string)

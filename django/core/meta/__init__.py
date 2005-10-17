@@ -1603,6 +1603,7 @@ def manipulator_init(opts, add, change, self, obj_key=None, follow=None):
         self.fields.append(formfields.CommaSeparatedIntegerField(field_name="order_"))
 
 def manipulator_save(opts, klass, add, change, self, new_data):
+    # TODO: big cleanup when core fields go -> use recursive manipulators. 
     from django.utils.datastructures import DotExpandedDict
     params = {}
     for f in opts.fields:
