@@ -2,7 +2,10 @@
 
 from django.core.template import Node, NodeList, Template, Context, resolve_variable, resolve_variable_with_filters, get_filters_from_token, registered_filters
 from django.core.template import TemplateSyntaxError, VariableDoesNotExist, BLOCK_TAG_START, BLOCK_TAG_END, VARIABLE_TAG_START, VARIABLE_TAG_END, register_tag
+from django.utils import translation
+
 import sys
+import re
 
 class CommentNode(Node):
     def render(self, context):
