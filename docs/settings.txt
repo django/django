@@ -1,0 +1,521 @@
+===============
+Django settings
+===============
+
+A Django settings file contains all the configuration of your Django
+installation. This document explains how settings work and which settings are
+available.
+
+The basics
+==========
+
+A settings file is just a Python module with module-level variables.
+
+Here are a couple of example settings::
+
+    DEBUG = False
+    DEFAULT_FROM_EMAIL = 'webmaster@example.com'
+    TEMPLATE_DIRS = ('/home/templates/mike', '/home/templates/john')
+
+Because a settings file is a Python module, the following apply:
+
+    * It shouldn't have Python syntax errors.
+    * It can assign settings dynamically using normal Python syntax.
+      For example::
+
+          MY_SETTING = [str(i) for i in range(30)]
+
+    * It can import values from other settings files.
+
+Designating the settings
+========================
+
+When you use Django, you have to tell it which settings you're using. Do this
+by using an environment variable, ``DJANGO_SETTINGS_MODULE``.
+
+The value of ``DJANGO_SETTINGS_MODULE`` should be in Python path syntax, e.g.
+``"myproject.settings.main"``. Note that the settings module should be on the
+Python `import search path`_.
+
+.. _import search path: http://diveintopython.org/getting_to_know_python/everything_is_an_object.html
+
+The django-admin.py utility
+---------------------------
+
+When using `django-admin.py`_, you can either set the environment variable
+once, or explicitly pass in the settings module each time you run the utility.
+
+Example (Unix Bash shell)::
+
+    export DJANGO_SETTINGS_MODULE=myproject.settings.main
+    django-admin.py runserver
+
+Example (Windows shell)::
+
+    set DJANGO_SETTINGS_MODULE=myproject.settings.main
+    django-admin.py runserver
+
+Use the ``--settings`` command-line argument to specify the settings manually::
+
+    django-admin.py runserver --settings=myproject.settings.main
+
+.. _django-admin.py: http://www.djangoproject.com/documentation/django_admin/
+
+On the server (mod_python)
+--------------------------
+
+In your live server environment, you'll need to tell Apache/mod_python which
+settings file to use. Do that with ``SetEnv``::
+
+    <Location "/mysite/">
+        SetHandler python-program
+        PythonHandler django.core.handlers.modpython
+        SetEnv DJANGO_SETTINGS_MODULE myproject.settings.main
+    </Location>
+
+Read the `Django mod_python documentation`_ for more information.
+
+.. _Django mod_python documentation: http://www.djangoproject.com/documentation/mod_python/
+
+Default settings
+================
+
+A Django settings file doesn't have to define any settings if it doesn't need
+to. Each setting has a sensible default value. These defaults live in the file
+``django/conf/global_settings.py``.
+
+Here's the algorithm Django uses in compiling settings:
+
+    * Load settings from ``global_settings.py``.
+    * Load settings from the specified settings file, overriding the global
+      settings as necessary.
+
+Note that a settings file should *not* import from ``global_settings``, because
+that's redundant.
+
+Using settings in Python code
+=============================
+
+In your Django apps, use settings by importing them from
+``django.conf.settings``. Example::
+
+    from django.conf.settings import DEBUG
+
+    if DEBUG:
+        # Do something
+
+Note that your code should *not* import from either ``global_settings`` or
+your own settings file. ``django.conf.settings`` abstracts the concepts of
+default settings and site-specific settings; it presents a single interface.
+
+Altering settings at runtime
+============================
+
+You shouldn't alter settings in your applications at runtime. For example,
+don't do this in a view::
+
+    from django.conf.settings import DEBUG
+
+    DEBUG = True   # Don't do this!
+
+The only place you should assign to settings is in a settings file.
+
+Security
+========
+
+Because a settings file contains sensitive information, such as the database
+password, you should make every attempt to limit access to it. For example,
+change its file permissions so that only you and your Web server's user can
+read it. This is especially important in a shared-hosting environment.
+
+Available settings
+==================
+
+Here's a full list of all available settings, in alphabetical order, and their
+default values.
+
+ABSOLUTE_URL_OVERRIDES
+----------------------
+
+Default: ``{}`` (Empty dictionary)
+
+A dictionary mapping ``"app_label.module_name"`` strings to functions that take
+a model object and return its URL. This is a way of overriding
+``get_absolute_url()`` methods on a per-installation basis. Example::
+
+    ABSOLUTE_URL_OVERRIDES = {
+        'blogs.blogs': lambda o: "/blogs/%s/" % o.slug,
+        'news.stories': lambda o: "/stories/%s/%s/" % (o.pub_year, o.slug),
+    }
+
+ADMIN_FOR
+---------
+
+Default: ``()`` (Empty list)
+
+Used for admin-site settings modules, this should be a tuple of settings
+modules (in the format ``'foo.bar.baz'``) for which this site is an admin.
+
+ADMIN_MEDIA_PREFIX
+------------------
+
+Default: ``'/media/'``
+
+The URL prefix for admin media -- CSS, JavaScript and images. Make sure to use
+a trailing slash.
+
+ADMINS
+------
+
+Default: ``()`` (Empty tuple)
+
+A tuple that lists people who get code error notifications. When
+``DEBUG=False`` and a view raises an exception, Django will e-mail these people
+with the full exception information. Each member of the tuple should be a tuple
+of (Full name, e-mail address). Example::
+
+    (('John', 'john@example.com'), ('Mary', 'mary@example.com'))
+
+ALLOWED_INCLUDE_ROOTS
+---------------------
+
+Default: ``()`` (Empty tuple)
+
+A tuple of strings representing allowed prefixes for the ``{% ssi %}`` template
+tag. This is a security measure, so that template authors can't access files
+that they shouldn't be accessing.
+
+For example, if ``ALLOWED_INCLUDE_ROOTS`` is ``('/home/html', '/var/www')``,
+then ``{% ssi /home/html/foo.txt %}`` would work, but ``{% ssi /etc/passwd %}``
+wouldn't.
+
+APPEND_SLASH
+------------
+
+Default: ``True``
+
+Whether to append trailing slashes to URLs. This is only used if
+``CommonMiddleware`` is installed (see the `middleware docs`_). See also
+``PREPEND_WWW``.
+
+CACHE_BACKEND
+-------------
+
+Default: ``'simple://'``
+
+The cache backend to use. See the `cache docs`_.
+
+CACHE_MIDDLEWARE_KEY_PREFIX
+
+Default: ``''`` (Empty string)
+
+The cache key prefix that the cache middleware should use. See the
+`cache docs`_.
+
+DATABASE_ENGINE
+---------------
+
+Default: ``'postgresql'``
+
+Which database backend to use. Either ``'postgresql'``, ``'mysql'``,
+``'sqlite3'`` or ``'ado_mssql'``.
+
+DATABASE_HOST
+-------------
+
+Default: ``''`` (Empty string)
+
+Which host to use when connecting to the database. An empty string means
+localhost. Not used with SQLite.
+
+DATABASE_NAME
+-------------
+
+Default: ``''`` (Empty string)
+
+The name of the database to use. For SQLite, it's the full path to the database
+file.
+
+DATABASE_PASSWORD
+-----------------
+
+Default: ``''`` (Empty string)
+
+The password to use when connecting to the database. Not used with SQLite.
+
+DATABASE_PORT
+-------------
+
+Default: ``''`` (Empty string)
+
+The port to use when connecting to the database. An empty string means the
+default port. Not used with SQLite.
+
+DATABASE_USER
+-------------
+
+Default: ``''`` (Empty string)
+
+The username to use when connecting to the database. Not used with SQLite.
+
+DEBUG
+-----
+
+Default: ``False``
+
+A boolean that turns on/off debug mode.
+
+DEFAULT_CHARSET
+---------------
+
+Default: ``'utf-8'``
+
+Default charset to use for all ``HttpResponse`` objects, if a MIME type isn't
+manually specified. Used with ``DEFAULT_CONTENT_TYPE`` to construct the
+``Content-Type`` header.
+
+DEFAULT_CONTENT_TYPE
+--------------------
+
+Default: ``'text/html'``
+
+Default content type to use for all ``HttpResponse`` objects, if a MIME type
+isn't manually specified. Used with ``DEFAULT_CHARSET`` to construct the
+``Content-Type`` header.
+
+DEFAULT_FROM_EMAIL
+------------------
+
+Default: ``'webmaster@localhost'``
+
+Default e-mail address to use for various automated correspondence from the
+site manager(s).
+
+DISALLOWED_USER_AGENTS
+----------------------
+
+Default: ``()`` (Empty tuple)
+
+List of compiled regular expression objects representing User-Agent strings
+that are not allowed to visit any page, systemwide. Use this for bad
+robots/crawlers.  This is only used if ``CommonMiddleware`` is installed (see
+the `middleware docs`_).
+
+EMAIL_HOST
+----------
+
+Default: ``'localhost'``
+
+The host to use for sending e-mail.
+
+EMAIL_SUBJECT_PREFIX
+--------------------
+
+Default: ``'[Django] '``
+
+Subject-line prefix for e-mail messages sent with ``django.core.mail.mail_admins``
+or ``django.core.mail.mail_managers``. You'll probably want to include the
+trailing space.
+
+IGNORABLE_404_ENDS
+------------------
+
+Default: ``('mail.pl', 'mailform.pl', 'mail.cgi', 'mailform.cgi', 'favicon.ico', '.php')``
+
+See also ``IGNORABLE_404_STARTS``.
+
+IGNORABLE_404_STARTS
+--------------------
+
+Default: ``('/cgi-bin/', '/_vti_bin', '/_vti_inf')``
+
+A tuple of strings that specify beginnings of URLs that should be ignored by
+the 404 e-mailer. See ``SEND_BROKEN_LINK_EMAILS`` and ``IGNORABLE_404_ENDS``.
+
+INTERNAL_IPS
+------------
+
+Default: ``()`` (Empty tuple)
+
+A tuple of IP addresses, as strings, that:
+
+    * See debug comments, when ``DEBUG`` is ``True``
+    * Receive X headers if the ``XViewMiddleware`` is installed (see the
+      `middleware docs`_)
+
+JING_PATH
+---------
+
+Default: ``'/usr/bin/jing'``
+
+Path to the "Jing" executable. Jing is a RELAX NG validator, and Django uses it
+to validate each ``XMLField`` in your models.
+See http://www.thaiopensource.com/relaxng/jing.html .
+
+LANGUAGE_CODE
+-------------
+
+Default: ``'en-us'``
+
+A string representing the language code for this installation.
+
+MANAGERS
+--------
+
+Default: ``ADMINS`` (Whatever ``ADMINS`` is set to)
+
+A tuple in the same format as ``ADMINS`` that specifies who should get
+broken-link notifications when ``SEND_BROKEN_LINK_EMAILS=True``.
+
+MEDIA_ROOT
+----------
+
+Default: ``''`` (Empty string)
+
+Absolute path to the directory that holds media for this installation.
+Example: ``"/home/media/media.lawrence.com/"`` See also ``MEDIA_URL``.
+
+MEDIA_URL
+---------
+
+Default: ``''`` (Empty string)
+
+URL that handles the media served from ``MEDIA_ROOT``.
+Example: ``"http://media.lawrence.com"``
+
+MIDDLEWARE_CLASSES
+------------------
+
+Default: ``("django.middleware.sessions.SessionMiddleware", "django.middleware.common.CommonMiddleware", "django.middleware.doc.XViewMiddleware")``
+
+A tuple of middleware classes to use. See the `middleware docs`_.
+
+PREPEND_WWW
+-----------
+
+Default: ``False``
+
+Whether to prepend the "www." subdomain to URLs that don't have it. This is
+only used if ``CommonMiddleware`` is installed (see the `middleware docs`_).
+See also ``PREPEND_WWW``.
+
+SECRET_KEY
+----------
+
+Default: ``''`` (Empty string)
+
+A secret key for this particular Django installation. Used to provide a seed in
+secret-key hashing algorithms. Set this to a random string -- the longer, the
+better. ``django-admin.py startproject`` creates one automatically.
+
+SEND_BROKEN_LINK_EMAILS
+-----------------------
+
+Default: ``False``
+
+Whether to send an e-mail to the ``MANAGERS`` each time somebody visits a
+Django-powered page that is 404ed with a non-empty referer (i.e., a broken
+link). This is only used if ``CommonMiddleware`` is installed (see the
+`middleware docs`_). See also ``IGNORABLE_404_STARTS`` and
+``IGNORABLE_404_ENDS``.
+
+SERVER_EMAIL
+------------
+
+Default: ``'root@localhost'``
+
+The e-mail address that error messages come from, such as those sent to
+``ADMINS`` and ``MANAGERS``.
+
+SESSION_COOKIE_AGE
+------------------
+
+Default: ``1209600`` (2 weeks, in seconds)
+
+The age of session cookies, in seconds. See the `session docs`_.
+
+SESSION_COOKIE_DOMAIN
+---------------------
+
+Default: ``None``
+
+The domain to use for session cookies. Set this to a string such as
+``".lawrence.com"`` for cross-domain cookies, or use ``None`` for a standard
+domain cookie. See the `session docs`_.
+
+SESSION_COOKIE_NAME
+-------------------
+
+Default: ``'hotclub'``
+
+The name of the cookie to use for sessions. This can be whatever you want.
+See the `session docs`_.
+
+``'hotclub'`` is a reference to the Hot Club of France, the band Django
+Reinhardt played in.
+
+TEMPLATE_DIRS
+-------------
+
+Default: ``()`` (Empty tuple)
+
+List of locations of the template source files, in search order. See the
+`template documentation`_.
+
+TEMPLATE_FILE_EXTENSION
+-----------------------
+
+Default: ``'.html'``
+
+The file extension to append to all template names when searching for
+templates. See the `template documentation`_.
+
+TEMPLATE_LOADERS
+----------------
+
+Default: ``('django.core.template.loaders.filesystem.load_template_source',)``
+
+A tuple of callables (as strings) that know how to import templates from
+various sources. See the `template documentation`_.
+
+TIME_ZONE
+---------
+
+Default: ``'America/Chicago'``
+
+A string representing the time zone for this installation.
+`See available choices`_.
+
+USE_ETAGS
+---------
+
+Default: ``False``
+
+A boolean that specifies whether to output the "Etag" header. This saves
+bandwidth but slows down performance. This is only used if ``CommonMiddleware``
+is installed (see the `middleware docs`_).
+
+USE_FLAT_PAGES
+--------------
+
+Default: ``True``
+
+Whether to check the flat-pages table as a last resort for all 404 errors. This
+is only used if ``CommonMiddleware`` is installed (see the `middleware docs`_).
+
+.. _cache docs: http://www.djangoproject.com/documentation/cache/
+.. _middleware docs: http://www.djangoproject.com/documentation/middleware/
+.. _session docs: http://www.djangoproject.com/documentation/sessions/
+.. _See available choices: http://www.postgresql.org/docs/current/static/datetime-keywords.html#DATETIME-TIMEZONE-SET-TABLE
+.. _template documentation: http://www.djangoproject.com/documentation/templates_python/
+
+Creating your own settings
+==========================
+
+There's nothing stopping you from creating your own settings, for your own
+Django apps. Just follow these conventions:
+
+    * Setting names are in all uppercase.
+    * For settings that are sequences, use tuples instead of lists. This is
+      purely for performance.
+    * Don't reinvent an already-existing setting.

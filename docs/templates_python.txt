@@ -287,8 +287,12 @@ Generally, you'll store templates in files on your filesystem rather than using
 the low-level ``Template`` API yourself. Save templates in a file with an
 ".html" extension in a directory specified as a **template directory**.
 
-(The ".html" extension is just a required convention. It doesn't mean templates
-can only contain HTML. They can contain whatever textual content you want.)
+If you don't like the requirement that templates have an ".html" extension,
+change your ``TEMPLATE_FILE_EXTENSION`` setting. It's set to ``".html"`` by
+default.
+
+Also, the .html extension doesn't mean templates can contain only HTML. They
+can contain whatever textual content you want.
 
 The TEMPLATE_DIRS setting
 ~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -354,6 +358,47 @@ single directory gets messy.
 To load a template that's within a subdirectory, just use a slash, like so::
 
     get_template("news/story_detail")
+
+Loader types
+~~~~~~~~~~~~
+
+By default, Django uses a filesystem-based template loader, but Django comes
+with a few other template loaders. They're disabled by default, but you can
+activate them by editing your ``TEMPLATE_LOADERS`` setting.
+``TEMPLATE_LOADERS`` should be a tuple of strings, where each string represents
+a template loader. Here are the built-in template loaders:
+
+``django.core.template.loaders.filesystem.load_template_source``
+    Loads templates from the filesystem, according to ``TEMPLATE_DIRS``.
+
+``django.core.template.loaders.app_directories.load_template_source``
+    Loads templates from Django apps on the filesystem. For each app in
+    ``INSTALLED_APPS``, the loader looks for a ``templates`` subdirectory. If
+    the directory exists, Django looks for templates in there.
+
+    This means you can store templates with your individual apps. This also
+    makes it easy to distribute Django apps with default templates.
+
+    For example, for this setting::
+
+        INSTALLED_APPS = ('myproject.polls', 'myproject.music')
+
+    ...then ``get_template("foo")`` will look for templates in these
+    directories, in this order:
+
+        * ``/path/to/myproject/polls/templates/foo.html``
+        * ``/path/to/myproject/music/templates/music.html``
+
+    Note that the loader performs an optimization when it is first imported:
+    It caches a list of which ``INSTALLED_APPS`` packages have a ``templates``
+    subdirectory.
+
+``django.core.template.loaders.eggs.load_template_source``
+    Just like ``app_directories`` above, but it loads templates from Python
+    eggs rather than from the filesystem.
+
+Django uses the template loaders in order according to the ``TEMPLATE_LOADERS``
+setting. It uses each loader until a loader finds a match.
 
 Extending the template system
 =============================

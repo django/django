@@ -252,7 +252,7 @@ Here are all available field types:
     Using a `FieldField` or an ``ImageField`` (see below) in a model takes a few
     steps:
 
-        1. In your settings file, you'll need to define ``MEDIA_ROOT``as the
+        1. In your settings file, you'll need to define ``MEDIA_ROOT`` as the
            full path to a directory where you'd like Django to store uploaded
            files. (For performance, these files are not stored in the database.)
            Define ``MEDIA_URL`` as the base public URL of that directory. Make

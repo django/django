@@ -79,6 +79,7 @@ TEMPLATE_FILE_EXTENSION = '.html'
 # See the comments in django/core/template/loader.py for interface
 # documentation.
 TEMPLATE_LOADERS = (
+#     'django.core.template.loaders.app_directories.load_template_source',
     'django.core.template.loaders.filesystem.load_template_source',
 #     'django.core.template.loaders.eggs.load_template_source',
 )
@@ -123,7 +124,7 @@ ALLOWED_INCLUDE_ROOTS = ()
 # If this is a admin settings module, this should be a list of
 # settings modules (in the format 'foo.bar.baz') for which this admin
 # is an admin.
-ADMIN_FOR = []
+ADMIN_FOR = ()
 
 # Whether to check the flat-pages table as a last resort for all 404 errors.
 USE_FLAT_PAGES = True
