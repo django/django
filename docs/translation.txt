@@ -85,7 +85,23 @@ This way only a lazy reference is stored for the string, not the actual translat
 The translation itself will be done when the string is used in a string context, like
 template rendering in the admin.
 
-There is a standard problem with translations, that is pluralization of
+If you don't like the verbose name gettext_lazy, you can just alias it as _ - in the model
+file you will allways use lazy translations anyway. And it's a good idea to add translations
+for the field names and table names, too. This means writing explicit verbose_name and
+verbose_names options in the META subclass, though::
+
+    from django.utils.translation import gettext_lazy as _
+
+    class Mything(meta.Model):
+    
+        name = meta.CharField(_('Name'), help_text=_('This is the help text'))
+
+        class META:
+
+            verbose_name = _('Mything')
+            verbose_name_plural = _('Mythings')
+
+There is another standard problem with translations, that is pluralization of
 strings. This is done by the standard helper ngettext like so::
 
     def hello_world(request, count):
@@ -199,9 +215,9 @@ setting, the middleware will look at the cookies for a django_language cookie.
 If that is found, it gives the language code.
 
 The format for the explicit django_language parameters is allways the
-locale to use - for example it's pt_BR for Brazilian. If a base language
+language to use - for example it's pt-br for Brazilian. If a base language
 is available, but the sublanguage specified is not, the base language is used.
-For example if you specify de_AT (Austrian German), but there is only a
+For example if you specify de-at (Austrian German), but there is only a
 language de available, that language is used.
 
 If neither the session nor the cookie carry a language code, the middleware
