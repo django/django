@@ -110,7 +110,7 @@ ALLOWED_INCLUDE_ROOTS = ()
 # If this is a admin settings module, this should be a list of
 # settings modules (in the format 'foo.bar.baz') for which this admin
 # is an admin.
-ADMIN_FOR = []
+ADMIN_FOR = ()
 
 # Whether to check the flat-pages table as a last resort for all 404 errors.
 USE_FLAT_PAGES = True
