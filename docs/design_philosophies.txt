@@ -242,3 +242,9 @@ Loose coupling
 
 A view shouldn't care about which template system the developer uses -- or even
 whether a template system is used at all.
+
+Designate between GET and POST
+------------------------------
+
+GET and POST are distinct; developers should explicitly use one or the other.
+The framework should make it easy to distinguish between GET and POST data.

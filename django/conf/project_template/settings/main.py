@@ -30,6 +30,13 @@ MEDIA_URL = ''
 # Make this unique, and don't share it with anybody.
 SECRET_KEY = ''
 
+# List of callables that know how to import templates from various sources.
+TEMPLATE_LOADERS = (
+#     'django.core.template.loaders.app_directories.load_template_source',
+    'django.core.template.loaders.filesystem.load_template_source',
+#     'django.core.template.loaders.eggs.load_template_source',
+)
+
 MIDDLEWARE_CLASSES = (
     "django.middleware.common.CommonMiddleware",
     "django.middleware.doc.XViewMiddleware",

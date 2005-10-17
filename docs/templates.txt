@@ -224,6 +224,13 @@ Here are some tips for working with inheritance:
       if you want to add to the contents of a parent block instead of
       completely overriding it.
 
+Finally, note that you can't define multiple ``{% block %}`` tags with the same
+name in the same template. This limitation exists because a block tag works in
+"both" directions. That is, a block tag doesn't just provide a hole to fill --
+it also defines the content that fills the hole in the *parent*. If there were
+two similarly-named ``{% block %}`` tags in a template, that template's parent
+wouldn't know which one of the blocks' content to use.
+
 Using the built-in reference
 ============================
 
@@ -392,13 +399,13 @@ Built-in tag reference
     block are output::
 
         {% if athlete_list %}
-            Number of athletes: {{ athlete_list|count }}
+            Number of athletes: {{ athlete_list|length }}
         {% else %}
             No athletes.
         {% endif %}
 
     In the above, if ``athlete_list`` is not empty, the number of athletes will be
-    displayed by the ``{{ athlete_list|count }}`` variable.
+    displayed by the ``{{ athlete_list|length }}`` variable.
 
     As you can see, the ``if`` tag can take an option ``{% else %}`` clause that
     will be displayed if the test fails.
@@ -425,8 +432,8 @@ Built-in tag reference
 
         {% if athlete_list %}
             {% if coach_list %}
-                Number of athletes: {{ athlete_list|count }}.
-                Number of coaches: {{ coach_list|count }}.
+                Number of athletes: {{ athlete_list|length }}.
+                Number of coaches: {{ coach_list|length }}.
             {% endif %}
         {% endif %}
 
