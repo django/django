@@ -1,4 +1,5 @@
 from django.core import meta, validators
+from django.utils.translation import gettext_lazy
 
 class Site(meta.Model):
     domain = meta.CharField('domain name', maxlength=100)
@@ -53,9 +54,9 @@ class ContentType(meta.Model):
 class Redirect(meta.Model):
     site = meta.ForeignKey(Site, radio_admin=meta.VERTICAL)
     old_path = meta.CharField('redirect from', maxlength=200, db_index=True,
-        help_text="This should be an absolute path, excluding the domain name. Example: '/events/search/'.")
+        help_text=gettext_lazy("This should be an absolute path, excluding the domain name. Example: '/events/search/'."))
     new_path = meta.CharField('redirect to', maxlength=200, blank=True,
-        help_text="This can be either an absolute path (as above) or a full URL starting with 'http://'.")
+        help_text=gettext_lazy("This can be either an absolute path (as above) or a full URL starting with 'http://'."))
     class META:
         db_table = 'redirects'
         unique_together=(('site', 'old_path'),)
@@ -70,13 +71,13 @@ class Redirect(meta.Model):
 
 class FlatFile(meta.Model):
     url = meta.CharField('URL', maxlength=100, validator_list=[validators.isAlphaNumericURL],
-        help_text="Example: '/about/contact/'. Make sure to have leading and trailing slashes.")
+        help_text=gettext_lazy("Example: '/about/contact/'. Make sure to have leading and trailing slashes."))
     title = meta.CharField(maxlength=200)
     content = meta.TextField()
     enable_comments = meta.BooleanField()
     template_name = meta.CharField(maxlength=70, blank=True,
-        help_text="Example: 'flatfiles/contact_page'. If this isn't provided, the system will use 'flatfiles/default'.")
-    registration_required = meta.BooleanField(help_text="If this is checked, only logged-in users will be able to view the page.")
+        help_text=gettext_lazy("Example: 'flatfiles/contact_page'. If this isn't provided, the system will use 'flatfiles/default'."))
+    registration_required = meta.BooleanField(help_text=gettext_lazy("If this is checked, only logged-in users will be able to view the page."))
     sites = meta.ManyToManyField(Site)
     class META:
         db_table = 'flatfiles'

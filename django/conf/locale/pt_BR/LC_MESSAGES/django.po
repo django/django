@@ -7,8 +7,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
-"Report-Msgid-Bugs-To: jpaulofarias@gmail.com\n"
-"POT-Creation-Date: 2005-10-11 09:11-0300\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2005-10-17 16:26+0200\n"
 "PO-Revision-Date: 2005-10-11 09:12GMT-3\n"
 "Last-Translator: João Paulo Farias <jpaulofarias@gmail.com>\n"
 "Language-Team: Português do Brasil <pt-br@li.org>\n"
@@ -16,46 +16,62 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: conf/admin_templates/404.html:3 conf/admin_templates/404.html.py:7
-msgid "Page not found"
-msgstr "Página não encontrada"
+#: models/core.py:57
+msgid ""
+"This should be an absolute path, excluding the domain name. Example: '/"
+"events/search/'."
+msgstr ""
 
-#: conf/admin_templates/404.html:9
-msgid "We're sorry, but the requested page could not be found."
-msgstr "Desculpe, mas a página requisitada não pode ser encontrada."
+#: models/core.py:59
+msgid ""
+"This can be either an absolute path (as above) or a full URL starting with "
+"'http://'."
+msgstr ""
 
-#: conf/admin_templates/index.html:26
-#: conf/admin_templates/changelist_generic.html:8
-msgid "Add"
-msgstr "Adicionar"
+#: models/core.py:74
+msgid ""
+"Example: '/about/contact/'. Make sure to have leading and trailing slashes."
+msgstr ""
 
-#: conf/admin_templates/index.html:32
-msgid "Change"
-msgstr "Modificar"
+#: models/core.py:79
+msgid ""
+"Example: 'flatfiles/contact_page'. If this isn't provided, the system will "
+"use 'flatfiles/default'."
+msgstr ""
 
-#: conf/admin_templates/index.html:42
-msgid "You don't have permission to edit anything."
-msgstr "Você não tem permissão para edição."
+#: models/core.py:80
+msgid "If this is checked, only logged-in users will be able to view the page."
+msgstr ""
 
-#: conf/admin_templates/index.html:50
-msgid "Recent Actions"
-msgstr "Ações Recentes"
+#: models/auth.py:33
+msgid "Use an MD5 hash -- not the raw password."
+msgstr ""
 
-#: conf/admin_templates/index.html:51
-msgid "My Actions"
-msgstr "Minhas Ações"
+#: models/auth.py:34
+msgid "Designates whether the user can log into this admin site."
+msgstr ""
 
-#: conf/admin_templates/index.html:55
-msgid "None available"
-msgstr "Nenhuma disponível"
+#: models/auth.py:40
+msgid ""
+"In addition to the permissions manually assigned, this user will also get "
+"all permissions granted to each group he/she is in."
+msgstr ""
+
+#: conf/admin_templates/base_site.html:3
+msgid "Django site admin"
+msgstr "Site de administração do Django"
+
+#: conf/admin_templates/base_site.html:6
+msgid "Django administration"
+msgstr "Administração do Django"
 
 #: conf/admin_templates/admin_object_history.html:4
 #: conf/admin_templates/base.html:28
+#: conf/admin_templates/registration/password_change_done.html:3
 #: conf/admin_templates/registration/password_reset_form.html:3
 #: conf/admin_templates/registration/logged_out.html:3
 #: conf/admin_templates/registration/password_reset_done.html:3
 #: conf/admin_templates/registration/password_change_form.html:3
-#: conf/admin_templates/registration/password_change_done.html:3
 msgid "Home"
 msgstr "Início"
 
@@ -83,14 +99,6 @@ msgstr ""
 "Este objeto não tem um histórico de alterações. Ele provavelmente não foi "
 "adicionado por este site de administração."
 
-#: conf/admin_templates/base_site.html:3
-msgid "Django site admin"
-msgstr "Site de administração do Django"
-
-#: conf/admin_templates/base_site.html:6
-msgid "Django administration"
-msgstr "Administração do Django"
-
 #: conf/admin_templates/500.html:5
 msgid "Server error (500)"
 msgstr "Erro no servidor (500)"
@@ -104,8 +112,8 @@ msgid ""
 "There's been an error. It's been reported to the site administrators via e-"
 "mail and should be fixed shortly. Thanks for your patience."
 msgstr ""
-"Houve um erro. Este foi reportado aos administradores do site através d "
-"e-mail e deve ser consertado em breve. Obrigado pela compreensão."
+"Houve um erro. Este foi reportado aos administradores do site através d e-"
+"mail e deve ser consertado em breve. Obrigado pela compreensão."
 
 #: conf/admin_templates/delete_confirmation_generic.html:6
 #, python-format
@@ -124,16 +132,44 @@ msgid ""
 "Are you sure you want to delete the %(object_name)s \"%(object)s\"? All of "
 "the following related items will be deleted:"
 msgstr ""
-"Você tem certeza que quer remover o \"%(object)s\" %(object_name)s? Todos "
-"os seguintes itens relacionados serão removidos:"
+"Você tem certeza que quer remover o \"%(object)s\" %(object_name)s? Todos os "
+"seguintes itens relacionados serão removidos:"
 
 #: conf/admin_templates/delete_confirmation_generic.html:17
 msgid "Yes, I'm sure"
 msgstr "Sim, tenho certeza"
 
-#: conf/admin_templates/changelist_generic.html:26
-msgid "Click to change"
-msgstr "Clique para alterar"
+#: conf/admin_templates/404.html:3 conf/admin_templates/404.html.py:7
+msgid "Page not found"
+msgstr "Página não encontrada"
+
+#: conf/admin_templates/404.html:9
+msgid "We're sorry, but the requested page could not be found."
+msgstr "Desculpe, mas a página requisitada não pode ser encontrada."
+
+#: conf/admin_templates/index.html:26
+msgid "Add"
+msgstr "Adicionar"
+
+#: conf/admin_templates/index.html:32
+msgid "Change"
+msgstr "Modificar"
+
+#: conf/admin_templates/index.html:42
+msgid "You don't have permission to edit anything."
+msgstr "Você não tem permissão para edição."
+
+#: conf/admin_templates/index.html:50
+msgid "Recent Actions"
+msgstr "Ações Recentes"
+
+#: conf/admin_templates/index.html:51
+msgid "My Actions"
+msgstr "Minhas Ações"
+
+#: conf/admin_templates/index.html:55
+msgid "None available"
+msgstr "Nenhuma disponível"
 
 #: conf/admin_templates/login.html:14
 msgid "Username:"
@@ -163,6 +199,22 @@ msgstr "Alterar senha"
 msgid "Log out"
 msgstr "Encerrar sessão"
 
+#: conf/admin_templates/registration/password_change_done.html:3
+#: conf/admin_templates/registration/password_change_form.html:3
+#: conf/admin_templates/registration/password_change_form.html:5
+#: conf/admin_templates/registration/password_change_form.html:9
+msgid "Password change"
+msgstr "Alterar senha"
+
+#: conf/admin_templates/registration/password_change_done.html:5
+#: conf/admin_templates/registration/password_change_done.html:9
+msgid "Password change successful"
+msgstr "Senha alterada com sucesso"
+
+#: conf/admin_templates/registration/password_change_done.html:11
+msgid "Your password was changed."
+msgstr "Sua senha foi alterada."
+
 #: conf/admin_templates/registration/password_reset_form.html:3
 #: conf/admin_templates/registration/password_reset_form.html:5
 #: conf/admin_templates/registration/password_reset_form.html:9
@@ -185,6 +237,51 @@ msgstr "Endereço de e-mail:"
 #: conf/admin_templates/registration/password_reset_form.html:15
 msgid "Reset my password"
 msgstr "Reinicializar minha senha"
+
+#: conf/admin_templates/registration/logged_out.html:7
+msgid "Thanks for spending some quality time with the Web site today."
+msgstr "Obrigado por visitar nosso Web site hoje."
+
+#: conf/admin_templates/registration/logged_out.html:9
+msgid "Log in again"
+msgstr "Acessar novamente"
+
+#: conf/admin_templates/registration/password_reset_done.html:5
+#: conf/admin_templates/registration/password_reset_done.html:9
+msgid "Password reset successful"
+msgstr "Senha inicializada com sucesso"
+
+#: conf/admin_templates/registration/password_reset_done.html:11
+msgid ""
+"We've e-mailed a new password to the e-mail address you submitted. You "
+"should be receiving it shortly."
+msgstr ""
+"Nós enviamos uma nova senha para o e-mail que você informou. Você deve estar "
+"recebendo uma mensagem em breve."
+
+#: conf/admin_templates/registration/password_change_form.html:11
+msgid ""
+"Please enter your old password, for security's sake, and then enter your new "
+"password twice so we can verify you typed it in correctly."
+msgstr ""
+"Por favor, informe sua senha antiga, por segurança, e então informe sua nova "
+"senha duas vezes para que possamos verificar que se ela está correta."
+
+#: conf/admin_templates/registration/password_change_form.html:16
+msgid "Old password:"
+msgstr "Senha antiga:"
+
+#: conf/admin_templates/registration/password_change_form.html:18
+msgid "New password:"
+msgstr "Nova senha:"
+
+#: conf/admin_templates/registration/password_change_form.html:20
+msgid "Confirm password:"
+msgstr "Confirme a senha:"
+
+#: conf/admin_templates/registration/password_change_form.html:22
+msgid "Change my password"
+msgstr "Alterar minha senha"
 
 #: conf/admin_templates/registration/password_reset_email.html:1
 msgid "You're receiving this e-mail because you requested a password reset"
@@ -217,67 +314,252 @@ msgstr "Obrigado por usar nosso site!"
 msgid "The %(site_name)s team"
 msgstr "Time do %(site_name)s"
 
-#: conf/admin_templates/registration/logged_out.html:7
-msgid "Thanks for spending some quality time with the Web site today."
-msgstr "Obrigado por visitar nosso Web site hoje."
-
-#: conf/admin_templates/registration/logged_out.html:9
-msgid "Log in again"
-msgstr "Acessar novamente"
-
-#: conf/admin_templates/registration/password_reset_done.html:5
-#: conf/admin_templates/registration/password_reset_done.html:9
-msgid "Password reset successful"
-msgstr "Senha inicializada com sucesso"
-
-#: conf/admin_templates/registration/password_reset_done.html:11
-msgid ""
-"We've e-mailed a new password to the e-mail address you submitted. You "
-"should be receiving it shortly."
-msgstr ""
-"Nós enviamos uma nova senha para o e-mail que você informou. Você deve "
-"estar recebendo uma mensagem em breve."
-
-#: conf/admin_templates/registration/password_change_form.html:3
-#: conf/admin_templates/registration/password_change_form.html:5
-#: conf/admin_templates/registration/password_change_form.html:9
-#: conf/admin_templates/registration/password_change_done.html:3
-msgid "Password change"
-msgstr "Alterar senha"
-
-#: conf/admin_templates/registration/password_change_form.html:11
-msgid ""
-"Please enter your old password, for security's sake, and then enter your new "
-"password twice so we can verify you typed it in correctly."
-msgstr ""
-"Por favor, informe sua senha antiga, por segurança, e então informe sua nova "
-"senha duas vezes para que possamos verificar que se ela está correta."
-
-#: conf/admin_templates/registration/password_change_form.html:16
-msgid "Old password:"
-msgstr "Senha antiga:"
-
-#: conf/admin_templates/registration/password_change_form.html:18
-msgid "New password:"
-msgstr "Nova senha:"
-
-#: conf/admin_templates/registration/password_change_form.html:20
-msgid "Confirm password:"
-msgstr "Confirme a senha:"
-
-#: conf/admin_templates/registration/password_change_form.html:22
-msgid "Change my password"
-msgstr "Alterar minha senha"
-
-#: conf/admin_templates/registration/password_change_done.html:5
-#: conf/admin_templates/registration/password_change_done.html:9
-msgid "Password change successful"
-msgstr "Senha alterada com sucesso"
-
-#: conf/admin_templates/registration/password_change_done.html:11
-msgid "Your password was changed."
-msgstr "Sua senha foi alterada."
-
-#: core/validators.py:56
+#: core/validators.py:57
 msgid "This value must contain only letters, numbers and underscores."
 msgstr "Deve conter apenas letras, números e sublinhados (_)."
+
+#: core/validators.py:61
+#, fuzzy
+msgid "This value must contain only letters, numbers, underscores and slashes."
+msgstr "Deve conter apenas letras, números e sublinhados (_)."
+
+#: core/validators.py:65
+msgid "Uppercase letters are not allowed here."
+msgstr ""
+
+#: core/validators.py:69
+msgid "Lowercase letters are not allowed here."
+msgstr ""
+
+#: core/validators.py:76
+msgid "Enter only digits separated by commas."
+msgstr ""
+
+#: core/validators.py:88
+msgid "Enter valid e-mail addresses separated by commas."
+msgstr ""
+
+#: core/validators.py:95
+msgid "Please enter a valid IP address."
+msgstr ""
+
+#: core/validators.py:99
+msgid "Empty values are not allowed here."
+msgstr ""
+
+#: core/validators.py:103
+msgid "Non-numeric characters aren't allowed here."
+msgstr ""
+
+#: core/validators.py:107
+msgid "This value can't be comprised solely of digits."
+msgstr ""
+
+#: core/validators.py:112
+msgid "Enter a whole number."
+msgstr ""
+
+#: core/validators.py:116
+msgid "Only alphabetical characters are allowed here."
+msgstr ""
+
+#: core/validators.py:120
+msgid "Enter a valid date in YYYY-MM-DD format."
+msgstr ""
+
+#: core/validators.py:124
+msgid "Enter a valid time in HH:MM format."
+msgstr ""
+
+#: core/validators.py:128
+msgid "Enter a valid date/time in YYYY-MM-DD HH:MM format."
+msgstr ""
+
+#: core/validators.py:132
+#, fuzzy
+msgid "Enter a valid e-mail address."
+msgstr "Endereço de e-mail:"
+
+#: core/validators.py:144
+msgid ""
+"Upload a valid image. The file you uploaded was either not an image or a "
+"corrupted image."
+msgstr ""
+
+#: core/validators.py:151
+#, python-format
+msgid "The URL %s does not point to a valid image."
+msgstr ""
+
+#: core/validators.py:155
+#, python-format
+msgid "Phone numbers must be in XXX-XXX-XXXX format. \"%s\" is invalid."
+msgstr ""
+
+#: core/validators.py:163
+#, python-format
+msgid "The URL %s does not point to a valid QuickTime video."
+msgstr ""
+
+#: core/validators.py:167
+msgid "A valid URL is required."
+msgstr ""
+
+#: core/validators.py:181
+#, python-format
+msgid ""
+"Valid HTML is required. Specific errors are:\n"
+"%s"
+msgstr ""
+
+#: core/validators.py:188
+#, python-format
+msgid "Badly formed XML: %s"
+msgstr ""
+
+#: core/validators.py:198
+#, python-format
+msgid "Invalid URL: %s"
+msgstr ""
+
+#: core/validators.py:200
+#, python-format
+msgid "The URL %s is a broken link."
+msgstr ""
+
+#: core/validators.py:206
+msgid "Enter a valid U.S. state abbreviation."
+msgstr ""
+
+#: core/validators.py:221
+#, python-format
+msgid "Watch your mouth! The word %s is not allowed here."
+msgid_plural "Watch your mouth! The words %s are not allowed here."
+msgstr[0] ""
+msgstr[1] ""
+
+#: core/validators.py:228
+#, python-format
+msgid "This field must match the '%s' field."
+msgstr ""
+
+#: core/validators.py:247
+msgid "Please enter something for at least one field."
+msgstr ""
+
+#: core/validators.py:256 core/validators.py:267
+msgid "Please enter both fields or leave them both empty."
+msgstr ""
+
+#: core/validators.py:274
+#, python-format
+msgid "This field must be given if %(field)s is %(value)s"
+msgstr ""
+
+#: core/validators.py:286
+#, python-format
+msgid "This field must be given if %(field)s is not %(value)s"
+msgstr ""
+
+#: core/validators.py:305
+msgid "Duplicate values are not allowed."
+msgstr ""
+
+#: core/validators.py:328
+#, python-format
+msgid "This value must be a power of %s."
+msgstr ""
+
+#: core/validators.py:339
+msgid "Please enter a valid decimal number."
+msgstr ""
+
+#: core/validators.py:341
+#, python-format
+msgid "Please enter a valid decimal number with at most %s total digit."
+msgid_plural ""
+"Please enter a valid decimal number with at most %s total digits."
+msgstr[0] ""
+msgstr[1] ""
+
+#: core/validators.py:344
+#, python-format
+msgid "Please enter a valid decimal number with at most %s decimal place."
+msgid_plural ""
+"Please enter a valid decimal number with at most %s decimal places."
+msgstr[0] ""
+msgstr[1] ""
+
+#: core/validators.py:354
+#, python-format
+msgid "Make sure your uploaded file is at least %s bytes big."
+msgstr ""
+
+#: core/validators.py:355
+#, python-format
+msgid "Make sure your uploaded file is at most %s bytes big."
+msgstr ""
+
+#: core/validators.py:368
+msgid "The format for this field is wrong."
+msgstr ""
+
+#: core/validators.py:383
+msgid "This field is invalid."
+msgstr ""
+
+#: core/validators.py:418
+#, python-format
+msgid "Could not retrieve anything from %s."
+msgstr ""
+
+#: core/validators.py:421
+#, python-format
+msgid ""
+"The URL %(url)s returned the invalid Content-Type header '%(contenttype)s'."
+msgstr ""
+
+#: core/validators.py:454
+#, python-format
+msgid ""
+"Please close the unclosed %(tag)s tag from line %(line)s. (Line starts with "
+"\"%(start)s\".)"
+msgstr ""
+
+#: core/validators.py:458
+#, python-format
+msgid ""
+"Some text starting on line %(line)s is not allowed in that context. (Line "
+"starts with \"%(start)s\".)"
+msgstr ""
+
+#: core/validators.py:463
+#, python-format
+msgid ""
+"\"%(attr)s\" on line %(line)s is an invalid attribute. (Line starts with \"%"
+"(start)s\".)"
+msgstr ""
+
+#: core/validators.py:468
+#, python-format
+msgid ""
+"\"<%(tag)s>\" on line %(line)s is an invalid tag. (Line starts with \"%"
+"(start)s\".)"
+msgstr ""
+
+#: core/validators.py:472
+#, python-format
+msgid ""
+"A tag on line %(line)s is missing one or more required attributes. (Line "
+"starts with \"%(start)s\".)"
+msgstr ""
+
+#: core/validators.py:477
+#, python-format
+msgid ""
+"The \"%(attr)s\" attribute on line %(line)s has an invalid value. (Line "
+"starts with \"%(start)s\".)"
+msgstr ""
+
+#~ msgid "Click to change"
+#~ msgstr "Clique para alterar"

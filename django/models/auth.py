@@ -1,5 +1,6 @@
 from django.core import meta, validators
 from django.models import core
+from django.utils.translation import gettext_lazy
 
 class Permission(meta.Model):
     name = meta.CharField(maxlength=50)
@@ -29,14 +30,14 @@ class User(meta.Model):
     first_name = meta.CharField(maxlength=30, blank=True)
     last_name = meta.CharField(maxlength=30, blank=True)
     email = meta.EmailField('e-mail address', blank=True)
-    password_md5 = meta.CharField('password', maxlength=32, help_text="Use an MD5 hash -- not the raw password.")
-    is_staff = meta.BooleanField('staff status', help_text="Designates whether the user can log into this admin site.")
+    password_md5 = meta.CharField('password', maxlength=32, help_text=gettext_lazy("Use an MD5 hash -- not the raw password."))
+    is_staff = meta.BooleanField('staff status', help_text=gettext_lazy("Designates whether the user can log into this admin site."))
     is_active = meta.BooleanField('active', default=True)
     is_superuser = meta.BooleanField('superuser status')
     last_login = meta.DateTimeField(default=meta.LazyDate())
     date_joined = meta.DateTimeField(default=meta.LazyDate())
     groups = meta.ManyToManyField(Group, blank=True,
-        help_text="In addition to the permissions manually assigned, this user will also get all permissions granted to each group he/she is in.")
+        help_text=gettext_lazy("In addition to the permissions manually assigned, this user will also get all permissions granted to each group he/she is in."))
     user_permissions = meta.ManyToManyField(Permission, blank=True, filter_interface=meta.HORIZONTAL)
     class META:
         module_constants = {

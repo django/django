@@ -24,7 +24,7 @@ phone_re = re.compile(r'^[A-PR-Y0-9]{3}-[A-PR-Y0-9]{3}-[A-PR-Y0-9]{4}$', re.IGNO
 url_re = re.compile(r'^http://\S+$')
 
 from django.conf.settings import JING_PATH
-from django.utils.translation import gettext_lazy
+from django.utils.translation import gettext_lazy, ngettext
 
 class ValidationError(Exception):
     def __init__(self, message):
@@ -218,10 +218,9 @@ def hasNoProfanities(field_data, all_data):
     if words_seen:
         from django.utils.text import get_text_list
         plural = len(words_seen) > 1
-        raise ValidationError, _("Watch your mouth! The word%s %s %s not allowed here.") % \
-            (plural and 's' or '',
-            get_text_list(['"%s%s%s"' % (i[0], '-'*(len(i)-2), i[-1]) for i in words_seen], 'and'),
-            plural and 'are' or 'is')
+        raise ValidationError, ngettext("Watch your mouth! The word %s is not allowed here.",
+            "Watch your mouth! The words %s are not allowed here.", plural) % \
+            get_text_list(['"%s%s%s"' % (i[0], '-'*(len(i)-2), i[-1]) for i in words_seen], 'and')
 
 class AlwaysMatchesOtherField:
     def __init__(self, other_field_name, error_message=None):
@@ -272,7 +271,8 @@ class RequiredIfOtherFieldEquals:
     def __init__(self, other_field, other_value, error_message=None):
         self.other_field = other_field
         self.other_value = other_value
-        self.error_message = error_message or gettext_lazy("This field must be given if %s is %s") % (other_field, other_value)
+        self.error_message = error_message or gettext_lazy("This field must be given if %(field)s is %(value)s") % {
+            'field': other_field, 'value': other_value}
         self.always_test = True
 
     def __call__(self, field_data, all_data):
@@ -283,7 +283,8 @@ class RequiredIfOtherFieldDoesNotEqual:
     def __init__(self, other_field, other_value, error_message=None):
         self.other_field = other_field
         self.other_value = other_value
-        self.error_message = error_message or gettext_lazy("This field must be given if %s is not %s") % (other_field, other_value)
+        self.error_message = error_message or gettext_lazy("This field must be given if %(field)s is not %(value)s") % {
+            'field': other_field, 'value': other_value}
         self.always_test = True
 
     def __call__(self, field_data, all_data):
@@ -337,11 +338,11 @@ class IsValidFloat:
         except ValueError:
             raise ValidationError, _("Please enter a valid decimal number.")
         if len(data) > (self.max_digits + 1):
-            raise ValidationError, _("Please enter a valid decimal number with at most %s total digit%s.") % \
-                (self.max_digits, self.max_digits > 1 and 's' or '')
+            raise ValidationError, ngettext( "Please enter a valid decimal number with at most %s total digit.",
+                "Please enter a valid decimal number with at most %s total digits.", self.max_digits) % self.max_digits
         if '.' in data and len(data.split('.')[1]) > self.decimal_places:
-            raise ValidationError, _("Please enter a valid decimal number with at most %s decimal place%s.") % \
-                (self.decimal_places, self.decimal_places > 1 and 's' or '')
+            raise ValidationError, ngettext("Please enter a valid decimal number with at most %s decimal place.",
+                "Please enter a valid decimal number with at most %s decimal places.", self.decimal_places) % self.decimal_places
 
 class HasAllowableSize:
     """
@@ -417,7 +418,8 @@ class URLMimeTypeCheck:
             raise URLMimeTypeCheck.CouldNotRetrieve, _("Could not retrieve anything from %s.") % field_data
         content_type = info['content-type']
         if content_type not in self.mime_type_list:
-            raise URLMimeTypeCheck.InvalidContentType, _("The URL %s returned the invalid Content-Type header '%s'.") % (field_data, content_type)
+            raise URLMimeTypeCheck.InvalidContentType, _("The URL %(url)s returned the invalid Content-Type header '%(contenttype)s'.") % {
+                'url': field_data, 'contenttype': content_type}
 
 class RelaxNGCompact:
     "Validate against a Relax NG compact schema"
@@ -449,31 +451,31 @@ class RelaxNGCompact:
             # Scrape the Jing error messages to reword them more nicely.
             m = re.search(r'Expected "(.*?)" to terminate element starting on line (\d+)', message)
             if m:
-                display_errors.append(_('Please close the unclosed %s tag from line %s. (Line starts with "%s".)') % \
-                    (m.group(1).replace('/', ''), m.group(2), lines[int(m.group(2)) - 1][:30]))
+                display_errors.append(_('Please close the unclosed %(tag)s tag from line %(line)s. (Line starts with "%(start)s".)') % \
+                    {'tag':m.group(1).replace('/', ''), 'line':m.group(2), 'start':lines[int(m.group(2)) - 1][:30]})
                 continue
             if message.strip() == 'text not allowed here':
-                display_errors.append(_('Some text starting on line %s is not allowed in that context. (Line starts with "%s".)') % \
-                    (line, lines[int(line) - 1][:30]))
+                display_errors.append(_('Some text starting on line %(line)s is not allowed in that context. (Line starts with "%(start)s".)') % \
+                    {'line':line, 'start':lines[int(line) - 1][:30]})
                 continue
             m = re.search(r'\s*attribute "(.*?)" not allowed at this point; ignored', message)
             if m:
-                display_errors.append(_('"%s" on line %s is an invalid attribute. (Line starts with "%s".)') % \
-                    (m.group(1), line, lines[int(line) - 1][:30]))
+                display_errors.append(_('"%(attr)s" on line %(line)s is an invalid attribute. (Line starts with "%(start)s".)') % \
+                    {'attr':m.group(1), 'line':line, 'start':lines[int(line) - 1][:30]})
                 continue
             m = re.search(r'\s*unknown element "(.*?)"', message)
             if m:
-                display_errors.append(_('"<%s>" on line %s is an invalid tag. (Line starts with "%s".)') % \
-                    (m.group(1), line, lines[int(line) - 1][:30]))
+                display_errors.append(_('"<%(tag)s>" on line %(line)s is an invalid tag. (Line starts with "%(start)s".)') % \
+                    {'tag':m.group(1), 'line':line, 'start':lines[int(line) - 1][:30]})
                 continue
             if message.strip() == 'required attributes missing':
-                display_errors.append(_('A tag on line %s is missing one or more required attributes. (Line starts with "%s".)') % \
-                    (line, lines[int(line) - 1][:30]))
+                display_errors.append(_('A tag on line %(line)s is missing one or more required attributes. (Line starts with "%(start)s".)') % \
+                    {'line':line, 'start':lines[int(line) - 1][:30]})
                 continue
             m = re.search(r'\s*bad value for attribute "(.*?)"', message)
             if m:
-                display_errors.append(_('The "%s" attribute on line %s has an invalid value. (Line starts with "%s".)') % \
-                    (m.group(1), line, lines[int(line) - 1][:30]))
+                display_errors.append(_('The "%(attr)s" attribute on line %(line)s has an invalid value. (Line starts with "%(start)s".)') % \
+                    {'attr':m.group(1), 'line':line, 'start':lines[int(line) - 1][:30]})
                 continue
             # Failing all those checks, use the default error message.
             display_error = 'Line %s: %s [%s]' % (line, message, level.strip())
