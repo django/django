@@ -355,9 +355,12 @@ See http://www.thaiopensource.com/relaxng/jing.html .
 LANGUAGE_CODE
 -------------
 
-Default: ``'en-us'``
+Default: ``'en'``
 
-A string representing the language code for this installation.
+A string representing the language code for this installation. This should
+be in locale format, that's 'en_US' for us-english. If you want to send
+out the language in your HTML code, use the LANGUAGE_CODE attribute of the
+request, instead, as the chosen language will depend on the browsers settings.
 
 MANAGERS
 --------
