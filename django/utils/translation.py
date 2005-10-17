@@ -247,6 +247,8 @@ def get_language_from_request(request):
     if request.GET or request.POST:
         lang_code = request.GET.get('django_language', None) or request.POST.get('django_language', None)
         if lang_code is not None:
+            if lang_code == 'en' or lang_code.startswith('en_'):
+                return lang_code
             lang = gettext_module.find('django', globalpath, [lang_code])
             if lang is not None:
                 if hasattr(request, 'session'):
@@ -258,12 +260,16 @@ def get_language_from_request(request):
     if hasattr(request, 'session'):
         lang_code = request.session.get('django_language', None)
         if lang_code is not None:
+            if lang_code == 'en' or lang_code.startswith('en_'):
+                return lang_code
             lang = gettext_module.find('django', globalpath, [lang_code])
             if lang is not None:
                 return lang_code
     
     lang_code = request.COOKIES.get('django_language', None)
     if lang_code is not None:
+        if lang_code == 'en' or lang_code.startswith('en_'):
+            return lang_code
         lang = gettext_module.find('django', globalpath, [lang_code])
         if lang is not None:
             return lang_code
