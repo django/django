@@ -1,3 +1,4 @@
+from django.contrib.admin.views.decorators import staff_member_required
 from django.core import formfields, validators
 from django.core import template
 from django.core.template import loader
@@ -26,6 +27,7 @@ def template_validator(request):
         'title': 'Template validator',
         'form': formfields.FormWrapper(manipulator, new_data, errors),
     }, context_instance=DjangoContext(request))
+template_validator = staff_member_required(template_validator)
 
 class TemplateValidator(formfields.Manipulator):
     def __init__(self, settings_modules):

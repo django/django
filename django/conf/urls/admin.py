@@ -2,24 +2,24 @@ from django.conf.urls.defaults import *
 from django.conf.settings import INSTALLED_APPS
 
 urlpatterns = (
-    ('^$', 'django.views.admin.main.index'),
+    ('^$', 'django.contrib.admin.views.main.index'),
     ('^logout/$', 'django.views.auth.login.logout'),
     ('^password_change/$', 'django.views.registration.passwords.password_change'),
     ('^password_change/done/$', 'django.views.registration.passwords.password_change_done'),
-    ('^template_validator/$', 'django.views.admin.template.template_validator'),
+    ('^template_validator/$', 'django.contrib.admin.views.template.template_validator'),
 
     # Documentation
-    ('^doc/$', 'django.views.admin.doc.doc_index'),
-    ('^doc/bookmarklets/$', 'django.views.admin.doc.bookmarklets'),
-    ('^doc/tags/$', 'django.views.admin.doc.template_tag_index'),
-    ('^doc/filters/$', 'django.views.admin.doc.template_filter_index'),
-    ('^doc/views/$', 'django.views.admin.doc.view_index'),
-    ('^doc/views/jump/$', 'django.views.admin.doc.jump_to_view'),
-    ('^doc/views/(?P<view>[^/]+)/$', 'django.views.admin.doc.view_detail'),
-    ('^doc/models/$', 'django.views.admin.doc.model_index'),
-    ('^doc/models/(?P<model>[^/]+)/$', 'django.views.admin.doc.model_detail'),
+    ('^doc/$', 'django.contrib.admin.views.doc.doc_index'),
+    ('^doc/bookmarklets/$', 'django.contrib.admin.views.doc.bookmarklets'),
+    ('^doc/tags/$', 'django.contrib.admin.views.doc.template_tag_index'),
+    ('^doc/filters/$', 'django.contrib.admin.views.doc.template_filter_index'),
+    ('^doc/views/$', 'django.contrib.admin.views.doc.view_index'),
+    ('^doc/views/jump/$', 'django.contrib.admin.views.doc.jump_to_view'),
+    ('^doc/views/(?P<view>[^/]+)/$', 'django.contrib.admin.views.doc.view_detail'),
+    ('^doc/models/$', 'django.contrib.admin.views.doc.model_index'),
+    ('^doc/models/(?P<model>[^/]+)/$', 'django.contrib.admin.views.doc.model_detail'),
 #    ('^doc/templates/$', 'django.views.admin.doc.template_index'),
-    ('^doc/templates/(?P<template>.*)/$', 'django.views.admin.doc.template_detail'),
+    ('^doc/templates/(?P<template>.*)/$', 'django.contrib.admin.views.doc.template_detail'),
 )
 
 if 'ellington.events' in INSTALLED_APPS:
@@ -48,13 +48,12 @@ if 'ellington.media' in INSTALLED_APPS:
 
 urlpatterns += (
     # Metasystem admin pages
-    ('^(?P<app_label>[^/]+)/(?P<module_name>[^/]+)/add_old/$', 'django.views.admin.main.add_stage'),
-    ('^(?P<app_label>[^/]+)/(?P<module_name>[^/]+)/(?P<object_id>.+)_old/$', 'django.views.admin.main.change_stage'),
-    ('^(?P<app_label>[^/]+)/(?P<module_name>[^/]+)/$', 'django.views.admin.main.change_list'),
-    ('^(?P<app_label>[^/]+)/(?P<module_name>[^/]+)/add/$', 'django.views.admin.main.add_stage_new'),
-    ('^(?P<app_label>[^/]+)/(?P<module_name>[^/]+)/jsvalidation/$', 'django.views.admin.jsvalidation.jsvalidation'),
-    ('^(?P<app_label>[^/]+)/(?P<module_name>[^/]+)/(?P<object_id>.+)/history/$', 'django.views.admin.main.history'),
-    ('^(?P<app_label>[^/]+)/(?P<module_name>[^/]+)/(?P<object_id>.+)/delete/$', 'django.views.admin.main.delete_stage'),
-    ('^(?P<app_label>[^/]+)/(?P<module_name>[^/]+)/(?P<object_id>.+)/$', 'django.views.admin.main.change_stage_new'),
+    ('^(?P<app_label>[^/]+)/(?P<module_name>[^/]+)/add_old/$', 'django.contrib.admin.views.main.add_stage'),
+    ('^(?P<app_label>[^/]+)/(?P<module_name>[^/]+)/(?P<object_id>.+)_old/$', 'django.contrib.admin.views.main.change_stage'),
+    ('^(?P<app_label>[^/]+)/(?P<module_name>[^/]+)/$', 'django.contrib.admin.views.main.change_list'),
+    ('^(?P<app_label>[^/]+)/(?P<module_name>[^/]+)/add/$', 'django.contrib.admin.views.main.add_stage_new'),
+    ('^(?P<app_label>[^/]+)/(?P<module_name>[^/]+)/(?P<object_id>.+)/history/$', 'django.contrib.admin.views.main.history'),
+    ('^(?P<app_label>[^/]+)/(?P<module_name>[^/]+)/(?P<object_id>.+)/delete/$', 'django.contrib.admin.views.main.delete_stage'),
+    ('^(?P<app_label>[^/]+)/(?P<module_name>[^/]+)/(?P<object_id>.+)/$', 'django.contrib.admin.views.main.change_stage_new'),
 )
 urlpatterns = patterns('', *urlpatterns)

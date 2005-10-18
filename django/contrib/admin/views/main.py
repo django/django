@@ -1,6 +1,8 @@
-# Generic admin views, with admin templates created dynamically at runtime.
+# Generic admin views.
 
-from django.core import formfields, meta, template_loader, template
+from django.contrib.admin.views.decorators import staff_member_required
+from django.core import formfields, meta, template
+from django.core.template import loader
 from django.core.meta.fields import BoundField, BoundFieldLine, BoundFieldSet
 from django.core.exceptions import Http404, ObjectDoesNotExist, PermissionDenied
 from django.core.extensions import DjangoContext as Context
@@ -49,6 +51,7 @@ def get_query_string(original_params, new_params={}, remove=[]):
 
 def index(request):
     return render_to_response('index', {'title': 'Site administration'}, context_instance=Context(request))
+index = staff_member_required(index)
 
 def change_list(request, app_label, module_name):
     from django.core import paginator
@@ -487,12 +490,13 @@ def change_list(request, app_label, module_name):
 
     raw_template.append('</div>\n</div>')
     raw_template.append('{% endblock %}\n')
-    t = template_loader.get_template_from_string(''.join(raw_template))
+    t = loader.get_template_from_string(''.join(raw_template))
     c = Context(request, {
         'title': (is_popup and 'Select %s' % opts.verbose_name or 'Select %s to change' % opts.verbose_name),
         'is_popup': is_popup,
     })
     return HttpResponse(t.render(c))
+change_list = staff_member_required(change_list)
 
 use_raw_id_admin = lambda field: isinstance(field.rel, (meta.ManyToOne, meta.ManyToMany)) and field.rel.raw_id_admin
 
@@ -721,7 +725,7 @@ def add_stage_new(request, app_label, module_name, show_delete=False, form_url='
     fill_extra_context(opts, app_label, c, add=True)
    
     return render_to_response("admin_change_form", context_instance=c) 
-
+add_stage_new = staff_member_required(add_stage_new)
 
 
 def change_stage_new(request, app_label, module_name, object_id):
@@ -817,10 +821,8 @@ def change_stage_new(request, app_label, module_name, object_id):
 
     fill_extra_context(opts, app_label, c, change=True)
     
-    #t = template_loader.get_template_from_string(raw_template)
-    
     return render_to_response('admin_change_form', context_instance=c);
-
+change_stage_new = staff_member_required(change_stage_new)
 
 def _get_template(opts, app_label, add=False, change=False, show_delete=False, form_url=''):
     admin_field_objs = opts.admin.get_field_objs(opts)
@@ -1144,8 +1146,9 @@ def add_stage(request, app_label, module_name, show_delete=False, form_url='', p
     if object_id_override is not None:
         c['object_id'] = object_id_override
     raw_template = _get_template(opts, app_label, add=True, show_delete=show_delete, form_url=form_url)
-    t = template_loader.get_template_from_string(raw_template)
+    t = loader.get_template_from_string(raw_template)
     return HttpResponse(t.render(c))
+add_stage = staff_member_required(add_stage)
 
 def change_stage(request, app_label, module_name, object_id):
     mod, opts = _get_mod_opts(app_label, module_name)
@@ -1271,8 +1274,9 @@ def change_stage(request, app_label, module_name, object_id):
     })
     raw_template = _get_template(opts, app_label, change=True)
 #     return HttpResponse(raw_template, mimetype='text/plain')
-    t = template_loader.get_template_from_string(raw_template)
+    t = loader.get_template_from_string(raw_template)
     return HttpResponse(t.render(c))
+change_stage = staff_member_required(change_stage)
 
 def _nest_help(obj, depth, val):
     current = obj
@@ -1384,6 +1388,7 @@ def delete_stage(request, app_label, module_name, object_id):
         "deleted_objects": deleted_objects,
         "perms_lacking": perms_needed,
     }, context_instance=Context(request))
+delete_stage = staff_member_required(delete_stage)
 
 def history(request, app_label, module_name, object_id):
     mod, opts = _get_mod_opts(app_label, module_name)
@@ -1397,3 +1402,4 @@ def history(request, app_label, module_name, object_id):
         'module_name': capfirst(opts.verbose_name_plural),
         'object': obj,
     }, context_instance=Context(request))
+history = staff_member_required(history)

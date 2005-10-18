@@ -1,11 +1,12 @@
 from django.core import meta
 from django import templatetags
 from django.conf import settings
+from django.contrib.admin.views.decorators import staff_member_required
 from django.models.core import sites
 from django.core.extensions import DjangoContext, render_to_response
 from django.core.exceptions import Http404, ViewDoesNotExist
-from django.core import template, template_loader, urlresolvers
-from django.core.template import defaulttags, defaultfilters
+from django.core import template, urlresolvers
+from django.core.template import defaulttags, defaultfilters, loader
 try:
     from django.parts.admin import doc
 except ImportError:
@@ -19,11 +20,13 @@ def doc_index(request):
     if not doc:
         return missing_docutils_page(request)
     return render_to_response('doc/index', context_instance=DjangoContext(request))
+doc_index = staff_member_required(doc_index)
 
 def bookmarklets(request):
     return render_to_response('doc/bookmarklets', {
         'admin_url' : "%s://%s" % (os.environ.get('HTTPS') == 'on' and 'https' or 'http', request.META['HTTP_HOST']),
     }, context_instance=DjangoContext(request))
+bookmarklets = staff_member_required(bookmarklets)
 
 def template_tag_index(request):
     import sys
@@ -61,6 +64,7 @@ def template_tag_index(request):
     template.registered_tags, template.registered_filters = saved_tagset
 
     return render_to_response('doc/template_tag_index', {'tags': tags}, context_instance=DjangoContext(request))
+template_tag_index = staff_member_required(template_tag_index)
 
 def template_filter_index(request):
     if not doc:
@@ -93,6 +97,7 @@ def template_filter_index(request):
     template.registered_tags, template.registered_filters = saved_tagset
 
     return render_to_response('doc/template_filter_index', {'filters': filters}, context_instance=DjangoContext(request))
+template_filter_index = staff_member_required(template_filter_index)
 
 def view_index(request):
     if not doc:
@@ -112,6 +117,7 @@ def view_index(request):
                 'url'    : simplify_regex(regex),
             })
     return render_to_response('doc/view_index', {'views': views}, context_instance=DjangoContext(request))
+view_index = staff_member_required(view_index)
 
 def view_detail(request, view):
     if not doc:
@@ -135,6 +141,7 @@ def view_detail(request, view):
         'body': body,
         'meta': metadata,
     }, context_instance=DjangoContext(request))
+view_detail = staff_member_required(view_detail)
 
 def model_index(request):
     if not doc:
@@ -150,6 +157,7 @@ def model_index(request):
                 'class'  : opts.module_name,
             })
     return render_to_response('doc/model_index', {'models': models}, context_instance=DjangoContext(request))
+model_index = staff_member_required(model_index)
 
 def model_detail(request, model):
     if not doc:
@@ -191,6 +199,7 @@ def model_detail(request, model):
         'summary': "Fields on %s objects" % opts.verbose_name,
         'fields': fields,
     }, context_instance=DjangoContext(request))
+model_detail = staff_member_required(model_detail)
 
 def template_detail(request, template):
     templates = []
@@ -210,6 +219,7 @@ def template_detail(request, template):
         'name': template,
         'templates': templates,
     }, context_instance=DjangoContext(request))
+template_detail = staff_member_required(template_detail)
 
 ####################
 # Helper functions #
@@ -223,7 +233,7 @@ def load_all_installed_template_libraries():
     # Clear out and reload default tags
     template.registered_tags.clear()
     reload(defaulttags)
-    reload(template_loader) # template_loader defines the block/extends tags
+    reload(loader) # loader defines the block/extends tags
 
     # Load any template tag libraries from installed apps
     for e in templatetags.__path__:
