@@ -283,12 +283,13 @@ class Field(object):
         else: 
            return self.get_default()
 
-    def flatten_data(self, obj = None):
+    def flatten_data(self, follow, obj = None):
          """
 	     Returns a dictionary mapping the field's manipulator field names to its
 	     "flattened" string values for the admin view. Obj is the instance to extract the 
              values from. 
 	 """
+     
 	 return { self.get_db_column(): self._get_val_from_obj(obj)}
 
     def get_follow(self, override=None):
@@ -361,7 +362,7 @@ class DateField(Field):
     def get_manipulator_field_objs(self):
         return [formfields.DateField]
 
-    def flatten_data(self, obj = None):
+    def flatten_data(self, follow, obj = None):
     	val = self._get_val_from_obj(obj)
         return {self.get_db_column(): (val is not None and val.strftime("%Y-%m-%d") or '')}
 
@@ -394,7 +395,7 @@ class DateTimeField(DateField):
             return datetime.datetime.combine(d, t)
         return self.get_default()
 
-    def flatten_data(self,obj = None):
+    def flatten_data(self,follow, obj = None):
         val = self._get_val_from_obj(obj) 
     	date_field, time_field = self.get_manipulator_field_names('')
 	return {date_field: (val is not None and val.strftime("%Y-%m-%d") or ''),
@@ -591,7 +592,7 @@ class TimeField(Field):
     def get_manipulator_field_objs(self):
         return [formfields.TimeField]
 
-    def flatten_data(self,obj = None):
+    def flatten_data(self,follow, obj = None):
         val = self._get_val_from_obj(obj) 
     	return {self.get_db_column(): (val is not None and val.strftime("%H:%M:%S") or '')} 
 
@@ -661,7 +662,7 @@ class ForeignKey(Field):
         else:
            return int(value)
 
-    def flatten_data(self, obj = None):
+    def flatten_data(self, follow, obj = None):
         if not obj: 
             # In required many-to-one fields with only one available choice,
             # select that one available choice. Note: We have to check that
@@ -671,7 +672,7 @@ class ForeignKey(Field):
                choice_list = self.get_choices_default()
                if len(choice_list) == 2:
                   return { self.name : choice_list[1][0] }
-        return Field.flatten_data(self, obj)
+        return Field.flatten_data(self, follow, obj)
 
 class ManyToManyField(Field):
     def __init__(self, to, **kwargs):
@@ -716,7 +717,7 @@ class ManyToManyField(Field):
                 len(badkeys) == 1 and badkeys[0] or tuple(badkeys),
                 len(badkeys) == 1 and "is" or "are")
 
-    def flatten_data(self, obj = None):
+    def flatten_data(self, follow, obj = None):
         new_data = {} 
         if obj:
             get_list_func = getattr(obj, 'get_%s_list' % self.rel.singular)

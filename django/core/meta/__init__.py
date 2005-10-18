@@ -156,20 +156,22 @@ class RelatedObject(object):
         self.name = opts.module_name
         self.var_name = opts.object_name.lower()
 
-    def flatten_data(self,obj = None):
+    def flatten_data(self,follow, obj = None):
         new_data = {}
         rel_instances = self.get_list(obj)
-
         for i, rel_instance in enumerate(rel_instances):
             instance_data = {} 
+            
             for f in self.opts.fields + self.opts.many_to_many:
-                field_data = f.flatten_data(rel_instance)
-                #if hasattr(f, 'editable') and f.editable and f != self.field:
-                for name, value in field_data.items():
-                    instance_data['%s.%d.%s' % (self.var_name, i, name)] = value
-            new_data.update(instance_data)             
+                #TODO fix for recursive manipulators.
+                fol = follow.get(f.name, None )
+                if fol:
+                    field_data = f.flatten_data(fol,rel_instance)
+                    for name, value in field_data.items():
+                        instance_data['%s.%d.%s' % (self.var_name, i, name)] = value
+            new_data.update(instance_data)
     
-        return new_data        
+        return new_data
 
     def extract_data(self, data):
         "Pull out the data meant for inline objects of this class, ie anything starting with our module name"
@@ -425,6 +427,11 @@ class Options:
 
     def get_all_related_objects_wrapped(self):
         return [RelatedObject(self, opts, field) for opts, field in self.get_all_related_objects()]
+
+    def get_followed_related_objects(self, follow=None):
+        if follow == None:
+            follow = self.get_follow()
+        return [f for f in self.get_all_related_objects_wrapped() if follow.get(f.name, None) ]
 
     def get_data_holders(self, follow=None):
         if follow == None :
@@ -1529,7 +1536,7 @@ def get_manipulator(opts, klass, extra_methods, add=False, change=False):
     man.__module__ = MODEL_PREFIX + '.' + opts.module_name # Set this explicitly, as above.
     man.__init__ = curry(manipulator_init, opts, add, change)
     man.save = curry(manipulator_save, opts, klass, add, change)
-    man.get_inline_related_objects_wrapped = curry(manipulator_get_inline_related_objects_wrapped, opts, klass, add, change)
+    man.get_related_objects = curry(manipulator_get_related_objects, opts, klass, add, change)
     man.flatten_data = curry(manipulator_flatten_data, opts, klass, add, change)
     for field_name_list in opts.unique_together:
         setattr(man, 'isUnique%s' % '_'.join(field_name_list), curry(manipulator_validator_unique_together, field_name_list, opts))
@@ -1762,14 +1769,15 @@ def manipulator_save(opts, klass, add, change, self, new_data):
             getattr(new_object, 'set_%s_order' % rel_opts.object_name.lower())(order)
     return new_object
 
-def manipulator_get_inline_related_objects_wrapped(opts, klass, add, change, self):
-    return opts.get_inline_related_objects_wrapped()
+def manipulator_get_related_objects(opts, klass, add, change, self):
+    return opts.get_followed_related_objects(self.follow)
         
 def manipulator_flatten_data(opts, klass, add, change, self):
      new_data = {}
      obj = change and self.original_object or None
      for f in opts.get_data_holders(self.follow):
-            new_data.update(f.flatten_data(obj))
+            fol = self.follow.get(f.name)
+            new_data.update(f.flatten_data(fol, obj))
      return new_data
 
 def manipulator_validator_unique_together(field_name_list, opts, self, field_data, all_data):

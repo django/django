@@ -821,7 +821,7 @@ def change_stage_new(request, app_label, module_name, object_id):
 
     fill_extra_context(opts, app_label, c, change=True)
     
-    return render_to_response('admin_change_form', context_instance=c);
+    return render_to_response('admin_change_form', context_instance=c)
 change_stage_new = staff_member_required(change_stage_new)
 
 def _get_template(opts, app_label, add=False, change=False, show_delete=False, form_url=''):

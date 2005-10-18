@@ -116,7 +116,7 @@ class FormWrapper:
                 data = field.extract_data(self.data)
 		return FormFieldWrapper(field, data, self.error_dict.get(field.field_name, []))
         if self.edit_inline:
-            self.fill_inline_collections() 
+            self.fill_inline_collections()
             for inline_collection in self._inline_collections:
                 if inline_collection.name == key:
                     return inline_collection
@@ -126,14 +126,12 @@ class FormWrapper:
     def fill_inline_collections(self): 
         if not self._inline_collections:
             ic = []
-            related_objects = self.manipulator.get_inline_related_objects_wrapped()
+            related_objects = self.manipulator.get_related_objects()
             for rel_obj in related_objects:
                 data = rel_obj.extract_data(self.data)
                 inline_collection = InlineObjectCollection(self.manipulator, rel_obj, data, self.error_dict)
                 ic.append(inline_collection)
             self._inline_collections = ic
-
-
 
     def has_errors(self):
         return self.error_dict != {}
