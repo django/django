@@ -180,7 +180,10 @@ def activate(appname, language):
     tuple of application name and language and installs it as
     the current translation object for the current thread.
     """
-    t = translation(appname, language)
+    if language == 'en' or language.startswith('en-'):
+        t = gettext_module.NullTranslations()
+    else:
+        t = translation(appname, language)
     _active[currentThread()] = t
 
 def deactivate():

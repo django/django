@@ -1,7 +1,12 @@
 #!/usr/bin/env python
 from django.core import management
+from django.utils import translation
 from optparse import OptionParser
 import os, sys
+
+# switch to english, because django-admin creates database content
+# like permissions, and those shouldn't contain any translations
+translation.activate('*', 'en-us')
 
 ACTION_MAPPING = {
     'adminindex': management.get_admin_index,
@@ -128,3 +133,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+
