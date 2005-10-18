@@ -2,7 +2,7 @@ from django.conf.urls.defaults import *
 from django.conf.settings import INSTALLED_APPS
 
 urlpatterns = (
-    ('^$', 'django.views.admin.main.index'),
+    ('^$', 'django.contrib.admin.views.main.index'),
     ('^logout/$', 'django.views.auth.login.logout'),
     ('^password_change/$', 'django.views.registration.passwords.password_change'),
     ('^password_change/done/$', 'django.views.registration.passwords.password_change_done'),
@@ -48,10 +48,10 @@ if 'ellington.media' in INSTALLED_APPS:
 
 urlpatterns += (
     # Metasystem admin pages
-    ('^(?P<app_label>[^/]+)/(?P<module_name>[^/]+)/$', 'django.views.admin.main.change_list'),
-    ('^(?P<app_label>[^/]+)/(?P<module_name>[^/]+)/add/$', 'django.views.admin.main.add_stage'),
-    ('^(?P<app_label>[^/]+)/(?P<module_name>[^/]+)/(?P<object_id>.+)/history/$', 'django.views.admin.main.history'),
-    ('^(?P<app_label>[^/]+)/(?P<module_name>[^/]+)/(?P<object_id>.+)/delete/$', 'django.views.admin.main.delete_stage'),
-    ('^(?P<app_label>[^/]+)/(?P<module_name>[^/]+)/(?P<object_id>.+)/$', 'django.views.admin.main.change_stage'),
+    ('^(?P<app_label>[^/]+)/(?P<module_name>[^/]+)/$', 'django.contrib.admin.views.main.change_list'),
+    ('^(?P<app_label>[^/]+)/(?P<module_name>[^/]+)/add/$', 'django.contrib.admin.views.main.add_stage'),
+    ('^(?P<app_label>[^/]+)/(?P<module_name>[^/]+)/(?P<object_id>.+)/history/$', 'django.contrib.admin.views.main.history'),
+    ('^(?P<app_label>[^/]+)/(?P<module_name>[^/]+)/(?P<object_id>.+)/delete/$', 'django.contrib.admin.views.main.delete_stage'),
+    ('^(?P<app_label>[^/]+)/(?P<module_name>[^/]+)/(?P<object_id>.+)/$', 'django.contrib.admin.views.main.change_stage'),
 )
 urlpatterns = patterns('', *urlpatterns)
