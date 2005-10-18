@@ -277,6 +277,11 @@ the charset definition in the file (it's in the Content-Type: line).
 The language code for storage is in locale format - so it is pt_BR for
 Brazilian or de_AT for Austrian German.
 
+If you don't have the gettext utilities installed, make-messages.py will create
+empty files. If that is the case, either install the gettext utilities, or
+just copy the conf/locale/en/LC_MESSAGES/django.po and start with that - it's just
+an empty translation file.
+
 Every message in the message file is of the same format. One line is the msgid.
 This is the actual string in the source - you don't change it. The other line
 is msgstr - this is the translation. It starts out empty. You change it.
