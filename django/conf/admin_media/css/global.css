@@ -1,45 +1,17 @@
 /*
-    ______________________________
-    DJANGO
-    Admin Global Styles
-
-    Extends base.css
-
-    by Wilson Miner
-    wilson@lawrence.com
-
-    Copyright (c) 2005
-    Lawrence Journal-World
-
-    645 New Hampshire
-    Lawrence, KS 66044
-
-    ______________________________
-    SITE DIMENSIONS
-
-    Site Width:     768px
-    Content Width:  750px
-    Main Column:    580px
-    Sidebar:        220px
-
-    ______________________________
-    COLORS
-
-    Blue           #5b80b2
-    Dark Blue      #036
-
+    DJANGO Admin Global Styles
+    by Wilson Miner wilson@lawrence.com
+    Copyright (c) 2005 Lawrence Journal-World
 */
 
 body { margin:0; padding:0; font-family:"Lucida Grande","Bitstream Vera Sans",Verdana,Arial,sans-serif; color:#333; }
 
 /* LINKS */
-
 a:link, a:visited { color: #5b80b2; text-decoration:none; }
 a:hover { color: #036; }
 a img { border:none; }
 
 /*  GLOBAL DEFAULTS */
-
 p, ol, ul, dl { margin:.2em 0 .8em 0; font-size:12px; }
 p { padding:0; line-height:140%; }
 h1,h2,h3,h4,h5 { font-weight:bold; }
@@ -67,7 +39,6 @@ div.system-message { background: #ffc; margin: 10px; padding: 6px 8px; font-size
 div.system-message p.system-message-title { padding:4px 5px 4px 25px; margin:0; color:red;background:#ffc url(../img/admin/icon_error.gif) 5px .3em no-repeat; }
 
 /*  PAGE STRUCTURE  */
-
 #container { position:relative; width:100%; min-width:720px; }
 #header	{ text-align:left; min-height:55px; _height:55px; }
 #content { margin:10px 15px; }
@@ -76,13 +47,6 @@ div.system-message p.system-message-title { padding:4px 5px 4px 25px; margin:0; 
 #footer	{ clear:both; padding:10px; }
 
 /*  COLUMN TYPES  */
-/*
-    colM = Main             |  M  |
-    colMS = Main, Sidebar   | M |S|
-    colSM = Sidebar, Main   |S| M |
-    flex = single-column, liquid width
-    superwide = single-column, extra-wide fixed width
-*/
 .colMS, .colM, .colSM, .colM #content-main, .colM #content-main .xfull { width:758px; } /* master site width for fixed-width pages */
 .colMS #content-main, .colSM #content-main, .colMS #content-main .xfull, .colSM #content-main .xfull { width:519px; } /* main column width for 2-column pages */
 .colMS #content-related, .colSM #content-related, .colSMS #content-related { width:220px; } /* sidebar column width */
@@ -94,7 +58,6 @@ div.system-message p.system-message-title { padding:4px 5px 4px 25px; margin:0; 
 .subcol { float:left; width:46%; margin-right:15px; }
 
 /*  WIDTHS  */
-
 .x50 { width:50px; }
 .x75 { width:75px; }
 .x100 { width:100px; }
@@ -106,7 +69,6 @@ div.system-message p.system-message-title { padding:4px 5px 4px 25px; margin:0; 
 .x500 { width:500px; }
 
 /*  HEADER  */
-
 #header	{ background:#417690; color:#ffc; }
 #header a:link, #header a:visited	{ color:white; }
 #header a:hover { text-decoration:underline; }
@@ -117,12 +79,10 @@ div.system-message p.system-message-title { padding:4px 5px 4px 25px; margin:0; 
 
 
 /*  SIDEBAR  */
-
 #content-related h3 { font-size:12px; color:#666; margin-bottom:3px; }
 #content-related h4 { font-size:11px; }
 
 /*  TABLES  */
-
 table { border-collapse:collapse; border-color:#ccc; }
 td, th { font-size:11px; line-height:13px; border-bottom:1px solid #eee; vertical-align:top; padding:5px; font-family:"Lucida Grande", Verdana, Arial, sans-serif; }
 th { text-align:left; font-size:12px; }
@@ -141,7 +101,6 @@ table#change-history { width:100%; }
 table#change-history tbody th { width:16em; }
 
 /*  TABLE SORTING  */
-
 thead th a:link, thead th a:visited { color:#666; display:block; }
 table thead th.sorted { background-position:bottom left !important; }
 table thead th.sorted a { padding-right:13px; }
@@ -149,7 +108,6 @@ table thead th.ascending a { background:url(../img/admin/arrow-down.gif) right .
 table thead th.descending a { background:url(../img/admin/arrow-up.gif) right .4em no-repeat; }
 
 /*  MODULES  */
-
 .module	{ border:1px solid #ccc; margin-bottom:5px; background:white; }
 .module p, .module ul, .module h3, .module h4, .module dl, .module pre { padding-left:10px; padding-right:10px; }
 .module blockquote { margin-left:12px; }
@@ -173,7 +131,6 @@ textarea { vertical-align:top !important; }
 input[type=checkbox], input[type=radio] { border:none; }
 
 /*  FORM BUTTONS  */
-
 input[type=submit], input[type=button], .submit-row input { background:white url(../img/admin/nav-bg.gif) bottom repeat-x; padding:3px; }
 input[type=submit]:active, input[type=button]:active { background-image:url(../img/admin/nav-bg-reverse.gif); background-position:top; }
 input[type=submit].default, .submit-row input.default { border:2px solid #5b80b2; background:#7CA0C7 url(../img/admin/default-bg.gif) bottom repeat-x; font-weight:bold; color:white; }
@@ -183,7 +140,6 @@ input[type=submit].default:active { background-image:url(../img/admin/default-bg
 .submit-row .float-left { padding-top:.1em; }
 
 /*  FORM ROWS  */
-
 .form-row { clear:both; padding:8px 12px; font-size:11px; }
 html>body .form-row { border-bottom:1px solid #eee; }
 .form-row:after { content: "."; display: block; height: 0; clear: both; visibility: hidden; }
@@ -191,21 +147,18 @@ html>body .form-row { border-bottom:1px solid #eee; }
 form .form-row p { padding-left:0; font-size:11px; }
 
 /*  FORM LABELS  */
-
 form h4	{ margin:0 !important; padding:0 !important; border:none !important; }
 label { font-weight:normal !important; color:#666; font-size:12px; }
 label.inline { margin-left:20px; }
 .required label, label.required	{ font-weight:bold !important; color:#333 !important; }
 
 /*  RADIO BUTTONS */
-
 form ul.radiolist li { list-style-type:none; }
 form ul.radiolist label { float:none; display:inline; }
 form ul.inline { margin-left:0; padding:0; }
 form ul.inline li { float:left; padding-right:7px; }
 
 /*  ALIGNED FIELDSETS  */
-
 .aligned label { display:block; padding:0 1em 3px 0; float:left; text-align:left; width:8em; }
 .aligned label.inline { display:inline; float:none; }
 .colMS .aligned .vLargeTextField, .colMS .aligned .vXMLLargeTextField { width:350px; }
@@ -217,14 +170,12 @@ form .aligned p.help { padding-left:38px; }
 .checkbox-row p.help { margin-left:0; padding-left:0 !important; }
 
 /*  WIDE FIELDSETS  */
-
 .wide label { width:15em !important; }
 form .wide p { margin-left:15em; }
 form .wide p.help { padding-left:38px; }
 .colM fieldset.wide .vLargeTextField, .colM fieldset.wide .vXMLLargeTextField { width:450px; }
 
 /*  COLLAPSED FIELDSETS  */
-
 fieldset.collapsed * { display:none; }
 fieldset.collapsed h2, fieldset.collapsed { display:block !important; }
 fieldset.collapsed .collapse-toggle { display: inline !important; }
@@ -233,7 +184,6 @@ fieldset.collapse h2 a.collapse-toggle:hover { text-decoration:underline; }
 .hidden { display:none; }
 
 /* MESSAGES & ERRORS  */
-
 ul.messagelist { padding:0 0 5px 0; margin:0; }
 ul.messagelist li { font-size:12px; display:block; padding:4px 5px 4px 25px; margin:0 0 3px 0; border-bottom:1px solid #ddd; color:#666; background:#ffc url(../img/admin/icon_success.gif) 5px .3em no-repeat; }
 .errornote { font-size:12px !important; display:block; padding:4px 5px 4px 25px; margin:0 0 3px 0; border:1px solid red; color:red;background:#ffc url(../img/admin/icon_error.gif) 5px .3em no-repeat; }
@@ -245,7 +195,6 @@ td ul.errorlist li { margin:0 !important; }
 .error input, .error select { border:1px solid red; }
 
 /*  ACTION ICONS  */
-
 .addlink { padding-left:12px; background:url(../img/admin/icon_addlink.gif) 0 .2em no-repeat; }
 .changelink { padding-left:12px; background:url(../img/admin/icon_changelink.gif) 0 .2em no-repeat; }
 .deletelink { padding-left:12px; background:url(../img/admin/icon_deletelink.gif) 0 50% no-repeat; }
@@ -253,7 +202,6 @@ a.deletelink:link, a.deletelink:visited { color:#CC3434; }
 a.deletelink:hover { color:#993333; }
 
 /*  OBJECT TOOLS  */
-
 .object-tools { font-size:10px; font-weight:bold; font-family:Arial,Helvetica,sans-serif; padding-left:0; margin-bottom:5px; float:right; position:relative; margin-top:-2.4em; margin-bottom:-2em; }
 .form-row .object-tools { margin-top:0; margin-bottom:0; }
 .object-tools li { display:block; float:left; background:url(../img/admin/tool-left.gif) 0 0 no-repeat; padding:0 0 0 8px; margin-left:2px; height:16px; }
@@ -266,17 +214,14 @@ a.deletelink:hover { color:#993333; }
 .object-tools a.addlink:hover { background:#5b80b2 url(../img/admin/tooltag-add_over.gif) top right no-repeat; }
 
 /*  INLINE CONTROLS  */
-
 #inline-controls { font-weight:bold; font-size:12px; }
 #inline-specific-controls { margin-left:6px; padding:0 8px; border-left:6px solid #ccc;  }
 
 /*  BREADCRUMBS  */
-
 p.breadcrumbs { font-size:11px; color:#ccc;text-align:left; } /* old breadcrumbs style */
 div.breadcrumbs { background:white url(../img/admin/nav-bg-reverse.gif) 0 -10px repeat-x; padding:2px 8px 3px 8px; font-size:11px;  color:#999;  border-top:1px solid white; border-bottom:1px solid #ccc; text-align:left; }
 
 /*  SELECTOR (FILTER INTERFACE)  */
-
 .selector { width:580px; float:left; }
 .selector select { width:270px; height:170px; }
 .selector-available, .selector-chosen { float:left; width:270px; text-align:center; margin-bottom:5px; }
@@ -297,7 +242,6 @@ a.selector-chooseall { width:7em; background:url(../img/admin/selector-addall.gi
 a.selector-clearall { background:url(../img/admin/selector-removeall.gif) left center no-repeat; }
 
 /*  Stacked selectors for long items  */
-
 .stacked { float:left; width:500px; }
 .stacked select { width:480px; height:100px; }
 .stacked .selector-available, .stacked .selector-chosen { width:480px; }
@@ -310,20 +254,17 @@ a.selector-clearall { background:url(../img/admin/selector-removeall.gif) left c
 .stacked .selector-remove { background-image:url(../img/admin/selector_stacked-remove.gif); }
 
 /*  DATE AND TIME  */
-
 p.datetime { line-height:20px; margin:0; padding:0; color:#666; font-size:11px; font-weight:bold; }
 .datetime span { font-size:11px; font-weight:normal; white-space:nowrap; }
 .vDateField { margin-left:4px; }
 table p.datetime { font-size:10px; margin-left:0; padding-left:0; }
 
 /*  FILE UPLOADS  */
-
 p.file-upload { line-height:20px; margin:0; padding:0; color:#666; font-size:11px; font-weight:bold; }
 .file-upload a { font-weight:normal; }
 .file-upload .deletelink { margin-left:5px; }
 
 /*  CALENDARS & CLOCKS  */
-
 .calendarbox, .clockbox { margin:5px auto; width: 10em; text-align: center; background:white; position:relative; }
 .clockbox { width:6em; }
 .calendar { margin:0; padding: 0; }
@@ -350,14 +291,12 @@ ul.timelist, .timelist li { list-style-type:none; margin:0; padding:0; }
 .timelist a { padding:2px; }
 
 /*  ORDERING WIDGET  */
-
 ul#orderthese { padding:0; margin:0; list-style-type:none; }
 ul#orderthese li { list-style-type:none; display:block; padding:0; margin:6px 0; width:214px; background:#f6f6f6; white-space:nowrap; overflow:hidden; }
 ul#orderthese li span { display:block; border:1px solid #e7e7e7; background:transparent url(../img/admin/nav-bg-grabber.gif) top left repeat-y; font-size:10px !important; padding:4px 6px 4px 12px; }
 ul#orderthese span:hover { background-color:#efefef; }
 
 /*  PAGINATOR  */
-
 .paginator { font-size:11px; padding-top:10px; padding-bottom:10px; line-height:22px; margin:0; border-top:1px solid #ddd; }
 .paginator a:link, .paginator a:visited	{ padding:2px 6px; border:solid 1px #ccc; background:white; text-decoration:none; }
 .paginator a.showall { padding:0 !important; border:none !important; }
@@ -367,7 +306,6 @@ ul#orderthese span:hover { background-color:#efefef; }
 .paginator a:hover { color:white; background:#5b80b2; border-color:#036; }
 
 /*  TEXT STYLES & MODIFIERS  */
-
 .small { font-size:11px; }
 .tiny { font-size:10px; }
 p.tiny { margin-top:-2px; }
@@ -386,7 +324,6 @@ p img, h1 img, h2 img, h3 img, h4 img, td img { vertical-align:middle; }
 .nowrap { white-space:nowrap; }
 
 /*  CUSTOM FORM FIELDS  */
-
 .vSelectMultipleField { vertical-align:top !important; }
 .vCheckboxField { border:none; }
 .vDateField, .vTimeField { margin-right:2px; }
