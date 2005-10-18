@@ -292,7 +292,7 @@ class Field(object):
 	 return { self.get_db_column(): self._get_val_from_obj(obj)}
 
     def get_follow(self, override=None):
-        if override:
+        if override != None:
             return override
         else:
             return self.editable

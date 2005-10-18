@@ -223,7 +223,6 @@ class RelatedObject(object):
         over[self.field.name] = False
         return self.opts.get_follow(over)
     
-    
     def __repr__(self):
         return "<RelatedObject: %s related to %s>" % ( self.name, self.field.name)      
 
@@ -1659,7 +1658,7 @@ def manipulator_save(opts, klass, add, change, self, new_data):
         #  ('1', {'id': ['941'], 'choice': ['This is the second choice']}),
         #  ('2', {'id': [''], 'choice': ['']})]
         child_follow = self.follow.get(related.name, None)
-                
+        
         if child_follow:
             obj_list = expanded_data[related.var_name].items()
             obj_list.sort(lambda x, y: cmp(int(x[0]), int(y[0])))
@@ -1707,8 +1706,7 @@ def manipulator_save(opts, klass, add, change, self, new_data):
                             param = f.get_default()
                     else:
                         param = f.get_manipulator_new_data(rel_new_data, rel=True)
-                    
-                    if param:
+                    if param != None:
                        params[f.column] = param
                     
 
@@ -1741,14 +1739,14 @@ def manipulator_save(opts, klass, add, change, self, new_data):
                         else:
                             for f in related.opts.fields:
                                 if not f.primary_key and f != related.field and str(getattr(old_rel_obj, f.column)) != str(getattr(new_rel_obj, f.column)):
-                                    self.fields_changed.append('%s for %s "%r"' % (f.verbose_name, rel_opts.verbose_name, new_rel_obj))
+                                    self.fields_changed.append('%s for %s "%r"' % (f.verbose_name, related.opts.verbose_name, new_rel_obj))
 
                     # Save many-to-many objects.
                     for f in related.opts.many_to_many:
                         if child_follow.get(f.name, None) and not f.rel.edit_inline:
                             was_changed = getattr(new_rel_obj, 'set_%s' % f.name)(rel_new_data[f.name])
                             if change and was_changed:
-                                self.fields_changed.append('%s for %s "%s"' % (f.verbose_name, rel_opts.verbose_name, new_rel_obj))
+                                self.fields_changed.append('%s for %s "%s"' % (f.verbose_name, related.opts.verbose_name, new_rel_obj))
 
                 # If, in the change stage, all of the core fields were blank and
                 # the primary key (ID) was provided, delete the item.
