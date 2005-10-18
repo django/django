@@ -105,6 +105,9 @@ def get_random_function_sql():
     # TODO: This is a guess. Make sure this is correct.
     return "RANDOM()"
 
+def get_table_list(cursor):
+    raise NotImplementedError
+
 def get_relations(cursor, table_name):
     raise NotImplementedError
 
