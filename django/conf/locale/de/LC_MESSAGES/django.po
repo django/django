@@ -207,7 +207,7 @@ msgstr "Nicht das Passwort selber eintragen, sondern dessen MD5 signatur."
 
 #: models/auth.py:38
 msgid "staff status"
-msgstr "Administratorstatus"
+msgstr "Administrator"
 
 #: models/auth.py:38
 msgid "Designates whether the user can log into this admin site."
@@ -220,7 +220,7 @@ msgstr "Aktiv"
 
 #: models/auth.py:40
 msgid "superuser status"
-msgstr "Hauptadministratorstatus"
+msgstr "Hauptadmin."
 
 #: models/auth.py:41
 msgid "last login"
