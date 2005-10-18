@@ -180,7 +180,7 @@ class Message(meta.Model):
 class LogEntry(meta.Model):
     action_time = meta.DateTimeField(auto_now=True)
     user = meta.ForeignKey(User)
-    content_type = meta.ForeignKey(core.ContentType, blank=True, null=True) # TODO: content_type_id name?
+    content_type = meta.ForeignKey(core.ContentType, blank=True, null=True)
     object_id = meta.TextField(blank=True, null=True)
     object_repr = meta.CharField(maxlength=200)
     action_flag = meta.PositiveSmallIntegerField()
