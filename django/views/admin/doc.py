@@ -4,8 +4,8 @@ from django.conf import settings
 from django.models.core import sites
 from django.core.extensions import DjangoContext, render_to_response
 from django.core.exceptions import Http404, ViewDoesNotExist
-from django.core import template, template_loader, urlresolvers
-from django.core.template import defaulttags, defaultfilters
+from django.core import template, urlresolvers
+from django.core.template import defaulttags, defaultfilters, loader
 try:
     from django.parts.admin import doc
 except ImportError:
@@ -223,7 +223,7 @@ def load_all_installed_template_libraries():
     # Clear out and reload default tags
     template.registered_tags.clear()
     reload(defaulttags)
-    reload(template_loader) # template_loader defines the block/extends tags
+    reload(loader) # loader defines the block/extends tags
 
     # Load any template tag libraries from installed apps
     for e in templatetags.__path__:
