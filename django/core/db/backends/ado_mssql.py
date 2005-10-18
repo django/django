@@ -153,3 +153,5 @@ DATA_TYPES = {
     'URLField':          'varchar(200)',
     'USStateField':      'varchar(2)',
 }
+
+DATA_TYPES_REVERSE = {}
