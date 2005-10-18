@@ -6,20 +6,20 @@ urlpatterns = (
     ('^logout/$', 'django.views.auth.login.logout'),
     ('^password_change/$', 'django.views.registration.passwords.password_change'),
     ('^password_change/done/$', 'django.views.registration.passwords.password_change_done'),
-    ('^template_validator/$', 'django.views.admin.template.template_validator'),
+    ('^template_validator/$', 'django.contrib.admin.views.template.template_validator'),
 
     # Documentation
-    ('^doc/$', 'django.views.admin.doc.doc_index'),
-    ('^doc/bookmarklets/$', 'django.views.admin.doc.bookmarklets'),
-    ('^doc/tags/$', 'django.views.admin.doc.template_tag_index'),
-    ('^doc/filters/$', 'django.views.admin.doc.template_filter_index'),
-    ('^doc/views/$', 'django.views.admin.doc.view_index'),
-    ('^doc/views/jump/$', 'django.views.admin.doc.jump_to_view'),
-    ('^doc/views/(?P<view>[^/]+)/$', 'django.views.admin.doc.view_detail'),
-    ('^doc/models/$', 'django.views.admin.doc.model_index'),
-    ('^doc/models/(?P<model>[^/]+)/$', 'django.views.admin.doc.model_detail'),
+    ('^doc/$', 'django.contrib.admin.views.doc.doc_index'),
+    ('^doc/bookmarklets/$', 'django.contrib.admin.views.doc.bookmarklets'),
+    ('^doc/tags/$', 'django.contrib.admin.views.doc.template_tag_index'),
+    ('^doc/filters/$', 'django.contrib.admin.views.doc.template_filter_index'),
+    ('^doc/views/$', 'django.contrib.admin.views.doc.view_index'),
+    ('^doc/views/jump/$', 'django.contrib.admin.views.doc.jump_to_view'),
+    ('^doc/views/(?P<view>[^/]+)/$', 'django.contrib.admin.views.doc.view_detail'),
+    ('^doc/models/$', 'django.contrib.admin.views.doc.model_index'),
+    ('^doc/models/(?P<model>[^/]+)/$', 'django.contrib.admin.views.doc.model_detail'),
 #    ('^doc/templates/$', 'django.views.admin.doc.template_index'),
-    ('^doc/templates/(?P<template>.*)/$', 'django.views.admin.doc.template_detail'),
+    ('^doc/templates/(?P<template>.*)/$', 'django.contrib.admin.views.doc.template_detail'),
 )
 
 if 'ellington.events' in INSTALLED_APPS:
