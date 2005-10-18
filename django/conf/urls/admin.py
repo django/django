@@ -50,7 +50,6 @@ urlpatterns += (
     # Metasystem admin pages
     ('^(?P<app_label>[^/]+)/(?P<module_name>[^/]+)/$', 'django.views.admin.main.change_list'),
     ('^(?P<app_label>[^/]+)/(?P<module_name>[^/]+)/add/$', 'django.views.admin.main.add_stage'),
-    ('^(?P<app_label>[^/]+)/(?P<module_name>[^/]+)/jsvalidation/$', 'django.views.admin.jsvalidation.jsvalidation'),
     ('^(?P<app_label>[^/]+)/(?P<module_name>[^/]+)/(?P<object_id>.+)/history/$', 'django.views.admin.main.history'),
     ('^(?P<app_label>[^/]+)/(?P<module_name>[^/]+)/(?P<object_id>.+)/delete/$', 'django.views.admin.main.delete_stage'),
     ('^(?P<app_label>[^/]+)/(?P<module_name>[^/]+)/(?P<object_id>.+)/$', 'django.views.admin.main.change_stage'),
