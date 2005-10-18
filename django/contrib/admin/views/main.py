@@ -1,5 +1,6 @@
 # Generic admin views, with admin templates created dynamically at runtime.
 
+from django.contrib.admin.views.decorators import staff_member_required
 from django.core import formfields, meta
 from django.core.template import loader
 from django.core.exceptions import Http404, ObjectDoesNotExist, PermissionDenied
@@ -49,6 +50,7 @@ def get_query_string(original_params, new_params={}, remove=[]):
 
 def index(request):
     return render_to_response('index', {'title': 'Site administration'}, context_instance=Context(request))
+index = staff_member_required(index)
 
 def change_list(request, app_label, module_name):
     from django.core import paginator
@@ -493,6 +495,7 @@ def change_list(request, app_label, module_name):
         'is_popup': is_popup,
     })
     return HttpResponse(t.render(c))
+change_list = staff_member_required(change_list)
 
 def _get_flattened_data(field, val):
     """
@@ -853,6 +856,7 @@ def add_stage(request, app_label, module_name, show_delete=False, form_url='', p
 #     return HttpResponse(raw_template, mimetype='text/plain')
     t = loader.get_template_from_string(raw_template)
     return HttpResponse(t.render(c))
+add_stage = staff_member_required(add_stage)
 
 def change_stage(request, app_label, module_name, object_id):
     mod, opts = _get_mod_opts(app_label, module_name)
@@ -978,6 +982,7 @@ def change_stage(request, app_label, module_name, object_id):
 #     return HttpResponse(raw_template, mimetype='text/plain')
     t = loader.get_template_from_string(raw_template)
     return HttpResponse(t.render(c))
+change_stage = staff_member_required(change_stage)
 
 def _nest_help(obj, depth, val):
     current = obj
@@ -1089,6 +1094,7 @@ def delete_stage(request, app_label, module_name, object_id):
         "deleted_objects": deleted_objects,
         "perms_lacking": perms_needed,
     }, context_instance=Context(request))
+delete_stage = staff_member_required(delete_stage)
 
 def history(request, app_label, module_name, object_id):
     mod, opts = _get_mod_opts(app_label, module_name)
@@ -1102,3 +1108,4 @@ def history(request, app_label, module_name, object_id):
         'module_name': capfirst(opts.verbose_name_plural),
         'object': obj,
     }, context_instance=Context(request))
+history = staff_member_required(history)
