@@ -394,7 +394,7 @@ Open your settings file (``myproject/settings.py``, remember) and look at the
 directories to check when loading Django templates. It's a search path.
 
 By default, ``TEMPLATE_DIRS`` is empty. So, let's add a line to it, to tell
-Django where our templates live.
+Django where our templates live::
 
     TEMPLATE_DIRS = (
         "/home/mytemplates", # Change this to your own directory.
