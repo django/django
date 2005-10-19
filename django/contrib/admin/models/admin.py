@@ -5,7 +5,7 @@ from django.utils.translation import gettext_lazy as _
 class LogEntry(meta.Model):
     action_time = meta.DateTimeField(_('action time'), auto_now=True)
     user = meta.ForeignKey(auth.User)
-    content_type = meta.ForeignKey(_('content type'), core.ContentType, blank=True, null=True)
+    content_type = meta.ForeignKey(core.ContentType, blank=True, null=True)
     object_id = meta.TextField(_('object id'), blank=True, null=True)
     object_repr = meta.CharField(_('object repr'), maxlength=200)
     action_flag = meta.PositiveSmallIntegerField(_('action flag'))
