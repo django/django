@@ -165,7 +165,11 @@ look like this::
 
 This would jump to the same page you came from and pass the django_language
 variable. This is used in discovery of languages, as described in the next
-chapter.
+chapter. Of course this can only work if your rendering context contains
+the LANGUAGE_CODE and LANGUAGES variables. If you use DjangoContext as
+your rendering context, they are automatically defined. If you use the
+simpler Context class, you need to pass them along from request.LANGUAGE_CODE
+and settings.LANGUAGES themselve.
 
 How the Language is Discovered
 ==============================
