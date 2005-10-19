@@ -3,9 +3,6 @@
 from django.utils.cache import patch_vary_headers
 from django.utils import translation
 
-# this is a cache that will build a map from modules to applications
-_module_to_app = {}
-
 class LocaleMiddleware:
     """
     This is a very simple middleware that parses a request
@@ -15,30 +12,13 @@ class LocaleMiddleware:
     is available, of course).
     """
 
-    def process_view(self, request, view_func, param_dict):
-        global _module_to_app
-
-        def findapp(module):
-            app = _module_to_app.get(view_func.__module__, None)
-            if app is not None:
-                return app
-
-            from django.conf import settings
-            for app in settings.INSTALLED_APPS:
-                if module.startswith(app):
-                    _module_to_app[module] = app
-                    return app
-            return '*'
-
-        app = findapp(view_func.__module__)
-
-        lang = translation.get_language_from_request(request)
-
-        translation.activate(app, lang)
-
+    def process_request(self, request):
+        language = translation.get_language_from_request(request)
+        translation.activate(language)
         request.LANGUAGE_CODE = translation.get_language()
 
     def process_response(self, request, response):
         patch_vary_headers(response, ('Accept-Language',))
+        translation.deactivate()
         return response
 

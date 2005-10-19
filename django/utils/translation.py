@@ -36,7 +36,7 @@ def to_locale(language):
     "turn a language name (en-us) into a locale name (en_US)"
     p = language.find('-')
     if p >= 0:
-        return language[:p].lower()+'_'+language[p:].upper()
+        return language[:p].lower()+'_'+language[p+1:].upper()
     else:
         return language.lower()
 
@@ -44,7 +44,7 @@ def to_language(locale):
     "turns a locale name (en_US) into a language name (en-us)"
     p = locale.find('_')
     if p >= 0:
-        return locale[:p].lower()+'-'+locale[p:].lower()
+        return locale[:p].lower()+'-'+locale[p+1:].lower()
     else:
         return locale.lower()
 
@@ -67,18 +67,19 @@ class DjangoTranslation(gettext_module.GNUTranslations):
         except AttributeError:
             pass
         self.django_output_charset = settings.DEFAULT_CHARSET
-        self.__app = '?.?.?'
         self.__language = '??'
+
+    def merge(self, other):
+        self._catalog.update(other._catalog)
     
-    def set_app_and_language(self, app, language):
-        self.__app = app
+    def set_language(self, language):
         self.__language = language
 
     def language(self):
         return self.__language
     
     def __repr__(self):
-        return "<DjangoTranslation app:%s lang:%s>" % (self.__app, self.__language)
+        return "<DjangoTranslation lang:%s>" % self.__language
 
 
 class DjangoTranslation23(DjangoTranslation):
@@ -101,27 +102,26 @@ class DjangoTranslation23(DjangoTranslation):
         res = self.ungettext(msgid1, msgid2, n)
         return res.encode(self.django_output_charset)
 
-def translation(appname, language):
+def translation(language):
     """
-    This function returns a translation object.
-    app must be the fully qualified name of the
-    application.
+    This function returns a translation object.  app must be the fully
+    qualified name of the application.
 
-    This function will first look into the app
-    messages directory for the django message file,
-    then in the project messages directory for the
-    django message file and last in the global
-    messages directory for the django message file.
+    This translation object will be constructed out of multiple GNUTranslations
+    objects by merging their catalogs. It will construct a object for the requested
+    language and add a fallback to the default language, if that is different
+    from the requested language.
     """
+    global _translations
 
-    t = _translations.get((appname, language), None)
+    if language == 'en' or language.startswith('en-'):
+        return gettext_module.NullTranslations()
+
+    t = _translations.get(language, None)
     if t is not None:
         return t
     
     from django.conf import settings
-
-    default_locale = to_locale(settings.LANGUAGE_CODE)
-    locale = to_locale(language)
 
     # set up the right translation class
     klass = DjangoTranslation
@@ -130,61 +130,79 @@ def translation(appname, language):
 
     globalpath = os.path.join(os.path.dirname(settings.__file__), 'locale')
 
-    try:
-        t = gettext_module.translation('django', globalpath, [locale, default_locale], klass)
-        t.set_app_and_language(appname, language)
-    except IOError: t = gettext_module.NullTranslations()
-    _translations[(appname, language)] = t
-
-    if hasattr(settings, 'LOCALE_PATHS'):
-        for localepath in settings.LOCALE_PATHS:
-            try:
-                t = gettext_module.translation('django', localepath, [locale, default_locale], klass)
-                t.set_app_and_language(appname, language)
-            except IOError: t = None
-            if t is not None:
-                t.add_fallback(_translations[(appname, language)])
-                _translations[(appname, language)] = t
-
     parts = os.environ['DJANGO_SETTINGS_MODULE'].split('.')
     project = __import__(parts[0], {}, {}, [])
-
     projectpath = os.path.join(os.path.dirname(project.__file__), 'locale')
 
-    try:
-        t = gettext_module.translation('django', projectpath, [locale, default_locale], klass)
-        t.set_app_and_language(appname, language)
-    except IOError: t = None
-    if t is not None:
-        t.add_fallback(_translations[(appname, language)])
-        _translations[(appname, language)] = t
+    def _fetch(lang, fallback=None):
 
-    if appname != '*':
-        app = __import__(appname, {}, {}, ['views'])
+        global _translations
 
-        apppath = os.path.join(os.path.dirname(app.__file__), 'locale')
+        loc = to_locale(lang)
 
-        try:
-            t = gettext_module.translation('django', apppath, [locale, default_locale], klass)
-            t.set_app_and_language(appname, language)
-        except IOError: t = None
-        if t is not None:
-            t.add_fallback(_translations[(appname, language)])
-            _translations[(appname, language)] = t
+        res = _translations.get(lang, None)
+        if res is not None:
+            return res
 
-    return _translations[(appname, language)]
+        def _translation(path):
+            try:
+                t = gettext_module.translation('django', path, [loc], klass)
+                t.set_language(lang)
+                return t
+            except IOError, e:
+                return None
+    
+        res = _translation(globalpath)
 
-def activate(appname, language):
+        def _merge(path):
+            t = _translation(path)
+            if t is not None:
+                if res is None:
+                    return t
+                else:
+                    res.merge(t)
+            return res
+
+        if hasattr(settings, 'LOCALE_PATHS'):
+            for localepath in settings.LOCALE_PATHS:
+                if os.path.isdir(localepath):
+                    res = _merge(localepath)
+
+        if os.path.isdir(projectpath):
+            res = _merge(projectpath)
+
+        for appname in settings.INSTALLED_APPS:
+            p = appname.rfind('.')
+            if p >= 0:
+                app = getattr(__import__(appname[:p], {}, {}, [appname[p+1:]]), appname[p+1:])
+            else:
+                app = __import__(appname, {}, {}, [])
+
+            apppath = os.path.join(os.path.dirname(app.__file__), 'locale')
+
+            if os.path.isdir(apppath):
+                res = _merge(apppath)
+  
+        if res is None:
+            if fallback is not None:
+                res = fallback
+            else:
+                return gettext_module.NullTranslations()
+        _translations[lang] = res
+        return res
+
+    default_translation = _fetch(settings.LANGUAGE_CODE)
+    current_translation = _fetch(language, fallback=default_translation)
+
+    return current_translation
+
+def activate(language):
     """
     This function fetches the translation object for a given
     tuple of application name and language and installs it as
     the current translation object for the current thread.
     """
-    if language == 'en' or language.startswith('en-'):
-        t = gettext_module.NullTranslations()
-    else:
-        t = translation(appname, language)
-    _active[currentThread()] = t
+    _active[currentThread()] = translation(language)
 
 def deactivate():
     """
@@ -192,7 +210,10 @@ def deactivate():
     object so that further _ calls will resolve against the
     default translation object, again.
     """
-    del _active[currentThread()]
+    global _active
+
+    if _active.has_key(currentThread()):
+        del _active[currentThread()]
 
 def get_language():
     """
@@ -225,7 +246,7 @@ def gettext(message):
         return t.gettext(message)
     if _default is None:
         from django.conf import settings
-        _default = translation('*', settings.LANGUAGE_CODE)
+        _default = translation(settings.LANGUAGE_CODE)
     return _default.gettext(message)
 
 def gettext_noop(message):
@@ -335,7 +356,7 @@ def get_language_from_request(request):
                     # report de_DE if we only have de available, but
                     # did find de_DE because of language normalization
                     lang = langfile[len(globalpath):].split('/')[1]
-                    _accepted[accept] = to_language(lang)
+                    _accepted[accept] = lang
                     return lang
     
     return settings.LANGUAGE_CODE
