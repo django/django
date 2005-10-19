@@ -74,7 +74,7 @@ class BaseHandler:
                     response = middleware_method(request, e)
                     if response:
                         return response
-                raise e
+                raise
 
             # Complain if the view returned None (a common error).
             if response is None:

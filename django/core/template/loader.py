@@ -20,7 +20,7 @@
 # installed, because pkg_resources is necessary to read eggs.
 
 from django.core.exceptions import ImproperlyConfigured
-from django.core.template import Template, Context, Node, TemplateDoesNotExist, TemplateSyntaxError, resolve_variable_with_filters, register_tag, UNKNOWN_SOURCE
+from django.core.template import Origin, StringOrigin, Template, Context, Node, TemplateDoesNotExist, TemplateSyntaxError, resolve_variable_with_filters, register_tag
 from django.conf.settings import TEMPLATE_LOADERS
 
 template_source_loaders = []
@@ -41,10 +41,30 @@ for path in TEMPLATE_LOADERS:
     else:
         template_source_loaders.append(func)
 
+
+
+
+class LoaderOrigin(Origin):
+    def __init__(self, name, loader):
+        super(LoaderOrigin, self).__init__(name)
+        self.loader = loader
+    
+    def reload(self):
+        if self.loader:
+            return self.loader()
+        else:
+            raise NotImplementedException
+
+
 def find_template_source(name, dirs=None):
     for loader in template_source_loaders:
         try:
-            return loader(name, dirs)
+            source, display_name  = loader(name, dirs) 
+            
+            def reload():
+                return loader(name, dirs)[0]
+            
+            return (source, LoaderOrigin(display_name, reload))
         except TemplateDoesNotExist:
             pass
     raise TemplateDoesNotExist, name
@@ -62,12 +82,15 @@ def get_template(template_name):
     """
     return get_template_from_string(*find_template_source(template_name))
 
-def get_template_from_string(source, filename=UNKNOWN_SOURCE):
+def get_template_from_string(source, origin=None ):
     """
     Returns a compiled Template object for the given template code,
     handling template inheritance recursively.
     """
-    return Template(source, filename)
+    if origin==None:
+        #Could do some crazy stack frame stuff to record where this string came from. 
+        origin = StringOrigin(source)
+    return Template(source, origin)
 
 def render_to_string(template_name, dictionary=None, context_instance=None):
     """

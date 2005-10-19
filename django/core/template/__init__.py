@@ -107,10 +107,30 @@ class SilentVariableFailure(Exception):
     "Any function raising this exception will be ignored by resolve_variable"
     pass
 
+class Origin(object):
+    def __init__(self, name):
+        self.name = name
+        
+    def reload(self):
+        raise NotImplementedException
+
+    def __str__(self):
+        return self.name
+
+class StringOrigin(Origin):
+    def __init__(self, source):
+        super(StringOrigin, self).__init__(UNKNOWN_SOURCE)
+        self.source = source
+    
+    def reload(self):
+        return (self.source, self.name)
+
 class Template:
-    def __init__(self, template_string, filename=UNKNOWN_SOURCE):
+    def __init__(self, template_string, origin=None):
         "Compilation stage"
-        self.nodelist = compile_string(template_string, filename)
+        if origin == None:
+            origin = StringOrigin(template_string)
+        self.nodelist = compile_string(template_string, origin)
        
     def __iter__(self):
         for node in self.nodelist:
@@ -120,8 +140,9 @@ class Template:
     def render(self, context):
         "Display stage -- can be called many times"
         return self.nodelist.render(context)
+        
 
-def compile_string(template_string, filename):
+def compile_string(template_string, origin):
     "Compiles template_string into NodeList ready for rendering"
     if DEBUG:
         lexer_factory = DebugLexer
@@ -130,7 +151,7 @@ def compile_string(template_string, filename):
         lexer_factory = Lexer
         parser_factory = Parser
         
-    lexer = lexer_factory(template_string, filename)
+    lexer = lexer_factory(template_string, origin)
     parser = parser_factory(lexer.tokenize())
     return parser.parse()
 
@@ -198,9 +219,9 @@ class Token:
             )
 
 class Lexer(object):
-    def __init__(self, template_string, filename):
+    def __init__(self, template_string, origin):
         self.template_string = template_string
-        self.filename = filename
+        self.origin = origin
     
     def tokenize(self):
         "Return a list of tokens from a given template_string"
@@ -218,8 +239,8 @@ class Lexer(object):
         return token 
 
 class DebugLexer(Lexer):
-    def __init__(self, template_string, filename):
-        super(DebugLexer,self).__init__(template_string, filename)
+    def __init__(self, template_string, origin):
+        super(DebugLexer,self).__init__(template_string, origin)
 
     def find_linebreaks(self, template_string):
         for match in newline_re.finditer(template_string):
@@ -233,19 +254,19 @@ class DebugLexer(Lexer):
         line, next_linebreak = lines.next()
         for match in tag_re.finditer(self.template_string):
             while next_linebreak <= upto:
-                line, next_linebreak = lines.next()    
+                line, next_linebreak = lines.next()
             start, end = match.span()
             if start > upto:       
                 token_tups.append( (self.template_string[upto:start], line) )
                 upto = start
                 while next_linebreak <= upto:
-                    line, next_linebreak = lines.next()              
+                    line, next_linebreak = lines.next()
             token_tups.append( (self.template_string[start:end], line) )
             upto = end
         last_bit = self.template_string[upto:]
         if last_bit:
            token_tups.append( (last_bit, line) )
-        return [ self.create_token(tok, (self.filename, line)) for tok, line in token_tups]
+        return [ self.create_token(tok, (self.origin, line)) for tok, line in token_tups]
 
     def create_token(self, token_string, source):
         token = super(DebugLexer, self).create_token(token_string)
@@ -256,9 +277,8 @@ class Parser(object):
     def __init__(self, tokens):
         self.tokens = tokens
         
-
     def parse(self, parse_until=[]):
-        nodelist = NodeList()
+        nodelist = self.create_nodelist()
         while self.tokens:
             token = self.next_token()
             if token.token_type == TOKEN_TEXT:
@@ -283,8 +303,14 @@ class Parser(object):
                     compile_func = registered_tags[command]
                 except KeyError:
                     self.invalid_block_tag(token, command)
+                
+                try:
+                    compiled_result = compile_func(self, token)
+                except TemplateSyntaxError, e:
+                    if not self.compile_function_error(token, e):
+                       raise
                     
-                self.extend_nodelist(nodelist, compile_func(self, token), token)
+                self.extend_nodelist(nodelist, compiled_result, token)
                 self.exit_command();
                 
         if parse_until:
@@ -292,6 +318,9 @@ class Parser(object):
             
         return nodelist
 
+    def create_nodelist(self):
+        return NodeList()
+    
     def extend_nodelist(self, nodelist, node, token):
         nodelist.append(node)
 
@@ -312,6 +341,9 @@ class Parser(object):
     
     def unclosed_block_tag(self, token, parse_until):
         raise TemplateSyntaxError, "Unclosed tags: %s " %  ', '.join(parse_until)
+
+    def compile_function_error(self, token, e):
+        pass
         
     def next_token(self):
         return self.tokens.pop(0)
@@ -334,27 +366,39 @@ class DebugParser(Parser):
     def exit_command(self):
         self.command_stack.pop()
 
+    def error(self, source, msg):
+        e = TemplateSyntaxError(msg)
+        e.source = source
+        return e
+
     def format_source(self, source):
         return "at %s, line %d" % source
+
+    def create_nodelist(self):
+        return DebugNodeList()
 
     def extend_nodelist(self, nodelist, node, token):
         node.source = token.source
         super(DebugParser, self).extend_nodelist(nodelist, node, token)
 
     def empty_variable(self, token):
-        raise TemplateSyntaxError, "Empty variable tag %s" % self.format_source(token.source)
+        raise self.error( token.source, "Empty variable tag %s" % self.format_source(token.source))
     
     def empty_block_tag(self, token):
-        raise TemplateSyntaxError, "Empty block tag %s" % self.format_source(token.source)
+        raise self.error( token.source, "Empty block tag %s" % self.format_source(token.source))
     
     def invalid_block_tag(self, token, command):
-        raise TemplateSyntaxError, "Invalid block tag: '%s' %s" % (command, self.format_source(token.source))
+        raise self.error( token.source, "Invalid block tag: '%s' %s" % (command, self.format_source(token.source)))
     
     def unclosed_block_tag(self, token, parse_until):
-        (command, (file,line)) = self.command_stack.pop()
+        (command, (origin,line)) = self.command_stack.pop()
         msg = "Unclosed tag '%s' starting at %s, line %d. Looking for one of: %s " % \
-              (command, file, line, ', '.join(parse_until) ) 
-        raise TemplateSyntaxError, msg
+              (command, origin, line, ', '.join(parse_until) ) 
+        raise self.error( token.source, msg)
+
+    def compile_function_error(self, token, e):
+        if not hasattr(e, 'source'):
+            e.source = token.source
 
 class FilterParser:
     """Parse a variable token and its optional filters (all as a single string),
@@ -562,7 +606,12 @@ class NodeList(list):
         bits = []
         for node in self:
             if isinstance(node, Node):
-                bits.append(node.render(context))
+                try:
+                   result = node.render(context)
+                except TemplateSyntaxError, e:
+                    if not self.handle_render_error(node, e):
+                       raise
+                bits.append(result)
             else:
                 bits.append(node)
         return ''.join(bits)
@@ -573,6 +622,15 @@ class NodeList(list):
         for node in self:
             nodes.extend(node.get_nodes_by_type(nodetype))
         return nodes
+
+    def handle_render_error(self, node, exception):
+        pass
+
+class DebugNodeList(NodeList):
+    def handle_render_error(self, node, exception):
+        if not hasattr(exception, 'source'):
+            exception.source = node.source
+
 
 class TextNode(Node):
     def __init__(self, s):
