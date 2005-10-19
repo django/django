@@ -23,7 +23,7 @@ def template_validator(request):
         errors = manipulator.get_validation_errors(new_data)
         if not errors:
             request.user.add_message('The template is valid.')
-    return render_to_response('template_validator', {
+    return render_to_response('admin/template_validator', {
         'title': 'Template validator',
         'form': formfields.FormWrapper(manipulator, new_data, errors),
     }, context_instance=DjangoContext(request))

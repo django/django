@@ -6,7 +6,7 @@ from django.core.template import loader
 from django.core.exceptions import Http404, ObjectDoesNotExist, PermissionDenied
 from django.core.extensions import DjangoContext as Context
 from django.core.extensions import get_object_or_404, render_to_response
-from django.models.auth import log
+from django.models.admin import log
 from django.utils.html import strip_tags
 from django.utils.httpwrappers import HttpResponse, HttpResponseRedirect
 from django.utils.text import capfirst, get_text_list
@@ -49,7 +49,7 @@ def get_query_string(original_params, new_params={}, remove=[]):
     return '?' + '&amp;'.join(['%s=%s' % (k, v) for k, v in p.items()]).replace(' ', '%20')
 
 def index(request):
-    return render_to_response('index', {'title': 'Site administration'}, context_instance=Context(request))
+    return render_to_response('admin/index', {'title': 'Site administration'}, context_instance=Context(request))
 index = staff_member_required(index)
 
 def change_list(request, app_label, module_name):
@@ -266,7 +266,7 @@ def change_list(request, app_label, module_name):
             else:
                 pass # Invalid argument to "list_filter"
 
-    raw_template = ['{% extends "base_site" %}\n']
+    raw_template = ['{% extends "admin/base_site" %}\n']
     raw_template.append('{% block bodyclass %}change-list{% endblock %}\n')
     if not is_popup:
         raw_template.append('{%% block breadcrumbs %%}<div class="breadcrumbs"><a href="../../">Home</a> &rsaquo; %s</div>{%% endblock %%}\n' % capfirst(opts.verbose_name_plural))
@@ -538,7 +538,7 @@ def _get_template(opts, app_label, add=False, change=False, show_delete=False, f
     admin_field_objs = opts.admin.get_field_objs(opts)
     ordered_objects = opts.get_ordered_objects()[:]
     auto_populated_fields = [f for f in opts.fields if f.prepopulate_from]
-    t = ['{% extends "base_site" %}\n']
+    t = ['{% extends "admin/base_site" %}\n']
     t.append('{% block extrahead %}')
 
     # Put in any necessary JavaScript imports.
@@ -1087,7 +1087,7 @@ def delete_stage(request, app_label, module_name, object_id):
         log.log_action(request.user.id, opts.get_content_type_id(), object_id, obj_repr, log.DELETION)
         request.user.add_message('The %s "%s" was deleted successfully.' % (opts.verbose_name, obj_repr))
         return HttpResponseRedirect("../../")
-    return render_to_response('delete_confirmation_generic', {
+    return render_to_response('admin/delete_confirmation', {
         "title": "Are you sure?",
         "object_name": opts.verbose_name,
         "object": obj,
@@ -1102,7 +1102,7 @@ def history(request, app_label, module_name, object_id):
         order_by=("action_time",), select_related=True)
     # If no history was found, see whether this object even exists.
     obj = get_object_or_404(mod, pk=object_id)
-    return render_to_response('admin_object_history', {
+    return render_to_response('admin/object_history', {
         'title': 'Change history: %r' % obj,
         'action_list': action_list,
         'module_name': capfirst(opts.verbose_name_plural),

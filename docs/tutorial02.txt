@@ -24,15 +24,26 @@ application and will focus on Django's automatically-generated admin site.
     The admin isn't necessarily intended to be used by site visitors; it's for site
     managers.
 
+Activate the admin site
+=======================
+
+The Django admin site is not activated by default -- it's an opt-in thing. To
+activate the admin site for your installation, do these three things:
+
+    * Add ``"django.contrib.admin"`` to your ``INSTALLED_APPS`` setting.
+    * Run the command ``django-admin.py install admin``. This will create an
+      extra database table that the admin needs.
+    * Edit your ``myproject.urls`` file and uncomment the line below
+      "Uncomment this for admin:". This file is a URLconf; we'll dig into
+      URLconfs in the next tutorial. For now, all you need to know is that it
+      maps URL roots to applications.
+
 Create a user account
 =====================
 
 Run the following command to create a superuser account for your admin site::
 
-    django-admin.py createsuperuser --settings="myproject.settings.main"
-
-(Note: You can use either "myproject.settings.main" or "myproject.settings.admin"
-here. They both reference the same database.)
+    django-admin.py createsuperuser --settings=myproject.settings
 
 The script will prompt you for a username, e-mail address and password (twice).
 
@@ -45,36 +56,26 @@ server and explore the admin site.
 
 Just run the following command to start the server::
 
-    django-admin.py runserver --settings="myproject.settings.admin"
+    django-admin.py runserver --settings=myproject.settings
 
 It'll start a Web server running locally -- on port 8000, by default. If you
 want to change the server's port, pass it as a command-line argument::
 
-    django-admin.py runserver 8080 --settings="myproject.settings.admin"
+    django-admin.py runserver 8080 --settings=myproject.settings
 
 DON'T use this server in anything resembling a production environment. It's
 intended only for use while developing.
 
-Now, open a Web browser and go to "/admin/" on your domain. You should see the
-admin's login screen:
+Now, open a Web browser and go to "/admin/" on your local domain -- e.g.,
+http://127.0.0.1:8000/admin/. You should see the admin's login screen:
 
 .. image:: http://media.djangoproject.com/img/doc/tutorial/admin01.png
    :alt: Django admin login screen
 
-.. admonition:: Note
-
-    If you get an error telling you that the URL 'admin/' didn't match any of
-    your URLconf entries, you most likely used ``myproject.settings.main``
-    instead of ``myproject.settings.admin``.
-
 Enter the admin site
 ====================
 
-Now, try logging in.
-
-If it didn't work, read the `"I can't log in" questions`_ in the FAQ.
-
-If it worked, you should see the Django admin index page:
+Now, try logging in. You should see the Django admin index page:
 
 .. image:: http://media.djangoproject.com/img/doc/tutorial/admin02t.png
    :alt: Django admin index page
@@ -381,38 +382,46 @@ think they should.
 Customize the admin look and feel
 =================================
 
-Clearly having "Django administration" and "example.com" at the top of each
+Clearly, having "Django administration" and "example.com" at the top of each
 admin page is ridiculous. It's just placeholder text.
 
-That's easy to change, though, using Django's template system.
+That's easy to change, though, using Django's template system. The Django admin
+is powered by Django itself, and its interfaces use Django's own template
+system. (How meta!)
 
-Open your admin settings file and look at the ``TEMPLATE_DIRS`` setting.
-``TEMPLATE_DIRS`` is a tuple of filesystem directories to check when loading
-Django templates. It's a search path.
+Open your settings file (``myproject/settings.py``, remember) and look at the
+``TEMPLATE_DIRS`` setting. ``TEMPLATE_DIRS`` is a tuple of filesystem
+directories to check when loading Django templates. It's a search path.
 
-The ``django-admin.py startproject`` command automatically prepopulated
-this setting with the location of Django's default admin templates, according
-to where you have Django installed. But let's add an extra line to
-``TEMPLATE_DIRS`` so that it checks a custom directory first, before checking
-the default admin template directory::
+By default, ``TEMPLATE_DIRS`` is empty. So, let's add a line to it, to tell
+Django where our templates live.
 
     TEMPLATE_DIRS = (
-        "/home/mytemplates/admin",
-        "/usr/lib/python2.3/site-packages/django/conf/admin_templates",
+        "/home/mytemplates", # Change this to your own directory.
     )
 
-Again, note that you should edit the admin settings file, not the main settings
-file. That's because we're dealing with admin-site templates.
+Now copy the template ``admin/base_site.html`` from within the default Django
+admin template directory (``django/contrib/admin/templates``) into an ``admin``
+subdirectory of whichever directory you're using in ``TEMPLATE_DIRS``. For
+example, if your ``TEMPLATE_DIRS`` includes ``"/home/mytemplates"``, as above,
+then copy ``django/contrib/admin/templates/admin/base_site.html`` to
+``/home/mytemplates/admin/base_site.html``.
 
-Now copy the template ``base_site.html`` from within the default Django admin
-template directory, into ``/home/mytemplates/admin`` (or wherever you're
-putting your custom admin templates). Edit the file and replace the generic
-Django stuff with your own site's name as you see fit.
+Then, just edit the file and replace the generic Django text with your own
+site's name and URL as you see fit.
 
 Note that any of Django's default admin templates can be overridden. To
 override a template, just do the same thing you did with ``base_site.html`` --
 copy it from the default directory into your custom directory, and make
 changes.
+
+Astute readers will ask: But if ``TEMPLATE_DIRS`` was empty by default, how was
+Django finding the default admin templates? The answer is that, by default,
+Django automatically looks for a ``templates/`` subdirectory within each app
+package, for use as a fallback. See the `loader types documentation`_ for full
+information.
+
+.. _loader types documentation: http://www.djangoproject.com/documentation/templates_python/#loader-types
 
 Customize the admin index page
 ==============================
@@ -425,11 +434,11 @@ setting. But the order in which it displays things is random, and you may want
 to make significant changes to the layout. After all, the index is probably the
 most important page of the admin, and it should be easy to use.
 
-The template to customize is ``index.html``. (Do the same as with
-``base_site.html`` in the previous section -- copy it from the default directory
-to your custom template directory.) Edit the file, and you'll see it uses a
-template tag called ``{% get_admin_app_list as app_list %}``. That's the magic
-that retrieves every installed Django app. Instead of using that, you can
+The template to customize is ``admin/index.html``. (Do the same as with
+``admin/base_site.html`` in the previous section -- copy it from the default
+directory to your custom template directory.) Edit the file, and you'll see it
+uses a template tag called ``{% get_admin_app_list as app_list %}``. That's the
+magic that retrieves every installed Django app. Instead of using that, you can
 hard-code links to object-specific admin pages in whatever way you think is
 best.
 

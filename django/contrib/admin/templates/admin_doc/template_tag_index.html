@@ -1,0 +1,49 @@
+{% extends "admin/base_site" %}
+
+{% block coltype %}colSM{% endblock %}
+
+{% block breadcrumbs %}<div class="breadcrumbs"><a href="../../">Home</a> &rsaquo; <a href="../">Documentation</a> &rsaquo; Tags</div>{% endblock %}
+
+{% block title %}Template tags{% endblock %}
+
+{% block content %}
+
+<h1>Template tag documentation</h1>
+
+<div id="content-main">
+{% regroup tags|dictsort:"library" by library as tag_libraries %}
+{% for library in tag_libraries %}
+<div class="module">
+    <h2>{% if library.grouper %}{{ library.grouper }}{% else %}Built-in tags{% endif %}</h2>
+    {% if library.grouper %}<p class="small quiet">To use these tags, put <code>{% templatetag openblock %} load {{ library.grouper }} {% templatetag closeblock %}</code> in your template before using the tag.</p><hr>{% endif %}
+    {% for tag in library.list|dictsort:"name" %}
+    <h3 id="{{ tag.name }}">{{ tag.name }}</h3>
+    <h4>{{ tag.title }}</h4>
+    <p>{{ tag.body }}</p>
+    {% if not forloop.last %}<hr />{% endif %}
+    {% endfor %}
+</div>
+{% endfor %}
+</div>
+
+{% endblock %}
+
+{% block sidebar %}
+
+<div id="content-related">
+
+{% regroup tags|dictsort:"library" by library as tag_libraries %}
+{% for library in tag_libraries %}
+<div class="module">
+    <h2>{% if library.grouper %}{{ library.grouper }}{% else %}Built-in tags{% endif %}</h2>
+    <ul>
+    {% for tag in library.list|dictsort:"name" %}
+        <li><a href="#{{ tag.name }}">{{ tag.name }}</a></li>
+    {% endfor %}
+    </ul>
+</div>
+{% endfor %}
+
+</div>
+
+{% endblock %}

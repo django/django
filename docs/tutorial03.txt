@@ -62,12 +62,12 @@ arguments from the dictionary (an optional third item in the tuple).
 For more on ``HTTPRequest`` objects, see the `request and response documentation`_.
 
 When you ran ``django-admin.py startproject myproject`` at the beginning of
-Tutorial 1, it created a default URLconf in ``myproject/settings/urls/main.py``.
-It also automatically set your ``ROOT_URLCONF`` setting to point at that file::
+Tutorial 1, it created a default URLconf in ``myproject/urls.py``. It also
+automatically set your ``ROOT_URLCONF`` setting to point at that file::
 
-    ROOT_URLCONF = 'myproject.settings.urls.main'
+    ROOT_URLCONF = 'myproject.urls'
 
-Time for an example. Edit ``myproject/settings/urls/main.py`` so it looks like
+Time for an example. Edit ``myproject/urls.py`` so it looks like
 this::
 
     from django.conf.urls.defaults import *
@@ -84,8 +84,8 @@ say, "/polls/23/", Django will load this Python module, because it's pointed to
 by the ``ROOT_URLCONF`` setting. It finds the variable named ``urlpatterns``
 and traverses the regular expressions in order. When it finds a regular
 expression that matches -- ``r'^polls/(?P<poll_id>\d+)/$'`` -- it loads the
-associated Python package/module: ``myproject.polls.views.polls.detail``. That
-corresponds to the function ``detail()`` in ``myproject/polls/views/polls.py``.
+associated Python package/module: ``myproject.apps.polls.views.polls.detail``. That
+corresponds to the function ``detail()`` in ``myproject/apps/polls/views/polls.py``.
 Finally, it calls that ``detail()`` function like so::
 
     detail(request=<HttpRequest object>, poll_id=23)
@@ -122,12 +122,7 @@ make sure Django is following the URLconf properly.
 
 Fire up the Django development Web server::
 
-    django-admin.py runserver --settings="myproject.settings.main"
-
-(If you're coming here straight from Tutorial 2, note that we're now running
-the server with ``--settings=myproject.settings.main`` instead of
-``--settings=myproject.settings.admin``. You'll need to restart the server to
-change the ``settings`` parameter.)
+    django-admin.py runserver --settings=myproject.settings
 
 Now go to "http://localhost:8000/polls/" on your domain in your Web browser.
 You should get a Python traceback with the following error message::
@@ -413,19 +408,15 @@ Our poll app is pretty decoupled at this point, thanks to the strict directory
 structure that ``django-admin.py startapp`` created, but one part of it is
 coupled to the Django settings: The URLconf.
 
-We've been editing the URLs in ``myproject/settings/urls/main.py``, but the
-URL design of an app is specific to the app, not to the Django installation --
-so let's move the URLs within the app directory.
+We've been editing the URLs in ``myproject/urls.py``, but the URL design of an
+app is specific to the app, not to the Django installation -- so let's move the
+URLs within the app directory.
 
-Create a directory ``myproject/apps/polls/urls/``, and put a blank file called
-``__init__.py`` into it. (The ``__init__.py`` file is necessary for Python to
-treat the directory as a package.) Then copy the file
-``myproject/settings/urls/main.py`` to ``myproject/apps/polls/urls/polls.py``.
+Copy the file ``myproject/urls.py`` to ``myproject/apps/polls/urls.py``. Then,
+change ``myproject/urls.py`` to remove the poll-specific URLs and insert an
+``include()``::
 
-Then, change ``myproject/settings/urls/main.py`` to remove the poll-specific
-URLs and insert an ``include()``::
-
-    (r'^polls/', include('myproject.apps.polls.urls.polls')),
+    (r'^polls/', include('myproject.apps.polls.urls')),
 
 ``include()``, simply, references another URLconf. Note that the regular
 expression doesn't have a ``$`` (end-of-string match character) but has the
@@ -437,12 +428,12 @@ Here's what happens if a user goes to "/polls/34/" in this system:
 
 * Django will find the match at ``'^polls/'``
 * It will strip off the matching text (``"polls/"``) and send the remaining
-  text -- ``"34/"`` -- to the 'myproject.apps.polls.urls.polls' urlconf for
+  text -- ``"34/"`` -- to the 'myproject.apps.polls.urls' urlconf for
   further processing.
 
 Now that we've decoupled that, we need to decouple the
-'myproject.apps.polls.urls.polls' urlconf by removing the leading "polls/"
-from each line::
+'myproject.apps.polls.urls' urlconf by removing the leading "polls/" from each
+line::
 
     urlpatterns = patterns('myproject.apps.polls.views.polls',
         (r'^$', 'index'),

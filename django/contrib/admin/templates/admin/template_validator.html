@@ -1,0 +1,31 @@
+{% extends "admin/base_site" %}
+
+{% block content %}
+
+<div id="content-main">
+
+<form action="" method="post">
+
+{% if form.error_dict %}
+<p class="errornote">Your template had {{ form.error_dict.items|length }} error{{ form.error_dict.items|pluralize }}:</p>
+{% endif %}
+
+<fieldset class="module aligned">
+<div class="form-row{% if form.site.errors %} error{% endif %} required">
+    {% if form.site.errors %}{{ form.site.html_error_list }}{% endif %}
+    <h4><label for="id_site">Site:</label> {{ form.site }}</h4>
+</div>
+<div class="form-row{% if form.template.errors %} error{% endif %} required">
+    {% if form.template.errors %}{{ form.template.html_error_list }}{% endif %}
+    <h4><label for="id_template">Template:</label> {{ form.template }}</h4>
+</div>
+</fieldset>
+
+<div class="submit-row">
+    <input type="submit" value="Check for errors" class="default" />
+</div>
+
+</form>
+</div>
+
+{% endblock %}

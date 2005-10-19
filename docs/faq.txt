@@ -348,8 +348,7 @@ things:
     * Set the ``SESSION_COOKIE_DOMAIN`` setting in your admin config file
       to match your domain. For example, if you're going to
       "http://www.mysite.com/admin/" in your browser, in
-      "myproject.settings.admin" you should set ``SESSION_COOKIE_DOMAIN =
-      'www.mysite.com'``.
+      "myproject.settings" you should set ``SESSION_COOKIE_DOMAIN = 'www.mysite.com'``.
 
     * Some browsers (Firefox?) don't like to accept cookies from domains that
       don't have dots in them. If you're running the admin site on "localhost"

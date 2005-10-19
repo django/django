@@ -602,7 +602,7 @@ class AdminMediaHandler:
         from django.conf import settings
         import django
         self.application = application
-        self.media_dir = django.__path__[0] + '/conf/admin_media'
+        self.media_dir = django.__path__[0] + '/contrib/admin/media'
         self.media_url = settings.ADMIN_MEDIA_PREFIX
 
     def __call__(self, environ, start_response):
