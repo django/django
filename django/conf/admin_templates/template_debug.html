@@ -1,0 +1,25 @@
+{% extends "base_site" %}
+
+{% block content %}
+   <div>
+   <h2> Error in Template </h2>
+   <pre>
+   {{message}}
+   </pre>
+   
+   {%ifnotequal bottom "0"%}
+   .<br/>.<br/>.<br/>
+   {%endifnotequal%}
+   
+   <pre class="source">
+   
+   {% for source_line in source_lines %}{% ifequal source_line.0 line %}<span class="error">{{source_line.0|rjust:"5"}}:{{ source_line.1}} </span>
+   {% else %}{{source_line.0|rjust:"5"}}:{{ source_line.1 }} 
+   {% endifequal %}{% endfor %}
+   </pre>
+   {%ifnotequal top total%}
+   .<br/>.<br/>.<br/>
+   {%endifnotequal%}
+   
+   </div>
+{% endblock %}
