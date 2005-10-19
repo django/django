@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2005-10-18 01:09+0200\n"
+"POT-Creation-Date: 2005-10-19 20:20+0200\n"
 "PO-Revision-Date: 2005-10-16 14:29+0100\n"
 "Last-Translator: Afonso Fernández Nogueira <fonzzo.django@gmail.com>\n"
 "Language-Team: Galego\n"
@@ -16,6 +16,297 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "X-Poedit-Language: Galician\n"
 "X-Poedit-SourceCharset: utf-8\n"
+
+#: contrib/admin/templates/admin/base_site.html:3
+msgid "Django site admin"
+msgstr "Administración de sitio Django"
+
+#: contrib/admin/templates/admin/base_site.html:6
+msgid "Django administration"
+msgstr "Administración de Django"
+
+#: contrib/admin/templates/admin/500.html:5
+msgid "Server error (500)"
+msgstr "Erro do servidor (500)"
+
+#: contrib/admin/templates/admin/500.html:8
+msgid "Server Error <em>(500)</em>"
+msgstr "Erro do servidor <em>(500)</em>"
+
+#: contrib/admin/templates/admin/500.html:9
+msgid ""
+"There's been an error. It's been reported to the site administrators via e-"
+"mail and should be fixed shortly. Thanks for your patience."
+msgstr ""
+"Houbo un erro. Xa se informou aos administradores do sitio por correo "
+"electrónico e debería quedar arranxado pronto. Grazas pola súa paciencia."
+
+#: contrib/admin/templates/admin/404.html:3
+#: contrib/admin/templates/admin/404.html:7
+msgid "Page not found"
+msgstr "Páxina non atopada"
+
+#: contrib/admin/templates/admin/404.html:9
+msgid "We're sorry, but the requested page could not be found."
+msgstr "Sentímolo, pero non se atopou a páxina solicitada."
+
+#: contrib/admin/templates/admin/index.html:26
+msgid "Add"
+msgstr "Engadir"
+
+#: contrib/admin/templates/admin/index.html:32
+msgid "Change"
+msgstr "Modificar"
+
+#: contrib/admin/templates/admin/index.html:42
+msgid "You don't have permission to edit anything."
+msgstr "Non ten permiso para editar nada."
+
+#: contrib/admin/templates/admin/index.html:50
+msgid "Recent Actions"
+msgstr "Accións recentes"
+
+#: contrib/admin/templates/admin/index.html:51
+msgid "My Actions"
+msgstr "As miñas accións"
+
+#: contrib/admin/templates/admin/index.html:55
+msgid "None available"
+msgstr "Ningunha dispoñíbel"
+
+#: contrib/admin/templates/admin/object_history.html:4
+#: contrib/admin/templates/admin/base.html:28
+#: contrib/admin/templates/registration/password_change_done.html:3
+#: contrib/admin/templates/registration/password_reset_form.html:3
+#: contrib/admin/templates/registration/logged_out.html:3
+#: contrib/admin/templates/registration/password_reset_done.html:3
+#: contrib/admin/templates/registration/password_change_form.html:3
+msgid "Home"
+msgstr "Inicio"
+
+#: contrib/admin/templates/admin/object_history.html:4
+msgid "History"
+msgstr "Histórico"
+
+#: contrib/admin/templates/admin/object_history.html:17
+msgid "Date/time"
+msgstr "Data/hora"
+
+#: contrib/admin/templates/admin/object_history.html:18 models/auth.py:47
+msgid "User"
+msgstr "Usuario"
+
+#: contrib/admin/templates/admin/object_history.html:19
+msgid "Action"
+msgstr "Acción"
+
+#: contrib/admin/templates/admin/object_history.html:35
+msgid ""
+"This object doesn't have a change history. It probably wasn't added via this "
+"admin site."
+msgstr ""
+"Este obxecto non ten histórico de cambios. Posibelmente non se creou usando "
+"este sitio de administración."
+
+#: contrib/admin/templates/admin/login.html:14
+msgid "Username:"
+msgstr "Usuario:"
+
+#: contrib/admin/templates/admin/login.html:17
+msgid "Password:"
+msgstr "Contrasinal:"
+
+#: contrib/admin/templates/admin/login.html:19
+msgid "Have you <a href=\"/password_reset/\">forgotten your password</a>?"
+msgstr "<a href=\"/password_reset/\">Esqueceu o contrasinal</a>?"
+
+#: contrib/admin/templates/admin/login.html:23
+msgid "Log in"
+msgstr "Entrar"
+
+#: contrib/admin/templates/admin/base.html:22
+msgid "Welcome,"
+msgstr "Benvido,"
+
+#: contrib/admin/templates/admin/base.html:22
+msgid "Change password"
+msgstr "Cambiar contrasinal"
+
+#: contrib/admin/templates/admin/base.html:22
+msgid "Log out"
+msgstr "Saír"
+
+#: contrib/admin/templates/admin/delete_confirmation.html:6
+#, python-format
+msgid ""
+"Deleting the %(object_name)s  '%(object)s' would result in deleting related "
+"objects, but your account doesn't have permission to delete the following "
+"types of objects:"
+msgstr ""
+"Borrar o %(object_name)s '%(object)s' resultaría na eliminación de obxectos "
+"relacionados, pero a súa conta non ten permiso para borrar os seguintes "
+"tipos de obxectos:"
+
+#: contrib/admin/templates/admin/delete_confirmation.html:13
+#, python-format
+msgid ""
+"Are you sure you want to delete the %(object_name)s \"%(object)s\"? All of "
+"the following related items will be deleted:"
+msgstr ""
+"Seguro que quere borrar o %(object_name)s \"%(object)s\"? Eliminaranse os "
+"seguintes obxectos relacionados:"
+
+#: contrib/admin/templates/admin/delete_confirmation.html:17
+msgid "Yes, I'm sure"
+msgstr "Si, estou seguro"
+
+#: contrib/admin/templates/registration/password_change_done.html:3
+#: contrib/admin/templates/registration/password_change_form.html:3
+#: contrib/admin/templates/registration/password_change_form.html:5
+#: contrib/admin/templates/registration/password_change_form.html:9
+msgid "Password change"
+msgstr "Cambiar o contrasinal"
+
+#: contrib/admin/templates/registration/password_change_done.html:5
+#: contrib/admin/templates/registration/password_change_done.html:9
+msgid "Password change successful"
+msgstr "O seu contrasinal cambiouse correctamente."
+
+#: contrib/admin/templates/registration/password_change_done.html:11
+msgid "Your password was changed."
+msgstr "Cambiouse o seu contrasinal."
+
+#: contrib/admin/templates/registration/password_reset_form.html:3
+#: contrib/admin/templates/registration/password_reset_form.html:5
+#: contrib/admin/templates/registration/password_reset_form.html:9
+#: contrib/admin/templates/registration/password_reset_done.html:3
+msgid "Password reset"
+msgstr "Recuperar o contrasinal"
+
+#: contrib/admin/templates/registration/password_reset_form.html:11
+msgid ""
+"Forgotten your password? Enter your e-mail address below, and we'll reset "
+"your password and e-mail the new one to you."
+msgstr ""
+"Esqueceu o contrasinal? Introduza o seu enderezo de correo electrónico "
+"embaixo e enviarémoslle un novo contrasinal."
+
+#: contrib/admin/templates/registration/password_reset_form.html:15
+msgid "E-mail address:"
+msgstr "Enderezo de correo electrónico:"
+
+#: contrib/admin/templates/registration/password_reset_form.html:15
+msgid "Reset my password"
+msgstr "Recuperar o meu contrasinal"
+
+#: contrib/admin/templates/registration/logged_out.html:7
+msgid "Thanks for spending some quality time with the Web site today."
+msgstr "Grazas polo tempo que dedicou ao sitio web."
+
+#: contrib/admin/templates/registration/logged_out.html:9
+msgid "Log in again"
+msgstr "Entrar de novo"
+
+#: contrib/admin/templates/registration/password_reset_done.html:5
+#: contrib/admin/templates/registration/password_reset_done.html:9
+msgid "Password reset successful"
+msgstr "O contrasinal foi recuperado correctamente"
+
+#: contrib/admin/templates/registration/password_reset_done.html:11
+msgid ""
+"We've e-mailed a new password to the e-mail address you submitted. You "
+"should be receiving it shortly."
+msgstr ""
+"Acabamos de enviarlle un novo contrasinal ao enderezo de correo indicado. "
+"Debería recibilo en breve."
+
+#: contrib/admin/templates/registration/password_change_form.html:11
+msgid ""
+"Please enter your old password, for security's sake, and then enter your new "
+"password twice so we can verify you typed it in correctly."
+msgstr ""
+"Por razóns de seguridade, introduza o contrasinal actual. Despois introduza "
+"dúas veces o contrasinal para verificarmos que o escribiu correctamente."
+
+#: contrib/admin/templates/registration/password_change_form.html:16
+msgid "Old password:"
+msgstr "Contrasinal actual:"
+
+#: contrib/admin/templates/registration/password_change_form.html:18
+msgid "New password:"
+msgstr "Contrasinal novo:"
+
+#: contrib/admin/templates/registration/password_change_form.html:20
+msgid "Confirm password:"
+msgstr "Confirmar contrasinal:"
+
+#: contrib/admin/templates/registration/password_change_form.html:22
+msgid "Change my password"
+msgstr "Cambiar o contrasinal"
+
+#: contrib/admin/templates/registration/password_reset_email.html:1
+msgid "You're receiving this e-mail because you requested a password reset"
+msgstr "Recibe esta mensaxe porque solicitou recuperar o contrasinal"
+
+#: contrib/admin/templates/registration/password_reset_email.html:2
+#, python-format
+msgid "for your user account at %(site_name)s"
+msgstr "para a súa conta de usuario en %(site_name)s"
+
+#: contrib/admin/templates/registration/password_reset_email.html:4
+#, python-format
+msgid "Your new password is: %(new_password)s"
+msgstr "O seu novo contrasinal é: %(new_password)s"
+
+#: contrib/admin/templates/registration/password_reset_email.html:6
+msgid "Feel free to change this password by going to this page:"
+msgstr "Pode cambiar este contrasinal visitando esta páxina:"
+
+#: contrib/admin/templates/registration/password_reset_email.html:10
+msgid "Your username, in case you've forgotten:"
+msgstr "No caso de que o esquecese, o seu nome de usuario é:"
+
+#: contrib/admin/templates/registration/password_reset_email.html:12
+msgid "Thanks for using our site!"
+msgstr "Grazas por usar o noso sitio web!"
+
+#: contrib/admin/templates/registration/password_reset_email.html:14
+#, python-format
+msgid "The %(site_name)s team"
+msgstr "O equipo de %(site_name)s"
+
+#: contrib/admin/models/admin.py:6
+#, fuzzy
+msgid "action time"
+msgstr "Data/hora"
+
+#: contrib/admin/models/admin.py:8 models/core.py:38
+msgid "content type"
+msgstr ""
+
+#: contrib/admin/models/admin.py:9
+msgid "object id"
+msgstr ""
+
+#: contrib/admin/models/admin.py:10
+msgid "object repr"
+msgstr ""
+
+#: contrib/admin/models/admin.py:11
+msgid "action flag"
+msgstr ""
+
+#: contrib/admin/models/admin.py:12
+msgid "change message"
+msgstr ""
+
+#: contrib/admin/models/admin.py:15
+msgid "log entry"
+msgstr ""
+
+#: contrib/admin/models/admin.py:16
+msgid "log entries"
+msgstr ""
 
 #: models/core.py:5
 msgid "domain name"
@@ -52,10 +343,6 @@ msgstr ""
 
 #: models/core.py:36
 msgid "python module name"
-msgstr ""
-
-#: models/core.py:38
-msgid "content type"
 msgstr ""
 
 #: models/core.py:39
@@ -234,10 +521,6 @@ msgid ""
 "all permissions granted to each group he/she is in."
 msgstr ""
 
-#: models/auth.py:47 conf/admin_templates/admin_object_history.html:18
-msgid "User"
-msgstr "Usuario"
-
 #: models/auth.py:48
 #, fuzzy
 msgid "Users"
@@ -251,291 +534,9 @@ msgstr ""
 msgid "Important dates"
 msgstr ""
 
-#: models/auth.py:182 models/auth.py:188
+#: models/auth.py:182
 msgid "Message"
 msgstr ""
-
-#: models/auth.py:189
-msgid "Messages"
-msgstr ""
-
-#: models/auth.py:192
-#, fuzzy
-msgid "action time"
-msgstr "Data/hora"
-
-#: models/auth.py:195
-msgid "object id"
-msgstr ""
-
-#: models/auth.py:196
-msgid "object repr"
-msgstr ""
-
-#: models/auth.py:197
-msgid "action flag"
-msgstr ""
-
-#: models/auth.py:201
-msgid "log entry"
-msgstr ""
-
-#: models/auth.py:202
-msgid "log entries"
-msgstr ""
-
-#: conf/admin_templates/admin_object_history.html:4
-#: conf/admin_templates/base.html:28
-#: conf/admin_templates/registration/password_change_done.html:3
-#: conf/admin_templates/registration/password_reset_form.html:3
-#: conf/admin_templates/registration/logged_out.html:3
-#: conf/admin_templates/registration/password_reset_done.html:3
-#: conf/admin_templates/registration/password_change_form.html:3
-msgid "Home"
-msgstr "Inicio"
-
-#: conf/admin_templates/admin_object_history.html:4
-msgid "History"
-msgstr "Histórico"
-
-#: conf/admin_templates/admin_object_history.html:17
-msgid "Date/time"
-msgstr "Data/hora"
-
-#: conf/admin_templates/admin_object_history.html:19
-msgid "Action"
-msgstr "Acción"
-
-#: conf/admin_templates/admin_object_history.html:35
-msgid ""
-"This object doesn't have a change history. It probably wasn't added via this "
-"admin site."
-msgstr ""
-"Este obxecto non ten histórico de cambios. Posibelmente non se creou usando "
-"este sitio de administración."
-
-#: conf/admin_templates/base_site.html:3
-msgid "Django site admin"
-msgstr "Administración de sitio Django"
-
-#: conf/admin_templates/base_site.html:6
-msgid "Django administration"
-msgstr "Administración de Django"
-
-#: conf/admin_templates/index.html:26
-msgid "Add"
-msgstr "Engadir"
-
-#: conf/admin_templates/index.html:32
-msgid "Change"
-msgstr "Modificar"
-
-#: conf/admin_templates/index.html:42
-msgid "You don't have permission to edit anything."
-msgstr "Non ten permiso para editar nada."
-
-#: conf/admin_templates/index.html:50
-msgid "Recent Actions"
-msgstr "Accións recentes"
-
-#: conf/admin_templates/index.html:51
-msgid "My Actions"
-msgstr "As miñas accións"
-
-#: conf/admin_templates/index.html:55
-msgid "None available"
-msgstr "Ningunha dispoñíbel"
-
-#: conf/admin_templates/500.html:5
-msgid "Server error (500)"
-msgstr "Erro do servidor (500)"
-
-#: conf/admin_templates/500.html:8
-msgid "Server Error <em>(500)</em>"
-msgstr "Erro do servidor <em>(500)</em>"
-
-#: conf/admin_templates/500.html:9
-msgid ""
-"There's been an error. It's been reported to the site administrators via e-"
-"mail and should be fixed shortly. Thanks for your patience."
-msgstr ""
-"Houbo un erro. Xa se informou aos administradores do sitio por correo "
-"electrónico e debería quedar arranxado pronto. Grazas pola súa paciencia."
-
-#: conf/admin_templates/404.html:3 conf/admin_templates/404.html.py:7
-msgid "Page not found"
-msgstr "Páxina non atopada"
-
-#: conf/admin_templates/404.html:9
-msgid "We're sorry, but the requested page could not be found."
-msgstr "Sentímolo, pero non se atopou a páxina solicitada."
-
-#: conf/admin_templates/delete_confirmation_generic.html:6
-#, python-format
-msgid ""
-"Deleting the %(object_name)s  '%(object)s' would result in deleting related "
-"objects, but your account doesn't have permission to delete the following "
-"types of objects:"
-msgstr ""
-"Borrar o %(object_name)s '%(object)s' resultaría na eliminación de obxectos "
-"relacionados, pero a súa conta non ten permiso para borrar os seguintes "
-"tipos de obxectos:"
-
-#: conf/admin_templates/delete_confirmation_generic.html:13
-#, python-format
-msgid ""
-"Are you sure you want to delete the %(object_name)s \"%(object)s\"? All of "
-"the following related items will be deleted:"
-msgstr ""
-"Seguro que quere borrar o %(object_name)s \"%(object)s\"? Eliminaranse os "
-"seguintes obxectos relacionados:"
-
-#: conf/admin_templates/delete_confirmation_generic.html:17
-msgid "Yes, I'm sure"
-msgstr "Si, estou seguro"
-
-#: conf/admin_templates/login.html:14
-msgid "Username:"
-msgstr "Usuario:"
-
-#: conf/admin_templates/login.html:17
-msgid "Password:"
-msgstr "Contrasinal:"
-
-#: conf/admin_templates/login.html:19
-msgid "Have you <a href=\"/password_reset/\">forgotten your password</a>?"
-msgstr "<a href=\"/password_reset/\">Esqueceu o contrasinal</a>?"
-
-#: conf/admin_templates/login.html:23
-msgid "Log in"
-msgstr "Entrar"
-
-#: conf/admin_templates/base.html:22
-msgid "Welcome,"
-msgstr "Benvido,"
-
-#: conf/admin_templates/base.html:22
-msgid "Change password"
-msgstr "Cambiar contrasinal"
-
-#: conf/admin_templates/base.html:22
-msgid "Log out"
-msgstr "Saír"
-
-#: conf/admin_templates/registration/password_change_done.html:3
-#: conf/admin_templates/registration/password_change_form.html:3
-#: conf/admin_templates/registration/password_change_form.html:5
-#: conf/admin_templates/registration/password_change_form.html:9
-msgid "Password change"
-msgstr "Cambiar o contrasinal"
-
-#: conf/admin_templates/registration/password_change_done.html:5
-#: conf/admin_templates/registration/password_change_done.html:9
-msgid "Password change successful"
-msgstr "O seu contrasinal cambiouse correctamente."
-
-#: conf/admin_templates/registration/password_change_done.html:11
-msgid "Your password was changed."
-msgstr "Cambiouse o seu contrasinal."
-
-#: conf/admin_templates/registration/password_reset_form.html:3
-#: conf/admin_templates/registration/password_reset_form.html:5
-#: conf/admin_templates/registration/password_reset_form.html:9
-#: conf/admin_templates/registration/password_reset_done.html:3
-msgid "Password reset"
-msgstr "Recuperar o contrasinal"
-
-#: conf/admin_templates/registration/password_reset_form.html:11
-msgid ""
-"Forgotten your password? Enter your e-mail address below, and we'll reset "
-"your password and e-mail the new one to you."
-msgstr ""
-"Esqueceu o contrasinal? Introduza o seu enderezo de correo electrónico "
-"embaixo e enviarémoslle un novo contrasinal."
-
-#: conf/admin_templates/registration/password_reset_form.html:15
-msgid "E-mail address:"
-msgstr "Enderezo de correo electrónico:"
-
-#: conf/admin_templates/registration/password_reset_form.html:15
-msgid "Reset my password"
-msgstr "Recuperar o meu contrasinal"
-
-#: conf/admin_templates/registration/logged_out.html:7
-msgid "Thanks for spending some quality time with the Web site today."
-msgstr "Grazas polo tempo que dedicou ao sitio web."
-
-#: conf/admin_templates/registration/logged_out.html:9
-msgid "Log in again"
-msgstr "Entrar de novo"
-
-#: conf/admin_templates/registration/password_reset_done.html:5
-#: conf/admin_templates/registration/password_reset_done.html:9
-msgid "Password reset successful"
-msgstr "O contrasinal foi recuperado correctamente"
-
-#: conf/admin_templates/registration/password_reset_done.html:11
-msgid ""
-"We've e-mailed a new password to the e-mail address you submitted. You "
-"should be receiving it shortly."
-msgstr ""
-"Acabamos de enviarlle un novo contrasinal ao enderezo de correo indicado. "
-"Debería recibilo en breve."
-
-#: conf/admin_templates/registration/password_change_form.html:11
-msgid ""
-"Please enter your old password, for security's sake, and then enter your new "
-"password twice so we can verify you typed it in correctly."
-msgstr ""
-"Por razóns de seguridade, introduza o contrasinal actual. Despois introduza "
-"dúas veces o contrasinal para verificarmos que o escribiu correctamente."
-
-#: conf/admin_templates/registration/password_change_form.html:16
-msgid "Old password:"
-msgstr "Contrasinal actual:"
-
-#: conf/admin_templates/registration/password_change_form.html:18
-msgid "New password:"
-msgstr "Contrasinal novo:"
-
-#: conf/admin_templates/registration/password_change_form.html:20
-msgid "Confirm password:"
-msgstr "Confirmar contrasinal:"
-
-#: conf/admin_templates/registration/password_change_form.html:22
-msgid "Change my password"
-msgstr "Cambiar o contrasinal"
-
-#: conf/admin_templates/registration/password_reset_email.html:1
-msgid "You're receiving this e-mail because you requested a password reset"
-msgstr "Recibe esta mensaxe porque solicitou recuperar o contrasinal"
-
-#: conf/admin_templates/registration/password_reset_email.html:2
-#, python-format
-msgid "for your user account at %(site_name)s"
-msgstr "para a súa conta de usuario en %(site_name)s"
-
-#: conf/admin_templates/registration/password_reset_email.html:4
-#, python-format
-msgid "Your new password is: %(new_password)s"
-msgstr "O seu novo contrasinal é: %(new_password)s"
-
-#: conf/admin_templates/registration/password_reset_email.html:6
-msgid "Feel free to change this password by going to this page:"
-msgstr "Pode cambiar este contrasinal visitando esta páxina:"
-
-#: conf/admin_templates/registration/password_reset_email.html:10
-msgid "Your username, in case you've forgotten:"
-msgstr "No caso de que o esquecese, o seu nome de usuario é:"
-
-#: conf/admin_templates/registration/password_reset_email.html:12
-msgid "Thanks for using our site!"
-msgstr "Grazas por usar o noso sitio web!"
-
-#: conf/admin_templates/registration/password_reset_email.html:14
-#, python-format
-msgid "The %(site_name)s team"
-msgstr "O equipo de %(site_name)s"
 
 #: core/validators.py:57
 msgid "This value must contain only letters, numbers and underscores."

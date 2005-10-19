@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django Serbian (latin) translation v1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2005-10-17 20:56+0200\n"
+"POT-Creation-Date: 2005-10-19 20:20+0200\n"
 "PO-Revision-Date: 2005-10-05 14:39+0100\n"
 "Last-Translator: Petar Marić <petar.maric@gmail.com>\n"
 "Language-Team: Nesh <nesh@studioquatro.co.yu> & Petar <petar.maric@gmail."
@@ -16,6 +16,298 @@ msgstr ""
 "X-Poedit-Country: YUGOSLAVIA\n"
 "X-Poedit-SourceCharset: utf-8\n"
 "X-Poedit-Basepath: ../../../../\n"
+
+#: contrib/admin/templates/admin/base_site.html:3
+msgid "Django site admin"
+msgstr "Django administracija sajta"
+
+#: contrib/admin/templates/admin/base_site.html:6
+msgid "Django administration"
+msgstr "Django administracija"
+
+#: contrib/admin/templates/admin/500.html:5
+msgid "Server error (500)"
+msgstr "Greška na serveru (500)"
+
+#: contrib/admin/templates/admin/500.html:8
+msgid "Server Error <em>(500)</em>"
+msgstr "Greška na serveru <em>(500)</em>"
+
+#: contrib/admin/templates/admin/500.html:9
+msgid ""
+"There's been an error. It's been reported to the site administrators via e-"
+"mail and should be fixed shortly. Thanks for your patience."
+msgstr ""
+"Dogodila se greška koja je prijavljena administratorima i biće popravljena "
+"uskoro. Hvala Vam na strpljenju."
+
+#: contrib/admin/templates/admin/404.html:3
+#: contrib/admin/templates/admin/404.html:7
+msgid "Page not found"
+msgstr "Strana nije pronađena"
+
+#: contrib/admin/templates/admin/404.html:9
+msgid "We're sorry, but the requested page could not be found."
+msgstr "Tražena strana ne postoji"
+
+#: contrib/admin/templates/admin/index.html:26
+msgid "Add"
+msgstr "Dodaj"
+
+#: contrib/admin/templates/admin/index.html:32
+msgid "Change"
+msgstr "Izmena"
+
+#: contrib/admin/templates/admin/index.html:42
+msgid "You don't have permission to edit anything."
+msgstr "Nemate dozvolu da vršite izmene."
+
+#: contrib/admin/templates/admin/index.html:50
+msgid "Recent Actions"
+msgstr "Skorije akcije"
+
+#: contrib/admin/templates/admin/index.html:51
+msgid "My Actions"
+msgstr "Moje akcije"
+
+#: contrib/admin/templates/admin/index.html:55
+msgid "None available"
+msgstr "Nema dostupnih"
+
+#: contrib/admin/templates/admin/object_history.html:4
+#: contrib/admin/templates/admin/base.html:28
+#: contrib/admin/templates/registration/password_change_done.html:3
+#: contrib/admin/templates/registration/password_reset_form.html:3
+#: contrib/admin/templates/registration/logged_out.html:3
+#: contrib/admin/templates/registration/password_reset_done.html:3
+#: contrib/admin/templates/registration/password_change_form.html:3
+msgid "Home"
+msgstr "Početna strana"
+
+#: contrib/admin/templates/admin/object_history.html:4
+msgid "History"
+msgstr "Istorija"
+
+#: contrib/admin/templates/admin/object_history.html:17
+msgid "Date/time"
+msgstr "Datum/vreme"
+
+#: contrib/admin/templates/admin/object_history.html:18 models/auth.py:47
+msgid "User"
+msgstr "Korisnik"
+
+#: contrib/admin/templates/admin/object_history.html:19
+msgid "Action"
+msgstr "Akcija"
+
+#: contrib/admin/templates/admin/object_history.html:35
+msgid ""
+"This object doesn't have a change history. It probably wasn't added via this "
+"admin site."
+msgstr ""
+"Ovaj objekat nema istoriju promena. Najverovatnije nije dodat korišćenjem "
+"administracije sajta."
+
+#: contrib/admin/templates/admin/login.html:14
+msgid "Username:"
+msgstr "Korisničko ime:"
+
+#: contrib/admin/templates/admin/login.html:17
+msgid "Password:"
+msgstr "Lozinka:"
+
+#: contrib/admin/templates/admin/login.html:19
+msgid "Have you <a href=\"/password_reset/\">forgotten your password</a>?"
+msgstr "Da li ste <a href=\"/password_reset/\">zaboravili Vašu lozinku?</a>?"
+
+#: contrib/admin/templates/admin/login.html:23
+msgid "Log in"
+msgstr "Prijavi se"
+
+#: contrib/admin/templates/admin/base.html:22
+msgid "Welcome,"
+msgstr "Dobrodošli,"
+
+#: contrib/admin/templates/admin/base.html:22
+msgid "Change password"
+msgstr "Izmeni lozinku"
+
+#: contrib/admin/templates/admin/base.html:22
+msgid "Log out"
+msgstr "Odjavi se"
+
+# pridruženih =? related
+#: contrib/admin/templates/admin/delete_confirmation.html:6
+#, python-format
+msgid ""
+"Deleting the %(object_name)s  '%(object)s' would result in deleting related "
+"objects, but your account doesn't have permission to delete the following "
+"types of objects:"
+msgstr ""
+"Brisanjem %(object_name)s  '%(object)s' došlo bi do brisanja pridruženih "
+"objekata, ali nemate dozvole da brišete sledeće tipove objekata:"
+
+#: contrib/admin/templates/admin/delete_confirmation.html:13
+#, python-format
+msgid ""
+"Are you sure you want to delete the %(object_name)s \"%(object)s\"? All of "
+"the following related items will be deleted:"
+msgstr ""
+"Da li ste sigurni da želite da obrišete %(object_name)s \"%(object)s\"? Biće "
+"obrisani i sledeći pridruženi objekti:"
+
+#: contrib/admin/templates/admin/delete_confirmation.html:17
+msgid "Yes, I'm sure"
+msgstr "Da, siguran sam"
+
+#: contrib/admin/templates/registration/password_change_done.html:3
+#: contrib/admin/templates/registration/password_change_form.html:3
+#: contrib/admin/templates/registration/password_change_form.html:5
+#: contrib/admin/templates/registration/password_change_form.html:9
+msgid "Password change"
+msgstr "Izmena lozinke"
+
+#: contrib/admin/templates/registration/password_change_done.html:5
+#: contrib/admin/templates/registration/password_change_done.html:9
+msgid "Password change successful"
+msgstr "Lozinka je uspešno izmenjena"
+
+#: contrib/admin/templates/registration/password_change_done.html:11
+msgid "Your password was changed."
+msgstr "Vaša lozinka je izmenjena."
+
+#: contrib/admin/templates/registration/password_reset_form.html:3
+#: contrib/admin/templates/registration/password_reset_form.html:5
+#: contrib/admin/templates/registration/password_reset_form.html:9
+#: contrib/admin/templates/registration/password_reset_done.html:3
+msgid "Password reset"
+msgstr "Resetovanje lozinke"
+
+#: contrib/admin/templates/registration/password_reset_form.html:11
+msgid ""
+"Forgotten your password? Enter your e-mail address below, and we'll reset "
+"your password and e-mail the new one to you."
+msgstr ""
+"Zaboravili ste svoju lozinku? Unesite Vašu e-mail adresu i dobićete novu "
+"lozinku na dati e-mail."
+
+#: contrib/admin/templates/registration/password_reset_form.html:15
+msgid "E-mail address:"
+msgstr "E-mail adresa:"
+
+#: contrib/admin/templates/registration/password_reset_form.html:15
+msgid "Reset my password"
+msgstr "Resetuj moju lozinku"
+
+#: contrib/admin/templates/registration/logged_out.html:7
+msgid "Thanks for spending some quality time with the Web site today."
+msgstr "Hvala Vam na poseti."
+
+#: contrib/admin/templates/registration/logged_out.html:9
+msgid "Log in again"
+msgstr "Prijavi se ponovo"
+
+#: contrib/admin/templates/registration/password_reset_done.html:5
+#: contrib/admin/templates/registration/password_reset_done.html:9
+msgid "Password reset successful"
+msgstr "Vaša lozinka je uspešno resetovana"
+
+#: contrib/admin/templates/registration/password_reset_done.html:11
+msgid ""
+"We've e-mailed a new password to the e-mail address you submitted. You "
+"should be receiving it shortly."
+msgstr ""
+"Nova lozinka poslata Vam je na zadatu e-mail adresu. E-mail bi trebao da "
+"stigne u narednih nekoliko minuta."
+
+# Nadam se da drugi deo rečenice nie previše fancy
+#: contrib/admin/templates/registration/password_change_form.html:11
+msgid ""
+"Please enter your old password, for security's sake, and then enter your new "
+"password twice so we can verify you typed it in correctly."
+msgstr ""
+"Unesite staru lozinku, nakon toga unesite novu lozinku dva puta, radi "
+"provere ispravnosti unosa nove lozinke."
+
+#: contrib/admin/templates/registration/password_change_form.html:16
+msgid "Old password:"
+msgstr "Stara lozinka:"
+
+#: contrib/admin/templates/registration/password_change_form.html:18
+msgid "New password:"
+msgstr "Nova lozinka:"
+
+#: contrib/admin/templates/registration/password_change_form.html:20
+msgid "Confirm password:"
+msgstr "Potvrdite novu lozinku:"
+
+#: contrib/admin/templates/registration/password_change_form.html:22
+msgid "Change my password"
+msgstr "Izmeni moju lozinku"
+
+#: contrib/admin/templates/registration/password_reset_email.html:1
+msgid "You're receiving this e-mail because you requested a password reset"
+msgstr "Primili ste ovaj e-mail jer ste tražili resetovanje lozinke"
+
+#: contrib/admin/templates/registration/password_reset_email.html:2
+#, python-format
+msgid "for your user account at %(site_name)s"
+msgstr "za vaš korisnički nalog na %(site_name)s"
+
+#: contrib/admin/templates/registration/password_reset_email.html:4
+#, python-format
+msgid "Your new password is: %(new_password)s"
+msgstr "Vaša nova lozinka je: %(new_password)s"
+
+#: contrib/admin/templates/registration/password_reset_email.html:6
+msgid "Feel free to change this password by going to this page:"
+msgstr "Lozinku možete izmeniti na sledećoj strani:"
+
+#: contrib/admin/templates/registration/password_reset_email.html:10
+msgid "Your username, in case you've forgotten:"
+msgstr "Vaše korisničko ime, u slučaju da ste zaboravili:"
+
+#: contrib/admin/templates/registration/password_reset_email.html:12
+msgid "Thanks for using our site!"
+msgstr "Hvala Vam na poseti!"
+
+#: contrib/admin/templates/registration/password_reset_email.html:14
+#, python-format
+msgid "The %(site_name)s team"
+msgstr "%(site_name)s tim"
+
+#: contrib/admin/models/admin.py:6
+#, fuzzy
+msgid "action time"
+msgstr "Datum/vreme"
+
+#: contrib/admin/models/admin.py:8 models/core.py:38
+msgid "content type"
+msgstr ""
+
+#: contrib/admin/models/admin.py:9
+msgid "object id"
+msgstr ""
+
+#: contrib/admin/models/admin.py:10
+msgid "object repr"
+msgstr ""
+
+#: contrib/admin/models/admin.py:11
+msgid "action flag"
+msgstr ""
+
+#: contrib/admin/models/admin.py:12
+msgid "change message"
+msgstr ""
+
+#: contrib/admin/models/admin.py:15
+msgid "log entry"
+msgstr ""
+
+#: contrib/admin/models/admin.py:16
+msgid "log entries"
+msgstr ""
 
 #: models/core.py:5
 msgid "domain name"
@@ -52,10 +344,6 @@ msgstr ""
 
 #: models/core.py:36
 msgid "python module name"
-msgstr ""
-
-#: models/core.py:38
-msgid "content type"
 msgstr ""
 
 #: models/core.py:39
@@ -234,10 +522,6 @@ msgid ""
 "all permissions granted to each group he/she is in."
 msgstr ""
 
-#: models/auth.py:47 conf/admin_templates/admin_object_history.html:18
-msgid "User"
-msgstr "Korisnik"
-
 #: models/auth.py:48
 #, fuzzy
 msgid "Users"
@@ -251,292 +535,9 @@ msgstr ""
 msgid "Important dates"
 msgstr ""
 
-#: models/auth.py:182 models/auth.py:188
+#: models/auth.py:182
 msgid "Message"
 msgstr ""
-
-#: models/auth.py:189
-msgid "Messages"
-msgstr ""
-
-#: models/auth.py:192
-#, fuzzy
-msgid "action time"
-msgstr "Datum/vreme"
-
-#: models/auth.py:195
-msgid "object id"
-msgstr ""
-
-#: models/auth.py:196
-msgid "object repr"
-msgstr ""
-
-#: models/auth.py:197
-msgid "action flag"
-msgstr ""
-
-#: models/auth.py:201
-msgid "log entry"
-msgstr ""
-
-#: models/auth.py:202
-msgid "log entries"
-msgstr ""
-
-#: conf/admin_templates/admin_object_history.html:4
-#: conf/admin_templates/base.html:28
-#: conf/admin_templates/registration/password_change_done.html:3
-#: conf/admin_templates/registration/password_reset_form.html:3
-#: conf/admin_templates/registration/logged_out.html:3
-#: conf/admin_templates/registration/password_reset_done.html:3
-#: conf/admin_templates/registration/password_change_form.html:3
-msgid "Home"
-msgstr "Početna strana"
-
-#: conf/admin_templates/admin_object_history.html:4
-msgid "History"
-msgstr "Istorija"
-
-#: conf/admin_templates/admin_object_history.html:17
-msgid "Date/time"
-msgstr "Datum/vreme"
-
-#: conf/admin_templates/admin_object_history.html:19
-msgid "Action"
-msgstr "Akcija"
-
-#: conf/admin_templates/admin_object_history.html:35
-msgid ""
-"This object doesn't have a change history. It probably wasn't added via this "
-"admin site."
-msgstr ""
-"Ovaj objekat nema istoriju promena. Najverovatnije nije dodat korišćenjem "
-"administracije sajta."
-
-#: conf/admin_templates/base_site.html:3
-msgid "Django site admin"
-msgstr "Django administracija sajta"
-
-#: conf/admin_templates/base_site.html:6
-msgid "Django administration"
-msgstr "Django administracija"
-
-#: conf/admin_templates/index.html:26
-msgid "Add"
-msgstr "Dodaj"
-
-#: conf/admin_templates/index.html:32
-msgid "Change"
-msgstr "Izmena"
-
-#: conf/admin_templates/index.html:42
-msgid "You don't have permission to edit anything."
-msgstr "Nemate dozvolu da vršite izmene."
-
-#: conf/admin_templates/index.html:50
-msgid "Recent Actions"
-msgstr "Skorije akcije"
-
-#: conf/admin_templates/index.html:51
-msgid "My Actions"
-msgstr "Moje akcije"
-
-#: conf/admin_templates/index.html:55
-msgid "None available"
-msgstr "Nema dostupnih"
-
-#: conf/admin_templates/500.html:5
-msgid "Server error (500)"
-msgstr "Greška na serveru (500)"
-
-#: conf/admin_templates/500.html:8
-msgid "Server Error <em>(500)</em>"
-msgstr "Greška na serveru <em>(500)</em>"
-
-#: conf/admin_templates/500.html:9
-msgid ""
-"There's been an error. It's been reported to the site administrators via e-"
-"mail and should be fixed shortly. Thanks for your patience."
-msgstr ""
-"Dogodila se greška koja je prijavljena administratorima i biće popravljena "
-"uskoro. Hvala Vam na strpljenju."
-
-#: conf/admin_templates/404.html:3 conf/admin_templates/404.html.py:7
-msgid "Page not found"
-msgstr "Strana nije pronađena"
-
-#: conf/admin_templates/404.html:9
-msgid "We're sorry, but the requested page could not be found."
-msgstr "Tražena strana ne postoji"
-
-# pridruženih =? related
-#: conf/admin_templates/delete_confirmation_generic.html:6
-#, python-format
-msgid ""
-"Deleting the %(object_name)s  '%(object)s' would result in deleting related "
-"objects, but your account doesn't have permission to delete the following "
-"types of objects:"
-msgstr ""
-"Brisanjem %(object_name)s  '%(object)s' došlo bi do brisanja pridruženih "
-"objekata, ali nemate dozvole da brišete sledeće tipove objekata:"
-
-#: conf/admin_templates/delete_confirmation_generic.html:13
-#, python-format
-msgid ""
-"Are you sure you want to delete the %(object_name)s \"%(object)s\"? All of "
-"the following related items will be deleted:"
-msgstr ""
-"Da li ste sigurni da želite da obrišete %(object_name)s \"%(object)s\"? Biće "
-"obrisani i sledeći pridruženi objekti:"
-
-#: conf/admin_templates/delete_confirmation_generic.html:17
-msgid "Yes, I'm sure"
-msgstr "Da, siguran sam"
-
-#: conf/admin_templates/login.html:14
-msgid "Username:"
-msgstr "Korisničko ime:"
-
-#: conf/admin_templates/login.html:17
-msgid "Password:"
-msgstr "Lozinka:"
-
-#: conf/admin_templates/login.html:19
-msgid "Have you <a href=\"/password_reset/\">forgotten your password</a>?"
-msgstr "Da li ste <a href=\"/password_reset/\">zaboravili Vašu lozinku?</a>?"
-
-#: conf/admin_templates/login.html:23
-msgid "Log in"
-msgstr "Prijavi se"
-
-#: conf/admin_templates/base.html:22
-msgid "Welcome,"
-msgstr "Dobrodošli,"
-
-#: conf/admin_templates/base.html:22
-msgid "Change password"
-msgstr "Izmeni lozinku"
-
-#: conf/admin_templates/base.html:22
-msgid "Log out"
-msgstr "Odjavi se"
-
-#: conf/admin_templates/registration/password_change_done.html:3
-#: conf/admin_templates/registration/password_change_form.html:3
-#: conf/admin_templates/registration/password_change_form.html:5
-#: conf/admin_templates/registration/password_change_form.html:9
-msgid "Password change"
-msgstr "Izmena lozinke"
-
-#: conf/admin_templates/registration/password_change_done.html:5
-#: conf/admin_templates/registration/password_change_done.html:9
-msgid "Password change successful"
-msgstr "Lozinka je uspešno izmenjena"
-
-#: conf/admin_templates/registration/password_change_done.html:11
-msgid "Your password was changed."
-msgstr "Vaša lozinka je izmenjena."
-
-#: conf/admin_templates/registration/password_reset_form.html:3
-#: conf/admin_templates/registration/password_reset_form.html:5
-#: conf/admin_templates/registration/password_reset_form.html:9
-#: conf/admin_templates/registration/password_reset_done.html:3
-msgid "Password reset"
-msgstr "Resetovanje lozinke"
-
-#: conf/admin_templates/registration/password_reset_form.html:11
-msgid ""
-"Forgotten your password? Enter your e-mail address below, and we'll reset "
-"your password and e-mail the new one to you."
-msgstr ""
-"Zaboravili ste svoju lozinku? Unesite Vašu e-mail adresu i dobićete novu "
-"lozinku na dati e-mail."
-
-#: conf/admin_templates/registration/password_reset_form.html:15
-msgid "E-mail address:"
-msgstr "E-mail adresa:"
-
-#: conf/admin_templates/registration/password_reset_form.html:15
-msgid "Reset my password"
-msgstr "Resetuj moju lozinku"
-
-#: conf/admin_templates/registration/logged_out.html:7
-msgid "Thanks for spending some quality time with the Web site today."
-msgstr "Hvala Vam na poseti."
-
-#: conf/admin_templates/registration/logged_out.html:9
-msgid "Log in again"
-msgstr "Prijavi se ponovo"
-
-#: conf/admin_templates/registration/password_reset_done.html:5
-#: conf/admin_templates/registration/password_reset_done.html:9
-msgid "Password reset successful"
-msgstr "Vaša lozinka je uspešno resetovana"
-
-#: conf/admin_templates/registration/password_reset_done.html:11
-msgid ""
-"We've e-mailed a new password to the e-mail address you submitted. You "
-"should be receiving it shortly."
-msgstr ""
-"Nova lozinka poslata Vam je na zadatu e-mail adresu. E-mail bi trebao da "
-"stigne u narednih nekoliko minuta."
-
-# Nadam se da drugi deo rečenice nie previše fancy
-#: conf/admin_templates/registration/password_change_form.html:11
-msgid ""
-"Please enter your old password, for security's sake, and then enter your new "
-"password twice so we can verify you typed it in correctly."
-msgstr ""
-"Unesite staru lozinku, nakon toga unesite novu lozinku dva puta, radi "
-"provere ispravnosti unosa nove lozinke."
-
-#: conf/admin_templates/registration/password_change_form.html:16
-msgid "Old password:"
-msgstr "Stara lozinka:"
-
-#: conf/admin_templates/registration/password_change_form.html:18
-msgid "New password:"
-msgstr "Nova lozinka:"
-
-#: conf/admin_templates/registration/password_change_form.html:20
-msgid "Confirm password:"
-msgstr "Potvrdite novu lozinku:"
-
-#: conf/admin_templates/registration/password_change_form.html:22
-msgid "Change my password"
-msgstr "Izmeni moju lozinku"
-
-#: conf/admin_templates/registration/password_reset_email.html:1
-msgid "You're receiving this e-mail because you requested a password reset"
-msgstr "Primili ste ovaj e-mail jer ste tražili resetovanje lozinke"
-
-#: conf/admin_templates/registration/password_reset_email.html:2
-#, python-format
-msgid "for your user account at %(site_name)s"
-msgstr "za vaš korisnički nalog na %(site_name)s"
-
-#: conf/admin_templates/registration/password_reset_email.html:4
-#, python-format
-msgid "Your new password is: %(new_password)s"
-msgstr "Vaša nova lozinka je: %(new_password)s"
-
-#: conf/admin_templates/registration/password_reset_email.html:6
-msgid "Feel free to change this password by going to this page:"
-msgstr "Lozinku možete izmeniti na sledećoj strani:"
-
-#: conf/admin_templates/registration/password_reset_email.html:10
-msgid "Your username, in case you've forgotten:"
-msgstr "Vaše korisničko ime, u slučaju da ste zaboravili:"
-
-#: conf/admin_templates/registration/password_reset_email.html:12
-msgid "Thanks for using our site!"
-msgstr "Hvala Vam na poseti!"
-
-#: conf/admin_templates/registration/password_reset_email.html:14
-#, python-format
-msgid "The %(site_name)s team"
-msgstr "%(site_name)s tim"
 
 #: core/validators.py:57
 msgid "This value must contain only letters, numbers and underscores."
