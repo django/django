@@ -68,7 +68,7 @@ msgid ""
 "This should be an absolute path, excluding the domain name. Example: '/"
 "events/search/'."
 msgstr ""
-"Ceci doit être un chemin absolu, sans nom de domaine. Par exemple: '/ events/"
+"Ceci doit être un chemin absolu, sans nom de domaine. Par exemple: '/events/"
 "search/'."
 
 #: models/core.py:64
@@ -99,7 +99,7 @@ msgstr "URL"
 msgid ""
 "Example: '/about/contact/'. Make sure to have leading and trailing slashes."
 msgstr ""
-"Par exemple : '/about/contact/'. Vérifiez la présence du caratère '/' en "
+"Par exemple : '/about/contact/'. Vérifiez la présence du caractère '/' en "
 "début et en fin de chaine."
 
 #: models/core.py:83
@@ -150,7 +150,7 @@ msgstr "clé de session"
 
 #: models/core.py:115
 msgid "session data"
-msgstr "données de session"
+msgstr "donnée de session"
 
 #: models/core.py:116
 msgid "expire date"
@@ -238,7 +238,7 @@ msgid ""
 "all permissions granted to each group he/she is in."
 msgstr ""
 "En plus des permissions qui lui sont manuellement assignées, cet utilisateur "
-"recevra aussi toutes les permissions de chaque groupe auquel il appartient. "
+"recevra aussi toutes les permissions de tous les groupes auquels il appartient. "
 
 #: models/auth.py:47 conf/admin_templates/admin_object_history.html:18
 msgid "User"
@@ -250,7 +250,7 @@ msgstr "Utilisateurs"
 
 #: models/auth.py:57
 msgid "Personal info"
-msgstr "Informations personnelle"
+msgstr "Information personnelle"
 
 #: models/auth.py:59
 msgid "Important dates"
@@ -432,7 +432,7 @@ msgstr "Déconnection"
 #: conf/admin_templates/registration/password_change_form.html:5
 #: conf/admin_templates/registration/password_change_form.html:9
 msgid "Password change"
-msgstr "Modifiaction de votre mot de passe"
+msgstr "Modification de votre mot de passe"
 
 #: conf/admin_templates/registration/password_change_done.html:5
 #: conf/admin_templates/registration/password_change_done.html:9
@@ -594,7 +594,7 @@ msgstr "Entrez un nombre entier."
 
 #: core/validators.py:116
 msgid "Only alphabetical characters are allowed here."
-msgstr "Seules les lettres de l'alphabet sont autorisés ici."
+msgstr "Seules les lettres de l'alphabet sont autorisées ici."
 
 #: core/validators.py:120
 msgid "Enter a valid date in YYYY-MM-DD format."
@@ -618,7 +618,7 @@ msgid ""
 "corrupted image."
 msgstr ""
 "Envoyez une image valide. Le fichier que vous avez transferé n'est pas une "
-"image ou bien une image corrompue."
+"image ou bien est une image corrompue."
 
 #: core/validators.py:151
 #, python-format
@@ -821,7 +821,7 @@ msgstr ""
 
 #: core/meta/fields.py:95
 msgid " Separate multiple IDs with commas."
-msgstr "Séparez les IDs par des virgules."
+msgstr "Séparez les ID par des virgules."
 
 #: core/meta/fields.py:98
 msgid ""
