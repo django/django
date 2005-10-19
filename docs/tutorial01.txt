@@ -40,16 +40,10 @@ settings. Let's look at what ``startproject`` created::
         __init__.py
         apps/
             __init__.py
-        settings/
-            __init__.py
-            admin.py
-            main.py
-            urls/
-                __init__.py
-                admin.py
-                main.py
+        settings.py
+        urls.py
 
-First, edit ``myproject/settings/main.py``. It's a normal Python module with
+First, edit ``myproject/settings.py``. It's a normal Python module with
 module-level variables representing Django settings. Edit the file and change
 these settings to match your database's connection parameters:
 
@@ -69,11 +63,6 @@ these settings to match your database's connection parameters:
     point. Do that with "``CREATE DATABASE database_name;``" within your
     database's interactive prompt.
 
-    Also, note that MySQL and sqlite support is a recent development, and Django
-    hasn't been comprehensively tested with either database. If you find any
-    bugs in those bindings, please file them in `Django's ticket system`_ so we
-    can fix them immediately.
-
 Now, take a second to make sure ``myproject`` is on your Python path. You
 can do this by copying ``myproject`` to Python's ``site-packages`` directory,
 or you can do it by altering the ``PYTHONPATH`` environment variable. See the
@@ -84,7 +73,7 @@ or you can do it by altering the ``PYTHONPATH`` environment variable. See the
 
 Run the following command::
 
-    django-admin.py init --settings=myproject.settings.main
+    django-admin.py init --settings=myproject.settings
 
 The ``django-admin.py`` utility generally needs to know which settings module
 you're using. Here, we're doing that by specifying ``settings=`` on the command
@@ -92,11 +81,11 @@ line, but that can get tedious. If you don't want to type ``settings=`` each
 time, you can set the ``DJANGO_SETTINGS_MODULE`` environment variable. Here's
 how you do that in the Bash shell on Unix::
 
-    export DJANGO_SETTINGS_MODULE=myproject.settings.main
+    export DJANGO_SETTINGS_MODULE=myproject.settings
 
 On Windows, you'd use ``set`` instead::
 
-    set DJANGO_SETTINGS_MODULE=myproject.settings.main
+    set DJANGO_SETTINGS_MODULE=myproject.settings
 
 If you don't see any errors after running ``django-admin.py init``, you know it
 worked. That command initialized your database with Django's core database
@@ -221,7 +210,7 @@ But first we need to tell our project that the ``polls`` app is installed.
    projects, and you can distribute apps, because they don't have to be tied to
    a given Django installation.
 
-Edit the myproject/settings/main.py file again, and change the ``INSTALLED_APPS``
+Edit the myproject/settings.py file again, and change the ``INSTALLED_APPS``
 setting to include the string "myproject.apps.polls". So it'll look like this::
 
     INSTALLED_APPS = (

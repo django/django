@@ -192,10 +192,10 @@ Available options
 
 Example usage::
 
-    django-admin.py init --settings='myproject.settings.main'
+    django-admin.py init --settings=myproject.settings
 
 Explicitly specifies the settings module to use. The settings module should be
-in Python path syntax, e.g. "myproject.settings.main". If this isn't provided,
+in Python path syntax, e.g. "myproject.settings". If this isn't provided,
 ``django-admin.py`` will use the DJANGO_SETTINGS_MODULE environment variable.
 
 --pythonpath

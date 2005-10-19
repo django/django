@@ -34,7 +34,7 @@ When you use Django, you have to tell it which settings you're using. Do this
 by using an environment variable, ``DJANGO_SETTINGS_MODULE``.
 
 The value of ``DJANGO_SETTINGS_MODULE`` should be in Python path syntax, e.g.
-``"myproject.settings.main"``. Note that the settings module should be on the
+``"myproject.settings"``. Note that the settings module should be on the
 Python `import search path`_.
 
 .. _import search path: http://diveintopython.org/getting_to_know_python/everything_is_an_object.html
@@ -47,17 +47,17 @@ once, or explicitly pass in the settings module each time you run the utility.
 
 Example (Unix Bash shell)::
 
-    export DJANGO_SETTINGS_MODULE=myproject.settings.main
+    export DJANGO_SETTINGS_MODULE=myproject.settings
     django-admin.py runserver
 
 Example (Windows shell)::
 
-    set DJANGO_SETTINGS_MODULE=myproject.settings.main
+    set DJANGO_SETTINGS_MODULE=myproject.settings
     django-admin.py runserver
 
 Use the ``--settings`` command-line argument to specify the settings manually::
 
-    django-admin.py runserver --settings=myproject.settings.main
+    django-admin.py runserver --settings=myproject.settings
 
 .. _django-admin.py: http://www.djangoproject.com/documentation/django_admin/
 
@@ -70,7 +70,7 @@ settings file to use. Do that with ``SetEnv``::
     <Location "/mysite/">
         SetHandler python-program
         PythonHandler django.core.handlers.modpython
-        SetEnv DJANGO_SETTINGS_MODULE myproject.settings.main
+        SetEnv DJANGO_SETTINGS_MODULE myproject.settings
     </Location>
 
 Read the `Django mod_python documentation`_ for more information.

@@ -1,0 +1,26 @@
+{% extends "admin/base_site" %}
+
+{% block breadcrumbs %}<div class="breadcrumbs"><a href="../../../">Home</a> &rsaquo; <a href="../../">Documentation</a> &rsaquo; <a href="../">Views</a> &rsaquo; {{ name }}</div>{% endblock %}
+
+{% block title %}View: {{ name }}{% endblock %}
+
+{% block content %}
+
+<h1>{{ name }}</h1>
+
+<h2 class="subhead">{{ summary }}</h2>
+
+<p>{{ body }}</p>
+
+{% if meta.Context %}
+<h3>Context:</h3>
+<p>{{ meta.Context }}</p>
+{% endif %}
+
+{% if meta.Templates %}
+<h3>Templates:</h3>
+<p>{{ meta.Templates }}</p>
+{% endif %}
+
+<p class="small"><a href="../">&lsaquo; Back to Views Documentation</a></p>
+{% endblock %}

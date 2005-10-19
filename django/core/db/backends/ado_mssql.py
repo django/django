@@ -102,8 +102,10 @@ def get_limit_offset_sql(limit, offset=None):
     return sql
 
 def get_random_function_sql():
-    # TODO: This is a guess. Make sure this is correct.
-    return "RANDOM()"
+    return "RAND()"
+
+def get_table_list(cursor):
+    raise NotImplementedError
 
 def get_relations(cursor, table_name):
     raise NotImplementedError
@@ -151,3 +153,5 @@ DATA_TYPES = {
     'URLField':          'varchar(200)',
     'USStateField':      'varchar(2)',
 }
+
+DATA_TYPES_REVERSE = {}

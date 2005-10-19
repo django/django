@@ -25,12 +25,11 @@ Then edit your ``httpd.conf`` file and add the following::
     <Location "/mysite/">
         SetHandler python-program
         PythonHandler django.core.handlers.modpython
-        SetEnv DJANGO_SETTINGS_MODULE myproject.settings.main
+        SetEnv DJANGO_SETTINGS_MODULE myproject.settings
         PythonDebug On
     </Location>
 
-...and replace ``myproject.settings.main`` with the Python path to your
-settings file.
+...and replace ``myproject.settings`` with the Python path to your settings file.
 
 This tells Apache: "Use mod_python for any URL at or under '/mysite/', using the
 Django mod_python handler." It passes the value of ``DJANGO_SETTINGS_MODULE``
@@ -55,17 +54,6 @@ full URL.
 When deploying Django sites on mod_python, you'll need to restart Apache each
 time you make changes to your Python code.
 
-Here's a template for an admin configuration::
-
-    <Location "/admin/">
-        SetHandler python-program
-        PythonHandler django.core.handlers.modpython
-        SetEnv DJANGO_SETTINGS_MODULE myproject.settings.admin
-        PythonDebug On
-    </Location>
-
-The only thing different here is the ``DJANGO_SETTINGS_MODULE``.
-
 Multiple Django installations on the same Apache
 ================================================
 
@@ -77,13 +65,13 @@ instance. Just use ``VirtualHost`` for that, like so::
     <VirtualHost *>
         ServerName www.example.com
         # ...
-        SetEnv DJANGO_SETTINGS_MODULE myproject.settings.main
+        SetEnv DJANGO_SETTINGS_MODULE myproject.settings
     </VirtualHost>
 
     <VirtualHost *>
-        ServerName admin.example.com
+        ServerName www2.example.com
         # ...
-        SetEnv DJANGO_SETTINGS_MODULE myproject.settings.admin
+        SetEnv DJANGO_SETTINGS_MODULE myproject.other_settings
     </VirtualHost>
 
 If you need to put two Django installations within the same ``VirtualHost``,
@@ -95,13 +83,13 @@ mess things up. Use the ``PythonInterpreter`` directive to give different
         ServerName www.example.com
         # ...
         <Location "/something">
-            SetEnv DJANGO_SETTINGS_MODULE myproject.settings.main
-            PythonInterpreter myproject_main
+            SetEnv DJANGO_SETTINGS_MODULE myproject.settings
+            PythonInterpreter myproject
         </Location>
 
-        <Location "/admin">
-            SetEnv DJANGO_SETTINGS_MODULE myproject.settings.admin
-            PythonInterpreter myproject_admin
+        <Location "/otherthing">
+            SetEnv DJANGO_SETTINGS_MODULE myproject.other_settings
+            PythonInterpreter myproject_other
         </Location>
     </VirtualHost>
 

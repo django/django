@@ -1,0 +1,42 @@
+{% extends "admin/base_site" %}
+
+{% block breadcrumbs %}
+<div class="breadcrumbs"><a href="../../../../">{{ _('Home') }}</a> &rsaquo; <a href="../../">{{ module_name }}</a> &rsaquo; <a href="../">{{ object|truncatewords:"18" }}</a> &rsaquo; {{ _('History') }}</div>
+{% endblock %}
+
+{% block content %}
+
+<div id="content-main">
+<div class="module">
+
+{% if action_list %}
+
+    <table id="change-history">
+        <thead>
+        <tr>
+            <th>{{ _('Date/time') }}</th>
+            <th>{{ _('User') }}</th>
+            <th>{{ _('Action') }}</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for action in action_list %}
+        <tr>
+            <th>{{ action.action_time|date:"N j, Y, P" }}</th>
+            <td>{{ action.get_user.username }}{% if action.get_user.first_name %} ({{ action.get_user.first_name }} {{ action.get_user.last_name }}){% endif %}</td>
+            <td>{{ action.change_message}}</td>
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+{% else %}
+
+    <p>{{ _("This object doesn't have a change history. It probably wasn't added via this admin site.") }}</p>
+
+{% endif %}
+
+</div>
+</div>
+
+{% endblock %}
