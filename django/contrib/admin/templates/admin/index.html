@@ -49,7 +49,7 @@
     <div class="module" id="recent-actions-module">
         <h2>Recent Actions</h2>
         <h3>My Actions</h3>
-            {% load auth.log %}
+            {% load log %}
             {% get_admin_log 10 as admin_log for_user user %}
             {% if not admin_log %}
             <p>None available</p>
