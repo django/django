@@ -171,7 +171,14 @@ The following arguments are available to all field types. All are optional.
     Like ``unique_for_date`` and ``unique_for_month``.
 
 ``validator_list``
-    A list of extra validators to apply to the field.
+    A list of extra validators to apply to the field. Each should be a callable
+    that takes the parameters ``field_data, all_data`` and raises
+    ``django.core.validators.ValidationError`` for errors. (See the
+    `validator docs`_.)
+
+    Django comes with quite a few validators. They're in ``django.core.validators``.
+
+.. _validator docs: http://www.djangoproject.com/documentation/forms/#validators
 
 Field types
 -----------
