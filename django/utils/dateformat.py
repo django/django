@@ -97,7 +97,7 @@ class TimeFormat(Formatter):
         "Seconds; i.e. '00' to '59'"
         return '%02d' % self.data.second
 
-class DateFormat(Formatter):
+class DateFormat(TimeFormat):
     year_days = [None, 0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334]
 
     def __init__(self, d):

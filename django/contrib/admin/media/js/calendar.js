@@ -65,7 +65,8 @@ var CalendarNamespace = {
         // Draw blanks before first of month
         tableRow = quickElement('tr', tableBody);
         for (var i = 0; i < startingPos; i++) {
-            quickElement('td', tableRow, ' ',  'bgcolor','#f3f3f3');
+            var _cell = quickElement('td', tableRow, ' ');
+            _cell.style.backgroundColor = '#f3f3f3';
         }
 
         // Draw days of month
@@ -81,7 +82,8 @@ var CalendarNamespace = {
 
         // Draw blanks after end of month (optional, but makes for valid code)
         while (tableRow.childNodes.length < 7) {
-            quickElement('td', tableRow, ' ',  'bgcolor','#f3f3f3');
+            var _cell = quickElement('td', tableRow, ' ');
+            _cell.style.backgroundColor = '#f3f3f3';
         }
 
         calDiv.appendChild(calTable);
