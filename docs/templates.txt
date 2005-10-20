@@ -610,6 +610,11 @@ Built-in tag reference
 
         {% ssi /home/html/ljworld.com/includes/right_generic.html parsed %}
 
+    Note that if you use ``{% ssi %}``, you'll need to define
+    `ALLOWED_INCLUDE_ROOTS`_ in your Django settings, as a security measure.
+
+.. _ALLOWED_INCLUDE_ROOTS: http://www.djangoproject.com/documentation/settings/#allowed-include-roots
+
 ``templatetag``
     Output one of the bits used to compose template tags.
 
