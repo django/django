@@ -77,13 +77,15 @@ var DateTimeShortcuts = {
         addEvent(clock_box, 'click', DateTimeShortcuts.cancelEventPropagation);
 
         quickElement('h2', clock_box, 'Choose a time');
-        time_list = quickElement('ul', clock_box, '', 'class', 'timelist');
+        time_list = quickElement('ul', clock_box, '');
+        time_list.className = 'timelist';
         quickElement("a", quickElement("li", time_list, ""), "Now", "href", "javascript:DateTimeShortcuts.handleClockQuicklink(" + num + ", new Date().getHourMinute());")
         quickElement("a", quickElement("li", time_list, ""), "Midnight", "href", "javascript:DateTimeShortcuts.handleClockQuicklink(" + num + ", '00:00');")
         quickElement("a", quickElement("li", time_list, ""), "6 a.m.", "href", "javascript:DateTimeShortcuts.handleClockQuicklink(" + num + ", '06:00');")
         quickElement("a", quickElement("li", time_list, ""), "Noon", "href", "javascript:DateTimeShortcuts.handleClockQuicklink(" + num + ", '12:00');")
 
-        cancel_p = quickElement('p', clock_box, '', 'class', 'calendar-cancel');
+        cancel_p = quickElement('p', clock_box, '');
+        cancel_p.className = 'calendar-cancel';
         quickElement('a', cancel_p, 'Cancel', 'href', 'javascript:DateTimeShortcuts.dismissClock(' + num + ');');
     },
     openClock: function(num) {
@@ -147,8 +149,10 @@ var DateTimeShortcuts = {
 
         // next-prev links
         var cal_nav = quickElement('div', cal_box, '');
-        quickElement('a', cal_nav, '<', 'class', 'calendarnav-previous', 'href', 'javascript:DateTimeShortcuts.drawPrev('+num+');');
-        quickElement('a', cal_nav, '>', 'class', 'calendarnav-next',     'href', 'javascript:DateTimeShortcuts.drawNext('+num+');');
+        var cal_nav_prev = quickElement('a', cal_nav, '<', 'href', 'javascript:DateTimeShortcuts.drawPrev('+num+');');
+        cal_nav_prev.className = 'calendarnav-previous';
+        var cal_nav_next = quickElement('a', cal_nav, '>', 'href', 'javascript:DateTimeShortcuts.drawNext('+num+');');
+        cal_nav_next.className = 'calendarnav-next';
         cal_box.appendChild(cal_nav);
 
         // main box
@@ -158,7 +162,8 @@ var DateTimeShortcuts = {
         DateTimeShortcuts.calendars[num].drawCurrent();
 
         // calendar shortcuts
-        var shortcuts = quickElement('div', cal_box, '', 'class', 'calendar-shortcuts');
+        var shortcuts = quickElement('div', cal_box, '');
+        shortcuts.className = 'calendar-shortcuts';
         quickElement('a', shortcuts, 'Yesterday', 'href', 'javascript:DateTimeShortcuts.handleCalendarQuickLink(' + num + ', -1);');
         shortcuts.appendChild(document.createTextNode('\240|\240'));
         quickElement('a', shortcuts, 'Today', 'href', 'javascript:DateTimeShortcuts.handleCalendarQuickLink(' + num + ', 0);');
@@ -166,7 +171,8 @@ var DateTimeShortcuts = {
         quickElement('a', shortcuts, 'Tomorrow', 'href', 'javascript:DateTimeShortcuts.handleCalendarQuickLink(' + num + ', +1);');
 
         // cancel bar
-        var cancel_p = quickElement('p', cal_box, '', 'class', 'calendar-cancel');
+        var cancel_p = quickElement('p', cal_box, '');
+        cancel_p.className = 'calendar-cancel';
         quickElement('a', cancel_p, 'Cancel', 'href', 'javascript:DateTimeShortcuts.dismissCalendar(' + num + ');');
     },
     openCalendar: function(num) {
