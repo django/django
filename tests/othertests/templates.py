@@ -235,9 +235,8 @@ TEMPLATE_TESTS = {
                     """  ), 
 }
 
-
-# This replaces the standard template loader.
 def test_template_loader(template_name, template_dirs=None):
+    "A custom template loader that loads the unit-test templates."
     try:
         return ( TEMPLATE_TESTS[template_name][0] , "test:%s" % template_name )
     except KeyError:
@@ -247,7 +246,7 @@ def run_tests(verbosity=0, standalone=False):
     # Register our custom template loader.
     old_template_loaders = loader.template_source_loaders
     loader.template_source_loaders = [test_template_loader]
-    
+
     failed_tests = []
     tests = TEMPLATE_TESTS.items()
     tests.sort()

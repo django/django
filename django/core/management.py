@@ -17,7 +17,6 @@ APP_ARGS = '[modelmodule ...]'
 # Use django.__path__[0] because we don't know which directory django into
 # which has been installed.
 PROJECT_TEMPLATE_DIR = os.path.join(django.__path__[0], 'conf', '%s_template')
-ADMIN_TEMPLATE_DIR = os.path.join(django.__path__[0], 'conf', 'admin_templates')
 
 def _get_packages_insert(app_label):
     return "INSERT INTO packages (label, name) VALUES ('%s', '%s');" % (app_label, app_label)
@@ -142,7 +141,7 @@ def get_sql_delete(mod):
     if cursor is not None:
         cursor.execute("SELECT id FROM content_types WHERE package = %s", [app_label])
         for row in cursor.fetchall():
-            output.append("DELETE FROM auth_admin_log WHERE content_type_id = %s;" % row[0])
+            output.append("DELETE FROM django_admin_log WHERE content_type_id = %s;" % row[0])
 
     # Close database connection explicitly, in case this output is being piped
     # directly into a database client, to avoid locking issues.
@@ -378,16 +377,8 @@ def startproject(project_name, directory):
     "Creates a Django project for the given project_name in the given directory."
     from random import choice
     _start_helper('project', project_name, directory)
-    # Populate TEMPLATE_DIRS for the admin templates, based on where Django is
-    # installed.
-    admin_settings_file = os.path.join(directory, project_name, 'settings', 'admin.py')
-    settings_contents = open(admin_settings_file, 'r').read()
-    fp = open(admin_settings_file, 'w')
-    settings_contents = re.sub(r'(?s)\b(TEMPLATE_DIRS\s*=\s*\()(.*?)\)', "\\1\n    r%r,\\2)" % ADMIN_TEMPLATE_DIR, settings_contents)
-    fp.write(settings_contents)
-    fp.close()
     # Create a random SECRET_KEY hash, and put it in the main settings.
-    main_settings_file = os.path.join(directory, project_name, 'settings', 'main.py')
+    main_settings_file = os.path.join(directory, project_name, 'settings.py')
     settings_contents = open(main_settings_file, 'r').read()
     fp = open(main_settings_file, 'w')
     secret_key = ''.join([choice('abcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*(-_=+)') for i in range(50)])

@@ -1,0 +1,65 @@
+{% extends "admin/base_site" %}
+
+{% block coltype %}colMS{% endblock %}
+{% block bodyclass %}dashboard{% endblock %}
+{% block breadcrumbs %}{% endblock %}
+{% block content %}
+<div id="content-main">
+
+{% load adminapplist %}
+
+{% get_admin_app_list as app_list %}
+{% if app_list %}
+    {% for app in app_list %}
+        <div class="module">
+        <h2>{{ app.name }}</h2>
+        <table>
+        {% for model in app.models %}
+            <tr>
+            {% if model.perms.change %}
+                <th><a href="{{ model.admin_url }}">{{ model.name }}</a></th>
+            {% else %}
+                <th>{{ model.name }}</th>
+            {% endif %}
+
+            {% if model.perms.add %}
+                <td class="x50"><a href="{{ model.admin_url }}add/" class="addlink">Add</a></td>
+            {% else %}
+                <td class="x50">&nbsp;</td>
+            {% endif %}
+
+            {% if model.perms.change %}
+                <td class="x75"><a href="{{ model.admin_url }}" class="changelink">Change</a></td>
+            {% else %}
+                <td class="x75">&nbsp;</td>
+            {% endif %}
+            </tr>
+        {% endfor %}
+        </table>
+        </div>
+    {% endfor %}
+{% else %}
+    <p>You don't have permission to edit anything.</p>
+{% endif %}
+</div>
+{% endblock %}
+
+{% block sidebar %}
+<div id="content-related">
+    <div class="module" id="recent-actions-module">
+        <h2>Recent Actions</h2>
+        <h3>My Actions</h3>
+            {% load log %}
+            {% get_admin_log 10 as admin_log for_user user %}
+            {% if not admin_log %}
+            <p>None available</p>
+            {% else %}
+            <ul class="actionlist">
+            {% for entry in admin_log %}
+                <li class="{% if entry.is_addition %}addlink{% endif %}{% if entry.is_change %}changelink{% endif %}{% if entry.is_deletion %}deletelink{% endif %}">{% if not entry.is_deletion %}<a href="{{ entry.get_admin_url }}">{% endif %}{{ entry.object_repr }}{% if not entry.is_deletion %}</a>{% endif %}<br /><span class="mini quiet">{{ entry.get_content_type.name|capfirst }}</span></li>
+            {% endfor %}
+            </ul>
+            {% endif %}
+    </div>
+</div>
+{% endblock %}

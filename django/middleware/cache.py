@@ -52,7 +52,7 @@ class CacheMiddleware:
 
     def process_response(self, request, response):
         "Sets the cache, if needed."
-        if not request._cache_update_cache:
+        if not hasattr(request, '_cache_update_cache') or not request._cache_update_cache:
             # We don't need to update the cache, just return.
             return response
         if not request.META['REQUEST_METHOD'] == 'GET':

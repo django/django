@@ -7,7 +7,7 @@ from django.core.meta.fields import BoundField, BoundFieldLine, BoundFieldSet
 from django.core.exceptions import Http404, ObjectDoesNotExist, PermissionDenied
 from django.core.extensions import DjangoContext as Context
 from django.core.extensions import get_object_or_404, render_to_response
-from django.models.auth import log
+from django.models.admin import log
 from django.utils.html import strip_tags
 from django.utils.httpwrappers import HttpResponse, HttpResponseRedirect
 from django.utils.text import capfirst, get_text_list
@@ -50,7 +50,7 @@ def get_query_string(original_params, new_params={}, remove=[]):
     return '?' + '&amp;'.join(['%s=%s' % (k, v) for k, v in p.items()]).replace(' ', '%20')
 
 def index(request):
-    return render_to_response('index', {'title': 'Site administration'}, context_instance=Context(request))
+    return render_to_response('admin/index', {'title': 'Site administration'}, context_instance=Context(request))
 index = staff_member_required(index)
 
 def change_list(request, app_label, module_name):
@@ -267,7 +267,7 @@ def change_list(request, app_label, module_name):
             else:
                 pass # Invalid argument to "list_filter"
 
-    raw_template = ['{% extends "base_site" %}\n']
+    raw_template = ['{% extends "admin/base_site" %}\n']
     raw_template.append('{% block bodyclass %}change-list{% endblock %}\n')
     if not is_popup:
         raw_template.append('{%% block breadcrumbs %%}<div class="breadcrumbs"><a href="../../">Home</a> &rsaquo; %s</div>{%% endblock %%}\n' % capfirst(opts.verbose_name_plural))
@@ -664,7 +664,7 @@ def fill_extra_context(opts, app_label, context, add=False, change=False, show_d
     context.update(extra_context)   
    
    
-def add_stage_new(request, app_label, module_name, show_delete=False, form_url='', post_url='../', post_url_continue='../%s/', object_id_override=None):
+def add_stage(request, app_label, module_name, show_delete=False, form_url='', post_url='../', post_url_continue='../%s/', object_id_override=None):
     mod, opts = _get_mod_opts(app_label, module_name)
     if not request.user.has_perm(app_label + '.' + opts.get_add_permission()):
         raise PermissionDenied
@@ -724,11 +724,11 @@ def add_stage_new(request, app_label, module_name, show_delete=False, form_url='
     
     fill_extra_context(opts, app_label, c, add=True)
    
-    return render_to_response("admin_change_form", context_instance=c) 
-add_stage_new = staff_member_required(add_stage_new)
+    return render_to_response("admin/change_form", context_instance=c) 
+add_stage = staff_member_required(add_stage)
 
 
-def change_stage_new(request, app_label, module_name, object_id):
+def change_stage(request, app_label, module_name, object_id):
     mod, opts = _get_mod_opts(app_label, module_name)
     if not request.user.has_perm(app_label + '.' + opts.get_change_permission()):
         raise PermissionDenied
@@ -821,461 +821,7 @@ def change_stage_new(request, app_label, module_name, object_id):
 
     fill_extra_context(opts, app_label, c, change=True)
     
-    return render_to_response('admin_change_form', context_instance=c)
-change_stage_new = staff_member_required(change_stage_new)
-
-def _get_template(opts, app_label, add=False, change=False, show_delete=False, form_url=''):
-    admin_field_objs = opts.admin.get_field_objs(opts)
-    ordered_objects = opts.get_ordered_objects()[:]
-    auto_populated_fields = [f for f in opts.fields if f.prepopulate_from]
-    t = ['{% extends "base_site" %}\n']
-    t.append('{% block extrahead %}')
-
-    # Put in any necessary JavaScript imports.
-    javascript_imports = ['%sjs/core.js' % ADMIN_MEDIA_PREFIX, '%sjs/admin/RelatedObjectLookups.js' % ADMIN_MEDIA_PREFIX]
-    if auto_populated_fields:
-        javascript_imports.append('%sjs/urlify.js' % ADMIN_MEDIA_PREFIX)
-    if opts.has_field_type(meta.DateTimeField) or opts.has_field_type(meta.TimeField) or opts.has_field_type(meta.DateField):
-        javascript_imports.extend(['%sjs/calendar.js' % ADMIN_MEDIA_PREFIX, '%sjs/admin/DateTimeShortcuts.js' % ADMIN_MEDIA_PREFIX])
-    if ordered_objects:
-        javascript_imports.extend(['%sjs/getElementsBySelector.js' % ADMIN_MEDIA_PREFIX, '%sjs/dom-drag.js' % ADMIN_MEDIA_PREFIX, '%sjs/admin/ordering.js' % ADMIN_MEDIA_PREFIX])
-    if opts.admin.js:
-        javascript_imports.extend(opts.admin.js)
-    seen_collapse = False
-    for _, options in admin_field_objs:
-        if not seen_collapse and 'collapse' in options.get('classes', ''):
-            seen_collapse = True
-            javascript_imports.append('%sjs/admin/CollapsedFieldsets.js' % ADMIN_MEDIA_PREFIX)
-        try:
-            for field_list in options['fields']:
-                for f in field_list:
-                    if f.rel and isinstance(f, meta.ManyToManyField) and f.rel.filter_interface:
-                        javascript_imports.extend(['%sjs/SelectBox.js' % ADMIN_MEDIA_PREFIX, '%sjs/SelectFilter2.js' % ADMIN_MEDIA_PREFIX])
-                        raise StopIteration
-        except StopIteration:
-            break
-    for j in javascript_imports:
-        t.append('<script type="text/javascript" src="%s"></script>' % j)
-
-    t.append('{% endblock %}\n')
-    if ordered_objects:
-        coltype = 'colMS'
-    else:
-        coltype = 'colM'
-    t.append('{%% block coltype %%}%s{%% endblock %%}\n' % coltype)
-    t.append('{%% block bodyclass %%}%s-%s change-form{%% endblock %%}\n' % (app_label, opts.object_name.lower()))
-    breadcrumb_title = add and "Add %s" % opts.verbose_name or '{{ original|striptags|truncatewords:"18" }}'
-    t.append('{%% block breadcrumbs %%}{%% if not is_popup %%}<div class="breadcrumbs"><a href="../../../">Home</a> &rsaquo; <a href="../">%s</a> &rsaquo; %s</div>{%% endif %%}{%% endblock %%}\n' % \
-        (capfirst(opts.verbose_name_plural), breadcrumb_title))
-    t.append('{% block content %}<div id="content-main">\n')
-    if change:
-        t.append('{% if not is_popup %}')
-        t.append('<ul class="object-tools"><li><a href="history/" class="historylink">History</a></li>')
-        if hasattr(opts.get_model_module().Klass, 'get_absolute_url'):
-            t.append('<li><a href="/r/%s/{{ object_id }}/" class="viewsitelink">View on site</a></li>' % opts.get_content_type_id())
-        t.append('</ul>\n')
-        t.append('{% endif %}')
-    t.append('<form ')
-    if opts.has_field_type(meta.FileField):
-        t.append('enctype="multipart/form-data" ')
-    t.append('action="%s" method="post">\n' % form_url)
-    t.append('{% if is_popup %}<input type="hidden" name="_popup" value="1">{% endif %}')
-    if opts.admin.save_on_top:
-        t.extend(_get_submit_row_template(opts, app_label, add, change, show_delete, ordered_objects))
-    t.append('{% if form.error_dict %}<p class="errornote">Please correct the error{{ form.error_dict.items|pluralize }} below.</p>{% endif %}\n')
-    for fieldset_name, options in admin_field_objs:
-        t.append('<fieldset class="module aligned %s">\n\n' % options.get('classes', ''))
-        if fieldset_name:
-            t.append('<h2>%s</h2>\n' % fieldset_name)
-        for field_list in options['fields']:
-            t.append(_get_admin_field(field_list, 'form.', False, add, change))
-            for f in field_list:
-                if f.rel and isinstance(f, meta.ManyToManyField) and f.rel.filter_interface:
-                    t.append('<script type="text/javascript">addEvent(window, "load", function(e) { SelectFilter.init("id_%s", "%s", %s, %r); });</script>\n' % (f.name, f.verbose_name, f.rel.filter_interface-1, ADMIN_MEDIA_PREFIX))
-        t.append('</fieldset>\n')
-    if ordered_objects and change:
-        t.append('<fieldset class="module"><h2>Ordering</h2>')
-        t.append('<div class="form-row{% if form.order_.errors %} error{% endif %} ">\n')
-        t.append('{% if form.order_.errors %}{{ form.order_.html_error_list }}{% endif %}')
-        t.append('<p><label for="id_order_">Order:</label> {{ form.order_ }}</p>\n')
-        t.append('</div></fieldset>\n')
-    for rel_obj, rel_field in opts.get_inline_related_objects():
-        var_name = rel_obj.object_name.lower()
-        field_list = [f for f in rel_obj.fields + rel_obj.many_to_many if f.editable and f != rel_field]
-
-        t.append('<fieldset class="module%s">\n' % ((rel_field.rel.edit_inline != meta.TABULAR) and ' aligned' or ''))
-        view_on_site = ''
-        if change and hasattr(rel_obj, 'get_absolute_url'):
-            view_on_site = '{%% if %s.original %%}<a href="/r/{{ %s.content_type_id }}/{{ %s.original.id }}/">View on site</a>{%% endif %%}' % (var_name, var_name, var_name)
-        if rel_field.rel.edit_inline == meta.TABULAR:
-            t.append('<h2>%s</h2>\n<table>\n' % capfirst(rel_obj.verbose_name_plural))
-            t.append('<thead><tr>')
-            for f in field_list:
-                if isinstance(f, meta.AutoField):
-                    continue
-                t.append('<th%s>%s</th>' % (f.blank and ' class="optional"' or '', capfirst(f.verbose_name)))
-            t.append('</tr></thead>\n')
-            t.append('{%% for %s in form.%s %%}\n' % (var_name, rel_obj.module_name))
-            if change:
-                for f in field_list:
-                    if use_raw_id_admin(f):
-                        t.append('{%% if %s.original %%}' % var_name)
-                        t.append('<tr class="row-label {% cycle row1,row2 %}">')
-                        t.append('<td colspan="%s"><strong>{{ %s.original }}</strong></td>' % (30, var_name))
-                        t.append('</tr>{% endif %}\n')
-                        break
-            t.append('{%% if %s %%}\n' % ' or '.join(['%s.%s.errors' % (var_name, f.name) for f in field_list]))
-            t.append('<tr class="errorlist"><td colspan="%s">%s</td></tr>\n{%% endif %%}\n' % \
-                (len(field_list), ''.join(['{{ %s.%s.html_error_list }}' % (var_name, f.name) for f in field_list])))
-            t.append('<tr class="{% cycle row1,row2 %}">\n')
-            hidden_fields = []
-            for f in field_list:
-                form_widget = _get_admin_field_form_widget(f, var_name+'.', True, add, change)
-                # Don't put AutoFields within a <td>, because they're hidden.
-                if not isinstance(f, meta.AutoField):
-                    # Fields with raw_id_admin=True get class="nowrap".
-                    if use_raw_id_admin(f):
-                        t.append('<td class="nowrap {%% if %s.%s.errors %%}error"{%% endif %%}">%s</td>\n' % (var_name, f.name, form_widget))
-                    else:
-                        t.append('<td{%% if %s.%s.errors %%} class="error"{%% endif %%}>%s</td>\n' % (var_name, f.name, form_widget))
-                else:
-                    hidden_fields.append(form_widget)
-            if hasattr(rel_obj, 'get_absolute_url'):
-                t.append('<td>%s</td>\n' % view_on_site)
-            t.append('</tr>\n')
-            t.append('{% endfor %}\n</table>\n')
-            # Write out the hidden fields. We didn't write them out earlier
-            # because it would've been invalid HTML.
-            t.append('{%% for %s in form.%s %%}\n' % (var_name, rel_obj.module_name))
-            t.extend(hidden_fields)
-            t.append('{% endfor %}\n')
-        else: # edit_inline == STACKED
-            t.append('{%% for %s in form.%s %%}' % (var_name, rel_obj.module_name))
-            t.append('<h2>%s #{{ forloop.counter }}</h2>' % capfirst(rel_obj.verbose_name))
-            if view_on_site:
-                t.append('<p>%s</p>' % view_on_site)
-            for f in field_list:
-                # Don't put AutoFields within the widget -- just use the field.
-                if isinstance(f, meta.AutoField):
-                    t.append(_get_admin_field_form_widget(f, var_name+'.', True, add, change))
-                else:
-                    t.append(_get_admin_field([f], var_name+'.', True, add, change))
-            t.append('{% endfor %}\n')
-        t.append('</fieldset>\n')
-    t.extend(_get_submit_row_template(opts, app_label, add, change, show_delete, ordered_objects))
-    if add:
-        # Add focus to the first field on the form, if this is an "add" form.
-        t.append('<script type="text/javascript">document.getElementById("id_%s").focus();</script>' % \
-            admin_field_objs[0][1]['fields'][0][0].get_manipulator_field_names('')[0])
-    if auto_populated_fields:
-        t.append('<script type="text/javascript">')
-        for field in auto_populated_fields:
-            if change:
-                t.append('document.getElementById("id_%s")._changed = true;' % field.name)
-            else:
-                t.append('document.getElementById("id_%s").onchange = function() { this._changed = true; };' % field.name)
-            for f in field.prepopulate_from:
-                t.append('document.getElementById("id_%s").onkeyup = function() { var e = document.getElementById("id_%s"); if (!e._changed) { e.value = URLify(%s, %s);}};' % \
-                    (f, field.name, ' + " " + '.join(['document.getElementById("id_%s").value' % g for g in field.prepopulate_from]), field.maxlength))
-        t.append('</script>\n')
-    if change and ordered_objects:
-        t.append('{% if form.order_objects %}<ul id="orderthese">{% for object in form.order_objects %}')
-        t.append('<li id="p{%% firstof %(x)s %%}"><span id="handlep{%% firstof %(x)s %%}">{{ object|truncatewords:"5" }}</span></li>' % \
-            {'x': ' '.join(['object.%s' % o.pk.name for o in ordered_objects])})
-        t.append('{% endfor %}</ul>{% endif %}\n')
-    t.append('</form>\n</div>\n{% endblock %}')
-    return ''.join(t)
-
-def _get_admin_field(field_list, name_prefix, rel, add, change):
-    "Returns the template code for editing the given list of fields in the admin template."
-    field_names = []
-    for f in field_list:
-        field_names.extend(f.get_manipulator_field_names(name_prefix))
-    div_class_names = ['form-row', '{%% if %s %%} error{%% endif %%}' % ' or '.join(['%s.errors' % n for n in field_names])]
-    # Assumes BooleanFields won't be stacked next to each other!
-    if isinstance(field_list[0], meta.BooleanField):
-        div_class_names.append('checkbox-row')
-    t = []
-    t.append('<div class="%s">\n' % ' '.join(div_class_names))
-    for n in field_names:
-        t.append('{%% if %s.errors %%}{{ %s.html_error_list }}{%% endif %%}\n' % (n, n))
-    for i, field in enumerate(field_list):
-        label_name = 'id_%s%s' % ((rel and "%s{{ forloop.counter0 }}." % name_prefix or ""), field.get_manipulator_field_names('')[0])
-        # BooleanFields are a special case, because the checkbox widget appears to
-        # the *left* of the label.
-        if isinstance(field, meta.BooleanField):
-            t.append(_get_admin_field_form_widget(field, name_prefix, rel, add, change))
-            t.append(' <label for="%s" class="vCheckboxLabel">%s</label>' % (label_name, capfirst(field.verbose_name)))
-        else:
-            class_names = []
-            if not field.blank:
-                class_names.append('required')
-            if i > 0:
-                class_names.append('inline')
-            t.append('<label for="%s"%s>%s:</label> ' % (label_name, class_names and ' class="%s"' % ' '.join(class_names) or '', capfirst(field.verbose_name)))
-            t.append(_get_admin_field_form_widget(field, name_prefix, rel, add, change))
-        if change and field.primary_key:
-            t.append('{{ %soriginal.%s }}' % ((rel and name_prefix or ''), field.name))
-        if change and use_raw_id_admin(field):
-            if isinstance(field.rel, meta.ManyToOne):
-                if_bit = '%soriginal.get_%s' % (rel and name_prefix or '', field.name)
-                obj_repr = if_bit + '|truncatewords:"14"'
-            elif isinstance(field.rel, meta.ManyToMany):
-                if_bit = '%soriginal.get_%s_list' % (rel and name_prefix or '', field.name)
-                obj_repr = if_bit + '|join:", "|truncatewords:"14"'
-            t.append('{%% if %s %%}&nbsp;<strong>{{ %s }}</strong>{%% endif %%}' % (if_bit, obj_repr))
-        if field.help_text:
-            t.append('<p class="help">%s</p>\n' % field.help_text)
-    t.append('</div>\n\n')
-    return ''.join(t)
-
-def _get_admin_field_form_widget(field, name_prefix, rel, add, change):
-    "Returns JUST the formfield widget for the field's admin interface."
-    field_names = field.get_manipulator_field_names(name_prefix)
-    if isinstance(field, meta.DateTimeField):
-        return '<p class="datetime">Date: {{ %s }}<br />Time: {{ %s }}</p>' % tuple(field_names)
-    t = ['{{ %s }}' % n for n in field_names]
-    if change and isinstance(field, meta.FileField):
-        return '{%% if %soriginal.%s %%}Currently: <a href="{{ %soriginal.get_%s_url }}">{{ %soriginal.%s }}</a><br />Change: %s{%% else %%}%s{%% endif %%}' % \
-            (name_prefix, field.name, name_prefix, field.name, name_prefix, field.name, ''.join(t), ''.join(t))
-    field_id = 'id_%s%s' % ((rel and "%s{{ forloop.counter0 }}." % name_prefix or ""), field.get_manipulator_field_names('')[0])
-    # raw_id_admin fields get the little lookup link next to them
-    if use_raw_id_admin(field):
-        t.append(' <a href="../../../%s/%s/" class="related-lookup" id="lookup_%s" onclick="return showRelatedObjectLookupPopup(this);">' % \
-                    (field.rel.to.app_label, field.rel.to.module_name, field_id))
-        t.append('<img src="%simg/admin/selector-search.gif" width="16" height="16" alt="Lookup" /></a>' % ADMIN_MEDIA_PREFIX)
-    # fields with relationships to editable objects get an "add another" link,
-    # but only if the field doesn't have raw_admin ('cause in that case they get
-    # the "add" button in the popup)
-    elif field.rel and (isinstance(field.rel, meta.ManyToOne) or isinstance(field.rel, meta.ManyToMany)) and field.rel.to.admin:
-        t.append('{%% if perms.%s.%s %%}' % (field.rel.to.app_label, field.rel.to.get_add_permission()))
-        t.append(' <a href="../../../%s/%s/add/" class="add-another" id="add_%s" onclick="return showAddAnotherPopup(this);">' % \
-                    (field.rel.to.app_label, field.rel.to.module_name, field_id))
-        t.append('<img src="%simg/admin/icon_addlink.gif" width="10" height="10" alt="Add Another" /></a>' % ADMIN_MEDIA_PREFIX)
-        t.append('{% endif %}')
-    return ''.join(t)
-
-def add_stage(request, app_label, module_name, show_delete=False, form_url='', post_url='../', post_url_continue='../%s/', object_id_override=None):
-    mod, opts = _get_mod_opts(app_label, module_name)
-    if not request.user.has_perm(app_label + '.' + opts.get_add_permission()):
-        raise PermissionDenied
-    manipulator = mod.AddManipulator()
-    if request.POST:
-        new_data = request.POST.copy()
-        if opts.has_field_type(meta.FileField):
-            new_data.update(request.FILES)
-        errors = manipulator.get_validation_errors(new_data)
-        if not errors and not request.POST.has_key("_preview"):
-            for f in opts.many_to_many:
-                if f.rel.raw_id_admin:
-                    new_data.setlist(f.name, new_data[f.name].split(","))
-            manipulator.do_html2python(new_data)
-            new_object = manipulator.save(new_data)
-            pk_value = getattr(new_object, opts.pk.column)
-            log.log_action(request.user.id, opts.get_content_type_id(), pk_value, repr(new_object), log.ADDITION)
-            msg = 'The %s "%s" was added successfully.' % (opts.verbose_name, new_object)
-            # Here, we distinguish between different save types by checking for
-            # the presence of keys in request.POST.
-            if request.POST.has_key("_continue"):
-                request.user.add_message("%s You may edit it again below." % msg)
-                if request.POST.has_key("_popup"):
-                    post_url_continue += "?_popup=1"
-                return HttpResponseRedirect(post_url_continue % pk_value)
-            if request.POST.has_key("_popup"):
-                return HttpResponse('<script type="text/javascript">opener.dismissAddAnotherPopup(window, %s, "%s");</script>' % \
-                    (pk_value, repr(new_object).replace('"', '\\"')))
-            elif request.POST.has_key("_addanother"):
-                request.user.add_message("%s You may add another %s below." % (msg, opts.verbose_name))
-                return HttpResponseRedirect(request.path)
-            else:
-                request.user.add_message(msg)
-                return HttpResponseRedirect(post_url)
-        if request.POST.has_key("_preview"):
-            manipulator.do_html2python(new_data)
-    else:
-        new_data = {}
-        # Add default data.
-        for f in opts.fields:
-            if f.has_default():
-                new_data.update( f.flatten_data() )
-            # In required many-to-one fields with only one available choice,
-            # select that one available choice. Note: We have to check that
-            # the length of choices is *2*, not 1, because SelectFields always
-            # have an initial "blank" value.
-            elif not f.blank and ((isinstance(f.rel, meta.ManyToOne) and not f.rel.raw_id_admin) or f.choices) and len(manipulator[f.name].choices) == 2:
-                new_data[f.name] = manipulator[f.name].choices[1][0]
-        # In required many-to-many fields with only one available choice,
-        # select that one available choice.
-        for f in opts.many_to_many:
-            if not f.blank and not f.rel.edit_inline and not f.rel.raw_id_admin and len(manipulator[f.name].choices) == 1:
-                new_data[f.name] = [manipulator[f.name].choices[0][0]]
-        # Add default data for related objects.
-        for rel_opts, rel_field in opts.get_inline_related_objects():
-            var_name = rel_opts.object_name.lower()
-            for i in range(rel_field.rel.num_in_admin):
-                for f in rel_opts.fields + rel_opts.many_to_many:
-                    if f.has_default():
-                        for field_name in f.get_manipulator_field_names(''):
-                            new_data['%s.%d.%s' % (var_name, i, field_name)] = f.get_default()
-        # Override the defaults with request.GET, if it exists.
-        new_data.update(request.GET)
-        errors = {}
-
-    # Populate the FormWrapper.
-    form = formfields.FormWrapper(manipulator, new_data, errors)
-    for rel_opts, rel_field in opts.get_inline_related_objects():
-        var_name = rel_opts.object_name.lower()
-        wrapper = []
-        for i in range(rel_field.rel.num_in_admin):
-            collection = {}
-            for f in rel_opts.fields + rel_opts.many_to_many:
-                if f.editable and f != rel_field and not isinstance(f, meta.AutoField):
-                    for field_name in f.get_manipulator_field_names(''):
-                        full_field_name = '%s.%d.%s' % (var_name, i, field_name)
-			field = manipulator[full_field_name]
-			data = field.extract_data(new_data)
-                        collection[field_name] = formfields.FormFieldWrapper(field, data, errors.get(full_field_name, []))
-            wrapper.append(formfields.FormFieldCollection(collection))
-        setattr(form, rel_opts.module_name, wrapper)
-
-    c = Context(request, {
-        'title': 'Add %s' % opts.verbose_name,
-        "form": form,
-        "is_popup": request.REQUEST.has_key("_popup"),
-    })
-    if object_id_override is not None:
-        c['object_id'] = object_id_override
-    raw_template = _get_template(opts, app_label, add=True, show_delete=show_delete, form_url=form_url)
-    t = loader.get_template_from_string(raw_template)
-    return HttpResponse(t.render(c))
-add_stage = staff_member_required(add_stage)
-
-def change_stage(request, app_label, module_name, object_id):
-    mod, opts = _get_mod_opts(app_label, module_name)
-    if not request.user.has_perm(app_label + '.' + opts.get_change_permission()):
-        raise PermissionDenied
-    if request.POST and request.POST.has_key("_saveasnew"):
-        return add_stage(request, app_label, module_name, form_url='../add/')
-    try:
-        manipulator = mod.ChangeManipulator(object_id)
-    except ObjectDoesNotExist:
-        raise Http404
-
-    inline_related_objects = opts.get_inline_related_objects()
-    if request.POST:
-        new_data = request.POST.copy()
-        if opts.has_field_type(meta.FileField):
-            new_data.update(request.FILES)
-
-        errors = manipulator.get_validation_errors(new_data)
-        if not errors and not request.POST.has_key("_preview"):
-            for f in opts.many_to_many:
-                if f.rel.raw_id_admin:
-                    new_data.setlist(f.name, new_data[f.name].split(","))
-            manipulator.do_html2python(new_data)
-            new_object = manipulator.save(new_data)
-            pk_value = getattr(new_object, opts.pk.column)
-
-            # Construct the change message.
-            change_message = []
-            if manipulator.fields_added:
-                change_message.append('Added %s.' % get_text_list(manipulator.fields_added, 'and'))
-            if manipulator.fields_changed:
-                change_message.append('Changed %s.' % get_text_list(manipulator.fields_changed, 'and'))
-            if manipulator.fields_deleted:
-                change_message.append('Deleted %s.' % get_text_list(manipulator.fields_deleted, 'and'))
-            change_message = ' '.join(change_message)
-            if not change_message:
-                change_message = 'No fields changed.'
-
-            log.log_action(request.user.id, opts.get_content_type_id(), pk_value, repr(new_object), log.CHANGE, change_message)
-            msg = 'The %s "%s" was changed successfully.' % (opts.verbose_name, new_object)
-            if request.POST.has_key("_continue"):
-                request.user.add_message("%s You may edit it again below." % msg)
-                if request.REQUEST.has_key('_popup'):
-                    return HttpResponseRedirect(request.path + "?_popup=1")
-                else:
-                    return HttpResponseRedirect(request.path)
-            elif request.POST.has_key("_saveasnew"):
-                request.user.add_message('The %s "%s" was added successfully. You may edit it again below.' % (opts.verbose_name, new_object))
-                return HttpResponseRedirect("../%s/" % pk_value)
-            elif request.POST.has_key("_addanother"):
-                request.user.add_message("%s You may add another %s below." % (msg, opts.verbose_name))
-                return HttpResponseRedirect("../add/")
-            else:
-                request.user.add_message(msg)
-                return HttpResponseRedirect("../")
-        if request.POST.has_key("_preview"):
-            manipulator.do_html2python(new_data)
-    else:
-        # Populate new_data with a "flattened" version of the current data.
-        new_data = {}
-        obj = manipulator.original_object
-        for f in opts.fields:
-            new_data.update(f.flatten_data(obj))
-        for f in opts.many_to_many:
-            get_list_func = getattr(obj, 'get_%s_list' % f.rel.singular)
-            if f.rel.raw_id_admin:
-                new_data[f.name] = ",".join([str(getattr(i, f.rel.to.pk.column)) for i in get_list_func()])
-            elif not f.rel.edit_inline:
-                new_data[f.name] = [getattr(i, f.rel.to.pk.column) for i in get_list_func()]
-        for rel_obj, rel_field in inline_related_objects:
-            var_name = rel_obj.object_name.lower()
-            for i, rel_instance in enumerate(getattr(obj, 'get_%s_list' % opts.get_rel_object_method_name(rel_obj, rel_field))()):
-                for f in rel_obj.fields:
-                    if f.editable and f != rel_field:
-                        for k, v in f.flatten_data(rel_instance).items():
-                            new_data['%s.%d.%s' % (var_name, i, k)] = v
-                for f in rel_obj.many_to_many:
-                    new_data['%s.%d.%s' % (var_name, i, f.column)] = [j.id for j in getattr(rel_instance, 'get_%s_list' % f.rel.singular)()]
-
-        # If the object has ordered objects on its admin page, get the existing
-        # order and flatten it into a comma-separated list of IDs.
-        id_order_list = []
-        for rel_obj in opts.get_ordered_objects():
-            id_order_list.extend(getattr(obj, 'get_%s_order' % rel_obj.object_name.lower())())
-        if id_order_list:
-            new_data['order_'] = ','.join(map(str, id_order_list))
-        errors = {}
-
-    # Populate the FormWrapper.
-    form = formfields.FormWrapper(manipulator, new_data, errors)
-    form.original = manipulator.original_object
-    form.order_objects = []
-    for rel_opts, rel_field in inline_related_objects:
-        var_name = rel_opts.object_name.lower()
-        wrapper = []
-        orig_list = getattr(manipulator.original_object, 'get_%s_list' % opts.get_rel_object_method_name(rel_opts, rel_field))()
-        count = len(orig_list) + rel_field.rel.num_extra_on_change
-        if rel_field.rel.min_num_in_admin:
-            count = max(count, rel_field.rel.min_num_in_admin)
-        if rel_field.rel.max_num_in_admin:
-            count = min(count, rel_field.rel.max_num_in_admin)
-        for i in range(count):
-            collection = {'original': (i < len(orig_list) and orig_list[i] or None)}
-            for f in rel_opts.fields + rel_opts.many_to_many:
-                if f.editable and f != rel_field:
-                    for field_name in f.get_manipulator_field_names(''):
-                        full_field_name = '%s.%d.%s' % (var_name, i, field_name)
-			field = manipulator[full_field_name]
-			data = field.extract_data(new_data)
-                        collection[field_name] = formfields.FormFieldWrapper(field, data, errors.get(full_field_name, []))
-            wrapper.append(formfields.FormFieldCollection(collection))
-        setattr(form, rel_opts.module_name, wrapper)
-        if rel_opts.order_with_respect_to and rel_opts.order_with_respect_to.rel and rel_opts.order_with_respect_to.rel.to == opts:
-            form.order_objects.extend(orig_list)
-
-    c = Context(request, {
-        'title': 'Change %s' % opts.verbose_name,
-        "form": form,
-        'object_id': object_id,
-        'original': manipulator.original_object,
-        'is_popup' : request.REQUEST.has_key('_popup'),
-    })
-    raw_template = _get_template(opts, app_label, change=True)
-#     return HttpResponse(raw_template, mimetype='text/plain')
-    t = loader.get_template_from_string(raw_template)
-    return HttpResponse(t.render(c))
+    return render_to_response('admin/change_form', context_instance=c)
 change_stage = staff_member_required(change_stage)
 
 def _nest_help(obj, depth, val):
@@ -1381,7 +927,7 @@ def delete_stage(request, app_label, module_name, object_id):
         log.log_action(request.user.id, opts.get_content_type_id(), object_id, obj_repr, log.DELETION)
         request.user.add_message('The %s "%s" was deleted successfully.' % (opts.verbose_name, obj_repr))
         return HttpResponseRedirect("../../")
-    return render_to_response('delete_confirmation_generic', {
+    return render_to_response('admin/delete_confirmation_generic', {
         "title": "Are you sure?",
         "object_name": opts.verbose_name,
         "object": obj,
@@ -1396,7 +942,7 @@ def history(request, app_label, module_name, object_id):
         order_by=("action_time",), select_related=True)
     # If no history was found, see whether this object even exists.
     obj = get_object_or_404(mod, pk=object_id)
-    return render_to_response('admin_object_history', {
+    return render_to_response('admin/object_history', {
         'title': 'Change history: %r' % obj,
         'action_list': action_list,
         'module_name': capfirst(opts.verbose_name_plural),

@@ -1,0 +1,71 @@
+{% extends "admin/base_site" %}
+{% load admin_modify %}
+{% load adminmedia %}
+{% block extrahead %}
+{% for js in javascript_imports %}{% include_admin_script js %}{% endfor %}
+{% endblock %}
+{% block coltype %}{{ coltype }}{% endblock %}
+{% block bodyclass %}{{app_label}}-{{object_name.lower}} change-form{% endblock %}
+{% block breadcrumbs %}{% if not is_popup %}
+<div class="breadcrumbs">
+     <a href="../../../">Home</a> &rsaquo;
+     <a href="../">{{verbose_name_plural|capfirst}}</a> &rsaquo;
+     {% if add %}Add {{verbose_name}}{% else %}{{original|striptags|truncatewords:"18"}}{% endif %}
+</div>
+{% endif %}{% endblock %}
+{% block content %}<div id="content-main">
+{% if change %}{% if not is_popup %}
+  <ul class="object-tools"><li><a href="history/" class="historylink">History</a></li>
+  {% if has_absolute_url %}<li><a href="/r/{{ content_type_id }}/{{ object_id }}/" class="viewsitelink">View on site</a></li>{% endif%}
+  </ul>
+{% endif %}{% endif %}
+<form {{ form_enc_attrib }} action='{{ form_url }}' method="post">
+
+
+{% if is_popup %}<input type="hidden" name="_popup" value="1">{% endif %}
+{% if save_on_top %}{% submit_row %}{% endif %}
+{% if form.error_dict %}<p class="errornote">Please correct the error{{ form.error_dict.items|pluralize }} below.</p>{% endif %}
+{% for bound_field_set in bound_field_sets %}
+   <fieldset class="module aligned {{ bound_field_set.classes }}">
+   
+    {% if bound_field_set.name %}<h2>{{bound_field_set.name }}</h2>{% endif %}
+    {% for bound_field_line in bound_field_set %}
+    	{% admin_field_line bound_field_line %}
+        {% for bound_field in bound_field_line %}
+            {% filter_interface_script_maybe bound_field %} 
+        {% endfor %}
+    {% endfor %}
+   </fieldset>
+{% endfor %}
+{% if change %}
+   {% if ordered_objects %}
+   <fieldset class="module"><h2>Ordering</h2>
+   <div class="form-row{% if form.order_.errors %} error{% endif %} ">
+   {% if form.order_.errors %}{{ form.order_.html_error_list }}{% endif %}
+   <p><label for="id_order_">Order:</label> {{ form.order_ }}</p>
+   </div></fieldset>
+   {% endif %}
+{% endif %}
+{% for related_object in inline_related_objects %}{% edit_inline related_object %}{% endfor %}
+{% submit_row %}
+{% if add %}
+   <script type="text/javascript">document.getElementById("{{first_form_field_id}}").focus();</script>
+{% endif %}
+{% if auto_populated_fields %}
+   <script type="text/javascript">
+   {% auto_populated_field_script auto_populated_fields change %} 
+   </script>
+{% endif %}
+{% if change %}
+   {% if ordered_objects %}
+      {% if form.order_objects %}<ul id="orderthese">
+          {% for object in form.order_objects %}
+	     <li id="p{% firstof ordered_object_names %}">
+	     <span id="handlep{% firstof ordered_object_names %}">{{ object|truncatewords:"5" }}</span>
+	     </li>
+	     {% endfor%}
+      {% endif %}
+   {% endif %}
+{% endif %}
+</form></div>
+{% endblock %}
