@@ -924,8 +924,8 @@ def method_save(opts, self):
         # If it does already exist, do an UPDATE.
         if cursor.fetchone():
             db_values = [f.get_db_prep_save(f.pre_save(getattr(self, f.column), False)) for f in non_pks]
-	    cursor.execute("UPDATE %s SET %s WHERE %s=%%s" % (opts.db_table, 
-	        ','.join(['%s=%%s' % f.column for f in non_pks]), opts.pk.column),
+            cursor.execute("UPDATE %s SET %s WHERE %s=%%s" % (opts.db_table, 
+	            ','.join(['%s=%%s' % f.column for f in non_pks]), opts.pk.column),
                 db_values + [pk_val])
         else:
             record_exists = False
@@ -1580,7 +1580,6 @@ def manipulator_init(opts, add, change, self, obj_key=None, follow=None):
 
     for f in opts.fields + opts.many_to_many:
         if self.follow.get(f.name, False):   
-        # if f.editable and not (f.primary_key and change) and (not f.rel or not f.rel.edit_inline):
             self.fields.extend(f.get_manipulator_fields(opts, self, change))
 
     # Add fields for related objects.
@@ -1588,21 +1587,6 @@ def manipulator_init(opts, add, change, self, obj_key=None, follow=None):
         if self.follow.get(f.name, False):
             fol = self.follow[f.name]
             self.fields.extend(f.get_manipulator_fields(opts, self, change, fol))
-
-   # for obj in opts.get_inline_related_objects_wrapped():
-   #     if change:
-   #         count = getattr(self.original_object, 'get_%s_count' % opts.get_rel_object_method_name(obj.opts, obj.field))()
-   #         count += obj.field.rel.num_extra_on_change
-   #         if obj.field.rel.min_num_in_admin:
-   #             count = max(count, obj.field.rel.min_num_in_admin)
-   #         if obj.field.rel.max_num_in_admin:
-   #             count = min(count, obj.field.rel.max_num_in_admin)
-   #     else:
-   #         count = obj.field.rel.num_in_admin
-   #     for f in obj.opts.fields + obj.opts.many_to_many:
-   #         if f.editable and f != obj.field :
-   #             for i in range(count):
-   #                self.fields.extend(f.get_manipulator_fields(obj.opts, self, change, name_prefix='%s.%d.' % (obj.opts.object_name.lower(), i), rel=True))
 
     # Add field for ordering.
     if change and opts.get_ordered_objects():
@@ -1612,7 +1596,8 @@ def manipulator_save(opts, klass, add, change, self, new_data):
     # TODO: big cleanup when core fields go -> use recursive manipulators. 
     from django.utils.datastructures import DotExpandedDict
     params = {}
-    for f in opts.fields:
+    for f in opts.fields:        
+        # Fields with auto_now_add should keep their original value in the change stage.
         auto_now_add = change and getattr(f, 'auto_now_add', False)
         if self.follow.get(f.name, None) and not auto_now_add:
             param = f.get_manipulator_new_data(new_data)
@@ -1623,12 +1608,6 @@ def manipulator_save(opts, klass, add, change, self, new_data):
                 param = f.get_default()
         params[f.column] = param    
     
-        # Fields with auto_now_add are another special case; they should keep
-        # their original value in the change stage.
-        #if change and getattr(f, 'auto_now_add', False):
-        #    params[f.column] = getattr(self.original_object, f.name)
-        #else:
-        #    params[f.column] = f.get_manipulator_new_data(new_data)
 
     if change:
         params[opts.pk.column] = self.obj_key

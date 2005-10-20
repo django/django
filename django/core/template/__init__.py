@@ -74,7 +74,7 @@ VARIABLE_TAG_END = '}}'
 
 ALLOWED_VARIABLE_CHARS = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_.'
 
-#What to report as the origin of templates that come from non file sources (eg strings)
+#What to report as the origin of templates that come from non loader sources (ie strings)
 UNKNOWN_SOURCE="<unknown source>"
 
 #match starts of lines
@@ -140,7 +140,6 @@ class Template:
     def render(self, context):
         "Display stage -- can be called many times"
         return self.nodelist.render(context)
-        
 
 def compile_string(template_string, origin):
     "Compiles template_string into NodeList ready for rendering"
@@ -225,6 +224,7 @@ class Lexer(object):
     
     def tokenize(self):
         "Return a list of tokens from a given template_string"
+        # remove all empty strings, because the regex has a tendency to add them
         bits = filter(None, tag_re.split(self.template_string))
         return map(self.create_token, bits)
         
@@ -276,7 +276,7 @@ class DebugLexer(Lexer):
 class Parser(object):
     def __init__(self, tokens):
         self.tokens = tokens
-        
+
     def parse(self, parse_until=[]):
         nodelist = self.create_nodelist()
         while self.tokens:
@@ -296,26 +296,21 @@ class Parser(object):
                     command = token.contents.split()[0]
                 except IndexError:
                     self.empty_block_tag(token)
-                
                 # execute callback function for this tag and append resulting node
                 self.enter_command(command, token);
                 try:
                     compile_func = registered_tags[command]
                 except KeyError:
-                    self.invalid_block_tag(token, command)
-                
+                    self.invalid_block_tag(token, command) 
                 try:
                     compiled_result = compile_func(self, token)
                 except TemplateSyntaxError, e:
                     if not self.compile_function_error(token, e):
                        raise
-                    
                 self.extend_nodelist(nodelist, compiled_result, token)
                 self.exit_command();
-                
         if parse_until:
             self.unclosed_block_tag(token, parse_until)
-            
         return nodelist
 
     def create_nodelist(self):

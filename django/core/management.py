@@ -633,7 +633,6 @@ def runserver(addr, port):
             sys.exit(0)
     from django.utils import autoreload
     autoreload.main(inner_run)
-    #inner_run()
 runserver.args = '[optional port number, or ipaddr:port]'
 
 def createcachetable(tablename):

@@ -227,7 +227,6 @@ class SsiNode(Node):
                 return '' # Fail silently for invalid included templates.
         return output
 
-
 class LoadNode(Node):
     def __init__(self, taglib):
         self.taglib = taglib

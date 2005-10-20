@@ -12,7 +12,7 @@ import re
 
 _datere = r'\d{4}-((?:0?[1-9])|(?:1[0-2]))-((?:0?[1-9])|(?:[12][0-9])|(?:3[0-1]))'
 _timere = r'(?:[01]?[0-9]|2[0-3]):[0-5][0-9](?::[0-5][0-9])?'
-alnum_re = re.compile(r'^[\w-]+$')
+alnum_re = re.compile(r'^\w+$')
 alnumurl_re = re.compile(r'^[\w/]+$')
 ansi_date_re = re.compile('^%s$' % _datere)
 ansi_time_re = re.compile('^%s$' % _timere)
@@ -54,7 +54,7 @@ class CriticalValidationError(Exception):
 
 def isAlphaNumeric(field_data, all_data):
     if not alnum_re.search(field_data):
-        raise ValidationError, "This value must contain only letters, numbers, dashes and underscores."
+        raise ValidationError, "This value must contain only letters, numbers and underscores."
 
 def isAlphaNumericURL(field_data, all_data):
     if not alnumurl_re.search(field_data):

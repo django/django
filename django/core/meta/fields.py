@@ -258,7 +258,6 @@ class Field(object):
                 val = None
             return val
 
-
     def get_choices(self, include_blank=True, blank_choice=BLANK_CHOICE_DASH):
         "Returns a list of tuples used as SelectField choices for this field."
        
@@ -266,10 +265,7 @@ class Field(object):
         if self.choices:
             return first_choice + list(self.choices)
         rel_obj = self.rel.to
-        choices = first_choice + [(getattr(x, rel_obj.pk.column), repr(x)) for x in rel_obj.get_model_module().get_list(**self.rel.limit_choices_to)]
- 
-        return choices
-
+        return first_choice + [(getattr(x, rel_obj.pk.column), repr(x)) for x in rel_obj.get_model_module().get_list(**self.rel.limit_choices_to)]
 
     def get_choices_default(self):
         if(self.radio_admin):
@@ -284,13 +280,12 @@ class Field(object):
            return self.get_default()
 
     def flatten_data(self, follow, obj = None):
-         """
-	     Returns a dictionary mapping the field's manipulator field names to its
-	     "flattened" string values for the admin view. Obj is the instance to extract the 
-             values from. 
-	 """
-     
-	 return { self.get_db_column(): self._get_val_from_obj(obj)}
+        """
+    	Returns a dictionary mapping the field's manipulator field names to its
+    	"flattened" string values for the admin view. Obj is the instance to extract the 
+        values from. 
+        """
+        return { self.get_db_column(): self._get_val_from_obj(obj)}
 
     def get_follow(self, override=None):
         if override != None:
@@ -306,7 +301,7 @@ class AutoField(Field):
 
     def get_manipulator_fields(self, opts, manipulator, change, name_prefix='', rel=False):
         if not rel:
-            return [] # Don't add a FormField unless it's in a related change context.
+            return [] # Don't add a FormField unless it's in a related context.
         return Field.get_manipulator_fields(self, opts, manipulator, change, name_prefix, rel)
 
     def get_manipulator_field_objs(self):
@@ -398,8 +393,8 @@ class DateTimeField(DateField):
     def flatten_data(self,follow, obj = None):
         val = self._get_val_from_obj(obj) 
     	date_field, time_field = self.get_manipulator_field_names('')
-	return {date_field: (val is not None and val.strftime("%Y-%m-%d") or ''),
-	        time_field: (val is not None and val.strftime("%H:%M:%S") or '')}
+        return {date_field: (val is not None and val.strftime("%Y-%m-%d") or ''),
+	            time_field: (val is not None and val.strftime("%H:%M:%S") or '')}
 
 class EmailField(Field):
     def get_manipulator_field_objs(self):
@@ -594,7 +589,7 @@ class TimeField(Field):
 
     def flatten_data(self,follow, obj = None):
         val = self._get_val_from_obj(obj) 
-    	return {self.get_db_column(): (val is not None and val.strftime("%H:%M:%S") or '')} 
+        return {self.get_db_column(): (val is not None and val.strftime("%H:%M:%S") or '')} 
 
 class URLField(Field):
     def __init__(self, verbose_name=None, name=None, verify_exists=True, **kwargs):
@@ -908,8 +903,6 @@ class Admin:
         returns a list of lists of name, dict 
         the dict has attribs 'fields' and maybe 'classes'. 
         fields is a list of subclasses of Field. 
-
-        TODO:Return value needs to be encapsulated.
         """
         if self.fields is None:
             field_struct = ((None, {'fields': [f.name for f in opts.fields + opts.many_to_many if f.editable and not isinstance(f, AutoField)]}),)

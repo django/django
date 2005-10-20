@@ -927,7 +927,7 @@ def delete_stage(request, app_label, module_name, object_id):
         log.log_action(request.user.id, opts.get_content_type_id(), object_id, obj_repr, log.DELETION)
         request.user.add_message('The %s "%s" was deleted successfully.' % (opts.verbose_name, obj_repr))
         return HttpResponseRedirect("../../")
-    return render_to_response('admin/delete_confirmation_generic', {
+    return render_to_response('admin/delete_confirmation', {
         "title": "Are you sure?",
         "object_name": opts.verbose_name,
         "object": obj,

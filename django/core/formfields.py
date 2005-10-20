@@ -244,7 +244,6 @@ class InlineObjectCollection:
                             field = self.parent_manipulator[full_field_name]
                             data = field.extract_data(self.data)
                             errors = self.errors.get(full_field_name, [])
-#                           if(errors):raise full_field_name + " " + repr(errors)
                             collection[field_name] = FormFieldWrapper(field, data, errors)
                 wrapper.append(FormFieldCollection(collection))
             self._collections = wrapper 
@@ -288,27 +287,24 @@ class FormField:
             return self.field_name
 
     def extract_data(self, data_dict):
-	if hasattr(self, 'requires_data_list') and hasattr(data_dict, 'getlist'):
+        if hasattr(self, 'requires_data_list') and hasattr(data_dict, 'getlist'):
             data = data_dict.getlist(self.get_member_name())
         else:
             data = data_dict.get(self.get_member_name(), None)
         if data is None:
             data = ''
-     	self.data_dict = data_dict  
-	return data
+	    return data
 
     def convert_post_data(self, new_data):
-    	name = self.get_member_name()
+        name = self.get_member_name()
         if new_data.has_key(self.field_name):
-	    d = new_data.getlist(self.field_name)
-	    #del new_data[self.field_name]
+            d = new_data.getlist(self.field_name)
             try:
                 converted_data = [self.__class__.html2python(data) 
                                   for data in d]
             except ValueError:
                 converted_data = d
             new_data.setlist(name, converted_data)
-         
         else:
             try:
                # individual fields deal with None values themselves

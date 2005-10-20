@@ -41,30 +41,24 @@ for path in TEMPLATE_LOADERS:
     else:
         template_source_loaders.append(func)
 
-
-
-
 class LoaderOrigin(Origin):
-    def __init__(self, name, loader):
+    def __init__(self, name, loader, name, dirs):
+        def reload():
+                return loader(name, dirs)[0]
         super(LoaderOrigin, self).__init__(name)
-        self.loader = loader
+        self._reload = reload
     
     def reload(self):
-        if self.loader:
-            return self.loader()
-        else:
-            raise NotImplementedException
-
+        return self._reload()
 
 def find_template_source(name, dirs=None):
     for loader in template_source_loaders:
         try:
             source, display_name  = loader(name, dirs) 
             
-            def reload():
-                return loader(name, dirs)[0]
             
-            return (source, LoaderOrigin(display_name, reload))
+            
+            return (source, LoaderOrigin(display_name, loader, name, dirs))
         except TemplateDoesNotExist:
             pass
     raise TemplateDoesNotExist, name
@@ -215,7 +209,6 @@ class IncludeNode(Node):
              return t.render(context)
          except Exception, e:
              return '' # Fail silently for invalid included templates.
-
 
 def do_block(parser, token):
     """

@@ -9,7 +9,7 @@ from django.core.exceptions import Http404, ObjectDoesNotExist, ImproperlyConfig
 
 def create_object(request, app_label, module_name, template_name=None, 
                  template_loader=template_loader, extra_context={}, 
-                 post_save_redirect=None, login_required=False):
+                 post_save_redirect=None, login_required=False, follow=None):
     """
     Generic object-creation function.
     
@@ -22,17 +22,17 @@ def create_object(request, app_label, module_name, template_name=None,
         return redirect_to_login(request.path)
         
     mod = models.get_module(app_label, module_name)
-    manipulator = mod.AddManipulator()
+    manipulator = mod.AddManipulator(follow=follow)
     if request.POST:
         # If data was POSTed, we're trying to create a new object
         new_data = request.POST.copy()
         
         # Check for errors
         errors = manipulator.get_validation_errors(new_data)
+        manipulator.do_html2python(new_data)
         
         if not errors:
             # No errors -- this means we can save the data!
-            manipulator.do_html2python(new_data)
             new_object = manipulator.save(new_data)
             
             if not request.user.is_anonymous():
@@ -48,7 +48,8 @@ def create_object(request, app_label, module_name, template_name=None,
                 raise ImproperlyConfigured("No URL to redirect to from generic create view.")
     else:
         # No POST, so we want a brand new form without any data or errors
-        errors = new_data = {}
+        errors = {}
+        new_data = manipulator.flatten_data()
     
     # Create the FormWrapper, template, context, response
     form = formfields.FormWrapper(manipulator, new_data, errors)
