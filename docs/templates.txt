@@ -537,6 +537,7 @@ Built-in tag reference
     Y                 Year, 4 digits.                         ``'1999'``
     z                 Day of the year.                        ``0`` to ``365``
     Z                 Not implemented.
+    ================  ======================================  =====================
 
     Example::
 
