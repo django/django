@@ -237,7 +237,7 @@ Here are all available field types:
 
 ``EmailField``
     A ``CharField`` that checks that the value is a valid e-mail address.
-    Currently, this is a loose test.
+    (Currently, this is a loose test.) This doesn't accept ``maxlength``.
 
 ``FileField``
     A file-upload field.
