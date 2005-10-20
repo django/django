@@ -508,7 +508,8 @@ Built-in tag reference
     H                 Hour, 24-hour format.                   ``'00'`` to ``'23'``
     i                 Minutes.                                ``'00'`` to ``'59'``
     I                 Not implemented.
-    j                 Day of the month without leading zeros. ``'1'`` to ``'31'``
+    j                 Day of the month without leading        ``'1'`` to ``'31'``
+                      zeros.
     l                 Day of the week, textual, long.         ``'Friday'``
     L                 Boolean for whether it's a leap year.   ``True`` or ``False``
     m                 Month, 2 digits with leading zeros.     ``'01'`` to ``'12'``
