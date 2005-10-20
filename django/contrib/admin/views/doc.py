@@ -19,11 +19,11 @@ MODEL_METHODS_EXCLUDE = ('_', 'add_', 'delete', 'save', 'set_')
 def doc_index(request):
     if not doc:
         return missing_docutils_page(request)
-    return render_to_response('doc/index', context_instance=DjangoContext(request))
+    return render_to_response('admin_doc/index', context_instance=DjangoContext(request))
 doc_index = staff_member_required(doc_index)
 
 def bookmarklets(request):
-    return render_to_response('doc/bookmarklets', {
+    return render_to_response('admin_doc/bookmarklets', {
         'admin_url' : "%s://%s" % (os.environ.get('HTTPS') == 'on' and 'https' or 'http', request.META['HTTP_HOST']),
     }, context_instance=DjangoContext(request))
 bookmarklets = staff_member_required(bookmarklets)
@@ -63,7 +63,7 @@ def template_tag_index(request):
     # Fix registered_tags
     template.registered_tags, template.registered_filters = saved_tagset
 
-    return render_to_response('doc/template_tag_index', {'tags': tags}, context_instance=DjangoContext(request))
+    return render_to_response('admin_doc/template_tag_index', {'tags': tags}, context_instance=DjangoContext(request))
 template_tag_index = staff_member_required(template_tag_index)
 
 def template_filter_index(request):
@@ -96,7 +96,7 @@ def template_filter_index(request):
 
     template.registered_tags, template.registered_filters = saved_tagset
 
-    return render_to_response('doc/template_filter_index', {'filters': filters}, context_instance=DjangoContext(request))
+    return render_to_response('admin_doc/template_filter_index', {'filters': filters}, context_instance=DjangoContext(request))
 template_filter_index = staff_member_required(template_filter_index)
 
 def view_index(request):
@@ -116,7 +116,7 @@ def view_index(request):
                 'site'   : sites.get_object(pk=settings_mod.SITE_ID),
                 'url'    : simplify_regex(regex),
             })
-    return render_to_response('doc/view_index', {'views': views}, context_instance=DjangoContext(request))
+    return render_to_response('admin_doc/view_index', {'views': views}, context_instance=DjangoContext(request))
 view_index = staff_member_required(view_index)
 
 def view_detail(request, view):
@@ -135,7 +135,7 @@ def view_detail(request, view):
         body = doc.parse_rst(body, 'view', 'view:' + view)
     for key in metadata:
         metadata[key] = doc.parse_rst(metadata[key], 'model', 'view:' + view)
-    return render_to_response('doc/view_detail', {
+    return render_to_response('admin_doc/view_detail', {
         'name': view,
         'summary': title,
         'body': body,
@@ -156,7 +156,7 @@ def model_index(request):
                 'module' : opts.app_label,
                 'class'  : opts.module_name,
             })
-    return render_to_response('doc/model_index', {'models': models}, context_instance=DjangoContext(request))
+    return render_to_response('admin_doc/model_index', {'models': models}, context_instance=DjangoContext(request))
 model_index = staff_member_required(model_index)
 
 def model_detail(request, model):
@@ -194,7 +194,7 @@ def model_detail(request, model):
                 'data_type' : get_return_data_type(func_name),
                 'verbose'   : verbose,
             })
-    return render_to_response('doc/model_detail', {
+    return render_to_response('admin_doc/model_detail', {
         'name': '%s.%s' % (opts.app_label, opts.module_name),
         'summary': "Fields on %s objects" % opts.verbose_name,
         'fields': fields,
@@ -215,7 +215,7 @@ def template_detail(request, template):
                 'site'      : sites.get_object(pk=settings_mod.SITE_ID),
                 'order'     : list(settings_mod.TEMPLATE_DIRS).index(dir),
             })
-    return render_to_response('doc/template_detail', {
+    return render_to_response('admin_doc/template_detail', {
         'name': template,
         'templates': templates,
     }, context_instance=DjangoContext(request))
@@ -227,7 +227,7 @@ template_detail = staff_member_required(template_detail)
 
 def missing_docutils_page(request):
     """Display an error message for people without docutils"""
-    return render_to_response('doc/missing_docutils')
+    return render_to_response('admin_doc/missing_docutils')
 
 def load_all_installed_template_libraries():
     # Clear out and reload default tags
