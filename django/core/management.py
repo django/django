@@ -301,12 +301,12 @@ def init():
             cursor.execute(sql)
         cursor.execute("INSERT INTO %s (domain, name) VALUES ('mysite.com', 'My Django site')" % core.Site._meta.db_table)
     except Exception, e:
-        sys.stderr.write("Error: The database couldn't be initialized.\n%s\n" % e)
+        sys.stderr.write("Error: The database couldn't be initialized.\n%s\n" % e) 
         try:
             db.db.rollback()
         except UnboundLocalError:
             pass
-        sys.exit(1)
+        raise
     else:
         db.db.commit()
 init.args = ''
@@ -582,12 +582,12 @@ def get_validation_errors(outfile):
                         e.add(opts, '"ordering" refers to "%s", a field that doesn\'t exist.' % field_name)
 
             # Check core=True, if needed.
-            for rel_opts, rel_field in opts.get_inline_related_objects():
+            for related in opts.get_followed_related_objects():
                 try:
-                    for f in rel_opts.fields:
+                    for f in related.opts.fields:
                         if f.core:
                             raise StopIteration
-                    e.add(rel_opts, "At least one field in %s should have core=True, because it's being edited inline by %s.%s." % (rel_opts.object_name, opts.module_name, opts.object_name))
+                    e.add(related.opts, "At least one field in %s should have core=True, because it's being edited inline by %s.%s." % (related.opts.object_name, opts.module_name, opts.object_name))
                 except StopIteration:
                     pass
     return len(e.errors)

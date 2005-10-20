@@ -250,6 +250,8 @@ class RelatedObject(object):
 
         return fields
 
+class BoundRelatedObject(object):
+    pass
 
 class Options:
     def __init__(self, module_name='', verbose_name='', verbose_name_plural='', db_table='',
@@ -401,7 +403,7 @@ class Options:
                 for klass in mod._MODELS:
                     for f in klass._meta.fields:
                         if f.rel and self == f.rel.to:
-                            rel_objs.append((klass._meta, f))
+                            rel_objs.append(RelatedObject(self, klass._meta, f))
             if self.has_related_links:
                 # Manually add RelatedLink objects, which are a special case.
                 relatedlinks = get_module('relatedlinks', 'relatedlinks')
@@ -415,32 +417,23 @@ class Options:
                         'content_type__package__label__exact': self.app_label,
                         'content_type__python_module_name__exact': self.module_name,
                     })
-                rel_objs.append((relatedlinks.RelatedLink._meta, link_field))
+                rel_objs.append(RelatedObject(self, relatedlinks.RelatedLink._meta, link_field))
             self._all_related_objects = rel_objs
             return rel_objs
-
-    def get_inline_related_objects(self):
-        return [(a, b) for a, b in self.get_all_related_objects() if b.rel.edit_inline]
-
-    def get_inline_related_objects_wrapped(self):
-        return [RelatedObject(self, opts, field) for opts, field in self.get_all_related_objects() if field.rel.edit_inline]
-
-    def get_all_related_objects_wrapped(self):
-        return [RelatedObject(self, opts, field) for opts, field in self.get_all_related_objects()]
 
     def get_followed_related_objects(self, follow=None):
         if follow == None:
             follow = self.get_follow()
-        return [f for f in self.get_all_related_objects_wrapped() if follow.get(f.name, None) ]
+        return [f for f in self.get_all_related_objects() if follow.get(f.name, None) ]
 
     def get_data_holders(self, follow=None):
         if follow == None :
             follow = self.get_follow()
-        return [f for f in self.fields + self.many_to_many + self.get_all_related_objects_wrapped() if follow.get(f.name, None) ]
+        return [f for f in self.fields + self.many_to_many + self.get_all_related_objects() if follow.get(f.name, None) ]
 
     def get_follow(self, override=None):
         follow = {}
-        for f in self.fields + self.many_to_many + self.get_all_related_objects_wrapped():
+        for f in self.fields + self.many_to_many + self.get_all_related_objects():
             if override and override.has_key(f.name):
                 child_override = override[f.name] 
             else:
@@ -476,7 +469,7 @@ class Options:
             self._ordered_objects = objects
         return self._ordered_objects
 
-    def has_field_type(self, field_type):
+    def has_field_type(self, field_type, follow):
         """
         Returns True if this object's admin form has at least one of the given
         field_type (e.g. FileField).
@@ -491,8 +484,8 @@ class Options:
                     if isinstance(f, field_type):
                         raise StopIteration
                 # Failing that, check related fields.
-                for rel_obj, rel_field in self.get_inline_related_objects():
-                    for f in rel_obj.fields:
+                for related in self.get_followed_related_objects(follow):
+                    for f in related.opts.fields:
                         if isinstance(f, field_type):
                             raise StopIteration
             except StopIteration:
@@ -853,8 +846,8 @@ class ModelBase(type):
                     old_app._MODELS[i] = new_class
                     # Replace all relationships to the old class with
                     # relationships to the new one.
-                    for rel_opts, rel_field in model._meta.get_all_related_objects():
-                        rel_field.rel.to = opts
+                    for related in model._meta.get_all_related_objects():
+                        related.field.rel.to = opts
                     for rel_opts, rel_field in model._meta.get_all_related_many_to_many_objects():
                         rel_field.rel.to = opts
                     break
@@ -954,9 +947,9 @@ def method_delete(opts, self):
     if hasattr(self, '_pre_delete'):
         self._pre_delete()
     cursor = db.db.cursor()
-    for rel_opts, rel_field in opts.get_all_related_objects():
-        rel_opts_name = opts.get_rel_object_method_name(rel_opts, rel_field)
-        if isinstance(rel_field.rel, OneToOne):
+    for related in opts.get_all_related_objects():
+        rel_opts_name = opts.get_rel_object_method_name(related.opts, related.field)
+        if isinstance(related.field.rel, OneToOne):
             try:
                 sub_obj = getattr(self, 'get_%s' % rel_opts_name)()
             except ObjectDoesNotExist:
@@ -1583,7 +1576,7 @@ def manipulator_init(opts, add, change, self, obj_key=None, follow=None):
             self.fields.extend(f.get_manipulator_fields(opts, self, change))
 
     # Add fields for related objects.
-    for f in opts.get_all_related_objects_wrapped():
+    for f in opts.get_all_related_objects():
         if self.follow.get(f.name, False):
             fol = self.follow[f.name]
             self.fields.extend(f.get_manipulator_fields(opts, self, change, fol))
@@ -1638,7 +1631,7 @@ def manipulator_save(opts, klass, add, change, self, new_data):
 
     expanded_data = DotExpandedDict(new_data.data)
     # Save many-to-one objects. Example: Add the Choice objects for a Poll.
-    for related in opts.get_all_related_objects_wrapped():
+    for related in opts.get_all_related_objects():
         # Create obj_list, which is a DotExpandedDict such as this:
         # [('0', {'id': ['940'], 'choice': ['This is the first choice']}),
         #  ('1', {'id': ['941'], 'choice': ['This is the second choice']}),

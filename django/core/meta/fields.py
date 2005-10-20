@@ -48,8 +48,27 @@ def manipulator_validator_unique(f, opts, self, field_data, all_data):
         return
     raise validators.ValidationError, "%s with this %s already exists." % (capfirst(opts.verbose_name), f.verbose_name)
 
-class Field(object):
+class BoundField(object):
+    def __init__(self, field, field_mapping, original):
+        self.field = field
+        self.original = original
+        self.form_fields = self.resolve_form_fields(field_mapping)
 
+    def resolve_form_fields(self, field_mapping):
+        return [field_mapping[name] for name in self.field.get_manipulator_field_names('')]
+
+    def as_field_list(self):
+        return [self.field]
+
+    def original_value(self):
+        if self.original:
+            return self.original.__dict__[self.field.column] 
+
+    def __repr__(self):
+        return "BoundField:(%s, %s)" %( self.field.name, self.form_fields)
+
+class Field(object):
+    
     # Designates whether empty strings fundamentally are allowed at the
     # database level.
     empty_strings_allowed = True
@@ -283,7 +302,7 @@ class Field(object):
         """
     	Returns a dictionary mapping the field's manipulator field names to its
     	"flattened" string values for the admin view. Obj is the instance to extract the 
-        values from. 
+        values from.
         """
         return { self.get_db_column(): self._get_val_from_obj(obj)}
 
@@ -292,6 +311,9 @@ class Field(object):
             return override
         else:
             return self.editable
+        
+    def bind(self, fieldmapping, original, bound_field_class=BoundField):
+        return bound_field_class(self, fieldmapping, original)
  
 class AutoField(Field):
     empty_strings_allowed = False
@@ -658,7 +680,7 @@ class ForeignKey(Field):
            return int(value)
 
     def flatten_data(self, follow, obj = None):
-        if not obj: 
+        if not obj:
             # In required many-to-one fields with only one available choice,
             # select that one available choice. Note: We have to check that
             # the length of choices is *2*, not 1, because SelectFields always
@@ -730,7 +752,6 @@ class ManyToManyField(Field):
                    new_data[self.name] = [choices_list[0][0]]
         return new_data
 
-
 class OneToOneField(IntegerField):
     def __init__(self, to, to_field=None, **kwargs):
         kwargs['verbose_name'] = kwargs.get('verbose_name', 'ID')
@@ -796,28 +817,10 @@ class OneToOne(ManyToOne):
         self.lookup_overrides = lookup_overrides or {}
         self.raw_id_admin = raw_id_admin
 
-
-class BoundField(object):
-    def __init__(self, field, field_mapping, original):
-        self.field = field
-        self.form_fields = self.resolve_form_fields(field_mapping)
-        self.original = original
-
-    def resolve_form_fields(self, field_mapping):
-        return [field_mapping[name] for name in self.field.get_manipulator_field_names('')]
-
-    def as_field_list(self):
-        return [self.field]
-
-    def original_value(self):
-        return self.original.__dict__[self.field.name] 
-
-    def __repr__(self):
-        return "BoundField:(%s, %s)" %( self.field.name, self.form_fields)
-
 class BoundFieldLine(object):
     def __init__(self, field_line, field_mapping, original, bound_field_class=BoundField):
-        self.bound_fields = [bound_field_class(field, field_mapping, original) for field in field_line]
+        self.bound_fields = [field.bind(field_mapping, original, bound_field_class) 
+                             for field in field_line]
     
     def __iter__(self):
         for bound_field in self.bound_fields:
@@ -881,7 +884,6 @@ class FieldSet(object):
     def __len__(self):
         return len(self.field_lines)
 
-
 class Admin:
     def __init__(self, fields=None, js=None, list_display=None, list_filter=None, date_hierarchy=None,
         save_as=False, ordering=None, search_fields=None, save_on_top=False):
@@ -893,34 +895,6 @@ class Admin:
         self.save_as, self.ordering = save_as, ordering
         self.search_fields = search_fields or []
         self.save_on_top = save_on_top
-
-    def get_field_objs(self, opts):
-        """
-        Returns self.fields, except with fields as Field objects instead of
-        field names. If self.fields is None, defaults to putting every
-        non-AutoField field with editable=True in a single fieldset.
-        
-        returns a list of lists of name, dict 
-        the dict has attribs 'fields' and maybe 'classes'. 
-        fields is a list of subclasses of Field. 
-        """
-        if self.fields is None:
-            field_struct = ((None, {'fields': [f.name for f in opts.fields + opts.many_to_many if f.editable and not isinstance(f, AutoField)]}),)
-        else:
-            field_struct = self.fields
-        new_fieldset_list = []
-        for fieldset in field_struct:
-            new_fieldset = [fieldset[0], {}]
-            new_fieldset[1].update(fieldset[1])
-            admin_fields = []
-            for field_name_or_list in fieldset[1]['fields']:
-                if isinstance(field_name_or_list, basestring):
-                    admin_fields.append([opts.get_field(field_name_or_list)])
-                else:
-                    admin_fields.append([opts.get_field(field_name) for field_name in field_name_or_list])
-            new_fieldset[1]['fields'] = admin_fields
-            new_fieldset_list.append(new_fieldset)
-        return new_fieldset_list
     
     def get_field_sets(self, opts):
         if self.fields is None:
@@ -930,12 +904,11 @@ class Admin:
         else:
             field_struct = self.fields
             
-        
         new_fieldset_list = []
         for fieldset in field_struct:
             name = fieldset[0]
             fs_options = fieldset[1]
-            classes =  fs_options.get('classes', None)
+            classes =  fs_options.get('classes', () )
             line_specs = fs_options['fields']
             new_fieldset_list.append(FieldSet(name, classes, opts.get_field, line_specs) )
         return new_fieldset_list

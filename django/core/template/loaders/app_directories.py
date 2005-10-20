@@ -7,13 +7,18 @@ import os
 # At compile time, cache the directories to search.
 app_template_dirs = []
 for app in INSTALLED_APPS:
-    i = app.rfind('.')
-    m, a = app[:i], app[i+1:]
-    mod = getattr(__import__(m, '', '', [a]), a)
-    template_dir = os.path.join(os.path.dirname(mod.__file__), 'templates')
-    if os.path.isdir(template_dir):
-        app_template_dirs.append(template_dir)
-
+    try:
+        i = app.rfind('.')
+        m, a = app[:i], app[i+1:]
+        mod = getattr(__import__(m, '', '', [a]), a)
+        template_dir = os.path.join(os.path.dirname(mod.__file__), 'templates')
+        if os.path.isdir(template_dir):
+            app_template_dirs.append(template_dir)
+    except Exception, e:
+        print "exception loading"
+        print e
+        raise e
+        
 # It won't change, so convert it to a tuple to save memory.
 app_template_dirs = tuple(app_template_dirs)
 

@@ -518,7 +518,7 @@ def _get_submit_row_template(opts, app_label, add, change, show_delete, ordered_
     t.append('</div>\n')
     return t
 
-def get_javascript_imports(opts,auto_populated_fields, ordered_objects, admin_field_objs):
+def get_javascript_imports(opts,auto_populated_fields, ordered_objects, field_sets):
 # Put in any necessary JavaScript imports.
     js = ['js/core.js', 'js/admin/RelatedObjectLookups.js']
     if auto_populated_fields:
@@ -530,13 +530,13 @@ def get_javascript_imports(opts,auto_populated_fields, ordered_objects, admin_fi
     if opts.admin.js:
         js.extend(opts.admin.js)
     seen_collapse = False
-    for _, options in admin_field_objs:
-        if not seen_collapse and 'collapse' in options.get('classes', ''):
+    for field_set in field_sets:
+        if not seen_collapse and 'collapse' in field_set.classes:
             seen_collapse = True
             js.append('js/admin/CollapsedFieldsets.js' )
         try:
-            for field_list in options['fields']:
-                for f in field_list:
+            for field_line in field_set:
+                for f in field_line:
                     if f.rel and isinstance(f, meta.ManyToManyField) and f.rel.filter_interface:
                         js.extend(['js/SelectBox.js' , 'js/SelectFilter2.js'])
                         raise StopIteration
@@ -608,33 +608,22 @@ class AdminBoundFieldSet(BoundFieldSet):
         
         
 def fill_extra_context(opts, app_label, context, add=False, change=False, show_delete=False, form_url=''):
-    admin_field_objs = opts.admin.get_field_objs(opts)
-    
     ordered_objects = opts.get_ordered_objects()[:]
     auto_populated_fields = [f for f in opts.fields if f.prepopulate_from]
- 
-    javascript_imports = get_javascript_imports(opts, auto_populated_fields, ordered_objects, admin_field_objs);
-    
-    if ordered_objects:
-        coltype = 'colMS'
-    else:
-        coltype = 'colM'
-	
+    coltype = ordered_objects and 'colMS' or 'colM'
+    	
     has_absolute_url = hasattr(opts.get_model_module().Klass, 'get_absolute_url')
-    
     form_enc_attrib = opts.has_field_type(meta.FileField) and 'enctype="multipart/form-data" ' or ''
-
     form = context['form']
     original = context['original']
     
     field_sets = opts.admin.get_field_sets(opts)
     bound_field_sets = [field_set.bind(form, original, AdminBoundFieldSet) 
                         for field_set in field_sets]
-    
-    first_form_field = bound_field_sets[0].bound_field_lines[0].bound_fields[0].form_fields[0];
-                    
-    inline_related_objects = opts.get_inline_related_objects_wrapped()
-    
+                        
+    javascript_imports = get_javascript_imports(opts, auto_populated_fields, ordered_objects, field_sets);
+    first_form_field = bound_field_sets[0].bound_field_lines[0].bound_fields[0].form_fields[0];                
+    inline_related_objects = opts.get_followed_related_objects()
     ordered_object_names =   ' '.join(['object.%s' % o.pk.name for o in ordered_objects])
    
     extra_context = {
@@ -739,7 +728,6 @@ def change_stage(request, app_label, module_name, object_id):
     except ObjectDoesNotExist:
         raise Http404
 
-    inline_related_objects = opts.get_inline_related_objects()
     if request.POST:
         new_data = request.POST.copy()
         if opts.has_field_type(meta.FileField):
@@ -806,11 +794,14 @@ def change_stage(request, app_label, module_name, object_id):
     form.original = manipulator.original_object
     form.order_objects = []
     
-    for rel_opts, rel_field in inline_related_objects:
-        if rel_opts.order_with_respect_to and rel_opts.order_with_respect_to.rel and rel_opts.order_with_respect_to.rel.to == opts:
-            orig_list = getattr(manipulator.original_object, 'get_%s_list' % opts.get_rel_object_method_name(rel_opts, rel_field))()
+    for related in opts.get_followed_related_objects():
+        wrt = related.opts.order_with_respect_to
+        if wrt and wrt.rel and wrt.rel.to == opts: 
+            func = getattr(manipulator.original_object, 'get_%s_list' % 
+                    opts.get_rel_object_method_name(rel_opts, rel_field))
+            orig_list = func()
             form.order_objects.extend(orig_list)
-
+            
     c = Context(request, {
         'title': 'Change %s' % opts.verbose_name,
         'form': form,
@@ -836,50 +827,50 @@ def _get_deleted_objects(deleted_objects, perms_needed, user, obj, opts, current
     if current_depth > 16:
         return # Avoid recursing too deep.
     objects_seen = []
-    for rel_opts, rel_field in opts.get_all_related_objects():
-        if rel_opts in objects_seen:
+    for related in opts.get_all_related_objects():
+        if related.opts in objects_seen:
             continue
         objects_seen.append(rel_opts)
-        rel_opts_name = opts.get_rel_object_method_name(rel_opts, rel_field)
-        if isinstance(rel_field.rel, meta.OneToOne):
+        rel_opts_name = opts.get_rel_object_method_name(related.opts, related.field)
+        if isinstance(related.field.rel, meta.OneToOne):
             try:
                 sub_obj = getattr(obj, 'get_%s' % rel_opts_name)()
             except ObjectDoesNotExist:
                 pass
             else:
                 if rel_opts.admin:
-                    p = '%s.%s' % (rel_opts.app_label, rel_opts.get_delete_permission())
+                    p = '%s.%s' % (related.opts.app_label, related.opts.get_delete_permission())
                     if not user.has_perm(p):
-                        perms_needed.add(rel_opts.verbose_name)
+                        perms_needed.add(related.opts.verbose_name)
                         # We don't care about populating deleted_objects now.
                         continue
-                if rel_field.rel.edit_inline or not rel_opts.admin:
+                if related.field.rel.edit_inline or not related.opts.admin:
                     # Don't display link to edit, because it either has no
                     # admin or is edited inline.
-                    nh(deleted_objects, current_depth, ['%s: %r' % (capfirst(rel_opts.verbose_name), sub_obj), []])
+                    nh(deleted_objects, current_depth, ['%s: %r' % (capfirst(related.opts.verbose_name), sub_obj), []])
                 else:
                     # Display a link to the admin page.
                     nh(deleted_objects, current_depth, ['%s: <a href="../../../../%s/%s/%s/">%r</a>' % \
-                        (capfirst(rel_opts.verbose_name), rel_opts.app_label, rel_opts.module_name,
-                        getattr(sub_obj, rel_opts.pk.column), sub_obj), []])
-                _get_deleted_objects(deleted_objects, perms_needed, user, sub_obj, rel_opts, current_depth+2)
+                        (capfirst(related.opts.verbose_name), related.opts.app_label, related.opts.module_name,
+                        getattr(sub_obj, related.opts.pk.column), sub_obj), []])
+                _get_deleted_objects(deleted_objects, perms_needed, user, sub_obj, related.opts, current_depth+2)
         else:
             has_related_objs = False
             for sub_obj in getattr(obj, 'get_%s_list' % rel_opts_name)():
                 has_related_objs = True
-                if rel_field.rel.edit_inline or not rel_opts.admin:
+                if related.field.rel.edit_inline or not related.opts.admin:
                     # Don't display link to edit, because it either has no
                     # admin or is edited inline.
-                    nh(deleted_objects, current_depth, ['%s: %s' % (capfirst(rel_opts.verbose_name), strip_tags(repr(sub_obj))), []])
+                    nh(deleted_objects, current_depth, ['%s: %s' % (capfirst(related.opts.verbose_name), strip_tags(repr(sub_obj))), []])
                 else:
                     # Display a link to the admin page.
                     nh(deleted_objects, current_depth, ['%s: <a href="../../../../%s/%s/%s/">%s</a>' % \
-                        (capfirst(rel_opts.verbose_name), rel_opts.app_label, rel_opts.module_name, sub_obj.id, strip_tags(repr(sub_obj))), []])
-                _get_deleted_objects(deleted_objects, perms_needed, user, sub_obj, rel_opts, current_depth+2)
+                        (capfirst(related.opts.verbose_name), related.opts.app_label, related.opts.module_name, sub_obj.id, strip_tags(repr(sub_obj))), []])
+                _get_deleted_objects(deleted_objects, perms_needed, user, sub_obj, related.opts, current_depth+2)
             # If there were related objects, and the user doesn't have
             # permission to delete them, add the missing perm to perms_needed.
-            if rel_opts.admin and has_related_objs:
-                p = '%s.%s' % (rel_opts.app_label, rel_opts.get_delete_permission())
+            if related.opts.admin and has_related_objs:
+                p = '%s.%s' % (related.opts.app_label, related.opts.get_delete_permission())
                 if not user.has_perm(p):
                     perms_needed.add(rel_opts.verbose_name)
     for rel_opts, rel_field in opts.get_all_related_many_to_many_objects():

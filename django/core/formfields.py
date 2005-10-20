@@ -88,12 +88,8 @@ class Manipulator:
         must happen after validation because html2python functions aren't
         expected to deal with invalid input.
         """
-        """
-	for field in self.fields:
-	"""
-
-	for field in self.fields:
-	    field.convert_post_data(new_data)
+        for field in self.fields:
+	        field.convert_post_data(new_data)
 
 class FormWrapper:
     """
@@ -101,12 +97,12 @@ class FormWrapper:
     This allows dictionary-style lookups of formfields. It also handles feeding
     prepopulated data and validation error messages to the formfield objects.
     """
-    def __init__(self, manipulator, data, error_dict, edit_inline = False):
+    def __init__(self, manipulator, data, error_dict, edit_inline = True):
         self.manipulator, self.data = manipulator, data
         self.error_dict = error_dict
         self._inline_collections = None
         self.edit_inline = edit_inline
-
+    
     def __repr__(self):
         return repr(self.__dict__)
 
@@ -246,7 +242,7 @@ class InlineObjectCollection:
                             errors = self.errors.get(full_field_name, [])
                             collection[field_name] = FormFieldWrapper(field, data, errors)
                 wrapper.append(FormFieldCollection(collection))
-            self._collections = wrapper 
+            self._collections = wrapper
 
 class FormField:
     """Abstract class representing a form field.
@@ -293,7 +289,7 @@ class FormField:
             data = data_dict.get(self.get_member_name(), None)
         if data is None:
             data = ''
-	    return data
+        return data
 
     def convert_post_data(self, new_data):
         name = self.get_member_name()

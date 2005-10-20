@@ -21,13 +21,11 @@
 {% endif %}{% endif %}
 <form {{ form_enc_attrib }} action='{{ form_url }}' method="post">
 
-
 {% if is_popup %}<input type="hidden" name="_popup" value="1">{% endif %}
 {% if save_on_top %}{% submit_row %}{% endif %}
 {% if form.error_dict %}<p class="errornote">Please correct the error{{ form.error_dict.items|pluralize }} below.</p>{% endif %}
 {% for bound_field_set in bound_field_sets %}
-   <fieldset class="module aligned {{ bound_field_set.classes }}">
-   
+   <fieldset class="module aligned {{ bound_field_set.classes }}"> 
     {% if bound_field_set.name %}<h2>{{bound_field_set.name }}</h2>{% endif %}
     {% for bound_field_line in bound_field_set %}
     	{% admin_field_line bound_field_line %}

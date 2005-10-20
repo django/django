@@ -30,6 +30,7 @@ for path in TEMPLATE_LOADERS:
     try:
         mod = __import__(module, globals(), locals(), [attr])
     except ImportError, e:
+        raise e
         raise ImproperlyConfigured, 'Error importing template source loader %s: "%s"' % (module, e)
     try:
         func = getattr(mod, attr)
@@ -42,10 +43,10 @@ for path in TEMPLATE_LOADERS:
         template_source_loaders.append(func)
 
 class LoaderOrigin(Origin):
-    def __init__(self, name, loader, name, dirs):
+    def __init__(self, display_name, loader, name, dirs):
         def reload():
                 return loader(name, dirs)[0]
-        super(LoaderOrigin, self).__init__(name)
+        super(LoaderOrigin, self).__init__(display_name)
         self._reload = reload
     
     def reload(self):
