@@ -237,7 +237,7 @@ Here are all available field types:
 
 ``EmailField``
     A ``CharField`` that checks that the value is a valid e-mail address.
-    Currently, this is a loose test.
+    (Currently, this is a loose test.) This doesn't accept ``maxlength``.
 
 ``FileField``
     A file-upload field.
@@ -369,8 +369,8 @@ Here are all available field types:
 
 ``SlugField``
     "Slug" is a newspaper term. A slug is a short label for something,
-    containing only letters, numbers and underscores. They're generally used in
-    URLs.
+    containing only letters, numbers, underscores or hyphens. They're generally
+    used in URLs.
 
     Implies ``maxlength=50`` and ``db_index=True``.
 
