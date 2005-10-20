@@ -171,7 +171,14 @@ The following arguments are available to all field types. All are optional.
     Like ``unique_for_date`` and ``unique_for_month``.
 
 ``validator_list``
-    A list of extra validators to apply to the field.
+    A list of extra validators to apply to the field. Each should be a callable
+    that takes the parameters ``field_data, all_data`` and raises
+    ``django.core.validators.ValidationError`` for errors. (See the
+    `validator docs`_.)
+
+    Django comes with quite a few validators. They're in ``django.core.validators``.
+
+.. _validator docs: http://www.djangoproject.com/documentation/forms/#validators
 
 Field types
 -----------
@@ -237,7 +244,7 @@ Here are all available field types:
 
 ``EmailField``
     A ``CharField`` that checks that the value is a valid e-mail address.
-    Currently, this is a loose test.
+    (Currently, this is a loose test.) This doesn't accept ``maxlength``.
 
 ``FileField``
     A file-upload field.
@@ -369,8 +376,8 @@ Here are all available field types:
 
 ``SlugField``
     "Slug" is a newspaper term. A slug is a short label for something,
-    containing only letters, numbers and underscores. They're generally used in
-    URLs.
+    containing only letters, numbers, underscores or hyphens. They're generally
+    used in URLs.
 
     Implies ``maxlength=50`` and ``db_index=True``.
 

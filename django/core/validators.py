@@ -21,6 +21,7 @@ email_re = re.compile(r'^[-\w.+]+@\w[\w.-]+$')
 integer_re = re.compile(r'^-?\d+$')
 ip4_re = re.compile(r'^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$')
 phone_re = re.compile(r'^[A-PR-Y0-9]{3}-[A-PR-Y0-9]{3}-[A-PR-Y0-9]{4}$', re.IGNORECASE)
+slug_re = re.compile(r'^[-\w]+$')
 url_re = re.compile(r'^http://\S+$')
 
 from django.conf.settings import JING_PATH
@@ -59,6 +60,10 @@ def isAlphaNumeric(field_data, all_data):
 def isAlphaNumericURL(field_data, all_data):
     if not alnumurl_re.search(field_data):
         raise ValidationError, _("This value must contain only letters, numbers, underscores and slashes.")
+
+def isSlug(field_data, all_data):
+    if not slug_re.search(field_data):
+        raise ValidationError, "This value must contain only letters, numbers, underscores or hyphens."
 
 def isLowerCase(field_data, all_data):
     if field_data.lower() != field_data:
