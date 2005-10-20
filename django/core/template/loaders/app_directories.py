@@ -1,6 +1,7 @@
 # Wrapper for loading templates from "template" directories in installed app packages.
 
 from django.conf.settings import INSTALLED_APPS, TEMPLATE_FILE_EXTENSION
+from django.core.exceptions import ImproperlyConfigured
 from django.core.template import TemplateDoesNotExist
 import os
 
@@ -8,8 +9,17 @@ import os
 app_template_dirs = []
 for app in INSTALLED_APPS:
     i = app.rfind('.')
-    m, a = app[:i], app[i+1:]
-    mod = getattr(__import__(m, '', '', [a]), a)
+    if i == -1:
+        m, a = app, None
+    else:
+        m, a = app[:i], app[i+1:]
+    try:
+        if a is None:
+            mod = __import__(m, '', '', [])
+        else:
+            mod = getattr(__import__(m, '', '', [a]), a)
+    except ImportError, e:
+        raise ImproperlyConfigured, 'ImportError %s: %s' % (app, e.args[0])
     template_dir = os.path.join(os.path.dirname(mod.__file__), 'templates')
     if os.path.isdir(template_dir):
         app_template_dirs.append(template_dir)

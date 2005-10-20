@@ -55,10 +55,7 @@ class LoaderOrigin(Origin):
 def find_template_source(name, dirs=None):
     for loader in template_source_loaders:
         try:
-            source, display_name  = loader(name, dirs) 
-            
-            
-            
+            source, display_name  = loader(name, dirs)
             return (source, LoaderOrigin(display_name, loader, name, dirs))
         except TemplateDoesNotExist:
             pass
