@@ -146,7 +146,17 @@ class FieldDoesNotExist(Exception):
 class BadKeywordArguments(Exception):
     pass
 
-
+class BoundRelatedObject(object):
+    def __init__(self,related_object, field_mapping, original):
+        self.relation = related_object
+        self.field_mappings = field_mapping[related_object.opts.module_name]
+    
+    def template_name(self):
+        raise NotImplementedException
+    
+    def __repr__(self):
+        return repr(self.__dict__)
+        
 class RelatedObject(object):
     def __init__(self,parent_opts, opts, field):
         self.parent_opts = parent_opts
@@ -249,9 +259,9 @@ class RelatedObject(object):
                              f.get_manipulator_fields(self.opts, manipulator, change, name_prefix=prefix, rel=True))
 
         return fields
-
-class BoundRelatedObject(object):
-    pass
+    
+    def bind(self, field_mapping, original, bound_related_object_class=BoundRelatedObject):
+        return bound_related_object_class(self, field_mapping, original)
 
 class Options:
     def __init__(self, module_name='', verbose_name='', verbose_name_plural='', db_table='',
@@ -469,7 +479,7 @@ class Options:
             self._ordered_objects = objects
         return self._ordered_objects
 
-    def has_field_type(self, field_type, follow):
+    def has_field_type(self, field_type, follow = None):
         """
         Returns True if this object's admin form has at least one of the given
         field_type (e.g. FileField).
@@ -1754,12 +1764,15 @@ def manipulator_flatten_data(opts, klass, add, change, self):
 
 def manipulator_validator_unique_together(field_name_list, opts, self, field_data, all_data):
     from django.utils.text import get_text_list
+    
     field_list = [opts.get_field(field_name) for field_name in field_name_list]
     if isinstance(field_list[0].rel, ManyToOne):
         kwargs = {'%s__%s__iexact' % (field_name_list[0], field_list[0].rel.field_name): field_data}
     else:
         kwargs = {'%s__iexact' % field_name_list[0]: field_data}
     for f in field_list[1:]:
+        # This is really not going to work for fields that have different form fields, eg DateTime 
+        # This validation needs to occur after html2python to be effective. 
         field_val = all_data.get(f.column, None)
         if field_val is None:
             # This will be caught by another validator, assuming the field

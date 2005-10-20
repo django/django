@@ -195,6 +195,12 @@ class Context:
             if dict.has_key(key):
                 return True
         return False
+    
+    def get(self, key, otherwise):
+        for dict in self.dicts:
+            if dict.has_key(key):
+                return dict[key]
+        return otherwise
 
     def update(self, other_dict):
         "Like dict.update(). Pushes an entire dictionary's keys and values onto the context."

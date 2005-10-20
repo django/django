@@ -16,7 +16,7 @@ BLANK_CHOICE_DASH = [("", "---------")]
 BLANK_CHOICE_NONE = [("", "None")]
 
 # Values for Relation.edit_inline.
-TABULAR, STACKED = "admin/edit_inline_tabular", "admin/edit_inline_stacked"
+TABULAR, STACKED = 1, 2
 
 RECURSIVE_RELATIONSHIP_CONSTANT = 'self'
 

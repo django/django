@@ -4,11 +4,11 @@ from django.conf.settings import ADMIN_MEDIA_PREFIX
 from django.utils.text import capfirst
 from django.utils.html import escape
 from django.utils.functional import curry
-
 from django.core.template.decorators import simple_tag, inclusion_tag
-
 from django.contrib.admin.views.main import AdminBoundField
 from django.core.meta.fields import BoundField, Field
+from django.core.meta import BoundRelatedObject, TABULAR, STACKED
+
 import re
 
 word_re = re.compile('[A-Z][a-z]+')
@@ -122,14 +122,41 @@ class FieldWrapper(object):
          return isinstance(self.field.rel, (meta.ManyToOne, meta.ManyToMany)) \
                 and self.field.rel.raw_id_admin
 
+
 class FormFieldCollectionWrapper(object):
     def __init__(self, field_mapping, fields):
         self.field_mapping = field_mapping
         self.fields = fields
-        self.bound_fields = [ AdminBoundField(field, self.field_mapping, field_mapping['original']) for field in self.fields ]
+        self.bound_fields = [AdminBoundField(field, self.field_mapping, field_mapping['original']) for field in self.fields ]
+        
+class TabularBoundRelatedObject(BoundRelatedObject):
+    def __init__(self, related_object, field_mapping, original):
+        super(TabularBoundRelatedObject, self).__init__(related_object, field_mapping, original)
+        self.field_wrapper_list = self.relation.editable_fields(FieldWrapper)
+        fields = self.relation.editable_fields()
+        self.form_field_collection_wrappers = [FormFieldCollectionWrapper(field_mapping ,fields) 
+                                                   for field_mapping in self.field_mappings] 
+        self.original_row_needed = max([fw.use_raw_id_admin() for fw in self.field_wrapper_list]) 
+        self.show_url = original and hasattr(self.relation.opts, 'get_absolute_url')
 
-    def showurl(self):
-        return False
+    def template_name(self):
+        return "admin/edit_inline_tabular"
+        
+class StackedBoundRelatedObject(BoundRelatedObject):
+    def __init__(self, related_object, field_mapping, original):
+        super(StackedBoundRelatedObject, self).__init__(related_object, field_mapping, original)
+        fields = self.relation.editable_fields()
+        self.form_field_collection_wrappers = [FormFieldCollectionWrapper(field_mapping ,fields) 
+                                                   for field_mapping in self.field_mappings] 
+        self.show_url = original and hasattr(self.relation.opts, 'get_absolute_url')
+                                                   
+    def template_name(self):
+        return "admin/edit_inline_stacked"
+    
+bound_related_object_overrides = {
+    TABULAR : TabularBoundRelatedObject,
+    STACKED : StackedBoundRelatedObject
+}
 
 class EditInlineNode(template.Node):
     def __init__(self, rel_var):
@@ -137,33 +164,23 @@ class EditInlineNode(template.Node):
     
     def render(self, context):
         relation = template.resolve_variable(self.rel_var, context)
-        add, change = context['add'], context['change']
-        
+
         context.push()
 
-        self.fill_context(relation, add, change, context)
+        klass = relation.field.rel.edit_inline
+        bound_related_object_class = bound_related_object_overrides.get(klass, klass)
         
-        t = template_loader.get_template(relation.field.rel.edit_inline)
+        original = context.get('original', None)
+        
+        bound_related_object = relation.bind(context['form'], original, bound_related_object_class) 
+        context['bound_related_object'] = bound_related_object
+        
+        t = template_loader.get_template( bound_related_object.template_name() )
         
         output = t.render(context)
          
         context.pop()
         return output
-
-    def fill_context(self, relation, add, change, context):
-        field_wrapper_list = relation.editable_fields(FieldWrapper)
-
-        var_name = relation.opts.object_name.lower()
-        
-        form = template.resolve_variable('form', context)
-        form_field_collections = form[relation.opts.module_name]
-        fields = relation.editable_fields()
-        form_field_collection_wrapper_list = [FormFieldCollectionWrapper(field_mapping ,fields) for field_mapping in form_field_collections] 
-   
-        context['field_wrapper_list'] = field_wrapper_list
-        context['form_field_collection_wrapper_list'] = form_field_collection_wrapper_list 
-        context['num_headers'] = len(field_wrapper_list)
-        context['original_row_needed'] = max([fw.use_raw_id_admin() for fw in field_wrapper_list]) 
 
 
 #@simple_tag
@@ -201,7 +218,7 @@ def do_one_arg_tag(node_factory, parser,token):
     tokens = token.contents.split()
     if len(tokens) != 2:
         raise template.TemplateSyntaxError("%s takes 1 argument" % tokens[0])
-    return node_factory(tokens[1]) 
+    return node_factory(tokens[1])
 
 
 one_arg_tag_nodes = [

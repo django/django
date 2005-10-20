@@ -1,7 +1,7 @@
 <fieldset class="module aligned">
-   {% for fcw in form_field_collection_wrapper_list %} 
-      <h2>{{relation.opts.verbose_name|capfirst }}&nbsp;#{{ forloop.counter }}</h2>
-      {% if fcw.show_url %}{% if fcw.obj.original %}
+   {% for fcw in bound_related_object.form_field_collection_wrappers %} 
+      <h2>{{ bound_related_object.relation.opts.verbose_name|capfirst }}&nbsp;#{{ forloop.counter }}</h2>
+      {% if bound_related_object.show_url %}{% if fcw.obj.original %}
       <p><a href="/r/{{ fcw.obj.original.content_type_id }}/{{ fcw.obj.original.id }}/">View on site</a></p>
       {% endif %}{% endif %}
       {% for bound_field in fcw.bound_fields %}
@@ -13,4 +13,3 @@
       {% endfor %}
     {%endfor%}
 </fieldset>
-
