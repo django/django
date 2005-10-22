@@ -1,0 +1,282 @@
+=============================
+User authentication in Django
+=============================
+
+Django comes with a user authentication system. It handles user accounts,
+groups, permissions and cookie-based user sessions. This document explains how
+things work.
+
+The basics
+==========
+
+Django supports authentication out of the box. The ``django-admin.py init``
+command, used to initialize a database with Django's core database tables,
+creates the infrastructure for the auth system. You don't have to do anything
+else to use authentication.
+
+The auth system consists of:
+
+    * Users
+    * Permissions: Binary (yes/no) flags designating whether a user may perform
+      a certain task.
+    * Groups: A generic way of applying labels and permissions to more than one
+      user.
+    * Messages: A simple way to queue messages for given users.
+
+Users
+=====
+
+Users are represented by a standard Django model, which lives in
+`django/models/auth.py`_.
+
+.. _django/models/auth.py: http://code.djangoproject.com/browser/django/trunk/django/models/auth.py
+
+API reference
+-------------
+
+Fields
+~~~~~~
+
+``User`` objects have the following fields:
+
+    * ``username`` -- Required. 30 characters or fewer. Alphanumeric characters
+      only (letters, digits and underscores).
+    * ``first_name`` -- Optional. 30 characters or fewer.
+    * ``last_name`` -- Optional. 30 characters or fewer.
+    * ``email`` -- Optional. E-mail address.
+    * ``password_md5`` -- Required. An MD5 hash of the password. (Django
+      doesn't store the raw password.) Raw passwords can be arbitrarily long
+      and can contain any character.
+    * ``is_staff`` -- Boolean. Designates whether this user can access the
+      admin site.
+    * ``is_active`` -- Boolean. Designates whether this user account is valid.
+      Set this to ``False`` instead of deleting accounts.
+    * ``is_superuser`` -- Boolean. Designates whether this user has permission
+      to do anything (according to the permission system).
+    * ``last_login`` -- A datetime of the user's last login. Is set to "now" by
+      default.
+    * ``date_joined`` -- A datetime designating when the account was created.
+      Is set to "now" by default when the account is created.
+
+Methods
+~~~~~~~
+
+``User`` objects have two many-to-many fields: ``groups`` and
+``user_permissions``. Because of those relationships, ``User`` objects get
+data-access methods like any other `Django model`_:
+
+    * ``get_group_list(**kwargs)``
+    * ``set_groups(id_list)``
+    * ``get_permission_list(**kwargs)``
+    * ``set_user_permissions(id_list)``
+
+In addition to those automatic API methods, ``User`` objects have the following
+methods:
+
+    * ``is_anonymous()`` -- Always returns ``False``. This is a way of
+      comparing ``User`` objects to anonymous users.
+
+    * ``get_full_name()`` -- Returns the ``first_name`` plus the ``last_name``,
+      with a space in between.
+
+    * ``set_password(raw_password)`` -- Sets the user's password to the given
+      raw string, taking care of the MD5 hashing. Doesn't save the ``User``
+      object.
+
+    * ``check_password(raw_password)`` -- Returns ``True`` if the given raw
+      string is the correct password for the user.
+
+    * ``get_group_permissions()`` -- Returns a list of permission strings that
+      the user has, through his/her groups.
+
+    * ``get_all_permissions()`` -- Returns a list of permission strings that
+      the user has, both through group and user permissions.
+
+    * ``has_perm(perm)`` -- Returns ``True`` if the user has the specified
+      permission.
+
+    * ``has_perms(perm_list)`` -- Returns ``True`` if the user has each of the
+      specified permissions.
+
+    * ``has_module_perms(package_name)`` -- Returns ``True`` if the user has
+      any permissions in the given package (the Django app label).
+
+    * ``get_and_delete_messages()`` -- Returns a list of ``Message`` objects in
+      the user's queue and deletes the messages from the queue.
+
+    * ``email_user(subject, message, from_email=None)`` -- Sends an e-mail to
+      the user. If ``from_email`` is ``None``, Django uses the
+      `DEFAULT_FROM_EMAIL`_ setting.
+
+    * ``get_profile()`` -- Returns a site-specific profile for this user.
+      Raises ``django.models.auth.SiteProfileNotAvailable`` if the current site
+      doesn't allow profiles.
+
+.. _Django model: http://www.djangoproject.com/documentation/model_api/
+.. _DEFAULT_FROM_EMAIL: http://www.djangoproject.com/documentation/settings/#default-from-email
+
+Module functions
+~~~~~~~~~~~~~~~~
+
+The ``django.models.users`` module has the following helper functions:
+
+    * ``create_user(username, email, password)`` -- Creates, saves and returns
+      a ``User``. The ``username``, ``email`` and ``password`` are set as
+      given, and the ``User`` gets ``is_active=True``.
+
+    * ``make_random_password(length=10, allowed_chars='abcdefghjkmnpqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789')``
+      -- Returns a random password with the given length and given string of
+      allowed characters. (Note that the default value of ``allowed_chars``
+      doesn't contain ``"I"`` or letters that look like it, to avoid user
+      confusion.
+
+Basic usage
+-----------
+
+Creating users
+~~~~~~~~~~~~~~
+
+The most basic way to create users is to use the standard Django
+`database API`_. Just create and save a ``User`` object::
+
+    >>> from django.models.auth import users
+    >>> import md5
+    >>> p = md5.new('johnpassword').hexdigest()
+    >>> u = users.User(username='john', first_name='John', last_name='lennon',
+    ...     email='lennon@thebeatles.com', password_md5=p, is_staff=True,
+    ...     is_active=True, is_superuser=False)
+    >>> u.save()
+
+Note that ``password_md5`` requires the raw MD5 hash. Because that's a pain,
+there's a ``create_user`` helper function::
+
+    >>> from django.models.auth import users
+    >>> u = users.create_user('john', 'lennon@thebeatles.com', 'johnpassword')
+
+.. _database API: http://www.djangoproject.com/documentation/db_api/
+
+Changing passwords
+~~~~~~~~~~~~~~~~~~
+
+Change a password with ``set_password()``::
+
+    >>> from django.models.auth import users
+    >>> u = users.get_object(username__exact='john')
+    >>> u.set_password('new password')
+    >>> u.save()
+
+Anonymous users
+---------------
+
+``django.parts.auth.anonymoususers.AnonymousUser`` is a class that implements
+the ``django.models.auth.users.User`` interface, with these differences:
+
+    * ``is_anonymous()`` returns ``True`` instead of ``False``.
+    * ``has_perm()`` always returns ``False``.
+    * ``set_password()``, ``check_password()``, ``set_groups()`` and
+      ``set_permissions()`` raise ``NotImplementedError``.
+
+In practice, you probably won't need to use ``AnonymousUser`` objects on your
+own, but they're used by Web requests, as explained in the next section.
+
+Authentication in Web requests
+==============================
+
+Until now, this document has dealt with the low-level APIs for manipulating
+authentication-related objects. On a higher level, Django hooks this
+authentication framework into its system of `request objects`_.
+
+In any Django view, ``request.user`` will give you a ``User`` object
+representing the currently logged-in user. If a user isn't currently logged in,
+``request.user`` will be set to an instance of ``AnonymousUser`` (see the
+previous section). You can tell them apart with ``is_anonymous()``, like so::
+
+    if request.user.is_anonymous():
+        # Do something for anonymous users.
+    else:
+        # Do something for logged-in users.
+
+.. _request objects: http://www.djangoproject.com/documentation/request_response/#httprequest-objects
+
+Limiting access to logged-in users
+----------------------------------
+
+The raw way
+~~~~~~~~~~~
+
+The simple, raw way to limit access to pages is to check
+``request.user.is_anonymous()`` and either redirect to a login page::
+
+    from django.utils.httpwrappers import HttpResponseRedirect
+    def my_view(request):
+        if request.user.is_anonymous():
+            return HttpResponseRedirect('/login/?next=%s' % request.path)
+        # ...
+
+...or displaying an error message::
+
+    def my_view(request):
+        if request.user.is_anonymous():
+            return render_to_response('myapp/login_error')
+        # ...
+
+The login_required decorator
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+As a shortcut, you can use the convenient ``login_required`` decorator::
+
+    from django.views.decorators.auth import login_required
+    def my_view(request):
+        # ...
+    my_view = login_required(my_view)
+
+Here's the same, using Python 2.4's decorator syntax::
+
+    from django.views.decorators.auth import login_required
+    @login_required
+    def my_view(request):
+        # ...
+
+``login_required`` does the following:
+
+    * If the user isn't logged in, redirect to ``/accounts/login/``, passing
+      the current absolute URL in the query string as ``next``. For example:
+      ``/accounts/login/?next=/polls/3/``.
+    * If the user is logged in, execute the view normally. The view code is
+      free to assume the user is logged in.
+
+Limiting access to logged-in users that pass a test
+---------------------------------------------------
+
+To limit access based on certain permissions or another test, you'd do the same
+thing as described in the previous section.
+
+The simple way is to run your test on ``request.user`` in the view directly.
+For example, this view checks to make sure the user is logged in and has the
+permission ``polls.can_vote``::
+
+    def my_view(request):
+        if request.user.is_anonymous() or not request.user.has_perm('polls.can_vote'):
+            return HttpResponse("You can't vote in this poll.")
+        # ...
+
+As a shortcut, you can use the convenient ``user_passes_test`` decorator::
+
+    from django.views.decorators.auth import user_passes_test
+    @user_passes_test(lambda u: u.has_perm('polls.can_vote'))
+    def my_view(request):
+        # ...
+
+``user_passes_test`` takes a required argument: a callable that takes a
+``User`` object and returns ``True`` if the user is allowed to view the page.
+
+
+
+Permissions
+===========
+
+Groups
+======
+
+Messages
+========
