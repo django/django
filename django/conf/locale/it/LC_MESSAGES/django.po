@@ -47,15 +47,10 @@ msgid "DATE_WITH_TIME_FULL"
 msgstr "Data/ora"
 
 #: contrib/admin/templates/admin/object_history.html:35
-#, fuzzy
 msgid ""
 "This object doesn't have a change history. It probably wasn't added via this "
 "admin site."
 msgstr ""
-"#-#-#-#-#  - (PACKAGE VERSION)  #-#-#-#-#\n"
-"Questo oggetto non ha cambiamenti storicizzati. Probabilmente non è stato "
-"creato con questo sito amministrativo.\n"
-"#-#-#-#-#  - (PACKAGE VERSION)  #-#-#-#-#\n"
 "Questo oggetto non ha cambiamenti storicizzati. Probabilmente non è stato "
 "creato con questo sito di amministrazione."
 
@@ -469,7 +464,8 @@ msgid ""
 "This should be an absolute path, excluding the domain name. Example: '/"
 "events/search/'."
 msgstr ""
-"Un percorso assoluto, senza nome a dominio. Esempio: '/events/search/'."
+"Un percorso assoluto, senza nome a dominio. Esempio: '/events/search/'.Un "
+"percorso assoluto, senza nome a dominio. Esempio: '/events/search/'."
 
 #: models/core.py:64
 msgid "redirect to"
@@ -718,7 +714,7 @@ msgstr "Inserire indirizzi e-mail validi separati da virgole."
 
 #: core/validators.py:100
 msgid "Please enter a valid IP address."
-msgstr "Inserire un indizzo IP valido."
+msgstr "Inserire un indirizzo IP valido."
 
 #: core/validators.py:104
 msgid "Empty values are not allowed here."
@@ -738,7 +734,7 @@ msgstr "Inserire un numero."
 
 #: core/validators.py:121
 msgid "Only alphabetical characters are allowed here."
-msgstr "Sono ammessi solo caratteri alfabeici."
+msgstr "Sono ammessi solo caratteri alfabetici."
 
 #: core/validators.py:125
 msgid "Enter a valid date in YYYY-MM-DD format."
@@ -761,12 +757,12 @@ msgid ""
 "Upload a valid image. The file you uploaded was either not an image or a "
 "corrupted image."
 msgstr ""
-"Caricare un immagine valida. Il file inserito non è un immagine o è corrotto."
+"Caricare un'immagine valida. Il file inserito non è un'immagine o è corrotto."
 
 #: core/validators.py:156
 #, python-format
 msgid "The URL %s does not point to a valid image."
-msgstr "L'URL %s non punta ad un immagine valida."
+msgstr "L'URL %s non punta ad un'immagine valida."
 
 #: core/validators.py:160
 #, python-format
@@ -883,7 +879,7 @@ msgstr "Verifica che il file inserito sia al massimo %d byte."
 
 #: core/validators.py:373
 msgid "The format for this field is wrong."
-msgstr "Formato delfile non valido."
+msgstr "Formato del file non valido."
 
 #: core/validators.py:388
 msgid "This field is invalid."
