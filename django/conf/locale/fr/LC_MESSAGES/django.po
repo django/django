@@ -109,7 +109,7 @@ msgstr "Mes actions"
 
 #: contrib/admin/templates/admin/index.html:55
 msgid "None available"
-msgstr "Aucun disponible"
+msgstr "Aucun(e) disponible"
 
 #: contrib/admin/templates/admin/login.html:14
 msgid "Username:"
@@ -299,7 +299,7 @@ msgstr "drapeau de l'action"
 
 #: contrib/admin/models/admin.py:12
 msgid "change message"
-msgstr ""
+msgstr "message de modification"
 
 #: contrib/admin/models/admin.py:15
 msgid "log entry"
@@ -311,107 +311,107 @@ msgstr "entrées de log"
 
 #: utils/dates.py:6
 msgid "Monday"
-msgstr ""
+msgstr "Lundi"
 
 #: utils/dates.py:6
 msgid "Tuesday"
-msgstr ""
+msgstr "Mardi"
 
 #: utils/dates.py:6
 msgid "Wednesday"
-msgstr ""
+msgstr "Mercredi"
 
 #: utils/dates.py:6
 msgid "Thursday"
-msgstr ""
+msgstr "Jeudi"
 
 #: utils/dates.py:6
 msgid "Friday"
-msgstr ""
+msgstr "Vendredi"
 
 #: utils/dates.py:7
 msgid "Saturday"
-msgstr ""
+msgstr "Samedi"
 
 #: utils/dates.py:7
 msgid "Sunday"
-msgstr ""
+msgstr "Dimanche"
 
 #: utils/dates.py:14
 msgid "January"
-msgstr ""
+msgstr "Janvier"
 
 #: utils/dates.py:14
 msgid "February"
-msgstr ""
+msgstr "Février"
 
 #: utils/dates.py:14 utils/dates.py:27
 msgid "March"
-msgstr ""
+msgstr "Mars"
 
 #: utils/dates.py:14 utils/dates.py:27
 msgid "April"
-msgstr ""
+msgstr "Avril"
 
 #: utils/dates.py:14 utils/dates.py:27
 msgid "May"
-msgstr ""
+msgstr "Mai"
 
 #: utils/dates.py:14 utils/dates.py:27
 msgid "June"
-msgstr ""
+msgstr "Juin"
 
 #: utils/dates.py:15 utils/dates.py:27
 msgid "July"
-msgstr ""
+msgstr "Juillet"
 
 #: utils/dates.py:15
 msgid "August"
-msgstr ""
+msgstr "Aôut"
 
 #: utils/dates.py:15
 msgid "September"
-msgstr ""
+msgstr "Septembre"
 
 #: utils/dates.py:15
 msgid "October"
-msgstr ""
+msgstr "Octobre"
 
 #: utils/dates.py:15
 msgid "November"
-msgstr ""
+msgstr "Novembre"
 
 #: utils/dates.py:16
 msgid "December"
-msgstr ""
+msgstr "Décembre"
 
 #: utils/dates.py:27
 msgid "Jan."
-msgstr ""
+msgstr "Jan."
 
 #: utils/dates.py:27
 msgid "Feb."
-msgstr ""
+msgstr "Fév."
 
 #: utils/dates.py:28
 msgid "Aug."
-msgstr ""
+msgstr "Aôut"
 
 #: utils/dates.py:28
 msgid "Sept."
-msgstr ""
+msgstr "Sept."
 
 #: utils/dates.py:28
 msgid "Oct."
-msgstr ""
+msgstr "Oct."
 
 #: utils/dates.py:28
 msgid "Nov."
-msgstr ""
+msgstr "Nov."
 
 #: utils/dates.py:28
 msgid "Dec."
-msgstr ""
+msgstr "Déc."
 
 #: models/core.py:5
 msgid "domain name"
@@ -564,7 +564,7 @@ msgstr "sessions"
 
 #: models/auth.py:8
 msgid "codename"
-msgstr "nom du code"
+msgstr "nom de code"
 
 #: models/auth.py:10
 msgid "Permission"
@@ -657,39 +657,39 @@ msgstr "Message"
 
 #: conf/global_settings.py:37
 msgid "German"
-msgstr ""
+msgstr "Allemand"
 
 #: conf/global_settings.py:38
 msgid "English"
-msgstr ""
+msgstr "Anglais"
 
 #: conf/global_settings.py:39
 msgid "Spanish"
-msgstr ""
+msgstr "Espagnol"
 
 #: conf/global_settings.py:40
 msgid "French"
-msgstr ""
+msgstr "Français"
 
 #: conf/global_settings.py:41
 msgid "Galician"
-msgstr ""
+msgstr "Galicien"
 
 #: conf/global_settings.py:42
 msgid "Itialian"
-msgstr ""
+msgstr "Italien"
 
 #: conf/global_settings.py:43
 msgid "Brazilian"
-msgstr ""
+msgstr "Brésilien"
 
 #: conf/global_settings.py:44
 msgid "Russian"
-msgstr ""
+msgstr "Russe"
 
 #: conf/global_settings.py:45
 msgid "Serbic"
-msgstr ""
+msgstr "Serbe"
 
 #: core/validators.py:58
 msgid "This value must contain only letters, numbers and underscores."
