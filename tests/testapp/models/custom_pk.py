@@ -53,6 +53,8 @@ EmployeeDoesNotExist: Employee does not exist for {'pk': 'foo'}
 >>> fran.save()
 >>> employees.get_list(last_name__exact='Jones')
 [Dan Jones, Fran Jones]
+>>> employees.get_in_bulk(['ABC123', 'XYZ456'])
+{'XYZ456': Fran Jones, 'ABC123': Dan Jones}
 
 >>> b = businesses.Business(name='Sears')
 >>> b.save()
@@ -62,4 +64,6 @@ True
 [Dan Jones, Fran Jones]
 >>> fran.get_business_list()
 [Sears]
+>>> businesses.get_in_bulk(['Sears'])
+{'Sears': Sears}
 """

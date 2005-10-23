@@ -299,7 +299,7 @@ def init():
         cursor = db.db.cursor()
         for sql in get_sql_create(core) + get_sql_create(auth) + get_sql_initial_data(core) + get_sql_initial_data(auth):
             cursor.execute(sql)
-        cursor.execute("INSERT INTO %s (domain, name) VALUES ('mysite.com', 'My Django site')" % core.Site._meta.db_table)
+        cursor.execute("INSERT INTO %s (domain, name) VALUES ('example.com', 'Example site')" % core.Site._meta.db_table)
     except Exception, e:
         sys.stderr.write("Error: The database couldn't be initialized.\n%s\n" % e)
         try:

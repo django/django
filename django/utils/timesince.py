@@ -1,4 +1,5 @@
-import time, math, datetime
+import datetime, math, time
+from django.utils.tzinfo import LocalTimezone
 
 def timesince(d, now=None):
     """
@@ -6,7 +7,6 @@ def timesince(d, now=None):
     as a nicely formatted string, e.g "10 minutes"
     Adapted from http://blog.natbat.co.uk/archive/2003/Jun/14/time_since
     """
-    original = time.mktime(d.timetuple())
     chunks = (
       (60 * 60 * 24 * 365, 'year'),
       (60 * 60 * 24 * 30, 'month'),
@@ -14,9 +14,17 @@ def timesince(d, now=None):
       (60 * 60, 'hour'),
       (60, 'minute')
     )
-    if not now:
-        now = time.time()
-    since = now - original
+    if now:
+        t = time.mktime(now)
+    else:
+        t = time.localtime()
+    if d.tzinfo:
+        tz = LocalTimezone()
+    else:
+        tz = None
+    now = datetime.datetime(t[0], t[1], t[2], t[3], t[4], t[5], tzinfo=tz)
+    delta = now - d
+    since = delta.days * 24 * 60 * 60 + delta.seconds
     # Crazy iteration syntax because we need i to be current index
     for i, (seconds, name) in zip(range(len(chunks)), chunks):
         count = math.floor(since / seconds)
