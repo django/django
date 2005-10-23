@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2005-10-23 23:49+0200\n"
+"POT-Creation-Date: 2005-10-24 00:03+0200\n"
 "PO-Revision-Date: 2005-10-08 00:03+0200\n"
 "Last-Translator: Georg Bauer <gb@bofh.ms>\n"
 "MIME-Version: 1.0\n"
@@ -687,6 +687,10 @@ msgstr "Russisch"
 #: conf/global_settings.py:45
 msgid "Serbic"
 msgstr "Serbisch"
+
+#: conf/global_settings.py:46
+msgid "Czech"
+msgstr "Tschechisch"
 
 #: core/validators.py:58
 msgid "This value must contain only letters, numbers and underscores."

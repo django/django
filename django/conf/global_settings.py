@@ -43,6 +43,7 @@ LANGUAGES = (
     ('pt_BR', _('Brazilian')),
     ('ru', _('Russian')),
     ('sr', _('Serbic')),
+    ('cs', _('Czech')),
 )
 
 # Not-necessarily-technical managers of the site. They get broken link
