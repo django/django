@@ -39,7 +39,7 @@ LANGUAGES = (
     ('es', _('Spanish')),
     ('fr', _('French')),
     ('gl', _('Galician')),
-    ('it', _('Itialian')),
+    ('it', _('Italian')),
     ('pt_BR', _('Brazilian')),
     ('ru', _('Russian')),
     ('sr', _('Serbic')),

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2005-10-23 13:53+0200\n"
+"POT-Creation-Date: 2005-10-23 23:49+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -288,10 +288,6 @@ msgstr "Il team di %(site_name)s"
 msgid "action time"
 msgstr "data azione"
 
-#: contrib/admin/models/admin.py:8 models/core.py:38
-msgid "content type"
-msgstr "tipo di contenuto"
-
 #: contrib/admin/models/admin.py:9
 msgid "object id"
 msgstr "id dell'oggetto"
@@ -455,6 +451,10 @@ msgstr "pacchetti"
 #: models/core.py:36
 msgid "python module name"
 msgstr "nome del modulo python"
+
+#: models/core.py:38
+msgid "content type"
+msgstr "tipo di contenuto"
 
 #: models/core.py:39
 msgid "content types"
@@ -671,10 +671,6 @@ msgstr "Francese"
 #: conf/global_settings.py:41
 msgid "Galician"
 msgstr "Galiziano"
-
-#: conf/global_settings.py:42
-msgid "Itialian"
-msgstr "Italiano"
 
 #: conf/global_settings.py:42
 msgid "Italian"
@@ -964,6 +960,9 @@ msgstr " Separa ID multipli con virgole."
 msgid ""
 " Hold down \"Control\", or \"Command\" on a Mac, to select more than one."
 msgstr " Premi \"Control\", o \"Command\" su Mac, per selezionarne più di uno."
+
+#~ msgid "Itialian"
+#~ msgstr "Italiano"
 
 #~ msgid "Server error <em>(500)</em>"
 #~ msgstr "Errore del server <em>(500)</em>"
