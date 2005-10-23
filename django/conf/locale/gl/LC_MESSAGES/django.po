@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2005-10-23 13:47+0200\n"
+"POT-Creation-Date: 2005-10-23 13:53+0200\n"
 "PO-Revision-Date: 2005-10-16 14:29+0100\n"
 "Last-Translator: Afonso Fernández Nogueira <fonzzo.django@gmail.com>\n"
 "Language-Team: Galego\n"
@@ -42,6 +42,10 @@ msgstr "Usuario"
 #: contrib/admin/templates/admin/object_history.html:19
 msgid "Action"
 msgstr "Acción"
+
+#: contrib/admin/templates/admin/object_history.html:25
+msgid "DATE_WITH_TIME_FULL"
+msgstr "j. N Y, H:i"
 
 #: contrib/admin/templates/admin/object_history.html:35
 msgid ""

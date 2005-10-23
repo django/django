@@ -22,7 +22,7 @@
         <tbody>
         {% for action in action_list %}
         <tr>
-            <th>{{ action.action_time|date:"N j, Y, P" }}</th>
+            <th>{{ action.action_time|date:_("DATE_WITH_TIME_FULL") }}</th>
             <td>{{ action.get_user.username }}{% if action.get_user.first_name %} ({{ action.get_user.first_name }} {{ action.get_user.last_name }}){% endif %}</td>
             <td>{{ action.change_message}}</td>
         </tr>
