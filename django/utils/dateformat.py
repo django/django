@@ -12,8 +12,9 @@ Usage:
 """
 
 from django.utils.dates import MONTHS, MONTHS_AP, WEEKDAYS
+from django.utils.tzinfo import LocalTimezone
 from calendar import isleap
-import re
+import re, time
 
 re_formatchars = re.compile(r'(?<!\\)([aABdDfFgGhHiIjlLmMnNOPrsStTUwWyYzZ])')
 re_escaped = re.compile(r'\\(.)')
@@ -40,7 +41,9 @@ class TimeFormat(Formatter):
 
     def A(self):
         "'AM' or 'PM'"
-        return self.a().upper()
+        if self.data.hour > 11:
+            return 'PM'
+        return 'AM'
 
     def B(self):
         "Swatch Internet time"
@@ -100,8 +103,12 @@ class TimeFormat(Formatter):
 class DateFormat(TimeFormat):
     year_days = [None, 0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334]
 
-    def __init__(self, d):
-        self.data = d
+    def __init__(self, dt):
+        # Accepts either a datetime or date object.
+        self.data = dt
+        self.timezone = getattr(dt, 'tzinfo', None)
+        if hasattr(self.data, 'hour') and not self.timezone:
+            self.timezone = LocalTimezone(dt)
 
     def d(self):
         "Day of the month, 2 digits with leading zeros; i.e. '01' to '31'"
@@ -118,6 +125,13 @@ class DateFormat(TimeFormat):
     def I(self):
         "'1' if Daylight Savings Time, '0' otherwise."
         raise NotImplementedError
+
+    def I(self):
+        "'1' if Daylight Savings Time, '0' otherwise."
+        if self.timezone.dst(self.data):
+            return '1'
+        else:
+            return '0'
 
     def j(self):
         "Day of the month without leading zeros; i.e. '1' to '31'"
@@ -149,11 +163,12 @@ class DateFormat(TimeFormat):
 
     def O(self):
         "Difference to Greenwich time in hours; e.g. '+0200'"
-        raise NotImplementedError
+        tz = self.timezone.utcoffset(self.data)
+        return "%+03d%02d" % (tz.seconds // 3600, (tz.seconds // 60) % 60)
 
     def r(self):
         "RFC 822 formatted date; e.g. 'Thu, 21 Dec 2000 16:01:07 +0200'"
-        raise NotImplementedError
+        return self.format('D, j M Y H:i:s O')
 
     def S(self):
         "English ordinal suffix for the day of the month, 2 characters; i.e. 'st', 'nd', 'rd' or 'th'"
@@ -174,11 +189,15 @@ class DateFormat(TimeFormat):
 
     def T(self):
         "Time zone of this machine; e.g. 'EST' or 'MDT'"
-        raise NotImplementedError
+        name = self.timezone.tzname(self.data)
+        if name is None:
+            name = self.format('O')
+        return name
 
     def U(self):
         "Seconds since the Unix epoch (January 1 1970 00:00:00 GMT)"
-        raise NotImplementedError
+        off = self.timezone.utcoffset(self.data)
+        return int(time.mktime(self.data.timetuple())) + off.seconds * 60
 
     def w(self):
         "Day of the week, numeric, i.e. '0' (Sunday) to '6' (Saturday)"
@@ -229,7 +248,7 @@ class DateFormat(TimeFormat):
         """Time zone offset in seconds (i.e. '-43200' to '43200'). The offset
         for timezones west of UTC is always negative, and for those east of UTC
         is always positive."""
-        raise NotImplementedError
+        return self.timezone.utcoffset(self.data).seconds
 
 def format(value, format_string):
     "Convenience function"

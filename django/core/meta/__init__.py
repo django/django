@@ -1498,9 +1498,10 @@ def function_get_sql_clause(opts, **kwargs):
 def function_get_in_bulk(opts, klass, *args, **kwargs):
     id_list = args and args[0] or kwargs['id_list']
     assert id_list != [], "get_in_bulk() cannot be passed an empty list."
-    kwargs['where'] = ["%s.id IN (%s)" % (opts.db_table, ",".join(map(str, id_list)))]
+    kwargs['where'] = ["%s.%s IN (%s)" % (opts.db_table, opts.pk.column, ",".join(['%s'] * len(id_list)))]
+    kwargs['params'] = id_list
     obj_list = function_get_list(opts, klass, **kwargs)
-    return dict([(o.id, o) for o in obj_list])
+    return dict([(getattr(o, opts.pk.column), o) for o in obj_list])
 
 def function_get_latest(opts, klass, does_not_exist_exception, **kwargs):
     kwargs['order_by'] = ('-' + opts.get_latest_by,)

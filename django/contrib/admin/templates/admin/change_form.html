@@ -19,8 +19,7 @@
   {% if has_absolute_url %}<li><a href="/r/{{ content_type_id }}/{{ object_id }}/" class="viewsitelink">View on site</a></li>{% endif%}
   </ul>
 {% endif %}{% endif %}
-<form {{ form_enc_attrib }} action='{{ form_url }}' method="post">
-
+<form {{ form_enc_attrib }} action='{{ form_url }}' method="post">{% block form_top %}{%endblock%}
 {% if is_popup %}<input type="hidden" name="_popup" value="1">{% endif %}
 {% if save_on_top %}{% submit_row %}{% endif %}
 {% if form.error_dict %}<p class="errornote">Please correct the error{{ form.error_dict.items|pluralize }} below.</p>{% endif %}
@@ -35,6 +34,7 @@
     {% endfor %}
    </fieldset>
 {% endfor %}
+{% block after_field_sets %}{% endblock %}
 {% if change %}
    {% if ordered_objects %}
    <fieldset class="module"><h2>Ordering</h2>
@@ -44,7 +44,9 @@
    </div></fieldset>
    {% endif %}
 {% endif %}
+
 {% for related_object in inline_related_objects %}{% edit_inline related_object %}{% endfor %}
+{% block after_related_objects%}{%endblock%}
 {% submit_row %}
 {% if add %}
    <script type="text/javascript">document.getElementById("{{first_form_field_id}}").focus();</script>

@@ -517,18 +517,18 @@ Built-in tag reference
     n                 Month without leading zeros.            ``'1'`` to ``'12'``
     N                 Month abbreviation in Associated Press  ``'Jan.'``, ``'Feb.'``, ``'March'``, ``'May'``
                       style. Proprietary extension.
-    O                 Not implemented.
+    O                 Difference to Greenwich time in hours.  ``'+0200'``
     P                 Time, in 12-hour hours, minutes and     ``'1 a.m.'``, ``'1:30 p.m.'``, ``'midnight'``, ``'noon'``, ``'12:30 p.m.'``
                       'a.m.'/'p.m.', with minutes left off
                       if they're zero and the special-case
                       strings 'midnight' and 'noon' if
                       appropriate. Proprietary extension.
-    r                 Not implemented.
+    r                 RFC 822 formatted date.                 ``'Thu, 21 Dec 2000 16:01:07 +0200'``
     s                 Seconds, 2 digits with leading zeros.   ``'00'`` to ``'59'``
     S                 English ordinal suffix for day of the   ``'st'``, ``'nd'``, ``'rd'`` or ``'th'``
                       month, 2 characters.
     t                 Not implemented.
-    T                 Not implemented.
+    T                 Time zone of this machine.              ``'EST'``, ``'MDT'``
     U                 Not implemented.
     w                 Day of the week, digits without         ``'0'`` (Sunday) to ``'6'`` (Saturday)
                       leading zeros.
@@ -537,7 +537,10 @@ Built-in tag reference
     y                 Year, 2 digits.                         ``'99'``
     Y                 Year, 4 digits.                         ``'1999'``
     z                 Day of the year.                        ``0`` to ``365``
-    Z                 Not implemented.
+    Z                 Time zone offset in seconds. The        ``-43200`` to ``43200``
+                      offset for timezones west of UTC is
+                      always negative, and for those east of
+                      UTC is always positive.
     ================  ======================================  =====================
 
     Example::

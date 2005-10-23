@@ -607,7 +607,7 @@ class AdminBoundFieldSet(BoundFieldSet):
         super(AdminBoundFieldSet, self).__init__(field_set, field_mapping, original, AdminBoundFieldLine)
         
         
-def fill_extra_context(opts, app_label, context, add=False, change=False, show_delete=False, form_url=''):
+def render_change_form(opts, app_label, context, add=False, change=False, show_delete=False, form_url=''):
     ordered_objects = opts.get_ordered_objects()[:]
     auto_populated_fields = [f for f in opts.fields if f.prepopulate_from]
     coltype = ordered_objects and 'colMS' or 'colM'
@@ -650,9 +650,17 @@ def fill_extra_context(opts, app_label, context, add=False, change=False, show_d
         'has_delete_permission' : context['perms'][app_label][opts.get_delete_permission()]
     }
     
-    context.update(extra_context)   
+    context.update(extra_context)
+    
+    return render_to_response(["admin/%s/%s/change_form" % (app_label, opts.object_name.lower() ), 
+                               "admin/%s/change_form" % app_label , 
+                               "admin/change_form"], 
+                              context_instance=context)
    
-   
+def log_add_message(user, opts,manipulator,new_object):
+    pk_value = getattr(new_object, opts.pk.column)
+    log.log_action(user.id, opts.get_content_type_id(), pk_value, repr(new_object), log.ADDITION)
+
 def add_stage(request, app_label, module_name, show_delete=False, form_url='', post_url='../', post_url_continue='../%s/', object_id_override=None):
     mod, opts = _get_mod_opts(app_label, module_name)
     if not request.user.has_perm(app_label + '.' + opts.get_add_permission()):
@@ -666,13 +674,10 @@ def add_stage(request, app_label, module_name, show_delete=False, form_url='', p
         manipulator.do_html2python(new_data)
         
         if not errors and not request.POST.has_key("_preview"):
-            for f in opts.many_to_many:
-                if f.rel.raw_id_admin:
-                    new_data.setlist(f.name, new_data[f.name].split(","))
             new_object = manipulator.save(new_data)
-            pk_value = getattr(new_object, opts.pk.column)
-            log.log_action(request.user.id, opts.get_content_type_id(), pk_value, repr(new_object), log.ADDITION)
+            log_add_message(request.user, opts,manipulator,new_object)
             msg = 'The %s "%s" was added successfully.' % (opts.verbose_name, new_object)
+            
             # Here, we distinguish between different save types by checking for
             # the presence of keys in request.POST.
             if request.POST.has_key("_continue"):
@@ -689,8 +694,6 @@ def add_stage(request, app_label, module_name, show_delete=False, form_url='', p
             else:
                 request.user.add_message(msg)
                 return HttpResponseRedirect(post_url)
-       # if request.POST.has_key("_preview"):   # Always happens anyway. 
-       #     manipulator.do_html2python(new_data)
     else:
         # Add default data.
         new_data = manipulator.flatten_data()
@@ -710,13 +713,24 @@ def add_stage(request, app_label, module_name, show_delete=False, form_url='', p
     if object_id_override is not None:
         c['object_id'] = object_id_override
     
-    
-    fill_extra_context(opts, app_label, c, add=True)
-   
-    return render_to_response("admin/change_form", context_instance=c) 
+    return render_change_form(opts, app_label, c, add=True)
 add_stage = staff_member_required(add_stage)
 
-
+def log_change_message(user, opts,manipulator,new_object):
+    pk_value = getattr(new_object, opts.pk.column)
+    # Construct the change message.
+    change_message = []
+    if manipulator.fields_added:
+        change_message.append('Added %s.' % get_text_list(manipulator.fields_added, 'and'))
+    if manipulator.fields_changed:
+        change_message.append('Changed %s.' % get_text_list(manipulator.fields_changed, 'and'))
+    if manipulator.fields_deleted:
+        change_message.append('Deleted %s.' % get_text_list(manipulator.fields_deleted, 'and'))
+    change_message = ' '.join(change_message)
+    if not change_message:
+        change_message = 'No fields changed.'
+    log.log_action(user.id, opts.get_content_type_id(), pk_value, repr(new_object), log.CHANGE, change_message)
+    
 def change_stage(request, app_label, module_name, object_id):
     mod, opts = _get_mod_opts(app_label, module_name)
     if not request.user.has_perm(app_label + '.' + opts.get_change_permission()):
@@ -737,26 +751,8 @@ def change_stage(request, app_label, module_name, object_id):
         
         manipulator.do_html2python(new_data)
         if not errors and not request.POST.has_key("_preview"):
-        # Now done in commaseparatedint
-        #    for f in opts.many_to_many: 
-        #        if f.rel.raw_id_admin:
-        #            new_data.setlist(f.name, new_data[f.name].split(","))
             new_object = manipulator.save(new_data)
-            pk_value = getattr(new_object, opts.pk.column)
-
-            # Construct the change message.
-            change_message = []
-            if manipulator.fields_added:
-                change_message.append('Added %s.' % get_text_list(manipulator.fields_added, 'and'))
-            if manipulator.fields_changed:
-                change_message.append('Changed %s.' % get_text_list(manipulator.fields_changed, 'and'))
-            if manipulator.fields_deleted:
-                change_message.append('Deleted %s.' % get_text_list(manipulator.fields_deleted, 'and'))
-            change_message = ' '.join(change_message)
-            if not change_message:
-                change_message = 'No fields changed.'
-
-            log.log_action(request.user.id, opts.get_content_type_id(), pk_value, repr(new_object), log.CHANGE, change_message)
+            log_change_message(request.user,opts,manipulator,new_object)
             msg = 'The %s "%s" was changed successfully.' % (opts.verbose_name, new_object)
             if request.POST.has_key("_continue"):
                 request.user.add_message("%s You may edit it again below." % msg)
@@ -773,15 +769,14 @@ def change_stage(request, app_label, module_name, object_id):
             else:
                 request.user.add_message(msg)
                 return HttpResponseRedirect("../")
-       # if request.POST.has_key("_preview"):  # always happens
-       #     manipulator.do_html2python(new_data)
     else:
         # Populate new_data with a "flattened" version of the current data.
         new_data = manipulator.flatten_data()
        
- 
+        # TODO: do this in flatten_data... 
         # If the object has ordered objects on its admin page, get the existing
         # order and flatten it into a comma-separated list of IDs.
+        
         id_order_list = []
         for rel_obj in opts.get_ordered_objects():
             id_order_list.extend(getattr(obj, 'get_%s_order' % rel_obj.object_name.lower())())
@@ -794,6 +789,7 @@ def change_stage(request, app_label, module_name, object_id):
     form.original = manipulator.original_object
     form.order_objects = []
     
+    #TODO Should be done in flatten_data  / FormWrapper construction
     for related in opts.get_followed_related_objects():
         wrt = related.opts.order_with_respect_to
         if wrt and wrt.rel and wrt.rel.to == opts: 
@@ -810,10 +806,9 @@ def change_stage(request, app_label, module_name, object_id):
         'is_popup' : request.REQUEST.has_key('_popup')
     })
 
-    fill_extra_context(opts, app_label, c, change=True)
+    return render_change_form(opts, app_label, c, change=True)
     
-    return render_to_response('admin/change_form', context_instance=c)
-change_stage = staff_member_required(change_stage)
+    
 
 def _nest_help(obj, depth, val):
     current = obj
