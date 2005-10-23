@@ -1,6 +1,8 @@
 # Default Django settings. Override these with settings in the module
 # pointed-to by the DJANGO_SETTINGS_MODULE environment variable.
 
+from django.utils.translation import gettext_lazy as _
+
 ####################
 # CORE             #
 ####################
@@ -32,10 +34,15 @@ LANGUAGE_CODE = 'en-us'
 # language name should be the utf-8 encoded local name for the
 # language.
 LANGUAGES = (
-    ('en', 'English'),
-    ('de', 'Deutsch'),
-    ('it', 'Italiano'),
-    ('sr', 'Srpski'),
+    ('de', _('German')),
+    ('en', _('English')),
+    ('es', _('Spanish')),
+    ('fr', _('French')),
+    ('gl', _('Galician')),
+    ('it', _('Itialian')),
+    ('pt_BR', _('Brazilian')),
+    ('ru', _('Russian')),
+    ('sr', _('Serbic')),
 )
 
 # Not-necessarily-technical managers of the site. They get broken link
