@@ -24,15 +24,15 @@ def fix_ampersands(value, _):
 
 def floatformat(text, _):
     """
-    Displays a floating point number as 34.2 (with one decimal place) - but
+    Displays a floating point number as 34.2 (with one decimal place) -- but
     only if there's a point to be displayed
     """
-    from math import modf
-    if not text:
-        return ''
-    if modf(float(text))[0] < 0.1:
-        return text
-    return "%.1f" % float(text)
+    f = float(text)
+    m = f - int(f)
+    if m:
+        return '%.1f' % f
+    else:
+        return '%d' % int(f)
 
 def linenumbers(value, _):
     "Displays text with line numbers"
