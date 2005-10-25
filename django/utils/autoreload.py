@@ -37,6 +37,8 @@ def reloader_thread():
     mtimes = {}
     while RUN_RELOADER:
         for filename in filter(lambda v: v, map(lambda m: getattr(m, "__file__", None), sys.modules.values())) + reloadFiles:
+            if not os.path.exists(filename):
+                continue # File might be in an egg, so it can't be reloaded.
             if filename.endswith(".pyc"):
                 filename = filename[:-1]
             mtime = os.stat(filename).st_mtime
