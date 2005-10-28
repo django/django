@@ -175,7 +175,7 @@ def removetags(value, tags):
     "Removes a space separated list of [X]HTML tags from the output"
     tags = [re.escape(tag) for tag in tags.split()]
     tags_re = '(%s)' % '|'.join(tags)
-    starttag_re = re.compile('<%s(>|(\s+[^>]*>))' % tags_re)
+    starttag_re = re.compile(r'<%s(/?>|(\s+[^>]*>))' % tags_re)
     endtag_re = re.compile('</%s>' % tags_re)
     value = starttag_re.sub('', value)
     value = endtag_re.sub('', value)
