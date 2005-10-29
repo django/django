@@ -29,7 +29,9 @@ Examples:
     CACHE_BACKEND                   Explanation
     ==============================  ===========================================
     memcached://127.0.0.1:11211/    A memcached backend; the server is running
-                                    on localhost port 11211.
+                                    on localhost port 11211.  You can use
+                                    multiple memcached servers by separating
+                                    them with semicolons.
 
     db://tablename/                 A database backend in a table named
                                     "tablename". This table should be created
