@@ -10,8 +10,24 @@ example, as that is unique across a Django project.
 Additionally, all headers from the response's Vary header will be taken into
 account on caching -- just like the middleware does.
 """
+import re
 
 from django.utils.decorators import decorator_from_middleware
+from django.utils.cache import patch_cache_control
 from django.middleware.cache import CacheMiddleware
 
 cache_page = decorator_from_middleware(CacheMiddleware)
+
+def cache_control(**kwargs):
+
+    def _cache_controller(viewfunc):
+
+        def _cache_controlled(request, *args, **kw):
+            response = viewfunc(request, *args, **kw)
+            patch_cache_control(response, **kwargs)
+            return response
+
+        return _cache_controlled
+
+    return _cache_controller
+
