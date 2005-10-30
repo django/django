@@ -338,8 +338,8 @@ class TextField(FormField):
             maxlength = 'maxlength="%s" ' % self.maxlength
         if isinstance(data, unicode):
             data = data.encode(DEFAULT_CHARSET)
-        return '<input type="text" id="%s" class="v%s%s" name="%s" size="%s" value="%s" %s/>' % \
-            (self.get_id(), self.__class__.__name__, self.is_required and ' required' or '',
+        return '<input type="%s" id="%s" class="v%s%s" name="%s" size="%s" value="%s" %s/>' % \
+            (self.input_type, self.get_id(), self.__class__.__name__, self.is_required and ' required' or '',
             self.field_name, self.length, escape(data), maxlength)
 
     def html2python(data):
@@ -347,11 +347,7 @@ class TextField(FormField):
     html2python = staticmethod(html2python)
 
 class PasswordField(TextField):
-    def render(self, data):
-        # value is always blank because we never want to redisplay it
-        return '<input type="password" id="%s" class="v%s%s" name="%s" value="" />' % \
-            (self.get_id(), self.__class__.__name__, self.is_required and ' required' or '',
-            self.field_name)
+    input_type="password"
 
 class LargeTextField(TextField):
     def __init__(self, field_name, rows=10, cols=40, is_required=False, validator_list=[], maxlength=None):
