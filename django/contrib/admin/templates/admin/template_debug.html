@@ -7,9 +7,9 @@
    {{message}}
    </pre>
    
-   {%ifnotequal bottom "0"%}
-   .<br/>.<br/>.<br/>
-   {%endifnotequal%}
+   {%if top%}
+   ...
+   {%endif%}
    
    <pre class="source">
    
@@ -17,8 +17,8 @@
    {% else %}{{source_line.0|rjust:"5"}}:{{ source_line.1 }} 
    {% endifequal %}{% endfor %}
    </pre>
-   {%ifnotequal top total%}
-   .<br/>.<br/>.<br/>
+   {%ifnotequal bottom total%}
+   ...
    {%endifnotequal%}
    
    </div>

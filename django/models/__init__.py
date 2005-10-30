@@ -25,7 +25,7 @@ for mod in modules:
             # label prepended, and the add_BLAH() method will not be
             # generated.
             rel_mod = related.opts.get_model_module()
-            rel_obj_name = klass._meta.get_rel_object_method_name(related.opts, related.field)
+            rel_obj_name = related.get_method_name_part()
             if isinstance(related.field.rel, meta.OneToOne):
                 # Add "get_thingie" methods for one-to-one related objects.
                 # EXAMPLE: Place.get_restaurants_restaurant()
@@ -62,18 +62,18 @@ for mod in modules:
             del rel_obj_name, rel_mod, related # clean up
 
         # Do the same for all related many-to-many objects.
-        for rel_opts, rel_field in klass._meta.get_all_related_many_to_many_objects():
-            rel_mod = rel_opts.get_model_module()
-            rel_obj_name = klass._meta.get_rel_object_method_name(rel_opts, rel_field)
-            setattr(klass, 'get_%s' % rel_obj_name, curry(meta.method_get_related_many_to_many, 'get_object', klass._meta, rel_mod, rel_field))
-            setattr(klass, 'get_%s_count' % rel_obj_name, curry(meta.method_get_related_many_to_many, 'get_count', klass._meta, rel_mod, rel_field))
-            setattr(klass, 'get_%s_list' % rel_obj_name, curry(meta.method_get_related_many_to_many, 'get_list', klass._meta, rel_mod, rel_field))
-            if rel_opts.app_label == klass._meta.app_label:
-                func = curry(meta.method_set_related_many_to_many, rel_opts, rel_field)
+        for related in klass._meta.get_all_related_many_to_many_objects():
+            rel_mod = related.opts.get_model_module()
+            rel_obj_name = related.get_method_name_part()
+            setattr(klass, 'get_%s' % rel_obj_name, curry(meta.method_get_related_many_to_many, 'get_object', klass._meta, rel_mod, related.field))
+            setattr(klass, 'get_%s_count' % rel_obj_name, curry(meta.method_get_related_many_to_many, 'get_count', klass._meta, rel_mod, related.field))
+            setattr(klass, 'get_%s_list' % rel_obj_name, curry(meta.method_get_related_many_to_many, 'get_list', klass._meta, rel_mod, related.field))
+            if related.opts.app_label == klass._meta.app_label:
+                func = curry(meta.method_set_related_many_to_many, related.opts, related.field)
                 func.alters_data = True
-                setattr(klass, 'set_%s' % rel_opts.module_name, func)
+                setattr(klass, 'set_%s' % related.opts.module_name, func)
                 del func
-            del rel_obj_name, rel_mod, rel_opts, rel_field # clean up
+            del rel_obj_name, rel_mod, related # clean up
 
         # Add "set_thingie_order" and "get_thingie_order" methods for objects
         # that are ordered with respect to this.

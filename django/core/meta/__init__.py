@@ -190,7 +190,7 @@ class RelatedObject(object):
     def get_list(self, parent_instance = None):
         "Get the list of this type of object from an instance of the parent class"
         if parent_instance != None:
-            func_name = 'get_%s_list' % self.parent_opts.get_rel_object_method_name(self.opts, self.field)
+            func_name = 'get_%s_list' % self.get_method_name_part()
             func = getattr(parent_instance, func_name)
             list = func()
             
@@ -239,8 +239,9 @@ class RelatedObject(object):
         return "<RelatedObject: %s related to %s>" % ( self.name, self.field.name)      
 
     def get_manipulator_fields(self, opts, manipulator, change, follow):
+        #TODO: remove core fields stuff
         if change:
-            meth_name = 'get_%s_count' % self.parent_opts.get_rel_object_method_name(self.opts, self.field)
+            meth_name = 'get_%s_count' % self.get_method_name_part()
             count = getattr(manipulator.original_object, meth_name)()
             count += self.field.rel.num_extra_on_change
             if self.field.rel.min_num_in_admin:
@@ -262,6 +263,9 @@ class RelatedObject(object):
     
     def bind(self, field_mapping, original, bound_related_object_class=BoundRelatedObject):
         return bound_related_object_class(self, field_mapping, original)
+
+    def get_method_name_part(self):
+        return self.parent_opts.get_rel_object_method_name(self.opts, self.field)
 
 class Options:
     def __init__(self, module_name='', verbose_name='', verbose_name_plural='', db_table='',
@@ -461,7 +465,7 @@ class Options:
                 try:
                     for f in klass._meta.many_to_many:
                         if f.rel and self == f.rel.to:
-                            rel_objs.append((klass._meta, f))
+                            rel_objs.append(RelatedObject(self, klass._meta, f))
                             raise StopIteration
                 except StopIteration:
                     continue
@@ -856,10 +860,9 @@ class ModelBase(type):
                     old_app._MODELS[i] = new_class
                     # Replace all relationships to the old class with
                     # relationships to the new one.
-                    for related in model._meta.get_all_related_objects():
+                    for related in model._meta.get_all_related_objects() + \
+                        model._meta.get_all_related_many_to_many_objects():
                         related.field.rel.to = opts
-                    for rel_opts, rel_field in model._meta.get_all_related_many_to_many_objects():
-                        rel_field.rel.to = opts
                     break
 
         return new_class
@@ -958,7 +961,7 @@ def method_delete(opts, self):
         self._pre_delete()
     cursor = db.db.cursor()
     for related in opts.get_all_related_objects():
-        rel_opts_name = opts.get_rel_object_method_name(related.opts, related.field)
+        rel_opts_name = related.get_method_name_part()
         if isinstance(related.field.rel, OneToOne):
             try:
                 sub_obj = getattr(self, 'get_%s' % rel_opts_name)()
@@ -969,8 +972,8 @@ def method_delete(opts, self):
         else:
             for sub_obj in getattr(self, 'get_%s_list' % rel_opts_name)():
                 sub_obj.delete()
-    for rel_opts, rel_field in opts.get_all_related_many_to_many_objects():
-        cursor.execute("DELETE FROM %s WHERE %s_id=%%s" % (rel_field.get_m2m_db_table(rel_opts),
+    for related in opts.get_all_related_many_to_many_objects():
+        cursor.execute("DELETE FROM %s WHERE %s_id=%%s" % (related.field.get_m2m_db_table(related.opts),
             self._meta.object_name.lower()), [getattr(self, opts.pk.column)])
     for f in opts.many_to_many:
         cursor.execute("DELETE FROM %s WHERE %s_id=%%s" % (f.get_m2m_db_table(opts), self._meta.object_name.lower()),
@@ -1671,7 +1674,7 @@ def manipulator_save(opts, klass, add, change, self, new_data):
                 if change:
                     if rel_new_data[related.opts.pk.name][0]:
                         try:
-                            old_rel_obj = getattr(self.original_object, 'get_%s' % opts.get_rel_object_method_name(related.opts, related.field))(**{'%s__exact' % related.opts.pk.name: rel_new_data[related.opts.pk.name][0]})
+                            old_rel_obj = getattr(self.original_object, 'get_%s' % related.get_method_name_part() )(**{'%s__exact' % related.opts.pk.name: rel_new_data[related.opts.pk.name][0]})
                         except ObjectDoesNotExist:
                             pass
 

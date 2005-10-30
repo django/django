@@ -706,7 +706,7 @@ class ManyToManyField(Field):
 
     def get_manipulator_field_objs(self):
         if self.rel.raw_id_admin:
-            return [formfields.CommaSeparatedIntegerField]
+            return [formfields.RawIdAdminField]
         else:
             choices = self.get_choices_default()
             return [curry(formfields.SelectMultipleField, size=min(max(len(choices), 5), 15), choices=choices)]
@@ -741,7 +741,7 @@ class ManyToManyField(Field):
             instance_ids = [getattr(instance, self.rel.to.pk.column) for instance in get_list_func()]
             if self.rel.raw_id_admin:
                  new_data[self.name] = ",".join([str(id) for id in instance_ids])
-            elif not self.rel.edit_inline:
+            else:
                  new_data[self.name] = instance_ids 
         else:
             # In required many-to-many fields with only one available choice,

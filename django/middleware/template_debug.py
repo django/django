@@ -14,7 +14,6 @@ class TemplateDebugMiddleware(object):
             top = max(0, line - context_lines)
             bottom = min(total, line + 1 + context_lines)
        
-       
             return render_to_response('template_debug', {
                'message'      : exception.args[0], 
                'source_lines' : source_lines[top:bottom],

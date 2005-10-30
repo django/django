@@ -315,6 +315,7 @@ class FormField:
 ####################
 
 class TextField(FormField):
+    input_type = "text"
     def __init__(self, field_name, length=30, maxlength=None, is_required=False, validator_list=[]):
         self.field_name = field_name
         self.length, self.maxlength = length, maxlength
@@ -878,8 +879,10 @@ class CommaSeparatedIntegerField(TextField):
         except validators.ValidationError, e:
             raise validators.CriticalValidationError, e.messages
 
+class RawIdAdminField(CommaSeparatedIntegerField):
     def html2python(data):
         return data.split(',');
+    html2python = classmethod(html2python)
 
 class XMLLargeTextField(LargeTextField):
     """

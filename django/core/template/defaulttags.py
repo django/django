@@ -142,6 +142,7 @@ class IfEqualNode(Node):
     def render(self, context):
         val1 = resolve_variable(self.var1, context)
         val2 = resolve_variable(self.var2, context)
+         
         if (self.negate and val1 != val2) or (not self.negate and val1 == val2):
             return self.nodelist_true.render(context)
         return self.nodelist_false.render(context)

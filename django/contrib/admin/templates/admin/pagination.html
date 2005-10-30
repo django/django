@@ -1,0 +1,13 @@
+
+<p class="paginator">
+{% if pagination_required %} 
+{%for i in page_range %} 
+	{% paginator_number cl i %}
+{%endfor%}
+{%endif%}
+{{cl.result_count}} {% ifequal cl.result_count 1 %}{{cl.opts.verbose_name}}{%else%}{{cl.opts.verbose_name_plural}}{%endifequal%}
+{% if need_show_all_link %}&nbsp;&nbsp;<a href="{% query_string cl override ALL_VAR:'' %}" class="showall">Show all</a>{%endif%}
+
+</p>
+
+    

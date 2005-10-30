@@ -13,7 +13,9 @@ settings.CACHE_BACKEND and use that to create and load a cache object.
 The CACHE_BACKEND setting is a quasi-URI; examples are:
 
     memcached://127.0.0.1:11211/    A memcached backend; the server is running
-                                    on localhost port 11211.
+                                    on localhost port 11211.  You can use
+                                    multiple memcached servers by separating
+                                    them with semicolons.
 
     db://tablename/                 A database backend in a table named
                                     "tablename". This table should be created
@@ -134,7 +136,7 @@ else:
         "Memcached cache backend."
         def __init__(self, server, params):
             _Cache.__init__(self, params)
-            self._cache = memcache.Client([server])
+            self._cache = memcache.Client(server.split(';'))
 
         def get(self, key, default=None):
             val = self._cache.get(key)

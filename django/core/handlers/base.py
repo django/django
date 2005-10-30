@@ -48,6 +48,9 @@ class BaseHandler:
         from django.core.mail import mail_admins
         from django.conf.settings import DEBUG, INTERNAL_IPS, ROOT_URLCONF
 
+        # Reset query list per request.
+        db.db.queries = []
+
         # Apply request middleware
         for middleware_method in self._request_middleware:
             response = middleware_method(request)

@@ -395,7 +395,7 @@ class DebugParser(Parser):
         (command, (origin,line)) = self.command_stack.pop()
         msg = "Unclosed tag '%s' starting at %s, line %d. Looking for one of: %s " % \
               (command, origin, line, ', '.join(parse_until) ) 
-        raise self.error( token.source, msg)
+        raise self.error( (origin,line), msg)
 
     def compile_function_error(self, token, e):
         if not hasattr(e, 'source'):

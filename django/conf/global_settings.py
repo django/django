@@ -65,8 +65,8 @@ TEMPLATE_FILE_EXTENSION = '.html'
 # See the comments in django/core/template/loader.py for interface
 # documentation.
 TEMPLATE_LOADERS = (
-#     'django.core.template.loaders.app_directories.load_template_source',
     'django.core.template.loaders.filesystem.load_template_source',
+    'django.core.template.loaders.app_directories.load_template_source',
 #     'django.core.template.loaders.eggs.load_template_source',
 )
 

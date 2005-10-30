@@ -2,28 +2,28 @@
 {% load admin_modify %}
 {% load adminmedia %}
 {% block extrahead %}
-{% for js in javascript_imports %}{% include_admin_script js %}{% endfor %}
+{% for js in bound_manipulator.javascript_imports %}{% include_admin_script js %}{% endfor %}
 {% endblock %}
-{% block coltype %}{{ coltype }}{% endblock %}
-{% block bodyclass %}{{app_label}}-{{object_name.lower}} change-form{% endblock %}
+{% block coltype %}{{ bound_manipulator.coltype }}{% endblock %}
+{% block bodyclass %}{{app_label}}-{{bound_manipulator.object_name.lower}} change-form{% endblock %}
 {% block breadcrumbs %}{% if not is_popup %}
 <div class="breadcrumbs">
      <a href="../../../">Home</a> &rsaquo;
-     <a href="../">{{verbose_name_plural|capfirst}}</a> &rsaquo;
-     {% if add %}Add {{verbose_name}}{% else %}{{original|striptags|truncatewords:"18"}}{% endif %}
+     <a href="../">{{bound_manipulator.verbose_name_plural|capfirst}}</a> &rsaquo;
+     {% if add %}Add {{bound_manipulator.verbose_name}}{% else %}{{bound_manipulator.original|striptags|truncatewords:"18"}}{% endif %}
 </div>
 {% endif %}{% endblock %}
 {% block content %}<div id="content-main">
 {% if change %}{% if not is_popup %}
   <ul class="object-tools"><li><a href="history/" class="historylink">History</a></li>
-  {% if has_absolute_url %}<li><a href="/r/{{ content_type_id }}/{{ object_id }}/" class="viewsitelink">View on site</a></li>{% endif%}
+  {% if has_absolute_url %}<li><a href="/r/{{ bound_manipulator.content_type_id }}/{{ object_id }}/" class="viewsitelink">View on site</a></li>{% endif%}
   </ul>
 {% endif %}{% endif %}
-<form {{ form_enc_attrib }} action='{{ form_url }}' method="post">{% block form_top %}{%endblock%}
+<form {{ bound_manipulator.form_enc_attrib }} action='{{ form_url }}' method="post">{% block form_top %}{%endblock%}
 {% if is_popup %}<input type="hidden" name="_popup" value="1">{% endif %}
-{% if save_on_top %}{% submit_row %}{% endif %}
+{% if bound_manipulator.save_on_top %}{% submit_row %}{% endif %}
 {% if form.error_dict %}<p class="errornote">Please correct the error{{ form.error_dict.items|pluralize }} below.</p>{% endif %}
-{% for bound_field_set in bound_field_sets %}
+{% for bound_field_set in bound_manipulator.bound_field_sets %}
    <fieldset class="module aligned {{ bound_field_set.classes }}"> 
     {% if bound_field_set.name %}<h2>{{bound_field_set.name }}</h2>{% endif %}
     {% for bound_field_line in bound_field_set %}
@@ -36,7 +36,7 @@
 {% endfor %}
 {% block after_field_sets %}{% endblock %}
 {% if change %}
-   {% if ordered_objects %}
+   {% if bound_manipulator.ordered_objects %}
    <fieldset class="module"><h2>Ordering</h2>
    <div class="form-row{% if form.order_.errors %} error{% endif %} ">
    {% if form.order_.errors %}{{ form.order_.html_error_list }}{% endif %}
@@ -45,23 +45,23 @@
    {% endif %}
 {% endif %}
 
-{% for related_object in inline_related_objects %}{% edit_inline related_object %}{% endfor %}
+{% for related_object in bound_manipulator.inline_related_objects %}{% edit_inline related_object %}{% endfor %}
 {% block after_related_objects%}{%endblock%}
 {% submit_row %}
 {% if add %}
-   <script type="text/javascript">document.getElementById("{{first_form_field_id}}").focus();</script>
+   <script type="text/javascript">document.getElementById("{{bound_manipulator.first_form_field_id}}").focus();</script>
 {% endif %}
-{% if auto_populated_fields %}
+{% if bound_manipulator.auto_populated_fields %}
    <script type="text/javascript">
-   {% auto_populated_field_script auto_populated_fields change %} 
+   {% auto_populated_field_script bound_manipulator.auto_populated_fields change %} 
    </script>
 {% endif %}
 {% if change %}
-   {% if ordered_objects %}
+   {% if bound_manipulator.ordered_objects %}
       {% if form.order_objects %}<ul id="orderthese">
           {% for object in form.order_objects %}
-	     <li id="p{% firstof ordered_object_names %}">
-	     <span id="handlep{% firstof ordered_object_names %}">{{ object|truncatewords:"5" }}</span>
+	     <li id="p{% firstof bound_manipulator.ordered_object_names %}">
+	     <span id="handlep{% firstof bound_manipulator.ordered_object_names %}">{{ object|truncatewords:"5" }}</span>
 	     </li>
 	     {% endfor%}
       {% endif %}
