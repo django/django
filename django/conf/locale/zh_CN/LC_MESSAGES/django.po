@@ -1,0 +1,888 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: django v1.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2005-10-24 00:03+0200\n"
+"PO-Revision-Date: 2005-10-30 15:46+0800\n"
+"Last-Translator: limodou <limodou@gmail.com>\n"
+"Language-Team: Simplified Chinese <limodou@gmail.com>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Poedit-Language: Chinese\n"
+"X-Poedit-Country: CHINA\n"
+"X-Poedit-SourceCharset: utf-8\n"
+
+#: contrib/admin/templates/admin/object_history.html:4
+#: contrib/admin/templates/admin/base.html:28
+#: contrib/admin/templates/registration/password_change_done.html:3
+#: contrib/admin/templates/registration/password_reset_form.html:3
+#: contrib/admin/templates/registration/logged_out.html:3
+#: contrib/admin/templates/registration/password_reset_done.html:3
+#: contrib/admin/templates/registration/password_change_form.html:3
+msgid "Home"
+msgstr "首页"
+
+#: contrib/admin/templates/admin/object_history.html:4
+msgid "History"
+msgstr "历史"
+
+#: contrib/admin/templates/admin/object_history.html:17
+msgid "Date/time"
+msgstr "日期/时间"
+
+#: contrib/admin/templates/admin/object_history.html:18
+#: models/auth.py:47
+msgid "User"
+msgstr "用户"
+
+#: contrib/admin/templates/admin/object_history.html:19
+msgid "Action"
+msgstr "动作"
+
+#: contrib/admin/templates/admin/object_history.html:25
+msgid "DATE_WITH_TIME_FULL"
+msgstr "N j, Y, P"
+
+#: contrib/admin/templates/admin/object_history.html:35
+msgid "This object doesn't have a change history. It probably wasn't added via this admin site."
+msgstr "此对象没有修改历史。可能不能通过这个管理站点来增加。"
+
+#: contrib/admin/templates/admin/base_site.html:3
+msgid "Django site admin"
+msgstr "Django管理站点"
+
+#: contrib/admin/templates/admin/base_site.html:6
+msgid "Django administration"
+msgstr "Django管理员"
+
+#: contrib/admin/templates/admin/500.html:5
+msgid "Server error (500)"
+msgstr "服务器错误(500)"
+
+#: contrib/admin/templates/admin/500.html:8
+msgid "Server Error <em>(500)</em>"
+msgstr "服务器错误 <em>(500)</em>"
+
+#: contrib/admin/templates/admin/500.html:9
+msgid "There's been an error. It's been reported to the site administrators via e-mail and should be fixed shortly. Thanks for your patience."
+msgstr "存在一个错误。它已经通过电子邮件被报告给站点管理员了，并且应该很快被改正。谢谢你的关心。"
+
+#: contrib/admin/templates/admin/404.html:3
+#: contrib/admin/templates/admin/404.html:7
+msgid "Page not found"
+msgstr "页面没有找到"
+
+#: contrib/admin/templates/admin/404.html:9
+msgid "We're sorry, but the requested page could not be found."
+msgstr "很报歉，请求页面无法找到。"
+
+#: contrib/admin/templates/admin/index.html:26
+msgid "Add"
+msgstr "增加"
+
+#: contrib/admin/templates/admin/index.html:32
+msgid "Change"
+msgstr "修改"
+
+#: contrib/admin/templates/admin/index.html:42
+msgid "You don't have permission to edit anything."
+msgstr "你无权修改任何东西。"
+
+#: contrib/admin/templates/admin/index.html:50
+msgid "Recent Actions"
+msgstr "最近动作"
+
+#: contrib/admin/templates/admin/index.html:51
+msgid "My Actions"
+msgstr "我的动作"
+
+#: contrib/admin/templates/admin/index.html:55
+msgid "None available"
+msgstr "无可用的"
+
+#: contrib/admin/templates/admin/login.html:14
+msgid "Username:"
+msgstr "用户名："
+
+#: contrib/admin/templates/admin/login.html:17
+msgid "Password:"
+msgstr "口令："
+
+#: contrib/admin/templates/admin/login.html:19
+msgid "Have you <a href=\"/password_reset/\">forgotten your password</a>?"
+msgstr "<a href=\"/password_reset/\">忘记你的密码</a>？"
+
+#: contrib/admin/templates/admin/login.html:23
+msgid "Log in"
+msgstr "登录"
+
+#: contrib/admin/templates/admin/base.html:22
+msgid "Welcome,"
+msgstr "欢迎，"
+
+#: contrib/admin/templates/admin/base.html:22
+msgid "Change password"
+msgstr "修改口令"
+
+#: contrib/admin/templates/admin/base.html:22
+msgid "Log out"
+msgstr "注销"
+
+#: contrib/admin/templates/admin/delete_confirmation.html:6
+#, python-format
+msgid "Deleting the %(object_name)s  '%(object)s' would result in deleting related objects, but your account doesn't have permission to delete the following types of objects:"
+msgstr "删除 %(object_name)s  '%(object)s' 会导致删除相关的对象，但你的帐号无权删除下列类型的对象："
+
+#: contrib/admin/templates/admin/delete_confirmation.html:13
+#, python-format
+msgid "Are you sure you want to delete the %(object_name)s \"%(object)s\"? All of the following related items will be deleted:"
+msgstr "你确信相要删除 %(object_name)s \"%(object)s\"？所有相关的项目都将被删除："
+
+#: contrib/admin/templates/admin/delete_confirmation.html:17
+msgid "Yes, I'm sure"
+msgstr "是的，我确定"
+
+#: contrib/admin/templates/registration/password_change_done.html:3
+#: contrib/admin/templates/registration/password_change_form.html:3
+#: contrib/admin/templates/registration/password_change_form.html:5
+#: contrib/admin/templates/registration/password_change_form.html:9
+msgid "Password change"
+msgstr "口令修改"
+
+#: contrib/admin/templates/registration/password_change_done.html:5
+#: contrib/admin/templates/registration/password_change_done.html:9
+msgid "Password change successful"
+msgstr "口令修改成功"
+
+#: contrib/admin/templates/registration/password_change_done.html:11
+msgid "Your password was changed."
+msgstr "你的口令已经被修改。"
+
+#: contrib/admin/templates/registration/password_reset_form.html:3
+#: contrib/admin/templates/registration/password_reset_form.html:5
+#: contrib/admin/templates/registration/password_reset_form.html:9
+#: contrib/admin/templates/registration/password_reset_done.html:3
+msgid "Password reset"
+msgstr "口令重设"
+
+#: contrib/admin/templates/registration/password_reset_form.html:11
+msgid "Forgotten your password? Enter your e-mail address below, and we'll reset your password and e-mail the new one to you."
+msgstr "忘记你的口令？在下面输入你的邮箱地址，我们将重设你的口令并且将新的口令通过邮件发送给你。"
+
+#: contrib/admin/templates/registration/password_reset_form.html:15
+msgid "E-mail address:"
+msgstr "邮箱地址："
+
+#: contrib/admin/templates/registration/password_reset_form.html:15
+msgid "Reset my password"
+msgstr "重设我的口令"
+
+#: contrib/admin/templates/registration/logged_out.html:7
+msgid "Thanks for spending some quality time with the Web site today."
+msgstr "感谢今天在本网站花费了您的一些宝贵时间。"
+
+#: contrib/admin/templates/registration/logged_out.html:9
+msgid "Log in again"
+msgstr "重新登录"
+
+#: contrib/admin/templates/registration/password_reset_done.html:5
+#: contrib/admin/templates/registration/password_reset_done.html:9
+msgid "Password reset successful"
+msgstr "口令重设成功"
+
+#: contrib/admin/templates/registration/password_reset_done.html:11
+msgid "We've e-mailed a new password to the e-mail address you submitted. You should be receiving it shortly."
+msgstr "我们已经按你所提交的邮箱地址发送了一个新的口令给你。你应该很会收到这封邮件。"
+
+#: contrib/admin/templates/registration/password_change_form.html:11
+msgid "Please enter your old password, for security's sake, and then enter your new password twice so we can verify you typed it in correctly."
+msgstr "请输入你的旧口令，为了安全起见，接着要输入你的新口令两遍，这样我们可以校验你输入的是否正确。"
+
+#: contrib/admin/templates/registration/password_change_form.html:16
+msgid "Old password:"
+msgstr "旧口令："
+
+#: contrib/admin/templates/registration/password_change_form.html:18
+msgid "New password:"
+msgstr "新口令："
+
+#: contrib/admin/templates/registration/password_change_form.html:20
+msgid "Confirm password:"
+msgstr "确认口令："
+
+#: contrib/admin/templates/registration/password_change_form.html:22
+msgid "Change my password"
+msgstr "修改我的口令"
+
+#: contrib/admin/templates/registration/password_reset_email.html:1
+msgid "You're receiving this e-mail because you requested a password reset"
+msgstr "你所收到的这封邮件是由于你请求了口令重设"
+
+#: contrib/admin/templates/registration/password_reset_email.html:2
+#, python-format
+msgid "for your user account at %(site_name)s"
+msgstr "在 %(site_name)s 你的用户帐号"
+
+#: contrib/admin/templates/registration/password_reset_email.html:4
+#, python-format
+msgid "Your new password is: %(new_password)s"
+msgstr "你的新口令是： %(new_password)s"
+
+#: contrib/admin/templates/registration/password_reset_email.html:6
+msgid "Feel free to change this password by going to this page:"
+msgstr "到这个页面可以自由地修改口令："
+
+#: contrib/admin/templates/registration/password_reset_email.html:10
+msgid "Your username, in case you've forgotten:"
+msgstr "你的用户名，一旦你忘记了："
+
+#: contrib/admin/templates/registration/password_reset_email.html:12
+msgid "Thanks for using our site!"
+msgstr "感谢使用我们的站点！"
+
+#: contrib/admin/templates/registration/password_reset_email.html:14
+#, python-format
+msgid "The %(site_name)s team"
+msgstr "%(site_name)s 小组"
+
+#: contrib/admin/models/admin.py:6
+msgid "action time"
+msgstr "动作时间"
+
+#: contrib/admin/models/admin.py:9
+msgid "object id"
+msgstr "对象id"
+
+#: contrib/admin/models/admin.py:10
+msgid "object repr"
+msgstr "对象表示"
+
+#: contrib/admin/models/admin.py:11
+msgid "action flag"
+msgstr "动作标志"
+
+#: contrib/admin/models/admin.py:12
+msgid "change message"
+msgstr "修改消息"
+
+#: contrib/admin/models/admin.py:15
+msgid "log entry"
+msgstr "日志记录"
+
+#: contrib/admin/models/admin.py:16
+msgid "log entries"
+msgstr "日志记录"
+
+#: utils/dates.py:6
+msgid "Monday"
+msgstr "星期一"
+
+#: utils/dates.py:6
+msgid "Tuesday"
+msgstr "星期二"
+
+#: utils/dates.py:6
+msgid "Wednesday"
+msgstr "星期三"
+
+#: utils/dates.py:6
+msgid "Thursday"
+msgstr "星期四"
+
+#: utils/dates.py:6
+msgid "Friday"
+msgstr "星期五"
+
+#: utils/dates.py:7
+msgid "Saturday"
+msgstr "星期六"
+
+#: utils/dates.py:7
+msgid "Sunday"
+msgstr "星期日"
+
+#: utils/dates.py:14
+msgid "January"
+msgstr "一月"
+
+#: utils/dates.py:14
+msgid "February"
+msgstr "二月"
+
+#: utils/dates.py:14
+#: utils/dates.py:27
+msgid "March"
+msgstr "三月"
+
+#: utils/dates.py:14
+#: utils/dates.py:27
+msgid "April"
+msgstr "四月"
+
+#: utils/dates.py:14
+#: utils/dates.py:27
+msgid "May"
+msgstr "五月"
+
+#: utils/dates.py:14
+#: utils/dates.py:27
+msgid "June"
+msgstr "六月"
+
+#: utils/dates.py:15
+#: utils/dates.py:27
+msgid "July"
+msgstr "七月"
+
+#: utils/dates.py:15
+msgid "August"
+msgstr "八月"
+
+#: utils/dates.py:15
+msgid "September"
+msgstr "九月"
+
+#: utils/dates.py:15
+msgid "October"
+msgstr "十月"
+
+#: utils/dates.py:15
+msgid "November"
+msgstr "十一月"
+
+#: utils/dates.py:16
+msgid "December"
+msgstr "十二月"
+
+#: utils/dates.py:27
+msgid "Jan."
+msgstr "一月"
+
+#: utils/dates.py:27
+msgid "Feb."
+msgstr "二月"
+
+#: utils/dates.py:28
+msgid "Aug."
+msgstr "八月"
+
+#: utils/dates.py:28
+msgid "Sept."
+msgstr "九月"
+
+#: utils/dates.py:28
+msgid "Oct."
+msgstr "十月"
+
+#: utils/dates.py:28
+msgid "Nov."
+msgstr "十一月"
+
+#: utils/dates.py:28
+msgid "Dec."
+msgstr "十二月"
+
+#: models/core.py:5
+msgid "domain name"
+msgstr "域名"
+
+#: models/core.py:6
+msgid "display name"
+msgstr "显示名"
+
+#: models/core.py:8
+msgid "site"
+msgstr "站点"
+
+#: models/core.py:9
+msgid "sites"
+msgstr "站点"
+
+#: models/core.py:22
+msgid "label"
+msgstr "标签"
+
+#: models/core.py:23
+#: models/core.py:34
+#: models/auth.py:6
+#: models/auth.py:19
+msgid "name"
+msgstr "名称"
+
+#: models/core.py:25
+msgid "package"
+msgstr "包"
+
+#: models/core.py:26
+msgid "packages"
+msgstr "包"
+
+#: models/core.py:36
+msgid "python module name"
+msgstr "python模块名"
+
+#: models/core.py:38
+msgid "content type"
+msgstr "内容类型"
+
+#: models/core.py:39
+msgid "content types"
+msgstr "内容类型"
+
+#: models/core.py:62
+msgid "redirect from"
+msgstr "重定向自"
+
+#: models/core.py:63
+msgid "This should be an absolute path, excluding the domain name. Example: '/events/search/'."
+msgstr "应该是一个绝对路径，不包括域名。例如：'/events/search/'。"
+
+#: models/core.py:64
+msgid "redirect to"
+msgstr "重定向到"
+
+#: models/core.py:65
+msgid "This can be either an absolute path (as above) or a full URL starting with 'http://'."
+msgstr "可以是绝对路径(同上)或以'http://'开始的全URL。"
+
+#: models/core.py:67
+msgid "redirect"
+msgstr "重定向"
+
+#: models/core.py:68
+msgid "redirects"
+msgstr "重定向"
+
+#: models/core.py:81
+msgid "URL"
+msgstr ""
+
+#: models/core.py:82
+msgid "Example: '/about/contact/'. Make sure to have leading and trailing slashes."
+msgstr "例如：'/about/contact/'。请确保前导和结尾的除号。"
+
+#: models/core.py:83
+msgid "title"
+msgstr "标题"
+
+#: models/core.py:84
+msgid "content"
+msgstr "内容"
+
+#: models/core.py:85
+msgid "enable comments"
+msgstr "允许评论"
+
+#: models/core.py:86
+msgid "template name"
+msgstr "模板名称"
+
+#: models/core.py:87
+msgid "Example: 'flatfiles/contact_page'. If this isn't provided, the system will use 'flatfiles/default'."
+msgstr "例如：'flatfiles/contact_page'。如果未提供，系统将使用'flatfiles/default'。"
+
+#: models/core.py:88
+msgid "registration required"
+msgstr "请先注册"
+
+#: models/core.py:88
+msgid "If this is checked, only logged-in users will be able to view the page."
+msgstr "如果被选中，仅登录用户才可以查看此页。"
+
+#: models/core.py:92
+msgid "flat page"
+msgstr "简单页面"
+
+#: models/core.py:93
+msgid "flat pages"
+msgstr "简单页面"
+
+#: models/core.py:114
+msgid "session key"
+msgstr "session键字"
+
+#: models/core.py:115
+msgid "session data"
+msgstr "session数据"
+
+#: models/core.py:116
+msgid "expire date"
+msgstr "过期日期"
+
+#: models/core.py:118
+msgid "session"
+msgstr ""
+
+#: models/core.py:119
+msgid "sessions"
+msgstr ""
+
+#: models/auth.py:8
+msgid "codename"
+msgstr "代码名称"
+
+#: models/auth.py:10
+msgid "Permission"
+msgstr "许可"
+
+#: models/auth.py:11
+#: models/auth.py:58
+msgid "Permissions"
+msgstr "许可"
+
+#: models/auth.py:22
+msgid "Group"
+msgstr "组"
+
+#: models/auth.py:23
+#: models/auth.py:60
+msgid "Groups"
+msgstr "组"
+
+#: models/auth.py:33
+msgid "username"
+msgstr "用户名"
+
+#: models/auth.py:34
+msgid "first name"
+msgstr "名字"
+
+#: models/auth.py:35
+msgid "last name"
+msgstr "姓"
+
+#: models/auth.py:36
+msgid "e-mail address"
+msgstr "邮件地址"
+
+#: models/auth.py:37
+msgid "password"
+msgstr "口令"
+
+#: models/auth.py:37
+msgid "Use an MD5 hash -- not the raw password."
+msgstr "使用MD5的哈希值 -- 不是原始的口令。"
+
+#: models/auth.py:38
+msgid "staff status"
+msgstr "人员状态"
+
+#: models/auth.py:38
+msgid "Designates whether the user can log into this admin site."
+msgstr "指定是否用户可以登录到这个管理站点。"
+
+#: models/auth.py:39
+msgid "active"
+msgstr "活动"
+
+#: models/auth.py:40
+msgid "superuser status"
+msgstr "超级用户状态"
+
+#: models/auth.py:41
+msgid "last login"
+msgstr "上次登录"
+
+#: models/auth.py:42
+msgid "date joined"
+msgstr "加入日期"
+
+#: models/auth.py:44
+msgid "In addition to the permissions manually assigned, this user will also get all permissions granted to each group he/she is in."
+msgstr "除了手动设置权限以外，用户也会从他(她)所在的小组获得所赋组小组的所有权限。"
+
+#: models/auth.py:48
+msgid "Users"
+msgstr "用户"
+
+#: models/auth.py:57
+msgid "Personal info"
+msgstr "个人信息"
+
+#: models/auth.py:59
+msgid "Important dates"
+msgstr "重要日期"
+
+#: models/auth.py:182
+msgid "Message"
+msgstr "消息"
+
+#: conf/global_settings.py:37
+msgid "German"
+msgstr "德语"
+
+#: conf/global_settings.py:38
+msgid "English"
+msgstr "英语"
+
+#: conf/global_settings.py:39
+msgid "Spanish"
+msgstr "西斑牙语"
+
+#: conf/global_settings.py:40
+msgid "French"
+msgstr "法语"
+
+#: conf/global_settings.py:41
+msgid "Galician"
+msgstr "加利西亚语"
+
+#: conf/global_settings.py:42
+msgid "Italian"
+msgstr "意大利语"
+
+#: conf/global_settings.py:43
+msgid "Brazilian"
+msgstr "巴西语"
+
+#: conf/global_settings.py:44
+msgid "Russian"
+msgstr "俄语"
+
+#: conf/global_settings.py:45
+msgid "Serbic"
+msgstr "塞尔维亚语"
+
+#: conf/global_settings.py:46
+msgid "Czech"
+msgstr "捷克语"
+
+#: core/validators.py:58
+msgid "This value must contain only letters, numbers and underscores."
+msgstr "此值只能包含字母、数字和下划线。"
+
+#: core/validators.py:62
+msgid "This value must contain only letters, numbers, underscores and slashes."
+msgstr "此值只能包含字母、数字、下划线和斜线。"
+
+#: core/validators.py:70
+msgid "Uppercase letters are not allowed here."
+msgstr "这里不允许大写字母。"
+
+#: core/validators.py:74
+msgid "Lowercase letters are not allowed here."
+msgstr "这里不允许小写字母。"
+
+#: core/validators.py:81
+msgid "Enter only digits separated by commas."
+msgstr "只能输入用逗号分隔的数字。"
+
+#: core/validators.py:93
+msgid "Enter valid e-mail addresses separated by commas."
+msgstr "输入用逗号分隔的有效邮件地址。"
+
+#: core/validators.py:100
+msgid "Please enter a valid IP address."
+msgstr "请输入一个有效的IP地址。"
+
+#: core/validators.py:104
+msgid "Empty values are not allowed here."
+msgstr "这里不允许输入空值。"
+
+#: core/validators.py:108
+msgid "Non-numeric characters aren't allowed here."
+msgstr "这里不允许非数字字符。"
+
+#: core/validators.py:112
+msgid "This value can't be comprised solely of digits."
+msgstr "此值不能全部由数字组成。"
+
+#: core/validators.py:117
+msgid "Enter a whole number."
+msgstr "输入整数。"
+
+#: core/validators.py:121
+msgid "Only alphabetical characters are allowed here."
+msgstr "这里只允许字母。"
+
+#: core/validators.py:125
+msgid "Enter a valid date in YYYY-MM-DD format."
+msgstr "输入一个 YYYY-MM-DD 格式的有效日期。"
+
+#: core/validators.py:129
+msgid "Enter a valid time in HH:MM format."
+msgstr "输入一个 HH:MM 格式的有效时间。"
+
+#: core/validators.py:133
+msgid "Enter a valid date/time in YYYY-MM-DD HH:MM format."
+msgstr "输入一个 YYYY-MM-DD HH:MM 格式的有效日期/时间。"
+
+#: core/validators.py:137
+msgid "Enter a valid e-mail address."
+msgstr "输入一个有效的邮件地址。"
+
+#: core/validators.py:149
+msgid "Upload a valid image. The file you uploaded was either not an image or a corrupted image."
+msgstr "上传一个有效的图片。您所上传的文件或者不是图片或是一个破坏的图片。"
+
+#: core/validators.py:156
+#, python-format
+msgid "The URL %s does not point to a valid image."
+msgstr "URL %s 指向的不是一个有效的图片。"
+
+#: core/validators.py:160
+#, python-format
+msgid "Phone numbers must be in XXX-XXX-XXXX format. \"%s\" is invalid."
+msgstr "电话号码必须为 XXX-XXX-XXXX 格式。\"%s\"是无效的。"
+
+#: core/validators.py:168
+#, python-format
+msgid "The URL %s does not point to a valid QuickTime video."
+msgstr "URL %s 指向的不是一个有效的 QuickTime 视频。"
+
+#: core/validators.py:172
+msgid "A valid URL is required."
+msgstr "需要是一个有效的URL。"
+
+#: core/validators.py:186
+#, python-format
+msgid ""
+"Valid HTML is required. Specific errors are:\n"
+"%s"
+msgstr ""
+"需要有效的HTML。详细的错误是：\n"
+"%s"
+
+#: core/validators.py:193
+#, python-format
+msgid "Badly formed XML: %s"
+msgstr "格式错误的 XML: %s"
+
+#: core/validators.py:203
+#, python-format
+msgid "Invalid URL: %s"
+msgstr "无效 URL: %s"
+
+#: core/validators.py:205
+#, python-format
+msgid "The URL %s is a broken link."
+msgstr "URL %s 是一个断开的链接。"
+
+#: core/validators.py:211
+msgid "Enter a valid U.S. state abbreviation."
+msgstr "输入一个有效的 U.S. 州缩写。"
+
+#: core/validators.py:226
+#, python-format
+msgid "Watch your mouth! The word %s is not allowed here."
+msgstr "小心你的嘴！%s 不允许在这里出现。"
+
+#: core/validators.py:233
+#, python-format
+msgid "This field must match the '%s' field."
+msgstr "这个字段必须与 '%s' 字段相匹配。"
+
+#: core/validators.py:252
+msgid "Please enter something for at least one field."
+msgstr "请至少在一个字段上输入些什么。"
+
+#: core/validators.py:261
+#: core/validators.py:272
+msgid "Please enter both fields or leave them both empty."
+msgstr "请要么两个字段都输入或者两个字段都空着。"
+
+#: core/validators.py:279
+#, python-format
+msgid "This field must be given if %(field)s is %(value)s"
+msgstr "如果 %(field)s 是 %(value)s 时这个字段必须给出"
+
+#: core/validators.py:291
+#, python-format
+msgid "This field must be given if %(field)s is not %(value)s"
+msgstr "如果 %(field)s 不是 %(value)s 时这个字段必须给出"
+
+#: core/validators.py:310
+msgid "Duplicate values are not allowed."
+msgstr "重复值不允许。"
+
+#: core/validators.py:333
+#, python-format
+msgid "This value must be a power of %s."
+msgstr "这个值必须是 %s 的乘方。"
+
+#: core/validators.py:344
+msgid "Please enter a valid decimal number."
+msgstr "请输入一个有效的小数。"
+
+#: core/validators.py:346
+#, python-format
+msgid "Please enter a valid decimal number with at most %s total digit."
+msgstr "请输入一个有效的小数，最多 %s 个数字。"
+
+#: core/validators.py:349
+#, python-format
+msgid "Please enter a valid decimal number with at most %s decimal place."
+msgstr "请输入一个有效的小数，最多 %s 个小数位。"
+
+#: core/validators.py:359
+#, python-format
+msgid "Make sure your uploaded file is at least %s bytes big."
+msgstr "请确保你上传的文件至少 %s 字节大。"
+
+#: core/validators.py:360
+#, python-format
+msgid "Make sure your uploaded file is at most %s bytes big."
+msgstr "请确保你上传的文件至多 %s 字节大。"
+
+#: core/validators.py:373
+msgid "The format for this field is wrong."
+msgstr "这个字段的格式不正确。"
+
+#: core/validators.py:388
+msgid "This field is invalid."
+msgstr "这个字段无效。"
+
+#: core/validators.py:423
+#, python-format
+msgid "Could not retrieve anything from %s."
+msgstr "不能从 %s 得到任何东西。"
+
+#: core/validators.py:426
+#, python-format
+msgid "The URL %(url)s returned the invalid Content-Type header '%(contenttype)s'."
+msgstr "URL %(url)s 返回了无效的 Content-Type 头 '%(contenttype)s'。"
+
+#: core/validators.py:459
+#, python-format
+msgid "Please close the unclosed %(tag)s tag from line %(line)s. (Line starts with \"%(start)s\".)"
+msgstr "请关闭未关闭的 %(tag)s 标签从第 %(line)s 行。(行开始于 \"%(start)s\"。)"
+
+#: core/validators.py:463
+#, python-format
+msgid "Some text starting on line %(line)s is not allowed in that context. (Line starts with \"%(start)s\".)"
+msgstr "在 %(line)s 行开始的一些文本不允许在那个上下文中。(行开始于 \"%(start)s\"。)"
+
+#: core/validators.py:468
+#, python-format
+msgid "\"%(attr)s\" on line %(line)s is an invalid attribute. (Line starts with \"%(start)s\".)"
+msgstr "在 %(line)s 行的\"%(attr)s\"不是一个有效的属性。(行开始于 \"%(start)s\"。)"
+
+#: core/validators.py:473
+#, python-format
+msgid "\"<%(tag)s>\" on line %(line)s is an invalid tag. (Line starts with \"%(start)s\".)"
+msgstr "在 %(line)s 行的\"<%(tag)s>\"不是一个有效的标签。(行开始于 \"%(start)s\"。)"
+
+#: core/validators.py:477
+#, python-format
+msgid "A tag on line %(line)s is missing one or more required attributes. (Line starts with \"%(start)s\".)"
+msgstr "在行 %(line)s 的标签少了一个或多个必须的属性。(行开始于 \"%(start)s\"。)"
+
+#: core/validators.py:482
+#, python-format
+msgid "The \"%(attr)s\" attribute on line %(line)s has an invalid value. (Line starts with \"%(start)s\".)"
+msgstr "在行 %(line)s 的\"%(attr)s\"属性有一个无效的值。(行开始于 \"%(start)s\"。)"
+
+#: core/meta/fields.py:95
+msgid " Separate multiple IDs with commas."
+msgstr " 用逗号分隔多个ID。"
+
+#: core/meta/fields.py:98
+msgid " Hold down \"Control\", or \"Command\" on a Mac, to select more than one."
+msgstr " 按下 \"Control\"，或者在Mac上按 \"Command\" 来选择一个或多个值。"
+
