@@ -621,6 +621,14 @@ the relationship should work. All are optional:
                              vertically).
 
     ``limit_choices_to``     See the description under ``ForeignKey`` above.
+
+    ``singular``             The singular name of the field.  Use to name the ``get_*``
+                             methods: in the example above, Django gives the ``Pizza``
+                             objects a ``get_topping_list()`` method, where ``topping``
+                             is the default ``singular`` value derived from the lowercase
+                             version of the class being linked to.  Use the singular
+                             parameter to change this, which is if you want one model to
+                             have multiple ``ManyToMany`` relationships to another model.
     =======================  ============================================================
 
 One-to-one relationships

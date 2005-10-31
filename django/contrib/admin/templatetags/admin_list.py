@@ -1,7 +1,8 @@
 from django.core.template.decorators import simple_tag, inclusion_tag
 
 from django.contrib.admin.views.main import MAX_SHOW_ALL_ALLOWED, DEFAULT_RESULTS_PER_PAGE, ALL_VAR, \
- ORDER_VAR, ORDER_TYPE_VAR, PAGE_VAR , SEARCH_VAR , IS_POPUP_VAR, EMPTY_CHANGELIST_VALUE
+ ORDER_VAR, ORDER_TYPE_VAR, PAGE_VAR , SEARCH_VAR , IS_POPUP_VAR, EMPTY_CHANGELIST_VALUE, \
+ MONTHS
 
 from django.core import meta
 from django.utils.text import capfirst
