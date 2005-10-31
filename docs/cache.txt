@@ -306,24 +306,23 @@ allows applications to do the following:
       because the cache copy isn't yet expired.)
 
 In Django, use the ``cache_control`` view decorator to specify these cache
-parameters. In this example, the ``cache_control`` decorator tells caches to
-revalidate the cache on every access and to store cached versions for, at most,
-3600 seconds::
+parameters. In this example, ``cache_control`` tells caches to revalidate the
+cache on every access and to store cached versions for, at most, 3600 seconds::
 
     from django.views.decorators.cache import cache_control
     @cache_control(must_revalidate=True, max_age=3600)
     def my_view(request):
         ...
 
-Any valid Cache-Control directive is valid in ``cache_control()``. For a full
-list, see the `Cache-Control spec`_. Just pass the directives as keyword
+Any valid ``Cache-Control`` directive is valid in ``cache_control()``. For a
+full list, see the `Cache-Control spec`_. Just pass the directives as keyword
 arguments to ``cache_control()``, substituting underscores for hyphens. For
 directives that don't take an argument, set the argument to ``True``.
 
 Examples:
 
-    ``@cache_control(max_age=3600)`` turns into ``max-age=3600``.
-    ``@cache_control(public=True)`` turns into ``public``.
+    * ``@cache_control(max_age=3600)`` turns into ``max-age=3600``.
+    * ``@cache_control(public=True)`` turns into ``public``.
 
 (Note that the caching middleware already sets the cache header's max-age with
 the value of the ``CACHE_MIDDLEWARE_SETTINGS`` setting. If you use a custom
