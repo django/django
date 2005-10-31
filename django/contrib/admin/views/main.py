@@ -106,9 +106,9 @@ class RelatedFilterSpec(FilterSpec):
             t.append('<h3>By %s:</h3>\n<ul>\n' % self.lookup_title)
             t.append('<li%s><a href="%s">All</a></li>\n' % \
                 ((self.lookup_val is None and ' class="selected"' or ''),
-                cl.get_query_string({}, [lookup_kwarg])))
-            for val in lookup_choices:
-                pk_val = getattr(val, f.rel.to.pk.column)
+                cl.get_query_string({}, [self.lookup_kwarg])))
+            for val in self.lookup_choices:
+                pk_val = getattr(val, self.field.rel.to.pk.column)
                 t.append('<li%s><a href="%s">%r</a></li>\n' % \
                     ((self.lookup_val == str(pk_val) and ' class="selected"' or ''),
                     cl.get_query_string( {self.lookup_kwarg: pk_val}), val))
@@ -121,7 +121,7 @@ class ChoicesFilterSpec(FilterSpec):
     def __init__(self, f, request, params):
         super(ChoicesFilterSpec, self).__init__(f, request, params)
         self.lookup_kwarg = '%s__exact' % f.name
-        self.lookup_val = request.GET.get(lookup_kwarg, None)
+        self.lookup_val = request.GET.get(self.lookup_kwarg, None)
         
     def output(self, cl):
         t = []
@@ -129,10 +129,10 @@ class ChoicesFilterSpec(FilterSpec):
         t.append('<li%s><a href="%s">All</a></li>\n' % \
             ((self.lookup_val is None and ' class="selected"' or ''),
             cl.get_query_string( {}, [self.lookup_kwarg])))
-        for k, v in f.choices:
+        for k, v in self.field.choices:
             t.append('<li%s><a href="%s">%s</a></li>' % \
                 ((str(k) == self.lookup_val) and ' class="selected"' or '',
-                cl.get_query_string( {lookup_kwarg: k}), v))
+                cl.get_query_string( {self.lookup_kwarg: k}), v))
         t.append('</ul>\n\n')
         return "".join(t)
 FilterSpec.register(lambda f: bool(f.choices), ChoicesFilterSpec)
@@ -144,11 +144,11 @@ class DateFieldFilterSpec(FilterSpec):
         
         self.field_generic = '%s__' % self.field.name
         
-        self.date_params = dict([(k, v) for k, v in params.items() if k.startswith(field_generic)])
+        self.date_params = dict([(k, v) for k, v in params.items() if k.startswith(self.field_generic)])
         
         today = datetime.date.today()
         one_week_ago = today - datetime.timedelta(days=7)
-        today_str = isinstance(self.f, meta.DateTimeField) and today.strftime('%Y-%m-%d 23:59:59') or today.strftime('%Y-%m-%d')
+        today_str = isinstance(self.field, meta.DateTimeField) and today.strftime('%Y-%m-%d 23:59:59') or today.strftime('%Y-%m-%d')
         
         self.links = (
             ('Any date', {}),
@@ -160,7 +160,7 @@ class DateFieldFilterSpec(FilterSpec):
             ('This month', {'%s__year' % self.field.name: str(today.year), 
                              '%s__month' % f.name: str(today.month)}),
             ('This year', {'%s__year' % self.field.name: str(today.year)})
-        )
+        ) 
         
     def output(self, cl):
         t = []    
@@ -386,6 +386,7 @@ def change_list(request, app_label, module_name):
         'is_popup': cl.is_popup,
         'cl' : cl
     })
+    c.update( { 'has_add_permission': c['perms'][app_label][cl.opts.get_add_permission()]}),
     return render_to_response('admin/change_list', 
                                context_instance = c)
 change_list = staff_member_required(change_list)
@@ -505,7 +506,7 @@ class AdminBoundManipulator(object):
         
        
         self.first_form_field_id = self.bound_field_sets[0].bound_field_lines[0].bound_fields[0].form_fields[0].get_id();                
-        self.ordered_object_names =   ' '.join(['object.%s' % o.pk.name for o in self.ordered_objects])
+        self.ordered_object_pk_names = [o.pk.name for o in self.ordered_objects]
         
         self.save_on_top = opts.admin.save_on_top
         self.save_as = opts.admin.save_as
@@ -514,6 +515,12 @@ class AdminBoundManipulator(object):
         self.verbose_name_plural = opts.verbose_name_plural
         self.verbose_name = opts.verbose_name
         self.object_name = opts.object_name
+        
+    def get_ordered_object_pk(self, ordered_obj):
+        for name in self.ordered_object_pk_names:
+            if hasattr(ordered_obj, name):
+                return str(getattr(ordered_obj, name))
+        return ""
         
 def render_change_form(opts, manipulator, app_label, context, add=False, change=False, show_delete=False, form_url=''):
     

@@ -6,7 +6,7 @@
 {% block content %}
 <div id="content-main">
 {%if has_add_permission %}
-  <ul class="object-tools"><li><a href="add/{%if is_popup%}?_popup=1{%endif%}" class="addlink">Add {{cl.opts.verbose_name}}</a></li></ul>\n'
+  <ul class="object-tools"><li><a href="add/{%if is_popup%}?_popup=1{%endif%}" class="addlink">Add {{cl.opts.verbose_name}}</a></li></ul>
 {% endif %}
 <div class="module{%if cl.has_filters%} filtered{%endif%}" id="changelist">
 {% search_form cl%}

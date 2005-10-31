@@ -21,7 +21,7 @@
 
 from django.core.exceptions import ImproperlyConfigured
 from django.core.template import Origin, StringOrigin, Template, Context, Node, TemplateDoesNotExist, TemplateSyntaxError, resolve_variable_with_filters, register_tag
-from django.conf.settings import TEMPLATE_LOADERS
+from django.conf.settings import TEMPLATE_LOADERS, TEMPLATE_DEBUG
 
 template_source_loaders = []
 for path in TEMPLATE_LOADERS:
@@ -30,7 +30,6 @@ for path in TEMPLATE_LOADERS:
     try:
         mod = __import__(module, globals(), locals(), [attr])
     except ImportError, e:
-        raise e
         raise ImproperlyConfigured, 'Error importing template source loader %s: "%s"' % (module, e)
     try:
         func = getattr(mod, attr)
@@ -44,19 +43,23 @@ for path in TEMPLATE_LOADERS:
 
 class LoaderOrigin(Origin):
     def __init__(self, display_name, loader, name, dirs):
-        def reload():
-                return loader(name, dirs)[0]
         super(LoaderOrigin, self).__init__(display_name)
-        self._reload = reload
+        self.loader, self.name, self.dirs = loader, name, dirs
     
     def reload(self):
-        return self._reload()
+        return self.loader(self.name, self.dirs)
+
+def make_origin(display_name, loader, name, dirs):
+    if TEMPLATE_DEBUG:
+        LoaderOrigin(display_name, loader, name, dirs)
+    else:
+        return None
 
 def find_template_source(name, dirs=None):
     for loader in template_source_loaders:
         try:
             source, display_name  = loader(name, dirs)
-            return (source, LoaderOrigin(display_name, loader, name, dirs))
+            return (source, make_origin(display_name, loader, name, dirs))
         except TemplateDoesNotExist:
             pass
     raise TemplateDoesNotExist, name
@@ -79,9 +82,6 @@ def get_template_from_string(source, origin=None ):
     Returns a compiled Template object for the given template code,
     handling template inheritance recursively.
     """
-    if origin==None:
-        #Could do some crazy stack frame stuff to record where this string came from. 
-        origin = StringOrigin(source)
     return Template(source, origin)
 
 def render_to_string(template_name, dictionary=None, context_instance=None):
@@ -241,7 +241,7 @@ def do_extends(parser, token):
     if len(bits) != 2:
         raise TemplateSyntaxError, "'%s' takes one argument" % bits[0]
     parent_name, parent_name_var = None, None
-    if (bits[1].startswith('"') and bits[1].endswith('"')) or (bits[1].startswith("'") and bits[1].endswith("'")):
+    if bits[1][0] in ('"', "'") and bits[1][-1] == bits[1][0]:
         parent_name = bits[1][1:-1]
     else:
         parent_name_var = bits[1]

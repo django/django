@@ -9,7 +9,7 @@ from django.utils.html import strip_tags, escape
 from django.core.exceptions import ObjectDoesNotExist
 from django.conf.settings import ADMIN_MEDIA_PREFIX
 from django.core import template
-
+from django.utils import dateformat
 DOT = '.'
 
 class QueryStringNode(template.Node):

@@ -55,7 +55,7 @@ times with multiple contexts)
 '\n<html>\n\n</html>\n'
 """
 import re
-from django.conf.settings import DEFAULT_CHARSET, DEBUG
+from django.conf.settings import DEFAULT_CHARSET, TEMPLATE_DEBUG
 
 __all__ = ('Template','Context','compile_string')
 
@@ -128,8 +128,9 @@ class StringOrigin(Origin):
 class Template:
     def __init__(self, template_string, origin=None):
         "Compilation stage"
-        if origin == None:
+        if TEMPLATE_DEBUG and origin == None:
             origin = StringOrigin(template_string)
+            #Could do some crazy stack frame stuff to record where this string came from...
         self.nodelist = compile_string(template_string, origin)
        
     def __iter__(self):
@@ -143,7 +144,7 @@ class Template:
 
 def compile_string(template_string, origin):
     "Compiles template_string into NodeList ready for rendering"
-    if DEBUG:
+    if TEMPLATE_DEBUG:
         lexer_factory = DebugLexer
         parser_factory = DebugParser
     else:

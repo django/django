@@ -6,6 +6,7 @@
 ####################
 
 DEBUG = False
+TEMPLATE_DEBUG = False
 
 # Whether to use the "Etag" header. This saves bandwidth but slows down performance.
 USE_ETAGS = False

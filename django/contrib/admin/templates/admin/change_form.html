@@ -60,11 +60,11 @@
    {% if bound_manipulator.ordered_objects %}
       {% if form.order_objects %}<ul id="orderthese">
           {% for object in form.order_objects %}
-	     <li id="p{% firstof bound_manipulator.ordered_object_names %}">
-	     <span id="handlep{% firstof bound_manipulator.ordered_object_names %}">{{ object|truncatewords:"5" }}</span>
+	     <li id="p{% object_pk bound_manipulator object %}">
+	     <span id="handlep{% object_pk bound_manipulator object %}">{{ object|truncatewords:"5" }}</span>
 	     </li>
 	     {% endfor%}
-      {% endif %}
+      </ul>{% endif %}
    {% endif %}
 {% endif %}
 </form></div>

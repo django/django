@@ -33,9 +33,9 @@
 
    {% endfor %} </table>
 
-   {% for fcw in bound_related_object.form_field_collection_wrapper_list %}
+   {% for fcw in bound_related_object.form_field_collection_wrappers %}
       {% for bound_field in fcw.bound_fields %}
-         {% if bound_field.not_in_table %}
+         {% if bound_field.not_in_table %}  
             {% field_widget bound_field %}
          {% endif %}
       {% endfor %}

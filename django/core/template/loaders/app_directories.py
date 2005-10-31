@@ -23,7 +23,6 @@ for app in INSTALLED_APPS:
     template_dir = os.path.join(os.path.dirname(mod.__file__), 'templates')
     if os.path.isdir(template_dir):
         app_template_dirs.append(template_dir)
-
         
 # It won't change, so convert it to a tuple to save memory.
 app_template_dirs = tuple(app_template_dirs)

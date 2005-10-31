@@ -43,9 +43,7 @@ def submit_row(context):
         'show_save_and_continue': not is_popup,
         'show_save': True
     }
-
-srdec = inclusion_tag('admin/submit_line', takes_context=True)
-submit_row = srdec(submit_row)
+submit_row = inclusion_tag('admin/submit_line', takes_context=True)(submit_row)
 
 #@simple_tag   
 def field_label(bound_field):
@@ -122,18 +120,23 @@ class FieldWrapper(object):
          return isinstance(self.field.rel, (meta.ManyToOne, meta.ManyToMany)) \
                 and self.field.rel.raw_id_admin
 
+    
 
 class FormFieldCollectionWrapper(object):
     def __init__(self, field_mapping, fields):
         self.field_mapping = field_mapping
         self.fields = fields
-        self.bound_fields = [AdminBoundField(field, self.field_mapping, field_mapping['original']) for field in self.fields ]
+        self.bound_fields = [AdminBoundField(field, self.field_mapping, field_mapping['original']) 
+                             for field in self.fields ]
+                             
         
 class TabularBoundRelatedObject(BoundRelatedObject):
     def __init__(self, related_object, field_mapping, original):
         super(TabularBoundRelatedObject, self).__init__(related_object, field_mapping, original)
         self.field_wrapper_list = self.relation.editable_fields(FieldWrapper)
+       
         fields = self.relation.editable_fields()
+        
         self.form_field_collection_wrappers = [FormFieldCollectionWrapper(field_mapping ,fields) 
                                                    for field_mapping in self.field_mappings] 
         self.original_row_needed = max([fw.use_raw_id_admin() for fw in self.field_wrapper_list]) 
@@ -200,8 +203,10 @@ def auto_populated_field_script(auto_pop_fields, change = False):
 
         add_values = ' + " " + '.join(['document.getElementById("id_%s").value' % g for g in field.prepopulate_from])
         for f in field.prepopulate_from:
-            t.append('document.getElementById("id_%s").onkeyup = function() { var e = document.getElementById("id_%s"); if(!e._changed) { e.value = URLify(%s, %s);} } ' % (f, field.name, add_values, field.maxlength) )
-
+            t.append('document.getElementById("id_%s").onkeyup = function() {' \
+                     ' var e = document.getElementById("id_%s");' \
+                     ' if(!e._changed) { e.value = URLify(%s, %s);} } ' % (
+                     f, field.name, add_values, field.maxlength) )
     return ''.join(t)
 auto_populated_field_script = simple_tag(auto_populated_field_script)
 
@@ -209,7 +214,9 @@ auto_populated_field_script = simple_tag(auto_populated_field_script)
 def filter_interface_script_maybe(bound_field):
     f = bound_field.field 
     if f.rel and isinstance(f.rel, meta.ManyToMany) and f.rel.filter_interface:
-       return '<script type="text/javascript">addEvent(window, "load", function(e) { SelectFilter.init("id_%s", "%s", %s, %r); });</script>\n' % (f.name, f.verbose_name, f.rel.filter_interface-1, ADMIN_MEDIA_PREFIX) 
+       return '<script type="text/javascript">addEvent(window, "load", function(e) {' \
+              ' SelectFilter.init("id_%s", "%s", %s, %r); });</script>\n' % (
+              f.name, f.verbose_name, f.rel.filter_interface-1, ADMIN_MEDIA_PREFIX) 
     else: 
         return ''
 filter_interface_script_maybe = simple_tag(filter_interface_script_maybe)
@@ -262,9 +269,10 @@ def admin_field_line(context, argument_val):
         'bound_fields' :  bound_fields, 
         'class_names' : " ".join(class_names)
     }
+admin_field_line = inclusion_tag('admin/field_line', takes_context=True)(admin_field_line)
 
+#@simple_tag
+def object_pk(bound_manip, ordered_obj):
+    return bound_manip.get_ordered_object_pk(ordered_obj)
     
-afbdec = inclusion_tag('admin/field_line', takes_context=True)    
-admin_field_line = afbdec(admin_field_line)
-
-
+object_pk = simple_tag(object_pk)
