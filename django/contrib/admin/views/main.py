@@ -556,14 +556,14 @@ def _get_template(opts, app_label, add=False, change=False, show_delete=False, f
         if not seen_collapse and 'collapse' in options.get('classes', ''):
             seen_collapse = True
             javascript_imports.append('%sjs/admin/CollapsedFieldsets.js' % ADMIN_MEDIA_PREFIX)
-        try:
-            for field_list in options['fields']:
+        for field_list in options['fields']:
+            try:
                 for f in field_list:
                     if f.rel and isinstance(f, meta.ManyToManyField) and f.rel.filter_interface:
                         javascript_imports.extend(['%sjs/SelectBox.js' % ADMIN_MEDIA_PREFIX, '%sjs/SelectFilter2.js' % ADMIN_MEDIA_PREFIX])
                         raise StopIteration
-        except StopIteration:
-            break
+            except StopIteration:
+                break
     for j in javascript_imports:
         t.append('<script type="text/javascript" src="%s"></script>' % j)
 

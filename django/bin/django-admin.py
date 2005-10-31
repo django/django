@@ -19,6 +19,7 @@ ACTION_MAPPING = {
     'init': management.init,
     'inspectdb': management.inspectdb,
     'install': management.install,
+    'installperms': management.installperms,
     'runserver': management.runserver,
     'sql': management.get_sql_create,
     'sqlall': management.get_sql_all,
@@ -32,7 +33,7 @@ ACTION_MAPPING = {
     'validate': management.validate,
 }
 
-NO_SQL_TRANSACTION = ('adminindex', 'createcachetable', 'dbcheck', 'install', 'sqlindexes')
+NO_SQL_TRANSACTION = ('adminindex', 'createcachetable', 'dbcheck', 'install', 'installperms', 'sqlindexes')
 
 def get_usage():
     """

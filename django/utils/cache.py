@@ -21,6 +21,45 @@ import datetime, md5, re
 from django.conf import settings
 from django.core.cache import cache
 
+cc_delim_re = re.compile(r'\s*,\s*')
+def patch_cache_control(response, **kwargs):
+    """
+    This function patches the Cache-Control header by adding all
+    keyword arguments to it. The transformation is as follows:
+
+    - all keyword parameter names are turned to lowercase and
+      all _ will be translated to -
+    - if the value of a parameter is True (exatly True, not just a
+      true value), only the parameter name is added to the header
+    - all other parameters are added with their value, after applying
+      str to it.
+    """
+
+    def dictitem(s):
+        t = s.split('=',1)
+        if len(t) > 1:
+            return (t[0].lower().replace('-', '_'), t[1])
+        else:
+            return (t[0].lower().replace('-', '_'), True)
+
+    def dictvalue(t):
+        if t[1] == True:
+            return t[0]
+        else:
+            return t[0] + '=' + str(t[1])
+
+    if response.has_header('Cache-Control'):
+        print response['Cache-Control']
+        cc = cc_delim_re.split(response['Cache-Control'])
+        print cc
+        cc = dict([dictitem(el) for el in cc])
+    else:
+        cc = {}
+    for (k,v) in kwargs.items():
+        cc[k.replace('_', '-')] = v
+    cc = ', '.join([dictvalue(el) for el in cc.items()])
+    response['Cache-Control'] = cc
+
 vary_delim_re = re.compile(r',\s*')
 
 def patch_response_headers(response, cache_timeout=None):
@@ -43,8 +82,7 @@ def patch_response_headers(response, cache_timeout=None):
         response['Last-Modified'] = now.strftime('%a, %d %b %Y %H:%M:%S GMT')
     if not response.has_header('Expires'):
         response['Expires'] = expires.strftime('%a, %d %b %Y %H:%M:%S GMT')
-    if not response.has_header('Cache-Control'):
-        response['Cache-Control'] = 'max-age=%d' % cache_timeout
+    patch_cache_control(response, max_age=cache_timeout)
 
 def patch_vary_headers(response, newheaders):
     """
