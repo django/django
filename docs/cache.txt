@@ -272,39 +272,65 @@ and a list/tuple of header names as its second argument.
 
 .. _`HTTP Vary headers`: http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.44
 
-Controlling cache: Using Vary headers
-=====================================
+Controlling cache: Using other headers
+======================================
 
-Another problem with caching is the privacy of data, and the question where data can
-be stored in a cascade of caches. A user usually faces two kinds of caches: his own
-browser cache (a private cache) and his providers cache (a public cache). A public cache
-is used by multiple users and controlled by someone else. This poses problems with private
-(in the sense of sensitive) data - you don't want your social security number or your
-banking account numbers stored in some public cache. So web applications need a way
-to tell the caches what data is private and what is public.
+Another problem with caching is the privacy of data and the question of where
+data should be stored in a cascade of caches.
 
-Other aspects are the definition how long a page should be cached at max, or wether the
-cache should allways check for newer versions and only deliver the cache content when
-there were no changes (some caches might deliver cached content even if the server page
-changed - just because the cache copy isn't yet expired).
+A user usually faces two kinds of caches: his own browser cache (a private
+cache) and his provider's cache (a public cache). A public cache is used by
+multiple users and controlled by someone else. This poses problems with
+sensitive data: You don't want, say, your banking-account number stored in a
+public cache. So Web applications need a way to tell caches which data is
+private and which is public.
 
-So there are a multitude of options you can control for your pages. This is where the
-Cache-Control header (more infos in `HTTP Cache-Control headers`_) comes in. The usage
-is quite simple::
+The solution is to indicate a page's cache should be "private." To do this in
+Django, use the ``cache_control`` view decorator. Example::
 
-    @cache_control(private=True, must_revalidate=True, max_age=3600)
+    from django.views.decorators.cache import cache_control
+    @cache_control(private=True)
     def my_view(request):
         ...
 
-This would define the view as private, to be revalidated on every access and cache
-copies will only be stored for 3600 seconds at max.
+This decorator takes care of sending out the appropriate HTTP header behind the
+scenes.
 
-The caching middleware already set's this header up with a max-age of the CACHE_MIDDLEWARE_SETTINGS
-setting. And the cache_page decorator does the same. The cache_control decorator correctly merges
-different values into one big header, though. But you should take into account that middlewares
-might overwrite some of your headers or set their own defaults if you don't give that header yourself.
+There are a few other ways to control cache parameters. For example, HTTP
+allows applications to do the following:
 
-.. _`HTTP Cache-Control headers`: http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.9
+    * Define the maximum time a page should be cached.
+    * Specify whether a cache should always check for newer versions, only
+      delivering the cached content when there are no changes. (Some caches
+      might deliver cached content even if the server page changed -- simply
+      because the cache copy isn't yet expired.)
+
+In Django, use the ``cache_control`` view decorator to specify these cache
+parameters. In this example, the ``cache_control`` decorator tells caches to
+revalidate the cache on every access and to store cached versions for, at most,
+3600 seconds::
+
+    from django.views.decorators.cache import cache_control
+    @cache_control(must_revalidate=True, max_age=3600)
+    def my_view(request):
+        ...
+
+Any valid Cache-Control directive is valid in ``cache_control()``. For a full
+list, see the `Cache-Control spec`_. Just pass the directives as keyword
+arguments to ``cache_control()``, substituting underscores for hyphens. For
+directives that don't take an argument, set the argument to ``True``.
+
+Examples:
+
+    ``@cache_control(max_age=3600)`` turns into ``max-age=3600``.
+    ``@cache_control(public=True)`` turns into ``public``.
+
+(Note that the caching middleware already sets the cache header's max-age with
+the value of the ``CACHE_MIDDLEWARE_SETTINGS`` setting. If you use a custom
+``max_age`` in a ``cache_control`` decorator, the decorator will take
+precedence, and the header values will be merged correctly.)
+
+.. _`Cache-Control spec`: http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.9
 
 Other optimizations
 ===================
