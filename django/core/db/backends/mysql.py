@@ -125,15 +125,15 @@ def get_relations(cursor, table_name):
 OPERATOR_MAPPING = {
     'exact': '=',
     'iexact': 'LIKE',
-    'contains': 'LIKE',
+    'contains': 'LIKE BINARY',
     'icontains': 'LIKE',
     'ne': '!=',
     'gt': '>',
     'gte': '>=',
     'lt': '<',
     'lte': '<=',
-    'startswith': 'LIKE',
-    'endswith': 'LIKE',
+    'startswith': 'LIKE BINARY',
+    'endswith': 'LIKE BINARY',
     'istartswith': 'LIKE',
     'iendswith': 'LIKE',
 }
