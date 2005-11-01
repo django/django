@@ -1,16 +1,11 @@
 """
 This is the core database connection.
 
-All CMS code assumes database SELECT statements cast the resulting values as such:
+All Django code assumes database SELECT statements cast the resulting values as such:
     * booleans are mapped to Python booleans
     * dates are mapped to Python datetime.date objects
     * times are mapped to Python datetime.time objects
     * timestamps are mapped to Python datetime.datetime objects
-
-Right now, we're handling this by using psycopg's custom typecast definitions.
-If we move to a different database module, we should ensure that it either
-performs the appropriate typecasting out of the box, or that it has hooks that
-let us do that.
 """
 
 from django.conf.settings import DATABASE_ENGINE
