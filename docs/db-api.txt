@@ -161,9 +161,9 @@ The DB API supports the following lookup types:
                  ``foo``, ``FOO``, ``fOo``, etc.
     contains     Case-sensitive containment test:
                  ``polls.get_list(question__contains="spam")`` returns all polls
-                 that contain "spam" in the question. (PostgreSQL only. MySQL
-                 doesn't support case-sensitive LIKE statements; ``contains``
-                 will act like ``icontains`` for MySQL.)
+                 that contain "spam" in the question. (PostgreSQL and MySQL
+                 only. SQLite doesn't support case-sensitive LIKE statements;
+                 ``contains`` will act like ``icontains`` for SQLite.)
     icontains    Case-insensitive containment test.
     gt           Greater than: ``polls.get_list(id__gt=4)``.
     gte          Greater than or equal to.
@@ -174,11 +174,10 @@ The DB API supports the following lookup types:
                  a list of polls whose IDs are either 1, 3 or 4.
     startswith   Case-sensitive starts-with:
                  ``polls.get_list(question_startswith="Would")``. (PostgreSQL
-                 only. MySQL doesn't support case-sensitive LIKE statements;
-                 ``startswith`` will act like ``istartswith`` for MySQL.)
-    endswith     Case-sensitive ends-with. (PostgreSQL only. MySQL doesn't
-                 support case-sensitive LIKE statements; ``endswith`` will act
-                 like ``iendswith`` for MySQL.)
+                 and MySQL only. SQLite doesn't support case-sensitive LIKE
+                 statements; ``startswith`` will act like ``istartswith`` for
+                 SQLite.)
+    endswith     Case-sensitive ends-with. (PostgreSQL and MySQL only.)
     istartswith  Case-insensitive starts-with.
     iendswith    Case-insensitive ends-with.
     range        Range test:

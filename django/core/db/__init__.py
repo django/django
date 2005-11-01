@@ -1,16 +1,11 @@
 """
 This is the core database connection.
 
-All CMS code assumes database SELECT statements cast the resulting values as such:
+All Django code assumes database SELECT statements cast the resulting values as such:
     * booleans are mapped to Python booleans
     * dates are mapped to Python datetime.date objects
     * times are mapped to Python datetime.time objects
     * timestamps are mapped to Python datetime.datetime objects
-
-Right now, we're handling this by using psycopg's custom typecast definitions.
-If we move to a different database module, we should ensure that it either
-performs the appropriate typecasting out of the box, or that it has hooks that
-let us do that.
 """
 
 from django.conf.settings import DATABASE_ENGINE
@@ -41,6 +36,7 @@ get_limit_offset_sql = dbmod.get_limit_offset_sql
 get_random_function_sql = dbmod.get_random_function_sql
 get_table_list = dbmod.get_table_list
 get_relations = dbmod.get_relations
+quote_name = dbmod.quote_name
 OPERATOR_MAPPING = dbmod.OPERATOR_MAPPING
 DATA_TYPES = dbmod.DATA_TYPES
 DATA_TYPES_REVERSE = dbmod.DATA_TYPES_REVERSE

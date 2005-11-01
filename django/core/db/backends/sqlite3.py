@@ -124,6 +124,11 @@ def get_table_list(cursor):
 def get_relations(cursor, table_name):
     raise NotImplementedError
 
+def quote_name(name):
+    if name.startswith('"') and name.endswith('"'):
+        return name # Quoting once is enough.
+    return '"%s"' % name
+
 # Operators and fields ########################################################
 
 OPERATOR_MAPPING = {

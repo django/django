@@ -172,9 +172,9 @@ class HttpResponse:
                 return True
         return False
 
-    def set_cookie(self, key, value='', max_age=None, path='/', domain=None, secure=None):
+    def set_cookie(self, key, value='', max_age=None, expires=None, path='/', domain=None, secure=None):
         self.cookies[key] = value
-        for var in ('max_age', 'path', 'domain', 'secure'):
+        for var in ('max_age', 'path', 'domain', 'secure', 'expires'):
             val = locals()[var]
             if val is not None:
                 self.cookies[key][var.replace('_', '-')] = val

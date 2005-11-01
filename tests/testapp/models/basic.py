@@ -51,12 +51,28 @@ datetime.datetime(2005, 7, 28, 0, 0)
 <Article object>
 >>> articles.get_object(pub_date__year=2005)
 <Article object>
+>>> articles.get_object(pub_date__year=2005, pub_date__month=7)
+<Article object>
+>>> articles.get_object(pub_date__year=2005, pub_date__month=7, pub_date__day=28)
+<Article object>
+
+>>> articles.get_list(pub_date__year=2005)
+[<Article object>]
+>>> articles.get_list(pub_date__year=2004)
+[]
+>>> articles.get_list(pub_date__year=2005, pub_date__month=7)
+[<Article object>]
 
 # Django raises an ArticleDoesNotExist exception for get_object()
 >>> articles.get_object(id__exact=2)
 Traceback (most recent call last):
     ...
 ArticleDoesNotExist: Article does not exist for {'id__exact': 2}
+
+>>> articles.get_object(pub_date__year=2005, pub_date__month=8)
+Traceback (most recent call last):
+    ...
+ArticleDoesNotExist: Article does not exist for ...
 
 # Lookup by a primary key is the most common case, so Django provides a
 # shortcut for primary-key exact lookups.

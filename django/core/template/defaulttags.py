@@ -211,8 +211,12 @@ class SsiNode(Node):
         self.filepath, self.parsed = filepath, parsed
 
     def render(self, context):
+        from django.conf.settings import DEBUG
         if not include_is_allowed(self.filepath):
-            return '' # Fail silently for invalid includes.
+            if DEBUG:
+                return "[Didn't have permission to include file]"
+            else:
+                return '' # Fail silently for invalid includes.
         try:
             fp = open(self.filepath, 'r')
             output = fp.read()
@@ -223,8 +227,11 @@ class SsiNode(Node):
             try:
                 t = Template(output)
                 return t.render(context)
-            except TemplateSyntaxError:
-                return '' # Fail silently for invalid included templates.
+            except (TemplateSyntaxError, e):
+                if DEBUG:
+                    return "[Included template had syntax error: %s]" % e
+                else:
+                    return '' # Fail silently for invalid included templates.
         return output
 
 class LoadNode(Node):

@@ -284,12 +284,14 @@ Methods
     Returns ``True`` or ``False`` based on a case-insensitive check for a
     header with the given name.
 
-``set_cookie(key, value='', max_age=None, path='/', domain=None, secure=None)``
+``set_cookie(key, value='', max_age=None, expires=None, path='/', domain=None, secure=None)``
     Sets a cookie. The parameters are the same as in the `cookie Morsel`_
     object in the Python standard library.
 
         * ``max_age`` should be a number of seconds, or ``None`` (default) if
           the cookie should last only as long as the client's browser session.
+        * ``expires`` should be a string in the format
+          ``"Wdy, DD-Mon-YY HH:MM:SS GMT"``.
         * Use ``domain`` if you want to set a cross-domain cookie. For example,
           ``domain=".lawrence.com"`` will set a cookie that is readable by
           the domains www.lawrence.com, blogs.lawrence.com and
