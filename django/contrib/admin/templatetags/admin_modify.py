@@ -215,7 +215,7 @@ def filter_interface_script_maybe(bound_field):
     f = bound_field.field 
     if f.rel and isinstance(f.rel, meta.ManyToMany) and f.rel.filter_interface:
        return '<script type="text/javascript">addEvent(window, "load", function(e) {' \
-              ' SelectFilter.init("id_%s", "%s", %s, %r); });</script>\n' % (
+              ' SelectFilter.init("id_%s", "%s", %s, "%s"); });</script>\n' % (
               f.name, f.verbose_name, f.rel.filter_interface-1, ADMIN_MEDIA_PREFIX) 
     else: 
         return ''

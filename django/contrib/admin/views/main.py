@@ -78,7 +78,7 @@ class FilterSpec(object):
             t.append('<h3>By %s:</h3>\n<ul>\n' % self.title)
             
             for choice in self.choices:
-                t.append('<li%s><a href="%s">%r</a></li>\n' % \
+                t.append('<li%s><a href="%s">%s</a></li>\n' % \
                     (self.is_selected(choice) and ' class="selected"' or ''),
                      self.get_query_string(choice) , 
                      self.get_display(choice)  )
@@ -109,7 +109,7 @@ class RelatedFilterSpec(FilterSpec):
                 cl.get_query_string({}, [self.lookup_kwarg])))
             for val in self.lookup_choices:
                 pk_val = getattr(val, self.field.rel.to.pk.column)
-                t.append('<li%s><a href="%s">%r</a></li>\n' % \
+                t.append('<li%s><a href="%s">%s</a></li>\n' % \
                     ((self.lookup_val == str(pk_val) and ' class="selected"' or ''),
                     cl.get_query_string( {self.lookup_kwarg: pk_val}), val))
             t.append('</ul>\n\n')
@@ -444,26 +444,26 @@ class AdminBoundField(BoundField):
             self.cell_class_attribute = ' class="%s" ' % ' '.join(classes)
         self._repr_filled = False
     
-    def _fetch_existing_repr(self, func_name):
+    def _fetch_existing_display(self, func_name):
         class_dict = self.original.__class__.__dict__
         func = class_dict.get(func_name)
         return func(self.original)
         
-    def _fill_existing_repr(self):
-        if self._repr_filled: 
+    def _fill_existing_display(self):
+        if self._display_filled: 
             return
         #HACK
         if isinstance(self.field.rel, meta.ManyToOne):
              func_name = 'get_%s' % self.field.name
-             self._repr = self._fetch_existing_repr(func_name)
+             self._display = self._fetch_existing_display(func_name)
         elif isinstance(self.field.rel, meta.ManyToMany):
             func_name = 'get_%s_list' % self.field.name 
-            self._repr =  ",".join(self._fetch_existing_repr(func_name))
-        self._repr_filled = True
-             
-    def existing_repr(self):
-        self._fill_existing_repr()
-        return self._repr
+            self._display =  ",".join(self._fetch_existing_display(func_name))
+        self._display_filled = True
+        
+    def existing_display(self):
+        self._fill_existing_display()
+        return self._display
 
     def __repr__(self):
         return repr(self.__dict__)
@@ -542,7 +542,7 @@ def render_change_form(opts, manipulator, app_label, context, add=False, change=
    
 def log_add_message(user, opts,manipulator,new_object):
     pk_value = getattr(new_object, opts.pk.column)
-    log.log_action(user.id, opts.get_content_type_id(), pk_value, repr(new_object), log.ADDITION)
+    log.log_action(user.id, opts.get_content_type_id(), pk_value, str(new_object), log.ADDITION)
 
 def add_stage(request, app_label, module_name, show_delete=False, form_url='', post_url='../', post_url_continue='../%s/', object_id_override=None):
     mod, opts = _get_mod_opts(app_label, module_name)
@@ -612,7 +612,7 @@ def log_change_message(user, opts,manipulator,new_object):
     change_message = ' '.join(change_message)
     if not change_message:
         change_message = 'No fields changed.'
-    log.log_action(user.id, opts.get_content_type_id(), pk_value, repr(new_object), log.CHANGE, change_message)
+    log.log_action(user.id, opts.get_content_type_id(), pk_value, str(new_object), log.CHANGE, change_message)
     
 def change_stage(request, app_label, module_name, object_id):
     mod, opts = _get_mod_opts(app_label, module_name)
@@ -726,10 +726,10 @@ def _get_deleted_objects(deleted_objects, perms_needed, user, obj, opts, current
                 if related.field.rel.edit_inline or not related.opts.admin:
                     # Don't display link to edit, because it either has no
                     # admin or is edited inline.
-                    nh(deleted_objects, current_depth, ['%s: %r' % (capfirst(related.opts.verbose_name), sub_obj), []])
+                    nh(deleted_objects, current_depth, ['%s: %s' % (capfirst(related.opts.verbose_name), sub_obj), []])
                 else:
                     # Display a link to the admin page.
-                    nh(deleted_objects, current_depth, ['%s: <a href="../../../../%s/%s/%s/">%r</a>' % \
+                    nh(deleted_objects, current_depth, ['%s: <a href="../../../../%s/%s/%s/">%s</a>' % \
                         (capfirst(related.opts.verbose_name), related.opts.app_label, related.opts.module_name,
                         getattr(sub_obj, related.opts.pk.column), sub_obj), []])
                 _get_deleted_objects(deleted_objects, perms_needed, user, sub_obj, related.opts, current_depth+2)
@@ -740,11 +740,11 @@ def _get_deleted_objects(deleted_objects, perms_needed, user, obj, opts, current
                 if related.field.rel.edit_inline or not related.opts.admin:
                     # Don't display link to edit, because it either has no
                     # admin or is edited inline.
-                    nh(deleted_objects, current_depth, ['%s: %s' % (capfirst(related.opts.verbose_name), strip_tags(repr(sub_obj))), []])
+                    nh(deleted_objects, current_depth, ['%s: %s' % (capfirst(related.opts.verbose_name), strip_tags(str(sub_obj))), []])
                 else:
                     # Display a link to the admin page.
                     nh(deleted_objects, current_depth, ['%s: <a href="../../../../%s/%s/%s/">%s</a>' % \
-                        (capfirst(related.opts.verbose_name), related.opts.app_label, related.opts.module_name, sub_obj.id, strip_tags(repr(sub_obj))), []])
+                        (capfirst(related.opts.verbose_name), related.opts.app_label, related.opts.module_name, sub_obj.id, strip_tags(str(sub_obj))), []])
                 _get_deleted_objects(deleted_objects, perms_needed, user, sub_obj, related.opts, current_depth+2)
             # If there were related objects, and the user doesn't have
             # permission to delete them, add the missing perm to perms_needed.
@@ -764,11 +764,11 @@ def _get_deleted_objects(deleted_objects, perms_needed, user, obj, opts, current
                 # Don't display link to edit, because it either has no
                 # admin or is edited inline.
                 nh(deleted_objects, current_depth, ['One or more %s in %s: %s' % \
-                    (related.field.name, related.opts.verbose_name, strip_tags(repr(sub_obj))), []])
+                    (related.field.name, related.opts.verbose_name, strip_tags(str(sub_obj))), []])
             else:
                 # Display a link to the admin page.
                 nh(deleted_objects, current_depth, ['One or more %s in %s: <a href="../../../../%s/%s/%s/">%s</a>' % \
-                    (related.field.name, related.opts.verbose_name, related.opts.app_label, related.opts.module_name, sub_obj.id, strip_tags(repr(sub_obj))), []])
+                    (related.field.name, related.opts.verbose_name, related.opts.app_label, related.opts.module_name, sub_obj.id, strip_tags(str(sub_obj))), []])
         # If there were related objects, and the user doesn't have
         # permission to change them, add the missing perm to perms_needed.
         if related.opts.admin and has_related_objs:
@@ -785,17 +785,17 @@ def delete_stage(request, app_label, module_name, object_id):
 
     # Populate deleted_objects, a data structure of all related objects that
     # will also be deleted.
-    deleted_objects = ['%s: <a href="../../%s/">%s</a>' % (capfirst(opts.verbose_name), object_id, strip_tags(repr(obj))), []]
+    deleted_objects = ['%s: <a href="../../%s/">%s</a>' % (capfirst(opts.verbose_name), object_id, strip_tags(str(obj))), []]
     perms_needed = sets.Set()
     _get_deleted_objects(deleted_objects, perms_needed, request.user, obj, opts, 1)
 
     if request.POST: # The user has already confirmed the deletion.
         if perms_needed:
             raise PermissionDenied
-        obj_repr = repr(obj)
+        obj_display = str(obj)
         obj.delete()
-        log.log_action(request.user.id, opts.get_content_type_id(), object_id, obj_repr, log.DELETION)
-        request.user.add_message('The %s "%s" was deleted successfully.' % (opts.verbose_name, obj_repr))
+        log.log_action(request.user.id, opts.get_content_type_id(), object_id, obj_display, log.DELETION)
+        request.user.add_message('The %s "%s" was deleted successfully.' % (opts.verbose_name, obj_display))
         return HttpResponseRedirect("../../")
     return render_to_response('admin/delete_confirmation', {
         "title": "Are you sure?",
@@ -813,7 +813,7 @@ def history(request, app_label, module_name, object_id):
     # If no history was found, see whether this object even exists.
     obj = get_object_or_404(mod, pk=object_id)
     return render_to_response('admin/object_history', {
-        'title': 'Change history: %r' % obj,
+        'title': 'Change history: %s' % obj,
         'action_list': action_list,
         'module_name': capfirst(opts.verbose_name_plural),
         'object': obj,

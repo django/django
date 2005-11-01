@@ -284,7 +284,7 @@ class Field(object):
         if self.choices:
             return first_choice + list(self.choices)
         rel_obj = self.rel.to
-        return first_choice + [(getattr(x, rel_obj.pk.column), repr(x)) for x in rel_obj.get_model_module().get_list(**self.rel.limit_choices_to)]
+        return first_choice + [(getattr(x, rel_obj.pk.column), str(x)) for x in rel_obj.get_model_module().get_list(**self.rel.limit_choices_to)]
 
     def get_choices_default(self):
         if(self.radio_admin):
