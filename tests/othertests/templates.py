@@ -96,6 +96,10 @@ TEMPLATE_TESTS = {
     # Chained filters, with an argument to the first one
     'basic-syntax29': ('{{ var|removetags:"b i"|upper|lower }}', {"var": "<b><i>Yes</i></b>"}, "yes"),
 
+    #Escaped string as argument 
+    'basic-syntax30': (r"""{{ var|default_if_none:" endquote\" hah" }}""", {"var": None}, ' endquote" hah'),
+    
+    
     ### IF TAG ################################################################
     'if-tag01': ("{% if foo %}yes{% else %}no{% endif %}", {"foo": True}, "yes"),
     'if-tag02': ("{% if foo %}yes{% else %}no{% endif %}", {"foo": False}, "no"),
@@ -233,6 +237,18 @@ TEMPLATE_TESTS = {
                     you
                     gentlemen. 
                     """  ), 
+    # translation of string without i18n tag
+    'i18n11': ('{{ _("blah") }}', {}, "blah"),
+
+    # translation of string without i18n tag but with interpolation
+    'i18n12': ('{{ _("blah%(anton)s") }}', {'anton': 'blubb'}, "blahblubb"),
+
+    # translation of a variable with a translated filter
+    'i18n13': ('{{ bool|yesno:_("ja,nein") }}', {'bool': True}, 'ja'),
+
+    # translation of a variable with a non-translated filter
+    'i18n14': ('{{ bool|yesno:"ja,nein" }}', {'bool': True}, 'ja'),
+    
 }
 
 def test_template_loader(template_name, template_dirs=None):

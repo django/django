@@ -516,9 +516,83 @@ class FilterParser:
         self.next_char()
         return arg
 
+
+filter_raw_string = r"""
+^%(i18n_open)s"(?P<i18n_constant>%(str)s)"%(i18n_close)s|
+^"(?P<constant>%(str)s)"|
+^(?P<var>[%(var_chars)s]+)|
+ (?:%(filter_sep)s
+     (?P<filter_name>\w+)
+         (?:%(arg_sep)s
+             (?:
+              %(i18n_open)s"(?P<i18n_arg>%(str)s)"%(i18n_close)s|
+              "(?P<arg>%(str)s)"
+             )
+         ){0,1}
+ )"""% {
+    'str': r"""[^"\\]*(?:\\.[^"\\]*)*""",
+    'var_chars': "A-Za-z0-9\_\." ,
+    'filter_sep': re.escape(FILTER_SEPARATOR),
+    'arg_sep': re.escape(FILTER_ARGUMENT_SEPARATOR),
+    'i18n_open' : re.escape("_("),
+    'i18n_close' : re.escape(")"),                         
+  }
+  
+filter_raw_string = filter_raw_string.replace("\n", "").replace(" ", "")
+
+filter_re = re.compile(filter_raw_string)
+
+class RegexFilterParser(object):
+    """ Not used yet because of i18n"""
+    
+    def __init__(self, token):
+        matches = filter_re.finditer(token)
+        var = None
+        filters = []
+        upto = 0
+        for match in matches:
+            start = match.start()
+            if upto != start:
+                raise TemplateSyntaxError, "Could not parse some characters: %s|%s|%s"  % \
+                                           (token[:upto], token[upto:start], token[start:])
+            if var == None:
+                var, constant, i18n_constant = match.group("var", "constant", "i18n_constant")
+                if i18n_constant:
+                    #HACK:i18n 
+                    #var = """_("%s")""" % i18n_constant
+                    var = '"%s"' % i18n_constant
+                elif constant:
+                    var = '"%s"' % constant
+                upto = match.end()
+                if var == None:
+                    raise TemplateSyntaxError, "Could not find variable at start of %s" % token
+                elif var.find(VARIABLE_ATTRIBUTE_SEPARATOR + '_') > -1 or var[0] == '_':
+                    raise TemplateSyntaxError, "Variables and attributes may not begin with underscores: '%s'" % var
+            else:
+                filter_name = match.group("filter_name")
+                arg, i18n_arg = match.group("arg","i18n_arg")
+                if i18n_arg:
+                    #HACK:i18n
+                    #arg =_(i18n_arg.replace('\\', ''))
+                    arg = i18n_arg.replace('\\', '')
+                if arg:
+                    arg = arg.replace('\\', '')
+                if not registered_filters.has_key(filter_name):
+                    raise TemplateSyntaxError, "Invalid filter: '%s'" % filter_name
+                if registered_filters[filter_name][1] == True and arg is None:
+                    raise TemplateSyntaxError, "Filter '%s' requires an argument" % filter_name
+                if registered_filters[filter_name][1] == False and arg is not None:
+                    raise TemplateSyntaxError, "Filter '%s' should not have an argument (argument is %r)" % (filter_name, arg)
+                filters.append( (filter_name,arg) )
+                upto = match.end()
+        if upto != len(token):
+            raise TemplateSyntaxError, "Could not parse the remainder: %s" % token[upto:]
+        self.var , self.filters = var, filters
+
+
 def get_filters_from_token(token):
     "Convenient wrapper for FilterParser"
-    p = FilterParser(token)
+    p = RegexFilterParser(token)
     return (p.var, p.filters)
 
 def resolve_variable(path, context):

@@ -205,7 +205,7 @@ def auto_populated_field_script(auto_pop_fields, change = False):
         for f in field.prepopulate_from:
             t.append('document.getElementById("id_%s").onkeyup = function() {' \
                      ' var e = document.getElementById("id_%s");' \
-                     ' if(!e._changed) { e.value = URLify(%s, %s);} } ' % (
+                     ' if(!e._changed) { e.value = URLify(%s, %s);} }; ' % (
                      f, field.name, add_values, field.maxlength) )
     return ''.join(t)
 auto_populated_field_script = simple_tag(auto_populated_field_script)
