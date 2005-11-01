@@ -49,9 +49,7 @@ def patch_cache_control(response, **kwargs):
             return t[0] + '=' + str(t[1])
 
     if response.has_header('Cache-Control'):
-        print response['Cache-Control']
         cc = cc_delim_re.split(response['Cache-Control'])
-        print cc
         cc = dict([dictitem(el) for el in cc])
     else:
         cc = {}
