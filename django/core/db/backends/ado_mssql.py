@@ -110,6 +110,10 @@ def get_table_list(cursor):
 def get_relations(cursor, table_name):
     raise NotImplementedError
 
+def quote_name(name):
+    # TODO: Figure out how MS-SQL quotes database identifiers.
+    return name
+
 OPERATOR_MAPPING = {
     'exact': '=',
     'iexact': 'LIKE',

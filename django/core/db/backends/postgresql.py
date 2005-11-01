@@ -116,6 +116,11 @@ def get_relations(cursor, table_name):
             continue
     return relations
 
+def quote_name(name):
+    if name.startswith('"') and name.endswith('"'):
+        return name # Quoting once is enough.
+    return '"%s"' % name
+
 # Register these custom typecasts, because Django expects dates/times to be
 # in Python's native (standard-library) datetime/time format, whereas psycopg
 # use mx.DateTime by default.
