@@ -1,25 +1,30 @@
-from django.core.extensions import render_to_response
-from django.utils.html import escape
-
-context_lines = 10
-
 class TemplateDebugMiddleware(object):
     def process_exception(self, request, exception):
+        from django.core.template.loader import render_to_string
+        from django.utils.html import escape
+        from django.utils.httpwrappers import HttpResponseServerError
+        from django.core.extensions import DjangoContext
+        from itertools import count, izip
+        context_lines = 10
         if hasattr(exception, 'source'):
             origin, line = exception.source
             template_source = origin.reload()
             
-            source_lines = [ (i + 1,s) for (i,s) in  enumerate(escape(template_source).split("\n"))]
+            source_lines = [ (i,s) for (i,s) in  izip(count(1), escape(template_source).split("\n"))]
             total = len(source_lines)
             top = max(0, line - context_lines)
             bottom = min(total, line + 1 + context_lines)
-       
-            return render_to_response('template_debug', {
-               'message'      : exception.args[0], 
-               'source_lines' : source_lines[top:bottom],
-               'top': top ,
-               'bottom': bottom ,
-               'total' : total,
-               'line'  : line
-            })
-           
+            traceback = hasattr(exception, 'traceback') and exception.traceback or ''
+            return HttpResponseServerError(
+                    render_to_string('template_debug',
+                           DjangoContext(request, {
+                               'message'      : exception.args[0], 
+                               'traceback'    : traceback,
+                               'source_lines' : source_lines[top:bottom],
+                               'top': top ,
+                               'bottom': bottom ,
+                               'total' : total,
+                               'line'  : line
+                            }),
+                            )
+                    )

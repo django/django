@@ -143,14 +143,7 @@ class Template:
         return self.nodelist.render(context)
 
 def compile_string(template_string, origin):
-    "Compiles template_string into NodeList ready for rendering"
-    if TEMPLATE_DEBUG:
-        lexer_factory = DebugLexer
-        parser_factory = DebugParser
-    else:
-        lexer_factory = Lexer
-        parser_factory = Parser
-        
+    "Compiles template_string into NodeList ready for rendering"     
     lexer = lexer_factory(template_string, origin)
     parser = parser_factory(lexer.tokenize())
     return parser.parse()
@@ -356,7 +349,9 @@ class Parser(object):
     def delete_first_token(self):
         del self.tokens[0]
 
-
+def format_source(source):
+    return "at %s, line %d" % source
+    
 class DebugParser(Parser):
     def __init__(self, lexer):
         super(DebugParser, self).__init__(lexer)
@@ -384,13 +379,13 @@ class DebugParser(Parser):
         super(DebugParser, self).extend_nodelist(nodelist, node, token)
 
     def empty_variable(self, token):
-        raise self.error( token.source, "Empty variable tag %s" % self.format_source(token.source))
+        raise self.error( token.source, "Empty variable tag %s" % format_source(token.source))
     
     def empty_block_tag(self, token):
-        raise self.error( token.source, "Empty block tag %s" % self.format_source(token.source))
+        raise self.error( token.source, "Empty block tag %s" % format_source(token.source))
     
     def invalid_block_tag(self, token, command):
-        raise self.error( token.source, "Invalid block tag: '%s' %s" % (command, self.format_source(token.source)))
+        raise self.error( token.source, "Invalid block tag: '%s' %s" % (command, format_source(token.source)))
     
     def unclosed_block_tag(self, token, parse_until):
         (command, (origin,line)) = self.command_stack.pop()
@@ -401,6 +396,13 @@ class DebugParser(Parser):
     def compile_function_error(self, token, e):
         if not hasattr(e, 'source'):
             e.source = token.source
+
+if TEMPLATE_DEBUG:
+    lexer_factory = DebugLexer
+    parser_factory = DebugParser
+else:
+    lexer_factory = Lexer
+    parser_factory = Parser
 
 class FilterParser:
     """Parse a variable token and its optional filters (all as a single string),
@@ -589,7 +591,6 @@ class RegexFilterParser(object):
             raise TemplateSyntaxError, "Could not parse the remainder: %s" % token[upto:]
         self.var , self.filters = var, filters
 
-
 def get_filters_from_token(token):
     "Convenient wrapper for FilterParser"
     p = RegexFilterParser(token)
@@ -682,12 +683,7 @@ class NodeList(list):
         bits = []
         for node in self:
             if isinstance(node, Node):
-                try:
-                   result = node.render(context)
-                except TemplateSyntaxError, e:
-                    if not self.handle_render_error(node, e):
-                       raise
-                bits.append(result)
+                bits.append(self.render_node(node, context))
             else:
                 bits.append(node)
         return ''.join(bits)
@@ -699,14 +695,30 @@ class NodeList(list):
             nodes.extend(node.get_nodes_by_type(nodetype))
         return nodes
 
-    def handle_render_error(self, node, exception):
-        pass
+    def render_node(self, node, context):
+        return(node.render(context))
 
 class DebugNodeList(NodeList):
-    def handle_render_error(self, node, exception):
-        if not hasattr(exception, 'source'):
-            exception.source = node.source
-
+    def render_node(self, node, context):
+        try:
+            result = node.render(context)
+        except TemplateSyntaxError, e:
+            if not hasattr(e, 'source'):
+                e.source = node.source
+            raise
+        except Exception, e:
+            from traceback import extract_tb, format_list, format_exception_only
+            from sys import exc_info
+            t,v,tb = exc_info()
+            frames = extract_tb(tb)
+            frames.pop(0)
+            wrapped = TemplateSyntaxError( '  While rendering %s , caught exception:\n  %s' 
+                                            % ( format_source(node.source), 
+                                                "".join(format_exception_only(t,v)).replace('\n','')))
+            wrapped.source = node.source
+            wrapped.traceback = "".join(format_list(frames))
+            raise wrapped
+        return result
 
 class TextNode(Node):
     def __init__(self, s):

@@ -345,10 +345,15 @@ class ChangeList(object):
         # If the order-by field is a field with a relationship, order by the value
         # in the related table.
         lookup_order_field = order_field
-        if isinstance(lookup_opts.get_field(order_field).rel, meta.ManyToOne):
+        try: 
             f = lookup_opts.get_field(order_field)
-            rel_ordering = f.rel.to.ordering and f.rel.to.ordering[0] or f.rel.to.pk.column
-            lookup_order_field = '%s.%s' % (f.rel.to.db_table, rel_ordering)
+        except meta.FieldDoesNotExist:
+            pass
+        else:
+            if isinstance(lookup_opts.get_field(order_field).rel, meta.ManyToOne):
+                f = lookup_opts.get_field(order_field)
+                rel_ordering = f.rel.to.ordering and f.rel.to.ordering[0] or f.rel.to.pk.column
+                lookup_order_field = '%s.%s' % (f.rel.to.db_table, rel_ordering)
         # Use select_related if one of the list_display options is a field with a
         # relationship.
         for field_name in lookup_opts.admin.list_display:

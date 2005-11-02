@@ -1728,11 +1728,11 @@ def manipulator_save(opts, klass, add, change, self, new_data):
                     # Calculate whether any fields have changed.
                     if change:
                         if not old_rel_obj: # This object didn't exist before.
-                            self.fields_added.append('%s "%r"' % (related.opts.verbose_name, new_rel_obj))
+                            self.fields_added.append('%s "%s"' % (related.opts.verbose_name, new_rel_obj))
                         else:
                             for f in related.opts.fields:
                                 if not f.primary_key and f != related.field and str(getattr(old_rel_obj, f.column)) != str(getattr(new_rel_obj, f.column)):
-                                    self.fields_changed.append('%s for %s "%r"' % (f.verbose_name, related.opts.verbose_name, new_rel_obj))
+                                    self.fields_changed.append('%s for %s "%s"' % (f.verbose_name, related.opts.verbose_name, new_rel_obj))
 
                     # Save many-to-many objects.
                     for f in related.opts.many_to_many:
@@ -1745,7 +1745,7 @@ def manipulator_save(opts, klass, add, change, self, new_data):
                 # the primary key (ID) was provided, delete the item.
                 if change and all_cores_blank and old_rel_obj:
                     new_rel_obj.delete()
-                    self.fields_deleted.append('%s "%r"' % (related.opts.verbose_name, old_rel_obj))
+                    self.fields_deleted.append('%s "%s"' % (related.opts.verbose_name, old_rel_obj))
 
 
     # Save the order, if applicable.

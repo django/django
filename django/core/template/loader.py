@@ -47,11 +47,11 @@ class LoaderOrigin(Origin):
         self.loader, self.name, self.dirs = loader, name, dirs
     
     def reload(self):
-        return self.loader(self.name, self.dirs)
+        return self.loader(self.name, self.dirs)[0]
 
 def make_origin(display_name, loader, name, dirs):
     if TEMPLATE_DEBUG:
-        LoaderOrigin(display_name, loader, name, dirs)
+        return LoaderOrigin(display_name, loader, name, dirs)
     else:
         return None
 

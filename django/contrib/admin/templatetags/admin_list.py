@@ -106,16 +106,11 @@ def pagination(cl):
             }
 pagination = inclusion_tag('admin/pagination')(pagination)
 
-#@simple_tag
-def result_list(cl):
-    result_list, lookup_opts, mod, order_field, order_type, params, is_popup, opts = \
-     cl.result_list, cl.lookup_opts, cl.mod, cl.order_field, cl.order_type, cl.params, cl.is_popup, cl.opts
+
+def result_headers(cl):
+    lookup_opts = cl.lookup_opts
     
-    raw_template = []
-    if result_list:
-        # Table headers.
-        raw_template.append('<table cellspacing="0">\n<thead>\n<tr>\n')
-        for i, field_name in enumerate(lookup_opts.admin.list_display):
+    for i, field_name in enumerate(lookup_opts.admin.list_display):
             try:
                 f = lookup_opts.get_field(field_name)
             except meta.FieldDoesNotExist:
@@ -131,91 +126,100 @@ def result_list(cl):
                     except AttributeError:
                         header = func.__name__
                 # Non-field list_display values don't get ordering capability.
-                raw_template.append('<th>%s</th>' % capfirst(header))
+                yield {"text": header}
             else:
                 if isinstance(f.rel, meta.ManyToOne) and f.null:
                     raw_template.append('<th>%s</th>' % capfirst(f.verbose_name))
+                    yield {"text": f.verbose_name}
                 else:
                     th_classes = []
                     new_order_type = 'asc'
-                    if field_name == order_field:
+                    if field_name == cl.order_field:
                         th_classes.append('sorted %sending' % order_type.lower())
                         new_order_type = {'asc': 'desc', 'desc': 'asc'}[order_type.lower()]
-                    raw_template.append('<th%s><a href="%s">%s</a></th>' % \
-                        ((th_classes and ' class="%s"' % ' '.join(th_classes) or ''),
-                        cl.get_query_string( {ORDER_VAR: i, ORDER_TYPE_VAR: new_order_type}),
-                        capfirst(f.verbose_name)))
-        raw_template.append('</tr>\n</thead>\n')
-        # Result rows.
-        pk = lookup_opts.pk.name
-        for i, result in enumerate(result_list):
-            raw_template.append('<tr class="row%s">\n' % (i % 2 + 1))
-            for j, field_name in enumerate(lookup_opts.admin.list_display):
-                row_class = ''
-                try:
-                    f = lookup_opts.get_field(field_name)
-                except meta.FieldDoesNotExist:
-                    # For non-field list_display values, the value is a method
-                    # name. Execute the method.
-                    try:
-                        result_repr = strip_tags(str(getattr(result, field_name)()))
-                    except ObjectDoesNotExist:
-                        result_repr = EMPTY_CHANGELIST_VALUE
+                    
+                    yield {"text" : f.verbose_name, 
+                           "sortable": True,
+                           "order" : new_order_type,
+                           "class_attrib" : (th_classes and ' class="%s"' % ' '.join(th_classes) or '') }
+    
+def items_for_result(cl, result):
+    first = True
+    pk = cl.lookup_opts.pk.name
+    for field_name in cl.lookup_opts.admin.list_display:
+        row_class = ''
+        try:
+            f = cl.lookup_opts.get_field(field_name)
+        except meta.FieldDoesNotExist:
+            # For non-field list_display values, the value is a method
+            # name. Execute the method.
+            try:
+                result_repr = strip_tags(str(getattr(result, field_name)()))
+            except ObjectDoesNotExist:
+                result_repr = EMPTY_CHANGELIST_VALUE
+        else:
+            field_val = getattr(result, f.column)
+        
+            if isinstance(f.rel, meta.ManyToOne):
+                if field_val is not None:
+                    result_repr = getattr(result, 'get_%s' % f.name)()
                 else:
-                    field_val = getattr(result, f.column)
-                    # Foreign-key fields are special: Use the repr of the
-                    # related object.
-                    if isinstance(f.rel, meta.ManyToOne):
-                        if field_val is not None:
-                            result_repr = getattr(result, 'get_%s' % f.name)()
-                        else:
-                            result_repr = EMPTY_CHANGELIST_VALUE
-                    # Dates are special: They're formatted in a certain way.
-                    elif isinstance(f, meta.DateField):
-                        if field_val:
-                            if isinstance(f, meta.DateTimeField):
-                                result_repr = dateformat.format(field_val, 'N j, Y, P')
-                            else:
-                                result_repr = dateformat.format(field_val, 'N j, Y')
-                        else:
-                            result_repr = EMPTY_CHANGELIST_VALUE
-                        row_class = ' class="nowrap"'
-                    # Booleans are special: We use images.
-                    elif isinstance(f, meta.BooleanField) or isinstance(f, meta.NullBooleanField):
-                        BOOLEAN_MAPPING = {True: 'yes', False: 'no', None: 'unknown'}
-                        result_repr = '<img src="%simg/admin/icon-%s.gif" alt="%s" />' % (ADMIN_MEDIA_PREFIX, BOOLEAN_MAPPING[field_val], field_val)
-                    # ImageFields are special: Use a thumbnail.
-                    elif isinstance(f, meta.ImageField):
-                        from django.parts.media.photos import get_thumbnail_url
-                        result_repr = '<img src="%s" alt="%s" title="%s" />' % (get_thumbnail_url(getattr(result, 'get_%s_url' % f.name)(), '120'), field_val, field_val)
-                    # FloatFields are special: Zero-pad the decimals.
-                    elif isinstance(f, meta.FloatField):
-                        if field_val is not None:
-                            result_repr = ('%%.%sf' % f.decimal_places) % field_val
-                        else:
-                            result_repr = EMPTY_CHANGELIST_VALUE
-                    # Fields with choices are special: Use the representation
-                    # of the choice.
-                    elif f.choices:
-                        result_repr = dict(f.choices).get(field_val, EMPTY_CHANGELIST_VALUE)
+                    result_repr = EMPTY_CHANGELIST_VALUE
+            # Dates are special: They're formatted in a certain way.
+            elif isinstance(f, meta.DateField):
+                if field_val:
+                    if isinstance(f, meta.DateTimeField):
+                        result_repr = dateformat.format(field_val, 'N j, Y, P')
                     else:
-                        result_repr = strip_tags(str(field_val))
-                # Some browsers don't like empty "<td></td>"s.
-                if result_repr == '':
-                    result_repr = '&nbsp;'
-                if j == 0: # First column is a special case
-                    result_id = getattr(result, pk)
-                    raw_template.append('<th%s><a href="%s/"%s>%s</a></th>' % \
-                        (row_class, result_id, (is_popup and ' onclick="opener.dismissRelatedLookupPopup(window, %r); return false;"' % result_id or ''), result_repr))
+                        result_repr = dateformat.format(field_val, 'N j, Y')
                 else:
-                    raw_template.append('<td%s>%s</td>' % (row_class, result_repr))
-            raw_template.append('</tr>\n')
-        del result_list # to free memory
-        raw_template.append('</table>\n')
-    else:
-        raw_template.append('<p>No %s matched your search criteria.</p>' % opts.verbose_name_plural)
-    return ''.join(raw_template)
-result_list = simple_tag(result_list)
+                    result_repr = EMPTY_CHANGELIST_VALUE
+                row_class = ' class="nowrap"'
+            # Booleans are special: We use images.
+            elif isinstance(f, meta.BooleanField) or isinstance(f, meta.NullBooleanField):
+                BOOLEAN_MAPPING = {True: 'yes', False: 'no', None: 'unknown'}
+                result_repr = '<img src="%simg/admin/icon-%s.gif" alt="%s" />' % (ADMIN_MEDIA_PREFIX, BOOLEAN_MAPPING[field_val], field_val)
+            # ImageFields are special: Use a thumbnail.
+            elif isinstance(f, meta.ImageField):
+                from django.parts.media.photos import get_thumbnail_url
+                result_repr = '<img src="%s" alt="%s" title="%s" />' % (get_thumbnail_url(getattr(result, 'get_%s_url' % f.name)(), '120'), field_val, field_val)
+            # FloatFields are special: Zero-pad the decimals.
+            elif isinstance(f, meta.FloatField):
+                if field_val is not None:
+                    result_repr = ('%%.%sf' % f.decimal_places) % field_val
+                else:
+                    result_repr = EMPTY_CHANGELIST_VALUE
+            # Fields with choices are special: Use the representation
+            # of the choice.
+            elif f.choices:
+                result_repr = dict(f.choices).get(field_val, EMPTY_CHANGELIST_VALUE)
+            else:
+                result_repr = strip_tags(str(field_val))
+        if result_repr == '':
+                result_repr = '&nbsp;'
+        if first: # First column is a special case
+            first = False
+            result_id = getattr(result, pk)
+            yield ('<th%s><a href="%s/"%s>%s</a></th>' % \
+                (row_class, result_id, (cl.is_popup and ' onclick="opener.dismissRelatedLookupPopup(window, %r); return false;"' % result_id or ''), result_repr))
+        else:
+            yield ('<td%s>%s</td>' % (row_class, result_repr))
+        
+        
+
+def results(cl):
+    for res in cl.result_list:
+        yield list(items_for_result(cl,res))
+
+#@inclusion_tag("admin/change_list_results")
+def result_list(cl):
+    res = list(results(cl))
+    return {'cl': cl, 
+             'result_headers': list(result_headers(cl)), 
+             'results': list(results(cl)), }
+result_list = inclusion_tag("admin/change_list_results")(result_list)
+
+
 
 #@simple_tag
 def date_hierarchy(cl):
