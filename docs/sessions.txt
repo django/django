@@ -158,6 +158,39 @@ This is necessary because the dictionary is stored in an encoded format::
     >>> s.get_decoded()
     {'user_id': 42}
 
+Session cookies
+===============
+
+A few `Django settings`_ give you control over the session cookie:
+
+SESSION_COOKIE_AGE
+------------------
+
+Default: ``1209600`` (2 weeks, in seconds)
+
+The age of session cookies, in seconds.
+
+SESSION_COOKIE_DOMAIN
+---------------------
+
+Default: ``None``
+
+The domain to use for session cookies. Set this to a string such as
+``".lawrence.com"`` for cross-domain cookies, or use ``None`` for a standard
+domain cookie.
+
+SESSION_COOKIE_NAME
+-------------------
+
+Default: ``'hotclub'``
+
+The name of the cookie to use for sessions. This can be whatever you want.
+
+``'hotclub'`` is a reference to the Hot Club of France, the band Django
+Reinhardt played in.
+
+.. _Django settings: http://www.djangoproject.com/documentation/settings/
+
 Technical details
 =================
 
@@ -170,3 +203,12 @@ Technical details
       data, it won't send a session cookie.
 
 .. _`the pickle module`: http://www.python.org/doc/current/lib/module-pickle.html
+
+Session IDs in URLs
+===================
+
+The Django sessions framework is entirely, and solely, cookie-based. It does
+not fall back to putting session IDs in URLs as a last resort, as PHP does.
+This is an intentional design decision. Not only does that behavior make URLs
+ugly, it makes your site vulnerable to session-ID theft via the "Referer"
+header.
