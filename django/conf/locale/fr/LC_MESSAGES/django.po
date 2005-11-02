@@ -147,7 +147,7 @@ msgid ""
 "types of objects:"
 msgstr ""
 "Supprimer %(object_name)s '%(object)s' provoquerait la suppression des "
-"objets qui lui sont liés mais votre compte ne possède pas la permissions de "
+"objets qui lui sont liés mais votre compte ne possède pas la permission de "
 "supprimer les types d'objets suivants:"
 
 #: contrib/admin/templates/admin/delete_confirmation.html:13
@@ -205,7 +205,7 @@ msgstr "Réinitialiser mon mot de passe"
 
 #: contrib/admin/templates/registration/logged_out.html:7
 msgid "Thanks for spending some quality time with the Web site today."
-msgstr "Merci pour le temps que vous avez accordez au site aujourd'hui."
+msgstr "Merci pour le temps que vous avez accordé au site aujourd'hui."
 
 #: contrib/admin/templates/registration/logged_out.html:9
 msgid "Log in again"
@@ -471,14 +471,14 @@ msgstr ""
 
 #: models/core.py:64
 msgid "redirect to"
-msgstr "redirigé depuis"
+msgstr "redirigé vers"
 
 #: models/core.py:65
 msgid ""
 "This can be either an absolute path (as above) or a full URL starting with "
 "'http://'."
 msgstr ""
-"Ceci peut être soit un chemin absolu (voir ci-dessus) ou une URL complète "
+"Ceci peut être soit un chemin absolu (voir ci-dessus) soit une URL complète "
 "débutant par 'http://'."
 
 #: models/core.py:67
@@ -694,7 +694,7 @@ msgstr "Serbe"
 
 #: conf/global_settings.py:46
 msgid "Czech"
-msgstr ""
+msgstr "Tchèque"
 
 #: core/validators.py:58
 msgid "This value must contain only letters, numbers and underscores."
@@ -761,7 +761,7 @@ msgstr "Entrez une date et une heure valide au format AAAA-MM-JJ HH:MM."
 
 #: core/validators.py:137
 msgid "Enter a valid e-mail address."
-msgstr "Entrez un adresse de courriel valide."
+msgstr "Entrez une adresse de courriel valide."
 
 #: core/validators.py:149
 msgid ""
