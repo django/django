@@ -155,21 +155,34 @@ is a list of tuples where the first element is the language code and the
 second element is the language name (in that language). The code might
 look like this::
 
-    <form method="POST">
-    <select name="django_language">
+    <form action="/i18n/setlang/" method="POST">
+    <input name="next" type="hidden" value="http://server.doma.in/path/to/go/to/after/switch/"/>
+    <select name="language">
     {% for lang in LANGUAGES %}
     <option value="{{ lang.0 }}">{{ lang.1 }}</option>
     {% endfor %}
     </select>
     </form>
 
-This would jump to the same page you came from and pass the django_language
-variable. This is used in discovery of languages, as described in the next
-chapter. Of course this can only work if your rendering context contains
-the LANGUAGE_CODE and LANGUAGES variables. If you use DjangoContext as
-your rendering context, they are automatically defined. If you use the
-simpler Context class, you need to pass them along from request.LANGUAGE_CODE
-and settings.LANGUAGES themselve.
+This would jump to a language switcher and then be redirected back to the
+page it came from. The switcher page will just store the language in either
+the users session or a special cookie for use in the language discovery.
+
+You can leave out the "next" field. In that case the /i18n/setlang/ view
+will redirect to the URL that is in the "Referer" header. Please keep in mind
+that people might suppress that header, so in those cases there won't be a
+URL to redirect to - in those cases the view function will redirect to "/"
+as a fallback.
+
+The /i18n/setlang/ url can be set up by including the following in your
+ROOT_URLCONF::
+
+    urlpatterns = patterns('',
+        (r'^i18n/', include('django.conf.urls.i18n'),
+    )
+
+This adds the setlang handler to your urlspace and hooks up a standard view
+function to it.
 
 How the Language is Discovered
 ==============================
@@ -206,20 +219,11 @@ from the admin.py settings file).
 The LocaleMiddleware allows a selection of the language based on data from
 the request - every user can have her own settings.
 
-The first thing the LocaleMiddleware does, is looking at the GET and POST
-data. If it finds a django_language variable there (if both have one, the
-one from GET will succeed), this language will be stored in the session
-(if sessions are used in your site) or in a cookie (if you don't use
-sessions). And it will be the selected langauge, of course. That way
-you can provide simple language switches by creating either a link with
-language (linked from country flags for example) or by giving the user some
-language selector like in the previous chapter.
-
-If neither GET nor POST have django_language, the middleware looks at the
-session data for the user. If that carries a key django_language, it's contents
-will be used as the language code. If the session doesn't contain a language
-setting, the middleware will look at the cookies for a django_language cookie.
-If that is found, it gives the language code.
+The first thing the LocaleMiddleware does, it looks at the session data for the
+user. If that carries a key django_language, it's contents will be used as the
+language code. If the session doesn't contain a language setting, the
+middleware will look at the cookies for a django_language cookie.  If that is
+found, it gives the language code.
 
 The format for the explicit django_language parameters is allways the
 language to use - for example it's pt-br for Brazilian. If a base language

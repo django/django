@@ -258,6 +258,9 @@ TEMPLATE_TESTS = {
 
     # translation of a variable with a non-translated filter
     'i18n14': ('{{ bool|yesno:"ja,nein" }}', {'bool': True}, 'ja'),
+
+    # usage of the get_available_languages tag
+    'i18n15': ('{% get_available_languages as langs %}{% for lang in langs %}{% ifequal lang.0 "de" %}{{ lang.0 }}{% endifequal %}{% endfor %}', {}, 'de'),
 }
 
 def test_template_loader(template_name, template_dirs=None):
@@ -277,7 +280,7 @@ def run_tests(verbosity=0, standalone=False):
     tests.sort()
     for name, vals in tests:
         if 'LANGUAGE_CODE' in vals[1]:
-            activate('*', vals[1]['LANGUAGE_CODE'])
+            activate(vals[1]['LANGUAGE_CODE'])
         try:
             output = loader.get_template(name).render(template.Context(vals[1]))
         except Exception, e:
