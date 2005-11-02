@@ -27,7 +27,10 @@ def floatformat(text, _):
     Displays a floating point number as 34.2 (with one decimal place) -- but
     only if there's a point to be displayed
     """
-    f = float(text)
+    try:
+        f = float(text)
+    except ValueError:
+        return ''
     m = f - int(f)
     if m:
         return '%.1f' % f
