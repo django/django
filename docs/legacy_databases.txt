@@ -75,7 +75,6 @@ following names:
     * ``auth_groups``
     * ``auth_users``
     * ``auth_messages``
-    * ``auth_admin_log``
     * ``auth_groups_permissions``
     * ``auth_users_groups``
     * ``auth_users_user_permissions``
