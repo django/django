@@ -290,6 +290,16 @@ class WidthRatioNode(Node):
             return ''
         return str(int(round(ratio)))
 
+class GetAvailableLanguagesNode(Node):
+
+    def __init__(self, variable):
+        self.variable = variable
+
+    def render(self, context):
+        from django.conf.settings import LANGUAGES
+        context[self.variable] = LANGUAGES
+        return ''
+
 class I18NNode(Node):
 
     def __init__(self, cmd):
@@ -803,6 +813,28 @@ def do_widthratio(parser, token):
         raise TemplateSyntaxError("widthratio final argument must be an integer")
     return WidthRatioNode(this_value_var, max_value_var, max_width)
 
+def do_get_available_languages(parser, token):
+    """
+    This will store a list of available languages
+    in the context.
+
+    Usage is as follows::
+
+        {% get_available_languages as languages %}
+        {% for language in languages %}
+        ...
+        {% endfor %}
+
+    This will just pull the LANGUAGES setting from
+    your setting file (or the default settings) and
+    put it into the named variable.
+    """
+
+    args = token.contents.split()
+    if len(args) != 3 or args[1] != 'as':
+        raise template.TemplateSyntaxError("'get_available_languages' requires 'as variable' (got %r)" % args)
+    return GetAvailableLanguagesNode(args[2])
+
 def do_i18n(parser, token):
     """
     translate a given string with the current
@@ -837,3 +869,4 @@ register_tag('now', do_now)
 register_tag('templatetag', do_templatetag)
 register_tag('widthratio', do_widthratio)
 register_tag('i18n', do_i18n)
+register_tag('get_available_languages', do_get_available_languages)

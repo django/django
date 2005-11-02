@@ -274,6 +274,19 @@ def ngettext(singular, plural, number):
 gettext_lazy = lazy(gettext, str)
 ngettext_lazy = lazy(ngettext, str)
 
+def check_for_language(lang_code):
+    """
+    This function checks wether there is a global language
+    file for the given language code. This is used to decide
+    wether a user-provided language is available.
+    """
+    from django.conf import settings
+    globalpath = os.path.join(os.path.dirname(settings.__file__), 'locale')
+    if gettext_module.find('django', globalpath, [to_locale(lang_code)]) is not None:
+        return True
+    else:
+        return False
+
 def get_language_from_request(request):
     """
     analyze the request to find what language the user
@@ -284,29 +297,14 @@ def get_language_from_request(request):
     from django.conf import settings
     globalpath = os.path.join(os.path.dirname(settings.__file__), 'locale')
 
-    if request.GET or request.POST:
-        lang_code = request.GET.get('django_language', None) or request.POST.get('django_language', None)
-        if lang_code is not None:
-            lang = gettext_module.find('django', globalpath, [to_locale(lang_code)])
-            if lang is not None:
-                if hasattr(request, 'session'):
-                    request.session['django_language'] = lang_code
-                else:
-                    request.set_cookie('django_language', lang_code)
-                return lang_code
-
     if hasattr(request, 'session'):
         lang_code = request.session.get('django_language', None)
-        if lang_code is not None:
-            lang = gettext_module.find('django', globalpath, [to_locale(lang_code)])
-            if lang is not None:
-                return lang_code
+        if lang_code is not None and check_for_language(lang_code):
+            return lang_code
     
     lang_code = request.COOKIES.get('django_language', None)
-    if lang_code is not None:
-        lang = gettext_module.find('django', globalpath, [to_locale(lang_code)])
-        if lang is not None:
-            return lang_code
+    if lang_code is not None and check_for_language(lang_code):
+        return lang_code
     
     accept = request.META.get('HTTP_ACCEPT_LANGUAGE', None)
     if accept is not None:
