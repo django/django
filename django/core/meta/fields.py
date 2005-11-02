@@ -196,11 +196,11 @@ class Field(object):
         if self.maxlength and not self.choices: # Don't give SelectFields a maxlength parameter.
             params['maxlength'] = self.maxlength
         if isinstance(self.rel, ManyToOne):
-            params['member_name'] = name_prefix + self.get_db_column()
             if self.rel.raw_id_admin:
                 field_objs = self.get_manipulator_field_objs()
                 params['validator_list'].append(curry(manipulator_valid_rel_key, self, manipulator))
             else:
+                params['member_name'] = name_prefix + self.get_db_column()
                 if self.radio_admin:
                     field_objs = [formfields.RadioSelectField]
                     params['ul_class'] = get_ul_class(self.radio_admin)
