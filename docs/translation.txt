@@ -96,8 +96,8 @@ If you don't like the verbose name ``gettext_lazy``, you can just alias it as
 
 Always use lazy translations in Django models. And it's a good idea to add
 translations for the field names and table names, too. This means writing
-explicit verbose_name and verbose_names options in the ``META`` class,
-though::
+explicit ``verbose_name`` and ``verbose_name_plural`` options in the ``META``
+class, though::
 
     from django.utils.translation import gettext_lazy as _
 
