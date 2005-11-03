@@ -22,19 +22,19 @@ from django.conf import settings
 from django.core.cache import cache
 
 cc_delim_re = re.compile(r'\s*,\s*')
+
 def patch_cache_control(response, **kwargs):
     """
     This function patches the Cache-Control header by adding all
     keyword arguments to it. The transformation is as follows:
 
-    - all keyword parameter names are turned to lowercase and
-      all _ will be translated to -
-    - if the value of a parameter is True (exatly True, not just a
-      true value), only the parameter name is added to the header
-    - all other parameters are added with their value, after applying
-      str to it.
+    * All keyword parameter names are turned to lowercase, and underscores
+      are converted to hyphens.
+    * If the value of a parameter is True (exactly True, not just a
+      true value), only the parameter name is added to the header.
+    * All other parameters are added with their value, after applying
+      str() to it.
     """
-
     def dictitem(s):
         t = s.split('=',1)
         if len(t) > 1:

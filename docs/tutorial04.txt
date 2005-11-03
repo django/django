@@ -213,6 +213,9 @@ The generic views pass ``object`` and ``object_list`` to their templates, so
 change your templates so that ``latest_poll_list`` becomes ``object_list`` and
 ``poll`` becomes ``object``.
 
+In the ``vote()`` view, change the template call from ``polls/detail`` to
+``polls/polls_detail``, and pass ``object`` in the context instead of ``poll``.
+
 Finally, you can delete the ``index()``, ``detail()`` and ``results()`` views
 from ``polls/views/polls.py``. We don't need them anymore.
 
