@@ -172,6 +172,16 @@ two tags::
 All tags live in the ``i18n`` tag library, so you need to specify
 ``{% load i18n %}`` in the head of your template to make use of them.
 
+There are some places where you will encounter constant strings in your template code.
+One is filter arguments, the other are normal string constants for tags. If you need to
+translate those, you can use the ``_("....")`` syntax::
+
+    {% some_special_tag _("Page not found") value|yesno:_("yes,no") %}
+
+In this case both the filter and the tag will see the already translated string, so they
+don't need to be aware of translations. And both strings will be pulled out of the templates
+for translation and stored in the .po files.
+
 The ``setlang`` redirect view
 -----------------------------
 

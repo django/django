@@ -364,6 +364,7 @@ inline_re = re.compile(r"""^\s*trans\s+((?:".*?")|(?:'.*?'))\s*""")
 block_re = re.compile(r"""^\s*blocktrans(?:\s+|$)""")
 endblock_re = re.compile(r"""^\s*endblocktrans$""")
 plural_re = re.compile(r"""^\s*plural$""")
+constant_re = re.compile(r"""_\(((?:".*?")|(?:'.*?'))\)""")
 def templateize(src):
     from django.core.template import tokenize, TOKEN_TEXT, TOKEN_VAR, TOKEN_BLOCK
     """
@@ -414,6 +415,7 @@ def templateize(src):
             if t.token_type == TOKEN_BLOCK:
                 imatch = inline_re.match(t.contents)
                 bmatch = block_re.match(t.contents)
+                cmatches = constant_re.findall(t.contents)
                 if imatch:
                     g = imatch.group(1)
                     if g[0] == '"': g = g.strip('"')
@@ -424,11 +426,17 @@ def templateize(src):
                     inplural = False
                     singular = []
                     plural = []
+                elif cmatches:
+                    for cmatch in cmatches:
+                        out.write(' _(%s) ' % cmatch)
                 else:
                     out.write(blankout(t.contents, 'B'))
             elif t.token_type == TOKEN_VAR:
                 parts = t.contents.split('|')
-                for p in parts:
+                cmatch = constant_re.match(parts[0])
+                if cmatch:
+                    out.write(' _(%s) ' % cmatch.group(1))
+                for p in parts[1:]:
                     if p.find(':_(') >= 0:
                         out.write(' %s ' % p.split(':',1)[1])
                     else:
