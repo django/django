@@ -5,6 +5,8 @@ import os
 import sys
 import getopt
 
+from django.utils.translation import templateize
+
 localedir = None
 
 if os.path.isdir(os.path.join('conf', 'locale')):
@@ -43,29 +45,6 @@ if lang is not None:
     languages.append(lang)
 elif all:
     languages = [el for el in os.listdir(localedir) if not el.startswith('.')]
-
-dot_re = re.compile('\S')
-def blank(src):
-    return dot_re.sub('p', src)
-
-def templateize(src):
-    o = []
-    going = 1
-    while going:
-        start = src.find('{')
-        if start >= 0 and src[start+1] in ('{', '%'):
-            o.append(blank(src[:start]))
-            end = src.find(src[start+1] == '{' and '}}' or '%}', start)
-            if end >= 0:
-                o.append(src[start:end+2])
-                src = src[end+2:]
-            else:
-                o.append(blank(src[start:]))
-                going = 0
-        else:
-            o.append(blank(src))
-            going = 0
-    return ''.join(o)
 
 for lang in languages:
 
