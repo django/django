@@ -218,49 +218,40 @@ TEMPLATE_TESTS = {
     'exception04': ("{% extends 'inheritance17' %}{% block first %}{% echo 400 %}5678{% endblock %}", {}, template.TemplateSyntaxError),
 
     # simple translation of a string delimited by '
-    'i18n01': ("{% i18n _('xxxyyyxxx') %}", {}, "xxxyyyxxx"),
+    'i18n01': ("{% load i18n %}{% trans 'xxxyyyxxx' %}", {}, "xxxyyyxxx"),
 
     # simple translation of a string delimited by "
-    'i18n02': ('{% i18n _("xxxyyyxxx") %}', {}, "xxxyyyxxx"),
-
-    # simple translation of a string delimited by """
-    'i18n03': ('{% i18n _("""xxxyyyxxx""") %}', {}, "xxxyyyxxx"),
+    'i18n02': ('{% load i18n %}{% trans "xxxyyyxxx" %}', {}, "xxxyyyxxx"),
 
     # simple translation of a variable
-    'i18n04': ('{% i18n _(anton) %}', {'anton': 'xxxyyyxxx'}, "xxxyyyxxx"),
+    'i18n03': ('{% load i18n %}{% blocktrans %}{{ anton }}{% endblocktrans %}', {'anton': 'xxxyyyxxx'}, "xxxyyyxxx"),
 
-    # simple translation of a variable
-    'i18n05': ('{% i18n _(anton|lower) %}', {'anton': 'XXXYYYXXX'}, "xxxyyyxxx"),
+    # simple translation of a variable and filter
+    'i18n04': ('{% load i18n %}{% blocktrans with anton|lower as berta %}{{ berta }}{% endblocktrans %}', {'anton': 'XXXYYYXXX'}, "xxxyyyxxx"),
 
     # simple translation of a string with interpolation
-    'i18n05': ('{% i18n _("xxx%(anton)sxxx") %}', {'anton': 'yyy'}, "xxxyyyxxx"),
+    'i18n05': ('{% load i18n %}{% blocktrans %}xxx{{ anton }}xxx{% endblocktrans %}', {'anton': 'yyy'}, "xxxyyyxxx"),
 
     # simple translation of a string to german
-    'i18n07': ('{% i18n _("Page not found") %}', {'LANGUAGE_CODE': 'de'}, "Seite nicht gefunden"),
+    'i18n06': ('{% load i18n %}{% trans "Page not found" %}', {'LANGUAGE_CODE': 'de'}, "Seite nicht gefunden"),
 
     # translation of singular form
-    'i18n08': ('{% i18n ngettext("singular", "plural", count) %}', {'count': 1}, "singular"),
+    'i18n07': ('{% load i18n %}{% blocktrans count number as counter %}singular{% plural %}plural{% endblocktrans %}', {'number': 1}, "singular"),
 
     # translation of plural form
-    'i18n09': ('{% i18n ngettext("singular", "plural", count) %}', {'count': 2}, "plural"),
+    'i18n08': ('{% load i18n %}{% blocktrans count number as counter %}singular{% plural %}plural{% endblocktrans %}', {'number': 2}, "plural"),
 
     # simple non-translation (only marking) of a string to german
-    'i18n10': ('{% i18n gettext_noop("Page not found") %}', {'LANGUAGE_CODE': 'de'}, "Page not found"),
-
-    # translation of string without i18n tag
-    'i18n11': ('{{ _("blah") }}', {}, "blah"),
-
-    # translation of string without i18n tag but with interpolation
-    'i18n12': ('{{ _("blah%(anton)s") }}', {'anton': 'blubb'}, "blahblubb"),
+    'i18n09': ('{% load i18n %}{% trans "Page not found" noop %}', {'LANGUAGE_CODE': 'de'}, "Page not found"),
 
     # translation of a variable with a translated filter
-    'i18n13': ('{{ bool|yesno:_("ja,nein") }}', {'bool': True}, 'ja'),
+    'i18n10': ('{{ bool|yesno:_("ja,nein") }}', {'bool': True}, 'ja'),
 
     # translation of a variable with a non-translated filter
-    'i18n14': ('{{ bool|yesno:"ja,nein" }}', {'bool': True}, 'ja'),
+    'i18n11': ('{{ bool|yesno:"ja,nein" }}', {'bool': True}, 'ja'),
 
     # usage of the get_available_languages tag
-    'i18n15': ('{% get_available_languages as langs %}{% for lang in langs %}{% ifequal lang.0 "de" %}{{ lang.0 }}{% endifequal %}{% endfor %}', {}, 'de'),
+    'i18n12': ('{% load i18n %}{% get_available_languages as langs %}{% for lang in langs %}{% ifequal lang.0 "de" %}{{ lang.0 }}{% endifequal %}{% endfor %}', {}, 'de'),
 }
 
 def test_template_loader(template_name, template_dirs=None):

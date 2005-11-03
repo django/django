@@ -18,7 +18,7 @@ class GetAvailableLanguagesNode(Node):
         context[self.variable] = LANGUAGES
         return ''
 
-class GetCurrentLanguage(Node):
+class GetCurrentLanguageNode(Node):
 
     def __init__(self, variable):
         self.variable = variable
@@ -112,7 +112,7 @@ def do_get_current_language(parser, token):
     args = token.contents.split()
     if len(args) != 3 or args[1] != 'as':
         raise TemplateSyntaxError, "'get_available_languages' requires 'as variable' (got %r)" % args
-    return GetAvailableLanguagesNode(args[2])
+    return GetCurrentLanguageNode(args[2])
 
 def do_translate(parser, token):
     """
@@ -144,14 +144,21 @@ def do_translate(parser, token):
     the variable ``variable``. Make sure that the string
     in there is something that is in the .po file.
     """
-    args = token.contents.split(None, 1)
-    p = args[1].rfind(' ')
-    noop = False
-    value = ''
-    if p >= 0 and args[1][p:].strip() == 'noop':
-        value = args[1][:p].strip()
-    else:
-        value = args[1]
+
+    class TranslateParser(TokenParser):
+
+        def top(self):
+            value = self.value()
+            if self.more():
+                if self.tag() == 'noop':
+                    noop = True
+                else:
+                    raise TemplateSyntaxError, "only option for 'trans' is 'noop'"
+            else:
+                noop = False
+            return (value, noop)
+
+    (value, noop) = TranslateParser(token.contents).top()
     return TranslateNode(value, noop)
 
 def do_block_translate(parser, token):
@@ -189,7 +196,7 @@ def do_block_translate(parser, token):
             singular.append(token)
         else:
             break
-    if countervar and counter:  
+    if countervar and counter:
         if token.contents.strip() != 'plural':
             raise TemplateSyntaxError, "'blocktrans' doesn't allow other block tags inside it" % tag
         while parser.tokens:
@@ -200,11 +207,11 @@ def do_block_translate(parser, token):
                 break
     if token.contents.strip() != 'endblocktrans':
         raise TemplateSyntaxError, "'blocktrans' doesn't allow other block tags (seen %r) inside it" % token.contents
-    
+
     return BlockTranslateNode(extra_context, singular, plural, countervar, counter)
 
 register_tag('get_available_languages', do_get_available_languages)
-register_tag('get_curent_language', do_get_current_language)
+register_tag('get_current_language', do_get_current_language)
 register_tag('trans', do_translate)
 register_tag('blocktrans', do_block_translate)
 

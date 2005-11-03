@@ -290,63 +290,6 @@ class WidthRatioNode(Node):
             return ''
         return str(int(round(ratio)))
 
-class GetAvailableLanguagesNode(Node):
-
-    def __init__(self, variable):
-        self.variable = variable
-
-    def render(self, context):
-        from django.conf.settings import LANGUAGES
-        context[self.variable] = LANGUAGES
-        return ''
-
-class I18NNode(Node):
-
-    def __init__(self, cmd):
-        self.cmd = cmd
-        self.i18n_re = re.compile(r'^\s*(_|gettext|gettext_noop)\((.*)\)\s*$')
-        self.ngettext_re = re.compile(r'''^\s*ngettext\(((?:".+")|(?:'.+')|(?:""".+"""))\s*,\s*((?:".+")|(?:'.+')|(?:""".+"""))\s*,\s*(.*)\)\s*$''')
-
-    def _resolve_var(self, s, context):
-        if s.startswith("'") and s.endswith("'"):
-            s = s[1:-1]
-        elif s.startswith('"""') and s.endswith('"""'):
-            s = s[3:-3]
-        elif s.startswith('"') and s.endswith('"'):
-            s = s[1:-1]
-        else:
-            s = resolve_variable_with_filters(s, context)
-        return s
-
-    def render(self, context):
-        m = self.i18n_re.match(self.cmd)
-        if m:
-            f = m.group(1)
-            s = self._resolve_var(m.group(2), context)
-            if f in ('_', 'gettext'):
-                return translation.gettext(s) % context
-            elif f == 'gettext_noop':
-                return translation.gettext_noop(s) % context
-            else:
-                raise TemplateSyntaxError("i18n only supports _, gettext, gettext_noop and ngettext as functions, not %s" % f)
-        m = self.ngettext_re.match(self.cmd)
-        if m:
-            singular = self._resolve_var(m.group(1), context)
-            plural = self._resolve_var(m.group(2), context)
-            var = resolve_variable_with_filters(m.group(3), context)
-            return translation.ngettext(singular, plural, var) % context
-        raise TemplateSyntaxError("i18n must be called as {% i18n _('some message') %} or {% i18n ngettext('singular', 'plural', var) %}")
-
-        cyclevars = [v for v in args[1].split(",") if v]    # split and kill blanks
-        name = args[3]
-        node = CycleNode(cyclevars)
-
-        if not hasattr(parser, '_namedCycleNodes'):
-            parser._namedCycleNodes = {}
-
-        parser._namedCycleNodes[name] = node
-        return node
-
 def do_comment(parser, token):
     """
     Ignore everything between ``{% comment %}`` and ``{% endcomment %}``
@@ -813,45 +756,6 @@ def do_widthratio(parser, token):
         raise TemplateSyntaxError("widthratio final argument must be an integer")
     return WidthRatioNode(this_value_var, max_value_var, max_width)
 
-def do_get_available_languages(parser, token):
-    """
-    This will store a list of available languages
-    in the context.
-
-    Usage is as follows::
-
-        {% get_available_languages as languages %}
-        {% for language in languages %}
-        ...
-        {% endfor %}
-
-    This will just pull the LANGUAGES setting from
-    your setting file (or the default settings) and
-    put it into the named variable.
-    """
-
-    args = token.contents.split()
-    if len(args) != 3 or args[1] != 'as':
-        raise template.TemplateSyntaxError("'get_available_languages' requires 'as variable' (got %r)" % args)
-    return GetAvailableLanguagesNode(args[2])
-
-def do_i18n(parser, token):
-    """
-    translate a given string with the current
-    translation object.
-
-    For example::
-
-        {% i18n _('test') %}
-        {% i18n ngettext('singular', 'plural', counter) %}
-
-    """
-    args = token.contents.split(' ', 1)
-    if len(args) != 2:
-        raise template.TemplateSyntaxError("'i18n' requires one argument (got %r)" % args)
-
-    return I18NNode(args[1].strip())
-
 register_tag('comment', do_comment)
 register_tag('cycle', do_cycle)
 register_tag('debug', do_debug)
@@ -868,5 +772,3 @@ register_tag('load', do_load)
 register_tag('now', do_now)
 register_tag('templatetag', do_templatetag)
 register_tag('widthratio', do_widthratio)
-register_tag('i18n', do_i18n)
-register_tag('get_available_languages', do_get_available_languages)
