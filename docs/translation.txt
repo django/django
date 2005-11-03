@@ -120,45 +120,41 @@ A standard problem with translations is pluralization of strings. Use
 Using translations in templates
 ===============================
 
-Using translations in Django templates works much like translations in Python
-code. The ``{% i18n %}`` template tag lets you use the same ``_()`` helper
-function as in your Python code::
+Using translations in Django templates uses two template tags and a slightly
+different syntax than standard gettext. The ``{% trans %}`` template tag
+translates a constant string or a variable content::
 
-    <html>
-    <title>{% i18n _('This is the title.') %}</title>
-    <body>
-    <p>{% i18n _('Hello %(name)s, welcome at %(site)s!') %}</p>
-    <p>{% i18n ngettext('There is %(count)d file', 'There are %(count)d files', files|count) %}</p>
-    </body>
-    </html>
+    <title>{% trans 'This is the title.' %}</title>
 
-It's not only possible to translate hard-coded strings, but the strings can
-contain interpolated parts, e.g. ``%(name)s``. Those parts are automatically
-resolved from the template context, just as they would be if you had used them
-in ``{{ ... }}``. But this can only resolve variables, not more complex
-expressions.
+If you only want to mark some value for translation, but translate it
+later from a variable, use the ``noop`` option::
 
-To translate a variable value, do this::
+    <input name="field" value="{% trans "value" noop %}"/>
 
-    {% i18n _(variable) %}
+It is not possible to use variables in this constant string. If you
+have variables you need to put in your translations, you have to use the
+``{% blocktrans %}`` tag::
 
-Filters are allowed, too::
+    {% blocktrans %}This will have {{ value }} inside{% endblocktrans %}
 
-    {% i18n _(variable|lower) %}
+If your expressions are more complex (like you need to have filters applied),
+you need to bind them to local variables for the translation block::
 
-Any template tag that resolves variables accepts i18n-string constants, too.
+    {% blocktrans with value|filter as variable %}
+    This will have {{ value }} inside
+    {% endblocktrans %}
 
-Also, note you can use ``_()`` around variable names, like so::
+The last variant is the pluralization form: you need to specify both the singular
+and plural sentence with intersparsed variables like this::
 
-    <html>
-    <title>{{ _('This is the title') }}</title>
-    <body>
-    <p>{{ _('Hello, world!') }}</p>
-    </body>
-    </html>
+    {% blocktrans count list|counted as counter %}
+    There is only one {{ name }} object.
+    {% plural %}
+    There are {{ counter }} {{ name }} objects.
+    {% endblocktrans %}
 
-This syntax is much shorter, but it doesn't allow you to use ``gettext_noop``
-or ``ngettext``.
+Internally all block translations and inline translations are translated into
+the actual gettext/ngettext call.
 
 Each ``DjangoContext`` has access to two translation-specific variables:
 
@@ -166,6 +162,15 @@ Each ``DjangoContext`` has access to two translation-specific variables:
       language code and the second is the language name (in that language).
     * ``LANGUAGE_CODE`` is the current user's preferred language, as a string.
       Example: ``en-us``. (See "How language preference is discovered", below.)
+
+If you don't use the ``DjangoContext`` extension, you can get those values with
+two tags::
+
+    {% get_current_language as LANGUAGE_CODE %}
+    {% get_available_languages as LANGUAGES %}
+
+All tags live in the ``i18n`` tag library, so you need to specify
+``{% load i18n %}`` in the head of your template to make use of them.
 
 The ``setlang`` redirect view
 -----------------------------
