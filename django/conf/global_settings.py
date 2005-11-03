@@ -34,16 +34,17 @@ LANGUAGE_CODE = 'en-us'
 # language name should be the utf-8 encoded local name for the
 # language.
 LANGUAGES = (
+    ('cs', _('Czech')),
     ('de', _('German')),
     ('en', _('English')),
     ('es', _('Spanish')),
     ('fr', _('French')),
     ('gl', _('Galician')),
     ('it', _('Italian')),
-    ('pt_BR', _('Brazilian')),
+    ('pt-br', _('Brazilian')),
     ('ru', _('Russian')),
-    ('sr', _('Serbic')),
-    ('cs', _('Czech')),
+    ('sr', _('Serbian')),
+    ('zh-cn', _('Traditional Chinese')),
 )
 
 # Not-necessarily-technical managers of the site. They get broken link
