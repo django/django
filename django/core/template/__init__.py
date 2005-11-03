@@ -348,7 +348,7 @@ class FilterParser:
         self.current_filter_arg = None
         # First read the variable part - decide on wether we need
         # to parse a string or a variable by peeking into the stream
-        if self.peek_char() in ('"', "'"):
+        if self.peek_char() in ('_', '"', "'"):
             self.var = self.read_constant_string_token()
         else:
             self.var = self.read_alphanumeric_token()
@@ -382,7 +382,14 @@ class FilterParser:
         or ' characters. The string is returned with it's delimiters."""
         val = ''
         qchar = None
+        i18n = False
         self.next_char()
+        if self.current == '_':
+            i18n = True
+            self.next_char() 
+            if self.current != '(':
+                raise TemplateSyntaxError, "Bad character (expecting '(') '%s'" % self.current
+            self.next_char()
         if not self.current in ('"', "'"):
             raise TemplateSyntaxError, "Bad character (expecting '\"' or ''') '%s'" % self.current
         qchar = self.current
@@ -394,6 +401,11 @@ class FilterParser:
            val += self.current
         val += self.current
         self.next_char()
+        if i18n:
+            if self.current != ')':
+                raise TemplateSyntaxError, "Bad character (expecting ')') '%s'" % self.current
+            self.next_char()
+            val = qchar+_(val.strip(qchar))+qchar
         return val
 
     def read_alphanumeric_token(self):

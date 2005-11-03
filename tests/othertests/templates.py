@@ -252,6 +252,9 @@ TEMPLATE_TESTS = {
 
     # usage of the get_available_languages tag
     'i18n12': ('{% load i18n %}{% get_available_languages as langs %}{% for lang in langs %}{% ifequal lang.0 "de" %}{{ lang.0 }}{% endifequal %}{% endfor %}', {}, 'de'),
+
+    # translation of a constant string
+    'i18n13': ('{{ _("Page not found") }}', {'LANGUAGE_CODE': 'de'}, 'Seite nicht gefunden'),
 }
 
 def test_template_loader(template_name, template_dirs=None):
