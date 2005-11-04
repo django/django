@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2005-11-03 12:26+0100\n"
+"POT-Creation-Date: 2005-11-04 08:50-0600\n"
 "PO-Revision-Date: 2005-10-18 12:27+0200\n"
 "Last-Translator: Laurent Rahuel <laurent.rahuel@gmail.com>\n"
 "Language-Team: français <fr@li.org>\n"
@@ -15,16 +15,59 @@ msgstr ""
 "Content-Type: text/plain; charset=ISO-8859-1\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: contrib/admin/templates/admin/object_history.html:5
-#: contrib/admin/templates/admin/500.html:4
+#: contrib/admin/templates/admin/base.html:23
+msgid "Welcome,"
+msgstr "Bienvenue,"
+
+#: contrib/admin/templates/admin/base.html:23
+msgid "Change password"
+msgstr "Modifier votre mot de passe"
+
+#: contrib/admin/templates/admin/base.html:23
+msgid "Log out"
+msgstr "Déconnection"
+
 #: contrib/admin/templates/admin/base.html:29
-#: contrib/admin/templates/registration/password_change_done.html:4
-#: contrib/admin/templates/registration/password_reset_form.html:4
+#: contrib/admin/templates/admin/500.html:4
+#: contrib/admin/templates/admin/object_history.html:5
 #: contrib/admin/templates/registration/logged_out.html:4
-#: contrib/admin/templates/registration/password_reset_done.html:4
+#: contrib/admin/templates/registration/password_change_done.html:4
 #: contrib/admin/templates/registration/password_change_form.html:4
+#: contrib/admin/templates/registration/password_reset_done.html:4
+#: contrib/admin/templates/registration/password_reset_form.html:4
 msgid "Home"
 msgstr "Accueil"
+
+#: contrib/admin/templates/admin/404.html:4
+#: contrib/admin/templates/admin/404.html:8
+msgid "Page not found"
+msgstr "Cette page n'a pas été trouvée"
+
+#: contrib/admin/templates/admin/404.html:10
+msgid "We're sorry, but the requested page could not be found."
+msgstr "Nous sommes désolés, mais la page demandée est introuvable."
+
+#: contrib/admin/templates/admin/500.html:4
+#, fuzzy
+msgid "Server error"
+msgstr "Erreur du serveur (500)"
+
+#: contrib/admin/templates/admin/500.html:6
+msgid "Server error (500)"
+msgstr "Erreur du serveur (500)"
+
+#: contrib/admin/templates/admin/500.html:9
+msgid "Server Error <em>(500)</em>"
+msgstr "Erreur du serveur <em>(500)</em>"
+
+#: contrib/admin/templates/admin/500.html:10
+msgid ""
+"There's been an error. It's been reported to the site administrators via e-"
+"mail and should be fixed shortly. Thanks for your patience."
+msgstr ""
+"Une erreur est survenue. Elle a été transmise par courriel aux "
+"administrateurs du site et sera corrigée dans les meilleurs délais. Merci "
+"pour votre patience."
 
 #: contrib/admin/templates/admin/object_history.html:5
 msgid "History"
@@ -62,36 +105,29 @@ msgstr "Site d'administration de Django"
 msgid "Django administration"
 msgstr "Administration de Django"
 
-#: contrib/admin/templates/admin/500.html:4
-#, fuzzy
-msgid "Server error"
-msgstr "Erreur du serveur (500)"
-
-#: contrib/admin/templates/admin/500.html:6
-msgid "Server error (500)"
-msgstr "Erreur du serveur (500)"
-
-#: contrib/admin/templates/admin/500.html:9
-msgid "Server Error <em>(500)</em>"
-msgstr "Erreur du serveur <em>(500)</em>"
-
-#: contrib/admin/templates/admin/500.html:10
+#: contrib/admin/templates/admin/delete_confirmation.html:7
+#, fuzzy, python-format
 msgid ""
-"There's been an error. It's been reported to the site administrators via e-"
-"mail and should be fixed shortly. Thanks for your patience."
+"Deleting the %(object_name)s '%(object)s' would result in deleting related "
+"objects, but your account doesn't have permission to delete the following "
+"types of objects:"
 msgstr ""
-"Une erreur est survenue. Elle a été transmise par courriel aux "
-"administrateurs du site et sera corrigée dans les meilleurs délais. Merci "
-"pour votre patience."
+"Supprimer %(object_name)s '%(object)s' provoquerait la suppression des "
+"objets qui lui sont liés mais votre compte ne possède pas la permission de "
+"supprimer les types d'objets suivants:"
 
-#: contrib/admin/templates/admin/404.html:4
-#: contrib/admin/templates/admin/404.html:8
-msgid "Page not found"
-msgstr "Cette page n'a pas été trouvée"
+#: contrib/admin/templates/admin/delete_confirmation.html:14
+#, python-format
+msgid ""
+"Are you sure you want to delete the %(object_name)s \"%(object)s\"? All of "
+"the following related items will be deleted:"
+msgstr ""
+"Êtes vous certain de vouloir supprimer %(object_name)s \"%(object)s\"? Tous "
+"les éléments liés suivants seront supprimés:"
 
-#: contrib/admin/templates/admin/404.html:10
-msgid "We're sorry, but the requested page could not be found."
-msgstr "Nous sommes désolés, mais la page demandée est introuvable."
+#: contrib/admin/templates/admin/delete_confirmation.html:18
+msgid "Yes, I'm sure"
+msgstr "Oui, je suis certain"
 
 #: contrib/admin/templates/admin/index.html:27
 msgid "Add"
@@ -133,41 +169,13 @@ msgstr "Avez vous <a href=\"/password_reset/\">perdu votre mot de passe</a>?"
 msgid "Log in"
 msgstr "Connectez vous"
 
-#: contrib/admin/templates/admin/base.html:23
-msgid "Welcome,"
-msgstr "Bienvenue,"
+#: contrib/admin/templates/registration/logged_out.html:8
+msgid "Thanks for spending some quality time with the Web site today."
+msgstr "Merci pour le temps que vous avez accordé au site aujourd'hui."
 
-#: contrib/admin/templates/admin/base.html:23
-msgid "Change password"
-msgstr "Modifier votre mot de passe"
-
-#: contrib/admin/templates/admin/base.html:23
-msgid "Log out"
-msgstr "Déconnection"
-
-#: contrib/admin/templates/admin/delete_confirmation.html:7
-#, fuzzy, python-format
-msgid ""
-"Deleting the %(object_name)s '%(object)s' would result in deleting related "
-"objects, but your account doesn't have permission to delete the following "
-"types of objects:"
-msgstr ""
-"Supprimer %(object_name)s '%(object)s' provoquerait la suppression des "
-"objets qui lui sont liés mais votre compte ne possède pas la permission de "
-"supprimer les types d'objets suivants:"
-
-#: contrib/admin/templates/admin/delete_confirmation.html:14
-#, python-format
-msgid ""
-"Are you sure you want to delete the %(object_name)s \"%(object)s\"? All of "
-"the following related items will be deleted:"
-msgstr ""
-"Êtes vous certain de vouloir supprimer %(object_name)s \"%(object)s\"? Tous "
-"les éléments liés suivants seront supprimés:"
-
-#: contrib/admin/templates/admin/delete_confirmation.html:18
-msgid "Yes, I'm sure"
-msgstr "Oui, je suis certain"
+#: contrib/admin/templates/registration/logged_out.html:10
+msgid "Log in again"
+msgstr "Connectez vous à nouveau"
 
 #: contrib/admin/templates/registration/password_change_done.html:4
 #: contrib/admin/templates/registration/password_change_form.html:4
@@ -184,50 +192,6 @@ msgstr "Mot de passe modifié avec succés"
 #: contrib/admin/templates/registration/password_change_done.html:12
 msgid "Your password was changed."
 msgstr "Votre mot de passe a été modifié."
-
-#: contrib/admin/templates/registration/password_reset_form.html:4
-#: contrib/admin/templates/registration/password_reset_form.html:6
-#: contrib/admin/templates/registration/password_reset_done.html:4
-msgid "Password reset"
-msgstr "Réinitialisation de votre mot de passe"
-
-#: contrib/admin/templates/registration/password_reset_form.html:12
-msgid ""
-"Forgotten your password? Enter your e-mail address below, and we'll reset "
-"your password and e-mail the new one to you."
-msgstr ""
-"Mot de passe perdu ? Saisissez votre adresse de courriel ci-dessous et nous "
-"annulerons votre mot de passe actuel avant de vous en faire parvenir un "
-"nouveau par courriel."
-
-#: contrib/admin/templates/registration/password_reset_form.html:16
-msgid "E-mail address:"
-msgstr "Courriel:"
-
-#: contrib/admin/templates/registration/password_reset_form.html:16
-msgid "Reset my password"
-msgstr "Réinitialiser mon mot de passe"
-
-#: contrib/admin/templates/registration/logged_out.html:8
-msgid "Thanks for spending some quality time with the Web site today."
-msgstr "Merci pour le temps que vous avez accordé au site aujourd'hui."
-
-#: contrib/admin/templates/registration/logged_out.html:10
-msgid "Log in again"
-msgstr "Connectez vous à nouveau"
-
-#: contrib/admin/templates/registration/password_reset_done.html:6
-#: contrib/admin/templates/registration/password_reset_done.html:10
-msgid "Password reset successful"
-msgstr "Mot de passe réinitialisé avec succés"
-
-#: contrib/admin/templates/registration/password_reset_done.html:12
-msgid ""
-"We've e-mailed a new password to the e-mail address you submitted. You "
-"should be receiving it shortly."
-msgstr ""
-"Nous vous avons envoyé par courriel un nouveau mot de passe. Vous devriez le "
-"recevoir rapidement."
 
 #: contrib/admin/templates/registration/password_change_form.html:12
 msgid ""
@@ -253,6 +217,25 @@ msgstr "Confirmation de votre nouveau mot de passe"
 #: contrib/admin/templates/registration/password_change_form.html:23
 msgid "Change my password"
 msgstr "Modifier mon mot de passe"
+
+#: contrib/admin/templates/registration/password_reset_done.html:4
+#: contrib/admin/templates/registration/password_reset_form.html:4
+#: contrib/admin/templates/registration/password_reset_form.html:6
+msgid "Password reset"
+msgstr "Réinitialisation de votre mot de passe"
+
+#: contrib/admin/templates/registration/password_reset_done.html:6
+#: contrib/admin/templates/registration/password_reset_done.html:10
+msgid "Password reset successful"
+msgstr "Mot de passe réinitialisé avec succés"
+
+#: contrib/admin/templates/registration/password_reset_done.html:12
+msgid ""
+"We've e-mailed a new password to the e-mail address you submitted. You "
+"should be receiving it shortly."
+msgstr ""
+"Nous vous avons envoyé par courriel un nouveau mot de passe. Vous devriez le "
+"recevoir rapidement."
 
 #: contrib/admin/templates/registration/password_reset_email.html:2
 msgid "You're receiving this e-mail because you requested a password reset"
@@ -285,6 +268,23 @@ msgstr "Merci d'utiliser notre site!"
 #, python-format
 msgid "The %(site_name)s team"
 msgstr "L'équipe %(site_name)s"
+
+#: contrib/admin/templates/registration/password_reset_form.html:12
+msgid ""
+"Forgotten your password? Enter your e-mail address below, and we'll reset "
+"your password and e-mail the new one to you."
+msgstr ""
+"Mot de passe perdu ? Saisissez votre adresse de courriel ci-dessous et nous "
+"annulerons votre mot de passe actuel avant de vous en faire parvenir un "
+"nouveau par courriel."
+
+#: contrib/admin/templates/registration/password_reset_form.html:16
+msgid "E-mail address:"
+msgstr "Courriel:"
+
+#: contrib/admin/templates/registration/password_reset_form.html:16
+msgid "Reset my password"
+msgstr "Réinitialiser mon mot de passe"
 
 #: contrib/admin/models/admin.py:6
 msgid "action time"
@@ -660,50 +660,50 @@ msgstr "Dates importantes"
 msgid "Message"
 msgstr "Message"
 
-#: conf/global_settings.py:37
+#: conf/global_settings.py:36
 msgid "Czech"
 msgstr "Tchèque"
 
-#: conf/global_settings.py:38
+#: conf/global_settings.py:37
 msgid "German"
 msgstr "Allemand"
 
-#: conf/global_settings.py:39
+#: conf/global_settings.py:38
 msgid "English"
 msgstr "Anglais"
 
-#: conf/global_settings.py:40
+#: conf/global_settings.py:39
 msgid "Spanish"
 msgstr "Espagnol"
 
-#: conf/global_settings.py:41
+#: conf/global_settings.py:40
 msgid "French"
 msgstr "Français"
 
-#: conf/global_settings.py:42
+#: conf/global_settings.py:41
 msgid "Galician"
 msgstr "Galicien"
 
-#: conf/global_settings.py:43
+#: conf/global_settings.py:42
 #, fuzzy
 msgid "Italian"
 msgstr "Italien"
 
-#: conf/global_settings.py:44
+#: conf/global_settings.py:43
 msgid "Brazilian"
 msgstr "Brésilien"
 
-#: conf/global_settings.py:45
+#: conf/global_settings.py:44
 msgid "Russian"
 msgstr "Russe"
 
-#: conf/global_settings.py:46
+#: conf/global_settings.py:45
 #, fuzzy
 msgid "Serbian"
 msgstr "Serbe"
 
-#: conf/global_settings.py:47
-msgid "Traditional Chinese"
+#: conf/global_settings.py:46
+msgid "Simplified Chinese"
 msgstr ""
 
 #: core/validators.py:58

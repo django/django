@@ -30,9 +30,8 @@ TIME_ZONE = 'America/Chicago'
 # http://blogs.law.harvard.edu/tech/stories/storyReader$15
 LANGUAGE_CODE = 'en-us'
 
-# Languages we provide translations for out of the base. The
-# language name should be the utf-8 encoded local name for the
-# language.
+# Languages we provide translations for, out of the box. The language name
+# should be the utf-8 encoded local name for the language.
 LANGUAGES = (
     ('cs', _('Czech')),
     ('de', _('German')),
@@ -44,7 +43,7 @@ LANGUAGES = (
     ('pt-br', _('Brazilian')),
     ('ru', _('Russian')),
     ('sr', _('Serbian')),
-    ('zh-cn', _('Traditional Chinese')),
+    ('zh-cn', _('Simplified Chinese')),
 )
 
 # Not-necessarily-technical managers of the site. They get broken link
