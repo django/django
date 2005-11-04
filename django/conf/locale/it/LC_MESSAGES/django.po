@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2005-11-04 08:50-0600\n"
+"POT-Creation-Date: 2005-11-04 09:29-0600\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -682,19 +682,23 @@ msgid "Italian"
 msgstr "Italiano"
 
 #: conf/global_settings.py:43
+msgid "Norwegian"
+msgstr ""
+
+#: conf/global_settings.py:44
 msgid "Brazilian"
 msgstr "Brasiliano"
 
-#: conf/global_settings.py:44
+#: conf/global_settings.py:45
 msgid "Russian"
 msgstr "Russo"
 
-#: conf/global_settings.py:45
+#: conf/global_settings.py:46
 #, fuzzy
 msgid "Serbian"
 msgstr "Serbo"
 
-#: conf/global_settings.py:46
+#: conf/global_settings.py:47
 msgid "Simplified Chinese"
 msgstr ""
 

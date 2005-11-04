@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django v1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2005-11-04 08:50-0600\n"
+"POT-Creation-Date: 2005-11-04 09:29-0600\n"
 "PO-Revision-Date: 2005-10-30 15:46+0800\n"
 "Last-Translator: limodou <limodou@gmail.com>\n"
 "Language-Team: Simplified Chinese <limodou@gmail.com>\n"
@@ -672,19 +672,23 @@ msgid "Italian"
 msgstr "意大利语"
 
 #: conf/global_settings.py:43
+msgid "Norwegian"
+msgstr ""
+
+#: conf/global_settings.py:44
 msgid "Brazilian"
 msgstr "巴西语"
 
-#: conf/global_settings.py:44
+#: conf/global_settings.py:45
 msgid "Russian"
 msgstr "俄语"
 
-#: conf/global_settings.py:45
+#: conf/global_settings.py:46
 #, fuzzy
 msgid "Serbian"
 msgstr "塞尔维亚语"
 
-#: conf/global_settings.py:46
+#: conf/global_settings.py:47
 msgid "Simplified Chinese"
 msgstr ""
 

@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django Serbian (latin) translation v1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2005-11-04 08:50-0600\n"
+"POT-Creation-Date: 2005-11-04 09:29-0600\n"
 "PO-Revision-Date: 2005-11-03 00:28+0100\n"
 "Last-Translator: Petar Marić <petar.maric@gmail.com>\n"
 "Language-Team: Nesh <nesh@studioquatro.co.yu> & Petar <petar.maric@gmail."
@@ -686,18 +686,22 @@ msgid "Italian"
 msgstr "Italijanski"
 
 #: conf/global_settings.py:43
+msgid "Norwegian"
+msgstr ""
+
+#: conf/global_settings.py:44
 msgid "Brazilian"
 msgstr "Brazilski"
 
-#: conf/global_settings.py:44
+#: conf/global_settings.py:45
 msgid "Russian"
 msgstr "Ruski"
 
-#: conf/global_settings.py:45
+#: conf/global_settings.py:46
 msgid "Serbian"
 msgstr "Srpski"
 
-#: conf/global_settings.py:46
+#: conf/global_settings.py:47
 msgid "Simplified Chinese"
 msgstr ""
 
