@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2005-11-04 16:27+0100\n"
+"POT-Creation-Date: 2005-11-04 18:22+0100\n"
 "PO-Revision-Date: 2005-10-08 00:03+0200\n"
 "Last-Translator: Georg Bauer <gb@bofh.ms>\n"
 "MIME-Version: 1.0\n"
@@ -108,11 +108,11 @@ msgstr "%s zur Änderung auswählen"
 msgid "The %(name)s \"%(obj)s\" was added successfully."
 msgstr "%(name)s \"%(obj)s\" wurde erfolgreich hinzugefügt."
 
-#: contrib/admin/views/main.py:572 contrib/admin/views/main.py:647
+#: contrib/admin/views/main.py:572 contrib/admin/views/main.py:648
 msgid "You may edit it again below."
 msgstr "Das Element kann jetzt weiter geändert werden."
 
-#: contrib/admin/views/main.py:580 contrib/admin/views/main.py:656
+#: contrib/admin/views/main.py:580 contrib/admin/views/main.py:657
 #, python-format
 msgid "You may add another %s below."
 msgstr "Jetzt kann ein weiteres Element vom Typ %s angelegt werden."
@@ -122,36 +122,36 @@ msgstr "Jetzt kann ein weiteres Element vom Typ %s angelegt werden."
 msgid "Add %s"
 msgstr "%s zufügen"
 
-#: contrib/admin/views/main.py:612
+#: contrib/admin/views/main.py:613
 #, python-format
 msgid "Added %s."
 msgstr "%s hinzugefügt."
 
-#: contrib/admin/views/main.py:612 contrib/admin/views/main.py:614
-#: contrib/admin/views/main.py:616
+#: contrib/admin/views/main.py:613 contrib/admin/views/main.py:615
+#: contrib/admin/views/main.py:617
 msgid "and"
 msgstr "und"
 
-#: contrib/admin/views/main.py:614
+#: contrib/admin/views/main.py:615
 #, python-format
 msgid "Changed %s."
 msgstr "%s geändert"
 
-#: contrib/admin/views/main.py:616
+#: contrib/admin/views/main.py:617
 #, python-format
 msgid "Deleted %s."
 msgstr "%s gelöscht."
 
-#: contrib/admin/views/main.py:619
+#: contrib/admin/views/main.py:620
 msgid "No fields changed."
 msgstr "Keine Felder geändert."
 
-#: contrib/admin/views/main.py:644
+#: contrib/admin/views/main.py:645
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was changed successfully."
 msgstr "%(name)s \"%(obj)s\" wurde erfolgreich geändert."
 
-#: contrib/admin/views/main.py:653
+#: contrib/admin/views/main.py:654
 #, python-format
 msgid ""
 "The %(name)s \"%(obj)s\" was added successfully. You may edit it again below."
@@ -159,31 +159,31 @@ msgstr ""
 "%(name)s \"%(obj)s\" wurde erfolgreich zugefügt. Das Element kann jetzt "
 "geändert werden."
 
-#: contrib/admin/views/main.py:691
+#: contrib/admin/views/main.py:692
 #, python-format
 msgid "Change %s"
 msgstr "%s ändern"
 
-#: contrib/admin/views/main.py:771
+#: contrib/admin/views/main.py:772
 #, python-format
 msgid "One or more %(fieldname)s in %(name)s: %(obj)s"
 msgstr "Ein oder mehrere %(fieldname)s in %(name)s: %(obj)s"
 
-#: contrib/admin/views/main.py:776
+#: contrib/admin/views/main.py:777
 #, python-format
 msgid "One or more %(fieldname)s in %(name)s:"
 msgstr "Ein oder mehrere %(fieldname)s in %(name)s:"
 
-#: contrib/admin/views/main.py:805
+#: contrib/admin/views/main.py:806
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was deleted successfully."
 msgstr "%(name)s \"%(obj)s\" wurde erfolgreich gelöscht."
 
-#: contrib/admin/views/main.py:808
+#: contrib/admin/views/main.py:809
 msgid "Are you sure?"
 msgstr "Sicher? Ganz sicher?"
 
-#: contrib/admin/views/main.py:823
+#: contrib/admin/views/main.py:824
 #, python-format
 msgid "Change history: %s"
 msgstr "Änderungsgeschichte: %s"
@@ -293,9 +293,10 @@ msgstr "Keine vorhanden"
 #: contrib/admin/templates/admin/change_form.html:12
 #: contrib/admin/templates/admin/base.html:29
 #: contrib/admin/templates/registration/password_change_done.html:4
-#: contrib/admin/templates/registration/password_change_form.html:4
-#: contrib/admin/templates/registration/password_reset_done.html:4
 #: contrib/admin/templates/registration/password_reset_form.html:4
+#: contrib/admin/templates/registration/logged_out.html:4
+#: contrib/admin/templates/registration/password_reset_done.html:4
+#: contrib/admin/templates/registration/password_change_form.html:4
 msgid "Home"
 msgstr "Start"
 
@@ -369,9 +370,14 @@ msgstr "Passwort:"
 msgid "Have you <a href=\"/password_reset/\">forgotten your password</a>?"
 msgstr "Haben Sie <a href=\"/password_reset/\">ihr Passwort vergessen</a>?"
 
-#: contrib/admin/templates/admin/delete_confirmation.html:18
-msgid "Yes, I'm sure"
-msgstr "Ja, ich bin sicher"
+#: contrib/admin/templates/admin/404.html:4
+#: contrib/admin/templates/admin/404.html:8
+msgid "Page not found"
+msgstr "Seite nicht gefunden"
+
+#: contrib/admin/templates/admin/404.html:10
+msgid "We're sorry, but the requested page could not be found."
+msgstr "Leider konnte die angeforderte Seite nicht gefunden werden."
 
 #: contrib/admin/templates/admin/change_form.html:20
 msgid "View on site"
@@ -463,6 +469,49 @@ msgstr "Erfolgreiche Kennwortänderung"
 msgid "Your password was changed."
 msgstr "Ihr Kennwort wurde geändert."
 
+#: contrib/admin/templates/registration/password_reset_form.html:4
+#: contrib/admin/templates/registration/password_reset_form.html:6
+#: contrib/admin/templates/registration/password_reset_done.html:4
+msgid "Password reset"
+msgstr "Kennwort zurücksetzen"
+
+#: contrib/admin/templates/registration/password_reset_form.html:12
+msgid ""
+"Forgotten your password? Enter your e-mail address below, and we'll reset "
+"your password and e-mail the new one to you."
+msgstr ""
+"Passwort vergessen? Einfach die E-Mail-Adresse eingeben und wir setzen "
+"das Passwort auf ein neues und senden das per E-Mail zu."
+
+#: contrib/admin/templates/registration/password_reset_form.html:16
+msgid "E-mail address:"
+msgstr "E-Mail-Adresse:"
+
+#: contrib/admin/templates/registration/password_reset_form.html:16
+msgid "Reset my password"
+msgstr "Mein Kennwort zurücksetzen"
+
+#: contrib/admin/templates/registration/logged_out.html:8
+msgid "Thanks for spending some quality time with the Web site today."
+msgstr "Vielen Dank, daß Sie hier ein paar nette Minuten verbracht haben."
+
+#: contrib/admin/templates/registration/logged_out.html:10
+msgid "Log in again"
+msgstr "Erneut Anmelden"
+
+#: contrib/admin/templates/registration/password_reset_done.html:6
+#: contrib/admin/templates/registration/password_reset_done.html:10
+msgid "Password reset successful"
+msgstr "Erfolgreich Kennwort zurückgesetzt"
+
+#: contrib/admin/templates/registration/password_reset_done.html:12
+msgid ""
+"We've e-mailed a new password to the e-mail address you submitted. You "
+"should be receiving it shortly."
+msgstr ""
+"Wir haben Ihnen ein neues Kennwort per eMail zugeschickt an die Adresse, die "
+"Sie uns gegeben haben. Es sollte in Kürze ankommen."
+
 #: contrib/admin/templates/registration/password_change_form.html:12
 msgid ""
 "Please enter your old password, for security's sake, and then enter your new "
@@ -487,25 +536,6 @@ msgstr "Kennwortwiederholung:"
 #: contrib/admin/templates/registration/password_change_form.html:23
 msgid "Change my password"
 msgstr "Mein Kennwort ändern"
-
-#: contrib/admin/templates/registration/password_reset_done.html:4
-#: contrib/admin/templates/registration/password_reset_form.html:4
-#: contrib/admin/templates/registration/password_reset_form.html:6
-msgid "Password reset"
-msgstr "Kennwort zurücksetzen"
-
-#: contrib/admin/templates/registration/password_reset_done.html:6
-#: contrib/admin/templates/registration/password_reset_done.html:10
-msgid "Password reset successful"
-msgstr "Erfolgreich Kennwort zurückgesetzt"
-
-#: contrib/admin/templates/registration/password_reset_done.html:12
-msgid ""
-"We've e-mailed a new password to the e-mail address you submitted. You "
-"should be receiving it shortly."
-msgstr ""
-"Wir haben Ihnen ein neues Kennwort per eMail zugeschickt an die Adresse, die "
-"Sie uns gegeben haben. Es sollte in Kürze ankommen."
 
 #: contrib/admin/templates/registration/password_reset_email.html:2
 msgid "You're receiving this e-mail because you requested a password reset"
@@ -878,33 +908,37 @@ msgstr "Wichtige Daten"
 msgid "Message"
 msgstr "Mitteilung"
 
-#: conf/global_settings.py:38
+#: conf/global_settings.py:37
 msgid "Czech"
 msgstr "Tschechisch"
 
-#: conf/global_settings.py:39
+#: conf/global_settings.py:38
 msgid "German"
 msgstr "Deutsch"
 
-#: conf/global_settings.py:40
+#: conf/global_settings.py:39
 msgid "English"
 msgstr "Englisch"
 
-#: conf/global_settings.py:41
+#: conf/global_settings.py:40
 msgid "Spanish"
 msgstr "Spanisch"
 
-#: conf/global_settings.py:42
+#: conf/global_settings.py:41
 msgid "French"
 msgstr "Französisch"
 
-#: conf/global_settings.py:43
+#: conf/global_settings.py:42
 msgid "Galician"
 msgstr "Galicisch"
 
-#: conf/global_settings.py:44
+#: conf/global_settings.py:43
 msgid "Italian"
 msgstr "Italienisch"
+
+#: conf/global_settings.py:44
+msgid "Norwegian"
+msgstr "Norwegisch"
 
 #: conf/global_settings.py:45
 msgid "Brazilian"
@@ -920,7 +954,7 @@ msgstr "Serbisch"
 
 #: conf/global_settings.py:48
 msgid "Simplified Chinese"
-msgstr ""
+msgstr "Vereinfachtes Chinesisch"
 
 #: core/validators.py:58
 msgid "This value must contain only letters, numbers and underscores."

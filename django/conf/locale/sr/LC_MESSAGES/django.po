@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django Serbian (latin) translation v1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2005-11-04 09:29-0600\n"
+"POT-Creation-Date: 2005-11-04 18:22+0100\n"
 "PO-Revision-Date: 2005-11-03 00:28+0100\n"
 "Last-Translator: Petar Marić <petar.maric@gmail.com>\n"
 "Language-Team: Nesh <nesh@studioquatro.co.yu> & Petar <petar.maric@gmail."
@@ -17,37 +17,289 @@ msgstr ""
 "X-Poedit-SourceCharset: utf-8\n"
 "X-Poedit-Basepath: ../../../../\n"
 
-#: contrib/admin/templates/admin/base.html:23
-msgid "Welcome,"
-msgstr "Dobrodošli,"
+#: contrib/admin/models/admin.py:6
+msgid "action time"
+msgstr "Datum/vreme akcije"
 
-#: contrib/admin/templates/admin/base.html:23
-msgid "Change password"
+#: contrib/admin/models/admin.py:9
+msgid "object id"
+msgstr "id objekta"
+
+#: contrib/admin/models/admin.py:10
+msgid "object repr"
+msgstr "opis objekta"
+
+#: contrib/admin/models/admin.py:11
+msgid "action flag"
+msgstr "akcija"
+
+#: contrib/admin/models/admin.py:12
+msgid "change message"
+msgstr "opis promene"
+
+#: contrib/admin/models/admin.py:15
+msgid "log entry"
+msgstr "unos u dnevnik izmena"
+
+#: contrib/admin/models/admin.py:16
+msgid "log entries"
+msgstr "unosi u dnevnik izmena"
+
+#: contrib/admin/templatetags/admin_list.py:256
+msgid "All dates"
+msgstr ""
+
+#: contrib/admin/views/decorators.py:22
+#: contrib/admin/templates/admin/login.html:24
+msgid "Log in"
+msgstr "Prijavi se"
+
+#: contrib/admin/views/decorators.py:56
+msgid ""
+"Please log in again, because your session has expired. Don't worry: Your "
+"submission has been saved."
+msgstr ""
+
+#: contrib/admin/views/decorators.py:63
+msgid ""
+"Looks like your browser isn't configured to accept cookies. Please enable "
+"cookies, reload this page, and try again."
+msgstr ""
+
+#: contrib/admin/views/decorators.py:77
+msgid "Usernames cannot contain the '@' character."
+msgstr ""
+
+#: contrib/admin/views/decorators.py:79
+#, python-format
+msgid "Your e-mail address is not your username. Try '%s' instead."
+msgstr ""
+
+#: contrib/admin/views/main.py:78 contrib/admin/views/main.py:106
+#, python-format
+msgid ""
+"<h3>By %s:</h3>\n"
+"<ul>\n"
+msgstr ""
+
+#: contrib/admin/views/main.py:128 contrib/admin/views/main.py:167
+#: contrib/admin/views/main.py:187
+#, python-format
+msgid "<h3>By %s:</h3><ul>\n"
+msgstr ""
+
+#: contrib/admin/views/main.py:210
+#, python-format
+msgid "Select %s"
+msgstr ""
+
+#: contrib/admin/views/main.py:211
+#, python-format
+msgid "Select %s to change"
+msgstr ""
+
+#: contrib/admin/views/main.py:567
+#, python-format
+msgid "The %(name)s \"%(obj)s\" was added successfully."
+msgstr ""
+
+#: contrib/admin/views/main.py:572 contrib/admin/views/main.py:648
+msgid "You may edit it again below."
+msgstr ""
+
+#: contrib/admin/views/main.py:580 contrib/admin/views/main.py:657
+#, python-format
+msgid "You may add another %s below."
+msgstr ""
+
+#: contrib/admin/views/main.py:597
+#, fuzzy, python-format
+msgid "Add %s"
+msgstr "Dodaj"
+
+#: contrib/admin/views/main.py:613
+#, python-format
+msgid "Added %s."
+msgstr ""
+
+#: contrib/admin/views/main.py:613 contrib/admin/views/main.py:615
+#: contrib/admin/views/main.py:617
+msgid "and"
+msgstr ""
+
+#: contrib/admin/views/main.py:615
+#, fuzzy, python-format
+msgid "Changed %s."
+msgstr "Izmena"
+
+#: contrib/admin/views/main.py:617
+#, python-format
+msgid "Deleted %s."
+msgstr ""
+
+#: contrib/admin/views/main.py:620
+msgid "No fields changed."
+msgstr ""
+
+#: contrib/admin/views/main.py:645
+#, python-format
+msgid "The %(name)s \"%(obj)s\" was changed successfully."
+msgstr ""
+
+#: contrib/admin/views/main.py:654
+#, python-format
+msgid ""
+"The %(name)s \"%(obj)s\" was added successfully. You may edit it again below."
+msgstr ""
+
+#: contrib/admin/views/main.py:692
+#, fuzzy, python-format
+msgid "Change %s"
+msgstr "Izmena"
+
+#: contrib/admin/views/main.py:772
+#, python-format
+msgid "One or more %(fieldname)s in %(name)s: %(obj)s"
+msgstr ""
+
+#: contrib/admin/views/main.py:777
+#, python-format
+msgid "One or more %(fieldname)s in %(name)s:"
+msgstr ""
+
+#: contrib/admin/views/main.py:806
+#, python-format
+msgid "The %(name)s \"%(obj)s\" was deleted successfully."
+msgstr ""
+
+#: contrib/admin/views/main.py:809
+msgid "Are you sure?"
+msgstr ""
+
+#: contrib/admin/views/main.py:824
+#, fuzzy, python-format
+msgid "Change history: %s"
 msgstr "Izmeni lozinku"
 
-#: contrib/admin/templates/admin/base.html:23
-msgid "Log out"
-msgstr "Odjavi se"
+#: contrib/admin/views/doc.py:262 contrib/admin/views/doc.py:271
+#: contrib/admin/views/doc.py:273 contrib/admin/views/doc.py:278
+#: contrib/admin/views/doc.py:279 contrib/admin/views/doc.py:281
+msgid "Integer"
+msgstr ""
 
-#: contrib/admin/templates/admin/base.html:29
+#: contrib/admin/views/doc.py:263
+msgid "Boolean (Either True or False)"
+msgstr ""
+
+#: contrib/admin/views/doc.py:264
+#, python-format
+msgid "String (up to %(maxlength)s)"
+msgstr ""
+
+#: contrib/admin/views/doc.py:265
+msgid "Comma-separated integers"
+msgstr ""
+
+#: contrib/admin/views/doc.py:266
+#, fuzzy
+msgid "Date (without time)"
+msgstr "Datum/vreme akcije"
+
+#: contrib/admin/views/doc.py:267
+#, fuzzy
+msgid "Date (with time)"
+msgstr "Datum/vreme"
+
+#: contrib/admin/views/doc.py:268
+#, fuzzy
+msgid "E-mail address"
+msgstr "E-mail adresa:"
+
+#: contrib/admin/views/doc.py:269 contrib/admin/views/doc.py:272
+msgid "File path"
+msgstr ""
+
+#: contrib/admin/views/doc.py:270
+#, fuzzy
+msgid "Decimal number"
+msgstr "Decembar"
+
+#: contrib/admin/views/doc.py:274
+#, fuzzy
+msgid "IP address"
+msgstr "e-mail adresa"
+
+#: contrib/admin/views/doc.py:276
+msgid "Boolean (Either True, False or None)"
+msgstr ""
+
+#: contrib/admin/views/doc.py:277
+#, fuzzy
+msgid "Phone number"
+msgstr "Unesite celi broj."
+
+#: contrib/admin/views/doc.py:280
+msgid "String (up to 50)"
+msgstr ""
+
+#: contrib/admin/views/doc.py:282
+msgid "Text"
+msgstr ""
+
+#: contrib/admin/views/doc.py:283
+msgid "Time"
+msgstr ""
+
+# nesh: ovo se valjda ne prevodi
+# petar: ne prevodi se
+#: contrib/admin/views/doc.py:284 models/core.py:81
+msgid "URL"
+msgstr ""
+
+#: contrib/admin/views/doc.py:285
+msgid "U.S. state (two uppercase letters)"
+msgstr ""
+
+#: contrib/admin/views/doc.py:286
+msgid "XML text"
+msgstr ""
+
+#: contrib/admin/templates/admin/index.html:27
+#: contrib/admin/templates/admin/change_form.html:14
+msgid "Add"
+msgstr "Dodaj"
+
+#: contrib/admin/templates/admin/index.html:33
+msgid "Change"
+msgstr "Izmena"
+
+#: contrib/admin/templates/admin/index.html:43
+msgid "You don't have permission to edit anything."
+msgstr "Nemate prava da vršite izmene."
+
+#: contrib/admin/templates/admin/index.html:51
+msgid "Recent Actions"
+msgstr "Skorije akcije"
+
+#: contrib/admin/templates/admin/index.html:52
+msgid "My Actions"
+msgstr "Moje akcije"
+
+#: contrib/admin/templates/admin/index.html:56
+msgid "None available"
+msgstr "Nema dostupnih"
+
 #: contrib/admin/templates/admin/500.html:4
 #: contrib/admin/templates/admin/object_history.html:5
-#: contrib/admin/templates/registration/logged_out.html:4
+#: contrib/admin/templates/admin/change_form.html:12
+#: contrib/admin/templates/admin/base.html:29
 #: contrib/admin/templates/registration/password_change_done.html:4
-#: contrib/admin/templates/registration/password_change_form.html:4
-#: contrib/admin/templates/registration/password_reset_done.html:4
 #: contrib/admin/templates/registration/password_reset_form.html:4
+#: contrib/admin/templates/registration/logged_out.html:4
+#: contrib/admin/templates/registration/password_reset_done.html:4
+#: contrib/admin/templates/registration/password_change_form.html:4
 msgid "Home"
 msgstr "Početna strana"
-
-#: contrib/admin/templates/admin/404.html:4
-#: contrib/admin/templates/admin/404.html:8
-msgid "Page not found"
-msgstr "Strana nije pronađena"
-
-#: contrib/admin/templates/admin/404.html:10
-msgid "We're sorry, but the requested page could not be found."
-msgstr "Tražena strana ne postoji."
 
 #: contrib/admin/templates/admin/500.html:4
 #, fuzzy
@@ -71,6 +323,7 @@ msgstr ""
 "uskoro. Hvala Vam na strpljenju."
 
 #: contrib/admin/templates/admin/object_history.html:5
+#: contrib/admin/templates/admin/change_form.html:19
 msgid "History"
 msgstr "Istorija"
 
@@ -106,6 +359,46 @@ msgstr "Django administracija sajta"
 msgid "Django administration"
 msgstr "Django administracija"
 
+#: contrib/admin/templates/admin/login.html:15
+msgid "Username:"
+msgstr "Korisničko ime:"
+
+#: contrib/admin/templates/admin/login.html:18
+msgid "Password:"
+msgstr "Lozinka:"
+
+#: contrib/admin/templates/admin/login.html:20
+msgid "Have you <a href=\"/password_reset/\">forgotten your password</a>?"
+msgstr "Da li ste <a href=\"/password_reset/\">zaboravili Vašu lozinku?</a>?"
+
+#: contrib/admin/templates/admin/404.html:4
+#: contrib/admin/templates/admin/404.html:8
+msgid "Page not found"
+msgstr "Strana nije pronađena"
+
+#: contrib/admin/templates/admin/404.html:10
+msgid "We're sorry, but the requested page could not be found."
+msgstr "Tražena strana ne postoji."
+
+#: contrib/admin/templates/admin/change_form.html:20
+msgid "View on site"
+msgstr ""
+
+#: contrib/admin/templates/admin/change_form.html:28
+msgid "Please correct the error below."
+msgid_plural "Please correct the errors below."
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+
+#: contrib/admin/templates/admin/change_form.html:45
+msgid "Ordering"
+msgstr ""
+
+#: contrib/admin/templates/admin/change_form.html:48
+msgid "Order:"
+msgstr ""
+
 #: contrib/admin/templates/admin/delete_confirmation.html:7
 #, fuzzy, python-format
 msgid ""
@@ -129,53 +422,38 @@ msgstr ""
 msgid "Yes, I'm sure"
 msgstr "Da, siguran sam"
 
-#: contrib/admin/templates/admin/index.html:27
-msgid "Add"
-msgstr "Dodaj"
+#: contrib/admin/templates/admin/base.html:23
+msgid "Welcome,"
+msgstr "Dobrodošli,"
 
-#: contrib/admin/templates/admin/index.html:33
-msgid "Change"
-msgstr "Izmena"
+#: contrib/admin/templates/admin/base.html:23
+msgid "Change password"
+msgstr "Izmeni lozinku"
 
-#: contrib/admin/templates/admin/index.html:43
-msgid "You don't have permission to edit anything."
-msgstr "Nemate prava da vršite izmene."
+#: contrib/admin/templates/admin/base.html:23
+msgid "Log out"
+msgstr "Odjavi se"
 
-#: contrib/admin/templates/admin/index.html:51
-msgid "Recent Actions"
-msgstr "Skorije akcije"
+#: contrib/admin/templates/admin/submit_line.html:3
+msgid "Delete"
+msgstr ""
 
-#: contrib/admin/templates/admin/index.html:52
-msgid "My Actions"
-msgstr "Moje akcije"
+#: contrib/admin/templates/admin/submit_line.html:4
+msgid "Save as new"
+msgstr ""
 
-#: contrib/admin/templates/admin/index.html:56
-msgid "None available"
-msgstr "Nema dostupnih"
+#: contrib/admin/templates/admin/submit_line.html:5
+msgid "Save and add another"
+msgstr ""
 
-#: contrib/admin/templates/admin/login.html:15
-msgid "Username:"
-msgstr "Korisničko ime:"
+#: contrib/admin/templates/admin/submit_line.html:6
+msgid "Save and continue editing"
+msgstr ""
 
-#: contrib/admin/templates/admin/login.html:18
-msgid "Password:"
-msgstr "Lozinka:"
-
-#: contrib/admin/templates/admin/login.html:20
-msgid "Have you <a href=\"/password_reset/\">forgotten your password</a>?"
-msgstr "Da li ste <a href=\"/password_reset/\">zaboravili Vašu lozinku?</a>?"
-
-#: contrib/admin/templates/admin/login.html:24
-msgid "Log in"
-msgstr "Prijavi se"
-
-#: contrib/admin/templates/registration/logged_out.html:8
-msgid "Thanks for spending some quality time with the Web site today."
-msgstr "Hvala Vam na poseti."
-
-#: contrib/admin/templates/registration/logged_out.html:10
-msgid "Log in again"
-msgstr "Prijavi se ponovo"
+#: contrib/admin/templates/admin/submit_line.html:7
+#, fuzzy
+msgid "Save"
+msgstr "aktivan"
 
 #: contrib/admin/templates/registration/password_change_done.html:4
 #: contrib/admin/templates/registration/password_change_form.html:4
@@ -192,6 +470,49 @@ msgstr "Lozinka je uspešno izmenjena"
 #: contrib/admin/templates/registration/password_change_done.html:12
 msgid "Your password was changed."
 msgstr "Vaša lozinka je izmenjena."
+
+#: contrib/admin/templates/registration/password_reset_form.html:4
+#: contrib/admin/templates/registration/password_reset_form.html:6
+#: contrib/admin/templates/registration/password_reset_done.html:4
+msgid "Password reset"
+msgstr "Resetovanje lozinke"
+
+#: contrib/admin/templates/registration/password_reset_form.html:12
+msgid ""
+"Forgotten your password? Enter your e-mail address below, and we'll reset "
+"your password and e-mail the new one to you."
+msgstr ""
+"Zaboravili ste svoju lozinku? Unesite vašu e-mail adresu i dobićete novu "
+"lozinku na dati e-mail."
+
+#: contrib/admin/templates/registration/password_reset_form.html:16
+msgid "E-mail address:"
+msgstr "E-mail adresa:"
+
+#: contrib/admin/templates/registration/password_reset_form.html:16
+msgid "Reset my password"
+msgstr "Resetuj moju lozinku"
+
+#: contrib/admin/templates/registration/logged_out.html:8
+msgid "Thanks for spending some quality time with the Web site today."
+msgstr "Hvala Vam na poseti."
+
+#: contrib/admin/templates/registration/logged_out.html:10
+msgid "Log in again"
+msgstr "Prijavi se ponovo"
+
+#: contrib/admin/templates/registration/password_reset_done.html:6
+#: contrib/admin/templates/registration/password_reset_done.html:10
+msgid "Password reset successful"
+msgstr "Vaša lozinka je uspešno resetovana"
+
+#: contrib/admin/templates/registration/password_reset_done.html:12
+msgid ""
+"We've e-mailed a new password to the e-mail address you submitted. You "
+"should be receiving it shortly."
+msgstr ""
+"Nova lozinka poslata vam je na zadatu e-mail adresu. E-mail bi trebao da "
+"stigne u narednih nekoliko minuta."
 
 #: contrib/admin/templates/registration/password_change_form.html:12
 msgid ""
@@ -216,25 +537,6 @@ msgstr "Potvrdite novu lozinku:"
 #: contrib/admin/templates/registration/password_change_form.html:23
 msgid "Change my password"
 msgstr "Izmeni moju lozinku"
-
-#: contrib/admin/templates/registration/password_reset_done.html:4
-#: contrib/admin/templates/registration/password_reset_form.html:4
-#: contrib/admin/templates/registration/password_reset_form.html:6
-msgid "Password reset"
-msgstr "Resetovanje lozinke"
-
-#: contrib/admin/templates/registration/password_reset_done.html:6
-#: contrib/admin/templates/registration/password_reset_done.html:10
-msgid "Password reset successful"
-msgstr "Vaša lozinka je uspešno resetovana"
-
-#: contrib/admin/templates/registration/password_reset_done.html:12
-msgid ""
-"We've e-mailed a new password to the e-mail address you submitted. You "
-"should be receiving it shortly."
-msgstr ""
-"Nova lozinka poslata vam je na zadatu e-mail adresu. E-mail bi trebao da "
-"stigne u narednih nekoliko minuta."
 
 #: contrib/admin/templates/registration/password_reset_email.html:2
 msgid "You're receiving this e-mail because you requested a password reset"
@@ -266,50 +568,6 @@ msgstr "Hvala Vam na poseti!"
 #, python-format
 msgid "The %(site_name)s team"
 msgstr "%(site_name)s tim"
-
-#: contrib/admin/templates/registration/password_reset_form.html:12
-msgid ""
-"Forgotten your password? Enter your e-mail address below, and we'll reset "
-"your password and e-mail the new one to you."
-msgstr ""
-"Zaboravili ste svoju lozinku? Unesite vašu e-mail adresu i dobićete novu "
-"lozinku na dati e-mail."
-
-#: contrib/admin/templates/registration/password_reset_form.html:16
-msgid "E-mail address:"
-msgstr "E-mail adresa:"
-
-#: contrib/admin/templates/registration/password_reset_form.html:16
-msgid "Reset my password"
-msgstr "Resetuj moju lozinku"
-
-#: contrib/admin/models/admin.py:6
-msgid "action time"
-msgstr "Datum/vreme akcije"
-
-#: contrib/admin/models/admin.py:9
-msgid "object id"
-msgstr "id objekta"
-
-#: contrib/admin/models/admin.py:10
-msgid "object repr"
-msgstr "opis objekta"
-
-#: contrib/admin/models/admin.py:11
-msgid "action flag"
-msgstr "akcija"
-
-#: contrib/admin/models/admin.py:12
-msgid "change message"
-msgstr "opis promene"
-
-#: contrib/admin/models/admin.py:15
-msgid "log entry"
-msgstr "unos u dnevnik izmena"
-
-#: contrib/admin/models/admin.py:16
-msgid "log entries"
-msgstr "unosi u dnevnik izmena"
 
 #: utils/dates.py:6
 msgid "Monday"
@@ -491,12 +749,6 @@ msgstr "redirekcija"
 msgid "redirects"
 msgstr "redirekcije"
 
-# nesh: ovo se valjda ne prevodi
-# petar: ne prevodi se
-#: models/core.py:81
-msgid "URL"
-msgstr ""
-
 #: models/core.py:82
 msgid ""
 "Example: '/about/contact/'. Make sure to have leading and trailing slashes."
@@ -657,51 +909,51 @@ msgstr "Važni datumi"
 msgid "Message"
 msgstr "Poruka"
 
-#: conf/global_settings.py:36
+#: conf/global_settings.py:37
 msgid "Czech"
 msgstr "Češki"
 
-#: conf/global_settings.py:37
+#: conf/global_settings.py:38
 msgid "German"
 msgstr "Nemački"
 
-#: conf/global_settings.py:38
+#: conf/global_settings.py:39
 msgid "English"
 msgstr "Engleski"
 
-#: conf/global_settings.py:39
+#: conf/global_settings.py:40
 msgid "Spanish"
 msgstr "Španski"
 
-#: conf/global_settings.py:40
+#: conf/global_settings.py:41
 msgid "French"
 msgstr "Francuski"
 
-#: conf/global_settings.py:41
+#: conf/global_settings.py:42
 msgid "Galician"
 msgstr ""
 
-#: conf/global_settings.py:42
+#: conf/global_settings.py:43
 msgid "Italian"
 msgstr "Italijanski"
 
-#: conf/global_settings.py:43
+#: conf/global_settings.py:44
 msgid "Norwegian"
 msgstr ""
 
-#: conf/global_settings.py:44
+#: conf/global_settings.py:45
 msgid "Brazilian"
 msgstr "Brazilski"
 
-#: conf/global_settings.py:45
+#: conf/global_settings.py:46
 msgid "Russian"
 msgstr "Ruski"
 
-#: conf/global_settings.py:46
+#: conf/global_settings.py:47
 msgid "Serbian"
 msgstr "Srpski"
 
-#: conf/global_settings.py:47
+#: conf/global_settings.py:48
 msgid "Simplified Chinese"
 msgstr ""
 
@@ -973,11 +1225,11 @@ msgstr ""
 "Atribut \"%(attr)s\" u redu %(line)s ima neispravnu vrednost. (Red počinje "
 "sa \"%(start)s\".)"
 
-#: core/meta/fields.py:95
+#: core/meta/fields.py:114
 msgid " Separate multiple IDs with commas."
 msgstr " Odvojite višestruke ID-ove zarezima."
 
-#: core/meta/fields.py:98
+#: core/meta/fields.py:117
 msgid ""
 " Hold down \"Control\", or \"Command\" on a Mac, to select more than one."
 msgstr ""
