@@ -1,7 +1,8 @@
 {% extends "admin/base_site" %}
+{% load i18n %}
 
 {% block breadcrumbs %}
-<div class="breadcrumbs"><a href="../../../../">Home</a> &rsaquo; <a href="../../">{{ module_name }}</a> &rsaquo; <a href="../">{{ object|truncatewords:"18" }}</a> &rsaquo; History</div>
+<div class="breadcrumbs"><a href="../../../../">{% trans 'Home' %}</a> &rsaquo; <a href="../../">{{ module_name }}</a> &rsaquo; <a href="../">{{ object|truncatewords:"18" }}</a> &rsaquo; {% trans 'History' %}</div>
 {% endblock %}
 
 {% block content %}
@@ -14,15 +15,15 @@
     <table id="change-history">
         <thead>
         <tr>
-            <th>Date/time</th>
-            <th>User</th>
-            <th>Action</th>
+            <th>{% trans 'Date/time' %}</th>
+            <th>{% trans 'User' %}</th>
+            <th>{% trans 'Action' %}</th>
         </tr>
         </thead>
         <tbody>
         {% for action in action_list %}
         <tr>
-            <th>{{ action.action_time|date:"N j, Y, P" }}</th>
+            <th>{{ action.action_time|date:_("DATE_WITH_TIME_FULL") }}</th>
             <td>{{ action.get_user.username }}{% if action.get_user.first_name %} ({{ action.get_user.first_name }} {{ action.get_user.last_name }}){% endif %}</td>
             <td>{{ action.change_message}}</td>
         </tr>
@@ -32,7 +33,7 @@
 
 {% else %}
 
-    <p>This object doesn't have a change history. It probably wasn't added via this admin site.</p>
+    <p>{% trans "This object doesn't have a change history. It probably wasn't added via this admin site." %}</p>
 
 {% endif %}
 

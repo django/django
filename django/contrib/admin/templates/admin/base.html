@@ -1,11 +1,12 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="{{ LANGUAGE_CODE }}" xml:lang="{{ LANGUAGE_CODE }}">
 <head>
 <title>{% block title %}{% endblock %}</title>
 <link rel="stylesheet" type="text/css" href="{% block stylesheet %}{% load adminmedia %}{% admin_media_prefix %}css/base.css{% endblock %}" />
 {% block extrastyle %}{% endblock %}
 {% block extrahead %}{% endblock %}
 </head>
+{% load i18n %}
 
 <body class="{% if is_popup %}popup {% endif %}{% block bodyclass %}{% endblock %}">
 
@@ -19,13 +20,13 @@
         {% block branding %}{% endblock %}
         </div>
         {% if not user.is_anonymous %}
-        <div id="user-tools">Welcome, <strong>{% if user.first_name %}{{ user.first_name }}{% else %}{{ user.username }}{% endif %}</strong>. <br />{% block userlinks %}<a href="/admin/password_change/">Change password</a> / <a href="/admin/logout/">Log out</a>{% endblock %}</div>
+        <div id="user-tools">{% trans 'Welcome,' %} <strong>{% if user.first_name %}{{ user.first_name }}{% else %}{{ user.username }}{% endif %}</strong>. <br />{% block userlinks %}<a href="/admin/password_change/">{% trans 'Change password' %}</a> / <a href="/admin/logout/">{% trans 'Log out' %}</a>{% endblock %}</div>
         {% endif %}
         {% block nav-global %}{% endblock %}
         <br class="clear" />
     </div>
     <!-- END Header -->
-    {% block breadcrumbs %}<div class="breadcrumbs"><a href="/">Home</a>{% if title %} &rsaquo; {{ title }}{% endif %}</div>{% endblock %}
+    {% block breadcrumbs %}<div class="breadcrumbs"><a href="/">{% trans 'Home' %}</a>{% if title %} &rsaquo; {{ title }}{% endif %}</div>{% endblock %}
     {% endif %}
 
         {% if messages %}

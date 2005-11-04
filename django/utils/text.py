@@ -55,7 +55,7 @@ def get_text_list(list_, last_word='or'):
     """
     if len(list_) == 0: return ''
     if len(list_) == 1: return list_[0]
-    return '%s %s %s' % (', '.join([i for i in list_][:-1]), last_word, list_[-1])
+    return '%s %s %s' % (', '.join([str(i) for i in list_][:-1]), last_word, list_[-1])
 
 def normalize_newlines(text):
     return re.sub(r'\r\n|\r|\n', '\n', text)

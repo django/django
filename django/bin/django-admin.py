@@ -3,6 +3,14 @@ from django.core import management
 from optparse import OptionParser
 import os, sys
 
+# switch to english, because django-admin creates database content
+# like permissions, and those shouldn't contain any translations
+try:
+    from django.utils import translation
+    translation.activate('en-us')
+except:
+    pass
+
 ACTION_MAPPING = {
     'adminindex': management.get_admin_index,
     'createsuperuser': management.createsuperuser,
@@ -129,3 +137,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+

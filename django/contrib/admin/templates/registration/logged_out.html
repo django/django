@@ -1,11 +1,12 @@
 {% extends "admin/base_site" %}
+{% load i18n %}
 
-{% block breadcrumbs %}<div class="breadcrumbs"><a href="../">Home</a></div>{% endblock %}
+{% block breadcrumbs %}<div class="breadcrumbs"><a href="../">{% trans 'Home' %}</a></div>{% endblock %}
 
 {% block content %}
 
-<p>Thanks for spending some quality time with the Web site today.</p>
+<p>{% trans "Thanks for spending some quality time with the Web site today." %}</p>
 
-<p><a href="../">Log in again</a></p>
+<p><a href="../">{% trans 'Log in again' %}</a></p>
 
 {% endblock %}

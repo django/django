@@ -1,5 +1,6 @@
 from django.core import template
 from django.core.template import loader
+from django.utils.translation import activate, deactivate
 
 # Helper objects for template tests
 class SomeClass:
@@ -215,6 +216,45 @@ TEMPLATE_TESTS = {
 
     # Raise exception for custom tags used in child with {% load %} tag in parent, not in child
     'exception04': ("{% extends 'inheritance17' %}{% block first %}{% echo 400 %}5678{% endblock %}", {}, template.TemplateSyntaxError),
+
+    # simple translation of a string delimited by '
+    'i18n01': ("{% load i18n %}{% trans 'xxxyyyxxx' %}", {}, "xxxyyyxxx"),
+
+    # simple translation of a string delimited by "
+    'i18n02': ('{% load i18n %}{% trans "xxxyyyxxx" %}', {}, "xxxyyyxxx"),
+
+    # simple translation of a variable
+    'i18n03': ('{% load i18n %}{% blocktrans %}{{ anton }}{% endblocktrans %}', {'anton': 'xxxyyyxxx'}, "xxxyyyxxx"),
+
+    # simple translation of a variable and filter
+    'i18n04': ('{% load i18n %}{% blocktrans with anton|lower as berta %}{{ berta }}{% endblocktrans %}', {'anton': 'XXXYYYXXX'}, "xxxyyyxxx"),
+
+    # simple translation of a string with interpolation
+    'i18n05': ('{% load i18n %}{% blocktrans %}xxx{{ anton }}xxx{% endblocktrans %}', {'anton': 'yyy'}, "xxxyyyxxx"),
+
+    # simple translation of a string to german
+    'i18n06': ('{% load i18n %}{% trans "Page not found" %}', {'LANGUAGE_CODE': 'de'}, "Seite nicht gefunden"),
+
+    # translation of singular form
+    'i18n07': ('{% load i18n %}{% blocktrans count number as counter %}singular{% plural %}plural{% endblocktrans %}', {'number': 1}, "singular"),
+
+    # translation of plural form
+    'i18n08': ('{% load i18n %}{% blocktrans count number as counter %}singular{% plural %}plural{% endblocktrans %}', {'number': 2}, "plural"),
+
+    # simple non-translation (only marking) of a string to german
+    'i18n09': ('{% load i18n %}{% trans "Page not found" noop %}', {'LANGUAGE_CODE': 'de'}, "Page not found"),
+
+    # translation of a variable with a translated filter
+    'i18n10': ('{{ bool|yesno:_("ja,nein") }}', {'bool': True}, 'ja'),
+
+    # translation of a variable with a non-translated filter
+    'i18n11': ('{{ bool|yesno:"ja,nein" }}', {'bool': True}, 'ja'),
+
+    # usage of the get_available_languages tag
+    'i18n12': ('{% load i18n %}{% get_available_languages as langs %}{% for lang in langs %}{% ifequal lang.0 "de" %}{{ lang.0 }}{% endifequal %}{% endfor %}', {}, 'de'),
+
+    # translation of a constant string
+    'i18n13': ('{{ _("Page not found") }}', {'LANGUAGE_CODE': 'de'}, 'Seite nicht gefunden'),
 }
 
 def test_template_loader(template_name, template_dirs=None):
@@ -233,6 +273,8 @@ def run_tests(verbosity=0, standalone=False):
     tests = TEMPLATE_TESTS.items()
     tests.sort()
     for name, vals in tests:
+        if 'LANGUAGE_CODE' in vals[1]:
+            activate(vals[1]['LANGUAGE_CODE'])
         try:
             output = loader.get_template(name).render(template.Context(vals[1]))
         except Exception, e:
@@ -244,6 +286,8 @@ def run_tests(verbosity=0, standalone=False):
                     print "Template test: %s -- FAILED. Got %s, exception: %s" % (name, e.__class__, e)
                 failed_tests.append(name)
             continue
+        if 'LANGUAGE_CODE' in vals[1]:
+            deactivate()
         if output == vals[2]:
             if verbosity:
                 print "Template test: %s -- Passed" % name

@@ -234,6 +234,97 @@ class Parser:
     def delete_first_token(self):
         del self.tokens[0]
 
+class TokenParser:
+    """
+    You need to subclass this class and implement the
+    top method to parse your template line. When instantiating
+    the parser, you pass in the line from the django template
+    parser.
+
+    If your tag needs to know what tag name it was called with,
+    you find it in the tagname instance variable of the parser.
+    """
+
+    def __init__(self, subject):
+        self.subject = subject
+        self.pointer = 0
+        self.backout = []
+        self.tagname = self.tag()
+
+    def top(self):
+        """
+        You need to overload this method to do the actual parsing
+        and return the result.
+        """
+        raise NotImplemented
+
+    def more(self):
+        """
+        This returns True if there is more stuff in the tag.
+        """
+        return self.pointer < len(self.subject)
+
+    def back(self):
+        """
+        This method undos the last microparser. This can be
+        used for lookahead and backtracking.
+        """
+        if not len(self.backout):
+            raise TemplateSyntaxError, "back called without some previous parsing"
+        self.pointer = self.backout.pop()
+
+    def tag(self):
+        """
+        This microparser just returns the next tag from the line.
+        """
+        subject = self.subject
+        i = self.pointer
+        if i >= len(subject):
+            raise TemplateSyntaxError, "expected another tag, found end of string: %s" % subject
+        p = i
+        while i < len(subject) and subject[i] not in (' ', '\t'):
+            i += 1
+        s = subject[p:i]
+        while i < len(subject) and subject[i] in (' ', '\t'):
+            i += 1
+        self.backout.append(self.pointer)
+        self.pointer = i
+        return s
+
+    def value(self):
+        """
+        This microparser parses for a value - some string constant or
+        variable name.
+        """
+        subject = self.subject
+        i = self.pointer
+        if i >= len(subject):
+            raise TemplateSyntaxError, "searching for value expected another value, found end of string: %s" % subject
+        if subject[i] in ('"', "'"):
+            p = i
+            i += 1
+            while i < len(subject) and subject[i] != subject[p]:
+                i += 1
+            if i >= len(subject):
+                raise TemplateSyntaxError, "searching for value, unexpected end of string in column %d: %s" % subject
+            i += 1
+            res = subject[p:i]
+            while i < len(subject) and subject[i] in (' ', '\t'):
+                i += 1
+            self.backout.append(self.pointer)
+            self.pointer = i
+            return res
+        else:
+            p = i
+            while i < len(subject) and subject[i] not in (' ', '\t'):
+                i += 1
+            s = subject[p:i]
+            while i < len(subject) and subject[i] in (' ', '\t'):
+                i += 1
+            self.backout.append(self.pointer)
+            self.pointer = i
+            return s
+
 class FilterParser:
     """Parse a variable token and its optional filters (all as a single string),
        and return a list of tuples of the filter name and arguments.
@@ -255,8 +346,12 @@ class FilterParser:
         self.filters = []
         self.current_filter_name = None
         self.current_filter_arg = None
-        # First read the variable part
-        self.var = self.read_alphanumeric_token()
+        # First read the variable part - decide on wether we need
+        # to parse a string or a variable by peeking into the stream
+        if self.peek_char() in ('_', '"', "'"):
+            self.var = self.read_constant_string_token()
+        else:
+            self.var = self.read_alphanumeric_token()
         if not self.var:
             raise TemplateSyntaxError, "Could not read variable name: '%s'" % self.s
         if self.var.find(VARIABLE_ATTRIBUTE_SEPARATOR + '_') > -1 or self.var[0] == '_':
@@ -269,12 +364,49 @@ class FilterParser:
         # We have a filter separator; start reading the filters
         self.read_filters()
 
+    def peek_char(self):
+        try:
+            return self.s[self.i+1]
+        except IndexError:
+            return None
+
     def next_char(self):
         self.i = self.i + 1
         try:
             self.current = self.s[self.i]
         except IndexError:
             self.current = None
+
+    def read_constant_string_token(self):
+        """Read a constant string that must be delimited by either "
+        or ' characters. The string is returned with it's delimiters."""
+        val = ''
+        qchar = None
+        i18n = False
+        self.next_char()
+        if self.current == '_':
+            i18n = True
+            self.next_char() 
+            if self.current != '(':
+                raise TemplateSyntaxError, "Bad character (expecting '(') '%s'" % self.current
+            self.next_char()
+        if not self.current in ('"', "'"):
+            raise TemplateSyntaxError, "Bad character (expecting '\"' or ''') '%s'" % self.current
+        qchar = self.current
+        val += qchar
+        while 1:
+           self.next_char()
+           if self.current == qchar:
+               break
+           val += self.current
+        val += self.current
+        self.next_char()
+        if i18n:
+            if self.current != ')':
+                raise TemplateSyntaxError, "Bad character (expecting ')') '%s'" % self.current
+            self.next_char()
+            val = qchar+_(val.strip(qchar))+qchar
+        return val
 
     def read_alphanumeric_token(self):
         """Read a variable name or filter name, which are continuous strings of
@@ -318,8 +450,15 @@ class FilterParser:
         return (self.current_filter_name, self.current_filter_arg)
 
     def read_arg(self):
-        # First read a "
+        # First read a " or a _("
         self.next_char()
+        translated = False
+        if self.current == '_':
+            self.next_char()
+            if self.current != '(':
+                raise TemplateSyntaxError, "Bad character (expecting '(') '%s'" % self.current
+            translated = True
+            self.next_char()
         if self.current != '"':
             raise TemplateSyntaxError, "Bad character (expecting '\"') '%s'" % self.current
         self.escaped = False
@@ -346,6 +485,11 @@ class FilterParser:
             arg += self.current
         # self.current must now be '"'
         self.next_char()
+        if translated:
+            if self.current != ')':
+                raise TemplateSyntaxError, "Bad character (expecting ')') '%s'" % self.current
+            self.next_char()
+            arg = _(arg)
         return arg
 
 def get_filters_from_token(token):
