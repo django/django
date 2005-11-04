@@ -135,8 +135,8 @@ def result_headers(cl):
                     th_classes = []
                     new_order_type = 'asc'
                     if field_name == cl.order_field:
-                        th_classes.append('sorted %sending' % order_type.lower())
-                        new_order_type = {'asc': 'desc', 'desc': 'asc'}[order_type.lower()]
+                        th_classes.append('sorted %sending' % cl.order_type.lower())
+                        new_order_type = {'asc': 'desc', 'desc': 'asc'}[cl.order_type.lower()]
                     
                     yield {"text" : f.verbose_name, 
                            "sortable": True,
