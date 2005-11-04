@@ -1,4 +1,5 @@
 {% extends "admin/base_site" %}
+{% load i18n %}
 {% load admin_modify %}
 {% load adminmedia %}
 {% block extrahead %}
@@ -8,21 +9,25 @@
 {% block bodyclass %}{{app_label}}-{{bound_manipulator.object_name.lower}} change-form{% endblock %}
 {% block breadcrumbs %}{% if not is_popup %}
 <div class="breadcrumbs">
-     <a href="../../../">Home</a> &rsaquo;
+     <a href="../../../">{% trans "Home" %}</a> &rsaquo;
      <a href="../">{{bound_manipulator.verbose_name_plural|capfirst}}</a> &rsaquo;
-     {% if add %}Add {{bound_manipulator.verbose_name}}{% else %}{{bound_manipulator.original|striptags|truncatewords:"18"}}{% endif %}
+     {% if add %}{% trans "Add" %} {{bound_manipulator.verbose_name}}{% else %}{{bound_manipulator.original|striptags|truncatewords:"18"}}{% endif %}
 </div>
 {% endif %}{% endblock %}
 {% block content %}<div id="content-main">
 {% if change %}{% if not is_popup %}
-  <ul class="object-tools"><li><a href="history/" class="historylink">History</a></li>
-  {% if bound_manipulator.has_absolute_url %}<li><a href="/r/{{ bound_manipulator.content_type_id }}/{{ object_id }}/" class="viewsitelink">View on site</a></li>{% endif%}
+  <ul class="object-tools"><li><a href="history/" class="historylink">{% trans "History" %}</a></li>
+  {% if bound_manipulator.has_absolute_url %}<li><a href="/r/{{ bound_manipulator.content_type_id }}/{{ object_id }}/" class="viewsitelink">{% trans "View on site" %}</a></li>{% endif%}
   </ul>
 {% endif %}{% endif %}
 <form {{ bound_manipulator.form_enc_attrib }} action='{{ form_url }}' method="post">{% block form_top %}{%endblock%}
 {% if is_popup %}<input type="hidden" name="_popup" value="1">{% endif %}
 {% if bound_manipulator.save_on_top %}{% submit_row %}{% endif %}
-{% if form.error_dict %}<p class="errornote">Please correct the error{{ form.error_dict.items|pluralize }} below.</p>{% endif %}
+{% if form.error_dict %}
+    <p class="errornote">
+    {% blocktrans count form.error_dict.items|length as counter %}Please correct the error below.{% plural %}Please correct the errors below.{% endblocktrans %}
+    </p>
+{% endif %}
 {% for bound_field_set in bound_manipulator.bound_field_sets %}
    <fieldset class="module aligned {{ bound_field_set.classes }}"> 
     {% if bound_field_set.name %}<h2>{{bound_field_set.name }}</h2>{% endif %}
@@ -37,10 +42,10 @@
 {% block after_field_sets %}{% endblock %}
 {% if change %}
    {% if bound_manipulator.ordered_objects %}
-   <fieldset class="module"><h2>Ordering</h2>
+   <fieldset class="module"><h2>{% trans "Ordering" %}</h2>
    <div class="form-row{% if form.order_.errors %} error{% endif %} ">
    {% if form.order_.errors %}{{ form.order_.html_error_list }}{% endif %}
-   <p><label for="id_order_">Order:</label> {{ form.order_ }}</p>
+   <p><label for="id_order_">{% trans "Order:" %}</label> {{ form.order_ }}</p>
    </div></fieldset>
    {% endif %}
 {% endif %}

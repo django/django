@@ -7,15 +7,69 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2005-11-03 12:26+0100\n"
+"POT-Creation-Date: 2005-11-04 15:21+0100\n"
 "PO-Revision-Date: 2005-10-08 00:03+0200\n"
 "Last-Translator: Georg Bauer <gb@bofh.ms>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=iso-8859-1\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: contrib/admin/templates/admin/object_history.html:5
+#: contrib/admin/models/admin.py:6
+msgid "action time"
+msgstr "Zeit der Aktion"
+
+#: contrib/admin/models/admin.py:9
+msgid "object id"
+msgstr "Objekt ID"
+
+#: contrib/admin/models/admin.py:10
+msgid "object repr"
+msgstr "Objekt Darst."
+
+#: contrib/admin/models/admin.py:11
+msgid "action flag"
+msgstr "Aktionskennzeichen"
+
+#: contrib/admin/models/admin.py:12
+msgid "change message"
+msgstr "Änderungsmeldung"
+
+#: contrib/admin/models/admin.py:15
+msgid "log entry"
+msgstr "Logeintrag"
+
+#: contrib/admin/models/admin.py:16
+msgid "log entries"
+msgstr "Logeinträge"
+
+#: contrib/admin/templates/admin/index.html:27
+#: contrib/admin/templates/admin/change_form.html:14
+msgid "Add"
+msgstr "Zufügen"
+
+#: contrib/admin/templates/admin/index.html:33
+msgid "Change"
+msgstr "Ändern"
+
+#: contrib/admin/templates/admin/index.html:43
+msgid "You don't have permission to edit anything."
+msgstr "Sie haben keine Berechtigung irgendwas zu ändern."
+
+#: contrib/admin/templates/admin/index.html:51
+msgid "Recent Actions"
+msgstr "Kürzliche Aktionen"
+
+#: contrib/admin/templates/admin/index.html:52
+msgid "My Actions"
+msgstr "Meine Aktionen"
+
+#: contrib/admin/templates/admin/index.html:56
+msgid "None available"
+msgstr "Keine vorhanden"
+
 #: contrib/admin/templates/admin/500.html:4
+#: contrib/admin/templates/admin/object_history.html:5
+#: contrib/admin/templates/admin/change_form.html:12
 #: contrib/admin/templates/admin/base.html:29
 #: contrib/admin/templates/registration/password_change_done.html:4
 #: contrib/admin/templates/registration/password_reset_form.html:4
@@ -25,7 +79,29 @@ msgstr ""
 msgid "Home"
 msgstr "Start"
 
+#: contrib/admin/templates/admin/500.html:4
+msgid "Server error"
+msgstr "Serverfehler"
+
+#: contrib/admin/templates/admin/500.html:6
+msgid "Server error (500)"
+msgstr "Serverfehler (500)"
+
+#: contrib/admin/templates/admin/500.html:9
+msgid "Server Error <em>(500)</em>"
+msgstr "Serverfehler <em>(500)</em>"
+
+#: contrib/admin/templates/admin/500.html:10
+msgid ""
+"There's been an error. It's been reported to the site administrators via e-"
+"mail and should be fixed shortly. Thanks for your patience."
+msgstr ""
+"Es hat einen Fehler gegeben. Dieser Fehler wurde an die Serververwalter per "
+"eMail weitergegeben und sollte bald behoben sein. Vielen Dank für Ihr "
+"Verständnis."
+
 #: contrib/admin/templates/admin/object_history.html:5
+#: contrib/admin/templates/admin/change_form.html:19
 msgid "History"
 msgstr "Geschichte"
 
@@ -61,61 +137,6 @@ msgstr "Django Systemverwaltung"
 msgid "Django administration"
 msgstr "Django Verwaltung"
 
-#: contrib/admin/templates/admin/500.html:4
-msgid "Server error"
-msgstr "Serverfehler"
-
-#: contrib/admin/templates/admin/500.html:6
-msgid "Server error (500)"
-msgstr "Serverfehler (500)"
-
-#: contrib/admin/templates/admin/500.html:9
-msgid "Server Error <em>(500)</em>"
-msgstr "Serverfehler <em>(500)</em>"
-
-#: contrib/admin/templates/admin/500.html:10
-msgid ""
-"There's been an error. It's been reported to the site administrators via e-"
-"mail and should be fixed shortly. Thanks for your patience."
-msgstr ""
-"Es hat einen Fehler gegeben. Dieser Fehler wurde an die Serververwalter per "
-"eMail weitergegeben und sollte bald behoben sein. Vielen Dank für Ihr "
-"Verständnis."
-
-#: contrib/admin/templates/admin/404.html:4
-#: contrib/admin/templates/admin/404.html:8
-msgid "Page not found"
-msgstr "Seite nicht gefunden"
-
-#: contrib/admin/templates/admin/404.html:10
-msgid "We're sorry, but the requested page could not be found."
-msgstr ""
-"Es tut uns leid, aber die angeforderte Seite kann nicht gefunden werden."
-
-#: contrib/admin/templates/admin/index.html:27
-msgid "Add"
-msgstr "Zufügen"
-
-#: contrib/admin/templates/admin/index.html:33
-msgid "Change"
-msgstr "Ändern"
-
-#: contrib/admin/templates/admin/index.html:43
-msgid "You don't have permission to edit anything."
-msgstr "Sie haben keine Berechtigung irgendwas zu ändern."
-
-#: contrib/admin/templates/admin/index.html:51
-msgid "Recent Actions"
-msgstr "Kürzliche Aktionen"
-
-#: contrib/admin/templates/admin/index.html:52
-msgid "My Actions"
-msgstr "Meine Aktionen"
-
-#: contrib/admin/templates/admin/index.html:56
-msgid "None available"
-msgstr "Keine vorhanden"
-
 #: contrib/admin/templates/admin/login.html:15
 msgid "Username:"
 msgstr "Benutzername:"
@@ -132,17 +153,33 @@ msgstr "Haben Sie <a href=\"/password_reset/\">ihr Passwort vergessen</a>?"
 msgid "Log in"
 msgstr "Anmelden"
 
-#: contrib/admin/templates/admin/base.html:23
-msgid "Welcome,"
-msgstr "Willkommen,"
+#: contrib/admin/templates/admin/404.html:4
+#: contrib/admin/templates/admin/404.html:8
+msgid "Page not found"
+msgstr "Seite nicht gefunden"
 
-#: contrib/admin/templates/admin/base.html:23
-msgid "Change password"
-msgstr "Passwort ändern"
+#: contrib/admin/templates/admin/404.html:10
+msgid "We're sorry, but the requested page could not be found."
+msgstr ""
+"Es tut uns leid, aber die angeforderte Seite kann nicht gefunden werden."
 
-#: contrib/admin/templates/admin/base.html:23
-msgid "Log out"
-msgstr "Abmelden"
+#: contrib/admin/templates/admin/change_form.html:20
+msgid "View on site"
+msgstr "Im Web Anzeigen"
+
+#: contrib/admin/templates/admin/change_form.html:28
+msgid "Please correct the error below."
+msgid_plural "Please correct the errors below."
+msgstr[0] "Bitte den Fehler korrigieren."
+msgstr[1] "Bitte die Fehler korrigieren."
+
+#: contrib/admin/templates/admin/change_form.html:45
+msgid "Ordering"
+msgstr "Sortierung"
+
+#: contrib/admin/templates/admin/change_form.html:48
+msgid "Order:"
+msgstr "Reihenfolge:"
 
 #: contrib/admin/templates/admin/delete_confirmation.html:7
 #, python-format
@@ -167,6 +204,18 @@ msgstr ""
 #: contrib/admin/templates/admin/delete_confirmation.html:18
 msgid "Yes, I'm sure"
 msgstr "Ja, ich bin sicher"
+
+#: contrib/admin/templates/admin/base.html:23
+msgid "Welcome,"
+msgstr "Willkommen,"
+
+#: contrib/admin/templates/admin/base.html:23
+msgid "Change password"
+msgstr "Passwort ändern"
+
+#: contrib/admin/templates/admin/base.html:23
+msgid "Log out"
+msgstr "Abmelden"
 
 #: contrib/admin/templates/registration/password_change_done.html:4
 #: contrib/admin/templates/registration/password_change_form.html:4
@@ -283,34 +332,6 @@ msgstr "Vielen Dank, das Sie unsere Seiten benutzen!"
 #, python-format
 msgid "The %(site_name)s team"
 msgstr "Das Team von %(site_name)s"
-
-#: contrib/admin/models/admin.py:6
-msgid "action time"
-msgstr "Zeit der Aktion"
-
-#: contrib/admin/models/admin.py:9
-msgid "object id"
-msgstr "Objekt ID"
-
-#: contrib/admin/models/admin.py:10
-msgid "object repr"
-msgstr "Objekt Darst."
-
-#: contrib/admin/models/admin.py:11
-msgid "action flag"
-msgstr "Aktionskennzeichen"
-
-#: contrib/admin/models/admin.py:12
-msgid "change message"
-msgstr "Änderungsmeldung"
-
-#: contrib/admin/models/admin.py:15
-msgid "log entry"
-msgstr "Logeintrag"
-
-#: contrib/admin/models/admin.py:16
-msgid "log entries"
-msgstr "Logeinträge"
 
 #: utils/dates.py:6
 msgid "Monday"
@@ -656,47 +677,47 @@ msgstr "Wichtige Daten"
 msgid "Message"
 msgstr "Mitteilung"
 
-#: conf/global_settings.py:37
+#: conf/global_settings.py:38
 msgid "Czech"
 msgstr "Tschechisch"
 
-#: conf/global_settings.py:38
+#: conf/global_settings.py:39
 msgid "German"
 msgstr "Deutsch"
 
-#: conf/global_settings.py:39
+#: conf/global_settings.py:40
 msgid "English"
 msgstr "Englisch"
 
-#: conf/global_settings.py:40
+#: conf/global_settings.py:41
 msgid "Spanish"
 msgstr "Spanisch"
 
-#: conf/global_settings.py:41
+#: conf/global_settings.py:42
 msgid "French"
 msgstr "Französisch"
 
-#: conf/global_settings.py:42
+#: conf/global_settings.py:43
 msgid "Galician"
 msgstr "Galicisch"
 
-#: conf/global_settings.py:43
+#: conf/global_settings.py:44
 msgid "Italian"
 msgstr "Italienisch"
 
-#: conf/global_settings.py:44
+#: conf/global_settings.py:45
 msgid "Brazilian"
 msgstr "Brasilianisch"
 
-#: conf/global_settings.py:45
+#: conf/global_settings.py:46
 msgid "Russian"
 msgstr "Russisch"
 
-#: conf/global_settings.py:46
+#: conf/global_settings.py:47
 msgid "Serbian"
 msgstr "Serbisch"
 
-#: conf/global_settings.py:47
+#: conf/global_settings.py:48
 msgid "Traditional Chinese"
 msgstr ""
 
@@ -972,11 +993,11 @@ msgstr ""
 "Das Attribut %(attr)s in Zeile %(line)s hat einen ungültigen Wert. Die Zeile "
 "beginnt mit \"%(start)s\"."
 
-#: core/meta/fields.py:95
+#: core/meta/fields.py:114
 msgid " Separate multiple IDs with commas."
 msgstr "Mehrere IDs können mit Komma getrennt werden."
 
-#: core/meta/fields.py:98
+#: core/meta/fields.py:117
 msgid ""
 " Hold down \"Control\", or \"Command\" on a Mac, to select more than one."
 msgstr ""
