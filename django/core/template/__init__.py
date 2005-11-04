@@ -530,8 +530,8 @@ filter_raw_string = r"""
               %(i18n_open)s"(?P<i18n_arg>%(str)s)"%(i18n_close)s|
               "(?P<arg>%(str)s)"
              )
-         ){0,1}
- )"""% {
+         )?
+ )""" % {
     'str': r"""[^"\\]*(?:\\.[^"\\]*)*""",
     'var_chars': "A-Za-z0-9\_\." ,
     'filter_sep': re.escape(FILTER_SEPARATOR),

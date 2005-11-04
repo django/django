@@ -619,8 +619,10 @@ class ImageUploadField(FileUploadField):
 ####################
 
 class IntegerField(TextField):
-    def __init__(self, field_name, length=10, maxlength=None, is_required=False, validator_list=[]):
+    def __init__(self, field_name, length=10, maxlength=None, is_required=False, validator_list=[], member_name=None):
         validator_list = [self.isInteger] + validator_list
+        if member_name is not None:
+	   self.member_name = member_name
         TextField.__init__(self, field_name, length, maxlength, is_required, validator_list)
 
     def isInteger(self, field_data, all_data):
