@@ -597,6 +597,7 @@ def add_stage(request, app_label, module_name, show_delete=False, form_url='', p
         'title': _('Add %s') % opts.verbose_name,
         'form': form,
         'is_popup': request.REQUEST.has_key('_popup'),
+        'show_delete': show_delete,
     })
     if object_id_override is not None:
         c['object_id'] = object_id_override

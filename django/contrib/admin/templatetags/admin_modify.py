@@ -24,22 +24,20 @@ include_admin_script = simple_tag(include_admin_script)
 
 
 #@inclusion_tag('admin/submit_line', takes_context=True)
-def submit_row(context):
+def submit_row(context, bound_manipulator):
     change = context['change']
     add = context['add']
     show_delete = context['show_delete']
-    ordered_objects = context['ordered_objects']
-    save_as = context['save_as']
     has_delete_permission = context['has_delete_permission']
     is_popup = context['is_popup']
   
     return {
-        'onclick_attrib' : (ordered_objects and change 
+        'onclick_attrib' : (bound_manipulator.ordered_objects and change 
                             and 'onclick="submitOrderForm();"' or ''), 
         'show_delete_link' : (not is_popup and has_delete_permission 
                               and (change or show_delete)), 
-        'show_save_as_new' : not is_popup and change and save_as,
-        'show_save_and_add_another': not is_popup and (not save_as or add),
+        'show_save_as_new' : not is_popup and change and bound_manipulator.save_as,
+        'show_save_and_add_another': not is_popup and (not bound_manipulator.save_as or add),
         'show_save_and_continue': not is_popup,
         'show_save': True
     }
