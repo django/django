@@ -120,7 +120,7 @@ def result_headers(cl):
                 if field_name == '__repr__':
                     header = lookup_opts.verbose_name
                 else:
-                    func = getattr(mod.Klass, field_name) # Let AttributeErrors propogate.
+                    func = getattr(cl.mod.Klass, field_name) # Let AttributeErrors propogate.
                     try:
                         header = func.short_description
                     except AttributeError:
