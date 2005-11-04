@@ -704,9 +704,7 @@ class RegexFilterParser(object):
             if var == None:
                 var, constant, i18n_constant = match.group("var", "constant", "i18n_constant")
                 if i18n_constant:
-                    #HACK:i18n 
-                    #var = """_("%s")""" % i18n_constant
-                    var = '"%s"' % i18n_constant
+                    var = '"%s"' %  _(i18n_constant)
                 elif constant:
                     var = '"%s"' % constant
                 upto = match.end()
@@ -718,9 +716,7 @@ class RegexFilterParser(object):
                 filter_name = match.group("filter_name")
                 arg, i18n_arg = match.group("arg","i18n_arg")
                 if i18n_arg:
-                    #HACK:i18n
-                    #arg =_(i18n_arg.replace('\\', ''))
-                    arg = i18n_arg.replace('\\', '')
+                    arg =_(i18n_arg.replace('\\', ''))
                 if arg:
                     arg = arg.replace('\\', '')
                 if not registered_filters.has_key(filter_name):
