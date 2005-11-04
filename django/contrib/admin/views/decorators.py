@@ -19,7 +19,7 @@ def _display_login_form(request, error_message=''):
     else:
         post_data = _encode_post_data({})
     return render_to_response('admin/login', {
-        'title': 'Log in',
+        'title': _('Log in'),
         'app_path': request.path,
         'post_data': post_data,
         'error_message': error_message
@@ -53,15 +53,14 @@ def staff_member_required(view_func):
         # If this isn't already the login page, display it.
         if not request.POST.has_key(LOGIN_FORM_KEY):
             if request.POST:
-                message = "Please log in again, because your session has expired. "\
-                          "Don't worry: Your submission has been saved."
+                message = _("Please log in again, because your session has expired. Don't worry: Your submission has been saved.")
             else:
                 message = ""
             return _display_login_form(request, message)
 
         # Check that the user accepts cookies.
         if not request.session.test_cookie_worked():
-            message = "Looks like your browser isn't configured to accept cookies. Please enable cookies, reload this page, and try again."
+            message = _("Looks like your browser isn't configured to accept cookies. Please enable cookies, reload this page, and try again.")
             return _display_login_form(request, message)
 
         # Check the password.
@@ -75,9 +74,9 @@ def staff_member_required(view_func):
                 try:
                     user = users.get_object(email__exact=username)
                 except users.UserDoesNotExist:
-                    message = "Usernames cannot contain the '@' character."
+                    message = _("Usernames cannot contain the '@' character.")
                 else:
-                    message = "Your e-mail address is not your username. Try '%s' instead." % user.username
+                    message = _("Your e-mail address is not your username. Try '%s' instead.") % user.username
             return _display_login_form(request, message)
 
         # The user data is correct; log in the user in and continue.

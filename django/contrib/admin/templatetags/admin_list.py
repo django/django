@@ -252,8 +252,8 @@ def date_hierarchy(cl):
                 raw_template.append('<li><a href="%s">%s</a></li>' % \
                     (cl.get_query_string({year_field: year_lookup, month_field: month_lookup, day_field: day.day}, [field_generic]), day.strftime('%B %d')))
         elif year_lookup:
-            raw_template.append('<li class="date-back"><a href="%s">&lsaquo; All dates</a></li>' % \
-                cl.get_query_string( {}, [year_field]))
+            raw_template.append('<li class="date-back"><a href="%s">&lsaquo; %s</a></li>' % \
+                cl.get_query_string( {}, [year_field]), _('All dates'))
             date_lookup_params = lookup_params.copy()
             date_lookup_params.update({year_field: year_lookup})
             for month in getattr(lookup_mod, 'get_%s_list' % field_name)('month', **date_lookup_params):

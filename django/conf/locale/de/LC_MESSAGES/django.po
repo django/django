@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2005-11-04 15:21+0100\n"
+"POT-Creation-Date: 2005-11-04 16:27+0100\n"
 "PO-Revision-Date: 2005-10-08 00:03+0200\n"
 "Last-Translator: Georg Bauer <gb@bofh.ms>\n"
 "MIME-Version: 1.0\n"
@@ -41,6 +41,227 @@ msgstr "Logeintrag"
 #: contrib/admin/models/admin.py:16
 msgid "log entries"
 msgstr "Logeinträge"
+
+#: contrib/admin/templatetags/admin_list.py:256
+msgid "All dates"
+msgstr "Alle Tage"
+
+#: contrib/admin/views/decorators.py:22
+#: contrib/admin/templates/admin/login.html:24
+msgid "Log in"
+msgstr "Anmelden"
+
+#: contrib/admin/views/decorators.py:56
+msgid ""
+"Please log in again, because your session has expired. Don't worry: Your "
+"submission has been saved."
+msgstr ""
+"Bitte neu anmelden, da die Session ausgelaufen ist. Keine Angst: die "
+"Beiträge wurden gesichert."
+
+#: contrib/admin/views/decorators.py:63
+msgid ""
+"Looks like your browser isn't configured to accept cookies. Please enable "
+"cookies, reload this page, and try again."
+msgstr ""
+"Es sieht danach aus, das der Browser keine Cookies akzeptiert. Bitte im "
+"Browser Cookies aktivieren und diese Seite neu laden."
+
+#: contrib/admin/views/decorators.py:77
+msgid "Usernames cannot contain the '@' character."
+msgstr "Benutzernamen können das Zeichen '@' nicht enthalten."
+
+#: contrib/admin/views/decorators.py:79
+#, python-format
+msgid "Your e-mail address is not your username. Try '%s' instead."
+msgstr ""
+"Die eMail-Adresse ist nicht der Benutzername. Bitte '%s' stattdessen "
+"versuchen."
+
+#: contrib/admin/views/main.py:78 contrib/admin/views/main.py:106
+#, python-format
+msgid ""
+"<h3>By %s:</h3>\n"
+"<ul>\n"
+msgstr ""
+"<h3>Nach %s:</h3>\n"
+"<ul>\n"
+
+#: contrib/admin/views/main.py:128 contrib/admin/views/main.py:167
+#: contrib/admin/views/main.py:187
+#, python-format
+msgid "<h3>By %s:</h3><ul>\n"
+msgstr "<h3>Nach %s:</h3><ul>\n"
+
+#: contrib/admin/views/main.py:210
+#, python-format
+msgid "Select %s"
+msgstr "%s auswählen"
+
+#: contrib/admin/views/main.py:211
+#, python-format
+msgid "Select %s to change"
+msgstr "%s zur Änderung auswählen"
+
+#: contrib/admin/views/main.py:567
+#, python-format
+msgid "The %(name)s \"%(obj)s\" was added successfully."
+msgstr "%(name)s \"%(obj)s\" wurde erfolgreich hinzugefügt."
+
+#: contrib/admin/views/main.py:572 contrib/admin/views/main.py:647
+msgid "You may edit it again below."
+msgstr "Das Element kann jetzt weiter geändert werden."
+
+#: contrib/admin/views/main.py:580 contrib/admin/views/main.py:656
+#, python-format
+msgid "You may add another %s below."
+msgstr "Jetzt kann ein weiteres Element vom Typ %s angelegt werden."
+
+#: contrib/admin/views/main.py:597
+#, python-format
+msgid "Add %s"
+msgstr "%s zufügen"
+
+#: contrib/admin/views/main.py:612
+#, python-format
+msgid "Added %s."
+msgstr "%s hinzugefügt."
+
+#: contrib/admin/views/main.py:612 contrib/admin/views/main.py:614
+#: contrib/admin/views/main.py:616
+msgid "and"
+msgstr "und"
+
+#: contrib/admin/views/main.py:614
+#, python-format
+msgid "Changed %s."
+msgstr "%s geändert"
+
+#: contrib/admin/views/main.py:616
+#, python-format
+msgid "Deleted %s."
+msgstr "%s gelöscht."
+
+#: contrib/admin/views/main.py:619
+msgid "No fields changed."
+msgstr "Keine Felder geändert."
+
+#: contrib/admin/views/main.py:644
+#, python-format
+msgid "The %(name)s \"%(obj)s\" was changed successfully."
+msgstr "%(name)s \"%(obj)s\" wurde erfolgreich geändert."
+
+#: contrib/admin/views/main.py:653
+#, python-format
+msgid ""
+"The %(name)s \"%(obj)s\" was added successfully. You may edit it again below."
+msgstr ""
+"%(name)s \"%(obj)s\" wurde erfolgreich zugefügt. Das Element kann jetzt "
+"geändert werden."
+
+#: contrib/admin/views/main.py:691
+#, python-format
+msgid "Change %s"
+msgstr "%s ändern"
+
+#: contrib/admin/views/main.py:771
+#, python-format
+msgid "One or more %(fieldname)s in %(name)s: %(obj)s"
+msgstr "Ein oder mehrere %(fieldname)s in %(name)s: %(obj)s"
+
+#: contrib/admin/views/main.py:776
+#, python-format
+msgid "One or more %(fieldname)s in %(name)s:"
+msgstr "Ein oder mehrere %(fieldname)s in %(name)s:"
+
+#: contrib/admin/views/main.py:805
+#, python-format
+msgid "The %(name)s \"%(obj)s\" was deleted successfully."
+msgstr "%(name)s \"%(obj)s\" wurde erfolgreich gelöscht."
+
+#: contrib/admin/views/main.py:808
+msgid "Are you sure?"
+msgstr "Sicher? Ganz sicher?"
+
+#: contrib/admin/views/main.py:823
+#, python-format
+msgid "Change history: %s"
+msgstr "Änderungsgeschichte: %s"
+
+#: contrib/admin/views/doc.py:262 contrib/admin/views/doc.py:271
+#: contrib/admin/views/doc.py:273 contrib/admin/views/doc.py:278
+#: contrib/admin/views/doc.py:279 contrib/admin/views/doc.py:281
+msgid "Integer"
+msgstr "Ganzzahl"
+
+#: contrib/admin/views/doc.py:263
+msgid "Boolean (Either True or False)"
+msgstr "Wahrheitswert (Wahr oder Falsch)"
+
+#: contrib/admin/views/doc.py:264
+#, python-format
+msgid "String (up to %(maxlength)s)"
+msgstr "Zeichenkette (bis zu %(maxlength)s Zeichen)"
+
+#: contrib/admin/views/doc.py:265
+msgid "Comma-separated integers"
+msgstr "Kommaseparierte Liste von Zahlen"
+
+#: contrib/admin/views/doc.py:266
+msgid "Date (without time)"
+msgstr "Datum (ohne Zeit)"
+
+#: contrib/admin/views/doc.py:267
+msgid "Date (with time)"
+msgstr "Datum (mit Zeit)"
+
+#: contrib/admin/views/doc.py:268
+msgid "E-mail address"
+msgstr "E-mail-Adresse"
+
+#: contrib/admin/views/doc.py:269 contrib/admin/views/doc.py:272
+msgid "File path"
+msgstr "Dateipfad"
+
+#: contrib/admin/views/doc.py:270
+msgid "Decimal number"
+msgstr "Dezimalzahl"
+
+#: contrib/admin/views/doc.py:274
+msgid "IP address"
+msgstr "IP-Adresse"
+
+#: contrib/admin/views/doc.py:276
+msgid "Boolean (Either True, False or None)"
+msgstr "Wahrheitswert (Wahr, Falsch oder Nichts)"
+
+#: contrib/admin/views/doc.py:277
+msgid "Phone number"
+msgstr "Telefonnummer"
+
+#: contrib/admin/views/doc.py:280
+msgid "String (up to 50)"
+msgstr "Zeichenkette (bis zu 50 Zeichen)"
+
+#: contrib/admin/views/doc.py:282
+msgid "Text"
+msgstr "Text"
+
+#: contrib/admin/views/doc.py:283
+msgid "Time"
+msgstr "Zeit"
+
+#: contrib/admin/views/doc.py:284 models/core.py:81
+msgid "URL"
+msgstr "URL"
+
+#: contrib/admin/views/doc.py:285
+msgid "U.S. state (two uppercase letters)"
+msgstr "U.S. Bundesstaat (zwei Grossbuchstaben)"
+
+#: contrib/admin/views/doc.py:286
+msgid "XML text"
+msgstr "XML Text"
 
 #: contrib/admin/templates/admin/index.html:27
 #: contrib/admin/templates/admin/change_form.html:14
@@ -149,10 +370,6 @@ msgstr "Passwort:"
 msgid "Have you <a href=\"/password_reset/\">forgotten your password</a>?"
 msgstr "Haben Sie <a href=\"/password_reset/\">ihr Passwort vergessen</a>?"
 
-#: contrib/admin/templates/admin/login.html:24
-msgid "Log in"
-msgstr "Anmelden"
-
 #: contrib/admin/templates/admin/404.html:4
 #: contrib/admin/templates/admin/404.html:8
 msgid "Page not found"
@@ -216,6 +433,26 @@ msgstr "Passwort ändern"
 #: contrib/admin/templates/admin/base.html:23
 msgid "Log out"
 msgstr "Abmelden"
+
+#: contrib/admin/templates/admin/submit_line.html:3
+msgid "Delete"
+msgstr "Löschen"
+
+#: contrib/admin/templates/admin/submit_line.html:4
+msgid "Save as new"
+msgstr "Als Neu sichern"
+
+#: contrib/admin/templates/admin/submit_line.html:5
+msgid "Save and add another"
+msgstr "Sichern und neu hinzufügen"
+
+#: contrib/admin/templates/admin/submit_line.html:6
+msgid "Save and continue editing"
+msgstr "Sichern und weiter bearbeiten"
+
+#: contrib/admin/templates/admin/submit_line.html:7
+msgid "Save"
+msgstr "Sichern"
 
 #: contrib/admin/templates/registration/password_change_done.html:4
 #: contrib/admin/templates/registration/password_change_form.html:4
@@ -512,10 +749,6 @@ msgstr "Umleitung"
 #: models/core.py:68
 msgid "redirects"
 msgstr "Umleitungen"
-
-#: models/core.py:81
-msgid "URL"
-msgstr "URL"
 
 #: models/core.py:82
 msgid ""

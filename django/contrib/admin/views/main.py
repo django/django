@@ -75,7 +75,7 @@ class FilterSpec(object):
     def output(self, cl):
         t = []
         if self.has_output():
-            t.append('<h3>By %s:</h3>\n<ul>\n' % self.title)
+            t.append(_('<h3>By %s:</h3>\n<ul>\n') % self.title)
             
             for choice in self.choices:
                 t.append('<li%s><a href="%s">%s</a></li>\n' % \
@@ -103,7 +103,7 @@ class RelatedFilterSpec(FilterSpec):
     def output(self, cl):  
         t = []
         if self.has_output():
-            t.append('<h3>By %s:</h3>\n<ul>\n' % self.lookup_title)
+            t.append(_('<h3>By %s:</h3>\n<ul>\n') % self.lookup_title)
             t.append('<li%s><a href="%s">All</a></li>\n' % \
                 ((self.lookup_val is None and ' class="selected"' or ''),
                 cl.get_query_string({}, [self.lookup_kwarg])))
@@ -125,7 +125,7 @@ class ChoicesFilterSpec(FilterSpec):
         
     def output(self, cl):
         t = []
-        t.append('<h3>By %s:</h3><ul>\n' % self.field.verbose_name)
+        t.append(_('<h3>By %s:</h3><ul>\n') % self.field.verbose_name)
         t.append('<li%s><a href="%s">All</a></li>\n' % \
             ((self.lookup_val is None and ' class="selected"' or ''),
             cl.get_query_string( {}, [self.lookup_kwarg])))
@@ -164,7 +164,7 @@ class DateFieldFilterSpec(FilterSpec):
         
     def output(self, cl):
         t = []    
-        t.append('<h3>By %s:</h3><ul>\n' % self.field.verbose_name)
+        t.append(_('<h3>By %s:</h3><ul>\n') % self.field.verbose_name)
         for title, param_dict in self.links:
             t.append('<li%s><a href="%s">%s</a></li>\n' % \
                 ((self.date_params == param_dict) and ' class="selected"' or '',
@@ -184,7 +184,7 @@ class BooleanFieldFilterSpec(FilterSpec):
         
     def output(self, cl):
         t = []
-        t.append('<h3>By %s:</h3><ul>\n' % self.field.verbose_name)
+        t.append(_('<h3>By %s:</h3><ul>\n') % self.field.verbose_name)
         for k, v in (('All', None), ('Yes', '1'), ('No', '0')):
             t.append('<li%s><a href="%s">%s</a></li>\n' % \
                 (((self.lookup_val == v and not self.lookup_val2) and ' class="selected"' or ''),
@@ -207,8 +207,8 @@ class ChangeList(object):
         self.get_lookup_params()
         self.get_results(request)
         self.title = (self.is_popup 
-                      and 'Select %s' % self.opts.verbose_name 
-                      or 'Select %s to change' % self.opts.verbose_name)
+                      and _('Select %s') % self.opts.verbose_name 
+                      or _('Select %s to change') % self.opts.verbose_name)
         self.get_filters(request)
     
     def get_filters(self, request):
@@ -429,7 +429,7 @@ def get_javascript_imports(opts,auto_populated_fields, ordered_objects, field_se
 
 class AdminBoundField(BoundField):
     def __init__(self, field, field_mapping, original):
-        super(AdminBoundField, self).__init__(field,field_mapping,original) 	
+        super(AdminBoundField, self).__init__(field,field_mapping,original)     
 
         self.element_id = self.form_fields[0].get_id() 
         self.has_label_first = not isinstance(self.field, meta.BooleanField)
@@ -564,12 +564,12 @@ def add_stage(request, app_label, module_name, show_delete=False, form_url='', p
         if not errors and not request.POST.has_key("_preview"):
             new_object = manipulator.save(new_data)
             log_add_message(request.user, opts,manipulator,new_object)
-            msg = 'The %s "%s" was added successfully.' % (opts.verbose_name, new_object)
+            msg = _('The %(name)s "%(obj)s" was added successfully.') % {'name':opts.verbose_name, 'obj':new_object}
             pk_value = getattr(new_object,opts.pk.column)
             # Here, we distinguish between different save types by checking for
             # the presence of keys in request.POST.
             if request.POST.has_key("_continue"):
-                request.user.add_message("%s You may edit it again below." % msg)
+                request.user.add_message(msg + ' ' + _("You may edit it again below."))
                 if request.POST.has_key("_popup"):
                     post_url_continue += "?_popup=1"
                 return HttpResponseRedirect(post_url_continue % pk_value)
@@ -577,7 +577,7 @@ def add_stage(request, app_label, module_name, show_delete=False, form_url='', p
                 return HttpResponse('<script type="text/javascript">opener.dismissAddAnotherPopup(window, %s, "%s");</script>' % \
                     (pk_value, repr(new_object).replace('"', '\\"')))
             elif request.POST.has_key("_addanother"):
-                request.user.add_message("%s You may add another %s below." % (msg, opts.verbose_name))
+                request.user.add_message(msg + ' ' + (_("You may add another %s below.") % opts.verbose_name))
                 return HttpResponseRedirect(request.path)
             else:
                 request.user.add_message(msg)
@@ -594,7 +594,7 @@ def add_stage(request, app_label, module_name, show_delete=False, form_url='', p
     form = formfields.FormWrapper(manipulator, new_data, errors, edit_inline=True)
     
     c = Context(request, {
-        'title': 'Add %s' % opts.verbose_name,
+        'title': _('Add %s') % opts.verbose_name,
         'form': form,
         'is_popup': request.REQUEST.has_key('_popup'),
     })
@@ -609,14 +609,14 @@ def log_change_message(user, opts,manipulator,new_object):
     # Construct the change message.
     change_message = []
     if manipulator.fields_added:
-        change_message.append('Added %s.' % get_text_list(manipulator.fields_added, 'and'))
+        change_message.append(_('Added %s.') % get_text_list(manipulator.fields_added, _('and')))
     if manipulator.fields_changed:
-        change_message.append('Changed %s.' % get_text_list(manipulator.fields_changed, 'and'))
+        change_message.append(_('Changed %s.') % get_text_list(manipulator.fields_changed, _('and')))
     if manipulator.fields_deleted:
-        change_message.append('Deleted %s.' % get_text_list(manipulator.fields_deleted, 'and'))
+        change_message.append(_('Deleted %s.') % get_text_list(manipulator.fields_deleted, _('and')))
     change_message = ' '.join(change_message)
     if not change_message:
-        change_message = 'No fields changed.'
+        change_message = _('No fields changed.')
     log.log_action(user.id, opts.get_content_type_id(), pk_value, str(new_object), log.CHANGE, change_message)
     
 def change_stage(request, app_label, module_name, object_id):
@@ -641,19 +641,19 @@ def change_stage(request, app_label, module_name, object_id):
         if not errors and not request.POST.has_key("_preview"):
             new_object = manipulator.save(new_data)
             log_change_message(request.user,opts,manipulator,new_object)
-            msg = 'The %s "%s" was changed successfully.' % (opts.verbose_name, new_object)
+            msg = _('The %(name)s "%(obj)s" was changed successfully.') % {'name': opts.verbose_name, 'obj':new_object}
             pk_value = getattr(new_object,opts.pk.column)
             if request.POST.has_key("_continue"):
-                request.user.add_message("%s You may edit it again below." % msg)
+                request.user.add_message(msg + ' ' + _("You may edit it again below."))
                 if request.REQUEST.has_key('_popup'):
                     return HttpResponseRedirect(request.path + "?_popup=1")
                 else:
                     return HttpResponseRedirect(request.path)
             elif request.POST.has_key("_saveasnew"):
-                request.user.add_message('The %s "%s" was added successfully. You may edit it again below.' % (opts.verbose_name, new_object))
+                request.user.add_message(_('The %(name)s "%(obj)s" was added successfully. You may edit it again below.') % {'name': opts.verbose_name, 'obj': new_object})
                 return HttpResponseRedirect("../%s/" % pk_value)
             elif request.POST.has_key("_addanother"):
-                request.user.add_message("%s You may add another %s below." % (msg, opts.verbose_name))
+                request.user.add_message(msg + ' ' + (_("You may add another %s below.") % opts.verbose_name))
                 return HttpResponseRedirect("../add/")
             else:
                 request.user.add_message(msg)
@@ -688,7 +688,7 @@ def change_stage(request, app_label, module_name, object_id):
             form.order_objects.extend(orig_list)
             
     c = Context(request, {
-        'title': 'Change %s' % opts.verbose_name,
+        'title': _('Change %s') % opts.verbose_name,
         'form': form,
         'object_id': object_id,
         'original': manipulator.original_object,
@@ -768,12 +768,14 @@ def _get_deleted_objects(deleted_objects, perms_needed, user, obj, opts, current
             if related.field.rel.edit_inline or not related.opts.admin:
                 # Don't display link to edit, because it either has no
                 # admin or is edited inline.
-                nh(deleted_objects, current_depth, ['One or more %s in %s: %s' % \
-                    (related.field.name, related.opts.verbose_name, strip_tags(str(sub_obj))), []])
+                nh(deleted_objects, current_depth, [_('One or more %(fieldname)s in %(name)s: %(obj)s') % \
+                    {'fieldname': related.field.name, 'name': related.opts.verbose_name, 'obj': strip_tags(str(sub_obj))}, []])
             else:
                 # Display a link to the admin page.
-                nh(deleted_objects, current_depth, ['One or more %s in %s: <a href="../../../../%s/%s/%s/">%s</a>' % \
-                    (related.field.name, related.opts.verbose_name, related.opts.app_label, related.opts.module_name, sub_obj.id, strip_tags(str(sub_obj))), []])
+                nh(deleted_objects, current_depth, [
+                    (_('One or more %(fieldname)s in %(name)s:') % {'fieldname': related.field.name, 'name':related.opts.verbose_name}) + \
+                    (' <a href="../../../../%s/%s/%s/">%s</a>' % \
+                        (related.opts.app_label, related.opts.module_name, sub_obj.id, strip_tags(str(sub_obj)))), []])
         # If there were related objects, and the user doesn't have
         # permission to change them, add the missing perm to perms_needed.
         if related.opts.admin and has_related_objs:
@@ -800,10 +802,10 @@ def delete_stage(request, app_label, module_name, object_id):
         obj_display = str(obj)
         obj.delete()
         log.log_action(request.user.id, opts.get_content_type_id(), object_id, obj_display, log.DELETION)
-        request.user.add_message('The %s "%s" was deleted successfully.' % (opts.verbose_name, obj_display))
+        request.user.add_message(_('The %(name)s "%(obj)s" was deleted successfully.') % {'name':opts.verbose_name, 'obj':obj_display})
         return HttpResponseRedirect("../../")
     return render_to_response('admin/delete_confirmation', {
-        "title": "Are you sure?",
+        "title": _("Are you sure?"),
         "object_name": opts.verbose_name,
         "object": obj,
         "deleted_objects": deleted_objects,
@@ -818,7 +820,7 @@ def history(request, app_label, module_name, object_id):
     # If no history was found, see whether this object even exists.
     obj = get_object_or_404(mod, pk=object_id)
     return render_to_response('admin/object_history', {
-        'title': 'Change history: %s' % obj,
+        'title': _('Change history: %s') % obj,
         'action_list': action_list,
         'module_name': capfirst(opts.verbose_name_plural),
         'object': obj,
