@@ -16,7 +16,7 @@
 {% block content %}<div id="content-main">
 {% if change %}{% if not is_popup %}
   <ul class="object-tools"><li><a href="history/" class="historylink">History</a></li>
-  {% if has_absolute_url %}<li><a href="/r/{{ bound_manipulator.content_type_id }}/{{ object_id }}/" class="viewsitelink">View on site</a></li>{% endif%}
+  {% if bound_manipulator.has_absolute_url %}<li><a href="/r/{{ bound_manipulator.content_type_id }}/{{ object_id }}/" class="viewsitelink">View on site</a></li>{% endif%}
   </ul>
 {% endif %}{% endif %}
 <form {{ bound_manipulator.form_enc_attrib }} action='{{ form_url }}' method="post">{% block form_top %}{%endblock%}
