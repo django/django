@@ -460,7 +460,7 @@ msgstr "innholds typer"
 
 #: models/core.py:62
 msgid "redirect from"
-msgstr "videresend fra"
+msgstr "omadresser fra"
 
 #: models/core.py:63
 msgid ""
@@ -472,7 +472,7 @@ msgstr ""
 
 #: models/core.py:64
 msgid "redirect to"
-msgstr "videresend til"
+msgstr "omadresser til"
 
 #: models/core.py:65
 msgid ""
@@ -484,11 +484,11 @@ msgstr ""
 
 #: models/core.py:67
 msgid "redirect"
-msgstr "videresend"
+msgstr "omadressering"
 
 #: models/core.py:68
 msgid "redirects"
-msgstr "vidersesendelser"
+msgstr "omadresserelser"
 
 #: models/core.py:81
 msgid "URL"
@@ -684,7 +684,7 @@ msgstr "Italiensk"
 
 #: conf/global_settings.py:43
 msgid "Norwegian"
-msgstr ""
+msgstr "Norsk"
 
 #: conf/global_settings.py:44
 msgid "Brazilian"
@@ -700,7 +700,7 @@ msgstr "Serbisk"
 
 #: conf/global_settings.py:47
 msgid "Simplified Chinese"
-msgstr ""
+msgstr "Simpel Kinesisk"
 
 #: core/validators.py:58
 msgid "This value must contain only letters, numbers and underscores."
