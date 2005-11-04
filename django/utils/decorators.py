@@ -23,7 +23,7 @@ def decorator_from_middleware(middleware_class):
                     result = middleware.process_exception(request, e)
                     if result is not None:
                         return result
-                raise e
+                raise
             if hasattr(middleware, 'process_response'):
                 result = middleware.process_response(request, response)
                 if result is not None:

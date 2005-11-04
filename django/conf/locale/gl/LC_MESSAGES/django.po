@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2005-11-03 12:26+0100\n"
+"POT-Creation-Date: 2005-11-04 09:29-0600\n"
 "PO-Revision-Date: 2005-10-16 14:29+0100\n"
 "Last-Translator: Afonso Fernández Nogueira <fonzzo.django@gmail.com>\n"
 "Language-Team: Galego\n"
@@ -17,16 +17,58 @@ msgstr ""
 "X-Poedit-Language: Galician\n"
 "X-Poedit-SourceCharset: utf-8\n"
 
-#: contrib/admin/templates/admin/object_history.html:5
-#: contrib/admin/templates/admin/500.html:4
+#: contrib/admin/templates/admin/base.html:23
+msgid "Welcome,"
+msgstr "Benvido,"
+
+#: contrib/admin/templates/admin/base.html:23
+msgid "Change password"
+msgstr "Cambiar contrasinal"
+
+#: contrib/admin/templates/admin/base.html:23
+msgid "Log out"
+msgstr "Saír"
+
 #: contrib/admin/templates/admin/base.html:29
-#: contrib/admin/templates/registration/password_change_done.html:4
-#: contrib/admin/templates/registration/password_reset_form.html:4
+#: contrib/admin/templates/admin/500.html:4
+#: contrib/admin/templates/admin/object_history.html:5
 #: contrib/admin/templates/registration/logged_out.html:4
-#: contrib/admin/templates/registration/password_reset_done.html:4
+#: contrib/admin/templates/registration/password_change_done.html:4
 #: contrib/admin/templates/registration/password_change_form.html:4
+#: contrib/admin/templates/registration/password_reset_done.html:4
+#: contrib/admin/templates/registration/password_reset_form.html:4
 msgid "Home"
 msgstr "Inicio"
+
+#: contrib/admin/templates/admin/404.html:4
+#: contrib/admin/templates/admin/404.html:8
+msgid "Page not found"
+msgstr "Páxina non atopada"
+
+#: contrib/admin/templates/admin/404.html:10
+msgid "We're sorry, but the requested page could not be found."
+msgstr "Sentímolo, pero non se atopou a páxina solicitada."
+
+#: contrib/admin/templates/admin/500.html:4
+#, fuzzy
+msgid "Server error"
+msgstr "Erro do servidor (500)"
+
+#: contrib/admin/templates/admin/500.html:6
+msgid "Server error (500)"
+msgstr "Erro do servidor (500)"
+
+#: contrib/admin/templates/admin/500.html:9
+msgid "Server Error <em>(500)</em>"
+msgstr "Erro do servidor <em>(500)</em>"
+
+#: contrib/admin/templates/admin/500.html:10
+msgid ""
+"There's been an error. It's been reported to the site administrators via e-"
+"mail and should be fixed shortly. Thanks for your patience."
+msgstr ""
+"Houbo un erro. Xa se informou aos administradores do sitio por correo "
+"electrónico e debería quedar arranxado pronto. Grazas pola súa paciencia."
 
 #: contrib/admin/templates/admin/object_history.html:5
 msgid "History"
@@ -64,35 +106,29 @@ msgstr "Administración de sitio Django"
 msgid "Django administration"
 msgstr "Administración de Django"
 
-#: contrib/admin/templates/admin/500.html:4
-#, fuzzy
-msgid "Server error"
-msgstr "Erro do servidor (500)"
-
-#: contrib/admin/templates/admin/500.html:6
-msgid "Server error (500)"
-msgstr "Erro do servidor (500)"
-
-#: contrib/admin/templates/admin/500.html:9
-msgid "Server Error <em>(500)</em>"
-msgstr "Erro do servidor <em>(500)</em>"
-
-#: contrib/admin/templates/admin/500.html:10
+#: contrib/admin/templates/admin/delete_confirmation.html:7
+#, fuzzy, python-format
 msgid ""
-"There's been an error. It's been reported to the site administrators via e-"
-"mail and should be fixed shortly. Thanks for your patience."
+"Deleting the %(object_name)s '%(object)s' would result in deleting related "
+"objects, but your account doesn't have permission to delete the following "
+"types of objects:"
 msgstr ""
-"Houbo un erro. Xa se informou aos administradores do sitio por correo "
-"electrónico e debería quedar arranxado pronto. Grazas pola súa paciencia."
+"Borrar o %(object_name)s '%(object)s' resultaría na eliminación de obxectos "
+"relacionados, pero a súa conta non ten permiso para borrar os seguintes "
+"tipos de obxectos:"
 
-#: contrib/admin/templates/admin/404.html:4
-#: contrib/admin/templates/admin/404.html:8
-msgid "Page not found"
-msgstr "Páxina non atopada"
+#: contrib/admin/templates/admin/delete_confirmation.html:14
+#, python-format
+msgid ""
+"Are you sure you want to delete the %(object_name)s \"%(object)s\"? All of "
+"the following related items will be deleted:"
+msgstr ""
+"Seguro que quere borrar o %(object_name)s \"%(object)s\"? Eliminaranse os "
+"seguintes obxectos relacionados:"
 
-#: contrib/admin/templates/admin/404.html:10
-msgid "We're sorry, but the requested page could not be found."
-msgstr "Sentímolo, pero non se atopou a páxina solicitada."
+#: contrib/admin/templates/admin/delete_confirmation.html:18
+msgid "Yes, I'm sure"
+msgstr "Si, estou seguro"
 
 #: contrib/admin/templates/admin/index.html:27
 msgid "Add"
@@ -134,41 +170,13 @@ msgstr "<a href=\"/password_reset/\">Esqueceu o contrasinal</a>?"
 msgid "Log in"
 msgstr "Entrar"
 
-#: contrib/admin/templates/admin/base.html:23
-msgid "Welcome,"
-msgstr "Benvido,"
+#: contrib/admin/templates/registration/logged_out.html:8
+msgid "Thanks for spending some quality time with the Web site today."
+msgstr "Grazas polo tempo que dedicou ao sitio web."
 
-#: contrib/admin/templates/admin/base.html:23
-msgid "Change password"
-msgstr "Cambiar contrasinal"
-
-#: contrib/admin/templates/admin/base.html:23
-msgid "Log out"
-msgstr "Saír"
-
-#: contrib/admin/templates/admin/delete_confirmation.html:7
-#, fuzzy, python-format
-msgid ""
-"Deleting the %(object_name)s '%(object)s' would result in deleting related "
-"objects, but your account doesn't have permission to delete the following "
-"types of objects:"
-msgstr ""
-"Borrar o %(object_name)s '%(object)s' resultaría na eliminación de obxectos "
-"relacionados, pero a súa conta non ten permiso para borrar os seguintes "
-"tipos de obxectos:"
-
-#: contrib/admin/templates/admin/delete_confirmation.html:14
-#, python-format
-msgid ""
-"Are you sure you want to delete the %(object_name)s \"%(object)s\"? All of "
-"the following related items will be deleted:"
-msgstr ""
-"Seguro que quere borrar o %(object_name)s \"%(object)s\"? Eliminaranse os "
-"seguintes obxectos relacionados:"
-
-#: contrib/admin/templates/admin/delete_confirmation.html:18
-msgid "Yes, I'm sure"
-msgstr "Si, estou seguro"
+#: contrib/admin/templates/registration/logged_out.html:10
+msgid "Log in again"
+msgstr "Entrar de novo"
 
 #: contrib/admin/templates/registration/password_change_done.html:4
 #: contrib/admin/templates/registration/password_change_form.html:4
@@ -185,49 +193,6 @@ msgstr "O seu contrasinal cambiouse correctamente."
 #: contrib/admin/templates/registration/password_change_done.html:12
 msgid "Your password was changed."
 msgstr "Cambiouse o seu contrasinal."
-
-#: contrib/admin/templates/registration/password_reset_form.html:4
-#: contrib/admin/templates/registration/password_reset_form.html:6
-#: contrib/admin/templates/registration/password_reset_done.html:4
-msgid "Password reset"
-msgstr "Recuperar o contrasinal"
-
-#: contrib/admin/templates/registration/password_reset_form.html:12
-msgid ""
-"Forgotten your password? Enter your e-mail address below, and we'll reset "
-"your password and e-mail the new one to you."
-msgstr ""
-"Esqueceu o contrasinal? Introduza o seu enderezo de correo electrónico "
-"embaixo e enviarémoslle un novo contrasinal."
-
-#: contrib/admin/templates/registration/password_reset_form.html:16
-msgid "E-mail address:"
-msgstr "Enderezo de correo electrónico:"
-
-#: contrib/admin/templates/registration/password_reset_form.html:16
-msgid "Reset my password"
-msgstr "Recuperar o meu contrasinal"
-
-#: contrib/admin/templates/registration/logged_out.html:8
-msgid "Thanks for spending some quality time with the Web site today."
-msgstr "Grazas polo tempo que dedicou ao sitio web."
-
-#: contrib/admin/templates/registration/logged_out.html:10
-msgid "Log in again"
-msgstr "Entrar de novo"
-
-#: contrib/admin/templates/registration/password_reset_done.html:6
-#: contrib/admin/templates/registration/password_reset_done.html:10
-msgid "Password reset successful"
-msgstr "O contrasinal foi recuperado correctamente"
-
-#: contrib/admin/templates/registration/password_reset_done.html:12
-msgid ""
-"We've e-mailed a new password to the e-mail address you submitted. You "
-"should be receiving it shortly."
-msgstr ""
-"Acabamos de enviarlle un novo contrasinal ao enderezo de correo indicado. "
-"Debería recibilo en breve."
 
 #: contrib/admin/templates/registration/password_change_form.html:12
 msgid ""
@@ -252,6 +217,25 @@ msgstr "Confirmar contrasinal:"
 #: contrib/admin/templates/registration/password_change_form.html:23
 msgid "Change my password"
 msgstr "Cambiar o contrasinal"
+
+#: contrib/admin/templates/registration/password_reset_done.html:4
+#: contrib/admin/templates/registration/password_reset_form.html:4
+#: contrib/admin/templates/registration/password_reset_form.html:6
+msgid "Password reset"
+msgstr "Recuperar o contrasinal"
+
+#: contrib/admin/templates/registration/password_reset_done.html:6
+#: contrib/admin/templates/registration/password_reset_done.html:10
+msgid "Password reset successful"
+msgstr "O contrasinal foi recuperado correctamente"
+
+#: contrib/admin/templates/registration/password_reset_done.html:12
+msgid ""
+"We've e-mailed a new password to the e-mail address you submitted. You "
+"should be receiving it shortly."
+msgstr ""
+"Acabamos de enviarlle un novo contrasinal ao enderezo de correo indicado. "
+"Debería recibilo en breve."
 
 #: contrib/admin/templates/registration/password_reset_email.html:2
 msgid "You're receiving this e-mail because you requested a password reset"
@@ -283,6 +267,22 @@ msgstr "Grazas por usar o noso sitio web!"
 #, python-format
 msgid "The %(site_name)s team"
 msgstr "O equipo de %(site_name)s"
+
+#: contrib/admin/templates/registration/password_reset_form.html:12
+msgid ""
+"Forgotten your password? Enter your e-mail address below, and we'll reset "
+"your password and e-mail the new one to you."
+msgstr ""
+"Esqueceu o contrasinal? Introduza o seu enderezo de correo electrónico "
+"embaixo e enviarémoslle un novo contrasinal."
+
+#: contrib/admin/templates/registration/password_reset_form.html:16
+msgid "E-mail address:"
+msgstr "Enderezo de correo electrónico:"
+
+#: contrib/admin/templates/registration/password_reset_form.html:16
+msgid "Reset my password"
+msgstr "Recuperar o meu contrasinal"
 
 #: contrib/admin/models/admin.py:6
 #, fuzzy
@@ -651,32 +651,36 @@ msgstr ""
 msgid "Message"
 msgstr ""
 
-#: conf/global_settings.py:37
+#: conf/global_settings.py:36
 msgid "Czech"
 msgstr ""
 
-#: conf/global_settings.py:38
+#: conf/global_settings.py:37
 msgid "German"
 msgstr ""
 
-#: conf/global_settings.py:39
+#: conf/global_settings.py:38
 msgid "English"
 msgstr ""
 
-#: conf/global_settings.py:40
+#: conf/global_settings.py:39
 msgid "Spanish"
 msgstr ""
 
-#: conf/global_settings.py:41
+#: conf/global_settings.py:40
 msgid "French"
 msgstr ""
 
-#: conf/global_settings.py:42
+#: conf/global_settings.py:41
 msgid "Galician"
 msgstr ""
 
-#: conf/global_settings.py:43
+#: conf/global_settings.py:42
 msgid "Italian"
+msgstr ""
+
+#: conf/global_settings.py:43
+msgid "Norwegian"
 msgstr ""
 
 #: conf/global_settings.py:44
@@ -692,7 +696,7 @@ msgid "Serbian"
 msgstr ""
 
 #: conf/global_settings.py:47
-msgid "Traditional Chinese"
+msgid "Simplified Chinese"
 msgstr ""
 
 #: core/validators.py:58
