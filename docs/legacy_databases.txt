@@ -16,17 +16,22 @@ Give Django your database parameters
 
 You'll need to tell Django what your database connection parameters are, and
 what the name of the database is. Do that by editing these settings in your
-settings file:
+`settings file`_:
 
-    * ``DATABASE_ENGINE``
-    * ``DATABASE_USER``
-    * ``DATABASE_PASSWORD``
-    * ``DATABASE_NAME``
-    * ``DATABASE_HOST``
+    * `DATABASE_ENGINE`_
+    * `DATABASE_USER`_
+    * `DATABASE_PASSWORD`_
+    * `DATABASE_NAME`_
+    * `DATABASE_HOST`_
+    * `DATABASE_PORT`_
 
-For more information on these settings see `Tutorial 1`_.
-
-.. _Tutorial 1: http://www.djangoproject.com/documentation/tutorial1/
+.. _settings file: http://www.djangoproject.com/documentation/settings/
+.. _DATABASE_ENGINE: http://www.djangoproject.com/documentation/settings/#database-engine
+.. _DATABASE_USER: http://www.djangoproject.com/documentation/settings/#database-user
+.. _DATABASE_PASSWORD: http://www.djangoproject.com/documentation/settings/#database-password
+.. _DATABASE_NAME: http://www.djangoproject.com/documentation/settings/#database-name
+.. _DATABASE_HOST: http://www.djangoproject.com/documentation/settings/#database-host
+.. _DATABASE_PORT: http://www.djangoproject.com/documentation/settings/#database-port
 
 Auto-generate the models
 ========================
@@ -72,7 +77,6 @@ following names:
     * ``auth_groups``
     * ``auth_users``
     * ``auth_messages``
-    * ``auth_admin_log``
     * ``auth_groups_permissions``
     * ``auth_users_groups``
     * ``auth_users_user_permissions``

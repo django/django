@@ -1,11 +1,14 @@
 from django.core import meta, validators
 from django.models import core
+from django.utils.translation import gettext_lazy as _
 
 class Permission(meta.Model):
-    name = meta.CharField(maxlength=50)
+    name = meta.CharField(_('name'), maxlength=50)
     package = meta.ForeignKey(core.Package, db_column='package')
-    codename = meta.CharField(maxlength=100)
+    codename = meta.CharField(_('codename'), maxlength=100)
     class META:
+        verbose_name = _('Permission')
+        verbose_name_plural = _('Permissions')
         unique_together = (('package', 'codename'),)
         ordering = ('package', 'codename')
 
@@ -13,9 +16,11 @@ class Permission(meta.Model):
         return "%s | %s" % (self.package, self.name)
 
 class Group(meta.Model):
-    name = meta.CharField(maxlength=80, unique=True)
+    name = meta.CharField(_('name'), maxlength=80, unique=True)
     permissions = meta.ManyToManyField(Permission, blank=True, filter_interface=meta.HORIZONTAL)
     class META:
+        verbose_name = _('Group')
+        verbose_name_plural = _('Groups')
         ordering = ('name',)
         admin = meta.Admin(
             search_fields = ('name',),
@@ -25,20 +30,22 @@ class Group(meta.Model):
         return self.name
 
 class User(meta.Model):
-    username = meta.CharField(maxlength=30, unique=True, validator_list=[validators.isAlphaNumeric])
-    first_name = meta.CharField(maxlength=30, blank=True)
-    last_name = meta.CharField(maxlength=30, blank=True)
-    email = meta.EmailField('e-mail address', blank=True)
-    password_md5 = meta.CharField('password', maxlength=32, help_text="Use an MD5 hash -- not the raw password.")
-    is_staff = meta.BooleanField('staff status', help_text="Designates whether the user can log into this admin site.")
-    is_active = meta.BooleanField('active', default=True)
-    is_superuser = meta.BooleanField('superuser status')
-    last_login = meta.DateTimeField(default=meta.LazyDate())
-    date_joined = meta.DateTimeField(default=meta.LazyDate())
+    username = meta.CharField(_('username'), maxlength=30, unique=True, validator_list=[validators.isAlphaNumeric])
+    first_name = meta.CharField(_('first name'), maxlength=30, blank=True)
+    last_name = meta.CharField(_('last name'), maxlength=30, blank=True)
+    email = meta.EmailField(_('e-mail address'), blank=True)
+    password_md5 = meta.CharField(_('password'), maxlength=32, help_text=_("Use an MD5 hash -- not the raw password."))
+    is_staff = meta.BooleanField(_('staff status'), help_text=_("Designates whether the user can log into this admin site."))
+    is_active = meta.BooleanField(_('active'), default=True)
+    is_superuser = meta.BooleanField(_('superuser status'))
+    last_login = meta.DateTimeField(_('last login'), default=meta.LazyDate())
+    date_joined = meta.DateTimeField(_('date joined'), default=meta.LazyDate())
     groups = meta.ManyToManyField(Group, blank=True,
-        help_text="In addition to the permissions manually assigned, this user will also get all permissions granted to each group he/she is in.")
+        help_text=_("In addition to the permissions manually assigned, this user will also get all permissions granted to each group he/she is in."))
     user_permissions = meta.ManyToManyField(Permission, blank=True, filter_interface=meta.HORIZONTAL)
     class META:
+        verbose_name = _('User')
+        verbose_name_plural = _('Users')
         module_constants = {
             'SESSION_KEY': '_auth_user_id',
         }
@@ -47,10 +54,10 @@ class User(meta.Model):
         admin = meta.Admin(
             fields = (
                 (None, {'fields': ('username', 'password_md5')}),
-                ('Personal info', {'fields': ('first_name', 'last_name', 'email')}),
-                ('Permissions', {'fields': ('is_staff', 'is_active', 'is_superuser', 'user_permissions')}),
-                ('Important dates', {'fields': ('last_login', 'date_joined')}),
-                ('Groups', {'fields': ('groups',)}),
+                (_('Personal info'), {'fields': ('first_name', 'last_name', 'email')}),
+                (_('Permissions'), {'fields': ('is_staff', 'is_active', 'is_superuser', 'user_permissions')}),
+                (_('Important dates'), {'fields': ('last_login', 'date_joined')}),
+                (_('Groups'), {'fields': ('groups',)}),
             ),
             list_display = ('username', 'email', 'first_name', 'last_name', 'is_staff'),
             list_filter = ('is_staff', 'is_superuser'),
@@ -172,7 +179,7 @@ class User(meta.Model):
 
 class Message(meta.Model):
     user = meta.ForeignKey(User)
-    message = meta.TextField()
+    message = meta.TextField(_('Message'))
 
     def __repr__(self):
         return self.message

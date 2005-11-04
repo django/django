@@ -55,3 +55,10 @@ for k in dir(me):
     if not k.startswith('_') and k != 'me' and k != k.upper():
         delattr(me, k)
 del me, k
+
+# as the last step, install the translation machinery and
+# remove the module again to not clutter the namespace.
+from django.utils import translation
+translation.install()
+del translation
+

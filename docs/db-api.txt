@@ -239,6 +239,10 @@ so::
 
     polls.get_list(order_by=['?'])
 
+There's no way to specify whether ordering should be case sensitive. With
+respect to case-sensitivity, Django will order results however your database
+backend normally orders them.
+
 Relationships (joins)
 =====================
 
