@@ -40,7 +40,7 @@ LANGUAGES = (
     ('fr', _('French')),
     ('gl', _('Galician')),
     ('it', _('Italian')),
-    ('no-nb', _('Norwegian')),
+    ('no', _('Norwegian')),
     ('pt-br', _('Brazilian')),
     ('ru', _('Russian')),
     ('sr', _('Serbian')),
