@@ -730,7 +730,7 @@ class OneToOne(ManyToOne):
 
 class Admin:
     def __init__(self, fields=None, js=None, list_display=None, list_filter=None, date_hierarchy=None,
-        save_as=False, ordering=None, search_fields=None, save_on_top=False):
+        save_as=False, ordering=None, search_fields=None, save_on_top=False, list_select_related=False):
         self.fields = fields
         self.js = js or []
         self.list_display = list_display or ['__repr__']
@@ -739,6 +739,7 @@ class Admin:
         self.save_as, self.ordering = save_as, ordering
         self.search_fields = search_fields or []
         self.save_on_top = save_on_top
+        self.list_select_related = list_select_related
 
     def get_field_objs(self, opts):
         """
