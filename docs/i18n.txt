@@ -3,12 +3,7 @@ Internationalization
 ====================
 
 Django has full support for internationalization of text in code and templates.
-Here's an overview of how translation works in Django.
-
-.. admonition:: Behind the scenes
-
-    Django's translation machinery uses the standard ``gettext`` module that
-    comes with Python.
+Here's how it works.
 
 Overview
 ========
@@ -39,6 +34,12 @@ How to internationalize your app: in three steps
     2. Get translations for those strings, in whichever languages you want to
        support.
     3. Activate the locale middleware in your Django settings.
+
+
+.. admonition:: Behind the scenes
+
+    Django's translation machinery uses the standard ``gettext`` module that
+    comes with Python.
 
 How to specify translation strings
 ==================================
@@ -87,6 +88,11 @@ Translation works on variables. Again, here's an identical example::
         output = _(sentence)
         return HttpResponse(output)
 
+(The caveat with using variables or computed values, as in the previous two
+examples, is that Django's translation-string-detecting utility,
+``make-messages.py``, won't be able to find these strings. More on
+``make-messages`` later.)
+
 The strings you pass to ``_()`` or ``gettext()`` can take placeholders,
 specified with Python's standard named-string interpolation syntax. Example::
 
@@ -108,7 +114,7 @@ Marking strings as no-op
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
 Use the function ``django.utils.translation.gettext_noop()`` to mark a string
-as a translate string without translating it. The string is later translated
+as a translation string without translating it. The string is later translated
 from a variable.
 
 Use this if you have constant strings that should be stored in the source
@@ -135,14 +141,14 @@ not the actual translation. The translation itself will be done when the string
 is used in a string context, such as template rendering on the Django admin site.
 
 If you don't like the verbose name ``gettext_lazy``, you can just alias it as
-``_``, like so::
+``_`` (underscore), like so::
 
     from django.utils.translation import gettext_lazy as _
 
     class MyThing(meta.Model):
         name = meta.CharField(help_text=_('This is the help text'))
 
-Always use lazy translations in Django models. And it's a good idea to add
+Always use lazy translations in `Django models`_. And it's a good idea to add
 translations for the field names and table names, too. This means writing
 explicit ``verbose_name`` and ``verbose_name_plural`` options in the ``META``
 class, though::
@@ -154,6 +160,8 @@ class, though::
         class META:
             verbose_name = _('my thing')
             verbose_name_plural = _('mythings')
+
+.. _Django models: http://www.djangoproject.com/documentation/model_api/
 
 Pluralization
 ~~~~~~~~~~~~~
@@ -175,7 +183,7 @@ translation languages as the ``count`` variable).
 In template code
 ----------------
 
-Using translations in Django templates uses two template tags and a slightly
+Using translations in `Django templates`_ uses two template tags and a slightly
 different syntax than in Python code. To give your template access to these
 tags, put ``{% load i18n %}`` toward the top of your template.
 
@@ -240,6 +248,8 @@ translation string. Example::
 In this case, both the tag and the filter will see the already-translated
 string, so they don't need to be aware of translations.
 
+.. _Django templates: http://www.djangoproject.com/documentation/templates_python/
+
 How to create language files
 ============================
 
@@ -262,10 +272,10 @@ To create or update a message file, run this command::
     bin/make-messages.py -l de
 
 ...where ``de`` is the language code for the message file you want to create.
-(The language code, in this case, is in locale format. So, for example, it's
-``pt_BR`` for Brazilian and ``de_AT`` for Austrian German.)
+The language code, in this case, is in locale format. For example, it's
+``pt_BR`` for Brazilian and ``de_AT`` for Austrian German.
 
-The script should be run from one of three places::
+The script should be run from one of three places:
 
     * The root ``django`` directory (not a Subversion checkout, but the one
       that is linked-to via ``$PYTHONPATH`` or is located somewhere on that
@@ -325,10 +335,12 @@ otherwise, they'll be tacked together without whitespace!
     When creating a ``.po`` file with your favorite text editor, first edit
     the charset line (search for ``"CHARSET"``) and set it to the charset
     you'll be using to edit the content. Generally, utf-8 should work for most
-    languages, but ``gettext`` can handle any charset you throw at it.
+    languages, but ``gettext`` should handle any charset you throw at it.
 
 To reexamine all source code and templates for new translation strings and
-update all message files for **all** languages, run ``make-messages.py -a``.
+update all message files for **all** languages, run this::
+
+    make-messages.py -a
 
 Compiling message files
 -----------------------
