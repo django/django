@@ -38,7 +38,7 @@ How to internationalize your app: in three steps
     1. Embed translation strings in your Python code and templates.
     2. Get translations for those strings, in whichever languages you want to
        support.
-    2. Activate the locale middleware in your Django settings.
+    3. Activate the locale middleware in your Django settings.
 
 How to specify translation strings
 ==================================
@@ -293,7 +293,7 @@ mappings between translation strings and the actual translated text for the
 particular language.
 
 For example, if your Django app contained a translation string for the text
-``"Welcome to my site.", like so::
+``"Welcome to my site."``, like so::
 
     _("Welcome to my site.")
 
