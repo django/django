@@ -97,7 +97,7 @@ def isValidIPAddress4(field_data, all_data):
         valid_parts = [el for el in field_data.split('.') if 0 <= int(el) <= 255]
         if len(valid_parts) == 4:
             return
-    raise validators.ValidationError, _("Please enter a valid IP address.")
+    raise ValidationError, _("Please enter a valid IP address.")
 
 def isNotEmpty(field_data, all_data):
     if field_data.strip() == '':
