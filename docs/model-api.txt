@@ -387,7 +387,10 @@ Here are all available field types:
 
         meta.SlugField(prepopulate_from=("pre_name", "name"))
 
-    The admin represents this as an ``<input type="text">`` (a single-line input).
+    ``prepopulate_from`` doesn't accept DateTimeFields.
+
+    The admin represents ``SlugField`` as an ``<input type="text">`` (a
+    single-line input).
 
 ``SmallIntegerField``
     Like an ``IntegerField``, but only allows values under a certain
