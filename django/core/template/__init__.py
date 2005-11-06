@@ -236,15 +236,12 @@ class Parser:
 
 class TokenParser:
     """
-    You need to subclass this class and implement the
-    top method to parse your template line. When instantiating
-    the parser, you pass in the line from the django template
-    parser.
+    Subclass this and implement the top() method to parse a template line. When
+    instantiating the parser, pass in the line from the Django template parser.
 
-    If your tag needs to know what tag name it was called with,
-    you find it in the tagname instance variable of the parser.
+    The parser's "tagname" instance-variable stores the name of the tag that
+    the filter was called with.
     """
-
     def __init__(self, subject):
         self.subject = subject
         self.pointer = 0
@@ -252,31 +249,21 @@ class TokenParser:
         self.tagname = self.tag()
 
     def top(self):
-        """
-        You need to overload this method to do the actual parsing
-        and return the result.
-        """
+        "Overload this method to do the actual parsing and return the result."
         raise NotImplemented
 
     def more(self):
-        """
-        This returns True if there is more stuff in the tag.
-        """
+        "Returns True if there is more stuff in the tag."
         return self.pointer < len(self.subject)
 
     def back(self):
-        """
-        This method undos the last microparser. This can be
-        used for lookahead and backtracking.
-        """
+        "Undoes the last microparser. Use this for lookahead and backtracking."
         if not len(self.backout):
             raise TemplateSyntaxError, "back called without some previous parsing"
         self.pointer = self.backout.pop()
 
     def tag(self):
-        """
-        This microparser just returns the next tag from the line.
-        """
+        "A microparser that just returns the next tag from the line."
         subject = self.subject
         i = self.pointer
         if i >= len(subject):
@@ -292,21 +279,18 @@ class TokenParser:
         return s
 
     def value(self):
-        """
-        This microparser parses for a value - some string constant or
-        variable name.
-        """
+        "A microparser that parses for a value: some string constant or variable name."
         subject = self.subject
         i = self.pointer
         if i >= len(subject):
-            raise TemplateSyntaxError, "searching for value expected another value, found end of string: %s" % subject
+            raise TemplateSyntaxError, "Searching for value. Expected another value but found end of string: %s" % subject
         if subject[i] in ('"', "'"):
             p = i
             i += 1
             while i < len(subject) and subject[i] != subject[p]:
                 i += 1
             if i >= len(subject):
-                raise TemplateSyntaxError, "searching for value, unexpected end of string in column %d: %s" % subject
+                raise TemplateSyntaxError, "Searching for value. Unexpected end of string in column %d: %s" % subject
             i += 1
             res = subject[p:i]
             while i < len(subject) and subject[i] in (' ', '\t'):
@@ -326,18 +310,19 @@ class TokenParser:
             return s
 
 class FilterParser:
-    """Parse a variable token and its optional filters (all as a single string),
-       and return a list of tuples of the filter name and arguments.
-       Sample:
-            >>> token = 'variable|default:"Default value"|date:"Y-m-d"'
-            >>> p = FilterParser(token)
-            >>> p.filters
-            [('default', 'Default value'), ('date', 'Y-m-d')]
-            >>> p.var
-            'variable'
+    """
+    Parses a variable token and its optional filters (all as a single string),
+    and return a list of tuples of the filter name and arguments.
+    Sample:
+        >>> token = 'variable|default:"Default value"|date:"Y-m-d"'
+        >>> p = FilterParser(token)
+        >>> p.filters
+        [('default', 'Default value'), ('date', 'Y-m-d')]
+        >>> p.var
+        'variable'
 
-        This class should never be instantiated outside of the
-        get_filters_from_token helper function.
+    This class should never be instantiated outside of the
+    get_filters_from_token helper function.
     """
     def __init__(self, s):
         self.s = s
@@ -346,8 +331,8 @@ class FilterParser:
         self.filters = []
         self.current_filter_name = None
         self.current_filter_arg = None
-        # First read the variable part - decide on wether we need
-        # to parse a string or a variable by peeking into the stream
+        # First read the variable part. Decide whether we need to parse a
+        # string or a variable by peeking into the stream.
         if self.peek_char() in ('_', '"', "'"):
             self.var = self.read_constant_string_token()
         else:
@@ -378,15 +363,17 @@ class FilterParser:
             self.current = None
 
     def read_constant_string_token(self):
-        """Read a constant string that must be delimited by either "
-        or ' characters. The string is returned with it's delimiters."""
+        """
+        Reads a constant string that must be delimited by either " or '
+        characters. The string is returned with its delimiters.
+        """
         val = ''
         qchar = None
         i18n = False
         self.next_char()
         if self.current == '_':
             i18n = True
-            self.next_char() 
+            self.next_char()
             if self.current != '(':
                 raise TemplateSyntaxError, "Bad character (expecting '(') '%s'" % self.current
             self.next_char()
@@ -409,8 +396,10 @@ class FilterParser:
         return val
 
     def read_alphanumeric_token(self):
-        """Read a variable name or filter name, which are continuous strings of
-        alphanumeric characters + the underscore"""
+        """
+        Reads a variable name or filter name, which are continuous strings of
+        alphanumeric characters + the underscore.
+        """
         var = ''
         while 1:
             self.next_char()

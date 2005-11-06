@@ -2,10 +2,7 @@
 
 from django.core.template import Node, NodeList, Template, Context, resolve_variable, resolve_variable_with_filters, get_filters_from_token, registered_filters
 from django.core.template import TemplateSyntaxError, VariableDoesNotExist, BLOCK_TAG_START, BLOCK_TAG_END, VARIABLE_TAG_START, VARIABLE_TAG_END, register_tag
-from django.utils import translation
-
 import sys
-import re
 
 class CommentNode(Node):
     def render(self, context):
@@ -531,12 +528,10 @@ def do_if(parser, token):
         {% endif %}
 
         {% if not athlete_list or coach_list %}
-            There are no athletes or there are some coaches (OK, so
-            writing English translations of boolean logic sounds
-            stupid; it's not my fault).
+            There are no athletes, or there are some coaches.
         {% endif %}
 
-    For simplicity, ``if`` tags do not allow ``and`` clauses; use nested ``if``
+    For simplicity, ``if`` tags do not allow ``and`` clauses. Use nested ``if``
     tags instead::
 
         {% if athlete_list %}
