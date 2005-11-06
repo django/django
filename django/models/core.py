@@ -1,3 +1,5 @@
+import base64, md5, random, sys
+import cPickle as pickle
 from django.core import meta, validators
 from django.utils.translation import gettext_lazy as _
 
@@ -107,9 +109,6 @@ class FlatFile(meta.Model):
     def get_absolute_url(self):
         return self.url
 
-import base64, md5, random, sys
-import cPickle as pickle
-
 class Session(meta.Model):
     session_key = meta.CharField(_('session key'), maxlength=40, primary_key=True)
     session_data = meta.TextField(_('session data'))
@@ -132,7 +131,12 @@ class Session(meta.Model):
         if md5.new(pickled + SECRET_KEY).hexdigest() != tamper_check:
             from django.core.exceptions import SuspiciousOperation
             raise SuspiciousOperation, "User tampered with session cookie."
-        return pickle.loads(pickled)
+        try:
+            return pickle.loads(pickled)
+        # Unpickling can cause a variety of exceptions. If something happens,
+        # just return an empty dictionary (an empty session).
+        except:
+            return {}
 
     def _module_encode(session_dict):
         "Returns the given session dictionary pickled and encoded as a string."
