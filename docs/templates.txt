@@ -10,8 +10,8 @@ or CheetahTemplate_, you should feel right at home with Django's templates.
 .. _Smarty: http://smarty.php.net/
 .. _CheetahTemplate: http://www.cheetahtemplate.org/
 
-What's a template?
-==================
+Templates
+=========
 
 A template is simply a text file. All Django templates, by convention, have
 ".html" extensions, but they can generate any text-based format (HTML, XML,
@@ -48,8 +48,8 @@ explained later in this document.::
     JavaScript and CSV. You can use the template language for any text-based
     format.
 
-What's a variable?
-==================
+Variables
+=========
 
 Variables look like this: ``{{ variable }}``. When the template engine
 encounters a variable, it evaluates that variable and replaces it with the
@@ -78,8 +78,8 @@ are available in a given template.
 
 You can modify variables for display by using **filters**.
 
-What's a filter?
-================
+Filters
+=======
 
 Filters look like this: ``{{ name|lower }}``. This displays the value of the
 ``{{ name }}`` variable after being filtered through the ``lower`` filter,
@@ -95,8 +95,8 @@ Certain filters take arguments. A filter argument looks like this:
 
 The `Built-in filter reference`_ below describes all the built-in filters.
 
-What's a tag?
-=============
+Tags
+====
 
 Tags look like this: ``{% tag %}``. Tags are more complex than variables: Some
 create text in the output, some control flow by performing loops or logic, and
