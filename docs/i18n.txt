@@ -393,6 +393,7 @@ should follow these guidelines:
     * Make sure it's one of the first middlewares installed.
     * It should come after ``SessionMiddleware``, because ``LocaleMiddleware``
       makes use of session data.
+    * If you use ``CacheMiddleware``, put ``LocaleMiddleware`` after it.
 
 For example, your ``MIDDLEWARE_CLASSES`` might look like this::
 
