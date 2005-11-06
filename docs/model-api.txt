@@ -900,6 +900,14 @@ object, which takes the following parameters. All are optional.
 
     (This example also has ``search_fields`` defined; see below).
 
+``list_select_related``
+    Either ``True`` or ``False``. Default is ``False``. If ``True``, the admin
+    change list page will use the ``select_related`` database-API parameter in
+    its query that retrieves the list of items.
+
+    Note that Django will use ``select_related``, regardless of this setting,
+    if one of the ``list_display`` fields is a ``ForeignKey``.
+
 ``ordering``
     A list or tuple (see the `META options`_, above) that gives a
     different ordering for the admin change list. If this isn't given, the
