@@ -552,7 +552,7 @@ Available format strings:
     s                 Seconds, 2 digits with leading zeros.     ``'00'`` to ``'59'``
     S                 English ordinal suffix for day of the     ``'st'``, ``'nd'``, ``'rd'`` or ``'th'``
                       month, 2 characters.
-    t                 Not implemented.
+    t                 Number of days in the given month.        ``28`` to ``31``
     T                 Time zone of this machine.                ``'EST'``, ``'MDT'``
     U                 Not implemented.
     w                 Day of the week, digits without           ``'0'`` (Sunday) to ``'6'`` (Saturday)
