@@ -1567,7 +1567,7 @@ def manipulator_save(opts, klass, add, change, self, new_data):
                 # Save any uploaded files.
                 for f in rel_opts.fields:
                     if isinstance(f, FileField) and rel_new_data.get(f.name, False):
-                        f.save_file(rel_new_data, new_rel_obj, change and old_rel_obj or None, change, rel=True)
+                        f.save_file(rel_new_data, new_rel_obj, change and old_rel_obj or None, old_rel_obj is not None, rel=True)
 
                 # Calculate whether any fields have changed.
                 if change:
