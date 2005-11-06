@@ -19,7 +19,7 @@ ansi_time_re = re.compile('^%s$' % _timere)
 ansi_datetime_re = re.compile('^%s %s$' % (_datere, _timere))
 email_re = re.compile(r'^[-\w.+]+@\w[\w.-]+$')
 integer_re = re.compile(r'^-?\d+$')
-ip4_re = re.compile(r'^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$')
+ip4_re = re.compile(r'^(25[0-5]|2[0-4]\d|[0-1]?\d?\d)(\.(25[0-5]|2[0-4]\d|[0-1]?\d?\d)){3}$')
 phone_re = re.compile(r'^[A-PR-Y0-9]{3}-[A-PR-Y0-9]{3}-[A-PR-Y0-9]{4}$', re.IGNORECASE)
 slug_re = re.compile(r'^[-\w]+$')
 url_re = re.compile(r'^http://\S+$')
@@ -93,11 +93,8 @@ def isCommaSeparatedEmailList(field_data, all_data):
             raise ValidationError, _("Enter valid e-mail addresses separated by commas.")
 
 def isValidIPAddress4(field_data, all_data):
-    if ip4_re.search(field_data):
-        valid_parts = [el for el in field_data.split('.') if 0 <= int(el) <= 255]
-        if len(valid_parts) == 4:
-            return
-    raise ValidationError, _("Please enter a valid IP address.")
+    if not ip4_re.search(field_data):
+        raise ValidationError, _("Please enter a valid IP address.")
 
 def isNotEmpty(field_data, all_data):
     if field_data.strip() == '':
