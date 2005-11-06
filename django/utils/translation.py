@@ -1,11 +1,8 @@
 "translation helper functions"
 
-import os
-import re
-import sys
+import os, re, sys
 import gettext as gettext_module
 from cStringIO import StringIO
-
 from django.utils.functional import lazy
 
 try:
@@ -20,22 +17,20 @@ else:
     def currentThread():
         return 'no threading'
 
-# translations are cached in a dictionary for
-# every language+app tuple. The active translations
-# are stored by threadid to make them thread local.
+# Translations are cached in a dictionary for every language+app tuple.
+# The active translations are stored by threadid to make them thread local.
 _translations = {}
 _active = {}
 
-# the default translation is based on the settings file
+# The default translation is based on the settings file.
 _default = None
 
-# this is a cache for accept-header to translation
-# object mappings to prevent the accept parser to
-# run multiple times for one user
+# This is a cache for accept-header to translation object mappings to prevent
+# the accept parser to run multiple times for one user.
 _accepted = {}
 
 def to_locale(language):
-    "turn a language name (en-us) into a locale name (en_US)"
+    "Turns a language name (en-us) into a locale name (en_US)."
     p = language.find('-')
     if p >= 0:
         return language[:p].lower()+'_'+language[p+1:].upper()
@@ -43,7 +38,7 @@ def to_locale(language):
         return language.lower()
 
 def to_language(locale):
-    "turns a locale name (en_US) into a language name (en-us)"
+    "Turns a locale name (en_US) into a language name (en-us)."
     p = locale.find('_')
     if p >= 0:
         return locale[:p].lower()+'-'+locale[p+1:].lower()
@@ -52,16 +47,14 @@ def to_language(locale):
 
 class DjangoTranslation(gettext_module.GNUTranslations):
     """
-    This class sets up the GNUTranslations context with
-    regard to output charset. Django uses a defined
-    DEFAULT_CHARSET as the output charset on Python 2.4 -
-    with Python 2.3, you need to use DjangoTranslation23.
+    This class sets up the GNUTranslations context with regard to output
+    charset. Django uses a defined DEFAULT_CHARSET as the output charset on
+    Python 2.4. With Python 2.3, use DjangoTranslation23.
     """
-
     def __init__(self, *args, **kw):
         from django.conf import settings
         gettext_module.GNUTranslations.__init__(self, *args, **kw)
-        # starting with Python 2.4, there is a function to define
+        # Starting with Python 2.4, there's a function to define
         # the output charset. Before 2.4, the output charset is
         # identical with the translation file charset.
         try:
@@ -73,29 +66,25 @@ class DjangoTranslation(gettext_module.GNUTranslations):
 
     def merge(self, other):
         self._catalog.update(other._catalog)
-    
+
     def set_language(self, language):
         self.__language = language
 
     def language(self):
         return self.__language
-    
+
     def __repr__(self):
         return "<DjangoTranslation lang:%s>" % self.__language
 
-
 class DjangoTranslation23(DjangoTranslation):
-
     """
-    This is a compatibility class that is only used with Python 2.3.
-    The reason is, Python 2.3 doesn't support set_output_charset on
-    translation objects and so needs this wrapper class to make sure
-    that input charsets from translation files are correctly translated
-    to output charsets.
+    Compatibility class that is only used with Python 2.3.
+    Python 2.3 doesn't support set_output_charset on translation objects and
+    needs this wrapper class to make sure input charsets from translation files
+    are correctly translated to output charsets.
 
     With a full switch to Python 2.4, this can be removed from the source.
     """
-
     def gettext(self, msgid):
         res = self.ugettext(msgid)
         return res.encode(self.django_output_charset)
@@ -106,20 +95,19 @@ class DjangoTranslation23(DjangoTranslation):
 
 def translation(language):
     """
-    This function returns a translation object.  app must be the fully
-    qualified name of the application.
+    Returns a translation object.
 
     This translation object will be constructed out of multiple GNUTranslations
-    objects by merging their catalogs. It will construct a object for the requested
-    language and add a fallback to the default language, if that is different
-    from the requested language.
+    objects by merging their catalogs. It will construct a object for the
+    requested language and add a fallback to the default language, if it's
+    different from the requested language.
     """
     global _translations
 
     t = _translations.get(language, None)
     if t is not None:
         return t
-    
+
     from django.conf import settings
 
     # set up the right translation class
@@ -150,7 +138,7 @@ def translation(language):
                 return t
             except IOError, e:
                 return None
-    
+
         res = _translation(globalpath)
 
         def _merge(path):
@@ -181,7 +169,7 @@ def translation(language):
 
             if os.path.isdir(apppath):
                 res = _merge(apppath)
-  
+
         if res is None:
             if fallback is not None:
                 res = fallback
@@ -197,49 +185,41 @@ def translation(language):
 
 def activate(language):
     """
-    This function fetches the translation object for a given
-    tuple of application name and language and installs it as
-    the current translation object for the current thread.
+    Fetches the translation object for a given tuple of application name and
+    language and installs it as the current translation object for the current
+    thread.
     """
     _active[currentThread()] = translation(language)
 
 def deactivate():
     """
-    This function deinstalls the currently active translation
-    object so that further _ calls will resolve against the
-    default translation object, again.
+    Deinstalls the currently active translation object so that further _ calls
+    will resolve against the default translation object, again.
     """
     global _active
-
     if _active.has_key(currentThread()):
         del _active[currentThread()]
 
 def get_language():
-    """
-    This function returns the currently selected language.
-    """
+    "Returns the currently selected language."
     t = _active.get(currentThread(), None)
     if t is not None:
         try:
             return to_language(t.language())
         except AttributeError:
             pass
-    # if we don't have a real translation object, we assume
-    # it's the default language.
+    # If we don't have a real translation object, assume it's the default language.
     from django.conf.settings import LANGUAGE_CODE
     return LANGUAGE_CODE
 
 def gettext(message):
     """
-    This function will be patched into the builtins module to
-    provide the _ helper function. It will use the current
-    thread as a discriminator to find the translation object
-    to use. If no current translation is activated, the
-    message will be run through the default translation
-    object.
+    This function will be patched into the builtins module to provide the _
+    helper function. It will use the current thread as a discriminator to find
+    the translation object to use. If no current translation is activated, the
+    message will be run through the default translation object.
     """
     global _default, _active
-
     t = _active.get(currentThread(), None)
     if t is not None:
         return t.gettext(message)
@@ -250,18 +230,15 @@ def gettext(message):
 
 def gettext_noop(message):
     """
-    This function is used to just mark strings for translation
-    but to not translate them now. This can be used to store
-    strings in global variables that should stay in the base
-    language (because they might be used externally) and will
-    be translated later on.
+    Marks strings for translation but doesn't translate them now. This can be
+    used to store strings in global variables that should stay in the base
+    language (because they might be used externally) and will be translated later.
     """
     return message
 
 def ngettext(singular, plural, number):
     """
-    This function returns the translation of either the singular
-    or plural, based on the number.
+    Returns the translation of either the singular or plural, based on the number.
     """
     global _default, _active
 
@@ -278,9 +255,8 @@ ngettext_lazy = lazy(ngettext, str)
 
 def check_for_language(lang_code):
     """
-    This function checks wether there is a global language
-    file for the given language code. This is used to decide
-    wether a user-provided language is available.
+    Checks whether there is a global language file for the given language code.
+    This is used to decide whether a user-provided language is available.
     """
     from django.conf import settings
     globalpath = os.path.join(os.path.dirname(settings.__file__), 'locale')
@@ -291,11 +267,9 @@ def check_for_language(lang_code):
 
 def get_language_from_request(request):
     """
-    analyze the request to find what language the user
-    wants the system to show.
+    Analyzes the request to find what language the user wants the system to show.
     """
     global _accepted
-
     from django.conf import settings
     globalpath = os.path.join(os.path.dirname(settings.__file__), 'locale')
 
@@ -303,11 +277,11 @@ def get_language_from_request(request):
         lang_code = request.session.get('django_language', None)
         if lang_code is not None and check_for_language(lang_code):
             return lang_code
-    
+
     lang_code = request.COOKIES.get('django_language', None)
     if lang_code is not None and check_for_language(lang_code):
         return lang_code
-    
+
     accept = request.META.get('HTTP_ACCEPT_LANGUAGE', None)
     if accept is not None:
 
@@ -338,25 +312,24 @@ def get_language_from_request(request):
                 # filename, because otherwise we might incorrectly
                 # report de_DE if we only have de available, but
                 # did find de_DE because of language normalization
-                lang = langfile[len(globalpath):].split('/')[1]
+                lang = langfile[len(globalpath):].split(os.path.sep)[1]
                 _accepted[accept] = lang
                 return lang
-    
+
     return settings.LANGUAGE_CODE
 
 def install():
     """
-    This installs the gettext function as the default
-    translation function under the name _.
+    Installs the gettext function as the default translation function under
+    the name _.
     """
     __builtins__['_'] = gettext
-
 
 dot_re = re.compile(r'\S')
 def blankout(src, char):
     """
-    This is used in the templateize function and changes every
-    non-whitespace character to the given char.
+    Changes every non-whitespace character to the given char.
+    Used in the templateize function.
     """
     return dot_re.sub(char, src)
 
@@ -368,9 +341,9 @@ constant_re = re.compile(r"""_\(((?:".*?")|(?:'.*?'))\)""")
 def templateize(src):
     from django.core.template import tokenize, TOKEN_TEXT, TOKEN_VAR, TOKEN_BLOCK
     """
-    This function turns a django template into something that is
-    understood by xgettext. It does so by translating the django
-    translation tags into standard gettext function invocations.
+    Turns a Django template into something that is understood by xgettext. It
+    does so by translating the Django translation tags into standard gettext
+    function invocations.
     """
     out = StringIO()
     intrans = False
@@ -400,7 +373,7 @@ def templateize(src):
                 elif pluralmatch:
                     inplural = True
                 else:
-                    raise SyntaxError, "translation blocks must not include other block tags: %s" % t.contents
+                    raise SyntaxError, "Translation blocks must not include other block tags: %s" % t.contents
             elif t.token_type == TOKEN_VAR:
                 if inplural:
                     plural.append('%%(%s)s' % t.contents)
@@ -444,4 +417,3 @@ def templateize(src):
             else:
                 out.write(blankout(t.contents, 'X'))
     return out.getvalue()
-
