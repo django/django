@@ -154,6 +154,18 @@ MEDIA_ROOT = ''
 # Example: "http://media.lawrence.com"
 MEDIA_URL = ''
 
+# Default formatting for date objects. See all available format strings here:
+# http://www.djangoproject.com/documentation/templates/#now
+DATE_FORMAT = 'N j, Y'
+
+# Default formatting for datetime objects. See all available format strings here:
+# http://www.djangoproject.com/documentation/templates/#now
+DATETIME_FORMAT = 'N j, Y, P'
+
+# Default formatting for time objects. See all available format strings here:
+# http://www.djangoproject.com/documentation/templates/#now
+TIME_FORMAT = 'P'
+
 ##############
 # MIDDLEWARE #
 ##############

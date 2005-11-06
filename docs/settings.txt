@@ -258,6 +258,32 @@ Default: ``''`` (Empty string)
 
 The username to use when connecting to the database. Not used with SQLite.
 
+DATE_FORMAT
+-----------
+
+Default: ``'N j, Y'`` (e.g. ``Feb. 4, 2003``)
+
+The default formatting to use for date fields on Django admin change-list
+pages -- and, possibly, by other parts of the system. See
+`allowed date format strings`_.
+
+See also DATETIME_FORMAT and TIME_FORMAT.
+
+.. _allowed date format strings: http://www.djangoproject.com/documentation/templates/#now
+
+DATETIME_FORMAT
+---------------
+
+Default: ``'N j, Y, P'`` (e.g. ``Feb. 4, 2003, 4 p.m.``)
+
+The default formatting to use for datetime fields on Django admin change-list
+pages -- and, possibly, by other parts of the system. See
+`allowed date format strings`_.
+
+See also DATE_FORMAT and TIME_FORMAT.
+
+.. _allowed date format strings: http://www.djangoproject.com/documentation/templates/#now
+
 DEBUG
 -----
 
@@ -481,6 +507,19 @@ Default: ``('django.core.template.loaders.filesystem.load_template_source',)``
 
 A tuple of callables (as strings) that know how to import templates from
 various sources. See the `template documentation`_.
+
+TIME_FORMAT
+-----------
+
+Default: ``'P'`` (e.g. ``4 p.m.``)
+
+The default formatting to use for time fields on Django admin change-list
+pages -- and, possibly, by other parts of the system. See
+`allowed date format strings`_.
+
+See also DATE_FORMAT and DATETIME_FORMAT.
+
+.. _allowed date format strings: http://www.djangoproject.com/documentation/templates/#now
 
 TIME_ZONE
 ---------
