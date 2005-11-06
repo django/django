@@ -11,15 +11,14 @@ class CommonMiddleware:
 
         - Forbids access to User-Agents in settings.DISALLOWED_USER_AGENTS
 
-        - URL rewriting: based on the APPEND_SLASH and PREPEND_WWW settings,
-          this middleware will -- shocking, isn't it -- append missing slashes
-          and/or prepend missing "www."s.
+        - URL rewriting: Based on the APPEND_SLASH and PREPEND_WWW settings,
+          this middleware appends missing slashes and/or prepends missing "www."s.
 
-        - ETags: if the USE_ETAGS setting is set, ETags will be calculated from
+        - ETags: If the USE_ETAGS setting is set, ETags will be calculated from
           the entire page content and Not Modified responses will be returned
           appropriately.
 
-        - Flat files: for 404 responses, a flat file matching the given path
+        - Flat files: For 404 responses, a flat file matching the given path
           will be looked up and used if found.
     """
 
