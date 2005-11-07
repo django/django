@@ -11,6 +11,10 @@ class Site(meta.Model):
         verbose_name_plural = _('sites')
         db_table = 'sites'
         ordering = ('domain',)
+        admin = meta.Admin(
+            list_display = ('domain', 'name'),
+            search_fields = ('domain', 'name'),
+        )
 
     def __repr__(self):
         return self.domain
