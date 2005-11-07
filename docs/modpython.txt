@@ -10,6 +10,8 @@ Python code into memory when the server starts. Code stays in memory throughout
 the life of an Apache process, which leads to significant performance gains over
 other server arrangements.
 
+Django requires Apache 2.x and mod_python 3.x.
+
 .. _Apache: http://httpd.apache.org/
 .. _mod_python: http://www.modpython.org/
 .. _mod_perl: http://perl.apache.org/
@@ -129,7 +131,26 @@ particular part of the site::
         SetHandler None
     </Location>
 
-Just change ``Location`` to the root URL of your media files.
+Just change ``Location`` to the root URL of your media files. You can also use
+``<LocationMatch>`` to match a regular expression.
+
+This example sets up Django at the site root but explicitly disables Django for
+the ``media`` subdirectory and any URL that ends with ``.jpg``, ``.gif`` or
+``.png``::
+
+    <Location "/">
+        SetHandler python-program
+        PythonHandler django.core.handlers.modpython
+        SetEnv DJANGO_SETTINGS_MODULE myproject.settings
+    </Location>
+
+    <Location "media">
+        SetHandler None
+    </Location>
+
+    <LocationMatch "\.(jpg|gif|png)$">
+        SetHandler None
+    </Location>
 
 Note that the Django development server automagically serves admin media files,
 but this is not the case when you use any other server arrangement.
