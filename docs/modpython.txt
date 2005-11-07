@@ -2,7 +2,7 @@
 How to use Django with mod_python
 =================================
 
-`Apache`_ with `mod_python`_ currently is the preferred setup for using Django
+Apache_ with `mod_python`_ currently is the preferred setup for using Django
 on a production server.
 
 mod_python is similar to `mod_perl`_ : It embeds Python within Apache and loads
@@ -112,12 +112,11 @@ revoke your Django privileges.
 Serving media files
 ===================
 
-Django doesn't serve media files itself. It'd be inefficient to flow media
-files through a (relatively) complex framework when much, much more well-tuned
-solutions are better.
+Django doesn't serve media files itself; it leaves that job to whichever Web
+server you choose.
 
-We recommend using a separate Web server for serving media. Here are some good
-choices:
+We recommend using a separate Web server -- i.e., one that's not also running
+Django -- for serving media. Here are some good choices:
 
 * lighttpd_
 * TUX_
@@ -152,9 +151,28 @@ the ``media`` subdirectory and any URL that ends with ``.jpg``, ``.gif`` or
         SetHandler None
     </Location>
 
-Note that the Django development server automagically serves admin media files,
-but this is not the case when you use any other server arrangement.
 
 .. _lighttpd: http://www.lighttpd.net/
 .. _TUX: http://en.wikipedia.org/wiki/TUX_web_server
 .. _Apache: http://httpd.apache.org/
+
+Serving the admin files
+=======================
+
+Note that the Django development server automagically serves admin media files,
+but this is not the case when you use any other server arrangement. You're
+responsible for setting up Apache, or whichever media server you're using, to
+serve the admin files.
+
+The admin files live in (``django/contrib/admin/media``) of the Django
+distribution.
+
+Here are two recommended approaches:
+
+    1. Create a symbolic link to the admin media files from within your
+       document root. This way, all of your Django-related files -- code
+       **and** templates -- stay in one place, and you'll still be able to
+       ``svn update`` your code to get the latest admin templates, if they
+       change.
+    2. Or, copy the admin media files so that they live within your document
+       root.
