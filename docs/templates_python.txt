@@ -611,7 +611,7 @@ Registering the tag
 Finally, use a ``register_tag`` call, as in ``register_filter`` above. Example::
 
     from django.core import template
-    template.register_tag('cycle', do_cycle)
+    template.register_tag('current_time', do_current_time)
 
 ``register_tag`` takes two arguments:
 
