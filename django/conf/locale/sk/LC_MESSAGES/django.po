@@ -1,33 +1,32 @@
-# Translation of django.po to Galego
+# Translation of django.po to.
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
-# Afonso Fernández Nogueira <fonzzo.django@gmail.com>, 2005.
+# Vladimir Labath <vlado@labath.org>, 2005.
 #
+#, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: django\n"
+"Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2005-11-06 21:41-0600\n"
-"PO-Revision-Date: 2005-10-16 14:29+0100\n"
-"Last-Translator: Afonso Fernández Nogueira <fonzzo.django@gmail.com>\n"
-"Language-Team: Galego\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: Vladimir Labath <vlado@labath.org>\n"
+"Language-Team: Slovak <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Poedit-Language: Galician\n"
-"X-Poedit-SourceCharset: utf-8\n"
 
 #: contrib/admin/templates/admin/base.html:23
 msgid "Welcome,"
-msgstr "Benvido,"
+msgstr "Vítajte,"
 
 #: contrib/admin/templates/admin/base.html:23
 msgid "Change password"
-msgstr "Cambiar contrasinal"
+msgstr "Zmena hesla"
 
 #: contrib/admin/templates/admin/base.html:23
 msgid "Log out"
-msgstr "Saír"
+msgstr "Odhlásenie"
 
 #: contrib/admin/templates/admin/base.html:29
 #: contrib/admin/templates/admin/500.html:4
@@ -38,84 +37,83 @@ msgstr "Saír"
 #: contrib/admin/templates/registration/password_reset_done.html:4
 #: contrib/admin/templates/registration/password_reset_form.html:4
 msgid "Home"
-msgstr "Inicio"
+msgstr "Začiatok"
 
 #: contrib/admin/templates/admin/404.html:4
 #: contrib/admin/templates/admin/404.html:8
 msgid "Page not found"
-msgstr "Páxina non atopada"
+msgstr "Stránka sa nenašla"
 
 #: contrib/admin/templates/admin/404.html:10
 msgid "We're sorry, but the requested page could not be found."
-msgstr "Sentímolo, pero non se atopou a páxina solicitada."
+msgstr "Ľutujeme, ale požadovaná stránka sa nenašla."
 
 #: contrib/admin/templates/admin/500.html:4
-#, fuzzy
 msgid "Server error"
-msgstr "Erro do servidor (500)"
+msgstr "Chyba servera"
 
 #: contrib/admin/templates/admin/500.html:6
 msgid "Server error (500)"
-msgstr "Erro do servidor (500)"
+msgstr "Chyba servera (500)"
 
 #: contrib/admin/templates/admin/500.html:9
 msgid "Server Error <em>(500)</em>"
-msgstr "Erro do servidor <em>(500)</em>"
+msgstr "Chyba servera <em>(500)</em>"
 
 #: contrib/admin/templates/admin/500.html:10
 msgid ""
 "There's been an error. It's been reported to the site administrators via e-"
 "mail and should be fixed shortly. Thanks for your patience."
 msgstr ""
-"Houbo un erro. Xa se informou aos administradores do sitio por correo "
-"electrónico e debería quedar arranxado pronto. Grazas pola súa paciencia."
+"Vznikla chyba. Prostredníctvom e-mailu  bol o nej informovaný správca a "
+"chyba by mala byť o chviľu odstránená. Ďakujeme za vašu trpezlivosť."
 
 #: contrib/admin/templates/admin/object_history.html:5
 msgid "History"
-msgstr "Histórico"
+msgstr "História"
 
 #: contrib/admin/templates/admin/object_history.html:18
 msgid "Date/time"
-msgstr "Data/hora"
+msgstr "Dátum/čas"
 
 #: contrib/admin/templates/admin/object_history.html:19 models/auth.py:47
 msgid "User"
-msgstr "Usuario"
+msgstr "Uživateľ"
 
 #: contrib/admin/templates/admin/object_history.html:20
 msgid "Action"
-msgstr "Acción"
+msgstr "Udalosť"
 
 #: contrib/admin/templates/admin/object_history.html:26
 msgid "DATE_WITH_TIME_FULL"
-msgstr "j. N Y, H:i"
+msgstr "PLNY_DATUM_AJ_CAS"
 
 #: contrib/admin/templates/admin/object_history.html:36
 msgid ""
 "This object doesn't have a change history. It probably wasn't added via this "
 "admin site."
 msgstr ""
-"Este obxecto non ten histórico de cambios. Posibelmente non se creou usando "
-"este sitio de administración."
+"Tento object nemá históriu zmien. Možno nebol pridaný prostredníctvom tohoto "
+"web admina"
 
 #: contrib/admin/templates/admin/base_site.html:4
 msgid "Django site admin"
-msgstr "Administración de sitio Django"
+msgstr "Django web admin"
 
 #: contrib/admin/templates/admin/base_site.html:7
 msgid "Django administration"
-msgstr "Administración de Django"
+msgstr "Administrácia Django"
 
 #: contrib/admin/templates/admin/delete_confirmation.html:7
-#, fuzzy, python-format
+#, python-format
 msgid ""
 "Deleting the %(object_name)s '%(object)s' would result in deleting related "
 "objects, but your account doesn't have permission to delete the following "
 "types of objects:"
 msgstr ""
-"Borrar o %(object_name)s '%(object)s' resultaría na eliminación de obxectos "
-"relacionados, pero a súa conta non ten permiso para borrar os seguintes "
-"tipos de obxectos:"
+"Vymazaním objektu %(object_name)s '%(object)s' môžete spôsobiť vymazanie "
+"súvisiacich objektov, ale váš účet nemá povolenie na mazanie nasledujúcich "
+"typov objektov:"
 
 #: contrib/admin/templates/admin/delete_confirmation.html:14
 #, python-format
@@ -123,271 +121,270 @@ msgid ""
 "Are you sure you want to delete the %(object_name)s \"%(object)s\"? All of "
 "the following related items will be deleted:"
 msgstr ""
-"Seguro que quere borrar o %(object_name)s \"%(object)s\"? Eliminaranse os "
-"seguintes obxectos relacionados:"
+"Ste si istý, že chcete vymazať %(object_name)s \"%(object)s\"? Všetky "
+"nasledujúce objekty budú tiež vymazané :"
 
 #: contrib/admin/templates/admin/delete_confirmation.html:18
 msgid "Yes, I'm sure"
-msgstr "Si, estou seguro"
+msgstr "Ano, som si istý"
 
 #: contrib/admin/templates/admin/index.html:27
 msgid "Add"
-msgstr "Engadir"
+msgstr "Pridaj"
 
 #: contrib/admin/templates/admin/index.html:33
 msgid "Change"
-msgstr "Modificar"
+msgstr "Zmeň"
 
 #: contrib/admin/templates/admin/index.html:43
 msgid "You don't have permission to edit anything."
-msgstr "Non ten permiso para editar nada."
+msgstr "Nemáte povolenie na zmeny ."
 
 #: contrib/admin/templates/admin/index.html:51
 msgid "Recent Actions"
-msgstr "Accións recentes"
+msgstr "Posledné udalosti"
 
 #: contrib/admin/templates/admin/index.html:52
 msgid "My Actions"
-msgstr "As miñas accións"
+msgstr "Moje udalosti"
 
 #: contrib/admin/templates/admin/index.html:56
 msgid "None available"
-msgstr "Ningunha dispoñíbel"
+msgstr "Nepovolené"
 
 #: contrib/admin/templates/admin/login.html:15
 msgid "Username:"
-msgstr "Usuario:"
+msgstr "Meno:"
 
 #: contrib/admin/templates/admin/login.html:18
 msgid "Password:"
-msgstr "Contrasinal:"
+msgstr "Heslo:"
 
 #: contrib/admin/templates/admin/login.html:20
 msgid "Have you <a href=\"/password_reset/\">forgotten your password</a>?"
-msgstr "<a href=\"/password_reset/\">Esqueceu o contrasinal</a>?"
+msgstr "Zabudli ste<a href=\"/password_reset/\"> vaše heslo</a>?"
 
 #: contrib/admin/templates/admin/login.html:24
 msgid "Log in"
-msgstr "Entrar"
+msgstr "Prihlásenie"
 
 #: contrib/admin/templates/registration/logged_out.html:8
 msgid "Thanks for spending some quality time with the Web site today."
-msgstr "Grazas polo tempo que dedicou ao sitio web."
+msgstr "Ďakujeme vám, za stráveny čas na našej stránke."
 
 #: contrib/admin/templates/registration/logged_out.html:10
 msgid "Log in again"
-msgstr "Entrar de novo"
+msgstr "Prihláste sa znovu"
 
 #: contrib/admin/templates/registration/password_change_done.html:4
 #: contrib/admin/templates/registration/password_change_form.html:4
 #: contrib/admin/templates/registration/password_change_form.html:6
 #: contrib/admin/templates/registration/password_change_form.html:10
 msgid "Password change"
-msgstr "Cambiar o contrasinal"
+msgstr "Zmena hesla"
 
 #: contrib/admin/templates/registration/password_change_done.html:6
 #: contrib/admin/templates/registration/password_change_done.html:10
 msgid "Password change successful"
-msgstr "O seu contrasinal cambiouse correctamente."
+msgstr "Heslo bolo úspešne zmenené"
 
 #: contrib/admin/templates/registration/password_change_done.html:12
 msgid "Your password was changed."
-msgstr "Cambiouse o seu contrasinal."
+msgstr "Vaše heslo bolo zmenené."
 
 #: contrib/admin/templates/registration/password_change_form.html:12
 msgid ""
 "Please enter your old password, for security's sake, and then enter your new "
 "password twice so we can verify you typed it in correctly."
 msgstr ""
-"Por razóns de seguridade, introduza o contrasinal actual. Despois introduza "
-"dúas veces o contrasinal para verificarmos que o escribiu correctamente."
+"Kvôli bezpečnosti vložte prosím vaše staré heslo, a potom dvakrát vaše nové "
+"heslo, tým môžeme skontrolovať jeho správnosť."
 
 #: contrib/admin/templates/registration/password_change_form.html:17
 msgid "Old password:"
-msgstr "Contrasinal actual:"
+msgstr "Staré heslo:"
 
 #: contrib/admin/templates/registration/password_change_form.html:19
 msgid "New password:"
-msgstr "Contrasinal novo:"
+msgstr "Nové heslo:"
 
 #: contrib/admin/templates/registration/password_change_form.html:21
 msgid "Confirm password:"
-msgstr "Confirmar contrasinal:"
+msgstr "Potvrdenie hesla:"
 
 #: contrib/admin/templates/registration/password_change_form.html:23
 msgid "Change my password"
-msgstr "Cambiar o contrasinal"
+msgstr "Zmena môjho hesla"
 
 #: contrib/admin/templates/registration/password_reset_done.html:4
 #: contrib/admin/templates/registration/password_reset_form.html:4
 #: contrib/admin/templates/registration/password_reset_form.html:6
 msgid "Password reset"
-msgstr "Recuperar o contrasinal"
+msgstr "Obnova hesla"
 
 #: contrib/admin/templates/registration/password_reset_done.html:6
 #: contrib/admin/templates/registration/password_reset_done.html:10
 msgid "Password reset successful"
-msgstr "O contrasinal foi recuperado correctamente"
+msgstr "Heslo bolo úspešne obnovené"
 
 #: contrib/admin/templates/registration/password_reset_done.html:12
 msgid ""
 "We've e-mailed a new password to the e-mail address you submitted. You "
 "should be receiving it shortly."
 msgstr ""
-"Acabamos de enviarlle un novo contrasinal ao enderezo de correo indicado. "
-"Debería recibilo en breve."
+"Poslali sme vám,  nové heslo na vami uvedenú emailovú adresu.Mali by ste ho "
+"dostať čo najskôr."
 
 #: contrib/admin/templates/registration/password_reset_email.html:2
 msgid "You're receiving this e-mail because you requested a password reset"
-msgstr "Recibe esta mensaxe porque solicitou recuperar o contrasinal"
+msgstr "Dostali ste túto správu preto, lebo ste požadovali obnoviť vaše heslo"
 
 #: contrib/admin/templates/registration/password_reset_email.html:3
 #, python-format
 msgid "for your user account at %(site_name)s"
-msgstr "para a súa conta de usuario en %(site_name)s"
+msgstr "pre váš užívateľský účet na %(site_name)s"
 
 #: contrib/admin/templates/registration/password_reset_email.html:5
 #, python-format
 msgid "Your new password is: %(new_password)s"
-msgstr "O seu novo contrasinal é: %(new_password)s"
+msgstr "Vaše nové heslo je: %(new_password)s"
 
 #: contrib/admin/templates/registration/password_reset_email.html:7
 msgid "Feel free to change this password by going to this page:"
-msgstr "Pode cambiar este contrasinal visitando esta páxina:"
+msgstr "Môžete zmeniť toto heslo na nasledujúcej stránke:"
 
 #: contrib/admin/templates/registration/password_reset_email.html:11
 msgid "Your username, in case you've forgotten:"
-msgstr "No caso de que o esquecese, o seu nome de usuario é:"
+msgstr "Vaše užívateľské meno, ak ste ho zabudli:"
 
 #: contrib/admin/templates/registration/password_reset_email.html:13
 msgid "Thanks for using our site!"
-msgstr "Grazas por usar o noso sitio web!"
+msgstr "Ďakujeme, že používate naše stránky!"
 
 #: contrib/admin/templates/registration/password_reset_email.html:15
 #, python-format
 msgid "The %(site_name)s team"
-msgstr "O equipo de %(site_name)s"
+msgstr "Skupina %(site_name)s"
 
 #: contrib/admin/templates/registration/password_reset_form.html:12
 msgid ""
 "Forgotten your password? Enter your e-mail address below, and we'll reset "
 "your password and e-mail the new one to you."
 msgstr ""
-"Esqueceu o contrasinal? Introduza o seu enderezo de correo electrónico "
-"embaixo e enviarémoslle un novo contrasinal."
+"Zabudli ste vaše heslo? Vložte nižšie vašu e-mail adresu, a nové heslo vám "
+"bude na ňu zaslané ."
 
 #: contrib/admin/templates/registration/password_reset_form.html:16
 msgid "E-mail address:"
-msgstr "Enderezo de correo electrónico:"
+msgstr "E-mailová adresa"
 
 #: contrib/admin/templates/registration/password_reset_form.html:16
 msgid "Reset my password"
-msgstr "Recuperar o meu contrasinal"
+msgstr "Obnova môjho hesla"
 
 #: contrib/admin/models/admin.py:6
-#, fuzzy
 msgid "action time"
-msgstr "Data/hora"
+msgstr "čas udalosti"
 
 #: contrib/admin/models/admin.py:9
 msgid "object id"
-msgstr ""
+msgstr "objekt id"
 
 #: contrib/admin/models/admin.py:10
 msgid "object repr"
-msgstr ""
+msgstr "objekt repr"
 
 #: contrib/admin/models/admin.py:11
 msgid "action flag"
-msgstr ""
+msgstr "návestie udalosti"
 
 #: contrib/admin/models/admin.py:12
 msgid "change message"
-msgstr ""
+msgstr "zmena zprávy"
 
 #: contrib/admin/models/admin.py:15
 msgid "log entry"
-msgstr ""
+msgstr "záznam priebehu"
 
 #: contrib/admin/models/admin.py:16
 msgid "log entries"
-msgstr ""
+msgstr "záznamy priebehu"
 
 #: utils/dates.py:6
 msgid "Monday"
-msgstr ""
+msgstr "Pondelok"
 
 #: utils/dates.py:6
 msgid "Tuesday"
-msgstr ""
+msgstr "Utorok"
 
 #: utils/dates.py:6
 msgid "Wednesday"
-msgstr ""
+msgstr "Streda"
 
 #: utils/dates.py:6
 msgid "Thursday"
-msgstr ""
+msgstr "Štvrtok"
 
 #: utils/dates.py:6
 msgid "Friday"
-msgstr ""
+msgstr "Piatok"
 
 #: utils/dates.py:7
 msgid "Saturday"
-msgstr ""
+msgstr "Sobota"
 
 #: utils/dates.py:7
 msgid "Sunday"
-msgstr ""
+msgstr "Nedeľa"
 
 #: utils/dates.py:14
 msgid "January"
-msgstr ""
+msgstr "Január"
 
 #: utils/dates.py:14
 msgid "February"
-msgstr ""
+msgstr "Február"
 
 #: utils/dates.py:14 utils/dates.py:27
 msgid "March"
-msgstr ""
+msgstr "Marec"
 
 #: utils/dates.py:14 utils/dates.py:27
 msgid "April"
-msgstr ""
+msgstr "Apríl"
 
 #: utils/dates.py:14 utils/dates.py:27
 msgid "May"
-msgstr ""
+msgstr "Máj"
 
 #: utils/dates.py:14 utils/dates.py:27
 msgid "June"
-msgstr ""
+msgstr "Jún"
 
 #: utils/dates.py:15 utils/dates.py:27
 msgid "July"
-msgstr ""
+msgstr "Júl"
 
 #: utils/dates.py:15
 msgid "August"
-msgstr ""
+msgstr "August"
 
 #: utils/dates.py:15
 msgid "September"
-msgstr ""
+msgstr "September"
 
 #: utils/dates.py:15
 msgid "October"
-msgstr ""
+msgstr "Octóber"
 
 #: utils/dates.py:15
 msgid "November"
-msgstr ""
+msgstr "November"
 
 #: utils/dates.py:16
 msgid "December"
-msgstr ""
+msgstr "December"
 
 #: utils/dates.py:27
 msgid "Jan."
@@ -419,285 +416,291 @@ msgstr ""
 
 #: models/core.py:7
 msgid "domain name"
-msgstr ""
+msgstr "meno domény"
 
 #: models/core.py:8
 msgid "display name"
-msgstr ""
+msgstr "zobrazené meno"
 
 #: models/core.py:10
 msgid "site"
-msgstr ""
+msgstr "web"
 
 #: models/core.py:11
 msgid "sites"
-msgstr ""
+msgstr "weby"
 
 #: models/core.py:24
 msgid "label"
-msgstr ""
+msgstr "popis"
 
 #: models/core.py:25 models/core.py:36 models/auth.py:6 models/auth.py:19
-#, fuzzy
 msgid "name"
-msgstr "Usuario:"
+msgstr "meno"
 
 #: models/core.py:27
 msgid "package"
-msgstr ""
+msgstr "balík"
 
 #: models/core.py:28
 msgid "packages"
-msgstr ""
+msgstr "balíky"
 
 #: models/core.py:38
 msgid "python module name"
-msgstr ""
+msgstr "meno python modulu"
 
 #: models/core.py:40
 msgid "content type"
-msgstr ""
+msgstr "typ obsahu"
 
 #: models/core.py:41
 msgid "content types"
-msgstr ""
+msgstr "typy obsahu"
 
 #: models/core.py:64
 msgid "redirect from"
-msgstr ""
+msgstr "presmerovaný z"
 
 #: models/core.py:65
 msgid ""
 "This should be an absolute path, excluding the domain name. Example: '/"
 "events/search/'."
 msgstr ""
+"Tu by sa mala použiť absolútna cesta, bez domény. Napr.: '/events/search/'."
 
 #: models/core.py:66
 msgid "redirect to"
-msgstr ""
+msgstr "presmerovaný na "
 
 #: models/core.py:67
 msgid ""
 "This can be either an absolute path (as above) or a full URL starting with "
 "'http://'."
 msgstr ""
+"Tu môže byť buď absolútna cesta (ako hore) alebo plné  URL začínajúce s "
+"'http://'."
 
 #: models/core.py:69
 msgid "redirect"
-msgstr ""
+msgstr "presmerovanie"
 
 #: models/core.py:70
 msgid "redirects"
-msgstr ""
+msgstr "presmerovania"
 
 #: models/core.py:83
 msgid "URL"
-msgstr ""
+msgstr "URL"
 
 #: models/core.py:84
 msgid ""
 "Example: '/about/contact/'. Make sure to have leading and trailing slashes."
 msgstr ""
+"Príklad: '/about/contact/'. Uistite sa, že máte vložené ako úvodné tak aj "
+"záverečné lomítka."
 
 #: models/core.py:85
 msgid "title"
-msgstr ""
+msgstr "názov"
 
 #: models/core.py:86
 msgid "content"
-msgstr ""
+msgstr "obsah"
 
 #: models/core.py:87
 msgid "enable comments"
-msgstr ""
+msgstr "povolené komentáre"
 
 #: models/core.py:88
 msgid "template name"
-msgstr ""
+msgstr "meno predlohy"
 
 #: models/core.py:89
 msgid ""
 "Example: 'flatfiles/contact_page'. If this isn't provided, the system will "
 "use 'flatfiles/default'."
 msgstr ""
+"Príklad: 'flatfiles/contact_page'. Ak sa toto nevykonalo,  systém použije  "
+"'flatfiles/default'."
 
 #: models/core.py:90
 msgid "registration required"
-msgstr ""
+msgstr "musíte byť zaregistrovaný"
 
 #: models/core.py:90
 msgid "If this is checked, only logged-in users will be able to view the page."
 msgstr ""
+"Ak je toto označené, potom len prihlásený užívateľ môže vidieť túto stránku."
 
 #: models/core.py:94
 msgid "flat page"
-msgstr ""
+msgstr "plochá stránka"
 
 #: models/core.py:95
 msgid "flat pages"
-msgstr ""
+msgstr "ploché stránky"
 
 #: models/core.py:113
 msgid "session key"
-msgstr ""
+msgstr "kľúč sedenia"
 
 #: models/core.py:114
 msgid "session data"
-msgstr ""
+msgstr "údaje sedenia"
 
 #: models/core.py:115
 msgid "expire date"
-msgstr ""
+msgstr "dátum konca platnosti"
 
 #: models/core.py:117
 msgid "session"
-msgstr ""
+msgstr "sedenie"
 
 #: models/core.py:118
 msgid "sessions"
-msgstr ""
+msgstr "sedenia"
 
 #: models/auth.py:8
 msgid "codename"
-msgstr ""
+msgstr "codename"
 
 #: models/auth.py:10
 msgid "Permission"
-msgstr ""
+msgstr "Povolenie"
 
 #: models/auth.py:11 models/auth.py:58
 msgid "Permissions"
-msgstr ""
+msgstr "Povolenia"
 
 #: models/auth.py:22
 msgid "Group"
-msgstr ""
+msgstr "Skupina"
 
 #: models/auth.py:23 models/auth.py:60
 msgid "Groups"
-msgstr ""
+msgstr "Skupiny"
 
 #: models/auth.py:33
-#, fuzzy
 msgid "username"
-msgstr "Usuario:"
+msgstr "užívateľské meno"
 
 #: models/auth.py:34
 msgid "first name"
-msgstr ""
+msgstr "meno"
 
 #: models/auth.py:35
 msgid "last name"
-msgstr ""
+msgstr "priezvisko"
 
 #: models/auth.py:36
-#, fuzzy
 msgid "e-mail address"
-msgstr "Enderezo de correo electrónico:"
+msgstr "emailová adresa"
 
 #: models/auth.py:37
-#, fuzzy
 msgid "password"
-msgstr "Contrasinal:"
+msgstr "heslo"
 
 #: models/auth.py:37
 msgid "Use an MD5 hash -- not the raw password."
 msgstr ""
+"Vložte takú hodnotu hesla , ako vám ju vráti MD5, nevkladajte ho priamo. "
 
 #: models/auth.py:38
 msgid "staff status"
-msgstr ""
+msgstr "zamestnanecká príslušnosť"
 
 #: models/auth.py:38
 msgid "Designates whether the user can log into this admin site."
-msgstr ""
+msgstr "Označenie, ak užívateľ má oprávnenie vstúpiť ako administrátor."
 
 #: models/auth.py:39
 msgid "active"
-msgstr ""
+msgstr "aktívny"
 
 #: models/auth.py:40
 msgid "superuser status"
-msgstr ""
+msgstr "superuživateľská príslušnosť"
 
 #: models/auth.py:41
 msgid "last login"
-msgstr ""
+msgstr "posledné prihlásenie"
 
 #: models/auth.py:42
 msgid "date joined"
-msgstr ""
+msgstr "dátum registrácie"
 
 #: models/auth.py:44
 msgid ""
 "In addition to the permissions manually assigned, this user will also get "
 "all permissions granted to each group he/she is in."
 msgstr ""
+"Okrem ručne vložených povolení, tento uživateľ dostane všetky povolenia  "
+"skupin, v ktorých sa nachádza."
 
 #: models/auth.py:48
-#, fuzzy
 msgid "Users"
-msgstr "Usuario"
+msgstr "Užívatelia"
 
 #: models/auth.py:57
 msgid "Personal info"
-msgstr ""
+msgstr "Osobné údaje"
 
 #: models/auth.py:59
 msgid "Important dates"
-msgstr ""
+msgstr "Dôležité údaje"
 
 #: models/auth.py:182
 msgid "Message"
-msgstr ""
+msgstr "Zpráva"
 
 #: conf/global_settings.py:36
 msgid "Czech"
-msgstr ""
+msgstr "Český"
 
 #: conf/global_settings.py:37
 msgid "German"
-msgstr ""
+msgstr "Nemecký"
 
 #: conf/global_settings.py:38
 msgid "English"
-msgstr ""
+msgstr "Anglický"
 
 #: conf/global_settings.py:39
 msgid "Spanish"
-msgstr ""
+msgstr "Španielsky"
 
 #: conf/global_settings.py:40
 msgid "French"
-msgstr ""
+msgstr "Francúzsky"
 
 #: conf/global_settings.py:41
 msgid "Galician"
-msgstr ""
+msgstr "Galicijský"
 
 #: conf/global_settings.py:42
 msgid "Italian"
-msgstr ""
+msgstr "Taliansky"
 
 #: conf/global_settings.py:43
 msgid "Norwegian"
-msgstr ""
+msgstr "Nórsky"
 
 #: conf/global_settings.py:44
 msgid "Brazilian"
-msgstr ""
+msgstr "Brazílsky"
 
 #: conf/global_settings.py:45
 msgid "Russian"
-msgstr ""
+msgstr "Ruský"
 
 #: conf/global_settings.py:46
 msgid "Serbian"
-msgstr ""
+msgstr "Srbský"
 
 #: conf/global_settings.py:47
 msgid "Simplified Chinese"
-msgstr ""
+msgstr "Zjednodušená činština "
 
 #: conf/global_settings.py:48
 msgid "Slovak"
@@ -705,94 +708,94 @@ msgstr ""
 
 #: core/validators.py:59
 msgid "This value must contain only letters, numbers and underscores."
-msgstr "Este valor soamente pode conter letras, números e guións baixos (_)."
+msgstr "Toto môže obsahovať len písmená, číslice a podčiarkovníky."
 
 #: core/validators.py:63
-#, fuzzy
 msgid "This value must contain only letters, numbers, underscores and slashes."
-msgstr "Este valor soamente pode conter letras, números e guións baixos (_)."
+msgstr "Toto môže obsahovať len písmena, číslice, podčiarkovniky a lomítka."
 
 #: core/validators.py:71
 msgid "Uppercase letters are not allowed here."
-msgstr ""
+msgstr "Veľké písmená tu nie sú povolené."
 
 #: core/validators.py:75
 msgid "Lowercase letters are not allowed here."
-msgstr ""
+msgstr "Malé písmena tu nie sú povolené."
 
 #: core/validators.py:82
 msgid "Enter only digits separated by commas."
-msgstr ""
+msgstr "Vložte len číslice, oddelené čiarkami."
 
 #: core/validators.py:94
 msgid "Enter valid e-mail addresses separated by commas."
-msgstr ""
+msgstr "Vložte platné e-mail adresy oddelené čiarkami."
 
 #: core/validators.py:98
 msgid "Please enter a valid IP address."
-msgstr ""
+msgstr "Prosím vložte platnú IP adresu."
 
 #: core/validators.py:102
 msgid "Empty values are not allowed here."
-msgstr ""
+msgstr "Prázdne hodnoty tu nie sú povolené."
 
 #: core/validators.py:106
 msgid "Non-numeric characters aren't allowed here."
-msgstr ""
+msgstr "Znaky, ktoré nie sú číslicami, tu nie sú povolené."
 
 #: core/validators.py:110
 msgid "This value can't be comprised solely of digits."
-msgstr ""
+msgstr "Tento údaj nemôže byť vytvorený len z číslic."
 
 #: core/validators.py:115
 msgid "Enter a whole number."
-msgstr ""
+msgstr "Vložte celé číslo."
 
 #: core/validators.py:119
 msgid "Only alphabetical characters are allowed here."
-msgstr ""
+msgstr "Tu sú povolené len alfanumerické znaky."
 
 #: core/validators.py:123
 msgid "Enter a valid date in YYYY-MM-DD format."
-msgstr ""
+msgstr "Vložte platný dátum vo formáte RRRR-MM-DD."
 
 #: core/validators.py:127
 msgid "Enter a valid time in HH:MM format."
-msgstr ""
+msgstr "Vložte platný čas vo formáte HH:MM."
 
 #: core/validators.py:131
 msgid "Enter a valid date/time in YYYY-MM-DD HH:MM format."
-msgstr ""
+msgstr "Vlož platný dátum/čas vo formáte RRRR-MM-DD HH:MM"
 
 #: core/validators.py:135
-#, fuzzy
 msgid "Enter a valid e-mail address."
-msgstr "Enderezo de correo electrónico:"
+msgstr "Vložte platnú e-mail adresu."
 
 #: core/validators.py:147
 msgid ""
 "Upload a valid image. The file you uploaded was either not an image or a "
 "corrupted image."
 msgstr ""
+"Nahrajte platný obrázok. Súbor, ktorý ste nahrali buď nebol obrázok alebo je "
+"nahratý poškodený obrázok."
 
 #: core/validators.py:154
 #, python-format
 msgid "The URL %s does not point to a valid image."
-msgstr ""
+msgstr "URL %s neodkazuje na platný obrázok."
 
 #: core/validators.py:158
 #, python-format
 msgid "Phone numbers must be in XXX-XXX-XXXX format. \"%s\" is invalid."
-msgstr ""
+msgstr "Telefónne číslo musí mať formát XXX-XXX-XXXX. \"%s\" je neplatné."
 
 #: core/validators.py:166
 #, python-format
 msgid "The URL %s does not point to a valid QuickTime video."
-msgstr ""
+msgstr "URL %s neodkazuje na platné QuickTime video."
 
 #: core/validators.py:170
 msgid "A valid URL is required."
-msgstr ""
+msgstr "Platné URL je požadované."
 
 #: core/validators.py:184
 #, python-format
@@ -800,76 +803,79 @@ msgid ""
 "Valid HTML is required. Specific errors are:\n"
 "%s"
 msgstr ""
+"Platná HTML je požadovaná. Konkrétne chyby sú:\n"
+"%s"
 
 #: core/validators.py:191
 #, python-format
 msgid "Badly formed XML: %s"
-msgstr ""
+msgstr "Zle formované XML: %s"
 
 #: core/validators.py:201
 #, python-format
 msgid "Invalid URL: %s"
-msgstr ""
+msgstr "Neplatný URL %s"
 
 #: core/validators.py:203
 #, python-format
 msgid "The URL %s is a broken link."
-msgstr ""
+msgstr "Odkaz na URL %s je neplatný."
 
 #: core/validators.py:209
 msgid "Enter a valid U.S. state abbreviation."
-msgstr ""
+msgstr "Vložte platnú skratku U.S. štátu."
 
 #: core/validators.py:224
 #, python-format
 msgid "Watch your mouth! The word %s is not allowed here."
 msgid_plural "Watch your mouth! The words %s are not allowed here."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Vyjadrujte sa slušne! Slovo %s tu nie je dovolené použivať."
+msgstr[1] "Vyjadrujte sa slušne! Slová %s tu nie je dovolené použivať."
 
 #: core/validators.py:231
 #, python-format
 msgid "This field must match the '%s' field."
-msgstr ""
+msgstr "Toto pole sa musí zhodovať s poľom '%s'. "
 
 #: core/validators.py:250
 msgid "Please enter something for at least one field."
-msgstr ""
+msgstr "Prosím vložte niečo aspoň pre jedno pole."
 
 #: core/validators.py:259 core/validators.py:270
 msgid "Please enter both fields or leave them both empty."
-msgstr ""
+msgstr "Prosím vložte obidve polia, alebo nechajte ich obe prázdne. "
 
 #: core/validators.py:277
 #, python-format
 msgid "This field must be given if %(field)s is %(value)s"
-msgstr ""
+msgstr "Toto pole musí byť vyplnené tak, že %(field)s obsahuje %(value)s"
 
 #: core/validators.py:289
 #, python-format
 msgid "This field must be given if %(field)s is not %(value)s"
 msgstr ""
+"Toto pole musí byť vyplnené tak, že %(field)s nesmie obsahovať %(value)s"
 
 #: core/validators.py:308
 msgid "Duplicate values are not allowed."
-msgstr ""
+msgstr "Duplicitné hodnoty nie sú povolené."
 
 #: core/validators.py:331
 #, python-format
 msgid "This value must be a power of %s."
-msgstr ""
+msgstr "Táto hodnota musí byť mocninou  %s."
 
 #: core/validators.py:342
 msgid "Please enter a valid decimal number."
-msgstr ""
+msgstr "Prosím vložte platné desiatkové číslo. "
 
 #: core/validators.py:344
 #, python-format
 msgid "Please enter a valid decimal number with at most %s total digit."
 msgid_plural ""
 "Please enter a valid decimal number with at most %s total digits."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Prosím vložte platné desiatkové číslo s najviac %s číslicou."
+msgstr[1] "Prosím vložte platné desiatkové číslo s najviac %s číslicami."
 
 #: core/validators.py:347
 #, python-format
@@ -877,36 +883,39 @@ msgid "Please enter a valid decimal number with at most %s decimal place."
 msgid_plural ""
 "Please enter a valid decimal number with at most %s decimal places."
 msgstr[0] ""
+"Prosím vložte platné desatinné číslo s najviac %s desatinným miestom."
 msgstr[1] ""
+"Prosím vložte platné desatinné číslo s najviac %s desatinnými miestami."
 
 #: core/validators.py:357
 #, python-format
 msgid "Make sure your uploaded file is at least %s bytes big."
-msgstr ""
+msgstr "Presvedčte sa, že posielaný súbor nemá menej ako %s bytov."
 
 #: core/validators.py:358
 #, python-format
 msgid "Make sure your uploaded file is at most %s bytes big."
-msgstr ""
+msgstr "Presvedčte sa, že posielaný súbor nemá viac ako %s bytov."
 
 #: core/validators.py:371
 msgid "The format for this field is wrong."
-msgstr ""
+msgstr "Formát pre toto pole je chybný."
 
 #: core/validators.py:386
 msgid "This field is invalid."
-msgstr ""
+msgstr "Toto pole nie je platné."
 
 #: core/validators.py:421
 #, python-format
 msgid "Could not retrieve anything from %s."
-msgstr ""
+msgstr "Nič som nemohol získať z %s."
 
 #: core/validators.py:424
 #, python-format
 msgid ""
 "The URL %(url)s returned the invalid Content-Type header '%(contenttype)s'."
 msgstr ""
+" URL %(url)s vrátilo neplatnú hlavičku  Content-Type  '%(contenttype)s'."
 
 #: core/validators.py:457
 #, python-format
@@ -914,6 +923,8 @@ msgid ""
 "Please close the unclosed %(tag)s tag from line %(line)s. (Line starts with "
 "\"%(start)s\".)"
 msgstr ""
+"Prosím zavrite nezavretý  %(tag)s popisovač v riadku %(line)s. (Riadok "
+"začína s  \"%(start)s\".)"
 
 #: core/validators.py:461
 #, python-format
@@ -921,6 +932,8 @@ msgid ""
 "Some text starting on line %(line)s is not allowed in that context. (Line "
 "starts with \"%(start)s\".)"
 msgstr ""
+"Nejaký text začínajúci na riadku %(line)s nie je povolený v tomto kontexte. "
+"(Riadok začína s \"%(start)s\".)"
 
 #: core/validators.py:466
 #, python-format
@@ -928,6 +941,8 @@ msgid ""
 "\"%(attr)s\" on line %(line)s is an invalid attribute. (Line starts with \"%"
 "(start)s\".)"
 msgstr ""
+"\"%(attr)s\" na riadku %(line)s je neplatný atribút. (Riadok začína s \"%"
+"(start)s\".)"
 
 #: core/validators.py:471
 #, python-format
@@ -935,6 +950,8 @@ msgid ""
 "\"<%(tag)s>\" on line %(line)s is an invalid tag. (Line starts with \"%"
 "(start)s\".)"
 msgstr ""
+"\"<%(tag)s>\" na riadku %(line)s je neplatný popisovač. (Riadok začína s \"%"
+"(start)s\".)"
 
 #: core/validators.py:475
 #, python-format
@@ -942,6 +959,8 @@ msgid ""
 "A tag on line %(line)s is missing one or more required attributes. (Line "
 "starts with \"%(start)s\".)"
 msgstr ""
+"Popisovaču na riadku %(line)s chýba jeden alebo viac atribútov. (Riadok "
+"začína s \"%(start)s\".)"
 
 #: core/validators.py:480
 #, python-format
@@ -949,15 +968,16 @@ msgid ""
 "The \"%(attr)s\" attribute on line %(line)s has an invalid value. (Line "
 "starts with \"%(start)s\".)"
 msgstr ""
+"Atribút \"%(attr)s\" na riadku %(line)s má neplatnú hodnotu. (Riadok začína "
+"s \"%(start)s\".)"
 
 #: core/meta/fields.py:95
 msgid " Separate multiple IDs with commas."
-msgstr ""
+msgstr "Identifikátory oddeľte  čiarkami."
 
 #: core/meta/fields.py:98
 msgid ""
 " Hold down \"Control\", or \"Command\" on a Mac, to select more than one."
 msgstr ""
-
-#~ msgid "Click to change"
-#~ msgstr "Faga clic para modificar"
+" Podržte \"Control\", alebo \"Command\" na  Mac_u, na výber viac ako jednej "
+"položky."

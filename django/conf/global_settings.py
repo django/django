@@ -45,6 +45,7 @@ LANGUAGES = (
     ('ru', _('Russian')),
     ('sr', _('Serbian')),
     ('zh-cn', _('Simplified Chinese')),
+    ('sk', _('Slovak')),
 )
 
 # Not-necessarily-technical managers of the site. They get broken link
