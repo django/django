@@ -4,7 +4,7 @@ from django.contrib.admin.views.main import MAX_SHOW_ALL_ALLOWED, DEFAULT_RESULT
  ORDER_VAR, ORDER_TYPE_VAR, PAGE_VAR , SEARCH_VAR , IS_POPUP_VAR, EMPTY_CHANGELIST_VALUE, \
  MONTHS
 
-from django.settings import DATE_FORMAT, TIME_FORMAT, DATETIME_FORMAT
+from django.conf.settings import DATE_FORMAT, TIME_FORMAT, DATETIME_FORMAT
 
 from django.core import meta
 from django.utils.text import capfirst
