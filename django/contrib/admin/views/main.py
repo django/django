@@ -120,7 +120,6 @@ class RelatedFilterSpec(FilterSpec):
 FilterSpec.register(lambda f: bool(f.rel), RelatedFilterSpec)
 
 class ChoicesFilterSpec(FilterSpec):
-   
     def __init__(self, f, request, params):
         super(ChoicesFilterSpec, self).__init__(f, request, params)
         self.lookup_kwarg = '%s__exact' % f.name
@@ -173,7 +172,6 @@ class DateFieldFilterSpec(FilterSpec):
 FilterSpec.register(lambda f: isinstance(f, meta.DateField), DateFieldFilterSpec)
 
 class BooleanFieldFilterSpec(FilterSpec):
-    
     def __init__(self, f, request, params):
         super(BooleanFieldFilterSpec, self).__init__(f, request, params)
         self.lookup_kwarg = '%s__exact' % f.name

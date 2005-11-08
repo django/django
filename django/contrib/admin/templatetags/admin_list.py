@@ -222,12 +222,11 @@ def result_list(cl):
 result_list = inclusion_tag("admin/change_list_results")(result_list)
 
 
-#@simple_tag
+#@inclusion_tag("admin/date_hierarchy")
 def date_hierarchy(cl):
     lookup_opts, params, lookup_params, lookup_mod = \
       cl.lookup_opts, cl.params, cl.lookup_params, cl.lookup_mod
     
-    raw_template = []
     if lookup_opts.admin.date_hierarchy:
         field_name = lookup_opts.admin.date_hierarchy
     
@@ -238,35 +237,52 @@ def date_hierarchy(cl):
         year_lookup = params.get(year_field)
         month_lookup = params.get(month_field)
         day_lookup = params.get(day_field)
-    
-        raw_template.append('<div class="xfull">\n<ul class="toplinks">\n')
+     
+        def link(d): 
+            return cl.get_query_string(d, [field_generic])
+     
+        def get_dates(unit, params):
+            return getattr(lookup_mod, 'get_%s_list' % field_name)(unit, **params)
+     
         if year_lookup and month_lookup and day_lookup:
-            raw_template.append('<li class="date-back"><a href="%s">&lsaquo; %s %s </a></li>' % \
-                (cl.get_query_string( {year_field: year_lookup, month_field: month_lookup}, [field_generic]), MONTHS[int(month_lookup)], year_lookup))
-            raw_template.append('<li>%s %s</li>' % (MONTHS[int(month_lookup)], day_lookup))
+            month_name = MONTHS[int(month_lookup)]
+            return { 'back': 
+                        { 'link' : link({year_field: year_lookup, month_field: month_lookup}), 
+                          'title': "%s %s" % ( month_name, year_lookup),
+                        },
+                      'choices': [ {'title': "%s %s" % ( month_name, day_lookup)} ]
+                  }
         elif year_lookup and month_lookup:
-            raw_template.append('<li class="date-back"><a href="%s">&lsaquo; %s</a></li>' % \
-                (cl.get_query_string( {year_field: year_lookup}, [field_generic]), year_lookup))
             date_lookup_params = lookup_params.copy()
             date_lookup_params.update({year_field: year_lookup, month_field: month_lookup})
-            for day in getattr(lookup_mod, 'get_%s_list' % field_name)('day', **date_lookup_params):
-                raw_template.append('<li><a href="%s">%s</a></li>' % \
-                    (cl.get_query_string({year_field: year_lookup, month_field: month_lookup, day_field: day.day}, [field_generic]), day.strftime('%B %d')))
+            days = get_dates('day', date_lookup_params)
+            return { 'back': 
+                        { 'link' : link({year_field: year_lookup}), 
+                          'title' : year_lookup 
+                        },
+                    'choices': 
+                        [ { 'link' : link({year_field: year_lookup, month_field: month_lookup, day_field: day.day}), 
+                            'title': day.strftime('%B %d') } for day in days ]
+                    }
         elif year_lookup:
-            raw_template.append('<li class="date-back"><a href="%s">&lsaquo; %s</a></li>' % \
-                cl.get_query_string( {}, [year_field]), _('All dates'))
             date_lookup_params = lookup_params.copy()
             date_lookup_params.update({year_field: year_lookup})
-            for month in getattr(lookup_mod, 'get_%s_list' % field_name)('month', **date_lookup_params):
-                raw_template.append('<li><a href="%s">%s %s</a></li>' % \
-                    (cl.get_query_string( {year_field: year_lookup, month_field: month.month}, [field_generic]), month.strftime('%B'), month.year))
+            months = get_dates('month', date_lookup_params)
+            return { 'back':
+                       { 'link' : link({}),
+                         'title': _('All dates')
+                       },
+                      'choices':
+                      [ { 'link': link( {year_field: year_lookup, month_field: month.month}), 
+                          'title': "%s %s" % (month.strftime('%B') ,  month.year) } for month in months ]
+                  }
         else:
-            for year in getattr(lookup_mod, 'get_%s_list' % field_name)('year', **lookup_params):
-                raw_template.append('<li><a href="%s">%s</a></li>\n' % \
-                    (cl.get_query_string( {year_field: year.year}, [field_generic]), year.year))
-        raw_template.append('</ul><br class="clear" />\n</div>\n')
-    return ''.join(raw_template)
-date_hierarchy = simple_tag(date_hierarchy)
+            years = get_dates('year', lookup_params)
+            return { 'choices':
+                        [ { 'link': link( {year_field: year.year}),
+                            'title': year.year  } for year in years ]
+                   }
+date_hierarchy = inclusion_tag('admin/date_hierarchy')(date_hierarchy)
 
 #@inclusion_tag('admin/search_form')
 def search_form(cl):
