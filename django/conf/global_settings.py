@@ -41,11 +41,12 @@ LANGUAGES = (
     ('fr', _('French')),
     ('gl', _('Galician')),
     ('it', _('Italian')),
-    ('no-nb', _('Norwegian')),
+    ('no', _('Norwegian')),
     ('pt-br', _('Brazilian')),
     ('ru', _('Russian')),
     ('sr', _('Serbian')),
     ('zh-cn', _('Simplified Chinese')),
+    ('sk', _('Slovak')),
 )
 
 # Not-necessarily-technical managers of the site. They get broken link
@@ -147,6 +148,26 @@ SECRET_KEY = ''
 # Path to the "jing" executable -- needed to validate XMLFields
 JING_PATH = "/usr/bin/jing"
 
+# Absolute path to the directory that holds media.
+# Example: "/home/media/media.lawrence.com/"
+MEDIA_ROOT = ''
+
+# URL that handles the media served from MEDIA_ROOT.
+# Example: "http://media.lawrence.com"
+MEDIA_URL = ''
+
+# Default formatting for date objects. See all available format strings here:
+# http://www.djangoproject.com/documentation/templates/#now
+DATE_FORMAT = 'N j, Y'
+
+# Default formatting for datetime objects. See all available format strings here:
+# http://www.djangoproject.com/documentation/templates/#now
+DATETIME_FORMAT = 'N j, Y, P'
+
+# Default formatting for time objects. See all available format strings here:
+# http://www.djangoproject.com/documentation/templates/#now
+TIME_FORMAT = 'P'
+
 ##############
 # MIDDLEWARE #
 ##############
@@ -204,11 +225,3 @@ COMMENTS_FIRST_FEW = 0
 # A tuple of IP addresses that have been banned from participating in various
 # Django-powered features.
 BANNED_IPS = ()
-
-# Absolute path to the directory that holds media.
-# Example: "/home/media/media.lawrence.com/"
-MEDIA_ROOT = ''
-
-# URL that handles the media served from MEDIA_ROOT.
-# Example: "http://media.lawrence.com"
-MEDIA_URL = ''

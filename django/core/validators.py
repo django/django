@@ -17,9 +17,10 @@ alnumurl_re = re.compile(r'^[\w/]+$')
 ansi_date_re = re.compile('^%s$' % _datere)
 ansi_time_re = re.compile('^%s$' % _timere)
 ansi_datetime_re = re.compile('^%s %s$' % (_datere, _timere))
-email_re = re.compile(r'^[-\w.+]+@\w[\w.-]+$')
+# From http://www.twilightsoul.com/Default.aspx?tabid=134
+email_re = re.compile(r'^((([\t\x20]*[!#-\'\*\+\-/-9=\?A-Z\^-~]+[\t\x20]*|"[\x01-\x09\x0B\x0C\x0E-\x21\x23-\x5B\x5D-\x7F]*")+)?[\t\x20]*<([\t\x20]*[!#-\'\*\+\-/-9=\?A-Z\^-~]+(\.[!#-\'\*\+\-/-9=\?A-Z\^-~]+)*|"[\x01-\x09\x0B\x0C\x0E-\x21\x23-\x5B\x5D-\x7F]*")@(([a-zA-Z0-9][-a-zA-Z0-9]*[a-zA-Z0-9]\.)+[a-zA-Z]{2,}|\[(([0-9]?[0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])\.){3}([0-9]?[0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])\])>[\t\x20]*|([\t\x20]*[!#-\'\*\+\-/-9=\?A-Z\^-~]+(\.[!#-\'\*\+\-/-9=\?A-Z\^-~]+)*|"[\x01-\x09\x0B\x0C\x0E-\x21\x23-\x5B\x5D-\x7F]*")@(([a-zA-Z0-9][-a-zA-Z0-9]*[a-zA-Z0-9]\.)+[a-zA-Z]{2,}|\[(([0-9]?[0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])\.){3}([0-9]?[0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])\]))$')
 integer_re = re.compile(r'^-?\d+$')
-ip4_re = re.compile(r'^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$')
+ip4_re = re.compile(r'^(25[0-5]|2[0-4]\d|[0-1]?\d?\d)(\.(25[0-5]|2[0-4]\d|[0-1]?\d?\d)){3}$')
 phone_re = re.compile(r'^[A-PR-Y0-9]{3}-[A-PR-Y0-9]{3}-[A-PR-Y0-9]{4}$', re.IGNORECASE)
 slug_re = re.compile(r'^[-\w]+$')
 url_re = re.compile(r'^http://\S+$')
@@ -93,11 +94,8 @@ def isCommaSeparatedEmailList(field_data, all_data):
             raise ValidationError, _("Enter valid e-mail addresses separated by commas.")
 
 def isValidIPAddress4(field_data, all_data):
-    if ip4_re.search(field_data):
-        valid_parts = [el for el in field_data.split('.') if 0 <= int(el) <= 255]
-        if len(valid_parts) == 4:
-            return
-    raise validators.ValidationError, _("Please enter a valid IP address.")
+    if not ip4_re.search(field_data):
+        raise ValidationError, _("Please enter a valid IP address.")
 
 def isNotEmpty(field_data, all_data):
     if field_data.strip() == '':

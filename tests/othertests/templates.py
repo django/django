@@ -317,7 +317,7 @@ def run_tests(verbosity=0, standalone=False):
                 print "Template test: %s -- FAILED. Expected %r, got %r" % (name, vals[2], output)
             failed_tests.append(name)
     loader.template_source_loaders = old_template_loaders
-
+    deactivate()
     if failed_tests and not standalone:
         msg = "Template tests %s failed." % failed_tests
         if not verbosity:

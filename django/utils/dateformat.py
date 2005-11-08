@@ -13,7 +13,7 @@ Usage:
 
 from django.utils.dates import MONTHS, MONTHS_AP, WEEKDAYS
 from django.utils.tzinfo import LocalTimezone
-from calendar import isleap
+from calendar import isleap, monthrange
 import re, time
 
 re_formatchars = re.compile(r'(?<!\\)([aABdDfFgGhHiIjlLmMnNOPrsStTUwWyYzZ])')
@@ -124,10 +124,6 @@ class DateFormat(TimeFormat):
 
     def I(self):
         "'1' if Daylight Savings Time, '0' otherwise."
-        raise NotImplementedError
-
-    def I(self):
-        "'1' if Daylight Savings Time, '0' otherwise."
         if self.timezone.dst(self.data):
             return '1'
         else:
@@ -185,7 +181,7 @@ class DateFormat(TimeFormat):
 
     def t(self):
         "Number of days in the given month; i.e. '28' to '31'"
-        raise NotImplementedError
+        return '%02d' % monthrange(self.data.year, self.data.month)[1]
 
     def T(self):
         "Time zone of this machine; e.g. 'EST' or 'MDT'"

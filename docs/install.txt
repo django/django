@@ -15,7 +15,7 @@ mod_python is similar to mod_perl -- it embeds Python within Apache and loads
 Python code into memory when the server starts. Code stays in memory throughout
 the life of an Apache process, which leads to significant performance gains
 over other server arrangements. Make sure you have Apache installed, with the
-mod_python module activated.
+mod_python module activated. Django requires Apache 2.x and mod_python 3.x.
 
 See `How to use Django with mod_python`_ for information on how to configure
 mod_python once you have it installed.

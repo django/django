@@ -4,6 +4,8 @@ from django.contrib.admin.views.main import MAX_SHOW_ALL_ALLOWED, DEFAULT_RESULT
  ORDER_VAR, ORDER_TYPE_VAR, PAGE_VAR , SEARCH_VAR , IS_POPUP_VAR, EMPTY_CHANGELIST_VALUE, \
  MONTHS
 
+from django.settings import DATE_FORMAT, TIME_FORMAT, DATETIME_FORMAT
+
 from django.core import meta
 from django.utils.text import capfirst
 from django.utils.html import strip_tags, escape
@@ -165,13 +167,15 @@ def items_for_result(cl, result):
                     result_repr = getattr(result, 'get_%s' % f.name)()
                 else:
                     result_repr = EMPTY_CHANGELIST_VALUE
-            # Dates are special: They're formatted in a certain way.
-            elif isinstance(f, meta.DateField):
+            # Dates and times are special: They're formatted in a certain way.
+            elif isinstance(f, meta.DateField) or isinstance(f, meta.TimeField):
                 if field_val:
                     if isinstance(f, meta.DateTimeField):
-                        result_repr = dateformat.format(field_val, 'N j, Y, P')
+                        result_repr = capfirst(dateformat.format(field_val, DATETIME_FORMAT))
+                    elif isinstance(f, meta.TimeField):
+                        result_repr = capfirst(dateformat.time_format(field_val, TIME_FORMAT))
                     else:
-                        result_repr = dateformat.format(field_val, 'N j, Y')
+                        result_repr = capfirst(dateformat.format(field_val, DATE_FORMAT))
                 else:
                     result_repr = EMPTY_CHANGELIST_VALUE
                 row_class = ' class="nowrap"'

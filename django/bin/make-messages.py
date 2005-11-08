@@ -70,7 +70,13 @@ for lang in languages:
                 if verbose: sys.stdout.write('processing file %s in %s\n' % (file, dirpath))
                 cmd = 'xgettext %s -d %s -L Python --keyword=gettext_noop --keyword=gettext_lazy --keyword=ngettext_lazy -o - "%s"' % (
                     os.path.exists(potfile) and '--omit-header' or '', domain, os.path.join(dirpath, thefile))
-                msgs = os.popen(cmd, 'r').read()
+                (stdin, stdout, stderr) = os.popen3(cmd, 'r')
+                msgs = stdout.read()
+                errors = stderr.read()
+                if errors: 
+                    print "errors happened while running xgettext on %s" % file
+                    print errors
+                    sys.exit(8)
                 if thefile != file:
                     old = '#: '+os.path.join(dirpath, thefile)[2:]
                     new = '#: '+os.path.join(dirpath, file)[2:]
@@ -80,10 +86,22 @@ for lang in languages:
                 if thefile != file:
                     os.unlink(os.path.join(dirpath, thefile))
 
-    msgs = os.popen('msguniq %s' % potfile, 'r').read()
+    (stdin, stdout, stderr) = os.popen3('msguniq %s' % potfile, 'r')
+    msgs = stdout.read()
+    errors = stderr.read()
+    if errors:
+        print "errors happened while running msguniq"
+        print errors
+        sys.exit(8)
     open(potfile, 'w').write(msgs)
     if os.path.exists(pofile):
-        msgs = os.popen('msgmerge %s %s' % (pofile, potfile), 'r').read()
+        (stdin, stdout, stderr) = os.popen3('msgmerge -q %s %s' % (pofile, potfile), 'r')
+        msgs = stdout.read()
+        errors = stderr.read()
+        if errors:
+            print "errors happened while running msgmerge"
+            print errors
+            sys.exit(8)
     open(pofile, 'wb').write(msgs)
     os.unlink(potfile)
 

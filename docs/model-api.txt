@@ -244,7 +244,7 @@ Here are all available field types:
 
 ``EmailField``
     A ``CharField`` that checks that the value is a valid e-mail address.
-    (Currently, this is a loose test.) This doesn't accept ``maxlength``.
+    This doesn't accept ``maxlength``.
 
 ``FileField``
     A file-upload field.
@@ -387,7 +387,10 @@ Here are all available field types:
 
         meta.SlugField(prepopulate_from=("pre_name", "name"))
 
-    The admin represents this as an ``<input type="text">`` (a single-line input).
+    ``prepopulate_from`` doesn't accept DateTimeFields.
+
+    The admin represents ``SlugField`` as an ``<input type="text">`` (a
+    single-line input).
 
 ``SmallIntegerField``
     Like an ``IntegerField``, but only allows values under a certain
@@ -896,6 +899,14 @@ object, which takes the following parameters. All are optional.
         .. image:: http://media.djangoproject.com/img/doc/users_changelist.png
 
     (This example also has ``search_fields`` defined; see below).
+
+``list_select_related``
+    Either ``True`` or ``False``. Default is ``False``. If ``True``, the admin
+    change list page will use the ``select_related`` database-API parameter in
+    its query that retrieves the list of items.
+
+    Note that Django will use ``select_related``, regardless of this setting,
+    if one of the ``list_display`` fields is a ``ForeignKey``.
 
 ``ordering``
     A list or tuple (see the `META options`_, above) that gives a

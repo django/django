@@ -1,18 +1,19 @@
-# Translation of django.po to russian.
-# Copyright (C) 2005 THE PACKAGE'S COPYRIGHT HOLDER
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2005 and beyond
 # This file is distributed under the same license as the PACKAGE package.
-# Dmitry Sorokin <ds@dial.com.ru>, 2005.
+# Espen Grindhaug <espen@grindhaug.org>, Nov 2005.
+#
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: django\n"
+"Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2005-11-08 09:05-0600\n"
-"PO-Revision-Date: 2005-10-05 00:00\n"
-"Last-Translator: Dmitry Sorokin <ds@@dial.com.ru>\n"
-"Language-Team: LANGUAGE <LL@li.org>\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: Espen Grndhaug <espen@grindhaug.org>\n"
+"Language-Team: Norwegian\n"
 "MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=koi8-r\n"
+"Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
 #: contrib/admin/views/main.py:78 contrib/admin/views/main.py:106
@@ -34,9 +35,9 @@ msgid "Select %s"
 msgstr ""
 
 #: contrib/admin/views/main.py:211
-#, fuzzy, python-format
+#, python-format
 msgid "Select %s to change"
-msgstr "Щелкните для изменения"
+msgstr ""
 
 #: contrib/admin/views/main.py:570
 #, python-format
@@ -55,7 +56,7 @@ msgstr ""
 #: contrib/admin/views/main.py:600
 #, fuzzy, python-format
 msgid "Add %s"
-msgstr "Добавить"
+msgstr "Legg til"
 
 #: contrib/admin/views/main.py:616
 #, python-format
@@ -70,7 +71,7 @@ msgstr ""
 #: contrib/admin/views/main.py:618
 #, fuzzy, python-format
 msgid "Changed %s."
-msgstr "Изменить"
+msgstr "Endre"
 
 #: contrib/admin/views/main.py:620
 #, python-format
@@ -95,7 +96,7 @@ msgstr ""
 #: contrib/admin/views/main.py:695
 #, fuzzy, python-format
 msgid "Change %s"
-msgstr "Изменить"
+msgstr "Endre"
 
 #: contrib/admin/views/main.py:775
 #, python-format
@@ -119,12 +120,12 @@ msgstr ""
 #: contrib/admin/views/main.py:827
 #, fuzzy, python-format
 msgid "Change history: %s"
-msgstr "Изменение пароля"
+msgstr "Endre passord"
 
 #: contrib/admin/views/decorators.py:22
 #: contrib/admin/templates/admin/login.html:24
 msgid "Log in"
-msgstr "Вход"
+msgstr "Log inn"
 
 #: contrib/admin/views/decorators.py:56
 msgid ""
@@ -169,38 +170,40 @@ msgstr ""
 #: contrib/admin/views/doc.py:266
 #, fuzzy
 msgid "Date (without time)"
-msgstr "Дата/время"
+msgstr "handlings tid"
 
 #: contrib/admin/views/doc.py:267
 #, fuzzy
 msgid "Date (with time)"
-msgstr "Дата/время"
+msgstr "Dato/tid"
 
 #: contrib/admin/views/doc.py:268
 #, fuzzy
 msgid "E-mail address"
-msgstr "E-mail адрес:"
+msgstr "Epost adresse:"
 
 #: contrib/admin/views/doc.py:269 contrib/admin/views/doc.py:272
 msgid "File path"
 msgstr ""
 
 #: contrib/admin/views/doc.py:270
+#, fuzzy
 msgid "Decimal number"
-msgstr ""
+msgstr "Desember"
 
 #: contrib/admin/views/doc.py:274
 #, fuzzy
 msgid "IP address"
-msgstr "E-mail адрес:"
+msgstr "e-post adresse"
 
 #: contrib/admin/views/doc.py:276
 msgid "Boolean (Either True, False or None)"
 msgstr ""
 
 #: contrib/admin/views/doc.py:277
+#, fuzzy
 msgid "Phone number"
-msgstr ""
+msgstr "Skriv inn et helt nummer."
 
 #: contrib/admin/views/doc.py:280
 msgid "String (up to 50)"
@@ -216,7 +219,7 @@ msgstr ""
 
 #: contrib/admin/views/doc.py:284 models/core.py:87
 msgid "URL"
-msgstr ""
+msgstr "Internettadresse"
 
 #: contrib/admin/views/doc.py:285
 msgid "U.S. state (two uppercase letters)"
@@ -228,11 +231,11 @@ msgstr ""
 
 #: contrib/admin/templates/admin/base_site.html:4
 msgid "Django site admin"
-msgstr "Административный сайт Django"
+msgstr "Django administrasjonsside"
 
 #: contrib/admin/templates/admin/base_site.html:7
 msgid "Django administration"
-msgstr "Администрирование Django"
+msgstr "Django administrasjon"
 
 #: contrib/admin/templates/admin/500.html:4
 #: contrib/admin/templates/admin/object_history.html:5
@@ -244,126 +247,124 @@ msgstr "Администрирование Django"
 #: contrib/admin/templates/registration/password_reset_done.html:4
 #: contrib/admin/templates/registration/password_change_form.html:4
 msgid "Home"
-msgstr "Начало"
+msgstr "Hjem"
 
 #: contrib/admin/templates/admin/500.html:4
-#, fuzzy
 msgid "Server error"
-msgstr "Ошибка сервера (500)"
+msgstr "Tjener feil"
 
 #: contrib/admin/templates/admin/500.html:6
 msgid "Server error (500)"
-msgstr "Ошибка сервера (500)"
+msgstr "Tjener feil (500)"
 
 #: contrib/admin/templates/admin/500.html:9
 msgid "Server Error <em>(500)</em>"
-msgstr "Ошибка сервера <em>(500)</em>"
+msgstr "Tjener feil <em>(500)</em>"
 
 #: contrib/admin/templates/admin/500.html:10
 msgid ""
 "There's been an error. It's been reported to the site administrators via e-"
 "mail and should be fixed shortly. Thanks for your patience."
 msgstr ""
-"Произошла ошибка. Отчет об ошибке отправлен администраторам сайта по e-mailи "
-"она должна быть вскоре исправлена. Благодарим вас на терпение и помощь."
+"Det har vц╕rt en feil. Feilen er blitt rapportert til administrator via e-"
+"mail, og vill bli fikset snart. Takk for din tц╔lmodighet."
 
 #: contrib/admin/templates/admin/404.html:4
 #: contrib/admin/templates/admin/404.html:8
 msgid "Page not found"
-msgstr "Страница не найдена"
+msgstr "Fant ikke siden"
 
 #: contrib/admin/templates/admin/404.html:10
 msgid "We're sorry, but the requested page could not be found."
-msgstr "К сожалению, запрашиваемая вами страница не найдена."
+msgstr "Beklager, men siden du spц╦r etter finnest ikke."
 
 #: contrib/admin/templates/admin/index.html:27
 #: contrib/admin/templates/admin/change_form.html:14
 msgid "Add"
-msgstr "Добавить"
+msgstr "Legg til"
 
 #: contrib/admin/templates/admin/index.html:33
 msgid "Change"
-msgstr "Изменить"
+msgstr "Endre"
 
 #: contrib/admin/templates/admin/index.html:43
 msgid "You don't have permission to edit anything."
-msgstr "Недостаточно прав для редактирования."
+msgstr "Du har ikke rettigheter til ц╔ endre."
 
 #: contrib/admin/templates/admin/index.html:51
 msgid "Recent Actions"
-msgstr "Последние Действия"
+msgstr "Siste handlinger"
 
 #: contrib/admin/templates/admin/index.html:52
 msgid "My Actions"
-msgstr "Мои Действия"
+msgstr "Mine handlinger"
 
 #: contrib/admin/templates/admin/index.html:56
 msgid "None available"
-msgstr "Недоступно"
+msgstr "Ingen tilgjengelige"
 
 #: contrib/admin/templates/admin/object_history.html:5
 #: contrib/admin/templates/admin/change_form.html:19
 msgid "History"
-msgstr "История"
+msgstr "Historie"
 
 #: contrib/admin/templates/admin/object_history.html:18
 msgid "Date/time"
-msgstr "Дата/время"
+msgstr "Dato/tid"
 
 #: contrib/admin/templates/admin/object_history.html:19 models/auth.py:47
 msgid "User"
-msgstr "Пользователь"
+msgstr "Bruker"
 
 #: contrib/admin/templates/admin/object_history.html:20
 msgid "Action"
-msgstr "Действие"
+msgstr "Funksjon"
 
 #: contrib/admin/templates/admin/object_history.html:26
 msgid "DATE_WITH_TIME_FULL"
-msgstr "j. N Y, H:i"
+msgstr "N j, Y, P"
 
 #: contrib/admin/templates/admin/object_history.html:36
 msgid ""
 "This object doesn't have a change history. It probably wasn't added via this "
 "admin site."
 msgstr ""
-"Данный обьект не имеет истории изменения. Возможно он не был добавлен через "
-"данный административный сайт."
+"Dette objektet har ingen endrings historie. Den var sannsynligvis ikke laget "
+"via denne siden"
 
 #: contrib/admin/templates/admin/login.html:15
 msgid "Username:"
-msgstr "Имя:"
+msgstr "Brukernavn:"
 
 #: contrib/admin/templates/admin/login.html:18
 msgid "Password:"
-msgstr "Пароль:"
+msgstr "Passord:"
 
 #: contrib/admin/templates/admin/login.html:20
 msgid "Have you <a href=\"/password_reset/\">forgotten your password</a>?"
-msgstr "Вы <a href=\"/password_reset/\">забыли пароль</a>?"
+msgstr "Har du <a href=\"/password_reset/\">glemt passordet ditt</a>?"
 
 #: contrib/admin/templates/admin/base.html:23
 msgid "Welcome,"
-msgstr "Добро пожаловать,"
+msgstr "Velkommen"
 
 #: contrib/admin/templates/admin/base.html:23
 msgid "Change password"
-msgstr "Изменение пароля"
+msgstr "Endre passord"
 
 #: contrib/admin/templates/admin/base.html:23
 msgid "Log out"
-msgstr "Выход"
+msgstr "Log ut"
 
 #: contrib/admin/templates/admin/delete_confirmation.html:7
-#, fuzzy, python-format
+#, python-format
 msgid ""
 "Deleting the %(object_name)s '%(object)s' would result in deleting related "
 "objects, but your account doesn't have permission to delete the following "
 "types of objects:"
 msgstr ""
-"Удаление обьекта %(object_name)s '%(object)s' приведет к удалению зависимых "
-"но, предоставленных вам прав недостаточно для удаления следующихтипов "
-"объектов:"
+"Vist du sletter %(object_name)s '%(object)s' vill du ogsц╔ slette relaterte "
+"objekter, men du har ikke tillatelse til ц╔ slette de fц╦lgende objektene:"
 
 #: contrib/admin/templates/admin/delete_confirmation.html:14
 #, python-format
@@ -371,12 +372,12 @@ msgid ""
 "Are you sure you want to delete the %(object_name)s \"%(object)s\"? All of "
 "the following related items will be deleted:"
 msgstr ""
-"Вы уверены, что хотите удалить  %(object_name)s \"%(object)s\"? Все "
-"следующиеобъекты также будут удалены:"
+"Er du sikker pц╔ at du vill slette %(object_name) \"%(object)s\"? Alle de "
+"fц╦lgende relaterte objektene vill bli slettet:"
 
 #: contrib/admin/templates/admin/delete_confirmation.html:18
 msgid "Yes, I'm sure"
-msgstr "Да, я уверен"
+msgstr "Ja, jeg er sikker"
 
 #: contrib/admin/templates/admin/change_form.html:20
 msgid "View on site"
@@ -413,151 +414,152 @@ msgid "Save and continue editing"
 msgstr ""
 
 #: contrib/admin/templates/admin/submit_line.html:7
+#, fuzzy
 msgid "Save"
-msgstr ""
+msgstr "aktiv"
 
 #: contrib/admin/templates/registration/password_change_done.html:4
 #: contrib/admin/templates/registration/password_change_form.html:4
 #: contrib/admin/templates/registration/password_change_form.html:6
 #: contrib/admin/templates/registration/password_change_form.html:10
 msgid "Password change"
-msgstr "Изменение пароля"
+msgstr "Endre passord"
 
 #: contrib/admin/templates/registration/password_change_done.html:6
 #: contrib/admin/templates/registration/password_change_done.html:10
 msgid "Password change successful"
-msgstr "La password Х stata cambiata con successo"
+msgstr "Passordet er endret"
 
 #: contrib/admin/templates/registration/password_change_done.html:12
 msgid "Your password was changed."
-msgstr "Ваш пароль был изменен."
+msgstr "Ditt passord er endret."
 
 #: contrib/admin/templates/registration/password_reset_form.html:4
 #: contrib/admin/templates/registration/password_reset_form.html:6
 #: contrib/admin/templates/registration/password_reset_done.html:4
 msgid "Password reset"
-msgstr "Сброс пароля"
+msgstr "Tilbakestill passord"
 
 #: contrib/admin/templates/registration/password_reset_form.html:12
 msgid ""
 "Forgotten your password? Enter your e-mail address below, and we'll reset "
 "your password and e-mail the new one to you."
 msgstr ""
-"Забыли пароль? Введите ваш e-mail адрес ниже и мы очистим ваш старый пароль, "
-"и вышлем вам по e-mail новый."
+"Har du glemt passordet ditt? Skriv inn epost adressen din under, sц╔ sender "
+"vi deg et nytt passord via epost."
 
 #: contrib/admin/templates/registration/password_reset_form.html:16
 msgid "E-mail address:"
-msgstr "E-mail адрес:"
+msgstr "Epost adresse:"
 
 #: contrib/admin/templates/registration/password_reset_form.html:16
 msgid "Reset my password"
-msgstr "Очистка пароля"
+msgstr "Tilbakestill mitt passord"
 
 #: contrib/admin/templates/registration/logged_out.html:8
 msgid "Thanks for spending some quality time with the Web site today."
-msgstr "Благодарим за проведенное вами сегодня время на этом сайте."
+msgstr "Takk for ц╔ bruke tid pц╔ internett siden i dag."
 
 #: contrib/admin/templates/registration/logged_out.html:10
 msgid "Log in again"
-msgstr "Повторный вход"
+msgstr "Log inn igjen"
 
 #: contrib/admin/templates/registration/password_reset_done.html:6
 #: contrib/admin/templates/registration/password_reset_done.html:10
 msgid "Password reset successful"
-msgstr "Успешная очистка пароля"
+msgstr "Passordet ble tilbakestilt"
 
 #: contrib/admin/templates/registration/password_reset_done.html:12
 msgid ""
 "We've e-mailed a new password to the e-mail address you submitted. You "
 "should be receiving it shortly."
 msgstr ""
-"Мы отправили новый пароль по указанному вами адресу электронной почты. Вы "
-"должны получить его очень быстро."
+"Vi sender deg et nytt passord til epost adressen du oppgav. Du villmotta det "
+"snart."
 
 #: contrib/admin/templates/registration/password_change_form.html:12
 msgid ""
 "Please enter your old password, for security's sake, and then enter your new "
 "password twice so we can verify you typed it in correctly."
 msgstr ""
-"В целях безопасности, пожалуйста, введите ваш старый пароль, затем - новый "
-"пароль дважды, с тем, чтобы мы могли убедиться в правильности написания."
+"Venligst skriv inn ditt gamle passord, for sikkerthets grunner, sц╔ skriv inn "
+"ditt nye passord to ganger slik at vi kan kontrollere at det er rett."
 
 #: contrib/admin/templates/registration/password_change_form.html:17
 msgid "Old password:"
-msgstr "Старый пароль:"
+msgstr "Gammelt passord:"
 
 #: contrib/admin/templates/registration/password_change_form.html:19
 msgid "New password:"
-msgstr "Новый пароль:"
+msgstr "Nytt passord:"
 
 #: contrib/admin/templates/registration/password_change_form.html:21
 msgid "Confirm password:"
-msgstr "Подтвердите пароль:"
+msgstr "Gjenta nytt passord:"
 
 #: contrib/admin/templates/registration/password_change_form.html:23
 msgid "Change my password"
-msgstr "Изменение пароля"
+msgstr "Endre passord"
 
 #: contrib/admin/templates/registration/password_reset_email.html:2
 msgid "You're receiving this e-mail because you requested a password reset"
-msgstr "Вы получили это сообщение потому что была запрошена очистка пароля"
+msgstr ""
+"Du har mottatt denne epost-en fordi du ba om ц╔ tilbakestille passordet ditt"
 
 #: contrib/admin/templates/registration/password_reset_email.html:3
 #, python-format
 msgid "for your user account at %(site_name)s"
-msgstr "для вашего пользовательского аккаунта на %(site_name)s"
+msgstr "for din konto hos %(site_name)s"
 
 #: contrib/admin/templates/registration/password_reset_email.html:5
 #, python-format
 msgid "Your new password is: %(new_password)s"
-msgstr "Ваш новый пароль: %(new_password)s"
+msgstr "Ditt nye passord er: %(new_password)s"
 
 #: contrib/admin/templates/registration/password_reset_email.html:7
 msgid "Feel free to change this password by going to this page:"
-msgstr "Вы всегда можете изменить этот пароль перейдя на страницу:"
+msgstr "Du kan endre dette passordet ved ц╔ gц╔ til denne siden:"
 
 #: contrib/admin/templates/registration/password_reset_email.html:11
 msgid "Your username, in case you've forgotten:"
-msgstr "Ваше имя, на случай если вы его забыли:"
+msgstr "I tilfellet du har glemt brukernavnet ditt, sц╔ er det:"
 
 #: contrib/admin/templates/registration/password_reset_email.html:13
 msgid "Thanks for using our site!"
-msgstr "Спасибо за посещение нашего сайта!"
+msgstr "Takk for at du bruker vц╔r side!"
 
 #: contrib/admin/templates/registration/password_reset_email.html:15
 #, python-format
 msgid "The %(site_name)s team"
-msgstr "Команда сайта di %(site_name)s"
+msgstr "Hilsen %(site_name)s"
 
 #: contrib/admin/models/admin.py:6
-#, fuzzy
 msgid "action time"
-msgstr "Дата/время"
+msgstr "handlings tid"
 
 #: contrib/admin/models/admin.py:9
 msgid "object id"
-msgstr ""
+msgstr "objekt id"
 
 #: contrib/admin/models/admin.py:10
 msgid "object repr"
-msgstr ""
+msgstr "objekt repr"
 
 #: contrib/admin/models/admin.py:11
 msgid "action flag"
-msgstr ""
+msgstr "handlings flagg"
 
 #: contrib/admin/models/admin.py:12
 msgid "change message"
-msgstr ""
+msgstr "endre melding"
 
 #: contrib/admin/models/admin.py:15
 msgid "log entry"
-msgstr ""
+msgstr "logg notis"
 
 #: contrib/admin/models/admin.py:16
 msgid "log entries"
-msgstr ""
+msgstr "logg innlegg"
 
 #: contrib/admin/templatetags/admin_list.py:260
 msgid "All dates"
@@ -565,385 +567,391 @@ msgstr ""
 
 #: utils/dates.py:6
 msgid "Monday"
-msgstr ""
+msgstr "Mondag"
 
 #: utils/dates.py:6
 msgid "Tuesday"
-msgstr ""
+msgstr "Tirsdag"
 
 #: utils/dates.py:6
 msgid "Wednesday"
-msgstr ""
+msgstr "Onsdag"
 
 #: utils/dates.py:6
 msgid "Thursday"
-msgstr ""
+msgstr "Torsdag"
 
 #: utils/dates.py:6
 msgid "Friday"
-msgstr ""
+msgstr "Fredag"
 
 #: utils/dates.py:7
 msgid "Saturday"
-msgstr ""
+msgstr "Lц╦rdag"
 
 #: utils/dates.py:7
 msgid "Sunday"
-msgstr ""
+msgstr "Sц╦ndag"
 
 #: utils/dates.py:14
 msgid "January"
-msgstr ""
+msgstr "Januar"
 
 #: utils/dates.py:14
 msgid "February"
-msgstr ""
+msgstr "Februar"
 
 #: utils/dates.py:14 utils/dates.py:27
 msgid "March"
-msgstr ""
+msgstr "Mars"
 
 #: utils/dates.py:14 utils/dates.py:27
 msgid "April"
-msgstr ""
+msgstr "April"
 
 #: utils/dates.py:14 utils/dates.py:27
 msgid "May"
-msgstr ""
+msgstr "Mai"
 
 #: utils/dates.py:14 utils/dates.py:27
 msgid "June"
-msgstr ""
+msgstr "Juni"
 
 #: utils/dates.py:15 utils/dates.py:27
 msgid "July"
-msgstr ""
+msgstr "Juli"
 
 #: utils/dates.py:15
 msgid "August"
-msgstr ""
+msgstr "August"
 
 #: utils/dates.py:15
 msgid "September"
-msgstr ""
+msgstr "September"
 
 #: utils/dates.py:15
 msgid "October"
-msgstr ""
+msgstr "Oktober"
 
 #: utils/dates.py:15
 msgid "November"
-msgstr ""
+msgstr "November"
 
 #: utils/dates.py:16
 msgid "December"
-msgstr ""
+msgstr "Desember"
 
 #: utils/dates.py:27
 msgid "Jan."
-msgstr ""
+msgstr "Jan."
 
 #: utils/dates.py:27
 msgid "Feb."
-msgstr ""
+msgstr "Fef."
 
 #: utils/dates.py:28
 msgid "Aug."
-msgstr ""
+msgstr "Aug."
 
 #: utils/dates.py:28
 msgid "Sept."
-msgstr ""
+msgstr "Sept."
 
 #: utils/dates.py:28
 msgid "Oct."
-msgstr ""
+msgstr "Okt."
 
 #: utils/dates.py:28
 msgid "Nov."
-msgstr ""
+msgstr "Nov."
 
 #: utils/dates.py:28
 msgid "Dec."
-msgstr ""
+msgstr "Des."
 
 #: models/core.py:7
 msgid "domain name"
-msgstr ""
+msgstr "domene navn"
 
 #: models/core.py:8
 msgid "display name"
-msgstr ""
+msgstr "vist navn"
 
 #: models/core.py:10
 msgid "site"
-msgstr ""
+msgstr "side"
 
 #: models/core.py:11
 msgid "sites"
-msgstr ""
+msgstr "sider"
 
 #: models/core.py:28
 msgid "label"
-msgstr ""
+msgstr "merkelapp"
 
 #: models/core.py:29 models/core.py:40 models/auth.py:6 models/auth.py:19
-#, fuzzy
 msgid "name"
-msgstr "Имя:"
+msgstr "navn"
 
 #: models/core.py:31
 msgid "package"
-msgstr ""
+msgstr "pakke"
 
 #: models/core.py:32
 msgid "packages"
-msgstr ""
+msgstr "pakker"
 
 #: models/core.py:42
 msgid "python module name"
-msgstr ""
+msgstr "python modul navn"
 
 #: models/core.py:44
 msgid "content type"
-msgstr ""
+msgstr "innholds type"
 
 #: models/core.py:45
 msgid "content types"
-msgstr ""
+msgstr "innholds typer"
 
 #: models/core.py:68
 msgid "redirect from"
-msgstr ""
+msgstr "omadresser fra"
 
 #: models/core.py:69
 msgid ""
 "This should be an absolute path, excluding the domain name. Example: '/"
 "events/search/'."
 msgstr ""
+"Denne burde vц╕r en fullstendig sti, uten domene navnet. Foreksempel: '/"
+"nyheter/les/"
 
 #: models/core.py:70
 msgid "redirect to"
-msgstr ""
+msgstr "omadresser til"
 
 #: models/core.py:71
 msgid ""
 "This can be either an absolute path (as above) or a full URL starting with "
 "'http://'."
 msgstr ""
+"Denne kan enten vц╕re en fullstendig sti (som over), eller en hel "
+"internettadresse som starter med 'http://'"
 
 #: models/core.py:73
 msgid "redirect"
-msgstr ""
+msgstr "omadressering"
 
 #: models/core.py:74
 msgid "redirects"
-msgstr ""
+msgstr "omadresserelser"
 
 #: models/core.py:88
 msgid ""
 "Example: '/about/contact/'. Make sure to have leading and trailing slashes."
 msgstr ""
+"Eksempel: '/om/kontakt/'. Vц╕r sikker pц╔ at du har en skrц╔strek forran og bak."
 
 #: models/core.py:89
 msgid "title"
-msgstr ""
+msgstr "tittel"
 
 #: models/core.py:90
 msgid "content"
-msgstr ""
+msgstr "innhold"
 
 #: models/core.py:91
 msgid "enable comments"
-msgstr ""
+msgstr "tillat kommentarer"
 
 #: models/core.py:92
 msgid "template name"
-msgstr ""
+msgstr "mal navn"
 
 #: models/core.py:93
 msgid ""
 "Example: 'flatfiles/contact_page'. If this isn't provided, the system will "
 "use 'flatfiles/default'."
 msgstr ""
+"Eksempel: 'flatfiler/kontakt_side'. Vist denne ikke denne er gitt, vill "
+"'flatfiles/default' bli brukt."
 
 #: models/core.py:94
 msgid "registration required"
-msgstr ""
+msgstr "registrering kreves"
 
 #: models/core.py:94
 msgid "If this is checked, only logged-in users will be able to view the page."
 msgstr ""
+"Vist denne er krysset av er det bare brukere som er logget inn som kan se "
+"siden."
 
 #: models/core.py:98
 msgid "flat page"
-msgstr ""
+msgstr "flatside"
 
 #: models/core.py:99
 msgid "flat pages"
-msgstr ""
+msgstr "flatsider"
 
 #: models/core.py:117
 msgid "session key"
-msgstr ""
+msgstr "sesjon nц╦kkel"
 
 #: models/core.py:118
 msgid "session data"
-msgstr ""
+msgstr "sesjon data"
 
 #: models/core.py:119
 msgid "expire date"
-msgstr ""
+msgstr "utlц╦psdato"
 
 #: models/core.py:121
 msgid "session"
-msgstr ""
+msgstr "sesjon"
 
 #: models/core.py:122
 msgid "sessions"
-msgstr ""
+msgstr "sesjoner"
 
 #: models/auth.py:8
 msgid "codename"
-msgstr ""
+msgstr "kodenavn"
 
 #: models/auth.py:10
 msgid "Permission"
-msgstr ""
+msgstr "Rettighet"
 
 #: models/auth.py:11 models/auth.py:58
 msgid "Permissions"
-msgstr ""
+msgstr "Rettigheter"
 
 #: models/auth.py:22
 msgid "Group"
-msgstr ""
+msgstr "Gruppe"
 
 #: models/auth.py:23 models/auth.py:60
 msgid "Groups"
-msgstr ""
+msgstr "Grupper"
 
 #: models/auth.py:33
-#, fuzzy
 msgid "username"
-msgstr "Имя:"
+msgstr "brukernavn"
 
 #: models/auth.py:34
 msgid "first name"
-msgstr ""
+msgstr "fornavn"
 
 #: models/auth.py:35
 msgid "last name"
-msgstr ""
+msgstr "etternavn"
 
 #: models/auth.py:36
-#, fuzzy
 msgid "e-mail address"
-msgstr "E-mail адрес:"
+msgstr "e-post adresse"
 
 #: models/auth.py:37
-#, fuzzy
 msgid "password"
-msgstr "Пароль:"
+msgstr "passord"
 
 #: models/auth.py:37
 msgid "Use an MD5 hash -- not the raw password."
-msgstr ""
+msgstr "Bruk en MD5 nц╦kkel -- ikke passordet i ren tekst"
 
 #: models/auth.py:38
 msgid "staff status"
-msgstr ""
+msgstr "administrasjons status"
 
 #: models/auth.py:38
 msgid "Designates whether the user can log into this admin site."
-msgstr ""
+msgstr "Bestemmer om brukeren kan logge inn pц╔ denne administrasjons siden."
 
 #: models/auth.py:39
 msgid "active"
-msgstr ""
+msgstr "aktiv"
 
 #: models/auth.py:40
 msgid "superuser status"
-msgstr ""
+msgstr "super bruker"
 
 #: models/auth.py:41
 msgid "last login"
-msgstr ""
+msgstr "liste logg inn"
 
 #: models/auth.py:42
 msgid "date joined"
-msgstr ""
+msgstr "registrerings dato"
 
 #: models/auth.py:44
 msgid ""
 "In addition to the permissions manually assigned, this user will also get "
 "all permissions granted to each group he/she is in."
 msgstr ""
+"I tillegg til rettighetene som blir gitt manuelt, fц╔r ogsц╔ brukeren full "
+"tilgang til gruppene han/hun er i."
 
 #: models/auth.py:48
-#, fuzzy
 msgid "Users"
-msgstr "Пользователь"
+msgstr "Brukere"
 
 #: models/auth.py:57
 msgid "Personal info"
-msgstr ""
+msgstr "Personlig informasjon"
 
 #: models/auth.py:59
 msgid "Important dates"
-msgstr ""
+msgstr "Viktige datoer"
 
 #: models/auth.py:182
 msgid "Message"
-msgstr ""
+msgstr "Meldinger"
 
 #: conf/global_settings.py:37
 msgid "Czech"
-msgstr ""
+msgstr "Tsjekkisk"
 
 #: conf/global_settings.py:38
 msgid "German"
-msgstr ""
+msgstr "Tysk"
 
 #: conf/global_settings.py:39
 msgid "English"
-msgstr ""
+msgstr "Engelsk"
 
 #: conf/global_settings.py:40
 msgid "Spanish"
-msgstr ""
+msgstr "Spansk"
 
 #: conf/global_settings.py:41
 msgid "French"
-msgstr ""
+msgstr "Fransk"
 
 #: conf/global_settings.py:42
 msgid "Galician"
-msgstr ""
+msgstr "Galisisk"
 
 #: conf/global_settings.py:43
 msgid "Italian"
-msgstr ""
+msgstr "Italiensk"
 
 #: conf/global_settings.py:44
 msgid "Norwegian"
-msgstr ""
+msgstr "Norsk"
 
 #: conf/global_settings.py:45
 msgid "Brazilian"
-msgstr ""
+msgstr "Brasiliansk"
 
 #: conf/global_settings.py:46
 msgid "Russian"
-msgstr ""
+msgstr "Russisk"
 
 #: conf/global_settings.py:47
 msgid "Serbian"
-msgstr ""
+msgstr "Serbisk"
 
 #: conf/global_settings.py:48
 msgid "Simplified Chinese"
-msgstr ""
+msgstr "Simpel Kinesisk"
 
 #: conf/global_settings.py:49
 msgid "Slovak"
@@ -951,94 +959,97 @@ msgstr ""
 
 #: core/validators.py:59
 msgid "This value must contain only letters, numbers and underscores."
-msgstr "Значение может содержать только буквы, цифры и подчеркивания."
+msgstr "Dette feltet mц╔ bare inneholde bokstaver, nummer og understreker."
 
 #: core/validators.py:63
-#, fuzzy
 msgid "This value must contain only letters, numbers, underscores and slashes."
-msgstr "Значение может содержать только буквы, цифры и подчеркивания."
+msgstr ""
+"Dette feltet mц╔ bare inneholde bokstaver, nummer, understreker og "
+"skrц╔streker."
 
 #: core/validators.py:71
 msgid "Uppercase letters are not allowed here."
-msgstr ""
+msgstr "Tor skrift er ikke tillatt her."
 
 #: core/validators.py:75
 msgid "Lowercase letters are not allowed here."
-msgstr ""
+msgstr "Smц╔ bokstaver er ikke tillatt her."
 
 #: core/validators.py:82
 msgid "Enter only digits separated by commas."
-msgstr ""
+msgstr "Skriv inn bare tall, skilt med kommaer."
 
 #: core/validators.py:94
 msgid "Enter valid e-mail addresses separated by commas."
-msgstr ""
+msgstr "Skriv inn e-post adresser skilt med kommaer."
 
 #: core/validators.py:98
 msgid "Please enter a valid IP address."
-msgstr ""
+msgstr "Vennligst skriv inn en godkjent IP adresse."
 
 #: core/validators.py:102
 msgid "Empty values are not allowed here."
-msgstr ""
+msgstr "Dette felte kan ikke vц╕re tomt."
 
 #: core/validators.py:106
 msgid "Non-numeric characters aren't allowed here."
-msgstr ""
+msgstr "Det er bare tall som kan stц╔ i dette feltet."
 
 #: core/validators.py:110
 msgid "This value can't be comprised solely of digits."
-msgstr ""
+msgstr "Dette feltet kan ikke bare bestц╔ av nummer."
 
 #: core/validators.py:115
 msgid "Enter a whole number."
-msgstr ""
+msgstr "Skriv inn et helt nummer."
 
 #: core/validators.py:119
 msgid "Only alphabetical characters are allowed here."
-msgstr ""
+msgstr "Bare alfabetiske bokstaber er tillatt her."
 
 #: core/validators.py:123
 msgid "Enter a valid date in YYYY-MM-DD format."
-msgstr ""
+msgstr "Skriv inn en dato i ц┘ц┘ц┘ц┘-MM-DD formatet."
 
 #: core/validators.py:127
 msgid "Enter a valid time in HH:MM format."
-msgstr ""
+msgstr "Skriv inn tiden i TT:MM formatet."
 
 #: core/validators.py:131
 msgid "Enter a valid date/time in YYYY-MM-DD HH:MM format."
-msgstr ""
+msgstr "Skriv inn dato og tid i ц┘ц┘ц┘ц┘-MM-DD TT:MM formatet."
 
 #: core/validators.py:135
-#, fuzzy
 msgid "Enter a valid e-mail address."
-msgstr "E-mail адрес:"
+msgstr "Skriv inn en godkjent e-post adresse."
 
 #: core/validators.py:147
 msgid ""
 "Upload a valid image. The file you uploaded was either not an image or a "
 "corrupted image."
 msgstr ""
+"Lastopp et bilde. Filen du lastet opp var ikke et bilde, eller sц╔ var det et "
+"ц╦delagt bilde"
 
 #: core/validators.py:154
 #, python-format
 msgid "The URL %s does not point to a valid image."
-msgstr ""
+msgstr "Internettadressen %s peker ikke til et godkjent bilde."
 
 #: core/validators.py:158
 #, python-format
 msgid "Phone numbers must be in XXX-XXX-XXXX format. \"%s\" is invalid."
 msgstr ""
+"Telefon nummeret mц╔ vц╕re i XXX-XXX-XXXX formatet. \"%s\" er ikke godkjent."
 
 #: core/validators.py:166
 #, python-format
 msgid "The URL %s does not point to a valid QuickTime video."
-msgstr ""
+msgstr "Internettadressen %s peker ikke til en godkjent QuickTime film."
 
 #: core/validators.py:170
 msgid "A valid URL is required."
-msgstr ""
+msgstr "En godkjent internettadresse er pц╔budt."
 
 #: core/validators.py:184
 #, python-format
@@ -1046,113 +1057,119 @@ msgid ""
 "Valid HTML is required. Specific errors are:\n"
 "%s"
 msgstr ""
+"Godkjent HTML er pц╔budt. Feilene var:\n"
+"%s"
 
 #: core/validators.py:191
 #, python-format
 msgid "Badly formed XML: %s"
-msgstr ""
+msgstr "Ikke godkjent XML: %s"
 
 #: core/validators.py:201
 #, python-format
 msgid "Invalid URL: %s"
-msgstr ""
+msgstr "Ikke godkjent internettadresse: %s"
 
 #: core/validators.py:203
 #, python-format
 msgid "The URL %s is a broken link."
-msgstr ""
+msgstr "Internettadresse fц╦rer til en side som ikke virker."
 
 #: core/validators.py:209
 msgid "Enter a valid U.S. state abbreviation."
-msgstr ""
+msgstr "Skriv inn en godkjent amerikansk stats forkortelse."
 
 #: core/validators.py:224
 #, python-format
 msgid "Watch your mouth! The word %s is not allowed here."
 msgid_plural "Watch your mouth! The words %s are not allowed here."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Pass munnen din! Ordet %s er ikke tillatt her."
+msgstr[1] "Pass munnen din! Ordene %s er ikke tillatt her."
 
 #: core/validators.py:231
 #, python-format
 msgid "This field must match the '%s' field."
-msgstr ""
+msgstr "Dette felte mц╔ vц╕re det samme som i '%s' feltet."
 
 #: core/validators.py:250
 msgid "Please enter something for at least one field."
-msgstr ""
+msgstr "Vennligst skriv inn noe i minst et felt."
 
 #: core/validators.py:259 core/validators.py:270
 msgid "Please enter both fields or leave them both empty."
-msgstr ""
+msgstr "Vennligst skriv inn noe i begge felta, eller la dem stц╔ blanke."
 
 #: core/validators.py:277
 #, python-format
 msgid "This field must be given if %(field)s is %(value)s"
-msgstr ""
+msgstr "Dette feltet mц╔ bare brukes vist %(field)s er lik %(value)s"
 
 #: core/validators.py:289
 #, python-format
 msgid "This field must be given if %(field)s is not %(value)s"
-msgstr ""
+msgstr "Dette feltet mц╔ bare brukes vist %(field)s ikke er lik %(value)s"
 
 #: core/validators.py:308
 msgid "Duplicate values are not allowed."
-msgstr ""
+msgstr "Like verdier er ikke tillatt."
 
 #: core/validators.py:331
 #, python-format
 msgid "This value must be a power of %s."
-msgstr ""
+msgstr "Denne verdien mц╔ vц╕re 'power' av %s."
 
 #: core/validators.py:342
 msgid "Please enter a valid decimal number."
-msgstr ""
+msgstr "Vennligst skriv inn et godkjent desimal tall."
 
 #: core/validators.py:344
 #, python-format
 msgid "Please enter a valid decimal number with at most %s total digit."
 msgid_plural ""
 "Please enter a valid decimal number with at most %s total digits."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Skriv inn et desimal tall med maksimum %s total antall tall."
+msgstr[1] "Skriv inn et desimal tall med maksimum %s total antall tall."
 
 #: core/validators.py:347
 #, python-format
 msgid "Please enter a valid decimal number with at most %s decimal place."
 msgid_plural ""
 "Please enter a valid decimal number with at most %s decimal places."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Skriv inn et desimal tall med maksimum %s tall bak komma. "
+msgstr[1] "Skriv inn et desimal tall med maksimum %s tall bak komma. "
 
 #: core/validators.py:357
 #, python-format
 msgid "Make sure your uploaded file is at least %s bytes big."
 msgstr ""
+"Er du sikker pц╔ at fila du prц╦ver ц╔ laste opp er minimum %s bytes stor?"
 
 #: core/validators.py:358
 #, python-format
 msgid "Make sure your uploaded file is at most %s bytes big."
 msgstr ""
+"Er du sikker pц╔ at fila du prц╦ver ц╔ laste opp er maksimum %s bytes stor?"
 
 #: core/validators.py:371
 msgid "The format for this field is wrong."
-msgstr ""
+msgstr "Formatet i dette feltet er feil."
 
 #: core/validators.py:386
 msgid "This field is invalid."
-msgstr ""
+msgstr "Dette feltet er feil."
 
 #: core/validators.py:421
 #, python-format
 msgid "Could not retrieve anything from %s."
-msgstr ""
+msgstr "Klarte ikke ц╔ motta noe fra %s."
 
 #: core/validators.py:424
 #, python-format
 msgid ""
 "The URL %(url)s returned the invalid Content-Type header '%(contenttype)s'."
 msgstr ""
+"Tnternettadressen %(url)s returnerte en ikke godkjent Content-Type '%"
+"(contenttype)s'."
 
 #: core/validators.py:457
 #, python-format
@@ -1160,6 +1177,8 @@ msgid ""
 "Please close the unclosed %(tag)s tag from line %(line)s. (Line starts with "
 "\"%(start)s\".)"
 msgstr ""
+"Vennligst lukk taggen %(tag)s pц╔ linje %(line)s. (Linja starer med \"%(start)"
+"s\".)"
 
 #: core/validators.py:461
 #, python-format
@@ -1167,6 +1186,8 @@ msgid ""
 "Some text starting on line %(line)s is not allowed in that context. (Line "
 "starts with \"%(start)s\".)"
 msgstr ""
+"Noe av teksten som starter pц╔ linje %(line)s er ikke tillatt. (Linja starter "
+"med \"%(start)s\".)"
 
 #: core/validators.py:466
 #, python-format
@@ -1174,6 +1195,8 @@ msgid ""
 "\"%(attr)s\" on line %(line)s is an invalid attribute. (Line starts with \"%"
 "(start)s\".)"
 msgstr ""
+"\"%(attr)s\" pц╔ linje %(line)s er ikke en godkjent tillegg. (Linja starter "
+"med \"%(start)s\".)"
 
 #: core/validators.py:471
 #, python-format
@@ -1181,6 +1204,8 @@ msgid ""
 "\"<%(tag)s>\" on line %(line)s is an invalid tag. (Line starts with \"%"
 "(start)s\".)"
 msgstr ""
+"\"<%(tag)s>\" pц╔ linje %(line)s er ikke en godkjent tag. (linja starter med "
+"\"%(start)s\".)"
 
 #: core/validators.py:475
 #, python-format
@@ -1188,6 +1213,8 @@ msgid ""
 "A tag on line %(line)s is missing one or more required attributes. (Line "
 "starts with \"%(start)s\".)"
 msgstr ""
+"En tag pц╔ linje %(line)s mangler en av de pц╔bydte tillegga. (linja starter "
+"med \"%(start)s\".)"
 
 #: core/validators.py:480
 #, python-format
@@ -1195,15 +1222,18 @@ msgid ""
 "The \"%(attr)s\" attribute on line %(line)s has an invalid value. (Line "
 "starts with \"%(start)s\".)"
 msgstr ""
+"\"%(attr)s\" tillegg pц╔ linje $(line)s har en ikke godkjent verdi. (Linja "
+"starter med \"%(start)s\".)"
 
 #: core/meta/fields.py:114
 msgid " Separate multiple IDs with commas."
-msgstr ""
+msgstr "Separer Id-ene med kommaer."
 
 #: core/meta/fields.py:117
 msgid ""
 " Hold down \"Control\", or \"Command\" on a Mac, to select more than one."
 msgstr ""
+"Hold nede \"Control\", eller \"Command\" pц╔ en Mac, for ц╔ velge mere enn en."
 
-#~ msgid "Server error <em>(500)</em>"
-#~ msgstr "Ошибка сервера <em>(500)</em>"
+#~ msgid "Traditional Chinese"
+#~ msgstr "Tradisjonell Kinesisk"

@@ -356,15 +356,18 @@ class ChangeList(object):
                 lookup_order_field = '%s.%s' % (f.rel.to.db_table, rel_ordering)
         # Use select_related if one of the list_display options is a field with a
         # relationship.
-        for field_name in lookup_opts.admin.list_display:
-            try:
-                f = lookup_opts.get_field(field_name)
-            except meta.FieldDoesNotExist:
-                pass
-            else:
-                if isinstance(f.rel, meta.ManyToOne):
-                    lookup_params['select_related'] = True
-                    break
+        if lookup_opts.admin.list_select_related:
+            lookup_params['select_related'] = True
+        else:
+            for field_name in lookup_opts.admin.list_display:
+                try:
+                    f = lookup_opts.get_field(field_name)
+                except meta.FieldDoesNotExist:
+                    pass
+                else:
+                    if isinstance(f.rel, meta.ManyToOne):
+                        lookup_params['select_related'] = True
+                        break
         lookup_params['order_by'] = ((order_type == 'desc' and '-' or '') + lookup_order_field,)
         if lookup_opts.admin.search_fields and query:
             or_queries = []

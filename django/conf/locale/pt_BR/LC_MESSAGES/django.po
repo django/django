@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2005-11-04 18:22+0100\n"
+"POT-Creation-Date: 2005-11-08 09:05-0600\n"
 "PO-Revision-Date: 2005-10-11 09:12GMT-3\n"
 "Last-Translator: João Paulo Farias <jpaulofarias@gmail.com>\n"
 "Language-Team: Português do Brasil <pt-br@li.org>\n"
@@ -16,37 +16,111 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: contrib/admin/models/admin.py:6
-msgid "action time"
-msgstr "hora da ação"
-
-#: contrib/admin/models/admin.py:9
-msgid "object id"
-msgstr "id do objeto"
-
-#: contrib/admin/models/admin.py:10
-msgid "object repr"
-msgstr "repr do objeto"
-
-#: contrib/admin/models/admin.py:11
-msgid "action flag"
-msgstr "flag de ação"
-
-#: contrib/admin/models/admin.py:12
-msgid "change message"
-msgstr "alterar mensagem"
-
-#: contrib/admin/models/admin.py:15
-msgid "log entry"
-msgstr "entrada de log"
-
-#: contrib/admin/models/admin.py:16
-msgid "log entries"
-msgstr "entradas de log"
-
-#: contrib/admin/templatetags/admin_list.py:256
-msgid "All dates"
+#: contrib/admin/views/main.py:78 contrib/admin/views/main.py:106
+#, python-format
+msgid ""
+"<h3>By %s:</h3>\n"
+"<ul>\n"
 msgstr ""
+
+#: contrib/admin/views/main.py:128 contrib/admin/views/main.py:167
+#: contrib/admin/views/main.py:187
+#, python-format
+msgid "<h3>By %s:</h3><ul>\n"
+msgstr ""
+
+#: contrib/admin/views/main.py:210
+#, python-format
+msgid "Select %s"
+msgstr ""
+
+#: contrib/admin/views/main.py:211
+#, fuzzy, python-format
+msgid "Select %s to change"
+msgstr "Clique para alterar"
+
+#: contrib/admin/views/main.py:570
+#, python-format
+msgid "The %(name)s \"%(obj)s\" was added successfully."
+msgstr ""
+
+#: contrib/admin/views/main.py:575 contrib/admin/views/main.py:651
+msgid "You may edit it again below."
+msgstr ""
+
+#: contrib/admin/views/main.py:583 contrib/admin/views/main.py:660
+#, python-format
+msgid "You may add another %s below."
+msgstr ""
+
+#: contrib/admin/views/main.py:600
+#, fuzzy, python-format
+msgid "Add %s"
+msgstr "Adicionar"
+
+#: contrib/admin/views/main.py:616
+#, python-format
+msgid "Added %s."
+msgstr ""
+
+#: contrib/admin/views/main.py:616 contrib/admin/views/main.py:618
+#: contrib/admin/views/main.py:620
+msgid "and"
+msgstr ""
+
+#: contrib/admin/views/main.py:618
+#, fuzzy, python-format
+msgid "Changed %s."
+msgstr "Modificar"
+
+#: contrib/admin/views/main.py:620
+#, python-format
+msgid "Deleted %s."
+msgstr ""
+
+#: contrib/admin/views/main.py:623
+msgid "No fields changed."
+msgstr ""
+
+#: contrib/admin/views/main.py:648
+#, python-format
+msgid "The %(name)s \"%(obj)s\" was changed successfully."
+msgstr ""
+
+#: contrib/admin/views/main.py:657
+#, python-format
+msgid ""
+"The %(name)s \"%(obj)s\" was added successfully. You may edit it again below."
+msgstr ""
+
+#: contrib/admin/views/main.py:695
+#, fuzzy, python-format
+msgid "Change %s"
+msgstr "Modificar"
+
+#: contrib/admin/views/main.py:775
+#, python-format
+msgid "One or more %(fieldname)s in %(name)s: %(obj)s"
+msgstr ""
+
+#: contrib/admin/views/main.py:780
+#, python-format
+msgid "One or more %(fieldname)s in %(name)s:"
+msgstr ""
+
+#: contrib/admin/views/main.py:809
+#, python-format
+msgid "The %(name)s \"%(obj)s\" was deleted successfully."
+msgstr ""
+
+#: contrib/admin/views/main.py:812
+msgid "Are you sure?"
+msgstr ""
+
+#: contrib/admin/views/main.py:827
+#, fuzzy, python-format
+msgid "Change history: %s"
+msgstr "Alterar senha"
 
 #: contrib/admin/views/decorators.py:22
 #: contrib/admin/templates/admin/login.html:24
@@ -73,112 +147,6 @@ msgstr ""
 #, python-format
 msgid "Your e-mail address is not your username. Try '%s' instead."
 msgstr ""
-
-#: contrib/admin/views/main.py:78 contrib/admin/views/main.py:106
-#, python-format
-msgid ""
-"<h3>By %s:</h3>\n"
-"<ul>\n"
-msgstr ""
-
-#: contrib/admin/views/main.py:128 contrib/admin/views/main.py:167
-#: contrib/admin/views/main.py:187
-#, python-format
-msgid "<h3>By %s:</h3><ul>\n"
-msgstr ""
-
-#: contrib/admin/views/main.py:210
-#, python-format
-msgid "Select %s"
-msgstr ""
-
-#: contrib/admin/views/main.py:211
-#, fuzzy, python-format
-msgid "Select %s to change"
-msgstr "Clique para alterar"
-
-#: contrib/admin/views/main.py:567
-#, python-format
-msgid "The %(name)s \"%(obj)s\" was added successfully."
-msgstr ""
-
-#: contrib/admin/views/main.py:572 contrib/admin/views/main.py:648
-msgid "You may edit it again below."
-msgstr ""
-
-#: contrib/admin/views/main.py:580 contrib/admin/views/main.py:657
-#, python-format
-msgid "You may add another %s below."
-msgstr ""
-
-#: contrib/admin/views/main.py:597
-#, fuzzy, python-format
-msgid "Add %s"
-msgstr "Adicionar"
-
-#: contrib/admin/views/main.py:613
-#, python-format
-msgid "Added %s."
-msgstr ""
-
-#: contrib/admin/views/main.py:613 contrib/admin/views/main.py:615
-#: contrib/admin/views/main.py:617
-msgid "and"
-msgstr ""
-
-#: contrib/admin/views/main.py:615
-#, fuzzy, python-format
-msgid "Changed %s."
-msgstr "Modificar"
-
-#: contrib/admin/views/main.py:617
-#, python-format
-msgid "Deleted %s."
-msgstr ""
-
-#: contrib/admin/views/main.py:620
-msgid "No fields changed."
-msgstr ""
-
-#: contrib/admin/views/main.py:645
-#, python-format
-msgid "The %(name)s \"%(obj)s\" was changed successfully."
-msgstr ""
-
-#: contrib/admin/views/main.py:654
-#, python-format
-msgid ""
-"The %(name)s \"%(obj)s\" was added successfully. You may edit it again below."
-msgstr ""
-
-#: contrib/admin/views/main.py:692
-#, fuzzy, python-format
-msgid "Change %s"
-msgstr "Modificar"
-
-#: contrib/admin/views/main.py:772
-#, python-format
-msgid "One or more %(fieldname)s in %(name)s: %(obj)s"
-msgstr ""
-
-#: contrib/admin/views/main.py:777
-#, python-format
-msgid "One or more %(fieldname)s in %(name)s:"
-msgstr ""
-
-#: contrib/admin/views/main.py:806
-#, python-format
-msgid "The %(name)s \"%(obj)s\" was deleted successfully."
-msgstr ""
-
-#: contrib/admin/views/main.py:809
-msgid "Are you sure?"
-msgstr ""
-
-#: contrib/admin/views/main.py:824
-#, fuzzy, python-format
-msgid "Change history: %s"
-msgstr "Alterar senha"
 
 #: contrib/admin/views/doc.py:262 contrib/admin/views/doc.py:271
 #: contrib/admin/views/doc.py:273 contrib/admin/views/doc.py:278
@@ -249,7 +217,7 @@ msgstr ""
 msgid "Time"
 msgstr ""
 
-#: contrib/admin/views/doc.py:284 models/core.py:81
+#: contrib/admin/views/doc.py:284 models/core.py:87
 msgid "URL"
 msgstr "URL"
 
@@ -261,35 +229,18 @@ msgstr ""
 msgid "XML text"
 msgstr ""
 
-#: contrib/admin/templates/admin/index.html:27
-#: contrib/admin/templates/admin/change_form.html:14
-msgid "Add"
-msgstr "Adicionar"
+#: contrib/admin/templates/admin/base_site.html:4
+msgid "Django site admin"
+msgstr "Site de administração do Django"
 
-#: contrib/admin/templates/admin/index.html:33
-msgid "Change"
-msgstr "Modificar"
-
-#: contrib/admin/templates/admin/index.html:43
-msgid "You don't have permission to edit anything."
-msgstr "Você não tem permissão para edição."
-
-#: contrib/admin/templates/admin/index.html:51
-msgid "Recent Actions"
-msgstr "Ações Recentes"
-
-#: contrib/admin/templates/admin/index.html:52
-msgid "My Actions"
-msgstr "Minhas Ações"
-
-#: contrib/admin/templates/admin/index.html:56
-msgid "None available"
-msgstr "Nenhuma disponível"
+#: contrib/admin/templates/admin/base_site.html:7
+msgid "Django administration"
+msgstr "Administração do Django"
 
 #: contrib/admin/templates/admin/500.html:4
 #: contrib/admin/templates/admin/object_history.html:5
-#: contrib/admin/templates/admin/change_form.html:12
 #: contrib/admin/templates/admin/base.html:29
+#: contrib/admin/templates/admin/change_form.html:12
 #: contrib/admin/templates/registration/password_change_done.html:4
 #: contrib/admin/templates/registration/password_reset_form.html:4
 #: contrib/admin/templates/registration/logged_out.html:4
@@ -318,6 +269,40 @@ msgid ""
 msgstr ""
 "Houve um erro. Este foi reportado aos administradores do site através d e-"
 "mail e deve ser consertado em breve. Obrigado pela compreensão."
+
+#: contrib/admin/templates/admin/404.html:4
+#: contrib/admin/templates/admin/404.html:8
+msgid "Page not found"
+msgstr "Página não encontrada"
+
+#: contrib/admin/templates/admin/404.html:10
+msgid "We're sorry, but the requested page could not be found."
+msgstr "Desculpe, mas a página requisitada não pode ser encontrada."
+
+#: contrib/admin/templates/admin/index.html:27
+#: contrib/admin/templates/admin/change_form.html:14
+msgid "Add"
+msgstr "Adicionar"
+
+#: contrib/admin/templates/admin/index.html:33
+msgid "Change"
+msgstr "Modificar"
+
+#: contrib/admin/templates/admin/index.html:43
+msgid "You don't have permission to edit anything."
+msgstr "Você não tem permissão para edição."
+
+#: contrib/admin/templates/admin/index.html:51
+msgid "Recent Actions"
+msgstr "Ações Recentes"
+
+#: contrib/admin/templates/admin/index.html:52
+msgid "My Actions"
+msgstr "Minhas Ações"
+
+#: contrib/admin/templates/admin/index.html:56
+msgid "None available"
+msgstr "Nenhuma disponível"
 
 #: contrib/admin/templates/admin/object_history.html:5
 #: contrib/admin/templates/admin/change_form.html:19
@@ -348,14 +333,6 @@ msgstr ""
 "Este objeto não tem um histórico de alterações. Ele provavelmente não foi "
 "adicionado por este site de administração."
 
-#: contrib/admin/templates/admin/base_site.html:4
-msgid "Django site admin"
-msgstr "Site de administração do Django"
-
-#: contrib/admin/templates/admin/base_site.html:7
-msgid "Django administration"
-msgstr "Administração do Django"
-
 #: contrib/admin/templates/admin/login.html:15
 msgid "Username:"
 msgstr "Usuário:"
@@ -368,32 +345,17 @@ msgstr "Senha:"
 msgid "Have you <a href=\"/password_reset/\">forgotten your password</a>?"
 msgstr "Você <a href=\"/password_reset/\"esqueceu a senha</a>?"
 
-#: contrib/admin/templates/admin/404.html:4
-#: contrib/admin/templates/admin/404.html:8
-msgid "Page not found"
-msgstr "Página não encontrada"
+#: contrib/admin/templates/admin/base.html:23
+msgid "Welcome,"
+msgstr "Bem vindo,"
 
-#: contrib/admin/templates/admin/404.html:10
-msgid "We're sorry, but the requested page could not be found."
-msgstr "Desculpe, mas a página requisitada não pode ser encontrada."
+#: contrib/admin/templates/admin/base.html:23
+msgid "Change password"
+msgstr "Alterar senha"
 
-#: contrib/admin/templates/admin/change_form.html:20
-msgid "View on site"
-msgstr ""
-
-#: contrib/admin/templates/admin/change_form.html:28
-msgid "Please correct the error below."
-msgid_plural "Please correct the errors below."
-msgstr[0] ""
-msgstr[1] ""
-
-#: contrib/admin/templates/admin/change_form.html:45
-msgid "Ordering"
-msgstr ""
-
-#: contrib/admin/templates/admin/change_form.html:48
-msgid "Order:"
-msgstr ""
+#: contrib/admin/templates/admin/base.html:23
+msgid "Log out"
+msgstr "Encerrar sessão"
 
 #: contrib/admin/templates/admin/delete_confirmation.html:7
 #, fuzzy, python-format
@@ -419,17 +381,23 @@ msgstr ""
 msgid "Yes, I'm sure"
 msgstr "Sim, tenho certeza"
 
-#: contrib/admin/templates/admin/base.html:23
-msgid "Welcome,"
-msgstr "Bem vindo,"
+#: contrib/admin/templates/admin/change_form.html:20
+msgid "View on site"
+msgstr ""
 
-#: contrib/admin/templates/admin/base.html:23
-msgid "Change password"
-msgstr "Alterar senha"
+#: contrib/admin/templates/admin/change_form.html:28
+msgid "Please correct the error below."
+msgid_plural "Please correct the errors below."
+msgstr[0] ""
+msgstr[1] ""
 
-#: contrib/admin/templates/admin/base.html:23
-msgid "Log out"
-msgstr "Encerrar sessão"
+#: contrib/admin/templates/admin/change_form.html:45
+msgid "Ordering"
+msgstr ""
+
+#: contrib/admin/templates/admin/change_form.html:48
+msgid "Order:"
+msgstr ""
 
 #: contrib/admin/templates/admin/submit_line.html:3
 msgid "Delete"
@@ -566,6 +534,38 @@ msgstr "Obrigado por usar nosso site!"
 msgid "The %(site_name)s team"
 msgstr "Time do %(site_name)s"
 
+#: contrib/admin/models/admin.py:6
+msgid "action time"
+msgstr "hora da ação"
+
+#: contrib/admin/models/admin.py:9
+msgid "object id"
+msgstr "id do objeto"
+
+#: contrib/admin/models/admin.py:10
+msgid "object repr"
+msgstr "repr do objeto"
+
+#: contrib/admin/models/admin.py:11
+msgid "action flag"
+msgstr "flag de ação"
+
+#: contrib/admin/models/admin.py:12
+msgid "change message"
+msgstr "alterar mensagem"
+
+#: contrib/admin/models/admin.py:15
+msgid "log entry"
+msgstr "entrada de log"
+
+#: contrib/admin/models/admin.py:16
+msgid "log entries"
+msgstr "entradas de log"
+
+#: contrib/admin/templatetags/admin_list.py:260
+msgid "All dates"
+msgstr ""
+
 #: utils/dates.py:6
 msgid "Monday"
 msgstr "Segunda Feira"
@@ -670,56 +670,56 @@ msgstr "Nov."
 msgid "Dec."
 msgstr "Dez."
 
-#: models/core.py:5
+#: models/core.py:7
 msgid "domain name"
 msgstr "nome do domínio"
 
-#: models/core.py:6
+#: models/core.py:8
 msgid "display name"
 msgstr "nome para exibição"
 
-#: models/core.py:8
+#: models/core.py:10
 msgid "site"
 msgstr "site"
 
-#: models/core.py:9
+#: models/core.py:11
 msgid "sites"
 msgstr "sites"
 
-#: models/core.py:22
+#: models/core.py:28
 msgid "label"
 msgstr "etiqueta"
 
-#: models/core.py:23 models/core.py:34 models/auth.py:6 models/auth.py:19
+#: models/core.py:29 models/core.py:40 models/auth.py:6 models/auth.py:19
 #, fuzzy
 msgid "name"
 msgstr "nome:"
 
-#: models/core.py:25
+#: models/core.py:31
 msgid "package"
 msgstr "pacote"
 
-#: models/core.py:26
+#: models/core.py:32
 msgid "packages"
 msgstr "pacotes"
 
-#: models/core.py:36
+#: models/core.py:42
 msgid "python module name"
 msgstr "nome do módulo python"
 
-#: models/core.py:38
+#: models/core.py:44
 msgid "content type"
 msgstr "tipo de conteúdo"
 
-#: models/core.py:39
+#: models/core.py:45
 msgid "content types"
 msgstr "tipos de conteúdo"
 
-#: models/core.py:62
+#: models/core.py:68
 msgid "redirect from"
 msgstr "redirecionar de"
 
-#: models/core.py:63
+#: models/core.py:69
 msgid ""
 "This should be an absolute path, excluding the domain name. Example: '/"
 "events/search/'."
@@ -727,11 +727,11 @@ msgstr ""
 "Deve conter um caminho absoluto, excluindo o nome de domínio. Exemplo: '/"
 "eventos/busca/'."
 
-#: models/core.py:64
+#: models/core.py:70
 msgid "redirect to"
 msgstr "redirecionar para"
 
-#: models/core.py:65
+#: models/core.py:71
 msgid ""
 "This can be either an absolute path (as above) or a full URL starting with "
 "'http://'."
@@ -739,36 +739,36 @@ msgstr ""
 "Deve conter um caminho absoluto (como acima) ou uma URL completa, começando "
 "com 'http://'."
 
-#: models/core.py:67
+#: models/core.py:73
 msgid "redirect"
 msgstr "redirecionar"
 
-#: models/core.py:68
+#: models/core.py:74
 msgid "redirects"
 msgstr "redirecionamentos"
 
-#: models/core.py:82
+#: models/core.py:88
 msgid ""
 "Example: '/about/contact/'. Make sure to have leading and trailing slashes."
 msgstr "Exemplo: '/sobre/contato/'. Lembre-se das barras no começo e no final."
 
-#: models/core.py:83
+#: models/core.py:89
 msgid "title"
 msgstr "título"
 
-#: models/core.py:84
+#: models/core.py:90
 msgid "content"
 msgstr "conteúdo"
 
-#: models/core.py:85
+#: models/core.py:91
 msgid "enable comments"
 msgstr "habilitar comentários"
 
-#: models/core.py:86
+#: models/core.py:92
 msgid "template name"
 msgstr "nome do modelo"
 
-#: models/core.py:87
+#: models/core.py:93
 msgid ""
 "Example: 'flatfiles/contact_page'. If this isn't provided, the system will "
 "use 'flatfiles/default'."
@@ -776,39 +776,39 @@ msgstr ""
 "Exemplo: 'flatfiles/contact_page'. Se não for informado, será utilizado "
 "'flatfiles/default'."
 
-#: models/core.py:88
+#: models/core.py:94
 msgid "registration required"
 msgstr "é obrigatório registrar"
 
-#: models/core.py:88
+#: models/core.py:94
 msgid "If this is checked, only logged-in users will be able to view the page."
 msgstr "Se estiver marcado, apenas usuários conectados poderão ver a página."
 
-#: models/core.py:92
+#: models/core.py:98
 msgid "flat page"
 msgstr "página plana"
 
-#: models/core.py:93
+#: models/core.py:99
 msgid "flat pages"
 msgstr "páginas planas"
 
-#: models/core.py:114
+#: models/core.py:117
 msgid "session key"
 msgstr "chave da sessão"
 
-#: models/core.py:115
+#: models/core.py:118
 msgid "session data"
 msgstr "dados da sessão"
 
-#: models/core.py:116
+#: models/core.py:119
 msgid "expire date"
 msgstr "data de expiração"
 
-#: models/core.py:118
+#: models/core.py:121
 msgid "session"
 msgstr "sessão"
 
-#: models/core.py:119
+#: models/core.py:122
 msgid "sessions"
 msgstr "sessões"
 
@@ -957,71 +957,75 @@ msgstr "Sérvio"
 msgid "Simplified Chinese"
 msgstr ""
 
-#: core/validators.py:58
+#: conf/global_settings.py:49
+msgid "Slovak"
+msgstr ""
+
+#: core/validators.py:59
 msgid "This value must contain only letters, numbers and underscores."
 msgstr "Deve conter apenas letras, números e sublinhados (_)."
 
-#: core/validators.py:62
+#: core/validators.py:63
 msgid "This value must contain only letters, numbers, underscores and slashes."
 msgstr "Deve conter apenas letras, números, sublinhados (_) e barras (/)."
 
-#: core/validators.py:70
+#: core/validators.py:71
 msgid "Uppercase letters are not allowed here."
 msgstr "Letras em maiúsculo não são permitidas aqui."
 
-#: core/validators.py:74
+#: core/validators.py:75
 msgid "Lowercase letters are not allowed here."
 msgstr "Letras em minúsculo não são permitidas aqui."
 
-#: core/validators.py:81
+#: core/validators.py:82
 msgid "Enter only digits separated by commas."
 msgstr "Informe apenas dígitos separados por vírgulas."
 
-#: core/validators.py:93
+#: core/validators.py:94
 msgid "Enter valid e-mail addresses separated by commas."
 msgstr "Informe endereços de email válidos separados por vírgulas."
 
-#: core/validators.py:100
+#: core/validators.py:98
 msgid "Please enter a valid IP address."
 msgstr "Informe um endereço IP válido."
 
-#: core/validators.py:104
+#: core/validators.py:102
 msgid "Empty values are not allowed here."
 msgstr "Valores em branco não são permitidos."
 
-#: core/validators.py:108
+#: core/validators.py:106
 msgid "Non-numeric characters aren't allowed here."
 msgstr "Caracteres não numéricos não são permitidos."
 
-#: core/validators.py:112
+#: core/validators.py:110
 msgid "This value can't be comprised solely of digits."
 msgstr "Este valor não pode conter apenas dígitos."
 
-#: core/validators.py:117
+#: core/validators.py:115
 msgid "Enter a whole number."
 msgstr "Informe um número inteiro."
 
-#: core/validators.py:121
+#: core/validators.py:119
 msgid "Only alphabetical characters are allowed here."
 msgstr "Apenas caracteres do alfabeto são permitidos aqui."
 
-#: core/validators.py:125
+#: core/validators.py:123
 msgid "Enter a valid date in YYYY-MM-DD format."
 msgstr "Informe uma data válida no formato AAAA-MM-DD."
 
-#: core/validators.py:129
+#: core/validators.py:127
 msgid "Enter a valid time in HH:MM format."
 msgstr "Informe uma hora válida no formato HH:MM."
 
-#: core/validators.py:133
+#: core/validators.py:131
 msgid "Enter a valid date/time in YYYY-MM-DD HH:MM format."
 msgstr "Informe uma data/hora válida no formato AAAA-MM-DD HH:MM."
 
-#: core/validators.py:137
+#: core/validators.py:135
 msgid "Enter a valid e-mail address."
 msgstr "Informe um endereço de email válido."
 
-#: core/validators.py:149
+#: core/validators.py:147
 msgid ""
 "Upload a valid image. The file you uploaded was either not an image or a "
 "corrupted image."
@@ -1029,27 +1033,27 @@ msgstr ""
 "Envie uma imagem válida. O arquivo enviado não é uma imagem ou está "
 "corrompido."
 
-#: core/validators.py:156
+#: core/validators.py:154
 #, python-format
 msgid "The URL %s does not point to a valid image."
 msgstr "A URL %s não aponta para um imagem válida."
 
-#: core/validators.py:160
+#: core/validators.py:158
 #, python-format
 msgid "Phone numbers must be in XXX-XXX-XXXX format. \"%s\" is invalid."
 msgstr ""
 "Números de telefone deves estar no formato XXX-XXX-XXXX.\"%s\" é inválido."
 
-#: core/validators.py:168
+#: core/validators.py:166
 #, python-format
 msgid "The URL %s does not point to a valid QuickTime video."
 msgstr "A URL %s não aponta para um vídeo QuickTime válido."
 
-#: core/validators.py:172
+#: core/validators.py:170
 msgid "A valid URL is required."
 msgstr "Uma URL válida é exigida."
 
-#: core/validators.py:186
+#: core/validators.py:184
 #, python-format
 msgid ""
 "Valid HTML is required. Specific errors are:\n"
@@ -1058,69 +1062,69 @@ msgstr ""
 "HTML válido é exigido. Estes são os erros específicos:\n"
 "%s"
 
-#: core/validators.py:193
+#: core/validators.py:191
 #, python-format
 msgid "Badly formed XML: %s"
 msgstr "XML mal formado: %s"
 
-#: core/validators.py:203
+#: core/validators.py:201
 #, python-format
 msgid "Invalid URL: %s"
 msgstr "URL inválida: %s"
 
-#: core/validators.py:205
+#: core/validators.py:203
 #, python-format
 msgid "The URL %s is a broken link."
 msgstr "A URL %s é um link quebrado."
 
-#: core/validators.py:211
+#: core/validators.py:209
 msgid "Enter a valid U.S. state abbreviation."
 msgstr "Informe uma abreviação válida de nome de um estado dos EUA."
 
-#: core/validators.py:226
+#: core/validators.py:224
 #, python-format
 msgid "Watch your mouth! The word %s is not allowed here."
 msgid_plural "Watch your mouth! The words %s are not allowed here."
 msgstr[0] "Lave sua boca! A palavra %s não é permitida aqui."
 msgstr[1] "Lave sua boca! As palavras %s não são permitidas aqui."
 
-#: core/validators.py:233
+#: core/validators.py:231
 #, python-format
 msgid "This field must match the '%s' field."
 msgstr "Este campo deve ser igual ao campo '%s'."
 
-#: core/validators.py:252
+#: core/validators.py:250
 msgid "Please enter something for at least one field."
 msgstr "Informe algo em pelo menos um campo."
 
-#: core/validators.py:261 core/validators.py:272
+#: core/validators.py:259 core/validators.py:270
 msgid "Please enter both fields or leave them both empty."
 msgstr "Informe ambos os campos ou deixe ambos vazios."
 
-#: core/validators.py:279
+#: core/validators.py:277
 #, python-format
 msgid "This field must be given if %(field)s is %(value)s"
 msgstr "Este campo deve ser informado se o campo %(field)s for %(value)s."
 
-#: core/validators.py:291
+#: core/validators.py:289
 #, python-format
 msgid "This field must be given if %(field)s is not %(value)s"
 msgstr "Este campo deve ser dado se o campo %(field)s não for %(value)s."
 
-#: core/validators.py:310
+#: core/validators.py:308
 msgid "Duplicate values are not allowed."
 msgstr "Valores duplicados não são permitidos."
 
-#: core/validators.py:333
+#: core/validators.py:331
 #, python-format
 msgid "This value must be a power of %s."
 msgstr "Este valor deve ser uma potência de %s."
 
-#: core/validators.py:344
+#: core/validators.py:342
 msgid "Please enter a valid decimal number."
 msgstr "Informe um número decimal."
 
-#: core/validators.py:346
+#: core/validators.py:344
 #, python-format
 msgid "Please enter a valid decimal number with at most %s total digit."
 msgid_plural ""
@@ -1128,7 +1132,7 @@ msgid_plural ""
 msgstr[0] ""
 msgstr[1] ""
 
-#: core/validators.py:349
+#: core/validators.py:347
 #, python-format
 msgid "Please enter a valid decimal number with at most %s decimal place."
 msgid_plural ""
@@ -1136,30 +1140,30 @@ msgid_plural ""
 msgstr[0] "Informe um número decimal com no máximo %s casa decimal."
 msgstr[1] "Informe um número decimal com no máximo %s casas decimais."
 
-#: core/validators.py:359
+#: core/validators.py:357
 #, python-format
 msgid "Make sure your uploaded file is at least %s bytes big."
 msgstr "Verifique se o arquivo enviado tem pelo menos %s bytes."
 
-#: core/validators.py:360
+#: core/validators.py:358
 #, python-format
 msgid "Make sure your uploaded file is at most %s bytes big."
 msgstr "Verifique se o arquivo enviado tem no máximo %s bytes."
 
-#: core/validators.py:373
+#: core/validators.py:371
 msgid "The format for this field is wrong."
 msgstr "O formato deste campo está errado."
 
-#: core/validators.py:388
+#: core/validators.py:386
 msgid "This field is invalid."
 msgstr "Este campo é inválido."
 
-#: core/validators.py:423
+#: core/validators.py:421
 #, python-format
 msgid "Could not retrieve anything from %s."
 msgstr "Não foi possível receber dados de %s."
 
-#: core/validators.py:426
+#: core/validators.py:424
 #, python-format
 msgid ""
 "The URL %(url)s returned the invalid Content-Type header '%(contenttype)s'."
@@ -1167,7 +1171,7 @@ msgstr ""
 "A URL %(url)s retornou um cabeçalho '%(contenttype)s' de Content-Type "
 "inválido."
 
-#: core/validators.py:459
+#: core/validators.py:457
 #, python-format
 msgid ""
 "Please close the unclosed %(tag)s tag from line %(line)s. (Line starts with "
@@ -1176,7 +1180,7 @@ msgstr ""
 "Por favor, feche a tag %(tag)s na linha %(line)s. (A linha começa com \"%"
 "(start)s\".)"
 
-#: core/validators.py:463
+#: core/validators.py:461
 #, python-format
 msgid ""
 "Some text starting on line %(line)s is not allowed in that context. (Line "
@@ -1185,7 +1189,7 @@ msgstr ""
 "Algum texto começando na linha %(line)s não é permitido no contexto. (Linha "
 "começa com \"%(start)s\".)"
 
-#: core/validators.py:468
+#: core/validators.py:466
 #, python-format
 msgid ""
 "\"%(attr)s\" on line %(line)s is an invalid attribute. (Line starts with \"%"
@@ -1194,7 +1198,7 @@ msgstr ""
 "\"%(attr)s\" na linha %(line)s não é um atributo válido. (Linha começa com "
 "\"%(start)s\".)"
 
-#: core/validators.py:473
+#: core/validators.py:471
 #, python-format
 msgid ""
 "\"<%(tag)s>\" on line %(line)s is an invalid tag. (Line starts with \"%"
@@ -1203,7 +1207,7 @@ msgstr ""
 "\"<%(tag)s>\" na linha %(line)s é uma tag inválida. (Linha começa com \"%"
 "(start)s\".)"
 
-#: core/validators.py:477
+#: core/validators.py:475
 #, python-format
 msgid ""
 "A tag on line %(line)s is missing one or more required attributes. (Line "
@@ -1212,7 +1216,7 @@ msgstr ""
 "Uma tag na linha %(line)s está não apresenta um ou mais atributos exigidos."
 "(Linha começa com \"%(start)s\".)"
 
-#: core/validators.py:482
+#: core/validators.py:480
 #, python-format
 msgid ""
 "The \"%(attr)s\" attribute on line %(line)s has an invalid value. (Line "
