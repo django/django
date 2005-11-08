@@ -72,21 +72,26 @@ class FilterSpec(object):
     def has_output(self):
         return True
     
+    def choices(self, cl):
+        raise NotImplementedException()
+    
+    def title(self):
+        return self.field.verbose_name
+    
     def output(self, cl):
         t = []
         if self.has_output():
-            t.append(_('<h3>By %s:</h3>\n<ul>\n') % self.title)
+            t.append(_('<h3>By %s:</h3>\n<ul>\n') % self.title())
             
-            for choice in self.choices:
+            for choice in self.choices(cl):
                 t.append('<li%s><a href="%s">%s</a></li>\n' % \
-                    (self.is_selected(choice) and ' class="selected"' or ''),
-                     self.get_query_string(choice) , 
-                     self.get_display(choice)  )
+                    ((choice['selected'] and ' class="selected"' or ''),
+                     choice['query_string'] , 
+                     choice['display']))            
             t.append('</ul>\n\n')
         return "".join(t)
     
 class RelatedFilterSpec(FilterSpec):
-    
     def __init__(self, f, request, params):
         super(RelatedFilterSpec, self).__init__(f, request, params)    
         if isinstance(f, meta.ManyToManyField):
@@ -100,20 +105,18 @@ class RelatedFilterSpec(FilterSpec):
     def has_output(self):
         return len(self.lookup_choices) > 1
         
-    def output(self, cl):  
-        t = []
-        if self.has_output():
-            t.append(_('<h3>By %s:</h3>\n<ul>\n') % self.lookup_title)
-            t.append('<li%s><a href="%s">All</a></li>\n' % \
-                ((self.lookup_val is None and ' class="selected"' or ''),
-                cl.get_query_string({}, [self.lookup_kwarg])))
-            for val in self.lookup_choices:
-                pk_val = getattr(val, self.field.rel.to.pk.column)
-                t.append('<li%s><a href="%s">%s</a></li>\n' % \
-                    ((self.lookup_val == str(pk_val) and ' class="selected"' or ''),
-                    cl.get_query_string( {self.lookup_kwarg: pk_val}), val))
-            t.append('</ul>\n\n')
-        return "".join(t)
+    def title(self):
+        return self.lookup_title     
+        
+    def choices(self, cl):
+        yield {'selected': self.lookup_val is None,
+               'query_string': cl.get_query_string({}, [self.lookup_kwarg]), 
+               'display': _('All') }
+        for val in self.lookup_choices:
+            pk_val = getattr(val, self.field.rel.to.pk.column)
+            yield { 'selected': self.lookup_val == str(pk_val), 
+                    'query_string': cl.get_query_string( {self.lookup_kwarg: pk_val}),
+                    'display' : val }
 FilterSpec.register(lambda f: bool(f.rel), RelatedFilterSpec)
 
 class ChoicesFilterSpec(FilterSpec):
@@ -123,18 +126,14 @@ class ChoicesFilterSpec(FilterSpec):
         self.lookup_kwarg = '%s__exact' % f.name
         self.lookup_val = request.GET.get(self.lookup_kwarg, None)
         
-    def output(self, cl):
-        t = []
-        t.append(_('<h3>By %s:</h3><ul>\n') % self.field.verbose_name)
-        t.append('<li%s><a href="%s">All</a></li>\n' % \
-            ((self.lookup_val is None and ' class="selected"' or ''),
-            cl.get_query_string( {}, [self.lookup_kwarg])))
+    def choices(self, cl):
+        yield {'selected' : self.lookup_val is None, 
+               'query_string': cl.get_query_string( {}, [self.lookup_kwarg]), 
+               'display': _('All') }
         for k, v in self.field.choices:
-            t.append('<li%s><a href="%s">%s</a></li>' % \
-                ((str(k) == self.lookup_val) and ' class="selected"' or '',
-                cl.get_query_string( {self.lookup_kwarg: k}), v))
-        t.append('</ul>\n\n')
-        return "".join(t)
+            yield {'selected': str(k) == self.lookup_val, 
+                    'query_string' : cl.get_query_string( {self.lookup_kwarg: k}),
+                    'display' : v }
 FilterSpec.register(lambda f: bool(f.choices), ChoicesFilterSpec)
 
 class DateFieldFilterSpec(FilterSpec):
@@ -161,16 +160,16 @@ class DateFieldFilterSpec(FilterSpec):
                              '%s__month' % f.name: str(today.month)}),
             ('This year', {'%s__year' % self.field.name: str(today.year)})
         ) 
-        
-    def output(self, cl):
-        t = []    
-        t.append(_('<h3>By %s:</h3><ul>\n') % self.field.verbose_name)
+    
+    def title(self):
+        return self.field.verbose_name
+    
+    def choices(self, cl):
         for title, param_dict in self.links:
-            t.append('<li%s><a href="%s">%s</a></li>\n' % \
-                ((self.date_params == param_dict) and ' class="selected"' or '',
-                cl.get_query_string( param_dict, self.field_generic), title))
-        t.append('</ul>\n\n')
-        return "".join(t)
+            yield { 'selected' : self.date_params == param_dict, 
+                    'query_string' : cl.get_query_string( param_dict, self.field_generic),
+                    'display' : title }
+                    
 FilterSpec.register(lambda f: isinstance(f, meta.DateField), DateFieldFilterSpec)
 
 class BooleanFieldFilterSpec(FilterSpec):
@@ -182,19 +181,20 @@ class BooleanFieldFilterSpec(FilterSpec):
         self.lookup_val = request.GET.get(self.lookup_kwarg, None)
         self.lookup_val2 = request.GET.get(self.lookup_kwarg2, None)
         
-    def output(self, cl):
-        t = []
-        t.append(_('<h3>By %s:</h3><ul>\n') % self.field.verbose_name)
+    def title(self):
+        return self.field.verbose_name
+    
+    def choices(self, cl):
         for k, v in (('All', None), ('Yes', '1'), ('No', '0')):
-            t.append('<li%s><a href="%s">%s</a></li>\n' % \
-                (((self.lookup_val == v and not self.lookup_val2) and ' class="selected"' or ''),
-                cl.get_query_string( {self.lookup_kwarg: v}, [self.lookup_kwarg2]), k))
+            yield { 'selected' : self.lookup_val == v and not self.lookup_val2, 
+                    'query_string' : cl.get_query_string( {self.lookup_kwarg: v}, [self.lookup_kwarg2]), 
+                    'display': k 
+                  }
         if isinstance(self.field, meta.NullBooleanField):
-            t.append('<li%s><a href="%s">%s</a></li>\n' % \
-                (((lookup_val2 == 'True') and ' class="selected"' or ''),
-                cl.get_query_string( {self.lookup_kwarg2: 'True'}, [self.lookup_kwarg]), 'Unknown'))
-        t.append('</ul>\n\n')
-        return "".join(t)
+            yield { 'selected' : lookup_val2 == 'True', 
+                    'query_string' : cl.get_query_string( {self.lookup_kwarg2: 'True'}, [self.lookup_kwarg]), 
+                    'display': _('Unknown')                                      
+                  }
 FilterSpec.register(lambda f: isinstance(f, meta.BooleanField) or 
                                    isinstance(f, meta.NullBooleanField), BooleanFieldFilterSpec)
 

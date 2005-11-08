@@ -209,8 +209,6 @@ def items_for_result(cl, result):
         else:
             yield ('<td%s>%s</td>' % (row_class, result_repr))
         
-        
-
 def results(cl):
     for res in cl.result_list:
         yield list(items_for_result(cl,res))
@@ -222,7 +220,6 @@ def result_list(cl):
              'result_headers': list(result_headers(cl)), 
              'results': list(results(cl)), }
 result_list = inclusion_tag("admin/change_list_results")(result_list)
-
 
 
 #@simple_tag
@@ -278,10 +275,11 @@ def search_form(cl):
              'search_var': SEARCH_VAR }
 search_form = inclusion_tag('admin/search_form')(search_form)
 
-#@simple_tag
-def output_filter_spec(cl, spec):
-    return spec.output(cl)
-output_filter_spec = simple_tag(output_filter_spec)
+#@inclusion_tag('admin/filter')
+def filter(cl, spec):
+    return {'title': spec.title(), 
+             'choices' : list(spec.choices(cl))}
+filter = inclusion_tag('admin/filter')(filter)
 
 #@inclusion_tag('admin/filters')
 def filters(cl):

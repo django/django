@@ -4,8 +4,8 @@
    <div>
    <h2> Error in Template </h2>
 <pre>
-{{message}}
-{{traceback}}
+{{message|escape}}
+{{traceback|escape}}
 </pre>
    
    {%if top%}

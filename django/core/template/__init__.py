@@ -286,7 +286,8 @@ class Parser(object):
             elif token.token_type == TOKEN_VAR:
                 if not token.contents:
                     self.empty_variable(token)
-                self.extend_nodelist(nodelist, VariableNode(token.contents), token)
+                var_node = self.create_variable_node(token.contents)
+                self.extend_nodelist(nodelist, var_node,token)
             elif token.token_type == TOKEN_BLOCK:
                 if token.contents in parse_until:
                     # put token back on token list so calling code knows why it terminated
@@ -312,6 +313,9 @@ class Parser(object):
         if parse_until:
             self.unclosed_block_tag(token, parse_until)
         return nodelist
+
+    def create_variable_node(self, contents):
+        return VariableNode(contents)
 
     def create_nodelist(self):
         return NodeList()
@@ -373,6 +377,9 @@ class DebugParser(Parser):
 
     def create_nodelist(self):
         return DebugNodeList()
+
+    def create_variable_node(self, contents):
+        return DebugVariableNode(contents)
 
     def extend_nodelist(self, nodelist, node, token):
         node.source = token.source
@@ -866,14 +873,28 @@ class VariableNode(Node):
     def __repr__(self):
         return "<Variable Node: %s>" % self.var_string
 
-    def render(self, context):
-        output = resolve_variable_with_filters(self.var_string, context)
+    def encode_output(self, output):
         # Check type so that we don't run str() on a Unicode object
         if not isinstance(output, basestring):
-            output = str(output)
+            return str(output)
         elif isinstance(output, unicode):
-            output = output.encode(DEFAULT_CHARSET)
-        return output
+            return output.encode(DEFAULT_CHARSET)
+        else:
+            return output
+        
+    def render(self, context):
+        output = resolve_variable_with_filters(self.var_string, context)
+        return self.encode_output(output)
+
+class DebugVariableNode(VariableNode):
+    def render(self, context):
+        try:
+             output = resolve_variable_with_filters(self.var_string, context)
+        except TemplateSyntaxError, e:
+            if not hasattr(e, 'source'):
+                e.source = self.source
+            raise
+        return self.encode_output(output)
 
 def register_tag(token_command, callback_function):
     registered_tags[token_command] = callback_function
