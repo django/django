@@ -663,7 +663,7 @@ msgstr "Tschechisch"
 
 #: conf/global_settings.py:37
 msgid "Welsh"
-msgstr "Gälisch"
+msgstr "Walisisch"
 
 #: conf/global_settings.py:38
 msgid "German"
