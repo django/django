@@ -1,0 +1,8 @@
+table.source td{  
+  font-family: monospace;
+  white-space: pre;
+}
+
+span.specific{
+  background:#ffcab7;
+}

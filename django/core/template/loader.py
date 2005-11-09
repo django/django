@@ -44,10 +44,10 @@ for path in TEMPLATE_LOADERS:
 class LoaderOrigin(Origin):
     def __init__(self, display_name, loader, name, dirs):
         super(LoaderOrigin, self).__init__(display_name)
-        self.loader, self.name, self.dirs = loader, name, dirs
+        self.loader, self.loadname, self.dirs = loader, name, dirs
     
     def reload(self):
-        return self.loader(self.name, self.dirs)[0]
+        return self.loader(self.loadname, self.dirs)[0]
 
 def make_origin(display_name, loader, name, dirs):
     if TEMPLATE_DEBUG:
@@ -99,7 +99,7 @@ def render_to_string(template_name, dictionary=None, context_instance=None):
     if context_instance:
         context_instance.update(dictionary)
     else:
-        context_instance = Context(dictionary)
+        context_instance = Context(dictionary) 
     return t.render(context_instance)
 
 def select_template(template_name_list):
@@ -187,6 +187,8 @@ class ConstantIncludeNode(Node):
             t = get_template(template_path)
             self.nodelist = t.nodelist
         except Exception, e:
+            if TEMPLATE_DEBUG:
+                raise
             self.nodelist = None
 
     def render(self, context):
@@ -202,10 +204,11 @@ class IncludeNode(Node):
     def render(self, context):
          try:
              template_path = resolve_variable(self.template_path_var, context)
-             print "IncludeNode rendering %s" % template_path
              t = get_template(template_path)
              return t.render(context)
          except Exception, e:
+             if TEMPLATE_DEBUG:
+                 raise
              return '' # Fail silently for invalid included templates.
 
 def do_block(parser, token):

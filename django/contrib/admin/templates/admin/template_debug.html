@@ -1,26 +1,36 @@
 {% extends "admin/base_site" %}
-
+{% load adminmedia %}
+{% block extrahead%} <link rel="stylesheet" type="text/css" href="{% admin_media_prefix %}css/template_errors.css" /> {%endblock%}
 {% block content %}
    <div>
-   <h2> Error in Template </h2>
+   <h2>{%trans "Error in Template" %}</h2>
+{%blocktrans %}
+In template {{name}}, error at line {{line}}:
+{%endblocktrans %}
 <pre>
 {{message|escape}}
 {{traceback|escape}}
 </pre>
-   
    {%if top%}
    ...
    {%endif%}
    
-   <pre class="source">
+   <table class="source{%if top%} cut-top{%endif%}{%ifnotequal bottom total%} cut-bottom{%endifnotequal%}">
+   {% for source_line in source_lines %}
+   {%ifequal source_line.0 line %}
+	   <tr class="error"><td>{{source_line.0}}</td>
+	   <td> {{before}}<span class="specific">{{during}}</span>{{after}}</td></tr>
+   {%else%}
+      <tr><td>{{source_line.0}}</td>
+	  <td> {{source_line.1}}</td></tr>
+   {%endifequal%}
+   {%endfor%}
+   </table>
    
-   {% for source_line in source_lines %}{% ifequal source_line.0 line %}<span class="error">{{source_line.0|rjust:"5"}}:{{ source_line.1}} </span>
-   {% else %}{{source_line.0|rjust:"5"}}:{{ source_line.1 }} 
-   {% endifequal %}{% endfor %}
-   </pre>
    {%ifnotequal bottom total%}
    ...
    {%endifnotequal%}
    
    </div>
+
 {% endblock %}

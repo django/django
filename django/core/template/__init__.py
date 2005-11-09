@@ -77,9 +77,6 @@ ALLOWED_VARIABLE_CHARS = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ01
 #What to report as the origin of templates that come from non loader sources (ie strings)
 UNKNOWN_SOURCE="<unknown source>"
 
-#match starts of lines
-newline_re = re.compile("^", re.M);
-
 # match a variable or block tag and capture the entire tag, including start/end delimiters
 tag_re = re.compile('(%s.*?%s|%s.*?%s)' % (re.escape(BLOCK_TAG_START), re.escape(BLOCK_TAG_END),
                                           re.escape(VARIABLE_TAG_START), re.escape(VARIABLE_TAG_END)))
@@ -242,31 +239,20 @@ class DebugLexer(Lexer):
     def __init__(self, template_string, origin):
         super(DebugLexer,self).__init__(template_string, origin)
 
-    def find_linebreaks(self, template_string):
-        for match in newline_re.finditer(template_string):
-            yield match.start()
-        yield len(template_string) + 1
-
     def tokenize(self):
         "Return a list of tokens from a given template_string"
         token_tups, upto = [], 0
-        lines = enumerate(self.find_linebreaks(self.template_string))
-        line, next_linebreak = lines.next()
         for match in tag_re.finditer(self.template_string):
-            while next_linebreak <= upto:
-                line, next_linebreak = lines.next()
             start, end = match.span()
             if start > upto:       
-                token_tups.append( (self.template_string[upto:start], line) )
+                token_tups.append( (self.template_string[upto:start], (upto, start) ) )
                 upto = start
-                while next_linebreak <= upto:
-                    line, next_linebreak = lines.next()
-            token_tups.append( (self.template_string[start:end], line) )
+            token_tups.append( (self.template_string[start:end], (start,end) ) )
             upto = end
         last_bit = self.template_string[upto:]
         if last_bit:
-           token_tups.append( (last_bit, line) )
-        return [ self.create_token(tok, (self.origin, line)) for tok, line in token_tups]
+           token_tups.append( (last_bit, (upto, upto + len(last_bit) ) ) )
+        return [ self.create_token(tok, (self.origin, loc)) for tok, loc in token_tups]
 
     def create_token(self, token_string, source):
         token = super(DebugLexer, self).create_token(token_string)
@@ -298,7 +284,7 @@ class Parser(object):
                 except IndexError:
                     self.empty_block_tag(token)
                 # execute callback function for this tag and append resulting node
-                self.enter_command(command, token);
+                self.enter_command(command, token)
                 try:
                     compile_func = registered_tags[command]
                 except KeyError:
@@ -309,9 +295,9 @@ class Parser(object):
                     if not self.compile_function_error(token, e):
                        raise
                 self.extend_nodelist(nodelist, compiled_result, token)
-                self.exit_command();
+                self.exit_command()
         if parse_until:
-            self.unclosed_block_tag(token, parse_until)
+            self.unclosed_block_tag(parse_until)
         return nodelist
 
     def create_variable_node(self, contents):
@@ -329,17 +315,20 @@ class Parser(object):
     def exit_command(self):
         pass
 
+    def error(self, token, msg ):
+        return TemplateSyntaxError(msg)
+
     def empty_variable(self, token):
-        raise TemplateSyntaxError, "Empty variable tag" 
+        raise self.error( token, "Empty variable tag")
     
     def empty_block_tag(self, token):
-        raise TemplateSyntaxError, "Empty block tag"
+        raise self.error( token, "Empty block tag")
     
     def invalid_block_tag(self, token, command):
-        raise TemplateSyntaxError, "Invalid block tag: %s" % (command)
+        raise self.error( token, "Invalid block tag: '%s'" % command)
     
-    def unclosed_block_tag(self, token, parse_until):
-        raise TemplateSyntaxError, "Unclosed tags: %s " %  ', '.join(parse_until)
+    def unclosed_block_tag(self, parse_until):
+        raise self.error(None, "Unclosed tags: %s " %  ', '.join(parse_until))
 
     def compile_function_error(self, token, e):
         pass
@@ -352,9 +341,6 @@ class Parser(object):
 
     def delete_first_token(self):
         del self.tokens[0]
-
-def format_source(source):
-    return "at %s, line %d" % source
     
 class DebugParser(Parser):
     def __init__(self, lexer):
@@ -367,13 +353,13 @@ class DebugParser(Parser):
     def exit_command(self):
         self.command_stack.pop()
 
-    def error(self, source, msg):
+    def error(self, token, msg):
+        return self.source_error(token.source, msg)
+
+    def source_error(self, source,msg):
         e = TemplateSyntaxError(msg)
         e.source = source
         return e
-
-    def format_source(self, source):
-        return "at %s, line %d" % source
 
     def create_nodelist(self):
         return DebugNodeList()
@@ -384,21 +370,12 @@ class DebugParser(Parser):
     def extend_nodelist(self, nodelist, node, token):
         node.source = token.source
         super(DebugParser, self).extend_nodelist(nodelist, node, token)
-
-    def empty_variable(self, token):
-        raise self.error( token.source, "Empty variable tag %s" % format_source(token.source))
     
-    def empty_block_tag(self, token):
-        raise self.error( token.source, "Empty block tag %s" % format_source(token.source))
-    
-    def invalid_block_tag(self, token, command):
-        raise self.error( token.source, "Invalid block tag: '%s' %s" % (command, format_source(token.source)))
-    
-    def unclosed_block_tag(self, token, parse_until):
-        (command, (origin,line)) = self.command_stack.pop()
-        msg = "Unclosed tag '%s' starting at %s, line %d. Looking for one of: %s " % \
-              (command, origin, line, ', '.join(parse_until) ) 
-        raise self.error( (origin,line), msg)
+    def unclosed_block_tag(self, parse_until):
+        (command, source) = self.command_stack.pop()
+        msg = "Unclosed tag '%s'. Looking for one of: %s " % \
+              (command, ', '.join(parse_until) ) 
+        raise self.source_error( source, msg)
 
     def compile_function_error(self, token, e):
         if not hasattr(e, 'source'):
@@ -843,14 +820,14 @@ class DebugNodeList(NodeList):
                 e.source = node.source
             raise
         except Exception, e:
+            
             from traceback import extract_tb, format_list, format_exception_only
             from sys import exc_info
             t,v,tb = exc_info()
             frames = extract_tb(tb)
             frames.pop(0)
-            wrapped = TemplateSyntaxError( '  While rendering %s , caught exception:\n  %s' 
-                                            % ( format_source(node.source), 
-                                                "".join(format_exception_only(t,v)).replace('\n','')))
+            wrapped = TemplateSyntaxError( 'Caught exception:\n  %s'
+                                            %  "".join(format_exception_only(t,v)).replace('\n',''))
             wrapped.source = node.source
             wrapped.traceback = "".join(format_list(frames))
             raise wrapped
