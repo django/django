@@ -1,0 +1,963 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <tibimicu@gmx.net>, 2005.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: Django \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2005-11-04 09:29-0600\n"
+"PO-Revision-Date: 2005-11-08 19:06+GMT+2\n"
+"Last-Translator: Tiberiu Micu <tibimicu@gmx.net>\n"
+"Language-Team: Romanian <ro@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: contrib/admin/templates/admin/base.html:23
+msgid "Welcome,"
+msgstr "Bine ai venit,"
+
+#: contrib/admin/templates/admin/base.html:23
+msgid "Change password"
+msgstr "Schimbă parola"
+
+#: contrib/admin/templates/admin/base.html:23
+msgid "Log out"
+msgstr "Deautentificare"
+
+#: contrib/admin/templates/admin/base.html:29
+#: contrib/admin/templates/admin/500.html:4
+#: contrib/admin/templates/admin/object_history.html:5
+#: contrib/admin/templates/registration/logged_out.html:4
+#: contrib/admin/templates/registration/password_change_done.html:4
+#: contrib/admin/templates/registration/password_change_form.html:4
+#: contrib/admin/templates/registration/password_reset_done.html:4
+#: contrib/admin/templates/registration/password_reset_form.html:4
+msgid "Home"
+msgstr "Acasă"
+
+#: contrib/admin/templates/admin/404.html:4
+#: contrib/admin/templates/admin/404.html:8
+msgid "Page not found"
+msgstr "Pagină inexistentă"
+
+#: contrib/admin/templates/admin/404.html:10
+msgid "We're sorry, but the requested page could not be found."
+msgstr "Ne pare rău, dar pagina cerută nu există."
+
+#: contrib/admin/templates/admin/500.html:4
+msgid "Server error"
+msgstr "Eroare de server"
+
+#: contrib/admin/templates/admin/500.html:6
+msgid "Server error (500)"
+msgstr "Eroare de server (500)"
+
+#: contrib/admin/templates/admin/500.html:9
+msgid "Server Error <em>(500)</em>"
+msgstr "Eroare server <em>(500)</em>"
+
+#: contrib/admin/templates/admin/500.html:10
+msgid ""
+"There's been an error. It's been reported to the site administrators via e-"
+"mail and should be fixed shortly. Thanks for your patience."
+msgstr "A apărut o eroare. Este raportată către administrator via email"
+"şi va fi fixată în scurt timp. Mulţumim pentru înţelegere."
+
+#: contrib/admin/templates/admin/object_history.html:5
+msgid "History"
+msgstr "Istoric"
+
+#: contrib/admin/templates/admin/object_history.html:18
+msgid "Date/time"
+msgstr "Dată/oră"
+
+#: contrib/admin/templates/admin/object_history.html:19 models/auth.py:47
+msgid "User"
+msgstr "Utilizator"
+
+#: contrib/admin/templates/admin/object_history.html:20
+msgid "Action"
+msgstr "Acţiune"
+
+#: contrib/admin/templates/admin/object_history.html:26
+msgid "DATE_WITH_TIME_FULL"
+msgstr "N j, Y, P"
+
+#: contrib/admin/templates/admin/object_history.html:36
+msgid ""
+"This object doesn't have a change history. It probably wasn't added via this "
+"admin site."
+msgstr ""
+"Acest obiect nu are un istoric al schimbărilor. Probabil nu a fost adăugat prin"
+"intermediul acestui sit de administrare."
+
+#: contrib/admin/templates/admin/base_site.html:4
+msgid "Django site admin"
+msgstr "Administrare sit Django"
+
+#: contrib/admin/templates/admin/base_site.html:7
+msgid "Django administration"
+msgstr "Administrare Django"
+
+#: contrib/admin/templates/admin/delete_confirmation.html:7
+#, python-format
+msgid ""
+"Deleting the %(object_name)s '%(object)s' would result in deleting related "
+"objects, but your account doesn't have permission to delete the following "
+"types of objects:"
+msgstr ""
+"Ştergînd %(object_name)s '%(object)s' va avea ca rezultat ştergerea şi a obiectelor ce au "
+"legătură, dar contul tău nu are permisiunea de a şterge următoarele tipuri de obiecte:"
+
+#: contrib/admin/templates/admin/delete_confirmation.html:14
+#, python-format
+msgid ""
+"Are you sure you want to delete the %(object_name)s \"%(object)s\"? All of "
+"the following related items will be deleted:"
+msgstr ""
+"Eşti sigur că vrei să ştergi %(object_name)s \"%(object)s\"?" 
+"Următoarele componente vor fi şterse:"
+
+#: contrib/admin/templates/admin/delete_confirmation.html:18
+msgid "Yes, I'm sure"
+msgstr "Da, sînt sigur"
+
+#: contrib/admin/templates/admin/index.html:27
+msgid "Add"
+msgstr "Adaugă"
+
+#: contrib/admin/templates/admin/index.html:33
+msgid "Change"
+msgstr "Schimbă"
+
+#: contrib/admin/templates/admin/index.html:43
+msgid "You don't have permission to edit anything."
+msgstr "Nu ai drepturi de editare."
+
+#: contrib/admin/templates/admin/index.html:51
+msgid "Recent Actions"
+msgstr "Acţiuni Recente"
+
+#: contrib/admin/templates/admin/index.html:52
+msgid "My Actions"
+msgstr "Acţiunile Mele"
+
+#: contrib/admin/templates/admin/index.html:56
+msgid "None available"
+msgstr "Indisponibil"
+
+#: contrib/admin/templates/admin/login.html:15
+msgid "Username:"
+msgstr "Utilizator:"
+
+#: contrib/admin/templates/admin/login.html:18
+msgid "Password:"
+msgstr "Parola:"
+
+#: contrib/admin/templates/admin/login.html:20
+msgid "Have you <a href=\"/password_reset/\">forgotten your password</a>?"
+msgstr "Ai <a href=\"/password_reset/\">uitat parola</a>?"
+
+#: contrib/admin/templates/admin/login.html:24
+msgid "Log in"
+msgstr "Login"
+
+#: contrib/admin/templates/registration/logged_out.html:8
+msgid "Thanks for spending some quality time with the Web site today."
+msgstr "Mulţumesc pentru petrecerea folositoare a timpului cu saitul astăzi."
+
+#: contrib/admin/templates/registration/logged_out.html:10
+msgid "Log in again"
+msgstr "Relogare"
+
+#: contrib/admin/templates/registration/password_change_done.html:4
+#: contrib/admin/templates/registration/password_change_form.html:4
+#: contrib/admin/templates/registration/password_change_form.html:6
+#: contrib/admin/templates/registration/password_change_form.html:10
+msgid "Password change"
+msgstr "Schimbă parola"
+
+#: contrib/admin/templates/registration/password_change_done.html:6
+#: contrib/admin/templates/registration/password_change_done.html:10
+msgid "Password change successful"
+msgstr "Schimbare reuşită a parolei"
+
+#: contrib/admin/templates/registration/password_change_done.html:12
+msgid "Your password was changed."
+msgstr "Parola a fost schimbată."
+
+#: contrib/admin/templates/registration/password_change_form.html:12
+msgid ""
+"Please enter your old password, for security's sake, and then enter your new "
+"password twice so we can verify you typed it in correctly."
+msgstr ""
+"Introdu te rog vechea parolă, pentru motive de siguranţă, şi apoi tastează noua "
+"parolă de două ori aşa încît putem verifica dacă ai tastat corect."
+
+#: contrib/admin/templates/registration/password_change_form.html:17
+msgid "Old password:"
+msgstr "Vechea parolă:"
+
+#: contrib/admin/templates/registration/password_change_form.html:19
+msgid "New password:"
+msgstr "Noua parolă:"
+
+#: contrib/admin/templates/registration/password_change_form.html:21
+msgid "Confirm password:"
+msgstr "Confirmă parola:"
+
+#: contrib/admin/templates/registration/password_change_form.html:23
+msgid "Change my password"
+msgstr "Schimbă-mi parola"
+
+#: contrib/admin/templates/registration/password_reset_done.html:4
+#: contrib/admin/templates/registration/password_reset_form.html:4
+#: contrib/admin/templates/registration/password_reset_form.html:6
+msgid "Password reset"
+msgstr "Resetează parola"
+
+#: contrib/admin/templates/registration/password_reset_done.html:6
+#: contrib/admin/templates/registration/password_reset_done.html:10
+msgid "Password reset successful"
+msgstr "Parola resetată cu succes"
+
+#: contrib/admin/templates/registration/password_reset_done.html:12
+msgid ""
+"We've e-mailed a new password to the e-mail address you submitted. You "
+"should be receiving it shortly."
+msgstr ""
+"Am trimis o nouă parolă prin email la adresa furnizată. Ar trebui"
+"să o primeşti în scurt timp."
+
+#: contrib/admin/templates/registration/password_reset_email.html:2
+msgid "You're receiving this e-mail because you requested a password reset"
+msgstr "Ai primit acest email pentru că ai cerut o resetare a parolei"
+
+#: contrib/admin/templates/registration/password_reset_email.html:3
+#, python-format
+msgid "for your user account at %(site_name)s"
+msgstr "pentru contul tău la %(site_name)s"
+
+#: contrib/admin/templates/registration/password_reset_email.html:5
+#, python-format
+msgid "Your new password is: %(new_password)s"
+msgstr "Noua ta parolă este: %(new_password)s"
+
+#: contrib/admin/templates/registration/password_reset_email.html:7
+msgid "Feel free to change this password by going to this page:"
+msgstr "Poţi schmiba această parolă vizitînd această pagină:"
+
+#: contrib/admin/templates/registration/password_reset_email.html:11
+msgid "Your username, in case you've forgotten:"
+msgstr "Numele tău utilizator, în caz că ai uitat:"
+
+#: contrib/admin/templates/registration/password_reset_email.html:13
+msgid "Thanks for using our site!"
+msgstr "Mulţumesc pentru folosirea saitului nostru!"
+
+#: contrib/admin/templates/registration/password_reset_email.html:15
+#, python-format
+msgid "The %(site_name)s team"
+msgstr "Echipa %(site_name)s"
+
+#: contrib/admin/templates/registration/password_reset_form.html:12
+msgid ""
+"Forgotten your password? Enter your e-mail address below, and we'll reset "
+"your password and e-mail the new one to you."
+msgstr ""
+"Ai uitat parola? Introdu adresa de email mai jos, iar noi vom reseta "
+"parola şi-ţi vom trimite una nouă prin email."
+
+#: contrib/admin/templates/registration/password_reset_form.html:16
+msgid "E-mail address:"
+msgstr "Adresa email:"
+
+#: contrib/admin/templates/registration/password_reset_form.html:16
+msgid "Reset my password"
+msgstr "Resetează-mi parola"
+
+#: contrib/admin/models/admin.py:6
+msgid "action time"
+msgstr "timp acţiune"
+
+#: contrib/admin/models/admin.py:9
+msgid "object id"
+msgstr "id obiect"
+
+#: contrib/admin/models/admin.py:10
+msgid "object repr"
+msgstr "repr obiect"
+
+#: contrib/admin/models/admin.py:11
+msgid "action flag"
+msgstr "steguleţ acţiune"
+
+#: contrib/admin/models/admin.py:12
+msgid "change message"
+msgstr "schimbă mesaj"
+
+#: contrib/admin/models/admin.py:15
+msgid "log entry"
+msgstr "intrare log"
+
+#: contrib/admin/models/admin.py:16
+msgid "log entries"
+msgstr "intrări log"
+
+#: utils/dates.py:6
+msgid "Monday"
+msgstr "Luni"
+
+#: utils/dates.py:6
+msgid "Tuesday"
+msgstr "Marţi"
+
+#: utils/dates.py:6
+msgid "Wednesday"
+msgstr "Miercuri"
+
+#: utils/dates.py:6
+msgid "Thursday"
+msgstr "Joi"
+
+#: utils/dates.py:6
+msgid "Friday"
+msgstr "Vineri"
+
+#: utils/dates.py:7
+msgid "Saturday"
+msgstr "Sîmbătă"
+
+#: utils/dates.py:7
+msgid "Sunday"
+msgstr "Duminică"
+
+#: utils/dates.py:14
+msgid "January"
+msgstr "Ianuarie"
+
+#: utils/dates.py:14
+msgid "February"
+msgstr "Februarie"
+
+#: utils/dates.py:14 utils/dates.py:27
+msgid "March"
+msgstr "Martie"
+
+#: utils/dates.py:14 utils/dates.py:27
+msgid "April"
+msgstr "Aprilie"
+
+#: utils/dates.py:14 utils/dates.py:27
+msgid "May"
+msgstr "Mai"
+
+#: utils/dates.py:14 utils/dates.py:27
+msgid "June"
+msgstr "Iunie"
+
+#: utils/dates.py:15 utils/dates.py:27
+msgid "July"
+msgstr "Iulie"
+
+#: utils/dates.py:15
+msgid "August"
+msgstr "August"
+
+#: utils/dates.py:15
+msgid "September"
+msgstr "Septembrie"
+
+#: utils/dates.py:15
+msgid "October"
+msgstr "Octombrie"
+
+#: utils/dates.py:15
+msgid "November"
+msgstr "Noiembrie"
+
+#: utils/dates.py:16
+msgid "December"
+msgstr "Decembrie"
+
+#: utils/dates.py:27
+msgid "Jan."
+msgstr "Ian."
+
+#: utils/dates.py:27
+msgid "Feb."
+msgstr "Feb."
+
+#: utils/dates.py:28
+msgid "Aug."
+msgstr "Aug."
+
+#: utils/dates.py:28
+msgid "Sept."
+msgstr "Sept."
+
+#: utils/dates.py:28
+msgid "Oct."
+msgstr "Oct"
+
+#: utils/dates.py:28
+msgid "Nov."
+msgstr "Noi."
+
+#: utils/dates.py:28
+msgid "Dec."
+msgstr "Dec."
+
+#: models/core.py:5
+msgid "domain name"
+msgstr "nume domeniu"
+
+#: models/core.py:6
+msgid "display name"
+msgstr "nume afişat"
+
+#: models/core.py:8
+msgid "site"
+msgstr "sit"
+
+#: models/core.py:9
+msgid "sites"
+msgstr "sit"
+
+#: models/core.py:22
+msgid "label"
+msgstr "etichetă"
+
+#: models/core.py:23 models/core.py:34 models/auth.py:6 models/auth.py:19
+msgid "name"
+msgstr "nume"
+
+#: models/core.py:25
+msgid "package"
+msgstr "pachet"
+
+#: models/core.py:26
+msgid "packages"
+msgstr "pachete"
+
+#: models/core.py:36
+msgid "python module name"
+msgstr "nume modul python"
+
+#: models/core.py:38
+msgid "content type"
+msgstr "tip conţinut"
+
+#: models/core.py:39
+msgid "content types"
+msgstr "tipuri conţinute"
+
+#: models/core.py:62
+msgid "redirect from"
+msgstr "redirectat de la "
+
+#: models/core.py:63
+msgid ""
+"This should be an absolute path, excluding the domain name. Example: '/"
+"events/search/'."
+msgstr ""
+"Aceasta ar trebui să fie o cale absolută, excluzînd numele de domeniu. Exemplu: '/"
+"evenimente/cautare/'."
+
+#: models/core.py:64
+msgid "redirect to"
+msgstr "redirectat la"
+
+#: models/core.py:65
+msgid ""
+"This can be either an absolute path (as above) or a full URL starting with "
+"'http://'."
+msgstr ""
+"Aceasta poate fi o cale absolută (ca mai sus) sau un URL începînd cu "
+"'http://'."
+
+#: models/core.py:67
+msgid "redirect"
+msgstr "redirectare"
+
+#: models/core.py:68
+msgid "redirects"
+msgstr "redictări"
+
+#: models/core.py:81
+msgid "URL"
+msgstr "URL"
+
+#: models/core.py:82
+msgid ""
+"Example: '/about/contact/'. Make sure to have leading and trailing slashes."
+msgstr ""
+"Exemplu: '/about/contact'. Asiguraţi-vă că aveţi slash-uri la început şi la sfîrşit."
+
+#: models/core.py:83
+msgid "title"
+msgstr "titlu"
+
+#: models/core.py:84
+msgid "content"
+msgstr "conţinut"
+
+#: models/core.py:85
+msgid "enable comments"
+msgstr "permite comentarii"
+
+#: models/core.py:86
+msgid "template name"
+msgstr "nume şablon"
+
+#: models/core.py:87
+msgid ""
+"Example: 'flatfiles/contact_page'. If this isn't provided, the system will "
+"use 'flatfiles/default'."
+msgstr ""
+"Exemplu: 'flatfiles/pagina_contact'. Dacă aceasta nu există, sistemul va "
+"folosi 'flatfiles/default'."
+
+#: models/core.py:88
+msgid "registration required"
+msgstr "necesită înregistrare"
+
+#: models/core.py:88
+msgid "If this is checked, only logged-in users will be able to view the page."
+msgstr "Dacă aceasta este bifată, numai utilizatorii logaţi vor putea vedea pagina."
+
+#: models/core.py:92
+msgid "flat page"
+msgstr "pagina plată"
+
+#: models/core.py:93
+msgid "flat pages"
+msgstr "pagini plate"
+
+#: models/core.py:114
+msgid "session key"
+msgstr "cheie sesiune"
+
+#: models/core.py:115
+msgid "session data"
+msgstr "date sesiune"
+
+#: models/core.py:116
+msgid "expire date"
+msgstr "data expirare"
+
+#: models/core.py:118
+msgid "session"
+msgstr "seiune"
+
+#: models/core.py:119
+msgid "sessions"
+msgstr "sesiuni"
+
+#: models/auth.py:8
+msgid "codename"
+msgstr "nume cod"
+
+#: models/auth.py:10
+msgid "Permission"
+msgstr "Permisiune"
+
+#: models/auth.py:11 models/auth.py:58
+msgid "Permissions"
+msgstr "Permisiuni"
+
+#: models/auth.py:22
+msgid "Group"
+msgstr "Grup"
+
+#: models/auth.py:23 models/auth.py:60
+msgid "Groups"
+msgstr "Grupuri"
+
+#: models/auth.py:33
+msgid "username"
+msgstr "nume utilizator"
+
+#: models/auth.py:34
+msgid "first name"
+msgstr "Prenume"
+
+#: models/auth.py:35
+msgid "last name"
+msgstr "Nume"
+
+#: models/auth.py:36
+msgid "e-mail address"
+msgstr "adresa email"
+
+#: models/auth.py:37
+msgid "password"
+msgstr "parola"
+
+#: models/auth.py:37
+msgid "Use an MD5 hash -- not the raw password."
+msgstr "Foloseşte un hash MD5 -- nu parola brută"
+
+#: models/auth.py:38
+msgid "staff status"
+msgstr "stare staff"
+
+#: models/auth.py:38
+msgid "Designates whether the user can log into this admin site."
+msgstr "Decide cînd utilizatorul se poate loga în acest sit de adminstrare."
+
+#: models/auth.py:39
+msgid "active"
+msgstr "activ"
+
+#: models/auth.py:40
+msgid "superuser status"
+msgstr "stare superutilizator"
+
+#: models/auth.py:41
+msgid "last login"
+msgstr "ultima logare"
+
+#: models/auth.py:42
+msgid "date joined"
+msgstr "data aderării"
+
+#: models/auth.py:44
+msgid ""
+"In addition to the permissions manually assigned, this user will also get "
+"all permissions granted to each group he/she is in."
+msgstr ""
+"Suplimentar permisiunilor manual alocate, acest utilizator va primi toate "
+"permisiunile alocate fiecărui grup din care el/ea face parte."
+
+#: models/auth.py:48
+msgid "Users"
+msgstr "Utilizatori"
+
+#: models/auth.py:57
+msgid "Personal info"
+msgstr "Informaţii personale"
+
+#: models/auth.py:59
+msgid "Important dates"
+msgstr "Date importante"
+
+#: models/auth.py:182
+msgid "Message"
+msgstr "Mesaj"
+
+#: conf/global_settings.py:36
+msgid "Czech"
+msgstr "Cehă"
+
+#: conf/global_settings.py:37
+msgid "German"
+msgstr "Germană"
+
+#: conf/global_settings.py:38
+msgid "English"
+msgstr "Engleză"
+
+#: conf/global_settings.py:39
+msgid "Spanish"
+msgstr "Spaniolă"
+
+#: conf/global_settings.py:40
+msgid "French"
+msgstr "Franceză"
+
+#: conf/global_settings.py:41
+msgid "Galician"
+msgstr "Galiciană"
+
+#: conf/global_settings.py:42
+msgid "Italian"
+msgstr "Italiană"
+
+#: conf/global_settings.py:43
+msgid "Norwegian"
+msgstr "Norvegiană"
+
+#: conf/global_settings.py:44
+msgid "Brazilian"
+msgstr "Braziliană"
+
+#: conf/global_settings.py:45
+msgid "Russian"
+msgstr "Rusă"
+
+#: conf/global_settings.py:46
+msgid "Serbian"
+msgstr "Sîrbă"
+
+#: conf/global_settings.py:47
+msgid "Simplified Chinese"
+msgstr "Chineză simplificată"
+
+#: core/validators.py:58
+msgid "This value must contain only letters, numbers and underscores."
+msgstr "Această valoare trebuie să conţină numai litere, numere şi liniuţe de subliniere."
+
+#: core/validators.py:62
+msgid "This value must contain only letters, numbers, underscores and slashes."
+msgstr "Această valoare trebuie să conţină numai litere, numere, liniuţe de subliniere şi slash-uri."
+
+#: core/validators.py:70
+msgid "Uppercase letters are not allowed here."
+msgstr "Literele mari nu sînt permise aici."
+
+#: core/validators.py:74
+msgid "Lowercase letters are not allowed here."
+msgstr "Literele mici nu sînt permise aici."
+
+#: core/validators.py:81
+msgid "Enter only digits separated by commas."
+msgstr "Introduceţi numai numere separate de virgule."
+
+#: core/validators.py:93
+msgid "Enter valid e-mail addresses separated by commas."
+msgstr "Introduceţi adrese de email valide separate de virgule."
+
+#: core/validators.py:100
+msgid "Please enter a valid IP address."
+msgstr "Introduceţi vă rog o adresă IP validă."
+
+#: core/validators.py:104
+msgid "Empty values are not allowed here."
+msgstr "Valorile vide nu sînt permise aici."
+
+#: core/validators.py:108
+msgid "Non-numeric characters aren't allowed here."
+msgstr "Caracterele ne-numerice nu sînt permise aici."
+
+#: core/validators.py:112
+msgid "This value can't be comprised solely of digits."
+msgstr "Această valoare nu poate conţîne numai cifre."
+
+#: core/validators.py:117
+msgid "Enter a whole number."
+msgstr "Introduceţi un număr întreg."
+
+#: core/validators.py:121
+msgid "Only alphabetical characters are allowed here."
+msgstr "Numai caractere alfabetice sînt permise aici."
+
+#: core/validators.py:125
+msgid "Enter a valid date in YYYY-MM-DD format."
+msgstr "Introduceţi o dată validă in format: AAAA-LL-ZZ."
+
+#: core/validators.py:129
+msgid "Enter a valid time in HH:MM format."
+msgstr "Introduceţi o oră în format OO:MM."
+
+#: core/validators.py:133
+msgid "Enter a valid date/time in YYYY-MM-DD HH:MM format."
+msgstr "Introduceţi o dată/oră validă în format AAAA-LL-ZZ OO:MM."
+
+#: core/validators.py:137
+msgid "Enter a valid e-mail address."
+msgstr "Introduceţi o adresă de email validă."
+
+#: core/validators.py:149
+msgid ""
+"Upload a valid image. The file you uploaded was either not an image or a "
+"corrupted image."
+msgstr ""
+"Încărcaţi o imagine validă. Fişierul încărcat nu era o imagine sau era "
+"o imagine coruptă."
+
+#: core/validators.py:156
+#, python-format
+msgid "The URL %s does not point to a valid image."
+msgstr "URL-ul %s nu pointează către o imagine validă."
+
+#: core/validators.py:160
+#, python-format
+msgid "Phone numbers must be in XXX-XXX-XXXX format. \"%s\" is invalid."
+msgstr "Numerele de telefon trebuie să fie in format XXX-XXX-XXXX. \"%s\" e invalid."
+
+#: core/validators.py:168
+#, python-format
+msgid "The URL %s does not point to a valid QuickTime video."
+msgstr "URL-ul %s nu pointează către o imagine video QuickTime validă."
+
+#: core/validators.py:172
+msgid "A valid URL is required."
+msgstr "E necesar un URL valid."
+
+#: core/validators.py:186
+#, python-format
+msgid ""
+"Valid HTML is required. Specific errors are:\n"
+"%s"
+msgstr ""
+"E necesar cod HTML valid. Erorile specifice sînt:\n"
+"%s"
+
+#: core/validators.py:193
+#, python-format
+msgid "Badly formed XML: %s"
+msgstr "Format XML invalid: %s"
+
+#: core/validators.py:203
+#, python-format
+msgid "Invalid URL: %s"
+msgstr "URL invalid: %s"
+
+#: core/validators.py:205
+#, python-format
+msgid "The URL %s is a broken link."
+msgstr "URL-ul %s e invalid."
+
+#: core/validators.py:211
+msgid "Enter a valid U.S. state abbreviation."
+msgstr "Introduceţi o abreviere validă în U.S."
+
+#: core/validators.py:226
+#, python-format
+msgid "Watch your mouth! The word %s is not allowed here."
+msgid_plural "Watch your mouth! The words %s are not allowed here."
+msgstr[0] "Îngrijiţi-vă limbajul! Cuvîntul %s nu este permis aici."
+msgstr[1] "Îngrijiţi-vă limbajul! Cuvintele %s nu sînt permise aici."
+
+#: core/validators.py:233
+#, python-format
+msgid "Please enter both fields or leave them both empty."
+msgstr "Vă rog comletaţi ambele cîmpuri sau lăsaţi-le goale pe ambele."
+
+#: core/validators.py:279
+#, python-format
+msgid "This field must be given if %(field)s is %(value)s"
+msgstr "Acest cîmp e necesar dacă %(field)s este %(value)s"
+
+#: core/validators.py:291
+#, python-format
+msgid "This field must be given if %(field)s is not %(value)s"
+msgstr "Acest cîmp e necesar dacă %(field)s nu este %(value)s"
+
+#: core/validators.py:310
+msgid "Duplicate values are not allowed."
+msgstr "Valorile duplicate nu sînt permise."
+
+#: core/validators.py:333
+#, python-format
+msgid "This value must be a power of %s."
+msgstr "Această valoare trebuie să fie o putere a lui %s."
+
+#: core/validators.py:344
+msgid "Please enter a valid decimal number."
+msgstr "Vă rog introduceţi un număr zecimal valid."
+
+#: core/validators.py:346
+#, python-format
+msgid "Please enter a valid decimal number with at most %s total digit."
+msgid_plural ""
+"Please enter a valid decimal number with at most %s total digits."
+msgstr[0] "Vă rog introduceţi un număr zecimal valid cu cel mult %s cifră."
+msgstr[1] "Vă rog introduceţi un număr zecimal valid cu cel mult %s cifre."
+
+#: core/validators.py:349
+#, python-format
+msgid "Please enter a valid decimal number with at most %s decimal place."
+msgid_plural ""
+"Please enter a valid decimal number with at most %s decimal places."
+msgstr[0] "Vă rog introduceţi un număr zecimal valid cu cel mult %s zecimală."
+msgstr[1] "Vă rog introduceţi un număr zecimal valid cu cel mult %s zecimale."
+
+#: core/validators.py:359
+#, python-format
+msgid "Make sure your uploaded file is at least %s bytes big."
+msgstr "Asigură-te că fişierul încărcact are cel puţin %s octeţi."
+
+#: core/validators.py:360
+#, python-format
+msgid "Make sure your uploaded file is at most %s bytes big."
+msgstr "Asigură-te că fişierul încărcact are cel mult %s octeţi."
+
+#: core/validators.py:373
+msgid "The format for this field is wrong."
+msgstr "Formatul acestui cîmp este invalid."
+
+#: core/validators.py:388
+msgid "This field is invalid."
+msgstr "Cîmpul este invalid."
+
+#: core/validators.py:423
+#, python-format
+msgid "Could not retrieve anything from %s."
+msgstr "Nu pot prelua nimic de la %s."
+
+#: core/validators.py:426
+#, python-format
+msgid ""
+"The URL %(url)s returned the invalid Content-Type header '%(contenttype)s'."
+msgstr ""
+"URL-ul %(url)s a returnat un header Content-Type invalid '%(contenttype)s'."
+
+#: core/validators.py:459
+#, python-format
+msgid ""
+"Please close the unclosed %(tag)s tag from line %(line)s. (Line starts with "
+"\"%(start)s\".)"
+msgstr ""
+"Te rog închide tagurile %(tag)s din linia %(line)s. ( Linia începe cu "
+"\"%(start)s\".)"
+
+#: core/validators.py:463
+#, python-format
+msgid ""
+"Some text starting on line %(line)s is not allowed in that context. (Line "
+"starts with \"%(start)s\".)"
+msgstr ""
+"Textul începînd cu linia %(line)s nu e permis în acest context. (Linia "
+"începînd cu \"%(start)s\".)"
+
+#: core/validators.py:468
+#, python-format
+msgid ""
+"\"%(attr)s\" on line %(line)s is an invalid attribute. (Line starts with \"%"
+"(start)s\".)"
+msgstr ""
+"\"%(attr)s\" în linia %(line)s e un atribut invalid. (Linia începînd cu \"%"
+"(start)s\".)"
+
+#: core/validators.py:473
+#, python-format
+msgid ""
+"\"<%(tag)s>\" on line %(line)s is an invalid tag. (Line starts with \"%"
+"(start)s\".)"
+msgstr ""
+"\"<%(tag)s>\" în linia %(line)s este un tag invalid. (Linia începe cu \"%"
+"(start)s\"."
+
+#: core/validators.py:477
+#, python-format
+msgid ""
+"A tag on line %(line)s is missing one or more required attributes. (Line "
+"starts with \"%(start)s\".)"
+msgstr ""
+"Unui tag din linia %(line)s îi lipseşte unul sau mai multe atribute. (Linia "
+"începe cu \"%(start)s\".)"
+
+#: core/validators.py:482
+#, python-format
+msgid ""
+"The \"%(attr)s\" attribute on line %(line)s has an invalid value. (Line "
+"starts with \"%(start)s\".)"
+msgstr ""
+"Atributul \"%(attr)s\" din linia %(line)s are o valoare invalidă. ( Linia "
+"începe cu \"%(start)s\".)"
+
+#: core/meta/fields.py:95
+msgid " Separate multiple IDs with commas."
+msgstr "Separă ID-urile multiple cu virgulă."
+
+#: core/meta/fields.py:98
+msgid ""
+" Hold down \"Control\", or \"Command\" on a Mac, to select more than one."
+msgstr ""
+" Ţine apăsat \"Control\", sau \"Command\" pe un Mac, pentru a selecta mai multe."
