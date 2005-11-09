@@ -55,9 +55,25 @@ def manipulator_validator_unique(f, opts, self, field_data, all_data):
         old_obj = opts.get_model_module().get_object(**{'%s__%s' % (f.name, lookup_type): field_data})
     except ObjectDoesNotExist:
         return
-    if hasattr(self, 'original_object') and getattr(self.original_object, opts.pk.column) == getattr(old_obj, opts.pk.column):
+    if hasattr(self, 'original_object') and getattr(self.original_object, opts.pk.attname) == getattr(old_obj, opts.pk.attname):
         return
     raise validators.ValidationError, "%s with this %s already exists." % (capfirst(opts.verbose_name), f.verbose_name)
+
+
+# A guide to Field parameters:
+#
+#   * name:      The name of the field specifed in the model.
+#   * attname:   The attribute to use on the model object. This is the same as
+#                "name", except in the case of ForeignKeys, where "_id" is
+#                appended.
+#   * db_column: The db_column specified in the model (or None).
+#   * column:    The database column for this field. This is the same as
+#                "attname", except if db_column is specified.
+#
+# Code that introspects values, or does other dynamic things, should use
+# attname. For example, this gets the primary key value of object "obj":
+#
+#     getattr(obj, opts.pk.attname)
 
 class Field(object):
 
@@ -110,19 +126,20 @@ class Field(object):
         self.creation_counter = Field.creation_counter
         Field.creation_counter += 1
 
-        # Set the name of the database column.
-        self.column = self.get_db_column()
+        self.attname, self.column = self.get_attname_column()
 
     def set_name(self, name):
         self.name = name
         self.verbose_name = self.verbose_name or name.replace('_', ' ')
-        self.column = self.get_db_column()
+        self.attname, self.column = self.get_attname_column()
 
-    def get_db_column(self):
-        if self.db_column: return self.db_column
+    def get_attname_column(self):
         if isinstance(self.rel, ManyToOne):
-            return '%s_id' % self.name
-        return self.name
+            attname = '%s_id' % self.name
+        else:
+            attname = self.name
+        column = self.db_column or attname
+        return attname, column
 
     def get_cache_name(self):
         return '_%s_cache' % self.name
@@ -277,7 +294,7 @@ class Field(object):
         if self.choices:
             return first_choice + list(self.choices)
         rel_obj = self.rel.to
-        return first_choice + [(getattr(x, rel_obj.pk.column), repr(x)) for x in rel_obj.get_model_module().get_list(**self.rel.limit_choices_to)]
+        return first_choice + [(getattr(x, rel_obj.pk.attname), repr(x)) for x in rel_obj.get_model_module().get_list(**self.rel.limit_choices_to)]
 
 class AutoField(Field):
     empty_strings_allowed = False

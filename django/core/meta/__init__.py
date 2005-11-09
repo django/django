@@ -748,7 +748,7 @@ def method_init(opts, self, *args, **kwargs):
                 except KeyError:
                     try:
                         # Object instance wasn't passed in -- must be an ID.
-                        val = kwargs.pop(f.column)
+                        val = kwargs.pop(f.attname)
                     except KeyError:
                         val = f.get_default()
                 else:
@@ -760,17 +760,17 @@ def method_init(opts, self, *args, **kwargs):
                             val = getattr(rel_obj, f.rel.field_name)
                         except AttributeError:
                             raise TypeError, "Invalid value: %r should be a %s instance, not a %s" % (f.name, f.rel.to, type(rel_obj))
-                setattr(self, f.column, val)
+                setattr(self, f.attname, val)
             else:
-                val = kwargs.pop(f.name, f.get_default())
-                setattr(self, f.name, val)
+                val = kwargs.pop(f.attname, f.get_default())
+                setattr(self, f.attname, val)
         if kwargs:
             raise TypeError, "'%s' is an invalid keyword argument for this function" % kwargs.keys()[0]
     for i, arg in enumerate(args):
-        setattr(self, opts.fields[i].column, arg)
+        setattr(self, opts.fields[i].attname, arg)
 
 def method_eq(opts, self, other):
-    return isinstance(other, self.__class__) and getattr(self, opts.pk.column) == getattr(other, opts.pk.column)
+    return isinstance(other, self.__class__) and getattr(self, opts.pk.attname) == getattr(other, opts.pk.attname)
 
 def method_save(opts, self):
     # Run any pre-save hooks.
@@ -780,7 +780,7 @@ def method_save(opts, self):
     cursor = db.db.cursor()
 
     # First, try an UPDATE. If that doesn't update anything, do an INSERT.
-    pk_val = getattr(self, opts.pk.column)
+    pk_val = getattr(self, opts.pk.attname)
     pk_set = bool(pk_val)
     record_exists = True
     if pk_set:
@@ -788,33 +788,33 @@ def method_save(opts, self):
         cursor.execute("SELECT 1 FROM %s WHERE %s=%%s LIMIT 1" % (opts.db_table, opts.pk.column), [pk_val])
         # If it does already exist, do an UPDATE.
         if cursor.fetchone():
-            db_values = [f.get_db_prep_save(f.pre_save(getattr(self, f.column), False)) for f in non_pks]
+            db_values = [f.get_db_prep_save(f.pre_save(getattr(self, f.attname), False)) for f in non_pks]
             cursor.execute("UPDATE %s SET %s WHERE %s=%%s" % (opts.db_table,
-                ','.join(['%s=%%s' % f.column for f in non_pks]), opts.pk.column),
+                ','.join(['%s=%%s' % f.column for f in non_pks]), opts.pk.attname),
                 db_values + [pk_val])
         else:
             record_exists = False
     if not pk_set or not record_exists:
         field_names = [f.column for f in opts.fields if not isinstance(f, AutoField)]
         placeholders = ['%s'] * len(field_names)
-        db_values = [f.get_db_prep_save(f.pre_save(getattr(self, f.column), True)) for f in opts.fields if not isinstance(f, AutoField)]
+        db_values = [f.get_db_prep_save(f.pre_save(getattr(self, f.attname), True)) for f in opts.fields if not isinstance(f, AutoField)]
         if opts.order_with_respect_to:
             field_names.append('_order')
             # TODO: This assumes the database supports subqueries.
             placeholders.append('(SELECT COUNT(*) FROM %s WHERE %s = %%s)' % \
                 (opts.db_table, opts.order_with_respect_to.column))
-            db_values.append(getattr(self, opts.order_with_respect_to.column))
+            db_values.append(getattr(self, opts.order_with_respect_to.attname))
         cursor.execute("INSERT INTO %s (%s) VALUES (%s)" % (opts.db_table,
             ','.join(field_names), ','.join(placeholders)), db_values)
         if opts.has_auto_field:
-            setattr(self, opts.pk.column, db.get_last_insert_id(cursor, opts.db_table, opts.pk.column))
+            setattr(self, opts.pk.attname, db.get_last_insert_id(cursor, opts.db_table, opts.pk.column))
     db.db.commit()
     # Run any post-save hooks.
     if hasattr(self, '_post_save'):
         self._post_save()
 
 def method_delete(opts, self):
-    assert getattr(self, opts.pk.column) is not None, "%r can't be deleted because it doesn't have an ID."
+    assert getattr(self, opts.pk.attname) is not None, "%r can't be deleted because it doesn't have an ID."
     # Run any pre-delete hooks.
     if hasattr(self, '_pre_delete'):
         self._pre_delete()
@@ -833,15 +833,15 @@ def method_delete(opts, self):
                 sub_obj.delete()
     for rel_opts, rel_field in opts.get_all_related_many_to_many_objects():
         cursor.execute("DELETE FROM %s WHERE %s_id=%%s" % (rel_field.get_m2m_db_table(rel_opts),
-            self._meta.object_name.lower()), [getattr(self, opts.pk.column)])
+            self._meta.object_name.lower()), [getattr(self, opts.pk.attname)])
     for f in opts.many_to_many:
         cursor.execute("DELETE FROM %s WHERE %s_id=%%s" % (f.get_m2m_db_table(opts), self._meta.object_name.lower()),
-            [getattr(self, opts.pk.column)])
-    cursor.execute("DELETE FROM %s WHERE %s=%%s" % (opts.db_table, opts.pk.column), [getattr(self, opts.pk.column)])
+            [getattr(self, opts.pk.attname)])
+    cursor.execute("DELETE FROM %s WHERE %s=%%s" % (opts.db_table, opts.pk.column), [getattr(self, opts.pk.attname)])
     db.db.commit()
-    setattr(self, opts.pk.column, None)
+    setattr(self, opts.pk.attname, None)
     for f in opts.fields:
-        if isinstance(f, FileField) and getattr(self, f.column):
+        if isinstance(f, FileField) and getattr(self, f.attname):
             file_name = getattr(self, 'get_%s_filename' % f.name)()
             # If the file exists and no other object of this type references it,
             # delete it from the filesystem.
@@ -856,7 +856,7 @@ def method_get_next_in_order(opts, order_field, self):
         self._next_in_order_cache = opts.get_model_module().get_object(order_by=('_order',),
             where=['_order > (SELECT _order FROM %s WHERE %s=%%s)' % (opts.db_table, opts.pk.column),
                 '%s=%%s' % order_field.column], limit=1,
-            params=[getattr(self, opts.pk.column), getattr(self, order_field.column)])
+            params=[getattr(self, opts.pk.attname), getattr(self, order_field.attname)])
     return self._next_in_order_cache
 
 def method_get_previous_in_order(opts, order_field, self):
@@ -864,7 +864,7 @@ def method_get_previous_in_order(opts, order_field, self):
         self._previous_in_order_cache = opts.get_model_module().get_object(order_by=('-_order',),
             where=['_order < (SELECT _order FROM %s WHERE %s=%%s)' % (opts.db_table, opts.pk.column),
                 '%s=%%s' % order_field.column], limit=1,
-            params=[getattr(self, opts.pk.column), getattr(self, order_field.column)])
+            params=[getattr(self, opts.pk.attname), getattr(self, order_field.attname)])
     return self._previous_in_order_cache
 
 # RELATIONSHIP METHODS #####################
@@ -873,7 +873,7 @@ def method_get_previous_in_order(opts, order_field, self):
 def method_get_many_to_one(field_with_rel, self):
     cache_var = field_with_rel.get_cache_name()
     if not hasattr(self, cache_var):
-        val = getattr(self, field_with_rel.column)
+        val = getattr(self, field_with_rel.attname)
         mod = field_with_rel.rel.to.get_model_module()
         if val is None:
             raise getattr(mod, '%sDoesNotExist' % field_with_rel.rel.to.object_name)
@@ -893,7 +893,7 @@ def method_get_many_to_many(field_with_rel, self):
             field_with_rel.get_m2m_db_table(self._meta), rel.pk.column,
             rel.object_name.lower(), self._meta.object_name.lower(), rel.get_order_sql('a'))
         cursor = db.db.cursor()
-        cursor.execute(sql, [getattr(self, self._meta.pk.column)])
+        cursor.execute(sql, [getattr(self, self._meta.pk.attname)])
         setattr(self, cache_var, [getattr(mod, rel.object_name)(*row) for row in cursor.fetchall()])
     return getattr(self, cache_var)
 
@@ -914,7 +914,7 @@ def method_set_many_to_many(rel_field, self, id_list):
     rel = rel_field.rel.to
     m2m_table = rel_field.get_m2m_db_table(self._meta)
     cursor = db.db.cursor()
-    this_id = getattr(self, self._meta.pk.column)
+    this_id = getattr(self, self._meta.pk.attname)
     if ids_to_delete:
         sql = "DELETE FROM %s WHERE %s_id = %%s AND %s_id IN (%s)" % (m2m_table, self._meta.object_name.lower(), rel.object_name.lower(), ','.join(map(str, ids_to_delete)))
         cursor.execute(sql, [this_id])
@@ -941,11 +941,11 @@ def method_get_related(method_name, rel_mod, rel_field, self, **kwargs):
 # Handles adding related objects.
 # Example: Poll.add_choice()
 def method_add_related(rel_obj, rel_mod, rel_field, self, *args, **kwargs):
-    init_kwargs = dict(zip([f.name for f in rel_obj.fields if f != rel_field and not isinstance(f, AutoField)], args))
+    init_kwargs = dict(zip([f.attname for f in rel_obj.fields if f != rel_field and not isinstance(f, AutoField)], args))
     init_kwargs.update(kwargs)
     for f in rel_obj.fields:
         if isinstance(f, AutoField):
-            init_kwargs[f.name] = None
+            init_kwargs[f.attname] = None
     init_kwargs[rel_field.name] = self
     obj = rel_mod.Klass(**init_kwargs)
     obj.save()
@@ -954,7 +954,7 @@ def method_add_related(rel_obj, rel_mod, rel_field, self, *args, **kwargs):
 # Handles related many-to-many object retrieval.
 # Examples: Album.get_song(), Album.get_song_list(), Album.get_song_count()
 def method_get_related_many_to_many(method_name, opts, rel_mod, rel_field, self, **kwargs):
-    kwargs['%s__%s__exact' % (rel_field.name, opts.pk.name)] = getattr(self, opts.pk.column)
+    kwargs['%s__%s__exact' % (rel_field.name, opts.pk.name)] = getattr(self, opts.pk.attname)
     return getattr(rel_mod, method_name)(**kwargs)
 
 # Handles setting many-to-many related objects.
@@ -963,7 +963,7 @@ def method_set_related_many_to_many(rel_opts, rel_field, self, id_list):
     id_list = map(int, id_list) # normalize to integers
     rel = rel_field.rel.to
     m2m_table = rel_field.get_m2m_db_table(rel_opts)
-    this_id = getattr(self, self._meta.pk.column)
+    this_id = getattr(self, self._meta.pk.attname)
     cursor = db.db.cursor()
     cursor.execute("DELETE FROM %s WHERE %s_id = %%s" % (m2m_table, rel.object_name.lower()), [this_id])
     sql = "INSERT INTO %s (%s_id, %s_id) VALUES (%%s, %%s)" % (m2m_table, rel.object_name.lower(), rel_opts.object_name.lower())
@@ -992,7 +992,7 @@ def method_get_order(ordered_obj, self):
 
 def method_get_next_or_previous(get_object_func, field, is_next, self, **kwargs):
     kwargs.setdefault('where', []).append('%s %s %%s' % (field.column, (is_next and '>' or '<')))
-    kwargs.setdefault('params', []).append(str(getattr(self, field.name)))
+    kwargs.setdefault('params', []).append(str(getattr(self, field.attname)))
     kwargs['order_by'] = [(not is_next and '-' or '') + field.name]
     kwargs['limit'] = 1
     return get_object_func(**kwargs)
@@ -1000,18 +1000,18 @@ def method_get_next_or_previous(get_object_func, field, is_next, self, **kwargs)
 # CHOICE-RELATED METHODS ###################
 
 def method_get_display_value(field, self):
-    value = getattr(self, field.column)
+    value = getattr(self, field.attname)
     return dict(field.choices).get(value, value)
 
 # FILE-RELATED METHODS #####################
 
 def method_get_file_filename(field, self):
-    return os.path.join(settings.MEDIA_ROOT, getattr(self, field.name))
+    return os.path.join(settings.MEDIA_ROOT, getattr(self, field.attname))
 
 def method_get_file_url(field, self):
-    if getattr(self, field.name): # value is not blank
+    if getattr(self, field.attname): # value is not blank
         import urlparse
-        return urlparse.urljoin(settings.MEDIA_URL, getattr(self, field.name)).replace('\\', '/')
+        return urlparse.urljoin(settings.MEDIA_URL, getattr(self, field.attname)).replace('\\', '/')
     return ''
 
 def method_get_file_size(field, self):
@@ -1036,7 +1036,7 @@ def method_save_file(field, self, filename, raw_contents):
             filename = filename[:dot_index] + '_' + filename[dot_index:]
 
     # Write the file to disk.
-    setattr(self, field.name, filename)
+    setattr(self, field.attname, filename)
     fp = open(getattr(self, 'get_%s_filename' % field.name)(), 'wb')
     fp.write(raw_contents)
     fp.close()
@@ -1363,7 +1363,7 @@ def function_get_in_bulk(opts, klass, *args, **kwargs):
     kwargs['where'] = ["%s.%s IN (%s)" % (opts.db_table, opts.pk.column, ",".join(['%s'] * len(id_list)))]
     kwargs['params'] = id_list
     obj_list = function_get_list(opts, klass, **kwargs)
-    return dict([(getattr(o, opts.pk.column), o) for o in obj_list])
+    return dict([(getattr(o, opts.pk.attname), o) for o in obj_list])
 
 def function_get_latest(opts, klass, does_not_exist_exception, **kwargs):
     kwargs['order_by'] = ('-' + opts.get_latest_by,)
@@ -1433,8 +1433,8 @@ def manipulator_init(opts, add, change, self, obj_key=None):
                 lookup_kwargs = opts.one_to_one_field.rel.limit_choices_to
                 lookup_kwargs['%s__exact' % opts.one_to_one_field.rel.field_name] = obj_key
                 _ = opts.one_to_one_field.rel.to.get_model_module().get_object(**lookup_kwargs)
-                params = dict([(f.column, f.get_default()) for f in opts.fields])
-                params[opts.pk.column] = obj_key
+                params = dict([(f.attname, f.get_default()) for f in opts.fields])
+                params[opts.pk.attname] = obj_key
                 self.original_object = opts.get_model_module().Klass(**params)
             else:
                 raise
@@ -1470,12 +1470,12 @@ def manipulator_save(opts, klass, add, change, self, new_data):
         # Fields with auto_now_add are another special case; they should keep
         # their original value in the change stage.
         if change and getattr(f, 'auto_now_add', False):
-            params[f.column] = getattr(self.original_object, f.name)
+            params[f.attname] = getattr(self.original_object, f.attname)
         else:
-            params[f.column] = f.get_manipulator_new_data(new_data)
+            params[f.attname] = f.get_manipulator_new_data(new_data)
 
     if change:
-        params[opts.pk.column] = self.obj_key
+        params[opts.pk.attname] = self.obj_key
 
     # First, save the basic object itself.
     new_object = klass(**params)
@@ -1490,7 +1490,7 @@ def manipulator_save(opts, klass, add, change, self, new_data):
     if change:
         self.fields_added, self.fields_changed, self.fields_deleted = [], [], []
         for f in opts.fields:
-            if not f.primary_key and str(getattr(self.original_object, f.column)) != str(getattr(new_object, f.column)):
+            if not f.primary_key and str(getattr(self.original_object, f.attname)) != str(getattr(new_object, f.attname)):
                 self.fields_changed.append(f.verbose_name)
 
     # Save many-to-many objects. Example: Poll.set_sites()
@@ -1526,7 +1526,7 @@ def manipulator_save(opts, klass, add, change, self, new_data):
                 old_rel_obj = None
                 if rel_new_data[rel_opts.pk.name][0]:
                     try:
-                        old_rel_obj = getattr(self.original_object, 'get_%s' % opts.get_rel_object_method_name(rel_opts, rel_field))(**{'%s__exact' % rel_opts.pk.name: rel_new_data[rel_opts.pk.name][0]})
+                        old_rel_obj = getattr(self.original_object, 'get_%s' % opts.get_rel_object_method_name(rel_opts, rel_field))(**{'%s__exact' % rel_opts.pk.name: rel_new_data[rel_opts.pk.attname][0]})
                     except ObjectDoesNotExist:
                         pass
 
@@ -1540,16 +1540,16 @@ def manipulator_save(opts, klass, add, change, self, new_data):
                 # given, use a default value. FileFields are also a special
                 # case, because they'll be dealt with later.
                 if change and (isinstance(f, FileField) or not f.editable):
-                    if rel_new_data.get(rel_opts.pk.name, False) and rel_new_data[rel_opts.pk.name][0]:
-                        params[f.column] = getattr(old_rel_obj, f.column)
+                    if rel_new_data.get(rel_opts.pk.attname, False) and rel_new_data[rel_opts.pk.attname][0]:
+                        params[f.attname] = getattr(old_rel_obj, f.attname)
                     else:
-                        params[f.column] = f.get_default()
+                        params[f.attname] = f.get_default()
                 elif f == rel_field:
-                    params[f.column] = getattr(new_object, rel_field.rel.field_name)
+                    params[f.attname] = getattr(new_object, rel_field.rel.field_name)
                 elif add and isinstance(f, AutoField):
-                    params[f.column] = None
+                    params[f.attname] = None
                 else:
-                    params[f.column] = f.get_manipulator_new_data(rel_new_data, rel=True)
+                    params[f.attname] = f.get_manipulator_new_data(rel_new_data, rel=True)
                 # Related links are a special case, because we have to
                 # manually set the "content_type_id" and "object_id" fields.
                 if opts.has_related_links and rel_opts.module_name == 'relatedlinks':
@@ -1566,7 +1566,7 @@ def manipulator_save(opts, klass, add, change, self, new_data):
 
                 # Save any uploaded files.
                 for f in rel_opts.fields:
-                    if isinstance(f, FileField) and rel_new_data.get(f.name, False):
+                    if isinstance(f, FileField) and rel_new_data.get(f.attname, False):
                         f.save_file(rel_new_data, new_rel_obj, change and old_rel_obj or None, old_rel_obj is not None, rel=True)
 
                 # Calculate whether any fields have changed.
@@ -1575,19 +1575,19 @@ def manipulator_save(opts, klass, add, change, self, new_data):
                         self.fields_added.append('%s "%r"' % (rel_opts.verbose_name, new_rel_obj))
                     else:
                         for f in rel_opts.fields:
-                            if not f.primary_key and f != rel_field and str(getattr(old_rel_obj, f.column)) != str(getattr(new_rel_obj, f.column)):
+                            if not f.primary_key and f != rel_field and str(getattr(old_rel_obj, f.attname)) != str(getattr(new_rel_obj, f.attname)):
                                 self.fields_changed.append('%s for %s "%r"' % (f.verbose_name, rel_opts.verbose_name, new_rel_obj))
 
                 # Save many-to-many objects.
                 for f in rel_opts.many_to_many:
                     if not f.rel.edit_inline:
-                        was_changed = getattr(new_rel_obj, 'set_%s' % f.name)(rel_new_data[f.name])
+                        was_changed = getattr(new_rel_obj, 'set_%s' % f.name)(rel_new_data[f.attname])
                         if change and was_changed:
                             self.fields_changed.append('%s for %s "%s"' % (f.verbose_name, rel_opts.verbose_name, new_rel_obj))
 
             # If, in the change stage, all of the core fields were blank and
             # the primary key (ID) was provided, delete the item.
-            if change and all_cores_blank and rel_new_data.has_key(rel_opts.pk.name) and rel_new_data[rel_opts.pk.name][0]:
+            if change and all_cores_blank and rel_new_data.has_key(rel_opts.pk.attname) and rel_new_data[rel_opts.pk.attname][0]:
                 new_rel_obj.delete()
                 self.fields_deleted.append('%s "%r"' % (rel_opts.verbose_name, old_rel_obj))
 
@@ -1606,7 +1606,7 @@ def manipulator_validator_unique_together(field_name_list, opts, self, field_dat
     else:
         kwargs = {'%s__iexact' % field_name_list[0]: field_data}
     for f in field_list[1:]:
-        field_val = all_data.get(f.column, None)
+        field_val = all_data.get(f.attname, None)
         if field_val is None:
             # This will be caught by another validator, assuming the field
             # doesn't have blank=True.
@@ -1620,7 +1620,7 @@ def manipulator_validator_unique_together(field_name_list, opts, self, field_dat
         old_obj = mod.get_object(**kwargs)
     except ObjectDoesNotExist:
         return
-    if hasattr(self, 'original_object') and getattr(self.original_object, opts.pk.column) == getattr(old_obj, opts.pk.column):
+    if hasattr(self, 'original_object') and getattr(self.original_object, opts.pk.attname) == getattr(old_obj, opts.pk.attname):
         pass
     else:
         raise validators.ValidationError, "%s with this %s already exists for the given %s." % \
@@ -1646,7 +1646,7 @@ def manipulator_validator_unique_for_date(from_field, date_field, opts, lookup_t
     except ObjectDoesNotExist:
         return
     else:
-        if hasattr(self, 'original_object') and getattr(self.original_object, opts.pk.column) == getattr(old_obj, opts.pk.column):
+        if hasattr(self, 'original_object') and getattr(self.original_object, opts.pk.attname) == getattr(old_obj, opts.pk.attname):
             pass
         else:
             format_string = (lookup_type == 'date') and '%B %d, %Y' or '%B %Y'

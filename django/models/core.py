@@ -48,11 +48,11 @@ class ContentType(meta.Model):
         unique_together = (('package', 'python_module_name'),)
 
     def __repr__(self):
-        return "%s | %s" % (self.package, self.name)
+        return "%s | %s" % (self.package_id, self.name)
 
     def get_model_module(self):
         "Returns the Python model module for accessing this type of content."
-        return __import__('django.models.%s.%s' % (self.package, self.python_module_name), '', '', [''])
+        return __import__('django.models.%s.%s' % (self.package_id, self.python_module_name), '', '', [''])
 
     def get_object_for_this_type(self, **kwargs):
         """
