@@ -34,6 +34,7 @@ LANGUAGE_CODE = 'en-us'
 # should be the utf-8 encoded local name for the language.
 LANGUAGES = (
     ('cs', _('Czech')),
+    ('cy', _('Welsh')),
     ('de', _('German')),
     ('en', _('English')),
     ('es', _('Spanish')),
@@ -42,10 +43,11 @@ LANGUAGES = (
     ('it', _('Italian')),
     ('no', _('Norwegian')),
     ('pt-br', _('Brazilian')),
+    ('ro', _('Romanian')),
     ('ru', _('Russian')),
+    ('sk', _('Slovak')),
     ('sr', _('Serbian')),
     ('zh-cn', _('Simplified Chinese')),
-    ('sk', _('Slovak')),
 )
 
 # Not-necessarily-technical managers of the site. They get broken link
