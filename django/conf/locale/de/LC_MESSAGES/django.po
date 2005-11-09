@@ -663,7 +663,7 @@ msgstr "Tschechisch"
 
 #: conf/global_settings.py:37
 msgid "Welsh"
-msgstr ""
+msgstr "Gälisch"
 
 #: conf/global_settings.py:38
 msgid "German"
@@ -699,7 +699,7 @@ msgstr "Brasilianisch"
 
 #: conf/global_settings.py:46
 msgid "Romanian"
-msgstr ""
+msgstr "Rumänisch"
 
 #: conf/global_settings.py:47
 msgid "Russian"
@@ -707,7 +707,7 @@ msgstr "Russisch"
 
 #: conf/global_settings.py:48
 msgid "Slovak"
-msgstr ""
+msgstr "Slovakisch"
 
 #: conf/global_settings.py:49
 msgid "Serbian"
