@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2005-11-06 21:41-0600\n"
+"POT-Creation-Date: 2005-11-09 04:26-0600\n"
 "PO-Revision-Date: 2005-10-11 09:12GMT-3\n"
 "Last-Translator: João Paulo Farias <jpaulofarias@gmail.com>\n"
 "Language-Team: Português do Brasil <pt-br@li.org>\n"
@@ -16,58 +16,44 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: contrib/admin/templates/admin/base.html:23
-msgid "Welcome,"
-msgstr "Bem vindo,"
+#: contrib/admin/models/admin.py:6
+msgid "action time"
+msgstr "hora da ação"
 
-#: contrib/admin/templates/admin/base.html:23
-msgid "Change password"
-msgstr "Alterar senha"
+#: contrib/admin/models/admin.py:9
+msgid "object id"
+msgstr "id do objeto"
 
-#: contrib/admin/templates/admin/base.html:23
-msgid "Log out"
-msgstr "Encerrar sessão"
+#: contrib/admin/models/admin.py:10
+msgid "object repr"
+msgstr "repr do objeto"
 
-#: contrib/admin/templates/admin/base.html:29
-#: contrib/admin/templates/admin/500.html:4
+#: contrib/admin/models/admin.py:11
+msgid "action flag"
+msgstr "flag de ação"
+
+#: contrib/admin/models/admin.py:12
+msgid "change message"
+msgstr "alterar mensagem"
+
+#: contrib/admin/models/admin.py:15
+msgid "log entry"
+msgstr "entrada de log"
+
+#: contrib/admin/models/admin.py:16
+msgid "log entries"
+msgstr "entradas de log"
+
 #: contrib/admin/templates/admin/object_history.html:5
-#: contrib/admin/templates/registration/logged_out.html:4
+#: contrib/admin/templates/admin/500.html:4
+#: contrib/admin/templates/admin/base.html:29
 #: contrib/admin/templates/registration/password_change_done.html:4
-#: contrib/admin/templates/registration/password_change_form.html:4
-#: contrib/admin/templates/registration/password_reset_done.html:4
 #: contrib/admin/templates/registration/password_reset_form.html:4
+#: contrib/admin/templates/registration/logged_out.html:4
+#: contrib/admin/templates/registration/password_reset_done.html:4
+#: contrib/admin/templates/registration/password_change_form.html:4
 msgid "Home"
 msgstr "Início"
-
-#: contrib/admin/templates/admin/404.html:4
-#: contrib/admin/templates/admin/404.html:8
-msgid "Page not found"
-msgstr "Página não encontrada"
-
-#: contrib/admin/templates/admin/404.html:10
-msgid "We're sorry, but the requested page could not be found."
-msgstr "Desculpe, mas a página requisitada não pode ser encontrada."
-
-#: contrib/admin/templates/admin/500.html:4
-#, fuzzy
-msgid "Server error"
-msgstr "Erro no servidor (500)"
-
-#: contrib/admin/templates/admin/500.html:6
-msgid "Server error (500)"
-msgstr "Erro no servidor (500)"
-
-#: contrib/admin/templates/admin/500.html:9
-msgid "Server Error <em>(500)</em>"
-msgstr "Erro no Servidor <em>(500)</em>"
-
-#: contrib/admin/templates/admin/500.html:10
-msgid ""
-"There's been an error. It's been reported to the site administrators via e-"
-"mail and should be fixed shortly. Thanks for your patience."
-msgstr ""
-"Houve um erro. Este foi reportado aos administradores do site através d e-"
-"mail e deve ser consertado em breve. Obrigado pela compreensão."
 
 #: contrib/admin/templates/admin/object_history.html:5
 msgid "History"
@@ -105,29 +91,35 @@ msgstr "Site de administração do Django"
 msgid "Django administration"
 msgstr "Administração do Django"
 
-#: contrib/admin/templates/admin/delete_confirmation.html:7
-#, fuzzy, python-format
-msgid ""
-"Deleting the %(object_name)s '%(object)s' would result in deleting related "
-"objects, but your account doesn't have permission to delete the following "
-"types of objects:"
-msgstr ""
-"A remoção de '%(object)s' %(object_name)s pode resultar na remoção de "
-"objetos relacionados, mas sua conta não tem a permissão para remoção dos "
-"seguintes tipos de objetos:"
+#: contrib/admin/templates/admin/500.html:4
+#, fuzzy
+msgid "Server error"
+msgstr "Erro no servidor (500)"
 
-#: contrib/admin/templates/admin/delete_confirmation.html:14
-#, python-format
-msgid ""
-"Are you sure you want to delete the %(object_name)s \"%(object)s\"? All of "
-"the following related items will be deleted:"
-msgstr ""
-"Você tem certeza que quer remover o \"%(object)s\" %(object_name)s? Todos os "
-"seguintes itens relacionados serão removidos:"
+#: contrib/admin/templates/admin/500.html:6
+msgid "Server error (500)"
+msgstr "Erro no servidor (500)"
 
-#: contrib/admin/templates/admin/delete_confirmation.html:18
-msgid "Yes, I'm sure"
-msgstr "Sim, tenho certeza"
+#: contrib/admin/templates/admin/500.html:9
+msgid "Server Error <em>(500)</em>"
+msgstr "Erro no Servidor <em>(500)</em>"
+
+#: contrib/admin/templates/admin/500.html:10
+msgid ""
+"There's been an error. It's been reported to the site administrators via e-"
+"mail and should be fixed shortly. Thanks for your patience."
+msgstr ""
+"Houve um erro. Este foi reportado aos administradores do site através d e-"
+"mail e deve ser consertado em breve. Obrigado pela compreensão."
+
+#: contrib/admin/templates/admin/404.html:4
+#: contrib/admin/templates/admin/404.html:8
+msgid "Page not found"
+msgstr "Página não encontrada"
+
+#: contrib/admin/templates/admin/404.html:10
+msgid "We're sorry, but the requested page could not be found."
+msgstr "Desculpe, mas a página requisitada não pode ser encontrada."
 
 #: contrib/admin/templates/admin/index.html:27
 msgid "Add"
@@ -169,13 +161,41 @@ msgstr "Você <a href=\"/password_reset/\"esqueceu a senha</a>?"
 msgid "Log in"
 msgstr "Acessar"
 
-#: contrib/admin/templates/registration/logged_out.html:8
-msgid "Thanks for spending some quality time with the Web site today."
-msgstr "Obrigado por visitar nosso Web site hoje."
+#: contrib/admin/templates/admin/base.html:23
+msgid "Welcome,"
+msgstr "Bem vindo,"
 
-#: contrib/admin/templates/registration/logged_out.html:10
-msgid "Log in again"
-msgstr "Acessar novamente"
+#: contrib/admin/templates/admin/base.html:23
+msgid "Change password"
+msgstr "Alterar senha"
+
+#: contrib/admin/templates/admin/base.html:23
+msgid "Log out"
+msgstr "Encerrar sessão"
+
+#: contrib/admin/templates/admin/delete_confirmation.html:7
+#, fuzzy, python-format
+msgid ""
+"Deleting the %(object_name)s '%(object)s' would result in deleting related "
+"objects, but your account doesn't have permission to delete the following "
+"types of objects:"
+msgstr ""
+"A remoção de '%(object)s' %(object_name)s pode resultar na remoção de "
+"objetos relacionados, mas sua conta não tem a permissão para remoção dos "
+"seguintes tipos de objetos:"
+
+#: contrib/admin/templates/admin/delete_confirmation.html:14
+#, python-format
+msgid ""
+"Are you sure you want to delete the %(object_name)s \"%(object)s\"? All of "
+"the following related items will be deleted:"
+msgstr ""
+"Você tem certeza que quer remover o \"%(object)s\" %(object_name)s? Todos os "
+"seguintes itens relacionados serão removidos:"
+
+#: contrib/admin/templates/admin/delete_confirmation.html:18
+msgid "Yes, I'm sure"
+msgstr "Sim, tenho certeza"
 
 #: contrib/admin/templates/registration/password_change_done.html:4
 #: contrib/admin/templates/registration/password_change_form.html:4
@@ -192,6 +212,49 @@ msgstr "Senha alterada com sucesso"
 #: contrib/admin/templates/registration/password_change_done.html:12
 msgid "Your password was changed."
 msgstr "Sua senha foi alterada."
+
+#: contrib/admin/templates/registration/password_reset_form.html:4
+#: contrib/admin/templates/registration/password_reset_form.html:6
+#: contrib/admin/templates/registration/password_reset_done.html:4
+msgid "Password reset"
+msgstr "Reinicializar senha"
+
+#: contrib/admin/templates/registration/password_reset_form.html:12
+msgid ""
+"Forgotten your password? Enter your e-mail address below, and we'll reset "
+"your password and e-mail the new one to you."
+msgstr ""
+"Esqueceu a senha? Digite seu e-mail abaixo e nós iremos enviar uma nova "
+"senha para você."
+
+#: contrib/admin/templates/registration/password_reset_form.html:16
+msgid "E-mail address:"
+msgstr "Endereço de e-mail:"
+
+#: contrib/admin/templates/registration/password_reset_form.html:16
+msgid "Reset my password"
+msgstr "Reinicializar minha senha"
+
+#: contrib/admin/templates/registration/logged_out.html:8
+msgid "Thanks for spending some quality time with the Web site today."
+msgstr "Obrigado por visitar nosso Web site hoje."
+
+#: contrib/admin/templates/registration/logged_out.html:10
+msgid "Log in again"
+msgstr "Acessar novamente"
+
+#: contrib/admin/templates/registration/password_reset_done.html:6
+#: contrib/admin/templates/registration/password_reset_done.html:10
+msgid "Password reset successful"
+msgstr "Senha inicializada com sucesso"
+
+#: contrib/admin/templates/registration/password_reset_done.html:12
+msgid ""
+"We've e-mailed a new password to the e-mail address you submitted. You "
+"should be receiving it shortly."
+msgstr ""
+"Nós enviamos uma nova senha para o e-mail que você informou. Você deve estar "
+"recebendo uma mensagem em breve."
 
 #: contrib/admin/templates/registration/password_change_form.html:12
 msgid ""
@@ -216,25 +279,6 @@ msgstr "Confirme a senha:"
 #: contrib/admin/templates/registration/password_change_form.html:23
 msgid "Change my password"
 msgstr "Alterar minha senha"
-
-#: contrib/admin/templates/registration/password_reset_done.html:4
-#: contrib/admin/templates/registration/password_reset_form.html:4
-#: contrib/admin/templates/registration/password_reset_form.html:6
-msgid "Password reset"
-msgstr "Reinicializar senha"
-
-#: contrib/admin/templates/registration/password_reset_done.html:6
-#: contrib/admin/templates/registration/password_reset_done.html:10
-msgid "Password reset successful"
-msgstr "Senha inicializada com sucesso"
-
-#: contrib/admin/templates/registration/password_reset_done.html:12
-msgid ""
-"We've e-mailed a new password to the e-mail address you submitted. You "
-"should be receiving it shortly."
-msgstr ""
-"Nós enviamos uma nova senha para o e-mail que você informou. Você deve estar "
-"recebendo uma mensagem em breve."
 
 #: contrib/admin/templates/registration/password_reset_email.html:2
 msgid "You're receiving this e-mail because you requested a password reset"
@@ -266,50 +310,6 @@ msgstr "Obrigado por usar nosso site!"
 #, python-format
 msgid "The %(site_name)s team"
 msgstr "Time do %(site_name)s"
-
-#: contrib/admin/templates/registration/password_reset_form.html:12
-msgid ""
-"Forgotten your password? Enter your e-mail address below, and we'll reset "
-"your password and e-mail the new one to you."
-msgstr ""
-"Esqueceu a senha? Digite seu e-mail abaixo e nós iremos enviar uma nova "
-"senha para você."
-
-#: contrib/admin/templates/registration/password_reset_form.html:16
-msgid "E-mail address:"
-msgstr "Endereço de e-mail:"
-
-#: contrib/admin/templates/registration/password_reset_form.html:16
-msgid "Reset my password"
-msgstr "Reinicializar minha senha"
-
-#: contrib/admin/models/admin.py:6
-msgid "action time"
-msgstr "hora da ação"
-
-#: contrib/admin/models/admin.py:9
-msgid "object id"
-msgstr "id do objeto"
-
-#: contrib/admin/models/admin.py:10
-msgid "object repr"
-msgstr "repr do objeto"
-
-#: contrib/admin/models/admin.py:11
-msgid "action flag"
-msgstr "flag de ação"
-
-#: contrib/admin/models/admin.py:12
-msgid "change message"
-msgstr "alterar mensagem"
-
-#: contrib/admin/models/admin.py:15
-msgid "log entry"
-msgstr "entrada de log"
-
-#: contrib/admin/models/admin.py:16
-msgid "log entries"
-msgstr "entradas de log"
 
 #: utils/dates.py:6
 msgid "Monday"
@@ -431,40 +431,40 @@ msgstr "site"
 msgid "sites"
 msgstr "sites"
 
-#: models/core.py:24
+#: models/core.py:28
 msgid "label"
 msgstr "etiqueta"
 
-#: models/core.py:25 models/core.py:36 models/auth.py:6 models/auth.py:19
+#: models/core.py:29 models/core.py:40 models/auth.py:6 models/auth.py:19
 #, fuzzy
 msgid "name"
 msgstr "nome:"
 
-#: models/core.py:27
+#: models/core.py:31
 msgid "package"
 msgstr "pacote"
 
-#: models/core.py:28
+#: models/core.py:32
 msgid "packages"
 msgstr "pacotes"
 
-#: models/core.py:38
+#: models/core.py:42
 msgid "python module name"
 msgstr "nome do módulo python"
 
-#: models/core.py:40
+#: models/core.py:44
 msgid "content type"
 msgstr "tipo de conteúdo"
 
-#: models/core.py:41
+#: models/core.py:45
 msgid "content types"
 msgstr "tipos de conteúdo"
 
-#: models/core.py:64
+#: models/core.py:68
 msgid "redirect from"
 msgstr "redirecionar de"
 
-#: models/core.py:65
+#: models/core.py:69
 msgid ""
 "This should be an absolute path, excluding the domain name. Example: '/"
 "events/search/'."
@@ -472,11 +472,11 @@ msgstr ""
 "Deve conter um caminho absoluto, excluindo o nome de domínio. Exemplo: '/"
 "eventos/busca/'."
 
-#: models/core.py:66
+#: models/core.py:70
 msgid "redirect to"
 msgstr "redirecionar para"
 
-#: models/core.py:67
+#: models/core.py:71
 msgid ""
 "This can be either an absolute path (as above) or a full URL starting with "
 "'http://'."
@@ -484,40 +484,40 @@ msgstr ""
 "Deve conter um caminho absoluto (como acima) ou uma URL completa, começando "
 "com 'http://'."
 
-#: models/core.py:69
+#: models/core.py:73
 msgid "redirect"
 msgstr "redirecionar"
 
-#: models/core.py:70
+#: models/core.py:74
 msgid "redirects"
 msgstr "redirecionamentos"
 
-#: models/core.py:83
+#: models/core.py:87
 msgid "URL"
 msgstr "URL"
 
-#: models/core.py:84
+#: models/core.py:88
 msgid ""
 "Example: '/about/contact/'. Make sure to have leading and trailing slashes."
 msgstr "Exemplo: '/sobre/contato/'. Lembre-se das barras no começo e no final."
 
-#: models/core.py:85
+#: models/core.py:89
 msgid "title"
 msgstr "título"
 
-#: models/core.py:86
+#: models/core.py:90
 msgid "content"
 msgstr "conteúdo"
 
-#: models/core.py:87
+#: models/core.py:91
 msgid "enable comments"
 msgstr "habilitar comentários"
 
-#: models/core.py:88
+#: models/core.py:92
 msgid "template name"
 msgstr "nome do modelo"
 
-#: models/core.py:89
+#: models/core.py:93
 msgid ""
 "Example: 'flatfiles/contact_page'. If this isn't provided, the system will "
 "use 'flatfiles/default'."
@@ -525,39 +525,39 @@ msgstr ""
 "Exemplo: 'flatfiles/contact_page'. Se não for informado, será utilizado "
 "'flatfiles/default'."
 
-#: models/core.py:90
+#: models/core.py:94
 msgid "registration required"
 msgstr "é obrigatório registrar"
 
-#: models/core.py:90
+#: models/core.py:94
 msgid "If this is checked, only logged-in users will be able to view the page."
 msgstr "Se estiver marcado, apenas usuários conectados poderão ver a página."
 
-#: models/core.py:94
+#: models/core.py:98
 msgid "flat page"
 msgstr "página plana"
 
-#: models/core.py:95
+#: models/core.py:99
 msgid "flat pages"
 msgstr "páginas planas"
 
-#: models/core.py:113
+#: models/core.py:117
 msgid "session key"
 msgstr "chave da sessão"
 
-#: models/core.py:114
+#: models/core.py:118
 msgid "session data"
 msgstr "dados da sessão"
 
-#: models/core.py:115
+#: models/core.py:119
 msgid "expire date"
 msgstr "data de expiração"
 
-#: models/core.py:117
+#: models/core.py:121
 msgid "session"
 msgstr "sessão"
 
-#: models/core.py:118
+#: models/core.py:122
 msgid "sessions"
 msgstr "sessões"
 
@@ -662,52 +662,60 @@ msgid "Czech"
 msgstr "Tcheco"
 
 #: conf/global_settings.py:37
+msgid "Welsh"
+msgstr ""
+
+#: conf/global_settings.py:38
 msgid "German"
 msgstr "Alemão"
 
-#: conf/global_settings.py:38
+#: conf/global_settings.py:39
 msgid "English"
 msgstr "Inglês"
 
-#: conf/global_settings.py:39
+#: conf/global_settings.py:40
 msgid "Spanish"
 msgstr "Espanhol"
 
-#: conf/global_settings.py:40
+#: conf/global_settings.py:41
 msgid "French"
 msgstr "Francês"
 
-#: conf/global_settings.py:41
+#: conf/global_settings.py:42
 msgid "Galician"
 msgstr "Galiciano"
 
-#: conf/global_settings.py:42
+#: conf/global_settings.py:43
 msgid "Italian"
 msgstr "Italiano"
 
-#: conf/global_settings.py:43
+#: conf/global_settings.py:44
 msgid "Norwegian"
 msgstr ""
 
-#: conf/global_settings.py:44
+#: conf/global_settings.py:45
 msgid "Brazilian"
 msgstr "Brazileiro"
 
-#: conf/global_settings.py:45
+#: conf/global_settings.py:46
+msgid "Romanian"
+msgstr ""
+
+#: conf/global_settings.py:47
 msgid "Russian"
 msgstr "Russo"
 
-#: conf/global_settings.py:46
+#: conf/global_settings.py:48
+msgid "Slovak"
+msgstr ""
+
+#: conf/global_settings.py:49
 #, fuzzy
 msgid "Serbian"
 msgstr "Sérvio"
 
-#: conf/global_settings.py:47
+#: conf/global_settings.py:50
 msgid "Simplified Chinese"
-msgstr ""
-
-#: conf/global_settings.py:48
-msgid "Slovak"
 msgstr ""
 
 #: core/validators.py:59

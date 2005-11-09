@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django Czech translation\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2005-11-06 21:41-0600\n"
+"POT-Creation-Date: 2005-11-09 04:26-0600\n"
 "PO-Revision-Date: 2005-11-06 18:39+0100\n"
 "Last-Translator: Radek Svarz <translate@svarz.cz>\n"
 "Language-Team: Czech\n"
@@ -19,57 +19,44 @@ msgstr ""
 "X-Poedit-Language: Czech\n"
 "X-Poedit-Country: CZECH REPUBLIC\n"
 
-#: contrib/admin/templates/admin/base.html:23
-msgid "Welcome,"
-msgstr "Vítejte,"
+#: contrib/admin/models/admin.py:6
+msgid "action time"
+msgstr "čas akce"
 
-#: contrib/admin/templates/admin/base.html:23
-msgid "Change password"
-msgstr "Změnit heslo"
+#: contrib/admin/models/admin.py:9
+msgid "object id"
+msgstr "object id"
 
-#: contrib/admin/templates/admin/base.html:23
-msgid "Log out"
-msgstr "Odhlásit se"
+#: contrib/admin/models/admin.py:10
+msgid "object repr"
+msgstr "object repr"
 
-#: contrib/admin/templates/admin/base.html:29
-#: contrib/admin/templates/admin/500.html:4
+#: contrib/admin/models/admin.py:11
+msgid "action flag"
+msgstr "příznak akce"
+
+#: contrib/admin/models/admin.py:12
+msgid "change message"
+msgstr "zpráva změny"
+
+#: contrib/admin/models/admin.py:15
+msgid "log entry"
+msgstr "log záznam"
+
+#: contrib/admin/models/admin.py:16
+msgid "log entries"
+msgstr "log záznamy"
+
 #: contrib/admin/templates/admin/object_history.html:5
-#: contrib/admin/templates/registration/logged_out.html:4
+#: contrib/admin/templates/admin/500.html:4
+#: contrib/admin/templates/admin/base.html:29
 #: contrib/admin/templates/registration/password_change_done.html:4
-#: contrib/admin/templates/registration/password_change_form.html:4
-#: contrib/admin/templates/registration/password_reset_done.html:4
 #: contrib/admin/templates/registration/password_reset_form.html:4
+#: contrib/admin/templates/registration/logged_out.html:4
+#: contrib/admin/templates/registration/password_reset_done.html:4
+#: contrib/admin/templates/registration/password_change_form.html:4
 msgid "Home"
 msgstr "Domů"
-
-#: contrib/admin/templates/admin/404.html:4
-#: contrib/admin/templates/admin/404.html:8
-msgid "Page not found"
-msgstr "Stránka nenalezena"
-
-#: contrib/admin/templates/admin/404.html:10
-msgid "We're sorry, but the requested page could not be found."
-msgstr "Je nám líto, ale vyžádaná stránka nebyla nalezena."
-
-#: contrib/admin/templates/admin/500.html:4
-msgid "Server error"
-msgstr "Chyba serveru"
-
-#: contrib/admin/templates/admin/500.html:6
-msgid "Server error (500)"
-msgstr "Chyba serveru (500)"
-
-#: contrib/admin/templates/admin/500.html:9
-msgid "Server Error <em>(500)</em>"
-msgstr "Chyba serveru <em>(500)</em>"
-
-#: contrib/admin/templates/admin/500.html:10
-msgid ""
-"There's been an error. It's been reported to the site administrators via e-"
-"mail and should be fixed shortly. Thanks for your patience."
-msgstr ""
-"Nastala chyba. Ta byla oznámena administrátorovi serveru pomocí e-mailu a "
-"měla by být brzy odstraněna. Děkujeme za trpělivost."
 
 #: contrib/admin/templates/admin/object_history.html:5
 msgid "History"
@@ -107,28 +94,34 @@ msgstr "Django správa webu"
 msgid "Django administration"
 msgstr "Django správa"
 
-#: contrib/admin/templates/admin/delete_confirmation.html:7
-#, fuzzy, python-format
-msgid ""
-"Deleting the %(object_name)s '%(object)s' would result in deleting related "
-"objects, but your account doesn't have permission to delete the following "
-"types of objects:"
-msgstr ""
-"Mazání %(object_name)s  '%(object)s' by vyústilo ve vymazání souvisejících "
-"objektů, ale Váš účet nemá oprávnění pro mazání následujících typů objektů:"
+#: contrib/admin/templates/admin/500.html:4
+msgid "Server error"
+msgstr "Chyba serveru"
 
-#: contrib/admin/templates/admin/delete_confirmation.html:14
-#, python-format
-msgid ""
-"Are you sure you want to delete the %(object_name)s \"%(object)s\"? All of "
-"the following related items will be deleted:"
-msgstr ""
-"Jste si jist(á), že chcete smazat %(object_name)s \"%(object)s\"? Všechny "
-"následující související položky budou smazány:"
+#: contrib/admin/templates/admin/500.html:6
+msgid "Server error (500)"
+msgstr "Chyba serveru (500)"
 
-#: contrib/admin/templates/admin/delete_confirmation.html:18
-msgid "Yes, I'm sure"
-msgstr "Ano, jsem si jist"
+#: contrib/admin/templates/admin/500.html:9
+msgid "Server Error <em>(500)</em>"
+msgstr "Chyba serveru <em>(500)</em>"
+
+#: contrib/admin/templates/admin/500.html:10
+msgid ""
+"There's been an error. It's been reported to the site administrators via e-"
+"mail and should be fixed shortly. Thanks for your patience."
+msgstr ""
+"Nastala chyba. Ta byla oznámena administrátorovi serveru pomocí e-mailu a "
+"měla by být brzy odstraněna. Děkujeme za trpělivost."
+
+#: contrib/admin/templates/admin/404.html:4
+#: contrib/admin/templates/admin/404.html:8
+msgid "Page not found"
+msgstr "Stránka nenalezena"
+
+#: contrib/admin/templates/admin/404.html:10
+msgid "We're sorry, but the requested page could not be found."
+msgstr "Je nám líto, ale vyžádaná stránka nebyla nalezena."
 
 #: contrib/admin/templates/admin/index.html:27
 msgid "Add"
@@ -170,13 +163,40 @@ msgstr "<a href=\"/password_reset/\">Zapomněl(a) jste své heslo?</a>"
 msgid "Log in"
 msgstr "Přihlášení"
 
-#: contrib/admin/templates/registration/logged_out.html:8
-msgid "Thanks for spending some quality time with the Web site today."
-msgstr "Děkujeme Vám za Váš strávený čas na našich webových stránkách."
+#: contrib/admin/templates/admin/base.html:23
+msgid "Welcome,"
+msgstr "Vítejte,"
 
-#: contrib/admin/templates/registration/logged_out.html:10
-msgid "Log in again"
-msgstr "Přihlašte se znova"
+#: contrib/admin/templates/admin/base.html:23
+msgid "Change password"
+msgstr "Změnit heslo"
+
+#: contrib/admin/templates/admin/base.html:23
+msgid "Log out"
+msgstr "Odhlásit se"
+
+#: contrib/admin/templates/admin/delete_confirmation.html:7
+#, fuzzy, python-format
+msgid ""
+"Deleting the %(object_name)s '%(object)s' would result in deleting related "
+"objects, but your account doesn't have permission to delete the following "
+"types of objects:"
+msgstr ""
+"Mazání %(object_name)s  '%(object)s' by vyústilo ve vymazání souvisejících "
+"objektů, ale Váš účet nemá oprávnění pro mazání následujících typů objektů:"
+
+#: contrib/admin/templates/admin/delete_confirmation.html:14
+#, python-format
+msgid ""
+"Are you sure you want to delete the %(object_name)s \"%(object)s\"? All of "
+"the following related items will be deleted:"
+msgstr ""
+"Jste si jist(á), že chcete smazat %(object_name)s \"%(object)s\"? Všechny "
+"následující související položky budou smazány:"
+
+#: contrib/admin/templates/admin/delete_confirmation.html:18
+msgid "Yes, I'm sure"
+msgstr "Ano, jsem si jist"
 
 #: contrib/admin/templates/registration/password_change_done.html:4
 #: contrib/admin/templates/registration/password_change_form.html:4
@@ -193,6 +213,49 @@ msgstr "Změna hesla byla úspěšná"
 #: contrib/admin/templates/registration/password_change_done.html:12
 msgid "Your password was changed."
 msgstr "Vaše heslo bylo změněno."
+
+#: contrib/admin/templates/registration/password_reset_form.html:4
+#: contrib/admin/templates/registration/password_reset_form.html:6
+#: contrib/admin/templates/registration/password_reset_done.html:4
+msgid "Password reset"
+msgstr "Obnovení hesla"
+
+#: contrib/admin/templates/registration/password_reset_form.html:12
+msgid ""
+"Forgotten your password? Enter your e-mail address below, and we'll reset "
+"your password and e-mail the new one to you."
+msgstr ""
+"Zapomněl(a) jste heslo? Vložte níže Vaši e-mailovou adresu a my Vaše heslo "
+"obnovíme a zašleme Vám e-mailem nové."
+
+#: contrib/admin/templates/registration/password_reset_form.html:16
+msgid "E-mail address:"
+msgstr "E-mailová adresa:"
+
+#: contrib/admin/templates/registration/password_reset_form.html:16
+msgid "Reset my password"
+msgstr "Obnovit mé heslo"
+
+#: contrib/admin/templates/registration/logged_out.html:8
+msgid "Thanks for spending some quality time with the Web site today."
+msgstr "Děkujeme Vám za Váš strávený čas na našich webových stránkách."
+
+#: contrib/admin/templates/registration/logged_out.html:10
+msgid "Log in again"
+msgstr "Přihlašte se znova"
+
+#: contrib/admin/templates/registration/password_reset_done.html:6
+#: contrib/admin/templates/registration/password_reset_done.html:10
+msgid "Password reset successful"
+msgstr "Obnovení hesla bylo úspěšné"
+
+#: contrib/admin/templates/registration/password_reset_done.html:12
+msgid ""
+"We've e-mailed a new password to the e-mail address you submitted. You "
+"should be receiving it shortly."
+msgstr ""
+"Poslali jsme Vám e-mailem nové heslo na adresu, kterou jste zadal(a). Měl(a) "
+"byste ji dostat během okamžiku."
 
 #: contrib/admin/templates/registration/password_change_form.html:12
 msgid ""
@@ -217,25 +280,6 @@ msgstr "Potvrdit heslo:"
 #: contrib/admin/templates/registration/password_change_form.html:23
 msgid "Change my password"
 msgstr "Změnit mé heslo:"
-
-#: contrib/admin/templates/registration/password_reset_done.html:4
-#: contrib/admin/templates/registration/password_reset_form.html:4
-#: contrib/admin/templates/registration/password_reset_form.html:6
-msgid "Password reset"
-msgstr "Obnovení hesla"
-
-#: contrib/admin/templates/registration/password_reset_done.html:6
-#: contrib/admin/templates/registration/password_reset_done.html:10
-msgid "Password reset successful"
-msgstr "Obnovení hesla bylo úspěšné"
-
-#: contrib/admin/templates/registration/password_reset_done.html:12
-msgid ""
-"We've e-mailed a new password to the e-mail address you submitted. You "
-"should be receiving it shortly."
-msgstr ""
-"Poslali jsme Vám e-mailem nové heslo na adresu, kterou jste zadal(a). Měl(a) "
-"byste ji dostat během okamžiku."
 
 #: contrib/admin/templates/registration/password_reset_email.html:2
 msgid "You're receiving this e-mail because you requested a password reset"
@@ -267,50 +311,6 @@ msgstr "Děkujeme za používání našeho webu!"
 #, python-format
 msgid "The %(site_name)s team"
 msgstr "Tým %(site_name)s"
-
-#: contrib/admin/templates/registration/password_reset_form.html:12
-msgid ""
-"Forgotten your password? Enter your e-mail address below, and we'll reset "
-"your password and e-mail the new one to you."
-msgstr ""
-"Zapomněl(a) jste heslo? Vložte níže Vaši e-mailovou adresu a my Vaše heslo "
-"obnovíme a zašleme Vám e-mailem nové."
-
-#: contrib/admin/templates/registration/password_reset_form.html:16
-msgid "E-mail address:"
-msgstr "E-mailová adresa:"
-
-#: contrib/admin/templates/registration/password_reset_form.html:16
-msgid "Reset my password"
-msgstr "Obnovit mé heslo"
-
-#: contrib/admin/models/admin.py:6
-msgid "action time"
-msgstr "čas akce"
-
-#: contrib/admin/models/admin.py:9
-msgid "object id"
-msgstr "object id"
-
-#: contrib/admin/models/admin.py:10
-msgid "object repr"
-msgstr "object repr"
-
-#: contrib/admin/models/admin.py:11
-msgid "action flag"
-msgstr "příznak akce"
-
-#: contrib/admin/models/admin.py:12
-msgid "change message"
-msgstr "zpráva změny"
-
-#: contrib/admin/models/admin.py:15
-msgid "log entry"
-msgstr "log záznam"
-
-#: contrib/admin/models/admin.py:16
-msgid "log entries"
-msgstr "log záznamy"
 
 #: utils/dates.py:6
 msgid "Monday"
@@ -432,50 +432,50 @@ msgstr "web"
 msgid "sites"
 msgstr "weby"
 
-#: models/core.py:24
+#: models/core.py:28
 msgid "label"
 msgstr "nadpis"
 
-#: models/core.py:25 models/core.py:36 models/auth.py:6 models/auth.py:19
+#: models/core.py:29 models/core.py:40 models/auth.py:6 models/auth.py:19
 msgid "name"
 msgstr "jméno"
 
-#: models/core.py:27
+#: models/core.py:31
 msgid "package"
 msgstr "balík"
 
-#: models/core.py:28
+#: models/core.py:32
 msgid "packages"
 msgstr "balíky"
 
-#: models/core.py:38
+#: models/core.py:42
 msgid "python module name"
 msgstr "jméno modulu Pythonu"
 
-#: models/core.py:40
+#: models/core.py:44
 msgid "content type"
 msgstr "typ obsahu"
 
-#: models/core.py:41
+#: models/core.py:45
 msgid "content types"
 msgstr "typy obsahu"
 
-#: models/core.py:64
+#: models/core.py:68
 msgid "redirect from"
 msgstr "přesměrovat z"
 
-#: models/core.py:65
+#: models/core.py:69
 msgid ""
 "This should be an absolute path, excluding the domain name. Example: '/"
 "events/search/'."
 msgstr ""
 "Toto by měla být absolutní cesta, bez domény. Např.  '/udalosti/hledat/'."
 
-#: models/core.py:66
+#: models/core.py:70
 msgid "redirect to"
 msgstr "přesměrovat na"
 
-#: models/core.py:67
+#: models/core.py:71
 msgid ""
 "This can be either an absolute path (as above) or a full URL starting with "
 "'http://'."
@@ -483,41 +483,41 @@ msgstr ""
 "Toto může být buď absolutní cesta (jako nahoře) nebo plné URL začínající na "
 "'http://'."
 
-#: models/core.py:69
+#: models/core.py:73
 msgid "redirect"
 msgstr "přesměrovat"
 
-#: models/core.py:70
+#: models/core.py:74
 msgid "redirects"
 msgstr "přesměrování"
 
-#: models/core.py:83
+#: models/core.py:87
 msgid "URL"
 msgstr "URL"
 
-#: models/core.py:84
+#: models/core.py:88
 msgid ""
 "Example: '/about/contact/'. Make sure to have leading and trailing slashes."
 msgstr ""
 "Příklad: '/o/kontakt/'. Ujistěte se, že máte počáteční a konečná lomítka."
 
-#: models/core.py:85
+#: models/core.py:89
 msgid "title"
 msgstr "titulek"
 
-#: models/core.py:86
+#: models/core.py:90
 msgid "content"
 msgstr "obsah"
 
-#: models/core.py:87
+#: models/core.py:91
 msgid "enable comments"
 msgstr "povolit komentáře"
 
-#: models/core.py:88
+#: models/core.py:92
 msgid "template name"
 msgstr "jméno šablony"
 
-#: models/core.py:89
+#: models/core.py:93
 msgid ""
 "Example: 'flatfiles/contact_page'. If this isn't provided, the system will "
 "use 'flatfiles/default'."
@@ -525,41 +525,41 @@ msgstr ""
 "Například: 'flatfiles/kontaktni_stranka'. Pokud toto není zadáno, systém "
 "použije 'flatfiles/default'."
 
-#: models/core.py:90
+#: models/core.py:94
 msgid "registration required"
 msgstr "nutná registrace"
 
-#: models/core.py:90
+#: models/core.py:94
 msgid "If this is checked, only logged-in users will be able to view the page."
 msgstr ""
 "Pokud je zaškrtnuto, pouze přihlášení uživatelé budou moci prohlížet tuto "
 "stránku."
 
-#: models/core.py:94
+#: models/core.py:98
 msgid "flat page"
 msgstr "statická stránka"
 
-#: models/core.py:95
+#: models/core.py:99
 msgid "flat pages"
 msgstr "statické stránky"
 
-#: models/core.py:113
+#: models/core.py:117
 msgid "session key"
 msgstr "klíč sezení"
 
-#: models/core.py:114
+#: models/core.py:118
 msgid "session data"
 msgstr "data sezení"
 
-#: models/core.py:115
+#: models/core.py:119
 msgid "expire date"
 msgstr "datum expirace"
 
-#: models/core.py:117
+#: models/core.py:121
 msgid "session"
 msgstr "sezení"
 
-#: models/core.py:118
+#: models/core.py:122
 msgid "sessions"
 msgstr "sezení"
 
@@ -661,53 +661,61 @@ msgid "Czech"
 msgstr "Česky"
 
 #: conf/global_settings.py:37
+msgid "Welsh"
+msgstr ""
+
+#: conf/global_settings.py:38
 msgid "German"
 msgstr "Německy"
 
-#: conf/global_settings.py:38
+#: conf/global_settings.py:39
 msgid "English"
 msgstr "Anglicky"
 
-#: conf/global_settings.py:39
+#: conf/global_settings.py:40
 msgid "Spanish"
 msgstr "Španělsky"
 
-#: conf/global_settings.py:40
+#: conf/global_settings.py:41
 msgid "French"
 msgstr "Francouzsky"
 
-#: conf/global_settings.py:41
+#: conf/global_settings.py:42
 #, fuzzy
 msgid "Galician"
 msgstr "Galicijský"
 
-#: conf/global_settings.py:42
+#: conf/global_settings.py:43
 msgid "Italian"
 msgstr "Italsky"
 
-#: conf/global_settings.py:43
+#: conf/global_settings.py:44
 msgid "Norwegian"
 msgstr "Norsky"
 
-#: conf/global_settings.py:44
+#: conf/global_settings.py:45
 msgid "Brazilian"
 msgstr "Brazilsky"
 
-#: conf/global_settings.py:45
-msgid "Russian"
-msgstr "Rusky"
-
 #: conf/global_settings.py:46
-msgid "Serbian"
-msgstr "Srbsky"
+msgid "Romanian"
+msgstr ""
 
 #: conf/global_settings.py:47
-msgid "Simplified Chinese"
-msgstr "Jednoduchá čínština"
+msgid "Russian"
+msgstr "Rusky"
 
 #: conf/global_settings.py:48
 msgid "Slovak"
 msgstr ""
+
+#: conf/global_settings.py:49
+msgid "Serbian"
+msgstr "Srbsky"
+
+#: conf/global_settings.py:50
+msgid "Simplified Chinese"
+msgstr "Jednoduchá čínština"
 
 #: core/validators.py:59
 msgid "This value must contain only letters, numbers and underscores."

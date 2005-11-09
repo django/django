@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django v1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2005-11-06 21:41-0600\n"
+"POT-Creation-Date: 2005-11-09 04:26-0600\n"
 "PO-Revision-Date: 2005-10-30 15:46+0800\n"
 "Last-Translator: limodou <limodou@gmail.com>\n"
 "Language-Team: Simplified Chinese <limodou@gmail.com>\n"
@@ -18,58 +18,44 @@ msgstr ""
 "X-Poedit-Country: CHINA\n"
 "X-Poedit-SourceCharset: utf-8\n"
 
-#: contrib/admin/templates/admin/base.html:23
-msgid "Welcome,"
-msgstr "欢迎，"
+#: contrib/admin/models/admin.py:6
+msgid "action time"
+msgstr "动作时间"
 
-#: contrib/admin/templates/admin/base.html:23
-msgid "Change password"
-msgstr "修改口令"
+#: contrib/admin/models/admin.py:9
+msgid "object id"
+msgstr "对象id"
 
-#: contrib/admin/templates/admin/base.html:23
-msgid "Log out"
-msgstr "注销"
+#: contrib/admin/models/admin.py:10
+msgid "object repr"
+msgstr "对象表示"
 
-#: contrib/admin/templates/admin/base.html:29
-#: contrib/admin/templates/admin/500.html:4
+#: contrib/admin/models/admin.py:11
+msgid "action flag"
+msgstr "动作标志"
+
+#: contrib/admin/models/admin.py:12
+msgid "change message"
+msgstr "修改消息"
+
+#: contrib/admin/models/admin.py:15
+msgid "log entry"
+msgstr "日志记录"
+
+#: contrib/admin/models/admin.py:16
+msgid "log entries"
+msgstr "日志记录"
+
 #: contrib/admin/templates/admin/object_history.html:5
-#: contrib/admin/templates/registration/logged_out.html:4
+#: contrib/admin/templates/admin/500.html:4
+#: contrib/admin/templates/admin/base.html:29
 #: contrib/admin/templates/registration/password_change_done.html:4
-#: contrib/admin/templates/registration/password_change_form.html:4
-#: contrib/admin/templates/registration/password_reset_done.html:4
 #: contrib/admin/templates/registration/password_reset_form.html:4
+#: contrib/admin/templates/registration/logged_out.html:4
+#: contrib/admin/templates/registration/password_reset_done.html:4
+#: contrib/admin/templates/registration/password_change_form.html:4
 msgid "Home"
 msgstr "首页"
-
-#: contrib/admin/templates/admin/404.html:4
-#: contrib/admin/templates/admin/404.html:8
-msgid "Page not found"
-msgstr "页面没有找到"
-
-#: contrib/admin/templates/admin/404.html:10
-msgid "We're sorry, but the requested page could not be found."
-msgstr "很报歉，请求页面无法找到。"
-
-#: contrib/admin/templates/admin/500.html:4
-#, fuzzy
-msgid "Server error"
-msgstr "服务器错误(500)"
-
-#: contrib/admin/templates/admin/500.html:6
-msgid "Server error (500)"
-msgstr "服务器错误(500)"
-
-#: contrib/admin/templates/admin/500.html:9
-msgid "Server Error <em>(500)</em>"
-msgstr "服务器错误 <em>(500)</em>"
-
-#: contrib/admin/templates/admin/500.html:10
-msgid ""
-"There's been an error. It's been reported to the site administrators via e-"
-"mail and should be fixed shortly. Thanks for your patience."
-msgstr ""
-"存在一个错误。它已经通过电子邮件被报告给站点管理员了，并且应该很快被改正。谢"
-"谢你的关心。"
 
 #: contrib/admin/templates/admin/object_history.html:5
 msgid "History"
@@ -105,27 +91,35 @@ msgstr "Django管理站点"
 msgid "Django administration"
 msgstr "Django管理员"
 
-#: contrib/admin/templates/admin/delete_confirmation.html:7
-#, fuzzy, python-format
-msgid ""
-"Deleting the %(object_name)s '%(object)s' would result in deleting related "
-"objects, but your account doesn't have permission to delete the following "
-"types of objects:"
-msgstr ""
-"删除 %(object_name)s  '%(object)s' 会导致删除相关的对象，但你的帐号无权删除下"
-"列类型的对象："
+#: contrib/admin/templates/admin/500.html:4
+#, fuzzy
+msgid "Server error"
+msgstr "服务器错误(500)"
 
-#: contrib/admin/templates/admin/delete_confirmation.html:14
-#, python-format
-msgid ""
-"Are you sure you want to delete the %(object_name)s \"%(object)s\"? All of "
-"the following related items will be deleted:"
-msgstr ""
-"你确信相要删除 %(object_name)s \"%(object)s\"？所有相关的项目都将被删除："
+#: contrib/admin/templates/admin/500.html:6
+msgid "Server error (500)"
+msgstr "服务器错误(500)"
 
-#: contrib/admin/templates/admin/delete_confirmation.html:18
-msgid "Yes, I'm sure"
-msgstr "是的，我确定"
+#: contrib/admin/templates/admin/500.html:9
+msgid "Server Error <em>(500)</em>"
+msgstr "服务器错误 <em>(500)</em>"
+
+#: contrib/admin/templates/admin/500.html:10
+msgid ""
+"There's been an error. It's been reported to the site administrators via e-"
+"mail and should be fixed shortly. Thanks for your patience."
+msgstr ""
+"存在一个错误。它已经通过电子邮件被报告给站点管理员了，并且应该很快被改正。谢"
+"谢你的关心。"
+
+#: contrib/admin/templates/admin/404.html:4
+#: contrib/admin/templates/admin/404.html:8
+msgid "Page not found"
+msgstr "页面没有找到"
+
+#: contrib/admin/templates/admin/404.html:10
+msgid "We're sorry, but the requested page could not be found."
+msgstr "很报歉，请求页面无法找到。"
 
 #: contrib/admin/templates/admin/index.html:27
 msgid "Add"
@@ -167,13 +161,39 @@ msgstr "<a href=\"/password_reset/\">忘记你的密码</a>？"
 msgid "Log in"
 msgstr "登录"
 
-#: contrib/admin/templates/registration/logged_out.html:8
-msgid "Thanks for spending some quality time with the Web site today."
-msgstr "感谢今天在本网站花费了您的一些宝贵时间。"
+#: contrib/admin/templates/admin/base.html:23
+msgid "Welcome,"
+msgstr "欢迎，"
 
-#: contrib/admin/templates/registration/logged_out.html:10
-msgid "Log in again"
-msgstr "重新登录"
+#: contrib/admin/templates/admin/base.html:23
+msgid "Change password"
+msgstr "修改口令"
+
+#: contrib/admin/templates/admin/base.html:23
+msgid "Log out"
+msgstr "注销"
+
+#: contrib/admin/templates/admin/delete_confirmation.html:7
+#, fuzzy, python-format
+msgid ""
+"Deleting the %(object_name)s '%(object)s' would result in deleting related "
+"objects, but your account doesn't have permission to delete the following "
+"types of objects:"
+msgstr ""
+"删除 %(object_name)s  '%(object)s' 会导致删除相关的对象，但你的帐号无权删除下"
+"列类型的对象："
+
+#: contrib/admin/templates/admin/delete_confirmation.html:14
+#, python-format
+msgid ""
+"Are you sure you want to delete the %(object_name)s \"%(object)s\"? All of "
+"the following related items will be deleted:"
+msgstr ""
+"你确信相要删除 %(object_name)s \"%(object)s\"？所有相关的项目都将被删除："
+
+#: contrib/admin/templates/admin/delete_confirmation.html:18
+msgid "Yes, I'm sure"
+msgstr "是的，我确定"
 
 #: contrib/admin/templates/registration/password_change_done.html:4
 #: contrib/admin/templates/registration/password_change_form.html:4
@@ -190,6 +210,48 @@ msgstr "口令修改成功"
 #: contrib/admin/templates/registration/password_change_done.html:12
 msgid "Your password was changed."
 msgstr "你的口令已经被修改。"
+
+#: contrib/admin/templates/registration/password_reset_form.html:4
+#: contrib/admin/templates/registration/password_reset_form.html:6
+#: contrib/admin/templates/registration/password_reset_done.html:4
+msgid "Password reset"
+msgstr "口令重设"
+
+#: contrib/admin/templates/registration/password_reset_form.html:12
+msgid ""
+"Forgotten your password? Enter your e-mail address below, and we'll reset "
+"your password and e-mail the new one to you."
+msgstr ""
+"忘记你的口令？在下面输入你的邮箱地址，我们将重设你的口令并且将新的口令通过邮"
+"件发送给你。"
+
+#: contrib/admin/templates/registration/password_reset_form.html:16
+msgid "E-mail address:"
+msgstr "邮箱地址："
+
+#: contrib/admin/templates/registration/password_reset_form.html:16
+msgid "Reset my password"
+msgstr "重设我的口令"
+
+#: contrib/admin/templates/registration/logged_out.html:8
+msgid "Thanks for spending some quality time with the Web site today."
+msgstr "感谢今天在本网站花费了您的一些宝贵时间。"
+
+#: contrib/admin/templates/registration/logged_out.html:10
+msgid "Log in again"
+msgstr "重新登录"
+
+#: contrib/admin/templates/registration/password_reset_done.html:6
+#: contrib/admin/templates/registration/password_reset_done.html:10
+msgid "Password reset successful"
+msgstr "口令重设成功"
+
+#: contrib/admin/templates/registration/password_reset_done.html:12
+msgid ""
+"We've e-mailed a new password to the e-mail address you submitted. You "
+"should be receiving it shortly."
+msgstr ""
+"我们已经按你所提交的邮箱地址发送了一个新的口令给你。你应该很会收到这封邮件。"
 
 #: contrib/admin/templates/registration/password_change_form.html:12
 msgid ""
@@ -214,24 +276,6 @@ msgstr "确认口令："
 #: contrib/admin/templates/registration/password_change_form.html:23
 msgid "Change my password"
 msgstr "修改我的口令"
-
-#: contrib/admin/templates/registration/password_reset_done.html:4
-#: contrib/admin/templates/registration/password_reset_form.html:4
-#: contrib/admin/templates/registration/password_reset_form.html:6
-msgid "Password reset"
-msgstr "口令重设"
-
-#: contrib/admin/templates/registration/password_reset_done.html:6
-#: contrib/admin/templates/registration/password_reset_done.html:10
-msgid "Password reset successful"
-msgstr "口令重设成功"
-
-#: contrib/admin/templates/registration/password_reset_done.html:12
-msgid ""
-"We've e-mailed a new password to the e-mail address you submitted. You "
-"should be receiving it shortly."
-msgstr ""
-"我们已经按你所提交的邮箱地址发送了一个新的口令给你。你应该很会收到这封邮件。"
 
 #: contrib/admin/templates/registration/password_reset_email.html:2
 msgid "You're receiving this e-mail because you requested a password reset"
@@ -263,50 +307,6 @@ msgstr "感谢使用我们的站点！"
 #, python-format
 msgid "The %(site_name)s team"
 msgstr "%(site_name)s 小组"
-
-#: contrib/admin/templates/registration/password_reset_form.html:12
-msgid ""
-"Forgotten your password? Enter your e-mail address below, and we'll reset "
-"your password and e-mail the new one to you."
-msgstr ""
-"忘记你的口令？在下面输入你的邮箱地址，我们将重设你的口令并且将新的口令通过邮"
-"件发送给你。"
-
-#: contrib/admin/templates/registration/password_reset_form.html:16
-msgid "E-mail address:"
-msgstr "邮箱地址："
-
-#: contrib/admin/templates/registration/password_reset_form.html:16
-msgid "Reset my password"
-msgstr "重设我的口令"
-
-#: contrib/admin/models/admin.py:6
-msgid "action time"
-msgstr "动作时间"
-
-#: contrib/admin/models/admin.py:9
-msgid "object id"
-msgstr "对象id"
-
-#: contrib/admin/models/admin.py:10
-msgid "object repr"
-msgstr "对象表示"
-
-#: contrib/admin/models/admin.py:11
-msgid "action flag"
-msgstr "动作标志"
-
-#: contrib/admin/models/admin.py:12
-msgid "change message"
-msgstr "修改消息"
-
-#: contrib/admin/models/admin.py:15
-msgid "log entry"
-msgstr "日志记录"
-
-#: contrib/admin/models/admin.py:16
-msgid "log entries"
-msgstr "日志记录"
 
 #: utils/dates.py:6
 msgid "Monday"
@@ -428,127 +428,127 @@ msgstr "站点"
 msgid "sites"
 msgstr "站点"
 
-#: models/core.py:24
+#: models/core.py:28
 msgid "label"
 msgstr "标签"
 
-#: models/core.py:25 models/core.py:36 models/auth.py:6 models/auth.py:19
+#: models/core.py:29 models/core.py:40 models/auth.py:6 models/auth.py:19
 msgid "name"
 msgstr "名称"
 
-#: models/core.py:27
+#: models/core.py:31
 msgid "package"
 msgstr "包"
 
-#: models/core.py:28
+#: models/core.py:32
 msgid "packages"
 msgstr "包"
 
-#: models/core.py:38
+#: models/core.py:42
 msgid "python module name"
 msgstr "python模块名"
 
-#: models/core.py:40
+#: models/core.py:44
 msgid "content type"
 msgstr "内容类型"
 
-#: models/core.py:41
+#: models/core.py:45
 msgid "content types"
 msgstr "内容类型"
 
-#: models/core.py:64
+#: models/core.py:68
 msgid "redirect from"
 msgstr "重定向自"
 
-#: models/core.py:65
+#: models/core.py:69
 msgid ""
 "This should be an absolute path, excluding the domain name. Example: '/"
 "events/search/'."
 msgstr "应该是一个绝对路径，不包括域名。例如：'/events/search/'。"
 
-#: models/core.py:66
+#: models/core.py:70
 msgid "redirect to"
 msgstr "重定向到"
 
-#: models/core.py:67
+#: models/core.py:71
 msgid ""
 "This can be either an absolute path (as above) or a full URL starting with "
 "'http://'."
 msgstr "可以是绝对路径(同上)或以'http://'开始的全URL。"
 
-#: models/core.py:69
+#: models/core.py:73
 msgid "redirect"
 msgstr "重定向"
 
-#: models/core.py:70
+#: models/core.py:74
 msgid "redirects"
 msgstr "重定向"
 
-#: models/core.py:83
+#: models/core.py:87
 msgid "URL"
 msgstr ""
 
-#: models/core.py:84
+#: models/core.py:88
 msgid ""
 "Example: '/about/contact/'. Make sure to have leading and trailing slashes."
 msgstr "例如：'/about/contact/'。请确保前导和结尾的除号。"
 
-#: models/core.py:85
+#: models/core.py:89
 msgid "title"
 msgstr "标题"
 
-#: models/core.py:86
+#: models/core.py:90
 msgid "content"
 msgstr "内容"
 
-#: models/core.py:87
+#: models/core.py:91
 msgid "enable comments"
 msgstr "允许评论"
 
-#: models/core.py:88
+#: models/core.py:92
 msgid "template name"
 msgstr "模板名称"
 
-#: models/core.py:89
+#: models/core.py:93
 msgid ""
 "Example: 'flatfiles/contact_page'. If this isn't provided, the system will "
 "use 'flatfiles/default'."
 msgstr ""
 "例如：'flatfiles/contact_page'。如果未提供，系统将使用'flatfiles/default'。"
 
-#: models/core.py:90
+#: models/core.py:94
 msgid "registration required"
 msgstr "请先注册"
 
-#: models/core.py:90
+#: models/core.py:94
 msgid "If this is checked, only logged-in users will be able to view the page."
 msgstr "如果被选中，仅登录用户才可以查看此页。"
 
-#: models/core.py:94
+#: models/core.py:98
 msgid "flat page"
 msgstr "简单页面"
 
-#: models/core.py:95
+#: models/core.py:99
 msgid "flat pages"
 msgstr "简单页面"
 
-#: models/core.py:113
+#: models/core.py:117
 msgid "session key"
 msgstr "session键字"
 
-#: models/core.py:114
+#: models/core.py:118
 msgid "session data"
 msgstr "session数据"
 
-#: models/core.py:115
+#: models/core.py:119
 msgid "expire date"
 msgstr "过期日期"
 
-#: models/core.py:117
+#: models/core.py:121
 msgid "session"
 msgstr ""
 
-#: models/core.py:118
+#: models/core.py:122
 msgid "sessions"
 msgstr ""
 
@@ -648,52 +648,60 @@ msgid "Czech"
 msgstr "捷克语"
 
 #: conf/global_settings.py:37
+msgid "Welsh"
+msgstr ""
+
+#: conf/global_settings.py:38
 msgid "German"
 msgstr "德语"
 
-#: conf/global_settings.py:38
+#: conf/global_settings.py:39
 msgid "English"
 msgstr "英语"
 
-#: conf/global_settings.py:39
+#: conf/global_settings.py:40
 msgid "Spanish"
 msgstr "西斑牙语"
 
-#: conf/global_settings.py:40
+#: conf/global_settings.py:41
 msgid "French"
 msgstr "法语"
 
-#: conf/global_settings.py:41
+#: conf/global_settings.py:42
 msgid "Galician"
 msgstr "加利西亚语"
 
-#: conf/global_settings.py:42
+#: conf/global_settings.py:43
 msgid "Italian"
 msgstr "意大利语"
 
-#: conf/global_settings.py:43
+#: conf/global_settings.py:44
 msgid "Norwegian"
 msgstr ""
 
-#: conf/global_settings.py:44
+#: conf/global_settings.py:45
 msgid "Brazilian"
 msgstr "巴西语"
 
-#: conf/global_settings.py:45
+#: conf/global_settings.py:46
+msgid "Romanian"
+msgstr ""
+
+#: conf/global_settings.py:47
 msgid "Russian"
 msgstr "俄语"
 
-#: conf/global_settings.py:46
+#: conf/global_settings.py:48
+msgid "Slovak"
+msgstr ""
+
+#: conf/global_settings.py:49
 #, fuzzy
 msgid "Serbian"
 msgstr "塞尔维亚语"
 
-#: conf/global_settings.py:47
+#: conf/global_settings.py:50
 msgid "Simplified Chinese"
-msgstr ""
-
-#: conf/global_settings.py:48
-msgid "Slovak"
 msgstr ""
 
 #: core/validators.py:59
