@@ -240,8 +240,8 @@ msgstr "Django správa webu"
 msgid "Django administration"
 msgstr "Django správa"
 
-#: contrib/admin/templates/admin/500.html:4
-#: contrib/admin/templates/admin/object_history.html:5
+#: contrib/admin/templates/registration/password_change_done.html:4
+#: contrib/admin/templates/registration/password_reset_form.html:4
 #: contrib/admin/templates/admin/base.html:29
 #: contrib/admin/templates/admin/change_form.html:12
 #: contrib/admin/templates/registration/password_change_done.html:4
@@ -369,18 +369,26 @@ msgstr ""
 "Mazání %(object_name)s  '%(object)s' by vyústilo ve vymazání souvisejících "
 "objektů, ale Váš účet nemá oprávnění pro mazání následujících typů objektů:"
 
-#: contrib/admin/templates/admin/delete_confirmation.html:14
-#, python-format
-msgid ""
-"Are you sure you want to delete the %(object_name)s \"%(object)s\"? All of "
-"the following related items will be deleted:"
-msgstr ""
-"Jste si jist(á), že chcete smazat %(object_name)s \"%(object)s\"? Všechny "
-"následující související položky budou smazány:"
+#: contrib/admin/templates/admin/500.html:6
+msgid "Server error (500)"
+msgstr "Chyba serveru (500)"
 
-#: contrib/admin/templates/admin/delete_confirmation.html:18
-msgid "Yes, I'm sure"
-msgstr "Ano, jsem si jist"
+#: contrib/admin/templates/admin/500.html:9
+msgid "Server Error <em>(500)</em>"
+msgstr "Chyba serveru <em>(500)</em>"
+
+#: contrib/admin/templates/admin/500.html:10
+msgid ""
+"There's been an error. It's been reported to the site administrators via e-"
+"mail and should be fixed shortly. Thanks for your patience."
+msgstr ""
+"Nastala chyba. Ta byla oznámena administrátorovi serveru pomocí e-mailu a "
+"měla by být brzy odstraněna. Děkujeme za trpělivost."
+
+#: contrib/admin/templates/admin/404.html:4
+#: contrib/admin/templates/admin/404.html:8
+msgid "Page not found"
+msgstr "Stránka nenalezena"
 
 #: contrib/admin/templates/admin/change_form.html:20
 msgid "View on site"
@@ -420,6 +428,33 @@ msgstr ""
 #, fuzzy
 msgid "Save"
 msgstr "aktivní"
+
+#: contrib/admin/templates/admin/base.html:23
+msgid "Log out"
+msgstr "Odhlásit se"
+
+#: contrib/admin/templates/admin/delete_confirmation.html:7
+#, fuzzy, python-format
+msgid ""
+"Deleting the %(object_name)s '%(object)s' would result in deleting related "
+"objects, but your account doesn't have permission to delete the following "
+"types of objects:"
+msgstr ""
+"Mazání %(object_name)s  '%(object)s' by vyústilo ve vymazání souvisejících "
+"objektů, ale Váš účet nemá oprávnění pro mazání následujících typů objektů:"
+
+#: contrib/admin/templates/admin/delete_confirmation.html:14
+#, python-format
+msgid ""
+"Are you sure you want to delete the %(object_name)s \"%(object)s\"? All of "
+"the following related items will be deleted:"
+msgstr ""
+"Jste si jist(á), že chcete smazat %(object_name)s \"%(object)s\"? Všechny "
+"následující související položky budou smazány:"
+
+#: contrib/admin/templates/admin/delete_confirmation.html:18
+msgid "Yes, I'm sure"
+msgstr "Ano, jsem si jist"
 
 #: contrib/admin/templates/registration/password_change_done.html:4
 #: contrib/admin/templates/registration/password_change_form.html:4
@@ -910,6 +945,10 @@ msgstr "Zpráva"
 #: conf/global_settings.py:37
 msgid "Czech"
 msgstr "Česky"
+
+#: conf/global_settings.py:38
+msgid "Welsh"
+msgstr ""
 
 #: conf/global_settings.py:38
 msgid "German"

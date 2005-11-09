@@ -239,8 +239,8 @@ msgstr "Django Systemverwaltung"
 msgid "Django administration"
 msgstr "Django Verwaltung"
 
-#: contrib/admin/templates/admin/500.html:4
-#: contrib/admin/templates/admin/object_history.html:5
+#: contrib/admin/templates/registration/password_change_done.html:4
+#: contrib/admin/templates/registration/password_reset_form.html:4
 #: contrib/admin/templates/admin/base.html:29
 #: contrib/admin/templates/admin/change_form.html:12
 #: contrib/admin/templates/registration/password_change_done.html:4
@@ -362,26 +362,22 @@ msgstr "Abmelden"
 #: contrib/admin/templates/admin/delete_confirmation.html:7
 #, python-format
 msgid ""
-"Deleting the %(object_name)s '%(object)s' would result in deleting related "
-"objects, but your account doesn't have permission to delete the following "
-"types of objects:"
+"There's been an error. It's been reported to the site administrators via e-"
+"mail and should be fixed shortly. Thanks for your patience."
 msgstr ""
-"Die Löschung des %(object_name)s '%(object)s' hätte die Löschung von "
-"abhängigen Daten zur Folge, aber Sie haben nicht die nötigen Rechte um die "
-"folgenden abhängigen Daten zu löschen:"
+"Es hat einen Fehler gegeben. Dieser Fehler wurde an die Serververwalter per "
+"eMail weitergegeben und sollte bald behoben sein. Vielen Dank für Ihr "
+"Verständnis."
 
-#: contrib/admin/templates/admin/delete_confirmation.html:14
-#, python-format
-msgid ""
-"Are you sure you want to delete the %(object_name)s \"%(object)s\"? All of "
-"the following related items will be deleted:"
+#: contrib/admin/templates/admin/404.html:4
+#: contrib/admin/templates/admin/404.html:8
+msgid "Page not found"
+msgstr "Seite nicht gefunden"
+
+#: contrib/admin/templates/admin/404.html:10
+msgid "We're sorry, but the requested page could not be found."
 msgstr ""
-"Sind Sie sicher, das Sie %(object_name)s \"%(object)s\" löschen wollen? Es "
-"werden zusätzlich die folgenden abhängigen Daten mit gelöscht:"
-
-#: contrib/admin/templates/admin/delete_confirmation.html:18
-msgid "Yes, I'm sure"
-msgstr "Ja, ich bin sicher"
+"Es tut uns leid, aber die angeforderte Seite kann nicht gefunden werden."
 
 #: contrib/admin/templates/admin/change_form.html:20
 msgid "View on site"
@@ -420,6 +416,34 @@ msgstr "Sichern und weiter bearbeiten"
 #: contrib/admin/templates/admin/submit_line.html:7
 msgid "Save"
 msgstr "Sichern"
+
+#: contrib/admin/templates/admin/base.html:23
+msgid "Log out"
+msgstr "Abmelden"
+
+#: contrib/admin/templates/admin/delete_confirmation.html:7
+#, python-format
+msgid ""
+"Deleting the %(object_name)s '%(object)s' would result in deleting related "
+"objects, but your account doesn't have permission to delete the following "
+"types of objects:"
+msgstr ""
+"Die Löschung des %(object_name)s '%(object)s' hätte die Löschung von "
+"abhängigen Daten zur Folge, aber Sie haben nicht die nötigen Rechte um die "
+"folgenden abhängigen Daten zu löschen:"
+
+#: contrib/admin/templates/admin/delete_confirmation.html:14
+#, python-format
+msgid ""
+"Are you sure you want to delete the %(object_name)s \"%(object)s\"? All of "
+"the following related items will be deleted:"
+msgstr ""
+"Sind Sie sicher, das Sie %(object_name)s \"%(object)s\" löschen wollen? Es "
+"werden zusätzlich die folgenden abhängigen Daten mit gelöscht:"
+
+#: contrib/admin/templates/admin/delete_confirmation.html:18
+msgid "Yes, I'm sure"
+msgstr "Ja, ich bin sicher"
 
 #: contrib/admin/templates/registration/password_change_done.html:4
 #: contrib/admin/templates/registration/password_change_form.html:4
@@ -911,6 +935,10 @@ msgstr "Mitteilung"
 #: conf/global_settings.py:37
 msgid "Czech"
 msgstr "Tschechisch"
+
+#: conf/global_settings.py:38
+msgid "Welsh"
+msgstr "Walisisch"
 
 #: conf/global_settings.py:38
 msgid "German"

@@ -237,8 +237,8 @@ msgstr "Amministrazione sito Django"
 msgid "Django administration"
 msgstr "Amministrazione Django"
 
-#: contrib/admin/templates/admin/500.html:4
-#: contrib/admin/templates/admin/object_history.html:5
+#: contrib/admin/templates/registration/password_change_done.html:4
+#: contrib/admin/templates/registration/password_reset_form.html:4
 #: contrib/admin/templates/admin/base.html:29
 #: contrib/admin/templates/admin/change_form.html:12
 #: contrib/admin/templates/registration/password_change_done.html:4
@@ -368,18 +368,26 @@ msgstr ""
 "degli oggetti relazionati, ma il tuo account non ha i permessi per rimuovere "
 "i seguenti tipi di oggetti:"
 
-#: contrib/admin/templates/admin/delete_confirmation.html:14
-#, python-format
-msgid ""
-"Are you sure you want to delete the %(object_name)s \"%(object)s\"? All of "
-"the following related items will be deleted:"
-msgstr ""
-"Sei sicuro di voler rimuovere %(object_name)s \"%(object)s\"? I seguenti "
-"oggetti relazionati saranno rimossi:"
+#: contrib/admin/templates/admin/500.html:6
+msgid "Server error (500)"
+msgstr "Errore del server (500)"
 
-#: contrib/admin/templates/admin/delete_confirmation.html:18
-msgid "Yes, I'm sure"
-msgstr "Sì, sono sicuro"
+#: contrib/admin/templates/admin/500.html:9
+msgid "Server Error <em>(500)</em>"
+msgstr "Errore del Server <em>(500)</em>"
+
+#: contrib/admin/templates/admin/500.html:10
+msgid ""
+"There's been an error. It's been reported to the site administrators via e-"
+"mail and should be fixed shortly. Thanks for your patience."
+msgstr ""
+"C'è stato un errore. E' stato riportato agli amministratori del sito via e-"
+"mail e verrà risolto a breve. Grazie per la pazienza."
+
+#: contrib/admin/templates/admin/404.html:4
+#: contrib/admin/templates/admin/404.html:8
+msgid "Page not found"
+msgstr "Pagina non trovata"
 
 #: contrib/admin/templates/admin/change_form.html:20
 msgid "View on site"
@@ -419,6 +427,34 @@ msgstr ""
 #, fuzzy
 msgid "Save"
 msgstr "attivo"
+
+#: contrib/admin/templates/admin/base.html:23
+msgid "Log out"
+msgstr "Esci"
+
+#: contrib/admin/templates/admin/delete_confirmation.html:7
+#, fuzzy, python-format
+msgid ""
+"Deleting the %(object_name)s '%(object)s' would result in deleting related "
+"objects, but your account doesn't have permission to delete the following "
+"types of objects:"
+msgstr ""
+"La rimozione di %(object_name)s '%(object)s' causerebbe la cancellazione "
+"degli oggetti relazionati, ma il tuo account non ha i permessi per rimuovere "
+"i seguenti tipi di oggetti:"
+
+#: contrib/admin/templates/admin/delete_confirmation.html:14
+#, python-format
+msgid ""
+"Are you sure you want to delete the %(object_name)s \"%(object)s\"? All of "
+"the following related items will be deleted:"
+msgstr ""
+"Sei sicuro di voler rimuovere %(object_name)s \"%(object)s\"? I seguenti "
+"oggetti relazionati saranno rimossi:"
+
+#: contrib/admin/templates/admin/delete_confirmation.html:18
+msgid "Yes, I'm sure"
+msgstr "Sì, sono sicuro"
 
 #: contrib/admin/templates/registration/password_change_done.html:4
 #: contrib/admin/templates/registration/password_change_form.html:4
@@ -906,6 +942,10 @@ msgstr "Messaggio"
 
 #: conf/global_settings.py:37
 msgid "Czech"
+msgstr ""
+
+#: conf/global_settings.py:38
+msgid "Welsh"
 msgstr ""
 
 #: conf/global_settings.py:38

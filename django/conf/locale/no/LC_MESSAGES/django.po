@@ -237,8 +237,8 @@ msgstr "Django administrasjonsside"
 msgid "Django administration"
 msgstr "Django administrasjon"
 
-#: contrib/admin/templates/admin/500.html:4
-#: contrib/admin/templates/admin/object_history.html:5
+#: contrib/admin/templates/registration/password_change_done.html:4
+#: contrib/admin/templates/registration/password_reset_form.html:4
 #: contrib/admin/templates/admin/base.html:29
 #: contrib/admin/templates/admin/change_form.html:12
 #: contrib/admin/templates/registration/password_change_done.html:4
@@ -366,18 +366,26 @@ msgstr ""
 "Vist du sletter %(object_name)s '%(object)s' vill du også slette relaterte "
 "objekter, men du har ikke tillatelse til å slette de følgende objektene:"
 
-#: contrib/admin/templates/admin/delete_confirmation.html:14
-#, python-format
-msgid ""
-"Are you sure you want to delete the %(object_name)s \"%(object)s\"? All of "
-"the following related items will be deleted:"
-msgstr ""
-"Er du sikker på at du vill slette %(object_name) \"%(object)s\"? Alle de "
-"følgende relaterte objektene vill bli slettet:"
+#: contrib/admin/templates/admin/500.html:6
+msgid "Server error (500)"
+msgstr "Tjener feil (500)"
 
-#: contrib/admin/templates/admin/delete_confirmation.html:18
-msgid "Yes, I'm sure"
-msgstr "Ja, jeg er sikker"
+#: contrib/admin/templates/admin/500.html:9
+msgid "Server Error <em>(500)</em>"
+msgstr "Tjener feil <em>(500)</em>"
+
+#: contrib/admin/templates/admin/500.html:10
+msgid ""
+"There's been an error. It's been reported to the site administrators via e-"
+"mail and should be fixed shortly. Thanks for your patience."
+msgstr ""
+"Det har vært en feil. Feilen er blitt rapportert til administrator via e-"
+"mail, og vill bli fikset snart. Takk for din tålmodighet."
+
+#: contrib/admin/templates/admin/404.html:4
+#: contrib/admin/templates/admin/404.html:8
+msgid "Page not found"
+msgstr "Fant ikke siden"
 
 #: contrib/admin/templates/admin/change_form.html:20
 msgid "View on site"
@@ -417,6 +425,33 @@ msgstr ""
 #, fuzzy
 msgid "Save"
 msgstr "aktiv"
+
+#: contrib/admin/templates/admin/base.html:23
+msgid "Log out"
+msgstr "Log ut"
+
+#: contrib/admin/templates/admin/delete_confirmation.html:7
+#, python-format
+msgid ""
+"Deleting the %(object_name)s '%(object)s' would result in deleting related "
+"objects, but your account doesn't have permission to delete the following "
+"types of objects:"
+msgstr ""
+"Vist du sletter %(object_name)s '%(object)s' vill du også slette relaterte "
+"objekter, men du har ikke tillatelse til å slette de følgende objektene:"
+
+#: contrib/admin/templates/admin/delete_confirmation.html:14
+#, python-format
+msgid ""
+"Are you sure you want to delete the %(object_name)s \"%(object)s\"? All of "
+"the following related items will be deleted:"
+msgstr ""
+"Er du sikker på at du vill slette %(object_name) \"%(object)s\"? Alle de "
+"følgende relaterte objektene vill bli slettet:"
+
+#: contrib/admin/templates/admin/delete_confirmation.html:18
+msgid "Yes, I'm sure"
+msgstr "Ja, jeg er sikker"
 
 #: contrib/admin/templates/registration/password_change_done.html:4
 #: contrib/admin/templates/registration/password_change_form.html:4
@@ -908,6 +943,10 @@ msgstr "Meldinger"
 #: conf/global_settings.py:37
 msgid "Czech"
 msgstr "Tsjekkisk"
+
+#: conf/global_settings.py:38
+msgid "Welsh"
+msgstr ""
 
 #: conf/global_settings.py:38
 msgid "German"

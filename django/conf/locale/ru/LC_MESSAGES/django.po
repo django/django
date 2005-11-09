@@ -234,8 +234,8 @@ msgstr "Административный сайт Django"
 msgid "Django administration"
 msgstr "Администрирование Django"
 
-#: contrib/admin/templates/admin/500.html:4
-#: contrib/admin/templates/admin/object_history.html:5
+#: contrib/admin/templates/registration/password_change_done.html:4
+#: contrib/admin/templates/registration/password_reset_form.html:4
 #: contrib/admin/templates/admin/base.html:29
 #: contrib/admin/templates/admin/change_form.html:12
 #: contrib/admin/templates/registration/password_change_done.html:4
@@ -365,18 +365,26 @@ msgstr ""
 "но, предоставленных вам прав недостаточно для удаления следующихтипов "
 "объектов:"
 
-#: contrib/admin/templates/admin/delete_confirmation.html:14
-#, python-format
-msgid ""
-"Are you sure you want to delete the %(object_name)s \"%(object)s\"? All of "
-"the following related items will be deleted:"
-msgstr ""
-"Вы уверены, что хотите удалить  %(object_name)s \"%(object)s\"? Все "
-"следующиеобъекты также будут удалены:"
+#: contrib/admin/templates/admin/500.html:6
+msgid "Server error (500)"
+msgstr "Ошибка сервера (500)"
 
-#: contrib/admin/templates/admin/delete_confirmation.html:18
-msgid "Yes, I'm sure"
-msgstr "Да, я уверен"
+#: contrib/admin/templates/admin/500.html:9
+msgid "Server Error <em>(500)</em>"
+msgstr "Ошибка сервера <em>(500)</em>"
+
+#: contrib/admin/templates/admin/500.html:10
+msgid ""
+"There's been an error. It's been reported to the site administrators via e-"
+"mail and should be fixed shortly. Thanks for your patience."
+msgstr ""
+"Произошла ошибка. Отчет об ошибке отправлен администраторам сайта по e-mailи "
+"она должна быть вскоре исправлена. Благодарим вас на терпение и помощь."
+
+#: contrib/admin/templates/admin/404.html:4
+#: contrib/admin/templates/admin/404.html:8
+msgid "Page not found"
+msgstr "Страница не найдена"
 
 #: contrib/admin/templates/admin/change_form.html:20
 msgid "View on site"
@@ -415,6 +423,34 @@ msgstr ""
 #: contrib/admin/templates/admin/submit_line.html:7
 msgid "Save"
 msgstr ""
+
+#: contrib/admin/templates/admin/base.html:23
+msgid "Log out"
+msgstr "Выход"
+
+#: contrib/admin/templates/admin/delete_confirmation.html:7
+#, fuzzy, python-format
+msgid ""
+"Deleting the %(object_name)s '%(object)s' would result in deleting related "
+"objects, but your account doesn't have permission to delete the following "
+"types of objects:"
+msgstr ""
+"Удаление обьекта %(object_name)s '%(object)s' приведет к удалению зависимых "
+"но, предоставленных вам прав недостаточно для удаления следующихтипов "
+"объектов:"
+
+#: contrib/admin/templates/admin/delete_confirmation.html:14
+#, python-format
+msgid ""
+"Are you sure you want to delete the %(object_name)s \"%(object)s\"? All of "
+"the following related items will be deleted:"
+msgstr ""
+"Вы уверены, что хотите удалить  %(object_name)s \"%(object)s\"? Все "
+"следующиеобъекты также будут удалены:"
+
+#: contrib/admin/templates/admin/delete_confirmation.html:18
+msgid "Yes, I'm sure"
+msgstr "Да, я уверен"
 
 #: contrib/admin/templates/registration/password_change_done.html:4
 #: contrib/admin/templates/registration/password_change_form.html:4
@@ -902,51 +938,59 @@ msgid "Czech"
 msgstr ""
 
 #: conf/global_settings.py:38
-msgid "German"
+msgid "Welsh"
 msgstr ""
 
 #: conf/global_settings.py:39
-msgid "English"
+msgid "German"
 msgstr ""
 
 #: conf/global_settings.py:40
-msgid "Spanish"
+msgid "English"
 msgstr ""
 
 #: conf/global_settings.py:41
-msgid "French"
+msgid "Spanish"
 msgstr ""
 
 #: conf/global_settings.py:42
-msgid "Galician"
+msgid "French"
 msgstr ""
 
 #: conf/global_settings.py:43
-msgid "Italian"
+msgid "Galician"
 msgstr ""
 
 #: conf/global_settings.py:44
-msgid "Norwegian"
+msgid "Italian"
 msgstr ""
 
 #: conf/global_settings.py:45
-msgid "Brazilian"
+msgid "Norwegian"
 msgstr ""
 
 #: conf/global_settings.py:46
-msgid "Russian"
+msgid "Brazilian"
 msgstr ""
 
 #: conf/global_settings.py:47
-msgid "Serbian"
+msgid "Romanian"
 msgstr ""
 
 #: conf/global_settings.py:48
-msgid "Simplified Chinese"
+msgid "Russian"
 msgstr ""
 
 #: conf/global_settings.py:49
 msgid "Slovak"
+msgstr ""
+
+#: conf/global_settings.py:49
+msgid "Serbian"
+msgstr ""
+
+#: conf/global_settings.py:50
+msgid "Simplified Chinese"
 msgstr ""
 
 #: core/validators.py:59
