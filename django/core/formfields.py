@@ -210,6 +210,10 @@ class FormField:
     def render(self, data):
         raise NotImplementedError
 
+    def get_id(self):
+        "Returns the HTML 'id' attribute for this form field."
+        return FORM_FIELD_ID_PREFIX + self.field_name
+
 ####################
 # GENERIC WIDGETS  #
 ####################
@@ -239,7 +243,7 @@ class TextField(FormField):
         if isinstance(data, unicode):
             data = data.encode(DEFAULT_CHARSET)
         return '<input type="%s" id="%s" class="v%s%s" name="%s" size="%s" value="%s" %s/>' % \
-            (self.input_type, FORM_FIELD_ID_PREFIX + self.field_name, self.__class__.__name__, self.is_required and ' required' or '',
+            (self.input_type, self.get_id(), self.__class__.__name__, self.is_required and ' required' or '',
             self.field_name, self.length, escape(data), maxlength)
 
     def html2python(data):
@@ -264,7 +268,7 @@ class LargeTextField(TextField):
         if isinstance(data, unicode):
             data = data.encode(DEFAULT_CHARSET)
         return '<textarea id="%s" class="v%s%s" name="%s" rows="%s" cols="%s">%s</textarea>' % \
-            (FORM_FIELD_ID_PREFIX + self.field_name, self.__class__.__name__, self.is_required and ' required' or '',
+            (self.get_id(), self.__class__.__name__, self.is_required and ' required' or '',
             self.field_name, self.rows, self.cols, escape(data))
 
 class HiddenField(FormField):
@@ -274,7 +278,7 @@ class HiddenField(FormField):
 
     def render(self, data):
         return '<input type="hidden" id="%s" name="%s" value="%s" />' % \
-            (FORM_FIELD_ID_PREFIX + self.field_name, self.field_name, escape(data))
+            (self.get_id(), self.field_name, escape(data))
 
 class CheckboxField(FormField):
     def __init__(self, field_name, checked_by_default=False):
@@ -287,7 +291,7 @@ class CheckboxField(FormField):
         if data or (data is '' and self.checked_by_default):
             checked_html = ' checked="checked"'
         return '<input type="checkbox" id="%s" class="v%s" name="%s"%s />' % \
-            (FORM_FIELD_ID_PREFIX + self.field_name, self.__class__.__name__,
+            (self.get_id(), self.__class__.__name__,
             self.field_name, checked_html)
 
     def html2python(data):
@@ -306,8 +310,8 @@ class SelectField(FormField):
 
     def render(self, data):
         output = ['<select id="%s" class="v%s%s" name="%s" size="%s">' % \
-            (FORM_FIELD_ID_PREFIX + self.field_name, self.__class__.__name__, self.is_required and ' required' or '',
-            self.field_name, self.size)]
+            (self.get_id(), self.__class__.__name__,
+             self.is_required and ' required' or '', self.field_name, self.size)]
         str_data = str(data) # normalize to string
         for value, display_name in self.choices:
             selected_html = ''
@@ -380,9 +384,9 @@ class RadioSelectField(FormField):
                 'value': value,
                 'name': display_name,
                 'field': '<input type="radio" id="%s" name="%s" value="%s"%s/>' % \
-                    (FORM_FIELD_ID_PREFIX + self.field_name + '_' + str(i), self.field_name, value, selected_html),
+                    (self.get_id() + '_' + str(i), self.field_name, value, selected_html),
                 'label': '<label for="%s">%s</label>' % \
-                    (FORM_FIELD_ID_PREFIX + self.field_name + '_' + str(i), display_name),
+                    (self.get_id() + '_' + str(i), display_name),
             })
         return RadioFieldRenderer(datalist, self.ul_class)
 
@@ -412,7 +416,7 @@ class SelectMultipleField(SelectField):
     requires_data_list = True
     def render(self, data):
         output = ['<select id="%s" class="v%s%s" name="%s" size="%s" multiple="multiple">' % \
-            (FORM_FIELD_ID_PREFIX + self.field_name, self.__class__.__name__, self.is_required and ' required' or '',
+            (self.get_id(), self.__class__.__name__, self.is_required and ' required' or '',
             self.field_name, self.size)]
         str_data_list = map(str, data) # normalize to strings
         for value, choice in self.choices:
@@ -467,9 +471,9 @@ class CheckboxSelectMultipleField(SelectMultipleField):
             if str(value) in str_data_list:
                 checked_html = ' checked="checked"'
             field_name = '%s%s' % (self.field_name, value)
-            output.append('<li><input type="checkbox" id="%s%s" class="v%s" name="%s"%s /> <label for="%s%s">%s</label></li>' % \
-                (FORM_FIELD_ID_PREFIX, field_name, self.__class__.__name__, field_name, checked_html,
-                FORM_FIELD_ID_PREFIX, field_name, choice))
+            output.append('<li><input type="checkbox" id="%s" class="v%s" name="%s"%s /> <label for="%s">%s</label></li>' % \
+                (self.get_id(), self.__class__.__name__, field_name, checked_html,
+                self.get_id(), choice))
         output.append('</ul>')
         return '\n'.join(output)
 
@@ -488,8 +492,7 @@ class FileUploadField(FormField):
 
     def render(self, data):
         return '<input type="file" id="%s" class="v%s" name="%s" />' % \
-            (FORM_FIELD_ID_PREFIX + self.field_name, self.__class__.__name__,
-            self.field_name)
+            (self.get_id(), self.__class__.__name__, self.field_name)
 
     def html2python(data):
         if data is None:
