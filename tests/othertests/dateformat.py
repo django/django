@@ -30,9 +30,7 @@
 >>> format(my_birthday, 'S')
 'th'
 >>> format(my_birthday, 't')
-Traceback (most recent call last):
-    ...
-NotImplementedError
+'31'
 >>> format(my_birthday, 'T')
 'CET'
 >>> format(my_birthday, 'U')
