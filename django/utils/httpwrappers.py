@@ -204,7 +204,7 @@ class HttpResponse:
 
     def tell(self):
         return len(self.content)
-
+        
 class HttpResponseRedirect(HttpResponse):
     def __init__(self, redirect_to):
         HttpResponse.__init__(self)

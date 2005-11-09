@@ -43,7 +43,7 @@ def submit_row(context, bound_manipulator):
     }
 submit_row = inclusion_tag('admin/submit_line', takes_context=True)(submit_row)
 
-#@simple_tag   
+#@simple_tag
 def field_label(bound_field):
     class_names = []
     if isinstance(bound_field.field, meta.BooleanField):
@@ -92,7 +92,6 @@ class FieldWidgetNode(template.Node):
             return cls.nodelists[klass]
     get_nodelist = classmethod(get_nodelist)       
             
-            
     def render(self, context):
     
         bound_field = template.resolve_variable(self.bound_field_var, context)
@@ -118,8 +117,6 @@ class FieldWrapper(object):
          return isinstance(self.field.rel, (meta.ManyToOne, meta.ManyToMany)) \
                 and self.field.rel.raw_id_admin
 
-    
-
 class FormFieldCollectionWrapper(object):
     def __init__(self, field_mapping, fields):
         self.field_mapping = field_mapping
@@ -127,12 +124,11 @@ class FormFieldCollectionWrapper(object):
         self.bound_fields = [AdminBoundField(field, self.field_mapping, field_mapping['original']) 
                              for field in self.fields ]
                              
-        
 class TabularBoundRelatedObject(BoundRelatedObject):
     def __init__(self, related_object, field_mapping, original):
         super(TabularBoundRelatedObject, self).__init__(related_object, field_mapping, original)
         self.field_wrapper_list = self.relation.editable_fields(FieldWrapper)
-       
+        
         fields = self.relation.editable_fields()
         
         self.form_field_collection_wrappers = [FormFieldCollectionWrapper(field_mapping ,fields) 

@@ -189,7 +189,7 @@ class BooleanFieldFilterSpec(FilterSpec):
                     'display': k 
                   }
         if isinstance(self.field, meta.NullBooleanField):
-            yield { 'selected' : lookup_val2 == 'True', 
+            yield { 'selected' : self.lookup_val2 == 'True', 
                     'query_string' : cl.get_query_string( {self.lookup_kwarg2: 'True'}, [self.lookup_kwarg]), 
                     'display': _('Unknown')                                      
                   }
