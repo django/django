@@ -416,7 +416,11 @@ Example: ``"http://media.lawrence.com"``
 MIDDLEWARE_CLASSES
 ------------------
 
-Default: ``("django.middleware.sessions.SessionMiddleware", "django.middleware.common.CommonMiddleware", "django.middleware.doc.XViewMiddleware")``
+Default::
+
+    ("django.middleware.sessions.SessionMiddleware",
+     "django.middleware.common.CommonMiddleware",
+     "django.middleware.doc.XViewMiddleware")
 
 A tuple of middleware classes to use. See the `middleware docs`_.
 
