@@ -1,0 +1,983 @@
+# Translation of Django to Welsh.
+# Copyright (C) 2005 Django.
+# This file is distributed under the same license as the Django package.
+# Jason Davies <jason@jasondavies.com>, 2005.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2005-11-05 23:23+0000\n"
+"PO-Revision-Date: 2005-11-05 HO:MI+ZONE\n"
+"Last-Translator: Jason Davies <jason@jasondavies.com>\n"
+"Language-Team: Cymraeg <cy@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: contrib/admin/templates/admin/object_history.html:5
+#: contrib/admin/templates/admin/500.html:4
+#: contrib/admin/templates/admin/base.html:29
+#: contrib/admin/templates/registration/password_change_done.html:4
+#: contrib/admin/templates/registration/password_reset_form.html:4
+#: contrib/admin/templates/registration/logged_out.html:4
+#: contrib/admin/templates/registration/password_reset_done.html:4
+#: contrib/admin/templates/registration/password_change_form.html:4
+msgid "Home"
+msgstr "Adref"
+
+#: contrib/admin/templates/admin/object_history.html:5
+msgid "History"
+msgstr "Hanes"
+
+#: contrib/admin/templates/admin/object_history.html:18
+msgid "Date/time"
+msgstr "Dyddiad/amser"
+
+#: contrib/admin/templates/admin/object_history.html:19 models/auth.py:47
+msgid "User"
+msgstr "Defnyddiwr"
+
+#: contrib/admin/templates/admin/object_history.html:20
+msgid "Action"
+msgstr "Gweithred"
+
+#: contrib/admin/templates/admin/object_history.html:26
+msgid "DATE_WITH_TIME_FULL"
+msgstr "N j, Y, P"
+
+#: contrib/admin/templates/admin/object_history.html:36
+msgid ""
+"This object doesn't have a change history. It probably wasn't added via this "
+"admin site."
+msgstr ""
+"Does dim hanes newid gan y gwrthrych yma. Mae'n debyg ni ychwanegwyd drwy'r "
+"safle gweinydd yma."
+
+#: contrib/admin/templates/admin/base_site.html:4
+msgid "Django site admin"
+msgstr "Gweinyddiad safle Django"
+
+#: contrib/admin/templates/admin/base_site.html:7
+msgid "Django administration"
+msgstr "Gweinyddiad Django"
+
+#: contrib/admin/templates/admin/500.html:4
+msgid "Server error"
+msgstr "Gwall gweinyddwr"
+
+#: contrib/admin/templates/admin/500.html:6
+msgid "Server error (500)"
+msgstr "Gwall gweinyddwr (500)"
+
+#: contrib/admin/templates/admin/500.html:9
+msgid "Server Error <em>(500)</em>"
+msgstr "Gwall Gweinyddwr <em>(500)</em>"
+
+#: contrib/admin/templates/admin/500.html:10
+msgid ""
+"There's been an error. It's been reported to the site administrators via e-"
+"mail and should be fixed shortly. Thanks for your patience."
+msgstr ""
+"Mae gwall wedi digwydd. Adroddwyd i weinyddwyr y safle drwy e-bost ac ddylai "
+"cael ei drwsio cyn bo hir."
+
+#: contrib/admin/templates/admin/404.html:4
+#: contrib/admin/templates/admin/404.html:8
+msgid "Page not found"
+msgstr "Tudalen heb ei ddarganfod"
+
+#: contrib/admin/templates/admin/404.html:10
+msgid "We're sorry, but the requested page could not be found."
+msgstr "Mae'n ddrwg gennym, ond nid darganfwyd y dudalen a dymunwyd"
+
+#: contrib/admin/templates/admin/index.html:27
+msgid "Add"
+msgstr "Ychwanegu"
+
+#: contrib/admin/templates/admin/index.html:33
+msgid "Change"
+msgstr "Newidio"
+
+#: contrib/admin/templates/admin/index.html:43
+msgid "You don't have permission to edit anything."
+msgstr "Does genych ddim hawl i olygu unrhywbeth."
+
+#: contrib/admin/templates/admin/index.html:51
+msgid "Recent Actions"
+msgstr "Gweithredau Diweddar"
+
+#: contrib/admin/templates/admin/index.html:52
+msgid "My Actions"
+msgstr "Fy Ngweithredau"
+
+#: contrib/admin/templates/admin/index.html:56
+msgid "None available"
+msgstr "Dim ar gael"
+
+#: contrib/admin/templates/admin/login.html:15
+msgid "Username:"
+msgstr "Enw defnyddiwr:"
+
+#: contrib/admin/templates/admin/login.html:18
+msgid "Password:"
+msgstr "Cyfrinair:"
+
+#: contrib/admin/templates/admin/login.html:20
+msgid "Have you <a href=\"/password_reset/\">forgotten your password</a>?"
+msgstr "Ydych wedi <a href=\"/password_reset/\">anghofio eich cyfrinair</a>?"
+
+#: contrib/admin/templates/admin/login.html:24
+msgid "Log in"
+msgstr "Mewngofnodi"
+
+#: contrib/admin/templates/admin/base.html:23
+msgid "Welcome,"
+msgstr "Croeso,"
+
+#: contrib/admin/templates/admin/base.html:23
+msgid "Change password"
+msgstr "Newid cyfrinair"
+
+#: contrib/admin/templates/admin/base.html:23
+msgid "Log out"
+msgstr "Allgofnodi"
+
+#: contrib/admin/templates/admin/delete_confirmation.html:7
+#, python-format
+msgid ""
+"Deleting the %(object_name)s '%(object)s' would result in deleting related "
+"objects, but your account doesn't have permission to delete the following "
+"types of objects:"
+msgstr ""
+"Bydda dileu'r %(object_name)s '%(object)s' yn ddilyn i dileu'r wrthrychau "
+"perthynol, ond ni chaniateir eich cyfrif ddileu'r mathau o wrthrych canlynol:"
+
+#: contrib/admin/templates/admin/delete_confirmation.html:14
+#, python-format
+msgid ""
+"Are you sure you want to delete the %(object_name)s \"%(object)s\"? All of "
+"the following related items will be deleted:"
+msgstr ""
+"Ydych yn sicr chi eiso ddileu'r %(object_name)s \"%(object)s\"? Bydd y cwbl "
+"o'r eitemau perthynol canlynol yn cae eu ddileu:"
+
+#: contrib/admin/templates/admin/delete_confirmation.html:18
+msgid "Yes, I'm sure"
+msgstr "Yndw, rwy'n sicr"
+
+#: contrib/admin/templates/registration/password_change_done.html:4
+#: contrib/admin/templates/registration/password_change_form.html:4
+#: contrib/admin/templates/registration/password_change_form.html:6
+#: contrib/admin/templates/registration/password_change_form.html:10
+msgid "Password change"
+msgstr "Newid cyfrinair"
+
+#: contrib/admin/templates/registration/password_change_done.html:6
+#: contrib/admin/templates/registration/password_change_done.html:10
+msgid "Password change successful"
+msgstr "Newid cyfrinair yn lwyddianus"
+
+#: contrib/admin/templates/registration/password_change_done.html:12
+msgid "Your password was changed."
+msgstr "Newidwyd eich cyfrinair."
+
+#: contrib/admin/templates/registration/password_reset_form.html:4
+#: contrib/admin/templates/registration/password_reset_form.html:6
+#: contrib/admin/templates/registration/password_reset_done.html:4
+msgid "Password reset"
+msgstr "Ailosod cyfrinair"
+
+#: contrib/admin/templates/registration/password_reset_form.html:12
+msgid ""
+"Forgotten your password? Enter your e-mail address below, and we'll reset "
+"your password and e-mail the new one to you."
+msgstr ""
+"Wedi anghofio eich cyfrinair? Rhowch eich cyfeiriad e-bost isod, ac "
+"ailosodan eich cyfrinair ac e-bostio'r un newydd i chi."
+
+#: contrib/admin/templates/registration/password_reset_form.html:16
+msgid "E-mail address:"
+msgstr "Cyfeiriad e-bost:"
+
+#: contrib/admin/templates/registration/password_reset_form.html:16
+msgid "Reset my password"
+msgstr "Ailosodi fy nghyfrinair"
+
+#: contrib/admin/templates/registration/logged_out.html:8
+msgid "Thanks for spending some quality time with the Web site today."
+msgstr "Diolch am dreulio amser ansawdd gyda'r safle we heddiw 'ma."
+
+#: contrib/admin/templates/registration/logged_out.html:10
+msgid "Log in again"
+msgstr "Ailmewngofnodi"
+
+#: contrib/admin/templates/registration/password_reset_done.html:6
+#: contrib/admin/templates/registration/password_reset_done.html:10
+msgid "Password reset successful"
+msgstr "Ailosod cyfrinair yn lwyddianus"
+
+#: contrib/admin/templates/registration/password_reset_done.html:12
+msgid ""
+"We've e-mailed a new password to the e-mail address you submitted. You "
+"should be receiving it shortly."
+msgstr "Wedi e-bostio cyfrinair newydd i'r gyfeiriad e-bost "
+
+#: contrib/admin/templates/registration/password_change_form.html:12
+msgid ""
+"Please enter your old password, for security's sake, and then enter your new "
+"password twice so we can verify you typed it in correctly."
+msgstr ""
+"Rhowch eich cyfrinair hen, er mwyn gwarchodaeth, yna rhowch eich cyfrinair "
+"newydd dwywaith er mwyn i ni wirio y teipiwyd yn gywir."
+
+#: contrib/admin/templates/registration/password_change_form.html:17
+msgid "Old password:"
+msgstr "Cyfrinair hen:"
+
+#: contrib/admin/templates/registration/password_change_form.html:19
+msgid "New password:"
+msgstr "Cyfrinair newydd:"
+
+#: contrib/admin/templates/registration/password_change_form.html:21
+msgid "Confirm password:"
+msgstr "Cadarnhewch cyfrinair:"
+
+#: contrib/admin/templates/registration/password_change_form.html:23
+msgid "Change my password"
+msgstr "Newidio fy nghyfrinair"
+
+#: contrib/admin/templates/registration/password_reset_email.html:2
+msgid "You're receiving this e-mail because you requested a password reset"
+msgstr "Chi'n derbyn yr e-bost yma achos ddymunwyd ailosod cyfrinair"
+
+#: contrib/admin/templates/registration/password_reset_email.html:3
+#, python-format
+msgid "for your user account at %(site_name)s"
+msgstr "er mwyn eich cyfrif defnyddiwr ar %(site_name)s"
+
+#: contrib/admin/templates/registration/password_reset_email.html:5
+#, python-format
+msgid "Your new password is: %(new_password)s"
+msgstr "Eich cyfrinair newydd yw: %(new_password)s"
+
+#: contrib/admin/templates/registration/password_reset_email.html:7
+msgid "Feel free to change this password by going to this page:"
+msgstr "Mae croeso i chi newid y gyfrinair hon wrth fynd i'r dudalen yma:"
+
+#: contrib/admin/templates/registration/password_reset_email.html:11
+msgid "Your username, in case you've forgotten:"
+msgstr "Eich enw defnyddiwr, rhag ofn chi wedi anghofio:"
+
+#: contrib/admin/templates/registration/password_reset_email.html:13
+msgid "Thanks for using our site!"
+msgstr "Diolch am ddefnyddio ein safle!"
+
+#: contrib/admin/templates/registration/password_reset_email.html:15
+#, python-format
+msgid "The %(site_name)s team"
+msgstr "Y tîm %(site_name)s"
+
+#: contrib/admin/models/admin.py:6
+msgid "action time"
+msgstr "amser gweithred"
+
+#: contrib/admin/models/admin.py:9
+msgid "object id"
+msgstr "id gwrthrych"
+
+#: contrib/admin/models/admin.py:10
+msgid "object repr"
+msgstr "repr gwrthrych"
+
+#: contrib/admin/models/admin.py:11
+msgid "action flag"
+msgstr "fflag gweithred"
+
+#: contrib/admin/models/admin.py:12
+msgid "change message"
+msgstr "neges newid"
+
+#: contrib/admin/models/admin.py:15
+msgid "log entry"
+msgstr "cofnod"
+
+#: contrib/admin/models/admin.py:16
+msgid "log entries"
+msgstr "cofnodion"
+
+#: utils/dates.py:6
+msgid "Monday"
+msgstr "Dydd Llun"
+
+#: utils/dates.py:6
+msgid "Tuesday"
+msgstr "Dydd Mawrth"
+
+#: utils/dates.py:6
+msgid "Wednesday"
+msgstr "Dydd Mercher"
+
+#: utils/dates.py:6
+msgid "Thursday"
+msgstr "Dydd Iau"
+
+#: utils/dates.py:6
+msgid "Friday"
+msgstr "Dydd Gwener"
+
+#: utils/dates.py:7
+msgid "Saturday"
+msgstr "Dydd Sadwrn"
+
+#: utils/dates.py:7
+msgid "Sunday"
+msgstr "Dydd Sul"
+
+#: utils/dates.py:14
+msgid "January"
+msgstr "Ionawr"
+
+#: utils/dates.py:14
+msgid "February"
+msgstr "Chwefror"
+
+#: utils/dates.py:14 utils/dates.py:27
+msgid "March"
+msgstr "Mawrth"
+
+#: utils/dates.py:14 utils/dates.py:27
+msgid "April"
+msgstr "Ebrill"
+
+#: utils/dates.py:14 utils/dates.py:27
+msgid "May"
+msgstr "Mai"
+
+#: utils/dates.py:14 utils/dates.py:27
+msgid "June"
+msgstr "Mehefin"
+
+#: utils/dates.py:15 utils/dates.py:27
+msgid "July"
+msgstr "Gorffenaf"
+
+#: utils/dates.py:15
+msgid "August"
+msgstr "Awst"
+
+#: utils/dates.py:15
+msgid "September"
+msgstr "Medi"
+
+#: utils/dates.py:15
+msgid "October"
+msgstr "Hydref"
+
+#: utils/dates.py:15
+msgid "November"
+msgstr "Tachwedd"
+
+#: utils/dates.py:16
+msgid "December"
+msgstr "Rhagfyr"
+
+#: utils/dates.py:27
+msgid "Jan."
+msgstr "Ion."
+
+#: utils/dates.py:27
+msgid "Feb."
+msgstr "Chwe."
+
+#: utils/dates.py:28
+msgid "Aug."
+msgstr "Awst"
+
+#: utils/dates.py:28
+msgid "Sept."
+msgstr "Medi"
+
+#: utils/dates.py:28
+msgid "Oct."
+msgstr "Hyd."
+
+#: utils/dates.py:28
+msgid "Nov."
+msgstr "Tach."
+
+#: utils/dates.py:28
+msgid "Dec."
+msgstr "Rhag."
+
+#: models/core.py:5
+msgid "domain name"
+msgstr "parth-enw"
+
+#: models/core.py:6
+msgid "display name"
+msgstr "enw arddangos"
+
+#: models/core.py:8
+msgid "site"
+msgstr "safle"
+
+#: models/core.py:9
+msgid "sites"
+msgstr "safleoedd"
+
+#: models/core.py:22
+msgid "label"
+msgstr "label"
+
+#: models/core.py:23 models/core.py:34 models/auth.py:6 models/auth.py:19
+msgid "name"
+msgstr "enw"
+
+#: models/core.py:25
+msgid "package"
+msgstr "pecyn"
+
+#: models/core.py:26
+msgid "packages"
+msgstr "pecynau"
+
+#: models/core.py:36
+msgid "python module name"
+msgstr "enw modwl python"
+
+#: models/core.py:38
+msgid "content type"
+msgstr "math cynnwys"
+
+#: models/core.py:39
+msgid "content types"
+msgstr "mathau cynnwys"
+
+#: models/core.py:62
+msgid "redirect from"
+msgstr "ailgyfeirio o"
+
+#: models/core.py:63
+msgid ""
+"This should be an absolute path, excluding the domain name. Example: '/"
+"events/search/'."
+msgstr ""
+"Ddylai hon bod yn lwybr hollol, heb y parth-enw. Er enghraifft: '/"
+"digwyddiadau/chwilio/'."
+
+#: models/core.py:64
+msgid "redirect to"
+msgstr "ailgyfeirio i"
+
+#: models/core.py:65
+msgid ""
+"This can be either an absolute path (as above) or a full URL starting with "
+"'http://'."
+msgstr ""
+"Gellir fod naill ai llwybr hollol (fel uwch) neu URL hollol yn ddechrau â "
+"'http://'."
+
+#: models/core.py:67
+msgid "redirect"
+msgstr "ailgyfeiriad"
+
+#: models/core.py:68
+msgid "redirects"
+msgstr "ailgyfeiriadau"
+
+#: models/core.py:81
+msgid "URL"
+msgstr "URL"
+
+#: models/core.py:82
+msgid ""
+"Example: '/about/contact/'. Make sure to have leading and trailing slashes."
+msgstr ""
+"Er enghraifft: '/amdan/cyswllt/'. Sicrhewch gennych slaesau arweiniol ac "
+"trywyddiol."
+
+#: models/core.py:83
+msgid "title"
+msgstr "teitl"
+
+#: models/core.py:84
+msgid "content"
+msgstr "cynnwys"
+
+#: models/core.py:85
+msgid "enable comments"
+msgstr "galluogi sylwadau"
+
+#: models/core.py:86
+msgid "template name"
+msgstr "enw'r templed"
+
+#: models/core.py:87
+msgid ""
+"Example: 'flatfiles/contact_page'. If this isn't provided, the system will "
+"use 'flatfiles/default'."
+msgstr ""
+"Er enghraifft: 'flatfiles/tudalen_cyswllt'. Os nid darparwyd, ddefnyddia'r "
+"system 'flatfiles/default'."
+
+#: models/core.py:88
+msgid "registration required"
+msgstr "cofrestriad gofynnol"
+
+#: models/core.py:88
+msgid "If this is checked, only logged-in users will be able to view the page."
+msgstr ""
+"Os wedi dewis, dim ond defnyddwyr a mewngofnodwyd bydd yn gallu gweld y "
+"tudalen."
+
+#: models/core.py:92
+msgid "flat page"
+msgstr "tudalen fflat"
+
+#: models/core.py:93
+msgid "flat pages"
+msgstr "tudalennau fflat"
+
+#: models/core.py:114
+msgid "session key"
+msgstr "goriad sesiwn"
+
+#: models/core.py:115
+msgid "session data"
+msgstr "data sesiwn"
+
+#: models/core.py:116
+msgid "expire date"
+msgstr "dyddiad darfod"
+
+#: models/core.py:118
+msgid "session"
+msgstr "sesiwn"
+
+#: models/core.py:119
+msgid "sessions"
+msgstr "sesiynau"
+
+#: models/auth.py:8
+msgid "codename"
+msgstr "enw arwyddol"
+
+#: models/auth.py:10
+msgid "Permission"
+msgstr "Hawl"
+
+#: models/auth.py:11 models/auth.py:58
+msgid "Permissions"
+msgstr "Hawliau"
+
+#: models/auth.py:22
+msgid "Group"
+msgstr "Grŵp"
+
+#: models/auth.py:23 models/auth.py:60
+msgid "Groups"
+msgstr "Grwpiau"
+
+#: models/auth.py:33
+msgid "username"
+msgstr "enw defnyddiwr"
+
+#: models/auth.py:34
+msgid "first name"
+msgstr "enw cyntaf"
+
+#: models/auth.py:35
+msgid "last name"
+msgstr "enw olaf"
+
+#: models/auth.py:36
+msgid "e-mail address"
+msgstr "cyfeiriad e-bost"
+
+#: models/auth.py:37
+msgid "password"
+msgstr "cyfrinair"
+
+#: models/auth.py:37
+msgid "Use an MD5 hash -- not the raw password."
+msgstr "Defnyddiwch stwnsh MD5 -- nid y gyfrinair crai."
+
+#: models/auth.py:38
+msgid "staff status"
+msgstr "statws staff"
+
+#: models/auth.py:38
+msgid "Designates whether the user can log into this admin site."
+msgstr "Dylunio ai'r defnyddiwr yn gally mewngofnodi i'r safle weinyddiad yma."
+
+#: models/auth.py:39
+msgid "active"
+msgstr "gweithredol"
+
+#: models/auth.py:40
+msgid "superuser status"
+msgstr "statws defnyddiwr swper"
+
+#: models/auth.py:41
+msgid "last login"
+msgstr "mewngofnod olaf"
+
+#: models/auth.py:42
+msgid "date joined"
+msgstr "Dyddiad"
+
+#: models/auth.py:44
+msgid ""
+"In addition to the permissions manually assigned, this user will also get "
+"all permissions granted to each group he/she is in."
+msgstr ""
+"Yn ogystal â'r hawliau trosglwyddwyd dros law, byddai'r defnyddiwr yma "
+"hefyd yn cael y cwbl hawliau a addefwyd i pob grŵp mae o/hi mewn."
+
+#: models/auth.py:48
+msgid "Users"
+msgstr "Defnyddwyr"
+
+#: models/auth.py:57
+msgid "Personal info"
+msgstr "Gwybodaeth personol"
+
+#: models/auth.py:59
+msgid "Important dates"
+msgstr "Dyddiadau pwysig"
+
+#: models/auth.py:182
+msgid "Message"
+msgstr "Neges"
+
+#: conf/global_settings.py:36
+msgid "Welsh"
+msgstr "Cymraeg"
+
+#: conf/global_settings.py:37
+msgid "Czech"
+msgstr "Tsieceg"
+
+#: conf/global_settings.py:38
+msgid "German"
+msgstr "Almaeneg"
+
+#: conf/global_settings.py:39
+msgid "English"
+msgstr "Saesneg"
+
+#: conf/global_settings.py:40
+msgid "Spanish"
+msgstr "Spaeneg"
+
+#: conf/global_settings.py:41
+msgid "French"
+msgstr "Ffrangeg"
+
+#: conf/global_settings.py:42
+msgid "Galician"
+msgstr "Galisieg"
+
+#: conf/global_settings.py:43
+msgid "Italian"
+msgstr "Eidaleg"
+
+#: conf/global_settings.py:44
+msgid "Norwegian"
+msgstr "Norwyeg"
+
+#: conf/global_settings.py:45
+msgid "Brazilian"
+msgstr "Brasileg"
+
+#: conf/global_settings.py:46
+msgid "Russian"
+msgstr "Rwsieg"
+
+#: conf/global_settings.py:47
+msgid "Serbian"
+msgstr "Serbeg"
+
+#: conf/global_settings.py:48
+msgid "Simplified Chinese"
+msgstr "Tsieinëeg Symledig"
+
+#: core/validators.py:58
+msgid "This value must contain only letters, numbers and underscores."
+msgstr "Rhaid i'r werth yma cynnwys lythrennau, rhifau ac tanlinellau yn unig."
+
+#: core/validators.py:62
+msgid ""
+"This value must contain only letters, numbers, underscores, dashes and "
+"slashes."
+msgstr ""
+"Rhaid i'r werth yma cynnwys lythrennau, rhifau, tanlinellau ac slaesau yn "
+"unig."
+
+#: core/validators.py:70
+msgid "Uppercase letters are not allowed here."
+msgstr "Ni chaniateir priflythrennau yma."
+
+#: core/validators.py:74
+msgid "Lowercase letters are not allowed here."
+msgstr "Ni chaniateir lythrennau bach yma."
+
+#: core/validators.py:81
+msgid "Enter only digits separated by commas."
+msgstr "Rhowch digidau gwahanu gyda atalnodau yn unig."
+
+#: core/validators.py:93
+msgid "Enter valid e-mail addresses separated by commas."
+msgstr "Rhowch cyfeiriad e-bost dilys gwahanu gyda atalnodau."
+
+#: core/validators.py:100
+msgid "Please enter a valid IP address."
+msgstr "Rhowch cyfeiriad IP dilys, os gwelwch yn dda."
+
+#: core/validators.py:104
+msgid "Empty values are not allowed here."
+msgstr "Ni chaniateir gwerthau gwag yma."
+
+#: core/validators.py:108
+msgid "Non-numeric characters aren't allowed here."
+msgstr "Ni chaniateir nodau anrhifol yma."
+
+#: core/validators.py:112
+msgid "This value can't be comprised solely of digits."
+msgstr "Ni gellir y werth yma"
+
+#: core/validators.py:117
+msgid "Enter a whole number."
+msgstr "Rhowch rhif cyfan."
+
+#: core/validators.py:121
+msgid "Only alphabetical characters are allowed here."
+msgstr "Caniateir nodau gwyddorol un unig yma."
+
+#: core/validators.py:125
+msgid "Enter a valid date in YYYY-MM-DD format."
+msgstr "Rhowch dyddiad dilys mewn fformat YYYY-MM-DD."
+
+#: core/validators.py:129
+msgid "Enter a valid time in HH:MM format."
+msgstr "Rhowch amser ddilys mewn fformat HH:MM."
+
+#: core/validators.py:133
+msgid "Enter a valid date/time in YYYY-MM-DD HH:MM format."
+msgstr "Rhowch dyddiad/amser ddilys mewn fformat YYYY-MM-DD HH:MM."
+
+#: core/validators.py:137
+msgid "Enter a valid e-mail address."
+msgstr "Rhowch cyfeiriad e-bost ddilys."
+
+#: core/validators.py:149
+msgid ""
+"Upload a valid image. The file you uploaded was either not an image or a "
+"corrupted image."
+msgstr ""
+"Llwythwch delwedd dilys. Doedd y delwedd a llwythwyd dim yn ddelwedd dilys, "
+"neu roedd o'n ddelwedd llwgr."
+
+#: core/validators.py:156
+#, python-format
+msgid "The URL %s does not point to a valid image."
+msgstr "Dydy'r URL %s dim yn pwyntio at delwedd dilys."
+
+#: core/validators.py:160
+#, python-format
+msgid "Phone numbers must be in XXX-XXX-XXXX format. \"%s\" is invalid."
+msgstr "Rhaid rifau ffon bod mewn fformat XXX-XXX-XXXX. Mae \"%s\" yn annilys."
+
+#: core/validators.py:168
+#, python-format
+msgid "The URL %s does not point to a valid QuickTime video."
+msgstr "Dydy'r URL %s dim yn pwyntio at fideo Quicktime dilys."
+
+#: core/validators.py:172
+msgid "A valid URL is required."
+msgstr "Mae URL dilys yn ofynnol."
+
+#: core/validators.py:186
+#, python-format
+msgid ""
+"Valid HTML is required. Specific errors are:\n"
+"%s"
+msgstr ""
+"Mae HTML dilys yn ofynnol. Gwallau penodol yw:\n"
+"%s"
+
+#: core/validators.py:193
+#, python-format
+msgid "Badly formed XML: %s"
+msgstr "XML wedi ffurfio'n wael: %s"
+
+#: core/validators.py:203
+#, python-format
+msgid "Invalid URL: %s"
+msgstr "URL annilys: %s"
+
+#: core/validators.py:205
+#, python-format
+msgid "The URL %s is a broken link."
+msgstr "Mae'r URL %s yn gyswllt toredig."
+
+#: core/validators.py:211
+msgid "Enter a valid U.S. state abbreviation."
+msgstr "Rhowch talfyriad dalaith U.S. dilys."
+
+#: core/validators.py:226
+#, python-format
+msgid "Watch your mouth! The word %s is not allowed here."
+msgid_plural "Watch your mouth! The words %s are not allowed here."
+msgstr[0] "Gwyliwch eich ceg! Ni chaniateir y gair %s yma."
+msgstr[1] "Gwyliwch eich ceg! Ni chaniateir y geiriau %s yma."
+
+#: core/validators.py:233
+#, python-format
+msgid "This field must match the '%s' field."
+msgstr "Rhaid i'r faes yma cydweddu'r faes '%s'."
+
+#: core/validators.py:252
+msgid "Please enter something for at least one field."
+msgstr "Rhowch rhywbeth am un maes o leiaf, os gwelwch yn dda."
+
+#: core/validators.py:261 core/validators.py:272
+msgid "Please enter both fields or leave them both empty."
+msgstr "Llenwch y ddwy faes, neu gadewch nhw'n wag, os gwelwch yn dda."
+
+#: core/validators.py:279
+#, python-format
+msgid "This field must be given if %(field)s is %(value)s"
+msgstr "Rhaid roi'r faes yma os mae %(field)s yn %(value)s"
+
+#: core/validators.py:291
+#, python-format
+msgid "This field must be given if %(field)s is not %(value)s"
+msgstr "Rhaid roi'r faes yma os mae %(field)s dim yn %(value)s"
+
+#: core/validators.py:310
+msgid "Duplicate values are not allowed."
+msgstr "Ni chaniateir gwerthau ddyblyg."
+
+#: core/validators.py:333
+#, python-format
+msgid "This value must be a power of %s."
+msgstr "Rhaid i'r gwerth yma fod yn bŵer o %s."
+
+#: core/validators.py:344
+msgid "Please enter a valid decimal number."
+msgstr "Rhowch rhif degol dilys, os gwelwch yn dda."
+
+#: core/validators.py:346
+#, python-format
+msgid "Please enter a valid decimal number with at most %s total digit."
+msgid_plural ""
+"Please enter a valid decimal number with at most %s total digits."
+msgstr[0] "Rhowch rhif degol dilys gyda cyfanswm %s digidau o fwyaf."
+msgstr[1] "Rhowch rhif degol dilys gyda cyfanswm %s digid o fwyaf."
+
+#: core/validators.py:349
+#, python-format
+msgid "Please enter a valid decimal number with at most %s decimal place."
+msgid_plural ""
+"Please enter a valid decimal number with at most %s decimal places."
+msgstr[0] ""
+"Rhowch rif degol dilydd gyda o fwyaf %s lle degol, os gwelwch yn dda."
+msgstr[1] ""
+"Rhowch rif degol dilydd gyda o fwyaf %s lleoedd degol, os gwelwch yn dda."
+
+#: core/validators.py:359
+#, python-format
+msgid "Make sure your uploaded file is at least %s bytes big."
+msgstr "Sicrhewch bod yr ffeil a llwythwyd yn o leiaf %s beit."
+
+#: core/validators.py:360
+#, python-format
+msgid "Make sure your uploaded file is at most %s bytes big."
+msgstr "Sicrhewch bod yr ffeil a llwythwyd yn %s beit o fwyaf."
+
+#: core/validators.py:373
+msgid "The format for this field is wrong."
+msgstr "Mae'r fformat i'r faes yma yn anghywir."
+
+#: core/validators.py:388
+msgid "This field is invalid."
+msgstr "Mae'r faes yma yn annilydd."
+
+#: core/validators.py:423
+#, python-format
+msgid "Could not retrieve anything from %s."
+msgstr "Ni gellir adalw unrhywbeth o %s."
+
+#: core/validators.py:426
+#, python-format
+msgid ""
+"The URL %(url)s returned the invalid Content-Type header '%(contenttype)s'."
+msgstr ""
+"Dychwelodd yr URL %(url)s y pennawd Content-Type annilys '%(contenttype)s'."
+
+#: core/validators.py:459
+#, python-format
+msgid ""
+"Please close the unclosed %(tag)s tag from line %(line)s. (Line starts with "
+"\"%(start)s\".)"
+msgstr ""
+"Caewch y tag anghaedig %(tag)s o linell %(line)s. (Linell yn ddechrau â "
+"\"%(start)s\".)"
+
+#: core/validators.py:463
+#, python-format
+msgid ""
+"Some text starting on line %(line)s is not allowed in that context. (Line "
+"starts with \"%(start)s\".)"
+msgstr ""
+"Ni chaniateir rhai o'r destun ar linell %(line)s yn y gyd-destun yna. (Linell "
+"yn ddechrau â \"%(start)s\".)"
+
+#: core/validators.py:468
+#, python-format
+msgid ""
+"\"%(attr)s\" on line %(line)s is an invalid attribute. (Line starts with \"%"
+"(start)s\".)"
+msgstr ""
+"Mae \"%(attr)s\" ar lein %(line)s yn priodoledd annilydd. (Linell yn ddechrau "
+"â \"%(start)s\".)"
+
+#: core/validators.py:473
+#, python-format
+msgid ""
+"\"<%(tag)s>\" on line %(line)s is an invalid tag. (Line starts with \"%"
+"(start)s\".)"
+msgstr ""
+"Mae \"<%(tag)s>\" ar lein %(line)s yn tag annilydd. (Linell yn ddechrau â \"%"
+"(start)s\".)"
+
+#: core/validators.py:477
+#, python-format
+msgid ""
+"A tag on line %(line)s is missing one or more required attributes. (Line "
+"starts with \"%(start)s\".)"
+msgstr ""
+"Mae tag ar lein %(line)s yn eisiau un new fwy priodoleddau gofynnol. (Linell "
+"yn ddechrau â \"%(start)s\".)"
+
+#: core/validators.py:482
+#, python-format
+msgid ""
+"The \"%(attr)s\" attribute on line %(line)s has an invalid value. (Line "
+"starts with \"%(start)s\".)"
+msgstr ""
+"Mae gan y priodoledd \"%(attr)s\" ar lein %(line)s gwerth annilydd. (Linell yn "
+"ddechrau â \"%(start)s\".)"
+
+#: core/meta/fields.py:95
+msgid " Separate multiple IDs with commas."
+msgstr " Gwahanwch mwy nag un ID gyda atalnodau."
+
+#: core/meta/fields.py:98
+msgid ""
+" Hold down \"Control\", or \"Command\" on a Mac, to select more than one."
+msgstr ""
+"Gafaelwch lawr \"Control\", neu \"Command\" ar Fac, i ddewis mwy nag un."
