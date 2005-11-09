@@ -63,11 +63,13 @@ NotImplementedError
 '1979 188 CET'
 """
 
-from django.utils import dateformat
-format = dateformat.format
+from django.utils import dateformat, translation
 import datetime, os, time
 
+format = dateformat.format
 os.environ['TZ'] = 'Europe/Copenhagen'
+translation.activate('en-us')
+
 time.tzset()
 
 my_birthday = datetime.datetime(1979, 7, 7, 22, 00)
