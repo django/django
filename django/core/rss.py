@@ -14,7 +14,7 @@ class FeedDoesNotExist(ObjectDoesNotExist):
 
 class Feed:
     item_pubdate = None
-    enclosure_url = None
+    item_enclosure_url = None
 
     def item_link(self, item):
         try:
@@ -67,12 +67,12 @@ class Feed:
         for item in self.__get_dynamic_attr('items', obj):
             link = add_domain(current_site.domain, self.__get_dynamic_attr('item_link', item))
             enc = None
-            enc_url = self.__get_dynamic_attr('enclosure_url', item)
+            enc_url = self.__get_dynamic_attr('item_enclosure_url', item)
             if enc_url:
                 enc = feedgenerator.Enclosure(
                     url = enc_url.decode('utf-8'),
-                    length = str(self.__get_dynamic_attr('enclosure_length', item)).decode('utf-8'),
-                    mime_type = self.__get_dynamic_attr('enclosure_mime_type', item).decode('utf-8'),
+                    length = str(self.__get_dynamic_attr('item_enclosure_length', item)).decode('utf-8'),
+                    mime_type = self.__get_dynamic_attr('item_enclosure_mime_type', item).decode('utf-8'),
                 )
             feed.add_item(
                 title = title_template.render(Context({'obj': item, 'site': current_site})).decode('utf-8'),
