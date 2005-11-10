@@ -309,6 +309,7 @@ class FormField:
                new_data.setlist(name, [])
 
     def get_id(self):
+    	"Returns the HTML 'id' attribute for this form field."
         return  FORM_FIELD_ID_PREFIX + self.field_name  
 ####################
 # GENERIC WIDGETS  #
@@ -408,10 +409,10 @@ class SelectField(FormField):
             self.member_name = member_name
 
     def render(self, data):
-        str_data = str(data) # normalize to string
         output = ['<select id="%s" class="v%s%s" name="%s" size="%s">' % \
-            (self.get_id(), self.__class__.__name__, 
+            (self.get_id(), self.__class__.__name__,
              self.is_required and ' required' or '', self.field_name, self.size)]
+        str_data = str(data) # normalize to string
         for value, display_name in self.choices:
             selected_html = ''
             if str(value) == str_data:
@@ -593,8 +594,7 @@ class FileUploadField(FormField):
 
     def render(self, data):
         return '<input type="file" id="%s" class="v%s" name="%s" />' % \
-            (self.get_id(), self.__class__.__name__,
-            self.field_name)
+            (self.get_id(), self.__class__.__name__, self.field_name)
 
     def html2python(data):
         if data is None:

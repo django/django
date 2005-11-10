@@ -108,7 +108,23 @@ def get_sql_delete(mod):
         cursor = db.db.cursor()
     except:
         cursor = None
+
+    # Determine whether the admin log table exists. It only exists if the
+    # person has installed the admin app.
+    try:
+        if cursor is not None:
+            # Check whether the table exists.
+            cursor.execute("SELECT 1 FROM django_admin_log LIMIT 1")
+    except:
+        # The table doesn't exist, so it doesn't need to be dropped.
+        db.db.rollback()
+        admin_log_exists = False
+    else:
+        admin_log_exists = True
+
     output = []
+
+    # Output DROP TABLE statements for standard application tables.
     for klass in mod._MODELS:
         try:
             if cursor is not None:
@@ -119,6 +135,8 @@ def get_sql_delete(mod):
             db.db.rollback()
         else:
             output.append("DROP TABLE %s;" % klass._meta.db_table)
+
+    # Output DROP TABLE statements for many-to-many tables.
     for klass in mod._MODELS:
         opts = klass._meta
         for f in opts.many_to_many:
@@ -140,8 +158,9 @@ def get_sql_delete(mod):
     # Delete from the admin log.
     if cursor is not None:
         cursor.execute("SELECT id FROM content_types WHERE package = %s", [app_label])
-        for row in cursor.fetchall():
-            output.append("DELETE FROM django_admin_log WHERE content_type_id = %s;" % row[0])
+        if admin_log_exists:
+            for row in cursor.fetchall():
+                output.append("DELETE FROM django_admin_log WHERE content_type_id = %s;" % row[0])
 
     # Close database connection explicitly, in case this output is being piped
     # directly into a database client, to avoid locking issues.

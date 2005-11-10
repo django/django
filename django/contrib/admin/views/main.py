@@ -113,7 +113,7 @@ class RelatedFilterSpec(FilterSpec):
                'query_string': cl.get_query_string({}, [self.lookup_kwarg]), 
                'display': _('All') }
         for val in self.lookup_choices:
-            pk_val = getattr(val, self.field.rel.to.pk.column)
+            pk_val = getattr(val, self.field.rel.to.pk.attname)
             yield { 'selected': self.lookup_val == str(pk_val), 
                     'query_string': cl.get_query_string( {self.lookup_kwarg: pk_val}),
                     'display' : val }
@@ -547,7 +547,7 @@ def render_change_form(opts, manipulator, app_label, context, add=False, change=
                               context_instance=context)
    
 def log_add_message(user, opts,manipulator,new_object):
-    pk_value = getattr(new_object, opts.pk.column)
+    pk_value = getattr(new_object, opts.pk.attname)
     log.log_action(user.id, opts.get_content_type_id(), pk_value, str(new_object), log.ADDITION)
 
 def add_stage(request, app_label, module_name, show_delete=False, form_url='', post_url='../', post_url_continue='../%s/', object_id_override=None):
@@ -566,7 +566,7 @@ def add_stage(request, app_label, module_name, show_delete=False, form_url='', p
             new_object = manipulator.save(new_data)
             log_add_message(request.user, opts,manipulator,new_object)
             msg = _('The %(name)s "%(obj)s" was added successfully.') % {'name':opts.verbose_name, 'obj':new_object}
-            pk_value = getattr(new_object,opts.pk.column)
+            pk_value = getattr(new_object,opts.pk.attname)
             # Here, we distinguish between different save types by checking for
             # the presence of keys in request.POST.
             if request.POST.has_key("_continue"):
@@ -644,7 +644,7 @@ def change_stage(request, app_label, module_name, object_id):
             new_object = manipulator.save(new_data)
             log_change_message(request.user,opts,manipulator,new_object)
             msg = _('The %(name)s "%(obj)s" was changed successfully.') % {'name': opts.verbose_name, 'obj':new_object}
-            pk_value = getattr(new_object,opts.pk.column)
+            pk_value = getattr(new_object,opts.pk.attname)
             if request.POST.has_key("_continue"):
                 request.user.add_message(msg + ' ' + _("You may edit it again below."))
                 if request.REQUEST.has_key('_popup'):
@@ -738,7 +738,7 @@ def _get_deleted_objects(deleted_objects, perms_needed, user, obj, opts, current
                     # Display a link to the admin page.
                     nh(deleted_objects, current_depth, ['%s: <a href="../../../../%s/%s/%s/">%s</a>' % \
                         (capfirst(related.opts.verbose_name), related.opts.app_label, related.opts.module_name,
-                        getattr(sub_obj, related.opts.pk.column), sub_obj), []])
+                        getattr(sub_obj, related.opts.pk.attname), sub_obj), []])
                 _get_deleted_objects(deleted_objects, perms_needed, user, sub_obj, related.opts, current_depth+2)
         else:
             has_related_objs = False

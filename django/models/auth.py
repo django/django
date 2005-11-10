@@ -13,7 +13,7 @@ class Permission(meta.Model):
         ordering = ('package', 'codename')
 
     def __repr__(self):
-        return "%s | %s" % (self.package, self.name)
+        return "%s | %s" % (self.package_id, self.name)
 
 class Group(meta.Model):
     name = meta.CharField(_('name'), maxlength=80, unique=True)
@@ -103,7 +103,7 @@ class User(meta.Model):
     def get_all_permissions(self):
         if not hasattr(self, '_perm_cache'):
             import sets
-            self._perm_cache = sets.Set(["%s.%s" % (p.package, p.codename) for p in self.get_permission_list()])
+            self._perm_cache = sets.Set(["%s.%s" % (p.package_id, p.codename) for p in self.get_permission_list()])
             self._perm_cache.update(self.get_group_permissions())
         return self._perm_cache
 
