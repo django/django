@@ -1,0 +1,987 @@
+# django.bn.po -- Bengali (bn) translation of Django core
+# Copyright (C) 2005 Django Authors
+# This file is distributed under the same license as the Django package.
+# Baishampayan Ghose <b.ghose@gnu.org.in>, 2005.
+# 
+# 
+msgid ""
+msgstr ""
+"Project-Id-Version: Django CVS\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2005-11-10 05:53-0600\n"
+"PO-Revision-Date: 2005-11-10 06:11+0530\n"
+"Last-Translator: Baishampayan Ghose <b.ghose@gnu.org.in>\n"
+"Language-Team: Bengali <core@bengalinux.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: contrib/admin/models/admin.py:6
+msgid "action time"
+msgstr "কাজ সময়"
+
+#: contrib/admin/models/admin.py:9
+msgid "object id"
+msgstr "বস্তু আই.ডি."
+
+#: contrib/admin/models/admin.py:10
+msgid "object repr"
+msgstr "বস্তু repr"
+
+#: contrib/admin/models/admin.py:11
+msgid "action flag"
+msgstr "কাজ ফ্ল্যাগ"
+
+#: contrib/admin/models/admin.py:12
+msgid "change message"
+msgstr "বার্তা পরিবর্তন"
+
+#: contrib/admin/models/admin.py:15
+msgid "log entry"
+msgstr "কার্যবিবরণী এন্ট্রি"
+
+#: contrib/admin/models/admin.py:16
+msgid "log entries"
+msgstr "কার্যবিবরণী এন্ট্রি সমুহ"
+
+#: contrib/admin/templates/admin/object_history.html:5
+#: contrib/admin/templates/admin/500.html:4
+#: contrib/admin/templates/admin/base.html:29
+#: contrib/admin/templates/registration/password_change_done.html:4
+#: contrib/admin/templates/registration/password_reset_form.html:4
+#: contrib/admin/templates/registration/logged_out.html:4
+#: contrib/admin/templates/registration/password_reset_done.html:4
+#: contrib/admin/templates/registration/password_change_form.html:4
+msgid "Home"
+msgstr "বাড়ি"
+
+#: contrib/admin/templates/admin/object_history.html:5
+msgid "History"
+msgstr "ইতিহাস"
+
+#: contrib/admin/templates/admin/object_history.html:18
+msgid "Date/time"
+msgstr "তারিখ/সময়"
+
+#: contrib/admin/templates/admin/object_history.html:19 models/auth.py:47
+msgid "User"
+msgstr "ব্যবহারকারী"
+
+#: contrib/admin/templates/admin/object_history.html:20
+msgid "Action"
+msgstr "কাজ"
+
+#: contrib/admin/templates/admin/object_history.html:26
+msgid "DATE_WITH_TIME_FULL"
+msgstr "N j, Y, P"
+
+#: contrib/admin/templates/admin/object_history.html:36
+msgid ""
+"This object doesn't have a change history. It probably wasn't added via this "
+"admin site."
+msgstr ""
+"এই বস্তুটি একটি পরিবর্তন ইতিহাস নেই। এইটি এই অ্যাডমিন স্থান দ্বারা সম্ভবত যোগ করা "
+"হয় নি।"
+
+#: contrib/admin/templates/admin/base_site.html:4
+msgid "Django site admin"
+msgstr "জ্যাঙ্গো স্থান অ্যাডমিন"
+
+#: contrib/admin/templates/admin/base_site.html:7
+msgid "Django administration"
+msgstr "জ্যাঙ্গো পরিচালনা"
+
+#: contrib/admin/templates/admin/500.html:4
+msgid "Server error"
+msgstr "সার্ভার ত্রুটি"
+
+#: contrib/admin/templates/admin/500.html:6
+msgid "Server error (500)"
+msgstr "সার্ভার ত্রুটি (৫০০)"
+
+#: contrib/admin/templates/admin/500.html:9
+msgid "Server Error <em>(500)</em>"
+msgstr "সার্ভার ত্রুটি<em>(৫০০)</em>"
+
+#: contrib/admin/templates/admin/500.html:10
+msgid ""
+"There's been an error. It's been reported to the site administrators via e-"
+"mail and should be fixed shortly. Thanks for your patience."
+msgstr ""
+"একটি ত্রুটি আছে। এইটি স্থান পরিচালককে ই-মেল দ্বারা প্রতিবেদন করা হয়েছে এবং খুব "
+"তাড়াতাড়ি মেরামত করা হবে। আপনার ধৈর্য্যের জন্য ধন্যবাদ।"
+
+#: contrib/admin/templates/admin/404.html:4
+#: contrib/admin/templates/admin/404.html:8
+msgid "Page not found"
+msgstr "পাতা খুঁজে পাওয়া গেল না"
+
+#: contrib/admin/templates/admin/404.html:10
+msgid "We're sorry, but the requested page could not be found."
+msgstr "আমরা দুঃখিত, কিন্তু আবেদনকৃত পাতা খুঁজে পাওয়া গেল না।"
+
+#: contrib/admin/templates/admin/index.html:27
+msgid "Add"
+msgstr "যোগ করুন"
+
+#: contrib/admin/templates/admin/index.html:33
+msgid "Change"
+msgstr "পরিবর্তন"
+
+#: contrib/admin/templates/admin/index.html:43
+msgid "You don't have permission to edit anything."
+msgstr "আপনার কোন কিছু সম্পাদনা করতে অনুমতি নেই।"
+
+#: contrib/admin/templates/admin/index.html:51
+msgid "Recent Actions"
+msgstr "সাম্প্রতিক কাজ"
+
+#: contrib/admin/templates/admin/index.html:52
+msgid "My Actions"
+msgstr "আমার কাজ"
+
+#: contrib/admin/templates/admin/index.html:56
+msgid "None available"
+msgstr "কিছুই পাওয়া যাচ্ছে না"
+
+#: contrib/admin/templates/admin/login.html:15
+msgid "Username:"
+msgstr "ব্যবহারকারীর নাম:"
+
+#: contrib/admin/templates/admin/login.html:18
+msgid "Password:"
+msgstr "পাসওয়ার্ড:"
+
+#: contrib/admin/templates/admin/login.html:20
+msgid "Have you <a href=\"/password_reset/\">forgotten your password</a>?"
+msgstr "আপনি কি <a href=\"/password_reset/\">আপনার পাসওয়ার্ড ভুলে গেছেন</a>?"
+
+#: contrib/admin/templates/admin/login.html:24
+msgid "Log in"
+msgstr "প্রবেশ করুন"
+
+#: contrib/admin/templates/admin/base.html:23
+msgid "Welcome,"
+msgstr "স্বাগত,"
+
+#: contrib/admin/templates/admin/base.html:23
+msgid "Change password"
+msgstr "পাসওয়ার্ড পরিবর্তন করুন"
+
+#: contrib/admin/templates/admin/base.html:23
+msgid "Log out"
+msgstr "বাইরে যান"
+
+#: contrib/admin/templates/admin/delete_confirmation.html:7
+#, python-format
+msgid ""
+"Deleting the %(object_name)s '%(object)s' would result in deleting related "
+"objects, but your account doesn't have permission to delete the following "
+"types of objects:"
+msgstr ""
+"%(object_name)s '%(object)s' মুছে ফেললে তা সম্পর্কিত বস্তুও মুছে ফেলা হবে কিন্তু "
+"আপনার অ্যাকাউন্টে বস্তুর নিম্নলিখিত ধরন মুছে ফেলার অনুমতি নেই:"
+
+#: contrib/admin/templates/admin/delete_confirmation.html:14
+#, python-format
+msgid ""
+"Are you sure you want to delete the %(object_name)s \"%(object)s\"? All of "
+"the following related items will be deleted:"
+msgstr ""
+"%(object_name)s\" %(object)s\" মুছে ফেলতে আপনি কি নিশ্চিত? নিম্নলিখিত সম্পর্কিত "
+"বস্তুর সব মুছে ফেলা হবে:"
+
+#: contrib/admin/templates/admin/delete_confirmation.html:18
+msgid "Yes, I'm sure"
+msgstr "হ্যাঁ, আমি নিশ্চিত"
+
+#: contrib/admin/templates/registration/password_change_done.html:4
+#: contrib/admin/templates/registration/password_change_form.html:4
+#: contrib/admin/templates/registration/password_change_form.html:6
+#: contrib/admin/templates/registration/password_change_form.html:10
+msgid "Password change"
+msgstr "পাসওয়ার্ড পরিবর্তন"
+
+#: contrib/admin/templates/registration/password_change_done.html:6
+#: contrib/admin/templates/registration/password_change_done.html:10
+msgid "Password change successful"
+msgstr "পাসওয়ার্ড পরিবর্তন সফল"
+
+#: contrib/admin/templates/registration/password_change_done.html:12
+msgid "Your password was changed."
+msgstr "আপনার পাসওয়ার্ড পরিবর্তন করা হয়েছিল।"
+
+#: contrib/admin/templates/registration/password_reset_form.html:4
+#: contrib/admin/templates/registration/password_reset_form.html:6
+#: contrib/admin/templates/registration/password_reset_done.html:4
+msgid "Password reset"
+msgstr "পাসওয়ার্ড রিসেট"
+
+#: contrib/admin/templates/registration/password_reset_form.html:12
+msgid ""
+"Forgotten your password? Enter your e-mail address below, and we'll reset "
+"your password and e-mail the new one to you."
+msgstr ""
+"আপনি কি আপনার পাসওয়ার্ড ভুলে গেছেন? আপনার ই-মেল ঠিকানা নিচে দিন এবং আমরা আপনার "
+"পাসওয়ার্ড রিসেট করে এবং আপনাকে নতুন এক পাসওয়ার্ড ই-মেল করে দেব।"
+
+#: contrib/admin/templates/registration/password_reset_form.html:16
+msgid "E-mail address:"
+msgstr "ই-মেল ঠিকানা:"
+
+#: contrib/admin/templates/registration/password_reset_form.html:16
+msgid "Reset my password"
+msgstr "আমার পাসওয়ার্ড রিসেট করুন"
+
+#: contrib/admin/templates/registration/logged_out.html:8
+msgid "Thanks for spending some quality time with the Web site today."
+msgstr "এই ওয়েব স্থানে আপনার কিছু সময় খরচ করার জন্য ধন্যবাদ।"
+
+#: contrib/admin/templates/registration/logged_out.html:10
+msgid "Log in again"
+msgstr "আবার প্রবেশ করুন"
+
+#: contrib/admin/templates/registration/password_reset_done.html:6
+#: contrib/admin/templates/registration/password_reset_done.html:10
+msgid "Password reset successful"
+msgstr "পাসওয়ার্ড রিসেট সফল"
+
+#: contrib/admin/templates/registration/password_reset_done.html:12
+msgid ""
+"We've e-mailed a new password to the e-mail address you submitted. You "
+"should be receiving it shortly."
+msgstr ""
+"আমরা আপনাকে একটি নতুন পাসওয়ার্ড আপনার দেওয়া ই-মেল ঠিকানায় পাঠিয়ে দিয়েছি। আপনার "
+"তা খুব তাড়াতাড়ি পাওয়া উচিত।"
+
+#: contrib/admin/templates/registration/password_change_form.html:12
+msgid ""
+"Please enter your old password, for security's sake, and then enter your new "
+"password twice so we can verify you typed it in correctly."
+msgstr ""
+"দয়া করে আপনার পুরনো পাসওয়ার্ড ঢোকান, নিরাপত্তার জন্য, এবংএর জন্য তারপর আপনার নতুন "
+"পাসওয়ার্ড দুবার ঢোকান যাতে আমরা সঠিকভাবেতে তার বৈধতা পরীক্ষণ করতে পারি।"
+
+#: contrib/admin/templates/registration/password_change_form.html:17
+msgid "Old password:"
+msgstr "পুরনো পাসওয়ার্ড:"
+
+#: contrib/admin/templates/registration/password_change_form.html:19
+msgid "New password:"
+msgstr "নতুন পাসওয়ার্ড:"
+
+#: contrib/admin/templates/registration/password_change_form.html:21
+msgid "Confirm password:"
+msgstr "পাসওয়ার্ড দৃঢ়তরভাবে প্রতিপন্ন করুন:"
+
+#: contrib/admin/templates/registration/password_change_form.html:23
+msgid "Change my password"
+msgstr "আমার পাসওয়ার্ড পরিবর্তন করুন"
+
+#: contrib/admin/templates/registration/password_reset_email.html:2
+msgid "You're receiving this e-mail because you requested a password reset"
+msgstr "আপনি এই ই-মেলটি পাচ্ছেন কারণ আপনি একটি পাসওয়ার্ড রিসেট অনুরোধ করেছেন"
+
+#: contrib/admin/templates/registration/password_reset_email.html:3
+#, python-format
+msgid "for your user account at %(site_name)s"
+msgstr "%(site_name)s আপনার ব্যবহারকারী অ্যাকাউন্টের জন্য"
+
+#: contrib/admin/templates/registration/password_reset_email.html:5
+#, python-format
+msgid "Your new password is: %(new_password)s"
+msgstr "আপনার নতুন পাসওয়ার্ড: %(new_password)s"
+
+#: contrib/admin/templates/registration/password_reset_email.html:7
+msgid "Feel free to change this password by going to this page:"
+msgstr "এই পাতাটিতে গিয়ে এই পাসওয়ার্ডটি পরিবর্তন করতে মুক্ত অনুভব করুন:"
+
+#: contrib/admin/templates/registration/password_reset_email.html:11
+msgid "Your username, in case you've forgotten:"
+msgstr "আপনার ব্যবহারকারীর নাম, যদি আপনি ভুলে গিয়ে থাকেন:"
+
+#: contrib/admin/templates/registration/password_reset_email.html:13
+msgid "Thanks for using our site!"
+msgstr "আমাদের স্থান ব্যবহার করার জন্য ধন্যবাদ!"
+
+#: contrib/admin/templates/registration/password_reset_email.html:15
+#, python-format
+msgid "The %(site_name)s team"
+msgstr "%(site_name)s দল"
+
+#: utils/dates.py:6
+msgid "Monday"
+msgstr "সোমবার"
+
+#: utils/dates.py:6
+msgid "Tuesday"
+msgstr "মঙ্গলবার"
+
+#: utils/dates.py:6
+msgid "Wednesday"
+msgstr "বুধবার"
+
+#: utils/dates.py:6
+msgid "Thursday"
+msgstr "বৃহস্পতিবার"
+
+#: utils/dates.py:6
+msgid "Friday"
+msgstr "শুক্রবার"
+
+#: utils/dates.py:7
+msgid "Saturday"
+msgstr "শনিবার"
+
+#: utils/dates.py:7
+msgid "Sunday"
+msgstr "রবিবার"
+
+#: utils/dates.py:14
+msgid "January"
+msgstr "জানুয়ারী"
+
+#: utils/dates.py:14
+msgid "February"
+msgstr "ফেব্রুয়ারী"
+
+#: utils/dates.py:14 utils/dates.py:27
+msgid "March"
+msgstr "মার্চ"
+
+#: utils/dates.py:14 utils/dates.py:27
+msgid "April"
+msgstr "এপ্রিল"
+
+#: utils/dates.py:14 utils/dates.py:27
+msgid "May"
+msgstr "মে"
+
+#: utils/dates.py:14 utils/dates.py:27
+msgid "June"
+msgstr "জুন"
+
+#: utils/dates.py:15 utils/dates.py:27
+msgid "July"
+msgstr "জুলাই"
+
+#: utils/dates.py:15
+msgid "August"
+msgstr "অগাস্ট"
+
+#: utils/dates.py:15
+msgid "September"
+msgstr "সেপ্টেম্বর"
+
+#: utils/dates.py:15
+msgid "October"
+msgstr "অক্টোবর"
+
+#: utils/dates.py:15
+msgid "November"
+msgstr "নভেম্বর"
+
+#: utils/dates.py:16
+msgid "December"
+msgstr "ডিসেম্বর"
+
+#: utils/dates.py:27
+msgid "Jan."
+msgstr "জানু."
+
+#: utils/dates.py:27
+msgid "Feb."
+msgstr "ফেব্রু"
+
+#: utils/dates.py:28
+msgid "Aug."
+msgstr "অগা."
+
+#: utils/dates.py:28
+msgid "Sept."
+msgstr "সেপ্টে."
+
+#: utils/dates.py:28
+msgid "Oct."
+msgstr "অক্টো."
+
+#: utils/dates.py:28
+msgid "Nov."
+msgstr "নভে."
+
+#: utils/dates.py:28
+msgid "Dec."
+msgstr "ডিসে."
+
+#: models/core.py:7
+msgid "domain name"
+msgstr "ক্ষেত্র নাম"
+
+#: models/core.py:8
+msgid "display name"
+msgstr "প্রদর্শিত নাম"
+
+#: models/core.py:10
+msgid "site"
+msgstr "স্থান"
+
+#: models/core.py:11
+msgid "sites"
+msgstr "স্থান"
+
+#: models/core.py:28
+msgid "label"
+msgstr "লেবেল"
+
+#: models/core.py:29 models/core.py:40 models/auth.py:6 models/auth.py:19
+msgid "name"
+msgstr "নাম"
+
+#: models/core.py:31
+msgid "package"
+msgstr "প্যাকেজ"
+
+#: models/core.py:32
+msgid "packages"
+msgstr "প্যাকেজ"
+
+#: models/core.py:42
+msgid "python module name"
+msgstr "পাইথন মডিউলের নাম"
+
+#: models/core.py:44
+msgid "content type"
+msgstr "অভ্যন্তরস্থ বস্তু ধরন"
+
+#: models/core.py:45
+msgid "content types"
+msgstr "অভ্যন্তরস্থ বস্তু ধরন"
+
+#: models/core.py:68
+msgid "redirect from"
+msgstr "রিডাইরেক্ট করা"
+
+#: models/core.py:69
+msgid ""
+"This should be an absolute path, excluding the domain name. Example: '/"
+"events/search/'."
+msgstr ""
+"এইটি একটি পরম পাথ হওয়া উচিত, ক্ষেত্র নাম বাদ দিয়ে। উদাহরণ: '/events/search / '।"
+
+#: models/core.py:70
+msgid "redirect to"
+msgstr "রিডাইরেক্ট কর"
+
+#: models/core.py:71
+msgid ""
+"This can be either an absolute path (as above) or a full URL starting with "
+"'http://'."
+msgstr ""
+"এইটি হয় একটি পরম পাথ হতে পারে  (যেমন উপরে) অথবা 'http:// এর সঙ্গে শুরু হওয়া "
+"একটি পূর্ণ ইউ.আর.এল ।"
+
+#: models/core.py:73
+msgid "redirect"
+msgstr "রিডাইরেক্ট"
+
+#: models/core.py:74
+msgid "redirects"
+msgstr "রিডাইরেক্ট করে"
+
+#: models/core.py:87
+msgid "URL"
+msgstr "ইউ.আর.এল"
+
+#: models/core.py:88
+msgid ""
+"Example: '/about/contact/'. Make sure to have leading and trailing slashes."
+msgstr ""
+"উদাহরণ: '/about/contact / '। প্রধান এবং অনুসরণ করা স্ল্যাশ যেন নিশ্চিত ভাবে থাকে।"
+
+#: models/core.py:89
+msgid "title"
+msgstr "শিরোনাম"
+
+#: models/core.py:90
+msgid "content"
+msgstr "অভ্যন্তরস্থ বস্তু"
+
+#: models/core.py:91
+msgid "enable comments"
+msgstr "মন্তব্য সক্রিয় করুন"
+
+#: models/core.py:92
+msgid "template name"
+msgstr "ছাঁদ নাম"
+
+#: models/core.py:93
+msgid ""
+"Example: 'flatfiles/contact_page'. If this isn't provided, the system will "
+"use 'flatfiles/default'."
+msgstr ""
+"উদাহরণ: 'flatfiles/contact_page '। যদি এইটি দেওয়া না থাকে তাহলে সিস্টেম "
+"'flatfiles/default ব্যবহার করবে।"
+
+#: models/core.py:94
+msgid "registration required"
+msgstr "নিবন্ধন প্রয়োজনীয়"
+
+#: models/core.py:94
+msgid "If this is checked, only logged-in users will be able to view the page."
+msgstr ""
+"যদি এইটি টিক্ করা থাকে তাহলে শুধুমাত্র প্রবেশ করা ব্যবহারকারী পাতা দেখতে সক্ষম হবে।"
+
+#: models/core.py:98
+msgid "flat page"
+msgstr "চ্যাপ্টা পাতা"
+
+#: models/core.py:99
+msgid "flat pages"
+msgstr "চ্যাপ্টা পাতাগুলো"
+
+#: models/core.py:117
+msgid "session key"
+msgstr "অধিবেশন চাবি"
+
+#: models/core.py:118
+msgid "session data"
+msgstr "অধিবেশন তথ্য"
+
+#: models/core.py:119
+msgid "expire date"
+msgstr "শেষ তারিখ"
+
+#: models/core.py:121
+msgid "session"
+msgstr "অধিবেশন"
+
+#: models/core.py:122
+msgid "sessions"
+msgstr "সেশন"
+
+#: models/auth.py:8
+msgid "codename"
+msgstr "ছদ্বনাম"
+
+#: models/auth.py:10
+msgid "Permission"
+msgstr "অনুমতি"
+
+#: models/auth.py:11 models/auth.py:58
+msgid "Permissions"
+msgstr "অনুমতি"
+
+#: models/auth.py:22
+msgid "Group"
+msgstr "গ্রুপ"
+
+#: models/auth.py:23 models/auth.py:60
+msgid "Groups"
+msgstr "দল"
+
+#: models/auth.py:33
+msgid "username"
+msgstr "ব্যবহারকারীর নাম"
+
+#: models/auth.py:34
+msgid "first name"
+msgstr "প্রথম নাম"
+
+#: models/auth.py:35
+msgid "last name"
+msgstr "শেষ নাম"
+
+#: models/auth.py:36
+msgid "e-mail address"
+msgstr "ই-মেল ঠিকানা"
+
+#: models/auth.py:37
+msgid "password"
+msgstr "পাসওয়ার্ড"
+
+#: models/auth.py:37
+msgid "Use an MD5 hash -- not the raw password."
+msgstr "একটি MD5 হ্যাশ ব্যাবহার করুন -- পরিস্কার পাসওয়ার্ড না যেন।"
+
+#: models/auth.py:38
+msgid "staff status"
+msgstr " অবস্থা"
+
+#: models/auth.py:38
+msgid "Designates whether the user can log into this admin site."
+msgstr "নিশ্চয় করে যে ব্যবহারকারী এই অ্যাডমিন স্থানে প্রবেশ করতে পারে কিনা।"
+
+#: models/auth.py:39
+msgid "active"
+msgstr "সক্রিয়"
+
+#: models/auth.py:40
+msgid "superuser status"
+msgstr "সুপারইউজার অবস্থা"
+
+#: models/auth.py:41
+msgid "last login"
+msgstr "শেষ প্রবেশ"
+
+#: models/auth.py:42
+msgid "date joined"
+msgstr "যোগাদান করার তারিখ "
+
+#: models/auth.py:44
+msgid ""
+"In addition to the permissions manually assigned, this user will also get "
+"all permissions granted to each group he/she is in."
+msgstr ""
+"নিজ হাতে বরাদ্দকৃতে অনুমতি ছাড়া এই ব্যবহারকারীটি যে সব গ্রুপে আছে তার অনুমতিও পাবে।"
+
+#: models/auth.py:48
+msgid "Users"
+msgstr "ব্যবহারকারী"
+
+#: models/auth.py:57
+msgid "Personal info"
+msgstr "ব্যক্তিগত তথ্য"
+
+#: models/auth.py:59
+msgid "Important dates"
+msgstr "গুরুত্বপূর্ণ তারিখ"
+
+#: models/auth.py:182
+msgid "Message"
+msgstr "বার্তা"
+
+#: conf/global_settings.py:36
+msgid "Bengali"
+msgstr ""
+
+#: conf/global_settings.py:37
+msgid "Czech"
+msgstr "চেক"
+
+#: conf/global_settings.py:38
+msgid "Welsh"
+msgstr "ওয়েল্শ"
+
+#: conf/global_settings.py:39
+msgid "German"
+msgstr "জার্মান"
+
+#: conf/global_settings.py:40
+msgid "English"
+msgstr "ইংরেজী"
+
+#: conf/global_settings.py:41
+msgid "Spanish"
+msgstr "স্পেনিয়"
+
+#: conf/global_settings.py:42
+msgid "French"
+msgstr "ফরাসী"
+
+#: conf/global_settings.py:43
+msgid "Galician"
+msgstr "গ্যালিসিয়"
+
+#: conf/global_settings.py:44
+msgid "Italian"
+msgstr "ইতালিয়"
+
+#: conf/global_settings.py:45
+msgid "Norwegian"
+msgstr "নরওয়েজিয়"
+
+#: conf/global_settings.py:46
+msgid "Brazilian"
+msgstr "ব্রাজিলীয়"
+
+#: conf/global_settings.py:47
+msgid "Romanian"
+msgstr "রোমানীয়"
+
+#: conf/global_settings.py:48
+msgid "Russian"
+msgstr "রুশ"
+
+#: conf/global_settings.py:49
+msgid "Slovak"
+msgstr "স্লোভাক"
+
+#: conf/global_settings.py:50
+msgid "Serbian"
+msgstr "সার্বিয়ান"
+
+#: conf/global_settings.py:51
+msgid "Simplified Chinese"
+msgstr "সরলীকৃত চীনা"
+
+#: core/validators.py:59
+msgid "This value must contain only letters, numbers and underscores."
+msgstr "এই মানটি শুধু মাত্র অক্ষর, অংক, এবং আন্ডারস্কোর (_) হতে পারবে।"
+
+#: core/validators.py:63
+msgid "This value must contain only letters, numbers, underscores and slashes."
+msgstr "এই মানটি শুধু মাত্র অক্ষর, অংক, আন্ডারস্কোর (_) এবং স্ল্যাশ হতে পারবে।"
+
+#: core/validators.py:71
+msgid "Uppercase letters are not allowed here."
+msgstr "বড় হাতের অক্ষর এখানে ঢোকাতে পারবেন না।"
+
+#: core/validators.py:75
+msgid "Lowercase letters are not allowed here."
+msgstr "ছোটহাতের অক্ষর এখানে ঢোকাতে পারবেন না।"
+
+#: core/validators.py:82
+msgid "Enter only digits separated by commas."
+msgstr "কমা দ্বারা আলাদা করে শুধু মাত্র অংক ঢোকান।"
+
+#: core/validators.py:94
+msgid "Enter valid e-mail addresses separated by commas."
+msgstr "কমা দ্বারা আলাদা করে বৈধ ই-মেল ঠিকানা ঢোকান।"
+
+#: core/validators.py:98
+msgid "Please enter a valid IP address."
+msgstr "দয়া করে একটি বৈধ IP ঠিকানা ঢোকান।"
+
+#: core/validators.py:102
+msgid "Empty values are not allowed here."
+msgstr "ফাঁকা মান এখানে ঢোকাতে পারবেন না।"
+
+#: core/validators.py:106
+msgid "Non-numeric characters aren't allowed here."
+msgstr "অংক বিহীন অক্ষর এখানে ঢোকাতে পারবেন না।"
+
+#: core/validators.py:110
+msgid "This value can't be comprised solely of digits."
+msgstr "এই মানটি শুধু মাত্র অংকের দ্বারা গঠিত  হতে পারে না।"
+
+#: core/validators.py:115
+msgid "Enter a whole number."
+msgstr "একটি গোটা সংখ্যা ঢোকান।"
+
+#: core/validators.py:119
+msgid "Only alphabetical characters are allowed here."
+msgstr "এখানে শুধু মাত্র অক্ষর ঢোকাতে পারবেন ।"
+
+#: core/validators.py:123
+msgid "Enter a valid date in YYYY-MM-DD format."
+msgstr "YYYY-MM-DD ফরম্যাটে একটি বৈধ তারিখ ঢোকান।"
+
+#: core/validators.py:127
+msgid "Enter a valid time in HH:MM format."
+msgstr "HH:MM ফরম্যাটে একটি বৈধ সময় ঢোকান।"
+
+#: core/validators.py:131
+msgid "Enter a valid date/time in YYYY-MM-DD HH:MM format."
+msgstr "YYYY-MM-DD.HH:MM ফরম্যাটে একটি বৈধ তারিখ/সময় ঢোকান।"
+
+#: core/validators.py:135
+msgid "Enter a valid e-mail address."
+msgstr "একটি বৈধ ই-মেল ঠিকানা ঢোকান।"
+
+#: core/validators.py:147
+msgid ""
+"Upload a valid image. The file you uploaded was either not an image or a "
+"corrupted image."
+msgstr ""
+"একটি বৈধ চিত্র আপলোড করুন। যে ফাইল আপনি আপলোড করলেন তা হয় একটি চিত্র নয় অথবা "
+"একটি খারাপ চিত্র।"
+
+#: core/validators.py:154
+#, python-format
+msgid "The URL %s does not point to a valid image."
+msgstr "%s ইউ.আর.এল-এ একটি বৈধ চিত্র নেই।"
+
+#: core/validators.py:158
+#, python-format
+msgid "Phone numbers must be in XXX-XXX-XXXX format. \"%s\" is invalid."
+msgstr "ফোন নম্বর XXX-XXX-XXXX ফরম্যাটে অবশ্যই হতে হবে। \"%s\" অবৈধ।"
+
+#: core/validators.py:166
+#, python-format
+msgid "The URL %s does not point to a valid QuickTime video."
+msgstr "%s ইউ.আর.এল-এ একটি বৈধ QuickTime ভিডিও পাওয়া গেল না।"
+
+#: core/validators.py:170
+msgid "A valid URL is required."
+msgstr "একটি বৈধ ইউ.আর.এল জরুরি।"
+
+#: core/validators.py:184
+#, python-format
+msgid ""
+"Valid HTML is required. Specific errors are:\n"
+"%s"
+msgstr ""
+"বৈধ এইচটিএমএল প্রয়োজনীয়। ত্রুটিগুল হল:\n"
+"%s"
+
+#: core/validators.py:191
+#, python-format
+msgid "Badly formed XML: %s"
+msgstr "খারাপভাবে গঠিত এক্সএমএল: %s"
+
+#: core/validators.py:201
+#, python-format
+msgid "Invalid URL: %s"
+msgstr "অবৈধ ইউ.আর.এল: %s"
+
+#: core/validators.py:203
+#, python-format
+msgid "The URL %s is a broken link."
+msgstr "ইউ.আর.এল %s একটি ভাঙা সংযোগ।"
+
+#: core/validators.py:209
+msgid "Enter a valid U.S. state abbreviation."
+msgstr "একটি বৈধ U S. রাজ্য abbreviation ঢোকান।"
+
+#: core/validators.py:224
+#, fuzzy, python-format
+msgid "Watch your mouth! The word %s is not allowed here."
+msgid_plural "Watch your mouth! The words %s are not allowed here."
+msgstr[0] "মুখ সামলে! %s এখানে ব্যাবহার করতে পারবেন না।"
+msgstr[1] "মুখ সামলে! %s এখানে ব্যাবহার করতে পারবেন না।"
+
+#: core/validators.py:231
+#, python-format
+msgid "This field must match the '%s' field."
+msgstr "এই ক্ষেত্রটি '%s' ক্ষেত্রের সঙ্গে অবশ্যই মিলতে হবে।"
+
+#: core/validators.py:250
+msgid "Please enter something for at least one field."
+msgstr "দয়া করে অন্তত এক ক্ষেত্রেতে কিছু জিনিষ ঢোকান।"
+
+#: core/validators.py:259 core/validators.py:270
+msgid "Please enter both fields or leave them both empty."
+msgstr "দয়া করে উভয় ক্ষেত্রে ঢোকান অথবা তাদেরকে উভয় ফাঁকা ছেড়ে চলে যান।"
+
+#: core/validators.py:277
+#, python-format
+msgid "This field must be given if %(field)s is %(value)s"
+msgstr "এই ক্ষেত্রেটি অবশ্যই দেওয়া হবে যদি %(field)s %(value)s হয়"
+
+#: core/validators.py:289
+#, python-format
+msgid "This field must be given if %(field)s is not %(value)s"
+msgstr "এই ক্ষেত্রেটি অবশ্যই দেওয়া হবে যদি %(field)s %(value)s না হয়"
+
+#: core/validators.py:308
+msgid "Duplicate values are not allowed."
+msgstr "নকল মান অনুমতি দেওয়া হল না।"
+
+#: core/validators.py:331
+#, python-format
+msgid "This value must be a power of %s."
+msgstr "এই মানটি %sএর একটি গুন অবশ্যই হতে হবে।"
+
+#: core/validators.py:342
+msgid "Please enter a valid decimal number."
+msgstr "দয়া করে একটি বৈধ দশমিক সংখ্যা ঢোকান।"
+
+#: core/validators.py:344
+#, fuzzy, python-format
+msgid "Please enter a valid decimal number with at most %s total digit."
+msgid_plural ""
+"Please enter a valid decimal number with at most %s total digits."
+msgstr[0] "দয়া করে একটি বৈধ দশমিক সংখ্যা ঢোকান যার অক্ষরের সংখ্যা %s থেকে কম হবে।"
+msgstr[1] "দয়া করে একটি বৈধ দশমিক সংখ্যা ঢোকান যার অক্ষরের সংখ্যা %s থেকে কম হবে।"
+
+#: core/validators.py:347
+#, fuzzy, python-format
+msgid "Please enter a valid decimal number with at most %s decimal place."
+msgid_plural ""
+"Please enter a valid decimal number with at most %s decimal places."
+msgstr[0] "দয়া করে একটি বৈধ দশমিক সংখ্যা ঢোকান যার দশমিক স্থান %s থেকে কম হবে।"
+msgstr[1] "দয়া করে একটি বৈধ দশমিক সংখ্যা ঢোকান যার দশমিক স্থান %s থেকে কম হবে।"
+
+#: core/validators.py:357
+#, python-format
+msgid "Make sure your uploaded file is at least %s bytes big."
+msgstr "আাপনার আপলোড করা ফাইল যেন অন্তত %s বাইট বড় হয় তা নিশ্চিত করুন।"
+
+#: core/validators.py:358
+#, python-format
+msgid "Make sure your uploaded file is at most %s bytes big."
+msgstr "আাপনার আপলোড করা ফাইল যেন %s বাইটের থেকে বড় না হয় তা নিশ্চিত করুন।"
+
+#: core/validators.py:371
+msgid "The format for this field is wrong."
+msgstr "এই ক্ষেত্রের জন্য ফরম্যাটটি ভূল।"
+
+#: core/validators.py:386
+msgid "This field is invalid."
+msgstr "এই ক্ষেত্রেটি অবৈধ।"
+
+#: core/validators.py:421
+#, python-format
+msgid "Could not retrieve anything from %s."
+msgstr "%s থেকে কোন কিছু গ্রহন করতে পারলাম না।"
+
+#: core/validators.py:424
+#, python-format
+msgid ""
+"The URL %(url)s returned the invalid Content-Type header '%(contenttype)s'."
+msgstr ""
+"ইউ.আর.এল %(url)s অবৈধ Content-Type শিরোনাম নিয়ে '%(contenttype)s ফিরে আসল।"
+
+#: core/validators.py:457
+#, python-format
+msgid ""
+"Please close the unclosed %(tag)s tag from line %(line)s. (Line starts with "
+"\"%(start)s\".)"
+msgstr ""
+"দয়া করে লাইন %(line)s থেকে খোলা %(tag)s বন্ধ করুন। (\"%(start)s\"এর সঙ্গে লাইন "
+"আরম্ভ।)"
+
+#: core/validators.py:461
+#, python-format
+msgid ""
+"Some text starting on line %(line)s is not allowed in that context. (Line "
+"starts with \"%(start)s\".)"
+msgstr ""
+"লাইন %(line)s এই প্রসঙ্গে কিছু শব্দ লেখার অনুমতি দেওয়া গেল না। (\"%(start)s\"এর "
+"সঙ্গে লাইন আরম্ভ।)"
+
+#: core/validators.py:466
+#, python-format
+msgid ""
+"\"%(attr)s\" on line %(line)s is an invalid attribute. (Line starts with \"%"
+"(start)s\".)"
+msgstr ""
+"লাইন %(line)s\"%(attr)s\"একটি অবৈধ বৈশিষ্ট্য। (\"%(start)s\"এর সঙ্গে লাইন আরম্ভ।)"
+
+#: core/validators.py:471
+#, python-format
+msgid ""
+"\"<%(tag)s>\" on line %(line)s is an invalid tag. (Line starts with \"%"
+"(start)s\".)"
+msgstr ""
+" %(line)s লাইনে \"<%(tag)s>\" একটি অবৈধ ট্যাগ। (\"%(start)s\"এর সঙ্গে লাইন "
+"আরম্ভ।)"
+
+#: core/validators.py:475
+#, python-format
+msgid ""
+"A tag on line %(line)s is missing one or more required attributes. (Line "
+"starts with \"%(start)s\".)"
+msgstr ""
+"লাইন %(line)s একটি ট্যাগে এক অথবা আরও বেশি প্রয়োজনীয় বিশিষ্ট্যাবলী নেই। (\"%"
+"(start)s\"এর সঙ্গে লাইন আরম্ভ।)"
+
+#: core/validators.py:480
+#, python-format
+msgid ""
+"The \"%(attr)s\" attribute on line %(line)s has an invalid value. (Line "
+"starts with \"%(start)s\".)"
+msgstr ""
+"\"%(attr)s\"বৈশিষ্ট্যয় লাইন %(line)s একটি অবৈধ মান আছে । (\"%(start)s\"এর সঙ্গে "
+"লাইন আরম্ভ।)"
+
+#: core/meta/fields.py:111
+msgid " Separate multiple IDs with commas."
+msgstr "একাধিক আই.ডি.কমার দ্বারা আলাদা করুন।"
+
+#: core/meta/fields.py:114
+msgid ""
+" Hold down \"Control\", or \"Command\" on a Mac, to select more than one."
+msgstr ""
+"একের চেয়ে বেশি নির্বাচন করতে \"Control\" অথবা ম্যাক-এ \"Command\" চেপে ধরে "
+"রাখুন।"
