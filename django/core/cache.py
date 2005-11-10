@@ -303,7 +303,7 @@ class _FileCache(_SimpleCache):
                 os.remove(fname)
             else:
                 return pickle.load(f)
-        except (IOError, pickle.PickleError):
+        except (IOError, OSError, pickle.PickleError):
             pass
         return default
 
