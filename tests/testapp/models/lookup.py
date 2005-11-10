@@ -18,18 +18,24 @@ class Article(meta.Model):
 API_TESTS = """
 # Create a couple of Articles.
 >>> from datetime import datetime
->>> a1 = articles.Article(id=None, headline='Article 1', pub_date=datetime(2005, 7, 26))
+>>> a1 = articles.Article(headline='Article 1', pub_date=datetime(2005, 7, 26))
 >>> a1.save()
->>> a2 = articles.Article(id=None, headline='Article 2', pub_date=datetime(2005, 7, 27))
+>>> a2 = articles.Article(headline='Article 2', pub_date=datetime(2005, 7, 27))
 >>> a2.save()
->>> a3 = articles.Article(id=None, headline='Article 3', pub_date=datetime(2005, 7, 27))
+>>> a3 = articles.Article(headline='Article 3', pub_date=datetime(2005, 7, 27))
 >>> a3.save()
->>> a4 = articles.Article(id=None, headline='Article 4', pub_date=datetime(2005, 7, 28))
+>>> a4 = articles.Article(headline='Article 4', pub_date=datetime(2005, 7, 28))
 >>> a4.save()
+>>> a5 = articles.Article(headline='Article 5', pub_date=datetime(2005, 8, 1, 9, 0))
+>>> a5.save()
+>>> a6 = articles.Article(headline='Article 6', pub_date=datetime(2005, 8, 1, 8, 0))
+>>> a6.save()
 
 # get_iterator() is just like get_list(), but it's a generator.
 >>> for a in articles.get_iterator():
 ...     print a.headline
+Article 5
+Article 6
 Article 4
 Article 2
 Article 3
@@ -42,7 +48,7 @@ Article 4
 
 # get_count() returns the number of objects matching search criteria.
 >>> articles.get_count()
-4L
+6L
 >>> articles.get_count(pub_date__exact=datetime(2005, 7, 27))
 2L
 >>> articles.get_count(headline__startswith='Blah blah')
@@ -61,10 +67,10 @@ Article 4
 # dictionaries instead of object instances -- and you can specify which fields
 # you want to retrieve.
 >>> articles.get_values(fields=['headline'])
-[{'headline': 'Article 4'}, {'headline': 'Article 2'}, {'headline': 'Article 3'}, {'headline': 'Article 1'}]
+[{'headline': 'Article 5'}, {'headline': 'Article 6'}, {'headline': 'Article 4'}, {'headline': 'Article 2'}, {'headline': 'Article 3'}, {'headline': 'Article 1'}]
 >>> articles.get_values(pub_date__exact=datetime(2005, 7, 27), fields=['id'])
 [{'id': 2}, {'id': 3}]
->>> articles.get_values(fields=['id', 'headline']) == [{'id': 4, 'headline': 'Article 4'}, {'id': 2, 'headline': 'Article 2'}, {'id': 3, 'headline': 'Article 3'}, {'id': 1, 'headline': 'Article 1'}]
+>>> articles.get_values(fields=['id', 'headline']) == [{'id': 5, 'headline': 'Article 5'}, {'id': 6, 'headline': 'Article 6'}, {'id': 4, 'headline': 'Article 4'}, {'id': 2, 'headline': 'Article 2'}, {'id': 3, 'headline': 'Article 3'}, {'id': 1, 'headline': 'Article 1'}]
 True
 
 # get_values_iterator() is just like get_values(), but it's a generator.
@@ -72,6 +78,8 @@ True
 ...     i = d.items()
 ...     i.sort()
 ...     i
+[('headline', 'Article 5'), ('id', 5)]
+[('headline', 'Article 6'), ('id', 6)]
 [('headline', 'Article 4'), ('id', 4)]
 [('headline', 'Article 2'), ('id', 2)]
 [('headline', 'Article 3'), ('id', 3)]
@@ -84,4 +92,15 @@ Article 4
 >>> a2.get_previous_by_pub_date()
 Article 1
 
+# get_next_by_FOO() and get_previous_by_FOO() take the time into account.
+>>> a4.get_next_by_pub_date()
+Article 6
+>>> a5.get_next_by_pub_date()
+Traceback (most recent call last):
+    ...
+ArticleDoesNotExist: Article does not exist for ...
+>>> a6.get_previous_by_pub_date()
+Article 4
+>>> a5.get_previous_by_pub_date()
+Article 6
 """
