@@ -474,3 +474,8 @@ messages are made available in the `template context`_ as the template variable
 
 Note that ``DjangoContext`` calls ``get_and_delete_messages`` behind the
 scenes, so any messages will be deleted even if you don't display them.
+
+Finally, note that this messages framework only works with users in the user
+database. To send messages to anonymous users, use the `session framework`_.
+
+.. _session framework: http://www.djangoproject.com/documentation/sessions/

@@ -336,7 +336,7 @@ class _FileCache(_SimpleCache):
         return os.path.exists(self._key_to_file(key))
 
     def _cull(self, filelist):
-        if self.cull_frequency == 0:
+        if self._cull_frequency == 0:
             doomed = filelist
         else:
             doomed = [k for (i, k) in enumerate(filelist) if i % self._cull_frequency == 0]
