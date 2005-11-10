@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2005-11-09 04:26-0600\n"
+"POT-Creation-Date: 2005-11-10 05:53-0600\n"
 "PO-Revision-Date: 2005-10-04 20:59GMT\n"
 "Last-Translator: Ricardo Javier Cárdenes Medina <ricardo.cardenes@gmail."
 "com>\n"
@@ -653,62 +653,66 @@ msgid "Message"
 msgstr ""
 
 #: conf/global_settings.py:36
-msgid "Czech"
+msgid "Bengali"
 msgstr ""
 
 #: conf/global_settings.py:37
-msgid "Welsh"
+msgid "Czech"
 msgstr ""
 
 #: conf/global_settings.py:38
-msgid "German"
+msgid "Welsh"
 msgstr ""
 
 #: conf/global_settings.py:39
-msgid "English"
+msgid "German"
 msgstr ""
 
 #: conf/global_settings.py:40
-msgid "Spanish"
+msgid "English"
 msgstr ""
 
 #: conf/global_settings.py:41
-msgid "French"
+msgid "Spanish"
 msgstr ""
 
 #: conf/global_settings.py:42
-msgid "Galician"
+msgid "French"
 msgstr ""
 
 #: conf/global_settings.py:43
-msgid "Italian"
+msgid "Galician"
 msgstr ""
 
 #: conf/global_settings.py:44
-msgid "Norwegian"
+msgid "Italian"
 msgstr ""
 
 #: conf/global_settings.py:45
-msgid "Brazilian"
+msgid "Norwegian"
 msgstr ""
 
 #: conf/global_settings.py:46
-msgid "Romanian"
+msgid "Brazilian"
 msgstr ""
 
 #: conf/global_settings.py:47
-msgid "Russian"
+msgid "Romanian"
 msgstr ""
 
 #: conf/global_settings.py:48
-msgid "Slovak"
+msgid "Russian"
 msgstr ""
 
 #: conf/global_settings.py:49
-msgid "Serbian"
+msgid "Slovak"
 msgstr ""
 
 #: conf/global_settings.py:50
+msgid "Serbian"
+msgstr ""
+
+#: conf/global_settings.py:51
 msgid "Simplified Chinese"
 msgstr ""
 
@@ -959,11 +963,11 @@ msgid ""
 "starts with \"%(start)s\".)"
 msgstr ""
 
-#: core/meta/fields.py:95
+#: core/meta/fields.py:111
 msgid " Separate multiple IDs with commas."
 msgstr ""
 
-#: core/meta/fields.py:98
+#: core/meta/fields.py:114
 msgid ""
 " Hold down \"Control\", or \"Command\" on a Mac, to select more than one."
 msgstr ""

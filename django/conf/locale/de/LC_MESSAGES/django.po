@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2005-11-09 04:27-0600\n"
+"POT-Creation-Date: 2005-11-10 05:53-0600\n"
 "PO-Revision-Date: 2005-11-06 13:54+0100\n"
 "Last-Translator: Lukas Kolbe <lucky@knup.de>\n"
 "Language-Team: \n"
@@ -658,62 +658,66 @@ msgid "Message"
 msgstr "Mitteilung"
 
 #: conf/global_settings.py:36
+msgid "Bengali"
+msgstr "Bengali"
+
+#: conf/global_settings.py:37
 msgid "Czech"
 msgstr "Tschechisch"
 
-#: conf/global_settings.py:37
+#: conf/global_settings.py:38
 msgid "Welsh"
 msgstr "Walisisch"
 
-#: conf/global_settings.py:38
+#: conf/global_settings.py:39
 msgid "German"
 msgstr "Deutsch"
 
-#: conf/global_settings.py:39
+#: conf/global_settings.py:40
 msgid "English"
 msgstr "Englisch"
 
-#: conf/global_settings.py:40
+#: conf/global_settings.py:41
 msgid "Spanish"
 msgstr "Spanisch"
 
-#: conf/global_settings.py:41
+#: conf/global_settings.py:42
 msgid "French"
 msgstr "Französisch"
 
-#: conf/global_settings.py:42
+#: conf/global_settings.py:43
 msgid "Galician"
 msgstr "Galicisch"
 
-#: conf/global_settings.py:43
+#: conf/global_settings.py:44
 msgid "Italian"
 msgstr "Italienisch"
 
-#: conf/global_settings.py:44
+#: conf/global_settings.py:45
 msgid "Norwegian"
 msgstr "Norwegisch"
 
-#: conf/global_settings.py:45
+#: conf/global_settings.py:46
 msgid "Brazilian"
 msgstr "Brasilianisch"
 
-#: conf/global_settings.py:46
+#: conf/global_settings.py:47
 msgid "Romanian"
 msgstr "Rumänisch"
 
-#: conf/global_settings.py:47
+#: conf/global_settings.py:48
 msgid "Russian"
 msgstr "Russisch"
 
-#: conf/global_settings.py:48
+#: conf/global_settings.py:49
 msgid "Slovak"
 msgstr "Slovakisch"
 
-#: conf/global_settings.py:49
+#: conf/global_settings.py:50
 msgid "Serbian"
 msgstr "Serbisch"
 
-#: conf/global_settings.py:50
+#: conf/global_settings.py:51
 msgid "Simplified Chinese"
 msgstr "vereinfachtes Chinesisch"
 
@@ -990,11 +994,11 @@ msgstr ""
 "Das Attribut %(attr)s in Zeile %(line)s hat einen ungültigen Wert. Die Zeile "
 "beginnt mit \"%(start)s\"."
 
-#: core/meta/fields.py:95
+#: core/meta/fields.py:111
 msgid " Separate multiple IDs with commas."
 msgstr "Mehrere IDs können mit Komma getrennt werden."
 
-#: core/meta/fields.py:98
+#: core/meta/fields.py:114
 msgid ""
 " Hold down \"Control\", or \"Command\" on a Mac, to select more than one."
 msgstr ""

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django Czech translation\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2005-11-09 04:26-0600\n"
+"POT-Creation-Date: 2005-11-10 05:53-0600\n"
 "PO-Revision-Date: 2005-11-06 18:39+0100\n"
 "Last-Translator: Radek Svarz <translate@svarz.cz>\n"
 "Language-Team: Czech\n"
@@ -657,63 +657,67 @@ msgid "Message"
 msgstr "Zpráva"
 
 #: conf/global_settings.py:36
+msgid "Bengali"
+msgstr ""
+
+#: conf/global_settings.py:37
 msgid "Czech"
 msgstr "Česky"
 
-#: conf/global_settings.py:37
+#: conf/global_settings.py:38
 msgid "Welsh"
 msgstr ""
 
-#: conf/global_settings.py:38
+#: conf/global_settings.py:39
 msgid "German"
 msgstr "Německy"
 
-#: conf/global_settings.py:39
+#: conf/global_settings.py:40
 msgid "English"
 msgstr "Anglicky"
 
-#: conf/global_settings.py:40
+#: conf/global_settings.py:41
 msgid "Spanish"
 msgstr "Španělsky"
 
-#: conf/global_settings.py:41
+#: conf/global_settings.py:42
 msgid "French"
 msgstr "Francouzsky"
 
-#: conf/global_settings.py:42
+#: conf/global_settings.py:43
 #, fuzzy
 msgid "Galician"
 msgstr "Galicijský"
 
-#: conf/global_settings.py:43
+#: conf/global_settings.py:44
 msgid "Italian"
 msgstr "Italsky"
 
-#: conf/global_settings.py:44
+#: conf/global_settings.py:45
 msgid "Norwegian"
 msgstr "Norsky"
 
-#: conf/global_settings.py:45
+#: conf/global_settings.py:46
 msgid "Brazilian"
 msgstr "Brazilsky"
 
-#: conf/global_settings.py:46
+#: conf/global_settings.py:47
 msgid "Romanian"
 msgstr ""
 
-#: conf/global_settings.py:47
+#: conf/global_settings.py:48
 msgid "Russian"
 msgstr "Rusky"
 
-#: conf/global_settings.py:48
+#: conf/global_settings.py:49
 msgid "Slovak"
 msgstr ""
 
-#: conf/global_settings.py:49
+#: conf/global_settings.py:50
 msgid "Serbian"
 msgstr "Srbsky"
 
-#: conf/global_settings.py:50
+#: conf/global_settings.py:51
 msgid "Simplified Chinese"
 msgstr "Jednoduchá čínština"
 
@@ -987,11 +991,11 @@ msgstr ""
 "Atribut \"%(attr)s\" na řádce %(line)s má neplatnou hodnotu. (Řádka začína s "
 "\"%(start)s\".)"
 
-#: core/meta/fields.py:95
+#: core/meta/fields.py:111
 msgid " Separate multiple IDs with commas."
 msgstr "Oddělte více identifikátorů čárkami."
 
-#: core/meta/fields.py:98
+#: core/meta/fields.py:114
 msgid ""
 " Hold down \"Control\", or \"Command\" on a Mac, to select more than one."
 msgstr ""

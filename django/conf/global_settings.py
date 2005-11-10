@@ -33,6 +33,7 @@ LANGUAGE_CODE = 'en-us'
 # Languages we provide translations for, out of the box. The language name
 # should be the utf-8 encoded local name for the language.
 LANGUAGES = (
+    ('bn', _('Bengali')),
     ('cs', _('Czech')),
     ('cy', _('Welsh')),
     ('de', _('German')),

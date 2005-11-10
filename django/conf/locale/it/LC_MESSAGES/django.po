@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2005-11-09 04:27-0600\n"
+"POT-Creation-Date: 2005-11-10 05:53-0600\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -654,63 +654,67 @@ msgid "Message"
 msgstr "Messaggio"
 
 #: conf/global_settings.py:36
-msgid "Czech"
+msgid "Bengali"
 msgstr ""
 
 #: conf/global_settings.py:37
-msgid "Welsh"
+msgid "Czech"
 msgstr ""
 
 #: conf/global_settings.py:38
+msgid "Welsh"
+msgstr ""
+
+#: conf/global_settings.py:39
 msgid "German"
 msgstr "Tedesco"
 
-#: conf/global_settings.py:39
+#: conf/global_settings.py:40
 msgid "English"
 msgstr "Inglese"
 
-#: conf/global_settings.py:40
+#: conf/global_settings.py:41
 msgid "Spanish"
 msgstr "Spagnolo"
 
-#: conf/global_settings.py:41
+#: conf/global_settings.py:42
 msgid "French"
 msgstr "Francese"
 
-#: conf/global_settings.py:42
+#: conf/global_settings.py:43
 msgid "Galician"
 msgstr "Galiziano"
 
-#: conf/global_settings.py:43
+#: conf/global_settings.py:44
 msgid "Italian"
 msgstr "Italiano"
 
-#: conf/global_settings.py:44
+#: conf/global_settings.py:45
 msgid "Norwegian"
 msgstr ""
 
-#: conf/global_settings.py:45
+#: conf/global_settings.py:46
 msgid "Brazilian"
 msgstr "Brasiliano"
 
-#: conf/global_settings.py:46
+#: conf/global_settings.py:47
 msgid "Romanian"
 msgstr ""
 
-#: conf/global_settings.py:47
+#: conf/global_settings.py:48
 msgid "Russian"
 msgstr "Russo"
 
-#: conf/global_settings.py:48
+#: conf/global_settings.py:49
 msgid "Slovak"
 msgstr ""
 
-#: conf/global_settings.py:49
+#: conf/global_settings.py:50
 #, fuzzy
 msgid "Serbian"
 msgstr "Serbo"
 
-#: conf/global_settings.py:50
+#: conf/global_settings.py:51
 msgid "Simplified Chinese"
 msgstr ""
 
@@ -978,11 +982,11 @@ msgstr ""
 "L'attributo \"%(attr)s\" alla linea %(line)s ha un valore non valido. (La "
 "linea comincia con \"%(start)s\".)"
 
-#: core/meta/fields.py:95
+#: core/meta/fields.py:111
 msgid " Separate multiple IDs with commas."
 msgstr " Separa ID multipli con virgole."
 
-#: core/meta/fields.py:98
+#: core/meta/fields.py:114
 msgid ""
 " Hold down \"Control\", or \"Command\" on a Mac, to select more than one."
 msgstr " Premi \"Control\", o \"Command\" su Mac, per selezionarne più di uno."
