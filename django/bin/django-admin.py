@@ -77,7 +77,7 @@ def main():
     try:
         action = args[0]
     except IndexError:
-        print_error("An action is required.", sys.argv[0])
+        parser.print_usage_and_exit()
     if not ACTION_MAPPING.has_key(action):
         print_error("Your action, %r, was invalid." % action, sys.argv[0])
     if action in ('createsuperuser', 'init', 'validate'):

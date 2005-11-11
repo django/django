@@ -265,7 +265,24 @@ class RelatedObject(object):
         return bound_related_object_class(self, field_mapping, original)
 
     def get_method_name_part(self):
-        return self.parent_opts.get_rel_object_method_name(self.opts, self.field)
+        # This method encapsulates the logic that decides what name to give a
+        # method that retrieves related many-to-one objects. Usually it just
+        # uses the lower-cased object_name, but if the related object is in
+        # another app, its app_label is appended.
+        #
+        # Examples:
+        #
+        #   # Normal case -- a related object in the same app.
+        #   # This method returns "choice".
+        #   Poll.get_choice_list()
+        #
+        #   # A related object in a different app.
+        #   # This method returns "lcom_bestofaward".
+        #   Place.get_lcom_bestofaward_list() # "lcom_bestofaward"
+        rel_obj_name = self.field.rel.related_name or self.opts.object_name.lower()
+        if self.parent_opts.app_label != self.opts.app_label:
+            rel_obj_name = '%s_%s' % (self.opts.app_label, rel_obj_name)
+        return rel_obj_name
 
 class Options:
     def __init__(self, module_name='', verbose_name='', verbose_name_plural='', db_table='',
@@ -386,26 +403,6 @@ class Options:
 
     def get_delete_permission(self):
         return 'delete_%s' % self.object_name.lower()
-
-    def get_rel_object_method_name(self, rel_opts, rel_field):
-        # This method encapsulates the logic that decides what name to give a
-        # method that retrieves related many-to-one objects. Usually it just
-        # uses the lower-cased object_name, but if the related object is in
-        # another app, its app_label is appended.
-        #
-        # Examples:
-        #
-        #   # Normal case -- a related object in the same app.
-        #   # This method returns "choice".
-        #   Poll.get_choice_list()
-        #
-        #   # A related object in a different app.
-        #   # This method returns "lcom_bestofaward".
-        #   Place.get_lcom_bestofaward_list() # "lcom_bestofaward"
-        rel_obj_name = rel_field.rel.related_name or rel_opts.object_name.lower()
-        if self.app_label != rel_opts.app_label:
-            rel_obj_name = '%s_%s' % (rel_opts.app_label, rel_obj_name)
-        return rel_obj_name
 
     def get_all_related_objects(self):
         try: # Try the cache first.
