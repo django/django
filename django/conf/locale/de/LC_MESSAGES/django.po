@@ -278,7 +278,6 @@ msgid "Page not found"
 msgstr "Seite nicht gefunden"
 
 #: contrib/admin/templates/admin/404.html:10
-#, fuzzy
 msgid "We're sorry, but the requested page could not be found."
 msgstr ""
 "Es tut uns leid, aber die angeforderte Seite kann nicht gefunden werden."
