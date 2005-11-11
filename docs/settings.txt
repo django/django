@@ -358,6 +358,17 @@ Default: ``('/cgi-bin/', '/_vti_bin', '/_vti_inf')``
 A tuple of strings that specify beginnings of URLs that should be ignored by
 the 404 e-mailer. See ``SEND_BROKEN_LINK_EMAILS`` and ``IGNORABLE_404_ENDS``.
 
+INSTALLED_APPS
+--------------
+
+Default: Not defined
+
+A tuple of strings designating all applications that are enabled in this Django
+installation. Each string should be a full Python path to a Python package that
+contains a Django application, as created by `django-admin.py startapp`_.
+
+.. _django-admin.py startapp: http://www.djangoproject.com/documentation/django_admin/#startapp-appname
+
 INTERNAL_IPS
 ------------
 
