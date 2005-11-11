@@ -147,7 +147,7 @@ def result_headers(cl):
     
 def items_for_result(cl, result):
     first = True
-    pk = cl.lookup_opts.pk.name
+    pk = cl.lookup_opts.pk.attname
     for field_name in cl.lookup_opts.admin.list_display:
         row_class = ''
         try:
@@ -160,7 +160,7 @@ def items_for_result(cl, result):
             except ObjectDoesNotExist:
                 result_repr = EMPTY_CHANGELIST_VALUE
         else:
-            field_val = getattr(result, f.column)
+            field_val = getattr(result, f.attname)
         
             if isinstance(f.rel, meta.ManyToOne):
                 if field_val is not None:
@@ -246,7 +246,8 @@ def date_hierarchy(cl):
      
         if year_lookup and month_lookup and day_lookup:
             month_name = MONTHS[int(month_lookup)]
-            return { 'back': 
+            return {  'show': True,
+                      'back': 
                         { 'link' : link({year_field: year_lookup, month_field: month_lookup}), 
                           'title': "%s %s" % ( month_name, year_lookup),
                         },
@@ -256,7 +257,8 @@ def date_hierarchy(cl):
             date_lookup_params = lookup_params.copy()
             date_lookup_params.update({year_field: year_lookup, month_field: month_lookup})
             days = get_dates('day', date_lookup_params)
-            return { 'back': 
+            return { 'show': True,
+                     'back': 
                         { 'link' : link({year_field: year_lookup}), 
                           'title' : year_lookup 
                         },
@@ -268,7 +270,8 @@ def date_hierarchy(cl):
             date_lookup_params = lookup_params.copy()
             date_lookup_params.update({year_field: year_lookup})
             months = get_dates('month', date_lookup_params)
-            return { 'back':
+            return {  'show' : True,
+                      'back':
                        { 'link' : link({}),
                          'title': _('All dates')
                        },
@@ -278,7 +281,8 @@ def date_hierarchy(cl):
                   }
         else:
             years = get_dates('year', lookup_params)
-            return { 'choices':
+            return { 'show': True,
+                     'choices':
                         [ { 'link': link( {year_field: year.year}),
                             'title': year.year  } for year in years ]
                    }

@@ -658,7 +658,6 @@ filter_raw_string = r"""
   }
   
 filter_raw_string = filter_raw_string.replace("\n", "").replace(" ", "")
-
 filter_re = re.compile(filter_raw_string)
 
 class RegexFilterParser(object):

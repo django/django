@@ -59,20 +59,7 @@ def manipulator_validator_unique(f, opts, self, field_data, all_data):
         return
     raise validators.ValidationError, "%s with this %s already exists." % (capfirst(opts.verbose_name), f.verbose_name)
 
-# A guide to Field parameters:
-#
-#   * name:      The name of the field specifed in the model.
-#   * attname:   The attribute to use on the model object. This is the same as
-#                "name", except in the case of ForeignKeys, where "_id" is
-#                appended.
-#   * db_column: The db_column specified in the model (or None).
-#   * column:    The database column for this field. This is the same as
-#                "attname", except if db_column is specified.
-#
-# Code that introspects values, or does other dynamic things, should use
-# attname. For example, this gets the primary key value of object "obj":
-#
-#     getattr(obj, opts.pk.attname)
+
 class BoundField(object):
     def __init__(self, field, field_mapping, original):
         self.field = field
@@ -91,6 +78,22 @@ class BoundField(object):
 
     def __repr__(self):
         return "BoundField:(%s, %s)" %( self.field.name, self.form_fields)
+
+
+# A guide to Field parameters:
+#
+#   * name:      The name of the field specifed in the model.
+#   * attname:   The attribute to use on the model object. This is the same as
+#                "name", except in the case of ForeignKeys, where "_id" is
+#                appended.
+#   * db_column: The db_column specified in the model (or None).
+#   * column:    The database column for this field. This is the same as
+#                "attname", except if db_column is specified.
+#
+# Code that introspects values, or does other dynamic things, should use
+# attname. For example, this gets the primary key value of object "obj":
+#
+#     getattr(obj, opts.pk.attname)
 
 class Field(object):
     
@@ -224,7 +227,7 @@ class Field(object):
         if self.maxlength and not self.choices: # Don't give SelectFields a maxlength parameter.
             params['maxlength'] = self.maxlength
         if isinstance(self.rel, ManyToOne):
-            params['member_name'] = name_prefix + self.get_db_column()
+            params['member_name'] = name_prefix + self.attname
             if self.rel.raw_id_admin:
                 field_objs = self.get_manipulator_field_objs()
                 params['validator_list'].append(curry(manipulator_valid_rel_key, self, manipulator))
@@ -312,7 +315,8 @@ class Field(object):
         if self.choices:
             return first_choice + list(self.choices)
         rel_obj = self.rel.to
-        return first_choice + [(getattr(x, rel_obj.pk.attlist), str(x)) for x in rel_obj.get_model_module().get_list(**self.rel.limit_choices_to)]
+        return first_choice + [(getattr(x, rel_obj.pk.attname), str(x)) 
+                               for x in rel_obj.get_model_module().get_list(**self.rel.limit_choices_to)]
 
     def get_choices_default(self):
         if(self.radio_admin):
@@ -322,7 +326,7 @@ class Field(object):
 
     def _get_val_from_obj(self, obj):
         if obj:
-           return getattr(obj, self.column) 
+           return getattr(obj, self.attname) 
         else: 
            return self.get_default()
 
@@ -332,7 +336,7 @@ class Field(object):
     	"flattened" string values for the admin view. Obj is the instance to extract the 
         values from.
         """
-        return { self.get_db_column(): self._get_val_from_obj(obj)}
+        return { self.attname : self._get_val_from_obj(obj)}
 
     def get_follow(self, override=None):
         if override != None:
@@ -716,7 +720,7 @@ class ForeignKey(Field):
             if not self.blank and not self.rel.raw_id_admin and self.choices:
                choice_list = self.get_choices_default()
                if len(choice_list) == 2:
-                  return { self.name : choice_list[1][0] }
+                  return { self.attname : choice_list[1][0] }
         return Field.flatten_data(self, follow, obj)
 
 class ManyToManyField(Field):
@@ -766,7 +770,7 @@ class ManyToManyField(Field):
         new_data = {} 
         if obj:
             get_list_func = getattr(obj, 'get_%s_list' % self.rel.singular)
-            instance_ids = [getattr(instance, self.rel.to.pk.column) for instance in get_list_func()]
+            instance_ids = [getattr(instance, self.rel.to.pk.attname) for instance in get_list_func()]
             if self.rel.raw_id_admin:
                  new_data[self.name] = ",".join([str(id) for id in instance_ids])
             else:
