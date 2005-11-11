@@ -388,10 +388,16 @@ def change_list(request, app_label, module_name):
                 except meta.FieldDoesNotExist:
                     # For non-field list_display values, the value is a method
                     # name. Execute the method.
+                    func = getattr(result, field_name)
                     try:
-                        result_repr = strip_tags(str(getattr(result, field_name)()))
+                        result_repr = str(func())
                     except ObjectDoesNotExist:
                         result_repr = EMPTY_CHANGELIST_VALUE
+                    else:
+                        # Strip HTML tags in the resulting text, except if the
+                        # function has an "allow_tags" attribute set to True.
+                        if not getattr(func, 'allow_tags', False):
+                            result_repr = strip_tags(result_repr)
                 else:
                     field_val = getattr(result, f.attname)
                     # Foreign-key fields are special: Use the repr of the
