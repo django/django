@@ -131,7 +131,6 @@ def result_headers(cl):
                 yield {"text": header}
             else:
                 if isinstance(f.rel, meta.ManyToOne) and f.null:
-                    raw_template.append('<th>%s</th>' % capfirst(f.verbose_name))
                     yield {"text": f.verbose_name}
                 else:
                     th_classes = []
