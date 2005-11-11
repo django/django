@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2005-11-10 12:53+0100\n"
+"POT-Creation-Date: 2005-11-11 23:12+0100\n"
 "PO-Revision-Date: 2005-11-08 19:06+GMT+2\n"
 "Last-Translator: Tiberiu Micu <tibimicu@gmx.net>\n"
 "Language-Team: Romanian <ro@li.org>\n"
@@ -310,6 +310,91 @@ msgstr "Mulţumesc pentru folosirea saitului nostru!"
 msgid "The %(site_name)s team"
 msgstr "Echipa %(site_name)s"
 
+#: contrib/redirects/models/redirects.py:7
+msgid "redirect from"
+msgstr "redirectat de la "
+
+#: contrib/redirects/models/redirects.py:8
+msgid ""
+"This should be an absolute path, excluding the domain name. Example: '/"
+"events/search/'."
+msgstr ""
+"Aceasta ar trebui să fie o cale absolută, excluzînd numele de domeniu. "
+"Exemplu: '/evenimente/cautare/'."
+
+#: contrib/redirects/models/redirects.py:9
+msgid "redirect to"
+msgstr "redirectat la"
+
+#: contrib/redirects/models/redirects.py:10
+msgid ""
+"This can be either an absolute path (as above) or a full URL starting with "
+"'http://'."
+msgstr ""
+"Aceasta poate fi o cale absolută (ca mai sus) sau un URL începînd cu "
+"'http://'."
+
+#: contrib/redirects/models/redirects.py:12
+msgid "redirect"
+msgstr "redirectare"
+
+#: contrib/redirects/models/redirects.py:13
+msgid "redirects"
+msgstr "redictări"
+
+#: contrib/flatpages/models/flatpages.py:6
+msgid "URL"
+msgstr "URL"
+
+#: contrib/flatpages/models/flatpages.py:7
+msgid ""
+"Example: '/about/contact/'. Make sure to have leading and trailing slashes."
+msgstr ""
+"Exemplu: '/about/contact'. Asiguraţi-vă că aveţi slash-uri la început şi la "
+"sfîrşit."
+
+#: contrib/flatpages/models/flatpages.py:8
+msgid "title"
+msgstr "titlu"
+
+#: contrib/flatpages/models/flatpages.py:9
+msgid "content"
+msgstr "conţinut"
+
+#: contrib/flatpages/models/flatpages.py:10
+msgid "enable comments"
+msgstr "permite comentarii"
+
+#: contrib/flatpages/models/flatpages.py:11
+msgid "template name"
+msgstr "nume şablon"
+
+#: contrib/flatpages/models/flatpages.py:12
+#, fuzzy
+msgid ""
+"Example: 'flatpages/contact_page'. If this isn't provided, the system will "
+"use 'flatpages/default'."
+msgstr ""
+"Exemplu: 'flatfiles/pagina_contact'. Dacă aceasta nu există, sistemul va "
+"folosi 'flatfiles/default'."
+
+#: contrib/flatpages/models/flatpages.py:13
+msgid "registration required"
+msgstr "necesită înregistrare"
+
+#: contrib/flatpages/models/flatpages.py:13
+msgid "If this is checked, only logged-in users will be able to view the page."
+msgstr ""
+"Dacă aceasta este bifată, numai utilizatorii logaţi vor putea vedea pagina."
+
+#: contrib/flatpages/models/flatpages.py:17
+msgid "flat page"
+msgstr "pagina plată"
+
+#: contrib/flatpages/models/flatpages.py:18
+msgid "flat pages"
+msgstr "pagini plate"
+
 #: utils/dates.py:6
 msgid "Monday"
 msgstr "Luni"
@@ -458,107 +543,23 @@ msgstr "tip conţinut"
 msgid "content types"
 msgstr "tipuri conţinute"
 
-#: models/core.py:68
-msgid "redirect from"
-msgstr "redirectat de la "
-
-#: models/core.py:69
-msgid ""
-"This should be an absolute path, excluding the domain name. Example: '/"
-"events/search/'."
-msgstr ""
-"Aceasta ar trebui să fie o cale absolută, excluzînd numele de domeniu. "
-"Exemplu: '/evenimente/cautare/'."
-
-#: models/core.py:70
-msgid "redirect to"
-msgstr "redirectat la"
-
-#: models/core.py:71
-msgid ""
-"This can be either an absolute path (as above) or a full URL starting with "
-"'http://'."
-msgstr ""
-"Aceasta poate fi o cale absolută (ca mai sus) sau un URL începînd cu "
-"'http://'."
-
-#: models/core.py:73
-msgid "redirect"
-msgstr "redirectare"
-
-#: models/core.py:74
-msgid "redirects"
-msgstr "redictări"
-
-#: models/core.py:87
-msgid "URL"
-msgstr "URL"
-
-#: models/core.py:88
-msgid ""
-"Example: '/about/contact/'. Make sure to have leading and trailing slashes."
-msgstr ""
-"Exemplu: '/about/contact'. Asiguraţi-vă că aveţi slash-uri la început şi la "
-"sfîrşit."
-
-#: models/core.py:89
-msgid "title"
-msgstr "titlu"
-
-#: models/core.py:90
-msgid "content"
-msgstr "conţinut"
-
-#: models/core.py:91
-msgid "enable comments"
-msgstr "permite comentarii"
-
-#: models/core.py:92
-msgid "template name"
-msgstr "nume şablon"
-
-#: models/core.py:93
-msgid ""
-"Example: 'flatfiles/contact_page'. If this isn't provided, the system will "
-"use 'flatfiles/default'."
-msgstr ""
-"Exemplu: 'flatfiles/pagina_contact'. Dacă aceasta nu există, sistemul va "
-"folosi 'flatfiles/default'."
-
-#: models/core.py:94
-msgid "registration required"
-msgstr "necesită înregistrare"
-
-#: models/core.py:94
-msgid "If this is checked, only logged-in users will be able to view the page."
-msgstr ""
-"Dacă aceasta este bifată, numai utilizatorii logaţi vor putea vedea pagina."
-
-#: models/core.py:98
-msgid "flat page"
-msgstr "pagina plată"
-
-#: models/core.py:99
-msgid "flat pages"
-msgstr "pagini plate"
-
-#: models/core.py:117
+#: models/core.py:67
 msgid "session key"
 msgstr "cheie sesiune"
 
-#: models/core.py:118
+#: models/core.py:68
 msgid "session data"
 msgstr "date sesiune"
 
-#: models/core.py:119
+#: models/core.py:69
 msgid "expire date"
 msgstr "data expirare"
 
-#: models/core.py:121
+#: models/core.py:71
 msgid "session"
 msgstr "seiune"
 
-#: models/core.py:122
+#: models/core.py:72
 msgid "sessions"
 msgstr "sesiuni"
 

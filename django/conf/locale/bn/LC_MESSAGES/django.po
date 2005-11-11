@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django CVS\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2005-11-10 05:53-0600\n"
+"POT-Creation-Date: 2005-11-11 16:13-0600\n"
 "PO-Revision-Date: 2005-11-10 06:11+0530\n"
 "Last-Translator: Baishampayan Ghose <b.ghose@gnu.org.in>\n"
 "Language-Team: Bengali <core@bengalinux.org>\n"
@@ -309,6 +309,89 @@ msgstr "আমাদের স্থান ব্যবহার করার �
 msgid "The %(site_name)s team"
 msgstr "%(site_name)s দল"
 
+#: contrib/redirects/models/redirects.py:7
+msgid "redirect from"
+msgstr "রিডাইরেক্ট করা"
+
+#: contrib/redirects/models/redirects.py:8
+msgid ""
+"This should be an absolute path, excluding the domain name. Example: '/"
+"events/search/'."
+msgstr ""
+"এইটি একটি পরম পাথ হওয়া উচিত, ক্ষেত্র নাম বাদ দিয়ে। উদাহরণ: '/events/search / '।"
+
+#: contrib/redirects/models/redirects.py:9
+msgid "redirect to"
+msgstr "রিডাইরেক্ট কর"
+
+#: contrib/redirects/models/redirects.py:10
+msgid ""
+"This can be either an absolute path (as above) or a full URL starting with "
+"'http://'."
+msgstr ""
+"এইটি হয় একটি পরম পাথ হতে পারে  (যেমন উপরে) অথবা 'http:// এর সঙ্গে শুরু হওয়া "
+"একটি পূর্ণ ইউ.আর.এল ।"
+
+#: contrib/redirects/models/redirects.py:12
+msgid "redirect"
+msgstr "রিডাইরেক্ট"
+
+#: contrib/redirects/models/redirects.py:13
+msgid "redirects"
+msgstr "রিডাইরেক্ট করে"
+
+#: contrib/flatpages/models/flatpages.py:6
+msgid "URL"
+msgstr "ইউ.আর.এল"
+
+#: contrib/flatpages/models/flatpages.py:7
+msgid ""
+"Example: '/about/contact/'. Make sure to have leading and trailing slashes."
+msgstr ""
+"উদাহরণ: '/about/contact / '। প্রধান এবং অনুসরণ করা স্ল্যাশ যেন নিশ্চিত ভাবে থাকে।"
+
+#: contrib/flatpages/models/flatpages.py:8
+msgid "title"
+msgstr "শিরোনাম"
+
+#: contrib/flatpages/models/flatpages.py:9
+msgid "content"
+msgstr "অভ্যন্তরস্থ বস্তু"
+
+#: contrib/flatpages/models/flatpages.py:10
+msgid "enable comments"
+msgstr "মন্তব্য সক্রিয় করুন"
+
+#: contrib/flatpages/models/flatpages.py:11
+msgid "template name"
+msgstr "ছাঁদ নাম"
+
+#: contrib/flatpages/models/flatpages.py:12
+#, fuzzy
+msgid ""
+"Example: 'flatpages/contact_page'. If this isn't provided, the system will "
+"use 'flatpages/default'."
+msgstr ""
+"উদাহরণ: 'flatfiles/contact_page '। যদি এইটি দেওয়া না থাকে তাহলে সিস্টেম "
+"'flatfiles/default ব্যবহার করবে।"
+
+#: contrib/flatpages/models/flatpages.py:13
+msgid "registration required"
+msgstr "নিবন্ধন প্রয়োজনীয়"
+
+#: contrib/flatpages/models/flatpages.py:13
+msgid "If this is checked, only logged-in users will be able to view the page."
+msgstr ""
+"যদি এইটি টিক্ করা থাকে তাহলে শুধুমাত্র প্রবেশ করা ব্যবহারকারী পাতা দেখতে সক্ষম হবে।"
+
+#: contrib/flatpages/models/flatpages.py:17
+msgid "flat page"
+msgstr "চ্যাপ্টা পাতা"
+
+#: contrib/flatpages/models/flatpages.py:18
+msgid "flat pages"
+msgstr "চ্যাপ্টা পাতাগুলো"
+
 #: utils/dates.py:6
 msgid "Monday"
 msgstr "সোমবার"
@@ -457,105 +540,23 @@ msgstr "অভ্যন্তরস্থ বস্তু ধরন"
 msgid "content types"
 msgstr "অভ্যন্তরস্থ বস্তু ধরন"
 
-#: models/core.py:68
-msgid "redirect from"
-msgstr "রিডাইরেক্ট করা"
-
-#: models/core.py:69
-msgid ""
-"This should be an absolute path, excluding the domain name. Example: '/"
-"events/search/'."
-msgstr ""
-"এইটি একটি পরম পাথ হওয়া উচিত, ক্ষেত্র নাম বাদ দিয়ে। উদাহরণ: '/events/search / '।"
-
-#: models/core.py:70
-msgid "redirect to"
-msgstr "রিডাইরেক্ট কর"
-
-#: models/core.py:71
-msgid ""
-"This can be either an absolute path (as above) or a full URL starting with "
-"'http://'."
-msgstr ""
-"এইটি হয় একটি পরম পাথ হতে পারে  (যেমন উপরে) অথবা 'http:// এর সঙ্গে শুরু হওয়া "
-"একটি পূর্ণ ইউ.আর.এল ।"
-
-#: models/core.py:73
-msgid "redirect"
-msgstr "রিডাইরেক্ট"
-
-#: models/core.py:74
-msgid "redirects"
-msgstr "রিডাইরেক্ট করে"
-
-#: models/core.py:87
-msgid "URL"
-msgstr "ইউ.আর.এল"
-
-#: models/core.py:88
-msgid ""
-"Example: '/about/contact/'. Make sure to have leading and trailing slashes."
-msgstr ""
-"উদাহরণ: '/about/contact / '। প্রধান এবং অনুসরণ করা স্ল্যাশ যেন নিশ্চিত ভাবে থাকে।"
-
-#: models/core.py:89
-msgid "title"
-msgstr "শিরোনাম"
-
-#: models/core.py:90
-msgid "content"
-msgstr "অভ্যন্তরস্থ বস্তু"
-
-#: models/core.py:91
-msgid "enable comments"
-msgstr "মন্তব্য সক্রিয় করুন"
-
-#: models/core.py:92
-msgid "template name"
-msgstr "ছাঁদ নাম"
-
-#: models/core.py:93
-msgid ""
-"Example: 'flatfiles/contact_page'. If this isn't provided, the system will "
-"use 'flatfiles/default'."
-msgstr ""
-"উদাহরণ: 'flatfiles/contact_page '। যদি এইটি দেওয়া না থাকে তাহলে সিস্টেম "
-"'flatfiles/default ব্যবহার করবে।"
-
-#: models/core.py:94
-msgid "registration required"
-msgstr "নিবন্ধন প্রয়োজনীয়"
-
-#: models/core.py:94
-msgid "If this is checked, only logged-in users will be able to view the page."
-msgstr ""
-"যদি এইটি টিক্ করা থাকে তাহলে শুধুমাত্র প্রবেশ করা ব্যবহারকারী পাতা দেখতে সক্ষম হবে।"
-
-#: models/core.py:98
-msgid "flat page"
-msgstr "চ্যাপ্টা পাতা"
-
-#: models/core.py:99
-msgid "flat pages"
-msgstr "চ্যাপ্টা পাতাগুলো"
-
-#: models/core.py:117
+#: models/core.py:67
 msgid "session key"
 msgstr "অধিবেশন চাবি"
 
-#: models/core.py:118
+#: models/core.py:68
 msgid "session data"
 msgstr "অধিবেশন তথ্য"
 
-#: models/core.py:119
+#: models/core.py:69
 msgid "expire date"
 msgstr "শেষ তারিখ"
 
-#: models/core.py:121
+#: models/core.py:71
 msgid "session"
 msgstr "অধিবেশন"
 
-#: models/core.py:122
+#: models/core.py:72
 msgid "sessions"
 msgstr "সেশন"
 

@@ -250,6 +250,7 @@ msgid "Time"
 msgstr ""
 
 #: contrib/admin/views/doc.py:284 models/core.py:81
+#: contrib/flatpages/models/flatpages.py:6
 msgid "URL"
 msgstr ""
 
@@ -563,6 +564,77 @@ msgstr "Grazas por usar o noso sitio web!"
 msgid "The %(site_name)s team"
 msgstr "O equipo de %(site_name)s"
 
+#: contrib/redirects/models/redirects.py:7 models/core.py:62
+msgid "redirect from"
+msgstr ""
+
+#: contrib/redirects/models/redirects.py:8 models/core.py:63
+msgid ""
+"This should be an absolute path, excluding the domain name. Example: '/"
+"events/search/'."
+msgstr ""
+
+#: contrib/redirects/models/redirects.py:9 models/core.py:64
+msgid "redirect to"
+msgstr ""
+
+#: contrib/redirects/models/redirects.py:10 models/core.py:65
+msgid ""
+"This can be either an absolute path (as above) or a full URL starting with "
+"'http://'."
+msgstr ""
+
+#: contrib/redirects/models/redirects.py:12 models/core.py:67
+msgid "redirect"
+msgstr ""
+
+#: contrib/redirects/models/redirects.py:13 models/core.py:68
+msgid "redirects"
+msgstr ""
+
+#: contrib/flatpages/models/flatpages.py:7 models/core.py:82
+msgid ""
+"Example: '/about/contact/'. Make sure to have leading and trailing slashes."
+msgstr ""
+
+#: contrib/flatpages/models/flatpages.py:8 models/core.py:83
+msgid "title"
+msgstr ""
+
+#: contrib/flatpages/models/flatpages.py:9 models/core.py:84
+msgid "content"
+msgstr ""
+
+#: contrib/flatpages/models/flatpages.py:10 models/core.py:85
+msgid "enable comments"
+msgstr ""
+
+#: contrib/flatpages/models/flatpages.py:11 models/core.py:86
+msgid "template name"
+msgstr ""
+
+#: contrib/flatpages/models/flatpages.py:12
+msgid ""
+"Example: 'flatpages/contact_page'. If this isn't provided, the system will "
+"use 'flatpages/default'."
+msgstr ""
+
+#: contrib/flatpages/models/flatpages.py:13 models/core.py:88
+msgid "registration required"
+msgstr ""
+
+#: contrib/flatpages/models/flatpages.py:13 models/core.py:88
+msgid "If this is checked, only logged-in users will be able to view the page."
+msgstr ""
+
+#: contrib/flatpages/models/flatpages.py:17 models/core.py:92
+msgid "flat page"
+msgstr ""
+
+#: contrib/flatpages/models/flatpages.py:18 models/core.py:93
+msgid "flat pages"
+msgstr ""
+
 #: utils/dates.py:6
 msgid "Monday"
 msgstr ""
@@ -712,75 +784,10 @@ msgstr ""
 msgid "content types"
 msgstr ""
 
-#: models/core.py:62
-msgid "redirect from"
-msgstr ""
-
-#: models/core.py:63
-msgid ""
-"This should be an absolute path, excluding the domain name. Example: '/"
-"events/search/'."
-msgstr ""
-
-#: models/core.py:64
-msgid "redirect to"
-msgstr ""
-
-#: models/core.py:65
-msgid ""
-"This can be either an absolute path (as above) or a full URL starting with "
-"'http://'."
-msgstr ""
-
-#: models/core.py:67
-msgid "redirect"
-msgstr ""
-
-#: models/core.py:68
-msgid "redirects"
-msgstr ""
-
-#: models/core.py:82
-msgid ""
-"Example: '/about/contact/'. Make sure to have leading and trailing slashes."
-msgstr ""
-
-#: models/core.py:83
-msgid "title"
-msgstr ""
-
-#: models/core.py:84
-msgid "content"
-msgstr ""
-
-#: models/core.py:85
-msgid "enable comments"
-msgstr ""
-
-#: models/core.py:86
-msgid "template name"
-msgstr ""
-
 #: models/core.py:87
 msgid ""
 "Example: 'flatfiles/contact_page'. If this isn't provided, the system will "
 "use 'flatfiles/default'."
-msgstr ""
-
-#: models/core.py:88
-msgid "registration required"
-msgstr ""
-
-#: models/core.py:88
-msgid "If this is checked, only logged-in users will be able to view the page."
-msgstr ""
-
-#: models/core.py:92
-msgid "flat page"
-msgstr ""
-
-#: models/core.py:93
-msgid "flat pages"
 msgstr ""
 
 #: models/core.py:114

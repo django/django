@@ -795,19 +795,19 @@ msgstr "flatsider"
 msgid "session key"
 msgstr "sesjon nøkkel"
 
-#: models/core.py:118
+#: models/core.py:68
 msgid "session data"
 msgstr "sesjon data"
 
-#: models/core.py:119
+#: models/core.py:69
 msgid "expire date"
 msgstr "utløpsdato"
 
-#: models/core.py:121
+#: models/core.py:71
 msgid "session"
 msgstr "sesjon"
 
-#: models/core.py:122
+#: models/core.py:72
 msgid "sessions"
 msgstr "sesjoner"
 

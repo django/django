@@ -785,19 +785,19 @@ msgstr "简单页面"
 msgid "session key"
 msgstr "session键字"
 
-#: models/core.py:118
+#: models/core.py:68
 msgid "session data"
 msgstr "session数据"
 
-#: models/core.py:119
+#: models/core.py:69
 msgid "expire date"
 msgstr "过期日期"
 
-#: models/core.py:121
+#: models/core.py:71
 msgid "session"
 msgstr ""
 
-#: models/core.py:122
+#: models/core.py:72
 msgid "sessions"
 msgstr ""
 

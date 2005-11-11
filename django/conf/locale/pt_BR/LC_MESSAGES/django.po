@@ -794,19 +794,19 @@ msgstr "páginas planas"
 msgid "session key"
 msgstr "chave da sessão"
 
-#: models/core.py:118
+#: models/core.py:68
 msgid "session data"
 msgstr "dados da sessão"
 
-#: models/core.py:119
+#: models/core.py:69
 msgid "expire date"
 msgstr "data de expiração"
 
-#: models/core.py:121
+#: models/core.py:71
 msgid "session"
 msgstr "sessão"
 
-#: models/core.py:122
+#: models/core.py:72
 msgid "sessions"
 msgstr "sessões"
 

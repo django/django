@@ -799,19 +799,19 @@ msgstr "ploché stránky"
 msgid "session key"
 msgstr "kľúč sedenia"
 
-#: models/core.py:118
+#: models/core.py:68
 msgid "session data"
 msgstr "údaje sedenia"
 
-#: models/core.py:119
+#: models/core.py:69
 msgid "expire date"
 msgstr "dátum konca platnosti"
 
-#: models/core.py:121
+#: models/core.py:71
 msgid "session"
 msgstr "sedenie"
 
-#: models/core.py:122
+#: models/core.py:72
 msgid "sessions"
 msgstr "sedenia"
 
@@ -1244,36 +1244,11 @@ msgstr ""
 " Podržte \"Control\", alebo \"Command\" na  Mac_u, na výber viac ako jednej "
 "položky."
 
+# #-#-#-#-#  django.po (PACKAGE VERSION)  #-#-#-#-#
+# templates/blog/entries_detail.html:24
 #: commit
 msgid "Post a comment"
 msgstr "Pošli komentár"
-
-msgid "Comments"
-msgstr "Komentáre"
-
-msgid "Comment"
-msgstr "Komentár"
-
-msgid "Your name"
-msgstr "Vaše meno"
-
-msgid "Preview revised comment"
-msgstr "Ukázať upravený komentár"
-
-msgid "Post public comment"
-msgstr "Zveréjniť komentár"
-
-msgid "Preview comment"
-msgstr "Ukázať komentár"
-
-msgid "Posted by"
-msgstr "Poslané"
-
-msgid "Or edit it again"
-msgstr "Alebo ho vytvorte znova"
-
-msgid "Please correct the following errors."
-msgstr "Odstráňte nasledujúce chyby, prosím."
 
 msgid ""
 "Looks like you followed a bad link. If you think it is our fault, please <a "
@@ -1286,3 +1261,28 @@ msgid ""
 "Here is a link to the <a href=\"/\">homepage</a>. You know, just in case"
 msgstr ""
 "Tu je adresa <a href=\"/\">úvodnej stránky</a>. Ak by ste ju potrebovali"
+
+#~ msgid "Comment posted"
+#~ msgstr "Komentár bol poslaný"
+
+#~ msgid "Comment posted successfully"
+#~ msgstr "Komentár bol úspešne odoslaný"
+
+#~ msgid "Thanks for contributing."
+#~ msgstr "Ďakujeme za príspevok."
+
+#~ msgid "View your comment"
+#~ msgstr "Pozri svôj príspevok"
+
+# templates/blog/entries_detail.html:15
+#~ msgid "Comments"
+#~ msgstr "Komentáre"
+
+#~ msgid "Comment"
+#~ msgstr "Komentár"
+
+#~ msgid "Your name"
+#~ msgstr "Vaše meno"
+
+#~ msgid "Preview revised comment"
+#~ msgstr "Prezretie upraveného komentára"

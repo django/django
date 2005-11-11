@@ -3,14 +3,6 @@ from django.core import management
 from optparse import OptionParser
 import os, sys
 
-# switch to english, because django-admin creates database content
-# like permissions, and those shouldn't contain any translations
-try:
-    from django.utils import translation
-    translation.activate('en-us')
-except:
-    pass
-
 ACTION_MAPPING = {
     'adminindex': management.get_admin_index,
     'createsuperuser': management.createsuperuser,
@@ -80,6 +72,14 @@ def main():
         parser.print_usage_and_exit()
     if not ACTION_MAPPING.has_key(action):
         print_error("Your action, %r, was invalid." % action, sys.argv[0])
+
+    # switch to english, because django-admin creates database content
+    # like permissions, and those shouldn't contain any translations.
+    # But only do this if we should have a working settings file.
+    if action not in ('startproject', 'startapp'):
+        from django.utils import translation
+        translation.activate('en-us')
+
     if action in ('createsuperuser', 'init', 'validate'):
         ACTION_MAPPING[action]()
     elif action == 'inspectdb':

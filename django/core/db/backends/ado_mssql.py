@@ -111,8 +111,9 @@ def get_relations(cursor, table_name):
     raise NotImplementedError
 
 def quote_name(name):
-    # TODO: Figure out how MS-SQL quotes database identifiers.
-    return name
+    if name.startswith('[') and name.endswith(']'):
+        return name # Quoting once is enough.
+    return '[%s]' % name
 
 OPERATOR_MAPPING = {
     'exact': '=',

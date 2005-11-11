@@ -278,6 +278,7 @@ msgid "Page not found"
 msgstr "Seite nicht gefunden"
 
 #: contrib/admin/templates/admin/404.html:10
+#, fuzzy
 msgid "We're sorry, but the requested page could not be found."
 msgstr ""
 "Es tut uns leid, aber die angeforderte Seite kann nicht gefunden werden."
@@ -800,19 +801,19 @@ msgstr "Webseiten"
 msgid "session key"
 msgstr "Sitzungs-ID"
 
-#: models/core.py:118
+#: models/core.py:68
 msgid "session data"
 msgstr "Sitzungsdaten"
 
-#: models/core.py:119
+#: models/core.py:69
 msgid "expire date"
 msgstr "Verfallsdatum"
 
-#: models/core.py:121
+#: models/core.py:71
 msgid "session"
 msgstr "Sitzung"
 
-#: models/core.py:122
+#: models/core.py:72
 msgid "sessions"
 msgstr "Sitzungen"
 
