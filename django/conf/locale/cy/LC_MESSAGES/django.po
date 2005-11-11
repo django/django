@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2005-11-09 04:27-0600\n"
+"POT-Creation-Date: 2005-11-10 05:53-0600\n"
 "PO-Revision-Date: 2005-11-05 HO:MI+ZONE\n"
 "Last-Translator: Jason Davies <jason@jasondavies.com>\n"
 "Language-Team: Cymraeg <cy@li.org>\n"
@@ -653,62 +653,66 @@ msgid "Message"
 msgstr "Neges"
 
 #: conf/global_settings.py:36
+msgid "Bengali"
+msgstr ""
+
+#: conf/global_settings.py:37
 msgid "Czech"
 msgstr "Tsieceg"
 
-#: conf/global_settings.py:37
+#: conf/global_settings.py:38
 msgid "Welsh"
 msgstr "Cymraeg"
 
-#: conf/global_settings.py:38
+#: conf/global_settings.py:39
 msgid "German"
 msgstr "Almaeneg"
 
-#: conf/global_settings.py:39
+#: conf/global_settings.py:40
 msgid "English"
 msgstr "Saesneg"
 
-#: conf/global_settings.py:40
+#: conf/global_settings.py:41
 msgid "Spanish"
 msgstr "Spaeneg"
 
-#: conf/global_settings.py:41
+#: conf/global_settings.py:42
 msgid "French"
 msgstr "Ffrangeg"
 
-#: conf/global_settings.py:42
+#: conf/global_settings.py:43
 msgid "Galician"
 msgstr "Galisieg"
 
-#: conf/global_settings.py:43
+#: conf/global_settings.py:44
 msgid "Italian"
 msgstr "Eidaleg"
 
-#: conf/global_settings.py:44
+#: conf/global_settings.py:45
 msgid "Norwegian"
 msgstr "Norwyeg"
 
-#: conf/global_settings.py:45
+#: conf/global_settings.py:46
 msgid "Brazilian"
 msgstr "Brasileg"
 
-#: conf/global_settings.py:46
+#: conf/global_settings.py:47
 msgid "Romanian"
 msgstr ""
 
-#: conf/global_settings.py:47
+#: conf/global_settings.py:48
 msgid "Russian"
 msgstr "Rwsieg"
 
-#: conf/global_settings.py:48
+#: conf/global_settings.py:49
 msgid "Slovak"
 msgstr ""
 
-#: conf/global_settings.py:49
+#: conf/global_settings.py:50
 msgid "Serbian"
 msgstr "Serbeg"
 
-#: conf/global_settings.py:50
+#: conf/global_settings.py:51
 msgid "Simplified Chinese"
 msgstr "Tsieinëeg Symledig"
 
@@ -979,11 +983,11 @@ msgstr ""
 "Mae gan y priodoledd \"%(attr)s\" ar lein %(line)s gwerth annilydd. (Linell "
 "yn ddechrau â \"%(start)s\".)"
 
-#: core/meta/fields.py:95
+#: core/meta/fields.py:111
 msgid " Separate multiple IDs with commas."
 msgstr " Gwahanwch mwy nag un ID gyda atalnodau."
 
-#: core/meta/fields.py:98
+#: core/meta/fields.py:114
 msgid ""
 " Hold down \"Control\", or \"Command\" on a Mac, to select more than one."
 msgstr ""

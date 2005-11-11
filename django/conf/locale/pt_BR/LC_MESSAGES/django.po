@@ -945,6 +945,10 @@ msgid "Message"
 msgstr "Mensagem"
 
 #: conf/global_settings.py:37
+msgid "Bengali"
+msgstr ""
+
+#: conf/global_settings.py:37
 msgid "Czech"
 msgstr "Tcheco"
 
@@ -952,39 +956,39 @@ msgstr "Tcheco"
 msgid "Welsh"
 msgstr ""
 
-#: conf/global_settings.py:38
+#: conf/global_settings.py:39
 msgid "German"
 msgstr "Alemão"
 
-#: conf/global_settings.py:39
+#: conf/global_settings.py:40
 msgid "English"
 msgstr "Inglês"
 
-#: conf/global_settings.py:40
+#: conf/global_settings.py:41
 msgid "Spanish"
 msgstr "Espanhol"
 
-#: conf/global_settings.py:41
+#: conf/global_settings.py:42
 msgid "French"
 msgstr "Francês"
 
-#: conf/global_settings.py:42
+#: conf/global_settings.py:43
 msgid "Galician"
 msgstr "Galiciano"
 
-#: conf/global_settings.py:43
+#: conf/global_settings.py:44
 msgid "Italian"
 msgstr "Italiano"
 
-#: conf/global_settings.py:44
+#: conf/global_settings.py:45
 msgid "Norwegian"
 msgstr ""
 
-#: conf/global_settings.py:45
+#: conf/global_settings.py:46
 msgid "Brazilian"
 msgstr "Brazileiro"
 
-#: conf/global_settings.py:46
+#: conf/global_settings.py:47
 msgid "Russian"
 msgstr "Russo"
 

@@ -746,8 +746,8 @@ class ModelBase(type):
                 # for all DateFields and DateTimeFields that cannot be null.
                 # EXAMPLES: Poll.get_next_by_pub_date(), Poll.get_previous_by_pub_date()
                 if not f.null:
-                    setattr(new_class, 'get_next_by_%s' % f.name, curry(method_get_next_or_previous, new_mod.get_object, f, True))
-                    setattr(new_class, 'get_previous_by_%s' % f.name, curry(method_get_next_or_previous, new_mod.get_object, f, False))
+                    setattr(new_class, 'get_next_by_%s' % f.name, curry(method_get_next_or_previous, new_mod.get_object, opts, f, True))
+                    setattr(new_class, 'get_previous_by_%s' % f.name, curry(method_get_next_or_previous, new_mod.get_object, opts, f, False))
                 # Add "get_thingie_list" for all DateFields and DateTimeFields.
                 # EXAMPLE: polls.get_pub_date_list()
                 func = curry(function_get_date_list, opts, f)
@@ -1131,10 +1131,13 @@ def method_get_order(ordered_obj, self):
 
 # DATE-RELATED METHODS #####################
 
-def method_get_next_or_previous(get_object_func, field, is_next, self, **kwargs):
-    kwargs.setdefault('where', []).append('%s %s %%s' % (field.column, (is_next and '>' or '<')))
-    kwargs.setdefault('params', []).append(str(getattr(self, field.attname)))
-    kwargs['order_by'] = [(not is_next and '-' or '') + field.name]
+def method_get_next_or_previous(get_object_func, opts, field, is_next, self, **kwargs):
+    op = is_next and '>' or '<'
+    kwargs.setdefault('where', []).append('(%s %s %%s OR (%s = %%s AND %s %s %%s))' % \
+        (field.column, op, field.column, opts.pk.column, op))
+    param = str(getattr(self, field.attname))
+    kwargs.setdefault('params', []).extend([param, param, getattr(self, opts.pk.attname)])
+    kwargs['order_by'] = [(not is_next and '-' or '') + field.name, (not is_next and '-' or '') + opts.pk.name]
     kwargs['limit'] = 1
     return get_object_func(**kwargs)
 

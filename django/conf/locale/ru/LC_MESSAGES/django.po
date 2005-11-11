@@ -934,6 +934,10 @@ msgid "Message"
 msgstr ""
 
 #: conf/global_settings.py:37
+msgid "Bengali"
+msgstr ""
+
+#: conf/global_settings.py:37
 msgid "Czech"
 msgstr ""
 
@@ -985,11 +989,11 @@ msgstr ""
 msgid "Slovak"
 msgstr ""
 
-#: conf/global_settings.py:49
+#: conf/global_settings.py:50
 msgid "Serbian"
 msgstr ""
 
-#: conf/global_settings.py:50
+#: conf/global_settings.py:51
 msgid "Simplified Chinese"
 msgstr ""
 

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2005-11-09 11:26+0100\n"
+"POT-Creation-Date: 2005-11-10 12:53+0100\n"
 "PO-Revision-Date: 2005-11-08 19:06+GMT+2\n"
 "Last-Translator: Tiberiu Micu <tibimicu@gmx.net>\n"
 "Language-Team: Romanian <ro@li.org>\n"
@@ -655,62 +655,66 @@ msgid "Message"
 msgstr "Mesaj"
 
 #: conf/global_settings.py:36
+msgid "Bengali"
+msgstr ""
+
+#: conf/global_settings.py:37
 msgid "Czech"
 msgstr "Cehă"
 
-#: conf/global_settings.py:37
+#: conf/global_settings.py:38
 msgid "Welsh"
 msgstr ""
 
-#: conf/global_settings.py:38
+#: conf/global_settings.py:39
 msgid "German"
 msgstr "Germană"
 
-#: conf/global_settings.py:39
+#: conf/global_settings.py:40
 msgid "English"
 msgstr "Engleză"
 
-#: conf/global_settings.py:40
+#: conf/global_settings.py:41
 msgid "Spanish"
 msgstr "Spaniolă"
 
-#: conf/global_settings.py:41
+#: conf/global_settings.py:42
 msgid "French"
 msgstr "Franceză"
 
-#: conf/global_settings.py:42
+#: conf/global_settings.py:43
 msgid "Galician"
 msgstr "Galiciană"
 
-#: conf/global_settings.py:43
+#: conf/global_settings.py:44
 msgid "Italian"
 msgstr "Italiană"
 
-#: conf/global_settings.py:44
+#: conf/global_settings.py:45
 msgid "Norwegian"
 msgstr "Norvegiană"
 
-#: conf/global_settings.py:45
+#: conf/global_settings.py:46
 msgid "Brazilian"
 msgstr "Braziliană"
 
-#: conf/global_settings.py:46
+#: conf/global_settings.py:47
 msgid "Romanian"
 msgstr ""
 
-#: conf/global_settings.py:47
+#: conf/global_settings.py:48
 msgid "Russian"
 msgstr "Rusă"
 
-#: conf/global_settings.py:48
+#: conf/global_settings.py:49
 msgid "Slovak"
 msgstr ""
 
-#: conf/global_settings.py:49
+#: conf/global_settings.py:50
 msgid "Serbian"
 msgstr "Sîrbă"
 
-#: conf/global_settings.py:50
+#: conf/global_settings.py:51
 msgid "Simplified Chinese"
 msgstr "Chineză simplificată"
 
@@ -982,11 +986,11 @@ msgstr ""
 "Atributul \"%(attr)s\" din linia %(line)s are o valoare invalidă. ( Linia "
 "începe cu \"%(start)s\".)"
 
-#: core/meta/fields.py:95
+#: core/meta/fields.py:111
 msgid " Separate multiple IDs with commas."
 msgstr "Separă ID-urile multiple cu virgulă."
 
-#: core/meta/fields.py:98
+#: core/meta/fields.py:114
 msgid ""
 " Hold down \"Control\", or \"Command\" on a Mac, to select more than one."
 msgstr ""

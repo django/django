@@ -515,6 +515,12 @@ previous object with respect to the date field, raising the appropriate
 Both methods accept optional keyword arguments, which should be in the format
 described in "Field lookups" above.
 
+Note that in the case of identical date values, these methods will use the ID
+as a fallback check. This guarantees that no records are skipped or duplicated.
+For a full example, see the `lookup API sample model_`.
+
+.. _lookup API sample model: http://www.djangoproject.com/documentation/models/lookup/
+
 get_FOO_filename()
 ------------------
 
