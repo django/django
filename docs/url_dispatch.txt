@@ -56,7 +56,6 @@ module that will be used for the entire site. Here's the URLconf for the
         (r'^documentation/', include('django_website.apps.docs.urls.docs')),
         (r'^comments/',      include('django.contrib.comments.urls.comments')),
         (r'^rss/',           include('django.conf.urls.rss')),
-        (r'',                include('django.conf.urls.flatfiles')),
     )
 
 Note that an included URLconf receives any captured parameters from parent

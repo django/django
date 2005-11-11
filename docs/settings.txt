@@ -562,14 +562,6 @@ A boolean that specifies whether to output the "Etag" header. This saves
 bandwidth but slows down performance. This is only used if ``CommonMiddleware``
 is installed (see the `middleware docs`_).
 
-USE_FLAT_PAGES
---------------
-
-Default: ``True``
-
-Whether to check the flat-pages table as a last resort for all 404 errors. This
-is only used if ``CommonMiddleware`` is installed (see the `middleware docs`_).
-
 .. _cache docs: http://www.djangoproject.com/documentation/cache/
 .. _middleware docs: http://www.djangoproject.com/documentation/middleware/
 .. _session docs: http://www.djangoproject.com/documentation/sessions/

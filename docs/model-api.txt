@@ -831,7 +831,7 @@ object, which takes the following parameters. All are optional.
             "click to expand" link.  Fieldsets with the ``wide`` style will be
             given extra horizontal space.
 
-    For example (taken from the ``core.flatfiles`` model)::
+    For example (taken from the ``django.contrib.flatpages`` model)::
 
         fields = (
             (None, {

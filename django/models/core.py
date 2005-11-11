@@ -1,6 +1,6 @@
 import base64, md5, random, sys
 import cPickle as pickle
-from django.core import meta, validators
+from django.core import meta
 from django.utils.translation import gettext_lazy as _
 
 class Site(meta.Model):
@@ -62,56 +62,6 @@ class ContentType(meta.Model):
         so code that calls this method should catch it.
         """
         return self.get_model_module().get_object(**kwargs)
-
-class Redirect(meta.Model):
-    site = meta.ForeignKey(Site, radio_admin=meta.VERTICAL)
-    old_path = meta.CharField(_('redirect from'), maxlength=200, db_index=True,
-        help_text=_("This should be an absolute path, excluding the domain name. Example: '/events/search/'."))
-    new_path = meta.CharField(_('redirect to'), maxlength=200, blank=True,
-        help_text=_("This can be either an absolute path (as above) or a full URL starting with 'http://'."))
-    class META:
-        verbose_name = _('redirect')
-        verbose_name_plural = _('redirects')
-        db_table = 'redirects'
-        unique_together=(('site', 'old_path'),)
-        ordering = ('old_path',)
-        admin = meta.Admin(
-            list_filter = ('site',),
-            search_fields = ('old_path', 'new_path'),
-        )
-
-    def __repr__(self):
-        return "%s ---> %s" % (self.old_path, self.new_path)
-
-class FlatFile(meta.Model):
-    url = meta.CharField(_('URL'), maxlength=100, validator_list=[validators.isAlphaNumericURL],
-        help_text=_("Example: '/about/contact/'. Make sure to have leading and trailing slashes."))
-    title = meta.CharField(_('title'), maxlength=200)
-    content = meta.TextField(_('content'))
-    enable_comments = meta.BooleanField(_('enable comments'))
-    template_name = meta.CharField(_('template name'), maxlength=70, blank=True,
-        help_text=_("Example: 'flatfiles/contact_page'. If this isn't provided, the system will use 'flatfiles/default'."))
-    registration_required = meta.BooleanField(_('registration required'), help_text=_("If this is checked, only logged-in users will be able to view the page."))
-    sites = meta.ManyToManyField(Site)
-    class META:
-        db_table = 'flatfiles'
-        verbose_name = _('flat page')
-        verbose_name_plural = _('flat pages')
-        ordering = ('url',)
-        admin = meta.Admin(
-            fields = (
-                (None, {'fields': ('url', 'title', 'content', 'sites')}),
-                ('Advanced options', {'classes': 'collapse', 'fields': ('enable_comments', 'registration_required', 'template_name')}),
-            ),
-            list_filter = ('sites',),
-            search_fields = ('url', 'title'),
-        )
-
-    def __repr__(self):
-        return "%s -- %s" % (self.url, self.title)
-
-    def get_absolute_url(self):
-        return self.url
 
 class Session(meta.Model):
     session_key = meta.CharField(_('session key'), maxlength=40, primary_key=True)

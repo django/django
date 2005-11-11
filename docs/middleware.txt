@@ -72,10 +72,6 @@ Adds a few conveniences for perfectionists:
   MD5-hashing the page content, and it'll take care of sending
   ``Not Modified`` responses, if appropriate.
 
-* Handles flat pages. Every time Django encounters a 404 -- either within
-  a view or as a result of no URLconfs matching -- it will check the
-  database of flat pages based on the current URL.
-
 django.middleware.doc.XViewMiddleware
 -------------------------------------
 

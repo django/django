@@ -69,10 +69,7 @@ following names:
     * ``sites``
     * ``packages``
     * ``content_types``
-    * ``redirects``
-    * ``flatfiles``
     * ``core_sessions``
-    * ``flatfiles_sites``
     * ``auth_permissions``
     * ``auth_groups``
     * ``auth_users``
