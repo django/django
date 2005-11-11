@@ -1,0 +1,118 @@
+==========================
+Outputting CSV with Django
+==========================
+
+This document explains how to output CSV (Comma Separated Values) dynamically
+using Django views.
+
+To do this, you can either use the `Python CSV library`_ or the Django template
+system.
+
+.. _Python CSV library: http://www.python.org/doc/current/lib/module-csv.html
+
+Using the Python CSV library
+============================
+
+Python comes with a CSV library, ``csv``. The key to using it with Django is
+that the ``csv`` module's CSV-creation capability acts on file-like objects,
+and Django's ``HttpResponse`` objects are file-like objects.
+
+.. admonition:: Note
+
+    For more information on ``HttpResponse`` objects, see
+    `Request and response objects`_.
+
+    For more information on the CSV library, see the `CSV library docs`.
+
+    .. _Request and response objects: http://www.djangoproject.com/documentation/request_response/
+    .. _CSV library docs: http://www.python.org/doc/current/lib/module-csv.html
+
+Here's an example::
+
+    import csv
+    from django.utils.httpwrappers import HttpResponse
+
+    def some_view(request):
+        # Create the HttpResponse object with the appropriate CSV header.
+        response = HttpResponse(mimetype='text/csv')
+        response['Content-Disposition'] = 'attachment; filename=somefilename.csv'
+
+        writer = csv.writer(response)
+        writer.writerow(['First row', 'Foo', 'Bar', 'Baz'])
+        writer.writerow(['Second row', 'A', 'B', 'C', '"Testing"', "Here's a quote"])
+
+        return response
+
+The code and comments should be self-explanatory, but a few things deserve a
+mention:
+
+    * The response gets a special mimetype, ``text/csv``. This tells
+      browsers that the document is a CSV file, rather than an HTML file. If
+      you leave this off, browsers will probably interpret the output as HTML,
+      which would result in ugly, scary gobbledygook in the browser window.
+
+    * The response gets an additional ``Content-Disposition`` header, which
+      contains the name of the CSV file. This filename is arbitrary: Call it
+      whatever you want. It'll be used by browsers in the "Save as..."
+      dialogue, etc.
+
+    * Hooking into the CSV-generation API is easy: Just pass ``response`` as
+      the first argument to ``csv.writer``. The ``csv.writer`` function expects
+      a file-like object, and ``HttpResponse`` objects fit the bill.
+
+    * For each row in your CSV file, call ``writer.writerow``, passing it an
+      iterable object such as a list or tuple.
+
+    * The CSV module takes care of quoting for you, so you don't have to worry
+      about escaping strings with quotes or commas in them. Just pass
+      ``writerow()`` your raw strings, and it'll do the right thing.
+
+Using the template system
+=========================
+
+Alternatively, you can use the Django template system to generate CSV. This
+is lower-level than using the convenient CSV, but the solution is presented
+here for completeness.
+
+The idea here is to pass a list of items to your template, and have the
+template output the commas in a ``{% for %}`` loop.
+
+Here's an example, which generates the same CSV file as above::
+
+    from django.utils.httpwrappers import HttpResponse
+    from django.core.template import loader, Context
+
+    def some_view(request):
+        # Create the HttpResponse object with the appropriate CSV header.
+        response = HttpResponse(mimetype='text/csv')
+        response['Content-Disposition'] = 'attachment; filename=somefilename.csv'
+
+        # The data is hard-coded here, but you could load it from a database or
+        # some other source.
+        csv_data = (
+            ('First row', 'Foo', 'Bar', 'Baz'),
+            ('Second row', 'A', 'B', 'C', '"Testing"', "Here's a quote"),
+        )
+
+        t = loader.get_template('my_template_name')
+        c = Context({
+            'data': csv_data,
+        })
+        response.write(t.render(c))
+        return response
+
+The only difference between this example and the previous example is that this
+one uses template loading instead of the CSV module. The rest of the code --
+such as the ``mimetype='text/csv'`` -- is the same.
+
+Then, create the template ``my_template_name``, with this template code::
+
+    {% for row in data %}"{{ row.0|addslashes }}", "{{ row.1|addslashes }}", "{{ row.2|addslashes }}", "{{ row.3|addslashes }}", "{{ row.4|addslashes }}"
+    {% endfor %}
+
+This template is quite basic. It just iterates over the given data and displays
+a line of CSV for each row. It uses the `addslashes template filter`_ to ensure
+there aren't any problems with quotes. If you can be certain your data doesn't
+have single or double quotes in it, you can remove the ``addslashes`` filters.
+
+.. _addslashes template filter: http://www.djangoproject.com/documentation/templates/#addslashes
