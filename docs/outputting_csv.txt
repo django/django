@@ -22,7 +22,7 @@ and Django's ``HttpResponse`` objects are file-like objects.
     For more information on ``HttpResponse`` objects, see
     `Request and response objects`_.
 
-    For more information on the CSV library, see the `CSV library docs`.
+    For more information on the CSV library, see the `CSV library docs`_.
 
     .. _Request and response objects: http://www.djangoproject.com/documentation/request_response/
     .. _CSV library docs: http://www.python.org/doc/current/lib/module-csv.html
