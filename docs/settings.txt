@@ -361,7 +361,7 @@ the 404 e-mailer. See ``SEND_BROKEN_LINK_EMAILS`` and ``IGNORABLE_404_ENDS``.
 INSTALLED_APPS
 --------------
 
-Default: Not defined
+Default: ``()`` (Empty tuple)
 
 A tuple of strings designating all applications that are enabled in this Django
 installation. Each string should be a full Python path to a Python package that
