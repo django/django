@@ -63,7 +63,7 @@ def paginator_number(cl,i):
     elif i == cl.page_num:
        return '<span class="this-page">%d</span> ' % (i+1) 
     else:
-       return '<a href="%s"%s>%d</a> ' % (cl.get_query_string( {PAGE_VAR: i}), (i == paginator.pages-1 and ' class="end"' or ''), i+1) 
+       return '<a href="%s"%s>%d</a> ' % (cl.get_query_string( {PAGE_VAR: i}), (i == cl.paginator.pages-1 and ' class="end"' or ''), i+1) 
 paginator_number = simple_tag(paginator_number)
 
 #@inclusion_tag('admin/pagination')
