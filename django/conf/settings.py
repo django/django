@@ -44,6 +44,19 @@ for setting in dir(mod):
             setting_value = (setting_value,) # In case the user forgot the comma.
         setattr(me, setting, setting_value)
 
+# Expand entries in INSTALLED_APPS like "django.contrib.*" to a list
+# of all those apps.
+new_installed_apps = []
+for app in me.INSTALLED_APPS:
+    if app.endswith('.*'):
+        appdir = os.path.dirname(__import__(app[:-2], '', '', ['']).__file__)
+        for d in os.listdir(appdir):
+            if d.isalpha() and os.path.isdir(os.path.join(appdir, d)):
+                new_installed_apps.append('%s.%s' % (app[:-2], d))
+    else:
+        new_installed_apps.append(app)
+me.INSTALLED_APPS = new_installed_apps
+
 # save DJANGO_SETTINGS_MODULE in case anyone in the future cares
 me.SETTINGS_MODULE = os.environ.get(ENVIRONMENT_VARIABLE, '')
 

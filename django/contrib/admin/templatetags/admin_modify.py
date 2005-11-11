@@ -30,7 +30,7 @@ def submit_row(context, bound_manipulator):
     show_delete = context['show_delete']
     has_delete_permission = context['has_delete_permission']
     is_popup = context['is_popup']
-  
+    print is_popup.something
     return {
         'onclick_attrib' : (bound_manipulator.ordered_objects and change 
                             and 'onclick="submitOrderForm();"' or ''), 

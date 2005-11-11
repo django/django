@@ -136,9 +136,6 @@ ALLOWED_INCLUDE_ROOTS = ()
 # is an admin.
 ADMIN_FOR = ()
 
-# Whether to check the flat-pages table as a last resort for all 404 errors.
-USE_FLAT_PAGES = True
-
 # 404s that may be ignored.
 IGNORABLE_404_STARTS = ('/cgi-bin/', '/_vti_bin', '/_vti_inf')
 IGNORABLE_404_ENDS = ('mail.pl', 'mailform.pl', 'mail.cgi', 'mailform.cgi', 'favicon.ico', '.php')

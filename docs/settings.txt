@@ -358,6 +358,17 @@ Default: ``('/cgi-bin/', '/_vti_bin', '/_vti_inf')``
 A tuple of strings that specify beginnings of URLs that should be ignored by
 the 404 e-mailer. See ``SEND_BROKEN_LINK_EMAILS`` and ``IGNORABLE_404_ENDS``.
 
+INSTALLED_APPS
+--------------
+
+Default: Not defined
+
+A tuple of strings designating all applications that are enabled in this Django
+installation. Each string should be a full Python path to a Python package that
+contains a Django application, as created by `django-admin.py startapp`_.
+
+.. _django-admin.py startapp: http://www.djangoproject.com/documentation/django_admin/#startapp-appname
+
 INTERNAL_IPS
 ------------
 
@@ -488,6 +499,15 @@ See the `session docs`_.
 ``'hotclub'`` is a reference to the Hot Club of France, the band Django
 Reinhardt played in.
 
+SITE_ID
+-------
+
+Default: Not defined
+
+The ID, as an integer, of the current site in the ``sites`` database. This is
+used so that application data can hook into specific site(s) and a single
+database can manage content for multiple sites.
+
 TEMPLATE_DIRS
 -------------
 
@@ -541,14 +561,6 @@ Default: ``False``
 A boolean that specifies whether to output the "Etag" header. This saves
 bandwidth but slows down performance. This is only used if ``CommonMiddleware``
 is installed (see the `middleware docs`_).
-
-USE_FLAT_PAGES
---------------
-
-Default: ``True``
-
-Whether to check the flat-pages table as a last resort for all 404 errors. This
-is only used if ``CommonMiddleware`` is installed (see the `middleware docs`_).
 
 .. _cache docs: http://www.djangoproject.com/documentation/cache/
 .. _middleware docs: http://www.djangoproject.com/documentation/middleware/

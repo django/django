@@ -49,7 +49,6 @@
    </div></fieldset>
    {% endif %}
 {% endif %}
-
 {% for related_object in bound_manipulator.inline_related_objects %}{% edit_inline related_object %}{% endfor %}
 {% block after_related_objects%}{%endblock%}
 {% submit_row bound_manipulator %}

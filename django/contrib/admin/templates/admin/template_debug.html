@@ -4,10 +4,10 @@
 {% block content %}
    <div>
    <h2>{%trans "Error in Template" %}</h2>
+<pre>
 {%blocktrans %}
 In template {{name}}, error at line {{line}}:
 {%endblocktrans %}
-<pre>
 {{message|escape}}
 {{traceback|escape}}
 </pre>
