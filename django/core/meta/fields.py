@@ -413,7 +413,7 @@ class DateField(Field):
 
     def flatten_data(self, follow, obj = None):
     	val = self._get_val_from_obj(obj)
-        return {self.get_db_column(): (val is not None and val.strftime("%Y-%m-%d") or '')}
+        return {self.attname: (val is not None and val.strftime("%Y-%m-%d") or '')}
 
 class DateTimeField(DateField):
     def get_db_prep_save(self, value):
@@ -643,7 +643,7 @@ class TimeField(Field):
 
     def flatten_data(self,follow, obj = None):
         val = self._get_val_from_obj(obj) 
-        return {self.get_db_column(): (val is not None and val.strftime("%H:%M:%S") or '')} 
+        return {self.attname: (val is not None and val.strftime("%H:%M:%S") or '')} 
 
 class URLField(Field):
     def __init__(self, verbose_name=None, name=None, verify_exists=True, **kwargs):
