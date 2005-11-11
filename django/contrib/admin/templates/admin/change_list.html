@@ -1,4 +1,5 @@
 {% load admin_list %}
+{% load i18n %}
 {% extends "admin/base_site" %}
 {% block bodyclass %}change-list{% endblock %}
 {% if not is_popup %}{% block breadcrumbs %}<div class="breadcrumbs"><a href="../../">Home</a> &rsaquo; {{cl.opts.verbose_name_plural|capfirst}} </div>{% endblock %}{% endif %}
