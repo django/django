@@ -8,10 +8,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2005-11-10 05:53-0600\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"POT-Creation-Date: 2005-11-10 20:55-0500\n"
+"PO-Revision-Date: 2005-11-10 23:22-0500\n"
 "Last-Translator: Vladimir Labath <vlado@labath.org>\n"
-"Language-Team: Slovak <LL@li.org>\n"
+"Language-Team: Slovak <info@labath.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -114,11 +114,11 @@ msgstr ""
 #: contrib/admin/templates/admin/404.html:4
 #: contrib/admin/templates/admin/404.html:8
 msgid "Page not found"
-msgstr "Stránka sa nenašla"
+msgstr "Stránka nebola nájdená"
 
 #: contrib/admin/templates/admin/404.html:10
 msgid "We're sorry, but the requested page could not be found."
-msgstr "Ľutujeme, ale požadovaná stránka sa nenašla."
+msgstr "Ľutujeme, ale požadovaná stránka nebola nájdená."
 
 #: contrib/admin/templates/admin/index.html:27
 msgid "Add"
@@ -993,3 +993,41 @@ msgid ""
 msgstr ""
 " Podržte \"Control\", alebo \"Command\" na  Mac_u, na výber viac ako jednej "
 "položky."
+#:commit
+msgid "Post a comment"
+msgstr "Pošli komentár"
+ 
+
+msgid "Comments"
+msgstr "Komentáre"
+
+msgid "Comment"
+msgstr "Komentár"
+
+msgid "Your name"
+msgstr "Vaše meno"
+
+msgid "Preview revised comment"
+msgstr "Ukázať upravený komentár"
+
+msgid "Post public comment"
+msgstr "Zveréjniť komentár"
+
+msgid "Preview comment"
+msgstr "Ukázať komentár"
+
+msgid "Posted by"
+msgstr "Poslané"
+
+msgid "Or edit it again"
+msgstr "Alebo ho vytvorte znova"
+
+msgid "Please correct the following errors."
+msgstr "Odstráňte nasledujúce chyby, prosím."
+
+msgid "Looks like you followed a bad link. If you think it is our fault, please <a href=\"http://doma.myvtoronte.com/staznost/\">let us know</a>"
+msgstr "Pozrite si linku , kde vzikla chyba. Ak si myslíte, že je to naša chyba, <a href=\"http://doma.myvtoronte.com/staznost/\">dajte nám to vedieť</a>, prosím"
+
+msgid "Here is a link to the <a href=\"/\">homepage</a>. You know, just in case"
+msgstr "Tu je adresa <a href=\"/\">úvodnej stránky</a>. Ak by ste ju potrebovali"
+
