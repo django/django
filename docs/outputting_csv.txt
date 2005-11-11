@@ -70,7 +70,7 @@ mention:
 Using the template system
 =========================
 
-Alternatively, you can use the Django template system to generate CSV. This
+Alternatively, you can use the `Django template system`_ to generate CSV. This
 is lower-level than using the convenient CSV, but the solution is presented
 here for completeness.
 
@@ -115,4 +115,5 @@ a line of CSV for each row. It uses the `addslashes template filter`_ to ensure
 there aren't any problems with quotes. If you can be certain your data doesn't
 have single or double quotes in it, you can remove the ``addslashes`` filters.
 
+.. _Django template system: http://www.djangoproject.com/documentation/templates/
 .. _addslashes template filter: http://www.djangoproject.com/documentation/templates/#addslashes
