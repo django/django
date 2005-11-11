@@ -499,6 +499,15 @@ See the `session docs`_.
 ``'hotclub'`` is a reference to the Hot Club of France, the band Django
 Reinhardt played in.
 
+SITE_ID
+-------
+
+Default: Not defined
+
+The ID, as an integer, of the current site in the ``sites`` database. This is
+used so that application data can hook into specific site(s) and a single
+database can manage content for multiple sites.
+
 TEMPLATE_DIRS
 -------------
 
