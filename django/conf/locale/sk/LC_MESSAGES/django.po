@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2005-11-10 20:55-0500\n"
+"POT-Creation-Date: 2005-11-11 16:13-0600\n"
 "PO-Revision-Date: 2005-11-10 23:22-0500\n"
 "Last-Translator: Vladimir Labath <vlado@labath.org>\n"
 "Language-Team: Slovak <info@labath.org>\n"
@@ -310,6 +310,89 @@ msgstr "Ďakujeme, že používate naše stránky!"
 msgid "The %(site_name)s team"
 msgstr "Skupina %(site_name)s"
 
+#: contrib/redirects/models/redirects.py:7
+msgid "redirect from"
+msgstr "presmerovaný z"
+
+#: contrib/redirects/models/redirects.py:8
+msgid ""
+"This should be an absolute path, excluding the domain name. Example: '/"
+"events/search/'."
+msgstr ""
+"Tu by sa mala použiť absolútna cesta, bez domény. Napr.: '/events/search/'."
+
+#: contrib/redirects/models/redirects.py:9
+msgid "redirect to"
+msgstr "presmerovaný na "
+
+#: contrib/redirects/models/redirects.py:10
+msgid ""
+"This can be either an absolute path (as above) or a full URL starting with "
+"'http://'."
+msgstr ""
+"Tu môže byť buď absolútna cesta (ako hore) alebo plné  URL začínajúce s "
+"'http://'."
+
+#: contrib/redirects/models/redirects.py:12
+msgid "redirect"
+msgstr "presmerovanie"
+
+#: contrib/redirects/models/redirects.py:13
+msgid "redirects"
+msgstr "presmerovania"
+
+#: contrib/flatpages/models/flatpages.py:6
+msgid "URL"
+msgstr "URL"
+
+#: contrib/flatpages/models/flatpages.py:7
+msgid ""
+"Example: '/about/contact/'. Make sure to have leading and trailing slashes."
+msgstr ""
+"Príklad: '/about/contact/'. Uistite sa, že máte vložené ako úvodné tak aj "
+"záverečné lomítka."
+
+#: contrib/flatpages/models/flatpages.py:8
+msgid "title"
+msgstr "názov"
+
+#: contrib/flatpages/models/flatpages.py:9
+msgid "content"
+msgstr "obsah"
+
+#: contrib/flatpages/models/flatpages.py:10
+msgid "enable comments"
+msgstr "povolené komentáre"
+
+#: contrib/flatpages/models/flatpages.py:11
+msgid "template name"
+msgstr "meno predlohy"
+
+#: contrib/flatpages/models/flatpages.py:12
+msgid ""
+"Example: 'flatpages/contact_page'. If this isn't provided, the system will "
+"use 'flatpages/default'."
+msgstr ""
+"Príklad: 'flatpages/contact_page'. Ak sa toto nevykonalo,  systém použije  "
+"'flatpages/default'."
+
+#: contrib/flatpages/models/flatpages.py:13
+msgid "registration required"
+msgstr "musíte byť zaregistrovaný"
+
+#: contrib/flatpages/models/flatpages.py:13
+msgid "If this is checked, only logged-in users will be able to view the page."
+msgstr ""
+"Ak je toto označené, potom len prihlásený užívateľ môže vidieť túto stránku."
+
+#: contrib/flatpages/models/flatpages.py:17
+msgid "flat page"
+msgstr "plochá stránka"
+
+#: contrib/flatpages/models/flatpages.py:18
+msgid "flat pages"
+msgstr "ploché stránky"
+
 #: utils/dates.py:6
 msgid "Monday"
 msgstr "Pondelok"
@@ -458,106 +541,23 @@ msgstr "typ obsahu"
 msgid "content types"
 msgstr "typy obsahu"
 
-#: models/core.py:68
-msgid "redirect from"
-msgstr "presmerovaný z"
-
-#: models/core.py:69
-msgid ""
-"This should be an absolute path, excluding the domain name. Example: '/"
-"events/search/'."
-msgstr ""
-"Tu by sa mala použiť absolútna cesta, bez domény. Napr.: '/events/search/'."
-
-#: models/core.py:70
-msgid "redirect to"
-msgstr "presmerovaný na "
-
-#: models/core.py:71
-msgid ""
-"This can be either an absolute path (as above) or a full URL starting with "
-"'http://'."
-msgstr ""
-"Tu môže byť buď absolútna cesta (ako hore) alebo plné  URL začínajúce s "
-"'http://'."
-
-#: models/core.py:73
-msgid "redirect"
-msgstr "presmerovanie"
-
-#: models/core.py:74
-msgid "redirects"
-msgstr "presmerovania"
-
-#: models/core.py:87
-msgid "URL"
-msgstr "URL"
-
-#: models/core.py:88
-msgid ""
-"Example: '/about/contact/'. Make sure to have leading and trailing slashes."
-msgstr ""
-"Príklad: '/about/contact/'. Uistite sa, že máte vložené ako úvodné tak aj "
-"záverečné lomítka."
-
-#: models/core.py:89
-msgid "title"
-msgstr "názov"
-
-#: models/core.py:90
-msgid "content"
-msgstr "obsah"
-
-#: models/core.py:91
-msgid "enable comments"
-msgstr "povolené komentáre"
-
-#: models/core.py:92
-msgid "template name"
-msgstr "meno predlohy"
-
-#: models/core.py:93
-msgid ""
-"Example: 'flatfiles/contact_page'. If this isn't provided, the system will "
-"use 'flatfiles/default'."
-msgstr ""
-"Príklad: 'flatfiles/contact_page'. Ak sa toto nevykonalo,  systém použije  "
-"'flatfiles/default'."
-
-#: models/core.py:94
-msgid "registration required"
-msgstr "musíte byť zaregistrovaný"
-
-#: models/core.py:94
-msgid "If this is checked, only logged-in users will be able to view the page."
-msgstr ""
-"Ak je toto označené, potom len prihlásený užívateľ môže vidieť túto stránku."
-
-#: models/core.py:98
-msgid "flat page"
-msgstr "plochá stránka"
-
-#: models/core.py:99
-msgid "flat pages"
-msgstr "ploché stránky"
-
-#: models/core.py:117
+#: models/core.py:67
 msgid "session key"
 msgstr "kľúč sedenia"
 
-#: models/core.py:118
+#: models/core.py:68
 msgid "session data"
 msgstr "údaje sedenia"
 
-#: models/core.py:119
+#: models/core.py:69
 msgid "expire date"
 msgstr "dátum konca platnosti"
 
-#: models/core.py:121
+#: models/core.py:71
 msgid "session"
 msgstr "sedenie"
 
-#: models/core.py:122
+#: models/core.py:72
 msgid "sessions"
 msgstr "sedenia"
 
@@ -993,41 +993,81 @@ msgid ""
 msgstr ""
 " Podržte \"Control\", alebo \"Command\" na  Mac_u, na výber viac ako jednej "
 "položky."
-#:commit
-msgid "Post a comment"
-msgstr "Pošli komentár"
- 
 
-msgid "Comments"
-msgstr "Komentáre"
+#~ msgid "Comment posted"
+#~ msgstr "Komentár bol poslaný"
 
-msgid "Comment"
-msgstr "Komentár"
+#~ msgid "Comment posted successfully"
+#~ msgstr "Komentár bol úspešne odoslaný"
 
-msgid "Your name"
-msgstr "Vaše meno"
+#~ msgid "Thanks for contributing."
+#~ msgstr "Ďakujeme za príspevok."
 
-msgid "Preview revised comment"
-msgstr "Ukázať upravený komentár"
+#~ msgid "View your comment"
+#~ msgstr "Pozri svôj príspevok"
 
-msgid "Post public comment"
-msgstr "Zveréjniť komentár"
+# templates/blog/entries_detail.html:24
+#~ msgid "Post a comment"
+#~ msgstr "Pošli komentár"
 
-msgid "Preview comment"
-msgstr "Ukázať komentár"
+# templates/blog/entries_detail.html:15
+#~ msgid "Comments"
+#~ msgstr "Komentáre"
 
-msgid "Posted by"
-msgstr "Poslané"
+#~ msgid "Comment"
+#~ msgstr "Komentár"
 
-msgid "Or edit it again"
-msgstr "Alebo ho vytvorte znova"
+#~ msgid "Your name"
+#~ msgstr "Vaše meno"
 
-msgid "Please correct the following errors."
-msgstr "Odstráňte nasledujúce chyby, prosím."
+#~ msgid "Preview revised comment"
+#~ msgstr "Prezretie upraveného komentára"
 
-msgid "Looks like you followed a bad link. If you think it is our fault, please <a href=\"http://doma.myvtoronte.com/staznost/\">let us know</a>"
-msgstr "Pozrite si linku , kde vzikla chyba. Ak si myslíte, že je to naša chyba, <a href=\"http://doma.myvtoronte.com/staznost/\">dajte nám to vedieť</a>, prosím"
+#~ msgid "Post public comment"
+#~ msgstr "Zveréjniť komentár"
 
-msgid "Here is a link to the <a href=\"/\">homepage</a>. You know, just in case"
-msgstr "Tu je adresa <a href=\"/\">úvodnej stránky</a>. Ak by ste ju potrebovali"
+#~ msgid "Preview comment"
+#~ msgstr "Prezrieť komentár"
 
+#~ msgid "Preview your comment"
+#~ msgstr "Prezrite si svoj komentár"
+
+#~ msgid "Posted by"
+#~ msgstr "Poslané"
+
+#~ msgid "Or edit it again"
+#~ msgstr "Alebo ho vytvorte znova"
+
+#~ msgid "Please correct the following errors."
+#~ msgstr "Odstráňte nasledujúce chyby, prosím."
+
+#~ msgid ""
+#~ "Looks like you followed a bad link. If you think it is our fault, please "
+#~ "<a href=\"http://doma.myvtoronte.com/staznost/\">let us know</a>"
+#~ msgstr ""
+#~ "Pozrite si linku , kde vzikla chyba. Ak si myslíte, že je to naša chyba, "
+#~ "<a href=\"http://doma.myvtoronte.com/staznost/\">dajte nám to vedieť</a>, "
+#~ "prosím"
+
+#~ msgid ""
+#~ "Here is a link to the <a href=\"/\">homepage</a>. You know, just in case"
+#~ msgstr ""
+#~ "Tu je adresa <a href=\"/\">úvodnej stránky</a>. Ak by ste ju potrebovali"
+
+#~ msgid "Recent comments"
+#~ msgstr "Posledný komentár"
+
+#~ msgid "Previous"
+#~ msgstr "Predchádzajúci/a"
+
+#~ msgid "Page"
+#~ msgstr "Stránka"
+
+#~ msgid "Next"
+#~ msgstr "Ďalší/ia"
+
+#~ msgid "Latest entries"
+#~ msgstr "Posledné záznamy"
+
+#~ msgid "archive"
+#~ msgstr "archív"
