@@ -243,8 +243,6 @@ msgstr "Django Verwaltung"
 #: contrib/admin/templates/registration/password_reset_form.html:4
 #: contrib/admin/templates/admin/base.html:29
 #: contrib/admin/templates/admin/change_form.html:12
-#: contrib/admin/templates/registration/password_change_done.html:4
-#: contrib/admin/templates/registration/password_reset_form.html:4
 #: contrib/admin/templates/registration/logged_out.html:4
 #: contrib/admin/templates/registration/password_reset_done.html:4
 #: contrib/admin/templates/registration/password_change_form.html:4
@@ -264,6 +262,8 @@ msgid "Server Error <em>(500)</em>"
 msgstr "Serverfehler <em>(500)</em>"
 
 #: contrib/admin/templates/admin/500.html:10
+#: contrib/admin/templates/admin/delete_confirmation.html:7
+#, python-format
 msgid ""
 "There's been an error. It's been reported to the site administrators via e-"
 "mail and should be fixed shortly. Thanks for your patience."
@@ -279,7 +279,8 @@ msgstr "Seite nicht gefunden"
 
 #: contrib/admin/templates/admin/404.html:10
 msgid "We're sorry, but the requested page could not be found."
-msgstr "Leider konnte die angeforderte Seite nicht gefunden werden."
+msgstr ""
+"Es tut uns leid, aber die angeforderte Seite kann nicht gefunden werden."
 
 #: contrib/admin/templates/admin/index.html:27
 #: contrib/admin/templates/admin/change_form.html:14
@@ -359,26 +360,6 @@ msgstr "Passwort ändern"
 msgid "Log out"
 msgstr "Abmelden"
 
-#: contrib/admin/templates/admin/delete_confirmation.html:7
-#, python-format
-msgid ""
-"There's been an error. It's been reported to the site administrators via e-"
-"mail and should be fixed shortly. Thanks for your patience."
-msgstr ""
-"Es hat einen Fehler gegeben. Dieser Fehler wurde an die Serververwalter per "
-"eMail weitergegeben und sollte bald behoben sein. Vielen Dank für Ihr "
-"Verständnis."
-
-#: contrib/admin/templates/admin/404.html:4
-#: contrib/admin/templates/admin/404.html:8
-msgid "Page not found"
-msgstr "Seite nicht gefunden"
-
-#: contrib/admin/templates/admin/404.html:10
-msgid "We're sorry, but the requested page could not be found."
-msgstr ""
-"Es tut uns leid, aber die angeforderte Seite kann nicht gefunden werden."
-
 #: contrib/admin/templates/admin/change_form.html:20
 msgid "View on site"
 msgstr "Im Web Anzeigen"
@@ -416,10 +397,6 @@ msgstr "Sichern und weiter bearbeiten"
 #: contrib/admin/templates/admin/submit_line.html:7
 msgid "Save"
 msgstr "Sichern"
-
-#: contrib/admin/templates/admin/base.html:23
-msgid "Log out"
-msgstr "Abmelden"
 
 #: contrib/admin/templates/admin/delete_confirmation.html:7
 #, python-format

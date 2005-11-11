@@ -240,8 +240,6 @@ msgstr "Administración de Django"
 #: contrib/admin/templates/registration/password_reset_form.html:4
 #: contrib/admin/templates/admin/base.html:29
 #: contrib/admin/templates/admin/change_form.html:12
-#: contrib/admin/templates/registration/password_change_done.html:4
-#: contrib/admin/templates/registration/password_reset_form.html:4
 #: contrib/admin/templates/registration/logged_out.html:4
 #: contrib/admin/templates/registration/password_reset_done.html:4
 #: contrib/admin/templates/registration/password_change_form.html:4
@@ -368,28 +366,6 @@ msgstr ""
 "objetos relacionados, pero su cuenta no tiene permiso para borrar los "
 "siguientes tipos de objetos:"
 
-#: contrib/admin/templates/admin/500.html:6
-msgid "Server error (500)"
-msgstr "Error del servidor (500)"
-
-#: contrib/admin/templates/admin/500.html:9
-msgid "Server Error <em>(500)</em>"
-msgstr "Error de servidor <em>(500)</em>"
-
-#: contrib/admin/templates/admin/500.html:10
-msgid ""
-"There's been an error. It's been reported to the site administrators via e-"
-"mail and should be fixed shortly. Thanks for your patience."
-msgstr ""
-"Ha ocurrido un error. Se ha informado a los administradores del sitio "
-"mediante correo electrónico y debería arreglarse en breve. Gracias por su "
-"paciencia"
-
-#: contrib/admin/templates/admin/404.html:4
-#: contrib/admin/templates/admin/404.html:8
-msgid "Page not found"
-msgstr "Página no encontrada"
-
 #: contrib/admin/templates/admin/change_form.html:20
 msgid "View on site"
 msgstr ""
@@ -427,21 +403,6 @@ msgstr ""
 #: contrib/admin/templates/admin/submit_line.html:7
 msgid "Save"
 msgstr ""
-
-#: contrib/admin/templates/admin/base.html:23
-msgid "Log out"
-msgstr "Terminar"
-
-#: contrib/admin/templates/admin/delete_confirmation.html:7
-#, fuzzy, python-format
-msgid ""
-"Deleting the %(object_name)s '%(object)s' would result in deleting related "
-"objects, but your account doesn't have permission to delete the following "
-"types of objects:"
-msgstr ""
-"Eliminar el %(object_name)s '%(object)s' provocaría la eliminación de "
-"objetos relacionados, pero su cuenta no tiene permiso para borrar los "
-"siguientes tipos de objetos:"
 
 #: contrib/admin/templates/admin/delete_confirmation.html:14
 #, python-format

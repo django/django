@@ -247,17 +247,6 @@ msgstr ""
 msgid "log entries"
 msgstr ""
 
-#: contrib/admin/templates/admin/object_history.html:5
-#: contrib/admin/templates/admin/500.html:4
-#: contrib/admin/templates/admin/base.html:29
-#: contrib/admin/templates/registration/password_change_done.html:4
-#: contrib/admin/templates/registration/password_reset_form.html:4
-#: contrib/admin/templates/registration/logged_out.html:4
-#: contrib/admin/templates/registration/password_reset_done.html:4
-#: contrib/admin/templates/registration/password_change_form.html:4
-msgid "Home"
-msgstr ""
-
 #: contrib/admin/templates/admin/404.html:4
 #: contrib/admin/templates/admin/404.html:8
 msgid "Page not found"
@@ -365,11 +354,6 @@ msgid ""
 "mail and should be fixed shortly. Thanks for your patience."
 msgstr ""
 
-#: contrib/admin/templates/admin/404.html:4
-#: contrib/admin/templates/admin/404.html:8
-msgid "Page not found"
-msgstr ""
-
 #: contrib/admin/templates/admin/change_form.html:20
 msgid "View on site"
 msgstr ""
@@ -406,18 +390,6 @@ msgstr ""
 
 #: contrib/admin/templates/admin/submit_line.html:7
 msgid "Save"
-msgstr ""
-
-#: contrib/admin/templates/admin/base.html:23
-msgid "Log out"
-msgstr ""
-
-#: contrib/admin/templates/admin/delete_confirmation.html:7
-#, python-format
-msgid ""
-"Deleting the %(object_name)s '%(object)s' would result in deleting related "
-"objects, but your account doesn't have permission to delete the following "
-"types of objects:"
 msgstr ""
 
 #: contrib/admin/templates/admin/delete_confirmation.html:14
@@ -561,10 +533,6 @@ msgstr ""
 
 #: contrib/admin/models/admin.py:15
 msgid "log entry"
-msgstr ""
-
-#: contrib/admin/models/admin.py:16
-msgid "log entries"
 msgstr ""
 
 #: contrib/admin/templatetags/admin_list.py:260

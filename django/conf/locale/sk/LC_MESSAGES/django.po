@@ -241,8 +241,6 @@ msgstr "Administrácia Django"
 #: contrib/admin/templates/registration/password_reset_form.html:4
 #: contrib/admin/templates/admin/base.html:29
 #: contrib/admin/templates/admin/change_form.html:12
-#: contrib/admin/templates/registration/password_change_done.html:4
-#: contrib/admin/templates/registration/password_reset_form.html:4
 #: contrib/admin/templates/registration/logged_out.html:4
 #: contrib/admin/templates/registration/password_reset_done.html:4
 #: contrib/admin/templates/registration/password_change_form.html:4
@@ -271,8 +269,13 @@ msgstr ""
 
 #: contrib/admin/templates/admin/404.html:4
 #: contrib/admin/templates/admin/404.html:8
+#, fuzzy
 msgid "Page not found"
-msgstr "Stránka nebola nájdená"
+msgstr ""
+"#-#-#-#-#  django.po (PACKAGE VERSION)  #-#-#-#-#\n"
+"Stránka nebola nájdená\n"
+"#-#-#-#-#  django.po (PACKAGE VERSION)  #-#-#-#-#\n"
+"Stránka sa nenašla"
 
 #: contrib/admin/templates/admin/404.html:10
 msgid "We're sorry, but the requested page could not be found."
@@ -367,27 +370,6 @@ msgstr ""
 "súvisiacich objektov, ale váš účet nemá povolenie na mazanie nasledujúcich "
 "typov objektov:"
 
-#: contrib/admin/templates/admin/500.html:6
-msgid "Server error (500)"
-msgstr "Chyba servera (500)"
-
-#: contrib/admin/templates/admin/500.html:9
-msgid "Server Error <em>(500)</em>"
-msgstr "Chyba servera <em>(500)</em>"
-
-#: contrib/admin/templates/admin/500.html:10
-msgid ""
-"There's been an error. It's been reported to the site administrators via e-"
-"mail and should be fixed shortly. Thanks for your patience."
-msgstr ""
-"Vznikla chyba. Prostredníctvom e-mailu  bol o nej informovaný správca a "
-"chyba by mala byť o chviľu odstránená. Ďakujeme za vašu trpezlivosť."
-
-#: contrib/admin/templates/admin/404.html:4
-#: contrib/admin/templates/admin/404.html:8
-msgid "Page not found"
-msgstr "Stránka sa nenašla"
-
 #: contrib/admin/templates/admin/change_form.html:20
 msgid "View on site"
 msgstr ""
@@ -426,21 +408,6 @@ msgstr ""
 #, fuzzy
 msgid "Save"
 msgstr "aktívny"
-
-#: contrib/admin/templates/admin/base.html:23
-msgid "Log out"
-msgstr "Odhlásenie"
-
-#: contrib/admin/templates/admin/delete_confirmation.html:7
-#, python-format
-msgid ""
-"Deleting the %(object_name)s '%(object)s' would result in deleting related "
-"objects, but your account doesn't have permission to delete the following "
-"types of objects:"
-msgstr ""
-"Vymazaním objektu %(object_name)s '%(object)s' môžete spôsobiť vymazanie "
-"súvisiacich objektov, ale váš účet nemá povolenie na mazanie nasledujúcich "
-"typov objektov:"
 
 #: contrib/admin/templates/admin/delete_confirmation.html:14
 #, python-format
@@ -1276,10 +1243,10 @@ msgid ""
 msgstr ""
 " Podržte \"Control\", alebo \"Command\" na  Mac_u, na výber viac ako jednej "
 "položky."
-#:commit
+
+#: commit
 msgid "Post a comment"
 msgstr "Pošli komentár"
- 
 
 msgid "Comments"
 msgstr "Komentáre"
@@ -1308,9 +1275,14 @@ msgstr "Alebo ho vytvorte znova"
 msgid "Please correct the following errors."
 msgstr "Odstráňte nasledujúce chyby, prosím."
 
-msgid "Looks like you followed a bad link. If you think it is our fault, please <a href=\"http://doma.myvtoronte.com/staznost/\">let us know</a>"
-msgstr "Pozrite si linku , kde vzikla chyba. Ak si myslíte, že je to naša chyba, <a href=\"http://doma.myvtoronte.com/staznost/\">dajte nám to vedieť</a>, prosím"
+msgid ""
+"Looks like you followed a bad link. If you think it is our fault, please <a "
+"href=\"http://doma.myvtoronte.com/staznost/\">let us know</a>"
+msgstr ""
+"Pozrite si linku , kde vzikla chyba. Ak si myslíte, že je to naša chyba, <a "
+"href=\"http://doma.myvtoronte.com/staznost/\">dajte nám to vedieť</a>, prosím"
 
-msgid "Here is a link to the <a href=\"/\">homepage</a>. You know, just in case"
-msgstr "Tu je adresa <a href=\"/\">úvodnej stránky</a>. Ak by ste ju potrebovali"
-
+msgid ""
+"Here is a link to the <a href=\"/\">homepage</a>. You know, just in case"
+msgstr ""
+"Tu je adresa <a href=\"/\">úvodnej stránky</a>. Ak by ste ju potrebovali"

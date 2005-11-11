@@ -244,8 +244,6 @@ msgstr "Django administracija"
 #: contrib/admin/templates/registration/password_reset_form.html:4
 #: contrib/admin/templates/admin/base.html:29
 #: contrib/admin/templates/admin/change_form.html:12
-#: contrib/admin/templates/registration/password_change_done.html:4
-#: contrib/admin/templates/registration/password_reset_form.html:4
 #: contrib/admin/templates/registration/logged_out.html:4
 #: contrib/admin/templates/registration/password_reset_done.html:4
 #: contrib/admin/templates/registration/password_change_form.html:4
@@ -370,27 +368,6 @@ msgstr ""
 "Brisanjem %(object_name)s  '%(object)s' došlo bi do brisanja dodatnih "
 "podataka, ali nemate prava da brišete sledeće tipove podataka:"
 
-#: contrib/admin/templates/admin/500.html:6
-msgid "Server error (500)"
-msgstr "Greška na serveru (500)"
-
-#: contrib/admin/templates/admin/500.html:9
-msgid "Server Error <em>(500)</em>"
-msgstr "Greška na serveru <em>(500)</em>"
-
-#: contrib/admin/templates/admin/500.html:10
-msgid ""
-"There's been an error. It's been reported to the site administrators via e-"
-"mail and should be fixed shortly. Thanks for your patience."
-msgstr ""
-"Dogodila se greška koja je prijavljena administratorima i biće popravljena "
-"uskoro. Hvala Vam na strpljenju."
-
-#: contrib/admin/templates/admin/404.html:4
-#: contrib/admin/templates/admin/404.html:8
-msgid "Page not found"
-msgstr "Strana nije pronađena"
-
 #: contrib/admin/templates/admin/change_form.html:20
 msgid "View on site"
 msgstr ""
@@ -430,20 +407,6 @@ msgstr ""
 #, fuzzy
 msgid "Save"
 msgstr "aktivan"
-
-#: contrib/admin/templates/admin/base.html:23
-msgid "Log out"
-msgstr "Odjavi se"
-
-#: contrib/admin/templates/admin/delete_confirmation.html:7
-#, fuzzy, python-format
-msgid ""
-"Deleting the %(object_name)s '%(object)s' would result in deleting related "
-"objects, but your account doesn't have permission to delete the following "
-"types of objects:"
-msgstr ""
-"Brisanjem %(object_name)s  '%(object)s' došlo bi do brisanja dodatnih "
-"podataka, ali nemate prava da brišete sledeće tipove podataka:"
 
 #: contrib/admin/templates/admin/delete_confirmation.html:14
 #, python-format
