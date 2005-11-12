@@ -497,7 +497,7 @@ several subclasses:
     * ``Atom1Feed``
 
 Each of these three classes knows how to render a certain type of feed as XML.
-They share this interface::
+They share this interface:
 
 ``__init__(title, link, description, language=None, author_email=None,
 author_name=None, author_link=None, subtitle=None, categories=None)``
