@@ -4,6 +4,16 @@ How to install Django
 
 This document will get you up and running with Django.
 
+Install Python
+==============
+
+Being a Python Web framework, Django requires Python.
+
+It works with any Python version 2.3 and higher.
+
+Get Python at www.python.org. If you're running Linux or Mac OS X, you probably
+already have it installed.
+
 Install Apache and mod_python
 =============================
 
