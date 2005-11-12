@@ -89,7 +89,7 @@ can live anywhere in your codebase.
 A simple example
 ----------------
 
-This simple example, taken from chicagocrime.org, describes a feed of the
+This simple example, taken from `chicagocrime.org`_, describes a feed of the
 latest five news items::
 
     from django.contrib.syndication.feeds import Feed
@@ -132,8 +132,8 @@ put into those elements.
             ``{{ site.domain }}`` or ``{{ site.name }}``.
 
       If you don't create a template for either the title or description, the
-      framework will use the template ``{{ obj }}`` by default -- that is, the
-      normal string representation of the object.
+      framework will use the template ``"{{ obj }}"`` by default -- that is,
+      the normal string representation of the object.
     * To specify the contents of ``<link>``, you have two options. For each
       item in ``items()``, Django first tries executing a
       ``get_absolute_url()`` method on that object. If that method doesn't
@@ -142,6 +142,7 @@ put into those elements.
       Both ``get_absolute_url()`` and ``item_link()`` should return the item's
       URL as a normal Python string.
 
+.. _chicagocrime.org: http://www.chicagocrime.org/
 .. _object-relational mapper: http://www.djangoproject.com/documentation/db_api/
 .. _Django templates: http://www.djangoproject.com/documentation/templates/
 
@@ -150,18 +151,18 @@ A complex example
 
 The framework also supports more complex feeds, via parameters.
 
-For example, chicagocrime.org offers an RSS feed of recent crimes for every
+For example, `chicagocrime.org`_ offers an RSS feed of recent crimes for every
 police beat in Chicago. It'd be silly to create a separate ``Feed`` class for
 each police beat; that would violate the `DRY principle`_ and would couple data
-to programming logic. Instead, the RSS framework lets you make generic feeds
-that output items based on information in the feed's URL.
+to programming logic. Instead, the syndication framework lets you make generic
+feeds that output items based on information in the feed's URL.
 
 On chicagocrime.org, the police-beat feeds are accessible via URLs like this:
 
     * ``/rss/beats/0613/`` -- Returns recent crimes for beat 0613.
     * ``/rss/beats/1424/`` -- Returns recent crimes for beat 1424.
 
-The slug here is ``beats``. The syndication framework sees the extra URL bits
+The slug here is ``"beats"``. The syndication framework sees the extra URL bits
 after the slug -- ``0613`` and ``1424`` -- and gives you a hook to tell it what
 those URL bits mean, and how they should influence which items get published in
 the feed.
@@ -207,8 +208,8 @@ request to the URL ``/rss/beats/0613/``:
       subclass of ``ObjectDoesNotExist``. Raising ``ObjectDoesNotExist`` in
       ``get_object()`` tells Django to produce a 404 error for that request.
     * To generate the feed's ``<title>``, ``<link>`` and ``<description>``,
-      Django uses the ``title``, ``link`` and ``description`` methods. In the
-      previous example, they were simple string class attributes, but this
+      Django uses the ``title()``, ``link()`` and ``description()`` methods. In
+      the previous example, they were simple string class attributes, but this
       example illustrates that they can be either strings *or* methods. For
       each of ``title``, ``link`` and ``description``, Django follows this
       algorithm:
@@ -242,7 +243,7 @@ To change that, add a ``feed_type`` attribute to your ``Feed`` class, like so::
 
 Note that you set ``feed_type`` to a class object, not an instance.
 
-Currently available feed types are::
+Currently available feed types are:
 
     * ``django.utils.feedgenerator.Rss201rev2Feed`` (RSS 2.01. Default.)
     * ``django.utils.feedgenerator.RssUserland091Feed`` (RSS 0.91.)
@@ -499,8 +500,8 @@ several subclasses:
 Each of these three classes knows how to render a certain type of feed as XML.
 They share this interface:
 
-``__init__(title, link, description, language=None, author_email=None,
-author_name=None, author_link=None, subtitle=None, categories=None)``
+``__init__(title, link, description, language=None, author_email=None,``
+``author_name=None, author_link=None, subtitle=None, categories=None)``
 
 Initializes the feed with the given metadata, which applies to the entire feed
 (i.e., not just to a specific item in the feed).
@@ -508,13 +509,13 @@ Initializes the feed with the given metadata, which applies to the entire feed
 All parameters, if given, should be Unicode objects, except ``categories``,
 which should be a sequence of Unicode objects.
 
-``add_item(title, link, description, author_email=None, author_name=None,
-pubdate=None, comments=None, unique_id=None, enclosure=None, categories=())``
+``add_item(title, link, description, author_email=None, author_name=None,``
+``pubdate=None, comments=None, unique_id=None, enclosure=None, categories=())``
 
 Add an item to the feed with the given parameters. All parameters, if given,
 should be Unicode objects, except:
 
-    * ``pubdate`` should be a Python datetime object.
+    * ``pubdate`` should be a `Python datetime object`_.
     * ``enclosure`` should be an instance of ``feedgenerator.Enclosure``.
     * ``categories`` should be a sequence of Unicode objects.
 
@@ -550,3 +551,4 @@ This example creates an Atom 1.0 feed and prints it to standard output::
     </entry></feed>
 
 .. _django/utils/feedgenerator.py: http://code.djangoproject.com/browser/django/trunk/django/utils/feedgenerator.py
+.. _Python datetime object: http://www.python.org/doc/current/lib/module-datetime.html
