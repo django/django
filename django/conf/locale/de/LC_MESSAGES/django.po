@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2005-11-11 16:13-0600\n"
+"POT-Creation-Date: 2005-11-12 16:05-0600\n"
 "PO-Revision-Date: 2005-11-06 13:54+0100\n"
 "Last-Translator: Lukas Kolbe <lucky@knup.de>\n"
 "Language-Team: \n"
@@ -395,6 +395,18 @@ msgstr "Webseite"
 #: contrib/flatpages/models/flatpages.py:18
 msgid "flat pages"
 msgstr "Webseiten"
+
+#: utils/translation.py:335
+msgid "DATE_FORMAT"
+msgstr "j. N Y"
+
+#: utils/translation.py:336
+msgid "DATETIME_FORMAT"
+msgstr "j. N Y, H:i"
+
+#: utils/translation.py:337
+msgid "TIME_FORMAT"
+msgstr "H:i"
 
 #: utils/dates.py:6
 msgid "Monday"

@@ -8,13 +8,13 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django CVS\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2005-11-11 16:13-0600\n"
+"POT-Creation-Date: 2005-11-12 16:05-0600\n"
 "PO-Revision-Date: 2005-11-12 20:05+0530\n"
 "Last-Translator: Baishampayan Ghose <b.ghose@gnu.org.in>\n"
 "Language-Team: Ankur Bangla <core@bengalinux.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
-"Content-Transfer-Encoding: 8bit"
+"Content-Transfer-Encoding: 8bit\n"
 
 #: contrib/admin/models/admin.py:6
 msgid "action time"
@@ -390,6 +390,18 @@ msgstr "চ্যাপ্টা পাতা"
 #: contrib/flatpages/models/flatpages.py:18
 msgid "flat pages"
 msgstr "চ্যাপ্টা পাতাগুলো"
+
+#: utils/translation.py:335
+msgid "DATE_FORMAT"
+msgstr ""
+
+#: utils/translation.py:336
+msgid "DATETIME_FORMAT"
+msgstr ""
+
+#: utils/translation.py:337
+msgid "TIME_FORMAT"
+msgstr ""
 
 #: utils/dates.py:6
 msgid "Monday"
@@ -881,16 +893,16 @@ msgstr "দয়া করে একটি বৈধ দশমিক সংখ্�
 msgid "Please enter a valid decimal number with at most %s total digit."
 msgid_plural ""
 "Please enter a valid decimal number with at most %s total digits."
-msgstr [0] "দয়া করে একটি বৈধ দশমিক সংখ্যা ঢোকান যার অক্ষরের সংখ্যা %s থেকে কম হবে।"
-msgstr [1] "দয়া করে একটি বৈধ দশমিক সংখ্যা ঢোকান যার অক্ষরের সংখ্যা %s থেকে কম হবে।"
+msgstr[0] "দয়া করে একটি বৈধ দশমিক সংখ্যা ঢোকান যার অক্ষরের সংখ্যা %s থেকে কম হবে।"
+msgstr[1] "দয়া করে একটি বৈধ দশমিক সংখ্যা ঢোকান যার অক্ষরের সংখ্যা %s থেকে কম হবে।"
 
 #: core/validators.py:347
 #, python-format
 msgid "Please enter a valid decimal number with at most %s decimal place."
 msgid_plural ""
 "Please enter a valid decimal number with at most %s decimal places."
-msgstr [0] "দয়া করে একটি বৈধ দশমিক সংখ্যা ঢোকান যার দশমিক স্থান %s থেকে কম হবে।"
-msgstr [1] "দয়া করে একটি বৈধ দশমিক সংখ্যা ঢোকান যার দশমিক স্থান %s থেকে কম হবে।"
+msgstr[0] "দয়া করে একটি বৈধ দশমিক সংখ্যা ঢোকান যার দশমিক স্থান %s থেকে কম হবে।"
+msgstr[1] "দয়া করে একটি বৈধ দশমিক সংখ্যা ঢোকান যার দশমিক স্থান %s থেকে কম হবে।"
 
 #: core/validators.py:357
 #, python-format
@@ -985,4 +997,3 @@ msgid ""
 msgstr ""
 "একের চেয়ে বেশি নির্বাচন করতে \"Control\" অথবা ম্যাক-এ \"Command\" চেপে ধরে "
 "রাখুন।"
-

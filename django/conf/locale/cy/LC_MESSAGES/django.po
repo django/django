@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2005-11-11 16:13-0600\n"
+"POT-Creation-Date: 2005-11-12 16:05-0600\n"
 "PO-Revision-Date: 2005-11-05 HO:MI+ZONE\n"
 "Last-Translator: Jason Davies <jason@jasondavies.com>\n"
 "Language-Team: Cymraeg <cy@li.org>\n"
@@ -392,6 +392,18 @@ msgstr "tudalen fflat"
 #: contrib/flatpages/models/flatpages.py:18
 msgid "flat pages"
 msgstr "tudalennau fflat"
+
+#: utils/translation.py:335
+msgid "DATE_FORMAT"
+msgstr ""
+
+#: utils/translation.py:336
+msgid "DATETIME_FORMAT"
+msgstr ""
+
+#: utils/translation.py:337
+msgid "TIME_FORMAT"
+msgstr ""
 
 #: utils/dates.py:6
 msgid "Monday"

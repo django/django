@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django Serbian (latin) translation v1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2005-11-11 16:13-0600\n"
+"POT-Creation-Date: 2005-11-12 16:05-0600\n"
 "PO-Revision-Date: 2005-11-03 00:28+0100\n"
 "Last-Translator: Petar Marić <petar.maric@gmail.com>\n"
 "Language-Team: Nesh <nesh@studioquatro.co.yu> & Petar <petar.maric@gmail."
@@ -398,6 +398,18 @@ msgstr "statična strana"
 #: contrib/flatpages/models/flatpages.py:18
 msgid "flat pages"
 msgstr "statične strane"
+
+#: utils/translation.py:335
+msgid "DATE_FORMAT"
+msgstr ""
+
+#: utils/translation.py:336
+msgid "DATETIME_FORMAT"
+msgstr ""
+
+#: utils/translation.py:337
+msgid "TIME_FORMAT"
+msgstr ""
 
 #: utils/dates.py:6
 msgid "Monday"

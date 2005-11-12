@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django Czech translation\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2005-11-11 16:13-0600\n"
+"POT-Creation-Date: 2005-11-12 16:05-0600\n"
 "PO-Revision-Date: 2005-11-10 19:29+0100\n"
 "Last-Translator: Radek Svarz <translate@svarz.cz>\n"
 "Language-Team: Czech\n"
@@ -395,6 +395,18 @@ msgstr "statická stránka"
 #: contrib/flatpages/models/flatpages.py:18
 msgid "flat pages"
 msgstr "statické stránky"
+
+#: utils/translation.py:335
+msgid "DATE_FORMAT"
+msgstr ""
+
+#: utils/translation.py:336
+msgid "DATETIME_FORMAT"
+msgstr ""
+
+#: utils/translation.py:337
+msgid "TIME_FORMAT"
+msgstr ""
 
 #: utils/dates.py:6
 msgid "Monday"

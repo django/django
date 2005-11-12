@@ -10,7 +10,8 @@ from django.models.admin import log
 from django.utils.html import strip_tags
 from django.utils.httpwrappers import HttpResponse, HttpResponseRedirect
 from django.utils.text import capfirst, get_text_list
-from django.conf.settings import ADMIN_MEDIA_PREFIX, DATE_FORMAT, DATETIME_FORMAT, TIME_FORMAT
+from django.conf.settings import ADMIN_MEDIA_PREFIX
+from django.utils.translation import get_date_formats
 import operator
 
 # Text to display within changelist table cells if the value is blank.
@@ -410,12 +411,13 @@ def change_list(request, app_label, module_name):
                     # Dates and times are special: They're formatted in a certain way.
                     elif isinstance(f, meta.DateField) or isinstance(f, meta.TimeField):
                         if field_val:
+                            (date_format, datetime_format, time_format) = get_date_formats()
                             if isinstance(f, meta.DateTimeField):
-                                result_repr = capfirst(dateformat.format(field_val, DATETIME_FORMAT))
+                                result_repr = capfirst(dateformat.format(field_val, datetime_format))
                             elif isinstance(f, meta.TimeField):
-                                result_repr = capfirst(dateformat.time_format(field_val, TIME_FORMAT))
+                                result_repr = capfirst(dateformat.time_format(field_val, time_format))
                             else:
-                                result_repr = capfirst(dateformat.format(field_val, DATE_FORMAT))
+                                result_repr = capfirst(dateformat.format(field_val, date_format))
                         else:
                             result_repr = EMPTY_CHANGELIST_VALUE
                         row_class = ' class="nowrap"'

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2005-11-11 23:12+0100\n"
+"POT-Creation-Date: 2005-11-12 23:04+0100\n"
 "PO-Revision-Date: 2005-11-08 19:06+GMT+2\n"
 "Last-Translator: Tiberiu Micu <tibimicu@gmx.net>\n"
 "Language-Team: Romanian <ro@li.org>\n"
@@ -394,6 +394,18 @@ msgstr "pagina plată"
 #: contrib/flatpages/models/flatpages.py:18
 msgid "flat pages"
 msgstr "pagini plate"
+
+#: utils/translation.py:335
+msgid "DATE_FORMAT"
+msgstr ""
+
+#: utils/translation.py:336
+msgid "DATETIME_FORMAT"
+msgstr ""
+
+#: utils/translation.py:337
+msgid "TIME_FORMAT"
+msgstr ""
 
 #: utils/dates.py:6
 msgid "Monday"

@@ -325,6 +325,24 @@ def get_language_from_request(request):
 
     return settings.LANGUAGE_CODE
 
+def get_date_formats():
+    """
+    This function checks wether translation files provide a translation for some
+    technical message ID to store date and time formats. If it doesn't contain
+    one, the formats provided in the settings will be used.
+    """
+    from django.conf.settings import DATE_FORMAT, DATETIME_FORMAT, TIME_FORMAT
+    date_format = _('DATE_FORMAT')
+    datetime_format = _('DATETIME_FORMAT')
+    time_format = _('TIME_FORMAT')
+    if date_format == 'DATE_FORMAT':
+        date_format = DATE_FORMAT
+    if datetime_format == 'DATETIME_FORMAT':
+        datetime_format = DATETIME_FORMAT
+    if time_format == 'TIME_FORMAT':
+        time_format = TIME_FORMAT
+    return (date_format, datetime_format, time_format)
+
 def install():
     """
     Installs the gettext function as the default translation function under
