@@ -426,6 +426,18 @@ Notes:
       Django uses the base language. For example, if a user specifies ``de-at``
       (Austrian German) but Django only has ``de`` available, Django uses
       ``de``.
+    * only languages listed in the LANGUAGES setting can be selected. So if you want
+      to restrict the language selection to a subset of provided languages (because
+      your appliaction doesn't provide all those languages), just set it to a list
+      of languages like this::
+
+          LANGUAGES = (
+            ('de', _('German')),
+            ('en', _('English')),
+          )
+
+      This would restrict the available languages for automatic selection to German
+      and English (and any sublanguage of those, like de-ch or en-us).
 
 Once ``LocaleMiddleware`` determines the user's preference, it makes this
 preference available as ``request.LANGUAGE_CODE`` for each `request object`_.
