@@ -76,12 +76,8 @@ msgid "DATE_WITH_TIME_FULL"
 msgstr "PLNY_DATUM_AJ_CAS"
 
 #: contrib/admin/templates/admin/object_history.html:36
-msgid ""
-"This object doesn't have a change history. It probably wasn't added via this "
-"admin site."
-msgstr ""
-"Tento object nemá históriu zmien. Možno nebol pridaný prostredníctvom tohoto "
-"web admina"
+msgid "This object doesn't have a change history. It probably wasn't added via this admin site."
+msgstr "Tento object nemá históriu zmien. Možno nebol pridaný prostredníctvom tohoto web admina"
 
 #: contrib/admin/templates/admin/base_site.html:4
 msgid "Django site admin"
@@ -104,12 +100,8 @@ msgid "Server Error <em>(500)</em>"
 msgstr "Chyba servera <em>(500)</em>"
 
 #: contrib/admin/templates/admin/500.html:10
-msgid ""
-"There's been an error. It's been reported to the site administrators via e-"
-"mail and should be fixed shortly. Thanks for your patience."
-msgstr ""
-"Vznikla chyba. Prostredníctvom e-mailu  bol o nej informovaný správca a "
-"chyba by mala byť o chviľu odstránená. Ďakujeme za vašu trpezlivosť."
+msgid "There's been an error. It's been reported to the site administrators via e-mail and should be fixed shortly. Thanks for your patience."
+msgstr "Vznikla chyba. Prostredníctvom e-mailu  bol o nej informovaný správca a chyba by mala byť o chviľu odstránená. Ďakujeme za vašu trpezlivosť."
 
 #: contrib/admin/templates/admin/404.html:4
 #: contrib/admin/templates/admin/404.html:8
@@ -174,23 +166,13 @@ msgstr "Odhlásenie"
 
 #: contrib/admin/templates/admin/delete_confirmation.html:7
 #, python-format
-msgid ""
-"Deleting the %(object_name)s '%(object)s' would result in deleting related "
-"objects, but your account doesn't have permission to delete the following "
-"types of objects:"
-msgstr ""
-"Vymazaním objektu %(object_name)s '%(object)s' môžete spôsobiť vymazanie "
-"súvisiacich objektov, ale váš účet nemá povolenie na mazanie nasledujúcich "
-"typov objektov:"
+msgid "Deleting the %(object_name)s '%(object)s' would result in deleting related objects, but your account doesn't have permission to delete the following types of objects:"
+msgstr "Vymazaním objektu %(object_name)s '%(object)s' môžete spôsobiť vymazanie súvisiacich objektov, ale váš účet nemá povolenie na mazanie nasledujúcich typov objektov:"
 
 #: contrib/admin/templates/admin/delete_confirmation.html:14
 #, python-format
-msgid ""
-"Are you sure you want to delete the %(object_name)s \"%(object)s\"? All of "
-"the following related items will be deleted:"
-msgstr ""
-"Ste si istý, že chcete vymazať %(object_name)s \"%(object)s\"? Všetky "
-"nasledujúce objekty budú tiež vymazané :"
+msgid "Are you sure you want to delete the %(object_name)s \"%(object)s\"? All of the following related items will be deleted:"
+msgstr "Ste si istý, že chcete vymazať %(object_name)s \"%(object)s\"? Všetky nasledujúce objekty budú tiež vymazané :"
 
 #: contrib/admin/templates/admin/delete_confirmation.html:18
 msgid "Yes, I'm sure"
@@ -219,12 +201,8 @@ msgid "Password reset"
 msgstr "Obnova hesla"
 
 #: contrib/admin/templates/registration/password_reset_form.html:12
-msgid ""
-"Forgotten your password? Enter your e-mail address below, and we'll reset "
-"your password and e-mail the new one to you."
-msgstr ""
-"Zabudli ste vaše heslo? Vložte nižšie vašu e-mail adresu, a nové heslo vám "
-"bude na ňu zaslané ."
+msgid "Forgotten your password? Enter your e-mail address below, and we'll reset your password and e-mail the new one to you."
+msgstr "Zabudli ste vaše heslo? Vložte nižšie vašu e-mail adresu, a nové heslo vám bude na ňu zaslané ."
 
 #: contrib/admin/templates/registration/password_reset_form.html:16
 msgid "E-mail address:"
@@ -248,20 +226,12 @@ msgid "Password reset successful"
 msgstr "Heslo bolo úspešne obnovené"
 
 #: contrib/admin/templates/registration/password_reset_done.html:12
-msgid ""
-"We've e-mailed a new password to the e-mail address you submitted. You "
-"should be receiving it shortly."
-msgstr ""
-"Poslali sme vám,  nové heslo na vami uvedenú emailovú adresu.Mali by ste ho "
-"dostať čo najskôr."
+msgid "We've e-mailed a new password to the e-mail address you submitted. You should be receiving it shortly."
+msgstr "Poslali sme vám,  nové heslo na vami uvedenú emailovú adresu.Mali by ste ho dostať čo najskôr."
 
 #: contrib/admin/templates/registration/password_change_form.html:12
-msgid ""
-"Please enter your old password, for security's sake, and then enter your new "
-"password twice so we can verify you typed it in correctly."
-msgstr ""
-"Kvôli bezpečnosti vložte prosím vaše staré heslo, a potom dvakrát vaše nové "
-"heslo, tým môžeme skontrolovať jeho správnosť."
+msgid "Please enter your old password, for security's sake, and then enter your new password twice so we can verify you typed it in correctly."
+msgstr "Kvôli bezpečnosti vložte prosím vaše staré heslo, a potom dvakrát vaše nové heslo, tým môžeme skontrolovať jeho správnosť."
 
 #: contrib/admin/templates/registration/password_change_form.html:17
 msgid "Old password:"
@@ -541,6 +511,41 @@ msgstr "typ obsahu"
 msgid "content types"
 msgstr "typy obsahu"
 
+#: models/core.py:68
+
+#: models/core.py:69
+
+#: models/core.py:70
+
+#: models/core.py:71
+
+#: models/core.py:73
+
+#: models/core.py:74
+
+#: models/core.py:87
+
+#: models/core.py:88
+
+#: models/core.py:89
+
+#: models/core.py:90
+
+#: models/core.py:91
+
+#: models/core.py:92
+
+#: models/core.py:93
+
+#: models/core.py:94
+
+#: models/core.py:94
+
+#: models/core.py:98
+
+#: models/core.py:99
+
+#: models/core.py:117
 #: models/core.py:67
 msgid "session key"
 msgstr "kľúč sedenia"
@@ -603,8 +608,7 @@ msgstr "heslo"
 
 #: models/auth.py:37
 msgid "Use an MD5 hash -- not the raw password."
-msgstr ""
-"Vložte takú hodnotu hesla , ako vám ju vráti MD5, nevkladajte ho priamo. "
+msgstr "Vložte takú hodnotu hesla , ako vám ju vráti MD5, nevkladajte ho priamo. "
 
 #: models/auth.py:38
 msgid "staff status"
@@ -631,12 +635,8 @@ msgid "date joined"
 msgstr "dátum registrácie"
 
 #: models/auth.py:44
-msgid ""
-"In addition to the permissions manually assigned, this user will also get "
-"all permissions granted to each group he/she is in."
-msgstr ""
-"Okrem ručne vložených povolení, tento uživateľ dostane všetky povolenia  "
-"skupin, v ktorých sa nachádza."
+msgid "In addition to the permissions manually assigned, this user will also get all permissions granted to each group he/she is in."
+msgstr "Okrem ručne vložených povolení, tento uživateľ dostane všetky povolenia  skupin, v ktorých sa nachádza."
 
 #: models/auth.py:48
 msgid "Users"
@@ -783,12 +783,8 @@ msgid "Enter a valid e-mail address."
 msgstr "Vložte platnú e-mail adresu."
 
 #: core/validators.py:147
-msgid ""
-"Upload a valid image. The file you uploaded was either not an image or a "
-"corrupted image."
-msgstr ""
-"Nahrajte platný obrázok. Súbor, ktorý ste nahrali buď nebol obrázok alebo je "
-"nahratý poškodený obrázok."
+msgid "Upload a valid image. The file you uploaded was either not an image or a corrupted image."
+msgstr "Nahrajte platný obrázok. Súbor, ktorý ste nahrali buď nebol obrázok alebo je nahratý poškodený obrázok."
 
 #: core/validators.py:154
 #, python-format
@@ -884,20 +880,16 @@ msgstr "Prosím vložte platné desiatkové číslo. "
 #: core/validators.py:344
 #, python-format
 msgid "Please enter a valid decimal number with at most %s total digit."
-msgid_plural ""
-"Please enter a valid decimal number with at most %s total digits."
+msgid_plural "Please enter a valid decimal number with at most %s total digits."
 msgstr[0] "Prosím vložte platné desiatkové číslo s najviac %s číslicou."
 msgstr[1] "Prosím vložte platné desiatkové číslo s najviac %s číslicami."
 
 #: core/validators.py:347
 #, python-format
 msgid "Please enter a valid decimal number with at most %s decimal place."
-msgid_plural ""
-"Please enter a valid decimal number with at most %s decimal places."
-msgstr[0] ""
-"Prosím vložte platné desatinné číslo s najviac %s desatinným miestom."
-msgstr[1] ""
-"Prosím vložte platné desatinné číslo s najviac %s desatinnými miestami."
+msgid_plural "Please enter a valid decimal number with at most %s decimal places."
+msgstr[0] "Prosím vložte platné desatinné číslo s najviac %s desatinným miestom."
+msgstr[1] "Prosím vložte platné desatinné číslo s najviac %s desatinnými miestami."
 
 #: core/validators.py:357
 #, python-format
@@ -924,150 +916,167 @@ msgstr "Nič som nemohol získať z %s."
 
 #: core/validators.py:424
 #, python-format
-msgid ""
-"The URL %(url)s returned the invalid Content-Type header '%(contenttype)s'."
-msgstr ""
-" URL %(url)s vrátilo neplatnú hlavičku  Content-Type  '%(contenttype)s'."
+msgid "The URL %(url)s returned the invalid Content-Type header '%(contenttype)s'."
+msgstr " URL %(url)s vrátilo neplatnú hlavičku  Content-Type  '%(contenttype)s'."
 
 #: core/validators.py:457
 #, python-format
-msgid ""
-"Please close the unclosed %(tag)s tag from line %(line)s. (Line starts with "
-"\"%(start)s\".)"
-msgstr ""
-"Prosím zavrite nezavretý  %(tag)s popisovač v riadku %(line)s. (Riadok "
-"začína s  \"%(start)s\".)"
+msgid "Please close the unclosed %(tag)s tag from line %(line)s. (Line starts with \"%(start)s\".)"
+msgstr "Prosím zavrite nezavretý  %(tag)s popisovač v riadku %(line)s. (Riadok začína s  \"%(start)s\".)"
 
 #: core/validators.py:461
 #, python-format
-msgid ""
-"Some text starting on line %(line)s is not allowed in that context. (Line "
-"starts with \"%(start)s\".)"
-msgstr ""
-"Nejaký text začínajúci na riadku %(line)s nie je povolený v tomto kontexte. "
-"(Riadok začína s \"%(start)s\".)"
+msgid "Some text starting on line %(line)s is not allowed in that context. (Line starts with \"%(start)s\".)"
+msgstr "Nejaký text začínajúci na riadku %(line)s nie je povolený v tomto kontexte. (Riadok začína s \"%(start)s\".)"
 
 #: core/validators.py:466
 #, python-format
-msgid ""
-"\"%(attr)s\" on line %(line)s is an invalid attribute. (Line starts with \"%"
-"(start)s\".)"
-msgstr ""
-"\"%(attr)s\" na riadku %(line)s je neplatný atribút. (Riadok začína s \"%"
-"(start)s\".)"
+msgid "\"%(attr)s\" on line %(line)s is an invalid attribute. (Line starts with \"%(start)s\".)"
+msgstr "\"%(attr)s\" na riadku %(line)s je neplatný atribút. (Riadok začína s \"%(start)s\".)"
 
 #: core/validators.py:471
 #, python-format
-msgid ""
-"\"<%(tag)s>\" on line %(line)s is an invalid tag. (Line starts with \"%"
-"(start)s\".)"
-msgstr ""
-"\"<%(tag)s>\" na riadku %(line)s je neplatný popisovač. (Riadok začína s \"%"
-"(start)s\".)"
+msgid "\"<%(tag)s>\" on line %(line)s is an invalid tag. (Line starts with \"%(start)s\".)"
+msgstr "\"<%(tag)s>\" na riadku %(line)s je neplatný popisovač. (Riadok začína s \"%(start)s\".)"
 
 #: core/validators.py:475
 #, python-format
-msgid ""
-"A tag on line %(line)s is missing one or more required attributes. (Line "
-"starts with \"%(start)s\".)"
-msgstr ""
-"Popisovaču na riadku %(line)s chýba jeden alebo viac atribútov. (Riadok "
-"začína s \"%(start)s\".)"
+msgid "A tag on line %(line)s is missing one or more required attributes. (Line starts with \"%(start)s\".)"
+msgstr "Popisovaču na riadku %(line)s chýba jeden alebo viac atribútov. (Riadok začína s \"%(start)s\".)"
 
 #: core/validators.py:480
 #, python-format
-msgid ""
-"The \"%(attr)s\" attribute on line %(line)s has an invalid value. (Line "
-"starts with \"%(start)s\".)"
-msgstr ""
-"Atribút \"%(attr)s\" na riadku %(line)s má neplatnú hodnotu. (Riadok začína "
-"s \"%(start)s\".)"
+msgid "The \"%(attr)s\" attribute on line %(line)s has an invalid value. (Line starts with \"%(start)s\".)"
+msgstr "Atribút \"%(attr)s\" na riadku %(line)s má neplatnú hodnotu. (Riadok začína s \"%(start)s\".)"
 
 #: core/meta/fields.py:111
 msgid " Separate multiple IDs with commas."
 msgstr "Identifikátory oddeľte  čiarkami."
 
 #: core/meta/fields.py:114
-msgid ""
-" Hold down \"Control\", or \"Command\" on a Mac, to select more than one."
-msgstr ""
-" Podržte \"Control\", alebo \"Command\" na  Mac_u, na výber viac ako jednej "
-"položky."
+msgid " Hold down \"Control\", or \"Command\" on a Mac, to select more than one."
+msgstr " Podržte \"Control\", alebo \"Command\" na  Mac_u, na výber viac ako jednej položky."
 
-#~ msgid "Comment posted"
-#~ msgstr "Komentár bol poslaný"
+#:templates/comments/posted.html :5
+msgid "Comment posted"
+msgstr "Komentár bol poslaný"
+  
+#:templates/comments/posted.html :9
+msgid "Comment posted successfully"
+msgstr "Komentár bol úspešne odoslaný"
+  
+#:templates/comments/posted.html :11
+msgid "Thanks for contributing."
+msgstr "Ďakujeme za príspevok."
+  
+#:templates/comments/posted.html :11
+msgid "View your comment"
+msgstr "Pozri svôj príspevok"
+  
+#templates/blog/entries_detail.html:24
+msgid "Post a comment"
+msgstr "Pridaj komentár"
 
-#~ msgid "Comment posted successfully"
-#~ msgstr "Komentár bol úspešne odoslaný"
+#templates/blog/entries_detail.html:15
+msgid "Comments"
+msgstr "Komentáre"
+#:templates/comments/free_preview.html :40
+msgid "Comment"
+msgstr "Komentár"
 
-#~ msgid "Thanks for contributing."
-#~ msgstr "Ďakujeme za príspevok."
+#:templates/comments/free_preview.html :34
+msgid "Your name"
+msgstr "Vaše meno"
 
-#~ msgid "View your comment"
-#~ msgstr "Pozri svôj príspevok"
+#:templates/comments/free_preview.html :5
+msgid "Preview revised comment"
+msgstr "Prezretie upraveného komentára"
 
+#:templates/comments/free_preview.html :25
+msgid "Post public comment"
+msgstr "Zveréjniť komentár"
 # templates/blog/entries_detail.html:24
-#~ msgid "Post a comment"
-#~ msgstr "Pošli komentár"
 
+#:templates/comments/free_preview.html :5
+msgid "Preview comment"
+msgstr "Prezrieť komentár"
 # templates/blog/entries_detail.html:15
-#~ msgid "Comments"
-#~ msgstr "Komentáre"
 
-#~ msgid "Comment"
-#~ msgstr "Komentár"
+#:templates/comments/free_preview.html :13
+msgid "Preview your comment"
+msgstr "Prezrite si svoj komentár"
 
-#~ msgid "Your name"
-#~ msgstr "Vaše meno"
+#:templates/comments/free_preview.html :22
+msgid "Posted by"
+msgstr "Poslané"
 
-#~ msgid "Preview revised comment"
-#~ msgstr "Prezretie upraveného komentára"
+#:templates/comments/free_preview.html :27
+msgid "Or edit it again"
+msgstr "Alebo ho vytvorte znova"
 
-#~ msgid "Post public comment"
-#~ msgstr "Zveréjniť komentár"
+#:templates/comments/free_preview.html :18
+msgid "Please correct the following errors."
+msgstr "Odstráňte nasledujúce chyby, prosím."
 
-#~ msgid "Preview comment"
-#~ msgstr "Prezrieť komentár"
+#:templates/404.html :10
+msgid "Looks like you followed a bad link. If you think it is our fault, please <a href=\"http://doma.myvtoronte.com/staznost/\">let us know</a>"
+msgstr "Pozrite si linku , kde vzikla chyba. Ak si myslíte, že je to naša chyba, <a href=\"http://doma.myvtoronte.com/staznost/\">dajte nám to vedieť</a>, prosím"
 
-#~ msgid "Preview your comment"
-#~ msgstr "Prezrite si svoj komentár"
+#:templates/404.html :12
+msgid "Here is a link to the <a href=\"/\">homepage</a>. You know, just in case"
+msgstr "Tu je adresa <a href=\"/\">úvodnej stránky</a>. Ak by ste ju potrebovali"
 
-#~ msgid "Posted by"
-#~ msgstr "Poslané"
+#:templates/comments/freecomments.html :9
+msgid "Recent comments"
+msgstr "Posledný komentár"
 
-#~ msgid "Or edit it again"
-#~ msgstr "Alebo ho vytvorte znova"
+#:templates/comments/freecomments.html :9
+msgid "Previous"
+msgstr "Predchádzajúci/a"
 
-#~ msgid "Please correct the following errors."
-#~ msgstr "Odstráňte nasledujúce chyby, prosím."
+#:templates/comments/freecomments.html :10
+msgid "Page"
+msgstr "Stránka"
 
-#~ msgid ""
-#~ "Looks like you followed a bad link. If you think it is our fault, please "
-#~ "<a href=\"http://doma.myvtoronte.com/staznost/\">let us know</a>"
-#~ msgstr ""
-#~ "Pozrite si linku , kde vzikla chyba. Ak si myslíte, že je to naša chyba, "
-#~ "<a href=\"http://doma.myvtoronte.com/staznost/\">dajte nám to vedieť</a>, "
-#~ "prosím"
+#:templates/comments/freecomments.html :11
+msgid "Next"
+msgstr "Ďalší/ia"
 
-#~ msgid ""
-#~ "Here is a link to the <a href=\"/\">homepage</a>. You know, just in case"
-#~ msgstr ""
-#~ "Tu je adresa <a href=\"/\">úvodnej stránky</a>. Ak by ste ju potrebovali"
+#:templates/blog/entries_archive.html :9
+msgid "Latest entries"
+msgstr "Posledné záznamy"
 
-#~ msgid "Recent comments"
-#~ msgstr "Posledný komentár"
+#:templates/blog/entries_archive_day.html :9
+msgid "archive"
+msgstr "archív"
 
-#~ msgid "Previous"
-#~ msgstr "Predchádzajúci/a"
+#:templates/500.html :4
+msgid "Page unavailable"
+msgstr "Stránka je neprístupná"
 
-#~ msgid "Page"
-#~ msgstr "Stránka"
+#:templates/500.html :10
+msgid "We're sorry, but the requested page is currently unavailable"
+msgstr "Ľutujeme ale požadovaná stránka je neprístupná"
 
-#~ msgid "Next"
-#~ msgstr "Ďalší/ia"
+#:templates/500.html :12
+msgid "We're messing around with things internally, and the server had a bit of a hiccup"
+msgstr "Máme problém na servri,  ktorý sa snažíme odstrániť"
 
-#~ msgid "Latest entries"
-#~ msgstr "Posledné záznamy"
+#:templates/500.html :14
+msgid "Please try again later"
+msgstr "Skúste znovu neskôr, prosím"
 
-#~ msgid "archive"
-#~ msgstr "archív"
+#:templates/miesta/miesta_archive.html :7
+msgid "Latest miesta"
+msgstr "Posledné miesta"
+
+#:templates/miesta/miesta_detail.html :57
+msgid "on"
+msgstr " "
+
+#:templates/miesta/miesta_detail.html :67
+msgid "at"
+msgstr "o"
+
+
+
