@@ -120,7 +120,7 @@ class StringOrigin(Origin):
         self.source = source
     
     def reload(self):
-        return (self.source, self.name)
+        return self.source
 
 class Template:
     def __init__(self, template_string, origin=None):
