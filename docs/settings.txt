@@ -400,6 +400,16 @@ in standard language format. For example, U.S. English is ``"en-us"``. See the
 
 .. _internationalization docs: http://www.djangoproject.com/documentation/i18n/
 
+LANGUAGES
+---------
+
+Default: a list of available languages and their name
+
+This is a list of two-tuples with language code and language name that are available
+for language selection. See the `internationalization docs`_ for details. It usually
+isn't defined, only if you want to restrict language selection to a subset of the
+django-provided languages you need to set it.
+
 MANAGERS
 --------
 
