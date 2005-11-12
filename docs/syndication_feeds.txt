@@ -124,11 +124,13 @@ put into those elements.
       ``feeds/sitenews_description``, where ``sitenews`` is the ``slug``
       specified in the URLconf for the given feed. The RSS system renders that
       template for each item, passing it two template context variables:
-        * ``{{ obj }}`` -- The current object (one of whichever objects you
-          returned in ``items()``).
-        * ``{{ site }}`` -- A ``django.models.core.sites.Site`` object
-          representing the current site. This is useful for
-          ``{{ site.domain }}`` or ``{{ site.name }}``.
+
+          * ``{{ obj }}`` -- The current object (one of whichever objects you
+            returned in ``items()``).
+          * ``{{ site }}`` -- A ``django.models.core.sites.Site`` object
+            representing the current site. This is useful for
+            ``{{ site.domain }}`` or ``{{ site.name }}``.
+
       If you don't create a template for either the title or description, the
       framework will use the template ``{{ obj }}`` by default -- that is, the
       normal string representation of the object.
@@ -210,10 +212,12 @@ request to the URL ``/rss/beats/0613/``:
       example illustrates that they can be either strings *or* methods. For
       each of ``title``, ``link`` and ``description``, Django follows this
       algorithm:
-        * First, it tries to call a method, passing the ``obj`` argument, where
-          ``obj`` is the object returned by ``get_object()``.
-        * Failing that, it tries to call a method with no arguments.
-        * Failing that, it uses the class attribute.
+
+          * First, it tries to call a method, passing the ``obj`` argument, where
+            ``obj`` is the object returned by ``get_object()``.
+          * Failing that, it tries to call a method with no arguments.
+          * Failing that, it uses the class attribute.
+
     * Finally, note that ``items()`` in this example also takes the ``obj``
       argument. The algorithm for ``items`` is the same as described in the
       previous step -- first, it tries ``items(obj)``, then ``items()``, then
@@ -304,7 +308,7 @@ And the accompanying URLconf::
     )
 
 Feed class reference
--------------------
+--------------------
 
 This example illustrates all possible attributes and methods for a ``Feed`` class::
 
@@ -496,7 +500,7 @@ Each of these three classes knows how to render a certain type of feed as XML.
 They share this interface::
 
 ``__init__(title, link, description, language=None, author_email=None,
-    author_name=None, author_link=None, subtitle=None, categories=None)``
+author_name=None, author_link=None, subtitle=None, categories=None)``
 
 Initializes the feed with the given metadata, which applies to the entire feed
 (i.e., not just to a specific item in the feed).
@@ -505,7 +509,7 @@ All parameters, if given, should be Unicode objects, except ``categories``,
 which should be a sequence of Unicode objects.
 
 ``add_item(title, link, description, author_email=None, author_name=None,
-    pubdate=None, comments=None, unique_id=None, enclosure=None, categories=())``
+pubdate=None, comments=None, unique_id=None, enclosure=None, categories=())``
 
 Add an item to the feed with the given parameters. All parameters, if given,
 should be Unicode objects, except:
