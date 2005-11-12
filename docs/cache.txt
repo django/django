@@ -101,12 +101,6 @@ Then, add the following three required settings to your Django settings file:
   sites using the same Django installation, set this to the name of the site,
   or some other string that is unique to this Django instance, to prevent key
   collisions. Use an empty string if you don't care.
-* ``CACHE_MIDDLEWARE_GZIP`` -- Either ``True`` or ``False``. If this is
-  enabled, Django will gzip all content for users whose browsers support gzip
-  encoding. Using gzip adds a level of overhead to page requests, but the
-  overhead generally is cancelled out by the fact that gzipped pages are stored
-  in the cache. That means subsequent requests won't have the overhead of
-  zipping, and the cache will hold more pages because each one is smaller.
 
 The cache middleware caches every page that doesn't have GET or POST
 parameters. Additionally, ``CacheMiddleware`` automatically sets a few headers
