@@ -301,6 +301,13 @@ class TokenParser:
         else:
             p = i
             while i < len(subject) and subject[i] not in (' ', '\t'):
+                if subject[i] in ('"', "'"):
+                    c = subject[i]
+                    i += 1
+                    while i < len(subject) and subject[i] != c:
+                        i += 1
+                    if i >= len(subject):
+                        raise TemplateSyntaxError, "Searching for value. Unexpected end of string in column %d: %s" % subject
                 i += 1
             s = subject[p:i]
             while i < len(subject) and subject[i] in (' ', '\t'):
