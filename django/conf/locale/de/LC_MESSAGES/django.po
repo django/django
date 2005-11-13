@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2005-11-12 16:05-0600\n"
+"POT-Creation-Date: 2005-11-13 12:06-0600\n"
 "PO-Revision-Date: 2005-11-06 13:54+0100\n"
 "Last-Translator: Lukas Kolbe <lucky@knup.de>\n"
 "Language-Team: \n"
@@ -730,6 +730,10 @@ msgid "Serbian"
 msgstr "Serbisch"
 
 #: conf/global_settings.py:51
+msgid "Swedish"
+msgstr "Schwedisch"
+
+#: conf/global_settings.py:52
 msgid "Simplified Chinese"
 msgstr "vereinfachtes Chinesisch"
 
@@ -848,61 +852,61 @@ msgstr "Ungültiges XML: %s"
 msgid "Invalid URL: %s"
 msgstr "Ungültige URL: %s"
 
-#: core/validators.py:203
+#: core/validators.py:205 core/validators.py:207
 #, python-format
 msgid "The URL %s is a broken link."
 msgstr "Die URL %s funktioniert nicht."
 
-#: core/validators.py:209
+#: core/validators.py:213
 msgid "Enter a valid U.S. state abbreviation."
 msgstr "Bitte eine gültige Abkürzung für einen US-Staat eingeben."
 
-#: core/validators.py:224
+#: core/validators.py:228
 #, python-format
 msgid "Watch your mouth! The word %s is not allowed here."
 msgid_plural "Watch your mouth! The words %s are not allowed here."
 msgstr[0] "Keine Schimpfworte! Das Wort %s ist hier nicht gern gesehen!"
 msgstr[1] "Keine Schimpfworte! Die Wörter %s sind hier nicht gern gesehen!"
 
-#: core/validators.py:231
+#: core/validators.py:235
 #, python-format
 msgid "This field must match the '%s' field."
 msgstr "Dieses Feld muss zum Feld '%s' passen."
 
-#: core/validators.py:250
+#: core/validators.py:254
 msgid "Please enter something for at least one field."
 msgstr "Bitte mindestens eines der Felder ausfüllen."
 
-#: core/validators.py:259 core/validators.py:270
+#: core/validators.py:263 core/validators.py:274
 msgid "Please enter both fields or leave them both empty."
 msgstr "Bitte entweder beide Felder ausfüllen, oder beide leer lassen."
 
-#: core/validators.py:277
+#: core/validators.py:281
 #, python-format
 msgid "This field must be given if %(field)s is %(value)s"
 msgstr ""
 "Dieses Feld muss gefüllt sein, wenn Feld %(field)s den Wert %(value)s hat."
 
-#: core/validators.py:289
+#: core/validators.py:293
 #, python-format
 msgid "This field must be given if %(field)s is not %(value)s"
 msgstr ""
 "Dieses Feld muss gefüllt sein, wenn Feld %(field)s nicht %(value)s ist."
 
-#: core/validators.py:308
+#: core/validators.py:312
 msgid "Duplicate values are not allowed."
 msgstr "Doppelte Werte sind hier nicht erlaubt."
 
-#: core/validators.py:331
+#: core/validators.py:335
 #, python-format
 msgid "This value must be a power of %s."
 msgstr "Dieser Wert muss eine Potenz von %s sein."
 
-#: core/validators.py:342
+#: core/validators.py:346
 msgid "Please enter a valid decimal number."
 msgstr "Bitte eine gültige Dezimalzahl eingeben."
 
-#: core/validators.py:344
+#: core/validators.py:348
 #, python-format
 msgid "Please enter a valid decimal number with at most %s total digit."
 msgid_plural ""
@@ -910,7 +914,7 @@ msgid_plural ""
 msgstr[0] "Bitte eine gültige Dezimalzahl mit maximal %s Ziffer eingeben."
 msgstr[1] "Bitte eine gültige Dezimalzahl mit maximal %s Ziffern eingeben."
 
-#: core/validators.py:347
+#: core/validators.py:351
 #, python-format
 msgid "Please enter a valid decimal number with at most %s decimal place."
 msgid_plural ""
@@ -920,39 +924,39 @@ msgstr[0] ""
 msgstr[1] ""
 "Bitte eine gültige Dezimalzahl mit maximal %s Dezimalstellen eingeben."
 
-#: core/validators.py:357
+#: core/validators.py:361
 #, python-format
 msgid "Make sure your uploaded file is at least %s bytes big."
 msgstr ""
 "Bitte sicherstellen, daß die hochgeladene Datei mindestens %s Bytes gross "
 "ist."
 
-#: core/validators.py:358
+#: core/validators.py:362
 #, python-format
 msgid "Make sure your uploaded file is at most %s bytes big."
 msgstr ""
 "Bitte sicherstellen, daß die hochgeladene Datei maximal %s Bytes gross ist."
 
-#: core/validators.py:371
+#: core/validators.py:375
 msgid "The format for this field is wrong."
 msgstr "Das Format für dieses Feld ist falsch."
 
-#: core/validators.py:386
+#: core/validators.py:390
 msgid "This field is invalid."
 msgstr "Dieses Feld ist ungültig."
 
-#: core/validators.py:421
+#: core/validators.py:425
 #, python-format
 msgid "Could not retrieve anything from %s."
 msgstr "Konnte nichts von %s empfangen."
 
-#: core/validators.py:424
+#: core/validators.py:428
 #, python-format
 msgid ""
 "The URL %(url)s returned the invalid Content-Type header '%(contenttype)s'."
 msgstr "Die URL %(url)s lieferte den falschen Content-Type '%(contenttype)s'."
 
-#: core/validators.py:457
+#: core/validators.py:461
 #, python-format
 msgid ""
 "Please close the unclosed %(tag)s tag from line %(line)s. (Line starts with "
@@ -961,7 +965,7 @@ msgstr ""
 "Bitte das ungeschlossene %(tag)s Tag in Zeile %(line)s schließen. Die Zeile "
 "beginnt mit \"%(start)s\"."
 
-#: core/validators.py:461
+#: core/validators.py:465
 #, python-format
 msgid ""
 "Some text starting on line %(line)s is not allowed in that context. (Line "
@@ -970,7 +974,7 @@ msgstr ""
 "In Zeile %(line)s ist Text, der nicht in dem Kontext erlaubt ist. Die Zeile "
 "beginnt mit \"%(start)s\"."
 
-#: core/validators.py:466
+#: core/validators.py:470
 #, python-format
 msgid ""
 "\"%(attr)s\" on line %(line)s is an invalid attribute. (Line starts with \"%"
@@ -979,7 +983,7 @@ msgstr ""
 "Das Attribute %(attr)s in Zeile %(line)s ist ungültig. Die Zeile beginnt mit "
 "\"%(start)s\"."
 
-#: core/validators.py:471
+#: core/validators.py:475
 #, python-format
 msgid ""
 "\"<%(tag)s>\" on line %(line)s is an invalid tag. (Line starts with \"%"
@@ -988,7 +992,7 @@ msgstr ""
 "<%(tag)s> in Zeile %(line)s ist ungültig. Die Zeile beginnt mit \"%(start)s"
 "\"."
 
-#: core/validators.py:475
+#: core/validators.py:479
 #, python-format
 msgid ""
 "A tag on line %(line)s is missing one or more required attributes. (Line "
@@ -997,7 +1001,7 @@ msgstr ""
 "Ein Tag in Zeile %(line)s hat eines oder mehrere Pflichtattribute nicht. Die "
 "Zeile beginnt mit \"%(start)s\"."
 
-#: core/validators.py:480
+#: core/validators.py:484
 #, python-format
 msgid ""
 "The \"%(attr)s\" attribute on line %(line)s has an invalid value. (Line "

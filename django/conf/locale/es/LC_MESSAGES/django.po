@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2005-11-12 16:05-0600\n"
+"POT-Creation-Date: 2005-11-13 12:06-0600\n"
 "PO-Revision-Date: 2005-10-04 20:59GMT\n"
 "Last-Translator: Ricardo Javier Cárdenes Medina <ricardo.cardenes@gmail."
 "com>\n"
@@ -725,6 +725,10 @@ msgid "Serbian"
 msgstr ""
 
 #: conf/global_settings.py:51
+msgid "Swedish"
+msgstr ""
+
+#: conf/global_settings.py:52
 msgid "Simplified Chinese"
 msgstr ""
 
@@ -836,59 +840,59 @@ msgstr ""
 msgid "Invalid URL: %s"
 msgstr ""
 
-#: core/validators.py:203
+#: core/validators.py:205 core/validators.py:207
 #, python-format
 msgid "The URL %s is a broken link."
 msgstr ""
 
-#: core/validators.py:209
+#: core/validators.py:213
 msgid "Enter a valid U.S. state abbreviation."
 msgstr ""
 
-#: core/validators.py:224
+#: core/validators.py:228
 #, python-format
 msgid "Watch your mouth! The word %s is not allowed here."
 msgid_plural "Watch your mouth! The words %s are not allowed here."
 msgstr[0] ""
 msgstr[1] ""
 
-#: core/validators.py:231
+#: core/validators.py:235
 #, python-format
 msgid "This field must match the '%s' field."
 msgstr ""
 
-#: core/validators.py:250
+#: core/validators.py:254
 msgid "Please enter something for at least one field."
 msgstr ""
 
-#: core/validators.py:259 core/validators.py:270
+#: core/validators.py:263 core/validators.py:274
 msgid "Please enter both fields or leave them both empty."
 msgstr ""
 
-#: core/validators.py:277
+#: core/validators.py:281
 #, python-format
 msgid "This field must be given if %(field)s is %(value)s"
 msgstr ""
 
-#: core/validators.py:289
+#: core/validators.py:293
 #, python-format
 msgid "This field must be given if %(field)s is not %(value)s"
 msgstr ""
 
-#: core/validators.py:308
+#: core/validators.py:312
 msgid "Duplicate values are not allowed."
 msgstr ""
 
-#: core/validators.py:331
+#: core/validators.py:335
 #, python-format
 msgid "This value must be a power of %s."
 msgstr ""
 
-#: core/validators.py:342
+#: core/validators.py:346
 msgid "Please enter a valid decimal number."
 msgstr ""
 
-#: core/validators.py:344
+#: core/validators.py:348
 #, python-format
 msgid "Please enter a valid decimal number with at most %s total digit."
 msgid_plural ""
@@ -896,7 +900,7 @@ msgid_plural ""
 msgstr[0] ""
 msgstr[1] ""
 
-#: core/validators.py:347
+#: core/validators.py:351
 #, python-format
 msgid "Please enter a valid decimal number with at most %s decimal place."
 msgid_plural ""
@@ -904,71 +908,71 @@ msgid_plural ""
 msgstr[0] ""
 msgstr[1] ""
 
-#: core/validators.py:357
+#: core/validators.py:361
 #, python-format
 msgid "Make sure your uploaded file is at least %s bytes big."
 msgstr ""
 
-#: core/validators.py:358
+#: core/validators.py:362
 #, python-format
 msgid "Make sure your uploaded file is at most %s bytes big."
 msgstr ""
 
-#: core/validators.py:371
+#: core/validators.py:375
 msgid "The format for this field is wrong."
 msgstr ""
 
-#: core/validators.py:386
+#: core/validators.py:390
 msgid "This field is invalid."
 msgstr ""
 
-#: core/validators.py:421
+#: core/validators.py:425
 #, python-format
 msgid "Could not retrieve anything from %s."
 msgstr ""
 
-#: core/validators.py:424
+#: core/validators.py:428
 #, python-format
 msgid ""
 "The URL %(url)s returned the invalid Content-Type header '%(contenttype)s'."
 msgstr ""
 
-#: core/validators.py:457
+#: core/validators.py:461
 #, python-format
 msgid ""
 "Please close the unclosed %(tag)s tag from line %(line)s. (Line starts with "
 "\"%(start)s\".)"
 msgstr ""
 
-#: core/validators.py:461
+#: core/validators.py:465
 #, python-format
 msgid ""
 "Some text starting on line %(line)s is not allowed in that context. (Line "
 "starts with \"%(start)s\".)"
 msgstr ""
 
-#: core/validators.py:466
+#: core/validators.py:470
 #, python-format
 msgid ""
 "\"%(attr)s\" on line %(line)s is an invalid attribute. (Line starts with \"%"
 "(start)s\".)"
 msgstr ""
 
-#: core/validators.py:471
+#: core/validators.py:475
 #, python-format
 msgid ""
 "\"<%(tag)s>\" on line %(line)s is an invalid tag. (Line starts with \"%"
 "(start)s\".)"
 msgstr ""
 
-#: core/validators.py:475
+#: core/validators.py:479
 #, python-format
 msgid ""
 "A tag on line %(line)s is missing one or more required attributes. (Line "
 "starts with \"%(start)s\".)"
 msgstr ""
 
-#: core/validators.py:480
+#: core/validators.py:484
 #, python-format
 msgid ""
 "The \"%(attr)s\" attribute on line %(line)s has an invalid value. (Line "

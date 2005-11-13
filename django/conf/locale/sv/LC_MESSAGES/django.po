@@ -2,13 +2,13 @@
 # Copyright (C) 2005
 # This file is distributed under the same license as the Django package.
 # Robin Sonefors <ozamosi@blinkenlights.se>, 2005.
-#
+# 
 #, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2005-11-13 10:02-0600\n"
+"POT-Creation-Date: 2005-11-13 12:06-0600\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -108,8 +108,8 @@ msgid ""
 "There's been an error. It's been reported to the site administrators via e-"
 "mail and should be fixed shortly. Thanks for your patience."
 msgstr ""
-"Ett fel har uppstått. Sidadministratören har meddelats via e-post och "
-"felet bör åtgärdas snart. Tack för ditt tålamod."
+"Ett fel har uppstått. Sidadministratören har meddelats via e-post och felet "
+"bör åtgärdas snart. Tack för ditt tålamod."
 
 #: contrib/admin/templates/admin/404.html:4
 #: contrib/admin/templates/admin/404.html:8
@@ -396,6 +396,18 @@ msgstr "flatsida"
 msgid "flat pages"
 msgstr "flatsidor"
 
+#: utils/translation.py:335
+msgid "DATE_FORMAT"
+msgstr "Y-m-d"
+
+#: utils/translation.py:336
+msgid "DATETIME_FORMAT"
+msgstr "Y-m-d, H:i"
+
+#: utils/translation.py:337
+msgid "TIME_FORMAT"
+msgstr "H:i:s"
+
 #: utils/dates.py:6
 msgid "Monday"
 msgstr "måndag"
@@ -499,18 +511,6 @@ msgstr "nov"
 #: utils/dates.py:28
 msgid "Dec."
 msgstr "dec"
-
-#: utils/translation.py:335
-msgid "DATE_FORMAT"
-msgstr "Y-m-d"
-
-#: utils/translation.py:336
-msgid "DATETIME_FORMAT"
-msgstr "Y-m-d, H:i"
-
-#: utils/translation.py:337
-msgid "TIME_FORMAT"
-msgstr "H:i:s"
 
 #: models/core.py:7
 msgid "domain name"
@@ -729,6 +729,10 @@ msgid "Serbian"
 msgstr "Serbiska"
 
 #: conf/global_settings.py:51
+msgid "Swedish"
+msgstr ""
+
+#: conf/global_settings.py:52
 msgid "Simplified Chinese"
 msgstr "Förenklad kinesiska"
 
@@ -814,8 +818,8 @@ msgstr "Adressen %s pekar inte till en giltig bild."
 #, python-format
 msgid "Phone numbers must be in XXX-XXX-XXXX format. \"%s\" is invalid."
 msgstr ""
-"Telefonnummer måste vara i det amerikanska formatet "
-"XXX-XXX-XXXX. \"%s\" är ogiltigt."
+"Telefonnummer måste vara i det amerikanska formatet XXX-XXX-XXXX. \"%s\" är "
+"ogiltigt."
 
 #: core/validators.py:166
 #, python-format
@@ -941,9 +945,8 @@ msgstr "Kunde inte hämta något från %s."
 msgid ""
 "The URL %(url)s returned the invalid Content-Type header '%(contenttype)s'."
 msgstr ""
-"Adressen %(url)s returnerade det ogiltiga innehållstyphuvudet "
-"(Content-Type header) '%(contenttype)"
-"s'"
+"Adressen %(url)s returnerade det ogiltiga innehållstyphuvudet (Content-Type "
+"header) '%(contenttype)s'"
 
 #: core/validators.py:461
 #, python-format

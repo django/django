@@ -48,6 +48,7 @@ LANGUAGES = (
     ('ru', _('Russian')),
     ('sk', _('Slovak')),
     ('sr', _('Serbian')),
+    ('sv', _('Swedish')),
     ('zh-cn', _('Simplified Chinese')),
 )
 
