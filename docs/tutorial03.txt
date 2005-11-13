@@ -211,9 +211,9 @@ filesystem, whose contents Django can access. (Django runs as whatever user
 your server runs.) Don't put them under your document root, though. You
 probably shouldn't make them public, just for security's sake.
 
-Then edit ``TEMPLATE_DIRS`` in your ``main.py`` settings file to tell Django
-where it can find templates -- just as you did in the "Customize the admin look
-and feel" section of Tutorial 2.
+Then edit ``TEMPLATE_DIRS`` in your settings file (``settings.py``) to tell
+Django where it can find templates -- just as you did in the "Customize the
+admin look and feel" section of Tutorial 2.
 
 When you've done that, create a directory ``polls`` in your template directory.
 Within that, create a file called ``index.html``. Django requires that
