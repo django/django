@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django CVS\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2005-11-13 12:06-0600\n"
+"POT-Creation-Date: 2005-11-13 13:41-0600\n"
 "PO-Revision-Date: 2005-11-12 20:05+0530\n"
 "Last-Translator: Baishampayan Ghose <b.ghose@gnu.org.in>\n"
 "Language-Team: Ankur Bangla <core@bengalinux.org>\n"
@@ -695,38 +695,42 @@ msgid "Galician"
 msgstr "গ্যালিসিয়"
 
 #: conf/global_settings.py:44
+msgid "Icelandic"
+msgstr ""
+
+#: conf/global_settings.py:45
 msgid "Italian"
 msgstr "ইতালিয়"
 
-#: conf/global_settings.py:45
+#: conf/global_settings.py:46
 msgid "Norwegian"
 msgstr "নরওয়েজিয়"
 
-#: conf/global_settings.py:46
+#: conf/global_settings.py:47
 msgid "Brazilian"
 msgstr "ব্রাজিলীয়"
 
-#: conf/global_settings.py:47
+#: conf/global_settings.py:48
 msgid "Romanian"
 msgstr "রোমানীয়"
 
-#: conf/global_settings.py:48
+#: conf/global_settings.py:49
 msgid "Russian"
 msgstr "রুশ"
 
-#: conf/global_settings.py:49
+#: conf/global_settings.py:50
 msgid "Slovak"
 msgstr "স্লোভাক"
 
-#: conf/global_settings.py:50
+#: conf/global_settings.py:51
 msgid "Serbian"
 msgstr "সার্বিয়ান"
 
-#: conf/global_settings.py:51
+#: conf/global_settings.py:52
 msgid "Swedish"
 msgstr ""
 
-#: conf/global_settings.py:52
+#: conf/global_settings.py:53
 msgid "Simplified Chinese"
 msgstr "সরলীকৃত চীনা"
 

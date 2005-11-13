@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2005-11-13 12:06-0600\n"
+"POT-Creation-Date: 2005-11-13 13:41-0600\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -699,39 +699,43 @@ msgid "Galician"
 msgstr "Galiziano"
 
 #: conf/global_settings.py:44
+msgid "Icelandic"
+msgstr ""
+
+#: conf/global_settings.py:45
 msgid "Italian"
 msgstr "Italiano"
 
-#: conf/global_settings.py:45
+#: conf/global_settings.py:46
 msgid "Norwegian"
 msgstr ""
 
-#: conf/global_settings.py:46
+#: conf/global_settings.py:47
 msgid "Brazilian"
 msgstr "Brasiliano"
 
-#: conf/global_settings.py:47
+#: conf/global_settings.py:48
 msgid "Romanian"
 msgstr ""
 
-#: conf/global_settings.py:48
+#: conf/global_settings.py:49
 msgid "Russian"
 msgstr "Russo"
 
-#: conf/global_settings.py:49
+#: conf/global_settings.py:50
 msgid "Slovak"
 msgstr ""
 
-#: conf/global_settings.py:50
+#: conf/global_settings.py:51
 #, fuzzy
 msgid "Serbian"
 msgstr "Serbo"
 
-#: conf/global_settings.py:51
+#: conf/global_settings.py:52
 msgid "Swedish"
 msgstr ""
 
-#: conf/global_settings.py:52
+#: conf/global_settings.py:53
 msgid "Simplified Chinese"
 msgstr ""
 

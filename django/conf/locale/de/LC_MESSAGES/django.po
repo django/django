@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2005-11-13 12:06-0600\n"
+"POT-Creation-Date: 2005-11-13 13:40-0600\n"
 "PO-Revision-Date: 2005-11-06 13:54+0100\n"
 "Last-Translator: Lukas Kolbe <lucky@knup.de>\n"
 "Language-Team: \n"
@@ -702,38 +702,42 @@ msgid "Galician"
 msgstr "Galicisch"
 
 #: conf/global_settings.py:44
+msgid "Icelandic"
+msgstr "Isländisch"
+
+#: conf/global_settings.py:45
 msgid "Italian"
 msgstr "Italienisch"
 
-#: conf/global_settings.py:45
+#: conf/global_settings.py:46
 msgid "Norwegian"
 msgstr "Norwegisch"
 
-#: conf/global_settings.py:46
+#: conf/global_settings.py:47
 msgid "Brazilian"
 msgstr "Brasilianisch"
 
-#: conf/global_settings.py:47
+#: conf/global_settings.py:48
 msgid "Romanian"
 msgstr "Rumänisch"
 
-#: conf/global_settings.py:48
+#: conf/global_settings.py:49
 msgid "Russian"
 msgstr "Russisch"
 
-#: conf/global_settings.py:49
+#: conf/global_settings.py:50
 msgid "Slovak"
 msgstr "Slovakisch"
 
-#: conf/global_settings.py:50
+#: conf/global_settings.py:51
 msgid "Serbian"
 msgstr "Serbisch"
 
-#: conf/global_settings.py:51
+#: conf/global_settings.py:52
 msgid "Swedish"
 msgstr "Schwedisch"
 
-#: conf/global_settings.py:52
+#: conf/global_settings.py:53
 msgid "Simplified Chinese"
 msgstr "vereinfachtes Chinesisch"
 

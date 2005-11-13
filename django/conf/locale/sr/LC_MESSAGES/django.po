@@ -2,9 +2,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django Serbian (latin) translation v1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2005-11-13 12:05-0600\n"
-"PO-Revision-Date: 2005-11-03 00:28+0100\n"
-"Last-Translator: Petar Marić <petar.maric@gmail.com>\n"
+"POT-Creation-Date: 2005-11-13 13:40-0600\n"
+"PO-Revision-Date: 2005-11-13 19:21+0100\n"
+"Last-Translator: Nebojša Đorđević <nesh@studioquattro.co.yu>\n"
 "Language-Team: Nesh <nesh@studioquatro.co.yu> & Petar <petar.maric@gmail."
 "com>\n"
 "MIME-Version: 1.0\n"
@@ -93,9 +93,8 @@ msgid "Django administration"
 msgstr "Django administracija"
 
 #: contrib/admin/templates/admin/500.html:4
-#, fuzzy
 msgid "Server error"
-msgstr "Greška na serveru (500)"
+msgstr "Greška na serveru"
 
 #: contrib/admin/templates/admin/500.html:6
 msgid "Server error (500)"
@@ -175,7 +174,7 @@ msgid "Log out"
 msgstr "Odjavi se"
 
 #: contrib/admin/templates/admin/delete_confirmation.html:7
-#, fuzzy, python-format
+#, python-format
 msgid ""
 "Deleting the %(object_name)s '%(object)s' would result in deleting related "
 "objects, but your account doesn't have permission to delete the following "
@@ -373,7 +372,6 @@ msgid "template name"
 msgstr "ime templejta"
 
 #: contrib/flatpages/models/flatpages.py:12
-#, fuzzy
 msgid ""
 "Example: 'flatpages/contact_page'. If this isn't provided, the system will "
 "use 'flatpages/default'."
@@ -401,15 +399,15 @@ msgstr "statične strane"
 
 #: utils/translation.py:335
 msgid "DATE_FORMAT"
-msgstr ""
+msgstr "D, d.m.Y."
 
 #: utils/translation.py:336
 msgid "DATETIME_FORMAT"
-msgstr ""
+msgstr "d.m.Y. H:i:s"
 
 #: utils/translation.py:337
 msgid "TIME_FORMAT"
-msgstr ""
+msgstr "H:i:s"
 
 #: utils/dates.py:6
 msgid "Monday"
@@ -672,7 +670,7 @@ msgstr "Poruka"
 
 #: conf/global_settings.py:36
 msgid "Bengali"
-msgstr ""
+msgstr "Bengalski"
 
 #: conf/global_settings.py:37
 msgid "Czech"
@@ -680,7 +678,7 @@ msgstr "Češki"
 
 #: conf/global_settings.py:38
 msgid "Welsh"
-msgstr ""
+msgstr "Welšski"
 
 #: conf/global_settings.py:39
 msgid "German"
@@ -703,40 +701,44 @@ msgid "Galician"
 msgstr ""
 
 #: conf/global_settings.py:44
+msgid "Icelandic"
+msgstr ""
+
+#: conf/global_settings.py:45
 msgid "Italian"
 msgstr "Italijanski"
 
-#: conf/global_settings.py:45
-msgid "Norwegian"
-msgstr ""
-
 #: conf/global_settings.py:46
+msgid "Norwegian"
+msgstr "Norveški"
+
+#: conf/global_settings.py:47
 msgid "Brazilian"
 msgstr "Brazilski"
 
-#: conf/global_settings.py:47
-msgid "Romanian"
-msgstr ""
-
 #: conf/global_settings.py:48
+msgid "Romanian"
+msgstr "Rumunski"
+
+#: conf/global_settings.py:49
 msgid "Russian"
 msgstr "Ruski"
 
-#: conf/global_settings.py:49
-msgid "Slovak"
-msgstr ""
-
 #: conf/global_settings.py:50
+msgid "Slovak"
+msgstr "Slovački"
+
+#: conf/global_settings.py:51
 msgid "Serbian"
 msgstr "Srpski"
 
-#: conf/global_settings.py:51
-msgid "Swedish"
-msgstr ""
-
 #: conf/global_settings.py:52
+msgid "Swedish"
+msgstr "Švedski"
+
+#: conf/global_settings.py:53
 msgid "Simplified Chinese"
-msgstr ""
+msgstr "Kineski (pojednostavljen)"
 
 # nesh: Ovo je opis za stari SlugField
 #: core/validators.py:59
