@@ -92,21 +92,21 @@ posts a comment. It doesn't let a user post a comment more than once::
         request.session['has_commented'] = True
         return HttpResponse('Thanks for your comment!')
 
-This simplistic view logs a user in::
+This simplistic view logs in a "member" of the site::
 
     def login(request):
-        u = users.get_object(username__exact=request.POST['username'])
-        if u.check_password(request.POST['password']):
-            request.session['user_id'] = u.id
+        m = members.get_object(username__exact=request.POST['username'])
+        if m.password == request.POST['password']:
+            request.session['member_id'] = m.id
             return HttpResponse("You're logged in.")
         else:
             return HttpResponse("Your username and password didn't match.")
 
-...And this one logs a user out, according to ``login()`` above::
+...And this one logs a member out, according to ``login()`` above::
 
     def logout(request):
         try:
-            del request.session['user_id']
+            del request.session['member_id']
         except KeyError:
             pass
         return HttpResponse("You're logged out.")
