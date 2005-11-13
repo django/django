@@ -282,6 +282,21 @@ As a shortcut, you can use the convenient ``user_passes_test`` decorator::
 Note that ``user_passes_test`` does not automatically check that the ``User``
 is not anonymous.
 
+Limiting access to generic views
+--------------------------------
+
+To limit access to a `generic view`_, write a thin wrapper around the view,
+and point your URLconf to your wrapper instead of the generic view itself.
+For example::
+
+    from django.views.generic.date_based import object_detail
+
+    @login_required
+    def limited_object_detail(*args, **kwargs):
+        return object_detail(*args, **kwargs)
+
+.. _generic view: http://www.djangoproject.com/documentation/generic_views/
+
 Permissions
 ===========
 
