@@ -414,6 +414,7 @@ Default: A tuple of all available languages. Currently, this is::
         ('es', _('Spanish')),
         ('fr', _('French')),
         ('gl', _('Galician')),
+        ('is', _('Icelandic')),
         ('it', _('Italian')),
         ('no', _('Norwegian')),
         ('pt-br', _('Brazilian')),
@@ -421,6 +422,7 @@ Default: A tuple of all available languages. Currently, this is::
         ('ru', _('Russian')),
         ('sk', _('Slovak')),
         ('sr', _('Serbian')),
+        ('sv', _('Swedish')),
         ('zh-cn', _('Simplified Chinese')),
     )
 
