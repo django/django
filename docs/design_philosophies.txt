@@ -175,7 +175,9 @@ a common header, footer, navigation bar, etc. The Django template system should
 make it easy to store those elements in a single place, eliminating duplicate
 code.
 
-This is the philosophy behind template inheritance.
+This is the philosophy behind `template inheritance`_.
+
+.. _template inheritance: http://www.djangoproject.com/documentation/templates/#template-inheritance
 
 Be decoupled from HTML
 ----------------------
@@ -197,7 +199,8 @@ Treat whitespace obviously
 
 The template system shouldn't do magic things with whitespace. If a template
 includes whitespace, the system should treat the whitespace as it treats text
--- just display it.
+-- just display it. Any whitespace that's not in a template tag should be
+displayed.
 
 Don't invent a programming language
 -----------------------------------
@@ -210,6 +213,18 @@ The template system intentionally doesn't allow the following:
 The goal is not to invent a programming language. The goal is to offer just
 enough programming-esque functionality, such as branching and looping, that is
 essential for making presentation-related decisions.
+
+The Django template system recognizes that templates are most often written by
+*designers*, not *programmers*, and therefore should not assume Python
+knowledge.
+
+Safety and security
+-------------------
+
+The template system, out of the box, should forbid the inclusion of malicious
+code -- such as commands that delete database records.
+
+This is another reason the template system doesn't allow arbitrary Python code.
 
 Extensibility
 -------------
