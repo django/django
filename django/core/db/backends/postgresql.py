@@ -49,6 +49,11 @@ class DatabaseWrapper:
             self.connection.close()
             self.connection = None
 
+    def quote_name(self, name):
+        if name.startswith('"') and name.endswith('"'):
+            return name # Quoting once is enough.
+        return '"%s"' % name
+
 def dictfetchone(cursor):
     "Returns a row from the cursor as a dict"
     return cursor.dictfetchone()
@@ -115,11 +120,6 @@ def get_relations(cursor, table_name):
         except ValueError:
             continue
     return relations
-
-def quote_name(name):
-    if name.startswith('"') and name.endswith('"'):
-        return name # Quoting once is enough.
-    return '"%s"' % name
 
 # Register these custom typecasts, because Django expects dates/times to be
 # in Python's native (standard-library) datetime/time format, whereas psycopg
