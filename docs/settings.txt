@@ -403,12 +403,33 @@ in standard language format. For example, U.S. English is ``"en-us"``. See the
 LANGUAGES
 ---------
 
-Default: a list of available languages and their name
+Default: A tuple of all available languages. Currently, this is::
 
-This is a list of two-tuples with language code and language name that are available
-for language selection. See the `internationalization docs`_ for details. It usually
-isn't defined, only if you want to restrict language selection to a subset of the
-django-provided languages you need to set it.
+    LANGUAGES = (
+        ('bn', _('Bengali')),
+        ('cs', _('Czech')),
+        ('cy', _('Welsh')),
+        ('de', _('German')),
+        ('en', _('English')),
+        ('es', _('Spanish')),
+        ('fr', _('French')),
+        ('gl', _('Galician')),
+        ('it', _('Italian')),
+        ('no', _('Norwegian')),
+        ('pt-br', _('Brazilian')),
+        ('ro', _('Romanian')),
+        ('ru', _('Russian')),
+        ('sk', _('Slovak')),
+        ('sr', _('Serbian')),
+        ('zh-cn', _('Simplified Chinese')),
+    )
+
+A tuple of two-tuples in the format (language code, language name). This
+specifies which languages are available for language selection. See the
+`internationalization docs`_ for details.
+
+Generally, the default value should suffice. Only set this setting if you want
+to restrict language selection to a subset of the Django-provided languages.
 
 MANAGERS
 --------

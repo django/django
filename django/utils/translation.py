@@ -256,7 +256,7 @@ ngettext_lazy = lazy(ngettext, str)
 def check_for_language(lang_code):
     """
     Checks whether there is a global language file for the given language code.
-    This is used to decide whether a user-provided language is available. this is
+    This is used to decide whether a user-provided language is available. This is
     only used for language codes from either the cookies or session.
     """
     from django.conf import settings
@@ -327,7 +327,7 @@ def get_language_from_request(request):
 
 def get_date_formats():
     """
-    This function checks wether translation files provide a translation for some
+    This function checks whether translation files provide a translation for some
     technical message ID to store date and time formats. If it doesn't contain
     one, the formats provided in the settings will be used.
     """
