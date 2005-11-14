@@ -27,6 +27,9 @@ from xml.parsers.expat import ExpatError
 def rfc2822_date(date):
     return email.Utils.formatdate(time.mktime(date.timetuple()))
 
+def rfc3339_date(date):
+    return date.strftime('%Y-%m-%dT%H:%M:%SZ')
+
 def get_tag_uri(url, date):
     "Creates a TagURI. See http://diveintomark.org/archives/2004/05/28/howto-atom-id"
     tag = re.sub('^http://', '', url)
@@ -189,7 +192,7 @@ class Atom1Feed(SyndicationFeed):
         handler.addQuickElement(u"title", self.feed['title'])
         handler.addQuickElement(u"link", "", {u"href": self.feed['link']})
         handler.addQuickElement(u"id", self.feed['link'])
-        handler.addQuickElement(u"updated", rfc2822_date(self.latest_post_date()).decode('ascii'))
+        handler.addQuickElement(u"updated", rfc3339_date(self.latest_post_date()).decode('ascii'))
         if self.feed['author_name'] is not None:
             handler.startElement(u"author", {})
             handler.addQuickElement(u"name", self.feed['author_name'])
@@ -211,7 +214,7 @@ class Atom1Feed(SyndicationFeed):
             handler.addQuickElement(u"title", item['title'])
             handler.addQuickElement(u"link", u"", {u"href": item['link']})
             if item['pubdate'] is not None:
-                handler.addQuickElement(u"updated", rfc2822_date(item['pubdate']).decode('ascii'))
+                handler.addQuickElement(u"updated", rfc3339_date(item['pubdate']).decode('ascii'))
 
             # Author information.
             if item['author_name'] is not None:
