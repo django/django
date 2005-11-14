@@ -983,7 +983,7 @@ msgstr "Vereinfachtes Chinesisch"
 
 #: conf/global_settings.py:49
 msgid "Slovak"
-msgstr ""
+msgstr "Slowakisch"
 
 #: core/validators.py:59
 msgid "This value must contain only letters, numbers and underscores."
