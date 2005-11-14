@@ -93,6 +93,7 @@ TECHNICAL_500_TEMPLATE = """
 <html lang="en">
 <head>
   <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+  <meta name="robots" content="NONE,NOARCHIVE" />
   <title>{{ exception_type }} at {{ request.path }}</title>
   <style type="text/css">
     html * { padding:0; margin:0; }
