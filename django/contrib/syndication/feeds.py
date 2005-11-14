@@ -27,8 +27,11 @@ class Feed:
         except AttributeError:
             raise ImproperlyConfigured, "Give your %s class a get_absolute_url() method, or define an item_link() method in your Feed class." % item.__class__.__name__
 
-    def __get_dynamic_attr(self, attname, obj):
-        attr = getattr(self, attname)
+    def __get_dynamic_attr(self, attname, obj, default=None):
+        try:
+            attr = getattr(self, attname)
+        except AttributeError:
+            return default
         if callable(attr):
             try:
                 return attr(obj)
@@ -59,6 +62,9 @@ class Feed:
             description = self.__get_dynamic_attr('description', obj),
             language = LANGUAGE_CODE.decode(),
             feed_url = add_domain(current_site, self.feed_url),
+            author_name = self.__get_dynamic_attr('author_name', obj),
+            author_link = self.__get_dynamic_attr('author_link', obj),
+            author_email = self.__get_dynamic_attr('author_email', obj),
         )
 
         try:
@@ -80,6 +86,12 @@ class Feed:
                     length = str(self.__get_dynamic_attr('item_enclosure_length', item)).decode('utf-8'),
                     mime_type = self.__get_dynamic_attr('item_enclosure_mime_type', item).decode('utf-8'),
                 )
+            author_name = self.__get_dynamic_attr('item_author_name', item)
+            if author_name is not None:
+                author_email = self.__get_dynamic_attr('item_author_email', item)
+                author_link = self.__get_dynamic_attr('item_author_link', item)
+            else:
+                author_email = author_link = None
             feed.add_item(
                 title = title_template.render(Context({'obj': item, 'site': current_site})).decode('utf-8'),
                 link = link,
@@ -87,5 +99,8 @@ class Feed:
                 unique_id = link,
                 enclosure = enc,
                 pubdate = self.__get_dynamic_attr('item_pubdate', item),
+                author_name = author_name,
+                author_email = author_email,
+                author_link = author_link,
             )
         return feed

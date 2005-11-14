@@ -386,6 +386,55 @@ This example illustrates all possible attributes and methods for a ``Feed`` clas
 
         description = 'Foo bar baz.' # Hard-coded description.
 
+        # AUTHOR NAME --One of the following three is optional. The framework
+        # looks for them in this order.
+
+        def author_name(self, obj):
+            """
+            Takes the object returned by get_object() and returns the feed's
+            author's name as a normal Python string.
+            """
+
+        def author_name(self):
+            """
+            Returns the feed's author's name as a normal Python string.
+            """
+
+        author_name = 'Sally Smith' # Hard-coded author name.
+
+        # AUTHOR E-MAIL --One of the following three is optional. The framework
+        # looks for them in this order.
+
+        def author_email(self, obj):
+            """
+            Takes the object returned by get_object() and returns the feed's
+            author's e-mail as a normal Python string.
+            """
+
+        def author_name(self):
+            """
+            Returns the feed's author's e-mail as a normal Python string.
+            """
+
+        author_email = 'test@example.com' # Hard-coded author e-mail.
+
+        # AUTHOR LINK --One of the following three is optional. The framework
+        # looks for them in this order. In each case, the URL should include
+        # the "http://" and domain name.
+
+        def author_link(self, obj):
+            """
+            Takes the object returned by get_object() and returns the feed's
+            author's URL as a normal Python string.
+            """
+
+        def author_link(self):
+            """
+            Returns the feed's author's URL as a normal Python string.
+            """
+
+        author_link = 'http://www.example.com/' # Hard-coded author URL.
+
         # ITEMS -- One of the following three is required. The framework looks
         # for them in this order.
 
@@ -427,6 +476,59 @@ This example illustrates all possible attributes and methods for a ``Feed`` clas
             """
             Returns the URL for every item in the feed.
             """
+
+        # ITEM AUTHOR NAME --One of the following three is optional. The
+        # framework looks for them in this order.
+
+        def item_author_name(self, item):
+            """
+            Takes an item, as returned by items(), and returns the item's
+            author's name as a normal Python string.
+            """
+
+        def item_author_name(self):
+            """
+            Returns the author name for every item in the feed.
+            """
+
+        item_author_name = 'Sally Smith' # Hard-coded author name.
+
+        # ITEM AUTHOR E-MAIL --One of the following three is optional. The
+        # framework looks for them in this order.
+        #
+        # If you specify this, you must specify item_author_name.
+
+        def item_author_email(self, obj):
+            """
+            Takes an item, as returned by items(), and returns the item's
+            author's e-mail as a normal Python string.
+            """
+
+        def item_author_email(self):
+            """
+            Returns the author e-mail for every item in the feed.
+            """
+
+        item_author_email = 'test@example.com' # Hard-coded author e-mail.
+
+        # ITEM AUTHOR LINK --One of the following three is optional. The
+        # framework looks for them in this order. In each case, the URL should
+        # include the "http://" and domain name.
+        #
+        # If you specify this, you must specify item_author_name.
+
+        def item_author_link(self, obj):
+            """
+            Takes an item, as returned by items(), and returns the item's
+            author's URL as a normal Python string.
+            """
+
+        def item_author_link(self):
+            """
+            Returns the author URL for every item in the feed.
+            """
+
+        item_author_link = 'http://www.example.com/' # Hard-coded author URL.
 
         # ITEM ENCLOSURE URL -- One of these three is required if you're
         # publishing enclosures. The framework looks for them in this order.

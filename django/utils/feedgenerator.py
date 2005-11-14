@@ -58,7 +58,7 @@ class SyndicationFeed:
         self.items = []
 
     def add_item(self, title, link, description, author_email=None,
-        author_name=None, pubdate=None, comments=None,
+        author_name=None, author_link=None, pubdate=None, comments=None,
         unique_id=None, enclosure=None, categories=()):
         """
         Adds an item to the feed. All args are expected to be Python Unicode
@@ -71,6 +71,7 @@ class SyndicationFeed:
             'description': description,
             'author_email': author_email,
             'author_name': author_name,
+            'author_link': author_link,
             'pubdate': pubdate,
             'comments': comments,
             'unique_id': unique_id,
@@ -226,6 +227,8 @@ class Atom1Feed(SyndicationFeed):
                 handler.addQuickElement(u"name", item['author_name'])
                 if item['author_email'] is not None:
                     handler.addQuickElement(u"email", item['author_email'])
+                if item['author_link'] is not None:
+                    handler.addQuickElement(u"uri", item['author_link'])
                 handler.endElement(u"author")
 
             # Unique ID.
