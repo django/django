@@ -172,6 +172,7 @@ Anonymous users
 ``django.parts.auth.anonymoususers.AnonymousUser`` is a class that implements
 the ``django.models.auth.users.User`` interface, with these differences:
 
+    * ``id`` is always ``None``.
     * ``is_anonymous()`` returns ``True`` instead of ``False``.
     * ``has_perm()`` always returns ``False``.
     * ``set_password()``, ``check_password()``, ``set_groups()`` and
@@ -281,6 +282,21 @@ As a shortcut, you can use the convenient ``user_passes_test`` decorator::
 ``User`` object and returns ``True`` if the user is allowed to view the page.
 Note that ``user_passes_test`` does not automatically check that the ``User``
 is not anonymous.
+
+Limiting access to generic views
+--------------------------------
+
+To limit access to a `generic view`_, write a thin wrapper around the view,
+and point your URLconf to your wrapper instead of the generic view itself.
+For example::
+
+    from django.views.generic.date_based import object_detail
+
+    @login_required
+    def limited_object_detail(*args, **kwargs):
+        return object_detail(*args, **kwargs)
+
+.. _generic view: http://www.djangoproject.com/documentation/generic_views/
 
 Permissions
 ===========
@@ -415,7 +431,7 @@ Thus, you can check permissions in template ``{% if %}`` statements::
         <p>You don't have permission to do anything in the foo app.</p>
     {% endif %}
 
-.. _template context: http://www.djangoproject.com/documentation/models/templates_python/
+.. _template context: http://www.djangoproject.com/documentation/templates_python/
 
 Groups
 ======
@@ -458,7 +474,7 @@ a playlist::
         # Create the playlist with the given songs.
         # ...
         request.user.add_message("Your playlist was added successfully.")
-        return render_to_response("playlists/create", context_instance=DjangoContext)
+        return render_to_response("playlists/create", context_instance=DjangoContext(request))
 
 When you use ``DjangoContext``, the currently logged-in user and his/her
 messages are made available in the `template context`_ as the template variable

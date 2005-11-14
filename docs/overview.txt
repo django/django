@@ -288,6 +288,6 @@ features:
 The next obvious steps are for you to `download Django`_, read `the tutorial`_
 and join `the community`_. Thanks for your interest!
 
-.. _download Django: http://www.djangoproject.com/documentation/
+.. _download Django: http://www.djangoproject.com/download/
 .. _the tutorial: http://www.djangoproject.com/documentation/tutorial1/
 .. _the community: http://www.djangoproject.com/community/

@@ -635,6 +635,18 @@ msgstr ""
 msgid "flat pages"
 msgstr ""
 
+#: utils/translation.py:335
+msgid "DATE_FORMAT"
+msgstr ""
+
+#: utils/translation.py:336
+msgid "DATETIME_FORMAT"
+msgstr ""
+
+#: utils/translation.py:337
+msgid "TIME_FORMAT"
+msgstr ""
+
 #: utils/dates.py:6
 msgid "Monday"
 msgstr ""
@@ -937,22 +949,26 @@ msgid "Galician"
 msgstr ""
 
 #: conf/global_settings.py:44
-msgid "Italian"
+msgid "Icelandic"
 msgstr ""
 
 #: conf/global_settings.py:45
-msgid "Norwegian"
+msgid "Italian"
 msgstr ""
 
 #: conf/global_settings.py:46
-msgid "Brazilian"
+msgid "Norwegian"
 msgstr ""
 
 #: conf/global_settings.py:47
-msgid "Romanian"
+msgid "Brazilian"
 msgstr ""
 
 #: conf/global_settings.py:48
+msgid "Romanian"
+msgstr ""
+
+#: conf/global_settings.py:49
 msgid "Russian"
 msgstr ""
 

@@ -256,7 +256,8 @@ ngettext_lazy = lazy(ngettext, str)
 def check_for_language(lang_code):
     """
     Checks whether there is a global language file for the given language code.
-    This is used to decide whether a user-provided language is available.
+    This is used to decide whether a user-provided language is available. This is
+    only used for language codes from either the cookies or session.
     """
     from django.conf import settings
     globalpath = os.path.join(os.path.dirname(settings.__file__), 'locale')
@@ -268,18 +269,21 @@ def check_for_language(lang_code):
 def get_language_from_request(request):
     """
     Analyzes the request to find what language the user wants the system to show.
+    Only languages listed in settings.LANGUAGES are taken into account. If the user
+    requests a sublanguage where we have a main language, we send out the main language.
     """
     global _accepted
     from django.conf import settings
     globalpath = os.path.join(os.path.dirname(settings.__file__), 'locale')
+    supported = dict(settings.LANGUAGES)
 
     if hasattr(request, 'session'):
         lang_code = request.session.get('django_language', None)
-        if lang_code is not None and check_for_language(lang_code):
+        if lang_code in supported and lang_code is not None and check_for_language(lang_code):
             return lang_code
 
     lang_code = request.COOKIES.get('django_language', None)
-    if lang_code is not None and check_for_language(lang_code):
+    if lang_code in supported and lang_code is not None and check_for_language(lang_code):
         return lang_code
 
     accept = request.META.get('HTTP_ACCEPT_LANGUAGE', None)
@@ -297,26 +301,47 @@ def get_language_from_request(request):
             else:
                 lang = el
                 order = 100
-            if lang.find('-') >= 0:
-                (lang, sublang) = lang.split('-')
-                lang = lang.lower() + '_' + sublang.upper()
-            return (lang, order)
+            p = lang.find('-')
+            if p >= 0:
+                mainlang = lang[:p]
+            else:
+                mainlang = lang
+            return (lang, mainlang, order)
 
         langs = [_parsed(el) for el in accept.split(',')]
-        langs.sort(lambda a,b: -1*cmp(a[1], b[1]))
+        langs.sort(lambda a,b: -1*cmp(a[2], b[2]))
 
-        for lang, order in langs:
-            langfile = gettext_module.find('django', globalpath, [to_locale(lang)])
-            if langfile:
-                # reconstruct the actual language from the language
-                # filename, because otherwise we might incorrectly
-                # report de_DE if we only have de available, but
-                # did find de_DE because of language normalization
-                lang = langfile[len(globalpath):].split(os.path.sep)[1]
-                _accepted[accept] = lang
-                return lang
+        for lang, mainlang, order in langs:
+            if lang in supported or mainlang in supported:
+                langfile = gettext_module.find('django', globalpath, [to_locale(lang)])
+                if langfile:
+                    # reconstruct the actual language from the language
+                    # filename, because otherwise we might incorrectly
+                    # report de_DE if we only have de available, but
+                    # did find de_DE because of language normalization
+                    lang = langfile[len(globalpath):].split(os.path.sep)[1]
+                    _accepted[accept] = lang
+                    return lang
 
     return settings.LANGUAGE_CODE
+
+def get_date_formats():
+    """
+    This function checks whether translation files provide a translation for some
+    technical message ID to store date and time formats. If it doesn't contain
+    one, the formats provided in the settings will be used.
+    """
+    from django.conf.settings import DATE_FORMAT, DATETIME_FORMAT, TIME_FORMAT
+    date_format = _('DATE_FORMAT')
+    datetime_format = _('DATETIME_FORMAT')
+    time_format = _('TIME_FORMAT')
+    if date_format == 'DATE_FORMAT':
+        date_format = DATE_FORMAT
+    if datetime_format == 'DATETIME_FORMAT':
+        datetime_format = DATETIME_FORMAT
+    if time_format == 'TIME_FORMAT':
+        time_format = TIME_FORMAT
+    return (date_format, datetime_format, time_format)
 
 def install():
     """

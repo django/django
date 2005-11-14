@@ -1,4 +1,4 @@
-# django.bn.po -- Bengali (bn) translation of Django core
+# django.po -- Bengali (bn) translation of Django core
 # Copyright (C) 2005 Django Authors
 # This file is distributed under the same license as the Django package.
 # Baishampayan Ghose <b.ghose@gnu.org.in>, 2005.
@@ -8,17 +8,17 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django CVS\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2005-11-11 16:13-0600\n"
-"PO-Revision-Date: 2005-11-10 06:11+0530\n"
+"POT-Creation-Date: 2005-11-13 13:41-0600\n"
+"PO-Revision-Date: 2005-11-12 20:05+0530\n"
 "Last-Translator: Baishampayan Ghose <b.ghose@gnu.org.in>\n"
-"Language-Team: Bengali <core@bengalinux.org>\n"
+"Language-Team: Ankur Bangla <core@bengalinux.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
 #: contrib/admin/models/admin.py:6
 msgid "action time"
-msgstr "কাজ সময়"
+msgstr "কাজের সময়"
 
 #: contrib/admin/models/admin.py:9
 msgid "object id"
@@ -30,7 +30,7 @@ msgstr "বস্তু repr"
 
 #: contrib/admin/models/admin.py:11
 msgid "action flag"
-msgstr "কাজ ফ্ল্যাগ"
+msgstr "কাজের ফ্ল্যাগ"
 
 #: contrib/admin/models/admin.py:12
 msgid "change message"
@@ -367,7 +367,6 @@ msgid "template name"
 msgstr "ছাঁদ নাম"
 
 #: contrib/flatpages/models/flatpages.py:12
-#, fuzzy
 msgid ""
 "Example: 'flatpages/contact_page'. If this isn't provided, the system will "
 "use 'flatpages/default'."
@@ -391,6 +390,18 @@ msgstr "চ্যাপ্টা পাতা"
 #: contrib/flatpages/models/flatpages.py:18
 msgid "flat pages"
 msgstr "চ্যাপ্টা পাতাগুলো"
+
+#: utils/translation.py:335
+msgid "DATE_FORMAT"
+msgstr ""
+
+#: utils/translation.py:336
+msgid "DATETIME_FORMAT"
+msgstr ""
+
+#: utils/translation.py:337
+msgid "TIME_FORMAT"
+msgstr ""
 
 #: utils/dates.py:6
 msgid "Monday"
@@ -653,7 +664,7 @@ msgstr "বার্তা"
 
 #: conf/global_settings.py:36
 msgid "Bengali"
-msgstr ""
+msgstr "বাংলা"
 
 #: conf/global_settings.py:37
 msgid "Czech"
@@ -673,7 +684,7 @@ msgstr "ইংরেজী"
 
 #: conf/global_settings.py:41
 msgid "Spanish"
-msgstr "স্পেনিয়"
+msgstr "স্প্যানিশ"
 
 #: conf/global_settings.py:42
 msgid "French"
@@ -684,34 +695,42 @@ msgid "Galician"
 msgstr "গ্যালিসিয়"
 
 #: conf/global_settings.py:44
+msgid "Icelandic"
+msgstr ""
+
+#: conf/global_settings.py:45
 msgid "Italian"
 msgstr "ইতালিয়"
 
-#: conf/global_settings.py:45
+#: conf/global_settings.py:46
 msgid "Norwegian"
 msgstr "নরওয়েজিয়"
 
-#: conf/global_settings.py:46
+#: conf/global_settings.py:47
 msgid "Brazilian"
 msgstr "ব্রাজিলীয়"
 
-#: conf/global_settings.py:47
+#: conf/global_settings.py:48
 msgid "Romanian"
 msgstr "রোমানীয়"
 
-#: conf/global_settings.py:48
+#: conf/global_settings.py:49
 msgid "Russian"
 msgstr "রুশ"
 
-#: conf/global_settings.py:49
+#: conf/global_settings.py:50
 msgid "Slovak"
 msgstr "স্লোভাক"
 
-#: conf/global_settings.py:50
+#: conf/global_settings.py:51
 msgid "Serbian"
 msgstr "সার্বিয়ান"
 
-#: conf/global_settings.py:51
+#: conf/global_settings.py:52
+msgid "Swedish"
+msgstr ""
+
+#: conf/global_settings.py:53
 msgid "Simplified Chinese"
 msgstr "সরলীকৃত চীনা"
 
@@ -825,105 +844,105 @@ msgstr "খারাপভাবে গঠিত এক্সএমএল: %s"
 msgid "Invalid URL: %s"
 msgstr "অবৈধ ইউ.আর.এল: %s"
 
-#: core/validators.py:203
+#: core/validators.py:205 core/validators.py:207
 #, python-format
 msgid "The URL %s is a broken link."
 msgstr "ইউ.আর.এল %s একটি ভাঙা সংযোগ।"
 
-#: core/validators.py:209
+#: core/validators.py:213
 msgid "Enter a valid U.S. state abbreviation."
 msgstr "একটি বৈধ U S. রাজ্য abbreviation ঢোকান।"
 
-#: core/validators.py:224
-#, fuzzy, python-format
+#: core/validators.py:228
+#, python-format
 msgid "Watch your mouth! The word %s is not allowed here."
 msgid_plural "Watch your mouth! The words %s are not allowed here."
 msgstr[0] "মুখ সামলে! %s এখানে ব্যাবহার করতে পারবেন না।"
 msgstr[1] "মুখ সামলে! %s এখানে ব্যাবহার করতে পারবেন না।"
 
-#: core/validators.py:231
+#: core/validators.py:235
 #, python-format
 msgid "This field must match the '%s' field."
 msgstr "এই ক্ষেত্রটি '%s' ক্ষেত্রের সঙ্গে অবশ্যই মিলতে হবে।"
 
-#: core/validators.py:250
+#: core/validators.py:254
 msgid "Please enter something for at least one field."
 msgstr "দয়া করে অন্তত এক ক্ষেত্রেতে কিছু জিনিষ ঢোকান।"
 
-#: core/validators.py:259 core/validators.py:270
+#: core/validators.py:263 core/validators.py:274
 msgid "Please enter both fields or leave them both empty."
 msgstr "দয়া করে উভয় ক্ষেত্রে ঢোকান অথবা তাদেরকে উভয় ফাঁকা ছেড়ে চলে যান।"
 
-#: core/validators.py:277
+#: core/validators.py:281
 #, python-format
 msgid "This field must be given if %(field)s is %(value)s"
 msgstr "এই ক্ষেত্রেটি অবশ্যই দেওয়া হবে যদি %(field)s %(value)s হয়"
 
-#: core/validators.py:289
+#: core/validators.py:293
 #, python-format
 msgid "This field must be given if %(field)s is not %(value)s"
 msgstr "এই ক্ষেত্রেটি অবশ্যই দেওয়া হবে যদি %(field)s %(value)s না হয়"
 
-#: core/validators.py:308
+#: core/validators.py:312
 msgid "Duplicate values are not allowed."
 msgstr "নকল মান অনুমতি দেওয়া হল না।"
 
-#: core/validators.py:331
+#: core/validators.py:335
 #, python-format
 msgid "This value must be a power of %s."
 msgstr "এই মানটি %sএর একটি গুন অবশ্যই হতে হবে।"
 
-#: core/validators.py:342
+#: core/validators.py:346
 msgid "Please enter a valid decimal number."
 msgstr "দয়া করে একটি বৈধ দশমিক সংখ্যা ঢোকান।"
 
-#: core/validators.py:344
-#, fuzzy, python-format
+#: core/validators.py:348
+#, python-format
 msgid "Please enter a valid decimal number with at most %s total digit."
 msgid_plural ""
 "Please enter a valid decimal number with at most %s total digits."
 msgstr[0] "দয়া করে একটি বৈধ দশমিক সংখ্যা ঢোকান যার অক্ষরের সংখ্যা %s থেকে কম হবে।"
 msgstr[1] "দয়া করে একটি বৈধ দশমিক সংখ্যা ঢোকান যার অক্ষরের সংখ্যা %s থেকে কম হবে।"
 
-#: core/validators.py:347
-#, fuzzy, python-format
+#: core/validators.py:351
+#, python-format
 msgid "Please enter a valid decimal number with at most %s decimal place."
 msgid_plural ""
 "Please enter a valid decimal number with at most %s decimal places."
 msgstr[0] "দয়া করে একটি বৈধ দশমিক সংখ্যা ঢোকান যার দশমিক স্থান %s থেকে কম হবে।"
 msgstr[1] "দয়া করে একটি বৈধ দশমিক সংখ্যা ঢোকান যার দশমিক স্থান %s থেকে কম হবে।"
 
-#: core/validators.py:357
+#: core/validators.py:361
 #, python-format
 msgid "Make sure your uploaded file is at least %s bytes big."
 msgstr "আাপনার আপলোড করা ফাইল যেন অন্তত %s বাইট বড় হয় তা নিশ্চিত করুন।"
 
-#: core/validators.py:358
+#: core/validators.py:362
 #, python-format
 msgid "Make sure your uploaded file is at most %s bytes big."
 msgstr "আাপনার আপলোড করা ফাইল যেন %s বাইটের থেকে বড় না হয় তা নিশ্চিত করুন।"
 
-#: core/validators.py:371
+#: core/validators.py:375
 msgid "The format for this field is wrong."
 msgstr "এই ক্ষেত্রের জন্য ফরম্যাটটি ভূল।"
 
-#: core/validators.py:386
+#: core/validators.py:390
 msgid "This field is invalid."
 msgstr "এই ক্ষেত্রেটি অবৈধ।"
 
-#: core/validators.py:421
+#: core/validators.py:425
 #, python-format
 msgid "Could not retrieve anything from %s."
 msgstr "%s থেকে কোন কিছু গ্রহন করতে পারলাম না।"
 
-#: core/validators.py:424
+#: core/validators.py:428
 #, python-format
 msgid ""
 "The URL %(url)s returned the invalid Content-Type header '%(contenttype)s'."
 msgstr ""
 "ইউ.আর.এল %(url)s অবৈধ Content-Type শিরোনাম নিয়ে '%(contenttype)s ফিরে আসল।"
 
-#: core/validators.py:457
+#: core/validators.py:461
 #, python-format
 msgid ""
 "Please close the unclosed %(tag)s tag from line %(line)s. (Line starts with "
@@ -932,7 +951,7 @@ msgstr ""
 "দয়া করে লাইন %(line)s থেকে খোলা %(tag)s বন্ধ করুন। (\"%(start)s\"এর সঙ্গে লাইন "
 "আরম্ভ।)"
 
-#: core/validators.py:461
+#: core/validators.py:465
 #, python-format
 msgid ""
 "Some text starting on line %(line)s is not allowed in that context. (Line "
@@ -941,7 +960,7 @@ msgstr ""
 "লাইন %(line)s এই প্রসঙ্গে কিছু শব্দ লেখার অনুমতি দেওয়া গেল না। (\"%(start)s\"এর "
 "সঙ্গে লাইন আরম্ভ।)"
 
-#: core/validators.py:466
+#: core/validators.py:470
 #, python-format
 msgid ""
 "\"%(attr)s\" on line %(line)s is an invalid attribute. (Line starts with \"%"
@@ -949,7 +968,7 @@ msgid ""
 msgstr ""
 "লাইন %(line)s\"%(attr)s\"একটি অবৈধ বৈশিষ্ট্য। (\"%(start)s\"এর সঙ্গে লাইন আরম্ভ।)"
 
-#: core/validators.py:471
+#: core/validators.py:475
 #, python-format
 msgid ""
 "\"<%(tag)s>\" on line %(line)s is an invalid tag. (Line starts with \"%"
@@ -958,7 +977,7 @@ msgstr ""
 " %(line)s লাইনে \"<%(tag)s>\" একটি অবৈধ ট্যাগ। (\"%(start)s\"এর সঙ্গে লাইন "
 "আরম্ভ।)"
 
-#: core/validators.py:475
+#: core/validators.py:479
 #, python-format
 msgid ""
 "A tag on line %(line)s is missing one or more required attributes. (Line "
@@ -967,7 +986,7 @@ msgstr ""
 "লাইন %(line)s একটি ট্যাগে এক অথবা আরও বেশি প্রয়োজনীয় বিশিষ্ট্যাবলী নেই। (\"%"
 "(start)s\"এর সঙ্গে লাইন আরম্ভ।)"
 
-#: core/validators.py:480
+#: core/validators.py:484
 #, python-format
 msgid ""
 "The \"%(attr)s\" attribute on line %(line)s has an invalid value. (Line "

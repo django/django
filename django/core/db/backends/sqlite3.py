@@ -55,6 +55,11 @@ class DatabaseWrapper:
             self.connection.close()
             self.connection = None
 
+    def quote_name(self, name):
+        if name.startswith('"') and name.endswith('"'):
+            return name # Quoting once is enough.
+        return '"%s"' % name
+
 class SQLiteCursorWrapper(Database.Cursor):
     """
     Django uses "format" style placeholders, but pysqlite2 uses "qmark" style.
@@ -123,11 +128,6 @@ def get_table_list(cursor):
 
 def get_relations(cursor, table_name):
     raise NotImplementedError
-
-def quote_name(name):
-    if name.startswith('"') and name.endswith('"'):
-        return name # Quoting once is enough.
-    return '"%s"' % name
 
 # Operators and fields ########################################################
 

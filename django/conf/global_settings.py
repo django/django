@@ -42,6 +42,7 @@ LANGUAGES = (
     ('es', _('Spanish')),
     ('fr', _('French')),
     ('gl', _('Galician')),
+    ('is', _('Icelandic')),
     ('it', _('Italian')),
     ('no', _('Norwegian')),
     ('pt-br', _('Brazilian')),
@@ -49,6 +50,7 @@ LANGUAGES = (
     ('ru', _('Russian')),
     ('sk', _('Slovak')),
     ('sr', _('Serbian')),
+    ('sv', _('Swedish')),
     ('zh-cn', _('Simplified Chinese')),
 )
 

@@ -3,8 +3,8 @@ from django.core.template.decorators import simple_tag, inclusion_tag
 from django.contrib.admin.views.main import MAX_SHOW_ALL_ALLOWED, DEFAULT_RESULTS_PER_PAGE, ALL_VAR, \
  ORDER_VAR, ORDER_TYPE_VAR, PAGE_VAR , SEARCH_VAR , IS_POPUP_VAR, EMPTY_CHANGELIST_VALUE, \
  MONTHS
+from django.utils.translation import get_date_formats 
 
-from django.conf.settings import DATE_FORMAT, TIME_FORMAT, DATETIME_FORMAT
 
 from django.core import meta
 from django.utils.text import capfirst
@@ -175,12 +175,13 @@ def items_for_result(cl, result):
             # Dates and times are special: They're formatted in a certain way.
             elif isinstance(f, meta.DateField) or isinstance(f, meta.TimeField):
                 if field_val:
+                    (date_format, datetime_format, time_format) = get_date_formats() 
                     if isinstance(f, meta.DateTimeField):
-                        result_repr = capfirst(dateformat.format(field_val, DATETIME_FORMAT))
+                        result_repr = capfirst(dateformat.format(field_val, datetime_format))
                     elif isinstance(f, meta.TimeField):
-                        result_repr = capfirst(dateformat.time_format(field_val, TIME_FORMAT))
+                        result_repr = capfirst(dateformat.time_format(field_val, time_format))
                     else:
-                        result_repr = capfirst(dateformat.format(field_val, DATE_FORMAT))
+                        result_repr = capfirst(dateformat.format(field_val, date_format))
                 else:
                     result_repr = EMPTY_CHANGELIST_VALUE
                 row_class = ' class="nowrap"'

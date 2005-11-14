@@ -149,7 +149,7 @@ the ``media`` subdirectory and any URL that ends with ``.jpg``, ``.gif`` or
 
     <LocationMatch "\.(jpg|gif|png)$">
         SetHandler None
-    </Location>
+    </LocationMatch>
 
 
 .. _lighttpd: http://www.lighttpd.net/

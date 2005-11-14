@@ -84,6 +84,11 @@ class DatabaseWrapper:
             self.connection.close()
             self.connection = None
 
+    def quote_name(self, name):
+        if name.startswith("`") and name.endswith("`"):
+            return name # Quoting once is enough.
+        return "`%s`" % name
+
 def get_last_insert_id(cursor, table_name, pk_name):
     cursor.execute("SELECT LAST_INSERT_ID()")
     return cursor.fetchone()[0]
@@ -121,11 +126,6 @@ def get_table_list(cursor):
 
 def get_relations(cursor, table_name):
     raise NotImplementedError
-
-def quote_name(name):
-    if name.startswith("`") and name.endswith("`"):
-        return name # Quoting once is enough.
-    return "`%s`" % name
 
 OPERATOR_MAPPING = {
     'exact': '=',

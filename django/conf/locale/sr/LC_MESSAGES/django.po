@@ -251,9 +251,8 @@ msgid "Home"
 msgstr "Početna strana"
 
 #: contrib/admin/templates/admin/500.html:4
-#, fuzzy
 msgid "Server error"
-msgstr "Greška na serveru (500)"
+msgstr "Greška na serveru"
 
 #: contrib/admin/templates/admin/500.html:6
 msgid "Server error (500)"
@@ -359,7 +358,7 @@ msgid "Log out"
 msgstr "Odjavi se"
 
 #: contrib/admin/templates/admin/delete_confirmation.html:7
-#, fuzzy, python-format
+#, python-format
 msgid ""
 "Deleting the %(object_name)s '%(object)s' would result in deleting related "
 "objects, but your account doesn't have permission to delete the following "
@@ -566,6 +565,18 @@ msgstr "unosi u dnevnik izmena"
 #: contrib/admin/templatetags/admin_list.py:260
 msgid "All dates"
 msgstr ""
+
+#: utils/translation.py:335
+msgid "DATE_FORMAT"
+msgstr "D, d.m.Y."
+
+#: utils/translation.py:336
+msgid "DATETIME_FORMAT"
+msgstr "d.m.Y. H:i:s"
+
+#: utils/translation.py:337
+msgid "TIME_FORMAT"
+msgstr "H:i:s"
 
 #: utils/dates.py:6
 msgid "Monday"
@@ -909,7 +920,7 @@ msgstr "Poruka"
 
 #: conf/global_settings.py:37
 msgid "Bengali"
-msgstr ""
+msgstr "Bengalski"
 
 #: conf/global_settings.py:37
 msgid "Czech"
@@ -917,7 +928,7 @@ msgstr "Češki"
 
 #: conf/global_settings.py:38
 msgid "Welsh"
-msgstr ""
+msgstr "Welšski"
 
 #: conf/global_settings.py:39
 msgid "German"
@@ -940,18 +951,22 @@ msgid "Galician"
 msgstr ""
 
 #: conf/global_settings.py:44
+msgid "Icelandic"
+msgstr ""
+
+#: conf/global_settings.py:45
 msgid "Italian"
 msgstr "Italijanski"
 
-#: conf/global_settings.py:45
-msgid "Norwegian"
-msgstr ""
-
 #: conf/global_settings.py:46
+msgid "Norwegian"
+msgstr "Norveški"
+
+#: conf/global_settings.py:47
 msgid "Brazilian"
 msgstr "Brazilski"
 
-#: conf/global_settings.py:47
+#: conf/global_settings.py:48
 msgid "Russian"
 msgstr "Ruski"
 
@@ -961,7 +976,7 @@ msgstr "Srpski"
 
 #: conf/global_settings.py:48
 msgid "Simplified Chinese"
-msgstr ""
+msgstr "Kineski (pojednostavljen)"
 
 #: conf/global_settings.py:49
 msgid "Slovak"
@@ -1080,17 +1095,17 @@ msgstr "Neispravan XML: %s"
 msgid "Invalid URL: %s"
 msgstr "Neispravan URL: %s"
 
-#: core/validators.py:203
+#: core/validators.py:205 core/validators.py:207
 #, python-format
 msgid "The URL %s is a broken link."
 msgstr "URL %s je neispravan link."
 
 # nesh: Ni ovo nije interesantno za i18n
-#: core/validators.py:209
+#: core/validators.py:213
 msgid "Enter a valid U.S. state abbreviation."
 msgstr ""
 
-#: core/validators.py:224
+#: core/validators.py:228
 #, python-format
 msgid "Watch your mouth! The word %s is not allowed here."
 msgid_plural "Watch your mouth! The words %s are not allowed here."
@@ -1098,43 +1113,43 @@ msgstr[0] "Pripazi na jezik! %s reč nije ovde dozvoljena."
 msgstr[1] "Pripazi na jezik! %s reči nisu ovde dozvoljene."
 msgstr[2] "Pripazi na jezik! %s reči nisu ovde dozvoljene."
 
-#: core/validators.py:231
+#: core/validators.py:235
 #, python-format
 msgid "This field must match the '%s' field."
 msgstr "Ovo polje mora biti jednako sa poljem '%s'."
 
-#: core/validators.py:250
+#: core/validators.py:254
 msgid "Please enter something for at least one field."
 msgstr "Morate popuniti barem jedno polje."
 
-#: core/validators.py:259 core/validators.py:270
+#: core/validators.py:263 core/validators.py:274
 msgid "Please enter both fields or leave them both empty."
 msgstr "Popunite oba polja ili oba ostavite prazna."
 
-#: core/validators.py:277
+#: core/validators.py:281
 #, python-format
 msgid "This field must be given if %(field)s is %(value)s"
 msgstr "Ovo polje mora biti uneto ako polje %(field)s ima vrednost %(value)s"
 
-#: core/validators.py:289
+#: core/validators.py:293
 #, python-format
 msgid "This field must be given if %(field)s is not %(value)s"
 msgstr "Ovo polje mora biti uneto ako polje %(field)s nema vrednost %(value)s"
 
-#: core/validators.py:308
+#: core/validators.py:312
 msgid "Duplicate values are not allowed."
 msgstr "Duple vrednosti nisu dozvoljene."
 
-#: core/validators.py:331
+#: core/validators.py:335
 #, python-format
 msgid "This value must be a power of %s."
 msgstr "Vrednost mora biti stepena %s."
 
-#: core/validators.py:342
+#: core/validators.py:346
 msgid "Please enter a valid decimal number."
 msgstr "Unesite ispravan decimalni broj."
 
-#: core/validators.py:344
+#: core/validators.py:348
 #, python-format
 msgid "Please enter a valid decimal number with at most %s total digit."
 msgid_plural ""
@@ -1143,7 +1158,7 @@ msgstr[0] "Unesite ispravan decimalni broj sa %s cifrom."
 msgstr[1] "Unesite ispravan decimalni broj sa %s cifre."
 msgstr[2] "Unesite ispravan decimalni broj sa %s cifara."
 
-#: core/validators.py:347
+#: core/validators.py:351
 #, python-format
 msgid "Please enter a valid decimal number with at most %s decimal place."
 msgid_plural ""
@@ -1152,37 +1167,37 @@ msgstr[0] "Unesite decimalni broj sa najviše %s decimalnim mestom."
 msgstr[1] "Unesite decimalni broj sa najviše %s decimalna mesta."
 msgstr[2] "Unesite decimalni broj sa najviše %s decimalnih mesta."
 
-#: core/validators.py:357
+#: core/validators.py:361
 #, python-format
 msgid "Make sure your uploaded file is at least %s bytes big."
 msgstr "Veličina fajla mora biti najmanje %s bajtova."
 
-#: core/validators.py:358
+#: core/validators.py:362
 #, python-format
 msgid "Make sure your uploaded file is at most %s bytes big."
 msgstr "Veličina fajla mora biti najviše %s bajtova."
 
-#: core/validators.py:371
+#: core/validators.py:375
 msgid "The format for this field is wrong."
 msgstr "Pogrešan format polja."
 
-#: core/validators.py:386
+#: core/validators.py:390
 msgid "This field is invalid."
 msgstr "Neispravno polje."
 
-#: core/validators.py:421
+#: core/validators.py:425
 #, python-format
 msgid "Could not retrieve anything from %s."
 msgstr "Ništa nije moglo da se skine sa URL-a %s."
 
-#: core/validators.py:424
+#: core/validators.py:428
 #, python-format
 msgid ""
 "The URL %(url)s returned the invalid Content-Type header '%(contenttype)s'."
 msgstr ""
 "Sa URL-a %(url)s se vratio pogrešan Content-Type header '%(contenttype)s'."
 
-#: core/validators.py:457
+#: core/validators.py:461
 #, python-format
 msgid ""
 "Please close the unclosed %(tag)s tag from line %(line)s. (Line starts with "
@@ -1191,7 +1206,7 @@ msgstr ""
 "Zatvorite nezatvoren tag \"%(tag)s\" iz reda %(line)s. (Red počinje sa \"%"
 "(start)s\".)"
 
-#: core/validators.py:461
+#: core/validators.py:465
 #, python-format
 msgid ""
 "Some text starting on line %(line)s is not allowed in that context. (Line "
@@ -1200,7 +1215,7 @@ msgstr ""
 "Tekst koji počinje u redu %(line)s nije dozvoljen u ovom kontekstu. (Red "
 "počinje sa \"%(start)s\".)"
 
-#: core/validators.py:466
+#: core/validators.py:470
 #, python-format
 msgid ""
 "\"%(attr)s\" on line %(line)s is an invalid attribute. (Line starts with \"%"
@@ -1209,7 +1224,7 @@ msgstr ""
 "Atribut \"%(attr)s\" u red %(line)s je neispravan. (Red počinje sa \"%(start)"
 "s\".)"
 
-#: core/validators.py:471
+#: core/validators.py:475
 #, python-format
 msgid ""
 "\"<%(tag)s>\" on line %(line)s is an invalid tag. (Line starts with \"%"
@@ -1217,7 +1232,7 @@ msgid ""
 msgstr ""
 "Tag \"<%(tag)s>\" u redu %(line)s je neispravan. (Red počinje \"%(start)s\".)"
 
-#: core/validators.py:475
+#: core/validators.py:479
 #, python-format
 msgid ""
 "A tag on line %(line)s is missing one or more required attributes. (Line "
@@ -1226,7 +1241,7 @@ msgstr ""
 "Tag-u u redu %(line)s nedostaje jedan ili više atributa. (Red počinje sa \"%"
 "(start)s\".)"
 
-#: core/validators.py:480
+#: core/validators.py:484
 #, python-format
 msgid ""
 "The \"%(attr)s\" attribute on line %(line)s has an invalid value. (Line "

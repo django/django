@@ -1,4 +1,6 @@
 class AnonymousUser:
+    id = None
+
     def __init__(self):
         pass
 

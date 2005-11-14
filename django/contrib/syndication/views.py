@@ -21,6 +21,6 @@ def feed(request, url, feed_dict=None):
     except feeds.FeedDoesNotExist:
         raise Http404, "Invalid feed parameters. Slug %r is valid, but other parameters, or lack thereof, are not." % slug
 
-    response = HttpResponse(mimetype='application/xml')
+    response = HttpResponse(mimetype=feedgen.mime_type)
     feedgen.write(response, 'utf-8')
     return response

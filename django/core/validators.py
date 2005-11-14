@@ -199,7 +199,11 @@ def isExistingURL(field_data, all_data):
         u = urllib2.urlopen(field_data)
     except ValueError:
         raise ValidationError, _("Invalid URL: %s") % field_data
-    except: # urllib2.HTTPError, urllib2.URLError, httplib.InvalidURL, etc.
+    except urllib2.HTTPError, e:
+        # 401s are valid; they just mean authorization is required.
+        if e.code not in ('401',):
+            raise ValidationError, _("The URL %s is a broken link.") % field_data
+    except: # urllib2.URLError, httplib.InvalidURL, etc.
         raise ValidationError, _("The URL %s is a broken link.") % field_data
 
 def isValidUSState(field_data, all_data):

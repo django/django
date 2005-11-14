@@ -565,6 +565,18 @@ msgstr "log záznamy"
 msgid "All dates"
 msgstr ""
 
+#: utils/translation.py:335
+msgid "DATE_FORMAT"
+msgstr ""
+
+#: utils/translation.py:336
+msgid "DATETIME_FORMAT"
+msgstr ""
+
+#: utils/translation.py:337
+msgid "TIME_FORMAT"
+msgstr ""
+
 #: utils/dates.py:6
 msgid "Monday"
 msgstr "Pondělí"
@@ -938,18 +950,22 @@ msgid "Galician"
 msgstr "Galicijsky"
 
 #: conf/global_settings.py:44
+msgid "Icelandic"
+msgstr ""
+
+#: conf/global_settings.py:45
 msgid "Italian"
 msgstr "Italsky"
 
-#: conf/global_settings.py:45
+#: conf/global_settings.py:46
 msgid "Norwegian"
 msgstr "Norsky"
 
-#: conf/global_settings.py:46
+#: conf/global_settings.py:47
 msgid "Brazilian"
 msgstr "Brazilsky"
 
-#: conf/global_settings.py:47
+#: conf/global_settings.py:48
 msgid "Russian"
 msgstr "Rusky"
 
@@ -1076,16 +1092,16 @@ msgstr "Špatně formované XML: %s"
 msgid "Invalid URL: %s"
 msgstr "Neplatné URL: %s"
 
-#: core/validators.py:203
+#: core/validators.py:205 core/validators.py:207
 #, python-format
 msgid "The URL %s is a broken link."
 msgstr "Odkaz na URL %s je rozbitý."
 
-#: core/validators.py:209
+#: core/validators.py:213
 msgid "Enter a valid U.S. state abbreviation."
 msgstr "Vložte platnou zkraku U.S. státu."
 
-#: core/validators.py:224
+#: core/validators.py:228
 #, python-format
 msgid "Watch your mouth! The word %s is not allowed here."
 msgid_plural "Watch your mouth! The words %s are not allowed here."
@@ -1093,43 +1109,43 @@ msgstr[0] "Mluvte slušně! Slovo %s zde není přípustné."
 msgstr[1] "Mluvte slušně! Slova %s zde nejsou přípustná."
 msgstr[2] "Mluvte slušně! Slova %s zde nejsou přípustná."
 
-#: core/validators.py:231
+#: core/validators.py:235
 #, python-format
 msgid "This field must match the '%s' field."
 msgstr "Toto pole se musí shodovat s polem '%s'."
 
-#: core/validators.py:250
+#: core/validators.py:254
 msgid "Please enter something for at least one field."
 msgstr "Prosíme, vložte něco alespoň pro jedno pole."
 
-#: core/validators.py:259 core/validators.py:270
+#: core/validators.py:263 core/validators.py:274
 msgid "Please enter both fields or leave them both empty."
 msgstr "Prosíme, vložte obě pole, nebo je nechte obě prázdná."
 
-#: core/validators.py:277
+#: core/validators.py:281
 #, python-format
 msgid "This field must be given if %(field)s is %(value)s"
 msgstr "Toto pole musí být vyplněno, když %(field)s má %(value)s"
 
-#: core/validators.py:289
+#: core/validators.py:293
 #, python-format
 msgid "This field must be given if %(field)s is not %(value)s"
 msgstr "Toto pole musí být vyplněno, když %(field)s nemá %(value)s"
 
-#: core/validators.py:308
+#: core/validators.py:312
 msgid "Duplicate values are not allowed."
 msgstr "Duplikátní hodnoty nejsou povolené."
 
-#: core/validators.py:331
+#: core/validators.py:335
 #, python-format
 msgid "This value must be a power of %s."
 msgstr "Tato hodnota musí být mocninou %s."
 
-#: core/validators.py:342
+#: core/validators.py:346
 msgid "Please enter a valid decimal number."
 msgstr "Prosíme, vložte platné číslo."
 
-#: core/validators.py:344
+#: core/validators.py:348
 #, python-format
 msgid "Please enter a valid decimal number with at most %s total digit."
 msgid_plural ""
@@ -1138,7 +1154,7 @@ msgstr[0] "Prosíme, vložte platné číslo s nejvíce %s cifrou celkem."
 msgstr[1] "Prosíme, vložte platné číslo s nejvíce %s ciframi celkem."
 msgstr[2] "Prosíme, vložte platné číslo s nejvíce %s ciframi celkem."
 
-#: core/validators.py:347
+#: core/validators.py:351
 #, python-format
 msgid "Please enter a valid decimal number with at most %s decimal place."
 msgid_plural ""
@@ -1152,36 +1168,36 @@ msgstr[2] ""
 "Prosíme, vložte platné číslo s nejvíce %s ciframi za desetinnou čárkou "
 "celkem."
 
-#: core/validators.py:357
+#: core/validators.py:361
 #, python-format
 msgid "Make sure your uploaded file is at least %s bytes big."
 msgstr "Ujistěte se, že posílaný soubor je velký nejméně %s bytů."
 
-#: core/validators.py:358
+#: core/validators.py:362
 #, python-format
 msgid "Make sure your uploaded file is at most %s bytes big."
 msgstr "Ujistěte se, že posílaný soubor je velký nejvíce %s bytů."
 
-#: core/validators.py:371
+#: core/validators.py:375
 msgid "The format for this field is wrong."
 msgstr "Formát pro toto pole je špatný."
 
-#: core/validators.py:386
+#: core/validators.py:390
 msgid "This field is invalid."
 msgstr "Toto pole není platné."
 
-#: core/validators.py:421
+#: core/validators.py:425
 #, python-format
 msgid "Could not retrieve anything from %s."
 msgstr "Nemohl jsem získat nic z %s."
 
-#: core/validators.py:424
+#: core/validators.py:428
 #, python-format
 msgid ""
 "The URL %(url)s returned the invalid Content-Type header '%(contenttype)s'."
 msgstr "URL %(url)s vrátilo neplatnou hlavičku Content-Type '%(contenttype)s'."
 
-#: core/validators.py:457
+#: core/validators.py:461
 #, python-format
 msgid ""
 "Please close the unclosed %(tag)s tag from line %(line)s. (Line starts with "
@@ -1190,7 +1206,7 @@ msgstr ""
 "Prosíme, zavřete nezavřenou značku %(tag)s z řádky %(line)s. (Řádka začíná s "
 "\"%(start)s\".)"
 
-#: core/validators.py:461
+#: core/validators.py:465
 #, python-format
 msgid ""
 "Some text starting on line %(line)s is not allowed in that context. (Line "
@@ -1199,7 +1215,7 @@ msgstr ""
 "Nějaký text začínající na řádce %(line)s není povolen v tomto kontextu. "
 "(Řádka začíná s \"%(start)s\".)"
 
-#: core/validators.py:466
+#: core/validators.py:470
 #, python-format
 msgid ""
 "\"%(attr)s\" on line %(line)s is an invalid attribute. (Line starts with \"%"
@@ -1208,7 +1224,7 @@ msgstr ""
 "\"%(attr)s\" na řádce %(line)s je neplatný atribut. (Řádka začíná s \"%"
 "(start)s\".)"
 
-#: core/validators.py:471
+#: core/validators.py:475
 #, python-format
 msgid ""
 "\"<%(tag)s>\" on line %(line)s is an invalid tag. (Line starts with \"%"
@@ -1217,7 +1233,7 @@ msgstr ""
 "\"<%(tag)s>\" na řádce %(line)s je neplatná značka. (Řádka začíná s \"%"
 "(start)s\".)"
 
-#: core/validators.py:475
+#: core/validators.py:479
 #, python-format
 msgid ""
 "A tag on line %(line)s is missing one or more required attributes. (Line "
@@ -1226,7 +1242,7 @@ msgstr ""
 "Značce na řádce %(line)s schází jeden nebo více požadovaných atributů. "
 "(Řádka začíná s \"%(start)s\".)"
 
-#: core/validators.py:480
+#: core/validators.py:484
 #, python-format
 msgid ""
 "The \"%(attr)s\" attribute on line %(line)s has an invalid value. (Line "
