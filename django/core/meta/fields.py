@@ -332,8 +332,8 @@ class Field(object):
 
     def flatten_data(self, follow, obj = None):
         """
-    	Returns a dictionary mapping the field's manipulator field names to its
-    	"flattened" string values for the admin view. Obj is the instance to extract the 
+        Returns a dictionary mapping the field's manipulator field names to its
+        "flattened" string values for the admin view. Obj is the instance to extract the 
         values from.
         """
         return { self.attname : self._get_val_from_obj(obj)}
@@ -412,7 +412,7 @@ class DateField(Field):
         return [formfields.DateField]
 
     def flatten_data(self, follow, obj = None):
-    	val = self._get_val_from_obj(obj)
+        val = self._get_val_from_obj(obj)
         return {self.attname: (val is not None and val.strftime("%Y-%m-%d") or '')}
 
 class DateTimeField(DateField):
@@ -446,9 +446,9 @@ class DateTimeField(DateField):
 
     def flatten_data(self,follow, obj = None):
         val = self._get_val_from_obj(obj) 
-    	date_field, time_field = self.get_manipulator_field_names('')
+        date_field, time_field = self.get_manipulator_field_names('')
         return {date_field: (val is not None and val.strftime("%Y-%m-%d") or ''),
-	            time_field: (val is not None and val.strftime("%H:%M:%S") or '')}
+                time_field: (val is not None and val.strftime("%H:%M:%S") or '')}
 
 class EmailField(Field):
     def get_manipulator_field_objs(self):
@@ -778,9 +778,10 @@ class ManyToManyField(Field):
         else:
             # In required many-to-many fields with only one available choice,
             # select that one available choice.
-            if not self.blank and not self.rel.edit_inline and not self.rel.raw_id_admin and self.choices:
-               choice_list = self.get_choices_default()
-               if len(choice_list) == 1:
+            if not self.blank and not self.rel.edit_inline and not self.rel.raw_id_admin:
+               choices_list = self.get_choices_default()
+               if len(choices_list) == 1:
+                   print self.name, choices_list[0][0]
                    new_data[self.name] = [choices_list[0][0]]
         return new_data
 
