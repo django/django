@@ -17,8 +17,9 @@ class Feed:
     item_enclosure_url = None
     feed_type = feedgenerator.DefaultFeed
 
-    def __init__(self, slug):
+    def __init__(self, slug, feed_url):
         self.slug = slug
+        self.feed_url = feed_url
 
     def item_link(self, item):
         try:
@@ -56,7 +57,8 @@ class Feed:
             title = self.__get_dynamic_attr('title', obj),
             link = link,
             description = self.__get_dynamic_attr('description', obj),
-            language = LANGUAGE_CODE.decode()
+            language = LANGUAGE_CODE.decode(),
+            feed_url = add_domain(current_site, self.feed_url),
         )
 
         try:

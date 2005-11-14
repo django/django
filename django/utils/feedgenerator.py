@@ -41,7 +41,8 @@ def get_tag_uri(url, date):
 class SyndicationFeed:
     "Base class for all syndication feeds. Subclasses should provide write()"
     def __init__(self, title, link, description, language=None, author_email=None,
-            author_name=None, author_link=None, subtitle=None, categories=None):
+            author_name=None, author_link=None, subtitle=None, categories=None,
+            feed_url=None):
         self.feed = {
             'title': title,
             'link': link,
@@ -52,6 +53,7 @@ class SyndicationFeed:
             'author_link': author_link,
             'subtitle': subtitle,
             'categories': categories or (),
+            'feed_url': feed_url,
         }
         self.items = []
 
@@ -190,7 +192,9 @@ class Atom1Feed(SyndicationFeed):
         else:
             handler.startElement(u"feed", {u"xmlns": self.ns})
         handler.addQuickElement(u"title", self.feed['title'])
-        handler.addQuickElement(u"link", "", {u"href": self.feed['link']})
+        handler.addQuickElement(u"link", "", {u"rel": u"alternate", u"href": self.feed['link']})
+        if self.feed['feed_url'] is not None:
+            handler.addQuickElement(u"link", "", {u"rel": u"self", u"href": self.feed['feed_url']})
         handler.addQuickElement(u"id", self.feed['link'])
         handler.addQuickElement(u"updated", rfc3339_date(self.latest_post_date()).decode('ascii'))
         if self.feed['author_name'] is not None:

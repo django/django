@@ -266,6 +266,21 @@ comes directly from your `LANGUAGE_CODE setting`_.
 
 .. _LANGUAGE_CODE setting: http://www.djangoproject.com/documentation/settings/#language-code
 
+URLs
+----
+
+The ``link`` method/attribute can return either an absolute URL (e.g.
+``"/blog/"``) or a URL with the fully-qualified domain and protocol (e.g.
+``"http://www.example.com/blog/"``). If ``link`` doesn't return the domain,
+the syndication framework will insert the domain of the current site, according
+to your `SITE_ID setting`_.
+
+Atom feeds require a ``<link rel="self">`` that defines the feed's current
+location. The syndication framework populates this automatically, using the
+domain of the current site according to the SITE_ID setting.
+
+.. _SITE_ID setting: http://www.djangoproject.com/documentation/settings/#site-id
+
 Publishing Atom and RSS feeds in tandem
 ---------------------------------------
 
@@ -501,7 +516,8 @@ Each of these three classes knows how to render a certain type of feed as XML.
 They share this interface:
 
 ``__init__(title, link, description, language=None, author_email=None,``
-``author_name=None, author_link=None, subtitle=None, categories=None)``
+``author_name=None, author_link=None, subtitle=None, categories=None,``
+``feed_url=None)``
 
 Initializes the feed with the given metadata, which applies to the entire feed
 (i.e., not just to a specific item in the feed).
