@@ -34,15 +34,21 @@ Django will use ``first_name`` and ``last_name`` as the database column names.
 
 Each field type, except for ``ForeignKey``, ``ManyToManyField`` and
 ``OneToOneField``, takes an optional first positional argument -- a
-human-readable name. If the human-readable name isn't given, Django will use
-the machine-readable name, converting underscores to spaces.
+human-readable name. If the human-readable name isn't given, Django will
+automatically create the human-readable name by using the machine-readable
+name, converting underscores to spaces.
 
-Example::
+In this example, the human-readable name is ``"Person's first name"``::
 
     first_name = meta.CharField("Person's first name", maxlength=30)
 
-For ``ForeignKey``, ``ManyToManyField`` and ``OneToOneField``, use the
-``verbose_name`` keyword argument::
+In this example, the human-readable name is ``"first name"``::
+
+    first_name = meta.CharField(maxlength=30)
+
+``ForeignKey``, ``ManyToManyField`` and ``OneToOneField`` require the first
+argument to be a model class, so use the ``verbose_name`` keyword argument to
+specify the human-readable name::
 
     poll = meta.ForeignKey(Poll, verbose_name="the related poll")
     sites = meta.ManyToManyField(Site, verbose_name="list of sites")
@@ -110,6 +116,11 @@ The following arguments are available to all field types. All are optional.
 ``db_column``
     The name of the database column to use for this field. If this isn't given,
     Django will use the field's name.
+
+    If your database column name is an SQL reserved word, or contains
+    characters that aren't allowed in Python variable names -- notably, the
+    hyphen -- that's OK. Django quotes column and table names behind the
+    scenes.
 
 ``db_index``
     If ``True``, ``django-admin.py sqlindexes`` will output a ``CREATE INDEX``
@@ -700,6 +711,10 @@ Here's a list of all possible ``META`` options. No options are required. Adding
 
     If this isn't given, Django will use ``app_label + '_' + module_name``.
 
+    If your database table name is an SQL reserved word, or contains characters
+    that aren't allowed in Python variable names -- notably, the hyphen --
+    that's OK. Django quotes column and table names behind the scenes.
+
 ``exceptions``
     Names of extra exception subclasses to include in the generated module.
     These exceptions are available from instance methods and from module-level
@@ -732,8 +747,8 @@ Here's a list of all possible ``META`` options. No options are required. Adding
         module_name = "pizza_orders"
 
     If this isn't given, Django will use a lowercased version of the class
-    name, plus "s". This "poor man's pluralization" is intentional: Any other
-    level of magic pluralization would get confusing.
+    name, plus ``"s"``. This "poor man's pluralization" is intentional: Any
+    other level of magic pluralization would get confusing.
 
 ``order_with_respect_to``
     Marks this object as "orderable" with respect to the given field. This is

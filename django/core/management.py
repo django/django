@@ -19,7 +19,10 @@ APP_ARGS = '[modelmodule ...]'
 PROJECT_TEMPLATE_DIR = os.path.join(django.__path__[0], 'conf', '%s_template')
 
 def _get_packages_insert(app_label):
-    return "INSERT INTO packages (label, name) VALUES ('%s', '%s');" % (app_label, app_label)
+    from django.core.db import db
+    return "INSERT INTO %s (%s, %s) VALUES ('%s', '%s');" % \
+        (db.quote_name('packages'), db.quote_name('label'), db.quote_name('name'),
+        app_label, app_label)
 
 def _get_permission_codename(action, opts):
     return '%s_%s' % (action, opts.object_name.lower())
@@ -33,12 +36,16 @@ def _get_all_permissions(opts):
     return perms + list(opts.permissions)
 
 def _get_permission_insert(name, codename, opts):
-    return "INSERT INTO auth_permissions (name, package, codename) VALUES ('%s', '%s', '%s');" % \
-        (name.replace("'", "''"), opts.app_label, codename)
+    from django.core.db import db
+    return "INSERT INTO %s (%s, %s, %s) VALUES ('%s', '%s', '%s');" % \
+        (db.quote_name('auth_permissions'), db.quote_name('name'), db.quote_name('package'),
+        db.quote_name('codename'), name.replace("'", "''"), opts.app_label, codename)
 
 def _get_contenttype_insert(opts):
-    return "INSERT INTO content_types (name, package, python_module_name) VALUES ('%s', '%s', '%s');" % \
-        (opts.verbose_name, opts.app_label, opts.module_name)
+    from django.core.db import db
+    return "INSERT INTO %s (%s, %s, %s) VALUES ('%s', '%s', '%s');" % \
+        (db.quote_name('content_types'), db.quote_name('name'), db.quote_name('package'),
+        db.quote_name('python_module_name'), opts.verbose_name, opts.app_label, opts.module_name)
 
 def _is_valid_dir_name(s):
     return bool(re.search(r'^\w+$', s))
@@ -64,7 +71,7 @@ def get_sql_create(mod):
                 data_type = f.get_internal_type()
             col_type = db.DATA_TYPES[data_type]
             if col_type is not None:
-                field_output = [f.column, col_type % rel_field.__dict__]
+                field_output = [db.db.quote_name(f.column), col_type % rel_field.__dict__]
                 field_output.append('%sNULL' % (not f.null and 'NOT ' or ''))
                 if f.unique:
                     field_output.append('UNIQUE')
@@ -72,14 +79,16 @@ def get_sql_create(mod):
                     field_output.append('PRIMARY KEY')
                 if f.rel:
                     field_output.append('REFERENCES %s (%s)' % \
-                        (f.rel.to.db_table, f.rel.to.get_field(f.rel.field_name).column))
+                        (db.db.quote_name(f.rel.to.db_table),
+                        db.db.quote_name(f.rel.to.get_field(f.rel.field_name).column)))
                 table_output.append(' '.join(field_output))
         if opts.order_with_respect_to:
-            table_output.append('_order %s NULL' % db.DATA_TYPES['IntegerField'])
+            table_output.append('%s %s NULL' % (db.db.quote_name('_order'), db.DATA_TYPES['IntegerField']))
         for field_constraints in opts.unique_together:
-            table_output.append('UNIQUE (%s)' % ", ".join([opts.get_field(f).column for f in field_constraints]))
+            table_output.append('UNIQUE (%s)' % \
+                ", ".join([db.db.quote_name(opts.get_field(f).column) for f in field_constraints]))
 
-        full_statement = ['CREATE TABLE %s (' % opts.db_table]
+        full_statement = ['CREATE TABLE %s (' % db.db.quote_name(opts.db_table)]
         for i, line in enumerate(table_output): # Combine and add commas.
             full_statement.append('    %s%s' % (line, i < len(table_output)-1 and ',' or ''))
         full_statement.append(');')
@@ -88,13 +97,21 @@ def get_sql_create(mod):
     for klass in mod._MODELS:
         opts = klass._meta
         for f in opts.many_to_many:
-            table_output = ['CREATE TABLE %s (' % f.get_m2m_db_table(opts)]
-            table_output.append('    id %s NOT NULL PRIMARY KEY,' % db.DATA_TYPES['AutoField'])
-            table_output.append('    %s_id %s NOT NULL REFERENCES %s (%s),' % \
-                (opts.object_name.lower(), db.DATA_TYPES[get_rel_data_type(opts.pk)] % opts.pk.__dict__, opts.db_table, opts.pk.column))
-            table_output.append('    %s_id %s NOT NULL REFERENCES %s (%s),' % \
-                (f.rel.to.object_name.lower(), db.DATA_TYPES[get_rel_data_type(f.rel.to.pk)] % f.rel.to.pk.__dict__, f.rel.to.db_table, f.rel.to.pk.column))
-            table_output.append('    UNIQUE (%s_id, %s_id)' % (opts.object_name.lower(), f.rel.to.object_name.lower()))
+            table_output = ['CREATE TABLE %s (' % db.db.quote_name(f.get_m2m_db_table(opts))]
+            table_output.append('    %s %s NOT NULL PRIMARY KEY,' % (db.db.quote_name('id'), db.DATA_TYPES['AutoField']))
+            table_output.append('    %s %s NOT NULL REFERENCES %s (%s),' % \
+                (db.db.quote_name(opts.object_name.lower() + '_id'),
+                db.DATA_TYPES[get_rel_data_type(opts.pk)] % opts.pk.__dict__,
+                db.db.quote_name(opts.db_table),
+                db.db.quote_name(opts.pk.column)))
+            table_output.append('    %s %s NOT NULL REFERENCES %s (%s),' % \
+                (db.db.quote_name(f.rel.to.object_name.lower() + '_id'),
+                db.DATA_TYPES[get_rel_data_type(f.rel.to.pk)] % f.rel.to.pk.__dict__,
+                db.db.quote_name(f.rel.to.db_table),
+                db.db.quote_name(f.rel.to.pk.column)))
+            table_output.append('    UNIQUE (%s, %s)' % \
+                (db.db.quote_name(opts.object_name.lower() + '_id'),
+                db.db.quote_name(f.rel.to.object_name.lower() + '_id')))
             table_output.append(');')
             final_output.append('\n'.join(table_output))
     return final_output
@@ -114,7 +131,7 @@ def get_sql_delete(mod):
     try:
         if cursor is not None:
             # Check whether the table exists.
-            cursor.execute("SELECT 1 FROM django_admin_log LIMIT 1")
+            cursor.execute("SELECT 1 FROM %s LIMIT 1" % db.db.quote_name('django_admin_log'))
     except:
         # The table doesn't exist, so it doesn't need to be dropped.
         db.db.rollback()
@@ -129,12 +146,12 @@ def get_sql_delete(mod):
         try:
             if cursor is not None:
                 # Check whether the table exists.
-                cursor.execute("SELECT 1 FROM %s LIMIT 1" % klass._meta.db_table)
+                cursor.execute("SELECT 1 FROM %s LIMIT 1" % db.db.quote_name(klass._meta.db_table))
         except:
             # The table doesn't exist, so it doesn't need to be dropped.
             db.db.rollback()
         else:
-            output.append("DROP TABLE %s;" % klass._meta.db_table)
+            output.append("DROP TABLE %s;" % db.db.quote_name(klass._meta.db_table))
 
     # Output DROP TABLE statements for many-to-many tables.
     for klass in mod._MODELS:
@@ -142,25 +159,31 @@ def get_sql_delete(mod):
         for f in opts.many_to_many:
             try:
                 if cursor is not None:
-                    cursor.execute("SELECT 1 FROM %s LIMIT 1" % f.get_m2m_db_table(opts))
+                    cursor.execute("SELECT 1 FROM %s LIMIT 1" % db.db.quote_name(f.get_m2m_db_table(opts)))
             except:
                 db.db.rollback()
             else:
-                output.append("DROP TABLE %s;" % f.get_m2m_db_table(opts))
+                output.append("DROP TABLE %s;" % db.db.quote_name(f.get_m2m_db_table(opts)))
 
     app_label = mod._MODELS[0]._meta.app_label
 
     # Delete from packages, auth_permissions, content_types.
-    output.append("DELETE FROM packages WHERE label = '%s';" % app_label)
-    output.append("DELETE FROM auth_permissions WHERE package = '%s';" % app_label)
-    output.append("DELETE FROM content_types WHERE package = '%s';" % app_label)
+    output.append("DELETE FROM %s WHERE %s = '%s';" % \
+        (db.db.quote_name('packages'), db.db.quote_name('label'), app_label))
+    output.append("DELETE FROM %s WHERE %s = '%s';" % \
+        (db.db.quote_name('auth_permissions'), db.db.quote_name('package'), app_label))
+    output.append("DELETE FROM %s WHERE %s = '%s';" % \
+        (db.db.quote_name('content_types'), db.db.quote_name('package'), app_label))
 
     # Delete from the admin log.
     if cursor is not None:
-        cursor.execute("SELECT id FROM content_types WHERE package = %s", [app_label])
+        cursor.execute("SELECT %s FROM %s WHERE %s = %%s" % \
+            (db.db.quote_name('id'), db.db.quote_name('content_types'),
+            db.db.quote_name('package')), [app_label])
         if admin_log_exists:
             for row in cursor.fetchall():
-                output.append("DELETE FROM django_admin_log WHERE content_type_id = %s;" % row[0])
+                output.append("DELETE FROM %s WHERE %s = %s;" % \
+                    (db.db.quote_name('django_admin_log'), db.db.quote_name('content_type_id'), row[0]))
 
     # Close database connection explicitly, in case this output is being piped
     # directly into a database client, to avoid locking issues.
@@ -206,25 +229,29 @@ get_sql_initial_data.args = APP_ARGS
 
 def get_sql_sequence_reset(mod):
     "Returns a list of the SQL statements to reset PostgreSQL sequences for the given module."
-    from django.core import meta
+    from django.core import db, meta
     output = []
     for klass in mod._MODELS:
         for f in klass._meta.fields:
             if isinstance(f, meta.AutoField):
-                output.append("SELECT setval('%s_%s_seq', (SELECT max(%s) FROM %s));" % (klass._meta.db_table, f.column, f.column, klass._meta.db_table))
+                output.append("SELECT setval('%s_%s_seq', (SELECT max(%s) FROM %s));" % \
+                    (klass._meta.db_table, f.column, db.db.quote_name(f.column),
+                    db.db.quote_name(klass._meta.db_table)))
     return output
 get_sql_sequence_reset.help_doc = "Prints the SQL statements for resetting PostgreSQL sequences for the given model module name(s)."
 get_sql_sequence_reset.args = APP_ARGS
 
 def get_sql_indexes(mod):
     "Returns a list of the CREATE INDEX SQL statements for the given module."
+    from django.core.db import db
     output = []
     for klass in mod._MODELS:
         for f in klass._meta.fields:
             if f.db_index:
                 unique = f.unique and "UNIQUE " or ""
                 output.append("CREATE %sINDEX %s_%s ON %s (%s);" % \
-                    (unique, klass._meta.db_table, f.column, klass._meta.db_table, f.column))
+                    (unique, klass._meta.db_table, f.column,
+                    db.quote_name(klass._meta.db_table), db.quote_name(f.column)))
     return output
 get_sql_indexes.help_doc = "Prints the CREATE INDEX SQL statements for the given model module name(s)."
 get_sql_indexes.args = APP_ARGS
@@ -242,7 +269,8 @@ def database_check(mod):
     app_label = mod._MODELS[0]._meta.app_label
 
     # Check that the package exists in the database.
-    cursor.execute("SELECT 1 FROM packages WHERE label = %s", [app_label])
+    cursor.execute("SELECT 1 FROM %s WHERE %s = %%s" % \
+        (db.db.quote_name('packages'), db.db.quote_name('label')), [app_label])
     if cursor.rowcount < 1:
 #         sys.stderr.write("The '%s' package isn't installed.\n" % app_label)
         print _get_packages_insert(app_label)
@@ -256,34 +284,46 @@ def database_check(mod):
         perms_seen.update(dict(perms))
         contenttypes_seen[opts.module_name] = 1
         for codename, name in perms:
-            cursor.execute("SELECT 1 FROM auth_permissions WHERE package = %s AND codename = %s", (app_label, codename))
+            cursor.execute("SELECT 1 FROM %s WHERE %s = %%s AND %s = %%s" % \
+                (db.db.quote_name('auth_permissions'), db.db.quote_name('package'),
+                db.db.quote_name('codename')), (app_label, codename))
             if cursor.rowcount < 1:
 #                 sys.stderr.write("The '%s.%s' permission doesn't exist.\n" % (app_label, codename))
                 print _get_permission_insert(name, codename, opts)
-        cursor.execute("SELECT 1 FROM content_types WHERE package = %s AND python_module_name = %s", (app_label, opts.module_name))
+        cursor.execute("SELECT 1 FROM %s WHERE %s = %%s AND %s = %%s" % \
+            (db.db.quote_name('content_types'), db.db.quote_name('package'),
+            db.db.quote_name('python_module_name')), (app_label, opts.module_name))
         if cursor.rowcount < 1:
 #             sys.stderr.write("The '%s.%s' content type doesn't exist.\n" % (app_label, opts.module_name))
             print _get_contenttype_insert(opts)
 
     # Check that there aren't any *extra* permissions in the DB that the model
     # doesn't know about.
-    cursor.execute("SELECT codename FROM auth_permissions WHERE package = %s", (app_label,))
+    cursor.execute("SELECT %s FROM %s WHERE %s = %%s" % \
+        (db.db.quote_name('codename'), db.db.quote_name('auth_permissions'),
+        db.db.quote_name('package')), (app_label,))
     for row in cursor.fetchall():
         try:
             perms_seen[row[0]]
         except KeyError:
 #             sys.stderr.write("A permission called '%s.%s' was found in the database but not in the model.\n" % (app_label, row[0]))
-            print "DELETE FROM auth_permissions WHERE package='%s' AND codename = '%s';" % (app_label, row[0])
+            print "DELETE FROM %s WHERE %s='%s' AND %s = '%s';" % \
+                (db.db.quote_name('auth_permissions'), db.db.quote_name('package'),
+                app_label, db.db.quote_name('codename'), row[0])
 
     # Check that there aren't any *extra* content types in the DB that the
     # model doesn't know about.
-    cursor.execute("SELECT python_module_name FROM content_types WHERE package = %s", (app_label,))
+    cursor.execute("SELECT %s FROM %s WHERE %s = %%s" % \
+        (db.db.quote_name('python_module_name'), db.db.quote_name('content_types'),
+        db.db.quote_name('package')), (app_label,))
     for row in cursor.fetchall():
         try:
             contenttypes_seen[row[0]]
         except KeyError:
 #             sys.stderr.write("A content type called '%s.%s' was found in the database but not in the model.\n" % (app_label, row[0]))
-            print "DELETE FROM content_types WHERE package='%s' AND python_module_name = '%s';" % (app_label, row[0])
+            print "DELETE FROM %s WHERE %s='%s' AND %s = '%s';" % \
+                (db.db.quote_name('content_types'), db.db.quote_name('package'),
+                app_label, db.db.quote_name('python_module_name'), row[0])
 database_check.help_doc = "Checks that everything is installed in the database for the given model module name(s) and prints SQL statements if needed."
 database_check.args = APP_ARGS
 
@@ -318,7 +358,9 @@ def init():
         cursor = db.db.cursor()
         for sql in get_sql_create(core) + get_sql_create(auth) + get_sql_initial_data(core) + get_sql_initial_data(auth):
             cursor.execute(sql)
-        cursor.execute("INSERT INTO %s (domain, name) VALUES ('example.com', 'Example site')" % core.Site._meta.db_table)
+        cursor.execute("INSERT INTO %s (%s, %s) VALUES ('example.com', 'Example site')" % \
+            (db.db.quote_name(core.Site._meta.db_table), db.db.quote_name('domain'),
+            db.db.quote_name('name')))
     except Exception, e:
         sys.stderr.write("Error: The database couldn't be initialized.\n%s\n" % e)
         try:
@@ -687,7 +729,7 @@ def createcachetable(tablename):
     table_output = []
     index_output = []
     for f in fields:
-        field_output = [f.column, db.DATA_TYPES[f.get_internal_type()] % f.__dict__]
+        field_output = [db.db.quote_name(f.column), db.DATA_TYPES[f.get_internal_type()] % f.__dict__]
         field_output.append("%sNULL" % (not f.null and "NOT " or ""))
         if f.unique:
             field_output.append("UNIQUE")
@@ -695,9 +737,11 @@ def createcachetable(tablename):
             field_output.append("PRIMARY KEY")
         if f.db_index:
             unique = f.unique and "UNIQUE " or ""
-            index_output.append("CREATE %sINDEX %s_%s ON %s (%s);" % (unique, tablename, f.column, tablename, f.column))
+            index_output.append("CREATE %sINDEX %s_%s ON %s (%s);" % \
+                (unique, tablename, f.column, db.db.quote_name(tablename),
+                db.db.quote_name(f.column)))
         table_output.append(" ".join(field_output))
-    full_statement = ["CREATE TABLE %s (" % tablename]
+    full_statement = ["CREATE TABLE %s (" % db.db.quote_name(tablename)]
     for i, line in enumerate(table_output):
         full_statement.append('    %s%s' % (line, i < len(table_output)-1 and ',' or ''))
     full_statement.append(');')
