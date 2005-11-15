@@ -108,6 +108,7 @@ class FormWrapper:
     def __init__(self, manipulator, data, error_dict):
         self.manipulator, self.data = manipulator, data
         self.error_dict = error_dict
+        self.fields = [self.__getitem__(field.field_name) for field in self.manipulator.fields]
 
     def __repr__(self):
         return repr(self.data)
