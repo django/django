@@ -109,6 +109,7 @@ class FormWrapper:
 
     def __getitem__(self, key):
         for field in self.manipulator.fields:
+            
             if field.field_name == key:
                 data = field.extract_data(self.data)
                 return FormFieldWrapper(field, data, self.error_dict.get(field.field_name, []))
@@ -117,8 +118,7 @@ class FormWrapper:
             for inline_collection in self._inline_collections:
                 if inline_collection.name == key:
                     return inline_collection
-
-        raise KeyError
+        raise KeyError("Could not find Formfield or InlineObjectCollection named:%s" % key )
 
     def fill_inline_collections(self): 
         if not self._inline_collections:

@@ -210,6 +210,7 @@ def items_for_result(cl, result):
         if first: # First column is a special case
             first = False
             url = cl.url_for_result(result)
+            result_id = getattr(result, pk)
             yield ('<th%s><a href="%s"%s>%s</a></th>' % \
                 (row_class, url, (cl.is_popup and ' onclick="opener.dismissRelatedLookupPopup(window, %r); return false;"' % result_id or ''), result_repr))
         else:

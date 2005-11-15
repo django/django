@@ -826,7 +826,6 @@ class DebugNodeList(NodeList):
                 e.source = node.source
             raise
         except Exception, e:
-            
             from traceback import extract_tb, format_list, format_exception_only
             from sys import exc_info
             t,v,tb = exc_info()

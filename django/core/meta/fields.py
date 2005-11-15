@@ -402,6 +402,13 @@ class DateField(Field):
             return datetime.datetime.now()
         return value
 
+    # Needed because of horrible auto_now[_add] behaviour wrt. editable
+    def get_follow(self, override=None):
+        if override != None:
+            return override
+        else:
+            return self.editable or self.auto_now or self.auto_now_add
+
     def get_db_prep_save(self, value):
         # Casts dates into string format for entry into database.
         if value is not None:
@@ -860,9 +867,7 @@ class BoundFieldLine(object):
         for bound_field in self.bound_fields:
             yield bound_field
     
-    def __repr__(self):
-        return "%s:(%s)" % (self.__class__.__name__, self.bound_fields)
-    
+
     def __len__(self):
         return len(self.bound_fields)
     
@@ -881,7 +886,7 @@ class FieldLine(object):
             yield field
     
     def __len__(self):
-        return len(self.fields)    
+        return len(self.fields)
     
 class BoundFieldSet(object):
     def __init__(self, field_set, field_mapping, original, bound_field_line_class=BoundFieldLine):
@@ -889,9 +894,7 @@ class BoundFieldSet(object):
         self.classes = field_set.classes
         self.bound_field_lines = [ field_line.bind(field_mapping,original, bound_field_line_class) 
                                    for field_line in field_set]
-    def __repr__(self):
-        return "%s:(%s,%s)" % (self.__class__.__name__, self.name, self.bound_field_lines)
-
+                                   
     def __iter__(self):
         for bound_field_line in self.bound_field_lines:
             yield bound_field_line
