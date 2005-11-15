@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2005-11-15 13:36+0100\n"
+"POT-Creation-Date: 2005-11-15 14:21+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: Espen Grndhaug <espen@grindhaug.org>\n"
 "Language-Team: Norwegian\n"
@@ -42,11 +42,6 @@ msgid ""
 "\n"
 "%(text)s"
 msgstr ""
-
-#: contrib/comments/views/comments.py:109
-#, fuzzy
-msgid "count"
-msgstr "innhold"
 
 #: contrib/comments/views/comments.py:112
 #, python-format
@@ -1075,6 +1070,46 @@ msgstr ""
 msgid "Simplified Chinese"
 msgstr "Simpel Kinesisk"
 
+#: core/formfields.py:59 core/meta/fields.py:287 core/meta/fields.py:475
+#: core/meta/fields.py:486
+#, fuzzy
+msgid "This field is required."
+msgstr "Dette feltet er feil."
+
+#: core/formfields.py:329
+#, python-format
+msgid "Ensure your text is less than %s characters."
+msgstr ""
+
+#: core/formfields.py:333
+#, fuzzy
+msgid "Line breaks are not allowed here."
+msgstr "Små bokstaver er ikke tillatt her."
+
+#: core/formfields.py:429 core/formfields.py:500 core/formfields.py:538
+#, python-format
+msgid "Select a valid choice; '%(data)s' is not in %(choices)s."
+msgstr ""
+
+#: core/formfields.py:594
+msgid "The submitted file is empty."
+msgstr ""
+
+#: core/formfields.py:648
+#, fuzzy
+msgid "Enter a whole number between -32,768 and 32,767."
+msgstr "Skriv inn et helt nummer."
+
+#: core/formfields.py:657
+#, fuzzy
+msgid "Enter a positive number."
+msgstr "Skriv inn et helt nummer."
+
+#: core/formfields.py:666
+#, fuzzy
+msgid "Enter a whole number between 0 and 32,767."
+msgstr "Skriv inn et helt nummer."
+
 #: core/validators.py:59
 msgid "This value must contain only letters, numbers and underscores."
 msgstr "Dette feltet må bare inneholde bokstaver, nummer og understreker."
@@ -1343,6 +1378,16 @@ msgstr ""
 "\"%(attr)s\" tillegg på linje $(line)s har en ikke godkjent verdi. (Linja "
 "starter med \"%(start)s\".)"
 
+#: core/meta/fields.py:46
+#, fuzzy, python-format
+msgid "Please enter a valid %s."
+msgstr "Vennligst skriv inn en godkjent IP adresse."
+
+#: core/meta/fields.py:60
+#, python-format
+msgid "%(optname)s with this %(fieldname)s already exists."
+msgstr ""
+
 #: core/meta/fields.py:131
 msgid " Separate multiple IDs with commas."
 msgstr "Separer Id-ene med kommaer."
@@ -1352,6 +1397,23 @@ msgid ""
 " Hold down \"Control\", or \"Command\" on a Mac, to select more than one."
 msgstr ""
 "Hold nede \"Control\", eller \"Command\" på en Mac, for å velge mere enn en."
+
+#: core/meta/fields.py:495
+#, fuzzy
+msgid "Enter a valid filename."
+msgstr "Skriv inn en godkjent e-post adresse."
+
+#: core/meta/fields.py:764
+#, python-format
+msgid "Please enter valid %(self)s IDs. The value %(value)r is invalid."
+msgid_plural ""
+"Please enter valid %(self)s IDs. The values %(value)r are invalid"
+msgstr[0] ""
+msgstr[1] ""
+
+#, fuzzy
+#~ msgid "count"
+#~ msgstr "innhold"
 
 #~ msgid "Traditional Chinese"
 #~ msgstr "Tradisjonell Kinesisk"

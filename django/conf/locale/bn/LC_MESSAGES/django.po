@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django CVS\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2005-11-15 13:36+0100\n"
+"POT-Creation-Date: 2005-11-15 14:21+0100\n"
 "PO-Revision-Date: 2005-11-12 20:05+0530\n"
 "Last-Translator: Baishampayan Ghose <b.ghose@gnu.org.in>\n"
 "Language-Team: Ankur Bangla <core@bengalinux.org>\n"
@@ -42,11 +42,6 @@ msgid ""
 "\n"
 "%(text)s"
 msgstr ""
-
-#: contrib/comments/views/comments.py:109
-#, fuzzy
-msgid "count"
-msgstr "অভ্যন্তরস্থ বস্তু"
 
 #: contrib/comments/views/comments.py:112
 #, python-format
@@ -1070,6 +1065,46 @@ msgstr ""
 msgid "Simplified Chinese"
 msgstr "সরলীকৃত চীনা"
 
+#: core/formfields.py:59 core/meta/fields.py:287 core/meta/fields.py:475
+#: core/meta/fields.py:486
+#, fuzzy
+msgid "This field is required."
+msgstr "এই ক্ষেত্রেটি অবৈধ।"
+
+#: core/formfields.py:329
+#, python-format
+msgid "Ensure your text is less than %s characters."
+msgstr ""
+
+#: core/formfields.py:333
+#, fuzzy
+msgid "Line breaks are not allowed here."
+msgstr "ছোটহাতের অক্ষর এখানে ঢোকাতে পারবেন না।"
+
+#: core/formfields.py:429 core/formfields.py:500 core/formfields.py:538
+#, python-format
+msgid "Select a valid choice; '%(data)s' is not in %(choices)s."
+msgstr ""
+
+#: core/formfields.py:594
+msgid "The submitted file is empty."
+msgstr ""
+
+#: core/formfields.py:648
+#, fuzzy
+msgid "Enter a whole number between -32,768 and 32,767."
+msgstr "একটি গোটা সংখ্যা ঢোকান।"
+
+#: core/formfields.py:657
+#, fuzzy
+msgid "Enter a positive number."
+msgstr "একটি গোটা সংখ্যা ঢোকান।"
+
+#: core/formfields.py:666
+#, fuzzy
+msgid "Enter a whole number between 0 and 32,767."
+msgstr "একটি গোটা সংখ্যা ঢোকান।"
+
 #: core/validators.py:59
 msgid "This value must contain only letters, numbers and underscores."
 msgstr "এই মানটি শুধু মাত্র অক্ষর, অংক, এবং আন্ডারস্কোর (_) হতে পারবে।"
@@ -1331,6 +1366,16 @@ msgstr ""
 "\"%(attr)s\"বৈশিষ্ট্যয় লাইন %(line)s একটি অবৈধ মান আছে । (\"%(start)s\"এর সঙ্গে "
 "লাইন আরম্ভ।)"
 
+#: core/meta/fields.py:46
+#, fuzzy, python-format
+msgid "Please enter a valid %s."
+msgstr "দয়া করে একটি বৈধ IP ঠিকানা ঢোকান।"
+
+#: core/meta/fields.py:60
+#, python-format
+msgid "%(optname)s with this %(fieldname)s already exists."
+msgstr ""
+
 #: core/meta/fields.py:131
 msgid " Separate multiple IDs with commas."
 msgstr "একাধিক আই.ডি.কমার দ্বারা আলাদা করুন।"
@@ -1341,3 +1386,20 @@ msgid ""
 msgstr ""
 "একের চেয়ে বেশি নির্বাচন করতে \"Control\" অথবা ম্যাক-এ \"Command\" চেপে ধরে "
 "রাখুন।"
+
+#: core/meta/fields.py:495
+#, fuzzy
+msgid "Enter a valid filename."
+msgstr "একটি বৈধ ই-মেল ঠিকানা ঢোকান।"
+
+#: core/meta/fields.py:764
+#, python-format
+msgid "Please enter valid %(self)s IDs. The value %(value)r is invalid."
+msgid_plural ""
+"Please enter valid %(self)s IDs. The values %(value)r are invalid"
+msgstr[0] ""
+msgstr[1] ""
+
+#, fuzzy
+#~ msgid "count"
+#~ msgstr "অভ্যন্তরস্থ বস্তু"

@@ -105,7 +105,7 @@ class PublicCommentManipulator(AuthenticationForm):
         # If the commentor has posted fewer than COMMENTS_FIRST_FEW comments,
         # send the comment to the managers.
         if self.user_cache.get_comments_comment_count() <= COMMENTS_FIRST_FEW:
-            message = _('This comment was posted by a user who has posted fewer than %(count)s comments:\n\n%(text)s' % \
+            message = _('This comment was posted by a user who has posted fewer than %(count)s comments:\n\n%(text)s') % \
                 {'count': COMMENTS_FIRST_FEW, 'text': c.get_as_text()}
             mail_managers("Comment posted by rookie user", message)
         if COMMENTS_SKETCHY_USERS_GROUP and COMMENTS_SKETCHY_USERS_GROUP in [g.id for g in self.user_cache.get_group_list()]:
