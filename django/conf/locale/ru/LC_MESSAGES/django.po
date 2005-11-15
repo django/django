@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2005-11-15 17:23+0100\n"
+"POT-Creation-Date: 2005-11-15 17:39+0100\n"
 "PO-Revision-Date: 2005-10-05 00:00\n"
 "Last-Translator: Dmitry Sorokin <ds@@dial.com.ru>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -333,6 +333,25 @@ msgid ""
 "In template %(name)s, error at line %(line)s:\n"
 msgstr ""
 
+#: contrib/admin/templates/admin/change_list.html:5
+#: contrib/admin/templates/admin/500.html:4
+#: contrib/admin/templates/admin/object_history.html:5
+#: contrib/admin/templates/admin/change_form.html:12
+#: contrib/admin/templates/admin/base.html:29
+#: contrib/admin/templates/registration/password_change_done.html:4
+#: contrib/admin/templates/registration/password_reset_form.html:4
+#: contrib/admin/templates/registration/logged_out.html:4
+#: contrib/admin/templates/registration/password_reset_done.html:4
+#: contrib/admin/templates/registration/password_change_form.html:4
+#: contrib/admin/templates/admin_doc/bookmarklets.html:3
+msgid "Home"
+msgstr "Начало"
+
+#: contrib/admin/templates/admin/change_list.html:10
+#, fuzzy, python-format
+msgid "Add %(name)s"
+msgstr "Добавить"
+
 #: contrib/admin/templates/admin/index.html:27
 #: contrib/admin/templates/admin/change_form.html:14
 msgid "Add"
@@ -357,18 +376,6 @@ msgstr "Мои Действия"
 #: contrib/admin/templates/admin/index.html:56
 msgid "None available"
 msgstr "Недоступно"
-
-#: contrib/admin/templates/admin/500.html:4
-#: contrib/admin/templates/admin/object_history.html:5
-#: contrib/admin/templates/admin/change_form.html:12
-#: contrib/admin/templates/admin/base.html:29
-#: contrib/admin/templates/registration/password_change_done.html:4
-#: contrib/admin/templates/registration/password_reset_form.html:4
-#: contrib/admin/templates/registration/logged_out.html:4
-#: contrib/admin/templates/registration/password_reset_done.html:4
-#: contrib/admin/templates/registration/password_change_form.html:4
-msgid "Home"
-msgstr "Начало"
 
 #: contrib/admin/templates/admin/500.html:4
 #, fuzzy
@@ -641,6 +648,65 @@ msgstr "Спасибо за посещение нашего сайта!"
 #, python-format
 msgid "The %(site_name)s team"
 msgstr "Команда сайта di %(site_name)s"
+
+#: contrib/admin/templates/admin_doc/bookmarklets.html:3
+msgid "Documentation"
+msgstr ""
+
+#: contrib/admin/templates/admin_doc/bookmarklets.html:3
+msgid "Bookmarklets"
+msgstr ""
+
+#: contrib/admin/templates/admin_doc/bookmarklets.html:5
+msgid "Documentation bookmarklets"
+msgstr ""
+
+#: contrib/admin/templates/admin_doc/bookmarklets.html:9
+msgid ""
+"\n"
+"<p class=\"help\">To install bookmarklets, drag the link to your bookmarks\n"
+"toolbar, or right-click the link and add it to your bookmarks. Now you can\n"
+"select the bookmarklet from any page in the site.  Note that some of these\n"
+"bookmarklets require you to be viewing the site from a computer designated\n"
+"as \"internal\" (talk to your system administrator if you aren't sure if\n"
+"your computer is \"internal\").</p>\n"
+msgstr ""
+
+#: contrib/admin/templates/admin_doc/bookmarklets.html:19
+msgid "Documentation for this page"
+msgstr ""
+
+#: contrib/admin/templates/admin_doc/bookmarklets.html:20
+msgid ""
+"Jumps you from any page to the documentation for the view that generates "
+"that page."
+msgstr ""
+
+#: contrib/admin/templates/admin_doc/bookmarklets.html:22
+msgid "Show object ID"
+msgstr ""
+
+#: contrib/admin/templates/admin_doc/bookmarklets.html:23
+msgid ""
+"Shows the content-type and unique ID for pages that represent a single "
+"object."
+msgstr ""
+
+#: contrib/admin/templates/admin_doc/bookmarklets.html:25
+msgid "Edit this object (current window)"
+msgstr ""
+
+#: contrib/admin/templates/admin_doc/bookmarklets.html:26
+msgid "Jumps to the admin page for pages that represent a single object."
+msgstr ""
+
+#: contrib/admin/templates/admin_doc/bookmarklets.html:28
+msgid "Edit this object (new window)"
+msgstr ""
+
+#: contrib/admin/templates/admin_doc/bookmarklets.html:29
+msgid "As above, but opens the admin page in a new window."
+msgstr ""
 
 #: contrib/redirects/models/redirects.py:7
 msgid "redirect from"

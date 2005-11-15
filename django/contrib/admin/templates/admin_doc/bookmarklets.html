@@ -1,30 +1,32 @@
 {% extends "admin/base_site" %}
 
-{% block breadcrumbs %}<div class="breadcrumbs"><a href="../../">Home</a> &rsaquo; <a href="../">Documentation</a> &rsaquo; Bookmarklets</div>{% endblock %}
+{% block breadcrumbs %}<div class="breadcrumbs"><a href="../../">{% trans "Home" %}</a> &rsaquo; <a href="../">{% trans "Documentation" %}</a> &rsaquo; {% trans "Bookmarklets" %}</div>{% endblock %}
 
-{% block title %}Documentation bookmarklets{% endblock %}
+{% block title %}{% trans "Documentation bookmarklets" %}{% endblock %}
 
 {% block content %}
 
+{% blocktrans %}
 <p class="help">To install bookmarklets, drag the link to your bookmarks
 toolbar, or right-click the link and add it to your bookmarks. Now you can
 select the bookmarklet from any page in the site.  Note that some of these
 bookmarklets require you to be viewing the site from a computer designated
 as "internal" (talk to your system administrator if you aren't sure if
 your computer is "internal").</p>
+{% endblocktrans %}
 
 <div id="content-main">
-    <h3><a href="javascript:(function(){if(typeof ActiveXObject!='undefined'){x=new ActiveXObject('Microsoft.XMLHTTP')}else if(typeof XMLHttpRequest!='undefined'){x=new XMLHttpRequest()}else{return;}x.open('HEAD',location.href,false);x.send(null);try{view=x.getResponseHeader('x-view');}catch(e){alert('No view found for this page');return;}if(view=="undefined"){alert("No view found for this page");}document.location='{{ admin_url }}/doc/views/'+view+'/';})()">Documentation for this page</a></h3>
-    <p>Jumps you from any page to the documentation for the view that generates that page.</p>
+    <h3><a href="javascript:(function(){if(typeof ActiveXObject!='undefined'){x=new ActiveXObject('Microsoft.XMLHTTP')}else if(typeof XMLHttpRequest!='undefined'){x=new XMLHttpRequest()}else{return;}x.open('HEAD',location.href,false);x.send(null);try{view=x.getResponseHeader('x-view');}catch(e){alert('No view found for this page');return;}if(view=="undefined"){alert("No view found for this page");}document.location='{{ admin_url }}/doc/views/'+view+'/';})()">{% trans "Documentation for this page" %}</a></h3>
+    <p>{% trans "Jumps you from any page to the documentation for the view that generates that page." %}</p>
 
-    <h3><a href="javascript:(function(){if(typeof ActiveXObject!='undefined'){x=new ActiveXObject('Microsoft.XMLHTTP')}else if(typeof XMLHttpRequest!='undefined'){x=new XMLHttpRequest()}else{return;}x.open('GET',location.href,false);x.send(null);try{type=x.getResponseHeader('x-object-type');id=x.getResponseHeader('x-object-id');}catch(e){type='(none)';id='(none)';}d=document;b=d.body;e=d.createElement('div');e.id='xxxhhh';s=e.style;s.position='absolute';s.left='10px';s.top='10px';s.font='10px monospace';s.border='1px black solid';s.padding='4px';s.backgroundColor='#eee';e.appendChild(d.createTextNode('Type: '+type));e.appendChild(d.createElement('br'));e.appendChild(d.createTextNode('ID: '+id));e.appendChild(d.createElement('br'));l=d.createElement('a');l.href='#';l.onclick=function(){b.removeChild(e);};l.appendChild(d.createTextNode('[close]'));l.style.textDecoration='none';e.appendChild(l);b.appendChild(e);})();">Show object ID</a></h3>
-    <p>Shows the content-type and unique ID for pages that represent a single object.</p>
+    <h3><a href="javascript:(function(){if(typeof ActiveXObject!='undefined'){x=new ActiveXObject('Microsoft.XMLHTTP')}else if(typeof XMLHttpRequest!='undefined'){x=new XMLHttpRequest()}else{return;}x.open('GET',location.href,false);x.send(null);try{type=x.getResponseHeader('x-object-type');id=x.getResponseHeader('x-object-id');}catch(e){type='(none)';id='(none)';}d=document;b=d.body;e=d.createElement('div');e.id='xxxhhh';s=e.style;s.position='absolute';s.left='10px';s.top='10px';s.font='10px monospace';s.border='1px black solid';s.padding='4px';s.backgroundColor='#eee';e.appendChild(d.createTextNode('Type: '+type));e.appendChild(d.createElement('br'));e.appendChild(d.createTextNode('ID: '+id));e.appendChild(d.createElement('br'));l=d.createElement('a');l.href='#';l.onclick=function(){b.removeChild(e);};l.appendChild(d.createTextNode('[close]'));l.style.textDecoration='none';e.appendChild(l);b.appendChild(e);})();">{% trans "Show object ID" %}</a></h3>
+    <p>{% trans "Shows the content-type and unique ID for pages that represent a single object." %}</p>
 
-    <h3><a href="javascript:(function(){if(typeof ActiveXObject!='undefined'){var x=new ActiveXObject('Microsoft.XMLHTTP')}else if(typeof XMLHttpRequest!='undefined'){var x=new XMLHttpRequest()}else{return;}x.open('GET',location.href,false);x.send(null);try{var type=x.getResponseHeader('x-object-type');var id=x.getResponseHeader('x-object-id');}catch(e){return;}document.location='{{ admun_url }}/'+type.split('.').join('/')+'/'+id+'/';})()">Edit this object (current window)</a></h3>
-    <p>Jumps to the admin page for pages that represent a single object.</p>
+    <h3><a href="javascript:(function(){if(typeof ActiveXObject!='undefined'){var x=new ActiveXObject('Microsoft.XMLHTTP')}else if(typeof XMLHttpRequest!='undefined'){var x=new XMLHttpRequest()}else{return;}x.open('GET',location.href,false);x.send(null);try{var type=x.getResponseHeader('x-object-type');var id=x.getResponseHeader('x-object-id');}catch(e){return;}document.location='{{ admun_url }}/'+type.split('.').join('/')+'/'+id+'/';})()">{% trans "Edit this object (current window)" %}</a></h3>
+    <p>{% trans "Jumps to the admin page for pages that represent a single object." %}</p>
 
-    <h3><a href="javascript:(function(){if(typeof ActiveXObject!='undefined'){var x=new ActiveXObject('Microsoft.XMLHTTP')}else if(typeof XMLHttpRequest!='undefined'){var x=new XMLHttpRequest()}else{return;}x.open('GET',location.href,false);x.send(null);try{var type=x.getResponseHeader('x-object-type');var id=x.getResponseHeader('x-object-id');}catch(e){return;}window.open('{{ admun_url }}/'+type.split('.').join('/')+'/'+id+'/');})()">Edit this object (new window)</a></h3>
-    <p>As above, but opens the admin page in a new window.</p>
+    <h3><a href="javascript:(function(){if(typeof ActiveXObject!='undefined'){var x=new ActiveXObject('Microsoft.XMLHTTP')}else if(typeof XMLHttpRequest!='undefined'){var x=new XMLHttpRequest()}else{return;}x.open('GET',location.href,false);x.send(null);try{var type=x.getResponseHeader('x-object-type');var id=x.getResponseHeader('x-object-id');}catch(e){return;}window.open('{{ admun_url }}/'+type.split('.').join('/')+'/'+id+'/');})()">{% trans "Edit this object (new window)" %}</a></h3>
+    <p>{% trans "As above, but opens the admin page in a new window." %}</p>
 </div>
 
 {% endblock %}
