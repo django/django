@@ -47,7 +47,7 @@ def _get_mod_opts(app_label, module_name):
 
 
 def index(request):
-    return render_to_response('admin/index', {'title': 'Site administration'}, context_instance=Context(request))
+    return render_to_response('admin/index', {'title': _('Site administration')}, context_instance=Context(request))
 index = staff_member_required(index)
 
 class IncorrectLookupParameters(Exception):
@@ -149,15 +149,15 @@ class DateFieldFilterSpec(FilterSpec):
         today_str = isinstance(self.field, meta.DateTimeField) and today.strftime('%Y-%m-%d 23:59:59') or today.strftime('%Y-%m-%d')
         
         self.links = (
-            ('Any date', {}),
-            ('Today', {'%s__year' % self.field.name: str(today.year), 
+            (_('Any date'), {}),
+            (_('Today'), {'%s__year' % self.field.name: str(today.year), 
                        '%s__month' % self.field.name: str(today.month), 
                        '%s__day' % self.field.name: str(today.day)}),
-            ('Past 7 days', {'%s__gte' % self.field.name: one_week_ago.strftime('%Y-%m-%d'), 
+            (_('Past 7 days'), {'%s__gte' % self.field.name: one_week_ago.strftime('%Y-%m-%d'), 
                              '%s__lte' % f.name: today_str}),
-            ('This month', {'%s__year' % self.field.name: str(today.year), 
+            (_('This month'), {'%s__year' % self.field.name: str(today.year), 
                              '%s__month' % f.name: str(today.month)}),
-            ('This year', {'%s__year' % self.field.name: str(today.year)})
+            (_('This year'), {'%s__year' % self.field.name: str(today.year)})
         ) 
     
     def title(self):
@@ -183,7 +183,7 @@ class BooleanFieldFilterSpec(FilterSpec):
         return self.field.verbose_name
     
     def choices(self, cl):
-        for k, v in (('All', None), ('Yes', '1'), ('No', '0')):
+        for k, v in ((_('All'), None), (_('Yes'), '1'), (_('No'), '0')):
             yield { 'selected' : self.lookup_val == v and not self.lookup_val2, 
                     'query_string' : cl.get_query_string( {self.lookup_kwarg: v}, [self.lookup_kwarg2]), 
                     'display': k 
