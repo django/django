@@ -145,7 +145,7 @@ production settings -- and our own code met our needs delightfully.
 
 In most cases, however, we found that existing frameworks/tools inevitably had
 some sort of fundamental, fatal flaw that made us squeamish. No tool fit our
-philosophies.
+philosophies 100%.
 
 Like we said: We're picky.
 
