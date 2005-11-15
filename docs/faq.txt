@@ -143,6 +143,16 @@ problems in similar ways, but it was too late to integrate outside code: We'd
 already written, tested and implemented our own framework bits in several
 production settings -- and our own code met our needs delightfully.
 
+In most cases, however, we found that existing frameworks/tools inevitably had
+some sort of fundamental, fatal flaw that made us squeamish. No tool fit our
+philosophies.
+
+Like we said: We're picky.
+
+We've documented our philosophies on the `design philosophies page`_.
+
+.. _design philosophies page: http://www.djangoproject.com/documentation/design_philosophies/
+
 Do you have any of those nifty "screencast" things?
 ---------------------------------------------------
 
