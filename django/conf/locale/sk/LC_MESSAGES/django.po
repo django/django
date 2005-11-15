@@ -11,7 +11,7 @@ msgstr ""
 "POT-Creation-Date: 2005-11-08 09:05-0600\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: Vladimir Labath <vlado@labath.org>\n"
-"Language-Team: Slovak <info@labath.org>\n"
+"Language-Team: Slovak <sk@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -568,18 +568,6 @@ msgstr "záznamy priebehu"
 msgid "All dates"
 msgstr ""
 
-#: utils/translation.py:335
-msgid "DATE_FORMAT"
-msgstr ""
-
-#: utils/translation.py:336
-msgid "DATETIME_FORMAT"
-msgstr ""
-
-#: utils/translation.py:337
-msgid "TIME_FORMAT"
-msgstr ""
-
 #: utils/dates.py:6
 msgid "Monday"
 msgstr "Pondelok"
@@ -683,6 +671,18 @@ msgstr ""
 #: utils/dates.py:28
 msgid "Dec."
 msgstr ""
+
+#: utils/translation.py:335
+msgid "DATE_FORMAT"
+msgstr "DATUM_FORMAT"
+
+#: utils/translation.py:336
+msgid "DATETIME_FORMAT"
+msgstr "DATUMCAS_FORMAT"
+
+#: utils/translation.py:337
+msgid "TIME_FORMAT"
+msgstr "CAS_FORMAT"
 
 #: models/core.py:7
 msgid "domain name"
@@ -916,7 +916,7 @@ msgstr "Osobné údaje"
 msgid "Important dates"
 msgstr "Dôležité údaje"
 
-#: models/auth.py:182
+#: models/auth.py:195
 msgid "Message"
 msgstr "Zpráva"
 

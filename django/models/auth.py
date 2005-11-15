@@ -91,12 +91,25 @@ class User(meta.Model):
         if not hasattr(self, '_group_perm_cache'):
             import sets
             cursor = db.cursor()
-            cursor.execute("""
-                SELECT p.package, p.codename
-                FROM auth_permissions p, auth_groups_permissions gp, auth_users_groups ug
-                WHERE p.id = gp.permission_id
-                    AND gp.group_id = ug.group_id
-                    AND ug.user_id = %s""", [self.id])
+            # The SQL below works out to the following, after DB quoting:
+            # cursor.execute("""
+            #     SELECT p.package, p.codename
+            #     FROM auth_permissions p, auth_groups_permissions gp, auth_users_groups ug
+            #     WHERE p.id = gp.permission_id
+            #         AND gp.group_id = ug.group_id
+            #         AND ug.user_id = %s""", [self.id])
+            sql = """
+                SELECT p.%s, p.%s
+                FROM %s p, %s gp, %s ug
+                WHERE p.%s = gp.%s
+                    AND gp.%s = ug.%s
+                    AND ug.%s = %%s""" % (
+                db.quote_name('package'), db.quote_name('codename'),
+                db.quote_name('auth_permissions'), db.quote_name('auth_groups_permissions'),
+                db.quote_name('auth_users_groups'), db.quote_name('id'),
+                db.quote_name('permission_id'), db.quote_name('group_id'),
+                db.quote_name('group_id'), db.quote_name('user_id'))
+            cursor.execute(sql, [self.id])
             self._group_perm_cache = sets.Set(["%s.%s" % (row[0], row[1]) for row in cursor.fetchall()])
         return self._group_perm_cache
 

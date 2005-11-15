@@ -62,11 +62,11 @@ class BlockTranslateNode(Node):
         context.push()
         for var,val in self.extra_context.items():
             context[var] = resolve_variable_with_filters(val, context)
-        singular = self.render_token_list(self.singular) % context
+        singular = self.render_token_list(self.singular)
         if self.plural and self.countervar and self.counter:
             count = resolve_variable_with_filters(self.counter, context)
             context[self.countervar] = count
-            plural = self.render_token_list(self.plural) % context
+            plural = self.render_token_list(self.plural)
             result = translation.ngettext(singular, plural, count) % context
         else:
             result = translation.gettext(singular) % context

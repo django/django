@@ -86,14 +86,14 @@ class BaseHandler:
             return response
         except exceptions.Http404, e:
             if DEBUG:
-                return self.get_technical_error_response(is404=True, exception=e)
+                return self.get_technical_error_response(request, is404=True, exception=e)
             else:
                 callback, param_dict = resolver.resolve404()
                 return callback(request, **param_dict)
         except db.DatabaseError:
             db.db.rollback()
             if DEBUG:
-                return self.get_technical_error_response()
+                return self.get_technical_error_response(request)
             else:
                 subject = 'Database error (%s IP): %s' % ((request.META.get('REMOTE_ADDR') in INTERNAL_IPS and 'internal' or 'EXTERNAL'), getattr(request, 'path', ''))
                 message = "%s\n\n%s" % (self._get_traceback(), request)
@@ -103,7 +103,7 @@ class BaseHandler:
             return httpwrappers.HttpResponseForbidden('<h1>Permission denied</h1>')
         except: # Handle everything else, including SuspiciousOperation, etc.
             if DEBUG:
-                return self.get_technical_error_response()
+                return self.get_technical_error_response(request)
             else:
                 subject = 'Coding error (%s IP): %s' % ((request.META.get('REMOTE_ADDR') in INTERNAL_IPS and 'internal' or 'EXTERNAL'), getattr(request, 'path', ''))
                 try:
@@ -123,35 +123,17 @@ class BaseHandler:
         callback, param_dict = resolver.resolve500()
         return callback(request, **param_dict)
 
-    def get_technical_error_response(self, is404=False, exception=None):
+    def get_technical_error_response(self, request, is404=False, exception=None):
         """
         Returns an HttpResponse that displays a TECHNICAL error message for a
         fundamental database or coding error.
         """
+        import sys
+        from django.views import debug
         if is404:
-            from django.conf.settings import ROOT_URLCONF
-            from django.utils.html import escape
-            html = ['<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">']
-            html.append('<html><head><title>Error 404</title>')
-            # Explicitly tell robots not to archive this, in case this slips
-            # onto a production site.
-            html.append('<meta name="robots" content="NONE,NOARCHIVE" />')
-            html.append('</head><body><h1>Error 404</h1>')
-            try:
-                tried = exception.args[0]['tried']
-            except (IndexError, TypeError):
-                if exception.args:
-                    html.append('<p>%s</p>' % escape(exception.args[0]))
-            else:
-                html.append('<p>Using the URLconf defined in <code>%s</code>, Django tried these URL patterns, in this order:</p>' % ROOT_URLCONF)
-                html.append('<ul>%s</ul>' % ''.join(['<li><code>%s</code></li>' % escape(t).replace(' ', '&nbsp;') for t in tried]))
-                html.append("<p>The current URL, <code><strong>%r</strong></code>, didn't match any of these.</p>" % exception.args[0]['path'])
-            html.append("<hr /><p>You're seeing this error because you have <code>DEBUG = True</code> in your Django settings file. Change that to <code>False</code>, and Django will display a standard 404 page.</p>")
-            html.append('</body></html>')
-            return httpwrappers.HttpResponseNotFound('\n'.join(html))
+            return debug.technical_404_response(request, exception)
         else:
-            output = "There's been an error:\n\n%s" % self._get_traceback()
-            return httpwrappers.HttpResponseServerError(output, mimetype='text/plain')
+            return debug.technical_500_response(request, *sys.exc_info())
 
     def _get_traceback(self):
         "Helper function to return the traceback as a string"

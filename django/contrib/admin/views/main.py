@@ -208,6 +208,7 @@ class ChangeList(object):
                       and _('Select %s') % self.opts.verbose_name 
                       or _('Select %s to change') % self.opts.verbose_name)
         self.get_filters(request)
+        self.pk_attname = self.lookup_opts.pk.attname
     
     def get_filters(self, request):
         self.filter_specs = []
@@ -301,6 +302,9 @@ class ChangeList(object):
             self.can_show_all, self.multi_page, self.paginator) = (result_count, 
                   full_result_count, result_list, can_show_all, multi_page, paginator )
     
+    def url_for_result(self, result):
+        return "%s/" % getattr(result, self.pk_attname)
+        
     def get_ordering(self):
         lookup_opts, params = self.lookup_opts, self.params
         # For ordering, first check the "ordering" parameter in the admin options,

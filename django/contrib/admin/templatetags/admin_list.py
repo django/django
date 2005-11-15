@@ -209,9 +209,9 @@ def items_for_result(cl, result):
                 result_repr = '&nbsp;'
         if first: # First column is a special case
             first = False
-            result_id = getattr(result, pk)
-            yield ('<th%s><a href="%s/"%s>%s</a></th>' % \
-                (row_class, result_id, (cl.is_popup and ' onclick="opener.dismissRelatedLookupPopup(window, %r); return false;"' % result_id or ''), result_repr))
+            url = cl.url_for_result(result)
+            yield ('<th%s><a href="%s"%s>%s</a></th>' % \
+                (row_class, url, (cl.is_popup and ' onclick="opener.dismissRelatedLookupPopup(window, %r); return false;"' % result_id or ''), result_repr))
         else:
             yield ('<td%s>%s</td>' % (row_class, result_repr))
         

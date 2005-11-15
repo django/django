@@ -17,7 +17,7 @@ def feed(request, url, feed_dict=None):
         raise Http404, "Slug %r isn't registered." % slug
 
     try:
-        feedgen = f(slug).get_feed(param)
+        feedgen = f(slug, request.path).get_feed(param)
     except feeds.FeedDoesNotExist:
         raise Http404, "Invalid feed parameters. Slug %r is valid, but other parameters, or lack thereof, are not." % slug
 

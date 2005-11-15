@@ -57,14 +57,16 @@ def orderfield2column(f, opts):
         return f
 
 def orderlist2sql(order_list, opts, prefix=''):
+    if prefix.endswith('.'):
+        prefix = db.db.quote_name(prefix[:-1]) + '.'
     output = []
     for f in handle_legacy_orderlist(order_list):
         if f.startswith('-'):
-            output.append('%s%s DESC' % (prefix, orderfield2column(f[1:], opts)))
+            output.append('%s%s DESC' % (prefix, db.db.quote_name(orderfield2column(f[1:], opts))))
         elif f == '?':
             output.append(db.get_random_function_sql())
         else:
-            output.append('%s%s ASC' % (prefix, orderfield2column(f, opts)))
+            output.append('%s%s ASC' % (prefix, db.db.quote_name(orderfield2column(f, opts))))
     return ', '.join(output)
 
 def get_module(app_label, module_name):
@@ -923,27 +925,31 @@ def method_save(opts, self):
     record_exists = True
     if pk_set:
         # Determine whether a record with the primary key already exists.
-        cursor.execute("SELECT 1 FROM %s WHERE %s=%%s LIMIT 1" % (opts.db_table, opts.pk.column), [pk_val])
+        cursor.execute("SELECT 1 FROM %s WHERE %s=%%s LIMIT 1" % \
+            (db.db.quote_name(opts.db_table), db.db.quote_name(opts.pk.column)), [pk_val])
         # If it does already exist, do an UPDATE.
         if cursor.fetchone():
             db_values = [f.get_db_prep_save(f.pre_save(getattr(self, f.attname), False)) for f in non_pks]
-            cursor.execute("UPDATE %s SET %s WHERE %s=%%s" % (opts.db_table, 
-                ','.join(['%s=%%s' % f.column for f in non_pks]), opts.pk.attname),
+            cursor.execute("UPDATE %s SET %s WHERE %s=%%s" % \
+                (db.db.quote_name(opts.db_table),
+                ','.join(['%s=%%s' % db.db.quote_name(f.column) for f in non_pks]),
+                db.db.quote_name(opts.pk.attname)),
                 db_values + [pk_val])
         else:
             record_exists = False
     if not pk_set or not record_exists:
-        field_names = [f.column for f in opts.fields if not isinstance(f, AutoField)]
+        field_names = [db.db.quote_name(f.column) for f in opts.fields if not isinstance(f, AutoField)]
         placeholders = ['%s'] * len(field_names)
         db_values = [f.get_db_prep_save(f.pre_save(getattr(self, f.attname), True)) for f in opts.fields if not isinstance(f, AutoField)]
         if opts.order_with_respect_to:
-            field_names.append('_order')
+            field_names.append(db.db.quote_name('_order'))
             # TODO: This assumes the database supports subqueries.
             placeholders.append('(SELECT COUNT(*) FROM %s WHERE %s = %%s)' % \
-                (opts.db_table, opts.order_with_respect_to.column))
+                (db.db.quote_name(opts.db_table), db.db.quote_name(opts.order_with_respect_to.column)))
             db_values.append(getattr(self, opts.order_with_respect_to.attname))
-        cursor.execute("INSERT INTO %s (%s) VALUES (%s)" % (opts.db_table,
-            ','.join(field_names), ','.join(placeholders)), db_values)
+        cursor.execute("INSERT INTO %s (%s) VALUES (%s)" % \
+            (db.db.quote_name(opts.db_table), ','.join(field_names),
+            ','.join(placeholders)), db_values)
         if opts.has_auto_field:
             setattr(self, opts.pk.attname, db.get_last_insert_id(cursor, opts.db_table, opts.pk.column))
     db.db.commit()
@@ -970,12 +976,17 @@ def method_delete(opts, self):
             for sub_obj in getattr(self, 'get_%s_list' % rel_opts_name)():
                 sub_obj.delete()
     for related in opts.get_all_related_many_to_many_objects():
-        cursor.execute("DELETE FROM %s WHERE %s_id=%%s" % (related.field.get_m2m_db_table(related.opts),
-            self._meta.object_name.lower()), [getattr(self, opts.pk.attname)])
+        cursor.execute("DELETE FROM %s WHERE %s=%%s" % \
+            (db.db.quote_name(related.field.get_m2m_db_table(related.opts)),
+            db.db.quote_name(self._meta.object_name.lower() + '_id')), [getattr(self, opts.pk.attname)])
     for f in opts.many_to_many:
-        cursor.execute("DELETE FROM %s WHERE %s_id=%%s" % (f.get_m2m_db_table(opts), self._meta.object_name.lower()),
+        cursor.execute("DELETE FROM %s WHERE %s=%%s" % \
+            (db.db.quote_name(f.get_m2m_db_table(opts)),
+            db.db.quote_name(self._meta.object_name.lower() + '_id')),
             [getattr(self, opts.pk.attname)])
-    cursor.execute("DELETE FROM %s WHERE %s=%%s" % (opts.db_table, opts.pk.column), [getattr(self, opts.pk.attname)])
+    cursor.execute("DELETE FROM %s WHERE %s=%%s" % \
+        (db.db.quote_name(opts.db_table), db.db.quote_name(opts.pk.column)),
+        [getattr(self, opts.pk.attname)])
     db.db.commit()
     setattr(self, opts.pk.attname, None)
     for f in opts.fields:
@@ -992,16 +1003,20 @@ def method_delete(opts, self):
 def method_get_next_in_order(opts, order_field, self):
     if not hasattr(self, '_next_in_order_cache'):
         self._next_in_order_cache = opts.get_model_module().get_object(order_by=('_order',),
-            where=['_order > (SELECT _order FROM %s WHERE %s=%%s)' % (opts.db_table, opts.pk.column),
-                '%s=%%s' % order_field.column], limit=1,
+            where=['%s > (SELECT %s FROM %s WHERE %s=%%s)' % \
+                (db.db.quote_name('_order'), db.db.quote_name('_order'),
+                db.db.quote_name(opts.db_table), db.db.quote_name(opts.pk.column)),
+                '%s=%%s' % db.db.quote_name(order_field.column)], limit=1,
             params=[getattr(self, opts.pk.attname), getattr(self, order_field.attname)])
     return self._next_in_order_cache
 
 def method_get_previous_in_order(opts, order_field, self):
     if not hasattr(self, '_previous_in_order_cache'):
         self._previous_in_order_cache = opts.get_model_module().get_object(order_by=('-_order',),
-            where=['_order < (SELECT _order FROM %s WHERE %s=%%s)' % (opts.db_table, opts.pk.column),
-                '%s=%%s' % order_field.column], limit=1,
+            where=['%s < (SELECT %s FROM %s WHERE %s=%%s)' % \
+                (db.db.quote_name('_order'), db.db.quote_name('_order'),
+                db.db.quote_name(opts.db_table), db.db.quote_name(opts.pk.column)),
+                '%s=%%s' % db.db.quote_name(order_field.column)], limit=1,
             params=[getattr(self, opts.pk.attname), getattr(self, order_field.attname)])
     return self._previous_in_order_cache
 
@@ -1026,10 +1041,13 @@ def method_get_many_to_many(field_with_rel, self):
     cache_var = '_%s_cache' % field_with_rel.name
     if not hasattr(self, cache_var):
         mod = rel.get_model_module()
-        sql = "SELECT %s FROM %s a, %s b WHERE a.%s = b.%s_id AND b.%s_id = %%s %s" % \
-            (','.join(['a.%s' % f.column for f in rel.fields]), rel.db_table,
-            field_with_rel.get_m2m_db_table(self._meta), rel.pk.column,
-            rel.object_name.lower(), self._meta.object_name.lower(), rel.get_order_sql('a'))
+        sql = "SELECT %s FROM %s a, %s b WHERE a.%s = b.%s AND b.%s = %%s %s" % \
+            (','.join(['a.%s' % db.db.quote_name(f.column) for f in rel.fields]),
+            db.db.quote_name(rel.db_table),
+            db.db.quote_name(field_with_rel.get_m2m_db_table(self._meta)),
+            db.db.quote_name(rel.pk.column),
+            db.db.quote_name(rel.object_name.lower() + '_id'),
+            db.db.quote_name(self._meta.object_name.lower() + '_id'), rel.get_order_sql('a'))
         cursor = db.db.cursor()
         cursor.execute(sql, [getattr(self, self._meta.pk.attname)])
         setattr(self, cache_var, [getattr(mod, rel.object_name)(*row) for row in cursor.fetchall()])
@@ -1054,10 +1072,16 @@ def method_set_many_to_many(rel_field, self, id_list):
     cursor = db.db.cursor()
     this_id = getattr(self, self._meta.pk.attname)
     if ids_to_delete:
-        sql = "DELETE FROM %s WHERE %s_id = %%s AND %s_id IN (%s)" % (m2m_table, self._meta.object_name.lower(), rel.object_name.lower(), ','.join(map(str, ids_to_delete)))
+        sql = "DELETE FROM %s WHERE %s = %%s AND %s IN (%s)" % \
+            (db.db.quote_name(m2m_table),
+            db.db.quote_name(self._meta.object_name.lower() + '_id'),
+            db.db.quote_name(rel.object_name.lower() + '_id'), ','.join(map(str, ids_to_delete)))
         cursor.execute(sql, [this_id])
     if ids_to_add:
-        sql = "INSERT INTO %s (%s_id, %s_id) VALUES (%%s, %%s)" % (m2m_table, self._meta.object_name.lower(), rel.object_name.lower())
+        sql = "INSERT INTO %s (%s, %s) VALUES (%%s, %%s)" % \
+            (db.db.quote_name(m2m_table),
+            db.db.quote_name(self._meta.object_name.lower() + '_id'),
+            db.db.quote_name(rel.object_name.lower() + '_id'))
         cursor.executemany(sql, [(this_id, i) for i in ids_to_add])
     db.db.commit()
     try:
@@ -1103,8 +1127,13 @@ def method_set_related_many_to_many(rel_opts, rel_field, self, id_list):
     m2m_table = rel_field.get_m2m_db_table(rel_opts)
     this_id = getattr(self, self._meta.pk.attname)
     cursor = db.db.cursor()
-    cursor.execute("DELETE FROM %s WHERE %s_id = %%s" % (m2m_table, rel.object_name.lower()), [this_id])
-    sql = "INSERT INTO %s (%s_id, %s_id) VALUES (%%s, %%s)" % (m2m_table, rel.object_name.lower(), rel_opts.object_name.lower())
+    cursor.execute("DELETE FROM %s WHERE %s = %%s" % \
+        (db.db.quote_name(m2m_table),
+        db.db.quote_name(rel.object_name.lower() + '_id')), [this_id])
+    sql = "INSERT INTO %s (%s, %s) VALUES (%%s, %%s)" % \
+        (db.db.quote_name(m2m_table),
+        db.db.quote_name(rel.object_name.lower() + '_id'),
+        db.db.quote_name(rel_opts.object_name.lower() + '_id'))
     cursor.executemany(sql, [(this_id, i) for i in id_list])
     db.db.commit()
 
@@ -1113,7 +1142,10 @@ def method_set_related_many_to_many(rel_opts, rel_field, self, id_list):
 def method_set_order(ordered_obj, self, id_list):
     cursor = db.db.cursor()
     # Example: "UPDATE poll_choices SET _order = %s WHERE poll_id = %s AND id = %s"
-    sql = "UPDATE %s SET _order = %%s WHERE %s = %%s AND %s = %%s" % (ordered_obj.db_table, ordered_obj.order_with_respect_to.column, ordered_obj.pk.column)
+    sql = "UPDATE %s SET %s = %%s WHERE %s = %%s AND %s = %%s" % \
+        (db.db.quote_name(ordered_obj.db_table), db.db.quote_name('_order'),
+        db.db.quote_name(ordered_obj.order_with_respect_to.column),
+        db.db.quote_name(ordered_obj.pk.column))
     rel_val = getattr(self, ordered_obj.order_with_respect_to.rel.field_name)
     cursor.executemany(sql, [(i, rel_val, j) for i, j in enumerate(id_list)])
     db.db.commit()
@@ -1121,7 +1153,11 @@ def method_set_order(ordered_obj, self, id_list):
 def method_get_order(ordered_obj, self):
     cursor = db.db.cursor()
     # Example: "SELECT id FROM poll_choices WHERE poll_id = %s ORDER BY _order"
-    sql = "SELECT %s FROM %s WHERE %s = %%s ORDER BY _order" % (ordered_obj.pk.column, ordered_obj.db_table, ordered_obj.order_with_respect_to.column)
+    sql = "SELECT %s FROM %s WHERE %s = %%s ORDER BY %s" % \
+        (db.db.quote_name(ordered_obj.pk.column),
+        db.db.quote_name(ordered_obj.db_table),
+        db.db.quote_name(ordered_obj.order_with_respect_to.column),
+        db.db.quote_name('_order'))
     rel_val = getattr(self, ordered_obj.order_with_respect_to.rel.field_name)
     cursor.execute(sql, [rel_val])
     return [r[0] for r in cursor.fetchall()]
@@ -1131,7 +1167,8 @@ def method_get_order(ordered_obj, self):
 def method_get_next_or_previous(get_object_func, opts, field, is_next, self, **kwargs):
     op = is_next and '>' or '<'
     kwargs.setdefault('where', []).append('(%s %s %%s OR (%s = %%s AND %s %s %%s))' % \
-        (field.column, op, field.column, opts.pk.column, op))
+        (db.db.quote_name(field.column), op, db.db.quote_name(field.column),
+        db.db.quote_name(opts.pk.column), op))
     param = str(getattr(self, field.attname))
     kwargs.setdefault('params', []).extend([param, param, getattr(self, opts.pk.attname)])
     kwargs['order_by'] = [(not is_next and '-' or '') + field.name, (not is_next and '-' or '') + opts.pk.name]
@@ -1218,6 +1255,9 @@ def get_absolute_url(opts, func, self):
     return settings.ABSOLUTE_URL_OVERRIDES.get('%s.%s' % (opts.app_label, opts.module_name), func)(self)
 
 def _get_where_clause(lookup_type, table_prefix, field_name, value):
+    if table_prefix.endswith('.'):
+        table_prefix = db.db.quote_name(table_prefix[:-1])+'.'
+    field_name = db.db.quote_name(field_name)
     try:
         return '%s%s %s %%s' % (table_prefix, field_name, db.OPERATOR_MAPPING[lookup_type])
     except KeyError:
@@ -1298,7 +1338,7 @@ def function_get_values_iterator(opts, klass, **kwargs):
 
     cursor = db.db.cursor()
     _, sql, params = function_get_sql_clause(opts, **kwargs)
-    select = ['%s.%s' % (opts.db_table, f) for f in fields]
+    select = ['%s.%s' % (db.db.quote_name(opts.db_table), db.db.quote_name(f)) for f in fields]
     cursor.execute("SELECT " + (kwargs.get('distinct') and "DISTINCT " or "") + ",".join(select) + sql, params)
     while 1:
         rows = cursor.fetchmany(GET_ITERATOR_CHUNK_SIZE)
@@ -1319,14 +1359,16 @@ def _fill_table_cache(opts, select, tables, where, old_prefix, cache_tables_seen
         if f.rel and not f.null:
             db_table = f.rel.to.db_table
             if db_table not in cache_tables_seen:
-                tables.append(db_table)
+                tables.append(db.db.quote_name(db_table))
             else: # The table was already seen, so give it a table alias.
                 new_prefix = '%s%s' % (db_table, len(cache_tables_seen))
-                tables.append('%s %s' % (db_table, new_prefix))
+                tables.append('%s %s' % (db.db.quote_name(db_table), db.db.quote_name(new_prefix)))
                 db_table = new_prefix
             cache_tables_seen.append(db_table)
-            where.append('%s.%s = %s.%s' % (old_prefix, f.column, db_table, f.rel.get_related_field().column))
-            select.extend(['%s.%s' % (db_table, f2.column) for f2 in f.rel.to.fields])
+            where.append('%s.%s = %s.%s' % \
+                (db.db.quote_name(old_prefix), db.db.quote_name(f.column),
+                db.db.quote_name(db_table), db.db.quote_name(f.rel.get_related_field().column)))
+            select.extend(['%s.%s' % (db.db.quote_name(db_table), db.db.quote_name(f2.column)) for f2 in f.rel.to.fields])
             _fill_table_cache(f.rel.to, select, tables, where, db_table, cache_tables_seen)
 
 def _throw_bad_kwarg_error(kwarg):
@@ -1385,11 +1427,15 @@ def _parse_lookup(kwarg_items, opts, table_count=0):
                 # Try many-to-many relationships first...
                 for f in current_opts.many_to_many:
                     if f.name == current:
-                        rel_table_alias = 't%s' % table_count
+                        rel_table_alias = db.db.quote_name('t%s' % table_count)
                         table_count += 1
-                        tables.append('%s %s' % (f.get_m2m_db_table(current_opts), rel_table_alias))
-                        join_where.append('%s.%s = %s.%s_id' % (current_table_alias, current_opts.pk.column,
-                            rel_table_alias, current_opts.object_name.lower()))
+                        tables.append('%s %s' % \
+                            (db.db.quote_name(f.get_m2m_db_table(current_opts)), rel_table_alias))
+                        join_where.append('%s.%s = %s.%s' % \
+                            (db.db.quote_name(current_table_alias),
+                            db.db.quote_name(current_opts.pk.column),
+                            rel_table_alias,
+                            db.db.quote_name(current_opts.object_name.lower() + '_id')))
                         # Optimization: In the case of primary-key lookups, we
                         # don't have to do an extra join.
                         if lookup_list and lookup_list[0] == f.rel.to.pk.name and lookup_type == 'exact':
@@ -1400,9 +1446,13 @@ def _parse_lookup(kwarg_items, opts, table_count=0):
                             param_required = False
                         else:
                             new_table_alias = 't%s' % table_count
-                            tables.append('%s %s' % (f.rel.to.db_table, new_table_alias))
-                            join_where.append('%s.%s_id = %s.%s' % (rel_table_alias, f.rel.to.object_name.lower(),
-                                new_table_alias, f.rel.to.pk.column))
+                            tables.append('%s %s' % (db.db.quote_name(f.rel.to.db_table),
+                                db.db.quote_name(new_table_alias)))
+                            join_where.append('%s.%s = %s.%s' % \
+                                (db.db.quote_name(rel_table_alias),
+                                db.db.quote_name(f.rel.to.object_name.lower() + '_id'),
+                                db.db.quote_name(new_table_alias),
+                                db.db.quote_name(f.rel.to.pk.column)))
                             current_table_alias = new_table_alias
                             param_required = True
                         current_opts = f.rel.to
@@ -1425,9 +1475,11 @@ def _parse_lookup(kwarg_items, opts, table_count=0):
                             params.extend(f.get_db_prep_lookup(lookup_type, kwarg_value))
                         else:
                             new_table_alias = 't%s' % table_count
-                            tables.append('%s %s' % (f.rel.to.db_table, new_table_alias))
-                            join_where.append('%s.%s = %s.%s' % (current_table_alias, f.column, \
-                                new_table_alias, f.rel.to.pk.column))
+                            tables.append('%s %s' % \
+                                (db.db.quote_name(f.rel.to.db_table), db.db.quote_name(new_table_alias)))
+                            join_where.append('%s.%s = %s.%s' % \
+                                (db.db.quote_name(current_table_alias), db.db.quote_name(f.column),
+                                db.db.quote_name(new_table_alias), db.db.quote_name(f.rel.to.pk.column)))
                             current_table_alias = new_table_alias
                             param_required = True
                         current_opts = f.rel.to
@@ -1446,8 +1498,9 @@ def _parse_lookup(kwarg_items, opts, table_count=0):
     return tables, join_where, where, params, table_count
 
 def function_get_sql_clause(opts, **kwargs):
-    select = ["%s.%s" % (opts.db_table, f.column) for f in opts.fields]
+    select = ["%s.%s" % (db.db.quote_name(opts.db_table), db.db.quote_name(f.column)) for f in opts.fields]
     tables = [opts.db_table] + (kwargs.get('tables') and kwargs['tables'][:] or [])
+    tables = [db.db.quote_name(t) for t in tables]
     where = kwargs.get('where') and kwargs['where'][:] or []
     params = kwargs.get('params') and kwargs['params'][:] or []
 
@@ -1466,7 +1519,7 @@ def function_get_sql_clause(opts, **kwargs):
 
     # Add any additional SELECTs passed in via kwargs.
     if kwargs.get('select'):
-        select.extend(['(%s) AS %s' % (s[1], s[0]) for s in kwargs['select']])
+        select.extend(['(%s) AS %s' % (db.db.quote_name(s[1]), db.db.quote_name(s[0])) for s in kwargs['select']])
 
     # ORDER BY clause
     order_by = []
@@ -1480,13 +1533,17 @@ def function_get_sql_clause(opts, **kwargs):
             else:
                 col_name = f
                 order = "ASC"
-            # Use the database table as a column prefix if it wasn't given,
-            # and if the requested column isn't a custom SELECT.
-            if "." not in col_name and col_name not in [k[0] for k in kwargs.get('select', [])]:
-                table_prefix = opts.db_table + '.'
+            if "." in col_name:
+                table_prefix, col_name = col_name.split('.', 1)
+                table_prefix = db.db.quote_name(table_prefix) + '.'
             else:
-                table_prefix = ''
-            order_by.append('%s%s %s' % (table_prefix, orderfield2column(col_name, opts), order))
+                # Use the database table as a column prefix if it wasn't given,
+                # and if the requested column isn't a custom SELECT.
+                if "." not in col_name and col_name not in [k[0] for k in kwargs.get('select', [])]:
+                    table_prefix = db.db.quote_name(opts.db_table) + '.'
+                else:
+                    table_prefix = ''
+            order_by.append('%s%s %s' % (table_prefix, db.db.quote_name(orderfield2column(col_name, opts)), order))
     order_by = ", ".join(order_by)
 
     # LIMIT and OFFSET clauses
@@ -1501,7 +1558,7 @@ def function_get_sql_clause(opts, **kwargs):
 def function_get_in_bulk(opts, klass, *args, **kwargs):
     id_list = args and args[0] or kwargs['id_list']
     assert id_list != [], "get_in_bulk() cannot be passed an empty list."
-    kwargs['where'] = ["%s.%s IN (%s)" % (opts.db_table, opts.pk.column, ",".join(['%s'] * len(id_list)))]
+    kwargs['where'] = ["%s.%s IN (%s)" % (db.db.quote_name(opts.db_table), db.db.quote_name(opts.pk.column), ",".join(['%s'] * len(id_list)))]
     kwargs['params'] = id_list
     obj_list = function_get_list(opts, klass, **kwargs)
     return dict([(getattr(o, opts.pk.attname), o) for o in obj_list])
@@ -1522,9 +1579,10 @@ def function_get_date_list(opts, field, *args, **kwargs):
     assert order in ('ASC', 'DESC'), "'order' must be either 'ASC' or 'DESC'"
     kwargs['order_by'] = [] # Clear this because it'll mess things up otherwise.
     if field.null:
-        kwargs.setdefault('where', []).append('%s.%s IS NOT NULL' % (opts.db_table, field.column))
+        kwargs.setdefault('where', []).append('%s.%s IS NOT NULL' % \
+            (db.db.quote_name(opts.db_table), db.db.quote_name(field.column)))
     select, sql, params = function_get_sql_clause(opts, **kwargs)
-    sql = 'SELECT %s %s GROUP BY 1 ORDER BY 1' % (db.get_date_trunc_sql(kind, '%s.%s' % (opts.db_table, field.column)), sql)
+    sql = 'SELECT %s %s GROUP BY 1 ORDER BY 1' % (db.get_date_trunc_sql(kind, '%s.%s' % (db.db.quote_name(opts.db_table), db.db.quote_name(field.column))), sql)
     cursor = db.db.cursor()
     cursor.execute(sql, params)
     # We have to manually run typecast_timestamp(str()) on the results, because

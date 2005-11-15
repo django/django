@@ -27,6 +27,9 @@ from xml.parsers.expat import ExpatError
 def rfc2822_date(date):
     return email.Utils.formatdate(time.mktime(date.timetuple()))
 
+def rfc3339_date(date):
+    return date.strftime('%Y-%m-%dT%H:%M:%SZ')
+
 def get_tag_uri(url, date):
     "Creates a TagURI. See http://diveintomark.org/archives/2004/05/28/howto-atom-id"
     tag = re.sub('^http://', '', url)
@@ -38,7 +41,8 @@ def get_tag_uri(url, date):
 class SyndicationFeed:
     "Base class for all syndication feeds. Subclasses should provide write()"
     def __init__(self, title, link, description, language=None, author_email=None,
-            author_name=None, author_link=None, subtitle=None, categories=None):
+            author_name=None, author_link=None, subtitle=None, categories=None,
+            feed_url=None):
         self.feed = {
             'title': title,
             'link': link,
@@ -49,11 +53,12 @@ class SyndicationFeed:
             'author_link': author_link,
             'subtitle': subtitle,
             'categories': categories or (),
+            'feed_url': feed_url,
         }
         self.items = []
 
     def add_item(self, title, link, description, author_email=None,
-        author_name=None, pubdate=None, comments=None,
+        author_name=None, author_link=None, pubdate=None, comments=None,
         unique_id=None, enclosure=None, categories=()):
         """
         Adds an item to the feed. All args are expected to be Python Unicode
@@ -66,6 +71,7 @@ class SyndicationFeed:
             'description': description,
             'author_email': author_email,
             'author_name': author_name,
+            'author_link': author_link,
             'pubdate': pubdate,
             'comments': comments,
             'unique_id': unique_id,
@@ -187,9 +193,11 @@ class Atom1Feed(SyndicationFeed):
         else:
             handler.startElement(u"feed", {u"xmlns": self.ns})
         handler.addQuickElement(u"title", self.feed['title'])
-        handler.addQuickElement(u"link", "", {u"href": self.feed['link']})
+        handler.addQuickElement(u"link", "", {u"rel": u"alternate", u"href": self.feed['link']})
+        if self.feed['feed_url'] is not None:
+            handler.addQuickElement(u"link", "", {u"rel": u"self", u"href": self.feed['feed_url']})
         handler.addQuickElement(u"id", self.feed['link'])
-        handler.addQuickElement(u"updated", rfc2822_date(self.latest_post_date()).decode('ascii'))
+        handler.addQuickElement(u"updated", rfc3339_date(self.latest_post_date()).decode('ascii'))
         if self.feed['author_name'] is not None:
             handler.startElement(u"author", {})
             handler.addQuickElement(u"name", self.feed['author_name'])
@@ -209,9 +217,9 @@ class Atom1Feed(SyndicationFeed):
         for item in self.items:
             handler.startElement(u"entry", {})
             handler.addQuickElement(u"title", item['title'])
-            handler.addQuickElement(u"link", item['link'])
+            handler.addQuickElement(u"link", u"", {u"href": item['link']})
             if item['pubdate'] is not None:
-                handler.addQuickElement(u"updated", rfc2822_date(item['pubdate']).decode('ascii'))
+                handler.addQuickElement(u"updated", rfc3339_date(item['pubdate']).decode('ascii'))
 
             # Author information.
             if item['author_name'] is not None:
@@ -219,6 +227,8 @@ class Atom1Feed(SyndicationFeed):
                 handler.addQuickElement(u"name", item['author_name'])
                 if item['author_email'] is not None:
                     handler.addQuickElement(u"email", item['author_email'])
+                if item['author_link'] is not None:
+                    handler.addQuickElement(u"uri", item['author_link'])
                 handler.endElement(u"author")
 
             # Unique ID.
