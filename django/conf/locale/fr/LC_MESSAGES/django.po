@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2005-11-15 14:21+0100\n"
+"POT-Creation-Date: 2005-11-15 17:23+0100\n"
 "PO-Revision-Date: 2005-10-18 12:27+0200\n"
 "Last-Translator: Laurent Rahuel <laurent.rahuel@gmail.com>\n"
 "Language-Team: français <fr@li.org>\n"
@@ -105,7 +105,7 @@ msgstr "entrée de log"
 msgid "log entries"
 msgstr "entrées de log"
 
-#: contrib/admin/templatetags/admin_list.py:282
+#: contrib/admin/templatetags/admin_list.py:283
 msgid "All dates"
 msgstr ""
 
@@ -1078,8 +1078,8 @@ msgstr ""
 msgid "Simplified Chinese"
 msgstr ""
 
-#: core/formfields.py:59 core/meta/fields.py:287 core/meta/fields.py:475
-#: core/meta/fields.py:486
+#: core/formfields.py:59 core/meta/fields.py:287 core/meta/fields.py:482
+#: core/meta/fields.py:493
 #, fuzzy
 msgid "This field is required."
 msgstr "Ce champ est invalide."
@@ -1413,12 +1413,12 @@ msgstr ""
 "Maintenez \"Control\", or \"Command\" sur un Mac, pour en sélectionner plus "
 "d'une."
 
-#: core/meta/fields.py:495
+#: core/meta/fields.py:502
 #, fuzzy
 msgid "Enter a valid filename."
 msgstr "Entrez une adresse de courriel valide."
 
-#: core/meta/fields.py:764
+#: core/meta/fields.py:771
 #, python-format
 msgid "Please enter valid %(self)s IDs. The value %(value)r is invalid."
 msgid_plural ""

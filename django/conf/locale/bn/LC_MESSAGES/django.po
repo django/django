@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django CVS\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2005-11-15 14:21+0100\n"
+"POT-Creation-Date: 2005-11-15 17:23+0100\n"
 "PO-Revision-Date: 2005-11-12 20:05+0530\n"
 "Last-Translator: Baishampayan Ghose <b.ghose@gnu.org.in>\n"
 "Language-Team: Ankur Bangla <core@bengalinux.org>\n"
@@ -106,7 +106,7 @@ msgstr "কার্যবিবরণী এন্ট্রি"
 msgid "log entries"
 msgstr "কার্যবিবরণী এন্ট্রি সমুহ"
 
-#: contrib/admin/templatetags/admin_list.py:282
+#: contrib/admin/templatetags/admin_list.py:283
 msgid "All dates"
 msgstr ""
 
@@ -1065,8 +1065,8 @@ msgstr ""
 msgid "Simplified Chinese"
 msgstr "সরলীকৃত চীনা"
 
-#: core/formfields.py:59 core/meta/fields.py:287 core/meta/fields.py:475
-#: core/meta/fields.py:486
+#: core/formfields.py:59 core/meta/fields.py:287 core/meta/fields.py:482
+#: core/meta/fields.py:493
 #, fuzzy
 msgid "This field is required."
 msgstr "এই ক্ষেত্রেটি অবৈধ।"
@@ -1387,12 +1387,12 @@ msgstr ""
 "একের চেয়ে বেশি নির্বাচন করতে \"Control\" অথবা ম্যাক-এ \"Command\" চেপে ধরে "
 "রাখুন।"
 
-#: core/meta/fields.py:495
+#: core/meta/fields.py:502
 #, fuzzy
 msgid "Enter a valid filename."
 msgstr "একটি বৈধ ই-মেল ঠিকানা ঢোকান।"
 
-#: core/meta/fields.py:764
+#: core/meta/fields.py:771
 #, python-format
 msgid "Please enter valid %(self)s IDs. The value %(value)r is invalid."
 msgid_plural ""

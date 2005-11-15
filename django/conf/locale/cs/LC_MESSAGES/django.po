@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django Czech translation\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2005-11-15 14:21+0100\n"
+"POT-Creation-Date: 2005-11-15 17:23+0100\n"
 "PO-Revision-Date: 2005-10-31 19:42+0100\n"
 "Last-Translator: Radek Svarz <translate@svarz.cz>\n"
 "Language-Team: Czech\n"
@@ -109,7 +109,7 @@ msgstr "log záznam"
 msgid "log entries"
 msgstr "log záznamy"
 
-#: contrib/admin/templatetags/admin_list.py:282
+#: contrib/admin/templatetags/admin_list.py:283
 msgid "All dates"
 msgstr ""
 
@@ -1072,8 +1072,8 @@ msgstr ""
 msgid "Simplified Chinese"
 msgstr "Jednoduchá čínština"
 
-#: core/formfields.py:59 core/meta/fields.py:287 core/meta/fields.py:475
-#: core/meta/fields.py:486
+#: core/formfields.py:59 core/meta/fields.py:287 core/meta/fields.py:482
+#: core/meta/fields.py:493
 #, fuzzy
 msgid "This field is required."
 msgstr "Toto pole není platné."
@@ -1403,12 +1403,12 @@ msgstr ""
 "Podržte  \"Control\", nebo \"Command\" na Macu pro vybrání více jak jedné "
 "položky."
 
-#: core/meta/fields.py:495
+#: core/meta/fields.py:502
 #, fuzzy
 msgid "Enter a valid filename."
 msgstr "Vložte platnou e-mailovou adresu."
 
-#: core/meta/fields.py:764
+#: core/meta/fields.py:771
 #, python-format
 msgid "Please enter valid %(self)s IDs. The value %(value)r is invalid."
 msgid_plural ""
