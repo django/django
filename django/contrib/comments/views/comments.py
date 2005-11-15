@@ -21,7 +21,7 @@ class PublicCommentManipulator(AuthenticationForm):
         choices = [(c, c) for c in ratings_range]
         def get_validator_list(rating_num):
             if rating_num <= num_rating_choices:
-                return [validators.RequiredIfOtherFieldsGiven(['rating%d' % i for i in range(1, 9) if i != rating_num], "This rating is required because you've entered at least one other rating.")]
+                return [validators.RequiredIfOtherFieldsGiven(['rating%d' % i for i in range(1, 9) if i != rating_num], _("This rating is required because you've entered at least one other rating."))]
             else:
                 return []
         self.fields.extend([
@@ -105,11 +105,11 @@ class PublicCommentManipulator(AuthenticationForm):
         # If the commentor has posted fewer than COMMENTS_FIRST_FEW comments,
         # send the comment to the managers.
         if self.user_cache.get_comments_comment_count() <= COMMENTS_FIRST_FEW:
-            message = 'This comment was posted by a user who has posted fewer than %s comments:\n\n%s' % \
-                (COMMENTS_FIRST_FEW, c.get_as_text())
+            message = _('This comment was posted by a user who has posted fewer than %(count)s comments:\n\n%(text)s' % \
+                {'count': COMMENTS_FIRST_FEW, 'text': c.get_as_text()}
             mail_managers("Comment posted by rookie user", message)
         if COMMENTS_SKETCHY_USERS_GROUP and COMMENTS_SKETCHY_USERS_GROUP in [g.id for g in self.user_cache.get_group_list()]:
-            message = 'This comment was posted by a sketchy user:\n\n%s' % c.get_as_text()
+            message = _('This comment was posted by a sketchy user:\n\n%(text)s') % {'text': c.get_as_text()}
             mail_managers("Comment posted by sketchy user (%s)" % self.user_cache.username, c.get_as_text())
         return c
 
@@ -181,15 +181,15 @@ def post_comment(request):
             choice of ratings
     """
     if not request.POST:
-        raise Http404, "Only POSTs are allowed"
+        raise Http404, _("Only POSTs are allowed")
     try:
         options, target, security_hash = request.POST['options'], request.POST['target'], request.POST['gonzo']
     except KeyError:
-        raise Http404, "One or more of the required fields wasn't submitted"
+        raise Http404, _("One or more of the required fields wasn't submitted")
     photo_options = request.POST.get('photo_options', '')
     rating_options = normalize_newlines(request.POST.get('rating_options', ''))
     if comments.get_security_hash(options, photo_options, rating_options, target) != security_hash:
-        raise Http404, "Somebody tampered with the comment form (security violation)"
+        raise Http404, _("Somebody tampered with the comment form (security violation)")
     # Now we can be assured the data is valid.
     if rating_options:
         rating_range, rating_choices = comments.get_rating_options(base64.decodestring(rating_options))
@@ -199,7 +199,7 @@ def post_comment(request):
     try:
         obj = contenttypes.get_object(pk=content_type_id).get_object_for_this_type(pk=object_id)
     except ObjectDoesNotExist:
-        raise Http404, "The comment form had an invalid 'target' parameter -- the object ID was invalid"
+        raise Http404, _("The comment form had an invalid 'target' parameter -- the object ID was invalid")
     option_list = options.split(',') # options is something like 'pa,ra'
     new_data = request.POST.copy()
     new_data['content_type_id'] = content_type_id
@@ -249,7 +249,7 @@ def post_comment(request):
             comment = manipulator.save(new_data)
         return HttpResponseRedirect("/comments/posted/?c=%s:%s" % (content_type_id, object_id))
     else:
-        raise Http404, "The comment form didn't provide either 'preview' or 'post'"
+        raise Http404, _("The comment form didn't provide either 'preview' or 'post'")
 
 def post_free_comment(request):
     """
@@ -272,19 +272,19 @@ def post_free_comment(request):
             post a comment).
     """
     if not request.POST:
-        raise Http404, "Only POSTs are allowed"
+        raise Http404, _("Only POSTs are allowed")
     try:
         options, target, security_hash = request.POST['options'], request.POST['target'], request.POST['gonzo']
     except KeyError:
-        raise Http404, "One or more of the required fields wasn't submitted"
+        raise Http404, _("One or more of the required fields wasn't submitted")
     if comments.get_security_hash(options, '', '', target) != security_hash:
-        raise Http404, "Somebody tampered with the comment form (security violation)"
+        raise Http404, _("Somebody tampered with the comment form (security violation)")
     content_type_id, object_id = target.split(':') # target is something like '52:5157'
     content_type = contenttypes.get_object(pk=content_type_id)
     try:
         obj = content_type.get_object_for_this_type(pk=object_id)
     except ObjectDoesNotExist:
-        raise Http404, "The comment form had an invalid 'target' parameter -- the object ID was invalid"
+        raise Http404, _("The comment form had an invalid 'target' parameter -- the object ID was invalid")
     option_list = options.split(',')
     new_data = request.POST.copy()
     new_data['content_type_id'] = content_type_id
@@ -313,7 +313,7 @@ def post_free_comment(request):
             comment = manipulator.save(new_data)
         return HttpResponseRedirect("/comments/posted/?c=%s:%s" % (content_type_id, object_id))
     else:
-        raise Http404, "The comment form didn't provide either 'preview' or 'post'"
+        raise Http404, _("The comment form didn't provide either 'preview' or 'post'")
 
 def comment_was_posted(request):
     """

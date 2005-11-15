@@ -7,17 +7,18 @@ from django.models.core import contenttypes
 import re
 
 COMMENT_FORM = '''
+{% load i18n %}
 {% if display_form %}
 <form {% if photos_optional or photos_required %}enctype="multipart/form-data" {% endif %}action="/comments/post/" method="post">
 
 {% if user.is_anonymous %}
-<p>Username: <input type="text" name="username" id="id_username" /><br />Password: <input type="password" name="password" id="id_password" /> (<a href="/accounts/password_reset/">Forgotten your password?</a>)</p>
+<p>{% trans "Username:" %} <input type="text" name="username" id="id_username" /><br />{% trans "Password:" %} <input type="password" name="password" id="id_password" /> (<a href="/accounts/password_reset/">{% trans "Forgotten your password?" %}</a>)</p>
 {% else %}
-<p>Username: <strong>{{ user.username }}</strong> (<a href="/accounts/logout/">Log out</a>)</p>
+<p>{% trans "Username:" %} <strong>{{ user.username }}</strong> (<a href="/accounts/logout/">{% trans "Log out" %}</a>)</p>
 {% endif %}
 
 {% if ratings_optional or ratings_required %}
-<p>Ratings ({% if ratings_required %}Required{% else %}Optional{% endif %}):</p>
+<p>{% trans "Ratings" %} ({% if ratings_required %}{% trans "Required" %}{% else %}{% trans "Optional" %}{% endif %}):</p>
 <table>
 <tr><th>&nbsp;</th>{% for value in rating_range %}<th>{{ value }}</th>{% endfor %}</tr>
 {% for rating in rating_choices %}
@@ -28,7 +29,7 @@ COMMENT_FORM = '''
 {% endif %}
 
 {% if photos_optional or photos_required %}
-<p>Post a photo ({% if photos_required %}Required{% else %}Optional{% endif %}): <input type="file" name="photo" /></p>
+<p>{% trans "Post a photo" %} ({% if photos_required %}{% trans "Required" %}{% else %}{% trans "Optional" %}{% endif %}): <input type="file" name="photo" /></p>
 <input type="hidden" name="photo_options" value="{{ photo_options }}" />
 {% endif %}
 
@@ -37,7 +38,7 @@ COMMENT_FORM = '''
 <input type="hidden" name="options" value="{{ options }}" />
 <input type="hidden" name="target" value="{{ target }}" />
 <input type="hidden" name="gonzo" value="{{ hash }}" />
-<p><input type="submit" name="preview" value="Preview comment" /></p>
+<p><input type="submit" name="preview" value="{% trans "Preview comment" %}" /></p>
 </form>
 {% endif %}
 '''
@@ -45,12 +46,12 @@ COMMENT_FORM = '''
 FREE_COMMENT_FORM = '''
 {% if display_form %}
 <form action="/comments/postfree/" method="post">
-<p>Your name: <input type="text" id="id_person_name" name="person_name" /></p>
-<p>Comment:<br /><textarea name="comment" id="id_comment" rows="10" cols="60"></textarea></p>
+<p>{% trans "Your name:" %} <input type="text" id="id_person_name" name="person_name" /></p>
+<p>{% trans "Comment:" %}<br /><textarea name="comment" id="id_comment" rows="10" cols="60"></textarea></p>
 <input type="hidden" name="options" value="{{ options }}" />
 <input type="hidden" name="target" value="{{ target }}" />
 <input type="hidden" name="gonzo" value="{{ hash }}" />
-<p><input type="submit" name="preview" value="Preview comment" /></p>
+<p><input type="submit" name="preview" value="{% trans "Preview comment" %}" /></p>
 </form>
 {% endif %}
 '''
