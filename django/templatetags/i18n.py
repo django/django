@@ -163,6 +163,23 @@ def do_translate(parser, token):
 
 def do_block_translate(parser, token):
     """
+    This will translate a block of text with parameters.
+
+    Format is like this::
+
+        {% blocktrans with foo|filter as bar and baz|filter as boo %}
+        This is {{ bar }} and {{ boo }}.
+        {% endblocktrans %}
+
+    Additionally this supports pluralization::
+
+        {% blocktrans count var|length as count %}
+        There is {{ count }} object.
+        {% plural %}
+        There are {{ count }} objects.
+        {% endblocktrans %}
+
+    This is much like ngettext, only in template syntax.
     """
     class BlockTranslateParser(TokenParser):
 
