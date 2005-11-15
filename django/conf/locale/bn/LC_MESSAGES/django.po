@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django CVS\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2005-11-13 13:41-0600\n"
+"POT-Creation-Date: 2005-11-15 12:41-0600\n"
 "PO-Revision-Date: 2005-11-12 20:05+0530\n"
 "Last-Translator: Baishampayan Ghose <b.ghose@gnu.org.in>\n"
 "Language-Team: Ankur Bangla <core@bengalinux.org>\n"
@@ -658,7 +658,7 @@ msgstr "ব্যক্তিগত তথ্য"
 msgid "Important dates"
 msgstr "গুরুত্বপূর্ণ তারিখ"
 
-#: models/auth.py:182
+#: models/auth.py:195
 msgid "Message"
 msgstr "বার্তা"
 
@@ -675,62 +675,67 @@ msgid "Welsh"
 msgstr "ওয়েল্শ"
 
 #: conf/global_settings.py:39
+#, fuzzy
+msgid "Danish"
+msgstr "স্প্যানিশ"
+
+#: conf/global_settings.py:40
 msgid "German"
 msgstr "জার্মান"
 
-#: conf/global_settings.py:40
+#: conf/global_settings.py:41
 msgid "English"
 msgstr "ইংরেজী"
 
-#: conf/global_settings.py:41
+#: conf/global_settings.py:42
 msgid "Spanish"
 msgstr "স্প্যানিশ"
 
-#: conf/global_settings.py:42
+#: conf/global_settings.py:43
 msgid "French"
 msgstr "ফরাসী"
 
-#: conf/global_settings.py:43
+#: conf/global_settings.py:44
 msgid "Galician"
 msgstr "গ্যালিসিয়"
 
-#: conf/global_settings.py:44
+#: conf/global_settings.py:45
 msgid "Icelandic"
 msgstr ""
 
-#: conf/global_settings.py:45
+#: conf/global_settings.py:46
 msgid "Italian"
 msgstr "ইতালিয়"
 
-#: conf/global_settings.py:46
+#: conf/global_settings.py:47
 msgid "Norwegian"
 msgstr "নরওয়েজিয়"
 
-#: conf/global_settings.py:47
+#: conf/global_settings.py:48
 msgid "Brazilian"
 msgstr "ব্রাজিলীয়"
 
-#: conf/global_settings.py:48
+#: conf/global_settings.py:49
 msgid "Romanian"
 msgstr "রোমানীয়"
 
-#: conf/global_settings.py:49
+#: conf/global_settings.py:50
 msgid "Russian"
 msgstr "রুশ"
 
-#: conf/global_settings.py:50
+#: conf/global_settings.py:51
 msgid "Slovak"
 msgstr "স্লোভাক"
 
-#: conf/global_settings.py:51
+#: conf/global_settings.py:52
 msgid "Serbian"
 msgstr "সার্বিয়ান"
 
-#: conf/global_settings.py:52
+#: conf/global_settings.py:53
 msgid "Swedish"
 msgstr ""
 
-#: conf/global_settings.py:53
+#: conf/global_settings.py:54
 msgid "Simplified Chinese"
 msgstr "সরলীকৃত চীনা"
 

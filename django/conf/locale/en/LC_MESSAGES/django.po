@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2005-11-13 13:40-0600\n"
+"POT-Creation-Date: 2005-11-15 12:40-0600\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -636,7 +636,7 @@ msgstr ""
 msgid "Important dates"
 msgstr ""
 
-#: models/auth.py:182
+#: models/auth.py:195
 msgid "Message"
 msgstr ""
 
@@ -653,62 +653,66 @@ msgid "Welsh"
 msgstr ""
 
 #: conf/global_settings.py:39
-msgid "German"
+msgid "Danish"
 msgstr ""
 
 #: conf/global_settings.py:40
-msgid "English"
+msgid "German"
 msgstr ""
 
 #: conf/global_settings.py:41
-msgid "Spanish"
+msgid "English"
 msgstr ""
 
 #: conf/global_settings.py:42
-msgid "French"
+msgid "Spanish"
 msgstr ""
 
 #: conf/global_settings.py:43
-msgid "Galician"
+msgid "French"
 msgstr ""
 
 #: conf/global_settings.py:44
-msgid "Icelandic"
+msgid "Galician"
 msgstr ""
 
 #: conf/global_settings.py:45
-msgid "Italian"
+msgid "Icelandic"
 msgstr ""
 
 #: conf/global_settings.py:46
-msgid "Norwegian"
+msgid "Italian"
 msgstr ""
 
 #: conf/global_settings.py:47
-msgid "Brazilian"
+msgid "Norwegian"
 msgstr ""
 
 #: conf/global_settings.py:48
-msgid "Romanian"
+msgid "Brazilian"
 msgstr ""
 
 #: conf/global_settings.py:49
-msgid "Russian"
+msgid "Romanian"
 msgstr ""
 
 #: conf/global_settings.py:50
-msgid "Slovak"
+msgid "Russian"
 msgstr ""
 
 #: conf/global_settings.py:51
-msgid "Serbian"
+msgid "Slovak"
 msgstr ""
 
 #: conf/global_settings.py:52
-msgid "Swedish"
+msgid "Serbian"
 msgstr ""
 
 #: conf/global_settings.py:53
+msgid "Swedish"
+msgstr ""
+
+#: conf/global_settings.py:54
 msgid "Simplified Chinese"
 msgstr ""
 

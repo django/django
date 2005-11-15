@@ -1,48 +1,48 @@
 # SOME DESCRIPTIVE TITLE.
-# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# Copyright (C) 2005 and beyond
 # This file is distributed under the same license as the PACKAGE package.
-# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+# Morten Bagai <m@bagai.com>, Nov 2005.
 #
-#, fuzzy
+#
 msgid ""
 msgstr ""
-"Project-Id-Version: django\n"
+"Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2005-11-15 12:40-0600\n"
-"PO-Revision-Date: 2005-10-11 09:12GMT-3\n"
-"Last-Translator: João Paulo Farias <jpaulofarias@gmail.com>\n"
-"Language-Team: Português do Brasil <pt-br@li.org>\n"
+"POT-Creation-Date: 2005-11-15 12:41-0600\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: Morten Bagai <m@bagai.com>\n"
+"Language-Team: Danish\n"
 "MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
 #: contrib/admin/models/admin.py:6
 msgid "action time"
-msgstr "hora da ação"
+msgstr "handlingstid"
 
 #: contrib/admin/models/admin.py:9
 msgid "object id"
-msgstr "id do objeto"
+msgstr "objekt id"
 
 #: contrib/admin/models/admin.py:10
 msgid "object repr"
-msgstr "repr do objeto"
+msgstr "objekt repr"
 
 #: contrib/admin/models/admin.py:11
 msgid "action flag"
-msgstr "flag de ação"
+msgstr "handlingsflag"
 
 #: contrib/admin/models/admin.py:12
 msgid "change message"
-msgstr "alterar mensagem"
+msgstr "ændringsmeddelelse"
 
 #: contrib/admin/models/admin.py:15
 msgid "log entry"
-msgstr "entrada de log"
+msgstr "logmeddelelse"
 
 #: contrib/admin/models/admin.py:16
 msgid "log entries"
-msgstr "entradas de log"
+msgstr "logmeddelelser"
 
 #: contrib/admin/templates/admin/object_history.html:5
 #: contrib/admin/templates/admin/500.html:4
@@ -53,136 +53,134 @@ msgstr "entradas de log"
 #: contrib/admin/templates/registration/password_reset_done.html:4
 #: contrib/admin/templates/registration/password_change_form.html:4
 msgid "Home"
-msgstr "Início"
+msgstr "Hjem"
 
 #: contrib/admin/templates/admin/object_history.html:5
 msgid "History"
-msgstr "Histórico"
+msgstr "Historik"
 
 #: contrib/admin/templates/admin/object_history.html:18
 msgid "Date/time"
-msgstr "Data/hora"
+msgstr "Dato/tid"
 
 #: contrib/admin/templates/admin/object_history.html:19 models/auth.py:47
 msgid "User"
-msgstr "Usuário"
+msgstr "Bruger"
 
 #: contrib/admin/templates/admin/object_history.html:20
 msgid "Action"
-msgstr "Ação"
+msgstr "Funktion"
 
 #: contrib/admin/templates/admin/object_history.html:26
 msgid "DATE_WITH_TIME_FULL"
-msgstr "j. N Y, H:i"
+msgstr "N j, Y, P"
 
 #: contrib/admin/templates/admin/object_history.html:36
 msgid ""
 "This object doesn't have a change history. It probably wasn't added via this "
 "admin site."
 msgstr ""
-"Este objeto não tem um histórico de alterações. Ele provavelmente não foi "
-"adicionado por este site de administração."
+"Dette objekt har ingen ændringshistorik. Det blev formentlig ikke tilføjet "
+"via dette administrations-site"
 
 #: contrib/admin/templates/admin/base_site.html:4
 msgid "Django site admin"
-msgstr "Site de administração do Django"
+msgstr "Django site administration"
 
 #: contrib/admin/templates/admin/base_site.html:7
 msgid "Django administration"
-msgstr "Administração do Django"
+msgstr "Django administration"
 
 #: contrib/admin/templates/admin/500.html:4
-#, fuzzy
 msgid "Server error"
-msgstr "Erro no servidor (500)"
+msgstr "Serverfejl"
 
 #: contrib/admin/templates/admin/500.html:6
 msgid "Server error (500)"
-msgstr "Erro no servidor (500)"
+msgstr "Serverfejl (500)"
 
 #: contrib/admin/templates/admin/500.html:9
 msgid "Server Error <em>(500)</em>"
-msgstr "Erro no Servidor <em>(500)</em>"
+msgstr "Serverfejl <em>(500)</em>"
 
 #: contrib/admin/templates/admin/500.html:10
 msgid ""
 "There's been an error. It's been reported to the site administrators via e-"
 "mail and should be fixed shortly. Thanks for your patience."
 msgstr ""
-"Houve um erro. Este foi reportado aos administradores do site através d e-"
-"mail e deve ser consertado em breve. Obrigado pela compreensão."
+"Der opstod en fejl. Fejlen er rapporteret til site-administratoren via e-"
+"mail, og vil blive rettet hurtigst muligt. Tak for din tålmodighed."
 
 #: contrib/admin/templates/admin/404.html:4
 #: contrib/admin/templates/admin/404.html:8
 msgid "Page not found"
-msgstr "Página não encontrada"
+msgstr "Siden blev ikke fundet"
 
 #: contrib/admin/templates/admin/404.html:10
 msgid "We're sorry, but the requested page could not be found."
-msgstr "Desculpe, mas a página requisitada não pode ser encontrada."
+msgstr "Vi Beklager, men den ønskede side kunne ikke findes"
 
 #: contrib/admin/templates/admin/index.html:27
 msgid "Add"
-msgstr "Adicionar"
+msgstr "Tilføj"
 
 #: contrib/admin/templates/admin/index.html:33
 msgid "Change"
-msgstr "Modificar"
+msgstr "Ændre"
 
 #: contrib/admin/templates/admin/index.html:43
 msgid "You don't have permission to edit anything."
-msgstr "Você não tem permissão para edição."
+msgstr "Du har ikke rettigehed til at foretage ændringer"
 
 #: contrib/admin/templates/admin/index.html:51
 msgid "Recent Actions"
-msgstr "Ações Recentes"
+msgstr "Seneste handlinger"
 
 #: contrib/admin/templates/admin/index.html:52
 msgid "My Actions"
-msgstr "Minhas Ações"
+msgstr "Mine handlinger"
 
 #: contrib/admin/templates/admin/index.html:56
 msgid "None available"
-msgstr "Nenhuma disponível"
+msgstr "Ingen tilgængelige"
 
 #: contrib/admin/templates/admin/login.html:15
 msgid "Username:"
-msgstr "Usuário:"
+msgstr "Brugernavn:"
 
 #: contrib/admin/templates/admin/login.html:18
 msgid "Password:"
-msgstr "Senha:"
+msgstr "Adgangskode:"
 
 #: contrib/admin/templates/admin/login.html:20
 msgid "Have you <a href=\"/password_reset/\">forgotten your password</a>?"
-msgstr "Você <a href=\"/password_reset/\"esqueceu a senha</a>?"
+msgstr "Har du <a href=\"/password_reset/\">glemt din adgangskode</a>?"
 
 #: contrib/admin/templates/admin/login.html:24
 msgid "Log in"
-msgstr "Acessar"
+msgstr "Log ind"
 
 #: contrib/admin/templates/admin/base.html:23
 msgid "Welcome,"
-msgstr "Bem vindo,"
+msgstr "Velkommen"
 
 #: contrib/admin/templates/admin/base.html:23
 msgid "Change password"
-msgstr "Alterar senha"
+msgstr "Ændre adgangskode"
 
 #: contrib/admin/templates/admin/base.html:23
 msgid "Log out"
-msgstr "Encerrar sessão"
+msgstr "Log ud"
 
 #: contrib/admin/templates/admin/delete_confirmation.html:7
-#, fuzzy, python-format
+#, python-format
 msgid ""
 "Deleting the %(object_name)s '%(object)s' would result in deleting related "
 "objects, but your account doesn't have permission to delete the following "
 "types of objects:"
 msgstr ""
-"A remoção de '%(object)s' %(object_name)s pode resultar na remoção de "
-"objetos relacionados, mas sua conta não tem a permissão para remoção dos "
-"seguintes tipos de objetos:"
+"Hvis du sletter %(object_name)s '%(object)s' vil du også slette relaterede "
+"objekter, men du har ikke rettigheder til at slette flg. typer objekter:"
 
 #: contrib/admin/templates/admin/delete_confirmation.html:14
 #, python-format
@@ -190,183 +188,187 @@ msgid ""
 "Are you sure you want to delete the %(object_name)s \"%(object)s\"? All of "
 "the following related items will be deleted:"
 msgstr ""
-"Você tem certeza que quer remover o \"%(object)s\" %(object_name)s? Todos os "
-"seguintes itens relacionados serão removidos:"
+"Er du sikker på at du vil slette %(object_name) \"%(object)s\"? Alle de "
+"følgende relaterede objekter vil blive slettet:"
 
 #: contrib/admin/templates/admin/delete_confirmation.html:18
 msgid "Yes, I'm sure"
-msgstr "Sim, tenho certeza"
+msgstr "Ja, jeg er sikker"
 
 #: contrib/admin/templates/registration/password_change_done.html:4
 #: contrib/admin/templates/registration/password_change_form.html:4
 #: contrib/admin/templates/registration/password_change_form.html:6
 #: contrib/admin/templates/registration/password_change_form.html:10
 msgid "Password change"
-msgstr "Alterar senha"
+msgstr "Ændre passord"
 
 #: contrib/admin/templates/registration/password_change_done.html:6
 #: contrib/admin/templates/registration/password_change_done.html:10
 msgid "Password change successful"
-msgstr "Senha alterada com sucesso"
+msgstr "Adgangskoden er ændret"
 
 #: contrib/admin/templates/registration/password_change_done.html:12
 msgid "Your password was changed."
-msgstr "Sua senha foi alterada."
+msgstr "Din adgangskode er ændret"
 
 #: contrib/admin/templates/registration/password_reset_form.html:4
 #: contrib/admin/templates/registration/password_reset_form.html:6
 #: contrib/admin/templates/registration/password_reset_done.html:4
 msgid "Password reset"
-msgstr "Reinicializar senha"
+msgstr "Nulstil adgangskode"
 
 #: contrib/admin/templates/registration/password_reset_form.html:12
 msgid ""
 "Forgotten your password? Enter your e-mail address below, and we'll reset "
 "your password and e-mail the new one to you."
 msgstr ""
-"Esqueceu a senha? Digite seu e-mail abaixo e nós iremos enviar uma nova "
-"senha para você."
+"Har din adgangskode? Indtast din email-adresse nedenfor, så sender vi dig en "
+"ny kode via e-mail"
 
 #: contrib/admin/templates/registration/password_reset_form.html:16
 msgid "E-mail address:"
-msgstr "Endereço de e-mail:"
+msgstr "E-mail adresse:"
 
 #: contrib/admin/templates/registration/password_reset_form.html:16
 msgid "Reset my password"
-msgstr "Reinicializar minha senha"
+msgstr "Nulstil min adgangskode"
 
 #: contrib/admin/templates/registration/logged_out.html:8
 msgid "Thanks for spending some quality time with the Web site today."
-msgstr "Obrigado por visitar nosso Web site hoje."
+msgstr "Tak for den tid du brugte på sitet idag"
 
 #: contrib/admin/templates/registration/logged_out.html:10
 msgid "Log in again"
-msgstr "Acessar novamente"
+msgstr "Log ind igen"
 
 #: contrib/admin/templates/registration/password_reset_done.html:6
 #: contrib/admin/templates/registration/password_reset_done.html:10
 msgid "Password reset successful"
-msgstr "Senha inicializada com sucesso"
+msgstr "Adgangskoden blev nulstillet"
 
 #: contrib/admin/templates/registration/password_reset_done.html:12
 msgid ""
 "We've e-mailed a new password to the e-mail address you submitted. You "
 "should be receiving it shortly."
 msgstr ""
-"Nós enviamos uma nova senha para o e-mail que você informou. Você deve estar "
-"recebendo uma mensagem em breve."
+"Vi har e-mailet en ny adgangskode til dig. Du skulle modtage den om ganske "
+"kort tid."
 
 #: contrib/admin/templates/registration/password_change_form.html:12
 msgid ""
 "Please enter your old password, for security's sake, and then enter your new "
 "password twice so we can verify you typed it in correctly."
 msgstr ""
-"Por favor, informe sua senha antiga, por segurança, e então informe sua nova "
-"senha duas vezes para que possamos verificar que se ela está correta."
+"Indtast venligst din gamle adgangskode af sikkerhedsgrunde, og indtast så "
+"dit nye password to gange, så vi kan være sikre på, at det er indtastet "
+"korrekt"
 
 #: contrib/admin/templates/registration/password_change_form.html:17
 msgid "Old password:"
-msgstr "Senha antiga:"
+msgstr "Gammel adgangskode:"
 
 #: contrib/admin/templates/registration/password_change_form.html:19
 msgid "New password:"
-msgstr "Nova senha:"
+msgstr "Ny adgangskode:"
 
 #: contrib/admin/templates/registration/password_change_form.html:21
 msgid "Confirm password:"
-msgstr "Confirme a senha:"
+msgstr "Bekræft ny adgangskode:"
 
 #: contrib/admin/templates/registration/password_change_form.html:23
 msgid "Change my password"
-msgstr "Alterar minha senha"
+msgstr "Ændre adgangskode"
 
 #: contrib/admin/templates/registration/password_reset_email.html:2
 msgid "You're receiving this e-mail because you requested a password reset"
-msgstr "Você está recebendo este e-mail porque você pediu uma nova senha"
+msgstr ""
+"Du modtager denne e-mail, fordi du har bedt om at få nulstillet dit password"
 
 #: contrib/admin/templates/registration/password_reset_email.html:3
 #, python-format
 msgid "for your user account at %(site_name)s"
-msgstr "para sua conta em %(site_name)s"
+msgstr "for din konto hos %(site_name)s"
 
 #: contrib/admin/templates/registration/password_reset_email.html:5
 #, python-format
 msgid "Your new password is: %(new_password)s"
-msgstr "Sua nova senha é: %(new_password)s"
+msgstr "Din nye adgangskode er: %(new_password)s"
 
 #: contrib/admin/templates/registration/password_reset_email.html:7
 msgid "Feel free to change this password by going to this page:"
-msgstr "Sinta-se livre para alterar esta senha visitando esta página:"
+msgstr "Du kan ændre din adgangskode ved at gå til denne side"
 
 #: contrib/admin/templates/registration/password_reset_email.html:11
 msgid "Your username, in case you've forgotten:"
-msgstr "Seu nome de usuário, caso tenha esquecido:"
+msgstr "I det tilfælde, at du har glemt dit brugernavn er det:"
 
 #: contrib/admin/templates/registration/password_reset_email.html:13
 msgid "Thanks for using our site!"
-msgstr "Obrigado por usar nosso site!"
+msgstr "Tak, fordi du brugte vores site!"
 
 #: contrib/admin/templates/registration/password_reset_email.html:15
 #, python-format
 msgid "The %(site_name)s team"
-msgstr "Time do %(site_name)s"
+msgstr "Med venlig hilsen %(site_name)s"
 
 #: contrib/redirects/models/redirects.py:7
 msgid "redirect from"
-msgstr "redirecionar de"
+msgstr "omadresser fra"
 
 #: contrib/redirects/models/redirects.py:8
 msgid ""
 "This should be an absolute path, excluding the domain name. Example: '/"
 "events/search/'."
 msgstr ""
-"Deve conter um caminho absoluto, excluindo o nome de domínio. Exemplo: '/"
-"eventos/busca/'."
+"Dette skal være en absolut sti uden domænenavnet. For eksempel: '/nyheder/"
+"find/"
 
 #: contrib/redirects/models/redirects.py:9
 msgid "redirect to"
-msgstr "redirecionar para"
+msgstr "omadresser til"
 
 #: contrib/redirects/models/redirects.py:10
 msgid ""
 "This can be either an absolute path (as above) or a full URL starting with "
 "'http://'."
 msgstr ""
-"Deve conter um caminho absoluto (como acima) ou uma URL completa, começando "
-"com 'http://'."
+"Dette kan enten være en absolut sti (som over), eller en komplet URL "
+"startende med 'http://'"
 
 #: contrib/redirects/models/redirects.py:12
 msgid "redirect"
-msgstr "redirecionar"
+msgstr "omadressering"
 
 #: contrib/redirects/models/redirects.py:13
 msgid "redirects"
-msgstr "redirecionamentos"
+msgstr "omaddresseringer"
 
 #: contrib/flatpages/models/flatpages.py:6
 msgid "URL"
-msgstr "URL"
+msgstr "Internetadresse"
 
 #: contrib/flatpages/models/flatpages.py:7
 msgid ""
 "Example: '/about/contact/'. Make sure to have leading and trailing slashes."
-msgstr "Exemplo: '/sobre/contato/'. Lembre-se das barras no começo e no final."
+msgstr ""
+"Eksempel: '/om/kontakt/'. Vær sikker på at du har en skråstreg foran og og "
+"bagefter."
 
 #: contrib/flatpages/models/flatpages.py:8
 msgid "title"
-msgstr "título"
+msgstr "titel"
 
 #: contrib/flatpages/models/flatpages.py:9
 msgid "content"
-msgstr "conteúdo"
+msgstr "indhold"
 
 #: contrib/flatpages/models/flatpages.py:10
 msgid "enable comments"
-msgstr "habilitar comentários"
+msgstr "tillad kommentarer"
 
 #: contrib/flatpages/models/flatpages.py:11
 msgid "template name"
-msgstr "nome do modelo"
+msgstr "skabelonnavn"
 
 #: contrib/flatpages/models/flatpages.py:12
 #, fuzzy
@@ -374,24 +376,26 @@ msgid ""
 "Example: 'flatpages/contact_page'. If this isn't provided, the system will "
 "use 'flatpages/default'."
 msgstr ""
-"Exemplo: 'flatfiles/contact_page'. Se não for informado, será utilizado "
-"'flatfiles/default'."
+"Eksempel: 'fladesider/kontakt_side'. Vist denne ikke denne er gitt, vill "
+"'flatfiles/default' bli brukt."
 
 #: contrib/flatpages/models/flatpages.py:13
 msgid "registration required"
-msgstr "é obrigatório registrar"
+msgstr "registrering kreves"
 
 #: contrib/flatpages/models/flatpages.py:13
 msgid "If this is checked, only logged-in users will be able to view the page."
-msgstr "Se estiver marcado, apenas usuários conectados poderão ver a página."
+msgstr ""
+"Hvis denne box er krydset af, vil kun brugere, der er logget ind, kunne se "
+"siden."
 
 #: contrib/flatpages/models/flatpages.py:17
 msgid "flat page"
-msgstr "página plana"
+msgstr "flad side"
 
 #: contrib/flatpages/models/flatpages.py:18
 msgid "flat pages"
-msgstr "páginas planas"
+msgstr "flade sider"
 
 #: utils/translation.py:335
 msgid "DATE_FORMAT"
@@ -407,79 +411,79 @@ msgstr ""
 
 #: utils/dates.py:6
 msgid "Monday"
-msgstr "Segunda Feira"
+msgstr "Mandag"
 
 #: utils/dates.py:6
 msgid "Tuesday"
-msgstr "Terça Feira"
+msgstr "Tirsdag"
 
 #: utils/dates.py:6
 msgid "Wednesday"
-msgstr "Quarta Feira"
+msgstr "Onsdag"
 
 #: utils/dates.py:6
 msgid "Thursday"
-msgstr "Quinta Feira"
+msgstr "Torsdag"
 
 #: utils/dates.py:6
 msgid "Friday"
-msgstr "Sexta Feira"
+msgstr "Fredag"
 
 #: utils/dates.py:7
 msgid "Saturday"
-msgstr "Sábado"
+msgstr "Lørdag"
 
 #: utils/dates.py:7
 msgid "Sunday"
-msgstr "Domingo"
+msgstr "Søndag"
 
 #: utils/dates.py:14
 msgid "January"
-msgstr "Janeiro"
+msgstr "Januar"
 
 #: utils/dates.py:14
 msgid "February"
-msgstr "Fevereiro"
+msgstr "Februar"
 
 #: utils/dates.py:14 utils/dates.py:27
 msgid "March"
-msgstr "Março"
+msgstr "Marts"
 
 #: utils/dates.py:14 utils/dates.py:27
 msgid "April"
-msgstr "Abril"
+msgstr "April"
 
 #: utils/dates.py:14 utils/dates.py:27
 msgid "May"
-msgstr "Maio"
+msgstr "Maj"
 
 #: utils/dates.py:14 utils/dates.py:27
 msgid "June"
-msgstr "Junho"
+msgstr "Juni"
 
 #: utils/dates.py:15 utils/dates.py:27
 msgid "July"
-msgstr "Julho"
+msgstr "Juli"
 
 #: utils/dates.py:15
 msgid "August"
-msgstr "Agosto"
+msgstr "August"
 
 #: utils/dates.py:15
 msgid "September"
-msgstr "Setembro"
+msgstr "September"
 
 #: utils/dates.py:15
 msgid "October"
-msgstr "Outubro"
+msgstr "Oktober"
 
 #: utils/dates.py:15
 msgid "November"
-msgstr "Novembro"
+msgstr "November"
 
 #: utils/dates.py:16
 msgid "December"
-msgstr "Dezembro"
+msgstr "December"
 
 #: utils/dates.py:27
 msgid "Jan."
@@ -487,19 +491,19 @@ msgstr "Jan."
 
 #: utils/dates.py:27
 msgid "Feb."
-msgstr "Fev."
+msgstr "Feb."
 
 #: utils/dates.py:28
 msgid "Aug."
-msgstr "Ago."
+msgstr "Aug."
 
 #: utils/dates.py:28
 msgid "Sept."
-msgstr "Set."
+msgstr "Sept."
 
 #: utils/dates.py:28
 msgid "Oct."
-msgstr "Out."
+msgstr "Okt."
 
 #: utils/dates.py:28
 msgid "Nov."
@@ -507,168 +511,163 @@ msgstr "Nov."
 
 #: utils/dates.py:28
 msgid "Dec."
-msgstr "Dez."
+msgstr "Dec."
 
 #: models/core.py:7
 msgid "domain name"
-msgstr "nome do domínio"
+msgstr "domænenavn"
 
 #: models/core.py:8
 msgid "display name"
-msgstr "nome para exibição"
+msgstr "vist navn"
 
 #: models/core.py:10
 msgid "site"
-msgstr "site"
+msgstr "side"
 
 #: models/core.py:11
 msgid "sites"
-msgstr "sites"
+msgstr "sider"
 
 #: models/core.py:28
 msgid "label"
-msgstr "etiqueta"
+msgstr "mærkat"
 
 #: models/core.py:29 models/core.py:40 models/auth.py:6 models/auth.py:19
-#, fuzzy
 msgid "name"
-msgstr "nome:"
+msgstr "navn"
 
 #: models/core.py:31
 msgid "package"
-msgstr "pacote"
+msgstr "pakke"
 
 #: models/core.py:32
 msgid "packages"
-msgstr "pacotes"
+msgstr "pakker"
 
 #: models/core.py:42
 msgid "python module name"
-msgstr "nome do módulo python"
+msgstr "python modulnavn"
 
 #: models/core.py:44
 msgid "content type"
-msgstr "tipo de conteúdo"
+msgstr "indholdstype"
 
 #: models/core.py:45
 msgid "content types"
-msgstr "tipos de conteúdo"
+msgstr "indholdstyper"
 
 #: models/core.py:67
 msgid "session key"
-msgstr "chave da sessão"
+msgstr "sessionsnøgle"
 
 #: models/core.py:68
 msgid "session data"
-msgstr "dados da sessão"
+msgstr "sessionsdata"
 
 #: models/core.py:69
 msgid "expire date"
-msgstr "data de expiração"
+msgstr "udløbsdato"
 
 #: models/core.py:71
 msgid "session"
-msgstr "sessão"
+msgstr "session"
 
 #: models/core.py:72
 msgid "sessions"
-msgstr "sessões"
+msgstr "sessioner"
 
 #: models/auth.py:8
 msgid "codename"
-msgstr "nome código"
+msgstr "kodenavn"
 
 #: models/auth.py:10
 msgid "Permission"
-msgstr "Permissão"
+msgstr "Rettighed"
 
 #: models/auth.py:11 models/auth.py:58
 msgid "Permissions"
-msgstr "Permissões"
+msgstr "Rettigheder"
 
 #: models/auth.py:22
 msgid "Group"
-msgstr "Grupo"
+msgstr "Gruppe"
 
 #: models/auth.py:23 models/auth.py:60
 msgid "Groups"
-msgstr "Grupos"
+msgstr "Grupper"
 
 #: models/auth.py:33
-#, fuzzy
 msgid "username"
-msgstr "usuário"
+msgstr "brugernavn"
 
 #: models/auth.py:34
 msgid "first name"
-msgstr "primeiro nome"
+msgstr "fornavn"
 
 #: models/auth.py:35
 msgid "last name"
-msgstr "último nome"
+msgstr "efternavn"
 
 #: models/auth.py:36
-#, fuzzy
 msgid "e-mail address"
-msgstr "endereço de e-mail:"
+msgstr "e-mail adresse"
 
 #: models/auth.py:37
-#, fuzzy
 msgid "password"
-msgstr "senha"
+msgstr "adgangskode"
 
 #: models/auth.py:37
 msgid "Use an MD5 hash -- not the raw password."
-msgstr "Usar um código MD5 -- não o texto da senha."
+msgstr "Brug et MD5 hash -- ikke adgangskoden i klartekst"
 
 #: models/auth.py:38
 msgid "staff status"
-msgstr "status da equipe"
+msgstr "administrationsstatus"
 
 #: models/auth.py:38
 msgid "Designates whether the user can log into this admin site."
-msgstr "Informa se o usuário pode acessar este site de administração."
+msgstr "Bestemmer om brugeren kan logge ind på dette administrationssite"
 
 #: models/auth.py:39
 msgid "active"
-msgstr "ativar"
+msgstr "aktiv"
 
 #: models/auth.py:40
 msgid "superuser status"
-msgstr "status de superusuário"
+msgstr "superbruger"
 
 #: models/auth.py:41
 msgid "last login"
-msgstr "último login"
+msgstr "sidst logget ind"
 
 #: models/auth.py:42
 msgid "date joined"
-msgstr "data de registro"
+msgstr "registreringsdato"
 
 #: models/auth.py:44
 msgid ""
 "In addition to the permissions manually assigned, this user will also get "
 "all permissions granted to each group he/she is in."
 msgstr ""
-"Em adição às permissões atribuídas manualmente, este usuário também terá "
-"todas as permissões dadas a cada grupo que participar."
+"I tillæg til de rettighder, som manuelt er tildelt brugeren, vil denne også "
+"få alle rettigheder tildelt hver gruppe han/hun er medlem af"
 
 #: models/auth.py:48
-#, fuzzy
 msgid "Users"
-msgstr "Usuários"
+msgstr "Brugere"
 
 #: models/auth.py:57
 msgid "Personal info"
-msgstr "Informações pessoais"
+msgstr "Personlig information"
 
 #: models/auth.py:59
 msgid "Important dates"
-msgstr "Datas importantes"
+msgstr "Vigtige datoer"
 
 #: models/auth.py:195
 msgid "Message"
-msgstr "Mensagem"
+msgstr "Meddelelse"
 
 #: conf/global_settings.py:36
 msgid "Bengali"
@@ -676,169 +675,169 @@ msgstr ""
 
 #: conf/global_settings.py:37
 msgid "Czech"
-msgstr "Tcheco"
+msgstr "Tjekkisk"
 
 #: conf/global_settings.py:38
 msgid "Welsh"
-msgstr ""
+msgstr "Walisisk"
 
 #: conf/global_settings.py:39
 #, fuzzy
 msgid "Danish"
-msgstr "Espanhol"
+msgstr "Spansk"
 
 #: conf/global_settings.py:40
 msgid "German"
-msgstr "Alemão"
+msgstr "Tysk"
 
 #: conf/global_settings.py:41
 msgid "English"
-msgstr "Inglês"
+msgstr "Engelsk"
 
 #: conf/global_settings.py:42
 msgid "Spanish"
-msgstr "Espanhol"
+msgstr "Spansk"
 
 #: conf/global_settings.py:43
 msgid "French"
-msgstr "Francês"
+msgstr "Fransk"
 
 #: conf/global_settings.py:44
 msgid "Galician"
-msgstr "Galiciano"
+msgstr "Galicisk"
 
 #: conf/global_settings.py:45
 msgid "Icelandic"
-msgstr ""
+msgstr "Islandsk"
 
 #: conf/global_settings.py:46
 msgid "Italian"
-msgstr "Italiano"
+msgstr "Italiensk"
 
 #: conf/global_settings.py:47
 msgid "Norwegian"
-msgstr ""
+msgstr "Norsk"
 
 #: conf/global_settings.py:48
 msgid "Brazilian"
-msgstr "Brazileiro"
+msgstr "Brasiliansk"
 
 #: conf/global_settings.py:49
 msgid "Romanian"
-msgstr ""
+msgstr "Rumænsk"
 
 #: conf/global_settings.py:50
 msgid "Russian"
-msgstr "Russo"
+msgstr "Russisk"
 
 #: conf/global_settings.py:51
 msgid "Slovak"
-msgstr ""
+msgstr "Slovakisk"
 
 #: conf/global_settings.py:52
-#, fuzzy
 msgid "Serbian"
-msgstr "Sérvio"
+msgstr "Serbisk"
 
 #: conf/global_settings.py:53
 msgid "Swedish"
-msgstr ""
+msgstr "Svensk"
 
 #: conf/global_settings.py:54
 msgid "Simplified Chinese"
-msgstr ""
+msgstr "Simpel Kinesisk"
 
 #: core/validators.py:59
 msgid "This value must contain only letters, numbers and underscores."
-msgstr "Deve conter apenas letras, números e sublinhados (_)."
+msgstr "Dette felt må kun indeholde bogstaver, tal og understreger."
 
 #: core/validators.py:63
 msgid "This value must contain only letters, numbers, underscores and slashes."
-msgstr "Deve conter apenas letras, números, sublinhados (_) e barras (/)."
+msgstr ""
+"Dette felt må kun indeholde bogstaver, tal, understreger og skråstreger."
 
 #: core/validators.py:71
 msgid "Uppercase letters are not allowed here."
-msgstr "Letras em maiúsculo não são permitidas aqui."
+msgstr "Store bogstaver er ikke tilladt her"
 
 #: core/validators.py:75
 msgid "Lowercase letters are not allowed here."
-msgstr "Letras em minúsculo não são permitidas aqui."
+msgstr "Små bogstaver er ikke tilladt her"
 
 #: core/validators.py:82
 msgid "Enter only digits separated by commas."
-msgstr "Informe apenas dígitos separados por vírgulas."
+msgstr "Indtast kun tal adskilt af kommaer."
 
 #: core/validators.py:94
 msgid "Enter valid e-mail addresses separated by commas."
-msgstr "Informe endereços de email válidos separados por vírgulas."
+msgstr "Indtast gyldige email-adresser adskilt af kommaer"
 
 #: core/validators.py:98
 msgid "Please enter a valid IP address."
-msgstr "Informe um endereço IP válido."
+msgstr "Venlist indtast en gyldig email-adresse."
 
 #: core/validators.py:102
 msgid "Empty values are not allowed here."
-msgstr "Valores em branco não são permitidos."
+msgstr "Dette felt kan ikke være tomt."
 
 #: core/validators.py:106
 msgid "Non-numeric characters aren't allowed here."
-msgstr "Caracteres não numéricos não são permitidos."
+msgstr "Der må kun være tal her"
 
 #: core/validators.py:110
 msgid "This value can't be comprised solely of digits."
-msgstr "Este valor não pode conter apenas dígitos."
+msgstr "Denne værdi kan ikke kun bestå af tal."
 
 #: core/validators.py:115
 msgid "Enter a whole number."
-msgstr "Informe um número inteiro."
+msgstr "Indtast et heltal."
 
 #: core/validators.py:119
 msgid "Only alphabetical characters are allowed here."
-msgstr "Apenas caracteres do alfabeto são permitidos aqui."
+msgstr "Her er kun bogstaver tilladt."
 
 #: core/validators.py:123
 msgid "Enter a valid date in YYYY-MM-DD format."
-msgstr "Informe uma data válida no formato AAAA-MM-DD."
+msgstr "Indtast en dato i ÅÅÅÅ-MM-DD format."
 
 #: core/validators.py:127
 msgid "Enter a valid time in HH:MM format."
-msgstr "Informe uma hora válida no formato HH:MM."
+msgstr "Indtast tid i TT:MM format."
 
 #: core/validators.py:131
 msgid "Enter a valid date/time in YYYY-MM-DD HH:MM format."
-msgstr "Informe uma data/hora válida no formato AAAA-MM-DD HH:MM."
+msgstr "Indtast dato og tid i ÅÅÅÅ-MM-DD TT:MM format."
 
 #: core/validators.py:135
 msgid "Enter a valid e-mail address."
-msgstr "Informe um endereço de email válido."
+msgstr "Indtast en gyldig email-adresse."
 
 #: core/validators.py:147
 msgid ""
 "Upload a valid image. The file you uploaded was either not an image or a "
 "corrupted image."
 msgstr ""
-"Envie uma imagem válida. O arquivo enviado não é uma imagem ou está "
-"corrompido."
+"Upload en billed-fil. Filen du uploadede var enten ikke et billede eller en "
+"ødelagt billed-fil"
 
 #: core/validators.py:154
 #, python-format
 msgid "The URL %s does not point to a valid image."
-msgstr "A URL %s não aponta para um imagem válida."
+msgstr "URLen %s viser ikke til en gyldig billed-fil"
 
 #: core/validators.py:158
 #, python-format
 msgid "Phone numbers must be in XXX-XXX-XXXX format. \"%s\" is invalid."
 msgstr ""
-"Números de telefone deves estar no formato XXX-XXX-XXXX.\"%s\" é inválido."
+"Telefonnumre skal være i XXX-XXX-XXXX formatet. \"%s\" er ikke godkjent."
 
 #: core/validators.py:166
 #, python-format
 msgid "The URL %s does not point to a valid QuickTime video."
-msgstr "A URL %s não aponta para um vídeo QuickTime válido."
+msgstr "URLen %s viser ikke til en gyldig QuickTime-film."
 
 #: core/validators.py:170
 msgid "A valid URL is required."
-msgstr "Uma URL válida é exigida."
+msgstr "En gyldig URL er påkrævet"
 
 #: core/validators.py:184
 #, python-format
@@ -846,117 +845,116 @@ msgid ""
 "Valid HTML is required. Specific errors are:\n"
 "%s"
 msgstr ""
-"HTML válido é exigido. Estes são os erros específicos:\n"
+"Gyldig HTML er påkrævet. Fejlene er:\n"
 "%s"
 
 #: core/validators.py:191
 #, python-format
 msgid "Badly formed XML: %s"
-msgstr "XML mal formado: %s"
+msgstr "Ugyldig XML: %s"
 
 #: core/validators.py:201
 #, python-format
 msgid "Invalid URL: %s"
-msgstr "URL inválida: %s"
+msgstr "Ugyldig URL: %s"
 
 #: core/validators.py:205 core/validators.py:207
 #, python-format
 msgid "The URL %s is a broken link."
-msgstr "A URL %s é um link quebrado."
+msgstr "Denne URL %s linker ikke til en gyldig side eller fil"
 
 #: core/validators.py:213
 msgid "Enter a valid U.S. state abbreviation."
-msgstr "Informe uma abreviação válida de nome de um estado dos EUA."
+msgstr "Indtast en gyldig amerikansk statsforkortelse"
 
 #: core/validators.py:228
 #, python-format
 msgid "Watch your mouth! The word %s is not allowed here."
 msgid_plural "Watch your mouth! The words %s are not allowed here."
-msgstr[0] "Lave sua boca! A palavra %s não é permitida aqui."
-msgstr[1] "Lave sua boca! As palavras %s não são permitidas aqui."
+msgstr[0] "Var din mund! Ordet %s er ikke tilladt her."
+msgstr[1] "Var din mund! Ordene %s er ikke tilladt her."
 
 #: core/validators.py:235
 #, python-format
 msgid "This field must match the '%s' field."
-msgstr "Este campo deve ser igual ao campo '%s'."
+msgstr "Dette felt skal matche '%s' feltet."
 
 #: core/validators.py:254
 msgid "Please enter something for at least one field."
-msgstr "Informe algo em pelo menos um campo."
+msgstr "Indtast venligst noget i mindst et felt"
 
 #: core/validators.py:263 core/validators.py:274
 msgid "Please enter both fields or leave them both empty."
-msgstr "Informe ambos os campos ou deixe ambos vazios."
+msgstr "Udfyld begge felter, eller lad dem begge være blanke"
 
 #: core/validators.py:281
 #, python-format
 msgid "This field must be given if %(field)s is %(value)s"
-msgstr "Este campo deve ser informado se o campo %(field)s for %(value)s."
+msgstr "Dette felt skal udfyldes, hvis %(field)s er lig %(value)s"
 
 #: core/validators.py:293
 #, python-format
 msgid "This field must be given if %(field)s is not %(value)s"
-msgstr "Este campo deve ser dado se o campo %(field)s não for %(value)s."
+msgstr "Dette felt skal udfyldes, hvis %(field)s ikke er lig %(value)s"
 
 #: core/validators.py:312
 msgid "Duplicate values are not allowed."
-msgstr "Valores duplicados não são permitidos."
+msgstr "Duplikate værdier er ikke tilladt her"
 
 #: core/validators.py:335
 #, python-format
 msgid "This value must be a power of %s."
-msgstr "Este valor deve ser uma potência de %s."
+msgstr "Denne værdi skal være en potens af %s."
 
 #: core/validators.py:346
 msgid "Please enter a valid decimal number."
-msgstr "Informe um número decimal."
+msgstr "Indtast venligst et gyldigt decimaltal."
 
 #: core/validators.py:348
-#, python-format
+#, fuzzy, python-format
 msgid "Please enter a valid decimal number with at most %s total digit."
 msgid_plural ""
 "Please enter a valid decimal number with at most %s total digits."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Indtast en gyldig decimal med max %s tal ialt"
+msgstr[1] "Indtast en gyldig decimal med max %s tal ialt"
 
 #: core/validators.py:351
 #, python-format
 msgid "Please enter a valid decimal number with at most %s decimal place."
 msgid_plural ""
 "Please enter a valid decimal number with at most %s decimal places."
-msgstr[0] "Informe um número decimal com no máximo %s casa decimal."
-msgstr[1] "Informe um número decimal com no máximo %s casas decimais."
+msgstr[0] "Indtast en gyldig decimal med max %s tal efter kommaet"
+msgstr[1] "Indtast en gyldig decimal med max %s tal efter kommaet"
 
 #: core/validators.py:361
 #, python-format
 msgid "Make sure your uploaded file is at least %s bytes big."
-msgstr "Verifique se o arquivo enviado tem pelo menos %s bytes."
+msgstr "Tjek at den uploadede fil er mindst % bytes."
 
 #: core/validators.py:362
 #, python-format
 msgid "Make sure your uploaded file is at most %s bytes big."
-msgstr "Verifique se o arquivo enviado tem no máximo %s bytes."
+msgstr "Tjek at den uploadede file er max %s bytes."
 
 #: core/validators.py:375
 msgid "The format for this field is wrong."
-msgstr "O formato deste campo está errado."
+msgstr "Formatet i dette feltet er feil."
 
 #: core/validators.py:390
 msgid "This field is invalid."
-msgstr "Este campo é inválido."
+msgstr "Dette felt er ugyldigt."
 
 #: core/validators.py:425
 #, python-format
 msgid "Could not retrieve anything from %s."
-msgstr "Não foi possível receber dados de %s."
+msgstr "Kunne ikke finde noget i %s."
 
 #: core/validators.py:428
 #, python-format
 msgid ""
 "The URL %(url)s returned the invalid Content-Type header '%(contenttype)s'."
 msgstr ""
-"A URL %(url)s retornou um cabeçalho '%(contenttype)s' de Content-Type "
-"inválido."
+"URLen %(url)s returnerede ikke en godkendt Content-Type '%(contenttype)s'."
 
 #: core/validators.py:461
 #, python-format
@@ -964,8 +962,7 @@ msgid ""
 "Please close the unclosed %(tag)s tag from line %(line)s. (Line starts with "
 "\"%(start)s\".)"
 msgstr ""
-"Por favor, feche a tag %(tag)s na linha %(line)s. (A linha começa com \"%"
-"(start)s\".)"
+"Luk venligst %(tag)s på linje %(line)s. (Linjen starer med \"%(start)s\".)"
 
 #: core/validators.py:465
 #, python-format
@@ -973,8 +970,8 @@ msgid ""
 "Some text starting on line %(line)s is not allowed in that context. (Line "
 "starts with \"%(start)s\".)"
 msgstr ""
-"Algum texto começando na linha %(line)s não é permitido no contexto. (Linha "
-"começa com \"%(start)s\".)"
+"En del af teksten som starter på linje %(line)s er ikke tilladt. (Linjen "
+"starter med \"%(start)s\".)"
 
 #: core/validators.py:470
 #, python-format
@@ -982,8 +979,8 @@ msgid ""
 "\"%(attr)s\" on line %(line)s is an invalid attribute. (Line starts with \"%"
 "(start)s\".)"
 msgstr ""
-"\"%(attr)s\" na linha %(line)s não é um atributo válido. (Linha começa com "
-"\"%(start)s\".)"
+"\"%(attr)s\" på linje %(line)s er ikke en gyldig attribut. (Linjen starter "
+"med \"%(start)s\".)"
 
 #: core/validators.py:475
 #, python-format
@@ -991,8 +988,8 @@ msgid ""
 "\"<%(tag)s>\" on line %(line)s is an invalid tag. (Line starts with \"%"
 "(start)s\".)"
 msgstr ""
-"\"<%(tag)s>\" na linha %(line)s é uma tag inválida. (Linha começa com \"%"
-"(start)s\".)"
+"\"<%(tag)s>\" på linje %(line)s er ikke et gyldigt tag. (Linjen starter med "
+"\"%(start)s\".)"
 
 #: core/validators.py:479
 #, python-format
@@ -1000,8 +997,8 @@ msgid ""
 "A tag on line %(line)s is missing one or more required attributes. (Line "
 "starts with \"%(start)s\".)"
 msgstr ""
-"Uma tag na linha %(line)s está não apresenta um ou mais atributos exigidos."
-"(Linha começa com \"%(start)s\".)"
+"Et tag på linje %(line)s mangler en obligatorisk attribut. (Linjen starter "
+"med \"%(start)s\".)"
 
 #: core/validators.py:484
 #, python-format
@@ -1009,19 +1006,18 @@ msgid ""
 "The \"%(attr)s\" attribute on line %(line)s has an invalid value. (Line "
 "starts with \"%(start)s\".)"
 msgstr ""
-"O atributo \"%(attr)s\" na linha %(line)s tem um valor inválido. (Linha "
-"começa com \"%(start)s\".)"
+"\"%(attr)s\" attributten på linje $(line)s har en ugyldig værdi. (Linjen "
+"starter med \"%(start)s\".)"
 
 #: core/meta/fields.py:111
 msgid " Separate multiple IDs with commas."
-msgstr " Separe IDs múltiplos com vírgulas."
+msgstr "Adskil id'er med kommaer."
 
 #: core/meta/fields.py:114
 msgid ""
 " Hold down \"Control\", or \"Command\" on a Mac, to select more than one."
 msgstr ""
-" Mantenha pressionado \"Control\", ou \"Command\" num Mac para selecionar "
-"mais de uma opção."
+"Hold \"Kontrol\", eller \"Æbletasten\" på Mac, nede for at vælge mere end en."
 
-#~ msgid "Click to change"
-#~ msgstr "Clique para alterar"
+#~ msgid "Traditional Chinese"
+#~ msgstr "Traditionel Kinesisk"

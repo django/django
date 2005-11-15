@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2005-11-13 20:40+0100\n"
+"POT-Creation-Date: 2005-11-15 19:40+0100\n"
 "PO-Revision-Date: 2005-11-08 19:06+GMT+2\n"
 "Last-Translator: Tiberiu Micu <tibimicu@gmx.net>\n"
 "Language-Team: Romanian <ro@li.org>\n"
@@ -663,7 +663,7 @@ msgstr "Informaţii personale"
 msgid "Important dates"
 msgstr "Date importante"
 
-#: models/auth.py:182
+#: models/auth.py:195
 msgid "Message"
 msgstr "Mesaj"
 
@@ -680,62 +680,67 @@ msgid "Welsh"
 msgstr ""
 
 #: conf/global_settings.py:39
+#, fuzzy
+msgid "Danish"
+msgstr "Spaniolă"
+
+#: conf/global_settings.py:40
 msgid "German"
 msgstr "Germană"
 
-#: conf/global_settings.py:40
+#: conf/global_settings.py:41
 msgid "English"
 msgstr "Engleză"
 
-#: conf/global_settings.py:41
+#: conf/global_settings.py:42
 msgid "Spanish"
 msgstr "Spaniolă"
 
-#: conf/global_settings.py:42
+#: conf/global_settings.py:43
 msgid "French"
 msgstr "Franceză"
 
-#: conf/global_settings.py:43
+#: conf/global_settings.py:44
 msgid "Galician"
 msgstr "Galiciană"
 
-#: conf/global_settings.py:44
+#: conf/global_settings.py:45
 msgid "Icelandic"
 msgstr ""
 
-#: conf/global_settings.py:45
+#: conf/global_settings.py:46
 msgid "Italian"
 msgstr "Italiană"
 
-#: conf/global_settings.py:46
+#: conf/global_settings.py:47
 msgid "Norwegian"
 msgstr "Norvegiană"
 
-#: conf/global_settings.py:47
+#: conf/global_settings.py:48
 msgid "Brazilian"
 msgstr "Braziliană"
 
-#: conf/global_settings.py:48
+#: conf/global_settings.py:49
 msgid "Romanian"
 msgstr ""
 
-#: conf/global_settings.py:49
+#: conf/global_settings.py:50
 msgid "Russian"
 msgstr "Rusă"
 
-#: conf/global_settings.py:50
+#: conf/global_settings.py:51
 msgid "Slovak"
 msgstr ""
 
-#: conf/global_settings.py:51
+#: conf/global_settings.py:52
 msgid "Serbian"
 msgstr "Sîrbă"
 
-#: conf/global_settings.py:52
+#: conf/global_settings.py:53
 msgid "Swedish"
 msgstr ""
 
-#: conf/global_settings.py:53
+#: conf/global_settings.py:54
 msgid "Simplified Chinese"
 msgstr "Chineză simplificată"
 

@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django Serbian (latin) translation v1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2005-11-13 13:40-0600\n"
+"POT-Creation-Date: 2005-11-15 12:40-0600\n"
 "PO-Revision-Date: 2005-11-13 19:21+0100\n"
 "Last-Translator: Nebojša Đorđević <nesh@studioquattro.co.yu>\n"
 "Language-Team: Nesh <nesh@studioquatro.co.yu> & Petar <petar.maric@gmail."
@@ -664,7 +664,7 @@ msgstr "Lične informacije"
 msgid "Important dates"
 msgstr "Važni datumi"
 
-#: models/auth.py:182
+#: models/auth.py:195
 msgid "Message"
 msgstr "Poruka"
 
@@ -681,62 +681,67 @@ msgid "Welsh"
 msgstr "Welšski"
 
 #: conf/global_settings.py:39
+#, fuzzy
+msgid "Danish"
+msgstr "Španski"
+
+#: conf/global_settings.py:40
 msgid "German"
 msgstr "Nemački"
 
-#: conf/global_settings.py:40
+#: conf/global_settings.py:41
 msgid "English"
 msgstr "Engleski"
 
-#: conf/global_settings.py:41
+#: conf/global_settings.py:42
 msgid "Spanish"
 msgstr "Španski"
 
-#: conf/global_settings.py:42
+#: conf/global_settings.py:43
 msgid "French"
 msgstr "Francuski"
 
-#: conf/global_settings.py:43
+#: conf/global_settings.py:44
 msgid "Galician"
 msgstr ""
 
-#: conf/global_settings.py:44
+#: conf/global_settings.py:45
 msgid "Icelandic"
 msgstr ""
 
-#: conf/global_settings.py:45
+#: conf/global_settings.py:46
 msgid "Italian"
 msgstr "Italijanski"
 
-#: conf/global_settings.py:46
+#: conf/global_settings.py:47
 msgid "Norwegian"
 msgstr "Norveški"
 
-#: conf/global_settings.py:47
+#: conf/global_settings.py:48
 msgid "Brazilian"
 msgstr "Brazilski"
 
-#: conf/global_settings.py:48
+#: conf/global_settings.py:49
 msgid "Romanian"
 msgstr "Rumunski"
 
-#: conf/global_settings.py:49
+#: conf/global_settings.py:50
 msgid "Russian"
 msgstr "Ruski"
 
-#: conf/global_settings.py:50
+#: conf/global_settings.py:51
 msgid "Slovak"
 msgstr "Slovački"
 
-#: conf/global_settings.py:51
+#: conf/global_settings.py:52
 msgid "Serbian"
 msgstr "Srpski"
 
-#: conf/global_settings.py:52
+#: conf/global_settings.py:53
 msgid "Swedish"
 msgstr "Švedski"
 
-#: conf/global_settings.py:53
+#: conf/global_settings.py:54
 msgid "Simplified Chinese"
 msgstr "Kineski (pojednostavljen)"
 

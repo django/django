@@ -36,6 +36,7 @@ LANGUAGES = (
     ('bn', _('Bengali')),
     ('cs', _('Czech')),
     ('cy', _('Welsh')),
+    ('da', _('Danish')),
     ('de', _('German')),
     ('en', _('English')),
     ('es', _('Spanish')),

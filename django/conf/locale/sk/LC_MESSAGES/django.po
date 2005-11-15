@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2005-11-14 07:26-0500\n"
+"POT-Creation-Date: 2005-11-15 12:40-0600\n"
 "PO-Revision-Date: 2005-11-10 23:22-0500\n"
 "Last-Translator: Vladimir Labath <vlado@labath.org>\n"
 "Language-Team: Slovak <sk@li.org>\n"
@@ -393,6 +393,18 @@ msgstr "plochá stránka"
 msgid "flat pages"
 msgstr "ploché stránky"
 
+#: utils/translation.py:335
+msgid "DATE_FORMAT"
+msgstr "DATUM_FORMAT"
+
+#: utils/translation.py:336
+msgid "DATETIME_FORMAT"
+msgstr "DATUMCAS_FORMAT"
+
+#: utils/translation.py:337
+msgid "TIME_FORMAT"
+msgstr "CAS_FORMAT"
+
 #: utils/dates.py:6
 msgid "Monday"
 msgstr "Pondelok"
@@ -496,18 +508,6 @@ msgstr ""
 #: utils/dates.py:28
 msgid "Dec."
 msgstr ""
-
-#: utils/translation.py:335
-msgid "DATE_FORMAT"
-msgstr "DATUM_FORMAT"
-
-#: utils/translation.py:336
-msgid "DATETIME_FORMAT"
-msgstr "DATUMCAS_FORMAT"
-
-#: utils/translation.py:337
-msgid "TIME_FORMAT"
-msgstr "CAS_FORMAT"
 
 #: models/core.py:7
 msgid "domain name"
@@ -679,62 +679,67 @@ msgid "Welsh"
 msgstr ""
 
 #: conf/global_settings.py:39
+#, fuzzy
+msgid "Danish"
+msgstr "Španielsky"
+
+#: conf/global_settings.py:40
 msgid "German"
 msgstr "Nemecký"
 
-#: conf/global_settings.py:40
+#: conf/global_settings.py:41
 msgid "English"
 msgstr "Anglický"
 
-#: conf/global_settings.py:41
+#: conf/global_settings.py:42
 msgid "Spanish"
 msgstr "Španielsky"
 
-#: conf/global_settings.py:42
+#: conf/global_settings.py:43
 msgid "French"
 msgstr "Francúzsky"
 
-#: conf/global_settings.py:43
+#: conf/global_settings.py:44
 msgid "Galician"
 msgstr "Galicijský"
 
-#: conf/global_settings.py:44
+#: conf/global_settings.py:45
 msgid "Icelandic"
 msgstr ""
 
-#: conf/global_settings.py:45
+#: conf/global_settings.py:46
 msgid "Italian"
 msgstr "Taliansky"
 
-#: conf/global_settings.py:46
+#: conf/global_settings.py:47
 msgid "Norwegian"
 msgstr "Nórsky"
 
-#: conf/global_settings.py:47
+#: conf/global_settings.py:48
 msgid "Brazilian"
 msgstr "Brazílsky"
 
-#: conf/global_settings.py:48
+#: conf/global_settings.py:49
 msgid "Romanian"
 msgstr ""
 
-#: conf/global_settings.py:49
+#: conf/global_settings.py:50
 msgid "Russian"
 msgstr "Ruský"
 
-#: conf/global_settings.py:50
+#: conf/global_settings.py:51
 msgid "Slovak"
 msgstr "Slovenský"
 
-#: conf/global_settings.py:51
+#: conf/global_settings.py:52
 msgid "Serbian"
 msgstr "Srbský"
 
-#: conf/global_settings.py:52
+#: conf/global_settings.py:53
 msgid "Swedish"
 msgstr "Švédsky"
 
-#: conf/global_settings.py:53
+#: conf/global_settings.py:54
 msgid "Simplified Chinese"
 msgstr "Zjednodušená činština "
 
@@ -1013,4 +1018,3 @@ msgid ""
 msgstr ""
 " Podržte \"Control\", alebo \"Command\" na  Mac_u, na výber viac ako jednej "
 "položky."
-

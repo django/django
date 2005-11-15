@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2005-11-13 13:41-0600\n"
+"POT-Creation-Date: 2005-11-15 12:40-0600\n"
 "PO-Revision-Date: 2005-11-05 HO:MI+ZONE\n"
 "Last-Translator: Jason Davies <jason@jasondavies.com>\n"
 "Language-Team: Cymraeg <cy@li.org>\n"
@@ -661,7 +661,7 @@ msgstr "Gwybodaeth personol"
 msgid "Important dates"
 msgstr "Dyddiadau pwysig"
 
-#: models/auth.py:182
+#: models/auth.py:195
 msgid "Message"
 msgstr "Neges"
 
@@ -678,62 +678,67 @@ msgid "Welsh"
 msgstr "Cymraeg"
 
 #: conf/global_settings.py:39
+#, fuzzy
+msgid "Danish"
+msgstr "Spaeneg"
+
+#: conf/global_settings.py:40
 msgid "German"
 msgstr "Almaeneg"
 
-#: conf/global_settings.py:40
+#: conf/global_settings.py:41
 msgid "English"
 msgstr "Saesneg"
 
-#: conf/global_settings.py:41
+#: conf/global_settings.py:42
 msgid "Spanish"
 msgstr "Spaeneg"
 
-#: conf/global_settings.py:42
+#: conf/global_settings.py:43
 msgid "French"
 msgstr "Ffrangeg"
 
-#: conf/global_settings.py:43
+#: conf/global_settings.py:44
 msgid "Galician"
 msgstr "Galisieg"
 
-#: conf/global_settings.py:44
+#: conf/global_settings.py:45
 msgid "Icelandic"
 msgstr ""
 
-#: conf/global_settings.py:45
+#: conf/global_settings.py:46
 msgid "Italian"
 msgstr "Eidaleg"
 
-#: conf/global_settings.py:46
+#: conf/global_settings.py:47
 msgid "Norwegian"
 msgstr "Norwyeg"
 
-#: conf/global_settings.py:47
+#: conf/global_settings.py:48
 msgid "Brazilian"
 msgstr "Brasileg"
 
-#: conf/global_settings.py:48
+#: conf/global_settings.py:49
 msgid "Romanian"
 msgstr ""
 
-#: conf/global_settings.py:49
+#: conf/global_settings.py:50
 msgid "Russian"
 msgstr "Rwsieg"
 
-#: conf/global_settings.py:50
+#: conf/global_settings.py:51
 msgid "Slovak"
 msgstr ""
 
-#: conf/global_settings.py:51
+#: conf/global_settings.py:52
 msgid "Serbian"
 msgstr "Serbeg"
 
-#: conf/global_settings.py:52
+#: conf/global_settings.py:53
 msgid "Swedish"
 msgstr ""
 
-#: conf/global_settings.py:53
+#: conf/global_settings.py:54
 msgid "Simplified Chinese"
 msgstr "Tsieinëeg Symledig"
 
