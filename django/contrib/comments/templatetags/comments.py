@@ -33,7 +33,7 @@ COMMENT_FORM = '''
 <input type="hidden" name="photo_options" value="{{ photo_options }}" />
 {% endif %}
 
-<p>Comment:<br /><textarea name="comment" id="id_comment" rows="10" cols="60"></textarea></p>
+<p>{% trans "Comment:" %}<br /><textarea name="comment" id="id_comment" rows="10" cols="60"></textarea></p>
 
 <input type="hidden" name="options" value="{{ options }}" />
 <input type="hidden" name="target" value="{{ target }}" />
