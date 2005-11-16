@@ -81,8 +81,8 @@ Now, try logging in. You should see the Django admin index page:
    :alt: Django admin index page
    :target: http://media.djangoproject.com/img/doc/tutorial/admin02.png
 
-By default, you should see four types of editable content: groups, users,
-redirects and flat pages. These are core features Django ships with by default.
+By default, you should see two types of editable content: groups and users.
+These are core features Django ships with by default.
 
 .. _"I can't log in" questions: http://www.djangoproject.com/documentation/faq/#the-admin-site
 
