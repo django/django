@@ -131,8 +131,7 @@ That'll create a directory structure like this::
         models/
             __init__.py
             polls.py
-        views/
-            __init__.py
+        views.py
 
 This directory structure will house the poll application.
 
