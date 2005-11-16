@@ -108,7 +108,6 @@ class FormWrapper:
     def __init__(self, manipulator, data, error_dict):
         self.manipulator, self.data = manipulator, data
         self.error_dict = error_dict
-        self.fields = [self.__getitem__(field.field_name) for field in self.manipulator.fields]
 
     def __repr__(self):
         return repr(self.data)
@@ -127,6 +126,15 @@ class FormWrapper:
 
     def has_errors(self):
         return self.error_dict != {}
+
+    def _get_fields(self):
+        try:
+            return self._fields
+        except AttributeError:
+            self._fields = [self.__getitem__(field.field_name) for field in self.manipulator.fields]
+            return self._fields
+
+    fields = property(_get_fields)
 
 class FormFieldWrapper:
     "A bridge between the template system and an individual form field. Used by FormWrapper."
