@@ -386,8 +386,10 @@ class DateField(Field):
     empty_strings_allowed = False
     def __init__(self, verbose_name=None, name=None, auto_now=False, auto_now_add=False, **kwargs):
         self.auto_now, self.auto_now_add = auto_now, auto_now_add
+        #HACKs : auto_now_add/auto_now should be done as a default or a pre_save... 
         if auto_now or auto_now_add:
             kwargs['editable'] = False
+            kwargs['blank'] = True
         Field.__init__(self, verbose_name, name, **kwargs)
 
     def get_db_prep_lookup(self, lookup_type, value):
