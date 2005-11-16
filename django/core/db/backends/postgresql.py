@@ -24,7 +24,7 @@ class DatabaseWrapper:
             if DATABASE_USER:
                 conn_string = "user=%s %s" % (DATABASE_USER, conn_string)
             if DATABASE_PASSWORD:
-                conn_string += " password=%s" % DATABASE_PASSWORD
+                conn_string += " password='%s'" % DATABASE_PASSWORD
             if DATABASE_HOST:
                 conn_string += " host=%s" % DATABASE_HOST
             if DATABASE_PORT:

@@ -1,3 +1,4 @@
+import re
 import os
 import sys
 import inspect
@@ -5,6 +6,8 @@ from django.conf import settings
 from os.path import dirname, join as pathjoin
 from django.core.template import Template, Context
 from django.utils.httpwrappers import HttpResponseServerError, HttpResponseNotFound
+
+HIDDEN_SETTINGS = re.compile('SECRET|PASSWORD')
 
 def technical_500_response(request, exc_type, exc_value, tb):
     """
@@ -30,7 +33,17 @@ def technical_500_response(request, exc_type, exc_value, tb):
             'pre_context_lineno' : pre_context_lineno,
         })
         tb = tb.tb_next
-        
+    
+    # Turn the settings module into a dict, filtering out anything that 
+    # matches HIDDEN_SETTINGS along the way.
+    settings_dict = {}
+    for k in dir(settings):
+        if k.isupper():
+            if HIDDEN_SETTINGS.search(k):
+                settings_dict[k] = '********************'
+            else:
+                settings_dict[k] = getattr(settings, k)
+                
     t = Template(TECHNICAL_500_TEMPLATE)
     c = Context({
         'exception_type' : exc_type.__name__,
@@ -39,7 +52,7 @@ def technical_500_response(request, exc_type, exc_value, tb):
         'lastframe' : frames[-1],
         'request' : request,
         'request_protocol' : os.environ.get("HTTPS") == "on" and "https" or "http",
-        'settings' : dict([(k, getattr(settings, k)) for k in dir(settings) if k.isupper()]),
+        'settings' : settings_dict,
         
     })
     return HttpResponseServerError(t.render(c))

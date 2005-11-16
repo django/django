@@ -1072,7 +1072,7 @@ msgstr "Zpráva"
 
 #: conf/global_settings.py:37
 msgid "Bengali"
-msgstr ""
+msgstr "Bengálsky"
 
 #: conf/global_settings.py:38
 msgid "Czech"
@@ -1080,7 +1080,7 @@ msgstr "Český"
 
 #: conf/global_settings.py:39
 msgid "Welsh"
-msgstr ""
+msgstr "Waleský"
 
 #: conf/global_settings.py:40
 msgid "German"
@@ -1104,7 +1104,7 @@ msgstr "Galicijský"
 
 #: conf/global_settings.py:45
 msgid "Icelandic"
-msgstr ""
+msgstr "Islandský"
 
 #: conf/global_settings.py:46
 msgid "Italian"
@@ -1120,7 +1120,7 @@ msgstr "Brazílsky"
 
 #: conf/global_settings.py:49
 msgid "Romanian"
-msgstr ""
+msgstr "Rumúnsky"
 
 #: conf/global_settings.py:50
 msgid "Russian"

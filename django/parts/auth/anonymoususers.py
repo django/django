@@ -34,6 +34,9 @@ class AnonymousUser:
     def has_perm(self, perm):
         return False
 
+    def has_module_perms(self, module):
+        return False
+
     def get_and_delete_messages(self):
         return []
 

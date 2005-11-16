@@ -1077,6 +1077,11 @@ msgid "Welsh"
 msgstr ""
 
 #: conf/global_settings.py:40
+#, fuzzy
+msgid "Danish"
+msgstr "Spagnolo"
+
+#: conf/global_settings.py:40
 msgid "German"
 msgstr "Tedesco"
 

@@ -1080,6 +1080,11 @@ msgid "Welsh"
 msgstr "Welšsky"
 
 #: conf/global_settings.py:40
+#, fuzzy
+msgid "Danish"
+msgstr "Španělsky"
+
+#: conf/global_settings.py:40
 msgid "German"
 msgstr "Německy"
 

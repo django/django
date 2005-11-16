@@ -102,6 +102,7 @@ class FormWrapper:
         self.manipulator, self.data = manipulator, data
         self.error_dict = error_dict
         self._inline_collections = None
+        self.fields = [self.__getitem__(field.field_name) for field in self.manipulator.fields]
         self.edit_inline = edit_inline
     
     def __repr__(self):
