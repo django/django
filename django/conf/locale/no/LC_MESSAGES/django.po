@@ -669,7 +669,7 @@ msgstr "Meldinger"
 
 #: conf/global_settings.py:36
 msgid "Bengali"
-msgstr ""
+msgstr "Bengalsk"
 
 #: conf/global_settings.py:37
 msgid "Czech"
@@ -677,12 +677,11 @@ msgstr "Tsjekkisk"
 
 #: conf/global_settings.py:38
 msgid "Welsh"
-msgstr ""
+msgstr "Walisisk"
 
 #: conf/global_settings.py:39
-#, fuzzy
 msgid "Danish"
-msgstr "Spansk"
+msgstr "Dnask"
 
 #: conf/global_settings.py:40
 msgid "German"
@@ -706,7 +705,7 @@ msgstr "Galisisk"
 
 #: conf/global_settings.py:45
 msgid "Icelandic"
-msgstr ""
+msgstr "Islandsk"
 
 #: conf/global_settings.py:46
 msgid "Italian"
@@ -722,7 +721,7 @@ msgstr "Brasiliansk"
 
 #: conf/global_settings.py:49
 msgid "Romanian"
-msgstr ""
+msgstr "Romansk"
 
 #: conf/global_settings.py:50
 msgid "Russian"
@@ -730,7 +729,7 @@ msgstr "Russisk"
 
 #: conf/global_settings.py:51
 msgid "Slovak"
-msgstr ""
+msgstr "Slovakisk"
 
 #: conf/global_settings.py:52
 msgid "Serbian"
@@ -738,11 +737,11 @@ msgstr "Serbisk"
 
 #: conf/global_settings.py:53
 msgid "Swedish"
-msgstr ""
+msgstr "Svensk"
 
 #: conf/global_settings.py:54
 msgid "Simplified Chinese"
-msgstr "Simpel Kinesisk"
+msgstr "Simplifisert Kinesisk"
 
 #: core/validators.py:59
 msgid "This value must contain only letters, numbers and underscores."
@@ -1021,6 +1020,3 @@ msgid ""
 " Hold down \"Control\", or \"Command\" on a Mac, to select more than one."
 msgstr ""
 "Hold nede \"Control\", eller \"Command\" på en Mac, for å velge mere enn en."
-
-#~ msgid "Traditional Chinese"
-#~ msgstr "Tradisjonell Kinesisk"
