@@ -77,12 +77,19 @@ It's easy either way.
 Installing the official version
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-There IS no official version yet. But once there is, here's how it'll work:
+1. Download Django-0.90.tar.gz from our `download page`_.
+2. ``tar xzvf Django-0.90.tar.gz``
+3. ``cd Django-0.90``
+4. ``sudo python setup.py install``
 
-1. Download the tarball of the latest official version from our `download page`_.
-2. ``tar xzvf django-1.0.0.tar.gz``
-3. ``cd django-1.0.0``
-4. ``python setup.py install``
+Note that the last command will automatically download and install setuptools_
+if you don't already have it installed. This requires a working Internet
+connection.
+
+This will install Django in your Python installation's ``site-packages``
+directory.
+
+.. _setuptools: http://peak.telecommunity.com/DevCenter/setuptools
 
 Installing the development version
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
