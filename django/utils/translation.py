@@ -247,7 +247,7 @@ def ngettext(singular, plural, number):
         return t.ngettext(singular, plural, number)
     if _default is None:
         from django.conf import settings
-        _default = translation('*', settings.LANGUAGE_CODE)
+        _default = translation(settings.LANGUAGE_CODE)
     return _default.ngettext(singular, plural, number)
 
 gettext_lazy = lazy(gettext, str)

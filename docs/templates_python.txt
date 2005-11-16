@@ -246,11 +246,12 @@ variables:
 
     * ``user`` -- An ``auth.User`` instance representing the currently
       logged-in user (or an ``AnonymousUser`` instance, if the client isn't
-      logged in).
+      logged in). See the `user authentication docs`.
     * ``messages`` -- A list of ``auth.Message`` objects for the currently
       logged-in user.
     * ``perms`` -- An instance of ``django.core.extensions.PermWrapper``,
-      representing the permissions that the currently logged-in user has.
+      representing the permissions that the currently logged-in user has. See
+      the `permissions docs`_.
 
 Also, if your ``DEBUG`` setting is set to ``True``, every ``DjangoContext``
 instance has the following two extra variables:
@@ -279,6 +280,9 @@ This technique has two caveats:
 
     * You'll have to be careful not to set the variable ``current_time`` when
       you populate this context. If you do, you'll override the other one.
+
+.. _user authentication docs: http://www.djangoproject.com/documentation/models/authentication/#users
+.. _permissions docs: http://www.djangoproject.com/documentation/models/authentication/#permissions
 
 Loading templates
 -----------------

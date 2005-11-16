@@ -389,7 +389,7 @@ You use this custom manipulator exactly as you would use an auto-generated one.
 Here's a simple function that might drive the above form::
 
     def contact_form(request):
-        manipulator = ContactFormManipulator()
+        manipulator = ContactManipulator()
         if request.POST:
             new_data = request.POST.copy()
             errors = manipulator.get_validation_errors(new_data)

@@ -73,10 +73,10 @@ this::
     from django.conf.urls.defaults import *
 
     urlpatterns = patterns('',
-        (r'^polls/$', 'myproject.apps.polls.views.polls.index'),
-        (r'^polls/(?P<poll_id>\d+)/$', 'myproject.apps.polls.views.polls.detail'),
-        (r'^polls/(?P<poll_id>\d+)/results/$', 'myproject.apps.polls.views.polls.results'),
-        (r'^polls/(?P<poll_id>\d+)/vote/$', 'myproject.apps.polls.views.polls.vote'),
+        (r'^polls/$', 'myproject.apps.polls.views.index'),
+        (r'^polls/(?P<poll_id>\d+)/$', 'myproject.apps.polls.views.detail'),
+        (r'^polls/(?P<poll_id>\d+)/results/$', 'myproject.apps.polls.views.results'),
+        (r'^polls/(?P<poll_id>\d+)/vote/$', 'myproject.apps.polls.views.vote'),
     )
 
 This is worth a review. When somebody requests a page from your Web site --
@@ -84,8 +84,8 @@ say, "/polls/23/", Django will load this Python module, because it's pointed to
 by the ``ROOT_URLCONF`` setting. It finds the variable named ``urlpatterns``
 and traverses the regular expressions in order. When it finds a regular
 expression that matches -- ``r'^polls/(?P<poll_id>\d+)/$'`` -- it loads the
-associated Python package/module: ``myproject.apps.polls.views.polls.detail``. That
-corresponds to the function ``detail()`` in ``myproject/apps/polls/views/polls.py``.
+associated Python package/module: ``myproject.apps.polls.views.detail``. That
+corresponds to the function ``detail()`` in ``myproject/apps/polls/views.py``.
 Finally, it calls that ``detail()`` function like so::
 
     detail(request=<HttpRequest object>, poll_id=23)
@@ -99,9 +99,9 @@ what you can do with them. And there's no need to add URL cruft such as
 ``.php`` -- unless you have a sick sense of humor, in which case you can do
 something like this::
 
-    (r'^polls/latest\.php$', 'myproject.apps.polls.views.polls.index'),
+    (r'^polls/latest\.php$', 'myproject.apps.polls.views.index'),
 
-But, don't do that. It's stupid.
+But, don't do that. It's silly.
 
 If you need help with regular expressions, see `Wikipedia's entry`_ and the
 `Python documentation`_. Also, the O'Reilly book "Mastering Regular
@@ -125,16 +125,21 @@ Fire up the Django development Web server::
     django-admin.py runserver --settings=myproject.settings
 
 Now go to "http://localhost:8000/polls/" on your domain in your Web browser.
-You should get a Python traceback with the following error message::
+You should get a pleasantly-colored error page with the following message::
 
-    ViewDoesNotExist: Could not import myproject.apps.polls.views.polls. Error
-    was: No module named polls
+    ViewDoesNotExist at /polls/
+
+    Tried index in module myproject.apps.polls.views. Error was: 'module'
+    object has no attribute 'index'
+
+This error happened because you haven't written a function ``index()`` in the
+module ``myproject/apps/polls/views.py``.
 
 Try "/polls/23/", "/polls/23/results/" and "/polls/23/vote/". The error
-messages should tell you which view Django tried (and failed to find, because
-you haven't written any views yet).
+messages tell you which view Django tried (and failed to find, because you
+haven't written any views yet).
 
-Time to write the first view. Create the file ``myproject/apps/polls/views/polls.py``
+Time to write the first view. Open the file ``myproject/apps/polls/views.py``
 and put the following Python code in it::
 
     from django.utils.httpwrappers import HttpResponse
@@ -374,19 +379,19 @@ Take some time to play around with the views and template system. As you edit
 the URLconf, you may notice there's a fair bit of redundancy in it::
 
     urlpatterns = patterns('',
-        (r'^polls/$', 'myproject.apps.polls.views.polls.index'),
-        (r'^polls/(?P<poll_id>\d+)/$', 'myproject.apps.polls.views.polls.detail'),
-        (r'^polls/(?P<poll_id>\d+)/results/$', 'myproject.apps.polls.views.polls.results'),
-        (r'^polls/(?P<poll_id>\d+)/vote/$', 'myproject.apps.polls.views.polls.vote'),
+        (r'^polls/$', 'myproject.apps.polls.views.index'),
+        (r'^polls/(?P<poll_id>\d+)/$', 'myproject.apps.polls.views.detail'),
+        (r'^polls/(?P<poll_id>\d+)/results/$', 'myproject.apps.polls.views.results'),
+        (r'^polls/(?P<poll_id>\d+)/vote/$', 'myproject.apps.polls.views.vote'),
     )
 
-Namely, ``myproject.apps.polls.views.polls`` is in every callback.
+Namely, ``myproject.apps.polls.views`` is in every callback.
 
 Because this is a common case, the URLconf framework provides a shortcut for
 common prefixes. You can factor out the common prefixes and add them as the
 first argument to ``patterns()``, like so::
 
-    urlpatterns = patterns('myproject.apps.polls.views.polls',
+    urlpatterns = patterns('myproject.apps.polls.views',
         (r'^polls/$', 'index'),
         (r'^polls/(?P<poll_id>\d+)/$', 'detail'),
         (r'^polls/(?P<poll_id>\d+)/results/$', 'results'),
@@ -435,7 +440,7 @@ Now that we've decoupled that, we need to decouple the
 'myproject.apps.polls.urls' urlconf by removing the leading "polls/" from each
 line::
 
-    urlpatterns = patterns('myproject.apps.polls.views.polls',
+    urlpatterns = patterns('myproject.apps.polls.views',
         (r'^$', 'index'),
         (r'^(?P<poll_id>\d+)/$', 'detail'),
         (r'^(?P<poll_id>\d+)/results/$', 'results'),
