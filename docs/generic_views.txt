@@ -76,33 +76,34 @@ couple of common cases: rendering a template when no view logic is needed,
 and issuing a redirect.  These views are:
 
 ``direct_to_template``
-    Renders a given template using any extra parameters passed in the
-    urlpattern; requires the ``template`` argument.
-    
+    Renders a given template, passing it a ``{{ params }}`` template variable,
+    which is a dictionary of the parameters captured in the URL. This requires
+    the ``template`` argument.
+
     For example, given the following URL patterns::
-        
+
         urlpatterns = patterns('django.views.generic.simple',
-            (r'^foo/$',             'direct_to_template', {'template' : 'foo_index'}),
-            (r'^foo/(?P<id>\d+)/$', 'direct_to_template', {'template' : 'foo_detail'}),
+            (r'^foo/$',             'direct_to_template', {'template': 'foo_index'}),
+            (r'^foo/(?P<id>\d+)/$', 'direct_to_template', {'template': 'foo_detail'}),
         )
-        
+
     ... a request to ``/foo/`` would cause the ``foo_index`` template to be
     rendered, and a request to ``/foo/15/`` would cause the ``foo_detail``
     template to be rendered with a context variable ``{{ params.id }}`` that is
     set to ``15``.
-    
+
 ``redirect_to``
     Issue a redirect to a given URL.
 
-    The given url may contain dict-style string formatting which will be
+    The given URL may contain dict-style string formatting, which will be
     interpolated against the params in the URL.  For example, to redirect from
     ``/foo/<id>/`` to ``/bar/<id>/``, you could use the following urlpattern::
 
         urlpatterns = patterns('django.views.generic.simple',
             ('^foo/(?p<id>\d+)/$', 'redirect_to', {'url' : '/bar/%(id)s/'}),
         )
-        
-    If the given url is ``None``, a HttpResponseGone (410) will be issued.
+
+    If the given URL is ``None``, an ``HttpResponseGone`` (410) will be issued.
 
 Using date-based generic views
 ==============================
