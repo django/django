@@ -145,6 +145,7 @@ TECHNICAL_500_TEMPLATE = """
     #requestinfo h3 { margin-bottom:-1em; }
   </style>
   <script type="text/javascript">
+  //<!--
     function getElementsByClassName(oElm, strTagName, strClassName){
         // Written by Jonathan Snook, http://www.snook.ca/jon; Add-ons by Robert Nyman, http://www.robertnyman.com
         var arrElements = (strTagName == "*" && document.all)? document.all :
@@ -188,6 +189,7 @@ TECHNICAL_500_TEMPLATE = """
       s.innerHTML = s.innerHTML == uarr ? darr : uarr;
       return false;
     }
+    //-->
   </script>
 </head>
 <body>
@@ -276,7 +278,7 @@ TECHNICAL_500_TEMPLATE = """
           <th>Value</th>
         </tr>
       </thead>
-      </tbody>
+      <tbody>
         {% for var in request.GET.items %}
           <tr>
             <td>{{ var.0 }}</td>
@@ -286,7 +288,7 @@ TECHNICAL_500_TEMPLATE = """
       </tbody>
     </table>
   {% else %}
-    <p>No GET data<p>
+    <p>No GET data</p>
   {% endif %}
 
   <h3 id="post-info">POST</h3>
@@ -298,7 +300,7 @@ TECHNICAL_500_TEMPLATE = """
           <th>Value</th>
         </tr>
       </thead>
-      </tbody>
+      <tbody>
         {% for var in request.POST.items %}
           <tr>
             <td>{{ var.0 }}</td>
@@ -308,7 +310,7 @@ TECHNICAL_500_TEMPLATE = """
       </tbody>
     </table>
   {% else %}
-    <p>No POST data<p>
+    <p>No POST data</p>
   {% endif %}
 
   <h3 id="cookie-info">COOKIES</h3>
@@ -320,7 +322,7 @@ TECHNICAL_500_TEMPLATE = """
           <th>Value</th>
         </tr>
       </thead>
-      </tbody>
+      <tbody>
         {% for var in request.COOKIES.items %}
           <tr>
             <td>{{ var.0 }}</td>
@@ -330,7 +332,7 @@ TECHNICAL_500_TEMPLATE = """
       </tbody>
     </table>
   {% else %}
-    <p>No cookie data<p>
+    <p>No cookie data</p>
   {% endif %}
 
   <h3 id="meta-info">META</h3>
@@ -341,7 +343,7 @@ TECHNICAL_500_TEMPLATE = """
         <th>Value</th>
       </tr>
     </thead>
-    </tbody>
+    <tbody>
       {% for var in request.META.items|dictsort:"0" %}
         <tr>
           <td>{{ var.0 }}</td>
@@ -360,7 +362,7 @@ TECHNICAL_500_TEMPLATE = """
         <th>Value</th>
       </tr>
     </thead>
-    </tbody>
+    <tbody>
       {% for var in settings.items|dictsort:"0" %}
         <tr>
           <td>{{ var.0 }}</td>
