@@ -131,8 +131,9 @@ TECHNICAL_500_TEMPLATE = """
     ul.traceback li.frame { margin-bottom:1em; }
     div.context { margin: 10px 0; }
     div.context ol { padding-left:30px; margin:0 10px; list-style-position: inside; }
-    div.context ol li { font-family:monospace; white-space:pre; color:#666; }
-    div.context ol.context-line li { color:black; background-color:#ccc; cursor:pointer; }
+    div.context ol li { font-family:monospace; white-space:pre; color:#666; cursor:pointer; }
+    div.context ol.context-line li { color:black; background-color:#ccc; }
+    div.context ol.context-line li span { float: right; }
     div.commands { margin-left: 40px; }
     div.commands a { color:black; text-decoration:none; }
     #summary { background: #ffc; }
@@ -231,11 +232,11 @@ TECHNICAL_500_TEMPLATE = """
         {% if frame.context_line %}
           <div class="context" id="c{{ frame.id }}">
             {% if frame.pre_context %}
-              <ol start="{{ frame.pre_context_lineno }}" class="pre-context" id="pre{{ frame.id }}">{% for line in frame.pre_context %}<li>{{ line|escape }}</li>{% endfor %}</ol>
+              <ol start="{{ frame.pre_context_lineno }}" class="pre-context" id="pre{{ frame.id }}">{% for line in frame.pre_context %}<li onclick="toggle('pre{{ frame.id }}', 'post{{ frame.id }}')">{{ line|escape }}</li>{% endfor %}</ol>
             {% endif %}
-            <ol start="{{ frame.lineno }}" class="context-line"><li onclick="toggle('pre{{ frame.id }}', 'post{{ frame.id }}')">{{ frame.context_line|escape }}</li></ol>
+            <ol start="{{ frame.lineno }}" class="context-line"><li onclick="toggle('pre{{ frame.id }}', 'post{{ frame.id }}')">{{ frame.context_line|escape }} <span>...</span></li></ol>
             {% if frame.post_context %}
-              <ol start='{{ frame.lineno|add:"1" }}' class="post-context" id="post{{ frame.id }}">{% for line in frame.post_context %}<li>{{ line|escape }}</li>{% endfor %}</ol>
+              <ol start='{{ frame.lineno|add:"1" }}' class="post-context" id="post{{ frame.id }}">{% for line in frame.post_context %}<li onclick="toggle('pre{{ frame.id }}', 'post{{ frame.id }}')">{{ line|escape }}</li>{% endfor %}</ol>
             {% endif %}
           </div>
         {% endif %}
