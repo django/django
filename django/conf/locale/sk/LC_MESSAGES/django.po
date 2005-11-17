@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2005-11-15 14:02-0500\n"
+"POT-Creation-Date: 2005-11-16 19:51-0500\n"
 "PO-Revision-Date: 2005-11-10 23:22-0500\n"
 "Last-Translator: Vladimir Labath <vlado@labath.org>\n"
 "Language-Team: Slovak <sk@li.org>\n"
@@ -471,31 +471,31 @@ msgstr "December"
 
 #: utils/dates.py:27
 msgid "Jan."
-msgstr ""
+msgstr "Jan."
 
 #: utils/dates.py:27
 msgid "Feb."
-msgstr ""
+msgstr "Feb."
 
 #: utils/dates.py:28
 msgid "Aug."
-msgstr ""
+msgstr "Aug."
 
 #: utils/dates.py:28
 msgid "Sept."
-msgstr ""
+msgstr "Sept."
 
 #: utils/dates.py:28
 msgid "Oct."
-msgstr ""
+msgstr "Oct."
 
 #: utils/dates.py:28
 msgid "Nov."
-msgstr ""
+msgstr "Nov."
 
 #: utils/dates.py:28
 msgid "Dec."
-msgstr ""
+msgstr "Dec."
 
 #: utils/translation.py:335
 msgid "DATE_FORMAT"
@@ -599,7 +599,7 @@ msgstr "užívateľské meno"
 
 #: models/auth.py:34
 msgid "first name"
-msgstr "meno"
+msgstr "krstné meno"
 
 #: models/auth.py:35
 msgid "last name"
@@ -615,8 +615,7 @@ msgstr "heslo"
 
 #: models/auth.py:37
 msgid "Use an MD5 hash -- not the raw password."
-msgstr ""
-"Vložte takú hodnotu hesla , ako vám ju vráti MD5, nevkladajte ho priamo. "
+msgstr "Vložte takú hodnotu hesla , ako vám ju vráti MD5, nevkladajte ho priamo. "
 
 #: models/auth.py:38
 msgid "staff status"
@@ -679,62 +678,67 @@ msgid "Welsh"
 msgstr "Waleský"
 
 #: conf/global_settings.py:39
+#, fuzzy
+msgid "Danish"
+msgstr "Španielsky"
+
+#: conf/global_settings.py:40
 msgid "German"
 msgstr "Nemecký"
 
-#: conf/global_settings.py:40
+#: conf/global_settings.py:41
 msgid "English"
 msgstr "Anglický"
 
-#: conf/global_settings.py:41
+#: conf/global_settings.py:42
 msgid "Spanish"
 msgstr "Španielsky"
 
-#: conf/global_settings.py:42
+#: conf/global_settings.py:43
 msgid "French"
 msgstr "Francúzsky"
 
-#: conf/global_settings.py:43
+#: conf/global_settings.py:44
 msgid "Galician"
 msgstr "Galicijský"
 
-#: conf/global_settings.py:44
+#: conf/global_settings.py:45
 msgid "Icelandic"
 msgstr "Islandský"
 
-#: conf/global_settings.py:45
+#: conf/global_settings.py:46
 msgid "Italian"
 msgstr "Taliansky"
 
-#: conf/global_settings.py:46
+#: conf/global_settings.py:47
 msgid "Norwegian"
 msgstr "Nórsky"
 
-#: conf/global_settings.py:47
+#: conf/global_settings.py:48
 msgid "Brazilian"
 msgstr "Brazílsky"
 
-#: conf/global_settings.py:48
+#: conf/global_settings.py:49
 msgid "Romanian"
 msgstr "Rumúnsky"
 
-#: conf/global_settings.py:49
+#: conf/global_settings.py:50
 msgid "Russian"
 msgstr "Ruský"
 
-#: conf/global_settings.py:50
+#: conf/global_settings.py:51
 msgid "Slovak"
 msgstr "Slovenský"
 
-#: conf/global_settings.py:51
+#: conf/global_settings.py:52
 msgid "Serbian"
 msgstr "Srbský"
 
-#: conf/global_settings.py:52
+#: conf/global_settings.py:53
 msgid "Swedish"
 msgstr "Švédsky"
 
-#: conf/global_settings.py:53
+#: conf/global_settings.py:54
 msgid "Simplified Chinese"
 msgstr "Zjednodušená činština "
 
@@ -885,8 +889,7 @@ msgstr "Toto pole musí byť vyplnené tak, že %(field)s obsahuje %(value)s"
 #: core/validators.py:293
 #, python-format
 msgid "This field must be given if %(field)s is not %(value)s"
-msgstr ""
-"Toto pole musí byť vyplnené tak, že %(field)s nesmie obsahovať %(value)s"
+msgstr "Toto pole musí byť vyplnené tak, že %(field)s nesmie obsahovať %(value)s"
 
 #: core/validators.py:312
 msgid "Duplicate values are not allowed."
