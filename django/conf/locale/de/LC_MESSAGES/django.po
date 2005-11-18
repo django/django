@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2005-11-15 18:00+0100\n"
+"POT-Creation-Date: 2005-11-18 15:43+0100\n"
 "PO-Revision-Date: 2005-10-08 00:03+0200\n"
 "Last-Translator: Georg Bauer <gb@bofh.ms>\n"
 "MIME-Version: 1.0\n"
@@ -216,27 +216,37 @@ msgstr "Ungültige Kommentar-ID"
 msgid "No voting for yourself"
 msgstr "Keine Abstimmung bei Dir selber"
 
-#: contrib/comments/views/comments.py:24
+#: contrib/comments/views/comments.py:25
 msgid ""
 "This rating is required because you've entered at least one other rating."
 msgstr ""
 "Die Abstimmung ist zwangsweise, weil Du an mindestens einer anderen "
 "Abstimmung teilnimmst."
 
-#: contrib/comments/views/comments.py:108
+#: contrib/comments/views/comments.py:109
 #, python-format
 msgid ""
+"This comment was posted by a user who has posted fewer than %(count)s "
+"comment:\n"
+"\n"
+"%(text)s"
+msgid_plural ""
 "This comment was posted by a user who has posted fewer than %(count)s "
 "comments:\n"
 "\n"
 "%(text)s"
-msgstr ""
+msgstr[0] ""
+"Dieser Kommentar ist von einem Benutzer mit weniger als %(count)s "
+"Kommentar:\n"
+"\n"
+"%(text)s"
+msgstr[1] ""
 "Dieser Kommentar ist von einem Benutzer mit weniger als %(count)s "
 "Kommentaren:\n"
 "\n"
 "%(text)s"
 
-#: contrib/comments/views/comments.py:112
+#: contrib/comments/views/comments.py:114
 #, python-format
 msgid ""
 "This comment was posted by a sketchy user:\n"
@@ -247,24 +257,24 @@ msgstr ""
 "\n"
 "%(text)s"
 
-#: contrib/comments/views/comments.py:184
-#: contrib/comments/views/comments.py:275
+#: contrib/comments/views/comments.py:186
+#: contrib/comments/views/comments.py:277
 msgid "Only POSTs are allowed"
 msgstr "Nur POST ist erlaubt"
 
-#: contrib/comments/views/comments.py:188
-#: contrib/comments/views/comments.py:279
+#: contrib/comments/views/comments.py:190
+#: contrib/comments/views/comments.py:281
 msgid "One or more of the required fields wasn't submitted"
 msgstr "Eines oder mehrere der erforderlichen Felder fehlt"
 
-#: contrib/comments/views/comments.py:192
-#: contrib/comments/views/comments.py:281
+#: contrib/comments/views/comments.py:194
+#: contrib/comments/views/comments.py:283
 msgid "Somebody tampered with the comment form (security violation)"
 msgstr ""
 "Jemand hat mit dem Kommentarformular herumgespielt (Sicherheitsverletzung)"
 
-#: contrib/comments/views/comments.py:202
-#: contrib/comments/views/comments.py:287
+#: contrib/comments/views/comments.py:204
+#: contrib/comments/views/comments.py:289
 msgid ""
 "The comment form had an invalid 'target' parameter -- the object ID was "
 "invalid"
@@ -272,8 +282,8 @@ msgstr ""
 "Das Kommentarformular hatte einen falschen 'target' Parameter -- die Objekt-"
 "ID ist ungültig."
 
-#: contrib/comments/views/comments.py:252
-#: contrib/comments/views/comments.py:316
+#: contrib/comments/views/comments.py:254
+#: contrib/comments/views/comments.py:318
 msgid "The comment form didn't provide either 'preview' or 'post'"
 msgstr ""
 "Das Kommentarformular wurde nicht mit 'preview' oder 'post' abgeschickt"
@@ -1332,99 +1342,99 @@ msgstr "Walisisch"
 msgid "Danish"
 msgstr "Dänisch"
 
-#: conf/global_settings.py:40
+#: conf/global_settings.py:41
 msgid "German"
 msgstr "Deutsch"
 
-#: conf/global_settings.py:41
+#: conf/global_settings.py:42
 msgid "English"
 msgstr "Englisch"
 
-#: conf/global_settings.py:42
+#: conf/global_settings.py:43
 msgid "Spanish"
 msgstr "Spanisch"
 
-#: conf/global_settings.py:43
+#: conf/global_settings.py:44
 msgid "French"
 msgstr "Französisch"
 
-#: conf/global_settings.py:44
+#: conf/global_settings.py:45
 msgid "Galician"
 msgstr "Galicisch"
 
-#: conf/global_settings.py:45
+#: conf/global_settings.py:46
 msgid "Icelandic"
 msgstr "Isländisch"
 
-#: conf/global_settings.py:46
+#: conf/global_settings.py:47
 msgid "Italian"
 msgstr "Italienisch"
 
-#: conf/global_settings.py:47
+#: conf/global_settings.py:48
 msgid "Norwegian"
 msgstr "Norwegisch"
 
-#: conf/global_settings.py:48
+#: conf/global_settings.py:49
 msgid "Brazilian"
 msgstr "Brasilianisch"
 
-#: conf/global_settings.py:49
+#: conf/global_settings.py:50
 msgid "Romanian"
 msgstr "Rumänisch"
 
-#: conf/global_settings.py:50
+#: conf/global_settings.py:51
 msgid "Russian"
 msgstr "Russisch"
 
-#: conf/global_settings.py:51
+#: conf/global_settings.py:52
 msgid "Slovak"
 msgstr "Slowakisch"
 
-#: conf/global_settings.py:52
+#: conf/global_settings.py:53
 msgid "Serbian"
 msgstr "Serbisch"
 
-#: conf/global_settings.py:53
+#: conf/global_settings.py:54
 msgid "Swedish"
 msgstr "Schwedisch"
 
-#: conf/global_settings.py:54
+#: conf/global_settings.py:55
 msgid "Simplified Chinese"
 msgstr "Vereinfachtes Chinesisch"
 
-#: core/formfields.py:59 core/meta/fields.py:287 core/meta/fields.py:482
-#: core/meta/fields.py:493
+#: core/formfields.py:59 core/meta/fields.py:287 core/meta/fields.py:484
+#: core/meta/fields.py:495
 msgid "This field is required."
 msgstr "Dieses Feld ist zwingend."
 
-#: core/formfields.py:329
+#: core/formfields.py:338
 #, python-format
 msgid "Ensure your text is less than %s characters."
 msgstr "Bitte sicherstellen, das der Text weniger als %s Zeichen hat."
 
-#: core/formfields.py:333
+#: core/formfields.py:342
 msgid "Line breaks are not allowed here."
 msgstr "Zeilenumbrüche sind hier nicht erlaubt."
 
-#: core/formfields.py:429 core/formfields.py:500 core/formfields.py:538
+#: core/formfields.py:438 core/formfields.py:509 core/formfields.py:547
 #, python-format
 msgid "Select a valid choice; '%(data)s' is not in %(choices)s."
 msgstr ""
 "Bitte eine gültige Auswahl treffen; '%(data)s' ist nicht in %(choices)s."
 
-#: core/formfields.py:594
+#: core/formfields.py:603
 msgid "The submitted file is empty."
 msgstr "Die ausgewählte Datei ist leer."
 
-#: core/formfields.py:648
+#: core/formfields.py:657
 msgid "Enter a whole number between -32,768 and 32,767."
 msgstr "Bitte eine ganze Zahl zwischen -32.768 und 32.767 eingeben."
 
-#: core/formfields.py:657
+#: core/formfields.py:666
 msgid "Enter a positive number."
 msgstr "Bitte eine ganze, positive Zahl eingeben."
 
-#: core/formfields.py:666
+#: core/formfields.py:675
 msgid "Enter a whole number between 0 and 32,767."
 msgstr "Bitte eine ganze Zahl zwischen 0 und 32.767 eingeben."
 
@@ -1722,11 +1732,11 @@ msgstr ""
 " Um mehr als eine Selektion zu treffen, \"Strg\", oder auf dem Mac \"Command"
 "\", beim Klicken gedrückt halten."
 
-#: core/meta/fields.py:502
+#: core/meta/fields.py:504
 msgid "Enter a valid filename."
 msgstr "Bitte einen gültigen Dateinamen eingeben"
 
-#: core/meta/fields.py:771
+#: core/meta/fields.py:773
 #, python-format
 msgid "Please enter valid %(self)s IDs. The value %(value)r is invalid."
 msgid_plural ""

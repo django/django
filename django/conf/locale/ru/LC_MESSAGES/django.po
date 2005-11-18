@@ -7,13 +7,197 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2005-11-15 17:39+0100\n"
+"POT-Creation-Date: 2005-11-18 15:43+0100\n"
 "PO-Revision-Date: 2005-10-05 00:00\n"
 "Last-Translator: Dmitry Sorokin <ds@@dial.com.ru>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=koi8-r\n"
 "Content-Transfer-Encoding: 8bit\n"
+
+#: contrib/comments/models/comments.py:8
+#: contrib/comments/models/comments.py:161
+msgid "object ID"
+msgstr ""
+
+#: contrib/comments/models/comments.py:9
+msgid "headline"
+msgstr ""
+
+#: contrib/comments/models/comments.py:10
+#: contrib/comments/models/comments.py:162
+msgid "comment"
+msgstr ""
+
+#: contrib/comments/models/comments.py:11
+msgid "rating #1"
+msgstr ""
+
+#: contrib/comments/models/comments.py:12
+msgid "rating #2"
+msgstr ""
+
+#: contrib/comments/models/comments.py:13
+msgid "rating #3"
+msgstr ""
+
+#: contrib/comments/models/comments.py:14
+msgid "rating #4"
+msgstr ""
+
+#: contrib/comments/models/comments.py:15
+msgid "rating #5"
+msgstr ""
+
+#: contrib/comments/models/comments.py:16
+msgid "rating #6"
+msgstr ""
+
+#: contrib/comments/models/comments.py:17
+msgid "rating #7"
+msgstr ""
+
+#: contrib/comments/models/comments.py:18
+msgid "rating #8"
+msgstr ""
+
+#: contrib/comments/models/comments.py:23
+msgid "is valid rating"
+msgstr ""
+
+#: contrib/comments/models/comments.py:24
+#: contrib/comments/models/comments.py:164
+msgid "date/time submitted"
+msgstr ""
+
+#: contrib/comments/models/comments.py:25
+#: contrib/comments/models/comments.py:165
+msgid "is public"
+msgstr ""
+
+#: contrib/comments/models/comments.py:26 contrib/admin/views/doc.py:274
+#, fuzzy
+msgid "IP address"
+msgstr "E-mail адрес:"
+
+#: contrib/comments/models/comments.py:27
+msgid "is removed"
+msgstr ""
+
+#: contrib/comments/models/comments.py:27
+msgid ""
+"Check this box if the comment is inappropriate. A \"This comment has been "
+"removed\" message will be displayed instead."
+msgstr ""
+
+#: contrib/comments/models/comments.py:31
+msgid "Comment"
+msgstr ""
+
+#: contrib/comments/models/comments.py:32
+msgid "Comments"
+msgstr ""
+
+#: contrib/comments/models/comments.py:85
+#: contrib/comments/models/comments.py:204
+msgid "Content object"
+msgstr ""
+
+#: contrib/comments/models/comments.py:113
+#, python-format
+msgid ""
+"Posted by %(user)s at %(date)s\n"
+"\n"
+"%(comment)s\n"
+"\n"
+"http://%(domain)s%(url)s"
+msgstr ""
+
+#: contrib/comments/models/comments.py:163
+msgid "person's name"
+msgstr ""
+
+#: contrib/comments/models/comments.py:166
+#, fuzzy
+msgid "ip address"
+msgstr "E-mail адрес:"
+
+#: contrib/comments/models/comments.py:168
+msgid "approved by staff"
+msgstr ""
+
+#: contrib/comments/models/comments.py:172
+msgid "Free comment"
+msgstr ""
+
+#: contrib/comments/models/comments.py:173
+msgid "Free comments"
+msgstr ""
+
+#: contrib/comments/models/comments.py:209
+msgid "score"
+msgstr ""
+
+#: contrib/comments/models/comments.py:210
+msgid "score date"
+msgstr ""
+
+#: contrib/comments/models/comments.py:213
+msgid "Karma score"
+msgstr ""
+
+#: contrib/comments/models/comments.py:214
+msgid "Karma scores"
+msgstr ""
+
+#: contrib/comments/models/comments.py:223
+#, python-format
+msgid "%(score)d rating by %(user)s"
+msgstr ""
+
+#: contrib/comments/models/comments.py:248
+msgid "flag date"
+msgstr ""
+
+#: contrib/comments/models/comments.py:251
+#, fuzzy
+msgid "User flag"
+msgstr "Пользователь"
+
+#: contrib/comments/models/comments.py:252
+#, fuzzy
+msgid "User flags"
+msgstr "Пользователь"
+
+#: contrib/comments/models/comments.py:256
+#, python-format
+msgid "Flag by %r"
+msgstr ""
+
+#: contrib/comments/models/comments.py:271
+#, python-format
+msgid ""
+"This comment was flagged by %(user)s:\n"
+"\n"
+"%(text)s"
+msgstr ""
+
+#: contrib/comments/models/comments.py:278
+msgid "deletion date"
+msgstr ""
+
+#: contrib/comments/models/comments.py:281
+msgid "Moderator deletion"
+msgstr ""
+
+#: contrib/comments/models/comments.py:282
+msgid "Moderator deletions"
+msgstr ""
+
+#: contrib/comments/models/comments.py:286
+#, python-format
+msgid "Moderator deletion by %r"
+msgstr ""
 
 #: contrib/comments/views/karma.py:18
 msgid "Anonymous users cannot vote"
@@ -27,21 +211,27 @@ msgstr ""
 msgid "No voting for yourself"
 msgstr ""
 
-#: contrib/comments/views/comments.py:24
+#: contrib/comments/views/comments.py:25
 msgid ""
 "This rating is required because you've entered at least one other rating."
 msgstr ""
 
-#: contrib/comments/views/comments.py:108
+#: contrib/comments/views/comments.py:109
 #, python-format
 msgid ""
+"This comment was posted by a user who has posted fewer than %(count)s "
+"comment:\n"
+"\n"
+"%(text)s"
+msgid_plural ""
 "This comment was posted by a user who has posted fewer than %(count)s "
 "comments:\n"
 "\n"
 "%(text)s"
-msgstr ""
+msgstr[0] ""
+msgstr[1] ""
 
-#: contrib/comments/views/comments.py:112
+#: contrib/comments/views/comments.py:114
 #, python-format
 msgid ""
 "This comment was posted by a sketchy user:\n"
@@ -49,30 +239,30 @@ msgid ""
 "%(text)s"
 msgstr ""
 
-#: contrib/comments/views/comments.py:184
-#: contrib/comments/views/comments.py:275
+#: contrib/comments/views/comments.py:186
+#: contrib/comments/views/comments.py:277
 msgid "Only POSTs are allowed"
 msgstr ""
 
-#: contrib/comments/views/comments.py:188
-#: contrib/comments/views/comments.py:279
+#: contrib/comments/views/comments.py:190
+#: contrib/comments/views/comments.py:281
 msgid "One or more of the required fields wasn't submitted"
 msgstr ""
 
-#: contrib/comments/views/comments.py:192
-#: contrib/comments/views/comments.py:281
+#: contrib/comments/views/comments.py:194
+#: contrib/comments/views/comments.py:283
 msgid "Somebody tampered with the comment form (security violation)"
 msgstr ""
 
-#: contrib/comments/views/comments.py:202
-#: contrib/comments/views/comments.py:287
+#: contrib/comments/views/comments.py:204
+#: contrib/comments/views/comments.py:289
 msgid ""
 "The comment form had an invalid 'target' parameter -- the object ID was "
 "invalid"
 msgstr ""
 
-#: contrib/comments/views/comments.py:252
-#: contrib/comments/views/comments.py:316
+#: contrib/comments/views/comments.py:254
+#: contrib/comments/views/comments.py:318
 msgid "The comment form didn't provide either 'preview' or 'post'"
 msgstr ""
 
@@ -135,6 +325,11 @@ msgstr ""
 msgid "Your e-mail address is not your username. Try '%s' instead."
 msgstr ""
 
+#: contrib/admin/views/main.py:50
+#, fuzzy
+msgid "Site administration"
+msgstr "Администрирование Django"
+
 #: contrib/admin/views/main.py:84
 #, python-format
 msgid ""
@@ -143,7 +338,36 @@ msgid ""
 msgstr ""
 
 #: contrib/admin/views/main.py:114 contrib/admin/views/main.py:131
+#: contrib/admin/views/main.py:186
 msgid "All"
+msgstr ""
+
+#: contrib/admin/views/main.py:152
+msgid "Any date"
+msgstr ""
+
+#: contrib/admin/views/main.py:153
+msgid "Today"
+msgstr ""
+
+#: contrib/admin/views/main.py:156
+msgid "Past 7 days"
+msgstr ""
+
+#: contrib/admin/views/main.py:158
+msgid "This month"
+msgstr ""
+
+#: contrib/admin/views/main.py:160
+msgid "This year"
+msgstr ""
+
+#: contrib/admin/views/main.py:186
+msgid "Yes"
+msgstr ""
+
+#: contrib/admin/views/main.py:186
+msgid "No"
 msgstr ""
 
 #: contrib/admin/views/main.py:194
@@ -284,11 +508,6 @@ msgstr ""
 #: contrib/admin/views/doc.py:270
 msgid "Decimal number"
 msgstr ""
-
-#: contrib/admin/views/doc.py:274
-#, fuzzy
-msgid "IP address"
-msgstr "E-mail адрес:"
 
 #: contrib/admin/views/doc.py:276
 msgid "Boolean (Either True, False or None)"
@@ -1070,99 +1289,99 @@ msgstr ""
 msgid "Danish"
 msgstr ""
 
-#: conf/global_settings.py:40
+#: conf/global_settings.py:41
 msgid "German"
 msgstr ""
 
-#: conf/global_settings.py:41
+#: conf/global_settings.py:42
 msgid "English"
 msgstr ""
 
-#: conf/global_settings.py:42
+#: conf/global_settings.py:43
 msgid "Spanish"
 msgstr ""
 
-#: conf/global_settings.py:43
+#: conf/global_settings.py:44
 msgid "French"
 msgstr ""
 
-#: conf/global_settings.py:44
+#: conf/global_settings.py:45
 msgid "Galician"
 msgstr ""
 
-#: conf/global_settings.py:45
+#: conf/global_settings.py:46
 msgid "Icelandic"
 msgstr ""
 
-#: conf/global_settings.py:46
+#: conf/global_settings.py:47
 msgid "Italian"
 msgstr ""
 
-#: conf/global_settings.py:47
+#: conf/global_settings.py:48
 msgid "Norwegian"
 msgstr ""
 
-#: conf/global_settings.py:48
+#: conf/global_settings.py:49
 msgid "Brazilian"
 msgstr ""
 
-#: conf/global_settings.py:49
+#: conf/global_settings.py:50
 msgid "Romanian"
 msgstr ""
 
-#: conf/global_settings.py:50
+#: conf/global_settings.py:51
 msgid "Russian"
 msgstr ""
 
-#: conf/global_settings.py:51
+#: conf/global_settings.py:52
 msgid "Slovak"
 msgstr ""
 
-#: conf/global_settings.py:52
+#: conf/global_settings.py:53
 msgid "Serbian"
 msgstr ""
 
-#: conf/global_settings.py:53
+#: conf/global_settings.py:54
 msgid "Swedish"
 msgstr ""
 
-#: conf/global_settings.py:54
+#: conf/global_settings.py:55
 msgid "Simplified Chinese"
 msgstr ""
 
-#: core/formfields.py:59 core/meta/fields.py:287 core/meta/fields.py:482
-#: core/meta/fields.py:493
+#: core/formfields.py:59 core/meta/fields.py:287 core/meta/fields.py:484
+#: core/meta/fields.py:495
 msgid "This field is required."
 msgstr ""
 
-#: core/formfields.py:329
+#: core/formfields.py:338
 #, python-format
 msgid "Ensure your text is less than %s characters."
 msgstr ""
 
-#: core/formfields.py:333
+#: core/formfields.py:342
 msgid "Line breaks are not allowed here."
 msgstr ""
 
-#: core/formfields.py:429 core/formfields.py:500 core/formfields.py:538
+#: core/formfields.py:438 core/formfields.py:509 core/formfields.py:547
 #, python-format
 msgid "Select a valid choice; '%(data)s' is not in %(choices)s."
 msgstr ""
 
-#: core/formfields.py:594
+#: core/formfields.py:603
 msgid "The submitted file is empty."
 msgstr ""
 
-#: core/formfields.py:648
+#: core/formfields.py:657
 msgid "Enter a whole number between -32,768 and 32,767."
 msgstr ""
 
-#: core/formfields.py:657
+#: core/formfields.py:666
 #, fuzzy
 msgid "Enter a positive number."
 msgstr "E-mail адрес:"
 
-#: core/formfields.py:666
+#: core/formfields.py:675
 msgid "Enter a whole number between 0 and 32,767."
 msgstr ""
 
@@ -1432,12 +1651,12 @@ msgid ""
 " Hold down \"Control\", or \"Command\" on a Mac, to select more than one."
 msgstr ""
 
-#: core/meta/fields.py:502
+#: core/meta/fields.py:504
 #, fuzzy
 msgid "Enter a valid filename."
 msgstr "E-mail адрес:"
 
-#: core/meta/fields.py:771
+#: core/meta/fields.py:773
 #, python-format
 msgid "Please enter valid %(self)s IDs. The value %(value)r is invalid."
 msgid_plural ""
