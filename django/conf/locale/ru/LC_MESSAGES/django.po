@@ -499,7 +499,7 @@ msgstr "URL"
 msgid ""
 "Example: '/about/contact/'. Make sure to have leading and trailing slashes."
 msgstr ""
-"Пример: '/about/contact/'. Будьте уверенны, что вставили завепршающий слэш."
+"Пример: '/about/contact/'. Будьте уверенны, что вставили завершающий слэш."
 
 #: models/core.py:89
 msgid "title"
@@ -606,15 +606,15 @@ msgstr "Пароль:"
 
 #: models/auth.py:37
 msgid "Use an MD5 hash -- not the raw password."
-msgstr "Используйте MD5 хэш -- только не необработанный пароль"
+msgstr "Используйте MD5 хэш -- только не необработанный пароль."
 
 #: models/auth.py:38
 msgid "staff status"
-msgstr ""
+msgstr "статус персонала"
 
 #: models/auth.py:38
 msgid "Designates whether the user can log into this admin site."
-msgstr ""
+msgstr "Отметте, если пользователь может входить в админ. часть сайта."
 
 #: models/auth.py:39
 msgid "active"
@@ -637,6 +637,8 @@ msgid ""
 "In addition to the permissions manually assigned, this user will also get "
 "all permissions granted to each group he/she is in."
 msgstr ""
+"К добавлению к перавам выбрнанным вуручную, этот пользователь может получить "
+"все права группы, к которой он принадлежит."
 
 #: models/auth.py:48
 #, fuzzy
@@ -843,8 +845,8 @@ msgstr "Вводите реальную абривиатуру штатов США."
 #, python-format
 msgid "Watch your mouth! The word %s is not allowed here."
 msgid_plural "Watch your mouth! The words %s are not allowed here."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Следите за своимми словами! Слова %s здесь запрещены."
+msgstr[1] "Следите за своимми словами! Слова %s здесь запрещены."
 
 #: core/validators.py:231
 #, python-format
@@ -871,7 +873,7 @@ msgstr ""
 
 #: core/validators.py:308
 msgid "Duplicate values are not allowed."
-msgstr ""
+msgstr "Двойные значения запрещенны."
 
 #: core/validators.py:331
 #, python-format
@@ -880,52 +882,55 @@ msgstr ""
 
 #: core/validators.py:342
 msgid "Please enter a valid decimal number."
-msgstr ""
+msgstr "Пожалуйста, вводите корректное десятичное число."
 
 #: core/validators.py:344
 #, python-format
 msgid "Please enter a valid decimal number with at most %s total digit."
 msgid_plural ""
 "Please enter a valid decimal number with at most %s total digits."
-msgstr[0] ""
+msgstr[0] "Пожалуйста, вводите корректное десятичное число с максимальным количеством знаков %s."
 msgstr[1] ""
+"Пожалуйста, вводите корректное десятичное число с максимальным количеством знаков %s."
 
 #: core/validators.py:347
 #, python-format
 msgid "Please enter a valid decimal number with at most %s decimal place."
 msgid_plural ""
 "Please enter a valid decimal number with at most %s decimal places."
-msgstr[0] ""
+msgstr[0] "Пожалуйста, вводите корректное десятичное число с максимальным количеством знаков после запятой %s."
 msgstr[1] ""
+"Пожалуйста, вводите корректное десятичное число с максимальным количеством знаков после запятой %s."
 
 #: core/validators.py:357
 #, python-format
 msgid "Make sure your uploaded file is at least %s bytes big."
-msgstr ""
+msgstr "Будте уверены, что загруженный файл по крайней мере не меньше %s байт."
 
 #: core/validators.py:358
 #, python-format
 msgid "Make sure your uploaded file is at most %s bytes big."
-msgstr ""
+msgstr "Будте уверены, что загруженный файл больше чем %s байт."
 
 #: core/validators.py:371
 msgid "The format for this field is wrong."
-msgstr ""
+msgstr "Формат этого поля неверен"
 
 #: core/validators.py:386
 msgid "This field is invalid."
-msgstr ""
+msgstr "Это поле неверно."
 
 #: core/validators.py:421
 #, python-format
 msgid "Could not retrieve anything from %s."
-msgstr ""
+msgstr "Невозможно получить что либо с %s."
 
 #: core/validators.py:424
 #, python-format
 msgid ""
 "The URL %(url)s returned the invalid Content-Type header '%(contenttype)s'."
 msgstr ""
+"URL %(url) вернул неверны заголовок Content-Type '%(contenttype)'."
 
 #: core/validators.py:457
 #, python-format
@@ -971,7 +976,7 @@ msgstr ""
 
 #: core/meta/fields.py:111
 msgid " Separate multiple IDs with commas."
-msgstr ""
+msgstr "Разделяйте множество ID запятой."
 
 #: core/meta/fields.py:114
 msgid ""
