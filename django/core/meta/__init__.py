@@ -1518,8 +1518,13 @@ def function_get_sql_clause(opts, **kwargs):
         _fill_table_cache(opts, select, tables, where, opts.db_table, [opts.db_table])
 
     # Add any additional SELECTs passed in via kwargs.
+    def quote_only_if_word(word):
+        if word.find(' ')>=0:
+            return word
+        else:
+            return db.db.quote_name(word)
     if kwargs.get('select'):
-        select.extend(['(%s) AS %s' % (db.db.quote_name(s[1]), db.db.quote_name(s[0])) for s in kwargs['select']])
+        select.extend(['(%s) AS %s' % (quote_only_if_word(s[1]), db.db.quote_name(s[0])) for s in kwargs['select']])
 
     # ORDER BY clause
     order_by = []

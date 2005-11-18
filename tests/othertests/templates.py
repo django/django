@@ -1,6 +1,8 @@
+import traceback
+
 from django.core import template
 from django.core.template import loader
-from django.utils.translation import activate, deactivate
+from django.utils.translation import activate, deactivate, install
 
 # Helper objects for template tests
 class SomeClass:
@@ -294,8 +296,11 @@ def run_tests(verbosity=0, standalone=False):
     tests = TEMPLATE_TESTS.items()
     tests.sort()
     for name, vals in tests:
+        install()
         if 'LANGUAGE_CODE' in vals[1]:
             activate(vals[1]['LANGUAGE_CODE'])
+        else:
+            activate('en-us')
         try:
             output = loader.get_template(name).render(template.Context(vals[1]))
         except Exception, e:
@@ -304,6 +309,7 @@ def run_tests(verbosity=0, standalone=False):
                     print "Template test: %s -- Passed" % name
             else:
                 if verbosity:
+                    traceback.print_exc()
                     print "Template test: %s -- FAILED. Got %s, exception: %s" % (name, e.__class__, e)
                 failed_tests.append(name)
             continue

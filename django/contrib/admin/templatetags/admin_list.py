@@ -126,7 +126,7 @@ def result_headers(cl):
                     try:
                         header = func.short_description
                     except AttributeError:
-                        header = func.__name__
+                        header = func.__name__.replace('_', ' ')
                 # Non-field list_display values don't get ordering capability.
                 yield {"text": header}
             else:

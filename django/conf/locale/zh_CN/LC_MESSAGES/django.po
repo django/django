@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: django v1.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2005-11-18 15:43+0100\n"
-"PO-Revision-Date: 2005-11-11 13:55+0800\n"
+"PO-Revision-Date: 2005-11-16 12:55+0800\n"
 "Last-Translator: limodou <limodou@gmail.com>\n"
 "Language-Team: Simplified Chinese <limodou@gmail.com>\n"
 "MIME-Version: 1.0\n"
@@ -990,7 +990,6 @@ msgid "template name"
 msgstr "模板名称"
 
 #: contrib/flatpages/models/flatpages.py:12
-#, fuzzy
 msgid ""
 "Example: 'flatpages/contact_page'. If this isn't provided, the system will "
 "use 'flatpages/default'."
@@ -1297,9 +1296,8 @@ msgid "Welsh"
 msgstr "威尔士语"
 
 #: conf/global_settings.py:40
-#, fuzzy
 msgid "Danish"
-msgstr "西斑牙语"
+msgstr "丹麦语"
 
 #: conf/global_settings.py:41
 msgid "German"
@@ -1311,7 +1309,7 @@ msgstr "英语"
 
 #: conf/global_settings.py:43
 msgid "Spanish"
-msgstr "西斑牙语"
+msgstr "西班牙语"
 
 #: conf/global_settings.py:44
 msgid "French"
@@ -1323,7 +1321,7 @@ msgstr "加利西亚语"
 
 #: conf/global_settings.py:46
 msgid "Icelandic"
-msgstr ""
+msgstr "冰岛语"
 
 #: conf/global_settings.py:47
 msgid "Italian"
@@ -1355,7 +1353,7 @@ msgstr "塞尔维亚语"
 
 #: conf/global_settings.py:54
 msgid "Swedish"
-msgstr ""
+msgstr "瑞典语"
 
 #: conf/global_settings.py:55
 msgid "Simplified Chinese"

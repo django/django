@@ -331,12 +331,13 @@ Now the poll change list page looks like this:
 You can click on the column headers to sort by those values -- except in the
 case of the ``was_published_today`` header, because sorting by the output of
 an arbitrary method is not supported. Also note that the column header for
-``was_published_today`` is, by default, the name of the method. But you can
-change that by giving that method a ``short_description`` attribute::
+``was_published_today`` is, by default, the name of the method (with
+underscores replaced with spaces). But you can change that by giving that
+method a ``short_description`` attribute::
 
     def was_published_today(self):
         return self.pub_date.date() == datetime.date.today()
-    was_published_today.short_description = 'Was published today'
+    was_published_today.short_description = 'Published today?'
 
 
 Let's add another improvement to the Poll change list page: Filters. Add the

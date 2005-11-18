@@ -1266,7 +1266,7 @@ msgstr "užívateľské meno"
 
 #: models/auth.py:34
 msgid "first name"
-msgstr "meno"
+msgstr "krstné meno"
 
 #: models/auth.py:35
 msgid "last name"
@@ -1345,12 +1345,12 @@ msgstr "Český"
 msgid "Welsh"
 msgstr "Waleský"
 
-#: conf/global_settings.py:40
+#: conf/global_settings.py:40 conf/global_settings.py:41
 #, fuzzy
 msgid "Danish"
 msgstr "Španielsky"
 
-#: conf/global_settings.py:41
+#: conf/global_settings.py:40
 msgid "German"
 msgstr "Nemecký"
 

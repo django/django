@@ -1298,7 +1298,7 @@ msgstr "Meldinger"
 
 #: conf/global_settings.py:37
 msgid "Bengali"
-msgstr ""
+msgstr "Bengalsk"
 
 #: conf/global_settings.py:38
 msgid "Czech"
@@ -1306,12 +1306,11 @@ msgstr "Tsjekkisk"
 
 #: conf/global_settings.py:39
 msgid "Welsh"
-msgstr ""
+msgstr "Walisisk"
 
 #: conf/global_settings.py:40
-#, fuzzy
 msgid "Danish"
-msgstr "Spansk"
+msgstr "Dnask"
 
 #: conf/global_settings.py:41
 msgid "German"
@@ -1335,7 +1334,7 @@ msgstr "Galisisk"
 
 #: conf/global_settings.py:46
 msgid "Icelandic"
-msgstr ""
+msgstr "Islandsk"
 
 #: conf/global_settings.py:47
 msgid "Italian"
@@ -1351,7 +1350,7 @@ msgstr "Brasiliansk"
 
 #: conf/global_settings.py:50
 msgid "Romanian"
-msgstr ""
+msgstr "Romansk"
 
 #: conf/global_settings.py:51
 msgid "Russian"
@@ -1359,7 +1358,7 @@ msgstr "Russisk"
 
 #: conf/global_settings.py:52
 msgid "Slovak"
-msgstr ""
+msgstr "Slovakisk"
 
 #: conf/global_settings.py:53
 msgid "Serbian"
@@ -1367,11 +1366,11 @@ msgstr "Serbisk"
 
 #: conf/global_settings.py:54
 msgid "Swedish"
-msgstr ""
+msgstr "Svensk"
 
 #: conf/global_settings.py:55
 msgid "Simplified Chinese"
-msgstr "Simpel Kinesisk"
+msgstr "Simplifisert Kinesisk"
 
 #: core/formfields.py:59 core/meta/fields.py:287 core/meta/fields.py:484
 #: core/meta/fields.py:495

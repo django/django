@@ -33,8 +33,8 @@ def technical_500_response(request, exc_type, exc_value, tb):
             'pre_context_lineno' : pre_context_lineno,
         })
         tb = tb.tb_next
-    
-    # Turn the settings module into a dict, filtering out anything that 
+
+    # Turn the settings module into a dict, filtering out anything that
     # matches HIDDEN_SETTINGS along the way.
     settings_dict = {}
     for k in dir(settings):
@@ -43,7 +43,7 @@ def technical_500_response(request, exc_type, exc_value, tb):
                 settings_dict[k] = '********************'
             else:
                 settings_dict[k] = getattr(settings, k)
-                
+
     t = Template(TECHNICAL_500_TEMPLATE)
     c = Context({
         'exception_type' : exc_type.__name__,
@@ -53,7 +53,7 @@ def technical_500_response(request, exc_type, exc_value, tb):
         'request' : request,
         'request_protocol' : os.environ.get("HTTPS") == "on" and "https" or "http",
         'settings' : settings_dict,
-        
+
     })
     return HttpResponseServerError(t.render(c))
 
@@ -66,7 +66,7 @@ def technical_404_response(request, exception):
         tried = exception.args[0]['tried']
     except (IndexError, TypeError):
         tried = []
-        
+
     t = Template(TECHNICAL_404_TEMPLATE)
     c = Context({
         'root_urlconf' : settings.ROOT_URLCONF,
@@ -80,7 +80,7 @@ def technical_404_response(request, exception):
 
 def _get_lines_from_file(filename, lineno, context_lines):
     """
-    Returns context_lines before and after lineno from file.  
+    Returns context_lines before and after lineno from file.
     Returns (pre_context_lineno, pre_context, context_line, post_context).
     """
     try:
@@ -91,7 +91,7 @@ def _get_lines_from_file(filename, lineno, context_lines):
         pre_context = [line.strip('\n') for line in source[lower_bound:lineno]]
         context_line = source[lineno].strip('\n')
         post_context = [line.strip('\n') for line in source[lineno+1:upper_bound]]
-        
+
         return lower_bound, pre_context, context_line, post_context
     except (OSError, IOError):
         return None, [], None, []
@@ -131,8 +131,9 @@ TECHNICAL_500_TEMPLATE = """
     ul.traceback li.frame { margin-bottom:1em; }
     div.context { margin: 10px 0; }
     div.context ol { padding-left:30px; margin:0 10px; list-style-position: inside; }
-    div.context ol li { font-family:monospace; white-space:pre; color:#666; }
-    div.context ol.context-line li { color:black; background-color:#ccc; cursor:pointer; }
+    div.context ol li { font-family:monospace; white-space:pre; color:#666; cursor:pointer; }
+    div.context ol.context-line li { color:black; background-color:#ccc; }
+    div.context ol.context-line li span { float: right; }
     div.commands { margin-left: 40px; }
     div.commands a { color:black; text-decoration:none; }
     #summary { background: #ffc; }
@@ -145,25 +146,26 @@ TECHNICAL_500_TEMPLATE = """
     #requestinfo h3 { margin-bottom:-1em; }
   </style>
   <script type="text/javascript">
+  //<!--
     function getElementsByClassName(oElm, strTagName, strClassName){
         // Written by Jonathan Snook, http://www.snook.ca/jon; Add-ons by Robert Nyman, http://www.robertnyman.com
-        var arrElements = (strTagName == "*" && document.all)? document.all : 
+        var arrElements = (strTagName == "*" && document.all)? document.all :
         oElm.getElementsByTagName(strTagName);
         var arrReturnElements = new Array();
         strClassName = strClassName.replace(/\-/g, "\\-");
         var oRegExp = new RegExp("(^|\\s)" + strClassName + "(\\s|$)");
         var oElement;
         for(var i=0; i<arrElements.length; i++){
-            oElement = arrElements[i];      
+            oElement = arrElements[i];
             if(oRegExp.test(oElement.className)){
                 arrReturnElements.push(oElement);
-            }   
+            }
         }
         return (arrReturnElements)
     }
     function hideAll(elems) {
-      for (var e = 0; e < elems.length; e++) { 
-        elems[e].style.display = 'none'; 
+      for (var e = 0; e < elems.length; e++) {
+        elems[e].style.display = 'none';
       }
     }
     window.onload = function() {
@@ -183,11 +185,12 @@ TECHNICAL_500_TEMPLATE = """
     function varToggle(link, id) {
       toggle('v' + id);
       var s = link.getElementsByTagName('span')[0];
-      var uarr = String.fromCharCode(0x2191);
-      var darr = String.fromCharCode(0x2193);
+      var uarr = String.fromCharCode(0x25b6);
+      var darr = String.fromCharCode(0x25bc);
       s.innerHTML = s.innerHTML == uarr ? darr : uarr;
       return false;
     }
+    //-->
   </script>
 </head>
 <body>
@@ -225,22 +228,22 @@ TECHNICAL_500_TEMPLATE = """
     {% for frame in frames %}
       <li class="frame">
         <code>{{ frame.filename }}</code> in <code>{{ frame.function }}</code>
-        
+
         {% if frame.context_line %}
           <div class="context" id="c{{ frame.id }}">
             {% if frame.pre_context %}
-              <ol start="{{ frame.pre_context_lineno }}" class="pre-context" id="pre{{ frame.id }}">{% for line in frame.pre_context %}<li>{{ line|escape }}</li>{% endfor %}</ol>
+              <ol start="{{ frame.pre_context_lineno }}" class="pre-context" id="pre{{ frame.id }}">{% for line in frame.pre_context %}<li onclick="toggle('pre{{ frame.id }}', 'post{{ frame.id }}')">{{ line|escape }}</li>{% endfor %}</ol>
             {% endif %}
-            <ol start="{{ frame.lineno }}" class="context-line"><li onclick="toggle('pre{{ frame.id }}', 'post{{ frame.id }}')">{{ frame.context_line|escape }}</li></ol>
+            <ol start="{{ frame.lineno }}" class="context-line"><li onclick="toggle('pre{{ frame.id }}', 'post{{ frame.id }}')">{{ frame.context_line|escape }} <span>...</span></li></ol>
             {% if frame.post_context %}
-              <ol start='{{ frame.lineno|add:"1" }}' class="post-context" id="post{{ frame.id }}">{% for line in frame.post_context %}<li>{{ line|escape }}</li>{% endfor %}</ol>
+              <ol start='{{ frame.lineno|add:"1" }}' class="post-context" id="post{{ frame.id }}">{% for line in frame.post_context %}<li onclick="toggle('pre{{ frame.id }}', 'post{{ frame.id }}')">{{ line|escape }}</li>{% endfor %}</ol>
             {% endif %}
           </div>
         {% endif %}
-    
+
         {% if frame.vars %}
           <div class="commands">
-              <a href="#" onclick="return varToggle(this, '{{ frame.id }}')">Local vars <span>&darr;</span> </a>
+              <a href="#" onclick="return varToggle(this, '{{ frame.id }}')"><span>&#x25b6;</span> Local vars</a>
           </div>
           <table class="vars" id="v{{ frame.id }}">
             <thead>
@@ -266,7 +269,7 @@ TECHNICAL_500_TEMPLATE = """
 
 <div id="requestinfo">
   <h2>Request information</h2>
-  
+
   <h3 id="get-info">GET</h3>
   {% if request.GET %}
     <table class="req">
@@ -276,7 +279,7 @@ TECHNICAL_500_TEMPLATE = """
           <th>Value</th>
         </tr>
       </thead>
-      </tbody>
+      <tbody>
         {% for var in request.GET.items %}
           <tr>
             <td>{{ var.0 }}</td>
@@ -286,9 +289,9 @@ TECHNICAL_500_TEMPLATE = """
       </tbody>
     </table>
   {% else %}
-    <p>No GET data<p>
+    <p>No GET data</p>
   {% endif %}
-  
+
   <h3 id="post-info">POST</h3>
   {% if request.POST %}
     <table class="req">
@@ -298,7 +301,7 @@ TECHNICAL_500_TEMPLATE = """
           <th>Value</th>
         </tr>
       </thead>
-      </tbody>
+      <tbody>
         {% for var in request.POST.items %}
           <tr>
             <td>{{ var.0 }}</td>
@@ -308,9 +311,9 @@ TECHNICAL_500_TEMPLATE = """
       </tbody>
     </table>
   {% else %}
-    <p>No POST data<p>
+    <p>No POST data</p>
   {% endif %}
-  
+
   <h3 id="cookie-info">COOKIES</h3>
   {% if request.COOKIES %}
     <table class="req">
@@ -320,7 +323,7 @@ TECHNICAL_500_TEMPLATE = """
           <th>Value</th>
         </tr>
       </thead>
-      </tbody>
+      <tbody>
         {% for var in request.COOKIES.items %}
           <tr>
             <td>{{ var.0 }}</td>
@@ -330,9 +333,9 @@ TECHNICAL_500_TEMPLATE = """
       </tbody>
     </table>
   {% else %}
-    <p>No cookie data<p>
+    <p>No cookie data</p>
   {% endif %}
-  
+
   <h3 id="meta-info">META</h3>
   <table class="req">
     <thead>
@@ -341,7 +344,7 @@ TECHNICAL_500_TEMPLATE = """
         <th>Value</th>
       </tr>
     </thead>
-    </tbody>
+    <tbody>
       {% for var in request.META.items|dictsort:"0" %}
         <tr>
           <td>{{ var.0 }}</td>
@@ -360,7 +363,7 @@ TECHNICAL_500_TEMPLATE = """
         <th>Value</th>
       </tr>
     </thead>
-    </tbody>
+    <tbody>
       {% for var in settings.items|dictsort:"0" %}
         <tr>
           <td>{{ var.0 }}</td>
@@ -434,12 +437,12 @@ TECHNICAL_404_TEMPLATE = """
           <li>{{ pattern|escape }}</li>
         {% endfor %}
       </ol>
-      <p>The current URL, <code>{{ request.path }}</code>, didn't match any of these.</p> 
+      <p>The current URL, <code>{{ request.path }}</code>, didn't match any of these.</p>
     {% else %}
       <p>{{ reason|escape }}</p>
     {% endif %}
   </div>
-  
+
   <div id="explanation">
     <p>
       You're seeing this error because you have <code>DEBUG = True</code> in
