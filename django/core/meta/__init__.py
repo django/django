@@ -213,12 +213,10 @@ class RelatedObject(object):
             return [None for _ in range(self.field.rel.num_in_admin)]
 
     
-    def editable_fields(self, wrapping_func = lambda x: x):
-        """Get the fields in this class that should be edited inline.
-        Pass a callable, eg a class, as the second argument to wrap the fields.
-        This can be useful to add extra attributes for use in templates."""
+    def editable_fields(self):
+        """Get the fields in this class that should be edited inline."""
         
-        return [wrapping_func(f) for f in self.opts.fields + self.opts.many_to_many if f.editable and f != self.field ]
+        return [f for f in self.opts.fields + self.opts.many_to_many if f.editable and f != self.field ]
       
     def get_follow(self, override=None):
         if isinstance(override, bool):

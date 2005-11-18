@@ -126,7 +126,7 @@ class FormFieldCollectionWrapper(object):
 class TabularBoundRelatedObject(BoundRelatedObject):
     def __init__(self, related_object, field_mapping, original):
         super(TabularBoundRelatedObject, self).__init__(related_object, field_mapping, original)
-        self.field_wrapper_list = self.relation.editable_fields(FieldWrapper)
+        self.field_wrapper_list = [FieldWrapper(field) for field in self.relation.editable_fields()]
         
         fields = self.relation.editable_fields()
         

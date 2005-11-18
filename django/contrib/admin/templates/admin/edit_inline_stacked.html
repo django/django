@@ -5,7 +5,7 @@
       <p><a href="/r/{{ fcw.obj.original.content_type_id }}/{{ fcw.obj.original.id }}/">View on site</a></p>
       {% endif %}{% endif %}
       {% for bound_field in fcw.bound_fields %}
-         {% if bound_field.not_in_table %}
+         {% if bound_field.hidden %}
             {% field_widget bound_field %}
          {% else %}
             {% admin_field_line bound_field %}

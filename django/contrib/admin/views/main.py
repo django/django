@@ -1,22 +1,22 @@
 # Generic admin views.
 from django.contrib.admin.views.decorators import staff_member_required
+from django.contrib.admin.filterspecs import FilterSpec
 from django.core import formfields, meta, template
 from django.core.template import loader
 from django.core.meta.fields import BoundField, BoundFieldLine, BoundFieldSet
 from django.core.exceptions import Http404, ObjectDoesNotExist, PermissionDenied
 from django.core.extensions import DjangoContext as Context
 from django.core.extensions import get_object_or_404, render_to_response
+from django.core.paginator import ObjectPaginator, InvalidPage
+from django.conf.settings import ADMIN_MEDIA_PREFIX
 from django.models.admin import log
 from django.utils.html import strip_tags
 from django.utils.httpwrappers import HttpResponse, HttpResponseRedirect
 from django.utils.text import capfirst, get_text_list
-from django.conf.settings import ADMIN_MEDIA_PREFIX
-from django.core.paginator import ObjectPaginator, InvalidPage
 from django.utils import dateformat
 from django.utils.dates import MONTHS
 from django.utils.html import escape
 import operator
-import datetime
 
 # The system will display a "Show all" link only if the total result count
 # is less than or equal to this setting.
@@ -53,148 +53,6 @@ index = staff_member_required(index)
 class IncorrectLookupParameters(Exception):
     pass
 
-class FilterSpec(object):
-    filter_specs = []
-    def __init__(self, f, request, params):
-        self.field = f
-        self.params = params
-        
-    def register(cls, test, factory):
-        cls.filter_specs.append( (test, factory) )
-    register = classmethod(register)
-    
-    def create(cls, f, request, params):
-        for test, factory in cls.filter_specs:
-            if test(f):
-                return factory(f, request, params)    
-    create = classmethod(create)
-    
-    def has_output(self):
-        return True
-    
-    def choices(self, cl):
-        raise NotImplementedException()
-    
-    def title(self):
-        return self.field.verbose_name
-    
-    def output(self, cl):
-        t = []
-        if self.has_output():
-            t.append(_('<h3>By %s:</h3>\n<ul>\n') % self.title())
-            
-            for choice in self.choices(cl):
-                t.append('<li%s><a href="%s">%s</a></li>\n' % \
-                    ((choice['selected'] and ' class="selected"' or ''),
-                     choice['query_string'] , 
-                     choice['display']))            
-            t.append('</ul>\n\n')
-        return "".join(t)
-    
-class RelatedFilterSpec(FilterSpec):
-    def __init__(self, f, request, params):
-        super(RelatedFilterSpec, self).__init__(f, request, params)    
-        if isinstance(f, meta.ManyToManyField):
-            self.lookup_title = f.rel.to.verbose_name
-        else:
-            self.lookup_title = f.verbose_name
-        self.lookup_kwarg = '%s__%s__exact' % (f.name, f.rel.to.pk.name)
-        self.lookup_val = request.GET.get(self.lookup_kwarg, None)
-        self.lookup_choices = f.rel.to.get_model_module().get_list()
-    
-    def has_output(self):
-        return len(self.lookup_choices) > 1
-        
-    def title(self):
-        return self.lookup_title     
-        
-    def choices(self, cl):
-        yield {'selected': self.lookup_val is None,
-               'query_string': cl.get_query_string({}, [self.lookup_kwarg]), 
-               'display': _('All') }
-        for val in self.lookup_choices:
-            pk_val = getattr(val, self.field.rel.to.pk.attname)
-            yield { 'selected': self.lookup_val == str(pk_val), 
-                    'query_string': cl.get_query_string( {self.lookup_kwarg: pk_val}),
-                    'display' : val }
-FilterSpec.register(lambda f: bool(f.rel), RelatedFilterSpec)
-
-class ChoicesFilterSpec(FilterSpec):
-    def __init__(self, f, request, params):
-        super(ChoicesFilterSpec, self).__init__(f, request, params)
-        self.lookup_kwarg = '%s__exact' % f.name
-        self.lookup_val = request.GET.get(self.lookup_kwarg, None)
-        
-    def choices(self, cl):
-        yield {'selected' : self.lookup_val is None, 
-               'query_string': cl.get_query_string( {}, [self.lookup_kwarg]), 
-               'display': _('All') }
-        for k, v in self.field.choices:
-            yield {'selected': str(k) == self.lookup_val, 
-                    'query_string' : cl.get_query_string( {self.lookup_kwarg: k}),
-                    'display' : v }
-FilterSpec.register(lambda f: bool(f.choices), ChoicesFilterSpec)
-
-class DateFieldFilterSpec(FilterSpec):
-    
-    def __init__(self, f, request, params):
-        super(DateFieldFilterSpec, self).__init__(f, request, params)
-        
-        self.field_generic = '%s__' % self.field.name
-        
-        self.date_params = dict([(k, v) for k, v in params.items() if k.startswith(self.field_generic)])
-        
-        today = datetime.date.today()
-        one_week_ago = today - datetime.timedelta(days=7)
-        today_str = isinstance(self.field, meta.DateTimeField) and today.strftime('%Y-%m-%d 23:59:59') or today.strftime('%Y-%m-%d')
-        
-        self.links = (
-            (_('Any date'), {}),
-            (_('Today'), {'%s__year' % self.field.name: str(today.year), 
-                       '%s__month' % self.field.name: str(today.month), 
-                       '%s__day' % self.field.name: str(today.day)}),
-            (_('Past 7 days'), {'%s__gte' % self.field.name: one_week_ago.strftime('%Y-%m-%d'), 
-                             '%s__lte' % f.name: today_str}),
-            (_('This month'), {'%s__year' % self.field.name: str(today.year), 
-                             '%s__month' % f.name: str(today.month)}),
-            (_('This year'), {'%s__year' % self.field.name: str(today.year)})
-        ) 
-    
-    def title(self):
-        return self.field.verbose_name
-    
-    def choices(self, cl):
-        for title, param_dict in self.links:
-            yield { 'selected' : self.date_params == param_dict, 
-                    'query_string' : cl.get_query_string( param_dict, self.field_generic),
-                    'display' : title }
-                    
-FilterSpec.register(lambda f: isinstance(f, meta.DateField), DateFieldFilterSpec)
-
-class BooleanFieldFilterSpec(FilterSpec):
-    def __init__(self, f, request, params):
-        super(BooleanFieldFilterSpec, self).__init__(f, request, params)
-        self.lookup_kwarg = '%s__exact' % f.name
-        self.lookup_kwarg2 = '%s__isnull' % f.name
-        self.lookup_val = request.GET.get(self.lookup_kwarg, None)
-        self.lookup_val2 = request.GET.get(self.lookup_kwarg2, None)
-        
-    def title(self):
-        return self.field.verbose_name
-    
-    def choices(self, cl):
-        for k, v in ((_('All'), None), (_('Yes'), '1'), (_('No'), '0')):
-            yield { 'selected' : self.lookup_val == v and not self.lookup_val2, 
-                    'query_string' : cl.get_query_string( {self.lookup_kwarg: v}, [self.lookup_kwarg2]), 
-                    'display': k 
-                  }
-        if isinstance(self.field, meta.NullBooleanField):
-            yield { 'selected' : self.lookup_val2 == 'True', 
-                    'query_string' : cl.get_query_string( {self.lookup_kwarg2: 'True'}, [self.lookup_kwarg]), 
-                    'display': _('Unknown')                                      
-                  }
-FilterSpec.register(lambda f: isinstance(f, meta.BooleanField) or 
-                                   isinstance(f, meta.NullBooleanField), BooleanFieldFilterSpec)
 
 class ChangeList(object):
     def __init__(self, request, app_label, module_name):
@@ -250,7 +108,6 @@ class ChangeList(object):
                 self.lookup_opts.admin = meta.Admin()
         else:
             self.lookup_mod, self.lookup_opts = self.mod, self.opts
-                
 
     def get_search_parameters(self, request):
         # Get search parameters from the query string.
@@ -432,6 +289,7 @@ def get_javascript_imports(opts,auto_populated_fields, ordered_objects, field_se
                 break
     return js
 
+
 class AdminBoundField(BoundField):
     def __init__(self, field, field_mapping, original):
         super(AdminBoundField, self).__init__(field,field_mapping,original)     
@@ -442,7 +300,7 @@ class AdminBoundField(BoundField):
         self.is_date_time = isinstance(field, meta.DateTimeField)
         self.is_file_field = isinstance(field, meta.FileField)
         self.needs_add_label = field.rel and isinstance(field.rel, meta.ManyToOne) or isinstance(field.rel, meta.ManyToMany) and field.rel.to.admin
-        self.not_in_table = isinstance(self.field, meta.AutoField)
+        self.hidden = isinstance(self.field, meta.AutoField)
         self.first = False
         
         classes = []
@@ -493,18 +351,21 @@ class AdminBoundFieldSet(BoundFieldSet):
     def __init__(self, field_set, field_mapping, original):
         super(AdminBoundFieldSet, self).__init__(field_set, field_mapping, original, AdminBoundFieldLine)
         
-
-class AdminBoundManipulator(object):
+class BoundManipulator(object):
     def __init__(self, opts, manipulator, field_mapping):
-        self.inline_related_objects = opts.get_followed_related_objects()
-        
-        field_sets = opts.admin.get_field_sets(opts)
+        self.inline_related_objects = opts.get_followed_related_objects(manipulator.follow)
         self.original = hasattr(manipulator, 'original_object') and manipulator.original_object or None
         self.bound_field_sets = [field_set.bind(field_mapping, self.original, AdminBoundFieldSet) 
-                                 for field_set in field_sets]
-                                        
-       
+                                 for field_set in opts.admin.get_field_sets(opts)]
         self.ordered_objects = opts.get_ordered_objects()[:]
+
+class AdminBoundManipulator(BoundManipulator):
+    def __init__(self, opts, manipulator, field_mapping):
+        super(AdminBoundManipulator, self).__init__(opts, manipulator, field_mapping)
+        field_sets = opts.admin.get_field_sets(opts)
+        
+       
+        
         self.auto_populated_fields = [f for f in opts.fields if f.prepopulate_from]
         self.javascript_imports = get_javascript_imports(opts, self.auto_populated_fields, self.ordered_objects, field_sets);                         
         
@@ -513,8 +374,6 @@ class AdminBoundManipulator(object):
         self.form_enc_attrib = opts.has_field_type(meta.FileField) and \
                                 'enctype="multipart/form-data" ' or ''
         
-        
-       
         self.first_form_field_id = self.bound_field_sets[0].bound_field_lines[0].bound_fields[0].form_fields[0].get_id();                
         self.ordered_object_pk_names = [o.pk.name for o in self.ordered_objects]
         
