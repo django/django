@@ -18,7 +18,7 @@ msgstr ""
 
 #: contrib/comments/views/karma.py:18
 msgid "Anonymous users cannot vote"
-msgstr ""
+msgstr "Ak chcete hlasovať, najprv sa musíte prihlásiť"
 
 #: contrib/comments/views/karma.py:22
 #, fuzzy
@@ -27,12 +27,12 @@ msgstr "povolené komentáre"
 
 #: contrib/comments/views/karma.py:24
 msgid "No voting for yourself"
-msgstr ""
+msgstr "Nemožete voliť vlastný príspevok"
 
 #: contrib/comments/views/comments.py:24
 msgid ""
 "This rating is required because you've entered at least one other rating."
-msgstr ""
+msgstr "Táto voľba je nevyhnutná nakoľko je pokračovaním vašej predchádzajúcej."
 
 #: contrib/comments/views/comments.py:108
 #, python-format
@@ -42,6 +42,10 @@ msgid ""
 "\n"
 "%(text)s"
 msgstr ""
+"Tento komentár bol poslaný užívateľom, ktorý ma menej než %(count)s "
+"komentárov:\n"
+"\n"
+"%(text)s"
 
 #: contrib/comments/views/comments.py:112
 #, python-format
@@ -50,21 +54,24 @@ msgid ""
 "\n"
 "%(text)s"
 msgstr ""
+"Tento komentár bol poslaný rámcovým uzívateľom:\n"
+"\n"
+"%(text)s"
 
 #: contrib/comments/views/comments.py:184
 #: contrib/comments/views/comments.py:275
 msgid "Only POSTs are allowed"
-msgstr ""
+msgstr "Sú povolené len POST metódy"
 
 #: contrib/comments/views/comments.py:188
 #: contrib/comments/views/comments.py:279
 msgid "One or more of the required fields wasn't submitted"
-msgstr ""
+msgstr "Jedno alebo viac požadovaných polí nebolo postúpených"
 
 #: contrib/comments/views/comments.py:192
 #: contrib/comments/views/comments.py:281
 msgid "Somebody tampered with the comment form (security violation)"
-msgstr ""
+msgstr "Bola zistena neoprávnená manipulácia s formulárom komentára "
 
 #: contrib/comments/views/comments.py:202
 #: contrib/comments/views/comments.py:287
@@ -72,11 +79,13 @@ msgid ""
 "The comment form had an invalid 'target' parameter -- the object ID was "
 "invalid"
 msgstr ""
+"Formulár kometára má chybný výstupný parameter -- object"
+"ID bol chybný"
 
 #: contrib/comments/views/comments.py:252
 #: contrib/comments/views/comments.py:316
 msgid "The comment form didn't provide either 'preview' or 'post'"
-msgstr ""
+msgstr "Neprišla ani jedna z možných volieb 'preview' alebo 'post'"
 
 #: contrib/admin/models/admin.py:6
 msgid "action time"
@@ -108,7 +117,7 @@ msgstr "záznamy priebehu"
 
 #: contrib/admin/templatetags/admin_list.py:283
 msgid "All dates"
-msgstr ""
+msgstr "Všetky dátumy"
 
 #: contrib/admin/views/decorators.py:22
 #: contrib/admin/templates/admin/login.html:24
@@ -120,6 +129,8 @@ msgid ""
 "Please log in again, because your session has expired. Don't worry: Your "
 "submission has been saved."
 msgstr ""
+"Prosím prihláste sa znova, vaše sedenie stratilo platnosť. Žiadne obavy: Všetko "
+"čo ste vložili bolo uchované."
 
 #: contrib/admin/views/decorators.py:63
 msgid ""
@@ -319,15 +330,15 @@ msgstr "URL"
 
 #: contrib/admin/views/doc.py:285
 msgid "U.S. state (two uppercase letters)"
-msgstr ""
+msgstr "U.S. štát (dve veľké písmená)"
 
 #: contrib/admin/views/doc.py:286
 msgid "XML text"
-msgstr ""
+msgstr "XML text"
 
 #: contrib/admin/templates/admin/template_debug.html:6
 msgid "Error in Template"
-msgstr ""
+msgstr "Chyba v predlohe"
 
 #: contrib/admin/templates/admin/template_debug.html:8
 #, python-format
@@ -335,6 +346,8 @@ msgid ""
 "\n"
 "In template %(name)s, error at line %(line)s:\n"
 msgstr ""
+"\n"
+"V predlohe %(name)s, chyba na riadku %(line)s:\n"
 
 #: contrib/admin/templates/admin/change_list.html:5
 #: contrib/admin/templates/admin/500.html:4
@@ -465,21 +478,21 @@ msgstr "Ľutujeme, ale požadovaná stránka nebola nájdená."
 
 #: contrib/admin/templates/admin/change_form.html:20
 msgid "View on site"
-msgstr ""
+msgstr "Pozri tu"
 
 #: contrib/admin/templates/admin/change_form.html:28
 msgid "Please correct the error below."
 msgid_plural "Please correct the errors below."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Prosím opravte chybu, je nižšie"
+msgstr[1] "Prosím opravte chyby, sú nižšie"
 
 #: contrib/admin/templates/admin/change_form.html:45
 msgid "Ordering"
-msgstr ""
+msgstr "Objednávanie"
 
 #: contrib/admin/templates/admin/change_form.html:48
 msgid "Order:"
-msgstr ""
+msgstr "Objednávka:"
 
 #: contrib/admin/templates/admin/delete_confirmation.html:7
 #, python-format
@@ -519,19 +532,19 @@ msgstr "Odhlásenie"
 
 #: contrib/admin/templates/admin/submit_line.html:3
 msgid "Delete"
-msgstr ""
+msgstr "Vymazať"
 
 #: contrib/admin/templates/admin/submit_line.html:4
 msgid "Save as new"
-msgstr ""
+msgstr "Uložiť ako nový"
 
 #: contrib/admin/templates/admin/submit_line.html:5
 msgid "Save and add another"
-msgstr ""
+msgstr "Uložiť a pridať ďalší"
 
 #: contrib/admin/templates/admin/submit_line.html:6
 msgid "Save and continue editing"
-msgstr ""
+msgstr "Uložiť a pokračovať editovať"
 
 #: contrib/admin/templates/admin/submit_line.html:7
 #, fuzzy
@@ -541,7 +554,7 @@ msgstr "aktívny"
 #: contrib/admin/templates/admin/filter.html:1
 #, python-format
 msgid " By %(title)s "
-msgstr ""
+msgstr "Podľa %(title)s "
 
 #: contrib/admin/templates/registration/password_change_done.html:4
 #: contrib/admin/templates/registration/password_change_form.html:4
@@ -659,15 +672,15 @@ msgstr "Skupina %(site_name)s"
 
 #: contrib/admin/templates/admin_doc/bookmarklets.html:3
 msgid "Documentation"
-msgstr ""
+msgstr "Dokumentácia"
 
 #: contrib/admin/templates/admin_doc/bookmarklets.html:3
 msgid "Bookmarklets"
-msgstr ""
+msgstr "Záložky"
 
 #: contrib/admin/templates/admin_doc/bookmarklets.html:5
 msgid "Documentation bookmarklets"
-msgstr ""
+msgstr "Záložky dokumentácie"
 
 #: contrib/admin/templates/admin_doc/bookmarklets.html:9
 msgid ""
@@ -679,43 +692,54 @@ msgid ""
 "as \"internal\" (talk to your system administrator if you aren't sure if\n"
 "your computer is \"internal\").</p>\n"
 msgstr ""
+"\n"
+"<p class=\"help\">Na inštaláciu zarážok, ťahajte linku do vášho bookmarks\n"
+"toolbar, alebo klik pravou myšou na linku a pridať do vášho  bookmarks. Teraz si môžete\n"
+"vyberať zarážky z ľubovoľnej stránky webu.  Poznámka: pri tvorbe niektorých\n"
+"zarážok z ních, sa vyžaduje aby ste sa pohybovali po stránke z počítača označeného\n"
+"ako \"internal\" (obrátte sa na vášho systémového administrátora, ak nie ste si istý a ak\n"
+"ak váš počítač je \"internal\").</p>\n"
 
 #: contrib/admin/templates/admin_doc/bookmarklets.html:19
 msgid "Documentation for this page"
-msgstr ""
+msgstr "Dokumentácia  tejto stránky"
 
 #: contrib/admin/templates/admin_doc/bookmarklets.html:20
 msgid ""
 "Jumps you from any page to the documentation for the view that generates "
 "that page."
 msgstr ""
+"Skoč na ľubovoľnú stránku dokumentácie, z ponuky "
+"na tejto stránke."
 
 #: contrib/admin/templates/admin_doc/bookmarklets.html:22
 #, fuzzy
 msgid "Show object ID"
-msgstr "objekt id"
+msgstr "Ukáž objekt id"
 
 #: contrib/admin/templates/admin_doc/bookmarklets.html:23
 msgid ""
 "Shows the content-type and unique ID for pages that represent a single "
 "object."
 msgstr ""
+"Ukáž  content-type a jedinečné  ID pre stránky reprezentované jednoduchými "
+"objektami."
 
 #: contrib/admin/templates/admin_doc/bookmarklets.html:25
 msgid "Edit this object (current window)"
-msgstr ""
+msgstr "Edituj tento objekt (aktuálne okno)"
 
 #: contrib/admin/templates/admin_doc/bookmarklets.html:26
 msgid "Jumps to the admin page for pages that represent a single object."
-msgstr ""
+msgstr "Skoč na admin stránku z jednoduchých objektov zastupujúcich stránku."
 
 #: contrib/admin/templates/admin_doc/bookmarklets.html:28
 msgid "Edit this object (new window)"
-msgstr ""
+msgstr "Edituj tento objekt (nové okno)"
 
 #: contrib/admin/templates/admin_doc/bookmarklets.html:29
 msgid "As above, but opens the admin page in a new window."
-msgstr ""
+msgstr "Ako hore, ale otvorí admin stránku v novom okne"
 
 #: contrib/redirects/models/redirects.py:7
 msgid "redirect from"
@@ -887,31 +911,31 @@ msgstr "December"
 
 #: utils/dates.py:27
 msgid "Jan."
-msgstr ""
+msgstr "Jan."
 
 #: utils/dates.py:27
 msgid "Feb."
-msgstr ""
+msgstr "Feb."
 
 #: utils/dates.py:28
 msgid "Aug."
-msgstr ""
+msgstr "Aug."
 
 #: utils/dates.py:28
 msgid "Sept."
-msgstr ""
+msgstr "Sept."
 
 #: utils/dates.py:28
 msgid "Oct."
-msgstr ""
+msgstr "Oct."
 
 #: utils/dates.py:28
 msgid "Nov."
-msgstr ""
+msgstr "Nov."
 
 #: utils/dates.py:28
 msgid "Dec."
-msgstr ""
+msgstr "Dec."
 
 #: models/core.py:7
 msgid "domain name"
@@ -1128,7 +1152,7 @@ msgstr "Ruský"
 
 #: conf/global_settings.py:51
 msgid "Slovak"
-msgstr ""
+msgstr "Slovenský"
 
 #: conf/global_settings.py:52
 msgid "Serbian"
@@ -1136,7 +1160,7 @@ msgstr "Srbský"
 
 #: conf/global_settings.py:53
 msgid "Swedish"
-msgstr ""
+msgstr "Švédsky"
 
 #: conf/global_settings.py:54
 msgid "Simplified Chinese"
@@ -1151,7 +1175,7 @@ msgstr "Toto pole nie je platné."
 #: core/formfields.py:329
 #, python-format
 msgid "Ensure your text is less than %s characters."
-msgstr ""
+msgstr "Uistite sa, že text je kratší ako %s znakov."
 
 #: core/formfields.py:333
 #, fuzzy
@@ -1161,11 +1185,11 @@ msgstr "Malé písmena tu nie sú povolené."
 #: core/formfields.py:429 core/formfields.py:500 core/formfields.py:538
 #, python-format
 msgid "Select a valid choice; '%(data)s' is not in %(choices)s."
-msgstr ""
+msgstr "Určená platná voľba; '%(data)s' sa nenachádza v %(choices)s."
 
 #: core/formfields.py:594
 msgid "The submitted file is empty."
-msgstr ""
+msgstr "Poslaný súbor je prázdny."
 
 #: core/formfields.py:648
 #, fuzzy
@@ -1455,7 +1479,7 @@ msgstr "Prosím vložte platnú IP adresu."
 #: core/meta/fields.py:60
 #, python-format
 msgid "%(optname)s with this %(fieldname)s already exists."
-msgstr ""
+msgstr "%(optname)s s týmto %(fieldname)s už existuje."
 
 #: core/meta/fields.py:131
 msgid " Separate multiple IDs with commas."
@@ -1478,52 +1502,6 @@ msgstr "Vložte platnú e-mail adresu."
 msgid "Please enter valid %(self)s IDs. The value %(value)r is invalid."
 msgid_plural ""
 "Please enter valid %(self)s IDs. The values %(value)r are invalid"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Prosím vložte platné %(self)s IDs. Hodnota %(value)r je chybná"
+msgstr[1] "Prosím vložte platné %(self)s IDs. Hodnoty %(value)r sú chybné"
 
-#, fuzzy
-#~ msgid "count"
-#~ msgstr "obsah"
-
-# #-#-#-#-#  django.po (PACKAGE VERSION)  #-#-#-#-#
-# templates/blog/entries_detail.html:24
-#~ msgid "Post a comment"
-#~ msgstr "Pošli komentár"
-
-#~ msgid ""
-#~ "Looks like you followed a bad link. If you think it is our fault, please "
-#~ "<a href=\"http://doma.myvtoronte.com/staznost/\">let us know</a>"
-#~ msgstr ""
-#~ "Pozrite si linku , kde vzikla chyba. Ak si myslíte, že je to naša chyba, "
-#~ "<a href=\"http://doma.myvtoronte.com/staznost/\">dajte nám to vedieť</a>, "
-#~ "prosím"
-
-#~ msgid ""
-#~ "Here is a link to the <a href=\"/\">homepage</a>. You know, just in case"
-#~ msgstr ""
-#~ "Tu je adresa <a href=\"/\">úvodnej stránky</a>. Ak by ste ju potrebovali"
-
-#~ msgid "Comment posted"
-#~ msgstr "Komentár bol poslaný"
-
-#~ msgid "Comment posted successfully"
-#~ msgstr "Komentár bol úspešne odoslaný"
-
-#~ msgid "Thanks for contributing."
-#~ msgstr "Ďakujeme za príspevok."
-
-#~ msgid "View your comment"
-#~ msgstr "Pozri svôj príspevok"
-
-# templates/blog/entries_detail.html:15
-#~ msgid "Comments"
-#~ msgstr "Komentáre"
-
-#~ msgid "Comment"
-#~ msgstr "Komentár"
-
-#~ msgid "Your name"
-#~ msgstr "Vaše meno"
-
-#~ msgid "Preview revised comment"
-#~ msgstr "Prezretie upraveného komentára"
