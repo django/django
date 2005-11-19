@@ -162,9 +162,9 @@ Reporter/Article example, here's what that might look like::
     from django.conf.urls.defaults import *
 
     urlpatterns = patterns('',
-        (r'^/articles/(?P<year>\d{4})/$', 'myproject.news.views.articles.year_archive'),
-        (r'^/articles/(?P<year>\d{4})/(?P<month>\d{2})/$', 'myproject.news.views.articles.month_archive'),
-        (r'^/articles/(?P<year>\d{4})/(?P<month>\d{2})/(?P<article_id>\d+)/$', 'myproject.news.views.articles.article_detail'),
+        (r'^/articles/(?P<year>\d{4})/$', 'myproject.news.views.year_archive'),
+        (r'^/articles/(?P<year>\d{4})/(?P<month>\d{2})/$', 'myproject.news.views.month_archive'),
+        (r'^/articles/(?P<year>\d{4})/(?P<month>\d{2})/(?P<article_id>\d+)/$', 'myproject.news.views.article_detail'),
     )
 
 The code above maps URLs, as regular expressions, to the location of Python
@@ -181,7 +181,7 @@ dictionaries -- and the values captured in the regex, via keyword
 arguments.
 
 For example, if a user requested the URL "/articles/2005/05/39323/", Django
-would call the function ``myproject.news.views.articles.article_detail(request,
+would call the function ``myproject.news.views.article_detail(request,
 year='2005', month='05', article_id='39323')``.
 
 Write your views
@@ -280,8 +280,8 @@ This has been only a quick overview of Django's functionality. Some more useful
 features:
 
     * A caching framework that integrates with memcached or other backends.
-    * An RSS framework that makes creating RSS feeds as easy as writing a
-      small Python class.
+    * A syndication framework that makes creating RSS and Atom feeds as easy as
+      writing a small Python class.
     * More sexy automatically-generated admin features -- this overview barely
       scratched the surface.
 

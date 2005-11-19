@@ -60,6 +60,7 @@ regular expression as keyword arguments, and, optionally, arbitrary keyword
 arguments from the dictionary (an optional third item in the tuple).
 
 For more on ``HTTPRequest`` objects, see the `request and response documentation`_.
+For more details on URLconfs, see the `URLconf documentation`_.
 
 When you ran ``django-admin.py startproject myproject`` at the beginning of
 Tutorial 1, it created a default URLconf in ``myproject/urls.py``. It also
@@ -67,8 +68,7 @@ automatically set your ``ROOT_URLCONF`` setting to point at that file::
 
     ROOT_URLCONF = 'myproject.urls'
 
-Time for an example. Edit ``myproject/urls.py`` so it looks like
-this::
+Time for an example. Edit ``myproject/urls.py`` so it looks like this::
 
     from django.conf.urls.defaults import *
 
@@ -88,9 +88,9 @@ associated Python package/module: ``myproject.apps.polls.views.detail``. That
 corresponds to the function ``detail()`` in ``myproject/apps/polls/views.py``.
 Finally, it calls that ``detail()`` function like so::
 
-    detail(request=<HttpRequest object>, poll_id=23)
+    detail(request=<HttpRequest object>, poll_id='23')
 
-The ``poll_id=23`` part comes from ``(?P<poll_id>\d+)``. Using
+The ``poll_id='23'`` part comes from ``(?P<poll_id>\d+)``. Using
 ``(?P<name>pattern)`` "captures" the text matched by ``pattern`` and sends it
 as a keyword argument to the view function.
 
@@ -103,6 +103,11 @@ something like this::
 
 But, don't do that. It's silly.
 
+Note that these regular expressions do not search GET and POST parameters, or
+the domain name. For example, in a request to ``http://www.example.com/myapp/``,
+the URLconf will look for ``/myapp/``. In a request to
+``http://www.example.com/myapp/?page=3``, the URLconf will look for ``/myapp/``.
+
 If you need help with regular expressions, see `Wikipedia's entry`_ and the
 `Python documentation`_. Also, the O'Reilly book "Mastering Regular
 Expressions" by Jeffrey Friedl is fantastic.
@@ -113,6 +118,7 @@ time the URLconf module is loaded. They're super fast.
 .. _Wikipedia's entry: http://en.wikipedia.org/wiki/Regular_expression
 .. _Python documentation: http://www.python.org/doc/current/lib/module-re.html
 .. _request and response documentation: http://www.djangoproject.com/documentation/request_response/
+.. _URLconf documentation: http://www.djangoproject.com/documentation/url_dispatch/
 
 Write your first view
 =====================
