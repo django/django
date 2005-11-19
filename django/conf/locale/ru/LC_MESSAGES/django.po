@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2005-11-18 15:43+0100\n"
+"POT-Creation-Date: 2005-11-19 10:43+0100\n"
 "PO-Revision-Date: 2005-10-05 00:00\n"
 "Last-Translator: Dmitry Sorokin <ds@@dial.com.ru>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -529,7 +529,7 @@ msgstr ""
 msgid "Time"
 msgstr ""
 
-#: models/core.py:87
+#: contrib/admin/views/doc.py:284 contrib/flatpages/models/flatpages.py:6
 msgid "URL"
 msgstr "URL"
 
@@ -927,11 +927,11 @@ msgstr ""
 msgid "As above, but opens the admin page in a new window."
 msgstr ""
 
-#: models/core.py:68
+#: contrib/redirects/models/redirects.py:7
 msgid "redirect from"
 msgstr "перенаправить из"
 
-#: models/core.py:69
+#: contrib/redirects/models/redirects.py:8
 msgid ""
 "This should be an absolute path, excluding the domain name. Example: '/"
 "events/search/'."
@@ -939,11 +939,11 @@ msgstr ""
 "Это должен быть абсолютный путь, исключая доменное имя. Пример: '/events/"
 "search/'."
 
-#: models/core.py:70
+#: contrib/redirects/models/redirects.py:9
 msgid "redirect to"
 msgstr "перенаправить на"
 
-#: models/core.py:71
+#: contrib/redirects/models/redirects.py:10
 msgid ""
 "This can be either an absolute path (as above) or a full URL starting with "
 "'http://'."
@@ -951,33 +951,33 @@ msgstr ""
 "Это должен быть, либо абсолютный путь (как выше) или полный URL начинающийся "
 "с 'http://'."
 
-#: models/core.py:73
+#: contrib/redirects/models/redirects.py:12
 msgid "redirect"
 msgstr "перенаправить"
 
-#: models/core.py:74
+#: contrib/redirects/models/redirects.py:13
 msgid "redirects"
 msgstr "перенапровления"
 
-#: models/core.py:88
+#: contrib/flatpages/models/flatpages.py:7
 msgid ""
 "Example: '/about/contact/'. Make sure to have leading and trailing slashes."
 msgstr ""
 "Пример: '/about/contact/'. Будьте уверенны, что вставили завепршающий слэш."
 
-#: models/core.py:89
+#: contrib/flatpages/models/flatpages.py:8
 msgid "title"
 msgstr "заголовок"
 
-#: models/core.py:90
+#: contrib/flatpages/models/flatpages.py:9
 msgid "content"
 msgstr "наполнение"
 
-#: models/core.py:91
+#: contrib/flatpages/models/flatpages.py:10
 msgid "enable comments"
 msgstr "активировать комментарии"
 
-#: models/core.py:92
+#: contrib/flatpages/models/flatpages.py:11
 msgid "template name"
 msgstr "имя шаблона"
 
@@ -987,19 +987,19 @@ msgid ""
 "use 'flatpages/default'."
 msgstr ""
 
-#: models/core.py:94
+#: contrib/flatpages/models/flatpages.py:13
 msgid "registration required"
 msgstr "регистрация обязательна"
 
-#: models/core.py:94
+#: contrib/flatpages/models/flatpages.py:13
 msgid "If this is checked, only logged-in users will be able to view the page."
 msgstr "Если отмечено, только вошедшие пользователи смогут видеть страницу"
 
-#: models/core.py:98
+#: contrib/flatpages/models/flatpages.py:17
 msgid "flat page"
 msgstr "простая страница"
 
-#: models/core.py:99
+#: contrib/flatpages/models/flatpages.py:18
 msgid "flat pages"
 msgstr "простые страницы"
 
@@ -1164,31 +1164,23 @@ msgstr "тип наполнения"
 msgid "content types"
 msgstr "типы наполнения"
 
-#: models/core.py:93
-msgid ""
-"Example: 'flatfiles/contact_page'. If this isn't provided, the system will "
-"use 'flatfiles/default'."
-msgstr ""
-"Пример: 'flatfiles/contact_page'. Если не предусмотрена, система будет "
-"использовать 'flatfiles/default'."
-
-#: models/core.py:117
+#: models/core.py:67
 msgid "session key"
 msgstr "ключ сессии"
 
-#: models/core.py:118
+#: models/core.py:68
 msgid "session data"
 msgstr "данные сессии"
 
-#: models/core.py:119
+#: models/core.py:69
 msgid "expire date"
 msgstr "дата окончания"
 
-#: models/core.py:121
+#: models/core.py:71
 msgid "session"
 msgstr "сессия"
 
-#: models/core.py:122
+#: models/core.py:72
 msgid "sessions"
 msgstr "сессии"
 
@@ -1282,7 +1274,7 @@ msgstr "Персанальная информация"
 msgid "Important dates"
 msgstr "Важные даты"
 
-#: models/auth.py:182
+#: models/auth.py:195
 msgid "Message"
 msgstr "Сообщение"
 
@@ -1369,32 +1361,34 @@ msgstr ""
 
 #: core/formfields.py:338
 #, python-format
-msgid "Ensure your text is less than %s characters."
-msgstr ""
+msgid "Ensure your text is less than %s character"
+msgid_plural "Ensure your text is less than %s characters."
+msgstr[0] ""
+msgstr[1] ""
 
-#: core/formfields.py:342
+#: core/formfields.py:343
 msgid "Line breaks are not allowed here."
 msgstr ""
 
-#: core/formfields.py:438 core/formfields.py:509 core/formfields.py:547
+#: core/formfields.py:439 core/formfields.py:510 core/formfields.py:548
 #, python-format
 msgid "Select a valid choice; '%(data)s' is not in %(choices)s."
 msgstr ""
 
-#: core/formfields.py:603
+#: core/formfields.py:604
 msgid "The submitted file is empty."
 msgstr ""
 
-#: core/formfields.py:657
+#: core/formfields.py:658
 msgid "Enter a whole number between -32,768 and 32,767."
 msgstr ""
 
-#: core/formfields.py:666
+#: core/formfields.py:667
 #, fuzzy
 msgid "Enter a positive number."
 msgstr "E-mail адрес:"
 
-#: core/formfields.py:675
+#: core/formfields.py:676
 msgid "Enter a whole number between 0 and 32,767."
 msgstr ""
 
@@ -1510,59 +1504,59 @@ msgstr "Неверный фформат XML: %s"
 msgid "Invalid URL: %s"
 msgstr "Неверный URL: %s"
 
-#: core/validators.py:203
+#: core/validators.py:205 core/validators.py:207
 #, python-format
 msgid "The URL %s is a broken link."
 msgstr "URL %s сломанная ссылкаю."
 
-#: core/validators.py:209
+#: core/validators.py:213
 msgid "Enter a valid U.S. state abbreviation."
 msgstr "Вводите реальную абривиатуру штатов США."
 
-#: core/validators.py:224
+#: core/validators.py:228
 #, python-format
 msgid "Watch your mouth! The word %s is not allowed here."
 msgid_plural "Watch your mouth! The words %s are not allowed here."
 msgstr[0] ""
 msgstr[1] ""
 
-#: core/validators.py:231
+#: core/validators.py:235
 #, python-format
 msgid "This field must match the '%s' field."
 msgstr "Это поле должно совподать с '%s' полем."
 
-#: core/validators.py:250
+#: core/validators.py:254
 msgid "Please enter something for at least one field."
 msgstr "Пожалуйста, запролните хотя бы одно поле."
 
-#: core/validators.py:259 core/validators.py:270
+#: core/validators.py:263 core/validators.py:274
 msgid "Please enter both fields or leave them both empty."
 msgstr "Пожалуйста, заполните оба поля либо оставте их пустыми."
 
-#: core/validators.py:277
+#: core/validators.py:281
 #, python-format
 msgid "This field must be given if %(field)s is %(value)s"
 msgstr ""
 
-#: core/validators.py:289
+#: core/validators.py:293
 #, python-format
 msgid "This field must be given if %(field)s is not %(value)s"
 msgstr ""
 
-#: core/validators.py:308
+#: core/validators.py:312
 msgid "Duplicate values are not allowed."
 msgstr ""
 
-#: core/validators.py:331
+#: core/validators.py:335
 #, python-format
 msgid "This value must be a power of %s."
 msgstr ""
 
-#: core/validators.py:342
+#: core/validators.py:346
 msgid "Please enter a valid decimal number."
 msgstr ""
 
-#: core/validators.py:344
+#: core/validators.py:348
 #, python-format
 msgid "Please enter a valid decimal number with at most %s total digit."
 msgid_plural ""
@@ -1570,7 +1564,7 @@ msgid_plural ""
 msgstr[0] ""
 msgstr[1] ""
 
-#: core/validators.py:347
+#: core/validators.py:351
 #, python-format
 msgid "Please enter a valid decimal number with at most %s decimal place."
 msgid_plural ""
@@ -1578,71 +1572,71 @@ msgid_plural ""
 msgstr[0] ""
 msgstr[1] ""
 
-#: core/validators.py:357
+#: core/validators.py:361
 #, python-format
 msgid "Make sure your uploaded file is at least %s bytes big."
 msgstr ""
 
-#: core/validators.py:358
+#: core/validators.py:362
 #, python-format
 msgid "Make sure your uploaded file is at most %s bytes big."
 msgstr ""
 
-#: core/validators.py:371
+#: core/validators.py:375
 msgid "The format for this field is wrong."
 msgstr ""
 
-#: core/validators.py:386
+#: core/validators.py:390
 msgid "This field is invalid."
 msgstr ""
 
-#: core/validators.py:421
+#: core/validators.py:425
 #, python-format
 msgid "Could not retrieve anything from %s."
 msgstr ""
 
-#: core/validators.py:424
+#: core/validators.py:428
 #, python-format
 msgid ""
 "The URL %(url)s returned the invalid Content-Type header '%(contenttype)s'."
 msgstr ""
 
-#: core/validators.py:457
+#: core/validators.py:461
 #, python-format
 msgid ""
 "Please close the unclosed %(tag)s tag from line %(line)s. (Line starts with "
 "\"%(start)s\".)"
 msgstr ""
 
-#: core/validators.py:461
+#: core/validators.py:465
 #, python-format
 msgid ""
 "Some text starting on line %(line)s is not allowed in that context. (Line "
 "starts with \"%(start)s\".)"
 msgstr ""
 
-#: core/validators.py:466
+#: core/validators.py:470
 #, python-format
 msgid ""
 "\"%(attr)s\" on line %(line)s is an invalid attribute. (Line starts with \"%"
 "(start)s\".)"
 msgstr ""
 
-#: core/validators.py:471
+#: core/validators.py:475
 #, python-format
 msgid ""
 "\"<%(tag)s>\" on line %(line)s is an invalid tag. (Line starts with \"%"
 "(start)s\".)"
 msgstr ""
 
-#: core/validators.py:475
+#: core/validators.py:479
 #, python-format
 msgid ""
 "A tag on line %(line)s is missing one or more required attributes. (Line "
 "starts with \"%(start)s\".)"
 msgstr ""
 
-#: core/validators.py:480
+#: core/validators.py:484
 #, python-format
 msgid ""
 "The \"%(attr)s\" attribute on line %(line)s has an invalid value. (Line "
@@ -1682,6 +1676,13 @@ msgid_plural ""
 "Please enter valid %(self)s IDs. The values %(value)r are invalid"
 msgstr[0] ""
 msgstr[1] ""
+
+#~ msgid ""
+#~ "Example: 'flatfiles/contact_page'. If this isn't provided, the system "
+#~ "will use 'flatfiles/default'."
+#~ msgstr ""
+#~ "Пример: 'flatfiles/contact_page'. Если не предусмотрена, система будет "
+#~ "использовать 'flatfiles/default'."
 
 #~ msgid "Server error <em>(500)</em>"
 #~ msgstr "Ошибка сервера <em>(500)</em>"

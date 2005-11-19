@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django CVS\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2005-11-18 15:44+0100\n"
+"POT-Creation-Date: 2005-11-19 10:44+0100\n"
 "PO-Revision-Date: 2005-11-12 20:05+0530\n"
 "Last-Translator: Baishampayan Ghose <b.ghose@gnu.org.in>\n"
 "Language-Team: Ankur Bangla <core@bengalinux.org>\n"
@@ -1376,34 +1376,36 @@ msgstr "এই ক্ষেত্রেটি অবৈধ।"
 
 #: core/formfields.py:338
 #, python-format
-msgid "Ensure your text is less than %s characters."
-msgstr ""
+msgid "Ensure your text is less than %s character"
+msgid_plural "Ensure your text is less than %s characters."
+msgstr[0] ""
+msgstr[1] ""
 
-#: core/formfields.py:342
+#: core/formfields.py:343
 #, fuzzy
 msgid "Line breaks are not allowed here."
 msgstr "ছোটহাতের অক্ষর এখানে ঢোকাতে পারবেন না।"
 
-#: core/formfields.py:438 core/formfields.py:509 core/formfields.py:547
+#: core/formfields.py:439 core/formfields.py:510 core/formfields.py:548
 #, python-format
 msgid "Select a valid choice; '%(data)s' is not in %(choices)s."
 msgstr ""
 
-#: core/formfields.py:603
+#: core/formfields.py:604
 msgid "The submitted file is empty."
 msgstr ""
 
-#: core/formfields.py:657
+#: core/formfields.py:658
 #, fuzzy
 msgid "Enter a whole number between -32,768 and 32,767."
 msgstr "একটি গোটা সংখ্যা ঢোকান।"
 
-#: core/formfields.py:666
+#: core/formfields.py:667
 #, fuzzy
 msgid "Enter a positive number."
 msgstr "একটি গোটা সংখ্যা ঢোকান।"
 
-#: core/formfields.py:675
+#: core/formfields.py:676
 #, fuzzy
 msgid "Enter a whole number between 0 and 32,767."
 msgstr "একটি গোটা সংখ্যা ঢোকান।"

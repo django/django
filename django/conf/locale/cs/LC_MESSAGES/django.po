@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django Czech translation\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2005-11-18 15:43+0100\n"
+"POT-Creation-Date: 2005-11-19 10:43+0100\n"
 "PO-Revision-Date: 2005-11-18 14:33+0100\n"
 "Last-Translator: Radek Svarz <translate@svarz.cz>\n"
 "Language-Team: Czech\n"
@@ -1418,32 +1418,35 @@ msgid "This field is required."
 msgstr "Toto pole je povinné."
 
 #: core/formfields.py:338
-#, python-format
-msgid "Ensure your text is less than %s characters."
-msgstr "Ujistěte se, že Váš text má méně, než %s znaků."
+#, fuzzy, python-format
+msgid "Ensure your text is less than %s character"
+msgid_plural "Ensure your text is less than %s characters."
+msgstr[0] "Ujistěte se, že Váš text má méně, než %s znaků."
+msgstr[1] "Ujistěte se, že Váš text má méně, než %s znaků."
+msgstr[2] "Ujistěte se, že Váš text má méně, než %s znaků."
 
-#: core/formfields.py:342
+#: core/formfields.py:343
 msgid "Line breaks are not allowed here."
 msgstr "Zalomení řádky zde nenjsou povolená."
 
-#: core/formfields.py:438 core/formfields.py:509 core/formfields.py:547
+#: core/formfields.py:439 core/formfields.py:510 core/formfields.py:548
 #, python-format
 msgid "Select a valid choice; '%(data)s' is not in %(choices)s."
 msgstr "Vyberte platnou volbu. '%(data)s' není mezi %(choices)s."
 
-#: core/formfields.py:603
+#: core/formfields.py:604
 msgid "The submitted file is empty."
 msgstr "Odevzdaný soubor je prázdný."
 
-#: core/formfields.py:657
+#: core/formfields.py:658
 msgid "Enter a whole number between -32,768 and 32,767."
 msgstr "Vložte celé číslo mezi -32,768 a 32,767."
 
-#: core/formfields.py:666
+#: core/formfields.py:667
 msgid "Enter a positive number."
 msgstr "Vložte celé kladné číslo."
 
-#: core/formfields.py:675
+#: core/formfields.py:676
 msgid "Enter a whole number between 0 and 32,767."
 msgstr "Vložte celé číslo mezi 0 a 32,767."
 

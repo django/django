@@ -335,7 +335,8 @@ class TextField(FormField):
 
     def isValidLength(self, data, form):
         if data and self.maxlength and len(data.decode(DEFAULT_CHARSET)) > self.maxlength:
-            raise validators.ValidationError, _("Ensure your text is less than %s characters.") % self.maxlength
+            raise validators.ValidationError, ngettext("Ensure your text is less than %s character",
+                "Ensure your text is less than %s characters.", self.maxlength) % self.maxlength
 
     def hasNoNewlines(self, data, form):
         if data and '\n' in data:

@@ -8,44 +8,13 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2005-11-18 11:37-0500\n"
+"POT-Creation-Date: 2005-11-19 10:43+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: Vladimir Labath <vlado@labath.org>\n"
 "Language-Team: Slovak <sk@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-
-#: contrib/redirects/models/redirects.py:7
-msgid "redirect from"
-msgstr "presmerovaný z"
-
-#: contrib/redirects/models/redirects.py:8
-msgid ""
-"This should be an absolute path, excluding the domain name. Example: '/"
-"events/search/'."
-msgstr ""
-"Tu by sa mala použiť absolútna cesta, bez domény. Napr.: '/events/search/'."
-
-#: contrib/redirects/models/redirects.py:9
-msgid "redirect to"
-msgstr "presmerovaný na "
-
-#: contrib/redirects/models/redirects.py:10
-msgid ""
-"This can be either an absolute path (as above) or a full URL starting with "
-"'http://'."
-msgstr ""
-"Tu môže byť buď absolútna cesta (ako hore) alebo plné  URL začínajúce s "
-"'http://'."
-
-#: contrib/redirects/models/redirects.py:12
-msgid "redirect"
-msgstr "presmerovanie"
-
-#: contrib/redirects/models/redirects.py:13
-msgid "redirects"
-msgstr "presmerovania"
 
 #: contrib/comments/models/comments.py:8
 #: contrib/comments/models/comments.py:161
@@ -123,8 +92,8 @@ msgid ""
 "Check this box if the comment is inappropriate. A \"This comment has been "
 "removed\" message will be displayed instead."
 msgstr ""
-"Označ túto voľbu ak je komentár nevhodný.  \"Tento komentár bol "
-"vymazaný\" sa zobrazí namiesto neho."
+"Označ túto voľbu ak je komentár nevhodný.  \"Tento komentár bol vymazaný\" "
+"sa zobrazí namiesto neho."
 
 #: contrib/comments/models/comments.py:31
 msgid "Comment"
@@ -331,59 +300,6 @@ msgstr "Formulár kometára má chybný výstupný parameter -- objectID bol chy
 msgid "The comment form didn't provide either 'preview' or 'post'"
 msgstr "Neprišla ani jedna z možných volieb 'preview' alebo 'post'"
 
-#: contrib/flatpages/models/flatpages.py:6 contrib/admin/views/doc.py:284
-msgid "URL"
-msgstr "URL"
-
-#: contrib/flatpages/models/flatpages.py:7
-msgid ""
-"Example: '/about/contact/'. Make sure to have leading and trailing slashes."
-msgstr ""
-"Príklad: '/about/contact/'. Uistite sa, že máte vložené ako úvodné tak aj "
-"záverečné lomítka."
-
-#: contrib/flatpages/models/flatpages.py:8
-msgid "title"
-msgstr "názov"
-
-#: contrib/flatpages/models/flatpages.py:9
-msgid "content"
-msgstr "obsah"
-
-#: contrib/flatpages/models/flatpages.py:10
-msgid "enable comments"
-msgstr "povolené komentáre"
-
-#: contrib/flatpages/models/flatpages.py:11
-msgid "template name"
-msgstr "meno predlohy"
-
-#: contrib/flatpages/models/flatpages.py:12
-#, fuzzy
-msgid ""
-"Example: 'flatpages/contact_page'. If this isn't provided, the system will "
-"use 'flatpages/default'."
-msgstr ""
-"Príklad: 'flatfiles/contact_page'. Ak sa toto nevykonalo,  systém použije  "
-"'flatfiles/default'."
-
-#: contrib/flatpages/models/flatpages.py:13
-msgid "registration required"
-msgstr "musíte byť zaregistrovaný"
-
-#: contrib/flatpages/models/flatpages.py:13
-msgid "If this is checked, only logged-in users will be able to view the page."
-msgstr ""
-"Ak je toto označené, potom len prihlásený užívateľ môže vidieť túto stránku."
-
-#: contrib/flatpages/models/flatpages.py:17
-msgid "flat page"
-msgstr "plochá stránka"
-
-#: contrib/flatpages/models/flatpages.py:18
-msgid "flat pages"
-msgstr "ploché stránky"
-
 #: contrib/admin/models/admin.py:6
 msgid "action time"
 msgstr "čas udalosti"
@@ -434,8 +350,8 @@ msgid ""
 "Looks like your browser isn't configured to accept cookies. Please enable "
 "cookies, reload this page, and try again."
 msgstr ""
-"Vyzera, že váš prehliadač neakceptuje  cookies. Prosím povoľte "
-"cookies, znovu natiahnite túto stránku, a skúste znova."
+"Vyzera, že váš prehliadač neakceptuje  cookies. Prosím povoľte cookies, "
+"znovu natiahnite túto stránku, a skúste znova."
 
 #: contrib/admin/views/decorators.py:77
 msgid "Usernames cannot contain the '@' character."
@@ -444,7 +360,9 @@ msgstr "Meno užívateľa nemôže obsahovať znak '@'."
 #: contrib/admin/views/decorators.py:79
 #, python-format
 msgid "Your e-mail address is not your username. Try '%s' instead."
-msgstr "Vaša emailová adresa nie je vaším užívateľským menon. Skuste toto '%s' namiesto nej"
+msgstr ""
+"Vaša emailová adresa nie je vaším užívateľským menon. Skuste toto '%s' "
+"namiesto nej"
 
 #: contrib/admin/views/main.py:50
 #, fuzzy
@@ -658,6 +576,10 @@ msgstr "Text"
 msgid "Time"
 msgstr "Čas"
 
+#: contrib/admin/views/doc.py:284 contrib/flatpages/models/flatpages.py:6
+msgid "URL"
+msgstr "URL"
+
 #: contrib/admin/views/doc.py:285
 msgid "U.S. state (two uppercase letters)"
 msgstr "U.S. štát (dve veľké písmená)"
@@ -666,11 +588,24 @@ msgstr "U.S. štát (dve veľké písmená)"
 msgid "XML text"
 msgstr "XML text"
 
-#: contrib/admin/templates/admin/object_history.html:5
-#: contrib/admin/templates/admin/500.html:4
-#: contrib/admin/templates/admin/base.html:29
+#: contrib/admin/templates/admin/template_debug.html:6
+msgid "Error in Template"
+msgstr "Chyba v predlohe"
+
+#: contrib/admin/templates/admin/template_debug.html:8
+#, python-format
+msgid ""
+"\n"
+"In template %(name)s, error at line %(line)s:\n"
+msgstr ""
+"\n"
+"V predlohe %(name)s, chyba na riadku %(line)s:\n"
+
 #: contrib/admin/templates/admin/change_list.html:5
+#: contrib/admin/templates/admin/500.html:4
+#: contrib/admin/templates/admin/object_history.html:5
 #: contrib/admin/templates/admin/change_form.html:12
+#: contrib/admin/templates/admin/base.html:29
 #: contrib/admin/templates/registration/password_change_done.html:4
 #: contrib/admin/templates/registration/password_reset_form.html:4
 #: contrib/admin/templates/registration/logged_out.html:4
@@ -679,6 +614,56 @@ msgstr "XML text"
 #: contrib/admin/templates/admin_doc/bookmarklets.html:3
 msgid "Home"
 msgstr "Začiatok"
+
+#: contrib/admin/templates/admin/change_list.html:10
+#, fuzzy, python-format
+msgid "Add %(name)s"
+msgstr "Pridaj %(name)s"
+
+#: contrib/admin/templates/admin/index.html:27
+#: contrib/admin/templates/admin/change_form.html:14
+msgid "Add"
+msgstr "Pridaj"
+
+#: contrib/admin/templates/admin/index.html:33
+msgid "Change"
+msgstr "Zmeň"
+
+#: contrib/admin/templates/admin/index.html:43
+msgid "You don't have permission to edit anything."
+msgstr "Nemáte povolenie na zmeny ."
+
+#: contrib/admin/templates/admin/index.html:51
+msgid "Recent Actions"
+msgstr "Posledné udalosti"
+
+#: contrib/admin/templates/admin/index.html:52
+msgid "My Actions"
+msgstr "Moje udalosti"
+
+#: contrib/admin/templates/admin/index.html:56
+msgid "None available"
+msgstr "Nepovolené"
+
+#: contrib/admin/templates/admin/500.html:4
+msgid "Server error"
+msgstr "Chyba servera"
+
+#: contrib/admin/templates/admin/500.html:6
+msgid "Server error (500)"
+msgstr "Chyba servera (500)"
+
+#: contrib/admin/templates/admin/500.html:9
+msgid "Server Error <em>(500)</em>"
+msgstr "Chyba servera <em>(500)</em>"
+
+#: contrib/admin/templates/admin/500.html:10
+msgid ""
+"There's been an error. It's been reported to the site administrators via e-"
+"mail and should be fixed shortly. Thanks for your patience."
+msgstr ""
+"Vznikla chyba. Prostredníctvom e-mailu  bol o nej informovaný správca a "
+"chyba by mala byť o chviľu odstránená. Ďakujeme za vašu trpezlivosť."
 
 #: contrib/admin/templates/admin/object_history.html:5
 #: contrib/admin/templates/admin/change_form.html:19
@@ -717,25 +702,17 @@ msgstr "Django web admin"
 msgid "Django administration"
 msgstr "Administrácia Django"
 
-#: contrib/admin/templates/admin/500.html:4
-msgid "Server error"
-msgstr "Chyba servera"
+#: contrib/admin/templates/admin/login.html:15
+msgid "Username:"
+msgstr "Meno užívateľa:"
 
-#: contrib/admin/templates/admin/500.html:6
-msgid "Server error (500)"
-msgstr "Chyba servera (500)"
+#: contrib/admin/templates/admin/login.html:18
+msgid "Password:"
+msgstr "Heslo:"
 
-#: contrib/admin/templates/admin/500.html:9
-msgid "Server Error <em>(500)</em>"
-msgstr "Chyba servera <em>(500)</em>"
-
-#: contrib/admin/templates/admin/500.html:10
-msgid ""
-"There's been an error. It's been reported to the site administrators via e-"
-"mail and should be fixed shortly. Thanks for your patience."
-msgstr ""
-"Vznikla chyba. Prostredníctvom e-mailu  bol o nej informovaný správca a "
-"chyba by mala byť o chviľu odstránená. Ďakujeme za vašu trpezlivosť."
+#: contrib/admin/templates/admin/login.html:20
+msgid "Have you <a href=\"/password_reset/\">forgotten your password</a>?"
+msgstr "Zabudli ste<a href=\"/password_reset/\"> vaše heslo</a>?"
 
 #: contrib/admin/templates/admin/404.html:4
 #: contrib/admin/templates/admin/404.html:8
@@ -751,54 +728,23 @@ msgstr ""
 msgid "We're sorry, but the requested page could not be found."
 msgstr "Ľutujeme, ale požadovaná stránka nebola nájdená."
 
-#: contrib/admin/templates/admin/index.html:27
-#: contrib/admin/templates/admin/change_form.html:14
-msgid "Add"
-msgstr "Pridaj"
+#: contrib/admin/templates/admin/change_form.html:20
+msgid "View on site"
+msgstr "Pozri tu"
 
-#: contrib/admin/templates/admin/index.html:33
-msgid "Change"
-msgstr "Zmeň"
+#: contrib/admin/templates/admin/change_form.html:28
+msgid "Please correct the error below."
+msgid_plural "Please correct the errors below."
+msgstr[0] "Prosím opravte chybu, je nižšie"
+msgstr[1] "Prosím opravte chyby, sú nižšie"
 
-#: contrib/admin/templates/admin/index.html:43
-msgid "You don't have permission to edit anything."
-msgstr "Nemáte povolenie na zmeny ."
+#: contrib/admin/templates/admin/change_form.html:45
+msgid "Ordering"
+msgstr "Objednávanie"
 
-#: contrib/admin/templates/admin/index.html:51
-msgid "Recent Actions"
-msgstr "Posledné udalosti"
-
-#: contrib/admin/templates/admin/index.html:52
-msgid "My Actions"
-msgstr "Moje udalosti"
-
-#: contrib/admin/templates/admin/index.html:56
-msgid "None available"
-msgstr "Nepovolené"
-
-#: contrib/admin/templates/admin/login.html:15
-msgid "Username:"
-msgstr "Meno užívateľa:"
-
-#: contrib/admin/templates/admin/login.html:18
-msgid "Password:"
-msgstr "Heslo:"
-
-#: contrib/admin/templates/admin/login.html:20
-msgid "Have you <a href=\"/password_reset/\">forgotten your password</a>?"
-msgstr "Zabudli ste<a href=\"/password_reset/\"> vaše heslo</a>?"
-
-#: contrib/admin/templates/admin/base.html:23
-msgid "Welcome,"
-msgstr "Vítajte,"
-
-#: contrib/admin/templates/admin/base.html:23
-msgid "Change password"
-msgstr "Zmena hesla"
-
-#: contrib/admin/templates/admin/base.html:23
-msgid "Log out"
-msgstr "Odhlásenie"
+#: contrib/admin/templates/admin/change_form.html:48
+msgid "Order:"
+msgstr "Objednávka:"
 
 #: contrib/admin/templates/admin/delete_confirmation.html:7
 #, python-format
@@ -824,46 +770,17 @@ msgstr ""
 msgid "Yes, I'm sure"
 msgstr "Ano, som si istý"
 
-#: contrib/admin/templates/admin/template_debug.html:6
-msgid "Error in Template"
-msgstr "Chyba v predlohe"
+#: contrib/admin/templates/admin/base.html:23
+msgid "Welcome,"
+msgstr "Vítajte,"
 
-#: contrib/admin/templates/admin/template_debug.html:8
-#, python-format
-msgid ""
-"\n"
-"In template %(name)s, error at line %(line)s:\n"
-msgstr ""
-"\n"
-"V predlohe %(name)s, chyba na riadku %(line)s:\n"
+#: contrib/admin/templates/admin/base.html:23
+msgid "Change password"
+msgstr "Zmena hesla"
 
-#: contrib/admin/templates/admin/change_list.html:10
-#, fuzzy, python-format
-msgid "Add %(name)s"
-msgstr "Pridaj %(name)s"
-
-#: contrib/admin/templates/admin/filter.html:1
-#, python-format
-msgid " By %(title)s "
-msgstr "Podľa %(title)s "
-
-#: contrib/admin/templates/admin/change_form.html:20
-msgid "View on site"
-msgstr "Pozri tu"
-
-#: contrib/admin/templates/admin/change_form.html:28
-msgid "Please correct the error below."
-msgid_plural "Please correct the errors below."
-msgstr[0] "Prosím opravte chybu, je nižšie"
-msgstr[1] "Prosím opravte chyby, sú nižšie"
-
-#: contrib/admin/templates/admin/change_form.html:45
-msgid "Ordering"
-msgstr "Objednávanie"
-
-#: contrib/admin/templates/admin/change_form.html:48
-msgid "Order:"
-msgstr "Objednávka:"
+#: contrib/admin/templates/admin/base.html:23
+msgid "Log out"
+msgstr "Odhlásenie"
 
 #: contrib/admin/templates/admin/submit_line.html:3
 msgid "Delete"
@@ -885,6 +802,11 @@ msgstr "Uložiť a pokračovať editovať"
 #, fuzzy
 msgid "Save"
 msgstr "Uložiť"
+
+#: contrib/admin/templates/admin/filter.html:1
+#, python-format
+msgid " By %(title)s "
+msgstr "Podľa %(title)s "
 
 #: contrib/admin/templates/registration/password_change_done.html:4
 #: contrib/admin/templates/registration/password_change_form.html:4
@@ -1024,11 +946,12 @@ msgid ""
 msgstr ""
 "\n"
 "<p class=\"help\">Na inštaláciu zarážok, ťahajte linku do vášho bookmarks\n"
-"toolbar, alebo klik pravou myšou na linku a pridať do vášho  bookmarks.\n "
-"Teraz si môžete vyberať zarážky z ľubovoľnej stránky webu.\n"
+"toolbar, alebo klik pravou myšou na linku a pridať do vášho  bookmarks.\n"
+" Teraz si môžete vyberať zarážky z ľubovoľnej stránky webu.\n"
 "Poznámka: pri tvorbe niektorých zarážok, sa vyžaduje aby ste sa pohybovali\n"
 "po stránke z počítača označeného ako \"internal\" (obrátte sa na vášho \n"
-"systémového administrátora, ak nie ste si istý či váš počítač je \"internal\").</p>\n"
+"systémového administrátora, ak nie ste si istý či váš počítač je \"internal"
+"\").</p>\n"
 
 #: contrib/admin/templates/admin_doc/bookmarklets.html:19
 msgid "Documentation for this page"
@@ -1068,6 +991,86 @@ msgstr "Edituj tento objekt (nové okno)"
 #: contrib/admin/templates/admin_doc/bookmarklets.html:29
 msgid "As above, but opens the admin page in a new window."
 msgstr "Ako hore, ale otvorí admin stránku v novom okne"
+
+#: contrib/redirects/models/redirects.py:7
+msgid "redirect from"
+msgstr "presmerovaný z"
+
+#: contrib/redirects/models/redirects.py:8
+msgid ""
+"This should be an absolute path, excluding the domain name. Example: '/"
+"events/search/'."
+msgstr ""
+"Tu by sa mala použiť absolútna cesta, bez domény. Napr.: '/events/search/'."
+
+#: contrib/redirects/models/redirects.py:9
+msgid "redirect to"
+msgstr "presmerovaný na "
+
+#: contrib/redirects/models/redirects.py:10
+msgid ""
+"This can be either an absolute path (as above) or a full URL starting with "
+"'http://'."
+msgstr ""
+"Tu môže byť buď absolútna cesta (ako hore) alebo plné  URL začínajúce s "
+"'http://'."
+
+#: contrib/redirects/models/redirects.py:12
+msgid "redirect"
+msgstr "presmerovanie"
+
+#: contrib/redirects/models/redirects.py:13
+msgid "redirects"
+msgstr "presmerovania"
+
+#: contrib/flatpages/models/flatpages.py:7
+msgid ""
+"Example: '/about/contact/'. Make sure to have leading and trailing slashes."
+msgstr ""
+"Príklad: '/about/contact/'. Uistite sa, že máte vložené ako úvodné tak aj "
+"záverečné lomítka."
+
+#: contrib/flatpages/models/flatpages.py:8
+msgid "title"
+msgstr "názov"
+
+#: contrib/flatpages/models/flatpages.py:9
+msgid "content"
+msgstr "obsah"
+
+#: contrib/flatpages/models/flatpages.py:10
+msgid "enable comments"
+msgstr "povolené komentáre"
+
+#: contrib/flatpages/models/flatpages.py:11
+msgid "template name"
+msgstr "meno predlohy"
+
+#: contrib/flatpages/models/flatpages.py:12
+#, fuzzy
+msgid ""
+"Example: 'flatpages/contact_page'. If this isn't provided, the system will "
+"use 'flatpages/default'."
+msgstr ""
+"Príklad: 'flatfiles/contact_page'. Ak sa toto nevykonalo,  systém použije  "
+"'flatfiles/default'."
+
+#: contrib/flatpages/models/flatpages.py:13
+msgid "registration required"
+msgstr "musíte byť zaregistrovaný"
+
+#: contrib/flatpages/models/flatpages.py:13
+msgid "If this is checked, only logged-in users will be able to view the page."
+msgstr ""
+"Ak je toto označené, potom len prihlásený užívateľ môže vidieť túto stránku."
+
+#: contrib/flatpages/models/flatpages.py:17
+msgid "flat page"
+msgstr "plochá stránka"
+
+#: contrib/flatpages/models/flatpages.py:18
+msgid "flat pages"
+msgstr "ploché stránky"
 
 #: utils/translation.py:335
 msgid "DATE_FORMAT"
@@ -1426,35 +1429,37 @@ msgid "This field is required."
 msgstr "Toto pole nie je platné."
 
 #: core/formfields.py:338
-#, python-format
-msgid "Ensure your text is less than %s characters."
-msgstr "Uistite sa, že text je kratší ako %s znakov."
+#, fuzzy, python-format
+msgid "Ensure your text is less than %s character"
+msgid_plural "Ensure your text is less than %s characters."
+msgstr[0] "Uistite sa, že text je kratší ako %s znakov."
+msgstr[1] "Uistite sa, že text je kratší ako %s znakov."
 
-#: core/formfields.py:342
+#: core/formfields.py:343
 #, fuzzy
 msgid "Line breaks are not allowed here."
 msgstr "Malé písmena tu nie sú povolené."
 
-#: core/formfields.py:438 core/formfields.py:509 core/formfields.py:547
+#: core/formfields.py:439 core/formfields.py:510 core/formfields.py:548
 #, python-format
 msgid "Select a valid choice; '%(data)s' is not in %(choices)s."
 msgstr "Určená platná voľba; '%(data)s' sa nenachádza v %(choices)s."
 
-#: core/formfields.py:603
+#: core/formfields.py:604
 msgid "The submitted file is empty."
 msgstr "Poslaný súbor je prázdny."
 
-#: core/formfields.py:657
+#: core/formfields.py:658
 #, fuzzy
 msgid "Enter a whole number between -32,768 and 32,767."
 msgstr "Vložte celé číslo."
 
-#: core/formfields.py:666
+#: core/formfields.py:667
 #, fuzzy
 msgid "Enter a positive number."
 msgstr "Vložte celé číslo."
 
-#: core/formfields.py:675
+#: core/formfields.py:676
 #, fuzzy
 msgid "Enter a whole number between 0 and 32,767."
 msgstr "Vložte celé číslo."
@@ -1658,7 +1663,7 @@ msgstr "Formát pre toto pole je chybný."
 msgid "This field is invalid."
 msgstr "Toto pole nie je platné."
 
-#: core/validators.py:425a
+#: core/validators.py:425
 #, python-format
 msgid "Could not retrieve anything from %s."
 msgstr "Nič som nemohol získať z %s."
