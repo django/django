@@ -53,7 +53,6 @@ index = staff_member_required(index)
 class IncorrectLookupParameters(Exception):
     pass
 
-
 class ChangeList(object):
     def __init__(self, request, app_label, module_name):
         self.get_modules_and_options(app_label, module_name, request)
@@ -152,7 +151,7 @@ class ChangeList(object):
             result_list = lookup_mod.get_list(**lookup_params)
         else:
             try:
-                result_list = p.get_page(page_num)
+                result_list = paginator.get_page(page_num)
             except InvalidPage:
                 result_list = []
         (self.result_count, self.full_result_count, self.result_list, 

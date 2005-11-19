@@ -200,6 +200,7 @@ def dictsort(value, arg):
     Takes a list of dicts, returns that list sorted by the property given in
     the argument.
     """
+    print "ds:", type(value)
     decorated = [(resolve_variable('var.' + arg, {'var' : item}), item) for item in value]
     decorated.sort()
     return [item[1] for item in decorated]

@@ -25,7 +25,7 @@ def technical_500_response(request, exc_type, exc_value, tb):
             'filename' : filename,
             'function' : function,
             'lineno' : lineno,
-            'vars' : tb.tb_frame.f_locals,
+            'vars' : tb.tb_frame.f_locals.items(),
             'id' : id(tb),
             'pre_context' : pre_context,
             'context_line' : context_line,
@@ -253,7 +253,7 @@ TECHNICAL_500_TEMPLATE = """
               </tr>
             </thead>
             <tbody>
-              {% for var in frame.vars.items|dictsort:"0" %}
+              {% for var in frame.vars|dictsort:"0" %}
                 <tr>
                   <td>{{ var.0 }}</td>
                   <td class="code"><div>{{ var.1|pprint|escape }}</div></td>

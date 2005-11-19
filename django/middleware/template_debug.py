@@ -18,8 +18,6 @@ class TemplateDebugMiddleware(object):
             origin, (start, end) = exception.source
             template_source = origin.reload()
             
-           
-           
             line = 0
             upto = 0
             source_lines = []
