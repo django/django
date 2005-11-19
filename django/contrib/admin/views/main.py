@@ -364,8 +364,6 @@ class AdminBoundManipulator(BoundManipulator):
         super(AdminBoundManipulator, self).__init__(opts, manipulator, field_mapping)
         field_sets = opts.admin.get_field_sets(opts)
         
-       
-        
         self.auto_populated_fields = [f for f in opts.fields if f.prepopulate_from]
         self.javascript_imports = get_javascript_imports(opts, self.auto_populated_fields, self.ordered_objects, field_sets);                         
         
