@@ -12,7 +12,7 @@ There's no ``.php`` or ``.cgi`` required, and certainly none of that
 See `Cool URIs don't change`_, by World Wide Web creator Tim Berners-Lee, for
 excellent arguments on why URLs should be clean and usable.
 
-.. _http://www.w3.org/Provider/Style/URI: Cool URIs don't change
+.. _Cool URIs don't change: http://www.w3.org/Provider/Style/URI
 
 Overview
 ========
@@ -231,6 +231,8 @@ With this in mind, the above example can be written more concisely as::
 
 Note that you don't put a trailing dot (``"."``) in the prefix. Django puts
 that in automatically.
+
+.. _Django overview: http://www.djangoproject.com/documentation/overview/
 
 Including other URLconfs
 ========================
