@@ -486,7 +486,7 @@ def change_stage(request, app_label, module_name, object_id):
     if not request.user.has_perm(app_label + '.' + opts.get_change_permission()):
         raise PermissionDenied
     if request.POST and request.POST.has_key("_saveasnew"):
-        return add_stage_new(request, app_label, module_name, form_url='../add/')
+        return add_stage(request, app_label, module_name, form_url='../add/')
     try:
         manipulator = mod.ChangeManipulator(object_id)
     except ObjectDoesNotExist:
