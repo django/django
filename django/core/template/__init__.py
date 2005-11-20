@@ -825,16 +825,11 @@ class DebugNodeList(NodeList):
             if not hasattr(e, 'source'):
                 e.source = node.source
             raise
-        except Exception, e:
-            from traceback import extract_tb, format_list, format_exception_only
+        except Exception:
             from sys import exc_info
-            t,v,tb = exc_info()
-            frames = extract_tb(tb)
-            frames.pop(0)
-            wrapped = TemplateSyntaxError( 'Caught exception:\n  %s'
-                                            %  "".join(format_exception_only(t,v)).replace('\n',''))
+            wrapped = TemplateSyntaxError( 'Caught exception whilst rendering' )
             wrapped.source = node.source
-            wrapped.traceback = "".join(format_list(frames))
+            wrapped.exc_info = exc_info()
             raise wrapped
         return result
 

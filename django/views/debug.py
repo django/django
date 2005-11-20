@@ -6,14 +6,65 @@ from django.conf import settings
 from os.path import dirname, join as pathjoin
 from django.core.template import Template, Context
 from django.utils.httpwrappers import HttpResponseServerError, HttpResponseNotFound
+from itertools import count, izip
+from django.utils.html import escape
 
 HIDDEN_SETTINGS = re.compile('SECRET|PASSWORD')
+
+def linebreak_iter(template_source):
+        import re
+        newline_re = re.compile("^", re.M)
+        for match in newline_re.finditer(template_source):
+            yield match.start()
+        yield len(template_source) + 1
+
+def get_template_exception_info(exc_type,exc_value,tb):
+    origin, (start, end) = exc_value.source
+    template_source = origin.reload()
+    context_lines = 10
+    line = 0
+    upto = 0
+    source_lines = []
+    linebreaks = izip(count(0), linebreak_iter(template_source))
+    linebreaks.next() # skip the nothing before initial line start
+    for num, next in linebreaks:
+        if start >= upto and end <= next :
+            line = num
+            before = escape(template_source[upto:start])
+            during = escape(template_source[start:end])
+            after = escape(template_source[end:next - 1])
+        
+        source_lines.append( (num, escape(template_source[upto:next - 1])) )
+        upto = next
+        
+    total = len(source_lines)
+    
+    top = max(0, line - context_lines)
+    bottom = min(total, line + 1 + context_lines)
+    
+    template_info =  {
+                   'message'      : exc_value.args[0], 
+                   'source_lines' : source_lines[top:bottom],
+                   'before' : before, 
+                   'during': during,
+                   'after': after,
+                   'top': top ,
+                   'bottom': bottom ,
+                   'total' : total,
+                   'line'  : line,
+                   'name' : origin.name,
+                }
+    exc_info = hasattr(exc_value, 'exc_info') and exc_value.exc_info or (exc_type,exc_value,tb)
+    return exc_info + (template_info,)
 
 def technical_500_response(request, exc_type, exc_value, tb):
     """
     Create a technical server error response.  The last three arguments are
     the values returned from sys.exc_info() and friends.
     """
+    template_info = None
+    if settings.TEMPLATE_DEBUG and hasattr(exc_value, 'source'):
+        exc_type, exc_value, tb, template_info = get_template_exception_info(exc_type,exc_value,tb)
     frames = []
     while tb is not None:
         filename = tb.tb_frame.f_code.co_filename
@@ -53,7 +104,7 @@ def technical_500_response(request, exc_type, exc_value, tb):
         'request' : request,
         'request_protocol' : os.environ.get("HTTPS") == "on" and "https" or "http",
         'settings' : settings_dict,
-
+        'template_info': template_info,
     })
     return HttpResponseServerError(t.render(c))
 
@@ -144,6 +195,9 @@ TECHNICAL_500_TEMPLATE = """
     #summary table { border:none; background:transparent; }
     #requestinfo h2, #requestinfo h3 { position:relative; margin-left:-100px; }
     #requestinfo h3 { margin-bottom:-1em; }
+    table.source td{ font-family: monospace; white-space: pre;}
+    span.specific{background:#ffcab7;}
+    .error { background:#ffc; }
   </style>
   <script type="text/javascript">
   //<!--
@@ -221,7 +275,24 @@ TECHNICAL_500_TEMPLATE = """
     </tr>
   </table>
 </div>
-
+{%if template_info %}
+<div id="template">
+   <h2>Template</h2>
+   In template {{template_info.name}}, error at line {{template_info.line}}
+   <div>{{template_info.message|escape}}</div>
+   <table class="source{%if template_info.top%} cut-top{%endif%}{%ifnotequal template_info.bottom template_info.total%} cut-bottom{%endifnotequal%}">
+   {% for source_line in template_info.source_lines %}
+   {%ifequal source_line.0 template_info.line %}
+       <tr class="error"><td>{{source_line.0}}</td>
+       <td> {{template_info.before}}<span class="specific">{{template_info.during}}</span>{{template_info.after}}</td></tr>
+   {%else%}
+      <tr><td>{{source_line.0}}</td>
+      <td> {{source_line.1}}</td></tr>
+   {%endifequal%}
+   {%endfor%}
+   </table>
+</div>
+{%endif%}
 <div id="traceback">
   <h2>Traceback <span>(innermost last)</span></h2>
   <ul class="traceback">
