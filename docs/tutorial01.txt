@@ -94,7 +94,6 @@ type ``\dt`` (PostgreSQL), ``SHOW TABLES;`` (MySQL), or ``.schema`` (SQLite) to
 display the tables.
 
 .. _`Python path documentation`: http://docs.python.org/tut/node8.html#SECTION008110000000000000000
-.. _Django's ticket system: http://code.djangoproject.com/report/1
 
 Creating models
 ===============

@@ -2,52 +2,246 @@
 URL dispatcher
 ==============
 
-We're fanatics about good URLs. No ".php" or ".cgi", and certainly not any of
-that "0,2097,1-1-1928,00" nonsense. Django's URL dispatcher lets you design
-your URLs to be as pretty as the rest of your application.
+A clean, elegant URL scheme is an important detail in a high-quality Web
+application. Django lets you design URLs however you want, with no framework
+limitations.
 
-See `the Django overview`_ for a quick introduction to URL configurations; this
-document will continue from there.
+There's no ``.php`` or ``.cgi`` required, and certainly none of that
+``0,2097,1-1-1928,00`` nonsense.
 
-.. _`the Django overview`: http://www.djangoproject.com/documentation/overview/#design-your-urls
+See `Cool URIs don't change`_, by World Wide Web creator Tim Berners-Lee, for
+excellent arguments on why URLs should be clean and usable.
 
-The view prefix
-===============
+.. _Cool URIs don't change: http://www.w3.org/Provider/Style/URI
 
-Here's the example from that overview::
+Overview
+========
+
+To design URLs for an app, you create a Python module informally called a
+**URLconf** (URL configuration). This module is pure Python code and
+is a simple mapping between URL patterns (as simple regular expressions) to
+Python callback functions (your views).
+
+This mapping can be as short or as long as needed. It can reference other
+mappings. And, because it's pure Python code, it can be constructed
+dynamically.
+
+How Django processes a request
+==============================
+
+When a user requests a page from your Django-powered site, this is the
+algorithm the system follows to determine which Python code to execute:
+
+    1. The system looks at the ``ROOT_URLCONF`` setting in your
+       `settings file`_. This should be a string representing the full Python
+       import path to your URLconf. For example: ``"mydjangoapps.urls"``.
+    2. The system loads that Python module and looks for the variable
+       ``urlpatterns``. This should be a Python list, in the format returned
+       by the function ``django.conf.urls.defaults.patterns()``.
+    3. The system runs through each URL pattern, in order, and stops at the
+       first one that matches the requested URL.
+    4. Once one of the regexes matches, Django imports and calls the given
+       view, which is a simple Python function. The view gets passed a
+       `request object`_ and any values captured in the regex as keyword
+       arguments.
+
+.. _settings file: http://www.djangoproject.com/documentation/settings/
+.. _request object: http://www.djangoproject.com/documentation/request_response/#httprequest-objects
+
+Example
+=======
+
+Here's a sample URLconf::
 
     from django.conf.urls.defaults import *
 
     urlpatterns = patterns('',
-        (r'^/articles/(?P<year>\d{4})/$', 'myproject.news.views.articles.year_archive'),
-        (r'^/articles/(?P<year>\d{4})/(?P<month>\d{2})/$', 'myproject.news.views.articles.month_archive'),
-        (r'^/articles/(?P<year>\d{4})/(?P<month>\d{2})/(?P<day>\d+)/$', 'myproject.news.views.articles.article_detail'),
+        (r'^/articles/2003/$', 'news.views.special_case_2003'),
+        (r'^/articles/(?P<year>\d{4})/$', 'news.views.year_archive'),
+        (r'^/articles/(?P<year>\d{4})/(?P<month>\d{2})/$', 'news.views.month_archive'),
+        (r'^/articles/(?P<year>\d{4})/(?P<month>\d{2})/(?P<day>\d+)/$', 'news.views.article_detail'),
     )
 
-The first argument to ``patterns`` is an empty string in the above example, but
-that argument can be useful. The first argument is prepended to all the view
-functions in the urlpatterns list, so the above example could be written more
-concisely as::
+Notes:
 
-    urlpatterns = patterns('myproject.news.views.articles',
+    * ``from django.conf.urls.defaults import *`` makes the ``patterns``
+      function available.
+
+    * To capture a value from the URL, use the syntax ``(?P<name>pattern)``,
+      where ``name`` is the name for that value and ``pattern`` is some pattern
+      to match.
+
+    * The ``"r"`` in front of each regular expression string is optional but
+      recommended. It tells Python that a string is "raw" -- that nothing in
+      the string should be escaped. See `Dive Into Python's explanation`_.
+
+Examples:
+
+    * A request to ``/articles/2005/03/`` would match the third entry in the
+      list. Django would call the function
+      ``news.views.month_archive(request, year='2005', month='03')``.
+
+    * ``/articles/2005/3/`` would not match any URL patterns, because the
+      third entry in the list requires two digits for the month.
+
+    * ``/articles/2003/`` would match the first pattern in the list, not the
+      second one, because the patterns are tested in order, and the first one
+      is the first test to pass. Feel free to exploit the ordering to insert
+      special cases like this.
+
+    * ``/articles/2003`` would not match any of these patterns, because each
+      pattern requires that the URL end with a slash.
+
+    * ``/articles/2003/03/3/`` would match the final pattern. Django would call
+      the function
+      ``news.views.article_detail(request, year='2003', month='03', day='3')``.
+
+.. _Dive Into Python's explanation: http://diveintopython.org/regular_expressions/street_addresses.html#re.matching.2.3
+
+What the URLconf searches against
+=================================
+
+The URLconf searches against the requested URL, as a normal Python string. This
+does not include GET or POST parameters, or the domain name.
+
+For example, in a request to ``http://www.example.com/myapp/``, the URLconf
+will look for ``/myapp/``.
+
+In a request to ``http://www.example.com/myapp/?page=3``, the URLconf will look
+for ``/myapp/``.
+
+Syntax of the urlpatterns variable
+==================================
+
+``urlpatterns`` should be a Python list, in the format returned by the function
+``django.conf.urls.defaults.patterns()``. Always use ``patterns()`` to create
+the ``urlpatterns`` variable.
+
+Convention is to use ``from django.conf.urls.defaults import *`` at the top of
+your URLconf. This gives your module access to these objects:
+
+patterns
+--------
+
+A function that takes a prefix an arbitrary number of URL patterns and returns
+a list of URL patterns in the format Django needs.
+
+The first argument to ``patterns()`` is a string ``prefix``. See
+"The view prefix" below.
+
+The remaining arguments should be tuples in this format::
+
+    (regular expression, Python callback function [, optional dictionary])
+
+...where ``dictionary_of_extra_arguments`` is optional. (See
+"Passing extra options to view functions" below.)
+
+handler404
+----------
+
+A string representing the full Python import path to the view that should be
+called if none of the URL patterns match.
+
+By default, this is ``'django.views.defaults.page_not_found'``. That default
+value should suffice.
+
+handler500
+----------
+
+A string representing the full Python import path to the view that should be
+called in case of server errors. Server errors happen when you have runtime
+errors in view code.
+
+By default, this is ``'django.views.defaults.server_error'``. That default
+value should suffice.
+
+include
+-------
+
+A function that takes a full Python import path to another URLconf that should
+be "included" in this place. See "Including other URLconfs" below.
+
+Notes on capturing text in URLs
+===============================
+
+Each captured argument is sent to the view as a plain Python string, regardless
+of what sort of match the regular expression makes. For example, in this
+URLconf::
+
+    (r'^/articles/(?P<year>\d{4})/$', 'news.views.year_archive'),
+
+...the ``year`` argument to ``news.views.year_archive()`` will be a string, not
+an integer, even though the ``\d{4}`` will only match integer strings.
+
+A convenient trick is to specify default parameters for your views' arguments.
+Here's an example URLconf and view::
+
+    # URLconf
+    urlpatterns = patterns('',
+        (r'^/blog/$', 'blog.views.page'),
+        (r'^/blog/page(?P<num>\d+)/$', 'blog.views.page'),
+    )
+
+    # View (in blog/views.py)
+    def page(request, num="1"):
+        # Output the appropriate page of blog entries, according to num.
+
+In the above example, both URL patterns point to the same view --
+``blog.views.page`` -- but the first pattern doesn't capture anything from the
+URL. If the first pattern matches, the ``page()`` function will use its
+default argument for ``num``, ``"1"``. If the second pattern matches,
+``page()`` will use whatever ``num`` value was captured by the regex.
+
+Performance
+===========
+
+Each regular expression in a ``urlpatterns`` is compiled the first time it's
+accessed. This makes the system blazingly fast.
+
+The view prefix
+===============
+
+You can specify a common prefix in your ``patterns()`` call, to cut down on
+code duplication.
+
+Here's the example URLconf from the `Django overview`_::
+
+    from django.conf.urls.defaults import *
+
+    urlpatterns = patterns('',
+        (r'^/articles/(?P<year>\d{4})/$', 'myproject.news.views.year_archive'),
+        (r'^/articles/(?P<year>\d{4})/(?P<month>\d{2})/$', 'myproject.news.views.month_archive'),
+        (r'^/articles/(?P<year>\d{4})/(?P<month>\d{2})/(?P<day>\d+)/$', 'myproject.news.views.article_detail'),
+    )
+
+In this example, each view has a common prefix -- ``"myproject.news.views"``.
+Instead of typing that out for each entry in ``urlpatterns``, you can use the
+first argument to the ``patterns()`` function to specify a prefix to apply to
+each view function.
+
+With this in mind, the above example can be written more concisely as::
+
+    from django.conf.urls.defaults import *
+
+    urlpatterns = patterns('myproject.news.views',
         (r'^/articles/(?P<year>\d{4})/$', 'year_archive'),
         (r'^/articles/(?P<year>\d{4})/(?P<month>\d{2})/$', 'month_archive'),
         (r'^/articles/(?P<year>\d{4})/(?P<month>\d{2})/(?P<day>\d+)/$', 'article_detail'),
     )
 
-.. admonition:: Note
+Note that you don't put a trailing dot (``"."``) in the prefix. Django puts
+that in automatically.
 
-    More precisely, the actual view function used is ``prefix + "." +
-    function_name``. The trailing "dot" does not need to be put in the prefix.
+.. _Django overview: http://www.djangoproject.com/documentation/overview/
 
 Including other URLconfs
 ========================
 
-You can also "include" other URLconf modules at any point along the path. This
-essentially "roots" a set of URLs below other ones.  This is most often used
-for a site's "base" URLconf; the ``ROOT_URLCONF`` setting points to a urlconf
-module that will be used for the entire site. Here's the URLconf for the
-`Django website`_ itself. It includes a number of other URLconfs::
+At any point, your ``urlpatterns`` can "include" other URLconf modules. This
+essentially "roots" a set of URLs below other ones.
+
+For example, here's the URLconf for the `Django website`_ itself. It includes a
+number of other URLconfs::
 
     from django.conf.urls.defaults import *
 
@@ -70,6 +264,7 @@ URLconfs, so the following example is valid::
     urlpatterns = patterns('foo.views'
         (r'^$', 'blog.index'),
         (r'^archive/$', 'blog.archive'),
+    )
 
 In the above example, the captured ``"username"`` variable is passed to the
 included URLconf, as expected.
@@ -79,11 +274,25 @@ included URLconf, as expected.
 Passing extra options to view functions
 =======================================
 
-There are two ways of passing arguments into your view functions: named captures
-from the regex (which you've already seen) and the optional third element
-in URLconf tuples. This third element can be a dictionary of extra keyword
-arguments that will be passed to the view function::
+URLconfs have a hook that lets you pass extra arguments to your view functions,
+as a Python dictionary.
 
-    urlpatterns = patterns('myproject.news.views.articles',
-        (r'^/articles/(?P<year>\d{4})/$', 'year_archive', {key: value, key2: value2}),
+Any URLconf tuple can have an optional third element, which should be a
+dictionary of extra keyword arguments to pass to the view function.
+
+For example::
+
+    urlpatterns = patterns('blog.views',
+        (r'^/blog/(?P<year>\d{4})/$', 'year_archive', {'foo': 'bar'}),
     )
+
+In this example, for a request to ``/blog/2005/``, Django will call the
+``blog.views.year_archive()`` view, passing it these keyword arguments::
+
+    year='2005', foo='bar'
+
+This technique is used in `generic views`_ and in the `syndication framework`_
+to pass metadata and options to views.
+
+.. _generic views: http://www.djangoproject.com/documentation/generic_views/
+.. _syndication framework: http://www.djangoproject.com/documentation/syndication/

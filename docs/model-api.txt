@@ -580,7 +580,7 @@ relationship should work. All are optional:
 Many-to-many relationships
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-To define a many-to-one relationship, use ``ManyToManyField``. You use it just
+To define a many-to-many relationship, use ``ManyToManyField``. You use it just
 like any other ``Field`` type: by including it as a class attribute of your
 model.
 

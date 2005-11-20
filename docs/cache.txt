@@ -93,7 +93,7 @@ entire site. Just add ``django.middleware.cache.CacheMiddleware`` to your
 (The order of ``MIDDLEWARE_CLASSES`` matters. See "Order of MIDDLEWARE_CLASSES"
 below.)
 
-Then, add the following three required settings to your Django settings file:
+Then, add the following required settings to your Django settings file:
 
 * ``CACHE_MIDDLEWARE_SECONDS`` -- The number of seconds each page should be
   cached.
