@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2005-11-19 09:48-0500\n"
+"POT-Creation-Date: 2005-11-20 17:02-0500\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: Vladimir Labath <vlado@labath.org>\n"
 "Language-Team: Slovak <sk@li.org>\n"
@@ -461,7 +461,7 @@ msgstr "záznam priebehu"
 msgid "log entries"
 msgstr "záznamy priebehu"
 
-#: contrib/admin/templatetags/admin_list.py:283
+#: contrib/admin/templatetags/admin_list.py:244
 msgid "All dates"
 msgstr "Všetky dátumy"
 
@@ -717,7 +717,7 @@ msgstr "Django web admin"
 
 #: contrib/admin/templates/admin/base_site.html:7
 msgid "Django administration"
-msgstr "Administrácia Django"
+msgstr "Spravované Djangom"
 
 #: contrib/admin/templates/admin/500.html:4
 msgid "Server error"
@@ -825,19 +825,6 @@ msgstr ""
 #: contrib/admin/templates/admin/delete_confirmation.html:18
 msgid "Yes, I'm sure"
 msgstr "Ano, som si istý"
-
-#: contrib/admin/templates/admin/template_debug.html:7
-msgid "Error in Template"
-msgstr "Chyba v predlohe"
-
-#: contrib/admin/templates/admin/template_debug.html:9
-#, python-format
-msgid ""
-"\n"
-"In template %(name)s, error at line %(line)s:\n"
-msgstr ""
-"\n"
-"V predlohe %(name)s, chyba na riadku %(line)s:\n"
 
 #: contrib/admin/templates/admin/change_list.html:10
 #, fuzzy, python-format
@@ -1025,7 +1012,8 @@ msgid ""
 "your computer is \"internal\").</p>\n"
 msgstr ""
 "\n"
-"<p class=\"help\">Na inštaláciu zarážok, chyťte a potiahnite linku do vášho bookmarks\n"
+"<p class=\"help\">Na inštaláciu zarážok, chyťte a potiahnite linku do vášho "
+"bookmarks\n"
 "toolbar, alebo klik pravou myšou na linku a pridať do vášho  bookmarks.\n"
 " Teraz si môžete vyberať zarážky z ľubovoľnej stránky webu.\n"
 "Poznámka: pri tvorbe niektorých zarážok, sa vyžaduje aby ste sa pohybovali\n"
@@ -1452,17 +1440,17 @@ msgstr "Poslaný súbor je prázdny."
 #: core/formfields.py:658
 #, fuzzy
 msgid "Enter a whole number between -32,768 and 32,767."
-msgstr "Vložte celé číslo."
+msgstr "Vložte celé číslo s hodnotou medzi -32,768 a 32,767."
 
 #: core/formfields.py:667
 #, fuzzy
 msgid "Enter a positive number."
-msgstr "Vložte celé číslo."
+msgstr "Vložte celé kladné číslo."
 
 #: core/formfields.py:676
 #, fuzzy
 msgid "Enter a whole number between 0 and 32,767."
-msgstr "Vložte celé číslo."
+msgstr "Vložte celé číslo s hodnotou medzi 0 a 32,767."
 
 #: core/validators.py:59
 msgid "This value must contain only letters, numbers and underscores."
