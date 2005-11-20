@@ -15,47 +15,6 @@ from django.core import template
 from django.utils import dateformat
 DOT = '.'
 
-class QueryStringNode(template.Node):
-    def __init__(self, cl_var, override_vars, remove_vars):
-        self.cl_var, self.override_vars, self.remove_vars = cl_var, override_vars, remove_vars
-        
-    def render(self, context):
-        def res(var):
-            return template.resolve_variable(var, context)
-        
-        cl = res(self.cl_var)
-        overrides = dict([ (res(k), res(v)) for k,v in self.override_vars ])
-        remove = [res(v) for v in self.remove_vars]
-        return cl.get_query_string(overrides, remove)
-
-def do_query_string(parser, token):
-    bits = token.contents.split()[1:]
-    in_override = False
-    in_remove = False
-    override_vars = []
-    remove_vars = []
-    cl_var = bits.pop(0)
-    
-    for word in bits:
-        if in_override:
-            if word == 'remove':
-                in_remove = True
-                in_override = False
-            else:
-                override_vars.append(word.split(':'))
-        elif in_remove:
-            remove_vars.append(word)
-        else:
-            if word == 'override':
-                in_override = True
-            elif word == 'remove':
-                remove = True
-    
-    return QueryStringNode(cl_var, override_vars, remove_vars)
-
-template.register_tag('query_string', do_query_string)          
-
-
 #@simple_tag
 def paginator_number(cl,i):
     if i == DOT:
@@ -99,9 +58,11 @@ def pagination(cl):
             else:
                 page_range.extend(range(page_num + 1, paginator.pages))
 
+    need_show_all_link = cl.can_show_all and not cl.show_all and cl.multi_page
+
     return {'cl': cl,
              'pagination_required': pagination_required,
-             'need_show_all_link': cl.can_show_all and not cl.show_all and cl.multi_page,
+             'show_all_url': need_show_all_link and cl.get_query_string({ALL_VAR:''}),
              'page_range': page_range, 
              'ALL_VAR': ALL_VAR,
              '1': 1
@@ -141,7 +102,7 @@ def result_headers(cl):
                     
                     yield {"text" : f.verbose_name, 
                            "sortable": True,
-                           "order" : new_order_type,
+                           "url" : cl.get_query_string({ORDER_VAR: i, ORDER_TYPE_VAR: new_order_type}),
                            "class_attrib" : (th_classes and ' class="%s"' % ' '.join(th_classes) or '') }
     
 def items_for_result(cl, result):

@@ -2,7 +2,7 @@
 <thead>
 <tr>
 {% for header in result_headers %}<th{{header.class_attrib}}>
-{%if header.sortable%}<a href="{% query_string cl override ORDER_VAR:i ORDER_TYPE_VAR:header.order %}" %>{%endif%}
+{%if header.sortable%}<a href="{{header.url}}" %>{%endif%}
 {{header.text|capfirst}}
 {%if header.sortable %}</a>{% endif %}</th>{% endfor %}
 </tr>
