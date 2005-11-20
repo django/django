@@ -9,6 +9,7 @@ from django.core import meta
 class Reporter(meta.Model):
     first_name = meta.CharField(maxlength=30)
     last_name = meta.CharField(maxlength=30)
+    email = meta.EmailField()
 
     def __repr__(self):
         return "%s %s" % (self.first_name, self.last_name)
@@ -23,7 +24,7 @@ class Article(meta.Model):
 
 API_TESTS = """
 # Create a Reporter.
->>> r = reporters.Reporter(first_name='John', last_name='Smith')
+>>> r = reporters.Reporter(first_name='John', last_name='Smith', email='john@example.com')
 >>> r.save()
 
 # Create an Article.
