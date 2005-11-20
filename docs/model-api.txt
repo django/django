@@ -1079,9 +1079,17 @@ the resulting rows. Example::
         row = cursor.fetchone()
         return row
 
-Note that ``db`` and ``cursor`` simply use the standard `Python DB-API`_.
+If your custom SQL statement alters the data in your database -- for example,
+via a ``DELETE``, ``INSERT`` or ``UPDATE`` -- you'll need to call
+``db.commit()``. example::
 
-If you're not familiar with the Python DB-API, note that the SQL statement in
+    def my_custom_sql2(self):
+        cursor = db.cursor()
+        cursor.execute("DELETE FROM bar WHERE baz = %s", [self.baz])
+        db.commit()
+
+``db`` and ``cursor`` simply use the standard `Python DB-API`_. If you're not
+familiar with the Python DB-API, note that the SQL statement in
 ``cursor.execute()`` uses placeholders, ``"%s"``, rather than adding parameters
 directly within the SQL. If you use this technique, the underlying database
 library will automatically add quotes and escaping to your parameter(s) as
