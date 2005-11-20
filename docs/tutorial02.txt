@@ -33,7 +33,7 @@ activate the admin site for your installation, do these three things:
     * Add ``"django.contrib.admin"`` to your ``INSTALLED_APPS`` setting.
     * Run the command ``django-admin.py install admin``. This will create an
       extra database table that the admin needs.
-    * Edit your ``myproject.urls`` file and uncomment the line below
+    * Edit your ``myproject/urls.py`` file and uncomment the line below
       "Uncomment this for admin:". This file is a URLconf; we'll dig into
       URLconfs in the next tutorial. For now, all you need to know is that it
       maps URL roots to applications.
