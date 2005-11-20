@@ -138,7 +138,6 @@ DATA_TYPES = {
     'CommaSeparatedIntegerField': 'varchar(%(maxlength)s)',
     'DateField':         'smalldatetime',
     'DateTimeField':     'smalldatetime',
-    'EmailField':        'varchar(75)',
     'FileField':         'varchar(100)',
     'FilePathField':     'varchar(100)',
     'FloatField':        'numeric(%(max_digits)s, %(decimal_places)s)',
