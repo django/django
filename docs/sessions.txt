@@ -41,7 +41,8 @@ It implements the following standard dictionary methods:
       Example: ``request.session['fav_color'] = 'blue'``
 
     * ``__delitem__(key)``
-      Example: ``del request.session['fav_color']``
+      Example: ``del request.session['fav_color']``. This raises ``KeyError``
+      if the given ``key`` isn't already in the session.
 
     * ``get(key, default=None)``
       Example: ``fav_color = request.session.get('fav_color', 'red')``
@@ -158,10 +159,41 @@ This is necessary because the dictionary is stored in an encoded format::
     >>> s.get_decoded()
     {'user_id': 42}
 
-Session cookies
-===============
+When sessions are saved
+=======================
 
-A few `Django settings`_ give you control over the session cookie:
+By default, Django only saves to the session database when the session has been
+modified -- that is if any of its dictionary values have been assigned or
+deleted::
+
+    # Session is modified.
+    request.session['foo'] = 'bar'
+
+    # Session is modified.
+    del request.session['foo']
+
+    # Session is modified.
+    request.session['foo'] = {}
+
+    # Gotcha: Session is NOT modified, because this alters
+    # request.session['foo'] instead of request.session.
+    request.session['foo']['bar'] = 'baz'
+
+To change this default behavior, set the ``SESSION_SAVE_EVERY_REQUEST`` setting
+to ``True``. If ``SESSION_SAVE_EVERY_REQUEST`` is ``True``, Django will save
+the session to the database on every single request.
+
+Note that the session cookie is only sent when a session has been created or
+modified. If ``SESSION_SAVE_EVERY_REQUEST`` is ``True``, the session cookie
+will be sent on every request.
+
+Similarly, the ``expires`` part of a session cookie is updated each time the
+session cookie is sent.
+
+Settings
+========
+
+A few `Django settings`_ give you control over session behavior:
 
 SESSION_COOKIE_AGE
 ------------------
@@ -188,6 +220,15 @@ The name of the cookie to use for sessions. This can be whatever you want.
 
 ``'hotclub'`` is a reference to the Hot Club of France, the band Django
 Reinhardt played in.
+
+SESSION_SAVE_EVERY_REQUEST
+--------------------------
+
+Default: ``False``
+
+Whether to save the session data on every request. If this is ``False``
+(default), then the session data will only be saved if it has been modified --
+that is, if any of its dictionary values have been assigned or deleted.
 
 .. _Django settings: http://www.djangoproject.com/documentation/settings/
 

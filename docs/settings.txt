@@ -533,6 +533,13 @@ See the `session docs`_.
 ``'hotclub'`` is a reference to the Hot Club of France, the band Django
 Reinhardt played in.
 
+SESSION_SAVE_EVERY_REQUEST
+--------------------------
+
+Default: ``False``
+
+Whether to save the session data on every request. See the `session docs`_.
+
 SITE_ID
 -------
 
