@@ -179,9 +179,10 @@ deleted::
     # request.session['foo'] instead of request.session.
     request.session['foo']['bar'] = 'baz'
 
-To change this default behavior, set the ``SESSION_SAVE_EVERY_REQUEST`` setting
-to ``True``. If ``SESSION_SAVE_EVERY_REQUEST`` is ``True``, Django will save
-the session to the database on every single request.
+**Only available in Django development version.** To change this default
+behavior, set the ``SESSION_SAVE_EVERY_REQUEST`` setting  to ``True``. If
+``SESSION_SAVE_EVERY_REQUEST`` is ``True``, Django will save the session to the
+database on every single request.
 
 Note that the session cookie is only sent when a session has been created or
 modified. If ``SESSION_SAVE_EVERY_REQUEST`` is ``True``, the session cookie
@@ -225,6 +226,8 @@ SESSION_SAVE_EVERY_REQUEST
 --------------------------
 
 Default: ``False``
+
+**Only available in Django development version.**
 
 Whether to save the session data on every request. If this is ``False``
 (default), then the session data will only be saved if it has been modified --
