@@ -1,4 +1,5 @@
 from django.contrib.flatpages.views import flatpage
+from django.core.extensions import Http404
 from django.conf.settings import DEBUG
 
 class FlatpageFallbackMiddleware:
@@ -9,6 +10,8 @@ class FlatpageFallbackMiddleware:
             return flatpage(request, request.path)
         # Return the original response if any errors happened. Because this
         # is a middleware, we can't assume the errors will be caught elsewhere.
+        except Http404:
+            return response
         except:
             if DEBUG:
                 raise
