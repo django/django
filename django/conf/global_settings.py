@@ -196,6 +196,7 @@ MIDDLEWARE_CLASSES = (
 SESSION_COOKIE_NAME = 'hotclub'           # Cookie name. This can be whatever you want.
 SESSION_COOKIE_AGE = 60 * 60 * 24 * 7 * 2 # Age of cookie, in seconds (default: 2 weeks).
 SESSION_COOKIE_DOMAIN = None              # A string like ".lawrence.com", or None for standard domain cookie.
+SESSION_SAVE_EVERY_REQUEST = False        # Whether to save the session data on every request.
 
 #########
 # CACHE #

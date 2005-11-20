@@ -1,4 +1,4 @@
-from django.conf.settings import SESSION_COOKIE_NAME, SESSION_COOKIE_AGE, SESSION_COOKIE_DOMAIN
+from django.conf.settings import SESSION_COOKIE_NAME, SESSION_COOKIE_AGE, SESSION_COOKIE_DOMAIN, SESSION_SAVE_EVERY_REQUEST
 from django.models.core import sessions
 from django.utils.cache import patch_vary_headers
 import datetime
@@ -67,7 +67,7 @@ class SessionMiddleware:
             modified = request.session.modified
         except AttributeError:
             modified = False
-        if modified:
+        if modified or SESSION_SAVE_EVERY_REQUEST:
             session_key = request.session.session_key or sessions.get_new_session_key()
             new_session = sessions.save(session_key, request.session._session,
                 datetime.datetime.now() + datetime.timedelta(seconds=SESSION_COOKIE_AGE))

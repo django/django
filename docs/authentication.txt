@@ -49,10 +49,10 @@ Fields
       and can contain any character.
     * ``is_staff`` -- Boolean. Designates whether this user can access the
       admin site.
-    * ``is_active`` -- Boolean. Designates whether this user account is valid.
-      Set this to ``False`` instead of deleting accounts.
-    * ``is_superuser`` -- Boolean. Designates whether this user has permission
-      to do anything (according to the permission system).
+    * ``is_active`` -- Boolean. Designates whether this user can log into the
+      Django admin. Set this to ``False`` instead of deleting accounts.
+    * ``is_superuser`` -- Boolean. Designates that this user has all permissions
+      without explicitly assigning them.
     * ``last_login`` -- A datetime of the user's last login. Is set to the
       current date/time by default.
     * ``date_joined`` -- A datetime designating when the account was created.
@@ -93,10 +93,11 @@ methods:
       the user has, both through group and user permissions.
 
     * ``has_perm(perm)`` -- Returns ``True`` if the user has the specified
-      permission.
+      permission, where perm is in the format ``"package.codename"``.
 
     * ``has_perms(perm_list)`` -- Returns ``True`` if the user has each of the
-      specified permissions.
+      specified permissions, where each perm is in the format
+      ``"package.codename"``.
 
     * ``has_module_perms(package_name)`` -- Returns ``True`` if the user has
       any permissions in the given package (the Django app label).
@@ -271,6 +272,14 @@ permission ``polls.can_vote``::
         # ...
 
 As a shortcut, you can use the convenient ``user_passes_test`` decorator::
+
+    from django.views.decorators.auth import user_passes_test
+
+    def my_view(request):
+        # ...
+    my_view = user_passes_test(my_view, lambda u: u.has_perm('polls.can_vote'))
+
+Here's the same thing, using Python 2.4's decorator syntax::
 
     from django.views.decorators.auth import user_passes_test
 
