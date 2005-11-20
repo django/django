@@ -328,7 +328,11 @@ Feed class reference
 
 This example illustrates all possible attributes and methods for a ``Feed`` class::
 
-    class ExampleFeed(rss.Feed):
+
+    from django.contrib.syndication.feeds import Feed
+    from django.utils import feedgenerator
+
+    class ExampleFeed(Feed):
 
         # FEED TYPE -- Optional. This should be a class that subclasses
         # django.utils.feedgenerator.SyndicationFeed. This designates which
