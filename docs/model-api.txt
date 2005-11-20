@@ -963,6 +963,13 @@ Now, every ``Pizza`` object will have a ``is_disgusting()`` method.
 
 Note that the scope of custom methods is modified to be the same as the module
 scope. These methods do NOT have access to globals within your model's module.
+Additionally, custom methods have access to a few commonly-used objects for
+convenience:
+
+    * The ``datetime`` module from Python's standard library.
+    * The ``db`` object from ``django.core.db``. This represents the database
+      connection, so you can do custom queries via a cursor object. See
+      "Executing custom SQL" below.
 
 See `Giving models custom methods`_ for a full example.
 
@@ -1055,6 +1062,32 @@ method that begins with "validate"::
 
             if int(field_data) in BAD_CUSTOMER_IDS:
                 raise validators.ValidationError, "We don't deliver to this customer."
+
+Executing custom SQL
+--------------------
+
+Feel free to write custom SQL statements in custom model methods and
+module-level methods. Each custom method automatically has access to the
+variable ``db``, which is the current database connection. To use it, call
+``db.cursor()`` to get a cursor object. Then, call ``cursor.execute(sql, [params])``
+to execute the SQL and ``cursor.fetchone()`` or ``cursor.fetchall()`` to return
+the resulting rows. Example::
+
+    def my_custom_sql(self):
+        cursor = db.cursor()
+        cursor.execute("SELECT foo FROM bar WHERE baz = %s", [self.baz])
+        row = cursor.fetchone()
+        return row
+
+Note that ``db`` and ``cursor`` simply use the standard `Python DB-API`_.
+
+If you're not familiar with the Python DB-API, note that the SQL statement in
+``cursor.execute()`` uses placeholders, ``"%s"``, rather than adding parameters
+directly within the SQL. If you use this technique, the underlying database
+library will automatically add quotes and escaping to your parameter(s) as
+necessary.
+
+.. _Python DB-API: http://www.python.org/peps/pep-0249.html
 
 Using models
 ============
