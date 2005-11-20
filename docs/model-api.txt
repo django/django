@@ -1080,8 +1080,7 @@ the resulting rows. Example::
         return row
 
 If your custom SQL statement alters the data in your database -- for example,
-via a ``DELETE``, ``INSERT`` or ``UPDATE`` -- you'll need to call
-``db.commit()``. example::
+via a ``DELETE`` or ``UPDATE`` -- you'll need to call ``db.commit()``. Example::
 
     def my_custom_sql2(self):
         cursor = db.cursor()
