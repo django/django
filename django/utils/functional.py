@@ -3,6 +3,14 @@ def curry(*args, **kwargs):
         return args[0](*(args[1:]+moreargs), **dict(kwargs.items() + morekwargs.items()))
     return _curried
 
+class Promise:
+    """
+    This is just a base class for the proxy class created in
+    the closure of the lazy function. It can be used to recognize
+    promises in code.
+    """
+    pass
+
 def lazy(func, *resultclasses):
     """
     Turns any callable into a lazy evaluated callable. You need to give result
@@ -10,7 +18,7 @@ def lazy(func, *resultclasses):
     the lazy evaluation code is triggered. Results are not memoized; the
     function is evaluated on every access.
     """
-    class __proxy__:
+    class __proxy__(Promise):
         # This inner class encapsulates the code that should be evaluated
         # lazily. On calling of one of the magic methods it will force
         # the evaluation and store the result. Afterwards, the result

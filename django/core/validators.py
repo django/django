@@ -27,6 +27,7 @@ url_re = re.compile(r'^http://\S+$')
 
 from django.conf.settings import JING_PATH
 from django.utils.translation import gettext_lazy, ngettext
+from django.utils.functional import Promise
 
 class ValidationError(Exception):
     def __init__(self, message):
@@ -34,7 +35,7 @@ class ValidationError(Exception):
         if isinstance(message, list):
             self.messages = message
         else:
-            assert isinstance(message, basestring), ("%s should be a string" % repr(message))
+            assert isinstance(message, (basestring, Promise)), ("%s should be a string" % repr(message))
             self.messages = [message]
     def __str__(self):
         # This is needed because, without a __str__(), printing an exception
@@ -49,7 +50,7 @@ class CriticalValidationError(Exception):
         if isinstance(message, list):
             self.messages = message
         else:
-            assert isinstance(message, basestring), ("'%s' should be a string" % message)
+            assert isinstance(message, (basestring, Promise)), ("'%s' should be a string" % message)
             self.messages = [message]
     def __str__(self):
         return str(self.messages)
