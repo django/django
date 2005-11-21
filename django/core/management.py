@@ -677,6 +677,17 @@ def get_validation_errors(outfile):
                     e.add(rel_opts, "At least one field in %s should have core=True, because it's being edited inline by %s.%s." % (rel_opts.object_name, opts.module_name, opts.object_name))
                 except StopIteration:
                     pass
+
+            # Check unique_together.
+            for ut in opts.unique_together:
+                for field_name in ut:
+                    try:
+                        f = opts.get_field(field_name, many_to_many=True)
+                    except meta.FieldDoesNotExist:
+                        e.add(opts, '"unique_together" refers to %s, a field that doesn\'t exist. Check your syntax.' % field_name)
+                    else:
+                        if isinstance(f.rel, meta.ManyToMany):
+                            e.add(opts, '"unique_together" refers to %s. ManyToManyFields are not supported in unique_together.' % f.name)
     return len(e.errors)
 
 def validate(outfile=sys.stdout):
