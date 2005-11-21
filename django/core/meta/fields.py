@@ -50,7 +50,7 @@ def manipulator_validator_unique(f, opts, self, field_data, all_data):
     if f.rel and isinstance(f.rel, ManyToOne):
         lookup_type = '%s__%s__exact' % (f.name, f.rel.get_related_field().name)
     else:
-        lookup_type = '%s__exact' % (f.name, lookup_type)
+        lookup_type = '%s__exact' % f.name
     try:
         old_obj = opts.get_model_module().get_object(**{lookup_type: field_data})
     except ObjectDoesNotExist:
