@@ -964,7 +964,7 @@ def method_get_related(method_name, rel_mod, rel_field, self, **kwargs):
     if self._meta.has_related_links and rel_mod.Klass._meta.module_name == 'relatedlinks':
         kwargs['object_id__exact'] = getattr(self, rel_field.rel.field_name)
     else:
-        kwargs['%s__%s__exact' % (rel_field.name, rel_field.rel.to.pk.name)] = getattr(self, rel_field.rel.field_name)
+        kwargs['%s__%s__exact' % (rel_field.name, rel_field.rel.to.pk.name)] = getattr(self, rel_field.rel.get_related_field().attname)
     kwargs.update(rel_field.rel.lookup_overrides)
     return getattr(rel_mod, method_name)(**kwargs)
 
