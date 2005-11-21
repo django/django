@@ -128,19 +128,19 @@ def get_relations(cursor, table_name):
     raise NotImplementedError
 
 OPERATOR_MAPPING = {
-    'exact': '=',
-    'iexact': 'LIKE',
-    'contains': 'LIKE BINARY',
-    'icontains': 'LIKE',
-    'ne': '!=',
-    'gt': '>',
-    'gte': '>=',
-    'lt': '<',
-    'lte': '<=',
-    'startswith': 'LIKE BINARY',
-    'endswith': 'LIKE BINARY',
-    'istartswith': 'LIKE',
-    'iendswith': 'LIKE',
+    'exact': '= %s',
+    'iexact': 'LIKE %s',
+    'contains': 'LIKE BINARY %s',
+    'icontains': 'LIKE %s',
+    'ne': '!= %s',
+    'gt': '> %s',
+    'gte': '>= %s',
+    'lt': '< %s',
+    'lte': '<= %s',
+    'startswith': 'LIKE BINARY %s',
+    'endswith': 'LIKE BINARY %s',
+    'istartswith': 'LIKE %s',
+    'iendswith': 'LIKE %s',
 }
 
 # This dictionary maps Field objects to their associated MySQL column

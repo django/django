@@ -116,19 +116,19 @@ def get_relations(cursor, table_name):
     raise NotImplementedError
 
 OPERATOR_MAPPING = {
-    'exact': '=',
-    'iexact': 'LIKE',
-    'contains': 'LIKE',
-    'icontains': 'LIKE',
-    'ne': '!=',
-    'gt': '>',
-    'gte': '>=',
-    'lt': '<',
-    'lte': '<=',
-    'startswith': 'LIKE',
-    'endswith': 'LIKE',
-    'istartswith': 'LIKE',
-    'iendswith': 'LIKE',
+    'exact': '= %s',
+    'iexact': 'LIKE %s',
+    'contains': 'LIKE %s',
+    'icontains': 'LIKE %s',
+    'ne': '!= %s',
+    'gt': '> %s',
+    'gte': '>= %s',
+    'lt': '< %s',
+    'lte': '<= %s',
+    'startswith': 'LIKE %s',
+    'endswith': 'LIKE %s',
+    'istartswith': 'LIKE %s',
+    'iendswith': 'LIKE %s',
 }
 
 DATA_TYPES = {
