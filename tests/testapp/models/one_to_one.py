@@ -74,4 +74,7 @@ Demon Dogs the restaurant
 >>> w.save()
 >>> w
 Joe the waiter at Demon Dogs the restaurant
+
+>>> r = restaurants.get_object(pk=1)
+>>> r.delete()
 """
