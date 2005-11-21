@@ -604,6 +604,11 @@ def get_validation_errors(outfile):
             for f in opts.fields:
                 if isinstance(f, meta.CharField) and f.maxlength in (None, 0):
                     e.add(opts, '"%s" field: CharFields require a "maxlength" attribute.' % f.name)
+                if isinstance(f, meta.FloatField):
+                    if f.decimal_places is None:
+                        e.add(opts, '"%s" field: FloatFields require a "decimal_places" attribute.' % f.name)
+                    if f.max_digits is None:
+                        e.add(opts, '"%s" field: FloatFields require a "max_digits" attribute.' % f.name)
                 if isinstance(f, meta.FileField) and not f.upload_to:
                     e.add(opts, '"%s" field: FileFields require an "upload_to" attribute.' % f.name)
                 if isinstance(f, meta.ImageField):

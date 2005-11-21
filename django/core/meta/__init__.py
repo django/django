@@ -890,12 +890,13 @@ def method_init(opts, self, *args, **kwargs):
                     except KeyError:
                         val = f.get_default()
                 else:
+                    # Object instance was passed in.
                     # Special case: You can pass in "None" for related objects if it's allowed.
                     if rel_obj is None and f.null:
                         val = None
                     else:
                         try:
-                            val = getattr(rel_obj, f.rel.field_name)
+                            val = getattr(rel_obj, f.rel.get_related_field().attname)
                         except AttributeError:
                             raise TypeError, "Invalid value: %r should be a %s instance, not a %s" % (f.name, f.rel.to, type(rel_obj))
                 setattr(self, f.attname, val)
@@ -1028,7 +1029,12 @@ def method_get_many_to_one(field_with_rel, self):
         mod = field_with_rel.rel.to.get_model_module()
         if val is None:
             raise getattr(mod, '%sDoesNotExist' % field_with_rel.rel.to.object_name)
-        retrieved_obj = mod.get_object(**{'%s__exact' % field_with_rel.rel.field_name: val})
+        other_field = field_with_rel.rel.get_related_field()
+        if other_field.rel:
+            params = {'%s__%s__exact' % (field_with_rel.rel.field_name, other_field.rel.field_name): val}
+        else:
+            params = {'%s__exact'% field_with_rel.rel.field_name: val}
+        retrieved_obj = mod.get_object(**params)
         setattr(self, cache_var, retrieved_obj)
     return getattr(self, cache_var)
 
@@ -1094,7 +1100,7 @@ def method_get_related(method_name, rel_mod, rel_field, self, **kwargs):
     if self._meta.has_related_links and rel_mod.Klass._meta.module_name == 'relatedlinks':
         kwargs['object_id__exact'] = getattr(self, rel_field.rel.field_name)
     else:
-        kwargs['%s__%s__exact' % (rel_field.name, rel_field.rel.to.pk.name)] = getattr(self, rel_field.rel.field_name)
+        kwargs['%s__%s__exact' % (rel_field.name, rel_field.rel.to.pk.name)] = getattr(self, rel_field.rel.get_related_field().attname)
     kwargs.update(rel_field.rel.lookup_overrides)
     return getattr(rel_mod, method_name)(**kwargs)
 

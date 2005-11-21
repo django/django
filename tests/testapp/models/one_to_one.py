@@ -28,7 +28,7 @@ class Waiter(meta.Model):
     name = meta.CharField(maxlength=50)
 
     def __repr__(self):
-        return "%s the waiter at %s" % (self.name, self.get_restaurant())
+        return "%s the waiter at %r" % (self.name, self.get_restaurant())
 
 API_TESTS = """
 # Create a couple of Places.

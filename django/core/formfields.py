@@ -778,9 +778,9 @@ class TimeField(TextField):
 
 class EmailField(TextField):
     "A convenience FormField for validating e-mail addresses"
-    def __init__(self, field_name, length=50, is_required=False, validator_list=[]):
+    def __init__(self, field_name, length=50, maxlength=75, is_required=False, validator_list=[]):
         validator_list = [self.isValidEmail] + validator_list
-        TextField.__init__(self, field_name, length, maxlength=75,
+        TextField.__init__(self, field_name, length, maxlength=maxlength,
             is_required=is_required, validator_list=validator_list)
 
     def isValidEmail(self, field_data, all_data):

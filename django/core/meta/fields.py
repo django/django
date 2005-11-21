@@ -460,6 +460,13 @@ class DateTimeField(DateField):
                 time_field: (val is not None and val.strftime("%H:%M:%S") or '')}
 
 class EmailField(Field):
+    def __init__(self, *args, **kwargs):
+        kwargs['maxlength'] = 75
+        Field.__init__(self, *args, **kwargs)
+
+    def get_internal_type(self):
+        return "CharField"
+
     def get_manipulator_field_objs(self):
         return [formfields.EmailField]
 

@@ -591,8 +591,11 @@ TIME_ZONE
 
 Default: ``'America/Chicago'``
 
-A string representing the time zone for this installation.
-`See available choices`_.
+A string representing the time zone for this installation. `See available choices`_.
+
+Note that this is the time zone to which Django will convert all dates/times --
+not necessarily the timezone of the server. For example, one server may serve
+multiple Django-powered sites, each with a separate time-zone setting.
 
 USE_ETAGS
 ---------
