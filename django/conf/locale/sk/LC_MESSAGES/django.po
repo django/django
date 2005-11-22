@@ -8,13 +8,96 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2005-11-22 15:44-0600\n"
+"POT-Creation-Date: 2005-11-22 17:33-0500\n"
 "PO-Revision-Date: 2005-11-10 23:22-0500\n"
 "Last-Translator: Vladimir Labath <vlado@labath.org>\n"
 "Language-Team: Slovak <sk@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+
+#: contrib/redirects/models/redirects.py:7
+msgid "redirect from"
+msgstr "presmerovaný z"
+
+#: contrib/redirects/models/redirects.py:8
+msgid ""
+"This should be an absolute path, excluding the domain name. Example: '/"
+"events/search/'."
+msgstr ""
+"Tu by sa mala použiť absolútna cesta, bez domény. Napr.: '/events/search/'."
+
+#: contrib/redirects/models/redirects.py:9
+msgid "redirect to"
+msgstr "presmerovaný na "
+
+#: contrib/redirects/models/redirects.py:10
+msgid ""
+"This can be either an absolute path (as above) or a full URL starting with "
+"'http://'."
+msgstr ""
+"Tu môže byť buď absolútna cesta (ako hore) alebo plné  URL začínajúce s "
+"'http://'."
+
+#: contrib/redirects/models/redirects.py:12
+msgid "redirect"
+msgstr "presmerovanie"
+
+#: contrib/redirects/models/redirects.py:13
+msgid "redirects"
+msgstr "presmerovania"
+
+#: contrib/flatpages/models/flatpages.py:6
+msgid "URL"
+msgstr "URL"
+
+#: contrib/flatpages/models/flatpages.py:7
+msgid ""
+"Example: '/about/contact/'. Make sure to have leading and trailing slashes."
+msgstr ""
+"Príklad: '/about/contact/'. Uistite sa, že máte vložené ako úvodné tak aj "
+"záverečné lomítka."
+
+#: contrib/flatpages/models/flatpages.py:8
+msgid "title"
+msgstr "názov"
+
+#: contrib/flatpages/models/flatpages.py:9
+msgid "content"
+msgstr "obsah"
+
+#: contrib/flatpages/models/flatpages.py:10
+msgid "enable comments"
+msgstr "povolené komentáre"
+
+#: contrib/flatpages/models/flatpages.py:11
+msgid "template name"
+msgstr "meno predlohy"
+
+#: contrib/flatpages/models/flatpages.py:12
+msgid ""
+"Example: 'flatpages/contact_page'. If this isn't provided, the system will "
+"use 'flatpages/default'."
+msgstr ""
+"Príklad: 'flatpages/contact_page'. Ak sa toto nevykonalo,  systém použije  "
+"'flatpages/default'."
+
+#: contrib/flatpages/models/flatpages.py:13
+msgid "registration required"
+msgstr "musíte byť zaregistrovaný"
+
+#: contrib/flatpages/models/flatpages.py:13
+msgid "If this is checked, only logged-in users will be able to view the page."
+msgstr ""
+"Ak je toto označené, potom len prihlásený užívateľ môže vidieť túto stránku."
+
+#: contrib/flatpages/models/flatpages.py:17
+msgid "flat page"
+msgstr "plochá stránka"
+
+#: contrib/flatpages/models/flatpages.py:18
+msgid "flat pages"
+msgstr "ploché stránky"
 
 #: contrib/admin/models/admin.py:6
 msgid "action time"
@@ -310,89 +393,6 @@ msgstr "Ďakujeme, že používate naše stránky!"
 msgid "The %(site_name)s team"
 msgstr "Skupina %(site_name)s"
 
-#: contrib/redirects/models/redirects.py:7
-msgid "redirect from"
-msgstr "presmerovaný z"
-
-#: contrib/redirects/models/redirects.py:8
-msgid ""
-"This should be an absolute path, excluding the domain name. Example: '/"
-"events/search/'."
-msgstr ""
-"Tu by sa mala použiť absolútna cesta, bez domény. Napr.: '/events/search/'."
-
-#: contrib/redirects/models/redirects.py:9
-msgid "redirect to"
-msgstr "presmerovaný na "
-
-#: contrib/redirects/models/redirects.py:10
-msgid ""
-"This can be either an absolute path (as above) or a full URL starting with "
-"'http://'."
-msgstr ""
-"Tu môže byť buď absolútna cesta (ako hore) alebo plné  URL začínajúce s "
-"'http://'."
-
-#: contrib/redirects/models/redirects.py:12
-msgid "redirect"
-msgstr "presmerovanie"
-
-#: contrib/redirects/models/redirects.py:13
-msgid "redirects"
-msgstr "presmerovania"
-
-#: contrib/flatpages/models/flatpages.py:6
-msgid "URL"
-msgstr "URL"
-
-#: contrib/flatpages/models/flatpages.py:7
-msgid ""
-"Example: '/about/contact/'. Make sure to have leading and trailing slashes."
-msgstr ""
-"Príklad: '/about/contact/'. Uistite sa, že máte vložené ako úvodné tak aj "
-"záverečné lomítka."
-
-#: contrib/flatpages/models/flatpages.py:8
-msgid "title"
-msgstr "názov"
-
-#: contrib/flatpages/models/flatpages.py:9
-msgid "content"
-msgstr "obsah"
-
-#: contrib/flatpages/models/flatpages.py:10
-msgid "enable comments"
-msgstr "povolené komentáre"
-
-#: contrib/flatpages/models/flatpages.py:11
-msgid "template name"
-msgstr "meno predlohy"
-
-#: contrib/flatpages/models/flatpages.py:12
-msgid ""
-"Example: 'flatpages/contact_page'. If this isn't provided, the system will "
-"use 'flatpages/default'."
-msgstr ""
-"Príklad: 'flatpages/contact_page'. Ak sa toto nevykonalo,  systém použije  "
-"'flatpages/default'."
-
-#: contrib/flatpages/models/flatpages.py:13
-msgid "registration required"
-msgstr "musíte byť zaregistrovaný"
-
-#: contrib/flatpages/models/flatpages.py:13
-msgid "If this is checked, only logged-in users will be able to view the page."
-msgstr ""
-"Ak je toto označené, potom len prihlásený užívateľ môže vidieť túto stránku."
-
-#: contrib/flatpages/models/flatpages.py:17
-msgid "flat page"
-msgstr "plochá stránka"
-
-#: contrib/flatpages/models/flatpages.py:18
-msgid "flat pages"
-msgstr "ploché stránky"
-
 #: utils/translation.py:335
 msgid "DATE_FORMAT"
 msgstr "DATUM_FORMAT"
@@ -512,34 +512,32 @@ msgstr "Dec."
 #: utils/timesince.py:12
 msgid "year"
 msgid_plural "years"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "rok"
+msgstr[1] "rokov"
 
 #: utils/timesince.py:13
 msgid "month"
 msgid_plural "months"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "mesiac"
+msgstr[1] "mesiacov"
 
 #: utils/timesince.py:14
-#, fuzzy
 msgid "day"
 msgid_plural "days"
-msgstr[0] "Máj"
-msgstr[1] "Máj"
+msgstr[0] "ďeň"
+msgstr[1] "dní"
 
 #: utils/timesince.py:15
 msgid "hour"
 msgid_plural "hours"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "hodina"
+msgstr[1] "hodín"
 
 #: utils/timesince.py:16
-#, fuzzy
 msgid "minute"
 msgid_plural "minutes"
-msgstr[0] "web"
-msgstr[1] "web"
+msgstr[0] "minúta"
+msgstr[1] "minút"
 
 #: models/core.py:7
 msgid "domain name"
@@ -710,9 +708,8 @@ msgid "Welsh"
 msgstr "Waleský"
 
 #: conf/global_settings.py:39
-#, fuzzy
 msgid "Danish"
-msgstr "Španielsky"
+msgstr "Dánsky"
 
 #: conf/global_settings.py:40
 msgid "German"
