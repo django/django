@@ -134,6 +134,12 @@ TEMPLATE_TESTS = {
     'ifnotequal03': ("{% ifnotequal a b %}yes{% else %}no{% endifnotequal %}", {"a": 1, "b": 2}, "yes"),
     'ifnotequal04': ("{% ifnotequal a b %}yes{% else %}no{% endifnotequal %}", {"a": 1, "b": 1}, "no"),
 
+    ### INCLUDE TAG ###########################################################
+    'include01': ('{% include "basic-syntax01" %}', {}, "something cool"),
+    'include02': ('{% include "basic-syntax02" %}', {'headline': 'Included'}, "Included"),
+    'include03': ('{% include template_name %}', {'template_name': 'basic-syntax02', 'headline': 'Included'}, "Included"),
+    'include04': ('a{% include "nonexistent" %}b', {}, "ab"),
+
     ### INHERITANCE ###########################################################
 
     # Standard template with no inheritance

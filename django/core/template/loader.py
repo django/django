@@ -17,7 +17,7 @@
 # installed, because pkg_resources is necessary to read eggs.
 
 from django.core.exceptions import ImproperlyConfigured
-from django.core.template import Template, Context, Node, TemplateDoesNotExist, TemplateSyntaxError, resolve_variable_with_filters, register_tag
+from django.core.template import Template, Context, Node, TemplateDoesNotExist, TemplateSyntaxError, resolve_variable_with_filters, resolve_variable, register_tag
 from django.conf.settings import TEMPLATE_LOADERS
 
 template_source_loaders = []
@@ -160,6 +160,32 @@ class ExtendsNode(Node):
                 parent_block.nodelist = block_node.nodelist
         return compiled_parent.render(context)
 
+class ConstantIncludeNode(Node):
+    def __init__(self, template_path):
+        try:
+            t = get_template(template_path)
+            self.template = t
+        except:
+            self.template = None
+
+    def render(self, context):
+        if self.template:
+            return self.template.render(context)
+        else:
+            return ''
+
+class IncludeNode(Node):
+    def __init__(self, template_name):
+        self.template_name = template_name
+
+    def render(self, context):
+         try:
+             template_name = resolve_variable(self.template_name, context)
+             t = get_template(template_name)
+             return t.render(context)
+         except:
+             return '' # Fail silently for invalid included templates.
+
 def do_block(parser, token):
     """
     Define a block that can be overridden by child templates.
@@ -202,5 +228,22 @@ def do_extends(parser, token):
         raise TemplateSyntaxError, "'%s' cannot appear more than once in the same template" % bits[0]
     return ExtendsNode(nodelist, parent_name, parent_name_var)
 
+def do_include(parser, token):
+    """
+    Loads a template and renders it with the current context.
+
+    Example::
+
+        {% include "foo/some_include" %}
+    """
+    bits = token.contents.split()
+    if len(bits) != 2:
+        raise TemplateSyntaxError, "%r tag takes one argument: the name of the template to be included" % bits[0]
+    path = bits[1]
+    if path[0] in ('"', "'") and path[-1] == path[0]:
+        return ConstantIncludeNode(path[1:-1])
+    return IncludeNode(bits[1])
+
 register_tag('block', do_block)
 register_tag('extends', do_extends)
+register_tag('include', do_include)
