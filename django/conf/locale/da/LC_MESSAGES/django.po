@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2005-11-19 10:44+0100\n"
+"POT-Creation-Date: 2005-11-23 00:06+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: Morten Bagai <m@bagai.com>\n"
 "Language-Team: Danish\n"
@@ -278,6 +278,52 @@ msgstr ""
 msgid "The comment form didn't provide either 'preview' or 'post'"
 msgstr ""
 
+#: contrib/admin/filterspecs.py:32
+#, python-format
+msgid ""
+"<h3>By %s:</h3>\n"
+"<ul>\n"
+msgstr ""
+
+#: contrib/admin/filterspecs.py:62 contrib/admin/filterspecs.py:79
+#: contrib/admin/filterspecs.py:134
+msgid "All"
+msgstr ""
+
+#: contrib/admin/filterspecs.py:100
+msgid "Any date"
+msgstr ""
+
+#: contrib/admin/filterspecs.py:101
+#, fuzzy
+msgid "Today"
+msgstr "Mandag"
+
+#: contrib/admin/filterspecs.py:104
+msgid "Past 7 days"
+msgstr ""
+
+#: contrib/admin/filterspecs.py:106
+msgid "This month"
+msgstr ""
+
+#: contrib/admin/filterspecs.py:108
+msgid "This year"
+msgstr ""
+
+#: contrib/admin/filterspecs.py:134
+msgid "Yes"
+msgstr ""
+
+#: contrib/admin/filterspecs.py:134
+#, fuzzy
+msgid "No"
+msgstr "Nov."
+
+#: contrib/admin/filterspecs.py:142
+msgid "Unknown"
+msgstr ""
+
 #: contrib/admin/models/admin.py:6
 msgid "action time"
 msgstr "handlingstid"
@@ -306,7 +352,7 @@ msgstr "logmeddelelse"
 msgid "log entries"
 msgstr "logmeddelelser"
 
-#: contrib/admin/templatetags/admin_list.py:283
+#: contrib/admin/templatetags/admin_list.py:244
 msgid "All dates"
 msgstr ""
 
@@ -341,141 +387,95 @@ msgstr ""
 msgid "Site administration"
 msgstr "Django administration"
 
-#: contrib/admin/views/main.py:84
-#, python-format
-msgid ""
-"<h3>By %s:</h3>\n"
-"<ul>\n"
-msgstr ""
-
-#: contrib/admin/views/main.py:114 contrib/admin/views/main.py:131
-#: contrib/admin/views/main.py:186
-msgid "All"
-msgstr ""
-
-#: contrib/admin/views/main.py:152
-msgid "Any date"
-msgstr ""
-
-#: contrib/admin/views/main.py:153
-#, fuzzy
-msgid "Today"
-msgstr "Mandag"
-
-#: contrib/admin/views/main.py:156
-msgid "Past 7 days"
-msgstr ""
-
-#: contrib/admin/views/main.py:158
-msgid "This month"
-msgstr ""
-
-#: contrib/admin/views/main.py:160
-msgid "This year"
-msgstr ""
-
-#: contrib/admin/views/main.py:186
-msgid "Yes"
-msgstr ""
-
-#: contrib/admin/views/main.py:186
-#, fuzzy
-msgid "No"
-msgstr "Nov."
-
-#: contrib/admin/views/main.py:194
-msgid "Unknown"
-msgstr ""
-
-#: contrib/admin/views/main.py:208
+#: contrib/admin/views/main.py:65
 #, python-format
 msgid "Select %s"
 msgstr ""
 
-#: contrib/admin/views/main.py:209
+#: contrib/admin/views/main.py:66
 #, python-format
 msgid "Select %s to change"
 msgstr ""
 
-#: contrib/admin/views/main.py:572
+#: contrib/admin/views/main.py:421
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was added successfully."
 msgstr ""
 
-#: contrib/admin/views/main.py:577 contrib/admin/views/main.py:653
+#: contrib/admin/views/main.py:426 contrib/admin/views/main.py:502
 msgid "You may edit it again below."
 msgstr ""
 
-#: contrib/admin/views/main.py:585 contrib/admin/views/main.py:662
+#: contrib/admin/views/main.py:434 contrib/admin/views/main.py:511
 #, python-format
 msgid "You may add another %s below."
 msgstr ""
 
-#: contrib/admin/views/main.py:602
+#: contrib/admin/views/main.py:451
 #, fuzzy, python-format
 msgid "Add %s"
 msgstr "Tilføj"
 
-#: contrib/admin/views/main.py:618
+#: contrib/admin/views/main.py:467
 #, python-format
 msgid "Added %s."
 msgstr ""
 
-#: contrib/admin/views/main.py:618 contrib/admin/views/main.py:620
-#: contrib/admin/views/main.py:622
+#: contrib/admin/views/main.py:467 contrib/admin/views/main.py:469
+#: contrib/admin/views/main.py:471
 msgid "and"
 msgstr ""
 
-#: contrib/admin/views/main.py:620
+#: contrib/admin/views/main.py:469
 #, fuzzy, python-format
 msgid "Changed %s."
 msgstr "Ændre"
 
-#: contrib/admin/views/main.py:622
+#: contrib/admin/views/main.py:471
 #, python-format
 msgid "Deleted %s."
 msgstr ""
 
-#: contrib/admin/views/main.py:625
+#: contrib/admin/views/main.py:474
 msgid "No fields changed."
 msgstr ""
 
-#: contrib/admin/views/main.py:650
+#: contrib/admin/views/main.py:499
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was changed successfully."
 msgstr ""
 
-#: contrib/admin/views/main.py:659
+#: contrib/admin/views/main.py:508
 #, python-format
 msgid ""
 "The %(name)s \"%(obj)s\" was added successfully. You may edit it again below."
 msgstr ""
 
-#: contrib/admin/views/main.py:697
+#: contrib/admin/views/main.py:546
 #, fuzzy, python-format
 msgid "Change %s"
 msgstr "Ændre"
 
-#: contrib/admin/views/main.py:777
+#: contrib/admin/views/main.py:626
 #, python-format
 msgid "One or more %(fieldname)s in %(name)s: %(obj)s"
 msgstr ""
 
-#: contrib/admin/views/main.py:782
+#: contrib/admin/views/main.py:631
 #, python-format
 msgid "One or more %(fieldname)s in %(name)s:"
 msgstr ""
 
-#: contrib/admin/views/main.py:811
+#: contrib/admin/views/main.py:660
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was deleted successfully."
 msgstr ""
 
-#: contrib/admin/views/main.py:814
+#: contrib/admin/views/main.py:663
 msgid "Are you sure?"
 msgstr ""
 
-#: contrib/admin/views/main.py:829
+#: contrib/admin/views/main.py:678
 #, fuzzy, python-format
 msgid "Change history: %s"
 msgstr "Ændre adgangskode"
@@ -554,17 +554,6 @@ msgstr ""
 
 #: contrib/admin/views/doc.py:286
 msgid "XML text"
-msgstr ""
-
-#: contrib/admin/templates/admin/template_debug.html:6
-msgid "Error in Template"
-msgstr ""
-
-#: contrib/admin/templates/admin/template_debug.html:8
-#, python-format
-msgid ""
-"\n"
-"In template %(name)s, error at line %(line)s:\n"
 msgstr ""
 
 #: contrib/admin/templates/admin/change_list.html:5
@@ -1407,49 +1396,49 @@ msgstr "Svensk"
 msgid "Simplified Chinese"
 msgstr "Simpel Kinesisk"
 
-#: core/formfields.py:59 core/meta/fields.py:287 core/meta/fields.py:484
-#: core/meta/fields.py:495
+#: core/formfields.py:59 core/meta/fields.py:287 core/meta/fields.py:491
+#: core/meta/fields.py:502
 #, fuzzy
 msgid "This field is required."
 msgstr "Dette felt er ugyldigt."
 
-#: core/formfields.py:338
+#: core/formfields.py:339
 #, python-format
 msgid "Ensure your text is less than %s character"
 msgid_plural "Ensure your text is less than %s characters."
 msgstr[0] ""
 msgstr[1] ""
 
-#: core/formfields.py:343
+#: core/formfields.py:344
 #, fuzzy
 msgid "Line breaks are not allowed here."
 msgstr "Små bogstaver er ikke tilladt her"
 
-#: core/formfields.py:439 core/formfields.py:510 core/formfields.py:548
+#: core/formfields.py:440 core/formfields.py:511 core/formfields.py:549
 #, python-format
 msgid "Select a valid choice; '%(data)s' is not in %(choices)s."
 msgstr ""
 
-#: core/formfields.py:604
+#: core/formfields.py:605
 msgid "The submitted file is empty."
 msgstr ""
 
-#: core/formfields.py:658
+#: core/formfields.py:659
 #, fuzzy
 msgid "Enter a whole number between -32,768 and 32,767."
 msgstr "Indtast et heltal."
 
-#: core/formfields.py:667
+#: core/formfields.py:668
 #, fuzzy
 msgid "Enter a positive number."
 msgstr "Indtast et heltal."
 
-#: core/formfields.py:676
+#: core/formfields.py:677
 #, fuzzy
 msgid "Enter a whole number between 0 and 32,767."
 msgstr "Indtast et heltal."
 
-#: core/validators.py:59
+#: core/validators.py:62
 msgid "This value must contain only letters, numbers and underscores."
 msgstr "Dette felt må kun indeholde bogstaver, tal og understreger."
 
@@ -1732,12 +1721,12 @@ msgid ""
 msgstr ""
 "Hold \"Kontrol\", eller \"Æbletasten\" på Mac, nede for at vælge mere end en."
 
-#: core/meta/fields.py:504
+#: core/meta/fields.py:511
 #, fuzzy
 msgid "Enter a valid filename."
 msgstr "Indtast en gyldig email-adresse."
 
-#: core/meta/fields.py:773
+#: core/meta/fields.py:780
 #, python-format
 msgid "Please enter valid %(self)s IDs. The value %(value)r is invalid."
 msgid_plural ""

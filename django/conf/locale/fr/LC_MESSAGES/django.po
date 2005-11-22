@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2005-11-19 10:43+0100\n"
+"POT-Creation-Date: 2005-11-23 00:05+0100\n"
 "PO-Revision-Date: 2005-10-18 12:27+0200\n"
 "Last-Translator: Laurent Rahuel <laurent.rahuel@gmail.com>\n"
 "Language-Team: français <fr@li.org>\n"
@@ -277,6 +277,52 @@ msgstr ""
 msgid "The comment form didn't provide either 'preview' or 'post'"
 msgstr ""
 
+#: contrib/admin/filterspecs.py:32
+#, python-format
+msgid ""
+"<h3>By %s:</h3>\n"
+"<ul>\n"
+msgstr ""
+
+#: contrib/admin/filterspecs.py:62 contrib/admin/filterspecs.py:79
+#: contrib/admin/filterspecs.py:134
+msgid "All"
+msgstr ""
+
+#: contrib/admin/filterspecs.py:100
+msgid "Any date"
+msgstr ""
+
+#: contrib/admin/filterspecs.py:101
+#, fuzzy
+msgid "Today"
+msgstr "Lundi"
+
+#: contrib/admin/filterspecs.py:104
+msgid "Past 7 days"
+msgstr ""
+
+#: contrib/admin/filterspecs.py:106
+msgid "This month"
+msgstr ""
+
+#: contrib/admin/filterspecs.py:108
+msgid "This year"
+msgstr ""
+
+#: contrib/admin/filterspecs.py:134
+msgid "Yes"
+msgstr ""
+
+#: contrib/admin/filterspecs.py:134
+#, fuzzy
+msgid "No"
+msgstr "Nov."
+
+#: contrib/admin/filterspecs.py:142
+msgid "Unknown"
+msgstr ""
+
 #: contrib/admin/models/admin.py:6
 msgid "action time"
 msgstr "heure de l'action"
@@ -305,7 +351,7 @@ msgstr "entrée de log"
 msgid "log entries"
 msgstr "entrées de log"
 
-#: contrib/admin/templatetags/admin_list.py:283
+#: contrib/admin/templatetags/admin_list.py:244
 msgid "All dates"
 msgstr ""
 
@@ -340,141 +386,95 @@ msgstr ""
 msgid "Site administration"
 msgstr "Administration de Django"
 
-#: contrib/admin/views/main.py:84
-#, python-format
-msgid ""
-"<h3>By %s:</h3>\n"
-"<ul>\n"
-msgstr ""
-
-#: contrib/admin/views/main.py:114 contrib/admin/views/main.py:131
-#: contrib/admin/views/main.py:186
-msgid "All"
-msgstr ""
-
-#: contrib/admin/views/main.py:152
-msgid "Any date"
-msgstr ""
-
-#: contrib/admin/views/main.py:153
-#, fuzzy
-msgid "Today"
-msgstr "Lundi"
-
-#: contrib/admin/views/main.py:156
-msgid "Past 7 days"
-msgstr ""
-
-#: contrib/admin/views/main.py:158
-msgid "This month"
-msgstr ""
-
-#: contrib/admin/views/main.py:160
-msgid "This year"
-msgstr ""
-
-#: contrib/admin/views/main.py:186
-msgid "Yes"
-msgstr ""
-
-#: contrib/admin/views/main.py:186
-#, fuzzy
-msgid "No"
-msgstr "Nov."
-
-#: contrib/admin/views/main.py:194
-msgid "Unknown"
-msgstr ""
-
-#: contrib/admin/views/main.py:208
+#: contrib/admin/views/main.py:65
 #, python-format
 msgid "Select %s"
 msgstr ""
 
-#: contrib/admin/views/main.py:209
+#: contrib/admin/views/main.py:66
 #, python-format
 msgid "Select %s to change"
 msgstr ""
 
-#: contrib/admin/views/main.py:572
+#: contrib/admin/views/main.py:421
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was added successfully."
 msgstr ""
 
-#: contrib/admin/views/main.py:577 contrib/admin/views/main.py:653
+#: contrib/admin/views/main.py:426 contrib/admin/views/main.py:502
 msgid "You may edit it again below."
 msgstr ""
 
-#: contrib/admin/views/main.py:585 contrib/admin/views/main.py:662
+#: contrib/admin/views/main.py:434 contrib/admin/views/main.py:511
 #, python-format
 msgid "You may add another %s below."
 msgstr ""
 
-#: contrib/admin/views/main.py:602
+#: contrib/admin/views/main.py:451
 #, fuzzy, python-format
 msgid "Add %s"
 msgstr "Ajouter"
 
-#: contrib/admin/views/main.py:618
+#: contrib/admin/views/main.py:467
 #, python-format
 msgid "Added %s."
 msgstr ""
 
-#: contrib/admin/views/main.py:618 contrib/admin/views/main.py:620
-#: contrib/admin/views/main.py:622
+#: contrib/admin/views/main.py:467 contrib/admin/views/main.py:469
+#: contrib/admin/views/main.py:471
 msgid "and"
 msgstr ""
 
-#: contrib/admin/views/main.py:620
+#: contrib/admin/views/main.py:469
 #, fuzzy, python-format
 msgid "Changed %s."
 msgstr "Modifier"
 
-#: contrib/admin/views/main.py:622
+#: contrib/admin/views/main.py:471
 #, python-format
 msgid "Deleted %s."
 msgstr ""
 
-#: contrib/admin/views/main.py:625
+#: contrib/admin/views/main.py:474
 msgid "No fields changed."
 msgstr ""
 
-#: contrib/admin/views/main.py:650
+#: contrib/admin/views/main.py:499
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was changed successfully."
 msgstr ""
 
-#: contrib/admin/views/main.py:659
+#: contrib/admin/views/main.py:508
 #, python-format
 msgid ""
 "The %(name)s \"%(obj)s\" was added successfully. You may edit it again below."
 msgstr ""
 
-#: contrib/admin/views/main.py:697
+#: contrib/admin/views/main.py:546
 #, fuzzy, python-format
 msgid "Change %s"
 msgstr "Modifier"
 
-#: contrib/admin/views/main.py:777
+#: contrib/admin/views/main.py:626
 #, python-format
 msgid "One or more %(fieldname)s in %(name)s: %(obj)s"
 msgstr ""
 
-#: contrib/admin/views/main.py:782
+#: contrib/admin/views/main.py:631
 #, python-format
 msgid "One or more %(fieldname)s in %(name)s:"
 msgstr ""
 
-#: contrib/admin/views/main.py:811
+#: contrib/admin/views/main.py:660
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was deleted successfully."
 msgstr ""
 
-#: contrib/admin/views/main.py:814
+#: contrib/admin/views/main.py:663
 msgid "Are you sure?"
 msgstr ""
 
-#: contrib/admin/views/main.py:829
+#: contrib/admin/views/main.py:678
 #, fuzzy, python-format
 msgid "Change history: %s"
 msgstr "Modifier votre mot de passe"
@@ -553,17 +553,6 @@ msgstr ""
 
 #: contrib/admin/views/doc.py:286
 msgid "XML text"
-msgstr ""
-
-#: contrib/admin/templates/admin/template_debug.html:6
-msgid "Error in Template"
-msgstr ""
-
-#: contrib/admin/templates/admin/template_debug.html:8
-#, python-format
-msgid ""
-"\n"
-"In template %(name)s, error at line %(line)s:\n"
 msgstr ""
 
 #: contrib/admin/templates/admin/change_list.html:5
@@ -1145,6 +1134,39 @@ msgstr "Nov."
 msgid "Dec."
 msgstr "Déc."
 
+#: utils/timesince.py:12
+msgid "year"
+msgid_plural "years"
+msgstr[0] ""
+msgstr[1] ""
+
+#: utils/timesince.py:13
+#, fuzzy
+msgid "month"
+msgid_plural "months"
+msgstr[0] "contenu"
+msgstr[1] "contenu"
+
+#: utils/timesince.py:14
+#, fuzzy
+msgid "day"
+msgid_plural "days"
+msgstr[0] "Lundi"
+msgstr[1] "Lundi"
+
+#: utils/timesince.py:15
+msgid "hour"
+msgid_plural "hours"
+msgstr[0] ""
+msgstr[1] ""
+
+#: utils/timesince.py:16
+#, fuzzy
+msgid "minute"
+msgid_plural "minutes"
+msgstr[0] "site"
+msgstr[1] "site"
+
 #: models/core.py:7
 msgid "domain name"
 msgstr "nom de domaine"
@@ -1298,13 +1320,9 @@ msgstr "Information personnelle"
 msgid "Important dates"
 msgstr "Dates importantes"
 
-#: models/auth.py:195
+#: models/auth.py:216
 msgid "Message"
 msgstr "Message"
-
-#: conf/global_settings.py:36
-msgid "Bengali"
-msgstr ""
 
 #: conf/global_settings.py:37
 msgid "Bengali"
@@ -1324,15 +1342,6 @@ msgid "Danish"
 msgstr "Espagnol"
 
 #: conf/global_settings.py:41
-msgid "Welsh"
-msgstr ""
-
-#: conf/global_settings.py:39
-#, fuzzy
-msgid "Danish"
-msgstr "Espagnol"
-
-#: conf/global_settings.py:40
 msgid "German"
 msgstr "Allemand"
 
@@ -1394,116 +1403,116 @@ msgstr ""
 msgid "Simplified Chinese"
 msgstr ""
 
-#: core/formfields.py:59 core/meta/fields.py:287 core/meta/fields.py:484
-#: core/meta/fields.py:495
+#: core/formfields.py:59 core/meta/fields.py:287 core/meta/fields.py:491
+#: core/meta/fields.py:502
 #, fuzzy
 msgid "This field is required."
 msgstr "Ce champ est invalide."
 
-#: core/formfields.py:338
+#: core/formfields.py:339
 #, python-format
 msgid "Ensure your text is less than %s character"
 msgid_plural "Ensure your text is less than %s characters."
 msgstr[0] ""
 msgstr[1] ""
 
-#: core/formfields.py:343
+#: core/formfields.py:344
 #, fuzzy
 msgid "Line breaks are not allowed here."
 msgstr "Les lettres minuscules ne sont pas autorisées ici."
 
-#: core/formfields.py:439 core/formfields.py:510 core/formfields.py:548
+#: core/formfields.py:440 core/formfields.py:511 core/formfields.py:549
 #, python-format
 msgid "Select a valid choice; '%(data)s' is not in %(choices)s."
 msgstr ""
 
-#: core/formfields.py:604
+#: core/formfields.py:605
 msgid "The submitted file is empty."
 msgstr ""
 
-#: core/formfields.py:658
+#: core/formfields.py:659
 #, fuzzy
 msgid "Enter a whole number between -32,768 and 32,767."
 msgstr "Entrez un nombre entier."
 
-#: core/formfields.py:667
+#: core/formfields.py:668
 #, fuzzy
 msgid "Enter a positive number."
 msgstr "Entrez un nombre entier."
 
-#: core/formfields.py:676
+#: core/formfields.py:677
 #, fuzzy
 msgid "Enter a whole number between 0 and 32,767."
 msgstr "Entrez un nombre entier."
 
-#: core/validators.py:59
+#: core/validators.py:62
 msgid "This value must contain only letters, numbers and underscores."
 msgstr ""
 "Ce champ ne doit contenir que des lettres, des nombres et des sous-tirets."
 
-#: core/validators.py:63
+#: core/validators.py:66
 msgid "This value must contain only letters, numbers, underscores and slashes."
 msgstr ""
 "Ce champ ne doit contenir que des lettres, des nombres, des sous-tirets et "
 "des '/'."
 
-#: core/validators.py:71
+#: core/validators.py:74
 msgid "Uppercase letters are not allowed here."
 msgstr "Les lettres majuscules ne sont pas autorisées ici."
 
-#: core/validators.py:75
+#: core/validators.py:78
 msgid "Lowercase letters are not allowed here."
 msgstr "Les lettres minuscules ne sont pas autorisées ici."
 
-#: core/validators.py:82
+#: core/validators.py:85
 msgid "Enter only digits separated by commas."
 msgstr "Seulement des chiffres ([0-9]), séparés par des virgules."
 
-#: core/validators.py:94
+#: core/validators.py:97
 msgid "Enter valid e-mail addresses separated by commas."
 msgstr "Entrez des adresses de courriel valides séparées par des virgules."
 
-#: core/validators.py:98
+#: core/validators.py:101
 msgid "Please enter a valid IP address."
 msgstr "Entrez une adresse IP valide."
 
-#: core/validators.py:102
+#: core/validators.py:105
 msgid "Empty values are not allowed here."
 msgstr "Vous ne pouvez pas laisser ce champ vide."
 
-#: core/validators.py:106
+#: core/validators.py:109
 msgid "Non-numeric characters aren't allowed here."
 msgstr "Les caractères non numériques ne sont pas autorisés ici."
 
-#: core/validators.py:110
+#: core/validators.py:113
 msgid "This value can't be comprised solely of digits."
 msgstr "Cette valeur ne peut contenir que des chiffres [0-9]."
 
-#: core/validators.py:115
+#: core/validators.py:118
 msgid "Enter a whole number."
 msgstr "Entrez un nombre entier."
 
-#: core/validators.py:119
+#: core/validators.py:122
 msgid "Only alphabetical characters are allowed here."
 msgstr "Seules les lettres de l'alphabet sont autorisées ici."
 
-#: core/validators.py:123
+#: core/validators.py:126
 msgid "Enter a valid date in YYYY-MM-DD format."
 msgstr "Entrez une date valide au format AAAA-MM-JJ."
 
-#: core/validators.py:127
+#: core/validators.py:130
 msgid "Enter a valid time in HH:MM format."
 msgstr "Entrez une heure valide au format HH:MM."
 
-#: core/validators.py:131
+#: core/validators.py:134
 msgid "Enter a valid date/time in YYYY-MM-DD HH:MM format."
 msgstr "Entrez une date et une heure valide au format AAAA-MM-JJ HH:MM."
 
-#: core/validators.py:135
+#: core/validators.py:138
 msgid "Enter a valid e-mail address."
 msgstr "Entrez une adresse de courriel valide."
 
-#: core/validators.py:147
+#: core/validators.py:150
 msgid ""
 "Upload a valid image. The file you uploaded was either not an image or a "
 "corrupted image."
@@ -1511,28 +1520,28 @@ msgstr ""
 "Envoyez une image valide. Le fichier que vous avez transferé n'est pas une "
 "image ou bien est une image corrompue."
 
-#: core/validators.py:154
+#: core/validators.py:157
 #, python-format
 msgid "The URL %s does not point to a valid image."
 msgstr "L'URL %s ne pointe pas vers une image valide."
 
-#: core/validators.py:158
+#: core/validators.py:161
 #, python-format
 msgid "Phone numbers must be in XXX-XXX-XXXX format. \"%s\" is invalid."
 msgstr ""
 "Les numéros de téléphone doivent être au format XX XX XX XX XX. \"%s\" est "
 "incorrect."
 
-#: core/validators.py:166
+#: core/validators.py:169
 #, python-format
 msgid "The URL %s does not point to a valid QuickTime video."
 msgstr "L'URL %s ne pointe pas vers une vidéo QuickTime valide."
 
-#: core/validators.py:170
+#: core/validators.py:173
 msgid "A valid URL is required."
 msgstr "Une URL valide est requise."
 
-#: core/validators.py:184
+#: core/validators.py:187
 #, python-format
 msgid ""
 "Valid HTML is required. Specific errors are:\n"
@@ -1541,69 +1550,69 @@ msgstr ""
 "Du HTML valide est requis. Les erreurs spécifiques sont:\n"
 "%s"
 
-#: core/validators.py:191
+#: core/validators.py:194
 #, python-format
 msgid "Badly formed XML: %s"
 msgstr "XML mal formé: %s"
 
-#: core/validators.py:201
+#: core/validators.py:204
 #, python-format
 msgid "Invalid URL: %s"
 msgstr "URL invalide: %s"
 
-#: core/validators.py:205 core/validators.py:207
+#: core/validators.py:208 core/validators.py:210
 #, python-format
 msgid "The URL %s is a broken link."
 msgstr "L'URL %s est un lien cassé."
 
-#: core/validators.py:213
+#: core/validators.py:216
 msgid "Enter a valid U.S. state abbreviation."
 msgstr "Entrez une abréviation d'état américain valide."
 
-#: core/validators.py:228
+#: core/validators.py:231
 #, python-format
 msgid "Watch your mouth! The word %s is not allowed here."
 msgid_plural "Watch your mouth! The words %s are not allowed here."
 msgstr[0] "Attention à votre langage,! Le mot %s n'est pas autorisé ici."
 msgstr[1] "Attention à votre langage,! Les mots %s ne sont pas autorisés ici."
 
-#: core/validators.py:235
+#: core/validators.py:238
 #, python-format
 msgid "This field must match the '%s' field."
 msgstr "Ce champ doit correspondre au champ '%s'."
 
-#: core/validators.py:254
+#: core/validators.py:257
 msgid "Please enter something for at least one field."
 msgstr "S'il vous plaît, saisissez au moins une valeur dans un des champs."
 
-#: core/validators.py:263 core/validators.py:274
+#: core/validators.py:266 core/validators.py:277
 msgid "Please enter both fields or leave them both empty."
 msgstr "S'il vous plaît, renseignez chaque champ ou laissez les deux vides."
 
-#: core/validators.py:281
+#: core/validators.py:284
 #, python-format
 msgid "This field must be given if %(field)s is %(value)s"
 msgstr "Ce champ doit être renseigné si %(field)s vaut %(value)s"
 
-#: core/validators.py:293
+#: core/validators.py:296
 #, python-format
 msgid "This field must be given if %(field)s is not %(value)s"
 msgstr "Ce champ doit être renseigné si %(field)s ne vaut pas %(value)s"
 
-#: core/validators.py:312
+#: core/validators.py:315
 msgid "Duplicate values are not allowed."
 msgstr "Des valeurs identiques ne sont pas autorisées."
 
-#: core/validators.py:335
+#: core/validators.py:338
 #, python-format
 msgid "This value must be a power of %s."
 msgstr "Cette valeur doit être une puissance de %s."
 
-#: core/validators.py:346
+#: core/validators.py:349
 msgid "Please enter a valid decimal number."
 msgstr "S'il vous plaît, saisissez un nombre décimal valide."
 
-#: core/validators.py:348
+#: core/validators.py:351
 #, python-format
 msgid "Please enter a valid decimal number with at most %s total digit."
 msgid_plural ""
@@ -1613,7 +1622,7 @@ msgstr[0] ""
 msgstr[1] ""
 "S'il vous plaît, saisissez un nombre décimal valide avec au plus %s chiffres."
 
-#: core/validators.py:351
+#: core/validators.py:354
 #, python-format
 msgid "Please enter a valid decimal number with at most %s decimal place."
 msgid_plural ""
@@ -1623,32 +1632,32 @@ msgstr[0] ""
 msgstr[1] ""
 "S'il vous plaît, saisissez un nombre décimal valide avec au plus %s décimales"
 
-#: core/validators.py:361
+#: core/validators.py:364
 #, python-format
 msgid "Make sure your uploaded file is at least %s bytes big."
 msgstr ""
 "Vérifiez que le fichier transféré fait au moins une taille de %s octets."
 
-#: core/validators.py:362
+#: core/validators.py:365
 #, python-format
 msgid "Make sure your uploaded file is at most %s bytes big."
 msgstr ""
 "Vérifiez que le fichier transféré fait au plus une taille de %s octets."
 
-#: core/validators.py:375
+#: core/validators.py:378
 msgid "The format for this field is wrong."
 msgstr "Le format de ce champ est mauvais."
 
-#: core/validators.py:390
+#: core/validators.py:393
 msgid "This field is invalid."
 msgstr "Ce champ est invalide."
 
-#: core/validators.py:425
+#: core/validators.py:428
 #, python-format
 msgid "Could not retrieve anything from %s."
 msgstr "Impossible de récupérer quoi que ce soit depuis %s."
 
-#: core/validators.py:428
+#: core/validators.py:431
 #, python-format
 msgid ""
 "The URL %(url)s returned the invalid Content-Type header '%(contenttype)s'."
@@ -1656,7 +1665,7 @@ msgstr ""
 "L'entête Content-Type '%(contenttype)s', renvoyée par l'url %(url)s n'est "
 "pas valide."
 
-#: core/validators.py:461
+#: core/validators.py:464
 #, python-format
 msgid ""
 "Please close the unclosed %(tag)s tag from line %(line)s. (Line starts with "
@@ -1665,7 +1674,7 @@ msgstr ""
 "Veuillez fermer le tag %(tag)s de la ligne %(line)s. (La ligne débutant par "
 "\"%(start)s\".)"
 
-#: core/validators.py:465
+#: core/validators.py:468
 #, python-format
 msgid ""
 "Some text starting on line %(line)s is not allowed in that context. (Line "
@@ -1674,7 +1683,7 @@ msgstr ""
 "Du texte commençant à la ligne %(line)s n'est pas autorisé dans ce contexte. "
 "(Ligne débutant par \"%(start)s\".)"
 
-#: core/validators.py:470
+#: core/validators.py:473
 #, python-format
 msgid ""
 "\"%(attr)s\" on line %(line)s is an invalid attribute. (Line starts with \"%"
@@ -1683,7 +1692,7 @@ msgstr ""
 "\"%(attr)s\" ligne %(line)s n'est pas un attribut valide. (Ligne débutant "
 "par \"%(start)s\".)"
 
-#: core/validators.py:475
+#: core/validators.py:478
 #, python-format
 msgid ""
 "\"<%(tag)s>\" on line %(line)s is an invalid tag. (Line starts with \"%"
@@ -1692,7 +1701,7 @@ msgstr ""
 "\"<%(tag)s>\" ligne %(line)s n'est pas un tag valide. (Ligne débutant par \"%"
 "(start)s\".)"
 
-#: core/validators.py:479
+#: core/validators.py:482
 #, python-format
 msgid ""
 "A tag on line %(line)s is missing one or more required attributes. (Line "
@@ -1701,7 +1710,7 @@ msgstr ""
 "Un tag, ou un ou plusieurs attributs, de la ligne %(line)s est manquant. "
 "(Ligne débutant par \"%(start)s\".)"
 
-#: core/validators.py:484
+#: core/validators.py:487
 #, python-format
 msgid ""
 "The \"%(attr)s\" attribute on line %(line)s has an invalid value. (Line "
@@ -1731,22 +1740,18 @@ msgstr ""
 "Maintenez \"Control\", or \"Command\" sur un Mac, pour en sélectionner plus "
 "d'une."
 
-#: core/meta/fields.py:504
+#: core/meta/fields.py:511
 #, fuzzy
 msgid "Enter a valid filename."
 msgstr "Entrez une adresse de courriel valide."
 
-#: core/meta/fields.py:773
+#: core/meta/fields.py:780
 #, python-format
 msgid "Please enter valid %(self)s IDs. The value %(value)r is invalid."
 msgid_plural ""
 "Please enter valid %(self)s IDs. The values %(value)r are invalid"
 msgstr[0] ""
 msgstr[1] ""
-
-#, fuzzy
-#~ msgid "count"
-#~ msgstr "contenu"
 
 #~ msgid "Traditional Chinese"
 #~ msgstr "Chinois traditionnel"
