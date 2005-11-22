@@ -100,7 +100,7 @@ view has a number of problems:
     * Even if you *do* perform validation, there's still no way to give that
       information to the user is any sort of useful way.
 
-    * You'll have to separate create a form (and view) that submits to this
+    * You'll have to separately create a form (and view) that submits to this
       page, which is a pain and is redundant.
 
 Let's dodge these problems momentarily to take a look at how you could create a
@@ -305,7 +305,7 @@ about editing an existing one? It's shockingly similar to creating a new one::
         except places.PlaceDoesNotExist:
             raise Http404
 
-        # Grab the Place object is question for future use.
+        # Grab the Place object in question for future use.
         place = manipulator.original_object
 
         if request.POST:
