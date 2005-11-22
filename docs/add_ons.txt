@@ -1,0 +1,66 @@
+=====================
+The "contrib" add-ons
+=====================
+
+Django aims to follow Python's "batteries included" philosophy. It ships with a
+variety of extra, optional tools that solve common Web-development problems.
+
+This code lives in ``django/contrib`` in the Django distribution. Here's a
+rundown of the packages in ``contrib``:
+
+admin
+=====
+
+The automatic Django administrative interface. For more information, see
+`Tutorial 3`_.
+
+.. _Tutorial 3: http://www.djangoproject.com/documentation/tutorial2/
+
+comments
+========
+
+A simple yet flexible comments system. This is not yet documented.
+
+flatpages
+=========
+
+A framework for managing simple "flat" HTML content in a database.
+
+See the `flatpages documentation`_.
+
+.. _flatpages documentation: http://www.djangoproject.com/documentation/flatpages/
+
+markup
+======
+
+A collection of template filters that implement these common markup languages:
+
+    * Textile
+    * Markdown
+    * ReST (ReStructured Text)
+
+redirects
+=========
+
+A framework for managing redirects.
+
+See the `redirects documentation`_.
+
+.. _redirects documentation: http://www.djangoproject.com/documentation/redirects/
+
+syndication
+===========
+
+A framework for generating syndication feeds, in RSS and Atom, quite easily.
+
+See the `syndication documentation`_.
+
+.. _syndication documentation: http://www.djangoproject.com/documentation/syndication/
+
+Other add-ons
+=============
+
+If you have an idea for functionality to include in ``contrib``, let us know!
+Code it up, and post it to the `django-users mailing list`_.
+
+.. _django-users mailing list: http://groups.google.com/group/django-users
