@@ -173,7 +173,7 @@ class FormFieldWrapper:
             return ''
 
     def get_id(self):
-        return  self.formfield.get_id()
+        return self.formfield.get_id()
 
 class FormFieldCollection(FormFieldWrapper):
     "A utility class that gives the template access to a dict of FormFieldWrappers"
@@ -320,7 +320,8 @@ class FormField:
 
     def get_id(self):
         "Returns the HTML 'id' attribute for this form field."
-        return  FORM_FIELD_ID_PREFIX + self.field_name  
+        return FORM_FIELD_ID_PREFIX + self.field_name
+
 ####################
 # GENERIC WIDGETS  #
 ####################
