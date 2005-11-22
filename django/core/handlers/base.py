@@ -20,7 +20,7 @@ class BaseHandler:
             try:
                 dot = middleware_path.rindex('.')
             except ValueError:
-                raise exceptions.ImproperlyConfigured, '%s isn\'t look like a middleware module' % middleware_path
+                raise exceptions.ImproperlyConfigured, '%s isn\'t a middleware module' % middleware_path
             mw_module, mw_classname = middleware_path[:dot], middleware_path[dot+1:]
             try:
                 mod = __import__(mw_module, '', '', [''])
