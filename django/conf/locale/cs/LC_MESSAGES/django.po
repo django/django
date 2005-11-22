@@ -76,7 +76,7 @@ msgstr "Akce"
 
 #: contrib/admin/templates/admin/object_history.html:26
 msgid "DATE_WITH_TIME_FULL"
-msgstr "Plné datum s časem"
+msgstr "j. N, Y, H:i"
 
 #: contrib/admin/templates/admin/object_history.html:36
 msgid ""
@@ -398,15 +398,15 @@ msgstr "statické stránky"
 
 #: utils/translation.py:335
 msgid "DATE_FORMAT"
-msgstr "Formát data"
+msgstr "j. N, Y"
 
 #: utils/translation.py:336
 msgid "DATETIME_FORMAT"
-msgstr "Formát data a času"
+msgstr "j. N, Y, H:i"
 
 #: utils/translation.py:337
 msgid "TIME_FORMAT"
-msgstr "Formát času"
+msgstr "H:i"
 
 #: utils/dates.py:6
 msgid "Monday"
