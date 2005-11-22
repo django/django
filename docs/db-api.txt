@@ -142,7 +142,7 @@ double-underscore). For example::
 
 translates (roughly) into the following SQL::
 
-    SELECT * FROM polls_polls WHERE pub_date < NOW();
+    SELECT * FROM polls_polls WHERE pub_date <= NOW();
 
 .. admonition:: How this is possible
 
