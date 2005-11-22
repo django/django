@@ -133,19 +133,19 @@ Database.register_type(Database.new_type((1114,1184), "TIMESTAMP", typecasts.typ
 Database.register_type(Database.new_type((16,), "BOOLEAN", typecasts.typecast_boolean))
 
 OPERATOR_MAPPING = {
-    'exact': '=',
-    'iexact': 'ILIKE',
-    'contains': 'LIKE',
-    'icontains': 'ILIKE',
-    'ne': '!=',
-    'gt': '>',
-    'gte': '>=',
-    'lt': '<',
-    'lte': '<=',
-    'startswith': 'LIKE',
-    'endswith': 'LIKE',
-    'istartswith': 'ILIKE',
-    'iendswith': 'ILIKE',
+    'exact': '= %s',
+    'iexact': 'ILIKE %s',
+    'contains': 'LIKE %s',
+    'icontains': 'ILIKE %s',
+    'ne': '!= %s',
+    'gt': '> %s',
+    'gte': '>= %s',
+    'lt': '< %s',
+    'lte': '<= %s',
+    'startswith': 'LIKE %s',
+    'endswith': 'LIKE %s',
+    'istartswith': 'ILIKE %s',
+    'iendswith': 'ILIKE %s',
 }
 
 # This dictionary maps Field objects to their associated PostgreSQL column

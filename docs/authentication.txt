@@ -44,9 +44,9 @@ Fields
     * ``first_name`` -- Optional. 30 characters or fewer.
     * ``last_name`` -- Optional. 30 characters or fewer.
     * ``email`` -- Optional. E-mail address.
-    * ``password_md5`` -- Required. An MD5 hash of the password. (Django
-      doesn't store the raw password.) Raw passwords can be arbitrarily long
-      and can contain any character.
+    * ``password`` -- Required. A hash of, and metadata about, the password.
+      (Django doesn't store the raw password.) Raw passwords can be arbitrarily
+      long and can contain any character. See the "Passwords" section below.
     * ``is_staff`` -- Boolean. Designates whether this user can access the
       admin site.
     * ``is_active`` -- Boolean. Designates whether this user can log into the
@@ -166,6 +166,28 @@ Change a password with ``set_password()``::
     >>> u = users.get_object(username__exact='john')
     >>> u.set_password('new password')
     >>> u.save()
+
+Passwords
+---------
+
+**This only applies to the Django development version.** Previous versions,
+such as Django 0.90, used simple MD5 hashes without password salts.
+
+The ``password`` field of a ``User`` object is a string in this format::
+
+    hashtype$salt$hash
+
+That's hashtype, salt and hash, separated by the dollar-sign character.
+
+Hashtype is either ``sha1`` (default) or ``md5``. Salt is a random string
+used to salt the raw password to create the hash.
+
+For example::
+
+    sha1$a1976$a36cc8cbf81742a8fb52e221aaeab48ed7f58ab4
+
+The ``User.set_password()`` and ``User.check_password()`` functions handle
+the setting and checking of these values behind the scenes.
 
 Anonymous users
 ---------------

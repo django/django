@@ -106,7 +106,7 @@ def technical_500_response(request, exc_type, exc_value, tb):
         'settings' : settings_dict,
         'template_info': template_info,
     })
-    return HttpResponseServerError(t.render(c))
+    return HttpResponseServerError(t.render(c), mimetype='text/html')
 
 def technical_404_response(request, exception):
     """
@@ -127,7 +127,7 @@ def technical_404_response(request, exception):
         'request_protocol' : os.environ.get("HTTPS") == "on" and "https" or "http",
         'settings' : dict([(k, getattr(settings, k)) for k in dir(settings) if k.isupper()]),
     })
-    return HttpResponseNotFound(t.render(c))
+    return HttpResponseNotFound(t.render(c), mimetype='text/html')
 
 def _get_lines_from_file(filename, lineno, context_lines):
     """

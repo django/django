@@ -122,4 +122,19 @@ Article 7
 Article 2
 >>> a2.get_previous_by_pub_date()
 Article 1
+
+# Underscores and percent signs have special meaning in the underlying
+# database library, but Django handles the quoting of them automatically.
+>>> a8 = articles.Article(headline='Article_ with underscore', pub_date=datetime(2005, 11, 20))
+>>> a8.save()
+>>> articles.get_list(headline__startswith='Article')
+[Article_ with underscore, Article 5, Article 6, Article 4, Article 2, Article 3, Article 7, Article 1]
+>>> articles.get_list(headline__startswith='Article_')
+[Article_ with underscore]
+>>> a9 = articles.Article(headline='Article% with percent sign', pub_date=datetime(2005, 11, 21))
+>>> a9.save()
+>>> articles.get_list(headline__startswith='Article')
+[Article% with percent sign, Article_ with underscore, Article 5, Article 6, Article 4, Article 2, Article 3, Article 7, Article 1]
+>>> articles.get_list(headline__startswith='Article%')
+[Article% with percent sign]
 """

@@ -131,20 +131,23 @@ def get_relations(cursor, table_name):
 
 # Operators and fields ########################################################
 
+# SQLite requires LIKE statements to include an ESCAPE clause if the value
+# being escaped has a percent or underscore in it.
+# See http://www.sqlite.org/lang_expr.html for an explanation.
 OPERATOR_MAPPING = {
-    'exact':        '=',
-    'iexact':       'LIKE',
-    'contains':     'LIKE',
-    'icontains':    'LIKE',
-    'ne':           '!=',
-    'gt':           '>',
-    'gte':          '>=',
-    'lt':           '<',
-    'lte':          '<=',
-    'startswith':   'LIKE',
-    'endswith':     'LIKE',
-    'istartswith':  'LIKE',
-    'iendswith':    'LIKE',
+    'exact': '= %s',
+    'iexact': "LIKE %s ESCAPE '\\'",
+    'contains': "LIKE %s ESCAPE '\\'",
+    'icontains': "LIKE %s ESCAPE '\\'",
+    'ne': '!= %s',
+    'gt': '> %s',
+    'gte': '>= %s',
+    'lt': '< %s',
+    'lte': '<= %s',
+    'startswith': "LIKE %s ESCAPE '\\'",
+    'endswith': "LIKE %s ESCAPE '\\'",
+    'istartswith': "LIKE %s ESCAPE '\\'",
+    'iendswith': "LIKE %s ESCAPE '\\'",
 }
 
 # SQLite doesn't actually support most of these types, but it "does the right

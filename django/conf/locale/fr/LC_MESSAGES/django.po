@@ -1250,8 +1250,8 @@ msgid "password"
 msgstr "mot de passe"
 
 #: models/auth.py:37
-msgid "Use an MD5 hash -- not the raw password."
-msgstr "Utilisez une chaine cryptée MD5 -- pas un mot de passe en clair."
+msgid "Use '[algo]$[salt]$[hexdigest]"
+msgstr ""
 
 #: models/auth.py:38
 msgid "staff status"
@@ -1302,6 +1302,10 @@ msgstr "Dates importantes"
 msgid "Message"
 msgstr "Message"
 
+#: conf/global_settings.py:36
+msgid "Bengali"
+msgstr ""
+
 #: conf/global_settings.py:37
 msgid "Bengali"
 msgstr ""
@@ -1320,6 +1324,15 @@ msgid "Danish"
 msgstr "Espagnol"
 
 #: conf/global_settings.py:41
+msgid "Welsh"
+msgstr ""
+
+#: conf/global_settings.py:39
+#, fuzzy
+msgid "Danish"
+msgstr "Espagnol"
+
+#: conf/global_settings.py:40
 msgid "German"
 msgstr "Allemand"
 

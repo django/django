@@ -255,12 +255,14 @@ def do_extends(parser, token):
 
 def do_include(parser, token):
     """
-    Loads a template using standard resolution mechanisms, and renders it in the current context.
-    """
+    Loads a template and renders it with the current context.
+
+    Example::
+
+        {% include "foo/some_include" %}
     bits = token.contents.split()
     if len(bits) != 2:
-        raise TemplateSyntaxError, "'include' tag takes one argument: the path to the template to be included"
-
+        raise TemplateSyntaxError, "%r tag takes one argument: the name of the template to be included" % bits[0]
     path = bits[1]
     if path[0] in ('"', "'") and path[-1] == path[0]:
         return ConstantIncludeNode(path[1:-1])

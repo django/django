@@ -1141,6 +1141,38 @@ msgstr "nov"
 msgid "Dec."
 msgstr "dec"
 
+#: utils/timesince.py:12
+msgid "year"
+msgid_plural "years"
+msgstr[0] ""
+msgstr[1] ""
+
+#: utils/timesince.py:13
+msgid "month"
+msgid_plural "months"
+msgstr[0] ""
+msgstr[1] ""
+
+#: utils/timesince.py:14
+#, fuzzy
+msgid "day"
+msgid_plural "days"
+msgstr[0] "maj"
+msgstr[1] "maj"
+
+#: utils/timesince.py:15
+msgid "hour"
+msgid_plural "hours"
+msgstr[0] ""
+msgstr[1] ""
+
+#: utils/timesince.py:16
+#, fuzzy
+msgid "minute"
+msgid_plural "minutes"
+msgstr[0] "sida"
+msgstr[1] "sida"
+
 #: models/core.py:7
 msgid "domain name"
 msgstr "domännamn"
@@ -1246,8 +1278,8 @@ msgid "password"
 msgstr "lösenord"
 
 #: models/auth.py:37
-msgid "Use an MD5 hash -- not the raw password."
-msgstr "Använd en MD5-hash -- inte lösenordet i ren text."
+msgid "Use '[algo]$[salt]$[hexdigest]"
+msgstr ""
 
 #: models/auth.py:38
 msgid "staff status"
@@ -1293,7 +1325,7 @@ msgstr "Personlig information"
 msgid "Important dates"
 msgstr "Viktiga datum"
 
-#: models/auth.py:195
+#: models/auth.py:216
 msgid "Message"
 msgstr "Meddelande"
 
@@ -1420,68 +1452,68 @@ msgstr "Fyll i ett heltal."
 msgid "This value must contain only letters, numbers and underscores."
 msgstr "Det här värdet får bara innehålla bokstäver, tal och understräck."
 
-#: core/validators.py:63
+#: core/validators.py:66
 msgid "This value must contain only letters, numbers, underscores and slashes."
 msgstr ""
 "Det här värdet får bara innehålla bokstäver, tal, understräck och snedsträck"
 
-#: core/validators.py:71
+#: core/validators.py:74
 msgid "Uppercase letters are not allowed here."
 msgstr "Stora bokstäver är inte tillåtna här."
 
-#: core/validators.py:75
+#: core/validators.py:78
 msgid "Lowercase letters are not allowed here."
 msgstr "Små bokstäver är inte tillåtna här."
 
-#: core/validators.py:82
+#: core/validators.py:85
 msgid "Enter only digits separated by commas."
 msgstr "Fyll enbart i siffror avskillda med kommatecken."
 
-#: core/validators.py:94
+#: core/validators.py:97
 msgid "Enter valid e-mail addresses separated by commas."
 msgstr "Fyll i giltiga e-postadresser avskillda med kommatecken."
 
-#: core/validators.py:98
+#: core/validators.py:101
 msgid "Please enter a valid IP address."
 msgstr "Var god fyll i ett giltigt IP-nummer."
 
-#: core/validators.py:102
+#: core/validators.py:105
 msgid "Empty values are not allowed here."
 msgstr "Tomma värden är inte tillåtna här."
 
-#: core/validators.py:106
+#: core/validators.py:109
 msgid "Non-numeric characters aren't allowed here."
 msgstr "Icke-numeriska tecken är inte tillåtna här."
 
-#: core/validators.py:110
+#: core/validators.py:113
 msgid "This value can't be comprised solely of digits."
 msgstr "Det här värdet kan inte enbart bestå av siffror."
 
-#: core/validators.py:115
+#: core/validators.py:118
 msgid "Enter a whole number."
 msgstr "Fyll i ett heltal."
 
-#: core/validators.py:119
+#: core/validators.py:122
 msgid "Only alphabetical characters are allowed here."
 msgstr "Endast alfabetiska bokstäver är tillåtna här."
 
-#: core/validators.py:123
+#: core/validators.py:126
 msgid "Enter a valid date in YYYY-MM-DD format."
 msgstr "Fyll i ett giltigt datum i formatet ÅÅÅÅ-MM-DD."
 
-#: core/validators.py:127
+#: core/validators.py:130
 msgid "Enter a valid time in HH:MM format."
 msgstr "Fyll i en giltig tid i formatet TT:MM"
 
-#: core/validators.py:131
+#: core/validators.py:134
 msgid "Enter a valid date/time in YYYY-MM-DD HH:MM format."
 msgstr "Fyll i en giltig tidpunkt i formatet ÅÅÅÅ-MM-DD TT:MM"
 
-#: core/validators.py:135
+#: core/validators.py:138
 msgid "Enter a valid e-mail address."
 msgstr "Fyll i en giltig e-postadress."
 
-#: core/validators.py:147
+#: core/validators.py:150
 msgid ""
 "Upload a valid image. The file you uploaded was either not an image or a "
 "corrupted image."
@@ -1489,28 +1521,28 @@ msgstr ""
 "Ladda upp en giltig bild. Filen du laddade upp var antingen inte en bild, "
 "eller så var det en korrupt bild."
 
-#: core/validators.py:154
+#: core/validators.py:157
 #, python-format
 msgid "The URL %s does not point to a valid image."
 msgstr "Adressen %s pekar inte till en giltig bild."
 
-#: core/validators.py:158
+#: core/validators.py:161
 #, python-format
 msgid "Phone numbers must be in XXX-XXX-XXXX format. \"%s\" is invalid."
 msgstr ""
 "Telefonnummer måste vara i det amerikanska formatet XXX-XXX-XXXX. \"%s\" är "
 "ogiltigt."
 
-#: core/validators.py:166
+#: core/validators.py:169
 #, python-format
 msgid "The URL %s does not point to a valid QuickTime video."
 msgstr "Adressen %s pekar inte till en giltig QuickTime-video."
 
-#: core/validators.py:170
+#: core/validators.py:173
 msgid "A valid URL is required."
 msgstr "En giltig adress krävs."
 
-#: core/validators.py:184
+#: core/validators.py:187
 #, python-format
 msgid ""
 "Valid HTML is required. Specific errors are:\n"
@@ -1519,69 +1551,69 @@ msgstr ""
 "Giltig HTML krävs. Specifika fel är:\n"
 "%s"
 
-#: core/validators.py:191
+#: core/validators.py:194
 #, python-format
 msgid "Badly formed XML: %s"
 msgstr "Missformad XML: %s"
 
-#: core/validators.py:201
+#: core/validators.py:204
 #, python-format
 msgid "Invalid URL: %s"
 msgstr "Felaktig adress: %s"
 
-#: core/validators.py:205 core/validators.py:207
+#: core/validators.py:208 core/validators.py:210
 #, python-format
 msgid "The URL %s is a broken link."
 msgstr "Adressen %s är en trasig länk."
 
-#: core/validators.py:213
+#: core/validators.py:216
 msgid "Enter a valid U.S. state abbreviation."
 msgstr "Fyll i en giltig förkortning för en amerikansk delstat"
 
-#: core/validators.py:228
+#: core/validators.py:231
 #, python-format
 msgid "Watch your mouth! The word %s is not allowed here."
 msgid_plural "Watch your mouth! The words %s are not allowed here."
 msgstr[0] "Håll i tungan! Ordet %s är inte tillåtet här."
 msgstr[1] "Håll i tungan! Orden %s är inte tillåtna här."
 
-#: core/validators.py:235
+#: core/validators.py:238
 #, python-format
 msgid "This field must match the '%s' field."
 msgstr "Det här fältet måste matcha fältet '%s'."
 
-#: core/validators.py:254
+#: core/validators.py:257
 msgid "Please enter something for at least one field."
 msgstr "Fyll i något i minst ett fält."
 
-#: core/validators.py:263 core/validators.py:274
+#: core/validators.py:266 core/validators.py:277
 msgid "Please enter both fields or leave them both empty."
 msgstr "Fyll antingen i båda fälten, eller lämna båda tomma"
 
-#: core/validators.py:281
+#: core/validators.py:284
 #, python-format
 msgid "This field must be given if %(field)s is %(value)s"
 msgstr "Det är fältet måste anges om %(field)s är %(value)s"
 
-#: core/validators.py:293
+#: core/validators.py:296
 #, python-format
 msgid "This field must be given if %(field)s is not %(value)s"
 msgstr "Det här fältet måste anges om %(field)s inte är %(value)s"
 
-#: core/validators.py:312
+#: core/validators.py:315
 msgid "Duplicate values are not allowed."
 msgstr "Upprepade värden är inte tillåtna."
 
-#: core/validators.py:335
+#: core/validators.py:338
 #, python-format
 msgid "This value must be a power of %s."
 msgstr "Det här värdet måste vara en multipel av %s."
 
-#: core/validators.py:346
+#: core/validators.py:349
 msgid "Please enter a valid decimal number."
 msgstr "Fyll i ett giltigt decimaltal."
 
-#: core/validators.py:348
+#: core/validators.py:351
 #, python-format
 msgid "Please enter a valid decimal number with at most %s total digit."
 msgid_plural ""
@@ -1589,7 +1621,7 @@ msgid_plural ""
 msgstr[0] "Fyll i ett giltigt decimaltal med mindre än %s siffra totalt."
 msgstr[1] "Fyll i ett giltigt decimaltal med mindre än %s siffror totalt."
 
-#: core/validators.py:351
+#: core/validators.py:354
 #, python-format
 msgid "Please enter a valid decimal number with at most %s decimal place."
 msgid_plural ""
@@ -1597,30 +1629,30 @@ msgid_plural ""
 msgstr[0] "Fyll i ett giltigt decimaltal med som mest %s decimalsiffra."
 msgstr[1] "Fyll i ett giltigt decimaltal med som mest %s decimalsiffror."
 
-#: core/validators.py:361
+#: core/validators.py:364
 #, python-format
 msgid "Make sure your uploaded file is at least %s bytes big."
 msgstr "Se till att filen du laddade upp är minst %s bytes stor."
 
-#: core/validators.py:362
+#: core/validators.py:365
 #, python-format
 msgid "Make sure your uploaded file is at most %s bytes big."
 msgstr "Se till att filen du laddade upp är max %s bytes stor."
 
-#: core/validators.py:375
+#: core/validators.py:378
 msgid "The format for this field is wrong."
 msgstr "Formatet på det här fältet är fel."
 
-#: core/validators.py:390
+#: core/validators.py:393
 msgid "This field is invalid."
 msgstr "Det här fältet är ogiltigt."
 
-#: core/validators.py:425
+#: core/validators.py:428
 #, python-format
 msgid "Could not retrieve anything from %s."
 msgstr "Kunde inte hämta något från %s."
 
-#: core/validators.py:428
+#: core/validators.py:431
 #, python-format
 msgid ""
 "The URL %(url)s returned the invalid Content-Type header '%(contenttype)s'."
@@ -1628,7 +1660,7 @@ msgstr ""
 "Adressen %(url)s returnerade det ogiltiga innehållstyphuvudet (Content-Type "
 "header) '%(contenttype)s'"
 
-#: core/validators.py:461
+#: core/validators.py:464
 #, python-format
 msgid ""
 "Please close the unclosed %(tag)s tag from line %(line)s. (Line starts with "
@@ -1637,7 +1669,7 @@ msgstr ""
 "Var god avsluta den oavslutade taggen %(tag)s på rad %(line)s. (Raden börjar "
 "med \"%(start)s\".)"
 
-#: core/validators.py:465
+#: core/validators.py:468
 #, python-format
 msgid ""
 "Some text starting on line %(line)s is not allowed in that context. (Line "
@@ -1646,7 +1678,7 @@ msgstr ""
 "En del text från rad %(line)s är inte tillåtet i det sammanhanget. (Raden "
 "börjar med \"%(start)s\".)"
 
-#: core/validators.py:470
+#: core/validators.py:473
 #, python-format
 msgid ""
 "\"%(attr)s\" on line %(line)s is an invalid attribute. (Line starts with \"%"
@@ -1655,7 +1687,7 @@ msgstr ""
 "\"%(attr)s\" på rad %(line)s är inte ett gilltigt attribut. (Raden startar "
 "med \"%(start)s\".)"
 
-#: core/validators.py:475
+#: core/validators.py:478
 #, python-format
 msgid ""
 "\"<%(tag)s>\" on line %(line)s is an invalid tag. (Line starts with \"%"
@@ -1664,7 +1696,7 @@ msgstr ""
 "\"<%(tag)s>\" på rad %(line)s är inte en giltig tagg. (Raden börjar med \"%"
 "(start)s\".)"
 
-#: core/validators.py:479
+#: core/validators.py:482
 #, python-format
 msgid ""
 "A tag on line %(line)s is missing one or more required attributes. (Line "
@@ -1673,7 +1705,7 @@ msgstr ""
 "En tagg på rad %(line)s saknar en eller flera nödvändiga attribut. (Raden "
 "börjar med \"%(start)s\".)"
 
-#: core/validators.py:484
+#: core/validators.py:487
 #, python-format
 msgid ""
 "The \"%(attr)s\" attribute on line %(line)s has an invalid value. (Line "

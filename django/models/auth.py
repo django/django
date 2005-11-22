@@ -34,7 +34,7 @@ class User(meta.Model):
     first_name = meta.CharField(_('first name'), maxlength=30, blank=True)
     last_name = meta.CharField(_('last name'), maxlength=30, blank=True)
     email = meta.EmailField(_('e-mail address'), blank=True)
-    password_md5 = meta.CharField(_('password'), maxlength=32, help_text=_("Use an MD5 hash -- not the raw password."))
+    password = meta.CharField(_('password'), maxlength=128, help_text=_("Use '[algo]$[salt]$[hexdigest]"))
     is_staff = meta.BooleanField(_('staff status'), help_text=_("Designates whether the user can log into this admin site."))
     is_active = meta.BooleanField(_('active'), default=True)
     is_superuser = meta.BooleanField(_('superuser status'))
@@ -53,7 +53,7 @@ class User(meta.Model):
         exceptions = ('SiteProfileNotAvailable',)
         admin = meta.Admin(
             fields = (
-                (None, {'fields': ('username', 'password_md5')}),
+                (None, {'fields': ('username', 'password')}),
                 (_('Personal info'), {'fields': ('first_name', 'last_name', 'email')}),
                 (_('Permissions'), {'fields': ('is_staff', 'is_active', 'is_superuser', 'user_permissions')}),
                 (_('Important dates'), {'fields': ('last_login', 'date_joined')}),
@@ -78,13 +78,35 @@ class User(meta.Model):
         return full_name.strip()
 
     def set_password(self, raw_password):
-        import md5
-        self.password_md5 = md5.new(raw_password).hexdigest()
+        import sha, random
+        algo = 'sha1'
+        salt = sha.new(str(random.random())).hexdigest()[:5]
+        hsh = sha.new(salt+raw_password).hexdigest()
+        self.password = '%s$%s$%s' % (algo, salt, hsh)
 
     def check_password(self, raw_password):
-        "Returns a boolean of whether the raw_password was correct."
-        import md5
-        return self.password_md5 == md5.new(raw_password).hexdigest()
+        """
+        Returns a boolean of whether the raw_password was correct. Handles
+        encryption formats behind the scenes.
+        """
+        # Backwards-compatibility check. Older passwords won't include the
+        # algorithm or salt.
+        if '$' not in self.password:
+            import md5
+            is_correct = (self.password == md5.new(raw_password).hexdigest())
+            if is_correct:
+                # Convert the password to the new, more secure format.
+                self.set_password(raw_password)
+                self.save()
+            return is_correct
+        algo, salt, hsh = self.password.split('$')
+        if algo == 'md5':
+            import md5
+            return hsh == md5.new(salt+raw_password).hexdigest()
+        elif algo == 'sha1':
+            import sha
+            return hsh == sha.new(salt+raw_password).hexdigest()
+        raise ValueError, "Got unknown password algorithm type in password."
 
     def get_group_permissions(self):
         "Returns a list of permission strings that this user has through his/her groups."
@@ -176,10 +198,9 @@ class User(meta.Model):
 
     def _module_create_user(username, email, password):
         "Creates and saves a User with the given username, e-mail and password."
-        import md5
-        password_md5 = md5.new(password).hexdigest()
         now = datetime.datetime.now()
-        user = User(None, username, '', '', email.strip().lower(), password_md5, False, True, False, now, now)
+        user = User(None, username, '', '', email.strip().lower(), 'placeholder', False, True, False, now, now)
+        user.set_password(password)
         user.save()
         return user
 

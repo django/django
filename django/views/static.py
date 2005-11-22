@@ -47,7 +47,7 @@ def serve(request, path, document_root=None, show_indexes=False):
         raise Http404, '"%s" does not exist' % fullpath
     else:
         mimetype = mimetypes.guess_type(fullpath)[0]
-        return HttpResponse(open(fullpath).read(), mimetype=mimetype)
+        return HttpResponse(open(fullpath, 'rb').read(), mimetype=mimetype)
 
 DEFAULT_DIRECTORY_INDEX_TEMPLATE = """
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">

@@ -1263,7 +1263,7 @@ def _get_where_clause(lookup_type, table_prefix, field_name, value):
         table_prefix = db.db.quote_name(table_prefix[:-1])+'.'
     field_name = db.db.quote_name(field_name)
     try:
-        return '%s%s %s %%s' % (table_prefix, field_name, db.OPERATOR_MAPPING[lookup_type])
+        return '%s%s %s' % (table_prefix, field_name, (db.OPERATOR_MAPPING[lookup_type] % '%s'))
     except KeyError:
         pass
     if lookup_type == 'in':

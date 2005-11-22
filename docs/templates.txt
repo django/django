@@ -492,6 +492,40 @@ ifnotequal
 
 Just like ``ifequal``, except it tests that the two arguments are not equal.
 
+include
+~~~~~~~
+
+**Only available in Django development version.**
+
+Loads a template and renders it with the current context. This is a way of
+"including" other templates within a template.
+
+The template name can either be a variable or a hard-coded (quoted) string,
+in either single or double quotes.
+
+This example includes the contents of the template ``"foo/bar"``::
+
+    {% include "foo/bar" %}
+
+This example includes the contents of the template whose name is contained in
+the variable ``template_name``::
+
+    {% include template_name %}
+
+An included template is rendered with the context of the template that's
+including it. This example produces the output ``"Hello, John"``:
+
+    * Context: variable ``person`` is set to ``"john"``.
+    * Template::
+
+        {% include "name_snippet" %}
+
+    * The ``name_snippet`` template::
+
+        Hello, {{ person }}
+
+See also: ``{% ssi %}``.
+
 load
 ~~~~
 
@@ -645,6 +679,8 @@ file are evaluated as template code, within the current context::
 Note that if you use ``{% ssi %}``, you'll need to define
 `ALLOWED_INCLUDE_ROOTS`_ in your Django settings, as a security measure.
 
+See also: ``{% include %}``.
+
 .. _ALLOWED_INCLUDE_ROOTS: http://www.djangoproject.com/documentation/settings/#allowed-include-roots
 
 templatetag
@@ -768,9 +804,14 @@ fix_ampersands
 Replaces ampersands with ``&amp;`` entities.
 
 floatformat
+~~~~~~~~~~~
 
-Displays a floating point number as 34.2 (with one decimal places) -- but only
-if there's a point to be displayed.
+Rounds a floating-point number to one decimal place -- but only if there's a
+decimal part to be displayed. For example:
+
+    * ``36.123`` gets converted to ``36.1``
+    * ``36.15`` gets converted to ``36.2``
+    * ``36`` gets converted to ``36``
 
 get_digit
 ~~~~~~~~~

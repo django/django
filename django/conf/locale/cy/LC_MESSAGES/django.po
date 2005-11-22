@@ -1138,6 +1138,38 @@ msgstr "Tach."
 msgid "Dec."
 msgstr "Rhag."
 
+#: utils/timesince.py:12
+msgid "year"
+msgid_plural "years"
+msgstr[0] ""
+msgstr[1] ""
+
+#: utils/timesince.py:13
+msgid "month"
+msgid_plural "months"
+msgstr[0] ""
+msgstr[1] ""
+
+#: utils/timesince.py:14
+#, fuzzy
+msgid "day"
+msgid_plural "days"
+msgstr[0] "Mai"
+msgstr[1] "Mai"
+
+#: utils/timesince.py:15
+msgid "hour"
+msgid_plural "hours"
+msgstr[0] ""
+msgstr[1] ""
+
+#: utils/timesince.py:16
+#, fuzzy
+msgid "minute"
+msgid_plural "minutes"
+msgstr[0] "safle"
+msgstr[1] "safle"
+
 #: models/core.py:7
 msgid "domain name"
 msgstr "parth-enw"
@@ -1243,8 +1275,8 @@ msgid "password"
 msgstr "cyfrinair"
 
 #: models/auth.py:37
-msgid "Use an MD5 hash -- not the raw password."
-msgstr "Defnyddiwch stwnsh MD5 -- nid y gyfrinair crai."
+msgid "Use '[algo]$[salt]$[hexdigest]"
+msgstr ""
 
 #: models/auth.py:38
 msgid "staff status"
@@ -1290,7 +1322,7 @@ msgstr "Gwybodaeth personol"
 msgid "Important dates"
 msgstr "Dyddiadau pwysig"
 
-#: models/auth.py:195
+#: models/auth.py:216
 msgid "Message"
 msgstr "Neges"
 
@@ -1417,70 +1449,70 @@ msgstr "Rhowch rhif cyfan."
 msgid "This value must contain only letters, numbers and underscores."
 msgstr "Rhaid i'r werth yma cynnwys lythrennau, rhifau ac tanlinellau yn unig."
 
-#: core/validators.py:63
+#: core/validators.py:66
 #, fuzzy
 msgid "This value must contain only letters, numbers, underscores and slashes."
 msgstr ""
 "Rhaid i'r werth yma cynnwys lythrennau, rhifau, tanlinellau ac slaesau yn "
 "unig."
 
-#: core/validators.py:71
+#: core/validators.py:74
 msgid "Uppercase letters are not allowed here."
 msgstr "Ni chaniateir priflythrennau yma."
 
-#: core/validators.py:75
+#: core/validators.py:78
 msgid "Lowercase letters are not allowed here."
 msgstr "Ni chaniateir lythrennau bach yma."
 
-#: core/validators.py:82
+#: core/validators.py:85
 msgid "Enter only digits separated by commas."
 msgstr "Rhowch digidau gwahanu gyda atalnodau yn unig."
 
-#: core/validators.py:94
+#: core/validators.py:97
 msgid "Enter valid e-mail addresses separated by commas."
 msgstr "Rhowch cyfeiriad e-bost dilys gwahanu gyda atalnodau."
 
-#: core/validators.py:98
+#: core/validators.py:101
 msgid "Please enter a valid IP address."
 msgstr "Rhowch cyfeiriad IP dilys, os gwelwch yn dda."
 
-#: core/validators.py:102
+#: core/validators.py:105
 msgid "Empty values are not allowed here."
 msgstr "Ni chaniateir gwerthau gwag yma."
 
-#: core/validators.py:106
+#: core/validators.py:109
 msgid "Non-numeric characters aren't allowed here."
 msgstr "Ni chaniateir nodau anrhifol yma."
 
-#: core/validators.py:110
+#: core/validators.py:113
 msgid "This value can't be comprised solely of digits."
 msgstr "Ni gellir y werth yma"
 
-#: core/validators.py:115
+#: core/validators.py:118
 msgid "Enter a whole number."
 msgstr "Rhowch rhif cyfan."
 
-#: core/validators.py:119
+#: core/validators.py:122
 msgid "Only alphabetical characters are allowed here."
 msgstr "Caniateir nodau gwyddorol un unig yma."
 
-#: core/validators.py:123
+#: core/validators.py:126
 msgid "Enter a valid date in YYYY-MM-DD format."
 msgstr "Rhowch dyddiad dilys mewn fformat YYYY-MM-DD."
 
-#: core/validators.py:127
+#: core/validators.py:130
 msgid "Enter a valid time in HH:MM format."
 msgstr "Rhowch amser ddilys mewn fformat HH:MM."
 
-#: core/validators.py:131
+#: core/validators.py:134
 msgid "Enter a valid date/time in YYYY-MM-DD HH:MM format."
 msgstr "Rhowch dyddiad/amser ddilys mewn fformat YYYY-MM-DD HH:MM."
 
-#: core/validators.py:135
+#: core/validators.py:138
 msgid "Enter a valid e-mail address."
 msgstr "Rhowch cyfeiriad e-bost ddilys."
 
-#: core/validators.py:147
+#: core/validators.py:150
 msgid ""
 "Upload a valid image. The file you uploaded was either not an image or a "
 "corrupted image."
@@ -1488,26 +1520,26 @@ msgstr ""
 "Llwythwch delwedd dilys. Doedd y delwedd a llwythwyd dim yn ddelwedd dilys, "
 "neu roedd o'n ddelwedd llwgr."
 
-#: core/validators.py:154
+#: core/validators.py:157
 #, python-format
 msgid "The URL %s does not point to a valid image."
 msgstr "Dydy'r URL %s dim yn pwyntio at delwedd dilys."
 
-#: core/validators.py:158
+#: core/validators.py:161
 #, python-format
 msgid "Phone numbers must be in XXX-XXX-XXXX format. \"%s\" is invalid."
 msgstr "Rhaid rifau ffon bod mewn fformat XXX-XXX-XXXX. Mae \"%s\" yn annilys."
 
-#: core/validators.py:166
+#: core/validators.py:169
 #, python-format
 msgid "The URL %s does not point to a valid QuickTime video."
 msgstr "Dydy'r URL %s dim yn pwyntio at fideo Quicktime dilys."
 
-#: core/validators.py:170
+#: core/validators.py:173
 msgid "A valid URL is required."
 msgstr "Mae URL dilys yn ofynnol."
 
-#: core/validators.py:184
+#: core/validators.py:187
 #, python-format
 msgid ""
 "Valid HTML is required. Specific errors are:\n"
@@ -1516,69 +1548,69 @@ msgstr ""
 "Mae HTML dilys yn ofynnol. Gwallau penodol yw:\n"
 "%s"
 
-#: core/validators.py:191
+#: core/validators.py:194
 #, python-format
 msgid "Badly formed XML: %s"
 msgstr "XML wedi ffurfio'n wael: %s"
 
-#: core/validators.py:201
+#: core/validators.py:204
 #, python-format
 msgid "Invalid URL: %s"
 msgstr "URL annilys: %s"
 
-#: core/validators.py:205 core/validators.py:207
+#: core/validators.py:208 core/validators.py:210
 #, python-format
 msgid "The URL %s is a broken link."
 msgstr "Mae'r URL %s yn gyswllt toredig."
 
-#: core/validators.py:213
+#: core/validators.py:216
 msgid "Enter a valid U.S. state abbreviation."
 msgstr "Rhowch talfyriad dalaith U.S. dilys."
 
-#: core/validators.py:228
+#: core/validators.py:231
 #, python-format
 msgid "Watch your mouth! The word %s is not allowed here."
 msgid_plural "Watch your mouth! The words %s are not allowed here."
 msgstr[0] "Gwyliwch eich ceg! Ni chaniateir y gair %s yma."
 msgstr[1] "Gwyliwch eich ceg! Ni chaniateir y geiriau %s yma."
 
-#: core/validators.py:235
+#: core/validators.py:238
 #, python-format
 msgid "This field must match the '%s' field."
 msgstr "Rhaid i'r faes yma cydweddu'r faes '%s'."
 
-#: core/validators.py:254
+#: core/validators.py:257
 msgid "Please enter something for at least one field."
 msgstr "Rhowch rhywbeth am un maes o leiaf, os gwelwch yn dda."
 
-#: core/validators.py:263 core/validators.py:274
+#: core/validators.py:266 core/validators.py:277
 msgid "Please enter both fields or leave them both empty."
 msgstr "Llenwch y ddwy faes, neu gadewch nhw'n wag, os gwelwch yn dda."
 
-#: core/validators.py:281
+#: core/validators.py:284
 #, python-format
 msgid "This field must be given if %(field)s is %(value)s"
 msgstr "Rhaid roi'r faes yma os mae %(field)s yn %(value)s"
 
-#: core/validators.py:293
+#: core/validators.py:296
 #, python-format
 msgid "This field must be given if %(field)s is not %(value)s"
 msgstr "Rhaid roi'r faes yma os mae %(field)s dim yn %(value)s"
 
-#: core/validators.py:312
+#: core/validators.py:315
 msgid "Duplicate values are not allowed."
 msgstr "Ni chaniateir gwerthau ddyblyg."
 
-#: core/validators.py:335
+#: core/validators.py:338
 #, python-format
 msgid "This value must be a power of %s."
 msgstr "Rhaid i'r gwerth yma fod yn bŵer o %s."
 
-#: core/validators.py:346
+#: core/validators.py:349
 msgid "Please enter a valid decimal number."
 msgstr "Rhowch rhif degol dilys, os gwelwch yn dda."
 
-#: core/validators.py:348
+#: core/validators.py:351
 #, python-format
 msgid "Please enter a valid decimal number with at most %s total digit."
 msgid_plural ""
@@ -1586,7 +1618,7 @@ msgid_plural ""
 msgstr[0] "Rhowch rhif degol dilys gyda cyfanswm %s digidau o fwyaf."
 msgstr[1] "Rhowch rhif degol dilys gyda cyfanswm %s digid o fwyaf."
 
-#: core/validators.py:351
+#: core/validators.py:354
 #, python-format
 msgid "Please enter a valid decimal number with at most %s decimal place."
 msgid_plural ""
@@ -1596,37 +1628,37 @@ msgstr[0] ""
 msgstr[1] ""
 "Rhowch rif degol dilydd gyda o fwyaf %s lleoedd degol, os gwelwch yn dda."
 
-#: core/validators.py:361
+#: core/validators.py:364
 #, python-format
 msgid "Make sure your uploaded file is at least %s bytes big."
 msgstr "Sicrhewch bod yr ffeil a llwythwyd yn o leiaf %s beit."
 
-#: core/validators.py:362
+#: core/validators.py:365
 #, python-format
 msgid "Make sure your uploaded file is at most %s bytes big."
 msgstr "Sicrhewch bod yr ffeil a llwythwyd yn %s beit o fwyaf."
 
-#: core/validators.py:375
+#: core/validators.py:378
 msgid "The format for this field is wrong."
 msgstr "Mae'r fformat i'r faes yma yn anghywir."
 
-#: core/validators.py:390
+#: core/validators.py:393
 msgid "This field is invalid."
 msgstr "Mae'r faes yma yn annilydd."
 
-#: core/validators.py:425
+#: core/validators.py:428
 #, python-format
 msgid "Could not retrieve anything from %s."
 msgstr "Ni gellir adalw unrhywbeth o %s."
 
-#: core/validators.py:428
+#: core/validators.py:431
 #, python-format
 msgid ""
 "The URL %(url)s returned the invalid Content-Type header '%(contenttype)s'."
 msgstr ""
 "Dychwelodd yr URL %(url)s y pennawd Content-Type annilys '%(contenttype)s'."
 
-#: core/validators.py:461
+#: core/validators.py:464
 #, python-format
 msgid ""
 "Please close the unclosed %(tag)s tag from line %(line)s. (Line starts with "
@@ -1635,7 +1667,7 @@ msgstr ""
 "Caewch y tag anghaedig %(tag)s o linell %(line)s. (Linell yn ddechrau â \"%"
 "(start)s\".)"
 
-#: core/validators.py:465
+#: core/validators.py:468
 #, python-format
 msgid ""
 "Some text starting on line %(line)s is not allowed in that context. (Line "
@@ -1644,7 +1676,7 @@ msgstr ""
 "Ni chaniateir rhai o'r destun ar linell %(line)s yn y gyd-destun yna. "
 "(Linell yn ddechrau â \"%(start)s\".)"
 
-#: core/validators.py:470
+#: core/validators.py:473
 #, python-format
 msgid ""
 "\"%(attr)s\" on line %(line)s is an invalid attribute. (Line starts with \"%"
@@ -1653,7 +1685,7 @@ msgstr ""
 "Mae \"%(attr)s\" ar lein %(line)s yn priodoledd annilydd. (Linell yn "
 "ddechrau â \"%(start)s\".)"
 
-#: core/validators.py:475
+#: core/validators.py:478
 #, python-format
 msgid ""
 "\"<%(tag)s>\" on line %(line)s is an invalid tag. (Line starts with \"%"
@@ -1662,7 +1694,7 @@ msgstr ""
 "Mae \"<%(tag)s>\" ar lein %(line)s yn tag annilydd. (Linell yn ddechrau â \"%"
 "(start)s\".)"
 
-#: core/validators.py:479
+#: core/validators.py:482
 #, python-format
 msgid ""
 "A tag on line %(line)s is missing one or more required attributes. (Line "
@@ -1671,7 +1703,7 @@ msgstr ""
 "Mae tag ar lein %(line)s yn eisiau un new fwy priodoleddau gofynnol. (Linell "
 "yn ddechrau â \"%(start)s\".)"
 
-#: core/validators.py:484
+#: core/validators.py:487
 #, python-format
 msgid ""
 "The \"%(attr)s\" attribute on line %(line)s has an invalid value. (Line "

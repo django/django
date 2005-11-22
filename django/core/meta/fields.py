@@ -48,11 +48,11 @@ def manipulator_valid_rel_key(f, self, field_data, all_data):
 def manipulator_validator_unique(f, opts, self, field_data, all_data):
     "Validates that the value is unique for this field."
     if f.rel and isinstance(f.rel, ManyToOne):
-        lookup_type = 'pk'
+        lookup_type = '%s__%s__exact' % (f.name, f.rel.get_related_field().name)
     else:
-        lookup_type = 'exact'
+        lookup_type = '%s__exact' % f.name
     try:
-        old_obj = opts.get_model_module().get_object(**{'%s__%s' % (f.name, lookup_type): field_data})
+        old_obj = opts.get_model_module().get_object(**{lookup_type: field_data})
     except ObjectDoesNotExist:
         return
     if hasattr(self, 'original_object') and getattr(self.original_object, opts.pk.attname) == getattr(old_obj, opts.pk.attname):

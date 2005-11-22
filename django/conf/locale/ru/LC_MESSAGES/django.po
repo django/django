@@ -1119,6 +1119,38 @@ msgstr "Нояб."
 msgid "Dec."
 msgstr "Дек."
 
+#: utils/timesince.py:12
+msgid "year"
+msgid_plural "years"
+msgstr[0] ""
+msgstr[1] ""
+
+#: utils/timesince.py:13
+msgid "month"
+msgid_plural "months"
+msgstr[0] ""
+msgstr[1] ""
+
+#: utils/timesince.py:14
+#, fuzzy
+msgid "day"
+msgid_plural "days"
+msgstr[0] "Май"
+msgstr[1] "Май"
+
+#: utils/timesince.py:15
+msgid "hour"
+msgid_plural "hours"
+msgstr[0] ""
+msgstr[1] ""
+
+#: utils/timesince.py:16
+#, fuzzy
+msgid "minute"
+msgid_plural "minutes"
+msgstr[0] "сайт"
+msgstr[1] "сайт"
+
 #: models/core.py:7
 msgid "domain name"
 msgstr "домен"
@@ -1228,8 +1260,8 @@ msgid "password"
 msgstr "Пароль:"
 
 #: models/auth.py:37
-msgid "Use an MD5 hash -- not the raw password."
-msgstr "Используйте MD5 хэш -- только не необработанный пароль."
+msgid "Use '[algo]$[salt]$[hexdigest]"
+msgstr ""
 
 #: models/auth.py:38
 msgid "staff status"
@@ -1297,6 +1329,10 @@ msgid "Danish"
 msgstr ""
 
 #: conf/global_settings.py:41
+msgid "Danish"
+msgstr ""
+
+#: conf/global_settings.py:40
 msgid "German"
 msgstr ""
 
@@ -1398,69 +1434,69 @@ msgstr ""
 msgid "This value must contain only letters, numbers and underscores."
 msgstr "Значение может содержать только буквы, цифры и подчеркивания."
 
-#: core/validators.py:63
+#: core/validators.py:66
 #, fuzzy
 msgid "This value must contain only letters, numbers, underscores and slashes."
 msgstr "Значение может содержать только буквы, цифры и подчеркивания."
 
-#: core/validators.py:71
+#: core/validators.py:74
 msgid "Uppercase letters are not allowed here."
 msgstr "Заглавные буквы не разрешены"
 
-#: core/validators.py:75
+#: core/validators.py:78
 msgid "Lowercase letters are not allowed here."
 msgstr "Строчные буквы не разрешены"
 
-#: core/validators.py:82
+#: core/validators.py:85
 msgid "Enter only digits separated by commas."
 msgstr "Вводите только цифры разделённые запятыми"
 
-#: core/validators.py:94
+#: core/validators.py:97
 msgid "Enter valid e-mail addresses separated by commas."
 msgstr "Вводите реальные e-mail адреса разделённые запятыми"
 
-#: core/validators.py:98
+#: core/validators.py:101
 msgid "Please enter a valid IP address."
 msgstr "Пожалуйста, вводите реальный IP адрес"
 
-#: core/validators.py:102
+#: core/validators.py:105
 msgid "Empty values are not allowed here."
 msgstr "Пустое значение не разрешено"
 
-#: core/validators.py:106
+#: core/validators.py:109
 msgid "Non-numeric characters aren't allowed here."
 msgstr "Не цифровые символы не рназрешены"
 
-#: core/validators.py:110
+#: core/validators.py:113
 msgid "This value can't be comprised solely of digits."
 msgstr ""
 
-#: core/validators.py:115
+#: core/validators.py:118
 msgid "Enter a whole number."
 msgstr "Введите номер"
 
-#: core/validators.py:119
+#: core/validators.py:122
 msgid "Only alphabetical characters are allowed here."
 msgstr "Только буквы можно использовать"
 
-#: core/validators.py:123
+#: core/validators.py:126
 msgid "Enter a valid date in YYYY-MM-DD format."
 msgstr "Вводите реальную дату в формате YYYY-MM-DD."
 
-#: core/validators.py:127
+#: core/validators.py:130
 msgid "Enter a valid time in HH:MM format."
 msgstr "Вводите реальное время в формате HH:MM."
 
-#: core/validators.py:131
+#: core/validators.py:134
 msgid "Enter a valid date/time in YYYY-MM-DD HH:MM format."
 msgstr "Вводите реальные дата/время в формате YYYY-MM-DD HH:MM."
 
-#: core/validators.py:135
+#: core/validators.py:138
 #, fuzzy
 msgid "Enter a valid e-mail address."
 msgstr "E-mail адрес:"
 
-#: core/validators.py:147
+#: core/validators.py:150
 msgid ""
 "Upload a valid image. The file you uploaded was either not an image or a "
 "corrupted image."
@@ -1468,26 +1504,26 @@ msgstr ""
 "Загрузите реальное изображение. Файл, который вы загружали, было либо не "
 "изображениеили сломанный формат."
 
-#: core/validators.py:154
+#: core/validators.py:157
 #, python-format
 msgid "The URL %s does not point to a valid image."
 msgstr "URL %s не указывает на реальное изображение."
 
-#: core/validators.py:158
+#: core/validators.py:161
 #, python-format
 msgid "Phone numbers must be in XXX-XXX-XXXX format. \"%s\" is invalid."
 msgstr "Телефонный номер должен быть в формате XXX-XXX-XXXX. \"%s\" не верен."
 
-#: core/validators.py:166
+#: core/validators.py:169
 #, python-format
 msgid "The URL %s does not point to a valid QuickTime video."
 msgstr "URL %s не указывает на реальное видео QuickTime."
 
-#: core/validators.py:170
+#: core/validators.py:173
 msgid "A valid URL is required."
 msgstr "Реальный URL обязателен."
 
-#: core/validators.py:184
+#: core/validators.py:187
 #, python-format
 msgid ""
 "Valid HTML is required. Specific errors are:\n"
@@ -1496,12 +1532,12 @@ msgstr ""
 "Реальный HTML обязателен. Специфичные ошибки:\n"
 "%s"
 
-#: core/validators.py:191
+#: core/validators.py:194
 #, python-format
 msgid "Badly formed XML: %s"
 msgstr "Неверный фформат XML: %s"
 
-#: core/validators.py:201
+#: core/validators.py:204
 #, python-format
 msgid "Invalid URL: %s"
 msgstr "Неверный URL: %s"
@@ -1563,18 +1599,24 @@ msgstr "Пожалуйста, вводите корректное десятичное число."
 msgid "Please enter a valid decimal number with at most %s total digit."
 msgid_plural ""
 "Please enter a valid decimal number with at most %s total digits."
-msgstr[0] "Пожалуйста, вводите корректное десятичное число с максимальным количеством знаков %s."
+msgstr[0] ""
+"Пожалуйста, вводите корректное десятичное число с максимальным количеством "
+"знаков %s."
 msgstr[1] ""
-"Пожалуйста, вводите корректное десятичное число с максимальным количеством знаков %s."
+"Пожалуйста, вводите корректное десятичное число с максимальным количеством "
+"знаков %s."
 
 #: core/validators.py:351
 #, python-format
 msgid "Please enter a valid decimal number with at most %s decimal place."
 msgid_plural ""
 "Please enter a valid decimal number with at most %s decimal places."
-msgstr[0] "Пожалуйста, вводите корректное десятичное число с максимальным количеством знаков после запятой %s."
+msgstr[0] ""
+"Пожалуйста, вводите корректное десятичное число с максимальным количеством "
+"знаков после запятой %s."
 msgstr[1] ""
-"Пожалуйста, вводите корректное десятичное число с максимальным количеством знаков после запятой %s."
+"Пожалуйста, вводите корректное десятичное число с максимальным количеством "
+"знаков после запятой %s."
 
 #: core/validators.py:361
 #, python-format
@@ -1603,8 +1645,7 @@ msgstr "Невозможно получить что либо с %s."
 #, python-format
 msgid ""
 "The URL %(url)s returned the invalid Content-Type header '%(contenttype)s'."
-msgstr ""
-"URL %(url) вернул неверны заголовок Content-Type '%(contenttype)'."
+msgstr "URL %(url) вернул неверны заголовок Content-Type '%(contenttype)'."
 
 #: core/validators.py:461
 #, python-format

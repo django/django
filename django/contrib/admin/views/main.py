@@ -99,14 +99,7 @@ class ChangeList(object):
         if not request.user.has_perm(app_label + '.' + self.opts.get_change_permission()):
             raise PermissionDenied
         
-        if self.opts.one_to_one_field:
-            self.lookup_mod = self.opts.one_to_one_field.rel.to.get_model_module()
-            self.lookup_opts = self.lookup_mod.Klass._meta
-            # If lookup_opts doesn't have admin set, give it the default meta.Admin().
-            if not self.lookup_opts.admin:
-                self.lookup_opts.admin = meta.Admin()
-        else:
-            self.lookup_mod, self.lookup_opts = self.mod, self.opts
+        self.lookup_mod, self.lookup_opts = self.mod, self.opts
 
     def get_search_parameters(self, request):
         # Get search parameters from the query string.

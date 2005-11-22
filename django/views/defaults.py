@@ -47,7 +47,7 @@ def shortcut(request, content_type_id, object_id):
             return httpwrappers.HttpResponseRedirect(obj.get_absolute_url())
     return httpwrappers.HttpResponseRedirect('http://%s%s' % (object_domain, obj.get_absolute_url()))
 
-def page_not_found(request):
+def page_not_found(request, template_name='404'):
     """
     Default 404 handler, which looks for the requested URL in the redirects
     table, redirects if found, and displays 404 page if not redirected.
@@ -55,15 +55,15 @@ def page_not_found(request):
     Templates: `404`
     Context: None
     """
-    t = loader.get_template('404')
+    t = loader.get_template(template_name)
     return httpwrappers.HttpResponseNotFound(t.render(Context()))
 
-def server_error(request):
+def server_error(request, template_name='500'):
     """
     500 error handler.
 
     Templates: `500`
     Context: None
     """
-    t = loader.get_template('500')
+    t = loader.get_template(template_name)
     return httpwrappers.HttpResponseServerError(t.render(Context()))

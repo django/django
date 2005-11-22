@@ -27,6 +27,9 @@ url_re = re.compile(r'^http://\S+$')
 
 from django.conf.settings import JING_PATH
 from django.utils.translation import gettext_lazy, ngettext
+from django.utils.functional import Promise, lazy
+
+lazy_inter = lazy(lambda a,b: str(a) % b, str)
 
 class ValidationError(Exception):
     def __init__(self, message):
@@ -34,7 +37,7 @@ class ValidationError(Exception):
         if isinstance(message, list):
             self.messages = message
         else:
-            assert isinstance(message, basestring), ("%s should be a string" % repr(message))
+            assert isinstance(message, (basestring, Promise)), ("%s should be a string" % repr(message))
             self.messages = [message]
     def __str__(self):
         # This is needed because, without a __str__(), printing an exception
@@ -49,7 +52,7 @@ class CriticalValidationError(Exception):
         if isinstance(message, list):
             self.messages = message
         else:
-            assert isinstance(message, basestring), ("'%s' should be a string" % message)
+            assert isinstance(message, (basestring, Promise)), ("'%s' should be a string" % message)
             self.messages = [message]
     def __str__(self):
         return str(self.messages)
@@ -232,7 +235,7 @@ def hasNoProfanities(field_data, all_data):
 class AlwaysMatchesOtherField:
     def __init__(self, other_field_name, error_message=None):
         self.other = other_field_name
-        self.error_message = error_message or gettext_lazy("This field must match the '%s' field.") % self.other
+        self.error_message = error_message or lazy_inter(gettext_lazy("This field must match the '%s' field."), self.other)
         self.always_test = True
 
     def __call__(self, field_data, all_data):
@@ -278,8 +281,8 @@ class RequiredIfOtherFieldEquals:
     def __init__(self, other_field, other_value, error_message=None):
         self.other_field = other_field
         self.other_value = other_value
-        self.error_message = error_message or gettext_lazy("This field must be given if %(field)s is %(value)s") % {
-            'field': other_field, 'value': other_value}
+        self.error_message = error_message or lazy_inter(gettext_lazy("This field must be given if %(field)s is %(value)s"), {
+            'field': other_field, 'value': other_value})
         self.always_test = True
 
     def __call__(self, field_data, all_data):
@@ -290,8 +293,8 @@ class RequiredIfOtherFieldDoesNotEqual:
     def __init__(self, other_field, other_value, error_message=None):
         self.other_field = other_field
         self.other_value = other_value
-        self.error_message = error_message or gettext_lazy("This field must be given if %(field)s is not %(value)s") % {
-            'field': other_field, 'value': other_value}
+        self.error_message = error_message or lazy_inter(gettext_lazy("This field must be given if %(field)s is not %(value)s"), {
+            'field': other_field, 'value': other_value})
         self.always_test = True
 
     def __call__(self, field_data, all_data):
@@ -358,8 +361,8 @@ class HasAllowableSize:
     """
     def __init__(self, min_size=None, max_size=None, min_error_message=None, max_error_message=None):
         self.min_size, self.max_size = min_size, max_size
-        self.min_error_message = min_error_message or gettext_lazy("Make sure your uploaded file is at least %s bytes big.") % min_size
-        self.max_error_message = max_error_message or gettext_lazy("Make sure your uploaded file is at most %s bytes big.") % min_size
+        self.min_error_message = min_error_message or lazy_inter(gettext_lazy("Make sure your uploaded file is at least %s bytes big."), min_size)
+        self.max_error_message = max_error_message or lazy_inter(gettext_lazy("Make sure your uploaded file is at most %s bytes big."), min_size)
 
     def __call__(self, field_data, all_data):
         if self.min_size is not None and len(field_data['content']) < self.min_size:
@@ -454,7 +457,7 @@ class RelaxNGCompact:
         display_errors = []
         lines = field_data.split('\n')
         for error in errors:
-            _, line, level, message = error.split(':', 3)
+            ignored, line, level, message = error.split(':', 3)
             # Scrape the Jing error messages to reword them more nicely.
             m = re.search(r'Expected "(.*?)" to terminate element starting on line (\d+)', message)
             if m:
