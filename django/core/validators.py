@@ -457,7 +457,7 @@ class RelaxNGCompact:
         display_errors = []
         lines = field_data.split('\n')
         for error in errors:
-            _, line, level, message = error.split(':', 3)
+            ignored, line, level, message = error.split(':', 3)
             # Scrape the Jing error messages to reword them more nicely.
             m = re.search(r'Expected "(.*?)" to terminate element starting on line (\d+)', message)
             if m:
