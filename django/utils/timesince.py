@@ -1,5 +1,6 @@
-import datetime, math, time
+import datetime, time
 from django.utils.tzinfo import LocalTimezone
+from django.utils.translation import ngettext
 
 def timesince(d, now=None):
     """
@@ -8,11 +9,11 @@ def timesince(d, now=None):
     Adapted from http://blog.natbat.co.uk/archive/2003/Jun/14/time_since
     """
     chunks = (
-      (60 * 60 * 24 * 365, 'year'),
-      (60 * 60 * 24 * 30, 'month'),
-      (60 * 60 * 24, 'day'),
-      (60 * 60, 'hour'),
-      (60, 'minute')
+      (60 * 60 * 24 * 365, lambda n: ngettext('year', 'years', n)),
+      (60 * 60 * 24 * 30, lambda n: ngettext('month', 'months', n)),
+      (60 * 60 * 24, lambda n : ngettext('day', 'days', n)),
+      (60 * 60, lambda n: ngettext('hour', 'hours', n)),
+      (60, lambda n: ngettext('minute', 'minutes', n))
     )
     if now:
         t = time.mktime(now)
@@ -25,24 +26,17 @@ def timesince(d, now=None):
     now = datetime.datetime(t[0], t[1], t[2], t[3], t[4], t[5], tzinfo=tz)
     delta = now - d
     since = delta.days * 24 * 60 * 60 + delta.seconds
-    # Crazy iteration syntax because we need i to be current index
-    for i, (seconds, name) in zip(range(len(chunks)), chunks):
-        count = math.floor(since / seconds)
+    for i, (seconds, name) in enumerate(chunks):
+        count = since / seconds
         if count != 0:
             break
-    if count == 1:
-        s = '1 %s' % name
-    else:
-        s = '%d %ss' % (count, name)
+    s = '%d %s' % (count, name(count))
     if i + 1 < len(chunks):
         # Now get the second item
         seconds2, name2 = chunks[i + 1]
-        count2 = math.floor((since - (seconds * count)) / seconds2)
+        count2 = (since - (seconds * count)) / seconds2
         if count2 != 0:
-            if count2 == 1:
-                s += ', 1 %s' % name2
-            else:
-                s += ', %d %ss' % (count2, name2)
+            s += ', %d %s' % (count2, name2(count2))
     return s
 
 def timeuntil(d):

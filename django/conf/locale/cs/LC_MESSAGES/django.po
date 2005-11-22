@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django Czech translation\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2005-11-15 12:40-0600\n"
+"POT-Creation-Date: 2005-11-22 15:44-0600\n"
 "PO-Revision-Date: 2005-11-14 15:34+0100\n"
 "Last-Translator: Radek Svarz <translate@svarz.cz>\n"
 "Language-Team: Czech\n"
@@ -512,6 +512,43 @@ msgstr "List."
 msgid "Dec."
 msgstr "Pros."
 
+#: utils/timesince.py:12
+msgid "year"
+msgid_plural "years"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+
+#: utils/timesince.py:13
+msgid "month"
+msgid_plural "months"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+
+#: utils/timesince.py:14
+#, fuzzy
+msgid "day"
+msgid_plural "days"
+msgstr[0] "Květen"
+msgstr[1] "Květen"
+msgstr[2] "Květen"
+
+#: utils/timesince.py:15
+msgid "hour"
+msgid_plural "hours"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+
+#: utils/timesince.py:16
+#, fuzzy
+msgid "minute"
+msgid_plural "minutes"
+msgstr[0] "web"
+msgstr[1] "web"
+msgstr[2] "web"
+
 #: models/core.py:7
 msgid "domain name"
 msgstr "jméno domény"
@@ -617,8 +654,8 @@ msgid "password"
 msgstr "heslo"
 
 #: models/auth.py:37
-msgid "Use an MD5 hash -- not the raw password."
-msgstr "Použije se MD5 hash -- ne čisté heslo."
+msgid "Use '[algo]$[salt]$[hexdigest]"
+msgstr ""
 
 #: models/auth.py:38
 #, fuzzy
@@ -665,7 +702,7 @@ msgstr "Osobní informace"
 msgid "Important dates"
 msgstr "Důležitá data"
 
-#: models/auth.py:195
+#: models/auth.py:216
 msgid "Message"
 msgstr "Zpráva"
 
@@ -746,72 +783,72 @@ msgstr "Švédsky"
 msgid "Simplified Chinese"
 msgstr "Jednoduchá čínština"
 
-#: core/validators.py:59
+#: core/validators.py:62
 msgid "This value must contain only letters, numbers and underscores."
 msgstr "Tato hodnota musí obsahovat pouze znaky, čísla nebo podtržítka."
 
-#: core/validators.py:63
+#: core/validators.py:66
 msgid "This value must contain only letters, numbers, underscores and slashes."
 msgstr ""
 "Tato hodnota musí obsahovat pouze znaky, čísla, podtržítka nebo lomítka."
 
-#: core/validators.py:71
+#: core/validators.py:74
 msgid "Uppercase letters are not allowed here."
 msgstr "Velká písmena zde nejsou povolená."
 
-#: core/validators.py:75
+#: core/validators.py:78
 msgid "Lowercase letters are not allowed here."
 msgstr "Malá písmena zde nejsou povolená."
 
-#: core/validators.py:82
+#: core/validators.py:85
 msgid "Enter only digits separated by commas."
 msgstr "Vložte pouze cifry oddělené čárkami."
 
-#: core/validators.py:94
+#: core/validators.py:97
 msgid "Enter valid e-mail addresses separated by commas."
 msgstr "Vložte platné e-mailové adresy oddělené čárkami."
 
-#: core/validators.py:98
+#: core/validators.py:101
 msgid "Please enter a valid IP address."
 msgstr "Prosíme, zadejte platnou IP adresu."
 
-#: core/validators.py:102
+#: core/validators.py:105
 msgid "Empty values are not allowed here."
 msgstr "Zde nejsou povolené prázdné hodnoty."
 
-#: core/validators.py:106
+#: core/validators.py:109
 msgid "Non-numeric characters aren't allowed here."
 msgstr "Znaky, které nejsou čísla, nejsou zde povoleny."
 
-#: core/validators.py:110
+#: core/validators.py:113
 msgid "This value can't be comprised solely of digits."
 msgstr "Tato hodnota nemůže být složená pouze z cifer."
 
-#: core/validators.py:115
+#: core/validators.py:118
 msgid "Enter a whole number."
 msgstr "Vložte celé číslo."
 
-#: core/validators.py:119
+#: core/validators.py:122
 msgid "Only alphabetical characters are allowed here."
 msgstr "Zde jsou povoleny pouze alfanumerické znaky."
 
-#: core/validators.py:123
+#: core/validators.py:126
 msgid "Enter a valid date in YYYY-MM-DD format."
 msgstr "Vložte platné datum ve formátu RRRR-MM-DD."
 
-#: core/validators.py:127
+#: core/validators.py:130
 msgid "Enter a valid time in HH:MM format."
 msgstr "Vložte platný čas ve formátu HH:MM."
 
-#: core/validators.py:131
+#: core/validators.py:134
 msgid "Enter a valid date/time in YYYY-MM-DD HH:MM format."
 msgstr "Vložte platné datum a čas ve formátu RRRR-MM-DD HH:MM."
 
-#: core/validators.py:135
+#: core/validators.py:138
 msgid "Enter a valid e-mail address."
 msgstr "Vložte platnou e-mailovou adresu."
 
-#: core/validators.py:147
+#: core/validators.py:150
 msgid ""
 "Upload a valid image. The file you uploaded was either not an image or a "
 "corrupted image."
@@ -819,26 +856,26 @@ msgstr ""
 "Nahrajte na server platný obrázek. Soubor, který jste nahrál(a) nebyl "
 "obrázek, nebo byl porušen."
 
-#: core/validators.py:154
+#: core/validators.py:157
 #, python-format
 msgid "The URL %s does not point to a valid image."
 msgstr "URL %s neukazuje na platný obrázek."
 
-#: core/validators.py:158
+#: core/validators.py:161
 #, python-format
 msgid "Phone numbers must be in XXX-XXX-XXXX format. \"%s\" is invalid."
 msgstr "Telefonní čísla musí být ve formátu XXX-XXX-XXXX. \"%s\" není platné."
 
-#: core/validators.py:166
+#: core/validators.py:169
 #, python-format
 msgid "The URL %s does not point to a valid QuickTime video."
 msgstr "URL %s neodkazuje na platné video ve formátu QuickTime."
 
-#: core/validators.py:170
+#: core/validators.py:173
 msgid "A valid URL is required."
 msgstr "Je vyžadováno platné URL."
 
-#: core/validators.py:184
+#: core/validators.py:187
 #, python-format
 msgid ""
 "Valid HTML is required. Specific errors are:\n"
@@ -847,26 +884,26 @@ msgstr ""
 "Je vyžadováno platné HTML. Konkrétní chyby jsou:\n"
 "%s"
 
-#: core/validators.py:191
+#: core/validators.py:194
 #, python-format
 msgid "Badly formed XML: %s"
 msgstr "Špatně formované XML: %s"
 
-#: core/validators.py:201
+#: core/validators.py:204
 #, python-format
 msgid "Invalid URL: %s"
 msgstr "Neplatné URL: %s"
 
-#: core/validators.py:205 core/validators.py:207
+#: core/validators.py:208 core/validators.py:210
 #, python-format
 msgid "The URL %s is a broken link."
 msgstr "Odkaz na URL %s je rozbitý."
 
-#: core/validators.py:213
+#: core/validators.py:216
 msgid "Enter a valid U.S. state abbreviation."
 msgstr "Vložte platnou zkraku U.S. státu."
 
-#: core/validators.py:228
+#: core/validators.py:231
 #, python-format
 msgid "Watch your mouth! The word %s is not allowed here."
 msgid_plural "Watch your mouth! The words %s are not allowed here."
@@ -874,43 +911,43 @@ msgstr[0] "Mluvte slušně! Slovo %s zde není přípustné."
 msgstr[1] "Mluvte slušně! Slova %s zde nejsou přípustná."
 msgstr[2] "Mluvte slušně! Slova %s zde nejsou přípustná."
 
-#: core/validators.py:235
+#: core/validators.py:238
 #, python-format
 msgid "This field must match the '%s' field."
 msgstr "Toto pole se musí shodovat s polem '%s'."
 
-#: core/validators.py:254
+#: core/validators.py:257
 msgid "Please enter something for at least one field."
 msgstr "Prosíme, vložte něco alespoň pro jedno pole."
 
-#: core/validators.py:263 core/validators.py:274
+#: core/validators.py:266 core/validators.py:277
 msgid "Please enter both fields or leave them both empty."
 msgstr "Prosíme, vložte obě pole, nebo je nechte obě prázdná."
 
-#: core/validators.py:281
+#: core/validators.py:284
 #, python-format
 msgid "This field must be given if %(field)s is %(value)s"
 msgstr "Toto pole musí být vyplněno, když %(field)s má %(value)s"
 
-#: core/validators.py:293
+#: core/validators.py:296
 #, python-format
 msgid "This field must be given if %(field)s is not %(value)s"
 msgstr "Toto pole musí být vyplněno, když %(field)s nemá %(value)s"
 
-#: core/validators.py:312
+#: core/validators.py:315
 msgid "Duplicate values are not allowed."
 msgstr "Duplikátní hodnoty nejsou povolené."
 
-#: core/validators.py:335
+#: core/validators.py:338
 #, python-format
 msgid "This value must be a power of %s."
 msgstr "Tato hodnota musí být mocninou %s."
 
-#: core/validators.py:346
+#: core/validators.py:349
 msgid "Please enter a valid decimal number."
 msgstr "Prosíme, vložte platné číslo."
 
-#: core/validators.py:348
+#: core/validators.py:351
 #, python-format
 msgid "Please enter a valid decimal number with at most %s total digit."
 msgid_plural ""
@@ -919,7 +956,7 @@ msgstr[0] "Prosíme, vložte platné číslo s nejvíce %s cifrou celkem."
 msgstr[1] "Prosíme, vložte platné číslo s nejvíce %s ciframi celkem."
 msgstr[2] "Prosíme, vložte platné číslo s nejvíce %s ciframi celkem."
 
-#: core/validators.py:351
+#: core/validators.py:354
 #, python-format
 msgid "Please enter a valid decimal number with at most %s decimal place."
 msgid_plural ""
@@ -933,36 +970,36 @@ msgstr[2] ""
 "Prosíme, vložte platné číslo s nejvíce %s ciframi za desetinnou čárkou "
 "celkem."
 
-#: core/validators.py:361
+#: core/validators.py:364
 #, python-format
 msgid "Make sure your uploaded file is at least %s bytes big."
 msgstr "Ujistěte se, že posílaný soubor je velký nejméně %s bytů."
 
-#: core/validators.py:362
+#: core/validators.py:365
 #, python-format
 msgid "Make sure your uploaded file is at most %s bytes big."
 msgstr "Ujistěte se, že posílaný soubor je velký nejvíce %s bytů."
 
-#: core/validators.py:375
+#: core/validators.py:378
 msgid "The format for this field is wrong."
 msgstr "Formát pro toto pole je špatný."
 
-#: core/validators.py:390
+#: core/validators.py:393
 msgid "This field is invalid."
 msgstr "Toto pole není platné."
 
-#: core/validators.py:425
+#: core/validators.py:428
 #, python-format
 msgid "Could not retrieve anything from %s."
 msgstr "Nemohl jsem získat nic z %s."
 
-#: core/validators.py:428
+#: core/validators.py:431
 #, python-format
 msgid ""
 "The URL %(url)s returned the invalid Content-Type header '%(contenttype)s'."
 msgstr "URL %(url)s vrátilo neplatnou hlavičku Content-Type '%(contenttype)s'."
 
-#: core/validators.py:461
+#: core/validators.py:464
 #, python-format
 msgid ""
 "Please close the unclosed %(tag)s tag from line %(line)s. (Line starts with "
@@ -971,7 +1008,7 @@ msgstr ""
 "Prosíme, zavřete nezavřenou značku %(tag)s z řádky %(line)s. (Řádka začíná s "
 "\"%(start)s\".)"
 
-#: core/validators.py:465
+#: core/validators.py:468
 #, python-format
 msgid ""
 "Some text starting on line %(line)s is not allowed in that context. (Line "
@@ -980,7 +1017,7 @@ msgstr ""
 "Nějaký text začínající na řádce %(line)s není povolen v tomto kontextu. "
 "(Řádka začíná s \"%(start)s\".)"
 
-#: core/validators.py:470
+#: core/validators.py:473
 #, python-format
 msgid ""
 "\"%(attr)s\" on line %(line)s is an invalid attribute. (Line starts with \"%"
@@ -989,7 +1026,7 @@ msgstr ""
 "\"%(attr)s\" na řádce %(line)s je neplatný atribut. (Řádka začíná s \"%"
 "(start)s\".)"
 
-#: core/validators.py:475
+#: core/validators.py:478
 #, python-format
 msgid ""
 "\"<%(tag)s>\" on line %(line)s is an invalid tag. (Line starts with \"%"
@@ -998,7 +1035,7 @@ msgstr ""
 "\"<%(tag)s>\" na řádce %(line)s je neplatná značka. (Řádka začíná s \"%"
 "(start)s\".)"
 
-#: core/validators.py:479
+#: core/validators.py:482
 #, python-format
 msgid ""
 "A tag on line %(line)s is missing one or more required attributes. (Line "
@@ -1007,7 +1044,7 @@ msgstr ""
 "Značce na řádce %(line)s schází jeden nebo více požadovaných atributů. "
 "(Řádka začíná s \"%(start)s\".)"
 
-#: core/validators.py:484
+#: core/validators.py:487
 #, python-format
 msgid ""
 "The \"%(attr)s\" attribute on line %(line)s has an invalid value. (Line "
@@ -1026,3 +1063,6 @@ msgid ""
 msgstr ""
 "Podržte  \"Control\", nebo \"Command\" na Macu pro vybrání více jak jedné "
 "položky."
+
+#~ msgid "Use an MD5 hash -- not the raw password."
+#~ msgstr "Použije se MD5 hash -- ne čisté heslo."

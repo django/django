@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2005-11-15 12:41-0600\n"
+"POT-Creation-Date: 2005-11-22 15:44-0600\n"
 "PO-Revision-Date: 2005-11-13 18:08-0000\n"
 "Last-Translator: Dagur Páll Ammendrup <dagurp@gmail.com>\n"
 "Language-Team:  <dagurp@gmail.com>\n"
@@ -510,6 +510,38 @@ msgstr "nóv."
 msgid "Dec."
 msgstr "des."
 
+#: utils/timesince.py:12
+msgid "year"
+msgid_plural "years"
+msgstr[0] ""
+msgstr[1] ""
+
+#: utils/timesince.py:13
+msgid "month"
+msgid_plural "months"
+msgstr[0] ""
+msgstr[1] ""
+
+#: utils/timesince.py:14
+#, fuzzy
+msgid "day"
+msgid_plural "days"
+msgstr[0] "maí"
+msgstr[1] "maí"
+
+#: utils/timesince.py:15
+msgid "hour"
+msgid_plural "hours"
+msgstr[0] ""
+msgstr[1] ""
+
+#: utils/timesince.py:16
+#, fuzzy
+msgid "minute"
+msgid_plural "minutes"
+msgstr[0] "vefur"
+msgstr[1] "vefur"
+
 #: models/core.py:7
 msgid "domain name"
 msgstr "lén"
@@ -615,8 +647,8 @@ msgid "password"
 msgstr "lykilorð"
 
 #: models/auth.py:37
-msgid "Use an MD5 hash -- not the raw password."
-msgstr "Notaðu MD5 hakk -- ekki hrátt lykilorðið"
+msgid "Use '[algo]$[salt]$[hexdigest]"
+msgstr ""
 
 #: models/auth.py:38
 msgid "staff status"
@@ -663,7 +695,7 @@ msgstr "Persónuupplýsingar"
 msgid "Important dates"
 msgstr "Mikilvægar dagsetningar"
 
-#: models/auth.py:195
+#: models/auth.py:216
 msgid "Message"
 msgstr "Skilaboð"
 
@@ -744,72 +776,72 @@ msgstr ""
 msgid "Simplified Chinese"
 msgstr "Einfölduð Kínverska "
 
-#: core/validators.py:59
+#: core/validators.py:62
 msgid "This value must contain only letters, numbers and underscores."
 msgstr "Þetta gildi má einungis innihalda stafi, tölur og undirstrik."
 
-#: core/validators.py:63
+#: core/validators.py:66
 msgid "This value must contain only letters, numbers, underscores and slashes."
 msgstr ""
 "Þetta gildi má einungis innihalda stafi, tölur, undirstrik og skástrik."
 
-#: core/validators.py:71
+#: core/validators.py:74
 msgid "Uppercase letters are not allowed here."
 msgstr "Hástafir eru ekki leyfðir hér."
 
-#: core/validators.py:75
+#: core/validators.py:78
 msgid "Lowercase letters are not allowed here."
 msgstr "Lágstafir eru ekki leyfðir hér."
 
-#: core/validators.py:82
+#: core/validators.py:85
 msgid "Enter only digits separated by commas."
 msgstr "Skrifaðu einungis tölur aðskildar með kommum."
 
-#: core/validators.py:94
+#: core/validators.py:97
 msgid "Enter valid e-mail addresses separated by commas."
 msgstr "Skrifaðu gild póstföng aðskilin með kommum."
 
-#: core/validators.py:98
+#: core/validators.py:101
 msgid "Please enter a valid IP address."
 msgstr "Vinsamlegast skrifaðu gilda IP tölu."
 
-#: core/validators.py:102
+#: core/validators.py:105
 msgid "Empty values are not allowed here."
 msgstr "Tóm gildi eru ekki leyfð hér."
 
-#: core/validators.py:106
+#: core/validators.py:109
 msgid "Non-numeric characters aren't allowed here."
 msgstr "Aðeins tölustafir eru leyfðir hér."
 
-#: core/validators.py:110
+#: core/validators.py:113
 msgid "This value can't be comprised solely of digits."
 msgstr "Þetta gildi verður að vera samsett úr fleiru en tölustöfum."
 
-#: core/validators.py:115
+#: core/validators.py:118
 msgid "Enter a whole number."
 msgstr "Settu inn heila tölu."
 
-#: core/validators.py:119
+#: core/validators.py:122
 msgid "Only alphabetical characters are allowed here."
 msgstr "Einungis bókstafir eru leyfðir hér."
 
-#: core/validators.py:123
+#: core/validators.py:126
 msgid "Enter a valid date in YYYY-MM-DD format."
 msgstr "Skrifaðu gilda dagsetningu á YYYY-MM-DD forminu."
 
-#: core/validators.py:127
+#: core/validators.py:130
 msgid "Enter a valid time in HH:MM format."
 msgstr "Skrifaðu gildan tíma á HH:MM forminu."
 
-#: core/validators.py:131
+#: core/validators.py:134
 msgid "Enter a valid date/time in YYYY-MM-DD HH:MM format."
 msgstr "Skrifaðu gilda dagsetningu/tíma á YYYY-MM-DD HH:MM forminu."
 
-#: core/validators.py:135
+#: core/validators.py:138
 msgid "Enter a valid e-mail address."
 msgstr "Skrifaðu gilt tölvupóstfang."
 
-#: core/validators.py:147
+#: core/validators.py:150
 msgid ""
 "Upload a valid image. The file you uploaded was either not an image or a "
 "corrupted image."
@@ -817,26 +849,26 @@ msgstr ""
 "Hladdu upp gilda myndskrá. Skráin sem þú hlóðst upp var annað hvort ekki "
 "mynd eða gölluð mynd."
 
-#: core/validators.py:154
+#: core/validators.py:157
 #, python-format
 msgid "The URL %s does not point to a valid image."
 msgstr "Veffangið %s bendir ekki á gilda mynd."
 
-#: core/validators.py:158
+#: core/validators.py:161
 #, python-format
 msgid "Phone numbers must be in XXX-XXX-XXXX format. \"%s\" is invalid."
 msgstr "Símanúmer verða að vera á XXX-XXX-XXXX forminu. \"%s\" er ógilt."
 
-#: core/validators.py:166
+#: core/validators.py:169
 #, python-format
 msgid "The URL %s does not point to a valid QuickTime video."
 msgstr "Veffangið %s bendir ekki á gilt QuickTime myndskeið."
 
-#: core/validators.py:170
+#: core/validators.py:173
 msgid "A valid URL is required."
 msgstr "Gilds veffangs er krafist"
 
-#: core/validators.py:184
+#: core/validators.py:187
 #, python-format
 msgid ""
 "Valid HTML is required. Specific errors are:\n"
@@ -845,69 +877,69 @@ msgstr ""
 "Gilt HTML er nauðsynlegt. Sérstakar villur:\n"
 "%s"
 
-#: core/validators.py:191
+#: core/validators.py:194
 #, python-format
 msgid "Badly formed XML: %s"
 msgstr "Illa formað XML: %s"
 
-#: core/validators.py:201
+#: core/validators.py:204
 #, python-format
 msgid "Invalid URL: %s"
 msgstr "Ógilt veffang: %s"
 
-#: core/validators.py:205 core/validators.py:207
+#: core/validators.py:208 core/validators.py:210
 #, python-format
 msgid "The URL %s is a broken link."
 msgstr "Veffangið %s er brotinn hlekkur."
 
-#: core/validators.py:213
+#: core/validators.py:216
 msgid "Enter a valid U.S. state abbreviation."
 msgstr "Skrifaðu gilda styttingu á bandarísku fylkisnafni."
 
-#: core/validators.py:228
+#: core/validators.py:231
 #, python-format
 msgid "Watch your mouth! The word %s is not allowed here."
 msgid_plural "Watch your mouth! The words %s are not allowed here."
 msgstr[0] "Passaðu orðbragðið! Orðið %s er ekki leyft hér."
 msgstr[1] "Passaðu orðbragðið! Orðin %s eru ekki leyfð hér."
 
-#: core/validators.py:235
+#: core/validators.py:238
 #, python-format
 msgid "This field must match the '%s' field."
 msgstr "Þessi reitur verður að passa við '%s' reitinn."
 
-#: core/validators.py:254
+#: core/validators.py:257
 msgid "Please enter something for at least one field."
 msgstr "Vinsamlegast fylltu út einn reit að minnsta kosti."
 
-#: core/validators.py:263 core/validators.py:274
+#: core/validators.py:266 core/validators.py:277
 msgid "Please enter both fields or leave them both empty."
 msgstr "Vinsamlegast fylltu út í báða reitina eða skildu þá eftir tóma."
 
-#: core/validators.py:281
+#: core/validators.py:284
 #, python-format
 msgid "This field must be given if %(field)s is %(value)s"
 msgstr "Þessi reitur á að vera óútfylltur ef %(field)s er %(value)s"
 
-#: core/validators.py:293
+#: core/validators.py:296
 #, python-format
 msgid "This field must be given if %(field)s is not %(value)s"
 msgstr "Þessi reitur verður að vera útfylltur ef %(field)s er ekki %(value)s"
 
-#: core/validators.py:312
+#: core/validators.py:315
 msgid "Duplicate values are not allowed."
 msgstr "Endurtekin gildi eru ekki leyfð."
 
-#: core/validators.py:335
+#: core/validators.py:338
 #, python-format
 msgid "This value must be a power of %s."
 msgstr "Þessi reitur verður að vera veldi af %s."
 
-#: core/validators.py:346
+#: core/validators.py:349
 msgid "Please enter a valid decimal number."
 msgstr "Vinsamlegast settu inn gilda tugatölu."
 
-#: core/validators.py:348
+#: core/validators.py:351
 #, python-format
 msgid "Please enter a valid decimal number with at most %s total digit."
 msgid_plural ""
@@ -915,7 +947,7 @@ msgid_plural ""
 msgstr[0] "Vinsamlegast skrifaðu gilda tugatölu með %s tugastaf í mesta lagi."
 msgstr[1] "Vinsamlegast skrifaðu gilda tugatölu með %s tugastafi í mesta lagi."
 
-#: core/validators.py:351
+#: core/validators.py:354
 #, python-format
 msgid "Please enter a valid decimal number with at most %s decimal place."
 msgid_plural ""
@@ -923,38 +955,38 @@ msgid_plural ""
 msgstr[0] "Vinsamlegast skrifaðu gilda tugatölu með %s tugasæti í mesta lagi."
 msgstr[1] "Vinsamlegast skrifaðu gilda tugatölu með %s tugasæti í mesta lagi."
 
-#: core/validators.py:361
+#: core/validators.py:364
 #, python-format
 msgid "Make sure your uploaded file is at least %s bytes big."
 msgstr ""
 "Gakktu úr skugga um að upphlaðin skrá sé að minnsta kosti %s bæti að stærð."
 
-#: core/validators.py:362
+#: core/validators.py:365
 #, python-format
 msgid "Make sure your uploaded file is at most %s bytes big."
 msgstr ""
 "Gakktu úr skugga um að upphlaðin skrá sé í mesta lagi %s bæti að stærð."
 
-#: core/validators.py:375
+#: core/validators.py:378
 msgid "The format for this field is wrong."
 msgstr "Sniðið á þessum reit í rangt."
 
-#: core/validators.py:390
+#: core/validators.py:393
 msgid "This field is invalid."
 msgstr "Þessi reitur er ótækur."
 
-#: core/validators.py:425
+#: core/validators.py:428
 #, python-format
 msgid "Could not retrieve anything from %s."
 msgstr "Gat engu náð úr %s."
 
-#: core/validators.py:428
+#: core/validators.py:431
 #, python-format
 msgid ""
 "The URL %(url)s returned the invalid Content-Type header '%(contenttype)s'."
 msgstr "Veffangið %(url)s skilaði ótæka efnistagishausnum '%(contenttype)s'."
 
-#: core/validators.py:461
+#: core/validators.py:464
 #, python-format
 msgid ""
 "Please close the unclosed %(tag)s tag from line %(line)s. (Line starts with "
@@ -963,7 +995,7 @@ msgstr ""
 "Vinsamlegast lokaðu opna %(tag)s taginu sem byrjar á línu %(line)s (línan "
 "hefst á \"%(start)s\")."
 
-#: core/validators.py:465
+#: core/validators.py:468
 #, python-format
 msgid ""
 "Some text starting on line %(line)s is not allowed in that context. (Line "
@@ -972,7 +1004,7 @@ msgstr ""
 "Texti sem hefst á línu %(line)s er ekki leyfður í því samhengi. (Line starts "
 "with \"%(start)s\".)"
 
-#: core/validators.py:470
+#: core/validators.py:473
 #, python-format
 msgid ""
 "\"%(attr)s\" on line %(line)s is an invalid attribute. (Line starts with \"%"
@@ -980,7 +1012,7 @@ msgid ""
 msgstr ""
 "\"%(attr)s\" á línu %(line)s er ótækt eigindi (línan hefst á \"%(start)s\")."
 
-#: core/validators.py:475
+#: core/validators.py:478
 #, python-format
 msgid ""
 "\"<%(tag)s>\" on line %(line)s is an invalid tag. (Line starts with \"%"
@@ -988,7 +1020,7 @@ msgid ""
 msgstr ""
 "\"<%(tag)s>\" á línu %(line)s er ótækt tag (línan hefst á \"%(start)s\"."
 
-#: core/validators.py:479
+#: core/validators.py:482
 #, python-format
 msgid ""
 "A tag on line %(line)s is missing one or more required attributes. (Line "
@@ -997,7 +1029,7 @@ msgstr ""
 "Tag á línu %(line)s vantar eitt eða fleiri nauðsynleg eigindi (línan hefst á "
 "\"%(start)s\")."
 
-#: core/validators.py:484
+#: core/validators.py:487
 #, python-format
 msgid ""
 "The \"%(attr)s\" attribute on line %(line)s has an invalid value. (Line "
@@ -1016,3 +1048,6 @@ msgid ""
 msgstr ""
 "Haltu niðri \"Control\", eða \"Command\" á Mac til þess að velja fleira en "
 "eitt."
+
+#~ msgid "Use an MD5 hash -- not the raw password."
+#~ msgstr "Notaðu MD5 hakk -- ekki hrátt lykilorðið"

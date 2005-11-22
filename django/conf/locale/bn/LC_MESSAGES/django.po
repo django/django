@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django CVS\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2005-11-15 12:41-0600\n"
+"POT-Creation-Date: 2005-11-22 15:44-0600\n"
 "PO-Revision-Date: 2005-11-12 20:05+0530\n"
 "Last-Translator: Baishampayan Ghose <b.ghose@gnu.org.in>\n"
 "Language-Team: Ankur Bangla <core@bengalinux.org>\n"
@@ -507,6 +507,38 @@ msgstr "নভে."
 msgid "Dec."
 msgstr "ডিসে."
 
+#: utils/timesince.py:12
+msgid "year"
+msgid_plural "years"
+msgstr[0] ""
+msgstr[1] ""
+
+#: utils/timesince.py:13
+msgid "month"
+msgid_plural "months"
+msgstr[0] ""
+msgstr[1] ""
+
+#: utils/timesince.py:14
+#, fuzzy
+msgid "day"
+msgid_plural "days"
+msgstr[0] "মে"
+msgstr[1] "মে"
+
+#: utils/timesince.py:15
+msgid "hour"
+msgid_plural "hours"
+msgstr[0] ""
+msgstr[1] ""
+
+#: utils/timesince.py:16
+#, fuzzy
+msgid "minute"
+msgid_plural "minutes"
+msgstr[0] "স্থান"
+msgstr[1] "স্থান"
+
 #: models/core.py:7
 msgid "domain name"
 msgstr "ক্ষেত্র নাম"
@@ -612,8 +644,8 @@ msgid "password"
 msgstr "পাসওয়ার্ড"
 
 #: models/auth.py:37
-msgid "Use an MD5 hash -- not the raw password."
-msgstr "একটি MD5 হ্যাশ ব্যাবহার করুন -- পরিস্কার পাসওয়ার্ড না যেন।"
+msgid "Use '[algo]$[salt]$[hexdigest]"
+msgstr ""
 
 #: models/auth.py:38
 msgid "staff status"
@@ -658,7 +690,7 @@ msgstr "ব্যক্তিগত তথ্য"
 msgid "Important dates"
 msgstr "গুরুত্বপূর্ণ তারিখ"
 
-#: models/auth.py:195
+#: models/auth.py:216
 msgid "Message"
 msgstr "বার্তা"
 
@@ -739,71 +771,71 @@ msgstr ""
 msgid "Simplified Chinese"
 msgstr "সরলীকৃত চীনা"
 
-#: core/validators.py:59
+#: core/validators.py:62
 msgid "This value must contain only letters, numbers and underscores."
 msgstr "এই মানটি শুধু মাত্র অক্ষর, অংক, এবং আন্ডারস্কোর (_) হতে পারবে।"
 
-#: core/validators.py:63
+#: core/validators.py:66
 msgid "This value must contain only letters, numbers, underscores and slashes."
 msgstr "এই মানটি শুধু মাত্র অক্ষর, অংক, আন্ডারস্কোর (_) এবং স্ল্যাশ হতে পারবে।"
 
-#: core/validators.py:71
+#: core/validators.py:74
 msgid "Uppercase letters are not allowed here."
 msgstr "বড় হাতের অক্ষর এখানে ঢোকাতে পারবেন না।"
 
-#: core/validators.py:75
+#: core/validators.py:78
 msgid "Lowercase letters are not allowed here."
 msgstr "ছোটহাতের অক্ষর এখানে ঢোকাতে পারবেন না।"
 
-#: core/validators.py:82
+#: core/validators.py:85
 msgid "Enter only digits separated by commas."
 msgstr "কমা দ্বারা আলাদা করে শুধু মাত্র অংক ঢোকান।"
 
-#: core/validators.py:94
+#: core/validators.py:97
 msgid "Enter valid e-mail addresses separated by commas."
 msgstr "কমা দ্বারা আলাদা করে বৈধ ই-মেল ঠিকানা ঢোকান।"
 
-#: core/validators.py:98
+#: core/validators.py:101
 msgid "Please enter a valid IP address."
 msgstr "দয়া করে একটি বৈধ IP ঠিকানা ঢোকান।"
 
-#: core/validators.py:102
+#: core/validators.py:105
 msgid "Empty values are not allowed here."
 msgstr "ফাঁকা মান এখানে ঢোকাতে পারবেন না।"
 
-#: core/validators.py:106
+#: core/validators.py:109
 msgid "Non-numeric characters aren't allowed here."
 msgstr "অংক বিহীন অক্ষর এখানে ঢোকাতে পারবেন না।"
 
-#: core/validators.py:110
+#: core/validators.py:113
 msgid "This value can't be comprised solely of digits."
 msgstr "এই মানটি শুধু মাত্র অংকের দ্বারা গঠিত  হতে পারে না।"
 
-#: core/validators.py:115
+#: core/validators.py:118
 msgid "Enter a whole number."
 msgstr "একটি গোটা সংখ্যা ঢোকান।"
 
-#: core/validators.py:119
+#: core/validators.py:122
 msgid "Only alphabetical characters are allowed here."
 msgstr "এখানে শুধু মাত্র অক্ষর ঢোকাতে পারবেন ।"
 
-#: core/validators.py:123
+#: core/validators.py:126
 msgid "Enter a valid date in YYYY-MM-DD format."
 msgstr "YYYY-MM-DD ফরম্যাটে একটি বৈধ তারিখ ঢোকান।"
 
-#: core/validators.py:127
+#: core/validators.py:130
 msgid "Enter a valid time in HH:MM format."
 msgstr "HH:MM ফরম্যাটে একটি বৈধ সময় ঢোকান।"
 
-#: core/validators.py:131
+#: core/validators.py:134
 msgid "Enter a valid date/time in YYYY-MM-DD HH:MM format."
 msgstr "YYYY-MM-DD.HH:MM ফরম্যাটে একটি বৈধ তারিখ/সময় ঢোকান।"
 
-#: core/validators.py:135
+#: core/validators.py:138
 msgid "Enter a valid e-mail address."
 msgstr "একটি বৈধ ই-মেল ঠিকানা ঢোকান।"
 
-#: core/validators.py:147
+#: core/validators.py:150
 msgid ""
 "Upload a valid image. The file you uploaded was either not an image or a "
 "corrupted image."
@@ -811,26 +843,26 @@ msgstr ""
 "একটি বৈধ চিত্র আপলোড করুন। যে ফাইল আপনি আপলোড করলেন তা হয় একটি চিত্র নয় অথবা "
 "একটি খারাপ চিত্র।"
 
-#: core/validators.py:154
+#: core/validators.py:157
 #, python-format
 msgid "The URL %s does not point to a valid image."
 msgstr "%s ইউ.আর.এল-এ একটি বৈধ চিত্র নেই।"
 
-#: core/validators.py:158
+#: core/validators.py:161
 #, python-format
 msgid "Phone numbers must be in XXX-XXX-XXXX format. \"%s\" is invalid."
 msgstr "ফোন নম্বর XXX-XXX-XXXX ফরম্যাটে অবশ্যই হতে হবে। \"%s\" অবৈধ।"
 
-#: core/validators.py:166
+#: core/validators.py:169
 #, python-format
 msgid "The URL %s does not point to a valid QuickTime video."
 msgstr "%s ইউ.আর.এল-এ একটি বৈধ QuickTime ভিডিও পাওয়া গেল না।"
 
-#: core/validators.py:170
+#: core/validators.py:173
 msgid "A valid URL is required."
 msgstr "একটি বৈধ ইউ.আর.এল জরুরি।"
 
-#: core/validators.py:184
+#: core/validators.py:187
 #, python-format
 msgid ""
 "Valid HTML is required. Specific errors are:\n"
@@ -839,69 +871,69 @@ msgstr ""
 "বৈধ এইচটিএমএল প্রয়োজনীয়। ত্রুটিগুল হল:\n"
 "%s"
 
-#: core/validators.py:191
+#: core/validators.py:194
 #, python-format
 msgid "Badly formed XML: %s"
 msgstr "খারাপভাবে গঠিত এক্সএমএল: %s"
 
-#: core/validators.py:201
+#: core/validators.py:204
 #, python-format
 msgid "Invalid URL: %s"
 msgstr "অবৈধ ইউ.আর.এল: %s"
 
-#: core/validators.py:205 core/validators.py:207
+#: core/validators.py:208 core/validators.py:210
 #, python-format
 msgid "The URL %s is a broken link."
 msgstr "ইউ.আর.এল %s একটি ভাঙা সংযোগ।"
 
-#: core/validators.py:213
+#: core/validators.py:216
 msgid "Enter a valid U.S. state abbreviation."
 msgstr "একটি বৈধ U S. রাজ্য abbreviation ঢোকান।"
 
-#: core/validators.py:228
+#: core/validators.py:231
 #, python-format
 msgid "Watch your mouth! The word %s is not allowed here."
 msgid_plural "Watch your mouth! The words %s are not allowed here."
 msgstr[0] "মুখ সামলে! %s এখানে ব্যাবহার করতে পারবেন না।"
 msgstr[1] "মুখ সামলে! %s এখানে ব্যাবহার করতে পারবেন না।"
 
-#: core/validators.py:235
+#: core/validators.py:238
 #, python-format
 msgid "This field must match the '%s' field."
 msgstr "এই ক্ষেত্রটি '%s' ক্ষেত্রের সঙ্গে অবশ্যই মিলতে হবে।"
 
-#: core/validators.py:254
+#: core/validators.py:257
 msgid "Please enter something for at least one field."
 msgstr "দয়া করে অন্তত এক ক্ষেত্রেতে কিছু জিনিষ ঢোকান।"
 
-#: core/validators.py:263 core/validators.py:274
+#: core/validators.py:266 core/validators.py:277
 msgid "Please enter both fields or leave them both empty."
 msgstr "দয়া করে উভয় ক্ষেত্রে ঢোকান অথবা তাদেরকে উভয় ফাঁকা ছেড়ে চলে যান।"
 
-#: core/validators.py:281
+#: core/validators.py:284
 #, python-format
 msgid "This field must be given if %(field)s is %(value)s"
 msgstr "এই ক্ষেত্রেটি অবশ্যই দেওয়া হবে যদি %(field)s %(value)s হয়"
 
-#: core/validators.py:293
+#: core/validators.py:296
 #, python-format
 msgid "This field must be given if %(field)s is not %(value)s"
 msgstr "এই ক্ষেত্রেটি অবশ্যই দেওয়া হবে যদি %(field)s %(value)s না হয়"
 
-#: core/validators.py:312
+#: core/validators.py:315
 msgid "Duplicate values are not allowed."
 msgstr "নকল মান অনুমতি দেওয়া হল না।"
 
-#: core/validators.py:335
+#: core/validators.py:338
 #, python-format
 msgid "This value must be a power of %s."
 msgstr "এই মানটি %sএর একটি গুন অবশ্যই হতে হবে।"
 
-#: core/validators.py:346
+#: core/validators.py:349
 msgid "Please enter a valid decimal number."
 msgstr "দয়া করে একটি বৈধ দশমিক সংখ্যা ঢোকান।"
 
-#: core/validators.py:348
+#: core/validators.py:351
 #, python-format
 msgid "Please enter a valid decimal number with at most %s total digit."
 msgid_plural ""
@@ -909,7 +941,7 @@ msgid_plural ""
 msgstr[0] "দয়া করে একটি বৈধ দশমিক সংখ্যা ঢোকান যার অক্ষরের সংখ্যা %s থেকে কম হবে।"
 msgstr[1] "দয়া করে একটি বৈধ দশমিক সংখ্যা ঢোকান যার অক্ষরের সংখ্যা %s থেকে কম হবে।"
 
-#: core/validators.py:351
+#: core/validators.py:354
 #, python-format
 msgid "Please enter a valid decimal number with at most %s decimal place."
 msgid_plural ""
@@ -917,37 +949,37 @@ msgid_plural ""
 msgstr[0] "দয়া করে একটি বৈধ দশমিক সংখ্যা ঢোকান যার দশমিক স্থান %s থেকে কম হবে।"
 msgstr[1] "দয়া করে একটি বৈধ দশমিক সংখ্যা ঢোকান যার দশমিক স্থান %s থেকে কম হবে।"
 
-#: core/validators.py:361
+#: core/validators.py:364
 #, python-format
 msgid "Make sure your uploaded file is at least %s bytes big."
 msgstr "আাপনার আপলোড করা ফাইল যেন অন্তত %s বাইট বড় হয় তা নিশ্চিত করুন।"
 
-#: core/validators.py:362
+#: core/validators.py:365
 #, python-format
 msgid "Make sure your uploaded file is at most %s bytes big."
 msgstr "আাপনার আপলোড করা ফাইল যেন %s বাইটের থেকে বড় না হয় তা নিশ্চিত করুন।"
 
-#: core/validators.py:375
+#: core/validators.py:378
 msgid "The format for this field is wrong."
 msgstr "এই ক্ষেত্রের জন্য ফরম্যাটটি ভূল।"
 
-#: core/validators.py:390
+#: core/validators.py:393
 msgid "This field is invalid."
 msgstr "এই ক্ষেত্রেটি অবৈধ।"
 
-#: core/validators.py:425
+#: core/validators.py:428
 #, python-format
 msgid "Could not retrieve anything from %s."
 msgstr "%s থেকে কোন কিছু গ্রহন করতে পারলাম না।"
 
-#: core/validators.py:428
+#: core/validators.py:431
 #, python-format
 msgid ""
 "The URL %(url)s returned the invalid Content-Type header '%(contenttype)s'."
 msgstr ""
 "ইউ.আর.এল %(url)s অবৈধ Content-Type শিরোনাম নিয়ে '%(contenttype)s ফিরে আসল।"
 
-#: core/validators.py:461
+#: core/validators.py:464
 #, python-format
 msgid ""
 "Please close the unclosed %(tag)s tag from line %(line)s. (Line starts with "
@@ -956,7 +988,7 @@ msgstr ""
 "দয়া করে লাইন %(line)s থেকে খোলা %(tag)s বন্ধ করুন। (\"%(start)s\"এর সঙ্গে লাইন "
 "আরম্ভ।)"
 
-#: core/validators.py:465
+#: core/validators.py:468
 #, python-format
 msgid ""
 "Some text starting on line %(line)s is not allowed in that context. (Line "
@@ -965,7 +997,7 @@ msgstr ""
 "লাইন %(line)s এই প্রসঙ্গে কিছু শব্দ লেখার অনুমতি দেওয়া গেল না। (\"%(start)s\"এর "
 "সঙ্গে লাইন আরম্ভ।)"
 
-#: core/validators.py:470
+#: core/validators.py:473
 #, python-format
 msgid ""
 "\"%(attr)s\" on line %(line)s is an invalid attribute. (Line starts with \"%"
@@ -973,7 +1005,7 @@ msgid ""
 msgstr ""
 "লাইন %(line)s\"%(attr)s\"একটি অবৈধ বৈশিষ্ট্য। (\"%(start)s\"এর সঙ্গে লাইন আরম্ভ।)"
 
-#: core/validators.py:475
+#: core/validators.py:478
 #, python-format
 msgid ""
 "\"<%(tag)s>\" on line %(line)s is an invalid tag. (Line starts with \"%"
@@ -982,7 +1014,7 @@ msgstr ""
 " %(line)s লাইনে \"<%(tag)s>\" একটি অবৈধ ট্যাগ। (\"%(start)s\"এর সঙ্গে লাইন "
 "আরম্ভ।)"
 
-#: core/validators.py:479
+#: core/validators.py:482
 #, python-format
 msgid ""
 "A tag on line %(line)s is missing one or more required attributes. (Line "
@@ -991,7 +1023,7 @@ msgstr ""
 "লাইন %(line)s একটি ট্যাগে এক অথবা আরও বেশি প্রয়োজনীয় বিশিষ্ট্যাবলী নেই। (\"%"
 "(start)s\"এর সঙ্গে লাইন আরম্ভ।)"
 
-#: core/validators.py:484
+#: core/validators.py:487
 #, python-format
 msgid ""
 "The \"%(attr)s\" attribute on line %(line)s has an invalid value. (Line "
@@ -1010,3 +1042,6 @@ msgid ""
 msgstr ""
 "একের চেয়ে বেশি নির্বাচন করতে \"Control\" অথবা ম্যাক-এ \"Command\" চেপে ধরে "
 "রাখুন।"
+
+#~ msgid "Use an MD5 hash -- not the raw password."
+#~ msgstr "একটি MD5 হ্যাশ ব্যাবহার করুন -- পরিস্কার পাসওয়ার্ড না যেন।"
