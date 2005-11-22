@@ -186,14 +186,14 @@ def do_extends(parser, token):
 
     This tag may be used in two ways: ``{% extends "base" %}`` (with quotes)
     uses the literal value "base" as the name of the parent template to extend,
-    or ``{% entends variable %}`` uses the value of ``variable`` as the name
+    or ``{% extends variable %}`` uses the value of ``variable`` as the name
     of the parent template to extend.
     """
     bits = token.contents.split()
     if len(bits) != 2:
         raise TemplateSyntaxError, "'%s' takes one argument" % bits[0]
     parent_name, parent_name_var = None, None
-    if (bits[1].startswith('"') and bits[1].endswith('"')) or (bits[1].startswith("'") and bits[1].endswith("'")):
+    if bits[1][0] in ('"', "'") and bits[1][-1] == bits[1][0]:
         parent_name = bits[1][1:-1]
     else:
         parent_name_var = bits[1]
