@@ -260,6 +260,8 @@ def do_include(parser, token):
     Example::
 
         {% include "foo/some_include" %}
+    """
+
     bits = token.contents.split()
     if len(bits) != 2:
         raise TemplateSyntaxError, "%r tag takes one argument: the name of the template to be included" % bits[0]
