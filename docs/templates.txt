@@ -770,8 +770,12 @@ Replaces ampersands with ``&amp;`` entities.
 floatformat
 ~~~~~~~~~~~
 
-Displays a floating point number as 34.2 (with one decimal places) -- but only
-if there's a point to be displayed.
+Rounds a floating-point number to one decimal place -- but only if there's a
+decimal part to be displayed. For example:
+
+    * ``36.123`` gets converted to ``36.123``
+    * ``36.15`` gets converted to ``36.2``
+    * ``36`` gets converted to ``36``
 
 get_digit
 ~~~~~~~~~
