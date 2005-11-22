@@ -768,6 +768,7 @@ fix_ampersands
 Replaces ampersands with ``&amp;`` entities.
 
 floatformat
+~~~~~~~~~~~
 
 Displays a floating point number as 34.2 (with one decimal places) -- but only
 if there's a point to be displayed.
