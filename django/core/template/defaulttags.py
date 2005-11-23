@@ -192,7 +192,7 @@ class RegroupNode(Node):
         for obj in obj_list:
             grouper = resolve_variable_with_filters('var.%s' % self.expression, \
                 Context({'var': obj}))
-            #TODO: Is this a sensible way to determine equality? 
+            # TODO: Is this a sensible way to determine equality?
             if output and repr(output[-1]['grouper']) == repr(grouper):
                 output[-1]['list'].append(obj)
             else:

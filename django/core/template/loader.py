@@ -7,9 +7,10 @@
 #
 # name is the template name.
 # dirs is an optional list of directories to search instead of TEMPLATE_DIRS.
+#
 # The loader should return a tuple of (template_source, path). The path returned
-# will be shown to the user for debugging purposes, so it should identify where the template 
-# was loaded from.  
+# might be shown to the user for debugging purposes, so it should identify where
+# the template was loaded from.
 #
 # Each loader should have an "is_usable" attribute set. This is a boolean that
 # specifies whether the loader can be used in this Python installation. Each
@@ -45,7 +46,7 @@ class LoaderOrigin(Origin):
     def __init__(self, display_name, loader, name, dirs):
         super(LoaderOrigin, self).__init__(display_name)
         self.loader, self.loadname, self.dirs = loader, name, dirs
-    
+
     def reload(self):
         return self.loader(self.loadname, self.dirs)[0]
 
@@ -89,7 +90,7 @@ def render_to_string(template_name, dictionary=None, context_instance=None):
     Loads the given template_name and renders it with the given dictionary as
     context. The template_name may be a string to load a single template using
     get_template, or it may be a tuple to use select_template to find one of
-    the templates in the list.  Returns a string. 
+    the templates in the list. Returns a string.
     """
     dictionary = dictionary or {}
     if isinstance(template_name, (list, tuple)):
@@ -99,7 +100,7 @@ def render_to_string(template_name, dictionary=None, context_instance=None):
     if context_instance:
         context_instance.update(dictionary)
     else:
-        context_instance = Context(dictionary) 
+        context_instance = Context(dictionary)
     return t.render(context_instance)
 
 def select_template(template_name_list):
@@ -185,26 +186,26 @@ class ConstantIncludeNode(Node):
     def __init__(self, template_path):
         try:
             t = get_template(template_path)
-            self.nodelist = t.nodelist
+            self.template = t
         except Exception, e:
             if TEMPLATE_DEBUG:
                 raise
-            self.nodelist = None
+            self.template = None
 
     def render(self, context):
-        if self.nodelist:
-            return self.nodelist.render(context)
+        if self.template:
+            return self.template.render(context)
         else:
             return ''
 
 class IncludeNode(Node):
-    def __init__(self, template_path_var):
-        self.template_path_var = template_path_var
+    def __init__(self, template_name):
+        self.template_name = template_name
 
     def render(self, context):
          try:
-             template_path = resolve_variable(self.template_path_var, context)
-             t = get_template(template_path)
+             template_name = resolve_variable(self.template_name, context)
+             t = get_template(template_name)
              return t.render(context)
          except Exception, e:
              if TEMPLATE_DEBUG:

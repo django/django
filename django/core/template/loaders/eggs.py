@@ -18,7 +18,7 @@ def load_template_source(template_name, template_dirs=None):
         pkg_name = 'templates/' + template_name + TEMPLATE_FILE_EXTENSION
         for app in INSTALLED_APPS:
             try:
-                return (resource_string(app, pkg_name), 'egg:%s:%s ' % (app, pkg_name)) 
+                return (resource_string(app, pkg_name), 'egg:%s:%s ' % (app, pkg_name))
             except:
                 pass
     raise TemplateDoesNotExist, template_name

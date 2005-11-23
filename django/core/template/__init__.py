@@ -74,7 +74,8 @@ VARIABLE_TAG_END = '}}'
 
 ALLOWED_VARIABLE_CHARS = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_.'
 
-#What to report as the origin of templates that come from non loader sources (ie strings)
+# what to report as the origin for templates that come from non-loader sources
+# (e.g. strings)
 UNKNOWN_SOURCE="<unknown source>"
 
 # match a variable or block tag and capture the entire tag, including start/end delimiters
@@ -107,7 +108,7 @@ class SilentVariableFailure(Exception):
 class Origin(object):
     def __init__(self, name):
         self.name = name
-        
+
     def reload(self):
         raise NotImplementedException
 
@@ -118,7 +119,7 @@ class StringOrigin(Origin):
     def __init__(self, source):
         super(StringOrigin, self).__init__(UNKNOWN_SOURCE)
         self.source = source
-    
+
     def reload(self):
         return self.source
 
@@ -127,9 +128,10 @@ class Template:
         "Compilation stage"
         if TEMPLATE_DEBUG and origin == None:
             origin = StringOrigin(template_string)
-            #Could do some crazy stack frame stuff to record where this string came from...
+            # Could do some crazy stack-frame stuff to record where this string
+            # came from...
         self.nodelist = compile_string(template_string, origin)
-       
+
     def __iter__(self):
         for node in self.nodelist:
             for subnode in node:
@@ -140,7 +142,7 @@ class Template:
         return self.nodelist.render(context)
 
 def compile_string(template_string, origin):
-    "Compiles template_string into NodeList ready for rendering"     
+    "Compiles template_string into NodeList ready for rendering"
     lexer = lexer_factory(template_string, origin)
     parser = parser_factory(lexer.tokenize())
     return parser.parse()
@@ -186,7 +188,7 @@ class Context:
             if dict.has_key(key):
                 return True
         return False
-    
+
     def get(self, key, otherwise):
         for dict in self.dicts:
             if dict.has_key(key):
@@ -204,13 +206,13 @@ class Token:
 
     def __str__(self):
         return '<%s token: "%s...">' % (
-            {TOKEN_TEXT:'Text', TOKEN_VAR:'Var', TOKEN_BLOCK:'Block'}[self.token_type],
+            {TOKEN_TEXT: 'Text', TOKEN_VAR: 'Var', TOKEN_BLOCK: 'Block'}[self.token_type],
             self.contents[:20].replace('\n', '')
             )
-            
+
     def __repr__(self):
         return '<%s token: "%s">' % (
-            {TOKEN_TEXT:'Text', TOKEN_VAR:'Var', TOKEN_BLOCK:'Block'}[self.token_type],
+            {TOKEN_TEXT: 'Text', TOKEN_VAR: 'Var', TOKEN_BLOCK: 'Block'}[self.token_type],
             self.contents[:].replace('\n', '')
             )
 
@@ -218,13 +220,13 @@ class Lexer(object):
     def __init__(self, template_string, origin):
         self.template_string = template_string
         self.origin = origin
-    
+
     def tokenize(self):
         "Return a list of tokens from a given template_string"
         # remove all empty strings, because the regex has a tendency to add them
         bits = filter(None, tag_re.split(self.template_string))
         return map(self.create_token, bits)
-        
+
     def create_token(self,token_string):
         "Convert the given token string into a new Token object and return it"
         if token_string.startswith(VARIABLE_TAG_START):
@@ -233,26 +235,26 @@ class Lexer(object):
             token = Token(TOKEN_BLOCK, token_string[len(BLOCK_TAG_START):-len(BLOCK_TAG_END)].strip())
         else:
             token = Token(TOKEN_TEXT, token_string)
-        return token 
+        return token
 
 class DebugLexer(Lexer):
     def __init__(self, template_string, origin):
-        super(DebugLexer,self).__init__(template_string, origin)
+        super(DebugLexer, self).__init__(template_string, origin)
 
     def tokenize(self):
         "Return a list of tokens from a given template_string"
         token_tups, upto = [], 0
         for match in tag_re.finditer(self.template_string):
             start, end = match.span()
-            if start > upto:       
-                token_tups.append( (self.template_string[upto:start], (upto, start) ) )
+            if start > upto:
+                token_tups.append( (self.template_string[upto:start], (upto, start)) )
                 upto = start
-            token_tups.append( (self.template_string[start:end], (start,end) ) )
+            token_tups.append( (self.template_string[start:end], (start,end)) )
             upto = end
         last_bit = self.template_string[upto:]
         if last_bit:
-           token_tups.append( (last_bit, (upto, upto + len(last_bit) ) ) )
-        return [ self.create_token(tok, (self.origin, loc)) for tok, loc in token_tups]
+           token_tups.append( (last_bit, (upto, upto + len(last_bit))) )
+        return [self.create_token(tok, (self.origin, loc)) for tok, loc in token_tups]
 
     def create_token(self, token_string, source):
         token = super(DebugLexer, self).create_token(token_string)
@@ -288,7 +290,7 @@ class Parser(object):
                 try:
                     compile_func = registered_tags[command]
                 except KeyError:
-                    self.invalid_block_tag(token, command) 
+                    self.invalid_block_tag(token, command)
                 try:
                     compiled_result = compile_func(self, token)
                 except TemplateSyntaxError, e:
@@ -305,13 +307,13 @@ class Parser(object):
 
     def create_nodelist(self):
         return NodeList()
-    
+
     def extend_nodelist(self, nodelist, node, token):
         nodelist.append(node)
 
     def enter_command(self, command, token):
         pass
-        
+
     def exit_command(self):
         pass
 
@@ -320,19 +322,19 @@ class Parser(object):
 
     def empty_variable(self, token):
         raise self.error( token, "Empty variable tag")
-    
+
     def empty_block_tag(self, token):
         raise self.error( token, "Empty block tag")
-    
+
     def invalid_block_tag(self, token, command):
         raise self.error( token, "Invalid block tag: '%s'" % command)
-    
+
     def unclosed_block_tag(self, parse_until):
         raise self.error(None, "Unclosed tags: %s " %  ', '.join(parse_until))
 
     def compile_function_error(self, token, e):
         pass
-        
+
     def next_token(self):
         return self.tokens.pop(0)
 
@@ -341,7 +343,7 @@ class Parser(object):
 
     def delete_first_token(self):
         del self.tokens[0]
-    
+
 class DebugParser(Parser):
     def __init__(self, lexer):
         super(DebugParser, self).__init__(lexer)
@@ -349,7 +351,7 @@ class DebugParser(Parser):
 
     def enter_command(self, command, token):
         self.command_stack.append( (command, token.source) )
-        
+
     def exit_command(self):
         self.command_stack.pop()
 
@@ -370,11 +372,10 @@ class DebugParser(Parser):
     def extend_nodelist(self, nodelist, node, token):
         node.source = token.source
         super(DebugParser, self).extend_nodelist(nodelist, node, token)
-    
+
     def unclosed_block_tag(self, parse_until):
         (command, source) = self.command_stack.pop()
-        msg = "Unclosed tag '%s'. Looking for one of: %s " % \
-              (command, ', '.join(parse_until) ) 
+        msg = "Unclosed tag '%s'. Looking for one of: %s " % (command, ', '.join(parse_until))
         raise self.source_error( source, msg)
 
     def compile_function_error(self, token, e):
@@ -661,15 +662,14 @@ filter_raw_string = r"""
     'filter_sep': re.escape(FILTER_SEPARATOR),
     'arg_sep': re.escape(FILTER_ARGUMENT_SEPARATOR),
     'i18n_open' : re.escape("_("),
-    'i18n_close' : re.escape(")"),                         
+    'i18n_close' : re.escape(")"),
   }
-  
+
 filter_raw_string = filter_raw_string.replace("\n", "").replace(" ", "")
 filter_re = re.compile(filter_raw_string)
 
 class RegexFilterParser(object):
-    """ Not used yet because of i18n"""
-    
+    "Not used yet because of i18n"
     def __init__(self, token):
         matches = filter_re.finditer(token)
         var = None
@@ -827,7 +827,7 @@ class DebugNodeList(NodeList):
             raise
         except Exception:
             from sys import exc_info
-            wrapped = TemplateSyntaxError( 'Caught exception whilst rendering' )
+            wrapped = TemplateSyntaxError('Caught an exception while rendering.')
             wrapped.source = node.source
             wrapped.exc_info = exc_info()
             raise wrapped
@@ -858,7 +858,7 @@ class VariableNode(Node):
             return output.encode(DEFAULT_CHARSET)
         else:
             return output
-        
+
     def render(self, context):
         output = resolve_variable_with_filters(self.var_string, context)
         return self.encode_output(output)
