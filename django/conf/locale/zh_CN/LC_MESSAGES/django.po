@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django v1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2005-11-23 11:06-0600\n"
+"POT-Creation-Date: 2005-11-23 11:34-0600\n"
 "PO-Revision-Date: 2005-11-16 12:55+0800\n"
 "Last-Translator: limodou <limodou@gmail.com>\n"
 "Language-Team: Simplified Chinese <limodou@gmail.com>\n"
@@ -81,7 +81,7 @@ msgstr ""
 msgid "is public"
 msgstr ""
 
-#: contrib/comments/models/comments.py:26
+#: contrib/comments/models/comments.py:26 contrib/admin/views/doc.py:274
 #, fuzzy
 msgid "IP address"
 msgstr "邮件地址"
@@ -307,6 +307,82 @@ msgstr "日志记录"
 #: contrib/admin/models/admin.py:16
 msgid "log entries"
 msgstr "日志记录"
+
+#: contrib/admin/views/doc.py:262 contrib/admin/views/doc.py:271
+#: contrib/admin/views/doc.py:273 contrib/admin/views/doc.py:278
+#: contrib/admin/views/doc.py:279 contrib/admin/views/doc.py:281
+msgid "Integer"
+msgstr ""
+
+#: contrib/admin/views/doc.py:263
+msgid "Boolean (Either True or False)"
+msgstr ""
+
+#: contrib/admin/views/doc.py:264
+#, python-format
+msgid "String (up to %(maxlength)s)"
+msgstr ""
+
+#: contrib/admin/views/doc.py:265
+msgid "Comma-separated integers"
+msgstr ""
+
+#: contrib/admin/views/doc.py:266
+#, fuzzy
+msgid "Date (without time)"
+msgstr "动作时间"
+
+#: contrib/admin/views/doc.py:267
+#, fuzzy
+msgid "Date (with time)"
+msgstr "日期/时间"
+
+#: contrib/admin/views/doc.py:268
+#, fuzzy
+msgid "E-mail address"
+msgstr "邮箱地址："
+
+#: contrib/admin/views/doc.py:269 contrib/admin/views/doc.py:272
+msgid "File path"
+msgstr ""
+
+#: contrib/admin/views/doc.py:270
+#, fuzzy
+msgid "Decimal number"
+msgstr "十二月"
+
+#: contrib/admin/views/doc.py:276
+msgid "Boolean (Either True, False or None)"
+msgstr ""
+
+#: contrib/admin/views/doc.py:277
+#, fuzzy
+msgid "Phone number"
+msgstr "输入整数。"
+
+#: contrib/admin/views/doc.py:280
+msgid "String (up to 50)"
+msgstr ""
+
+#: contrib/admin/views/doc.py:282
+msgid "Text"
+msgstr ""
+
+#: contrib/admin/views/doc.py:283
+msgid "Time"
+msgstr ""
+
+#: contrib/admin/views/doc.py:284 contrib/flatpages/models/flatpages.py:6
+msgid "URL"
+msgstr ""
+
+#: contrib/admin/views/doc.py:285
+msgid "U.S. state (two uppercase letters)"
+msgstr ""
+
+#: contrib/admin/views/doc.py:286
+msgid "XML text"
+msgstr ""
 
 #: contrib/admin/templates/admin/object_history.html:5
 #: contrib/admin/templates/admin/500.html:4
@@ -596,10 +672,6 @@ msgstr "重定向"
 #: contrib/redirects/models/redirects.py:13
 msgid "redirects"
 msgstr "重定向"
-
-#: contrib/flatpages/models/flatpages.py:6
-msgid "URL"
-msgstr ""
 
 #: contrib/flatpages/models/flatpages.py:7
 msgid ""
