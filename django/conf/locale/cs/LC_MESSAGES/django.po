@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django Czech translation\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2005-11-22 15:44-0600\n"
+"POT-Creation-Date: 2005-11-23 11:06-0600\n"
 "PO-Revision-Date: 2005-11-14 15:34+0100\n"
 "Last-Translator: Radek Svarz <translate@svarz.cz>\n"
 "Language-Team: Czech\n"
@@ -18,6 +18,269 @@ msgstr ""
 "10<=4 && (n%100<10 || n%100>=20) ? 1 : 2;\n"
 "X-Poedit-Language: Czech\n"
 "X-Poedit-Country: CZECH REPUBLIC\n"
+
+#: contrib/comments/models/comments.py:8
+#: contrib/comments/models/comments.py:161
+#, fuzzy
+msgid "object ID"
+msgstr "object id"
+
+#: contrib/comments/models/comments.py:9
+msgid "headline"
+msgstr ""
+
+#: contrib/comments/models/comments.py:10
+#: contrib/comments/models/comments.py:162
+#, fuzzy
+msgid "comment"
+msgstr "obsah"
+
+#: contrib/comments/models/comments.py:11
+msgid "rating #1"
+msgstr ""
+
+#: contrib/comments/models/comments.py:12
+msgid "rating #2"
+msgstr ""
+
+#: contrib/comments/models/comments.py:13
+msgid "rating #3"
+msgstr ""
+
+#: contrib/comments/models/comments.py:14
+msgid "rating #4"
+msgstr ""
+
+#: contrib/comments/models/comments.py:15
+msgid "rating #5"
+msgstr ""
+
+#: contrib/comments/models/comments.py:16
+msgid "rating #6"
+msgstr ""
+
+#: contrib/comments/models/comments.py:17
+msgid "rating #7"
+msgstr ""
+
+#: contrib/comments/models/comments.py:18
+msgid "rating #8"
+msgstr ""
+
+#: contrib/comments/models/comments.py:23
+msgid "is valid rating"
+msgstr ""
+
+#: contrib/comments/models/comments.py:24
+#: contrib/comments/models/comments.py:164
+msgid "date/time submitted"
+msgstr ""
+
+#: contrib/comments/models/comments.py:25
+#: contrib/comments/models/comments.py:165
+msgid "is public"
+msgstr ""
+
+#: contrib/comments/models/comments.py:26
+#, fuzzy
+msgid "IP address"
+msgstr "e-mailová adresa"
+
+#: contrib/comments/models/comments.py:27
+msgid "is removed"
+msgstr ""
+
+#: contrib/comments/models/comments.py:27
+msgid ""
+"Check this box if the comment is inappropriate. A \"This comment has been "
+"removed\" message will be displayed instead."
+msgstr ""
+
+#: contrib/comments/models/comments.py:31
+msgid "Comment"
+msgstr ""
+
+#: contrib/comments/models/comments.py:32
+#, fuzzy
+msgid "Comments"
+msgstr "povolit komentáře"
+
+#: contrib/comments/models/comments.py:85
+#: contrib/comments/models/comments.py:204
+#, fuzzy
+msgid "Content object"
+msgstr "typ obsahu"
+
+#: contrib/comments/models/comments.py:113
+#, python-format
+msgid ""
+"Posted by %(user)s at %(date)s\n"
+"\n"
+"%(comment)s\n"
+"\n"
+"http://%(domain)s%(url)s"
+msgstr ""
+
+#: contrib/comments/models/comments.py:163
+#, fuzzy
+msgid "person's name"
+msgstr "křestní jméno"
+
+#: contrib/comments/models/comments.py:166
+#, fuzzy
+msgid "ip address"
+msgstr "e-mailová adresa"
+
+#: contrib/comments/models/comments.py:168
+msgid "approved by staff"
+msgstr ""
+
+#: contrib/comments/models/comments.py:172
+#, fuzzy
+msgid "Free comment"
+msgstr "povolit komentáře"
+
+#: contrib/comments/models/comments.py:173
+#, fuzzy
+msgid "Free comments"
+msgstr "povolit komentáře"
+
+#: contrib/comments/models/comments.py:209
+msgid "score"
+msgstr ""
+
+#: contrib/comments/models/comments.py:210
+#, fuzzy
+msgid "score date"
+msgstr "datum expirace"
+
+#: contrib/comments/models/comments.py:213
+msgid "Karma score"
+msgstr ""
+
+#: contrib/comments/models/comments.py:214
+msgid "Karma scores"
+msgstr ""
+
+#: contrib/comments/models/comments.py:223
+#, python-format
+msgid "%(score)d rating by %(user)s"
+msgstr ""
+
+#: contrib/comments/models/comments.py:248
+#, fuzzy
+msgid "flag date"
+msgstr "statická stránka"
+
+#: contrib/comments/models/comments.py:251
+#, fuzzy
+msgid "User flag"
+msgstr "Uživatel"
+
+#: contrib/comments/models/comments.py:252
+#, fuzzy
+msgid "User flags"
+msgstr "Uživatelé"
+
+#: contrib/comments/models/comments.py:256
+#, python-format
+msgid "Flag by %r"
+msgstr ""
+
+#: contrib/comments/models/comments.py:271
+#, python-format
+msgid ""
+"This comment was flagged by %(user)s:\n"
+"\n"
+"%(text)s"
+msgstr ""
+
+#: contrib/comments/models/comments.py:278
+#, fuzzy
+msgid "deletion date"
+msgstr "data sezení"
+
+#: contrib/comments/models/comments.py:281
+msgid "Moderator deletion"
+msgstr ""
+
+#: contrib/comments/models/comments.py:282
+msgid "Moderator deletions"
+msgstr ""
+
+#: contrib/comments/models/comments.py:286
+#, python-format
+msgid "Moderator deletion by %r"
+msgstr ""
+
+#: contrib/comments/views/karma.py:18
+msgid "Anonymous users cannot vote"
+msgstr ""
+
+#: contrib/comments/views/karma.py:22
+#, fuzzy
+msgid "Invalid comment ID"
+msgstr "povolit komentáře"
+
+#: contrib/comments/views/karma.py:24
+msgid "No voting for yourself"
+msgstr ""
+
+#: contrib/comments/views/comments.py:25
+msgid ""
+"This rating is required because you've entered at least one other rating."
+msgstr ""
+
+#: contrib/comments/views/comments.py:109
+#, python-format
+msgid ""
+"This comment was posted by a user who has posted fewer than %(count)s "
+"comment:\n"
+"\n"
+"%(text)s"
+msgid_plural ""
+"This comment was posted by a user who has posted fewer than %(count)s "
+"comments:\n"
+"\n"
+"%(text)s"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+
+#: contrib/comments/views/comments.py:114
+#, python-format
+msgid ""
+"This comment was posted by a sketchy user:\n"
+"\n"
+"%(text)s"
+msgstr ""
+
+#: contrib/comments/views/comments.py:186
+#: contrib/comments/views/comments.py:277
+msgid "Only POSTs are allowed"
+msgstr ""
+
+#: contrib/comments/views/comments.py:190
+#: contrib/comments/views/comments.py:281
+msgid "One or more of the required fields wasn't submitted"
+msgstr ""
+
+#: contrib/comments/views/comments.py:194
+#: contrib/comments/views/comments.py:283
+msgid "Somebody tampered with the comment form (security violation)"
+msgstr ""
+
+#: contrib/comments/views/comments.py:204
+#: contrib/comments/views/comments.py:289
+msgid ""
+"The comment form had an invalid 'target' parameter -- the object ID was "
+"invalid"
+msgstr ""
+
+#: contrib/comments/views/comments.py:254
+#: contrib/comments/views/comments.py:318
+msgid "The comment form didn't provide either 'preview' or 'post'"
+msgstr ""
 
 #: contrib/admin/models/admin.py:6
 msgid "action time"

@@ -7,13 +7,285 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2005-11-22 15:44-0600\n"
+"POT-Creation-Date: 2005-11-23 11:06-0600\n"
 "PO-Revision-Date: 2005-11-06 13:54+0100\n"
 "Last-Translator: Lukas Kolbe <lucky@knup.de>\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=iso-8859-1\n"
 "Content-Transfer-Encoding: 8bit\n"
+
+#: contrib/comments/models/comments.py:8
+#: contrib/comments/models/comments.py:161
+msgid "object ID"
+msgstr "Objekt ID"
+
+#: contrib/comments/models/comments.py:9
+msgid "headline"
+msgstr "Überschrift"
+
+#: contrib/comments/models/comments.py:10
+#: contrib/comments/models/comments.py:162
+msgid "comment"
+msgstr "Kommentar"
+
+#: contrib/comments/models/comments.py:11
+msgid "rating #1"
+msgstr "Bewertung #1"
+
+#: contrib/comments/models/comments.py:12
+msgid "rating #2"
+msgstr "Bewertung #2"
+
+#: contrib/comments/models/comments.py:13
+msgid "rating #3"
+msgstr "Bewertung #3"
+
+#: contrib/comments/models/comments.py:14
+msgid "rating #4"
+msgstr "Bewertung #4"
+
+#: contrib/comments/models/comments.py:15
+msgid "rating #5"
+msgstr "Bewertung #5"
+
+#: contrib/comments/models/comments.py:16
+msgid "rating #6"
+msgstr "Bewertung #6"
+
+#: contrib/comments/models/comments.py:17
+msgid "rating #7"
+msgstr "Bewertung #7"
+
+#: contrib/comments/models/comments.py:18
+msgid "rating #8"
+msgstr "Bewertung #8"
+
+#: contrib/comments/models/comments.py:23
+msgid "is valid rating"
+msgstr "ist eine Bewertung"
+
+#: contrib/comments/models/comments.py:24
+#: contrib/comments/models/comments.py:164
+msgid "date/time submitted"
+msgstr "Datum/Zeit Erstellung"
+
+#: contrib/comments/models/comments.py:25
+#: contrib/comments/models/comments.py:165
+msgid "is public"
+msgstr "ist öffentlich"
+
+#: contrib/comments/models/comments.py:26
+msgid "IP address"
+msgstr "IP Adresse"
+
+#: contrib/comments/models/comments.py:27
+msgid "is removed"
+msgstr "ist gelöscht"
+
+#: contrib/comments/models/comments.py:27
+msgid ""
+"Check this box if the comment is inappropriate. A \"This comment has been "
+"removed\" message will be displayed instead."
+msgstr ""
+"Hier einen Haken setzen, wenn der Kommentar unpassend ist. Es wird dann eine "
+"\"Dieser Kommentar wurde entfernt\" Meldung statt dessen angezeigt."
+
+#: contrib/comments/models/comments.py:31
+msgid "Comment"
+msgstr "Kommentar"
+
+#: contrib/comments/models/comments.py:32
+msgid "Comments"
+msgstr "Kommentare"
+
+#: contrib/comments/models/comments.py:85
+#: contrib/comments/models/comments.py:204
+msgid "Content object"
+msgstr "Inhaltsobjekt"
+
+#: contrib/comments/models/comments.py:113
+#, python-format
+msgid ""
+"Posted by %(user)s at %(date)s\n"
+"\n"
+"%(comment)s\n"
+"\n"
+"http://%(domain)s%(url)s"
+msgstr ""
+"Geschrieben von %(user)s am %(date)s\n"
+"\n"
+"$(comment)s\n"
+"\n"
+"http://%(domain)s%(url)s"
+
+#: contrib/comments/models/comments.py:163
+msgid "person's name"
+msgstr "Autorname"
+
+#: contrib/comments/models/comments.py:166
+msgid "ip address"
+msgstr "IP-Adresse"
+
+#: contrib/comments/models/comments.py:168
+msgid "approved by staff"
+msgstr "Bestätigt vom Betreiber"
+
+#: contrib/comments/models/comments.py:172
+msgid "Free comment"
+msgstr "Freier Kommentar"
+
+#: contrib/comments/models/comments.py:173
+msgid "Free comments"
+msgstr "Freie Kommentare"
+
+#: contrib/comments/models/comments.py:209
+msgid "score"
+msgstr "Bewertung"
+
+#: contrib/comments/models/comments.py:210
+msgid "score date"
+msgstr "Bewertungsdatum"
+
+#: contrib/comments/models/comments.py:213
+msgid "Karma score"
+msgstr "Karma Bewertung"
+
+#: contrib/comments/models/comments.py:214
+msgid "Karma scores"
+msgstr "Karma Bewertungen"
+
+#: contrib/comments/models/comments.py:223
+#, python-format
+msgid "%(score)d rating by %(user)s"
+msgstr "%(score)d Bewertung von %(user)s"
+
+#: contrib/comments/models/comments.py:248
+msgid "flag date"
+msgstr "Kennzeichnungsdatum"
+
+#: contrib/comments/models/comments.py:251
+msgid "User flag"
+msgstr "Benutzerkennzeichnung"
+
+#: contrib/comments/models/comments.py:252
+msgid "User flags"
+msgstr "Benutzerkennzeichnungen"
+
+#: contrib/comments/models/comments.py:256
+#, python-format
+msgid "Flag by %r"
+msgstr "Gekennzeichnet von %r"
+
+#: contrib/comments/models/comments.py:271
+#, python-format
+msgid ""
+"This comment was flagged by %(user)s:\n"
+"\n"
+"%(text)s"
+msgstr ""
+"Dieser Kommentar ist von %(user)s markiert:\n"
+"\n"
+"%(text)s"
+
+#: contrib/comments/models/comments.py:278
+msgid "deletion date"
+msgstr "Löschdatum"
+
+#: contrib/comments/models/comments.py:281
+msgid "Moderator deletion"
+msgstr "Löschung vom Moderator"
+
+#: contrib/comments/models/comments.py:282
+msgid "Moderator deletions"
+msgstr "Löschungen vom Moderator"
+
+#: contrib/comments/models/comments.py:286
+#, python-format
+msgid "Moderator deletion by %r"
+msgstr "Vom Moderator %r gelöscht"
+
+#: contrib/comments/views/karma.py:18
+msgid "Anonymous users cannot vote"
+msgstr "Anonyme Benutzer können nicht abstimmen"
+
+#: contrib/comments/views/karma.py:22
+msgid "Invalid comment ID"
+msgstr "Ungültige Kommentar-ID"
+
+#: contrib/comments/views/karma.py:24
+msgid "No voting for yourself"
+msgstr "Keine Abstimmung bei Dir selber"
+
+#: contrib/comments/views/comments.py:25
+msgid ""
+"This rating is required because you've entered at least one other rating."
+msgstr ""
+"Die Abstimmung ist zwangsweise, weil Du an mindestens einer anderen "
+"Abstimmung teilnimmst."
+
+#: contrib/comments/views/comments.py:109
+#, python-format
+msgid ""
+"This comment was posted by a user who has posted fewer than %(count)s "
+"comment:\n"
+"\n"
+"%(text)s"
+msgid_plural ""
+"This comment was posted by a user who has posted fewer than %(count)s "
+"comments:\n"
+"\n"
+"%(text)s"
+msgstr[0] ""
+"Dieser Kommentar ist von einem Benutzer mit weniger als %(count)s "
+"Kommentar:\n"
+"\n"
+"%(text)s"
+msgstr[1] ""
+"Dieser Kommentar ist von einem Benutzer mit weniger als %(count)s "
+"Kommentaren:\n"
+"\n"
+"%(text)s"
+
+#: contrib/comments/views/comments.py:114
+#, python-format
+msgid ""
+"This comment was posted by a sketchy user:\n"
+"\n"
+"%(text)s"
+msgstr ""
+"Dieser Kommentar ist von einem nicht einschätzbaren Benutzer:\n"
+"\n"
+"%(text)s"
+
+#: contrib/comments/views/comments.py:186
+#: contrib/comments/views/comments.py:277
+msgid "Only POSTs are allowed"
+msgstr "Nur POST ist erlaubt"
+
+#: contrib/comments/views/comments.py:190
+#: contrib/comments/views/comments.py:281
+msgid "One or more of the required fields wasn't submitted"
+msgstr "Eines oder mehrere der erforderlichen Felder fehlt"
+
+#: contrib/comments/views/comments.py:194
+#: contrib/comments/views/comments.py:283
+msgid "Somebody tampered with the comment form (security violation)"
+msgstr "Jemand hat mit dem Kommentarformular herumgespielt (Sicherheitsverletzung)"
+
+#: contrib/comments/views/comments.py:204
+#: contrib/comments/views/comments.py:289
+msgid ""
+"The comment form had an invalid 'target' parameter -- the object ID was "
+"invalid"
+msgstr ""
+"Das Kommentarformular hatte einen falschen 'target' Parameter -- die Objekt-"
+"ID ist ungültig."
+
+#: contrib/comments/views/comments.py:254
+#: contrib/comments/views/comments.py:318
+msgid "The comment form didn't provide either 'preview' or 'post'"
+msgstr "Das Kommentarformular wurde nicht mit 'preview' oder 'post' abgeschickt"
 
 #: contrib/admin/models/admin.py:6
 msgid "action time"
@@ -533,8 +805,8 @@ msgstr[1] "Tage"
 #: utils/timesince.py:15
 msgid "hour"
 msgid_plural "hours"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Stunde"
+msgstr[1] "Stunden"
 
 #: utils/timesince.py:16
 msgid "minute"
@@ -1058,4 +1330,3 @@ msgid ""
 msgstr ""
 " Um mehr als eine Selektion zu treffen, \"Strg\", oder auf dem Mac \"Command"
 "\", beim Klicken gedrückt halten."
-
