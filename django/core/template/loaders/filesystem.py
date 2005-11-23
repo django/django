@@ -11,7 +11,7 @@ def load_template_source(template_name, template_dirs=None):
     for template_dir in template_dirs:
         filepath = os.path.join(template_dir, template_name) + TEMPLATE_FILE_EXTENSION
         try:
-            return open(filepath).read()
+            return (open(filepath).read(), filepath)
         except IOError:
             tried.append(filepath)
     if template_dirs:

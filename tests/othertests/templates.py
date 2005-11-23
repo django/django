@@ -99,6 +99,9 @@ TEMPLATE_TESTS = {
     # Chained filters, with an argument to the first one
     'basic-syntax29': ('{{ var|removetags:"b i"|upper|lower }}', {"var": "<b><i>Yes</i></b>"}, "yes"),
 
+    #Escaped string as argument
+    'basic-syntax30': (r"""{{ var|default_if_none:" endquote\" hah" }}""", {"var": None}, ' endquote" hah'),
+
     ### IF TAG ################################################################
     'if-tag01': ("{% if foo %}yes{% else %}no{% endif %}", {"foo": True}, "yes"),
     'if-tag02': ("{% if foo %}yes{% else %}no{% endif %}", {"foo": False}, "no"),
@@ -225,6 +228,23 @@ TEMPLATE_TESTS = {
     # Raise exception for custom tags used in child with {% load %} tag in parent, not in child
     'exception04': ("{% extends 'inheritance17' %}{% block first %}{% echo 400 %}5678{% endblock %}", {}, template.TemplateSyntaxError),
 
+    'multiline01': ("""
+                    Hello,
+                    boys.
+                    How
+                    are
+                    you
+                    gentlemen.
+                    """,
+                    {},
+                    """
+                    Hello,
+                    boys.
+                    How
+                    are
+                    you
+                    gentlemen.
+                    """  ),
     # simple translation of a string delimited by '
     'i18n01': ("{% load i18n %}{% trans 'xxxyyyxxx' %}", {}, "xxxyyyxxx"),
 
@@ -268,7 +288,7 @@ TEMPLATE_TESTS = {
 def test_template_loader(template_name, template_dirs=None):
     "A custom template loader that loads the unit-test templates."
     try:
-        return TEMPLATE_TESTS[template_name][0]
+        return ( TEMPLATE_TESTS[template_name][0] , "test:%s" % template_name )
     except KeyError:
         raise template.TemplateDoesNotExist, template_name
 
@@ -308,7 +328,7 @@ def run_tests(verbosity=0, standalone=False):
                 print "Template test: %s -- FAILED. Expected %r, got %r" % (name, vals[2], output)
             failed_tests.append(name)
     loader.template_source_loaders = old_template_loaders
-
+    deactivate()
     if failed_tests and not standalone:
         msg = "Template tests %s failed." % failed_tests
         if not verbosity:

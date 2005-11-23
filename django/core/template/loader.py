@@ -8,6 +8,10 @@
 # name is the template name.
 # dirs is an optional list of directories to search instead of TEMPLATE_DIRS.
 #
+# The loader should return a tuple of (template_source, path). The path returned
+# might be shown to the user for debugging purposes, so it should identify where
+# the template was loaded from.
+#
 # Each loader should have an "is_usable" attribute set. This is a boolean that
 # specifies whether the loader can be used in this Python installation. Each
 # loader is responsible for setting this when it's initialized.
@@ -17,8 +21,8 @@
 # installed, because pkg_resources is necessary to read eggs.
 
 from django.core.exceptions import ImproperlyConfigured
-from django.core.template import Template, Context, Node, TemplateDoesNotExist, TemplateSyntaxError, resolve_variable_with_filters, resolve_variable, register_tag
-from django.conf.settings import TEMPLATE_LOADERS
+from django.core.template import Origin, StringOrigin, Template, Context, Node, TemplateDoesNotExist, TemplateSyntaxError, resolve_variable_with_filters, resolve_variable, register_tag
+from django.conf.settings import TEMPLATE_LOADERS, TEMPLATE_DEBUG
 
 template_source_loaders = []
 for path in TEMPLATE_LOADERS:
@@ -38,13 +42,31 @@ for path in TEMPLATE_LOADERS:
     else:
         template_source_loaders.append(func)
 
-def load_template_source(name, dirs=None):
+class LoaderOrigin(Origin):
+    def __init__(self, display_name, loader, name, dirs):
+        super(LoaderOrigin, self).__init__(display_name)
+        self.loader, self.loadname, self.dirs = loader, name, dirs
+
+    def reload(self):
+        return self.loader(self.loadname, self.dirs)[0]
+
+def make_origin(display_name, loader, name, dirs):
+    if TEMPLATE_DEBUG:
+        return LoaderOrigin(display_name, loader, name, dirs)
+    else:
+        return None
+
+def find_template_source(name, dirs=None):
     for loader in template_source_loaders:
         try:
-            return loader(name, dirs)
+            source, display_name  = loader(name, dirs)
+            return (source, make_origin(display_name, loader, name, dirs))
         except TemplateDoesNotExist:
             pass
     raise TemplateDoesNotExist, name
+
+def load_template_source(name, dirs=None):
+    find_template_source(name, dirs)[0]
 
 class ExtendsError(Exception):
     pass
@@ -54,14 +76,14 @@ def get_template(template_name):
     Returns a compiled Template object for the given template name,
     handling template inheritance recursively.
     """
-    return get_template_from_string(load_template_source(template_name))
+    return get_template_from_string(*find_template_source(template_name))
 
-def get_template_from_string(source):
+def get_template_from_string(source, origin=None ):
     """
     Returns a compiled Template object for the given template code,
     handling template inheritance recursively.
     """
-    return Template(source)
+    return Template(source, origin)
 
 def render_to_string(template_name, dictionary=None, context_instance=None):
     """
@@ -134,7 +156,7 @@ class ExtendsNode(Node):
                 error_msg += " Got this from the %r variable." % self.parent_name_var
             raise TemplateSyntaxError, error_msg
         try:
-            return get_template_from_string(load_template_source(parent, self.template_dirs))
+            return get_template_from_string(*find_template_source(parent, self.template_dirs))
         except TemplateDoesNotExist:
             raise TemplateSyntaxError, "Template %r cannot be extended, because it doesn't exist" % parent
 
@@ -165,7 +187,9 @@ class ConstantIncludeNode(Node):
         try:
             t = get_template(template_path)
             self.template = t
-        except:
+        except Exception, e:
+            if TEMPLATE_DEBUG:
+                raise
             self.template = None
 
     def render(self, context):
@@ -183,6 +207,10 @@ class IncludeNode(Node):
              template_name = resolve_variable(self.template_name, context)
              t = get_template(template_name)
              return t.render(context)
+         except TemplateSyntaxError, e:
+             if TEMPLATE_DEBUG:
+                 raise
+             return ''
          except:
              return '' # Fail silently for invalid included templates.
 
@@ -236,6 +264,7 @@ def do_include(parser, token):
 
         {% include "foo/some_include" %}
     """
+
     bits = token.contents.split()
     if len(bits) != 2:
         raise TemplateSyntaxError, "%r tag takes one argument: the name of the template to be included" % bits[0]

@@ -192,6 +192,7 @@ class RegroupNode(Node):
         for obj in obj_list:
             grouper = resolve_variable_with_filters('var.%s' % self.expression, \
                 Context({'var': obj}))
+            # TODO: Is this a sensible way to determine equality?
             if output and repr(output[-1]['grouper']) == repr(grouper):
                 output[-1]['list'].append(obj)
             else:
@@ -628,8 +629,8 @@ def do_load(parser, token):
     # check at compile time that the module can be imported
     try:
         LoadNode.load_taglib(taglib)
-    except ImportError:
-        raise TemplateSyntaxError, "'%s' is not a valid tag library" % taglib
+    except ImportError, e:
+        raise TemplateSyntaxError, "'%s' is not a valid tag library: %s" % (taglib, e)
     return LoadNode(taglib)
 
 def do_now(parser, token):
