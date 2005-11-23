@@ -471,177 +471,7 @@ class TokenParser:
             self.pointer = i
             return s
 
-class FilterParser:
-    """
-    Parses a variable token and its optional filters (all as a single string),
-    and return a list of tuples of the filter name and arguments.
-    Sample:
-        >>> token = 'variable|default:"Default value"|date:"Y-m-d"'
-        >>> p = FilterParser(token)
-        >>> p.filters
-        [('default', 'Default value'), ('date', 'Y-m-d')]
-        >>> p.var
-        'variable'
 
-    This class should never be instantiated outside of the
-    get_filters_from_token helper function.
-    """
-    def __init__(self, s):
-        self.s = s
-        self.i = -1
-        self.current = ''
-        self.filters = []
-        self.current_filter_name = None
-        self.current_filter_arg = None
-        # First read the variable part. Decide whether we need to parse a
-        # string or a variable by peeking into the stream.
-        if self.peek_char() in ('_', '"', "'"):
-            self.var = self.read_constant_string_token()
-        else:
-            self.var = self.read_alphanumeric_token()
-        if not self.var:
-            raise TemplateSyntaxError, "Could not read variable name: '%s'" % self.s
-        if self.var.find(VARIABLE_ATTRIBUTE_SEPARATOR + '_') > -1 or self.var[0] == '_':
-            raise TemplateSyntaxError, "Variables and attributes may not begin with underscores: '%s'" % self.var
-        # Have we reached the end?
-        if self.current is None:
-            return
-        if self.current != FILTER_SEPARATOR:
-            raise TemplateSyntaxError, "Bad character (expecting '%s') '%s'" % (FILTER_SEPARATOR, self.current)
-        # We have a filter separator; start reading the filters
-        self.read_filters()
-
-    def peek_char(self):
-        try:
-            return self.s[self.i+1]
-        except IndexError:
-            return None
-
-    def next_char(self):
-        self.i = self.i + 1
-        try:
-            self.current = self.s[self.i]
-        except IndexError:
-            self.current = None
-
-    def read_constant_string_token(self):
-        """
-        Reads a constant string that must be delimited by either " or '
-        characters. The string is returned with its delimiters.
-        """
-        val = ''
-        qchar = None
-        i18n = False
-        self.next_char()
-        if self.current == '_':
-            i18n = True
-            self.next_char()
-            if self.current != '(':
-                raise TemplateSyntaxError, "Bad character (expecting '(') '%s'" % self.current
-            self.next_char()
-        if not self.current in ('"', "'"):
-            raise TemplateSyntaxError, "Bad character (expecting '\"' or ''') '%s'" % self.current
-        qchar = self.current
-        val += qchar
-        while 1:
-           self.next_char()
-           if self.current == qchar:
-               break
-           val += self.current
-        val += self.current
-        self.next_char()
-        if i18n:
-            if self.current != ')':
-                raise TemplateSyntaxError, "Bad character (expecting ')') '%s'" % self.current
-            self.next_char()
-            val = qchar+_(val.strip(qchar))+qchar
-        return val
-
-    def read_alphanumeric_token(self):
-        """
-        Reads a variable name or filter name, which are continuous strings of
-        alphanumeric characters + the underscore.
-        """
-        var = ''
-        while 1:
-            self.next_char()
-            if self.current is None:
-                break
-            if self.current not in ALLOWED_VARIABLE_CHARS:
-                break
-            var += self.current
-        return var
-
-    def read_filters(self):
-        while 1:
-            filter_name, arg = self.read_filter()
-            if not registered_filters.has_key(filter_name):
-                raise TemplateSyntaxError, "Invalid filter: '%s'" % filter_name
-            if registered_filters[filter_name][1] == True and arg is None:
-                raise TemplateSyntaxError, "Filter '%s' requires an argument" % filter_name
-            if registered_filters[filter_name][1] == False and arg is not None:
-                raise TemplateSyntaxError, "Filter '%s' should not have an argument (argument is %r)" % (filter_name, arg)
-            self.filters.append((filter_name, arg))
-            if self.current is None:
-                break
-
-    def read_filter(self):
-        self.current_filter_name = self.read_alphanumeric_token()
-        self.current_filter_arg = None
-        # Have we reached the end?
-        if self.current is None:
-            return (self.current_filter_name, None)
-        # Does the filter have an argument?
-        if self.current == FILTER_ARGUMENT_SEPARATOR:
-            self.current_filter_arg = self.read_arg()
-            return (self.current_filter_name, self.current_filter_arg)
-        # Next thing MUST be a pipe
-        if self.current != FILTER_SEPARATOR:
-            raise TemplateSyntaxError, "Bad character (expecting '%s') '%s'" % (FILTER_SEPARATOR, self.current)
-        return (self.current_filter_name, self.current_filter_arg)
-
-    def read_arg(self):
-        # First read a " or a _("
-        self.next_char()
-        translated = False
-        if self.current == '_':
-            self.next_char()
-            if self.current != '(':
-                raise TemplateSyntaxError, "Bad character (expecting '(') '%s'" % self.current
-            translated = True
-            self.next_char()
-        if self.current != '"':
-            raise TemplateSyntaxError, "Bad character (expecting '\"') '%s'" % self.current
-        self.escaped = False
-        arg = ''
-        while 1:
-            self.next_char()
-            if self.current == '"' and not self.escaped:
-                break
-            if self.current == '\\' and not self.escaped:
-                self.escaped = True
-                continue
-            if self.current == '\\' and self.escaped:
-                arg += '\\'
-                self.escaped = False
-                continue
-            if self.current == '"' and self.escaped:
-                arg += '"'
-                self.escaped = False
-                continue
-            if self.escaped and self.current not in '\\"':
-                raise TemplateSyntaxError, "Unescaped backslash in '%s'" % self.s
-            if self.current is None:
-                raise TemplateSyntaxError, "Unexpected end of argument in '%s'" % self.s
-            arg += self.current
-        # self.current must now be '"'
-        self.next_char()
-        if translated:
-            if self.current != ')':
-                raise TemplateSyntaxError, "Bad character (expecting ')') '%s'" % self.current
-            self.next_char()
-            arg = _(arg)
-        return arg
 
 
 filter_raw_string = r"""
@@ -668,8 +498,21 @@ filter_raw_string = r"""
 filter_raw_string = filter_raw_string.replace("\n", "").replace(" ", "")
 filter_re = re.compile(filter_raw_string)
 
-class RegexFilterParser(object):
-    "Not used yet because of i18n"
+class FilterParser(object):
+    """
+    Parses a variable token and its optional filters (all as a single string),
+    and return a list of tuples of the filter name and arguments.
+    Sample:
+        >>> token = 'variable|default:"Default value"|date:"Y-m-d"'
+        >>> p = FilterParser(token)
+        >>> p.filters
+        [('default', 'Default value'), ('date', 'Y-m-d')]
+        >>> p.var
+        'variable'
+
+    This class should never be instantiated outside of the
+    get_filters_from_token helper function.
+    """
     def __init__(self, token):
         matches = filter_re.finditer(token)
         var = None
@@ -712,7 +555,7 @@ class RegexFilterParser(object):
 
 def get_filters_from_token(token):
     "Convenient wrapper for FilterParser"
-    p = RegexFilterParser(token)
+    p = FilterParser(token)
     return (p.var, p.filters)
 
 def resolve_variable(path, context):
