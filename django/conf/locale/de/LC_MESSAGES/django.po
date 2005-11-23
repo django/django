@@ -1177,8 +1177,8 @@ msgstr[1] "Tage"
 #: utils/timesince.py:15
 msgid "hour"
 msgid_plural "hours"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Stunde"
+msgstr[1] "Stunden"
 
 #: utils/timesince.py:16
 msgid "minute"

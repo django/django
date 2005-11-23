@@ -1,4 +1,4 @@
-import datetime, time
+import datetime, math, time
 from django.utils.tzinfo import LocalTimezone
 from django.utils.translation import ngettext
 
@@ -30,6 +30,8 @@ def timesince(d, now=None):
         count = since / seconds
         if count != 0:
             break
+    if count < 0:
+        return '%d milliseconds' % math.floor(delta.microseconds / 1000)
     s = '%d %s' % (count, name(count))
     if i + 1 < len(chunks):
         # Now get the second item

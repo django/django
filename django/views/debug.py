@@ -1,3 +1,4 @@
+
 from django.conf import settings
 from django.core.template import Template, Context
 from django.utils.html import escape
@@ -172,6 +173,8 @@ TECHNICAL_500_TEMPLATE = """
     table.vars td, table.req td { font-family:monospace; }
     table td.code { width:100%; }
     table td.code div { overflow:hidden; }
+    table.source th { color:#666; }
+    table.source td { font-family:monospace; white-space:pre; border-bottom:1px solid #eee; }
     ul.traceback { list-style-type:none; }
     ul.traceback li.frame { margin-bottom:1em; }
     div.context { margin: 10px 0; }
@@ -184,14 +187,14 @@ TECHNICAL_500_TEMPLATE = """
     #summary { background: #ffc; }
     #summary h2 { font-weight: normal; color: #666; }
     #explanation { background:#eee; }
+    #template { background:#f6f6f6; }
     #traceback { background:#eee; }
     #requestinfo { background:#f6f6f6; padding-left:120px; }
     #summary table { border:none; background:transparent; }
     #requestinfo h2, #requestinfo h3 { position:relative; margin-left:-100px; }
     #requestinfo h3 { margin-bottom:-1em; }
-    table.source td { font-family: monospace; white-space: pre; }
-    span.specific { background:#ffcab7; }
     .error { background: #ffc; }
+    .specific { color:#cc3300; font-weight:bold; }
   </style>
   <script type="text/javascript">
   //<!--
@@ -271,16 +274,16 @@ TECHNICAL_500_TEMPLATE = """
 </div>
 {% if template_info %}
 <div id="template">
-   <h2>Template</h2>
-   In template {{ template_info.name }}, error at line {{ template_info.line }}
-   <div>{{ template_info.message|escape }}</div>
+   <h2>Template error</h2>
+   <p>In template <code>{{ template_info.name }}</code>, error at line <strong>{{ template_info.line }}</strong></p>
+   <h3>{{ template_info.message|escape }}</h3>
    <table class="source{% if template_info.top %} cut-top{% endif %}{% ifnotequal template_info.bottom template_info.total %} cut-bottom{% endifnotequal %}">
    {% for source_line in template_info.source_lines %}
    {% ifequal source_line.0 template_info.line %}
-       <tr class="error"><td>{{ source_line.0 }}</td>
+       <tr class="error"><th>{{ source_line.0 }}</th>
        <td>{{ template_info.before }}<span class="specific">{{ template_info.during }}</span>{{ template_info.after }}</td></tr>
    {% else %}
-      <tr><td>{{ source_line.0 }}</td>
+      <tr><th>{{ source_line.0 }}</th>
       <td> {{ source_line.1 }}</td></tr>
    {% endifequal %}
    {% endfor %}

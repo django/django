@@ -14,7 +14,12 @@ if os.path.isdir(os.path.join('conf', 'locale')):
 elif os.path.isdir('locale'):
     localedir = os.path.abspath('locale')
 else:
-    print "this script should be run from the django svn tree or your project or app tree"
+    print "This script should be run from the django svn tree or your project or app tree."
+    print "If you did indeed run it from the svn checkout or your project or application,"
+    print "maybe you are just missing the conf/locale (in the django tree) or locale (for project"
+    print "and application) directory?"
+    print "make-messages.py doesn't create it automatically, you have to create it by hand if"
+    print "you want to enable i18n for your project or application."
     sys.exit(1)
 
 (opts, args) = getopt.getopt(sys.argv[1:], 'l:d:va')

@@ -99,9 +99,9 @@ TEMPLATE_TESTS = {
     # Chained filters, with an argument to the first one
     'basic-syntax29': ('{{ var|removetags:"b i"|upper|lower }}', {"var": "<b><i>Yes</i></b>"}, "yes"),
 
-    #Escaped string as argument 
+    #Escaped string as argument
     'basic-syntax30': (r"""{{ var|default_if_none:" endquote\" hah" }}""", {"var": None}, ' endquote" hah'),
-    
+
     
     ### IF TAG ################################################################
     'if-tag01': ("{% if foo %}yes{% else %}no{% endif %}", {"foo": True}, "yes"),
@@ -232,19 +232,19 @@ TEMPLATE_TESTS = {
     'multiline01': ("""
                     Hello,
                     boys.
-                    How 
-                    are 
+                    How
+                    are
                     you
-                    gentlemen. 
-                    """, 
-                    {}, 
+                    gentlemen.
+                    """,
+                    {},
                     """
                     Hello,
                     boys.
-                    How 
-                    are 
+                    How
+                    are
                     you
-                    gentlemen. 
+                    gentlemen.
                     """  ),
     # simple translation of a string delimited by '
     'i18n01': ("{% load i18n %}{% trans 'xxxyyyxxx' %}", {}, "xxxyyyxxx"),

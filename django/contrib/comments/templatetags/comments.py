@@ -44,6 +44,7 @@ COMMENT_FORM = '''
 '''
 
 FREE_COMMENT_FORM = '''
+{% load i18n %}
 {% if display_form %}
 <form action="/comments/postfree/" method="post">
 <p>{% trans "Your name:" %} <input type="text" id="id_person_name" name="person_name" /></p>

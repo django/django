@@ -1191,7 +1191,6 @@ msgstr[0] "Tento mesiac"
 msgstr[1] "Tento mesiac"
 
 #: utils/timesince.py:14
-#, fuzzy
 msgid "day"
 msgid_plural "days"
 msgstr[0] "Dnes"
@@ -1200,15 +1199,14 @@ msgstr[1] "Dnes"
 #: utils/timesince.py:15
 msgid "hour"
 msgid_plural "hours"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "hodina"
+msgstr[1] "hodín"
 
 #: utils/timesince.py:16
-#, fuzzy
 msgid "minute"
 msgid_plural "minutes"
-msgstr[0] "web"
-msgstr[1] "web"
+msgstr[0] "minúta"
+msgstr[1] "minút"
 
 #: models/core.py:7
 msgid "domain name"
@@ -1379,9 +1377,8 @@ msgid "Welsh"
 msgstr "Waleský"
 
 #: conf/global_settings.py:40
-#, fuzzy
 msgid "Danish"
-msgstr "Španielsky"
+msgstr "Dánsky"
 
 #: conf/global_settings.py:41
 msgid "German"
