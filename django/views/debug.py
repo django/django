@@ -273,16 +273,16 @@ TECHNICAL_500_TEMPLATE = """
 </div>
 {% if template_info %}
 <div id="template">
-   <h2>Template</h2>
-   In template {{ template_info.name }}, error at line {{ template_info.line }}
-   <div>{{ template_info.message|escape }}</div>
+   <h2>Template error</h2>
+   <p>In template <code>{{ template_info.name }}</code>, error at line <strong>{{ template_info.line }}</strong></p>
+   <h3>{{ template_info.message|escape }}</h3>
    <table class="source{% if template_info.top %} cut-top{% endif %}{% ifnotequal template_info.bottom template_info.total %} cut-bottom{% endifnotequal %}">
    {% for source_line in template_info.source_lines %}
    {% ifequal source_line.0 template_info.line %}
-       <tr class="error"><td>{{ source_line.0 }}</td>
+       <tr class="error"><th>{{ source_line.0 }}</th>
        <td>{{ template_info.before }}<span class="specific">{{ template_info.during }}</span>{{ template_info.after }}</td></tr>
    {% else %}
-      <tr><td>{{ source_line.0 }}</td>
+      <tr><th>{{ source_line.0 }}</th>
       <td> {{ source_line.1 }}</td></tr>
    {% endifequal %}
    {% endfor %}
