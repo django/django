@@ -172,6 +172,8 @@ TECHNICAL_500_TEMPLATE = """
     table.vars td, table.req td { font-family:monospace; }
     table td.code { width:100%; }
     table td.code div { overflow:hidden; }
+    table.source th { color:#666; }
+    table.source td { font-family:monospace; white-space:pre; border-bottom:1px solid #eee; }
     ul.traceback { list-style-type:none; }
     ul.traceback li.frame { margin-bottom:1em; }
     div.context { margin: 10px 0; }
@@ -184,14 +186,14 @@ TECHNICAL_500_TEMPLATE = """
     #summary { background: #ffc; }
     #summary h2 { font-weight: normal; color: #666; }
     #explanation { background:#eee; }
+    #template { background:#f6f6f6; }
     #traceback { background:#eee; }
     #requestinfo { background:#f6f6f6; padding-left:120px; }
     #summary table { border:none; background:transparent; }
     #requestinfo h2, #requestinfo h3 { position:relative; margin-left:-100px; }
     #requestinfo h3 { margin-bottom:-1em; }
-    table.source td { font-family: monospace; white-space: pre; }
-    span.specific { background:#ffcab7; }
     .error { background: #ffc; }
+    .specific { color:#cc3300; font-weight:bold; }
   </style>
   <script type="text/javascript">
   //<!--
