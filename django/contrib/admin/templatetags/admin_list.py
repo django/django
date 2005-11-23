@@ -115,10 +115,10 @@ def items_for_result(cl, result):
         except meta.FieldDoesNotExist:
             # For non-field list_display values, the value is a method
             # name. Execute the method.
-            func = getattr(result, field_name)
             try:
+                func = getattr(result, field_name)
                 result_repr = str(func())
-            except ObjectDoesNotExist:
+            except AttributeError, ObjectDoesNotExist:
                 result_repr = EMPTY_CHANGELIST_VALUE
             else:
                 # Strip HTML tags in the resulting text, except if the 
