@@ -7,7 +7,7 @@ a string) and returns a tuple in this format:
     (view_function, dict_of_view_function_args)
 """
 
-from django.core.exceptions import Http404, ViewDoesNotExist
+from django.core.exceptions import Http404, ImproperlyConfigured, ViewDoesNotExist
 import re
 
 class Resolver404(Http404):
@@ -74,7 +74,11 @@ class RegexURLResolver(object):
         try:
             return self._urlconf_module
         except AttributeError:
-            self._urlconf_module = __import__(self.urlconf_name, '', '', [''])
+            try:
+                self._urlconf_module = __import__(self.urlconf_name, '', '', [''])
+            except ValueError, e:
+                # Invalid urlconf_name, such as "foo.bar." (note trailing period)
+                raise ImproperlyConfigured, "Error while importing URLconf %r: %s" % (self.urlconf_name, e)
             return self._urlconf_module
     urlconf_module = property(_get_urlconf_module)
 
