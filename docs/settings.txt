@@ -549,6 +549,23 @@ The ID, as an integer, of the current site in the ``sites`` database. This is
 used so that application data can hook into specific site(s) and a single
 database can manage content for multiple sites.
 
+TEMPLATE_DEBUG
+--------------
+
+Default: ``False``
+
+**Only available in Django development version.**
+
+A boolean that turns on/off template debug mode. If this is ``True``, the fancy
+error page will display a detailed report for any ``TemplateSyntaxError``. This
+report contains the relevant snippet of the template, with the appropriate line
+highlighted.
+
+Note that Django only displays fancy error pages if ``DEBUG`` is ``True``, so you'll
+want to set that to take advantage of this setting.
+
+See also DEBUG.
+
 TEMPLATE_DIRS
 -------------
 
