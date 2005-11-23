@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2005-11-23 11:06-0600\n"
+"POT-Creation-Date: 2005-11-23 18:30+0100\n"
 "PO-Revision-Date: 2005-11-06 13:54+0100\n"
 "Last-Translator: Lukas Kolbe <lucky@knup.de>\n"
 "Language-Team: \n"
@@ -75,7 +75,7 @@ msgstr "Datum/Zeit Erstellung"
 msgid "is public"
 msgstr "ist öffentlich"
 
-#: contrib/comments/models/comments.py:26
+#: contrib/comments/models/comments.py:26 contrib/admin/views/doc.py:274
 msgid "IP address"
 msgstr "IP Adresse"
 
@@ -271,7 +271,8 @@ msgstr "Eines oder mehrere der erforderlichen Felder fehlt"
 #: contrib/comments/views/comments.py:194
 #: contrib/comments/views/comments.py:283
 msgid "Somebody tampered with the comment form (security violation)"
-msgstr "Jemand hat mit dem Kommentarformular herumgespielt (Sicherheitsverletzung)"
+msgstr ""
+"Jemand hat mit dem Kommentarformular herumgespielt (Sicherheitsverletzung)"
 
 #: contrib/comments/views/comments.py:204
 #: contrib/comments/views/comments.py:289
@@ -285,7 +286,8 @@ msgstr ""
 #: contrib/comments/views/comments.py:254
 #: contrib/comments/views/comments.py:318
 msgid "The comment form didn't provide either 'preview' or 'post'"
-msgstr "Das Kommentarformular wurde nicht mit 'preview' oder 'post' abgeschickt"
+msgstr ""
+"Das Kommentarformular wurde nicht mit 'preview' oder 'post' abgeschickt"
 
 #: contrib/admin/models/admin.py:6
 msgid "action time"
@@ -314,6 +316,77 @@ msgstr "Logeintrag"
 #: contrib/admin/models/admin.py:16
 msgid "log entries"
 msgstr "Logeinträge"
+
+#: contrib/admin/views/doc.py:262 contrib/admin/views/doc.py:271
+#: contrib/admin/views/doc.py:273 contrib/admin/views/doc.py:278
+#: contrib/admin/views/doc.py:279 contrib/admin/views/doc.py:281
+msgid "Integer"
+msgstr "Ganzzahl"
+
+#: contrib/admin/views/doc.py:263
+msgid "Boolean (Either True or False)"
+msgstr "Wahrheitswert (Wahr oder Falsch)"
+
+#: contrib/admin/views/doc.py:264
+#, python-format
+msgid "String (up to %(maxlength)s)"
+msgstr "Zeichenkette (bis zu %(maxlength)s Zeichen)"
+
+#: contrib/admin/views/doc.py:265
+msgid "Comma-separated integers"
+msgstr "Kommaseparierte Liste von Zahlen"
+
+#: contrib/admin/views/doc.py:266
+msgid "Date (without time)"
+msgstr "Datum (ohne Zeit)"
+
+#: contrib/admin/views/doc.py:267
+msgid "Date (with time)"
+msgstr "Datum (mit Zeit)"
+
+#: contrib/admin/views/doc.py:268
+msgid "E-mail address"
+msgstr "E-mail-Adresse"
+
+#: contrib/admin/views/doc.py:269 contrib/admin/views/doc.py:272
+msgid "File path"
+msgstr "Dateipfad"
+
+#: contrib/admin/views/doc.py:270
+msgid "Decimal number"
+msgstr "Dezimalzahl"
+
+#: contrib/admin/views/doc.py:276
+msgid "Boolean (Either True, False or None)"
+msgstr "Wahrheitswert (Wahr, Falsch oder Nichts)"
+
+#: contrib/admin/views/doc.py:277
+msgid "Phone number"
+msgstr "Telefonnummer"
+
+#: contrib/admin/views/doc.py:280
+msgid "String (up to 50)"
+msgstr "Zeichenkette (bis zu 50 Zeichen)"
+
+#: contrib/admin/views/doc.py:282
+msgid "Text"
+msgstr "Text"
+
+#: contrib/admin/views/doc.py:283
+msgid "Time"
+msgstr "Zeit"
+
+#: contrib/admin/views/doc.py:284 contrib/flatpages/models/flatpages.py:6
+msgid "URL"
+msgstr "URL"
+
+#: contrib/admin/views/doc.py:285
+msgid "U.S. state (two uppercase letters)"
+msgstr "U.S. Bundesstaat (zwei Grossbuchstaben)"
+
+#: contrib/admin/views/doc.py:286
+msgid "XML text"
+msgstr "XML Text"
 
 #: contrib/admin/templates/admin/object_history.html:5
 #: contrib/admin/templates/admin/500.html:4
@@ -502,7 +575,7 @@ msgstr ""
 
 #: contrib/admin/templates/registration/password_reset_form.html:16
 msgid "E-mail address:"
-msgstr "eMail-Adresse:"
+msgstr "E-Mail-Adresse:"
 
 #: contrib/admin/templates/registration/password_reset_form.html:16
 msgid "Reset my password"
@@ -510,16 +583,16 @@ msgstr "Mein Kennwort zurücksetzen"
 
 #: contrib/admin/templates/registration/logged_out.html:8
 msgid "Thanks for spending some quality time with the Web site today."
-msgstr "Danke, dass Sie heute eine Weile bei uns waren."
+msgstr "Vielen Dank, daß Sie hier ein paar nette Minuten verbracht haben."
 
 #: contrib/admin/templates/registration/logged_out.html:10
 msgid "Log in again"
-msgstr "Neu anmelden"
+msgstr "Erneut Anmelden"
 
 #: contrib/admin/templates/registration/password_reset_done.html:6
 #: contrib/admin/templates/registration/password_reset_done.html:10
 msgid "Password reset successful"
-msgstr "Kennwort erfolgreich  zurückgesetzt"
+msgstr "Kennwort erfolgreich zurückgesetzt"
 
 #: contrib/admin/templates/registration/password_reset_done.html:12
 msgid ""
@@ -616,10 +689,6 @@ msgstr "Umleitung"
 #: contrib/redirects/models/redirects.py:13
 msgid "redirects"
 msgstr "Umleitungen"
-
-#: contrib/flatpages/models/flatpages.py:6
-msgid "URL"
-msgstr "URL"
 
 #: contrib/flatpages/models/flatpages.py:7
 msgid ""
@@ -1033,7 +1102,7 @@ msgstr "Russisch"
 
 #: conf/global_settings.py:51
 msgid "Slovak"
-msgstr "Slovakisch"
+msgstr "Slowakisch"
 
 #: conf/global_settings.py:52
 msgid "Serbian"
@@ -1045,7 +1114,7 @@ msgstr "Schwedisch"
 
 #: conf/global_settings.py:54
 msgid "Simplified Chinese"
-msgstr "vereinfachtes Chinesisch"
+msgstr "Vereinfachtes Chinesisch"
 
 #: core/validators.py:62
 msgid "This value must contain only letters, numbers and underscores."
