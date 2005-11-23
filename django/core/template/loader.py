@@ -21,7 +21,7 @@
 # installed, because pkg_resources is necessary to read eggs.
 
 from django.core.exceptions import ImproperlyConfigured
-from django.core.template import Origin, StringOrigin, Template, Context, Node, TemplateDoesNotExist, TemplateSyntaxError, resolve_variable_with_filters, register_tag
+from django.core.template import Origin, StringOrigin, Template, Context, Node, TemplateDoesNotExist, TemplateSyntaxError, resolve_variable_with_filters, resolve_variable, register_tag
 from django.conf.settings import TEMPLATE_LOADERS, TEMPLATE_DEBUG
 
 template_source_loaders = []
@@ -207,9 +207,11 @@ class IncludeNode(Node):
              template_name = resolve_variable(self.template_name, context)
              t = get_template(template_name)
              return t.render(context)
-         except Exception, e:
+         except TemplateSyntaxError, e:
              if TEMPLATE_DEBUG:
                  raise
+             return ''
+         except:
              return '' # Fail silently for invalid included templates.
 
 def do_block(parser, token):
