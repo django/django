@@ -22,7 +22,6 @@
             {% else %}
                 <th>{{ model.name }}</th>
             {% endif %}
-			{{}}
             {% if model.perms.add %}
                 <td class="x50"><a href="{{ model.admin_url }}add/" class="addlink">{% trans 'Add' %}</a></td>
             {% else %}
