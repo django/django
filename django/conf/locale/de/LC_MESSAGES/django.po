@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2005-11-23 11:34-0600\n"
+"POT-Creation-Date: 2005-11-24 19:33+0100\n"
 "PO-Revision-Date: 2005-11-06 13:54+0100\n"
 "Last-Translator: Lukas Kolbe <lucky@knup.de>\n"
 "Language-Team: \n"
@@ -560,6 +560,7 @@ msgstr "Ihr Kennwort wurde geändert."
 
 #: contrib/admin/templates/registration/password_reset_form.html:4
 #: contrib/admin/templates/registration/password_reset_form.html:6
+#: contrib/admin/templates/registration/password_reset_form.html:10
 #: contrib/admin/templates/registration/password_reset_done.html:4
 msgid "Password reset"
 msgstr "Kennwort zurücksetzen"
@@ -988,8 +989,8 @@ msgid "password"
 msgstr "Kennwort"
 
 #: models/auth.py:37
-msgid "Use '[algo]$[salt]$[hexdigest]"
-msgstr "Im Format '[algo]$[salt]$[hexdigest]"
+msgid "Use '[algo]$[salt]$[hexdigest]'"
+msgstr "Im Format '[algo]$[salt]$[hexdigest]'"
 
 #: models/auth.py:38
 msgid "staff status"
@@ -1040,79 +1041,79 @@ msgstr "Wichtige Daten"
 msgid "Message"
 msgstr "Mitteilung"
 
-#: conf/global_settings.py:36
+#: conf/global_settings.py:37
 msgid "Bengali"
 msgstr "Bengali"
 
-#: conf/global_settings.py:37
+#: conf/global_settings.py:38
 msgid "Czech"
 msgstr "Tschechisch"
 
-#: conf/global_settings.py:38
+#: conf/global_settings.py:39
 msgid "Welsh"
 msgstr "Walisisch"
 
-#: conf/global_settings.py:39
+#: conf/global_settings.py:40
 msgid "Danish"
 msgstr "Dänisch"
 
-#: conf/global_settings.py:40
+#: conf/global_settings.py:41
 msgid "German"
 msgstr "Deutsch"
 
-#: conf/global_settings.py:41
+#: conf/global_settings.py:42
 msgid "English"
 msgstr "Englisch"
 
-#: conf/global_settings.py:42
+#: conf/global_settings.py:43
 msgid "Spanish"
 msgstr "Spanisch"
 
-#: conf/global_settings.py:43
+#: conf/global_settings.py:44
 msgid "French"
 msgstr "Französisch"
 
-#: conf/global_settings.py:44
+#: conf/global_settings.py:45
 msgid "Galician"
 msgstr "Galicisch"
 
-#: conf/global_settings.py:45
+#: conf/global_settings.py:46
 msgid "Icelandic"
 msgstr "Isländisch"
 
-#: conf/global_settings.py:46
+#: conf/global_settings.py:47
 msgid "Italian"
 msgstr "Italienisch"
 
-#: conf/global_settings.py:47
+#: conf/global_settings.py:48
 msgid "Norwegian"
 msgstr "Norwegisch"
 
-#: conf/global_settings.py:48
+#: conf/global_settings.py:49
 msgid "Brazilian"
 msgstr "Brasilianisch"
 
-#: conf/global_settings.py:49
+#: conf/global_settings.py:50
 msgid "Romanian"
 msgstr "Rumänisch"
 
-#: conf/global_settings.py:50
+#: conf/global_settings.py:51
 msgid "Russian"
 msgstr "Russisch"
 
-#: conf/global_settings.py:51
+#: conf/global_settings.py:52
 msgid "Slovak"
 msgstr "Slowakisch"
 
-#: conf/global_settings.py:52
+#: conf/global_settings.py:53
 msgid "Serbian"
 msgstr "Serbisch"
 
-#: conf/global_settings.py:53
+#: conf/global_settings.py:54
 msgid "Swedish"
 msgstr "Schwedisch"
 
-#: conf/global_settings.py:54
+#: conf/global_settings.py:55
 msgid "Simplified Chinese"
 msgstr "Vereinfachtes Chinesisch"
 
