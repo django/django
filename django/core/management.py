@@ -362,12 +362,12 @@ def init():
             (db.db.quote_name(core.Site._meta.db_table), db.db.quote_name('domain'),
             db.db.quote_name('name')))
     except Exception, e:
-        sys.stderr.write("Error: The database couldn't be initialized.\n%s\n" % e) 
+        sys.stderr.write("Error: The database couldn't be initialized.\n%s\n" % e)
         try:
             db.db.rollback()
         except UnboundLocalError:
             pass
-        raise
+        sys.exit(1)
     else:
         db.db.commit()
 init.args = ''
