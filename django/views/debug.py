@@ -23,14 +23,13 @@ def get_template_exception_info(exc_type, exc_value, tb):
     upto = 0
     source_lines = []
     linebreaks = izip(count(0), linebreak_iter(template_source))
-    linebreaks.next() # skip the nothing before initial line start
     for num, next in linebreaks:
         if start >= upto and end <= next:
             line = num
             before = escape(template_source[upto:start])
             during = escape(template_source[start:end])
-            after = escape(template_source[end:next - 1])
-        source_lines.append( (num, escape(template_source[upto:next - 1])) )
+            after = escape(template_source[end:next])
+        source_lines.append( (num, escape(template_source[upto:next])) )
         upto = next
     total = len(source_lines)
 
