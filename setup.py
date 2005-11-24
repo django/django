@@ -33,7 +33,7 @@ setup(
                         'locale/sr/LC_MESSAGES/*',
                         'locale/sv/LC_MESSAGES/*',
                         'locale/zh_CN/LC_MESSAGES/*'],
-         'django.contrib.admin':['templates/admin/*.html', 
+        'django.contrib.admin': ['templates/admin/*.html',
                                  'templates/admin_doc/*.html',
                                  'templates/registration/*.html',
                                  'templates/widget/*.html',
