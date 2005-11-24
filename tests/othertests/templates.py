@@ -102,7 +102,6 @@ TEMPLATE_TESTS = {
     #Escaped string as argument
     'basic-syntax30': (r"""{{ var|default_if_none:" endquote\" hah" }}""", {"var": None}, ' endquote" hah'),
 
-    
     ### IF TAG ################################################################
     'if-tag01': ("{% if foo %}yes{% else %}no{% endif %}", {"foo": True}, "yes"),
     'if-tag02': ("{% if foo %}yes{% else %}no{% endif %}", {"foo": False}, "no"),
@@ -245,7 +244,8 @@ TEMPLATE_TESTS = {
                     are
                     you
                     gentlemen.
-                    """  ),
+                    """),
+
     # simple translation of a string delimited by '
     'i18n01': ("{% load i18n %}{% trans 'xxxyyyxxx' %}", {}, "xxxyyyxxx"),
 
