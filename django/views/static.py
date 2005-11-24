@@ -34,7 +34,7 @@ def serve(request, path, document_root=None, show_indexes=False):
         if part in (os.curdir, os.pardir):
             # strip '.' amd '..' in path
             continue
-        newpath = os.path.join(newpath, part)
+        newpath = os.path.join(newpath, part).replace('\\', '/')
     if newpath and path != newpath:
         return HttpResponseRedirect(newpath)
     fullpath = os.path.join(document_root, newpath)
