@@ -6,12 +6,12 @@
 {% for js in bound_manipulator.javascript_imports %}{% include_admin_script js %}{% endfor %}
 {% endblock %}
 {% block coltype %}{{ bound_manipulator.coltype }}{% endblock %}
-{% block bodyclass %}{{app_label}}-{{bound_manipulator.object_name.lower}} change-form{% endblock %}
+{% block bodyclass %}{{ app_label }}-{{ bound_manipulator.object_name.lower }} change-form{% endblock %}
 {% block breadcrumbs %}{% if not is_popup %}
 <div class="breadcrumbs">
      <a href="../../../">{% trans "Home" %}</a> &rsaquo;
-     <a href="../">{{bound_manipulator.verbose_name_plural|capfirst}}</a> &rsaquo;
-     {% if add %}{% trans "Add" %} {{bound_manipulator.verbose_name}}{% else %}{{bound_manipulator.original|striptags|truncatewords:"18"}}{% endif %}
+     <a href="../">{{ bound_manipulator.verbose_name_plural|capfirst }}</a> &rsaquo;
+     {% if add %}{% trans "Add" %} {{ bound_manipulator.verbose_name }}{% else %}{{ bound_manipulator.original|striptags|truncatewords:"18" }}{% endif %}
 </div>
 {% endif %}{% endblock %}
 {% block content %}<div id="content-main">
@@ -20,7 +20,7 @@
   {% if bound_manipulator.has_absolute_url %}<li><a href="/r/{{ bound_manipulator.content_type_id }}/{{ object_id }}/" class="viewsitelink">{% trans "View on site" %}</a></li>{% endif%}
   </ul>
 {% endif %}{% endif %}
-<form {{ bound_manipulator.form_enc_attrib }} action='{{ form_url }}' method="post">{% block form_top %}{%endblock%}
+<form {{ bound_manipulator.form_enc_attrib }} action='{{ form_url }}' method="post">{% block form_top %}{% endblock %}
 {% if is_popup %}<input type="hidden" name="_popup" value="1">{% endif %}
 {% if bound_manipulator.save_on_top %}{% submit_row bound_manipulator %}{% endif %}
 {% if form.error_dict %}
@@ -29,12 +29,12 @@
     </p>
 {% endif %}
 {% for bound_field_set in bound_manipulator.bound_field_sets %}
-   <fieldset class="module aligned {{ bound_field_set.classes }}"> 
-    {% if bound_field_set.name %}<h2>{{bound_field_set.name }}</h2>{% endif %}
+   <fieldset class="module aligned {{ bound_field_set.classes }}">
+    {% if bound_field_set.name %}<h2>{{ bound_field_set.name }}</h2>{% endif %}
     {% for bound_field_line in bound_field_set %}
-    	{% admin_field_line bound_field_line %}
+        {% admin_field_line bound_field_line %}
         {% for bound_field in bound_field_line %}
-            {% filter_interface_script_maybe bound_field %} 
+            {% filter_interface_script_maybe bound_field %}
         {% endfor %}
     {% endfor %}
    </fieldset>
@@ -50,24 +50,24 @@
    {% endif %}
 {% endif %}
 {% for related_object in bound_manipulator.inline_related_objects %}{% edit_inline related_object %}{% endfor %}
-{% block after_related_objects%}{%endblock%}
+{% block after_related_objects %}{% endblock %}
 {% submit_row bound_manipulator %}
 {% if add %}
-   <script type="text/javascript">document.getElementById("{{bound_manipulator.first_form_field_id}}").focus();</script>
+   <script type="text/javascript">document.getElementById("{{ bound_manipulator.first_form_field_id }}").focus();</script>
 {% endif %}
 {% if bound_manipulator.auto_populated_fields %}
    <script type="text/javascript">
-   {% auto_populated_field_script bound_manipulator.auto_populated_fields change %} 
+   {% auto_populated_field_script bound_manipulator.auto_populated_fields change %}
    </script>
 {% endif %}
 {% if change %}
    {% if bound_manipulator.ordered_objects %}
       {% if form.order_objects %}<ul id="orderthese">
           {% for object in form.order_objects %}
-	     <li id="p{% object_pk bound_manipulator object %}">
-	     <span id="handlep{% object_pk bound_manipulator object %}">{{ object|truncatewords:"5" }}</span>
-	     </li>
-	     {% endfor%}
+             <li id="p{% object_pk bound_manipulator object %}">
+             <span id="handlep{% object_pk bound_manipulator object %}">{{ object|truncatewords:"5" }}</span>
+             </li>
+             {% endfor %}
       </ul>{% endif %}
    {% endif %}
 {% endif %}

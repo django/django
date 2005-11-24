@@ -2,19 +2,19 @@
 {% load i18n %}
 {% extends "admin/base_site" %}
 {% block bodyclass %}change-list{% endblock %}
-{% if not is_popup %}{% block breadcrumbs %}<div class="breadcrumbs"><a href="../../">{% trans "Home" %}</a> &rsaquo; {{cl.opts.verbose_name_plural|capfirst}} </div>{% endblock %}{% endif %}
+{% if not is_popup %}{% block breadcrumbs %}<div class="breadcrumbs"><a href="../../">{% trans "Home" %}</a> &rsaquo; {{ cl.opts.verbose_name_plural|capfirst }} </div>{% endblock %}{% endif %}
 {% block coltype %}flex{% endblock %}
 {% block content %}
 <div id="content-main">
-{%if has_add_permission %}
-  <ul class="object-tools"><li><a href="add/{%if is_popup%}?_popup=1{%endif%}" class="addlink">{% blocktrans with cl.opts.verbose_name as name %}Add {{ name }}{% endblocktrans %}</a></li></ul>
+{% if has_add_permission %}
+<ul class="object-tools"><li><a href="add/{% if is_popup %}?_popup=1{% endif %}" class="addlink">{% blocktrans with cl.opts.verbose_name as name %}Add {{ name }}{% endblocktrans %}</a></li></ul>
 {% endif %}
-<div class="module{%if cl.has_filters%} filtered{%endif%}" id="changelist">
-{% search_form cl%}
-{% date_hierarchy cl%}
+<div class="module{% if cl.has_filters %} filtered{% endif %}" id="changelist">
+{% search_form cl %}
+{% date_hierarchy cl %}
 {% filters cl %}
-{% result_list cl%}
-{% pagination cl%}
+{% result_list cl %}
+{% pagination cl %}
 </div>
 </div>
-{%endblock%}
+{% endblock %}

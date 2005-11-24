@@ -1,7 +1,7 @@
- <h3>{%blocktrans%} By {{title}} {%endblocktrans%}</h3>
- <ul>         
- {% for choice in choices %}
- 	<li{%if choice.selected%} class="selected"{%endif%}>
- 	<a href="{{choice.query_string}}">{{choice.display}}</a></li>
- {% endfor %}
- </ul>
+<h3>{% blocktrans %} By {{ title }} {% endblocktrans %}</h3>
+<ul>
+{% for choice in choices %}
+    <li{% if choice.selected %} class="selected"{% endif %}>
+    <a href="{{ choice.query_string }}">{{ choice.display }}</a></li>
+{% endfor %}
+</ul>
