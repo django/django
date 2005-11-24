@@ -364,18 +364,18 @@ endblock_re = re.compile(r"""^\s*endblocktrans$""")
 plural_re = re.compile(r"""^\s*plural$""")
 constant_re = re.compile(r"""_\(((?:".*?")|(?:'.*?'))\)""")
 def templateize(src):
-    from django.core.template import tokenize, TOKEN_TEXT, TOKEN_VAR, TOKEN_BLOCK
     """
     Turns a Django template into something that is understood by xgettext. It
     does so by translating the Django translation tags into standard gettext
     function invocations.
     """
+    from django.core.template import Lexer, TOKEN_TEXT, TOKEN_VAR, TOKEN_BLOCK
     out = StringIO()
     intrans = False
     inplural = False
     singular = []
     plural = []
-    for t in tokenize(src):
+    for t in Lexer(src, None).tokenize():
         if intrans:
             if t.token_type == TOKEN_BLOCK:
                 endbmatch = endblock_re.match(t.contents)
