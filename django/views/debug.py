@@ -9,9 +9,10 @@ from os.path import dirname, join as pathjoin
 HIDDEN_SETTINGS = re.compile('SECRET|PASSWORD')
 
 def linebreak_iter(template_source):
-    newline_re = re.compile("^", re.M)
-    for match in newline_re.finditer(template_source):
-        yield match.start()
+    p = template_source.find('\n')
+    while p >= 0:
+        yield p
+        p = template_source.find('\n', p+1)
     yield len(template_source) + 1
 
 def get_template_exception_info(exc_type, exc_value, tb):
