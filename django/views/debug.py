@@ -1,5 +1,5 @@
 from django.conf import settings
-from django.core.template import Template, Context
+from django.core.template import Template, Context, TemplateDoesNotExist
 from django.utils.html import escape
 from django.utils.httpwrappers import HttpResponseServerError, HttpResponseNotFound
 import inspect, os, re, sys
@@ -43,8 +43,8 @@ def get_template_exception_info(exc_type, exc_value, tb):
         'before': before,
         'during': during,
         'after': after,
-        'top': top ,
-        'bottom': bottom ,
+        'top': top,
+        'bottom': bottom,
         'total': total,
         'line': line,
         'name': origin.name,
@@ -58,6 +58,25 @@ def technical_500_response(request, exc_type, exc_value, tb):
     the values returned from sys.exc_info() and friends.
     """
     template_info = None
+    template_does_not_exist = False
+    loader_debug_info = None
+    if issubclass(exc_type, TemplateDoesNotExist):
+        from django.core.template.loader import template_source_loaders
+        template_does_not_exist = True
+        loader_debug_info = []
+        for loader in template_source_loaders:
+            try:
+                source_list_func = getattr(__import__(loader.__module__, '', '', ['get_template_sources']), 'get_template_sources')
+                # NOTE: This assumes exc_value is the name of the template that
+                # the loader attempted to load.
+                template_list = [{'name': t, 'exists': os.path.exists(t)} \
+                    for t in source_list_func(str(exc_value))]
+            except (ImportError, AttributeError):
+                template_list = []
+            loader_debug_info.append({
+                'loader': loader.__module__ + '.' + loader.__name__,
+                'templates': template_list,
+            })
     if settings.TEMPLATE_DEBUG and hasattr(exc_value, 'source'):
         exc_type, exc_value, tb, template_info = get_template_exception_info(exc_type, exc_value, tb)
     frames = []
@@ -100,6 +119,8 @@ def technical_500_response(request, exc_type, exc_value, tb):
         'request_protocol': os.environ.get("HTTPS") == "on" and "https" or "http",
         'settings': settings_dict,
         'template_info': template_info,
+        'template_does_not_exist': template_does_not_exist,
+        'loader_debug_info': loader_debug_info,
     })
     return HttpResponseServerError(t.render(c), mimetype='text/html')
 
@@ -187,7 +208,8 @@ TECHNICAL_500_TEMPLATE = """
     #summary { background: #ffc; }
     #summary h2 { font-weight: normal; color: #666; }
     #explanation { background:#eee; }
-    #template { background:#f6f6f6; }
+    #template, #template-not-exist { background:#f6f6f6; }
+    #template-not-exist ul { margin: 0 0 0 20px; }
     #traceback { background:#eee; }
     #requestinfo { background:#f6f6f6; padding-left:120px; }
     #summary table { border:none; background:transparent; }
@@ -272,6 +294,23 @@ TECHNICAL_500_TEMPLATE = """
     </tr>
   </table>
 </div>
+{% if template_does_not_exist %}
+<div id="template-not-exist">
+    <h2>Template-loader postmortem</h2>
+    {% if loader_debug_info %}
+        <p>Django tried loading these templates, in this order:</p>
+        <ul>
+        {% for loader in loader_debug_info %}
+            <li>Using loader <code>{{ loader.loader }}</code>:
+                <ul>{% for t in loader.templates %}<li><code>{{ t.name }}</code> (File {% if t.exists %}exists{% else %}does not exist{% endif %})</li>{% endfor %}</ul>
+            </li>
+        {% endfor %}
+        </ul>
+    {% else %}
+        <p>Django couldn't find any templates because your <code>TEMPLATE_LOADERS</code> setting is empty!</p>
+    {% endif %}
+</div>
+{% endif %}
 {% if template_info %}
 <div id="template">
    <h2>Template error</h2>
