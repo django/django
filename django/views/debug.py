@@ -27,10 +27,10 @@ def get_template_exception_info(exc_type, exc_value, tb):
     for num, next in linebreaks:
         if start >= upto and end <= next:
             line = num
-            before = escape(template_source[upto:start])
+            before = escape(template_source[upto+1:start])
             during = escape(template_source[start:end])
             after = escape(template_source[end:next])
-        source_lines.append( (num, escape(template_source[upto:next])) )
+        source_lines.append( (num, escape(template_source[upto+1:next])) )
         upto = next
     total = len(source_lines)
 
