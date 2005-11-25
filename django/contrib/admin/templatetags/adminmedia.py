@@ -1,17 +1,9 @@
-from django.core import template
+from django.core.template.decorators import simple_tag
 
-class AdminMediaPrefixNode(template.Node):
-    def render(self, context):
-        try:
-            from django.conf.settings import ADMIN_MEDIA_PREFIX
-        except ImportError:
-            return ''
-        return ADMIN_MEDIA_PREFIX
-
-def admin_media_prefix(parser, token):
-    """
-    {% admin_media_prefix %}
-    """
-    return AdminMediaPrefixNode()
-
-template.register_tag('admin_media_prefix', admin_media_prefix)
+def admin_media_prefix():
+    try:
+        from django.conf.settings import ADMIN_MEDIA_PREFIX
+    except ImportError:
+        return ''
+    return ADMIN_MEDIA_PREFIX
+admin_media_prefix = simple_tag(admin_media_prefix)

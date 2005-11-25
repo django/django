@@ -775,7 +775,7 @@ class ManyToManyField(Field):
         if len(objects) != len(pks):
             badkeys = [k for k in pks if k not in objects]
             raise validators.ValidationError, ngettext("Please enter valid %(self)s IDs. The value %(value)r is invalid.",
-                    "Please enter valid %(self)s IDs. The values %(value)r are invalid", len(badkeys)) % {
+                    "Please enter valid %(self)s IDs. The values %(value)r are invalid.", len(badkeys)) % {
                 'self': self.verbose_name,
                 'value': len(badkeys) == 1 and badkeys[0] or tuple(badkeys),
             }
