@@ -36,6 +36,7 @@ setup(
         'django.contrib.admin': ['templates/admin/*.html',
                                  'templates/admin_doc/*.html',
                                  'templates/registration/*.html',
+                                 'templates/widget/*.html',
                                  'media/css/*.css',
                                  'media/img/admin/*.gif',
                                  'media/img/admin/*.png',

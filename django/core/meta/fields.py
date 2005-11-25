@@ -59,6 +59,24 @@ def manipulator_validator_unique(f, opts, self, field_data, all_data):
         return
     raise validators.ValidationError, _("%(optname)s with this %(fieldname)s already exists.") % {'optname': capfirst(opts.verbose_name), 'fieldname': f.verbose_name}
 
+class BoundField(object):
+    def __init__(self, field, field_mapping, original):
+        self.field = field
+        self.original = original
+        self.form_fields = self.resolve_form_fields(field_mapping)
+
+    def resolve_form_fields(self, field_mapping):
+        return [field_mapping[name] for name in self.field.get_manipulator_field_names('')]
+
+    def as_field_list(self):
+        return [self.field]
+
+    def original_value(self):
+        if self.original:
+            return self.original.__dict__[self.field.column]
+
+    def __repr__(self):
+        return "BoundField:(%s, %s)" % (self.field.name, self.form_fields)
 
 # A guide to Field parameters:
 #
@@ -185,7 +203,7 @@ class Field(object):
             if hasattr(self.default, '__get_value__'):
                 return self.default.__get_value__()
             return self.default
-        if self.null:
+        if not self.empty_strings_allowed or self.null:
             return None
         return ""
 
@@ -207,28 +225,28 @@ class Field(object):
         if self.maxlength and not self.choices: # Don't give SelectFields a maxlength parameter.
             params['maxlength'] = self.maxlength
         if isinstance(self.rel, ManyToOne):
+            params['member_name'] = name_prefix + self.attname
             if self.rel.raw_id_admin:
                 field_objs = self.get_manipulator_field_objs()
                 params['validator_list'].append(curry(manipulator_valid_rel_key, self, manipulator))
             else:
                 if self.radio_admin:
                     field_objs = [formfields.RadioSelectField]
-                    params['choices'] = self.get_choices(include_blank=self.blank, blank_choice=BLANK_CHOICE_NONE)
                     params['ul_class'] = get_ul_class(self.radio_admin)
                 else:
                     if self.null:
                         field_objs = [formfields.NullSelectField]
                     else:
                         field_objs = [formfields.SelectField]
-                    params['choices'] = self.get_choices()
+                params['choices'] = self.get_choices_default()
         elif self.choices:
             if self.radio_admin:
                 field_objs = [formfields.RadioSelectField]
-                params['choices'] = self.get_choices(include_blank=self.blank, blank_choice=BLANK_CHOICE_NONE)
                 params['ul_class'] = get_ul_class(self.radio_admin)
             else:
                 field_objs = [formfields.SelectField]
-                params['choices'] = self.get_choices()
+
+            params['choices'] = self.get_choices_default()
         else:
             field_objs = self.get_manipulator_field_objs()
 
@@ -294,7 +312,37 @@ class Field(object):
         if self.choices:
             return first_choice + list(self.choices)
         rel_obj = self.rel.to
-        return first_choice + [(getattr(x, rel_obj.pk.attname), repr(x)) for x in rel_obj.get_model_module().get_list(**self.rel.limit_choices_to)]
+        return first_choice + [(getattr(x, rel_obj.pk.attname), str(x))
+                               for x in rel_obj.get_model_module().get_list(**self.rel.limit_choices_to)]
+
+    def get_choices_default(self):
+        if(self.radio_admin):
+            return self.get_choices(include_blank=self.blank, blank_choice=BLANK_CHOICE_NONE)
+        else:
+            return self.get_choices()
+
+    def _get_val_from_obj(self, obj):
+        if obj:
+           return getattr(obj, self.attname)
+        else:
+           return self.get_default()
+
+    def flatten_data(self, follow, obj = None):
+        """
+        Returns a dictionary mapping the field's manipulator field names to its
+        "flattened" string values for the admin view. obj is the instance to
+        extract the values from.
+        """
+        return {self.attname: self._get_val_from_obj(obj)}
+
+    def get_follow(self, override=None):
+        if override != None:
+            return override
+        else:
+            return self.editable
+
+    def bind(self, fieldmapping, original, bound_field_class=BoundField):
+        return bound_field_class(self, fieldmapping, original)
 
 class AutoField(Field):
     empty_strings_allowed = False
@@ -335,8 +383,10 @@ class DateField(Field):
     empty_strings_allowed = False
     def __init__(self, verbose_name=None, name=None, auto_now=False, auto_now_add=False, **kwargs):
         self.auto_now, self.auto_now_add = auto_now, auto_now_add
+        #HACKs : auto_now_add/auto_now should be done as a default or a pre_save...
         if auto_now or auto_now_add:
             kwargs['editable'] = False
+            kwargs['blank'] = True
         Field.__init__(self, verbose_name, name, **kwargs)
 
     def get_db_prep_lookup(self, lookup_type, value):
@@ -351,6 +401,13 @@ class DateField(Field):
             return datetime.datetime.now()
         return value
 
+    # Needed because of horrible auto_now[_add] behaviour wrt. editable
+    def get_follow(self, override=None):
+        if override != None:
+            return override
+        else:
+            return self.editable or self.auto_now or self.auto_now_add
+
     def get_db_prep_save(self, value):
         # Casts dates into string format for entry into database.
         if value is not None:
@@ -359,6 +416,10 @@ class DateField(Field):
 
     def get_manipulator_field_objs(self):
         return [formfields.DateField]
+
+    def flatten_data(self, follow, obj = None):
+        val = self._get_val_from_obj(obj)
+        return {self.attname: (val is not None and val.strftime("%Y-%m-%d") or '')}
 
 class DateTimeField(DateField):
     def get_db_prep_save(self, value):
@@ -388,6 +449,12 @@ class DateTimeField(DateField):
         if d is not None and t is not None:
             return datetime.datetime.combine(d, t)
         return self.get_default()
+
+    def flatten_data(self,follow, obj = None):
+        val = self._get_val_from_obj(obj)
+        date_field, time_field = self.get_manipulator_field_names('')
+        return {date_field: (val is not None and val.strftime("%Y-%m-%d") or ''),
+                time_field: (val is not None and val.strftime("%H:%M:%S") or '')}
 
 class EmailField(Field):
     def __init__(self, *args, **kwargs):
@@ -587,6 +654,10 @@ class TimeField(Field):
     def get_manipulator_field_objs(self):
         return [formfields.TimeField]
 
+    def flatten_data(self,follow, obj = None):
+        val = self._get_val_from_obj(obj)
+        return {self.attname: (val is not None and val.strftime("%H:%M:%S") or '')}
+
 class URLField(Field):
     def __init__(self, verbose_name=None, name=None, verify_exists=True, **kwargs):
         if verify_exists:
@@ -647,6 +718,24 @@ class ForeignKey(Field):
         else:
             return [formfields.IntegerField]
 
+    def get_db_prep_save(self,value):
+        if value == '' or value == None:
+           return None
+        else:
+           return int(value)
+
+    def flatten_data(self, follow, obj = None):
+        if not obj:
+            # In required many-to-one fields with only one available choice,
+            # select that one available choice. Note: We have to check that
+            # the length of choices is *2*, not 1, because SelectFields always
+            # have an initial "blank" value.
+            if not self.blank and not self.rel.raw_id_admin and self.choices:
+               choice_list = self.get_choices_default()
+               if len(choice_list) == 2:
+                  return { self.attname : choice_list[1][0] }
+        return Field.flatten_data(self, follow, obj)
+
 class ManyToManyField(Field):
     def __init__(self, to, **kwargs):
         kwargs['verbose_name'] = kwargs.get('verbose_name', to._meta.verbose_name_plural)
@@ -662,10 +751,13 @@ class ManyToManyField(Field):
 
     def get_manipulator_field_objs(self):
         if self.rel.raw_id_admin:
-            return [formfields.CommaSeparatedIntegerField]
+            return [formfields.RawIdAdminField]
         else:
-            choices = self.get_choices(include_blank=False)
+            choices = self.get_choices_default()
             return [curry(formfields.SelectMultipleField, size=min(max(len(choices), 5), 15), choices=choices)]
+
+    def get_choices_default(self):
+        return Field.get_choices(self, include_blank=False)
 
     def get_m2m_db_table(self, original_opts):
         "Returns the name of the many-to-many 'join' table."
@@ -687,6 +779,25 @@ class ManyToManyField(Field):
                 'self': self.verbose_name,
                 'value': len(badkeys) == 1 and badkeys[0] or tuple(badkeys),
             }
+
+    def flatten_data(self, follow, obj = None):
+        new_data = {}
+        if obj:
+            get_list_func = getattr(obj, 'get_%s_list' % self.rel.singular)
+            instance_ids = [getattr(instance, self.rel.to.pk.attname) for instance in get_list_func()]
+            if self.rel.raw_id_admin:
+                 new_data[self.name] = ",".join([str(id) for id in instance_ids])
+            else:
+                 new_data[self.name] = instance_ids
+        else:
+            # In required many-to-many fields with only one available choice,
+            # select that one available choice.
+            if not self.blank and not self.rel.edit_inline and not self.rel.raw_id_admin:
+               choices_list = self.get_choices_default()
+               if len(choices_list) == 1:
+                   print self.name, choices_list[0][0]
+                   new_data[self.name] = [choices_list[0][0]]
+        return new_data
 
 class OneToOneField(IntegerField):
     def __init__(self, to, to_field=None, **kwargs):
@@ -753,6 +864,66 @@ class OneToOne(ManyToOne):
         self.lookup_overrides = lookup_overrides or {}
         self.raw_id_admin = raw_id_admin
 
+class BoundFieldLine(object):
+    def __init__(self, field_line, field_mapping, original, bound_field_class=BoundField):
+        self.bound_fields = [field.bind(field_mapping, original, bound_field_class) for field in field_line]
+
+    def __iter__(self):
+        for bound_field in self.bound_fields:
+            yield bound_field
+
+    def __len__(self):
+        return len(self.bound_fields)
+
+class FieldLine(object):
+    def __init__(self, field_locator_func, linespec):
+        if isinstance(linespec, basestring):
+            self.fields = [field_locator_func(linespec)]
+        else:
+            self.fields = [field_locator_func(field_name) for field_name in linespec]
+
+    def bind(self, field_mapping, original, bound_field_line_class=BoundFieldLine):
+        return bound_field_line_class(self, field_mapping, original)
+
+    def __iter__(self):
+        for field in self.fields:
+            yield field
+
+    def __len__(self):
+        return len(self.fields)
+
+class BoundFieldSet(object):
+    def __init__(self, field_set, field_mapping, original, bound_field_line_class=BoundFieldLine):
+        self.name = field_set.name
+        self.classes = field_set.classes
+        self.bound_field_lines = [field_line.bind(field_mapping,original, bound_field_line_class) for field_line in field_set]
+
+    def __iter__(self):
+        for bound_field_line in self.bound_field_lines:
+            yield bound_field_line
+
+    def __len__(self):
+        return len(self.bound_field_lines)
+
+class FieldSet(object):
+    def __init__(self, name, classes, field_locator_func, line_specs):
+        self.name = name
+        self.field_lines = [FieldLine(field_locator_func, line_spec) for line_spec in line_specs]
+        self.classes = classes
+
+    def __repr__(self):
+         return "FieldSet:(%s,%s)" % (self.name, self.field_lines)
+
+    def bind(self, field_mapping, original, bound_field_set_class=BoundFieldSet):
+        return bound_field_set_class(self, field_mapping, original)
+
+    def __iter__(self):
+        for field_line in self.field_lines:
+            yield field_line
+
+    def __len__(self):
+        return len(self.field_lines)
+
 class Admin:
     def __init__(self, fields=None, js=None, list_display=None, list_filter=None, date_hierarchy=None,
         save_as=False, ordering=None, search_fields=None, save_on_top=False, list_select_related=False):
@@ -766,26 +937,18 @@ class Admin:
         self.save_on_top = save_on_top
         self.list_select_related = list_select_related
 
-    def get_field_objs(self, opts):
-        """
-        Returns self.fields, except with fields as Field objects instead of
-        field names. If self.fields is None, defaults to putting every
-        non-AutoField field with editable=True in a single fieldset.
-        """
+    def get_field_sets(self, opts):
         if self.fields is None:
-            field_struct = ((None, {'fields': [f.name for f in opts.fields + opts.many_to_many if f.editable and not isinstance(f, AutoField)]}),)
+            field_struct = ((None, {
+                'fields': [f.name for f in opts.fields + opts.many_to_many if f.editable and not isinstance(f, AutoField)]
+                }),)
         else:
             field_struct = self.fields
         new_fieldset_list = []
         for fieldset in field_struct:
-            new_fieldset = [fieldset[0], {}]
-            new_fieldset[1].update(fieldset[1])
-            admin_fields = []
-            for field_name_or_list in fieldset[1]['fields']:
-                if isinstance(field_name_or_list, basestring):
-                    admin_fields.append([opts.get_field(field_name_or_list)])
-                else:
-                    admin_fields.append([opts.get_field(field_name) for field_name in field_name_or_list])
-            new_fieldset[1]['fields'] = admin_fields
-            new_fieldset_list.append(new_fieldset)
+            name = fieldset[0]
+            fs_options = fieldset[1]
+            classes = fs_options.get('classes', ())
+            line_specs = fs_options['fields']
+            new_fieldset_list.append(FieldSet(name, classes, opts.get_field, line_specs))
         return new_fieldset_list

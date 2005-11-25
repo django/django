@@ -1,0 +1,4 @@
+{% if bound_field.original_value %}
+Currently: <a href="{{ bound_field.original_url }}" > {{ bound_field.original_value }} </a><br />
+Change: {% output_all bound_field.form_fields %}
+{% else %} {% output_all bound_field.form_fields %} {% endif %}
