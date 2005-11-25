@@ -1,15 +1,10 @@
-"Default tags used by the template system, available to all templates."
-
 from django.core.template import Node, NodeList, Template, Context, resolve_variable, resolve_variable_with_filters, registered_filters
 from django.core.template import TemplateSyntaxError, register_tag, TokenParser
 from django.core.template import TOKEN_BLOCK, TOKEN_TEXT, TOKEN_VAR
 from django.utils import translation
-
-import sys
-import re
+import re, sys
 
 class GetAvailableLanguagesNode(Node):
-
     def __init__(self, variable):
         self.variable = variable
 
@@ -19,7 +14,6 @@ class GetAvailableLanguagesNode(Node):
         return ''
 
 class GetCurrentLanguageNode(Node):
-
     def __init__(self, variable):
         self.variable = variable
 
@@ -28,7 +22,6 @@ class GetCurrentLanguageNode(Node):
         return ''
 
 class TranslateNode(Node):
-
     def __init__(self, value, noop):
         self.value = value
         self.noop = noop
@@ -41,7 +34,6 @@ class TranslateNode(Node):
             return translation.gettext(value)
 
 class BlockTranslateNode(Node):
-
     def __init__(self, extra_context, singular, plural=None, countervar=None, counter=None):
         self.extra_context = extra_context
         self.singular = singular
@@ -78,7 +70,7 @@ def do_get_available_languages(parser, token):
     This will store a list of available languages
     in the context.
 
-    Usage is as follows::
+    Usage::
 
         {% get_available_languages as languages %}
         {% for language in languages %}
@@ -89,7 +81,6 @@ def do_get_available_languages(parser, token):
     your setting file (or the default settings) and
     put it into the named variable.
     """
-
     args = token.contents.split()
     if len(args) != 3 or args[1] != 'as':
         raise TemplateSyntaxError, "'get_available_languages' requires 'as variable' (got %r)" % args
@@ -97,10 +88,9 @@ def do_get_available_languages(parser, token):
 
 def do_get_current_language(parser, token):
     """
-    This will store the current language in
-    the context.
+    This will store the current language in the context.
 
-    Usage is as follows::
+    Usage::
 
         {% get_current_language as language %}
 
@@ -108,7 +98,6 @@ def do_get_current_language(parser, token):
     put it's value into the ``language`` context
     variable.
     """
-
     args = token.contents.split()
     if len(args) != 3 or args[1] != 'as':
         raise TemplateSyntaxError, "'get_available_languages' requires 'as variable' (got %r)" % args
@@ -119,7 +108,7 @@ def do_translate(parser, token):
     This will mark a string for translation and will
     translate the string for the current language.
 
-    Usage is like this::
+    Usage::
 
         {% trans "this is a test" %}
 
@@ -144,9 +133,7 @@ def do_translate(parser, token):
     the variable ``variable``. Make sure that the string
     in there is something that is in the .po file.
     """
-
     class TranslateParser(TokenParser):
-
         def top(self):
             value = self.value()
             if self.more():
@@ -157,7 +144,6 @@ def do_translate(parser, token):
             else:
                 noop = False
             return (value, noop)
-
     (value, noop) = TranslateParser(token.contents).top()
     return TranslateNode(value, noop)
 
@@ -165,13 +151,13 @@ def do_block_translate(parser, token):
     """
     This will translate a block of text with parameters.
 
-    Format is like this::
+    Usage::
 
         {% blocktrans with foo|filter as bar and baz|filter as boo %}
         This is {{ bar }} and {{ boo }}.
         {% endblocktrans %}
 
-    Additionally this supports pluralization::
+    Additionally, this supports pluralization::
 
         {% blocktrans count var|length as count %}
         There is {{ count }} object.
@@ -231,4 +217,3 @@ register_tag('get_available_languages', do_get_available_languages)
 register_tag('get_current_language', do_get_current_language)
 register_tag('trans', do_translate)
 register_tag('blocktrans', do_block_translate)
-
