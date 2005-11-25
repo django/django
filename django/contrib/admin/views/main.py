@@ -45,7 +45,6 @@ def _get_mod_opts(app_label, module_name):
         raise Http404 # This object is valid but has no admin interface.
     return mod, opts
 
-
 def index(request):
     return render_to_response('admin/index', {'title': _('Site administration')}, context_instance=Context(request))
 index = staff_member_required(index)
@@ -61,15 +60,14 @@ class ChangeList(object):
         self.query = request.GET.get(SEARCH_VAR,'')
         self.get_lookup_params()
         self.get_results(request)
-        self.title = (self.is_popup 
-                      and _('Select %s') % self.opts.verbose_name 
+        self.title = (self.is_popup
+                      and _('Select %s') % self.opts.verbose_name
                       or _('Select %s to change') % self.opts.verbose_name)
         self.get_filters(request)
         self.pk_attname = self.lookup_opts.pk.attname
-    
+
     def get_filters(self, request):
         self.filter_specs = []
-   
         if self.lookup_opts.admin.list_filter and not self.opts.one_to_one_field:
             filter_fields = [self.lookup_opts.get_field(field_name) \
                               for field_name in self.lookup_opts.admin.list_filter]
@@ -77,9 +75,8 @@ class ChangeList(object):
                 spec = FilterSpec.create(f, request, self.params)
                 if spec.has_output():
                     self.filter_specs.append(spec)
-        
         self.has_filters = bool(self.filter_specs)
-    
+
     def get_query_string(self, new_params={}, remove=[]):
         p = self.params.copy()
         for r in remove:
@@ -92,13 +89,12 @@ class ChangeList(object):
             elif v is not None:
                 p[k] = v
         return '?' + '&amp;'.join(['%s=%s' % (k, v) for k, v in p.items()]).replace(' ', '%20')
-    
-    
+
     def get_modules_and_options(self, app_label, module_name, request):
         self.mod, self.opts = _get_mod_opts(app_label, module_name)
         if not request.user.has_perm(app_label + '.' + self.opts.get_change_permission()):
             raise PermissionDenied
-        
+
         self.lookup_mod, self.lookup_opts = self.mod, self.opts
 
     def get_search_parameters(self, request):
@@ -113,7 +109,7 @@ class ChangeList(object):
         self.params = dict(request.GET.copy())
         if self.params.has_key(PAGE_VAR):
             del self.params[PAGE_VAR]
-            
+
     def get_results(self, request):
         lookup_mod, lookup_params, show_all, page_num = \
             self.lookup_mod, self.lookup_params, self.show_all, self.page_num
@@ -126,7 +122,7 @@ class ChangeList(object):
         # error).
         except:
             raise IncorrectLookupParameters()
-            
+
         # Get the total number of objects, with no filters applied.
         real_lookup_params = lookup_params.copy()
         del real_lookup_params['order_by']
@@ -138,7 +134,7 @@ class ChangeList(object):
         result_count = paginator.hits
         can_show_all = result_count <= MAX_SHOW_ALL_ALLOWED
         multi_page = result_count > DEFAULT_RESULTS_PER_PAGE
-        
+
         # Get the list of objects to display on this page.
         if (show_all and can_show_all) or not multi_page:
             result_list = lookup_mod.get_list(**lookup_params)
@@ -147,13 +143,13 @@ class ChangeList(object):
                 result_list = paginator.get_page(page_num)
             except InvalidPage:
                 result_list = []
-        (self.result_count, self.full_result_count, self.result_list, 
-            self.can_show_all, self.multi_page, self.paginator) = (result_count, 
+        (self.result_count, self.full_result_count, self.result_list,
+            self.can_show_all, self.multi_page, self.paginator) = (result_count,
                   full_result_count, result_list, can_show_all, multi_page, paginator )
-    
+
     def url_for_result(self, result):
         return "%s/" % getattr(result, self.pk_attname)
-        
+
     def get_ordering(self):
         lookup_opts, params = self.lookup_opts, self.params
         # For ordering, first check the "ordering" parameter in the admin options,
@@ -161,10 +157,10 @@ class ChangeList(object):
         # order descending by ID by default. Finally, look for manually-specified
         # ordering from the query string.
         ordering = lookup_opts.admin.ordering or lookup_opts.ordering or ['-' + lookup_opts.pk.name]
-        
+
         # Normalize it to new-style ordering.
         ordering = meta.handle_legacy_orderlist(ordering)
-        
+
         if ordering[0].startswith('-'):
             order_field, order_type = ordering[0][1:], 'desc'
         else:
@@ -183,12 +179,12 @@ class ChangeList(object):
         if params.has_key(ORDER_TYPE_VAR) and params[ORDER_TYPE_VAR] in ('asc', 'desc'):
             order_type = params[ORDER_TYPE_VAR]
         self.order_field, self.order_type = order_field, order_type
-    
+
     def get_lookup_params(self):
         # Prepare the lookup parameters for the API lookup.
         (params, order_field, lookup_opts, order_type, opts, query) = \
            (self.params, self.order_field, self.lookup_opts, self.order_type, self.opts, self.query)
-           
+
         lookup_params = params.copy()
         for i in (ALL_VAR, ORDER_VAR, ORDER_TYPE_VAR, SEARCH_VAR, IS_POPUP_VAR):
             if lookup_params.has_key(i):
@@ -196,7 +192,7 @@ class ChangeList(object):
         # If the order-by field is a field with a relationship, order by the value
         # in the related table.
         lookup_order_field = order_field
-        try: 
+        try:
             f = lookup_opts.get_field(order_field)
         except meta.FieldDoesNotExist:
             pass
@@ -228,25 +224,25 @@ class ChangeList(object):
                     or_query.append(('%s__icontains' % field_name, bit))
                 or_queries.append(or_query)
             lookup_params['_or'] = or_queries
-        
+
         if opts.one_to_one_field:
             lookup_params.update(opts.one_to_one_field.rel.limit_choices_to)
         self.lookup_params = lookup_params
-    
+
 
 def change_list(request, app_label, module_name):
     try:
         cl = ChangeList(request, app_label, module_name)
     except IncorrectLookupParameters:
         return HttpResponseRedirect(request.path)
-    
+
     c = Context(request, {
         'title': cl.title,
         'is_popup': cl.is_popup,
         'cl' : cl
     })
     c.update( { 'has_add_permission': c['perms'][app_label][cl.opts.get_add_permission()]}),
-    return render_to_response('admin/change_list', 
+    return render_to_response('admin/change_list',
                                context_instance = c)
 change_list = staff_member_required(change_list)
 
@@ -270,7 +266,7 @@ def get_javascript_imports(opts,auto_populated_fields, ordered_objects, field_se
         if not seen_collapse and 'collapse' in field_set.classes:
             seen_collapse = True
             js.append('js/admin/CollapsedFieldsets.js' )
-        
+
         for field_line in field_set:
             try:
                 for f in field_line:
@@ -284,9 +280,9 @@ def get_javascript_imports(opts,auto_populated_fields, ordered_objects, field_se
 
 class AdminBoundField(BoundField):
     def __init__(self, field, field_mapping, original):
-        super(AdminBoundField, self).__init__(field,field_mapping,original)     
+        super(AdminBoundField, self).__init__(field,field_mapping,original)
 
-        self.element_id = self.form_fields[0].get_id() 
+        self.element_id = self.form_fields[0].get_id()
         self.has_label_first = not isinstance(self.field, meta.BooleanField)
         self.raw_id_admin = use_raw_id_admin(field)
         self.is_date_time = isinstance(field, meta.DateTimeField)
@@ -294,33 +290,33 @@ class AdminBoundField(BoundField):
         self.needs_add_label = field.rel and isinstance(field.rel, meta.ManyToOne) or isinstance(field.rel, meta.ManyToMany) and field.rel.to.admin
         self.hidden = isinstance(self.field, meta.AutoField)
         self.first = False
-        
+
         classes = []
-        if(self.raw_id_admin): 
+        if(self.raw_id_admin):
             classes.append('nowrap')
         if max([bool(f.errors()) for f in self.form_fields]):
             classes.append('error')
         if classes:
             self.cell_class_attribute = ' class="%s" ' % ' '.join(classes)
         self._repr_filled = False
-    
+
     def _fetch_existing_display(self, func_name):
         class_dict = self.original.__class__.__dict__
         func = class_dict.get(func_name)
         return func(self.original)
-        
+
     def _fill_existing_display(self):
-        if self._display_filled: 
+        if self._display_filled:
             return
         #HACK
         if isinstance(self.field.rel, meta.ManyToOne):
              func_name = 'get_%s' % self.field.name
              self._display = self._fetch_existing_display(func_name)
         elif isinstance(self.field.rel, meta.ManyToMany):
-            func_name = 'get_%s_list' % self.field.name 
+            func_name = 'get_%s_list' % self.field.name
             self._display =  ",".join(self._fetch_existing_display(func_name))
         self._display_filled = True
-        
+
     def existing_display(self):
         self._fill_existing_display()
         return self._display
@@ -329,8 +325,7 @@ class AdminBoundField(BoundField):
         return repr(self.__dict__)
 
     def html_error_list(self):
-        return " ".join([form_field.html_error_list() for form_field in self.form_fields if form_field.errors])        
-
+        return " ".join([form_field.html_error_list() for form_field in self.form_fields if form_field.errors])
 
 class AdminBoundFieldLine(BoundFieldLine):
     def __init__(self, field_line, field_mapping, original):
@@ -342,12 +337,12 @@ class AdminBoundFieldLine(BoundFieldLine):
 class AdminBoundFieldSet(BoundFieldSet):
     def __init__(self, field_set, field_mapping, original):
         super(AdminBoundFieldSet, self).__init__(field_set, field_mapping, original, AdminBoundFieldLine)
-        
+
 class BoundManipulator(object):
     def __init__(self, opts, manipulator, field_mapping):
         self.inline_related_objects = opts.get_followed_related_objects(manipulator.follow)
         self.original = hasattr(manipulator, 'original_object') and manipulator.original_object or None
-        self.bound_field_sets = [field_set.bind(field_mapping, self.original, AdminBoundFieldSet) 
+        self.bound_field_sets = [field_set.bind(field_mapping, self.original, AdminBoundFieldSet)
                                  for field_set in opts.admin.get_field_sets(opts)]
         self.ordered_objects = opts.get_ordered_objects()[:]
 
@@ -355,34 +350,33 @@ class AdminBoundManipulator(BoundManipulator):
     def __init__(self, opts, manipulator, field_mapping):
         super(AdminBoundManipulator, self).__init__(opts, manipulator, field_mapping)
         field_sets = opts.admin.get_field_sets(opts)
-        
+
         self.auto_populated_fields = [f for f in opts.fields if f.prepopulate_from]
-        self.javascript_imports = get_javascript_imports(opts, self.auto_populated_fields, self.ordered_objects, field_sets);                         
-        
+        self.javascript_imports = get_javascript_imports(opts, self.auto_populated_fields, self.ordered_objects, field_sets);
+
         self.coltype = self.ordered_objects and 'colMS' or 'colM'
         self.has_absolute_url = hasattr(opts.get_model_module().Klass, 'get_absolute_url')
         self.form_enc_attrib = opts.has_field_type(meta.FileField) and \
                                 'enctype="multipart/form-data" ' or ''
-        
-        self.first_form_field_id = self.bound_field_sets[0].bound_field_lines[0].bound_fields[0].form_fields[0].get_id();                
+
+        self.first_form_field_id = self.bound_field_sets[0].bound_field_lines[0].bound_fields[0].form_fields[0].get_id();
         self.ordered_object_pk_names = [o.pk.name for o in self.ordered_objects]
-        
+
         self.save_on_top = opts.admin.save_on_top
         self.save_as = opts.admin.save_as
-        
+
         self.content_type_id = opts.get_content_type_id()
         self.verbose_name_plural = opts.verbose_name_plural
         self.verbose_name = opts.verbose_name
         self.object_name = opts.object_name
-        
+
     def get_ordered_object_pk(self, ordered_obj):
         for name in self.ordered_object_pk_names:
             if hasattr(ordered_obj, name):
                 return str(getattr(ordered_obj, name))
         return ""
-        
+
 def render_change_form(opts, manipulator, app_label, context, add=False, change=False, show_delete=False, form_url=''):
-    
     extra_context = {
         'add': add,
         'change': change,
@@ -391,14 +385,11 @@ def render_change_form(opts, manipulator, app_label, context, add=False, change=
         'form_url' : form_url,
         'app_label': app_label,
     }
-    
     context.update(extra_context)
-    
-    return render_to_response(["admin/%s/%s/change_form" % (app_label, opts.object_name.lower() ), 
-                               "admin/%s/change_form" % app_label , 
-                               "admin/change_form"], 
-                              context_instance=context)
-   
+    return render_to_response(["admin/%s/%s/change_form" % (app_label, opts.object_name.lower() ),
+                               "admin/%s/change_form" % app_label ,
+                               "admin/change_form"], context_instance=context)
+
 def log_add_message(user, opts,manipulator,new_object):
     pk_value = getattr(new_object, opts.pk.attname)
     log.log_action(user.id, opts.get_content_type_id(), pk_value, str(new_object), log.ADDITION)
@@ -414,7 +405,7 @@ def add_stage(request, app_label, module_name, show_delete=False, form_url='', p
             new_data.update(request.FILES)
         errors = manipulator.get_validation_errors(new_data)
         manipulator.do_html2python(new_data)
-        
+
         if not errors and not request.POST.has_key("_preview"):
             new_object = manipulator.save(new_data)
             log_add_message(request.user, opts,manipulator,new_object)
@@ -439,14 +430,14 @@ def add_stage(request, app_label, module_name, show_delete=False, form_url='', p
     else:
         # Add default data.
         new_data = manipulator.flatten_data()
-        
+
         # Override the defaults with request.GET, if it exists.
         new_data.update(request.GET)
         errors = {}
 
     # Populate the FormWrapper.
     form = formfields.FormWrapper(manipulator, new_data, errors, edit_inline=True)
-    
+
     c = Context(request, {
         'title': _('Add %s') % opts.verbose_name,
         'form': form,
@@ -455,7 +446,7 @@ def add_stage(request, app_label, module_name, show_delete=False, form_url='', p
     })
     if object_id_override is not None:
         c['object_id'] = object_id_override
-    
+
     return render_change_form(opts, manipulator, app_label, c, add=True)
 add_stage = staff_member_required(add_stage)
 
@@ -473,7 +464,7 @@ def log_change_message(user, opts,manipulator,new_object):
     if not change_message:
         change_message = _('No fields changed.')
     log.log_action(user.id, opts.get_content_type_id(), pk_value, str(new_object), log.CHANGE, change_message)
-    
+
 def change_stage(request, app_label, module_name, object_id):
     mod, opts = _get_mod_opts(app_label, module_name)
     if not request.user.has_perm(app_label + '.' + opts.get_change_permission()):
@@ -491,7 +482,7 @@ def change_stage(request, app_label, module_name, object_id):
             new_data.update(request.FILES)
 
         errors = manipulator.get_validation_errors(new_data)
-        
+
         manipulator.do_html2python(new_data)
         if not errors and not request.POST.has_key("_preview"):
             new_object = manipulator.save(new_data)
@@ -516,11 +507,11 @@ def change_stage(request, app_label, module_name, object_id):
     else:
         # Populate new_data with a "flattened" version of the current data.
         new_data = manipulator.flatten_data()
-       
-        # TODO: do this in flatten_data... 
+
+        # TODO: do this in flatten_data...
         # If the object has ordered objects on its admin page, get the existing
         # order and flatten it into a comma-separated list of IDs.
-        
+
         id_order_list = []
         for rel_obj in opts.get_ordered_objects():
             id_order_list.extend(getattr(manipulator.original_object, 'get_%s_order' % rel_obj.object_name.lower())())
@@ -532,16 +523,16 @@ def change_stage(request, app_label, module_name, object_id):
     form = formfields.FormWrapper(manipulator, new_data, errors, edit_inline = True)
     form.original = manipulator.original_object
     form.order_objects = []
-    
+
     #TODO Should be done in flatten_data  / FormWrapper construction
     for related in opts.get_followed_related_objects():
         wrt = related.opts.order_with_respect_to
-        if wrt and wrt.rel and wrt.rel.to == opts: 
-            func = getattr(manipulator.original_object, 'get_%s_list' % 
+        if wrt and wrt.rel and wrt.rel.to == opts:
+            func = getattr(manipulator.original_object, 'get_%s_list' %
                     related.get_method_name_part())
             orig_list = func()
             form.order_objects.extend(orig_list)
-            
+
     c = Context(request, {
         'title': _('Change %s') % opts.verbose_name,
         'form': form,
@@ -551,8 +542,6 @@ def change_stage(request, app_label, module_name, object_id):
     })
 
     return render_change_form(opts,manipulator, app_label, c, change=True)
-    
-    
 
 def _nest_help(obj, depth, val):
     current = obj
