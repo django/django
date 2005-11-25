@@ -1,0 +1,96 @@
+Django was originally created in late 2003 at World Online, the Web division
+of the Lawrence Journal-World newspaper in Lawrence, Kansas.
+
+
+The PRIMARY AUTHORS are (and/or have been):
+
+Adrian Holovaty <http://www.holovaty.com/>, who originally created Django with
+Simon and currently oversees things with Jacob.
+
+Simon Willison <http://simon.incutio.com/>, who originally created Django with
+Adrian during his year-long internship/placement at World Online and currently
+helps from the sidelines.
+
+Jacob Kaplan-Moss <http://www.jacobian.org/>, who joined the team shortly
+before Simon departed and currently oversees things with Adrian.
+
+Wilson Miner <http://www.wilsonminer.com/>, who designed Django's admin
+interface, pretty error pages, official Web site (djangoproject.com) and has
+made many other contributions.
+
+Georg "Hugo" Bauer <http://hugo.muensterland.org/>, who added
+internationalization support, manages i18n contributions and has made a ton
+of excellent tweaks, feature additions and bug fixes.
+
+Robert Wittams <http://robert.wittams.com/>, who majorly refactored the Django
+admin application to allow for easier reuse and has made a ton of excellent
+tweaks, feature additions and bug fixes.
+
+
+And here is an inevitably incomplete list of MUCH-APPRECIATED CONTRIBUTORS --
+people who have submitted patches, reported bugs, added translations, helped
+answer newbie questions, and generally made Django that much better:
+
+    Andreas
+    David Ascher <http://ascher.ca/>
+    James Bennett
+    Paul Bissex <http://e-scribe.com/>
+    Simon Blanchard
+    Andrew Brehaut <http://brehaut.net/blog>
+    Antonio Cavedoni <http://cavedoni.com/>
+    Amit Chakradeo <http://amit.chakradeo.net/>
+    Matt Croydon <http://www.postneo.com/>
+    Jeremy Dunck <http://dunck.us/>
+    Clint Ecker
+    Baishampayan Ghose
+    Espen Grindhaug <http://grindhaug.org/>
+    Brant Harris
+    Ian Holsman <http://feh.holsman.net/>
+    Kieran Holland <http://www.kieranholland.com>
+    Robert Rock Howard <http://djangomojo.com/>
+    Jason Huggins <http://www.jrandolph.com/blog/>
+    Michael Josephson <http://www.sdjournal.com/>
+    Garth Kidd <http://www.deadlybloodyserious.com/>
+    Sune Kirkeby <http://ibofobi.dk/>
+    lakin.wecker@gmail.com
+    Stuart Langridge <http://www.kryogenix.org/>
+    Eugene Lazutkin <http://lazutkin.com/blog/>
+    Martin Maney <http://www.chipy.org/Martin_Maney>
+    Maniac <http://www.softwaremaniacs.org/>
+    Manuzhai
+    Petar Marić
+    mark@junklight.com
+    mattycakes@gmail.com
+    Jason McBrayer <http://www.carcosa.net/jason/>
+    mmarshall
+    Eric Moritz <http://eric.themoritzfamily.com/>
+    Robin Munn <http://www.geekforgod.com/>
+    nesh
+    Sam Newman <http://www.magpiebrain.com/>
+    Luke Plant <http://lukeplant.me.uk/>
+    phaedo <http://phaedo.cx/>
+    plisk
+    David Schein
+    sopel
+    Radek Švarz <http://www.svarz.cz/translate/>
+    Aaron Swartz <http://www.aaronsw.com/>
+    Tom Tobin
+    Joe Topjian <http://joe.terrarum.net/geek/code/python/django/>
+    Amit Upadhyay
+    Milton Waddams
+    Rachel Willmer <http://www.willmer.com/kb/>
+    wojtek
+
+
+A big THANK YOU goes to:
+
+    Rob Curley and Ralph Gage for letting us open-source Django.
+
+    Frank Wiles for making excellent arguments for open-sourcing, and for
+    his sage sysadmin advice.
+
+    Ian Bicking for convincing Adrian to ditch code generation.
+
+    Mark Pilgrim for diveintopython.org.
+
+    Guido van Rossum for creating Python.
