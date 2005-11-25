@@ -3,7 +3,7 @@ from django.core import formfields, validators
 from django.core.exceptions import ObjectDoesNotExist
 from django.utils.functional import curry, lazy
 from django.utils.text import capfirst
-from django.utils.translation import gettext_lazy
+from django.utils.translation import gettext_lazy, ngettext
 import datetime, os
 
 # Random entropy string used by "default" param.
@@ -43,7 +43,7 @@ def manipulator_valid_rel_key(f, self, field_data, all_data):
     try:
         mod.get_object(pk=field_data)
     except ObjectDoesNotExist:
-        raise validators.ValidationError, "Please enter a valid %s." % f.verbose_name
+        raise validators.ValidationError, _("Please enter a valid %s.") % f.verbose_name
 
 def manipulator_validator_unique(f, opts, self, field_data, all_data):
     "Validates that the value is unique for this field."
@@ -57,7 +57,7 @@ def manipulator_validator_unique(f, opts, self, field_data, all_data):
         return
     if hasattr(self, 'original_object') and getattr(self.original_object, opts.pk.attname) == getattr(old_obj, opts.pk.attname):
         return
-    raise validators.ValidationError, "%s with this %s already exists." % (capfirst(opts.verbose_name), f.verbose_name)
+    raise validators.ValidationError, _("%(optname)s with this %(fieldname)s already exists.") % {'optname': capfirst(opts.verbose_name), 'fieldname': f.verbose_name}
 
 
 # A guide to Field parameters:
@@ -264,7 +264,7 @@ class Field(object):
                     core_field_names.extend(f.get_manipulator_field_names(name_prefix))
             # Now, if there are any, add the validator to this FormField.
             if core_field_names:
-                params['validator_list'].append(validators.RequiredIfOtherFieldsGiven(core_field_names, "This field is required."))
+                params['validator_list'].append(validators.RequiredIfOtherFieldsGiven(core_field_names, gettext_lazy("This field is required.")))
 
         # BooleanFields (CheckboxFields) are a special case. They don't take
         # is_required or validator_list.
@@ -418,7 +418,7 @@ class FileField(Field):
                         self.always_test = True
                     def __call__(self, field_data, all_data):
                         if not all_data.get(self.other_file_field_name, False):
-                            c = validators.RequiredIfOtherFieldsGiven(self.other_field_names, "This field is required.")
+                            c = validators.RequiredIfOtherFieldsGiven(self.other_field_names, gettext_lazy("This field is required."))
                             c(field_data, all_data)
                 # First, get the core fields, if any.
                 core_field_names = []
@@ -429,7 +429,7 @@ class FileField(Field):
                 if core_field_names:
                     field_list[0].validator_list.append(RequiredFileField(core_field_names, field_list[1].field_name))
             else:
-                v = validators.RequiredIfOtherFieldNotGiven(field_list[1].field_name, "This field is required.")
+                v = validators.RequiredIfOtherFieldNotGiven(field_list[1].field_name, gettext_lazy("This field is required."))
                 v.always_test = True
                 field_list[0].validator_list.append(v)
                 field_list[0].is_required = field_list[1].is_required = False
@@ -438,7 +438,7 @@ class FileField(Field):
         def isWithinMediaRoot(field_data, all_data):
             f = os.path.abspath(os.path.join(settings.MEDIA_ROOT, field_data))
             if not f.startswith(os.path.normpath(settings.MEDIA_ROOT)):
-                raise validators.ValidationError, "Enter a valid filename."
+                raise validators.ValidationError, _("Enter a valid filename.")
         field_list[1].validator_list.append(isWithinMediaRoot)
         return field_list
 
@@ -682,10 +682,11 @@ class ManyToManyField(Field):
         objects = mod.get_in_bulk(pks)
         if len(objects) != len(pks):
             badkeys = [k for k in pks if k not in objects]
-            raise validators.ValidationError, "Please enter valid %s IDs. The value%s %r %s invalid." % \
-                (self.verbose_name, len(badkeys) > 1 and 's' or '',
-                len(badkeys) == 1 and badkeys[0] or tuple(badkeys),
-                len(badkeys) == 1 and "is" or "are")
+            raise validators.ValidationError, ngettext("Please enter valid %(self)s IDs. The value %(value)r is invalid.",
+                    "Please enter valid %(self)s IDs. The values %(value)r are invalid.", len(badkeys)) % {
+                'self': self.verbose_name,
+                'value': len(badkeys) == 1 and badkeys[0] or tuple(badkeys),
+            }
 
 class OneToOneField(IntegerField):
     def __init__(self, to, to_field=None, **kwargs):
