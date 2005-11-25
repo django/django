@@ -2,7 +2,7 @@ from django.core import validators
 from django.core.exceptions import PermissionDenied
 from django.utils.html import escape
 from django.conf.settings import DEFAULT_CHARSET
-from django.utils.translation import gettext_lazy
+from django.utils.translation import gettext_lazy, ngettext
 
 FORM_FIELD_ID_PREFIX = 'id_'
 
