@@ -34,7 +34,7 @@ class User(meta.Model):
     first_name = meta.CharField(_('first name'), maxlength=30, blank=True)
     last_name = meta.CharField(_('last name'), maxlength=30, blank=True)
     email = meta.EmailField(_('e-mail address'), blank=True)
-    password = meta.CharField(_('password'), maxlength=128, help_text=_("Use '[algo]$[salt]$[hexdigest]"))
+    password = meta.CharField(_('password'), maxlength=128, help_text=_("Use '[algo]$[salt]$[hexdigest]'"))
     is_staff = meta.BooleanField(_('staff status'), help_text=_("Designates whether the user can log into this admin site."))
     is_active = meta.BooleanField(_('active'), default=True)
     is_superuser = meta.BooleanField(_('superuser status'))

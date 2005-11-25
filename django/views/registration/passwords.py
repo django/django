@@ -41,7 +41,7 @@ class PasswordResetForm(formfields.Manipulator):
             'site_name': site_name,
             'user': self.user_cache,
         }
-        send_mail('Password reset on %s' % site_name, t.render(c), None, [self.user_cache.email])
+        send_mail('Password reset on %s' % site_name, t.render(Context(c)), None, [self.user_cache.email])
 
 class PasswordChangeForm(formfields.Manipulator):
     "A form that lets a user change his password."

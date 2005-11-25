@@ -27,9 +27,12 @@ for app in INSTALLED_APPS:
 # It won't change, so convert it to a tuple to save memory.
 app_template_dirs = tuple(app_template_dirs)
 
-def load_template_source(template_name, template_dirs=None):
+def get_template_sources(template_name, template_dirs=None):
     for template_dir in app_template_dirs:
-        filepath = os.path.join(template_dir, template_name) + TEMPLATE_FILE_EXTENSION
+        yield os.path.join(template_dir, template_name) + TEMPLATE_FILE_EXTENSION
+
+def load_template_source(template_name, template_dirs=None):
+    for filepath in get_template_sources(template_name, template_dirs):
         try:
             return (open(filepath).read(), filepath)
         except IOError:

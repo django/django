@@ -789,6 +789,7 @@ msgstr "Ihr Kennwort wurde geändert."
 
 #: contrib/admin/templates/registration/password_reset_form.html:4
 #: contrib/admin/templates/registration/password_reset_form.html:6
+#: contrib/admin/templates/registration/password_reset_form.html:10
 #: contrib/admin/templates/registration/password_reset_done.html:4
 msgid "Password reset"
 msgstr "Kennwort zurücksetzen"
@@ -1291,8 +1292,8 @@ msgid "password"
 msgstr "Kennwort"
 
 #: models/auth.py:37
-msgid "Use '[algo]$[salt]$[hexdigest]"
-msgstr "Im Format '[algo]$[salt]$[hexdigest]"
+msgid "Use '[algo]$[salt]$[hexdigest]'"
+msgstr "Im Format '[algo]$[salt]$[hexdigest]'"
 
 #: models/auth.py:38
 msgid "staff status"
