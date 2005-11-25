@@ -149,18 +149,18 @@ class BadKeywordArguments(Exception):
     pass
 
 class BoundRelatedObject(object):
-    def __init__(self,related_object, field_mapping, original):
+    def __init__(self, related_object, field_mapping, original):
         self.relation = related_object
         self.field_mappings = field_mapping[related_object.opts.module_name]
-    
+
     def template_name(self):
-        raise NotImplementedException
-    
+        raise NotImplementedError
+
     def __repr__(self):
         return repr(self.__dict__)
-        
+
 class RelatedObject(object):
-    def __init__(self,parent_opts, opts, field):
+    def __init__(self, parent_opts, opts, field):
         self.parent_opts = parent_opts
         self.opts = opts
         self.field = field
@@ -168,41 +168,42 @@ class RelatedObject(object):
         self.name = opts.module_name
         self.var_name = opts.object_name.lower()
 
-    def flatten_data(self,follow, obj = None):
+    def flatten_data(self, follow, obj=None):
         new_data = {}
         rel_instances = self.get_list(obj)
         for i, rel_instance in enumerate(rel_instances):
-            instance_data = {} 
-            
+            instance_data = {}
             for f in self.opts.fields + self.opts.many_to_many:
-                #TODO fix for recursive manipulators.
-                fol = follow.get(f.name, None )
+                # TODO: Fix for recursive manipulators.
+                fol = follow.get(f.name, None)
                 if fol:
-                    field_data = f.flatten_data(fol,rel_instance)
+                    field_data = f.flatten_data(fol, rel_instance)
                     for name, value in field_data.items():
                         instance_data['%s.%d.%s' % (self.var_name, i, name)] = value
             new_data.update(instance_data)
-    
         return new_data
 
     def extract_data(self, data):
-        "Pull out the data meant for inline objects of this class, ie anything starting with our module name"
-        return data # TODO  
-    
-    def get_list(self, parent_instance = None):
-        "Get the list of this type of object from an instance of the parent class"
+        """
+        Pull out the data meant for inline objects of this class,
+        i.e. anything starting with our module name.
+        """
+        return data # TODO
+
+    def get_list(self, parent_instance=None):
+        "Get the list of this type of object from an instance of the parent class."
         if parent_instance != None:
             func_name = 'get_%s_list' % self.get_method_name_part()
             func = getattr(parent_instance, func_name)
             list = func()
-            
+
             count = len(list) + self.field.rel.num_extra_on_change
             if self.field.rel.min_num_in_admin:
                count = max(count, self.field.rel.min_num_in_admin)
             if self.field.rel.max_num_in_admin:
                count = min(count, self.field.rel.max_num_in_admin)
-       
-            change = count - len(list) 
+
+            change = count - len(list)
             if change > 0:
                 return list + [None for _ in range(change)]
             if change < 0:
@@ -212,12 +213,11 @@ class RelatedObject(object):
         else:
             return [None for _ in range(self.field.rel.num_in_admin)]
 
-    
+
     def editable_fields(self):
-        """Get the fields in this class that should be edited inline."""
-        
-        return [f for f in self.opts.fields + self.opts.many_to_many if f.editable and f != self.field ]
-      
+        "Get the fields in this class that should be edited inline."
+        return [f for f in self.opts.fields + self.opts.many_to_many if f.editable and f != self.field]
+
     def get_follow(self, override=None):
         if isinstance(override, bool):
             if override:
@@ -231,15 +231,15 @@ class RelatedObject(object):
                 over = {}
             else:
                 return None
-        
+
         over[self.field.name] = False
         return self.opts.get_follow(over)
-    
+
     def __repr__(self):
-        return "<RelatedObject: %s related to %s>" % ( self.name, self.field.name)      
+        return "<RelatedObject: %s related to %s>" % ( self.name, self.field.name)
 
     def get_manipulator_fields(self, opts, manipulator, change, follow):
-        #TODO: remove core fields stuff
+        # TODO: Remove core fields stuff.
         if change:
             meth_name = 'get_%s_count' % self.get_method_name_part()
             count = getattr(manipulator.original_object, meth_name)()
@@ -250,17 +250,15 @@ class RelatedObject(object):
                 count = min(count, self.field.rel.max_num_in_admin)
         else:
             count = self.field.rel.num_in_admin
-            
+
         fields = []
         for i in range(count):
             for f in self.opts.fields + self.opts.many_to_many:
-                    if follow.get(f.name, False):
-                        prefix = '%s.%d.' % (self.var_name, i)
-                        fields.extend(
-                             f.get_manipulator_fields(self.opts, manipulator, change, name_prefix=prefix, rel=True))
-
+                if follow.get(f.name, False):
+                    prefix = '%s.%d.' % (self.var_name, i)
+                    fields.extend(f.get_manipulator_fields(self.opts, manipulator, change, name_prefix=prefix, rel=True))
         return fields
-    
+
     def bind(self, field_mapping, original, bound_related_object_class=BoundRelatedObject):
         return bound_related_object_class(self, field_mapping, original)
 
@@ -435,18 +433,18 @@ class Options:
     def get_followed_related_objects(self, follow=None):
         if follow == None:
             follow = self.get_follow()
-        return [f for f in self.get_all_related_objects() if follow.get(f.name, None) ]
+        return [f for f in self.get_all_related_objects() if follow.get(f.name, None)]
 
     def get_data_holders(self, follow=None):
-        if follow == None :
+        if follow == None:
             follow = self.get_follow()
-        return [f for f in self.fields + self.many_to_many + self.get_all_related_objects() if follow.get(f.name, None) ]
+        return [f for f in self.fields + self.many_to_many + self.get_all_related_objects() if follow.get(f.name, None)]
 
     def get_follow(self, override=None):
         follow = {}
         for f in self.fields + self.many_to_many + self.get_all_related_objects():
             if override and override.has_key(f.name):
-                child_override = override[f.name] 
+                child_override = override[f.name]
             else:
                 child_override = None
             fol = f.get_follow(child_override)
@@ -480,12 +478,12 @@ class Options:
             self._ordered_objects = objects
         return self._ordered_objects
 
-    def has_field_type(self, field_type, follow = None):
+    def has_field_type(self, field_type, follow=None):
         """
         Returns True if this object's admin form has at least one of the given
         field_type (e.g. FileField).
         """
-        #TODO: follow
+        # TODO: follow
         if not hasattr(self, '_field_types'):
             self._field_types = {}
         if not self._field_types.has_key(field_type):
@@ -733,7 +731,7 @@ class ModelBase(type):
             new_mod.get_latest = curry(function_get_latest, opts, new_class, does_not_exist_exception)
 
         for f in opts.fields:
-            #TODO : change this into a virtual function so that user defined fields will be able to add methods to module or class. 
+            #TODO : change this into a virtual function so that user defined fields will be able to add methods to module or class.
             if f.choices:
                 # Add "get_thingie_display" method to get human-readable value.
                 func = curry(method_get_display_value, f)
@@ -857,11 +855,9 @@ class ModelBase(type):
                     old_app._MODELS[i] = new_class
                     # Replace all relationships to the old class with
                     # relationships to the new one.
-                    for related in model._meta.get_all_related_objects() + \
-                        model._meta.get_all_related_many_to_many_objects():
+                    for related in model._meta.get_all_related_objects() + model._meta.get_all_related_many_to_many_objects():
                         related.field.rel.to = opts
                     break
-
         return new_class
 
 class Model:
@@ -1626,8 +1622,8 @@ def get_manipulator(opts, klass, extra_methods, add=False, change=False):
     return man
 
 def manipulator_init(opts, add, change, self, obj_key=None, follow=None):
-    self.follow = opts.get_follow(follow)   
-    
+    self.follow = opts.get_follow(follow)
+
     if change:
         assert obj_key is not None, "ChangeManipulator.__init__() must be passed obj_key parameter."
         self.obj_key = obj_key
@@ -1653,7 +1649,7 @@ def manipulator_init(opts, add, change, self, obj_key=None, follow=None):
     self.fields = []
 
     for f in opts.fields + opts.many_to_many:
-        if self.follow.get(f.name, False):   
+        if self.follow.get(f.name, False):
             self.fields.extend(f.get_manipulator_fields(opts, self, change))
 
     # Add fields for related objects.
@@ -1667,10 +1663,10 @@ def manipulator_init(opts, add, change, self, obj_key=None, follow=None):
         self.fields.append(formfields.CommaSeparatedIntegerField(field_name="order_"))
 
 def manipulator_save(opts, klass, add, change, self, new_data):
-    # TODO: big cleanup when core fields go -> use recursive manipulators. 
+    # TODO: big cleanup when core fields go -> use recursive manipulators.
     from django.utils.datastructures import DotExpandedDict
     params = {}
-    for f in opts.fields:        
+    for f in opts.fields:
         # Fields with auto_now_add should keep their original value in the change stage.
         auto_now_add = change and getattr(f, 'auto_now_add', False)
         if self.follow.get(f.name, None) and not auto_now_add:
@@ -1680,8 +1676,8 @@ def manipulator_save(opts, klass, add, change, self, new_data):
                 param = getattr(self.original_object, f.attname)
             else:
                 param = f.get_default()
-        params[f.attname] = param    
-    
+        params[f.attname] = param
+
 
     if change:
         params[opts.pk.attname] = self.obj_key
@@ -1718,7 +1714,7 @@ def manipulator_save(opts, klass, add, change, self, new_data):
         #  ('1', {'id': ['941'], 'choice': ['This is the second choice']}),
         #  ('2', {'id': [''], 'choice': ['']})]
         child_follow = self.follow.get(related.name, None)
-        
+
         if child_follow:
             obj_list = expanded_data[related.var_name].items()
             obj_list.sort(lambda x, y: cmp(int(x[0]), int(y[0])))
@@ -1754,7 +1750,7 @@ def manipulator_save(opts, klass, add, change, self, new_data):
                     # previously, according to the given ID. If the ID wasn't
                     # given, use a default value. FileFields are also a special
                     # case, because they'll be dealt with later.
-                    
+
                     if f == related.field:
                         param = getattr(new_object, related.field.rel.field_name)
                     elif add and isinstance(f, AutoField):
@@ -1768,7 +1764,7 @@ def manipulator_save(opts, klass, add, change, self, new_data):
                         param = f.get_manipulator_new_data(rel_new_data, rel=True)
                     if param != None:
                        params[f.attname] = param
-                    
+
 
                     # Related links are a special case, because we have to
                     # manually set the "content_type_id" and "object_id" fields.
@@ -1779,8 +1775,8 @@ def manipulator_save(opts, klass, add, change, self, new_data):
 
                 # Create the related item.
                 new_rel_obj = related.opts.get_model_module().Klass(**params)
-    
-                
+
+
 
                 # If all the core fields were provided (non-empty), save the item.
                 if all_cores_given:
@@ -1824,7 +1820,7 @@ def manipulator_save(opts, klass, add, change, self, new_data):
 
 def manipulator_get_related_objects(opts, klass, add, change, self):
     return opts.get_followed_related_objects(self.follow)
-        
+
 def manipulator_flatten_data(opts, klass, add, change, self):
      new_data = {}
      obj = change and self.original_object or None
@@ -1835,15 +1831,15 @@ def manipulator_flatten_data(opts, klass, add, change, self):
 
 def manipulator_validator_unique_together(field_name_list, opts, self, field_data, all_data):
     from django.utils.text import get_text_list
-    
+
     field_list = [opts.get_field(field_name) for field_name in field_name_list]
     if isinstance(field_list[0].rel, ManyToOne):
         kwargs = {'%s__%s__iexact' % (field_name_list[0], field_list[0].rel.field_name): field_data}
     else:
         kwargs = {'%s__iexact' % field_name_list[0]: field_data}
     for f in field_list[1:]:
-        # This is really not going to work for fields that have different form fields, eg DateTime 
-        # This validation needs to occur after html2python to be effective. 
+        # This is really not going to work for fields that have different form fields, eg DateTime
+        # This validation needs to occur after html2python to be effective.
         field_val = all_data.get(f.attname, None)
         if field_val is None:
             # This will be caught by another validator, assuming the field
