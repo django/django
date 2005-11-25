@@ -1,4 +1,3 @@
-
 from django.conf import settings
 from django.core.template import Template, Context, TemplateDoesNotExist
 from django.utils.html import escape
