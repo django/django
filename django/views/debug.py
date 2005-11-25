@@ -12,7 +12,7 @@ def linebreak_iter(template_source):
     yield 0
     p = template_source.find('\n')
     while p >= 0:
-        yield p
+        yield p+1
         p = template_source.find('\n', p+1)
     yield len(template_source) + 1
 
@@ -23,18 +23,17 @@ def get_template_exception_info(exc_type, exc_value, tb):
     line = 0
     upto = 0
     source_lines = []
-    linebreaks = izip(count(0), linebreak_iter(template_source))
-    for num, next in linebreaks:
+    for num, next in enumerate(linebreak_iter(template_source)):
         if start >= upto and end <= next:
             line = num
-            before = escape(template_source[upto+1:start])
+            before = escape(template_source[upto:start])
             during = escape(template_source[start:end])
             after = escape(template_source[end:next])
-        source_lines.append( (num, escape(template_source[upto+1:next])) )
+        source_lines.append( (num, escape(template_source[upto:next])) )
         upto = next
     total = len(source_lines)
 
-    top = max(0, line - context_lines)
+    top = max(1, line - context_lines)
     bottom = min(total, line + 1 + context_lines)
 
     template_info = {
@@ -323,7 +322,7 @@ TECHNICAL_500_TEMPLATE = """
        <td>{{ template_info.before }}<span class="specific">{{ template_info.during }}</span>{{ template_info.after }}</td></tr>
    {% else %}
       <tr><th>{{ source_line.0 }}</th>
-      <td> {{ source_line.1 }}</td></tr>
+      <td>{{ source_line.1 }}</td></tr>
    {% endifequal %}
    {% endfor %}
    </table>
