@@ -14,27 +14,26 @@ def validate_class(klass):
     for f in opts.fields:
         if isinstance(f, meta.ManyToManyField):
             assert isinstance(f.rel, meta.ManyToMany), \
-                  "ManyToManyField %s should have 'rel' set to a ManyToMany instance." % f.name
+                "ManyToManyField %s should have 'rel' set to a ManyToMany instance." % f.name
     # Inline related objects.
     for related in opts.get_followed_related_objects():
         assert len([f for f in related.opts.fields if f.core]) > 0, \
-               "At least one field in %s should have core=True, because it's being edited inline by %s." % \
-               (related.opts.object_name, opts.object_name)
+            "At least one field in %s should have core=True, because it's being edited inline by %s." % \
+            (related.opts.object_name, opts.object_name)
     # All related objects.
     related_apps_seen = []
     for related in opts.get_all_related_objects():
         if related.opts in related_apps_seen:
             assert related.field.rel.related_name is not None, \
-                 "Relationship in field %s.%s needs to set 'related_name' because more than one" \
-                 " %s object is referenced in %s." % \
-                 (related.opts.object_name, related.field.name, opts.object_name, rel_opts.object_name)
+                "Relationship in field %s.%s needs to set 'related_name' because more than one" \
+                " %s object is referenced in %s." % \
+                (related.opts.object_name, related.field.name, opts.object_name, rel_opts.object_name)
         related_apps_seen.append(related.opts)
     # Etc.
     if opts.admin is not None:
         assert opts.admin.ordering or opts.ordering, \
             "%s needs to set 'ordering' on either its 'admin' or its model," \
-            "because it has 'admin' set." % \
-            opts.object_name
+            " because it has 'admin' set." % opts.object_name
 
 if __name__ == "__main__":
     import sys
