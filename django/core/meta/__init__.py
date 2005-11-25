@@ -1825,20 +1825,20 @@ def manipulator_flatten_data(opts, klass, add, change, self):
      new_data = {}
      obj = change and self.original_object or None
      for f in opts.get_data_holders(self.follow):
-            fol = self.follow.get(f.name)
-            new_data.update(f.flatten_data(fol, obj))
+        fol = self.follow.get(f.name)
+        new_data.update(f.flatten_data(fol, obj))
      return new_data
 
 def manipulator_validator_unique_together(field_name_list, opts, self, field_data, all_data):
     from django.utils.text import get_text_list
-
     field_list = [opts.get_field(field_name) for field_name in field_name_list]
     if isinstance(field_list[0].rel, ManyToOne):
         kwargs = {'%s__%s__iexact' % (field_name_list[0], field_list[0].rel.field_name): field_data}
     else:
         kwargs = {'%s__iexact' % field_name_list[0]: field_data}
     for f in field_list[1:]:
-        # This is really not going to work for fields that have different form fields, eg DateTime
+        # This is really not going to work for fields that have different
+        # form fields, e.g. DateTime.
         # This validation needs to occur after html2python to be effective.
         field_val = all_data.get(f.attname, None)
         if field_val is None:
