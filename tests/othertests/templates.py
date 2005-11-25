@@ -244,7 +244,8 @@ TEMPLATE_TESTS = {
                     are
                     you
                     gentlemen.
-                    """  ),
+                    """),
+
     # simple translation of a string delimited by '
     'i18n01': ("{% load i18n %}{% trans 'xxxyyyxxx' %}", {}, "xxxyyyxxx"),
 
