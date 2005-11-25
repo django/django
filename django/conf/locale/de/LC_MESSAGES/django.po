@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2005-11-23 16:48+0100\n"
+"POT-Creation-Date: 2005-11-25 17:27-0600\n"
 "PO-Revision-Date: 2005-10-08 00:03+0200\n"
 "Last-Translator: Georg Bauer <gb@bofh.ms>\n"
 "MIME-Version: 1.0\n"
@@ -288,7 +288,7 @@ msgid "The comment form didn't provide either 'preview' or 'post'"
 msgstr ""
 "Das Kommentarformular wurde nicht mit 'preview' oder 'post' abgeschickt"
 
-#: contrib/admin/filterspecs.py:32
+#: contrib/admin/filterspecs.py:40
 #, python-format
 msgid ""
 "<h3>By %s:</h3>\n"
@@ -297,40 +297,40 @@ msgstr ""
 "<h3>Nach %s:</h3>\n"
 "<ul>\n"
 
-#: contrib/admin/filterspecs.py:62 contrib/admin/filterspecs.py:79
-#: contrib/admin/filterspecs.py:134
+#: contrib/admin/filterspecs.py:70 contrib/admin/filterspecs.py:88
+#: contrib/admin/filterspecs.py:143
 msgid "All"
 msgstr "Alle"
 
-#: contrib/admin/filterspecs.py:100
+#: contrib/admin/filterspecs.py:109
 msgid "Any date"
 msgstr "Alle Daten"
 
-#: contrib/admin/filterspecs.py:101
+#: contrib/admin/filterspecs.py:110
 msgid "Today"
 msgstr "Heute"
 
-#: contrib/admin/filterspecs.py:104
+#: contrib/admin/filterspecs.py:113
 msgid "Past 7 days"
 msgstr "Letzte 7 Tage"
 
-#: contrib/admin/filterspecs.py:106
+#: contrib/admin/filterspecs.py:115
 msgid "This month"
 msgstr "Diesen Monat"
 
-#: contrib/admin/filterspecs.py:108
+#: contrib/admin/filterspecs.py:117
 msgid "This year"
 msgstr "Dieses Jahr"
 
-#: contrib/admin/filterspecs.py:134
+#: contrib/admin/filterspecs.py:143
 msgid "Yes"
 msgstr "Ja"
 
-#: contrib/admin/filterspecs.py:134
+#: contrib/admin/filterspecs.py:143
 msgid "No"
 msgstr "Nein"
 
-#: contrib/admin/filterspecs.py:142
+#: contrib/admin/filterspecs.py:150
 msgid "Unknown"
 msgstr "Unbekannt"
 
@@ -362,7 +362,7 @@ msgstr "Logeintrag"
 msgid "log entries"
 msgstr "Logeinträge"
 
-#: contrib/admin/templatetags/admin_list.py:244
+#: contrib/admin/templatetags/admin_list.py:243
 msgid "All dates"
 msgstr "Alle Tage"
 
@@ -398,69 +398,69 @@ msgstr ""
 "Die eMail-Adresse ist nicht der Benutzername. Bitte '%s' stattdessen "
 "versuchen."
 
-#: contrib/admin/views/main.py:50
+#: contrib/admin/views/main.py:49
 msgid "Site administration"
 msgstr "Website Verwaltung"
 
-#: contrib/admin/views/main.py:65
+#: contrib/admin/views/main.py:64
 #, python-format
 msgid "Select %s"
 msgstr "%s auswählen"
 
-#: contrib/admin/views/main.py:66
+#: contrib/admin/views/main.py:65
 #, python-format
 msgid "Select %s to change"
 msgstr "%s zur Änderung auswählen"
 
-#: contrib/admin/views/main.py:421
+#: contrib/admin/views/main.py:412
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was added successfully."
 msgstr "%(name)s \"%(obj)s\" wurde erfolgreich hinzugefügt."
 
-#: contrib/admin/views/main.py:426 contrib/admin/views/main.py:502
+#: contrib/admin/views/main.py:417 contrib/admin/views/main.py:493
 msgid "You may edit it again below."
 msgstr "Das Element kann jetzt weiter geändert werden."
 
-#: contrib/admin/views/main.py:434 contrib/admin/views/main.py:511
+#: contrib/admin/views/main.py:425 contrib/admin/views/main.py:502
 #, python-format
 msgid "You may add another %s below."
 msgstr "Jetzt kann ein weiteres Element vom Typ %s angelegt werden."
 
-#: contrib/admin/views/main.py:451
+#: contrib/admin/views/main.py:442
 #, python-format
 msgid "Add %s"
 msgstr "%s zufügen"
 
-#: contrib/admin/views/main.py:467
+#: contrib/admin/views/main.py:458
 #, python-format
 msgid "Added %s."
 msgstr "%s hinzugefügt."
 
-#: contrib/admin/views/main.py:467 contrib/admin/views/main.py:469
-#: contrib/admin/views/main.py:471
+#: contrib/admin/views/main.py:458 contrib/admin/views/main.py:460
+#: contrib/admin/views/main.py:462
 msgid "and"
 msgstr "und"
 
-#: contrib/admin/views/main.py:469
+#: contrib/admin/views/main.py:460
 #, python-format
 msgid "Changed %s."
 msgstr "%s geändert"
 
-#: contrib/admin/views/main.py:471
+#: contrib/admin/views/main.py:462
 #, python-format
 msgid "Deleted %s."
 msgstr "%s gelöscht."
 
-#: contrib/admin/views/main.py:474
+#: contrib/admin/views/main.py:465
 msgid "No fields changed."
 msgstr "Keine Felder geändert."
 
-#: contrib/admin/views/main.py:499
+#: contrib/admin/views/main.py:490
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was changed successfully."
 msgstr "%(name)s \"%(obj)s\" wurde erfolgreich geändert."
 
-#: contrib/admin/views/main.py:508
+#: contrib/admin/views/main.py:499
 #, python-format
 msgid ""
 "The %(name)s \"%(obj)s\" was added successfully. You may edit it again below."
@@ -468,31 +468,31 @@ msgstr ""
 "%(name)s \"%(obj)s\" wurde erfolgreich zugefügt. Das Element kann jetzt "
 "geändert werden."
 
-#: contrib/admin/views/main.py:546
+#: contrib/admin/views/main.py:537
 #, python-format
 msgid "Change %s"
 msgstr "%s ändern"
 
-#: contrib/admin/views/main.py:626
+#: contrib/admin/views/main.py:615
 #, python-format
 msgid "One or more %(fieldname)s in %(name)s: %(obj)s"
 msgstr "Ein oder mehrere %(fieldname)s in %(name)s: %(obj)s"
 
-#: contrib/admin/views/main.py:631
+#: contrib/admin/views/main.py:620
 #, python-format
 msgid "One or more %(fieldname)s in %(name)s:"
 msgstr "Ein oder mehrere %(fieldname)s in %(name)s:"
 
-#: contrib/admin/views/main.py:660
+#: contrib/admin/views/main.py:649
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was deleted successfully."
 msgstr "%(name)s \"%(obj)s\" wurde erfolgreich gelöscht."
 
-#: contrib/admin/views/main.py:663
+#: contrib/admin/views/main.py:652
 msgid "Are you sure?"
 msgstr "Sicher? Ganz sicher?"
 
-#: contrib/admin/views/main.py:678
+#: contrib/admin/views/main.py:667
 #, python-format
 msgid "Change history: %s"
 msgstr "Änderungsgeschichte: %s"
@@ -568,11 +568,11 @@ msgstr "U.S. Bundesstaat (zwei Grossbuchstaben)"
 msgid "XML text"
 msgstr "XML Text"
 
-#: contrib/admin/templates/admin/change_list.html:5
-#: contrib/admin/templates/admin/500.html:4
 #: contrib/admin/templates/admin/object_history.html:5
-#: contrib/admin/templates/admin/change_form.html:12
+#: contrib/admin/templates/admin/500.html:4
+#: contrib/admin/templates/admin/change_list.html:5
 #: contrib/admin/templates/admin/base.html:29
+#: contrib/admin/templates/admin/change_form.html:12
 #: contrib/admin/templates/registration/password_change_done.html:4
 #: contrib/admin/templates/registration/password_reset_form.html:4
 #: contrib/admin/templates/registration/logged_out.html:4
@@ -581,57 +581,6 @@ msgstr "XML Text"
 #: contrib/admin/templates/admin_doc/bookmarklets.html:3
 msgid "Home"
 msgstr "Start"
-
-#: contrib/admin/templates/admin/change_list.html:10
-#, python-format
-msgid "Add %(name)s"
-msgstr "%(name)s zufügen"
-
-#: contrib/admin/templates/admin/index.html:27
-#: contrib/admin/templates/admin/change_form.html:14
-msgid "Add"
-msgstr "Zufügen"
-
-#: contrib/admin/templates/admin/index.html:33
-msgid "Change"
-msgstr "Ändern"
-
-#: contrib/admin/templates/admin/index.html:43
-msgid "You don't have permission to edit anything."
-msgstr "Sie haben keine Berechtigung irgendwas zu ändern."
-
-#: contrib/admin/templates/admin/index.html:51
-msgid "Recent Actions"
-msgstr "Kürzliche Aktionen"
-
-#: contrib/admin/templates/admin/index.html:52
-msgid "My Actions"
-msgstr "Meine Aktionen"
-
-#: contrib/admin/templates/admin/index.html:56
-msgid "None available"
-msgstr "Keine vorhanden"
-
-#: contrib/admin/templates/admin/500.html:4
-msgid "Server error"
-msgstr "Serverfehler"
-
-#: contrib/admin/templates/admin/500.html:6
-msgid "Server error (500)"
-msgstr "Serverfehler (500)"
-
-#: contrib/admin/templates/admin/500.html:9
-msgid "Server Error <em>(500)</em>"
-msgstr "Serverfehler <em>(500)</em>"
-
-#: contrib/admin/templates/admin/500.html:10
-msgid ""
-"There's been an error. It's been reported to the site administrators via e-"
-"mail and should be fixed shortly. Thanks for your patience."
-msgstr ""
-"Es hat einen Fehler gegeben. Dieser Fehler wurde an die Serververwalter per "
-"eMail weitergegeben und sollte bald behoben sein. Vielen Dank für Ihr "
-"Verständnis."
 
 #: contrib/admin/templates/admin/object_history.html:5
 #: contrib/admin/templates/admin/change_form.html:19
@@ -670,6 +619,67 @@ msgstr "Django Systemverwaltung"
 msgid "Django administration"
 msgstr "Django Verwaltung"
 
+#: contrib/admin/templates/admin/500.html:4
+msgid "Server error"
+msgstr "Serverfehler"
+
+#: contrib/admin/templates/admin/500.html:6
+msgid "Server error (500)"
+msgstr "Serverfehler (500)"
+
+#: contrib/admin/templates/admin/500.html:9
+msgid "Server Error <em>(500)</em>"
+msgstr "Serverfehler <em>(500)</em>"
+
+#: contrib/admin/templates/admin/500.html:10
+msgid ""
+"There's been an error. It's been reported to the site administrators via e-"
+"mail and should be fixed shortly. Thanks for your patience."
+msgstr ""
+"Es hat einen Fehler gegeben. Dieser Fehler wurde an die Serververwalter per "
+"eMail weitergegeben und sollte bald behoben sein. Vielen Dank für Ihr "
+"Verständnis."
+
+#: contrib/admin/templates/admin/404.html:4
+#: contrib/admin/templates/admin/404.html:8
+msgid "Page not found"
+msgstr "Seite nicht gefunden"
+
+#: contrib/admin/templates/admin/404.html:10
+msgid "We're sorry, but the requested page could not be found."
+msgstr ""
+"Es tut uns leid, aber die angeforderte Seite kann nicht gefunden werden."
+
+#: contrib/admin/templates/admin/index.html:27
+#: contrib/admin/templates/admin/change_form.html:14
+msgid "Add"
+msgstr "Zufügen"
+
+#: contrib/admin/templates/admin/index.html:33
+msgid "Change"
+msgstr "Ändern"
+
+#: contrib/admin/templates/admin/index.html:43
+msgid "You don't have permission to edit anything."
+msgstr "Sie haben keine Berechtigung irgendwas zu ändern."
+
+#: contrib/admin/templates/admin/index.html:51
+msgid "Recent Actions"
+msgstr "Kürzliche Aktionen"
+
+#: contrib/admin/templates/admin/index.html:52
+msgid "My Actions"
+msgstr "Meine Aktionen"
+
+#: contrib/admin/templates/admin/index.html:56
+msgid "None available"
+msgstr "Keine vorhanden"
+
+#: contrib/admin/templates/admin/change_list.html:10
+#, python-format
+msgid "Add %(name)s"
+msgstr "%(name)s zufügen"
+
 #: contrib/admin/templates/admin/login.html:15
 msgid "Username:"
 msgstr "Benutzername:"
@@ -682,33 +692,17 @@ msgstr "Passwort:"
 msgid "Have you <a href=\"/password_reset/\">forgotten your password</a>?"
 msgstr "Haben Sie <a href=\"/password_reset/\">ihr Passwort vergessen</a>?"
 
-#: contrib/admin/templates/admin/404.html:4
-#: contrib/admin/templates/admin/404.html:8
-msgid "Page not found"
-msgstr "Seite nicht gefunden"
+#: contrib/admin/templates/admin/base.html:23
+msgid "Welcome,"
+msgstr "Willkommen,"
 
-#: contrib/admin/templates/admin/404.html:10
-msgid "We're sorry, but the requested page could not be found."
-msgstr ""
-"Es tut uns leid, aber die angeforderte Seite kann nicht gefunden werden."
+#: contrib/admin/templates/admin/base.html:23
+msgid "Change password"
+msgstr "Passwort ändern"
 
-#: contrib/admin/templates/admin/change_form.html:20
-msgid "View on site"
-msgstr "Im Web Anzeigen"
-
-#: contrib/admin/templates/admin/change_form.html:28
-msgid "Please correct the error below."
-msgid_plural "Please correct the errors below."
-msgstr[0] "Bitte den Fehler korrigieren."
-msgstr[1] "Bitte die Fehler korrigieren."
-
-#: contrib/admin/templates/admin/change_form.html:45
-msgid "Ordering"
-msgstr "Sortierung"
-
-#: contrib/admin/templates/admin/change_form.html:48
-msgid "Order:"
-msgstr "Reihenfolge:"
+#: contrib/admin/templates/admin/base.html:23
+msgid "Log out"
+msgstr "Abmelden"
 
 #: contrib/admin/templates/admin/delete_confirmation.html:7
 #, python-format
@@ -734,17 +728,28 @@ msgstr ""
 msgid "Yes, I'm sure"
 msgstr "Ja, ich bin sicher"
 
-#: contrib/admin/templates/admin/base.html:23
-msgid "Welcome,"
-msgstr "Willkommen,"
+#: contrib/admin/templates/admin/filter.html:1
+#, python-format
+msgid " By %(title)s "
+msgstr " Nach %(title)s "
 
-#: contrib/admin/templates/admin/base.html:23
-msgid "Change password"
-msgstr "Passwort ändern"
+#: contrib/admin/templates/admin/change_form.html:20
+msgid "View on site"
+msgstr "Im Web Anzeigen"
 
-#: contrib/admin/templates/admin/base.html:23
-msgid "Log out"
-msgstr "Abmelden"
+#: contrib/admin/templates/admin/change_form.html:28
+msgid "Please correct the error below."
+msgid_plural "Please correct the errors below."
+msgstr[0] "Bitte den Fehler korrigieren."
+msgstr[1] "Bitte die Fehler korrigieren."
+
+#: contrib/admin/templates/admin/change_form.html:45
+msgid "Ordering"
+msgstr "Sortierung"
+
+#: contrib/admin/templates/admin/change_form.html:48
+msgid "Order:"
+msgstr "Reihenfolge:"
 
 #: contrib/admin/templates/admin/submit_line.html:3
 msgid "Delete"
@@ -765,11 +770,6 @@ msgstr "Sichern und weiter bearbeiten"
 #: contrib/admin/templates/admin/submit_line.html:7
 msgid "Save"
 msgstr "Sichern"
-
-#: contrib/admin/templates/admin/filter.html:1
-#, python-format
-msgid " By %(title)s "
-msgstr " Nach %(title)s "
 
 #: contrib/admin/templates/registration/password_change_done.html:4
 #: contrib/admin/templates/registration/password_change_form.html:4
@@ -1420,41 +1420,41 @@ msgstr "Schwedisch"
 msgid "Simplified Chinese"
 msgstr "Vereinfachtes Chinesisch"
 
-#: core/formfields.py:59 core/meta/fields.py:287 core/meta/fields.py:491
-#: core/meta/fields.py:502
+#: core/formfields.py:59 core/meta/fields.py:285 core/meta/fields.py:488
+#: core/meta/fields.py:499
 msgid "This field is required."
 msgstr "Dieses Feld ist zwingend."
 
-#: core/formfields.py:339
+#: core/formfields.py:336
 #, python-format
-msgid "Ensure your text is less than %s character"
+msgid "Ensure your text is less than %s character."
 msgid_plural "Ensure your text is less than %s characters."
 msgstr[0] "Bitte sicherstellen, das der Text weniger als %s Zeichen hat."
 msgstr[1] "Bitte sicherstellen, das der Text weniger als %s Zeichen hat."
 
-#: core/formfields.py:344
+#: core/formfields.py:341
 msgid "Line breaks are not allowed here."
 msgstr "Zeilenumbrüche sind hier nicht erlaubt."
 
-#: core/formfields.py:440 core/formfields.py:511 core/formfields.py:549
+#: core/formfields.py:436 core/formfields.py:507 core/formfields.py:545
 #, python-format
 msgid "Select a valid choice; '%(data)s' is not in %(choices)s."
 msgstr ""
 "Bitte eine gültige Auswahl treffen; '%(data)s' ist nicht in %(choices)s."
 
-#: core/formfields.py:605
+#: core/formfields.py:601
 msgid "The submitted file is empty."
 msgstr "Die ausgewählte Datei ist leer."
 
-#: core/formfields.py:659
+#: core/formfields.py:655
 msgid "Enter a whole number between -32,768 and 32,767."
 msgstr "Bitte eine ganze Zahl zwischen -32.768 und 32.767 eingeben."
 
-#: core/formfields.py:668
+#: core/formfields.py:664
 msgid "Enter a positive number."
 msgstr "Bitte eine ganze, positive Zahl eingeben."
 
-#: core/formfields.py:677
+#: core/formfields.py:673
 msgid "Enter a whole number between 0 and 32,767."
 msgstr "Bitte eine ganze Zahl zwischen 0 und 32.767 eingeben."
 
@@ -1741,37 +1741,28 @@ msgstr "Bitte ein gültiges '%s' eingeben."
 msgid "%(optname)s with this %(fieldname)s already exists."
 msgstr "Ein '%(optname)s' mit diesem '%(fieldname)s' existiert bereits."
 
-#: core/meta/fields.py:131
+#: core/meta/fields.py:129
 msgid " Separate multiple IDs with commas."
 msgstr "Mehrere IDs können mit Komma getrennt werden."
 
-#: core/meta/fields.py:134
+#: core/meta/fields.py:132
 msgid ""
 " Hold down \"Control\", or \"Command\" on a Mac, to select more than one."
 msgstr ""
 " Um mehr als eine Selektion zu treffen, \"Strg\", oder auf dem Mac \"Command"
 "\", beim Klicken gedrückt halten."
 
-#: core/meta/fields.py:511
+#: core/meta/fields.py:508
 msgid "Enter a valid filename."
 msgstr "Bitte einen gültigen Dateinamen eingeben"
 
-#: core/meta/fields.py:780
+#: core/meta/fields.py:777
 #, python-format
 msgid "Please enter valid %(self)s IDs. The value %(value)r is invalid."
 msgid_plural ""
-"Please enter valid %(self)s IDs. The values %(value)r are invalid"
+"Please enter valid %(self)s IDs. The values %(value)r are invalid."
 msgstr[0] ""
 "Bitte gültige IDs für %(self)s eingeben. Der Wert %(value)r ist ungültig."
 msgstr[1] ""
 "Bitte gültige IDs für %(self)s eingeben. Die Werte %(value)r sind ungültig."
 
-#~ msgid "Error in Template"
-#~ msgstr "Fehler in der Vorlage"
-
-#~ msgid ""
-#~ "\n"
-#~ "In template %(name)s, error at line %(line)s:\n"
-#~ msgstr ""
-#~ "\n"
-#~ "Fehler in der Vorlage %(name)s, in Zeile %(line)s:\n"

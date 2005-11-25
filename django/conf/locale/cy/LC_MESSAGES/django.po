@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2005-11-23 00:06+0100\n"
+"POT-Creation-Date: 2005-11-25 17:27-0600\n"
 "PO-Revision-Date: 2005-11-05 HO:MI+ZONE\n"
 "Last-Translator: Jason Davies <jason@jasondavies.com>\n"
 "Language-Team: Cymraeg <cy@li.org>\n"
@@ -278,49 +278,49 @@ msgstr ""
 msgid "The comment form didn't provide either 'preview' or 'post'"
 msgstr ""
 
-#: contrib/admin/filterspecs.py:32
+#: contrib/admin/filterspecs.py:40
 #, python-format
 msgid ""
 "<h3>By %s:</h3>\n"
 "<ul>\n"
 msgstr ""
 
-#: contrib/admin/filterspecs.py:62 contrib/admin/filterspecs.py:79
-#: contrib/admin/filterspecs.py:134
+#: contrib/admin/filterspecs.py:70 contrib/admin/filterspecs.py:88
+#: contrib/admin/filterspecs.py:143
 msgid "All"
 msgstr ""
 
-#: contrib/admin/filterspecs.py:100
+#: contrib/admin/filterspecs.py:109
 msgid "Any date"
 msgstr ""
 
-#: contrib/admin/filterspecs.py:101
+#: contrib/admin/filterspecs.py:110
 #, fuzzy
 msgid "Today"
 msgstr "Dydd Llun"
 
-#: contrib/admin/filterspecs.py:104
+#: contrib/admin/filterspecs.py:113
 msgid "Past 7 days"
 msgstr ""
 
-#: contrib/admin/filterspecs.py:106
+#: contrib/admin/filterspecs.py:115
 msgid "This month"
 msgstr ""
 
-#: contrib/admin/filterspecs.py:108
+#: contrib/admin/filterspecs.py:117
 msgid "This year"
 msgstr ""
 
-#: contrib/admin/filterspecs.py:134
+#: contrib/admin/filterspecs.py:143
 msgid "Yes"
 msgstr ""
 
-#: contrib/admin/filterspecs.py:134
+#: contrib/admin/filterspecs.py:143
 #, fuzzy
 msgid "No"
 msgstr "Tach."
 
-#: contrib/admin/filterspecs.py:142
+#: contrib/admin/filterspecs.py:150
 msgid "Unknown"
 msgstr ""
 
@@ -352,7 +352,7 @@ msgstr "cofnod"
 msgid "log entries"
 msgstr "cofnodion"
 
-#: contrib/admin/templatetags/admin_list.py:244
+#: contrib/admin/templatetags/admin_list.py:243
 msgid "All dates"
 msgstr ""
 
@@ -382,100 +382,100 @@ msgstr ""
 msgid "Your e-mail address is not your username. Try '%s' instead."
 msgstr ""
 
-#: contrib/admin/views/main.py:50
+#: contrib/admin/views/main.py:49
 #, fuzzy
 msgid "Site administration"
 msgstr "Gweinyddiad Django"
 
-#: contrib/admin/views/main.py:65
+#: contrib/admin/views/main.py:64
 #, python-format
 msgid "Select %s"
 msgstr ""
 
-#: contrib/admin/views/main.py:66
+#: contrib/admin/views/main.py:65
 #, python-format
 msgid "Select %s to change"
 msgstr ""
 
-#: contrib/admin/views/main.py:421
+#: contrib/admin/views/main.py:412
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was added successfully."
 msgstr ""
 
-#: contrib/admin/views/main.py:426 contrib/admin/views/main.py:502
+#: contrib/admin/views/main.py:417 contrib/admin/views/main.py:493
 msgid "You may edit it again below."
 msgstr ""
 
-#: contrib/admin/views/main.py:434 contrib/admin/views/main.py:511
+#: contrib/admin/views/main.py:425 contrib/admin/views/main.py:502
 #, python-format
 msgid "You may add another %s below."
 msgstr ""
 
-#: contrib/admin/views/main.py:451
+#: contrib/admin/views/main.py:442
 #, fuzzy, python-format
 msgid "Add %s"
 msgstr "Ychwanegu"
 
-#: contrib/admin/views/main.py:467
+#: contrib/admin/views/main.py:458
 #, python-format
 msgid "Added %s."
 msgstr ""
 
-#: contrib/admin/views/main.py:467 contrib/admin/views/main.py:469
-#: contrib/admin/views/main.py:471
+#: contrib/admin/views/main.py:458 contrib/admin/views/main.py:460
+#: contrib/admin/views/main.py:462
 msgid "and"
 msgstr ""
 
-#: contrib/admin/views/main.py:469
+#: contrib/admin/views/main.py:460
 #, fuzzy, python-format
 msgid "Changed %s."
 msgstr "Newidio"
 
-#: contrib/admin/views/main.py:471
+#: contrib/admin/views/main.py:462
 #, python-format
 msgid "Deleted %s."
 msgstr ""
 
-#: contrib/admin/views/main.py:474
+#: contrib/admin/views/main.py:465
 msgid "No fields changed."
 msgstr ""
 
-#: contrib/admin/views/main.py:499
+#: contrib/admin/views/main.py:490
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was changed successfully."
 msgstr ""
 
-#: contrib/admin/views/main.py:508
+#: contrib/admin/views/main.py:499
 #, python-format
 msgid ""
 "The %(name)s \"%(obj)s\" was added successfully. You may edit it again below."
 msgstr ""
 
-#: contrib/admin/views/main.py:546
+#: contrib/admin/views/main.py:537
 #, fuzzy, python-format
 msgid "Change %s"
 msgstr "Newidio"
 
-#: contrib/admin/views/main.py:626
+#: contrib/admin/views/main.py:615
 #, python-format
 msgid "One or more %(fieldname)s in %(name)s: %(obj)s"
 msgstr ""
 
-#: contrib/admin/views/main.py:631
+#: contrib/admin/views/main.py:620
 #, python-format
 msgid "One or more %(fieldname)s in %(name)s:"
 msgstr ""
 
-#: contrib/admin/views/main.py:660
+#: contrib/admin/views/main.py:649
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was deleted successfully."
 msgstr ""
 
-#: contrib/admin/views/main.py:663
+#: contrib/admin/views/main.py:652
 msgid "Are you sure?"
 msgstr ""
 
-#: contrib/admin/views/main.py:678
+#: contrib/admin/views/main.py:667
 #, fuzzy, python-format
 msgid "Change history: %s"
 msgstr "Newid cyfrinair"
@@ -556,11 +556,11 @@ msgstr ""
 msgid "XML text"
 msgstr ""
 
-#: contrib/admin/templates/admin/change_list.html:5
-#: contrib/admin/templates/admin/500.html:4
 #: contrib/admin/templates/admin/object_history.html:5
-#: contrib/admin/templates/admin/change_form.html:12
+#: contrib/admin/templates/admin/500.html:4
+#: contrib/admin/templates/admin/change_list.html:5
 #: contrib/admin/templates/admin/base.html:29
+#: contrib/admin/templates/admin/change_form.html:12
 #: contrib/admin/templates/registration/password_change_done.html:4
 #: contrib/admin/templates/registration/password_reset_form.html:4
 #: contrib/admin/templates/registration/logged_out.html:4
@@ -569,56 +569,6 @@ msgstr ""
 #: contrib/admin/templates/admin_doc/bookmarklets.html:3
 msgid "Home"
 msgstr "Adref"
-
-#: contrib/admin/templates/admin/change_list.html:10
-#, fuzzy, python-format
-msgid "Add %(name)s"
-msgstr "Ychwanegu"
-
-#: contrib/admin/templates/admin/index.html:27
-#: contrib/admin/templates/admin/change_form.html:14
-msgid "Add"
-msgstr "Ychwanegu"
-
-#: contrib/admin/templates/admin/index.html:33
-msgid "Change"
-msgstr "Newidio"
-
-#: contrib/admin/templates/admin/index.html:43
-msgid "You don't have permission to edit anything."
-msgstr "Does genych ddim hawl i olygu unrhywbeth."
-
-#: contrib/admin/templates/admin/index.html:51
-msgid "Recent Actions"
-msgstr "Gweithredau Diweddar"
-
-#: contrib/admin/templates/admin/index.html:52
-msgid "My Actions"
-msgstr "Fy Ngweithredau"
-
-#: contrib/admin/templates/admin/index.html:56
-msgid "None available"
-msgstr "Dim ar gael"
-
-#: contrib/admin/templates/admin/500.html:4
-msgid "Server error"
-msgstr "Gwall gweinyddwr"
-
-#: contrib/admin/templates/admin/500.html:6
-msgid "Server error (500)"
-msgstr "Gwall gweinyddwr (500)"
-
-#: contrib/admin/templates/admin/500.html:9
-msgid "Server Error <em>(500)</em>"
-msgstr "Gwall Gweinyddwr <em>(500)</em>"
-
-#: contrib/admin/templates/admin/500.html:10
-msgid ""
-"There's been an error. It's been reported to the site administrators via e-"
-"mail and should be fixed shortly. Thanks for your patience."
-msgstr ""
-"Mae gwall wedi digwydd. Adroddwyd i weinyddwyr y safle drwy e-bost ac ddylai "
-"cael ei drwsio cyn bo hir."
 
 #: contrib/admin/templates/admin/object_history.html:5
 #: contrib/admin/templates/admin/change_form.html:19
@@ -657,6 +607,65 @@ msgstr "Gweinyddiad safle Django"
 msgid "Django administration"
 msgstr "Gweinyddiad Django"
 
+#: contrib/admin/templates/admin/500.html:4
+msgid "Server error"
+msgstr "Gwall gweinyddwr"
+
+#: contrib/admin/templates/admin/500.html:6
+msgid "Server error (500)"
+msgstr "Gwall gweinyddwr (500)"
+
+#: contrib/admin/templates/admin/500.html:9
+msgid "Server Error <em>(500)</em>"
+msgstr "Gwall Gweinyddwr <em>(500)</em>"
+
+#: contrib/admin/templates/admin/500.html:10
+msgid ""
+"There's been an error. It's been reported to the site administrators via e-"
+"mail and should be fixed shortly. Thanks for your patience."
+msgstr ""
+"Mae gwall wedi digwydd. Adroddwyd i weinyddwyr y safle drwy e-bost ac ddylai "
+"cael ei drwsio cyn bo hir."
+
+#: contrib/admin/templates/admin/404.html:4
+#: contrib/admin/templates/admin/404.html:8
+msgid "Page not found"
+msgstr "Tudalen heb ei ddarganfod"
+
+#: contrib/admin/templates/admin/404.html:10
+msgid "We're sorry, but the requested page could not be found."
+msgstr "Mae'n ddrwg gennym, ond nid darganfwyd y dudalen a dymunwyd"
+
+#: contrib/admin/templates/admin/index.html:27
+#: contrib/admin/templates/admin/change_form.html:14
+msgid "Add"
+msgstr "Ychwanegu"
+
+#: contrib/admin/templates/admin/index.html:33
+msgid "Change"
+msgstr "Newidio"
+
+#: contrib/admin/templates/admin/index.html:43
+msgid "You don't have permission to edit anything."
+msgstr "Does genych ddim hawl i olygu unrhywbeth."
+
+#: contrib/admin/templates/admin/index.html:51
+msgid "Recent Actions"
+msgstr "Gweithredau Diweddar"
+
+#: contrib/admin/templates/admin/index.html:52
+msgid "My Actions"
+msgstr "Fy Ngweithredau"
+
+#: contrib/admin/templates/admin/index.html:56
+msgid "None available"
+msgstr "Dim ar gael"
+
+#: contrib/admin/templates/admin/change_list.html:10
+#, fuzzy, python-format
+msgid "Add %(name)s"
+msgstr "Ychwanegu"
+
 #: contrib/admin/templates/admin/login.html:15
 msgid "Username:"
 msgstr "Enw defnyddiwr:"
@@ -669,32 +678,17 @@ msgstr "Cyfrinair:"
 msgid "Have you <a href=\"/password_reset/\">forgotten your password</a>?"
 msgstr "Ydych wedi <a href=\"/password_reset/\">anghofio eich cyfrinair</a>?"
 
-#: contrib/admin/templates/admin/404.html:4
-#: contrib/admin/templates/admin/404.html:8
-msgid "Page not found"
-msgstr "Tudalen heb ei ddarganfod"
+#: contrib/admin/templates/admin/base.html:23
+msgid "Welcome,"
+msgstr "Croeso,"
 
-#: contrib/admin/templates/admin/404.html:10
-msgid "We're sorry, but the requested page could not be found."
-msgstr "Mae'n ddrwg gennym, ond nid darganfwyd y dudalen a dymunwyd"
+#: contrib/admin/templates/admin/base.html:23
+msgid "Change password"
+msgstr "Newid cyfrinair"
 
-#: contrib/admin/templates/admin/change_form.html:20
-msgid "View on site"
-msgstr ""
-
-#: contrib/admin/templates/admin/change_form.html:28
-msgid "Please correct the error below."
-msgid_plural "Please correct the errors below."
-msgstr[0] ""
-msgstr[1] ""
-
-#: contrib/admin/templates/admin/change_form.html:45
-msgid "Ordering"
-msgstr ""
-
-#: contrib/admin/templates/admin/change_form.html:48
-msgid "Order:"
-msgstr ""
+#: contrib/admin/templates/admin/base.html:23
+msgid "Log out"
+msgstr "Allgofnodi"
 
 #: contrib/admin/templates/admin/delete_confirmation.html:7
 #, python-format
@@ -719,17 +713,28 @@ msgstr ""
 msgid "Yes, I'm sure"
 msgstr "Yndw, rwy'n sicr"
 
-#: contrib/admin/templates/admin/base.html:23
-msgid "Welcome,"
-msgstr "Croeso,"
+#: contrib/admin/templates/admin/filter.html:1
+#, python-format
+msgid " By %(title)s "
+msgstr ""
 
-#: contrib/admin/templates/admin/base.html:23
-msgid "Change password"
-msgstr "Newid cyfrinair"
+#: contrib/admin/templates/admin/change_form.html:20
+msgid "View on site"
+msgstr ""
 
-#: contrib/admin/templates/admin/base.html:23
-msgid "Log out"
-msgstr "Allgofnodi"
+#: contrib/admin/templates/admin/change_form.html:28
+msgid "Please correct the error below."
+msgid_plural "Please correct the errors below."
+msgstr[0] ""
+msgstr[1] ""
+
+#: contrib/admin/templates/admin/change_form.html:45
+msgid "Ordering"
+msgstr ""
+
+#: contrib/admin/templates/admin/change_form.html:48
+msgid "Order:"
+msgstr ""
 
 #: contrib/admin/templates/admin/submit_line.html:3
 msgid "Delete"
@@ -752,11 +757,6 @@ msgstr ""
 msgid "Save"
 msgstr "gweithredol"
 
-#: contrib/admin/templates/admin/filter.html:1
-#, python-format
-msgid " By %(title)s "
-msgstr ""
-
 #: contrib/admin/templates/registration/password_change_done.html:4
 #: contrib/admin/templates/registration/password_change_form.html:4
 #: contrib/admin/templates/registration/password_change_form.html:6
@@ -775,6 +775,7 @@ msgstr "Newidwyd eich cyfrinair."
 
 #: contrib/admin/templates/registration/password_reset_form.html:4
 #: contrib/admin/templates/registration/password_reset_form.html:6
+#: contrib/admin/templates/registration/password_reset_form.html:10
 #: contrib/admin/templates/registration/password_reset_done.html:4
 msgid "Password reset"
 msgstr "Ailosod cyfrinair"
@@ -1264,7 +1265,7 @@ msgid "password"
 msgstr "cyfrinair"
 
 #: models/auth.py:37
-msgid "Use '[algo]$[salt]$[hexdigest]"
+msgid "Use '[algo]$[salt]$[hexdigest]'"
 msgstr ""
 
 #: models/auth.py:38
@@ -1392,44 +1393,44 @@ msgstr ""
 msgid "Simplified Chinese"
 msgstr "Tsieinëeg Symledig"
 
-#: core/formfields.py:59 core/meta/fields.py:287 core/meta/fields.py:491
-#: core/meta/fields.py:502
+#: core/formfields.py:59 core/meta/fields.py:285 core/meta/fields.py:488
+#: core/meta/fields.py:499
 #, fuzzy
 msgid "This field is required."
 msgstr "Mae'r faes yma yn annilydd."
 
-#: core/formfields.py:339
+#: core/formfields.py:336
 #, python-format
-msgid "Ensure your text is less than %s character"
+msgid "Ensure your text is less than %s character."
 msgid_plural "Ensure your text is less than %s characters."
 msgstr[0] ""
 msgstr[1] ""
 
-#: core/formfields.py:344
+#: core/formfields.py:341
 #, fuzzy
 msgid "Line breaks are not allowed here."
 msgstr "Ni chaniateir lythrennau bach yma."
 
-#: core/formfields.py:440 core/formfields.py:511 core/formfields.py:549
+#: core/formfields.py:436 core/formfields.py:507 core/formfields.py:545
 #, python-format
 msgid "Select a valid choice; '%(data)s' is not in %(choices)s."
 msgstr ""
 
-#: core/formfields.py:605
+#: core/formfields.py:601
 msgid "The submitted file is empty."
 msgstr ""
 
-#: core/formfields.py:659
+#: core/formfields.py:655
 #, fuzzy
 msgid "Enter a whole number between -32,768 and 32,767."
 msgstr "Rhowch rhif cyfan."
 
-#: core/formfields.py:668
+#: core/formfields.py:664
 #, fuzzy
 msgid "Enter a positive number."
 msgstr "Rhowch rhif cyfan."
 
-#: core/formfields.py:677
+#: core/formfields.py:673
 #, fuzzy
 msgid "Enter a whole number between 0 and 32,767."
 msgstr "Rhowch rhif cyfan."
@@ -1711,26 +1712,26 @@ msgstr "Rhowch cyfeiriad IP dilys, os gwelwch yn dda."
 msgid "%(optname)s with this %(fieldname)s already exists."
 msgstr ""
 
-#: core/meta/fields.py:131
+#: core/meta/fields.py:129
 msgid " Separate multiple IDs with commas."
 msgstr " Gwahanwch mwy nag un ID gyda atalnodau."
 
-#: core/meta/fields.py:134
+#: core/meta/fields.py:132
 msgid ""
 " Hold down \"Control\", or \"Command\" on a Mac, to select more than one."
 msgstr ""
 "Gafaelwch lawr \"Control\", neu \"Command\" ar Fac, i ddewis mwy nag un."
 
-#: core/meta/fields.py:511
+#: core/meta/fields.py:508
 #, fuzzy
 msgid "Enter a valid filename."
 msgstr "Rhowch cyfeiriad e-bost ddilys."
 
-#: core/meta/fields.py:780
+#: core/meta/fields.py:777
 #, python-format
 msgid "Please enter valid %(self)s IDs. The value %(value)r is invalid."
 msgid_plural ""
-"Please enter valid %(self)s IDs. The values %(value)r are invalid"
+"Please enter valid %(self)s IDs. The values %(value)r are invalid."
 msgstr[0] ""
 msgstr[1] ""
 

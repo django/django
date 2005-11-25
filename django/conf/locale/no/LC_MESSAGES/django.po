@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2005-11-23 00:06+0100\n"
+"POT-Creation-Date: 2005-11-25 17:27-0600\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: Espen Grndhaug <espen@grindhaug.org>\n"
 "Language-Team: Norwegian\n"
@@ -292,7 +292,7 @@ msgid "The comment form didn't provide either 'preview' or 'post'"
 msgstr ""
 "Kommentar skjemaet returnerte ikke et 'forhåndsvisning' eller 'post' objekt"
 
-#: contrib/admin/filterspecs.py:32
+#: contrib/admin/filterspecs.py:40
 #, python-format
 msgid ""
 "<h3>By %s:</h3>\n"
@@ -301,43 +301,43 @@ msgstr ""
 "<h3>Av %s:</h3>\n"
 "<ul>\n"
 
-#: contrib/admin/filterspecs.py:62 contrib/admin/filterspecs.py:79
-#: contrib/admin/filterspecs.py:134
+#: contrib/admin/filterspecs.py:70 contrib/admin/filterspecs.py:88
+#: contrib/admin/filterspecs.py:143
 msgid "All"
 msgstr "Alle"
 
-#: contrib/admin/filterspecs.py:100
+#: contrib/admin/filterspecs.py:109
 #, fuzzy
 msgid "Any date"
 msgstr "Alle datoer"
 
-#: contrib/admin/filterspecs.py:101
+#: contrib/admin/filterspecs.py:110
 #, fuzzy
 msgid "Today"
 msgstr "Mondag"
 
-#: contrib/admin/filterspecs.py:104
+#: contrib/admin/filterspecs.py:113
 msgid "Past 7 days"
 msgstr ""
 
-#: contrib/admin/filterspecs.py:106
+#: contrib/admin/filterspecs.py:115
 msgid "This month"
 msgstr ""
 
-#: contrib/admin/filterspecs.py:108
+#: contrib/admin/filterspecs.py:117
 msgid "This year"
 msgstr ""
 
-#: contrib/admin/filterspecs.py:134
+#: contrib/admin/filterspecs.py:143
 msgid "Yes"
 msgstr ""
 
-#: contrib/admin/filterspecs.py:134
+#: contrib/admin/filterspecs.py:143
 #, fuzzy
 msgid "No"
 msgstr "Nov."
 
-#: contrib/admin/filterspecs.py:142
+#: contrib/admin/filterspecs.py:150
 msgid "Unknown"
 msgstr "Ukjent"
 
@@ -369,7 +369,7 @@ msgstr "logg notis"
 msgid "log entries"
 msgstr "logg innlegg"
 
-#: contrib/admin/templatetags/admin_list.py:244
+#: contrib/admin/templatetags/admin_list.py:243
 msgid "All dates"
 msgstr "Alle datoer"
 
@@ -404,100 +404,100 @@ msgstr "Brukernavnet kan ikke inneholde '@'"
 msgid "Your e-mail address is not your username. Try '%s' instead."
 msgstr "Epost adressen din er ikke brukernavnet ditt, prøv '%s' i stede."
 
-#: contrib/admin/views/main.py:50
+#: contrib/admin/views/main.py:49
 #, fuzzy
 msgid "Site administration"
 msgstr "Django administrasjon"
 
-#: contrib/admin/views/main.py:65
+#: contrib/admin/views/main.py:64
 #, python-format
 msgid "Select %s"
 msgstr "Velg %s"
 
-#: contrib/admin/views/main.py:66
+#: contrib/admin/views/main.py:65
 #, python-format
 msgid "Select %s to change"
 msgstr "Velg %s for å endre"
 
-#: contrib/admin/views/main.py:421
+#: contrib/admin/views/main.py:412
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was added successfully."
 msgstr "%(name)s \"%(obj)s\" ble lagt inn i databasen."
 
-#: contrib/admin/views/main.py:426 contrib/admin/views/main.py:502
+#: contrib/admin/views/main.py:417 contrib/admin/views/main.py:493
 msgid "You may edit it again below."
 msgstr "Du kan endre under"
 
-#: contrib/admin/views/main.py:434 contrib/admin/views/main.py:511
+#: contrib/admin/views/main.py:425 contrib/admin/views/main.py:502
 #, python-format
 msgid "You may add another %s below."
 msgstr "Du kan legge til en ny %s under."
 
-#: contrib/admin/views/main.py:451
+#: contrib/admin/views/main.py:442
 #, python-format
 msgid "Add %s"
 msgstr "Ny %s"
 
-#: contrib/admin/views/main.py:467
+#: contrib/admin/views/main.py:458
 #, python-format
 msgid "Added %s."
 msgstr "La til %s"
 
-#: contrib/admin/views/main.py:467 contrib/admin/views/main.py:469
-#: contrib/admin/views/main.py:471
+#: contrib/admin/views/main.py:458 contrib/admin/views/main.py:460
+#: contrib/admin/views/main.py:462
 msgid "and"
 msgstr "og"
 
-#: contrib/admin/views/main.py:469
+#: contrib/admin/views/main.py:460
 #, python-format
 msgid "Changed %s."
 msgstr "Endret %s."
 
-#: contrib/admin/views/main.py:471
+#: contrib/admin/views/main.py:462
 #, python-format
 msgid "Deleted %s."
 msgstr "Slettet %s."
 
-#: contrib/admin/views/main.py:474
+#: contrib/admin/views/main.py:465
 msgid "No fields changed."
 msgstr "Ingen felt endret."
 
-#: contrib/admin/views/main.py:499
+#: contrib/admin/views/main.py:490
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was changed successfully."
 msgstr "%(name)s \"%(obj)s\" ble endret."
 
-#: contrib/admin/views/main.py:508
+#: contrib/admin/views/main.py:499
 #, python-format
 msgid ""
 "The %(name)s \"%(obj)s\" was added successfully. You may edit it again below."
 msgstr "%(name)s \"%(obj)s\" ble endret. Du kan endre det igjen under."
 
-#: contrib/admin/views/main.py:546
+#: contrib/admin/views/main.py:537
 #, python-format
 msgid "Change %s"
 msgstr "Endre %s"
 
-#: contrib/admin/views/main.py:626
+#: contrib/admin/views/main.py:615
 #, python-format
 msgid "One or more %(fieldname)s in %(name)s: %(obj)s"
 msgstr "En eller flere %(fieldname)s i %(name)s: %(obj)s"
 
-#: contrib/admin/views/main.py:631
+#: contrib/admin/views/main.py:620
 #, python-format
 msgid "One or more %(fieldname)s in %(name)s:"
 msgstr "En eller flere %(fieldname)s i %(name)s:"
 
-#: contrib/admin/views/main.py:660
+#: contrib/admin/views/main.py:649
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was deleted successfully."
 msgstr "%(name)s \"%(obj)s\" ble slettet."
 
-#: contrib/admin/views/main.py:663
+#: contrib/admin/views/main.py:652
 msgid "Are you sure?"
 msgstr "Er du sikker?"
 
-#: contrib/admin/views/main.py:678
+#: contrib/admin/views/main.py:667
 #, fuzzy, python-format
 msgid "Change history: %s"
 msgstr "Endre historien: %s"
@@ -575,11 +575,11 @@ msgstr "Stat (i USA, to store bokstaver)"
 msgid "XML text"
 msgstr "XML tekst"
 
-#: contrib/admin/templates/admin/change_list.html:5
-#: contrib/admin/templates/admin/500.html:4
 #: contrib/admin/templates/admin/object_history.html:5
-#: contrib/admin/templates/admin/change_form.html:12
+#: contrib/admin/templates/admin/500.html:4
+#: contrib/admin/templates/admin/change_list.html:5
 #: contrib/admin/templates/admin/base.html:29
+#: contrib/admin/templates/admin/change_form.html:12
 #: contrib/admin/templates/registration/password_change_done.html:4
 #: contrib/admin/templates/registration/password_reset_form.html:4
 #: contrib/admin/templates/registration/logged_out.html:4
@@ -588,56 +588,6 @@ msgstr "XML tekst"
 #: contrib/admin/templates/admin_doc/bookmarklets.html:3
 msgid "Home"
 msgstr "Hjem"
-
-#: contrib/admin/templates/admin/change_list.html:10
-#, python-format
-msgid "Add %(name)s"
-msgstr "Legg til %(name)s"
-
-#: contrib/admin/templates/admin/index.html:27
-#: contrib/admin/templates/admin/change_form.html:14
-msgid "Add"
-msgstr "Legg til"
-
-#: contrib/admin/templates/admin/index.html:33
-msgid "Change"
-msgstr "Endre"
-
-#: contrib/admin/templates/admin/index.html:43
-msgid "You don't have permission to edit anything."
-msgstr "Du har ikke rettigheter til å endre."
-
-#: contrib/admin/templates/admin/index.html:51
-msgid "Recent Actions"
-msgstr "Siste handlinger"
-
-#: contrib/admin/templates/admin/index.html:52
-msgid "My Actions"
-msgstr "Mine handlinger"
-
-#: contrib/admin/templates/admin/index.html:56
-msgid "None available"
-msgstr "Ingen tilgjengelige"
-
-#: contrib/admin/templates/admin/500.html:4
-msgid "Server error"
-msgstr "Tjener feil"
-
-#: contrib/admin/templates/admin/500.html:6
-msgid "Server error (500)"
-msgstr "Tjener feil (500)"
-
-#: contrib/admin/templates/admin/500.html:9
-msgid "Server Error <em>(500)</em>"
-msgstr "Tjener feil <em>(500)</em>"
-
-#: contrib/admin/templates/admin/500.html:10
-msgid ""
-"There's been an error. It's been reported to the site administrators via e-"
-"mail and should be fixed shortly. Thanks for your patience."
-msgstr ""
-"Det har vært en feil. Feilen er blitt rapportert til administrator via e-"
-"mail, og vill bli fikset snart. Takk for din tålmodighet."
 
 #: contrib/admin/templates/admin/object_history.html:5
 #: contrib/admin/templates/admin/change_form.html:19
@@ -676,6 +626,65 @@ msgstr "Django administrasjonsside"
 msgid "Django administration"
 msgstr "Django administrasjon"
 
+#: contrib/admin/templates/admin/500.html:4
+msgid "Server error"
+msgstr "Tjener feil"
+
+#: contrib/admin/templates/admin/500.html:6
+msgid "Server error (500)"
+msgstr "Tjener feil (500)"
+
+#: contrib/admin/templates/admin/500.html:9
+msgid "Server Error <em>(500)</em>"
+msgstr "Tjener feil <em>(500)</em>"
+
+#: contrib/admin/templates/admin/500.html:10
+msgid ""
+"There's been an error. It's been reported to the site administrators via e-"
+"mail and should be fixed shortly. Thanks for your patience."
+msgstr ""
+"Det har vært en feil. Feilen er blitt rapportert til administrator via e-"
+"mail, og vill bli fikset snart. Takk for din tålmodighet."
+
+#: contrib/admin/templates/admin/404.html:4
+#: contrib/admin/templates/admin/404.html:8
+msgid "Page not found"
+msgstr "Fant ikke siden"
+
+#: contrib/admin/templates/admin/404.html:10
+msgid "We're sorry, but the requested page could not be found."
+msgstr "Beklager, men siden du spør etter finnest ikke."
+
+#: contrib/admin/templates/admin/index.html:27
+#: contrib/admin/templates/admin/change_form.html:14
+msgid "Add"
+msgstr "Legg til"
+
+#: contrib/admin/templates/admin/index.html:33
+msgid "Change"
+msgstr "Endre"
+
+#: contrib/admin/templates/admin/index.html:43
+msgid "You don't have permission to edit anything."
+msgstr "Du har ikke rettigheter til å endre."
+
+#: contrib/admin/templates/admin/index.html:51
+msgid "Recent Actions"
+msgstr "Siste handlinger"
+
+#: contrib/admin/templates/admin/index.html:52
+msgid "My Actions"
+msgstr "Mine handlinger"
+
+#: contrib/admin/templates/admin/index.html:56
+msgid "None available"
+msgstr "Ingen tilgjengelige"
+
+#: contrib/admin/templates/admin/change_list.html:10
+#, python-format
+msgid "Add %(name)s"
+msgstr "Legg til %(name)s"
+
 #: contrib/admin/templates/admin/login.html:15
 msgid "Username:"
 msgstr "Brukernavn:"
@@ -688,32 +697,17 @@ msgstr "Passord:"
 msgid "Have you <a href=\"/password_reset/\">forgotten your password</a>?"
 msgstr "Har du <a href=\"/password_reset/\">glemt passordet ditt</a>?"
 
-#: contrib/admin/templates/admin/404.html:4
-#: contrib/admin/templates/admin/404.html:8
-msgid "Page not found"
-msgstr "Fant ikke siden"
+#: contrib/admin/templates/admin/base.html:23
+msgid "Welcome,"
+msgstr "Velkommen"
 
-#: contrib/admin/templates/admin/404.html:10
-msgid "We're sorry, but the requested page could not be found."
-msgstr "Beklager, men siden du spør etter finnest ikke."
+#: contrib/admin/templates/admin/base.html:23
+msgid "Change password"
+msgstr "Endre passord"
 
-#: contrib/admin/templates/admin/change_form.html:20
-msgid "View on site"
-msgstr "Vis på siden"
-
-#: contrib/admin/templates/admin/change_form.html:28
-msgid "Please correct the error below."
-msgid_plural "Please correct the errors below."
-msgstr[0] "Vennligst fiks feilen under."
-msgstr[1] "Vennligst fiks feilene under."
-
-#: contrib/admin/templates/admin/change_form.html:45
-msgid "Ordering"
-msgstr "Rekkefølge"
-
-#: contrib/admin/templates/admin/change_form.html:48
-msgid "Order:"
-msgstr "Rekkefølge:"
+#: contrib/admin/templates/admin/base.html:23
+msgid "Log out"
+msgstr "Log ut"
 
 #: contrib/admin/templates/admin/delete_confirmation.html:7
 #, python-format
@@ -738,17 +732,28 @@ msgstr ""
 msgid "Yes, I'm sure"
 msgstr "Ja, jeg er sikker"
 
-#: contrib/admin/templates/admin/base.html:23
-msgid "Welcome,"
-msgstr "Velkommen"
+#: contrib/admin/templates/admin/filter.html:1
+#, python-format
+msgid " By %(title)s "
+msgstr "Av %(title)s "
 
-#: contrib/admin/templates/admin/base.html:23
-msgid "Change password"
-msgstr "Endre passord"
+#: contrib/admin/templates/admin/change_form.html:20
+msgid "View on site"
+msgstr "Vis på siden"
 
-#: contrib/admin/templates/admin/base.html:23
-msgid "Log out"
-msgstr "Log ut"
+#: contrib/admin/templates/admin/change_form.html:28
+msgid "Please correct the error below."
+msgid_plural "Please correct the errors below."
+msgstr[0] "Vennligst fiks feilen under."
+msgstr[1] "Vennligst fiks feilene under."
+
+#: contrib/admin/templates/admin/change_form.html:45
+msgid "Ordering"
+msgstr "Rekkefølge"
+
+#: contrib/admin/templates/admin/change_form.html:48
+msgid "Order:"
+msgstr "Rekkefølge:"
 
 #: contrib/admin/templates/admin/submit_line.html:3
 msgid "Delete"
@@ -770,11 +775,6 @@ msgstr "Lagre og fortsett å endre"
 msgid "Save"
 msgstr "Lagre"
 
-#: contrib/admin/templates/admin/filter.html:1
-#, python-format
-msgid " By %(title)s "
-msgstr "Av %(title)s "
-
 #: contrib/admin/templates/registration/password_change_done.html:4
 #: contrib/admin/templates/registration/password_change_form.html:4
 #: contrib/admin/templates/registration/password_change_form.html:6
@@ -793,6 +793,7 @@ msgstr "Ditt passord er endret."
 
 #: contrib/admin/templates/registration/password_reset_form.html:4
 #: contrib/admin/templates/registration/password_reset_form.html:6
+#: contrib/admin/templates/registration/password_reset_form.html:10
 #: contrib/admin/templates/registration/password_reset_done.html:4
 msgid "Password reset"
 msgstr "Tilbakestill passord"
@@ -1288,7 +1289,7 @@ msgid "password"
 msgstr "passord"
 
 #: models/auth.py:37
-msgid "Use '[algo]$[salt]$[hexdigest]"
+msgid "Use '[algo]$[salt]$[hexdigest]'"
 msgstr ""
 
 #: models/auth.py:38
@@ -1415,40 +1416,40 @@ msgstr "Svensk"
 msgid "Simplified Chinese"
 msgstr "Simplifisert Kinesisk"
 
-#: core/formfields.py:59 core/meta/fields.py:287 core/meta/fields.py:491
-#: core/meta/fields.py:502
+#: core/formfields.py:59 core/meta/fields.py:285 core/meta/fields.py:488
+#: core/meta/fields.py:499
 msgid "This field is required."
 msgstr "Dette feltet er påkrevd."
 
-#: core/formfields.py:339
+#: core/formfields.py:336
 #, fuzzy, python-format
-msgid "Ensure your text is less than %s character"
+msgid "Ensure your text is less than %s character."
 msgid_plural "Ensure your text is less than %s characters."
 msgstr[0] "Sjekk at teksten er kortere enn %s bokstaver"
 msgstr[1] "Sjekk at teksten er kortere enn %s bokstaver"
 
-#: core/formfields.py:344
+#: core/formfields.py:341
 msgid "Line breaks are not allowed here."
 msgstr "Det er ikke tillatt med flere linjer her."
 
-#: core/formfields.py:440 core/formfields.py:511 core/formfields.py:549
+#: core/formfields.py:436 core/formfields.py:507 core/formfields.py:545
 #, python-format
 msgid "Select a valid choice; '%(data)s' is not in %(choices)s."
 msgstr "Velg et av valga; '%(data)s' er ikke i %(choices)s."
 
-#: core/formfields.py:605
+#: core/formfields.py:601
 msgid "The submitted file is empty."
 msgstr "Filen er tom."
 
-#: core/formfields.py:659
+#: core/formfields.py:655
 msgid "Enter a whole number between -32,768 and 32,767."
 msgstr "Skriv inn et heltall mellom -31768 og 32767."
 
-#: core/formfields.py:668
+#: core/formfields.py:664
 msgid "Enter a positive number."
 msgstr "Skriv inn et positivt heltall."
 
-#: core/formfields.py:677
+#: core/formfields.py:673
 msgid "Enter a whole number between 0 and 32,767."
 msgstr "Skriv inn et heltall mellom 0 og 32767."
 
@@ -1730,26 +1731,26 @@ msgstr "Vennligst skriv inn en godkjent IP adresse."
 msgid "%(optname)s with this %(fieldname)s already exists."
 msgstr "$(optname)s med %(fieldname)s finnes allerede."
 
-#: core/meta/fields.py:131
+#: core/meta/fields.py:129
 msgid " Separate multiple IDs with commas."
 msgstr "Separer Id-ene med kommaer."
 
-#: core/meta/fields.py:134
+#: core/meta/fields.py:132
 msgid ""
 " Hold down \"Control\", or \"Command\" on a Mac, to select more than one."
 msgstr ""
 "Hold nede \"Control\", eller \"Command\" på en Mac, for å velge mere enn en."
 
-#: core/meta/fields.py:511
+#: core/meta/fields.py:508
 #, fuzzy
 msgid "Enter a valid filename."
 msgstr "Skriv inn en godkjent e-post adresse."
 
-#: core/meta/fields.py:780
+#: core/meta/fields.py:777
 #, python-format
 msgid "Please enter valid %(self)s IDs. The value %(value)r is invalid."
 msgid_plural ""
-"Please enter valid %(self)s IDs. The values %(value)r are invalid"
+"Please enter valid %(self)s IDs. The values %(value)r are invalid."
 msgstr[0] ""
 msgstr[1] ""
 
