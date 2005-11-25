@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2005-11-23 11:35-0600\n"
+"POT-Creation-Date: 2005-11-23 00:06+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: Espen Grndhaug <espen@grindhaug.org>\n"
 "Language-Team: Norwegian\n"
@@ -20,7 +20,7 @@ msgstr ""
 #: contrib/comments/models/comments.py:161
 #, fuzzy
 msgid "object ID"
-msgstr "objekt id"
+msgstr "Vis objekt ID"
 
 #: contrib/comments/models/comments.py:9
 msgid "headline"
@@ -79,9 +79,8 @@ msgid "is public"
 msgstr ""
 
 #: contrib/comments/models/comments.py:26 contrib/admin/views/doc.py:274
-#, fuzzy
 msgid "IP address"
-msgstr "e-post adresse"
+msgstr "IP adresse"
 
 #: contrib/comments/models/comments.py:27
 msgid "is removed"
@@ -126,7 +125,7 @@ msgstr "fornavn"
 #: contrib/comments/models/comments.py:166
 #, fuzzy
 msgid "ip address"
-msgstr "e-post adresse"
+msgstr "IP adresse"
 
 #: contrib/comments/models/comments.py:168
 msgid "approved by staff"
@@ -185,12 +184,15 @@ msgid "Flag by %r"
 msgstr ""
 
 #: contrib/comments/models/comments.py:271
-#, python-format
+#, fuzzy, python-format
 msgid ""
 "This comment was flagged by %(user)s:\n"
 "\n"
 "%(text)s"
 msgstr ""
+"Denne kommentaren er skrevet med lite omtanke:\n"
+"\n"
+"%(text)s"
 
 #: contrib/comments/models/comments.py:278
 #, fuzzy
@@ -212,24 +214,24 @@ msgstr ""
 
 #: contrib/comments/views/karma.py:18
 msgid "Anonymous users cannot vote"
-msgstr ""
+msgstr "Anonyme brukere kan ikke stemme"
 
 #: contrib/comments/views/karma.py:22
-#, fuzzy
 msgid "Invalid comment ID"
-msgstr "tillat kommentarer"
+msgstr "Ikke gyldig kommentar ID"
 
 #: contrib/comments/views/karma.py:24
 msgid "No voting for yourself"
-msgstr ""
+msgstr "Du kan ikke stemme selv"
 
 #: contrib/comments/views/comments.py:25
+#, fuzzy
 msgid ""
 "This rating is required because you've entered at least one other rating."
-msgstr ""
+msgstr "Denne bla bla.."
 
 #: contrib/comments/views/comments.py:109
-#, python-format
+#, fuzzy, python-format
 msgid ""
 "This comment was posted by a user who has posted fewer than %(count)s "
 "comment:\n"
@@ -241,46 +243,107 @@ msgid_plural ""
 "\n"
 "%(text)s"
 msgstr[0] ""
+"Denne kommentaren var skrevet av en bruker som har fra før skrevet under %"
+"(count)s kommentarer:\n"
+"\n"
+"%(text)s"
 msgstr[1] ""
+"Denne kommentaren var skrevet av en bruker som har fra før skrevet under %"
+"(count)s kommentarer:\n"
+"\n"
+"%(text)s"
 
 #: contrib/comments/views/comments.py:114
-#, python-format
+#, fuzzy, python-format
 msgid ""
 "This comment was posted by a sketchy user:\n"
 "\n"
 "%(text)s"
 msgstr ""
+"Denne kommentaren er skrevet med lite omtanke:\n"
+"\n"
+"%(text)s"
 
 #: contrib/comments/views/comments.py:186
 #: contrib/comments/views/comments.py:277
 msgid "Only POSTs are allowed"
-msgstr ""
+msgstr "Bare POST er tillatt"
 
 #: contrib/comments/views/comments.py:190
 #: contrib/comments/views/comments.py:281
 msgid "One or more of the required fields wasn't submitted"
-msgstr ""
+msgstr "En eller flere av feltene som er krevd ble ikke sendt."
 
 #: contrib/comments/views/comments.py:194
 #: contrib/comments/views/comments.py:283
 msgid "Somebody tampered with the comment form (security violation)"
-msgstr ""
+msgstr "Noen har endret på komentar feltene (sikkerhets advarsel)"
 
 #: contrib/comments/views/comments.py:204
 #: contrib/comments/views/comments.py:289
 msgid ""
 "The comment form had an invalid 'target' parameter -- the object ID was "
 "invalid"
-msgstr ""
+msgstr "Skjemaet hadde en ugyldig verdi - objekt IDen var ugyldig"
 
 #: contrib/comments/views/comments.py:254
 #: contrib/comments/views/comments.py:318
 msgid "The comment form didn't provide either 'preview' or 'post'"
 msgstr ""
+"Kommentar skjemaet returnerte ikke et 'forhåndsvisning' eller 'post' objekt"
+
+#: contrib/admin/filterspecs.py:32
+#, python-format
+msgid ""
+"<h3>By %s:</h3>\n"
+"<ul>\n"
+msgstr ""
+"<h3>Av %s:</h3>\n"
+"<ul>\n"
+
+#: contrib/admin/filterspecs.py:62 contrib/admin/filterspecs.py:79
+#: contrib/admin/filterspecs.py:134
+msgid "All"
+msgstr "Alle"
+
+#: contrib/admin/filterspecs.py:100
+#, fuzzy
+msgid "Any date"
+msgstr "Alle datoer"
+
+#: contrib/admin/filterspecs.py:101
+#, fuzzy
+msgid "Today"
+msgstr "Mondag"
+
+#: contrib/admin/filterspecs.py:104
+msgid "Past 7 days"
+msgstr ""
+
+#: contrib/admin/filterspecs.py:106
+msgid "This month"
+msgstr ""
+
+#: contrib/admin/filterspecs.py:108
+msgid "This year"
+msgstr ""
+
+#: contrib/admin/filterspecs.py:134
+msgid "Yes"
+msgstr ""
+
+#: contrib/admin/filterspecs.py:134
+#, fuzzy
+msgid "No"
+msgstr "Nov."
+
+#: contrib/admin/filterspecs.py:142
+msgid "Unknown"
+msgstr "Ukjent"
 
 #: contrib/admin/models/admin.py:6
 msgid "action time"
-msgstr "handlings tid"
+msgstr "tid for handling"
 
 #: contrib/admin/models/admin.py:9
 msgid "object id"
@@ -306,69 +369,199 @@ msgstr "logg notis"
 msgid "log entries"
 msgstr "logg innlegg"
 
+#: contrib/admin/templatetags/admin_list.py:244
+msgid "All dates"
+msgstr "Alle datoer"
+
+#: contrib/admin/views/decorators.py:22
+#: contrib/admin/templates/admin/login.html:24
+msgid "Log in"
+msgstr "Log inn"
+
+#: contrib/admin/views/decorators.py:56
+msgid ""
+"Please log in again, because your session has expired. Don't worry: Your "
+"submission has been saved."
+msgstr ""
+"Du må logge inn igjen, fordi sesjonen din har gått ut på dato, men ikke ikke "
+"bekjymr deg informasjonen du sendte ble lagret."
+
+#: contrib/admin/views/decorators.py:63
+msgid ""
+"Looks like your browser isn't configured to accept cookies. Please enable "
+"cookies, reload this page, and try again."
+msgstr ""
+"Det ser ut som om nettleseren din ikke vill ta i mot informasjonskapsler "
+"('cookies'). Vennligst omkonfigurer nettleseren din, last siden på ny og "
+"prøv igjen."
+
+#: contrib/admin/views/decorators.py:77
+msgid "Usernames cannot contain the '@' character."
+msgstr "Brukernavnet kan ikke inneholde '@'"
+
+#: contrib/admin/views/decorators.py:79
+#, python-format
+msgid "Your e-mail address is not your username. Try '%s' instead."
+msgstr "Epost adressen din er ikke brukernavnet ditt, prøv '%s' i stede."
+
+#: contrib/admin/views/main.py:50
+#, fuzzy
+msgid "Site administration"
+msgstr "Django administrasjon"
+
+#: contrib/admin/views/main.py:65
+#, python-format
+msgid "Select %s"
+msgstr "Velg %s"
+
+#: contrib/admin/views/main.py:66
+#, python-format
+msgid "Select %s to change"
+msgstr "Velg %s for å endre"
+
+#: contrib/admin/views/main.py:421
+#, python-format
+msgid "The %(name)s \"%(obj)s\" was added successfully."
+msgstr "%(name)s \"%(obj)s\" ble lagt inn i databasen."
+
+#: contrib/admin/views/main.py:426 contrib/admin/views/main.py:502
+msgid "You may edit it again below."
+msgstr "Du kan endre under"
+
+#: contrib/admin/views/main.py:434 contrib/admin/views/main.py:511
+#, python-format
+msgid "You may add another %s below."
+msgstr "Du kan legge til en ny %s under."
+
+#: contrib/admin/views/main.py:451
+#, python-format
+msgid "Add %s"
+msgstr "Ny %s"
+
+#: contrib/admin/views/main.py:467
+#, python-format
+msgid "Added %s."
+msgstr "La til %s"
+
+#: contrib/admin/views/main.py:467 contrib/admin/views/main.py:469
+#: contrib/admin/views/main.py:471
+msgid "and"
+msgstr "og"
+
+#: contrib/admin/views/main.py:469
+#, python-format
+msgid "Changed %s."
+msgstr "Endret %s."
+
+#: contrib/admin/views/main.py:471
+#, python-format
+msgid "Deleted %s."
+msgstr "Slettet %s."
+
+#: contrib/admin/views/main.py:474
+msgid "No fields changed."
+msgstr "Ingen felt endret."
+
+#: contrib/admin/views/main.py:499
+#, python-format
+msgid "The %(name)s \"%(obj)s\" was changed successfully."
+msgstr "%(name)s \"%(obj)s\" ble endret."
+
+#: contrib/admin/views/main.py:508
+#, python-format
+msgid ""
+"The %(name)s \"%(obj)s\" was added successfully. You may edit it again below."
+msgstr "%(name)s \"%(obj)s\" ble endret. Du kan endre det igjen under."
+
+#: contrib/admin/views/main.py:546
+#, python-format
+msgid "Change %s"
+msgstr "Endre %s"
+
+#: contrib/admin/views/main.py:626
+#, python-format
+msgid "One or more %(fieldname)s in %(name)s: %(obj)s"
+msgstr "En eller flere %(fieldname)s i %(name)s: %(obj)s"
+
+#: contrib/admin/views/main.py:631
+#, python-format
+msgid "One or more %(fieldname)s in %(name)s:"
+msgstr "En eller flere %(fieldname)s i %(name)s:"
+
+#: contrib/admin/views/main.py:660
+#, python-format
+msgid "The %(name)s \"%(obj)s\" was deleted successfully."
+msgstr "%(name)s \"%(obj)s\" ble slettet."
+
+#: contrib/admin/views/main.py:663
+msgid "Are you sure?"
+msgstr "Er du sikker?"
+
+#: contrib/admin/views/main.py:678
+#, fuzzy, python-format
+msgid "Change history: %s"
+msgstr "Endre historien: %s"
+
 #: contrib/admin/views/doc.py:262 contrib/admin/views/doc.py:271
 #: contrib/admin/views/doc.py:273 contrib/admin/views/doc.py:278
 #: contrib/admin/views/doc.py:279 contrib/admin/views/doc.py:281
 msgid "Integer"
-msgstr ""
+msgstr "Heltall"
 
 #: contrib/admin/views/doc.py:263
+#, fuzzy
 msgid "Boolean (Either True or False)"
-msgstr ""
+msgstr "Boolean (Enten \"True\" eller \"False\")"
 
 #: contrib/admin/views/doc.py:264
 #, python-format
 msgid "String (up to %(maxlength)s)"
-msgstr ""
+msgstr "Tekst (opp til %(maxlength)s tegn)"
 
 #: contrib/admin/views/doc.py:265
 msgid "Comma-separated integers"
-msgstr ""
+msgstr "Heltall skilt med kommaer"
 
 #: contrib/admin/views/doc.py:266
-#, fuzzy
 msgid "Date (without time)"
-msgstr "handlings tid"
+msgstr "Dato (uten tid)"
 
 #: contrib/admin/views/doc.py:267
-#, fuzzy
 msgid "Date (with time)"
 msgstr "Dato/tid"
 
 #: contrib/admin/views/doc.py:268
-#, fuzzy
 msgid "E-mail address"
-msgstr "Epost adresse:"
+msgstr "Epost adresse"
 
 #: contrib/admin/views/doc.py:269 contrib/admin/views/doc.py:272
 msgid "File path"
-msgstr ""
+msgstr "Sti til fil"
 
 #: contrib/admin/views/doc.py:270
-#, fuzzy
 msgid "Decimal number"
-msgstr "Desember"
+msgstr "Desimal tall"
 
 #: contrib/admin/views/doc.py:276
+#, fuzzy
 msgid "Boolean (Either True, False or None)"
-msgstr ""
+msgstr "Boolean (enten \"True\", \"False\" eller \"None\")"
 
 #: contrib/admin/views/doc.py:277
-#, fuzzy
 msgid "Phone number"
-msgstr "Skriv inn et helt nummer."
+msgstr "Telefonnummer"
 
 #: contrib/admin/views/doc.py:280
 msgid "String (up to 50)"
-msgstr ""
+msgstr "Tekst (opp til 50 tegn)"
 
 #: contrib/admin/views/doc.py:282
 msgid "Text"
-msgstr ""
+msgstr "Tekst"
 
 #: contrib/admin/views/doc.py:283
 msgid "Time"
-msgstr ""
+msgstr "Tid"
 
 #: contrib/admin/views/doc.py:284 contrib/flatpages/models/flatpages.py:6
 msgid "URL"
@@ -376,89 +569,33 @@ msgstr "Internettadresse"
 
 #: contrib/admin/views/doc.py:285
 msgid "U.S. state (two uppercase letters)"
-msgstr ""
+msgstr "Stat (i USA, to store bokstaver)"
 
 #: contrib/admin/views/doc.py:286
 msgid "XML text"
-msgstr ""
+msgstr "XML tekst"
 
-#: contrib/admin/templates/admin/object_history.html:5
+#: contrib/admin/templates/admin/change_list.html:5
 #: contrib/admin/templates/admin/500.html:4
+#: contrib/admin/templates/admin/object_history.html:5
+#: contrib/admin/templates/admin/change_form.html:12
 #: contrib/admin/templates/admin/base.html:29
 #: contrib/admin/templates/registration/password_change_done.html:4
 #: contrib/admin/templates/registration/password_reset_form.html:4
 #: contrib/admin/templates/registration/logged_out.html:4
 #: contrib/admin/templates/registration/password_reset_done.html:4
 #: contrib/admin/templates/registration/password_change_form.html:4
+#: contrib/admin/templates/admin_doc/bookmarklets.html:3
 msgid "Home"
 msgstr "Hjem"
 
-#: contrib/admin/templates/admin/object_history.html:5
-msgid "History"
-msgstr "Historie"
-
-#: contrib/admin/templates/admin/object_history.html:18
-msgid "Date/time"
-msgstr "Dato/tid"
-
-#: contrib/admin/templates/admin/object_history.html:19 models/auth.py:47
-msgid "User"
-msgstr "Bruker"
-
-#: contrib/admin/templates/admin/object_history.html:20
-msgid "Action"
-msgstr "Funksjon"
-
-#: contrib/admin/templates/admin/object_history.html:26
-msgid "DATE_WITH_TIME_FULL"
-msgstr "N j, Y, P"
-
-#: contrib/admin/templates/admin/object_history.html:36
-msgid ""
-"This object doesn't have a change history. It probably wasn't added via this "
-"admin site."
-msgstr ""
-"Dette objektet har ingen endrings historie. Den var sannsynligvis ikke laget "
-"via denne siden"
-
-#: contrib/admin/templates/admin/base_site.html:4
-msgid "Django site admin"
-msgstr "Django administrasjonsside"
-
-#: contrib/admin/templates/admin/base_site.html:7
-msgid "Django administration"
-msgstr "Django administrasjon"
-
-#: contrib/admin/templates/admin/500.html:4
-msgid "Server error"
-msgstr "Tjener feil"
-
-#: contrib/admin/templates/admin/500.html:6
-msgid "Server error (500)"
-msgstr "Tjener feil (500)"
-
-#: contrib/admin/templates/admin/500.html:9
-msgid "Server Error <em>(500)</em>"
-msgstr "Tjener feil <em>(500)</em>"
-
-#: contrib/admin/templates/admin/500.html:10
-msgid ""
-"There's been an error. It's been reported to the site administrators via e-"
-"mail and should be fixed shortly. Thanks for your patience."
-msgstr ""
-"Det har vært en feil. Feilen er blitt rapportert til administrator via e-"
-"mail, og vill bli fikset snart. Takk for din tålmodighet."
-
-#: contrib/admin/templates/admin/404.html:4
-#: contrib/admin/templates/admin/404.html:8
-msgid "Page not found"
-msgstr "Fant ikke siden"
-
-#: contrib/admin/templates/admin/404.html:10
-msgid "We're sorry, but the requested page could not be found."
-msgstr "Beklager, men siden du spør etter finnest ikke."
+#: contrib/admin/templates/admin/change_list.html:10
+#, python-format
+msgid "Add %(name)s"
+msgstr "Legg til %(name)s"
 
 #: contrib/admin/templates/admin/index.html:27
+#: contrib/admin/templates/admin/change_form.html:14
 msgid "Add"
 msgstr "Legg til"
 
@@ -482,6 +619,63 @@ msgstr "Mine handlinger"
 msgid "None available"
 msgstr "Ingen tilgjengelige"
 
+#: contrib/admin/templates/admin/500.html:4
+msgid "Server error"
+msgstr "Tjener feil"
+
+#: contrib/admin/templates/admin/500.html:6
+msgid "Server error (500)"
+msgstr "Tjener feil (500)"
+
+#: contrib/admin/templates/admin/500.html:9
+msgid "Server Error <em>(500)</em>"
+msgstr "Tjener feil <em>(500)</em>"
+
+#: contrib/admin/templates/admin/500.html:10
+msgid ""
+"There's been an error. It's been reported to the site administrators via e-"
+"mail and should be fixed shortly. Thanks for your patience."
+msgstr ""
+"Det har vært en feil. Feilen er blitt rapportert til administrator via e-"
+"mail, og vill bli fikset snart. Takk for din tålmodighet."
+
+#: contrib/admin/templates/admin/object_history.html:5
+#: contrib/admin/templates/admin/change_form.html:19
+msgid "History"
+msgstr "Historie"
+
+#: contrib/admin/templates/admin/object_history.html:18
+msgid "Date/time"
+msgstr "Dato/tid"
+
+#: contrib/admin/templates/admin/object_history.html:19 models/auth.py:47
+msgid "User"
+msgstr "Bruker"
+
+#: contrib/admin/templates/admin/object_history.html:20
+msgid "Action"
+msgstr "Funksjon"
+
+#: contrib/admin/templates/admin/object_history.html:26
+msgid "DATE_WITH_TIME_FULL"
+msgstr "j. M U - h:i"
+
+#: contrib/admin/templates/admin/object_history.html:36
+msgid ""
+"This object doesn't have a change history. It probably wasn't added via this "
+"admin site."
+msgstr ""
+"Dette objektet har ingen endrings historie. Den var sannsynligvis ikke laget "
+"via denne siden"
+
+#: contrib/admin/templates/admin/base_site.html:4
+msgid "Django site admin"
+msgstr "Django administrasjonsside"
+
+#: contrib/admin/templates/admin/base_site.html:7
+msgid "Django administration"
+msgstr "Django administrasjon"
+
 #: contrib/admin/templates/admin/login.html:15
 msgid "Username:"
 msgstr "Brukernavn:"
@@ -494,21 +688,32 @@ msgstr "Passord:"
 msgid "Have you <a href=\"/password_reset/\">forgotten your password</a>?"
 msgstr "Har du <a href=\"/password_reset/\">glemt passordet ditt</a>?"
 
-#: contrib/admin/templates/admin/login.html:24
-msgid "Log in"
-msgstr "Log inn"
+#: contrib/admin/templates/admin/404.html:4
+#: contrib/admin/templates/admin/404.html:8
+msgid "Page not found"
+msgstr "Fant ikke siden"
 
-#: contrib/admin/templates/admin/base.html:23
-msgid "Welcome,"
-msgstr "Velkommen"
+#: contrib/admin/templates/admin/404.html:10
+msgid "We're sorry, but the requested page could not be found."
+msgstr "Beklager, men siden du spør etter finnest ikke."
 
-#: contrib/admin/templates/admin/base.html:23
-msgid "Change password"
-msgstr "Endre passord"
+#: contrib/admin/templates/admin/change_form.html:20
+msgid "View on site"
+msgstr "Vis på siden"
 
-#: contrib/admin/templates/admin/base.html:23
-msgid "Log out"
-msgstr "Log ut"
+#: contrib/admin/templates/admin/change_form.html:28
+msgid "Please correct the error below."
+msgid_plural "Please correct the errors below."
+msgstr[0] "Vennligst fiks feilen under."
+msgstr[1] "Vennligst fiks feilene under."
+
+#: contrib/admin/templates/admin/change_form.html:45
+msgid "Ordering"
+msgstr "Rekkefølge"
+
+#: contrib/admin/templates/admin/change_form.html:48
+msgid "Order:"
+msgstr "Rekkefølge:"
 
 #: contrib/admin/templates/admin/delete_confirmation.html:7
 #, python-format
@@ -532,6 +737,43 @@ msgstr ""
 #: contrib/admin/templates/admin/delete_confirmation.html:18
 msgid "Yes, I'm sure"
 msgstr "Ja, jeg er sikker"
+
+#: contrib/admin/templates/admin/base.html:23
+msgid "Welcome,"
+msgstr "Velkommen"
+
+#: contrib/admin/templates/admin/base.html:23
+msgid "Change password"
+msgstr "Endre passord"
+
+#: contrib/admin/templates/admin/base.html:23
+msgid "Log out"
+msgstr "Log ut"
+
+#: contrib/admin/templates/admin/submit_line.html:3
+msgid "Delete"
+msgstr "Slett"
+
+#: contrib/admin/templates/admin/submit_line.html:4
+msgid "Save as new"
+msgstr "Lagre som ny"
+
+#: contrib/admin/templates/admin/submit_line.html:5
+msgid "Save and add another"
+msgstr "Lagre og legg til en ny"
+
+#: contrib/admin/templates/admin/submit_line.html:6
+msgid "Save and continue editing"
+msgstr "Lagre og fortsett å endre"
+
+#: contrib/admin/templates/admin/submit_line.html:7
+msgid "Save"
+msgstr "Lagre"
+
+#: contrib/admin/templates/admin/filter.html:1
+#, python-format
+msgid " By %(title)s "
+msgstr "Av %(title)s "
 
 #: contrib/admin/templates/registration/password_change_done.html:4
 #: contrib/admin/templates/registration/password_change_form.html:4
@@ -648,6 +890,71 @@ msgstr "Takk for at du bruker vår side!"
 msgid "The %(site_name)s team"
 msgstr "Hilsen %(site_name)s"
 
+#: contrib/admin/templates/admin_doc/bookmarklets.html:3
+msgid "Documentation"
+msgstr "Dokumentasjon"
+
+#: contrib/admin/templates/admin_doc/bookmarklets.html:3
+msgid "Bookmarklets"
+msgstr "Bokmerker"
+
+#: contrib/admin/templates/admin_doc/bookmarklets.html:5
+msgid "Documentation bookmarklets"
+msgstr "Dokumentasjon bokmerker"
+
+#: contrib/admin/templates/admin_doc/bookmarklets.html:9
+msgid ""
+"\n"
+"<p class=\"help\">To install bookmarklets, drag the link to your bookmarks\n"
+"toolbar, or right-click the link and add it to your bookmarks. Now you can\n"
+"select the bookmarklet from any page in the site.  Note that some of these\n"
+"bookmarklets require you to be viewing the site from a computer designated\n"
+"as \"internal\" (talk to your system administrator if you aren't sure if\n"
+"your computer is \"internal\").</p>\n"
+msgstr ""
+
+#: contrib/admin/templates/admin_doc/bookmarklets.html:19
+msgid "Documentation for this page"
+msgstr "Dokumentasjon for denne siden"
+
+#: contrib/admin/templates/admin_doc/bookmarklets.html:20
+msgid ""
+"Jumps you from any page to the documentation for the view that generates "
+"that page."
+msgstr ""
+"Hopp fra hvilken som helst side til dokumentasjonen for visnings funksjonen "
+"som laget siden."
+
+#: contrib/admin/templates/admin_doc/bookmarklets.html:22
+msgid "Show object ID"
+msgstr "Vis objekt ID"
+
+#: contrib/admin/templates/admin_doc/bookmarklets.html:23
+msgid ""
+"Shows the content-type and unique ID for pages that represent a single "
+"object."
+msgstr ""
+"Viser \"content-type\" og en unik ID for sider som representerer et enkelt "
+"objekt."
+
+#: contrib/admin/templates/admin_doc/bookmarklets.html:25
+msgid "Edit this object (current window)"
+msgstr "Endre dette objektet (åpnes i dette vinduet)"
+
+#: contrib/admin/templates/admin_doc/bookmarklets.html:26
+#, fuzzy
+msgid "Jumps to the admin page for pages that represent a single object."
+msgstr ""
+"Hopp til administrasjonsiden for siden som representerer et enkelt objekt."
+
+#: contrib/admin/templates/admin_doc/bookmarklets.html:28
+msgid "Edit this object (new window)"
+msgstr "Endre dette objektet (åpnes i et nytt vindu)"
+
+#: contrib/admin/templates/admin_doc/bookmarklets.html:29
+msgid "As above, but opens the admin page in a new window."
+msgstr "Samme som over, men åpner administrasjonsiden i et nytt vindu."
+
 #: contrib/redirects/models/redirects.py:7
 msgid "redirect from"
 msgstr "omadresser fra"
@@ -703,7 +1010,6 @@ msgid "template name"
 msgstr "mal navn"
 
 #: contrib/flatpages/models/flatpages.py:12
-#, fuzzy
 msgid ""
 "Example: 'flatpages/contact_page'. If this isn't provided, the system will "
 "use 'flatpages/default'."
@@ -731,15 +1037,15 @@ msgstr "flatsider"
 
 #: utils/translation.py:335
 msgid "DATE_FORMAT"
-msgstr ""
+msgstr "j. M U"
 
 #: utils/translation.py:336
 msgid "DATETIME_FORMAT"
-msgstr ""
+msgstr "j. M U - h:i"
 
 #: utils/translation.py:337
 msgid "TIME_FORMAT"
-msgstr ""
+msgstr "h:i"
 
 #: utils/dates.py:6
 msgid "Monday"
@@ -1033,81 +1339,118 @@ msgstr "Viktige datoer"
 msgid "Message"
 msgstr "Meldinger"
 
-#: conf/global_settings.py:36
+#: conf/global_settings.py:37
 msgid "Bengali"
 msgstr "Bengalsk"
 
-#: conf/global_settings.py:37
+#: conf/global_settings.py:38
 msgid "Czech"
 msgstr "Tsjekkisk"
 
-#: conf/global_settings.py:38
+#: conf/global_settings.py:39
 msgid "Welsh"
 msgstr "Walisisk"
 
-#: conf/global_settings.py:39
-msgid "Danish"
-msgstr "Dnask"
-
 #: conf/global_settings.py:40
+msgid "Danish"
+msgstr "Dansk"
+
+#: conf/global_settings.py:41
 msgid "German"
 msgstr "Tysk"
 
-#: conf/global_settings.py:41
+#: conf/global_settings.py:42
 msgid "English"
 msgstr "Engelsk"
 
-#: conf/global_settings.py:42
+#: conf/global_settings.py:43
 msgid "Spanish"
 msgstr "Spansk"
 
-#: conf/global_settings.py:43
+#: conf/global_settings.py:44
 msgid "French"
 msgstr "Fransk"
 
-#: conf/global_settings.py:44
+#: conf/global_settings.py:45
 msgid "Galician"
 msgstr "Galisisk"
 
-#: conf/global_settings.py:45
+#: conf/global_settings.py:46
 msgid "Icelandic"
 msgstr "Islandsk"
 
-#: conf/global_settings.py:46
+#: conf/global_settings.py:47
 msgid "Italian"
 msgstr "Italiensk"
 
-#: conf/global_settings.py:47
+#: conf/global_settings.py:48
 msgid "Norwegian"
 msgstr "Norsk"
 
-#: conf/global_settings.py:48
+#: conf/global_settings.py:49
 msgid "Brazilian"
 msgstr "Brasiliansk"
 
-#: conf/global_settings.py:49
+#: conf/global_settings.py:50
 msgid "Romanian"
 msgstr "Romansk"
 
-#: conf/global_settings.py:50
+#: conf/global_settings.py:51
 msgid "Russian"
 msgstr "Russisk"
 
-#: conf/global_settings.py:51
+#: conf/global_settings.py:52
 msgid "Slovak"
 msgstr "Slovakisk"
 
-#: conf/global_settings.py:52
+#: conf/global_settings.py:53
 msgid "Serbian"
 msgstr "Serbisk"
 
-#: conf/global_settings.py:53
+#: conf/global_settings.py:54
 msgid "Swedish"
 msgstr "Svensk"
 
-#: conf/global_settings.py:54
+#: conf/global_settings.py:55
 msgid "Simplified Chinese"
 msgstr "Simplifisert Kinesisk"
+
+#: core/formfields.py:59 core/meta/fields.py:287 core/meta/fields.py:491
+#: core/meta/fields.py:502
+msgid "This field is required."
+msgstr "Dette feltet er påkrevd."
+
+#: core/formfields.py:339
+#, fuzzy, python-format
+msgid "Ensure your text is less than %s character"
+msgid_plural "Ensure your text is less than %s characters."
+msgstr[0] "Sjekk at teksten er kortere enn %s bokstaver"
+msgstr[1] "Sjekk at teksten er kortere enn %s bokstaver"
+
+#: core/formfields.py:344
+msgid "Line breaks are not allowed here."
+msgstr "Det er ikke tillatt med flere linjer her."
+
+#: core/formfields.py:440 core/formfields.py:511 core/formfields.py:549
+#, python-format
+msgid "Select a valid choice; '%(data)s' is not in %(choices)s."
+msgstr "Velg et av valga; '%(data)s' er ikke i %(choices)s."
+
+#: core/formfields.py:605
+msgid "The submitted file is empty."
+msgstr "Filen er tom."
+
+#: core/formfields.py:659
+msgid "Enter a whole number between -32,768 and 32,767."
+msgstr "Skriv inn et heltall mellom -31768 og 32767."
+
+#: core/formfields.py:668
+msgid "Enter a positive number."
+msgstr "Skriv inn et positivt heltall."
+
+#: core/formfields.py:677
+msgid "Enter a whole number between 0 and 32,767."
+msgstr "Skriv inn et heltall mellom 0 og 32767."
 
 #: core/validators.py:62
 msgid "This value must contain only letters, numbers and underscores."
@@ -1377,15 +1720,45 @@ msgstr ""
 "\"%(attr)s\" tillegg på linje $(line)s har en ikke godkjent verdi. (Linja "
 "starter med \"%(start)s\".)"
 
-#: core/meta/fields.py:111
+#: core/meta/fields.py:46
+#, fuzzy, python-format
+msgid "Please enter a valid %s."
+msgstr "Vennligst skriv inn en godkjent IP adresse."
+
+#: core/meta/fields.py:60
+#, python-format
+msgid "%(optname)s with this %(fieldname)s already exists."
+msgstr "$(optname)s med %(fieldname)s finnes allerede."
+
+#: core/meta/fields.py:131
 msgid " Separate multiple IDs with commas."
 msgstr "Separer Id-ene med kommaer."
 
-#: core/meta/fields.py:114
+#: core/meta/fields.py:134
 msgid ""
 " Hold down \"Control\", or \"Command\" on a Mac, to select more than one."
 msgstr ""
 "Hold nede \"Control\", eller \"Command\" på en Mac, for å velge mere enn en."
 
-#~ msgid "Use an MD5 hash -- not the raw password."
-#~ msgstr "Bruk en MD5 nøkkel -- ikke passordet i ren tekst"
+#: core/meta/fields.py:511
+#, fuzzy
+msgid "Enter a valid filename."
+msgstr "Skriv inn en godkjent e-post adresse."
+
+#: core/meta/fields.py:780
+#, python-format
+msgid "Please enter valid %(self)s IDs. The value %(value)r is invalid."
+msgid_plural ""
+"Please enter valid %(self)s IDs. The values %(value)r are invalid"
+msgstr[0] ""
+msgstr[1] ""
+
+#~ msgid "Error in Template"
+#~ msgstr "Feil i mal"
+
+#~ msgid ""
+#~ "\n"
+#~ "In template %(name)s, error at line %(line)s:\n"
+#~ msgstr ""
+#~ "\n"
+#~ "I mal %(name)s, var det en feil på linje %(line)s:\n"
