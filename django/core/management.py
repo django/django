@@ -187,6 +187,7 @@ def get_sql_delete(mod):
 
     # Close database connection explicitly, in case this output is being piped
     # directly into a database client, to avoid locking issues.
+    cursor.close()
     db.db.close()
 
     return output[::-1] # Reverse it, to deal with table dependencies.
