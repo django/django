@@ -909,7 +909,7 @@ object, which takes the following parameters. All are optional.
         list_display = ('username', 'email', 'first_name', 'last_name', 'is_staff'),
         list_filter = ('is_staff', 'is_superuser'),
 
-    This results in a admin that looks like:
+    The above code results in an admin that looks like this:
 
         .. image:: http://media.djangoproject.com/img/doc/users_changelist.png
 
