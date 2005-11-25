@@ -24,7 +24,7 @@ class Manipulator:
         for field in self.fields:
             if field.field_name == field_name:
                 return field
-        raise KeyError, "Field %s not found\n%s" % (field_name, repr(self.fields)) 
+        raise KeyError, "Field %s not found\n%s" % (field_name, repr(self.fields))
 
     def __delitem__(self, field_name):
         "Deletes the field with the given field name; raises KeyError on failure"
@@ -98,18 +98,17 @@ class FormWrapper:
     This allows dictionary-style lookups of formfields. It also handles feeding
     prepopulated data and validation error messages to the formfield objects.
     """
-    def __init__(self, manipulator, data, error_dict, edit_inline = True):
+    def __init__(self, manipulator, data, error_dict, edit_inline=True):
         self.manipulator, self.data = manipulator, data
         self.error_dict = error_dict
         self._inline_collections = None
         self.edit_inline = edit_inline
-    
+
     def __repr__(self):
         return repr(self.__dict__)
 
     def __getitem__(self, key):
         for field in self.manipulator.fields:
-            
             if field.field_name == key:
                 data = field.extract_data(self.data)
                 return FormFieldWrapper(field, data, self.error_dict.get(field.field_name, []))
@@ -118,9 +117,9 @@ class FormWrapper:
             for inline_collection in self._inline_collections:
                 if inline_collection.name == key:
                     return inline_collection
-        raise KeyError("Could not find Formfield or InlineObjectCollection named:%s" % key )
+        raise KeyError, "Could not find Formfield or InlineObjectCollection named %r" % key
 
-    def fill_inline_collections(self): 
+    def fill_inline_collections(self):
         if not self._inline_collections:
             ic = []
             related_objects = self.manipulator.get_related_objects()
@@ -151,7 +150,6 @@ class FormFieldWrapper:
     def __str__(self):
         "Renders the field"
         return str(self.formfield.render(self.data))
-            
 
     def __repr__(self):
         return '<FormFieldWrapper for "%s">' % self.formfield.field_name
@@ -194,30 +192,30 @@ class FormFieldCollection(FormFieldWrapper):
         "Returns list of all errors in this collection's formfields"
         errors = []
         for field in self.formfield_dict.values():
-            if(hasattr(field, 'errors') ):
+            if hasattr(field, 'errors'):
                 errors.extend(field.errors())
         return errors
 
     def has_errors(self):
-        return bool(len(self.errors())) 
-        
+        return bool(len(self.errors()))
+
     def html_combined_error_list(self):
-        return ''.join( [ field.html_error_list() for field in self.formfield_dict.values() if hasattr(field, 'errors')])
+        return ''.join([field.html_error_list() for field in self.formfield_dict.values() if hasattr(field, 'errors')])
 
 class InlineObjectCollection:
-    "An object that acts like a list of form field collections."  
-    def __init__(self, parent_manipulator,  rel_obj, data, errors):
-        self.parent_manipulator = parent_manipulator 
+    "An object that acts like a list of form field collections."
+    def __init__(self, parent_manipulator, rel_obj, data, errors):
+        self.parent_manipulator = parent_manipulator
         self.rel_obj = rel_obj
         self.data = data
         self.errors = errors
-        self._collections = None   
+        self._collections = None
         self.name = rel_obj.name
- 
+
     def __len__(self):
-        self.fill() 
+        self.fill()
         return self._collections.__len__()
-    
+
     def __getitem__(self, k):
         self.fill()
         return self._collections.__getitem__(k)
@@ -236,14 +234,14 @@ class InlineObjectCollection:
 
     def fill(self):
         if self._collections:
-            return 
+            return
         else:
             var_name = self.rel_obj.opts.object_name.lower()
             wrapper = []
-            orig = hasattr(self.parent_manipulator, 'original_object') and self.parent_manipulator.original_object  or None 
+            orig = hasattr(self.parent_manipulator, 'original_object') and self.parent_manipulator.original_object  or None
             orig_list = self.rel_obj.get_list(orig)
             for i, instance in enumerate(orig_list):
-                collection = {'original': instance }
+                collection = {'original': instance}
                 for f in self.rel_obj.editable_fields():
                         for field_name in f.get_manipulator_field_names(''):
                             full_field_name = '%s.%d.%s' % (var_name, i, field_name)
@@ -306,8 +304,7 @@ class FormField:
         if new_data.has_key(self.field_name):
             d = new_data.getlist(self.field_name)
             try:
-                converted_data = [self.__class__.html2python(data) 
-                                  for data in d]
+                converted_data = [self.__class__.html2python(data) for data in d]
             except ValueError:
                 converted_data = d
             new_data.setlist(name, converted_data)
@@ -360,7 +357,7 @@ class TextField(FormField):
     html2python = staticmethod(html2python)
 
 class PasswordField(TextField):
-    input_type="password"
+    input_type = "password"
 
 class LargeTextField(TextField):
     def __init__(self, field_name, rows=10, cols=40, is_required=False, validator_list=[], maxlength=None):
@@ -409,7 +406,6 @@ class CheckboxField(FormField):
             return True
         return False
     html2python = staticmethod(html2python)
-
 
 class SelectField(FormField):
     def __init__(self, field_name, choices=[], size=1, is_required=False, validator_list=[], member_name=None):
@@ -586,8 +582,8 @@ class CheckboxSelectMultipleField(SelectMultipleField):
                 checked_html = ' checked="checked"'
             field_name = '%s%s' % (self.field_name, value)
             output.append('<li><input type="checkbox" id="%s" class="v%s" name="%s"%s /> <label for="%s">%s</label></li>' % \
-                (get_id() + value , self.__class__.__name__, field_name, checked_html,
-                get_id() + value, choice))
+                (self.get_id() + value , self.__class__.__name__, field_name, checked_html,
+                self.get_id() + value, choice))
         output.append('</ul>')
         return '\n'.join(output)
 
