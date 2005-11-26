@@ -1,4 +1,6 @@
-def user_passes_test(test_func):
+from django.views.auth import login
+
+def user_passes_test(test_func, login_url=login.LOGIN_URL):
     """
     Decorator for views that checks that the user passes the given test,
     redirecting to the log-in page if necessary. The test should be a callable
@@ -6,10 +8,9 @@ def user_passes_test(test_func):
     """
     def _dec(view_func):
         def _checklogin(request, *args, **kwargs):
-            from django.views.auth.login import redirect_to_login
             if test_func(request.user):
                 return view_func(request, *args, **kwargs)
-            return redirect_to_login(request.path)
+            return login.redirect_to_login(request.path, login_url)
         return _checklogin
     return _dec
 

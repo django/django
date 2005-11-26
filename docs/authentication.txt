@@ -314,6 +314,26 @@ Here's the same thing, using Python 2.4's decorator syntax::
 Note that ``user_passes_test`` does not automatically check that the ``User``
 is not anonymous.
 
+**New in the Django development version**: ``user_passes_test()`` takes an
+optional ``login_url`` argument, which lets you specify the URL for your login
+page (``/accounts/login/`` by default).
+
+Example in Python 2.3 syntax::
+
+    from django.views.decorators.auth import user_passes_test
+
+    def my_view(request):
+        # ...
+    my_view = user_passes_test(lambda u: u.has_perm('polls.can_vote'), login_url='/login/')(my_view)
+
+Example in Python 2.4 syntax::
+
+    from django.views.decorators.auth import user_passes_test
+
+    @user_passes_test(lambda u: u.has_perm('polls.can_vote'), login_url='/login/')
+    def my_view(request):
+        # ...
+
 Limiting access to generic views
 --------------------------------
 

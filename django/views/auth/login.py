@@ -6,6 +6,7 @@ from django.models.core import sites
 from django.utils.httpwrappers import HttpResponse, HttpResponseRedirect
 
 REDIRECT_FIELD_NAME = 'next'
+LOGIN_URL = '/accounts/login/'
 
 def login(request):
     "Displays the login form and handles the login action."
@@ -39,10 +40,10 @@ def logout(request, next_page=None):
         # Redirect to this page until the session has been cleared.
         return HttpResponseRedirect(next_page or request.path)
 
-def logout_then_login(request):
+def logout_then_login(request, login_url=LOGIN_URL):
     "Logs out the user if he is logged in. Then redirects to the log-in page."
-    return logout(request, '/accounts/login/')
+    return logout(request, login_url)
 
-def redirect_to_login(next):
+def redirect_to_login(next, login_url=LOGIN_URL):
     "Redirects the user to the login page, passing the given 'next' page"
-    return HttpResponseRedirect('/accounts/login/?%s=%s' % (REDIRECT_FIELD_NAME, next))
+    return HttpResponseRedirect('%s?%s=%s' % (login_url, REDIRECT_FIELD_NAME, next))
