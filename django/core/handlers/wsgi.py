@@ -81,7 +81,8 @@ class WSGIRequest(httpwrappers.HttpRequest):
 
     def _get_get(self):
         if not hasattr(self, '_get'):
-            self._get = httpwrappers.QueryDict(self.environ['QUERY_STRING'])
+            # The WSGI spec says 'QUERY_STRING' may be absent.
+            self._get = httpwrappers.QueryDict(self.environ.get('QUERY_STRING', ''))
         return self._get
 
     def _set_get(self, get):
