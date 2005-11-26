@@ -299,7 +299,7 @@ As a shortcut, you can use the convenient ``user_passes_test`` decorator::
 
     def my_view(request):
         # ...
-    my_view = user_passes_test(my_view, lambda u: u.has_perm('polls.can_vote'))
+    my_view = user_passes_test(lambda u: u.has_perm('polls.can_vote'))(my_view)
 
 Here's the same thing, using Python 2.4's decorator syntax::
 
