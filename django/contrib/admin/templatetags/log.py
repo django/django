@@ -1,6 +1,8 @@
 from django.models.admin import log
 from django.core import template
 
+register = template.Library()
+
 class AdminLogNode(template.Node):
     def __init__(self, limit, varname, user):
         self.limit, self.varname, self.user = limit, varname, user
@@ -48,4 +50,4 @@ class DoGetAdminLog:
                 raise template.TemplateSyntaxError, "Fourth argument in '%s' must be 'for_user'" % self.tag_name
         return AdminLogNode(limit=tokens[1], varname=tokens[3], user=(len(tokens) > 5 and tokens[5] or None))
 
-template.register_tag('get_admin_log', DoGetAdminLog('get_admin_log'))
+register.tag('get_admin_log', DoGetAdminLog('get_admin_log'))

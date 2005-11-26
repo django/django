@@ -2,6 +2,8 @@
 
 from django.core import template
 
+register = template.Library()
+
 class EchoNode(template.Node):
     def __init__(self, contents):
         self.contents = contents
@@ -11,5 +13,5 @@ class EchoNode(template.Node):
         
 def do_echo(parser, token):
     return EchoNode(token.contents.split()[1:])
-    
-template.register_tag("echo", do_echo)
+
+register.tag("echo", do_echo)

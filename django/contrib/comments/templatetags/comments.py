@@ -6,6 +6,8 @@ from django.models.comments import comments, freecomments
 from django.models.core import contenttypes
 import re
 
+register = template.Library()
+
 COMMENT_FORM = '''
 {% load i18n %}
 {% if display_form %}
@@ -360,10 +362,10 @@ class DoGetCommentList:
         return CommentListNode(package, module, var_name, obj_id, tokens[5], self.free, ordering)
 
 # registration comments
-template.register_tag('get_comment_list', DoGetCommentList(False))
-template.register_tag('comment_form', DoCommentForm(False))
-template.register_tag('get_comment_count', DoCommentCount(False))
+register.tag('get_comment_list', DoGetCommentList(False))
+register.tag('comment_form', DoCommentForm(False))
+register.tag('get_comment_count', DoCommentCount(False))
 # free comments
-template.register_tag('get_free_comment_list', DoGetCommentList(True))
-template.register_tag('free_comment_form', DoCommentForm(True))
-template.register_tag('get_free_comment_count', DoCommentCount(True))
+register.tag('get_free_comment_list', DoGetCommentList(True))
+register.tag('free_comment_form', DoCommentForm(True))
+register.tag('get_free_comment_count', DoCommentCount(True))

@@ -1,4 +1,5 @@
-from django.core.template.decorators import simple_tag
+from django.core.template import Library
+register = Library()
 
 def admin_media_prefix():
     try:
@@ -6,4 +7,4 @@ def admin_media_prefix():
     except ImportError:
         return ''
     return ADMIN_MEDIA_PREFIX
-admin_media_prefix = simple_tag(admin_media_prefix)
+admin_media_prefix = register.simple_tag(admin_media_prefix)

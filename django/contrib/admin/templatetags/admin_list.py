@@ -3,16 +3,18 @@ from django.contrib.admin.views.main import ORDER_VAR, ORDER_TYPE_VAR, PAGE_VAR,
 from django.contrib.admin.views.main import IS_POPUP_VAR, EMPTY_CHANGELIST_VALUE, MONTHS
 from django.core import meta, template
 from django.core.exceptions import ObjectDoesNotExist
-from django.core.template.decorators import simple_tag, inclusion_tag
 from django.utils import dateformat
 from django.utils.html import strip_tags, escape
 from django.utils.text import capfirst
 from django.utils.translation import get_date_formats
 from django.conf.settings import ADMIN_MEDIA_PREFIX
+from django.core.template import Library
+
+register = Library()
 
 DOT = '.'
 
-#@simple_tag
+#@register.simple_tag
 def paginator_number(cl,i):
     if i == DOT:
        return '... '
@@ -20,9 +22,9 @@ def paginator_number(cl,i):
        return '<span class="this-page">%d</span> ' % (i+1)
     else:
        return '<a href="%s"%s>%d</a> ' % (cl.get_query_string({PAGE_VAR: i}), (i == cl.paginator.pages-1 and ' class="end"' or ''), i+1)
-paginator_number = simple_tag(paginator_number)
+paginator_number = register.simple_tag(paginator_number)
 
-#@inclusion_tag('admin/pagination')
+#@register.inclusion_tag('admin/pagination')
 def pagination(cl):
     paginator, page_num = cl.paginator, cl.page_num
 
@@ -64,7 +66,7 @@ def pagination(cl):
         'ALL_VAR': ALL_VAR,
         '1': 1,
     }
-pagination = inclusion_tag('admin/pagination')(pagination)
+pagination = register.inclusion_tag('admin/pagination')(pagination)
 
 def result_headers(cl):
     lookup_opts = cl.lookup_opts
@@ -177,15 +179,15 @@ def results(cl):
     for res in cl.result_list:
         yield list(items_for_result(cl,res))
 
-#@inclusion_tag("admin/change_list_results")
+#@register.inclusion_tag("admin/change_list_results")
 def result_list(cl):
     res = list(results(cl))
     return {'cl': cl,
             'result_headers': list(result_headers(cl)),
             'results': list(results(cl))}
-result_list = inclusion_tag("admin/change_list_results")(result_list)
+result_list = register.inclusion_tag("admin/change_list_results")(result_list)
 
-#@inclusion_tag("admin/date_hierarchy")
+#@register.inclusion_tag("admin/date_hierarchy")
 def date_hierarchy(cl):
     lookup_opts, params, lookup_params, lookup_mod = \
       cl.lookup_opts, cl.params, cl.lookup_params, cl.lookup_mod
@@ -256,23 +258,23 @@ def date_hierarchy(cl):
                     'title': year.year
                 } for year in years ]
             }
-date_hierarchy = inclusion_tag('admin/date_hierarchy')(date_hierarchy)
+date_hierarchy = register.inclusion_tag('admin/date_hierarchy')(date_hierarchy)
 
-#@inclusion_tag('admin/search_form')
+#@register.inclusion_tag('admin/search_form')
 def search_form(cl):
     return {
         'cl': cl,
         'show_result_count': cl.result_count != cl.full_result_count and not cl.opts.one_to_one_field,
         'search_var': SEARCH_VAR
     }
-search_form = inclusion_tag('admin/search_form')(search_form)
+search_form = register.inclusion_tag('admin/search_form')(search_form)
 
-#@inclusion_tag('admin/filter')
+#@register.inclusion_tag('admin/filter')
 def filter(cl, spec):
     return {'title': spec.title(), 'choices' : list(spec.choices(cl))}
-filter = inclusion_tag('admin/filter')(filter)
+filter = register.inclusion_tag('admin/filter')(filter)
 
-#@inclusion_tag('admin/filters')
+#@register.inclusion_tag('admin/filters')
 def filters(cl):
     return {'cl': cl}
-filters = inclusion_tag('admin/filters')(filters)
+filters = register.inclusion_tag('admin/filters')(filters)

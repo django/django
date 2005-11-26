@@ -1,3 +1,4 @@
+{% load admin_modify %}
 <fieldset class="module aligned">
    {% for fcw in bound_related_object.form_field_collection_wrappers %}
       <h2>{{ bound_related_object.relation.opts.verbose_name|capfirst }}&nbsp;#{{ forloop.counter }}</h2>

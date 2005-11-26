@@ -1,5 +1,7 @@
 from django.core import template
 
+register = template.Library()
+
 class AdminApplistNode(template.Node):
     def __init__(self, varname):
         self.varname = varname
@@ -54,4 +56,4 @@ def get_admin_app_list(parser, token):
         raise template.TemplateSyntaxError, "First argument to '%s' tag must be 'as'" % tokens[0]
     return AdminApplistNode(tokens[2])
 
-template.register_tag('get_admin_app_list', get_admin_app_list)
+register.tag('get_admin_app_list', get_admin_app_list)

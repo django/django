@@ -1,8 +1,10 @@
-from django.core.template import Node, NodeList, Template, Context, resolve_variable, resolve_variable_with_filters, registered_filters
-from django.core.template import TemplateSyntaxError, register_tag, TokenParser
+from django.core.template import Node, NodeList, Template, Context, resolve_variable
+from django.core.template import TemplateSyntaxError, TokenParser, Library
 from django.core.template import TOKEN_BLOCK, TOKEN_TEXT, TOKEN_VAR
 from django.utils import translation
 import re, sys
+
+register = Library()
 
 class GetAvailableLanguagesNode(Node):
     def __init__(self, variable):
@@ -53,10 +55,10 @@ class BlockTranslateNode(Node):
     def render(self, context):
         context.push()
         for var,val in self.extra_context.items():
-            context[var] = resolve_variable_with_filters(val, context)
+            context[var] = val.resolve(context)
         singular = self.render_token_list(self.singular)
         if self.plural and self.countervar and self.counter:
-            count = resolve_variable_with_filters(self.counter, context)
+            count = self.counter.resolve(context)
             context[self.countervar] = count
             plural = self.render_token_list(self.plural)
             result = translation.ngettext(singular, plural, count) % context
@@ -179,9 +181,9 @@ def do_block_translate(parser, token):
                     value = self.value()
                     if self.tag() != 'as':
                         raise TemplateSyntaxError, "variable bindings in 'blocktrans' must be 'with value as variable'"
-                    extra_context[self.tag()] = value
+                    extra_context[self.tag()] = parser.compile_filter(value)
                 elif tag == 'count':
-                    counter = self.value()
+                    counter = parser.compile_filter(self.value())
                     if self.tag() != 'as':
                         raise TemplateSyntaxError, "counter specification in 'blocktrans' must be 'count value as variable'"
                     countervar = self.tag()
@@ -213,7 +215,7 @@ def do_block_translate(parser, token):
 
     return BlockTranslateNode(extra_context, singular, plural, countervar, counter)
 
-register_tag('get_available_languages', do_get_available_languages)
-register_tag('get_current_language', do_get_current_language)
-register_tag('trans', do_translate)
-register_tag('blocktrans', do_block_translate)
+register.tag('get_available_languages', do_get_available_languages)
+register.tag('get_current_language', do_get_current_language)
+register.tag('trans', do_translate)
+register.tag('blocktrans', do_block_translate)

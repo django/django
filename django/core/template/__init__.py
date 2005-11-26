@@ -3,7 +3,7 @@ This is the Django template system.
 
 How it works:
 
-The tokenize() function converts a template string (i.e., a string containing
+The Lexer.tokenize() function converts a template string (i.e., a string containing
 markup with custom template tags) to tokens, which can be either plain text
 (TOKEN_TEXT), variables (TOKEN_VAR) or block statements (TOKEN_BLOCK).
 
@@ -55,6 +55,8 @@ times with multiple contexts)
 '\n<html>\n\n</html>\n'
 """
 import re
+from inspect import getargspec
+from django.utils.functional import curry
 from django.conf.settings import DEFAULT_CHARSET, TEMPLATE_DEBUG
 
 __all__ = ('Template','Context','compile_string')
@@ -82,11 +84,10 @@ UNKNOWN_SOURCE="<unknown source>"
 tag_re = re.compile('(%s.*?%s|%s.*?%s)' % (re.escape(BLOCK_TAG_START), re.escape(BLOCK_TAG_END),
                                           re.escape(VARIABLE_TAG_START), re.escape(VARIABLE_TAG_END)))
 
-# global dict used by register_tag; maps custom tags to callback functions
-registered_tags = {}
-
-# global dict used by register_filter; maps custom filters to callback functions
-registered_filters = {}
+# global dictionary of libraries that have been loaded using get_library
+libraries = {}
+# global list of libraries to load by default for a new parser
+builtins = []
 
 class TemplateSyntaxError(Exception):
     pass
@@ -105,12 +106,15 @@ class SilentVariableFailure(Exception):
     "Any function raising this exception will be ignored by resolve_variable"
     pass
 
+class InvalidTemplateLibrary(Exception):
+    pass
+
 class Origin(object):
     def __init__(self, name):
         self.name = name
 
     def reload(self):
-        raise NotImplementedException
+        raise NotImplementedError
 
     def __str__(self):
         return self.name
@@ -264,6 +268,10 @@ class DebugLexer(Lexer):
 class Parser(object):
     def __init__(self, tokens):
         self.tokens = tokens
+        self.tags = {}
+        self.filters = {}
+        for lib in builtins:
+            self.add_library(lib)
 
     def parse(self, parse_until=[]):
         nodelist = self.create_nodelist()
@@ -274,7 +282,8 @@ class Parser(object):
             elif token.token_type == TOKEN_VAR:
                 if not token.contents:
                     self.empty_variable(token)
-                var_node = self.create_variable_node(token.contents)
+                filter_expression = self.compile_filter(token.contents)
+                var_node = self.create_variable_node(filter_expression)
                 self.extend_nodelist(nodelist, var_node,token)
             elif token.token_type == TOKEN_BLOCK:
                 if token.contents in parse_until:
@@ -288,7 +297,7 @@ class Parser(object):
                 # execute callback function for this tag and append resulting node
                 self.enter_command(command, token)
                 try:
-                    compile_func = registered_tags[command]
+                    compile_func = self.tags[command]
                 except KeyError:
                     self.invalid_block_tag(token, command)
                 try:
@@ -302,8 +311,8 @@ class Parser(object):
             self.unclosed_block_tag(parse_until)
         return nodelist
 
-    def create_variable_node(self, contents):
-        return VariableNode(contents)
+    def create_variable_node(self, filter_expression):
+        return VariableNode(filter_expression)
 
     def create_nodelist(self):
         return NodeList()
@@ -343,6 +352,20 @@ class Parser(object):
 
     def delete_first_token(self):
         del self.tokens[0]
+
+    def add_library(self, lib):
+        self.tags.update(lib.tags)
+        self.filters.update(lib.filters)
+
+    def compile_filter(self,token):
+        "Convenient wrapper for FilterExpression"
+        return FilterExpression(token, self)
+
+    def find_filter(self, filter_name):
+        if self.filters.has_key(filter_name):
+            return self.filters[filter_name]
+        else:
+            raise TemplateSyntaxError, "Invalid filter: '%s'" % filter_name
 
 class DebugParser(Parser):
     def __init__(self, lexer):
@@ -483,7 +506,8 @@ filter_raw_string = r"""
          (?:%(arg_sep)s
              (?:
               %(i18n_open)s"(?P<i18n_arg>%(str)s)"%(i18n_close)s|
-              "(?P<arg>%(str)s)"
+              "(?P<constant_arg>%(str)s)"|
+              (?P<var_arg>[%(var_chars)s]+)
              )
          )?
  )""" % {
@@ -498,7 +522,7 @@ filter_raw_string = r"""
 filter_raw_string = filter_raw_string.replace("\n", "").replace(" ", "")
 filter_re = re.compile(filter_raw_string)
 
-class FilterParser(object):
+class FilterExpression(object):
     """
     Parses a variable token and its optional filters (all as a single string),
     and return a list of tuples of the filter name and arguments.
@@ -513,7 +537,8 @@ class FilterParser(object):
     This class should never be instantiated outside of the
     get_filters_from_token helper function.
     """
-    def __init__(self, token):
+    def __init__(self, token, parser):
+        self.token = token
         matches = filter_re.finditer(token)
         var = None
         filters = []
@@ -536,27 +561,69 @@ class FilterParser(object):
                     raise TemplateSyntaxError, "Variables and attributes may not begin with underscores: '%s'" % var
             else:
                 filter_name = match.group("filter_name")
-                arg, i18n_arg = match.group("arg","i18n_arg")
+                args = []
+                constant_arg, i18n_arg, var_arg = match.group("constant_arg", "i18n_arg", "var_arg")
                 if i18n_arg:
-                    arg =_(i18n_arg.replace('\\', ''))
-                if arg:
-                    arg = arg.replace('\\', '')
-                if not registered_filters.has_key(filter_name):
-                    raise TemplateSyntaxError, "Invalid filter: '%s'" % filter_name
-                if registered_filters[filter_name][1] == True and arg is None:
-                    raise TemplateSyntaxError, "Filter '%s' requires an argument" % filter_name
-                if registered_filters[filter_name][1] == False and arg is not None:
-                    raise TemplateSyntaxError, "Filter '%s' should not have an argument (argument is %r)" % (filter_name, arg)
-                filters.append( (filter_name,arg) )
+                    args.append((False, _(i18n_arg.replace('\\', ''))))
+                elif constant_arg:
+                    args.append((False, constant_arg.replace('\\', '')))
+                elif var_arg:
+                    args.append((True, var_arg))
+                filter_func = parser.find_filter(filter_name)
+                self.args_check(filter_name,filter_func, args)
+                filters.append( (filter_func,args))
                 upto = match.end()
         if upto != len(token):
             raise TemplateSyntaxError, "Could not parse the remainder: %s" % token[upto:]
         self.var , self.filters = var, filters
 
-def get_filters_from_token(token):
-    "Convenient wrapper for FilterParser"
-    p = FilterParser(token)
-    return (p.var, p.filters)
+    def resolve(self, context):
+        try:
+            obj = resolve_variable(self.var, context)
+        except VariableDoesNotExist:
+            obj = ''
+        for func, args in self.filters:
+            arg_vals = []
+            for lookup, arg in args:
+                if not lookup:
+                    arg_vals.append(arg)
+                else:
+                    arg_vals.append(resolve_variable(arg, context))
+            obj = func(obj, *arg_vals)
+        return obj
+
+    def args_check(name, func, provided):
+        provided = list(provided)
+        plen = len(provided)
+        (args, varargs, varkw, defaults) = getargspec(func)
+        # First argument is filter input.
+        args.pop(0)
+        if defaults:
+            nondefs = args[:-len(defaults)]
+        else:
+            nondefs = args
+        # Args without defaults must be provided.
+        try:
+            for arg in nondefs:
+                provided.pop(0)
+        except IndexError:
+            # Not enough
+            raise TemplateSyntaxError, "%s requires %d arguments, %d provided" % (name, len(nondefs), plen)
+
+        # Defaults can be overridden.
+        defaults = defaults and list(defaults) or []
+        try:
+            for parg in provided:
+                defaults.pop(0)
+        except IndexError:
+            # Too many.
+            raise TemplateSyntaxError, "%s requires %d arguments, %d provided" % (name, len(nondefs), plen)
+
+        return True
+    args_check = staticmethod(args_check)
+
+    def __str__(self):
+        return self.token
 
 def resolve_variable(path, context):
     """
@@ -606,22 +673,6 @@ def resolve_variable(path, context):
                         raise VariableDoesNotExist, "Failed lookup for key [%s] in %r" % (bits[0], current) # missing attribute
             del bits[0]
     return current
-
-def resolve_variable_with_filters(var_string, context):
-    """
-    var_string is a full variable expression with optional filters, like:
-        a.b.c|lower|date:"y/m/d"
-    This function resolves the variable in the context, applies all filters and
-    returns the object.
-    """
-    var, filters = get_filters_from_token(var_string)
-    try:
-        obj = resolve_variable(var, context)
-    except VariableDoesNotExist:
-        obj = ''
-    for name, arg in filters:
-        obj = registered_filters[name][0](obj, arg)
-    return obj
 
 class Node:
     def render(self, context):
@@ -687,11 +738,11 @@ class TextNode(Node):
         return self.s
 
 class VariableNode(Node):
-    def __init__(self, var_string):
-        self.var_string = var_string
+    def __init__(self, filter_expression):
+        self.filter_expression = filter_expression
 
     def __repr__(self):
-        return "<Variable Node: %s>" % self.var_string
+        return "<Variable Node: %s>" % self.filter_expression
 
     def encode_output(self, output):
         # Check type so that we don't run str() on a Unicode object
@@ -703,30 +754,153 @@ class VariableNode(Node):
             return output
 
     def render(self, context):
-        output = resolve_variable_with_filters(self.var_string, context)
+        output = self.filter_expression.resolve(context)
         return self.encode_output(output)
 
 class DebugVariableNode(VariableNode):
     def render(self, context):
         try:
-             output = resolve_variable_with_filters(self.var_string, context)
+             output = self.filter_expression.resolve(context)
         except TemplateSyntaxError, e:
             if not hasattr(e, 'source'):
                 e.source = self.source
             raise
         return self.encode_output(output)
 
-def register_tag(token_command, callback_function):
-    registered_tags[token_command] = callback_function
+def generic_tag_compiler(params, defaults, name, node_class, parser, token):
+    "Returns a template.Node subclass."
+    bits = token.contents.split()[1:]
+    bmax = len(params)
+    def_len = defaults and len(defaults) or 0
+    bmin = bmax - def_len
+    if(len(bits) < bmin or len(bits) > bmax):
+        if bmin == bmax:
+            message = "%s takes %s arguments" % (name, bmin)
+        else:
+            message = "%s takes between %s and %s arguments" % (name, bmin, bmax)
+        raise TemplateSyntaxError, message
+    return node_class(bits)
 
-def unregister_tag(token_command):
-    del registered_tags[token_command]
+class Library(object):
+    def __init__(self):
+        self.filters = {}
+        self.tags = {}
 
-def register_filter(filter_name, callback_function, has_arg):
-    registered_filters[filter_name] = (callback_function, has_arg)
+    def tag(self, name = None, compile_function = None):
+        if name == None and compile_function == None:
+            # @register.tag()
+            return self.tag_function
+        elif name != None and compile_function == None:
+            if(callable(name)):
+                # @register.tag
+                return self.tag_function(name)
+            else:
+                # @register.tag('somename') or @register.tag(name='somename')
+                def dec(func):
+                    return self.tag(name, func)
+                return dec
+        elif name != None and compile_function != None:
+            # register.tag('somename', somefunc)
+            self.tags[name] = compile_function
+            return compile_function
+        else:
+            raise InvalidTemplateLibrary, "Unsupported arguments to Library.tag: (%r, %r)", (name, compile_function)
 
-def unregister_filter(filter_name):
-    del registered_filters[filter_name]
+    def tag_function(self,func):
+        self.tags[func.__name__] = func
+        return func
 
-import defaulttags
-import defaultfilters
+    def filter(self, name = None, filter_func = None):
+        if name == None and filter_func == None:
+            # @register.filter()
+            return self.filter_function
+        elif filter_func == None:
+            if(callable(name)):
+                # @register.filter
+                return self.filter_function(name)
+            else:
+                # @register.filter('somename') or @register.filter(name='somename')
+                def dec(func):
+                    return self.filter(name, func)
+                return dec
+        elif name != None and filter_func != None:
+            # register.filter('somename', somefunc)
+            self.filters[name] = filter_func
+        else:
+            raise InvalidTemplateLibrary, "Unsupported arguments to Library.filter: (%r, %r, %r)", (name, compile_function, has_arg)
+
+    def filter_function(self, func):
+        self.filters[func.__name__] = func
+        return func
+
+    def simple_tag(self,func):
+        (params, xx, xxx, defaults) = getargspec(func)
+
+        class SimpleNode(Node):
+            def __init__(self, vars_to_resolve):
+                self.vars_to_resolve = vars_to_resolve
+
+            def render(self, context):
+                resolved_vars = [resolve_variable(var, context) for var in self.vars_to_resolve]
+                return func(*resolved_vars)
+
+        compile_func = curry(generic_tag_compiler, params, defaults, func.__name__, SimpleNode)
+        compile_func.__doc__ = func.__doc__
+        self.tag(func.__name__, compile_func)
+        return func
+
+    def inclusion_tag(self, file_name, context_class=Context, takes_context=False):
+        def dec(func):
+            (params, xx, xxx, defaults) = getargspec(func)
+            if takes_context:
+                if params[0] == 'context':
+                    params = params[1:]
+                else:
+                    raise TemplateSyntaxError, "Any tag function decorated with takes_context=True must have a first argument of 'context'"
+
+            class InclusionNode(Node):
+                def __init__(self, vars_to_resolve):
+                    self.vars_to_resolve = vars_to_resolve
+
+                def render(self, context):
+                    resolved_vars = [resolve_variable(var, context) for var in self.vars_to_resolve]
+                    if takes_context:
+                        args = [context] + resolved_vars
+                    else:
+                        args = resolved_vars
+
+                    dict = func(*args)
+
+                    if not getattr(self, 'nodelist', False):
+                        from django.core.template_loader import get_template
+                        t = get_template(file_name)
+                        self.nodelist = t.nodelist
+                    return self.nodelist.render(context_class(dict))
+
+            compile_func = curry(generic_tag_compiler, params, defaults, func.__name__, InclusionNode)
+            compile_func.__doc__ = func.__doc__
+            self.tag(func.__name__, compile_func)
+            return func
+        return dec
+
+def get_library(module_name):
+    lib = libraries.get(module_name, None)
+    if not lib:
+        try:
+            mod = __import__(module_name, '', '', [''])
+        except ImportError, e:
+            raise InvalidTemplateLibrary, "Could not load template library from %s, %s" % (module_name, e)
+        for k, v in mod.__dict__.items():
+            if isinstance(v, Library):
+                lib = v
+                libraries[module_name] = lib
+                break
+    if not lib:
+        raise InvalidTemplateLibrary, "Template library %s does not have a Library member" % module_name
+    return lib
+
+def add_to_builtins(module_name):
+    builtins.append(get_library(module_name))
+
+add_to_builtins('django.core.template.defaulttags')
+add_to_builtins('django.core.template.defaultfilters')

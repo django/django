@@ -1,8 +1,12 @@
-import traceback
+from django.conf import settings
+
+# Turn TEMPLATE_DEBUG off, because tests assume that.
+settings.TEMPLATE_DEBUG = False
 
 from django.core import template
 from django.core.template import loader
 from django.utils.translation import activate, deactivate, install
+import traceback
 
 # Helper objects for template tests
 class SomeClass:
@@ -99,8 +103,14 @@ TEMPLATE_TESTS = {
     # Chained filters, with an argument to the first one
     'basic-syntax29': ('{{ var|removetags:"b i"|upper|lower }}', {"var": "<b><i>Yes</i></b>"}, "yes"),
 
-    #Escaped string as argument
-    'basic-syntax30': (r"""{{ var|default_if_none:" endquote\" hah" }}""", {"var": None}, ' endquote" hah'),
+    # Escaped string as argument
+    'basic-syntax30': (r'{{ var|default_if_none:" endquote\" hah" }}', {"var": None}, ' endquote" hah'),
+
+    # Variable as argument
+    'basic-syntax31': (r'{{ var|default_if_none:var2 }}', {"var": None, "var2": "happy"}, 'happy'),
+
+    # Default argument testing
+    'basic-syntax32' : (r'{{ var|yesno:"yup,nup,mup" }} {{ var|yesno }}', {"var": True}, 'yup yes'),
 
     ### IF TAG ################################################################
     'if-tag01': ("{% if foo %}yes{% else %}no{% endif %}", {"foo": True}, "yes"),
@@ -289,7 +299,7 @@ TEMPLATE_TESTS = {
 def test_template_loader(template_name, template_dirs=None):
     "A custom template loader that loads the unit-test templates."
     try:
-        return ( TEMPLATE_TESTS[template_name][0] , "test:%s" % template_name )
+        return (TEMPLATE_TESTS[template_name][0] , "test:%s" % template_name)
     except KeyError:
         raise template.TemplateDoesNotExist, template_name
 

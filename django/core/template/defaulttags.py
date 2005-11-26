@@ -1,8 +1,11 @@
 "Default tags used by the template system, available to all templates."
 
-from django.core.template import Node, NodeList, Template, Context, resolve_variable, resolve_variable_with_filters, get_filters_from_token, registered_filters
-from django.core.template import TemplateSyntaxError, VariableDoesNotExist, BLOCK_TAG_START, BLOCK_TAG_END, VARIABLE_TAG_START, VARIABLE_TAG_END, register_tag
+from django.core.template import Node, NodeList, Template, Context, resolve_variable
+from django.core.template import TemplateSyntaxError, VariableDoesNotExist, BLOCK_TAG_START, BLOCK_TAG_END, VARIABLE_TAG_START, VARIABLE_TAG_END
+from django.core.template import get_library, Library, InvalidTemplateLibrary
 import sys
+
+register = Library()
 
 class CommentNode(Node):
     def render(self, context):
@@ -27,15 +30,13 @@ class DebugNode(Node):
         return ''.join(output)
 
 class FilterNode(Node):
-    def __init__(self, filters, nodelist):
-        self.filters, self.nodelist = filters, nodelist
+    def __init__(self, filter_expr, nodelist):
+        self.filter_expr, self.nodelist = filter_expr, nodelist
 
     def render(self, context):
         output = self.nodelist.render(context)
         # apply filters
-        for f in self.filters:
-            output = registered_filters[f[0]][0](output, f[1])
-        return output
+        return self.filter_expr.resolve(Context({'var': output}))
 
 class FirstOfNode(Node):
     def __init__(self, vars):
@@ -81,7 +82,7 @@ class ForNode(Node):
             parentloop = {}
         context.push()
         try:
-            values = resolve_variable_with_filters(self.sequence, context)
+            values = self.sequence.resolve(context)
         except VariableDoesNotExist:
             values = []
         if values is None:
@@ -147,8 +148,8 @@ class IfEqualNode(Node):
         return self.nodelist_false.render(context)
 
 class IfNode(Node):
-    def __init__(self, boolvars, nodelist_true, nodelist_false):
-        self.boolvars = boolvars
+    def __init__(self, bool_exprs, nodelist_true, nodelist_false):
+        self.bool_exprs = bool_exprs
         self.nodelist_true, self.nodelist_false = nodelist_true, nodelist_false
 
     def __repr__(self):
@@ -169,9 +170,9 @@ class IfNode(Node):
         return nodes
 
     def render(self, context):
-        for ifnot, boolvar in self.boolvars:
+        for ifnot, bool_expr in self.bool_exprs:
             try:
-                value = resolve_variable_with_filters(boolvar, context)
+                value = bool_expr.resolve(context)
             except VariableDoesNotExist:
                 value = None
             if (value and not ifnot) or (ifnot and not value):
@@ -179,19 +180,18 @@ class IfNode(Node):
         return self.nodelist_false.render(context)
 
 class RegroupNode(Node):
-    def __init__(self, target_var, expression, var_name):
-        self.target_var, self.expression = target_var, expression
+    def __init__(self, target, expression, var_name):
+        self.target, self.expression = target, expression
         self.var_name = var_name
 
     def render(self, context):
-        obj_list = resolve_variable_with_filters(self.target_var, context)
+        obj_list = self.target.resolve(context)
         if obj_list == '': # target_var wasn't found in context; fail silently
             context[self.var_name] = []
             return ''
         output = [] # list of dictionaries in the format {'grouper': 'key', 'list': [list of contents]}
         for obj in obj_list:
-            grouper = resolve_variable_with_filters('var.%s' % self.expression, \
-                Context({'var': obj}))
+            grouper = self.expression.resolve(Context({'var': obj}))
             # TODO: Is this a sensible way to determine equality?
             if output and repr(output[-1]['grouper']) == repr(grouper):
                 output[-1]['list'].append(obj)
@@ -236,21 +236,7 @@ class SsiNode(Node):
         return output
 
 class LoadNode(Node):
-    def __init__(self, taglib):
-        self.taglib = taglib
-
-    def load_taglib(taglib):
-        mod = __import__("django.templatetags.%s" % taglib.split('.')[-1], '', '', [''])
-        reload(mod)
-        return mod
-    load_taglib = staticmethod(load_taglib)
-
     def render(self, context):
-        "Import the relevant module"
-        try:
-            self.__class__.load_taglib(self.taglib)
-        except ImportError:
-            pass # Fail silently for invalid loads.
         return ''
 
 class NowNode(Node):
@@ -276,15 +262,15 @@ class TemplateTagNode(Node):
         return self.mapping.get(self.tagtype, '')
 
 class WidthRatioNode(Node):
-    def __init__(self, val_var, max_var, max_width):
-        self.val_var = val_var
-        self.max_var = max_var
+    def __init__(self, val_expr, max_expr, max_width):
+        self.val_expr = val_expr
+        self.max_expr = max_expr
         self.max_width = max_width
 
     def render(self, context):
         try:
-            value = resolve_variable_with_filters(self.val_var, context)
-            maxvalue = resolve_variable_with_filters(self.max_var, context)
+            value = self.val_expr.resolve(context)
+            maxvalue = self.max_expr.resolve(context)
         except VariableDoesNotExist:
             return ''
         try:
@@ -295,15 +281,18 @@ class WidthRatioNode(Node):
             return ''
         return str(int(round(ratio)))
 
-def do_comment(parser, token):
+#@register.tag
+def comment(parser, token):
     """
     Ignore everything between ``{% comment %}`` and ``{% endcomment %}``
     """
     nodelist = parser.parse(('endcomment',))
     parser.delete_first_token()
     return CommentNode()
+comment = register.tag(comment)
 
-def do_cycle(parser, token):
+#@register.tag
+def cycle(parser, token):
     """
     Cycle among the given strings each time this tag is encountered
 
@@ -369,11 +358,9 @@ def do_cycle(parser, token):
 
     else:
         raise TemplateSyntaxError("Invalid arguments to 'cycle': %s" % args)
+cycle = register.tag(cycle)
 
-def do_debug(parser, token):
-    "Print a whole load of debugging information, including the context and imported modules"
-    return DebugNode()
-
+#@register.tag(name="filter")
 def do_filter(parser, token):
     """
     Filter the contents of the blog through variable filters.
@@ -388,12 +375,14 @@ def do_filter(parser, token):
         {% endfilter %}
     """
     _, rest = token.contents.split(None, 1)
-    _, filters = get_filters_from_token('var|%s' % rest)
+    filter_expr = parser.compile_filter("var|%s" % (rest))
     nodelist = parser.parse(('endfilter',))
     parser.delete_first_token()
-    return FilterNode(filters, nodelist)
+    return FilterNode(filter_expr, nodelist)
+filter = register.tag("filter", do_filter)
 
-def do_firstof(parser, token):
+#@register.tag
+def firstof(parser, token):
     """
     Outputs the first variable passed that is not False.
 
@@ -419,8 +408,9 @@ def do_firstof(parser, token):
     if len(bits) < 1:
         raise TemplateSyntaxError, "'firstof' statement requires at least one argument"
     return FirstOfNode(bits)
+firstof = register.tag(firstof)
 
-
+#@register.tag(name="for")
 def do_for(parser, token):
     """
     Loop over each item in an array.
@@ -462,11 +452,12 @@ def do_for(parser, token):
     if bits[2] != 'in':
         raise TemplateSyntaxError, "'for' statement must contain 'in' as the second word: %s" % token.contents
     loopvar = bits[1]
-    sequence = bits[3]
+    sequence = parser.compile_filter(bits[3])
     reversed = (len(bits) == 5)
     nodelist_loop = parser.parse(('endfor',))
     parser.delete_first_token()
     return ForNode(loopvar, sequence, reversed, nodelist_loop)
+do_for = register.tag("for", do_for)
 
 def do_ifequal(parser, token, negate):
     """
@@ -497,6 +488,17 @@ def do_ifequal(parser, token, negate):
         nodelist_false = NodeList()
     return IfEqualNode(bits[1], bits[2], nodelist_true, nodelist_false, negate)
 
+#@register.tag
+def ifequal(parser, token):
+    return do_ifequal(parser, token, False)
+ifequal = register.tag(ifequal)
+
+#@register.tag
+def ifnotequal(parser, token):
+    return do_ifequal(parser, token, True)
+ifnotequal = register.tag(ifnotequal)
+
+#@register.tag(name="if")
 def do_if(parser, token):
     """
     The ``{% if %}`` tag evaluates a variable, and if that variable is "true"
@@ -554,9 +556,9 @@ def do_if(parser, token):
             not_, boolvar = boolpair.split()
             if not_ != 'not':
                 raise TemplateSyntaxError, "Expected 'not' in if statement"
-            boolvars.append((True, boolvar))
+            boolvars.append((True, parser.compile_filter(boolvar)))
         else:
-            boolvars.append((False, boolpair))
+            boolvars.append((False, parser.compile_filter(boolpair)))
     nodelist_true = parser.parse(('else', 'endif'))
     token = parser.next_token()
     if token.contents == 'else':
@@ -565,8 +567,10 @@ def do_if(parser, token):
     else:
         nodelist_false = NodeList()
     return IfNode(boolvars, nodelist_true, nodelist_false)
+do_if = register.tag("if", do_if)
 
-def do_ifchanged(parser, token):
+#@register.tag
+def ifchanged(parser, token):
     """
     Check if a value has changed from the last iteration of a loop.
 
@@ -587,8 +591,10 @@ def do_ifchanged(parser, token):
     nodelist = parser.parse(('endifchanged',))
     parser.delete_first_token()
     return IfChangedNode(nodelist)
+ifchanged = register.tag(ifchanged)
 
-def do_ssi(parser, token):
+#@register.tag
+def ssi(parser, token):
     """
     Output the contents of a given file into the page.
 
@@ -613,8 +619,10 @@ def do_ssi(parser, token):
         else:
             raise TemplateSyntaxError, "Second (optional) argument to %s tag must be 'parsed'" % bits[0]
     return SsiNode(bits[1], parsed)
+ssi = register.tag(ssi)
 
-def do_load(parser, token):
+#@register.tag
+def load(parser, token):
     """
     Load a custom template tag set.
 
@@ -623,17 +631,18 @@ def do_load(parser, token):
         {% load news.photos %}
     """
     bits = token.contents.split()
-    if len(bits) != 2:
-        raise TemplateSyntaxError, "'load' statement takes one argument"
-    taglib = bits[1]
-    # check at compile time that the module can be imported
-    try:
-        LoadNode.load_taglib(taglib)
-    except ImportError, e:
-        raise TemplateSyntaxError, "'%s' is not a valid tag library: %s" % (taglib, e)
-    return LoadNode(taglib)
+    for taglib in bits[1:]:
+        # add the library to the parser
+        try:
+            lib = get_library("django.templatetags.%s" % taglib.split('.')[-1])
+            parser.add_library(lib)
+        except InvalidTemplateLibrary, e:
+            raise TemplateSyntaxError, "'%s' is not a valid tag library: %s" % (taglib, e)
+    return LoadNode()
+load = register.tag(load)
 
-def do_now(parser, token):
+#@register.tag
+def now(parser, token):
     """
     Display the date, formatted according to the given string.
 
@@ -649,8 +658,10 @@ def do_now(parser, token):
         raise TemplateSyntaxError, "'now' statement takes one argument"
     format_string = bits[1]
     return NowNode(format_string)
+now = register.tag(now)
 
-def do_regroup(parser, token):
+#@register.tag
+def regroup(parser, token):
     """
     Regroup a list of alike objects by a common attribute.
 
@@ -699,17 +710,21 @@ def do_regroup(parser, token):
     firstbits = token.contents.split(None, 3)
     if len(firstbits) != 4:
         raise TemplateSyntaxError, "'regroup' tag takes five arguments"
-    target_var = firstbits[1]
+    target = parser.compile_filter(firstbits[1])
     if firstbits[2] != 'by':
         raise TemplateSyntaxError, "second argument to 'regroup' tag must be 'by'"
     lastbits_reversed = firstbits[3][::-1].split(None, 2)
     if lastbits_reversed[1][::-1] != 'as':
         raise TemplateSyntaxError, "next-to-last argument to 'regroup' tag must be 'as'"
-    expression = lastbits_reversed[2][::-1]
-    var_name = lastbits_reversed[0][::-1]
-    return RegroupNode(target_var, expression, var_name)
 
-def do_templatetag(parser, token):
+    expression = parser.compile_filters('var.%s' % lastbits_reversed[2][::-1])
+
+    var_name = lastbits_reversed[0][::-1]
+    return RegroupNode(target, expression, var_name)
+regroup = register.tag(regroup)
+
+#@register.tag
+def templatetag(parser, token):
     """
     Output one of the bits used to compose template tags.
 
@@ -735,8 +750,10 @@ def do_templatetag(parser, token):
         raise TemplateSyntaxError, "Invalid templatetag argument: '%s'. Must be one of: %s" % \
             (tag, TemplateTagNode.mapping.keys())
     return TemplateTagNode(tag)
+templatetag = register.tag(templatetag)
 
-def do_widthratio(parser, token):
+@register.tag
+def widthratio(parser, token):
     """
     For creating bar charts and such, this tag calculates the ratio of a given
     value to a maximum value, and then applies that ratio to a constant.
@@ -752,26 +769,11 @@ def do_widthratio(parser, token):
     bits = token.contents.split()
     if len(bits) != 4:
         raise TemplateSyntaxError("widthratio takes three arguments")
-    tag, this_value_var, max_value_var, max_width = bits
+    tag, this_value_expr, max_value_expr, max_width = bits
     try:
         max_width = int(max_width)
     except ValueError:
         raise TemplateSyntaxError("widthratio final argument must be an integer")
-    return WidthRatioNode(this_value_var, max_value_var, max_width)
-
-register_tag('comment', do_comment)
-register_tag('cycle', do_cycle)
-register_tag('debug', do_debug)
-register_tag('filter', do_filter)
-register_tag('firstof', do_firstof)
-register_tag('for', do_for)
-register_tag('ifequal', lambda parser, token: do_ifequal(parser, token, False))
-register_tag('ifnotequal', lambda parser, token: do_ifequal(parser, token, True))
-register_tag('if', do_if)
-register_tag('ifchanged', do_ifchanged)
-register_tag('regroup', do_regroup)
-register_tag('ssi', do_ssi)
-register_tag('load', do_load)
-register_tag('now', do_now)
-register_tag('templatetag', do_templatetag)
-register_tag('widthratio', do_widthratio)
+    return WidthRatioNode(parser.compile_filter(this_value_expr),
+                          parser.compile_filter(max_value_expr), max_width)
+widthratio = register.tag(widthratio)

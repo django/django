@@ -444,6 +444,15 @@ the given Python module name, not the name of the app.
 Once you've created that Python module, you'll just have to write a bit of
 Python code, depending on whether you're writing filters or tags.
 
+To be a valid tag library, the module contain a module-level variable that is a
+``template.Library`` instance, in which all the tags and filters are
+registered. So, near the top of your module, put the following::
+
+    from django.core import template
+    register = template.Library()
+
+Convention is to call this instance ``register``.
+
 .. admonition:: Behind the scenes
 
     For a ton of examples, read the source code for Django's default filters
@@ -453,10 +462,16 @@ Python code, depending on whether you're writing filters or tags.
 Writing custom template filters
 -------------------------------
 
-Custom filters are just Python functions that take two arguments:
+**This section applies to the Django development version.**
 
-    * The value of the variable (input) -- not necessarily a string
-    * The value of the argument -- always a string
+Custom filters are just Python functions that take one or two arguments:
+
+    * The value of the variable (input) -- not necessarily a string.
+    * The value of the argument -- this can have a default value, or be left
+      out altogether.
+
+For example, in the filter ``{{ var|foo:"bar" }}``, the filter ``foo`` would be
+passed the variable ``var`` and the argument ``"bar"``.
 
 Filter functions should always return something. They shouldn't raise
 exceptions. They should fail silently. In case of error, they should return
@@ -468,35 +483,47 @@ Here's an example filter definition::
         "Removes all values of arg from the given string"
         return value.replace(arg, '')
 
-Most filters don't take arguments. For filters that don't take arguments, the
-convention is to use a single underscore as the second argument to the filter
-definition. Example::
+And here's an example of how that filter would be used::
 
-    def lower(value, _):
+    {{ somevariable|cut:"0" }}
+
+Most filters don't take arguments. In this case, just leave the argument out of
+your function. Example::
+
+    def lower(value): # Only one argument.
         "Converts a string into all lowercase"
         return value.lower()
 
-When you've written your filter definition, you need to register it, to make it
-available to Django's template language::
+When you've written your filter definition, you need to register it with
+your ``Library`` instance, to make it available to Django's template language::
 
-    from django.core import template
-    template.register_filter('cut', cut, True)
-    template.register_filter('lower', lower, False)
+    register.filter('cut', cut)
+    register.filter('lower', lower)
 
-``register_filter`` takes three arguments:
+The ``Library.filter()`` method takes two arguments:
 
     1. The name of the filter -- a string.
     2. The compilation function -- a Python function (not the name of the
        function as a string).
-    3. A boolean, designating whether the filter requires an argument. This
-       tells Django's template parser whether to throw ``TemplateSyntaxError``
-       when filter arguments are given (or missing).
 
-The convention is to put all ``register_filter`` calls at the bottom of your
-template-library module.
+If you're using Python 2.4 or above, you can use ``register.filter()`` as a
+decorator instead::
+
+    @register.filter(name='cut')
+    def cut(value, arg):
+        return value.replace(arg, '')
+
+    @register.filter
+    def lower(value):
+        return value.lower()
+
+If you leave off the ``name`` argument, as in the second example above, Django
+will use the function's name as the filter name.
 
 Writing custom template tags
 ----------------------------
+
+**This section applies to the Django development version.**
 
 Tags are more complex than filters, because tags can do anything.
 
@@ -524,8 +551,6 @@ Writing the compilation function
 For each template tag the template parser encounters, it calls a Python
 function with the tag contents and the parser object itself. This function is
 responsible for returning a ``Node`` instance based on the contents of the tag.
-
-By convention, the name of each compilation function should start with ``do_``.
 
 For example, let's write a template tag, ``{% current_time %}``, that displays
 the current date/time, formatted according to a parameter given in the tag, in
@@ -612,16 +637,31 @@ without having to be parsed multiple times.
 Registering the tag
 ~~~~~~~~~~~~~~~~~~~
 
-Finally, use a ``register_tag`` call, as in ``register_filter`` above. Example::
+Finally, register the tag with your module's ``Library`` instance, as explained
+in "Writing custom template filters" above. Example::
 
-    from django.core import template
-    template.register_tag('current_time', do_current_time)
+    register.tag('current_time', do_current_time)
 
-``register_tag`` takes two arguments:
+The ``tag()`` method takes two arguments:
 
-    1. The name of the template tag -- a string.
+    1. The name of the template tag -- a string. If this is left out, the
+       name of the compilation function will be used.
     2. The compilation function -- a Python function (not the name of the
        function as a string).
+
+As with filter registration, it is also possible to use this as a decorator, in
+Python 2.4 and above:
+
+    @register.tag(name="current_time")
+    def do_current_time(parser, token):
+        # ...
+
+    @register.tag
+    def shout(parser, token):
+        # ...
+
+If you leave off the ``name`` argument, as in the second example above, Django
+will use the function's name as the tag name.
 
 Setting a variable in the context
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

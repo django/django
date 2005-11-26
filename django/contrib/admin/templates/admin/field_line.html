@@ -1,3 +1,4 @@
+{% load admin_modify %}
 <div class="{{ class_names }}" >
 {% for bound_field in bound_fields %}{{ bound_field.html_error_list }}{% endfor %}
 {% for bound_field in bound_fields %}

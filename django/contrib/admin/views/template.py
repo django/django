@@ -50,21 +50,23 @@ class TemplateValidator(formfields.Manipulator):
             return
 
         # so that inheritance works in the site's context, register a new function
-        # for "extends" that uses the site's TEMPLATE_DIR instead
+        # for "extends" that uses the site's TEMPLATE_DIRS instead.
         def new_do_extends(parser, token):
             node = loader.do_extends(parser, token)
             node.template_dirs = settings_module.TEMPLATE_DIRS
             return node
-        template.register_tag('extends', new_do_extends)
+        register = template.Library()
+        register.tag('extends', new_do_extends)
+        template.builtins.append(register)
 
-        # now validate the template using the new template dirs
-        # making sure to reset the extends function in any case
+        # Now validate the template using the new template dirs
+        # making sure to reset the extends function in any case.
         error = None
         try:
             tmpl = loader.get_template_from_string(field_data)
             tmpl.render(template.Context({}))
         except template.TemplateSyntaxError, e:
             error = e
-        template.register_tag('extends', loader.do_extends)
+        template.builtins.remove(register)
         if error:
             raise validators.ValidationError, e.args

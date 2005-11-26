@@ -278,6 +278,11 @@ In the above, the ``load`` tag loads the ``comments`` tag library, which then
 makes the ``comment_form`` tag available for use. Consult the documentation
 area in your admin to find the list of custom libraries in your installation.
 
+**New in Django development version:** The ``{% load %}`` tag can take multiple
+library names, separated by spaces. Example::
+
+    {% load comments i18n %}
+
 Built-in tag and filter reference
 =================================
 

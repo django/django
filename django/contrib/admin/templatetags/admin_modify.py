@@ -2,24 +2,25 @@ from django.core import template, template_loader, meta
 from django.utils.html import escape
 from django.utils.text import capfirst
 from django.utils.functional import curry
-from django.core.template.decorators import simple_tag, inclusion_tag
 from django.contrib.admin.views.main import AdminBoundField
 from django.core.meta.fields import BoundField, Field
 from django.core.meta import BoundRelatedObject, TABULAR, STACKED
 from django.conf.settings import ADMIN_MEDIA_PREFIX
 import re
 
+register = template.Library()
+
 word_re = re.compile('[A-Z][a-z]+')
 
 def class_name_to_underscored(name):
     return '_'.join([s.lower() for s in word_re.findall(name)[:-1]])
 
-#@simple_tag
+#@register.simple_tag
 def include_admin_script(script_path):
     return '<script type="text/javascript" src="%s%s"></script>' % (ADMIN_MEDIA_PREFIX, script_path)
-include_admin_script = simple_tag(include_admin_script)
+include_admin_script = register.simple_tag(include_admin_script)
 
-#@inclusion_tag('admin/submit_line', takes_context=True)
+#@register.inclusion_tag('admin/submit_line', takes_context=True)
 def submit_row(context, bound_manipulator):
     change = context['change']
     add = context['add']
@@ -36,9 +37,9 @@ def submit_row(context, bound_manipulator):
         'show_save_and_continue': not is_popup,
         'show_save': True
     }
-submit_row = inclusion_tag('admin/submit_line', takes_context=True)(submit_row)
+submit_row = register.inclusion_tag('admin/submit_line', takes_context=True)(submit_row)
 
-#@simple_tag
+#@register.simple_tag
 def field_label(bound_field):
     class_names = []
     if isinstance(bound_field.field, meta.BooleanField):
@@ -53,7 +54,7 @@ def field_label(bound_field):
     class_str = class_names and ' class="%s"' % ' '.join(class_names) or ''
     return '<label for="%s"%s>%s%s</label> ' % (bound_field.element_id, class_str, \
         capfirst(bound_field.field.verbose_name), colon)
-field_label = simple_tag(field_label)
+field_label = register.simple_tag(field_label)
 
 class FieldWidgetNode(template.Node):
     nodelists = {}
@@ -170,12 +171,12 @@ class EditInlineNode(template.Node):
         context.pop()
         return output
 
-#@simple_tag
+#@register.simple_tag
 def output_all(form_fields):
     return ''.join([str(f) for f in form_fields])
-output_all = simple_tag(output_all)
+output_all = register.simple_tag(output_all)
 
-#@simple_tag
+#@register.simple_tag
 def auto_populated_field_script(auto_pop_fields, change = False):
     for field in auto_pop_fields:
         t = []
@@ -191,9 +192,9 @@ def auto_populated_field_script(auto_pop_fields, change = False):
                      ' if(!e._changed) { e.value = URLify(%s, %s);} }; ' % (
                      f, field.name, add_values, field.maxlength))
     return ''.join(t)
-auto_populated_field_script = simple_tag(auto_populated_field_script)
+auto_populated_field_script = register.simple_tag(auto_populated_field_script)
 
-#@simple_tag
+#@register.simple_tag
 def filter_interface_script_maybe(bound_field):
     f = bound_field.field
     if f.rel and isinstance(f.rel, meta.ManyToMany) and f.rel.filter_interface:
@@ -202,7 +203,7 @@ def filter_interface_script_maybe(bound_field):
               f.name, f.verbose_name, f.rel.filter_interface-1, ADMIN_MEDIA_PREFIX)
     else:
         return ''
-filter_interface_script_maybe = simple_tag(filter_interface_script_maybe)
+filter_interface_script_maybe = register.simple_tag(filter_interface_script_maybe)
 
 def do_one_arg_tag(node_factory, parser,token):
     tokens = token.contents.split()
@@ -213,7 +214,7 @@ def do_one_arg_tag(node_factory, parser,token):
 def register_one_arg_tag(node):
     tag_name = class_name_to_underscored(node.__name__)
     parse_func = curry(do_one_arg_tag, node)
-    template.register_tag(tag_name, parse_func)
+    register.tag(tag_name, parse_func)
 
 one_arg_tag_nodes = (
     FieldWidgetNode,
@@ -223,7 +224,7 @@ one_arg_tag_nodes = (
 for node in one_arg_tag_nodes:
     register_one_arg_tag(node)
 
-#@inclusion_tag('admin/field_line', takes_context=True)
+#@register.inclusion_tag('admin/field_line', takes_context=True)
 def admin_field_line(context, argument_val):
     if (isinstance(argument_val, BoundField)):
         bound_fields = [argument_val]
@@ -249,10 +250,10 @@ def admin_field_line(context, argument_val):
         'bound_fields':  bound_fields,
         'class_names': " ".join(class_names),
     }
-admin_field_line = inclusion_tag('admin/field_line', takes_context=True)(admin_field_line)
+admin_field_line = register.inclusion_tag('admin/field_line', takes_context=True)(admin_field_line)
 
-#@simple_tag
+#@register.simple_tag
 def object_pk(bound_manip, ordered_obj):
     return bound_manip.get_ordered_object_pk(ordered_obj)
 
-object_pk = simple_tag(object_pk)
+object_pk = register.simple_tag(object_pk)

@@ -1,28 +1,32 @@
 "Default variable filters"
 
-from django.core.template import register_filter, resolve_variable
+from django.core.template import resolve_variable, Library
+from django.conf.settings import DATE_FORMAT, TIME_FORMAT
 import re
 import random as random_module
+
+register = Library()
 
 ###################
 # STRINGS         #
 ###################
 
-def addslashes(value, _):
+
+def addslashes(value):
     "Adds slashes - useful for passing strings to JavaScript, for example."
     return value.replace('"', '\\"').replace("'", "\\'")
 
-def capfirst(value, _):
+def capfirst(value):
     "Capitalizes the first character of the value"
     value = str(value)
     return value and value[0].upper() + value[1:]
 
-def fix_ampersands(value, _):
+def fix_ampersands(value):
     "Replaces ampersands with ``&amp;`` entities"
     from django.utils.html import fix_ampersands
     return fix_ampersands(value)
 
-def floatformat(text, _):
+def floatformat(text):
     """
     Displays a floating point number as 34.2 (with one decimal place) -- but
     only if there's a point to be displayed
@@ -37,7 +41,7 @@ def floatformat(text, _):
     else:
         return '%d' % int(f)
 
-def linenumbers(value, _):
+def linenumbers(value):
     "Displays text with line numbers"
     from django.utils.html import escape
     lines = value.split('\n')
@@ -47,18 +51,18 @@ def linenumbers(value, _):
         lines[i] = ("%0" + width  + "d. %s") % (i + 1, escape(line))
     return '\n'.join(lines)
 
-def lower(value, _):
+def lower(value):
     "Converts a string into all lowercase"
     return value.lower()
 
-def make_list(value, _):
+def make_list(value):
     """
     Returns the value turned into a list. For an integer, it's a list of
     digits. For a string, it's a list of characters.
     """
     return list(str(value))
 
-def slugify(value, _):
+def slugify(value):
     "Converts to lowercase, removes non-alpha chars and converts spaces to hyphens"
     value = re.sub('[^\w\s-]', '', value).strip().lower()
     return re.sub('\s+', '-', value)
@@ -77,7 +81,7 @@ def stringformat(value, arg):
     except (ValueError, TypeError):
         return ""
 
-def title(value, _):
+def title(value):
     "Converts a string into titlecase"
     return re.sub("([a-z])'([A-Z])", lambda m: m.group(0).lower(), value.title())
 
@@ -96,16 +100,16 @@ def truncatewords(value, arg):
         value = str(value)
     return truncate_words(value, length)
 
-def upper(value, _):
+def upper(value):
     "Converts a string into all uppercase"
     return value.upper()
 
-def urlencode(value, _):
+def urlencode(value):
     "Escapes a value for use in a URL"
     import urllib
     return urllib.quote(value)
 
-def urlize(value, _):
+def urlize(value):
     "Converts URLs in plain text into clickable links"
     from django.utils.html import urlize
     return urlize(value, nofollow=True)
@@ -119,7 +123,7 @@ def urlizetrunc(value, limit):
     from django.utils.html import urlize
     return urlize(value, trim_url_limit=int(limit), nofollow=True)
 
-def wordcount(value, _):
+def wordcount(value):
     "Returns the number of words"
     return len(value.split())
 
@@ -160,17 +164,17 @@ def cut(value, arg):
 # HTML STRINGS    #
 ###################
 
-def escape(value, _):
+def escape(value):
     "Escapes a string's HTML"
     from django.utils.html import escape
     return escape(value)
 
-def linebreaks(value, _):
+def linebreaks(value):
     "Converts newlines into <p> and <br />s"
     from django.utils.html import linebreaks
     return linebreaks(value)
 
-def linebreaksbr(value, _):
+def linebreaksbr(value):
     "Converts newlines into <br />s"
     return value.replace('\n', '<br />')
 
@@ -184,7 +188,7 @@ def removetags(value, tags):
     value = endtag_re.sub('', value)
     return value
 
-def striptags(value, _):
+def striptags(value):
     "Strips all [X]HTML tags"
     from django.utils.html import strip_tags
     if not isinstance(value, basestring):
@@ -214,7 +218,7 @@ def dictsortreversed(value, arg):
     decorated.reverse()
     return [item[1] for item in decorated]
 
-def first(value, _):
+def first(value):
     "Returns the first item in a list"
     try:
         return value[0]
@@ -228,7 +232,7 @@ def join(value, arg):
     except AttributeError: # fail silently but nicely
         return value
 
-def length(value, _):
+def length(value):
     "Returns the length of the value - useful for lists"
     return len(value)
 
@@ -236,7 +240,7 @@ def length_is(value, arg):
     "Returns a boolean of whether the value's length is the argument"
     return len(value) == int(arg)
 
-def random(value, _):
+def random(value):
     "Returns a random item from the list"
     return random_module.choice(value)
 
@@ -253,7 +257,7 @@ def slice_(value, arg):
     except (ValueError, TypeError):
         return value # Fail silently.
 
-def unordered_list(value, _):
+def unordered_list(value):
     """
     Recursively takes a self-nested list and returns an HTML unordered list --
     WITHOUT opening and closing <ul> tags.
@@ -314,17 +318,17 @@ def get_digit(value, arg):
 # DATES           #
 ###################
 
-def date(value, arg):
+def date(value, arg=DATE_FORMAT):
     "Formats a date according to the given format"
     from django.utils.dateformat import format
     return format(value, arg)
 
-def time(value, arg):
+def time(value, arg=TIME_FORMAT):
     "Formats a time according to the given format"
     from django.utils.dateformat import time_format
     return time_format(value, arg)
 
-def timesince(value, _):
+def timesince(value):
     'Formats a date as the time since that date (i.e. "4 days, 6 hours")'
     from django.utils.timesince import timesince
     return timesince(value)
@@ -347,7 +351,7 @@ def divisibleby(value, arg):
     "Returns true if the value is devisible by the argument"
     return int(value) % int(arg) == 0
 
-def yesno(value, arg):
+def yesno(value, arg=_("yes,no,maybe")):
     """
     Given a string mapping values for true, false and (optionally) None,
     returns one of those strings accoding to the value:
@@ -379,7 +383,7 @@ def yesno(value, arg):
 # MISC            #
 ###################
 
-def filesizeformat(bytes, _):
+def filesizeformat(bytes):
     """
     Format the value like a 'human-readable' file size (i.e. 13 KB, 4.1 MB, 102
     bytes, etc).
@@ -393,7 +397,7 @@ def filesizeformat(bytes, _):
         return "%.1f MB" % (bytes / (1024 * 1024))
     return "%.1f GB" % (bytes / (1024 * 1024 * 1024))
 
-def pluralize(value, _):
+def pluralize(value):
     "Returns 's' if the value is not 1, for '1 vote' vs. '2 votes'"
     try:
         if int(value) != 1:
@@ -408,62 +412,62 @@ def pluralize(value, _):
             pass
     return ''
 
-def phone2numeric(value, _):
+def phone2numeric(value):
     "Takes a phone number and converts it in to its numerical equivalent"
     from django.utils.text import phone2numeric
     return phone2numeric(value)
 
-def pprint(value, _):
+def pprint(value):
     "A wrapper around pprint.pprint -- for debugging, really"
     from pprint import pformat
     return pformat(value)
 
-# Syntax: register_filter(name of filter, callback, has_argument)
-register_filter('add', add, True)
-register_filter('addslashes', addslashes, False)
-register_filter('capfirst', capfirst, False)
-register_filter('center', center, True)
-register_filter('cut', cut, True)
-register_filter('date', date, True)
-register_filter('default', default, True)
-register_filter('default_if_none', default_if_none, True)
-register_filter('dictsort', dictsort, True)
-register_filter('dictsortreversed', dictsortreversed, True)
-register_filter('divisibleby', divisibleby, True)
-register_filter('escape', escape, False)
-register_filter('filesizeformat', filesizeformat, False)
-register_filter('first', first, False)
-register_filter('fix_ampersands', fix_ampersands, False)
-register_filter('floatformat', floatformat, False)
-register_filter('get_digit', get_digit, True)
-register_filter('join', join, True)
-register_filter('length', length, False)
-register_filter('length_is', length_is, True)
-register_filter('linebreaks', linebreaks, False)
-register_filter('linebreaksbr', linebreaksbr, False)
-register_filter('linenumbers', linenumbers, False)
-register_filter('ljust', ljust, True)
-register_filter('lower', lower, False)
-register_filter('make_list', make_list, False)
-register_filter('phone2numeric', phone2numeric, False)
-register_filter('pluralize', pluralize, False)
-register_filter('pprint', pprint, False)
-register_filter('removetags', removetags, True)
-register_filter('random', random, False)
-register_filter('rjust', rjust, True)
-register_filter('slice', slice_, True)
-register_filter('slugify', slugify, False)
-register_filter('stringformat', stringformat, True)
-register_filter('striptags', striptags, False)
-register_filter('time', time, True)
-register_filter('timesince', timesince, False)
-register_filter('title', title, False)
-register_filter('truncatewords', truncatewords, True)
-register_filter('unordered_list', unordered_list, False)
-register_filter('upper', upper, False)
-register_filter('urlencode', urlencode, False)
-register_filter('urlize', urlize, False)
-register_filter('urlizetrunc', urlizetrunc, True)
-register_filter('wordcount', wordcount, False)
-register_filter('wordwrap', wordwrap, True)
-register_filter('yesno', yesno, True)
+# Syntax: register.filter(name of filter, callback)
+register.filter(add)
+register.filter(addslashes)
+register.filter(capfirst)
+register.filter(center)
+register.filter(cut)
+register.filter(date)
+register.filter(default)
+register.filter(default_if_none)
+register.filter(dictsort)
+register.filter(dictsortreversed)
+register.filter(divisibleby)
+register.filter(escape)
+register.filter(filesizeformat)
+register.filter(first)
+register.filter(fix_ampersands)
+register.filter(floatformat)
+register.filter(get_digit)
+register.filter(join)
+register.filter(length)
+register.filter(length_is)
+register.filter(linebreaks)
+register.filter(linebreaksbr)
+register.filter(linenumbers)
+register.filter(ljust)
+register.filter(lower)
+register.filter(make_list)
+register.filter(phone2numeric)
+register.filter(pluralize)
+register.filter(pprint)
+register.filter(removetags)
+register.filter(random)
+register.filter(rjust)
+register.filter(slice_)
+register.filter(slugify)
+register.filter(stringformat)
+register.filter(striptags)
+register.filter(time)
+register.filter(timesince)
+register.filter(title)
+register.filter(truncatewords)
+register.filter(unordered_list)
+register.filter(upper)
+register.filter(urlencode)
+register.filter(urlize)
+register.filter(urlizetrunc)
+register.filter(wordcount)
+register.filter(wordwrap)
+register.filter(yesno)

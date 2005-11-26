@@ -1,19 +1,20 @@
 # Quick tests for the markup templatetags (django.contrib.markup)
 
-from django.core.template import Template, Context
-import django.contrib.markup.templatetags.markup # this registers the filters
+from django.core.template import Template, Context, add_to_builtins
+
+add_to_builtins('django.contrib.markup.templatetags.markup')
 
 # find out if markup modules are installed and tailor the test appropriately
 try:
     import textile
 except ImportError:
     textile = None
-    
+
 try:
     import markdown
 except ImportError:
     markdown = None
-    
+
 try:
     import docutils
 except ImportError:
@@ -36,7 +37,7 @@ if textile:
 <p>Paragraph 2 with &#8220;quotes&#8221; and <code>code</code></p>"""
 else:
     assert rendered == textile_content
-    
+
 ### test markdown
 
 markdown_content = """Paragraph 1
