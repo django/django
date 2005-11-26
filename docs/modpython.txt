@@ -176,3 +176,16 @@ Here are two recommended approaches:
        change.
     2. Or, copy the admin media files so that they live within your document
        root.
+
+Error handling
+==============
+
+When you use Apache/mod_python, errors will be caught by Django -- in other
+words, they won't propogate to the Apache level and won't appear in the Apache
+``error_log``.
+
+The exception for this is if something is really wonky in your Django setup. In
+that case, you'll see an "Internal Server Error" page in your browser and the
+full Python traceback in your Apache ``error_log`` file. The ``error_log``
+traceback is spread over multiple lines. (Yes, this is ugly and rather hard to
+read, but it's how mod_python does things.)
