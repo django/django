@@ -752,7 +752,7 @@ def templatetag(parser, token):
     return TemplateTagNode(tag)
 templatetag = register.tag(templatetag)
 
-@register.tag
+#@register.tag
 def widthratio(parser, token):
     """
     For creating bar charts and such, this tag calculates the ratio of a given
