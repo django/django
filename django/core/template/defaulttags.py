@@ -717,7 +717,7 @@ def regroup(parser, token):
     if lastbits_reversed[1][::-1] != 'as':
         raise TemplateSyntaxError, "next-to-last argument to 'regroup' tag must be 'as'"
 
-    expression = parser.compile_filters('var.%s' % lastbits_reversed[2][::-1])
+    expression = parser.compile_filter('var.%s' % lastbits_reversed[2][::-1])
 
     var_name = lastbits_reversed[0][::-1]
     return RegroupNode(target, expression, var_name)
