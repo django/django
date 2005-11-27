@@ -254,6 +254,7 @@ DATA_TYPE_MAPPING = {
     'IPAddressField'            : _('IP address'),
     'ManyToManyField'           : '',
     'NullBooleanField'          : _('Boolean (Either True, False or None)'),
+    'OneToOneField'             : _('Relation to parent model'),
     'PhoneNumberField'          : _('Phone number'),
     'PositiveIntegerField'      : _('Integer'),
     'PositiveSmallIntegerField' : _('Integer'),
