@@ -83,8 +83,7 @@ class ConstantIncludeNode(Node):
             self.template = t
         except:
             if TEMPLATE_DEBUG:
-                pass
-#                 raise
+                 raise
             self.template = None
 
     def render(self, context):
