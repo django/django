@@ -107,6 +107,15 @@ having to restart the server each time you make code changes. Just set
 everything for each request. But don't do that on a production server, or we'll
 revoke your Django privileges.
 
+If you're the type of programmer who debugs using scattered ``print``
+statements, note that ``print`` statements have no effect in mod_python; they
+don't appear in the Apache log, as one might expect. If you have the need to
+print debugging information in a mod_python setup, either do this::
+
+    assert False, the_value_i_want_to_see
+
+Or add the debugging information to the template of your page.
+
 .. _mod_python documentation: http://modpython.org/live/current/doc-html/directives.html
 
 Serving media files
