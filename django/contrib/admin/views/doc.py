@@ -6,7 +6,6 @@ from django.models.core import sites
 from django.core.extensions import DjangoContext, render_to_response
 from django.core.exceptions import Http404, ViewDoesNotExist
 from django.core import template, urlresolvers
-from django.core.template import defaulttags, defaultfilters, loader
 try:
     from django.parts.admin import doc
 except ImportError:
@@ -24,44 +23,37 @@ doc_index = staff_member_required(doc_index)
 
 def bookmarklets(request):
     return render_to_response('admin_doc/bookmarklets', {
-        'admin_url' : "%s://%s" % (os.environ.get('HTTPS') == 'on' and 'https' or 'http', request.META['HTTP_HOST']),
+        'admin_url': "%s://%s" % (os.environ.get('HTTPS') == 'on' and 'https' or 'http', request.META['HTTP_HOST']),
     }, context_instance=DjangoContext(request))
 bookmarklets = staff_member_required(bookmarklets)
 
 def template_tag_index(request):
-    import sys
-
     if not doc:
         return missing_docutils_page(request)
 
-    # We have to jump through some hoops with registered_tags to make sure
-    # they don't get messed up by loading outside tagsets
-    saved_tagset = template.registered_tags.copy(), template.registered_filters.copy()
     load_all_installed_template_libraries()
 
-    # Gather docs
     tags = []
-    for tagname in template.registered_tags:
-        title, body, metadata = doc.parse_docstring(template.registered_tags[tagname].__doc__)
-        if title:
-            title = doc.parse_rst(title, 'tag', 'tag:' + tagname)
-        if body:
-            body = doc.parse_rst(body, 'tag', 'tag:' + tagname)
-        for key in metadata:
-            metadata[key] = doc.parse_rst(metadata[key], 'tag', 'tag:' + tagname)
-        library = template.registered_tags[tagname].__module__.split('.')[-1]
-        if library == 'template_loader' or library == 'defaulttags':
-            library = None
-        tags.append({
-            'name'    : tagname,
-            'title'   : title,
-            'body'    : body,
-            'meta'    : metadata,
-            'library' : library,
-        })
-
-    # Fix registered_tags
-    template.registered_tags, template.registered_filters = saved_tagset
+    for module_name, library in template.libraries.items():
+        for tag_name, tag_func in library.tags.items():
+            title, body, metadata = doc.parse_docstring(tag_func.__doc__)
+            if title:
+                title = doc.parse_rst(title, 'tag', 'tag:' + tag_name)
+            if body:
+                body = doc.parse_rst(body, 'tag', 'tag:' + tag_name)
+            for key in metadata:
+                metadata[key] = doc.parse_rst(metadata[key], 'tag', 'tag:' + tag_name)
+            if library in template.builtins:
+                tag_library = None
+            else:
+                tag_library = module_name.split('.')[-1]
+            tags.append({
+                'name': tag_name,
+                'title': title,
+                'body': body,
+                'meta': metadata,
+                'library': tag_library,
+            })
 
     return render_to_response('admin_doc/template_tag_index', {'tags': tags}, context_instance=DjangoContext(request))
 template_tag_index = staff_member_required(template_tag_index)
@@ -70,32 +62,29 @@ def template_filter_index(request):
     if not doc:
         return missing_docutils_page(request)
 
-    saved_tagset = template.registered_tags.copy(), template.registered_filters.copy()
     load_all_installed_template_libraries()
 
     filters = []
-    for filtername in template.registered_filters:
-        title, body, metadata = doc.parse_docstring(template.registered_filters[filtername][0].__doc__)
-        if title:
-            title = doc.parse_rst(title, 'filter', 'filter:' + filtername)
-        if body:
-            body = doc.parse_rst(body, 'filter', 'filter:' + filtername)
-        for key in metadata:
-            metadata[key] = doc.parse_rst(metadata[key], 'filter', 'filter:' + filtername)
-        metadata['AcceptsArgument'] = template.registered_filters[filtername][1]
-        library = template.registered_filters[filtername][0].__module__.split('.')[-1]
-        if library == 'template_loader' or library == 'defaultfilters':
-            library = None
-        filters.append({
-            'name'    : filtername,
-            'title'   : title,
-            'body'    : body,
-            'meta'    : metadata,
-            'library' : library,
-        })
-
-    template.registered_tags, template.registered_filters = saved_tagset
-
+    for module_name, library in template.libraries.items():
+        for filter_name, filter_func in library.filters.items():
+            title, body, metadata = doc.parse_docstring(filter_func.__doc__)
+            if title:
+                title = doc.parse_rst(title, 'filter', 'filter:' + filter_name)
+            if body:
+                body = doc.parse_rst(body, 'filter', 'filter:' + filter_name)
+            for key in metadata:
+                metadata[key] = doc.parse_rst(metadata[key], 'filter', 'filter:' + filter_name)
+            if library in template.builtins:
+                tag_library = None
+            else:
+                tag_library = module_name.split('.')[-1]
+            filters.append({
+                'name': filter_name,
+                'title': title,
+                'body': body,
+                'meta': metadata,
+                'library': tag_library,
+            })
     return render_to_response('admin_doc/template_filter_index', {'filters': filters}, context_instance=DjangoContext(request))
 template_filter_index = staff_member_required(template_filter_index)
 
@@ -110,11 +99,11 @@ def view_index(request):
         view_functions = extract_views_from_urlpatterns(urlconf.urlpatterns)
         for (func, regex) in view_functions:
             views.append({
-                'name'   : func.__name__,
-                'module' : func.__module__,
+                'name': func.__name__,
+                'module': func.__module__,
                 'site_id': settings_mod.SITE_ID,
-                'site'   : sites.get_object(pk=settings_mod.SITE_ID),
-                'url'    : simplify_regex(regex),
+                'site': sites.get_object(pk=settings_mod.SITE_ID),
+                'url': simplify_regex(regex),
             })
     return render_to_response('admin_doc/view_index', {'views': views}, context_instance=DjangoContext(request))
 view_index = staff_member_required(view_index)
@@ -152,9 +141,9 @@ def model_index(request):
         for model in app._MODELS:
             opts = model._meta
             models.append({
-                'name'   : '%s.%s' % (opts.app_label, opts.module_name),
-                'module' : opts.app_label,
-                'class'  : opts.module_name,
+                'name': '%s.%s' % (opts.app_label, opts.module_name),
+                'module': opts.app_label,
+                'class': opts.module_name,
             })
     return render_to_response('admin_doc/model_index', {'models': models}, context_instance=DjangoContext(request))
 model_index = staff_member_required(model_index)
@@ -173,10 +162,10 @@ def model_detail(request, model):
     fields = []
     for field in opts.fields:
         fields.append({
-            'name'     : field.name,
+            'name': field.name,
             'data_type': get_readable_field_data_type(field),
-            'verbose'  : field.verbose_name,
-            'help'     : field.help_text,
+            'verbose': field.verbose_name,
+            'help': field.help_text,
         })
     for func_name, func in model.Klass.__dict__.items():
         if callable(func) and len(inspect.getargspec(func)[0]) == 0:
@@ -190,9 +179,9 @@ def model_detail(request, model):
             if verbose:
                 verbose = doc.parse_rst(doc.trim_docstring(verbose), 'model', 'model:' + opts.module_name)
             fields.append({
-                'name'      : func_name,
-                'data_type' : get_return_data_type(func_name),
-                'verbose'   : verbose,
+                'name': func_name,
+                'data_type': get_return_data_type(func_name),
+                'verbose': verbose,
             })
     return render_to_response('admin_doc/model_detail', {
         'name': '%s.%s' % (opts.app_label, opts.module_name),
@@ -208,12 +197,12 @@ def template_detail(request, template):
         for dir in settings_mod.TEMPLATE_DIRS:
             template_file = os.path.join(dir, "%s.html" % template)
             templates.append({
-                'file'      : template_file,
-                'exists'    : os.path.exists(template_file),
-                'contents'  : lambda: os.path.exists(template_file) and open(template_file).read() or '',
-                'site_id'   : settings_mod.SITE_ID,
-                'site'      : sites.get_object(pk=settings_mod.SITE_ID),
-                'order'     : list(settings_mod.TEMPLATE_DIRS).index(dir),
+                'file': template_file,
+                'exists': os.path.exists(template_file),
+                'contents': lambda: os.path.exists(template_file) and open(template_file).read() or '',
+                'site_id': settings_mod.SITE_ID,
+                'site': sites.get_object(pk=settings_mod.SITE_ID),
+                'order': list(settings_mod.TEMPLATE_DIRS).index(dir),
             })
     return render_to_response('admin_doc/template_detail', {
         'name': template,
@@ -230,19 +219,13 @@ def missing_docutils_page(request):
     return render_to_response('admin_doc/missing_docutils')
 
 def load_all_installed_template_libraries():
-    # Clear out and reload default tags
-    template.registered_tags.clear()
-    reload(defaulttags)
-    reload(loader) # loader defines the block/extends tags
-
-    # Load any template tag libraries from installed apps
+    # Load/register all template tag libraries from installed apps.
     for e in templatetags.__path__:
         libraries = [os.path.splitext(p)[0] for p in os.listdir(e) if p.endswith('.py') and p[0].isalpha()]
-        for lib in libraries:
+        for library_name in libraries:
             try:
-                mod = defaulttags.LoadNode.load_taglib(lib)
-                reload(mod)
-            except ImportError:
+                lib = template.get_library("django.templatetags.%s" % library_name.split('.')[-1])
+            except template.InvalidTemplateLibrary:
                 pass
 
 def get_return_data_type(func_name):

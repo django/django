@@ -19,7 +19,6 @@
     {% for filter in library.list|dictsort:"name" %}
     <h3 id="{{ filter.name }}">{{ filter.name }}</h3>
     <p>{{ filter.title }}</p>
-    <p><strong>Usage:</strong> <code>{% templatetag openvariable %} variable|{{ filter.name }}{% if filter.meta.AcceptsArgument %}:"arg"{% endif %} {% templatetag closevariable %}</code></p>
     <p>{{ filter.body }}</p>
     {% if not forloop.last %}<hr />{% endif %}
     {% endfor %}
