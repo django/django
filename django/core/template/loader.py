@@ -65,9 +65,6 @@ def find_template_source(name, dirs=None):
             pass
     raise TemplateDoesNotExist, name
 
-def load_template_source(name, dirs=None):
-    find_template_source(name, dirs)[0]
-
 def get_template(template_name):
     """
     Returns a compiled Template object for the given template name,
