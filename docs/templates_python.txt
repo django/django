@@ -411,13 +411,12 @@ Although the Django template language comes with several default tags and
 filters, you might want to write your own. It's easy to do.
 
 First, create a ``templatetags`` package in the appropriate Django app's
-package. It should be on the same level as ``models``, ``views``, etc. For
+package. It should be on the same level as ``models``, ``views.py``, etc. For
 example::
 
     polls/
         models/
         templatetags/
-        views/
 
 Add two files to the ``templatetags`` package: an ``__init__.py`` file and a
 file that will contain your custom tag/filter definitions. The name of the
@@ -650,7 +649,7 @@ The ``tag()`` method takes two arguments:
        function as a string).
 
 As with filter registration, it is also possible to use this as a decorator, in
-Python 2.4 and above:
+Python 2.4 and above::
 
     @register.tag(name="current_time")
     def do_current_time(parser, token):
