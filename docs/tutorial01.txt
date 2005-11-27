@@ -227,16 +227,16 @@ Now Django knows myproject includes the polls app. Let's run another command::
 You should see the following (the CREATE TABLE SQL statements for the polls app)::
 
     BEGIN;
-    CREATE TABLE polls_polls (
-        id serial NOT NULL PRIMARY KEY,
-        question varchar(200) NOT NULL,
-        pub_date timestamp with time zone NOT NULL
+    CREATE TABLE "polls_polls" (
+        "id" serial NOT NULL PRIMARY KEY,
+        "question" varchar(200) NOT NULL,
+        "pub_date" timestamp with time zone NOT NULL
     );
-    CREATE TABLE polls_choices (
-        id serial NOT NULL PRIMARY KEY,
-        poll_id integer NOT NULL REFERENCES polls_polls (id),
-        choice varchar(200) NOT NULL,
-        votes integer NOT NULL
+    CREATE TABLE "polls_choices" (
+        "id" serial NOT NULL PRIMARY KEY,
+        "poll_id" integer NOT NULL REFERENCES "polls_polls" ("id"),
+        "choice" varchar(200) NOT NULL,
+        "votes" integer NOT NULL
     );
     COMMIT;
 
@@ -255,9 +255,10 @@ Note the following:
 
     * It's tailored to the database you're using, so database-specific field types
       such as ``auto_increment`` (MySQL), ``serial`` (PostgreSQL), or ``integer
-      primary key`` (SQLite) are handled for you automatically. The author of
-      this tutorial runs PostgreSQL, so the example output is in PostgreSQL
-      syntax.
+      primary key`` (SQLite) are handled for you automatically. Same goes for
+      quoting of field names -- e.g., using double quotes or single quotes. The
+      author of this tutorial runs PostgreSQL, so the example output is in
+      PostgreSQL syntax.
 
 If you're interested, also run the following commands:
 
