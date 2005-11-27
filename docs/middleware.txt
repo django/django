@@ -125,12 +125,14 @@ the appropriate view; it'll return that ``HttpResponse``.
 process_view
 ------------
 
-Interface: ``process_view(self, request, view_func, param_dict)``
+Interface: ``process_view(self, request, view_func, view_args, view_kwargs)``
 
 ``request`` is an ``HttpRequest`` object. ``view_func`` is the Python function
 that Django is about to use. (It's the actual function object, not the name of
-the function as a string.) ``param_dict`` is a dictionary of keyword arguments
-that will be passed to the view -- NOT including the first argument (``request``).
+the function as a string.) ``view_args`` is a list of positional arguments that
+will be passed to the view, and ``view_kwargs`` is a dictionary of keyword
+arguments that will be passed to the view. Neither ``view_args`` nor
+``view_kwargs`` include the first view argument (``request``).
 
 ``process_view()`` is called just before Django calls the view. It should
 return either ``None`` or an ``HttpResponse`` object. If it returns ``None``,

@@ -42,7 +42,7 @@ algorithm the system follows to determine which Python code to execute:
        first one that matches the requested URL.
     4. Once one of the regexes matches, Django imports and calls the given
        view, which is a simple Python function. The view gets passed a
-       `request object`_ and any values captured in the regex as keyword
+       `request object`_ and any values captured in the regex as function
        arguments.
 
 .. _settings file: http://www.djangoproject.com/documentation/settings/
@@ -51,15 +51,18 @@ algorithm the system follows to determine which Python code to execute:
 Example
 =======
 
+**This syntax is new in the Django development version.** See "Named groups"
+below if you're using Django 0.90.
+
 Here's a sample URLconf::
 
     from django.conf.urls.defaults import *
 
     urlpatterns = patterns('',
         (r'^articles/2003/$', 'news.views.special_case_2003'),
-        (r'^articles/(?P<year>\d{4})/$', 'news.views.year_archive'),
-        (r'^articles/(?P<year>\d{4})/(?P<month>\d{2})/$', 'news.views.month_archive'),
-        (r'^articles/(?P<year>\d{4})/(?P<month>\d{2})/(?P<day>\d+)/$', 'news.views.article_detail'),
+        (r'^articles/(\d{4})/$', 'news.views.year_archive'),
+        (r'^articles/(\d{4})/(\d{2})/$', 'news.views.month_archive'),
+        (r'^articles/(\d{4})/(\d{2})/(\d+)/$', 'news.views.article_detail'),
     )
 
 Notes:
@@ -67,9 +70,7 @@ Notes:
     * ``from django.conf.urls.defaults import *`` makes the ``patterns``
       function available.
 
-    * To capture a value from the URL, use the syntax ``(?P<name>pattern)``,
-      where ``name`` is the name for that value and ``pattern`` is some pattern
-      to match.
+    * To capture a value from the URL, just put parenthesis around it.
 
     * There's no need to add a leading slash, because every URL has that. For
       example, it's ``^articles``, not ``^/articles``.
@@ -82,7 +83,7 @@ Examples:
 
     * A request to ``/articles/2005/03/`` would match the third entry in the
       list. Django would call the function
-      ``news.views.month_archive(request, year='2005', month='03')``.
+      ``news.views.month_archive(request, '2005', '03')``.
 
     * ``/articles/2005/3/`` would not match any URL patterns, because the
       third entry in the list requires two digits for the month.
@@ -96,10 +97,67 @@ Examples:
       pattern requires that the URL end with a slash.
 
     * ``/articles/2003/03/3/`` would match the final pattern. Django would call
-      the function
-      ``news.views.article_detail(request, year='2003', month='03', day='3')``.
+      the function ``news.views.article_detail(request, '2003', '03', '3')``.
 
 .. _Dive Into Python's explanation: http://diveintopython.org/regular_expressions/street_addresses.html#re.matching.2.3
+
+Named groups
+============
+
+The above example used simple, *non-named* regular-expression groups (via
+parenthesis) to capture bits of the URL and pass them as *positional* arguments
+to a view. In more advanced usage, it's possible to use *named*
+regular-expression groups to capture URL bits and pass them as *keyword*
+arguments to a view.
+
+(Note that support for non-named regex groups is a new feature in the Django
+development version. Django 0.90 requires named groups.)
+
+In Python regular expressions, the syntax for named regular-expression groups
+is ``(?P<name>pattern)``, where ``name`` is the name of the group and
+``pattern`` is some pattern to match.
+
+Here's the above example URLconf, rewritten to use named groups::
+
+    urlpatterns = patterns('',
+        (r'^articles/2003/$', 'news.views.special_case_2003'),
+        (r'^articles/(?P<year>\d{4})/$', 'news.views.year_archive'),
+        (r'^articles/(?P<year>\d{4})/(?P<month>\d{2})/$', 'news.views.month_archive'),
+        (r'^articles/(?P<year>\d{4})/(?P<month>\d{2})/(?P<day>\d+)/$', 'news.views.article_detail'),
+    )
+
+This accomplishes exactly the same thing as the previous example, with one
+subtle difference: The captured values are passed as keyword arguments rather
+than positional arguments. For example:
+
+    * A request to ``/articles/2005/03/`` would call the function
+      ``news.views.month_archive(request, year='2005', month='03')``, instead
+      of ``news.views.month_archive(request, '2005', '03')``.
+
+    * A request to ``/articles/2003/03/3/`` would call the function
+      ``news.views.article_detail(request, year='2003', month='03', day='3')``.
+
+In practice, this means your URLconfs are slightly more explicit and less prone
+to argument-order bugs -- and you can reorder the arguments in your views'
+function definitions. Of course, these benefits come at the cost of brevity;
+some folks find the named-group syntax ugly and too verbose.
+
+The matching/grouping algorithm
+-------------------------------
+
+Here's the algorithm the URLconf parser follows, with respect to named groups
+vs. non-named groups in a regular expression:
+
+    * If there are any named groups, it will use those as keyword arguments,
+      ignoring any non-named groups.
+    * Otherwise, it will pass all non-named groups as positional arguments.
+    * In both cases, it will pass any extra
+
+If there are any named arguments, it will use those, ignoring non-named arguments.
+Otherwise, it will pass all non-named arguments as positional arguments.
+
+In both cases, it will pass any extra keyword arguments as keyword arguments.
+See "Passing extra options to view functions" below.
 
 What the URLconf searches against
 =================================
@@ -169,7 +227,7 @@ Notes on capturing text in URLs
 
 Each captured argument is sent to the view as a plain Python string, regardless
 of what sort of match the regular expression makes. For example, in this
-URLconf::
+URLconf line::
 
     (r'^articles/(?P<year>\d{4})/$', 'news.views.year_archive'),
 
