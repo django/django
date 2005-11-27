@@ -890,13 +890,11 @@ def get_library(module_name):
             mod = __import__(module_name, '', '', [''])
         except ImportError, e:
             raise InvalidTemplateLibrary, "Could not load template library from %s, %s" % (module_name, e)
-        for k, v in mod.__dict__.items():
-            if isinstance(v, Library):
-                lib = v
-                libraries[module_name] = lib
-                break
-    if not lib:
-        raise InvalidTemplateLibrary, "Template library %s does not have a Library member" % module_name
+        try:
+            lib = mod.register
+            libraries[module_name] = lib
+        except AttributeError:
+            raise InvalidTemplateLibrary, "Template library %s does not have a variable named 'register'" % module_name
     return lib
 
 def add_to_builtins(module_name):

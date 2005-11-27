@@ -443,14 +443,13 @@ the given Python module name, not the name of the app.
 Once you've created that Python module, you'll just have to write a bit of
 Python code, depending on whether you're writing filters or tags.
 
-To be a valid tag library, the module contain a module-level variable that is a
-``template.Library`` instance, in which all the tags and filters are
-registered. So, near the top of your module, put the following::
+To be a valid tag library, the module contain a module-level variable named
+``register`` that is a ``template.Library`` instance, in which all the tags and
+filters are registered. So, near the top of your module, put the following::
 
     from django.core import template
-    register = template.Library()
 
-Convention is to call this instance ``register``.
+    register = template.Library()
 
 .. admonition:: Behind the scenes
 
