@@ -24,7 +24,7 @@ production setting. Use this only for development.
 For information on serving static files in an Apache production environment,
 see the `Django mod_python documentation`_.
 
--- _Django mod_python documentation: http://www.djangoproject.com/documentation/modpython/#serving-media-files
+.. _Django mod_python documentation: http://www.djangoproject.com/documentation/modpython/#serving-media-files
 
 How to do it
 ============
