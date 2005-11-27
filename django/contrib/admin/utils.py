@@ -1,14 +1,17 @@
-"""
-Misc. utility functions/classes for documentation generator
-"""
+"Misc. utility functions/classes for admin documentation generator."
 
 import re
 from email.Parser import HeaderParser
 from email.Errors import HeaderParseError
-import docutils.core
-import docutils.nodes
-import docutils.parsers.rst.roles
 from urlparse import urljoin
+try:
+    import docutils.core
+    import docutils.nodes
+    import docutils.parsers.rst.roles
+except ImportError:
+    docutils_is_available = False
+else:
+    docutils_is_available = True
 
 def trim_docstring(docstring):
     """

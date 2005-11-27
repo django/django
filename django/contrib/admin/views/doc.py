@@ -6,17 +6,14 @@ from django.models.core import sites
 from django.core.extensions import DjangoContext, render_to_response
 from django.core.exceptions import Http404, ViewDoesNotExist
 from django.core import template, urlresolvers
-try:
-    from django.parts.admin import doc
-except ImportError:
-    doc = None
+from django.contrib.admin import utils
 import inspect, os, re
 
 # Exclude methods starting with these strings from documentation
 MODEL_METHODS_EXCLUDE = ('_', 'add_', 'delete', 'save', 'set_')
 
 def doc_index(request):
-    if not doc:
+    if not utils.docutils_is_available:
         return missing_docutils_page(request)
     return render_to_response('admin_doc/index', context_instance=DjangoContext(request))
 doc_index = staff_member_required(doc_index)
@@ -28,7 +25,7 @@ def bookmarklets(request):
 bookmarklets = staff_member_required(bookmarklets)
 
 def template_tag_index(request):
-    if not doc:
+    if not utils.docutils_is_available:
         return missing_docutils_page(request)
 
     load_all_installed_template_libraries()
@@ -36,13 +33,13 @@ def template_tag_index(request):
     tags = []
     for module_name, library in template.libraries.items():
         for tag_name, tag_func in library.tags.items():
-            title, body, metadata = doc.parse_docstring(tag_func.__doc__)
+            title, body, metadata = utils.parse_docstring(tag_func.__doc__)
             if title:
-                title = doc.parse_rst(title, 'tag', 'tag:' + tag_name)
+                title = utils.parse_rst(title, 'tag', 'tag:' + tag_name)
             if body:
-                body = doc.parse_rst(body, 'tag', 'tag:' + tag_name)
+                body = utils.parse_rst(body, 'tag', 'tag:' + tag_name)
             for key in metadata:
-                metadata[key] = doc.parse_rst(metadata[key], 'tag', 'tag:' + tag_name)
+                metadata[key] = utils.parse_rst(metadata[key], 'tag', 'tag:' + tag_name)
             if library in template.builtins:
                 tag_library = None
             else:
@@ -59,7 +56,7 @@ def template_tag_index(request):
 template_tag_index = staff_member_required(template_tag_index)
 
 def template_filter_index(request):
-    if not doc:
+    if not utils.docutils_is_available:
         return missing_docutils_page(request)
 
     load_all_installed_template_libraries()
@@ -67,13 +64,13 @@ def template_filter_index(request):
     filters = []
     for module_name, library in template.libraries.items():
         for filter_name, filter_func in library.filters.items():
-            title, body, metadata = doc.parse_docstring(filter_func.__doc__)
+            title, body, metadata = utils.parse_docstring(filter_func.__doc__)
             if title:
-                title = doc.parse_rst(title, 'filter', 'filter:' + filter_name)
+                title = utils.parse_rst(title, 'filter', 'filter:' + filter_name)
             if body:
-                body = doc.parse_rst(body, 'filter', 'filter:' + filter_name)
+                body = utils.parse_rst(body, 'filter', 'filter:' + filter_name)
             for key in metadata:
-                metadata[key] = doc.parse_rst(metadata[key], 'filter', 'filter:' + filter_name)
+                metadata[key] = utils.parse_rst(metadata[key], 'filter', 'filter:' + filter_name)
             if library in template.builtins:
                 tag_library = None
             else:
@@ -89,7 +86,7 @@ def template_filter_index(request):
 template_filter_index = staff_member_required(template_filter_index)
 
 def view_index(request):
-    if not doc:
+    if not utils.docutils_is_available:
         return missing_docutils_page(request)
 
     views = []
@@ -109,7 +106,7 @@ def view_index(request):
 view_index = staff_member_required(view_index)
 
 def view_detail(request, view):
-    if not doc:
+    if not utils.docutils_is_available:
         return missing_docutils_page(request)
 
     mod, func = urlresolvers.get_mod_func(view)
@@ -117,13 +114,13 @@ def view_detail(request, view):
         view_func = getattr(__import__(mod, '', '', ['']), func)
     except (ImportError, AttributeError):
         raise Http404
-    title, body, metadata = doc.parse_docstring(view_func.__doc__)
+    title, body, metadata = utils.parse_docstring(view_func.__doc__)
     if title:
-        title = doc.parse_rst(title, 'view', 'view:' + view)
+        title = utils.parse_rst(title, 'view', 'view:' + view)
     if body:
-        body = doc.parse_rst(body, 'view', 'view:' + view)
+        body = utils.parse_rst(body, 'view', 'view:' + view)
     for key in metadata:
-        metadata[key] = doc.parse_rst(metadata[key], 'model', 'view:' + view)
+        metadata[key] = utils.parse_rst(metadata[key], 'model', 'view:' + view)
     return render_to_response('admin_doc/view_detail', {
         'name': view,
         'summary': title,
@@ -133,7 +130,7 @@ def view_detail(request, view):
 view_detail = staff_member_required(view_detail)
 
 def model_index(request):
-    if not doc:
+    if not utils.docutils_is_available:
         return missing_docutils_page(request)
 
     models = []
@@ -149,7 +146,7 @@ def model_index(request):
 model_index = staff_member_required(model_index)
 
 def model_detail(request, model):
-    if not doc:
+    if not utils.docutils_is_available:
         return missing_docutils_page(request)
 
     try:
@@ -177,7 +174,7 @@ def model_detail(request, model):
                 continue
             verbose = func.__doc__
             if verbose:
-                verbose = doc.parse_rst(doc.trim_docstring(verbose), 'model', 'model:' + opts.module_name)
+                verbose = utils.parse_rst(utils.trim_docstring(verbose), 'model', 'model:' + opts.module_name)
             fields.append({
                 'name': func_name,
                 'data_type': get_return_data_type(func_name),
