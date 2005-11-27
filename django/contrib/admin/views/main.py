@@ -241,14 +241,13 @@ def change_list(request, app_label, module_name):
         'is_popup': cl.is_popup,
         'cl' : cl
     })
-    c.update( { 'has_add_permission': c['perms'][app_label][cl.opts.get_add_permission()]}),
-    return render_to_response('admin/change_list',
-                               context_instance = c)
+    c.update({'has_add_permission': c['perms'][app_label][cl.opts.get_add_permission()]}),
+    return render_to_response(['admin/%s/%s/change_list' % (app_label, cl.opts.object_name.lower()),
+                               'admin/%s/change_list' % app_label,
+                               'admin/change_list'], context_instance=c)
 change_list = staff_member_required(change_list)
 
-
 use_raw_id_admin = lambda field: isinstance(field.rel, (meta.ManyToOne, meta.ManyToMany)) and field.rel.raw_id_admin
-
 
 def get_javascript_imports(opts,auto_populated_fields, ordered_objects, field_sets):
 # Put in any necessary JavaScript imports.

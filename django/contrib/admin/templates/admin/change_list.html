@@ -9,11 +9,11 @@
 <ul class="object-tools"><li><a href="add/{% if is_popup %}?_popup=1{% endif %}" class="addlink">{% blocktrans with cl.opts.verbose_name as name %}Add {{ name }}{% endblocktrans %}</a></li></ul>
 {% endif %}
 <div class="module{% if cl.has_filters %} filtered{% endif %}" id="changelist">
-{% search_form cl %}
-{% date_hierarchy cl %}
-{% filters cl %}
-{% result_list cl %}
-{% pagination cl %}
+{% block search %}{% search_form cl %}{% endblock %}
+{% block date_hierarchy %}{% date_hierarchy cl %}{% endblock %}
+{% block filters %}{% filters cl %}{% endblock %}
+{% block result_list %}{% result_list cl %}{% endblock %}
+{% block pagination %}{% pagination cl %}{% endblock %}
 </div>
 </div>
 {% endblock %}
