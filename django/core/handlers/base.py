@@ -62,16 +62,16 @@ class BaseHandler:
 
         resolver = urlresolvers.RegexURLResolver(r'^/', ROOT_URLCONF)
         try:
-            callback, param_dict = resolver.resolve(path)
+            callback, callback_args, callback_kwargs = resolver.resolve(path)
 
             # Apply view middleware
             for middleware_method in self._view_middleware:
-                response = middleware_method(request, callback, param_dict)
+                response = middleware_method(request, callback, callback_args, callback_kwargs)
                 if response:
                     return response
 
             try:
-                response = callback(request, **param_dict)
+                response = callback(request, *callback_args, **callback_kwargs)
             except Exception, e:
                 # If the view raised an exception, run it through exception
                 # middleware, and if the exception middleware returns a

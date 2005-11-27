@@ -13,7 +13,7 @@ def decorator_from_middleware(middleware_class):
                 if result is not None:
                     return result
             if hasattr(middleware, 'process_view'):
-                result = middleware.process_view(request, view_func, **kwargs)
+                result = middleware.process_view(request, view_func, *args, **kwargs)
                 if result is not None:
                     return result
             try:

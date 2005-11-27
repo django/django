@@ -4,7 +4,7 @@ This module converts requested URLs to callback view functions.
 RegexURLResolver is the main class here. Its resolve() method takes a URL (as
 a string) and returns a tuple in this format:
 
-    (view_function, dict_of_view_function_args)
+    (view_function, function_args, function_kwargs)
 """
 
 from django.core.exceptions import Http404, ImproperlyConfigured, ViewDoesNotExist
@@ -31,12 +31,22 @@ class RegexURLPattern:
     def resolve(self, path):
         match = self.regex.search(path)
         if match:
-            args = dict(match.groupdict(), **self.default_args)
+            # If there are any named groups, use those as kwargs, ignoring
+            # non-named groups. Otherwise, pass all non-named arguments as
+            # positional arguments.
+            kwargs = match.groupdict()
+            if kwargs:
+                args = ()
+            if not kwargs:
+                args = match.groups()
+            # In both cases, pass any extra_kwargs as **kwargs.
+            kwargs.update(self.default_args)
+
             try: # Lazily load self.func.
-                return self.func, args
+                return self.func, args, kwargs
             except AttributeError:
                 self.func = self.get_callback()
-            return self.func, args
+            return self.func, args, kwargs
 
     def get_callback(self):
         mod_name, func_name = get_mod_func(self.callback)
@@ -66,7 +76,7 @@ class RegexURLResolver(object):
                     tried.extend([(pattern.regex.pattern + '   ' + t) for t in e.args[0]['tried']])
                 else:
                     if sub_match:
-                        return sub_match[0], dict(match.groupdict(), **sub_match[1])
+                        return sub_match[0], sub_match[1], dict(match.groupdict(), **sub_match[2])
                     tried.append(pattern.regex.pattern)
             raise Resolver404, {'tried': tried, 'path': new_path}
 
