@@ -56,10 +56,10 @@ Here's a sample URLconf::
     from django.conf.urls.defaults import *
 
     urlpatterns = patterns('',
-        (r'^/articles/2003/$', 'news.views.special_case_2003'),
-        (r'^/articles/(?P<year>\d{4})/$', 'news.views.year_archive'),
-        (r'^/articles/(?P<year>\d{4})/(?P<month>\d{2})/$', 'news.views.month_archive'),
-        (r'^/articles/(?P<year>\d{4})/(?P<month>\d{2})/(?P<day>\d+)/$', 'news.views.article_detail'),
+        (r'^articles/2003/$', 'news.views.special_case_2003'),
+        (r'^articles/(?P<year>\d{4})/$', 'news.views.year_archive'),
+        (r'^articles/(?P<year>\d{4})/(?P<month>\d{2})/$', 'news.views.month_archive'),
+        (r'^articles/(?P<year>\d{4})/(?P<month>\d{2})/(?P<day>\d+)/$', 'news.views.article_detail'),
     )
 
 Notes:
@@ -70,6 +70,9 @@ Notes:
     * To capture a value from the URL, use the syntax ``(?P<name>pattern)``,
       where ``name`` is the name for that value and ``pattern`` is some pattern
       to match.
+
+    * There's no need to add a leading slash, because every URL has that. For
+      example, it's ``^articles``, not ``^/articles``.
 
     * The ``"r"`` in front of each regular expression string is optional but
       recommended. It tells Python that a string is "raw" -- that nothing in
@@ -168,7 +171,7 @@ Each captured argument is sent to the view as a plain Python string, regardless
 of what sort of match the regular expression makes. For example, in this
 URLconf::
 
-    (r'^/articles/(?P<year>\d{4})/$', 'news.views.year_archive'),
+    (r'^articles/(?P<year>\d{4})/$', 'news.views.year_archive'),
 
 ...the ``year`` argument to ``news.views.year_archive()`` will be a string, not
 an integer, even though the ``\d{4}`` will only match integer strings.
@@ -178,8 +181,8 @@ Here's an example URLconf and view::
 
     # URLconf
     urlpatterns = patterns('',
-        (r'^/blog/$', 'blog.views.page'),
-        (r'^/blog/page(?P<num>\d+)/$', 'blog.views.page'),
+        (r'^blog/$', 'blog.views.page'),
+        (r'^blog/page(?P<num>\d+)/$', 'blog.views.page'),
     )
 
     # View (in blog/views.py)
@@ -209,9 +212,9 @@ Here's the example URLconf from the `Django overview`_::
     from django.conf.urls.defaults import *
 
     urlpatterns = patterns('',
-        (r'^/articles/(?P<year>\d{4})/$', 'myproject.news.views.year_archive'),
-        (r'^/articles/(?P<year>\d{4})/(?P<month>\d{2})/$', 'myproject.news.views.month_archive'),
-        (r'^/articles/(?P<year>\d{4})/(?P<month>\d{2})/(?P<day>\d+)/$', 'myproject.news.views.article_detail'),
+        (r'^articles/(?P<year>\d{4})/$', 'myproject.news.views.year_archive'),
+        (r'^articles/(?P<year>\d{4})/(?P<month>\d{2})/$', 'myproject.news.views.month_archive'),
+        (r'^articles/(?P<year>\d{4})/(?P<month>\d{2})/(?P<day>\d+)/$', 'myproject.news.views.article_detail'),
     )
 
 In this example, each view has a common prefix -- ``"myproject.news.views"``.
@@ -224,9 +227,9 @@ With this in mind, the above example can be written more concisely as::
     from django.conf.urls.defaults import *
 
     urlpatterns = patterns('myproject.news.views',
-        (r'^/articles/(?P<year>\d{4})/$', 'year_archive'),
-        (r'^/articles/(?P<year>\d{4})/(?P<month>\d{2})/$', 'month_archive'),
-        (r'^/articles/(?P<year>\d{4})/(?P<month>\d{2})/(?P<day>\d+)/$', 'article_detail'),
+        (r'^articles/(?P<year>\d{4})/$', 'year_archive'),
+        (r'^articles/(?P<year>\d{4})/(?P<month>\d{2})/$', 'month_archive'),
+        (r'^articles/(?P<year>\d{4})/(?P<month>\d{2})/(?P<day>\d+)/$', 'article_detail'),
     )
 
 Note that you don't put a trailing dot (``"."``) in the prefix. Django puts
@@ -252,8 +255,19 @@ number of other URLconfs::
         (r'^rss/',           include('django.conf.urls.rss')),
     )
 
-Note that an included URLconf receives any captured parameters from parent
-URLconfs, so the following example is valid::
+Note that the regular expressions in this example don't have a ``$``
+(end-of-string match character) but do include a trailing slash. Whenever
+Django encounters ``include()``, it chops off whatever part of the URL matched
+up to that point and sends the remaining string to the included URLconf for
+further processing.
+
+.. _`Django website`: http://www.djangoproject.com/
+
+Captured parameters
+-------------------
+
+An included URLconf receives any captured parameters from parent URLconfs, so
+the following example is valid::
 
     # In settings/urls/main.py
     urlpatterns = patterns('',
@@ -268,8 +282,6 @@ URLconfs, so the following example is valid::
 
 In the above example, the captured ``"username"`` variable is passed to the
 included URLconf, as expected.
-
-.. _`Django website`: http://www.djangoproject.com/
 
 Passing extra options to view functions
 =======================================
