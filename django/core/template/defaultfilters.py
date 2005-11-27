@@ -282,7 +282,7 @@ def unordered_list(value):
         indent = '\t' * tabs
         if value[1]:
             return '%s<li>%s\n%s<ul>\n%s\n%s</ul>\n%s</li>' % (indent, value[0], indent,
-                '\n'.join([unordered_list(v, tabs+1) for v in value[1]]), indent, indent)
+                '\n'.join([_helper(v, tabs+1) for v in value[1]]), indent, indent)
         else:
             return '%s<li>%s</li>' % (indent, value[0])
     return _helper(value, 1)
