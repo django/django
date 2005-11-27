@@ -55,6 +55,7 @@ DEFAULT_DIRECTORY_INDEX_TEMPLATE = """
   <head>
     <meta http-equiv="Content-type" content="text/html; charset=utf-8" />
     <meta http-equiv="Content-Language" content="en-us" />
+    <meta name="robots" content="NONE,NOARCHIVE" />
     <title>Index of {{ directory }}</title>
   </head>
   <body>
