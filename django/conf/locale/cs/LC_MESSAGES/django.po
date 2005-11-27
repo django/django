@@ -7,108 +7,102 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django Czech translation\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2005-11-25 17:27-0600\n"
-"PO-Revision-Date: 2005-11-18 14:33+0100\n"
+"POT-Creation-Date: 2005-11-23 00:05+0100\n"
+"PO-Revision-Date: 2005-11-23 19:58+0100\n"
 "Last-Translator: Radek Svarz <translate@svarz.cz>\n"
 "Language-Team: Czech\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=3; plural=n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%"
-"10<=4 && (n%100<10 || n%100>=20) ? 1 : 2;\n"
+"Plural-Forms: nplurals=3; plural=n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2;\n"
 "X-Poedit-Language: Czech\n"
 "X-Poedit-Country: CZECH REPUBLIC\n"
 
 #: contrib/comments/models/comments.py:8
 #: contrib/comments/models/comments.py:161
-#, fuzzy
 msgid "object ID"
-msgstr "Ukázat id objektu"
+msgstr "ID objektu"
 
 #: contrib/comments/models/comments.py:9
 msgid "headline"
-msgstr ""
+msgstr "titulek"
 
 #: contrib/comments/models/comments.py:10
 #: contrib/comments/models/comments.py:162
-#, fuzzy
 msgid "comment"
-msgstr "obsah"
+msgstr "komentář"
 
 #: contrib/comments/models/comments.py:11
 msgid "rating #1"
-msgstr ""
+msgstr "hodnocení #1"
 
 #: contrib/comments/models/comments.py:12
 msgid "rating #2"
-msgstr ""
+msgstr "hodnocení #2"
 
 #: contrib/comments/models/comments.py:13
 msgid "rating #3"
-msgstr ""
+msgstr "hodnocení #3"
 
 #: contrib/comments/models/comments.py:14
 msgid "rating #4"
-msgstr ""
+msgstr "hodnocení #4"
 
 #: contrib/comments/models/comments.py:15
 msgid "rating #5"
-msgstr ""
+msgstr "hodnocení #5"
 
 #: contrib/comments/models/comments.py:16
 msgid "rating #6"
-msgstr ""
+msgstr "hodnocení #6"
 
 #: contrib/comments/models/comments.py:17
 msgid "rating #7"
-msgstr ""
+msgstr "hodnocení #7"
 
 #: contrib/comments/models/comments.py:18
 msgid "rating #8"
-msgstr ""
+msgstr "hodnocení #8"
 
 #: contrib/comments/models/comments.py:23
 msgid "is valid rating"
-msgstr ""
+msgstr "je platné hodnocení"
 
 #: contrib/comments/models/comments.py:24
 #: contrib/comments/models/comments.py:164
 msgid "date/time submitted"
-msgstr ""
+msgstr "datum/čas byl zaslán"
 
 #: contrib/comments/models/comments.py:25
 #: contrib/comments/models/comments.py:165
 msgid "is public"
-msgstr ""
+msgstr "je veřejné"
 
-#: contrib/comments/models/comments.py:26 contrib/admin/views/doc.py:274
+#: contrib/comments/models/comments.py:26
+#: contrib/admin/views/doc.py:274
 msgid "IP address"
 msgstr "IP adresa"
 
 #: contrib/comments/models/comments.py:27
 msgid "is removed"
-msgstr ""
+msgstr "je odstraněno"
 
 #: contrib/comments/models/comments.py:27
-msgid ""
-"Check this box if the comment is inappropriate. A \"This comment has been "
-"removed\" message will be displayed instead."
-msgstr ""
+msgid "Check this box if the comment is inappropriate. A \"This comment has been removed\" message will be displayed instead."
+msgstr "Zaškrtněte tento box, pokud komentář není vhodný. Místo něj bude zobrazena zpráva \"Tento komentář byl smazán\"."
 
 #: contrib/comments/models/comments.py:31
 msgid "Comment"
-msgstr ""
+msgstr "Komentář"
 
 #: contrib/comments/models/comments.py:32
-#, fuzzy
 msgid "Comments"
-msgstr "povolit komentáře"
+msgstr "Komentáře"
 
 #: contrib/comments/models/comments.py:85
 #: contrib/comments/models/comments.py:204
-#, fuzzy
 msgid "Content object"
-msgstr "typ obsahu"
+msgstr "objekt obsahu"
 
 #: contrib/comments/models/comments.py:113
 #, python-format
@@ -119,101 +113,97 @@ msgid ""
 "\n"
 "http://%(domain)s%(url)s"
 msgstr ""
+"Zadané %(user)s dne %(date)s\n"
+"\n"
+"%(comment)s\n"
+"\n"
+"http://%(domain)s%(url)s"
 
 #: contrib/comments/models/comments.py:163
-#, fuzzy
 msgid "person's name"
-msgstr "křestní jméno"
+msgstr "jméno osoby"
 
 #: contrib/comments/models/comments.py:166
-#, fuzzy
 msgid "ip address"
 msgstr "IP adresa"
 
 #: contrib/comments/models/comments.py:168
 msgid "approved by staff"
-msgstr ""
+msgstr "scháleno správci"
 
 #: contrib/comments/models/comments.py:172
-#, fuzzy
 msgid "Free comment"
-msgstr "povolit komentáře"
+msgstr "volný komentář"
 
 #: contrib/comments/models/comments.py:173
-#, fuzzy
 msgid "Free comments"
-msgstr "povolit komentáře"
+msgstr "volné komentáře"
 
 #: contrib/comments/models/comments.py:209
 msgid "score"
-msgstr ""
+msgstr "body"
 
 #: contrib/comments/models/comments.py:210
-#, fuzzy
 msgid "score date"
-msgstr "datum expirace"
+msgstr "expirace hodnocení"
 
 #: contrib/comments/models/comments.py:213
 msgid "Karma score"
-msgstr ""
+msgstr "bod karma"
 
 #: contrib/comments/models/comments.py:214
 msgid "Karma scores"
-msgstr ""
+msgstr "karma body"
 
 #: contrib/comments/models/comments.py:223
 #, python-format
 msgid "%(score)d rating by %(user)s"
-msgstr ""
+msgstr "%(score)d hodnoceno od %(user)s"
 
 #: contrib/comments/models/comments.py:248
-#, fuzzy
 msgid "flag date"
-msgstr "statická stránka"
+msgstr "datum označení"
 
 #: contrib/comments/models/comments.py:251
-#, fuzzy
 msgid "User flag"
-msgstr "Uživatel"
+msgstr "Uživatelské označení"
 
 #: contrib/comments/models/comments.py:252
-#, fuzzy
 msgid "User flags"
-msgstr "Uživatelé"
+msgstr "Uživatelská označení"
 
 #: contrib/comments/models/comments.py:256
 #, python-format
 msgid "Flag by %r"
-msgstr ""
+msgstr "Označeno %r"
 
 #: contrib/comments/models/comments.py:271
-#, fuzzy, python-format
+#, python-format
 msgid ""
 "This comment was flagged by %(user)s:\n"
 "\n"
 "%(text)s"
 msgstr ""
-"Tento komentář byl odevzdán povrchním uživatelem:\n"
+"Tento komentář byl označkován uživatelem %(user)s:\n"
 "\n"
 "%(text)s"
 
 #: contrib/comments/models/comments.py:278
-#, fuzzy
 msgid "deletion date"
-msgstr "data sezení"
+msgstr "datum smazání"
 
 #: contrib/comments/models/comments.py:281
 msgid "Moderator deletion"
-msgstr ""
+msgstr "Vymazáno moderátorem"
 
 #: contrib/comments/models/comments.py:282
 msgid "Moderator deletions"
-msgstr ""
+msgstr "Vymazané moderátorem"
 
 #: contrib/comments/models/comments.py:286
 #, python-format
 msgid "Moderator deletion by %r"
-msgstr ""
+msgstr "Vymazáno moderátorem od %r"
 
 #: contrib/comments/views/karma.py:18
 msgid "Anonymous users cannot vote"
@@ -228,37 +218,29 @@ msgid "No voting for yourself"
 msgstr "Nelze hlasovat pro sebe"
 
 #: contrib/comments/views/comments.py:25
-msgid ""
-"This rating is required because you've entered at least one other rating."
-msgstr ""
-"Toto hodnocení je povinné, protože jste zadal(a) alespoň jedno jiné "
-"hodnocení."
+msgid "This rating is required because you've entered at least one other rating."
+msgstr "Toto hodnocení je povinné, protože jste zadal(a) alespoň jedno jiné hodnocení."
 
 #: contrib/comments/views/comments.py:109
-#, fuzzy, python-format
+#, python-format
 msgid ""
-"This comment was posted by a user who has posted fewer than %(count)s "
-"comment:\n"
+"This comment was posted by a user who has posted fewer than %(count)s comment:\n"
 "\n"
 "%(text)s"
 msgid_plural ""
-"This comment was posted by a user who has posted fewer than %(count)s "
-"comments:\n"
+"This comment was posted by a user who has posted fewer than %(count)s comments:\n"
 "\n"
 "%(text)s"
 msgstr[0] ""
-"Tento komentář byl odevzdán uživatelem, který(á) odevzdal(a) méně než %"
-"(count)s komentářů:\n"
+"Tento komentář byl odevzdán uživatelem, který(á) odevzdal(a) méně než %(count)s komentář:\n"
 "\n"
 "%(text)s"
 msgstr[1] ""
-"Tento komentář byl odevzdán uživatelem, který(á) odevzdal(a) méně než %"
-"(count)s komentářů:\n"
+"Tento komentář byl odevzdán uživatelem, který(á) odevzdal(a) méně než %(count)s komentáře:\n"
 "\n"
 "%(text)s"
 msgstr[2] ""
-"Tento komentář byl odevzdán uživatelem, který(á) odevzdal(a) méně než %"
-"(count)s komentářů:\n"
+"Tento komentář byl odevzdán uživatelem, který(á) odevzdal(a) méně než %(count)s komentářů:\n"
 "\n"
 "%(text)s"
 
@@ -290,18 +272,15 @@ msgstr "Někdo falšoval formulář komentáře (bezpečnostní narušení)"
 
 #: contrib/comments/views/comments.py:204
 #: contrib/comments/views/comments.py:289
-msgid ""
-"The comment form had an invalid 'target' parameter -- the object ID was "
-"invalid"
-msgstr ""
-"Formulář komentáře měl neplatný parametr 'target' -- ID objektu nebylo platné"
+msgid "The comment form had an invalid 'target' parameter -- the object ID was invalid"
+msgstr "Formulář komentáře měl neplatný parametr 'target' -- ID objektu nebylo platné"
 
 #: contrib/comments/views/comments.py:254
 #: contrib/comments/views/comments.py:318
 msgid "The comment form didn't provide either 'preview' or 'post'"
 msgstr "Formulář komentáře neobsahoval buď 'preview' nebo 'post'"
 
-#: contrib/admin/filterspecs.py:40
+#: contrib/admin/filterspecs.py:32
 #, python-format
 msgid ""
 "<h3>By %s:</h3>\n"
@@ -310,43 +289,41 @@ msgstr ""
 "<h3>Od %s:</h3>\n"
 "<ul>\n"
 
-#: contrib/admin/filterspecs.py:70 contrib/admin/filterspecs.py:88
-#: contrib/admin/filterspecs.py:143
+#: contrib/admin/filterspecs.py:62
+#: contrib/admin/filterspecs.py:79
+#: contrib/admin/filterspecs.py:134
 msgid "All"
 msgstr "Vše"
 
-#: contrib/admin/filterspecs.py:109
-#, fuzzy
+#: contrib/admin/filterspecs.py:100
 msgid "Any date"
-msgstr "Všechna data"
+msgstr "Libovolné datum"
 
-#: contrib/admin/filterspecs.py:110
-#, fuzzy
+#: contrib/admin/filterspecs.py:101
 msgid "Today"
-msgstr "Pondělí"
+msgstr "Dnes"
 
-#: contrib/admin/filterspecs.py:113
+#: contrib/admin/filterspecs.py:104
 msgid "Past 7 days"
-msgstr ""
+msgstr "Posledních 7 dní"
 
-#: contrib/admin/filterspecs.py:115
+#: contrib/admin/filterspecs.py:106
 msgid "This month"
-msgstr ""
+msgstr "Tento měsíc"
 
-#: contrib/admin/filterspecs.py:117
+#: contrib/admin/filterspecs.py:108
 msgid "This year"
-msgstr ""
+msgstr "Tento rok"
 
-#: contrib/admin/filterspecs.py:143
+#: contrib/admin/filterspecs.py:134
 msgid "Yes"
-msgstr ""
+msgstr "Ano"
 
-#: contrib/admin/filterspecs.py:143
-#, fuzzy
+#: contrib/admin/filterspecs.py:134
 msgid "No"
-msgstr "List."
+msgstr "Ne"
 
-#: contrib/admin/filterspecs.py:150
+#: contrib/admin/filterspecs.py:142
 msgid "Unknown"
 msgstr "Neznámé"
 
@@ -378,7 +355,7 @@ msgstr "log záznam"
 msgid "log entries"
 msgstr "log záznamy"
 
-#: contrib/admin/templatetags/admin_list.py:243
+#: contrib/admin/templatetags/admin_list.py:244
 msgid "All dates"
 msgstr "Všechna data"
 
@@ -388,20 +365,12 @@ msgid "Log in"
 msgstr "Přihlášení"
 
 #: contrib/admin/views/decorators.py:56
-msgid ""
-"Please log in again, because your session has expired. Don't worry: Your "
-"submission has been saved."
-msgstr ""
-"Prosíme, znovu se přihlašte, Vaše sezení vypršelo. Nemusíte se obávat, Vaše "
-"podání je uloženo."
+msgid "Please log in again, because your session has expired. Don't worry: Your submission has been saved."
+msgstr "Prosíme, znovu se přihlašte, Vaše sezení vypršelo. Nemusíte se obávat, Vaše podání je uloženo."
 
 #: contrib/admin/views/decorators.py:63
-msgid ""
-"Looks like your browser isn't configured to accept cookies. Please enable "
-"cookies, reload this page, and try again."
-msgstr ""
-"Vypadá to, že Váš prohlížeč není nastaven, aby akceptoval cookies. Prosíme, "
-"zapněte cookies, obnovte tuto stránku a zkuste znovu."
+msgid "Looks like your browser isn't configured to accept cookies. Please enable cookies, reload this page, and try again."
+msgstr "Vypadá to, že Váš prohlížeč není nastaven, aby akceptoval cookies. Prosíme, zapněte cookies, obnovte tuto stránku a zkuste znovu."
 
 #: contrib/admin/views/decorators.py:77
 msgid "Usernames cannot contain the '@' character."
@@ -410,111 +379,113 @@ msgstr "Uživatelská jména nemohou obsahovat znak '@'."
 #: contrib/admin/views/decorators.py:79
 #, python-format
 msgid "Your e-mail address is not your username. Try '%s' instead."
-msgstr ""
-"Vaše e-mailová adresa není Vaše uživatelské jméno. Zkuste místo toho '%s'."
+msgstr "Vaše e-mailová adresa není Vaše uživatelské jméno. Zkuste místo toho '%s'."
 
-#: contrib/admin/views/main.py:49
-#, fuzzy
+#: contrib/admin/views/main.py:50
 msgid "Site administration"
 msgstr "Django správa"
 
-#: contrib/admin/views/main.py:64
+#: contrib/admin/views/main.py:65
 #, python-format
 msgid "Select %s"
 msgstr "Vybrat %s"
 
-#: contrib/admin/views/main.py:65
+#: contrib/admin/views/main.py:66
 #, python-format
 msgid "Select %s to change"
 msgstr "Vyberte %s pro změnu"
 
-#: contrib/admin/views/main.py:412
+#: contrib/admin/views/main.py:421
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was added successfully."
 msgstr "Záznam %(name)s \"%(obj)s\" byl úspěšně přidán."
 
-#: contrib/admin/views/main.py:417 contrib/admin/views/main.py:493
+#: contrib/admin/views/main.py:426
+#: contrib/admin/views/main.py:502
 msgid "You may edit it again below."
 msgstr "Můžete to opět upravit níže."
 
-#: contrib/admin/views/main.py:425 contrib/admin/views/main.py:502
+#: contrib/admin/views/main.py:434
+#: contrib/admin/views/main.py:511
 #, python-format
 msgid "You may add another %s below."
 msgstr "Můžete přidat další %s níže."
 
-#: contrib/admin/views/main.py:442
+#: contrib/admin/views/main.py:451
 #, python-format
 msgid "Add %s"
 msgstr "%s: přidat"
 
-#: contrib/admin/views/main.py:458
+#: contrib/admin/views/main.py:467
 #, python-format
 msgid "Added %s."
 msgstr "Záznam %s byl přidán."
 
-#: contrib/admin/views/main.py:458 contrib/admin/views/main.py:460
-#: contrib/admin/views/main.py:462
+#: contrib/admin/views/main.py:467
+#: contrib/admin/views/main.py:469
+#: contrib/admin/views/main.py:471
 msgid "and"
 msgstr "a"
 
-#: contrib/admin/views/main.py:460
+#: contrib/admin/views/main.py:469
 #, python-format
 msgid "Changed %s."
 msgstr "%s: změněno"
 
-#: contrib/admin/views/main.py:462
+#: contrib/admin/views/main.py:471
 #, python-format
 msgid "Deleted %s."
 msgstr "Záznam %s byl smazán."
 
-#: contrib/admin/views/main.py:465
+#: contrib/admin/views/main.py:474
 msgid "No fields changed."
 msgstr "Nebyly změněny žádné pole."
 
-#: contrib/admin/views/main.py:490
+#: contrib/admin/views/main.py:499
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was changed successfully."
 msgstr "%(name)s \"%(obj)s\" byl úspěšně změněn."
 
-#: contrib/admin/views/main.py:499
+#: contrib/admin/views/main.py:508
 #, python-format
-msgid ""
-"The %(name)s \"%(obj)s\" was added successfully. You may edit it again below."
-msgstr ""
-"The %(name)s \"%(obj)s\" byl úspěšně přidán. Můžete to opět upravit níže."
+msgid "The %(name)s \"%(obj)s\" was added successfully. You may edit it again below."
+msgstr "The %(name)s \"%(obj)s\" byl úspěšně přidán. Můžete to opět upravit níže."
 
-#: contrib/admin/views/main.py:537
+#: contrib/admin/views/main.py:546
 #, python-format
 msgid "Change %s"
 msgstr "%s: změnit"
 
-#: contrib/admin/views/main.py:615
+#: contrib/admin/views/main.py:626
 #, python-format
 msgid "One or more %(fieldname)s in %(name)s: %(obj)s"
 msgstr "Jedno nebo více %(fieldname)s z %(name)s: %(obj)s"
 
-#: contrib/admin/views/main.py:620
+#: contrib/admin/views/main.py:631
 #, python-format
 msgid "One or more %(fieldname)s in %(name)s:"
 msgstr "Jedno nebo více %(fieldname)s z %(name)s:"
 
-#: contrib/admin/views/main.py:649
+#: contrib/admin/views/main.py:660
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was deleted successfully."
 msgstr "Záznam %(name)s \"%(obj)s\" byl úspěšně smazán."
 
-#: contrib/admin/views/main.py:652
+#: contrib/admin/views/main.py:663
 msgid "Are you sure?"
 msgstr "Jste si jist(á)?"
 
-#: contrib/admin/views/main.py:667
+#: contrib/admin/views/main.py:678
 #, python-format
 msgid "Change history: %s"
 msgstr "Historie změn: %s"
 
-#: contrib/admin/views/doc.py:262 contrib/admin/views/doc.py:271
-#: contrib/admin/views/doc.py:273 contrib/admin/views/doc.py:278
-#: contrib/admin/views/doc.py:279 contrib/admin/views/doc.py:281
+#: contrib/admin/views/doc.py:262
+#: contrib/admin/views/doc.py:271
+#: contrib/admin/views/doc.py:273
+#: contrib/admin/views/doc.py:278
+#: contrib/admin/views/doc.py:279
+#: contrib/admin/views/doc.py:281
 msgid "Integer"
 msgstr "Celé číslo"
 
@@ -543,7 +514,8 @@ msgstr "Datum (s časem)"
 msgid "E-mail address"
 msgstr "E-mailová adresa"
 
-#: contrib/admin/views/doc.py:269 contrib/admin/views/doc.py:272
+#: contrib/admin/views/doc.py:269
+#: contrib/admin/views/doc.py:272
 msgid "File path"
 msgstr "Cesta k souboru"
 
@@ -571,7 +543,8 @@ msgstr "Text"
 msgid "Time"
 msgstr "Čas"
 
-#: contrib/admin/views/doc.py:284 contrib/flatpages/models/flatpages.py:6
+#: contrib/admin/views/doc.py:284
+#: contrib/flatpages/models/flatpages.py:6
 msgid "URL"
 msgstr "URL"
 
@@ -583,11 +556,11 @@ msgstr "Stát US (2 velké znaky)"
 msgid "XML text"
 msgstr "text XML"
 
-#: contrib/admin/templates/admin/object_history.html:5
-#: contrib/admin/templates/admin/500.html:4
 #: contrib/admin/templates/admin/change_list.html:5
-#: contrib/admin/templates/admin/base.html:29
+#: contrib/admin/templates/admin/500.html:4
+#: contrib/admin/templates/admin/object_history.html:5
 #: contrib/admin/templates/admin/change_form.html:12
+#: contrib/admin/templates/admin/base.html:29
 #: contrib/admin/templates/registration/password_change_done.html:4
 #: contrib/admin/templates/registration/password_reset_form.html:4
 #: contrib/admin/templates/registration/logged_out.html:4
@@ -597,71 +570,10 @@ msgstr "text XML"
 msgid "Home"
 msgstr "Domů"
 
-#: contrib/admin/templates/admin/object_history.html:5
-#: contrib/admin/templates/admin/change_form.html:19
-msgid "History"
-msgstr "Historie"
-
-#: contrib/admin/templates/admin/object_history.html:18
-msgid "Date/time"
-msgstr "Datum/čas"
-
-#: contrib/admin/templates/admin/object_history.html:19 models/auth.py:47
-msgid "User"
-msgstr "Uživatel"
-
-#: contrib/admin/templates/admin/object_history.html:20
-msgid "Action"
-msgstr "Akce"
-
-#: contrib/admin/templates/admin/object_history.html:26
-msgid "DATE_WITH_TIME_FULL"
-msgstr "j. N, Y, H:i"
-
-#: contrib/admin/templates/admin/object_history.html:36
-msgid ""
-"This object doesn't have a change history. It probably wasn't added via this "
-"admin site."
-msgstr ""
-"Tento objekt nemá historii změn. Pravděpodobně nebyl přidán přes "
-"administrátorské rozhraní."
-
-#: contrib/admin/templates/admin/base_site.html:4
-msgid "Django site admin"
-msgstr "Django správa webu"
-
-#: contrib/admin/templates/admin/base_site.html:7
-msgid "Django administration"
-msgstr "Django správa"
-
-#: contrib/admin/templates/admin/500.html:4
-msgid "Server error"
-msgstr "Chyba serveru"
-
-#: contrib/admin/templates/admin/500.html:6
-msgid "Server error (500)"
-msgstr "Chyba serveru (500)"
-
-#: contrib/admin/templates/admin/500.html:9
-msgid "Server Error <em>(500)</em>"
-msgstr "Chyba serveru <em>(500)</em>"
-
-#: contrib/admin/templates/admin/500.html:10
-msgid ""
-"There's been an error. It's been reported to the site administrators via e-"
-"mail and should be fixed shortly. Thanks for your patience."
-msgstr ""
-"Nastala chyba. Ta byla oznámena administrátorovi serveru pomocí e-mailu a "
-"měla by být brzy odstraněna. Děkujeme za trpělivost."
-
-#: contrib/admin/templates/admin/404.html:4
-#: contrib/admin/templates/admin/404.html:8
-msgid "Page not found"
-msgstr "Stránka nenalezena"
-
-#: contrib/admin/templates/admin/404.html:10
-msgid "We're sorry, but the requested page could not be found."
-msgstr "Je nám líto, ale vyžádaná stránka nebyla nalezena."
+#: contrib/admin/templates/admin/change_list.html:10
+#, python-format
+msgid "Add %(name)s"
+msgstr "%(name)s: přidat"
 
 #: contrib/admin/templates/admin/index.html:27
 #: contrib/admin/templates/admin/change_form.html:14
@@ -688,10 +600,55 @@ msgstr "Mé akce"
 msgid "None available"
 msgstr "Nic"
 
-#: contrib/admin/templates/admin/change_list.html:10
-#, python-format
-msgid "Add %(name)s"
-msgstr "%(name)s: přidat"
+#: contrib/admin/templates/admin/500.html:4
+msgid "Server error"
+msgstr "Chyba serveru"
+
+#: contrib/admin/templates/admin/500.html:6
+msgid "Server error (500)"
+msgstr "Chyba serveru (500)"
+
+#: contrib/admin/templates/admin/500.html:9
+msgid "Server Error <em>(500)</em>"
+msgstr "Chyba serveru <em>(500)</em>"
+
+#: contrib/admin/templates/admin/500.html:10
+msgid "There's been an error. It's been reported to the site administrators via e-mail and should be fixed shortly. Thanks for your patience."
+msgstr "Nastala chyba. Ta byla oznámena administrátorovi serveru pomocí e-mailu a měla by být brzy odstraněna. Děkujeme za trpělivost."
+
+#: contrib/admin/templates/admin/object_history.html:5
+#: contrib/admin/templates/admin/change_form.html:19
+msgid "History"
+msgstr "Historie"
+
+#: contrib/admin/templates/admin/object_history.html:18
+msgid "Date/time"
+msgstr "Datum/čas"
+
+#: contrib/admin/templates/admin/object_history.html:19
+#: models/auth.py:47
+msgid "User"
+msgstr "Uživatel"
+
+#: contrib/admin/templates/admin/object_history.html:20
+msgid "Action"
+msgstr "Akce"
+
+#: contrib/admin/templates/admin/object_history.html:26
+msgid "DATE_WITH_TIME_FULL"
+msgstr "N, j.n. Y, H:i"
+
+#: contrib/admin/templates/admin/object_history.html:36
+msgid "This object doesn't have a change history. It probably wasn't added via this admin site."
+msgstr "Tento objekt nemá historii změn. Pravděpodobně nebyl přidán přes administrátorské rozhraní."
+
+#: contrib/admin/templates/admin/base_site.html:4
+msgid "Django site admin"
+msgstr "Django správa webu"
+
+#: contrib/admin/templates/admin/base_site.html:7
+msgid "Django administration"
+msgstr "Django správa"
 
 #: contrib/admin/templates/admin/login.html:15
 msgid "Username:"
@@ -705,45 +662,14 @@ msgstr "Heslo:"
 msgid "Have you <a href=\"/password_reset/\">forgotten your password</a>?"
 msgstr "<a href=\"/password_reset/\">Zapomněl(a) jste své heslo?</a>"
 
-#: contrib/admin/templates/admin/base.html:23
-msgid "Welcome,"
-msgstr "Vítejte,"
+#: contrib/admin/templates/admin/404.html:4
+#: contrib/admin/templates/admin/404.html:8
+msgid "Page not found"
+msgstr "Stránka nenalezena"
 
-#: contrib/admin/templates/admin/base.html:23
-msgid "Change password"
-msgstr "Změnit heslo"
-
-#: contrib/admin/templates/admin/base.html:23
-msgid "Log out"
-msgstr "Odhlásit se"
-
-#: contrib/admin/templates/admin/delete_confirmation.html:7
-#, python-format
-msgid ""
-"Deleting the %(object_name)s '%(object)s' would result in deleting related "
-"objects, but your account doesn't have permission to delete the following "
-"types of objects:"
-msgstr ""
-"Mazání %(object_name)s  '%(object)s' by vyústilo ve vymazání souvisejících "
-"objektů, ale Váš účet nemá oprávnění pro mazání následujících typů objektů:"
-
-#: contrib/admin/templates/admin/delete_confirmation.html:14
-#, python-format
-msgid ""
-"Are you sure you want to delete the %(object_name)s \"%(object)s\"? All of "
-"the following related items will be deleted:"
-msgstr ""
-"Jste si jist(á), že chcete smazat %(object_name)s \"%(object)s\"? Všechny "
-"následující související položky budou smazány:"
-
-#: contrib/admin/templates/admin/delete_confirmation.html:18
-msgid "Yes, I'm sure"
-msgstr "Ano, jsem si jist"
-
-#: contrib/admin/templates/admin/filter.html:1
-#, python-format
-msgid " By %(title)s "
-msgstr "Od %(title)s"
+#: contrib/admin/templates/admin/404.html:10
+msgid "We're sorry, but the requested page could not be found."
+msgstr "Je nám líto, ale vyžádaná stránka nebyla nalezena."
 
 #: contrib/admin/templates/admin/change_form.html:20
 msgid "View on site"
@@ -763,6 +689,32 @@ msgstr "Objednávání"
 #: contrib/admin/templates/admin/change_form.html:48
 msgid "Order:"
 msgstr "Objednávka:"
+
+#: contrib/admin/templates/admin/delete_confirmation.html:7
+#, python-format
+msgid "Deleting the %(object_name)s '%(object)s' would result in deleting related objects, but your account doesn't have permission to delete the following types of objects:"
+msgstr "Mazání %(object_name)s  '%(object)s' by vyústilo ve vymazání souvisejících objektů, ale Váš účet nemá oprávnění pro mazání následujících typů objektů:"
+
+#: contrib/admin/templates/admin/delete_confirmation.html:14
+#, python-format
+msgid "Are you sure you want to delete the %(object_name)s \"%(object)s\"? All of the following related items will be deleted:"
+msgstr "Jste si jist(á), že chcete smazat %(object_name)s \"%(object)s\"? Všechny následující související položky budou smazány:"
+
+#: contrib/admin/templates/admin/delete_confirmation.html:18
+msgid "Yes, I'm sure"
+msgstr "Ano, jsem si jist"
+
+#: contrib/admin/templates/admin/base.html:23
+msgid "Welcome,"
+msgstr "Vítejte,"
+
+#: contrib/admin/templates/admin/base.html:23
+msgid "Change password"
+msgstr "Změnit heslo"
+
+#: contrib/admin/templates/admin/base.html:23
+msgid "Log out"
+msgstr "Odhlásit se"
 
 #: contrib/admin/templates/admin/submit_line.html:3
 msgid "Delete"
@@ -784,6 +736,11 @@ msgstr "Uložit a pokračovat v úpravách"
 msgid "Save"
 msgstr "Uložit"
 
+#: contrib/admin/templates/admin/filter.html:1
+#, python-format
+msgid " By %(title)s "
+msgstr "Od %(title)s"
+
 #: contrib/admin/templates/registration/password_change_done.html:4
 #: contrib/admin/templates/registration/password_change_form.html:4
 #: contrib/admin/templates/registration/password_change_form.html:6
@@ -802,18 +759,13 @@ msgstr "Vaše heslo bylo změněno."
 
 #: contrib/admin/templates/registration/password_reset_form.html:4
 #: contrib/admin/templates/registration/password_reset_form.html:6
-#: contrib/admin/templates/registration/password_reset_form.html:10
 #: contrib/admin/templates/registration/password_reset_done.html:4
 msgid "Password reset"
 msgstr "Obnovení hesla"
 
 #: contrib/admin/templates/registration/password_reset_form.html:12
-msgid ""
-"Forgotten your password? Enter your e-mail address below, and we'll reset "
-"your password and e-mail the new one to you."
-msgstr ""
-"Zapomněl(a) jste heslo? Vložte níže Vaši e-mailovou adresu a my Vaše heslo "
-"obnovíme a zašleme Vám e-mailem nové."
+msgid "Forgotten your password? Enter your e-mail address below, and we'll reset your password and e-mail the new one to you."
+msgstr "Zapomněl(a) jste heslo? Vložte níže Vaši e-mailovou adresu a my Vaše heslo obnovíme a zašleme Vám e-mailem nové."
 
 #: contrib/admin/templates/registration/password_reset_form.html:16
 msgid "E-mail address:"
@@ -837,20 +789,12 @@ msgid "Password reset successful"
 msgstr "Obnovení hesla bylo úspěšné"
 
 #: contrib/admin/templates/registration/password_reset_done.html:12
-msgid ""
-"We've e-mailed a new password to the e-mail address you submitted. You "
-"should be receiving it shortly."
-msgstr ""
-"Poslali jsme Vám e-mailem nové heslo na adresu, kterou jste zadal(a). Měl(a) "
-"byste ji dostat během okamžiku."
+msgid "We've e-mailed a new password to the e-mail address you submitted. You should be receiving it shortly."
+msgstr "Poslali jsme Vám e-mailem nové heslo na adresu, kterou jste zadal(a). Měl(a) byste ji dostat během okamžiku."
 
 #: contrib/admin/templates/registration/password_change_form.html:12
-msgid ""
-"Please enter your old password, for security's sake, and then enter your new "
-"password twice so we can verify you typed it in correctly."
-msgstr ""
-"Prosíme, pro zabezpečení vložte svoje staré heslo a poté vložte dvakrát nové "
-"heslo, takže můžeme ověřit, že jste ho napsal(a) správně."
+msgid "Please enter your old password, for security's sake, and then enter your new password twice so we can verify you typed it in correctly."
+msgstr "Prosíme, pro zabezpečení vložte svoje staré heslo a poté vložte dvakrát nové heslo, takže můžeme ověřit, že jste ho napsal(a) správně."
 
 #: contrib/admin/templates/registration/password_change_form.html:17
 msgid "Old password:"
@@ -922,13 +866,10 @@ msgid ""
 "your computer is \"internal\").</p>\n"
 msgstr ""
 "\n"
-"<p class=\"help\">Pro nainstalování bookmarkletů, přetáhněte odkaz na Vaše "
-"záložky (oblíbené),\n"
-"nebo klikněte pravým tlačítkem na odkaz a přidejte ho k Vašim záložkám "
-"(oblíbeným). Nyní můžete\n"
+"<p class=\"help\">Pro nainstalování bookmarkletů, přetáhněte odkaz na Vaše záložky (oblíbené),\n"
+"nebo klikněte pravým tlačítkem na odkaz a přidejte ho k Vašim záložkám (oblíbeným). Nyní můžete\n"
 "zvolit bookmarklet z libovolné stránky. Poznámka: Některé tyto\n"
-"bookmarklety vyžadují, abyste prohlížel(a) stránky z počítače, který je "
-"nastaven jako\n"
+"bookmarklety vyžadují, abyste prohlížel(a) stránky z počítače, který je nastaven jako\n"
 "\"interní\" (promluvte si s Vaším administrátorem, jestli si nejste jisti,\n"
 "zda je Váš počítač \"interní\").</p>\n"
 
@@ -937,25 +878,16 @@ msgid "Documentation for this page"
 msgstr "Dokumentace pro tuto stránku"
 
 #: contrib/admin/templates/admin_doc/bookmarklets.html:20
-msgid ""
-"Jumps you from any page to the documentation for the view that generates "
-"that page."
-msgstr ""
-"Z libovolné stránky otevře dokumentaci pro pohled, který vygeneroval tuto "
-"stránku."
+msgid "Jumps you from any page to the documentation for the view that generates that page."
+msgstr "Z libovolné stránky otevře dokumentaci pro pohled, který vygeneroval tuto stránku."
 
 #: contrib/admin/templates/admin_doc/bookmarklets.html:22
 msgid "Show object ID"
 msgstr "Ukázat id objektu"
 
 #: contrib/admin/templates/admin_doc/bookmarklets.html:23
-#, fuzzy
-msgid ""
-"Shows the content-type and unique ID for pages that represent a single "
-"object."
-msgstr ""
-"Ukáže content-type a unikátní ID pro stránky, které reprezentují jeden "
-"objekt."
+msgid "Shows the content-type and unique ID for pages that represent a single object."
+msgstr "Ukáže content-type a unikátní ID pro stránky, které reprezentují jeden objekt."
 
 #: contrib/admin/templates/admin_doc/bookmarklets.html:25
 msgid "Edit this object (current window)"
@@ -978,23 +910,16 @@ msgid "redirect from"
 msgstr "přesměrovat z"
 
 #: contrib/redirects/models/redirects.py:8
-msgid ""
-"This should be an absolute path, excluding the domain name. Example: '/"
-"events/search/'."
-msgstr ""
-"Toto by měla být absolutní cesta, bez domény. Např.  '/udalosti/hledat/'."
+msgid "This should be an absolute path, excluding the domain name. Example: '/events/search/'."
+msgstr "Toto by měla být absolutní cesta, bez domény. Např.  '/udalosti/hledat/'."
 
 #: contrib/redirects/models/redirects.py:9
 msgid "redirect to"
 msgstr "přesměrovat na"
 
 #: contrib/redirects/models/redirects.py:10
-msgid ""
-"This can be either an absolute path (as above) or a full URL starting with "
-"'http://'."
-msgstr ""
-"Toto může být buď absolutní cesta (jako nahoře) nebo plné URL začínající na "
-"'http://'."
+msgid "This can be either an absolute path (as above) or a full URL starting with 'http://'."
+msgstr "Toto může být buď absolutní cesta (jako nahoře) nebo plné URL začínající na 'http://'."
 
 #: contrib/redirects/models/redirects.py:12
 msgid "redirect"
@@ -1005,10 +930,8 @@ msgid "redirects"
 msgstr "přesměrování"
 
 #: contrib/flatpages/models/flatpages.py:7
-msgid ""
-"Example: '/about/contact/'. Make sure to have leading and trailing slashes."
-msgstr ""
-"Příklad: '/o/kontakt/'. Ujistěte se, že máte počáteční a konečná lomítka."
+msgid "Example: '/about/contact/'. Make sure to have leading and trailing slashes."
+msgstr "Příklad: '/o/kontakt/'. Ujistěte se, že máte počáteční a konečná lomítka."
 
 #: contrib/flatpages/models/flatpages.py:8
 msgid "title"
@@ -1027,12 +950,8 @@ msgid "template name"
 msgstr "jméno šablony"
 
 #: contrib/flatpages/models/flatpages.py:12
-msgid ""
-"Example: 'flatpages/contact_page'. If this isn't provided, the system will "
-"use 'flatpages/default'."
-msgstr ""
-"Například: 'flatfiles/kontaktni_stranka'. Pokud toto není zadáno, systém "
-"použije 'flatfiles/default'."
+msgid "Example: 'flatpages/contact_page'. If this isn't provided, the system will use 'flatpages/default'."
+msgstr "Například: 'flatfiles/kontaktni_stranka'. Pokud toto není zadáno, systém použije 'flatfiles/default'."
 
 #: contrib/flatpages/models/flatpages.py:13
 msgid "registration required"
@@ -1040,9 +959,7 @@ msgstr "nutná registrace"
 
 #: contrib/flatpages/models/flatpages.py:13
 msgid "If this is checked, only logged-in users will be able to view the page."
-msgstr ""
-"Pokud je zaškrtnuto, pouze přihlášení uživatelé budou moci prohlížet tuto "
-"stránku."
+msgstr "Pokud je zaškrtnuto, pouze přihlášení uživatelé budou moci prohlížet tuto stránku."
 
 #: contrib/flatpages/models/flatpages.py:17
 msgid "flat page"
@@ -1054,11 +971,11 @@ msgstr "statické stránky"
 
 #: utils/translation.py:335
 msgid "DATE_FORMAT"
-msgstr "j. N, Y"
+msgstr "j.n.Y"
 
 #: utils/translation.py:336
 msgid "DATETIME_FORMAT"
-msgstr "j. N, Y, H:i"
+msgstr "j.n.Y, H:i"
 
 #: utils/translation.py:337
 msgid "TIME_FORMAT"
@@ -1100,23 +1017,28 @@ msgstr "Leden"
 msgid "February"
 msgstr "Únor"
 
-#: utils/dates.py:14 utils/dates.py:27
+#: utils/dates.py:14
+#: utils/dates.py:27
 msgid "March"
 msgstr "Březen"
 
-#: utils/dates.py:14 utils/dates.py:27
+#: utils/dates.py:14
+#: utils/dates.py:27
 msgid "April"
 msgstr "Duben"
 
-#: utils/dates.py:14 utils/dates.py:27
+#: utils/dates.py:14
+#: utils/dates.py:27
 msgid "May"
 msgstr "Květen"
 
-#: utils/dates.py:14 utils/dates.py:27
+#: utils/dates.py:14
+#: utils/dates.py:27
 msgid "June"
 msgstr "Červen"
 
-#: utils/dates.py:15 utils/dates.py:27
+#: utils/dates.py:15
+#: utils/dates.py:27
 msgid "July"
 msgstr "Červenec"
 
@@ -1171,39 +1093,37 @@ msgstr "Pros."
 #: utils/timesince.py:12
 msgid "year"
 msgid_plural "years"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "rok"
+msgstr[1] "roky"
+msgstr[2] "let"
 
 #: utils/timesince.py:13
 msgid "month"
 msgid_plural "months"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "měsíc"
+msgstr[1] "měsíce"
+msgstr[2] "měsíců"
 
 #: utils/timesince.py:14
-#, fuzzy
 msgid "day"
 msgid_plural "days"
-msgstr[0] "Květen"
-msgstr[1] "Květen"
-msgstr[2] "Květen"
+msgstr[0] "den"
+msgstr[1] "dny"
+msgstr[2] "dnů"
 
 #: utils/timesince.py:15
 msgid "hour"
 msgid_plural "hours"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "hodina"
+msgstr[1] "hodiny"
+msgstr[2] "hodin"
 
 #: utils/timesince.py:16
-#, fuzzy
 msgid "minute"
 msgid_plural "minutes"
-msgstr[0] "web"
-msgstr[1] "web"
-msgstr[2] "web"
+msgstr[0] "minuta"
+msgstr[1] "minuty"
+msgstr[2] "minut"
 
 #: models/core.py:7
 msgid "domain name"
@@ -1225,7 +1145,10 @@ msgstr "weby"
 msgid "label"
 msgstr "nadpis"
 
-#: models/core.py:29 models/core.py:40 models/auth.py:6 models/auth.py:19
+#: models/core.py:29
+#: models/core.py:40
+#: models/auth.py:6
+#: models/auth.py:19
 msgid "name"
 msgstr "jméno"
 
@@ -1277,7 +1200,8 @@ msgstr "codename"
 msgid "Permission"
 msgstr "Oprávnění"
 
-#: models/auth.py:11 models/auth.py:58
+#: models/auth.py:11
+#: models/auth.py:58
 msgid "Permissions"
 msgstr "Oprávnění"
 
@@ -1285,7 +1209,8 @@ msgstr "Oprávnění"
 msgid "Group"
 msgstr "Skupina"
 
-#: models/auth.py:23 models/auth.py:60
+#: models/auth.py:23
+#: models/auth.py:60
 msgid "Groups"
 msgstr "Skupiny"
 
@@ -1310,8 +1235,8 @@ msgid "password"
 msgstr "heslo"
 
 #: models/auth.py:37
-msgid "Use '[algo]$[salt]$[hexdigest]'"
-msgstr ""
+msgid "Use '[algo]$[salt]$[hexdigest]"
+msgstr "Použijte '[algo]$[salt]$[hexdigest]"
 
 #: models/auth.py:38
 msgid "staff status"
@@ -1338,12 +1263,8 @@ msgid "date joined"
 msgstr "datum zaregistrování"
 
 #: models/auth.py:44
-msgid ""
-"In addition to the permissions manually assigned, this user will also get "
-"all permissions granted to each group he/she is in."
-msgstr ""
-"Kromě manuálně přidělených oprávnění uživatel dostane všechna oprávnění pro "
-"každou skupinu, ve které je."
+msgid "In addition to the permissions manually assigned, this user will also get all permissions granted to each group he/she is in."
+msgstr "Kromě manuálně přidělených oprávnění uživatel dostane všechna oprávnění pro každou skupinu, ve které je."
 
 #: models/auth.py:48
 msgid "Users"
@@ -1437,41 +1358,45 @@ msgstr "Švédsky"
 msgid "Simplified Chinese"
 msgstr "Jednoduchá čínština"
 
-#: core/formfields.py:59 core/meta/fields.py:285 core/meta/fields.py:488
-#: core/meta/fields.py:499
+#: core/formfields.py:59
+#: core/meta/fields.py:287
+#: core/meta/fields.py:491
+#: core/meta/fields.py:502
 msgid "This field is required."
 msgstr "Toto pole je povinné."
 
-#: core/formfields.py:336
-#, fuzzy, python-format
-msgid "Ensure your text is less than %s character."
+#: core/formfields.py:339
+#, python-format
+msgid "Ensure your text is less than %s character"
 msgid_plural "Ensure your text is less than %s characters."
-msgstr[0] "Ujistěte se, že Váš text má méně, než %s znaků."
-msgstr[1] "Ujistěte se, že Váš text má méně, než %s znaků."
+msgstr[0] "Ujistěte se, že Váš text má méně než %s znak."
+msgstr[1] "Ujistěte se, že Váš text má méně, než %s znaky."
 msgstr[2] "Ujistěte se, že Váš text má méně, než %s znaků."
 
-#: core/formfields.py:341
+#: core/formfields.py:344
 msgid "Line breaks are not allowed here."
 msgstr "Zalomení řádky zde nenjsou povolená."
 
-#: core/formfields.py:436 core/formfields.py:507 core/formfields.py:545
+#: core/formfields.py:440
+#: core/formfields.py:511
+#: core/formfields.py:549
 #, python-format
 msgid "Select a valid choice; '%(data)s' is not in %(choices)s."
 msgstr "Vyberte platnou volbu. '%(data)s' není mezi %(choices)s."
 
-#: core/formfields.py:601
+#: core/formfields.py:605
 msgid "The submitted file is empty."
 msgstr "Odevzdaný soubor je prázdný."
 
-#: core/formfields.py:655
+#: core/formfields.py:659
 msgid "Enter a whole number between -32,768 and 32,767."
 msgstr "Vložte celé číslo mezi -32,768 a 32,767."
 
-#: core/formfields.py:664
+#: core/formfields.py:668
 msgid "Enter a positive number."
 msgstr "Vložte celé kladné číslo."
 
-#: core/formfields.py:673
+#: core/formfields.py:677
 msgid "Enter a whole number between 0 and 32,767."
 msgstr "Vložte celé číslo mezi 0 a 32,767."
 
@@ -1481,8 +1406,7 @@ msgstr "Tato hodnota musí obsahovat pouze znaky, čísla nebo podtržítka."
 
 #: core/validators.py:66
 msgid "This value must contain only letters, numbers, underscores and slashes."
-msgstr ""
-"Tato hodnota musí obsahovat pouze znaky, čísla, podtržítka nebo lomítka."
+msgstr "Tato hodnota musí obsahovat pouze znaky, čísla, podtržítka nebo lomítka."
 
 #: core/validators.py:74
 msgid "Uppercase letters are not allowed here."
@@ -1541,12 +1465,8 @@ msgid "Enter a valid e-mail address."
 msgstr "Vložte platnou e-mailovou adresu."
 
 #: core/validators.py:150
-msgid ""
-"Upload a valid image. The file you uploaded was either not an image or a "
-"corrupted image."
-msgstr ""
-"Nahrajte na server platný obrázek. Soubor, který jste nahrál(a) nebyl "
-"obrázek, nebo byl porušen."
+msgid "Upload a valid image. The file you uploaded was either not an image or a corrupted image."
+msgstr "Nahrajte na server platný obrázek. Soubor, který jste nahrál(a) nebyl obrázek, nebo byl porušen."
 
 #: core/validators.py:157
 #, python-format
@@ -1586,7 +1506,8 @@ msgstr "Špatně formované XML: %s"
 msgid "Invalid URL: %s"
 msgstr "Neplatné URL: %s"
 
-#: core/validators.py:208 core/validators.py:210
+#: core/validators.py:208
+#: core/validators.py:210
 #, python-format
 msgid "The URL %s is a broken link."
 msgstr "Odkaz na URL %s je rozbitý."
@@ -1612,7 +1533,8 @@ msgstr "Toto pole se musí shodovat s polem '%s'."
 msgid "Please enter something for at least one field."
 msgstr "Prosíme, vložte něco alespoň pro jedno pole."
 
-#: core/validators.py:266 core/validators.py:277
+#: core/validators.py:266
+#: core/validators.py:277
 msgid "Please enter both fields or leave them both empty."
 msgstr "Prosíme, vložte obě pole, nebo je nechte obě prázdná."
 
@@ -1642,8 +1564,7 @@ msgstr "Prosíme, vložte platné číslo."
 #: core/validators.py:351
 #, python-format
 msgid "Please enter a valid decimal number with at most %s total digit."
-msgid_plural ""
-"Please enter a valid decimal number with at most %s total digits."
+msgid_plural "Please enter a valid decimal number with at most %s total digits."
 msgstr[0] "Prosíme, vložte platné číslo s nejvíce %s cifrou celkem."
 msgstr[1] "Prosíme, vložte platné číslo s nejvíce %s ciframi celkem."
 msgstr[2] "Prosíme, vložte platné číslo s nejvíce %s ciframi celkem."
@@ -1651,16 +1572,10 @@ msgstr[2] "Prosíme, vložte platné číslo s nejvíce %s ciframi celkem."
 #: core/validators.py:354
 #, python-format
 msgid "Please enter a valid decimal number with at most %s decimal place."
-msgid_plural ""
-"Please enter a valid decimal number with at most %s decimal places."
-msgstr[0] ""
-"Prosíme, vložte platné číslo s nejvíce %s cifrou za desetinnou čárkou celkem."
-msgstr[1] ""
-"Prosíme, vložte platné číslo s nejvíce %s ciframi za desetinnou čárkou "
-"celkem."
-msgstr[2] ""
-"Prosíme, vložte platné číslo s nejvíce %s ciframi za desetinnou čárkou "
-"celkem."
+msgid_plural "Please enter a valid decimal number with at most %s decimal places."
+msgstr[0] "Prosíme, vložte platné číslo s nejvíce %s cifrou za desetinnou čárkou celkem."
+msgstr[1] "Prosíme, vložte platné číslo s nejvíce %s ciframi za desetinnou čárkou celkem."
+msgstr[2] "Prosíme, vložte platné číslo s nejvíce %s ciframi za desetinnou čárkou celkem."
 
 #: core/validators.py:364
 #, python-format
@@ -1687,63 +1602,38 @@ msgstr "Nemohl jsem získat nic z %s."
 
 #: core/validators.py:431
 #, python-format
-msgid ""
-"The URL %(url)s returned the invalid Content-Type header '%(contenttype)s'."
+msgid "The URL %(url)s returned the invalid Content-Type header '%(contenttype)s'."
 msgstr "URL %(url)s vrátilo neplatnou hlavičku Content-Type '%(contenttype)s'."
 
 #: core/validators.py:464
 #, python-format
-msgid ""
-"Please close the unclosed %(tag)s tag from line %(line)s. (Line starts with "
-"\"%(start)s\".)"
-msgstr ""
-"Prosíme, zavřete nezavřenou značku %(tag)s z řádky %(line)s. (Řádka začíná s "
-"\"%(start)s\".)"
+msgid "Please close the unclosed %(tag)s tag from line %(line)s. (Line starts with \"%(start)s\".)"
+msgstr "Prosíme, zavřete nezavřenou značku %(tag)s z řádky %(line)s. (Řádka začíná s \"%(start)s\".)"
 
 #: core/validators.py:468
 #, python-format
-msgid ""
-"Some text starting on line %(line)s is not allowed in that context. (Line "
-"starts with \"%(start)s\".)"
-msgstr ""
-"Nějaký text začínající na řádce %(line)s není povolen v tomto kontextu. "
-"(Řádka začíná s \"%(start)s\".)"
+msgid "Some text starting on line %(line)s is not allowed in that context. (Line starts with \"%(start)s\".)"
+msgstr "Nějaký text začínající na řádce %(line)s není povolen v tomto kontextu. (Řádka začíná s \"%(start)s\".)"
 
 #: core/validators.py:473
 #, python-format
-msgid ""
-"\"%(attr)s\" on line %(line)s is an invalid attribute. (Line starts with \"%"
-"(start)s\".)"
-msgstr ""
-"\"%(attr)s\" na řádce %(line)s je neplatný atribut. (Řádka začíná s \"%"
-"(start)s\".)"
+msgid "\"%(attr)s\" on line %(line)s is an invalid attribute. (Line starts with \"%(start)s\".)"
+msgstr "\"%(attr)s\" na řádce %(line)s je neplatný atribut. (Řádka začíná s \"%(start)s\".)"
 
 #: core/validators.py:478
 #, python-format
-msgid ""
-"\"<%(tag)s>\" on line %(line)s is an invalid tag. (Line starts with \"%"
-"(start)s\".)"
-msgstr ""
-"\"<%(tag)s>\" na řádce %(line)s je neplatná značka. (Řádka začíná s \"%"
-"(start)s\".)"
+msgid "\"<%(tag)s>\" on line %(line)s is an invalid tag. (Line starts with \"%(start)s\".)"
+msgstr "\"<%(tag)s>\" na řádce %(line)s je neplatná značka. (Řádka začíná s \"%(start)s\".)"
 
 #: core/validators.py:482
 #, python-format
-msgid ""
-"A tag on line %(line)s is missing one or more required attributes. (Line "
-"starts with \"%(start)s\".)"
-msgstr ""
-"Značce na řádce %(line)s schází jeden nebo více požadovaných atributů. "
-"(Řádka začíná s \"%(start)s\".)"
+msgid "A tag on line %(line)s is missing one or more required attributes. (Line starts with \"%(start)s\".)"
+msgstr "Značce na řádce %(line)s schází jeden nebo více požadovaných atributů. (Řádka začíná s \"%(start)s\".)"
 
 #: core/validators.py:487
 #, python-format
-msgid ""
-"The \"%(attr)s\" attribute on line %(line)s has an invalid value. (Line "
-"starts with \"%(start)s\".)"
-msgstr ""
-"Atribut \"%(attr)s\" na řádce %(line)s má neplatnou hodnotu. (Řádka začína s "
-"\"%(start)s\".)"
+msgid "The \"%(attr)s\" attribute on line %(line)s has an invalid value. (Line starts with \"%(start)s\".)"
+msgstr "Atribut \"%(attr)s\" na řádce %(line)s má neplatnou hodnotu. (Řádka začína s \"%(start)s\".)"
 
 #: core/meta/fields.py:46
 #, python-format
@@ -1755,35 +1645,28 @@ msgstr "Prosíme, zadejte %s správně."
 msgid "%(optname)s with this %(fieldname)s already exists."
 msgstr "%(optname)s s tímto %(fieldname)s již existuje."
 
-#: core/meta/fields.py:129
+#: core/meta/fields.py:131
 msgid " Separate multiple IDs with commas."
 msgstr "Oddělte více identifikátorů čárkami."
 
-#: core/meta/fields.py:132
-msgid ""
-" Hold down \"Control\", or \"Command\" on a Mac, to select more than one."
-msgstr ""
-"Podržte  \"Control\", nebo \"Command\" na Macu pro vybrání více jak jedné "
-"položky."
+#: core/meta/fields.py:134
+msgid " Hold down \"Control\", or \"Command\" on a Mac, to select more than one."
+msgstr "Podržte  \"Control\", nebo \"Command\" na Macu pro vybrání více jak jedné položky."
 
-#: core/meta/fields.py:508
+#: core/meta/fields.py:511
 msgid "Enter a valid filename."
 msgstr "Vložte platný název souboru."
 
-#: core/meta/fields.py:777
+#: core/meta/fields.py:780
 #, python-format
 msgid "Please enter valid %(self)s IDs. The value %(value)r is invalid."
-msgid_plural ""
-"Please enter valid %(self)s IDs. The values %(value)r are invalid."
+msgid_plural "Please enter valid %(self)s IDs. The values %(value)r are invalid"
 msgstr[0] "Prosíme, vložte platná %(self)s ID. Hodnota %(value)r není platná."
-msgstr[1] ""
-"Prosíme, vložte platná %(self)s ID. Hodnoty %(value)r nejsou platné."
-msgstr[2] ""
-"Prosíme, vložte platná %(self)s ID. Hodnoty %(value)r nejsou platné."
+msgstr[1] "Prosíme, vložte platná %(self)s ID. Hodnoty %(value)r nejsou platné."
+msgstr[2] "Prosíme, vložte platná %(self)s ID. Hodnoty %(value)r nejsou platné."
 
 #~ msgid "Error in Template"
 #~ msgstr "Chyba v šabloně"
-
 #~ msgid ""
 #~ "\n"
 #~ "In template %(name)s, error at line %(line)s:\n"
@@ -1794,3 +1677,4 @@ msgstr[2] ""
 #, fuzzy
 #~ msgid "count"
 #~ msgstr "počet"
+
