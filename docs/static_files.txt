@@ -36,6 +36,8 @@ Just put this in your URLconf_::
 ...where ``site_media`` is the URL where your media will be rooted, and
 ``/path/to/media`` is the filesystem root for your media.
 
+You must pass a ``document_root`` parameter to indicate the filesystem root.
+
 Examples:
 
     * The file ``/path/to/media/foo.jpg`` will be made available at the URL
@@ -48,6 +50,43 @@ Examples:
       fall under the document root.
 
 .. _URLconf: http://www.djangoproject.com/documentation/url_dispatch/
+
+Directory listings
+==================
+
+Optionally, you can pass a ``show_indexes`` parameter to the ``static.serve``
+view. This is ``False`` by default. If it's ``True``, Django will display file
+listings for directories.
+
+Example::
+
+    (r'^site_media/(?P<path>.*)$', 'django.views.static.serve', {'document_root': '/path/to/media', 'show_indexes': True}),
+
+You can customize the index view by creating a template called
+``static/directory_index``. That template gets two objects in its context:
+
+    * ``directory`` -- the directory name (a string)
+    * ``file_list`` -- a list of file names (as strings) in the directory
+
+Here's the default ``static/directory_index`` template::
+
+    <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+    <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+    <head>
+        <meta http-equiv="Content-type" content="text/html; charset=utf-8" />
+        <meta http-equiv="Content-Language" content="en-us" />
+        <meta name="robots" content="NONE,NOARCHIVE" />
+        <title>Index of {{ directory }}</title>
+    </head>
+    <body>
+        <h1>Index of {{ directory }}</h1>
+        <ul>
+        {% for f in file_list %}
+        <li><a href="{{ f }}">{{ f }}</a></li>
+        {% endfor %}
+        </ul>
+    </body>
+    </html>
 
 Limiting use to DEBUG=True
 ==========================
