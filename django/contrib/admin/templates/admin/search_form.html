@@ -1,9 +1,10 @@
 {% load adminmedia %}
+{% load i18n %}
 {% if cl.lookup_opts.admin.search_fields %}
 <div id="toolbar"><form id="changelist-search" action="" method="get">
 <label><img src="{% admin_media_prefix %}img/admin/icon_searchbox.png" /></label>
 <input type="text" size="40" name="{{ search_var }}" value="{{ cl.query|escape }}" id="searchbar" />
-<input type="submit" value="Go" />
+<input type="submit" value="{% trans 'Go' %}" />
 {% if show_result_count %}
     <span class="small quiet">{{ cl.result_count }} result{{ cl.result_count|pluralize }} (<a href="?">{{ cl.full_result_count }} total</a>)</span>
 {% endif %}

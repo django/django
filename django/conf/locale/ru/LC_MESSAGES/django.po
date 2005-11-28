@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2005-11-23 00:05+0100\n"
+"POT-Creation-Date: 2005-11-28 11:31+0100\n"
 "PO-Revision-Date: 2005-11-26 00:00\n"
 "Last-Translator: Dmitry Sorokin <ds@dial.com.ru>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -75,7 +75,7 @@ msgstr ""
 msgid "is public"
 msgstr ""
 
-#: contrib/comments/models/comments.py:26 contrib/admin/views/doc.py:274
+#: contrib/comments/models/comments.py:26 contrib/admin/views/doc.py:254
 msgid "IP address"
 msgstr "IP адрес"
 
@@ -269,47 +269,47 @@ msgstr ""
 msgid "The comment form didn't provide either 'preview' or 'post'"
 msgstr ""
 
-#: contrib/admin/filterspecs.py:32
+#: contrib/admin/filterspecs.py:40
 #, python-format
 msgid ""
 "<h3>By %s:</h3>\n"
 "<ul>\n"
 msgstr ""
 
-#: contrib/admin/filterspecs.py:62 contrib/admin/filterspecs.py:79
-#: contrib/admin/filterspecs.py:134
+#: contrib/admin/filterspecs.py:70 contrib/admin/filterspecs.py:88
+#: contrib/admin/filterspecs.py:143
 msgid "All"
 msgstr "Все"
 
-#: contrib/admin/filterspecs.py:100
+#: contrib/admin/filterspecs.py:109
 msgid "Any date"
 msgstr "За любую дату"
 
-#: contrib/admin/filterspecs.py:101
+#: contrib/admin/filterspecs.py:110
 msgid "Today"
 msgstr "Сегодня"
 
-#: contrib/admin/filterspecs.py:104
+#: contrib/admin/filterspecs.py:113
 msgid "Past 7 days"
 msgstr "Последние 7 дней"
 
-#: contrib/admin/filterspecs.py:106
+#: contrib/admin/filterspecs.py:115
 msgid "This month"
 msgstr "В этом месяце"
 
-#: contrib/admin/filterspecs.py:108
+#: contrib/admin/filterspecs.py:117
 msgid "This year"
 msgstr "В этом году"
 
-#: contrib/admin/filterspecs.py:134
+#: contrib/admin/filterspecs.py:143
 msgid "Yes"
 msgstr "Да"
 
-#: contrib/admin/filterspecs.py:134
+#: contrib/admin/filterspecs.py:143
 msgid "No"
 msgstr "Нет"
 
-#: contrib/admin/filterspecs.py:142
+#: contrib/admin/filterspecs.py:150
 msgid "Unknown"
 msgstr "Неизвестно"
 
@@ -341,7 +341,7 @@ msgstr "журнальная запись"
 msgid "log entries"
 msgstr "журнальные записи"
 
-#: contrib/admin/templatetags/admin_list.py:244
+#: contrib/admin/templatetags/admin_list.py:245
 msgid "All dates"
 msgstr "Все даты"
 
@@ -354,7 +354,8 @@ msgstr "Вход"
 msgid ""
 "Please log in again, because your session has expired. Don't worry: Your "
 "submission has been saved."
-msgstr "Пожалуйста войдите снова, посколькук ваша сессия устарела. Не беспокойтесь:"
+msgstr ""
+"Пожалуйста войдите снова, посколькук ваша сессия устарела. Не беспокойтесь:"
 "введенные вами данные сохранены."
 
 #: contrib/admin/views/decorators.py:63
@@ -374,179 +375,179 @@ msgstr "Имя пользователя не может включать символ '@'."
 msgid "Your e-mail address is not your username. Try '%s' instead."
 msgstr ""
 
-#: contrib/admin/views/main.py:50
+#: contrib/admin/views/main.py:49
 msgid "Site administration"
 msgstr "Администрирование сайта"
 
-#: contrib/admin/views/main.py:65
+#: contrib/admin/views/main.py:64
 #, python-format
 msgid "Select %s"
 msgstr "Выберите %s"
 
-#: contrib/admin/views/main.py:66
+#: contrib/admin/views/main.py:65
 #, python-format
 msgid "Select %s to change"
 msgstr "Выберите %s для изменения"
 
-#: contrib/admin/views/main.py:421
+#: contrib/admin/views/main.py:411
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was added successfully."
 msgstr "%(name)s \"%(obj)s\" были успешно добавлены."
 
-#: contrib/admin/views/main.py:426 contrib/admin/views/main.py:502
+#: contrib/admin/views/main.py:416 contrib/admin/views/main.py:492
 msgid "You may edit it again below."
 msgstr "Вы снова можете редактировать их внизу"
 
-#: contrib/admin/views/main.py:434 contrib/admin/views/main.py:511
+#: contrib/admin/views/main.py:424 contrib/admin/views/main.py:501
 #, python-format
 msgid "You may add another %s below."
 msgstr "Вы можете добавить % внизу."
 
-#: contrib/admin/views/main.py:451
+#: contrib/admin/views/main.py:441
 #, python-format
 msgid "Add %s"
 msgstr "Добавить %s"
 
-#: contrib/admin/views/main.py:467
+#: contrib/admin/views/main.py:457
 #, python-format
 msgid "Added %s."
 msgstr "Добавлено %s"
 
-#: contrib/admin/views/main.py:467 contrib/admin/views/main.py:469
-#: contrib/admin/views/main.py:471
+#: contrib/admin/views/main.py:457 contrib/admin/views/main.py:459
+#: contrib/admin/views/main.py:461
 msgid "and"
 msgstr "и"
 
-#: contrib/admin/views/main.py:469
+#: contrib/admin/views/main.py:459
 #, python-format
 msgid "Changed %s."
 msgstr "Изменено %s."
 
-#: contrib/admin/views/main.py:471
+#: contrib/admin/views/main.py:461
 #, python-format
 msgid "Deleted %s."
 msgstr "Удалено %s."
 
-#: contrib/admin/views/main.py:474
+#: contrib/admin/views/main.py:464
 msgid "No fields changed."
 msgstr ""
 
-#: contrib/admin/views/main.py:499
+#: contrib/admin/views/main.py:489
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was changed successfully."
 msgstr ""
 
-#: contrib/admin/views/main.py:508
+#: contrib/admin/views/main.py:498
 #, python-format
 msgid ""
 "The %(name)s \"%(obj)s\" was added successfully. You may edit it again below."
 msgstr ""
 
-#: contrib/admin/views/main.py:546
+#: contrib/admin/views/main.py:536
 #, python-format
 msgid "Change %s"
 msgstr "Изменить %s"
 
-#: contrib/admin/views/main.py:626
+#: contrib/admin/views/main.py:614
 #, python-format
 msgid "One or more %(fieldname)s in %(name)s: %(obj)s"
 msgstr "Одно или более  %(fieldname)s в %(name)s: %(obj)s"
 
-#: contrib/admin/views/main.py:631
+#: contrib/admin/views/main.py:619
 #, python-format
 msgid "One or more %(fieldname)s in %(name)s:"
 msgstr "Одно или более %(fieldname)s в %(name)s:"
 
-#: contrib/admin/views/main.py:660
+#: contrib/admin/views/main.py:648
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was deleted successfully."
 msgstr "%(name)s \"%(obj)s\" было успешно удалено."
 
-#: contrib/admin/views/main.py:663
+#: contrib/admin/views/main.py:651
 msgid "Are you sure?"
 msgstr "Вы уверены?"
 
-#: contrib/admin/views/main.py:678
+#: contrib/admin/views/main.py:666
 #, python-format
 msgid "Change history: %s"
 msgstr "Измени историю: %s"
 
-#: contrib/admin/views/doc.py:262 contrib/admin/views/doc.py:271
-#: contrib/admin/views/doc.py:273 contrib/admin/views/doc.py:278
-#: contrib/admin/views/doc.py:279 contrib/admin/views/doc.py:281
+#: contrib/admin/views/doc.py:242 contrib/admin/views/doc.py:251
+#: contrib/admin/views/doc.py:253 contrib/admin/views/doc.py:258
+#: contrib/admin/views/doc.py:259 contrib/admin/views/doc.py:261
 msgid "Integer"
 msgstr "Целое"
 
-#: contrib/admin/views/doc.py:263
+#: contrib/admin/views/doc.py:243
 msgid "Boolean (Either True or False)"
 msgstr "Логическое (True или False)"
 
-#: contrib/admin/views/doc.py:264
+#: contrib/admin/views/doc.py:244
 #, python-format
 msgid "String (up to %(maxlength)s)"
 msgstr "Строка (до %(maxlength)s символов)"
 
-#: contrib/admin/views/doc.py:265
+#: contrib/admin/views/doc.py:245
 msgid "Comma-separated integers"
 msgstr "Целые, разделенные запятыми"
 
-#: contrib/admin/views/doc.py:266
+#: contrib/admin/views/doc.py:246
 msgid "Date (without time)"
 msgstr "Дата (без указания времени)"
 
-#: contrib/admin/views/doc.py:267
+#: contrib/admin/views/doc.py:247
 msgid "Date (with time)"
 msgstr "Дата (с указанием времени)"
 
-#: contrib/admin/views/doc.py:268
+#: contrib/admin/views/doc.py:248
 msgid "E-mail address"
 msgstr "E-mail адрес"
 
-#: contrib/admin/views/doc.py:269 contrib/admin/views/doc.py:272
+#: contrib/admin/views/doc.py:249 contrib/admin/views/doc.py:252
 msgid "File path"
 msgstr "Путь к файлу"
 
-#: contrib/admin/views/doc.py:270
+#: contrib/admin/views/doc.py:250
 msgid "Decimal number"
 msgstr "Десятичное число"
 
-#: contrib/admin/views/doc.py:276
+#: contrib/admin/views/doc.py:256
 msgid "Boolean (Either True, False or None)"
 msgstr "Логическое (True, False или None)"
 
-#: contrib/admin/views/doc.py:277
+#: contrib/admin/views/doc.py:257
 msgid "Phone number"
 msgstr "Номер телефона"
 
-#: contrib/admin/views/doc.py:280
+#: contrib/admin/views/doc.py:260
 msgid "String (up to 50)"
 msgstr "Строка (до 50 символов)"
 
-#: contrib/admin/views/doc.py:282
+#: contrib/admin/views/doc.py:262
 msgid "Text"
 msgstr "Текст"
 
-#: contrib/admin/views/doc.py:283
+#: contrib/admin/views/doc.py:263
 msgid "Time"
 msgstr "Время"
 
-#: contrib/admin/views/doc.py:284 contrib/flatpages/models/flatpages.py:6
+#: contrib/admin/views/doc.py:264 contrib/flatpages/models/flatpages.py:6
 msgid "URL"
 msgstr "URL"
 
-#: contrib/admin/views/doc.py:285
+#: contrib/admin/views/doc.py:265
 msgid "U.S. state (two uppercase letters)"
 msgstr "Штат США (два заглавных символа)"
 
-#: contrib/admin/views/doc.py:286
+#: contrib/admin/views/doc.py:266
 msgid "XML text"
 msgstr "XML текст"
 
-#: contrib/admin/templates/admin/change_list.html:5
-#: contrib/admin/templates/admin/500.html:4
 #: contrib/admin/templates/admin/object_history.html:5
-#: contrib/admin/templates/admin/change_form.html:12
+#: contrib/admin/templates/admin/500.html:4
+#: contrib/admin/templates/admin/change_list.html:4
 #: contrib/admin/templates/admin/base.html:29
+#: contrib/admin/templates/admin/change_form.html:10
 #: contrib/admin/templates/registration/password_change_done.html:4
 #: contrib/admin/templates/registration/password_reset_form.html:4
 #: contrib/admin/templates/registration/logged_out.html:4
@@ -556,58 +557,8 @@ msgstr "XML текст"
 msgid "Home"
 msgstr "Начало"
 
-#: contrib/admin/templates/admin/change_list.html:10
-#, python-format
-msgid "Add %(name)s"
-msgstr "Добавить %(name)s"
-
-#: contrib/admin/templates/admin/index.html:27
-#: contrib/admin/templates/admin/change_form.html:14
-msgid "Add"
-msgstr "Добавить"
-
-#: contrib/admin/templates/admin/index.html:33
-msgid "Change"
-msgstr "Изменить"
-
-#: contrib/admin/templates/admin/index.html:43
-msgid "You don't have permission to edit anything."
-msgstr "Недостаточно прав для редактирования."
-
-#: contrib/admin/templates/admin/index.html:51
-msgid "Recent Actions"
-msgstr "Последние Действия"
-
-#: contrib/admin/templates/admin/index.html:52
-msgid "My Actions"
-msgstr "Мои Действия"
-
-#: contrib/admin/templates/admin/index.html:56
-msgid "None available"
-msgstr "Недоступно"
-
-#: contrib/admin/templates/admin/500.html:4
-msgid "Server error"
-msgstr "Ошибка сервера"
-
-#: contrib/admin/templates/admin/500.html:6
-msgid "Server error (500)"
-msgstr "Ошибка сервера (500)"
-
-#: contrib/admin/templates/admin/500.html:9
-msgid "Server Error <em>(500)</em>"
-msgstr "Ошибка сервера <em>(500)</em>"
-
-#: contrib/admin/templates/admin/500.html:10
-msgid ""
-"There's been an error. It's been reported to the site administrators via e-"
-"mail and should be fixed shortly. Thanks for your patience."
-msgstr ""
-"Произошла ошибка. Отчет об ошибке отправлен администраторам сайта по e-mailи "
-"она должна быть вскоре исправлена. Благодарим вас на терпение и помощь."
-
 #: contrib/admin/templates/admin/object_history.html:5
-#: contrib/admin/templates/admin/change_form.html:19
+#: contrib/admin/templates/admin/change_form.html:17
 msgid "History"
 msgstr "История"
 
@@ -643,6 +594,65 @@ msgstr "Административный сайт Django"
 msgid "Django administration"
 msgstr "Администрирование Django"
 
+#: contrib/admin/templates/admin/500.html:4
+msgid "Server error"
+msgstr "Ошибка сервера"
+
+#: contrib/admin/templates/admin/500.html:6
+msgid "Server error (500)"
+msgstr "Ошибка сервера (500)"
+
+#: contrib/admin/templates/admin/500.html:9
+msgid "Server Error <em>(500)</em>"
+msgstr "Ошибка сервера <em>(500)</em>"
+
+#: contrib/admin/templates/admin/500.html:10
+msgid ""
+"There's been an error. It's been reported to the site administrators via e-"
+"mail and should be fixed shortly. Thanks for your patience."
+msgstr ""
+"Произошла ошибка. Отчет об ошибке отправлен администраторам сайта по e-mailи "
+"она должна быть вскоре исправлена. Благодарим вас на терпение и помощь."
+
+#: contrib/admin/templates/admin/404.html:4
+#: contrib/admin/templates/admin/404.html:8
+msgid "Page not found"
+msgstr "Страница не найдена"
+
+#: contrib/admin/templates/admin/404.html:10
+msgid "We're sorry, but the requested page could not be found."
+msgstr "К сожалению, запрашиваемая вами страница не найдена."
+
+#: contrib/admin/templates/admin/index.html:27
+#: contrib/admin/templates/admin/change_form.html:12
+msgid "Add"
+msgstr "Добавить"
+
+#: contrib/admin/templates/admin/index.html:33
+msgid "Change"
+msgstr "Изменить"
+
+#: contrib/admin/templates/admin/index.html:43
+msgid "You don't have permission to edit anything."
+msgstr "Недостаточно прав для редактирования."
+
+#: contrib/admin/templates/admin/index.html:51
+msgid "Recent Actions"
+msgstr "Последние Действия"
+
+#: contrib/admin/templates/admin/index.html:52
+msgid "My Actions"
+msgstr "Мои Действия"
+
+#: contrib/admin/templates/admin/index.html:56
+msgid "None available"
+msgstr "Недоступно"
+
+#: contrib/admin/templates/admin/change_list.html:9
+#, python-format
+msgid "Add %(name)s"
+msgstr "Добавить %(name)s"
+
 #: contrib/admin/templates/admin/login.html:15
 msgid "Username:"
 msgstr "Имя:"
@@ -655,32 +665,17 @@ msgstr "Пароль:"
 msgid "Have you <a href=\"/password_reset/\">forgotten your password</a>?"
 msgstr "Вы <a href=\"/password_reset/\">забыли пароль</a>?"
 
-#: contrib/admin/templates/admin/404.html:4
-#: contrib/admin/templates/admin/404.html:8
-msgid "Page not found"
-msgstr "Страница не найдена"
+#: contrib/admin/templates/admin/base.html:23
+msgid "Welcome,"
+msgstr "Добро пожаловать,"
 
-#: contrib/admin/templates/admin/404.html:10
-msgid "We're sorry, but the requested page could not be found."
-msgstr "К сожалению, запрашиваемая вами страница не найдена."
+#: contrib/admin/templates/admin/base.html:23
+msgid "Change password"
+msgstr "Изменение пароля"
 
-#: contrib/admin/templates/admin/change_form.html:20
-msgid "View on site"
-msgstr ""
-
-#: contrib/admin/templates/admin/change_form.html:28
-msgid "Please correct the error below."
-msgid_plural "Please correct the errors below."
-msgstr[0] "Пожалуйста исправьте ошибку ниже."
-msgstr[1] "Пожалуйста исправьте ошибки ниже."
-
-#: contrib/admin/templates/admin/change_form.html:45
-msgid "Ordering"
-msgstr ""
-
-#: contrib/admin/templates/admin/change_form.html:48
-msgid "Order:"
-msgstr "Порядок:"
+#: contrib/admin/templates/admin/base.html:23
+msgid "Log out"
+msgstr "Выход"
 
 #: contrib/admin/templates/admin/delete_confirmation.html:7
 #, python-format
@@ -689,9 +684,9 @@ msgid ""
 "objects, but your account doesn't have permission to delete the following "
 "types of objects:"
 msgstr ""
-"Удаление объекта %(object_name)s '%(object)s' приведет к удалению зависимых "
-" элементов, но предоставленных вам прав недостаточно для удаления следующих типов "
-"объектов:"
+"Удаление объекта %(object_name)s '%(object)s' приведет к удалению зависимых  "
+"элементов, но предоставленных вам прав недостаточно для удаления следующих "
+"типов объектов:"
 
 #: contrib/admin/templates/admin/delete_confirmation.html:14
 #, python-format
@@ -706,17 +701,32 @@ msgstr ""
 msgid "Yes, I'm sure"
 msgstr "Да, я уверен"
 
-#: contrib/admin/templates/admin/base.html:23
-msgid "Welcome,"
-msgstr "Добро пожаловать,"
+#: contrib/admin/templates/admin/filter.html:2
+#, python-format
+msgid " By %(title)s "
+msgstr ""
 
-#: contrib/admin/templates/admin/base.html:23
-msgid "Change password"
-msgstr "Изменение пароля"
+#: contrib/admin/templates/admin/search_form.html:7
+msgid "Go"
+msgstr ""
 
-#: contrib/admin/templates/admin/base.html:23
-msgid "Log out"
-msgstr "Выход"
+#: contrib/admin/templates/admin/change_form.html:18
+msgid "View on site"
+msgstr ""
+
+#: contrib/admin/templates/admin/change_form.html:26
+msgid "Please correct the error below."
+msgid_plural "Please correct the errors below."
+msgstr[0] "Пожалуйста исправьте ошибку ниже."
+msgstr[1] "Пожалуйста исправьте ошибки ниже."
+
+#: contrib/admin/templates/admin/change_form.html:43
+msgid "Ordering"
+msgstr ""
+
+#: contrib/admin/templates/admin/change_form.html:46
+msgid "Order:"
+msgstr "Порядок:"
 
 #: contrib/admin/templates/admin/submit_line.html:3
 msgid "Delete"
@@ -738,11 +748,6 @@ msgstr "Сохранить и продолжить редактирование"
 msgid "Save"
 msgstr "Сохранить"
 
-#: contrib/admin/templates/admin/filter.html:1
-#, python-format
-msgid " By %(title)s "
-msgstr ""
-
 #: contrib/admin/templates/registration/password_change_done.html:4
 #: contrib/admin/templates/registration/password_change_form.html:4
 #: contrib/admin/templates/registration/password_change_form.html:6
@@ -761,6 +766,7 @@ msgstr "Ваш пароль был изменен."
 
 #: contrib/admin/templates/registration/password_reset_form.html:4
 #: contrib/admin/templates/registration/password_reset_form.html:6
+#: contrib/admin/templates/registration/password_reset_form.html:10
 #: contrib/admin/templates/registration/password_reset_done.html:4
 msgid "Password reset"
 msgstr "Сброс пароля"
@@ -1243,7 +1249,7 @@ msgid "password"
 msgstr "пароль"
 
 #: models/auth.py:37
-msgid "Use '[algo]$[salt]$[hexdigest]"
+msgid "Use '[algo]$[salt]$[hexdigest]'"
 msgstr ""
 
 #: models/auth.py:38
@@ -1370,40 +1376,40 @@ msgstr ""
 msgid "Simplified Chinese"
 msgstr ""
 
-#: core/formfields.py:59 core/meta/fields.py:287 core/meta/fields.py:491
-#: core/meta/fields.py:502
+#: core/formfields.py:59 core/meta/fields.py:285 core/meta/fields.py:488
+#: core/meta/fields.py:499
 msgid "This field is required."
 msgstr "Обязательное поле."
 
-#: core/formfields.py:339
+#: core/formfields.py:336
 #, python-format
-msgid "Ensure your text is less than %s character"
+msgid "Ensure your text is less than %s character."
 msgid_plural "Ensure your text is less than %s characters."
 msgstr[0] ""
 msgstr[1] ""
 
-#: core/formfields.py:344
+#: core/formfields.py:341
 msgid "Line breaks are not allowed here."
 msgstr "Переносы строк не допускаются здесь."
 
-#: core/formfields.py:440 core/formfields.py:511 core/formfields.py:549
+#: core/formfields.py:436 core/formfields.py:507 core/formfields.py:545
 #, python-format
 msgid "Select a valid choice; '%(data)s' is not in %(choices)s."
 msgstr ""
 
-#: core/formfields.py:605
+#: core/formfields.py:601
 msgid "The submitted file is empty."
 msgstr "Указанный файл - пуст."
 
-#: core/formfields.py:659
+#: core/formfields.py:655
 msgid "Enter a whole number between -32,768 and 32,767."
 msgstr ""
 
-#: core/formfields.py:668
+#: core/formfields.py:664
 msgid "Enter a positive number."
 msgstr "Введите положительное число."
 
-#: core/formfields.py:677
+#: core/formfields.py:673
 msgid "Enter a whole number between 0 and 32,767."
 msgstr "Введите целое число в диапазоне от 0 до 32767."
 
@@ -1675,28 +1681,32 @@ msgstr ""
 msgid "%(optname)s with this %(fieldname)s already exists."
 msgstr ""
 
-#: core/meta/fields.py:131
+#: core/meta/fields.py:129
 msgid " Separate multiple IDs with commas."
 msgstr "Несколько значений ID разделяйте запятыми."
 
-#: core/meta/fields.py:134
+#: core/meta/fields.py:132
 msgid ""
 " Hold down \"Control\", or \"Command\" on a Mac, to select more than one."
 msgstr ""
 " Удерживайте \"Control\", или \"Command\" на Макинтош, для выбора больше чем "
 "одного."
 
-#: core/meta/fields.py:511
+#: core/meta/fields.py:508
 msgid "Enter a valid filename."
 msgstr "Укажите правильное имя файла."
 
-#: core/meta/fields.py:780
+#: core/meta/fields.py:777
 #, python-format
 msgid "Please enter valid %(self)s IDs. The value %(value)r is invalid."
 msgid_plural ""
-"Please enter valid %(self)s IDs. The values %(value)r are invalid"
+"Please enter valid %(self)s IDs. The values %(value)r are invalid."
 msgstr[0] ""
 msgstr[1] ""
+
+#: core/template/defaultfilters.py:354
+msgid "yes,no,maybe"
+msgstr ""
 
 #~ msgid ""
 #~ "Example: 'flatfiles/contact_page'. If this isn't provided, the system "

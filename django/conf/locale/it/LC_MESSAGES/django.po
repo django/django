@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2005-11-25 17:27-0600\n"
+"POT-Creation-Date: 2005-11-28 11:31+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -78,7 +78,7 @@ msgstr ""
 msgid "is public"
 msgstr ""
 
-#: contrib/comments/models/comments.py:26 contrib/admin/views/doc.py:274
+#: contrib/comments/models/comments.py:26 contrib/admin/views/doc.py:254
 #, fuzzy
 msgid "IP address"
 msgstr "indirizzo e-mail"
@@ -352,7 +352,7 @@ msgstr "voce di log"
 msgid "log entries"
 msgstr "voci di log"
 
-#: contrib/admin/templatetags/admin_list.py:243
+#: contrib/admin/templatetags/admin_list.py:245
 msgid "All dates"
 msgstr ""
 
@@ -397,170 +397,170 @@ msgstr ""
 msgid "Select %s to change"
 msgstr "Clicca per cambiare"
 
-#: contrib/admin/views/main.py:412
+#: contrib/admin/views/main.py:411
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was added successfully."
 msgstr ""
 
-#: contrib/admin/views/main.py:417 contrib/admin/views/main.py:493
+#: contrib/admin/views/main.py:416 contrib/admin/views/main.py:492
 msgid "You may edit it again below."
 msgstr ""
 
-#: contrib/admin/views/main.py:425 contrib/admin/views/main.py:502
+#: contrib/admin/views/main.py:424 contrib/admin/views/main.py:501
 #, python-format
 msgid "You may add another %s below."
 msgstr ""
 
-#: contrib/admin/views/main.py:442
+#: contrib/admin/views/main.py:441
 #, fuzzy, python-format
 msgid "Add %s"
 msgstr "Aggiungi"
 
-#: contrib/admin/views/main.py:458
+#: contrib/admin/views/main.py:457
 #, python-format
 msgid "Added %s."
 msgstr ""
 
-#: contrib/admin/views/main.py:458 contrib/admin/views/main.py:460
-#: contrib/admin/views/main.py:462
+#: contrib/admin/views/main.py:457 contrib/admin/views/main.py:459
+#: contrib/admin/views/main.py:461
 msgid "and"
 msgstr ""
 
-#: contrib/admin/views/main.py:460
+#: contrib/admin/views/main.py:459
 #, fuzzy, python-format
 msgid "Changed %s."
 msgstr "Cambia"
 
-#: contrib/admin/views/main.py:462
+#: contrib/admin/views/main.py:461
 #, python-format
 msgid "Deleted %s."
 msgstr ""
 
-#: contrib/admin/views/main.py:465
+#: contrib/admin/views/main.py:464
 msgid "No fields changed."
 msgstr ""
 
-#: contrib/admin/views/main.py:490
+#: contrib/admin/views/main.py:489
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was changed successfully."
 msgstr ""
 
-#: contrib/admin/views/main.py:499
+#: contrib/admin/views/main.py:498
 #, python-format
 msgid ""
 "The %(name)s \"%(obj)s\" was added successfully. You may edit it again below."
 msgstr ""
 
-#: contrib/admin/views/main.py:537
+#: contrib/admin/views/main.py:536
 #, fuzzy, python-format
 msgid "Change %s"
 msgstr "Cambia"
 
-#: contrib/admin/views/main.py:615
+#: contrib/admin/views/main.py:614
 #, python-format
 msgid "One or more %(fieldname)s in %(name)s: %(obj)s"
 msgstr ""
 
-#: contrib/admin/views/main.py:620
+#: contrib/admin/views/main.py:619
 #, python-format
 msgid "One or more %(fieldname)s in %(name)s:"
 msgstr ""
 
-#: contrib/admin/views/main.py:649
+#: contrib/admin/views/main.py:648
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was deleted successfully."
 msgstr ""
 
-#: contrib/admin/views/main.py:652
+#: contrib/admin/views/main.py:651
 msgid "Are you sure?"
 msgstr ""
 
-#: contrib/admin/views/main.py:667
+#: contrib/admin/views/main.py:666
 #, fuzzy, python-format
 msgid "Change history: %s"
 msgstr "Cambia la password"
 
-#: contrib/admin/views/doc.py:262 contrib/admin/views/doc.py:271
-#: contrib/admin/views/doc.py:273 contrib/admin/views/doc.py:278
-#: contrib/admin/views/doc.py:279 contrib/admin/views/doc.py:281
+#: contrib/admin/views/doc.py:242 contrib/admin/views/doc.py:251
+#: contrib/admin/views/doc.py:253 contrib/admin/views/doc.py:258
+#: contrib/admin/views/doc.py:259 contrib/admin/views/doc.py:261
 msgid "Integer"
 msgstr ""
 
-#: contrib/admin/views/doc.py:263
+#: contrib/admin/views/doc.py:243
 msgid "Boolean (Either True or False)"
 msgstr ""
 
-#: contrib/admin/views/doc.py:264
+#: contrib/admin/views/doc.py:244
 #, python-format
 msgid "String (up to %(maxlength)s)"
 msgstr ""
 
-#: contrib/admin/views/doc.py:265
+#: contrib/admin/views/doc.py:245
 msgid "Comma-separated integers"
 msgstr ""
 
-#: contrib/admin/views/doc.py:266
+#: contrib/admin/views/doc.py:246
 #, fuzzy
 msgid "Date (without time)"
 msgstr "data azione"
 
-#: contrib/admin/views/doc.py:267
+#: contrib/admin/views/doc.py:247
 #, fuzzy
 msgid "Date (with time)"
 msgstr "Data/ora"
 
-#: contrib/admin/views/doc.py:268
+#: contrib/admin/views/doc.py:248
 #, fuzzy
 msgid "E-mail address"
 msgstr "Indirizzo e-mail:"
 
-#: contrib/admin/views/doc.py:269 contrib/admin/views/doc.py:272
+#: contrib/admin/views/doc.py:249 contrib/admin/views/doc.py:252
 msgid "File path"
 msgstr ""
 
-#: contrib/admin/views/doc.py:270
+#: contrib/admin/views/doc.py:250
 #, fuzzy
 msgid "Decimal number"
 msgstr "Dicembre"
 
-#: contrib/admin/views/doc.py:276
+#: contrib/admin/views/doc.py:256
 msgid "Boolean (Either True, False or None)"
 msgstr ""
 
-#: contrib/admin/views/doc.py:277
+#: contrib/admin/views/doc.py:257
 #, fuzzy
 msgid "Phone number"
 msgstr "Inserire un numero."
 
-#: contrib/admin/views/doc.py:280
+#: contrib/admin/views/doc.py:260
 msgid "String (up to 50)"
 msgstr ""
 
-#: contrib/admin/views/doc.py:282
+#: contrib/admin/views/doc.py:262
 msgid "Text"
 msgstr ""
 
-#: contrib/admin/views/doc.py:283
+#: contrib/admin/views/doc.py:263
 msgid "Time"
 msgstr ""
 
-#: contrib/admin/views/doc.py:284 contrib/flatpages/models/flatpages.py:6
+#: contrib/admin/views/doc.py:264 contrib/flatpages/models/flatpages.py:6
 msgid "URL"
 msgstr "URL"
 
-#: contrib/admin/views/doc.py:285
+#: contrib/admin/views/doc.py:265
 msgid "U.S. state (two uppercase letters)"
 msgstr ""
 
-#: contrib/admin/views/doc.py:286
+#: contrib/admin/views/doc.py:266
 msgid "XML text"
 msgstr ""
 
 #: contrib/admin/templates/admin/object_history.html:5
 #: contrib/admin/templates/admin/500.html:4
-#: contrib/admin/templates/admin/change_list.html:5
+#: contrib/admin/templates/admin/change_list.html:4
 #: contrib/admin/templates/admin/base.html:29
-#: contrib/admin/templates/admin/change_form.html:12
+#: contrib/admin/templates/admin/change_form.html:10
 #: contrib/admin/templates/registration/password_change_done.html:4
 #: contrib/admin/templates/registration/password_reset_form.html:4
 #: contrib/admin/templates/registration/logged_out.html:4
@@ -571,7 +571,7 @@ msgid "Home"
 msgstr "Pagina iniziale"
 
 #: contrib/admin/templates/admin/object_history.html:5
-#: contrib/admin/templates/admin/change_form.html:19
+#: contrib/admin/templates/admin/change_form.html:17
 msgid "History"
 msgstr "Storia"
 
@@ -638,7 +638,7 @@ msgid "We're sorry, but the requested page could not be found."
 msgstr "Spiacente, ma la pagina richiesta non esiste."
 
 #: contrib/admin/templates/admin/index.html:27
-#: contrib/admin/templates/admin/change_form.html:14
+#: contrib/admin/templates/admin/change_form.html:12
 msgid "Add"
 msgstr "Aggiungi"
 
@@ -662,7 +662,7 @@ msgstr "Azioni Proprie"
 msgid "None available"
 msgstr "Nessuna disponibile"
 
-#: contrib/admin/templates/admin/change_list.html:10
+#: contrib/admin/templates/admin/change_list.html:9
 #, fuzzy, python-format
 msgid "Add %(name)s"
 msgstr "Aggiungi"
@@ -715,26 +715,30 @@ msgstr ""
 msgid "Yes, I'm sure"
 msgstr "Sì, sono sicuro"
 
-#: contrib/admin/templates/admin/filter.html:1
+#: contrib/admin/templates/admin/filter.html:2
 #, python-format
 msgid " By %(title)s "
 msgstr ""
 
-#: contrib/admin/templates/admin/change_form.html:20
+#: contrib/admin/templates/admin/search_form.html:7
+msgid "Go"
+msgstr ""
+
+#: contrib/admin/templates/admin/change_form.html:18
 msgid "View on site"
 msgstr ""
 
-#: contrib/admin/templates/admin/change_form.html:28
+#: contrib/admin/templates/admin/change_form.html:26
 msgid "Please correct the error below."
 msgid_plural "Please correct the errors below."
 msgstr[0] ""
 msgstr[1] ""
 
-#: contrib/admin/templates/admin/change_form.html:45
+#: contrib/admin/templates/admin/change_form.html:43
 msgid "Ordering"
 msgstr ""
 
-#: contrib/admin/templates/admin/change_form.html:48
+#: contrib/admin/templates/admin/change_form.html:46
 msgid "Order:"
 msgstr ""
 
@@ -1732,6 +1736,10 @@ msgid_plural ""
 "Please enter valid %(self)s IDs. The values %(value)r are invalid."
 msgstr[0] ""
 msgstr[1] ""
+
+#: core/template/defaultfilters.py:354
+msgid "yes,no,maybe"
+msgstr ""
 
 #, fuzzy
 #~ msgid "count"
