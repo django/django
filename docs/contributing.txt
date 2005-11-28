@@ -1,0 +1,304 @@
+======================
+Contributing to Django
+======================
+
+If you think working *with* Django is fun, wait until you start working *on* it.
+We're passionate about helping Django users make the jump to contributing members
+of the community, so there are many ways you can help Django's development:
+
+    * Blog about Django.  We syndicate all the Django blogs we know about on
+      the `community page`_; contact jacob@jacobian.org if you've got a blog
+      you'd like to see on that page.
+
+    * Report bugs and request features in our `ticket tracker`_.  Please read
+      `reporting bugs`, below, for the details on how we like our bug reports
+      served up.
+      
+    * Submit patches for new and/or fixed behavior.  Please read the `submitting
+      patches`_, below, for the details on how to submit a patch.
+      
+    * Join the `django-dev`_ mailing list and share your ideas for how to improve
+      Django.  We're always open to suggestions, although we're likely to be skeptical
+      of large-scale suggestions without some code to back it up.
+      
+That's all you need to know if you'd like to join the Django development
+community. The rest of this document describes the details of how our community
+works and how it handles bugs, mailing lists, and all the other minutiae of how
+Django development works.
+
+Reporting bugs
+==============
+
+Well-written bug reports are *incredibly* helpful. However, there's a certain
+amount of overhead involved in working with any bug tracking system, so your
+help in keeping our ticket tracker as useful as possible is appreciated.  In
+particular:
+
+    * **Do** read the FAQ_ to see if your issue might be a well-known question.
+    
+    * **Do** `search the tracker`_ to see if your issue has already been filed.
+    
+    * **Do** ask on `django-users`_ *first* if you're not sure if what you're 
+      seeing is a bug.
+      
+    * **Do** write complete, reproducible, specific bug reports. Include as
+      much information as you possibly can, complete with code snippets, test
+      cases, etc.  A minimal example the illustrates the bug in a nice small
+      test case is the best possible bug report.
+
+    * **Don't** use the ticket system to ask support questions.  Use the
+      `django-users`_ list, or the `#django`_ IRC channel for that.
+      
+    * **Don't** use the ticket system to make large-scale feature requests.
+      We like to discuss any big changes to Django's core on the `django-dev`_ 
+      list before actually working on them.
+      
+    * **Don't** reopen issues that have been marked "wontfix". This mark means
+      that the decision has been made that we can't or won't fix this particular
+      issue.  If you're not sure why, please ask on `django-dev`_.
+      
+    * **Don't** use the ticket tracker for lengthy discussions because they're
+      likely to get lost. If a particular ticket is controversial, please move
+      discussion to `django-dev`_.
+      
+Reporting security issues
+=========================
+
+Report security issues to security@djangoproject.com. This is a private list
+only open to long-time, highly trusted Django developers, and its archives are
+not publicly readable.
+
+In the event of a confirmed vulnerability in Django itself, we will take the
+following actions:
+
+    * Acknowledge to the reporter that we've received the report and that a fix
+      is forthcoming. We'll give a rough timeline and ask the reporter to keep
+      the issue confidential until we announce it.
+
+    * Halt all other development as long as is needed to develop a fix, including
+      patches against the current and two previous releases.
+      
+    * Determine a go-public date for announcing the vulnerability and the fix.
+      To try to mitigate a possible "arms race" between those applying the patch
+      and those trying to exploit the hole, we will not announce security
+      problems immediately.
+      
+    * Pre-notify everyone we know to be running the affected version(s) of
+      Django. We will send these notifications through private e-mail which will
+      include documentation of the vulnerability, links to the relevant patch(es),
+      and a request to keep the vulnerability confidential until the official
+      go-public date.
+
+    * Publicly announce the vulnerability and the fix on the pre-determined
+      go-public date. This will probably mean a new release of Django, but
+      in some cases it may simply be patches against current releases.
+
+Submitting patches
+==================
+
+We're always grateful for patches to Django's code. Indeed, bug reports with
+associated patches will get fixed *far* more quickly than those without patches.
+
+Patch style
+-----------
+
+    * Make sure your code matches our `coding style`.
+
+    * Submit patches in the format returned by the ``svn diff`` command. 
+      An exception is for code changes that are described more clearly in plain
+      English than in code. Indentation is the most common example; it's hard to
+      read patches when the only difference in code is that it's indented.
+      
+    * Attach patches to a ticket in the `ticket tracker`_, using the "attach file"
+      button. Please *don't* put the patch in the ticket description or comment
+      unless it's a single line patch.
+      
+    * Name the patch file with a ``.diff`` extension; this will let the ticket
+      tracker apply correct syntax highlighting, which is quite helpful.
+
+Coding style
+============
+
+Please follow these coding standards when writing code for inclusion in Django:
+
+    * Unless otherwise specified, follow `PEP 8`_.
+
+    * Use four spaces for indentation.
+    
+    * Use underscores, not camelCase, for variable, function and method names
+      (i.e. ``poll.get_unique_voters()``, not ``poll.getUniqueVoters``).
+      
+    * Use ``InitialCaps`` for class names (or for factory functions that
+      return classes).
+      
+    * Mark all strings for internationalization; see the `i18n documentation`_
+      for details.
+
+Requesting features
+===================
+
+We're always trying to make Django better, and your feature requests make that
+possible. Here are some tips on how to most effectively make a request:
+
+    * Request the feature on `django-dev`_, not in the ticket tracker; it'll get
+      read more closely if it's on the mailing list.
+      
+    * Describe clearly and concisely what the missing feature is and how you'd 
+      like to see it implemented. Include example code (non-functional is OK)
+      if possible.
+      
+    * Explain *why* you'd like the feature. In some cases this is obvious, but
+      since Django is designed to help real developers get real work done,
+      you'll need to explain it if it isn't obvious why the feature would be
+      useful.
+      
+As with most open-source projects, code talks. If you are willing to write the
+code for the feature yourself or if (even better) you've already written it,
+it's much more likely to be accepted.  If it's a large feature that might need
+multiple developers we're always happy to give you an experimental branch in
+our repository; see below.
+
+Branch policy
+=============
+
+In general, most development is confined to the trunk, and the trunk
+is kept stable. People should be able to run production sites against the
+trunk at any time.
+
+Thus, large architectural changes -- that is, changes too large to be
+encapsulated in a single patch, or changes that need multiple eyes on them --
+will have dedicated branches. See, for example, the `i18n branch`_. If you
+have a change of this nature that you'd like to work on, ask on `django-dev` for
+a branch to be created for you. We'll create a branch for pretty much any kind of
+experimenting you'd like to do.
+
+We will only branch entire copies of the Django tree, even if work is only
+happening on part of that tree. This makes it painless to switch to a branch.
+
+Developers working on a branch should periodically merge changes from the trunk
+into the branch. Please merge at least once a week. Every time you merge from
+the trunk, note the merge and revision numbers in the commit message.
+
+Once the branch is stable and ready to be merged into the trunk, alert 
+django-dev.
+
+After a branch has been merged, it should be considered "dead"; write access to
+it will be disabled, and old branches will be periodically "trimmed." To keep
+our SVN wrangling to a minimum, we won't be merging from a given branch into the
+trunk more than once.
+
+Using branches
+--------------
+
+To test a given branch, you can simply check out the entire branch. Or, if
+you've got a working directory you'd like to switch to use a branch, you can
+use::
+
+    svn switch http://code.djangoproject.com/svn/django/branches/<branch>/
+
+in the root of your Django sandbox (the directory that contains ``django``, 
+``docs``, and ``tests``).
+
+Official releases
+=================
+
+Django's release numbering works as follows:
+
+    * Versions are numbered in the form ``A.B`` or ``A.B.C``.  
+    
+    * ``A`` is the major version number, which is only incremented for major
+      changes to Django, and these changes are not necessarily
+      backwards-compatible. That is, code you wrote for Django 6.0 may break
+      when we release Django 7.0.
+
+    * ``B`` is the minor version number, which is incremented for large yet
+      backwards compatible changes.  Code written for Django 6.4 will continue
+      to work under Django 6.5.
+
+      A minor release may deprecate certain features in previous releases. If a
+      feature in version ``A.B`` is deprecated, it will continue to work in
+      version ``A.B+1``. In version ``A.B+2``, use of the feature will raise a
+      ``PendingDeprecationWarning`` but will continue to work.  Version
+      ``A.B+3`` will remove the feature entirely. However, a release of version
+      ``A+1`` will remove the feature entirely.
+
+    * ``C`` is the micro version number which, is incremented for bug and
+      security fixes.  A new micro-release will always be 100% 
+      backwards-compatible with the previous micro-release.
+      
+    * In some cases we'll make release candidate releases. These are of the
+      form ``A.BrcN``, which means the ``Nth`` candidate release of version
+      ``A.B``.
+
+In Subversion, each Django release will be tagged under `tags/releases`_.  If
+it's necessary to release a bug fix release or a security release that doesn't
+come from the trunk, we'll copy that tag to ``branches/releases`` to make the bug fix release.
+
+Deciding on features
+====================
+
+Once a feature's been requested and discussed, eventually we'll have a decision
+about whether to include the feature or drop it.
+
+Whenever possible, we strive for a rough consensus. To that end, we'll often
+have informal votes on django-dev about a feature. In these votes we follow the
+voting style invented by Apache and used on Python itself, where votes are given
+as +1, +0, -0, or -1.  Roughly translated, these votes mean:
+
+    * +1: "I love the idea and I'm strongly committed to it."
+    
+    * +0: "Sounds OK to me."
+    
+    * -0: "I'm not thrilled, but I won't stand in the way."
+    
+    * -1: "I strongly disagree and would be very unhappy to see the idea turn
+      into reality."
+      
+Although these votes on django-dev are informal, they'll be taken very
+seriously. After a suitable voting period, if an obvious consensus arises
+we'll follow the votes.
+
+However, consensus is not always possible.  Touch decisions will be discussed by
+all full committers and finally decided by the Benevolent Dictators for Life,
+Adrian and Jacob.
+
+Commit access
+=============
+
+Django has two types of committers:
+
+Full committers
+    These are people who have a long history of contributions to Django's
+    codebase, a solid track record of being polite and helpful on the mailing
+    lists, and a proven desire to dedicate serious time to Django's development.
+    
+    The bar is very high for full commit access. It will only be granted by
+    unanimous approval of all existing full committers, and the decision will err
+    on the side of rejection.
+    
+Partial committers
+    These are people who are "domain experts." They have direct check-in access
+    to the subsystems that fall under their jurisdiction, and they're given a
+    formal vote in questions that involve their subsystems. This type of access
+    is likely to be given to someone who contributes a large subframework to
+    Django and wants to continue to maintain it.
+
+    Like full committers, partial commit access is by unanimous approval of all
+    full committers (and any other partial committers in the same area).
+    However, the bar is set lower; proven expertise in the area in question is
+    likely to be sufficient.
+  
+To request commit access, please contact an existing committer privately. Public
+requests for commit access are potential flame-war starters, and will be ignored.
+      
+.. _community page: http://www.djangoproject.com/community/
+.. _ticket tracker: http://code.djangoproject.com/newticket
+.. _django-dev: http://groups.google.com/group/django-developers
+.. _FAQ: http://www.djangoproject.com/documentation/faq/
+.. _search the tracker: http://code.djangoproject.com/search
+.. _django-users: http://groups.google.com/group/django-users
+.. _`#django`: irc://irc.freenode.net/django
+.. _PEP 8: http://www.python.org/peps/pep-0008.html
+.. _i18n documentation: http://www.djangoproject.com/documentation/i18n/
+.. _i18n branch: http://code.djangoproject.com/browser/django/branches/i18n
+.. _`tags/releases`: http://code.djangoproject.com/browser/django/tags/releases
