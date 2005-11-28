@@ -360,6 +360,10 @@ def cycle(parser, token):
         raise TemplateSyntaxError("Invalid arguments to 'cycle': %s" % args)
 cycle = register.tag(cycle)
 
+def debug(parser, token):
+    return DebugNode()
+debug = register.tag(debug)
+
 #@register.tag(name="filter")
 def do_filter(parser, token):
     """
