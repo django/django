@@ -481,39 +481,46 @@ def startapp(app_name, directory):
 startapp.help_doc = "Creates a Django app directory structure for the given app name in the current directory."
 startapp.args = "[appname]"
 
-def createsuperuser():
+def createsuperuser(username=None, email=None, password=None):
     "Creates a superuser account."
     from django.core import validators
     from django.models.auth import users
     import getpass
     try:
         while 1:
-            username = raw_input('Username (only letters, digits and underscores): ')
+            if not username:
+                username = raw_input('Username (only letters, digits and underscores): ')
             if not username.isalnum():
                 sys.stderr.write("Error: That username is invalid.\n")
-                continue
+                username = None
             try:
                 users.get_object(username__exact=username)
             except users.UserDoesNotExist:
                 break
             else:
                 sys.stderr.write("Error: That username is already taken.\n")
+                username = None
         while 1:
-            email = raw_input('E-mail address: ')
+            if not email:
+                email = raw_input('E-mail address: ')
             try:
                 validators.isValidEmail(email, None)
             except validators.ValidationError:
                 sys.stderr.write("Error: That e-mail address is invalid.\n")
+                email = None
             else:
                 break
         while 1:
-            password = getpass.getpass()
-            password2 = getpass.getpass('Password (again): ')
-            if password != password2:
-                sys.stderr.write("Error: Your passwords didn't match.\n")
-                continue
+            if not password:
+                password = getpass.getpass()
+                password2 = getpass.getpass('Password (again): ')
+                if password != password2:
+                    sys.stderr.write("Error: Your passwords didn't match.\n")
+                    password = None
+                    continue
             if password.strip() == '':
                 sys.stderr.write("Error: Blank passwords aren't allowed.\n")
+                password = None
                 continue
             break
     except KeyboardInterrupt:
@@ -525,7 +532,7 @@ def createsuperuser():
     u.is_superuser = True
     u.save()
     print "User created successfully."
-createsuperuser.args = ''
+createsuperuser.args = '[username] [email] [password] (Either all or none)'
 
 def inspectdb(db_name):
     "Generator that introspects the tables in the given database name and returns a Django model, one line at a time."

@@ -80,7 +80,14 @@ def main():
         from django.utils import translation
         translation.activate('en-us')
 
-    if action in ('createsuperuser', 'init', 'validate'):
+    if action == 'createsuperuser':
+        try:
+            username, email, password = args[1], args[2], args[3]
+        except IndexError:
+            sys.stderr.write("Error: %r requires arguments of 'username email password' or no argument at all.\n")
+            sys.exit(1)
+        ACTION_MAPPING[action](username, email, password)
+    elif action in ('init', 'validate'):
         ACTION_MAPPING[action]()
     elif action == 'inspectdb':
         try:
