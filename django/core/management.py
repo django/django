@@ -263,6 +263,15 @@ def get_sql_all(mod):
 get_sql_all.help_doc = "Prints the CREATE TABLE and initial-data SQL statements for the given model module name(s)."
 get_sql_all.args = APP_ARGS
 
+def has_no_records(cursor):
+    "Returns True if the cursor, having executed a query, returned no records."
+    # This is necessary due to an inconsistency in the DB-API spec.
+    # cursor.rowcount can be -1 (undetermined), according to
+    # http://www.python.org/peps/pep-0249.html
+    if cursor.rowcount < 0:
+        return cursor.fetchone() is None
+    return cursor.rowcount < 1
+
 def database_check(mod):
     "Checks that everything is properly installed in the database for the given module."
     from django.core import db
@@ -272,7 +281,7 @@ def database_check(mod):
     # Check that the package exists in the database.
     cursor.execute("SELECT 1 FROM %s WHERE %s = %%s" % \
         (db.db.quote_name('packages'), db.db.quote_name('label')), [app_label])
-    if cursor.rowcount < 1:
+    if has_no_records(cursor):
 #         sys.stderr.write("The '%s' package isn't installed.\n" % app_label)
         print _get_packages_insert(app_label)
 
@@ -288,13 +297,13 @@ def database_check(mod):
             cursor.execute("SELECT 1 FROM %s WHERE %s = %%s AND %s = %%s" % \
                 (db.db.quote_name('auth_permissions'), db.db.quote_name('package'),
                 db.db.quote_name('codename')), (app_label, codename))
-            if cursor.rowcount < 1:
+            if has_no_records(cursor):
 #                 sys.stderr.write("The '%s.%s' permission doesn't exist.\n" % (app_label, codename))
                 print _get_permission_insert(name, codename, opts)
         cursor.execute("SELECT 1 FROM %s WHERE %s = %%s AND %s = %%s" % \
             (db.db.quote_name('content_types'), db.db.quote_name('package'),
             db.db.quote_name('python_module_name')), (app_label, opts.module_name))
-        if cursor.rowcount < 1:
+        if has_no_records(cursor):
 #             sys.stderr.write("The '%s.%s' content type doesn't exist.\n" % (app_label, opts.module_name))
             print _get_contenttype_insert(opts)
 
