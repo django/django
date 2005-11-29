@@ -35,6 +35,7 @@ get_date_trunc_sql = dbmod.get_date_trunc_sql
 get_limit_offset_sql = dbmod.get_limit_offset_sql
 get_random_function_sql = dbmod.get_random_function_sql
 get_table_list = dbmod.get_table_list
+get_table_description = dbmod.get_table_description
 get_relations = dbmod.get_relations
 OPERATOR_MAPPING = dbmod.OPERATOR_MAPPING
 DATA_TYPES = dbmod.DATA_TYPES

@@ -124,7 +124,12 @@ def _sqlite_date_trunc(lookup_type, dt):
         return "%i-%02i-%02i 00:00:00" % (dt.year, dt.month, dt.day)
 
 def get_table_list(cursor):
-    raise NotImplementedError
+    cursor.execute("SELECT name FROM sqlite_master WHERE type='table' ORDER BY name")
+    return [row[0] for row in cursor.fetchall()]
+
+def get_table_description(cursor, table_name):
+    cursor.execute("PRAGMA table_info(%s)" % table_name)
+    return [(row[1], row[2], None, None) for row in cursor.fetchall()]
 
 def get_relations(cursor, table_name):
     raise NotImplementedError

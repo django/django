@@ -571,8 +571,7 @@ def inspectdb(db_name):
             relations = db.get_relations(cursor, table_name)
         except NotImplementedError:
             relations = {}
-        cursor.execute("SELECT * FROM %s LIMIT 1" % table_name)
-        for i, row in enumerate(cursor.description):
+        for i, row in enumerate(db.get_table_description(cursor, table_name)):
             column_name = row[0]
             if relations.has_key(i):
                 rel = relations[i]
@@ -586,12 +585,16 @@ def inspectdb(db_name):
                     field_type = db.DATA_TYPES_REVERSE[row[1]]
                 except KeyError:
                     field_type = 'TextField'
-                    yield "    # The model-creator script used TextField by default, because"
-                    yield "    # it couldn't recognize your field type."
+                    field_type_was_guessed = True
+                else:
+                    field_type_was_guessed = False
                 field_desc = '%s = meta.%s(' % (column_name, field_type)
                 if field_type == 'CharField':
                     field_desc += 'maxlength=%s' % (row[3])
-            yield '    %s)' % field_desc
+                field_desc += ')'
+                if field_type_was_guessed:
+                    field_desc += ' # This is a guess!'
+            yield '    %s' % field_desc
         yield '    class META:'
         yield '        db_table = %r' % table_name
         yield ''
