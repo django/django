@@ -247,7 +247,7 @@ def admin_field_line(context, argument_val):
     return {
         'add': context['add'],
         'change': context['change'],
-        'bound_fields':  bound_fields,
+        'bound_fields': bound_fields,
         'class_names': " ".join(class_names),
     }
 admin_field_line = register.inclusion_tag('admin/field_line', takes_context=True)(admin_field_line)
