@@ -665,6 +665,8 @@ def resolve_variable(path, context):
                             except SilentVariableFailure:
                                 current = ''
                             except TypeError: # arguments *were* required
+                                # GOTCHA: This will also catch any TypeError
+                                # raised in the function itself.
                                 current = '' # invalid method call
                 except (TypeError, AttributeError):
                     try: # list-index lookup
