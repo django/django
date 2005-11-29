@@ -234,8 +234,8 @@ Django's release numbering works as follows:
       feature in version ``A.B`` is deprecated, it will continue to work in
       version ``A.B+1``. In version ``A.B+2``, use of the feature will raise a
       ``PendingDeprecationWarning`` but will continue to work.  Version
-      ``A.B+3`` will remove the feature entirely. However, a release of version
-      ``A+1`` will remove the feature entirely.
+      ``A.B+3`` will remove the feature entirely. Major point releases will
+      always remove deprecated features immediately.
 
     * ``C`` is the micro version number which, is incremented for bug and
       security fixes.  A new micro-release will always be 100%
