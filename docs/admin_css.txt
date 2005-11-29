@@ -49,7 +49,7 @@ colM superwide
     waste them.
 flex
     This is for liquid-width pages, such as changelists. Currently only works
-    with single-colum pages (does not combine with ``.colMS`` or ``.colSM``).
+    with single-column pages (does not combine with ``.colMS`` or ``.colSM``).
     Form pages should never use ``.flex``.
 
 For instance, you could stick this in a template to make a superwide page::
@@ -143,7 +143,7 @@ Example from a changelist page::
     <ul class="object-tools">
 	  <li><a href="/stories/add/" class="addlink">Add redirect</a></li>
 	 </ul>
-	
+
 .. image:: http://media.djangoproject.com/img/doc/admincss/objecttools_01.gif
    :alt: Object tools on a changelist page
 
@@ -192,4 +192,4 @@ Labels
 Form labels should always precede the field, except in the case
 of checkboxes and radio buttons, where the ``input`` should come first. Any
 explanation or help text should follow the ``label`` in a ``p`` with class
-``.help``. 
+``.help``.
