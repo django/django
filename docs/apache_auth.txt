@@ -31,7 +31,7 @@ with the standard ``Auth*`` and ``Require`` directives::
 
 By default, the authentication handler will limit access to the ``/example/``
 location to users marked as staff members.  You can use a set of
-``PythonOption`` directives to modify this behavior::
+``PythonOption`` directives to modify this behavior:
 
     ================================  =========================================
     ``PythonOption``                  Explanation
