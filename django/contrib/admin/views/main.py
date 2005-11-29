@@ -276,10 +276,9 @@ def get_javascript_imports(opts,auto_populated_fields, ordered_objects, field_se
                 break
     return js
 
-
 class AdminBoundField(BoundField):
     def __init__(self, field, field_mapping, original):
-        super(AdminBoundField, self).__init__(field,field_mapping,original)
+        super(AdminBoundField, self).__init__(field, field_mapping, original)
 
         self.element_id = self.form_fields[0].get_id()
         self.has_label_first = not isinstance(self.field, meta.BooleanField)
@@ -291,7 +290,7 @@ class AdminBoundField(BoundField):
         self.first = False
 
         classes = []
-        if(self.raw_id_admin):
+        if self.raw_id_admin:
             classes.append('nowrap')
         if max([bool(f.errors()) for f in self.form_fields]):
             classes.append('error')
@@ -305,15 +304,15 @@ class AdminBoundField(BoundField):
         return func(self.original)
 
     def _fill_existing_display(self):
-        if self._display_filled:
+        if getattr(self, '_display_filled', False):
             return
-        #HACK
+        # HACK
         if isinstance(self.field.rel, meta.ManyToOne):
              func_name = 'get_%s' % self.field.name
              self._display = self._fetch_existing_display(func_name)
         elif isinstance(self.field.rel, meta.ManyToMany):
-            func_name = 'get_%s_list' % self.field.name
-            self._display =  ",".join(self._fetch_existing_display(func_name))
+            func_name = 'get_%s_list' % self.field.rel.singular
+            self._display =  ", ".join([str(obj) for obj in self._fetch_existing_display(func_name)])
         self._display_filled = True
 
     def existing_display(self):
