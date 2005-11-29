@@ -1702,7 +1702,11 @@ def manipulator_save(opts, klass, add, change, self, new_data):
     for f in opts.many_to_many:
         if self.follow.get(f.name, None):
             if not f.rel.edit_inline:
-                was_changed = getattr(new_object, 'set_%s' % f.name)(new_data.getlist(f.name))
+                if f.rel.raw_id_admin:
+                    new_vals = new_data.get(f.name, ())
+                else:
+                    new_vals = new_data.getlist(f.name)
+                was_changed = getattr(new_object, 'set_%s' % f.name)(new_vals)
                 if change and was_changed:
                     self.fields_changed.append(f.verbose_name)
 

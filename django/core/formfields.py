@@ -887,8 +887,8 @@ class CommaSeparatedIntegerField(TextField):
 
 class RawIdAdminField(CommaSeparatedIntegerField):
     def html2python(data):
-        return data.split(',');
-    html2python = classmethod(html2python)
+        return data.split(',')
+    html2python = staticmethod(html2python)
 
 class XMLLargeTextField(LargeTextField):
     """
