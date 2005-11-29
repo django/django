@@ -1,0 +1,62 @@
+=========================================================
+Authenticating against Django's user database from Apache
+=========================================================
+
+Since keeping multiple authentication databases in sync is a common problem when
+dealing with Apache, you can configuring Apache to authenticate against Django's
+`authentication system`_ directly.  For example, you could:
+
+    * Serve media files directly from Apache only to authenticated users.
+    
+    * Authenticate access to a Subversion_ repository against Django users with
+      a certain permission.
+      
+    * Allow certain users to connect to a WebDAV share created with mod_dav_.
+        
+Configuring Apache
+==================
+
+To check against Django's authorization database from a Apache configuration
+file, you'll need to use mod_python's ``PythonAuthenHandler`` directive along
+with the standard ``Auth*`` and ``Require`` directives::
+
+    <Location /example/>
+        AuthType basic
+        AuthName "example.com"
+        Require valid-user
+        
+        SetEnv DJANGO_SETTINGS_MODULE mysite.settings
+        PythonAuthenHandler django.core.handlers.modpython
+    </Location>
+
+By default, the authentication handler will limit access to the ``/example/``
+location to users marked as staff members.  You can use a set of
+``PythonOption`` directives to modify this behavior::
+
+    ================================  =========================================
+    ``PythonOption``                  Explanation
+    ================================  =========================================
+    ``DjangoRequireStaffStatus``      If set to ``on`` only "staff" users (i.e.
+                                      those with the ``is_staff`` flag set) 
+                                      will be allowed.
+                                      
+                                      Defaults to ``on``.
+
+    ``DjangoRequireSuperuserStatus``  If set to ``on`` only superusers (i.e.
+                                      those with the ``is_superuser`` flag set)
+                                      will be allowed.
+                                      
+                                      Defaults to ``off``.
+    
+    ``DjangoPermissionName``          The name of a permission to require for
+                                      access.  See `custom permissions`_ for
+                                      more information.
+                                      
+                                      By default no specific permission will be
+                                      required.
+    ================================  =========================================
+    
+.. _authentication system: http://www.djangoproject.com/documentation/authentication/
+.. _Subversion: http://subversion.tigris.org/
+.. _mod_dav: http://httpd.apache.org/docs/2.0/mod/mod_dav.html
+.. _custom permissions: http://www.djangoproject.com/documentation/authentication/#custom-permissions
