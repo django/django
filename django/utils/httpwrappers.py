@@ -3,6 +3,12 @@ from pprint import pformat
 from urllib import urlencode
 from django.utils.datastructures import MultiValueDict
 
+try:
+    # The mod_python version is more efficient, so try importing it first.
+    from mod_python.util import parse_qsl
+except ImportError:
+    from cgi import parse_qsl
+
 class HttpRequest(object): # needs to be new-style class because subclasses define "property"s
     "A basic HTTP request"
     def __init__(self):
@@ -61,10 +67,6 @@ class QueryDict(MultiValueDict):
     """A specialized MultiValueDict that takes a query string when initialized.
     This is immutable unless you create a copy of it."""
     def __init__(self, query_string):
-        try:
-            from mod_python.util import parse_qsl
-        except ImportError:
-            from cgi import parse_qsl
         if not query_string:
             self.data = {}
             self._keys = []
