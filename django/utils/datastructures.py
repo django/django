@@ -81,6 +81,9 @@ class MultiValueDict:
     def __len__(self):
         return len(self.data)
 
+    def __contains__(self, key):
+        return self.data.has_key(key)
+
     def get(self, key, default):
         "Returns the default value if the requested data doesn't exist"
         try:

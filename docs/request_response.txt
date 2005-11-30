@@ -31,11 +31,11 @@ All attributes except ``session`` should be considered read-only.
 
 ``GET``
     A dictionary-like object containing all given HTTP GET parameters. See the
-    ``MultiValueDict`` documentation below.
+    ``QueryDict`` documentation below.
 
 ``POST``
     A dictionary-like object containing all given HTTP POST parameters. See the
-    ``MultiValueDict`` documentation below.
+    ``QueryDict`` documentation below.
 
 ``REQUEST``
     For convenience, a dictionary-like object that searches ``POST`` first,
@@ -149,6 +149,10 @@ directly.
 
     * ``__setitem__(key, value)`` -- Sets the given key to ``[value]``
       (a Python list whose single element is ``value``).
+
+    * ``__contains__(key)`` -- **New in Django development version.*** Returns
+      ``True`` if the given key exists. This lets you do, e.g.,
+      ``if "foo" in request.GET``.
 
     * ``__len__()``
 
