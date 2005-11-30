@@ -105,7 +105,7 @@ class ChangeList(object):
             self.page_num = 0
         self.show_all = request.GET.has_key(ALL_VAR)
         self.is_popup = request.GET.has_key(IS_POPUP_VAR)
-        self.params = dict([(k, v) for k, v in request.GET.items()])
+        self.params = dict(request.GET.items())
         if self.params.has_key(PAGE_VAR):
             del self.params[PAGE_VAR]
 
