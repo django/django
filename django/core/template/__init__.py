@@ -788,7 +788,7 @@ class Library(object):
         self.filters = {}
         self.tags = {}
 
-    def tag(self, name = None, compile_function = None):
+    def tag(self, name=None, compile_function=None):
         if name == None and compile_function == None:
             # @register.tag()
             return self.tag_function
@@ -812,7 +812,7 @@ class Library(object):
         self.tags[func.__name__] = func
         return func
 
-    def filter(self, name = None, filter_func = None):
+    def filter(self, name=None, filter_func=None):
         if name == None and filter_func == None:
             # @register.filter()
             return self.filter_function
@@ -828,6 +828,7 @@ class Library(object):
         elif name != None and filter_func != None:
             # register.filter('somename', somefunc)
             self.filters[name] = filter_func
+            return filter_func
         else:
             raise InvalidTemplateLibrary, "Unsupported arguments to Library.filter: (%r, %r, %r)", (name, compile_function, has_arg)
 
