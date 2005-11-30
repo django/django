@@ -219,6 +219,42 @@ If you pass an invalid keyword argument, the function will raise ``TypeError``.
 
 .. _`Keyword Arguments`: http://docs.python.org/tut/node6.html#SECTION006720000000000000000
 
+OR lookups
+----------
+
+**New in Django development version.**
+
+By default, multiple lookups are "AND"ed together. If you'd like to use ``OR``
+statements in your queries, use the ``complex`` lookup type.
+
+``complex`` takes an expression of clauses, each of which is an instance of
+``django.core.meta.Q``. ``Q`` takes an arbitrary number of keyword arguments in
+the standard Django lookup format. And you can use Python's "and" (``&``) and
+"or" (``|``) operators to combine ``Q`` instances. For example::
+
+    from django.core.meta import Q
+    polls.get_object(complex=(Q(question__startswith='Who') | Q(question__startswith='What')))
+
+The ``|`` symbol signifies an "OR", so this (roughly) translates into::
+
+    SELECT * FROM polls
+    WHERE question LIKE 'Who%' OR question LIKE 'What%';
+
+You can use ``&`` and ``|`` operators together, and use parenthetical grouping.
+Example::
+
+    polls.get_object(complex=(Q(question__startswith='Who') & (Q(pub_date__exact=date(2005, 5, 2)) | pub_date__exact=date(2005, 5, 6)))
+
+This roughly translates into::
+
+    SELECT * FROM polls
+    WHERE question LIKE 'Who%'
+        AND (pub_date = '2005-05-02' OR pub_date = '2005-05-06');
+
+See the `OR lookups examples page`_ for more examples.
+
+.. _OR lookups examples page: http://www.djangoproject.com/documentation/models/or_lookups/
+
 Ordering
 ========
 

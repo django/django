@@ -282,6 +282,81 @@ class RelatedObject(object):
             rel_obj_name = '%s_%s' % (self.opts.app_label, rel_obj_name)
         return rel_obj_name
 
+class QBase:
+    "Base class for QAnd and QOr"
+    def __init__(self, *args):
+        self.args = args
+
+    def __repr__(self):
+        return '(%s)' % self.operator.join([repr(el) for el in self.args])
+
+    def get_sql(self, opts, table_count):
+        tables, join_where, where, params = [], [], [], []
+        for val in self.args:
+            tables2, join_where2, where2, params2, table_count = val.get_sql(opts, table_count)
+            tables.extend(tables2)
+            join_where.extend(join_where2)
+            where.extend(where2)
+            params.extend(params2)
+        return tables, join_where, ['(%s)' % self.operator.join(where)], params, table_count
+
+class QAnd(QBase):
+    "Encapsulates a combined query that uses 'AND'."
+    operator = ' AND '
+    def __or__(self, other):
+        if isinstance(other, (QAnd, QOr, Q)):
+            return QOr(self, other)
+        else:
+            raise TypeError, other
+
+    def __and__(self, other):
+        if isinstance(other, QAnd):
+            return QAnd(*(self.args+other.args))
+        elif isinstance(other, (Q, QOr)):
+            return QAnd(*(self.args+(other,)))
+        else:
+            raise TypeError, other
+
+class QOr(QBase):
+    "Encapsulates a combined query that uses 'OR'."
+    operator = ' OR '
+    def __and__(self, other):
+        if isinstance(other, (QAnd, QOr, Q)):
+            return QAnd(self, other)
+        else:
+            raise TypeError, other
+
+    def __or__(self, other):
+        if isinstance(other, QOr):
+            return QOr(*(self.args+other.args))
+        elif isinstance(other, (Q, QAnd)):
+            return QOr(*(self.args+(other,)))
+        else:
+            raise TypeError, other
+
+class Q:
+    "Encapsulates queries for the 'complex' parameter to Django API functions."
+    def __init__(self, **kwargs):
+        self.kwargs = kwargs
+
+    def __repr__(self):
+        return 'Q%r' % self.kwargs
+
+    def __and__(self, other):
+        if isinstance(other, (Q, QAnd, QOr)):
+            return QAnd(self, other)
+        else:
+            raise TypeError, other
+
+    def __or__(self, other):
+        if isinstance(other, (Q, QAnd, QOr)):
+            return QOr(self, other)
+        else:
+            raise TypeError, other
+
+    def get_sql(self, opts, table_count):
+        return _parse_lookup(self.kwargs.items(), opts, table_count)
+
 class Options:
     def __init__(self, module_name='', verbose_name='', verbose_name_plural='', db_table='',
         fields=None, ordering=None, unique_together=None, admin=None, has_related_links=False,
@@ -1389,6 +1464,13 @@ def _parse_lookup(kwarg_items, opts, table_count=0):
         if kwarg in ('order_by', 'limit', 'offset', 'select_related', 'distinct', 'select', 'tables', 'where', 'params'):
             continue
         if kwarg_value is None:
+            continue
+        if kwarg == 'complex':
+            tables2, join_where2, where2, params2, table_count = kwarg_value.get_sql(opts, table_count)
+            tables.extend(tables2)
+            join_where.extend(join_where2)
+            where.extend(where2)
+            params.extend(params2)
             continue
         if kwarg == '_or':
             for val in kwarg_value:

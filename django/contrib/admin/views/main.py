@@ -216,18 +216,16 @@ class ChangeList(object):
                         break
         lookup_params['order_by'] = ((order_type == 'desc' and '-' or '') + lookup_order_field,)
         if lookup_opts.admin.search_fields and query:
-            or_queries = []
+            complex_queries = []
             for bit in query.split():
-                or_query = []
+                or_queries = []
                 for field_name in lookup_opts.admin.search_fields:
-                    or_query.append(('%s__icontains' % field_name, bit))
-                or_queries.append(or_query)
-            lookup_params['_or'] = or_queries
-
+                    or_queries.append(meta.Q(**{'%s__icontains' % field_name: bit}))
+                complex_queries.append(reduce(operator.or_, or_queries))
+            lookup_params['complex'] = reduce(operator.and_, complex_queries)
         if opts.one_to_one_field:
             lookup_params.update(opts.one_to_one_field.rel.limit_choices_to)
         self.lookup_params = lookup_params
-
 
 def change_list(request, app_label, module_name):
     try:
