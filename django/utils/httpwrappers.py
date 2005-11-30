@@ -67,63 +67,62 @@ class QueryDict(MultiValueDict):
     """A specialized MultiValueDict that takes a query string when initialized.
     This is immutable unless you create a copy of it."""
     def __init__(self, query_string):
-        if not query_string:
-            self.data = {}
-            self._keys = []
-        else:
-            self.data = {}
-            self._keys = []
-            for name, value in parse_qsl(query_string, True): # keep_blank_values=True
-                if name in self.data:
-                    self.data[name].append(value)
-                else:
-                    self.data[name] = [value]
-                if name not in self._keys:
-                    self._keys.append(name)
+        MultiValueDict.__init__(self)
+        self._mutable = True
+        for key, value in parse_qsl(query_string, True): # keep_blank_values=True
+            self.appendlist(key, value)
         self._mutable = False
 
-    def __setitem__(self, key, value):
+    def _assert_mutable(self):
         if not self._mutable:
             raise AttributeError, "This QueryDict instance is immutable"
-        else:
-            self.data[key] = [value]
-            if not key in self._keys:
-                self._keys.append(key)
+
+    def _setitem_if_mutable(self, key, value):
+        self._assert_mutable()
+        MultiValueDict.__setitem__(self, key, value)
+    __setitem__ = _setitem_if_mutable
 
     def setlist(self, key, list_):
-        if not self._mutable:
-            raise AttributeError, "This QueryDict instance is immutable"
-        else:
-            self.data[key] = list_
-            if not key in self._keys:
-                self._keys.append(key)
+        self._assert_mutable()
+        MultiValueDict.setlist(self, key, list_)
+
+    def appendlist(self, key, value):
+        self._assert_mutable()
+        MultiValueDict.appendlist(self, key, value)
+
+    def update(self, other_dict):
+        self._assert_mutable()
+        MultiValueDict.update(self, other_dict)
+
+    def pop(self, key):
+        self._assert_mutable()
+        return MultiValueDict.pop(self, key)
+
+    def popitem(self):
+        self._assert_mutable()
+        return MultiValueDict.popitem(self)
+
+    def clear(self):
+        self._assert_mutable()
+        MultiValueDict.clear(self)
+
+    def setdefault(self, *args):
+        self._assert_mutable()
+        return MultiValueDict.setdefault(self, *args)
 
     def copy(self):
-        "Returns a mutable copy of this object"
-        cp = MultiValueDict.copy(self)
+        "Returns a mutable copy of this object."
+        import copy
+        # Our custom __setitem__ must be disabled for copying machinery.
+        QueryDict.__setitem__ = dict.__setitem__
+        cp = copy.deepcopy(self)
+        QueryDict.__setitem__ = QueryDict._setitem_if_mutable
         cp._mutable = True
         return cp
 
-    def assert_synchronized(self):
-        assert(len(self._keys) == len(self.data.keys())), \
-            "QueryDict data structure is out of sync: %s %s" % (str(self._keys), str(self.data))
-
-    def items(self):
-        "Respect order preserved by self._keys"
-        self.assert_synchronized()
-        items = []
-        for key in self._keys:
-            if key in self.data:
-                items.append((key, self.data[key][0]))
-        return items
-
-    def keys(self):
-        self.assert_synchronized()
-        return self._keys
-
     def urlencode(self):
         output = []
-        for k, list_ in self.data.items():
+        for k, list_ in self.lists():
             output.extend([urlencode({k: v}) for v in list_])
         return '&'.join(output)
 

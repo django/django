@@ -1678,7 +1678,6 @@ def manipulator_save(opts, klass, add, change, self, new_data):
                 param = f.get_default()
         params[f.attname] = param
 
-
     if change:
         params[opts.pk.attname] = self.obj_key
 
@@ -1710,7 +1709,7 @@ def manipulator_save(opts, klass, add, change, self, new_data):
                 if change and was_changed:
                     self.fields_changed.append(f.verbose_name)
 
-    expanded_data = DotExpandedDict(new_data.data)
+    expanded_data = DotExpandedDict(dict(new_data))
     # Save many-to-one objects. Example: Add the Choice objects for a Poll.
     for related in opts.get_all_related_objects():
         # Create obj_list, which is a DotExpandedDict such as this:
@@ -1723,7 +1722,6 @@ def manipulator_save(opts, klass, add, change, self, new_data):
             obj_list = expanded_data[related.var_name].items()
             obj_list.sort(lambda x, y: cmp(int(x[0]), int(y[0])))
             params = {}
-
 
             # For each related item...
             for _, rel_new_data in obj_list:
@@ -1769,7 +1767,6 @@ def manipulator_save(opts, klass, add, change, self, new_data):
                     if param != None:
                        params[f.attname] = param
 
-
                     # Related links are a special case, because we have to
                     # manually set the "content_type_id" and "object_id" fields.
                     if opts.has_related_links and related.opts.module_name == 'relatedlinks':
@@ -1779,8 +1776,6 @@ def manipulator_save(opts, klass, add, change, self, new_data):
 
                 # Create the related item.
                 new_rel_obj = related.opts.get_model_module().Klass(**params)
-
-
 
                 # If all the core fields were provided (non-empty), save the item.
                 if all_cores_given:
@@ -1813,7 +1808,6 @@ def manipulator_save(opts, klass, add, change, self, new_data):
                 if change and all_cores_blank and old_rel_obj:
                     new_rel_obj.delete()
                     self.fields_deleted.append('%s "%s"' % (related.opts.verbose_name, old_rel_obj))
-
 
     # Save the order, if applicable.
     if change and opts.get_ordered_objects():

@@ -140,51 +140,83 @@ multiple values for the same key.
 That means you can't change attributes of ``request.POST`` and ``request.GET``
 directly.
 
-``QueryDict`` implements the following standard dictionary methods:
-
-    * ``__repr__()``
+``QueryDict`` implements the all standard dictionary methods, because it's a
+subclass of dictionary. Exceptions are outlined here:
 
     * ``__getitem__(key)`` -- Returns the value for the given key. If the key
       has more than one value, ``__getitem__()`` returns the last value.
 
     * ``__setitem__(key, value)`` -- Sets the given key to ``[value]``
-      (a Python list whose single element is ``value``).
+      (a Python list whose single element is ``value``). Note that this, as
+      other dictionary functions that have side effects, can only be called on
+      an immutable ``QueryDict`` (one that was created via ``copy()``).
 
-    * ``__contains__(key)`` -- **New in Django development version.*** Returns
-      ``True`` if the given key exists. This lets you do, e.g.,
+    * ``__contains__(key)`` -- **New in Django development version.** Returns
+      ``True`` if the given key is set. This lets you do, e.g.,
       ``if "foo" in request.GET``.
-
-    * ``__len__()``
 
     * ``get(key, default)`` -- Uses the same logic as ``__getitem__()`` above,
       with a hook for returning a default value if the key doesn't exist.
 
     * ``has_key(key)``
 
+    * ``setdefault(key, default)`` -- Just like the standard dictionary
+      ``setdefault()`` method, except it uses ``__setitem__`` internally.
+
+    * ``update(other_dict)`` -- Takes either a ``QueryDict`` or standard
+      dictionary. Just like the standard dictionary ``update()`` method, except
+      it *appends* to the current dictionary items rather than replacing them.
+      For example::
+
+          >>> q = QueryDict('a=1')
+          >>> q = q.copy() # to make it mutable
+          >>> q.update({'a': '2'})
+          >>> q.getlist('a')
+          ['1', '2']
+          >>> q['a'] # returns the last
+          ['2']
+
     * ``items()`` -- Just like the standard dictionary ``items()`` method,
-      except this retains the order for values of duplicate keys, if any. For
-      example, if the original query string was ``"a=1&b=2&b=3"``, ``items()``
-      will return ``[("a", ["1"]), ("b", ["2", "3"])]``, where the order of
-      ``["2", "3"]`` is guaranteed, but the order of ``a`` vs. ``b`` isn't.
+      except this uses the same last-value logic as ``__getitem()__``. For
+      example::
 
-    * ``keys()``
+           >>> q = QueryDict('a=1&a=2&a=3')
+           >>> q.items()
+           [('a', '3')]
 
-    * ``update(other_dict)``
+    * ``values()`` -- Just like the standard dictionary ``values()`` method,
+      except this uses the same last-value logic as ``__getitem()__``. For
+      example::
 
-In addition, it has the following methods:
+           >>> q = QueryDict('a=1&a=2&a=3')
+           >>> q.values()
+           ['3']
+
+In addition, ``QueryDict`` has the following methods:
 
     * ``copy()`` -- Returns a copy of the object, using ``copy.deepcopy()``
       from the Python standard library. The copy will be mutable -- that is,
       you can change its values.
 
     * ``getlist(key)`` -- Returns the data with the requested key, as a Python
-      list. Returns an empty list if the key doesn't exist.
+      list. Returns an empty list if the key doesn't exist. It's guaranteed to
+      return a list of some sort.
 
     * ``setlist(key, list_)`` -- Sets the given key to ``list_`` (unlike
       ``__setitem__()``).
 
     * ``appendlist(key, item)`` -- Appends an item to the internal list
       associated with key.
+
+    * ``setlistdefault(key, default_list)`` -- Just like ``setdefault``, except
+      it takes a list of values instead of a single value.
+
+    * ``lists()`` -- Like ``items()``, except it includes all values, as a list,
+      for each member of the dictionary. For example::
+
+           >>> q = QueryDict('a=1&a=2&a=3')
+           >>> q.lists()
+           [('a', ['1', '2', '3'])]
 
     * ``urlencode()`` -- Returns a string of the data in query-string format.
       Example: ``"a=2&b=3&b=5"``.

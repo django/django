@@ -57,7 +57,7 @@ class ChangeList(object):
         self.get_modules_and_options(app_label, module_name, request)
         self.get_search_parameters(request)
         self.get_ordering()
-        self.query = request.GET.get(SEARCH_VAR,'')
+        self.query = request.GET.get(SEARCH_VAR, '')
         self.get_lookup_params()
         self.get_results(request)
         self.title = (self.is_popup
@@ -100,13 +100,12 @@ class ChangeList(object):
     def get_search_parameters(self, request):
         # Get search parameters from the query string.
         try:
-            self.req_get = request.GET
             self.page_num = int(request.GET.get(PAGE_VAR, 0))
         except ValueError:
             self.page_num = 0
         self.show_all = request.GET.has_key(ALL_VAR)
         self.is_popup = request.GET.has_key(IS_POPUP_VAR)
-        self.params = dict(request.GET.copy())
+        self.params = dict((k, v) for k, v in request.GET.items())
         if self.params.has_key(PAGE_VAR):
             del self.params[PAGE_VAR]
 
