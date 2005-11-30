@@ -1,7 +1,7 @@
 from Cookie import SimpleCookie
 from pprint import pformat
 from urllib import urlencode
-from django.utils import datastructures
+from django.utils.datastructures import MultiValueDict
 
 class HttpRequest(object): # needs to be new-style class because subclasses define "property"s
     "A basic HTTP request"
@@ -33,8 +33,8 @@ def parse_file_upload(header_dict, post_data):
     raw_message = '\r\n'.join(['%s:%s' % pair for pair in header_dict.items()])
     raw_message += '\r\n\r\n' + post_data
     msg = email.message_from_string(raw_message)
-    POST = datastructures.MultiValueDict()
-    FILES = datastructures.MultiValueDict()
+    POST = MultiValueDict()
+    FILES = MultiValueDict()
     for submessage in msg.get_payload():
         if isinstance(submessage, email.Message.Message):
             name_dict = parse_header(submessage['Content-Disposition'])[1]
@@ -57,7 +57,7 @@ def parse_file_upload(header_dict, post_data):
                 POST.appendlist(name_dict['name'], submessage.get_payload())
     return POST, FILES
 
-class QueryDict(datastructures.MultiValueDict):
+class QueryDict(MultiValueDict):
     """A specialized MultiValueDict that takes a query string when initialized.
     This is immutable unless you create a copy of it."""
     def __init__(self, query_string):
@@ -98,7 +98,7 @@ class QueryDict(datastructures.MultiValueDict):
 
     def copy(self):
         "Returns a mutable copy of this object"
-        cp = datastructures.MultiValueDict.copy(self)
+        cp = MultiValueDict.copy(self)
         cp._mutable = True
         return cp
 
