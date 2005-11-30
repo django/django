@@ -135,9 +135,21 @@ arguments:
 The date-based generic functions are:
 
 ``archive_index``
-    A top-level index page showing the "latest" objects. Has an optional
-    argument, ``num_latest``, which is the number of items to display on the
-    page (defaults to 15).
+    A top-level index page showing the "latest" objects.
+
+    Takes the following optional arguments:
+
+        =======================  =================================================
+        Argument                 Description
+        =======================  =================================================
+        ``num_latest``           The number of items to display on the page.
+                                 Defaults to 15.
+
+        ``allow_empty``          **New in Django development version.**
+                                 If ``False`` and there are no objects to display,
+                                 the view will raise a 404 instead of displaying
+                                 an empty index page. ``False`` is default.
+        =======================  =================================================
 
     Uses the template ``app_label/module_name_archive`` by default.
 

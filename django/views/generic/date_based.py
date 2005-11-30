@@ -8,7 +8,7 @@ import datetime, time
 
 def archive_index(request, app_label, module_name, date_field, num_latest=15,
                   template_name=None, template_loader=template_loader,
-                  extra_lookup_kwargs={}, extra_context={}):
+                  extra_lookup_kwargs={}, extra_context={}, allow_empty=False):
     """
     Generic top-level archive of date-based objects.
 
@@ -23,10 +23,10 @@ def archive_index(request, app_label, module_name, date_field, num_latest=15,
     lookup_kwargs = {'%s__lte' % date_field: datetime.datetime.now()}
     lookup_kwargs.update(extra_lookup_kwargs)
     date_list = getattr(mod, "get_%s_list" % date_field)('year', **lookup_kwargs)[::-1]
-    if not date_list:
+    if not date_list and not allow_empty:
         raise Http404("No %s.%s available" % (app_label, module_name))
 
-    if num_latest:
+    if date_list and num_latest:
         lookup_kwargs.update({
             'limit': num_latest,
             'order_by': ('-' + date_field,),
@@ -140,7 +140,7 @@ def archive_month(request, year, month, app_label, module_name, date_field,
 
 def archive_day(request, year, month, day, app_label, module_name, date_field,
                 month_format='%b', day_format='%d', template_name=None,
-                template_loader=template_loader, extra_lookup_kwargs={}, 
+                template_loader=template_loader, extra_lookup_kwargs={},
                 extra_context={}, allow_empty=False):
     """
     Generic daily archive view.
@@ -204,7 +204,7 @@ def archive_today(request, **kwargs):
 def object_detail(request, year, month, day, app_label, module_name, date_field,
                   month_format='%b', day_format='%d', object_id=None, slug=None,
                   slug_field=None, template_name=None, template_name_field=None,
-                  template_loader=template_loader, extra_lookup_kwargs={}, 
+                  template_loader=template_loader, extra_lookup_kwargs={},
                   extra_context={}):
     """
     Generic detail view from year/month/day/slug or year/month/day/id structure.
