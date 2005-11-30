@@ -69,7 +69,7 @@ class QueryDict(MultiValueDict):
     def __init__(self, query_string):
         MultiValueDict.__init__(self)
         self._mutable = True
-        for key, value in parse_qsl(query_string, True): # keep_blank_values=True
+        for key, value in parse_qsl((query_string or ''), True): # keep_blank_values=True
             self.appendlist(key, value)
         self._mutable = False
 
