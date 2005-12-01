@@ -1009,8 +1009,12 @@ def method_save(opts, self):
             record_exists = False
     if not pk_set or not record_exists:
         field_names = [db.db.quote_name(f.column) for f in opts.fields if not isinstance(f, AutoField)]
-        placeholders = ['%s'] * len(field_names)
         db_values = [f.get_db_prep_save(f.pre_save(getattr(self, f.attname), True)) for f in opts.fields if not isinstance(f, AutoField)]
+        # If the PK has been manually set we must respect that
+        if pk_set:
+            field_names += [f.column for f in opts.fields if isinstance(f, AutoField)]
+            db_values += [f.get_db_prep_save(f.pre_save(getattr(self, f.column), True)) for f in opts.fields if isinstance(f, AutoField)]
+        placeholders = ['%s'] * len(field_names)
         if opts.order_with_respect_to:
             field_names.append(db.db.quote_name('_order'))
             # TODO: This assumes the database supports subqueries.
@@ -1020,7 +1024,7 @@ def method_save(opts, self):
         cursor.execute("INSERT INTO %s (%s) VALUES (%s)" % \
             (db.db.quote_name(opts.db_table), ','.join(field_names),
             ','.join(placeholders)), db_values)
-        if opts.has_auto_field:
+        if opts.has_auto_field and not pk_set:
             setattr(self, opts.pk.attname, db.get_last_insert_id(cursor, opts.db_table, opts.pk.column))
     db.db.commit()
     # Run any post-save hooks.
