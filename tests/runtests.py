@@ -100,8 +100,9 @@ class TestRunner:
             self.output(1, "Creating test database")
             try:
                 cursor.execute("CREATE DATABASE %s" % TEST_DATABASE_NAME)
-            except:
-                confirm = raw_input("The test database, %s, already exists. Type 'yes' to delete it, or 'no' to cancel: " % TEST_DATABASE_NAME)
+            except Exception, e:
+                sys.stderr.write("Got an error creating the test database: %s\n" % e)
+                confirm = raw_input("It appears the test database, %s, already exists. Type 'yes' to delete it, or 'no' to cancel: " % TEST_DATABASE_NAME)
                 if confirm == 'yes':
                     cursor.execute("DROP DATABASE %s" % TEST_DATABASE_NAME)
                     cursor.execute("CREATE DATABASE %s" % TEST_DATABASE_NAME)
