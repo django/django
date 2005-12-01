@@ -1,18 +1,18 @@
 from django import models
 from django.core.xheaders import populate_xheaders
-from django.core import template_loader, formfields
+from django.core import template_loader, formfields, meta
 from django.views.auth.login import redirect_to_login
 from django.core.extensions import DjangoContext as Context
 from django.core.paginator import ObjectPaginator, InvalidPage
 from django.utils.httpwrappers import HttpResponse, HttpResponseRedirect
 from django.core.exceptions import Http404, ObjectDoesNotExist, ImproperlyConfigured
 
-def create_object(request, app_label, module_name, template_name=None, 
-                 template_loader=template_loader, extra_context={}, 
+def create_object(request, app_label, module_name, template_name=None,
+                 template_loader=template_loader, extra_context={},
                  post_save_redirect=None, login_required=False, follow=None):
     """
     Generic object-creation function.
-    
+
     Templates: ``<app_label>/<module_name>_form``
     Context:
         form
@@ -20,24 +20,27 @@ def create_object(request, app_label, module_name, template_name=None,
     """
     if login_required and request.user.is_anonymous():
         return redirect_to_login(request.path)
-        
+
     mod = models.get_module(app_label, module_name)
     manipulator = mod.AddManipulator(follow=follow)
     if request.POST:
         # If data was POSTed, we're trying to create a new object
         new_data = request.POST.copy()
-        
+
+        if mod.Klass._meta.has_field_type(meta.FileField):
+            new_data.update(request.FILES)
+
         # Check for errors
         errors = manipulator.get_validation_errors(new_data)
         manipulator.do_html2python(new_data)
-        
+
         if not errors:
             # No errors -- this means we can save the data!
             new_object = manipulator.save(new_data)
-            
+
             if not request.user.is_anonymous():
                 request.user.add_message("The %s was created sucessfully." % mod.Klass._meta.verbose_name)
-            
+
             # Redirect to the new object: first by trying post_save_redirect,
             # then by obj.get_absolute_url; fail if neither works.
             if post_save_redirect:
@@ -50,7 +53,7 @@ def create_object(request, app_label, module_name, template_name=None,
         # No POST, so we want a brand new form without any data or errors
         errors = {}
         new_data = manipulator.flatten_data()
-    
+
     # Create the FormWrapper, template, context, response
     form = formfields.FormWrapper(manipulator, new_data, errors)
     if not template_name:
@@ -62,13 +65,13 @@ def create_object(request, app_label, module_name, template_name=None,
     for key, value in extra_context.items():
         if callable(value):
             c[key] = value()
-        else:   
+        else:
             c[key] = value
     return HttpResponse(t.render(c))
 
-def update_object(request, app_label, module_name, object_id=None, slug=None, 
+def update_object(request, app_label, module_name, object_id=None, slug=None,
                   slug_field=None, template_name=None, template_loader=template_loader,
-                  extra_lookup_kwargs={}, extra_context={}, post_save_redirect=None, 
+                  extra_lookup_kwargs={}, extra_context={}, post_save_redirect=None,
                   login_required=False, follow=None):
     """
     Generic object-update function.
@@ -84,7 +87,7 @@ def update_object(request, app_label, module_name, object_id=None, slug=None,
         return redirect_to_login(request.path)
 
     mod = models.get_module(app_label, module_name)
-    
+
     # Look up the object to be edited
     lookup_kwargs = {}
     if object_id:
@@ -98,16 +101,16 @@ def update_object(request, app_label, module_name, object_id=None, slug=None,
         object = mod.get_object(**lookup_kwargs)
     except ObjectDoesNotExist:
         raise Http404("%s.%s does not exist for %s" % (app_label, module_name, lookup_kwargs))
-    
+
     manipulator = mod.ChangeManipulator(object.id, follow=follow)
-    
+
     if request.POST:
         new_data = request.POST.copy()
         errors = manipulator.get_validation_errors(new_data)
         manipulator.do_html2python(new_data)
         if not errors:
             manipulator.save(new_data)
-            
+
             if not request.user.is_anonymous():
                 request.user.add_message("The %s was updated sucessfully." % mod.Klass._meta.verbose_name)
 
@@ -122,7 +125,7 @@ def update_object(request, app_label, module_name, object_id=None, slug=None,
         errors = {}
         # This makes sure the form acurate represents the fields of the place.
         new_data = manipulator.flatten_data()
-    
+
     form = formfields.FormWrapper(manipulator, new_data, errors)
     if not template_name:
         template_name = "%s/%s_form" % (app_label, module_name)
@@ -134,20 +137,20 @@ def update_object(request, app_label, module_name, object_id=None, slug=None,
     for key, value in extra_context.items():
         if callable(value):
             c[key] = value()
-        else:   
+        else:
             c[key] = value
     response = HttpResponse(t.render(c))
     populate_xheaders(request, response, app_label, module_name, getattr(object, object._meta.pk.name))
     return response
 
-def delete_object(request, app_label, module_name, post_delete_redirect, 
-                  object_id=None, slug=None, slug_field=None, template_name=None, 
-                  template_loader=template_loader, extra_lookup_kwargs={}, 
+def delete_object(request, app_label, module_name, post_delete_redirect,
+                  object_id=None, slug=None, slug_field=None, template_name=None,
+                  template_loader=template_loader, extra_lookup_kwargs={},
                   extra_context={}, login_required=False):
     """
     Generic object-delete function.
-    
-    The given template will be used to confirm deletetion if this view is 
+
+    The given template will be used to confirm deletetion if this view is
     fetched using GET; for safty, deletion will only be performed if this
     view is POSTed.
 
@@ -160,7 +163,7 @@ def delete_object(request, app_label, module_name, post_delete_redirect,
         return redirect_to_login(request.path)
 
     mod = models.get_module(app_label, module_name)
-    
+
     # Look up the object to be edited
     lookup_kwargs = {}
     if object_id:
@@ -174,7 +177,7 @@ def delete_object(request, app_label, module_name, post_delete_redirect,
         object = mod.get_object(**lookup_kwargs)
     except ObjectDoesNotExist:
         raise Http404("%s.%s does not exist for %s" % (app_label, module_name, lookup_kwargs))
-    
+
     if request.META['REQUEST_METHOD'] == 'POST':
         object.delete()
         if not request.user.is_anonymous():
@@ -190,7 +193,7 @@ def delete_object(request, app_label, module_name, post_delete_redirect,
         for key, value in extra_context.items():
             if callable(value):
                 c[key] = value()
-            else:   
+            else:
                 c[key] = value
         response = HttpResponse(t.render(c))
         populate_xheaders(request, response, app_label, module_name, getattr(object, object._meta.pk.name))
