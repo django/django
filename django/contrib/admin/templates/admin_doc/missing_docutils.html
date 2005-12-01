@@ -1,7 +1,7 @@
 {% extends "admin/base_site" %}
-
+{% load i18n %}
 {% block breadcrumbs %}<div class="breadcrumbs"><a href="../">Home</a> &rsaquo; Documentation</div>{% endblock %}
-
+{% block userlinks %}<a href="../password_change/">{% trans 'Change password' %}</a> / <a href="../logout/">{% trans 'Log out' %}</a>{% endblock %}
 {% block title %}Please install docutils{% endblock %}
 
 {% block content %}
