@@ -158,13 +158,6 @@ datetime.datetime(2005, 7, 31, 12, 30, 45)
 >>> a8.id
 8L
 
-# You can manually specify the primary key when creating a new objet
->>> a101 = articles.Article(id=101, headline='Article 101', pub_date=datetime(2005, 7, 31, 12, 30, 45))
->>> a101.save()
->>> a101 = articles.get_object(pk=101)
->>> a101.headline
-'Article 101'
-
 """
 
 from django.conf import settings
@@ -188,4 +181,14 @@ if building_docs or settings.DATABASE_ENGINE == 'mysql':
 >>> a9.save()
 >>> articles.get_object(id__exact=9).pub_date
 datetime.datetime(2005, 7, 31, 12, 30, 45)
+"""
+
+API_TESTS += """
+
+# You can manually specify the primary key when creating a new objet
+>>> a101 = articles.Article(id=101, headline='Article 101', pub_date=datetime(2005, 7, 31, 12, 30, 45))
+>>> a101.save()
+>>> a101 = articles.get_object(pk=101)
+>>> a101.headline
+'Article 101'
 """
