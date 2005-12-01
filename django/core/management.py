@@ -646,6 +646,13 @@ def get_validation_errors(outfile):
                             if not type(c) in (tuple, list) or len(c) != 2:
                                 e.add(opts, '"%s" field: "choices" should be a sequence of two-tuples.' % f.name)
 
+            # Check for multiple ManyToManyFields to the same object, and
+            # verify "singular" is set in that case.
+            for i, f in enumerate(opts.many_to_many):
+                for previous_f in opts.many_to_many[:i]:
+                    if f.rel.to == previous_f.rel.to and f.rel.singular == previous_f.rel.singular:
+                        e.add(opts, 'The "%s" field requires a "singular" parameter, because the %s model has more than one ManyToManyField to the same model (%s).' % (f.name, opts.object_name, previous_f.rel.to.object_name))
+
             # Check admin attribute.
             if opts.admin is not None:
                 if not isinstance(opts.admin, meta.Admin):
