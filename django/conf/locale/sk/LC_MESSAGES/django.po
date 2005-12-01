@@ -292,47 +292,45 @@ msgid ""
 "<h3>By %s:</h3>\n"
 "<ul>\n"
 msgstr ""
+"<h3>Od %s:</h3>\n"
+"<ul>\n"
 
 #: contrib/admin/filterspecs.py:70 contrib/admin/filterspecs.py:88
 #: contrib/admin/filterspecs.py:143
 msgid "All"
-msgstr ""
+msgstr "Všetko"
 
 #: contrib/admin/filterspecs.py:109
 msgid "Any date"
-msgstr ""
+msgstr "Ľubovoľný dátum"
 
 #: contrib/admin/filterspecs.py:110
-#, fuzzy
 msgid "Today"
-msgstr "ďeň"
+msgstr "Dnes"
 
 #: contrib/admin/filterspecs.py:113
 msgid "Past 7 days"
-msgstr ""
+msgstr "Posledných 7 dní"
 
 #: contrib/admin/filterspecs.py:115
-#, fuzzy
 msgid "This month"
-msgstr "mesiac"
+msgstr "Tento mesiac"
 
 #: contrib/admin/filterspecs.py:117
-#, fuzzy
 msgid "This year"
-msgstr "rok"
+msgstr "Tento rok"
 
 #: contrib/admin/filterspecs.py:143
 msgid "Yes"
-msgstr ""
+msgstr "Áno"
 
 #: contrib/admin/filterspecs.py:143
-#, fuzzy
 msgid "No"
-msgstr "Nov."
+msgstr "Nie"
 
 #: contrib/admin/filterspecs.py:150
 msgid "Unknown"
-msgstr ""
+msgstr "Neznámy"
 
 #: contrib/admin/models/admin.py:6
 msgid "action time"
@@ -363,9 +361,8 @@ msgid "log entries"
 msgstr "záznamy priebehu"
 
 #: contrib/admin/templatetags/admin_list.py:245
-#, fuzzy
 msgid "All dates"
-msgstr "dátumové návestie"
+msgstr "Všetky dátumy"
 
 #: contrib/admin/views/decorators.py:22
 #: contrib/admin/templates/admin/login.html:24
@@ -398,100 +395,96 @@ msgid "Your e-mail address is not your username. Try '%s' instead."
 msgstr "Vaša e-mailova adresa nie je vaše užívateľské meno. Skúste '%s'."
 
 #: contrib/admin/views/main.py:49
-#, fuzzy
 msgid "Site administration"
-msgstr "Administrácia Django"
+msgstr "Administrácia webu"
 
 #: contrib/admin/views/main.py:64
 #, python-format
 msgid "Select %s"
-msgstr ""
+msgstr "Výber %s"
 
 #: contrib/admin/views/main.py:65
 #, python-format
 msgid "Select %s to change"
-msgstr ""
+msgstr "Výber %s na zmenu"
 
 #: contrib/admin/views/main.py:411
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was added successfully."
-msgstr ""
+msgstr "Objekt  %(name)s \"%(obj)s\" bol úspešne pridaný."
 
 #: contrib/admin/views/main.py:416 contrib/admin/views/main.py:492
 msgid "You may edit it again below."
-msgstr ""
+msgstr "Môžete urobiť zmeny zase nižšie."
 
 #: contrib/admin/views/main.py:424 contrib/admin/views/main.py:501
 #, python-format
 msgid "You may add another %s below."
-msgstr ""
+msgstr "Môžete pridať ďalší %s nižšie."
 
 #: contrib/admin/views/main.py:441
-#, fuzzy, python-format
 msgid "Add %s"
-msgstr "Pridaj"
+msgstr "Pridaj %s"
 
 #: contrib/admin/views/main.py:457
 #, python-format
 msgid "Added %s."
-msgstr ""
+msgstr "Bol pridaný %s."
 
 #: contrib/admin/views/main.py:457 contrib/admin/views/main.py:459
 #: contrib/admin/views/main.py:461
 msgid "and"
-msgstr ""
+msgstr "a"
 
 #: contrib/admin/views/main.py:459
-#, fuzzy, python-format
 msgid "Changed %s."
-msgstr "Zmeň"
+msgstr "Bol zmenený %s"
 
 #: contrib/admin/views/main.py:461
 #, python-format
 msgid "Deleted %s."
-msgstr ""
+msgstr "Bol vymazaný %s."
 
 #: contrib/admin/views/main.py:464
 msgid "No fields changed."
-msgstr ""
+msgstr "Polia neboli zmenené."
 
 #: contrib/admin/views/main.py:489
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was changed successfully."
-msgstr ""
+msgstr "Objekt %(name)s \"%(obj)s\" boli úspešne zmenený."
 
 #: contrib/admin/views/main.py:498
 #, python-format
 msgid ""
 "The %(name)s \"%(obj)s\" was added successfully. You may edit it again below."
 msgstr ""
+"Objekt %(name)s \"%(obj)s\" bol úspešne zmenený. Ďalšie zmeny môžete urobiť zase nižšie."
 
 #: contrib/admin/views/main.py:536
-#, fuzzy, python-format
 msgid "Change %s"
-msgstr "Zmeň"
+msgstr "Zmeň %s"
 
 #: contrib/admin/views/main.py:614
 #, python-format
 msgid "One or more %(fieldname)s in %(name)s: %(obj)s"
-msgstr ""
+msgstr "Jeden alebo viac %(fieldname)s v %(name)s: %(obj)s"
 
 #: contrib/admin/views/main.py:619
 #, python-format
 msgid "One or more %(fieldname)s in %(name)s:"
-msgstr ""
+msgstr "Jeden alebo viac %(fieldname)s v %(name)s:"
 
 #: contrib/admin/views/main.py:648
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was deleted successfully."
-msgstr ""
+msgstr "Objekt %(name)s \"%(obj)s\" bol úspešne vymazaný."
 
 #: contrib/admin/views/main.py:651
 msgid "Are you sure?"
-msgstr ""
+msgstr "Ste si istý?"
 
 #: contrib/admin/views/main.py:666
-#, fuzzy, python-format
 msgid "Change history: %s"
 msgstr "Zmena hesla"
 
@@ -727,50 +720,49 @@ msgstr "Ano, som si istý"
 #: contrib/admin/templates/admin/filter.html:2
 #, python-format
 msgid " By %(title)s "
-msgstr ""
+msgstr " Od %(title)s "
 
 #: contrib/admin/templates/admin/search_form.html:7
 msgid "Go"
-msgstr ""
+msgstr "Choď"
 
 #: contrib/admin/templates/admin/change_form.html:18
 msgid "View on site"
-msgstr ""
+msgstr "Pozri na webe"
 
 #: contrib/admin/templates/admin/change_form.html:26
 msgid "Please correct the error below."
 msgid_plural "Please correct the errors below."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Opravte chybu, čo je nižšie, prosím."
+msgstr[1] "Opravte chyby, čo sú nižšie, prosím."
 
 #: contrib/admin/templates/admin/change_form.html:43
 msgid "Ordering"
-msgstr ""
+msgstr "Určenie"
 
 #: contrib/admin/templates/admin/change_form.html:46
 msgid "Order:"
-msgstr ""
+msgstr "Poradie:"
 
 #: contrib/admin/templates/admin/submit_line.html:3
 msgid "Delete"
-msgstr ""
+msgstr "Vymazať"
 
 #: contrib/admin/templates/admin/submit_line.html:4
 msgid "Save as new"
-msgstr ""
+msgstr "Zapísať ako nový"
 
 #: contrib/admin/templates/admin/submit_line.html:5
 msgid "Save and add another"
-msgstr ""
+msgstr "Zapísať a pridať ďaší"
 
 #: contrib/admin/templates/admin/submit_line.html:6
 msgid "Save and continue editing"
-msgstr ""
+msgstr "Zapísať a pokračovať v zmenách"
 
 #: contrib/admin/templates/admin/submit_line.html:7
-#, fuzzy
 msgid "Save"
-msgstr "aktívny"
+msgstr "Zápis"
 
 #: contrib/admin/templates/registration/password_change_done.html:4
 #: contrib/admin/templates/registration/password_change_form.html:4
@@ -889,15 +881,15 @@ msgstr "Skupina %(site_name)s"
 
 #: contrib/admin/templates/admin_doc/bookmarklets.html:3
 msgid "Documentation"
-msgstr ""
+msgstr "Dokumentácia"
 
 #: contrib/admin/templates/admin_doc/bookmarklets.html:3
 msgid "Bookmarklets"
-msgstr ""
+msgstr "Záložky"
 
 #: contrib/admin/templates/admin_doc/bookmarklets.html:5
 msgid "Documentation bookmarklets"
-msgstr ""
+msgstr "Dokumentácia záložiek"
 
 #: contrib/admin/templates/admin_doc/bookmarklets.html:9
 msgid ""
@@ -909,43 +901,53 @@ msgid ""
 "as \"internal\" (talk to your system administrator if you aren't sure if\n"
 "your computer is \"internal\").</p>\n"
 msgstr ""
+"\n"
+"<p class=\"help\">Na inštaláciu záložiek, potiahnite linku do vášho  bookmarks\n"
+"toolbar, alebo kliknite pravou myšou na linku a pridajte ju do vášho bookmarks.\n"
+"Teraz si môžete vybrať záložku pre ľubovoľnú stránku na webe.  Poznámka:\n"
+"niektoré záložky vyžadujú aby ste prezerali web z počítača označeného \n"
+"ako \"internal\" (opýtajte sa vášho systémového administrátora ak nie ste si istý/á, \n"
+"že váš počítač je označený ako \"internal\").</p>\n"
 
 #: contrib/admin/templates/admin_doc/bookmarklets.html:19
 msgid "Documentation for this page"
-msgstr ""
+msgstr "Dokumnentácia tejto stránky"
 
 #: contrib/admin/templates/admin_doc/bookmarklets.html:20
 msgid ""
 "Jumps you from any page to the documentation for the view that generates "
 "that page."
 msgstr ""
+"Skoč z ľubovoľnej stránky do dokumentácie, kde je popísaná generácia "
+"tejto stránky."
 
 #: contrib/admin/templates/admin_doc/bookmarklets.html:22
-#, fuzzy
 msgid "Show object ID"
-msgstr "objekt ID"
+msgstr "Ukáž objekt ID"
 
 #: contrib/admin/templates/admin_doc/bookmarklets.html:23
 msgid ""
 "Shows the content-type and unique ID for pages that represent a single "
 "object."
 msgstr ""
+"Ukáž typ obsahu a jednoznačné ID pre stránky, ktoré zatupujú jednoduché "
+"objekty."
 
 #: contrib/admin/templates/admin_doc/bookmarklets.html:25
 msgid "Edit this object (current window)"
-msgstr ""
+msgstr "Edituj tento object (aktuálne okno)"
 
 #: contrib/admin/templates/admin_doc/bookmarklets.html:26
 msgid "Jumps to the admin page for pages that represent a single object."
-msgstr ""
+msgstr "Skoč na stránku admina, ktorá zastupuje jednoduchý objekt"
 
 #: contrib/admin/templates/admin_doc/bookmarklets.html:28
 msgid "Edit this object (new window)"
-msgstr ""
+msgstr "Editujte tento objekt (nové okno)"
 
 #: contrib/admin/templates/admin_doc/bookmarklets.html:29
 msgid "As above, but opens the admin page in a new window."
-msgstr ""
+msgstr "Ako vyššie, ale stranka admina sa otvorí v novom okne."
 
 #: contrib/redirects/models/redirects.py:7
 msgid "redirect from"
@@ -1742,4 +1744,4 @@ msgstr[1] "Prosím vložte platné %(self)s IDs. Hodnoty  %(value)r sú neplatn�
 
 #: core/template/defaultfilters.py:354
 msgid "yes,no,maybe"
-msgstr ""
+msgstr "ano,nie,možno"
