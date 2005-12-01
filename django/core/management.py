@@ -591,9 +591,19 @@ def inspectdb(db_name):
                     field_type_was_guessed = True
                 else:
                     field_type_was_guessed = False
+
+                # This is a hook for DATA_TYPES_REVERSE to return a tuple of
+                # (field_type, extra_params_dict).
+                if type(field_type) is tuple:
+                    field_type, extra_params = field_type
+                else:
+                    extra_params = {}
+
+                if field_type == 'CharField' and row[3]:
+                    extra_params['maxlength'] = row[3]
+
                 field_desc = '%s = meta.%s(' % (column_name, field_type)
-                if field_type == 'CharField':
-                    field_desc += 'maxlength=%s' % (row[3])
+                field_desc += ', '.join(['%s=%s' % (k, v) for k, v in extra_params.items()])
                 field_desc += ')'
                 if field_type_was_guessed:
                     field_desc += ' # This is a guess!'
