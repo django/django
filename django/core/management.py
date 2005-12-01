@@ -238,6 +238,9 @@ def get_sql_sequence_reset(mod):
                 output.append("SELECT setval('%s_%s_seq', (SELECT max(%s) FROM %s));" % \
                     (klass._meta.db_table, f.column, db.db.quote_name(f.column),
                     db.db.quote_name(klass._meta.db_table)))
+        for f in klass._meta.many_to_many:
+            output.append("SELECT setval('%s_id_seq', (SELECT max(%s) FROM %s));" % \
+                (f.get_m2m_db_table(klass._meta), db.db.quote_name('id'), f.get_m2m_db_table(klass._meta)))
     return output
 get_sql_sequence_reset.help_doc = "Prints the SQL statements for resetting PostgreSQL sequences for the given model module name(s)."
 get_sql_sequence_reset.args = APP_ARGS
