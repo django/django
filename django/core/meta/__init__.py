@@ -532,13 +532,9 @@ class Options:
         rel_objs = []
         for mod in module_list:
             for klass in mod._MODELS:
-                try:
-                    for f in klass._meta.many_to_many:
-                        if f.rel and self == f.rel.to:
-                            rel_objs.append(RelatedObject(self, klass._meta, f))
-                            raise StopIteration
-                except StopIteration:
-                    continue
+                for f in klass._meta.many_to_many:
+                    if f.rel and self == f.rel.to:
+                        rel_objs.append(RelatedObject(self, klass._meta, f))
         return rel_objs
 
     def get_ordered_objects(self):
