@@ -8,13 +8,44 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2005-11-28 11:32+0100\n"
+"POT-Creation-Date: 2005-12-01 09:46-0500\n"
 "PO-Revision-Date: 2005-11-10 23:22-0500\n"
 "Last-Translator: Vladimir Labath <vlado@labath.org>\n"
 "Language-Team: Slovak <sk@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+
+#: contrib/redirects/models/redirects.py:7
+msgid "redirect from"
+msgstr "presmerovaný z"
+
+#: contrib/redirects/models/redirects.py:8
+msgid ""
+"This should be an absolute path, excluding the domain name. Example: '/"
+"events/search/'."
+msgstr ""
+"Tu by sa mala použiť absolútna cesta, bez domény. Napr.: '/events/search/'."
+
+#: contrib/redirects/models/redirects.py:9
+msgid "redirect to"
+msgstr "presmerovaný na "
+
+#: contrib/redirects/models/redirects.py:10
+msgid ""
+"This can be either an absolute path (as above) or a full URL starting with "
+"'http://'."
+msgstr ""
+"Tu môže byť buď absolútna cesta (ako hore) alebo plné  URL začínajúce s "
+"'http://'."
+
+#: contrib/redirects/models/redirects.py:12
+msgid "redirect"
+msgstr "presmerovanie"
+
+#: contrib/redirects/models/redirects.py:13
+msgid "redirects"
+msgstr "presmerovania"
 
 #: contrib/comments/models/comments.py:8
 #: contrib/comments/models/comments.py:161
@@ -76,7 +107,7 @@ msgstr "dátum/čas poslania"
 msgid "is public"
 msgstr "je zveréjnený"
 
-#: contrib/comments/models/comments.py:26 contrib/admin/views/doc.py:254
+#: contrib/comments/models/comments.py:26 contrib/admin/views/doc.py:256
 msgid "IP address"
 msgstr "IP adresa"
 
@@ -286,6 +317,58 @@ msgstr ""
 msgid "The comment form didn't provide either 'preview' or 'post'"
 msgstr "Formulár komentára neposkytuje odpoveď buď 'prezri' alebo 'pošli'"
 
+#: contrib/flatpages/models/flatpages.py:6 contrib/admin/views/doc.py:267
+msgid "URL"
+msgstr "URL"
+
+#: contrib/flatpages/models/flatpages.py:7
+msgid ""
+"Example: '/about/contact/'. Make sure to have leading and trailing slashes."
+msgstr ""
+"Príklad: '/about/contact/'. Uistite sa, že máte vložené ako úvodné tak aj "
+"záverečné lomítka."
+
+#: contrib/flatpages/models/flatpages.py:8
+msgid "title"
+msgstr "názov"
+
+#: contrib/flatpages/models/flatpages.py:9
+msgid "content"
+msgstr "obsah"
+
+#: contrib/flatpages/models/flatpages.py:10
+msgid "enable comments"
+msgstr "povolené komentáre"
+
+#: contrib/flatpages/models/flatpages.py:11
+msgid "template name"
+msgstr "meno predlohy"
+
+#: contrib/flatpages/models/flatpages.py:12
+msgid ""
+"Example: 'flatpages/contact_page'. If this isn't provided, the system will "
+"use 'flatpages/default'."
+msgstr ""
+"Príklad: 'flatpages/contact_page'. Ak sa toto nevykonalo,  systém použije  "
+"'flatpages/default'."
+
+#: contrib/flatpages/models/flatpages.py:13
+msgid "registration required"
+msgstr "musíte byť zaregistrovaný"
+
+#: contrib/flatpages/models/flatpages.py:13
+msgid "If this is checked, only logged-in users will be able to view the page."
+msgstr ""
+"Ak je toto označené, potom len prihlásený užívateľ môže vidieť túto stránku."
+
+#: contrib/flatpages/models/flatpages.py:17
+msgid "flat page"
+msgstr "plochá stránka"
+
+#: contrib/flatpages/models/flatpages.py:18
+msgid "flat pages"
+msgstr "ploché stránky"
+
 #: contrib/admin/filterspecs.py:40
 #, python-format
 msgid ""
@@ -408,162 +491,202 @@ msgstr "Výber %s"
 msgid "Select %s to change"
 msgstr "Výber %s na zmenu"
 
-#: contrib/admin/views/main.py:411
+#: contrib/admin/views/main.py:407
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was added successfully."
 msgstr "Objekt  %(name)s \"%(obj)s\" bol úspešne pridaný."
 
-#: contrib/admin/views/main.py:416 contrib/admin/views/main.py:492
+#: contrib/admin/views/main.py:412 contrib/admin/views/main.py:488
 msgid "You may edit it again below."
 msgstr "Môžete urobiť zmeny zase nižšie."
 
-#: contrib/admin/views/main.py:424 contrib/admin/views/main.py:501
+#: contrib/admin/views/main.py:420 contrib/admin/views/main.py:497
 #, python-format
 msgid "You may add another %s below."
 msgstr "Môžete pridať ďalší %s nižšie."
 
-#: contrib/admin/views/main.py:441
+#: contrib/admin/views/main.py:437
+#, python-format
 msgid "Add %s"
 msgstr "Pridaj %s"
 
-#: contrib/admin/views/main.py:457
+#: contrib/admin/views/main.py:453
 #, python-format
 msgid "Added %s."
 msgstr "Bol pridaný %s."
 
-#: contrib/admin/views/main.py:457 contrib/admin/views/main.py:459
-#: contrib/admin/views/main.py:461
+#: contrib/admin/views/main.py:453 contrib/admin/views/main.py:455
+#: contrib/admin/views/main.py:457
 msgid "and"
 msgstr "a"
 
-#: contrib/admin/views/main.py:459
+#: contrib/admin/views/main.py:455
+#, python-format
 msgid "Changed %s."
 msgstr "Bol zmenený %s"
 
-#: contrib/admin/views/main.py:461
+#: contrib/admin/views/main.py:457
 #, python-format
 msgid "Deleted %s."
 msgstr "Bol vymazaný %s."
 
-#: contrib/admin/views/main.py:464
+#: contrib/admin/views/main.py:460
 msgid "No fields changed."
 msgstr "Polia neboli zmenené."
 
-#: contrib/admin/views/main.py:489
+#: contrib/admin/views/main.py:485
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was changed successfully."
 msgstr "Objekt %(name)s \"%(obj)s\" boli úspešne zmenený."
 
-#: contrib/admin/views/main.py:498
+#: contrib/admin/views/main.py:494
 #, python-format
 msgid ""
 "The %(name)s \"%(obj)s\" was added successfully. You may edit it again below."
 msgstr ""
-"Objekt %(name)s \"%(obj)s\" bol úspešne zmenený. Ďalšie zmeny môžete urobiť zase nižšie."
+"Objekt %(name)s \"%(obj)s\" bol úspešne zmenený. Ďalšie zmeny môžete urobiť "
+"zase nižšie."
 
-#: contrib/admin/views/main.py:536
+#: contrib/admin/views/main.py:532
+#, python-format
 msgid "Change %s"
 msgstr "Zmeň %s"
 
-#: contrib/admin/views/main.py:614
+#: contrib/admin/views/main.py:610
 #, python-format
 msgid "One or more %(fieldname)s in %(name)s: %(obj)s"
 msgstr "Jeden alebo viac %(fieldname)s v %(name)s: %(obj)s"
 
-#: contrib/admin/views/main.py:619
+#: contrib/admin/views/main.py:615
 #, python-format
 msgid "One or more %(fieldname)s in %(name)s:"
 msgstr "Jeden alebo viac %(fieldname)s v %(name)s:"
 
-#: contrib/admin/views/main.py:648
+#: contrib/admin/views/main.py:644
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was deleted successfully."
 msgstr "Objekt %(name)s \"%(obj)s\" bol úspešne vymazaný."
 
-#: contrib/admin/views/main.py:651
+#: contrib/admin/views/main.py:647
 msgid "Are you sure?"
 msgstr "Ste si istý?"
 
-#: contrib/admin/views/main.py:666
+#: contrib/admin/views/main.py:662
 msgid "Change history: %s"
-msgstr "Zmena hesla"
+msgstr "Zmena histórie:"
 
-#: contrib/admin/views/doc.py:242 contrib/admin/views/doc.py:251
-#: contrib/admin/views/doc.py:253 contrib/admin/views/doc.py:258
-#: contrib/admin/views/doc.py:259 contrib/admin/views/doc.py:261
+#: contrib/admin/views/doc.py:244 contrib/admin/views/doc.py:253
+#: contrib/admin/views/doc.py:255 contrib/admin/views/doc.py:261
+#: contrib/admin/views/doc.py:262 contrib/admin/views/doc.py:264
 msgid "Integer"
 msgstr "Celočíselná hodnota"
 
-#: contrib/admin/views/doc.py:243
+#: contrib/admin/views/doc.py:245
 msgid "Boolean (Either True or False)"
 msgstr "Logická hodnota (buď True alebo False)"
 
-#: contrib/admin/views/doc.py:244
+#: contrib/admin/views/doc.py:246
 #, python-format
 msgid "String (up to %(maxlength)s)"
 msgstr "Dĺžka reťazca (maximálne do %(maxlength)s)"
 
-#: contrib/admin/views/doc.py:245
+#: contrib/admin/views/doc.py:247
 msgid "Comma-separated integers"
 msgstr "Čiarka oddeľuje celé čísla"
 
-#: contrib/admin/views/doc.py:246
+#: contrib/admin/views/doc.py:248
 msgid "Date (without time)"
 msgstr "Dátum (bez času)"
 
-#: contrib/admin/views/doc.py:247
+#: contrib/admin/views/doc.py:249
 msgid "Date (with time)"
 msgstr "Dátum ( a čas)"
 
-#: contrib/admin/views/doc.py:248
+#: contrib/admin/views/doc.py:250
 msgid "E-mail address"
 msgstr "E-mailová adresa"
 
-#: contrib/admin/views/doc.py:249 contrib/admin/views/doc.py:252
+#: contrib/admin/views/doc.py:251 contrib/admin/views/doc.py:254
 msgid "File path"
 msgstr "Cesta k súboru"
 
-#: contrib/admin/views/doc.py:250
+#: contrib/admin/views/doc.py:252
 msgid "Decimal number"
 msgstr "Desiatkové číslo"
 
-#: contrib/admin/views/doc.py:256
+#: contrib/admin/views/doc.py:258
 msgid "Boolean (Either True, False or None)"
 msgstr "Logická hodnota (buď True, False alebo None)"
 
-#: contrib/admin/views/doc.py:257
+#: contrib/admin/views/doc.py:259
+msgid "Relation to parent model"
+msgstr "Má vzťah na rodičovský model"
+
+#: contrib/admin/views/doc.py:260
 msgid "Phone number"
 msgstr "Číslo telefónu"
 
-#: contrib/admin/views/doc.py:260
+#: contrib/admin/views/doc.py:263
 msgid "String (up to 50)"
 msgstr "Reťazec (do 50 )"
 
-#: contrib/admin/views/doc.py:262
+#: contrib/admin/views/doc.py:265
 msgid "Text"
 msgstr "Text"
 
-#: contrib/admin/views/doc.py:263
+#: contrib/admin/views/doc.py:266
 msgid "Time"
 msgstr "Čas"
 
-#: contrib/admin/views/doc.py:264 contrib/flatpages/models/flatpages.py:6
-msgid "URL"
-msgstr "URL"
-
-#: contrib/admin/views/doc.py:265
+#: contrib/admin/views/doc.py:268
 msgid "U.S. state (two uppercase letters)"
 msgstr "U.S. štát (dve veľké písmena)"
 
-#: contrib/admin/views/doc.py:266
+#: contrib/admin/views/doc.py:269
 msgid "XML text"
 msgstr "XML text"
 
-#: contrib/admin/templates/admin/object_history.html:5
-#: contrib/admin/templates/admin/500.html:4
+#: contrib/admin/templates/admin/object_history.html:3
 #: contrib/admin/templates/admin/change_list.html:4
+#: contrib/admin/templates/admin/change_form.html:8
+#: contrib/admin/templates/admin/base.html:23
+#: contrib/admin/templates/admin/delete_confirmation.html:3
+#: contrib/admin/templates/admin_doc/bookmarklets.html:4
+#: contrib/admin/templates/admin_doc/view_detail.html:4
+#: contrib/admin/templates/admin_doc/template_tag_index.html:5
+#: contrib/admin/templates/admin_doc/template_detail.html:4
+#: contrib/admin/templates/admin_doc/template_filter_index.html:5
+#: contrib/admin/templates/admin_doc/missing_docutils.html:4
+#: contrib/admin/templates/admin_doc/view_index.html:5
+#: contrib/admin/templates/admin_doc/model_detail.html:3
+#: contrib/admin/templates/admin_doc/index.html:4
+#: contrib/admin/templates/admin_doc/model_index.html:5
+msgid "Change password"
+msgstr "Zmena hesla"
+
+#: contrib/admin/templates/admin/object_history.html:3
+#: contrib/admin/templates/admin/change_list.html:4
+#: contrib/admin/templates/admin/change_form.html:8
+#: contrib/admin/templates/admin/base.html:23
+#: contrib/admin/templates/admin/delete_confirmation.html:3
+#: contrib/admin/templates/admin_doc/bookmarklets.html:4
+#: contrib/admin/templates/admin_doc/view_detail.html:4
+#: contrib/admin/templates/admin_doc/template_tag_index.html:5
+#: contrib/admin/templates/admin_doc/template_detail.html:4
+#: contrib/admin/templates/admin_doc/template_filter_index.html:5
+#: contrib/admin/templates/admin_doc/missing_docutils.html:4
+#: contrib/admin/templates/admin_doc/view_index.html:5
+#: contrib/admin/templates/admin_doc/model_detail.html:3
+#: contrib/admin/templates/admin_doc/index.html:4
+#: contrib/admin/templates/admin_doc/model_index.html:5
+msgid "Log out"
+msgstr "Odhlásenie"
+
+#: contrib/admin/templates/admin/object_history.html:5
+#: contrib/admin/templates/admin/change_list.html:5
+#: contrib/admin/templates/admin/500.html:4
+#: contrib/admin/templates/admin/change_form.html:11
 #: contrib/admin/templates/admin/base.html:29
-#: contrib/admin/templates/admin/change_form.html:10
 #: contrib/admin/templates/registration/password_change_done.html:4
 #: contrib/admin/templates/registration/password_reset_form.html:4
 #: contrib/admin/templates/registration/logged_out.html:4
@@ -574,7 +697,7 @@ msgid "Home"
 msgstr "Začiatok"
 
 #: contrib/admin/templates/admin/object_history.html:5
-#: contrib/admin/templates/admin/change_form.html:17
+#: contrib/admin/templates/admin/change_form.html:18
 msgid "History"
 msgstr "História"
 
@@ -602,13 +725,15 @@ msgstr ""
 "Tento object nemá históriu zmien. Možno nebol pridaný prostredníctvom tohoto "
 "web admina"
 
-#: contrib/admin/templates/admin/base_site.html:4
-msgid "Django site admin"
-msgstr "Django web admin"
+#: contrib/admin/templates/admin/change_list.html:10
+#, python-format
+msgid "Add %(name)s"
+msgstr ""
 
-#: contrib/admin/templates/admin/base_site.html:7
-msgid "Django administration"
-msgstr "Administrácia Django"
+#: contrib/admin/templates/admin/filter.html:2
+#, python-format
+msgid " By %(title)s "
+msgstr " Od %(title)s "
 
 #: contrib/admin/templates/admin/500.html:4
 msgid "Server error"
@@ -630,17 +755,20 @@ msgstr ""
 "Vznikla chyba. Prostredníctvom e-mailu  bol o nej informovaný správca a "
 "chyba by mala byť o chviľu odstránená. Ďakujeme za vašu trpezlivosť."
 
-#: contrib/admin/templates/admin/404.html:4
-#: contrib/admin/templates/admin/404.html:8
-msgid "Page not found"
-msgstr "Stránka nebola nájdená"
+#: contrib/admin/templates/admin/search_form.html:7
+msgid "Go"
+msgstr "Choď"
 
-#: contrib/admin/templates/admin/404.html:10
-msgid "We're sorry, but the requested page could not be found."
-msgstr "Ľutujeme, ale požadovaná stránka nebola nájdená."
+#: contrib/admin/templates/admin/base_site.html:4
+msgid "Django site admin"
+msgstr "Django web admin"
+
+#: contrib/admin/templates/admin/base_site.html:7
+msgid "Django administration"
+msgstr "Administrácia Django"
 
 #: contrib/admin/templates/admin/index.html:27
-#: contrib/admin/templates/admin/change_form.html:12
+#: contrib/admin/templates/admin/change_form.html:13
 msgid "Add"
 msgstr "Pridaj"
 
@@ -664,10 +792,14 @@ msgstr "Moje udalosti"
 msgid "None available"
 msgstr "Nepovolené"
 
-#: contrib/admin/templates/admin/change_list.html:9
-#, python-format
-msgid "Add %(name)s"
-msgstr ""
+#: contrib/admin/templates/admin/404.html:4
+#: contrib/admin/templates/admin/404.html:8
+msgid "Page not found"
+msgstr "Stránka nebola nájdená"
+
+#: contrib/admin/templates/admin/404.html:10
+msgid "We're sorry, but the requested page could not be found."
+msgstr "Ľutujeme, ale požadovaná stránka nebola nájdená."
 
 #: contrib/admin/templates/admin/login.html:15
 msgid "Username:"
@@ -681,19 +813,29 @@ msgstr "Heslo:"
 msgid "Have you <a href=\"/password_reset/\">forgotten your password</a>?"
 msgstr "Zabudli ste<a href=\"/password_reset/\"> vaše heslo</a>?"
 
+#: contrib/admin/templates/admin/change_form.html:19
+msgid "View on site"
+msgstr "Pozri na webe"
+
+#: contrib/admin/templates/admin/change_form.html:27
+msgid "Please correct the error below."
+msgid_plural "Please correct the errors below."
+msgstr[0] "Opravte chybu, čo je nižšie, prosím."
+msgstr[1] "Opravte chyby, čo sú nižšie, prosím."
+
+#: contrib/admin/templates/admin/change_form.html:44
+msgid "Ordering"
+msgstr "Určenie"
+
+#: contrib/admin/templates/admin/change_form.html:47
+msgid "Order:"
+msgstr "Poradie:"
+
 #: contrib/admin/templates/admin/base.html:23
 msgid "Welcome,"
 msgstr "Vítajte,"
 
-#: contrib/admin/templates/admin/base.html:23
-msgid "Change password"
-msgstr "Zmena hesla"
-
-#: contrib/admin/templates/admin/base.html:23
-msgid "Log out"
-msgstr "Odhlásenie"
-
-#: contrib/admin/templates/admin/delete_confirmation.html:7
+#: contrib/admin/templates/admin/delete_confirmation.html:6
 #, python-format
 msgid ""
 "Deleting the %(object_name)s '%(object)s' would result in deleting related "
@@ -704,7 +846,7 @@ msgstr ""
 "súvisiacich objektov, ale váš účet nemá povolenie na mazanie nasledujúcich "
 "typov objektov:"
 
-#: contrib/admin/templates/admin/delete_confirmation.html:14
+#: contrib/admin/templates/admin/delete_confirmation.html:13
 #, python-format
 msgid ""
 "Are you sure you want to delete the %(object_name)s \"%(object)s\"? All of "
@@ -713,36 +855,9 @@ msgstr ""
 "Ste si istý, že chcete vymazať %(object_name)s \"%(object)s\"? Všetky "
 "nasledujúce objekty budú tiež vymazané :"
 
-#: contrib/admin/templates/admin/delete_confirmation.html:18
+#: contrib/admin/templates/admin/delete_confirmation.html:17
 msgid "Yes, I'm sure"
 msgstr "Ano, som si istý"
-
-#: contrib/admin/templates/admin/filter.html:2
-#, python-format
-msgid " By %(title)s "
-msgstr " Od %(title)s "
-
-#: contrib/admin/templates/admin/search_form.html:7
-msgid "Go"
-msgstr "Choď"
-
-#: contrib/admin/templates/admin/change_form.html:18
-msgid "View on site"
-msgstr "Pozri na webe"
-
-#: contrib/admin/templates/admin/change_form.html:26
-msgid "Please correct the error below."
-msgid_plural "Please correct the errors below."
-msgstr[0] "Opravte chybu, čo je nižšie, prosím."
-msgstr[1] "Opravte chyby, čo sú nižšie, prosím."
-
-#: contrib/admin/templates/admin/change_form.html:43
-msgid "Ordering"
-msgstr "Určenie"
-
-#: contrib/admin/templates/admin/change_form.html:46
-msgid "Order:"
-msgstr "Poradie:"
 
 #: contrib/admin/templates/admin/submit_line.html:3
 msgid "Delete"
@@ -902,11 +1017,14 @@ msgid ""
 "your computer is \"internal\").</p>\n"
 msgstr ""
 "\n"
-"<p class=\"help\">Na inštaláciu záložiek, potiahnite linku do vášho  bookmarks\n"
-"toolbar, alebo kliknite pravou myšou na linku a pridajte ju do vášho bookmarks.\n"
+"<p class=\"help\">Na inštaláciu záložiek, potiahnite linku do vášho  "
+"bookmarks\n"
+"toolbar, alebo kliknite pravou myšou na linku a pridajte ju do vášho "
+"bookmarks.\n"
 "Teraz si môžete vybrať záložku pre ľubovoľnú stránku na webe.  Poznámka:\n"
 "niektoré záložky vyžadujú aby ste prezerali web z počítača označeného \n"
-"ako \"internal\" (opýtajte sa vášho systémového administrátora ak nie ste si istý/á, \n"
+"ako \"internal\" (opýtajte sa vášho systémového administrátora ak nie ste si "
+"istý/á, \n"
 "že váš počítač je označený ako \"internal\").</p>\n"
 
 #: contrib/admin/templates/admin_doc/bookmarklets.html:19
@@ -918,8 +1036,8 @@ msgid ""
 "Jumps you from any page to the documentation for the view that generates "
 "that page."
 msgstr ""
-"Skoč z ľubovoľnej stránky do dokumentácie, kde je popísaná generácia "
-"tejto stránky."
+"Skoč z ľubovoľnej stránky do dokumentácie, kde je popísaná generácia tejto "
+"stránky."
 
 #: contrib/admin/templates/admin_doc/bookmarklets.html:22
 msgid "Show object ID"
@@ -948,85 +1066,6 @@ msgstr "Editujte tento objekt (nové okno)"
 #: contrib/admin/templates/admin_doc/bookmarklets.html:29
 msgid "As above, but opens the admin page in a new window."
 msgstr "Ako vyššie, ale stranka admina sa otvorí v novom okne."
-
-#: contrib/redirects/models/redirects.py:7
-msgid "redirect from"
-msgstr "presmerovaný z"
-
-#: contrib/redirects/models/redirects.py:8
-msgid ""
-"This should be an absolute path, excluding the domain name. Example: '/"
-"events/search/'."
-msgstr ""
-"Tu by sa mala použiť absolútna cesta, bez domény. Napr.: '/events/search/'."
-
-#: contrib/redirects/models/redirects.py:9
-msgid "redirect to"
-msgstr "presmerovaný na "
-
-#: contrib/redirects/models/redirects.py:10
-msgid ""
-"This can be either an absolute path (as above) or a full URL starting with "
-"'http://'."
-msgstr ""
-"Tu môže byť buď absolútna cesta (ako hore) alebo plné  URL začínajúce s "
-"'http://'."
-
-#: contrib/redirects/models/redirects.py:12
-msgid "redirect"
-msgstr "presmerovanie"
-
-#: contrib/redirects/models/redirects.py:13
-msgid "redirects"
-msgstr "presmerovania"
-
-#: contrib/flatpages/models/flatpages.py:7
-msgid ""
-"Example: '/about/contact/'. Make sure to have leading and trailing slashes."
-msgstr ""
-"Príklad: '/about/contact/'. Uistite sa, že máte vložené ako úvodné tak aj "
-"záverečné lomítka."
-
-#: contrib/flatpages/models/flatpages.py:8
-msgid "title"
-msgstr "názov"
-
-#: contrib/flatpages/models/flatpages.py:9
-msgid "content"
-msgstr "obsah"
-
-#: contrib/flatpages/models/flatpages.py:10
-msgid "enable comments"
-msgstr "povolené komentáre"
-
-#: contrib/flatpages/models/flatpages.py:11
-msgid "template name"
-msgstr "meno predlohy"
-
-#: contrib/flatpages/models/flatpages.py:12
-msgid ""
-"Example: 'flatpages/contact_page'. If this isn't provided, the system will "
-"use 'flatpages/default'."
-msgstr ""
-"Príklad: 'flatpages/contact_page'. Ak sa toto nevykonalo,  systém použije  "
-"'flatpages/default'."
-
-#: contrib/flatpages/models/flatpages.py:13
-msgid "registration required"
-msgstr "musíte byť zaregistrovaný"
-
-#: contrib/flatpages/models/flatpages.py:13
-msgid "If this is checked, only logged-in users will be able to view the page."
-msgstr ""
-"Ak je toto označené, potom len prihlásený užívateľ môže vidieť túto stránku."
-
-#: contrib/flatpages/models/flatpages.py:17
-msgid "flat page"
-msgstr "plochá stránka"
-
-#: contrib/flatpages/models/flatpages.py:18
-msgid "flat pages"
-msgstr "ploché stránky"
 
 #: utils/translation.py:335
 msgid "DATE_FORMAT"
