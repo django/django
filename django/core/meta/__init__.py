@@ -264,9 +264,9 @@ class RelatedObject(object):
 
     def get_method_name_part(self):
         # This method encapsulates the logic that decides what name to give a
-        # method that retrieves related many-to-one objects. Usually it just
-        # uses the lower-cased object_name, but if the related object is in
-        # another app, its app_label is appended.
+        # method that retrieves related many-to-one or many-to-many objects.
+        # Usually it just uses the lower-cased object_name, but if the related
+        # object is in another app, the related object's app_label is appended.
         #
         # Examples:
         #
