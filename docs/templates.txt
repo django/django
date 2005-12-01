@@ -616,7 +616,7 @@ Note that you can backslash-escape a format string if you want to use the
 "f" is a format string that displays the time. The "o" doesn't need to be
 escaped, because it's not a format character.::
 
-    It is the {% "jS o\f F" %}
+    It is the {% now "jS o\f F" %}
 
 (Displays "It is the 4th of September" %}
 
