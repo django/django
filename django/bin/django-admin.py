@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 from django.core import management
 from optparse import OptionParser
-import os, sys
+import os, sys, textwrap
 
 ACTION_MAPPING = {
     'adminindex': management.get_admin_index,
@@ -37,8 +37,10 @@ def get_usage():
     available_actions.sort()
     for a in available_actions:
         func = ACTION_MAPPING[a]
-        usage.append("  %s %s -- %s" % (a, func.args, getattr(func, 'help_doc', func.__doc__)))
-    return '\n'.join(usage)
+        usage.append("  %s %s" % (a, func.args))
+        usage.extend(textwrap.wrap(getattr(func, 'help_doc', func.__doc__), initial_indent='    ', subsequent_indent='    '))
+        usage.append("")
+    return '\n'.join(usage[:-1]) # Cut off last list element, an empty space.
 
 class DjangoOptionParser(OptionParser):
     def print_usage_and_exit(self):
