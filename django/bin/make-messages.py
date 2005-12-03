@@ -75,7 +75,7 @@ for lang in languages:
                 if verbose: sys.stdout.write('processing file %s in %s\n' % (file, dirpath))
                 cmd = 'xgettext %s -d %s -L Python --keyword=gettext_noop --keyword=gettext_lazy --keyword=ngettext_lazy -o - "%s"' % (
                     os.path.exists(potfile) and '--omit-header' or '', domain, os.path.join(dirpath, thefile))
-                (stdin, stdout, stderr) = os.popen3(cmd, 'r')
+                (stdin, stdout, stderr) = os.popen3(cmd, 'rb')
                 msgs = stdout.read()
                 errors = stderr.read()
                 if errors: 
@@ -91,7 +91,7 @@ for lang in languages:
                 if thefile != file:
                     os.unlink(os.path.join(dirpath, thefile))
 
-    (stdin, stdout, stderr) = os.popen3('msguniq %s' % potfile, 'r')
+    (stdin, stdout, stderr) = os.popen3('msguniq %s' % potfile, 'rb')
     msgs = stdout.read()
     errors = stderr.read()
     if errors:
@@ -100,7 +100,7 @@ for lang in languages:
         sys.exit(8)
     open(potfile, 'w').write(msgs)
     if os.path.exists(pofile):
-        (stdin, stdout, stderr) = os.popen3('msgmerge -q %s %s' % (pofile, potfile), 'r')
+        (stdin, stdout, stderr) = os.popen3('msgmerge -q %s %s' % (pofile, potfile), 'rb')
         msgs = stdout.read()
         errors = stderr.read()
         if errors:
