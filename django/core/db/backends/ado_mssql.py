@@ -132,12 +132,6 @@ OPERATOR_MAPPING = {
     'endswith': 'LIKE %s',
     'istartswith': 'LIKE %s',
     'iendswith': 'LIKE %s',
-    'notcontains': 'NOT LIKE %s',
-    'notstartswith': 'NOT LIKE %s',
-    'notendswith': 'NOT LIKE %s',
-    'inotcontains': 'NOT LIKE %s',
-    'inotstartswith': 'NOT LIKE %s',
-    'inotendswith': 'NOT LIKE %s',
 }
 
 DATA_TYPES = {

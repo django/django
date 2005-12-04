@@ -181,13 +181,13 @@ class Field(object):
             return value
         elif lookup_type == 'year':
             return ['%s-01-01' % value, '%s-12-31' % value]
-        elif lookup_type in ('contains', 'icontains', 'notcontains', 'inotcontains'):
+        elif lookup_type in ('contains', 'icontains'):
             return ["%%%s%%" % prep_for_like_query(value)]
         elif lookup_type == 'iexact':
             return [prep_for_like_query(value)]
-        elif lookup_type in ('startswith', 'istartswith', 'notstartswith', 'inotstartswith'):
+        elif lookup_type in ('startswith', 'istartswith'):
             return ["%s%%" % prep_for_like_query(value)]
-        elif lookup_type in ('endswith', 'iendswith', 'notendswith', 'inotendswith'):
+        elif lookup_type in ('endswith', 'iendswith'):
             return ["%%%s" % prep_for_like_query(value)]
         elif lookup_type == 'isnull':
             return []
