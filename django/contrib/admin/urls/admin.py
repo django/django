@@ -3,6 +3,7 @@ from django.conf.settings import INSTALLED_APPS
 
 urlpatterns = (
     ('^$', 'django.contrib.admin.views.main.index'),
+    ('^jsi18n/$', 'django.views.i18n.javascript_catalog', {'packages': 'django.conf'}),
     ('^logout/$', 'django.views.auth.login.logout'),
     ('^password_change/$', 'django.views.registration.passwords.password_change'),
     ('^password_change/done/$', 'django.views.registration.passwords.password_change_done'),
