@@ -552,20 +552,28 @@ independently.
 Translations and JavaScript
 ===========================
 
-Adding translations to JavaScript poses some new problems. The main problem
-is, your JavaScript code doesn't have access to a readily available ``gettext``
-implementation. The second problem is, your JavaScript code doesn't have access
-to .po or .mo files - they need to be delivered by the server. Additionally you
-want to keep those translation catalogs as small as possible. Django provides
-an integrated solution for all these problems.
+Adding translations to JavaScript poses some problems:
 
-The ``javascript_catalog`` view function
-----------------------------------------
+    * JavaScript code doesn't have access to a ``gettext`` implementation.
 
-This is a generic view that will send out a JavaScript code library with functions
-that mimick the ``gettext`` interface and an array with translation strings. Those
-translation strings are taken from the application, project or django core, just
-as you specifiy in either the info_dict or the URL.
+    * JavaScript code doesn't have access to .po or .mo files; they need to be
+      delivered by the server.
+
+    * The translation catalogs for JavaScript should be kept as small as
+      possible.
+
+Django provides an integrated solution for these problems: It passes the
+translations into JavaScript, so you can call ``gettext``, etc., from within
+JavaScript.
+
+The ``javascript_catalog`` view
+-------------------------------
+
+The main solution to these problems is the ``javascript_catalog`` view, which
+sends out a JavaScript code library with functions that mimick the ``gettext``
+interface, plus an array of translation strings. Those translation strings are
+taken from the application, project or Django core, according to what you
+specify in either the {{{info_dict}}} or the URL.
 
 You hook it up like this::
 
@@ -577,35 +585,34 @@ You hook it up like this::
         (r'^jsi18n/$', 'django.views.i18n.javascript_catalog', js_info_dict),
     )
 
-The package specifications are the same as with ``INSTALLED_APPS``. You can
-specify multiple packages - in that case all those catalogs are merged into
-one catalog. This is usefull if you have JavaScript that uses strings from different
-applications.
+Each string in ``packages`` should be in Python dotted-package syntax (the
+same format as the strings in ``INSTALLED_APPS``) and should refer to a package
+that contains a ``locale`` directory. If you specify multiple packages, all
+those catalogs aremerged into one catalog. This is useful if you have
+JavaScript that uses strings from different applications.
 
-Additionally you can make the view dynamic by putting the packages into the URL
-specification::
+You can make the view dynamic by putting the packages into the URL pattern::
 
     urlpatterns = patterns('',
         (r'^jsi18n/(?P<packages>\S+?)/$, 'django.views.i18n.javascript_catalog'),
     )
 
-This way you can specify the packages as a list of package names delimited by '+'
-signs in the URL. This is especially useful if your pages use code from different
-apps and this changes often and you don't want to pull in one big catalog file.
-Packages are limited to either ``django.conf`` or any package from the ``INSTALLED_APPS``
-setting.
+With this, you specify the packages as a list of package names delimited by '+'
+signs in the URL. This is especially useful if your pages use code from
+different apps and this changes often and you don't want to pull in one big
+catalog file. As a security measure, these values can only be either
+``django.conf`` or any package from the ``INSTALLED_APPS`` setting.
 
 Using the JavaScript translation catalog
 ----------------------------------------
 
-To make use of the catalog, you just have to pull in the dynamically generated
-script like this::
+To use the catalog, just pull in the dynamically generated script like this::
 
-    <script type="text/javascript" src="../../../jsi18n/"></script>
+    <script type="text/javascript" src="/path/to/jsi18n/"></script>
 
 This is how the admin fetches the translation catalog from the server. When the
-catalog is loaded, your JavaScript code can use the standard ``gettext`` interface
-to access it::
+catalog is loaded, your JavaScript code can use the standard ``gettext``
+interface to access it::
 
     document.write(gettext('this is to be translated'));
 
@@ -616,29 +623,30 @@ There even is a ``ngettext`` interface and a string interpolation function::
     };
     s = interpolate(ngettext('this is %(count)s object', 'this are %(count)s objects', d.count), d);
 
-The ``interpolate`` function both supports positional interpolation and named interpolation.
-So the above could have been written as::
+The ``interpolate`` function supports both positional interpolation and named
+interpolation. So the above could have been written as::
 
     s = interpolate(ngettext('this is %s object', 'this are %s objects', 11), [11]);
 
-The interpolation syntax is borrowed from Python. You shouldn't go over the top with
-string interpolation, though: this is still JavaScript, so the code will have to do
-repeated regular expression substituions. This isn't as fast as string interpolation
-in Python, so keep it to those cases where you really need it (for example in conjunction with
-ngettext to produce proper pluralizations).
+The interpolation syntax is borrowed from Python. You shouldn't go over the top
+with string interpolation, though: this is still JavaScript, so the code will
+have to do repeated regular-expression substitutions. This isn't as fast as
+string interpolation  in Python, so keep it to those cases where you really
+need it (for example, in conjunction with ``ngettext`` to produce proper
+pluralizations).
 
 Creating JavaScript translation catalogs
 ----------------------------------------
 
-You create and update the translation catalogs the same way as the other django
-translation catalogs with the make-messages.py tool. Only difference is, you have
-to provide a ``-d djangojs`` parameter like this::
+You create and update the translation catalogs the same way as the other Django
+translation catalogs -- with the {{{make-messages.py}}} tool. The only
+difference is you need to provide a ``-d djangojs`` parameter, like this::
 
     make-messages.py -d djangojs -l de
 
 This would create or update the translation catalog for JavaScript for German.
 After updating translation catalogs, just run ``compile-messages.py`` the same
-way as you do with normal django translation catalogs.
+way as you do with normal Django translation catalogs.
 
 Specialities of Django translation
 ==================================
