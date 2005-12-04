@@ -151,6 +151,12 @@ OPERATOR_MAPPING = {
     'endswith': 'LIKE %s',
     'istartswith': 'ILIKE %s',
     'iendswith': 'ILIKE %s',
+    'notcontains': 'NOT LIKE %s',
+    'notstartswith': 'NOT LIKE %s',
+    'notendswith': 'NOT LIKE %s',
+    'inotcontains': 'NOT ILIKE %s',
+    'inotstartswith': 'NOT ILIKE %s',
+    'inotendswith': 'NOT ILIKE %s',
 }
 
 # This dictionary maps Field objects to their associated PostgreSQL column

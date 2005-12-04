@@ -153,6 +153,12 @@ OPERATOR_MAPPING = {
     'endswith': "LIKE %s ESCAPE '\\'",
     'istartswith': "LIKE %s ESCAPE '\\'",
     'iendswith': "LIKE %s ESCAPE '\\'",
+    'notcontains': "NOT LIKE %s ESCAPE '\\'",
+    'notstartswith': "NOT LIKE %s ESCAPE '\\'",
+    'notendswith': "NOT LIKE %s ESCAPE '\\'",
+    'inotcontains': "NOT LIKE %s ESCAPE '\\'",
+    'inotstartswith': "NOT LIKE %s ESCAPE '\\'",
+    'inotendswith': "NOT LIKE %s ESCAPE '\\'",
 }
 
 # SQLite doesn't actually support most of these types, but it "does the right

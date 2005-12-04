@@ -146,6 +146,12 @@ OPERATOR_MAPPING = {
     'endswith': 'LIKE BINARY %s',
     'istartswith': 'LIKE %s',
     'iendswith': 'LIKE %s',
+    'notcontains': 'NOT LIKE BINARY %s',
+    'notstartswith': 'NOT LIKE BINARY %s',
+    'notendswith': 'NOT LIKE BINARY %s',
+    'inotcontains': 'NOT LIKE %s',
+    'inotstartswith': 'NOT LIKE %s',
+    'inotendswith': 'NOT LIKE %s',
 }
 
 # This dictionary maps Field objects to their associated MySQL column
