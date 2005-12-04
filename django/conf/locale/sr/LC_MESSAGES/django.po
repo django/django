@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django Serbian (latin) translation v1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2005-11-28 11:31+0100\n"
+"POT-Creation-Date: 2005-12-04 14:55+0100\n"
 "PO-Revision-Date: 2005-11-26 17:10+0100\n"
 "Last-Translator: Nebojša Đorđević <nesh@studioquattro.co.yu>\n"
 "Language-Team: Nesh <nesh@studioquatro.co.yu> & Petar <petar.maric@gmail."
@@ -77,7 +77,7 @@ msgstr "datum/vreme slanja"
 msgid "is public"
 msgstr "da li je javni"
 
-#: contrib/comments/models/comments.py:26 contrib/admin/views/doc.py:254
+#: contrib/comments/models/comments.py:26 contrib/admin/views/doc.py:256
 msgid "IP address"
 msgstr "IP adresa"
 
@@ -415,167 +415,207 @@ msgstr "Izaberi %s"
 msgid "Select %s to change"
 msgstr "Izaberi %s za izmenu"
 
-#: contrib/admin/views/main.py:411
+#: contrib/admin/views/main.py:407
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was added successfully."
 msgstr "Uspešno dodat %(name)s \"%(obj)s\"."
 
-#: contrib/admin/views/main.py:416 contrib/admin/views/main.py:492
+#: contrib/admin/views/main.py:412 contrib/admin/views/main.py:488
 msgid "You may edit it again below."
 msgstr "Ispod ga možete ponovo izmeniti."
 
-#: contrib/admin/views/main.py:424 contrib/admin/views/main.py:501
+#: contrib/admin/views/main.py:420 contrib/admin/views/main.py:497
 #, python-format
 msgid "You may add another %s below."
 msgstr "Ispod možete dodati još jedan %s."
 
-#: contrib/admin/views/main.py:441
+#: contrib/admin/views/main.py:437
 #, python-format
 msgid "Add %s"
 msgstr "Dodaj %s"
 
-#: contrib/admin/views/main.py:457
+#: contrib/admin/views/main.py:453
 #, python-format
 msgid "Added %s."
 msgstr "Dodat %s"
 
-#: contrib/admin/views/main.py:457 contrib/admin/views/main.py:459
-#: contrib/admin/views/main.py:461
+#: contrib/admin/views/main.py:453 contrib/admin/views/main.py:455
+#: contrib/admin/views/main.py:457
 msgid "and"
 msgstr "i"
 
-#: contrib/admin/views/main.py:459
+#: contrib/admin/views/main.py:455
 #, python-format
 msgid "Changed %s."
 msgstr "Izmenjen %s."
 
-#: contrib/admin/views/main.py:461
+#: contrib/admin/views/main.py:457
 #, python-format
 msgid "Deleted %s."
 msgstr "Obrisan %s"
 
-#: contrib/admin/views/main.py:464
+#: contrib/admin/views/main.py:460
 msgid "No fields changed."
 msgstr "Nijedno polje nije promenjeno."
 
-#: contrib/admin/views/main.py:489
+#: contrib/admin/views/main.py:485
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was changed successfully."
 msgstr "Uspešno izmenjen: %(name)s \"%(obj)s\"."
 
-#: contrib/admin/views/main.py:498
+#: contrib/admin/views/main.py:494
 #, python-format
 msgid ""
 "The %(name)s \"%(obj)s\" was added successfully. You may edit it again below."
 msgstr "%(name)s \"%(obj)s\" je uspešno dodat. Ispod ga možete ponovo menjati."
 
-#: contrib/admin/views/main.py:536
+#: contrib/admin/views/main.py:532
 #, python-format
 msgid "Change %s"
 msgstr "Izmeni %s"
 
-#: contrib/admin/views/main.py:614
+#: contrib/admin/views/main.py:610
 #, python-format
 msgid "One or more %(fieldname)s in %(name)s: %(obj)s"
 msgstr "Jedno ili više %(fieldname)s u %(name)s: %(obj)s"
 
-#: contrib/admin/views/main.py:619
+#: contrib/admin/views/main.py:615
 #, python-format
 msgid "One or more %(fieldname)s in %(name)s:"
 msgstr "Jedan ili više %(fieldname)s u %(name)s:"
 
-#: contrib/admin/views/main.py:648
+#: contrib/admin/views/main.py:644
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was deleted successfully."
 msgstr "Uspešno obrisan: %(name)s \"%(obj)s\"."
 
-#: contrib/admin/views/main.py:651
+#: contrib/admin/views/main.py:647
 msgid "Are you sure?"
 msgstr "Da li ste sigurni?"
 
-#: contrib/admin/views/main.py:666
+#: contrib/admin/views/main.py:662
 #, python-format
 msgid "Change history: %s"
 msgstr "Istorija izmena: %s"
 
-#: contrib/admin/views/doc.py:242 contrib/admin/views/doc.py:251
-#: contrib/admin/views/doc.py:253 contrib/admin/views/doc.py:258
-#: contrib/admin/views/doc.py:259 contrib/admin/views/doc.py:261
+#: contrib/admin/views/doc.py:244 contrib/admin/views/doc.py:253
+#: contrib/admin/views/doc.py:255 contrib/admin/views/doc.py:261
+#: contrib/admin/views/doc.py:262 contrib/admin/views/doc.py:264
 msgid "Integer"
 msgstr "Ceo broj"
 
-#: contrib/admin/views/doc.py:243
+#: contrib/admin/views/doc.py:245
 msgid "Boolean (Either True or False)"
 msgstr "Logička vrednost (Tačno ili Netačno)"
 
-#: contrib/admin/views/doc.py:244
+#: contrib/admin/views/doc.py:246
 #, python-format
 msgid "String (up to %(maxlength)s)"
 msgstr "Niz karaktera (maksimalno %(maxlength)s karaktera)"
 
-#: contrib/admin/views/doc.py:245
+#: contrib/admin/views/doc.py:247
 msgid "Comma-separated integers"
 msgstr "Brojevi razdvojeni zarezima"
 
-#: contrib/admin/views/doc.py:246
+#: contrib/admin/views/doc.py:248
 msgid "Date (without time)"
 msgstr "Datum (bez vremena)"
 
-#: contrib/admin/views/doc.py:247
+#: contrib/admin/views/doc.py:249
 msgid "Date (with time)"
 msgstr "Datum (sa vremenom)"
 
-#: contrib/admin/views/doc.py:248
+#: contrib/admin/views/doc.py:250
 msgid "E-mail address"
 msgstr "E-mail adresa"
 
-#: contrib/admin/views/doc.py:249 contrib/admin/views/doc.py:252
+#: contrib/admin/views/doc.py:251 contrib/admin/views/doc.py:254
 msgid "File path"
 msgstr "Putanja do fajla"
 
-#: contrib/admin/views/doc.py:250
+#: contrib/admin/views/doc.py:252
 msgid "Decimal number"
 msgstr "Decimalni broj"
 
-#: contrib/admin/views/doc.py:256
+#: contrib/admin/views/doc.py:258
 msgid "Boolean (Either True, False or None)"
 msgstr "Logička vrednost (Tačno, Netačno ili prazno)"
 
-#: contrib/admin/views/doc.py:257
+#: contrib/admin/views/doc.py:259
+msgid "Relation to parent model"
+msgstr ""
+
+#: contrib/admin/views/doc.py:260
 msgid "Phone number"
 msgstr "Telefonski broj"
 
-#: contrib/admin/views/doc.py:260
+#: contrib/admin/views/doc.py:263
 msgid "String (up to 50)"
 msgstr "Niz karaktera (maksimalno 50 karaktera)"
 
-#: contrib/admin/views/doc.py:262
+#: contrib/admin/views/doc.py:265
 msgid "Text"
 msgstr "Tekst"
 
-#: contrib/admin/views/doc.py:263
+#: contrib/admin/views/doc.py:266
 msgid "Time"
 msgstr "Vreme"
 
 # nesh: ovo se valjda ne prevodi
 # petar: ne prevodi se
-#: contrib/admin/views/doc.py:264 contrib/flatpages/models/flatpages.py:6
+#: contrib/admin/views/doc.py:267 contrib/flatpages/models/flatpages.py:6
 msgid "URL"
 msgstr "URL"
 
-#: contrib/admin/views/doc.py:265
+#: contrib/admin/views/doc.py:268
 msgid "U.S. state (two uppercase letters)"
 msgstr "U.S. država (dva VELIKA slova)"
 
-#: contrib/admin/views/doc.py:266
+#: contrib/admin/views/doc.py:269
 msgid "XML text"
 msgstr "XML tekst"
 
+#: contrib/admin/templates/admin/object_history.html:3
+#: contrib/admin/templates/admin/change_list.html:4
+#: contrib/admin/templates/admin/base.html:23
+#: contrib/admin/templates/admin/delete_confirmation.html:3
+#: contrib/admin/templates/admin/change_form.html:9
+#: contrib/admin/templates/admin_doc/bookmarklets.html:4
+#: contrib/admin/templates/admin_doc/view_detail.html:4
+#: contrib/admin/templates/admin_doc/template_tag_index.html:5
+#: contrib/admin/templates/admin_doc/template_detail.html:4
+#: contrib/admin/templates/admin_doc/template_filter_index.html:5
+#: contrib/admin/templates/admin_doc/missing_docutils.html:4
+#: contrib/admin/templates/admin_doc/view_index.html:5
+#: contrib/admin/templates/admin_doc/model_detail.html:3
+#: contrib/admin/templates/admin_doc/index.html:4
+#: contrib/admin/templates/admin_doc/model_index.html:5
+msgid "Change password"
+msgstr "Izmeni lozinku"
+
+#: contrib/admin/templates/admin/object_history.html:3
+#: contrib/admin/templates/admin/change_list.html:4
+#: contrib/admin/templates/admin/base.html:23
+#: contrib/admin/templates/admin/delete_confirmation.html:3
+#: contrib/admin/templates/admin/change_form.html:9
+#: contrib/admin/templates/admin_doc/bookmarklets.html:4
+#: contrib/admin/templates/admin_doc/view_detail.html:4
+#: contrib/admin/templates/admin_doc/template_tag_index.html:5
+#: contrib/admin/templates/admin_doc/template_detail.html:4
+#: contrib/admin/templates/admin_doc/template_filter_index.html:5
+#: contrib/admin/templates/admin_doc/missing_docutils.html:4
+#: contrib/admin/templates/admin_doc/view_index.html:5
+#: contrib/admin/templates/admin_doc/model_detail.html:3
+#: contrib/admin/templates/admin_doc/index.html:4
+#: contrib/admin/templates/admin_doc/model_index.html:5
+msgid "Log out"
+msgstr "Odjavi se"
+
 #: contrib/admin/templates/admin/object_history.html:5
 #: contrib/admin/templates/admin/500.html:4
-#: contrib/admin/templates/admin/change_list.html:4
+#: contrib/admin/templates/admin/change_list.html:5
 #: contrib/admin/templates/admin/base.html:29
-#: contrib/admin/templates/admin/change_form.html:10
+#: contrib/admin/templates/admin/change_form.html:12
 #: contrib/admin/templates/registration/password_change_done.html:4
 #: contrib/admin/templates/registration/password_reset_form.html:4
 #: contrib/admin/templates/registration/logged_out.html:4
@@ -586,7 +626,7 @@ msgid "Home"
 msgstr "Početna strana"
 
 #: contrib/admin/templates/admin/object_history.html:5
-#: contrib/admin/templates/admin/change_form.html:17
+#: contrib/admin/templates/admin/change_form.html:19
 msgid "History"
 msgstr "Istorija"
 
@@ -652,7 +692,7 @@ msgid "We're sorry, but the requested page could not be found."
 msgstr "Tražena strana ne postoji."
 
 #: contrib/admin/templates/admin/index.html:27
-#: contrib/admin/templates/admin/change_form.html:12
+#: contrib/admin/templates/admin/change_form.html:14
 msgid "Add"
 msgstr "Dodaj"
 
@@ -676,7 +716,7 @@ msgstr "Moje akcije"
 msgid "None available"
 msgstr "Nema dostupnih"
 
-#: contrib/admin/templates/admin/change_list.html:9
+#: contrib/admin/templates/admin/change_list.html:10
 #, python-format
 msgid "Add %(name)s"
 msgstr "Dodaj %(name)s"
@@ -697,15 +737,7 @@ msgstr "Da li ste <a href=\"/password_reset/\">zaboravili Vašu lozinku?</a>?"
 msgid "Welcome,"
 msgstr "Dobrodošli,"
 
-#: contrib/admin/templates/admin/base.html:23
-msgid "Change password"
-msgstr "Izmeni lozinku"
-
-#: contrib/admin/templates/admin/base.html:23
-msgid "Log out"
-msgstr "Odjavi se"
-
-#: contrib/admin/templates/admin/delete_confirmation.html:7
+#: contrib/admin/templates/admin/delete_confirmation.html:6
 #, python-format
 msgid ""
 "Deleting the %(object_name)s '%(object)s' would result in deleting related "
@@ -715,7 +747,7 @@ msgstr ""
 "Brisanjem %(object_name)s  '%(object)s' došlo bi do brisanja dodatnih "
 "podataka, ali nemate prava da brišete sledeće tipove podataka:"
 
-#: contrib/admin/templates/admin/delete_confirmation.html:14
+#: contrib/admin/templates/admin/delete_confirmation.html:13
 #, python-format
 msgid ""
 "Are you sure you want to delete the %(object_name)s \"%(object)s\"? All of "
@@ -724,7 +756,7 @@ msgstr ""
 "Da li ste sigurni da želite da obrišete %(object_name)s \"%(object)s\"? Biće "
 "obrisani i sledeći pridruženi objekti:"
 
-#: contrib/admin/templates/admin/delete_confirmation.html:18
+#: contrib/admin/templates/admin/delete_confirmation.html:17
 msgid "Yes, I'm sure"
 msgstr "Da, siguran sam"
 
@@ -737,22 +769,22 @@ msgstr "Po %(title)s "
 msgid "Go"
 msgstr ""
 
-#: contrib/admin/templates/admin/change_form.html:18
+#: contrib/admin/templates/admin/change_form.html:20
 msgid "View on site"
 msgstr "Pogledaj na sajtu"
 
-#: contrib/admin/templates/admin/change_form.html:26
+#: contrib/admin/templates/admin/change_form.html:28
 msgid "Please correct the error below."
 msgid_plural "Please correct the errors below."
 msgstr[0] "Ispravite dole navedenu grešku."
 msgstr[1] "Ispravite dole navedene greške."
 msgstr[2] "Ispravite dole navedene greške."
 
-#: contrib/admin/templates/admin/change_form.html:43
+#: contrib/admin/templates/admin/change_form.html:45
 msgid "Ordering"
 msgstr "Redosled"
 
-#: contrib/admin/templates/admin/change_form.html:46
+#: contrib/admin/templates/admin/change_form.html:48
 msgid "Order:"
 msgstr "Red:"
 
@@ -961,6 +993,15 @@ msgstr "Izmeni objekt (novi prozor)"
 msgid "As above, but opens the admin page in a new window."
 msgstr "Kao iznad, samo otvara admin stranu u novom prozoru."
 
+#: contrib/admin/templates/widget/date_time.html:3
+msgid "Date:"
+msgstr ""
+
+#: contrib/admin/templates/widget/date_time.html:4
+#, fuzzy
+msgid "Time:"
+msgstr "Vreme"
+
 #: contrib/redirects/models/redirects.py:7
 msgid "redirect from"
 msgstr "redirekcija od"
@@ -1042,15 +1083,15 @@ msgstr "statična strana"
 msgid "flat pages"
 msgstr "statične strane"
 
-#: utils/translation.py:335
+#: utils/translation.py:350
 msgid "DATE_FORMAT"
 msgstr "D, d.m.Y."
 
-#: utils/translation.py:336
+#: utils/translation.py:351
 msgid "DATETIME_FORMAT"
 msgstr "d.m.Y. H:i:s"
 
-#: utils/translation.py:337
+#: utils/translation.py:352
 msgid "TIME_FORMAT"
 msgstr "H:i:s"
 

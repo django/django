@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2005-12-04 13:13+0100\n"
+"POT-Creation-Date: 2005-12-04 14:56+0100\n"
 "PO-Revision-Date: 2005-10-08 00:03+0200\n"
 "Last-Translator: Georg Bauer <gb@bofh.ms>\n"
 "MIME-Version: 1.0\n"
@@ -576,7 +576,7 @@ msgstr "XML Text"
 #: contrib/admin/templates/admin/change_list.html:4
 #: contrib/admin/templates/admin/base.html:23
 #: contrib/admin/templates/admin/delete_confirmation.html:3
-#: contrib/admin/templates/admin/change_form.html:8
+#: contrib/admin/templates/admin/change_form.html:9
 #: contrib/admin/templates/admin_doc/bookmarklets.html:4
 #: contrib/admin/templates/admin_doc/view_detail.html:4
 #: contrib/admin/templates/admin_doc/template_tag_index.html:5
@@ -594,7 +594,7 @@ msgstr "Passwort ändern"
 #: contrib/admin/templates/admin/change_list.html:4
 #: contrib/admin/templates/admin/base.html:23
 #: contrib/admin/templates/admin/delete_confirmation.html:3
-#: contrib/admin/templates/admin/change_form.html:8
+#: contrib/admin/templates/admin/change_form.html:9
 #: contrib/admin/templates/admin_doc/bookmarklets.html:4
 #: contrib/admin/templates/admin_doc/view_detail.html:4
 #: contrib/admin/templates/admin_doc/template_tag_index.html:5
@@ -612,7 +612,7 @@ msgstr "Abmelden"
 #: contrib/admin/templates/admin/500.html:4
 #: contrib/admin/templates/admin/change_list.html:5
 #: contrib/admin/templates/admin/base.html:29
-#: contrib/admin/templates/admin/change_form.html:11
+#: contrib/admin/templates/admin/change_form.html:12
 #: contrib/admin/templates/registration/password_change_done.html:4
 #: contrib/admin/templates/registration/password_reset_form.html:4
 #: contrib/admin/templates/registration/logged_out.html:4
@@ -623,7 +623,7 @@ msgid "Home"
 msgstr "Start"
 
 #: contrib/admin/templates/admin/object_history.html:5
-#: contrib/admin/templates/admin/change_form.html:18
+#: contrib/admin/templates/admin/change_form.html:19
 msgid "History"
 msgstr "Geschichte"
 
@@ -691,7 +691,7 @@ msgstr ""
 "Es tut uns leid, aber die angeforderte Seite kann nicht gefunden werden."
 
 #: contrib/admin/templates/admin/index.html:27
-#: contrib/admin/templates/admin/change_form.html:13
+#: contrib/admin/templates/admin/change_form.html:14
 msgid "Add"
 msgstr "Zufügen"
 
@@ -769,21 +769,21 @@ msgstr " Nach %(title)s "
 msgid "Go"
 msgstr "Los"
 
-#: contrib/admin/templates/admin/change_form.html:19
+#: contrib/admin/templates/admin/change_form.html:20
 msgid "View on site"
 msgstr "Im Web Anzeigen"
 
-#: contrib/admin/templates/admin/change_form.html:27
+#: contrib/admin/templates/admin/change_form.html:28
 msgid "Please correct the error below."
 msgid_plural "Please correct the errors below."
 msgstr[0] "Bitte den Fehler korrigieren."
 msgstr[1] "Bitte die Fehler korrigieren."
 
-#: contrib/admin/templates/admin/change_form.html:44
+#: contrib/admin/templates/admin/change_form.html:45
 msgid "Ordering"
 msgstr "Sortierung"
 
-#: contrib/admin/templates/admin/change_form.html:47
+#: contrib/admin/templates/admin/change_form.html:48
 msgid "Order:"
 msgstr "Reihenfolge:"
 

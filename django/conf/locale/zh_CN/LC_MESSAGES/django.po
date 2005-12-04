@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django v1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2005-11-28 11:31+0100\n"
+"POT-Creation-Date: 2005-12-04 14:55+0100\n"
 "PO-Revision-Date: 2005-11-26 23:02+0800\n"
 "Last-Translator: limodou <limodou@gmail.com>\n"
 "Language-Team: Simplified Chinese <limodou@gmail.com>\n"
@@ -79,7 +79,7 @@ msgstr "日期/时间已提交"
 msgid "is public"
 msgstr "公开"
 
-#: contrib/comments/models/comments.py:26 contrib/admin/views/doc.py:254
+#: contrib/comments/models/comments.py:26 contrib/admin/views/doc.py:256
 msgid "IP address"
 msgstr "IP地址"
 
@@ -400,165 +400,205 @@ msgstr "选择 %s"
 msgid "Select %s to change"
 msgstr "选择 %s 来修改"
 
-#: contrib/admin/views/main.py:411
+#: contrib/admin/views/main.py:407
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was added successfully."
 msgstr "%(name)s \"%(obj)s\" 添加成功。"
 
-#: contrib/admin/views/main.py:416 contrib/admin/views/main.py:492
+#: contrib/admin/views/main.py:412 contrib/admin/views/main.py:488
 msgid "You may edit it again below."
 msgstr "你可以在下面再次编辑它。"
 
-#: contrib/admin/views/main.py:424 contrib/admin/views/main.py:501
+#: contrib/admin/views/main.py:420 contrib/admin/views/main.py:497
 #, python-format
 msgid "You may add another %s below."
 msgstr "你可以在下面增加另一个 %s 。"
 
-#: contrib/admin/views/main.py:441
+#: contrib/admin/views/main.py:437
 #, python-format
 msgid "Add %s"
 msgstr "增加 %s"
 
-#: contrib/admin/views/main.py:457
+#: contrib/admin/views/main.py:453
 #, python-format
 msgid "Added %s."
 msgstr "%s 已增加。"
 
-#: contrib/admin/views/main.py:457 contrib/admin/views/main.py:459
-#: contrib/admin/views/main.py:461
+#: contrib/admin/views/main.py:453 contrib/admin/views/main.py:455
+#: contrib/admin/views/main.py:457
 msgid "and"
 msgstr "和"
 
-#: contrib/admin/views/main.py:459
+#: contrib/admin/views/main.py:455
 #, python-format
 msgid "Changed %s."
 msgstr "已修改 %s 。"
 
-#: contrib/admin/views/main.py:461
+#: contrib/admin/views/main.py:457
 #, python-format
 msgid "Deleted %s."
 msgstr "%s 已删除。"
 
-#: contrib/admin/views/main.py:464
+#: contrib/admin/views/main.py:460
 msgid "No fields changed."
 msgstr "没有字段被修改。"
 
-#: contrib/admin/views/main.py:489
+#: contrib/admin/views/main.py:485
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was changed successfully."
 msgstr "%(name)s \"%(obj)s\" 修改成功。"
 
-#: contrib/admin/views/main.py:498
+#: contrib/admin/views/main.py:494
 #, python-format
 msgid ""
 "The %(name)s \"%(obj)s\" was added successfully. You may edit it again below."
 msgstr "%(name)s \"%(obj)s\" 添加成功。你可以在下面再次编辑它。"
 
-#: contrib/admin/views/main.py:536
+#: contrib/admin/views/main.py:532
 #, python-format
 msgid "Change %s"
 msgstr "修改 %s"
 
-#: contrib/admin/views/main.py:614
+#: contrib/admin/views/main.py:610
 #, python-format
 msgid "One or more %(fieldname)s in %(name)s: %(obj)s"
 msgstr "一个或多个 %(fieldname)s 在 %(name)s 中: %(obj)s"
 
-#: contrib/admin/views/main.py:619
+#: contrib/admin/views/main.py:615
 #, python-format
 msgid "One or more %(fieldname)s in %(name)s:"
 msgstr "一个或多个 %(fieldname)s 在 %(name)s 中:"
 
-#: contrib/admin/views/main.py:648
+#: contrib/admin/views/main.py:644
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was deleted successfully."
 msgstr "%(name)s \"%(obj)s\" 删除成功。"
 
-#: contrib/admin/views/main.py:651
+#: contrib/admin/views/main.py:647
 msgid "Are you sure?"
 msgstr "你确信吗？"
 
-#: contrib/admin/views/main.py:666
+#: contrib/admin/views/main.py:662
 #, python-format
 msgid "Change history: %s"
 msgstr "修改历史： %s"
 
-#: contrib/admin/views/doc.py:242 contrib/admin/views/doc.py:251
-#: contrib/admin/views/doc.py:253 contrib/admin/views/doc.py:258
-#: contrib/admin/views/doc.py:259 contrib/admin/views/doc.py:261
+#: contrib/admin/views/doc.py:244 contrib/admin/views/doc.py:253
+#: contrib/admin/views/doc.py:255 contrib/admin/views/doc.py:261
+#: contrib/admin/views/doc.py:262 contrib/admin/views/doc.py:264
 msgid "Integer"
 msgstr "整数"
 
-#: contrib/admin/views/doc.py:243
+#: contrib/admin/views/doc.py:245
 msgid "Boolean (Either True or False)"
 msgstr "布尔(True或False)"
 
-#: contrib/admin/views/doc.py:244
+#: contrib/admin/views/doc.py:246
 #, python-format
 msgid "String (up to %(maxlength)s)"
 msgstr "字符串(最长 %(maxlength)s)"
 
-#: contrib/admin/views/doc.py:245
+#: contrib/admin/views/doc.py:247
 msgid "Comma-separated integers"
 msgstr "逗号分隔的整数"
 
-#: contrib/admin/views/doc.py:246
+#: contrib/admin/views/doc.py:248
 msgid "Date (without time)"
 msgstr "日期(无时间)"
 
-#: contrib/admin/views/doc.py:247
+#: contrib/admin/views/doc.py:249
 msgid "Date (with time)"
 msgstr "日期(带时间)"
 
-#: contrib/admin/views/doc.py:248
+#: contrib/admin/views/doc.py:250
 msgid "E-mail address"
 msgstr "邮箱地址"
 
-#: contrib/admin/views/doc.py:249 contrib/admin/views/doc.py:252
+#: contrib/admin/views/doc.py:251 contrib/admin/views/doc.py:254
 msgid "File path"
 msgstr "文件路径"
 
-#: contrib/admin/views/doc.py:250
+#: contrib/admin/views/doc.py:252
 msgid "Decimal number"
 msgstr "小数"
 
-#: contrib/admin/views/doc.py:256
+#: contrib/admin/views/doc.py:258
 msgid "Boolean (Either True, False or None)"
 msgstr "布尔(True, False或None)"
 
-#: contrib/admin/views/doc.py:257
+#: contrib/admin/views/doc.py:259
+msgid "Relation to parent model"
+msgstr ""
+
+#: contrib/admin/views/doc.py:260
 msgid "Phone number"
 msgstr "电话号码"
 
-#: contrib/admin/views/doc.py:260
+#: contrib/admin/views/doc.py:263
 msgid "String (up to 50)"
 msgstr "整数(最长50)"
 
-#: contrib/admin/views/doc.py:262
+#: contrib/admin/views/doc.py:265
 msgid "Text"
 msgstr "文本"
 
-#: contrib/admin/views/doc.py:263
+#: contrib/admin/views/doc.py:266
 msgid "Time"
 msgstr "时间"
 
-#: contrib/admin/views/doc.py:264 contrib/flatpages/models/flatpages.py:6
+#: contrib/admin/views/doc.py:267 contrib/flatpages/models/flatpages.py:6
 msgid "URL"
 msgstr "URL"
 
-#: contrib/admin/views/doc.py:265
+#: contrib/admin/views/doc.py:268
 msgid "U.S. state (two uppercase letters)"
 msgstr "美国州名(两个大写字母)"
 
-#: contrib/admin/views/doc.py:266
+#: contrib/admin/views/doc.py:269
 msgid "XML text"
 msgstr "XML文本"
 
+#: contrib/admin/templates/admin/object_history.html:3
+#: contrib/admin/templates/admin/change_list.html:4
+#: contrib/admin/templates/admin/base.html:23
+#: contrib/admin/templates/admin/delete_confirmation.html:3
+#: contrib/admin/templates/admin/change_form.html:9
+#: contrib/admin/templates/admin_doc/bookmarklets.html:4
+#: contrib/admin/templates/admin_doc/view_detail.html:4
+#: contrib/admin/templates/admin_doc/template_tag_index.html:5
+#: contrib/admin/templates/admin_doc/template_detail.html:4
+#: contrib/admin/templates/admin_doc/template_filter_index.html:5
+#: contrib/admin/templates/admin_doc/missing_docutils.html:4
+#: contrib/admin/templates/admin_doc/view_index.html:5
+#: contrib/admin/templates/admin_doc/model_detail.html:3
+#: contrib/admin/templates/admin_doc/index.html:4
+#: contrib/admin/templates/admin_doc/model_index.html:5
+msgid "Change password"
+msgstr "修改口令"
+
+#: contrib/admin/templates/admin/object_history.html:3
+#: contrib/admin/templates/admin/change_list.html:4
+#: contrib/admin/templates/admin/base.html:23
+#: contrib/admin/templates/admin/delete_confirmation.html:3
+#: contrib/admin/templates/admin/change_form.html:9
+#: contrib/admin/templates/admin_doc/bookmarklets.html:4
+#: contrib/admin/templates/admin_doc/view_detail.html:4
+#: contrib/admin/templates/admin_doc/template_tag_index.html:5
+#: contrib/admin/templates/admin_doc/template_detail.html:4
+#: contrib/admin/templates/admin_doc/template_filter_index.html:5
+#: contrib/admin/templates/admin_doc/missing_docutils.html:4
+#: contrib/admin/templates/admin_doc/view_index.html:5
+#: contrib/admin/templates/admin_doc/model_detail.html:3
+#: contrib/admin/templates/admin_doc/index.html:4
+#: contrib/admin/templates/admin_doc/model_index.html:5
+msgid "Log out"
+msgstr "注销"
+
 #: contrib/admin/templates/admin/object_history.html:5
 #: contrib/admin/templates/admin/500.html:4
-#: contrib/admin/templates/admin/change_list.html:4
+#: contrib/admin/templates/admin/change_list.html:5
 #: contrib/admin/templates/admin/base.html:29
-#: contrib/admin/templates/admin/change_form.html:10
+#: contrib/admin/templates/admin/change_form.html:12
 #: contrib/admin/templates/registration/password_change_done.html:4
 #: contrib/admin/templates/registration/password_reset_form.html:4
 #: contrib/admin/templates/registration/logged_out.html:4
@@ -569,7 +609,7 @@ msgid "Home"
 msgstr "首页"
 
 #: contrib/admin/templates/admin/object_history.html:5
-#: contrib/admin/templates/admin/change_form.html:17
+#: contrib/admin/templates/admin/change_form.html:19
 msgid "History"
 msgstr "历史"
 
@@ -633,7 +673,7 @@ msgid "We're sorry, but the requested page could not be found."
 msgstr "很报歉，请求页面无法找到。"
 
 #: contrib/admin/templates/admin/index.html:27
-#: contrib/admin/templates/admin/change_form.html:12
+#: contrib/admin/templates/admin/change_form.html:14
 msgid "Add"
 msgstr "增加"
 
@@ -657,7 +697,7 @@ msgstr "我的动作"
 msgid "None available"
 msgstr "无可用的"
 
-#: contrib/admin/templates/admin/change_list.html:9
+#: contrib/admin/templates/admin/change_list.html:10
 #, python-format
 msgid "Add %(name)s"
 msgstr "增加 %(name)s"
@@ -678,15 +718,7 @@ msgstr "<a href=\"/password_reset/\">忘记你的密码</a>？"
 msgid "Welcome,"
 msgstr "欢迎，"
 
-#: contrib/admin/templates/admin/base.html:23
-msgid "Change password"
-msgstr "修改口令"
-
-#: contrib/admin/templates/admin/base.html:23
-msgid "Log out"
-msgstr "注销"
-
-#: contrib/admin/templates/admin/delete_confirmation.html:7
+#: contrib/admin/templates/admin/delete_confirmation.html:6
 #, python-format
 msgid ""
 "Deleting the %(object_name)s '%(object)s' would result in deleting related "
@@ -696,7 +728,7 @@ msgstr ""
 "删除 %(object_name)s  '%(object)s' 会导致删除相关的对象，但你的帐号无权删除下"
 "列类型的对象："
 
-#: contrib/admin/templates/admin/delete_confirmation.html:14
+#: contrib/admin/templates/admin/delete_confirmation.html:13
 #, python-format
 msgid ""
 "Are you sure you want to delete the %(object_name)s \"%(object)s\"? All of "
@@ -704,7 +736,7 @@ msgid ""
 msgstr ""
 "你确信相要删除 %(object_name)s \"%(object)s\"？所有相关的项目都将被删除："
 
-#: contrib/admin/templates/admin/delete_confirmation.html:18
+#: contrib/admin/templates/admin/delete_confirmation.html:17
 msgid "Yes, I'm sure"
 msgstr "是的，我确定"
 
@@ -717,20 +749,20 @@ msgstr " 由 %(title)s"
 msgid "Go"
 msgstr ""
 
-#: contrib/admin/templates/admin/change_form.html:18
+#: contrib/admin/templates/admin/change_form.html:20
 msgid "View on site"
 msgstr "在站点上查看"
 
-#: contrib/admin/templates/admin/change_form.html:26
+#: contrib/admin/templates/admin/change_form.html:28
 msgid "Please correct the error below."
 msgid_plural "Please correct the errors below."
 msgstr[0] "请改正下面的错误。"
 
-#: contrib/admin/templates/admin/change_form.html:43
+#: contrib/admin/templates/admin/change_form.html:45
 msgid "Ordering"
 msgstr "排序中"
 
-#: contrib/admin/templates/admin/change_form.html:46
+#: contrib/admin/templates/admin/change_form.html:48
 msgid "Order:"
 msgstr "排序："
 
@@ -934,6 +966,15 @@ msgstr "编辑本对象(新窗口)"
 msgid "As above, but opens the admin page in a new window."
 msgstr "同上，但在新窗口中打开管理页面。"
 
+#: contrib/admin/templates/widget/date_time.html:3
+msgid "Date:"
+msgstr ""
+
+#: contrib/admin/templates/widget/date_time.html:4
+#, fuzzy
+msgid "Time:"
+msgstr "时间"
+
 #: contrib/redirects/models/redirects.py:7
 msgid "redirect from"
 msgstr "重定向自"
@@ -1006,15 +1047,15 @@ msgstr "简单页面"
 msgid "flat pages"
 msgstr "简单页面"
 
-#: utils/translation.py:335
+#: utils/translation.py:350
 msgid "DATE_FORMAT"
 msgstr "日期格式"
 
-#: utils/translation.py:336
+#: utils/translation.py:351
 msgid "DATETIME_FORMAT"
 msgstr "日期时间格式"
 
-#: utils/translation.py:337
+#: utils/translation.py:352
 msgid "TIME_FORMAT"
 msgstr "时间格式"
 
