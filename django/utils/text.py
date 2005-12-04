@@ -1,5 +1,7 @@
 import re
 
+from django.conf.settings import DEFAULT_CHARSET
+
 # Capitalizes the first letter of a string.
 capfirst = lambda x: x and x[0].upper() + x[1:]
 
@@ -90,3 +92,20 @@ def compress_string(s):
     zfile.write(s)
     zfile.close()
     return zbuf.getvalue()
+
+ustring_re = re.compile(u"([\u0080-\uffff])")
+def javascript_quote(s):
+
+    def fix(match):
+        return r"\u%04x" % ord(match.group(1))
+
+    if type(s) == str:
+        s = s.decode(DEFAULT_ENCODING)
+    elif type(s) != unicode:
+        raise TypeError, s
+    s = s.replace('\\', '\\\\')
+    s = s.replace('\n', '\\n')
+    s = s.replace('\t', '\\t')
+    s = s.replace("'", "\\'")
+    return str(ustring_re.sub(fix, s))
+

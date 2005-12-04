@@ -212,6 +212,21 @@ def get_language():
     from django.conf.settings import LANGUAGE_CODE
     return LANGUAGE_CODE
 
+def catalog():
+    """
+    This function returns the current active catalog for further processing.
+    This can be used if you need to modify the catalog or want to access the
+    whole message catalog instead of just translating one string.
+    """
+    global _default, _active
+    t = _active.get(currentThread(), None)
+    if t is not None:
+        return t
+    if _default is None:
+        from django.conf import settings
+        _default = translation(settings.LANGUAGE_CODE)
+    return _default
+
 def gettext(message):
     """
     This function will be patched into the builtins module to provide the _
