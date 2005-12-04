@@ -549,20 +549,110 @@ The easiest way out is to store applications that are not part of the project
 connected to your explicit project and not strings that are distributed
 independently.
 
+Translations and JavaScript
+===========================
+
+Adding translations to JavaScript poses some new problems. The main problem
+is, your JavaScript code doesn't have access to a readily available ``gettext``
+implementation. The second problem is, your JavaScript code doesn't have access
+to .po or .mo files - they need to be delivered by the server. Additionally you
+want to keep those translation catalogs as small as possible. Django provides
+an integrated solution for all these problems.
+
+The ``javascript_catalog`` view function
+----------------------------------------
+
+This is a generic view that will send out a JavaScript code library with functions
+that mimick the ``gettext`` interface and an array with translation strings. Those
+translation strings are taken from the application, project or django core, just
+as you specifiy in either the info_dict or the URL.
+
+You hook it up like this::
+
+    js_info_dict = {
+        'packages': ('your.app.package',),
+    }
+
+    urlpatterns = patterns('',
+        (r'^jsi18n/$', 'django.views.i18n.javascript_catalog', js_info_dict),
+    )
+
+The package specifications are the same as with ``INSTALLED_APPS``. You can
+specify multiple packages - in that case all those catalogs are merged into
+one catalog. This is usefull if you have JavaScript that uses strings from different
+applications.
+
+Additionally you can make the view dynamic by putting the packages into the URL
+specification::
+
+    urlpatterns = patterns('',
+        (r'^jsi18n/(?P<packages>\S+?)/$, 'django.views.i18n.javascript_catalog'),
+    )
+
+This way you can specify the packages as a list of package names delimited by '+'
+signs in the URL. This is especially useful if your pages use code from different
+apps and this changes often and you don't want to pull in one big catalog file.
+Packages are limited to either ``django.conf`` or any package from the ``INSTALLED_APPS``
+setting.
+
+Using the JavaScript translation catalog
+----------------------------------------
+
+To make use of the catalog, you just have to pull in the dynamically generated
+script like this::
+
+    <script type="text/javascript" src="../../../jsi18n/"></script>
+
+This is how the admin fetches the translation catalog from the server. When the
+catalog is loaded, your JavaScript code can use the standard ``gettext`` interface
+to access it::
+
+    document.write(gettext('this is to be translated'));
+
+There even is a ``ngettext`` interface and a string interpolation function::
+
+    d = {
+        count: 10
+    };
+    s = interpolate(ngettext('this is %(count)s object', 'this are %(count)s objects', d.count), d);
+
+The ``interpolate`` function both supports positional interpolation and named interpolation.
+So the above could have been written as::
+
+    s = interpolate(ngettext('this is %s object', 'this are %s objects', 11), 11);
+
+The interpolation syntax is borrowed from Python. You shouldn't go over the top with
+string interpolation, though: this is still JavaScript, so the code will have to do
+repeated regular expression substituions. This isn't as fast as string interpolation
+in Python, so keep it to those cases where you really need it (for example in conjunction with
+ngettext to produce proper pluralizations).
+
+Creating JavaScript translation catalogs
+----------------------------------------
+
+You create and update the translation catalogs the same way as the other django
+translation catalogs with the make-messages.py tool. Only difference is, you have
+to provide a ``-d djangojs`` parameter like this::
+
+    make-messages.py -d djangojs -l de
+
+This would create or update the translation catalog for JavaScript for German.
+After updating translation catalogs, just run ``compile-messages.py`` the same
+way as you do with normal django translation catalogs.
+
 Specialities of Django translation
 ==================================
 
 If you know ``gettext``, you might note these specialities in the way Django
 does translation:
 
-    * The string domain is always ``django``. The string domain is used to
+    * The string domain is ``django`` or ``djangojs``. The string domain is used to
       differentiate between different programs that store their data in a
-      common message-file library (usually ``/usr/share/locale/``). In Django's
-      case, there are Django-specific locale libraries, so the domain itself
-      isn't used. We could store app message files with different names and put
-      them, say, in the project library, but we decided against this. With
-      message files in the application tree, apps can be distributed more
-      easily.
+      common message-file library (usually ``/usr/share/locale/``). The ``django``
+      domain is used for python and template translation strings and is loaded into
+      the global translation catalogs. The ``djangojs`` domain is only used for
+      JavaScript translation catalogs to make sure that those are as small as
+      possible.
     * Django only uses ``gettext`` and ``gettext_noop``. That's because Django
       always uses ``DEFAULT_CHARSET`` strings internally. There isn't much use
       in using ``ugettext``, because you'll always need to produce utf-8
