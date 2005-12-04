@@ -619,7 +619,7 @@ There even is a ``ngettext`` interface and a string interpolation function::
 The ``interpolate`` function both supports positional interpolation and named interpolation.
 So the above could have been written as::
 
-    s = interpolate(ngettext('this is %s object', 'this are %s objects', 11), 11);
+    s = interpolate(ngettext('this is %s object', 'this are %s objects', 11), [11]);
 
 The interpolation syntax is borrowed from Python. You shouldn't go over the top with
 string interpolation, though: this is still JavaScript, so the code will have to do
