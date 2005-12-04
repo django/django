@@ -23,8 +23,8 @@ function quickElement() {
 
 // CalendarNamespace -- Provides a collection of HTML calendar-related helper functions
 var CalendarNamespace = {
-    monthsOfYear: 'January February March April May June July August September October November December'.split(' '),
-    daysOfWeek: 'S M T W T F S'.split(' '),
+    monthsOfYear: gettext('January February March April May June July August September October November December').split(' '),
+    daysOfWeek: gettext('S M T W T F S').split(' '),
     isLeapYear: function(year) {
         return (((year % 4)==0) && ((year % 100)!=0) || ((year % 400)==0));
     },

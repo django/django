@@ -7,13 +7,23 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2005-12-04 13:32+0100\n"
+"POT-Creation-Date: 2005-12-04 17:27+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+
+#: contrib/admin/media/js/calendar.js:24
+msgid ""
+"January February March April May June July August September October November "
+"December"
+msgstr ""
+
+#: contrib/admin/media/js/calendar.js:25
+msgid "S M T W T F S"
+msgstr ""
 
 #: contrib/admin/media/js/admin/DateTimeShortcuts.js:45
 #: contrib/admin/media/js/admin/DateTimeShortcuts.js:80

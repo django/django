@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2005-12-04 15:59+0100\n"
+"POT-Creation-Date: 2005-12-04 17:27+0100\n"
 "PO-Revision-Date: 2005-12-04 14:12+0100\n"
 "Last-Translator: Robin Sonefors <ozamosi@blinkenlights.se>\n"
 "Language-Team: Django Translators <Django-I18N@googlegroups.com>\n"
@@ -17,6 +17,16 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=n != 1\n"
 "X-Poedit-Language: Swedish\n"
 "X-Poedit-Country: SWEDEN\n"
+
+#: contrib/admin/media/js/calendar.js:24
+msgid ""
+"January February March April May June July August September October November "
+"December"
+msgstr ""
+
+#: contrib/admin/media/js/calendar.js:25
+msgid "S M T W T F S"
+msgstr ""
 
 #: contrib/admin/media/js/admin/DateTimeShortcuts.js:45
 #: contrib/admin/media/js/admin/DateTimeShortcuts.js:80

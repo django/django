@@ -7,12 +7,24 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django JavaScript 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2005-12-04 13:29+0100\n"
+"POT-Creation-Date: 2005-12-04 17:27+0100\n"
 "PO-Revision-Date: 2005-12-04 13:21+0100\n"
 "Last-Translator: Georg Bauer <gb@bofh.ms>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=iso-8859-1\n"
 "Content-Transfer-Encoding: 8bit\n"
+
+#: contrib/admin/media/js/calendar.js:24
+msgid ""
+"January February March April May June July August September October November "
+"December"
+msgstr ""
+"Januar Februar März April Mai Juni Juli August September Oktober November "
+"Dezember"
+
+#: contrib/admin/media/js/calendar.js:25
+msgid "S M T W T F S"
+msgstr "S M D M D F S"
 
 #: contrib/admin/media/js/admin/DateTimeShortcuts.js:45
 #: contrib/admin/media/js/admin/DateTimeShortcuts.js:80
