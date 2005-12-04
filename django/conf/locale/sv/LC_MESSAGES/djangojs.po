@@ -1,0 +1,66 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2005-12-04 15:59+0100\n"
+"PO-Revision-Date: 2005-12-04 14:12+0100\n"
+"Last-Translator: Robin Sonefors <ozamosi@blinkenlights.se>\n"
+"Language-Team: Django Translators <Django-I18N@googlegroups.com>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=n != 1\n"
+"X-Poedit-Language: Swedish\n"
+"X-Poedit-Country: SWEDEN\n"
+
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:45
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:80
+msgid "Now"
+msgstr "Nu"
+
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:48
+msgid "Clock"
+msgstr "Klocka"
+
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:77
+msgid "Choose a time"
+msgstr "Välj en tidpunkt"
+
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:81
+msgid "Midnight"
+msgstr "Midnatt"
+
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:82
+msgid "6 a.m."
+msgstr "06.00"
+
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:83
+msgid "Noon"
+msgstr "Mitt på dagen"
+
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:87
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:168
+msgid "Cancel"
+msgstr "Ångra"
+
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:111
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:162
+msgid "Today"
+msgstr "Idag"
+
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:114
+msgid "Calendar"
+msgstr "Kalender"
+
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:160
+msgid "Yesterday"
+msgstr "Igår"
+
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:164
+msgid "Tomorrow"
+msgstr "Imorgon"
