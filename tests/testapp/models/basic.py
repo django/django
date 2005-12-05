@@ -158,6 +158,12 @@ datetime.datetime(2005, 7, 31, 12, 30, 45)
 >>> a8.id
 8L
 
+>>> a7 == a8
+False
+>>> a8 == articles.get_object(id__exact=8)
+True
+>>> a7 != a8
+True
 """
 
 from django.conf import settings
