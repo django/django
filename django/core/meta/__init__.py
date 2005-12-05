@@ -729,6 +729,7 @@ class ModelBase(type):
         # Create the default class methods.
         attrs['__init__'] = curry(method_init, opts)
         attrs['__eq__'] = curry(method_eq, opts)
+        attrs['__ne__'] = curry(method_ne, opts)
         attrs['save'] = curry(method_save, opts)
         attrs['save'].alters_data = True
         attrs['delete'] = curry(method_delete, opts)
@@ -977,6 +978,9 @@ def method_init(opts, self, *args, **kwargs):
 
 def method_eq(opts, self, other):
     return isinstance(other, self.__class__) and getattr(self, opts.pk.attname) == getattr(other, opts.pk.attname)
+
+def method_ne(opts, self, other):
+    return not method_eq(opts, self, other)
 
 def method_save(opts, self):
     # Run any pre-save hooks.
