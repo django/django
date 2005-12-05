@@ -164,6 +164,10 @@ False
 True
 >>> a7 != a8
 True
+>>> articles.get_object(id__exact=8) != articles.get_object(id__exact=7)
+True
+>>> articles.get_object(id__exact=8) == articles.get_object(id__exact=7)
+False
 """
 
 from django.conf import settings
