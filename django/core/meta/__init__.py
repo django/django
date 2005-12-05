@@ -1245,9 +1245,9 @@ def method_get_order(ordered_obj, self):
 
 def method_get_next_or_previous(get_object_func, opts, field, is_next, self, **kwargs):
     op = is_next and '>' or '<'
-    kwargs.setdefault('where', []).append('(%s %s %%s OR (%s = %%s AND %s %s %%s))' % \
+    kwargs.setdefault('where', []).append('(%s %s %%s OR (%s = %%s AND %s.%s %s %%s))' % \
         (db.db.quote_name(field.column), op, db.db.quote_name(field.column),
-        db.db.quote_name(opts.pk.column), op))
+        db.db.quote_name(opts.db_table), db.db.quote_name(opts.pk.column), op))
     param = str(getattr(self, field.attname))
     kwargs.setdefault('params', []).extend([param, param, getattr(self, opts.pk.attname)])
     kwargs['order_by'] = [(not is_next and '-' or '') + field.name, (not is_next and '-' or '') + opts.pk.name]
