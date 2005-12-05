@@ -30,9 +30,9 @@ class CommonMiddleware:
                     return httpwrappers.HttpResponseForbidden('<h1>Forbidden</h1>')
 
         # Check for a redirect based on settings.APPEND_SLASH and settings.PREPEND_WWW
-        old_url = [request.META['HTTP_HOST'], request.path]
+        old_url = [request.META.get('HTTP_HOST', ''), request.path]
         new_url = old_url[:]
-        if settings.PREPEND_WWW and not old_url[0].startswith('www.'):
+        if settings.PREPEND_WWW and old_url[0] and not old_url[0].startswith('www.'):
             new_url[0] = 'www.' + old_url[0]
         # Append a slash if append_slash is set and the URL doesn't have a
         # trailing slash or a file extension.
@@ -40,7 +40,10 @@ class CommonMiddleware:
             new_url[1] = new_url[1] + '/'
         if new_url != old_url:
             # Redirect
-            newurl = "%s://%s%s" % (os.environ.get('HTTPS') == 'on' and 'https' or 'http', new_url[0], new_url[1])
+            if new_url[0]:
+                newurl = "%s://%s%s" % (os.environ.get('HTTPS') == 'on' and 'https' or 'http', new_url[0], new_url[1])
+            else:
+                newurl = new_url[1]
             if request.GET:
                 newurl += '?' + request.GET.urlencode()
             return httpwrappers.HttpResponseRedirect(newurl)
