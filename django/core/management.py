@@ -960,3 +960,24 @@ def execute_from_command_line(action_mapping=DEFAULT_ACTION_MAPPING):
                 print '\n'.join(output)
         if action not in NO_SQL_TRANSACTION:
             print "COMMIT;"
+
+def execute_manager(settings_mod):
+    # Add this project to sys.path so that it's importable in the conventional
+    # way. For example, if this file (manage.py) lives in a directory
+    # "myproject", this code would add "/path/to/myproject" to sys.path.
+    project_directory = os.path.dirname(settings_mod.__file__)
+    project_name = os.path.basename(project_directory)
+    sys.path.append(os.path.join(project_directory, '..'))
+    project_module = __import__(project_name, '', '', [''])
+    sys.path.pop()
+
+    # Set DJANGO_SETTINGS_MODULE appropriately.
+    os.environ['DJANGO_SETTINGS_MODULE'] = '%s.settings' % project_name
+
+    # Remove the "startproject" command from the action_mapping, because that's
+    # a django-admin.py command, not a manage.py command.
+    action_mapping = DEFAULT_ACTION_MAPPING.copy()
+    del action_mapping['startproject']
+
+    # Run the django-admin.py command.
+    execute_from_command_line(action_mapping)
