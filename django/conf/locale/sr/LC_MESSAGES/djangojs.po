@@ -7,20 +7,31 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2005-12-05 14:49+0100\n"
+"POT-Creation-Date: 2005-12-06 21:32+0100\n"
 "PO-Revision-Date: 2005-12-05 15:00+0100\n"
 "Last-Translator: Nebojša Đorđević <nesh@studioquattro.co.yu>\n"
-"Language-Team: Nesh <nesh@studioquatro.co.yu> & Petar <petar.maric@gmail.com> <sr@li.org>\n"
+"Language-Team: Nesh <nesh@studioquatro.co.yu> & Petar <petar.maric@gmail."
+"com> <sr@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Poedit-Language: Serbian\n"
 "X-Poedit-Country: YUGOSLAVIA\n"
-"Plural-Forms: nplurals=3; plural=n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2;\n"
+"Plural-Forms: nplurals=3; plural=n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%"
+"10<=4 && (n%100<10 || n%100>=20) ? 1 : 2;\n"
 
+#: contrib/admin/media/js/dateparse.js:26
 #: contrib/admin/media/js/calendar.js:24
-msgid "January February March April May June July August September October November December"
-msgstr "Januar Februar Mart April Maj Jun Jul Avgust Septembar Oktobar Novembar Decembar"
+msgid ""
+"January February March April May June July August September October November "
+"December"
+msgstr ""
+"Januar Februar Mart April Maj Jun Jul Avgust Septembar Oktobar Novembar "
+"Decembar"
+
+#: contrib/admin/media/js/dateparse.js:27
+msgid "Sunday Monday Tuesday Wednesday Thursday Friday Saturday"
+msgstr ""
 
 #: contrib/admin/media/js/calendar.js:25
 msgid "S M T W T F S"
@@ -72,4 +83,3 @@ msgstr "Juče"
 #: contrib/admin/media/js/admin/DateTimeShortcuts.js:164
 msgid "Tomorrow"
 msgstr "Sutra"
-

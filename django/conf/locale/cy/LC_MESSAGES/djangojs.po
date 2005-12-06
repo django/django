@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2005-12-04 16:46+0000\n"
+"POT-Creation-Date: 2005-12-06 21:32+0100\n"
 "PO-Revision-Date: 2005-12-04 16:53+0000\n"
 "Last-Translator: Jason Davies <jason@jasondavies.com>\n"
 "Language-Team: Cymraeg <cy@li.org>\n"
@@ -16,11 +16,18 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
+#: contrib/admin/media/js/dateparse.js:26
 #: contrib/admin/media/js/calendar.js:24
 msgid ""
 "January February March April May June July August September October November "
 "December"
-msgstr "Ionawr Chwefror Mawrth Ebrill Mai Mehefin Gorffennaf Medi Hydref Tachwedd Rhagfyr"
+msgstr ""
+"Ionawr Chwefror Mawrth Ebrill Mai Mehefin Gorffennaf Medi Hydref Tachwedd "
+"Rhagfyr"
+
+#: contrib/admin/media/js/dateparse.js:27
+msgid "Sunday Monday Tuesday Wednesday Thursday Friday Saturday"
+msgstr ""
 
 #: contrib/admin/media/js/calendar.js:25
 msgid "S M T W T F S"

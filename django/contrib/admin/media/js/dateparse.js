@@ -23,8 +23,8 @@ Array.prototype.filter = function(test) {
     return matches;
 };
 
-var monthNames = "January February March April May June July August September October November December".split(" ");
-var weekdayNames = "Sunday Monday Tuesday Wednesday Thursday Friday Saturday".split(" ");
+var monthNames = gettext("January February March April May June July August September October November December").split(" ");
+var weekdayNames = gettext("Sunday Monday Tuesday Wednesday Thursday Friday Saturday").split(" ");
 
 /* Takes a string, returns the index of the month matching that string, throws
    an error if 0 or more than 1 matches
