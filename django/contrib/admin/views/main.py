@@ -4,12 +4,15 @@ from django.contrib.admin.filterspecs import FilterSpec
 from django.core import formfields, meta, template
 from django.core.template import loader
 from django.core.meta.fields import BoundField, BoundFieldLine, BoundFieldSet
-from django.core.exceptions import Http404, ObjectDoesNotExist, PermissionDenied
+from django.core.exceptions import Http404, ImproperlyConfigured, ObjectDoesNotExist, PermissionDenied
 from django.core.extensions import DjangoContext as Context
 from django.core.extensions import get_object_or_404, render_to_response
 from django.core.paginator import ObjectPaginator, InvalidPage
 from django.conf.settings import ADMIN_MEDIA_PREFIX
-from django.models.admin import log
+try:
+    from django.models.admin import log
+except ImportError:
+    raise ImproperlyConfigured, "You don't have 'django.contrib.admin' in INSTALLED_APPS."
 from django.utils.html import strip_tags
 from django.utils.httpwrappers import HttpResponse, HttpResponseRedirect
 from django.utils.text import capfirst, get_text_list
