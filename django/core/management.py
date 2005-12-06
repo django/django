@@ -888,7 +888,7 @@ def execute_from_command_line(action_mapping=DEFAULT_ACTION_MAPPING):
     if not action_mapping.has_key(action):
         print_error("Your action, %r, was invalid." % action, sys.argv[0])
 
-    # switch to english, because django-admin creates database content
+    # Switch to English, because django-admin.py creates database content
     # like permissions, and those shouldn't contain any translations.
     # But only do this if we should have a working settings file.
     if action not in ('startproject', 'startapp'):
