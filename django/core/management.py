@@ -816,7 +816,7 @@ createcachetable.args = "[tablename]"
 
 # Utilities for command-line script
 
-ACTION_MAPPING = {
+DEFAULT_ACTION_MAPPING = {
     'adminindex': get_admin_index,
     'createsuperuser': createsuperuser,
     'createcachetable' : createcachetable,
@@ -845,16 +845,16 @@ class DjangoOptionParser(OptionParser):
         self.print_help(sys.stderr)
         sys.exit(1)
 
-def get_usage():
+def get_usage(action_mapping):
     """
     Returns a usage string. Doesn't do the options stuff, because optparse
     takes care of that.
     """
     usage = ["usage: %prog action [options]\nactions:"]
-    available_actions = ACTION_MAPPING.keys()
+    available_actions = action_mapping.keys()
     available_actions.sort()
     for a in available_actions:
-        func = ACTION_MAPPING[a]
+        func = action_mapping[a]
         usage.append("  %s %s" % (a, func.args))
         usage.extend(textwrap.wrap(getattr(func, 'help_doc', func.__doc__), initial_indent='    ', subsequent_indent='    '))
         usage.append("")
@@ -864,9 +864,9 @@ def print_error(msg, cmd):
     sys.stderr.write('Error: %s\nRun "%s --help" for help.\n' % (msg, cmd))
     sys.exit(1)
 
-def execute_from_command_line():
+def execute_from_command_line(action_mapping=DEFAULT_ACTION_MAPPING):
     # Parse the command-line arguments. optparse handles the dirty work.
-    parser = DjangoOptionParser(get_usage())
+    parser = DjangoOptionParser(get_usage(action_mapping))
     parser.add_option('--settings',
         help='Python path to settings module, e.g. "myproject.settings.main". If this isn\'t provided, the DJANGO_SETTINGS_MODULE environment variable will be used.')
     parser.add_option('--pythonpath',
@@ -885,7 +885,7 @@ def execute_from_command_line():
         action = args[0]
     except IndexError:
         parser.print_usage_and_exit()
-    if not ACTION_MAPPING.has_key(action):
+    if not action_mapping.has_key(action):
         print_error("Your action, %r, was invalid." % action, sys.argv[0])
 
     # switch to english, because django-admin creates database content
@@ -900,28 +900,28 @@ def execute_from_command_line():
             username, email, password = args[1], args[2], args[3]
         except IndexError:
             if len(args) == 1: # We got no arguments, just the action.
-                ACTION_MAPPING[action]()
+                action_mapping[action]()
             else:
                 sys.stderr.write("Error: %r requires arguments of 'username email password' or no argument at all.\n")
                 sys.exit(1)
         else:
-            ACTION_MAPPING[action](username, email, password)
+            action_mapping[action](username, email, password)
     elif action in ('init', 'validate'):
-        ACTION_MAPPING[action]()
+        action_mapping[action]()
     elif action == 'inspectdb':
         try:
             param = args[1]
         except IndexError:
             parser.print_usage_and_exit()
         try:
-            for line in ACTION_MAPPING[action](param):
+            for line in action_mapping[action](param):
                 print line
         except NotImplementedError:
             sys.stderr.write("Error: %r isn't supported for the currently selected database backend.\n" % action)
             sys.exit(1)
     elif action == 'createcachetable':
         try:
-            ACTION_MAPPING[action](args[1])
+            action_mapping[action](args[1])
         except IndexError:
             parser.print_usage_and_exit()
     elif action in ('startapp', 'startproject'):
@@ -929,7 +929,7 @@ def execute_from_command_line():
             name = args[1]
         except IndexError:
             parser.print_usage_and_exit()
-        ACTION_MAPPING[action](name, os.getcwd())
+        action_mapping[action](name, os.getcwd())
     elif action == 'runserver':
         if len(args) < 2:
             addr = ''
@@ -939,7 +939,7 @@ def execute_from_command_line():
                 addr, port = args[1].split(':')
             except ValueError:
                 addr, port = '', args[1]
-        ACTION_MAPPING[action](addr, port)
+        action_mapping[action](addr, port)
     else:
         from django.core import meta
         if action == 'dbcheck':
@@ -955,7 +955,7 @@ def execute_from_command_line():
         if action not in NO_SQL_TRANSACTION:
             print "BEGIN;"
         for mod in mod_list:
-            output = ACTION_MAPPING[action](mod)
+            output = action_mapping[action](mod)
             if output:
                 print '\n'.join(output)
         if action not in NO_SQL_TRANSACTION:
