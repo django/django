@@ -133,17 +133,23 @@ def javascript_catalog(request, domain='djangojs', packages=None):
     locale = to_locale(get_language())
     t = {}
     paths = []
+    # first load all english languages files for defaults
     for package in packages:
         p = __import__(package, {}, {}, [''])
         path = os.path.join(os.path.dirname(p.__file__), 'locale')
         paths.append(path)
-        #!!! add loading of catalogs from settings.LANGUAGE_CODE and request.LANGUAGE_CODE!
-        try:
-            catalog = gettext_module.translation(domain, path, [default_locale])
-        except IOError, e:
-            catalog = None
-        if catalog is not None:
-            t.update(catalog._catalog)
+        catalog = gettext_module.translation(domain, path, ['en'])
+        t.update(catalog._catalog)
+    # next load the settings.LANGUAGE_CODE translations if it isn't english
+    if default_locale != 'en':
+        for path in paths:
+            try:
+                catalog = gettext_module.translation(domain, path, [default_locale])
+            except IOError, e:
+                catalog = None
+            if catalog is not None:
+                t.update(catalog._catalog)
+    # last load the currently selected language, if it isn't identical to the default.
     if locale != default_locale:
         for path in paths:
             try:
@@ -154,9 +160,10 @@ def javascript_catalog(request, domain='djangojs', packages=None):
                 t.update(catalog._catalog)
     src = [LibHead]
     plural = None
-    for l in t[''].split('\n'):
-        if l.startswith('Plural-Forms:'):
-            plural = l.split(':',1)[1].strip()
+    if t.has_key(''):
+        for l in t[''].split('\n'):
+            if l.startswith('Plural-Forms:'):
+                plural = l.split(':',1)[1].strip()
     if plural is not None:
         # this should actually be a compiled function of a typical plural-form:
         # Plural-Forms: nplurals=3; plural=n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2;
