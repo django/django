@@ -128,15 +128,21 @@ def technical_404_response(request, exception):
     Create a technical 404 error response.  The exception should be the Http404
     exception.
     """
+    urlconf_is_empty = False
     try:
         tried = exception.args[0]['tried']
     except (IndexError, TypeError):
         tried = []
+    else:
+        if not tried:
+            # tried exists but is an empty list. The URLconf must've been empty.
+            urlconf_is_empty = True
 
     t = Template(TECHNICAL_404_TEMPLATE)
     c = Context({
         'root_urlconf': settings.ROOT_URLCONF,
         'urlpatterns': tried,
+        'urlconf_is_empty': urlconf_is_empty,
         'reason': str(exception),
         'request': request,
         'request_protocol': os.environ.get("HTTPS") == "on" and "https" or "http",
@@ -533,19 +539,23 @@ TECHNICAL_404_TEMPLATE = """
     </table>
   </div>
   <div id="info">
-    {% if urlpatterns %}
-      <p>
+    {% if urlconf_is_empty %}
+      <p>Your URLconf, <code>{{ settings.ROOT_URLCONF }}</code>, was empty.</p>
+    {% else %}
+      {% if urlpatterns %}
+        <p>
         Using the URLconf defined in <code>{{ settings.ROOT_URLCONF }}</code>,
         Django tried these URL patterns, in this order:
-      </p>
-      <ol>
-        {% for pattern in urlpatterns %}
-          <li>{{ pattern|escape }}</li>
-        {% endfor %}
-      </ol>
-      <p>The current URL, <code>{{ request.path }}</code>, didn't match any of these.</p>
-    {% else %}
-      <p>{{ reason|escape }}</p>
+        </p>
+        <ol>
+          {% for pattern in urlpatterns %}
+            <li>{{ pattern|escape }}</li>
+          {% endfor %}
+        </ol>
+        <p>The current URL, <code>{{ request.path }}</code>, didn't match any of these.</p>
+      {% else %}
+        <p>{{ reason|escape }}</p>
+      {% endif %}
     {% endif %}
   </div>
 
