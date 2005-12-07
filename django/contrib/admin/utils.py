@@ -90,8 +90,10 @@ def default_reference_role(name, rawtext, text, lineno, inliner, options={}, con
     context = inliner.document.settings.default_reference_context
     node = docutils.nodes.reference(rawtext, text, refuri=(ROLES[context] % (inliner.document.settings.link_base, text)), **options)
     return [node], []
-docutils.parsers.rst.roles.register_canonical_role('cmsreference', default_reference_role)
-docutils.parsers.rst.roles.DEFAULT_INTERPRETED_ROLE = 'cmsreference'
 
-for (name, urlbase) in ROLES.items():
-    create_reference_role(name, urlbase)
+if docutils_is_available:
+    docutils.parsers.rst.roles.register_canonical_role('cmsreference', default_reference_role)
+    docutils.parsers.rst.roles.DEFAULT_INTERPRETED_ROLE = 'cmsreference'
+
+    for (name, urlbase) in ROLES.items():
+        create_reference_role(name, urlbase)
