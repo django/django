@@ -24,15 +24,15 @@
             {% endif %}
 
             {% if model.perms.add %}
-                <td class="x50"><a href="{{ model.admin_url }}add/" class="addlink">{% trans 'Add' %}</a></td>
+                <td><a href="{{ model.admin_url }}add/" class="addlink">{% trans 'Add' %}</a></td>
             {% else %}
-                <td class="x50">&nbsp;</td>
+                <td>&nbsp;</td>
             {% endif %}
 
             {% if model.perms.change %}
-                <td class="x75"><a href="{{ model.admin_url }}" class="changelink">{% trans 'Change' %}</a></td>
+                <td><a href="{{ model.admin_url }}" class="changelink">{% trans 'Change' %}</a></td>
             {% else %}
-                <td class="x75">&nbsp;</td>
+                <td>&nbsp;</td>
             {% endif %}
             </tr>
         {% endfor %}

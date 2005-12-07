@@ -117,15 +117,17 @@ table thead th.descending a { background:url(../img/admin/arrow-up.gif) right .4
 .module h3 { margin-top:.6em; }
 #content-related .module h2	{ background:#eee url(../img/admin/nav-bg.gif) bottom left repeat-x; color:#666; }
 #content-main .verbose .actionlist { float:right; font-size:10px; width:17em; position:relative; top:-1.6em; margin:0 8px; }
-.dashboard .module table { width:100%; }
+
+/* DASHBOARD */
+.dashboard .module table th { width:100%; }
+.dashboard .module table td { white-space:nowrap; }
+.dashboard .module table td a { display:block; padding-right:.6em; }
 
 /*  RECENT ACTIONS MODULE  */
-
 .module ul.actionlist { margin-left:0; }
 ul.actionlist li { list-style-type:none; }
 
 /*  FORM DEFAULTS  */
-
 input, textarea, select	{ margin:2px 0; padding:2px 3px; vertical-align:middle; border:1px solid #ccc; font-family:"Lucida Grande", Verdana, Arial, sans-serif; font-weight:normal; font-size:11px; }
 textarea { vertical-align:top !important; }
 input[type=checkbox], input[type=radio] { border:none; }
