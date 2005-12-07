@@ -564,7 +564,7 @@ def _get_deleted_objects(deleted_objects, perms_needed, user, obj, opts, current
             except ObjectDoesNotExist:
                 pass
             else:
-                if rel_opts.admin:
+                if related.opts.admin:
                     p = '%s.%s' % (related.opts.app_label, related.opts.get_delete_permission())
                     if not user.has_perm(p):
                         perms_needed.add(related.opts.verbose_name)
