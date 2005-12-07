@@ -51,9 +51,20 @@ def get_template_exception_info(exc_type, exc_value, tb):
     exc_info = hasattr(exc_value, 'exc_info') and exc_value.exc_info or (exc_type, exc_value, tb)
     return exc_info + (template_info,)
 
+def get_safe_settings():
+    "Returns a dictionary of the settings module, with sensitive settings blurred out."
+    settings_dict = {}
+    for k in dir(settings):
+        if k.isupper():
+            if HIDDEN_SETTINGS.search(k):
+                settings_dict[k] = '********************'
+            else:
+                settings_dict[k] = getattr(settings, k)
+    return settings_dict
+
 def technical_500_response(request, exc_type, exc_value, tb):
     """
-    Create a technical server error response.  The last three arguments are
+    Create a technical server error response. The last three arguments are
     the values returned from sys.exc_info() and friends.
     """
     template_info = None
@@ -98,16 +109,6 @@ def technical_500_response(request, exc_type, exc_value, tb):
         })
         tb = tb.tb_next
 
-    # Turn the settings module into a dict, filtering out anything that
-    # matches HIDDEN_SETTINGS along the way.
-    settings_dict = {}
-    for k in dir(settings):
-        if k.isupper():
-            if HIDDEN_SETTINGS.search(k):
-                settings_dict[k] = '********************'
-            else:
-                settings_dict[k] = getattr(settings, k)
-
     t = Template(TECHNICAL_500_TEMPLATE)
     c = Context({
         'exception_type': exc_type.__name__,
@@ -116,7 +117,7 @@ def technical_500_response(request, exc_type, exc_value, tb):
         'lastframe': frames[-1],
         'request': request,
         'request_protocol': os.environ.get("HTTPS") == "on" and "https" or "http",
-        'settings': settings_dict,
+        'settings': get_safe_settings(),
         'template_info': template_info,
         'template_does_not_exist': template_does_not_exist,
         'loader_debug_info': loader_debug_info,
@@ -124,11 +125,7 @@ def technical_500_response(request, exc_type, exc_value, tb):
     return HttpResponseServerError(t.render(c), mimetype='text/html')
 
 def technical_404_response(request, exception):
-    """
-    Create a technical 404 error response.  The exception should be the Http404
-    exception.
-    """
-    urlconf_is_empty = False
+    "Create a technical 404 error response. The exception should be the Http404."
     try:
         tried = exception.args[0]['tried']
     except (IndexError, TypeError):
@@ -136,17 +133,24 @@ def technical_404_response(request, exception):
     else:
         if not tried:
             # tried exists but is an empty list. The URLconf must've been empty.
-            urlconf_is_empty = True
+            return empty_urlconf(request)
 
     t = Template(TECHNICAL_404_TEMPLATE)
     c = Context({
         'root_urlconf': settings.ROOT_URLCONF,
         'urlpatterns': tried,
-        'urlconf_is_empty': urlconf_is_empty,
         'reason': str(exception),
         'request': request,
         'request_protocol': os.environ.get("HTTPS") == "on" and "https" or "http",
-        'settings': dict([(k, getattr(settings, k)) for k in dir(settings) if k.isupper()]),
+        'settings': get_safe_settings(),
+    })
+    return HttpResponseNotFound(t.render(c), mimetype='text/html')
+
+def empty_urlconf(request):
+    "Create an empty URLconf 404 error response."
+    t = Template(EMPTY_URLCONF_TEMPLATE)
+    c = Context({
+        'project_name': settings.SETTINGS_MODULE.split('.')[0]
     })
     return HttpResponseNotFound(t.render(c), mimetype='text/html')
 
@@ -539,23 +543,19 @@ TECHNICAL_404_TEMPLATE = """
     </table>
   </div>
   <div id="info">
-    {% if urlconf_is_empty %}
-      <p>Your URLconf, <code>{{ settings.ROOT_URLCONF }}</code>, was empty.</p>
+    {% if urlpatterns %}
+      <p>
+      Using the URLconf defined in <code>{{ settings.ROOT_URLCONF }}</code>,
+      Django tried these URL patterns, in this order:
+      </p>
+      <ol>
+        {% for pattern in urlpatterns %}
+          <li>{{ pattern|escape }}</li>
+        {% endfor %}
+      </ol>
+      <p>The current URL, <code>{{ request.path }}</code>, didn't match any of these.</p>
     {% else %}
-      {% if urlpatterns %}
-        <p>
-        Using the URLconf defined in <code>{{ settings.ROOT_URLCONF }}</code>,
-        Django tried these URL patterns, in this order:
-        </p>
-        <ol>
-          {% for pattern in urlpatterns %}
-            <li>{{ pattern|escape }}</li>
-          {% endfor %}
-        </ol>
-        <p>The current URL, <code>{{ request.path }}</code>, didn't match any of these.</p>
-      {% else %}
-        <p>{{ reason|escape }}</p>
-      {% endif %}
+      <p>{{ reason|escape }}</p>
     {% endif %}
   </div>
 
@@ -568,4 +568,56 @@ TECHNICAL_404_TEMPLATE = """
   </div>
 </body>
 </html>
+"""
+
+EMPTY_URLCONF_TEMPLATE = """
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en"><head>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8">
+  <meta name="robots" content="NONE,NOARCHIVE"><title>Welcome to Django</title>
+  <style type="text/css">
+    html * { padding:0; margin:0; }
+    body * { padding:10px 20px; }
+    body * * { padding:0; }
+    body { font:small sans-serif; }
+    body>div { border-bottom:1px solid #ddd; }
+    h1 { font-weight:normal; }
+    h2 { margin-bottom:.8em; }
+    h2 span { font-size:80%; color:#666; font-weight:normal; }
+    h3 { margin:1em 0 .5em 0; }
+    h4 { margin:0 0 .5em 0; font-weight: normal; }
+    table { border:1px solid #ccc; border-collapse: collapse; width:100%; background:white; }
+    tbody td, tbody th { vertical-align:top; padding:2px 3px; }
+    thead th { padding:1px 6px 1px 3px; background:#fefefe; text-align:left; font-weight:normal; font-size:11px; border:1px solid #ddd; }
+    tbody th { width:12em; text-align:right; color:#666; padding-right:.5em; }
+    ul { margin-left: 2em; margin-top: 1em; }
+    #summary { background: #e0ebff; }
+    #summary h2 { font-weight: normal; color: #666; }
+    #explanation { background:#eee; }
+    #instructions { background:#f6f6f6; }
+    #summary table { border:none; background:transparent; }
+  </style>
+</head>
+
+<body>
+<div id="summary">
+  <h1>It worked!</h1>
+  <h2>Congratulations on your first Django-powered page.</h2>
+</div>
+
+<div id="instructions">
+  <p>Of course, you haven't actually done any work yet. Here's what to do next:</p>
+  <ul>
+    <li>Edit the <code>DATABASE_*</code> settings in <code>{{ project_name }}/settings.py</code>.</li>
+    <li>Start your first app by running <code>{{ project_name }}/manage.py startapp [appname]</code>.</li>
+  </ul>
+</div>
+
+<div id="explanation">
+  <p>
+    You're seeing this message because you have <code>DEBUG = True</code> in your
+    Django settings file and you haven't configured any URLs. Get to work!
+  </p>
+</div>
+</body></html>
 """
