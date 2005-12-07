@@ -362,7 +362,7 @@ class HasAllowableSize:
     def __init__(self, min_size=None, max_size=None, min_error_message=None, max_error_message=None):
         self.min_size, self.max_size = min_size, max_size
         self.min_error_message = min_error_message or lazy_inter(gettext_lazy("Make sure your uploaded file is at least %s bytes big."), min_size)
-        self.max_error_message = max_error_message or lazy_inter(gettext_lazy("Make sure your uploaded file is at most %s bytes big."), min_size)
+        self.max_error_message = max_error_message or lazy_inter(gettext_lazy("Make sure your uploaded file is at most %s bytes big."), max_size)
 
     def __call__(self, field_data, all_data):
         if self.min_size is not None and len(field_data['content']) < self.min_size:
