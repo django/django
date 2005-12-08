@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2005-12-06 12:08-0500\n"
+"POT-Creation-Date: 2005-12-07 22:10-0500\n"
 "PO-Revision-Date: 2005-11-10 23:22-0500\n"
 "Last-Translator: Vladimir Labath <vlado@labath.org>\n"
 "Language-Team: Slovak <sk@li.org>\n"
@@ -572,7 +572,7 @@ msgid "Are you sure?"
 msgstr "Ste si istý?"
 
 #: contrib/admin/views/main.py:665
-#, fuzzy, python-format
+#,  python-format
 msgid "Change history: %s"
 msgstr "Zmena histórie:"
 
@@ -1078,15 +1078,15 @@ msgstr "Ako vyššie, ale stranka admina sa otvorí v novom okne."
 
 #: utils/translation.py:350
 msgid "DATE_FORMAT"
-msgstr "DATUM_FORMAT"
+msgstr ""
 
 #: utils/translation.py:351
 msgid "DATETIME_FORMAT"
-msgstr "DATUMCAS_FORMAT"
+msgstr ""
 
 #: utils/translation.py:352
 msgid "TIME_FORMAT"
-msgstr "CAS_FORMAT"
+msgstr ""
 
 #: utils/dates.py:6
 msgid "Monday"
@@ -1154,7 +1154,7 @@ msgstr "September"
 
 #: utils/dates.py:15
 msgid "October"
-msgstr "Octóber"
+msgstr "Október"
 
 #: utils/dates.py:15
 msgid "November"
@@ -1182,7 +1182,7 @@ msgstr "Sept."
 
 #: utils/dates.py:28
 msgid "Oct."
-msgstr "Oct."
+msgstr "Okt."
 
 #: utils/dates.py:28
 msgid "Nov."
@@ -1332,7 +1332,7 @@ msgstr "Použi '[algo]$[salt]$[hexdigest]'"
 
 #: models/auth.py:38
 msgid "staff status"
-msgstr "zamestnanecká príslušnosť"
+msgstr "štatút zamestnanca"
 
 #: models/auth.py:38
 msgid "Designates whether the user can log into this admin site."
@@ -1344,7 +1344,7 @@ msgstr "aktívny"
 
 #: models/auth.py:40
 msgid "superuser status"
-msgstr "superuživateľská príslušnosť"
+msgstr "štatút superužívateľa"
 
 #: models/auth.py:41
 msgid "last login"
