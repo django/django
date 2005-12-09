@@ -720,9 +720,9 @@ class ForeignKey(Field):
 
     def get_db_prep_save(self,value):
         if value == '' or value == None:
-           return None
+            return None
         else:
-           return int(value)
+            return self.rel.get_related_field().get_db_prep_save(value)
 
     def flatten_data(self, follow, obj = None):
         if not obj:
@@ -731,9 +731,9 @@ class ForeignKey(Field):
             # the length of choices is *2*, not 1, because SelectFields always
             # have an initial "blank" value.
             if not self.blank and not self.rel.raw_id_admin and self.choices:
-               choice_list = self.get_choices_default()
-               if len(choice_list) == 2:
-                  return { self.attname : choice_list[1][0] }
+                choice_list = self.get_choices_default()
+                if len(choice_list) == 2:
+                    return { self.attname : choice_list[1][0] }
         return Field.flatten_data(self, follow, obj)
 
 class ManyToManyField(Field):
