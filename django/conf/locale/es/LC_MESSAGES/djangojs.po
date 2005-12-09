@@ -17,33 +17,33 @@ msgstr ""
 #: contrib/admin/media/js/SelectFilter2.js:33
 #, perl-format
 msgid "Available %s"
-msgstr ""
+msgstr "%s Disponibles"
 
 #: contrib/admin/media/js/SelectFilter2.js:41
 #, fuzzy
 msgid "Choose all"
-msgstr "Elige una hora"
+msgstr "Selecciona todos"
 
 #: contrib/admin/media/js/SelectFilter2.js:46
 msgid "Add"
-msgstr ""
+msgstr "Agregar"
 
 #: contrib/admin/media/js/SelectFilter2.js:48
 msgid "Remove"
-msgstr ""
+msgstr "Remover"
 
 #: contrib/admin/media/js/SelectFilter2.js:53
 #, perl-format
 msgid "Chosen %s"
-msgstr ""
+msgstr "%s Elegidos"
 
 #: contrib/admin/media/js/SelectFilter2.js:54
 msgid "Select your choice(s) and click "
-msgstr ""
+msgstr "Haz tus elecciones y da click en "
 
 #: contrib/admin/media/js/SelectFilter2.js:59
 msgid "Clear all"
-msgstr ""
+msgstr "Elimina todos"
 
 #: contrib/admin/media/js/dateparse.js:26
 #: contrib/admin/media/js/calendar.js:24
