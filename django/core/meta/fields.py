@@ -327,7 +327,7 @@ class Field(object):
         else:
            return self.get_default()
 
-    def flatten_data(self, follow, obj = None):
+    def flatten_data(self, follow, obj=None):
         """
         Returns a dictionary mapping the field's manipulator field names to its
         "flattened" string values for the admin view. obj is the instance to
@@ -724,7 +724,7 @@ class ForeignKey(Field):
         else:
             return self.rel.get_related_field().get_db_prep_save(value)
 
-    def flatten_data(self, follow, obj = None):
+    def flatten_data(self, follow, obj=None):
         if not obj:
             # In required many-to-one fields with only one available choice,
             # select that one available choice. Note: We have to check that
@@ -733,7 +733,7 @@ class ForeignKey(Field):
             if not self.blank and not self.rel.raw_id_admin and self.choices:
                 choice_list = self.get_choices_default()
                 if len(choice_list) == 2:
-                    return { self.attname : choice_list[1][0] }
+                    return {self.attname: choice_list[1][0]}
         return Field.flatten_data(self, follow, obj)
 
 class ManyToManyField(Field):
