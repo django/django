@@ -8,13 +8,44 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2005-12-06 21:32+0100\n"
+"POT-Creation-Date: 2005-12-09 11:51+0100\n"
 "PO-Revision-Date: 2005-12-04 16:53+0000\n"
 "Last-Translator: Jason Davies <jason@jasondavies.com>\n"
 "Language-Team: Cymraeg <cy@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+
+#: contrib/admin/media/js/SelectFilter2.js:33
+#, perl-format
+msgid "Available %s"
+msgstr ""
+
+#: contrib/admin/media/js/SelectFilter2.js:41
+#, fuzzy
+msgid "Choose all"
+msgstr "Dewis amser"
+
+#: contrib/admin/media/js/SelectFilter2.js:46
+msgid "Add"
+msgstr ""
+
+#: contrib/admin/media/js/SelectFilter2.js:48
+msgid "Remove"
+msgstr ""
+
+#: contrib/admin/media/js/SelectFilter2.js:53
+#, perl-format
+msgid "Chosen %s"
+msgstr ""
+
+#: contrib/admin/media/js/SelectFilter2.js:54
+msgid "Select your choice(s) and click "
+msgstr ""
+
+#: contrib/admin/media/js/SelectFilter2.js:59
+msgid "Clear all"
+msgstr ""
 
 #: contrib/admin/media/js/dateparse.js:26
 #: contrib/admin/media/js/calendar.js:24
