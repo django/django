@@ -727,12 +727,16 @@ class ForeignKey(Field):
     def flatten_data(self, follow, obj=None):
         if not obj:
             # In required many-to-one fields with only one available choice,
-            # select that one available choice. Note: We have to check that
-            # the length of choices is *2*, not 1, because SelectFields always
-            # have an initial "blank" value.
-            if not self.blank and not self.rel.raw_id_admin and self.choices:
+            # select that one available choice. Note: For SelectFields
+            # (radio_admin=False), we have to check that the length of choices
+            # is *2*, not 1, because SelectFields always have an initial
+            # "blank" value. Otherwise (radio_admin=True), we check that the
+            # length is 1.
+            if not self.blank and (not self.rel.raw_id_admin or self.choices):
                 choice_list = self.get_choices_default()
-                if len(choice_list) == 2:
+                if self.radio_admin and len(choice_list) == 1:
+                    return {self.attname: choice_list[0][0]}
+                if not self.radio_admin and len(choice_list) == 2:
                     return {self.attname: choice_list[1][0]}
         return Field.flatten_data(self, follow, obj)
 
