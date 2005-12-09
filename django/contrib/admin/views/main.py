@@ -378,9 +378,9 @@ def render_change_form(opts, manipulator, app_label, context, add=False, change=
     extra_context = {
         'add': add,
         'change': change,
-        'bound_manipulator' : AdminBoundManipulator(opts, manipulator, context['form']),
-        'has_delete_permission' : context['perms'][app_label][opts.get_delete_permission()],
-        'form_url' : form_url,
+        'bound_manipulator': AdminBoundManipulator(opts, manipulator, context['form']),
+        'has_delete_permission': context['perms'][app_label][opts.get_delete_permission()],
+        'form_url': form_url,
         'app_label': app_label,
     }
     context.update(extra_context)
