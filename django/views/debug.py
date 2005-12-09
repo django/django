@@ -23,6 +23,7 @@ def get_template_exception_info(exc_type, exc_value, tb):
     line = 0
     upto = 0
     source_lines = []
+    before = during = after = ""
     for num, next in enumerate(linebreak_iter(template_source)):
         if start >= upto and end <= next:
             line = num
