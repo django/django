@@ -1584,9 +1584,16 @@ def _parse_lookup(kwarg_items, opts, table_count=0):
     return tables, join_where, where, params, table_count
 
 def function_get_sql_clause(opts, **kwargs):
+    def quote_only_if_word(word):
+        if ' ' in word:
+            return word
+        else:
+            return db.db.quote_name(word)
+
+    # Construct the fundamental parts of the query: SELECT X FROM Y WHERE Z.
     select = ["%s.%s" % (db.db.quote_name(opts.db_table), db.db.quote_name(f.column)) for f in opts.fields]
     tables = [opts.db_table] + (kwargs.get('tables') and kwargs['tables'][:] or [])
-    tables = [db.db.quote_name(t) for t in tables]
+    tables = [quote_only_if_word(t) for t in tables]
     where = kwargs.get('where') and kwargs['where'][:] or []
     params = kwargs.get('params') and kwargs['params'][:] or []
 
@@ -1604,11 +1611,6 @@ def function_get_sql_clause(opts, **kwargs):
         _fill_table_cache(opts, select, tables, where, opts.db_table, [opts.db_table])
 
     # Add any additional SELECTs passed in via kwargs.
-    def quote_only_if_word(word):
-        if word.find(' ')>=0:
-            return word
-        else:
-            return db.db.quote_name(word)
     if kwargs.get('select'):
         select.extend(['(%s) AS %s' % (quote_only_if_word(s[1]), db.db.quote_name(s[0])) for s in kwargs['select']])
 
