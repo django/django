@@ -525,13 +525,11 @@ domain cookie. See the `session docs`_.
 SESSION_COOKIE_NAME
 -------------------
 
-Default: ``'hotclub'``
+Default: ``'sessionid'`` (**Django development version.** Previous default was
+``'hotclub'``, which was deemed to pornish.)
 
 The name of the cookie to use for sessions. This can be whatever you want.
 See the `session docs`_.
-
-``'hotclub'`` is a reference to the Hot Club of France, the band Django
-Reinhardt played in.
 
 SESSION_SAVE_EVERY_REQUEST
 --------------------------
