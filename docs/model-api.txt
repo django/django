@@ -104,6 +104,25 @@ The following arguments are available to all field types. All are optional.
     The first element in each tuple is the actual value to be stored. The
     second element is the human-readable name for the option.
 
+    Define the choices list **outside** of your model class, not inside it.
+    For example, this is not valid::
+
+        class Foo(meta.Model):
+            GENDER_CHOICES = (
+                ('M', 'Male'),
+                ('F', 'Female'),
+            )
+            gender = meta.CharField(maxlength=1, choices=GENDER_CHOICES)
+
+    But this is valid::
+
+        GENDER_CHOICES = (
+            ('M', 'Male'),
+            ('F', 'Female'),
+        )
+        class Foo(meta.Model):
+            gender = meta.CharField(maxlength=1, choices=GENDER_CHOICES)
+
 ``core``
     For objects that are edited inline to a related object.
 
