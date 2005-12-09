@@ -325,11 +325,13 @@ class FormField:
 
 class TextField(FormField):
     input_type = "text"
-    def __init__(self, field_name, length=30, maxlength=None, is_required=False, validator_list=[]):
+    def __init__(self, field_name, length=30, maxlength=None, is_required=False, validator_list=[], member_name=None):
         self.field_name = field_name
         self.length, self.maxlength = length, maxlength
         self.is_required = is_required
         self.validator_list = [self.isValidLength, self.hasNoNewlines] + validator_list
+        if member_name != None:
+            self.member_name = member_name
 
     def isValidLength(self, data, form):
         if data and self.maxlength and len(data.decode(DEFAULT_CHARSET)) > self.maxlength:
