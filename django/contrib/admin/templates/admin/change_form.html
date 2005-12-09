@@ -20,7 +20,7 @@
   {% if bound_manipulator.has_absolute_url %}<li><a href="/r/{{ bound_manipulator.content_type_id }}/{{ object_id }}/" class="viewsitelink">{% trans "View on site" %}</a></li>{% endif%}
   </ul>
 {% endif %}{% endif %}
-<form {{ bound_manipulator.form_enc_attrib }} action='{{ form_url }}' method="post">{% block form_top %}{% endblock %}
+<form {{ bound_manipulator.form_enc_attrib }} action="{{ form_url }}" method="post">{% block form_top %}{% endblock %}
 {% if is_popup %}<input type="hidden" name="_popup" value="1">{% endif %}
 {% if bound_manipulator.save_on_top %}{% submit_row bound_manipulator %}{% endif %}
 {% if form.error_dict %}
