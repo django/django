@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django Czech translation\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2005-12-04 14:56+0100\n"
+"POT-Creation-Date: 2005-12-09 11:45+0100\n"
 "PO-Revision-Date: 2005-11-28 12:00+0100\n"
 "Last-Translator: Radek Svarz <translate@svarz.cz>\n"
 "Language-Team: Czech\n"
@@ -404,100 +404,100 @@ msgid "Your e-mail address is not your username. Try '%s' instead."
 msgstr ""
 "Vaše e-mailová adresa není Vaše uživatelské jméno. Zkuste místo toho '%s'."
 
-#: contrib/admin/views/main.py:49
+#: contrib/admin/views/main.py:52
 msgid "Site administration"
 msgstr "Django správa"
 
-#: contrib/admin/views/main.py:64
+#: contrib/admin/views/main.py:67
 #, python-format
 msgid "Select %s"
 msgstr "Vybrat %s"
 
-#: contrib/admin/views/main.py:65
+#: contrib/admin/views/main.py:68
 #, python-format
 msgid "Select %s to change"
 msgstr "Vyberte %s pro změnu"
 
-#: contrib/admin/views/main.py:407
+#: contrib/admin/views/main.py:410
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was added successfully."
 msgstr "Záznam %(name)s \"%(obj)s\" byl úspěšně přidán."
 
-#: contrib/admin/views/main.py:412 contrib/admin/views/main.py:488
+#: contrib/admin/views/main.py:415 contrib/admin/views/main.py:491
 msgid "You may edit it again below."
 msgstr "Můžete to opět upravit níže."
 
-#: contrib/admin/views/main.py:420 contrib/admin/views/main.py:497
+#: contrib/admin/views/main.py:423 contrib/admin/views/main.py:500
 #, python-format
 msgid "You may add another %s below."
 msgstr "Můžete přidat další %s níže."
 
-#: contrib/admin/views/main.py:437
+#: contrib/admin/views/main.py:440
 #, python-format
 msgid "Add %s"
 msgstr "%s: přidat"
 
-#: contrib/admin/views/main.py:453
+#: contrib/admin/views/main.py:456
 #, python-format
 msgid "Added %s."
 msgstr "Záznam %s byl přidán."
 
-#: contrib/admin/views/main.py:453 contrib/admin/views/main.py:455
-#: contrib/admin/views/main.py:457
+#: contrib/admin/views/main.py:456 contrib/admin/views/main.py:458
+#: contrib/admin/views/main.py:460
 msgid "and"
 msgstr "a"
 
-#: contrib/admin/views/main.py:455
+#: contrib/admin/views/main.py:458
 #, python-format
 msgid "Changed %s."
 msgstr "%s: změněno"
 
-#: contrib/admin/views/main.py:457
+#: contrib/admin/views/main.py:460
 #, python-format
 msgid "Deleted %s."
 msgstr "Záznam %s byl smazán."
 
-#: contrib/admin/views/main.py:460
+#: contrib/admin/views/main.py:463
 msgid "No fields changed."
 msgstr "Nebyly změněny žádné pole."
 
-#: contrib/admin/views/main.py:485
+#: contrib/admin/views/main.py:488
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was changed successfully."
 msgstr "%(name)s \"%(obj)s\" byl úspěšně změněn."
 
-#: contrib/admin/views/main.py:494
+#: contrib/admin/views/main.py:497
 #, python-format
 msgid ""
 "The %(name)s \"%(obj)s\" was added successfully. You may edit it again below."
 msgstr ""
 "The %(name)s \"%(obj)s\" byl úspěšně přidán. Můžete to opět upravit níže."
 
-#: contrib/admin/views/main.py:532
+#: contrib/admin/views/main.py:535
 #, python-format
 msgid "Change %s"
 msgstr "%s: změnit"
 
-#: contrib/admin/views/main.py:610
+#: contrib/admin/views/main.py:613
 #, python-format
 msgid "One or more %(fieldname)s in %(name)s: %(obj)s"
 msgstr "Jedno nebo více %(fieldname)s z %(name)s: %(obj)s"
 
-#: contrib/admin/views/main.py:615
+#: contrib/admin/views/main.py:618
 #, python-format
 msgid "One or more %(fieldname)s in %(name)s:"
 msgstr "Jedno nebo více %(fieldname)s z %(name)s:"
 
-#: contrib/admin/views/main.py:644
+#: contrib/admin/views/main.py:647
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was deleted successfully."
 msgstr "Záznam %(name)s \"%(obj)s\" byl úspěšně smazán."
 
-#: contrib/admin/views/main.py:647
+#: contrib/admin/views/main.py:650
 msgid "Are you sure?"
 msgstr "Jste si jist(á)?"
 
-#: contrib/admin/views/main.py:662
+#: contrib/admin/views/main.py:665
 #, python-format
 msgid "Change history: %s"
 msgstr "Historie změn: %s"

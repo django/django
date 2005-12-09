@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2005-12-04 14:55+0100\n"
+"POT-Creation-Date: 2005-12-09 11:44+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -365,99 +365,99 @@ msgstr ""
 msgid "Your e-mail address is not your username. Try '%s' instead."
 msgstr ""
 
-#: contrib/admin/views/main.py:49
+#: contrib/admin/views/main.py:52
 msgid "Site administration"
 msgstr ""
 
-#: contrib/admin/views/main.py:64
+#: contrib/admin/views/main.py:67
 #, python-format
 msgid "Select %s"
 msgstr ""
 
-#: contrib/admin/views/main.py:65
+#: contrib/admin/views/main.py:68
 #, python-format
 msgid "Select %s to change"
 msgstr ""
 
-#: contrib/admin/views/main.py:407
+#: contrib/admin/views/main.py:410
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was added successfully."
 msgstr ""
 
-#: contrib/admin/views/main.py:412 contrib/admin/views/main.py:488
+#: contrib/admin/views/main.py:415 contrib/admin/views/main.py:491
 msgid "You may edit it again below."
 msgstr ""
 
-#: contrib/admin/views/main.py:420 contrib/admin/views/main.py:497
+#: contrib/admin/views/main.py:423 contrib/admin/views/main.py:500
 #, python-format
 msgid "You may add another %s below."
 msgstr ""
 
-#: contrib/admin/views/main.py:437
+#: contrib/admin/views/main.py:440
 #, python-format
 msgid "Add %s"
 msgstr ""
 
-#: contrib/admin/views/main.py:453
+#: contrib/admin/views/main.py:456
 #, python-format
 msgid "Added %s."
 msgstr ""
 
-#: contrib/admin/views/main.py:453 contrib/admin/views/main.py:455
-#: contrib/admin/views/main.py:457
+#: contrib/admin/views/main.py:456 contrib/admin/views/main.py:458
+#: contrib/admin/views/main.py:460
 msgid "and"
 msgstr ""
 
-#: contrib/admin/views/main.py:455
+#: contrib/admin/views/main.py:458
 #, python-format
 msgid "Changed %s."
 msgstr ""
 
-#: contrib/admin/views/main.py:457
+#: contrib/admin/views/main.py:460
 #, python-format
 msgid "Deleted %s."
 msgstr ""
 
-#: contrib/admin/views/main.py:460
+#: contrib/admin/views/main.py:463
 msgid "No fields changed."
 msgstr ""
 
-#: contrib/admin/views/main.py:485
+#: contrib/admin/views/main.py:488
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was changed successfully."
 msgstr ""
 
-#: contrib/admin/views/main.py:494
+#: contrib/admin/views/main.py:497
 #, python-format
 msgid ""
 "The %(name)s \"%(obj)s\" was added successfully. You may edit it again below."
 msgstr ""
 
-#: contrib/admin/views/main.py:532
+#: contrib/admin/views/main.py:535
 #, python-format
 msgid "Change %s"
 msgstr ""
 
-#: contrib/admin/views/main.py:610
+#: contrib/admin/views/main.py:613
 #, python-format
 msgid "One or more %(fieldname)s in %(name)s: %(obj)s"
 msgstr ""
 
-#: contrib/admin/views/main.py:615
+#: contrib/admin/views/main.py:618
 #, python-format
 msgid "One or more %(fieldname)s in %(name)s:"
 msgstr ""
 
-#: contrib/admin/views/main.py:644
+#: contrib/admin/views/main.py:647
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was deleted successfully."
 msgstr ""
 
-#: contrib/admin/views/main.py:647
+#: contrib/admin/views/main.py:650
 msgid "Are you sure?"
 msgstr ""
 
-#: contrib/admin/views/main.py:662
+#: contrib/admin/views/main.py:665
 #, python-format
 msgid "Change history: %s"
 msgstr ""

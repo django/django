@@ -33,7 +33,7 @@ var SelectFilter = {
         // <div class="selector-available">
         var selector_available = quickElement('div', selector_div, '');
         selector_available.className = 'selector-available';
-        quickElement('h2', selector_available, 'Available ' + field_name);
+        quickElement('h2', selector_available, interpolate(gettext('Available %s'), [field_name]));
         var filter_p = quickElement('p', selector_available, '');
         filter_p.className = 'selector-filter';
         quickElement('img', filter_p, '', 'src', admin_media_prefix + 'img/admin/selector-search.gif');
@@ -41,27 +41,27 @@ var SelectFilter = {
         var filter_input = quickElement('input', filter_p, '', 'type', 'text');
         filter_input.id = field_id + '_input';
         selector_available.appendChild(from_box);
-        var choose_all = quickElement('a', selector_available, 'Choose all', 'href', 'javascript: (function(){ SelectBox.move_all("' + field_id + '_from", "' + field_id + '_to"); })()');
+        var choose_all = quickElement('a', selector_available, gettext('Choose all'), 'href', 'javascript: (function(){ SelectBox.move_all("' + field_id + '_from", "' + field_id + '_to"); })()');
         choose_all.className = 'selector-chooseall';
 
         // <ul class="selector-chooser">
         var selector_chooser = quickElement('ul', selector_div, '');
         selector_chooser.className = 'selector-chooser';
-        var add_link = quickElement('a', quickElement('li', selector_chooser, ''), 'Add', 'href', 'javascript: (function(){ SelectBox.move("' + field_id + '_from","' + field_id + '_to");})()');
+        var add_link = quickElement('a', quickElement('li', selector_chooser, ''), gettext('Add'), 'href', 'javascript: (function(){ SelectBox.move("' + field_id + '_from","' + field_id + '_to");})()');
         add_link.className = 'selector-add';
-        var remove_link = quickElement('a', quickElement('li', selector_chooser, ''), 'Remove', 'href', 'javascript: (function(){ SelectBox.move("' + field_id + '_to","' + field_id + '_from");})()');
+        var remove_link = quickElement('a', quickElement('li', selector_chooser, ''), gettext('Remove'), 'href', 'javascript: (function(){ SelectBox.move("' + field_id + '_to","' + field_id + '_from");})()');
         remove_link.className = 'selector-remove';
 
         // <div class="selector-chosen">
         var selector_chosen = quickElement('div', selector_div, '');
         selector_chosen.className = 'selector-chosen';
-        quickElement('h2', selector_chosen, 'Chosen ' + field_name);
-        var selector_filter = quickElement('p', selector_chosen, 'Select your choice(s) and click ');
+        quickElement('h2', selector_chosen, interpolate(gettext('Chosen %s'), [field_name]));
+        var selector_filter = quickElement('p', selector_chosen, gettext('Select your choice(s) and click '));
         selector_filter.className = 'selector-filter';
         quickElement('img', selector_filter, '', 'src', admin_media_prefix + 'img/admin/selector-add.gif', 'alt', 'Add');
         var to_box = quickElement('select', selector_chosen, '', 'id', field_id + '_to', 'multiple', 'multiple', 'size', from_box.size, 'name', from_box.getAttribute('name'));
         to_box.className = 'filtered';
-        var clear_all = quickElement('a', selector_chosen, 'Clear all', 'href', 'javascript: (function() { SelectBox.move_all("' + field_id + '_to", "' + field_id + '_from");})()');
+        var clear_all = quickElement('a', selector_chosen, gettext('Clear all'), 'href', 'javascript: (function() { SelectBox.move_all("' + field_id + '_to", "' + field_id + '_from");})()');
         clear_all.className = 'selector-clearall';
 
         from_box.setAttribute('name', from_box.getAttribute('name') + '_old');
