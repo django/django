@@ -228,7 +228,7 @@ class SsiNode(Node):
             try:
                 t = Template(output)
                 return t.render(context)
-            except (TemplateSyntaxError, e):
+            except TemplateSyntaxError, e:
                 if DEBUG:
                     return "[Included template had syntax error: %s]" % e
                 else:
