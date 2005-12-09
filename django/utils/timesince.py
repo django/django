@@ -4,7 +4,7 @@ from django.utils.translation import ngettext
 
 def timesince(d, now=None):
     """
-    Takes a datetime object, returns the time between then and now
+    Takes two datetime objects and returns the time between then and now
     as a nicely formatted string, e.g "10 minutes"
     Adapted from http://blog.natbat.co.uk/archive/2003/Jun/14/time_since
     """
@@ -16,7 +16,7 @@ def timesince(d, now=None):
       (60, lambda n: ngettext('minute', 'minutes', n))
     )
     if now:
-        t = time.mktime(now)
+        t = now.timetuple()
     else:
         t = time.localtime()
     if d.tzinfo:
@@ -47,4 +47,4 @@ def timeuntil(d):
     the given time.
     """
     now = datetime.datetime.now()
-    return timesince(now, time.mktime(d.timetuple()))
+    return timesince(now, d)
