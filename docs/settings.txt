@@ -526,7 +526,7 @@ SESSION_COOKIE_NAME
 -------------------
 
 Default: ``'sessionid'`` (**Django development version.** Previous default was
-``'hotclub'``, which was deemed to pornish.)
+``'hotclub'``, which was deemed too pornish.)
 
 The name of the cookie to use for sessions. This can be whatever you want.
 See the `session docs`_.
