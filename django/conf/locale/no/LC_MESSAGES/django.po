@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2005-12-04 14:56+0100\n"
+"POT-Creation-Date: 2005-12-09 11:47+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: Espen Grndhaug <espen@grindhaug.org>\n"
 "Language-Team: Norwegian\n"
@@ -404,100 +404,100 @@ msgstr "Brukernavnet kan ikke inneholde '@'"
 msgid "Your e-mail address is not your username. Try '%s' instead."
 msgstr "Epost adressen din er ikke brukernavnet ditt, prøv '%s' i stede."
 
-#: contrib/admin/views/main.py:49
+#: contrib/admin/views/main.py:52
 #, fuzzy
 msgid "Site administration"
 msgstr "Django administrasjon"
 
-#: contrib/admin/views/main.py:64
+#: contrib/admin/views/main.py:67
 #, python-format
 msgid "Select %s"
 msgstr "Velg %s"
 
-#: contrib/admin/views/main.py:65
+#: contrib/admin/views/main.py:68
 #, python-format
 msgid "Select %s to change"
 msgstr "Velg %s for å endre"
 
-#: contrib/admin/views/main.py:407
+#: contrib/admin/views/main.py:410
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was added successfully."
 msgstr "%(name)s \"%(obj)s\" ble lagt inn i databasen."
 
-#: contrib/admin/views/main.py:412 contrib/admin/views/main.py:488
+#: contrib/admin/views/main.py:415 contrib/admin/views/main.py:491
 msgid "You may edit it again below."
 msgstr "Du kan endre under"
 
-#: contrib/admin/views/main.py:420 contrib/admin/views/main.py:497
+#: contrib/admin/views/main.py:423 contrib/admin/views/main.py:500
 #, python-format
 msgid "You may add another %s below."
 msgstr "Du kan legge til en ny %s under."
 
-#: contrib/admin/views/main.py:437
+#: contrib/admin/views/main.py:440
 #, python-format
 msgid "Add %s"
 msgstr "Ny %s"
 
-#: contrib/admin/views/main.py:453
+#: contrib/admin/views/main.py:456
 #, python-format
 msgid "Added %s."
 msgstr "La til %s"
 
-#: contrib/admin/views/main.py:453 contrib/admin/views/main.py:455
-#: contrib/admin/views/main.py:457
+#: contrib/admin/views/main.py:456 contrib/admin/views/main.py:458
+#: contrib/admin/views/main.py:460
 msgid "and"
 msgstr "og"
 
-#: contrib/admin/views/main.py:455
+#: contrib/admin/views/main.py:458
 #, python-format
 msgid "Changed %s."
 msgstr "Endret %s."
 
-#: contrib/admin/views/main.py:457
+#: contrib/admin/views/main.py:460
 #, python-format
 msgid "Deleted %s."
 msgstr "Slettet %s."
 
-#: contrib/admin/views/main.py:460
+#: contrib/admin/views/main.py:463
 msgid "No fields changed."
 msgstr "Ingen felt endret."
 
-#: contrib/admin/views/main.py:485
+#: contrib/admin/views/main.py:488
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was changed successfully."
 msgstr "%(name)s \"%(obj)s\" ble endret."
 
-#: contrib/admin/views/main.py:494
+#: contrib/admin/views/main.py:497
 #, python-format
 msgid ""
 "The %(name)s \"%(obj)s\" was added successfully. You may edit it again below."
 msgstr "%(name)s \"%(obj)s\" ble endret. Du kan endre det igjen under."
 
-#: contrib/admin/views/main.py:532
+#: contrib/admin/views/main.py:535
 #, python-format
 msgid "Change %s"
 msgstr "Endre %s"
 
-#: contrib/admin/views/main.py:610
+#: contrib/admin/views/main.py:613
 #, python-format
 msgid "One or more %(fieldname)s in %(name)s: %(obj)s"
 msgstr "En eller flere %(fieldname)s i %(name)s: %(obj)s"
 
-#: contrib/admin/views/main.py:615
+#: contrib/admin/views/main.py:618
 #, python-format
 msgid "One or more %(fieldname)s in %(name)s:"
 msgstr "En eller flere %(fieldname)s i %(name)s:"
 
-#: contrib/admin/views/main.py:644
+#: contrib/admin/views/main.py:647
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was deleted successfully."
 msgstr "%(name)s \"%(obj)s\" ble slettet."
 
-#: contrib/admin/views/main.py:647
+#: contrib/admin/views/main.py:650
 msgid "Are you sure?"
 msgstr "Er du sikker?"
 
-#: contrib/admin/views/main.py:662
+#: contrib/admin/views/main.py:665
 #, fuzzy, python-format
 msgid "Change history: %s"
 msgstr "Endre historien: %s"

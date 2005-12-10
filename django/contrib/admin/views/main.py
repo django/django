@@ -552,11 +552,11 @@ def _get_deleted_objects(deleted_objects, perms_needed, user, obj, opts, current
     nh = _nest_help # Bind to local variable for performance
     if current_depth > 16:
         return # Avoid recursing too deep.
-    objects_seen = []
+    opts_seen = []
     for related in opts.get_all_related_objects():
-        if related.opts in objects_seen:
+        if related.opts in opts_seen:
             continue
-        objects_seen.append(related.opts)
+        opts_seen.append(related.opts)
         rel_opts_name = related.get_method_name_part()
         if isinstance(related.field.rel, meta.OneToOne):
             try:
@@ -600,9 +600,9 @@ def _get_deleted_objects(deleted_objects, perms_needed, user, obj, opts, current
                 if not user.has_perm(p):
                     perms_needed.add(rel_opts.verbose_name)
     for related in opts.get_all_related_many_to_many_objects():
-        if related.opts in objects_seen:
+        if related.opts in opts_seen:
             continue
-        objects_seen.append(related.opts)
+        opts_seen.append(related.opts)
         rel_opts_name = related.get_method_name_part()
         has_related_objs = False
         for sub_obj in getattr(obj, 'get_%s_list' % rel_opts_name)():

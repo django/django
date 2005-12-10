@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2005-12-04 14:55+0100\n"
+"POT-Creation-Date: 2005-12-09 11:45+0100\n"
 "PO-Revision-Date: 2005-12-08 15:03+0100\n"
 "Last-Translator: Afonso Fernández Nogueira <fonzzo.django@gmail.com>\n"
 "Language-Team: Galego\n"
@@ -237,13 +237,13 @@ msgid_plural ""
 "\n"
 "%(text)s"
 msgstr[0] ""
-"Este comentario foi publicado por un usuario que ten publicados menos de "
-"%(count)s comentario:\n"
+"Este comentario foi publicado por un usuario que ten publicados menos de %"
+"(count)s comentario:\n"
 "\n"
 "%(text)s"
 msgstr[1] ""
-"Este comentario foi publicado por un usuario que ten publicados menos de "
-"%(count)s comentarios:\n"
+"Este comentario foi publicado por un usuario que ten publicados menos de %"
+"(count)s comentarios:\n"
 "\n"
 "%(text)s"
 
@@ -394,69 +394,69 @@ msgstr ""
 "O seu enderezo de correo electrónico non é o seu nome de usuario. Probe con "
 "'%s'."
 
-#: contrib/admin/views/main.py:49
+#: contrib/admin/views/main.py:52
 msgid "Site administration"
 msgstr "Administración do sitio web"
 
-#: contrib/admin/views/main.py:64
+#: contrib/admin/views/main.py:67
 #, python-format
 msgid "Select %s"
 msgstr "Seleccione un elemento %s"
 
-#: contrib/admin/views/main.py:65
+#: contrib/admin/views/main.py:68
 #, python-format
 msgid "Select %s to change"
 msgstr "Seleccione un elemento %s para modificar"
 
-#: contrib/admin/views/main.py:407
+#: contrib/admin/views/main.py:410
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was added successfully."
 msgstr "O elemento \"%(obj)s\" de tipo %(name)s engadiuse correctamente."
 
-#: contrib/admin/views/main.py:412 contrib/admin/views/main.py:488
+#: contrib/admin/views/main.py:415 contrib/admin/views/main.py:491
 msgid "You may edit it again below."
 msgstr "Pode volver editalo embaixo."
 
-#: contrib/admin/views/main.py:420 contrib/admin/views/main.py:497
+#: contrib/admin/views/main.py:423 contrib/admin/views/main.py:500
 #, python-format
 msgid "You may add another %s below."
 msgstr "Pode engadir outro elemento %s embaixo."
 
-#: contrib/admin/views/main.py:437
+#: contrib/admin/views/main.py:440
 #, python-format
 msgid "Add %s"
 msgstr "Engadir un elemento %s"
 
-#: contrib/admin/views/main.py:453
+#: contrib/admin/views/main.py:456
 #, python-format
 msgid "Added %s."
 msgstr "Engadido(s) %s."
 
-#: contrib/admin/views/main.py:453 contrib/admin/views/main.py:455
-#: contrib/admin/views/main.py:457
+#: contrib/admin/views/main.py:456 contrib/admin/views/main.py:458
+#: contrib/admin/views/main.py:460
 msgid "and"
 msgstr "e"
 
-#: contrib/admin/views/main.py:455
+#: contrib/admin/views/main.py:458
 #, python-format
 msgid "Changed %s."
 msgstr "Modificado(s) %s."
 
-#: contrib/admin/views/main.py:457
+#: contrib/admin/views/main.py:460
 #, python-format
 msgid "Deleted %s."
 msgstr "Eliminado(s) %s."
 
-#: contrib/admin/views/main.py:460
+#: contrib/admin/views/main.py:463
 msgid "No fields changed."
 msgstr "Non se modificou ningún campo."
 
-#: contrib/admin/views/main.py:485
+#: contrib/admin/views/main.py:488
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was changed successfully."
 msgstr "O elemento %(name)s \"%(obj)s\"  modificouse correctamente."
 
-#: contrib/admin/views/main.py:494
+#: contrib/admin/views/main.py:497
 #, python-format
 msgid ""
 "The %(name)s \"%(obj)s\" was added successfully. You may edit it again below."
@@ -464,31 +464,31 @@ msgstr ""
 "O elemento %(name)s \"%(obj)s\" engadiuse correctamente. Pode volver editalo "
 "embaixo."
 
-#: contrib/admin/views/main.py:532
+#: contrib/admin/views/main.py:535
 #, python-format
 msgid "Change %s"
 msgstr "Modificar %s"
 
-#: contrib/admin/views/main.py:610
+#: contrib/admin/views/main.py:613
 #, python-format
 msgid "One or more %(fieldname)s in %(name)s: %(obj)s"
 msgstr "Un ou máis %(fieldname)s no elemento %(name)s: %(obj)s"
 
-#: contrib/admin/views/main.py:615
+#: contrib/admin/views/main.py:618
 #, python-format
 msgid "One or more %(fieldname)s in %(name)s:"
 msgstr "Un ou máis %(fieldname)s no elemento %(name)s:"
 
-#: contrib/admin/views/main.py:644
+#: contrib/admin/views/main.py:647
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was deleted successfully."
 msgstr "O elemento %(name)s \"%(obj)s\" eliminouse correctamente."
 
-#: contrib/admin/views/main.py:647
+#: contrib/admin/views/main.py:650
 msgid "Are you sure?"
 msgstr "Está seguro?"
 
-#: contrib/admin/views/main.py:662
+#: contrib/admin/views/main.py:665
 #, python-format
 msgid "Change history: %s"
 msgstr "Histórico de cambios: %s"
@@ -1785,8 +1785,8 @@ msgid "Please enter valid %(self)s IDs. The value %(value)r is invalid."
 msgid_plural ""
 "Please enter valid %(self)s IDs. The values %(value)r are invalid."
 msgstr[0] "Insira IDs de %(self)s válidas. O valor %(value)r non é válido."
-msgstr[1] "Insira IDs de %(self)s válidas. Os valores %(value)r "
-"non son válidos."
+msgstr[1] ""
+"Insira IDs de %(self)s válidas. Os valores %(value)r non son válidos."
 
 #: core/template/defaultfilters.py:354
 msgid "yes,no,maybe"

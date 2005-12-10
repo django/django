@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2005-12-06 21:32+0100\n"
+"POT-Creation-Date: 2005-12-09 11:51+0100\n"
 "PO-Revision-Date: 2005-12-05 15:00+0100\n"
 "Last-Translator: Nebojša Đorđević <nesh@studioquattro.co.yu>\n"
 "Language-Team: Nesh <nesh@studioquatro.co.yu> & Petar <petar.maric@gmail."
@@ -19,6 +19,37 @@ msgstr ""
 "X-Poedit-Country: YUGOSLAVIA\n"
 "Plural-Forms: nplurals=3; plural=n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%"
 "10<=4 && (n%100<10 || n%100>=20) ? 1 : 2;\n"
+
+#: contrib/admin/media/js/SelectFilter2.js:33
+#, perl-format
+msgid "Available %s"
+msgstr ""
+
+#: contrib/admin/media/js/SelectFilter2.js:41
+#, fuzzy
+msgid "Choose all"
+msgstr "Izaberi vreme"
+
+#: contrib/admin/media/js/SelectFilter2.js:46
+msgid "Add"
+msgstr ""
+
+#: contrib/admin/media/js/SelectFilter2.js:48
+msgid "Remove"
+msgstr ""
+
+#: contrib/admin/media/js/SelectFilter2.js:53
+#, perl-format
+msgid "Chosen %s"
+msgstr ""
+
+#: contrib/admin/media/js/SelectFilter2.js:54
+msgid "Select your choice(s) and click "
+msgstr ""
+
+#: contrib/admin/media/js/SelectFilter2.js:59
+msgid "Clear all"
+msgstr ""
 
 #: contrib/admin/media/js/dateparse.js:26
 #: contrib/admin/media/js/calendar.js:24
