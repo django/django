@@ -727,14 +727,6 @@ class ModelBase(type):
             setattr(new_mod, k, v)
 
         # Create the default class methods.
-        attrs['__init__'] = curry(method_init, opts)
-        attrs['__eq__'] = curry(method_eq, opts)
-        attrs['__ne__'] = curry(method_ne, opts)
-        attrs['save'] = curry(method_save, opts)
-        attrs['save'].alters_data = True
-        attrs['delete'] = curry(method_delete, opts)
-        attrs['delete'].alters_data = True
-
         if opts.order_with_respect_to:
             attrs['get_next_in_order'] = curry(method_get_next_in_order, opts, opts.order_with_respect_to)
             attrs['get_previous_in_order'] = curry(method_get_previous_in_order, opts, opts.order_with_respect_to)
@@ -803,7 +795,6 @@ class ModelBase(type):
             new_mod.get_latest = curry(function_get_latest, opts, new_class, does_not_exist_exception)
 
         for f in opts.fields:
-            #TODO : change this into a virtual function so that user defined fields will be able to add methods to module or class.
             if f.choices:
                 # Add "get_thingie_display" method to get human-readable value.
                 func = curry(method_get_display_value, f)
@@ -938,141 +929,150 @@ class Model:
     def __repr__(self):
         return '<%s object>' % self.__class__.__name__
 
+    def __eq__(self, other):
+        return isinstance(other, self.__class__) and getattr(self, self._meta.pk.attname) == getattr(other, self._meta.pk.attname)
+
+    def __ne__(self, other):
+        return not self.__eq__(other)
+
+    def __init__(self, *args, **kwargs):
+        if kwargs:
+            for f in self._meta.fields:
+                if isinstance(f.rel, ManyToOne):
+                    try:
+                        # Assume object instance was passed in.
+                        rel_obj = kwargs.pop(f.name)
+                    except KeyError:
+                        try:
+                            # Object instance wasn't passed in -- must be an ID.
+                            val = kwargs.pop(f.attname)
+                        except KeyError:
+                            val = f.get_default()
+                    else:
+                        # Object instance was passed in.
+                        # Special case: You can pass in "None" for related objects if it's allowed.
+                        if rel_obj is None and f.null:
+                            val = None
+                        else:
+                            try:
+                                val = getattr(rel_obj, f.rel.get_related_field().attname)
+                            except AttributeError:
+                                raise TypeError, "Invalid value: %r should be a %s instance, not a %s" % (f.name, f.rel.to, type(rel_obj))
+                    setattr(self, f.attname, val)
+                else:
+                    val = kwargs.pop(f.attname, f.get_default())
+                    setattr(self, f.attname, val)
+            if kwargs:
+                raise TypeError, "'%s' is an invalid keyword argument for this function" % kwargs.keys()[0]
+        for i, arg in enumerate(args):
+            setattr(self, self._meta.fields[i].attname, arg)
+
+    def save(self):
+        # Run any pre-save hooks.
+        if hasattr(self, '_pre_save'):
+            self._pre_save()
+
+        non_pks = [f for f in self._meta.fields if not f.primary_key]
+        cursor = db.db.cursor()
+
+        # First, try an UPDATE. If that doesn't update anything, do an INSERT.
+        pk_val = getattr(self, self._meta.pk.attname)
+        pk_set = bool(pk_val)
+        record_exists = True
+        if pk_set:
+            # Determine whether a record with the primary key already exists.
+            cursor.execute("SELECT 1 FROM %s WHERE %s=%%s LIMIT 1" % \
+                (db.db.quote_name(self._meta.db_table), db.db.quote_name(self._meta.pk.column)), [pk_val])
+            # If it does already exist, do an UPDATE.
+            if cursor.fetchone():
+                db_values = [f.get_db_prep_save(f.pre_save(getattr(self, f.attname), False)) for f in non_pks]
+                cursor.execute("UPDATE %s SET %s WHERE %s=%%s" % \
+                    (db.db.quote_name(self._meta.db_table),
+                    ','.join(['%s=%%s' % db.db.quote_name(f.column) for f in non_pks]),
+                    db.db.quote_name(self._meta.pk.attname)),
+                    db_values + [pk_val])
+            else:
+                record_exists = False
+        if not pk_set or not record_exists:
+            field_names = [db.db.quote_name(f.column) for f in self._meta.fields if not isinstance(f, AutoField)]
+            db_values = [f.get_db_prep_save(f.pre_save(getattr(self, f.attname), True)) for f in self._meta.fields if not isinstance(f, AutoField)]
+            # If the PK has been manually set, respect that.
+            if pk_set:
+                field_names += [f.column for f in self._meta.fields if isinstance(f, AutoField)]
+                db_values += [f.get_db_prep_save(f.pre_save(getattr(self, f.column), True)) for f in self._meta.fields if isinstance(f, AutoField)]
+            placeholders = ['%s'] * len(field_names)
+            if self._meta.order_with_respect_to:
+                field_names.append(db.db.quote_name('_order'))
+                # TODO: This assumes the database supports subqueries.
+                placeholders.append('(SELECT COUNT(*) FROM %s WHERE %s = %%s)' % \
+                    (db.db.quote_name(self._meta.db_table), db.db.quote_name(self._meta.order_with_respect_to.column)))
+                db_values.append(getattr(self, self._meta.order_with_respect_to.attname))
+            cursor.execute("INSERT INTO %s (%s) VALUES (%s)" % \
+                (db.db.quote_name(self._meta.db_table), ','.join(field_names),
+                ','.join(placeholders)), db_values)
+            if self._meta.has_auto_field and not pk_set:
+                setattr(self, self._meta.pk.attname, db.get_last_insert_id(cursor, self._meta.db_table, self._meta.pk.column))
+        db.db.commit()
+
+        # Run any post-save hooks.
+        if hasattr(self, '_post_save'):
+            self._post_save()
+
+    save.alters_data = True
+
+    def delete(self):
+        assert getattr(self, self._meta.pk.attname) is not None, "%r can't be deleted because it doesn't have an ID."
+
+        # Run any pre-delete hooks.
+        if hasattr(self, '_pre_delete'):
+            self._pre_delete()
+
+        cursor = db.db.cursor()
+        for related in self._meta.get_all_related_objects():
+            rel_opts_name = related.get_method_name_part()
+            if isinstance(related.field.rel, OneToOne):
+                try:
+                    sub_obj = getattr(self, 'get_%s' % rel_opts_name)()
+                except ObjectDoesNotExist:
+                    pass
+                else:
+                    sub_obj.delete()
+            else:
+                for sub_obj in getattr(self, 'get_%s_list' % rel_opts_name)():
+                    sub_obj.delete()
+        for related in self._meta.get_all_related_many_to_many_objects():
+            cursor.execute("DELETE FROM %s WHERE %s=%%s" % \
+                (db.db.quote_name(related.field.get_m2m_db_table(related.opts)),
+                db.db.quote_name(self._meta.object_name.lower() + '_id')), [getattr(self, self._meta.pk.attname)])
+        for f in self._meta.many_to_many:
+            cursor.execute("DELETE FROM %s WHERE %s=%%s" % \
+                (db.db.quote_name(f.get_m2m_db_table(self._meta)),
+                db.db.quote_name(self._meta.object_name.lower() + '_id')),
+                [getattr(self, self._meta.pk.attname)])
+        cursor.execute("DELETE FROM %s WHERE %s=%%s" % \
+            (db.db.quote_name(self._meta.db_table), db.db.quote_name(self._meta.pk.column)),
+            [getattr(self, self._meta.pk.attname)])
+        db.db.commit()
+        setattr(self, self._meta.pk.attname, None)
+        for f in self._meta.fields:
+            if isinstance(f, FileField) and getattr(self, f.attname):
+                file_name = getattr(self, 'get_%s_filename' % f.name)()
+                # If the file exists and no other object of this type references it,
+                # delete it from the filesystem.
+                if os.path.exists(file_name) and not self._meta.get_model_module().get_list(**{'%s__exact' % f.name: getattr(self, f.name)}):
+                    os.remove(file_name)
+
+        # Run any post-delete hooks.
+        if hasattr(self, '_post_delete'):
+            self._post_delete()
+
+    delete.alters_data = True
+
 ############################################
 # HELPER FUNCTIONS (CURRIED MODEL METHODS) #
 ############################################
 
 # CORE METHODS #############################
-
-def method_init(opts, self, *args, **kwargs):
-    if kwargs:
-        for f in opts.fields:
-            if isinstance(f.rel, ManyToOne):
-                try:
-                    # Assume object instance was passed in.
-                    rel_obj = kwargs.pop(f.name)
-                except KeyError:
-                    try:
-                        # Object instance wasn't passed in -- must be an ID.
-                        val = kwargs.pop(f.attname)
-                    except KeyError:
-                        val = f.get_default()
-                else:
-                    # Object instance was passed in.
-                    # Special case: You can pass in "None" for related objects if it's allowed.
-                    if rel_obj is None and f.null:
-                        val = None
-                    else:
-                        try:
-                            val = getattr(rel_obj, f.rel.get_related_field().attname)
-                        except AttributeError:
-                            raise TypeError, "Invalid value: %r should be a %s instance, not a %s" % (f.name, f.rel.to, type(rel_obj))
-                setattr(self, f.attname, val)
-            else:
-                val = kwargs.pop(f.attname, f.get_default())
-                setattr(self, f.attname, val)
-        if kwargs:
-            raise TypeError, "'%s' is an invalid keyword argument for this function" % kwargs.keys()[0]
-    for i, arg in enumerate(args):
-        setattr(self, opts.fields[i].attname, arg)
-
-def method_eq(opts, self, other):
-    return isinstance(other, self.__class__) and getattr(self, opts.pk.attname) == getattr(other, opts.pk.attname)
-
-def method_ne(opts, self, other):
-    return not method_eq(opts, self, other)
-
-def method_save(opts, self):
-    # Run any pre-save hooks.
-    if hasattr(self, '_pre_save'):
-        self._pre_save()
-    non_pks = [f for f in opts.fields if not f.primary_key]
-    cursor = db.db.cursor()
-
-    # First, try an UPDATE. If that doesn't update anything, do an INSERT.
-    pk_val = getattr(self, opts.pk.attname)
-    pk_set = bool(pk_val)
-    record_exists = True
-    if pk_set:
-        # Determine whether a record with the primary key already exists.
-        cursor.execute("SELECT 1 FROM %s WHERE %s=%%s LIMIT 1" % \
-            (db.db.quote_name(opts.db_table), db.db.quote_name(opts.pk.column)), [pk_val])
-        # If it does already exist, do an UPDATE.
-        if cursor.fetchone():
-            db_values = [f.get_db_prep_save(f.pre_save(getattr(self, f.attname), False)) for f in non_pks]
-            cursor.execute("UPDATE %s SET %s WHERE %s=%%s" % \
-                (db.db.quote_name(opts.db_table),
-                ','.join(['%s=%%s' % db.db.quote_name(f.column) for f in non_pks]),
-                db.db.quote_name(opts.pk.attname)),
-                db_values + [pk_val])
-        else:
-            record_exists = False
-    if not pk_set or not record_exists:
-        field_names = [db.db.quote_name(f.column) for f in opts.fields if not isinstance(f, AutoField)]
-        db_values = [f.get_db_prep_save(f.pre_save(getattr(self, f.attname), True)) for f in opts.fields if not isinstance(f, AutoField)]
-        # If the PK has been manually set we must respect that
-        if pk_set:
-            field_names += [f.column for f in opts.fields if isinstance(f, AutoField)]
-            db_values += [f.get_db_prep_save(f.pre_save(getattr(self, f.column), True)) for f in opts.fields if isinstance(f, AutoField)]
-        placeholders = ['%s'] * len(field_names)
-        if opts.order_with_respect_to:
-            field_names.append(db.db.quote_name('_order'))
-            # TODO: This assumes the database supports subqueries.
-            placeholders.append('(SELECT COUNT(*) FROM %s WHERE %s = %%s)' % \
-                (db.db.quote_name(opts.db_table), db.db.quote_name(opts.order_with_respect_to.column)))
-            db_values.append(getattr(self, opts.order_with_respect_to.attname))
-        cursor.execute("INSERT INTO %s (%s) VALUES (%s)" % \
-            (db.db.quote_name(opts.db_table), ','.join(field_names),
-            ','.join(placeholders)), db_values)
-        if opts.has_auto_field and not pk_set:
-            setattr(self, opts.pk.attname, db.get_last_insert_id(cursor, opts.db_table, opts.pk.column))
-    db.db.commit()
-    # Run any post-save hooks.
-    if hasattr(self, '_post_save'):
-        self._post_save()
-
-def method_delete(opts, self):
-    assert getattr(self, opts.pk.attname) is not None, "%r can't be deleted because it doesn't have an ID."
-    # Run any pre-delete hooks.
-    if hasattr(self, '_pre_delete'):
-        self._pre_delete()
-    cursor = db.db.cursor()
-    for related in opts.get_all_related_objects():
-        rel_opts_name = related.get_method_name_part()
-        if isinstance(related.field.rel, OneToOne):
-            try:
-                sub_obj = getattr(self, 'get_%s' % rel_opts_name)()
-            except ObjectDoesNotExist:
-                pass
-            else:
-                sub_obj.delete()
-        else:
-            for sub_obj in getattr(self, 'get_%s_list' % rel_opts_name)():
-                sub_obj.delete()
-    for related in opts.get_all_related_many_to_many_objects():
-        cursor.execute("DELETE FROM %s WHERE %s=%%s" % \
-            (db.db.quote_name(related.field.get_m2m_db_table(related.opts)),
-            db.db.quote_name(self._meta.object_name.lower() + '_id')), [getattr(self, opts.pk.attname)])
-    for f in opts.many_to_many:
-        cursor.execute("DELETE FROM %s WHERE %s=%%s" % \
-            (db.db.quote_name(f.get_m2m_db_table(opts)),
-            db.db.quote_name(self._meta.object_name.lower() + '_id')),
-            [getattr(self, opts.pk.attname)])
-    cursor.execute("DELETE FROM %s WHERE %s=%%s" % \
-        (db.db.quote_name(opts.db_table), db.db.quote_name(opts.pk.column)),
-        [getattr(self, opts.pk.attname)])
-    db.db.commit()
-    setattr(self, opts.pk.attname, None)
-    for f in opts.fields:
-        if isinstance(f, FileField) and getattr(self, f.attname):
-            file_name = getattr(self, 'get_%s_filename' % f.name)()
-            # If the file exists and no other object of this type references it,
-            # delete it from the filesystem.
-            if os.path.exists(file_name) and not opts.get_model_module().get_list(**{'%s__exact' % f.name: getattr(self, f.name)}):
-                os.remove(file_name)
-    # Run any post-delete hooks.
-    if hasattr(self, '_post_delete'):
-        self._post_delete()
 
 def method_get_next_in_order(opts, order_field, self):
     if not hasattr(self, '_next_in_order_cache'):
