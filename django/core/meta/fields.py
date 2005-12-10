@@ -518,10 +518,11 @@ class FileField(Field):
     def save_file(self, new_data, new_object, original_object, change, rel):
         upload_field_name = self.get_manipulator_field_names('')[0]
         if new_data.get(upload_field_name, False):
+            func = getattr(new_object, 'save_%s_file' % self.name)
             if rel:
-                getattr(new_object, 'save_%s_file' % self.name)(new_data[upload_field_name][0]["filename"], new_data[upload_field_name][0]["content"])
+                func(new_data[upload_field_name][0]["filename"], new_data[upload_field_name][0]["content"])
             else:
-                getattr(new_object, 'save_%s_file' % self.name)(new_data[upload_field_name]["filename"], new_data[upload_field_name]["content"])
+                func(new_data[upload_field_name]["filename"], new_data[upload_field_name]["content"])
 
     def get_directory_name(self):
         return os.path.normpath(datetime.datetime.now().strftime(self.upload_to))
