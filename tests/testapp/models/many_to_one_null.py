@@ -22,11 +22,11 @@ class Article(meta.Model):
 
 API_TESTS = """
 # Create a Reporter.
->>> r = reporters.Reporter(name='John Smith')
+>>> r = Reporter(name='John Smith')
 >>> r.save()
 
 # Create an Article.
->>> a = articles.Article(headline="First", reporter=r)
+>>> a = Article(headline="First", reporter=r)
 >>> a.save()
 
 >>> a.reporter_id
@@ -54,14 +54,14 @@ First
 2
 
 # Create an Article with no Reporter by passing "reporter=None".
->>> a3 = articles.Article(headline="Third", reporter=None)
+>>> a3 = Article(headline="Third", reporter=None)
 >>> a3.save()
 >>> a3.id
 3
 >>> a3.reporter_id
 >>> print a3.reporter_id
 None
->>> a3 = articles.get_object(pk=3)
+>>> a3 = Article.objects.get_object(pk=3)
 >>> print a3.reporter_id
 None
 
@@ -70,9 +70,9 @@ None
 >>> a3.get_reporter()
 Traceback (most recent call last):
     ...
-ReporterDoesNotExist
+DoesNotExist
 
 # To retrieve the articles with no reporters set, use "reporter__isnull=True".
->>> articles.get_list(reporter__isnull=True)
+>>> Article.objects.get_list(reporter__isnull=True)
 [Third]
 """

@@ -25,23 +25,23 @@ class Thing(meta.Model):
         return self.when
 
 API_TESTS = """
->>> t = things.Thing(when='a', join='b', like='c', drop='d', alter='e', having='f', where='g', has_hyphen='h')
+>>> t = Thing(when='a', join='b', like='c', drop='d', alter='e', having='f', where='g', has_hyphen='h')
 >>> t.save()
 >>> print t.when
 a
 
->>> u = things.Thing(when='h', join='i', like='j', drop='k', alter='l', having='m', where='n')
+>>> u = Thing(when='h', join='i', like='j', drop='k', alter='l', having='m', where='n')
 >>> u.save()
 >>> print u.when
 h
 
->>> things.get_list(order_by=['when'])
+>>> Thing.objects.get_list(order_by=['when'])
 [a, h]
->>> v = things.get_object(pk='a')
+>>> v = Thing.objects.get_object(pk='a')
 >>> print v.join
 b
 >>> print v.where
 g
->>> things.get_list(order_by=['select.when'])
+>>> Thing.objects.get_list(order_by=['select.when'])
 [a, h]
 """

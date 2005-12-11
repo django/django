@@ -23,9 +23,9 @@ class Category(meta.Model):
 
 API_TESTS = """
 # Create a few Category objects.
->>> r = categories.Category(id=None, name='Root category', parent=None)
+>>> r = Category(id=None, name='Root category', parent=None)
 >>> r.save()
->>> c = categories.Category(id=None, name='Child category', parent=r)
+>>> c = Category(id=None, name='Child category', parent=r)
 >>> c.save()
 
 >>> r.get_child_list()
@@ -35,7 +35,7 @@ Child category
 >>> r.get_parent()
 Traceback (most recent call last):
     ...
-CategoryDoesNotExist
+DoesNotExist
 
 >>> c.get_child_list()
 []

@@ -63,16 +63,16 @@ class NoModuleNameSecond(Article):
 
 API_TESTS = """
 # No data is in the system yet.
->>> subarticles1.get_list()
+>>> ArticleWithSection.objects.get_list()
 []
->>> subarticles2.get_list()
+>>> ArticleWithoutPubDate.objects.get_list()
 []
->>> subarticles3.get_list()
+>>> ArticleWithFieldOverride.objects.get_list()
 []
 
 # Create an ArticleWithSection.
 >>> from datetime import date, datetime
->>> a1 = subarticles1.ArticleWithSection(headline='First', pub_date=datetime(2005, 8, 22), section='News')
+>>> a1 = ArticleWithSection(headline='First', pub_date=datetime(2005, 8, 22), section='News')
 >>> a1.save()
 >>> a1
 <ArticleWithSection object>
@@ -84,7 +84,7 @@ API_TESTS = """
 datetime.datetime(2005, 8, 22, 0, 0)
 
 # Retrieve it again, to prove the fields have been saved.
->>> a1 = subarticles1.get_object(pk=1)
+>>> a1 = ArticleWithSection.objects.get_object(pk=1)
 >>> a1.headline
 'First'
 >>> a1.pub_date
@@ -93,7 +93,7 @@ datetime.datetime(2005, 8, 22, 0, 0)
 'News'
 
 # Create an ArticleWithoutPubDate.
->>> a2 = subarticles2.ArticleWithoutPubDate(headline='Second')
+>>> a2 = ArticleWithoutPubDate(headline='Second')
 >>> a2.save()
 >>> a2
 <ArticleWithoutPubDate object>
@@ -105,7 +105,7 @@ Traceback (most recent call last):
 AttributeError: 'ArticleWithoutPubDate' object has no attribute 'pub_date'
 
 # Retrieve it again, to prove the fields have been saved.
->>> a2 = subarticles2.get_object(pk=1)
+>>> a2 = ArticleWithoutPubDate.objects.get_object(pk=1)
 >>> a2.headline
 'Second'
 >>> a2.pub_date
@@ -114,7 +114,7 @@ Traceback (most recent call last):
 AttributeError: 'ArticleWithoutPubDate' object has no attribute 'pub_date'
 
 # Create an ArticleWithFieldOverride.
->>> a3 = subarticles3.ArticleWithFieldOverride(headline='Third', pub_date=date(2005, 8, 22))
+>>> a3 = ArticleWithFieldOverride(headline='Third', pub_date=date(2005, 8, 22))
 >>> a3.save()
 >>> a3
 <ArticleWithFieldOverride object>
@@ -124,14 +124,14 @@ AttributeError: 'ArticleWithoutPubDate' object has no attribute 'pub_date'
 datetime.date(2005, 8, 22)
 
 # Retrieve it again, to prove the fields have been saved.
->>> a3 = subarticles3.get_object(pk=1)
+>>> a3 = ArticleWithFieldOverride.objects.get_object(pk=1)
 >>> a3.headline
 'Third'
 >>> a3.pub_date
 datetime.date(2005, 8, 22)
 
 # Create an ArticleWithManyChanges.
->>> a4 = subarticles4.ArticleWithManyChanges(headline='Fourth', section='Arts',
+>>> a4 = ArticleWithManyChanges(headline='Fourth', section='Arts',
 ...     is_popular=True, pub_date=date(2005, 8, 22))
 >>> a4.save()
 
@@ -140,7 +140,7 @@ datetime.date(2005, 8, 22)
 Fourth
 
 # Retrieve it again, to prove the fields have been saved.
->>> a4 = subarticles4.get_object(pk=1)
+>>> a4 = ArticleWithManyChanges.objects.get_object(pk=1)
 >>> a4.headline
 'Fourth'
 >>> a4.section
@@ -151,26 +151,26 @@ True
 datetime.date(2005, 8, 22)
 
 # Test get_list().
->>> subarticles1.get_list()
+>>> ArticleWithSection.objects.get_list()
 [<ArticleWithSection object>]
->>> subarticles2.get_list()
+>>> ArticleWithoutPubDate.objects.get_list()
 [<ArticleWithoutPubDate object>]
->>> subarticles3.get_list()
+>>> ArticleWithFieldOverride.objects.get_list()
 [<ArticleWithFieldOverride object>]
->>> subarticles4.get_list()
+>>> ArticleWithManyChanges.objects.get_list()
 [Fourth]
 
 # Create a couple of ArticleWithChangedMeta objects.
->>> a5 = subarticles5.ArticleWithChangedMeta(headline='A', pub_date=datetime(2005, 3, 1))
+>>> a5 = ArticleWithChangedMeta(headline='A', pub_date=datetime(2005, 3, 1))
 >>> a5.save()
->>> a6 = subarticles5.ArticleWithChangedMeta(headline='B', pub_date=datetime(2005, 4, 1))
+>>> a6 = ArticleWithChangedMeta(headline='B', pub_date=datetime(2005, 4, 1))
 >>> a6.save()
->>> a7 = subarticles5.ArticleWithChangedMeta(headline='C', pub_date=datetime(2005, 5, 1))
+>>> a7 = ArticleWithChangedMeta(headline='C', pub_date=datetime(2005, 5, 1))
 >>> a7.save()
 
 # Ordering has been overridden, so objects are ordered
 # by headline ASC instead of pub_date DESC.
->>> subarticles5.get_list()
+>>> ArticleWithChangedMeta.objects.get_list()
 [A, B, C]
 
 >>> nomodulenamefirsts.get_list()

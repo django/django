@@ -32,13 +32,13 @@ class Waiter(meta.Model):
 
 API_TESTS = """
 # Create a couple of Places.
->>> p1 = places.Place(name='Demon Dogs', address='944 W. Fullerton')
+>>> p1 = Place(name='Demon Dogs', address='944 W. Fullerton')
 >>> p1.save()
->>> p2 = places.Place(name='Ace Hardware', address='1013 N. Ashland')
+>>> p2 = Place(name='Ace Hardware', address='1013 N. Ashland')
 >>> p2.save()
 
 # Create a Restaurant. Pass the ID of the "parent" object as this object's ID.
->>> r = restaurants.Restaurant(place=p1, serves_hot_dogs=True, serves_pizza=False)
+>>> r = Restaurant(place=p1, serves_hot_dogs=True, serves_pizza=False)
 >>> r.save()
 
 # A Restaurant can access its place.
@@ -53,20 +53,20 @@ Demon Dogs the restaurant
 >>> p2.get_restaurant()
 Traceback (most recent call last):
     ...
-RestaurantDoesNotExist: Restaurant does not exist for {'place__id__exact': ...}
+DoesNotExist: Restaurant does not exist for {'place__id__exact': ...}
 
-# restaurants.get_list() just returns the Restaurants, not the Places.
->>> restaurants.get_list()
+# Restaurant.objects.get_list() just returns the Restaurants, not the Places.
+>>> Restaurant.objects.get_list()
 [Demon Dogs the restaurant]
 
-# places.get_list() returns all Places, regardless of whether they have
+# Place.objects.get_list() returns all Places, regardless of whether they have
 # Restaurants.
->>> places.get_list(order_by=['name'])
+>>> Place.objects.get_list(order_by=['name'])
 [Ace Hardware the place, Demon Dogs the place]
 
->>> restaurants.get_object(place__id__exact=1)
+>>> Restaurant.objects.get_object(place__id__exact=1)
 Demon Dogs the restaurant
->>> restaurants.get_object(pk=1)
+>>> Restaurant.objects.get_object(pk=1)
 Demon Dogs the restaurant
 
 # Add a Waiter to the Restaurant.
@@ -75,6 +75,6 @@ Demon Dogs the restaurant
 >>> w
 Joe the waiter at Demon Dogs the restaurant
 
->>> r = restaurants.get_object(pk=1)
+>>> r = Restaurant.objects.get_object(pk=1)
 >>> r.delete()
 """

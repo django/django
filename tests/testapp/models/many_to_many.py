@@ -24,13 +24,13 @@ class Article(meta.Model):
 
 API_TESTS = """
 # Create a couple of Publications.
->>> p1 = publications.Publication(id=None, title='The Python Journal')
+>>> p1 = Publication(id=None, title='The Python Journal')
 >>> p1.save()
->>> p2 = publications.Publication(id=None, title='Science News')
+>>> p2 = Publication(id=None, title='Science News')
 >>> p2.save()
 
 # Create an Article.
->>> a1 = articles.Article(id=None, headline='Django lets you build Web apps easily')
+>>> a1 = Article(id=None, headline='Django lets you build Web apps easily')
 >>> a1.save()
 
 # Associate the Article with one Publication. set_publications() returns a
@@ -44,7 +44,7 @@ True
 False
 
 # Create another Article, and set it to appear in both Publications.
->>> a2 = articles.Article(id=None, headline='NASA uses Python')
+>>> a2 = Article(id=None, headline='NASA uses Python')
 >>> a2.save()
 >>> a2.set_publications([p1.id, p2.id])
 True

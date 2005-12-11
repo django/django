@@ -37,23 +37,23 @@ class Article(meta.Model):
 API_TESTS = """
 >>> from datetime import datetime
 
->>> c1 = categories.Category(name='Sports')
+>>> c1 = Category(name='Sports')
 >>> c1.save()
->>> c2 = categories.Category(name='News')
+>>> c2 = Category(name='News')
 >>> c2.save()
->>> c3 = categories.Category(name='Crime')
+>>> c3 = Category(name='Crime')
 >>> c3.save()
->>> c4 = categories.Category(name='Life')
+>>> c4 = Category(name='Life')
 >>> c4.save()
 
->>> a1 = articles.Article(headline='Area man steals', pub_date=datetime(2005, 11, 27))
+>>> a1 = Article(headline='Area man steals', pub_date=datetime(2005, 11, 27))
 >>> a1.save()
 >>> a1.set_primary_categories([c2.id, c3.id])
 True
 >>> a1.set_secondary_categories([c4.id])
 True
 
->>> a2 = articles.Article(headline='Area man runs', pub_date=datetime(2005, 11, 28))
+>>> a2 = Article(headline='Area man runs', pub_date=datetime(2005, 11, 28))
 >>> a2.save()
 >>> a2.set_primary_categories([c1.id, c2.id])
 True

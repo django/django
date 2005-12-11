@@ -28,35 +28,35 @@ class Business(meta.Model):
         return self.name
 
 API_TESTS = """
->>> dan = employees.Employee(employee_code='ABC123', first_name='Dan', last_name='Jones')
+>>> dan = Employee(employee_code='ABC123', first_name='Dan', last_name='Jones')
 >>> dan.save()
->>> employees.get_list()
+>>> Employee.objects.get_list()
 [Dan Jones]
 
->>> fran = employees.Employee(employee_code='XYZ456', first_name='Fran', last_name='Bones')
+>>> fran = Employee(employee_code='XYZ456', first_name='Fran', last_name='Bones')
 >>> fran.save()
->>> employees.get_list()
+>>> Employee.objects.get_list()
 [Fran Bones, Dan Jones]
 
->>> employees.get_object(pk='ABC123')
+>>> Employee.objects.get_object(pk='ABC123')
 Dan Jones
->>> employees.get_object(pk='XYZ456')
+>>> Employee.objects.get_object(pk='XYZ456')
 Fran Bones
->>> employees.get_object(pk='foo')
+>>> Employee.objects.get_object(pk='foo')
 Traceback (most recent call last):
     ...
 EmployeeDoesNotExist: Employee does not exist for {'pk': 'foo'}
 
 # Fran got married and changed her last name.
->>> fran = employees.get_object(pk='XYZ456')
+>>> fran = Employee.objects.get_object(pk='XYZ456')
 >>> fran.last_name = 'Jones'
 >>> fran.save()
->>> employees.get_list(last_name__exact='Jones')
+>>> Employee.objects.get_list(last_name__exact='Jones')
 [Dan Jones, Fran Jones]
->>> employees.get_in_bulk(['ABC123', 'XYZ456'])
+>>> Employee.objects.get_in_bulk(['ABC123', 'XYZ456'])
 {'XYZ456': Fran Jones, 'ABC123': Dan Jones}
 
->>> b = businesses.Business(name='Sears')
+>>> b = Business(name='Sears')
 >>> b.save()
 >>> b.set_employees([dan.employee_code, fran.employee_code])
 True
@@ -64,6 +64,6 @@ True
 [Dan Jones, Fran Jones]
 >>> fran.get_business_list()
 [Sears]
->>> businesses.get_in_bulk(['Sears'])
+>>> Business.objects.get_in_bulk(['Sears'])
 {'Sears': Sears}
 """

@@ -19,13 +19,13 @@ class Person(meta.Model):
 
 API_TESTS = """
 # Create two Person objects -- the mom and dad in our family.
->>> dad = persons.Person(full_name='John Smith Senior', mother=None, father=None)
+>>> dad = Person(full_name='John Smith Senior', mother=None, father=None)
 >>> dad.save()
->>> mom = persons.Person(full_name='Jane Smith', mother=None, father=None)
+>>> mom = Person(full_name='Jane Smith', mother=None, father=None)
 >>> mom.save()
 
 # Give mom and dad a kid.
->>> kid = persons.Person(full_name='John Smith Junior', mother=mom, father=dad)
+>>> kid = Person(full_name='John Smith Junior', mother=mom, father=dad)
 >>> kid.save()
 
 >>> kid.get_mother()

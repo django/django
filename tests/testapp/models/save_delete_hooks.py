@@ -32,18 +32,18 @@ class Person(meta.Model):
         print "After deletion"
 
 API_TESTS = """
->>> p1 = persons.Person(first_name='John', last_name='Smith')
+>>> p1 = Person(first_name='John', last_name='Smith')
 >>> p1.save()
 Before save
 After save
 
->>> persons.get_list()
+>>> Person.objects.get_list()
 [John Smith]
 
 >>> p1.delete()
 Before deletion
 After deletion
 
->>> persons.get_list()
+>>> Person.objects.get_list()
 []
 """

@@ -17,27 +17,27 @@ class Person(meta.Model):
 
 API_TESTS = """
 # Create a Person.
->>> p = persons.Person(first_name='John', last_name='Smith')
+>>> p = Person(first_name='John', last_name='Smith')
 >>> p.save()
 
 >>> p.id
 1
 
->>> persons.get_list()
+>>> Person.objects.get_list()
 [John Smith]
 
->>> persons.get_list(first_name__exact='John')
+>>> Person.objects.get_list(first_name__exact='John')
 [John Smith]
 
->>> persons.get_object(first_name__exact='John')
+>>> Person.objects.get_object(first_name__exact='John')
 John Smith
 
->>> persons.get_list(firstname__exact='John')
+>>> Person.objects.get_list(firstname__exact='John')
 Traceback (most recent call last):
     ...
 TypeError: got unexpected keyword argument 'firstname__exact'
 
->>> p = persons.get_object(last_name__exact='Smith')
+>>> p = Person.objects.get_object(last_name__exact='Smith')
 >>> p.first_name
 'John'
 >>> p.last_name

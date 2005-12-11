@@ -27,37 +27,37 @@ class Article(meta.Model):
 API_TESTS = """
 # Create a couple of Articles.
 >>> from datetime import datetime
->>> a1 = articles.Article(headline='Article 1', pub_date=datetime(2005, 7, 26))
+>>> a1 = Article(headline='Article 1', pub_date=datetime(2005, 7, 26))
 >>> a1.save()
->>> a2 = articles.Article(headline='Article 2', pub_date=datetime(2005, 7, 27))
+>>> a2 = Article(headline='Article 2', pub_date=datetime(2005, 7, 27))
 >>> a2.save()
->>> a3 = articles.Article(headline='Article 3', pub_date=datetime(2005, 7, 27))
+>>> a3 = Article(headline='Article 3', pub_date=datetime(2005, 7, 27))
 >>> a3.save()
->>> a4 = articles.Article(headline='Article 4', pub_date=datetime(2005, 7, 28))
+>>> a4 = Article(headline='Article 4', pub_date=datetime(2005, 7, 28))
 >>> a4.save()
 
 # By default, articles.get_list() orders by pub_date descending, then
 # headline ascending.
->>> articles.get_list()
+>>> Article.objects.get_list()
 [Article 4, Article 2, Article 3, Article 1]
 
 # Override ordering with order_by, which is in the same format as the ordering
 # attribute in models.
->>> articles.get_list(order_by=['headline'])
+>>> Article.objects.get_list(order_by=['headline'])
 [Article 1, Article 2, Article 3, Article 4]
->>> articles.get_list(order_by=['pub_date', '-headline'])
+>>> Article.objects.get_list(order_by=['pub_date', '-headline'])
 [Article 1, Article 3, Article 2, Article 4]
 
 # Use the "limit" parameter to limit the results.
->>> articles.get_list(order_by=['headline'], limit=2)
+>>> Article.objects.get_list(order_by=['headline'], limit=2)
 [Article 1, Article 2]
 
 # Use the "offset" parameter with "limit" to offset the result list.
->>> articles.get_list(order_by=['headline'], offset=1, limit=2)
+>>> Article.objects.get_list(order_by=['headline'], offset=1, limit=2)
 [Article 2, Article 3]
 
 # Use '?' to order randomly. (We're using [...] in the output to indicate we
 # don't know what order the output will be in.
->>> articles.get_list(order_by=['?'])
+>>> Article.objects.get_list(order_by=['?'])
 [...]
 """

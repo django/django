@@ -20,7 +20,7 @@ class Article(meta.Model):
 API_TESTS = """
 # Create an Article.
 >>> from datetime import datetime
->>> a = articles.Article(headline='Area man programs in Python', pub_date=datetime(2005, 7, 28))
+>>> a = Article(headline='Area man programs in Python', pub_date=datetime(2005, 7, 28))
 >>> a.save()
 
 >>> repr(a)

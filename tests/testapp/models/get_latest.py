@@ -21,23 +21,23 @@ class Article(meta.Model):
 
 API_TESTS = """
 # Because no Articles exist yet, get_latest() raises ArticleDoesNotExist.
->>> articles.get_latest()
+>>> Article.objects.get_latest()
 Traceback (most recent call last):
     ...
-ArticleDoesNotExist: Article does not exist for {'order_by': ('-pub_date',), 'limit': 1}
+DoesNotExist: Article does not exist for {'order_by': ('-pub_date',), 'limit': 1}
 
 # Create a couple of Articles.
 >>> from datetime import datetime
->>> a1 = articles.Article(id=None, headline='Article 1', pub_date=datetime(2005, 7, 26))
+>>> a1 = Article(id=None, headline='Article 1', pub_date=datetime(2005, 7, 26))
 >>> a1.save()
->>> a2 = articles.Article(id=None, headline='Article 2', pub_date=datetime(2005, 7, 27))
+>>> a2 = Article(id=None, headline='Article 2', pub_date=datetime(2005, 7, 27))
 >>> a2.save()
->>> a3 = articles.Article(id=None, headline='Article 3', pub_date=datetime(2005, 7, 27))
+>>> a3 = Article(id=None, headline='Article 3', pub_date=datetime(2005, 7, 27))
 >>> a3.save()
->>> a4 = articles.Article(id=None, headline='Article 4', pub_date=datetime(2005, 7, 28))
+>>> a4 = Article(id=None, headline='Article 4', pub_date=datetime(2005, 7, 28))
 >>> a4.save()
 
 # Get the latest Article.
->>> articles.get_latest()
+>>> Article.objects.get_latest()
 Article 4
 """

@@ -36,20 +36,20 @@ class Writer(meta.Model):
 
 API_TESTS = """
 # Create a few Reporters.
->>> r1 = reporters.Reporter(first_name='John', last_name='Smith')
+>>> r1 = Reporter(first_name='John', last_name='Smith')
 >>> r1.save()
->>> r2 = reporters.Reporter(first_name='Jane', last_name='Doe')
+>>> r2 = Reporter(first_name='Jane', last_name='Doe')
 >>> r2.save()
 
 # Create an Article.
 >>> from datetime import datetime
->>> a = articles.Article(headline='This is a test', pub_date=datetime(2005, 7, 27))
+>>> a = Article(headline='This is a test', pub_date=datetime(2005, 7, 27))
 >>> a.save()
 
 # Create a few Writers.
->>> w1 = writers.Writer(reporter=r1, article=a, position='Main writer')
+>>> w1 = Writer(reporter=r1, article=a, position='Main writer')
 >>> w1.save()
->>> w2 = writers.Writer(reporter=r2, article=a, position='Contributor')
+>>> w2 = Writer(reporter=r2, article=a, position='Contributor')
 >>> w2.save()
 
 # Play around with the API.

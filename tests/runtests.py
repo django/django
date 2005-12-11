@@ -132,7 +132,7 @@ class TestRunner:
 
             # Run the API tests.
             p = doctest.DocTestParser()
-            test_namespace = dict([(m._meta.module_name, getattr(mod, m._meta.module_name)) for m in mod._MODELS])
+            test_namespace = dict([(m._meta.object_name, getattr(mod, m._meta.module_name).Klass) for m in mod._MODELS])
             dtest = p.get_doctest(mod.API_TESTS, test_namespace, model_name, None, None)
             # Manually set verbose=False, because "-v" command-line parameter
             # has side effects on doctest TestRunner class.
