@@ -164,10 +164,22 @@ False
 True
 >>> a7 != a8
 True
->>> Article.objects.get_object(id__exact=8) != articles.get_object(id__exact=7)
+>>> Article.objects.get_object(id__exact=8) != Article.objects.get_object(id__exact=7)
 True
->>> Article.objects.get_object(id__exact=8) == articles.get_object(id__exact=7)
+>>> Article.objects.get_object(id__exact=8) == Article.objects.get_object(id__exact=7)
 False
+
+>>> Article.objects.get_pub_date_list('year')
+[datetime.datetime(2005, 1, 1, 0, 0)]
+>>> Article.objects.get_pub_date_list('month')
+[datetime.datetime(2005, 7, 1, 0, 0)]
+>>> Article.objects.get_pub_date_list('day')
+[datetime.datetime(2005, 7, 28, 0, 0), datetime.datetime(2005, 7, 29, 0, 0), datetime.datetime(2005, 7, 30, 0, 0), datetime.datetime(2005, 7, 31, 0, 0)]
+>>> Article.objects.get_pub_date_list('day', order='ASC')
+[datetime.datetime(2005, 7, 28, 0, 0), datetime.datetime(2005, 7, 29, 0, 0), datetime.datetime(2005, 7, 30, 0, 0), datetime.datetime(2005, 7, 31, 0, 0)]
+>>> Article.objects.get_pub_date_list('day', order='DESC')
+[datetime.datetime(2005, 7, 31, 0, 0), datetime.datetime(2005, 7, 30, 0, 0), datetime.datetime(2005, 7, 29, 0, 0), datetime.datetime(2005, 7, 28, 0, 0)]
+
 """
 
 from django.conf import settings
