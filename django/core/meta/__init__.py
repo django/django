@@ -778,7 +778,8 @@ class ModelBase(type):
             app_label = replaces_module[0]
         else:
             app_package.__dict__[opts.module_name] = new_mod
-            app_label = app_package.__name__[app_package.__name__.rfind('.')+1:]
+            app_label = app_package.__name__.replace('.models', '')
+            app_label = app_label[app_label.rfind('.')+1:]
 
             # Populate the _MODELS member on the module the class is in.
             # Example: django.models.polls will have a _MODELS member that will
