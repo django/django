@@ -1020,7 +1020,7 @@ class Model:
                 file_name = getattr(self, 'get_%s_filename' % f.name)()
                 # If the file exists and no other object of this type references it,
                 # delete it from the filesystem.
-                if os.path.exists(file_name) and not self._meta.get_model_module().get_list(**{'%s__exact' % f.name: getattr(self, f.name)}):
+                if os.path.exists(file_name) and not self.objects.get_list(**{'%s__exact' % f.name: getattr(self, f.name)}):
                     os.remove(file_name)
 
         # Run any post-delete hooks.
