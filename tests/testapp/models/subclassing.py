@@ -173,8 +173,8 @@ datetime.date(2005, 8, 22)
 >>> ArticleWithChangedMeta.objects.get_list()
 [A, B, C]
 
->>> nomodulenamefirsts.get_list()
+>>> NoModuleNameFirst.objects.get_list()
 []
->>> nomodulenameseconds.get_list()
+>>> NoModuleNameSecond.objects.get_list()
 []
 """
