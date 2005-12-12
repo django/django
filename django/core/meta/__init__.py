@@ -1288,7 +1288,7 @@ class Manager:
                 raise StopIteration
             for row in rows:
                 if fill_cache:
-                    obj, index_end = _get_cached_row(opts, row, 0)
+                    obj, index_end = _get_cached_row(self.klass._meta, row, 0)
                 else:
                     obj = self.klass(*row[:index_end])
                 for i, k in enumerate(kwargs['select']):
@@ -1391,7 +1391,7 @@ def method_get_related(method_name, rel_mod, rel_field, self, **kwargs):
     else:
         kwargs['%s__%s__exact' % (rel_field.name, rel_field.rel.to._meta.pk.name)] = getattr(self, rel_field.rel.get_related_field().attname)
     kwargs.update(rel_field.rel.lookup_overrides)
-    return getattr(rel_mod, method_name)(**kwargs)
+    return getattr(rel_mod.Klass.objects, method_name)(**kwargs)
 
 # Handles adding related objects.
 # Example: Poll.add_choice()
@@ -1410,7 +1410,7 @@ def method_add_related(rel_obj, rel_mod, rel_field, self, *args, **kwargs):
 # Examples: Album.get_song(), Album.get_song_list(), Album.get_song_count()
 def method_get_related_many_to_many(method_name, opts, rel_mod, rel_field, self, **kwargs):
     kwargs['%s__%s__exact' % (rel_field.name, opts.pk.name)] = getattr(self, opts.pk.attname)
-    return getattr(rel_mod, method_name)(**kwargs)
+    return getattr(rel_mod.Klass.objects, method_name)(**kwargs)
 
 # Handles setting many-to-many related objects.
 # Example: Album.set_songs()
@@ -1486,7 +1486,7 @@ def _get_cached_row(opts, row, index_start):
     obj = opts.get_model_module().Klass(*row[index_start:index_end])
     for f in opts.fields:
         if f.rel and not f.null:
-            rel_obj, index_end = _get_cached_row(f.rel.to, row, index_end)
+            rel_obj, index_end = _get_cached_row(f.rel.to._meta, row, index_end)
             setattr(obj, f.get_cache_name(), rel_obj)
     return obj, index_end
 
@@ -1509,7 +1509,7 @@ def _fill_table_cache(opts, select, tables, where, old_prefix, cache_tables_seen
                 (db.db.quote_name(old_prefix), db.db.quote_name(f.column),
                 db.db.quote_name(db_table), db.db.quote_name(f.rel.get_related_field().column)))
             select.extend(['%s.%s' % (db.db.quote_name(db_table), db.db.quote_name(f2.column)) for f2 in f.rel.to._meta.fields])
-            _fill_table_cache(f.rel.to, select, tables, where, db_table, cache_tables_seen)
+            _fill_table_cache(f.rel.to._meta, select, tables, where, db_table, cache_tables_seen)
 
 def _throw_bad_kwarg_error(kwarg):
     # Helper function to remove redundancy.
