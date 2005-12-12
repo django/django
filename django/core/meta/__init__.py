@@ -924,9 +924,9 @@ class Model:
                     # if the image field doesn't have width and height cache
                     # fields.
                     if not f.width_field:
-                        setattr(cls, 'get_%s_width' % f.name, curry(method_get_image_width, f))
+                        setattr(cls, 'get_%s_width' % f.name, curry(cls.__get_FIELD_width, f))
                     if not f.height_field:
-                        setattr(cls, 'get_%s_height' % f.name, curry(method_get_image_height, f))
+                        setattr(cls, 'get_%s_height' % f.name, curry(cls.__get_FIELD_height, f))
         if cls._meta.order_with_respect_to:
             cls.get_next_in_order = curry(cls.__get_next_or_previous_in_order, True)
             cls.get_previous_in_order = curry(cls.__get_next_or_previous_in_order, False)
