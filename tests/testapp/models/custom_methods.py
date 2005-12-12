@@ -1,23 +1,7 @@
 """
-3. Giving models custom methods and custom module-level functions
+3. Giving models custom methods and custom managers
 
 Any method you add to a model will be available to instances.
-
-Custom methods have the same namespace as if the model class were defined
-in the dynamically-generated module. That is, methods can access
-``get_list()``, ``get_object()``, ``AddManipulator``, and all other
-module-level objects.
-
-Also, custom methods have access to a few commonly-used objects for
-convenience:
-
-    * The ``datetime`` module from Python's standard library.
-    * The ``db`` object from ``django.core.db``. This represents the database
-      connection, so you can do custom queries via a cursor object.
-
-If your model method starts with "_module_", it'll be a module-level function
-instead of a method. Otherwise, custom module-level functions have the same
-namespace as custom methods.
 """
 
 from django.core import meta
@@ -33,22 +17,23 @@ class Article(meta.Model):
         return self.pub_date == datetime.date.today()
 
     def get_articles_from_same_day_1(self):
-        return get_list(id__ne=self.id, pub_date__exact=self.pub_date)
+        return self.objects.get_list(id__ne=self.id, pub_date__exact=self.pub_date)
 
     def get_articles_from_same_day_2(self):
         """
         Verbose version of get_articles_from_same_day_1, which does a custom
         database query for the sake of demonstration.
         """
+        from django.core.db import db
         cursor = db.cursor()
         cursor.execute("""
             SELECT id, headline, pub_date
             FROM custom_methods_articles
             WHERE pub_date = %s
                 AND id != %s""", [str(self.pub_date), self.id])
-        # The asterisk in "Article(*row)" tells Python to expand the list into
+        # The asterisk in "(*row)" tells Python to expand the list into
         # positional arguments to Article().
-        return [Article(*row) for row in cursor.fetchall()]
+        return [self.__class__(*row) for row in cursor.fetchall()]
 
 API_TESTS = """
 # Create a couple of Articles.
