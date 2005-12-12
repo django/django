@@ -708,13 +708,8 @@ class ModelBase(type):
                 custom_methods[k] = v
             del attrs[k]
 
-        # Create the module-level ObjectDoesNotExist exception.
-        dne_exc_name = '%sDoesNotExist' % name
-        does_not_exist_exception = types.ClassType(dne_exc_name, (ObjectDoesNotExist,), {})
-        # Explicitly set its __module__ because it will initially (incorrectly)
-        # be set to the module the code is being executed in.
-        does_not_exist_exception.__module__ = MODEL_PREFIX + '.' + opts.module_name
-        setattr(new_mod, dne_exc_name, does_not_exist_exception)
+        # Create the DoesNotExist exception.
+        attrs['DoesNotExist'] = types.ClassType('DoesNotExist', (ObjectDoesNotExist,), {})
 
         # Create other exceptions.
         for exception_name in opts.exceptions:
@@ -727,10 +722,6 @@ class ModelBase(type):
             setattr(new_mod, k, v)
 
         # Create the default class methods.
-        if opts.order_with_respect_to:
-            attrs['get_next_in_order'] = curry(method_get_next_in_order, opts, opts.order_with_respect_to)
-            attrs['get_previous_in_order'] = curry(method_get_previous_in_order, opts, opts.order_with_respect_to)
-
         for f in opts.fields:
             # If the object has a relationship to itself, as designated by
             # RECURSIVE_RELATIONSHIP_CONSTANT, create that relationship formally.
@@ -762,71 +753,14 @@ class ModelBase(type):
         # Create the class, because we need it to use in currying.
         new_class = type.__new__(cls, name, bases, attrs)
 
+        # Create the manager.
+        # TODO: Use weakref because of possible memory leak / circular reference.
+        # TODO: Allow for overriding of the name, and custom manager subclasses.
+        new_class.objects = Manager(new_class)
+
         # Give the class a docstring -- its definition.
         if new_class.__doc__ is None:
             new_class.__doc__ = "%s.%s(%s)" % (opts.module_name, name, ", ".join([f.name for f in opts.fields]))
-
-        # Create the standard, module-level API helper functions such
-        # as get_object() and get_list().
-        new_mod.get_object = curry(function_get_object, opts, new_class, does_not_exist_exception)
-        new_mod.get_object.__doc__ = "Returns the %s object matching the given parameters." % name
-
-        new_mod.get_list = curry(function_get_list, opts, new_class)
-        new_mod.get_list.__doc__ = "Returns a list of %s objects matching the given parameters." % name
-
-        new_mod.get_iterator = curry(function_get_iterator, opts, new_class)
-        new_mod.get_iterator.__doc__ = "Returns an iterator of %s objects matching the given parameters." % name
-
-        new_mod.get_values = curry(function_get_values, opts, new_class)
-        new_mod.get_values.__doc__ = "Returns a list of dictionaries matching the given parameters."
-
-        new_mod.get_values_iterator = curry(function_get_values_iterator, opts, new_class)
-        new_mod.get_values_iterator.__doc__ = "Returns an iterator of dictionaries matching the given parameters."
-
-        new_mod.get_count = curry(function_get_count, opts)
-        new_mod.get_count.__doc__ = "Returns the number of %s objects matching the given parameters." % name
-
-        new_mod._get_sql_clause = curry(function_get_sql_clause, opts)
-
-        new_mod.get_in_bulk = curry(function_get_in_bulk, opts, new_class)
-        new_mod.get_in_bulk.__doc__ = "Returns a dictionary of ID -> %s for the %s objects with IDs in the given id_list." % (name, name)
-
-        if opts.get_latest_by:
-            new_mod.get_latest = curry(function_get_latest, opts, new_class, does_not_exist_exception)
-
-        for f in opts.fields:
-            if f.choices:
-                # Add "get_thingie_display" method to get human-readable value.
-                func = curry(method_get_display_value, f)
-                setattr(new_class, 'get_%s_display' % f.name, func)
-            if isinstance(f, DateField) or isinstance(f, DateTimeField):
-                # Add "get_next_by_thingie" and "get_previous_by_thingie" methods
-                # for all DateFields and DateTimeFields that cannot be null.
-                # EXAMPLES: Poll.get_next_by_pub_date(), Poll.get_previous_by_pub_date()
-                if not f.null:
-                    setattr(new_class, 'get_next_by_%s' % f.name, curry(method_get_next_or_previous, new_mod.get_object, opts, f, True))
-                    setattr(new_class, 'get_previous_by_%s' % f.name, curry(method_get_next_or_previous, new_mod.get_object, opts, f, False))
-                # Add "get_thingie_list" for all DateFields and DateTimeFields.
-                # EXAMPLE: polls.get_pub_date_list()
-                func = curry(function_get_date_list, opts, f)
-                func.__doc__ = "Returns a list of days, months or years (as datetime.datetime objects) in which %s objects are available. The first parameter ('kind') must be one of 'year', 'month' or 'day'." % name
-                setattr(new_mod, 'get_%s_list' % f.name, func)
-
-            elif isinstance(f, FileField):
-                setattr(new_class, 'get_%s_filename' % f.name, curry(method_get_file_filename, f))
-                setattr(new_class, 'get_%s_url' % f.name, curry(method_get_file_url, f))
-                setattr(new_class, 'get_%s_size' % f.name, curry(method_get_file_size, f))
-                func = curry(method_save_file, f)
-                func.alters_data = True
-                setattr(new_class, 'save_%s_file' % f.name, func)
-                if isinstance(f, ImageField):
-                    # Add get_BLAH_width and get_BLAH_height methods, but only
-                    # if the image field doesn't have width and height cache
-                    # fields.
-                    if not f.width_field:
-                        setattr(new_class, 'get_%s_width' % f.name, curry(method_get_image_width, f))
-                    if not f.height_field:
-                        setattr(new_class, 'get_%s_height' % f.name, curry(method_get_image_height, f))
 
         # Add the class itself to the new module we've created.
         new_mod.__dict__[name] = new_class
@@ -921,6 +855,10 @@ class ModelBase(type):
                     for related in model._meta.get_all_related_objects() + model._meta.get_all_related_many_to_many_objects():
                         related.field.rel.to = opts
                     break
+
+        new_class._prepare()
+        new_class.objects._prepare()
+
         return new_class
 
 class Model:
@@ -966,6 +904,34 @@ class Model:
                 raise TypeError, "'%s' is an invalid keyword argument for this function" % kwargs.keys()[0]
         for i, arg in enumerate(args):
             setattr(self, self._meta.fields[i].attname, arg)
+
+    def _prepare(cls):
+        # Creates some methods once self._meta has been populated.
+        for f in cls._meta.fields:
+            if f.choices:
+                setattr(cls, 'get_%s_display' % f.name, curry(cls.__get_FIELD_display, field=f))
+            if isinstance(f, DateField):
+                if not f.null:
+                    setattr(cls, 'get_next_by_%s' % f.name, curry(cls.__get_next_or_previous_by_FIELD, field=f, is_next=True))
+                    setattr(cls, 'get_previous_by_%s' % f.name, curry(cls.__get_next_or_previous_by_FIELD, field=f, is_next=False))
+            elif isinstance(f, FileField):
+                setattr(cls, 'get_%s_filename' % f.name, curry(cls.__get_FIELD_filename, f))
+                setattr(cls, 'get_%s_url' % f.name, curry(cls.__get_FIELD_url, f))
+                setattr(cls, 'get_%s_size' % f.name, curry(cls.__get_FIELD_size, f))
+                setattr(cls, 'save_%s_file' % f.name, curry(cls.__save_FIELD_file, f))
+                if isinstance(f, ImageField):
+                    # Add get_BLAH_width and get_BLAH_height methods, but only
+                    # if the image field doesn't have width and height cache
+                    # fields.
+                    if not f.width_field:
+                        setattr(cls, 'get_%s_width' % f.name, curry(method_get_image_width, f))
+                    if not f.height_field:
+                        setattr(cls, 'get_%s_height' % f.name, curry(method_get_image_height, f))
+        if cls._meta.order_with_respect_to:
+            cls.get_next_in_order = curry(cls.__get_next_or_previous_in_order, True)
+            cls.get_previous_in_order = curry(cls.__get_next_or_previous_in_order, False)
+
+    _prepare = classmethod(_prepare)
 
     def save(self):
         # Run any pre-save hooks.
@@ -1068,31 +1034,289 @@ class Model:
 
     delete.alters_data = True
 
+    def __get_FIELD_display(self, field):
+        value = getattr(self, field.attname)
+        return dict(field.choices).get(value, value)
+
+    def __get_next_or_previous_by_FIELD(self, field, is_next, **kwargs):
+        op = is_next and '>' or '<'
+        kwargs.setdefault('where', []).append('(%s %s %%s OR (%s = %%s AND %s.%s %s %%s))' % \
+            (db.db.quote_name(field.column), op, db.db.quote_name(field.column),
+            db.db.quote_name(self._meta.db_table), db.db.quote_name(self._meta.pk.column), op))
+        param = str(getattr(self, field.attname))
+        kwargs.setdefault('params', []).extend([param, param, getattr(self, self._meta.pk.attname)])
+        kwargs['order_by'] = [(not is_next and '-' or '') + field.name, (not is_next and '-' or '') + self._meta.pk.name]
+        kwargs['limit'] = 1
+        return self.objects.get_object(**kwargs)
+
+    def __get_next_or_previous_in_order(self, is_next):
+        cachename = "__%s_order_cache" % is_next
+        if not hasattr(self, cachename):
+            op = is_next and '>' or '<'
+            order_field = self.order_with_respect_to
+            obj = self.objects.get_object(order_by=('_order',),
+                where=['%s %s (SELECT %s FROM %s WHERE %s=%%s)' % \
+                    (db.db.quote_name('_order'), op, db.db.quote_name('_order'),
+                    db.db.quote_name(opts.db_table), db.db.quote_name(opts.pk.column)),
+                    '%s=%%s' % db.db.quote_name(order_field.column)],
+                limit=1,
+                params=[getattr(self, opts.pk.attname), getattr(self, order_field.attname)])
+            setattr(self, cachename, obj)
+        return getattr(self, cachename)
+
+    def __get_FIELD_filename(self, field):
+        return os.path.join(settings.MEDIA_ROOT, getattr(self, field.attname))
+
+    def __get_FIELD_url(self, field):
+        if getattr(self, field.attname): # value is not blank
+            import urlparse
+            return urlparse.urljoin(settings.MEDIA_URL, getattr(self, field.attname)).replace('\\', '/')
+        return ''
+
+    def __get_FIELD_size(self, field):
+        return os.path.getsize(self.__get_FIELD_filename(field))
+
+    def __save_FIELD_file(self, field, filename, raw_contents):
+        directory = field.get_directory_name()
+        try: # Create the date-based directory if it doesn't exist.
+            os.makedirs(os.path.join(settings.MEDIA_ROOT, directory))
+        except OSError: # Directory probably already exists.
+            pass
+        filename = field.get_filename(filename)
+
+        # If the filename already exists, keep adding an underscore to the name of
+        # the file until the filename doesn't exist.
+        while os.path.exists(os.path.join(settings.MEDIA_ROOT, filename)):
+            try:
+                dot_index = filename.rindex('.')
+            except ValueError: # filename has no dot
+                filename += '_'
+            else:
+                filename = filename[:dot_index] + '_' + filename[dot_index:]
+
+        # Write the file to disk.
+        setattr(self, field.attname, filename)
+
+        full_filename = self.__get_FIELD_filename(field)
+        fp = open(full_filename, 'wb')
+        fp.write(raw_contents)
+        fp.close()
+
+        # Save the width and/or height, if applicable.
+        if isinstance(field, ImageField) and (field.width_field or field.height_field):
+            from django.utils.images import get_image_dimensions
+            width, height = get_image_dimensions(full_filename)
+            if field.width_field:
+                setattr(self, field.width_field, width)
+            if field.height_field:
+                setattr(self, field.height_field, height)
+
+        # Save the object, because it has changed.
+        self.save()
+
+    __save_FIELD_file.alters_data = True
+
+    def __get_FIELD_width(self, field):
+        return self.__get_image_dimensions(field)[0]
+
+    def __get_FIELD_height(self, field):
+        return self.__get_image_dimensions(field)[1]
+
+    def __get_image_dimensions(self, field):
+        cachename = "__%s_dimensions_cache" % field.name
+        if not hasattr(self, cachename):
+            from django.utils.images import get_image_dimensions
+            filename = self.__get_FIELD_filename(field)()
+            setattr(self, cachename, get_image_dimensions(filename))
+        return getattr(self, cachename)
+
+class Manager:
+    def __init__(self, model_class):
+        self.klass = model_class
+
+    def _prepare(self):
+        # Creates some methods once self.klass._meta has been populated.
+        if self.klass._meta.get_latest_by:
+            self.get_latest = self.__get_latest
+        for f in self.klass._meta.fields:
+            if isinstance(f, DateField):
+                setattr(self, 'get_%s_list' % f.name, curry(self.__get_date_list, f))
+
+    def _get_sql_clause(self, **kwargs):
+        def quote_only_if_word(word):
+            if ' ' in word:
+                return word
+            else:
+                return db.db.quote_name(word)
+
+        opts = self.klass._meta
+
+        # Construct the fundamental parts of the query: SELECT X FROM Y WHERE Z.
+        select = ["%s.%s" % (db.db.quote_name(opts.db_table), db.db.quote_name(f.column)) for f in opts.fields]
+        tables = [opts.db_table] + (kwargs.get('tables') and kwargs['tables'][:] or [])
+        tables = [quote_only_if_word(t) for t in tables]
+        where = kwargs.get('where') and kwargs['where'][:] or []
+        params = kwargs.get('params') and kwargs['params'][:] or []
+
+        # Convert the kwargs into SQL.
+        tables2, join_where2, where2, params2, _ = _parse_lookup(kwargs.items(), opts)
+        tables.extend(tables2)
+        where.extend(join_where2 + where2)
+        params.extend(params2)
+
+        # Add any additional constraints from the "where_constraints" parameter.
+        where.extend(opts.where_constraints)
+
+        # Add additional tables and WHERE clauses based on select_related.
+        if kwargs.get('select_related') is True:
+            _fill_table_cache(opts, select, tables, where, opts.db_table, [opts.db_table])
+
+        # Add any additional SELECTs passed in via kwargs.
+        if kwargs.get('select'):
+            select.extend(['(%s) AS %s' % (quote_only_if_word(s[1]), db.db.quote_name(s[0])) for s in kwargs['select']])
+
+        # ORDER BY clause
+        order_by = []
+        for f in handle_legacy_orderlist(kwargs.get('order_by', opts.ordering)):
+            if f == '?': # Special case.
+                order_by.append(db.get_random_function_sql())
+            else:
+                if f.startswith('-'):
+                    col_name = f[1:]
+                    order = "DESC"
+                else:
+                    col_name = f
+                    order = "ASC"
+                if "." in col_name:
+                    table_prefix, col_name = col_name.split('.', 1)
+                    table_prefix = db.db.quote_name(table_prefix) + '.'
+                else:
+                    # Use the database table as a column prefix if it wasn't given,
+                    # and if the requested column isn't a custom SELECT.
+                    if "." not in col_name and col_name not in [k[0] for k in kwargs.get('select', [])]:
+                        table_prefix = db.db.quote_name(opts.db_table) + '.'
+                    else:
+                        table_prefix = ''
+                order_by.append('%s%s %s' % (table_prefix, db.db.quote_name(orderfield2column(col_name, opts)), order))
+        order_by = ", ".join(order_by)
+
+        # LIMIT and OFFSET clauses
+        if kwargs.get('limit') is not None:
+            limit_sql = " %s " % db.get_limit_offset_sql(kwargs['limit'], kwargs.get('offset'))
+        else:
+            assert kwargs.get('offset') is None, "'offset' is not allowed without 'limit'"
+            limit_sql = ""
+
+        return select, " FROM " + ",".join(tables) + (where and " WHERE " + " AND ".join(where) or "") + (order_by and " ORDER BY " + order_by or "") + limit_sql, params
+
+    def get_iterator(self, **kwargs):
+        # kwargs['select'] is a dictionary, and dictionaries' key order is
+        # undefined, so we convert it to a list of tuples internally.
+        kwargs['select'] = kwargs.get('select', {}).items()
+
+        cursor = db.db.cursor()
+        select, sql, params = self._get_sql_clause(**kwargs)
+        cursor.execute("SELECT " + (kwargs.get('distinct') and "DISTINCT " or "") + ",".join(select) + sql, params)
+        fill_cache = kwargs.get('select_related')
+        index_end = len(self.klass._meta.fields)
+        while 1:
+            rows = cursor.fetchmany(GET_ITERATOR_CHUNK_SIZE)
+            if not rows:
+                raise StopIteration
+            for row in rows:
+                if fill_cache:
+                    obj, index_end = _get_cached_row(opts, row, 0)
+                else:
+                    obj = self.klass(*row[:index_end])
+                for i, k in enumerate(kwargs['select']):
+                    setattr(obj, k[0], row[index_end+i])
+                yield obj
+
+    def get_list(self, **kwargs):
+        return list(self.get_iterator(**kwargs))
+
+    def get_count(self, **kwargs):
+        kwargs['order_by'] = []
+        kwargs['offset'] = None
+        kwargs['limit'] = None
+        kwargs['select_related'] = False
+        _, sql, params = self._get_sql_clause(**kwargs)
+        cursor = db.db.cursor()
+        cursor.execute("SELECT COUNT(*)" + sql, params)
+        return cursor.fetchone()[0]
+
+    def get_object(self, **kwargs):
+        obj_list = self.get_list(**kwargs)
+        if len(obj_list) < 1:
+            raise self.klass.DoesNotExist, "%s does not exist for %s" % (self.klass._meta.object_name, kwargs)
+        assert len(obj_list) == 1, "get_object() returned more than one %s -- it returned %s! Lookup parameters were %s" % (self.klass._meta.object_name, len(obj_list), kwargs)
+        return obj_list[0]
+
+    def get_in_bulk(self, *args, **kwargs):
+        id_list = args and args[0] or kwargs['id_list']
+        assert id_list != [], "get_in_bulk() cannot be passed an empty list."
+        kwargs['where'] = ["%s.%s IN (%s)" % (db.db.quote_name(self.klass._meta.db_table), db.db.quote_name(self.klass._meta.pk.column), ",".join(['%s'] * len(id_list)))]
+        kwargs['params'] = id_list
+        obj_list = self.get_list(**kwargs)
+        return dict([(getattr(o, self.klass._meta.pk.attname), o) for o in obj_list])
+
+    def get_values_iterator(self, **kwargs):
+        # select_related and select aren't supported in get_values().
+        kwargs['select_related'] = False
+        kwargs['select'] = {}
+
+        # 'fields' is a list of field names to fetch.
+        try:
+            fields = [self.klass._meta.get_field(f).column for f in kwargs.pop('fields')]
+        except KeyError: # Default to all fields.
+            fields = [f.column for f in self.klass._meta.fields]
+
+        cursor = db.db.cursor()
+        _, sql, params = self._get_sql_clause(**kwargs)
+        select = ['%s.%s' % (db.db.quote_name(self.klass._meta.db_table), db.db.quote_name(f)) for f in fields]
+        cursor.execute("SELECT " + (kwargs.get('distinct') and "DISTINCT " or "") + ",".join(select) + sql, params)
+        while 1:
+            rows = cursor.fetchmany(GET_ITERATOR_CHUNK_SIZE)
+            if not rows:
+                raise StopIteration
+            for row in rows:
+                yield dict(zip(fields, row))
+
+    def get_values(self, **kwargs):
+        return list(self.get_values_iterator(**kwargs))
+
+    def __get_latest(self, **kwargs):
+        kwargs['order_by'] = ('-' + self.klass._meta.get_latest_by,)
+        kwargs['limit'] = 1
+        return self.get_object(**kwargs)
+
+    def __get_date_list(self, field, *args, **kwargs):
+        from django.core.db.typecasts import typecast_timestamp
+        kind = args and args[0] or kwargs['kind']
+        assert kind in ("month", "year", "day"), "'kind' must be one of 'year', 'month' or 'day'."
+        order = 'ASC'
+        if kwargs.has_key('order'):
+            order = kwargs['order']
+            del kwargs['order']
+        assert order in ('ASC', 'DESC'), "'order' must be either 'ASC' or 'DESC'"
+        kwargs['order_by'] = () # Clear this because it'll mess things up otherwise.
+        if field.null:
+            kwargs.setdefault('where', []).append('%s.%s IS NOT NULL' % \
+                (db.db.quote_name(self.klass._meta.db_table), db.db.quote_name(field.column)))
+        select, sql, params = self._get_sql_clause(**kwargs)
+        sql = 'SELECT %s %s GROUP BY 1 ORDER BY 1 %s' % \
+            (db.get_date_trunc_sql(kind, '%s.%s' % (db.db.quote_name(self.klass._meta.db_table),
+            db.db.quote_name(field.column))), sql, order)
+        cursor = db.db.cursor()
+        cursor.execute(sql, params)
+        # We have to manually run typecast_timestamp(str()) on the results, because
+        # MySQL doesn't automatically cast the result of date functions as datetime
+        # objects -- MySQL returns the values as strings, instead.
+        return [typecast_timestamp(str(row[0])) for row in cursor.fetchall()]
+
 ############################################
 # HELPER FUNCTIONS (CURRIED MODEL METHODS) #
 ############################################
-
-# CORE METHODS #############################
-
-def method_get_next_in_order(opts, order_field, self):
-    if not hasattr(self, '_next_in_order_cache'):
-        self._next_in_order_cache = opts.get_model_module().get_object(order_by=('_order',),
-            where=['%s > (SELECT %s FROM %s WHERE %s=%%s)' % \
-                (db.db.quote_name('_order'), db.db.quote_name('_order'),
-                db.db.quote_name(opts.db_table), db.db.quote_name(opts.pk.column)),
-                '%s=%%s' % db.db.quote_name(order_field.column)], limit=1,
-            params=[getattr(self, opts.pk.attname), getattr(self, order_field.attname)])
-    return self._next_in_order_cache
-
-def method_get_previous_in_order(opts, order_field, self):
-    if not hasattr(self, '_previous_in_order_cache'):
-        self._previous_in_order_cache = opts.get_model_module().get_object(order_by=('-_order',),
-            where=['%s < (SELECT %s FROM %s WHERE %s=%%s)' % \
-                (db.db.quote_name('_order'), db.db.quote_name('_order'),
-                db.db.quote_name(opts.db_table), db.db.quote_name(opts.pk.column)),
-                '%s=%%s' % db.db.quote_name(order_field.column)], limit=1,
-            params=[getattr(self, opts.pk.attname), getattr(self, order_field.attname)])
-    return self._previous_in_order_cache
 
 # RELATIONSHIP METHODS #####################
 
@@ -1241,91 +1465,6 @@ def method_get_order(ordered_obj, self):
     cursor.execute(sql, [rel_val])
     return [r[0] for r in cursor.fetchall()]
 
-# DATE-RELATED METHODS #####################
-
-def method_get_next_or_previous(get_object_func, opts, field, is_next, self, **kwargs):
-    op = is_next and '>' or '<'
-    kwargs.setdefault('where', []).append('(%s %s %%s OR (%s = %%s AND %s.%s %s %%s))' % \
-        (db.db.quote_name(field.column), op, db.db.quote_name(field.column),
-        db.db.quote_name(opts.db_table), db.db.quote_name(opts.pk.column), op))
-    param = str(getattr(self, field.attname))
-    kwargs.setdefault('params', []).extend([param, param, getattr(self, opts.pk.attname)])
-    kwargs['order_by'] = [(not is_next and '-' or '') + field.name, (not is_next and '-' or '') + opts.pk.name]
-    kwargs['limit'] = 1
-    return get_object_func(**kwargs)
-
-# CHOICE-RELATED METHODS ###################
-
-def method_get_display_value(field, self):
-    value = getattr(self, field.attname)
-    return dict(field.choices).get(value, value)
-
-# FILE-RELATED METHODS #####################
-
-def method_get_file_filename(field, self):
-    return os.path.join(settings.MEDIA_ROOT, getattr(self, field.attname))
-
-def method_get_file_url(field, self):
-    if getattr(self, field.attname): # value is not blank
-        import urlparse
-        return urlparse.urljoin(settings.MEDIA_URL, getattr(self, field.attname)).replace('\\', '/')
-    return ''
-
-def method_get_file_size(field, self):
-    return os.path.getsize(method_get_file_filename(field, self))
-
-def method_save_file(field, self, filename, raw_contents):
-    directory = field.get_directory_name()
-    try: # Create the date-based directory if it doesn't exist.
-        os.makedirs(os.path.join(settings.MEDIA_ROOT, directory))
-    except OSError: # Directory probably already exists.
-        pass
-    filename = field.get_filename(filename)
-
-    # If the filename already exists, keep adding an underscore to the name of
-    # the file until the filename doesn't exist.
-    while os.path.exists(os.path.join(settings.MEDIA_ROOT, filename)):
-        try:
-            dot_index = filename.rindex('.')
-        except ValueError: # filename has no dot
-            filename += '_'
-        else:
-            filename = filename[:dot_index] + '_' + filename[dot_index:]
-
-    # Write the file to disk.
-    setattr(self, field.attname, filename)
-    fp = open(getattr(self, 'get_%s_filename' % field.name)(), 'wb')
-    fp.write(raw_contents)
-    fp.close()
-
-    # Save the width and/or height, if applicable.
-    if isinstance(field, ImageField) and (field.width_field or field.height_field):
-        from django.utils.images import get_image_dimensions
-        width, height = get_image_dimensions(getattr(self, 'get_%s_filename' % field.name)())
-        if field.width_field:
-            setattr(self, field.width_field, width)
-        if field.height_field:
-            setattr(self, field.height_field, height)
-
-    # Save the object, because it has changed.
-    self.save()
-
-# IMAGE FIELD METHODS ######################
-
-def method_get_image_width(field, self):
-    return _get_image_dimensions(field, self)[0]
-
-def method_get_image_height(field, self):
-    return _get_image_dimensions(field, self)[1]
-
-def _get_image_dimensions(field, self):
-    cachename = "__%s_dimensions_cache" % field.name
-    if not hasattr(self, cachename):
-        from django.utils.images import get_image_dimensions
-        fname = getattr(self, "get_%s_filename" % field.name)()
-        setattr(self, cachename, get_image_dimensions(fname))
-    return getattr(self, cachename)
-
 ##############################################
 # HELPER FUNCTIONS (CURRIED MODEL FUNCTIONS) #
 ##############################################
@@ -1351,13 +1490,6 @@ def _get_where_clause(lookup_type, table_prefix, field_name, value):
         return "%s%s IS %sNULL" % (table_prefix, field_name, (not value and 'NOT ' or ''))
     raise TypeError, "Got invalid lookup_type: %s" % repr(lookup_type)
 
-def function_get_object(opts, klass, does_not_exist_exception, **kwargs):
-    obj_list = function_get_list(opts, klass, **kwargs)
-    if len(obj_list) < 1:
-        raise does_not_exist_exception, "%s does not exist for %s" % (opts.object_name, kwargs)
-    assert len(obj_list) == 1, "get_object() returned more than one %s -- it returned %s! Lookup parameters were %s" % (opts.object_name, len(obj_list), kwargs)
-    return obj_list[0]
-
 def _get_cached_row(opts, row, index_start):
     "Helper function that recursively returns an object with cache filled"
     index_end = index_start + len(opts.fields)
@@ -1367,67 +1499,6 @@ def _get_cached_row(opts, row, index_start):
             rel_obj, index_end = _get_cached_row(f.rel.to, row, index_end)
             setattr(obj, f.get_cache_name(), rel_obj)
     return obj, index_end
-
-def function_get_iterator(opts, klass, **kwargs):
-    # kwargs['select'] is a dictionary, and dictionaries' key order is
-    # undefined, so we convert it to a list of tuples internally.
-    kwargs['select'] = kwargs.get('select', {}).items()
-
-    cursor = db.db.cursor()
-    select, sql, params = function_get_sql_clause(opts, **kwargs)
-    cursor.execute("SELECT " + (kwargs.get('distinct') and "DISTINCT " or "") + ",".join(select) + sql, params)
-    fill_cache = kwargs.get('select_related')
-    index_end = len(opts.fields)
-    while 1:
-        rows = cursor.fetchmany(GET_ITERATOR_CHUNK_SIZE)
-        if not rows:
-            raise StopIteration
-        for row in rows:
-            if fill_cache:
-                obj, index_end = _get_cached_row(opts, row, 0)
-            else:
-                obj = klass(*row[:index_end])
-            for i, k in enumerate(kwargs['select']):
-                setattr(obj, k[0], row[index_end+i])
-            yield obj
-
-def function_get_list(opts, klass, **kwargs):
-    return list(function_get_iterator(opts, klass, **kwargs))
-
-def function_get_count(opts, **kwargs):
-    kwargs['order_by'] = []
-    kwargs['offset'] = None
-    kwargs['limit'] = None
-    kwargs['select_related'] = False
-    _, sql, params = function_get_sql_clause(opts, **kwargs)
-    cursor = db.db.cursor()
-    cursor.execute("SELECT COUNT(*)" + sql, params)
-    return cursor.fetchone()[0]
-
-def function_get_values_iterator(opts, klass, **kwargs):
-    # select_related and select aren't supported in get_values().
-    kwargs['select_related'] = False
-    kwargs['select'] = {}
-
-    # 'fields' is a list of field names to fetch.
-    try:
-        fields = [opts.get_field(f).column for f in kwargs.pop('fields')]
-    except KeyError: # Default to all fields.
-        fields = [f.column for f in opts.fields]
-
-    cursor = db.db.cursor()
-    _, sql, params = function_get_sql_clause(opts, **kwargs)
-    select = ['%s.%s' % (db.db.quote_name(opts.db_table), db.db.quote_name(f)) for f in fields]
-    cursor.execute("SELECT " + (kwargs.get('distinct') and "DISTINCT " or "") + ",".join(select) + sql, params)
-    while 1:
-        rows = cursor.fetchmany(GET_ITERATOR_CHUNK_SIZE)
-        if not rows:
-            raise StopIteration
-        for row in rows:
-            yield dict(zip(fields, row))
-
-def function_get_values(opts, klass, **kwargs):
-    return list(function_get_values_iterator(opts, klass, **kwargs))
 
 def _fill_table_cache(opts, select, tables, where, old_prefix, cache_tables_seen):
     """
@@ -1582,106 +1653,6 @@ def _parse_lookup(kwarg_items, opts, table_count=0):
             except StopIteration:
                 continue
     return tables, join_where, where, params, table_count
-
-def function_get_sql_clause(opts, **kwargs):
-    def quote_only_if_word(word):
-        if ' ' in word:
-            return word
-        else:
-            return db.db.quote_name(word)
-
-    # Construct the fundamental parts of the query: SELECT X FROM Y WHERE Z.
-    select = ["%s.%s" % (db.db.quote_name(opts.db_table), db.db.quote_name(f.column)) for f in opts.fields]
-    tables = [opts.db_table] + (kwargs.get('tables') and kwargs['tables'][:] or [])
-    tables = [quote_only_if_word(t) for t in tables]
-    where = kwargs.get('where') and kwargs['where'][:] or []
-    params = kwargs.get('params') and kwargs['params'][:] or []
-
-    # Convert the kwargs into SQL.
-    tables2, join_where2, where2, params2, _ = _parse_lookup(kwargs.items(), opts)
-    tables.extend(tables2)
-    where.extend(join_where2 + where2)
-    params.extend(params2)
-
-    # Add any additional constraints from the "where_constraints" parameter.
-    where.extend(opts.where_constraints)
-
-    # Add additional tables and WHERE clauses based on select_related.
-    if kwargs.get('select_related') is True:
-        _fill_table_cache(opts, select, tables, where, opts.db_table, [opts.db_table])
-
-    # Add any additional SELECTs passed in via kwargs.
-    if kwargs.get('select'):
-        select.extend(['(%s) AS %s' % (quote_only_if_word(s[1]), db.db.quote_name(s[0])) for s in kwargs['select']])
-
-    # ORDER BY clause
-    order_by = []
-    for f in handle_legacy_orderlist(kwargs.get('order_by', opts.ordering)):
-        if f == '?': # Special case.
-            order_by.append(db.get_random_function_sql())
-        else:
-            if f.startswith('-'):
-                col_name = f[1:]
-                order = "DESC"
-            else:
-                col_name = f
-                order = "ASC"
-            if "." in col_name:
-                table_prefix, col_name = col_name.split('.', 1)
-                table_prefix = db.db.quote_name(table_prefix) + '.'
-            else:
-                # Use the database table as a column prefix if it wasn't given,
-                # and if the requested column isn't a custom SELECT.
-                if "." not in col_name and col_name not in [k[0] for k in kwargs.get('select', [])]:
-                    table_prefix = db.db.quote_name(opts.db_table) + '.'
-                else:
-                    table_prefix = ''
-            order_by.append('%s%s %s' % (table_prefix, db.db.quote_name(orderfield2column(col_name, opts)), order))
-    order_by = ", ".join(order_by)
-
-    # LIMIT and OFFSET clauses
-    if kwargs.get('limit') is not None:
-        limit_sql = " %s " % db.get_limit_offset_sql(kwargs['limit'], kwargs.get('offset'))
-    else:
-        assert kwargs.get('offset') is None, "'offset' is not allowed without 'limit'"
-        limit_sql = ""
-
-    return select, " FROM " + ",".join(tables) + (where and " WHERE " + " AND ".join(where) or "") + (order_by and " ORDER BY " + order_by or "") + limit_sql, params
-
-def function_get_in_bulk(opts, klass, *args, **kwargs):
-    id_list = args and args[0] or kwargs['id_list']
-    assert id_list != [], "get_in_bulk() cannot be passed an empty list."
-    kwargs['where'] = ["%s.%s IN (%s)" % (db.db.quote_name(opts.db_table), db.db.quote_name(opts.pk.column), ",".join(['%s'] * len(id_list)))]
-    kwargs['params'] = id_list
-    obj_list = function_get_list(opts, klass, **kwargs)
-    return dict([(getattr(o, opts.pk.attname), o) for o in obj_list])
-
-def function_get_latest(opts, klass, does_not_exist_exception, **kwargs):
-    kwargs['order_by'] = ('-' + opts.get_latest_by,)
-    kwargs['limit'] = 1
-    return function_get_object(opts, klass, does_not_exist_exception, **kwargs)
-
-def function_get_date_list(opts, field, *args, **kwargs):
-    from django.core.db.typecasts import typecast_timestamp
-    kind = args and args[0] or kwargs['kind']
-    assert kind in ("month", "year", "day"), "'kind' must be one of 'year', 'month' or 'day'."
-    order = 'ASC'
-    if kwargs.has_key('_order'):
-        order = kwargs['_order']
-        del kwargs['_order']
-    assert order in ('ASC', 'DESC'), "'order' must be either 'ASC' or 'DESC'"
-    kwargs['order_by'] = [] # Clear this because it'll mess things up otherwise.
-    if field.null:
-        kwargs.setdefault('where', []).append('%s.%s IS NOT NULL' % \
-            (db.db.quote_name(opts.db_table), db.db.quote_name(field.column)))
-    select, sql, params = function_get_sql_clause(opts, **kwargs)
-    sql = 'SELECT %s %s GROUP BY 1 ORDER BY 1' % (db.get_date_trunc_sql(kind, '%s.%s' % (db.db.quote_name(opts.db_table), db.db.quote_name(field.column))), sql)
-    cursor = db.db.cursor()
-    cursor.execute(sql, params)
-    # We have to manually run typecast_timestamp(str()) on the results, because
-    # MySQL doesn't automatically cast the result of date functions as datetime
-    # objects -- MySQL returns the values as strings, instead.
-    return [typecast_timestamp(str(row[0])) for row in cursor.fetchall()]
 
 ###################################
 # HELPER FUNCTIONS (MANIPULATORS) #
