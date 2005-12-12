@@ -201,8 +201,8 @@ class ChangeList(object):
         else:
             if isinstance(lookup_opts.get_field(order_field).rel, meta.ManyToOne):
                 f = lookup_opts.get_field(order_field)
-                rel_ordering = f.rel.to.ordering and f.rel.to.ordering[0] or f.rel.to.pk.column
-                lookup_order_field = '%s.%s' % (f.rel.to.db_table, rel_ordering)
+                rel_ordering = f.rel.to._meta.ordering and f.rel.to._meta.ordering[0] or f.rel.to._meta.pk.column
+                lookup_order_field = '%s.%s' % (f.rel.to._meta.db_table, rel_ordering)
         # Use select_related if one of the list_display options is a field with a
         # relationship.
         if lookup_opts.admin.list_select_related:
@@ -285,7 +285,7 @@ class AdminBoundField(BoundField):
         self.raw_id_admin = use_raw_id_admin(field)
         self.is_date_time = isinstance(field, meta.DateTimeField)
         self.is_file_field = isinstance(field, meta.FileField)
-        self.needs_add_label = field.rel and isinstance(field.rel, meta.ManyToOne) or isinstance(field.rel, meta.ManyToMany) and field.rel.to.admin
+        self.needs_add_label = field.rel and isinstance(field.rel, meta.ManyToOne) or isinstance(field.rel, meta.ManyToMany) and field.rel.to._meta.admin
         self.hidden = isinstance(self.field, meta.AutoField)
         self.first = False
 
@@ -525,7 +525,7 @@ def change_stage(request, app_label, module_name, object_id):
     #TODO Should be done in flatten_data  / FormWrapper construction
     for related in opts.get_followed_related_objects():
         wrt = related.opts.order_with_respect_to
-        if wrt and wrt.rel and wrt.rel.to == opts:
+        if wrt and wrt.rel and wrt.rel.to._meta == opts:
             func = getattr(manipulator.original_object, 'get_%s_list' %
                     related.get_method_name_part())
             orig_list = func()

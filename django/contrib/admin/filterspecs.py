@@ -51,12 +51,12 @@ class RelatedFilterSpec(FilterSpec):
     def __init__(self, f, request, params):
         super(RelatedFilterSpec, self).__init__(f, request, params)
         if isinstance(f, meta.ManyToManyField):
-            self.lookup_title = f.rel.to.verbose_name
+            self.lookup_title = f.rel.to._meta.verbose_name
         else:
             self.lookup_title = f.verbose_name
-        self.lookup_kwarg = '%s__%s__exact' % (f.name, f.rel.to.pk.name)
+        self.lookup_kwarg = '%s__%s__exact' % (f.name, f.rel.to._meta.pk.name)
         self.lookup_val = request.GET.get(self.lookup_kwarg, None)
-        self.lookup_choices = f.rel.to.get_model_module().get_list()
+        self.lookup_choices = f.rel.to._meta.get_model_module().get_list()
 
     def has_output(self):
         return len(self.lookup_choices) > 1
@@ -69,7 +69,7 @@ class RelatedFilterSpec(FilterSpec):
                'query_string': cl.get_query_string({}, [self.lookup_kwarg]),
                'display': _('All')}
         for val in self.lookup_choices:
-            pk_val = getattr(val, self.field.rel.to.pk.attname)
+            pk_val = getattr(val, self.field.rel.to._meta.pk.attname)
             yield {'selected': self.lookup_val == str(pk_val),
                    'query_string': cl.get_query_string( {self.lookup_kwarg: pk_val}),
                    'display': val}

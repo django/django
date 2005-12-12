@@ -39,7 +39,7 @@ string_concat = lazy(string_concat, str)
 
 def manipulator_valid_rel_key(f, self, field_data, all_data):
     "Validates that the value is a valid foreign key"
-    mod = f.rel.to.get_model_module()
+    mod = f.rel.to._meta.get_model_module()
     try:
         mod.get_object(pk=field_data)
     except ObjectDoesNotExist:
@@ -311,9 +311,9 @@ class Field(object):
         first_choice = include_blank and blank_choice or []
         if self.choices:
             return first_choice + list(self.choices)
-        rel_obj = self.rel.to
-        return first_choice + [(getattr(x, rel_obj.pk.attname), str(x))
-                               for x in rel_obj.get_model_module().get_list(**self.rel.limit_choices_to)]
+        rel_model = self.rel.to
+        return first_choice + [(getattr(x, rel_model._meta.pk.attname), str(x))
+                               for x in rel_model.objects.get_list(**self.rel._meta.limit_choices_to)]
 
     def get_choices_default(self):
         if(self.radio_admin):
@@ -770,7 +770,7 @@ class ManyToManyField(Field):
 
     def isValidIDList(self, field_data, all_data):
         "Validates that the value is a valid list of foreign keys"
-        mod = self.rel.to.get_model_module()
+        mod = self.rel.to._meta.get_model_module()
         try:
             pks = map(int, field_data.split(','))
         except ValueError:
@@ -789,7 +789,7 @@ class ManyToManyField(Field):
         new_data = {}
         if obj:
             get_list_func = getattr(obj, 'get_%s_list' % self.rel.singular)
-            instance_ids = [getattr(instance, self.rel.to.pk.attname) for instance in get_list_func()]
+            instance_ids = [getattr(instance, self.rel.to._meta.pk.attname) for instance in get_list_func()]
             if self.rel.raw_id_admin:
                  new_data[self.name] = ",".join([str(id) for id in instance_ids])
             else:
@@ -829,11 +829,10 @@ class ManyToOne:
         max_num_in_admin=None, num_extra_on_change=1, edit_inline=False,
         related_name=None, limit_choices_to=None, lookup_overrides=None, raw_id_admin=False):
         try:
-            self.to = to._meta
+            to._meta
         except AttributeError: # to._meta doesn't exist, so it must be RECURSIVE_RELATIONSHIP_CONSTANT
-            assert to == RECURSIVE_RELATIONSHIP_CONSTANT, "'to' must be either a model or the string '%s'" % RECURSIVE_RELATIONSHIP_CONSTANT
-            self.to = to
-        self.field_name = field_name
+            assert to == RECURSIVE_RELATIONSHIP_CONSTANT, "'to' must be either a model or the string %r" % RECURSIVE_RELATIONSHIP_CONSTANT
+        self.to, self.field_name = to, field_name
         self.num_in_admin, self.edit_inline = num_in_admin, edit_inline
         self.min_num_in_admin, self.max_num_in_admin = min_num_in_admin, max_num_in_admin
         self.num_extra_on_change, self.related_name = num_extra_on_change, related_name
@@ -843,12 +842,12 @@ class ManyToOne:
 
     def get_related_field(self):
         "Returns the Field in the 'to' object to which this relationship is tied."
-        return self.to.get_field(self.field_name)
+        return self.to._meta.get_field(self.field_name)
 
 class ManyToMany:
     def __init__(self, to, singular=None, num_in_admin=0, related_name=None,
         filter_interface=None, limit_choices_to=None, raw_id_admin=False):
-        self.to = to._meta
+        self.to = to
         self.singular = singular or to._meta.object_name.lower()
         self.num_in_admin = num_in_admin
         self.related_name = related_name
@@ -862,7 +861,7 @@ class OneToOne(ManyToOne):
     def __init__(self, to, field_name, num_in_admin=0, edit_inline=False,
         related_name=None, limit_choices_to=None, lookup_overrides=None,
         raw_id_admin=False):
-        self.to, self.field_name = to._meta, field_name
+        self.to, self.field_name = to, field_name
         self.num_in_admin, self.edit_inline = num_in_admin, edit_inline
         self.related_name = related_name
         self.limit_choices_to = limit_choices_to or {}

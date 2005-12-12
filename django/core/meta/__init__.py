@@ -486,7 +486,7 @@ class Options:
             for mod in module_list:
                 for klass in mod._MODELS:
                     for f in klass._meta.fields:
-                        if f.rel and self == f.rel.to:
+                        if f.rel and self == f.rel.to._meta:
                             rel_objs.append(RelatedObject(self, klass._meta, f))
             if self.has_related_links:
                 # Manually add RelatedLink objects, which are a special case.
@@ -533,7 +533,7 @@ class Options:
         for mod in module_list:
             for klass in mod._MODELS:
                 for f in klass._meta.many_to_many:
-                    if f.rel and self == f.rel.to:
+                    if f.rel and self == f.rel.to._meta:
                         rel_objs.append(RelatedObject(self, klass._meta, f))
         return rel_objs
 
@@ -544,7 +544,7 @@ class Options:
             for klass in get_app(self.app_label)._MODELS:
                 opts = klass._meta
                 if opts.order_with_respect_to and opts.order_with_respect_to.rel \
-                    and self == opts.order_with_respect_to.rel.to:
+                    and self == opts.order_with_respect_to.rel.to._meta:
                     objects.append(opts)
             self._ordered_objects = objects
         return self._ordered_objects
@@ -722,31 +722,16 @@ class ModelBase(type):
             setattr(new_mod, k, v)
 
         # Create the default class methods.
-        for f in opts.fields:
-            # If the object has a relationship to itself, as designated by
-            # RECURSIVE_RELATIONSHIP_CONSTANT, create that relationship formally.
-            if f.rel and f.rel.to == RECURSIVE_RELATIONSHIP_CONSTANT:
-                f.rel.to = opts
-                f.name = f.name or (f.rel.to.object_name.lower() + '_' + f.rel.to.pk.name)
-                f.verbose_name = f.verbose_name or f.rel.to.verbose_name
-                f.rel.field_name = f.rel.field_name or f.rel.to.pk.name
-            # Add "get_thingie" methods for many-to-one related objects.
-            # EXAMPLES: Choice.get_poll(), Story.get_dateline()
-            if isinstance(f.rel, ManyToOne):
-                func = curry(method_get_many_to_one, f)
-                func.__doc__ = "Returns the associated `%s.%s` object." % (f.rel.to.app_label, f.rel.to.module_name)
-                attrs['get_%s' % f.name] = func
-
         for f in opts.many_to_many:
             # Add "get_thingie" methods for many-to-many related objects.
             # EXAMPLES: Poll.get_site_list(), Story.get_byline_list()
             func = curry(method_get_many_to_many, f)
-            func.__doc__ = "Returns a list of associated `%s.%s` objects." % (f.rel.to.app_label, f.rel.to.module_name)
+            func.__doc__ = "Returns a list of associated `%s.%s` objects." % (f.rel.to._meta.app_label, f.rel.to._meta.module_name)
             attrs['get_%s_list' % f.rel.singular] = func
             # Add "set_thingie" methods for many-to-many related objects.
             # EXAMPLES: Poll.set_sites(), Story.set_bylines()
             func = curry(method_set_many_to_many, f)
-            func.__doc__ = "Resets this object's `%s.%s` list to the given list of IDs. Note that it doesn't check whether the given IDs are valid." % (f.rel.to.app_label, f.rel.to.module_name)
+            func.__doc__ = "Resets this object's `%s.%s` list to the given list of IDs. Note that it doesn't check whether the given IDs are valid." % (f.rel.to._meta.app_label, f.rel.to._meta.module_name)
             func.alters_data = True
             attrs['set_%s' % f.name] = func
 
@@ -915,21 +900,35 @@ class Model:
                     setattr(cls, 'get_next_by_%s' % f.name, curry(cls.__get_next_or_previous_by_FIELD, field=f, is_next=True))
                     setattr(cls, 'get_previous_by_%s' % f.name, curry(cls.__get_next_or_previous_by_FIELD, field=f, is_next=False))
             elif isinstance(f, FileField):
-                setattr(cls, 'get_%s_filename' % f.name, curry(cls.__get_FIELD_filename, f))
-                setattr(cls, 'get_%s_url' % f.name, curry(cls.__get_FIELD_url, f))
-                setattr(cls, 'get_%s_size' % f.name, curry(cls.__get_FIELD_size, f))
-                setattr(cls, 'save_%s_file' % f.name, curry(cls.__save_FIELD_file, f))
+                setattr(cls, 'get_%s_filename' % f.name, curry(cls.__get_FIELD_filename, field=f))
+                setattr(cls, 'get_%s_url' % f.name, curry(cls.__get_FIELD_url, field=f))
+                setattr(cls, 'get_%s_size' % f.name, curry(cls.__get_FIELD_size, field=f))
+                setattr(cls, 'save_%s_file' % f.name, curry(cls.__save_FIELD_file, field=f))
                 if isinstance(f, ImageField):
                     # Add get_BLAH_width and get_BLAH_height methods, but only
                     # if the image field doesn't have width and height cache
                     # fields.
                     if not f.width_field:
-                        setattr(cls, 'get_%s_width' % f.name, curry(cls.__get_FIELD_width, f))
+                        setattr(cls, 'get_%s_width' % f.name, curry(cls.__get_FIELD_width, field=f))
                     if not f.height_field:
-                        setattr(cls, 'get_%s_height' % f.name, curry(cls.__get_FIELD_height, f))
+                        setattr(cls, 'get_%s_height' % f.name, curry(cls.__get_FIELD_height, field=f))
+
+            # If the object has a relationship to itself, as designated by
+            # RECURSIVE_RELATIONSHIP_CONSTANT, create that relationship formally.
+            if f.rel and f.rel.to == RECURSIVE_RELATIONSHIP_CONSTANT:
+                f.rel.to = cls
+                f.name = f.name or (f.rel.to._meta.object_name.lower() + '_' + f.rel.to._meta.pk.name)
+                f.verbose_name = f.verbose_name or f.rel.to._meta.verbose_name
+                f.rel.field_name = f.rel.field_name or f.rel.to._meta.pk.name
+
+            # Add methods for many-to-one related objects.
+            # EXAMPLES: Choice.get_poll(), Story.get_dateline()
+            if isinstance(f.rel, ManyToOne):
+                setattr(cls, 'get_%s' % f.name, curry(cls.__get_foreign_key_object, field_with_rel=f))
+
         if cls._meta.order_with_respect_to:
-            cls.get_next_in_order = curry(cls.__get_next_or_previous_in_order, True)
-            cls.get_previous_in_order = curry(cls.__get_next_or_previous_in_order, False)
+            cls.get_next_in_order = curry(cls.__get_next_or_previous_in_order, is_next=True)
+            cls.get_previous_in_order = curry(cls.__get_next_or_previous_in_order, is_next=False)
 
     _prepare = classmethod(_prepare)
 
@@ -1130,6 +1129,21 @@ class Model:
             setattr(self, cachename, get_image_dimensions(filename))
         return getattr(self, cachename)
 
+    def __get_foreign_key_object(self, field_with_rel):
+        cache_var = field_with_rel.get_cache_name()
+        if not hasattr(self, cache_var):
+            val = getattr(self, field_with_rel.attname)
+            if val is None:
+                raise field_with_rel.rel.to.DoesNotExist
+            other_field = field_with_rel.rel.get_related_field()
+            if other_field.rel:
+                params = {'%s__%s__exact' % (field_with_rel.rel.field_name, other_field.rel.field_name): val}
+            else:
+                params = {'%s__exact' % field_with_rel.rel.field_name: val}
+            retrieved_obj = field_with_rel.rel.to.objects.get_object(**params)
+            setattr(self, cache_var, retrieved_obj)
+        return getattr(self, cache_var)
+
 class Manager:
     def __init__(self, model_class):
         self.klass = model_class
@@ -1320,23 +1334,6 @@ class Manager:
 
 # RELATIONSHIP METHODS #####################
 
-# Example: Story.get_dateline()
-def method_get_many_to_one(field_with_rel, self):
-    cache_var = field_with_rel.get_cache_name()
-    if not hasattr(self, cache_var):
-        val = getattr(self, field_with_rel.attname)
-        mod = field_with_rel.rel.to.get_model_module()
-        if val is None:
-            raise getattr(mod, '%sDoesNotExist' % field_with_rel.rel.to.object_name)
-        other_field = field_with_rel.rel.get_related_field()
-        if other_field.rel:
-            params = {'%s__%s__exact' % (field_with_rel.rel.field_name, other_field.rel.field_name): val}
-        else:
-            params = {'%s__exact'% field_with_rel.rel.field_name: val}
-        retrieved_obj = mod.get_object(**params)
-        setattr(self, cache_var, retrieved_obj)
-    return getattr(self, cache_var)
-
 # Handles getting many-to-many related objects.
 # Example: Poll.get_site_list()
 def method_get_many_to_many(field_with_rel, self):
@@ -1399,7 +1396,7 @@ def method_get_related(method_name, rel_mod, rel_field, self, **kwargs):
     if self._meta.has_related_links and rel_mod.Klass._meta.module_name == 'relatedlinks':
         kwargs['object_id__exact'] = getattr(self, rel_field.rel.field_name)
     else:
-        kwargs['%s__%s__exact' % (rel_field.name, rel_field.rel.to.pk.name)] = getattr(self, rel_field.rel.get_related_field().attname)
+        kwargs['%s__%s__exact' % (rel_field.name, rel_field.rel.to._meta.pk.name)] = getattr(self, rel_field.rel.get_related_field().attname)
     kwargs.update(rel_field.rel.lookup_overrides)
     return getattr(rel_mod, method_name)(**kwargs)
 
@@ -1507,7 +1504,7 @@ def _fill_table_cache(opts, select, tables, where, old_prefix, cache_tables_seen
     """
     for f in opts.fields:
         if f.rel and not f.null:
-            db_table = f.rel.to.db_table
+            db_table = f.rel.to._meta.db_table
             if db_table not in cache_tables_seen:
                 tables.append(db.db.quote_name(db_table))
             else: # The table was already seen, so give it a table alias.
@@ -1518,7 +1515,7 @@ def _fill_table_cache(opts, select, tables, where, old_prefix, cache_tables_seen
             where.append('%s.%s = %s.%s' % \
                 (db.db.quote_name(old_prefix), db.db.quote_name(f.column),
                 db.db.quote_name(db_table), db.db.quote_name(f.rel.get_related_field().column)))
-            select.extend(['%s.%s' % (db.db.quote_name(db_table), db.db.quote_name(f2.column)) for f2 in f.rel.to.fields])
+            select.extend(['%s.%s' % (db.db.quote_name(db_table), db.db.quote_name(f2.column)) for f2 in f.rel.to._meta.fields])
             _fill_table_cache(f.rel.to, select, tables, where, db_table, cache_tables_seen)
 
 def _throw_bad_kwarg_error(kwarg):
@@ -1595,31 +1592,31 @@ def _parse_lookup(kwarg_items, opts, table_count=0):
                             db.db.quote_name(current_opts.object_name.lower() + '_id')))
                         # Optimization: In the case of primary-key lookups, we
                         # don't have to do an extra join.
-                        if lookup_list and lookup_list[0] == f.rel.to.pk.name and lookup_type == 'exact':
+                        if lookup_list and lookup_list[0] == f.rel.to._meta.pk.name and lookup_type == 'exact':
                             where.append(_get_where_clause(lookup_type, rel_table_alias+'.',
-                                f.rel.to.object_name.lower()+'_id', kwarg_value))
+                                f.rel.to._meta.object_name.lower()+'_id', kwarg_value))
                             params.extend(f.get_db_prep_lookup(lookup_type, kwarg_value))
                             lookup_list.pop()
                             param_required = False
                         else:
                             new_table_alias = 't%s' % table_count
-                            tables.append('%s %s' % (db.db.quote_name(f.rel.to.db_table),
+                            tables.append('%s %s' % (db.db.quote_name(f.rel.to._meta.db_table),
                                 db.db.quote_name(new_table_alias)))
                             join_where.append('%s.%s = %s.%s' % \
                                 (db.db.quote_name(rel_table_alias),
-                                db.db.quote_name(f.rel.to.object_name.lower() + '_id'),
+                                db.db.quote_name(f.rel.to._meta.object_name.lower() + '_id'),
                                 db.db.quote_name(new_table_alias),
-                                db.db.quote_name(f.rel.to.pk.column)))
+                                db.db.quote_name(f.rel.to._meta.pk.column)))
                             current_table_alias = new_table_alias
                             param_required = True
-                        current_opts = f.rel.to
+                        current_opts = f.rel.to._meta
                         raise StopIteration
                 for f in current_opts.fields:
                     # Try many-to-one relationships...
                     if f.rel and f.name == current:
                         # Optimization: In the case of primary-key lookups, we
                         # don't have to do an extra join.
-                        if lookup_list and lookup_list[0] == f.rel.to.pk.name and lookup_type == 'exact':
+                        if lookup_list and lookup_list[0] == f.rel.to._meta.pk.name and lookup_type == 'exact':
                             where.append(_get_where_clause(lookup_type, current_table_alias+'.', f.column, kwarg_value))
                             params.extend(f.get_db_prep_lookup(lookup_type, kwarg_value))
                             lookup_list.pop()
@@ -1633,13 +1630,13 @@ def _parse_lookup(kwarg_items, opts, table_count=0):
                         else:
                             new_table_alias = 't%s' % table_count
                             tables.append('%s %s' % \
-                                (db.db.quote_name(f.rel.to.db_table), db.db.quote_name(new_table_alias)))
+                                (db.db.quote_name(f.rel.to._meta.db_table), db.db.quote_name(new_table_alias)))
                             join_where.append('%s.%s = %s.%s' % \
                                 (db.db.quote_name(current_table_alias), db.db.quote_name(f.column),
-                                db.db.quote_name(new_table_alias), db.db.quote_name(f.rel.to.pk.column)))
+                                db.db.quote_name(new_table_alias), db.db.quote_name(f.rel.to._meta.pk.column)))
                             current_table_alias = new_table_alias
                             param_required = True
-                        current_opts = f.rel.to
+                        current_opts = f.rel.to._meta
                         raise StopIteration
                     # Try direct field-name lookups...
                     if f.name == current:
@@ -1699,7 +1696,7 @@ def manipulator_init(opts, add, change, self, obj_key=None, follow=None):
                 # Let the ObjectDoesNotExist exception propogate up.
                 lookup_kwargs = opts.one_to_one_field.rel.limit_choices_to
                 lookup_kwargs['%s__exact' % opts.one_to_one_field.rel.field_name] = obj_key
-                _ = opts.one_to_one_field.rel.to.get_model_module().get_object(**lookup_kwargs)
+                _ = opts.one_to_one_field.rel.to._meta.get_model_module().get_object(**lookup_kwargs)
                 params = dict([(f.attname, f.get_default()) for f in opts.fields])
                 params[opts.pk.attname] = obj_key
                 self.original_object = opts.get_model_module().Klass(**params)

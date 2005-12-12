@@ -82,8 +82,8 @@ def get_sql_create(mod):
                     field_output.append('PRIMARY KEY')
                 if f.rel:
                     field_output.append('REFERENCES %s (%s)' % \
-                        (db.db.quote_name(f.rel.to.db_table),
-                        db.db.quote_name(f.rel.to.get_field(f.rel.field_name).column)))
+                        (db.db.quote_name(f.rel.to._meta.db_table),
+                        db.db.quote_name(f.rel.to._meta.get_field(f.rel.field_name).column)))
                 table_output.append(' '.join(field_output))
         if opts.order_with_respect_to:
             table_output.append('%s %s NULL' % (db.db.quote_name('_order'), db.DATA_TYPES['IntegerField']))
@@ -108,13 +108,13 @@ def get_sql_create(mod):
                 db.db.quote_name(opts.db_table),
                 db.db.quote_name(opts.pk.column)))
             table_output.append('    %s %s NOT NULL REFERENCES %s (%s),' % \
-                (db.db.quote_name(f.rel.to.object_name.lower() + '_id'),
-                db.DATA_TYPES[get_rel_data_type(f.rel.to.pk)] % f.rel.to.pk.__dict__,
-                db.db.quote_name(f.rel.to.db_table),
-                db.db.quote_name(f.rel.to.pk.column)))
+                (db.db.quote_name(f.rel.to._meta.object_name.lower() + '_id'),
+                db.DATA_TYPES[get_rel_data_type(f.rel.to._meta.pk)] % f.rel.to._meta.pk.__dict__,
+                db.db.quote_name(f.rel.to._meta.db_table),
+                db.db.quote_name(f.rel.to._meta.pk.column)))
             table_output.append('    UNIQUE (%s, %s)' % \
                 (db.db.quote_name(opts.object_name.lower() + '_id'),
-                db.db.quote_name(f.rel.to.object_name.lower() + '_id')))
+                db.db.quote_name(f.rel.to._meta.object_name.lower() + '_id')))
             table_output.append(');')
             final_output.append('\n'.join(table_output))
     return final_output
@@ -669,8 +669,8 @@ def get_validation_errors(outfile):
             # verify "singular" is set in that case.
             for i, f in enumerate(opts.many_to_many):
                 for previous_f in opts.many_to_many[:i]:
-                    if f.rel.to == previous_f.rel.to and f.rel.singular == previous_f.rel.singular:
-                        e.add(opts, 'The "%s" field requires a "singular" parameter, because the %s model has more than one ManyToManyField to the same model (%s).' % (f.name, opts.object_name, previous_f.rel.to.object_name))
+                    if f.rel.to._meta == previous_f.rel.to._meta and f.rel.singular == previous_f.rel.singular:
+                        e.add(opts, 'The "%s" field requires a "singular" parameter, because the %s model has more than one ManyToManyField to the same model (%s).' % (f.name, opts.object_name, previous_f.rel.to._meta.object_name))
 
             # Check admin attribute.
             if opts.admin is not None:
