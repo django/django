@@ -7,7 +7,7 @@ import os, sys, time, traceback
 # and Django aims to work with Python 2.3+.
 import doctest
 
-APP_NAME = 'testapp'
+MODEL_TESTS_DIR_NAME = 'modeltests'
 OTHER_TESTS_DIR = "othertests"
 TEST_DATABASE_NAME = 'django_test_db'
 
@@ -18,10 +18,10 @@ def log_error(model_name, title, description):
         'description': description,
     })
 
-MODEL_DIR = os.path.join(os.path.dirname(__file__), APP_NAME, 'models')
+MODEL_TEST_DIR = os.path.join(os.path.dirname(__file__), MODEL_TESTS_DIR_NAME)
 
 def get_test_models():
-    return [f[:-3] for f in os.listdir(MODEL_DIR) if f.endswith('.py') and not f.startswith('__init__')]
+    return [f for f in os.listdir(MODEL_TEST_DIR) if not f.startswith('__init__') and not f.startswith('.')]
 
 class DjangoDoctestRunner(doctest.DocTestRunner):
     def __init__(self, verbosity_level, *args, **kwargs):
@@ -67,8 +67,8 @@ class TestRunner:
         from django.core.db import db
         from django.core import management, meta
 
-        # Manually set INSTALLED_APPS to point to the test app.
-        settings.INSTALLED_APPS = (APP_NAME,)
+        # Manually set INSTALLED_APPS to point to the test models.
+        settings.INSTALLED_APPS = [MODEL_TESTS_DIR_NAME + '.' + a for a in get_test_models()]
 
         # Determine which models we're going to test.
         test_models = get_test_models()
@@ -123,7 +123,8 @@ class TestRunner:
         for model_name in test_models:
             self.output(1, "%s model: Importing" % model_name)
             try:
-                mod = meta.get_app(model_name)
+                # TODO: Abstract this into a meta.get_app() replacement?
+                mod = __import__(MODEL_TESTS_DIR_NAME + '.' + model_name + '.models', '', '', [''])
             except Exception, e:
                 log_error(model_name, "Error while importing", ''.join(traceback.format_exception(*sys.exc_info())[1:]))
                 continue

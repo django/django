@@ -8,13 +8,13 @@ differently.
 from django.core import meta
 
 # From the "Bare-bones model" example
-from django.models.basic import Article
+from modeltests.basic.models import Article
 
 # From the "Adding __repr__()" example
-from django.models.repr import Article as ArticleWithRepr
+from modeltests.repr.models import Article as ArticleWithRepr
 
 # From the "Specifying ordering" example
-from django.models.ordering import Article as ArticleWithOrdering
+from modeltests.ordering.models import Article as ArticleWithOrdering
 
 # This uses all fields and metadata from Article and
 # adds a "section" field.
