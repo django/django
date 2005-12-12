@@ -721,20 +721,6 @@ class ModelBase(type):
         for k, v in opts.module_constants.items():
             setattr(new_mod, k, v)
 
-        # Create the default class methods.
-        for f in opts.many_to_many:
-            # Add "get_thingie" methods for many-to-many related objects.
-            # EXAMPLES: Poll.get_site_list(), Story.get_byline_list()
-            func = curry(method_get_many_to_many, f)
-            func.__doc__ = "Returns a list of associated `%s.%s` objects." % (f.rel.to._meta.app_label, f.rel.to._meta.module_name)
-            attrs['get_%s_list' % f.rel.singular] = func
-            # Add "set_thingie" methods for many-to-many related objects.
-            # EXAMPLES: Poll.set_sites(), Story.set_bylines()
-            func = curry(method_set_many_to_many, f)
-            func.__doc__ = "Resets this object's `%s.%s` list to the given list of IDs. Note that it doesn't check whether the given IDs are valid." % (f.rel.to._meta.app_label, f.rel.to._meta.module_name)
-            func.alters_data = True
-            attrs['set_%s' % f.name] = func
-
         # Create the class, because we need it to use in currying.
         new_class = type.__new__(cls, name, bases, attrs)
 
@@ -925,6 +911,16 @@ class Model:
             # EXAMPLES: Choice.get_poll(), Story.get_dateline()
             if isinstance(f.rel, ManyToOne):
                 setattr(cls, 'get_%s' % f.name, curry(cls.__get_foreign_key_object, field_with_rel=f))
+
+        # Create the default class methods.
+        for f in cls._meta.many_to_many:
+            # Add "get_thingie" methods for many-to-many related objects.
+            # EXAMPLES: Poll.get_site_list(), Story.get_byline_list()
+            setattr(cls, 'get_%s_list' % f.rel.singular, curry(cls.__get_many_to_many_objects, field_with_rel=f))
+
+            # Add "set_thingie" methods for many-to-many related objects.
+            # EXAMPLES: Poll.set_sites(), Story.set_bylines()
+            setattr(cls, 'set_%s' % f.name, curry(cls.__set_many_to_many_objects, field_with_rel=f))
 
         if cls._meta.order_with_respect_to:
             cls.get_next_in_order = curry(cls.__get_next_or_previous_in_order, is_next=True)
@@ -1144,6 +1140,59 @@ class Model:
             setattr(self, cache_var, retrieved_obj)
         return getattr(self, cache_var)
 
+    def __get_many_to_many_objects(self, field_with_rel):
+        cache_var = '_%s_cache' % field_with_rel.name
+        if not hasattr(self, cache_var):
+            rel_opts = field_with_rel.rel.to._meta
+            sql = "SELECT %s FROM %s a, %s b WHERE a.%s = b.%s AND b.%s = %%s %s" % \
+                (','.join(['a.%s' % db.db.quote_name(f.column) for f in rel_opts.fields]),
+                db.db.quote_name(rel_opts.db_table),
+                db.db.quote_name(field_with_rel.get_m2m_db_table(self._meta)),
+                db.db.quote_name(rel_opts.pk.column),
+                db.db.quote_name(rel_opts.object_name.lower() + '_id'),
+                db.db.quote_name(self._meta.object_name.lower() + '_id'), rel_opts.get_order_sql('a'))
+            cursor = db.db.cursor()
+            cursor.execute(sql, [getattr(self, self._meta.pk.attname)])
+            setattr(self, cache_var, [field_with_rel.rel.to(*row) for row in cursor.fetchall()])
+        return getattr(self, cache_var)
+
+    def __set_many_to_many_objects(self, field_with_rel, id_list):
+        current_ids = [obj.id for obj in self.__get_many_to_many_objects(field_with_rel)]
+        ids_to_add, ids_to_delete = dict([(i, 1) for i in id_list]), []
+        for current_id in current_ids:
+            if current_id in id_list:
+                del ids_to_add[current_id]
+            else:
+                ids_to_delete.append(current_id)
+        ids_to_add = ids_to_add.keys()
+        # Now ids_to_add is a list of IDs to add, and ids_to_delete is a list of IDs to delete.
+        if not ids_to_delete and not ids_to_add:
+            return False # No change
+        rel = field_with_rel.rel.to._meta
+        m2m_table = field_with_rel.get_m2m_db_table(self._meta)
+        cursor = db.db.cursor()
+        this_id = getattr(self, self._meta.pk.attname)
+        if ids_to_delete:
+            sql = "DELETE FROM %s WHERE %s = %%s AND %s IN (%s)" % \
+                (db.db.quote_name(m2m_table),
+                db.db.quote_name(self._meta.object_name.lower() + '_id'),
+                db.db.quote_name(rel.object_name.lower() + '_id'), ','.join(map(str, ids_to_delete)))
+            cursor.execute(sql, [this_id])
+        if ids_to_add:
+            sql = "INSERT INTO %s (%s, %s) VALUES (%%s, %%s)" % \
+                (db.db.quote_name(m2m_table),
+                db.db.quote_name(self._meta.object_name.lower() + '_id'),
+                db.db.quote_name(rel.object_name.lower() + '_id'))
+            cursor.executemany(sql, [(this_id, i) for i in ids_to_add])
+        db.db.commit()
+        try:
+            delattr(self, '_%s_cache' % field_with_rel.name) # clear cache, if it exists
+        except AttributeError:
+            pass
+        return True
+
+    __set_many_to_many_objects.alters_data = True
+
 class Manager:
     def __init__(self, model_class):
         self.klass = model_class
@@ -1333,62 +1382,6 @@ class Manager:
 ############################################
 
 # RELATIONSHIP METHODS #####################
-
-# Handles getting many-to-many related objects.
-# Example: Poll.get_site_list()
-def method_get_many_to_many(field_with_rel, self):
-    rel = field_with_rel.rel.to
-    cache_var = '_%s_cache' % field_with_rel.name
-    if not hasattr(self, cache_var):
-        mod = rel.get_model_module()
-        sql = "SELECT %s FROM %s a, %s b WHERE a.%s = b.%s AND b.%s = %%s %s" % \
-            (','.join(['a.%s' % db.db.quote_name(f.column) for f in rel.fields]),
-            db.db.quote_name(rel.db_table),
-            db.db.quote_name(field_with_rel.get_m2m_db_table(self._meta)),
-            db.db.quote_name(rel.pk.column),
-            db.db.quote_name(rel.object_name.lower() + '_id'),
-            db.db.quote_name(self._meta.object_name.lower() + '_id'), rel.get_order_sql('a'))
-        cursor = db.db.cursor()
-        cursor.execute(sql, [getattr(self, self._meta.pk.attname)])
-        setattr(self, cache_var, [getattr(mod, rel.object_name)(*row) for row in cursor.fetchall()])
-    return getattr(self, cache_var)
-
-# Handles setting many-to-many relationships.
-# Example: Poll.set_sites()
-def method_set_many_to_many(rel_field, self, id_list):
-    current_ids = [obj.id for obj in method_get_many_to_many(rel_field, self)]
-    ids_to_add, ids_to_delete = dict([(i, 1) for i in id_list]), []
-    for current_id in current_ids:
-        if current_id in id_list:
-            del ids_to_add[current_id]
-        else:
-            ids_to_delete.append(current_id)
-    ids_to_add = ids_to_add.keys()
-    # Now ids_to_add is a list of IDs to add, and ids_to_delete is a list of IDs to delete.
-    if not ids_to_delete and not ids_to_add:
-        return False # No change
-    rel = rel_field.rel.to
-    m2m_table = rel_field.get_m2m_db_table(self._meta)
-    cursor = db.db.cursor()
-    this_id = getattr(self, self._meta.pk.attname)
-    if ids_to_delete:
-        sql = "DELETE FROM %s WHERE %s = %%s AND %s IN (%s)" % \
-            (db.db.quote_name(m2m_table),
-            db.db.quote_name(self._meta.object_name.lower() + '_id'),
-            db.db.quote_name(rel.object_name.lower() + '_id'), ','.join(map(str, ids_to_delete)))
-        cursor.execute(sql, [this_id])
-    if ids_to_add:
-        sql = "INSERT INTO %s (%s, %s) VALUES (%%s, %%s)" % \
-            (db.db.quote_name(m2m_table),
-            db.db.quote_name(self._meta.object_name.lower() + '_id'),
-            db.db.quote_name(rel.object_name.lower() + '_id'))
-        cursor.executemany(sql, [(this_id, i) for i in ids_to_add])
-    db.db.commit()
-    try:
-        delattr(self, '_%s_cache' % rel_field.name) # clear cache, if it exists
-    except AttributeError:
-        pass
-    return True
 
 # Handles related-object retrieval.
 # Examples: Poll.get_choice(), Poll.get_choice_list(), Poll.get_choice_count()
