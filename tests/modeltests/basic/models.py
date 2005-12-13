@@ -180,6 +180,18 @@ False
 >>> Article.objects.get_pub_date_list('day', order='DESC')
 [datetime.datetime(2005, 7, 31, 0, 0), datetime.datetime(2005, 7, 30, 0, 0), datetime.datetime(2005, 7, 29, 0, 0), datetime.datetime(2005, 7, 28, 0, 0)]
 
+# An Article instance doesn't have access to the "objects" attribute.
+# That is only available as a class method.
+>>> a7.objects.get_list()
+Traceback (most recent call last):
+    ...
+AttributeError: Manager isn't accessible via Article instances
+
+>>> a7.objects
+Traceback (most recent call last):
+    ...
+AttributeError: Manager isn't accessible via Article instances
+
 """
 
 from django.conf import settings

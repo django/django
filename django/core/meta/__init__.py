@@ -1194,9 +1194,14 @@ class Model:
 
     __set_many_to_many_objects.alters_data = True
 
-class Manager:
+class Manager(object):
     def __init__(self, model_class):
         self.klass = model_class
+
+    def __get__(self, instance, type=None):
+        if instance != None:
+            raise AttributeError, "Manager isn't accessible via %s instances" % self.klass.__name__
+        return self
 
     def _prepare(self):
         # Creates some methods once self.klass._meta has been populated.
