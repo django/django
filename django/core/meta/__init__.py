@@ -160,9 +160,10 @@ class BoundRelatedObject(object):
         return repr(self.__dict__)
 
 class RelatedObject(object):
-    def __init__(self, parent_opts, opts, field):
+    def __init__(self, parent_opts, model, field):
         self.parent_opts = parent_opts
-        self.opts = opts
+        self.model = model
+        self.opts = model._meta
         self.field = field
         self.edit_inline = field.rel.edit_inline
         self.name = opts.module_name
@@ -236,7 +237,7 @@ class RelatedObject(object):
         return self.opts.get_follow(over)
 
     def __repr__(self):
-        return "<RelatedObject: %s related to %s>" % ( self.name, self.field.name)
+        return "<RelatedObject: %s related to %s>" % (self.name, self.field.name)
 
     def get_manipulator_fields(self, opts, manipulator, change, follow):
         # TODO: Remove core fields stuff.
@@ -487,7 +488,7 @@ class Options:
                 for klass in mod._MODELS:
                     for f in klass._meta.fields:
                         if f.rel and self == f.rel.to._meta:
-                            rel_objs.append(RelatedObject(self, klass._meta, f))
+                            rel_objs.append(RelatedObject(self, klass, f))
             if self.has_related_links:
                 # Manually add RelatedLink objects, which are a special case.
                 relatedlinks = get_module('relatedlinks', 'relatedlinks')
@@ -501,7 +502,7 @@ class Options:
                         'content_type__package__label__exact': self.app_label,
                         'content_type__python_module_name__exact': self.module_name,
                     })
-                rel_objs.append(RelatedObject(self, relatedlinks.RelatedLink._meta, link_field))
+                rel_objs.append(RelatedObject(self, relatedlinks.RelatedLink, link_field))
             self._all_related_objects = rel_objs
             return rel_objs
 
@@ -534,7 +535,7 @@ class Options:
             for klass in mod._MODELS:
                 for f in klass._meta.many_to_many:
                     if f.rel and self == f.rel.to._meta:
-                        rel_objs.append(RelatedObject(self, klass._meta, f))
+                        rel_objs.append(RelatedObject(self, klass, f))
         return rel_objs
 
     def get_ordered_objects(self):
