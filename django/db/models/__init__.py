@@ -543,16 +543,23 @@ get_module_name = lambda class_name: class_name.lower() + 's'
 get_verbose_name = lambda class_name: re.sub('([A-Z])', ' \\1', class_name).lower().strip()
 
 class Manager(object):
-    def __init__(self, model_class):
-        self.klass = model_class
+
+    # Tracks each time a Field instance is created. Used to retain order.
+    creation_counter = 0
+
+    def __init__(self):
+        # Increase the creation counter, and save our local copy.
+        self.creation_counter = Manager.creation_counter
+        Manager.creation_counter += 1
 
     def __get__(self, instance, type=None):
         if instance != None:
             raise AttributeError, "Manager isn't accessible via %s instances" % self.klass.__name__
         return self
 
-    def _prepare(self):
+    def _prepare(self, klass):
         # Creates some methods once self.klass._meta has been populated.
+        self.klass = klass
         if self.klass._meta.get_latest_by:
             self.get_latest = self.__get_latest
         for f in self.klass._meta.fields:
@@ -735,7 +742,7 @@ class ModelBase(type):
     "Metaclass for all models"
     def __new__(cls, name, bases, attrs):
         # If this isn't a subclass of Model, don't do anything special.
-        if not bases:
+        if not bases or bases == (object,):
             return type.__new__(cls, name, bases, attrs)
 
         try:
@@ -745,18 +752,22 @@ class ModelBase(type):
         except KeyError:
             meta_attrs = {}
 
-        # Gather all attributes that are Field instances.
-        fields = []
+        # Gather all attributes that are Field or Manager instances.
+        fields, managers = [], []
         for obj_name, obj in attrs.items():
             if isinstance(obj, Field):
                 obj.set_name(obj_name)
                 fields.append(obj)
                 del attrs[obj_name]
+            elif isinstance(obj, Manager):
+                managers.append((obj_name, obj))
+                del attrs[obj_name]
 
-        # Sort the fields in the order that they were created. The
+        # Sort the fields and managers in the order that they were created. The
         # "creation_counter" is needed because metaclasses don't preserve the
         # attribute order.
         fields.sort(lambda x, y: x.creation_counter - y.creation_counter)
+        managers.sort(lambda x, y: x[1].creation_counter - y[1].creation_counter)
 
         opts = Options(
             module_name = meta_attrs.pop('module_name', get_module_name(name)),
@@ -788,11 +799,6 @@ class ModelBase(type):
         # Create the class, because we need it to use in currying.
         new_class = type.__new__(cls, name, bases, attrs)
 
-        # Create the manager.
-        # TODO: Use weakref because of possible memory leak / circular reference.
-        # TODO: Allow for overriding of the name, and custom manager subclasses.
-        new_class.objects = Manager(new_class)
-
         # Give the class a docstring -- its definition.
         if new_class.__doc__ is None:
             new_class.__doc__ = "%s.%s(%s)" % (opts.module_name, name, ", ".join([f.name for f in opts.fields]))
@@ -816,8 +822,22 @@ class ModelBase(type):
             opts.db_table = "%s_%s" % (app_label, opts.module_name)
         new_class._meta = opts
 
+        # Create the default manager, if needed.
+        # TODO: Use weakref because of possible memory leak / circular reference.
+        if managers:
+            for m_name, m in managers:
+                m._prepare(new_class)
+                setattr(new_class, m_name, m)
+            new_class._default_manager = managers[0][1]
+        else:
+            if hasattr(new_class, 'objects'):
+                raise ValueError, "Model %s must specify a custom Manager, because it has a field named 'objects'" % name
+            m = Manager()
+            m._prepare(new_class)
+            new_class.objects = m
+            new_class._default_manager = m
+
         new_class._prepare()
-        new_class.objects._prepare()
 
         return new_class
 
@@ -1037,7 +1057,7 @@ class Model(object):
                 file_name = getattr(self, 'get_%s_filename' % f.name)()
                 # If the file exists and no other object of this type references it,
                 # delete it from the filesystem.
-                if os.path.exists(file_name) and not self.objects.get_list(**{'%s__exact' % f.name: getattr(self, f.name)}):
+                if os.path.exists(file_name) and not self._default_manager.get_list(**{'%s__exact' % f.name: getattr(self, f.name)}):
                     os.remove(file_name)
 
         # Run any post-delete hooks.
@@ -1059,14 +1079,14 @@ class Model(object):
         kwargs.setdefault('params', []).extend([param, param, getattr(self, self._meta.pk.attname)])
         kwargs['order_by'] = [(not is_next and '-' or '') + field.name, (not is_next and '-' or '') + self._meta.pk.name]
         kwargs['limit'] = 1
-        return self.objects.get_object(**kwargs)
+        return self._default_manager.get_object(**kwargs)
 
     def __get_next_or_previous_in_order(self, is_next):
         cachename = "__%s_order_cache" % is_next
         if not hasattr(self, cachename):
             op = is_next and '>' or '<'
             order_field = self.order_with_respect_to
-            obj = self.objects.get_object(order_by=('_order',),
+            obj = self._default_manager.get_object(order_by=('_order',),
                 where=['%s %s (SELECT %s FROM %s WHERE %s=%%s)' % \
                     (backend.quote_name('_order'), op, backend.quote_name('_order'),
                     backend.quote_name(opts.db_table), backend.quote_name(opts.pk.column)),
@@ -1153,7 +1173,7 @@ class Model(object):
                 params = {'%s__%s__exact' % (field_with_rel.rel.field_name, other_field.rel.field_name): val}
             else:
                 params = {'%s__exact' % field_with_rel.rel.field_name: val}
-            retrieved_obj = field_with_rel.rel.to.objects.get_object(**params)
+            retrieved_obj = field_with_rel.rel.to._default_manager.get_object(**params)
             setattr(self, cache_var, retrieved_obj)
         return getattr(self, cache_var)
 
@@ -1213,7 +1233,7 @@ class Model(object):
     def __get_related(self, method_name, rel_class, rel_field, **kwargs):
         kwargs['%s__%s__exact' % (rel_field.name, rel_field.rel.to._meta.pk.name)] = getattr(self, rel_field.rel.get_related_field().attname)
         kwargs.update(rel_field.rel.lookup_overrides)
-        return getattr(rel_class.objects, method_name)(**kwargs)
+        return getattr(rel_class._default_manager, method_name)(**kwargs)
 
     def __add_related(self, rel_class, rel_field, *args, **kwargs):
         init_kwargs = dict(zip([f.attname for f in rel_class._meta.fields if f != rel_field and not isinstance(f, AutoField)], args))
@@ -1238,7 +1258,7 @@ class Model(object):
 # Examples: Album.get_song(), Album.get_song_list(), Album.get_song_count()
 def method_get_related_many_to_many(method_name, opts, rel_mod, rel_field, self, **kwargs):
     kwargs['%s__%s__exact' % (rel_field.name, opts.pk.name)] = getattr(self, opts.pk.attname)
-    return getattr(rel_mod.Klass.objects, method_name)(**kwargs)
+    return getattr(rel_mod.Klass._default_manager, method_name)(**kwargs)
 
 # Handles setting many-to-many related objects.
 # Example: Album.set_songs()

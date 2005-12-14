@@ -83,4 +83,9 @@ AttributeError: type object 'Book' has no attribute 'objects'
 [Corvette, Neon]
 >>> Car.fast_cars.get_list()
 [Corvette]
+
+# Each model class gets a "_default_manager" attribute, which is a reference
+# to the first manager defined in the class. In this case, it's "cars".
+>>> Car._default_manager.get_list(order_by=('name',))
+[Corvette, Neon]
 """
