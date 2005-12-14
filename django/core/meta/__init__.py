@@ -599,6 +599,195 @@ get_module_name = lambda class_name: class_name.lower() + 's'
 # Calculate the verbose_name by converting from InitialCaps to "lowercase with spaces".
 get_verbose_name = lambda class_name: re.sub('([A-Z])', ' \\1', class_name).lower().strip()
 
+class Manager(object):
+    def __init__(self, model_class):
+        self.klass = model_class
+
+    def __get__(self, instance, type=None):
+        if instance != None:
+            raise AttributeError, "Manager isn't accessible via %s instances" % self.klass.__name__
+        return self
+
+    def _prepare(self):
+        # Creates some methods once self.klass._meta has been populated.
+        if self.klass._meta.get_latest_by:
+            self.get_latest = self.__get_latest
+        for f in self.klass._meta.fields:
+            if isinstance(f, DateField):
+                setattr(self, 'get_%s_list' % f.name, curry(self.__get_date_list, f))
+
+    def _get_sql_clause(self, **kwargs):
+        def quote_only_if_word(word):
+            if ' ' in word:
+                return word
+            else:
+                return db.db.quote_name(word)
+
+        opts = self.klass._meta
+
+        # Construct the fundamental parts of the query: SELECT X FROM Y WHERE Z.
+        select = ["%s.%s" % (db.db.quote_name(opts.db_table), db.db.quote_name(f.column)) for f in opts.fields]
+        tables = [opts.db_table] + (kwargs.get('tables') and kwargs['tables'][:] or [])
+        tables = [quote_only_if_word(t) for t in tables]
+        where = kwargs.get('where') and kwargs['where'][:] or []
+        params = kwargs.get('params') and kwargs['params'][:] or []
+
+        # Convert the kwargs into SQL.
+        tables2, join_where2, where2, params2, _ = _parse_lookup(kwargs.items(), opts)
+        tables.extend(tables2)
+        where.extend(join_where2 + where2)
+        params.extend(params2)
+
+        # Add any additional constraints from the "where_constraints" parameter.
+        where.extend(opts.where_constraints)
+
+        # Add additional tables and WHERE clauses based on select_related.
+        if kwargs.get('select_related') is True:
+            _fill_table_cache(opts, select, tables, where, opts.db_table, [opts.db_table])
+
+        # Add any additional SELECTs passed in via kwargs.
+        if kwargs.get('select'):
+            select.extend(['(%s) AS %s' % (quote_only_if_word(s[1]), db.db.quote_name(s[0])) for s in kwargs['select']])
+
+        # ORDER BY clause
+        order_by = []
+        for f in handle_legacy_orderlist(kwargs.get('order_by', opts.ordering)):
+            if f == '?': # Special case.
+                order_by.append(db.get_random_function_sql())
+            else:
+                if f.startswith('-'):
+                    col_name = f[1:]
+                    order = "DESC"
+                else:
+                    col_name = f
+                    order = "ASC"
+                if "." in col_name:
+                    table_prefix, col_name = col_name.split('.', 1)
+                    table_prefix = db.db.quote_name(table_prefix) + '.'
+                else:
+                    # Use the database table as a column prefix if it wasn't given,
+                    # and if the requested column isn't a custom SELECT.
+                    if "." not in col_name and col_name not in [k[0] for k in kwargs.get('select', [])]:
+                        table_prefix = db.db.quote_name(opts.db_table) + '.'
+                    else:
+                        table_prefix = ''
+                order_by.append('%s%s %s' % (table_prefix, db.db.quote_name(orderfield2column(col_name, opts)), order))
+        order_by = ", ".join(order_by)
+
+        # LIMIT and OFFSET clauses
+        if kwargs.get('limit') is not None:
+            limit_sql = " %s " % db.get_limit_offset_sql(kwargs['limit'], kwargs.get('offset'))
+        else:
+            assert kwargs.get('offset') is None, "'offset' is not allowed without 'limit'"
+            limit_sql = ""
+
+        return select, " FROM " + ",".join(tables) + (where and " WHERE " + " AND ".join(where) or "") + (order_by and " ORDER BY " + order_by or "") + limit_sql, params
+
+    def get_iterator(self, **kwargs):
+        # kwargs['select'] is a dictionary, and dictionaries' key order is
+        # undefined, so we convert it to a list of tuples internally.
+        kwargs['select'] = kwargs.get('select', {}).items()
+
+        cursor = db.db.cursor()
+        select, sql, params = self._get_sql_clause(**kwargs)
+        cursor.execute("SELECT " + (kwargs.get('distinct') and "DISTINCT " or "") + ",".join(select) + sql, params)
+        fill_cache = kwargs.get('select_related')
+        index_end = len(self.klass._meta.fields)
+        while 1:
+            rows = cursor.fetchmany(GET_ITERATOR_CHUNK_SIZE)
+            if not rows:
+                raise StopIteration
+            for row in rows:
+                if fill_cache:
+                    obj, index_end = _get_cached_row(self.klass._meta, row, 0)
+                else:
+                    obj = self.klass(*row[:index_end])
+                for i, k in enumerate(kwargs['select']):
+                    setattr(obj, k[0], row[index_end+i])
+                yield obj
+
+    def get_list(self, **kwargs):
+        return list(self.get_iterator(**kwargs))
+
+    def get_count(self, **kwargs):
+        kwargs['order_by'] = []
+        kwargs['offset'] = None
+        kwargs['limit'] = None
+        kwargs['select_related'] = False
+        _, sql, params = self._get_sql_clause(**kwargs)
+        cursor = db.db.cursor()
+        cursor.execute("SELECT COUNT(*)" + sql, params)
+        return cursor.fetchone()[0]
+
+    def get_object(self, **kwargs):
+        obj_list = self.get_list(**kwargs)
+        if len(obj_list) < 1:
+            raise self.klass.DoesNotExist, "%s does not exist for %s" % (self.klass._meta.object_name, kwargs)
+        assert len(obj_list) == 1, "get_object() returned more than one %s -- it returned %s! Lookup parameters were %s" % (self.klass._meta.object_name, len(obj_list), kwargs)
+        return obj_list[0]
+
+    def get_in_bulk(self, *args, **kwargs):
+        id_list = args and args[0] or kwargs['id_list']
+        assert id_list != [], "get_in_bulk() cannot be passed an empty list."
+        kwargs['where'] = ["%s.%s IN (%s)" % (db.db.quote_name(self.klass._meta.db_table), db.db.quote_name(self.klass._meta.pk.column), ",".join(['%s'] * len(id_list)))]
+        kwargs['params'] = id_list
+        obj_list = self.get_list(**kwargs)
+        return dict([(getattr(o, self.klass._meta.pk.attname), o) for o in obj_list])
+
+    def get_values_iterator(self, **kwargs):
+        # select_related and select aren't supported in get_values().
+        kwargs['select_related'] = False
+        kwargs['select'] = {}
+
+        # 'fields' is a list of field names to fetch.
+        try:
+            fields = [self.klass._meta.get_field(f).column for f in kwargs.pop('fields')]
+        except KeyError: # Default to all fields.
+            fields = [f.column for f in self.klass._meta.fields]
+
+        cursor = db.db.cursor()
+        _, sql, params = self._get_sql_clause(**kwargs)
+        select = ['%s.%s' % (db.db.quote_name(self.klass._meta.db_table), db.db.quote_name(f)) for f in fields]
+        cursor.execute("SELECT " + (kwargs.get('distinct') and "DISTINCT " or "") + ",".join(select) + sql, params)
+        while 1:
+            rows = cursor.fetchmany(GET_ITERATOR_CHUNK_SIZE)
+            if not rows:
+                raise StopIteration
+            for row in rows:
+                yield dict(zip(fields, row))
+
+    def get_values(self, **kwargs):
+        return list(self.get_values_iterator(**kwargs))
+
+    def __get_latest(self, **kwargs):
+        kwargs['order_by'] = ('-' + self.klass._meta.get_latest_by,)
+        kwargs['limit'] = 1
+        return self.get_object(**kwargs)
+
+    def __get_date_list(self, field, *args, **kwargs):
+        from django.core.db.typecasts import typecast_timestamp
+        kind = args and args[0] or kwargs['kind']
+        assert kind in ("month", "year", "day"), "'kind' must be one of 'year', 'month' or 'day'."
+        order = 'ASC'
+        if kwargs.has_key('order'):
+            order = kwargs['order']
+            del kwargs['order']
+        assert order in ('ASC', 'DESC'), "'order' must be either 'ASC' or 'DESC'"
+        kwargs['order_by'] = () # Clear this because it'll mess things up otherwise.
+        if field.null:
+            kwargs.setdefault('where', []).append('%s.%s IS NOT NULL' % \
+                (db.db.quote_name(self.klass._meta.db_table), db.db.quote_name(field.column)))
+        select, sql, params = self._get_sql_clause(**kwargs)
+        sql = 'SELECT %s %s GROUP BY 1 ORDER BY 1 %s' % \
+            (db.get_date_trunc_sql(kind, '%s.%s' % (db.db.quote_name(self.klass._meta.db_table),
+            db.db.quote_name(field.column))), sql, order)
+        cursor = db.db.cursor()
+        cursor.execute(sql, params)
+        # We have to manually run typecast_timestamp(str()) on the results, because
+        # MySQL doesn't automatically cast the result of date functions as datetime
+        # objects -- MySQL returns the values as strings, instead.
+        return [typecast_timestamp(str(row[0])) for row in cursor.fetchall()]
+
 class ModelBase(type):
     "Metaclass for all models"
     def __new__(cls, name, bases, attrs):
@@ -626,88 +815,34 @@ class ModelBase(type):
         # attribute order.
         fields.sort(lambda x, y: x.creation_counter - y.creation_counter)
 
-        # If this model is a subclass of another model, create an Options
-        # object by first copying the base class's _meta and then updating it
-        # with the overrides from this class.
-        replaces_module = None
-        if bases[0] != Model:
-            field_names = [f.name for f in fields]
-            remove_fields = meta_attrs.pop('remove_fields', [])
-            for f in bases[0]._meta._orig_init_args['fields']:
-                if f.name not in field_names and f.name not in remove_fields:
-                    fields.insert(0, f)
-            if meta_attrs.has_key('replaces_module'):
-                # Set the replaces_module variable for now. We can't actually
-                # do anything with it yet, because the module hasn't yet been
-                # created.
-                replaces_module = meta_attrs.pop('replaces_module').split('.')
-            # Pass any Options overrides to the base's Options instance, and
-            # simultaneously remove them from attrs. When this is done, attrs
-            # will be a dictionary of custom methods, plus __module__.
-            meta_overrides = {'fields': fields, 'module_name': get_module_name(name), 'verbose_name': get_verbose_name(name)}
-            for k, v in meta_attrs.items():
-                if not callable(v) and k != '__module__':
-                    meta_overrides[k] = meta_attrs.pop(k)
-            opts = bases[0]._meta.copy(**meta_overrides)
-            opts.object_name = name
-            del meta_overrides
-        else:
-            opts = Options(
-                module_name = meta_attrs.pop('module_name', get_module_name(name)),
-                # If the verbose_name wasn't given, use the class name,
-                # converted from InitialCaps to "lowercase with spaces".
-                verbose_name = meta_attrs.pop('verbose_name', get_verbose_name(name)),
-                verbose_name_plural = meta_attrs.pop('verbose_name_plural', ''),
-                db_table = meta_attrs.pop('db_table', ''),
-                fields = fields,
-                ordering = meta_attrs.pop('ordering', None),
-                unique_together = meta_attrs.pop('unique_together', None),
-                admin = meta_attrs.pop('admin', None),
-                has_related_links = meta_attrs.pop('has_related_links', False),
-                where_constraints = meta_attrs.pop('where_constraints', None),
-                object_name = name,
-                app_label = meta_attrs.pop('app_label', None),
-                exceptions = meta_attrs.pop('exceptions', None),
-                permissions = meta_attrs.pop('permissions', None),
-                get_latest_by = meta_attrs.pop('get_latest_by', None),
-                order_with_respect_to = meta_attrs.pop('order_with_respect_to', None),
-                module_constants = meta_attrs.pop('module_constants', None),
-            )
+        opts = Options(
+            module_name = meta_attrs.pop('module_name', get_module_name(name)),
+            # If the verbose_name wasn't given, use the class name,
+            # converted from InitialCaps to "lowercase with spaces".
+            verbose_name = meta_attrs.pop('verbose_name', get_verbose_name(name)),
+            verbose_name_plural = meta_attrs.pop('verbose_name_plural', ''),
+            db_table = meta_attrs.pop('db_table', ''),
+            fields = fields,
+            ordering = meta_attrs.pop('ordering', None),
+            unique_together = meta_attrs.pop('unique_together', None),
+            admin = meta_attrs.pop('admin', None),
+            has_related_links = meta_attrs.pop('has_related_links', False),
+            where_constraints = meta_attrs.pop('where_constraints', None),
+            object_name = name,
+            app_label = meta_attrs.pop('app_label', None),
+            exceptions = meta_attrs.pop('exceptions', None),
+            permissions = meta_attrs.pop('permissions', None),
+            get_latest_by = meta_attrs.pop('get_latest_by', None),
+            order_with_respect_to = meta_attrs.pop('order_with_respect_to', None),
+            module_constants = meta_attrs.pop('module_constants', None),
+        )
 
         if meta_attrs != {}:
             raise TypeError, "'class META' got invalid attribute(s): %s" % ','.join(meta_attrs.keys())
 
         # Dynamically create the module that will contain this class and its
         # associated helper functions.
-        if replaces_module is not None:
-            new_mod = get_module(*replaces_module)
-        else:
-            new_mod = types.ModuleType(opts.module_name)
-
-        # Collect any/all custom class methods and module functions, and move
-        # them to a temporary holding variable. We'll deal with them later.
-        if replaces_module is not None:
-            # Initialize these values to the base class' custom_methods and
-            # custom_functions.
-            custom_methods = dict([(k, v) for k, v in new_mod.Klass.__dict__.items() if hasattr(v, 'custom')])
-            custom_functions = dict([(k, v) for k, v in new_mod.__dict__.items() if hasattr(v, 'custom')])
-        else:
-            custom_methods, custom_functions = {}, {}
-        manipulator_methods = {}
-        for k, v in attrs.items():
-            if k in ('__module__', '__init__', '_overrides', '__doc__'):
-                continue # Skip the important stuff.
-            assert callable(v), "%r is an invalid model parameter." % k
-            # Give the function a function attribute "custom" to designate that
-            # it's a custom function/method.
-            v.custom = True
-            if k.startswith(MODEL_FUNCTIONS_PREFIX):
-                custom_functions[k[len(MODEL_FUNCTIONS_PREFIX):]] = v
-            elif k.startswith(MANIPULATOR_FUNCTIONS_PREFIX):
-                manipulator_methods[k[len(MANIPULATOR_FUNCTIONS_PREFIX):]] = v
-            else:
-                custom_methods[k] = v
-            del attrs[k]
+        new_mod = types.ModuleType(opts.module_name)
 
         # Create the DoesNotExist exception.
         attrs['DoesNotExist'] = types.ClassType('DoesNotExist', (ObjectDoesNotExist,), {})
@@ -740,54 +875,22 @@ class ModelBase(type):
         # Add "Klass" -- a shortcut reference to the class.
         new_mod.__dict__['Klass'] = new_class
 
-        # Add the Manipulators.
-        new_mod.__dict__['AddManipulator'] = get_manipulator(opts, new_class, manipulator_methods, add=True)
-        new_mod.__dict__['ChangeManipulator'] = get_manipulator(opts, new_class, manipulator_methods, change=True)
-
-        # Now that we have references to new_mod and new_class, we can add
-        # any/all extra class methods to the new class. Note that we could
-        # have just left the extra methods in attrs (above), but that would
-        # have meant that any code within the extra methods would *not* have
-        # access to module-level globals, such as get_list(), db, etc.
-        # In order to give these methods access to those globals, we have to
-        # deconstruct the method getting its raw "code" object, then recreating
-        # the function with a new "globals" dictionary.
-        #
-        # To complicate matters more, because each method is manually assigned
-        # a "globals" value, that "globals" value does NOT include the methods
-        # that haven't been created yet. For instance, if there are two custom
-        # methods, foo() and bar(), and foo() is created first, it won't have
-        # bar() within its globals(). This is a problem because sometimes
-        # custom methods/functions refer to other custom methods/functions. To
-        # solve this problem, we keep track of the new functions created (in
-        # the new_functions variable) and manually append each new function to
-        # the func_globals() of all previously-created functions. So, by the
-        # end of the loop, all functions will "know" about all the other
-        # functions.
-        _reassign_globals(custom_methods, new_mod, new_class)
-        _reassign_globals(custom_functions, new_mod, new_mod)
-        _reassign_globals(manipulator_methods, new_mod, new_mod.__dict__['AddManipulator'])
-        _reassign_globals(manipulator_methods, new_mod, new_mod.__dict__['ChangeManipulator'])
-
         if hasattr(new_class, 'get_absolute_url'):
             new_class.get_absolute_url = curry(get_absolute_url, opts, new_class.get_absolute_url)
 
         # Get a reference to the module the class is in, and dynamically add
         # the new module to it.
         app_package = sys.modules.get(new_class.__module__)
-        if replaces_module is not None:
-            app_label = replaces_module[0]
-        else:
-            app_package.__dict__[opts.module_name] = new_mod
-            app_label = app_package.__name__.replace('.models', '')
-            app_label = app_label[app_label.rfind('.')+1:]
+        app_package.__dict__[opts.module_name] = new_mod
+        app_label = app_package.__name__.replace('.models', '')
+        app_label = app_label[app_label.rfind('.')+1:]
 
-            # Populate the _MODELS member on the module the class is in.
-            # Example: django.models.polls will have a _MODELS member that will
-            # contain this list:
-            # [<class 'django.models.polls.Poll'>, <class 'django.models.polls.Choice'>]
-            # Don't do this if replaces_module is set.
-            app_package.__dict__.setdefault('_MODELS', []).append(new_class)
+        # Populate the _MODELS member on the module the class is in.
+        # Example: django.models.polls will have a _MODELS member that will
+        # contain this list:
+        # [<class 'django.models.polls.Poll'>, <class 'django.models.polls.Choice'>]
+        # Don't do this if replaces_module is set.
+        app_package.__dict__.setdefault('_MODELS', []).append(new_class)
 
         # Cache the app label.
         opts.app_label = app_label
@@ -812,29 +915,12 @@ class ModelBase(type):
         # been added automatically.
         sys.modules.setdefault('%s.%s.%s' % (MODEL_PREFIX, app_label, opts.module_name), new_mod)
 
-        # If this module replaces another one, get a reference to the other
-        # module's parent, and replace the other module with the one we've just
-        # created.
-        if replaces_module is not None:
-            old_app = get_app(replaces_module[0])
-            setattr(old_app, replaces_module[1], new_mod)
-            for i, model in enumerate(old_app._MODELS):
-                if model._meta.module_name == replaces_module[1]:
-                    # Replace the appropriate member of the old app's _MODELS
-                    # data structure.
-                    old_app._MODELS[i] = new_class
-                    # Replace all relationships to the old class with
-                    # relationships to the new one.
-                    for related in model._meta.get_all_related_objects() + model._meta.get_all_related_many_to_many_objects():
-                        related.field.rel.to = opts
-                    break
-
         new_class._prepare()
         new_class.objects._prepare()
 
         return new_class
 
-class Model:
+class Model(object):
     __metaclass__ = ModelBase
 
     def __repr__(self):
@@ -1240,195 +1326,6 @@ class Model:
         return obj
 
     __add_related.alters_data = True
-
-class Manager(object):
-    def __init__(self, model_class):
-        self.klass = model_class
-
-    def __get__(self, instance, type=None):
-        if instance != None:
-            raise AttributeError, "Manager isn't accessible via %s instances" % self.klass.__name__
-        return self
-
-    def _prepare(self):
-        # Creates some methods once self.klass._meta has been populated.
-        if self.klass._meta.get_latest_by:
-            self.get_latest = self.__get_latest
-        for f in self.klass._meta.fields:
-            if isinstance(f, DateField):
-                setattr(self, 'get_%s_list' % f.name, curry(self.__get_date_list, f))
-
-    def _get_sql_clause(self, **kwargs):
-        def quote_only_if_word(word):
-            if ' ' in word:
-                return word
-            else:
-                return db.db.quote_name(word)
-
-        opts = self.klass._meta
-
-        # Construct the fundamental parts of the query: SELECT X FROM Y WHERE Z.
-        select = ["%s.%s" % (db.db.quote_name(opts.db_table), db.db.quote_name(f.column)) for f in opts.fields]
-        tables = [opts.db_table] + (kwargs.get('tables') and kwargs['tables'][:] or [])
-        tables = [quote_only_if_word(t) for t in tables]
-        where = kwargs.get('where') and kwargs['where'][:] or []
-        params = kwargs.get('params') and kwargs['params'][:] or []
-
-        # Convert the kwargs into SQL.
-        tables2, join_where2, where2, params2, _ = _parse_lookup(kwargs.items(), opts)
-        tables.extend(tables2)
-        where.extend(join_where2 + where2)
-        params.extend(params2)
-
-        # Add any additional constraints from the "where_constraints" parameter.
-        where.extend(opts.where_constraints)
-
-        # Add additional tables and WHERE clauses based on select_related.
-        if kwargs.get('select_related') is True:
-            _fill_table_cache(opts, select, tables, where, opts.db_table, [opts.db_table])
-
-        # Add any additional SELECTs passed in via kwargs.
-        if kwargs.get('select'):
-            select.extend(['(%s) AS %s' % (quote_only_if_word(s[1]), db.db.quote_name(s[0])) for s in kwargs['select']])
-
-        # ORDER BY clause
-        order_by = []
-        for f in handle_legacy_orderlist(kwargs.get('order_by', opts.ordering)):
-            if f == '?': # Special case.
-                order_by.append(db.get_random_function_sql())
-            else:
-                if f.startswith('-'):
-                    col_name = f[1:]
-                    order = "DESC"
-                else:
-                    col_name = f
-                    order = "ASC"
-                if "." in col_name:
-                    table_prefix, col_name = col_name.split('.', 1)
-                    table_prefix = db.db.quote_name(table_prefix) + '.'
-                else:
-                    # Use the database table as a column prefix if it wasn't given,
-                    # and if the requested column isn't a custom SELECT.
-                    if "." not in col_name and col_name not in [k[0] for k in kwargs.get('select', [])]:
-                        table_prefix = db.db.quote_name(opts.db_table) + '.'
-                    else:
-                        table_prefix = ''
-                order_by.append('%s%s %s' % (table_prefix, db.db.quote_name(orderfield2column(col_name, opts)), order))
-        order_by = ", ".join(order_by)
-
-        # LIMIT and OFFSET clauses
-        if kwargs.get('limit') is not None:
-            limit_sql = " %s " % db.get_limit_offset_sql(kwargs['limit'], kwargs.get('offset'))
-        else:
-            assert kwargs.get('offset') is None, "'offset' is not allowed without 'limit'"
-            limit_sql = ""
-
-        return select, " FROM " + ",".join(tables) + (where and " WHERE " + " AND ".join(where) or "") + (order_by and " ORDER BY " + order_by or "") + limit_sql, params
-
-    def get_iterator(self, **kwargs):
-        # kwargs['select'] is a dictionary, and dictionaries' key order is
-        # undefined, so we convert it to a list of tuples internally.
-        kwargs['select'] = kwargs.get('select', {}).items()
-
-        cursor = db.db.cursor()
-        select, sql, params = self._get_sql_clause(**kwargs)
-        cursor.execute("SELECT " + (kwargs.get('distinct') and "DISTINCT " or "") + ",".join(select) + sql, params)
-        fill_cache = kwargs.get('select_related')
-        index_end = len(self.klass._meta.fields)
-        while 1:
-            rows = cursor.fetchmany(GET_ITERATOR_CHUNK_SIZE)
-            if not rows:
-                raise StopIteration
-            for row in rows:
-                if fill_cache:
-                    obj, index_end = _get_cached_row(self.klass._meta, row, 0)
-                else:
-                    obj = self.klass(*row[:index_end])
-                for i, k in enumerate(kwargs['select']):
-                    setattr(obj, k[0], row[index_end+i])
-                yield obj
-
-    def get_list(self, **kwargs):
-        return list(self.get_iterator(**kwargs))
-
-    def get_count(self, **kwargs):
-        kwargs['order_by'] = []
-        kwargs['offset'] = None
-        kwargs['limit'] = None
-        kwargs['select_related'] = False
-        _, sql, params = self._get_sql_clause(**kwargs)
-        cursor = db.db.cursor()
-        cursor.execute("SELECT COUNT(*)" + sql, params)
-        return cursor.fetchone()[0]
-
-    def get_object(self, **kwargs):
-        obj_list = self.get_list(**kwargs)
-        if len(obj_list) < 1:
-            raise self.klass.DoesNotExist, "%s does not exist for %s" % (self.klass._meta.object_name, kwargs)
-        assert len(obj_list) == 1, "get_object() returned more than one %s -- it returned %s! Lookup parameters were %s" % (self.klass._meta.object_name, len(obj_list), kwargs)
-        return obj_list[0]
-
-    def get_in_bulk(self, *args, **kwargs):
-        id_list = args and args[0] or kwargs['id_list']
-        assert id_list != [], "get_in_bulk() cannot be passed an empty list."
-        kwargs['where'] = ["%s.%s IN (%s)" % (db.db.quote_name(self.klass._meta.db_table), db.db.quote_name(self.klass._meta.pk.column), ",".join(['%s'] * len(id_list)))]
-        kwargs['params'] = id_list
-        obj_list = self.get_list(**kwargs)
-        return dict([(getattr(o, self.klass._meta.pk.attname), o) for o in obj_list])
-
-    def get_values_iterator(self, **kwargs):
-        # select_related and select aren't supported in get_values().
-        kwargs['select_related'] = False
-        kwargs['select'] = {}
-
-        # 'fields' is a list of field names to fetch.
-        try:
-            fields = [self.klass._meta.get_field(f).column for f in kwargs.pop('fields')]
-        except KeyError: # Default to all fields.
-            fields = [f.column for f in self.klass._meta.fields]
-
-        cursor = db.db.cursor()
-        _, sql, params = self._get_sql_clause(**kwargs)
-        select = ['%s.%s' % (db.db.quote_name(self.klass._meta.db_table), db.db.quote_name(f)) for f in fields]
-        cursor.execute("SELECT " + (kwargs.get('distinct') and "DISTINCT " or "") + ",".join(select) + sql, params)
-        while 1:
-            rows = cursor.fetchmany(GET_ITERATOR_CHUNK_SIZE)
-            if not rows:
-                raise StopIteration
-            for row in rows:
-                yield dict(zip(fields, row))
-
-    def get_values(self, **kwargs):
-        return list(self.get_values_iterator(**kwargs))
-
-    def __get_latest(self, **kwargs):
-        kwargs['order_by'] = ('-' + self.klass._meta.get_latest_by,)
-        kwargs['limit'] = 1
-        return self.get_object(**kwargs)
-
-    def __get_date_list(self, field, *args, **kwargs):
-        from django.core.db.typecasts import typecast_timestamp
-        kind = args and args[0] or kwargs['kind']
-        assert kind in ("month", "year", "day"), "'kind' must be one of 'year', 'month' or 'day'."
-        order = 'ASC'
-        if kwargs.has_key('order'):
-            order = kwargs['order']
-            del kwargs['order']
-        assert order in ('ASC', 'DESC'), "'order' must be either 'ASC' or 'DESC'"
-        kwargs['order_by'] = () # Clear this because it'll mess things up otherwise.
-        if field.null:
-            kwargs.setdefault('where', []).append('%s.%s IS NOT NULL' % \
-                (db.db.quote_name(self.klass._meta.db_table), db.db.quote_name(field.column)))
-        select, sql, params = self._get_sql_clause(**kwargs)
-        sql = 'SELECT %s %s GROUP BY 1 ORDER BY 1 %s' % \
-            (db.get_date_trunc_sql(kind, '%s.%s' % (db.db.quote_name(self.klass._meta.db_table),
-            db.db.quote_name(field.column))), sql, order)
-        cursor = db.db.cursor()
-        cursor.execute(sql, params)
-        # We have to manually run typecast_timestamp(str()) on the results, because
-        # MySQL doesn't automatically cast the result of date functions as datetime
-        # objects -- MySQL returns the values as strings, instead.
-        return [typecast_timestamp(str(row[0])) for row in cursor.fetchall()]
 
 ############################################
 # HELPER FUNCTIONS (CURRIED MODEL METHODS) #
