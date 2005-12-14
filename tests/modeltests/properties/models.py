@@ -16,5 +16,11 @@ API_TESTS = """
 >>> a = Person(first_name='John', last_name='Lennon')
 >>> a.save()
 >>> a.full_name
-John Lennon
+'John Lennon'
+
+# The "full_name" property hasn't provided a "set" method.
+>>> a.full_name = 'Paul McCartney'
+Traceback (most recent call last):
+    ...
+AttributeError: can't set attribute
 """
