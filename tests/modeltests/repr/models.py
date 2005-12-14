@@ -8,11 +8,11 @@ because objects' representations are used throughout Django's
 automatically-generated admin.
 """
 
-from django.core import meta
+from django.db import models
 
-class Article(meta.Model):
-    headline = meta.CharField(maxlength=100)
-    pub_date = meta.DateTimeField()
+class Article(models.Model):
+    headline = models.CharField(maxlength=100)
+    pub_date = models.DateTimeField()
 
     def __repr__(self):
         return self.headline

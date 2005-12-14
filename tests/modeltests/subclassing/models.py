@@ -5,7 +5,7 @@ You can subclass another model to create a copy of it that behaves slightly
 differently.
 """
 
-from django.core import meta
+from django.db import models
 
 # From the "Bare-bones model" example
 from modeltests.basic.models import Article
@@ -19,7 +19,7 @@ from modeltests.ordering.models import Article as ArticleWithOrdering
 # This uses all fields and metadata from Article and
 # adds a "section" field.
 class ArticleWithSection(Article):
-    section = meta.CharField(maxlength=30)
+    section = models.CharField(maxlength=30)
 
 # This uses all fields and metadata from Article but
 # removes the "pub_date" field.
@@ -30,15 +30,15 @@ class ArticleWithoutPubDate(Article):
 # This uses all fields and metadata from Article but
 # overrides the "pub_date" field.
 class ArticleWithFieldOverride(Article):
-    pub_date = meta.DateField() # overrides the old field, a DateTimeField
+    pub_date = models.DateField() # overrides the old field, a DateTimeField
     # No need to add remove_fields = ('pub_date',)
 
 # This uses all fields and metadata from ArticleWithRepr and
 # makes a few additions/changes.
 class ArticleWithManyChanges(ArticleWithRepr):
-    section = meta.CharField(maxlength=30)
-    is_popular = meta.BooleanField()
-    pub_date = meta.DateField() # overrides the old field, a DateTimeField
+    section = models.CharField(maxlength=30)
+    is_popular = models.BooleanField()
+    pub_date = models.DateField() # overrides the old field, a DateTimeField
 
 # This uses all fields from ArticleWithOrdering but
 # changes the ordering parameter.
@@ -47,10 +47,10 @@ class ArticleWithChangedMeta(ArticleWithOrdering):
        ordering = ('headline', 'pub_date')
 
 class NoModuleNameFirst(Article):
-    section = meta.CharField(maxlength=30)
+    section = models.CharField(maxlength=30)
 
 class NoModuleNameSecond(Article):
-    section = meta.CharField(maxlength=30)
+    section = models.CharField(maxlength=30)
 
 API_TESTS = """
 # No data is in the system yet.

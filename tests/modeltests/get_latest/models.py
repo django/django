@@ -8,11 +8,11 @@ object in the database according to that field. "Latest" means "having the
 date farthest into the future."
 """
 
-from django.core import meta
+from django.db import models
 
-class Article(meta.Model):
-    headline = meta.CharField(maxlength=100)
-    pub_date = meta.DateTimeField()
+class Article(models.Model):
+    headline = models.CharField(maxlength=100)
+    pub_date = models.DateTimeField()
     class META:
         get_latest_by = 'pub_date'
 

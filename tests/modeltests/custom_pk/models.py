@@ -5,21 +5,21 @@ By default, Django adds an ``"id"`` field to each model. But you can override
 this behavior by explicitly adding ``primary_key=True`` to a field.
 """
 
-from django.core import meta
+from django.db import models
 
-class Employee(meta.Model):
-    employee_code = meta.CharField(maxlength=10, primary_key=True)
-    first_name = meta.CharField(maxlength=20)
-    last_name = meta.CharField(maxlength=20)
+class Employee(models.Model):
+    employee_code = models.CharField(maxlength=10, primary_key=True)
+    first_name = models.CharField(maxlength=20)
+    last_name = models.CharField(maxlength=20)
     class META:
         ordering = ('last_name', 'first_name')
 
     def __repr__(self):
         return "%s %s" % (self.first_name, self.last_name)
 
-class Business(meta.Model):
-    name = meta.CharField(maxlength=20, primary_key=True)
-    employees = meta.ManyToManyField(Employee)
+class Business(models.Model):
+    name = models.CharField(maxlength=20, primary_key=True)
+    employees = models.ManyToManyField(Employee)
     class META:
         verbose_name_plural = 'businesses'
         module_name = 'businesses'

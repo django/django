@@ -2,7 +2,7 @@ from django.conf import settings
 from django.core import formfields, validators
 from django.core import db
 from django.core.exceptions import ObjectDoesNotExist
-from django.core.meta.fields import *
+from django.db.models.fields import *
 from django.utils.functional import curry
 from django.utils.text import capfirst
 import copy, datetime, os, re, sys, types

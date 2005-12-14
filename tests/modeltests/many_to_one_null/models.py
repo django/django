@@ -5,17 +5,17 @@ To define a many-to-one relationship that can have a null foreign key, use
 ``ForeignKey()`` with ``null=True`` .
 """
 
-from django.core import meta
+from django.db import models
 
-class Reporter(meta.Model):
-    name = meta.CharField(maxlength=30)
+class Reporter(models.Model):
+    name = models.CharField(maxlength=30)
 
     def __repr__(self):
         return self.name
 
-class Article(meta.Model):
-    headline = meta.CharField(maxlength=100)
-    reporter = meta.ForeignKey(Reporter, null=True)
+class Article(models.Model):
+    headline = models.CharField(maxlength=100)
+    reporter = models.ForeignKey(Reporter, null=True)
 
     def __repr__(self):
         return self.headline

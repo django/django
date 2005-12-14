@@ -6,7 +6,7 @@ Each filter subclass knows how to display a filter for a field that passes a
 certain test -- e.g. being a DateField or ForeignKey.
 """
 
-from django.core import meta
+from django.db import models
 import datetime
 
 class FilterSpec(object):
@@ -50,7 +50,7 @@ class FilterSpec(object):
 class RelatedFilterSpec(FilterSpec):
     def __init__(self, f, request, params):
         super(RelatedFilterSpec, self).__init__(f, request, params)
-        if isinstance(f, meta.ManyToManyField):
+        if isinstance(f, models.ManyToManyField):
             self.lookup_title = f.rel.to._meta.verbose_name
         else:
             self.lookup_title = f.verbose_name
@@ -103,7 +103,7 @@ class DateFieldFilterSpec(FilterSpec):
 
         today = datetime.date.today()
         one_week_ago = today - datetime.timedelta(days=7)
-        today_str = isinstance(self.field, meta.DateTimeField) and today.strftime('%Y-%m-%d 23:59:59') or today.strftime('%Y-%m-%d')
+        today_str = isinstance(self.field, models.DateTimeField) and today.strftime('%Y-%m-%d 23:59:59') or today.strftime('%Y-%m-%d')
 
         self.links = (
             (_('Any date'), {}),
@@ -126,7 +126,7 @@ class DateFieldFilterSpec(FilterSpec):
                    'query_string': cl.get_query_string( param_dict, self.field_generic),
                    'display': title}
 
-FilterSpec.register(lambda f: isinstance(f, meta.DateField), DateFieldFilterSpec)
+FilterSpec.register(lambda f: isinstance(f, models.DateField), DateFieldFilterSpec)
 
 class BooleanFieldFilterSpec(FilterSpec):
     def __init__(self, f, request, params):
@@ -144,9 +144,9 @@ class BooleanFieldFilterSpec(FilterSpec):
             yield {'selected': self.lookup_val == v and not self.lookup_val2,
                    'query_string': cl.get_query_string( {self.lookup_kwarg: v}, [self.lookup_kwarg2]),
                    'display': k}
-        if isinstance(self.field, meta.NullBooleanField):
+        if isinstance(self.field, models.NullBooleanField):
             yield {'selected': self.lookup_val2 == 'True',
                    'query_string': cl.get_query_string( {self.lookup_kwarg2: 'True'}, [self.lookup_kwarg]),
                    'display': _('Unknown')}
 
-FilterSpec.register(lambda f: isinstance(f, meta.BooleanField) or isinstance(f, meta.NullBooleanField), BooleanFieldFilterSpec)
+FilterSpec.register(lambda f: isinstance(f, models.BooleanField) or isinstance(f, models.NullBooleanField), BooleanFieldFilterSpec)

@@ -3,14 +3,14 @@
 
 To perform an OR lookup, or a lookup that combines ANDs and ORs, use the
 ``complex`` keyword argument, and pass it an expression of clauses using the
-variable ``django.core.meta.Q``.
+variable ``django.db.models.Q``.
 """
 
-from django.core import meta
+from django.db import models
 
-class Article(meta.Model):
-    headline = meta.CharField(maxlength=50)
-    pub_date = meta.DateTimeField()
+class Article(models.Model):
+    headline = models.CharField(maxlength=50)
+    pub_date = models.DateTimeField()
     class META:
        ordering = ('pub_date',)
 
@@ -19,7 +19,7 @@ class Article(meta.Model):
 
 API_TESTS = """
 >>> from datetime import datetime
->>> from django.core.meta import Q
+>>> from django.db.models import Q
 
 >>> a1 = Article(headline='Hello', pub_date=datetime(2005, 11, 27))
 >>> a1.save()

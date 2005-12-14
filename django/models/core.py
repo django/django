@@ -1,17 +1,17 @@
 import base64, md5, random, sys
 import cPickle as pickle
-from django.core import meta
+from django.db import models
 from django.utils.translation import gettext_lazy as _
 
-class Site(meta.Model):
-    domain = meta.CharField(_('domain name'), maxlength=100)
-    name = meta.CharField(_('display name'), maxlength=50)
+class Site(models.Model):
+    domain = models.CharField(_('domain name'), maxlength=100)
+    name = models.CharField(_('display name'), maxlength=50)
     class META:
         verbose_name = _('site')
         verbose_name_plural = _('sites')
         db_table = 'sites'
         ordering = ('domain',)
-        admin = meta.Admin(
+        admin = models.Admin(
             list_display = ('domain', 'name'),
             search_fields = ('domain', 'name'),
         )
@@ -24,9 +24,9 @@ class Site(meta.Model):
         from django.conf.settings import SITE_ID
         return get_object(pk=SITE_ID)
 
-class Package(meta.Model):
-    label = meta.CharField(_('label'), maxlength=20, primary_key=True)
-    name = meta.CharField(_('name'), maxlength=30, unique=True)
+class Package(models.Model):
+    label = models.CharField(_('label'), maxlength=20, primary_key=True)
+    name = models.CharField(_('name'), maxlength=30, unique=True)
     class META:
         verbose_name = _('package')
         verbose_name_plural = _('packages')
@@ -36,10 +36,10 @@ class Package(meta.Model):
     def __repr__(self):
         return self.name
 
-class ContentType(meta.Model):
-    name = meta.CharField(_('name'), maxlength=100)
-    package = meta.ForeignKey(Package, db_column='package')
-    python_module_name = meta.CharField(_('python module name'), maxlength=50)
+class ContentType(models.Model):
+    name = models.CharField(_('name'), maxlength=100)
+    package = models.ForeignKey(Package, db_column='package')
+    python_module_name = models.CharField(_('python module name'), maxlength=50)
     class META:
         verbose_name = _('content type')
         verbose_name_plural = _('content types')
@@ -63,10 +63,10 @@ class ContentType(meta.Model):
         """
         return self.get_model_module().get_object(**kwargs)
 
-class Session(meta.Model):
-    session_key = meta.CharField(_('session key'), maxlength=40, primary_key=True)
-    session_data = meta.TextField(_('session data'))
-    expire_date = meta.DateTimeField(_('expire date'))
+class Session(models.Model):
+    session_key = models.CharField(_('session key'), maxlength=40, primary_key=True)
+    session_data = models.TextField(_('session data'))
+    expire_date = models.DateTimeField(_('expire date'))
     class META:
         verbose_name = _('session')
         verbose_name_plural = _('sessions')

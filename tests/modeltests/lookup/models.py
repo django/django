@@ -4,11 +4,11 @@
 This demonstrates features of the database API.
 """
 
-from django.core import meta
+from django.db import models
 
-class Article(meta.Model):
-    headline = meta.CharField(maxlength=100)
-    pub_date = meta.DateTimeField()
+class Article(models.Model):
+    headline = models.CharField(maxlength=100)
+    pub_date = models.DateTimeField()
     class META:
         ordering = ('-pub_date', 'headline')
 

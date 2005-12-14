@@ -1,9 +1,9 @@
 # Generic admin views.
 from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.admin.filterspecs import FilterSpec
-from django.core import formfields, meta, template
+from django.core import formfields, template
 from django.core.template import loader
-from django.core.meta.fields import BoundField, BoundFieldLine, BoundFieldSet
+from django.db.models.fields import BoundField, BoundFieldLine, BoundFieldSet
 from django.core.exceptions import Http404, ImproperlyConfigured, ObjectDoesNotExist, PermissionDenied
 from django.core.extensions import DjangoContext as Context
 from django.core.extensions import get_object_or_404, render_to_response
@@ -13,6 +13,7 @@ try:
     from django.models.admin import log
 except ImportError:
     raise ImproperlyConfigured, "You don't have 'django.contrib.admin' in INSTALLED_APPS."
+from django.db import models
 from django.utils.html import strip_tags
 from django.utils.httpwrappers import HttpResponse, HttpResponseRedirect
 from django.utils.text import capfirst, get_text_list
@@ -40,7 +41,7 @@ EMPTY_CHANGELIST_VALUE = '(None)'
 def _get_mod_opts(app_label, module_name):
     "Helper function that returns a tuple of (module, opts), raising Http404 if necessary."
     try:
-        mod = meta.get_module(app_label, module_name)
+        mod = models.get_module(app_label, module_name)
     except ImportError:
         raise Http404 # Invalid app or module name. Maybe it's not in INSTALLED_APPS.
     opts = mod.Klass._meta
@@ -161,7 +162,7 @@ class ChangeList(object):
         ordering = lookup_opts.admin.ordering or lookup_opts.ordering or ['-' + lookup_opts.pk.name]
 
         # Normalize it to new-style ordering.
-        ordering = meta.handle_legacy_orderlist(ordering)
+        ordering = models.handle_legacy_orderlist(ordering)
 
         if ordering[0].startswith('-'):
             order_field, order_type = ordering[0][1:], 'desc'
@@ -171,10 +172,10 @@ class ChangeList(object):
             try:
                 try:
                     f = lookup_opts.get_field(lookup_opts.admin.list_display[int(params[ORDER_VAR])])
-                except meta.FieldDoesNotExist:
+                except models.FieldDoesNotExist:
                     pass
                 else:
-                    if not isinstance(f.rel, meta.ManyToOne) or not f.null:
+                    if not isinstance(f.rel, models.ManyToOne) or not f.null:
                         order_field = f.name
             except (IndexError, ValueError):
                 pass # Invalid ordering specified. Just use the default.
@@ -196,10 +197,10 @@ class ChangeList(object):
         lookup_order_field = order_field
         try:
             f = lookup_opts.get_field(order_field)
-        except meta.FieldDoesNotExist:
+        except models.FieldDoesNotExist:
             pass
         else:
-            if isinstance(lookup_opts.get_field(order_field).rel, meta.ManyToOne):
+            if isinstance(lookup_opts.get_field(order_field).rel, models.ManyToOne):
                 f = lookup_opts.get_field(order_field)
                 rel_ordering = f.rel.to._meta.ordering and f.rel.to._meta.ordering[0] or f.rel.to._meta.pk.column
                 lookup_order_field = '%s.%s' % (f.rel.to._meta.db_table, rel_ordering)
@@ -211,10 +212,10 @@ class ChangeList(object):
             for field_name in lookup_opts.admin.list_display:
                 try:
                     f = lookup_opts.get_field(field_name)
-                except meta.FieldDoesNotExist:
+                except models.FieldDoesNotExist:
                     pass
                 else:
-                    if isinstance(f.rel, meta.ManyToOne):
+                    if isinstance(f.rel, models.ManyToOne):
                         lookup_params['select_related'] = True
                         break
         lookup_params['order_by'] = ((order_type == 'desc' and '-' or '') + lookup_order_field,)
@@ -223,7 +224,7 @@ class ChangeList(object):
             for bit in query.split():
                 or_queries = []
                 for field_name in lookup_opts.admin.search_fields:
-                    or_queries.append(meta.Q(**{'%s__icontains' % field_name: bit}))
+                    or_queries.append(models.Q(**{'%s__icontains' % field_name: bit}))
                 complex_queries.append(reduce(operator.or_, or_queries))
             lookup_params['complex'] = reduce(operator.and_, complex_queries)
         if opts.one_to_one_field:
@@ -247,14 +248,14 @@ def change_list(request, app_label, module_name):
                                'admin/change_list'], context_instance=c)
 change_list = staff_member_required(change_list)
 
-use_raw_id_admin = lambda field: isinstance(field.rel, (meta.ManyToOne, meta.ManyToMany)) and field.rel.raw_id_admin
+use_raw_id_admin = lambda field: isinstance(field.rel, (models.ManyToOne, models.ManyToMany)) and field.rel.raw_id_admin
 
 def get_javascript_imports(opts,auto_populated_fields, ordered_objects, field_sets):
 # Put in any necessary JavaScript imports.
     js = ['js/core.js', 'js/admin/RelatedObjectLookups.js']
     if auto_populated_fields:
         js.append('js/urlify.js')
-    if opts.has_field_type(meta.DateTimeField) or opts.has_field_type(meta.TimeField) or opts.has_field_type(meta.DateField):
+    if opts.has_field_type(models.DateTimeField) or opts.has_field_type(models.TimeField) or opts.has_field_type(models.DateField):
         js.extend(['js/calendar.js', 'js/admin/DateTimeShortcuts.js'])
     if ordered_objects:
         js.extend(['js/getElementsBySelector.js', 'js/dom-drag.js' , 'js/admin/ordering.js'])
@@ -269,7 +270,7 @@ def get_javascript_imports(opts,auto_populated_fields, ordered_objects, field_se
         for field_line in field_set:
             try:
                 for f in field_line:
-                    if f.rel and isinstance(f, meta.ManyToManyField) and f.rel.filter_interface:
+                    if f.rel and isinstance(f, models.ManyToManyField) and f.rel.filter_interface:
                         js.extend(['js/SelectBox.js' , 'js/SelectFilter2.js'])
                         raise StopIteration
             except StopIteration:
@@ -281,12 +282,12 @@ class AdminBoundField(BoundField):
         super(AdminBoundField, self).__init__(field, field_mapping, original)
 
         self.element_id = self.form_fields[0].get_id()
-        self.has_label_first = not isinstance(self.field, meta.BooleanField)
+        self.has_label_first = not isinstance(self.field, models.BooleanField)
         self.raw_id_admin = use_raw_id_admin(field)
-        self.is_date_time = isinstance(field, meta.DateTimeField)
-        self.is_file_field = isinstance(field, meta.FileField)
-        self.needs_add_label = field.rel and isinstance(field.rel, meta.ManyToOne) or isinstance(field.rel, meta.ManyToMany) and field.rel.to._meta.admin
-        self.hidden = isinstance(self.field, meta.AutoField)
+        self.is_date_time = isinstance(field, models.DateTimeField)
+        self.is_file_field = isinstance(field, models.FileField)
+        self.needs_add_label = field.rel and isinstance(field.rel, models.ManyToOne) or isinstance(field.rel, models.ManyToMany) and field.rel.to._meta.admin
+        self.hidden = isinstance(self.field, models.AutoField)
         self.first = False
 
         classes = []
@@ -307,10 +308,10 @@ class AdminBoundField(BoundField):
         if getattr(self, '_display_filled', False):
             return
         # HACK
-        if isinstance(self.field.rel, meta.ManyToOne):
+        if isinstance(self.field.rel, models.ManyToOne):
              func_name = 'get_%s' % self.field.name
              self._display = self._fetch_existing_display(func_name)
-        elif isinstance(self.field.rel, meta.ManyToMany):
+        elif isinstance(self.field.rel, models.ManyToMany):
             func_name = 'get_%s_list' % self.field.rel.singular
             self._display =  ", ".join([str(obj) for obj in self._fetch_existing_display(func_name)])
         self._display_filled = True
@@ -354,7 +355,7 @@ class AdminBoundManipulator(BoundManipulator):
 
         self.coltype = self.ordered_objects and 'colMS' or 'colM'
         self.has_absolute_url = hasattr(opts.get_model_module().Klass, 'get_absolute_url')
-        self.form_enc_attrib = opts.has_field_type(meta.FileField) and \
+        self.form_enc_attrib = opts.has_field_type(models.FileField) and \
                                 'enctype="multipart/form-data" ' or ''
 
         self.first_form_field_id = self.bound_field_sets[0].bound_field_lines[0].bound_fields[0].form_fields[0].get_id();
@@ -399,7 +400,7 @@ def add_stage(request, app_label, module_name, show_delete=False, form_url='', p
     manipulator = mod.AddManipulator()
     if request.POST:
         new_data = request.POST.copy()
-        if opts.has_field_type(meta.FileField):
+        if opts.has_field_type(models.FileField):
             new_data.update(request.FILES)
         errors = manipulator.get_validation_errors(new_data)
         manipulator.do_html2python(new_data)
@@ -476,7 +477,7 @@ def change_stage(request, app_label, module_name, object_id):
 
     if request.POST:
         new_data = request.POST.copy()
-        if opts.has_field_type(meta.FileField):
+        if opts.has_field_type(models.FileField):
             new_data.update(request.FILES)
 
         errors = manipulator.get_validation_errors(new_data)
@@ -558,7 +559,7 @@ def _get_deleted_objects(deleted_objects, perms_needed, user, obj, opts, current
             continue
         opts_seen.append(related.opts)
         rel_opts_name = related.get_method_name_part()
-        if isinstance(related.field.rel, meta.OneToOne):
+        if isinstance(related.field.rel, models.OneToOne):
             try:
                 sub_obj = getattr(obj, 'get_%s' % rel_opts_name)()
             except ObjectDoesNotExist:

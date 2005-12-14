@@ -1,8 +1,9 @@
 from django.contrib.admin.views.main import MAX_SHOW_ALL_ALLOWED, DEFAULT_RESULTS_PER_PAGE, ALL_VAR
 from django.contrib.admin.views.main import ORDER_VAR, ORDER_TYPE_VAR, PAGE_VAR, SEARCH_VAR
 from django.contrib.admin.views.main import IS_POPUP_VAR, EMPTY_CHANGELIST_VALUE, MONTHS
-from django.core import meta, template
+from django.core import template
 from django.core.exceptions import ObjectDoesNotExist
+from django.db import models
 from django.utils import dateformat
 from django.utils.html import strip_tags, escape
 from django.utils.text import capfirst
@@ -74,7 +75,7 @@ def result_headers(cl):
     for i, field_name in enumerate(lookup_opts.admin.list_display):
         try:
             f = lookup_opts.get_field(field_name)
-        except meta.FieldDoesNotExist:
+        except models.FieldDoesNotExist:
             # For non-field list_display values, check for the function
             # attribute "short_description". If that doesn't exist, fall
             # back to the method name. And __repr__ is a special-case.
@@ -89,7 +90,7 @@ def result_headers(cl):
             # Non-field list_display values don't get ordering capability.
             yield {"text": header}
         else:
-            if isinstance(f.rel, meta.ManyToOne) and f.null:
+            if isinstance(f.rel, models.ManyToOne) and f.null:
                 yield {"text": f.verbose_name}
             else:
                 th_classes = []
@@ -110,7 +111,7 @@ def items_for_result(cl, result):
         row_class = ''
         try:
             f = cl.lookup_opts.get_field(field_name)
-        except meta.FieldDoesNotExist:
+        except models.FieldDoesNotExist:
             # For non-field list_display values, the value is a method
             # name. Execute the method.
             try:
@@ -126,18 +127,18 @@ def items_for_result(cl, result):
         else:
             field_val = getattr(result, f.attname)
 
-            if isinstance(f.rel, meta.ManyToOne):
+            if isinstance(f.rel, models.ManyToOne):
                 if field_val is not None:
                     result_repr = getattr(result, 'get_%s' % f.name)()
                 else:
                     result_repr = EMPTY_CHANGELIST_VALUE
             # Dates and times are special: They're formatted in a certain way.
-            elif isinstance(f, meta.DateField) or isinstance(f, meta.TimeField):
+            elif isinstance(f, models.DateField) or isinstance(f, models.TimeField):
                 if field_val:
                     (date_format, datetime_format, time_format) = get_date_formats()
-                    if isinstance(f, meta.DateTimeField):
+                    if isinstance(f, models.DateTimeField):
                         result_repr = capfirst(dateformat.format(field_val, datetime_format))
-                    elif isinstance(f, meta.TimeField):
+                    elif isinstance(f, models.TimeField):
                         result_repr = capfirst(dateformat.time_format(field_val, time_format))
                     else:
                         result_repr = capfirst(dateformat.format(field_val, date_format))
@@ -145,15 +146,15 @@ def items_for_result(cl, result):
                     result_repr = EMPTY_CHANGELIST_VALUE
                 row_class = ' class="nowrap"'
             # Booleans are special: We use images.
-            elif isinstance(f, meta.BooleanField) or isinstance(f, meta.NullBooleanField):
+            elif isinstance(f, models.BooleanField) or isinstance(f, models.NullBooleanField):
                 BOOLEAN_MAPPING = {True: 'yes', False: 'no', None: 'unknown'}
                 result_repr = '<img src="%simg/admin/icon-%s.gif" alt="%s" />' % (ADMIN_MEDIA_PREFIX, BOOLEAN_MAPPING[field_val], field_val)
             # ImageFields are special: Use a thumbnail.
-            elif isinstance(f, meta.ImageField):
+            elif isinstance(f, models.ImageField):
                 from django.parts.media.photos import get_thumbnail_url
                 result_repr = '<img src="%s" alt="%s" title="%s" />' % (get_thumbnail_url(getattr(result, 'get_%s_url' % f.name)(), '120'), field_val, field_val)
             # FloatFields are special: Zero-pad the decimals.
-            elif isinstance(f, meta.FloatField):
+            elif isinstance(f, models.FloatField):
                 if field_val is not None:
                     result_repr = ('%%.%sf' % f.decimal_places) % field_val
                 else:

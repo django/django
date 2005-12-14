@@ -3,8 +3,8 @@ from django.utils.html import escape
 from django.utils.text import capfirst
 from django.utils.functional import curry
 from django.contrib.admin.views.main import AdminBoundField
-from django.core.meta.fields import BoundField, Field
-from django.core.meta import BoundRelatedObject, TABULAR, STACKED
+from django.db.models.fields import BoundField, Field
+from django.db.models import BoundRelatedObject, TABULAR, STACKED
 from django.conf.settings import ADMIN_MEDIA_PREFIX
 import re
 

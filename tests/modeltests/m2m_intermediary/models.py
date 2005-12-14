@@ -10,26 +10,26 @@ which specifies the ``Reporter``'s position for the given article (e.g. "Staff
 writer").
 """
 
-from django.core import meta
+from django.db import models
 
-class Reporter(meta.Model):
-    first_name = meta.CharField(maxlength=30)
-    last_name = meta.CharField(maxlength=30)
+class Reporter(models.Model):
+    first_name = models.CharField(maxlength=30)
+    last_name = models.CharField(maxlength=30)
 
     def __repr__(self):
         return "%s %s" % (self.first_name, self.last_name)
 
-class Article(meta.Model):
-    headline = meta.CharField(maxlength=100)
-    pub_date = meta.DateField()
+class Article(models.Model):
+    headline = models.CharField(maxlength=100)
+    pub_date = models.DateField()
 
     def __repr__(self):
         return self.headline
 
-class Writer(meta.Model):
-    reporter = meta.ForeignKey(Reporter)
-    article = meta.ForeignKey(Article)
-    position = meta.CharField(maxlength=100)
+class Writer(models.Model):
+    reporter = models.ForeignKey(Reporter)
+    article = models.ForeignKey(Article)
+    position = models.CharField(maxlength=100)
 
     def __repr__(self):
         return '%r (%s)' % (self.get_reporter(), self.position)

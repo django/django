@@ -1,12 +1,12 @@
-from django.core import meta
 from django import templatetags
 from django.conf import settings
 from django.contrib.admin.views.decorators import staff_member_required
-from django.models.core import sites
+from django.db import models
 from django.core.extensions import DjangoContext, render_to_response
 from django.core.exceptions import Http404, ViewDoesNotExist
 from django.core import template, urlresolvers
 from django.contrib.admin import utils
+from django.models.core import sites
 import inspect, os, re
 
 # Exclude methods starting with these strings from documentation
@@ -136,7 +136,7 @@ def model_index(request):
         return missing_docutils_page(request)
 
     models = []
-    for app in meta.get_installed_model_modules():
+    for app in models.get_installed_model_modules():
         for model in app._MODELS:
             opts = model._meta
             models.append({
@@ -152,7 +152,7 @@ def model_detail(request, model):
         return missing_docutils_page(request)
 
     try:
-        model = meta.get_app(model)
+        model = models.get_app(model)
     except ImportError:
         raise Http404
     opts = model.Klass._meta

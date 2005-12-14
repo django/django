@@ -6,26 +6,26 @@ To define a one-to-one relationship, use ``OneToOneField()``.
 In this example, a ``Place`` optionally can be a ``Restaurant``.
 """
 
-from django.core import meta
+from django.db import models
 
-class Place(meta.Model):
-    name = meta.CharField(maxlength=50)
-    address = meta.CharField(maxlength=80)
+class Place(models.Model):
+    name = models.CharField(maxlength=50)
+    address = models.CharField(maxlength=80)
 
     def __repr__(self):
         return "%s the place" % self.name
 
-class Restaurant(meta.Model):
-    place = meta.OneToOneField(Place)
-    serves_hot_dogs = meta.BooleanField()
-    serves_pizza = meta.BooleanField()
+class Restaurant(models.Model):
+    place = models.OneToOneField(Place)
+    serves_hot_dogs = models.BooleanField()
+    serves_pizza = models.BooleanField()
 
     def __repr__(self):
         return "%s the restaurant" % self.get_place().name
 
-class Waiter(meta.Model):
-    restaurant = meta.ForeignKey(Restaurant)
-    name = meta.CharField(maxlength=50)
+class Waiter(models.Model):
+    restaurant = models.ForeignKey(Restaurant)
+    name = models.CharField(maxlength=50)
 
     def __repr__(self):
         return "%s the waiter at %r" % (self.name, self.get_restaurant())

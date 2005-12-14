@@ -7,17 +7,17 @@ In this example, an article can be published in multiple publications,
 and a publication has multiple articles.
 """
 
-from django.core import meta
+from django.db import models
 
-class Publication(meta.Model):
-    title = meta.CharField(maxlength=30)
+class Publication(models.Model):
+    title = models.CharField(maxlength=30)
 
     def __repr__(self):
         return self.title
 
-class Article(meta.Model):
-    headline = meta.CharField(maxlength=100)
-    publications = meta.ManyToManyField(Publication)
+class Article(models.Model):
+    headline = models.CharField(maxlength=100)
+    publications = models.ManyToManyField(Publication)
 
     def __repr__(self):
         return self.headline

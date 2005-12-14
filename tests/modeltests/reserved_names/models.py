@@ -7,17 +7,17 @@ appropriately behind the scenes, so your database won't complain about
 reserved-name usage.
 """
 
-from django.core import meta
+from django.db import models
 
-class Thing(meta.Model):
-    when = meta.CharField(maxlength=1, primary_key=True)
-    join = meta.CharField(maxlength=1)
-    like = meta.CharField(maxlength=1)
-    drop = meta.CharField(maxlength=1)
-    alter = meta.CharField(maxlength=1)
-    having = meta.CharField(maxlength=1)
-    where = meta.CharField(maxlength=1)
-    has_hyphen = meta.CharField(maxlength=1, db_column='has-hyphen')
+class Thing(models.Model):
+    when = models.CharField(maxlength=1, primary_key=True)
+    join = models.CharField(maxlength=1)
+    like = models.CharField(maxlength=1)
+    drop = models.CharField(maxlength=1)
+    alter = models.CharField(maxlength=1)
+    having = models.CharField(maxlength=1)
+    where = models.CharField(maxlength=1)
+    has_hyphen = models.CharField(maxlength=1, db_column='has-hyphen')
     class META:
        db_table = 'select'
 

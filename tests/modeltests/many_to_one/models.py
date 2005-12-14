@@ -4,20 +4,20 @@
 To define a many-to-one relationship, use ``ForeignKey()`` .
 """
 
-from django.core import meta
+from django.db import models
 
-class Reporter(meta.Model):
-    first_name = meta.CharField(maxlength=30)
-    last_name = meta.CharField(maxlength=30)
-    email = meta.EmailField()
+class Reporter(models.Model):
+    first_name = models.CharField(maxlength=30)
+    last_name = models.CharField(maxlength=30)
+    email = models.EmailField()
 
     def __repr__(self):
         return "%s %s" % (self.first_name, self.last_name)
 
-class Article(meta.Model):
-    headline = meta.CharField(maxlength=100)
-    pub_date = meta.DateField()
-    reporter = meta.ForeignKey(Reporter)
+class Article(models.Model):
+    headline = models.CharField(maxlength=100)
+    pub_date = models.DateField()
+    reporter = models.ForeignKey(Reporter)
 
     def __repr__(self):
         return self.headline

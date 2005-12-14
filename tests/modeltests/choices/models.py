@@ -9,16 +9,16 @@ For each field that has ``choices``, a model instance gets a
 field. This method returns the "human-readable" value of the field.
 """
 
-from django.core import meta
+from django.db import models
 
 GENDER_CHOICES = (
     ('M', 'Male'),
     ('F', 'Female'),
 )
 
-class Person(meta.Model):
-    name = meta.CharField(maxlength=20)
-    gender = meta.CharField(maxlength=1, choices=GENDER_CHOICES)
+class Person(models.Model):
+    name = models.CharField(maxlength=20)
+    gender = models.CharField(maxlength=1, choices=GENDER_CHOICES)
 
     def __repr__(self):
         return self.name

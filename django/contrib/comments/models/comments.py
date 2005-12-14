@@ -1,31 +1,31 @@
-from django.core import meta
+from django.db import models
 from django.models import auth, core
 from django.utils.translation import gettext_lazy as _
 
-class Comment(meta.Model):
-    user = meta.ForeignKey(auth.User, raw_id_admin=True)
-    content_type = meta.ForeignKey(core.ContentType)
-    object_id = meta.IntegerField(_('object ID'))
-    headline = meta.CharField(_('headline'), maxlength=255, blank=True)
-    comment = meta.TextField(_('comment'), maxlength=3000)
-    rating1 = meta.PositiveSmallIntegerField(_('rating #1'), blank=True, null=True)
-    rating2 = meta.PositiveSmallIntegerField(_('rating #2'), blank=True, null=True)
-    rating3 = meta.PositiveSmallIntegerField(_('rating #3'), blank=True, null=True)
-    rating4 = meta.PositiveSmallIntegerField(_('rating #4'), blank=True, null=True)
-    rating5 = meta.PositiveSmallIntegerField(_('rating #5'), blank=True, null=True)
-    rating6 = meta.PositiveSmallIntegerField(_('rating #6'), blank=True, null=True)
-    rating7 = meta.PositiveSmallIntegerField(_('rating #7'), blank=True, null=True)
-    rating8 = meta.PositiveSmallIntegerField(_('rating #8'), blank=True, null=True)
+class Comment(models.Model):
+    user = models.ForeignKey(auth.User, raw_id_admin=True)
+    content_type = models.ForeignKey(core.ContentType)
+    object_id = models.IntegerField(_('object ID'))
+    headline = models.CharField(_('headline'), maxlength=255, blank=True)
+    comment = models.TextField(_('comment'), maxlength=3000)
+    rating1 = models.PositiveSmallIntegerField(_('rating #1'), blank=True, null=True)
+    rating2 = models.PositiveSmallIntegerField(_('rating #2'), blank=True, null=True)
+    rating3 = models.PositiveSmallIntegerField(_('rating #3'), blank=True, null=True)
+    rating4 = models.PositiveSmallIntegerField(_('rating #4'), blank=True, null=True)
+    rating5 = models.PositiveSmallIntegerField(_('rating #5'), blank=True, null=True)
+    rating6 = models.PositiveSmallIntegerField(_('rating #6'), blank=True, null=True)
+    rating7 = models.PositiveSmallIntegerField(_('rating #7'), blank=True, null=True)
+    rating8 = models.PositiveSmallIntegerField(_('rating #8'), blank=True, null=True)
     # This field designates whether to use this row's ratings in aggregate
     # functions (summaries). We need this because people are allowed to post
     # multiple reviews on the same thing, but the system will only use the
     # latest one (with valid_rating=True) in tallying the reviews.
-    valid_rating = meta.BooleanField(_('is valid rating'))
-    submit_date = meta.DateTimeField(_('date/time submitted'), auto_now_add=True)
-    is_public = meta.BooleanField(_('is public'))
-    ip_address = meta.IPAddressField(_('IP address'), blank=True, null=True)
-    is_removed = meta.BooleanField(_('is removed'), help_text=_('Check this box if the comment is inappropriate. A "This comment has been removed" message will be displayed instead.'))
-    site = meta.ForeignKey(core.Site)
+    valid_rating = models.BooleanField(_('is valid rating'))
+    submit_date = models.DateTimeField(_('date/time submitted'), auto_now_add=True)
+    is_public = models.BooleanField(_('is public'))
+    ip_address = models.IPAddressField(_('IP address'), blank=True, null=True)
+    is_removed = models.BooleanField(_('is removed'), help_text=_('Check this box if the comment is inappropriate. A "This comment has been removed" message will be displayed instead.'))
+    site = models.ForeignKey(core.Site)
     class META:
         db_table = 'comments'
         verbose_name = _('Comment')
@@ -43,7 +43,7 @@ class Comment(meta.Model):
             'IS_PUBLIC': 'ip',
         }
         ordering = ('-submit_date',)
-        admin = meta.Admin(
+        admin = models.Admin(
             fields = (
                 (None, {'fields': ('content_type', 'object_id', 'site')}),
                 ('Content', {'fields': ('user', 'headline', 'comment')}),
@@ -155,24 +155,24 @@ class Comment(meta.Model):
                 return True
         return False
 
-class FreeComment(meta.Model):
+class FreeComment(models.Model):
     # A FreeComment is a comment by a non-registered user.
-    content_type = meta.ForeignKey(core.ContentType)
-    object_id = meta.IntegerField(_('object ID'))
-    comment = meta.TextField(_('comment'), maxlength=3000)
-    person_name = meta.CharField(_("person's name"), maxlength=50)
-    submit_date = meta.DateTimeField(_('date/time submitted'), auto_now_add=True)
-    is_public = meta.BooleanField(_('is public'))
-    ip_address = meta.IPAddressField(_('ip address'))
+    content_type = models.ForeignKey(core.ContentType)
+    object_id = models.IntegerField(_('object ID'))
+    comment = models.TextField(_('comment'), maxlength=3000)
+    person_name = models.CharField(_("person's name"), maxlength=50)
+    submit_date = models.DateTimeField(_('date/time submitted'), auto_now_add=True)
+    is_public = models.BooleanField(_('is public'))
+    ip_address = models.IPAddressField(_('ip address'))
     # TODO: Change this to is_removed, like Comment
-    approved = meta.BooleanField(_('approved by staff'))
-    site = meta.ForeignKey(core.Site)
+    approved = models.BooleanField(_('approved by staff'))
+    site = models.ForeignKey(core.Site)
     class META:
         db_table = 'comments_free'
         verbose_name = _('Free comment')
         verbose_name_plural = _('Free comments')
         ordering = ('-submit_date',)
-        admin = meta.Admin(
+        admin = models.Admin(
             fields = (
                 (None, {'fields': ('content_type', 'object_id', 'site')}),
                 ('Content', {'fields': ('person_name', 'comment')}),
@@ -203,11 +203,11 @@ class FreeComment(meta.Model):
 
     get_content_object.short_description = _('Content object')
 
-class KarmaScore(meta.Model):
-    user = meta.ForeignKey(auth.User)
-    comment = meta.ForeignKey(Comment)
-    score = meta.SmallIntegerField(_('score'), db_index=True)
-    scored_date = meta.DateTimeField(_('score date'), auto_now=True)
+class KarmaScore(models.Model):
+    user = models.ForeignKey(auth.User)
+    comment = models.ForeignKey(Comment)
+    score = models.SmallIntegerField(_('score'), db_index=True)
+    scored_date = models.DateTimeField(_('score date'), auto_now=True)
     class META:
         module_name = 'karma'
         verbose_name = _('Karma score')
@@ -242,10 +242,10 @@ class KarmaScore(meta.Model):
             return DEFAULT_KARMA
         return int(round((4.5 * score) + 5.5))
 
-class UserFlag(meta.Model):
-    user = meta.ForeignKey(auth.User)
-    comment = meta.ForeignKey(Comment)
-    flag_date = meta.DateTimeField(_('flag date'), auto_now_add=True)
+class UserFlag(models.Model):
+    user = models.ForeignKey(auth.User)
+    comment = models.ForeignKey(Comment)
+    flag_date = models.DateTimeField(_('flag date'), auto_now_add=True)
     class META:
         db_table = 'comments_user_flags'
         verbose_name = _('User flag')
@@ -272,10 +272,10 @@ class UserFlag(meta.Model):
             mail_managers('Comment flagged', message, fail_silently=True)
             f.save()
 
-class ModeratorDeletion(meta.Model):
-    user = meta.ForeignKey(auth.User, verbose_name='moderator')
-    comment = meta.ForeignKey(Comment)
-    deletion_date = meta.DateTimeField(_('deletion date'), auto_now_add=True)
+class ModeratorDeletion(models.Model):
+    user = models.ForeignKey(auth.User, verbose_name='moderator')
+    comment = models.ForeignKey(Comment)
+    deletion_date = models.DateTimeField(_('deletion date'), auto_now_add=True)
     class META:
         db_table = 'comments_moderator_deletions'
         verbose_name = _('Moderator deletion')

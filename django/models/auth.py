@@ -1,11 +1,12 @@
-from django.core import meta, validators
+from django.core import validators
+from django.db import models
 from django.models import core
 from django.utils.translation import gettext_lazy as _
 
-class Permission(meta.Model):
-    name = meta.CharField(_('name'), maxlength=50)
-    package = meta.ForeignKey(core.Package, db_column='package')
-    codename = meta.CharField(_('codename'), maxlength=100)
+class Permission(models.Model):
+    name = models.CharField(_('name'), maxlength=50)
+    package = models.ForeignKey(core.Package, db_column='package')
+    codename = models.CharField(_('codename'), maxlength=100)
     class META:
         verbose_name = _('Permission')
         verbose_name_plural = _('Permissions')
@@ -15,34 +16,34 @@ class Permission(meta.Model):
     def __repr__(self):
         return "%s | %s" % (self.package_id, self.name)
 
-class Group(meta.Model):
-    name = meta.CharField(_('name'), maxlength=80, unique=True)
-    permissions = meta.ManyToManyField(Permission, blank=True, filter_interface=meta.HORIZONTAL)
+class Group(models.Model):
+    name = models.CharField(_('name'), maxlength=80, unique=True)
+    permissions = models.ManyToManyField(Permission, blank=True, filter_interface=models.HORIZONTAL)
     class META:
         verbose_name = _('Group')
         verbose_name_plural = _('Groups')
         ordering = ('name',)
-        admin = meta.Admin(
+        admin = models.Admin(
             search_fields = ('name',),
         )
 
     def __repr__(self):
         return self.name
 
-class User(meta.Model):
-    username = meta.CharField(_('username'), maxlength=30, unique=True, validator_list=[validators.isAlphaNumeric])
-    first_name = meta.CharField(_('first name'), maxlength=30, blank=True)
-    last_name = meta.CharField(_('last name'), maxlength=30, blank=True)
-    email = meta.EmailField(_('e-mail address'), blank=True)
-    password = meta.CharField(_('password'), maxlength=128, help_text=_("Use '[algo]$[salt]$[hexdigest]'"))
-    is_staff = meta.BooleanField(_('staff status'), help_text=_("Designates whether the user can log into this admin site."))
-    is_active = meta.BooleanField(_('active'), default=True)
-    is_superuser = meta.BooleanField(_('superuser status'))
-    last_login = meta.DateTimeField(_('last login'), default=meta.LazyDate())
-    date_joined = meta.DateTimeField(_('date joined'), default=meta.LazyDate())
-    groups = meta.ManyToManyField(Group, blank=True,
+class User(models.Model):
+    username = models.CharField(_('username'), maxlength=30, unique=True, validator_list=[validators.isAlphaNumeric])
+    first_name = models.CharField(_('first name'), maxlength=30, blank=True)
+    last_name = models.CharField(_('last name'), maxlength=30, blank=True)
+    email = models.EmailField(_('e-mail address'), blank=True)
+    password = models.CharField(_('password'), maxlength=128, help_text=_("Use '[algo]$[salt]$[hexdigest]'"))
+    is_staff = models.BooleanField(_('staff status'), help_text=_("Designates whether the user can log into this admin site."))
+    is_active = models.BooleanField(_('active'), default=True)
+    is_superuser = models.BooleanField(_('superuser status'))
+    last_login = models.DateTimeField(_('last login'), default=models.LazyDate())
+    date_joined = models.DateTimeField(_('date joined'), default=models.LazyDate())
+    groups = models.ManyToManyField(Group, blank=True,
         help_text=_("In addition to the permissions manually assigned, this user will also get all permissions granted to each group he/she is in."))
-    user_permissions = meta.ManyToManyField(Permission, blank=True, filter_interface=meta.HORIZONTAL)
+    user_permissions = models.ManyToManyField(Permission, blank=True, filter_interface=models.HORIZONTAL)
     class META:
         verbose_name = _('User')
         verbose_name_plural = _('Users')
@@ -51,7 +52,7 @@ class User(meta.Model):
         }
         ordering = ('username',)
         exceptions = ('SiteProfileNotAvailable',)
-        admin = meta.Admin(
+        admin = models.Admin(
             fields = (
                 (None, {'fields': ('username', 'password')}),
                 (_('Personal info'), {'fields': ('first_name', 'last_name', 'email')}),
@@ -211,9 +212,9 @@ class User(meta.Model):
         from random import choice
         return ''.join([choice(allowed_chars) for i in range(length)])
 
-class Message(meta.Model):
-    user = meta.ForeignKey(User)
-    message = meta.TextField(_('Message'))
+class Message(models.Model):
+    user = models.ForeignKey(User)
+    message = models.TextField(_('Message'))
 
     def __repr__(self):
         return self.message

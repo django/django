@@ -6,11 +6,11 @@ If your database column name is different than your model attribute, use the
 name, in API usage.
 """
 
-from django.core import meta
+from django.db import models
 
-class Person(meta.Model):
-    first_name = meta.CharField(maxlength=30, db_column='firstname')
-    last_name = meta.CharField(maxlength=30, db_column='last')
+class Person(models.Model):
+    first_name = models.CharField(maxlength=30, db_column='firstname')
+    last_name = models.CharField(maxlength=30, db_column='last')
 
     def __repr__(self):
         return '%s %s' % (self.first_name, self.last_name)

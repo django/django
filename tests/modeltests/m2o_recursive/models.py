@@ -10,11 +10,11 @@ In this example, a ``Category`` is related to itself. That is, each
 Set ``related_name`` to designate what the reverse relationship is called.
 """
 
-from django.core import meta
+from django.db import models
 
-class Category(meta.Model):
-    name = meta.CharField(maxlength=20)
-    parent = meta.ForeignKey('self', null=True, related_name='child')
+class Category(models.Model):
+    name = models.CharField(maxlength=20)
+    parent = models.ForeignKey('self', null=True, related_name='child')
 
     def __repr__(self):
         return self.name

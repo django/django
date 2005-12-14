@@ -10,22 +10,22 @@ Set ``singular`` to designate what the category object is called. This is
 required if a model has multiple ``ManyToManyFields`` to the same object.
 """
 
-from django.core import meta
+from django.db import models
 
-class Category(meta.Model):
-    name = meta.CharField(maxlength=20)
+class Category(models.Model):
+    name = models.CharField(maxlength=20)
     class META:
        ordering = ('name',)
 
     def __repr__(self):
         return self.name
 
-class Article(meta.Model):
-    headline = meta.CharField(maxlength=50)
-    pub_date = meta.DateTimeField()
-    primary_categories = meta.ManyToManyField(Category,
+class Article(models.Model):
+    headline = models.CharField(maxlength=50)
+    pub_date = models.DateTimeField()
+    primary_categories = models.ManyToManyField(Category,
         singular='primary_category', related_name='primary_article')
-    secondary_categories = meta.ManyToManyField(Category,
+    secondary_categories = models.ManyToManyField(Category,
         singular='secondary_category', related_name='secondary_article')
     class META:
        ordering = ('pub_date',)

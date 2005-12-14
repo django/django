@@ -7,12 +7,12 @@ which are other ``Person`` objects.
 Set ``related_name`` to designate what the reverse relationship is called.
 """
 
-from django.core import meta
+from django.db import models
 
-class Person(meta.Model):
-    full_name = meta.CharField(maxlength=20)
-    mother = meta.ForeignKey('self', null=True, related_name='mothers_child')
-    father = meta.ForeignKey('self', null=True, related_name='fathers_child')
+class Person(models.Model):
+    full_name = models.CharField(maxlength=20)
+    mother = models.ForeignKey('self', null=True, related_name='mothers_child')
+    father = models.ForeignKey('self', null=True, related_name='fathers_child')
 
     def __repr__(self):
         return self.full_name

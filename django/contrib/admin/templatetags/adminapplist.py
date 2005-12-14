@@ -7,12 +7,12 @@ class AdminApplistNode(template.Node):
         self.varname = varname
 
     def render(self, context):
-        from django.core import meta
+        from django.db import models
         from django.utils.text import capfirst
         app_list = []
         user = context['user']
 
-        for app in meta.get_installed_model_modules():
+        for app in models.get_installed_model_modules():
             app_label = app.__name__[app.__name__.rindex('.')+1:]
             has_module_perms = user.has_module_perms(app_label)
 

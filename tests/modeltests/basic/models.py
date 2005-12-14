@@ -4,11 +4,11 @@
 This is a basic model with only two non-primary-key fields.
 """
 
-from django.core import meta
+from django.db import models
 
-class Article(meta.Model):
-    headline = meta.CharField(maxlength=100, default='Default headline')
-    pub_date = meta.DateTimeField()
+class Article(models.Model):
+    headline = models.CharField(maxlength=100, default='Default headline')
+    pub_date = models.DateTimeField()
 
 API_TESTS = """
 # No articles are in the system yet.

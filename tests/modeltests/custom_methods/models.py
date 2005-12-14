@@ -4,11 +4,11 @@
 Any method you add to a model will be available to instances.
 """
 
-from django.core import meta
+from django.db import models
 
-class Article(meta.Model):
-    headline = meta.CharField(maxlength=100)
-    pub_date = meta.DateField()
+class Article(models.Model):
+    headline = models.CharField(maxlength=100)
+    pub_date = models.DateField()
 
     def __repr__(self):
         return self.headline

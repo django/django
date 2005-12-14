@@ -60,13 +60,14 @@ get_rel_data_type = lambda f: (f.get_internal_type() == 'AutoField') and 'Intege
 
 def get_sql_create(mod):
     "Returns a list of the CREATE TABLE SQL statements for the given module."
-    from django.core import db, meta
+    from django.core import db
+    from django.db import models
     final_output = []
     for klass in mod._MODELS:
         opts = klass._meta
         table_output = []
         for f in opts.fields:
-            if isinstance(f, meta.ForeignKey):
+            if isinstance(f, models.ForeignKey):
                 rel_field = f.rel.get_related_field()
                 data_type = get_rel_data_type(rel_field)
             else:
@@ -233,11 +234,12 @@ get_sql_initial_data.args = APP_ARGS
 
 def get_sql_sequence_reset(mod):
     "Returns a list of the SQL statements to reset PostgreSQL sequences for the given module."
-    from django.core import db, meta
+    from django.core import db
+    from django.db import models
     output = []
     for klass in mod._MODELS:
         for f in klass._meta.fields:
-            if isinstance(f, meta.AutoField):
+            if isinstance(f, models.AutoField):
                 output.append("SELECT setval('%s_%s_seq', (SELECT max(%s) FROM %s));" % \
                     (klass._meta.db_table, f.column, db.db.quote_name(f.column),
                     db.db.quote_name(klass._meta.db_table)))
@@ -368,9 +370,10 @@ get_admin_index.args = APP_ARGS
 def init():
     "Initializes the database with auth and core."
     try:
-        from django.core import db, meta
-        auth = meta.get_app('auth')
-        core = meta.get_app('core')
+        from django.core import db
+        from django.db import models
+        auth = models.get_app('auth')
+        core = models.get_app('core')
         cursor = db.db.cursor()
         for sql in get_sql_create(core) + get_sql_create(auth) + get_sql_initial_data(core) + get_sql_initial_data(auth):
             cursor.execute(sql)
@@ -574,10 +577,10 @@ def inspectdb(db_name):
     yield "# Also note: You'll have to insert the output of 'django-admin.py sqlinitialdata [appname]'"
     yield "# into your database."
     yield ''
-    yield 'from django.core import meta'
+    yield 'from django.db import models'
     yield ''
     for table_name in db.get_table_list(cursor):
-        yield 'class %s(meta.Model):' % table2model(table_name)
+        yield 'class %s(models.Model):' % table2model(table_name)
         try:
             relations = db.get_relations(cursor, table_name)
         except NotImplementedError:
@@ -588,9 +591,9 @@ def inspectdb(db_name):
                 rel = relations[i]
                 rel_to = rel[1] == table_name and "'self'" or table2model(rel[1])
                 if column_name.endswith('_id'):
-                    field_desc = '%s = meta.ForeignKey(%s' % (column_name[:-3], rel_to)
+                    field_desc = '%s = models.ForeignKey(%s' % (column_name[:-3], rel_to)
                 else:
-                    field_desc = '%s = meta.ForeignKey(%s, db_column=%r' % (column_name, rel_to, column_name)
+                    field_desc = '%s = models.ForeignKey(%s, db_column=%r' % (column_name, rel_to, column_name)
             else:
                 try:
                     field_type = db.DATA_TYPES_REVERSE[row[1]]
@@ -610,7 +613,7 @@ def inspectdb(db_name):
                 if field_type == 'CharField' and row[3]:
                     extra_params['maxlength'] = row[3]
 
-                field_desc = '%s = meta.%s(' % (column_name, field_type)
+                field_desc = '%s = models.%s(' % (column_name, field_type)
                 field_desc += ', '.join(['%s=%s' % (k, v) for k, v in extra_params.items()])
                 field_desc += ')'
                 if field_type_was_guessed:
@@ -634,25 +637,25 @@ class ModelErrorCollection:
 def get_validation_errors(outfile):
     "Validates all installed models. Writes errors, if any, to outfile. Returns number of errors."
     import django.models
-    from django.core import meta
+    from django.db import models
     e = ModelErrorCollection(outfile)
-    module_list = meta.get_installed_model_modules()
+    module_list = models.get_installed_model_modules()
     for module in module_list:
         for mod in module._MODELS:
             opts = mod._meta
 
             # Do field-specific validation.
             for f in opts.fields:
-                if isinstance(f, meta.CharField) and f.maxlength in (None, 0):
+                if isinstance(f, models.CharField) and f.maxlength in (None, 0):
                     e.add(opts, '"%s" field: CharFields require a "maxlength" attribute.' % f.name)
-                if isinstance(f, meta.FloatField):
+                if isinstance(f, models.FloatField):
                     if f.decimal_places is None:
                         e.add(opts, '"%s" field: FloatFields require a "decimal_places" attribute.' % f.name)
                     if f.max_digits is None:
                         e.add(opts, '"%s" field: FloatFields require a "max_digits" attribute.' % f.name)
-                if isinstance(f, meta.FileField) and not f.upload_to:
+                if isinstance(f, models.FileField) and not f.upload_to:
                     e.add(opts, '"%s" field: FileFields require an "upload_to" attribute.' % f.name)
-                if isinstance(f, meta.ImageField):
+                if isinstance(f, models.ImageField):
                     try:
                         from PIL import Image
                     except ImportError:
@@ -676,8 +679,8 @@ def get_validation_errors(outfile):
 
             # Check admin attribute.
             if opts.admin is not None:
-                if not isinstance(opts.admin, meta.Admin):
-                    e.add(opts, '"admin" attribute, if given, must be set to a meta.Admin() instance.')
+                if not isinstance(opts.admin, models.Admin):
+                    e.add(opts, '"admin" attribute, if given, must be set to a models.Admin() instance.')
                 else:
                     # list_display
                     if not isinstance(opts.admin.list_display, (list, tuple)):
@@ -686,12 +689,12 @@ def get_validation_errors(outfile):
                         for fn in opts.admin.list_display:
                             try:
                                 f = opts.get_field(fn)
-                            except meta.FieldDoesNotExist:
+                            except models.FieldDoesNotExist:
                                 klass = opts.get_model_module().Klass
                                 if not hasattr(klass, fn) or not callable(getattr(klass, fn)):
                                     e.add(opts, '"admin.list_display" refers to %r, which isn\'t a field or method.' % fn)
                             else:
-                                if isinstance(f, meta.ManyToManyField):
+                                if isinstance(f, models.ManyToManyField):
                                     e.add(opts, '"admin.list_display" doesn\'t support ManyToManyFields (%r).' % fn)
                     # list_filter
                     if not isinstance(opts.admin.list_filter, (list, tuple)):
@@ -700,7 +703,7 @@ def get_validation_errors(outfile):
                         for fn in opts.admin.list_filter:
                             try:
                                 f = opts.get_field(fn)
-                            except meta.FieldDoesNotExist:
+                            except models.FieldDoesNotExist:
                                 e.add(opts, '"admin.list_filter" refers to %r, which isn\'t a field.' % fn)
 
             # Check ordering attribute.
@@ -713,7 +716,7 @@ def get_validation_errors(outfile):
                         continue
                     try:
                         opts.get_field(field_name, many_to_many=False)
-                    except meta.FieldDoesNotExist:
+                    except models.FieldDoesNotExist:
                         e.add(opts, '"ordering" refers to "%s", a field that doesn\'t exist.' % field_name)
 
             # Check core=True, if needed.
@@ -731,10 +734,10 @@ def get_validation_errors(outfile):
                 for field_name in ut:
                     try:
                         f = opts.get_field(field_name, many_to_many=True)
-                    except meta.FieldDoesNotExist:
+                    except models.FieldDoesNotExist:
                         e.add(opts, '"unique_together" refers to %s, a field that doesn\'t exist. Check your syntax.' % field_name)
                     else:
-                        if isinstance(f.rel, meta.ManyToMany):
+                        if isinstance(f.rel, models.ManyToMany):
                             e.add(opts, '"unique_together" refers to %s. ManyToManyFields are not supported in unique_together.' % f.name)
     return len(e.errors)
 
@@ -783,12 +786,13 @@ runserver.args = '[optional port number, or ipaddr:port]'
 
 def createcachetable(tablename):
     "Creates the table needed to use the SQL cache backend"
-    from django.core import db, meta
+    from django.core import db
+    from django.db import models
     fields = (
         # "key" is a reserved word in MySQL, so use "cache_key" instead.
-        meta.CharField(name='cache_key', maxlength=255, unique=True, primary_key=True),
-        meta.TextField(name='value'),
-        meta.DateTimeField(name='expires', db_index=True),
+        models.CharField(name='cache_key', maxlength=255, unique=True, primary_key=True),
+        models.TextField(name='value'),
+        models.DateTimeField(name='expires', db_index=True),
     )
     table_output = []
     index_output = []
@@ -943,12 +947,12 @@ def execute_from_command_line(action_mapping=DEFAULT_ACTION_MAPPING):
                 addr, port = '', args[1]
         action_mapping[action](addr, port)
     else:
-        from django.core import meta
+        from django.db import models
         if action == 'dbcheck':
-            mod_list = meta.get_all_installed_modules()
+            mod_list = models.get_all_installed_modules()
         else:
             try:
-                mod_list = [meta.get_app(app_label) for app_label in args[1:]]
+                mod_list = [models.get_app(app_label) for app_label in args[1:]]
             except ImportError, e:
                 sys.stderr.write("Error: %s. Are you sure your INSTALLED_APPS setting is correct?\n" % e)
                 sys.exit(1)
