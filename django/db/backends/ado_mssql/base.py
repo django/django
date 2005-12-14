@@ -4,8 +4,7 @@ ADO MSSQL database backend for Django.
 Requires adodbapi 2.0.1: http://adodbapi.sourceforge.net/
 """
 
-from django.core.db import base
-from django.core.db.dicthelpers import *
+from django.db.backends import util
 import adodbapi as Database
 import datetime
 try:
@@ -82,6 +81,10 @@ class DatabaseWrapper:
             return name # Quoting once is enough.
         return '[%s]' % name
 
+dictfetchone = util.dictfetchone
+dictfetchmany = util.dictfetchmany
+dictfetchall  = util.dictfetchall
+
 def get_last_insert_id(cursor, table_name, pk_name):
     cursor.execute("SELECT %s FROM %s WHERE %s = @@IDENTITY" % (pk_name, table_name, pk_name))
     return cursor.fetchone()[0]
@@ -151,4 +154,3 @@ DATA_TYPES = {
     'URLField':          'varchar(200)',
     'USStateField':      'varchar(2)',
 }
-

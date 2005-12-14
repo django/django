@@ -4,8 +4,7 @@ MySQL database backend for Django.
 Requires MySQLdb: http://sourceforge.net/projects/mysql-python
 """
 
-from django.core.db import base, typecasts
-from django.core.db.dicthelpers import *
+from django.db.backends import util
 import MySQLdb as Database
 from MySQLdb.converters import conversions
 from MySQLdb.constants import FIELD_TYPE
@@ -15,10 +14,10 @@ DatabaseError = Database.DatabaseError
 
 django_conversions = conversions.copy()
 django_conversions.update({
-    types.BooleanType: typecasts.rev_typecast_boolean,
-    FIELD_TYPE.DATETIME: typecasts.typecast_timestamp,
-    FIELD_TYPE.DATE: typecasts.typecast_date,
-    FIELD_TYPE.TIME: typecasts.typecast_time,
+    types.BooleanType: util.rev_typecast_boolean,
+    FIELD_TYPE.DATETIME: util.typecast_timestamp,
+    FIELD_TYPE.DATE: util.typecast_date,
+    FIELD_TYPE.TIME: util.typecast_time,
 })
 
 # This is an extra debug layer over MySQL queries, to display warnings.
@@ -66,7 +65,7 @@ class DatabaseWrapper:
                 kwargs['port'] = DATABASE_PORT
             self.connection = Database.connect(**kwargs)
         if DEBUG:
-            return base.CursorDebugWrapper(MysqlDebugWrapper(self.connection.cursor()), self)
+            return util.CursorDebugWrapper(MysqlDebugWrapper(self.connection.cursor()), self)
         return self.connection.cursor()
 
     def commit(self):
@@ -88,6 +87,10 @@ class DatabaseWrapper:
         if name.startswith("`") and name.endswith("`"):
             return name # Quoting once is enough.
         return "`%s`" % name
+
+dictfetchone = util.dictfetchone
+dictfetchmany = util.dictfetchmany
+dictfetchall  = util.dictfetchall
 
 def get_last_insert_id(cursor, table_name, pk_name):
     cursor.execute("SELECT LAST_INSERT_ID()")

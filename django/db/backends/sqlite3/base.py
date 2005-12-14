@@ -2,17 +2,16 @@
 SQLite3 backend for django.  Requires pysqlite2 (http://pysqlite.org/).
 """
 
-from django.core.db import base, typecasts
-from django.core.db.dicthelpers import *
+from django.db.backends import util
 from pysqlite2 import dbapi2 as Database
 DatabaseError = Database.DatabaseError
 
 # Register adaptors ###########################################################
 
 Database.register_converter("bool", lambda s: str(s) == '1')
-Database.register_converter("time", typecasts.typecast_time)
-Database.register_converter("date", typecasts.typecast_date)
-Database.register_converter("datetime", typecasts.typecast_timestamp)
+Database.register_converter("time", util.typecast_time)
+Database.register_converter("date", util.typecast_date)
+Database.register_converter("datetime", util.typecast_timestamp)
 
 # Database wrapper ############################################################
 
@@ -39,7 +38,7 @@ class DatabaseWrapper:
         cursor = self.connection.cursor(factory=SQLiteCursorWrapper)
         cursor.row_factory = utf8rowFactory
         if DEBUG:
-            return base.CursorDebugWrapper(cursor, self)
+            return util.CursorDebugWrapper(cursor, self)
         else:
             return cursor
 
@@ -59,6 +58,10 @@ class DatabaseWrapper:
         if name.startswith('"') and name.endswith('"'):
             return name # Quoting once is enough.
         return '"%s"' % name
+
+dictfetchone = util.dictfetchone
+dictfetchmany = util.dictfetchmany
+dictfetchall  = util.dictfetchall
 
 class SQLiteCursorWrapper(Database.Cursor):
     """
@@ -92,7 +95,7 @@ def get_date_extract_sql(lookup_type, table_name):
 
 def _sqlite_extract(lookup_type, dt):
     try:
-        dt = typecasts.typecast_timestamp(dt)
+        dt = util.typecast_timestamp(dt)
     except (ValueError, TypeError):
         return None
     return str(getattr(dt, lookup_type))
@@ -113,7 +116,7 @@ def get_random_function_sql():
 
 def _sqlite_date_trunc(lookup_type, dt):
     try:
-        dt = typecasts.typecast_timestamp(dt)
+        dt = util.typecast_timestamp(dt)
     except (ValueError, TypeError):
         return None
     if lookup_type == 'year':

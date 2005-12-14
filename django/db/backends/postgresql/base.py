@@ -4,7 +4,7 @@ PostgreSQL database backend for Django.
 Requires psycopg 1: http://initd.org/projects/psycopg1
 """
 
-from django.core.db import base, typecasts
+from django.db.backends import util
 import psycopg as Database
 
 DatabaseError = Database.DatabaseError
@@ -34,7 +34,7 @@ class DatabaseWrapper:
         cursor = self.connection.cursor()
         cursor.execute("SET TIME ZONE %s", [TIME_ZONE])
         if DEBUG:
-            return base.CursorDebugWrapper(cursor, self)
+            return util.CursorDebugWrapper(cursor, self)
         return cursor
 
     def commit(self):
@@ -93,12 +93,12 @@ def get_random_function_sql():
 # in Python's native (standard-library) datetime/time format, whereas psycopg
 # use mx.DateTime by default.
 try:
-    Database.register_type(Database.new_type((1082,), "DATE", typecasts.typecast_date))
+    Database.register_type(Database.new_type((1082,), "DATE", util.typecast_date))
 except AttributeError:
     raise Exception, "You appear to be using psycopg version 2, which isn't supported yet, because it's still in beta. Use psycopg version 1 instead: http://initd.org/projects/psycopg1"
-Database.register_type(Database.new_type((1083,1266), "TIME", typecasts.typecast_time))
-Database.register_type(Database.new_type((1114,1184), "TIMESTAMP", typecasts.typecast_timestamp))
-Database.register_type(Database.new_type((16,), "BOOLEAN", typecasts.typecast_boolean))
+Database.register_type(Database.new_type((1083,1266), "TIME", util.typecast_time))
+Database.register_type(Database.new_type((1114,1184), "TIMESTAMP", util.typecast_timestamp))
+Database.register_type(Database.new_type((16,), "BOOLEAN", util.typecast_boolean))
 
 OPERATOR_MAPPING = {
     'exact': '= %s',
