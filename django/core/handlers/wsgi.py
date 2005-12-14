@@ -143,7 +143,7 @@ class WSGIRequest(httpwrappers.HttpRequest):
 class WSGIHandler(BaseHandler):
     def __call__(self, environ, start_response):
         from django.conf import settings
-        from django.core import db
+        from django.db import connection
 
         # Set up middleware if needed. We couldn't do this earlier, because
         # settings weren't available.
@@ -154,7 +154,7 @@ class WSGIHandler(BaseHandler):
             request = WSGIRequest(environ)
             response = self.get_response(request.path, request)
         finally:
-            db.db.close()
+            connection.close()
 
         # Apply response middleware
         for middleware_method in self._response_middleware:

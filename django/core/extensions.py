@@ -41,8 +41,8 @@ class DjangoContext(Context):
             self['LANGUAGE_CODE'] = settings.LANGUAGE_CODE
         if DEBUG and request.META.get('REMOTE_ADDR') in INTERNAL_IPS:
             self['debug'] = True
-            from django.core import db
-            self['sql_queries'] = db.db.queries
+            from django.db import connection
+            self['sql_queries'] = connection.queries
 
 # PermWrapper and PermLookupDict proxy the permissions system into objects that
 # the template system can understand.

@@ -128,7 +128,7 @@ class ModPythonHandler(BaseHandler):
         # now that the environ works we can see the correct settings, so imports
         # that use settings now can work
         from django.conf import settings
-        from django.core import db
+        from django.db import connection
 
         # if we need to set up middleware, now that settings works we can do it now.
         if self._request_middleware is None:
@@ -138,7 +138,7 @@ class ModPythonHandler(BaseHandler):
             request = ModPythonRequest(req)
             response = self.get_response(req.uri, request)
         finally:
-            db.db.close()
+            connection.close()
 
         # Apply response middleware
         for middleware_method in self._response_middleware:

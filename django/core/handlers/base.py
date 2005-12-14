@@ -47,12 +47,13 @@ class BaseHandler:
 
     def get_response(self, path, request):
         "Returns an HttpResponse object for the given HttpRequest"
-        from django.core import db, exceptions, urlresolvers
+        from django.core import exceptions, urlresolvers
+        from django.db import connection, DatabaseError
         from django.core.mail import mail_admins
         from django.conf.settings import DEBUG, INTERNAL_IPS, ROOT_URLCONF
 
         # Reset query list per request.
-        db.db.queries = []
+        connection.queries = []
 
         # Apply request middleware
         for middleware_method in self._request_middleware:
@@ -93,8 +94,8 @@ class BaseHandler:
             else:
                 callback, param_dict = resolver.resolve404()
                 return callback(request, **param_dict)
-        except db.DatabaseError:
-            db.db.rollback()
+        except DatabaseError:
+            connection.rollback()
             if DEBUG:
                 return self.get_technical_error_response(request)
             else:
