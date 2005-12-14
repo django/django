@@ -64,11 +64,12 @@ class TestRunner:
 
     def run_tests(self):
         from django.conf import settings
-        from django.core.db import db
-        from django.core import management, meta
 
         # Manually set INSTALLED_APPS to point to the test models.
         settings.INSTALLED_APPS = [MODEL_TESTS_DIR_NAME + '.' + a for a in get_test_models()]
+
+        from django.core.db import db
+        from django.core import management, meta
 
         # Determine which models we're going to test.
         test_models = get_test_models()
