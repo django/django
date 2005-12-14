@@ -166,8 +166,9 @@ class RelatedObject(object):
         self.opts = model._meta
         self.field = field
         self.edit_inline = field.rel.edit_inline
-        self.name = opts.module_name
-        self.var_name = opts.object_name.lower()
+        self.name = self.opts.module_name
+        self.var_name = self.opts.object_name.lower()
+
 
     def flatten_data(self, follow, obj=None):
         new_data = {}
@@ -738,6 +739,7 @@ class Manager(object):
         # objects -- MySQL returns the values as strings, instead.
         return [typecast_timestamp(str(row[0])) for row in cursor.fetchall()]
 
+
 class ModelBase(type):
     "Metaclass for all models"
     def __new__(cls, name, bases, attrs):
@@ -839,6 +841,16 @@ class ModelBase(type):
 
         new_class._prepare()
 
+        
+        for field in fields:
+            if field.rel:
+                other = field.rel.to
+                if isinstance(other, basestring):
+                    print "string lookup"
+                else:
+                    related = RelatedObject(other._meta, new_class, field)
+                    field.contribute_to_related_class(other, related)
+        
         return new_class
 
 class Model(object):
@@ -935,34 +947,7 @@ class Model(object):
             cls.get_next_in_order = curry(cls.__get_next_or_previous_in_order, is_next=True)
             cls.get_previous_in_order = curry(cls.__get_next_or_previous_in_order, is_next=False)
 
-        # Add "get_thingie", "get_thingie_count" and "get_thingie_list" methods
-        # for all related objects.
-        for related in cls._meta.get_all_related_objects():
-            # Determine whether this related object is in another app.
-            # If it's in another app, the method names will have the app
-            # label prepended, and the add_BLAH() method will not be
-            # generated.
-            rel_obj_name = related.get_method_name_part()
-            if isinstance(related.field.rel, meta.OneToOne):
-                # Add "get_thingie" methods for one-to-one related objects.
-                # EXAMPLE: Place.get_restaurants_restaurant()
-                setattr(cls, 'get_%s' % rel_obj_name, curry(cls.__get_related, method_name='get_object', rel_class=related.model, rel_field=related.field))
-            elif isinstance(related.field.rel, meta.ManyToOne):
-                # Add "get_thingie" methods for many-to-one related objects.
-                # EXAMPLE: Poll.get_choice()
-                setattr(cls, 'get_%s' % rel_obj_name, curry(cls.__get_related, method_name='get_object', rel_class=related.model, rel_field=related.field))
-                # Add "get_thingie_count" methods for many-to-one related objects.
-                # EXAMPLE: Poll.get_choice_count()
-                setattr(cls, 'get_%s_count' % rel_obj_name, curry(cls.__get_related, method_name='get_count', rel_class=related.model, rel_field=related.field))
-                # Add "get_thingie_list" methods for many-to-one related objects.
-                # EXAMPLE: Poll.get_choice_list()
-                setattr(cls, 'get_%s_list' % rel_obj_name, curry(cls.__get_related, method_name='get_list', rel_class=related.model, rel_field=related.field))
-                # Add "add_thingie" methods for many-to-one related objects,
-                # but only for related objects that are in the same app.
-                # EXAMPLE: Poll.add_choice()
-                if related.opts.app_label == cls._meta.app_label:
-                    setattr(cls, 'add_%s' % rel_obj_name, curry(cls.__add_related, rel_class=related.model, rel_field=related.field))
-
+       
     _prepare = classmethod(_prepare)
 
     def save(self):
@@ -1079,7 +1064,7 @@ class Model(object):
         kwargs.setdefault('params', []).extend([param, param, getattr(self, self._meta.pk.attname)])
         kwargs['order_by'] = [(not is_next and '-' or '') + field.name, (not is_next and '-' or '') + self._meta.pk.name]
         kwargs['limit'] = 1
-        return self._default_manager.get_object(**kwargs)
+        return self.__class__._default_manager.get_object(**kwargs)
 
     def __get_next_or_previous_in_order(self, is_next):
         cachename = "__%s_order_cache" % is_next
@@ -1193,7 +1178,7 @@ class Model(object):
             setattr(self, cache_var, [field_with_rel.rel.to(*row) for row in cursor.fetchall()])
         return getattr(self, cache_var)
 
-    def __set_many_to_many_objects(self, field_with_rel, id_list):
+    def __set_many_to_many_objects(self, id_list, field_with_rel):
         current_ids = [obj.id for obj in self.__get_many_to_many_objects(field_with_rel)]
         ids_to_add, ids_to_delete = dict([(i, 1) for i in id_list]), []
         for current_id in current_ids:
@@ -1230,12 +1215,12 @@ class Model(object):
 
     __set_many_to_many_objects.alters_data = True
 
-    def __get_related(self, method_name, rel_class, rel_field, **kwargs):
+    def _get_related(self, method_name, rel_class, rel_field, **kwargs):
         kwargs['%s__%s__exact' % (rel_field.name, rel_field.rel.to._meta.pk.name)] = getattr(self, rel_field.rel.get_related_field().attname)
         kwargs.update(rel_field.rel.lookup_overrides)
         return getattr(rel_class._default_manager, method_name)(**kwargs)
 
-    def __add_related(self, rel_class, rel_field, *args, **kwargs):
+    def _add_related(self, rel_class, rel_field, *args, **kwargs):
         init_kwargs = dict(zip([f.attname for f in rel_class._meta.fields if f != rel_field and not isinstance(f, AutoField)], args))
         init_kwargs.update(kwargs)
         for f in rel_class._meta.fields:
@@ -1246,37 +1231,40 @@ class Model(object):
         obj.save()
         return obj
 
-    __add_related.alters_data = True
+    _add_related.alters_data = True
+
+
+
+    
+    
+    # Handles related many-to-many object retrieval.
+    # Examples: Album.get_song(), Album.get_song_list(), Album.get_song_count()
+    def _get_related_many_to_many(self, method_name, rel_class, rel_field, **kwargs):
+        kwargs['%s__%s__exact' % (rel_field.name, rel_class._meta.pk.name)] = getattr(self, rel_class._meta.pk.attname)
+        return getattr(rel_class._default_manager, method_name)(**kwargs)
+    
+    # Handles setting many-to-many related objects.
+    # Example: Album.set_songs()
+    def _set_related_many_to_many(self, rel_class, rel_field, id_list):
+        id_list = map(int, id_list) # normalize to integers
+        rel = rel_field.rel.to
+        m2m_table = rel_field.get_m2m_db_table(rel_opts)
+        this_id = getattr(self, self._meta.pk.attname)
+        cursor = connection.cursor()
+        cursor.execute("DELETE FROM %s WHERE %s = %%s" % \
+            (backend.quote_name(m2m_table),
+            backend.quote_name(rel.object_name.lower() + '_id')), [this_id])
+        sql = "INSERT INTO %s (%s, %s) VALUES (%%s, %%s)" % \
+            (backend.quote_name(m2m_table),
+            backend.quote_name(rel.object_name.lower() + '_id'),
+            backend.quote_name(rel_opts.object_name.lower() + '_id'))
+        cursor.executemany(sql, [(this_id, i) for i in id_list])
+        connection.commit()
+
 
 ############################################
 # HELPER FUNCTIONS (CURRIED MODEL METHODS) #
 ############################################
-
-# RELATIONSHIP METHODS #####################
-
-# Handles related many-to-many object retrieval.
-# Examples: Album.get_song(), Album.get_song_list(), Album.get_song_count()
-def method_get_related_many_to_many(method_name, opts, rel_mod, rel_field, self, **kwargs):
-    kwargs['%s__%s__exact' % (rel_field.name, opts.pk.name)] = getattr(self, opts.pk.attname)
-    return getattr(rel_mod.Klass._default_manager, method_name)(**kwargs)
-
-# Handles setting many-to-many related objects.
-# Example: Album.set_songs()
-def method_set_related_many_to_many(rel_opts, rel_field, self, id_list):
-    id_list = map(int, id_list) # normalize to integers
-    rel = rel_field.rel.to
-    m2m_table = rel_field.get_m2m_db_table(rel_opts)
-    this_id = getattr(self, self._meta.pk.attname)
-    cursor = connection.cursor()
-    cursor.execute("DELETE FROM %s WHERE %s = %%s" % \
-        (backend.quote_name(m2m_table),
-        backend.quote_name(rel.object_name.lower() + '_id')), [this_id])
-    sql = "INSERT INTO %s (%s, %s) VALUES (%%s, %%s)" % \
-        (backend.quote_name(m2m_table),
-        backend.quote_name(rel.object_name.lower() + '_id'),
-        backend.quote_name(rel_opts.object_name.lower() + '_id'))
-    cursor.executemany(sql, [(this_id, i) for i in id_list])
-    connection.commit()
 
 # ORDERING METHODS #########################
 

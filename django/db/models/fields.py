@@ -741,6 +741,25 @@ class ForeignKey(Field):
                     return {self.attname: choice_list[1][0]}
         return Field.flatten_data(self, follow, obj)
 
+    def contribute_to_related_class(self, cls, related):
+        rel_obj_name = related.get_method_name_part()
+
+        # Add "get_thingie" methods for many-to-one related objects.
+        # EXAMPLE: Poll.get_choice()
+        setattr(cls, 'get_%s' % rel_obj_name, curry(cls._get_related, method_name='get_object', rel_class=related.model, rel_field=related.field))
+        # Add "get_thingie_count" methods for many-to-one related objects.
+        # EXAMPLE: Poll.get_choice_count()
+        setattr(cls, 'get_%s_count' % rel_obj_name, curry(cls._get_related, method_name='get_count', rel_class=related.model, rel_field=related.field))
+        # Add "get_thingie_list" methods for many-to-one related objects.
+        # EXAMPLE: Poll.get_choice_list()
+        setattr(cls, 'get_%s_list' % rel_obj_name, curry(cls._get_related, method_name='get_list', rel_class=related.model, rel_field=related.field))
+        # Add "add_thingie" methods for many-to-one related objects,
+        # but only for related objects that are in the same app.
+        # EXAMPLE: Poll.add_choice()
+        if related.opts.app_label == cls._meta.app_label:
+            setattr(cls, 'add_%s' % rel_obj_name, curry(cls._add_related, rel_class=related.model, rel_field=related.field))
+
+
 class ManyToManyField(Field):
     def __init__(self, to, **kwargs):
         kwargs['verbose_name'] = kwargs.get('verbose_name', to._meta.verbose_name_plural)
@@ -800,9 +819,18 @@ class ManyToManyField(Field):
             if not self.blank and not self.rel.edit_inline and not self.rel.raw_id_admin:
                choices_list = self.get_choices_default()
                if len(choices_list) == 1:
-                   print self.name, choices_list[0][0]
                    new_data[self.name] = [choices_list[0][0]]
         return new_data
+    
+    def contribute_to_related_class(self, cls, related):
+        rel_obj_name = related.get_method_name_part()
+        setattr(cls, 'get_%s' % rel_obj_name, curry(cls._get_related_many_to_many, method_name='get_object', rel_class=related.model , rel_field=related.field))
+        setattr(cls, 'get_%s_count' % rel_obj_name, curry(cls._get_related_many_to_many, method_name='get_count', rel_class=related.model, rel_field=related.field))
+        setattr(cls, 'get_%s_list' % rel_obj_name, curry(cls._get_related_many_to_many, method_name='get_list', rel_class=related.model, rel_field=related.field))
+        if related.opts.app_label == cls._meta.app_label:
+            func = curry(cls._set_related_many_to_many, cls, related.field)
+            func.alters_data = True
+            setattr(cls, 'set_%s' % related.opts.module_name, func)
 
 class OneToOneField(IntegerField):
     def __init__(self, to, to_field=None, **kwargs):
@@ -823,6 +851,14 @@ class OneToOneField(IntegerField):
             raw_id_admin=kwargs.pop('raw_id_admin', False))
         kwargs['primary_key'] = True
         IntegerField.__init__(self, **kwargs)
+
+    def contribute_to_related_class(self, cls, related):
+        rel_obj_name = related.get_method_name_part()
+        # Add "get_thingie" methods for one-to-one related objects.
+        # EXAMPLE: Place.get_restaurants_restaurant()
+        setattr(cls, 'get_%s' % rel_obj_name, 
+                curry(cls._get_related, method_name='get_object', 
+                      rel_class=related.model, rel_field=related.field))
 
 class ManyToOne:
     def __init__(self, to, field_name, num_in_admin=3, min_num_in_admin=None,

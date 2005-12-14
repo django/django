@@ -5,6 +5,7 @@ Any method you add to a model will be available to instances.
 """
 
 from django.db import models
+import datetime
 
 class Article(models.Model):
     headline = models.CharField(maxlength=100)
@@ -17,7 +18,7 @@ class Article(models.Model):
         return self.pub_date == datetime.date.today()
 
     def get_articles_from_same_day_1(self):
-        return self.objects.get_list(id__ne=self.id, pub_date__exact=self.pub_date)
+        return Article.objects.get_list(id__ne=self.id, pub_date__exact=self.pub_date)
 
     def get_articles_from_same_day_2(self):
         """
