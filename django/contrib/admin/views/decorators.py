@@ -1,6 +1,6 @@
 from django.core.extensions import DjangoContext, render_to_response
 from django.conf.settings import SECRET_KEY
-from django.models.auth import users
+from django.models.auth import User, SESSION_KEY
 from django.utils import httpwrappers
 import base64, md5
 import cPickle as pickle
@@ -66,14 +66,14 @@ def staff_member_required(view_func):
         # Check the password.
         username = request.POST.get('username', '')
         try:
-            user = users.get_object(username__exact=username, is_staff__exact=True)
-        except users.UserDoesNotExist:
+            user = User.objects.get_object(username__exact=username, is_staff__exact=True)
+        except User.DoesNotExist:
             message = ERROR_MESSAGE
             if '@' in username:
                 # Mistakenly entered e-mail address instead of username? Look it up.
                 try:
-                    user = users.get_object(email__exact=username)
-                except users.UserDoesNotExist:
+                    user = User.objects.get_object(email__exact=username)
+                except User.DoesNotExist:
                     message = _("Usernames cannot contain the '@' character.")
                 else:
                     message = _("Your e-mail address is not your username. Try '%s' instead.") % user.username
@@ -82,7 +82,7 @@ def staff_member_required(view_func):
         # The user data is correct; log in the user in and continue.
         else:
             if user.check_password(request.POST.get('password', '')):
-                request.session[users.SESSION_KEY] = user.id
+                request.session[SESSION_KEY] = user.id
                 if request.POST.has_key('post_data'):
                     post_data = _decode_post_data(request.POST['post_data'])
                     if post_data and not post_data.has_key(LOGIN_FORM_KEY):

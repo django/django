@@ -97,13 +97,13 @@ class ModPythonRequest(httpwrappers.HttpRequest):
 
     def _get_user(self):
         if not hasattr(self, '_user'):
-            from django.models.auth import users
+            from django.models.auth import User, SESSION_KEY
             try:
-                user_id = self.session[users.SESSION_KEY]
+                user_id = self.session[SESSION_KEY]
                 if not user_id:
                     raise ValueError
-                self._user = users.get_object(pk=user_id)
-            except (AttributeError, KeyError, ValueError, users.UserDoesNotExist):
+                self._user = User.objects.get_object(pk=user_id)
+            except (AttributeError, KeyError, ValueError, user.DoesNotExist):
                 from django.parts.auth import anonymoususers
                 self._user = anonymoususers.AnonymousUser()
         return self._user

@@ -3,6 +3,8 @@ from django.db import models
 from django.models import core
 from django.utils.translation import gettext_lazy as _
 
+SESSION_KEY = '_auth_user_id'
+
 class Permission(models.Model):
     name = models.CharField(_('name'), maxlength=50)
     package = models.ForeignKey(core.Package, db_column='package')
@@ -47,9 +49,6 @@ class User(models.Model):
     class META:
         verbose_name = _('User')
         verbose_name_plural = _('Users')
-        module_constants = {
-            'SESSION_KEY': '_auth_user_id',
-        }
         ordering = ('username',)
         exceptions = ('SiteProfileNotAvailable',)
         admin = models.Admin(

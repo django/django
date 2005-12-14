@@ -1,6 +1,6 @@
 from django.core.exceptions import ImproperlyConfigured, ObjectDoesNotExist
 from django.core.template import Context, loader, Template, TemplateDoesNotExist
-from django.models.core import sites
+from django.models.core import Site
 from django.utils import feedgenerator
 from django.conf.settings import LANGUAGE_CODE, SETTINGS_MODULE
 
@@ -52,7 +52,7 @@ class Feed:
         else:
             obj = None
 
-        current_site = sites.get_current()
+        current_site = Site.objects.get_current()
         link = self.__get_dynamic_attr('link', obj)
         link = add_domain(current_site.domain, link)
 
