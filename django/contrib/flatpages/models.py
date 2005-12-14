@@ -1,4 +1,4 @@
-from django.core validators
+from django.core import validators
 from django.db import models
 from django.models.core import Site
 from django.utils.translation import gettext_lazy as _
