@@ -928,6 +928,34 @@ class Model:
             cls.get_next_in_order = curry(cls.__get_next_or_previous_in_order, is_next=True)
             cls.get_previous_in_order = curry(cls.__get_next_or_previous_in_order, is_next=False)
 
+        # Add "get_thingie", "get_thingie_count" and "get_thingie_list" methods
+        # for all related objects.
+        for related in cls._meta.get_all_related_objects():
+            # Determine whether this related object is in another app.
+            # If it's in another app, the method names will have the app
+            # label prepended, and the add_BLAH() method will not be
+            # generated.
+            rel_obj_name = related.get_method_name_part()
+            if isinstance(related.field.rel, meta.OneToOne):
+                # Add "get_thingie" methods for one-to-one related objects.
+                # EXAMPLE: Place.get_restaurants_restaurant()
+                setattr(cls, 'get_%s' % rel_obj_name, curry(cls.__get_related, method_name='get_object', rel_class=related.model, rel_field=related.field))
+            elif isinstance(related.field.rel, meta.ManyToOne):
+                # Add "get_thingie" methods for many-to-one related objects.
+                # EXAMPLE: Poll.get_choice()
+                setattr(cls, 'get_%s' % rel_obj_name, curry(cls.__get_related, method_name='get_object', rel_class=related.model, rel_field=related.field))
+                # Add "get_thingie_count" methods for many-to-one related objects.
+                # EXAMPLE: Poll.get_choice_count()
+                setattr(cls, 'get_%s_count' % rel_obj_name, curry(cls.__get_related, method_name='get_count', rel_class=related.model, rel_field=related.field))
+                # Add "get_thingie_list" methods for many-to-one related objects.
+                # EXAMPLE: Poll.get_choice_list()
+                setattr(cls, 'get_%s_list' % rel_obj_name, curry(cls.__get_related, method_name='get_list', rel_class=related.model, rel_field=related.field))
+                # Add "add_thingie" methods for many-to-one related objects,
+                # but only for related objects that are in the same app.
+                # EXAMPLE: Poll.add_choice()
+                if related.opts.app_label == cls._meta.app_label:
+                    setattr(cls, 'add_%s' % rel_obj_name, curry(cls.__add_related, rel_class=related.model, rel_field=related.field))
+
     _prepare = classmethod(_prepare)
 
     def save(self):
@@ -1195,6 +1223,24 @@ class Model:
 
     __set_many_to_many_objects.alters_data = True
 
+    def __get_related(self, method_name, rel_class, rel_field, **kwargs):
+        kwargs['%s__%s__exact' % (rel_field.name, rel_field.rel.to._meta.pk.name)] = getattr(self, rel_field.rel.get_related_field().attname)
+        kwargs.update(rel_field.rel.lookup_overrides)
+        return getattr(rel_class.objects, method_name)(**kwargs)
+
+    def __add_related(self, rel_class, rel_field, *args, **kwargs):
+        init_kwargs = dict(zip([f.attname for f in rel_class._meta.fields if f != rel_field and not isinstance(f, AutoField)], args))
+        init_kwargs.update(kwargs)
+        for f in rel_class._meta.fields:
+            if isinstance(f, AutoField):
+                init_kwargs[f.attname] = None
+        init_kwargs[rel_field.name] = self
+        obj = rel_class(**init_kwargs)
+        obj.save()
+        return obj
+
+    __add_related.alters_data = True
+
 class Manager(object):
     def __init__(self, model_class):
         self.klass = model_class
@@ -1389,29 +1435,6 @@ class Manager(object):
 ############################################
 
 # RELATIONSHIP METHODS #####################
-
-# Handles related-object retrieval.
-# Examples: Poll.get_choice(), Poll.get_choice_list(), Poll.get_choice_count()
-def method_get_related(method_name, rel_mod, rel_field, self, **kwargs):
-    if self._meta.has_related_links and rel_mod.Klass._meta.module_name == 'relatedlinks':
-        kwargs['object_id__exact'] = getattr(self, rel_field.rel.field_name)
-    else:
-        kwargs['%s__%s__exact' % (rel_field.name, rel_field.rel.to._meta.pk.name)] = getattr(self, rel_field.rel.get_related_field().attname)
-    kwargs.update(rel_field.rel.lookup_overrides)
-    return getattr(rel_mod.Klass.objects, method_name)(**kwargs)
-
-# Handles adding related objects.
-# Example: Poll.add_choice()
-def method_add_related(rel_obj, rel_mod, rel_field, self, *args, **kwargs):
-    init_kwargs = dict(zip([f.attname for f in rel_obj.fields if f != rel_field and not isinstance(f, AutoField)], args))
-    init_kwargs.update(kwargs)
-    for f in rel_obj.fields:
-        if isinstance(f, AutoField):
-            init_kwargs[f.attname] = None
-    init_kwargs[rel_field.name] = self
-    obj = rel_mod.Klass(**init_kwargs)
-    obj.save()
-    return obj
 
 # Handles related many-to-many object retrieval.
 # Examples: Album.get_song(), Album.get_song_list(), Album.get_song_count()
