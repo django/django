@@ -11,7 +11,7 @@ msgstr ""
 "PO-Revision-Date: 2005-12-06 21:32+0100\n"
 "Last-Translator: Jorge Gajon <gajon@gajon.org>\n"
 "MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=utf-8\n"
+"Content-Type: text/plain; charset=ISO-8859-1\n"
 "Content-Transfer-Encoding: 8bit\n"
 
 #: contrib/admin/media/js/SelectFilter2.js:33
@@ -56,7 +56,7 @@ msgstr ""
 
 #: contrib/admin/media/js/dateparse.js:27
 msgid "Sunday Monday Tuesday Wednesday Thursday Friday Saturday"
-msgstr "Domingo Lunes Martes MiÃ©rcoles Jueves Viernes SÃ¡bado"
+msgstr "Domingo Lunes Martes Miércoles Jueves Viernes Sábado"
 
 #: contrib/admin/media/js/calendar.js:25
 msgid "S M T W T F S"
@@ -85,7 +85,7 @@ msgstr "6 a.m."
 
 #: contrib/admin/media/js/admin/DateTimeShortcuts.js:83
 msgid "Noon"
-msgstr "MediodÃ­a"
+msgstr "Mediodía"
 
 #: contrib/admin/media/js/admin/DateTimeShortcuts.js:87
 #: contrib/admin/media/js/admin/DateTimeShortcuts.js:168
@@ -107,4 +107,4 @@ msgstr "Ayer"
 
 #: contrib/admin/media/js/admin/DateTimeShortcuts.js:164
 msgid "Tomorrow"
-msgstr "MaÃ±ana"
+msgstr "Mañana"
