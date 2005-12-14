@@ -68,7 +68,7 @@ class TestRunner:
         # Manually set INSTALLED_APPS to point to the test models.
         settings.INSTALLED_APPS = [MODEL_TESTS_DIR_NAME + '.' + a for a in get_test_models()]
 
-        from django.core.db import db
+        from django.db import connection
         from django.core import management
 
         # Determine which models we're going to test.
@@ -93,9 +93,9 @@ class TestRunner:
             # Create the test database and connect to it. We need autocommit()
             # because PostgreSQL doesn't allow CREATE DATABASE statements
             # within transactions.
-            cursor = db.cursor()
+            cursor = connection.cursor()
             try:
-                db.connection.autocommit(1)
+                connection.connection.autocommit(1)
             except AttributeError:
                 pass
             self.output(1, "Creating test database")
@@ -110,12 +110,12 @@ class TestRunner:
                 else:
                     print "Tests cancelled."
                     return
-        db.close()
+        connection.close()
         old_database_name = settings.DATABASE_NAME
         settings.DATABASE_NAME = TEST_DATABASE_NAME
 
         # Initialize the test database.
-        cursor = db.cursor()
+        cursor = connection.cursor()
         self.output(1, "Initializing test database")
         management.init()
 
@@ -145,7 +145,7 @@ class TestRunner:
             finally:
                 # Rollback, in case of database errors. Otherwise they'd have
                 # side effects on other tests.
-                db.rollback()
+                connection.rollback()
 
         if not self.which_tests:
             # Run the non-model tests in the other tests dir
@@ -178,12 +178,12 @@ class TestRunner:
         # to do so, because it's not allowed to delete a database while being
         # connected to it.
         if settings.DATABASE_ENGINE != "sqlite3":
-            db.close()
+            connection.close()
             settings.DATABASE_NAME = old_database_name
-            cursor = db.cursor()
+            cursor = connection.cursor()
             self.output(1, "Deleting test database")
             try:
-                db.connection.autocommit(1)
+                connection.connection.autocommit(1)
             except AttributeError:
                 pass
             else:

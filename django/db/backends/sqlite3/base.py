@@ -54,10 +54,10 @@ class DatabaseWrapper:
             self.connection.close()
             self.connection = None
 
-    def quote_name(self, name):
-        if name.startswith('"') and name.endswith('"'):
-            return name # Quoting once is enough.
-        return '"%s"' % name
+def quote_name(name):
+    if name.startswith('"') and name.endswith('"'):
+        return name # Quoting once is enough.
+    return '"%s"' % name
 
 dictfetchone = util.dictfetchone
 dictfetchmany = util.dictfetchmany
@@ -145,34 +145,4 @@ OPERATOR_MAPPING = {
     'endswith': "LIKE %s ESCAPE '\\'",
     'istartswith': "LIKE %s ESCAPE '\\'",
     'iendswith': "LIKE %s ESCAPE '\\'",
-}
-
-# SQLite doesn't actually support most of these types, but it "does the right
-# thing" given more verbose field definitions, so leave them as is so that
-# schema inspection is more useful.
-DATA_TYPES = {
-    'AutoField':                    'integer',
-    'BooleanField':                 'bool',
-    'CharField':                    'varchar(%(maxlength)s)',
-    'CommaSeparatedIntegerField':   'varchar(%(maxlength)s)',
-    'DateField':                    'date',
-    'DateTimeField':                'datetime',
-    'FileField':                    'varchar(100)',
-    'FilePathField':                'varchar(100)',
-    'FloatField':                   'numeric(%(max_digits)s, %(decimal_places)s)',
-    'ImageField':                   'varchar(100)',
-    'IntegerField':                 'integer',
-    'IPAddressField':               'char(15)',
-    'ManyToManyField':              None,
-    'NullBooleanField':             'bool',
-    'OneToOneField':                'integer',
-    'PhoneNumberField':             'varchar(20)',
-    'PositiveIntegerField':         'integer unsigned',
-    'PositiveSmallIntegerField':    'smallint unsigned',
-    'SlugField':                    'varchar(50)',
-    'SmallIntegerField':            'smallint',
-    'TextField':                    'text',
-    'TimeField':                    'time',
-    'URLField':                     'varchar(200)',
-    'USStateField':                 'varchar(2)',
 }

@@ -76,10 +76,10 @@ class DatabaseWrapper:
             self.connection.close()
             self.connection = None
 
-    def quote_name(self, name):
-        if name.startswith('[') and name.endswith(']'):
-            return name # Quoting once is enough.
-        return '[%s]' % name
+def quote_name(name):
+    if name.startswith('[') and name.endswith(']'):
+        return name # Quoting once is enough.
+    return '[%s]' % name
 
 dictfetchone = util.dictfetchone
 dictfetchmany = util.dictfetchmany
@@ -126,31 +126,4 @@ OPERATOR_MAPPING = {
     'endswith': 'LIKE %s',
     'istartswith': 'LIKE %s',
     'iendswith': 'LIKE %s',
-}
-
-DATA_TYPES = {
-    'AutoField':         'int IDENTITY (1, 1)',
-    'BooleanField':      'bit',
-    'CharField':         'varchar(%(maxlength)s)',
-    'CommaSeparatedIntegerField': 'varchar(%(maxlength)s)',
-    'DateField':         'smalldatetime',
-    'DateTimeField':     'smalldatetime',
-    'FileField':         'varchar(100)',
-    'FilePathField':     'varchar(100)',
-    'FloatField':        'numeric(%(max_digits)s, %(decimal_places)s)',
-    'ImageField':        'varchar(100)',
-    'IntegerField':      'int',
-    'IPAddressField':    'char(15)',
-    'ManyToManyField':   None,
-    'NullBooleanField':  'bit',
-    'OneToOneField':     'int',
-    'PhoneNumberField':  'varchar(20)',
-    'PositiveIntegerField': 'int CONSTRAINT [CK_int_pos_%(column)s] CHECK ([%(column)s] > 0)',
-    'PositiveSmallIntegerField': 'smallint CONSTRAINT [CK_smallint_pos_%(column)s] CHECK ([%(column)s] > 0)',
-    'SlugField':         'varchar(50)',
-    'SmallIntegerField': 'smallint',
-    'TextField':         'text',
-    'TimeField':         'time',
-    'URLField':          'varchar(200)',
-    'USStateField':      'varchar(2)',
 }

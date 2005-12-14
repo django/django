@@ -1,7 +1,7 @@
 from django.conf import settings
 from django.core import formfields, validators
-from django.core import db
 from django.core.exceptions import ObjectDoesNotExist
+from django.db import backend, connection
 from django.db.models.fields import *
 from django.utils.functional import curry
 from django.utils.text import capfirst
@@ -58,15 +58,15 @@ def orderfield2column(f, opts):
 
 def orderlist2sql(order_list, opts, prefix=''):
     if prefix.endswith('.'):
-        prefix = db.db.quote_name(prefix[:-1]) + '.'
+        prefix = backend.quote_name(prefix[:-1]) + '.'
     output = []
     for f in handle_legacy_orderlist(order_list):
         if f.startswith('-'):
-            output.append('%s%s DESC' % (prefix, db.db.quote_name(orderfield2column(f[1:], opts))))
+            output.append('%s%s DESC' % (prefix, backend.quote_name(orderfield2column(f[1:], opts))))
         elif f == '?':
-            output.append(db.get_random_function_sql())
+            output.append(backend.get_random_function_sql())
         else:
-            output.append('%s%s ASC' % (prefix, db.db.quote_name(orderfield2column(f, opts))))
+            output.append('%s%s ASC' % (prefix, backend.quote_name(orderfield2column(f, opts))))
     return ', '.join(output)
 
 def get_module(app_label, module_name):
@@ -536,24 +536,6 @@ class Options:
                 self._field_types[field_type] = False
         return self._field_types[field_type]
 
-def _reassign_globals(function_dict, extra_globals, namespace):
-    new_functions = {}
-    for k, v in function_dict.items():
-        # Get the code object.
-        code = v.func_code
-        # Recreate the function, but give it access to extra_globals and the
-        # given namespace's globals, too.
-        new_globals = {'__builtins__': __builtins__, 'db': db.db, 'datetime': datetime}
-        new_globals.update(extra_globals.__dict__)
-        func = types.FunctionType(code, globals=new_globals, name=k, argdefs=v.func_defaults)
-        func.__dict__.update(v.__dict__)
-        setattr(namespace, k, func)
-        # For all of the custom functions that have been added so far, give
-        # them access to the new function we've just created.
-        for new_k, new_v in new_functions.items():
-            new_v.func_globals[k] = func
-        new_functions[k] = func
-
 # Calculate the module_name using a poor-man's pluralization.
 get_module_name = lambda class_name: class_name.lower() + 's'
 
@@ -582,12 +564,12 @@ class Manager(object):
             if ' ' in word:
                 return word
             else:
-                return db.db.quote_name(word)
+                return backend.quote_name(word)
 
         opts = self.klass._meta
 
         # Construct the fundamental parts of the query: SELECT X FROM Y WHERE Z.
-        select = ["%s.%s" % (db.db.quote_name(opts.db_table), db.db.quote_name(f.column)) for f in opts.fields]
+        select = ["%s.%s" % (backend.quote_name(opts.db_table), backend.quote_name(f.column)) for f in opts.fields]
         tables = [opts.db_table] + (kwargs.get('tables') and kwargs['tables'][:] or [])
         tables = [quote_only_if_word(t) for t in tables]
         where = kwargs.get('where') and kwargs['where'][:] or []
@@ -608,13 +590,13 @@ class Manager(object):
 
         # Add any additional SELECTs passed in via kwargs.
         if kwargs.get('select'):
-            select.extend(['(%s) AS %s' % (quote_only_if_word(s[1]), db.db.quote_name(s[0])) for s in kwargs['select']])
+            select.extend(['(%s) AS %s' % (quote_only_if_word(s[1]), backend.quote_name(s[0])) for s in kwargs['select']])
 
         # ORDER BY clause
         order_by = []
         for f in handle_legacy_orderlist(kwargs.get('order_by', opts.ordering)):
             if f == '?': # Special case.
-                order_by.append(db.get_random_function_sql())
+                order_by.append(backend.get_random_function_sql())
             else:
                 if f.startswith('-'):
                     col_name = f[1:]
@@ -624,20 +606,20 @@ class Manager(object):
                     order = "ASC"
                 if "." in col_name:
                     table_prefix, col_name = col_name.split('.', 1)
-                    table_prefix = db.db.quote_name(table_prefix) + '.'
+                    table_prefix = backend.quote_name(table_prefix) + '.'
                 else:
                     # Use the database table as a column prefix if it wasn't given,
                     # and if the requested column isn't a custom SELECT.
                     if "." not in col_name and col_name not in [k[0] for k in kwargs.get('select', [])]:
-                        table_prefix = db.db.quote_name(opts.db_table) + '.'
+                        table_prefix = backend.quote_name(opts.db_table) + '.'
                     else:
                         table_prefix = ''
-                order_by.append('%s%s %s' % (table_prefix, db.db.quote_name(orderfield2column(col_name, opts)), order))
+                order_by.append('%s%s %s' % (table_prefix, backend.quote_name(orderfield2column(col_name, opts)), order))
         order_by = ", ".join(order_by)
 
         # LIMIT and OFFSET clauses
         if kwargs.get('limit') is not None:
-            limit_sql = " %s " % db.get_limit_offset_sql(kwargs['limit'], kwargs.get('offset'))
+            limit_sql = " %s " % backend.get_limit_offset_sql(kwargs['limit'], kwargs.get('offset'))
         else:
             assert kwargs.get('offset') is None, "'offset' is not allowed without 'limit'"
             limit_sql = ""
@@ -649,7 +631,7 @@ class Manager(object):
         # undefined, so we convert it to a list of tuples internally.
         kwargs['select'] = kwargs.get('select', {}).items()
 
-        cursor = db.db.cursor()
+        cursor = connection.cursor()
         select, sql, params = self._get_sql_clause(**kwargs)
         cursor.execute("SELECT " + (kwargs.get('distinct') and "DISTINCT " or "") + ",".join(select) + sql, params)
         fill_cache = kwargs.get('select_related')
@@ -676,7 +658,7 @@ class Manager(object):
         kwargs['limit'] = None
         kwargs['select_related'] = False
         _, sql, params = self._get_sql_clause(**kwargs)
-        cursor = db.db.cursor()
+        cursor = connection.cursor()
         cursor.execute("SELECT COUNT(*)" + sql, params)
         return cursor.fetchone()[0]
 
@@ -690,7 +672,7 @@ class Manager(object):
     def get_in_bulk(self, *args, **kwargs):
         id_list = args and args[0] or kwargs['id_list']
         assert id_list != [], "get_in_bulk() cannot be passed an empty list."
-        kwargs['where'] = ["%s.%s IN (%s)" % (db.db.quote_name(self.klass._meta.db_table), db.db.quote_name(self.klass._meta.pk.column), ",".join(['%s'] * len(id_list)))]
+        kwargs['where'] = ["%s.%s IN (%s)" % (backend.quote_name(self.klass._meta.db_table), backend.quote_name(self.klass._meta.pk.column), ",".join(['%s'] * len(id_list)))]
         kwargs['params'] = id_list
         obj_list = self.get_list(**kwargs)
         return dict([(getattr(o, self.klass._meta.pk.attname), o) for o in obj_list])
@@ -706,9 +688,9 @@ class Manager(object):
         except KeyError: # Default to all fields.
             fields = [f.column for f in self.klass._meta.fields]
 
-        cursor = db.db.cursor()
+        cursor = connection.cursor()
         _, sql, params = self._get_sql_clause(**kwargs)
-        select = ['%s.%s' % (db.db.quote_name(self.klass._meta.db_table), db.db.quote_name(f)) for f in fields]
+        select = ['%s.%s' % (backend.quote_name(self.klass._meta.db_table), backend.quote_name(f)) for f in fields]
         cursor.execute("SELECT " + (kwargs.get('distinct') and "DISTINCT " or "") + ",".join(select) + sql, params)
         while 1:
             rows = cursor.fetchmany(GET_ITERATOR_CHUNK_SIZE)
@@ -726,7 +708,7 @@ class Manager(object):
         return self.get_object(**kwargs)
 
     def __get_date_list(self, field, *args, **kwargs):
-        from django.core.db.typecasts import typecast_timestamp
+        from django.db.backends.util import typecast_timestamp
         kind = args and args[0] or kwargs['kind']
         assert kind in ("month", "year", "day"), "'kind' must be one of 'year', 'month' or 'day'."
         order = 'ASC'
@@ -737,12 +719,12 @@ class Manager(object):
         kwargs['order_by'] = () # Clear this because it'll mess things up otherwise.
         if field.null:
             kwargs.setdefault('where', []).append('%s.%s IS NOT NULL' % \
-                (db.db.quote_name(self.klass._meta.db_table), db.db.quote_name(field.column)))
+                (backend.quote_name(self.klass._meta.db_table), backend.quote_name(field.column)))
         select, sql, params = self._get_sql_clause(**kwargs)
         sql = 'SELECT %s %s GROUP BY 1 ORDER BY 1 %s' % \
-            (db.get_date_trunc_sql(kind, '%s.%s' % (db.db.quote_name(self.klass._meta.db_table),
-            db.db.quote_name(field.column))), sql, order)
-        cursor = db.db.cursor()
+            (backend.get_date_trunc_sql(kind, '%s.%s' % (backend.quote_name(self.klass._meta.db_table),
+            backend.quote_name(field.column))), sql, order)
+        cursor = connection.cursor()
         cursor.execute(sql, params)
         # We have to manually run typecast_timestamp(str()) on the results, because
         # MySQL doesn't automatically cast the result of date functions as datetime
@@ -969,7 +951,7 @@ class Model(object):
             self._pre_save()
 
         non_pks = [f for f in self._meta.fields if not f.primary_key]
-        cursor = db.db.cursor()
+        cursor = connection.cursor()
 
         # First, try an UPDATE. If that doesn't update anything, do an INSERT.
         pk_val = getattr(self, self._meta.pk.attname)
@@ -978,19 +960,19 @@ class Model(object):
         if pk_set:
             # Determine whether a record with the primary key already exists.
             cursor.execute("SELECT 1 FROM %s WHERE %s=%%s LIMIT 1" % \
-                (db.db.quote_name(self._meta.db_table), db.db.quote_name(self._meta.pk.column)), [pk_val])
+                (backend.quote_name(self._meta.db_table), backend.quote_name(self._meta.pk.column)), [pk_val])
             # If it does already exist, do an UPDATE.
             if cursor.fetchone():
                 db_values = [f.get_db_prep_save(f.pre_save(getattr(self, f.attname), False)) for f in non_pks]
                 cursor.execute("UPDATE %s SET %s WHERE %s=%%s" % \
-                    (db.db.quote_name(self._meta.db_table),
-                    ','.join(['%s=%%s' % db.db.quote_name(f.column) for f in non_pks]),
-                    db.db.quote_name(self._meta.pk.attname)),
+                    (backend.quote_name(self._meta.db_table),
+                    ','.join(['%s=%%s' % backend.quote_name(f.column) for f in non_pks]),
+                    backend.quote_name(self._meta.pk.attname)),
                     db_values + [pk_val])
             else:
                 record_exists = False
         if not pk_set or not record_exists:
-            field_names = [db.db.quote_name(f.column) for f in self._meta.fields if not isinstance(f, AutoField)]
+            field_names = [backend.quote_name(f.column) for f in self._meta.fields if not isinstance(f, AutoField)]
             db_values = [f.get_db_prep_save(f.pre_save(getattr(self, f.attname), True)) for f in self._meta.fields if not isinstance(f, AutoField)]
             # If the PK has been manually set, respect that.
             if pk_set:
@@ -998,17 +980,17 @@ class Model(object):
                 db_values += [f.get_db_prep_save(f.pre_save(getattr(self, f.column), True)) for f in self._meta.fields if isinstance(f, AutoField)]
             placeholders = ['%s'] * len(field_names)
             if self._meta.order_with_respect_to:
-                field_names.append(db.db.quote_name('_order'))
+                field_names.append(backend.quote_name('_order'))
                 # TODO: This assumes the database supports subqueries.
                 placeholders.append('(SELECT COUNT(*) FROM %s WHERE %s = %%s)' % \
-                    (db.db.quote_name(self._meta.db_table), db.db.quote_name(self._meta.order_with_respect_to.column)))
+                    (backend.quote_name(self._meta.db_table), backend.quote_name(self._meta.order_with_respect_to.column)))
                 db_values.append(getattr(self, self._meta.order_with_respect_to.attname))
             cursor.execute("INSERT INTO %s (%s) VALUES (%s)" % \
-                (db.db.quote_name(self._meta.db_table), ','.join(field_names),
+                (backend.quote_name(self._meta.db_table), ','.join(field_names),
                 ','.join(placeholders)), db_values)
             if self._meta.has_auto_field and not pk_set:
-                setattr(self, self._meta.pk.attname, db.get_last_insert_id(cursor, self._meta.db_table, self._meta.pk.column))
-        db.db.commit()
+                setattr(self, self._meta.pk.attname, backend.get_last_insert_id(cursor, self._meta.db_table, self._meta.pk.column))
+        connection.commit()
 
         # Run any post-save hooks.
         if hasattr(self, '_post_save'):
@@ -1023,7 +1005,7 @@ class Model(object):
         if hasattr(self, '_pre_delete'):
             self._pre_delete()
 
-        cursor = db.db.cursor()
+        cursor = connection.cursor()
         for related in self._meta.get_all_related_objects():
             rel_opts_name = related.get_method_name_part()
             if isinstance(related.field.rel, OneToOne):
@@ -1038,17 +1020,17 @@ class Model(object):
                     sub_obj.delete()
         for related in self._meta.get_all_related_many_to_many_objects():
             cursor.execute("DELETE FROM %s WHERE %s=%%s" % \
-                (db.db.quote_name(related.field.get_m2m_db_table(related.opts)),
-                db.db.quote_name(self._meta.object_name.lower() + '_id')), [getattr(self, self._meta.pk.attname)])
+                (backend.quote_name(related.field.get_m2m_db_table(related.opts)),
+                backend.quote_name(self._meta.object_name.lower() + '_id')), [getattr(self, self._meta.pk.attname)])
         for f in self._meta.many_to_many:
             cursor.execute("DELETE FROM %s WHERE %s=%%s" % \
-                (db.db.quote_name(f.get_m2m_db_table(self._meta)),
-                db.db.quote_name(self._meta.object_name.lower() + '_id')),
+                (backend.quote_name(f.get_m2m_db_table(self._meta)),
+                backend.quote_name(self._meta.object_name.lower() + '_id')),
                 [getattr(self, self._meta.pk.attname)])
         cursor.execute("DELETE FROM %s WHERE %s=%%s" % \
-            (db.db.quote_name(self._meta.db_table), db.db.quote_name(self._meta.pk.column)),
+            (backend.quote_name(self._meta.db_table), backend.quote_name(self._meta.pk.column)),
             [getattr(self, self._meta.pk.attname)])
-        db.db.commit()
+        connection.commit()
         setattr(self, self._meta.pk.attname, None)
         for f in self._meta.fields:
             if isinstance(f, FileField) and getattr(self, f.attname):
@@ -1071,8 +1053,8 @@ class Model(object):
     def __get_next_or_previous_by_FIELD(self, field, is_next, **kwargs):
         op = is_next and '>' or '<'
         kwargs.setdefault('where', []).append('(%s %s %%s OR (%s = %%s AND %s.%s %s %%s))' % \
-            (db.db.quote_name(field.column), op, db.db.quote_name(field.column),
-            db.db.quote_name(self._meta.db_table), db.db.quote_name(self._meta.pk.column), op))
+            (backend.quote_name(field.column), op, backend.quote_name(field.column),
+            backend.quote_name(self._meta.db_table), backend.quote_name(self._meta.pk.column), op))
         param = str(getattr(self, field.attname))
         kwargs.setdefault('params', []).extend([param, param, getattr(self, self._meta.pk.attname)])
         kwargs['order_by'] = [(not is_next and '-' or '') + field.name, (not is_next and '-' or '') + self._meta.pk.name]
@@ -1086,9 +1068,9 @@ class Model(object):
             order_field = self.order_with_respect_to
             obj = self.objects.get_object(order_by=('_order',),
                 where=['%s %s (SELECT %s FROM %s WHERE %s=%%s)' % \
-                    (db.db.quote_name('_order'), op, db.db.quote_name('_order'),
-                    db.db.quote_name(opts.db_table), db.db.quote_name(opts.pk.column)),
-                    '%s=%%s' % db.db.quote_name(order_field.column)],
+                    (backend.quote_name('_order'), op, backend.quote_name('_order'),
+                    backend.quote_name(opts.db_table), backend.quote_name(opts.pk.column)),
+                    '%s=%%s' % backend.quote_name(order_field.column)],
                 limit=1,
                 params=[getattr(self, opts.pk.attname), getattr(self, order_field.attname)])
             setattr(self, cachename, obj)
@@ -1180,13 +1162,13 @@ class Model(object):
         if not hasattr(self, cache_var):
             rel_opts = field_with_rel.rel.to._meta
             sql = "SELECT %s FROM %s a, %s b WHERE a.%s = b.%s AND b.%s = %%s %s" % \
-                (','.join(['a.%s' % db.db.quote_name(f.column) for f in rel_opts.fields]),
-                db.db.quote_name(rel_opts.db_table),
-                db.db.quote_name(field_with_rel.get_m2m_db_table(self._meta)),
-                db.db.quote_name(rel_opts.pk.column),
-                db.db.quote_name(rel_opts.object_name.lower() + '_id'),
-                db.db.quote_name(self._meta.object_name.lower() + '_id'), rel_opts.get_order_sql('a'))
-            cursor = db.db.cursor()
+                (','.join(['a.%s' % backend.quote_name(f.column) for f in rel_opts.fields]),
+                backend.quote_name(rel_opts.db_table),
+                backend.quote_name(field_with_rel.get_m2m_db_table(self._meta)),
+                backend.quote_name(rel_opts.pk.column),
+                backend.quote_name(rel_opts.object_name.lower() + '_id'),
+                backend.quote_name(self._meta.object_name.lower() + '_id'), rel_opts.get_order_sql('a'))
+            cursor = connection.cursor()
             cursor.execute(sql, [getattr(self, self._meta.pk.attname)])
             setattr(self, cache_var, [field_with_rel.rel.to(*row) for row in cursor.fetchall()])
         return getattr(self, cache_var)
@@ -1205,21 +1187,21 @@ class Model(object):
             return False # No change
         rel = field_with_rel.rel.to._meta
         m2m_table = field_with_rel.get_m2m_db_table(self._meta)
-        cursor = db.db.cursor()
+        cursor = connection.cursor()
         this_id = getattr(self, self._meta.pk.attname)
         if ids_to_delete:
             sql = "DELETE FROM %s WHERE %s = %%s AND %s IN (%s)" % \
-                (db.db.quote_name(m2m_table),
-                db.db.quote_name(self._meta.object_name.lower() + '_id'),
-                db.db.quote_name(rel.object_name.lower() + '_id'), ','.join(map(str, ids_to_delete)))
+                (backend.quote_name(m2m_table),
+                backend.quote_name(self._meta.object_name.lower() + '_id'),
+                backend.quote_name(rel.object_name.lower() + '_id'), ','.join(map(str, ids_to_delete)))
             cursor.execute(sql, [this_id])
         if ids_to_add:
             sql = "INSERT INTO %s (%s, %s) VALUES (%%s, %%s)" % \
-                (db.db.quote_name(m2m_table),
-                db.db.quote_name(self._meta.object_name.lower() + '_id'),
-                db.db.quote_name(rel.object_name.lower() + '_id'))
+                (backend.quote_name(m2m_table),
+                backend.quote_name(self._meta.object_name.lower() + '_id'),
+                backend.quote_name(rel.object_name.lower() + '_id'))
             cursor.executemany(sql, [(this_id, i) for i in ids_to_add])
-        db.db.commit()
+        connection.commit()
         try:
             delattr(self, '_%s_cache' % field_with_rel.name) # clear cache, if it exists
         except AttributeError:
@@ -1265,38 +1247,38 @@ def method_set_related_many_to_many(rel_opts, rel_field, self, id_list):
     rel = rel_field.rel.to
     m2m_table = rel_field.get_m2m_db_table(rel_opts)
     this_id = getattr(self, self._meta.pk.attname)
-    cursor = db.db.cursor()
+    cursor = connection.cursor()
     cursor.execute("DELETE FROM %s WHERE %s = %%s" % \
-        (db.db.quote_name(m2m_table),
-        db.db.quote_name(rel.object_name.lower() + '_id')), [this_id])
+        (backend.quote_name(m2m_table),
+        backend.quote_name(rel.object_name.lower() + '_id')), [this_id])
     sql = "INSERT INTO %s (%s, %s) VALUES (%%s, %%s)" % \
-        (db.db.quote_name(m2m_table),
-        db.db.quote_name(rel.object_name.lower() + '_id'),
-        db.db.quote_name(rel_opts.object_name.lower() + '_id'))
+        (backend.quote_name(m2m_table),
+        backend.quote_name(rel.object_name.lower() + '_id'),
+        backend.quote_name(rel_opts.object_name.lower() + '_id'))
     cursor.executemany(sql, [(this_id, i) for i in id_list])
-    db.db.commit()
+    connection.commit()
 
 # ORDERING METHODS #########################
 
 def method_set_order(ordered_obj, self, id_list):
-    cursor = db.db.cursor()
+    cursor = connection.cursor()
     # Example: "UPDATE poll_choices SET _order = %s WHERE poll_id = %s AND id = %s"
     sql = "UPDATE %s SET %s = %%s WHERE %s = %%s AND %s = %%s" % \
-        (db.db.quote_name(ordered_obj.db_table), db.db.quote_name('_order'),
-        db.db.quote_name(ordered_obj.order_with_respect_to.column),
-        db.db.quote_name(ordered_obj.pk.column))
+        (backend.quote_name(ordered_obj.db_table), backend.quote_name('_order'),
+        backend.quote_name(ordered_obj.order_with_respect_to.column),
+        backend.quote_name(ordered_obj.pk.column))
     rel_val = getattr(self, ordered_obj.order_with_respect_to.rel.field_name)
     cursor.executemany(sql, [(i, rel_val, j) for i, j in enumerate(id_list)])
-    db.db.commit()
+    connection.commit()
 
 def method_get_order(ordered_obj, self):
-    cursor = db.db.cursor()
+    cursor = connection.cursor()
     # Example: "SELECT id FROM poll_choices WHERE poll_id = %s ORDER BY _order"
     sql = "SELECT %s FROM %s WHERE %s = %%s ORDER BY %s" % \
-        (db.db.quote_name(ordered_obj.pk.column),
-        db.db.quote_name(ordered_obj.db_table),
-        db.db.quote_name(ordered_obj.order_with_respect_to.column),
-        db.db.quote_name('_order'))
+        (backend.quote_name(ordered_obj.pk.column),
+        backend.quote_name(ordered_obj.db_table),
+        backend.quote_name(ordered_obj.order_with_respect_to.column),
+        backend.quote_name('_order'))
     rel_val = getattr(self, ordered_obj.order_with_respect_to.rel.field_name)
     cursor.execute(sql, [rel_val])
     return [r[0] for r in cursor.fetchall()]
@@ -1310,10 +1292,10 @@ def get_absolute_url(opts, func, self):
 
 def _get_where_clause(lookup_type, table_prefix, field_name, value):
     if table_prefix.endswith('.'):
-        table_prefix = db.db.quote_name(table_prefix[:-1])+'.'
-    field_name = db.db.quote_name(field_name)
+        table_prefix = backend.quote_name(table_prefix[:-1])+'.'
+    field_name = backend.quote_name(field_name)
     try:
-        return '%s%s %s' % (table_prefix, field_name, (db.OPERATOR_MAPPING[lookup_type] % '%s'))
+        return '%s%s %s' % (table_prefix, field_name, (backend.OPERATOR_MAPPING[lookup_type] % '%s'))
     except KeyError:
         pass
     if lookup_type == 'in':
@@ -1321,7 +1303,7 @@ def _get_where_clause(lookup_type, table_prefix, field_name, value):
     elif lookup_type in ('range', 'year'):
         return '%s%s BETWEEN %%s AND %%s' % (table_prefix, field_name)
     elif lookup_type in ('month', 'day'):
-        return "%s = %%s" % db.get_date_extract_sql(lookup_type, table_prefix + field_name)
+        return "%s = %%s" % backend.get_date_extract_sql(lookup_type, table_prefix + field_name)
     elif lookup_type == 'isnull':
         return "%s%s IS %sNULL" % (table_prefix, field_name, (not value and 'NOT ' or ''))
     raise TypeError, "Got invalid lookup_type: %s" % repr(lookup_type)
@@ -1345,16 +1327,16 @@ def _fill_table_cache(opts, select, tables, where, old_prefix, cache_tables_seen
         if f.rel and not f.null:
             db_table = f.rel.to._meta.db_table
             if db_table not in cache_tables_seen:
-                tables.append(db.db.quote_name(db_table))
+                tables.append(backend.quote_name(db_table))
             else: # The table was already seen, so give it a table alias.
                 new_prefix = '%s%s' % (db_table, len(cache_tables_seen))
-                tables.append('%s %s' % (db.db.quote_name(db_table), db.db.quote_name(new_prefix)))
+                tables.append('%s %s' % (backend.quote_name(db_table), backend.quote_name(new_prefix)))
                 db_table = new_prefix
             cache_tables_seen.append(db_table)
             where.append('%s.%s = %s.%s' % \
-                (db.db.quote_name(old_prefix), db.db.quote_name(f.column),
-                db.db.quote_name(db_table), db.db.quote_name(f.rel.get_related_field().column)))
-            select.extend(['%s.%s' % (db.db.quote_name(db_table), db.db.quote_name(f2.column)) for f2 in f.rel.to._meta.fields])
+                (backend.quote_name(old_prefix), backend.quote_name(f.column),
+                backend.quote_name(db_table), backend.quote_name(f.rel.get_related_field().column)))
+            select.extend(['%s.%s' % (backend.quote_name(db_table), backend.quote_name(f2.column)) for f2 in f.rel.to._meta.fields])
             _fill_table_cache(f.rel.to._meta, select, tables, where, db_table, cache_tables_seen)
 
 def _throw_bad_kwarg_error(kwarg):
@@ -1420,15 +1402,15 @@ def _parse_lookup(kwarg_items, opts, table_count=0):
                 # Try many-to-many relationships first...
                 for f in current_opts.many_to_many:
                     if f.name == current:
-                        rel_table_alias = db.db.quote_name('t%s' % table_count)
+                        rel_table_alias = backend.quote_name('t%s' % table_count)
                         table_count += 1
                         tables.append('%s %s' % \
-                            (db.db.quote_name(f.get_m2m_db_table(current_opts)), rel_table_alias))
+                            (backend.quote_name(f.get_m2m_db_table(current_opts)), rel_table_alias))
                         join_where.append('%s.%s = %s.%s' % \
-                            (db.db.quote_name(current_table_alias),
-                            db.db.quote_name(current_opts.pk.column),
+                            (backend.quote_name(current_table_alias),
+                            backend.quote_name(current_opts.pk.column),
                             rel_table_alias,
-                            db.db.quote_name(current_opts.object_name.lower() + '_id')))
+                            backend.quote_name(current_opts.object_name.lower() + '_id')))
                         # Optimization: In the case of primary-key lookups, we
                         # don't have to do an extra join.
                         if lookup_list and lookup_list[0] == f.rel.to._meta.pk.name and lookup_type == 'exact':
@@ -1439,13 +1421,13 @@ def _parse_lookup(kwarg_items, opts, table_count=0):
                             param_required = False
                         else:
                             new_table_alias = 't%s' % table_count
-                            tables.append('%s %s' % (db.db.quote_name(f.rel.to._meta.db_table),
-                                db.db.quote_name(new_table_alias)))
+                            tables.append('%s %s' % (backend.quote_name(f.rel.to._meta.db_table),
+                                backend.quote_name(new_table_alias)))
                             join_where.append('%s.%s = %s.%s' % \
-                                (db.db.quote_name(rel_table_alias),
-                                db.db.quote_name(f.rel.to._meta.object_name.lower() + '_id'),
-                                db.db.quote_name(new_table_alias),
-                                db.db.quote_name(f.rel.to._meta.pk.column)))
+                                (backend.quote_name(rel_table_alias),
+                                backend.quote_name(f.rel.to._meta.object_name.lower() + '_id'),
+                                backend.quote_name(new_table_alias),
+                                backend.quote_name(f.rel.to._meta.pk.column)))
                             current_table_alias = new_table_alias
                             param_required = True
                         current_opts = f.rel.to._meta
@@ -1469,10 +1451,10 @@ def _parse_lookup(kwarg_items, opts, table_count=0):
                         else:
                             new_table_alias = 't%s' % table_count
                             tables.append('%s %s' % \
-                                (db.db.quote_name(f.rel.to._meta.db_table), db.db.quote_name(new_table_alias)))
+                                (backend.quote_name(f.rel.to._meta.db_table), backend.quote_name(new_table_alias)))
                             join_where.append('%s.%s = %s.%s' % \
-                                (db.db.quote_name(current_table_alias), db.db.quote_name(f.column),
-                                db.db.quote_name(new_table_alias), db.db.quote_name(f.rel.to._meta.pk.column)))
+                                (backend.quote_name(current_table_alias), backend.quote_name(f.column),
+                                backend.quote_name(new_table_alias), backend.quote_name(f.rel.to._meta.pk.column)))
                             current_table_alias = new_table_alias
                             param_required = True
                         current_opts = f.rel.to._meta

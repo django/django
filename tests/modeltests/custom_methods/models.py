@@ -24,8 +24,8 @@ class Article(models.Model):
         Verbose version of get_articles_from_same_day_1, which does a custom
         database query for the sake of demonstration.
         """
-        from django.core.db import db
-        cursor = db.cursor()
+        from django.db import connection
+        cursor = connection.cursor()
         cursor.execute("""
             SELECT id, headline, pub_date
             FROM custom_methods_articles

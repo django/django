@@ -360,7 +360,7 @@ class _FileCache(_SimpleCache):
 #############
 
 import base64
-from django.core.db import db, DatabaseError
+from django.db import connection, DatabaseError
 from datetime import datetime
 
 class _DBCache(_Cache):
@@ -380,7 +380,7 @@ class _DBCache(_Cache):
             self._cull_frequency = 3
 
     def get(self, key, default=None):
-        cursor = db.cursor()
+        cursor = connection.cursor()
         cursor.execute("SELECT cache_key, value, expires FROM %s WHERE cache_key = %%s" % self._table, [key])
         row = cursor.fetchone()
         if row is None:
@@ -388,14 +388,14 @@ class _DBCache(_Cache):
         now = datetime.now()
         if row[2] < now:
             cursor.execute("DELETE FROM %s WHERE cache_key = %%s" % self._table, [key])
-            db.commit()
+            connection.commit()
             return default
         return pickle.loads(base64.decodestring(row[1]))
 
     def set(self, key, value, timeout=None):
         if timeout is None:
             timeout = self.default_timeout
-        cursor = db.cursor()
+        cursor = connection.cursor()
         cursor.execute("SELECT COUNT(*) FROM %s" % self._table)
         num = cursor.fetchone()[0]
         now = datetime.now().replace(microsecond=0)
@@ -413,15 +413,15 @@ class _DBCache(_Cache):
             # To be threadsafe, updates/inserts are allowed to fail silently
             pass
         else:
-            db.commit()
+            connection.commit()
 
     def delete(self, key):
-        cursor = db.cursor()
+        cursor = connection.cursor()
         cursor.execute("DELETE FROM %s WHERE cache_key = %%s" % self._table, [key])
-        db.commit()
+        connection.commit()
 
     def has_key(self, key):
-        cursor = db.cursor()
+        cursor = connection.cursor()
         cursor.execute("SELECT cache_key FROM %s WHERE cache_key = %%s" % self._table, [key])
         return cursor.fetchone() is not None
 
