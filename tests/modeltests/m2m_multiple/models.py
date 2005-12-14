@@ -15,7 +15,6 @@ from django.core import meta
 class Category(meta.Model):
     name = meta.CharField(maxlength=20)
     class META:
-       module_name = 'categories'
        ordering = ('name',)
 
     def __repr__(self):

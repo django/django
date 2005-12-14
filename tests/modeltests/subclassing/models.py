@@ -20,23 +20,18 @@ from modeltests.ordering.models import Article as ArticleWithOrdering
 # adds a "section" field.
 class ArticleWithSection(Article):
     section = meta.CharField(maxlength=30)
-    class META:
-       module_name = 'subarticles1'
 
 # This uses all fields and metadata from Article but
 # removes the "pub_date" field.
 class ArticleWithoutPubDate(Article):
     class META:
-       module_name = 'subarticles2'
        remove_fields = ('pub_date',)
 
 # This uses all fields and metadata from Article but
 # overrides the "pub_date" field.
 class ArticleWithFieldOverride(Article):
     pub_date = meta.DateField() # overrides the old field, a DateTimeField
-    class META:
-        module_name = 'subarticles3'
-        # No need to add remove_fields = ('pub_date',)
+    # No need to add remove_fields = ('pub_date',)
 
 # This uses all fields and metadata from ArticleWithRepr and
 # makes a few additions/changes.
@@ -44,17 +39,13 @@ class ArticleWithManyChanges(ArticleWithRepr):
     section = meta.CharField(maxlength=30)
     is_popular = meta.BooleanField()
     pub_date = meta.DateField() # overrides the old field, a DateTimeField
-    class META:
-       module_name = 'subarticles4'
 
 # This uses all fields from ArticleWithOrdering but
 # changes the ordering parameter.
 class ArticleWithChangedMeta(ArticleWithOrdering):
     class META:
-       module_name = 'subarticles5'
        ordering = ('headline', 'pub_date')
 
-# These two models don't define a module_name.
 class NoModuleNameFirst(Article):
     section = meta.CharField(maxlength=30)
 

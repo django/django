@@ -15,8 +15,6 @@ from django.core import meta
 class Category(meta.Model):
     name = meta.CharField(maxlength=20)
     parent = meta.ForeignKey('self', null=True, related_name='child')
-    class META:
-        module_name = 'categories'
 
     def __repr__(self):
         return self.name
