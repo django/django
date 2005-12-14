@@ -81,12 +81,12 @@ class SessionManager(models.Manager):
             session_key = md5.new(str(random.randint(0, sys.maxint - 1)) + SECRET_KEY).hexdigest()
             try:
                 self.get_object(session_key__exact=session_key)
-            except SessionDoesNotExist:
+            except self.klass.DoesNotExist:
                 break
         return session_key
 
     def save(self, session_key, session_dict, expire_date):
-        s = self.klass(session_key, encode(session_dict), expire_date)
+        s = self.klass(session_key, self.encode(session_dict), expire_date)
         if session_dict:
             s.save()
         else:
