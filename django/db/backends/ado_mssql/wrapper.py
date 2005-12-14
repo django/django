@@ -109,15 +109,6 @@ def get_limit_offset_sql(limit, offset=None):
 def get_random_function_sql():
     return "RAND()"
 
-def get_table_list(cursor):
-    raise NotImplementedError
-
-def get_table_description(cursor, table_name):
-    raise NotImplementedError
-
-def get_relations(cursor, table_name):
-    raise NotImplementedError
-
 OPERATOR_MAPPING = {
     'exact': '= %s',
     'iexact': 'LIKE %s',
@@ -161,4 +152,3 @@ DATA_TYPES = {
     'USStateField':      'varchar(2)',
 }
 
-DATA_TYPES_REVERSE = {}
