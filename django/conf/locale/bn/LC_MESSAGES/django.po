@@ -8,13 +8,44 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django CVS\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2005-12-09 11:46+0100\n"
+"POT-Creation-Date: 2005-12-14 17:21+0100\n"
 "PO-Revision-Date: 2005-11-12 20:05+0530\n"
 "Last-Translator: Baishampayan Ghose <b.ghose@gnu.org.in>\n"
 "Language-Team: Ankur Bangla <core@bengalinux.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+
+#: contrib/redirects/models/redirects.py:7
+msgid "redirect from"
+msgstr "রিডাইরেক্ট করা"
+
+#: contrib/redirects/models/redirects.py:8
+msgid ""
+"This should be an absolute path, excluding the domain name. Example: '/"
+"events/search/'."
+msgstr ""
+"এইটি একটি পরম পাথ হওয়া উচিত, ক্ষেত্র নাম বাদ দিয়ে। উদাহরণ: '/events/search / '।"
+
+#: contrib/redirects/models/redirects.py:9
+msgid "redirect to"
+msgstr "রিডাইরেক্ট কর"
+
+#: contrib/redirects/models/redirects.py:10
+msgid ""
+"This can be either an absolute path (as above) or a full URL starting with "
+"'http://'."
+msgstr ""
+"এইটি হয় একটি পরম পাথ হতে পারে  (যেমন উপরে) অথবা 'http:// এর সঙ্গে শুরু হওয়া "
+"একটি পূর্ণ ইউ.আর.এল ।"
+
+#: contrib/redirects/models/redirects.py:12
+msgid "redirect"
+msgstr "রিডাইরেক্ট"
+
+#: contrib/redirects/models/redirects.py:13
+msgid "redirects"
+msgstr "রিডাইরেক্ট করে"
 
 #: contrib/comments/models/comments.py:8
 #: contrib/comments/models/comments.py:161
@@ -277,6 +308,57 @@ msgstr ""
 #: contrib/comments/views/comments.py:318
 msgid "The comment form didn't provide either 'preview' or 'post'"
 msgstr ""
+
+#: contrib/flatpages/models/flatpages.py:6 contrib/admin/views/doc.py:267
+msgid "URL"
+msgstr "ইউ.আর.এল"
+
+#: contrib/flatpages/models/flatpages.py:7
+msgid ""
+"Example: '/about/contact/'. Make sure to have leading and trailing slashes."
+msgstr ""
+"উদাহরণ: '/about/contact / '। প্রধান এবং অনুসরণ করা স্ল্যাশ যেন নিশ্চিত ভাবে থাকে।"
+
+#: contrib/flatpages/models/flatpages.py:8
+msgid "title"
+msgstr "শিরোনাম"
+
+#: contrib/flatpages/models/flatpages.py:9
+msgid "content"
+msgstr "অভ্যন্তরস্থ বস্তু"
+
+#: contrib/flatpages/models/flatpages.py:10
+msgid "enable comments"
+msgstr "মন্তব্য সক্রিয় করুন"
+
+#: contrib/flatpages/models/flatpages.py:11
+msgid "template name"
+msgstr "ছাঁদ নাম"
+
+#: contrib/flatpages/models/flatpages.py:12
+msgid ""
+"Example: 'flatpages/contact_page'. If this isn't provided, the system will "
+"use 'flatpages/default'."
+msgstr ""
+"উদাহরণ: 'flatfiles/contact_page '। যদি এইটি দেওয়া না থাকে তাহলে সিস্টেম "
+"'flatfiles/default ব্যবহার করবে।"
+
+#: contrib/flatpages/models/flatpages.py:13
+msgid "registration required"
+msgstr "নিবন্ধন প্রয়োজনীয়"
+
+#: contrib/flatpages/models/flatpages.py:13
+msgid "If this is checked, only logged-in users will be able to view the page."
+msgstr ""
+"যদি এইটি টিক্ করা থাকে তাহলে শুধুমাত্র প্রবেশ করা ব্যবহারকারী পাতা দেখতে সক্ষম হবে।"
+
+#: contrib/flatpages/models/flatpages.py:17
+msgid "flat page"
+msgstr "চ্যাপ্টা পাতা"
+
+#: contrib/flatpages/models/flatpages.py:18
+msgid "flat pages"
+msgstr "চ্যাপ্টা পাতাগুলো"
 
 #: contrib/admin/filterspecs.py:40
 #, python-format
@@ -548,10 +630,6 @@ msgstr ""
 msgid "Time"
 msgstr ""
 
-#: contrib/admin/views/doc.py:267 contrib/flatpages/models/flatpages.py:6
-msgid "URL"
-msgstr "ইউ.আর.এল"
-
 #: contrib/admin/views/doc.py:268
 msgid "U.S. state (two uppercase letters)"
 msgstr ""
@@ -560,11 +638,19 @@ msgstr ""
 msgid "XML text"
 msgstr ""
 
+#: contrib/admin/templates/widget/date_time.html:3
+msgid "Date:"
+msgstr ""
+
+#: contrib/admin/templates/widget/date_time.html:4
+msgid "Time:"
+msgstr ""
+
 #: contrib/admin/templates/admin/object_history.html:3
 #: contrib/admin/templates/admin/change_list.html:4
+#: contrib/admin/templates/admin/change_form.html:9
 #: contrib/admin/templates/admin/base.html:23
 #: contrib/admin/templates/admin/delete_confirmation.html:3
-#: contrib/admin/templates/admin/change_form.html:9
 #: contrib/admin/templates/admin_doc/bookmarklets.html:4
 #: contrib/admin/templates/admin_doc/view_detail.html:4
 #: contrib/admin/templates/admin_doc/template_tag_index.html:5
@@ -580,9 +666,9 @@ msgstr "পাসওয়ার্ড পরিবর্তন করুন"
 
 #: contrib/admin/templates/admin/object_history.html:3
 #: contrib/admin/templates/admin/change_list.html:4
+#: contrib/admin/templates/admin/change_form.html:9
 #: contrib/admin/templates/admin/base.html:23
 #: contrib/admin/templates/admin/delete_confirmation.html:3
-#: contrib/admin/templates/admin/change_form.html:9
 #: contrib/admin/templates/admin_doc/bookmarklets.html:4
 #: contrib/admin/templates/admin_doc/view_detail.html:4
 #: contrib/admin/templates/admin_doc/template_tag_index.html:5
@@ -597,10 +683,10 @@ msgid "Log out"
 msgstr "বাইরে যান"
 
 #: contrib/admin/templates/admin/object_history.html:5
-#: contrib/admin/templates/admin/500.html:4
 #: contrib/admin/templates/admin/change_list.html:5
-#: contrib/admin/templates/admin/base.html:29
+#: contrib/admin/templates/admin/500.html:4
 #: contrib/admin/templates/admin/change_form.html:12
+#: contrib/admin/templates/admin/base.html:29
 #: contrib/admin/templates/registration/password_change_done.html:4
 #: contrib/admin/templates/registration/password_reset_form.html:4
 #: contrib/admin/templates/registration/logged_out.html:4
@@ -639,13 +725,15 @@ msgstr ""
 "এই বস্তুটি একটি পরিবর্তন ইতিহাস নেই। এইটি এই অ্যাডমিন স্থান দ্বারা সম্ভবত যোগ করা "
 "হয় নি।"
 
-#: contrib/admin/templates/admin/base_site.html:4
-msgid "Django site admin"
-msgstr "জ্যাঙ্গো স্থান অ্যাডমিন"
+#: contrib/admin/templates/admin/change_list.html:10
+#, fuzzy, python-format
+msgid "Add %(name)s"
+msgstr "যোগ করুন"
 
-#: contrib/admin/templates/admin/base_site.html:7
-msgid "Django administration"
-msgstr "জ্যাঙ্গো পরিচালনা"
+#: contrib/admin/templates/admin/filter.html:2
+#, python-format
+msgid " By %(title)s "
+msgstr ""
 
 #: contrib/admin/templates/admin/500.html:4
 msgid "Server error"
@@ -667,14 +755,17 @@ msgstr ""
 "একটি ত্রুটি আছে। এইটি স্থান পরিচালককে ই-মেল দ্বারা প্রতিবেদন করা হয়েছে এবং খুব "
 "তাড়াতাড়ি মেরামত করা হবে। আপনার ধৈর্য্যের জন্য ধন্যবাদ।"
 
-#: contrib/admin/templates/admin/404.html:4
-#: contrib/admin/templates/admin/404.html:8
-msgid "Page not found"
-msgstr "পাতা খুঁজে পাওয়া গেল না"
+#: contrib/admin/templates/admin/search_form.html:7
+msgid "Go"
+msgstr ""
 
-#: contrib/admin/templates/admin/404.html:10
-msgid "We're sorry, but the requested page could not be found."
-msgstr "আমরা দুঃখিত, কিন্তু আবেদনকৃত পাতা খুঁজে পাওয়া গেল না।"
+#: contrib/admin/templates/admin/base_site.html:4
+msgid "Django site admin"
+msgstr "জ্যাঙ্গো স্থান অ্যাডমিন"
+
+#: contrib/admin/templates/admin/base_site.html:7
+msgid "Django administration"
+msgstr "জ্যাঙ্গো পরিচালনা"
 
 #: contrib/admin/templates/admin/index.html:27
 #: contrib/admin/templates/admin/change_form.html:14
@@ -701,10 +792,14 @@ msgstr "আমার কাজ"
 msgid "None available"
 msgstr "কিছুই পাওয়া যাচ্ছে না"
 
-#: contrib/admin/templates/admin/change_list.html:10
-#, fuzzy, python-format
-msgid "Add %(name)s"
-msgstr "যোগ করুন"
+#: contrib/admin/templates/admin/404.html:4
+#: contrib/admin/templates/admin/404.html:8
+msgid "Page not found"
+msgstr "পাতা খুঁজে পাওয়া গেল না"
+
+#: contrib/admin/templates/admin/404.html:10
+msgid "We're sorry, but the requested page could not be found."
+msgstr "আমরা দুঃখিত, কিন্তু আবেদনকৃত পাতা খুঁজে পাওয়া গেল না।"
 
 #: contrib/admin/templates/admin/login.html:15
 msgid "Username:"
@@ -717,6 +812,24 @@ msgstr "পাসওয়ার্ড:"
 #: contrib/admin/templates/admin/login.html:20
 msgid "Have you <a href=\"/password_reset/\">forgotten your password</a>?"
 msgstr "আপনি কি <a href=\"/password_reset/\">আপনার পাসওয়ার্ড ভুলে গেছেন</a>?"
+
+#: contrib/admin/templates/admin/change_form.html:20
+msgid "View on site"
+msgstr ""
+
+#: contrib/admin/templates/admin/change_form.html:28
+msgid "Please correct the error below."
+msgid_plural "Please correct the errors below."
+msgstr[0] ""
+msgstr[1] ""
+
+#: contrib/admin/templates/admin/change_form.html:45
+msgid "Ordering"
+msgstr ""
+
+#: contrib/admin/templates/admin/change_form.html:48
+msgid "Order:"
+msgstr ""
 
 #: contrib/admin/templates/admin/base.html:23
 msgid "Welcome,"
@@ -744,33 +857,6 @@ msgstr ""
 #: contrib/admin/templates/admin/delete_confirmation.html:17
 msgid "Yes, I'm sure"
 msgstr "হ্যাঁ, আমি নিশ্চিত"
-
-#: contrib/admin/templates/admin/filter.html:2
-#, python-format
-msgid " By %(title)s "
-msgstr ""
-
-#: contrib/admin/templates/admin/search_form.html:7
-msgid "Go"
-msgstr ""
-
-#: contrib/admin/templates/admin/change_form.html:20
-msgid "View on site"
-msgstr ""
-
-#: contrib/admin/templates/admin/change_form.html:28
-msgid "Please correct the error below."
-msgid_plural "Please correct the errors below."
-msgstr[0] ""
-msgstr[1] ""
-
-#: contrib/admin/templates/admin/change_form.html:45
-msgid "Ordering"
-msgstr ""
-
-#: contrib/admin/templates/admin/change_form.html:48
-msgid "Order:"
-msgstr ""
 
 #: contrib/admin/templates/admin/submit_line.html:3
 msgid "Delete"
@@ -967,92 +1053,6 @@ msgstr ""
 #: contrib/admin/templates/admin_doc/bookmarklets.html:29
 msgid "As above, but opens the admin page in a new window."
 msgstr ""
-
-#: contrib/admin/templates/widget/date_time.html:3
-msgid "Date:"
-msgstr ""
-
-#: contrib/admin/templates/widget/date_time.html:4
-msgid "Time:"
-msgstr ""
-
-#: contrib/redirects/models/redirects.py:7
-msgid "redirect from"
-msgstr "রিডাইরেক্ট করা"
-
-#: contrib/redirects/models/redirects.py:8
-msgid ""
-"This should be an absolute path, excluding the domain name. Example: '/"
-"events/search/'."
-msgstr ""
-"এইটি একটি পরম পাথ হওয়া উচিত, ক্ষেত্র নাম বাদ দিয়ে। উদাহরণ: '/events/search / '।"
-
-#: contrib/redirects/models/redirects.py:9
-msgid "redirect to"
-msgstr "রিডাইরেক্ট কর"
-
-#: contrib/redirects/models/redirects.py:10
-msgid ""
-"This can be either an absolute path (as above) or a full URL starting with "
-"'http://'."
-msgstr ""
-"এইটি হয় একটি পরম পাথ হতে পারে  (যেমন উপরে) অথবা 'http:// এর সঙ্গে শুরু হওয়া "
-"একটি পূর্ণ ইউ.আর.এল ।"
-
-#: contrib/redirects/models/redirects.py:12
-msgid "redirect"
-msgstr "রিডাইরেক্ট"
-
-#: contrib/redirects/models/redirects.py:13
-msgid "redirects"
-msgstr "রিডাইরেক্ট করে"
-
-#: contrib/flatpages/models/flatpages.py:7
-msgid ""
-"Example: '/about/contact/'. Make sure to have leading and trailing slashes."
-msgstr ""
-"উদাহরণ: '/about/contact / '। প্রধান এবং অনুসরণ করা স্ল্যাশ যেন নিশ্চিত ভাবে থাকে।"
-
-#: contrib/flatpages/models/flatpages.py:8
-msgid "title"
-msgstr "শিরোনাম"
-
-#: contrib/flatpages/models/flatpages.py:9
-msgid "content"
-msgstr "অভ্যন্তরস্থ বস্তু"
-
-#: contrib/flatpages/models/flatpages.py:10
-msgid "enable comments"
-msgstr "মন্তব্য সক্রিয় করুন"
-
-#: contrib/flatpages/models/flatpages.py:11
-msgid "template name"
-msgstr "ছাঁদ নাম"
-
-#: contrib/flatpages/models/flatpages.py:12
-msgid ""
-"Example: 'flatpages/contact_page'. If this isn't provided, the system will "
-"use 'flatpages/default'."
-msgstr ""
-"উদাহরণ: 'flatfiles/contact_page '। যদি এইটি দেওয়া না থাকে তাহলে সিস্টেম "
-"'flatfiles/default ব্যবহার করবে।"
-
-#: contrib/flatpages/models/flatpages.py:13
-msgid "registration required"
-msgstr "নিবন্ধন প্রয়োজনীয়"
-
-#: contrib/flatpages/models/flatpages.py:13
-msgid "If this is checked, only logged-in users will be able to view the page."
-msgstr ""
-"যদি এইটি টিক্ করা থাকে তাহলে শুধুমাত্র প্রবেশ করা ব্যবহারকারী পাতা দেখতে সক্ষম হবে।"
-
-#: contrib/flatpages/models/flatpages.py:17
-msgid "flat page"
-msgstr "চ্যাপ্টা পাতা"
-
-#: contrib/flatpages/models/flatpages.py:18
-msgid "flat pages"
-msgstr "চ্যাপ্টা পাতাগুলো"
 
 #: utils/translation.py:350
 msgid "DATE_FORMAT"
@@ -1440,38 +1440,38 @@ msgstr "সরলীকৃত চীনা"
 msgid "This field is required."
 msgstr "এই ক্ষেত্রেটি অবৈধ।"
 
-#: core/formfields.py:336
+#: core/formfields.py:338
 #, python-format
 msgid "Ensure your text is less than %s character."
 msgid_plural "Ensure your text is less than %s characters."
 msgstr[0] ""
 msgstr[1] ""
 
-#: core/formfields.py:341
+#: core/formfields.py:343
 #, fuzzy
 msgid "Line breaks are not allowed here."
 msgstr "ছোটহাতের অক্ষর এখানে ঢোকাতে পারবেন না।"
 
-#: core/formfields.py:436 core/formfields.py:507 core/formfields.py:545
+#: core/formfields.py:438 core/formfields.py:509 core/formfields.py:547
 #, python-format
 msgid "Select a valid choice; '%(data)s' is not in %(choices)s."
 msgstr ""
 
-#: core/formfields.py:601
+#: core/formfields.py:603
 msgid "The submitted file is empty."
 msgstr ""
 
-#: core/formfields.py:655
+#: core/formfields.py:657
 #, fuzzy
 msgid "Enter a whole number between -32,768 and 32,767."
 msgstr "একটি গোটা সংখ্যা ঢোকান।"
 
-#: core/formfields.py:664
+#: core/formfields.py:666
 #, fuzzy
 msgid "Enter a positive number."
 msgstr "একটি গোটা সংখ্যা ঢোকান।"
 
-#: core/formfields.py:673
+#: core/formfields.py:675
 #, fuzzy
 msgid "Enter a whole number between 0 and 32,767."
 msgstr "একটি গোটা সংখ্যা ঢোকান।"
@@ -1737,6 +1737,11 @@ msgstr ""
 "\"%(attr)s\"বৈশিষ্ট্যয় লাইন %(line)s একটি অবৈধ মান আছে । (\"%(start)s\"এর সঙ্গে "
 "লাইন আরম্ভ।)"
 
+#: core/meta/__init__.py:1946
+#, python-format
+msgid "%(object)s with this %(type)s already exists for the given %(field)s."
+msgstr ""
+
 #: core/meta/fields.py:46
 #, fuzzy, python-format
 msgid "Please enter a valid %s."
@@ -1763,7 +1768,7 @@ msgstr ""
 msgid "Enter a valid filename."
 msgstr "একটি বৈধ ই-মেল ঠিকানা ঢোকান।"
 
-#: core/meta/fields.py:777
+#: core/meta/fields.py:782
 #, python-format
 msgid "Please enter valid %(self)s IDs. The value %(value)r is invalid."
 msgid_plural ""
