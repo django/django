@@ -815,22 +815,8 @@ class ModelBase(type):
         if meta_attrs != {}:
             raise TypeError, "'class META' got invalid attribute(s): %s" % ','.join(meta_attrs.keys())
 
-        # Dynamically create the module that will contain this class and its
-        # associated helper functions.
-        new_mod = types.ModuleType(opts.module_name)
-
         # Create the DoesNotExist exception.
         attrs['DoesNotExist'] = types.ClassType('DoesNotExist', (ObjectDoesNotExist,), {})
-
-        # Create other exceptions.
-        for exception_name in opts.exceptions:
-            exc = types.ClassType(exception_name, (Exception,), {})
-            exc.__module__ = MODEL_PREFIX + '.' + opts.module_name # Set this explicitly, as above.
-            setattr(new_mod, exception_name, exc)
-
-        # Create any module-level constants, if applicable.
-        for k, v in opts.module_constants.items():
-            setattr(new_mod, k, v)
 
         # Create the class, because we need it to use in currying.
         new_class = type.__new__(cls, name, bases, attrs)
@@ -844,19 +830,11 @@ class ModelBase(type):
         if new_class.__doc__ is None:
             new_class.__doc__ = "%s.%s(%s)" % (opts.module_name, name, ", ".join([f.name for f in opts.fields]))
 
-        # Add the class itself to the new module we've created.
-        new_mod.__dict__[name] = new_class
-
-        # Add "Klass" -- a shortcut reference to the class.
-        new_mod.__dict__['Klass'] = new_class
-
         if hasattr(new_class, 'get_absolute_url'):
             new_class.get_absolute_url = curry(get_absolute_url, opts, new_class.get_absolute_url)
 
-        # Get a reference to the module the class is in, and dynamically add
-        # the new module to it.
+        # Figure out the app_label by looking one level up.
         app_package = sys.modules.get(new_class.__module__)
-        app_package.__dict__[opts.module_name] = new_mod
         app_label = app_package.__name__.replace('.models', '')
         app_label = app_label[app_label.rfind('.')+1:]
 
@@ -864,7 +842,6 @@ class ModelBase(type):
         # Example: django.models.polls will have a _MODELS member that will
         # contain this list:
         # [<class 'django.models.polls.Poll'>, <class 'django.models.polls.Choice'>]
-        # Don't do this if replaces_module is set.
         app_package.__dict__.setdefault('_MODELS', []).append(new_class)
 
         # Cache the app label.
@@ -874,21 +851,6 @@ class ModelBase(type):
         if not opts.db_table:
             opts.db_table = "%s_%s" % (app_label, opts.module_name)
         new_class._meta = opts
-
-        # Set the __file__ attribute to the __file__ attribute of its package,
-        # because they're technically from the same file. Note: if we didn't
-        # set this, sys.modules would think this module was built-in.
-        try:
-            new_mod.__file__ = app_package.__file__
-        except AttributeError:
-            # 'module' object has no attribute '__file__', which means the
-            # class was probably being entered via the interactive interpreter.
-            pass
-
-        # Add the module's entry to sys.modules -- for instance,
-        # "django.models.polls.polls". Note that "django.models.polls" has already
-        # been added automatically.
-        sys.modules.setdefault('%s.%s.%s' % (MODEL_PREFIX, app_label, opts.module_name), new_mod)
 
         new_class._prepare()
         new_class.objects._prepare()
