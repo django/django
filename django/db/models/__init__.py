@@ -169,7 +169,6 @@ class RelatedObject(object):
         self.name = self.opts.module_name
         self.var_name = self.opts.object_name.lower()
 
-
     def flatten_data(self, follow, obj=None):
         new_data = {}
         rel_instances = self.get_list(obj)
@@ -739,7 +738,6 @@ class Manager(object):
         # objects -- MySQL returns the values as strings, instead.
         return [typecast_timestamp(str(row[0])) for row in cursor.fetchall()]
 
-
 class ModelBase(type):
     "Metaclass for all models"
     def __new__(cls, name, bases, attrs):
@@ -841,7 +839,6 @@ class ModelBase(type):
 
         new_class._prepare()
 
-        
         for field in fields:
             if field.rel:
                 other = field.rel.to
@@ -850,7 +847,7 @@ class ModelBase(type):
                 else:
                     related = RelatedObject(other._meta, new_class, field)
                     field.contribute_to_related_class(other, related)
-        
+
         return new_class
 
 class Model(object):
@@ -947,7 +944,7 @@ class Model(object):
             cls.get_next_in_order = curry(cls.__get_next_or_previous_in_order, is_next=True)
             cls.get_previous_in_order = curry(cls.__get_next_or_previous_in_order, is_next=False)
 
-       
+
     _prepare = classmethod(_prepare)
 
     def save(self):
@@ -1233,16 +1230,12 @@ class Model(object):
 
     _add_related.alters_data = True
 
-
-
-    
-    
     # Handles related many-to-many object retrieval.
     # Examples: Album.get_song(), Album.get_song_list(), Album.get_song_count()
     def _get_related_many_to_many(self, method_name, rel_class, rel_field, **kwargs):
         kwargs['%s__%s__exact' % (rel_field.name, rel_class._meta.pk.name)] = getattr(self, rel_class._meta.pk.attname)
         return getattr(rel_class._default_manager, method_name)(**kwargs)
-    
+
     # Handles setting many-to-many related objects.
     # Example: Album.set_songs()
     def _set_related_many_to_many(self, rel_class, rel_field, id_list):
