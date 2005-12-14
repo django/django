@@ -1,5 +1,5 @@
 from django.conf.settings import SESSION_COOKIE_NAME, SESSION_COOKIE_AGE, SESSION_COOKIE_DOMAIN, SESSION_SAVE_EVERY_REQUEST
-from django.models.core import sessions
+from django.models.core import Session
 from django.utils.cache import patch_vary_headers
 import datetime
 
@@ -43,10 +43,10 @@ class SessionWrapper(object):
                 self._session_cache = {}
             else:
                 try:
-                    s = sessions.get_object(session_key__exact=self.session_key,
+                    s = Session.objects.get_object(session_key__exact=self.session_key,
                         expire_date__gt=datetime.datetime.now())
                     self._session_cache = s.get_decoded()
-                except sessions.SessionDoesNotExist:
+                except Session.DoesNotExist:
                     self._session_cache = {}
                     # Set the session_key to None to force creation of a new
                     # key, for extra security.
@@ -68,8 +68,8 @@ class SessionMiddleware:
         except AttributeError:
             modified = False
         if modified or SESSION_SAVE_EVERY_REQUEST:
-            session_key = request.session.session_key or sessions.get_new_session_key()
-            new_session = sessions.save(session_key, request.session._session,
+            session_key = request.session.session_key or Session.objects.get_new_session_key()
+            new_session = Session.objects.save(session_key, request.session._session,
                 datetime.datetime.now() + datetime.timedelta(seconds=SESSION_COOKIE_AGE))
             expires = datetime.datetime.strftime(datetime.datetime.utcnow() + datetime.timedelta(seconds=SESSION_COOKIE_AGE), "%a, %d-%b-%Y %H:%M:%S GMT")
             response.set_cookie(SESSION_COOKIE_NAME, session_key,

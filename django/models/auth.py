@@ -32,6 +32,22 @@ class Group(models.Model):
     def __repr__(self):
         return self.name
 
+class UserManager(models.Manager):
+    def create_user(self, username, email, password):
+        "Creates and saves a User with the given username, e-mail and password."
+        now = datetime.datetime.now()
+        user = self.klass(None, username, '', '', email.strip().lower(), 'placeholder', False, True, False, now, now)
+        user.set_password(password)
+        user.save()
+        return user
+
+    def make_random_password(self, length=10, allowed_chars='abcdefghjkmnpqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789'):
+        "Generates a random password with the given length and given allowed_chars"
+        # Note that default value of allowed_chars does not have "I" or letters
+        # that look like it -- just to avoid confusion.
+        from random import choice
+        return ''.join([choice(allowed_chars) for i in range(length)])
+
 class User(models.Model):
     username = models.CharField(_('username'), maxlength=30, unique=True, validator_list=[validators.isAlphaNumeric])
     first_name = models.CharField(_('first name'), maxlength=30, blank=True)
@@ -46,6 +62,7 @@ class User(models.Model):
     groups = models.ManyToManyField(Group, blank=True,
         help_text=_("In addition to the permissions manually assigned, this user will also get all permissions granted to each group he/she is in."))
     user_permissions = models.ManyToManyField(Permission, blank=True, filter_interface=models.HORIZONTAL)
+    objects = UserManager()
     class META:
         verbose_name = _('User')
         verbose_name_plural = _('Users')
@@ -195,21 +212,6 @@ class User(models.Model):
                 except ImportError:
                     raise SiteProfileNotAvailable
         return self._profile_cache
-
-    def _module_create_user(username, email, password):
-        "Creates and saves a User with the given username, e-mail and password."
-        now = datetime.datetime.now()
-        user = User(None, username, '', '', email.strip().lower(), 'placeholder', False, True, False, now, now)
-        user.set_password(password)
-        user.save()
-        return user
-
-    def _module_make_random_password(length=10, allowed_chars='abcdefghjkmnpqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789'):
-        "Generates a random password with the given length and given allowed_chars"
-        # Note that default value of allowed_chars does not have "I" or letters
-        # that look like it -- just to avoid confusion.
-        from random import choice
-        return ''.join([choice(allowed_chars) for i in range(length)])
 
 class Message(models.Model):
     user = models.ForeignKey(User)

@@ -10,7 +10,7 @@ from django.core.extensions import get_object_or_404, render_to_response
 from django.core.paginator import ObjectPaginator, InvalidPage
 from django.conf.settings import ADMIN_MEDIA_PREFIX
 try:
-    from django.models.admin import log
+    from django.contrib.admin.models import LogEntry, ADDITION, CHANGE, DELETION
 except ImportError:
     raise ImproperlyConfigured, "You don't have 'django.contrib.admin' in INSTALLED_APPS."
 from django.db import models
@@ -391,7 +391,7 @@ def render_change_form(opts, manipulator, app_label, context, add=False, change=
 
 def log_add_message(user, opts,manipulator,new_object):
     pk_value = getattr(new_object, opts.pk.attname)
-    log.log_action(user.id, opts.get_content_type_id(), pk_value, str(new_object), log.ADDITION)
+    LogEntry.objects.log_action(user.id, opts.get_content_type_id(), pk_value, str(new_object), ADDITION)
 
 def add_stage(request, app_label, module_name, show_delete=False, form_url='', post_url='../', post_url_continue='../%s/', object_id_override=None):
     mod, opts = _get_mod_opts(app_label, module_name)
@@ -462,7 +462,7 @@ def log_change_message(user, opts,manipulator,new_object):
     change_message = ' '.join(change_message)
     if not change_message:
         change_message = _('No fields changed.')
-    log.log_action(user.id, opts.get_content_type_id(), pk_value, str(new_object), log.CHANGE, change_message)
+    LogEntry.objects.log_action(user.id, opts.get_content_type_id(), pk_value, str(new_object), CHANGE, change_message)
 
 def change_stage(request, app_label, module_name, object_id):
     mod, opts = _get_mod_opts(app_label, module_name)
@@ -644,7 +644,7 @@ def delete_stage(request, app_label, module_name, object_id):
             raise PermissionDenied
         obj_display = str(obj)
         obj.delete()
-        log.log_action(request.user.id, opts.get_content_type_id(), object_id, obj_display, log.DELETION)
+        LogEntry.objects.log_action(request.user.id, opts.get_content_type_id(), object_id, obj_display, DELETION)
         request.user.add_message(_('The %(name)s "%(obj)s" was deleted successfully.') % {'name':opts.verbose_name, 'obj':obj_display})
         return HttpResponseRedirect("../../")
     return render_to_response('admin/delete_confirmation', {
@@ -658,7 +658,7 @@ delete_stage = staff_member_required(delete_stage)
 
 def history(request, app_label, module_name, object_id):
     mod, opts = _get_mod_opts(app_label, module_name)
-    action_list = log.get_list(object_id__exact=object_id, content_type__id__exact=opts.get_content_type_id(),
+    action_list = LogEntry.objects.get_list(object_id__exact=object_id, content_type__id__exact=opts.get_content_type_id(),
         order_by=("action_time",), select_related=True)
     # If no history was found, see whether this object even exists.
     obj = get_object_or_404(mod, pk=object_id)

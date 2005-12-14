@@ -2,6 +2,15 @@ from django.db import models
 from django.models import auth, core
 from django.utils.translation import gettext_lazy as _
 
+ADDITION = 1
+CHANGE = 2
+DELETION = 3
+
+class LogEntryManager(models.Manager):
+    def log_action(self, user_id, content_type_id, object_id, object_repr, action_flag, change_message=''):
+        e = self.klass(None, None, user_id, content_type_id, object_id, object_repr[:200], action_flag, change_message)
+        e.save()
+
 class LogEntry(models.Model):
     action_time = models.DateTimeField(_('action time'), auto_now=True)
     user = models.ForeignKey(auth.User)
@@ -10,16 +19,12 @@ class LogEntry(models.Model):
     object_repr = models.CharField(_('object repr'), maxlength=200)
     action_flag = models.PositiveSmallIntegerField(_('action flag'))
     change_message = models.TextField(_('change message'), blank=True)
+    objects = LogEntryManager()
     class META:
         verbose_name = _('log entry')
         verbose_name_plural = _('log entries')
         db_table = 'django_admin_log'
         ordering = ('-action_time',)
-        module_constants = {
-            'ADDITION': 1,
-            'CHANGE': 2,
-            'DELETION': 3,
-        }
 
     def __repr__(self):
         return str(self.action_time)
@@ -43,7 +48,3 @@ class LogEntry(models.Model):
         This is relative to the Django admin index page.
         """
         return "%s/%s/%s/" % (self.get_content_type().get_package(), self.get_content_type().python_module_name, self.object_id)
-
-    def _module_log_action(user_id, content_type_id, object_id, object_repr, action_flag, change_message=''):
-        e = LogEntry(None, None, user_id, content_type_id, object_id, object_repr[:200], action_flag, change_message)
-        e.save()
