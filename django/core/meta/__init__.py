@@ -360,7 +360,7 @@ class Q:
 
 class Options:
     def __init__(self, module_name='', verbose_name='', verbose_name_plural='', db_table='',
-        fields=None, ordering=None, unique_together=None, admin=None, has_related_links=False,
+        fields=None, ordering=None, unique_together=None, admin=None,
         where_constraints=None, object_name=None, app_label=None,
         exceptions=None, permissions=None, get_latest_by=None,
         order_with_respect_to=None, module_constants=None):
@@ -373,7 +373,7 @@ class Options:
                 self.fields.append(field)
         self.module_name, self.verbose_name = module_name, verbose_name
         self.verbose_name_plural = verbose_name_plural or verbose_name + 's'
-        self.db_table, self.has_related_links = db_table, has_related_links
+        self.db_table = db_table
         self.ordering = ordering or []
         self.unique_together = unique_together or []
         self.where_constraints = where_constraints or []
@@ -464,20 +464,6 @@ class Options:
                     for f in klass._meta.fields:
                         if f.rel and self == f.rel.to._meta:
                             rel_objs.append(RelatedObject(self, klass, f))
-            if self.has_related_links:
-                # Manually add RelatedLink objects, which are a special case.
-                relatedlinks = get_module('relatedlinks', 'relatedlinks')
-                # Note that the copy() is very important -- otherwise any
-                # subsequently loaded object with related links will override this
-                # relationship we're adding.
-                link_field = copy.copy(relatedlinks.RelatedLink._meta.get_field('object_id'))
-                link_field.rel = ManyToOne(self.get_model_module().Klass, 'id',
-                    num_in_admin=3, min_num_in_admin=3, edit_inline=TABULAR,
-                    lookup_overrides={
-                        'content_type__package__label__exact': self.app_label,
-                        'content_type__python_module_name__exact': self.module_name,
-                    })
-                rel_objs.append(RelatedObject(self, relatedlinks.RelatedLink, link_field))
             self._all_related_objects = rel_objs
             return rel_objs
 
@@ -801,7 +787,6 @@ class ModelBase(type):
             ordering = meta_attrs.pop('ordering', None),
             unique_together = meta_attrs.pop('unique_together', None),
             admin = meta_attrs.pop('admin', None),
-            has_related_links = meta_attrs.pop('has_related_links', False),
             where_constraints = meta_attrs.pop('where_constraints', None),
             object_name = name,
             app_label = meta_attrs.pop('app_label', None),
@@ -1679,13 +1664,6 @@ def manipulator_save(opts, klass, add, change, self, new_data):
                         param = f.get_manipulator_new_data(rel_new_data, rel=True)
                     if param != None:
                        params[f.attname] = param
-
-                    # Related links are a special case, because we have to
-                    # manually set the "content_type_id" and "object_id" fields.
-                    if opts.has_related_links and related.opts.module_name == 'relatedlinks':
-                        contenttypes_mod = get_module('core', 'contenttypes')
-                        params['content_type_id'] = contenttypes_mod.get_object(package__label__exact=opts.app_label, python_module_name__exact=opts.module_name).id
-                        params['object_id'] = new_object.id
 
                 # Create the related item.
                 new_rel_obj = related.opts.get_model_module().Klass(**params)
