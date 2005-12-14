@@ -364,26 +364,6 @@ class Options:
         where_constraints=None, object_name=None, app_label=None,
         exceptions=None, permissions=None, get_latest_by=None,
         order_with_respect_to=None, module_constants=None):
-
-        # Save the original function args, for use by copy(). Note that we're
-        # NOT using copy.deepcopy(), because that would create a new copy of
-        # everything in memory, and it's better to conserve memory. Of course,
-        # this comes with the important gotcha that changing any attribute of
-        # this object will change its value in self._orig_init_args, so we
-        # need to be careful not to do that. In practice, we can pull this off
-        # because Options are generally read-only objects, and __init__() is
-        # the only place where its attributes are manipulated.
-
-        # locals() is used purely for convenience, so we don't have to do
-        # something verbose like this:
-        #    self._orig_init_args = {
-        #       'module_name': module_name,
-        #       'verbose_name': verbose_name,
-        #       ...
-        #    }
-        self._orig_init_args = locals()
-        del self._orig_init_args['self'] # because we don't care about it.
-
         # Move many-to-many related fields from self.fields into self.many_to_many.
         self.fields, self.many_to_many = [], []
         for field in (fields or []):
@@ -437,11 +417,6 @@ class Options:
 
     def __repr__(self):
         return '<Options for %s>' % self.module_name
-
-    def copy(self, **kwargs):
-        args = self._orig_init_args.copy()
-        args.update(kwargs)
-        return self.__class__(**args)
 
     def get_model_module(self):
         return get_module(self.app_label, self.module_name)
