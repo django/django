@@ -660,7 +660,7 @@ class Manager(object):
                 raise StopIteration
             for row in rows:
                 if fill_cache:
-                    obj, index_end = _get_cached_row(self.klass._meta, row, 0)
+                    obj, index_end = _get_cached_row(self.klass, row, 0)
                 else:
                     obj = self.klass(*row[:index_end])
                 for i, k in enumerate(kwargs['select']):
@@ -824,9 +824,6 @@ class ModelBase(type):
         app_label = app_label[app_label.rfind('.')+1:]
 
         # Populate the _MODELS member on the module the class is in.
-        # Example: django.models.polls will have a _MODELS member that will
-        # contain this list:
-        # [<class 'django.models.polls.Poll'>, <class 'django.models.polls.Choice'>]
         app_package.__dict__.setdefault('_MODELS', []).append(new_class)
 
         # Cache the app label.
@@ -1329,13 +1326,13 @@ def _get_where_clause(lookup_type, table_prefix, field_name, value):
         return "%s%s IS %sNULL" % (table_prefix, field_name, (not value and 'NOT ' or ''))
     raise TypeError, "Got invalid lookup_type: %s" % repr(lookup_type)
 
-def _get_cached_row(opts, row, index_start):
+def _get_cached_row(klass, row, index_start):
     "Helper function that recursively returns an object with cache filled"
-    index_end = index_start + len(opts.fields)
-    obj = opts.get_model_module().Klass(*row[index_start:index_end])
-    for f in opts.fields:
+    index_end = index_start + len(klass._meta.fields)
+    obj = klass(*row[index_start:index_end])
+    for f in klass._meta.fields:
         if f.rel and not f.null:
-            rel_obj, index_end = _get_cached_row(f.rel.to._meta, row, index_end)
+            rel_obj, index_end = _get_cached_row(f.rel.to, row, index_end)
             setattr(obj, f.get_cache_name(), rel_obj)
     return obj, index_end
 
