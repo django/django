@@ -56,7 +56,7 @@ class RelatedFilterSpec(FilterSpec):
             self.lookup_title = f.verbose_name
         self.lookup_kwarg = '%s__%s__exact' % (f.name, f.rel.to._meta.pk.name)
         self.lookup_val = request.GET.get(self.lookup_kwarg, None)
-        self.lookup_choices = f.rel.to._meta.get_model_module().get_list()
+        self.lookup_choices = f.rel.to._default_manager.get_list()
 
     def has_output(self):
         return len(self.lookup_choices) > 1
