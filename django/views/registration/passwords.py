@@ -1,7 +1,7 @@
 from django.core import formfields, validators
 from django.core.extensions import DjangoContext, render_to_response
 from django.core.template import Context, loader
-from django.models.auth import users
+from django.models.auth import User
 from django.views.decorators.auth import login_required
 from django.utils.httpwrappers import HttpResponseRedirect
 
@@ -16,15 +16,15 @@ class PasswordResetForm(formfields.Manipulator):
     def isValidUserEmail(self, new_data, all_data):
         "Validates that a user exists with the given e-mail address"
         try:
-            self.user_cache = users.get_object(email__iexact=new_data)
-        except users.UserDoesNotExist:
+            self.user_cache = User.objects.get_object(email__iexact=new_data)
+        except User.DoesNotExist:
             raise validators.ValidationError, "That e-mail address doesn't have an associated user acount. Are you sure you've registered?"
 
     def save(self, domain_override=None):
         "Calculates a new password randomly and sends it to the user"
         from django.core.mail import send_mail
         from django.models.core import sites
-        new_pass = users.make_random_password()
+        new_pass = User.objects.make_random_password()
         self.user_cache.set_password(new_pass)
         self.user_cache.save()
         if not domain_override:

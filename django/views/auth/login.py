@@ -1,8 +1,8 @@
 from django.parts.auth.formfields import AuthenticationForm
 from django.core import formfields
 from django.core.extensions import DjangoContext, render_to_response
-from django.models.auth import users
-from django.models.core import sites
+from django.models.auth import SESSION_KEY
+from django.models.core import Site
 from django.utils.httpwrappers import HttpResponse, HttpResponseRedirect
 
 REDIRECT_FIELD_NAME = 'next'
@@ -18,7 +18,7 @@ def login(request):
             # Light security check -- make sure redirect_to isn't garbage.
             if not redirect_to or '://' in redirect_to or ' ' in redirect_to:
                 redirect_to = '/accounts/profile/'
-            request.session[users.SESSION_KEY] = manipulator.get_user_id()
+            request.session[SESSION_KEY] = manipulator.get_user_id()
             request.session.delete_test_cookie()
             return HttpResponseRedirect(redirect_to)
     else:
@@ -27,13 +27,13 @@ def login(request):
     return render_to_response('registration/login', {
         'form': formfields.FormWrapper(manipulator, request.POST, errors),
         REDIRECT_FIELD_NAME: redirect_to,
-        'site_name': sites.get_current().name,
+        'site_name': Site.objects.get_current().name,
     }, context_instance=DjangoContext(request))
 
 def logout(request, next_page=None):
     "Logs out the user and displays 'You are logged out' message."
     try:
-        del request.session[users.SESSION_KEY]
+        del request.session[SESSION_KEY]
     except KeyError:
         return render_to_response('registration/logged_out', context_instance=DjangoContext(request))
     else:
