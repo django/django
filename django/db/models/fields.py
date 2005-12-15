@@ -39,10 +39,10 @@ string_concat = lazy(string_concat, str)
 
 def manipulator_valid_rel_key(f, self, field_data, all_data):
     "Validates that the value is a valid foreign key"
-    mod = f.rel.to._meta.get_model_module()
+    klass = f.rel.to
     try:
-        mod.get_object(pk=field_data)
-    except ObjectDoesNotExist:
+        klass._default_manager.get_object(pk=field_data)
+    except klass.DoesNotExist:
         raise validators.ValidationError, _("Please enter a valid %s.") % f.verbose_name
 
 def manipulator_validator_unique(f, opts, self, field_data, all_data):
@@ -821,7 +821,7 @@ class ManyToManyField(Field):
                if len(choices_list) == 1:
                    new_data[self.name] = [choices_list[0][0]]
         return new_data
-    
+
     def contribute_to_related_class(self, cls, related):
         rel_obj_name = related.get_method_name_part()
         setattr(cls, 'get_%s' % rel_obj_name, curry(cls._get_related_many_to_many, method_name='get_object', rel_class=related.model , rel_field=related.field))
@@ -856,8 +856,8 @@ class OneToOneField(IntegerField):
         rel_obj_name = related.get_method_name_part()
         # Add "get_thingie" methods for one-to-one related objects.
         # EXAMPLE: Place.get_restaurants_restaurant()
-        setattr(cls, 'get_%s' % rel_obj_name, 
-                curry(cls._get_related, method_name='get_object', 
+        setattr(cls, 'get_%s' % rel_obj_name,
+                curry(cls._get_related, method_name='get_object',
                       rel_class=related.model, rel_field=related.field))
 
 class ManyToOne:
