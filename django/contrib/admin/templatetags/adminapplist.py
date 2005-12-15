@@ -17,6 +17,8 @@ class AdminApplistNode(template.Node):
             has_module_perms = user.has_module_perms(app_label)
             if has_module_perms:
                 model_list = []
+                #HACK
+                app_url = "/".join( [comp for comp in app.__name__.split('.') if comp != 'models' ])
                 for m in app._MODELS:
                     if m._meta.admin:
                         module_name = m._meta.module_name
@@ -28,10 +30,12 @@ class AdminApplistNode(template.Node):
 
                         # Check whether user has any perm for this module.
                         # If so, add the module to the model_list.
+                        
+                        
                         if True in perms.values():
                             model_list.append({
                                 'name': capfirst(m._meta.verbose_name_plural),
-                                'admin_url': '%s/%s/' % (app_label, m._meta.module_name),
+                                'admin_url':  '%s/%s/' % (app_url, m.__name__.lower()),
                                 'perms': perms,
                             })
 

@@ -48,11 +48,10 @@ if 'ellington.media' in INSTALLED_APPS:
     )
 
 urlpatterns += (
-    # Metasystem admin pages
-    ('^(?P<app_label>[^/]+)/(?P<module_name>[^/]+)/$', 'django.contrib.admin.views.main.change_list'),
-    ('^(?P<app_label>[^/]+)/(?P<module_name>[^/]+)/add/$', 'django.contrib.admin.views.main.add_stage'),
-    ('^(?P<app_label>[^/]+)/(?P<module_name>[^/]+)/(?P<object_id>.+)/history/$', 'django.contrib.admin.views.main.history'),
-    ('^(?P<app_label>[^/]+)/(?P<module_name>[^/]+)/(?P<object_id>.+)/delete/$', 'django.contrib.admin.views.main.delete_stage'),
-    ('^(?P<app_label>[^/]+)/(?P<module_name>[^/]+)/(?P<object_id>.+)/$', 'django.contrib.admin.views.main.change_stage'),
+    ('^((?:[^/]+/)+?)add/$', 'django.contrib.admin.views.main.add_stage'),
+    ('^((?:[^/]+/)+?)([^/]+)/history/$', 'django.contrib.admin.views.main.history'),
+    ('^((?:[^/]+/)+?)([^/]+)/delete/$', 'django.contrib.admin.views.main.delete_stage'),
+    ('^((?:[^/]+/)+?)([^/]+)/change/$', 'django.contrib.admin.views.main.change_stage'),
+    ('^((?:[^/]+/)+?)$', 'django.contrib.admin.views.main.change_list' ),
 )
 urlpatterns = patterns('', *urlpatterns)

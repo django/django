@@ -1,4 +1,5 @@
 # Generic admin views.
+from django.conf import settings
 from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.admin.filterspecs import FilterSpec
 from django.core import formfields, template
@@ -21,6 +22,7 @@ from django.utils import dateformat
 from django.utils.dates import MONTHS
 from django.utils.html import escape
 import operator
+from itertools import izip
 
 # The system will display a "Show all" link only if the total result count
 # is less than or equal to this setting.
@@ -41,13 +43,59 @@ EMPTY_CHANGELIST_VALUE = '(None)'
 def _get_mod_opts(app_label, module_name):
     "Helper function that returns a tuple of (module, opts), raising Http404 if necessary."
     try:
-        mod = models.get_module(app_label, module_name)
+        mod = models.get_app(app_label)
     except ImportError:
         raise Http404 # Invalid app or module name. Maybe it's not in INSTALLED_APPS.
     opts = mod.Klass._meta
     if not opts.admin:
         raise Http404 # This object is valid but has no admin interface.
     return mod, opts
+
+def matches_app(mod, comps):
+    modcomps = mod.__name__.split('.')[:-1] #HACK: leave off 'models'
+    for c, mc in izip(comps, modcomps):
+        if c != mc:
+            return ([],False)
+    return (comps[len(modcomps):], True)
+
+def find_model(mod, remaining):
+   # print "finding ", mod, remaining
+    if len(remaining) == 0:
+       # print "no comps left"
+        raise Http404
+    if len(remaining) == 1:
+        if hasattr(mod, '_MODELS'):
+            name = remaining[0]
+            for model in mod._MODELS:
+                print "'%s'" % name, model
+                if model.__name__.lower() == name:
+                    return model
+            raise Http404
+        else:
+            raise Http404
+    else:
+        child = getattr(mod, remaining[0], None)
+       # print mod, remaining[0], child
+        if child:
+            return find_model(child, remaining[1:])
+        else:
+            raise Http404
+
+def get_app_label(mod):
+    modcomps = mod.__name__.split('.')
+    return modcomps[-2]
+
+def get_model_and_app(path):
+    comps = path.split('/')
+    comps = comps[:-1] # remove '' after final /
+    for mod in models.get_installed_models():  
+        remaining, matched =  matches_app(mod, comps)
+        if matched and len(remaining) > 0:
+           # print "matched ", mod 
+           # print "left", remaining
+            return ( find_model(mod, remaining), get_app_label(mod) )
+            
+    raise Http404 # Couldn't find app
 
 def index(request):
     return render_to_response('admin/index', {'title': _('Site administration')}, context_instance=Context(request))
@@ -57,8 +105,8 @@ class IncorrectLookupParameters(Exception):
     pass
 
 class ChangeList(object):
-    def __init__(self, request, app_label, module_name):
-        self.get_modules_and_options(app_label, module_name, request)
+    def __init__(self, request, path):
+        self.resolve_model(path, request)
         self.get_search_parameters(request)
         self.get_ordering()
         self.query = request.GET.get(SEARCH_VAR, '')
@@ -94,12 +142,16 @@ class ChangeList(object):
                 p[k] = v
         return '?' + '&amp;'.join(['%s=%s' % (k, v) for k, v in p.items()]).replace(' ', '%20')
 
-    def get_modules_and_options(self, app_label, module_name, request):
-        self.mod, self.opts = _get_mod_opts(app_label, module_name)
-        if not request.user.has_perm(app_label + '.' + self.opts.get_change_permission()):
+    def resolve_model(self, path, request):
+        self.model, self.app_label = get_model_and_app(path)
+        # _get_mod_opts(app_label, module_name)
+        self.opts = self.model._meta
+        
+        if not request.user.has_perm(self.app_label + '.' + self.opts.get_change_permission()):
             raise PermissionDenied
 
-        self.lookup_mod, self.lookup_opts = self.mod, self.opts
+        self.lookup_opts = self.opts
+        self.manager = self.model._default_manager
 
     def get_search_parameters(self, request):
         # Get search parameters from the query string.
@@ -114,11 +166,11 @@ class ChangeList(object):
             del self.params[PAGE_VAR]
 
     def get_results(self, request):
-        lookup_mod, lookup_params, show_all, page_num = \
-            self.lookup_mod, self.lookup_params, self.show_all, self.page_num
+        manager, lookup_params, show_all, page_num = \
+            self.manager, self.lookup_params, self.show_all, self.page_num
         # Get the results.
         try:
-            paginator = ObjectPaginator(lookup_mod, lookup_params, DEFAULT_RESULTS_PER_PAGE)
+            paginator = ObjectPaginator(manager, lookup_params, DEFAULT_RESULTS_PER_PAGE)
         # Naked except! Because we don't have any other way of validating "params".
         # They might be invalid if the keyword arguments are incorrect, or if the
         # values are not in the correct type (which would result in a database
@@ -130,7 +182,7 @@ class ChangeList(object):
         real_lookup_params = lookup_params.copy()
         del real_lookup_params['order_by']
         if real_lookup_params:
-            full_result_count = lookup_mod.get_count()
+            full_result_count = manager.get_count()
         else:
             full_result_count = paginator.hits
         del real_lookup_params
@@ -140,7 +192,7 @@ class ChangeList(object):
 
         # Get the list of objects to display on this page.
         if (show_all and can_show_all) or not multi_page:
-            result_list = lookup_mod.get_list(**lookup_params)
+            result_list = manager.get_list(**lookup_params)
         else:
             try:
                 result_list = paginator.get_page(page_num)
@@ -231,9 +283,10 @@ class ChangeList(object):
             lookup_params.update(opts.one_to_one_field.rel.limit_choices_to)
         self.lookup_params = lookup_params
 
-def change_list(request, app_label, module_name):
+def change_list(request, path):
+    print "change_list:", path
     try:
-        cl = ChangeList(request, app_label, module_name)
+        cl = ChangeList(request, path)
     except IncorrectLookupParameters:
         return HttpResponseRedirect(request.path)
 
@@ -242,9 +295,9 @@ def change_list(request, app_label, module_name):
         'is_popup': cl.is_popup,
         'cl' : cl
     })
-    c.update({'has_add_permission': c['perms'][app_label][cl.opts.get_add_permission()]}),
-    return render_to_response(['admin/%s/%s/change_list' % (app_label, cl.opts.object_name.lower()),
-                               'admin/%s/change_list' % app_label,
+    c.update({'has_add_permission': c['perms'][cl.app_label][cl.opts.get_add_permission()]}),
+    return render_to_response(['admin/%s/%s/change_list' % (cl.app_label, cl.opts.object_name.lower()),
+                               'admin/%s/change_list' % cl.app_label,
                                'admin/change_list'], context_instance=c)
 change_list = staff_member_required(change_list)
 
@@ -464,12 +517,15 @@ def log_change_message(user, opts,manipulator,new_object):
         change_message = _('No fields changed.')
     LogEntry.objects.log_action(user.id, opts.get_content_type_id(), pk_value, str(new_object), CHANGE, change_message)
 
-def change_stage(request, app_label, module_name, object_id):
-    mod, opts = _get_mod_opts(app_label, module_name)
+def change_stage(request, path, object_id):
+    print "change_stage", path, object_id
+    model, app_label = get_model_and_app(path)
+    opts = model._meta
+    #mod, opts = _get_mod_opts(app_label, module_name)
     if not request.user.has_perm(app_label + '.' + opts.get_change_permission()):
         raise PermissionDenied
     if request.POST and request.POST.has_key("_saveasnew"):
-        return add_stage(request, app_label, module_name, form_url='../add/')
+        return add_stage(request, path, form_url='../add/')
     try:
         manipulator = mod.ChangeManipulator(object_id)
     except ObjectDoesNotExist:

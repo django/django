@@ -190,8 +190,8 @@ result_list = register.inclusion_tag("admin/change_list_results")(result_list)
 
 #@register.inclusion_tag("admin/date_hierarchy")
 def date_hierarchy(cl):
-    lookup_opts, params, lookup_params, lookup_mod = \
-      cl.lookup_opts, cl.params, cl.lookup_params, cl.lookup_mod
+    lookup_opts, params, lookup_params, manager = \
+      cl.lookup_opts, cl.params, cl.lookup_params, cl.manager
 
     if lookup_opts.admin.date_hierarchy:
         field_name = lookup_opts.admin.date_hierarchy
@@ -208,7 +208,7 @@ def date_hierarchy(cl):
             return cl.get_query_string(d, [field_generic])
 
         def get_dates(unit, params):
-            return getattr(lookup_mod, 'get_%s_list' % field_name)(unit, **params)
+            return getattr(manager, 'get_%s_list' % field_name)(unit, **params)
 
         if year_lookup and month_lookup and day_lookup:
             month_name = MONTHS[int(month_lookup)]

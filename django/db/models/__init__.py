@@ -1051,6 +1051,17 @@ class Model(object):
 
     delete.alters_data = True
 
+    def __get_add_manipulator(cls):
+        cls.AddManipulator = get_manipulator
+        
+    AddManipulator = property(classmethod(__get_add_manipulator))
+    
+    def __get_change_manipulator(cls):
+        
+    ChangeManipulator = property(classmethod(__get_change_manipulator)) 
+    
+    
+
     def __get_FIELD_display(self, field):
         value = getattr(self, field.attname)
         return dict(field.choices).get(value, value)
@@ -1257,6 +1268,8 @@ class Model(object):
             backend.quote_name(rel_opts.object_name.lower() + '_id'))
         cursor.executemany(sql, [(this_id, i) for i in id_list])
         connection.commit()
+
+
 
 
 ############################################
@@ -1503,6 +1516,73 @@ def get_manipulator(opts, klass, extra_methods, add=False, change=False):
         setattr(man, k, v)
     return man
 
+class AutomaticManipulator(formfields.Manipulator):
+    def __classinit__(cls, model):
+        cls.model = model
+        cls.manager = model._default_manager
+    __classinit__ = classmethod(__classinit__)
+    
+    def __init__(self, follow=None):
+        self.follow = self.model._meta.get_follow(follow)
+        self.fields = []
+
+        for f in opts.fields + opts.many_to_many:
+            if self.follow.get(f.name, False):
+                self.fields.extend(f.get_manipulator_fields(opts, self, change))
+    
+        # Add fields for related objects.
+        for f in opts.get_all_related_objects():
+            if self.follow.get(f.name, False):
+                fol = self.follow[f.name]
+                self.fields.extend(f.get_manipulator_fields(opts, self, change, fol))
+        
+    def save(self):
+        pass
+    
+    def get_related_objects(opts, klass, add, change, self):
+        return opts.get_followed_related_objects(self.follow)
+
+    def flatten_data(opts, klass, add, change, self):
+         new_data = {}
+         obj = change and self.original_object or None
+         for f in opts.get_data_holders(self.follow):
+            fol = self.follow.get(f.name)
+            new_data.update(f.flatten_data(fol, obj))
+         return new_data
+
+class ModelAddManipulator(AutomaticManipulator):
+    pass
+
+class ModelSaveManipulator(AutomaticManipulator):
+    def __init__(self, obj_key=None, follow=None):
+       
+        assert obj_key is not None, "ChangeManipulator.__init__() must be passed obj_key parameter."
+        self.obj_key = obj_key
+        try:
+            self.original_object = self.manager.get_object(pk=obj_key)
+        except ObjectDoesNotExist:
+            # If the object doesn't exist, this might be a manipulator for a
+            # one-to-one related object that hasn't created its subobject yet.
+            # For example, this might be a Restaurant for a Place that doesn't
+            # yet have restaurant information.
+            if opts.one_to_one_field:
+                # Sanity check -- Make sure the "parent" object exists.
+                # For example, make sure the Place exists for the Restaurant.
+                # Let the ObjectDoesNotExist exception propogate up.
+                lookup_kwargs = opts.one_to_one_field.rel.limit_choices_to
+                lookup_kwargs['%s__exact' % opts.one_to_one_field.rel.field_name] = obj_key
+                _ = opts.one_to_one_field.rel.to._meta.get_model_module().get_object(**lookup_kwargs)
+                params = dict([(f.attname, f.get_default()) for f in opts.fields])
+                params[opts.pk.attname] = obj_key
+                self.original_object = opts.get_model_module().Klass(**params)
+            else:
+                raise
+        
+        super(ModelSaveManipulator, self).__init__(self, follow=follow)
+        
+        if  opts.get_ordered_objects():
+            self.fields.append(formfields.CommaSeparatedIntegerField(field_name="order_"))
+
 def manipulator_init(opts, add, change, self, obj_key=None, follow=None):
     self.follow = opts.get_follow(follow)
 
@@ -1691,16 +1771,7 @@ def manipulator_save(opts, klass, add, change, self, new_data):
             getattr(new_object, 'set_%s_order' % rel_opts.object_name.lower())(order)
     return new_object
 
-def manipulator_get_related_objects(opts, klass, add, change, self):
-    return opts.get_followed_related_objects(self.follow)
 
-def manipulator_flatten_data(opts, klass, add, change, self):
-     new_data = {}
-     obj = change and self.original_object or None
-     for f in opts.get_data_holders(self.follow):
-        fol = self.follow.get(f.name)
-        new_data.update(f.flatten_data(fol, obj))
-     return new_data
 
 def manipulator_validator_unique_together(field_name_list, opts, self, field_data, all_data):
     from django.utils.text import get_text_list
