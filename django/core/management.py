@@ -371,8 +371,7 @@ def init():
     "Initializes the database with auth and core."
     try:
         from django.db import backend, connection, models
-        auth = models.get_app('auth')
-        core = models.get_app('core')
+        from django.models import auth, core
         cursor = connection.cursor()
         for sql in get_sql_create(core) + get_sql_create(auth) + get_sql_initial_data(core) + get_sql_initial_data(auth):
             cursor.execute(sql)
@@ -642,8 +641,8 @@ def get_validation_errors(outfile):
     e = ModelErrorCollection(outfile)
     module_list = models.get_installed_model_modules()
     for module in module_list:
-        for mod in module._MODELS:
-            opts = mod._meta
+        for cls in module._MODELS:
+            opts = cls._meta
 
             # Do field-specific validation.
             for f in opts.fields:
@@ -690,8 +689,8 @@ def get_validation_errors(outfile):
                         for fn in opts.admin.list_display:
                             try:
                                 f = opts.get_field(fn)
-                            except models.FieldDoesNotExist:
-                                if not hasattr(mod, fn) or not callable(getattr(mod, fn)):
+                            except models.FieldDoesNotExist:                            
+                                if not hasattr(cls, fn) or not callable(getattr(cls, fn)):
                                     e.add(opts, '"admin.list_display" refers to %r, which isn\'t a field or method.' % fn)
                             else:
                                 if isinstance(f, models.ManyToManyField):

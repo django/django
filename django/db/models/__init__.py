@@ -69,13 +69,14 @@ def orderlist2sql(order_list, opts, prefix=''):
             output.append('%s%s ASC' % (prefix, backend.quote_name(orderfield2column(f, opts))))
     return ', '.join(output)
 
-def get_module(app_label, module_name):
-    return __import__('%s.%s.%s' % (MODEL_PREFIX, app_label, module_name), '', '', [''])
+#def get_module(app_label, module_name):
+#    return __import__('%s.%s.%s' % (MODEL_PREFIX, app_label, module_name), '', '', [''])
 
-def get_app(app_label):
-    return __import__('%s.%s' % (MODEL_PREFIX, app_label), '', '', [''])
+#def get_app(app_label):
+#    return __import__('%s.%s' % (MODEL_PREFIX, app_label), '', '', [''])
 
 _installed_models_cache = None
+
 def get_installed_models():
     """
     Returns a list of installed "models" packages, such as foo.models,
@@ -88,11 +89,19 @@ def get_installed_models():
     for a in settings.INSTALLED_APPS:
         try:
             _installed_models_cache.append(__import__(a + '.models', '', '', ['']))
-        except ImportError:
+        except ImportError, e:
             pass
     return _installed_models_cache
 
 _installed_modules_cache = None
+
+def add_model_module(mod, modules):
+    if hasattr(mod, '_MODELS'):
+        modules.append(mod)
+    for name in getattr(mod, '__all__', []):
+        submod = __import__("%s.%s" % ( mod.__name__, name),'','',[''])
+        add_model_module(submod, modules)
+
 def get_installed_model_modules(core_models=None):
     """
     Returns a list of installed models, such as django.models.core,
@@ -107,12 +116,7 @@ def get_installed_model_modules(core_models=None):
     for submodule in (core_models or []):
         _installed_modules_cache.append(__import__('django.models.%s' % submodule, '', '', ['']))
     for mod in get_installed_models():
-        try:
-            mod._MODELS
-        except AttributeError:
-            pass # Skip model modules that don't actually have models in them.
-        else:
-            _installed_modules_cache.append(mod)
+        add_model_module(mod, _installed_modules_cache)
     return _installed_modules_cache
 
 class LazyDate:
@@ -416,8 +420,8 @@ class Options:
     def __repr__(self):
         return '<Options for %s>' % self.module_name
 
-    def get_model_module(self):
-        return get_module(self.app_label, self.module_name)
+   # def get_model_module(self):
+   #     return get_module(self.app_label, self.module_name)
 
     def get_content_type_id(self):
         "Returns the content-type ID for this object type."
