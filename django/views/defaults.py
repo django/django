@@ -1,13 +1,13 @@
 from django.core.exceptions import Http404, ObjectDoesNotExist
 from django.core.template import Context, loader
-from django.models.core import sites, contenttypes
+from django.models.core import ContentType, Site
 from django.utils import httpwrappers
 
 def shortcut(request, content_type_id, object_id):
     "Redirect to an object's page based on a content-type ID and an object ID."
     # Look up the object, making sure it's got a get_absolute_url() function.
     try:
-        content_type = contenttypes.get_object(pk=content_type_id)
+        content_type = ContentType.objects.get_object(pk=content_type_id)
         obj = content_type.get_object_for_this_type(pk=object_id)
     except ObjectDoesNotExist:
         raise Http404, "Content type %s object %s doesn't exist" % (content_type_id, object_id)
@@ -35,14 +35,14 @@ def shortcut(request, content_type_id, object_id):
     elif hasattr(obj, 'get_site'):
         try:
             object_domain = obj.get_site().domain
-        except sites.SiteDoesNotExist:
+        except Site.DoesNotExist:
             pass
 
     # Then, fall back to the current site (if possible)
     else:
         try:
-            object_domain = sites.get_current().domain
-        except sites.SiteDoesNotExist:
+            object_domain = Site.objects.get_current().domain
+        except Site.DoesNotExist:
             # Finally, give up and use a URL without the domain name
             return httpwrappers.HttpResponseRedirect(obj.get_absolute_url())
     return httpwrappers.HttpResponseRedirect('http://%s%s' % (object_domain, obj.get_absolute_url()))

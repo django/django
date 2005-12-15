@@ -427,17 +427,17 @@ install.args = APP_ARGS
 
 def installperms(mod):
     "Installs any permissions for the given model, if needed."
-    from django.models.auth import permissions
-    from django.models.core import packages
+    from django.models.auth import Permission
+    from django.models.core import Package
     num_added = 0
-    package = packages.get_object(pk=mod._MODELS[0]._meta.app_label)
+    package = Package.objects.get_object(pk=mod._MODELS[0]._meta.app_label)
     for klass in mod._MODELS:
         opts = klass._meta
         for codename, name in _get_all_permissions(opts):
             try:
-                permissions.get_object(name__exact=name, codename__exact=codename, package__label__exact=package.label)
-            except permissions.PermissionDoesNotExist:
-                p = permissions.Permission(name=name, package=package, codename=codename)
+                Permission.objects.get_object(name__exact=name, codename__exact=codename, package__label__exact=package.label)
+            except Permission.DoesNotExist:
+                p = Permission(name=name, package=package, codename=codename)
                 p.save()
                 print "Added permission '%r'." % p
                 num_added += 1

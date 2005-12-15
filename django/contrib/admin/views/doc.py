@@ -6,7 +6,7 @@ from django.core.extensions import DjangoContext, render_to_response
 from django.core.exceptions import Http404, ViewDoesNotExist
 from django.core import template, urlresolvers
 from django.contrib.admin import utils
-from django.models.core import sites
+from django.models.core import Site
 import inspect, os, re
 
 # Exclude methods starting with these strings from documentation
@@ -101,7 +101,7 @@ def view_index(request):
                 'name': func.__name__,
                 'module': func.__module__,
                 'site_id': settings_mod.SITE_ID,
-                'site': sites.get_object(pk=settings_mod.SITE_ID),
+                'site': Site.objects.get_object(pk=settings_mod.SITE_ID),
                 'url': simplify_regex(regex),
             })
     return render_to_response('admin_doc/view_index', {'views': views}, context_instance=DjangoContext(request))
@@ -200,7 +200,7 @@ def template_detail(request, template):
                 'exists': os.path.exists(template_file),
                 'contents': lambda: os.path.exists(template_file) and open(template_file).read() or '',
                 'site_id': settings_mod.SITE_ID,
-                'site': sites.get_object(pk=settings_mod.SITE_ID),
+                'site': Site.objects.get_object(pk=settings_mod.SITE_ID),
                 'order': list(settings_mod.TEMPLATE_DIRS).index(dir),
             })
     return render_to_response('admin_doc/template_detail', {

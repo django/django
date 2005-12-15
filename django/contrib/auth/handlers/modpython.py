@@ -10,7 +10,7 @@ def authenhandler(req, **kwargs):
     # that so that the following import works
     os.environ.update(req.subprocess_env)
 
-    from django.models.auth import users
+    from django.models.auth import User
 
     # check for PythonOptions
     _str_to_bool = lambda s: s.lower() in '1', 'true', 'on', 'yes'
@@ -27,8 +27,8 @@ def authenhandler(req, **kwargs):
     if superuser_only:
         kwargs['is_superuser__exact'] = True
     try:
-        user = users.get_object(**kwargs)
-    except users.UserDoesNotExist:
+        user = User.objects.get_object(**kwargs)
+    except User.DoesNotExist:
         return apache.HTTP_UNAUTHORIZED
 
     # check the password and any permission given

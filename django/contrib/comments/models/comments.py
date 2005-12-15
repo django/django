@@ -1,6 +1,63 @@
 from django.db import models
 from django.models import auth, core
 from django.utils.translation import gettext_lazy as _
+import datetime
+
+MIN_PHOTO_DIMENSION = 5
+MAX_PHOTO_DIMENSION = 1000
+
+# option codes for comment-form hidden fields
+PHOTOS_REQUIRED = 'pr'
+PHOTOS_OPTIONAL = 'pa'
+RATINGS_REQUIRED = 'rr'
+RATINGS_OPTIONAL = 'ra'
+IS_PUBLIC = 'ip'
+
+# what users get if they don't have any karma
+DEFAULT_KARMA = 5
+KARMA_NEEDED_BEFORE_DISPLAYED = 3
+
+class CommentManager(models.Manager):
+    def get_security_hash(self, options, photo_options, rating_options, target):
+        """
+        Returns the MD5 hash of the given options (a comma-separated string such as
+        'pa,ra') and target (something like 'lcom.eventtimes:5157'). Used to
+        validate that submitted form options have not been tampered-with.
+        """
+        from django.conf.settings import SECRET_KEY
+        import md5
+        return md5.new(options + photo_options + rating_options + target + SECRET_KEY).hexdigest()
+
+    def get_rating_options(self, rating_string):
+        """
+        Given a rating_string, this returns a tuple of (rating_range, options).
+        >>> s = "scale:1-10|First_category|Second_category"
+        >>> get_rating_options(s)
+        ([1, 2, 3, 4, 5, 6, 7, 8, 9, 10], ['First category', 'Second category'])
+        """
+        rating_range, options = rating_string.split('|', 1)
+        rating_range = range(int(rating_range[6:].split('-')[0]), int(rating_range[6:].split('-')[1])+1)
+        choices = [c.replace('_', ' ') for c in options.split('|')]
+        return rating_range, choices
+
+    def get_list_with_karma(self, **kwargs):
+        """
+        Returns a list of Comment objects matching the given lookup terms, with
+        _karma_total_good and _karma_total_bad filled.
+        """
+        kwargs.setdefault('select', {})
+        kwargs['select']['_karma_total_good'] = 'SELECT COUNT(*) FROM comments_karma WHERE comments_karma.comment_id=comments.id AND score=1'
+        kwargs['select']['_karma_total_bad'] = 'SELECT COUNT(*) FROM comments_karma WHERE comments_karma.comment_id=comments.id AND score=-1'
+        return self.get_list(**kwargs)
+
+    def user_is_moderator(self, user):
+        from django.conf.settings import COMMENTS_MODERATORS_GROUP
+        if user.is_superuser:
+            return True
+        for g in user.get_group_list():
+            if g.id == COMMENTS_MODERATORS_GROUP:
+                return True
+        return False
 
 class Comment(models.Model):
     user = models.ForeignKey(auth.User, raw_id_admin=True)
@@ -26,22 +83,11 @@ class Comment(models.Model):
     ip_address = models.IPAddressField(_('IP address'), blank=True, null=True)
     is_removed = models.BooleanField(_('is removed'), help_text=_('Check this box if the comment is inappropriate. A "This comment has been removed" message will be displayed instead.'))
     site = models.ForeignKey(core.Site)
+    objects = CommentManager()
     class META:
         db_table = 'comments'
         verbose_name = _('Comment')
         verbose_name_plural = _('Comments')
-        module_constants = {
-            # min. and max. allowed dimensions for photo resizing (in pixels)
-            'MIN_PHOTO_DIMENSION': 5,
-            'MAX_PHOTO_DIMENSION': 1000,
-
-            # option codes for comment-form hidden fields
-            'PHOTOS_REQUIRED': 'pr',
-            'PHOTOS_OPTIONAL': 'pa',
-            'RATINGS_REQUIRED': 'rr',
-            'RATINGS_OPTIONAL': 'ra',
-            'IS_PUBLIC': 'ip',
-        }
         ordering = ('-submit_date',)
         admin = models.Admin(
             fields = (
@@ -114,47 +160,6 @@ class Comment(models.Model):
             {'user': self.get_user().username, 'date': self.submit_date,
             'comment': self.comment, 'domain': self.get_site().domain, 'url': self.get_absolute_url()}
 
-    def _module_get_security_hash(options, photo_options, rating_options, target):
-        """
-        Returns the MD5 hash of the given options (a comma-separated string such as
-        'pa,ra') and target (something like 'lcom.eventtimes:5157'). Used to
-        validate that submitted form options have not been tampered-with.
-        """
-        from django.conf.settings import SECRET_KEY
-        import md5
-        return md5.new(options + photo_options + rating_options + target + SECRET_KEY).hexdigest()
-
-    def _module_get_rating_options(rating_string):
-        """
-        Given a rating_string, this returns a tuple of (rating_range, options).
-        >>> s = "scale:1-10|First_category|Second_category"
-        >>> get_rating_options(s)
-        ([1, 2, 3, 4, 5, 6, 7, 8, 9, 10], ['First category', 'Second category'])
-        """
-        rating_range, options = rating_string.split('|', 1)
-        rating_range = range(int(rating_range[6:].split('-')[0]), int(rating_range[6:].split('-')[1])+1)
-        choices = [c.replace('_', ' ') for c in options.split('|')]
-        return rating_range, choices
-
-    def _module_get_list_with_karma(**kwargs):
-        """
-        Returns a list of Comment objects matching the given lookup terms, with
-        _karma_total_good and _karma_total_bad filled.
-        """
-        kwargs.setdefault('select', {})
-        kwargs['select']['_karma_total_good'] = 'SELECT COUNT(*) FROM comments_karma WHERE comments_karma.comment_id=comments.id AND score=1'
-        kwargs['select']['_karma_total_bad'] = 'SELECT COUNT(*) FROM comments_karma WHERE comments_karma.comment_id=comments.id AND score=-1'
-        return get_list(**kwargs)
-
-    def _module_user_is_moderator(user):
-        from django.conf.settings import COMMENTS_MODERATORS_GROUP
-        if user.is_superuser:
-            return True
-        for g in user.get_group_list():
-            if g.id == COMMENTS_MODERATORS_GROUP:
-                return True
-        return False
-
 class FreeComment(models.Model):
     # A FreeComment is a comment by a non-registered user.
     content_type = models.ForeignKey(core.ContentType)
@@ -203,37 +208,19 @@ class FreeComment(models.Model):
 
     get_content_object.short_description = _('Content object')
 
-class KarmaScore(models.Model):
-    user = models.ForeignKey(auth.User)
-    comment = models.ForeignKey(Comment)
-    score = models.SmallIntegerField(_('score'), db_index=True)
-    scored_date = models.DateTimeField(_('score date'), auto_now=True)
-    class META:
-        module_name = 'karma'
-        verbose_name = _('Karma score')
-        verbose_name_plural = _('Karma scores')
-        unique_together = (('user', 'comment'),)
-        module_constants = {
-            # what users get if they don't have any karma
-            'DEFAULT_KARMA': 5,
-            'KARMA_NEEDED_BEFORE_DISPLAYED': 3,
-        }
-
-    def __repr__(self):
-        return _("%(score)d rating by %(user)s") % {'score': self.score, 'user': self.get_user()}
-
-    def _module_vote(user_id, comment_id, score):
+class KarmaScoreManager(models.Manager):
+    def vote(self, user_id, comment_id, score):
         try:
-            karma = get_object(comment__id__exact=comment_id, user__id__exact=user_id)
-        except KarmaScoreDoesNotExist:
-            karma = KarmaScore(None, user_id, comment_id, score, datetime.datetime.now())
+            karma = self.get_object(comment__id__exact=comment_id, user__id__exact=user_id)
+        except self.klass.DoesNotExist:
+            karma = self.klass(None, user_id, comment_id, score, datetime.datetime.now())
             karma.save()
         else:
             karma.score = score
             karma.scored_date = datetime.datetime.now()
             karma.save()
 
-    def _module_get_pretty_score(score):
+    def get_pretty_score(self, score):
         """
         Given a score between -1 and 1 (inclusive), returns the same score on a
         scale between 1 and 10 (inclusive), as an integer.
@@ -242,20 +229,22 @@ class KarmaScore(models.Model):
             return DEFAULT_KARMA
         return int(round((4.5 * score) + 5.5))
 
-class UserFlag(models.Model):
+class KarmaScore(models.Model):
     user = models.ForeignKey(auth.User)
     comment = models.ForeignKey(Comment)
-    flag_date = models.DateTimeField(_('flag date'), auto_now_add=True)
+    score = models.SmallIntegerField(_('score'), db_index=True)
+    scored_date = models.DateTimeField(_('score date'), auto_now=True)
+    objects = KarmaScoreManager()
     class META:
-        db_table = 'comments_user_flags'
-        verbose_name = _('User flag')
-        verbose_name_plural = _('User flags')
+        verbose_name = _('Karma score')
+        verbose_name_plural = _('Karma scores')
         unique_together = (('user', 'comment'),)
 
     def __repr__(self):
-        return _("Flag by %r") % self.get_user()
+        return _("%(score)d rating by %(user)s") % {'score': self.score, 'user': self.get_user()}
 
-    def _module_flag(comment, user):
+class UserFlagManager(models.Manager):
+    def flag(self, comment, user):
         """
         Flags the given comment by the given user. If the comment has already
         been flagged by the user, or it was a comment posted by the user,
@@ -264,13 +253,27 @@ class UserFlag(models.Model):
         if int(comment.user_id) == int(user.id):
             return # A user can't flag his own comment. Fail silently.
         try:
-            f = get_object(user__id__exact=user.id, comment__id__exact=comment.id)
-        except UserFlagDoesNotExist:
+            f = self.get_object(user__id__exact=user.id, comment__id__exact=comment.id)
+        except self.klass.DoesNotExist:
             from django.core.mail import mail_managers
-            f = UserFlag(None, user.id, comment.id, None)
+            f = self.klass(None, user.id, comment.id, None)
             message = _('This comment was flagged by %(user)s:\n\n%(text)s') % {'user': user.username, 'text': comment.get_as_text()}
             mail_managers('Comment flagged', message, fail_silently=True)
             f.save()
+
+class UserFlag(models.Model):
+    user = models.ForeignKey(auth.User)
+    comment = models.ForeignKey(Comment)
+    flag_date = models.DateTimeField(_('flag date'), auto_now_add=True)
+    objects = UserFlagManager()
+    class META:
+        db_table = 'comments_user_flags'
+        verbose_name = _('User flag')
+        verbose_name_plural = _('User flags')
+        unique_together = (('user', 'comment'),)
+
+    def __repr__(self):
+        return _("Flag by %r") % self.get_user()
 
 class ModeratorDeletion(models.Model):
     user = models.ForeignKey(auth.User, verbose_name='moderator')
@@ -284,4 +287,3 @@ class ModeratorDeletion(models.Model):
 
     def __repr__(self):
         return _("Moderator deletion by %r") % self.get_user()
-

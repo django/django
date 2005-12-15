@@ -1,8 +1,8 @@
-"Custom template tags for user comments"
-
+from django.contrib.comments.models import Comment, FreeComment
+from django.contrib.comments.models import PHOTOS_REQUIRED, PHOTOS_OPTIONAL, RATINGS_REQUIRED, RATINGS_OPTIONAL, IS_PUBLIC
+from django.contrib.comments.models import MIN_PHOTO_DIMENSION, MAX_PHOTO_DIMENSION
 from django.core import template
 from django.core.exceptions import ObjectDoesNotExist
-from django.models.comments import comments, freecomments
 from django.models.core import contenttypes
 import re
 
@@ -93,24 +93,24 @@ class CommentFormNode(template.Node):
             context['display_form'] = True
         context['target'] = '%s:%s' % (self.content_type.id, self.obj_id)
         options = []
-        for var, abbr in (('photos_required', comments.PHOTOS_REQUIRED),
-                          ('photos_optional', comments.PHOTOS_OPTIONAL),
-                          ('ratings_required', comments.RATINGS_REQUIRED),
-                          ('ratings_optional', comments.RATINGS_OPTIONAL),
-                          ('is_public', comments.IS_PUBLIC)):
+        for var, abbr in (('photos_required', PHOTOS_REQUIRED),
+                          ('photos_optional', PHOTOS_OPTIONAL),
+                          ('ratings_required', RATINGS_REQUIRED),
+                          ('ratings_optional', RATINGS_OPTIONAL),
+                          ('is_public', IS_PUBLIC)):
             context[var] = getattr(self, var)
             if getattr(self, var):
                 options.append(abbr)
         context['options'] = ','.join(options)
         if self.free:
-            context['hash'] = comments.get_security_hash(context['options'], '', '', context['target'])
+            context['hash'] = Comment.objects.get_security_hash(context['options'], '', '', context['target'])
             default_form = FREE_COMMENT_FORM
         else:
             context['photo_options'] = self.photo_options
             context['rating_options'] = normalize_newlines(base64.encodestring(self.rating_options).strip())
             if self.rating_options:
-                context['rating_range'], context['rating_choices'] = comments.get_rating_options(self.rating_options)
-            context['hash'] = comments.get_security_hash(context['options'], context['photo_options'], context['rating_options'], context['target'])
+                context['rating_range'], context['rating_choices'] = Comment.objects.get_rating_options(self.rating_options)
+            context['hash'] = Comment.objects.get_security_hash(context['options'], context['photo_options'], context['rating_options'], context['target'])
             default_form = COMMENT_FORM
         output = template.Template(default_form).render(context)
         context.pop()
@@ -124,7 +124,7 @@ class CommentCountNode(template.Node):
 
     def render(self, context):
         from django.conf.settings import SITE_ID
-        get_count_function = self.free and freecomments.get_count or comments.get_count
+        get_count_function = self.free and FreeComment.objects.get_count or Comment.objects.get_count
         if self.context_var_name is not None:
             self.obj_id = template.resolve_variable(self.context_var_name, context)
         comment_count = get_count_function(object_id__exact=self.obj_id,
@@ -143,7 +143,7 @@ class CommentListNode(template.Node):
 
     def render(self, context):
         from django.conf.settings import COMMENTS_BANNED_USERS_GROUP, SITE_ID
-        get_list_function = self.free and freecomments.get_list or comments.get_list_with_karma
+        get_list_function = self.free and FreeComment.objects.get_list or Comment.objects.get_list_with_karma
         if self.context_var_name is not None:
             try:
                 self.obj_id = template.resolve_variable(self.context_var_name, context)
@@ -165,7 +165,7 @@ class CommentListNode(template.Node):
         if not self.free:
             if context.has_key('user') and not context['user'].is_anonymous():
                 user_id = context['user'].id
-                context['user_can_moderate_comments'] = comments.user_is_moderator(context['user'])
+                context['user_can_moderate_comments'] = Comment.objects.user_is_moderator(context['user'])
             else:
                 user_id = None
                 context['user_can_moderate_comments'] = False
@@ -230,8 +230,8 @@ class DoCommentForm:
                         if not opt.isalnum():
                             raise template.TemplateSyntaxError, "Invalid photo directory name in %r tag: '%s'" % (tokens[0], opt)
                     for opt in option_list[1::3] + option_list[2::3]:
-                        if not opt.isdigit() or not (comments.MIN_PHOTO_DIMENSION <= int(opt) <= comments.MAX_PHOTO_DIMENSION):
-                            raise template.TemplateSyntaxError, "Invalid photo dimension in %r tag: '%s'. Only values between %s and %s are allowed." % (tokens[0], opt, comments.MIN_PHOTO_DIMENSION, comments.MAX_PHOTO_DIMENSION)
+                        if not opt.isdigit() or not (MIN_PHOTO_DIMENSION <= int(opt) <= MAX_PHOTO_DIMENSION):
+                            raise template.TemplateSyntaxError, "Invalid photo dimension in %r tag: '%s'. Only values between %s and %s are allowed." % (tokens[0], opt, MIN_PHOTO_DIMENSION, MAX_PHOTO_DIMENSION)
                     # VALIDATION ENDS #########################################
                     kwargs[option] = True
                     kwargs['photo_options'] = args

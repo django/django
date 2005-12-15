@@ -1,4 +1,4 @@
-from django.models.auth import users
+from django.models.auth import User
 from django.core import formfields, validators
 
 class AuthenticationForm(formfields.Manipulator):
@@ -28,8 +28,8 @@ class AuthenticationForm(formfields.Manipulator):
 
     def isValidUser(self, field_data, all_data):
         try:
-            self.user_cache = users.get_object(username__exact=field_data)
-        except users.UserDoesNotExist:
+            self.user_cache = User.objects.get_object(username__exact=field_data)
+        except User.DoesNotExist:
             raise validators.ValidationError, "Please enter a correct username and password. Note that both fields are case-sensitive."
 
     def isValidPasswordForUser(self, field_data, all_data):

@@ -3,8 +3,8 @@ from django.core.mail import mail_admins, mail_managers
 from django.core.exceptions import Http404, ObjectDoesNotExist
 from django.core.extensions import DjangoContext, render_to_response
 from django.models.auth import SESSION_KEY
-from django.models.comments import comments, freecomments
-from django.models.core import contenttypes
+from django.contrib.comments.models import Comment, FreeComment, PHOTOS_REQUIRED, PHOTOS_OPTIONAL, RATINGS_REQUIRED, RATINGS_OPTIONAL, IS_PUBLIC
+from django.models.core import ContentType
 from django.parts.auth.formfields import AuthenticationForm
 from django.utils.httpwrappers import HttpResponseRedirect
 from django.utils.text import normalize_newlines
@@ -75,7 +75,7 @@ class PublicCommentManipulator(AuthenticationForm):
 
     def get_comment(self, new_data):
         "Helper function"
-        return comments.Comment(None, self.get_user_id(), new_data["content_type_id"],
+        return Comment(None, self.get_user_id(), new_data["content_type_id"],
             new_data["object_id"], new_data.get("headline", "").strip(),
             new_data["comment"].strip(), new_data.get("rating1", None),
             new_data.get("rating2", None), new_data.get("rating3", None),
@@ -87,7 +87,7 @@ class PublicCommentManipulator(AuthenticationForm):
     def save(self, new_data):
         today = datetime.date.today()
         c = self.get_comment(new_data)
-        for old in comments.get_list(content_type__id__exact=new_data["content_type_id"],
+        for old in Comment.objects.get_list(content_type__id__exact=new_data["content_type_id"],
             object_id__exact=new_data["object_id"], user__id__exact=self.get_user_id()):
             # Check that this comment isn't duplicate. (Sometimes people post
             # comments twice by mistake.) If it is, fail silently by pretending
@@ -132,7 +132,7 @@ class PublicFreeCommentManipulator(formfields.Manipulator):
 
     def get_comment(self, new_data):
         "Helper function"
-        return freecomments.FreeComment(None, new_data["content_type_id"],
+        return FreeComment(None, new_data["content_type_id"],
             new_data["object_id"], new_data["comment"].strip(),
             new_data["person_name"].strip(), datetime.datetime.now(), new_data["is_public"],
             new_data["ip_address"], False, SITE_ID)
@@ -143,7 +143,7 @@ class PublicFreeCommentManipulator(formfields.Manipulator):
         # Check that this comment isn't duplicate. (Sometimes people post
         # comments twice by mistake.) If it is, fail silently by pretending
         # the comment was posted successfully.
-        for old_comment in freecomments.get_list(content_type__id__exact=new_data["content_type_id"],
+        for old_comment in FreeComment.objects.get_list(content_type__id__exact=new_data["content_type_id"],
             object_id__exact=new_data["object_id"], person_name__exact=new_data["person_name"],
             submit_date__year=today.year, submit_date__month=today.month,
             submit_date__day=today.day):
@@ -190,16 +190,16 @@ def post_comment(request):
         raise Http404, _("One or more of the required fields wasn't submitted")
     photo_options = request.POST.get('photo_options', '')
     rating_options = normalize_newlines(request.POST.get('rating_options', ''))
-    if comments.get_security_hash(options, photo_options, rating_options, target) != security_hash:
+    if Comment.objects.get_security_hash(options, photo_options, rating_options, target) != security_hash:
         raise Http404, _("Somebody tampered with the comment form (security violation)")
     # Now we can be assured the data is valid.
     if rating_options:
-        rating_range, rating_choices = comments.get_rating_options(base64.decodestring(rating_options))
+        rating_range, rating_choices = Comment.objects.get_rating_options(base64.decodestring(rating_options))
     else:
         rating_range, rating_choices = [], []
     content_type_id, object_id = target.split(':') # target is something like '52:5157'
     try:
-        obj = contenttypes.get_object(pk=content_type_id).get_object_for_this_type(pk=object_id)
+        obj = ContentType.objects.get_object(pk=content_type_id).get_object_for_this_type(pk=object_id)
     except ObjectDoesNotExist:
         raise Http404, _("The comment form had an invalid 'target' parameter -- the object ID was invalid")
     option_list = options.split(',') # options is something like 'pa,ra'
@@ -207,9 +207,9 @@ def post_comment(request):
     new_data['content_type_id'] = content_type_id
     new_data['object_id'] = object_id
     new_data['ip_address'] = request.META.get('REMOTE_ADDR')
-    new_data['is_public'] = comments.IS_PUBLIC in option_list
+    new_data['is_public'] = IS_PUBLIC in option_list
     manipulator = PublicCommentManipulator(request.user,
-        ratings_required=comments.RATINGS_REQUIRED in option_list,
+        ratings_required=RATINGS_REQUIRED in option_list,
         ratings_range=rating_range,
         num_rating_choices=len(rating_choices))
     errors = manipulator.get_validation_errors(new_data)
@@ -236,8 +236,8 @@ def post_comment(request):
             'target': target,
             'hash': security_hash,
             'rating_options': rating_options,
-            'ratings_optional': comments.RATINGS_OPTIONAL in option_list,
-            'ratings_required': comments.RATINGS_REQUIRED in option_list,
+            'ratings_optional': RATINGS_OPTIONAL in option_list,
+            'ratings_required': RATINGS_REQUIRED in option_list,
             'rating_range': rating_range,
             'rating_choices': rating_choices,
         }, context_instance=DjangoContext(request))
@@ -279,10 +279,10 @@ def post_free_comment(request):
         options, target, security_hash = request.POST['options'], request.POST['target'], request.POST['gonzo']
     except KeyError:
         raise Http404, _("One or more of the required fields wasn't submitted")
-    if comments.get_security_hash(options, '', '', target) != security_hash:
+    if Comment.objects.get_security_hash(options, '', '', target) != security_hash:
         raise Http404, _("Somebody tampered with the comment form (security violation)")
     content_type_id, object_id = target.split(':') # target is something like '52:5157'
-    content_type = contenttypes.get_object(pk=content_type_id)
+    content_type = ContentType.objects.get_object(pk=content_type_id)
     try:
         obj = content_type.get_object_for_this_type(pk=object_id)
     except ObjectDoesNotExist:
@@ -292,7 +292,7 @@ def post_free_comment(request):
     new_data['content_type_id'] = content_type_id
     new_data['object_id'] = object_id
     new_data['ip_address'] = request.META['REMOTE_ADDR']
-    new_data['is_public'] = comments.IS_PUBLIC in option_list
+    new_data['is_public'] = IS_PUBLIC in option_list
     manipulator = PublicFreeCommentManipulator()
     errors = manipulator.get_validation_errors(new_data)
     if errors or request.POST.has_key('preview'):
@@ -330,7 +330,7 @@ def comment_was_posted(request):
     if request.GET.has_key('c'):
         content_type_id, object_id = request.GET['c'].split(':')
         try:
-            content_type = contenttypes.get_object(pk=content_type_id)
+            content_type = ContentType.objects.get_object(pk=content_type_id)
             obj = content_type.get_object_for_this_type(pk=object_id)
         except ObjectDoesNotExist:
             pass
