@@ -1730,8 +1730,8 @@ def manipulator_validator_unique_together(field_name_list, opts, self, field_dat
     if hasattr(self, 'original_object') and getattr(self.original_object, opts.pk.attname) == getattr(old_obj, opts.pk.attname):
         pass
     else:
-        raise validators.ValidationError, "%s with this %s already exists for the given %s." % \
-            (capfirst(opts.verbose_name), field_list[0].verbose_name, get_text_list(field_name_list[1:], 'and'))
+        raise validators.ValidationError, _("%(object)s with this %(type)s already exists for the given %(field)s.") % \
+            {'object': capfirst(opts.verbose_name), 'type': field_list[0].verbose_name, 'field': get_text_list(field_name_list[1:], 'and')}
 
 def manipulator_validator_unique_for_date(from_field, date_field, opts, lookup_type, self, field_data, all_data):
     date_str = all_data.get(date_field.get_manipulator_field_names('')[0], None)
