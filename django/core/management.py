@@ -691,8 +691,7 @@ def get_validation_errors(outfile):
                             try:
                                 f = opts.get_field(fn)
                             except models.FieldDoesNotExist:
-                                klass = opts.get_model_module().Klass
-                                if not hasattr(klass, fn) or not callable(getattr(klass, fn)):
+                                if not hasattr(mod, fn) or not callable(getattr(mod, fn)):
                                     e.add(opts, '"admin.list_display" refers to %r, which isn\'t a field or method.' % fn)
                             else:
                                 if isinstance(f, models.ManyToManyField):
