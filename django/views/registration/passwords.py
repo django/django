@@ -2,6 +2,7 @@ from django.core import formfields, validators
 from django.core.extensions import DjangoContext, render_to_response
 from django.core.template import Context, loader
 from django.models.auth import User
+from django.models.core import Site
 from django.views.decorators.auth import login_required
 from django.utils.httpwrappers import HttpResponseRedirect
 
@@ -23,12 +24,11 @@ class PasswordResetForm(formfields.Manipulator):
     def save(self, domain_override=None):
         "Calculates a new password randomly and sends it to the user"
         from django.core.mail import send_mail
-        from django.models.core import sites
         new_pass = User.objects.make_random_password()
         self.user_cache.set_password(new_pass)
         self.user_cache.save()
         if not domain_override:
-            current_site = sites.get_current()
+            current_site = Site.objects.get_current()
             site_name = current_site.name
             domain = current_site.domain
         else:

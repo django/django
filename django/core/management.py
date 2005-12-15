@@ -505,7 +505,7 @@ startapp.args = "[appname]"
 def createsuperuser(username=None, email=None, password=None):
     "Creates a superuser account."
     from django.core import validators
-    from django.models.auth import users
+    from django.models.auth import User
     import getpass
     try:
         while 1:
@@ -515,8 +515,8 @@ def createsuperuser(username=None, email=None, password=None):
                 sys.stderr.write("Error: That username is invalid.\n")
                 username = None
             try:
-                users.get_object(username__exact=username)
-            except users.UserDoesNotExist:
+                User.objects.get_object(username__exact=username)
+            except User.DoesNotExist:
                 break
             else:
                 sys.stderr.write("Error: That username is already taken.\n")
@@ -547,7 +547,7 @@ def createsuperuser(username=None, email=None, password=None):
     except KeyboardInterrupt:
         sys.stderr.write("\nOperation cancelled.\n")
         sys.exit(1)
-    u = users.create_user(username, email, password)
+    u = User.objects.create_user(username, email, password)
     u.is_staff = True
     u.is_active = True
     u.is_superuser = True
@@ -689,7 +689,7 @@ def get_validation_errors(outfile):
                         for fn in opts.admin.list_display:
                             try:
                                 f = opts.get_field(fn)
-                            except models.FieldDoesNotExist:                            
+                            except models.FieldDoesNotExist:
                                 if not hasattr(cls, fn) or not callable(getattr(cls, fn)):
                                     e.add(opts, '"admin.list_display" refers to %r, which isn\'t a field or method.' % fn)
                             else:
