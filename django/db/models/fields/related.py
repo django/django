@@ -64,7 +64,8 @@ class ForeignKey(SharedMethods,Field):
         try:
             to_name = to._meta.object_name.lower()
         except AttributeError: # to._meta doesn't exist, so it must be RECURSIVE_RELATIONSHIP_CONSTANT
-            assert to == 'self', "ForeignKey(%r) is invalid. First parameter to ForeignKey must be either a model or the string %r" % (to, RECURSIVE_RELATIONSHIP_CONSTANT)
+            assert isinstance(to, basestring) , """ForeignKey(%r) is invalid. First parameter to ForeignKey must be either 
+                         a model, a model name, or the string %r""" % (to, RECURSIVE_RELATIONSHIP_CONSTANT)
             kwargs['verbose_name'] = kwargs.get('verbose_name', '')
         else:
             to_field = to_field or to._meta.pk.name
@@ -276,7 +277,7 @@ class ManyToOne:
         try:
             to._meta
         except AttributeError: # to._meta doesn't exist, so it must be RECURSIVE_RELATIONSHIP_CONSTANT
-            assert to == RECURSIVE_RELATIONSHIP_CONSTANT, "'to' must be either a model or the string %r" % RECURSIVE_RELATIONSHIP_CONSTANT
+            assert isinstance(to, basestring) , "'to' must be either a model, a model name or the string %r" % RECURSIVE_RELATIONSHIP_CONSTANT
         self.to, self.field_name = to, field_name
         self.num_in_admin, self.edit_inline = num_in_admin, edit_inline
         self.min_num_in_admin, self.max_num_in_admin = min_num_in_admin, max_num_in_admin
