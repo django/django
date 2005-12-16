@@ -34,7 +34,7 @@ class RelatedField(object):
         if isinstance(other, basestring):
             if other == RECURSIVE_RELATIONSHIP_CONSTANT:
                 self.rel.to = cls.__name__
-                self.add_lookup(cls, self)
+            self.add_lookup(cls, self)
         else:
             self.do_related_class(other, cls)
 
