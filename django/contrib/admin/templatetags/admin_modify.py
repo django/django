@@ -1,10 +1,11 @@
-from django.core import template, template_loader, meta
+from django.core import template, template_loader
 from django.utils.html import escape
 from django.utils.text import capfirst
 from django.utils.functional import curry
 from django.contrib.admin.views.main import AdminBoundField
 from django.db.models.fields import BoundField, Field
 from django.db.models import BoundRelatedObject, TABULAR, STACKED
+from django.db import models
 from django.conf.settings import ADMIN_MEDIA_PREFIX
 import re
 
@@ -42,7 +43,7 @@ submit_row = register.inclusion_tag('admin/submit_line', takes_context=True)(sub
 #@register.simple_tag
 def field_label(bound_field):
     class_names = []
-    if isinstance(bound_field.field, meta.BooleanField):
+    if isinstance(bound_field.field, models.BooleanField):
         class_names.append("vCheckboxLabel")
         colon = ""
     else:
@@ -135,6 +136,8 @@ class StackedBoundRelatedObject(BoundRelatedObject):
     def __init__(self, related_object, field_mapping, original):
         super(StackedBoundRelatedObject, self).__init__(related_object, field_mapping, original)
         fields = self.relation.editable_fields()
+        self.field_mappings.fill()
+        print  self.field_mappings.__dict__
         self.form_field_collection_wrappers = [FormFieldCollectionWrapper(field_mapping ,fields)
                                                for field_mapping in self.field_mappings]
         self.show_url = original and hasattr(self.relation.opts, 'get_absolute_url')
@@ -241,7 +244,7 @@ def admin_field_line(context, argument_val):
                 break
 
     # Assumes BooleanFields won't be stacked next to each other!
-    if isinstance(bound_fields[0].field, meta.BooleanField):
+    if isinstance(bound_fields[0].field, models.BooleanField):
         class_names.append('checkbox-row')
 
     return {

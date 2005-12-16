@@ -311,9 +311,10 @@ class Field(object):
         first_choice = include_blank and blank_choice or []
         if self.choices:
             return first_choice + list(self.choices)
+        
         rel_model = self.rel.to
         return first_choice + [(getattr(x, rel_model._meta.pk.attname), str(x))
-                               for x in rel_model._default_manager.get_list(**self.rel._meta.limit_choices_to)]
+                               for x in rel_model._default_manager.get_list(**rel_model._meta.limit_choices_to)]
 
     def get_choices_default(self):
         if(self.radio_admin):

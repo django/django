@@ -67,7 +67,6 @@ def find_model(mod, remaining):
         if hasattr(mod, '_MODELS'):
             name = remaining[0]
             for model in mod._MODELS:
-                print "'%s'" % name, model
                 if model.__name__.lower() == name:
                     return model
             raise Http404
@@ -391,29 +390,32 @@ class AdminBoundFieldSet(BoundFieldSet):
         super(AdminBoundFieldSet, self).__init__(field_set, field_mapping, original, AdminBoundFieldLine)
 
 class BoundManipulator(object):
-    def __init__(self, opts, manipulator, field_mapping):
-        self.inline_related_objects = opts.get_followed_related_objects(manipulator.follow)
+    def __init__(self, model, manipulator, field_mapping):
+        self.model = model
+        self.opts = model._meta
+        self.inline_related_objects = self.opts.get_followed_related_objects(manipulator.follow)
         self.original = hasattr(manipulator, 'original_object') and manipulator.original_object or None
         self.bound_field_sets = [field_set.bind(field_mapping, self.original, AdminBoundFieldSet)
-                                 for field_set in opts.admin.get_field_sets(opts)]
-        self.ordered_objects = opts.get_ordered_objects()[:]
+                                 for field_set in self.opts.admin.get_field_sets(self.opts)]
+        self.ordered_objects = self.opts.get_ordered_objects()[:]
 
 class AdminBoundManipulator(BoundManipulator):
-    def __init__(self, opts, manipulator, field_mapping):
-        super(AdminBoundManipulator, self).__init__(opts, manipulator, field_mapping)
-        field_sets = opts.admin.get_field_sets(opts)
+    def __init__(self, model, manipulator, field_mapping):
+        super(AdminBoundManipulator, self).__init__(model, manipulator, field_mapping)
+        field_sets = self.opts.admin.get_field_sets(self.opts)
 
-        self.auto_populated_fields = [f for f in opts.fields if f.prepopulate_from]
-        self.javascript_imports = get_javascript_imports(opts, self.auto_populated_fields, self.ordered_objects, field_sets);
+        self.auto_populated_fields = [f for f in self.opts.fields if f.prepopulate_from]
+        self.javascript_imports = get_javascript_imports(self.opts, self.auto_populated_fields, self.ordered_objects, field_sets);
 
         self.coltype = self.ordered_objects and 'colMS' or 'colM'
-        self.has_absolute_url = hasattr(opts.get_model_module().Klass, 'get_absolute_url')
-        self.form_enc_attrib = opts.has_field_type(models.FileField) and \
+        self.has_absolute_url = hasattr(model, 'get_absolute_url')
+        self.form_enc_attrib = self.opts.has_field_type(models.FileField) and \
                                 'enctype="multipart/form-data" ' or ''
 
         self.first_form_field_id = self.bound_field_sets[0].bound_field_lines[0].bound_fields[0].form_fields[0].get_id();
         self.ordered_object_pk_names = [o.pk.name for o in self.ordered_objects]
 
+        opts = self.opts
         self.save_on_top = opts.admin.save_on_top
         self.save_as = opts.admin.save_as
 
@@ -428,11 +430,12 @@ class AdminBoundManipulator(BoundManipulator):
                 return str(getattr(ordered_obj, name))
         return ""
 
-def render_change_form(opts, manipulator, app_label, context, add=False, change=False, show_delete=False, form_url=''):
+def render_change_form(model, manipulator, app_label, context, add=False, change=False, show_delete=False, form_url=''):
+    opts = model._meta
     extra_context = {
         'add': add,
         'change': change,
-        'bound_manipulator': AdminBoundManipulator(opts, manipulator, context['form']),
+        'bound_manipulator': AdminBoundManipulator(model, manipulator, context['form']),
         'has_delete_permission': context['perms'][app_label][opts.get_delete_permission()],
         'form_url': form_url,
         'app_label': app_label,
@@ -527,7 +530,8 @@ def change_stage(request, path, object_id):
     if request.POST and request.POST.has_key("_saveasnew"):
         return add_stage(request, path, form_url='../add/')
     try:
-        manipulator = mod.ChangeManipulator(object_id)
+        manipulator_class = model.ChangeManipulator
+        manipulator = manipulator_class(object_id)
     except ObjectDoesNotExist:
         raise Http404
 
@@ -596,7 +600,7 @@ def change_stage(request, path, object_id):
         'is_popup' : request.REQUEST.has_key('_popup')
     })
 
-    return render_change_form(opts,manipulator, app_label, c, change=True)
+    return render_change_form(model,manipulator, app_label, c, change=True)
 
 def _nest_help(obj, depth, val):
     current = obj

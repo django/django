@@ -10,7 +10,7 @@ class EmptyValue(Exception):
     "This is raised when empty data is provided"
     pass
 
-class Manipulator:
+class Manipulator(object):
     # List of permission strings. User must have at least one to manipulate.
     # None means everybody has permission.
     required_permission = ''
