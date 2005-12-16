@@ -17,7 +17,6 @@ from django.db.models.fields.related import *
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.models.exceptions import FieldDoesNotExist, BadKeywordArguments
 
-
 # Admin stages.
 ADD, CHANGE, BOTH = 1, 2, 3
 
@@ -27,7 +26,6 @@ ADD, CHANGE, BOTH = 1, 2, 3
 
 #def get_app(app_label):
 #    return __import__('%s.%s' % (MODEL_PREFIX, app_label), '', '', [''])
-
 
 class LazyDate:
     """
@@ -49,11 +47,6 @@ class LazyDate:
 
     def __get_value__(self):
         return datetime.datetime.now() + self.delta
-
-################
-# MAIN CLASSES #
-################
-
 
 
 

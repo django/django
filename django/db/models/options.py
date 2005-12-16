@@ -5,19 +5,17 @@ from django.db.models.loading import get_installed_model_modules
 from django.db.models.query import orderlist2sql
 from django.db.models.exceptions import FieldDoesNotExist
 
+from bisect import bisect
+
 class Options:
     def __init__(self, module_name='', verbose_name='', verbose_name_plural='', db_table='',
-        fields=None, ordering=None, unique_together=None, admin=None,
+        ordering=None, unique_together=None, admin=None,
         where_constraints=None, object_name=None, app_label=None,
         exceptions=None, permissions=None, get_latest_by=None,
         order_with_respect_to=None, module_constants=None):
         # Move many-to-many related fields from self.fields into self.many_to_many.
         self.fields, self.many_to_many = [], []
-        for field in (fields or []):
-            if field.rel and isinstance(field.rel, ManyToMany):
-                self.many_to_many.append(field)
-            else:
-                self.fields.append(field)
+        
         self.module_name, self.verbose_name = module_name, verbose_name
         self.verbose_name_plural = verbose_name_plural or verbose_name + 's'
         self.db_table = db_table
@@ -28,14 +26,22 @@ class Options:
         self.permissions = permissions or []
         self.object_name, self.app_label = object_name, app_label
         self.get_latest_by = get_latest_by
-        if order_with_respect_to:
+        self.order_with_respect_to = order_with_respect_to
+        
+        self.module_constants = module_constants or {}
+        self.admin = admin
+    
+    def contribute_to_class(self, cls, name):
+        self.model = cls
+        cls._meta = self
+
+    def _prepare(self):
+        if self.order_with_respect_to:
             self.order_with_respect_to = self.get_field(order_with_respect_to)
             self.ordering = ('_order',)
         else:
             self.order_with_respect_to = None
-        self.module_constants = module_constants or {}
-        self.admin = admin
-
+        
         # Calculate one_to_one_field.
         self.one_to_one_field = None
         for f in self.fields:
@@ -51,7 +57,9 @@ class Options:
         # If a primary_key field hasn't been specified, add an
         # auto-incrementing primary-key ID field automatically.
         if self.pk is None:
-            self.fields.insert(0, AutoField(name='id', verbose_name='ID', primary_key=True))
+            auto = AutoField(verbose_name='ID', primary_key=True)
+            auto.creation_counter = -1
+            self.model.add_to_class('id', auto)
             self.pk = self.fields[0]
         # Cache whether this has an AutoField.
         self.has_auto_field = False
@@ -64,6 +72,15 @@ class Options:
         #HACK
         self.limit_choices_to = {}
 
+    def add_field(self, field):
+        # Insert the fields in the order that they were created. The
+        # "creation_counter" is needed because metaclasses don't preserve the
+        # attribute order.
+        if field.rel and isinstance(field.rel, ManyToMany):
+            self.many_to_many.insert(bisect(self.many_to_many, field), field)
+        else:
+            self.fields.insert(bisect(self.fields,field),field)
+            
 
     def __repr__(self):
         return '<Options for %s>' % self.module_name

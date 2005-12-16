@@ -1,6 +1,6 @@
 from django.db.models.manipulators import ManipulatorDescriptor, ModelAddManipulator, ModelChangeManipulator
 from django.db.models.fields import Field, DateField, FileField, ImageField, AutoField
-from django.db.models.fields.related import OneToOne, ManyToOne, ManyToMany, RECURSIVE_RELATIONSHIP_CONSTANT
+from django.db.models.fields.related import RelatedField, OneToOne, ManyToOne, ManyToMany, RECURSIVE_RELATIONSHIP_CONSTANT
 from django.db.models.related import RelatedObject
 from django.db.models.manager import Manager, ManagerDescriptor
 from django.db.models.query import orderlist2sql 
@@ -36,23 +36,9 @@ class ModelBase(type):
         except KeyError:
             meta_attrs = {}
 
-        # Gather all attributes that are Field or Manager instances.
-        fields, managers = [], []
-        for obj_name, obj in attrs.items():
-            if isinstance(obj, Field):
-                obj.set_name(obj_name)
-                fields.append(obj)
-                del attrs[obj_name]
-            elif isinstance(obj, Manager):
-                managers.append((obj_name, obj))
-                del attrs[obj_name]
-
-        # Sort the fields and managers in the order that they were created. The
-        # "creation_counter" is needed because metaclasses don't preserve the
-        # attribute order.
-        fields.sort(lambda x, y: x.creation_counter - y.creation_counter)
-        managers.sort(lambda x, y: x[1].creation_counter - y[1].creation_counter)
-
+        # Create the class, because we need it to use in currying.
+        new_class = type.__new__(cls, name, bases, { '__module__' : attrs.pop('__module__') })
+        
         opts = Options(
             module_name = meta_attrs.pop('module_name', get_module_name(name)),
             # If the verbose_name wasn't given, use the class name,
@@ -60,7 +46,6 @@ class ModelBase(type):
             verbose_name = meta_attrs.pop('verbose_name', get_verbose_name(name)),
             verbose_name_plural = meta_attrs.pop('verbose_name_plural', ''),
             db_table = meta_attrs.pop('db_table', ''),
-            fields = fields,
             ordering = meta_attrs.pop('ordering', None),
             unique_together = meta_attrs.pop('unique_together', None),
             admin = meta_attrs.pop('admin', None),
@@ -76,38 +61,24 @@ class ModelBase(type):
 
         if meta_attrs != {}:
             raise TypeError, "'class META' got invalid attribute(s): %s" % ','.join(meta_attrs.keys())
-
+        new_class.add_to_class('_meta', opts)
+        
         # Create the DoesNotExist exception.
-        attrs['DoesNotExist'] = types.ClassType('DoesNotExist', (ObjectDoesNotExist,), {})
-
-        # Create the class, because we need it to use in currying.
-        new_class = type.__new__(cls, name, bases, attrs)
-
-        # Give the class a docstring -- its definition.
-        if new_class.__doc__ is None:
-            new_class.__doc__ = "%s.%s(%s)" % (opts.module_name, name, ", ".join([f.name for f in opts.fields]))
-
-        if hasattr(new_class, 'get_absolute_url'):
-            new_class.get_absolute_url = curry(get_absolute_url, opts, new_class.get_absolute_url)
-
+        new_class.DoesNotExist = types.ClassType('DoesNotExist', (ObjectDoesNotExist,), {})
+        
         # Figure out the app_label by looking one level up.
+        #FIXME: wrong for nested model modules
         app_package = sys.modules.get(new_class.__module__)
         app_label = app_package.__name__.replace('.models', '')
         app_label = app_label[app_label.rfind('.')+1:]
 
-        # Populate the _MODELS member on the module the class is in.
-        app_package.__dict__.setdefault('_MODELS', []).append(new_class)
-
         # Cache the app label.
         opts.app_label = app_label
-
-        # If the db_table wasn't provided, use the app_label + module_name.
-        if not opts.db_table:
-            opts.db_table = "%s_%s" % (app_label, opts.module_name)
-        new_class._meta = opts
-
-        for m_name, m in managers:
-            new_class.add_to_class(m_name, m)
+        
+        #Add all attributes to the class
+        #fields, managers = [], []
+        for obj_name, obj in attrs.items():
+            new_class.add_to_class(obj_name, obj)
         
         if not hasattr(new_class, '_default_manager'):
             # Create the default manager, if needed.
@@ -115,18 +86,25 @@ class ModelBase(type):
                 raise ValueError, "Model %s must specify a custom Manager, because it has a field named 'objects'" % name
             new_class.add_to_class('objects',  Manager())
 
-        new_class._prepare()
-
-        for field in fields:
-            if field.rel:
-                other = field.rel.to
-                if isinstance(other, basestring):
-                    print "string lookup"
-                else:
-                    related = RelatedObject(other._meta, new_class, field)
-                    field.contribute_to_related_class(other, related)
-
         
+        # Give the class a docstring -- its definition.
+        if new_class.__doc__ is None:
+            new_class.__doc__ = "%s.%s(%s)" % (opts.module_name, name, ", ".join([f.name for f in opts.fields]))
+
+        if hasattr(new_class, 'get_absolute_url'):
+            new_class.get_absolute_url = curry(get_absolute_url, opts, new_class.get_absolute_url)
+            
+        opts._prepare()
+        new_class._prepare()
+        
+        # If the db_table wasn't provided, use the app_label + module_name.
+        if not opts.db_table:
+            opts.db_table = "%s_%s" % (app_label, opts.module_name)
+        
+        # Populate the _MODELS member on the module the class is in.
+        app_package.__dict__.setdefault('_MODELS', []).append(new_class)
+        
+    
         return new_class
 
 
@@ -207,13 +185,6 @@ class Model(object):
                     if not f.height_field:
                         setattr(cls, 'get_%s_height' % f.name, curry(cls.__get_FIELD_height, field=f))
 
-            # If the object has a relationship to itself, as designated by
-            # RECURSIVE_RELATIONSHIP_CONSTANT, create that relationship formally.
-            if f.rel and f.rel.to == RECURSIVE_RELATIONSHIP_CONSTANT:
-                f.rel.to = cls
-                f.name = f.name or (f.rel.to._meta.object_name.lower() + '_' + f.rel.to._meta.pk.name)
-                f.verbose_name = f.verbose_name or f.rel.to._meta.verbose_name
-                f.rel.field_name = f.rel.field_name or f.rel.to._meta.pk.name
 
             # Add methods for many-to-one related objects.
             # EXAMPLES: Choice.get_poll(), Story.get_dateline()
@@ -233,6 +204,8 @@ class Model(object):
         if cls._meta.order_with_respect_to:
             cls.get_next_in_order = curry(cls.__get_next_or_previous_in_order, is_next=True)
             cls.get_previous_in_order = curry(cls.__get_next_or_previous_in_order, is_next=False)
+        
+        RelatedField.do_pending_lookups(cls)
 
     _prepare = classmethod(_prepare)
 

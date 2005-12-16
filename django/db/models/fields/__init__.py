@@ -88,7 +88,7 @@ class Field(object):
 
     # Tracks each time a Field instance is created. Used to retain order.
     creation_counter = 0
-
+    
     def __init__(self, verbose_name=None, name=None, primary_key=False,
         maxlength=None, unique=False, blank=False, null=False, db_index=False,
         core=False, rel=None, default=NOT_PROVIDED, editable=True,
@@ -96,7 +96,8 @@ class Field(object):
         unique_for_year=None, validator_list=None, choices=None, radio_admin=None,
         help_text='', db_column=None):
         self.name = name
-        self.verbose_name = verbose_name or (name and name.replace('_', ' '))
+        self.verbose_name = verbose_name 
+        
         self.primary_key = primary_key
         self.maxlength, self.unique = maxlength, unique
         self.blank, self.null = blank, null
@@ -110,16 +111,23 @@ class Field(object):
         self.radio_admin = radio_admin
         self.help_text = help_text
         self.db_column = db_column
-       
-        # Set db_index to True if the field has a relationship and doesn't explicitly set db_index.
         
+        # Set db_index to True if the field has a relationship and doesn't explicitly set db_index.
         self.db_index = db_index
-
         # Increase the creation counter, and save our local copy.
         self.creation_counter = Field.creation_counter
         Field.creation_counter += 1
 
+
+    def __cmp__(self,other ):
+        #This is because bisect does not take a comparison function. grrr. 
+        return cmp(self.creation_counter, other.creation_counter)
+
+    def contribute_to_class(self, cls, name):
+        self.name = name
         self.attname, self.column = self.get_attname_column()
+        self.verbose_name = self.verbose_name or (name and name.replace('_', ' '))
+        cls._meta.add_field(self)
 
     def set_name(self, name):
         self.name = name

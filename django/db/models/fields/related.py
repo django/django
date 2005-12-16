@@ -1,21 +1,63 @@
 from django.db.models.fields import Field, IntegerField
+from django.db.models.related import RelatedObject
 from django.utils.translation import gettext_lazy, string_concat
 from django.utils.functional import curry
 from django.core import formfields
+
 
 # Values for Relation.edit_inline.
 TABULAR, STACKED = 1, 2
 
 RECURSIVE_RELATIONSHIP_CONSTANT = 'self'
 
+#HACK 
+class RelatedField(object):
+    pending_lookups = {}
+    
+    def add_lookup(cls, rel_cls, field):
+        name = field.rel.to
+        module = rel_cls.__module__
+        key = (module, name)
+        cls.pending_lookups.setdefault(key,[]).append( (rel_cls, field) )
+    add_lookup = classmethod(add_lookup)
+        
+    def do_pending_lookups(cls, other_cls):
+        key = (other_cls.__module__, other_cls.__name__)
+        for (rel_cls,field) in cls.pending_lookups.setdefault(key,[]):
+            field.rel.to = other_cls
+            field.do_related_class(other_cls, rel_cls)
+    do_pending_lookups = classmethod(do_pending_lookups)
+    
+    def contribute_to_class(self, cls, name):
+        Field.contribute_to_class(self,cls,name)
+        other = self.rel.to
+        if isinstance(other, basestring):
+            if other == RECURSIVE_RELATIONSHIP_CONSTANT:
+                self.rel.to = cls.__name__
+                self.add_lookup(cls, self)
+        else:
+            self.do_related_class(other, cls)
+
+    def set_attributes_from_rel(self):
+        self.name = self.name or (self.rel.to._meta.object_name.lower() + '_' + self.rel.to._meta.pk.name)
+        self.verbose_name = self.verbose_name or self.rel.to._meta.verbose_name
+        self.rel.field_name = self.rel.field_name or self.rel.to._meta.pk.name
+        
+    def do_related_class(self, other, cls):
+        self.set_attributes_from_rel()
+        related = RelatedObject(other._meta, cls, self)
+        self.contribute_to_related_class(other, related)
+        
+
 #HACK
-class SharedMethods(object):
+class SharedMethods(RelatedField):
     def get_attname(self):
         return '%s_id' % self.name
     
     def get_validator_unique_lookup_type(self):
         return '%s__%s__exact' % (self.name, self.rel.get_related_field().name)
-    
+
+
 class ForeignKey(SharedMethods,Field):
     empty_strings_allowed = False
     def __init__(self, to, to_field=None, **kwargs):
@@ -98,7 +140,6 @@ class ForeignKey(SharedMethods,Field):
 
     def contribute_to_related_class(self, cls, related):
         rel_obj_name = related.get_method_name_part()
-
         # Add "get_thingie" methods for many-to-one related objects.
         # EXAMPLE: Poll.get_choice()
         setattr(cls, 'get_%s' % rel_obj_name, curry(cls._get_related, method_name='get_object', rel_class=related.model, rel_field=related.field))
@@ -147,7 +188,7 @@ class OneToOneField(SharedMethods, IntegerField):
                       rel_class=related.model, rel_field=related.field))
 
 
-class ManyToManyField(Field):
+class ManyToManyField(RelatedField,Field):
     def __init__(self, to, **kwargs):
         kwargs['verbose_name'] = kwargs.get('verbose_name', to._meta.verbose_name_plural)
         kwargs['rel'] = ManyToMany(to, kwargs.pop('singular', None),
@@ -224,6 +265,9 @@ class ManyToManyField(Field):
             func = curry(cls._set_related_many_to_many, cls, related.field)
             func.alters_data = True
             setattr(cls, 'set_%s' % related.opts.module_name, func)
+
+    def set_attributes_from_rel(self):
+        pass
 
 class ManyToOne:
     def __init__(self, to, field_name, num_in_admin=3, min_num_in_admin=None,
