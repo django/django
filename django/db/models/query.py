@@ -1,6 +1,47 @@
 from django.db import backend, connection
 
 LOOKUP_SEPARATOR = '__'
+####################
+# HELPER FUNCTIONS #
+####################
+
+# Django currently supports two forms of ordering.
+# Form 1 (deprecated) example:
+#     order_by=(('pub_date', 'DESC'), ('headline', 'ASC'), (None, 'RANDOM'))
+# Form 2 (new-style) example:
+#     order_by=('-pub_date', 'headline', '?')
+# Form 1 is deprecated and will no longer be supported for Django's first
+# official release. The following code converts from Form 1 to Form 2.
+
+LEGACY_ORDERING_MAPPING = {'ASC': '_', 'DESC': '-_', 'RANDOM': '?'}
+
+def handle_legacy_orderlist(order_list):
+    if not order_list or isinstance(order_list[0], basestring):
+        return order_list
+    else:
+        import warnings
+        new_order_list = [LEGACY_ORDERING_MAPPING[j.upper()].replace('_', str(i)) for i, j in order_list]
+        warnings.warn("%r ordering syntax is deprecated. Use %r instead." % (order_list, new_order_list), DeprecationWarning)
+        return new_order_list
+
+def orderfield2column(f, opts):
+    try:
+        return opts.get_field(f, False).column
+    except FieldDoesNotExist:
+        return f
+
+def orderlist2sql(order_list, opts, prefix=''):
+    if prefix.endswith('.'):
+        prefix = backend.quote_name(prefix[:-1]) + '.'
+    output = []
+    for f in handle_legacy_orderlist(order_list):
+        if f.startswith('-'):
+            output.append('%s%s DESC' % (prefix, backend.quote_name(orderfield2column(f[1:], opts))))
+        elif f == '?':
+            output.append(backend.get_random_function_sql())
+        else:
+            output.append('%s%s ASC' % (prefix, backend.quote_name(orderfield2column(f, opts))))
+    return ', '.join(output)
 
 class QBase:
     "Base class for QAnd and QOr"

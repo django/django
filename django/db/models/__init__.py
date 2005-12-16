@@ -9,14 +9,12 @@ import copy, datetime, os, re, sys, types
 
 from django.db.models.loading import get_installed_models, get_installed_model_modules
 from django.db.models.manipulators import ManipulatorDescriptor, ModelAddManipulator, ModelChangeManipulator
-from django.db.models.query import Q, parse_lookup, get_where_clause, get_cached_row, fill_table_cache, throw_bad_kwarg_error
+from django.db.models.query import Q, orderlist2sql 
+from django.db.models.manager import Manager
 
 # Admin stages.
 ADD, CHANGE, BOTH = 1, 2, 3
 
-# Size of each "chunk" for get_iterator calls.
-# Larger values are slightly faster at the expense of more storage space.
-GET_ITERATOR_CHUNK_SIZE = 100
 
 # Prefix (in Python path style) to location of models.
 MODEL_PREFIX = 'django.models'
@@ -31,47 +29,7 @@ MANIPULATOR_FUNCTIONS_PREFIX = '_manipulator_'
 
 
 
-####################
-# HELPER FUNCTIONS #
-####################
 
-# Django currently supports two forms of ordering.
-# Form 1 (deprecated) example:
-#     order_by=(('pub_date', 'DESC'), ('headline', 'ASC'), (None, 'RANDOM'))
-# Form 2 (new-style) example:
-#     order_by=('-pub_date', 'headline', '?')
-# Form 1 is deprecated and will no longer be supported for Django's first
-# official release. The following code converts from Form 1 to Form 2.
-
-LEGACY_ORDERING_MAPPING = {'ASC': '_', 'DESC': '-_', 'RANDOM': '?'}
-
-def handle_legacy_orderlist(order_list):
-    if not order_list or isinstance(order_list[0], basestring):
-        return order_list
-    else:
-        import warnings
-        new_order_list = [LEGACY_ORDERING_MAPPING[j.upper()].replace('_', str(i)) for i, j in order_list]
-        warnings.warn("%r ordering syntax is deprecated. Use %r instead." % (order_list, new_order_list), DeprecationWarning)
-        return new_order_list
-
-def orderfield2column(f, opts):
-    try:
-        return opts.get_field(f, False).column
-    except FieldDoesNotExist:
-        return f
-
-def orderlist2sql(order_list, opts, prefix=''):
-    if prefix.endswith('.'):
-        prefix = backend.quote_name(prefix[:-1]) + '.'
-    output = []
-    for f in handle_legacy_orderlist(order_list):
-        if f.startswith('-'):
-            output.append('%s%s DESC' % (prefix, backend.quote_name(orderfield2column(f[1:], opts))))
-        elif f == '?':
-            output.append(backend.get_random_function_sql())
-        else:
-            output.append('%s%s ASC' % (prefix, backend.quote_name(orderfield2column(f, opts))))
-    return ', '.join(output)
 
 #def get_module(app_label, module_name):
 #    return __import__('%s.%s.%s' % (MODEL_PREFIX, app_label, module_name), '', '', [''])
@@ -440,201 +398,6 @@ get_module_name = lambda class_name: class_name.lower() + 's'
 # Calculate the verbose_name by converting from InitialCaps to "lowercase with spaces".
 get_verbose_name = lambda class_name: re.sub('([A-Z])', ' \\1', class_name).lower().strip()
 
-class Manager(object):
-
-    # Tracks each time a Field instance is created. Used to retain order.
-    creation_counter = 0
-
-    def __init__(self):
-        # Increase the creation counter, and save our local copy.
-        self.creation_counter = Manager.creation_counter
-        Manager.creation_counter += 1
-
-    def __get__(self, instance, type=None):
-        if instance != None:
-            raise AttributeError, "Manager isn't accessible via %s instances" % self.klass.__name__
-        return self
-
-    def _prepare(self, klass):
-        # Creates some methods once self.klass._meta has been populated.
-        self.klass = klass
-        if self.klass._meta.get_latest_by:
-            self.get_latest = self.__get_latest
-        for f in self.klass._meta.fields:
-            if isinstance(f, DateField):
-                setattr(self, 'get_%s_list' % f.name, curry(self.__get_date_list, f))
-
-    def _get_sql_clause(self, **kwargs):
-        def quote_only_if_word(word):
-            if ' ' in word:
-                return word
-            else:
-                return backend.quote_name(word)
-
-        opts = self.klass._meta
-
-        # Construct the fundamental parts of the query: SELECT X FROM Y WHERE Z.
-        select = ["%s.%s" % (backend.quote_name(opts.db_table), backend.quote_name(f.column)) for f in opts.fields]
-        tables = [opts.db_table] + (kwargs.get('tables') and kwargs['tables'][:] or [])
-        tables = [quote_only_if_word(t) for t in tables]
-        where = kwargs.get('where') and kwargs['where'][:] or []
-        params = kwargs.get('params') and kwargs['params'][:] or []
-
-        # Convert the kwargs into SQL.
-        tables2, join_where2, where2, params2, _ = parse_lookup(kwargs.items(), opts)
-        tables.extend(tables2)
-        where.extend(join_where2 + where2)
-        params.extend(params2)
-
-        # Add any additional constraints from the "where_constraints" parameter.
-        where.extend(opts.where_constraints)
-
-        # Add additional tables and WHERE clauses based on select_related.
-        if kwargs.get('select_related') is True:
-            fill_table_cache(opts, select, tables, where, opts.db_table, [opts.db_table])
-
-        # Add any additional SELECTs passed in via kwargs.
-        if kwargs.get('select'):
-            select.extend(['(%s) AS %s' % (quote_only_if_word(s[1]), backend.quote_name(s[0])) for s in kwargs['select']])
-
-        # ORDER BY clause
-        order_by = []
-        for f in handle_legacy_orderlist(kwargs.get('order_by', opts.ordering)):
-            if f == '?': # Special case.
-                order_by.append(backend.get_random_function_sql())
-            else:
-                if f.startswith('-'):
-                    col_name = f[1:]
-                    order = "DESC"
-                else:
-                    col_name = f
-                    order = "ASC"
-                if "." in col_name:
-                    table_prefix, col_name = col_name.split('.', 1)
-                    table_prefix = backend.quote_name(table_prefix) + '.'
-                else:
-                    # Use the database table as a column prefix if it wasn't given,
-                    # and if the requested column isn't a custom SELECT.
-                    if "." not in col_name and col_name not in [k[0] for k in kwargs.get('select', [])]:
-                        table_prefix = backend.quote_name(opts.db_table) + '.'
-                    else:
-                        table_prefix = ''
-                order_by.append('%s%s %s' % (table_prefix, backend.quote_name(orderfield2column(col_name, opts)), order))
-        order_by = ", ".join(order_by)
-
-        # LIMIT and OFFSET clauses
-        if kwargs.get('limit') is not None:
-            limit_sql = " %s " % backend.get_limit_offset_sql(kwargs['limit'], kwargs.get('offset'))
-        else:
-            assert kwargs.get('offset') is None, "'offset' is not allowed without 'limit'"
-            limit_sql = ""
-
-        return select, " FROM " + ",".join(tables) + (where and " WHERE " + " AND ".join(where) or "") + (order_by and " ORDER BY " + order_by or "") + limit_sql, params
-
-    def get_iterator(self, **kwargs):
-        # kwargs['select'] is a dictionary, and dictionaries' key order is
-        # undefined, so we convert it to a list of tuples internally.
-        kwargs['select'] = kwargs.get('select', {}).items()
-
-        cursor = connection.cursor()
-        select, sql, params = self._get_sql_clause(**kwargs)
-        cursor.execute("SELECT " + (kwargs.get('distinct') and "DISTINCT " or "") + ",".join(select) + sql, params)
-        fill_cache = kwargs.get('select_related')
-        index_end = len(self.klass._meta.fields)
-        while 1:
-            rows = cursor.fetchmany(GET_ITERATOR_CHUNK_SIZE)
-            if not rows:
-                raise StopIteration
-            for row in rows:
-                if fill_cache:
-                    obj, index_end = get_cached_row(self.klass, row, 0)
-                else:
-                    obj = self.klass(*row[:index_end])
-                for i, k in enumerate(kwargs['select']):
-                    setattr(obj, k[0], row[index_end+i])
-                yield obj
-
-    def get_list(self, **kwargs):
-        return list(self.get_iterator(**kwargs))
-
-    def get_count(self, **kwargs):
-        kwargs['order_by'] = []
-        kwargs['offset'] = None
-        kwargs['limit'] = None
-        kwargs['select_related'] = False
-        _, sql, params = self._get_sql_clause(**kwargs)
-        cursor = connection.cursor()
-        cursor.execute("SELECT COUNT(*)" + sql, params)
-        return cursor.fetchone()[0]
-
-    def get_object(self, **kwargs):
-        obj_list = self.get_list(**kwargs)
-        if len(obj_list) < 1:
-            raise self.klass.DoesNotExist, "%s does not exist for %s" % (self.klass._meta.object_name, kwargs)
-        assert len(obj_list) == 1, "get_object() returned more than one %s -- it returned %s! Lookup parameters were %s" % (self.klass._meta.object_name, len(obj_list), kwargs)
-        return obj_list[0]
-
-    def get_in_bulk(self, *args, **kwargs):
-        id_list = args and args[0] or kwargs['id_list']
-        assert id_list != [], "get_in_bulk() cannot be passed an empty list."
-        kwargs['where'] = ["%s.%s IN (%s)" % (backend.quote_name(self.klass._meta.db_table), backend.quote_name(self.klass._meta.pk.column), ",".join(['%s'] * len(id_list)))]
-        kwargs['params'] = id_list
-        obj_list = self.get_list(**kwargs)
-        return dict([(getattr(o, self.klass._meta.pk.attname), o) for o in obj_list])
-
-    def get_values_iterator(self, **kwargs):
-        # select_related and select aren't supported in get_values().
-        kwargs['select_related'] = False
-        kwargs['select'] = {}
-
-        # 'fields' is a list of field names to fetch.
-        try:
-            fields = [self.klass._meta.get_field(f).column for f in kwargs.pop('fields')]
-        except KeyError: # Default to all fields.
-            fields = [f.column for f in self.klass._meta.fields]
-
-        cursor = connection.cursor()
-        _, sql, params = self._get_sql_clause(**kwargs)
-        select = ['%s.%s' % (backend.quote_name(self.klass._meta.db_table), backend.quote_name(f)) for f in fields]
-        cursor.execute("SELECT " + (kwargs.get('distinct') and "DISTINCT " or "") + ",".join(select) + sql, params)
-        while 1:
-            rows = cursor.fetchmany(GET_ITERATOR_CHUNK_SIZE)
-            if not rows:
-                raise StopIteration
-            for row in rows:
-                yield dict(zip(fields, row))
-
-    def get_values(self, **kwargs):
-        return list(self.get_values_iterator(**kwargs))
-
-    def __get_latest(self, **kwargs):
-        kwargs['order_by'] = ('-' + self.klass._meta.get_latest_by,)
-        kwargs['limit'] = 1
-        return self.get_object(**kwargs)
-
-    def __get_date_list(self, field, *args, **kwargs):
-        from django.db.backends.util import typecast_timestamp
-        kind = args and args[0] or kwargs['kind']
-        assert kind in ("month", "year", "day"), "'kind' must be one of 'year', 'month' or 'day'."
-        order = 'ASC'
-        if kwargs.has_key('order'):
-            order = kwargs['order']
-            del kwargs['order']
-        assert order in ('ASC', 'DESC'), "'order' must be either 'ASC' or 'DESC'"
-        kwargs['order_by'] = () # Clear this because it'll mess things up otherwise.
-        if field.null:
-            kwargs.setdefault('where', []).append('%s.%s IS NOT NULL' % \
-                (backend.quote_name(self.klass._meta.db_table), backend.quote_name(field.column)))
-        select, sql, params = self._get_sql_clause(**kwargs)
-        sql = 'SELECT %s %s GROUP BY 1 ORDER BY 1 %s' % \
-            (backend.get_date_trunc_sql(kind, '%s.%s' % (backend.quote_name(self.klass._meta.db_table),
-            backend.quote_name(field.column))), sql, order)
-        cursor = connection.cursor()
-        cursor.execute(sql, params)
-        # We have to manually run typecast_timestamp(str()) on the results, because
-        # MySQL doesn't automatically cast the result of date functions as datetime
-        # objects -- MySQL returns the values as strings, instead.
-        return [typecast_timestamp(str(row[0])) for row in cursor.fetchall()]
 
 
 
