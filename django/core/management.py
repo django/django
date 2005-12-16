@@ -979,10 +979,18 @@ def execute_manager(settings_mod):
     # Set DJANGO_SETTINGS_MODULE appropriately.
     os.environ['DJANGO_SETTINGS_MODULE'] = '%s.settings' % project_name
 
+    action_mapping = DEFAULT_ACTION_MAPPING.copy()
+
     # Remove the "startproject" command from the action_mapping, because that's
     # a django-admin.py command, not a manage.py command.
-    action_mapping = DEFAULT_ACTION_MAPPING.copy()
     del action_mapping['startproject']
+
+    # Override the startapp handler so that it always uses the
+    # project_directory, not the current working directory (which is default).
+    action_mapping['startapp'] = lambda app_name, directory: startapp(app_name, project_directory)
+    action_mapping['startapp'].help_doc = startapp.help_doc
+    action_mapping['startapp'].args = startapp.args
 
     # Run the django-admin.py command.
     execute_from_command_line(action_mapping)
+
