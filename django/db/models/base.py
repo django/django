@@ -14,6 +14,9 @@ import re
 import types
 import sys
 
+#HACK: for Python2.3 
+if not hasattr(__builtins__,'set'):
+    from sets import Set as set
 
 # Calculate the module_name using a poor-man's pluralization.
 get_module_name = lambda class_name: class_name.lower() + 's'
@@ -105,7 +108,15 @@ class ModelBase(type):
         
     
         return new_class
-
+    
+def cmp_cls(x, y):
+    for field in x._meta.fields:
+        if field.rel and field.null and field.rel.to == y:
+            return -1
+    for field in y._meta.fields:
+        if field.rel and field.null and field.rel.to == x:
+            return 1
+    return 0
 
 class Model(object):
     __metaclass__ = ModelBase
@@ -261,14 +272,18 @@ class Model(object):
 
     save.alters_data = True
 
-    def delete(self):
-        assert getattr(self, self._meta.pk.attname) is not None, "%r can't be deleted because it doesn't have an ID."
+    def __get_pk_val(self):
+        return str(getattr(self, self._meta.pk.attname))
 
-        # Run any pre-delete hooks.
-        if hasattr(self, '_pre_delete'):
-            self._pre_delete()
-
-        cursor = connection.cursor()
+    def __collect_sub_objects(self, seen_objs, ignore_objs):
+        pk_val = self.__get_pk_val()
+        
+        key = (self.__class__, pk_val)        
+        
+        if key in seen_objs or key in ignore_objs:
+            return
+        seen_objs[key] = self
+        
         for related in self._meta.get_all_related_objects():
             rel_opts_name = related.get_method_name_part()
             if isinstance(related.field.rel, OneToOne):
@@ -277,37 +292,74 @@ class Model(object):
                 except ObjectDoesNotExist:
                     pass
                 else:
-                    sub_obj.delete()
+                    sub_obj.__collect_sub_objects(seen_objs, ignore_objs)
             else:
                 for sub_obj in getattr(self, 'get_%s_list' % rel_opts_name)():
-                    sub_obj.delete()
-        for related in self._meta.get_all_related_many_to_many_objects():
-            cursor.execute("DELETE FROM %s WHERE %s=%%s" % \
-                (backend.quote_name(related.field.get_m2m_db_table(related.opts)),
-                backend.quote_name(self._meta.object_name.lower() + '_id')), [getattr(self, self._meta.pk.attname)])
-        for f in self._meta.many_to_many:
-            cursor.execute("DELETE FROM %s WHERE %s=%%s" % \
-                (backend.quote_name(f.get_m2m_db_table(self._meta)),
-                backend.quote_name(self._meta.object_name.lower() + '_id')),
-                [getattr(self, self._meta.pk.attname)])
+                    sub_obj.__collect_sub_objects(seen_objs, ignore_objs)
 
-        cursor.execute("DELETE FROM %s WHERE %s=%%s" % \
-            (backend.quote_name(self._meta.db_table), backend.quote_name(self._meta.pk.column)),
-            [getattr(self, self._meta.pk.attname)])
+    def delete(self, ignore_objects=None):
+        assert getattr(self, self._meta.pk.attname) is not None, "%r can't be deleted because it doesn't have an ID."
+        ignore_objects = \
+            ignore_objects and dict([ (o.__class,o.__get_pk_val) for o in ignore_objects ]) or {}
+        
+        seen_objs = {}
+        self.__collect_sub_objects(seen_objs, ignore_objects)
+        
+        seen_cls = set([cls for cls,pk in seen_objs.keys()])
+        cls_order = list(seen_cls)
+        cls_order.sort(cmp_cls)
 
+        seen_tups = [ (cls, pk_val, instance) for (cls, pk_val),instance in seen_objs.items() ]
+        seen_tups.sort(lambda x,y: cmp(cls_order.index(x[0]), cls_order.index(y[0])))
+        
+        cursor = connection.cursor()
+    
+        for cls, pk_val, instance in seen_tups:
+        
+            # Run any pre-delete hooks.
+            if hasattr(instance, '_pre_delete'):
+                instance._pre_delete()
+            
+            for related in cls._meta.get_all_related_many_to_many_objects():
+                cursor.execute("DELETE FROM %s WHERE %s=%%s" % \
+                    (backend.quote_name(related.field.get_m2m_db_table(related.opts)),
+                    backend.quote_name(cls._meta.object_name.lower() + '_id')),
+                    [pk_val])
+            for f in cls._meta.many_to_many:
+                cursor.execute("DELETE FROM %s WHERE %s=%%s" % \
+                    (backend.quote_name(f.get_m2m_db_table(cls._meta)),
+                    backend.quote_name(cls._meta.object_name.lower() + '_id')),
+                    [pk_val])
+                    
+            for field in cls._meta.fields:
+                if field.rel and field.null and field.rel.to in seen_cls:
+                    cursor.execute("UPDATE %s SET %s = NULL WHERE %s =%%s" % \
+                                   ( backend.quote_name(cls._meta.db_table), 
+                                     backend.quote_name(field.column),
+                                     backend.quote_name(cls._meta.pk.column)),
+                                   [pk_val] )
+              
+        seen_tups.reverse()
+        
+        for cls, pk_val, instance in seen_tups:
+            cursor.execute("DELETE FROM %s WHERE %s=%%s" % \
+                (backend.quote_name(cls._meta.db_table), backend.quote_name(cls._meta.pk.column)),
+                [pk_val])
+                
+            
+            setattr(self, cls._meta.pk.attname, None)
+            for f in cls._meta.fields:
+                if isinstance(f, FileField) and getattr(self, f.attname):
+                    file_name = getattr(instance, 'get_%s_filename' % f.name)()
+                    # If the file exists and no other object of this type references it,
+                    # delete it from the filesystem.
+                    if os.path.exists(file_name) and not cls._default_manager.get_list(**{'%s__exact' % f.name: getattr(self, f.name)}):
+                        os.remove(file_name)
+            # Run any post-delete hooks.
+            if hasattr(instance, '_post_delete'):
+                instance._post_delete()
+            
         connection.commit()
-        setattr(self, self._meta.pk.attname, None)
-        for f in self._meta.fields:
-            if isinstance(f, FileField) and getattr(self, f.attname):
-                file_name = getattr(self, 'get_%s_filename' % f.name)()
-                # If the file exists and no other object of this type references it,
-                # delete it from the filesystem.
-                if os.path.exists(file_name) and not self._default_manager.get_list(**{'%s__exact' % f.name: getattr(self, f.name)}):
-                    os.remove(file_name)
-
-        # Run any post-delete hooks.
-        if hasattr(self, '_post_delete'):
-            self._post_delete()
 
     delete.alters_data = True
 
