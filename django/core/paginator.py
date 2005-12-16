@@ -1,6 +1,5 @@
 from copy import copy
 from math import ceil
-from django.db.models import ModelBase
 
 class InvalidPage(Exception):
     pass

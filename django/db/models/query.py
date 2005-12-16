@@ -1,4 +1,5 @@
 from django.db import backend, connection
+from django.db.models.exceptions import *
 
 LOOKUP_SEPARATOR = '__'
 ####################

@@ -24,6 +24,8 @@ from django.utils.html import escape
 import operator
 from itertools import izip
 
+from django.db.models.query import handle_legacy_orderlist
+
 # The system will display a "Show all" link only if the total result count
 # is less than or equal to this setting.
 MAX_SHOW_ALL_ALLOWED = 200
@@ -231,7 +233,7 @@ class ChangeList(object):
         ordering = lookup_opts.admin.ordering or lookup_opts.ordering or ['-' + lookup_opts.pk.name]
 
         # Normalize it to new-style ordering.
-        ordering = models.handle_legacy_orderlist(ordering)
+        ordering = handle_legacy_orderlist(ordering)
 
         if ordering[0].startswith('-'):
             order_field, order_type = ordering[0][1:], 'desc'
