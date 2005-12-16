@@ -66,7 +66,6 @@ class AutomaticManipulator(Manipulator):
         
     def save(self, new_data):
         add, change, opts, klass = self.add, self.change, self.opts, self.model
-        print add, change, opts, klass 
         # TODO: big cleanup when core fields go -> use recursive manipulators.
         from django.utils.datastructures import DotExpandedDict
         params = {}
@@ -203,7 +202,7 @@ class AutomaticManipulator(Manipulator):
                     # If, in the change stage, all of the core fields were blank and
                     # the primary key (ID) was provided, delete the item.
                     if change and all_cores_blank and old_rel_obj:
-                        new_rel_obj.delete()
+                        new_rel_obj.delete(ignore_objects=[new_object])
                         self.fields_deleted.append('%s "%s"' % (related.opts.verbose_name, old_rel_obj))
     
         # Save the order, if applicable.
