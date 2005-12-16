@@ -31,21 +31,24 @@
 import os, sys, thread, time
 
 RUN_RELOADER = True
-reloadFiles = []
 
 def reloader_thread():
     mtimes = {}
+    win = (sys.platform == "win32")
     while RUN_RELOADER:
-        for filename in filter(lambda v: v, map(lambda m: getattr(m, "__file__", None), sys.modules.values())) + reloadFiles:
+        for filename in filter(lambda v: v, map(lambda m: getattr(m, "__file__", None), sys.modules.values())):
+            if filename.endswith(".pyc") or filename.endswith("*.pyo"):
+                filename = filename[:-1]
             if not os.path.exists(filename):
                 continue # File might be in an egg, so it can't be reloaded.
-            if filename.endswith(".pyc"):
-                filename = filename[:-1]
-            mtime = os.stat(filename).st_mtime
+            stat = os.stat(filename)
+            mtime = stat.st_mtime
+            if win:
+                mtime -= stat.st_ctime
             if filename not in mtimes:
                 mtimes[filename] = mtime
                 continue
-            if mtime > mtimes[filename]:
+            if mtime != mtimes[filename]:
                 sys.exit(3) # force reload
         time.sleep(1)
 

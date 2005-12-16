@@ -2,6 +2,7 @@
 
 from django.core.template import resolve_variable, Library
 from django.conf.settings import DATE_FORMAT, TIME_FORMAT
+from django.utils.translation import gettext
 import re
 import random as random_module
 
@@ -351,7 +352,7 @@ def divisibleby(value, arg):
     "Returns true if the value is devisible by the argument"
     return int(value) % int(arg) == 0
 
-def yesno(value, arg=_("yes,no,maybe")):
+def yesno(value, arg=None):
     """
     Given a string mapping values for true, false and (optionally) None,
     returns one of those strings accoding to the value:
@@ -365,7 +366,9 @@ def yesno(value, arg=_("yes,no,maybe")):
     ``None``    ``"yeah,no"``           ``"no"`` (converts None to False
                                         if no mapping for None is given.
     ==========  ======================  ==================================
-   """
+    """
+    if arg is None:
+        arg = gettext('yes,no,maybe')
     bits = arg.split(',')
     if len(bits) < 2:
         return value # Invalid arg.

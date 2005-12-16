@@ -199,7 +199,7 @@ td ul.errorlist li { margin:0 !important; }
 /*  ACTION ICONS  */
 .addlink { padding-left:12px; background:url(../img/admin/icon_addlink.gif) 0 .2em no-repeat; }
 .changelink { padding-left:12px; background:url(../img/admin/icon_changelink.gif) 0 .2em no-repeat; }
-.deletelink { padding-left:12px; background:url(../img/admin/icon_deletelink.gif) 0 50% no-repeat; }
+.deletelink { padding-left:12px; background:url(../img/admin/icon_deletelink.gif) 0 .2em no-repeat; }
 a.deletelink:link, a.deletelink:visited { color:#CC3434; }
 a.deletelink:hover { color:#993333; }
 
