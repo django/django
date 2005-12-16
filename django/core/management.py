@@ -65,7 +65,7 @@ def get_sql_create(mod):
     data_types = get_creation_module().DATA_TYPES
     final_output = []
     opts_output = set()
-    pending_references = {} 
+    pending_references = {}
     for klass in mod._MODELS:
         opts = klass._meta
         table_output = []
@@ -87,8 +87,8 @@ def get_sql_create(mod):
                 if f.rel:
                      if f.rel.to in opts_output:
                          field_output.append('REFERENCES %s (%s)' % \
-                             (db.db.quote_name(f.rel.to._meta.db_table),
-                             db.db.quote_name(f.rel.to._meta.get_field(f.rel.field_name).column)))
+                             (backend.quote_name(f.rel.to._meta.db_table),
+                             backend.quote_name(f.rel.to._meta.get_field(f.rel.field_name).column)))
                      else:
                          pr = pending_references.setdefault(f.rel.to._meta, []).append( (opts, f) )
                 table_output.append(' '.join(field_output))
@@ -110,7 +110,7 @@ def get_sql_create(mod):
                 table =  opts.db_table
                 col = opts.get_field(f.rel.field_name).column
                 final_output.append( 'ALTER TABLE %s ADD CONSTRAINT %s FOREIGN KEY (%s) REFERENCES %s (%s);'  % \
-                                     (backend.quote_name(r_table), 
+                                     (backend.quote_name(r_table),
                                       backend.quote_name("%s_referencing_%s_%s" % (r_col,table,col)),
                                       backend.quote_name(r_col), backend.quote_name(table),backend.quote_name(col))
                                      )
@@ -167,7 +167,7 @@ def get_sql_delete(mod):
 
     # Output DROP TABLE statements for standard application tables.
     to_delete = set()
-    
+
     references_to_delete = {}
     for klass in mod._MODELS:
         try:
@@ -186,28 +186,26 @@ def get_sql_delete(mod):
                     references_to_delete[f.rel.to] = refs
 
             to_delete.add(opts)
-             
+
     for klass in mod._MODELS:
          try:
              if cursor is not None:
                  # Check whether the table exists.
-                 cursor.execute("SELECT 1 FROM %s LIMIT 1" % db.db.quote_name(klass._meta.db_table))
+                 cursor.execute("SELECT 1 FROM %s LIMIT 1" % backend.quote_name(klass._meta.db_table))
          except:
              # The table doesn't exist, so it doesn't need to be dropped.
-             db.db.rollback()
+             connection.rollback()
          else:
-             output.append("DROP TABLE %s;" % db.db.quote_name(klass._meta.db_table))
+             output.append("DROP TABLE %s;" % backend.quote_name(klass._meta.db_table))
              if references_to_delete.has_key(klass._meta):
                  for opts, f in references_to_delete[klass._meta]:
                      col = f.column
                      table = opts.db_table
                      r_table = f.rel.to._meta.db_table
                      r_col = f.rel.to.get_field(f.rel.field_name).column
-
-                     output.append( 'ALTER TABLE %s DROP CONSTRAINT %s;'  % \
-                                          (db.db.quote_name(table),
-                                           db.db.quote_name("%s_referencing_%s_%s" % (col,r_table,r_col))
-                                          ))
+                     output.append('ALTER TABLE %s DROP CONSTRAINT %s;' % \
+                        (backend.quote_name(table),
+                         backend.quote_name("%s_referencing_%s_%s" % (col,r_table,r_col))))
 
     # Output DROP TABLE statements for many-to-many tables.
     for klass in mod._MODELS:
