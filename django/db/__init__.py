@@ -2,6 +2,10 @@ from django.conf.settings import DATABASE_ENGINE
 
 __all__ = ('backend', 'connection', 'DatabaseError')
 
+if not DATABASE_ENGINE:
+    from django.core.exceptions import ImproperlyConfigured
+    raise ImproperlyConfigured, "You haven't set the DATABASE_ENGINE setting yet."
+
 try:
     backend = __import__('django.db.backends.%s.base' % DATABASE_ENGINE, '', '', [''])
 except ImportError, e:
