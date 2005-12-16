@@ -62,10 +62,12 @@ get_rel_data_type = lambda f: (f.get_internal_type() == 'AutoField') and 'Intege
 def get_sql_create(mod):
     "Returns a list of the CREATE TABLE SQL statements for the given module."
     from django.db import backend, get_creation_module, models
+
     data_types = get_creation_module().DATA_TYPES
     final_output = []
     opts_output = set()
     pending_references = {}
+
     for klass in mod._MODELS:
         opts = klass._meta
         table_output = []
@@ -78,6 +80,7 @@ def get_sql_create(mod):
                 data_type = f.get_internal_type()
             col_type = data_types[data_type]
             if col_type is not None:
+                # Make the definition (e.g. 'foo VARCHAR(30)') for this field.
                 field_output = [backend.quote_name(f.column), col_type % rel_field.__dict__]
                 field_output.append('%sNULL' % (not f.null and 'NOT ' or ''))
                 if f.unique:
@@ -90,7 +93,9 @@ def get_sql_create(mod):
                              (backend.quote_name(f.rel.to._meta.db_table),
                              backend.quote_name(f.rel.to._meta.get_field(f.rel.field_name).column)))
                      else:
-                         pr = pending_references.setdefault(f.rel.to._meta, []).append( (opts, f) )
+                         # We haven't yet created the table to which this field
+                         # is related, so save it for later.
+                         pr = pending_references.setdefault(f.rel.to._meta, []).append((opts, f))
                 table_output.append(' '.join(field_output))
         if opts.order_with_respect_to:
             table_output.append('%s %s NULL' % (backend.quote_name('_order'), data_types['IntegerField']))
@@ -103,20 +108,25 @@ def get_sql_create(mod):
             full_statement.append('    %s%s' % (line, i < len(table_output)-1 and ',' or ''))
         full_statement.append(');')
         final_output.append('\n'.join(full_statement))
+
+        # Take care of any ALTER TABLE statements to add constraints
+        # after the fact.
         if opts in pending_references:
-            for (rel_opts, f) in pending_references[opts]:
+            for rel_opts, f in pending_references[opts]:
                 r_table = rel_opts.db_table
                 r_col = f.column
-                table =  opts.db_table
+                table = opts.db_table
                 col = opts.get_field(f.rel.field_name).column
-                final_output.append( 'ALTER TABLE %s ADD CONSTRAINT %s FOREIGN KEY (%s) REFERENCES %s (%s);'  % \
-                                     (backend.quote_name(r_table),
-                                      backend.quote_name("%s_referencing_%s_%s" % (r_col,table,col)),
-                                      backend.quote_name(r_col), backend.quote_name(table),backend.quote_name(col))
-                                     )
+                final_output.append('ALTER TABLE %s ADD CONSTRAINT %s FOREIGN KEY (%s) REFERENCES %s (%s);' % \
+                    (backend.quote_name(r_table),
+                    backend.quote_name("%s_referencing_%s_%s" % (r_col, table, col)),
+                    backend.quote_name(r_col), backend.quote_name(table), backend.quote_name(col)))
             del pending_references[opts]
+
+        # Keep track of the fact that we've created the table for this model.
         opts_output.add(opts)
 
+    # Create the many-to-many join tables.
     for klass in mod._MODELS:
         opts = klass._meta
         for f in opts.many_to_many:
@@ -205,7 +215,7 @@ def get_sql_delete(mod):
                      r_col = f.rel.to.get_field(f.rel.field_name).column
                      output.append('ALTER TABLE %s DROP CONSTRAINT %s;' % \
                         (backend.quote_name(table),
-                         backend.quote_name("%s_referencing_%s_%s" % (col,r_table,r_col))))
+                         backend.quote_name("%s_referencing_%s_%s" % (col, r_table, r_col))))
 
     # Output DROP TABLE statements for many-to-many tables.
     for klass in mod._MODELS:
