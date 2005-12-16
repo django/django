@@ -128,7 +128,7 @@ def get_table_list(cursor):
     return [row[0] for row in cursor.fetchall()]
 
 def get_table_description(cursor, table_name):
-    cursor.execute("PRAGMA table_info(%s)" % table_name)
+    cursor.execute("PRAGMA table_info(%s)" % DatabaseWrapper.quote_name(table_name))
     return [(row[1], row[2], None, None) for row in cursor.fetchall()]
 
 def get_relations(cursor, table_name):
