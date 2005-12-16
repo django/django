@@ -102,10 +102,6 @@ class TemplateDoesNotExist(Exception):
 class VariableDoesNotExist(Exception):
     pass
 
-class SilentVariableFailure(Exception):
-    "Any function raising this exception will be ignored by resolve_variable"
-    pass
-
 class InvalidTemplateLibrary(Exception):
     pass
 
@@ -662,12 +658,15 @@ def resolve_variable(path, context):
                         else:
                             try: # method call (assuming no args required)
                                 current = current()
-                            except SilentVariableFailure:
-                                current = ''
                             except TypeError: # arguments *were* required
                                 # GOTCHA: This will also catch any TypeError
                                 # raised in the function itself.
                                 current = '' # invalid method call
+                            except Exception, e:
+                                if getattr(e, 'silent_variable_failure', False):
+                                    current = ''
+                                else:
+                                    raise
                 except (TypeError, AttributeError):
                     try: # list-index lookup
                         current = current[int(bits[0])]

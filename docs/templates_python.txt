@@ -147,10 +147,10 @@ Method lookups are slightly more complex than the other lookup types. Here are
 some things to keep in mind:
 
     * If, during the method lookup, a method raises an exception, the exception
-      will be propagated, unless the exception subclasses
-      ``django.core.template.SilentVariableFailure``. If the exception
-      subclasses ``SilentVariableFailure``, the variable will render as an
-      empty string. Example::
+      will be propagated, unless the exception has an attribute
+      ``silent_variable_failure`` whose value is ``True``. If the exception
+      *does* have a ``silent_variable_failure`` attribute, the variable will
+      render as an empty string. Example::
 
         >>> t = Template("My name is {{ person.first_name }}.")
         >>> class PersonClass3:
@@ -162,14 +162,20 @@ some things to keep in mind:
         ...
         AssertionError: foo
 
-        >>> from django.core.template import SilentVariableFailure
-        >>> class SilentAssertionError(SilentVariableFailure): pass
+        >>> class SilentAssertionError(Exception):
+        ...     silent_variable_failure = True
         >>> class PersonClass4:
         ...     def first_name(self):
-        ...         raise SilentAssertionError, "foo"
+        ...         raise SilentAssertionError
         >>> p = PersonClass4()
         >>> t.render(Context({"person": p}))
         "My name is ."
+
+      Note that ``django.core.exceptions.ObjectDoesNotExist``, which is the
+      base class for all Django database API ``DoesNotExist`` exceptions, has
+      ``silent_variable_failure = True``. So if you're using Django templates
+      with Django model objects, any ``DoesNotExist`` exception will fail
+      silently.
 
     * A method call will only work if the method has no required arguments.
       Otherwise, the system will move to the next lookup type (list-index

@@ -32,6 +32,12 @@ template.libraries['django.templatetags.testtags'] = register
 # Helper objects for template tests #
 #####################################
 
+class SomeException(Exception):
+    silent_variable_failure = True
+
+class SomeOtherException(Exception):
+    pass
+
 class SomeClass:
     def __init__(self):
         self.otherclass = OtherClass()
@@ -41,6 +47,12 @@ class SomeClass:
 
     def method2(self, o):
         return o
+
+    def method3(self):
+        raise SomeException
+
+    def method4(self):
+        raise SomeOtherException
 
 class OtherClass:
     def method(self):
@@ -133,7 +145,14 @@ TEMPLATE_TESTS = {
     'basic-syntax31': (r'{{ var|default_if_none:var2 }}', {"var": None, "var2": "happy"}, 'happy'),
 
     # Default argument testing
-    'basic-syntax32' : (r'{{ var|yesno:"yup,nup,mup" }} {{ var|yesno }}', {"var": True}, 'yup yes'),
+    'basic-syntax32': (r'{{ var|yesno:"yup,nup,mup" }} {{ var|yesno }}', {"var": True}, 'yup yes'),
+
+    # Fail silently for methods that raise an exception with a "silent_variable_failure" attribute
+    'basic-syntax33': (r'1{{ var.method3 }}2', {"var": SomeClass()}, "12"),
+
+    # In methods that raise an exception without a "silent_variable_attribute" set to True,
+    # the exception propogates
+    'basic-syntax34': (r'1{{ var.method4 }}2', {"var": SomeClass()}, SomeOtherException),
 
     ### IF TAG ################################################################
     'if-tag01': ("{% if foo %}yes{% else %}no{% endif %}", {"foo": True}, "yes"),
