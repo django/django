@@ -2,7 +2,7 @@ from django.db.models.manipulators import ManipulatorDescriptor, ModelAddManipul
 from django.db.models.fields import Field, DateField, FileField, ImageField, AutoField
 from django.db.models.fields import OneToOne, ManyToOne, ManyToMany, RECURSIVE_RELATIONSHIP_CONSTANT
 from django.db.models.related import RelatedObject
-from django.db.models.manager import Manager
+from django.db.models.manager import Manager, ManagerDescriptor
 from django.db.models.query import orderlist2sql 
 from django.db.models.options import Options
 from django.db import connection, backend
@@ -106,20 +106,14 @@ class ModelBase(type):
             opts.db_table = "%s_%s" % (app_label, opts.module_name)
         new_class._meta = opts
 
-        # Create the default manager, if needed.
-        # TODO: Use weakref because of possible memory leak / circular reference.
-        if managers:
-            for m_name, m in managers:
-                m._prepare(new_class)
-                setattr(new_class, m_name, m)
-            new_class._default_manager = managers[0][1]
-        else:
+        for m_name, m in managers:
+            new_class.add_to_class(m_name, m)
+        
+        if not hasattr(new_class, '_default_manager'):
+            # Create the default manager, if needed.
             if hasattr(new_class, 'objects'):
                 raise ValueError, "Model %s must specify a custom Manager, because it has a field named 'objects'" % name
-            m = Manager()
-            m._prepare(new_class)
-            new_class.objects = m
-            new_class._default_manager = m
+            new_class.add_to_class('objects',  Manager())
 
         new_class._prepare()
 
@@ -138,6 +132,13 @@ class ModelBase(type):
 
 class Model(object):
     __metaclass__ = ModelBase
+    
+    def add_to_class(cls, name, attribute):
+        if hasattr(attribute, 'contribute_to_class'):
+            attribute.contribute_to_class(cls, name)
+        else:
+            setattr(cls, name, attribute)
+    add_to_class = classmethod(add_to_class)
     
     AddManipulator = ManipulatorDescriptor('AddManipulator', ModelAddManipulator)
     ChangeManipulator = ManipulatorDescriptor('ChangeManipulator', ModelChangeManipulator)    

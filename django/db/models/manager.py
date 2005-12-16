@@ -8,25 +8,17 @@ from django.db.models.query import handle_legacy_orderlist, orderlist2sql, order
 # Larger values are slightly faster at the expense of more storage space.
 GET_ITERATOR_CHUNK_SIZE = 100
 
-
-
 class Manager(object):
-
-    # Tracks each time a Field instance is created. Used to retain order.
+        # Tracks each time a Field instance is created. Used to retain order.
     creation_counter = 0
 
     def __init__(self):
         # Increase the creation counter, and save our local copy.
         self.creation_counter = Manager.creation_counter
         Manager.creation_counter += 1
-
-    def __get__(self, instance, type=None):
-        if instance != None:
-            raise AttributeError, "Manager isn't accessible via %s instances" % self.klass.__name__
-        return self
-
+        self.klass = None
+    
     def _prepare(self, klass):
-        # Creates some methods once self.klass._meta has been populated.
         self.klass = klass
         if self.klass._meta.get_latest_by:
             self.get_latest = self.__get_latest
@@ -34,6 +26,14 @@ class Manager(object):
             if isinstance(f, DateField):
                 setattr(self, 'get_%s_list' % f.name, curry(self.__get_date_list, f))
 
+    def contribute_to_class(self, klass, name):
+        # TODO: Use weakref because of possible memory leak / circular reference.
+        self._prepare(klass)
+        setattr(klass,name, ManagerDescriptor(self))
+        if not hasattr(klass, '_default_manager') or \
+           self.creation_counter < klass._default_manager.creation_counter:
+                klass._default_manager = self
+        
     def _get_sql_clause(self, **kwargs):
         def quote_only_if_word(word):
             if ' ' in word:
@@ -204,4 +204,13 @@ class Manager(object):
         # We have to manually run typecast_timestamp(str()) on the results, because
         # MySQL doesn't automatically cast the result of date functions as datetime
         # objects -- MySQL returns the values as strings, instead.
-        return [typecast_timestamp(str(row[0])) for row in cursor.fetchall()]
+        return [typecast_timestamp(str(row[0])) for row in cursor.fetchall()] 
+
+class ManagerDescriptor(object):
+    def __init__(self, manager):
+        self.manager = manager
+
+    def __get__(self, instance, type=None):
+        if instance != None:
+            raise AttributeError, "Manager isn't accessible via %s instances" % type.__name__
+        return self.manager
