@@ -2,6 +2,7 @@
 # development-server initialization.
 
 import django
+from django.core.exceptions import ImproperlyConfigured
 import os, re, sys, textwrap
 from optparse import OptionParser
 
@@ -742,8 +743,11 @@ def get_validation_errors(outfile):
 
 def validate(outfile=sys.stdout):
     "Validates all installed models."
-    num_errors = get_validation_errors(outfile)
-    outfile.write('%s error%s found.\n' % (num_errors, num_errors != 1 and 's' or ''))
+    try:
+        num_errors = get_validation_errors(outfile)
+        outfile.write('%s error%s found.\n' % (num_errors, num_errors != 1 and 's' or ''))
+    except ImproperlyConfigured:
+        outfile.write("Skipping validation because things aren't configured properly.")
 validate.args = ''
 
 def runserver(addr, port):
