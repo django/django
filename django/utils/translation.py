@@ -457,3 +457,13 @@ def templateize(src):
             else:
                 out.write(blankout(t.contents, 'X'))
     return out.getvalue()
+
+def string_concat(*strings):
+    """"
+    lazy variant of string concatenation, needed for translations that are
+    constructed from multiple parts. Handles lazy strings and non-strings by
+    first turning all arguments to strings, before joining them.
+    """
+    return ''.join([str(el) for el in strings])
+
+string_concat = lazy(string_concat, str)

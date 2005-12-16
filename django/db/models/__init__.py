@@ -10,10 +10,13 @@ from django.db.models.loading import get_installed_models, get_installed_model_m
 from django.db.models.query import Q
 from django.db.models.manager import Manager
 from django.db.models.base import Model
+
 from django.db.models.fields import *
+from django.db.models.fields.related import *
 
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.models.exceptions import FieldDoesNotExist, BadKeywordArguments
+
 
 # Admin stages.
 ADD, CHANGE, BOTH = 1, 2, 3

@@ -1,6 +1,6 @@
 from django.db.models.manipulators import ManipulatorDescriptor, ModelAddManipulator, ModelChangeManipulator
 from django.db.models.fields import Field, DateField, FileField, ImageField, AutoField
-from django.db.models.fields import OneToOne, ManyToOne, ManyToMany, RECURSIVE_RELATIONSHIP_CONSTANT
+from django.db.models.fields.related import OneToOne, ManyToOne, ManyToMany, RECURSIVE_RELATIONSHIP_CONSTANT
 from django.db.models.related import RelatedObject
 from django.db.models.manager import Manager, ManagerDescriptor
 from django.db.models.query import orderlist2sql 

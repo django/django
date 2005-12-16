@@ -472,11 +472,13 @@ def log_add_message(user, opts,manipulator,new_object):
     pk_value = getattr(new_object, opts.pk.attname)
     LogEntry.objects.log_action(user.id, opts.get_content_type_id(), pk_value, str(new_object), ADDITION)
 
-def add_stage(request, app_label, module_name, show_delete=False, form_url='', post_url='../', post_url_continue='../%s/', object_id_override=None):
-    mod, opts = _get_mod_opts(app_label, module_name)
+def add_stage(request, path, show_delete=False, form_url='', post_url='../change/', post_url_continue='../%s/', object_id_override=None):
+    model, app_label = get_model_and_app(path)
+    opts = model._meta
+    
     if not request.user.has_perm(app_label + '.' + opts.get_add_permission()):
         raise PermissionDenied
-    manipulator = mod.AddManipulator()
+    manipulator = model.AddManipulator()
     if request.POST:
         new_data = request.POST.copy()
         if opts.has_field_type(models.FileField):
@@ -525,7 +527,7 @@ def add_stage(request, app_label, module_name, show_delete=False, form_url='', p
     if object_id_override is not None:
         c['object_id'] = object_id_override
 
-    return render_change_form(opts, manipulator, app_label, c, add=True)
+    return render_change_form(model, manipulator, app_label, c, add=True)
 add_stage = staff_member_required(add_stage)
 
 def log_change_message(user, opts,manipulator,new_object):
@@ -544,7 +546,7 @@ def log_change_message(user, opts,manipulator,new_object):
     LogEntry.objects.log_action(user.id, opts.get_content_type_id(), pk_value, str(new_object), CHANGE, change_message)
 
 def change_stage(request, path, object_id):
-    print "change_stage", path, object_id
+
     model, app_label = get_model_and_app(path)
     opts = model._meta
     #mod, opts = _get_mod_opts(app_label, module_name)

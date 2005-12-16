@@ -1,5 +1,5 @@
 from django.db.models.related import RelatedObject
-from django.db.models.fields import OneToOne, ManyToMany
+from django.db.models.fields.related import OneToOne, ManyToMany
 from django.db.models.fields import AutoField
 from django.db.models.loading import get_installed_model_modules
 from django.db.models.query import orderlist2sql
