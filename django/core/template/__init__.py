@@ -629,7 +629,7 @@ def resolve_variable(path, context):
     """
     Returns the resolved variable, which may contain attribute syntax, within
     the given context. The variable may be a hard-coded string (if it begins
-    and ends with single or double quote marks).
+    and ends with single or double quote marks), or an integer or float literal.
 
     >>> c = {'article': {'section':'News'}}
     >>> resolve_variable('article.section', c)
@@ -645,7 +645,13 @@ def resolve_variable(path, context):
 
     (The example assumes VARIABLE_ATTRIBUTE_SEPARATOR is '.')
     """
-    if path[0] in ('"', "'") and path[0] == path[-1]:
+    if path[0] in '0123456789':
+        number_type = '.' in path and float or int
+        try:
+           current = number_type(path)
+        except ValueError:
+           current = ''
+    elif path[0] in ('"', "'") and path[0] == path[-1]:
         current = path[1:-1]
     else:
         current = context

@@ -164,6 +164,20 @@ TEMPLATE_TESTS = {
     'ifequal09': ('{% ifequal a "test" %}yes{% else %}no{% endifequal %}', {}, "no"),
     'ifequal10': ('{% ifequal a b %}yes{% else %}no{% endifequal %}', {}, "yes"),
 
+    # Integers
+    'ifequal11': ('{% ifequal a 1 %}yes{% else %}no{% endifequal %}', {}, "no"),
+    'ifequal12': ('{% ifequal a 1 %}yes{% else %}no{% endifequal %}', {"a": 1}, "yes"),
+    'ifequal13': ('{% ifequal a 1 %}yes{% else %}no{% endifequal %}', {"a": "1"}, "no"),
+    'ifequal14': ('{% ifequal a "1" %}yes{% else %}no{% endifequal %}', {"a": 1}, "no"),
+    'ifequal15': ('{% ifequal a "1" %}yes{% else %}no{% endifequal %}', {"a": "1"}, "yes"),
+
+    # Floats
+    'ifequal16': ('{% ifequal a 1.2 %}yes{% else %}no{% endifequal %}', {}, "no"),
+    'ifequal17': ('{% ifequal a 1.2 %}yes{% else %}no{% endifequal %}', {"a": 1.2}, "yes"),
+    'ifequal18': ('{% ifequal a 1.2 %}yes{% else %}no{% endifequal %}', {"a": "1.2"}, "no"),
+    'ifequal19': ('{% ifequal a "1.2" %}yes{% else %}no{% endifequal %}', {"a": 1.2}, "no"),
+    'ifequal20': ('{% ifequal a "1.2" %}yes{% else %}no{% endifequal %}', {"a": "1.2"}, "yes"),
+
     ### IFNOTEQUAL TAG ########################################################
     'ifnotequal01': ("{% ifnotequal a b %}yes{% endifnotequal %}", {"a": 1, "b": 2}, "yes"),
     'ifnotequal02': ("{% ifnotequal a b %}yes{% endifnotequal %}", {"a": 1, "b": 1}, ""),
