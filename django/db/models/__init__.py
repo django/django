@@ -1051,13 +1051,29 @@ class Model(object):
 
     delete.alters_data = True
 
+    def __get_manipulator(cls):
+        if hasattr(cls, 'MANIPULATOR'):
+            man = cls.MANIPULATOR
+        else:
+            class man:
+                pass
+        return man
+    __get_manipulator=classmethod(__get_manipulator)
+
     def __get_add_manipulator(cls):
-        cls.AddManipulator = get_manipulator
-        
+        class AddManipulator(cls.__get_manipulator(), ModelAddManipulator):
+            pass
+        AddManipulator.classinit(cls)
+        cls.AddManipulator = AddManipulator
+        return AddManipulator
     AddManipulator = property(classmethod(__get_add_manipulator))
     
     def __get_change_manipulator(cls):
-        
+        class ChangeManipulator(cls.__get_manipulator(), ModelChangeManipulator):
+            pass
+        ChangeManipulator.classinit(cls)
+        cls.ChangeManipulator = ChangeManipulator
+        return ChangeManipulator 
     ChangeManipulator = property(classmethod(__get_change_manipulator)) 
     
     
@@ -1503,24 +1519,24 @@ def get_manipulator(opts, klass, extra_methods, add=False, change=False):
     man.save = curry(manipulator_save, opts, klass, add, change)
     man.get_related_objects = curry(manipulator_get_related_objects, opts, klass, add, change)
     man.flatten_data = curry(manipulator_flatten_data, opts, klass, add, change)
-    for field_name_list in opts.unique_together:
-        setattr(man, 'isUnique%s' % '_'.join(field_name_list), curry(manipulator_validator_unique_together, field_name_list, opts))
-    for f in opts.fields:
-        if f.unique_for_date:
-            setattr(man, 'isUnique%sFor%s' % (f.name, f.unique_for_date), curry(manipulator_validator_unique_for_date, f, opts.get_field(f.unique_for_date), opts, 'date'))
-        if f.unique_for_month:
-            setattr(man, 'isUnique%sFor%s' % (f.name, f.unique_for_month), curry(manipulator_validator_unique_for_date, f, opts.get_field(f.unique_for_month), opts, 'month'))
-        if f.unique_for_year:
-            setattr(man, 'isUnique%sFor%s' % (f.name, f.unique_for_year), curry(manipulator_validator_unique_for_date, f, opts.get_field(f.unique_for_year), opts, 'year'))
-    for k, v in extra_methods.items():
-        setattr(man, k, v)
+    
     return man
 
 class AutomaticManipulator(formfields.Manipulator):
-    def __classinit__(cls, model):
+    def classinit(cls, model):
         cls.model = model
         cls.manager = model._default_manager
-    __classinit__ = classmethod(__classinit__)
+        cls.opts = model._meta
+        for field_name_list in cls.opts.unique_together:
+            setattr(cls, 'isUnique%s' % '_'.join(field_name_list), curry(manipulator_validator_unique_together, field_name_list, opts))
+        for f in cls.opts.fields:
+            if f.unique_for_date:
+                setattr(man, 'isUnique%sFor%s' % (f.name, f.unique_for_date), curry(manipulator_validator_unique_for_date, f, opts.get_field(f.unique_for_date), opts, 'date'))
+            if f.unique_for_month:
+                setattr(man, 'isUnique%sFor%s' % (f.name, f.unique_for_month), curry(manipulator_validator_unique_for_date, f, opts.get_field(f.unique_for_month), opts, 'month'))
+            if f.unique_for_year:
+                setattr(man, 'isUnique%sFor%s' % (f.name, f.unique_for_year), curry(manipulator_validator_unique_for_date, f, opts.get_field(f.unique_for_year), opts, 'year'))
+    classinit = classmethod(classinit)
     
     def __init__(self, follow=None):
         self.follow = self.model._meta.get_follow(follow)
@@ -1535,31 +1551,179 @@ class AutomaticManipulator(formfields.Manipulator):
             if self.follow.get(f.name, False):
                 fol = self.follow[f.name]
                 self.fields.extend(f.get_manipulator_fields(opts, self, change, fol))
+        self.original_object = None
         
-    def save(self):
-        pass
+    def save(self, new_data):
+        add, change, opts, klass = self.add, self.change, self.opts, self.model
+        # TODO: big cleanup when core fields go -> use recursive manipulators.
+        from django.utils.datastructures import DotExpandedDict
+        params = {}
+        for f in opts.fields:
+            # Fields with auto_now_add should keep their original value in the change stage.
+            auto_now_add = change and getattr(f, 'auto_now_add', False)
+            if self.follow.get(f.name, None) and not auto_now_add:
+                param = f.get_manipulator_new_data(new_data)
+            else:
+                if change:
+                    param = getattr(self.original_object, f.attname)
+                else:
+                    param = f.get_default()
+            params[f.attname] = param
+    
+        if change:
+            params[opts.pk.attname] = self.obj_key
+    
+        # First, save the basic object itself.
+        new_object = klass(**params)
+        new_object.save()
+    
+        # Now that the object's been saved, save any uploaded files.
+        for f in opts.fields:
+            if isinstance(f, FileField):
+                f.save_file(new_data, new_object, change and self.original_object or None, change, rel=False)
+    
+        # Calculate which primary fields have changed.
+        if change:
+            self.fields_added, self.fields_changed, self.fields_deleted = [], [], []
+            for f in opts.fields:
+                if not f.primary_key and str(getattr(self.original_object, f.attname)) != str(getattr(new_object, f.attname)):
+                    self.fields_changed.append(f.verbose_name)
+    
+        # Save many-to-many objects. Example: Poll.set_sites()
+        for f in opts.many_to_many:
+            if self.follow.get(f.name, None):
+                if not f.rel.edit_inline:
+                    if f.rel.raw_id_admin:
+                        new_vals = new_data.get(f.name, ())
+                    else:
+                        new_vals = new_data.getlist(f.name)
+                    was_changed = getattr(new_object, 'set_%s' % f.name)(new_vals)
+                    if change and was_changed:
+                        self.fields_changed.append(f.verbose_name)
+    
+        expanded_data = DotExpandedDict(dict(new_data))
+        # Save many-to-one objects. Example: Add the Choice objects for a Poll.
+        for related in opts.get_all_related_objects():
+            # Create obj_list, which is a DotExpandedDict such as this:
+            # [('0', {'id': ['940'], 'choice': ['This is the first choice']}),
+            #  ('1', {'id': ['941'], 'choice': ['This is the second choice']}),
+            #  ('2', {'id': [''], 'choice': ['']})]
+            child_follow = self.follow.get(related.name, None)
+    
+            if child_follow:
+                obj_list = expanded_data[related.var_name].items()
+                obj_list.sort(lambda x, y: cmp(int(x[0]), int(y[0])))
+                params = {}
+    
+                # For each related item...
+                for _, rel_new_data in obj_list:
+    
+                    # Keep track of which core=True fields were provided.
+                    # If all core fields were given, the related object will be saved.
+                    # If none of the core fields were given, the object will be deleted.
+                    # If some, but not all, of the fields were given, the validator would
+                    # have caught that.
+                    all_cores_given, all_cores_blank = True, True
+    
+                    # Get a reference to the old object. We'll use it to compare the
+                    # old to the new, to see which fields have changed.
+                    old_rel_obj = None
+                    if change:
+                        if rel_new_data[related.opts.pk.name][0]:
+                            try:
+                                old_rel_obj = getattr(self.original_object, 'get_%s' % related.get_method_name_part() )(**{'%s__exact' % related.opts.pk.name: rel_new_data[related.opts.pk.attname][0]})
+                            except ObjectDoesNotExist:
+                                pass
+    
+                    for f in related.opts.fields:
+                        if f.core and not isinstance(f, FileField) and f.get_manipulator_new_data(rel_new_data, rel=True) in (None, ''):
+                            all_cores_given = False
+                        elif f.core and not isinstance(f, FileField) and f.get_manipulator_new_data(rel_new_data, rel=True) not in (None, ''):
+                            all_cores_blank = False
+                        # If this field isn't editable, give it the same value it had
+                        # previously, according to the given ID. If the ID wasn't
+                        # given, use a default value. FileFields are also a special
+                        # case, because they'll be dealt with later.
+    
+                        if f == related.field:
+                            param = getattr(new_object, related.field.rel.field_name)
+                        elif add and isinstance(f, AutoField):
+                            param = None
+                        elif change and (isinstance(f, FileField) or not child_follow.get(f.name, None)):
+                            if old_rel_obj:
+                                param = getattr(old_rel_obj, f.column)
+                            else:
+                                param = f.get_default()
+                        else:
+                            param = f.get_manipulator_new_data(rel_new_data, rel=True)
+                        if param != None:
+                           params[f.attname] = param
+    
+                    # Create the related item.
+                    new_rel_obj = related.opts.get_model_module().Klass(**params)
+    
+                    # If all the core fields were provided (non-empty), save the item.
+                    if all_cores_given:
+                        new_rel_obj.save()
+    
+                        # Save any uploaded files.
+                        for f in related.opts.fields:
+                            if child_follow.get(f.name, None):
+                                if isinstance(f, FileField) and rel_new_data.get(f.name, False):
+                                    f.save_file(rel_new_data, new_rel_obj, change and old_rel_obj or None, old_rel_obj is not None, rel=True)
+    
+                        # Calculate whether any fields have changed.
+                        if change:
+                            if not old_rel_obj: # This object didn't exist before.
+                                self.fields_added.append('%s "%s"' % (related.opts.verbose_name, new_rel_obj))
+                            else:
+                                for f in related.opts.fields:
+                                    if not f.primary_key and f != related.field and str(getattr(old_rel_obj, f.attname)) != str(getattr(new_rel_obj, f.attname)):
+                                        self.fields_changed.append('%s for %s "%s"' % (f.verbose_name, related.opts.verbose_name, new_rel_obj))
+    
+                        # Save many-to-many objects.
+                        for f in related.opts.many_to_many:
+                            if child_follow.get(f.name, None) and not f.rel.edit_inline:
+                                was_changed = getattr(new_rel_obj, 'set_%s' % f.name)(rel_new_data[f.attname])
+                                if change and was_changed:
+                                    self.fields_changed.append('%s for %s "%s"' % (f.verbose_name, related.opts.verbose_name, new_rel_obj))
+    
+                    # If, in the change stage, all of the core fields were blank and
+                    # the primary key (ID) was provided, delete the item.
+                    if change and all_cores_blank and old_rel_obj:
+                        new_rel_obj.delete()
+                        self.fields_deleted.append('%s "%s"' % (related.opts.verbose_name, old_rel_obj))
+    
+        # Save the order, if applicable.
+        if change and opts.get_ordered_objects():
+            order = new_data['order_'] and map(int, new_data['order_'].split(',')) or []
+            for rel_opts in opts.get_ordered_objects():
+                getattr(new_object, 'set_%s_order' % rel_opts.object_name.lower())(order)
+        return new_object
     
     def get_related_objects(opts, klass, add, change, self):
         return opts.get_followed_related_objects(self.follow)
 
     def flatten_data(opts, klass, add, change, self):
          new_data = {}
-         obj = change and self.original_object or None
          for f in opts.get_data_holders(self.follow):
             fol = self.follow.get(f.name)
-            new_data.update(f.flatten_data(fol, obj))
+            new_data.update(f.flatten_data(fol, self.original_object))
          return new_data
 
 class ModelAddManipulator(AutomaticManipulator):
-    pass
+    change = False
+    add = True
 
-class ModelSaveManipulator(AutomaticManipulator):
+class ModelChangeManipulator(AutomaticManipulator):
+    change = False
+    add = True
+    
     def __init__(self, obj_key=None, follow=None):
-       
         assert obj_key is not None, "ChangeManipulator.__init__() must be passed obj_key parameter."
         self.obj_key = obj_key
         try:
-            self.original_object = self.manager.get_object(pk=obj_key)
+            original_object = self.manager.get_object(pk=obj_key)
         except ObjectDoesNotExist:
             # If the object doesn't exist, this might be a manipulator for a
             # one-to-one related object that hasn't created its subobject yet.
@@ -1574,202 +1738,203 @@ class ModelSaveManipulator(AutomaticManipulator):
                 _ = opts.one_to_one_field.rel.to._meta.get_model_module().get_object(**lookup_kwargs)
                 params = dict([(f.attname, f.get_default()) for f in opts.fields])
                 params[opts.pk.attname] = obj_key
-                self.original_object = opts.get_model_module().Klass(**params)
+                original_object = opts.get_model_module().Klass(**params)
             else:
                 raise
         
         super(ModelSaveManipulator, self).__init__(self, follow=follow)
+        self.original_object = original_object
         
         if  opts.get_ordered_objects():
             self.fields.append(formfields.CommaSeparatedIntegerField(field_name="order_"))
 
-def manipulator_init(opts, add, change, self, obj_key=None, follow=None):
-    self.follow = opts.get_follow(follow)
+#def manipulator_init(opts, add, change, self, obj_key=None, follow=None):
+#    self.follow = opts.get_follow(follow)
+#
+#    if change:
+#        assert obj_key is not None, "ChangeManipulator.__init__() must be passed obj_key parameter."
+#        self.obj_key = obj_key
+#        try:
+#            self.original_object = opts.get_model_module().get_object(pk=obj_key)
+#        except ObjectDoesNotExist:
+#            # If the object doesn't exist, this might be a manipulator for a
+#            # one-to-one related object that hasn't created its subobject yet.
+#            # For example, this might be a Restaurant for a Place that doesn't
+#            # yet have restaurant information.
+#            if opts.one_to_one_field:
+#                # Sanity check -- Make sure the "parent" object exists.
+#                # For example, make sure the Place exists for the Restaurant.
+#                # Let the ObjectDoesNotExist exception propogate up.
+#                lookup_kwargs = opts.one_to_one_field.rel.limit_choices_to
+#                lookup_kwargs['%s__exact' % opts.one_to_one_field.rel.field_name] = obj_key
+#                _ = opts.one_to_one_field.rel.to._meta.get_model_module().get_object(**lookup_kwargs)
+#                params = dict([(f.attname, f.get_default()) for f in opts.fields])
+#                params[opts.pk.attname] = obj_key
+#                self.original_object = opts.get_model_module().Klass(**params)
+#            else:
+#                raise
+#    self.fields = []
+#
+#    for f in opts.fields + opts.many_to_many:
+#        if self.follow.get(f.name, False):
+#            self.fields.extend(f.get_manipulator_fields(opts, self, change))
+#
+#    # Add fields for related objects.
+#    for f in opts.get_all_related_objects():
+#        if self.follow.get(f.name, False):
+#            fol = self.follow[f.name]
+#            self.fields.extend(f.get_manipulator_fields(opts, self, change, fol))
+#
+#    # Add field for ordering.
+#    if change and opts.get_ordered_objects():
+#        self.fields.append(formfields.CommaSeparatedIntegerField(field_name="order_"))
 
-    if change:
-        assert obj_key is not None, "ChangeManipulator.__init__() must be passed obj_key parameter."
-        self.obj_key = obj_key
-        try:
-            self.original_object = opts.get_model_module().get_object(pk=obj_key)
-        except ObjectDoesNotExist:
-            # If the object doesn't exist, this might be a manipulator for a
-            # one-to-one related object that hasn't created its subobject yet.
-            # For example, this might be a Restaurant for a Place that doesn't
-            # yet have restaurant information.
-            if opts.one_to_one_field:
-                # Sanity check -- Make sure the "parent" object exists.
-                # For example, make sure the Place exists for the Restaurant.
-                # Let the ObjectDoesNotExist exception propogate up.
-                lookup_kwargs = opts.one_to_one_field.rel.limit_choices_to
-                lookup_kwargs['%s__exact' % opts.one_to_one_field.rel.field_name] = obj_key
-                _ = opts.one_to_one_field.rel.to._meta.get_model_module().get_object(**lookup_kwargs)
-                params = dict([(f.attname, f.get_default()) for f in opts.fields])
-                params[opts.pk.attname] = obj_key
-                self.original_object = opts.get_model_module().Klass(**params)
-            else:
-                raise
-    self.fields = []
-
-    for f in opts.fields + opts.many_to_many:
-        if self.follow.get(f.name, False):
-            self.fields.extend(f.get_manipulator_fields(opts, self, change))
-
-    # Add fields for related objects.
-    for f in opts.get_all_related_objects():
-        if self.follow.get(f.name, False):
-            fol = self.follow[f.name]
-            self.fields.extend(f.get_manipulator_fields(opts, self, change, fol))
-
-    # Add field for ordering.
-    if change and opts.get_ordered_objects():
-        self.fields.append(formfields.CommaSeparatedIntegerField(field_name="order_"))
-
-def manipulator_save(opts, klass, add, change, self, new_data):
-    # TODO: big cleanup when core fields go -> use recursive manipulators.
-    from django.utils.datastructures import DotExpandedDict
-    params = {}
-    for f in opts.fields:
-        # Fields with auto_now_add should keep their original value in the change stage.
-        auto_now_add = change and getattr(f, 'auto_now_add', False)
-        if self.follow.get(f.name, None) and not auto_now_add:
-            param = f.get_manipulator_new_data(new_data)
-        else:
-            if change:
-                param = getattr(self.original_object, f.attname)
-            else:
-                param = f.get_default()
-        params[f.attname] = param
-
-    if change:
-        params[opts.pk.attname] = self.obj_key
-
-    # First, save the basic object itself.
-    new_object = klass(**params)
-    new_object.save()
-
-    # Now that the object's been saved, save any uploaded files.
-    for f in opts.fields:
-        if isinstance(f, FileField):
-            f.save_file(new_data, new_object, change and self.original_object or None, change, rel=False)
-
-    # Calculate which primary fields have changed.
-    if change:
-        self.fields_added, self.fields_changed, self.fields_deleted = [], [], []
-        for f in opts.fields:
-            if not f.primary_key and str(getattr(self.original_object, f.attname)) != str(getattr(new_object, f.attname)):
-                self.fields_changed.append(f.verbose_name)
-
-    # Save many-to-many objects. Example: Poll.set_sites()
-    for f in opts.many_to_many:
-        if self.follow.get(f.name, None):
-            if not f.rel.edit_inline:
-                if f.rel.raw_id_admin:
-                    new_vals = new_data.get(f.name, ())
-                else:
-                    new_vals = new_data.getlist(f.name)
-                was_changed = getattr(new_object, 'set_%s' % f.name)(new_vals)
-                if change and was_changed:
-                    self.fields_changed.append(f.verbose_name)
-
-    expanded_data = DotExpandedDict(dict(new_data))
-    # Save many-to-one objects. Example: Add the Choice objects for a Poll.
-    for related in opts.get_all_related_objects():
-        # Create obj_list, which is a DotExpandedDict such as this:
-        # [('0', {'id': ['940'], 'choice': ['This is the first choice']}),
-        #  ('1', {'id': ['941'], 'choice': ['This is the second choice']}),
-        #  ('2', {'id': [''], 'choice': ['']})]
-        child_follow = self.follow.get(related.name, None)
-
-        if child_follow:
-            obj_list = expanded_data[related.var_name].items()
-            obj_list.sort(lambda x, y: cmp(int(x[0]), int(y[0])))
-            params = {}
-
-            # For each related item...
-            for _, rel_new_data in obj_list:
-
-                # Keep track of which core=True fields were provided.
-                # If all core fields were given, the related object will be saved.
-                # If none of the core fields were given, the object will be deleted.
-                # If some, but not all, of the fields were given, the validator would
-                # have caught that.
-                all_cores_given, all_cores_blank = True, True
-
-                # Get a reference to the old object. We'll use it to compare the
-                # old to the new, to see which fields have changed.
-                old_rel_obj = None
-                if change:
-                    if rel_new_data[related.opts.pk.name][0]:
-                        try:
-                            old_rel_obj = getattr(self.original_object, 'get_%s' % related.get_method_name_part() )(**{'%s__exact' % related.opts.pk.name: rel_new_data[related.opts.pk.attname][0]})
-                        except ObjectDoesNotExist:
-                            pass
-
-                for f in related.opts.fields:
-                    if f.core and not isinstance(f, FileField) and f.get_manipulator_new_data(rel_new_data, rel=True) in (None, ''):
-                        all_cores_given = False
-                    elif f.core and not isinstance(f, FileField) and f.get_manipulator_new_data(rel_new_data, rel=True) not in (None, ''):
-                        all_cores_blank = False
-                    # If this field isn't editable, give it the same value it had
-                    # previously, according to the given ID. If the ID wasn't
-                    # given, use a default value. FileFields are also a special
-                    # case, because they'll be dealt with later.
-
-                    if f == related.field:
-                        param = getattr(new_object, related.field.rel.field_name)
-                    elif add and isinstance(f, AutoField):
-                        param = None
-                    elif change and (isinstance(f, FileField) or not child_follow.get(f.name, None)):
-                        if old_rel_obj:
-                            param = getattr(old_rel_obj, f.column)
-                        else:
-                            param = f.get_default()
-                    else:
-                        param = f.get_manipulator_new_data(rel_new_data, rel=True)
-                    if param != None:
-                       params[f.attname] = param
-
-                # Create the related item.
-                new_rel_obj = related.opts.get_model_module().Klass(**params)
-
-                # If all the core fields were provided (non-empty), save the item.
-                if all_cores_given:
-                    new_rel_obj.save()
-
-                    # Save any uploaded files.
-                    for f in related.opts.fields:
-                        if child_follow.get(f.name, None):
-                            if isinstance(f, FileField) and rel_new_data.get(f.name, False):
-                                f.save_file(rel_new_data, new_rel_obj, change and old_rel_obj or None, old_rel_obj is not None, rel=True)
-
-                    # Calculate whether any fields have changed.
-                    if change:
-                        if not old_rel_obj: # This object didn't exist before.
-                            self.fields_added.append('%s "%s"' % (related.opts.verbose_name, new_rel_obj))
-                        else:
-                            for f in related.opts.fields:
-                                if not f.primary_key and f != related.field and str(getattr(old_rel_obj, f.attname)) != str(getattr(new_rel_obj, f.attname)):
-                                    self.fields_changed.append('%s for %s "%s"' % (f.verbose_name, related.opts.verbose_name, new_rel_obj))
-
-                    # Save many-to-many objects.
-                    for f in related.opts.many_to_many:
-                        if child_follow.get(f.name, None) and not f.rel.edit_inline:
-                            was_changed = getattr(new_rel_obj, 'set_%s' % f.name)(rel_new_data[f.attname])
-                            if change and was_changed:
-                                self.fields_changed.append('%s for %s "%s"' % (f.verbose_name, related.opts.verbose_name, new_rel_obj))
-
-                # If, in the change stage, all of the core fields were blank and
-                # the primary key (ID) was provided, delete the item.
-                if change and all_cores_blank and old_rel_obj:
-                    new_rel_obj.delete()
-                    self.fields_deleted.append('%s "%s"' % (related.opts.verbose_name, old_rel_obj))
-
-    # Save the order, if applicable.
-    if change and opts.get_ordered_objects():
-        order = new_data['order_'] and map(int, new_data['order_'].split(',')) or []
-        for rel_opts in opts.get_ordered_objects():
-            getattr(new_object, 'set_%s_order' % rel_opts.object_name.lower())(order)
-    return new_object
+#def manipulator_save(opts, klass, add, change, self, new_data):
+#    # TODO: big cleanup when core fields go -> use recursive manipulators.
+#    from django.utils.datastructures import DotExpandedDict
+#    params = {}
+#    for f in opts.fields:
+#        # Fields with auto_now_add should keep their original value in the change stage.
+#        auto_now_add = change and getattr(f, 'auto_now_add', False)
+#        if self.follow.get(f.name, None) and not auto_now_add:
+#            param = f.get_manipulator_new_data(new_data)
+#        else:
+#            if change:
+#                param = getattr(self.original_object, f.attname)
+#            else:
+#                param = f.get_default()
+#        params[f.attname] = param
+#
+#    if change:
+#        params[opts.pk.attname] = self.obj_key
+#
+#    # First, save the basic object itself.
+#    new_object = klass(**params)
+#    new_object.save()
+#
+#    # Now that the object's been saved, save any uploaded files.
+#    for f in opts.fields:
+#        if isinstance(f, FileField):
+#            f.save_file(new_data, new_object, change and self.original_object or None, change, rel=False)
+#
+#    # Calculate which primary fields have changed.
+#    if change:
+#        self.fields_added, self.fields_changed, self.fields_deleted = [], [], []
+#        for f in opts.fields:
+#            if not f.primary_key and str(getattr(self.original_object, f.attname)) != str(getattr(new_object, f.attname)):
+#                self.fields_changed.append(f.verbose_name)
+#
+#    # Save many-to-many objects. Example: Poll.set_sites()
+#    for f in opts.many_to_many:
+#        if self.follow.get(f.name, None):
+#            if not f.rel.edit_inline:
+#                if f.rel.raw_id_admin:
+#                    new_vals = new_data.get(f.name, ())
+#                else:
+#                    new_vals = new_data.getlist(f.name)
+#                was_changed = getattr(new_object, 'set_%s' % f.name)(new_vals)
+#                if change and was_changed:
+#                    self.fields_changed.append(f.verbose_name)
+#
+#    expanded_data = DotExpandedDict(dict(new_data))
+#    # Save many-to-one objects. Example: Add the Choice objects for a Poll.
+#    for related in opts.get_all_related_objects():
+#        # Create obj_list, which is a DotExpandedDict such as this:
+#        # [('0', {'id': ['940'], 'choice': ['This is the first choice']}),
+#        #  ('1', {'id': ['941'], 'choice': ['This is the second choice']}),
+#        #  ('2', {'id': [''], 'choice': ['']})]
+#        child_follow = self.follow.get(related.name, None)
+#
+#        if child_follow:
+#            obj_list = expanded_data[related.var_name].items()
+#            obj_list.sort(lambda x, y: cmp(int(x[0]), int(y[0])))
+#            params = {}
+#
+#            # For each related item...
+#            for _, rel_new_data in obj_list:
+#
+#                # Keep track of which core=True fields were provided.
+#                # If all core fields were given, the related object will be saved.
+#                # If none of the core fields were given, the object will be deleted.
+#                # If some, but not all, of the fields were given, the validator would
+#                # have caught that.
+#                all_cores_given, all_cores_blank = True, True
+#
+#                # Get a reference to the old object. We'll use it to compare the
+#                # old to the new, to see which fields have changed.
+#                old_rel_obj = None
+#                if change:
+#                    if rel_new_data[related.opts.pk.name][0]:
+#                        try:
+#                            old_rel_obj = getattr(self.original_object, 'get_%s' % related.get_method_name_part() )(**{'%s__exact' % related.opts.pk.name: rel_new_data[related.opts.pk.attname][0]})
+#                        except ObjectDoesNotExist:
+#                            pass
+#
+#                for f in related.opts.fields:
+#                    if f.core and not isinstance(f, FileField) and f.get_manipulator_new_data(rel_new_data, rel=True) in (None, ''):
+#                        all_cores_given = False
+#                    elif f.core and not isinstance(f, FileField) and f.get_manipulator_new_data(rel_new_data, rel=True) not in (None, ''):
+#                        all_cores_blank = False
+#                    # If this field isn't editable, give it the same value it had
+#                    # previously, according to the given ID. If the ID wasn't
+#                    # given, use a default value. FileFields are also a special
+#                    # case, because they'll be dealt with later.
+#
+#                    if f == related.field:
+#                        param = getattr(new_object, related.field.rel.field_name)
+#                    elif add and isinstance(f, AutoField):
+#                        param = None
+#                    elif change and (isinstance(f, FileField) or not child_follow.get(f.name, None)):
+#                        if old_rel_obj:
+#                            param = getattr(old_rel_obj, f.column)
+#                        else:
+#                            param = f.get_default()
+#                    else:
+#                        param = f.get_manipulator_new_data(rel_new_data, rel=True)
+#                    if param != None:
+#                       params[f.attname] = param
+#
+#                # Create the related item.
+#                new_rel_obj = related.opts.get_model_module().Klass(**params)
+#
+#                # If all the core fields were provided (non-empty), save the item.
+#                if all_cores_given:
+#                    new_rel_obj.save()
+#
+#                    # Save any uploaded files.
+#                    for f in related.opts.fields:
+#                        if child_follow.get(f.name, None):
+#                            if isinstance(f, FileField) and rel_new_data.get(f.name, False):
+#                                f.save_file(rel_new_data, new_rel_obj, change and old_rel_obj or None, old_rel_obj is not None, rel=True)
+#
+#                    # Calculate whether any fields have changed.
+#                    if change:
+#                        if not old_rel_obj: # This object didn't exist before.
+#                            self.fields_added.append('%s "%s"' % (related.opts.verbose_name, new_rel_obj))
+#                        else:
+#                            for f in related.opts.fields:
+#                                if not f.primary_key and f != related.field and str(getattr(old_rel_obj, f.attname)) != str(getattr(new_rel_obj, f.attname)):
+#                                    self.fields_changed.append('%s for %s "%s"' % (f.verbose_name, related.opts.verbose_name, new_rel_obj))
+#
+#                    # Save many-to-many objects.
+#                    for f in related.opts.many_to_many:
+#                        if child_follow.get(f.name, None) and not f.rel.edit_inline:
+#                            was_changed = getattr(new_rel_obj, 'set_%s' % f.name)(rel_new_data[f.attname])
+#                            if change and was_changed:
+#                                self.fields_changed.append('%s for %s "%s"' % (f.verbose_name, related.opts.verbose_name, new_rel_obj))
+#
+#                # If, in the change stage, all of the core fields were blank and
+#                # the primary key (ID) was provided, delete the item.
+#                if change and all_cores_blank and old_rel_obj:
+#                    new_rel_obj.delete()
+#                    self.fields_deleted.append('%s "%s"' % (related.opts.verbose_name, old_rel_obj))
+#
+#    # Save the order, if applicable.
+#    if change and opts.get_ordered_objects():
+#        order = new_data['order_'] and map(int, new_data['order_'].split(',')) or []
+#        for rel_opts in opts.get_ordered_objects():
+#            getattr(new_object, 'set_%s_order' % rel_opts.object_name.lower())(order)
+#    return new_object
 
 
 
