@@ -6,6 +6,10 @@ from django.core.exceptions import ImproperlyConfigured
 import os, re, sys, textwrap
 from optparse import OptionParser
 
+#HACK: for Python2.3 
+if not hasattr(__builtins__,'set'):
+    from sets import Set as set
+
 MODULE_TEMPLATE = '''    {%% if perms.%(app)s.%(addperm)s or perms.%(app)s.%(changeperm)s %%}
     <tr>
         <th>{%% if perms.%(app)s.%(changeperm)s %%}<a href="%(app)s/%(mod)s/">{%% endif %%}%(name)s{%% if perms.%(app)s.%(changeperm)s %%}</a>{%% endif %%}</th>
