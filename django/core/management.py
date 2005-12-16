@@ -64,6 +64,8 @@ def get_sql_create(mod):
     from django.db import backend, get_creation_module, models
     data_types = get_creation_module().DATA_TYPES
     final_output = []
+    opts_output = set()
+    pending_references = {} 
     for klass in mod._MODELS:
         opts = klass._meta
         table_output = []
@@ -83,9 +85,12 @@ def get_sql_create(mod):
                 if f.primary_key:
                     field_output.append('PRIMARY KEY')
                 if f.rel:
-                    field_output.append('REFERENCES %s (%s)' % \
-                        (backend.quote_name(f.rel.to._meta.db_table),
-                        backend.quote_name(f.rel.to._meta.get_field(f.rel.field_name).column)))
+                     if f.rel.to in opts_output:
+                         field_output.append('REFERENCES %s (%s)' % \
+                             (db.db.quote_name(f.rel.to._meta.db_table),
+                             db.db.quote_name(f.rel.to._meta.get_field(f.rel.field_name).column)))
+                     else:
+                         pr = pending_references.setdefault(f.rel.to._meta, []).append( (opts, f) )
                 table_output.append(' '.join(field_output))
         if opts.order_with_respect_to:
             table_output.append('%s %s NULL' % (backend.quote_name('_order'), data_types['IntegerField']))
@@ -98,6 +103,19 @@ def get_sql_create(mod):
             full_statement.append('    %s%s' % (line, i < len(table_output)-1 and ',' or ''))
         full_statement.append(');')
         final_output.append('\n'.join(full_statement))
+        if opts in pending_references:
+            for (rel_opts, f) in pending_references[opts]:
+                r_table = rel_opts.db_table
+                r_col = f.column
+                table =  opts.db_table
+                col = opts.get_field(f.rel.field_name).column
+                final_output.append( 'ALTER TABLE %s ADD CONSTRAINT %s FOREIGN KEY (%s) REFERENCES %s (%s);'  % \
+                                     (backend.quote_name(r_table), 
+                                      backend.quote_name("%s_referencing_%s_%s" % (r_col,table,col)),
+                                      backend.quote_name(r_col), backend.quote_name(table),backend.quote_name(col))
+                                     )
+            del pending_references[opts]
+        opts_output.add(opts)
 
     for klass in mod._MODELS:
         opts = klass._meta
@@ -148,6 +166,9 @@ def get_sql_delete(mod):
     output = []
 
     # Output DROP TABLE statements for standard application tables.
+    to_delete = set()
+    
+    references_to_delete = {}
     for klass in mod._MODELS:
         try:
             if cursor is not None:
@@ -157,7 +178,36 @@ def get_sql_delete(mod):
             # The table doesn't exist, so it doesn't need to be dropped.
             connection.rollback()
         else:
-            output.append("DROP TABLE %s;" % backend.quote_name(klass._meta.db_table))
+            opts = klass._meta
+            for f in opts.fields:
+                if f.rel and f.rel.to not in to_delete:
+                    refs = references_to_delete.get(f.rel.to, [])
+                    refs.append( (opts, f) )
+                    references_to_delete[f.rel.to] = refs
+
+            to_delete.add(opts)
+             
+    for klass in mod._MODELS:
+         try:
+             if cursor is not None:
+                 # Check whether the table exists.
+                 cursor.execute("SELECT 1 FROM %s LIMIT 1" % db.db.quote_name(klass._meta.db_table))
+         except:
+             # The table doesn't exist, so it doesn't need to be dropped.
+             db.db.rollback()
+         else:
+             output.append("DROP TABLE %s;" % db.db.quote_name(klass._meta.db_table))
+             if references_to_delete.has_key(klass._meta):
+                 for opts, f in references_to_delete[klass._meta]:
+                     col = f.column
+                     table = opts.db_table
+                     r_table = f.rel.to._meta.db_table
+                     r_col = f.rel.to.get_field(f.rel.field_name).column
+
+                     output.append( 'ALTER TABLE %s DROP CONSTRAINT %s;'  % \
+                                          (db.db.quote_name(table),
+                                           db.db.quote_name("%s_referencing_%s_%s" % (col,r_table,r_col))
+                                          ))
 
     # Output DROP TABLE statements for many-to-many tables.
     for klass in mod._MODELS:

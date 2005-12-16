@@ -85,7 +85,6 @@ class ModelBase(type):
             if hasattr(new_class, 'objects'):
                 raise ValueError, "Model %s must specify a custom Manager, because it has a field named 'objects'" % name
             new_class.add_to_class('objects',  Manager())
-
         
         # Give the class a docstring -- its definition.
         if new_class.__doc__ is None:

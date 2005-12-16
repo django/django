@@ -37,7 +37,7 @@ class Options:
 
     def _prepare(self):
         if self.order_with_respect_to:
-            self.order_with_respect_to = self.get_field(order_with_respect_to)
+            self.order_with_respect_to = self.get_field(self.order_with_respect_to)
             self.ordering = ('_order',)
         else:
             self.order_with_respect_to = None
