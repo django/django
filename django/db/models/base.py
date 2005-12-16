@@ -3,7 +3,7 @@ from django.db.models.fields import Field, DateField, FileField, ImageField, Aut
 from django.db.models.fields.related import RelatedField, OneToOne, ManyToOne, ManyToMany, RECURSIVE_RELATIONSHIP_CONSTANT
 from django.db.models.related import RelatedObject
 from django.db.models.manager import Manager, ManagerDescriptor
-from django.db.models.query import orderlist2sql 
+from django.db.models.query import orderlist2sql
 from django.db.models.options import Options
 from django.db import connection, backend
 
@@ -14,8 +14,8 @@ import re
 import types
 import sys
 
-#HACK: for Python2.3 
-if not hasattr(__builtins__,'set'):
+# For Python 2.3
+if not hasattr(__builtins__, 'set'):
     from sets import Set as set
 
 # Calculate the module_name using a poor-man's pluralization.
@@ -41,7 +41,7 @@ class ModelBase(type):
 
         # Create the class, because we need it to use in currying.
         new_class = type.__new__(cls, name, bases, { '__module__' : attrs.pop('__module__') })
-        
+
         opts = Options(
             module_name = meta_attrs.pop('module_name', get_module_name(name)),
             # If the verbose_name wasn't given, use the class name,
@@ -65,10 +65,10 @@ class ModelBase(type):
         if meta_attrs != {}:
             raise TypeError, "'class META' got invalid attribute(s): %s" % ','.join(meta_attrs.keys())
         new_class.add_to_class('_meta', opts)
-        
+
         # Create the DoesNotExist exception.
         new_class.DoesNotExist = types.ClassType('DoesNotExist', (ObjectDoesNotExist,), {})
-        
+
         # Figure out the app_label by looking one level up.
         #FIXME: wrong for nested model modules
         app_package = sys.modules.get(new_class.__module__)
@@ -77,38 +77,38 @@ class ModelBase(type):
 
         # Cache the app label.
         opts.app_label = app_label
-        
+
         #Add all attributes to the class
         #fields, managers = [], []
         for obj_name, obj in attrs.items():
             new_class.add_to_class(obj_name, obj)
-        
+
         if not hasattr(new_class, '_default_manager'):
             # Create the default manager, if needed.
             if hasattr(new_class, 'objects'):
                 raise ValueError, "Model %s must specify a custom Manager, because it has a field named 'objects'" % name
             new_class.add_to_class('objects',  Manager())
-        
+
         # Give the class a docstring -- its definition.
         if new_class.__doc__ is None:
             new_class.__doc__ = "%s.%s(%s)" % (opts.module_name, name, ", ".join([f.name for f in opts.fields]))
 
         if hasattr(new_class, 'get_absolute_url'):
             new_class.get_absolute_url = curry(get_absolute_url, opts, new_class.get_absolute_url)
-            
+
         opts._prepare()
         new_class._prepare()
-        
+
         # If the db_table wasn't provided, use the app_label + module_name.
         if not opts.db_table:
             opts.db_table = "%s_%s" % (app_label, opts.module_name)
-        
+
         # Populate the _MODELS member on the module the class is in.
         app_package.__dict__.setdefault('_MODELS', []).append(new_class)
-        
-    
+
+
         return new_class
-    
+
 def cmp_cls(x, y):
     for field in x._meta.fields:
         if field.rel and field.null and field.rel.to == y:
@@ -120,17 +120,17 @@ def cmp_cls(x, y):
 
 class Model(object):
     __metaclass__ = ModelBase
-    
+
     def add_to_class(cls, name, attribute):
         if hasattr(attribute, 'contribute_to_class'):
             attribute.contribute_to_class(cls, name)
         else:
             setattr(cls, name, attribute)
     add_to_class = classmethod(add_to_class)
-    
+
     AddManipulator = ManipulatorDescriptor('AddManipulator', ModelAddManipulator)
-    ChangeManipulator = ManipulatorDescriptor('ChangeManipulator', ModelChangeManipulator)    
-    
+    ChangeManipulator = ManipulatorDescriptor('ChangeManipulator', ModelChangeManipulator)
+
     def __repr__(self):
         return '<%s object>' % self.__class__.__name__
 
@@ -214,7 +214,7 @@ class Model(object):
         if cls._meta.order_with_respect_to:
             cls.get_next_in_order = curry(cls.__get_next_or_previous_in_order, is_next=True)
             cls.get_previous_in_order = curry(cls.__get_next_or_previous_in_order, is_next=False)
-        
+
         RelatedField.do_pending_lookups(cls)
 
     _prepare = classmethod(_prepare)
@@ -277,13 +277,13 @@ class Model(object):
 
     def __collect_sub_objects(self, seen_objs, ignore_objs):
         pk_val = self.__get_pk_val()
-        
-        key = (self.__class__, pk_val)        
-        
+
+        key = (self.__class__, pk_val)
+
         if key in seen_objs or key in ignore_objs:
             return
         seen_objs[key] = self
-        
+
         for related in self._meta.get_all_related_objects():
             rel_opts_name = related.get_method_name_part()
             if isinstance(related.field.rel, OneToOne):
@@ -301,25 +301,25 @@ class Model(object):
         assert getattr(self, self._meta.pk.attname) is not None, "%r can't be deleted because it doesn't have an ID."
         ignore_objects = \
             ignore_objects and dict([ (o.__class,o.__get_pk_val) for o in ignore_objects ]) or {}
-        
+
         seen_objs = {}
         self.__collect_sub_objects(seen_objs, ignore_objects)
-        
+
         seen_cls = set([cls for cls,pk in seen_objs.keys()])
         cls_order = list(seen_cls)
         cls_order.sort(cmp_cls)
 
         seen_tups = [ (cls, pk_val, instance) for (cls, pk_val),instance in seen_objs.items() ]
         seen_tups.sort(lambda x,y: cmp(cls_order.index(x[0]), cls_order.index(y[0])))
-        
+
         cursor = connection.cursor()
-    
+
         for cls, pk_val, instance in seen_tups:
-        
+
             # Run any pre-delete hooks.
             if hasattr(instance, '_pre_delete'):
                 instance._pre_delete()
-            
+
             for related in cls._meta.get_all_related_many_to_many_objects():
                 cursor.execute("DELETE FROM %s WHERE %s=%%s" % \
                     (backend.quote_name(related.field.get_m2m_db_table(related.opts)),
@@ -330,23 +330,22 @@ class Model(object):
                     (backend.quote_name(f.get_m2m_db_table(cls._meta)),
                     backend.quote_name(cls._meta.object_name.lower() + '_id')),
                     [pk_val])
-                    
+
             for field in cls._meta.fields:
                 if field.rel and field.null and field.rel.to in seen_cls:
                     cursor.execute("UPDATE %s SET %s = NULL WHERE %s =%%s" % \
-                                   ( backend.quote_name(cls._meta.db_table), 
+                                   ( backend.quote_name(cls._meta.db_table),
                                      backend.quote_name(field.column),
                                      backend.quote_name(cls._meta.pk.column)),
                                    [pk_val] )
-              
+
         seen_tups.reverse()
-        
+
         for cls, pk_val, instance in seen_tups:
             cursor.execute("DELETE FROM %s WHERE %s=%%s" % \
                 (backend.quote_name(cls._meta.db_table), backend.quote_name(cls._meta.pk.column)),
                 [pk_val])
-                
-            
+
             setattr(self, cls._meta.pk.attname, None)
             for f in cls._meta.fields:
                 if isinstance(f, FileField) and getattr(self, f.attname):
@@ -358,12 +357,12 @@ class Model(object):
             # Run any post-delete hooks.
             if hasattr(instance, '_post_delete'):
                 instance._post_delete()
-            
+
         connection.commit()
 
     delete.alters_data = True
 
-    
+
     def __get_FIELD_display(self, field):
         value = getattr(self, field.attname)
         return dict(field.choices).get(value, value)
@@ -572,7 +571,7 @@ class Model(object):
         connection.commit()
 
 
-    
+
 
 
 ############################################

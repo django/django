@@ -6,8 +6,8 @@ from django.core.exceptions import ImproperlyConfigured
 import os, re, sys, textwrap
 from optparse import OptionParser
 
-#HACK: for Python2.3 
-if not hasattr(__builtins__,'set'):
+# For Python 2.3
+if not hasattr(__builtins__, 'set'):
     from sets import Set as set
 
 MODULE_TEMPLATE = '''    {%% if perms.%(app)s.%(addperm)s or perms.%(app)s.%(changeperm)s %%}
