@@ -1,5 +1,5 @@
 from django import models
-from django.core import template_loader
+from django.core.template import loader
 from django.utils.httpwrappers import HttpResponse
 from django.core.xheaders import populate_xheaders
 from django.core.extensions import DjangoContext as Context
@@ -7,7 +7,7 @@ from django.core.paginator import ObjectPaginator, InvalidPage
 from django.core.exceptions import Http404, ObjectDoesNotExist
 
 def object_list(request, app_label, module_name, paginate_by=None, allow_empty=False,
-                template_name=None, template_loader=template_loader,
+                template_name=None, template_loader=loader,
                 extra_lookup_kwargs={}, extra_context={}):
     """
     Generic list of objects.
@@ -80,7 +80,7 @@ def object_list(request, app_label, module_name, paginate_by=None, allow_empty=F
 
 def object_detail(request, app_label, module_name, object_id=None, slug=None,
                   slug_field=None, template_name=None, template_name_field=None,
-                  template_loader=template_loader, extra_lookup_kwargs={},
+                  template_loader=loader, extra_lookup_kwargs={},
                   extra_context={}):
     """
     Generic list of objects.
