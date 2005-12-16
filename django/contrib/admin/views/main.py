@@ -40,6 +40,8 @@ IS_POPUP_VAR = 'pop'
 # Text to display within changelist table cells if the value is blank.
 EMPTY_CHANGELIST_VALUE = '(None)'
 
+ADMIN_PREFIX = "/admin/"
+
 def _get_mod_opts(app_label, module_name):
     "Helper function that returns a tuple of (module, opts), raising Http404 if necessary."
     try:
@@ -95,6 +97,22 @@ def get_model_and_app(path):
             return ( find_model(mod, remaining), get_app_label(mod) )
             
     raise Http404 # Couldn't find app
+
+_model_urls = {}
+
+def url_for_model(model):
+    try:
+        return _model_urls[model]
+    except KeyError:
+        comps = model.__module__.split('.')
+        for mod in models.get_installed_models():  
+            remaining, matched =  matches_app(mod, comps)
+            if matched and len(remaining) > 0:
+                comps = comps[: - len(remaining)] + remaining[1:]
+                url = "%s%s/%s/" % (ADMIN_PREFIX, '/'.join(comps) , model.__name__.lower() )
+                _model_urls[model] = url
+                return url
+        raise ImproperlyConfigured('%s is not a model in an installed app' % model.__name__ )
 
 def index(request):
     return render_to_response('admin/index', {'title': _('Site administration')}, context_instance=Context(request))
@@ -350,6 +368,9 @@ class AdminBoundField(BoundField):
         if classes:
             self.cell_class_attribute = ' class="%s" ' % ' '.join(classes)
         self._repr_filled = False
+
+        if field.rel:
+            self.related_url = url_for_model(field.rel.to)
 
     def _fetch_existing_display(self, func_name):
         class_dict = self.original.__class__.__dict__

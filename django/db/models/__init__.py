@@ -813,6 +813,7 @@ class AutomaticManipulator(formfields.Manipulator):
         
     def save(self, new_data):
         add, change, opts, klass = self.add, self.change, self.opts, self.model
+        print add, change, opts, klass 
         # TODO: big cleanup when core fields go -> use recursive manipulators.
         from django.utils.datastructures import DotExpandedDict
         params = {}
@@ -918,7 +919,7 @@ class AutomaticManipulator(formfields.Manipulator):
                            params[f.attname] = param
     
                     # Create the related item.
-                    new_rel_obj = related.opts.get_model_module().Klass(**params)
+                    new_rel_obj = related.model(**params)
     
                     # If all the core fields were provided (non-empty), save the item.
                     if all_cores_given:
@@ -976,8 +977,8 @@ class ModelAddManipulator(AutomaticManipulator):
         super(ModelAddManipulator, self).__init__(follow=follow)
         
 class ModelChangeManipulator(AutomaticManipulator):
-    change = False
-    add = True
+    change = True
+    add = False
     
     def __init__(self, obj_key=None, follow=None):
         assert obj_key is not None, "ChangeManipulator.__init__() must be passed obj_key parameter."

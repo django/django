@@ -758,7 +758,8 @@ class ForeignKey(Field):
         # but only for related objects that are in the same app.
         # EXAMPLE: Poll.add_choice()
         if related.opts.app_label == cls._meta.app_label:
-            setattr(cls, 'add_%s' % rel_obj_name, curry(cls._add_related, rel_class=related.model, rel_field=related.field))
+            func = lambda self, *args, **kwargs: self._add_related(related.model, related.field, *args, **kwargs) 
+            setattr(cls, 'add_%s' % rel_obj_name, func)
 
 
 class ManyToManyField(Field):
