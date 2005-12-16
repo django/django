@@ -22,7 +22,8 @@
 
 from django.core.exceptions import ImproperlyConfigured
 from django.core.template import Origin, StringOrigin, Template, Context, TemplateDoesNotExist, add_to_builtins
-from django.conf.settings import TEMPLATE_LOADERS, TEMPLATE_DEBUG
+from django.conf.settings import TEMPLATE_LOADERS
+from django.conf import settings
 
 template_source_loaders = []
 for path in TEMPLATE_LOADERS:
@@ -51,7 +52,7 @@ class LoaderOrigin(Origin):
         return self.loader(self.loadname, self.dirs)[0]
 
 def make_origin(display_name, loader, name, dirs):
-    if TEMPLATE_DEBUG:
+    if settings.TEMPLATE_DEBUG:
         return LoaderOrigin(display_name, loader, name, dirs)
     else:
         return None

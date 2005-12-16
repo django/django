@@ -9,7 +9,7 @@ from django.db.models.query import handle_legacy_orderlist, orderlist2sql, order
 GET_ITERATOR_CHUNK_SIZE = 100
 
 class Manager(object):
-        # Tracks each time a Field instance is created. Used to retain order.
+        # Tracks each time a Manager instance is created. Used to retain order.
     creation_counter = 0
 
     def __init__(self):

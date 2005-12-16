@@ -1,7 +1,7 @@
 from django.core.template import TemplateSyntaxError, TemplateDoesNotExist, resolve_variable
 from django.core.template import Library, Context, Node
 from django.core.template.loader import get_template, get_template_from_string, find_template_source
-from django.conf.settings import TEMPLATE_DEBUG
+
 register = Library()
 
 class ExtendsError(Exception):
@@ -82,6 +82,7 @@ class ConstantIncludeNode(Node):
             t = get_template(template_path)
             self.template = t
         except:
+            from django.conf.settings import TEMPLATE_DEBUG
             if TEMPLATE_DEBUG:
                  raise
             self.template = None

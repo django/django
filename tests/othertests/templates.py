@@ -1,7 +1,5 @@
 from django.conf import settings
 
-# Turn TEMPLATE_DEBUG off, because tests assume that.
-settings.TEMPLATE_DEBUG = False
 
 from django.core import template
 from django.core.template import loader
@@ -353,6 +351,9 @@ def run_tests(verbosity=0, standalone=False):
     failed_tests = []
     tests = TEMPLATE_TESTS.items()
     tests.sort()
+    
+    # Turn TEMPLATE_DEBUG off, because tests assume that.
+    old_td, settings.TEMPLATE_DEBUG = settings.TEMPLATE_DEBUG, False
     for name, vals in tests:
         install()
         if 'LANGUAGE_CODE' in vals[1]:
@@ -382,6 +383,8 @@ def run_tests(verbosity=0, standalone=False):
             failed_tests.append(name)
     loader.template_source_loaders = old_template_loaders
     deactivate()
+    settings.TEMPLATE_DEBUG = old_td
+    
     if failed_tests and not standalone:
         msg = "Template tests %s failed." % failed_tests
         if not verbosity:

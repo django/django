@@ -57,7 +57,8 @@ times with multiple contexts)
 import re
 from inspect import getargspec
 from django.utils.functional import curry
-from django.conf.settings import DEFAULT_CHARSET, TEMPLATE_DEBUG
+from django.conf.settings import DEFAULT_CHARSET
+from django.conf import settings
 
 __all__ = ('Template','Context','compile_string')
 
@@ -126,7 +127,7 @@ class StringOrigin(Origin):
 class Template:
     def __init__(self, template_string, origin=None):
         "Compilation stage"
-        if TEMPLATE_DEBUG and origin == None:
+        if settings.TEMPLATE_DEBUG and origin == None:
             origin = StringOrigin(template_string)
             # Could do some crazy stack-frame stuff to record where this string
             # came from...
@@ -401,13 +402,20 @@ class DebugParser(Parser):
         if not hasattr(e, 'source'):
             e.source = token.source
 
-if TEMPLATE_DEBUG:
-    lexer_factory = DebugLexer
-    parser_factory = DebugParser
-else:
-    lexer_factory = Lexer
-    parser_factory = Parser
 
+def lexer_factory(*args, **kwargs):
+    if settings.TEMPLATE_DEBUG:
+        return DebugLexer(*args, **kwargs)
+    else:
+        return Lexer(*args, **kwargs)
+
+def parser_factory(*args, **kwargs):
+    if settings.TEMPLATE_DEBUG:
+        return DebugParser(*args, **kwargs)
+    else:
+        return Parser(*args, **kwargs)
+        
+        
 class TokenParser:
     """
     Subclass this and implement the top() method to parse a template line. When
