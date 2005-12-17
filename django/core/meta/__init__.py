@@ -1809,10 +1809,11 @@ def manipulator_save(opts, klass, add, change, self, new_data):
         if child_follow:
             obj_list = expanded_data[related.var_name].items()
             obj_list.sort(lambda x, y: cmp(int(x[0]), int(y[0])))
-            params = {}
 
             # For each related item...
             for _, rel_new_data in obj_list:
+
+                params = {}
 
                 # Keep track of which core=True fields were provided.
                 # If all core fields were given, the related object will be saved.
