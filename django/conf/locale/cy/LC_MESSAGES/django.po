@@ -8,45 +8,13 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2005-12-14 17:22+0100\n"
+"POT-Creation-Date: 2005-12-17 22:26+0100\n"
 "PO-Revision-Date: 2005-11-05 HO:MI+ZONE\n"
 "Last-Translator: Jason Davies <jason@jasondavies.com>\n"
 "Language-Team: Cymraeg <cy@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-
-#: contrib/redirects/models/redirects.py:7
-msgid "redirect from"
-msgstr "ailgyfeirio o"
-
-#: contrib/redirects/models/redirects.py:8
-msgid ""
-"This should be an absolute path, excluding the domain name. Example: '/"
-"events/search/'."
-msgstr ""
-"Ddylai hon bod yn lwybr hollol, heb y parth-enw. Er enghraifft: '/"
-"digwyddiadau/chwilio/'."
-
-#: contrib/redirects/models/redirects.py:9
-msgid "redirect to"
-msgstr "ailgyfeirio i"
-
-#: contrib/redirects/models/redirects.py:10
-msgid ""
-"This can be either an absolute path (as above) or a full URL starting with "
-"'http://'."
-msgstr ""
-"Gellir fod naill ai llwybr hollol (fel uwch) neu URL hollol yn ddechrau â "
-"'http://'."
-
-#: contrib/redirects/models/redirects.py:12
-msgid "redirect"
-msgstr "ailgyfeiriad"
-
-#: contrib/redirects/models/redirects.py:13
-msgid "redirects"
-msgstr "ailgyfeiriadau"
 
 #: contrib/comments/models/comments.py:8
 #: contrib/comments/models/comments.py:161
@@ -299,59 +267,6 @@ msgstr ""
 #: contrib/comments/views/comments.py:318
 msgid "The comment form didn't provide either 'preview' or 'post'"
 msgstr ""
-
-#: contrib/flatpages/models/flatpages.py:6 contrib/admin/views/doc.py:267
-msgid "URL"
-msgstr "URL"
-
-#: contrib/flatpages/models/flatpages.py:7
-msgid ""
-"Example: '/about/contact/'. Make sure to have leading and trailing slashes."
-msgstr ""
-"Er enghraifft: '/amdan/cyswllt/'. Sicrhewch gennych slaesau arweiniol ac "
-"trywyddiol."
-
-#: contrib/flatpages/models/flatpages.py:8
-msgid "title"
-msgstr "teitl"
-
-#: contrib/flatpages/models/flatpages.py:9
-msgid "content"
-msgstr "cynnwys"
-
-#: contrib/flatpages/models/flatpages.py:10
-msgid "enable comments"
-msgstr "galluogi sylwadau"
-
-#: contrib/flatpages/models/flatpages.py:11
-msgid "template name"
-msgstr "enw'r templed"
-
-#: contrib/flatpages/models/flatpages.py:12
-msgid ""
-"Example: 'flatpages/contact_page'. If this isn't provided, the system will "
-"use 'flatpages/default'."
-msgstr ""
-"Er enghraifft: 'flatpages/tudalen_cyswllt'. Os nid darparwyd, ddefnyddia'r "
-"system 'flatpages/default'."
-
-#: contrib/flatpages/models/flatpages.py:13
-msgid "registration required"
-msgstr "cofrestriad gofynnol"
-
-#: contrib/flatpages/models/flatpages.py:13
-msgid "If this is checked, only logged-in users will be able to view the page."
-msgstr ""
-"Os wedi dewis, dim ond defnyddwyr a mewngofnodwyd bydd yn gallu gweld y "
-"tudalen."
-
-#: contrib/flatpages/models/flatpages.py:17
-msgid "flat page"
-msgstr "tudalen fflat"
-
-#: contrib/flatpages/models/flatpages.py:18
-msgid "flat pages"
-msgstr "tudalennau fflat"
 
 #: contrib/admin/filterspecs.py:40
 #, python-format
@@ -615,6 +530,10 @@ msgstr "Testun"
 msgid "Time"
 msgstr "Amser"
 
+#: contrib/admin/views/doc.py:267 contrib/flatpages/models/flatpages.py:6
+msgid "URL"
+msgstr "URL"
+
 #: contrib/admin/views/doc.py:268
 msgid "U.S. state (two uppercase letters)"
 msgstr "Talaith U.D. (dwy briflythyren)"
@@ -623,19 +542,11 @@ msgstr "Talaith U.D. (dwy briflythyren)"
 msgid "XML text"
 msgstr "Testun XML"
 
-#: contrib/admin/templates/widget/date_time.html:3
-msgid "Date:"
-msgstr "Dyddiad:"
-
-#: contrib/admin/templates/widget/date_time.html:4
-msgid "Time:"
-msgstr "Amser:"
-
 #: contrib/admin/templates/admin/object_history.html:3
 #: contrib/admin/templates/admin/change_list.html:4
-#: contrib/admin/templates/admin/change_form.html:9
 #: contrib/admin/templates/admin/base.html:23
 #: contrib/admin/templates/admin/delete_confirmation.html:3
+#: contrib/admin/templates/admin/change_form.html:9
 #: contrib/admin/templates/admin_doc/bookmarklets.html:4
 #: contrib/admin/templates/admin_doc/view_detail.html:4
 #: contrib/admin/templates/admin_doc/template_tag_index.html:5
@@ -651,9 +562,9 @@ msgstr "Newid cyfrinair"
 
 #: contrib/admin/templates/admin/object_history.html:3
 #: contrib/admin/templates/admin/change_list.html:4
-#: contrib/admin/templates/admin/change_form.html:9
 #: contrib/admin/templates/admin/base.html:23
 #: contrib/admin/templates/admin/delete_confirmation.html:3
+#: contrib/admin/templates/admin/change_form.html:9
 #: contrib/admin/templates/admin_doc/bookmarklets.html:4
 #: contrib/admin/templates/admin_doc/view_detail.html:4
 #: contrib/admin/templates/admin_doc/template_tag_index.html:5
@@ -668,10 +579,10 @@ msgid "Log out"
 msgstr "Allgofnodi"
 
 #: contrib/admin/templates/admin/object_history.html:5
-#: contrib/admin/templates/admin/change_list.html:5
 #: contrib/admin/templates/admin/500.html:4
-#: contrib/admin/templates/admin/change_form.html:12
+#: contrib/admin/templates/admin/change_list.html:5
 #: contrib/admin/templates/admin/base.html:29
+#: contrib/admin/templates/admin/change_form.html:12
 #: contrib/admin/templates/registration/password_change_done.html:4
 #: contrib/admin/templates/registration/password_reset_form.html:4
 #: contrib/admin/templates/registration/logged_out.html:4
@@ -710,15 +621,13 @@ msgstr ""
 "Does dim hanes newid gan y gwrthrych yma. Mae'n debyg ni ychwanegwyd drwy'r "
 "safle gweinydd yma."
 
-#: contrib/admin/templates/admin/change_list.html:10
-#, python-format
-msgid "Add %(name)s"
-msgstr "Ychwanegu %(name)s"
+#: contrib/admin/templates/admin/base_site.html:4
+msgid "Django site admin"
+msgstr "Gweinyddiad safle Django"
 
-#: contrib/admin/templates/admin/filter.html:2
-#, python-format
-msgid " By %(title)s "
-msgstr " Gan %(title)s"
+#: contrib/admin/templates/admin/base_site.html:7
+msgid "Django administration"
+msgstr "Gweinyddiad Django"
 
 #: contrib/admin/templates/admin/500.html:4
 msgid "Server error"
@@ -740,17 +649,14 @@ msgstr ""
 "Mae gwall wedi digwydd. Adroddwyd i weinyddwyr y safle drwy e-bost ac ddylai "
 "cael ei drwsio cyn bo hir."
 
-#: contrib/admin/templates/admin/search_form.html:7
-msgid "Go"
-msgstr "Ewch"
+#: contrib/admin/templates/admin/404.html:4
+#: contrib/admin/templates/admin/404.html:8
+msgid "Page not found"
+msgstr "Tudalen heb ei ddarganfod"
 
-#: contrib/admin/templates/admin/base_site.html:4
-msgid "Django site admin"
-msgstr "Gweinyddiad safle Django"
-
-#: contrib/admin/templates/admin/base_site.html:7
-msgid "Django administration"
-msgstr "Gweinyddiad Django"
+#: contrib/admin/templates/admin/404.html:10
+msgid "We're sorry, but the requested page could not be found."
+msgstr "Mae'n ddrwg gennym, ond nid darganfwyd y dudalen a dymunwyd"
 
 #: contrib/admin/templates/admin/index.html:27
 #: contrib/admin/templates/admin/change_form.html:14
@@ -777,14 +683,10 @@ msgstr "Fy Ngweithredau"
 msgid "None available"
 msgstr "Dim ar gael"
 
-#: contrib/admin/templates/admin/404.html:4
-#: contrib/admin/templates/admin/404.html:8
-msgid "Page not found"
-msgstr "Tudalen heb ei ddarganfod"
-
-#: contrib/admin/templates/admin/404.html:10
-msgid "We're sorry, but the requested page could not be found."
-msgstr "Mae'n ddrwg gennym, ond nid darganfwyd y dudalen a dymunwyd"
+#: contrib/admin/templates/admin/change_list.html:10
+#, python-format
+msgid "Add %(name)s"
+msgstr "Ychwanegu %(name)s"
 
 #: contrib/admin/templates/admin/login.html:15
 msgid "Username:"
@@ -797,24 +699,6 @@ msgstr "Cyfrinair:"
 #: contrib/admin/templates/admin/login.html:20
 msgid "Have you <a href=\"/password_reset/\">forgotten your password</a>?"
 msgstr "Ydych wedi <a href=\"/password_reset/\">anghofio eich cyfrinair</a>?"
-
-#: contrib/admin/templates/admin/change_form.html:20
-msgid "View on site"
-msgstr "Gweld ar safle"
-
-#: contrib/admin/templates/admin/change_form.html:28
-msgid "Please correct the error below."
-msgid_plural "Please correct the errors below."
-msgstr[0] ""
-msgstr[1] ""
-
-#: contrib/admin/templates/admin/change_form.html:45
-msgid "Ordering"
-msgstr "Trefnu"
-
-#: contrib/admin/templates/admin/change_form.html:48
-msgid "Order:"
-msgstr "Trefn:"
 
 #: contrib/admin/templates/admin/base.html:23
 msgid "Welcome,"
@@ -842,6 +726,33 @@ msgstr ""
 #: contrib/admin/templates/admin/delete_confirmation.html:17
 msgid "Yes, I'm sure"
 msgstr "Yndw, rwy'n sicr"
+
+#: contrib/admin/templates/admin/filter.html:2
+#, python-format
+msgid " By %(title)s "
+msgstr " Gan %(title)s"
+
+#: contrib/admin/templates/admin/search_form.html:7
+msgid "Go"
+msgstr "Ewch"
+
+#: contrib/admin/templates/admin/change_form.html:20
+msgid "View on site"
+msgstr "Gweld ar safle"
+
+#: contrib/admin/templates/admin/change_form.html:28
+msgid "Please correct the error below."
+msgid_plural "Please correct the errors below."
+msgstr[0] ""
+msgstr[1] ""
+
+#: contrib/admin/templates/admin/change_form.html:45
+msgid "Ordering"
+msgstr "Trefnu"
+
+#: contrib/admin/templates/admin/change_form.html:48
+msgid "Order:"
+msgstr "Trefn:"
 
 #: contrib/admin/templates/admin/submit_line.html:3
 msgid "Delete"
@@ -1038,6 +949,104 @@ msgstr "Golygu'r gwrthrych yma (ffenestr newydd)"
 #: contrib/admin/templates/admin_doc/bookmarklets.html:29
 msgid "As above, but opens the admin page in a new window."
 msgstr "Fel uwchben, ond yn agor y dudalen weinyddiad mewn ffenestr newydd."
+
+#: contrib/admin/templates/widget/date_time.html:3
+msgid "Date:"
+msgstr "Dyddiad:"
+
+#: contrib/admin/templates/widget/date_time.html:4
+msgid "Time:"
+msgstr "Amser:"
+
+#: contrib/admin/templates/widget/file.html:2
+msgid "Currently:"
+msgstr ""
+
+#: contrib/admin/templates/widget/file.html:3
+#, fuzzy
+msgid "Change:"
+msgstr "Newidio"
+
+#: contrib/redirects/models/redirects.py:7
+msgid "redirect from"
+msgstr "ailgyfeirio o"
+
+#: contrib/redirects/models/redirects.py:8
+msgid ""
+"This should be an absolute path, excluding the domain name. Example: '/"
+"events/search/'."
+msgstr ""
+"Ddylai hon bod yn lwybr hollol, heb y parth-enw. Er enghraifft: '/"
+"digwyddiadau/chwilio/'."
+
+#: contrib/redirects/models/redirects.py:9
+msgid "redirect to"
+msgstr "ailgyfeirio i"
+
+#: contrib/redirects/models/redirects.py:10
+msgid ""
+"This can be either an absolute path (as above) or a full URL starting with "
+"'http://'."
+msgstr ""
+"Gellir fod naill ai llwybr hollol (fel uwch) neu URL hollol yn ddechrau â "
+"'http://'."
+
+#: contrib/redirects/models/redirects.py:12
+msgid "redirect"
+msgstr "ailgyfeiriad"
+
+#: contrib/redirects/models/redirects.py:13
+msgid "redirects"
+msgstr "ailgyfeiriadau"
+
+#: contrib/flatpages/models/flatpages.py:7
+msgid ""
+"Example: '/about/contact/'. Make sure to have leading and trailing slashes."
+msgstr ""
+"Er enghraifft: '/amdan/cyswllt/'. Sicrhewch gennych slaesau arweiniol ac "
+"trywyddiol."
+
+#: contrib/flatpages/models/flatpages.py:8
+msgid "title"
+msgstr "teitl"
+
+#: contrib/flatpages/models/flatpages.py:9
+msgid "content"
+msgstr "cynnwys"
+
+#: contrib/flatpages/models/flatpages.py:10
+msgid "enable comments"
+msgstr "galluogi sylwadau"
+
+#: contrib/flatpages/models/flatpages.py:11
+msgid "template name"
+msgstr "enw'r templed"
+
+#: contrib/flatpages/models/flatpages.py:12
+msgid ""
+"Example: 'flatpages/contact_page'. If this isn't provided, the system will "
+"use 'flatpages/default'."
+msgstr ""
+"Er enghraifft: 'flatpages/tudalen_cyswllt'. Os nid darparwyd, ddefnyddia'r "
+"system 'flatpages/default'."
+
+#: contrib/flatpages/models/flatpages.py:13
+msgid "registration required"
+msgstr "cofrestriad gofynnol"
+
+#: contrib/flatpages/models/flatpages.py:13
+msgid "If this is checked, only logged-in users will be able to view the page."
+msgstr ""
+"Os wedi dewis, dim ond defnyddwyr a mewngofnodwyd bydd yn gallu gweld y "
+"tudalen."
+
+#: contrib/flatpages/models/flatpages.py:17
+msgid "flat page"
+msgstr "tudalen fflat"
+
+#: contrib/flatpages/models/flatpages.py:18
+msgid "flat pages"
+msgstr "tudalennau fflat"
 
 #: utils/translation.py:350
 msgid "DATE_FORMAT"
@@ -1720,7 +1729,7 @@ msgstr ""
 "Mae gan y priodoledd \"%(attr)s\" ar lein %(line)s gwerth annilydd. (Linell "
 "yn ddechrau â \"%(start)s\".)"
 
-#: core/meta/__init__.py:1946
+#: core/meta/__init__.py:1947
 #, python-format
 msgid "%(object)s with this %(type)s already exists for the given %(field)s."
 msgstr ""
@@ -1757,7 +1766,7 @@ msgid_plural ""
 msgstr[0] ""
 msgstr[1] ""
 
-#: core/template/defaultfilters.py:354
+#: core/template/defaultfilters.py:371
 msgid "yes,no,maybe"
 msgstr "ie,na,efallai"
 

@@ -8,44 +8,13 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2005-12-14 17:23+0100\n"
+"POT-Creation-Date: 2005-12-17 22:26+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=iso-8859-1\n"
 "Content-Transfer-Encoding: 8bit\n"
-
-#: contrib/redirects/models/redirects.py:7
-msgid "redirect from"
-msgstr "redirigi da"
-
-#: contrib/redirects/models/redirects.py:8
-msgid ""
-"This should be an absolute path, excluding the domain name. Example: '/"
-"events/search/'."
-msgstr ""
-"Un percorso assoluto, senza nome a dominio. Esempio: '/events/search/'.Un "
-"percorso assoluto, senza nome a dominio. Esempio: '/events/search/'."
-
-#: contrib/redirects/models/redirects.py:9
-msgid "redirect to"
-msgstr "redirigi verso"
-
-#: contrib/redirects/models/redirects.py:10
-msgid ""
-"This can be either an absolute path (as above) or a full URL starting with "
-"'http://'."
-msgstr ""
-"Un percorso assoluto (come sopra) o un URL completa che inizi con 'http://'."
-
-#: contrib/redirects/models/redirects.py:12
-msgid "redirect"
-msgstr "redirigi"
-
-#: contrib/redirects/models/redirects.py:13
-msgid "redirects"
-msgstr "redirezioni"
 
 #: contrib/comments/models/comments.py:8
 #: contrib/comments/models/comments.py:161
@@ -308,57 +277,6 @@ msgstr ""
 #: contrib/comments/views/comments.py:318
 msgid "The comment form didn't provide either 'preview' or 'post'"
 msgstr ""
-
-#: contrib/flatpages/models/flatpages.py:6 contrib/admin/views/doc.py:267
-msgid "URL"
-msgstr "URL"
-
-#: contrib/flatpages/models/flatpages.py:7
-msgid ""
-"Example: '/about/contact/'. Make sure to have leading and trailing slashes."
-msgstr ""
-"Esempio: '/about/contact/'. Attenzione alla barra ('/') iniziale e finale."
-
-#: contrib/flatpages/models/flatpages.py:8
-msgid "title"
-msgstr "titolo"
-
-#: contrib/flatpages/models/flatpages.py:9
-msgid "content"
-msgstr "contenuto"
-
-#: contrib/flatpages/models/flatpages.py:10
-msgid "enable comments"
-msgstr "abilita commenti"
-
-#: contrib/flatpages/models/flatpages.py:11
-msgid "template name"
-msgstr "nome modello"
-
-#: contrib/flatpages/models/flatpages.py:12
-#, fuzzy
-msgid ""
-"Example: 'flatpages/contact_page'. If this isn't provided, the system will "
-"use 'flatpages/default'."
-msgstr ""
-"Esempio: 'flatfiles/contact_page'. Se non specificato, il sistema userà "
-"'flatfiles/default'."
-
-#: contrib/flatpages/models/flatpages.py:13
-msgid "registration required"
-msgstr "registrazione obbligatoria"
-
-#: contrib/flatpages/models/flatpages.py:13
-msgid "If this is checked, only logged-in users will be able to view the page."
-msgstr "Se selezionata, solo gli utenti registrati potranno vedere la pagina."
-
-#: contrib/flatpages/models/flatpages.py:17
-msgid "flat page"
-msgstr "pagina statica"
-
-#: contrib/flatpages/models/flatpages.py:18
-msgid "flat pages"
-msgstr "pagine statiche"
 
 #: contrib/admin/filterspecs.py:40
 #, python-format
@@ -630,6 +548,10 @@ msgstr ""
 msgid "Time"
 msgstr ""
 
+#: contrib/admin/views/doc.py:267 contrib/flatpages/models/flatpages.py:6
+msgid "URL"
+msgstr "URL"
+
 #: contrib/admin/views/doc.py:268
 msgid "U.S. state (two uppercase letters)"
 msgstr ""
@@ -638,19 +560,11 @@ msgstr ""
 msgid "XML text"
 msgstr ""
 
-#: contrib/admin/templates/widget/date_time.html:3
-msgid "Date:"
-msgstr ""
-
-#: contrib/admin/templates/widget/date_time.html:4
-msgid "Time:"
-msgstr ""
-
 #: contrib/admin/templates/admin/object_history.html:3
 #: contrib/admin/templates/admin/change_list.html:4
-#: contrib/admin/templates/admin/change_form.html:9
 #: contrib/admin/templates/admin/base.html:23
 #: contrib/admin/templates/admin/delete_confirmation.html:3
+#: contrib/admin/templates/admin/change_form.html:9
 #: contrib/admin/templates/admin_doc/bookmarklets.html:4
 #: contrib/admin/templates/admin_doc/view_detail.html:4
 #: contrib/admin/templates/admin_doc/template_tag_index.html:5
@@ -666,9 +580,9 @@ msgstr "Cambia la password"
 
 #: contrib/admin/templates/admin/object_history.html:3
 #: contrib/admin/templates/admin/change_list.html:4
-#: contrib/admin/templates/admin/change_form.html:9
 #: contrib/admin/templates/admin/base.html:23
 #: contrib/admin/templates/admin/delete_confirmation.html:3
+#: contrib/admin/templates/admin/change_form.html:9
 #: contrib/admin/templates/admin_doc/bookmarklets.html:4
 #: contrib/admin/templates/admin_doc/view_detail.html:4
 #: contrib/admin/templates/admin_doc/template_tag_index.html:5
@@ -683,10 +597,10 @@ msgid "Log out"
 msgstr "Esci"
 
 #: contrib/admin/templates/admin/object_history.html:5
-#: contrib/admin/templates/admin/change_list.html:5
 #: contrib/admin/templates/admin/500.html:4
-#: contrib/admin/templates/admin/change_form.html:12
+#: contrib/admin/templates/admin/change_list.html:5
 #: contrib/admin/templates/admin/base.html:29
+#: contrib/admin/templates/admin/change_form.html:12
 #: contrib/admin/templates/registration/password_change_done.html:4
 #: contrib/admin/templates/registration/password_reset_form.html:4
 #: contrib/admin/templates/registration/logged_out.html:4
@@ -725,15 +639,13 @@ msgstr ""
 "Questo oggetto non ha cambiamenti storicizzati. Probabilmente non è stato "
 "creato con questo sito di amministrazione."
 
-#: contrib/admin/templates/admin/change_list.html:10
-#, fuzzy, python-format
-msgid "Add %(name)s"
-msgstr "Aggiungi"
+#: contrib/admin/templates/admin/base_site.html:4
+msgid "Django site admin"
+msgstr "Amministrazione sito Django"
 
-#: contrib/admin/templates/admin/filter.html:2
-#, python-format
-msgid " By %(title)s "
-msgstr ""
+#: contrib/admin/templates/admin/base_site.html:7
+msgid "Django administration"
+msgstr "Amministrazione Django"
 
 #: contrib/admin/templates/admin/500.html:4
 #, fuzzy
@@ -756,17 +668,14 @@ msgstr ""
 "C'è stato un errore. E' stato riportato agli amministratori del sito via e-"
 "mail e verrà risolto a breve. Grazie per la pazienza."
 
-#: contrib/admin/templates/admin/search_form.html:7
-msgid "Go"
-msgstr ""
+#: contrib/admin/templates/admin/404.html:4
+#: contrib/admin/templates/admin/404.html:8
+msgid "Page not found"
+msgstr "Pagina non trovata"
 
-#: contrib/admin/templates/admin/base_site.html:4
-msgid "Django site admin"
-msgstr "Amministrazione sito Django"
-
-#: contrib/admin/templates/admin/base_site.html:7
-msgid "Django administration"
-msgstr "Amministrazione Django"
+#: contrib/admin/templates/admin/404.html:10
+msgid "We're sorry, but the requested page could not be found."
+msgstr "Spiacente, ma la pagina richiesta non esiste."
 
 #: contrib/admin/templates/admin/index.html:27
 #: contrib/admin/templates/admin/change_form.html:14
@@ -793,14 +702,10 @@ msgstr "Azioni Proprie"
 msgid "None available"
 msgstr "Nessuna disponibile"
 
-#: contrib/admin/templates/admin/404.html:4
-#: contrib/admin/templates/admin/404.html:8
-msgid "Page not found"
-msgstr "Pagina non trovata"
-
-#: contrib/admin/templates/admin/404.html:10
-msgid "We're sorry, but the requested page could not be found."
-msgstr "Spiacente, ma la pagina richiesta non esiste."
+#: contrib/admin/templates/admin/change_list.html:10
+#, fuzzy, python-format
+msgid "Add %(name)s"
+msgstr "Aggiungi"
 
 #: contrib/admin/templates/admin/login.html:15
 msgid "Username:"
@@ -813,24 +718,6 @@ msgstr "Password:"
 #: contrib/admin/templates/admin/login.html:20
 msgid "Have you <a href=\"/password_reset/\">forgotten your password</a>?"
 msgstr "Hai <a href=\"/password_reset/\">dimenticato la tua password</a>?"
-
-#: contrib/admin/templates/admin/change_form.html:20
-msgid "View on site"
-msgstr ""
-
-#: contrib/admin/templates/admin/change_form.html:28
-msgid "Please correct the error below."
-msgid_plural "Please correct the errors below."
-msgstr[0] ""
-msgstr[1] ""
-
-#: contrib/admin/templates/admin/change_form.html:45
-msgid "Ordering"
-msgstr ""
-
-#: contrib/admin/templates/admin/change_form.html:48
-msgid "Order:"
-msgstr ""
 
 #: contrib/admin/templates/admin/base.html:23
 msgid "Welcome,"
@@ -859,6 +746,33 @@ msgstr ""
 #: contrib/admin/templates/admin/delete_confirmation.html:17
 msgid "Yes, I'm sure"
 msgstr "Sì, sono sicuro"
+
+#: contrib/admin/templates/admin/filter.html:2
+#, python-format
+msgid " By %(title)s "
+msgstr ""
+
+#: contrib/admin/templates/admin/search_form.html:7
+msgid "Go"
+msgstr ""
+
+#: contrib/admin/templates/admin/change_form.html:20
+msgid "View on site"
+msgstr ""
+
+#: contrib/admin/templates/admin/change_form.html:28
+msgid "Please correct the error below."
+msgid_plural "Please correct the errors below."
+msgstr[0] ""
+msgstr[1] ""
+
+#: contrib/admin/templates/admin/change_form.html:45
+msgid "Ordering"
+msgstr ""
+
+#: contrib/admin/templates/admin/change_form.html:48
+msgid "Order:"
+msgstr ""
 
 #: contrib/admin/templates/admin/submit_line.html:3
 msgid "Delete"
@@ -1056,6 +970,101 @@ msgstr ""
 #: contrib/admin/templates/admin_doc/bookmarklets.html:29
 msgid "As above, but opens the admin page in a new window."
 msgstr ""
+
+#: contrib/admin/templates/widget/date_time.html:3
+msgid "Date:"
+msgstr ""
+
+#: contrib/admin/templates/widget/date_time.html:4
+msgid "Time:"
+msgstr ""
+
+#: contrib/admin/templates/widget/file.html:2
+msgid "Currently:"
+msgstr ""
+
+#: contrib/admin/templates/widget/file.html:3
+#, fuzzy
+msgid "Change:"
+msgstr "Cambia"
+
+#: contrib/redirects/models/redirects.py:7
+msgid "redirect from"
+msgstr "redirigi da"
+
+#: contrib/redirects/models/redirects.py:8
+msgid ""
+"This should be an absolute path, excluding the domain name. Example: '/"
+"events/search/'."
+msgstr ""
+"Un percorso assoluto, senza nome a dominio. Esempio: '/events/search/'.Un "
+"percorso assoluto, senza nome a dominio. Esempio: '/events/search/'."
+
+#: contrib/redirects/models/redirects.py:9
+msgid "redirect to"
+msgstr "redirigi verso"
+
+#: contrib/redirects/models/redirects.py:10
+msgid ""
+"This can be either an absolute path (as above) or a full URL starting with "
+"'http://'."
+msgstr ""
+"Un percorso assoluto (come sopra) o un URL completa che inizi con 'http://'."
+
+#: contrib/redirects/models/redirects.py:12
+msgid "redirect"
+msgstr "redirigi"
+
+#: contrib/redirects/models/redirects.py:13
+msgid "redirects"
+msgstr "redirezioni"
+
+#: contrib/flatpages/models/flatpages.py:7
+msgid ""
+"Example: '/about/contact/'. Make sure to have leading and trailing slashes."
+msgstr ""
+"Esempio: '/about/contact/'. Attenzione alla barra ('/') iniziale e finale."
+
+#: contrib/flatpages/models/flatpages.py:8
+msgid "title"
+msgstr "titolo"
+
+#: contrib/flatpages/models/flatpages.py:9
+msgid "content"
+msgstr "contenuto"
+
+#: contrib/flatpages/models/flatpages.py:10
+msgid "enable comments"
+msgstr "abilita commenti"
+
+#: contrib/flatpages/models/flatpages.py:11
+msgid "template name"
+msgstr "nome modello"
+
+#: contrib/flatpages/models/flatpages.py:12
+#, fuzzy
+msgid ""
+"Example: 'flatpages/contact_page'. If this isn't provided, the system will "
+"use 'flatpages/default'."
+msgstr ""
+"Esempio: 'flatfiles/contact_page'. Se non specificato, il sistema userà "
+"'flatfiles/default'."
+
+#: contrib/flatpages/models/flatpages.py:13
+msgid "registration required"
+msgstr "registrazione obbligatoria"
+
+#: contrib/flatpages/models/flatpages.py:13
+msgid "If this is checked, only logged-in users will be able to view the page."
+msgstr "Se selezionata, solo gli utenti registrati potranno vedere la pagina."
+
+#: contrib/flatpages/models/flatpages.py:17
+msgid "flat page"
+msgstr "pagina statica"
+
+#: contrib/flatpages/models/flatpages.py:18
+msgid "flat pages"
+msgstr "pagine statiche"
 
 #: utils/translation.py:350
 msgid "DATE_FORMAT"
@@ -1745,7 +1754,7 @@ msgstr ""
 "L'attributo \"%(attr)s\" alla linea %(line)s ha un valore non valido. (La "
 "linea comincia con \"%(start)s\".)"
 
-#: core/meta/__init__.py:1946
+#: core/meta/__init__.py:1947
 #, python-format
 msgid "%(object)s with this %(type)s already exists for the given %(field)s."
 msgstr ""
@@ -1782,7 +1791,7 @@ msgid_plural ""
 msgstr[0] ""
 msgstr[1] ""
 
-#: core/template/defaultfilters.py:354
+#: core/template/defaultfilters.py:371
 msgid "yes,no,maybe"
 msgstr ""
 
