@@ -44,16 +44,16 @@ EMPTY_CHANGELIST_VALUE = '(None)'
 
 ADMIN_PREFIX = "/admin/"
 
-def _get_mod_opts(app_label, module_name):
-    "Helper function that returns a tuple of (module, opts), raising Http404 if necessary."
-    try:
-        mod = models.get_app(app_label)
-    except ImportError:
-        raise Http404 # Invalid app or module name. Maybe it's not in INSTALLED_APPS.
-    opts = mod.Klass._meta
-    if not opts.admin:
-        raise Http404 # This object is valid but has no admin interface.
-    return mod, opts
+#def _get_mod_opts(app_label, module_name):
+#    "Helper function that returns a tuple of (module, opts), raising Http404 if necessary."
+#    try:
+#        mod = models.get_app(app_label)
+#    except ImportError:
+#        raise Http404 # Invalid app or module name. Maybe it's not in INSTALLED_APPS.
+#    opts = mod.Klass._meta
+#    if not opts.admin:
+#        raise Http404 # This object is valid but has no admin interface.
+#    return mod, opts
 
 def matches_app(mod, comps):
     modcomps = mod.__name__.split('.')[:-1] #HACK: leave off 'models'
@@ -85,6 +85,7 @@ def find_model(mod, remaining):
             raise Http404
 
 def get_app_label(mod):
+    #HACK
     modcomps = mod.__name__.split('.')
     return modcomps[-2]
 

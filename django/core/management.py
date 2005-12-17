@@ -63,16 +63,18 @@ def _is_valid_dir_name(s):
 # type of field as the field to which it points.
 get_rel_data_type = lambda f: (f.get_internal_type() == 'AutoField') and 'IntegerField' or f.get_internal_type()
 
-def get_sql_create(mod):
-    "Returns a list of the CREATE TABLE SQL statements for the given module."
+def get_sql_create(app):
+    "Returns a list of the CREATE TABLE SQL statements for the given app."
     from django.db import backend, get_creation_module, models
 
     data_types = get_creation_module().DATA_TYPES
     final_output = []
-    opts_output = set()
+    models_output = set()
     pending_references = {}
 
-    for klass in mod._MODELS:
+    app_models = models.get_models(app)
+
+    for klass in app_models:
         opts = klass._meta
         table_output = []
         for f in opts.fields:
@@ -92,14 +94,14 @@ def get_sql_create(mod):
                 if f.primary_key:
                     field_output.append('PRIMARY KEY')
                 if f.rel:
-                     if f.rel.to in opts_output:
+                     if f.rel.to in models_output:
                          field_output.append('REFERENCES %s (%s)' % \
                              (backend.quote_name(f.rel.to._meta.db_table),
                              backend.quote_name(f.rel.to._meta.get_field(f.rel.field_name).column)))
                      else:
                          # We haven't yet created the table to which this field
                          # is related, so save it for later.
-                         pr = pending_references.setdefault(f.rel.to._meta, []).append((opts, f))
+                         pr = pending_references.setdefault(f.rel.to, []).append((klass, f))
                 table_output.append(' '.join(field_output))
         if opts.order_with_respect_to:
             table_output.append('%s %s NULL' % (backend.quote_name('_order'), data_types['IntegerField']))
@@ -115,8 +117,9 @@ def get_sql_create(mod):
 
         # Take care of any ALTER TABLE statements to add constraints
         # after the fact.
-        if opts in pending_references:
-            for rel_opts, f in pending_references[opts]:
+        if klass in pending_references:
+            for rel_class, f in pending_references[klass]:
+                rel_opts = rel_class._meta
                 r_table = rel_opts.db_table
                 r_col = f.column
                 table = opts.db_table
@@ -125,13 +128,13 @@ def get_sql_create(mod):
                     (backend.quote_name(r_table),
                     backend.quote_name("%s_referencing_%s_%s" % (r_col, table, col)),
                     backend.quote_name(r_col), backend.quote_name(table), backend.quote_name(col)))
-            del pending_references[opts]
+            del pending_references[klass]
 
         # Keep track of the fact that we've created the table for this model.
-        opts_output.add(opts)
+        models_output.add(klass)
 
     # Create the many-to-many join tables.
-    for klass in mod._MODELS:
+    for klass in app_models:
         opts = klass._meta
         for f in opts.many_to_many:
             table_output = ['CREATE TABLE %s (' % backend.quote_name(f.get_m2m_db_table(opts))]
@@ -152,12 +155,12 @@ def get_sql_create(mod):
             table_output.append(');')
             final_output.append('\n'.join(table_output))
     return final_output
-get_sql_create.help_doc = "Prints the CREATE TABLE SQL statements for the given model module name(s)."
+get_sql_create.help_doc = "Prints the CREATE TABLE SQL statements for the given app name(s)."
 get_sql_create.args = APP_ARGS
 
-def get_sql_delete(mod):
-    "Returns a list of the DROP TABLE SQL statements for the given module."
-    from django.db import backend, connection
+def get_sql_delete(app):
+    "Returns a list of the DROP TABLE SQL statements for the given app."
+    from django.db import backend, connection, models
 
     try:
         cursor = connection.cursor()
@@ -183,7 +186,8 @@ def get_sql_delete(mod):
     to_delete = set()
 
     references_to_delete = {}
-    for klass in mod._MODELS:
+    app_models = models.get_models(app)
+    for klass in app_models:
         try:
             if cursor is not None:
                 # Check whether the table exists.
@@ -195,13 +199,11 @@ def get_sql_delete(mod):
             opts = klass._meta
             for f in opts.fields:
                 if f.rel and f.rel.to not in to_delete:
-                    refs = references_to_delete.get(f.rel.to, [])
-                    refs.append( (opts, f) )
-                    references_to_delete[f.rel.to] = refs
+                    references_to_delete.setdefault(f.rel.to, []).append( (klass, f) )
 
-            to_delete.add(opts)
+            to_delete.add(klass)
 
-    for klass in mod._MODELS:
+    for klass in app_models:
          try:
              if cursor is not None:
                  # Check whether the table exists.
@@ -211,18 +213,19 @@ def get_sql_delete(mod):
              connection.rollback()
          else:
              output.append("DROP TABLE %s;" % backend.quote_name(klass._meta.db_table))
-             if references_to_delete.has_key(klass._meta):
-                 for opts, f in references_to_delete[klass._meta]:
+             if references_to_delete.has_key(klass):
+                 for rel_class, f in references_to_delete[klass]:
+                     table = rel_class._meta.db_table
                      col = f.column
-                     table = opts.db_table
-                     r_table = f.rel.to._meta.db_table
-                     r_col = f.rel.to.get_field(f.rel.field_name).column
+                     r_table = klass._meta.db_table
+                     r_col = klass._meta.get_field(f.rel.field_name).column
                      output.append('ALTER TABLE %s DROP CONSTRAINT %s;' % \
                         (backend.quote_name(table),
                          backend.quote_name("%s_referencing_%s_%s" % (col, r_table, r_col))))
+                 del references_to_delete[klass]
 
     # Output DROP TABLE statements for many-to-many tables.
-    for klass in mod._MODELS:
+    for klass in app_models:
         opts = klass._meta
         for f in opts.many_to_many:
             try:
@@ -233,7 +236,7 @@ def get_sql_delete(mod):
             else:
                 output.append("DROP TABLE %s;" % backend.quote_name(f.get_m2m_db_table(opts)))
 
-    app_label = mod._MODELS[0]._meta.app_label
+    app_label = app_models[0]._meta.app_label
 
     # Delete from packages, auth_permissions, content_types.
     output.append("DELETE FROM %s WHERE %s = '%s';" % \
@@ -259,26 +262,31 @@ def get_sql_delete(mod):
     connection.close()
 
     return output[::-1] # Reverse it, to deal with table dependencies.
-get_sql_delete.help_doc = "Prints the DROP TABLE SQL statements for the given model module name(s)."
+get_sql_delete.help_doc = "Prints the DROP TABLE SQL statements for the given app name(s)."
 get_sql_delete.args = APP_ARGS
 
-def get_sql_reset(mod):
+def get_sql_reset(app):
     "Returns a list of the DROP TABLE SQL, then the CREATE TABLE SQL, for the given module."
-    return get_sql_delete(mod) + get_sql_all(mod)
-get_sql_reset.help_doc = "Prints the DROP TABLE SQL, then the CREATE TABLE SQL, for the given model module name(s)."
+    return get_sql_delete(app) + get_sql_all(app)
+get_sql_reset.help_doc = "Prints the DROP TABLE SQL, then the CREATE TABLE SQL, for the given app name(s)."
 get_sql_reset.args = APP_ARGS
 
-def get_sql_initial_data(mod):
-    "Returns a list of the initial INSERT SQL statements for the given module."
+def get_sql_initial_data(app):
+    "Returns a list of the initial INSERT SQL statements for the given app."
     from django.conf.settings import DATABASE_ENGINE
+    from django.db.models import get_models
     output = []
-    app_label = mod._MODELS[0]._meta.app_label
+    
+    app_models = get_models(app)
+    app_label = app_models[0]._meta.app_label
     output.append(_get_packages_insert(app_label))
-    app_dir = os.path.normpath(os.path.join(os.path.dirname(mod.__file__), '..', 'sql'))
-    for klass in mod._MODELS:
+    app_dir = os.path.normpath(os.path.join(os.path.dirname(app.__file__), 'sql'))
+    
+    for klass in app_models:
         opts = klass._meta
 
         # Add custom SQL, if it's available.
+        # FIXME: THis probably needs changing
         sql_files = [os.path.join(app_dir, opts.module_name + '.' + DATABASE_ENGINE +  '.sql'),
                      os.path.join(app_dir, opts.module_name + '.sql')]
         for sql_file in sql_files:
@@ -293,14 +301,15 @@ def get_sql_initial_data(mod):
         for codename, name in _get_all_permissions(opts):
             output.append(_get_permission_insert(name, codename, opts))
     return output
-get_sql_initial_data.help_doc = "Prints the initial INSERT SQL statements for the given model module name(s)."
+get_sql_initial_data.help_doc = "Prints the initial INSERT SQL statements for the given app name(s)."
 get_sql_initial_data.args = APP_ARGS
 
-def get_sql_sequence_reset(mod):
-    "Returns a list of the SQL statements to reset PostgreSQL sequences for the given module."
+
+def get_sql_sequence_reset(app):
+    "Returns a list of the SQL statements to reset PostgreSQL sequences for the given app."
     from django.db import backend, models
     output = []
-    for klass in mod._MODELS:
+    for klass in models.get_models(app):
         for f in klass._meta.fields:
             if isinstance(f, models.AutoField):
                 output.append("SELECT setval('%s_%s_seq', (SELECT max(%s) FROM %s));" % \
@@ -310,14 +319,15 @@ def get_sql_sequence_reset(mod):
             output.append("SELECT setval('%s_id_seq', (SELECT max(%s) FROM %s));" % \
                 (f.get_m2m_db_table(klass._meta), backend.quote_name('id'), f.get_m2m_db_table(klass._meta)))
     return output
-get_sql_sequence_reset.help_doc = "Prints the SQL statements for resetting PostgreSQL sequences for the given model module name(s)."
+get_sql_sequence_reset.help_doc = "Prints the SQL statements for resetting PostgreSQL sequences for the given app name(s)."
 get_sql_sequence_reset.args = APP_ARGS
 
-def get_sql_indexes(mod):
-    "Returns a list of the CREATE INDEX SQL statements for the given module."
-    from django.db import backend
+def get_sql_indexes(app):
+    "Returns a list of the CREATE INDEX SQL statements for the given app."
+    from django.db import backend, models
     output = []
-    for klass in mod._MODELS:
+    
+    for klass in models.get_models(app):
         for f in klass._meta.fields:
             if f.db_index:
                 unique = f.unique and "UNIQUE " or ""
@@ -328,9 +338,9 @@ def get_sql_indexes(mod):
 get_sql_indexes.help_doc = "Prints the CREATE INDEX SQL statements for the given model module name(s)."
 get_sql_indexes.args = APP_ARGS
 
-def get_sql_all(mod):
-    "Returns a list of CREATE TABLE SQL and initial-data insert for the given module."
-    return get_sql_create(mod) + get_sql_initial_data(mod)
+def get_sql_all(app):
+    "Returns a list of CREATE TABLE SQL and initial-data insert for the given app."
+    return get_sql_create(app) + get_sql_initial_data(app)
 get_sql_all.help_doc = "Prints the CREATE TABLE and initial-data SQL statements for the given model module name(s)."
 get_sql_all.args = APP_ARGS
 
@@ -343,11 +353,12 @@ def has_no_records(cursor):
         return cursor.fetchone() is None
     return cursor.rowcount < 1
 
-def database_check(mod):
+def database_check(app):
     "Checks that everything is properly installed in the database for the given module."
-    from django.db import backend, connection
+    from django.db import backend, connection, models
     cursor = connection.cursor()
-    app_label = mod._MODELS[0]._meta.app_label
+    app_modules = models.get_models(app)
+    app_label = app_modules[0]._meta.app_label
 
     # Check that the package exists in the database.
     cursor.execute("SELECT 1 FROM %s WHERE %s = %%s" % \
@@ -359,7 +370,7 @@ def database_check(mod):
     # Check that the permissions and content types are in the database.
     perms_seen = {}
     contenttypes_seen = {}
-    for klass in mod._MODELS:
+    for klass in app_models:
         opts = klass._meta
         perms = _get_all_permissions(opts)
         perms_seen.update(dict(perms))
@@ -408,11 +419,13 @@ def database_check(mod):
 database_check.help_doc = "Checks that everything is installed in the database for the given model module name(s) and prints SQL statements if needed."
 database_check.args = APP_ARGS
 
-def get_admin_index(mod):
-    "Returns admin-index template snippet (in list form) for the given module."
+def get_admin_index(app):
+    "Returns admin-index template snippet (in list form) for the given app."
     from django.utils.text import capfirst
+    from django.db.models import get_models
     output = []
-    app_label = mod._MODELS[0]._meta.app_label
+    app_models = get_models(app)
+    app_label = app_models[0]._meta.app_label
     output.append('{%% if perms.%s %%}' % app_label)
     output.append('<div class="module"><h2>%s</h2><table>' % app_label.title())
     for klass in mod._MODELS:
@@ -427,7 +440,7 @@ def get_admin_index(mod):
     output.append('</table></div>')
     output.append('{% endif %}')
     return output
-get_admin_index.help_doc = "Prints the admin-index template snippet for the given model module name(s)."
+get_admin_index.help_doc = "Prints the admin-index template snippet for the given app name(s)."
 get_admin_index.args = APP_ARGS
 
 def init():
@@ -454,12 +467,13 @@ def init():
         connection.commit()
 init.args = ''
 
-def install(mod):
+def install(app):
     "Executes the equivalent of 'get_sql_all' in the current database."
     from django.db import connection
     from cStringIO import StringIO
-    mod_name = mod.__name__[mod.__name__.rindex('.')+1:]
-
+    app_name = app.__name__[app.__name__.rindex('.')+1:]
+    app_label = app_name.split('.')[-1]
+    
     # First, try validating the models.
     s = StringIO()
     num_errors = get_validation_errors(s)
@@ -468,7 +482,7 @@ def install(mod):
         s.seek(0)
         sys.stderr.write(s.read())
         sys.exit(1)
-    sql_list = get_sql_all(mod)
+    sql_list = get_sql_all(app)
 
     try:
         cursor = connection.cursor()
@@ -481,20 +495,23 @@ def install(mod):
   * The SQL was invalid.
 Hint: Look at the output of 'django-admin.py sqlall %s'. That's the SQL this command wasn't able to run.
 The full error: %s\n""" % \
-            (mod_name, mod_name, e))
+            (app_name, app_label, e))
         connection.rollback()
         sys.exit(1)
     connection.commit()
-install.help_doc = "Executes ``sqlall`` for the given model module name(s) in the current database."
+install.help_doc = "Executes ``sqlall`` for the given app(s) in the current database."
 install.args = APP_ARGS
 
-def installperms(mod):
-    "Installs any permissions for the given model, if needed."
+def installperms(app):
+    "Installs any permissions for the given app, if needed."
     from django.models.auth import Permission
     from django.models.core import Package
+    from django.db.models import get_models
     num_added = 0
-    package = Package.objects.get_object(pk=mod._MODELS[0]._meta.app_label)
-    for klass in mod._MODELS:
+    app_models = get_models(app)
+    app_label = app_models[0]._meta.app_label
+    package = Package.objects.get_object(pk=app_label)
+    for klass in app_models:
         opts = klass._meta
         for codename, name in _get_all_permissions(opts):
             try:
