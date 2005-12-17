@@ -13,9 +13,11 @@ class ManipulatorDescriptor(object):
 
     def __get__(self, instance, type=None):
         if instance != None:
-            raise "Manipulator accessed via instance"
+            raise "Manipulator can not be accessed via instance"
         else:
             if not self.man:
+                # Create a class which inherits from the MANIPULATOR class given in the class, 
+                # and the appropriate automatic manipulator, 
                 class Man(self.get_base_manipulator(type), self.base):
                     pass
 
@@ -25,6 +27,7 @@ class ManipulatorDescriptor(object):
             return self.man
 
     def get_base_manipulator(self, type):
+        
         if hasattr(type, 'MANIPULATOR'):
             man = type.MANIPULATOR
         else:
@@ -60,16 +63,12 @@ class AutomaticManipulator(Manipulator):
             if self.follow.get(f.name, False):
                 self.fields.extend(f.get_manipulator_fields(self.opts, self, self.change))
 
-
         # Add fields for related objects.
         for f in self.opts.get_all_related_objects():
             if self.follow.get(f.name, False):
-                print f.name
                 fol = self.follow[f.name]
                 fields = f.get_manipulator_fields(self.opts, self, self.change, fol)
-                print fields
                 self.fields.extend(fields)
-
 
     def save(self, new_data):
         add, change, opts, klass = self.add, self.change, self.opts, self.model

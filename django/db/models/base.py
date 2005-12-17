@@ -27,7 +27,6 @@ get_module_name = lambda class_name: class_name.lower() + 's'
 get_verbose_name = lambda class_name: re.sub('([A-Z])', ' \\1', class_name).lower().strip()
 
 
-
 class ModelBase(type):
     "Metaclass for all models"
     def __new__(cls, name, bases, attrs):
@@ -42,7 +41,7 @@ class ModelBase(type):
         except KeyError:
             meta_attrs = {}
 
-        # Create the class, because we need it to use in currying.
+        # Create the class, we need to add the options to it. 
         new_class = type.__new__(cls, name, bases, { '__module__' : attrs.pop('__module__') })
 
         opts = Options(
@@ -82,15 +81,10 @@ class ModelBase(type):
         opts.app_label = app_label
 
         #Add all attributes to the class
-        #fields, managers = [], []
         for obj_name, obj in attrs.items():
             new_class.add_to_class(obj_name, obj)
 
-        if not hasattr(new_class, '_default_manager'):
-            # Create the default manager, if needed.
-            if hasattr(new_class, 'objects'):
-                raise ValueError, "Model %s must specify a custom Manager, because it has a field named 'objects'" % name
-            new_class.add_to_class('objects',  Manager())
+
 
         # Give the class a docstring -- its definition.
         if new_class.__doc__ is None:
@@ -102,9 +96,7 @@ class ModelBase(type):
         opts._prepare()
         new_class._prepare()
 
-        # If the db_table wasn't provided, use the app_label + module_name.
-        if not opts.db_table:
-            opts.db_table = "%s_%s" % (app_label, opts.module_name)
+        
 
         # Populate the _MODELS member on the module the class is in.
         app_package.__dict__.setdefault('_MODELS', []).append(new_class)
@@ -175,6 +167,12 @@ class Model(object):
         dispatcher.send( signal = Signals.post_init, sender = self.__class__, instance=self)
 
     def _prepare(cls):
+        if not hasattr(cls, '_default_manager'):
+            # Create the default manager, if needed.
+            if hasattr(cls, 'objects'):
+                raise ValueError, "Model %s must specify a custom Manager, because it has a field named 'objects'" % name
+            cls.add_to_class('objects',  Manager())
+        
         cls.add_to_class(  'AddManipulator', ModelAddManipulator)
         cls.add_to_class(  'ChangeManipulator', ModelChangeManipulator)
 

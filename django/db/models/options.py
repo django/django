@@ -71,6 +71,10 @@ class Options:
                 self.has_auto_field = True
         #HACK
         self.limit_choices_to = {}
+        
+        # If the db_table wasn't provided, use the app_label + module_name.
+        if not self.db_table:
+            self.db_table = "%s_%s" % (self.app_label, self.module_name)
 
     def add_field(self, field):
         # Insert the fields in the order that they were created. The

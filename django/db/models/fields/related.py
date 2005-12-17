@@ -37,9 +37,10 @@ class RelatedField(object):
     do_pending_lookups = classmethod(do_pending_lookups)
     
     
-    
     def contribute_to_class(self, cls, name):
-        Field.contribute_to_class(self,cls,name)
+        sup = super(RelatedField,self)
+        if hasattr(sup, 'contribute_to_class'):
+            sup.contribute_to_class(cls,name)
         other = self.rel.to
         if isinstance(other, basestring):
             if other == RECURSIVE_RELATIONSHIP_CONSTANT:
@@ -206,7 +207,7 @@ class OneToOneField(SharedMethods, IntegerField):
 
 class ManyToManyField(RelatedField,Field):
     def __init__(self, to, **kwargs):
-        kwargs['verbose_name'] = kwargs.get('verbose_name', to._meta.verbose_name_plural)
+        kwargs['verbose_name'] = kwargs.get('verbose_name', None)
         kwargs['rel'] = ManyToMany(to, kwargs.pop('singular', None),
             num_in_admin=kwargs.pop('num_in_admin', 0),
             related_name=kwargs.pop('related_name', None),
@@ -292,8 +293,52 @@ class ManyToManyField(RelatedField,Field):
             func.alters_data = True
             setattr(cls, 'set_%s' % related.opts.module_name, func)
 
+        self.rel.singular = self.rel.singular or self.rel.to._meta.object_name.lower()
+
     def set_attributes_from_rel(self):
         pass
+
+class ManyToManyFieldNew(RelatedField):
+    def __init__(self, to, **kwargs):
+        self.to = to
+        self.from_ = None
+        self.rel = self
+        self.edit_inline = False
+    
+    def set_attributes_from_rel(self):
+        pass
+    
+    def contribute_to_class(self, cls, name):
+        self.from_ = cls
+        self.name = name
+        super(ManyToManyFieldNew, self).contribute_to_class(cls, name)
+        
+        
+    def contribute_to_related_class(self, cls, name):
+        #Now we know both classes exist. 
+        self.to = cls
+        # We need to wait until the class we were in was fully defined
+        dispatcher.connect(
+            self.from_prepared,
+            signal = Signals.class_prepared,
+            sender = self.from_
+        )
+        
+    def from_prepared(self):
+        from django.db.models.base import Model
+                
+        class M2M(Model):
+            __module__ = self.from_.__module__
+        
+        id_to =  self.from_._meta.db_table
+        id_from =  self.to._meta.db_table
+
+        M2M.add_to_class(id_from, ForeignKey(to=self.from_) )
+        M2M.add_to_class(id_to, ForeignKey(to=self.to) )
+        M2M._meta.db_table = '%s_%s' % (self.from_._meta.db_table, self.name)
+        M2M._meta.unique_together = ((id_to, id_from),)
+        M2M.__name__ = "M2M_%s_%s_%s" % (self.name,self.from_.__name__, self.to.__name__)
+
 
 class ManyToOne:
     def __init__(self, to, field_name, num_in_admin=3, min_num_in_admin=None,
@@ -331,7 +376,7 @@ class ManyToMany:
     def __init__(self, to, singular=None, num_in_admin=0, related_name=None,
         filter_interface=None, limit_choices_to=None, raw_id_admin=False):
         self.to = to
-        self.singular = singular or to._meta.object_name.lower()
+        self.singular = singular or None 
         self.num_in_admin = num_in_admin
         self.related_name = related_name
         self.filter_interface = filter_interface
