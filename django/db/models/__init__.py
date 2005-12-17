@@ -16,6 +16,7 @@ from django.db.models.fields.related import *
 
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.models.exceptions import FieldDoesNotExist, BadKeywordArguments
+from django.db.models.signals import Signals
 
 # Admin stages.
 ADD, CHANGE, BOTH = 1, 2, 3

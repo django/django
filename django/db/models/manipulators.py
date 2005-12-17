@@ -15,11 +15,14 @@ class ManipulatorDescriptor(object):
         if instance != None:
             raise "Manipulator accessed via instance"
         else:
-            class Man(self.get_base_manipulator(type), self.base):
-                pass
-            Man.classinit(type)
-            Man.__name__ = self.name
-            return Man
+            if not self.man:
+                class Man(self.get_base_manipulator(type), self.base):
+                    pass
+                
+                Man._prepare(type)
+                Man.__name__ = self.name
+                self.man = Man
+            return self.man
             
     def get_base_manipulator(self, type):
         if hasattr(type, 'MANIPULATOR'):
@@ -30,7 +33,7 @@ class ManipulatorDescriptor(object):
 
 
 class AutomaticManipulator(Manipulator):
-    def classinit(cls, model):
+    def _prepare(cls, model):
         cls.model = model
         cls.manager = model._default_manager
         cls.opts = model._meta
@@ -43,7 +46,11 @@ class AutomaticManipulator(Manipulator):
                 setattr(cls, 'isUnique%sFor%s' % (f.name, f.unique_for_month), curry(manipulator_validator_unique_for_date, f, opts.get_field(f.unique_for_month), opts, 'month'))
             if f.unique_for_year:
                 setattr(cls, 'isUnique%sFor%s' % (f.name, f.unique_for_year), curry(manipulator_validator_unique_for_date, f, opts.get_field(f.unique_for_year), opts, 'year'))
-    classinit = classmethod(classinit)
+    _prepare = classmethod(_prepare)
+    
+    def contribute_to_class(cls, other_cls, name ):
+        setattr(other_cls, name, ManipulatorDescriptor(name, cls))
+    contribute_to_class = classmethod(contribute_to_class)
     
     def __init__(self, original_object= None, follow=None):
         self.follow = self.model._meta.get_follow(follow)

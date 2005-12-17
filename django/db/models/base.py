@@ -1,12 +1,14 @@
-from django.db.models.manipulators import ManipulatorDescriptor, ModelAddManipulator, ModelChangeManipulator
-from django.db.models.fields import Field, DateField, FileField, ImageField, AutoField
-from django.db.models.fields.related import RelatedField, OneToOne, ManyToOne, ManyToMany, RECURSIVE_RELATIONSHIP_CONSTANT
+from django.db.models.manipulators import ModelAddManipulator, ModelChangeManipulator
+from django.db.models.fields import  AutoField
+from django.db.models.fields.related import OneToOne, ManyToOne
 from django.db.models.related import RelatedObject
-from django.db.models.manager import Manager, ManagerDescriptor
+from django.db.models.manager import Manager
 from django.db.models.query import orderlist2sql
 from django.db.models.options import Options
 from django.db import connection, backend
+from django.db.models.signals import Signals
 
+from django.dispatch import dispatcher
 from django.core.exceptions import ObjectDoesNotExist
 from django.utils.functional import curry
 
@@ -23,6 +25,7 @@ get_module_name = lambda class_name: class_name.lower() + 's'
 
 # Calculate the verbose_name by converting from InitialCaps to "lowercase with spaces".
 get_verbose_name = lambda class_name: re.sub('([A-Z])', ' \\1', class_name).lower().strip()
+
 
 
 class ModelBase(type):
@@ -118,6 +121,9 @@ def cmp_cls(x, y):
             return 1
     return 0
 
+
+
+
 class Model(object):
     __metaclass__ = ModelBase
 
@@ -128,9 +134,7 @@ class Model(object):
             setattr(cls, name, attribute)
     add_to_class = classmethod(add_to_class)
 
-    AddManipulator = ManipulatorDescriptor('AddManipulator', ModelAddManipulator)
-    ChangeManipulator = ManipulatorDescriptor('ChangeManipulator', ModelChangeManipulator)
-
+    
     def __repr__(self):
         return '<%s object>' % self.__class__.__name__
 
@@ -141,6 +145,7 @@ class Model(object):
         return not self.__eq__(other)
 
     def __init__(self, *args, **kwargs):
+        dispatcher.send( signal = Signals.pre_init, sender = self.__class__, args=args, kwargs=kwargs)
         if kwargs:
             for f in self._meta.fields:
                 if isinstance(f.rel, ManyToOne):
@@ -171,15 +176,21 @@ class Model(object):
                 raise TypeError, "'%s' is an invalid keyword argument for this function" % kwargs.keys()[0]
         for i, arg in enumerate(args):
             setattr(self, self._meta.fields[i].attname, arg)
+        dispatcher.send( signal = Signals.post_init, sender = self.__class__, instance=self)
 
     def _prepare(cls):
+        cls.add_to_class(  'AddManipulator', ModelAddManipulator)
+        cls.add_to_class(  'ChangeManipulator', ModelChangeManipulator)
+        
         # Creates some methods once self._meta has been populated.
 
         if cls._meta.order_with_respect_to:
             cls.get_next_in_order = curry(cls._get_next_or_previous_in_order, is_next=True)
             cls.get_previous_in_order = curry(cls._get_next_or_previous_in_order, is_next=False)
 
-        RelatedField.do_pending_lookups(cls)
+        dispatcher.send( signal = Signals.class_prepared, sender = cls)
+
+        #RelatedField.do_pending_lookups(cls)
 
     _prepare = classmethod(_prepare)
 
@@ -187,6 +198,7 @@ class Model(object):
         # Run any pre-save hooks.
         if hasattr(self, '_pre_save'):
             self._pre_save()
+        dispatcher.send( signal=Signals.pre_save, sender = self.__class__, instance = self )
 
         non_pks = [f for f in self._meta.fields if not f.primary_key]
         cursor = connection.cursor()
@@ -231,6 +243,8 @@ class Model(object):
         connection.commit()
 
         # Run any post-save hooks.
+        dispatcher.send(signal=Signals.pre_save, sender = self.__class__, instance = self )
+        
         if hasattr(self, '_post_save'):
             self._post_save()
 
@@ -283,6 +297,8 @@ class Model(object):
             # Run any pre-delete hooks.
             if hasattr(instance, '_pre_delete'):
                 instance._pre_delete()
+            
+            dispatcher.send(signal=Signals.pre_delete, sender = cls, instance = instance )
 
             for related in cls._meta.get_all_related_many_to_many_objects():
                 cursor.execute("DELETE FROM %s WHERE %s=%%s" % \
@@ -311,14 +327,9 @@ class Model(object):
                 [pk_val])
 
             setattr(self, cls._meta.pk.attname, None)
-            for f in cls._meta.fields:
-                if isinstance(f, FileField) and getattr(self, f.attname):
-                    file_name = getattr(instance, 'get_%s_filename' % f.name)()
-                    # If the file exists and no other object of this type references it,
-                    # delete it from the filesystem.
-                    if os.path.exists(file_name) and not cls._default_manager.get_list(**{'%s__exact' % f.name: getattr(self, f.name)}):
-                        os.remove(file_name)
-            # Run any post-delete hooks.
+            
+            dispatcher.send(signal=Signals.post_delete, sender = cls, instance = instance )
+            
             if hasattr(instance, '_post_delete'):
                 instance._post_delete()
 

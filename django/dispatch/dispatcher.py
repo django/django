@@ -27,7 +27,7 @@ Internal attributes:
 """
 from __future__ import generators
 import types, weakref
-from dispatch import saferef, robustapply, errors
+from django.dispatch import saferef, robustapply, errors
 
 __author__ = "Patrick K. O'Brien <pobrien@orbtech.com>"
 __cvsid__ = "$Id: dispatcher.py,v 1.8 2004/11/26 06:37:33 mcfletch Exp $"

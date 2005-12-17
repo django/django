@@ -3,7 +3,9 @@ from django.db.models.related import RelatedObject
 from django.utils.translation import gettext_lazy, string_concat
 from django.utils.functional import curry
 from django.core import formfields
+from django.db.models.signals import Signals
 
+from django.dispatch import dispatcher
 
 # Values for Relation.edit_inline.
 TABULAR, STACKED = 1, 2
@@ -13,6 +15,12 @@ RECURSIVE_RELATIONSHIP_CONSTANT = 'self'
 #HACK 
 class RelatedField(object):
     pending_lookups = {}
+    
+    dispatcher.connect(
+        lambda sender: RelatedField.do_pending_lookups(sender) ,
+        signal = Signals.class_prepared,
+        weak = False)
+    
     
     def add_lookup(cls, rel_cls, field):
         name = field.rel.to
@@ -27,6 +35,8 @@ class RelatedField(object):
             field.rel.to = other_cls
             field.do_related_class(other_cls, rel_cls)
     do_pending_lookups = classmethod(do_pending_lookups)
+    
+    
     
     def contribute_to_class(self, cls, name):
         Field.contribute_to_class(self,cls,name)

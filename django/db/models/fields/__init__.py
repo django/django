@@ -1,3 +1,5 @@
+from django.db.models.signals import Signals
+from django.dispatch import dispatcher
 from django.conf import settings
 from django.core import formfields, validators
 from django.core.exceptions import ObjectDoesNotExist
@@ -5,6 +7,7 @@ from django.utils.functional import curry, lazy
 from django.utils.text import capfirst
 from django.utils.translation import gettext_lazy, ngettext
 import datetime, os
+
 
 # Random entropy string used by "default" param.
 NOT_PROVIDED = 'oijpwojefiojpanv'
@@ -502,6 +505,20 @@ class FileField(Field):
         setattr(cls, 'get_%s_url' % self.name, curry(cls._get_FIELD_url, field=self))
         setattr(cls, 'get_%s_size' % self.name, curry(cls._get_FIELD_size, field=self))
         setattr(cls, 'save_%s_file' % self.name, curry(cls._save_FIELD_file, field=self))
+        dispatcher.connect(
+            self.delete_file,
+            signal = Signals.post_delete,
+            sender = cls
+        )
+        
+    def delete_file(self, instance):
+         if getattr(instance, f.attname):
+            file_name = getattr(instance, 'get_%s_filename' % f.name)()
+            # If the file exists and no other object of this type references it,
+            # delete it from the filesystem.
+            if os.path.exists(file_name) and \
+                not instance.__class__._default_manager.get_list(**{'%s__exact' % self.name: getattr(instance, self.attname)}):
+                os.remove(file_name)
 
     def get_manipulator_field_objs(self):
         return [formfields.FileUploadField, formfields.HiddenField]
