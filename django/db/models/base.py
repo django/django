@@ -121,9 +121,6 @@ def cmp_cls(x, y):
             return 1
     return 0
 
-
-
-
 class Model(object):
     __metaclass__ = ModelBase
 
@@ -134,7 +131,6 @@ class Model(object):
             setattr(cls, name, attribute)
     add_to_class = classmethod(add_to_class)
 
-    
     def __repr__(self):
         return '<%s object>' % self.__class__.__name__
 
@@ -181,7 +177,7 @@ class Model(object):
     def _prepare(cls):
         cls.add_to_class(  'AddManipulator', ModelAddManipulator)
         cls.add_to_class(  'ChangeManipulator', ModelChangeManipulator)
-        
+
         # Creates some methods once self._meta has been populated.
 
         if cls._meta.order_with_respect_to:
@@ -244,7 +240,7 @@ class Model(object):
 
         # Run any post-save hooks.
         dispatcher.send(signal=Signals.pre_save, sender = self.__class__, instance = self )
-        
+
         if hasattr(self, '_post_save'):
             self._post_save()
 
@@ -297,7 +293,7 @@ class Model(object):
             # Run any pre-delete hooks.
             if hasattr(instance, '_pre_delete'):
                 instance._pre_delete()
-            
+
             dispatcher.send(signal=Signals.pre_delete, sender = cls, instance = instance )
 
             for related in cls._meta.get_all_related_many_to_many_objects():
@@ -327,9 +323,9 @@ class Model(object):
                 [pk_val])
 
             setattr(self, cls._meta.pk.attname, None)
-            
+
             dispatcher.send(signal=Signals.post_delete, sender = cls, instance = instance )
-            
+
             if hasattr(instance, '_post_delete'):
                 instance._post_delete()
 

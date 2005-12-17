@@ -5,7 +5,7 @@ from django.db.models.fields import FileField, AutoField
 class ManipulatorDescriptor(object):
     class empty:
         pass
-    
+
     def __init__(self, name, base):
         self.man = None
         self.name = name
@@ -18,12 +18,12 @@ class ManipulatorDescriptor(object):
             if not self.man:
                 class Man(self.get_base_manipulator(type), self.base):
                     pass
-                
+
                 Man._prepare(type)
                 Man.__name__ = self.name
                 self.man = Man
             return self.man
-            
+
     def get_base_manipulator(self, type):
         if hasattr(type, 'MANIPULATOR'):
             man = type.MANIPULATOR
@@ -47,11 +47,11 @@ class AutomaticManipulator(Manipulator):
             if f.unique_for_year:
                 setattr(cls, 'isUnique%sFor%s' % (f.name, f.unique_for_year), curry(manipulator_validator_unique_for_date, f, opts.get_field(f.unique_for_year), opts, 'year'))
     _prepare = classmethod(_prepare)
-    
+
     def contribute_to_class(cls, other_cls, name ):
         setattr(other_cls, name, ManipulatorDescriptor(name, cls))
     contribute_to_class = classmethod(contribute_to_class)
-    
+
     def __init__(self, original_object= None, follow=None):
         self.follow = self.model._meta.get_follow(follow)
         self.fields = []
@@ -59,8 +59,8 @@ class AutomaticManipulator(Manipulator):
         for f in self.opts.fields + self.opts.many_to_many:
             if self.follow.get(f.name, False):
                 self.fields.extend(f.get_manipulator_fields(self.opts, self, self.change))
-        
-        
+
+
         # Add fields for related objects.
         for f in self.opts.get_all_related_objects():
             if self.follow.get(f.name, False):
@@ -69,8 +69,8 @@ class AutomaticManipulator(Manipulator):
                 fields = f.get_manipulator_fields(self.opts, self, self.change, fol)
                 print fields
                 self.fields.extend(fields)
-        
-        
+
+
     def save(self, new_data):
         add, change, opts, klass = self.add, self.change, self.opts, self.model
         # TODO: big cleanup when core fields go -> use recursive manipulators.
@@ -87,26 +87,26 @@ class AutomaticManipulator(Manipulator):
                 else:
                     param = f.get_default()
             params[f.attname] = param
-    
+
         if change:
             params[opts.pk.attname] = self.obj_key
-    
+
         # First, save the basic object itself.
         new_object = klass(**params)
         new_object.save()
-    
+
         # Now that the object's been saved, save any uploaded files.
         for f in opts.fields:
             if isinstance(f, FileField):
                 f.save_file(new_data, new_object, change and self.original_object or None, change, rel=False)
-    
+
         # Calculate which primary fields have changed.
         if change:
             self.fields_added, self.fields_changed, self.fields_deleted = [], [], []
             for f in opts.fields:
                 if not f.primary_key and str(getattr(self.original_object, f.attname)) != str(getattr(new_object, f.attname)):
                     self.fields_changed.append(f.verbose_name)
-    
+
         # Save many-to-many objects. Example: Poll.set_sites()
         for f in opts.many_to_many:
             if self.follow.get(f.name, None):
@@ -118,7 +118,7 @@ class AutomaticManipulator(Manipulator):
                     was_changed = getattr(new_object, 'set_%s' % f.name)(new_vals)
                     if change and was_changed:
                         self.fields_changed.append(f.verbose_name)
-    
+
         expanded_data = DotExpandedDict(dict(new_data))
         # Save many-to-one objects. Example: Add the Choice objects for a Poll.
         for related in opts.get_all_related_objects():
@@ -127,22 +127,23 @@ class AutomaticManipulator(Manipulator):
             #  ('1', {'id': ['941'], 'choice': ['This is the second choice']}),
             #  ('2', {'id': [''], 'choice': ['']})]
             child_follow = self.follow.get(related.name, None)
-    
+
             if child_follow:
                 obj_list = expanded_data[related.var_name].items()
                 obj_list.sort(lambda x, y: cmp(int(x[0]), int(y[0])))
-                params = {}
-    
+
                 # For each related item...
                 for _, rel_new_data in obj_list:
-    
+
+                    params = {}
+
                     # Keep track of which core=True fields were provided.
                     # If all core fields were given, the related object will be saved.
                     # If none of the core fields were given, the object will be deleted.
                     # If some, but not all, of the fields were given, the validator would
                     # have caught that.
                     all_cores_given, all_cores_blank = True, True
-    
+
                     # Get a reference to the old object. We'll use it to compare the
                     # old to the new, to see which fields have changed.
                     old_rel_obj = None
@@ -152,7 +153,7 @@ class AutomaticManipulator(Manipulator):
                                 old_rel_obj = getattr(self.original_object, 'get_%s' % related.get_method_name_part() )(**{'%s__exact' % related.opts.pk.name: rel_new_data[related.opts.pk.attname][0]})
                             except ObjectDoesNotExist:
                                 pass
-    
+
                     for f in related.opts.fields:
                         if f.core and not isinstance(f, FileField) and f.get_manipulator_new_data(rel_new_data, rel=True) in (None, ''):
                             all_cores_given = False
@@ -162,7 +163,7 @@ class AutomaticManipulator(Manipulator):
                         # previously, according to the given ID. If the ID wasn't
                         # given, use a default value. FileFields are also a special
                         # case, because they'll be dealt with later.
-    
+
                         if f == related.field:
                             param = getattr(new_object, related.field.rel.field_name)
                         elif add and isinstance(f, AutoField):
@@ -176,20 +177,20 @@ class AutomaticManipulator(Manipulator):
                             param = f.get_manipulator_new_data(rel_new_data, rel=True)
                         if param != None:
                            params[f.attname] = param
-    
+
                     # Create the related item.
                     new_rel_obj = related.model(**params)
-    
+
                     # If all the core fields were provided (non-empty), save the item.
                     if all_cores_given:
                         new_rel_obj.save()
-    
+
                         # Save any uploaded files.
                         for f in related.opts.fields:
                             if child_follow.get(f.name, None):
                                 if isinstance(f, FileField) and rel_new_data.get(f.name, False):
                                     f.save_file(rel_new_data, new_rel_obj, change and old_rel_obj or None, old_rel_obj is not None, rel=True)
-    
+
                         # Calculate whether any fields have changed.
                         if change:
                             if not old_rel_obj: # This object didn't exist before.
@@ -198,27 +199,27 @@ class AutomaticManipulator(Manipulator):
                                 for f in related.opts.fields:
                                     if not f.primary_key and f != related.field and str(getattr(old_rel_obj, f.attname)) != str(getattr(new_rel_obj, f.attname)):
                                         self.fields_changed.append('%s for %s "%s"' % (f.verbose_name, related.opts.verbose_name, new_rel_obj))
-    
+
                         # Save many-to-many objects.
                         for f in related.opts.many_to_many:
                             if child_follow.get(f.name, None) and not f.rel.edit_inline:
                                 was_changed = getattr(new_rel_obj, 'set_%s' % f.name)(rel_new_data[f.attname])
                                 if change and was_changed:
                                     self.fields_changed.append('%s for %s "%s"' % (f.verbose_name, related.opts.verbose_name, new_rel_obj))
-    
+
                     # If, in the change stage, all of the core fields were blank and
                     # the primary key (ID) was provided, delete the item.
                     if change and all_cores_blank and old_rel_obj:
                         new_rel_obj.delete(ignore_objects=[new_object])
                         self.fields_deleted.append('%s "%s"' % (related.opts.verbose_name, old_rel_obj))
-    
+
         # Save the order, if applicable.
         if change and opts.get_ordered_objects():
             order = new_data['order_'] and map(int, new_data['order_'].split(',')) or []
             for rel_opts in opts.get_ordered_objects():
                 getattr(new_object, 'set_%s_order' % rel_opts.object_name.lower())(order)
         return new_object
-    
+
     def get_related_objects(self):
         return self.opts.get_followed_related_objects(self.follow)
 
@@ -234,11 +235,11 @@ class ModelAddManipulator(AutomaticManipulator):
     add = True
     def __init__(self, follow=None):
         super(ModelAddManipulator, self).__init__(follow=follow)
-        
+
 class ModelChangeManipulator(AutomaticManipulator):
     change = True
     add = False
-    
+
     def __init__(self, obj_key=None, follow=None):
         assert obj_key is not None, "ChangeManipulator.__init__() must be passed obj_key parameter."
         self.obj_key = obj_key
@@ -265,11 +266,11 @@ class ModelChangeManipulator(AutomaticManipulator):
         super(ModelChangeManipulator, self).__init__(original_object=original_object, follow=follow)
         print "Back"
         self.original_object = original_object
-       
+
         if  self.opts.get_ordered_objects():
             self.fields.append(formfields.CommaSeparatedIntegerField(field_name="order_"))
 
-            
+
 
 
 def manipulator_validator_unique_together(field_name_list, opts, self, field_data, all_data):
@@ -329,4 +330,3 @@ def manipulator_validator_unique_for_date(from_field, date_field, opts, lookup_t
             format_string = (lookup_type == 'date') and '%B %d, %Y' or '%B %Y'
             raise validators.ValidationError, "Please enter a different %s. The one you entered is already being used for %s." % \
                 (from_field.verbose_name, date_val.strftime(format_string))
-            

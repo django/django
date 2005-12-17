@@ -36,8 +36,8 @@ def manipulator_valid_rel_key(f, self, field_data, all_data):
 def manipulator_validator_unique(f, opts, self, field_data, all_data):
     "Validates that the value is unique for this field."
 
-    lookup_type = f.get_validator_unique_lookup_type()    
-        
+    lookup_type = f.get_validator_unique_lookup_type()
+
     try:
         old_obj = self.__class__._default_manager.get_object(**{lookup_type: field_data})
     except ObjectDoesNotExist:
@@ -88,7 +88,7 @@ class Field(object):
 
     # Tracks each time a Field instance is created. Used to retain order.
     creation_counter = 0
-    
+
     def __init__(self, verbose_name=None, name=None, primary_key=False,
         maxlength=None, unique=False, blank=False, null=False, db_index=False,
         core=False, rel=None, default=NOT_PROVIDED, editable=True,
@@ -96,8 +96,8 @@ class Field(object):
         unique_for_year=None, validator_list=None, choices=None, radio_admin=None,
         help_text='', db_column=None):
         self.name = name
-        self.verbose_name = verbose_name 
-        
+        self.verbose_name = verbose_name
+
         self.primary_key = primary_key
         self.maxlength, self.unique = maxlength, unique
         self.blank, self.null = blank, null
@@ -111,7 +111,7 @@ class Field(object):
         self.radio_admin = radio_admin
         self.help_text = help_text
         self.db_column = db_column
-        
+
         # Set db_index to True if the field has a relationship and doesn't explicitly set db_index.
         self.db_index = db_index
         # Increase the creation counter, and save our local copy.
@@ -120,7 +120,7 @@ class Field(object):
 
 
     def __cmp__(self,other ):
-        #This is because bisect does not take a comparison function. grrr. 
+        #This is because bisect does not take a comparison function. grrr.
         return cmp(self.creation_counter, other.creation_counter)
 
     def set_attributes_from_name(self, name):
@@ -205,7 +205,7 @@ class Field(object):
         params = {'validator_list': self.validator_list[:]}
         if self.maxlength and not self.choices: # Don't give SelectFields a maxlength parameter.
             params['maxlength'] = self.maxlength
-            
+
         if self.choices:
             if self.radio_admin:
                 field_objs = [formfields.RadioSelectField]
@@ -292,7 +292,7 @@ class Field(object):
         first_choice = include_blank and blank_choice or []
         if self.choices:
             return first_choice + list(self.choices)
-        
+
         rel_model = self.rel.to
         return first_choice + [(getattr(x, rel_model._meta.pk.attname), str(x))
                                for x in rel_model._default_manager.get_list(**rel_model._meta.limit_choices_to)]
@@ -386,10 +386,10 @@ class DateField(Field):
     def contribute_to_class(self,cls, name ):
         super(DateField,self).contribute_to_class(cls, name)
         if not self.null:
-            setattr(cls, 'get_next_by_%s' % self.name, 
-                     curry(cls._get_next_or_previous_by_FIELD, field=self, is_next=True))
-            setattr(cls, 'get_previous_by_%s' % self.name, 
-                     curry(cls._get_next_or_previous_by_FIELD, field=self, is_next=False)) 
+            setattr(cls, 'get_next_by_%s' % self.name,
+                curry(cls._get_next_or_previous_by_FIELD, field=self, is_next=True))
+            setattr(cls, 'get_previous_by_%s' % self.name,
+                curry(cls._get_next_or_previous_by_FIELD, field=self, is_next=False))
 
     # Needed because of horrible auto_now[_add] behaviour wrt. editable
     def get_follow(self, override=None):
@@ -510,7 +510,7 @@ class FileField(Field):
             signal = Signals.post_delete,
             sender = cls
         )
-        
+
     def delete_file(self, instance):
          if getattr(instance, f.attname):
             file_name = getattr(instance, 'get_%s_filename' % f.name)()
@@ -570,9 +570,8 @@ class ImageField(FileField):
 
     def contribute_to_class(self, cls, name):
         super(FileField, self).contribute_to_class(cls, name)
-        # Add get_BLAH_width and get_BLAH_height methods, but only
-        # if the image field doesn't have width and height cache
-        # fields.
+        # Add get_BLAH_width and get_BLAH_height methods, but only if the
+        # image field doesn't have width and height cache fields.
         if not self.width_field:
             setattr(cls, 'get_%s_width' % self.name, curry(cls._get_FIELD_width, field=self))
         if not self.height_field:
