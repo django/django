@@ -57,6 +57,11 @@ class SharedMethods(RelatedField):
     def get_validator_unique_lookup_type(self):
         return '%s__%s__exact' % (self.name, self.rel.get_related_field().name)
 
+    def contribute_to_class(self, cls, name):
+        super(SharedMethods, self).contribute_to_class(cls, name)
+        # Add methods for many-to-one related objects.
+        # EXAMPLES: Choice.get_poll(), Story.get_dateline()
+        setattr(cls, 'get_%s' % self.name, curry(cls._get_foreign_key_object, field_with_rel=self))
 
 class ForeignKey(SharedMethods,Field):
     empty_strings_allowed = False
@@ -256,6 +261,16 @@ class ManyToManyField(RelatedField,Field):
                if len(choices_list) == 1:
                    new_data[self.name] = [choices_list[0][0]]
         return new_data
+
+    def contribute_to_class(self, cls, name):
+        super(ManyToManyField, self).contribute_to_class(cls, name)
+        # Add "get_thingie" methods for many-to-many related objects.
+        # EXAMPLES: Poll.get_site_list(), Story.get_byline_list()
+        setattr(cls, 'get_%s_list' % self.rel.singular, curry(cls._get_many_to_many_objects, field_with_rel=self))
+
+        # Add "set_thingie" methods for many-to-many related objects.
+        # EXAMPLES: Poll.set_sites(), Story.set_bylines()
+        setattr(cls, 'set_%s' % self.name, curry(cls._set_many_to_many_objects, field_with_rel=self))
 
     def contribute_to_related_class(self, cls, related):
         rel_obj_name = related.get_method_name_part()

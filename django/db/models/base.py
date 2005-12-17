@@ -174,46 +174,10 @@ class Model(object):
 
     def _prepare(cls):
         # Creates some methods once self._meta has been populated.
-        for f in cls._meta.fields:
-            if f.choices:
-                setattr(cls, 'get_%s_display' % f.name, curry(cls.__get_FIELD_display, field=f))
-            if isinstance(f, DateField):
-                if not f.null:
-                    setattr(cls, 'get_next_by_%s' % f.name, curry(cls.__get_next_or_previous_by_FIELD, field=f, is_next=True))
-                    setattr(cls, 'get_previous_by_%s' % f.name, curry(cls.__get_next_or_previous_by_FIELD, field=f, is_next=False))
-            elif isinstance(f, FileField):
-                setattr(cls, 'get_%s_filename' % f.name, curry(cls.__get_FIELD_filename, field=f))
-                setattr(cls, 'get_%s_url' % f.name, curry(cls.__get_FIELD_url, field=f))
-                setattr(cls, 'get_%s_size' % f.name, curry(cls.__get_FIELD_size, field=f))
-                setattr(cls, 'save_%s_file' % f.name, curry(cls.__save_FIELD_file, field=f))
-                if isinstance(f, ImageField):
-                    # Add get_BLAH_width and get_BLAH_height methods, but only
-                    # if the image field doesn't have width and height cache
-                    # fields.
-                    if not f.width_field:
-                        setattr(cls, 'get_%s_width' % f.name, curry(cls.__get_FIELD_width, field=f))
-                    if not f.height_field:
-                        setattr(cls, 'get_%s_height' % f.name, curry(cls.__get_FIELD_height, field=f))
-
-
-            # Add methods for many-to-one related objects.
-            # EXAMPLES: Choice.get_poll(), Story.get_dateline()
-            if isinstance(f.rel, ManyToOne):
-                setattr(cls, 'get_%s' % f.name, curry(cls.__get_foreign_key_object, field_with_rel=f))
-
-        # Create the default class methods.
-        for f in cls._meta.many_to_many:
-            # Add "get_thingie" methods for many-to-many related objects.
-            # EXAMPLES: Poll.get_site_list(), Story.get_byline_list()
-            setattr(cls, 'get_%s_list' % f.rel.singular, curry(cls.__get_many_to_many_objects, field_with_rel=f))
-
-            # Add "set_thingie" methods for many-to-many related objects.
-            # EXAMPLES: Poll.set_sites(), Story.set_bylines()
-            setattr(cls, 'set_%s' % f.name, curry(cls.__set_many_to_many_objects, field_with_rel=f))
 
         if cls._meta.order_with_respect_to:
-            cls.get_next_in_order = curry(cls.__get_next_or_previous_in_order, is_next=True)
-            cls.get_previous_in_order = curry(cls.__get_next_or_previous_in_order, is_next=False)
+            cls.get_next_in_order = curry(cls._get_next_or_previous_in_order, is_next=True)
+            cls.get_previous_in_order = curry(cls._get_next_or_previous_in_order, is_next=False)
 
         RelatedField.do_pending_lookups(cls)
 
@@ -363,11 +327,11 @@ class Model(object):
     delete.alters_data = True
 
 
-    def __get_FIELD_display(self, field):
+    def _get_FIELD_display(self, field):
         value = getattr(self, field.attname)
         return dict(field.choices).get(value, value)
 
-    def __get_next_or_previous_by_FIELD(self, field, is_next, **kwargs):
+    def _get_next_or_previous_by_FIELD(self, field, is_next, **kwargs):
         op = is_next and '>' or '<'
         kwargs.setdefault('where', []).append('(%s %s %%s OR (%s = %%s AND %s.%s %s %%s))' % \
             (backend.quote_name(field.column), op, backend.quote_name(field.column),
@@ -378,7 +342,7 @@ class Model(object):
         kwargs['limit'] = 1
         return self.__class__._default_manager.get_object(**kwargs)
 
-    def __get_next_or_previous_in_order(self, is_next):
+    def _get_next_or_previous_in_order(self, is_next):
         cachename = "__%s_order_cache" % is_next
         if not hasattr(self, cachename):
             op = is_next and '>' or '<'
@@ -393,19 +357,19 @@ class Model(object):
             setattr(self, cachename, obj)
         return getattr(self, cachename)
 
-    def __get_FIELD_filename(self, field):
+    def _get_FIELD_filename(self, field):
         return os.path.join(settings.MEDIA_ROOT, getattr(self, field.attname))
 
-    def __get_FIELD_url(self, field):
+    def _get_FIELD_url(self, field):
         if getattr(self, field.attname): # value is not blank
             import urlparse
             return urlparse.urljoin(settings.MEDIA_URL, getattr(self, field.attname)).replace('\\', '/')
         return ''
 
-    def __get_FIELD_size(self, field):
+    def _get_FIELD_size(self, field):
         return os.path.getsize(self.__get_FIELD_filename(field))
 
-    def __save_FIELD_file(self, field, filename, raw_contents):
+    def _save_FIELD_file(self, field, filename, raw_contents):
         directory = field.get_directory_name()
         try: # Create the date-based directory if it doesn't exist.
             os.makedirs(os.path.join(settings.MEDIA_ROOT, directory))
@@ -443,15 +407,15 @@ class Model(object):
         # Save the object, because it has changed.
         self.save()
 
-    __save_FIELD_file.alters_data = True
+    _save_FIELD_file.alters_data = True
 
-    def __get_FIELD_width(self, field):
+    def _get_FIELD_width(self, field):
         return self.__get_image_dimensions(field)[0]
 
-    def __get_FIELD_height(self, field):
+    def _get_FIELD_height(self, field):
         return self.__get_image_dimensions(field)[1]
 
-    def __get_image_dimensions(self, field):
+    def _get_image_dimensions(self, field):
         cachename = "__%s_dimensions_cache" % field.name
         if not hasattr(self, cachename):
             from django.utils.images import get_image_dimensions
@@ -459,7 +423,7 @@ class Model(object):
             setattr(self, cachename, get_image_dimensions(filename))
         return getattr(self, cachename)
 
-    def __get_foreign_key_object(self, field_with_rel):
+    def _get_foreign_key_object(self, field_with_rel):
         cache_var = field_with_rel.get_cache_name()
         if not hasattr(self, cache_var):
             val = getattr(self, field_with_rel.attname)
@@ -474,7 +438,7 @@ class Model(object):
             setattr(self, cache_var, retrieved_obj)
         return getattr(self, cache_var)
 
-    def __get_many_to_many_objects(self, field_with_rel):
+    def _get_many_to_many_objects(self, field_with_rel):
         cache_var = '_%s_cache' % field_with_rel.name
         if not hasattr(self, cache_var):
             rel_opts = field_with_rel.rel.to._meta
@@ -490,8 +454,8 @@ class Model(object):
             setattr(self, cache_var, [field_with_rel.rel.to(*row) for row in cursor.fetchall()])
         return getattr(self, cache_var)
 
-    def __set_many_to_many_objects(self, id_list, field_with_rel):
-        current_ids = [obj.id for obj in self.__get_many_to_many_objects(field_with_rel)]
+    def _set_many_to_many_objects(self, id_list, field_with_rel):
+        current_ids = [obj.id for obj in self._get_many_to_many_objects(field_with_rel)]
         ids_to_add, ids_to_delete = dict([(i, 1) for i in id_list]), []
         for current_id in current_ids:
             if current_id in id_list:
@@ -525,7 +489,7 @@ class Model(object):
             pass
         return True
 
-    __set_many_to_many_objects.alters_data = True
+    _set_many_to_many_objects.alters_data = True
 
     def _get_related(self, method_name, rel_class, rel_field, **kwargs):
         kwargs['%s__%s__exact' % (rel_field.name, rel_field.rel.to._meta.pk.name)] = getattr(self, rel_field.rel.get_related_field().attname)

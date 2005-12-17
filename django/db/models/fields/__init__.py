@@ -120,11 +120,16 @@ class Field(object):
         #This is because bisect does not take a comparison function. grrr. 
         return cmp(self.creation_counter, other.creation_counter)
 
-    def contribute_to_class(self, cls, name):
+    def set_attributes_from_name(self, name):
         self.name = name
         self.attname, self.column = self.get_attname_column()
         self.verbose_name = self.verbose_name or (name and name.replace('_', ' '))
+
+    def contribute_to_class(self, cls, name):
+        self.set_attributes_from_name(name)
         cls._meta.add_field(self)
+        if self.choices:
+            setattr(cls, 'get_%s_display' % self.name, curry(cls._get_FIELD_display, field=self))
 
     def set_name(self, name):
         self.name = name
@@ -375,6 +380,14 @@ class DateField(Field):
             return datetime.datetime.now()
         return value
 
+    def contribute_to_class(self,cls, name ):
+        super(DateField,self).contribute_to_class(cls, name)
+        if not self.null:
+            setattr(cls, 'get_next_by_%s' % self.name, 
+                     curry(cls._get_next_or_previous_by_FIELD, field=self, is_next=True))
+            setattr(cls, 'get_previous_by_%s' % self.name, 
+                     curry(cls._get_next_or_previous_by_FIELD, field=self, is_next=False)) 
+
     # Needed because of horrible auto_now[_add] behaviour wrt. editable
     def get_follow(self, override=None):
         if override != None:
@@ -483,6 +496,13 @@ class FileField(Field):
         field_list[1].validator_list.append(isWithinMediaRoot)
         return field_list
 
+    def contribute_to_class(self, cls, name):
+        super(FileField, self).contribute_to_class(cls, name)
+        setattr(cls, 'get_%s_filename' % self.name, curry(cls._get_FIELD_filename, field=self))
+        setattr(cls, 'get_%s_url' % self.name, curry(cls._get_FIELD_url, field=self))
+        setattr(cls, 'get_%s_size' % self.name, curry(cls._get_FIELD_size, field=self))
+        setattr(cls, 'save_%s_file' % self.name, curry(cls._save_FIELD_file, field=self))
+
     def get_manipulator_field_objs(self):
         return [formfields.FileUploadField, formfields.HiddenField]
 
@@ -530,6 +550,16 @@ class ImageField(FileField):
 
     def get_manipulator_field_objs(self):
         return [formfields.ImageUploadField, formfields.HiddenField]
+
+    def contribute_to_class(self, cls, name):
+        super(FileField, self).contribute_to_class(cls, name)
+        # Add get_BLAH_width and get_BLAH_height methods, but only
+        # if the image field doesn't have width and height cache
+        # fields.
+        if not self.width_field:
+            setattr(cls, 'get_%s_width' % self.name, curry(cls._get_FIELD_width, field=self))
+        if not self.height_field:
+            setattr(cls, 'get_%s_height' % self.name, curry(cls._get_FIELD_height, field=self))
 
     def save_file(self, new_data, new_object, original_object, change, rel):
         FileField.save_file(self, new_data, new_object, original_object, change, rel)
