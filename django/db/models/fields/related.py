@@ -3,7 +3,7 @@ from django.db.models.related import RelatedObject
 from django.utils.translation import gettext_lazy, string_concat
 from django.utils.functional import curry
 from django.core import formfields
-from django.db.models.signals import Signals
+from django.db.models import signals
 
 from django.dispatch import dispatcher
 
@@ -18,7 +18,7 @@ class RelatedField(object):
     
     dispatcher.connect(
         lambda sender: RelatedField.do_pending_lookups(sender) ,
-        signal = Signals.class_prepared,
+        signal = signals.class_prepared,
         weak = False)
     
     
@@ -320,13 +320,13 @@ class ManyToManyFieldNew(RelatedField):
         # We need to wait until the class we were in was fully defined
         dispatcher.connect(
             self.from_prepared,
-            signal = Signals.class_prepared,
+            signal = signals.class_prepared,
             sender = self.from_
         )
         
     def from_prepared(self):
         from django.db.models.base import Model
-                
+        
         class M2M(Model):
             __module__ = self.from_.__module__
         
@@ -338,6 +338,7 @@ class ManyToManyFieldNew(RelatedField):
         M2M._meta.db_table = '%s_%s' % (self.from_._meta.db_table, self.name)
         M2M._meta.unique_together = ((id_to, id_from),)
         M2M.__name__ = "M2M_%s_%s_%s" % (self.name,self.from_.__name__, self.to.__name__)
+
 
 
 class ManyToOne:

@@ -3,10 +3,25 @@ from django.utils.functional import curry
 from django.db import backend, connection
 from django.db.models.query import Q, parse_lookup, fill_table_cache, get_cached_row
 from django.db.models.query import handle_legacy_orderlist, orderlist2sql, orderfield2column
+from django.dispatch import dispatcher
+from django.db.models import signals
 
 # Size of each "chunk" for get_iterator calls.
 # Larger values are slightly faster at the expense of more storage space.
 GET_ITERATOR_CHUNK_SIZE = 100
+
+def ensure_default_manager(sender):
+    cls = sender
+    if not hasattr(cls, '_default_manager'):
+        # Create the default manager, if needed.
+        if hasattr(cls, 'objects'):
+            raise ValueError, "Model %s must specify a custom Manager, because it has a field named 'objects'" % name
+        cls.add_to_class('objects',  Manager())
+
+dispatcher.connect(
+    ensure_default_manager,
+    signal=signals.class_prepared
+)
 
 class Manager(object):
         # Tracks each time a Manager instance is created. Used to retain order.

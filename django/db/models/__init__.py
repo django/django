@@ -16,7 +16,7 @@ from django.db.models.fields.related import *
 
 from django.core.exceptions import ObjectDoesNotExist, ImproperlyConfigured
 from django.db.models.exceptions import FieldDoesNotExist, BadKeywordArguments
-from django.db.models.signals import Signals
+from django.db.models import signals
 
 
 # Admin stages.

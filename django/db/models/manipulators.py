@@ -1,6 +1,18 @@
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.formfields import Manipulator
 from django.db.models.fields import FileField, AutoField
+from django.dispatch import dispatcher
+from django.db.models import signals
+
+def add_manipulators(sender):
+    cls = sender
+    cls.add_to_class(  'AddManipulator', ModelAddManipulator)
+    cls.add_to_class(  'ChangeManipulator', ModelChangeManipulator)
+
+dispatcher.connect(
+    add_manipulators,
+    signal=signals.class_prepared
+)
 
 class ManipulatorDescriptor(object):
     class empty:

@@ -1,12 +1,13 @@
-from django.db.models.manipulators import ModelAddManipulator, ModelChangeManipulator
+import django.db.models.manipulators
+import django.db.models.manager
+
 from django.db.models.fields import  AutoField
 from django.db.models.fields.related import OneToOne, ManyToOne
 from django.db.models.related import RelatedObject
-from django.db.models.manager import Manager
 from django.db.models.query import orderlist2sql
 from django.db.models.options import Options
 from django.db import connection, backend
-from django.db.models.signals import Signals
+from django.db.models import signals
 
 from django.dispatch import dispatcher
 from django.core.exceptions import ObjectDoesNotExist
@@ -133,7 +134,7 @@ class Model(object):
         return not self.__eq__(other)
 
     def __init__(self, *args, **kwargs):
-        dispatcher.send( signal = Signals.pre_init, sender = self.__class__, args=args, kwargs=kwargs)
+        dispatcher.send( signal = signals.pre_init, sender = self.__class__, args=args, kwargs=kwargs)
         if kwargs:
             for f in self._meta.fields:
                 if isinstance(f.rel, ManyToOne):
@@ -164,26 +165,15 @@ class Model(object):
                 raise TypeError, "'%s' is an invalid keyword argument for this function" % kwargs.keys()[0]
         for i, arg in enumerate(args):
             setattr(self, self._meta.fields[i].attname, arg)
-        dispatcher.send( signal = Signals.post_init, sender = self.__class__, instance=self)
+        dispatcher.send( signal = signals.post_init, sender = self.__class__, instance=self)
 
     def _prepare(cls):
-        if not hasattr(cls, '_default_manager'):
-            # Create the default manager, if needed.
-            if hasattr(cls, 'objects'):
-                raise ValueError, "Model %s must specify a custom Manager, because it has a field named 'objects'" % name
-            cls.add_to_class('objects',  Manager())
-        
-        cls.add_to_class(  'AddManipulator', ModelAddManipulator)
-        cls.add_to_class(  'ChangeManipulator', ModelChangeManipulator)
-
         # Creates some methods once self._meta has been populated.
-
         if cls._meta.order_with_respect_to:
             cls.get_next_in_order = curry(cls._get_next_or_previous_in_order, is_next=True)
             cls.get_previous_in_order = curry(cls._get_next_or_previous_in_order, is_next=False)
 
-        dispatcher.send( signal = Signals.class_prepared, sender = cls)
-
+        dispatcher.send( signal = signals.class_prepared, sender = cls)
         #RelatedField.do_pending_lookups(cls)
 
     _prepare = classmethod(_prepare)
@@ -192,7 +182,7 @@ class Model(object):
         # Run any pre-save hooks.
         if hasattr(self, '_pre_save'):
             self._pre_save()
-        dispatcher.send( signal=Signals.pre_save, sender = self.__class__, instance = self )
+        dispatcher.send( signal=signals.pre_save, sender = self.__class__, instance = self )
 
         non_pks = [f for f in self._meta.fields if not f.primary_key]
         cursor = connection.cursor()
@@ -237,7 +227,7 @@ class Model(object):
         connection.commit()
 
         # Run any post-save hooks.
-        dispatcher.send(signal=Signals.pre_save, sender = self.__class__, instance = self )
+        dispatcher.send(signal=signals.pre_save, sender = self.__class__, instance = self )
 
         if hasattr(self, '_post_save'):
             self._post_save()
@@ -292,7 +282,7 @@ class Model(object):
             if hasattr(instance, '_pre_delete'):
                 instance._pre_delete()
 
-            dispatcher.send(signal=Signals.pre_delete, sender = cls, instance = instance )
+            dispatcher.send(signal=signals.pre_delete, sender = cls, instance = instance )
 
             for related in cls._meta.get_all_related_many_to_many_objects():
                 cursor.execute("DELETE FROM %s WHERE %s=%%s" % \
@@ -322,7 +312,7 @@ class Model(object):
 
             setattr(self, cls._meta.pk.attname, None)
 
-            dispatcher.send(signal=Signals.post_delete, sender = cls, instance = instance )
+            dispatcher.send(signal=signals.post_delete, sender = cls, instance = instance )
 
             if hasattr(instance, '_post_delete'):
                 instance._post_delete()

@@ -1,4 +1,4 @@
-from django.db.models.signals import Signals
+from django.db.models import signals
 from django.dispatch import dispatcher
 from django.conf import settings
 from django.core import formfields, validators
@@ -507,7 +507,7 @@ class FileField(Field):
         setattr(cls, 'save_%s_file' % self.name, curry(cls._save_FIELD_file, field=self))
         dispatcher.connect(
             self.delete_file,
-            signal = Signals.post_delete,
+            signal = signals.post_delete,
             sender = cls
         )
 
