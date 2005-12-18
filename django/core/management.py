@@ -276,12 +276,12 @@ def get_sql_initial_data(app):
     from django.conf.settings import DATABASE_ENGINE
     from django.db.models import get_models
     output = []
-    
+
     app_models = get_models(app)
     app_label = app_models[0]._meta.app_label
     output.append(_get_packages_insert(app_label))
     app_dir = os.path.normpath(os.path.join(os.path.dirname(app.__file__), 'sql'))
-    
+
     for klass in app_models:
         opts = klass._meta
 
@@ -326,14 +326,14 @@ def get_sql_indexes(app):
     "Returns a list of the CREATE INDEX SQL statements for the given app."
     from django.db import backend, models
     output = []
-    
+
     for klass in models.get_models(app):
         for f in klass._meta.fields:
             if f.db_index:
                 unique = f.unique and "UNIQUE " or ""
                 output.append("CREATE %sINDEX %s_%s ON %s (%s);" % \
                     (unique, klass._meta.db_table, f.column,
-                    baackend.quote_name(klass._meta.db_table), backend.quote_name(f.column)))
+                    backend.quote_name(klass._meta.db_table), backend.quote_name(f.column)))
     return output
 get_sql_indexes.help_doc = "Prints the CREATE INDEX SQL statements for the given model module name(s)."
 get_sql_indexes.args = APP_ARGS
@@ -473,7 +473,7 @@ def install(app):
     from cStringIO import StringIO
     app_name = app.__name__[app.__name__.rindex('.')+1:]
     app_label = app_name.split('.')[-1]
-    
+
     # First, try validating the models.
     s = StringIO()
     num_errors = get_validation_errors(s)
@@ -1076,4 +1076,3 @@ def execute_manager(settings_mod):
 
     # Run the django-admin.py command.
     execute_from_command_line(action_mapping)
-

@@ -18,10 +18,8 @@ from django.core.exceptions import ObjectDoesNotExist, ImproperlyConfigured
 from django.db.models.exceptions import FieldDoesNotExist, BadKeywordArguments
 from django.db.models import signals
 
-
 # Admin stages.
 ADD, CHANGE, BOTH = 1, 2, 3
-
 
 #def get_module(app_label, module_name):
 #    return __import__('%s.%s.%s' % (MODEL_PREFIX, app_label, module_name), '', '', [''])
@@ -34,20 +32,18 @@ def get_models(app):
 def get_models_helper(mod, seen_models):
     if hasattr(mod, '_MODELS'):
         seen_models.extend(mod._MODELS)
-    if hasattr(mod, '__all__'): 
+    if hasattr(mod, '__all__'):
         for name in mod.__all__:
             sub_mod = __import__("%s.%s" % (mod.__name__, name), '','',[''])
             get_models_helper(sub_mod, seen_models)
 
 def get_app(app_label):
-    
     for app_name in settings.INSTALLED_APPS:
         comps = app_name.split('.')
         if app_label == comps[-1]:
             app_models = __import__('%s.models' % app_name , '','',[''])
             return app_models
-    
-    raise ImproperlyConfigured, "App with label %s could not be found" % app_labelpostgres
+    raise ImproperlyConfigured, "App with label %s could not be found" % app_label
 
 class LazyDate:
     """
@@ -69,10 +65,3 @@ class LazyDate:
 
     def __get_value__(self):
         return datetime.datetime.now() + self.delta
-
-
-
-
-
-
-
