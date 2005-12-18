@@ -15,7 +15,6 @@ class Options:
         order_with_respect_to=None, module_constants=None):
         # Move many-to-many related fields from self.fields into self.many_to_many.
         self.fields, self.many_to_many = [], []
-        
         self.module_name, self.verbose_name = module_name, verbose_name
         self.verbose_name_plural = verbose_name_plural or verbose_name + 's'
         self.db_table = db_table
@@ -27,10 +26,9 @@ class Options:
         self.object_name, self.app_label = object_name, app_label
         self.get_latest_by = get_latest_by
         self.order_with_respect_to = order_with_respect_to
-        
         self.module_constants = module_constants or {}
         self.admin = admin
-    
+
     def contribute_to_class(self, cls, name):
         self.model = cls
         cls._meta = self
@@ -41,7 +39,7 @@ class Options:
             self.ordering = ('_order',)
         else:
             self.order_with_respect_to = None
-        
+
         # Calculate one_to_one_field.
         self.one_to_one_field = None
         for f in self.fields:
@@ -71,20 +69,18 @@ class Options:
                 self.has_auto_field = True
         #HACK
         self.limit_choices_to = {}
-        
+
         # If the db_table wasn't provided, use the app_label + module_name.
         if not self.db_table:
             self.db_table = "%s_%s" % (self.app_label, self.module_name)
 
     def add_field(self, field):
-        # Insert the fields in the order that they were created. The
-        # "creation_counter" is needed because metaclasses don't preserve the
-        # attribute order.
+        # Insert the given field in the order in which it was created, using
+        # the "creation_counter" attribute of the field.
         if field.rel and isinstance(field.rel, ManyToMany):
             self.many_to_many.insert(bisect(self.many_to_many, field), field)
         else:
-            self.fields.insert(bisect(self.fields,field),field)
-            
+            self.fields.insert(bisect(self.fields, field), field)
 
     def __repr__(self):
         return '<Options for %s>' % self.module_name
@@ -95,11 +91,10 @@ class Options:
     def get_content_type_id(self):
         "Returns the content-type ID for this object type."
         if not hasattr(self, '_content_type_id'):
-            import django.models.core
-            manager = django.models.core.ContentType.objects
-            self._content_type_id = \
-                manager.get_object(python_module_name__exact=self.module_name, 
-                                   package__label__exact=self.app_label).id
+            from django.models.core import ContentType
+            self._content_type_id = ContentType.objects.get_object(
+                python_module_name__exact=self.module_name,
+                package__label__exact=self.app_label).id
         return self._content_type_id
 
     def get_field(self, name, many_to_many=True):

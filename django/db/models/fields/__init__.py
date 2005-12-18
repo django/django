@@ -8,7 +8,6 @@ from django.utils.text import capfirst
 from django.utils.translation import gettext_lazy, ngettext
 import datetime, os
 
-
 # Random entropy string used by "default" param.
 NOT_PROVIDED = 'oijpwojefiojpanv'
 
@@ -35,9 +34,7 @@ def manipulator_valid_rel_key(f, self, field_data, all_data):
 
 def manipulator_validator_unique(f, opts, self, field_data, all_data):
     "Validates that the value is unique for this field."
-
     lookup_type = f.get_validator_unique_lookup_type()
-
     try:
         old_obj = self.__class__._default_manager.get_object(**{lookup_type: field_data})
     except ObjectDoesNotExist:
@@ -97,7 +94,6 @@ class Field(object):
         help_text='', db_column=None):
         self.name = name
         self.verbose_name = verbose_name
-
         self.primary_key = primary_key
         self.maxlength, self.unique = maxlength, unique
         self.blank, self.null = blank, null
@@ -118,9 +114,8 @@ class Field(object):
         self.creation_counter = Field.creation_counter
         Field.creation_counter += 1
 
-
     def __cmp__(self,other ):
-        #This is because bisect does not take a comparison function. grrr.
+        # This is needed because bisect does not take a comparison function.
         return cmp(self.creation_counter, other.creation_counter)
 
     def set_attributes_from_name(self, name):
@@ -292,7 +287,6 @@ class Field(object):
         first_choice = include_blank and blank_choice or []
         if self.choices:
             return first_choice + list(self.choices)
-
         rel_model = self.rel.to
         return first_choice + [(getattr(x, rel_model._meta.pk.attname), str(x))
                                for x in rel_model._default_manager.get_list(**rel_model._meta.limit_choices_to)]
@@ -365,7 +359,7 @@ class DateField(Field):
     empty_strings_allowed = False
     def __init__(self, verbose_name=None, name=None, auto_now=False, auto_now_add=False, **kwargs):
         self.auto_now, self.auto_now_add = auto_now, auto_now_add
-        #HACKs : auto_now_add/auto_now should be done as a default or a pre_save...
+        #HACKs : auto_now_add/auto_now should be done as a default or a pre_save.
         if auto_now or auto_now_add:
             kwargs['editable'] = False
             kwargs['blank'] = True

@@ -4,27 +4,24 @@ from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.admin.filterspecs import FilterSpec
 from django.core import formfields, template
 from django.core.template import loader
+from django.db import models
 from django.db.models.fields import BoundField, BoundFieldLine, BoundFieldSet
+from django.db.models.query import handle_legacy_orderlist
 from django.core.exceptions import Http404, ImproperlyConfigured, ObjectDoesNotExist, PermissionDenied
 from django.core.extensions import DjangoContext as Context
 from django.core.extensions import get_object_or_404, render_to_response
 from django.core.paginator import ObjectPaginator, InvalidPage
-from django.conf.settings import ADMIN_MEDIA_PREFIX
 try:
     from django.contrib.admin.models import LogEntry, ADDITION, CHANGE, DELETION
 except ImportError:
     raise ImproperlyConfigured, "You don't have 'django.contrib.admin' in INSTALLED_APPS."
-from django.db import models
-from django.utils.html import strip_tags
-from django.utils.httpwrappers import HttpResponse, HttpResponseRedirect
-from django.utils.text import capfirst, get_text_list
 from django.utils import dateformat
 from django.utils.dates import MONTHS
-from django.utils.html import escape
+from django.utils.html import escape, strip_tags
+from django.utils.httpwrappers import HttpResponse, HttpResponseRedirect
+from django.utils.text import capfirst, get_text_list
 import operator
 from itertools import izip
-
-from django.db.models.query import handle_legacy_orderlist
 
 # The system will display a "Show all" link only if the total result count
 # is less than or equal to this setting.
@@ -59,7 +56,7 @@ def matches_app(mod, comps):
     modcomps = mod.__name__.split('.')[:-1] #HACK: leave off 'models'
     for c, mc in izip(comps, modcomps):
         if c != mc:
-            return ([],False)
+            return ([], False)
     return (comps[len(modcomps):], True)
 
 def find_model(mod, remaining):
@@ -92,13 +89,13 @@ def get_app_label(mod):
 def get_model_and_app(path):
     comps = path.split('/')
     comps = comps[:-1] # remove '' after final /
-    for mod in models.get_installed_models():  
+    for mod in models.get_installed_models():
         remaining, matched =  matches_app(mod, comps)
         if matched and len(remaining) > 0:
-           # print "matched ", mod 
+           # print "matched ", mod
            # print "left", remaining
             return ( find_model(mod, remaining), get_app_label(mod) )
-            
+
     raise Http404 # Couldn't find app
 
 _model_urls = {}
@@ -108,7 +105,7 @@ def url_for_model(model):
         return _model_urls[model]
     except KeyError:
         comps = model.__module__.split('.')
-        for mod in models.get_installed_models():  
+        for mod in models.get_installed_models():
             remaining, matched =  matches_app(mod, comps)
             if matched and len(remaining) > 0:
                 comps = comps[: - len(remaining)] + remaining[1:]
@@ -166,7 +163,7 @@ class ChangeList(object):
         self.model, self.app_label = get_model_and_app(path)
         # _get_mod_opts(app_label, module_name)
         self.opts = self.model._meta
-        
+
         if not request.user.has_perm(self.app_label + '.' + self.opts.get_change_permission()):
             raise PermissionDenied
 
@@ -312,7 +309,7 @@ def change_list(request, path):
     c = Context(request, {
         'title': cl.title,
         'is_popup': cl.is_popup,
-        'cl' : cl,
+        'cl': cl,
         'path': path[:path.rindex('/')]
     })
     c.update({'has_add_permission': c['perms'][cl.app_label][cl.opts.get_add_permission()]}),
@@ -323,7 +320,7 @@ change_list = staff_member_required(change_list)
 
 use_raw_id_admin = lambda field: isinstance(field.rel, (models.ManyToOne, models.ManyToMany)) and field.rel.raw_id_admin
 
-def get_javascript_imports(opts,auto_populated_fields, ordered_objects, field_sets):
+def get_javascript_imports(opts, auto_populated_fields, ordered_objects, field_sets):
 # Put in any necessary JavaScript imports.
     js = ['js/core.js', 'js/admin/RelatedObjectLookups.js']
     if auto_populated_fields:
@@ -476,14 +473,14 @@ def render_change_form(model, manipulator, app_label, context, add=False, change
                                "admin/%s/change_form" % app_label ,
                                "admin/change_form"], context_instance=context)
 
-def log_add_message(user, opts,manipulator,new_object):
+def log_add_message(user, opts, manipulator, new_object):
     pk_value = getattr(new_object, opts.pk.attname)
     LogEntry.objects.log_action(user.id, opts.get_content_type_id(), pk_value, str(new_object), ADDITION)
 
 def add_stage(request, path, show_delete=False, form_url='', post_url='../change/', post_url_continue='../%s/', object_id_override=None):
     model, app_label = get_model_and_app(path)
     opts = model._meta
-    
+
     if not request.user.has_perm(app_label + '.' + opts.get_add_permission()):
         raise PermissionDenied
     manipulator = model.AddManipulator()
@@ -496,9 +493,9 @@ def add_stage(request, path, show_delete=False, form_url='', post_url='../change
 
         if not errors and not request.POST.has_key("_preview"):
             new_object = manipulator.save(new_data)
-            log_add_message(request.user, opts,manipulator,new_object)
-            msg = _('The %(name)s "%(obj)s" was added successfully.') % {'name':opts.verbose_name, 'obj':new_object}
-            pk_value = getattr(new_object,opts.pk.attname)
+            log_add_message(request.user, opts, manipulator, new_object)
+            msg = _('The %(name)s "%(obj)s" was added successfully.') % {'name': opts.verbose_name, 'obj': new_object}
+            pk_value = getattr(new_object, opts.pk.attname)
             # Here, we distinguish between different save types by checking for
             # the presence of keys in request.POST.
             if request.POST.has_key("_continue"):
@@ -531,16 +528,16 @@ def add_stage(request, path, show_delete=False, form_url='', post_url='../change
         'form': form,
         'is_popup': request.REQUEST.has_key('_popup'),
         'show_delete': show_delete,
-        'path' : path ,
+        'path': path ,
     })
-    
+
     if object_id_override is not None:
         c['object_id'] = object_id_override
 
     return render_change_form(model, manipulator, app_label, c, add=True)
 add_stage = staff_member_required(add_stage)
 
-def log_change_message(user, opts,manipulator,new_object):
+def log_change_message(user, opts, manipulator, new_object):
     pk_value = getattr(new_object, opts.pk.column)
     # Construct the change message.
     change_message = []
@@ -556,7 +553,6 @@ def log_change_message(user, opts,manipulator,new_object):
     LogEntry.objects.log_action(user.id, opts.get_content_type_id(), pk_value, str(new_object), CHANGE, change_message)
 
 def change_stage(request, path, object_id):
-
     model, app_label = get_model_and_app(path)
     opts = model._meta
     #mod, opts = _get_mod_opts(app_label, module_name)
@@ -580,9 +576,9 @@ def change_stage(request, path, object_id):
         manipulator.do_html2python(new_data)
         if not errors and not request.POST.has_key("_preview"):
             new_object = manipulator.save(new_data)
-            log_change_message(request.user,opts,manipulator,new_object)
-            msg = _('The %(name)s "%(obj)s" was changed successfully.') % {'name': opts.verbose_name, 'obj':new_object}
-            pk_value = getattr(new_object,opts.pk.attname)
+            log_change_message(request.user, opts, manipulator, new_object)
+            msg = _('The %(name)s "%(obj)s" was changed successfully.') % {'name': opts.verbose_name, 'obj': new_object}
+            pk_value = getattr(new_object, opts.pk.attname)
             if request.POST.has_key("_continue"):
                 request.user.add_message(msg + ' ' + _("You may edit it again below."))
                 if request.REQUEST.has_key('_popup'):
@@ -632,11 +628,10 @@ def change_stage(request, path, object_id):
         'form': form,
         'object_id': object_id,
         'original': manipulator.original_object,
-        'is_popup' : request.REQUEST.has_key('_popup'),
-        'path' : path ,
+        'is_popup': request.REQUEST.has_key('_popup'),
+        'path': path ,
     })
-
-    return render_change_form(model,manipulator, app_label, c, change=True)
+    return render_change_form(model, manipulator, app_label, c, change=True)
 
 def _nest_help(obj, depth, val):
     current = obj

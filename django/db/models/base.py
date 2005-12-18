@@ -1,18 +1,15 @@
 import django.db.models.manipulators
 import django.db.models.manager
-
-from django.db.models.fields import  AutoField
+from django.db.models.fields import AutoField
 from django.db.models.fields.related import OneToOne, ManyToOne
 from django.db.models.related import RelatedObject
 from django.db.models.query import orderlist2sql
 from django.db.models.options import Options
 from django.db import connection, backend
 from django.db.models import signals
-
 from django.dispatch import dispatcher
 from django.core.exceptions import ObjectDoesNotExist
 from django.utils.functional import curry
-
 import re
 import types
 import sys
@@ -26,7 +23,6 @@ get_module_name = lambda class_name: class_name.lower() + 's'
 
 # Calculate the verbose_name by converting from InitialCaps to "lowercase with spaces".
 get_verbose_name = lambda class_name: re.sub('([A-Z])', ' \\1', class_name).lower().strip()
-
 
 class ModelBase(type):
     "Metaclass for all models"
@@ -42,13 +38,13 @@ class ModelBase(type):
         except KeyError:
             meta_attrs = {}
 
-        # Create the class, we need to add the options to it. 
-        new_class = type.__new__(cls, name, bases, { '__module__' : attrs.pop('__module__') })
+        # Create the class.
+        new_class = type.__new__(cls, name, bases, {'__module__': attrs.pop('__module__')})
 
         opts = Options(
             module_name = meta_attrs.pop('module_name', get_module_name(name)),
             # If the verbose_name wasn't given, use the class name,
-            # converted from InitialCaps to "lowercase with spaces".
+            # converted from "InitialCaps" to "lowercase with spaces".
             verbose_name = meta_attrs.pop('verbose_name', get_verbose_name(name)),
             verbose_name_plural = meta_attrs.pop('verbose_name_plural', ''),
             db_table = meta_attrs.pop('db_table', ''),
@@ -81,11 +77,9 @@ class ModelBase(type):
         # Cache the app label.
         opts.app_label = app_label
 
-        #Add all attributes to the class
+        # Add all attributes to the class.
         for obj_name, obj in attrs.items():
             new_class.add_to_class(obj_name, obj)
-
-
 
         # Give the class a docstring -- its definition.
         if new_class.__doc__ is None:
@@ -97,11 +91,8 @@ class ModelBase(type):
         opts._prepare()
         new_class._prepare()
 
-        
-
         # Populate the _MODELS member on the module the class is in.
         app_package.__dict__.setdefault('_MODELS', []).append(new_class)
-
 
         return new_class
 
@@ -117,13 +108,6 @@ def cmp_cls(x, y):
 class Model(object):
     __metaclass__ = ModelBase
 
-    def add_to_class(cls, name, attribute):
-        if hasattr(attribute, 'contribute_to_class'):
-            attribute.contribute_to_class(cls, name)
-        else:
-            setattr(cls, name, attribute)
-    add_to_class = classmethod(add_to_class)
-
     def __repr__(self):
         return '<%s object>' % self.__class__.__name__
 
@@ -134,7 +118,7 @@ class Model(object):
         return not self.__eq__(other)
 
     def __init__(self, *args, **kwargs):
-        dispatcher.send( signal = signals.pre_init, sender = self.__class__, args=args, kwargs=kwargs)
+        dispatcher.send(signal=signals.pre_init, sender=self.__class__, args=args, kwargs=kwargs)
         if kwargs:
             for f in self._meta.fields:
                 if isinstance(f.rel, ManyToOne):
@@ -165,7 +149,14 @@ class Model(object):
                 raise TypeError, "'%s' is an invalid keyword argument for this function" % kwargs.keys()[0]
         for i, arg in enumerate(args):
             setattr(self, self._meta.fields[i].attname, arg)
-        dispatcher.send( signal = signals.post_init, sender = self.__class__, instance=self)
+        dispatcher.send(signal=signals.post_init, sender=self.__class__, instance=self)
+
+    def add_to_class(cls, name, attribute):
+        if hasattr(attribute, 'contribute_to_class'):
+            attribute.contribute_to_class(cls, name)
+        else:
+            setattr(cls, name, attribute)
+    add_to_class = classmethod(add_to_class)
 
     def _prepare(cls):
         # Creates some methods once self._meta has been populated.
@@ -173,7 +164,7 @@ class Model(object):
             cls.get_next_in_order = curry(cls._get_next_or_previous_in_order, is_next=True)
             cls.get_previous_in_order = curry(cls._get_next_or_previous_in_order, is_next=False)
 
-        dispatcher.send( signal = signals.class_prepared, sender = cls)
+        dispatcher.send(signal=signals.class_prepared, sender=cls)
         #RelatedField.do_pending_lookups(cls)
 
     _prepare = classmethod(_prepare)
@@ -182,7 +173,7 @@ class Model(object):
         # Run any pre-save hooks.
         if hasattr(self, '_pre_save'):
             self._pre_save()
-        dispatcher.send( signal=signals.pre_save, sender = self.__class__, instance = self )
+        dispatcher.send(signal=signals.pre_save, sender=self.__class__, instance=self)
 
         non_pks = [f for f in self._meta.fields if not f.primary_key]
         cursor = connection.cursor()
@@ -261,8 +252,7 @@ class Model(object):
 
     def delete(self, ignore_objects=None):
         assert getattr(self, self._meta.pk.attname) is not None, "%r can't be deleted because it doesn't have an ID."
-        ignore_objects = \
-            ignore_objects and dict([ (o.__class,o.__get_pk_val) for o in ignore_objects ]) or {}
+        ignore_objects = ignore_objects and dict([(o.__class,o.__get_pk_val) for o in ignore_objects]) or {}
 
         seen_objs = {}
         self.__collect_sub_objects(seen_objs, ignore_objects)
@@ -282,7 +272,7 @@ class Model(object):
             if hasattr(instance, '_pre_delete'):
                 instance._pre_delete()
 
-            dispatcher.send(signal=signals.pre_delete, sender = cls, instance = instance )
+            dispatcher.send(signal=signals.pre_delete, sender=cls, instance=instance)
 
             for related in cls._meta.get_all_related_many_to_many_objects():
                 cursor.execute("DELETE FROM %s WHERE %s=%%s" % \
@@ -294,14 +284,11 @@ class Model(object):
                     (backend.quote_name(f.get_m2m_db_table(cls._meta)),
                     backend.quote_name(cls._meta.object_name.lower() + '_id')),
                     [pk_val])
-
             for field in cls._meta.fields:
                 if field.rel and field.null and field.rel.to in seen_cls:
-                    cursor.execute("UPDATE %s SET %s = NULL WHERE %s =%%s" % \
-                                   ( backend.quote_name(cls._meta.db_table),
-                                     backend.quote_name(field.column),
-                                     backend.quote_name(cls._meta.pk.column)),
-                                   [pk_val] )
+                    cursor.execute("UPDATE %s SET %s = NULL WHERE %s=%%s" % \
+                        (backend.quote_name(cls._meta.db_table), backend.quote_name(field.column),
+                        backend.quote_name(cls._meta.pk.column)), [pk_val])
 
         seen_tups.reverse()
 
@@ -312,7 +299,7 @@ class Model(object):
 
             setattr(self, cls._meta.pk.attname, None)
 
-            dispatcher.send(signal=signals.post_delete, sender = cls, instance = instance )
+            dispatcher.send(signal=signals.post_delete, sender=cls, instance=instance)
 
             if hasattr(instance, '_post_delete'):
                 instance._post_delete()
@@ -320,7 +307,6 @@ class Model(object):
         connection.commit()
 
     delete.alters_data = True
-
 
     def _get_FIELD_display(self, field):
         value = getattr(self, field.attname)
@@ -504,7 +490,6 @@ class Model(object):
 
     _add_related.alters_data = True
 
-
     # Handles related many-to-many object retrieval.
     # Examples: Album.get_song(), Album.get_song_list(), Album.get_song_count()
     def _get_related_many_to_many(self, method_name, rel_class, rel_field, **kwargs):
@@ -528,10 +513,6 @@ class Model(object):
             backend.quote_name(rel_opts.object_name.lower() + '_id'))
         cursor.executemany(sql, [(this_id, i) for i in id_list])
         connection.commit()
-
-
-
-
 
 ############################################
 # HELPER FUNCTIONS (CURRIED MODEL METHODS) #
@@ -568,5 +549,3 @@ def method_get_order(ordered_obj, self):
 
 def get_absolute_url(opts, func, self):
     return settings.ABSOLUTE_URL_OVERRIDES.get('%s.%s' % (opts.app_label, opts.module_name), func)(self)
-
-
