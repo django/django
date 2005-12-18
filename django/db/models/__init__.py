@@ -47,7 +47,7 @@ def get_app(app_label):
             app_models = __import__('%s.models' % app_name , '','',[''])
             return app_models
     
-    raise ImproperlyConfigured, "App with label %s could not be found" % app_name
+    raise ImproperlyConfigured, "App with label %s could not be found" % app_labelpostgres
 
 class LazyDate:
     """

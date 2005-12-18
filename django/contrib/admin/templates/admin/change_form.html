@@ -1,5 +1,5 @@
 {% extends "admin/base_site" %}
-{% load i18n admin_modify adminmedia %}
+{% load i18n admin_modify adminmedia breadcrumbs %}
 {% block extrahead %}{{ block.super }}
 <script type="text/javascript" src="../../../jsi18n/"></script>
 {% for js in bound_manipulator.javascript_imports %}{% include_admin_script js %}{% endfor %}
@@ -9,8 +9,7 @@
 {% block userlinks %}<a href="../../../password_change/">{% trans 'Change password' %}</a> / <a href="../../../logout/">{% trans 'Log out' %}</a>{% endblock %}
 {% block breadcrumbs %}{% if not is_popup %}
 <div class="breadcrumbs">
-     <a href="../../../">{% trans "Home" %}</a> &rsaquo;
-     <a href="../../">{{ bound_manipulator.verbose_name_plural|capfirst }}</a> &rsaquo;
+	 {% path_breadcrumbs path "Home" "1" "1" %}
      {% if add %}{% trans "Add" %} {{ bound_manipulator.verbose_name }}{% else %}{{ bound_manipulator.original|striptags|truncatewords:"18" }}{% endif %}
 </div>
 {% endif %}{% endblock %}

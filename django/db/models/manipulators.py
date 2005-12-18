@@ -273,9 +273,7 @@ class ModelChangeManipulator(AutomaticManipulator):
                 original_object = opts.get_model_module().Klass(**params)
             else:
                 raise
-        print "calling super"
         super(ModelChangeManipulator, self).__init__(original_object=original_object, follow=follow)
-        print "Back"
         self.original_object = original_object
 
         if  self.opts.get_ordered_objects():

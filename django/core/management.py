@@ -333,7 +333,7 @@ def get_sql_indexes(app):
                 unique = f.unique and "UNIQUE " or ""
                 output.append("CREATE %sINDEX %s_%s ON %s (%s);" % \
                     (unique, klass._meta.db_table, f.column,
-                    backend.quote_name(klass._meta.db_table), backend.quote_name(f.column)))
+                    baackend.quote_name(klass._meta.db_table), backend.quote_name(f.column)))
     return output
 get_sql_indexes.help_doc = "Prints the CREATE INDEX SQL statements for the given model module name(s)."
 get_sql_indexes.args = APP_ARGS

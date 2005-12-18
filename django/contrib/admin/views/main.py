@@ -304,7 +304,6 @@ class ChangeList(object):
         self.lookup_params = lookup_params
 
 def change_list(request, path):
-    print "change_list:", path
     try:
         cl = ChangeList(request, path)
     except IncorrectLookupParameters:
@@ -313,7 +312,8 @@ def change_list(request, path):
     c = Context(request, {
         'title': cl.title,
         'is_popup': cl.is_popup,
-        'cl' : cl
+        'cl' : cl,
+        'path': path[:path.rindex('/')]
     })
     c.update({'has_add_permission': c['perms'][cl.app_label][cl.opts.get_add_permission()]}),
     return render_to_response(['admin/%s/%s/change_list' % (cl.app_label, cl.opts.object_name.lower()),
@@ -531,7 +531,9 @@ def add_stage(request, path, show_delete=False, form_url='', post_url='../change
         'form': form,
         'is_popup': request.REQUEST.has_key('_popup'),
         'show_delete': show_delete,
+        'path' : path ,
     })
+    
     if object_id_override is not None:
         c['object_id'] = object_id_override
 
@@ -630,7 +632,8 @@ def change_stage(request, path, object_id):
         'form': form,
         'object_id': object_id,
         'original': manipulator.original_object,
-        'is_popup' : request.REQUEST.has_key('_popup')
+        'is_popup' : request.REQUEST.has_key('_popup'),
+        'path' : path ,
     })
 
     return render_change_form(model,manipulator, app_label, c, change=True)
