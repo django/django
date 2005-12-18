@@ -7,31 +7,56 @@ from django.db.models.exceptions import FieldDoesNotExist
 
 from bisect import bisect
 
-class Options:
-    def __init__(self, module_name='', verbose_name='', verbose_name_plural='', db_table='',
-        ordering=None, unique_together=None, admin=None,
-        where_constraints=None, object_name=None, app_label=None,
-        exceptions=None, permissions=None, get_latest_by=None,
-        order_with_respect_to=None, module_constants=None):
-        # Move many-to-many related fields from self.fields into self.many_to_many.
-        self.fields, self.many_to_many = [], []
-        self.module_name, self.verbose_name = module_name, verbose_name
-        self.verbose_name_plural = verbose_name_plural or verbose_name + 's'
-        self.db_table = db_table
-        self.ordering = ordering or []
-        self.unique_together = unique_together or []
-        self.where_constraints = where_constraints or []
-        self.exceptions = exceptions or []
-        self.permissions = permissions or []
-        self.object_name, self.app_label = object_name, app_label
-        self.get_latest_by = get_latest_by
-        self.order_with_respect_to = order_with_respect_to
-        self.module_constants = module_constants or {}
-        self.admin = admin
+import re
+# Calculate the module_name using a poor-man's pluralization.
+get_module_name = lambda class_name: class_name.lower() + 's'
 
-    def contribute_to_class(self, cls, name):
+# Calculate the verbose_name by converting from InitialCaps to "lowercase with spaces".
+get_verbose_name = lambda class_name: re.sub('([A-Z])', ' \\1', class_name).lower().strip()
+
+
+default_names = ['module_name','verbose_name','verbose_name_plural','db_table','ordering', 
+                  'unique_together', 'admin','where_constraints', 'exceptions', 'permissions', 
+                  'get_latest_by','order_with_respect_to', 'module_constants']
+
+class Options:
+    def __init__(self, meta):
+        self.fields, self.many_to_many = [], []
+        self.module_name, self.verbose_name = None, None
+        self.verbose_name_plural = None
+        self.db_table = ''
+        self.ordering = []
+        self.unique_together =  []
+        self.where_constraints =  []
+        self.exceptions =  []
+        self.permissions =  []
+        self.object_name, self.app_label = None, None
+        self.get_latest_by = None
+        self.order_with_respect_to = None
+        self.module_constants = {}
+        self.admin = None
+        self.meta = meta
+    def merge_meta(self):
+        meta_attrs = self.meta.__dict__
+        del meta_attrs['__module__']
+        del meta_attrs['__doc__']
+        for attr_name in default_names:
+            setattr(self, attr_name, meta_attrs.pop(attr_name, getattr(self, attr_name)))
+        if meta_attrs != {}:
+            raise TypeError, "'class META' got invalid attribute(s): %s" % ','.join(meta_attrs.keys())
+
+    def contribute_to_class(self, cls, name):        
         self.model = cls
         cls._meta = self
+        self.object_name = cls.__name__
+        self.module_name = get_module_name(self.object_name )
+        # If the verbose_name wasn't given, use the class name,
+        # converted from "InitialCaps" to "lowercase with spaces".
+        self.verbose_name = get_verbose_name(self.object_name)
+        self.verbose_name_plural = self.verbose_name + 's'
+        if self.meta:
+            self.merge_meta()
+        del self.meta
 
     def _prepare(self):
         if self.order_with_respect_to:
@@ -77,6 +102,7 @@ class Options:
     def add_field(self, field):
         # Insert the given field in the order in which it was created, using
         # the "creation_counter" attribute of the field.
+        # Move many-to-many related fields from self.fields into self.many_to_many.
         if field.rel and isinstance(field.rel, ManyToMany):
             self.many_to_many.insert(bisect(self.many_to_many, field), field)
         else:

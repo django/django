@@ -18,12 +18,7 @@ import sys
 if not hasattr(__builtins__, 'set'):
     from sets import Set as set
 
-# Calculate the module_name using a poor-man's pluralization.
-get_module_name = lambda class_name: class_name.lower() + 's'
-
-# Calculate the verbose_name by converting from InitialCaps to "lowercase with spaces".
-get_verbose_name = lambda class_name: re.sub('([A-Z])', ' \\1', class_name).lower().strip()
-
+attribute_transforms = {}
 class ModelBase(type):
     "Metaclass for all models"
     def __new__(cls, name, bases, attrs):
@@ -31,69 +26,30 @@ class ModelBase(type):
         if not bases or bases == (object,):
             return type.__new__(cls, name, bases, attrs)
 
-        try:
-            meta_attrs = attrs.pop('META').__dict__
-            del meta_attrs['__module__']
-            del meta_attrs['__doc__']
-        except KeyError:
-            meta_attrs = {}
-
         # Create the class.
         new_class = type.__new__(cls, name, bases, {'__module__': attrs.pop('__module__')})
-
-        opts = Options(
-            module_name = meta_attrs.pop('module_name', get_module_name(name)),
-            # If the verbose_name wasn't given, use the class name,
-            # converted from "InitialCaps" to "lowercase with spaces".
-            verbose_name = meta_attrs.pop('verbose_name', get_verbose_name(name)),
-            verbose_name_plural = meta_attrs.pop('verbose_name_plural', ''),
-            db_table = meta_attrs.pop('db_table', ''),
-            ordering = meta_attrs.pop('ordering', None),
-            unique_together = meta_attrs.pop('unique_together', None),
-            admin = meta_attrs.pop('admin', None),
-            where_constraints = meta_attrs.pop('where_constraints', None),
-            object_name = name,
-            app_label = meta_attrs.pop('app_label', None),
-            exceptions = meta_attrs.pop('exceptions', None),
-            permissions = meta_attrs.pop('permissions', None),
-            get_latest_by = meta_attrs.pop('get_latest_by', None),
-            order_with_respect_to = meta_attrs.pop('order_with_respect_to', None),
-            module_constants = meta_attrs.pop('module_constants', None),
-        )
-
-        if meta_attrs != {}:
-            raise TypeError, "'class META' got invalid attribute(s): %s" % ','.join(meta_attrs.keys())
-        new_class.add_to_class('_meta', opts)
-
-        # Create the DoesNotExist exception.
-        new_class.DoesNotExist = types.ClassType('DoesNotExist', (ObjectDoesNotExist,), {})
-
-        # Figure out the app_label by looking one level up.
+        new_class.add_to_class('_meta', 
+                                Options(attrs.pop('META', None)))
+        new_class.add_to_class('DoesNotExist', 
+                                types.ClassType('DoesNotExist', (ObjectDoesNotExist,), {}) )
+        
+        #Figure out the app_label by looking one level up.
         #FIXME: wrong for nested model modules
         app_package = sys.modules.get(new_class.__module__)
         app_label = app_package.__name__.replace('.models', '')
         app_label = app_label[app_label.rfind('.')+1:]
-
+        
         # Cache the app label.
-        opts.app_label = app_label
-
+        new_class._meta.app_label = app_label
+        
         # Add all attributes to the class.
         for obj_name, obj in attrs.items():
             new_class.add_to_class(obj_name, obj)
 
-        # Give the class a docstring -- its definition.
-        if new_class.__doc__ is None:
-            new_class.__doc__ = "%s.%s(%s)" % (opts.module_name, name, ", ".join([f.name for f in opts.fields]))
-
-        if hasattr(new_class, 'get_absolute_url'):
-            new_class.get_absolute_url = curry(get_absolute_url, opts, new_class.get_absolute_url)
-
-        opts._prepare()
         new_class._prepare()
 
         # Populate the _MODELS member on the module the class is in.
         app_package.__dict__.setdefault('_MODELS', []).append(new_class)
-
         return new_class
 
 def cmp_cls(x, y):
@@ -152,6 +108,9 @@ class Model(object):
         dispatcher.send(signal=signals.post_init, sender=self.__class__, instance=self)
 
     def add_to_class(cls, name, attribute):
+        transform = attribute_transforms.get(name, None)
+        if transform:
+            attribute = transform(attribute) 
         if hasattr(attribute, 'contribute_to_class'):
             attribute.contribute_to_class(cls, name)
         else:
@@ -160,12 +119,21 @@ class Model(object):
 
     def _prepare(cls):
         # Creates some methods once self._meta has been populated.
-        if cls._meta.order_with_respect_to:
+        opts =  cls._meta
+        opts._prepare()
+        
+        if opts.order_with_respect_to:
             cls.get_next_in_order = curry(cls._get_next_or_previous_in_order, is_next=True)
             cls.get_previous_in_order = curry(cls._get_next_or_previous_in_order, is_next=False)
 
+        # Give the class a docstring -- its definition.
+        if cls.__doc__ is None:
+            cls.__doc__ = "%s.%s(%s)" % (opts.module_name, cls.__name__, ", ".join([f.name for f in opts.fields]))
+
+        if hasattr(cls, 'get_absolute_url'):
+            cls.get_absolute_url = curry(get_absolute_url, opts, cls.get_absolute_url)
+
         dispatcher.send(signal=signals.class_prepared, sender=cls)
-        #RelatedField.do_pending_lookups(cls)
 
     _prepare = classmethod(_prepare)
 
