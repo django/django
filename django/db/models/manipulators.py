@@ -6,8 +6,8 @@ from django.db.models import signals
 
 def add_manipulators(sender):
     cls = sender
-    cls.add_to_class(  'AddManipulator', ModelAddManipulator)
-    cls.add_to_class(  'ChangeManipulator', ModelChangeManipulator)
+    cls.add_to_class('AddManipulator', ModelAddManipulator)
+    cls.add_to_class('ChangeManipulator', ModelChangeManipulator)
 
 dispatcher.connect(
     add_manipulators,
@@ -28,8 +28,8 @@ class ManipulatorDescriptor(object):
             raise "Manipulator can not be accessed via instance"
         else:
             if not self.man:
-                # Create a class which inherits from the MANIPULATOR class given in the class, 
-                # and the appropriate automatic manipulator, 
+                # Create a class which inherits from the MANIPULATOR class given in the class,
+                # and the appropriate automatic manipulator,
                 class Man(self.get_base_manipulator(type), self.base):
                     pass
 
@@ -39,13 +39,11 @@ class ManipulatorDescriptor(object):
             return self.man
 
     def get_base_manipulator(self, type):
-        
         if hasattr(type, 'MANIPULATOR'):
             man = type.MANIPULATOR
         else:
             man = self.empty
         return man
-
 
 class AutomaticManipulator(Manipulator):
     def _prepare(cls, model):
@@ -235,11 +233,11 @@ class AutomaticManipulator(Manipulator):
         return self.opts.get_followed_related_objects(self.follow)
 
     def flatten_data(self):
-         new_data = {}
-         for f in self.opts.get_data_holders(self.follow):
+        new_data = {}
+        for f in self.opts.get_data_holders(self.follow):
             fol = self.follow.get(f.name)
             new_data.update(f.flatten_data(fol, self.original_object))
-         return new_data
+        return new_data
 
 class ModelAddManipulator(AutomaticManipulator):
     change = False
@@ -276,11 +274,8 @@ class ModelChangeManipulator(AutomaticManipulator):
         super(ModelChangeManipulator, self).__init__(original_object=original_object, follow=follow)
         self.original_object = original_object
 
-        if  self.opts.get_ordered_objects():
+        if self.opts.get_ordered_objects():
             self.fields.append(formfields.CommaSeparatedIntegerField(field_name="order_"))
-
-
-
 
 def manipulator_validator_unique_together(field_name_list, opts, self, field_data, all_data):
     from django.utils.text import get_text_list

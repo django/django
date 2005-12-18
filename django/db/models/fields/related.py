@@ -1,10 +1,9 @@
+from django.db.models import signals
 from django.db.models.fields import Field, IntegerField
 from django.db.models.related import RelatedObject
 from django.utils.translation import gettext_lazy, string_concat
 from django.utils.functional import curry
 from django.core import formfields
-from django.db.models import signals
-
 from django.dispatch import dispatcher
 
 # Values for Relation.edit_inline.
@@ -12,35 +11,33 @@ TABULAR, STACKED = 1, 2
 
 RECURSIVE_RELATIONSHIP_CONSTANT = 'self'
 
-#HACK 
+#HACK
 class RelatedField(object):
     pending_lookups = {}
-    
+
     dispatcher.connect(
-        lambda sender: RelatedField.do_pending_lookups(sender) ,
+        lambda sender: RelatedField.do_pending_lookups(sender),
         signal = signals.class_prepared,
         weak = False)
-    
-    
+
     def add_lookup(cls, rel_cls, field):
         name = field.rel.to
         module = rel_cls.__module__
         key = (module, name)
-        cls.pending_lookups.setdefault(key,[]).append( (rel_cls, field) )
+        cls.pending_lookups.setdefault(key, []).append((rel_cls, field))
     add_lookup = classmethod(add_lookup)
-        
+
     def do_pending_lookups(cls, other_cls):
         key = (other_cls.__module__, other_cls.__name__)
-        for (rel_cls,field) in cls.pending_lookups.setdefault(key,[]):
+        for rel_cls, field in cls.pending_lookups.setdefault(key,[]):
             field.rel.to = other_cls
             field.do_related_class(other_cls, rel_cls)
     do_pending_lookups = classmethod(do_pending_lookups)
-    
-    
+
     def contribute_to_class(self, cls, name):
-        sup = super(RelatedField,self)
+        sup = super(RelatedField, self)
         if hasattr(sup, 'contribute_to_class'):
-            sup.contribute_to_class(cls,name)
+            sup.contribute_to_class(cls, name)
         other = self.rel.to
         if isinstance(other, basestring):
             if other == RECURSIVE_RELATIONSHIP_CONSTANT:
@@ -53,18 +50,17 @@ class RelatedField(object):
         self.name = self.name or (self.rel.to._meta.object_name.lower() + '_' + self.rel.to._meta.pk.name)
         self.verbose_name = self.verbose_name or self.rel.to._meta.verbose_name
         self.rel.field_name = self.rel.field_name or self.rel.to._meta.pk.name
-        
+
     def do_related_class(self, other, cls):
         self.set_attributes_from_rel()
         related = RelatedObject(other._meta, cls, self)
         self.contribute_to_related_class(other, related)
-        
 
 #HACK
 class SharedMethods(RelatedField):
     def get_attname(self):
         return '%s_id' % self.name
-    
+
     def get_validator_unique_lookup_type(self):
         return '%s__%s__exact' % (self.name, self.rel.get_related_field().name)
 
@@ -74,13 +70,13 @@ class SharedMethods(RelatedField):
         # EXAMPLES: Choice.get_poll(), Story.get_dateline()
         setattr(cls, 'get_%s' % self.name, curry(cls._get_foreign_key_object, field_with_rel=self))
 
-class ForeignKey(SharedMethods,Field):
+class ForeignKey(SharedMethods, Field):
     empty_strings_allowed = False
     def __init__(self, to, to_field=None, **kwargs):
         try:
             to_name = to._meta.object_name.lower()
         except AttributeError: # to._meta doesn't exist, so it must be RECURSIVE_RELATIONSHIP_CONSTANT
-            assert isinstance(to, basestring) , """ForeignKey(%r) is invalid. First parameter to ForeignKey must be either 
+            assert isinstance(to, basestring) , """ForeignKey(%r) is invalid. First parameter to ForeignKey must be either
                          a model, a model name, or the string %r""" % (to, RECURSIVE_RELATIONSHIP_CONSTANT)
             kwargs['verbose_name'] = kwargs.get('verbose_name', '')
         else:
@@ -103,13 +99,13 @@ class ForeignKey(SharedMethods,Field):
             lookup_overrides=kwargs.pop('lookup_overrides', None),
             raw_id_admin=kwargs.pop('raw_id_admin', False))
         Field.__init__(self, **kwargs)
-        
+
         if not self.db_index:
                 self.db_index = True
-    
+
     def prepare_field_objs_and_params(self, manipulator, name_prefix):
         params = {'validator_list': self.validator_list[:]}
-        
+
         params['member_name'] = name_prefix + self.attname
         if self.rel.raw_id_admin:
             field_objs = self.get_manipulator_field_objs()
@@ -124,7 +120,7 @@ class ForeignKey(SharedMethods,Field):
                 else:
                     field_objs = [formfields.SelectField]
             params['choices'] = self.get_choices_default()
-        return (field_objs,params)
+        return (field_objs, params)
 
     def get_manipulator_field_objs(self):
         rel_field = self.rel.get_related_field()
@@ -133,7 +129,7 @@ class ForeignKey(SharedMethods,Field):
         else:
             return [formfields.IntegerField]
 
-    def get_db_prep_save(self,value):
+    def get_db_prep_save(self, value):
         if value == '' or value == None:
             return None
         else:
@@ -170,9 +166,8 @@ class ForeignKey(SharedMethods,Field):
         # but only for related objects that are in the same app.
         # EXAMPLE: Poll.add_choice()
         if related.opts.app_label == cls._meta.app_label:
-            func = lambda self, *args, **kwargs: self._add_related(related.model, related.field, *args, **kwargs) 
+            func = lambda self, *args, **kwargs: self._add_related(related.model, related.field, *args, **kwargs)
             setattr(cls, 'add_%s' % rel_obj_name, func)
-
 
 class OneToOneField(SharedMethods, IntegerField):
     def __init__(self, to, to_field=None, **kwargs):
@@ -205,7 +200,7 @@ class OneToOneField(SharedMethods, IntegerField):
                       rel_class=related.model, rel_field=related.field))
 
 
-class ManyToManyField(RelatedField,Field):
+class ManyToManyField(RelatedField, Field):
     def __init__(self, to, **kwargs):
         kwargs['verbose_name'] = kwargs.get('verbose_name', None)
         kwargs['rel'] = ManyToMany(to, kwargs.pop('singular', None),
@@ -222,7 +217,7 @@ class ManyToManyField(RelatedField,Field):
         else:
             msg = gettext_lazy(' Hold down "Control", or "Command" on a Mac, to select more than one.')
         self.help_text = string_concat( self.help_text , msg )
-        
+
 
     def get_manipulator_field_objs(self):
         if self.rel.raw_id_admin:
@@ -304,18 +299,18 @@ class ManyToManyFieldNew(RelatedField):
         self.from_ = None
         self.rel = self
         self.edit_inline = False
-    
+
     def set_attributes_from_rel(self):
         pass
-    
+
     def contribute_to_class(self, cls, name):
         self.from_ = cls
         self.name = name
         super(ManyToManyFieldNew, self).contribute_to_class(cls, name)
-        
-        
+
+
     def contribute_to_related_class(self, cls, name):
-        #Now we know both classes exist. 
+        #Now we know both classes exist.
         self.to = cls
         # We need to wait until the class we were in was fully defined
         dispatcher.connect(
@@ -323,23 +318,21 @@ class ManyToManyFieldNew(RelatedField):
             signal = signals.class_prepared,
             sender = self.from_
         )
-        
+
     def from_prepared(self):
         from django.db.models.base import Model
-        
+
         class M2M(Model):
             __module__ = self.from_.__module__
-        
+
         id_to =  self.from_._meta.db_table
         id_from =  self.to._meta.db_table
 
-        M2M.add_to_class(id_from, ForeignKey(to=self.from_) )
-        M2M.add_to_class(id_to, ForeignKey(to=self.to) )
+        M2M.add_to_class(id_from, ForeignKey(to=self.from_))
+        M2M.add_to_class(id_to, ForeignKey(to=self.to))
         M2M._meta.db_table = '%s_%s' % (self.from_._meta.db_table, self.name)
         M2M._meta.unique_together = ((id_to, id_from),)
-        M2M.__name__ = "M2M_%s_%s_%s" % (self.name,self.from_.__name__, self.to.__name__)
-
-
+        M2M.__name__ = "M2M_%s_%s_%s" % (self.name, self.from_.__name__, self.to.__name__)
 
 class ManyToOne:
     def __init__(self, to, field_name, num_in_admin=3, min_num_in_admin=None,
@@ -372,12 +365,11 @@ class OneToOne(ManyToOne):
         self.lookup_overrides = lookup_overrides or {}
         self.raw_id_admin = raw_id_admin
 
-
 class ManyToMany:
     def __init__(self, to, singular=None, num_in_admin=0, related_name=None,
         filter_interface=None, limit_choices_to=None, raw_id_admin=False):
         self.to = to
-        self.singular = singular or None 
+        self.singular = singular or None
         self.num_in_admin = num_in_admin
         self.related_name = related_name
         self.filter_interface = filter_interface
