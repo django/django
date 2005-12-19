@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2005-12-17 22:26+0100\n"
+"POT-Creation-Date: 2005-12-19 13:36-0300\n"
 "PO-Revision-Date: 2005-11-28 15:28+0000\n"
 "Last-Translator: Ricardo Javier Cardenes Medina <ricardo.cardenes@gmail."
 "com>\n"
@@ -369,6 +369,7 @@ msgstr "Todas las fechas"
 
 #: contrib/admin/views/decorators.py:22
 #: contrib/admin/templates/admin/login.html:24
+#: contrib/admin/templates/templates/admin/login.html:24
 msgid "Log in"
 msgstr "Identificarse"
 
@@ -587,6 +588,21 @@ msgstr "Texto XML"
 #: contrib/admin/templates/admin_doc/model_detail.html:3
 #: contrib/admin/templates/admin_doc/index.html:4
 #: contrib/admin/templates/admin_doc/model_index.html:5
+#: contrib/admin/templates/templates/admin/object_history.html:3
+#: contrib/admin/templates/templates/admin/change_list.html:4
+#: contrib/admin/templates/templates/admin/base.html:23
+#: contrib/admin/templates/templates/admin/delete_confirmation.html:3
+#: contrib/admin/templates/templates/admin/change_form.html:9
+#: contrib/admin/templates/templates/admin_doc/bookmarklets.html:4
+#: contrib/admin/templates/templates/admin_doc/view_detail.html:4
+#: contrib/admin/templates/templates/admin_doc/template_tag_index.html:5
+#: contrib/admin/templates/templates/admin_doc/template_detail.html:4
+#: contrib/admin/templates/templates/admin_doc/template_filter_index.html:5
+#: contrib/admin/templates/templates/admin_doc/missing_docutils.html:4
+#: contrib/admin/templates/templates/admin_doc/view_index.html:5
+#: contrib/admin/templates/templates/admin_doc/model_detail.html:3
+#: contrib/admin/templates/templates/admin_doc/index.html:4
+#: contrib/admin/templates/templates/admin_doc/model_index.html:5
 msgid "Change password"
 msgstr "Cambiar clave"
 
@@ -605,6 +621,21 @@ msgstr "Cambiar clave"
 #: contrib/admin/templates/admin_doc/model_detail.html:3
 #: contrib/admin/templates/admin_doc/index.html:4
 #: contrib/admin/templates/admin_doc/model_index.html:5
+#: contrib/admin/templates/templates/admin/object_history.html:3
+#: contrib/admin/templates/templates/admin/change_list.html:4
+#: contrib/admin/templates/templates/admin/base.html:23
+#: contrib/admin/templates/templates/admin/delete_confirmation.html:3
+#: contrib/admin/templates/templates/admin/change_form.html:9
+#: contrib/admin/templates/templates/admin_doc/bookmarklets.html:4
+#: contrib/admin/templates/templates/admin_doc/view_detail.html:4
+#: contrib/admin/templates/templates/admin_doc/template_tag_index.html:5
+#: contrib/admin/templates/templates/admin_doc/template_detail.html:4
+#: contrib/admin/templates/templates/admin_doc/template_filter_index.html:5
+#: contrib/admin/templates/templates/admin_doc/missing_docutils.html:4
+#: contrib/admin/templates/templates/admin_doc/view_index.html:5
+#: contrib/admin/templates/templates/admin_doc/model_detail.html:3
+#: contrib/admin/templates/templates/admin_doc/index.html:4
+#: contrib/admin/templates/templates/admin_doc/model_index.html:5
 msgid "Log out"
 msgstr "Terminar sesión"
 
@@ -619,31 +650,50 @@ msgstr "Terminar sesión"
 #: contrib/admin/templates/registration/password_reset_done.html:4
 #: contrib/admin/templates/registration/password_change_form.html:4
 #: contrib/admin/templates/admin_doc/bookmarklets.html:3
+#: contrib/admin/templates/templates/admin/object_history.html:5
+#: contrib/admin/templates/templates/admin/500.html:4
+#: contrib/admin/templates/templates/admin/change_list.html:5
+#: contrib/admin/templates/templates/admin/base.html:29
+#: contrib/admin/templates/templates/admin/change_form.html:12
+#: contrib/admin/templates/templates/registration/password_change_done.html:4
+#: contrib/admin/templates/templates/registration/password_reset_form.html:4
+#: contrib/admin/templates/templates/registration/logged_out.html:4
+#: contrib/admin/templates/templates/registration/password_reset_done.html:4
+#: contrib/admin/templates/templates/registration/password_change_form.html:4
+#: contrib/admin/templates/templates/admin_doc/bookmarklets.html:3
 msgid "Home"
 msgstr "Inicio"
 
 #: contrib/admin/templates/admin/object_history.html:5
 #: contrib/admin/templates/admin/change_form.html:19
+#: contrib/admin/templates/templates/admin/object_history.html:5
+#: contrib/admin/templates/templates/admin/change_form.html:19
 msgid "History"
 msgstr "Histórico"
 
 #: contrib/admin/templates/admin/object_history.html:18
+#: contrib/admin/templates/templates/admin/object_history.html:18
 msgid "Date/time"
 msgstr "Fecha/hora"
 
-#: contrib/admin/templates/admin/object_history.html:19 models/auth.py:47
+#: contrib/admin/templates/admin/object_history.html:19
+#: contrib/admin/templates/templates/admin/object_history.html:19
+#: models/auth.py:47
 msgid "User"
 msgstr "Usuario"
 
 #: contrib/admin/templates/admin/object_history.html:20
+#: contrib/admin/templates/templates/admin/object_history.html:20
 msgid "Action"
 msgstr "Acción"
 
 #: contrib/admin/templates/admin/object_history.html:26
+#: contrib/admin/templates/templates/admin/object_history.html:26
 msgid "DATE_WITH_TIME_FULL"
 msgstr ""
 
 #: contrib/admin/templates/admin/object_history.html:36
+#: contrib/admin/templates/templates/admin/object_history.html:36
 msgid ""
 "This object doesn't have a change history. It probably wasn't added via this "
 "admin site."
@@ -652,26 +702,32 @@ msgstr ""
 "usando este sitio de administración."
 
 #: contrib/admin/templates/admin/base_site.html:4
+#: contrib/admin/templates/templates/admin/base_site.html:4
 msgid "Django site admin"
 msgstr "Sitio de administración de Django"
 
 #: contrib/admin/templates/admin/base_site.html:7
+#: contrib/admin/templates/templates/admin/base_site.html:7
 msgid "Django administration"
 msgstr "Administración de Django"
 
 #: contrib/admin/templates/admin/500.html:4
+#: contrib/admin/templates/templates/admin/500.html:4
 msgid "Server error"
 msgstr "Error del servidor"
 
 #: contrib/admin/templates/admin/500.html:6
+#: contrib/admin/templates/templates/admin/500.html:6
 msgid "Server error (500)"
 msgstr "Error del servidor (500)"
 
 #: contrib/admin/templates/admin/500.html:9
+#: contrib/admin/templates/templates/admin/500.html:9
 msgid "Server Error <em>(500)</em>"
 msgstr "Error de servidor <em>(500)</em>"
 
 #: contrib/admin/templates/admin/500.html:10
+#: contrib/admin/templates/templates/admin/500.html:10
 msgid ""
 "There's been an error. It's been reported to the site administrators via e-"
 "mail and should be fixed shortly. Thanks for your patience."
@@ -682,60 +738,77 @@ msgstr ""
 
 #: contrib/admin/templates/admin/404.html:4
 #: contrib/admin/templates/admin/404.html:8
+#: contrib/admin/templates/templates/admin/404.html:4
+#: contrib/admin/templates/templates/admin/404.html:8
 msgid "Page not found"
 msgstr "Página no encontrada"
 
 #: contrib/admin/templates/admin/404.html:10
+#: contrib/admin/templates/templates/admin/404.html:10
 msgid "We're sorry, but the requested page could not be found."
 msgstr "Lo sentimos, pero no se encuentra la página solicitada."
 
 #: contrib/admin/templates/admin/index.html:27
 #: contrib/admin/templates/admin/change_form.html:14
+#: contrib/admin/templates/templates/admin/index.html:27
+#: contrib/admin/templates/templates/admin/change_form.html:14
 msgid "Add"
 msgstr "Agregar"
 
 #: contrib/admin/templates/admin/index.html:33
+#: contrib/admin/templates/widget/file.html:3
+#: contrib/admin/templates/templates/admin/index.html:33
 msgid "Change"
 msgstr "Modificar"
 
 #: contrib/admin/templates/admin/index.html:43
+#: contrib/admin/templates/templates/admin/index.html:43
 msgid "You don't have permission to edit anything."
 msgstr "No tiene permiso para editar nada."
 
 #: contrib/admin/templates/admin/index.html:51
+#: contrib/admin/templates/templates/admin/index.html:51
 msgid "Recent Actions"
 msgstr "Acciones recientes"
 
 #: contrib/admin/templates/admin/index.html:52
+#: contrib/admin/templates/templates/admin/index.html:52
 msgid "My Actions"
 msgstr "Mis acciones"
 
 #: contrib/admin/templates/admin/index.html:56
+#: contrib/admin/templates/templates/admin/index.html:56
 msgid "None available"
 msgstr "Ninguno disponible"
 
 #: contrib/admin/templates/admin/change_list.html:10
+#: contrib/admin/templates/templates/admin/change_list.html:10
 #, python-format
 msgid "Add %(name)s"
 msgstr "Agregar %(name)s"
 
 #: contrib/admin/templates/admin/login.html:15
+#: contrib/admin/templates/templates/admin/login.html:15
 msgid "Username:"
 msgstr "Usuario:"
 
 #: contrib/admin/templates/admin/login.html:18
+#: contrib/admin/templates/templates/admin/login.html:18
 msgid "Password:"
 msgstr "Clave:"
 
 #: contrib/admin/templates/admin/login.html:20
+#: contrib/admin/templates/templates/admin/login.html:20
 msgid "Have you <a href=\"/password_reset/\">forgotten your password</a>?"
 msgstr "¿Ha <a href=\"/password_reset/\">olvidado su clave</a>?"
 
 #: contrib/admin/templates/admin/base.html:23
+#: contrib/admin/templates/templates/admin/base.html:23
 msgid "Welcome,"
 msgstr "Bienvenido,"
 
 #: contrib/admin/templates/admin/delete_confirmation.html:6
+#: contrib/admin/templates/templates/admin/delete_confirmation.html:6
 #, python-format
 msgid ""
 "Deleting the %(object_name)s '%(object)s' would result in deleting related "
@@ -747,6 +820,7 @@ msgstr ""
 "siguientes tipos de objetos:"
 
 #: contrib/admin/templates/admin/delete_confirmation.html:13
+#: contrib/admin/templates/templates/admin/delete_confirmation.html:13
 #, python-format
 msgid ""
 "Are you sure you want to delete the %(object_name)s \"%(object)s\"? All of "
@@ -756,53 +830,65 @@ msgstr ""
 "borrarán los siguientes objetos relacionados:"
 
 #: contrib/admin/templates/admin/delete_confirmation.html:17
+#: contrib/admin/templates/templates/admin/delete_confirmation.html:17
 msgid "Yes, I'm sure"
 msgstr "Sí, estoy seguro"
 
 #: contrib/admin/templates/admin/filter.html:2
+#: contrib/admin/templates/templates/admin/filter.html:2
 #, python-format
 msgid " By %(title)s "
 msgstr " Por %(title)s "
 
 #: contrib/admin/templates/admin/search_form.html:7
+#: contrib/admin/templates/templates/admin/search_form.html:7
 msgid "Go"
 msgstr "Buscar"
 
 #: contrib/admin/templates/admin/change_form.html:20
+#: contrib/admin/templates/templates/admin/change_form.html:20
 msgid "View on site"
 msgstr "Ver en el sitio"
 
 #: contrib/admin/templates/admin/change_form.html:28
+#: contrib/admin/templates/templates/admin/change_form.html:28
 msgid "Please correct the error below."
 msgid_plural "Please correct the errors below."
 msgstr[0] "Por favor, corrija el siguiente error."
 msgstr[1] "Por favor, corrija los siguientes errores."
 
 #: contrib/admin/templates/admin/change_form.html:45
+#: contrib/admin/templates/templates/admin/change_form.html:45
 msgid "Ordering"
 msgstr "Ordenación"
 
 #: contrib/admin/templates/admin/change_form.html:48
+#: contrib/admin/templates/templates/admin/change_form.html:48
 msgid "Order:"
 msgstr "Orden:"
 
 #: contrib/admin/templates/admin/submit_line.html:3
+#: contrib/admin/templates/templates/admin/submit_line.html:3
 msgid "Delete"
 msgstr "Eliminar"
 
 #: contrib/admin/templates/admin/submit_line.html:4
+#: contrib/admin/templates/templates/admin/submit_line.html:4
 msgid "Save as new"
 msgstr "Grabar como nuevo"
 
 #: contrib/admin/templates/admin/submit_line.html:5
+#: contrib/admin/templates/templates/admin/submit_line.html:5
 msgid "Save and add another"
 msgstr "Grabar y añadir otro"
 
 #: contrib/admin/templates/admin/submit_line.html:6
+#: contrib/admin/templates/templates/admin/submit_line.html:6
 msgid "Save and continue editing"
 msgstr "Grabar y continuar editando"
 
 #: contrib/admin/templates/admin/submit_line.html:7
+#: contrib/admin/templates/templates/admin/submit_line.html:7
 msgid "Save"
 msgstr "Grabar"
 
@@ -810,15 +896,22 @@ msgstr "Grabar"
 #: contrib/admin/templates/registration/password_change_form.html:4
 #: contrib/admin/templates/registration/password_change_form.html:6
 #: contrib/admin/templates/registration/password_change_form.html:10
+#: contrib/admin/templates/templates/registration/password_change_done.html:4
+#: contrib/admin/templates/templates/registration/password_change_form.html:4
+#: contrib/admin/templates/templates/registration/password_change_form.html:6
+#: contrib/admin/templates/templates/registration/password_change_form.html:10
 msgid "Password change"
 msgstr "Cambio de clave"
 
 #: contrib/admin/templates/registration/password_change_done.html:6
 #: contrib/admin/templates/registration/password_change_done.html:10
+#: contrib/admin/templates/templates/registration/password_change_done.html:6
+#: contrib/admin/templates/templates/registration/password_change_done.html:10
 msgid "Password change successful"
 msgstr "Cambio de clave exitoso"
 
 #: contrib/admin/templates/registration/password_change_done.html:12
+#: contrib/admin/templates/templates/registration/password_change_done.html:12
 msgid "Your password was changed."
 msgstr "Su clave ha sido cambiada."
 
@@ -826,10 +919,15 @@ msgstr "Su clave ha sido cambiada."
 #: contrib/admin/templates/registration/password_reset_form.html:6
 #: contrib/admin/templates/registration/password_reset_form.html:10
 #: contrib/admin/templates/registration/password_reset_done.html:4
+#: contrib/admin/templates/templates/registration/password_reset_form.html:4
+#: contrib/admin/templates/templates/registration/password_reset_form.html:6
+#: contrib/admin/templates/templates/registration/password_reset_form.html:10
+#: contrib/admin/templates/templates/registration/password_reset_done.html:4
 msgid "Password reset"
 msgstr "Recuperar clave"
 
 #: contrib/admin/templates/registration/password_reset_form.html:12
+#: contrib/admin/templates/templates/registration/password_reset_form.html:12
 msgid ""
 "Forgotten your password? Enter your e-mail address below, and we'll reset "
 "your password and e-mail the new one to you."
@@ -838,27 +936,34 @@ msgstr ""
 "crearemos una nueva que le enviaremos por correo."
 
 #: contrib/admin/templates/registration/password_reset_form.html:16
+#: contrib/admin/templates/templates/registration/password_reset_form.html:16
 msgid "E-mail address:"
 msgstr "Dirección de correo electrónico:"
 
 #: contrib/admin/templates/registration/password_reset_form.html:16
+#: contrib/admin/templates/templates/registration/password_reset_form.html:16
 msgid "Reset my password"
 msgstr "Recuperar mi clave"
 
 #: contrib/admin/templates/registration/logged_out.html:8
+#: contrib/admin/templates/templates/registration/logged_out.html:8
 msgid "Thanks for spending some quality time with the Web site today."
 msgstr "Gracias por el tiempo que ha dedicado al sitio web hoy."
 
 #: contrib/admin/templates/registration/logged_out.html:10
+#: contrib/admin/templates/templates/registration/logged_out.html:10
 msgid "Log in again"
 msgstr "Identificarse de nuevo"
 
 #: contrib/admin/templates/registration/password_reset_done.html:6
 #: contrib/admin/templates/registration/password_reset_done.html:10
+#: contrib/admin/templates/templates/registration/password_reset_done.html:6
+#: contrib/admin/templates/templates/registration/password_reset_done.html:10
 msgid "Password reset successful"
 msgstr "Recuperación de clave exitosa"
 
 #: contrib/admin/templates/registration/password_reset_done.html:12
+#: contrib/admin/templates/templates/registration/password_reset_done.html:12
 msgid ""
 "We've e-mailed a new password to the e-mail address you submitted. You "
 "should be receiving it shortly."
@@ -867,6 +972,7 @@ msgstr ""
 "recibirla en breve."
 
 #: contrib/admin/templates/registration/password_change_form.html:12
+#: contrib/admin/templates/templates/registration/password_change_form.html:12
 msgid ""
 "Please enter your old password, for security's sake, and then enter your new "
 "password twice so we can verify you typed it in correctly."
@@ -875,65 +981,80 @@ msgstr ""
 "la nueva clave dos veces para verificar que la ha escrito correctamente."
 
 #: contrib/admin/templates/registration/password_change_form.html:17
+#: contrib/admin/templates/templates/registration/password_change_form.html:17
 msgid "Old password:"
 msgstr "Clave antigua:"
 
 #: contrib/admin/templates/registration/password_change_form.html:19
+#: contrib/admin/templates/templates/registration/password_change_form.html:19
 msgid "New password:"
 msgstr "Clave nueva:"
 
 #: contrib/admin/templates/registration/password_change_form.html:21
+#: contrib/admin/templates/templates/registration/password_change_form.html:21
 msgid "Confirm password:"
 msgstr "Confirme clave:"
 
 #: contrib/admin/templates/registration/password_change_form.html:23
+#: contrib/admin/templates/templates/registration/password_change_form.html:23
 msgid "Change my password"
 msgstr "Cambiar mi clave"
 
 #: contrib/admin/templates/registration/password_reset_email.html:2
+#: contrib/admin/templates/templates/registration/password_reset_email.html:2
 msgid "You're receiving this e-mail because you requested a password reset"
 msgstr "Está recibiendo este mensaje debido a que solicitó recuperar la clave"
 
 #: contrib/admin/templates/registration/password_reset_email.html:3
+#: contrib/admin/templates/templates/registration/password_reset_email.html:3
 #, python-format
 msgid "for your user account at %(site_name)s"
 msgstr "de su cuenta de usuario en %(site_name)s."
 
 #: contrib/admin/templates/registration/password_reset_email.html:5
+#: contrib/admin/templates/templates/registration/password_reset_email.html:5
 #, python-format
 msgid "Your new password is: %(new_password)s"
 msgstr "Su nueva clave es: %(new_password)s"
 
 #: contrib/admin/templates/registration/password_reset_email.html:7
+#: contrib/admin/templates/templates/registration/password_reset_email.html:7
 msgid "Feel free to change this password by going to this page:"
 msgstr "Puede cambiarla accediendo a esta página:"
 
 #: contrib/admin/templates/registration/password_reset_email.html:11
+#: contrib/admin/templates/templates/registration/password_reset_email.html:11
 msgid "Your username, in case you've forgotten:"
 msgstr "Su nombre de usuario, en caso de haberlo olvidado:"
 
 #: contrib/admin/templates/registration/password_reset_email.html:13
+#: contrib/admin/templates/templates/registration/password_reset_email.html:13
 msgid "Thanks for using our site!"
 msgstr "¡Gracias por usar nuestro sitio!"
 
 #: contrib/admin/templates/registration/password_reset_email.html:15
+#: contrib/admin/templates/templates/registration/password_reset_email.html:15
 #, python-format
 msgid "The %(site_name)s team"
 msgstr "El equipo de %(site_name)s"
 
 #: contrib/admin/templates/admin_doc/bookmarklets.html:3
+#: contrib/admin/templates/templates/admin_doc/bookmarklets.html:3
 msgid "Documentation"
 msgstr "Documentación"
 
 #: contrib/admin/templates/admin_doc/bookmarklets.html:3
+#: contrib/admin/templates/templates/admin_doc/bookmarklets.html:3
 msgid "Bookmarklets"
 msgstr "Bookmarklets"
 
 #: contrib/admin/templates/admin_doc/bookmarklets.html:5
+#: contrib/admin/templates/templates/admin_doc/bookmarklets.html:5
 msgid "Documentation bookmarklets"
 msgstr "Bookmarklets de documentación"
 
 #: contrib/admin/templates/admin_doc/bookmarklets.html:9
+#: contrib/admin/templates/templates/admin_doc/bookmarklets.html:9
 msgid ""
 "\n"
 "<p class=\"help\">To install bookmarklets, drag the link to your bookmarks\n"
@@ -954,10 +1075,12 @@ msgstr ""
 "p>\n"
 
 #: contrib/admin/templates/admin_doc/bookmarklets.html:19
+#: contrib/admin/templates/templates/admin_doc/bookmarklets.html:19
 msgid "Documentation for this page"
 msgstr "Documentación de esta página"
 
 #: contrib/admin/templates/admin_doc/bookmarklets.html:20
+#: contrib/admin/templates/templates/admin_doc/bookmarklets.html:20
 msgid ""
 "Jumps you from any page to the documentation for the view that generates "
 "that page."
@@ -965,10 +1088,12 @@ msgstr ""
 "Le lleva desde cualquier página a la documentación de la vista que la genera."
 
 #: contrib/admin/templates/admin_doc/bookmarklets.html:22
+#: contrib/admin/templates/templates/admin_doc/bookmarklets.html:22
 msgid "Show object ID"
 msgstr "Mostrar ID de objeto"
 
 #: contrib/admin/templates/admin_doc/bookmarklets.html:23
+#: contrib/admin/templates/templates/admin_doc/bookmarklets.html:23
 msgid ""
 "Shows the content-type and unique ID for pages that represent a single "
 "object."
@@ -977,41 +1102,42 @@ msgstr ""
 "único objeto."
 
 #: contrib/admin/templates/admin_doc/bookmarklets.html:25
+#: contrib/admin/templates/templates/admin_doc/bookmarklets.html:25
 msgid "Edit this object (current window)"
 msgstr "Editar este objeto (ventana actual)"
 
 #: contrib/admin/templates/admin_doc/bookmarklets.html:26
+#: contrib/admin/templates/templates/admin_doc/bookmarklets.html:26
 msgid "Jumps to the admin page for pages that represent a single object."
 msgstr ""
 "Le lleva a la página de administración de páginas que representan un único "
 "objeto."
 
 #: contrib/admin/templates/admin_doc/bookmarklets.html:28
+#: contrib/admin/templates/templates/admin_doc/bookmarklets.html:28
 msgid "Edit this object (new window)"
 msgstr "Editar este objeto (nueva ventana)"
 
 #: contrib/admin/templates/admin_doc/bookmarklets.html:29
+#: contrib/admin/templates/templates/admin_doc/bookmarklets.html:29
 msgid "As above, but opens the admin page in a new window."
 msgstr ""
 "Como antes, pero abre la página de administración en una nueva ventana."
 
 #: contrib/admin/templates/widget/date_time.html:3
+#: contrib/admin/templates/templates/widget/date_time.html:3
 msgid "Date:"
 msgstr "Fecha:"
 
 #: contrib/admin/templates/widget/date_time.html:4
+#: contrib/admin/templates/templates/widget/date_time.html:4
 #, fuzzy
 msgid "Time:"
 msgstr "Hora"
 
 #: contrib/admin/templates/widget/file.html:2
-msgid "Currently:"
-msgstr ""
-
-#: contrib/admin/templates/widget/file.html:3
-#, fuzzy
-msgid "Change:"
-msgstr "Modificar"
+msgid "Currently"
+msgstr "Actualmente"
 
 #: contrib/redirects/models/redirects.py:7
 msgid "redirect from"
@@ -1091,18 +1217,6 @@ msgstr "página estática"
 #: contrib/flatpages/models/flatpages.py:18
 msgid "flat pages"
 msgstr "páginas estáticas"
-
-#: utils/translation.py:350
-msgid "DATE_FORMAT"
-msgstr ""
-
-#: utils/translation.py:351
-msgid "DATETIME_FORMAT"
-msgstr ""
-
-#: utils/translation.py:352
-msgid "TIME_FORMAT"
-msgstr ""
 
 #: utils/dates.py:6
 msgid "Monday"
@@ -1237,6 +1351,18 @@ msgid "minute"
 msgid_plural "minutes"
 msgstr[0] "minuto"
 msgstr[1] "minutos"
+
+#: utils/translation.py:350
+msgid "DATE_FORMAT"
+msgstr ""
+
+#: utils/translation.py:351
+msgid "DATETIME_FORMAT"
+msgstr ""
+
+#: utils/translation.py:352
+msgid "TIME_FORMAT"
+msgstr ""
 
 #: models/core.py:7
 msgid "domain name"
@@ -1470,8 +1596,8 @@ msgstr "Sueco"
 msgid "Simplified Chinese"
 msgstr "Chino simplificado"
 
-#: core/formfields.py:59 core/meta/fields.py:285 core/meta/fields.py:488
-#: core/meta/fields.py:499
+#: core/formfields.py:59 core/meta/fields.py:292 core/meta/fields.py:495
+#: core/meta/fields.py:506
 msgid "This field is required."
 msgstr "Este campo es obligatorio."
 
@@ -1678,47 +1804,61 @@ msgid "Please enter a valid decimal number with at most %s total digit."
 msgid_plural ""
 "Please enter a valid decimal number with at most %s total digits."
 msgstr[0] ""
-"Por favor, introduzca un número decimal válido con al menos %s dígito total."
+"Por favor, introduzca un número decimal válido con a lo más %s dígito en "
+"total."
 msgstr[1] ""
-"Por favor, introduzca un número decimal válido con al menos %s dígitos "
-"totales."
+"Por favor, introduzca un número decimal válido con a lo más %s dígitos en "
+"total."
 
 #: core/validators.py:354
+#, fuzzy, python-format
+msgid ""
+"Please enter a valid decimal number with a whole part of at most %s digit."
+msgid_plural ""
+"Please enter a valid decimal number with a whole part of at most %s digits."
+msgstr[0] ""
+"Por favor, introduzca un número decimal válido con a lo más %s dígito en "
+"total."
+msgstr[1] ""
+"Por favor, introduzca un número decimal válido con a lo más %s dígitos en "
+"total."
+
+#: core/validators.py:357
 #, python-format
 msgid "Please enter a valid decimal number with at most %s decimal place."
 msgid_plural ""
 "Please enter a valid decimal number with at most %s decimal places."
 msgstr[0] ""
-"Por favor, introduzca un número decimal válido con al menos %s dígito "
+"Por favor, introduzca un número decimal válido con a lo más %s dígito "
 "decimal."
 msgstr[1] ""
-"Por favor, introduzca un número decimal válido con al menos %s dígitos "
+"Por favor, introduzca un número decimal válido con a lo más %s dígitos "
 "decimales."
 
-#: core/validators.py:364
+#: core/validators.py:367
 #, python-format
 msgid "Make sure your uploaded file is at least %s bytes big."
 msgstr "Asegúrese de que el fichero que envía tiene al menos %s bytes."
 
-#: core/validators.py:365
+#: core/validators.py:368
 #, python-format
 msgid "Make sure your uploaded file is at most %s bytes big."
 msgstr "Asegúrese de que el fichero que envía tiene como máximo %s bytes."
 
-#: core/validators.py:378
+#: core/validators.py:381
 msgid "The format for this field is wrong."
 msgstr "El formato de este campo es incorrecto."
 
-#: core/validators.py:393
+#: core/validators.py:396
 msgid "This field is invalid."
 msgstr "Este campo no es válido."
 
-#: core/validators.py:428
+#: core/validators.py:431
 #, python-format
 msgid "Could not retrieve anything from %s."
 msgstr "No pude obtener nada de %s."
 
-#: core/validators.py:431
+#: core/validators.py:434
 #, python-format
 msgid ""
 "The URL %(url)s returned the invalid Content-Type header '%(contenttype)s'."
@@ -1726,7 +1866,7 @@ msgstr ""
 "La URL %(url)s devolvió la cabecera Content-Type '%(contenttype)s', que no "
 "es válida."
 
-#: core/validators.py:464
+#: core/validators.py:467
 #, python-format
 msgid ""
 "Please close the unclosed %(tag)s tag from line %(line)s. (Line starts with "
@@ -1735,7 +1875,7 @@ msgstr ""
 "Por favor, cierre la etiqueta %(tag)s de la línea %(line)s. (La línea "
 "empieza por \"%(start)s\".)"
 
-#: core/validators.py:468
+#: core/validators.py:471
 #, python-format
 msgid ""
 "Some text starting on line %(line)s is not allowed in that context. (Line "
@@ -1744,7 +1884,7 @@ msgstr ""
 "Parte del texto que comienza en la línea %(line)s no está permitido en ese "
 "contexto. (La línea empieza por \"%(start)s\".)"
 
-#: core/validators.py:473
+#: core/validators.py:476
 #, python-format
 msgid ""
 "\"%(attr)s\" on line %(line)s is an invalid attribute. (Line starts with \"%"
@@ -1753,7 +1893,7 @@ msgstr ""
 "El \"%(attr)s\" de la línea %(line)s no es un atributo válido. (La línea "
 "empieza por \"%(start)s\".)"
 
-#: core/validators.py:478
+#: core/validators.py:481
 #, python-format
 msgid ""
 "\"<%(tag)s>\" on line %(line)s is an invalid tag. (Line starts with \"%"
@@ -1762,7 +1902,7 @@ msgstr ""
 "La \"<%(tag)s>\" de la línea %(line)s no es una etiqueta válida. (La línea "
 "empieza por \"%(start)s\".)"
 
-#: core/validators.py:482
+#: core/validators.py:485
 #, python-format
 msgid ""
 "A tag on line %(line)s is missing one or more required attributes. (Line "
@@ -1771,7 +1911,7 @@ msgstr ""
 "A una etiqueta de la línea %(line)s le faltan uno o más atributos "
 "requeridos. (La línea empieza por \"%(start)s\".)"
 
-#: core/validators.py:487
+#: core/validators.py:490
 #, python-format
 msgid ""
 "The \"%(attr)s\" attribute on line %(line)s has an invalid value. (Line "
@@ -1780,7 +1920,7 @@ msgstr ""
 "El atributo \"%(attr)s\" de la línea %(line)s tiene un valor que no es "
 "válido. (La línea empieza por \"%(start)s\".)"
 
-#: core/meta/__init__.py:1947
+#: core/meta/__init__.py:1946
 #, fuzzy, python-format
 msgid "%(object)s with this %(type)s already exists for the given %(field)s."
 msgstr "Ya existe %(optname)s con este %(fieldname)s."
@@ -1795,20 +1935,20 @@ msgstr "Por favor, introduzca un %s válido."
 msgid "%(optname)s with this %(fieldname)s already exists."
 msgstr "Ya existe %(optname)s con este %(fieldname)s."
 
-#: core/meta/fields.py:129
+#: core/meta/fields.py:136
 msgid " Separate multiple IDs with commas."
 msgstr " Separe múltiples IDs con comas."
 
-#: core/meta/fields.py:132
+#: core/meta/fields.py:139
 msgid ""
 " Hold down \"Control\", or \"Command\" on a Mac, to select more than one."
 msgstr "Pulse \"Control\" o \"Command\" en un Mac para escoger más de uno."
 
-#: core/meta/fields.py:508
+#: core/meta/fields.py:515
 msgid "Enter a valid filename."
 msgstr "Introduzca un nombre de fichero válido"
 
-#: core/meta/fields.py:782
+#: core/meta/fields.py:789
 #, python-format
 msgid "Please enter valid %(self)s IDs. The value %(value)r is invalid."
 msgid_plural ""
@@ -1822,4 +1962,4 @@ msgstr[1] ""
 
 #: core/template/defaultfilters.py:371
 msgid "yes,no,maybe"
-msgstr "sí,no,tal vez"
+msgstr "si,no,tal vez"
