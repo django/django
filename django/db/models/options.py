@@ -45,6 +45,7 @@ class Options:
             raise TypeError, "'class META' got invalid attribute(s): %s" % ','.join(meta_attrs.keys())
 
     def contribute_to_class(self, cls, name):
+        # TODO: Remove this self.model reference. This is a circular reference.
         self.model = cls
         cls._meta = self
         self.object_name = cls.__name__
