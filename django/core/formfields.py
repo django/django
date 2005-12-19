@@ -570,7 +570,7 @@ class CheckboxSelectMultipleField(SelectMultipleField):
         # new_data has "split" this field into several fields, so flatten it
         # back into a single list.
         data_list = []
-        for value, _ in self.choices:
+        for value, readable_value in self.choices:
             if new_data.get('%s%s' % (self.field_name, value), '') == 'on':
                 data_list.append(value)
         new_data.setlist(self.field_name, data_list)
