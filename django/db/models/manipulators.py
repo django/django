@@ -1,8 +1,11 @@
 from django.core.exceptions import ObjectDoesNotExist
+from django.core import formfields
 from django.core.formfields import Manipulator
 from django.db.models.fields import FileField, AutoField
+from django.db.models.fields.related import ManyToOne
 from django.dispatch import dispatcher
 from django.db.models import signals
+from django.utils.functional import curry
 
 def add_manipulators(sender):
     cls = sender
@@ -51,14 +54,14 @@ class AutomaticManipulator(Manipulator):
         cls.manager = model._default_manager
         cls.opts = model._meta
         for field_name_list in cls.opts.unique_together:
-            setattr(cls, 'isUnique%s' % '_'.join(field_name_list), curry(manipulator_validator_unique_together, field_name_list, opts))
+            setattr(cls, 'isUnique%s' % '_'.join(field_name_list), curry(manipulator_validator_unique_together, field_name_list, cls.opts))
         for f in cls.opts.fields:
             if f.unique_for_date:
-                setattr(cls, 'isUnique%sFor%s' % (f.name, f.unique_for_date), curry(manipulator_validator_unique_for_date, f, opts.get_field(f.unique_for_date), opts, 'date'))
+                setattr(cls, 'isUnique%sFor%s' % (f.name, f.unique_for_date), curry(manipulator_validator_unique_for_date, f, cls.opts.get_field(f.unique_for_date), cls.opts, 'date'))
             if f.unique_for_month:
-                setattr(cls, 'isUnique%sFor%s' % (f.name, f.unique_for_month), curry(manipulator_validator_unique_for_date, f, opts.get_field(f.unique_for_month), opts, 'month'))
+                setattr(cls, 'isUnique%sFor%s' % (f.name, f.unique_for_month), curry(manipulator_validator_unique_for_date, f, cls.opts.get_field(f.unique_for_month), cls.opts, 'month'))
             if f.unique_for_year:
-                setattr(cls, 'isUnique%sFor%s' % (f.name, f.unique_for_year), curry(manipulator_validator_unique_for_date, f, opts.get_field(f.unique_for_year), opts, 'year'))
+                setattr(cls, 'isUnique%sFor%s' % (f.name, f.unique_for_year), curry(manipulator_validator_unique_for_date, f, cls.opts.get_field(f.unique_for_year), cls.opts, 'year'))
     _prepare = classmethod(_prepare)
 
     def contribute_to_class(cls, other_cls, name ):
@@ -310,7 +313,6 @@ def manipulator_validator_unique_together(field_name_list, opts, self, field_dat
 
 def manipulator_validator_unique_for_date(from_field, date_field, opts, lookup_type, self, field_data, all_data):
     date_str = all_data.get(date_field.get_manipulator_field_names('')[0], None)
-    mod = opts.get_model_module()
     date_val = formfields.DateField.html2python(date_str)
     if date_val is None:
         return # Date was invalid. This will be caught by another validator.
@@ -324,7 +326,7 @@ def manipulator_validator_unique_for_date(from_field, date_field, opts, lookup_t
     if lookup_type == 'date':
         lookup_kwargs['%s__day' % date_field.name] = date_val.day
     try:
-        old_obj = mod.get_object(**lookup_kwargs)
+        old_obj = opts.model._default_manager.get_object(**lookup_kwargs)
     except ObjectDoesNotExist:
         return
     else:

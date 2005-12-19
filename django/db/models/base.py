@@ -10,6 +10,7 @@ from django.db.models import signals
 from django.dispatch import dispatcher
 from django.core.exceptions import ObjectDoesNotExist
 from django.utils.functional import curry
+from django.conf import settings
 import re
 import types
 import sys
@@ -28,20 +29,18 @@ class ModelBase(type):
 
         # Create the class.
         new_class = type.__new__(cls, name, bases, {'__module__': attrs.pop('__module__')})
-        new_class.add_to_class('_meta', 
-                                Options(attrs.pop('META', None)))
-        new_class.add_to_class('DoesNotExist', 
-                                types.ClassType('DoesNotExist', (ObjectDoesNotExist,), {}) )
-        
+        new_class.add_to_class('_meta', Options(attrs.pop('META', None)))
+        new_class.add_to_class('DoesNotExist', types.ClassType('DoesNotExist', (ObjectDoesNotExist,), {}))
+
         #Figure out the app_label by looking one level up.
         #FIXME: wrong for nested model modules
         app_package = sys.modules.get(new_class.__module__)
         app_label = app_package.__name__.replace('.models', '')
         app_label = app_label[app_label.rfind('.')+1:]
-        
+
         # Cache the app label.
         new_class._meta.app_label = app_label
-        
+
         # Add all attributes to the class.
         for obj_name, obj in attrs.items():
             new_class.add_to_class(obj_name, obj)
@@ -110,7 +109,7 @@ class Model(object):
     def add_to_class(cls, name, attribute):
         transform = attribute_transforms.get(name, None)
         if transform:
-            attribute = transform(attribute) 
+            attribute = transform(attribute)
         if hasattr(attribute, 'contribute_to_class'):
             attribute.contribute_to_class(cls, name)
         else:
@@ -121,7 +120,7 @@ class Model(object):
         # Creates some methods once self._meta has been populated.
         opts =  cls._meta
         opts._prepare()
-        
+
         if opts.order_with_respect_to:
             cls.get_next_in_order = curry(cls._get_next_or_previous_in_order, is_next=True)
             cls.get_previous_in_order = curry(cls._get_next_or_previous_in_order, is_next=False)
