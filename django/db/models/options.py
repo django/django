@@ -4,20 +4,18 @@ from django.db.models.fields import AutoField
 from django.db.models.loading import get_installed_model_modules
 from django.db.models.query import orderlist2sql
 from django.db.models.exceptions import FieldDoesNotExist
-
 from bisect import bisect
-
 import re
+
 # Calculate the module_name using a poor-man's pluralization.
 get_module_name = lambda class_name: class_name.lower() + 's'
 
 # Calculate the verbose_name by converting from InitialCaps to "lowercase with spaces".
 get_verbose_name = lambda class_name: re.sub('([A-Z])', ' \\1', class_name).lower().strip()
 
-
-default_names = ['module_name','verbose_name','verbose_name_plural','db_table','ordering', 
-                  'unique_together', 'admin','where_constraints', 'exceptions', 'permissions', 
-                  'get_latest_by','order_with_respect_to', 'module_constants']
+DEFAULT_NAMES = ('module_name', 'verbose_name', 'verbose_name_plural', 'db_table', 'ordering',
+                  'unique_together', 'admin','where_constraints', 'exceptions', 'permissions',
+                  'get_latest_by','order_with_respect_to', 'module_constants')
 
 class Options:
     def __init__(self, meta):
@@ -36,17 +34,17 @@ class Options:
         self.module_constants = {}
         self.admin = None
         self.meta = meta
-        
+
     def merge_meta(self):
         meta_attrs = self.meta.__dict__
         del meta_attrs['__module__']
         del meta_attrs['__doc__']
-        for attr_name in default_names:
+        for attr_name in DEFAULT_NAMES:
             setattr(self, attr_name, meta_attrs.pop(attr_name, getattr(self, attr_name)))
         if meta_attrs != {}:
             raise TypeError, "'class META' got invalid attribute(s): %s" % ','.join(meta_attrs.keys())
 
-    def contribute_to_class(self, cls, name):        
+    def contribute_to_class(self, cls, name):
         self.model = cls
         cls._meta = self
         self.object_name = cls.__name__
