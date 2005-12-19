@@ -65,7 +65,7 @@ class AutomaticManipulator(Manipulator):
         setattr(other_cls, name, ManipulatorDescriptor(name, cls))
     contribute_to_class = classmethod(contribute_to_class)
 
-    def __init__(self, original_object= None, follow=None):
+    def __init__(self, original_object=None, follow=None):
         self.follow = self.model._meta.get_follow(follow)
         self.fields = []
         self.original_object = original_object

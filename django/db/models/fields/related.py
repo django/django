@@ -76,8 +76,7 @@ class ForeignKey(SharedMethods, Field):
         try:
             to_name = to._meta.object_name.lower()
         except AttributeError: # to._meta doesn't exist, so it must be RECURSIVE_RELATIONSHIP_CONSTANT
-            assert isinstance(to, basestring) , """ForeignKey(%r) is invalid. First parameter to ForeignKey must be either
-                         a model, a model name, or the string %r""" % (to, RECURSIVE_RELATIONSHIP_CONSTANT)
+            assert isinstance(to, basestring), "ForeignKey(%r) is invalid. First parameter to ForeignKey must be either a model, a model name, or the string %r" % (to, RECURSIVE_RELATIONSHIP_CONSTANT)
             kwargs['verbose_name'] = kwargs.get('verbose_name', '')
         else:
             to_field = to_field or to._meta.pk.name
@@ -101,7 +100,7 @@ class ForeignKey(SharedMethods, Field):
         Field.__init__(self, **kwargs)
 
         if not self.db_index:
-                self.db_index = True
+            self.db_index = True
 
     def prepare_field_objs_and_params(self, manipulator, name_prefix):
         params = {'validator_list': self.validator_list[:]}
