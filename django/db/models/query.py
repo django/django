@@ -2,6 +2,7 @@ from django.db import backend, connection
 from django.db.models.exceptions import *
 
 LOOKUP_SEPARATOR = '__'
+
 ####################
 # HELPER FUNCTIONS #
 ####################
@@ -119,7 +120,7 @@ class Q:
     def get_sql(self, opts, table_count):
         return parse_lookup(self.kwargs.items(), opts, table_count)
 
-        
+
 def get_where_clause(lookup_type, table_prefix, field_name, value):
     if table_prefix.endswith('.'):
         table_prefix = backend.quote_name(table_prefix[:-1])+'.'

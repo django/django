@@ -142,7 +142,7 @@ class AutomaticManipulator(Manipulator):
                 obj_list.sort(lambda x, y: cmp(int(x[0]), int(y[0])))
 
                 # For each related item...
-                for _, rel_new_data in obj_list:
+                for null, rel_new_data in obj_list:
 
                     params = {}
 
@@ -265,7 +265,7 @@ class ModelChangeManipulator(AutomaticManipulator):
                 # Let the ObjectDoesNotExist exception propogate up.
                 lookup_kwargs = opts.one_to_one_field.rel.limit_choices_to
                 lookup_kwargs['%s__exact' % opts.one_to_one_field.rel.field_name] = obj_key
-                _ = opts.one_to_one_field.rel.to._meta.get_model_module().get_object(**lookup_kwargs)
+                null = opts.one_to_one_field.rel.to._meta.get_model_module().get_object(**lookup_kwargs)
                 params = dict([(f.attname, f.get_default()) for f in opts.fields])
                 params[opts.pk.attname] = obj_key
                 original_object = opts.get_model_module().Klass(**params)

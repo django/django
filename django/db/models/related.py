@@ -56,13 +56,13 @@ class RelatedObject(object):
 
             change = count - len(list)
             if change > 0:
-                return list + [None for _ in range(change)]
+                return list + [None for i in range(change)]
             if change < 0:
                 return list[:change]
             else: # Just right
                 return list
         else:
-            return [None for _ in range(self.field.rel.num_in_admin)]
+            return [None for i in range(self.field.rel.num_in_admin)]
 
 
     def editable_fields(self):
@@ -91,11 +91,11 @@ class RelatedObject(object):
 
     def get_manipulator_fields(self, opts, manipulator, change, follow):
         # TODO: Remove core fields stuff.
-        
+
         if manipulator.original_object:
             meth_name = 'get_%s_count' % self.get_method_name_part()
             count = getattr(manipulator.original_object, meth_name)()
-            
+
             count += self.field.rel.num_extra_on_change
             if self.field.rel.min_num_in_admin:
                 count = max(count, self.field.rel.min_num_in_admin)
