@@ -8,45 +8,13 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2005-12-14 17:23+0100\n"
+"POT-Creation-Date: 2005-12-17 22:26+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: Espen Grndhaug <espen@grindhaug.org>\n"
 "Language-Team: Norwegian\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-
-#: contrib/redirects/models/redirects.py:7
-msgid "redirect from"
-msgstr "omadresser fra"
-
-#: contrib/redirects/models/redirects.py:8
-msgid ""
-"This should be an absolute path, excluding the domain name. Example: '/"
-"events/search/'."
-msgstr ""
-"Denne burde vær en fullstendig sti, uten domene navnet. Foreksempel: '/"
-"nyheter/les/"
-
-#: contrib/redirects/models/redirects.py:9
-msgid "redirect to"
-msgstr "omadresser til"
-
-#: contrib/redirects/models/redirects.py:10
-msgid ""
-"This can be either an absolute path (as above) or a full URL starting with "
-"'http://'."
-msgstr ""
-"Denne kan enten være en fullstendig sti (som over), eller en hel "
-"internettadresse som starter med 'http://'"
-
-#: contrib/redirects/models/redirects.py:12
-msgid "redirect"
-msgstr "omadressering"
-
-#: contrib/redirects/models/redirects.py:13
-msgid "redirects"
-msgstr "omadresserelser"
 
 #: contrib/comments/models/comments.py:8
 #: contrib/comments/models/comments.py:161
@@ -324,58 +292,6 @@ msgid "The comment form didn't provide either 'preview' or 'post'"
 msgstr ""
 "Kommentar skjemaet returnerte ikke et 'forhåndsvisning' eller 'post' objekt"
 
-#: contrib/flatpages/models/flatpages.py:6 contrib/admin/views/doc.py:267
-msgid "URL"
-msgstr "Internettadresse"
-
-#: contrib/flatpages/models/flatpages.py:7
-msgid ""
-"Example: '/about/contact/'. Make sure to have leading and trailing slashes."
-msgstr ""
-"Eksempel: '/om/kontakt/'. Vær sikker på at du har en skråstrek forran og bak."
-
-#: contrib/flatpages/models/flatpages.py:8
-msgid "title"
-msgstr "tittel"
-
-#: contrib/flatpages/models/flatpages.py:9
-msgid "content"
-msgstr "innhold"
-
-#: contrib/flatpages/models/flatpages.py:10
-msgid "enable comments"
-msgstr "tillat kommentarer"
-
-#: contrib/flatpages/models/flatpages.py:11
-msgid "template name"
-msgstr "mal navn"
-
-#: contrib/flatpages/models/flatpages.py:12
-msgid ""
-"Example: 'flatpages/contact_page'. If this isn't provided, the system will "
-"use 'flatpages/default'."
-msgstr ""
-"Eksempel: 'flatfiler/kontakt_side'. Vist denne ikke denne er gitt, vill "
-"'flatfiles/default' bli brukt."
-
-#: contrib/flatpages/models/flatpages.py:13
-msgid "registration required"
-msgstr "registrering kreves"
-
-#: contrib/flatpages/models/flatpages.py:13
-msgid "If this is checked, only logged-in users will be able to view the page."
-msgstr ""
-"Vist denne er krysset av er det bare brukere som er logget inn som kan se "
-"siden."
-
-#: contrib/flatpages/models/flatpages.py:17
-msgid "flat page"
-msgstr "flatside"
-
-#: contrib/flatpages/models/flatpages.py:18
-msgid "flat pages"
-msgstr "flatsider"
-
 #: contrib/admin/filterspecs.py:40
 #, python-format
 msgid ""
@@ -651,6 +567,10 @@ msgstr "Tekst"
 msgid "Time"
 msgstr "Tid"
 
+#: contrib/admin/views/doc.py:267 contrib/flatpages/models/flatpages.py:6
+msgid "URL"
+msgstr "Internettadresse"
+
 #: contrib/admin/views/doc.py:268
 msgid "U.S. state (two uppercase letters)"
 msgstr "Stat (i USA, to store bokstaver)"
@@ -659,20 +579,11 @@ msgstr "Stat (i USA, to store bokstaver)"
 msgid "XML text"
 msgstr "XML tekst"
 
-#: contrib/admin/templates/widget/date_time.html:3
-msgid "Date:"
-msgstr ""
-
-#: contrib/admin/templates/widget/date_time.html:4
-#, fuzzy
-msgid "Time:"
-msgstr "Tid"
-
 #: contrib/admin/templates/admin/object_history.html:3
 #: contrib/admin/templates/admin/change_list.html:4
-#: contrib/admin/templates/admin/change_form.html:9
 #: contrib/admin/templates/admin/base.html:23
 #: contrib/admin/templates/admin/delete_confirmation.html:3
+#: contrib/admin/templates/admin/change_form.html:9
 #: contrib/admin/templates/admin_doc/bookmarklets.html:4
 #: contrib/admin/templates/admin_doc/view_detail.html:4
 #: contrib/admin/templates/admin_doc/template_tag_index.html:5
@@ -688,9 +599,9 @@ msgstr "Endre passord"
 
 #: contrib/admin/templates/admin/object_history.html:3
 #: contrib/admin/templates/admin/change_list.html:4
-#: contrib/admin/templates/admin/change_form.html:9
 #: contrib/admin/templates/admin/base.html:23
 #: contrib/admin/templates/admin/delete_confirmation.html:3
+#: contrib/admin/templates/admin/change_form.html:9
 #: contrib/admin/templates/admin_doc/bookmarklets.html:4
 #: contrib/admin/templates/admin_doc/view_detail.html:4
 #: contrib/admin/templates/admin_doc/template_tag_index.html:5
@@ -705,10 +616,10 @@ msgid "Log out"
 msgstr "Log ut"
 
 #: contrib/admin/templates/admin/object_history.html:5
-#: contrib/admin/templates/admin/change_list.html:5
 #: contrib/admin/templates/admin/500.html:4
-#: contrib/admin/templates/admin/change_form.html:12
+#: contrib/admin/templates/admin/change_list.html:5
 #: contrib/admin/templates/admin/base.html:29
+#: contrib/admin/templates/admin/change_form.html:12
 #: contrib/admin/templates/registration/password_change_done.html:4
 #: contrib/admin/templates/registration/password_reset_form.html:4
 #: contrib/admin/templates/registration/logged_out.html:4
@@ -747,15 +658,13 @@ msgstr ""
 "Dette objektet har ingen endrings historie. Den var sannsynligvis ikke laget "
 "via denne siden"
 
-#: contrib/admin/templates/admin/change_list.html:10
-#, python-format
-msgid "Add %(name)s"
-msgstr "Legg til %(name)s"
+#: contrib/admin/templates/admin/base_site.html:4
+msgid "Django site admin"
+msgstr "Django administrasjonsside"
 
-#: contrib/admin/templates/admin/filter.html:2
-#, python-format
-msgid " By %(title)s "
-msgstr "Av %(title)s "
+#: contrib/admin/templates/admin/base_site.html:7
+msgid "Django administration"
+msgstr "Django administrasjon"
 
 #: contrib/admin/templates/admin/500.html:4
 msgid "Server error"
@@ -777,17 +686,14 @@ msgstr ""
 "Det har vært en feil. Feilen er blitt rapportert til administrator via e-"
 "mail, og vill bli fikset snart. Takk for din tålmodighet."
 
-#: contrib/admin/templates/admin/search_form.html:7
-msgid "Go"
-msgstr ""
+#: contrib/admin/templates/admin/404.html:4
+#: contrib/admin/templates/admin/404.html:8
+msgid "Page not found"
+msgstr "Fant ikke siden"
 
-#: contrib/admin/templates/admin/base_site.html:4
-msgid "Django site admin"
-msgstr "Django administrasjonsside"
-
-#: contrib/admin/templates/admin/base_site.html:7
-msgid "Django administration"
-msgstr "Django administrasjon"
+#: contrib/admin/templates/admin/404.html:10
+msgid "We're sorry, but the requested page could not be found."
+msgstr "Beklager, men siden du spør etter finnest ikke."
 
 #: contrib/admin/templates/admin/index.html:27
 #: contrib/admin/templates/admin/change_form.html:14
@@ -814,14 +720,10 @@ msgstr "Mine handlinger"
 msgid "None available"
 msgstr "Ingen tilgjengelige"
 
-#: contrib/admin/templates/admin/404.html:4
-#: contrib/admin/templates/admin/404.html:8
-msgid "Page not found"
-msgstr "Fant ikke siden"
-
-#: contrib/admin/templates/admin/404.html:10
-msgid "We're sorry, but the requested page could not be found."
-msgstr "Beklager, men siden du spør etter finnest ikke."
+#: contrib/admin/templates/admin/change_list.html:10
+#, python-format
+msgid "Add %(name)s"
+msgstr "Legg til %(name)s"
 
 #: contrib/admin/templates/admin/login.html:15
 msgid "Username:"
@@ -834,24 +736,6 @@ msgstr "Passord:"
 #: contrib/admin/templates/admin/login.html:20
 msgid "Have you <a href=\"/password_reset/\">forgotten your password</a>?"
 msgstr "Har du <a href=\"/password_reset/\">glemt passordet ditt</a>?"
-
-#: contrib/admin/templates/admin/change_form.html:20
-msgid "View on site"
-msgstr "Vis på siden"
-
-#: contrib/admin/templates/admin/change_form.html:28
-msgid "Please correct the error below."
-msgid_plural "Please correct the errors below."
-msgstr[0] "Vennligst fiks feilen under."
-msgstr[1] "Vennligst fiks feilene under."
-
-#: contrib/admin/templates/admin/change_form.html:45
-msgid "Ordering"
-msgstr "Rekkefølge"
-
-#: contrib/admin/templates/admin/change_form.html:48
-msgid "Order:"
-msgstr "Rekkefølge:"
 
 #: contrib/admin/templates/admin/base.html:23
 msgid "Welcome,"
@@ -879,6 +763,33 @@ msgstr ""
 #: contrib/admin/templates/admin/delete_confirmation.html:17
 msgid "Yes, I'm sure"
 msgstr "Ja, jeg er sikker"
+
+#: contrib/admin/templates/admin/filter.html:2
+#, python-format
+msgid " By %(title)s "
+msgstr "Av %(title)s "
+
+#: contrib/admin/templates/admin/search_form.html:7
+msgid "Go"
+msgstr ""
+
+#: contrib/admin/templates/admin/change_form.html:20
+msgid "View on site"
+msgstr "Vis på siden"
+
+#: contrib/admin/templates/admin/change_form.html:28
+msgid "Please correct the error below."
+msgid_plural "Please correct the errors below."
+msgstr[0] "Vennligst fiks feilen under."
+msgstr[1] "Vennligst fiks feilene under."
+
+#: contrib/admin/templates/admin/change_form.html:45
+msgid "Ordering"
+msgstr "Rekkefølge"
+
+#: contrib/admin/templates/admin/change_form.html:48
+msgid "Order:"
+msgstr "Rekkefølge:"
 
 #: contrib/admin/templates/admin/submit_line.html:3
 msgid "Delete"
@@ -1080,6 +991,104 @@ msgstr "Endre dette objektet (åpnes i et nytt vindu)"
 #: contrib/admin/templates/admin_doc/bookmarklets.html:29
 msgid "As above, but opens the admin page in a new window."
 msgstr "Samme som over, men åpner administrasjonsiden i et nytt vindu."
+
+#: contrib/admin/templates/widget/date_time.html:3
+msgid "Date:"
+msgstr ""
+
+#: contrib/admin/templates/widget/date_time.html:4
+#, fuzzy
+msgid "Time:"
+msgstr "Tid"
+
+#: contrib/admin/templates/widget/file.html:2
+msgid "Currently:"
+msgstr ""
+
+#: contrib/admin/templates/widget/file.html:3
+#, fuzzy
+msgid "Change:"
+msgstr "Endre"
+
+#: contrib/redirects/models/redirects.py:7
+msgid "redirect from"
+msgstr "omadresser fra"
+
+#: contrib/redirects/models/redirects.py:8
+msgid ""
+"This should be an absolute path, excluding the domain name. Example: '/"
+"events/search/'."
+msgstr ""
+"Denne burde vær en fullstendig sti, uten domene navnet. Foreksempel: '/"
+"nyheter/les/"
+
+#: contrib/redirects/models/redirects.py:9
+msgid "redirect to"
+msgstr "omadresser til"
+
+#: contrib/redirects/models/redirects.py:10
+msgid ""
+"This can be either an absolute path (as above) or a full URL starting with "
+"'http://'."
+msgstr ""
+"Denne kan enten være en fullstendig sti (som over), eller en hel "
+"internettadresse som starter med 'http://'"
+
+#: contrib/redirects/models/redirects.py:12
+msgid "redirect"
+msgstr "omadressering"
+
+#: contrib/redirects/models/redirects.py:13
+msgid "redirects"
+msgstr "omadresserelser"
+
+#: contrib/flatpages/models/flatpages.py:7
+msgid ""
+"Example: '/about/contact/'. Make sure to have leading and trailing slashes."
+msgstr ""
+"Eksempel: '/om/kontakt/'. Vær sikker på at du har en skråstrek forran og bak."
+
+#: contrib/flatpages/models/flatpages.py:8
+msgid "title"
+msgstr "tittel"
+
+#: contrib/flatpages/models/flatpages.py:9
+msgid "content"
+msgstr "innhold"
+
+#: contrib/flatpages/models/flatpages.py:10
+msgid "enable comments"
+msgstr "tillat kommentarer"
+
+#: contrib/flatpages/models/flatpages.py:11
+msgid "template name"
+msgstr "mal navn"
+
+#: contrib/flatpages/models/flatpages.py:12
+msgid ""
+"Example: 'flatpages/contact_page'. If this isn't provided, the system will "
+"use 'flatpages/default'."
+msgstr ""
+"Eksempel: 'flatfiler/kontakt_side'. Vist denne ikke denne er gitt, vill "
+"'flatfiles/default' bli brukt."
+
+#: contrib/flatpages/models/flatpages.py:13
+msgid "registration required"
+msgstr "registrering kreves"
+
+#: contrib/flatpages/models/flatpages.py:13
+msgid "If this is checked, only logged-in users will be able to view the page."
+msgstr ""
+"Vist denne er krysset av er det bare brukere som er logget inn som kan se "
+"siden."
+
+#: contrib/flatpages/models/flatpages.py:17
+msgid "flat page"
+msgstr "flatside"
+
+#: contrib/flatpages/models/flatpages.py:18
+msgid "flat pages"
+msgstr "flatsider"
 
 #: utils/translation.py:350
 msgid "DATE_FORMAT"
@@ -1766,7 +1775,7 @@ msgstr ""
 "\"%(attr)s\" tillegg på linje $(line)s har en ikke godkjent verdi. (Linja "
 "starter med \"%(start)s\".)"
 
-#: core/meta/__init__.py:1946
+#: core/meta/__init__.py:1947
 #, fuzzy, python-format
 msgid "%(object)s with this %(type)s already exists for the given %(field)s."
 msgstr "$(optname)s med %(fieldname)s finnes allerede."
@@ -1804,7 +1813,7 @@ msgid_plural ""
 msgstr[0] ""
 msgstr[1] ""
 
-#: core/template/defaultfilters.py:354
+#: core/template/defaultfilters.py:371
 msgid "yes,no,maybe"
 msgstr ""
 

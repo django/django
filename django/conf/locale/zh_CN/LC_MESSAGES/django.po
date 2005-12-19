@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django v1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2005-12-14 17:21+0100\n"
+"POT-Creation-Date: 2005-12-17 22:25+0100\n"
 "PO-Revision-Date: 2005-12-10 22:08+0800\n"
 "Last-Translator: Hiweed Leng <hiweed@gmail.com>\n"
 "Language-Team: Simplified Chinese <limodou@gmail.com>\n"
@@ -18,34 +18,6 @@ msgstr ""
 "X-Poedit-Country: CHINA\n"
 "X-Poedit-SourceCharset: utf-8\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-
-#: contrib/redirects/models/redirects.py:7
-msgid "redirect from"
-msgstr "重定向自"
-
-#: contrib/redirects/models/redirects.py:8
-msgid ""
-"This should be an absolute path, excluding the domain name. Example: '/"
-"events/search/'."
-msgstr "应该是一个绝对路径，不包括域名。例如：'/events/search/'。"
-
-#: contrib/redirects/models/redirects.py:9
-msgid "redirect to"
-msgstr "重定向到"
-
-#: contrib/redirects/models/redirects.py:10
-msgid ""
-"This can be either an absolute path (as above) or a full URL starting with "
-"'http://'."
-msgstr "可以是绝对路径(同上)或以'http://'开始的全URL。"
-
-#: contrib/redirects/models/redirects.py:12
-msgid "redirect"
-msgstr "重定向"
-
-#: contrib/redirects/models/redirects.py:13
-msgid "redirects"
-msgstr "重定向"
 
 #: contrib/comments/models/comments.py:8
 #: contrib/comments/models/comments.py:161
@@ -307,54 +279,6 @@ msgstr "评论表格有一个无效的 'target' 参数 -- 对象 ID 无效"
 #: contrib/comments/views/comments.py:318
 msgid "The comment form didn't provide either 'preview' or 'post'"
 msgstr "评论表格无法提供 '预览' 或 '张贴' 功能"
-
-#: contrib/flatpages/models/flatpages.py:6 contrib/admin/views/doc.py:267
-msgid "URL"
-msgstr "URL"
-
-#: contrib/flatpages/models/flatpages.py:7
-msgid ""
-"Example: '/about/contact/'. Make sure to have leading and trailing slashes."
-msgstr "例如：'/about/contact/'。请确保前导和结尾的除号。"
-
-#: contrib/flatpages/models/flatpages.py:8
-msgid "title"
-msgstr "标题"
-
-#: contrib/flatpages/models/flatpages.py:9
-msgid "content"
-msgstr "内容"
-
-#: contrib/flatpages/models/flatpages.py:10
-msgid "enable comments"
-msgstr "允许评论"
-
-#: contrib/flatpages/models/flatpages.py:11
-msgid "template name"
-msgstr "模板名称"
-
-#: contrib/flatpages/models/flatpages.py:12
-msgid ""
-"Example: 'flatpages/contact_page'. If this isn't provided, the system will "
-"use 'flatpages/default'."
-msgstr ""
-"例如：'flatfiles/contact_page'。如果未提供，系统将使用'flatfiles/default'。"
-
-#: contrib/flatpages/models/flatpages.py:13
-msgid "registration required"
-msgstr "请先注册"
-
-#: contrib/flatpages/models/flatpages.py:13
-msgid "If this is checked, only logged-in users will be able to view the page."
-msgstr "如果被选中，仅登录用户才可以查看此页。"
-
-#: contrib/flatpages/models/flatpages.py:17
-msgid "flat page"
-msgstr "简单页面"
-
-#: contrib/flatpages/models/flatpages.py:18
-msgid "flat pages"
-msgstr "简单页面"
 
 #: contrib/admin/filterspecs.py:40
 #, python-format
@@ -622,6 +546,10 @@ msgstr "文本"
 msgid "Time"
 msgstr "时间"
 
+#: contrib/admin/views/doc.py:267 contrib/flatpages/models/flatpages.py:6
+msgid "URL"
+msgstr "URL"
+
 #: contrib/admin/views/doc.py:268
 msgid "U.S. state (two uppercase letters)"
 msgstr "美国州名(两个大写字母)"
@@ -630,19 +558,11 @@ msgstr "美国州名(两个大写字母)"
 msgid "XML text"
 msgstr "XML文本"
 
-#: contrib/admin/templates/widget/date_time.html:3
-msgid "Date:"
-msgstr "日期："
-
-#: contrib/admin/templates/widget/date_time.html:4
-msgid "Time:"
-msgstr "时间："
-
 #: contrib/admin/templates/admin/object_history.html:3
 #: contrib/admin/templates/admin/change_list.html:4
-#: contrib/admin/templates/admin/change_form.html:9
 #: contrib/admin/templates/admin/base.html:23
 #: contrib/admin/templates/admin/delete_confirmation.html:3
+#: contrib/admin/templates/admin/change_form.html:9
 #: contrib/admin/templates/admin_doc/bookmarklets.html:4
 #: contrib/admin/templates/admin_doc/view_detail.html:4
 #: contrib/admin/templates/admin_doc/template_tag_index.html:5
@@ -658,9 +578,9 @@ msgstr "修改口令"
 
 #: contrib/admin/templates/admin/object_history.html:3
 #: contrib/admin/templates/admin/change_list.html:4
-#: contrib/admin/templates/admin/change_form.html:9
 #: contrib/admin/templates/admin/base.html:23
 #: contrib/admin/templates/admin/delete_confirmation.html:3
+#: contrib/admin/templates/admin/change_form.html:9
 #: contrib/admin/templates/admin_doc/bookmarklets.html:4
 #: contrib/admin/templates/admin_doc/view_detail.html:4
 #: contrib/admin/templates/admin_doc/template_tag_index.html:5
@@ -675,10 +595,10 @@ msgid "Log out"
 msgstr "注销"
 
 #: contrib/admin/templates/admin/object_history.html:5
-#: contrib/admin/templates/admin/change_list.html:5
 #: contrib/admin/templates/admin/500.html:4
-#: contrib/admin/templates/admin/change_form.html:12
+#: contrib/admin/templates/admin/change_list.html:5
 #: contrib/admin/templates/admin/base.html:29
+#: contrib/admin/templates/admin/change_form.html:12
 #: contrib/admin/templates/registration/password_change_done.html:4
 #: contrib/admin/templates/registration/password_reset_form.html:4
 #: contrib/admin/templates/registration/logged_out.html:4
@@ -715,15 +635,13 @@ msgid ""
 "admin site."
 msgstr "此对象没有修改历史。可能不能通过这个管理站点来增加。"
 
-#: contrib/admin/templates/admin/change_list.html:10
-#, python-format
-msgid "Add %(name)s"
-msgstr "增加 %(name)s"
+#: contrib/admin/templates/admin/base_site.html:4
+msgid "Django site admin"
+msgstr "Django管理站点"
 
-#: contrib/admin/templates/admin/filter.html:2
-#, python-format
-msgid " By %(title)s "
-msgstr " 由 %(title)s"
+#: contrib/admin/templates/admin/base_site.html:7
+msgid "Django administration"
+msgstr "Django管理员"
 
 #: contrib/admin/templates/admin/500.html:4
 msgid "Server error"
@@ -745,17 +663,14 @@ msgstr ""
 "存在一个错误。它已经通过电子邮件被报告给站点管理员了，并且应该很快被改正。谢"
 "谢你的关心。"
 
-#: contrib/admin/templates/admin/search_form.html:7
-msgid "Go"
-msgstr "去"
+#: contrib/admin/templates/admin/404.html:4
+#: contrib/admin/templates/admin/404.html:8
+msgid "Page not found"
+msgstr "页面没有找到"
 
-#: contrib/admin/templates/admin/base_site.html:4
-msgid "Django site admin"
-msgstr "Django管理站点"
-
-#: contrib/admin/templates/admin/base_site.html:7
-msgid "Django administration"
-msgstr "Django管理员"
+#: contrib/admin/templates/admin/404.html:10
+msgid "We're sorry, but the requested page could not be found."
+msgstr "很报歉，请求页面无法找到。"
 
 #: contrib/admin/templates/admin/index.html:27
 #: contrib/admin/templates/admin/change_form.html:14
@@ -782,14 +697,10 @@ msgstr "我的动作"
 msgid "None available"
 msgstr "无可用的"
 
-#: contrib/admin/templates/admin/404.html:4
-#: contrib/admin/templates/admin/404.html:8
-msgid "Page not found"
-msgstr "页面没有找到"
-
-#: contrib/admin/templates/admin/404.html:10
-msgid "We're sorry, but the requested page could not be found."
-msgstr "很报歉，请求页面无法找到。"
+#: contrib/admin/templates/admin/change_list.html:10
+#, python-format
+msgid "Add %(name)s"
+msgstr "增加 %(name)s"
 
 #: contrib/admin/templates/admin/login.html:15
 msgid "Username:"
@@ -802,23 +713,6 @@ msgstr "口令："
 #: contrib/admin/templates/admin/login.html:20
 msgid "Have you <a href=\"/password_reset/\">forgotten your password</a>?"
 msgstr "<a href=\"/password_reset/\">忘记你的密码</a>？"
-
-#: contrib/admin/templates/admin/change_form.html:20
-msgid "View on site"
-msgstr "在站点上查看"
-
-#: contrib/admin/templates/admin/change_form.html:28
-msgid "Please correct the error below."
-msgid_plural "Please correct the errors below."
-msgstr[0] "请改正下面的错误。"
-
-#: contrib/admin/templates/admin/change_form.html:45
-msgid "Ordering"
-msgstr "排序中"
-
-#: contrib/admin/templates/admin/change_form.html:48
-msgid "Order:"
-msgstr "排序："
 
 #: contrib/admin/templates/admin/base.html:23
 msgid "Welcome,"
@@ -845,6 +739,32 @@ msgstr ""
 #: contrib/admin/templates/admin/delete_confirmation.html:17
 msgid "Yes, I'm sure"
 msgstr "是的，我确定"
+
+#: contrib/admin/templates/admin/filter.html:2
+#, python-format
+msgid " By %(title)s "
+msgstr " 由 %(title)s"
+
+#: contrib/admin/templates/admin/search_form.html:7
+msgid "Go"
+msgstr "去"
+
+#: contrib/admin/templates/admin/change_form.html:20
+msgid "View on site"
+msgstr "在站点上查看"
+
+#: contrib/admin/templates/admin/change_form.html:28
+msgid "Please correct the error below."
+msgid_plural "Please correct the errors below."
+msgstr[0] "请改正下面的错误。"
+
+#: contrib/admin/templates/admin/change_form.html:45
+msgid "Ordering"
+msgstr "排序中"
+
+#: contrib/admin/templates/admin/change_form.html:48
+msgid "Order:"
+msgstr "排序："
 
 #: contrib/admin/templates/admin/submit_line.html:3
 msgid "Delete"
@@ -1045,6 +965,95 @@ msgstr "编辑本对象(新窗口)"
 #: contrib/admin/templates/admin_doc/bookmarklets.html:29
 msgid "As above, but opens the admin page in a new window."
 msgstr "同上，但在新窗口中打开管理页面。"
+
+#: contrib/admin/templates/widget/date_time.html:3
+msgid "Date:"
+msgstr "日期："
+
+#: contrib/admin/templates/widget/date_time.html:4
+msgid "Time:"
+msgstr "时间："
+
+#: contrib/admin/templates/widget/file.html:2
+msgid "Currently:"
+msgstr ""
+
+#: contrib/admin/templates/widget/file.html:3
+#, fuzzy
+msgid "Change:"
+msgstr "修改"
+
+#: contrib/redirects/models/redirects.py:7
+msgid "redirect from"
+msgstr "重定向自"
+
+#: contrib/redirects/models/redirects.py:8
+msgid ""
+"This should be an absolute path, excluding the domain name. Example: '/"
+"events/search/'."
+msgstr "应该是一个绝对路径，不包括域名。例如：'/events/search/'。"
+
+#: contrib/redirects/models/redirects.py:9
+msgid "redirect to"
+msgstr "重定向到"
+
+#: contrib/redirects/models/redirects.py:10
+msgid ""
+"This can be either an absolute path (as above) or a full URL starting with "
+"'http://'."
+msgstr "可以是绝对路径(同上)或以'http://'开始的全URL。"
+
+#: contrib/redirects/models/redirects.py:12
+msgid "redirect"
+msgstr "重定向"
+
+#: contrib/redirects/models/redirects.py:13
+msgid "redirects"
+msgstr "重定向"
+
+#: contrib/flatpages/models/flatpages.py:7
+msgid ""
+"Example: '/about/contact/'. Make sure to have leading and trailing slashes."
+msgstr "例如：'/about/contact/'。请确保前导和结尾的除号。"
+
+#: contrib/flatpages/models/flatpages.py:8
+msgid "title"
+msgstr "标题"
+
+#: contrib/flatpages/models/flatpages.py:9
+msgid "content"
+msgstr "内容"
+
+#: contrib/flatpages/models/flatpages.py:10
+msgid "enable comments"
+msgstr "允许评论"
+
+#: contrib/flatpages/models/flatpages.py:11
+msgid "template name"
+msgstr "模板名称"
+
+#: contrib/flatpages/models/flatpages.py:12
+msgid ""
+"Example: 'flatpages/contact_page'. If this isn't provided, the system will "
+"use 'flatpages/default'."
+msgstr ""
+"例如：'flatfiles/contact_page'。如果未提供，系统将使用'flatfiles/default'。"
+
+#: contrib/flatpages/models/flatpages.py:13
+msgid "registration required"
+msgstr "请先注册"
+
+#: contrib/flatpages/models/flatpages.py:13
+msgid "If this is checked, only logged-in users will be able to view the page."
+msgstr "如果被选中，仅登录用户才可以查看此页。"
+
+#: contrib/flatpages/models/flatpages.py:17
+msgid "flat page"
+msgstr "简单页面"
+
+#: contrib/flatpages/models/flatpages.py:18
+msgid "flat pages"
+msgstr "简单页面"
 
 #: utils/translation.py:350
 msgid "DATE_FORMAT"
@@ -1704,7 +1713,7 @@ msgid ""
 msgstr ""
 "在行 %(line)s 的\"%(attr)s\"属性有一个无效的值。(行开始于 \"%(start)s\"。)"
 
-#: core/meta/__init__.py:1946
+#: core/meta/__init__.py:1947
 #, fuzzy, python-format
 msgid "%(object)s with this %(type)s already exists for the given %(field)s."
 msgstr "%(optname)s 带有 %(fieldname)s 已经存在。"
@@ -1739,7 +1748,7 @@ msgid_plural ""
 "Please enter valid %(self)s IDs. The values %(value)r are invalid."
 msgstr[0] "请输入有效的 %(self)s ID。值 %(value)r 无效。"
 
-#: core/template/defaultfilters.py:354
+#: core/template/defaultfilters.py:371
 msgid "yes,no,maybe"
 msgstr "是、否、也许"
 

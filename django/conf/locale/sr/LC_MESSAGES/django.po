@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django Serbian (latin) translation v1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2005-12-14 17:20+0100\n"
+"POT-Creation-Date: 2005-12-17 22:25+0100\n"
 "PO-Revision-Date: 2005-12-05 15:00+0100\n"
 "Last-Translator: Nebojša Đorđević <nesh@studioquattro.co.yu>\n"
 "Language-Team: Nesh <nesh@studioquatro.co.yu> & Petar <petar.maric@gmail."
@@ -16,38 +16,6 @@ msgstr ""
 "X-Poedit-Country: YUGOSLAVIA\n"
 "X-Poedit-SourceCharset: utf-8\n"
 "X-Poedit-Basepath: ../../../../\n"
-
-#: contrib/redirects/models/redirects.py:7
-msgid "redirect from"
-msgstr "redirekcija od"
-
-#: contrib/redirects/models/redirects.py:8
-msgid ""
-"This should be an absolute path, excluding the domain name. Example: '/"
-"events/search/'."
-msgstr ""
-"Ovde treba upisati apsolutnu putanju bez imena domena. Primer: '/events/"
-"search/'."
-
-#: contrib/redirects/models/redirects.py:9
-msgid "redirect to"
-msgstr "redirekcija na"
-
-#: contrib/redirects/models/redirects.py:10
-msgid ""
-"This can be either an absolute path (as above) or a full URL starting with "
-"'http://'."
-msgstr ""
-"Ovo može biti apsolutna putanja (kao gore) ili puni URL koji počinje sa "
-"'http://'."
-
-#: contrib/redirects/models/redirects.py:12
-msgid "redirect"
-msgstr "redirekcija"
-
-#: contrib/redirects/models/redirects.py:13
-msgid "redirects"
-msgstr "redirekcije"
 
 #: contrib/comments/models/comments.py:8
 #: contrib/comments/models/comments.py:161
@@ -325,61 +293,6 @@ msgstr ""
 msgid "The comment form didn't provide either 'preview' or 'post'"
 msgstr "Ovaj komentar nije koristio 'preview' ili 'post'"
 
-# nesh: ovo se valjda ne prevodi
-# petar: ne prevodi se
-#: contrib/flatpages/models/flatpages.py:6 contrib/admin/views/doc.py:267
-msgid "URL"
-msgstr "URL"
-
-#: contrib/flatpages/models/flatpages.py:7
-msgid ""
-"Example: '/about/contact/'. Make sure to have leading and trailing slashes."
-msgstr ""
-"Primer: '/about/contact/'. Proverite da li ste uneli početnu i kranju kosu "
-"crtu."
-
-#: contrib/flatpages/models/flatpages.py:8
-msgid "title"
-msgstr "naslov"
-
-#: contrib/flatpages/models/flatpages.py:9
-msgid "content"
-msgstr "sadržaj"
-
-#: contrib/flatpages/models/flatpages.py:10
-msgid "enable comments"
-msgstr "omogućite komentare"
-
-#: contrib/flatpages/models/flatpages.py:11
-msgid "template name"
-msgstr "ime templejta"
-
-#: contrib/flatpages/models/flatpages.py:12
-msgid ""
-"Example: 'flatpages/contact_page'. If this isn't provided, the system will "
-"use 'flatpages/default'."
-msgstr ""
-"Primer: 'flatpages/contact-page'. Ako nije dato sistem će koristiti "
-"flatpages/default'."
-
-#: contrib/flatpages/models/flatpages.py:13
-msgid "registration required"
-msgstr "samo za registrovane korisnike"
-
-#: contrib/flatpages/models/flatpages.py:13
-msgid "If this is checked, only logged-in users will be able to view the page."
-msgstr ""
-"Ako izaberete ovu opciju samo prijavljeni korisnici će imati pristup datoj "
-"strani."
-
-#: contrib/flatpages/models/flatpages.py:17
-msgid "flat page"
-msgstr "statična strana"
-
-#: contrib/flatpages/models/flatpages.py:18
-msgid "flat pages"
-msgstr "statične strane"
-
 #: contrib/admin/filterspecs.py:40
 #, python-format
 msgid ""
@@ -648,6 +561,12 @@ msgstr "Tekst"
 msgid "Time"
 msgstr "Vreme"
 
+# nesh: ovo se valjda ne prevodi
+# petar: ne prevodi se
+#: contrib/admin/views/doc.py:267 contrib/flatpages/models/flatpages.py:6
+msgid "URL"
+msgstr "URL"
+
 #: contrib/admin/views/doc.py:268
 msgid "U.S. state (two uppercase letters)"
 msgstr "U.S. država (dva VELIKA slova)"
@@ -656,19 +575,11 @@ msgstr "U.S. država (dva VELIKA slova)"
 msgid "XML text"
 msgstr "XML tekst"
 
-#: contrib/admin/templates/widget/date_time.html:3
-msgid "Date:"
-msgstr "Datum:"
-
-#: contrib/admin/templates/widget/date_time.html:4
-msgid "Time:"
-msgstr "Vreme:"
-
 #: contrib/admin/templates/admin/object_history.html:3
 #: contrib/admin/templates/admin/change_list.html:4
-#: contrib/admin/templates/admin/change_form.html:9
 #: contrib/admin/templates/admin/base.html:23
 #: contrib/admin/templates/admin/delete_confirmation.html:3
+#: contrib/admin/templates/admin/change_form.html:9
 #: contrib/admin/templates/admin_doc/bookmarklets.html:4
 #: contrib/admin/templates/admin_doc/view_detail.html:4
 #: contrib/admin/templates/admin_doc/template_tag_index.html:5
@@ -684,9 +595,9 @@ msgstr "Izmeni lozinku"
 
 #: contrib/admin/templates/admin/object_history.html:3
 #: contrib/admin/templates/admin/change_list.html:4
-#: contrib/admin/templates/admin/change_form.html:9
 #: contrib/admin/templates/admin/base.html:23
 #: contrib/admin/templates/admin/delete_confirmation.html:3
+#: contrib/admin/templates/admin/change_form.html:9
 #: contrib/admin/templates/admin_doc/bookmarklets.html:4
 #: contrib/admin/templates/admin_doc/view_detail.html:4
 #: contrib/admin/templates/admin_doc/template_tag_index.html:5
@@ -701,10 +612,10 @@ msgid "Log out"
 msgstr "Odjavi se"
 
 #: contrib/admin/templates/admin/object_history.html:5
-#: contrib/admin/templates/admin/change_list.html:5
 #: contrib/admin/templates/admin/500.html:4
-#: contrib/admin/templates/admin/change_form.html:12
+#: contrib/admin/templates/admin/change_list.html:5
 #: contrib/admin/templates/admin/base.html:29
+#: contrib/admin/templates/admin/change_form.html:12
 #: contrib/admin/templates/registration/password_change_done.html:4
 #: contrib/admin/templates/registration/password_reset_form.html:4
 #: contrib/admin/templates/registration/logged_out.html:4
@@ -743,15 +654,13 @@ msgstr ""
 "Ovaj objekat nema istoriju promena. Najverovatnije nije dodat korišćenjem "
 "administracije sajta."
 
-#: contrib/admin/templates/admin/change_list.html:10
-#, python-format
-msgid "Add %(name)s"
-msgstr "Dodaj %(name)s"
+#: contrib/admin/templates/admin/base_site.html:4
+msgid "Django site admin"
+msgstr "Django administracija sajta"
 
-#: contrib/admin/templates/admin/filter.html:2
-#, python-format
-msgid " By %(title)s "
-msgstr "Po %(title)s "
+#: contrib/admin/templates/admin/base_site.html:7
+msgid "Django administration"
+msgstr "Django administracija"
 
 #: contrib/admin/templates/admin/500.html:4
 msgid "Server error"
@@ -773,17 +682,14 @@ msgstr ""
 "Dogodila se greška koja je prijavljena administratorima i biće popravljena "
 "uskoro. Hvala Vam na strpljenju."
 
-#: contrib/admin/templates/admin/search_form.html:7
-msgid "Go"
-msgstr "Uradi"
+#: contrib/admin/templates/admin/404.html:4
+#: contrib/admin/templates/admin/404.html:8
+msgid "Page not found"
+msgstr "Strana nije pronađena"
 
-#: contrib/admin/templates/admin/base_site.html:4
-msgid "Django site admin"
-msgstr "Django administracija sajta"
-
-#: contrib/admin/templates/admin/base_site.html:7
-msgid "Django administration"
-msgstr "Django administracija"
+#: contrib/admin/templates/admin/404.html:10
+msgid "We're sorry, but the requested page could not be found."
+msgstr "Tražena strana ne postoji."
 
 #: contrib/admin/templates/admin/index.html:27
 #: contrib/admin/templates/admin/change_form.html:14
@@ -810,14 +716,10 @@ msgstr "Moje akcije"
 msgid "None available"
 msgstr "Nema dostupnih"
 
-#: contrib/admin/templates/admin/404.html:4
-#: contrib/admin/templates/admin/404.html:8
-msgid "Page not found"
-msgstr "Strana nije pronađena"
-
-#: contrib/admin/templates/admin/404.html:10
-msgid "We're sorry, but the requested page could not be found."
-msgstr "Tražena strana ne postoji."
+#: contrib/admin/templates/admin/change_list.html:10
+#, python-format
+msgid "Add %(name)s"
+msgstr "Dodaj %(name)s"
 
 #: contrib/admin/templates/admin/login.html:15
 msgid "Username:"
@@ -830,25 +732,6 @@ msgstr "Lozinka:"
 #: contrib/admin/templates/admin/login.html:20
 msgid "Have you <a href=\"/password_reset/\">forgotten your password</a>?"
 msgstr "Da li ste <a href=\"/password_reset/\">zaboravili Vašu lozinku?</a>?"
-
-#: contrib/admin/templates/admin/change_form.html:20
-msgid "View on site"
-msgstr "Pogledaj na sajtu"
-
-#: contrib/admin/templates/admin/change_form.html:28
-msgid "Please correct the error below."
-msgid_plural "Please correct the errors below."
-msgstr[0] "Ispravite dole navedenu grešku."
-msgstr[1] "Ispravite dole navedene greške."
-msgstr[2] "Ispravite dole navedene greške."
-
-#: contrib/admin/templates/admin/change_form.html:45
-msgid "Ordering"
-msgstr "Redosled"
-
-#: contrib/admin/templates/admin/change_form.html:48
-msgid "Order:"
-msgstr "Red:"
 
 #: contrib/admin/templates/admin/base.html:23
 msgid "Welcome,"
@@ -876,6 +759,34 @@ msgstr ""
 #: contrib/admin/templates/admin/delete_confirmation.html:17
 msgid "Yes, I'm sure"
 msgstr "Da, siguran sam"
+
+#: contrib/admin/templates/admin/filter.html:2
+#, python-format
+msgid " By %(title)s "
+msgstr "Po %(title)s "
+
+#: contrib/admin/templates/admin/search_form.html:7
+msgid "Go"
+msgstr "Uradi"
+
+#: contrib/admin/templates/admin/change_form.html:20
+msgid "View on site"
+msgstr "Pogledaj na sajtu"
+
+#: contrib/admin/templates/admin/change_form.html:28
+msgid "Please correct the error below."
+msgid_plural "Please correct the errors below."
+msgstr[0] "Ispravite dole navedenu grešku."
+msgstr[1] "Ispravite dole navedene greške."
+msgstr[2] "Ispravite dole navedene greške."
+
+#: contrib/admin/templates/admin/change_form.html:45
+msgid "Ordering"
+msgstr "Redosled"
+
+#: contrib/admin/templates/admin/change_form.html:48
+msgid "Order:"
+msgstr "Red:"
 
 #: contrib/admin/templates/admin/submit_line.html:3
 msgid "Delete"
@@ -1081,6 +992,104 @@ msgstr "Izmeni objekt (novi prozor)"
 #: contrib/admin/templates/admin_doc/bookmarklets.html:29
 msgid "As above, but opens the admin page in a new window."
 msgstr "Kao iznad, samo otvara admin stranu u novom prozoru."
+
+#: contrib/admin/templates/widget/date_time.html:3
+msgid "Date:"
+msgstr "Datum:"
+
+#: contrib/admin/templates/widget/date_time.html:4
+msgid "Time:"
+msgstr "Vreme:"
+
+#: contrib/admin/templates/widget/file.html:2
+msgid "Currently:"
+msgstr ""
+
+#: contrib/admin/templates/widget/file.html:3
+#, fuzzy
+msgid "Change:"
+msgstr "Izmena"
+
+#: contrib/redirects/models/redirects.py:7
+msgid "redirect from"
+msgstr "redirekcija od"
+
+#: contrib/redirects/models/redirects.py:8
+msgid ""
+"This should be an absolute path, excluding the domain name. Example: '/"
+"events/search/'."
+msgstr ""
+"Ovde treba upisati apsolutnu putanju bez imena domena. Primer: '/events/"
+"search/'."
+
+#: contrib/redirects/models/redirects.py:9
+msgid "redirect to"
+msgstr "redirekcija na"
+
+#: contrib/redirects/models/redirects.py:10
+msgid ""
+"This can be either an absolute path (as above) or a full URL starting with "
+"'http://'."
+msgstr ""
+"Ovo može biti apsolutna putanja (kao gore) ili puni URL koji počinje sa "
+"'http://'."
+
+#: contrib/redirects/models/redirects.py:12
+msgid "redirect"
+msgstr "redirekcija"
+
+#: contrib/redirects/models/redirects.py:13
+msgid "redirects"
+msgstr "redirekcije"
+
+#: contrib/flatpages/models/flatpages.py:7
+msgid ""
+"Example: '/about/contact/'. Make sure to have leading and trailing slashes."
+msgstr ""
+"Primer: '/about/contact/'. Proverite da li ste uneli početnu i kranju kosu "
+"crtu."
+
+#: contrib/flatpages/models/flatpages.py:8
+msgid "title"
+msgstr "naslov"
+
+#: contrib/flatpages/models/flatpages.py:9
+msgid "content"
+msgstr "sadržaj"
+
+#: contrib/flatpages/models/flatpages.py:10
+msgid "enable comments"
+msgstr "omogućite komentare"
+
+#: contrib/flatpages/models/flatpages.py:11
+msgid "template name"
+msgstr "ime templejta"
+
+#: contrib/flatpages/models/flatpages.py:12
+msgid ""
+"Example: 'flatpages/contact_page'. If this isn't provided, the system will "
+"use 'flatpages/default'."
+msgstr ""
+"Primer: 'flatpages/contact-page'. Ako nije dato sistem će koristiti "
+"flatpages/default'."
+
+#: contrib/flatpages/models/flatpages.py:13
+msgid "registration required"
+msgstr "samo za registrovane korisnike"
+
+#: contrib/flatpages/models/flatpages.py:13
+msgid "If this is checked, only logged-in users will be able to view the page."
+msgstr ""
+"Ako izaberete ovu opciju samo prijavljeni korisnici će imati pristup datoj "
+"strani."
+
+#: contrib/flatpages/models/flatpages.py:17
+msgid "flat page"
+msgstr "statična strana"
+
+#: contrib/flatpages/models/flatpages.py:18
+msgid "flat pages"
+msgstr "statične strane"
 
 #: utils/translation.py:350
 msgid "DATE_FORMAT"
@@ -1771,7 +1780,7 @@ msgstr ""
 "Atribut \"%(attr)s\" u redu %(line)s ima neispravnu vrednost. (Red počinje "
 "sa \"%(start)s\".)"
 
-#: core/meta/__init__.py:1946
+#: core/meta/__init__.py:1947
 #, fuzzy, python-format
 msgid "%(object)s with this %(type)s already exists for the given %(field)s."
 msgstr "%(optname)s sa ovim %(fieldname)s već postoji."
@@ -1810,7 +1819,7 @@ msgstr[0] "Unesite validne %(self)s ID-ove. Vrednost %(value)r je neispravna."
 msgstr[1] "Unesite validne %(self)s ID-ove. Vrednost %(value)r je neispravna."
 msgstr[2] "Unesite validne %(self)s ID-ove. Vrednost %(value)r je neispravna."
 
-#: core/template/defaultfilters.py:354
+#: core/template/defaultfilters.py:371
 msgid "yes,no,maybe"
 msgstr "da,ne,možda"
 

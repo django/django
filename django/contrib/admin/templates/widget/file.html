@@ -1,4 +1,4 @@
-{% load admin_modify %}{% if bound_field.original_value %}
-Currently: <a href="{{ bound_field.original_url }}" > {{ bound_field.original_value }} </a><br />
-Change: {% output_all bound_field.form_fields %}
+{% load admin_modify i18n %}{% if bound_field.original_value %}
+{% trans "Currently:" %} <a href="{{ bound_field.original_url }}" > {{ bound_field.original_value }} </a><br />
+{% trans "Change:" %}{% output_all bound_field.form_fields %}
 {% else %} {% output_all bound_field.form_fields %} {% endif %}

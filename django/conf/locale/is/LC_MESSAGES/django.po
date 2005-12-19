@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2005-12-14 17:22+0100\n"
+"POT-Creation-Date: 2005-12-17 22:27+0100\n"
 "PO-Revision-Date: 2005-11-13 18:08-0000\n"
 "Last-Translator: Dagur Páll Ammendrup <dagurp@gmail.com>\n"
 "Language-Team:  <dagurp@gmail.com>\n"
@@ -17,36 +17,6 @@ msgstr ""
 "X-Poedit-Language: Icelandic\n"
 "X-Poedit-Country: ICELAND\n"
 "Plural-Forms: nplurals=2; plural=n != 1\n"
-
-#: contrib/redirects/models/redirects.py:7
-msgid "redirect from"
-msgstr "beina frá"
-
-#: contrib/redirects/models/redirects.py:8
-msgid ""
-"This should be an absolute path, excluding the domain name. Example: '/"
-"events/search/'."
-msgstr "Þetta þarf að vera full slóð án lénsins. Dæmi: '/events/search/'."
-
-#: contrib/redirects/models/redirects.py:9
-msgid "redirect to"
-msgstr "beina til"
-
-#: contrib/redirects/models/redirects.py:10
-msgid ""
-"This can be either an absolute path (as above) or a full URL starting with "
-"'http://'."
-msgstr ""
-"Þetta getur verið full slóð (eins og hér að ofan) eða veffang með 'http://' "
-"fremst."
-
-#: contrib/redirects/models/redirects.py:12
-msgid "redirect"
-msgstr "beining"
-
-#: contrib/redirects/models/redirects.py:13
-msgid "redirects"
-msgstr "beiningar"
 
 #: contrib/comments/models/comments.py:8
 #: contrib/comments/models/comments.py:161
@@ -309,56 +279,6 @@ msgstr ""
 #: contrib/comments/views/comments.py:318
 msgid "The comment form didn't provide either 'preview' or 'post'"
 msgstr ""
-
-#: contrib/flatpages/models/flatpages.py:6 contrib/admin/views/doc.py:267
-msgid "URL"
-msgstr "veffang"
-
-#: contrib/flatpages/models/flatpages.py:7
-msgid ""
-"Example: '/about/contact/'. Make sure to have leading and trailing slashes."
-msgstr "Dænu: '/about/contact/'. Passaðu að hafa skástrik fremst og aftast."
-
-#: contrib/flatpages/models/flatpages.py:8
-msgid "title"
-msgstr "titill"
-
-#: contrib/flatpages/models/flatpages.py:9
-msgid "content"
-msgstr "innihald"
-
-#: contrib/flatpages/models/flatpages.py:10
-msgid "enable comments"
-msgstr "virkja athugasemdir"
-
-#: contrib/flatpages/models/flatpages.py:11
-msgid "template name"
-msgstr "nafn sniðmáts"
-
-#: contrib/flatpages/models/flatpages.py:12
-#, fuzzy
-msgid ""
-"Example: 'flatpages/contact_page'. If this isn't provided, the system will "
-"use 'flatpages/default'."
-msgstr ""
-"Dæmi: 'flatfiles/contact_page'. Ef ekkert er gefið upp mun kerfið nota "
-"'flatfiles/default'."
-
-#: contrib/flatpages/models/flatpages.py:13
-msgid "registration required"
-msgstr "skráning nauðsynleg"
-
-#: contrib/flatpages/models/flatpages.py:13
-msgid "If this is checked, only logged-in users will be able to view the page."
-msgstr "Ef þetta er valið fá bara innskráðir notendur að sjá síðuna."
-
-#: contrib/flatpages/models/flatpages.py:17
-msgid "flat page"
-msgstr "flöt síða"
-
-#: contrib/flatpages/models/flatpages.py:18
-msgid "flat pages"
-msgstr "flatar síður"
 
 #: contrib/admin/filterspecs.py:40
 #, python-format
@@ -630,6 +550,10 @@ msgstr ""
 msgid "Time"
 msgstr ""
 
+#: contrib/admin/views/doc.py:267 contrib/flatpages/models/flatpages.py:6
+msgid "URL"
+msgstr "veffang"
+
 #: contrib/admin/views/doc.py:268
 msgid "U.S. state (two uppercase letters)"
 msgstr ""
@@ -638,19 +562,11 @@ msgstr ""
 msgid "XML text"
 msgstr ""
 
-#: contrib/admin/templates/widget/date_time.html:3
-msgid "Date:"
-msgstr ""
-
-#: contrib/admin/templates/widget/date_time.html:4
-msgid "Time:"
-msgstr ""
-
 #: contrib/admin/templates/admin/object_history.html:3
 #: contrib/admin/templates/admin/change_list.html:4
-#: contrib/admin/templates/admin/change_form.html:9
 #: contrib/admin/templates/admin/base.html:23
 #: contrib/admin/templates/admin/delete_confirmation.html:3
+#: contrib/admin/templates/admin/change_form.html:9
 #: contrib/admin/templates/admin_doc/bookmarklets.html:4
 #: contrib/admin/templates/admin_doc/view_detail.html:4
 #: contrib/admin/templates/admin_doc/template_tag_index.html:5
@@ -666,9 +582,9 @@ msgstr "Breyta lykilorði"
 
 #: contrib/admin/templates/admin/object_history.html:3
 #: contrib/admin/templates/admin/change_list.html:4
-#: contrib/admin/templates/admin/change_form.html:9
 #: contrib/admin/templates/admin/base.html:23
 #: contrib/admin/templates/admin/delete_confirmation.html:3
+#: contrib/admin/templates/admin/change_form.html:9
 #: contrib/admin/templates/admin_doc/bookmarklets.html:4
 #: contrib/admin/templates/admin_doc/view_detail.html:4
 #: contrib/admin/templates/admin_doc/template_tag_index.html:5
@@ -683,10 +599,10 @@ msgid "Log out"
 msgstr "Skrá út"
 
 #: contrib/admin/templates/admin/object_history.html:5
-#: contrib/admin/templates/admin/change_list.html:5
 #: contrib/admin/templates/admin/500.html:4
-#: contrib/admin/templates/admin/change_form.html:12
+#: contrib/admin/templates/admin/change_list.html:5
 #: contrib/admin/templates/admin/base.html:29
+#: contrib/admin/templates/admin/change_form.html:12
 #: contrib/admin/templates/registration/password_change_done.html:4
 #: contrib/admin/templates/registration/password_reset_form.html:4
 #: contrib/admin/templates/registration/logged_out.html:4
@@ -725,15 +641,13 @@ msgstr ""
 "Þessi hlutur hefur enga breytingasögu. Hann var líklega ekki búinn til á "
 "þessari stjórnunarsíðu."
 
-#: contrib/admin/templates/admin/change_list.html:10
-#, fuzzy, python-format
-msgid "Add %(name)s"
-msgstr "Bæta við"
+#: contrib/admin/templates/admin/base_site.html:4
+msgid "Django site admin"
+msgstr "Django vefstjóri"
 
-#: contrib/admin/templates/admin/filter.html:2
-#, python-format
-msgid " By %(title)s "
-msgstr ""
+#: contrib/admin/templates/admin/base_site.html:7
+msgid "Django administration"
+msgstr "Django vefstjórn"
 
 #: contrib/admin/templates/admin/500.html:4
 msgid "Server error"
@@ -755,17 +669,14 @@ msgstr ""
 "Villa hefur komið upp. Hún hefur verið tilkynnt vefstjórunum með tölvupósti "
 "og ætti að verða lagað fljótlega. Þökkum þolinmæðina."
 
-#: contrib/admin/templates/admin/search_form.html:7
-msgid "Go"
-msgstr ""
+#: contrib/admin/templates/admin/404.html:4
+#: contrib/admin/templates/admin/404.html:8
+msgid "Page not found"
+msgstr "Síða fannst ekki"
 
-#: contrib/admin/templates/admin/base_site.html:4
-msgid "Django site admin"
-msgstr "Django vefstjóri"
-
-#: contrib/admin/templates/admin/base_site.html:7
-msgid "Django administration"
-msgstr "Django vefstjórn"
+#: contrib/admin/templates/admin/404.html:10
+msgid "We're sorry, but the requested page could not be found."
+msgstr "Því miður fannst umbeðin síða ekki."
 
 #: contrib/admin/templates/admin/index.html:27
 #: contrib/admin/templates/admin/change_form.html:14
@@ -792,14 +703,10 @@ msgstr "Aðgerðir mínar"
 msgid "None available"
 msgstr "Engin fáanleg"
 
-#: contrib/admin/templates/admin/404.html:4
-#: contrib/admin/templates/admin/404.html:8
-msgid "Page not found"
-msgstr "Síða fannst ekki"
-
-#: contrib/admin/templates/admin/404.html:10
-msgid "We're sorry, but the requested page could not be found."
-msgstr "Því miður fannst umbeðin síða ekki."
+#: contrib/admin/templates/admin/change_list.html:10
+#, fuzzy, python-format
+msgid "Add %(name)s"
+msgstr "Bæta við"
 
 #: contrib/admin/templates/admin/login.html:15
 msgid "Username:"
@@ -812,24 +719,6 @@ msgstr "Lykilorð:"
 #: contrib/admin/templates/admin/login.html:20
 msgid "Have you <a href=\"/password_reset/\">forgotten your password</a>?"
 msgstr "<a href=\"/password_reset/\">Gleymdir þú lykilorðinu</a> þínu?"
-
-#: contrib/admin/templates/admin/change_form.html:20
-msgid "View on site"
-msgstr ""
-
-#: contrib/admin/templates/admin/change_form.html:28
-msgid "Please correct the error below."
-msgid_plural "Please correct the errors below."
-msgstr[0] ""
-msgstr[1] ""
-
-#: contrib/admin/templates/admin/change_form.html:45
-msgid "Ordering"
-msgstr ""
-
-#: contrib/admin/templates/admin/change_form.html:48
-msgid "Order:"
-msgstr ""
 
 #: contrib/admin/templates/admin/base.html:23
 msgid "Welcome,"
@@ -857,6 +746,33 @@ msgstr ""
 #: contrib/admin/templates/admin/delete_confirmation.html:17
 msgid "Yes, I'm sure"
 msgstr "Já ég er viss."
+
+#: contrib/admin/templates/admin/filter.html:2
+#, python-format
+msgid " By %(title)s "
+msgstr ""
+
+#: contrib/admin/templates/admin/search_form.html:7
+msgid "Go"
+msgstr ""
+
+#: contrib/admin/templates/admin/change_form.html:20
+msgid "View on site"
+msgstr ""
+
+#: contrib/admin/templates/admin/change_form.html:28
+msgid "Please correct the error below."
+msgid_plural "Please correct the errors below."
+msgstr[0] ""
+msgstr[1] ""
+
+#: contrib/admin/templates/admin/change_form.html:45
+msgid "Ordering"
+msgstr ""
+
+#: contrib/admin/templates/admin/change_form.html:48
+msgid "Order:"
+msgstr ""
 
 #: contrib/admin/templates/admin/submit_line.html:3
 msgid "Delete"
@@ -1056,6 +972,99 @@ msgstr ""
 #: contrib/admin/templates/admin_doc/bookmarklets.html:29
 msgid "As above, but opens the admin page in a new window."
 msgstr ""
+
+#: contrib/admin/templates/widget/date_time.html:3
+msgid "Date:"
+msgstr ""
+
+#: contrib/admin/templates/widget/date_time.html:4
+msgid "Time:"
+msgstr ""
+
+#: contrib/admin/templates/widget/file.html:2
+msgid "Currently:"
+msgstr ""
+
+#: contrib/admin/templates/widget/file.html:3
+#, fuzzy
+msgid "Change:"
+msgstr "Breyta"
+
+#: contrib/redirects/models/redirects.py:7
+msgid "redirect from"
+msgstr "beina frá"
+
+#: contrib/redirects/models/redirects.py:8
+msgid ""
+"This should be an absolute path, excluding the domain name. Example: '/"
+"events/search/'."
+msgstr "Þetta þarf að vera full slóð án lénsins. Dæmi: '/events/search/'."
+
+#: contrib/redirects/models/redirects.py:9
+msgid "redirect to"
+msgstr "beina til"
+
+#: contrib/redirects/models/redirects.py:10
+msgid ""
+"This can be either an absolute path (as above) or a full URL starting with "
+"'http://'."
+msgstr ""
+"Þetta getur verið full slóð (eins og hér að ofan) eða veffang með 'http://' "
+"fremst."
+
+#: contrib/redirects/models/redirects.py:12
+msgid "redirect"
+msgstr "beining"
+
+#: contrib/redirects/models/redirects.py:13
+msgid "redirects"
+msgstr "beiningar"
+
+#: contrib/flatpages/models/flatpages.py:7
+msgid ""
+"Example: '/about/contact/'. Make sure to have leading and trailing slashes."
+msgstr "Dænu: '/about/contact/'. Passaðu að hafa skástrik fremst og aftast."
+
+#: contrib/flatpages/models/flatpages.py:8
+msgid "title"
+msgstr "titill"
+
+#: contrib/flatpages/models/flatpages.py:9
+msgid "content"
+msgstr "innihald"
+
+#: contrib/flatpages/models/flatpages.py:10
+msgid "enable comments"
+msgstr "virkja athugasemdir"
+
+#: contrib/flatpages/models/flatpages.py:11
+msgid "template name"
+msgstr "nafn sniðmáts"
+
+#: contrib/flatpages/models/flatpages.py:12
+#, fuzzy
+msgid ""
+"Example: 'flatpages/contact_page'. If this isn't provided, the system will "
+"use 'flatpages/default'."
+msgstr ""
+"Dæmi: 'flatfiles/contact_page'. Ef ekkert er gefið upp mun kerfið nota "
+"'flatfiles/default'."
+
+#: contrib/flatpages/models/flatpages.py:13
+msgid "registration required"
+msgstr "skráning nauðsynleg"
+
+#: contrib/flatpages/models/flatpages.py:13
+msgid "If this is checked, only logged-in users will be able to view the page."
+msgstr "Ef þetta er valið fá bara innskráðir notendur að sjá síðuna."
+
+#: contrib/flatpages/models/flatpages.py:17
+msgid "flat page"
+msgstr "flöt síða"
+
+#: contrib/flatpages/models/flatpages.py:18
+msgid "flat pages"
+msgstr "flatar síður"
 
 #: utils/translation.py:350
 msgid "DATE_FORMAT"
@@ -1743,7 +1752,7 @@ msgstr ""
 "\"%(attr)s\" eigindið á línu %(line)s hefur ótækt gildi (línan hefst á \"%"
 "(start)s\")."
 
-#: core/meta/__init__.py:1946
+#: core/meta/__init__.py:1947
 #, python-format
 msgid "%(object)s with this %(type)s already exists for the given %(field)s."
 msgstr ""
@@ -1782,7 +1791,7 @@ msgid_plural ""
 msgstr[0] ""
 msgstr[1] ""
 
-#: core/template/defaultfilters.py:354
+#: core/template/defaultfilters.py:371
 msgid "yes,no,maybe"
 msgstr ""
 

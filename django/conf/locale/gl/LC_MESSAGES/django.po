@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2005-12-14 17:21+0100\n"
+"POT-Creation-Date: 2005-12-17 22:25+0100\n"
 "PO-Revision-Date: 2005-12-08 15:03+0100\n"
 "Last-Translator: Afonso Fernández Nogueira <fonzzo.django@gmail.com>\n"
 "Language-Team: Galego\n"
@@ -16,38 +16,6 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "X-Poedit-Language: Galician\n"
 "X-Poedit-SourceCharset: utf-8\n"
-
-#: contrib/redirects/models/redirects.py:7
-msgid "redirect from"
-msgstr "orixe da redirección"
-
-#: contrib/redirects/models/redirects.py:8
-msgid ""
-"This should be an absolute path, excluding the domain name. Example: '/"
-"events/search/'."
-msgstr ""
-"Debe ser unha ruta absoluta, sen o nome de dominio. Exemplo: '/events/"
-"search/'"
-
-#: contrib/redirects/models/redirects.py:9
-msgid "redirect to"
-msgstr "destino da redirección"
-
-#: contrib/redirects/models/redirects.py:10
-msgid ""
-"This can be either an absolute path (as above) or a full URL starting with "
-"'http://'."
-msgstr ""
-"Pode ser unha ruta absoluta (coma a de enriba) ou un URL completo que empece "
-"por 'http://'"
-
-#: contrib/redirects/models/redirects.py:12
-msgid "redirect"
-msgstr "redirección"
-
-#: contrib/redirects/models/redirects.py:13
-msgid "redirects"
-msgstr "redireccións"
 
 #: contrib/comments/models/comments.py:8
 #: contrib/comments/models/comments.py:161
@@ -315,56 +283,6 @@ msgstr ""
 #: contrib/comments/views/comments.py:318
 msgid "The comment form didn't provide either 'preview' or 'post'"
 msgstr "O formulario de comentario non proporciona 'preview' ou 'post'"
-
-#: contrib/flatpages/models/flatpages.py:6 contrib/admin/views/doc.py:267
-msgid "URL"
-msgstr "URL"
-
-#: contrib/flatpages/models/flatpages.py:7
-msgid ""
-"Example: '/about/contact/'. Make sure to have leading and trailing slashes."
-msgstr ""
-"Exemplo: '/about/contact/'. Lembre incluír as barras ao principio e ao final."
-
-#: contrib/flatpages/models/flatpages.py:8
-msgid "title"
-msgstr "título"
-
-#: contrib/flatpages/models/flatpages.py:9
-msgid "content"
-msgstr "contido"
-
-#: contrib/flatpages/models/flatpages.py:10
-msgid "enable comments"
-msgstr "activar comentarios"
-
-#: contrib/flatpages/models/flatpages.py:11
-msgid "template name"
-msgstr "nome da plantilla"
-
-#: contrib/flatpages/models/flatpages.py:12
-msgid ""
-"Example: 'flatpages/contact_page'. If this isn't provided, the system will "
-"use 'flatpages/default'."
-msgstr ""
-"Exemplo: 'flatpages/contact_page'. Se non se especifica, o sistema usará "
-"'flatpages/default'."
-
-#: contrib/flatpages/models/flatpages.py:13
-msgid "registration required"
-msgstr "require rexistro"
-
-#: contrib/flatpages/models/flatpages.py:13
-msgid "If this is checked, only logged-in users will be able to view the page."
-msgstr "Se se marca, só poderán ver a páxina os usuarios identificados."
-
-#: contrib/flatpages/models/flatpages.py:17
-msgid "flat page"
-msgstr "páxina simple"
-
-#: contrib/flatpages/models/flatpages.py:18
-msgid "flat pages"
-msgstr "páxinas simples"
 
 #: contrib/admin/filterspecs.py:40
 #, python-format
@@ -638,6 +556,10 @@ msgstr "Texto"
 msgid "Time"
 msgstr "Hora"
 
+#: contrib/admin/views/doc.py:267 contrib/flatpages/models/flatpages.py:6
+msgid "URL"
+msgstr "URL"
+
 #: contrib/admin/views/doc.py:268
 msgid "U.S. state (two uppercase letters)"
 msgstr "Estado dos Estados Unidos (dúas letras maíusculas)"
@@ -646,19 +568,11 @@ msgstr "Estado dos Estados Unidos (dúas letras maíusculas)"
 msgid "XML text"
 msgstr "Texto XML"
 
-#: contrib/admin/templates/widget/date_time.html:3
-msgid "Date:"
-msgstr "Data:"
-
-#: contrib/admin/templates/widget/date_time.html:4
-msgid "Time:"
-msgstr "Hora"
-
 #: contrib/admin/templates/admin/object_history.html:3
 #: contrib/admin/templates/admin/change_list.html:4
-#: contrib/admin/templates/admin/change_form.html:9
 #: contrib/admin/templates/admin/base.html:23
 #: contrib/admin/templates/admin/delete_confirmation.html:3
+#: contrib/admin/templates/admin/change_form.html:9
 #: contrib/admin/templates/admin_doc/bookmarklets.html:4
 #: contrib/admin/templates/admin_doc/view_detail.html:4
 #: contrib/admin/templates/admin_doc/template_tag_index.html:5
@@ -674,9 +588,9 @@ msgstr "Cambiar contrasinal"
 
 #: contrib/admin/templates/admin/object_history.html:3
 #: contrib/admin/templates/admin/change_list.html:4
-#: contrib/admin/templates/admin/change_form.html:9
 #: contrib/admin/templates/admin/base.html:23
 #: contrib/admin/templates/admin/delete_confirmation.html:3
+#: contrib/admin/templates/admin/change_form.html:9
 #: contrib/admin/templates/admin_doc/bookmarklets.html:4
 #: contrib/admin/templates/admin_doc/view_detail.html:4
 #: contrib/admin/templates/admin_doc/template_tag_index.html:5
@@ -691,10 +605,10 @@ msgid "Log out"
 msgstr "Saír"
 
 #: contrib/admin/templates/admin/object_history.html:5
-#: contrib/admin/templates/admin/change_list.html:5
 #: contrib/admin/templates/admin/500.html:4
-#: contrib/admin/templates/admin/change_form.html:12
+#: contrib/admin/templates/admin/change_list.html:5
 #: contrib/admin/templates/admin/base.html:29
+#: contrib/admin/templates/admin/change_form.html:12
 #: contrib/admin/templates/registration/password_change_done.html:4
 #: contrib/admin/templates/registration/password_reset_form.html:4
 #: contrib/admin/templates/registration/logged_out.html:4
@@ -733,15 +647,13 @@ msgstr ""
 "Este obxecto non ten histórico de cambios. Posibelmente non se creou usando "
 "este sitio de administración."
 
-#: contrib/admin/templates/admin/change_list.html:10
-#, python-format
-msgid "Add %(name)s"
-msgstr "Engadir %(name)s"
+#: contrib/admin/templates/admin/base_site.html:4
+msgid "Django site admin"
+msgstr "Administración de sitio Django"
 
-#: contrib/admin/templates/admin/filter.html:2
-#, python-format
-msgid " By %(title)s "
-msgstr " Por %(title)s "
+#: contrib/admin/templates/admin/base_site.html:7
+msgid "Django administration"
+msgstr "Administración de Django"
 
 #: contrib/admin/templates/admin/500.html:4
 msgid "Server error"
@@ -763,17 +675,14 @@ msgstr ""
 "Houbo un erro. Xa se informou aos administradores do sitio por correo "
 "electrónico e debería quedar arranxado pronto. Grazas pola súa paciencia."
 
-#: contrib/admin/templates/admin/search_form.html:7
-msgid "Go"
-msgstr "Ir"
+#: contrib/admin/templates/admin/404.html:4
+#: contrib/admin/templates/admin/404.html:8
+msgid "Page not found"
+msgstr "Páxina non atopada"
 
-#: contrib/admin/templates/admin/base_site.html:4
-msgid "Django site admin"
-msgstr "Administración de sitio Django"
-
-#: contrib/admin/templates/admin/base_site.html:7
-msgid "Django administration"
-msgstr "Administración de Django"
+#: contrib/admin/templates/admin/404.html:10
+msgid "We're sorry, but the requested page could not be found."
+msgstr "Sentímolo, pero non se atopou a páxina solicitada."
 
 #: contrib/admin/templates/admin/index.html:27
 #: contrib/admin/templates/admin/change_form.html:14
@@ -800,14 +709,10 @@ msgstr "As miñas accións"
 msgid "None available"
 msgstr "Ningunha dispoñíbel"
 
-#: contrib/admin/templates/admin/404.html:4
-#: contrib/admin/templates/admin/404.html:8
-msgid "Page not found"
-msgstr "Páxina non atopada"
-
-#: contrib/admin/templates/admin/404.html:10
-msgid "We're sorry, but the requested page could not be found."
-msgstr "Sentímolo, pero non se atopou a páxina solicitada."
+#: contrib/admin/templates/admin/change_list.html:10
+#, python-format
+msgid "Add %(name)s"
+msgstr "Engadir %(name)s"
 
 #: contrib/admin/templates/admin/login.html:15
 msgid "Username:"
@@ -820,24 +725,6 @@ msgstr "Contrasinal:"
 #: contrib/admin/templates/admin/login.html:20
 msgid "Have you <a href=\"/password_reset/\">forgotten your password</a>?"
 msgstr "<a href=\"/password_reset/\">Esqueceu o contrasinal</a>?"
-
-#: contrib/admin/templates/admin/change_form.html:20
-msgid "View on site"
-msgstr "Ver na web"
-
-#: contrib/admin/templates/admin/change_form.html:28
-msgid "Please correct the error below."
-msgid_plural "Please correct the errors below."
-msgstr[0] "Por favor, corrixa o erro de embaixo."
-msgstr[1] "Por favor, corrixa os erros de embaixo."
-
-#: contrib/admin/templates/admin/change_form.html:45
-msgid "Ordering"
-msgstr "Orde"
-
-#: contrib/admin/templates/admin/change_form.html:48
-msgid "Order:"
-msgstr "Orde:"
 
 #: contrib/admin/templates/admin/base.html:23
 msgid "Welcome,"
@@ -866,6 +753,33 @@ msgstr ""
 #: contrib/admin/templates/admin/delete_confirmation.html:17
 msgid "Yes, I'm sure"
 msgstr "Si, estou seguro"
+
+#: contrib/admin/templates/admin/filter.html:2
+#, python-format
+msgid " By %(title)s "
+msgstr " Por %(title)s "
+
+#: contrib/admin/templates/admin/search_form.html:7
+msgid "Go"
+msgstr "Ir"
+
+#: contrib/admin/templates/admin/change_form.html:20
+msgid "View on site"
+msgstr "Ver na web"
+
+#: contrib/admin/templates/admin/change_form.html:28
+msgid "Please correct the error below."
+msgid_plural "Please correct the errors below."
+msgstr[0] "Por favor, corrixa o erro de embaixo."
+msgstr[1] "Por favor, corrixa os erros de embaixo."
+
+#: contrib/admin/templates/admin/change_form.html:45
+msgid "Ordering"
+msgstr "Orde"
+
+#: contrib/admin/templates/admin/change_form.html:48
+msgid "Order:"
+msgstr "Orde:"
 
 #: contrib/admin/templates/admin/submit_line.html:3
 msgid "Delete"
@@ -1072,6 +986,101 @@ msgstr "Editar este obxecto (nunha nova fiestra)"
 #: contrib/admin/templates/admin_doc/bookmarklets.html:29
 msgid "As above, but opens the admin page in a new window."
 msgstr "Como enriba, pero abre a páxina de administración nunha nova fiestra."
+
+#: contrib/admin/templates/widget/date_time.html:3
+msgid "Date:"
+msgstr "Data:"
+
+#: contrib/admin/templates/widget/date_time.html:4
+msgid "Time:"
+msgstr "Hora"
+
+#: contrib/admin/templates/widget/file.html:2
+msgid "Currently:"
+msgstr ""
+
+#: contrib/admin/templates/widget/file.html:3
+#, fuzzy
+msgid "Change:"
+msgstr "Modificar"
+
+#: contrib/redirects/models/redirects.py:7
+msgid "redirect from"
+msgstr "orixe da redirección"
+
+#: contrib/redirects/models/redirects.py:8
+msgid ""
+"This should be an absolute path, excluding the domain name. Example: '/"
+"events/search/'."
+msgstr ""
+"Debe ser unha ruta absoluta, sen o nome de dominio. Exemplo: '/events/"
+"search/'"
+
+#: contrib/redirects/models/redirects.py:9
+msgid "redirect to"
+msgstr "destino da redirección"
+
+#: contrib/redirects/models/redirects.py:10
+msgid ""
+"This can be either an absolute path (as above) or a full URL starting with "
+"'http://'."
+msgstr ""
+"Pode ser unha ruta absoluta (coma a de enriba) ou un URL completo que empece "
+"por 'http://'"
+
+#: contrib/redirects/models/redirects.py:12
+msgid "redirect"
+msgstr "redirección"
+
+#: contrib/redirects/models/redirects.py:13
+msgid "redirects"
+msgstr "redireccións"
+
+#: contrib/flatpages/models/flatpages.py:7
+msgid ""
+"Example: '/about/contact/'. Make sure to have leading and trailing slashes."
+msgstr ""
+"Exemplo: '/about/contact/'. Lembre incluír as barras ao principio e ao final."
+
+#: contrib/flatpages/models/flatpages.py:8
+msgid "title"
+msgstr "título"
+
+#: contrib/flatpages/models/flatpages.py:9
+msgid "content"
+msgstr "contido"
+
+#: contrib/flatpages/models/flatpages.py:10
+msgid "enable comments"
+msgstr "activar comentarios"
+
+#: contrib/flatpages/models/flatpages.py:11
+msgid "template name"
+msgstr "nome da plantilla"
+
+#: contrib/flatpages/models/flatpages.py:12
+msgid ""
+"Example: 'flatpages/contact_page'. If this isn't provided, the system will "
+"use 'flatpages/default'."
+msgstr ""
+"Exemplo: 'flatpages/contact_page'. Se non se especifica, o sistema usará "
+"'flatpages/default'."
+
+#: contrib/flatpages/models/flatpages.py:13
+msgid "registration required"
+msgstr "require rexistro"
+
+#: contrib/flatpages/models/flatpages.py:13
+msgid "If this is checked, only logged-in users will be able to view the page."
+msgstr "Se se marca, só poderán ver a páxina os usuarios identificados."
+
+#: contrib/flatpages/models/flatpages.py:17
+msgid "flat page"
+msgstr "páxina simple"
+
+#: contrib/flatpages/models/flatpages.py:18
+msgid "flat pages"
+msgstr "páxinas simples"
 
 #: utils/translation.py:350
 msgid "DATE_FORMAT"
@@ -1754,7 +1763,7 @@ msgstr ""
 "O atributo \"%(attr)s\" na liña %(line)s contén un valor non válido. (A liña "
 "comeza con \"%(start)s\")."
 
-#: core/meta/__init__.py:1946
+#: core/meta/__init__.py:1947
 #, fuzzy, python-format
 msgid "%(object)s with this %(type)s already exists for the given %(field)s."
 msgstr "Xa existe un/ha %(optname)s con este/a %(fieldname)s."
@@ -1793,6 +1802,6 @@ msgstr[0] "Insira IDs de %(self)s válidas. O valor %(value)r non é válido."
 msgstr[1] ""
 "Insira IDs de %(self)s válidas. Os valores %(value)r non son válidos."
 
-#: core/template/defaultfilters.py:354
+#: core/template/defaultfilters.py:371
 msgid "yes,no,maybe"
 msgstr "si,non,quizais"
