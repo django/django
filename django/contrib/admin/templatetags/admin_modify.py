@@ -2,7 +2,7 @@ from django.core import template, template_loader
 from django.utils.html import escape
 from django.utils.text import capfirst
 from django.utils.functional import curry
-from django.contrib.admin.views.main import AdminBoundField
+from django.contrib.admin.views.stages.modify import AdminBoundField
 from django.db.models.fields import BoundField, Field
 from django.db.models.related import BoundRelatedObject
 from django.db.models import TABULAR, STACKED

@@ -36,6 +36,7 @@ class Options:
         self.module_constants = {}
         self.admin = None
         self.meta = meta
+        
     def merge_meta(self):
         meta_attrs = self.meta.__dict__
         del meta_attrs['__module__']

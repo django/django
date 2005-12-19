@@ -1,6 +1,6 @@
-from django.contrib.admin.views.main import MAX_SHOW_ALL_ALLOWED, DEFAULT_RESULTS_PER_PAGE, ALL_VAR
-from django.contrib.admin.views.main import ORDER_VAR, ORDER_TYPE_VAR, PAGE_VAR, SEARCH_VAR
-from django.contrib.admin.views.main import IS_POPUP_VAR, EMPTY_CHANGELIST_VALUE, MONTHS
+from django.contrib.admin.views.changelist import MAX_SHOW_ALL_ALLOWED, DEFAULT_RESULTS_PER_PAGE, ALL_VAR
+from django.contrib.admin.views.changelist import ORDER_VAR, ORDER_TYPE_VAR, PAGE_VAR, SEARCH_VAR
+from django.contrib.admin.views.changelist import IS_POPUP_VAR, EMPTY_CHANGELIST_VALUE, MONTHS
 from django.core import template
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import models
@@ -82,7 +82,7 @@ def result_headers(cl):
             if field_name == '__repr__':
                 header = lookup_opts.verbose_name
             else:
-                func = getattr(cl.mod.Klass, field_name) # Let AttributeErrors propogate.
+                func = getattr(cl.model, field_name) # Let AttributeErrors propogate.
                 try:
                     header = func.short_description
                 except AttributeError:

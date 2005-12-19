@@ -48,10 +48,10 @@ if 'ellington.media' in INSTALLED_APPS:
     )
 
 urlpatterns += (
-    ('^((?:[^/]+/)+?)add/$', 'django.contrib.admin.views.main.add_stage'),
+    ('^((?:[^/]+/)+?)add/$', 'django.contrib.admin.views.stages.add.add_stage'),
     ('^((?:[^/]+/)+?)([^/]+)/history/$', 'django.contrib.admin.views.main.history'),
-    ('^((?:[^/]+/)+?)([^/]+)/delete/$', 'django.contrib.admin.views.main.delete_stage'),
-    ('^((?:[^/]+/)+?)([^/]+)/change/$', 'django.contrib.admin.views.main.change_stage'),
-    ('^((?:[^/]+/)+?)$', 'django.contrib.admin.views.main.change_list' ),
+    ('^((?:[^/]+/)+?)([^/]+)/delete/$', 'django.contrib.admin.views.stages.delete.delete_stage'),
+    ('^((?:[^/]+/)+?)([^/]+)/change/$', 'django.contrib.admin.views.stages.change.change_stage'),
+    ('^((?:[^/]+/)+?)$', 'django.contrib.admin.views.changelist.change_list' ),
 )
 urlpatterns = patterns('', *urlpatterns)

@@ -17,6 +17,7 @@ def ensure_default_manager(sender):
         if hasattr(cls, 'objects'):
             raise ValueError, "Model %s must specify a custom Manager, because it has a field named 'objects'" % name
         cls.add_to_class('objects',  Manager())
+        cls.objects._prepare()
 
 dispatcher.connect(
     ensure_default_manager,
@@ -33,8 +34,7 @@ class Manager(object):
         Manager.creation_counter += 1
         self.klass = None
     
-    def _prepare(self, klass):
-        self.klass = klass
+    def _prepare(self):
         if self.klass._meta.get_latest_by:
             self.get_latest = self.__get_latest
         for f in self.klass._meta.fields:
@@ -43,7 +43,8 @@ class Manager(object):
 
     def contribute_to_class(self, klass, name):
         # TODO: Use weakref because of possible memory leak / circular reference.
-        self._prepare(klass)
+        self.klass = klass
+        dispatcher.connect(self._prepare, signal=signals.class_prepared, sender=klass)
         setattr(klass,name, ManagerDescriptor(self))
         if not hasattr(klass, '_default_manager') or \
            self.creation_counter < klass._default_manager.creation_counter:
