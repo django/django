@@ -1,13 +1,12 @@
+from django.contrib.admin.models import LogEntry
+from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.admin.views.main import get_model_and_app
+from django.contrib.admin.views.stages.modify import render_change_form
 from django.core import formfields, template
 from django.core.extensions import DjangoContext as Context
-from django.contrib.admin.views.stages.modify import render_change_form
 from django.db import models
-from django.utils.text import capfirst, get_text_list
 from django.utils.httpwrappers import HttpResponse, HttpResponseRedirect
-from django.contrib.admin.views.decorators import staff_member_required
-
-
+from django.utils.text import capfirst, get_text_list
 
 def log_add_message(user, opts, manipulator, new_object):
     pk_value = getattr(new_object, opts.pk.attname)
