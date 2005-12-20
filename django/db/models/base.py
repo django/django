@@ -20,6 +20,7 @@ if not hasattr(__builtins__, 'set'):
     from sets import Set as set
 
 attribute_transforms = {}
+
 class ModelBase(type):
     "Metaclass for all models"
     def __new__(cls, name, bases, attrs):
@@ -119,7 +120,7 @@ class Model(object):
     def _prepare(cls):
         # Creates some methods once self._meta has been populated.
         opts =  cls._meta
-        opts._prepare()
+        opts._prepare(cls)
 
         if opts.order_with_respect_to:
             cls.get_next_in_order = curry(cls._get_next_or_previous_in_order, is_next=True)

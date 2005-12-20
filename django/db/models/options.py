@@ -45,8 +45,6 @@ class Options:
             raise TypeError, "'class META' got invalid attribute(s): %s" % ','.join(meta_attrs.keys())
 
     def contribute_to_class(self, cls, name):
-        # TODO: Remove this self.model reference. This is a circular reference.
-        self.model = cls
         cls._meta = self
         self.object_name = cls.__name__
         self.module_name = get_module_name(self.object_name )
@@ -58,7 +56,7 @@ class Options:
             self.merge_meta()
         del self.meta
 
-    def _prepare(self):
+    def _prepare(self, model):
         if self.order_with_respect_to:
             self.order_with_respect_to = self.get_field(self.order_with_respect_to)
             self.ordering = ('_order',)
@@ -82,7 +80,7 @@ class Options:
         if self.pk is None:
             auto = AutoField(verbose_name='ID', primary_key=True)
             auto.creation_counter = -1
-            self.model.add_to_class('id', auto)
+            model.add_to_class('id', auto)
             self.pk = self.fields[0]
         # Cache whether this has an AutoField.
         self.has_auto_field = False
