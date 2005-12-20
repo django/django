@@ -197,8 +197,9 @@ class OneToOneField(SharedMethods, IntegerField):
         setattr(cls, 'get_%s' % rel_obj_name,
                 curry(cls._get_related, method_name='get_object',
                       rel_class=related.model, rel_field=related.field))
-
-
+        if not cls._meta.one_to_one_field:
+           cls._meta.one_to_one_field = self
+           
 class ManyToManyField(RelatedField, Field):
     def __init__(self, to, **kwargs):
         kwargs['verbose_name'] = kwargs.get('verbose_name', None)

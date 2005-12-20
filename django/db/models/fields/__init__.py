@@ -339,6 +339,12 @@ class AutoField(Field):
             return None
         return Field.get_manipulator_new_data(self, new_data, rel)
 
+    def contribute_to_class(self, cls, name):
+        if cls._meta.has_auto_field:
+            raise AssertionError, "A model can't have more than one AutoField." 
+        super(AutoField, self).contribute_to_class(cls, name)
+        cls._meta.has_auto_field = True
+
 class BooleanField(Field):
     def __init__(self, *args, **kwargs):
         kwargs['blank'] = True

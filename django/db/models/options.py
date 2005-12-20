@@ -1,5 +1,5 @@
 from django.db.models.related import RelatedObject
-from django.db.models.fields.related import OneToOne, ManyToMany
+from django.db.models.fields.related import ManyToMany
 from django.db.models.fields import AutoField
 from django.db.models.loading import get_installed_model_modules
 from django.db.models.query import orderlist2sql
@@ -33,7 +33,11 @@ class Options:
         self.order_with_respect_to = None
         self.module_constants = {}
         self.admin = None
+        
         self.meta = meta
+        self.pk = None
+        self.has_auto_field = False
+        self.one_to_one_field = None
 
     def merge_meta(self):
         meta_attrs = self.meta.__dict__
@@ -63,34 +67,11 @@ class Options:
         else:
             self.order_with_respect_to = None
 
-        # Calculate one_to_one_field.
-        self.one_to_one_field = None
-        for f in self.fields:
-            if isinstance(f.rel, OneToOne):
-                self.one_to_one_field = f
-                break
-        # Cache the primary-key field.
-        self.pk = None
-        for f in self.fields:
-            if f.primary_key:
-                self.pk = f
-                break
-        # If a primary_key field hasn't been specified, add an
-        # auto-incrementing primary-key ID field automatically.
         if self.pk is None:
             auto = AutoField(verbose_name='ID', primary_key=True)
             auto.creation_counter = -1
             model.add_to_class('id', auto)
-            self.pk = self.fields[0]
-        # Cache whether this has an AutoField.
-        self.has_auto_field = False
-        for f in self.fields:
-            is_auto = isinstance(f, AutoField)
-            if is_auto and self.has_auto_field:
-                raise AssertionError, "A model can't have more than one AutoField."
-            elif is_auto:
-                self.has_auto_field = True
-        #HACK
+
         self.limit_choices_to = {}
 
         # If the db_table wasn't provided, use the app_label + module_name.
@@ -105,6 +86,8 @@ class Options:
             self.many_to_many.insert(bisect(self.many_to_many, field), field)
         else:
             self.fields.insert(bisect(self.fields, field), field)
+            if not self.pk and field.primary_key:
+                self.pk = field
 
     def __repr__(self):
         return '<Options for %s>' % self.module_name
