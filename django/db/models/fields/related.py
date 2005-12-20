@@ -11,28 +11,29 @@ TABULAR, STACKED = 1, 2
 
 RECURSIVE_RELATIONSHIP_CONSTANT = 'self'
 
+pending_lookups = {}
+
+def add_lookup(rel_cls, field):
+    name = field.rel.to
+    module = rel_cls.__module__
+    key = (module, name)
+    pending_lookups.setdefault(key, []).append((rel_cls, field))
+
+
+def do_pending_lookups(sender):
+    other_cls = sender
+    key = (other_cls.__module__, other_cls.__name__)
+    for rel_cls, field in pending_lookups.setdefault(key,[]):
+        field.rel.to = other_cls
+        field.do_related_class(other_cls, rel_cls)
+
+dispatcher.connect(
+    do_pending_lookups,
+    signal = signals.class_prepared
+)
+
 #HACK
 class RelatedField(object):
-    pending_lookups = {}
-
-    dispatcher.connect(
-        lambda sender: RelatedField.do_pending_lookups(sender),
-        signal = signals.class_prepared,
-        weak = False)
-
-    def add_lookup(cls, rel_cls, field):
-        name = field.rel.to
-        module = rel_cls.__module__
-        key = (module, name)
-        cls.pending_lookups.setdefault(key, []).append((rel_cls, field))
-    add_lookup = classmethod(add_lookup)
-
-    def do_pending_lookups(cls, other_cls):
-        key = (other_cls.__module__, other_cls.__name__)
-        for rel_cls, field in cls.pending_lookups.setdefault(key,[]):
-            field.rel.to = other_cls
-            field.do_related_class(other_cls, rel_cls)
-    do_pending_lookups = classmethod(do_pending_lookups)
 
     def contribute_to_class(self, cls, name):
         sup = super(RelatedField, self)
@@ -42,7 +43,7 @@ class RelatedField(object):
         if isinstance(other, basestring):
             if other == RECURSIVE_RELATIONSHIP_CONSTANT:
                 self.rel.to = cls.__name__
-            self.add_lookup(cls, self)
+            add_lookup(cls, self)
         else:
             self.do_related_class(other, cls)
 
