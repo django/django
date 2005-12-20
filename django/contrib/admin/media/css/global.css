@@ -257,7 +257,7 @@ a.selector-clearall { background:url(../img/admin/selector-removeall.gif) left c
 
 /*  DATE AND TIME  */
 p.datetime { line-height:20px; margin:0; padding:0; color:#666; font-size:11px; font-weight:bold; }
-.datetime span { font-size:11px; font-weight:normal; white-space:nowrap; }
+.datetime span { font-size:11px; font-weight:normal; color:#ccc; white-space:nowrap; }
 .vDateField { margin-left:4px; }
 table p.datetime { font-size:10px; margin-left:0; padding-left:0; }
 
@@ -267,8 +267,8 @@ p.file-upload { line-height:20px; margin:0; padding:0; color:#666; font-size:11p
 .file-upload .deletelink { margin-left:5px; }
 
 /*  CALENDARS & CLOCKS  */
-.calendarbox, .clockbox { margin:5px auto; width: 10em; text-align: center; background:white; position:relative; }
-.clockbox { width:6em; }
+.calendarbox, .clockbox { margin:5px auto; font-size:11px; width: 16em; text-align: center; background:white; position:relative; }
+.clockbox { width:9em; }
 .calendar { margin:0; padding: 0; }
 .calendar table { margin: 0; padding: 0; border-collapse:collapse; background:white; width:99%; }
 .calendar caption, .calendarbox h2 { margin: 0; font-size:11px; text-align:center; border-top:none; }
