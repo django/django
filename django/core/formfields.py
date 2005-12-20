@@ -2,7 +2,7 @@ from django.core import validators
 from django.core.exceptions import PermissionDenied
 from django.utils.html import escape
 from django.conf.settings import DEFAULT_CHARSET
-from django.utils.translation import gettext_lazy, ngettext
+from django.utils.translation import gettext, gettext_lazy, ngettext
 
 FORM_FIELD_ID_PREFIX = 'id_'
 
@@ -340,7 +340,7 @@ class TextField(FormField):
 
     def hasNoNewlines(self, data, form):
         if data and '\n' in data:
-            raise validators.ValidationError, _("Line breaks are not allowed here.")
+            raise validators.ValidationError, gettext("Line breaks are not allowed here.")
 
     def render(self, data):
         if data is None:
@@ -435,7 +435,7 @@ class SelectField(FormField):
         str_data = str(data)
         str_choices = [str(item[0]) for item in self.choices]
         if str_data not in str_choices:
-            raise validators.ValidationError, _("Select a valid choice; '%(data)s' is not in %(choices)s.") % {'data': str_data, 'choices': str_choices}
+            raise validators.ValidationError, gettext("Select a valid choice; '%(data)s' is not in %(choices)s.") % {'data': str_data, 'choices': str_choices}
 
 class NullSelectField(SelectField):
     "This SelectField converts blank fields to None"
@@ -506,7 +506,7 @@ class RadioSelectField(FormField):
         str_data = str(data)
         str_choices = [str(item[0]) for item in self.choices]
         if str_data not in str_choices:
-            raise validators.ValidationError, _("Select a valid choice; '%(data)s' is not in %(choices)s.") % {'data':str_data, 'choices':str_choices}
+            raise validators.ValidationError, gettext("Select a valid choice; '%(data)s' is not in %(choices)s.") % {'data':str_data, 'choices':str_choices}
 
 class NullBooleanField(SelectField):
     "This SelectField provides 'Yes', 'No' and 'Unknown', mapping results to True, False or None"
@@ -544,7 +544,7 @@ class SelectMultipleField(SelectField):
         str_choices = [str(item[0]) for item in self.choices]
         for val in map(str, field_data):
             if val not in str_choices:
-                raise validators.ValidationError, _("Select a valid choice; '%(data)s' is not in %(choices)s.") % {'data':val, 'choices':str_choices}
+                raise validators.ValidationError, gettext("Select a valid choice; '%(data)s' is not in %(choices)s.") % {'data':val, 'choices':str_choices}
 
     def html2python(data):
         if data is None:
@@ -600,7 +600,7 @@ class FileUploadField(FormField):
 
     def isNonEmptyFile(self, field_data, all_data):
         if not field_data['content']:
-            raise validators.CriticalValidationError, _("The submitted file is empty.")
+            raise validators.CriticalValidationError, gettext("The submitted file is empty.")
 
     def render(self, data):
         return '<input type="file" id="%s" class="v%s" name="%s" />' % \
@@ -654,7 +654,7 @@ class SmallIntegerField(IntegerField):
 
     def isSmallInteger(self, field_data, all_data):
         if not -32768 <= int(field_data) <= 32767:
-            raise validators.CriticalValidationError, _("Enter a whole number between -32,768 and 32,767.")
+            raise validators.CriticalValidationError, gettext("Enter a whole number between -32,768 and 32,767.")
 
 class PositiveIntegerField(IntegerField):
     def __init__(self, field_name, length=10, maxlength=None, is_required=False, validator_list=[]):
@@ -663,7 +663,7 @@ class PositiveIntegerField(IntegerField):
 
     def isPositive(self, field_data, all_data):
         if int(field_data) < 0:
-            raise validators.CriticalValidationError, _("Enter a positive number.")
+            raise validators.CriticalValidationError, gettext("Enter a positive number.")
 
 class PositiveSmallIntegerField(IntegerField):
     def __init__(self, field_name, length=5, maxlength=None, is_required=False, validator_list=[]):
@@ -672,7 +672,7 @@ class PositiveSmallIntegerField(IntegerField):
 
     def isPositiveSmall(self, field_data, all_data):
         if not 0 <= int(field_data) <= 32767:
-            raise validators.CriticalValidationError, _("Enter a whole number between 0 and 32,767.")
+            raise validators.CriticalValidationError, gettext("Enter a whole number between 0 and 32,767.")
 
 class FloatField(TextField):
     def __init__(self, field_name, max_digits, decimal_places, is_required=False, validator_list=[]):
