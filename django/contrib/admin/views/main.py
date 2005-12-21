@@ -429,8 +429,9 @@ def add_stage(request, app_label, module_name, show_delete=False, form_url='', p
         # Add default data.
         new_data = manipulator.flatten_data()
 
-        # Override the defaults with request.GET, if it exists.
-        new_data.update(request.GET)
+        # Override the defaults with GET params, if they exist.
+        new_data.update(dict(request.GET.items()))
+
         errors = {}
 
     # Populate the FormWrapper.
