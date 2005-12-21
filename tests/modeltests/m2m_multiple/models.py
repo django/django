@@ -14,7 +14,7 @@ from django.db import models
 
 class Category(models.Model):
     name = models.CharField(maxlength=20)
-    class META:
+    class Meta:
        ordering = ('name',)
 
     def __repr__(self):
@@ -27,7 +27,7 @@ class Article(models.Model):
         singular='primary_category', related_name='primary_article')
     secondary_categories = models.ManyToManyField(Category,
         singular='secondary_category', related_name='secondary_article')
-    class META:
+    class Meta:
        ordering = ('pub_date',)
 
     def __repr__(self):

@@ -18,7 +18,7 @@ class Thing(models.Model):
     having = models.CharField(maxlength=1)
     where = models.CharField(maxlength=1)
     has_hyphen = models.CharField(maxlength=1, db_column='has-hyphen')
-    class META:
+    class Meta:
        db_table = 'select'
 
     def __repr__(self):

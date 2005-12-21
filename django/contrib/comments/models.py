@@ -84,7 +84,7 @@ class Comment(models.Model):
     is_removed = models.BooleanField(_('is removed'), help_text=_('Check this box if the comment is inappropriate. A "This comment has been removed" message will be displayed instead.'))
     site = models.ForeignKey(core.Site)
     objects = CommentManager()
-    class META:
+    class Meta:
         db_table = 'comments'
         verbose_name = _('Comment')
         verbose_name_plural = _('Comments')
@@ -172,7 +172,7 @@ class FreeComment(models.Model):
     # TODO: Change this to is_removed, like Comment
     approved = models.BooleanField(_('approved by staff'))
     site = models.ForeignKey(core.Site)
-    class META:
+    class Meta:
         db_table = 'comments_free'
         verbose_name = _('Free comment')
         verbose_name_plural = _('Free comments')
@@ -235,7 +235,7 @@ class KarmaScore(models.Model):
     score = models.SmallIntegerField(_('score'), db_index=True)
     scored_date = models.DateTimeField(_('score date'), auto_now=True)
     objects = KarmaScoreManager()
-    class META:
+    class Meta:
         verbose_name = _('Karma score')
         verbose_name_plural = _('Karma scores')
         unique_together = (('user', 'comment'),)
@@ -266,7 +266,7 @@ class UserFlag(models.Model):
     comment = models.ForeignKey(Comment)
     flag_date = models.DateTimeField(_('flag date'), auto_now_add=True)
     objects = UserFlagManager()
-    class META:
+    class Meta:
         db_table = 'comments_user_flags'
         verbose_name = _('User flag')
         verbose_name_plural = _('User flags')
@@ -279,7 +279,7 @@ class ModeratorDeletion(models.Model):
     user = models.ForeignKey(auth.User, verbose_name='moderator')
     comment = models.ForeignKey(Comment)
     deletion_date = models.DateTimeField(_('deletion date'), auto_now_add=True)
-    class META:
+    class Meta:
         db_table = 'comments_moderator_deletions'
         verbose_name = _('Moderator deletion')
         verbose_name_plural = _('Moderator deletions')

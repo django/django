@@ -93,15 +93,15 @@ But where's our poll app? It's not displayed on the admin index page.
 
 Just one thing to do: We need to specify in the ``polls.Poll`` model that Poll
 objects have an admin interface. Edit the ``myproject/apps/polls/models/polls.py``
-file and make the following change to add an inner ``META`` class with an
+file and make the following change to add an inner ``Meta`` class with an
 ``admin`` attribute::
 
     class Poll(meta.Model):
         # ...
-        class META:
+        class Meta:
             admin = meta.Admin()
 
-The ``class META`` contains all non-field metadata about this model.
+The ``class Meta`` contains all non-field metadata about this model.
 
 Now reload the Django admin page to see your changes. Note that you don't have
 to restart the development server -- it auto-reloads code.
@@ -227,7 +227,7 @@ Here's what that would look like::
 
     class Choice(meta.Model):
         # ...
-        class META:
+        class Meta:
             admin = meta.Admin()
 
 Now "Choices" is an available option in the Django admin. The "Add choice" form
@@ -311,7 +311,7 @@ on the change list page for the object::
 
     class Poll(meta.Model):
         # ...
-        class META:
+        class Meta:
             admin = meta.Admin(
                 # ...
                 list_display = ('question', 'pub_date'),

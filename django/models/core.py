@@ -12,7 +12,7 @@ class Site(models.Model):
     domain = models.CharField(_('domain name'), maxlength=100)
     name = models.CharField(_('display name'), maxlength=50)
     objects = SiteManager()
-    class META:
+    class Meta:
         verbose_name = _('site')
         verbose_name_plural = _('sites')
         db_table = 'sites'
@@ -28,7 +28,7 @@ class Site(models.Model):
 class Package(models.Model):
     label = models.CharField(_('label'), maxlength=20, primary_key=True)
     name = models.CharField(_('name'), maxlength=30, unique=True)
-    class META:
+    class Meta:
         verbose_name = _('package')
         verbose_name_plural = _('packages')
         db_table = 'packages'
@@ -41,7 +41,7 @@ class ContentType(models.Model):
     name = models.CharField(_('name'), maxlength=100)
     package = models.ForeignKey(Package, db_column='package')
     python_module_name = models.CharField(_('python module name'), maxlength=50)
-    class META:
+    class Meta:
         verbose_name = _('content type')
         verbose_name_plural = _('content types')
         db_table = 'content_types'
@@ -98,7 +98,7 @@ class Session(models.Model):
     session_data = models.TextField(_('session data'))
     expire_date = models.DateTimeField(_('expire date'))
     objects = SessionManager()
-    class META:
+    class Meta:
         verbose_name = _('session')
         verbose_name_plural = _('sessions')
         module_constants = {

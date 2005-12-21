@@ -395,20 +395,20 @@ Custom permissions
 ------------------
 
 To create custom permissions for a given model object, use the ``permissions``
-`model META attribute`_.
+`model Meta attribute`_.
 
 This example model creates three custom permissions::
 
     class USCitizen(meta.Model):
         # ...
-        class META:
+        class Meta:
             permissions = (
                 ("can_drive", "Can drive"),
                 ("can_vote", "Can vote in elections"),
                 ("can_drink", "Can drink alcohol"),
             )
 
-.. _model META attribute: http://www.djangoproject.com/documentation/model_api/#meta-options
+.. _model Meta attribute: http://www.djangoproject.com/documentation/model_api/#meta-options
 
 API reference
 -------------

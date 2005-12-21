@@ -150,14 +150,14 @@ If you don't like the verbose name ``gettext_lazy``, you can just alias it as
 
 Always use lazy translations in `Django models`_. And it's a good idea to add
 translations for the field names and table names, too. This means writing
-explicit ``verbose_name`` and ``verbose_name_plural`` options in the ``META``
+explicit ``verbose_name`` and ``verbose_name_plural`` options in the ``Meta``
 class, though::
 
     from django.utils.translation import gettext_lazy as _
 
     class MyThing(meta.Model):
         name = meta.CharField(_('name'), help_text=_('This is the help text'))
-        class META:
+        class Meta:
             verbose_name = _('my thing')
             verbose_name_plural = _('mythings')
 

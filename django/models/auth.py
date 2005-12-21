@@ -10,7 +10,7 @@ class Permission(models.Model):
     name = models.CharField(_('name'), maxlength=50)
     package = models.ForeignKey(core.Package, db_column='package')
     codename = models.CharField(_('codename'), maxlength=100)
-    class META:
+    class Meta:
         verbose_name = _('Permission')
         verbose_name_plural = _('Permissions')
         unique_together = (('package', 'codename'),)
@@ -22,7 +22,7 @@ class Permission(models.Model):
 class Group(models.Model):
     name = models.CharField(_('name'), maxlength=80, unique=True)
     permissions = models.ManyToManyField(Permission, blank=True, filter_interface=models.HORIZONTAL)
-    class META:
+    class Meta:
         verbose_name = _('Group')
         verbose_name_plural = _('Groups')
         ordering = ('name',)
@@ -64,7 +64,7 @@ class User(models.Model):
         help_text=_("In addition to the permissions manually assigned, this user will also get all permissions granted to each group he/she is in."))
     user_permissions = models.ManyToManyField(Permission, blank=True, filter_interface=models.HORIZONTAL)
     objects = UserManager()
-    class META:
+    class Meta:
         verbose_name = _('User')
         verbose_name_plural = _('Users')
         ordering = ('username',)

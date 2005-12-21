@@ -10,7 +10,7 @@ The basics:
 
     * Each model is a Python class that subclasses ``django.core.meta.Model``.
     * Each attribute of the model represents a database field.
-    * Model metadata (non-field information) goes in an inner class named ``META``.
+    * Model metadata (non-field information) goes in an inner class named ``Meta``.
 
 A companion to this document is the `official repository of model examples`_.
 
@@ -21,7 +21,7 @@ Field objects
 
 The most important part of a model is the list of database fields it defines.
 Fields are defined by class attributes. Each class attribute in a model, aside
-from the optional inner ``class META``, should be an instance of a
+from the optional inner ``class Meta``, should be an instance of a
 ``meta.Field`` subclass.
 
 In this example, there are two fields, ``first_name`` and ``last_name`` ::
@@ -700,23 +700,23 @@ See the `One-to-one relationship model example`_ for a full example.
 
 .. _One-to-one relationship model example: http://www.djangoproject.com/documentation/models/one_to_one/
 
-META options
+Meta options
 ============
 
-Give your model metadata by using an inner ``"class META"``, like so::
+Give your model metadata by using an inner ``"class Meta"``, like so::
 
     class Foo(meta.Model):
         bar = meta.CharField(maxlength=30)
         # ...
-        class META:
+        class Meta:
             admin = meta.Admin()
             # ...
 
 Model metadata is "anything that's not a field" -- ordering options, admin
 options, etc.
 
-Here's a list of all possible ``META`` options. No options are required. Adding
-``class META`` to a model is completely optional.
+Here's a list of all possible ``Meta`` options. No options are required. Adding
+``class Meta`` to a model is completely optional.
 
 ``admin``
     A ``meta.Admin`` object; see `Admin options`_. If this field is given, the
@@ -943,7 +943,7 @@ object, which takes the following parameters. All are optional.
     if one of the ``list_display`` fields is a ``ForeignKey``.
 
 ``ordering``
-    A list or tuple (see the `META options`_, above) that gives a
+    A list or tuple (see the `Meta options`_, above) that gives a
     different ordering for the admin change list. If this isn't given, the
     model's default ordering will be used.
 

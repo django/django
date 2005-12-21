@@ -20,7 +20,7 @@ class LogEntry(models.Model):
     action_flag = models.PositiveSmallIntegerField(_('action flag'))
     change_message = models.TextField(_('change message'), blank=True)
     objects = LogEntryManager()
-    class META:
+    class Meta:
         verbose_name = _('log entry')
         verbose_name_plural = _('log entries')
         db_table = 'django_admin_log'

@@ -30,7 +30,7 @@ class ModelBase(type):
 
         # Create the class.
         new_class = type.__new__(cls, name, bases, {'__module__': attrs.pop('__module__')})
-        new_class.add_to_class('_meta', Options(attrs.pop('META', None)))
+        new_class.add_to_class('_meta', Options(attrs.pop('Meta', None)))
         new_class.add_to_class('DoesNotExist', types.ClassType('DoesNotExist', (ObjectDoesNotExist,), {}))
 
         #Figure out the app_label by looking one level up.

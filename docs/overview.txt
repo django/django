@@ -138,7 +138,7 @@ model classes::
         headline = meta.CharField(maxlength=200)
         article = meta.TextField()
         reporter = meta.ForeignKey(Reporter)
-        class META:
+        class Meta:
             admin = meta.Admin()
 
 The philosophy here is that your site is edited by a staff, or a client, or

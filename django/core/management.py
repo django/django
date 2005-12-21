@@ -699,7 +699,7 @@ def inspectdb(db_name):
                 if field_type_was_guessed:
                     field_desc += ' # This is a guess!'
             yield '    %s' % field_desc
-        yield '    class META:'
+        yield '    class Meta:'
         yield '        db_table = %r' % table_name
         yield ''
 inspectdb.help_doc = "Introspects the database tables in the given database and outputs a Django model module."

@@ -33,7 +33,7 @@ class Options:
         self.order_with_respect_to = None
         self.module_constants = {}
         self.admin = None
-        
+
         self.meta = meta
         self.pk = None
         self.has_auto_field = False
@@ -46,7 +46,7 @@ class Options:
         for attr_name in DEFAULT_NAMES:
             setattr(self, attr_name, meta_attrs.pop(attr_name, getattr(self, attr_name)))
         if meta_attrs != {}:
-            raise TypeError, "'class META' got invalid attribute(s): %s" % ','.join(meta_attrs.keys())
+            raise TypeError, "'class Meta' got invalid attribute(s): %s" % ','.join(meta_attrs.keys())
 
     def contribute_to_class(self, cls, name):
         cls._meta = self

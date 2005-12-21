@@ -13,7 +13,7 @@ from django.db import models
 class Article(models.Model):
     headline = models.CharField(maxlength=100)
     pub_date = models.DateTimeField()
-    class META:
+    class Meta:
         get_latest_by = 'pub_date'
 
     def __repr__(self):

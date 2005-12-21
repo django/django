@@ -11,7 +11,7 @@ class Employee(models.Model):
     employee_code = models.CharField(maxlength=10, primary_key=True)
     first_name = models.CharField(maxlength=20)
     last_name = models.CharField(maxlength=20)
-    class META:
+    class Meta:
         ordering = ('last_name', 'first_name')
 
     def __repr__(self):
@@ -20,7 +20,7 @@ class Employee(models.Model):
 class Business(models.Model):
     name = models.CharField(maxlength=20, primary_key=True)
     employees = models.ManyToManyField(Employee)
-    class META:
+    class Meta:
         verbose_name_plural = 'businesses'
         module_name = 'businesses'
 

@@ -11,7 +11,7 @@ from django.db import models
 class Article(models.Model):
     headline = models.CharField(maxlength=50)
     pub_date = models.DateTimeField()
-    class META:
+    class Meta:
        ordering = ('pub_date',)
 
     def __repr__(self):
