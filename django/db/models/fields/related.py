@@ -19,7 +19,6 @@ def add_lookup(rel_cls, field):
     key = (module, name)
     pending_lookups.setdefault(key, []).append((rel_cls, field))
 
-
 def do_pending_lookups(sender):
     other_cls = sender
     key = (other_cls.__module__, other_cls.__name__)

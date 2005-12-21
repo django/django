@@ -213,7 +213,7 @@ class Field(object):
             field_objs = self.get_manipulator_field_objs()
         return (field_objs,params)
 
-    def get_manipulator_fields(self, opts, manipulator, change, name_prefix='', rel=False):
+    def get_manipulator_fields(self, opts, manipulator, change, name_prefix='', rel=False, follow=True):
         """
         Returns a list of formfields.FormField instances for this field. It
         calculates the choices at runtime, not at compile time.
@@ -326,10 +326,10 @@ class AutoField(Field):
         assert kwargs.get('primary_key', False) is True, "%ss must have primary_key=True." % self.__class__.__name__
         Field.__init__(self, *args, **kwargs)
 
-    def get_manipulator_fields(self, opts, manipulator, change, name_prefix='', rel=False):
+    def get_manipulator_fields(self, opts, manipulator, change, name_prefix='', rel=False, follow=True):
         if not rel:
             return [] # Don't add a FormField unless it's in a related context.
-        return Field.get_manipulator_fields(self, opts, manipulator, change, name_prefix, rel)
+        return Field.get_manipulator_fields(self, opts, manipulator, change, name_prefix, rel, follow)
 
     def get_manipulator_field_objs(self):
         return [formfields.HiddenField]
@@ -462,8 +462,8 @@ class FileField(Field):
         self.upload_to = upload_to
         Field.__init__(self, verbose_name, name, **kwargs)
 
-    def get_manipulator_fields(self, opts, manipulator, change, name_prefix='', rel=False):
-        field_list = Field.get_manipulator_fields(self, opts, manipulator, change, name_prefix, rel)
+    def get_manipulator_fields(self, opts, manipulator, change, name_prefix='', rel=False, follow=True):
+        field_list = Field.get_manipulator_fields(self, opts, manipulator, change, name_prefix, rel, follow)
 
         if not self.blank:
             if rel:

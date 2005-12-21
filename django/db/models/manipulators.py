@@ -72,16 +72,10 @@ class AutomaticManipulator(Manipulator):
         self.follow = self.model._meta.get_follow(follow)
         self.fields = []
         self.original_object = original_object
-        for f in self.opts.fields + self.opts.many_to_many:
-            if self.follow.get(f.name, False):
-                self.fields.extend(f.get_manipulator_fields(self.opts, self, self.change))
-
-        # Add fields for related objects.
-        for f in self.opts.get_all_related_objects():
-            if self.follow.get(f.name, False):
-                fol = self.follow[f.name]
-                fields = f.get_manipulator_fields(self.opts, self, self.change, fol)
-                self.fields.extend(fields)
+        for f in self.opts.get_data_holders(self.follow):
+            fol = self.follow[f.name]
+            fields = f.get_manipulator_fields(self.opts, self, self.change, follow=fol)
+            self.fields.extend(fields)
 
     def save(self, new_data):
         add, change, opts, klass = self.add, self.change, self.opts, self.model

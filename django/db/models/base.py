@@ -220,7 +220,7 @@ class Model(object):
 
     def delete(self, ignore_objects=None):
         assert getattr(self, self._meta.pk.attname) is not None, "%r can't be deleted because it doesn't have an ID."
-        ignore_objects = ignore_objects and dict([(o.__class,o.__get_pk_val) for o in ignore_objects]) or {}
+        ignore_objects = ignore_objects and dict([(o.__class__,o.__get_pk_val()) for o in ignore_objects]) or {}
 
         seen_objs = {}
         self.__collect_sub_objects(seen_objs, ignore_objects)
