@@ -117,18 +117,19 @@ def get_sql_create(app):
 
         # Take care of any ALTER TABLE statements to add constraints
         # after the fact.
-        if klass in pending_references:
-            for rel_class, f in pending_references[klass]:
-                rel_opts = rel_class._meta
-                r_table = rel_opts.db_table
-                r_col = f.column
-                table = opts.db_table
-                col = opts.get_field(f.rel.field_name).column
-                final_output.append('ALTER TABLE %s ADD CONSTRAINT %s FOREIGN KEY (%s) REFERENCES %s (%s);' % \
-                    (backend.quote_name(r_table),
-                    backend.quote_name("%s_referencing_%s_%s" % (r_col, table, col)),
-                    backend.quote_name(r_col), backend.quote_name(table), backend.quote_name(col)))
-            del pending_references[klass]
+        if backend.supports_constraints:
+            if klass in pending_references:
+                for rel_class, f in pending_references[klass]:
+                    rel_opts = rel_class._meta
+                    r_table = rel_opts.db_table
+                    r_col = f.column
+                    table = opts.db_table
+                    col = opts.get_field(f.rel.field_name).column
+                    final_output.append('ALTER TABLE %s ADD CONSTRAINT %s FOREIGN KEY (%s) REFERENCES %s (%s);' % \
+                        (backend.quote_name(r_table),
+                        backend.quote_name("%s_referencing_%s_%s" % (r_col, table, col)),
+                        backend.quote_name(r_col), backend.quote_name(table), backend.quote_name(col)))
+                del pending_references[klass]
 
         # Keep track of the fact that we've created the table for this model.
         models_output.add(klass)

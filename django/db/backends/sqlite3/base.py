@@ -70,6 +70,8 @@ class SQLiteCursorWrapper(Database.Cursor):
         # XXX this seems too simple to be correct... is this right?
         return query % tuple("?" * num_params)
 
+supports_constraints = False
+
 def quote_name(name):
     if name.startswith('"') and name.endswith('"'):
         return name # Quoting once is enough.

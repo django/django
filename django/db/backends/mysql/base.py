@@ -83,6 +83,8 @@ class DatabaseWrapper:
             self.connection.close()
             self.connection = None
 
+supports_constraints = True
+
 def quote_name(name):
     if name.startswith("`") and name.endswith("`"):
         return name # Quoting once is enough.
