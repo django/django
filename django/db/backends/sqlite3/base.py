@@ -4,16 +4,13 @@ SQLite3 backend for django.  Requires pysqlite2 (http://pysqlite.org/).
 
 from django.db.backends import util
 from pysqlite2 import dbapi2 as Database
-DatabaseError = Database.DatabaseError
 
-# Register adaptors ###########################################################
+DatabaseError = Database.DatabaseError
 
 Database.register_converter("bool", lambda s: str(s) == '1')
 Database.register_converter("time", util.typecast_time)
 Database.register_converter("date", util.typecast_date)
 Database.register_converter("datetime", util.typecast_timestamp)
-
-# Database wrapper ############################################################
 
 def utf8rowFactory(cursor, row):
     def utf8(s):
@@ -54,15 +51,6 @@ class DatabaseWrapper:
             self.connection.close()
             self.connection = None
 
-def quote_name(name):
-    if name.startswith('"') and name.endswith('"'):
-        return name # Quoting once is enough.
-    return '"%s"' % name
-
-dictfetchone = util.dictfetchone
-dictfetchmany = util.dictfetchmany
-dictfetchall  = util.dictfetchall
-
 class SQLiteCursorWrapper(Database.Cursor):
     """
     Django uses "format" style placeholders, but pysqlite2 uses "qmark" style.
@@ -82,7 +70,14 @@ class SQLiteCursorWrapper(Database.Cursor):
         # XXX this seems too simple to be correct... is this right?
         return query % tuple("?" * num_params)
 
-# Helper functions ############################################################
+def quote_name(name):
+    if name.startswith('"') and name.endswith('"'):
+        return name # Quoting once is enough.
+    return '"%s"' % name
+
+dictfetchone = util.dictfetchone
+dictfetchmany = util.dictfetchmany
+dictfetchall  = util.dictfetchall
 
 def get_last_insert_id(cursor, table_name, pk_name):
     return cursor.lastrowid
@@ -125,8 +120,6 @@ def _sqlite_date_trunc(lookup_type, dt):
         return "%i-%02i-01 00:00:00" % (dt.year, dt.month)
     elif lookup_type == 'day':
         return "%i-%02i-%02i 00:00:00" % (dt.year, dt.month, dt.day)
-
-# Operators and fields ########################################################
 
 # SQLite requires LIKE statements to include an ESCAPE clause if the value
 # being escaped has a percent or underscore in it.
