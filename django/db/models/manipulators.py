@@ -7,6 +7,8 @@ from django.dispatch import dispatcher
 from django.db.models import signals
 from django.utils.functional import curry
 
+import types
+
 def add_manipulators(sender):
     cls = sender
     cls.add_to_class('AddManipulator', ModelAddManipulator)
@@ -33,20 +35,12 @@ class ManipulatorDescriptor(object):
             if not self.man:
                 # Create a class which inherits from the MANIPULATOR class given in the class,
                 # and the appropriate automatic manipulator,
-                class Man(self.get_base_manipulator(type), self.base):
-                    pass
-
-                Man._prepare(type)
-                Man.__name__ = self.name
-                self.man = Man
+                bases = [ self.base ]
+                if hasattr(type, 'MANIPULATOR'):
+                    bases = [type.MANIPULATOR] + bases
+                self.man = types.ClassType(self.name, tuple(bases), {})
+                self.man._prepare(type)
             return self.man
-
-    def get_base_manipulator(self, type):
-        if hasattr(type, 'MANIPULATOR'):
-            man = type.MANIPULATOR
-        else:
-            man = self.empty
-        return man
 
 class AutomaticManipulator(Manipulator):
     def _prepare(cls, model):
