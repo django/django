@@ -1002,9 +1002,8 @@ msgid "Currently:"
 msgstr ""
 
 #: contrib/admin/templates/widget/file.html:3
-#, fuzzy
 msgid "Change:"
-msgstr "Zmeň"
+msgstr "Zmeň:"
 
 #: contrib/redirects/models/redirects.py:7
 msgid "redirect from"
@@ -1767,9 +1766,9 @@ msgstr ""
 "s \"%(start)s\".)"
 
 #: core/meta/__init__.py:1947
-#, fuzzy, python-format
+#, python-format
 msgid "%(object)s with this %(type)s already exists for the given %(field)s."
-msgstr "%(optname)s s %(fieldname)s už existuje."
+msgstr "%(object)s s %(type)s už existuje pre prvok  %(field)s."
 
 #: core/meta/fields.py:46
 #, python-format

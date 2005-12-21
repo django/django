@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2005-12-17 22:25+0100\n"
-"PO-Revision-Date: 2005-12-08 15:03+0100\n"
+"PO-Revision-Date: 2005-12-20 10:48+0100\n"
 "Last-Translator: Afonso Fernández Nogueira <fonzzo.django@gmail.com>\n"
 "Language-Team: Galego\n"
 "MIME-Version: 1.0\n"
@@ -401,36 +401,36 @@ msgstr "Administración do sitio web"
 #: contrib/admin/views/main.py:67
 #, python-format
 msgid "Select %s"
-msgstr "Seleccione un elemento %s"
+msgstr "Seleccione un/ha %s"
 
 #: contrib/admin/views/main.py:68
 #, python-format
 msgid "Select %s to change"
-msgstr "Seleccione un elemento %s para modificar"
+msgstr "Seleccione %s que modificar"
 
 #: contrib/admin/views/main.py:410
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was added successfully."
-msgstr "O elemento \"%(obj)s\" de tipo %(name)s engadiuse correctamente."
+msgstr "Engadiuse correctamente o/a %(name)s  \"%(obj)s\"."
 
 #: contrib/admin/views/main.py:415 contrib/admin/views/main.py:491
 msgid "You may edit it again below."
-msgstr "Pode volver editalo embaixo."
+msgstr "Pode editalo embaixo."
 
 #: contrib/admin/views/main.py:423 contrib/admin/views/main.py:500
 #, python-format
 msgid "You may add another %s below."
-msgstr "Pode engadir outro elemento %s embaixo."
+msgstr "Pode engadir outro/a %s embaixo."
 
 #: contrib/admin/views/main.py:440
 #, python-format
 msgid "Add %s"
-msgstr "Engadir un elemento %s"
+msgstr "Engadir %s"
 
 #: contrib/admin/views/main.py:456
 #, python-format
 msgid "Added %s."
-msgstr "Engadido(s) %s."
+msgstr "Engadido/a %s."
 
 #: contrib/admin/views/main.py:456 contrib/admin/views/main.py:458
 #: contrib/admin/views/main.py:460
@@ -454,14 +454,14 @@ msgstr "Non se modificou ningún campo."
 #: contrib/admin/views/main.py:488
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was changed successfully."
-msgstr "O elemento %(name)s \"%(obj)s\"  modificouse correctamente."
+msgstr "Modificouse correctamente o/a %(name)s \"%(obj)s\"."
 
 #: contrib/admin/views/main.py:497
 #, python-format
 msgid ""
 "The %(name)s \"%(obj)s\" was added successfully. You may edit it again below."
 msgstr ""
-"O elemento %(name)s \"%(obj)s\" engadiuse correctamente. Pode volver editalo "
+"Engadiuse correctamente o/a %(name)s \"%(obj)s\" Pode editalo "
 "embaixo."
 
 #: contrib/admin/views/main.py:535
@@ -472,17 +472,17 @@ msgstr "Modificar %s"
 #: contrib/admin/views/main.py:613
 #, python-format
 msgid "One or more %(fieldname)s in %(name)s: %(obj)s"
-msgstr "Un ou máis %(fieldname)s no elemento %(name)s: %(obj)s"
+msgstr "Un ou máis %(fieldname)s no/a %(name)s: %(obj)s"
 
 #: contrib/admin/views/main.py:618
 #, python-format
 msgid "One or more %(fieldname)s in %(name)s:"
-msgstr "Un ou máis %(fieldname)s no elemento %(name)s:"
+msgstr "Un ou máis %(fieldname)s no/a %(name)s:"
 
 #: contrib/admin/views/main.py:647
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was deleted successfully."
-msgstr "O elemento %(name)s \"%(obj)s\" eliminouse correctamente."
+msgstr "Eliminouse correctamente o/a %(name)s \"%(obj)s\"."
 
 #: contrib/admin/views/main.py:650
 msgid "Are you sure?"
