@@ -120,6 +120,24 @@ Patch style
       it obvious that the ticket includes a patch, and it will add the ticket
       to the `list of tickets with patches`_.
 
+Submitting and maintaining translations
+=======================================
+
+Various parts of Django, such as the admin site and validator error messages,
+are internationalized. This means they display different text depending on a
+user's language setting.
+
+These translations are contributed by Django users worldwide. If you find an
+incorrect translation, or if you'd like to add a language that isn't yet
+translated, here's what to do:
+
+    * Join the `Django i18n mailing list`_ and introduce yourself.
+    * Create and submit translations using the methods described in the
+      `i18n documentation`_.
+
+.. _Django i18n mailing list: http://groups.google.com/group/django-i18n/
+.. _i18n documentation: http://www.djangoproject.com/documentation/i18n/
+
 Coding style
 ============
 
