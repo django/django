@@ -11,6 +11,8 @@ try:
 except ImportError:
     raise ImproperlyConfigured, "You don't have 'django.contrib.admin' in INSTALLED_APPS."
 
+from django.core.exceptions import Http404, ImproperlyConfigured, ObjectDoesNotExist
+
 def log_change_message(user, opts, manipulator, new_object):
     pk_value = getattr(new_object, opts.pk.column)
     # Construct the change message.

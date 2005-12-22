@@ -727,6 +727,10 @@ def get_validation_errors(outfile):
 
             # Do field-specific validation.
             for f in opts.fields:
+                # Check for deprecated args
+                dep_args = getattr(f, 'deprecated_args', None)
+                if dep_args:
+                    e.add(opts, "'%s' field: Initialised with deprecated args:%s" % (f.name, ",".join(dep_args)))
                 if isinstance(f, models.CharField) and f.maxlength in (None, 0):
                     e.add(opts, '"%s" field: CharFields require a "maxlength" attribute.' % f.name)
                 if isinstance(f, models.FloatField):
@@ -799,16 +803,6 @@ def get_validation_errors(outfile):
                     except models.FieldDoesNotExist:
                         e.add(opts, '"ordering" refers to "%s", a field that doesn\'t exist.' % field_name)
 
-            # Check core=True, if needed.
-            for related in opts.get_followed_related_objects():
-                try:
-                    for f in related.opts.fields:
-                        if f.core:
-                            raise StopIteration
-                    e.add(related.opts, "At least one field in %s should have core=True, because it's being edited inline by %s.%s." % (related.opts.object_name, opts.module_name, opts.object_name))
-                except StopIteration:
-                    pass
-
             # Check unique_together.
             for ut in opts.unique_together:
                 for field_name in ut:
@@ -819,6 +813,7 @@ def get_validation_errors(outfile):
                     else:
                         if isinstance(f.rel, models.ManyToMany):
                             e.add(opts, '"unique_together" refers to %s. ManyToManyFields are not supported in unique_together.' % f.name)
+
     return len(e.errors)
 
 def validate(outfile=sys.stdout):

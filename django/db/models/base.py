@@ -1,6 +1,6 @@
 import django.db.models.manipulators
 import django.db.models.manager
-from django.db.models.fields import AutoField
+from django.db.models.fields import AutoField, ImageField
 from django.db.models.fields.related import OneToOne, ManyToOne
 from django.db.models.related import RelatedObject
 from django.db.models.query import orderlist2sql
@@ -14,6 +14,7 @@ from django.conf import settings
 import re
 import types
 import sys
+import os
 
 # For Python 2.3
 if not hasattr(__builtins__, 'set'):
@@ -347,7 +348,7 @@ class Model(object):
         # Write the file to disk.
         setattr(self, field.attname, filename)
 
-        full_filename = self.__get_FIELD_filename(field)
+        full_filename = self._get_FIELD_filename(field)
         fp = open(full_filename, 'wb')
         fp.write(raw_contents)
         fp.close()

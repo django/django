@@ -423,8 +423,11 @@ def phone2numeric(value):
 def pprint(value):
     "A wrapper around pprint.pprint -- for debugging, really"
     from pprint import pformat
-    return pformat(value)
-
+    try:
+        return pformat(value)
+    except Exception, e:
+        return "Error in formatting:%s" % e
+    
 # Syntax: register.filter(name of filter, callback)
 register.filter(add)
 register.filter(addslashes)

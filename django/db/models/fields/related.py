@@ -88,16 +88,16 @@ class ForeignKey(SharedMethods, Field):
             kwargs['edit_inline'] = kwargs.pop('edit_inline_type')
 
         kwargs['rel'] = ManyToOne(to, to_field,
-            num_in_admin=kwargs.pop('num_in_admin', 3),
-            min_num_in_admin=kwargs.pop('min_num_in_admin', None),
-            max_num_in_admin=kwargs.pop('max_num_in_admin', None),
-            num_extra_on_change=kwargs.pop('num_extra_on_change', 1),
             edit_inline=kwargs.pop('edit_inline', False),
             related_name=kwargs.pop('related_name', None),
             limit_choices_to=kwargs.pop('limit_choices_to', None),
             lookup_overrides=kwargs.pop('lookup_overrides', None),
-            raw_id_admin=kwargs.pop('raw_id_admin', False))
+            raw_id_admin=kwargs.pop('raw_id_admin', False))            
         Field.__init__(self, **kwargs)
+
+        for name in ('num_in_admin', 'min_num_in_admin', 'max_num_in_admin', 'num_extra_on_change'):
+            if name in kwargs:
+                self.deprecated_args.append(name)
 
         if not self.db_index:
             self.db_index = True
@@ -179,14 +179,18 @@ class OneToOneField(SharedMethods, IntegerField):
             kwargs['edit_inline'] = kwargs.pop('edit_inline_type')
 
         kwargs['rel'] = OneToOne(to, to_field,
-            num_in_admin=kwargs.pop('num_in_admin', 0),
             edit_inline=kwargs.pop('edit_inline', False),
             related_name=kwargs.pop('related_name', None),
             limit_choices_to=kwargs.pop('limit_choices_to', None),
             lookup_overrides=kwargs.pop('lookup_overrides', None),
-            raw_id_admin=kwargs.pop('raw_id_admin', False))
+            raw_id_admin=kwargs.pop('raw_id_admin', False))    
         kwargs['primary_key'] = True
         IntegerField.__init__(self, **kwargs)
+        
+        for name in ('num_in_admin'):
+            if name in kwargs:
+                self.deprecated_args.append(name)
+        
         if not self.db_index:
            self.db_index = True
 
@@ -204,7 +208,6 @@ class ManyToManyField(RelatedField, Field):
     def __init__(self, to, **kwargs):
         kwargs['verbose_name'] = kwargs.get('verbose_name', None)
         kwargs['rel'] = ManyToMany(to, kwargs.pop('singular', None),
-            num_in_admin=kwargs.pop('num_in_admin', 0),
             related_name=kwargs.pop('related_name', None),
             filter_interface=kwargs.pop('filter_interface', None),
             limit_choices_to=kwargs.pop('limit_choices_to', None),
@@ -212,6 +215,11 @@ class ManyToManyField(RelatedField, Field):
         if kwargs["rel"].raw_id_admin:
             kwargs.setdefault("validator_list", []).append(self.isValidIDList)
         Field.__init__(self, **kwargs)
+        for name in ('num_in_admin'):
+            if name in kwargs:
+                self.deprecated_args.append(name)
+        
+        
         if self.rel.raw_id_admin:
             msg = gettext_lazy(' Separate multiple IDs with commas.')
         else:
@@ -335,17 +343,15 @@ class ManyToManyFieldNew(RelatedField):
         M2M.__name__ = "M2M_%s_%s_%s" % (self.name, self.from_.__name__, self.to.__name__)
 
 class ManyToOne:
-    def __init__(self, to, field_name, num_in_admin=3, min_num_in_admin=None,
-        max_num_in_admin=None, num_extra_on_change=1, edit_inline=False,
+    def __init__(self, to, field_name, edit_inline=False,
         related_name=None, limit_choices_to=None, lookup_overrides=None, raw_id_admin=False):
         try:
             to._meta
-        except AttributeError: # to._meta doesn't exist, so it must be RECURSIVE_RELATIONSHIP_CONSTANT
+        except AttributeError:
             assert isinstance(to, basestring) , "'to' must be either a model, a model name or the string %r" % RECURSIVE_RELATIONSHIP_CONSTANT
         self.to, self.field_name = to, field_name
-        self.num_in_admin, self.edit_inline = num_in_admin, edit_inline
-        self.min_num_in_admin, self.max_num_in_admin = min_num_in_admin, max_num_in_admin
-        self.num_extra_on_change, self.related_name = num_extra_on_change, related_name
+        self.edit_inline = edit_inline
+        self.related_name = related_name
         self.limit_choices_to = limit_choices_to or {}
         self.lookup_overrides = lookup_overrides or {}
         self.raw_id_admin = raw_id_admin
@@ -355,22 +361,21 @@ class ManyToOne:
         return self.to._meta.get_field(self.field_name)
 
 class OneToOne(ManyToOne):
-    def __init__(self, to, field_name, num_in_admin=0, edit_inline=False,
+    def __init__(self, to, field_name, edit_inline=False,
         related_name=None, limit_choices_to=None, lookup_overrides=None,
         raw_id_admin=False):
         self.to, self.field_name = to, field_name
-        self.num_in_admin, self.edit_inline = num_in_admin, edit_inline
+        self.edit_inline = edit_inline
         self.related_name = related_name
         self.limit_choices_to = limit_choices_to or {}
         self.lookup_overrides = lookup_overrides or {}
         self.raw_id_admin = raw_id_admin
 
 class ManyToMany:
-    def __init__(self, to, singular=None, num_in_admin=0, related_name=None,
+    def __init__(self, to, singular=None, related_name=None,
         filter_interface=None, limit_choices_to=None, raw_id_admin=False):
         self.to = to
         self.singular = singular or None
-        self.num_in_admin = num_in_admin
         self.related_name = related_name
         self.filter_interface = filter_interface
         self.limit_choices_to = limit_choices_to or {}

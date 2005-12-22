@@ -185,4 +185,19 @@ class DotExpandedDict(dict):
             try:
                 current[bits[-1]] = v
             except TypeError: # Special-case if current isn't a dict.
-                current = {bits[-1]: v}
+                current = {bits[-1] : v}
+                
+def dot_expand(key_to_list_mapping, dict_factory=dict):                
+    top = dict_factory()
+    
+    for k, v in key_to_list_mapping.items():
+        current = top
+        bits = k.split('.')
+        for bit in bits[:-1]:
+            current = current.setdefault(bit, dict_factory())
+        # Now assign value to current position
+        try:
+            current[bits[-1]] = v
+        except TypeError: # Special-case if current isn't a dict.
+            current = dict_factory( (bits[-1], v) )
+    return top    
