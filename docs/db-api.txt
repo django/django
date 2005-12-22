@@ -243,7 +243,7 @@ The ``|`` symbol signifies an "OR", so this (roughly) translates into::
 You can use ``&`` and ``|`` operators together, and use parenthetical grouping.
 Example::
 
-    polls.get_object(complex=(Q(question__startswith='Who') & (Q(pub_date__exact=date(2005, 5, 2)) | pub_date__exact=date(2005, 5, 6)))
+    polls.get_object(complex=(Q(question__startswith='Who') & (Q(pub_date__exact=date(2005, 5, 2)) | Q(pub_date__exact=date(2005, 5, 6))))
 
 This roughly translates into::
 
