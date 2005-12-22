@@ -213,6 +213,12 @@ class Field(object):
             field_objs = self.get_manipulator_field_objs()
         return (field_objs,params)
 
+    def get_fields_and_manipulators(self, opts, manipulator, follow ):
+        change = manipulator.change
+        rel = manipulator.name_prefix != ''
+        name_prefix = manipulator.name_prefix
+        return (self.get_manipulator_fields(opts, manipulator, change,name_prefix, rel, follow), [] )
+
     def get_manipulator_fields(self, opts, manipulator, change, name_prefix='', rel=False, follow=True):
         """
         Returns a list of formfields.FormField instances for this field. It

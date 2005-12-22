@@ -86,4 +86,14 @@ Ella Fitzgerald
 Ultimate Ella
 >>> a2.release_date
 datetime.date(2005, 2, 13)
+
+# Test follow (inline editing) functionality.
+>>> follow = {"albums":True}
+>>> man = Musician.ChangeManipulator(m1 ,follow=follow)
+>>> data = man.flatten_data()
+>>> sorted(data.items(), cmp=lambda x,y: cmp(x[0],y[0]))
+[('album.0.id', 1), ('album.0.name', 'Ella and Basie'), ('album.0.release_date', ''), ('album.1.id', 2), ('album.1.name', 'Ultimate Ella'), ('album.1.release_date', '2005-02-13'), ('first_name', 'Ella'), ('id', 1L), ('last_name', 'Fitzgerald')]
+
+
+
 """

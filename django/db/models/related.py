@@ -46,24 +46,9 @@ class RelatedObject(object):
         if parent_instance != None:
             func_name = 'get_%s_list' % self.get_method_name_part()
             func = getattr(parent_instance, func_name)
-            list = func()
-
-            count = len(list) + self.field.rel.num_extra_on_change
-            if self.field.rel.min_num_in_admin:
-               count = max(count, self.field.rel.min_num_in_admin)
-            if self.field.rel.max_num_in_admin:
-               count = min(count, self.field.rel.max_num_in_admin)
-
-            change = count - len(list)
-            if change > 0:
-                return list + [None for i in range(change)]
-            if change < 0:
-                return list[:change]
-            else: # Just right
-                return list
+            return func()
         else:
-            return [None for i in range(self.field.rel.num_in_admin)]
-
+            return []
 
     def editable_fields(self):
         "Get the fields in this class that should be edited inline."
@@ -85,13 +70,30 @@ class RelatedObject(object):
 
         over[self.field.name] = False
         return self.opts.get_follow(over)
-
+        
     def __repr__(self):
         return "<RelatedObject: %s related to %s>" % (self.name, self.field.name)
 
-    def get_manipulator_fields(self, opts, manipulator, change, follow):
-        # TODO: Remove core fields stuff.
+    def get_fields_and_manipulators(self, opts, manipulator, follow ):
+        return ([], self.get_manipulators(manipulator, follow)  )
 
+    def get_manipulators(self,parent_manipulator, follow):
+        
+        man_class = self.model.ChangeManipulator
+        
+        if parent_manipulator.original_object:
+            meth_name = 'get_%s_list' % self.get_method_name_part()
+            list = getattr(parent_manipulator.original_object, meth_name)()
+        
+        manipulators = []
+        for i,obj in enumerate(list):
+            prefix = '%s.%d.' % (self.var_name, i)
+            manipulators.append(man_class(obj,follow, prefix) )
+        return manipulators
+
+    def get_manipulator_fields(self, opts, manipulator, follow):
+        # TODO: Remove core fields stuff.
+        change = manipulator.change
         if manipulator.original_object:
             meth_name = 'get_%s_count' % self.get_method_name_part()
             count = getattr(manipulator.original_object, meth_name)()
@@ -104,6 +106,7 @@ class RelatedObject(object):
         else:
             count = self.field.rel.num_in_admin
         fields = []
+        
         for i in range(count):
             for f in self.opts.fields + self.opts.many_to_many:
                 if follow.get(f.name, False):

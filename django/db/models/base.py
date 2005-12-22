@@ -54,10 +54,10 @@ class ModelBase(type):
 
 def cmp_cls(x, y):
     for field in x._meta.fields:
-        if field.rel and field.null and field.rel.to == y:
+        if field.rel and not field.null and field.rel.to == y:
             return -1
     for field in y._meta.fields:
-        if field.rel and field.null and field.rel.to == x:
+        if field.rel and not field.null and field.rel.to == x:
             return 1
     return 0
 
@@ -196,14 +196,12 @@ class Model(object):
     def __get_pk_val(self):
         return str(getattr(self, self._meta.pk.attname))
 
-    def __collect_sub_objects(self, seen_objs, ignore_objs):
+    def __collect_sub_objects(self, seen_objs):
         pk_val = self.__get_pk_val()
 
-        key = (self.__class__, pk_val)
-
-        if key in seen_objs or key in ignore_objs:
+        if pk_val in seen_objs.setdefault(self.__class__, {}):
             return
-        seen_objs[key] = self
+        seen_objs.setdefault(self.__class__, {})[pk_val] = (self, True)
 
         for related in self._meta.get_all_related_objects():
             rel_opts_name = related.get_method_name_part()
@@ -213,64 +211,74 @@ class Model(object):
                 except ObjectDoesNotExist:
                     pass
                 else:
-                    sub_obj.__collect_sub_objects(seen_objs, ignore_objs)
+                    sub_obj.__collect_sub_objects(seen_objs)
             else:
                 for sub_obj in getattr(self, 'get_%s_list' % rel_opts_name)():
-                    sub_obj.__collect_sub_objects(seen_objs, ignore_objs)
+                    sub_obj.__collect_sub_objects(seen_objs)
 
     def delete(self, ignore_objects=None):
         assert getattr(self, self._meta.pk.attname) is not None, "%r can't be deleted because it doesn't have an ID."
-        ignore_objects = ignore_objects and dict([(o.__class__,o.__get_pk_val()) for o in ignore_objects]) or {}
+        seen_objs = {}
+        if ignore_objects:
+            for obj in ignore_objects:
+                ignore_objs.setdefault(self.__class__,{})[obj.__get_pk_val()] = (obj, False)
 
         seen_objs = {}
-        self.__collect_sub_objects(seen_objs, ignore_objects)
+        self.__collect_sub_objects(seen_objs)
 
-        seen_cls = set([cls for cls,pk in seen_objs.keys()])
+        #TODO: create a total class ordering rather than this sorting, which is 
+        # only a partial ordering, and also is done each delete.. 
+        seen_cls = set(seen_objs.keys())
         cls_order = list(seen_cls)
         cls_order.sort(cmp_cls)
-
-        seen_tups = [ (cls, pk_val, instance) for (cls, pk_val),instance in seen_objs.items() ]
-        seen_tups.sort(lambda x,y: cmp(cls_order.index(x[0]), cls_order.index(y[0])))
-
+        
         cursor = connection.cursor()
-
-        for cls, pk_val, instance in seen_tups:
-
-            # Run any pre-delete hooks.
-            if hasattr(instance, '_pre_delete'):
-                instance._pre_delete()
-
-            dispatcher.send(signal=signals.pre_delete, sender=cls, instance=instance)
-
-            for related in cls._meta.get_all_related_many_to_many_objects():
-                cursor.execute("DELETE FROM %s WHERE %s=%%s" % \
-                    (backend.quote_name(related.field.get_m2m_db_table(related.opts)),
-                    backend.quote_name(cls._meta.object_name.lower() + '_id')),
-                    [pk_val])
-            for f in cls._meta.many_to_many:
-                cursor.execute("DELETE FROM %s WHERE %s=%%s" % \
-                    (backend.quote_name(f.get_m2m_db_table(cls._meta)),
-                    backend.quote_name(cls._meta.object_name.lower() + '_id')),
-                    [pk_val])
-            for field in cls._meta.fields:
-                if field.rel and field.null and field.rel.to in seen_cls:
-                    cursor.execute("UPDATE %s SET %s = NULL WHERE %s=%%s" % \
-                        (backend.quote_name(cls._meta.db_table), backend.quote_name(field.column),
-                        backend.quote_name(cls._meta.pk.column)), [pk_val])
-
-        seen_tups.reverse()
-
-        for cls, pk_val, instance in seen_tups:
-            cursor.execute("DELETE FROM %s WHERE %s=%%s" % \
-                (backend.quote_name(cls._meta.db_table), backend.quote_name(cls._meta.pk.column)),
-                [pk_val])
-
-            setattr(self, cls._meta.pk.attname, None)
-
-            dispatcher.send(signal=signals.post_delete, sender=cls, instance=instance)
-
-            if hasattr(instance, '_post_delete'):
-                instance._post_delete()
+        
+        for cls in cls_order:
+            seen_objs[cls] = seen_objs[cls].items()
+            seen_objs[cls].sort()
+            for pk_val,(instance, do_delete) in seen_objs[cls]:
+                
+                # Run any pre-delete hooks.
+                if do_delete:
+                    if hasattr(instance, '_pre_delete'):
+                        instance._pre_delete()
+                
+                    dispatcher.send(signal=signals.pre_delete, sender=cls, instance=instance)
+                
+                    for related in cls._meta.get_all_related_many_to_many_objects():
+                        cursor.execute("DELETE FROM %s WHERE %s=%%s" % \
+                            (backend.quote_name(related.field.get_m2m_db_table(related.opts)),
+                            backend.quote_name(cls._meta.object_name.lower() + '_id')),
+                            [pk_val])
+                    for f in cls._meta.many_to_many:
+                        cursor.execute("DELETE FROM %s WHERE %s=%%s" % \
+                            (backend.quote_name(f.get_m2m_db_table(cls._meta)),
+                            backend.quote_name(cls._meta.object_name.lower() + '_id')),
+                            [pk_val])
+                            
+                    for field in cls._meta.fields:
+                        if field.rel and field.null and field.rel.to in seen_cls:
+                            cursor.execute("UPDATE %s SET %s = NULL WHERE %s=%%s" % \
+                                (backend.quote_name(cls._meta.db_table), backend.quote_name(field.column),
+                                backend.quote_name(cls._meta.pk.column)), [pk_val])
+                            setattr(instance, field.attname, None)
+        
+        for cls in cls_order:
+            seen_objs[cls].reverse()
+            
+            for pk_val, (instance, do_delete) in seen_objs[cls]:
+                if do_delete:
+                    cursor.execute("DELETE FROM %s WHERE %s=%%s" % \
+                        (backend.quote_name(cls._meta.db_table), backend.quote_name(cls._meta.pk.column)),
+                        [pk_val])
+        
+                    setattr(instance, cls._meta.pk.attname, None)
+        
+                    dispatcher.send(signal=signals.post_delete, sender=cls, instance=instance)
+        
+                    if hasattr(instance, '_post_delete'):
+                        instance._post_delete()
 
         connection.commit()
 

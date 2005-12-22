@@ -20,9 +20,6 @@ dispatcher.connect(
 )
 
 class ManipulatorDescriptor(object):
-    class empty:
-        pass
-
     def __init__(self, name, base):
         self.man = None
         self.name = name
@@ -62,15 +59,32 @@ class AutomaticManipulator(Manipulator):
         setattr(other_cls, name, ManipulatorDescriptor(name, cls))
     contribute_to_class = classmethod(contribute_to_class)
 
-    def __init__(self, original_object=None, follow=None):
-        self.follow = self.model._meta.get_follow(follow)
-        self.fields = []
+    def __init__(self, original_object=None, follow=None, name_prefix=''):
+        if name_prefix == '':
+            self.follow = self.model._meta.get_follow(follow)
+        else:
+            self.follow = follow
+        self.fields_, self.children = [], []
         self.original_object = original_object
+        self.name_prefix = name_prefix
         for f in self.opts.get_data_holders(self.follow):
             fol = self.follow[f.name]
-            fields = f.get_manipulator_fields(self.opts, self, self.change, follow=fol)
-            self.fields.extend(fields)
-
+            fields,manipulators = f.get_fields_and_manipulators(self.opts, self, follow=fol)
+            #fields = f.get_manipulator_fields(self.opts, self, self.change, follow=fol)
+            self.fields_.extend(fields)
+            self.children.append(manipulators)
+        #print self.fields_
+        
+    def get_fields(self):
+        l = list(self.fields_)
+        for child in self.children:
+            for manip in child:
+                l.extend(manip.fields)
+        #print l
+        return l
+            
+    fields = property(get_fields)
+    
     def save(self, new_data):
         add, change, opts, klass = self.add, self.change, self.opts, self.model
         # TODO: big cleanup when core fields go -> use recursive manipulators.
@@ -233,37 +247,42 @@ class AutomaticManipulator(Manipulator):
 class ModelAddManipulator(AutomaticManipulator):
     change = False
     add = True
-    def __init__(self, follow=None):
-        super(ModelAddManipulator, self).__init__(follow=follow)
+    def __init__(self, follow=None, name_prefix=''):
+        super(ModelAddManipulator, self).__init__(follow=follow, name_prefix=name_prefix)
 
 class ModelChangeManipulator(AutomaticManipulator):
     change = True
     add = False
 
-    def __init__(self, obj_key=None, follow=None):
+    def __init__(self, obj_key=None, follow=None, name_prefix=''):
         assert obj_key is not None, "ChangeManipulator.__init__() must be passed obj_key parameter."
-        self.obj_key = obj_key
-        try:
-            original_object = self.__class__.manager.get_object(pk=obj_key)
-        except ObjectDoesNotExist:
-            # If the object doesn't exist, this might be a manipulator for a
-            # one-to-one related object that hasn't created its subobject yet.
-            # For example, this might be a Restaurant for a Place that doesn't
-            # yet have restaurant information.
-            if opts.one_to_one_field:
-                # Sanity check -- Make sure the "parent" object exists.
-                # For example, make sure the Place exists for the Restaurant.
-                # Let the ObjectDoesNotExist exception propogate up.
-                lookup_kwargs = opts.one_to_one_field.rel.limit_choices_to
-                lookup_kwargs['%s__exact' % opts.one_to_one_field.rel.field_name] = obj_key
-                null = opts.one_to_one_field.rel.to._meta.get_model_module().get_object(**lookup_kwargs)
-                params = dict([(f.attname, f.get_default()) for f in opts.fields])
-                params[opts.pk.attname] = obj_key
-                original_object = opts.get_model_module().Klass(**params)
-            else:
-                raise
-        super(ModelChangeManipulator, self).__init__(original_object=original_object, follow=follow)
-        self.original_object = original_object
+        if isinstance(obj_key, self.model):
+            original_object = obj_key
+            self.obj_key = getattr(original_object, self.model._meta.pk.attname)
+        else:
+            self.obj_key = obj_key
+            try:
+                original_object = self.manager.get_object(pk=obj_key)
+            except ObjectDoesNotExist:
+                # If the object doesn't exist, this might be a manipulator for a
+                # one-to-one related object that hasn't created its subobject yet.
+                # For example, this might be a Restaurant for a Place that doesn't
+                # yet have restaurant information.
+                if opts.one_to_one_field:
+                    # Sanity check -- Make sure the "parent" object exists.
+                    # For example, make sure the Place exists for the Restaurant.
+                    # Let the ObjectDoesNotExist exception propogate up.
+                    lookup_kwargs = opts.one_to_one_field.rel.limit_choices_to
+                    lookup_kwargs['%s__exact' % opts.one_to_one_field.rel.field_name] = obj_key
+                    null = opts.one_to_one_field.rel.to._meta.get_model_module().get_object(**lookup_kwargs)
+                    params = dict([(f.attname, f.get_default()) for f in opts.fields])
+                    params[opts.pk.attname] = obj_key
+                    original_object = opts.get_model_module().Klass(**params)
+                else:
+                    raise
+        
+        super(ModelChangeManipulator, self).__init__(original_object=original_object, follow=follow, name_prefix=name_prefix)
+        #self.original_object = original_object
 
         if self.opts.get_ordered_objects():
             self.fields.append(formfields.CommaSeparatedIntegerField(field_name="order_"))

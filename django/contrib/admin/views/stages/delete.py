@@ -1,3 +1,15 @@
+from django.contrib.admin.views.decorators import staff_member_required
+from django.contrib.admin.views.main import get_model_and_app
+from django.core.extensions import get_object_or_404,render_to_response
+from django.core.extensions import DjangoContext as Context
+from django.utils.text import capfirst
+from django.utils.html import escape, strip_tags
+from django.db import models
+try:
+    from django.contrib.admin.models import LogEntry, ADDITION, CHANGE, DELETION
+except ImportError:
+    raise ImproperlyConfigured, "You don't have 'django.contrib.admin' in INSTALLED_APPS."
+from django.utils.httpwrappers import HttpResponse, HttpResponseRedirect
 
 def _nest_help(obj, depth, val):
     current = obj
@@ -83,12 +95,14 @@ def _get_deleted_objects(deleted_objects, perms_needed, user, obj, opts, current
             if not user.has_perm(p):
                 perms_needed.add(related.opts.verbose_name)
 
-def delete_stage(request, app_label, module_name, object_id):
+def delete_stage(request, path, object_id):
     import sets
-    mod, opts = _get_mod_opts(app_label, module_name)
+    #mod, opts = _get_mod_opts(app_label, module_name)
+    model, app_label = get_model_and_app(path)
+    opts = model._meta
     if not request.user.has_perm(app_label + '.' + opts.get_delete_permission()):
         raise PermissionDenied
-    obj = get_object_or_404(mod, pk=object_id)
+    obj = get_object_or_404(model, pk=object_id)
 
     # Populate deleted_objects, a data structure of all related objects that
     # will also be deleted.

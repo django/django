@@ -161,7 +161,7 @@ class Options:
             else:
                 child_override = None
             fol = f.get_follow(child_override)
-            if fol:
+            if fol != None:
                 follow[f.name] = fol
         return follow
 
