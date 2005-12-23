@@ -87,32 +87,10 @@ class RelatedObject(object):
         
         manipulators = []
         for i,obj in enumerate(list):
-            prefix = '%s.%d.' % (self.var_name, i)
+            prefix = '%s%s.%d.' % (parent_manipulator.name_prefix, self.var_name, i)
             manipulators.append(man_class(obj,follow, prefix) )
         return manipulators
 
-    def get_manipulator_fields(self, opts, manipulator, follow):
-        # TODO: Remove core fields stuff.
-        change = manipulator.change
-        if manipulator.original_object:
-            meth_name = 'get_%s_count' % self.get_method_name_part()
-            count = getattr(manipulator.original_object, meth_name)()
-
-            count += self.field.rel.num_extra_on_change
-            if self.field.rel.min_num_in_admin:
-                count = max(count, self.field.rel.min_num_in_admin)
-            if self.field.rel.max_num_in_admin:
-                count = min(count, self.field.rel.max_num_in_admin)
-        else:
-            count = self.field.rel.num_in_admin
-        fields = []
-        
-        for i in range(count):
-            for f in self.opts.fields + self.opts.many_to_many:
-                if follow.get(f.name, False):
-                    prefix = '%s.%d.' % (self.var_name, i)
-                    fields.extend(f.get_manipulator_fields(self.opts, manipulator, change, name_prefix=prefix, rel=True))
-        return fields
 
     def bind(self, field_mapping, original, bound_related_object_class=BoundRelatedObject):
         return bound_related_object_class(self, field_mapping, original)

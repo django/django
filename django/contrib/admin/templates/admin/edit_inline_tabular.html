@@ -7,6 +7,8 @@
          <th{{ fw.header_class_attribute }}>{{ fw.field.verbose_name|capfirst }}</th>
       {% endif %}
    {% endfor %}
+   <td><td>
+   </tr></thead>
    {% for fcw in bound_related_object.form_field_collection_wrappers %}
       {% if change %}{% if original_row_needed %}
          {% if fcw.obj.original %}
@@ -29,10 +31,14 @@
       {% if bound_related_object.show_url %}<td>
          {% if fcw.obj.original %}<a href="/r/{{ fcw.obj.original.content_type_id }}/{{ fcw.obj.original.id }}/">View on site</a>{% endif %}
       </td>{% endif %}
+      <td>
+      	<button class="deletebutton" name="command" value="{{fcw.deletecommand}}">Delete</button>
+      </td>
       </tr>
 
    {% endfor %} </table>
-
+    <button class="addbutton" name="command" value="{{bound_related_object.addcommand}}">Add</button>
+    
    {% for fcw in bound_related_object.form_field_collection_wrappers %}
       {% for bound_field in fcw.bound_fields %}
          {% if bound_field.hidden %}

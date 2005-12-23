@@ -36,9 +36,9 @@ def change_stage(request, path, object_id):
         raise PermissionDenied
     if request.POST and request.POST.has_key("_saveasnew"):
         return add_stage(request, path, form_url='../../add/')
+    
     try:
-        manipulator_class = model.ChangeManipulator
-        manipulator = manipulator_class(object_id)
+        manipulator = model.ChangeManipulator(object_id)
     except ObjectDoesNotExist:
         raise Http404
 
@@ -50,26 +50,31 @@ def change_stage(request, path, object_id):
         errors = manipulator.get_validation_errors(new_data)
 
         manipulator.do_html2python(new_data)
-        if not errors and not request.POST.has_key("_preview"):
-            new_object = manipulator.save(new_data)
-            log_change_message(request.user, opts, manipulator, new_object)
-            msg = _('The %(name)s "%(obj)s" was changed successfully.') % {'name': opts.verbose_name, 'obj': new_object}
-            pk_value = getattr(new_object, opts.pk.attname)
-            if request.POST.has_key("_continue"):
-                request.user.add_message(msg + ' ' + _("You may edit it again below."))
-                if request.REQUEST.has_key('_popup'):
-                    return HttpResponseRedirect(request.path + "?_popup=1")
+        if not errors:
+            if request.POST.has_key("command"):
+                command_name = request.POST.get("command")
+                manipulator.do_command(new_data, command_name)
+                new_data = manipulator.flatten_data()
+            elif not request.POST.has_key("_preview"):
+                new_object = manipulator.save(new_data)
+                log_change_message(request.user, opts, manipulator, new_object)
+                msg = _('The %(name)s "%(obj)s" was changed successfully.') % {'name': opts.verbose_name, 'obj': new_object}
+                pk_value = getattr(new_object, opts.pk.attname)
+                if request.POST.has_key("_continue"):
+                    request.user.add_message(msg + ' ' + _("You may edit it again below."))
+                    if request.REQUEST.has_key('_popup'):
+                        return HttpResponseRedirect(request.path + "?_popup=1")
+                    else:
+                        return HttpResponseRedirect(request.path)
+                elif request.POST.has_key("_saveasnew"):
+                    request.user.add_message(_('The %(name)s "%(obj)s" was added successfully. You may edit it again below.') % {'name': opts.verbose_name, 'obj': new_object})
+                    return HttpResponseRedirect("../../%s/" % pk_value)
+                elif request.POST.has_key("_addanother"):
+                    request.user.add_message(msg + ' ' + (_("You may add another %s below.") % opts.verbose_name))
+                    return HttpResponseRedirect("../../add/")
                 else:
-                    return HttpResponseRedirect(request.path)
-            elif request.POST.has_key("_saveasnew"):
-                request.user.add_message(_('The %(name)s "%(obj)s" was added successfully. You may edit it again below.') % {'name': opts.verbose_name, 'obj': new_object})
-                return HttpResponseRedirect("../../%s/" % pk_value)
-            elif request.POST.has_key("_addanother"):
-                request.user.add_message(msg + ' ' + (_("You may add another %s below.") % opts.verbose_name))
-                return HttpResponseRedirect("../../add/")
-            else:
-                request.user.add_message(msg)
-                return HttpResponseRedirect("../../")
+                    request.user.add_message(msg)
+                    return HttpResponseRedirect("../../")
     else:
         # Populate new_data with a "flattened" version of the current data.
         new_data = manipulator.flatten_data()

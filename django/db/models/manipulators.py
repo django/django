@@ -47,7 +47,7 @@ class ManipulatorHelper(object):
         self.related_collection = related_collection
 
 class FillHelper(ManipulatorHelper):
-    def matched_item(self,child_manip, obj_data):
+    def matched_item(self,index, child_manip, obj_data):
         child_manip._fill_data(obj_data)
         
     def missing_item(self, index, child_manip):
@@ -155,51 +155,58 @@ class AutomaticManipulator(Manipulator):
                         helper.new_item(obj_data)
                         
     def _fill_data(self, expanded_data):
-        self.original_object = self.get_new_object()
+        self.original_object = self.get_new_object(expanded_data)
         # TODO: many_to_many
         self._fill_related_objects(expanded_data,FillHelper)
         
     def do_command(self, new_data, command):
         expanded_data = dot_expand(new_data, MultiValueDict)
         # Deal with the effects of previous commands
-        self.fill_data(expanded_data)
+        self._fill_data(expanded_data)
         # Do this command
         command_parts = command.split('.')
-        self._do_command_expanded(self, expanded_data, command_parts)
+        self._do_command_expanded(expanded_data, command_parts)
     
     def _do_command_expanded(self, expanded_data, command_parts):
-        part = command_parts.pop(0, None)
-        if part == None:
+        try: 
+            part = command_parts.pop(0)
+        except IndexError:
             raise BadCommand, "Not enough parts in command"
     
         # must be the name of a child manipulator collection
         child_manips = None
         related = None
-        for rel,manips in self.children: 
+        for rel,manips in self.children.items(): 
             if rel.var_name == part:
                 related = rel
                 child_manips = manips
                 break
         if child_manips == None: 
-            raise BadCommand, "%s : unknown manipulator collection name." % (part,)
+            raise BadCommand, "'%s' : unknown manipulator collection name." % (part,)
         
         child_data = expanded_data.get(part, None)
         if child_data == None: 
-            raise BadCommand, "%s : could not find data for manipulator collection." % (part,)                
+            raise BadCommand, "'%s' : could not find data for manipulator collection." % (part,)                
             
             # The next part could be an index of a manipulator,
             # or it could be a command on the collection.
-            index_part = command_parts.pop(0)
+            try: 
+                part = command_parts.pop(0)
+            except IndexError:
+                raise BadCommand, "Not enough parts in command"
             try:
                 index = int(index_part)
                 manip = child_manips.get(index, None)
+                
                 if manip == None:
                     raise BadCommand, "No %s manipulator found for index %s in command." % (part, index)
-                
+                obj_data = child_data.get(index_part, None)
+                if obj_data == None:
+                    raise BadCommand, "Could not find data for manipulator %s in %s collection." % (index, part)
                 if command_parts == ["delete"]:
                     child_manips[index] = None
                 else:
-                    manip._do_command_expanded(expanded_data,command_parts)
+                    manip._do_command_expanded(obj_data,command_parts)
             except ValueError:
             # Must be a command on the collection. Possible commands: 
             # add. 
