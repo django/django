@@ -222,7 +222,7 @@ class Field(object):
         change = manipulator.change
         rel = manipulator.name_prefix != ''
         name_prefix = manipulator.name_prefix
-        return (self.get_manipulator_fields(opts, manipulator, change,name_prefix, rel, follow), [] )
+        return (self.get_manipulator_fields(opts, manipulator, change,name_prefix, rel, follow), None )
 
     def get_manipulator_fields(self, opts, manipulator, change, name_prefix='', rel=False, follow=True):
         """

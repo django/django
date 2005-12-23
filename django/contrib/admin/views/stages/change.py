@@ -47,16 +47,33 @@ def change_stage(request, path, object_id):
         if opts.has_field_type(models.FileField):
             new_data.update(request.FILES)
 
-        errors = manipulator.get_validation_errors(new_data)
-
-        manipulator.do_html2python(new_data)
-        if not errors:
-            if request.POST.has_key("command"):
-                command_name = request.POST.get("command")
-                manipulator.do_command(new_data, command_name)
-                new_data = manipulator.flatten_data()
-            elif not request.POST.has_key("_preview"):
-                new_object = manipulator.save(new_data)
+        if request.POST.has_key("command"):
+            #save a copy of the data to use for errors later. 
+            data = new_data.copy()
+            
+            manipulator.do_html2python(new_data)
+            command_name = request.POST.get("command")
+            manipulator.do_command(new_data, command_name)
+            new_data = manipulator.flatten_data()
+            
+            #HACK - validators should not work on POSTED data directly... 
+            errors = manipulator.get_validation_errors(data)
+        elif request.POST.has_key("_preview"):
+            errors = manipulator.get_validation_errors(new_data)
+            manipulator.do_html2python(new_data)
+        else:
+            #save a copy of the data to use for errors later. 
+            data = new_data.copy()
+            
+            manipulator.do_html2python(new_data)
+            manipulator.update(new_data)
+            errors = manipulator.get_validation_errors(data)
+            if errors:
+                flat_data = manipulator.flatten_data()
+                flat_data.update(new_data)
+                new_data = flat_data
+            else:
+                new_object = manipulator.save_from_update()
                 log_change_message(request.user, opts, manipulator, new_object)
                 msg = _('The %(name)s "%(obj)s" was changed successfully.') % {'name': opts.verbose_name, 'obj': new_object}
                 pk_value = getattr(new_object, opts.pk.attname)
@@ -75,33 +92,15 @@ def change_stage(request, path, object_id):
                 else:
                     request.user.add_message(msg)
                     return HttpResponseRedirect("../../")
-    else:
+    else: 
         # Populate new_data with a "flattened" version of the current data.
         new_data = manipulator.flatten_data()
-        # TODO: do this in flatten_data...
-        # If the object has ordered objects on its admin page, get the existing
-        # order and flatten it into a comma-separated list of IDs.
-
-        id_order_list = []
-        for rel_obj in opts.get_ordered_objects():
-            id_order_list.extend(getattr(manipulator.original_object, 'get_%s_order' % rel_obj.object_name.lower())())
-        if id_order_list:
-            new_data['order_'] = ','.join(map(str, id_order_list))
         errors = {}
-
+        
     # Populate the FormWrapper.
     form = formfields.FormWrapper(manipulator, new_data, errors, edit_inline = True)
     form.original = manipulator.original_object
     form.order_objects = []
-
-    #TODO Should be done in flatten_data  / FormWrapper construction
-    for related in opts.get_followed_related_objects():
-        wrt = related.opts.order_with_respect_to
-        if wrt and wrt.rel and wrt.rel.to._meta == opts:
-            func = getattr(manipulator.original_object, 'get_%s_list' %
-                    related.get_method_name_part())
-            orig_list = func()
-            form.order_objects.extend(orig_list)
 
     c = Context(request, {
         'title': _('Change %s') % opts.verbose_name,

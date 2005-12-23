@@ -247,7 +247,7 @@ class InlineObjectCollection:
             #orig_list = self.rel_obj.get_list(orig)
             
             for i, manip in enumerate(self.child_manips) :
-                if manip:
+                if manip and not manip.needs_deletion:
                     collection = {'original': manip.original_object}
                     for field in manip.fields:
                         errors = self.errors.get(field.field_name, [])
@@ -314,12 +314,12 @@ class FormField:
             except ValueError:
                 converted_data = d
             new_data.setlist(name, converted_data)
-        else:
-            try:
-               # individual fields deal with None values themselves
-               new_data.setlist(name, [self.__class__.html2python(None)])
-            except EmptyValue:
-               new_data.setlist(name, [])
+#        else:
+#            try:
+#               # individual fields deal with None values themselves
+#               new_data.setlist(name, [self.__class__.html2python(None)])
+#            except EmptyValue:
+#               new_data.setlist(name, [])
 
     def get_id(self):
         "Returns the HTML 'id' attribute for this form field."
