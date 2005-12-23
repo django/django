@@ -32,12 +32,12 @@
          {% if fcw.obj.original %}<a href="/r/{{ fcw.obj.original.content_type_id }}/{{ fcw.obj.original.id }}/">View on site</a>{% endif %}
       </td>{% endif %}
       <td>
-      	<button class="deletebutton" name="command" value="{{fcw.deletecommand}}">Delete</button>
+      	<button class="deletebutton" name="command" value="{{bound_related_object.relation.var_name}}.{{fcw.index}}.delete">Delete</button>
       </td>
       </tr>
 
    {% endfor %} </table>
-    <button class="addbutton" name="command" value="{{bound_related_object.addcommand}}">Add</button>
+    <button class="addbutton" name="command" value="{{bound_related_object.relation.var_name}}.add">Add</button>
     
    {% for fcw in bound_related_object.form_field_collection_wrappers %}
       {% for bound_field in fcw.bound_fields %}

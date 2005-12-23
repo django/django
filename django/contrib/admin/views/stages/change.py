@@ -78,7 +78,6 @@ def change_stage(request, path, object_id):
     else:
         # Populate new_data with a "flattened" version of the current data.
         new_data = manipulator.flatten_data()
-
         # TODO: do this in flatten_data...
         # If the object has ordered objects on its admin page, get the existing
         # order and flatten it into a comma-separated list of IDs.

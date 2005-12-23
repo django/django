@@ -122,10 +122,10 @@ class FormWrapper:
     def fill_inline_collections(self):
         if not self._inline_collections:
             ic = []
-            related_objects = self.manipulator.get_related_objects()
-            for rel_obj in related_objects:
+            children = self.manipulator.children.items()
+            for rel_obj, child_manips  in children:
                 data = rel_obj.extract_data(self.data)
-                inline_collection = InlineObjectCollection(self.manipulator, rel_obj, data, self.error_dict)
+                inline_collection = InlineObjectCollection(self.manipulator, rel_obj, child_manips, data, self.error_dict)
                 ic.append(inline_collection)
             self._inline_collections = ic
 
@@ -203,12 +203,13 @@ class FormFieldCollection(FormFieldWrapper):
         return ''.join([field.html_error_list() for field in self.formfield_dict.values() if hasattr(field, 'errors')])
 
 class InlineObjectCollection:
-    "An object that acts like a list of form field collections."
-    def __init__(self, parent_manipulator, rel_obj, data, errors):
+    "An object that acts like a sparse list of form field collections."
+    def __init__(self, parent_manipulator, rel_obj,child_manips, data, errors):
         self.parent_manipulator = parent_manipulator
         self.rel_obj = rel_obj
         self.data = data
         self.errors = errors
+        self.child_manips = child_manips
         self._collections = None
         self.name = rel_obj.name
 
@@ -230,27 +231,32 @@ class InlineObjectCollection:
 
     def __iter__(self):
         self.fill()
-        return self._collections.__iter__()
+        return self._collections.values().__iter__()
+
+    def items(self):
+        self.fill()
+        return self._collections.items()
 
     def fill(self):
         if self._collections:
             return
         else:
-            var_name = self.rel_obj.opts.object_name.lower()
-            wrapper = []
-            orig = hasattr(self.parent_manipulator, 'original_object') and self.parent_manipulator.original_object  or None
-            orig_list = self.rel_obj.get_list(orig)
-            for i, instance in enumerate(orig_list):
-                collection = {'original': instance}
-                for f in self.rel_obj.editable_fields():
-                        for field_name in f.get_manipulator_field_names(''):
-                            full_field_name = '%s.%d.%s' % (var_name, i, field_name)
-                            field = self.parent_manipulator[full_field_name]
-                            data = field.extract_data(self.data)
-                            errors = self.errors.get(full_field_name, [])
-                            collection[field_name] = FormFieldWrapper(field, data, errors)
-                wrapper.append(FormFieldCollection(collection))
-            self._collections = wrapper
+            #var_name = self.rel_obj.opts.object_name.lower()
+            cols = {}
+            #orig = hasattr(self.parent_manipulator, 'original_object') and self.parent_manipulator.original_object  or None
+            #orig_list = self.rel_obj.get_list(orig)
+            
+            for i, manip in enumerate(self.child_manips) :
+                if manip:
+                    collection = {'original': manip.original_object}
+                    for field in manip.fields:
+                        errors = self.errors.get(field.field_name, [])
+                        data = field.extract_data(self.data)
+                        last_part = field.field_name[field.field_name.rindex('.') + 1:]
+                        collection[last_part] = FormFieldWrapper(field, data, errors)
+             
+                    cols[i] = FormFieldCollection(collection)
+            self._collections = cols
 
 class FormField:
     """Abstract class representing a form field.

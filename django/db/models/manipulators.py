@@ -42,20 +42,20 @@ class ManipulatorDescriptor(object):
             return self.man
 
 class ManipulatorHelper(object):
-    def __init__(self, manip, related_collection):
+    def __init__(self, manip, related, child_manipulators):
         self.manip = manip
-        self.related_collection = related_collection
+        self.related = related
+        self.child_manipulators = child_manipulators
 
 class FillHelper(ManipulatorHelper):
     def matched_item(self,index, child_manip, obj_data):
         child_manip._fill_data(obj_data)
         
     def missing_item(self, index, child_manip):
-        self.related_collection[index] = None
+        self.child_manipulators[index] = None
 
-    def new_item(self):
-        child_manip = self.manip.model.AddManipulator()
-        self.related_collection.append(child_manip)
+    def new_item(self, obj_data):
+        child_manip = self.manip._add_manipulator_for_child(self.related)
         child_manip._fill_data(obj_data)
     
 class SaveHelper(ManipulatorHelper):
@@ -65,9 +65,11 @@ class SaveHelper(ManipulatorHelper):
     def missing_item(self, index, child_manip):
         child_manip.manip.original_object.delete(ignore_objects=[parent.original_object])
 
-    def new_item(self, index, obj_data):
-        child_manip = self.manip.model.AddManipulator()
-        child_manip._save_expanded(obj_data)
+    def new_item(self, obj_data):
+        child_manip = self.manip._add_manipulator_for_child(self.related)
+        overrides = { self.related.field : 
+                      getattr(self.manip.original_object, self.manip.opts.pk.attname) }
+        child_manip._save_expanded(obj_data, overrides)
 
 class AutomaticManipulator(Manipulator):
     def _prepare(cls, model):
@@ -118,16 +120,20 @@ class AutomaticManipulator(Manipulator):
     def get_original_value(self, field):
         raise NotImplementedError 
     
-    def get_new_object(self, expanded_data):
+    def get_new_object(self, expanded_data, overrides=None):
         params = {}
-        
+        overrides = overrides or {}
         for f in self.opts.fields:
-            # Fields with auto_now_add should keep their original value in the change stage.
-            auto_now_add = self.change and getattr(f, 'auto_now_add', False)
-            if self.follow.get(f.name, None) and not auto_now_add:
-                param = f.get_manipulator_new_data(expanded_data)
+            over = overrides.get(f, None)
+            if over:
+                param = over
             else:
-                param = self.get_original_value(f)
+                # Fields with auto_now_add should keep their original value in the change stage.
+                auto_now_add = self.change and getattr(f, 'auto_now_add', False)
+                if self.follow.get(f.name, None) and not auto_now_add:
+                    param = f.get_manipulator_new_data(expanded_data)
+                else:
+                    param = self.get_original_value(f)
                 
             params[f.attname] = param
         
@@ -137,12 +143,12 @@ class AutomaticManipulator(Manipulator):
     
     def _fill_related_objects(self, expanded_data, helper_factory):
         for related, manips in self.children.items():
-                helper = helper_factory(self, related)
-                child_data = expanded_data[related.var_name]
+                helper = helper_factory(self, related, manips)
+                child_data = MultiValueDict(expanded_data[related.var_name])
                 # existing objects
                 for index,manip in enumerate(manips): 
                     obj_data = child_data.get(str(index), None)
-                    child_data.pop(str(index) )
+                    child_data.pop(str(index), None)
                     if obj_data != None:
                         #the object has new data
                         helper.matched_item(index,manip, obj_data )
@@ -151,7 +157,7 @@ class AutomaticManipulator(Manipulator):
                         helper.missing_item(index,manip)
                 if child_data:
                     # There are new objects in the data
-                    for index, obj_data in child_data:
+                    for index, obj_data in child_data.items():
                         helper.new_item(obj_data)
                         
     def _fill_data(self, expanded_data):
@@ -168,7 +174,7 @@ class AutomaticManipulator(Manipulator):
         self._do_command_expanded(expanded_data, command_parts)
     
     def _do_command_expanded(self, expanded_data, command_parts):
-        try: 
+        try:
             part = command_parts.pop(0)
         except IndexError:
             raise BadCommand, "Not enough parts in command"
@@ -188,40 +194,49 @@ class AutomaticManipulator(Manipulator):
         if child_data == None: 
             raise BadCommand, "'%s' : could not find data for manipulator collection." % (part,)                
             
-            # The next part could be an index of a manipulator,
-            # or it could be a command on the collection.
-            try: 
-                part = command_parts.pop(0)
-            except IndexError:
-                raise BadCommand, "Not enough parts in command"
-            try:
-                index = int(index_part)
-                manip = child_manips.get(index, None)
-                
-                if manip == None:
-                    raise BadCommand, "No %s manipulator found for index %s in command." % (part, index)
-                obj_data = child_data.get(index_part, None)
-                if obj_data == None:
-                    raise BadCommand, "Could not find data for manipulator %s in %s collection." % (index, part)
-                if command_parts == ["delete"]:
-                    child_manips[index] = None
-                else:
-                    manip._do_command_expanded(obj_data,command_parts)
-            except ValueError:
-            # Must be a command on the collection. Possible commands: 
-            # add. 
-                if index_part == "add":
-                    child_manips.append(related.model.AddManipulator())
-                        
+        # The next part could be an index of a manipulator,
+        # or it could be a command on the collection.
+        try: 
+            index_part = command_parts.pop(0)
+        except IndexError:
+            raise BadCommand, "Not enough parts in command"
+        try:
+            index = int(index_part)
+            manip = child_manips[index]
+            
+            if manip == None:
+                raise BadCommand, "No %s manipulator found for index %s in command." % (part, index)
+            obj_data = child_data.get(index_part, None)
+            if obj_data == None:
+                raise BadCommand, "Could not find data for manipulator %s in %s collection." % (index, part)
+            if command_parts == ["delete"]:
+                child_manips[index] = None
+            else:
+                manip._do_command_expanded(obj_data,command_parts)
+        except ValueError:
+        # Must be a command on the collection. Possible commands: 
+        # add. 
+            if index_part == "add":
+                self._add_manipulator_for_child(related)
+            else: 
+                raise BadCommand, "%s, unknown command" % (part)
+    
+    def _add_manipulator_for_child(self, related):
+        child_manips = self.children.setdefault(related, [])
+        fol = self.follow[related.name]
+        prefix = "%s%s.%s." % (self.name_prefix, related.var_name, len(child_manips) )
+        child_manip = related.model.AddManipulator(follow=fol,name_prefix=prefix)
+        child_manips.append(child_manip)
+        return child_manip
     
     def save(self, new_data):
         expanded_data = dot_expand(new_data,MultiValueDict)
         return self._save_expanded(expanded_data)
         
-    def _save_expanded(self, expanded_data):        
+    def _save_expanded(self, expanded_data, overrides = None):        
         add, change, opts, klass = self.add, self.change, self.opts, self.model
         
-        new_object = self.get_new_object(expanded_data)
+        new_object = self.get_new_object(expanded_data, overrides)
 
         # First, save the basic object itself.
         new_object.save()
@@ -254,29 +269,6 @@ class AutomaticManipulator(Manipulator):
         self._fill_related_objects(expanded_data,SaveHelper)
         
         return new_object
-#        for related, manips in self.children.items():
-#            child_data = expanded_data[related.var_name]
-#            #print "with child:",  name
-#            # Apply changes to existing objects
-#            for index,manip in enumerate(manips): 
-#                obj_data = child_data.get(str(index), None)
-#                child_data.pop(str(index) )
-#                if obj_data != None:
-#                    #save the object with the new data
-#                    #print "saving child data:", obj_data
-#                    manip._save_expanded(obj_data)
-#                else:
-#                    #delete the object as it was not in the data
-#                    manip.original_object.delete(ignore_objects=[self])
-#                    #print "deleting child object:", manip.original_original
-#            if child_data:
-#                # There are new objects in the data, so 
-#                # add them.
-#                for index, obj_data in child_data:
-#                    manip = related.model.AddManipulator()
-#                    manip._save_expanded(obj_data)
-#                #print "new data to be added:", child_data
-        
 
         # Save the order, if applicable.
         #if change and opts.get_ordered_objects():
@@ -290,9 +282,17 @@ class AutomaticManipulator(Manipulator):
 
     def flatten_data(self):
         new_data = {}
-        for f in self.opts.get_data_holders(self.follow):
-            fol = self.follow.get(f.name)
-            new_data.update(f.flatten_data(fol, self.original_object))
+        for f in self.opts.fields + self.opts.many_to_many: 
+            fol = self.follow.get(f.name, None)
+            if fol:
+                new_data.update(f.flatten_data(fol, self.original_object))
+        for rel, child_manips in self.children.items():
+            for manip in child_manips:
+                if manip:
+                    child_data = manip.flatten_data()
+                    new_data.update(child_data)     
+                
+        new_data = dict([(self.name_prefix +k, v) for k,v in new_data.items()])  
         return new_data
 
 class ModelAddManipulator(AutomaticManipulator):

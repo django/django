@@ -84,7 +84,8 @@ class RelatedObject(object):
         if parent_manipulator.original_object:
             meth_name = 'get_%s_list' % self.get_method_name_part()
             list = getattr(parent_manipulator.original_object, meth_name)()
-        
+        else:
+            list = []
         manipulators = []
         for i,obj in enumerate(list):
             prefix = '%s%s.%d.' % (parent_manipulator.name_prefix, self.var_name, i)
