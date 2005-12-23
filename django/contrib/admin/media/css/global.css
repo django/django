@@ -141,6 +141,10 @@ input[type=submit].default:active { background-image:url(../img/admin/default-bg
 .submit-row input { margin:0 0 0 5px; }
 .submit-row .float-left { padding-top:.1em; }
 
+/* ACTIONS */
+.actions { border-bottom:1px solid #eee; text-align:right; }
+.collection { border-top: 1ex solid #7CA0C7; }
+
 /*  FORM ROWS  */
 .form-row { clear:both; padding:8px 12px; font-size:11px; }
 html>body .form-row { border-bottom:1px solid #eee; }

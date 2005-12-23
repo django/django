@@ -139,8 +139,8 @@ class StackedBoundRelatedObject(BoundRelatedObject):
         super(StackedBoundRelatedObject, self).__init__(related_object, field_mapping, original)
         fields = self.relation.editable_fields()
         self.field_mappings.fill()
-        self.form_field_collection_wrappers = [FormFieldCollectionWrapper(field_mapping ,fields)
-                                               for field_mapping in self.field_mappings]
+        self.form_field_collection_wrappers = [FormFieldCollectionWrapper(field_mapping ,fields, i)
+                                               for (i,field_mapping) in self.field_mappings.items()]
         self.show_url = original and hasattr(self.relation.opts, 'get_absolute_url')
 
     def template_name(self):
