@@ -424,7 +424,7 @@ your own couldn't be easier::
 
         def isValidToAddress(self, field_data, all_data):
             if not field_data.endswith("@example.com"):
-                raise ValidationError("You can only send messages to example.com e-mail addresses.")
+                raise validators.ValidationError("You can only send messages to example.com e-mail addresses.")
 
 Above, we've added a "to" field to the contact form, but required that the "to"
 address end with "@example.com" by adding the ``isValidToAddress`` validator to
