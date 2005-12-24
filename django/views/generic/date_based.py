@@ -1,14 +1,14 @@
 from django.core.template import loader
 from django.core.exceptions import Http404, ObjectDoesNotExist
-from django.core.extensions import DjangoContext as Context
+from django.core.extensions import DjangoContext
 from django.core.xheaders import populate_xheaders
 from django.models import get_module
 from django.utils.httpwrappers import HttpResponse
 import datetime, time
 
 def archive_index(request, app_label, module_name, date_field, num_latest=15,
-                  template_name=None, template_loader=loader,
-                  extra_lookup_kwargs={}, extra_context={}, allow_empty=False):
+        template_name=None, template_loader=loader, extra_lookup_kwargs={},
+        extra_context={}, allow_empty=False, context_processors=None):
     """
     Generic top-level archive of date-based objects.
 
@@ -38,10 +38,10 @@ def archive_index(request, app_label, module_name, date_field, num_latest=15,
     if not template_name:
         template_name = "%s/%s_archive" % (app_label, module_name)
     t = template_loader.get_template(template_name)
-    c = Context(request, {
+    c = DjangoContext(request, {
         'date_list' : date_list,
         'latest' : latest,
-    })
+    }, context_processors)
     for key, value in extra_context.items():
         if callable(value):
             c[key] = value()
@@ -50,8 +50,8 @@ def archive_index(request, app_label, module_name, date_field, num_latest=15,
     return HttpResponse(t.render(c))
 
 def archive_year(request, year, app_label, module_name, date_field,
-                 template_name=None, template_loader=loader,
-                 extra_lookup_kwargs={}, extra_context={}):
+        template_name=None, template_loader=loader, extra_lookup_kwargs={},
+        extra_context={}, context_processors=None):
     """
     Generic yearly archive view.
 
@@ -75,10 +75,10 @@ def archive_year(request, year, app_label, module_name, date_field,
     if not template_name:
         template_name = "%s/%s_archive_year" % (app_label, module_name)
     t = template_loader.get_template(template_name)
-    c = Context(request, {
+    c = DjangoContext(request, {
         'date_list': date_list,
         'year': year,
-    })
+    }, context_processors)
     for key, value in extra_context.items():
         if callable(value):
             c[key] = value()
@@ -87,8 +87,8 @@ def archive_year(request, year, app_label, module_name, date_field,
     return HttpResponse(t.render(c))
 
 def archive_month(request, year, month, app_label, module_name, date_field,
-                  month_format='%b', template_name=None, template_loader=loader,
-                  extra_lookup_kwargs={}, extra_context={}):
+        month_format='%b', template_name=None, template_loader=loader,
+        extra_lookup_kwargs={}, extra_context={}, context_processors=None):
     """
     Generic monthly archive view.
 
@@ -123,10 +123,10 @@ def archive_month(request, year, month, app_label, module_name, date_field,
     if not template_name:
         template_name = "%s/%s_archive_month" % (app_label, module_name)
     t = template_loader.get_template(template_name)
-    c = Context(request, {
+    c = DjangoContext(request, {
         'object_list': object_list,
         'month': date,
-    })
+    }, context_processors)
     for key, value in extra_context.items():
         if callable(value):
             c[key] = value()
@@ -135,9 +135,9 @@ def archive_month(request, year, month, app_label, module_name, date_field,
     return HttpResponse(t.render(c))
 
 def archive_day(request, year, month, day, app_label, module_name, date_field,
-                month_format='%b', day_format='%d', template_name=None,
-                template_loader=loader, extra_lookup_kwargs={},
-                extra_context={}, allow_empty=False):
+        month_format='%b', day_format='%d', template_name=None,
+        template_loader=loader, extra_lookup_kwargs={}, extra_context={},
+        allow_empty=False, context_processors=None):
     """
     Generic daily archive view.
 
@@ -172,12 +172,12 @@ def archive_day(request, year, month, day, app_label, module_name, date_field,
     if not template_name:
         template_name = "%s/%s_archive_day" % (app_label, module_name)
     t = template_loader.get_template(template_name)
-    c = Context(request, {
+    c = DjangoContext(request, {
         'object_list': object_list,
         'day': date,
         'previous_day': date - datetime.timedelta(days=1),
         'next_day': (date < datetime.date.today()) and (date + datetime.timedelta(days=1)) or None,
-    })
+    }, context_processors)
     for key, value in extra_context.items():
         if callable(value):
             c[key] = value()
@@ -198,10 +198,10 @@ def archive_today(request, **kwargs):
     return archive_day(request, **kwargs)
 
 def object_detail(request, year, month, day, app_label, module_name, date_field,
-                  month_format='%b', day_format='%d', object_id=None, slug=None,
-                  slug_field=None, template_name=None, template_name_field=None,
-                  template_loader=loader, extra_lookup_kwargs={},
-                  extra_context={}):
+        month_format='%b', day_format='%d', object_id=None, slug=None,
+        slug_field=None, template_name=None, template_name_field=None,
+        template_loader=loader, extra_lookup_kwargs={}, extra_context={},
+        context_processors=None):
     """
     Generic detail view from year/month/day/slug or year/month/day/id structure.
 
@@ -241,9 +241,9 @@ def object_detail(request, year, month, day, app_label, module_name, date_field,
         t = template_loader.select_template(template_name_list)
     else:
         t = template_loader.get_template(template_name)
-    c = Context(request, {
+    c = DjangoContext(request, {
         'object': object,
-    })
+    }, context_processors)
     for key, value in extra_context.items():
         if callable(value):
             c[key] = value()

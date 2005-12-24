@@ -3,14 +3,14 @@ from django.core.xheaders import populate_xheaders
 from django.core.template import loader
 from django.core import formfields, meta
 from django.views.auth.login import redirect_to_login
-from django.core.extensions import DjangoContext as Context
+from django.core.extensions import DjangoContext
 from django.core.paginator import ObjectPaginator, InvalidPage
 from django.utils.httpwrappers import HttpResponse, HttpResponseRedirect
 from django.core.exceptions import Http404, ObjectDoesNotExist, ImproperlyConfigured
 
 def create_object(request, app_label, module_name, template_name=None,
-                 template_loader=loader, extra_context={},
-                 post_save_redirect=None, login_required=False, follow=None):
+        template_loader=loader, extra_context={}, post_save_redirect=None,
+        login_required=False, follow=None, context_processors=None):
     """
     Generic object-creation function.
 
@@ -60,9 +60,9 @@ def create_object(request, app_label, module_name, template_name=None,
     if not template_name:
         template_name = "%s/%s_form" % (app_label, module_name)
     t = template_loader.get_template(template_name)
-    c = Context(request, {
-        'form' : form,
-    })
+    c = DjangoContext(request, {
+        'form': form,
+    }, context_processors)
     for key, value in extra_context.items():
         if callable(value):
             c[key] = value()
@@ -71,9 +71,9 @@ def create_object(request, app_label, module_name, template_name=None,
     return HttpResponse(t.render(c))
 
 def update_object(request, app_label, module_name, object_id=None, slug=None,
-                  slug_field=None, template_name=None, template_loader=loader,
-                  extra_lookup_kwargs={}, extra_context={}, post_save_redirect=None,
-                  login_required=False, follow=None):
+        slug_field=None, template_name=None, template_loader=loader,
+        extra_lookup_kwargs={}, extra_context={}, post_save_redirect=None,
+        login_required=False, follow=None, context_processors=None):
     """
     Generic object-update function.
 
@@ -131,10 +131,10 @@ def update_object(request, app_label, module_name, object_id=None, slug=None,
     if not template_name:
         template_name = "%s/%s_form" % (app_label, module_name)
     t = template_loader.get_template(template_name)
-    c = Context(request, {
-        'form' : form,
-        'object' : object,
-    })
+    c = DjangoContext(request, {
+        'form': form,
+        'object': object,
+    }, context_processors)
     for key, value in extra_context.items():
         if callable(value):
             c[key] = value()
@@ -145,9 +145,9 @@ def update_object(request, app_label, module_name, object_id=None, slug=None,
     return response
 
 def delete_object(request, app_label, module_name, post_delete_redirect,
-                  object_id=None, slug=None, slug_field=None, template_name=None,
-                  template_loader=loader, extra_lookup_kwargs={},
-                  extra_context={}, login_required=False):
+        object_id=None, slug=None, slug_field=None, template_name=None,
+        template_loader=loader, extra_lookup_kwargs={}, extra_context={},
+        login_required=False, context_processors=None):
     """
     Generic object-delete function.
 
@@ -188,9 +188,9 @@ def delete_object(request, app_label, module_name, post_delete_redirect,
         if not template_name:
             template_name = "%s/%s_confirm_delete" % (app_label, module_name)
         t = template_loader.get_template(template_name)
-        c = Context(request, {
-            'object' : object,
-        })
+        c = DjangoContext(request, {
+            'object': object,
+        }, context_processors)
         for key, value in extra_context.items():
             if callable(value):
                 c[key] = value()
@@ -199,4 +199,3 @@ def delete_object(request, app_label, module_name, post_delete_redirect,
         response = HttpResponse(t.render(c))
         populate_xheaders(request, response, app_label, module_name, getattr(object, object._meta.pk.name))
         return response
-

@@ -2,13 +2,13 @@ from django import models
 from django.core.template import loader
 from django.utils.httpwrappers import HttpResponse
 from django.core.xheaders import populate_xheaders
-from django.core.extensions import DjangoContext as Context
+from django.core.extensions import DjangoContext
 from django.core.paginator import ObjectPaginator, InvalidPage
 from django.core.exceptions import Http404, ObjectDoesNotExist
 
 def object_list(request, app_label, module_name, paginate_by=None, allow_empty=False,
-                template_name=None, template_loader=loader,
-                extra_lookup_kwargs={}, extra_context={}):
+        template_name=None, template_loader=loader, extra_lookup_kwargs={},
+        extra_context={}, context_processors=None):
     """
     Generic list of objects.
 
@@ -48,7 +48,7 @@ def object_list(request, app_label, module_name, paginate_by=None, allow_empty=F
             else:
                 raise Http404
         page = int(page)
-        c = Context(request, {
+        c = DjangoContext(request, {
             'object_list': object_list,
             'is_paginated': paginator.pages > 1,
             'results_per_page': paginate_by,
@@ -59,13 +59,13 @@ def object_list(request, app_label, module_name, paginate_by=None, allow_empty=F
             'previous': page - 1,
             'pages': paginator.pages,
             'hits' : paginator.hits,
-        })
+        }, context_processors)
     else:
         object_list = mod.get_list(**lookup_kwargs)
-        c = Context(request, {
+        c = DjangoContext(request, {
             'object_list': object_list,
             'is_paginated': False
-        })
+        }, context_processors)
         if len(object_list) == 0 and not allow_empty:
             raise Http404
     for key, value in extra_context.items():
@@ -79,9 +79,9 @@ def object_list(request, app_label, module_name, paginate_by=None, allow_empty=F
     return HttpResponse(t.render(c))
 
 def object_detail(request, app_label, module_name, object_id=None, slug=None,
-                  slug_field=None, template_name=None, template_name_field=None,
-                  template_loader=loader, extra_lookup_kwargs={},
-                  extra_context={}):
+        slug_field=None, template_name=None, template_name_field=None,
+        template_loader=loader, extra_lookup_kwargs={}, extra_context={},
+        context_processors=None):
     """
     Generic list of objects.
 
@@ -110,9 +110,9 @@ def object_detail(request, app_label, module_name, object_id=None, slug=None,
         t = template_loader.select_template(template_name_list)
     else:
         t = template_loader.get_template(template_name)
-    c = Context(request, {
+    c = DjangoContext(request, {
         'object': object,
-    })
+    }, context_processors)
     for key, value in extra_context.items():
         if callable(value):
             c[key] = value()

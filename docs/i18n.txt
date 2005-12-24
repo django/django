@@ -361,8 +361,10 @@ That's it. Your translations are ready for use.
 .. admonition:: A note to translators
 
     If you've created a translation in a language Django doesn't yet support,
-    please let us know! We'll add it to the global list of available languages
-    in the global Django settings (``settings.LANGUAGES``).
+    please let us know! See `Submitting and maintaining translations`_ for
+    the steps to take.
+
+    .. _Submitting and maintaining translations: http://www.djangoproject.com/documentation/contributing/
 
 How Django discovers language preference
 ========================================
