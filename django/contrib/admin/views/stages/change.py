@@ -46,59 +46,51 @@ def change_stage(request, path, object_id):
         new_data = request.POST.copy()
         if opts.has_field_type(models.FileField):
             new_data.update(request.FILES)
-
-        if request.POST.has_key("command"):
-            #save a copy of the data to use for errors later. 
-            data = new_data.copy()
-            
-            manipulator.do_html2python(new_data)
+        
+        #save a copy of the data to use for errors later. 
+        data = new_data.copy()
+        
+        manipulator.do_html2python(new_data)
+        #update the manipulator with the effects of previous commands.
+        manipulator.update(new_data)
+        #get the errors on the updated shape of the manipulator
+        #HACK - validators should not work on POSTED data directly... 
+        errors = manipulator.get_validation_errors(data)
+        if request.POST.has_key("_preview"):
+            pass
+        elif request.POST.has_key("command"):
             command_name = request.POST.get("command")
-            manipulator.do_command(new_data, command_name)
+            manipulator.do_command(command_name)
             new_data = manipulator.flatten_data()
-            
-            #HACK - validators should not work on POSTED data directly... 
-            errors = manipulator.get_validation_errors(data)
-        elif request.POST.has_key("_preview"):
-            errors = manipulator.get_validation_errors(new_data)
-            manipulator.do_html2python(new_data)
+        elif errors:
+            new_data = manipulator.flatten_data()
         else:
-            #save a copy of the data to use for errors later. 
-            data = new_data.copy()
-            
-            manipulator.do_html2python(new_data)
-            manipulator.update(new_data)
-            errors = manipulator.get_validation_errors(data)
-            if errors:
-                flat_data = manipulator.flatten_data()
-                flat_data.update(new_data)
-                new_data = flat_data
-            else:
-                new_object = manipulator.save_from_update()
-                log_change_message(request.user, opts, manipulator, new_object)
-                msg = _('The %(name)s "%(obj)s" was changed successfully.') % {'name': opts.verbose_name, 'obj': new_object}
-                pk_value = getattr(new_object, opts.pk.attname)
-                if request.POST.has_key("_continue"):
-                    request.user.add_message(msg + ' ' + _("You may edit it again below."))
-                    if request.REQUEST.has_key('_popup'):
-                        return HttpResponseRedirect(request.path + "?_popup=1")
-                    else:
-                        return HttpResponseRedirect(request.path)
-                elif request.POST.has_key("_saveasnew"):
-                    request.user.add_message(_('The %(name)s "%(obj)s" was added successfully. You may edit it again below.') % {'name': opts.verbose_name, 'obj': new_object})
-                    return HttpResponseRedirect("../../%s/" % pk_value)
-                elif request.POST.has_key("_addanother"):
-                    request.user.add_message(msg + ' ' + (_("You may add another %s below.") % opts.verbose_name))
-                    return HttpResponseRedirect("../../add/")
+            new_object = manipulator.save_from_update()
+            log_change_message(request.user, opts, manipulator, new_object)
+            msg = _('The %(name)s "%(obj)s" was changed successfully.') % {'name': opts.verbose_name, 'obj': new_object}
+            pk_value = getattr(new_object, opts.pk.attname)
+            if request.POST.has_key("_continue"):
+                request.user.add_message(msg + ' ' + _("You may edit it again below."))
+                if request.REQUEST.has_key('_popup'):
+                    return HttpResponseRedirect(request.path + "?_popup=1")
                 else:
-                    request.user.add_message(msg)
-                    return HttpResponseRedirect("../../")
+                    return HttpResponseRedirect(request.path)
+            elif request.POST.has_key("_saveasnew"):
+                request.user.add_message(_('The %(name)s "%(obj)s" was added successfully. You may edit it again below.') % {'name': opts.verbose_name, 'obj': new_object})
+                return HttpResponseRedirect("../../%s/" % pk_value)
+            elif request.POST.has_key("_addanother"):
+                request.user.add_message(msg + ' ' + (_("You may add another %s below.") % opts.verbose_name))
+                return HttpResponseRedirect("../../add/")
+            else:
+                request.user.add_message(msg)
+                return HttpResponseRedirect("../../")
     else: 
         # Populate new_data with a "flattened" version of the current data.
         new_data = manipulator.flatten_data()
         errors = {}
         
     # Populate the FormWrapper.
-    form = formfields.FormWrapper(manipulator, new_data, errors, edit_inline = True)
+    form = formfields.FormWrapper(manipulator, new_data, errors)
     form.original = manipulator.original_object
     form.order_objects = []
 

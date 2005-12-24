@@ -1,3 +1,5 @@
+from django.db.models.manipulators import ManipulatorCollection
+
 class BoundRelatedObject(object):
     def __init__(self, related_object, field_mapping, original):
         self.relation = related_object
@@ -78,20 +80,10 @@ class RelatedObject(object):
         return ([], self.get_manipulators(manipulator, follow)  )
 
     def get_manipulators(self,parent_manipulator, follow):
+        name_prefix = parent_manipulator.name_prefix
+        obj = parent_manipulator.original_object
         
-        man_class = self.model.ChangeManipulator
-        
-        if parent_manipulator.original_object:
-            meth_name = 'get_%s_list' % self.get_method_name_part()
-            list = getattr(parent_manipulator.original_object, meth_name)()
-        else:
-            list = []
-        manipulators = []
-        for i,obj in enumerate(list):
-            prefix = '%s%s.%d.' % (parent_manipulator.name_prefix, self.var_name, i)
-            manipulators.append(man_class(obj,follow, prefix) )
-        return manipulators
-
+        return ManipulatorCollection(self, name_prefix, obj, follow)
 
     def bind(self, field_mapping, original, bound_related_object_class=BoundRelatedObject):
         return bound_related_object_class(self, field_mapping, original)
