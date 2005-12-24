@@ -438,6 +438,15 @@ Authentication data in templates
 The currently logged-in user and his/her permissions are made available in the
 `template context`_ when you use ``DjangoContext``.
 
+.. admonition:: Technicality
+
+   Technically, these variables are only made available in the template context
+   if you use ``DjangoContext`` *and* your ``TEMPLATE_CONTEXT_PROCESSORS``
+   setting contains ``"django.core.context_processors.auth"``, which is default.
+   For more, see the `DjangoContext docs`_.
+
+   .. _DjangoContext docs: http://www.djangoproject.com/documentation/templates_python/#subclassing-context-djangocontext
+
 Users
 -----
 
@@ -454,7 +463,7 @@ Permissions
 -----------
 
 The currently logged-in user's permissions are stored in the template variable
-``{{ perms }}``. This is an instance of ``django.core.extensions.PermWrapper``,
+``{{ perms }}``. This is an instance of ``django.core.context_processors.PermWrapper``,
 which is a template-friendly proxy of permissions.
 
 In the ``{{ perms }}`` object, single-attribute lookup is a proxy to

@@ -547,6 +547,21 @@ The ID, as an integer, of the current site in the ``sites`` database. This is
 used so that application data can hook into specific site(s) and a single
 database can manage content for multiple sites.
 
+TEMPLATE_CONTEXT_PROCESSORS
+---------------------------
+
+Default::
+
+    ("django.core.context_processors.auth",
+    "django.core.context_processors.debug",
+    "django.core.context_processors.i18n")
+
+**Only available in Django development version.**
+
+A tuple of callables that are used to populate the context in ``DjangoContext``.
+These callables take a request object as their argument and return a dictionary
+of items to be merged into the context.
+
 TEMPLATE_DEBUG
 --------------
 

@@ -128,9 +128,14 @@ arguments:
 
     ``extra_context``        A dictionary of extra data to put into the
                              template's context.
+
+    ``processors``           **New in Django development version.** A tuple of
+                             processors to apply to the ``DjangoContext`` of
+                             this view's template. See the `DjangoContext docs`_
     =======================  ==================================================
 
-.. _`database API docs`: http://www.djangoproject.com/documentation/db_api/
+.. _database API docs: http://www.djangoproject.com/documentation/db_api/
+.. _DjangoContext docs: http://www.djangoproject.com/documentation/templates_python/#subclassing-context-djangocontext
 
 The date-based generic functions are:
 
@@ -247,7 +252,7 @@ The list-detail generic-view framework (in the
 except the former simply has two views: a list of objects and an individual
 object page.
 
-All these views take the same three optional arguments as the date-based ones
+All these views take the same four optional arguments as the date-based ones
 -- and, clearly, they don't accept the ``date_field`` argument.
 
 Individual views are:
@@ -371,4 +376,3 @@ The create/update/delete views are:
 
         object
             The object about to be deleted
-
