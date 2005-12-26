@@ -715,6 +715,22 @@ class XMLField(TextField):
     def get_manipulator_field_objs(self):
         return [curry(formfields.XMLLargeTextField, schema_path=self.schema_path)]
 
+class OrderingField(IntegerField):
+    empty_strings_allowed=False
+    def __init__(self, with_respect_to, **kwargs):
+        self.wrt = with_respect_to
+        kwargs['null'] = True
+        IntegerField.__init__(self, **kwargs )
+    
+    def get_internal_type(self):
+        return "IntegerField"
+    
+    def get_manipulator_fields(self, opts, manipulator, change, name_prefix='', rel=False, follow=True):
+        return [HiddenField(name_prefix + self.name)  ]
+
+    def contribute_to_class(self, cls, name):
+        super(OrderingField, self ).contribute_to_class(cls, name)
+
 class BoundFieldLine(object):
     def __init__(self, field_line, field_mapping, original, bound_field_class=BoundField):
         self.bound_fields = [field.bind(field_mapping, original, bound_field_class) for field in field_line]

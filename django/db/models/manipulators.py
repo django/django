@@ -41,7 +41,28 @@ class ManipulatorDescriptor(object):
                 self.man._prepare(type)
             return self.man
 
-class AutomaticManipulator(Manipulator):
+class Naming(object):
+    def __init__(self, name_parts):
+        self.name_parts = name_parts
+        
+    def _get_dotted_name(self):
+        if len(self.name_parts) == 0:
+            return ""
+        else:
+            return ".".join(self.name_parts) + "."
+    
+    dotted_name = property(_get_dotted_name)
+    name_prefix = dotted_name
+    
+    def _get_name(self):
+        if len(self.name_parts) == 0:
+            return ""
+        else:
+            return self.name[-1]
+    
+    name = property(_get_name)
+
+class AutomaticManipulator(Manipulator, Naming):
     def _prepare(cls, model):
         cls.model = model
         cls.manager = model._default_manager
@@ -57,18 +78,18 @@ class AutomaticManipulator(Manipulator):
                 setattr(cls, 'isUnique%sFor%s' % (f.name, f.unique_for_year), curry(manipulator_validator_unique_for_date, f, cls.opts.get_field(f.unique_for_year), cls.opts, 'year'))
     _prepare = classmethod(_prepare)
 
-    def contribute_to_class(cls, other_cls, name ):
+    def contribute_to_class(cls, other_cls, name):
         setattr(other_cls, name, ManipulatorDescriptor(name, cls))
     contribute_to_class = classmethod(contribute_to_class)
 
-    def __init__(self, original_object=None, follow=None, name_prefix=''):
-        if name_prefix == '':
+    def __init__(self, original_object=None, follow=None, name_parts=() ):
+        Naming.__init__(self, name_parts)
+        if name_parts == ():
             self.follow = self.model._meta.get_follow(follow)
         else:
             self.follow = follow
         self.fields_, self.children = [], {}
         self.original_object = original_object
-        self.name_prefix = name_prefix
         for f in self.opts.get_data_holders(self.follow):
             fol = self.follow[f.name]
             fields,manipulators = f.get_fields_and_manipulators(self.opts, self, follow=fol)
@@ -171,6 +192,7 @@ class AutomaticManipulator(Manipulator):
     def save(self, new_data):
         self.update(new_data)
         self.save_from_update()
+        return self.original_object
         
 #    def _save_expanded(self, expanded_data, overrides = None):        
 #        add, change, opts, klass = self.add, self.change, self.opts, self.model
@@ -219,30 +241,29 @@ class AutomaticManipulator(Manipulator):
 #        #    for rel_opts in opts.get_ordered_objects():
 #        #        getattr(new_object, 'set_%s_order' % rel_opts.object_name.lower())(order)
 
-        
     def get_related_objects(self):
         return self.opts.get_followed_related_objects(self.follow)
 
     def flatten_data(self):
         new_data = {}
+    
         for f in self.opts.fields + self.opts.many_to_many: 
             fol = self.follow.get(f.name, None)
             if fol:
                 new_data.update(f.flatten_data(fol, self.original_object))
         for rel, child_manips in self.children.items():
-            for manip in child_manips:
-                if manip:
-                    child_data = manip.flatten_data()
-                    new_data.update(child_data)     
-                
-        new_data = dict([(self.name_prefix +k, v) for k,v in new_data.items()])  
+            child_data = child_manips.flatten_data()
+            new_data.update(child_data)
+            
+        prefix = self.name_prefix
+        new_data = dict([(prefix + k, v) for k,v in new_data.items()])  
         return new_data
 
 class ModelAddManipulator(AutomaticManipulator):
     change = False
     add = True
-    def __init__(self, follow=None, name_prefix=''):
-        super(ModelAddManipulator, self).__init__(follow=follow, name_prefix=name_prefix)
+    def __init__(self, follow=None, name_parts=()):
+        super(ModelAddManipulator, self).__init__(follow=follow, name_parts=name_parts)
 
     def get_original_value(self, field):
         return field.get_default()
@@ -254,7 +275,7 @@ class ModelChangeManipulator(AutomaticManipulator):
     change = True
     add = False
 
-    def __init__(self, obj_key=None, follow=None, name_prefix=''):
+    def __init__(self, obj_key=None, follow=None, name_parts=()):
         assert obj_key is not None, "ChangeManipulator.__init__() must be passed obj_key parameter."
         opts = self.model._meta
         if isinstance(obj_key, self.model):
@@ -282,11 +303,11 @@ class ModelChangeManipulator(AutomaticManipulator):
                 else:
                     raise
         
-        super(ModelChangeManipulator, self).__init__(original_object=original_object, follow=follow, name_prefix=name_prefix)
+        super(ModelChangeManipulator, self).__init__(original_object=original_object, follow=follow, name_parts=name_parts)
         #self.original_object = original_object
 
-        if self.opts.get_ordered_objects():
-            self.fields.append(formfields.CommaSeparatedIntegerField(field_name="order_"))
+        #if self.opts.get_ordered_objects():
+        #    self.fields.append(formfields.CommaSeparatedIntegerField(field_name="order_"))
 
         self.fields_added, self.fields_changed, self.fields_deleted = [], [], []
 
@@ -296,31 +317,29 @@ class ModelChangeManipulator(AutomaticManipulator):
     def __repr__(self):
         return "<Automatic ChangeManipulator '%s' for %s:%r >" % (self.name_prefix, self.model.__name__, self.obj_key)
 
-
-class ManipulatorCollection(list):
-    def __init__(self,related, parent_prefix, instance, follow):
-        self.related = related
-        self.name_prefix = '%s%s.' % ( parent_prefix, related.var_name)
+class ManipulatorCollection(list, Naming):
+    def __init__(self, model, follow, name_parts=()):
+        Naming.__init__(self, name_parts)
+        self.model = model
         self.follow = follow
-        self._load(instance)
+        self._load()
     
-    def _load(self, instance):    
-        man_class = self.related.model.ChangeManipulator
-        if instance != None:
-            meth_name = 'get_%s_list' % self.related.get_method_name_part()
-            list = getattr(instance, meth_name)()
-        else:
-            list = []
+    def _get_list(self):
+        return self.model._default_manager.get_list()
+
+    def _load(self):
+        man_class = self.model.ChangeManipulator
         
-        for i,obj in enumerate(list):
-            prefix = '%s%d.' % (self.name_prefix, i)
-            self.append(man_class(obj,self.follow, prefix) )
+        for i,obj in enumerate(self._get_list()):
+            self.append(man_class(obj,self.follow, self.name_parts + (str(i),)  ))
     
-    def save_from_update(self, parent_key):
+    def _save_child(self, manip, parent_key):
+        manip.save_from_update()
+    
+    def save_from_update(self, parent_key=None):
         for manip in self:
             if manip:
-                setattr(manip.original_object, self.related.field.attname , parent_key)
-                manip.save_from_update()
+                self._save_child(manip, parent_key)
     
     def _fill_data(self, expanded_data):
         for index,manip in enumerate(self):
@@ -360,16 +379,36 @@ class ManipulatorCollection(list):
             
             manip._do_command_expanded(command_parts)
         except ValueError:
+            command_name = index_part
         # Must be a command on the collection. Possible commands: 
         # add. 
         # TODO: page.forward, page.back, page.n, swap.n.m
-            if index_part == "add":
+            if command_name == "add":
                 self.add_child()
+            elif command_name == "swap":
+                order_field = self.model._meta.order_with_respect_to
+                if not order_field:
+                    raise BadCommand, "Swap command recieved on unordered ManipulatorCollection" 
+                try:
+                    manip1 = self[int(command_parts.pop(0))]
+                    manip2 = self[int(command_parts.pop(0))]
+                    if manip1 == None or manip2 == None:
+                        raise BadCommand, "Attempt to swap a deleted manipulator"
+                except ValueError, IndexError:
+                    raise BadCommand, "Could not find manipulators for swap command"
+                else:
+                    # Set the ordering field value on the objects in the manipulators.
+                    # This will make sure they are put in a different when rendered on the form.
+                    # The indices in this collection will stay the same.  
+                    temp = getattr(manip1.original_object, order_field.attname)
+                    setattr(manip1.original_object, order_field.attname, 
+                             getattr(manip2.original_object, order_field.attname))
+                    setattr(manip2.original_object, order_field.attname, temp)
             else:
-                raise BadCommand, "%s, unknown command" % (part)
+                raise BadCommand, "%s, unknown command" % (command_name)
     
     def add_child(self, index = None):
-        man_class = self.related.model.AddManipulator
+        man_class = self.model.AddManipulator
         if index == None:
             index = len(self)
         # Make sure that we are going to put this in the right index, by prefilling with Nones.
@@ -377,10 +416,17 @@ class ManipulatorCollection(list):
             self.append(None)
         
         prefix = '%s%s.' % (self.name_prefix, index )
-        child_manip = man_class(self.follow, prefix)
+        child_manip = man_class(self.follow, self.name_parts + ( str(index), )  )
         self[index] = child_manip
         return child_manip
 
+    def flatten_data(self):
+        new_data = {}
+        for manip in self:
+            if manip:
+                manip_data = manip.flatten_data()
+                new_data.update(manip_data)
+        return new_data
 
 def manipulator_validator_unique_together(field_name_list, opts, self, field_data, all_data):
     from django.db.models.fields.related import ManyToOne

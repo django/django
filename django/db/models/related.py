@@ -1,5 +1,25 @@
 from django.db.models.manipulators import ManipulatorCollection
 
+class RelatedManipulatorCollection(ManipulatorCollection):
+    def __init__(self,related, parent_name_parts , instance, follow):
+        name_parts = parent_name_parts + (related.var_name, )
+        self.instance = instance
+        self.related = related
+        super(RelatedManipulatorCollection, self).__init__(
+            related.model,follow,name_parts)
+        
+    def _save_child(self, manip, parent_key):
+        setattr(manip.original_object, self.related.field.attname, parent_key)
+        super(RelatedManipulatorCollection, self)._save_child(manip, parent_key)
+        
+    def _get_list(self):
+        if self.instance != None:
+            meth_name = 'get_%s_list' % self.related.get_method_name_part()
+            list = getattr(self.instance, meth_name)()
+        else:
+            list = []
+        return list
+
 class BoundRelatedObject(object):
     def __init__(self, related_object, field_mapping, original):
         self.relation = related_object
@@ -80,10 +100,10 @@ class RelatedObject(object):
         return ([], self.get_manipulators(manipulator, follow)  )
 
     def get_manipulators(self,parent_manipulator, follow):
-        name_prefix = parent_manipulator.name_prefix
+        name_parts = parent_manipulator.name_parts
         obj = parent_manipulator.original_object
         
-        return ManipulatorCollection(self, name_prefix, obj, follow)
+        return RelatedManipulatorCollection(self, name_parts, obj, follow)
 
     def bind(self, field_mapping, original, bound_related_object_class=BoundRelatedObject):
         return bound_related_object_class(self, field_mapping, original)
