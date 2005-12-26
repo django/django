@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2005-12-17 22:25+0100\n"
+"POT-Creation-Date: 2005-12-26 12:34+0100\n"
 "PO-Revision-Date: 2005-12-20 10:48+0100\n"
 "Last-Translator: Afonso Fernández Nogueira <fonzzo.django@gmail.com>\n"
 "Language-Team: Galego\n"
@@ -362,12 +362,19 @@ msgstr "entradas de rexistro"
 msgid "All dates"
 msgstr "Todas as datas"
 
-#: contrib/admin/views/decorators.py:22
+#: contrib/admin/views/decorators.py:9 parts/auth/formfields.py:33
+#: parts/auth/formfields.py:38
+msgid ""
+"Please enter a correct username and password. Note that both fields are case-"
+"sensitive."
+msgstr ""
+
+#: contrib/admin/views/decorators.py:23
 #: contrib/admin/templates/admin/login.html:24
 msgid "Log in"
 msgstr "Entrar"
 
-#: contrib/admin/views/decorators.py:56
+#: contrib/admin/views/decorators.py:57
 msgid ""
 "Please log in again, because your session has expired. Don't worry: Your "
 "submission has been saved."
@@ -375,7 +382,7 @@ msgstr ""
 "Ten que identicarse outra vez porque a súa sesión expirou. Non se preocupe, "
 "o que enviou quedou gardado."
 
-#: contrib/admin/views/decorators.py:63
+#: contrib/admin/views/decorators.py:64
 msgid ""
 "Looks like your browser isn't configured to accept cookies. Please enable "
 "cookies, reload this page, and try again."
@@ -383,11 +390,11 @@ msgstr ""
 "Semella que o seu navegador non está configurado para aceptar  'cookies'. "
 "Por favor, habilite as 'cookies', recargue a páxina e ténteo de novo."
 
-#: contrib/admin/views/decorators.py:77
+#: contrib/admin/views/decorators.py:78
 msgid "Usernames cannot contain the '@' character."
 msgstr "Os nomes de usuario non poden conter o carácter '@'."
 
-#: contrib/admin/views/decorators.py:79
+#: contrib/admin/views/decorators.py:80
 #, python-format
 msgid "Your e-mail address is not your username. Try '%s' instead."
 msgstr ""
@@ -413,82 +420,80 @@ msgstr "Seleccione %s que modificar"
 msgid "The %(name)s \"%(obj)s\" was added successfully."
 msgstr "Engadiuse correctamente o/a %(name)s  \"%(obj)s\"."
 
-#: contrib/admin/views/main.py:415 contrib/admin/views/main.py:491
+#: contrib/admin/views/main.py:415 contrib/admin/views/main.py:492
 msgid "You may edit it again below."
 msgstr "Pode editalo embaixo."
 
-#: contrib/admin/views/main.py:423 contrib/admin/views/main.py:500
+#: contrib/admin/views/main.py:423 contrib/admin/views/main.py:501
 #, python-format
 msgid "You may add another %s below."
 msgstr "Pode engadir outro/a %s embaixo."
 
-#: contrib/admin/views/main.py:440
+#: contrib/admin/views/main.py:441
 #, python-format
 msgid "Add %s"
 msgstr "Engadir %s"
 
-#: contrib/admin/views/main.py:456
+#: contrib/admin/views/main.py:457
 #, python-format
 msgid "Added %s."
 msgstr "Engadido/a %s."
 
-#: contrib/admin/views/main.py:456 contrib/admin/views/main.py:458
-#: contrib/admin/views/main.py:460
+#: contrib/admin/views/main.py:457 contrib/admin/views/main.py:459
+#: contrib/admin/views/main.py:461
 msgid "and"
 msgstr "e"
 
-#: contrib/admin/views/main.py:458
+#: contrib/admin/views/main.py:459
 #, python-format
 msgid "Changed %s."
 msgstr "Modificado(s) %s."
 
-#: contrib/admin/views/main.py:460
+#: contrib/admin/views/main.py:461
 #, python-format
 msgid "Deleted %s."
 msgstr "Eliminado(s) %s."
 
-#: contrib/admin/views/main.py:463
+#: contrib/admin/views/main.py:464
 msgid "No fields changed."
 msgstr "Non se modificou ningún campo."
 
-#: contrib/admin/views/main.py:488
+#: contrib/admin/views/main.py:489
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was changed successfully."
 msgstr "Modificouse correctamente o/a %(name)s \"%(obj)s\"."
 
-#: contrib/admin/views/main.py:497
+#: contrib/admin/views/main.py:498
 #, python-format
 msgid ""
 "The %(name)s \"%(obj)s\" was added successfully. You may edit it again below."
-msgstr ""
-"Engadiuse correctamente o/a %(name)s \"%(obj)s\" Pode editalo "
-"embaixo."
+msgstr "Engadiuse correctamente o/a %(name)s \"%(obj)s\" Pode editalo embaixo."
 
-#: contrib/admin/views/main.py:535
+#: contrib/admin/views/main.py:536
 #, python-format
 msgid "Change %s"
 msgstr "Modificar %s"
 
-#: contrib/admin/views/main.py:613
+#: contrib/admin/views/main.py:614
 #, python-format
 msgid "One or more %(fieldname)s in %(name)s: %(obj)s"
 msgstr "Un ou máis %(fieldname)s no/a %(name)s: %(obj)s"
 
-#: contrib/admin/views/main.py:618
+#: contrib/admin/views/main.py:619
 #, python-format
 msgid "One or more %(fieldname)s in %(name)s:"
 msgstr "Un ou máis %(fieldname)s no/a %(name)s:"
 
-#: contrib/admin/views/main.py:647
+#: contrib/admin/views/main.py:648
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was deleted successfully."
 msgstr "Eliminouse correctamente o/a %(name)s \"%(obj)s\"."
 
-#: contrib/admin/views/main.py:650
+#: contrib/admin/views/main.py:651
 msgid "Are you sure?"
 msgstr "Está seguro?"
 
-#: contrib/admin/views/main.py:665
+#: contrib/admin/views/main.py:666
 #, python-format
 msgid "Change history: %s"
 msgstr "Histórico de cambios: %s"
@@ -1805,3 +1810,9 @@ msgstr[1] ""
 #: core/template/defaultfilters.py:371
 msgid "yes,no,maybe"
 msgstr "si,non,quizais"
+
+#: parts/auth/formfields.py:27
+msgid ""
+"Your Web browser doesn't appear to have cookies enabled. Cookies are "
+"required for logging in."
+msgstr ""

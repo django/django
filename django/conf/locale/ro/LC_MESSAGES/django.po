@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2005-12-17 22:26+0100\n"
+"POT-Creation-Date: 2005-12-26 12:35+0100\n"
 "PO-Revision-Date: 2005-11-08 19:06+GMT+2\n"
 "Last-Translator: Tiberiu Micu <tibimicu@gmx.net>\n"
 "Language-Team: Romanian <ro@li.org>\n"
@@ -356,28 +356,35 @@ msgstr "intrări log"
 msgid "All dates"
 msgstr ""
 
-#: contrib/admin/views/decorators.py:22
+#: contrib/admin/views/decorators.py:9 parts/auth/formfields.py:33
+#: parts/auth/formfields.py:38
+msgid ""
+"Please enter a correct username and password. Note that both fields are case-"
+"sensitive."
+msgstr ""
+
+#: contrib/admin/views/decorators.py:23
 #: contrib/admin/templates/admin/login.html:24
 msgid "Log in"
 msgstr "Login"
 
-#: contrib/admin/views/decorators.py:56
+#: contrib/admin/views/decorators.py:57
 msgid ""
 "Please log in again, because your session has expired. Don't worry: Your "
 "submission has been saved."
 msgstr ""
 
-#: contrib/admin/views/decorators.py:63
+#: contrib/admin/views/decorators.py:64
 msgid ""
 "Looks like your browser isn't configured to accept cookies. Please enable "
 "cookies, reload this page, and try again."
 msgstr ""
 
-#: contrib/admin/views/decorators.py:77
+#: contrib/admin/views/decorators.py:78
 msgid "Usernames cannot contain the '@' character."
 msgstr ""
 
-#: contrib/admin/views/decorators.py:79
+#: contrib/admin/views/decorators.py:80
 #, python-format
 msgid "Your e-mail address is not your username. Try '%s' instead."
 msgstr ""
@@ -402,80 +409,80 @@ msgstr ""
 msgid "The %(name)s \"%(obj)s\" was added successfully."
 msgstr ""
 
-#: contrib/admin/views/main.py:415 contrib/admin/views/main.py:491
+#: contrib/admin/views/main.py:415 contrib/admin/views/main.py:492
 msgid "You may edit it again below."
 msgstr ""
 
-#: contrib/admin/views/main.py:423 contrib/admin/views/main.py:500
+#: contrib/admin/views/main.py:423 contrib/admin/views/main.py:501
 #, python-format
 msgid "You may add another %s below."
 msgstr ""
 
-#: contrib/admin/views/main.py:440
+#: contrib/admin/views/main.py:441
 #, fuzzy, python-format
 msgid "Add %s"
 msgstr "Adaugă"
 
-#: contrib/admin/views/main.py:456
+#: contrib/admin/views/main.py:457
 #, python-format
 msgid "Added %s."
 msgstr ""
 
-#: contrib/admin/views/main.py:456 contrib/admin/views/main.py:458
-#: contrib/admin/views/main.py:460
+#: contrib/admin/views/main.py:457 contrib/admin/views/main.py:459
+#: contrib/admin/views/main.py:461
 msgid "and"
 msgstr ""
 
-#: contrib/admin/views/main.py:458
+#: contrib/admin/views/main.py:459
 #, fuzzy, python-format
 msgid "Changed %s."
 msgstr "Schimbă"
 
-#: contrib/admin/views/main.py:460
+#: contrib/admin/views/main.py:461
 #, python-format
 msgid "Deleted %s."
 msgstr ""
 
-#: contrib/admin/views/main.py:463
+#: contrib/admin/views/main.py:464
 msgid "No fields changed."
 msgstr ""
 
-#: contrib/admin/views/main.py:488
+#: contrib/admin/views/main.py:489
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was changed successfully."
 msgstr ""
 
-#: contrib/admin/views/main.py:497
+#: contrib/admin/views/main.py:498
 #, python-format
 msgid ""
 "The %(name)s \"%(obj)s\" was added successfully. You may edit it again below."
 msgstr ""
 
-#: contrib/admin/views/main.py:535
+#: contrib/admin/views/main.py:536
 #, fuzzy, python-format
 msgid "Change %s"
 msgstr "Schimbă"
 
-#: contrib/admin/views/main.py:613
+#: contrib/admin/views/main.py:614
 #, python-format
 msgid "One or more %(fieldname)s in %(name)s: %(obj)s"
 msgstr ""
 
-#: contrib/admin/views/main.py:618
+#: contrib/admin/views/main.py:619
 #, python-format
 msgid "One or more %(fieldname)s in %(name)s:"
 msgstr ""
 
-#: contrib/admin/views/main.py:647
+#: contrib/admin/views/main.py:648
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was deleted successfully."
 msgstr ""
 
-#: contrib/admin/views/main.py:650
+#: contrib/admin/views/main.py:651
 msgid "Are you sure?"
 msgstr ""
 
-#: contrib/admin/views/main.py:665
+#: contrib/admin/views/main.py:666
 #, fuzzy, python-format
 msgid "Change history: %s"
 msgstr "Schimbă parola"
@@ -1799,6 +1806,12 @@ msgstr[1] ""
 
 #: core/template/defaultfilters.py:371
 msgid "yes,no,maybe"
+msgstr ""
+
+#: parts/auth/formfields.py:27
+msgid ""
+"Your Web browser doesn't appear to have cookies enabled. Cookies are "
+"required for logging in."
 msgstr ""
 
 #, fuzzy
