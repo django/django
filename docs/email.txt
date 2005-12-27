@@ -80,14 +80,20 @@ site admins, as defined in the `ADMINS setting`_. Here's the definition::
 ``mail_admins()`` prefixes the subject with the value of the
 `EMAIL_SUBJECT_PREFIX setting`_, which is ``"[Django] "`` by default.
 
+The "From:" header of the e-mail will be the value of the `SERVER_EMAIL setting`_.
+
 .. _ADMINS setting: http://www.djangoproject.com/documentation/settings/#admins
 .. _EMAIL_SUBJECT_PREFIX setting: http://www.djangoproject.com/documentation/settings/#email-subject-prefix
+.. _SERVER_EMAIL setting: http://www.djangoproject.com/documentation/settings/#server-email
 
 The mail_managers function
 ==========================
 
 ``django.core.mail.mail_managers`` is just like ``mail_admins``, except it
 sends an e-mail to the site managers, as defined in the `MANAGERS setting`_.
+Here's the definition::
+
+    mail_managers(subject, message, fail_silently=False)
 
 .. _MANAGERS setting: http://www.djangoproject.com/documentation/settings/#managers
 
