@@ -1,0 +1,109 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2005-12-27 23:26+0900\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: contrib/admin/media/js/calendar.js:24
+#: contrib/admin/media/js/dateparse.js:26
+msgid ""
+"January February March April May June July August September October November "
+"December"
+msgstr "一月 二月 三月 四月 五月 六月 七月 八月 九月 十月 十一月 十二月"
+
+#: contrib/admin/media/js/calendar.js:25
+msgid "S M T W T F S"
+msgstr "日 月 火 水 木 金 土"
+
+#: contrib/admin/media/js/dateparse.js:27
+msgid "Sunday Monday Tuesday Wednesday Thursday Friday Saturday"
+msgstr "日曜 月曜 火曜 水曜 木曜 金曜 土曜"
+
+#: contrib/admin/media/js/SelectFilter2.js:33
+#, perl-format
+msgid "Available %s"
+msgstr "利用可能 %s"
+
+#: contrib/admin/media/js/SelectFilter2.js:41
+msgid "Choose all"
+msgstr "全て選択"
+
+#: contrib/admin/media/js/SelectFilter2.js:46
+msgid "Add"
+msgstr "追加"
+
+#: contrib/admin/media/js/SelectFilter2.js:48
+msgid "Remove"
+msgstr "削除"
+
+#: contrib/admin/media/js/SelectFilter2.js:53
+#, perl-format
+msgid "Chosen %s"
+msgstr "選択された %s"
+
+#: contrib/admin/media/js/SelectFilter2.js:54
+msgid "Select your choice(s) and click "
+msgstr ""
+
+#: contrib/admin/media/js/SelectFilter2.js:59
+msgid "Clear all"
+msgstr "全てクリア"
+
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:45
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:80
+msgid "Now"
+msgstr "現在"
+
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:48
+msgid "Clock"
+msgstr "時計"
+
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:77
+msgid "Choose a time"
+msgstr "時間を選択"
+
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:81
+msgid "Midnight"
+msgstr "夜中"
+
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:82
+msgid "6 a.m."
+msgstr "朝6時"
+
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:83
+msgid "Noon"
+msgstr "昼"
+
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:87
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:168
+msgid "Cancel"
+msgstr "キャンセル"
+
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:111
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:162
+msgid "Today"
+msgstr "今日"
+
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:114
+msgid "Calendar"
+msgstr "カレンダー"
+
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:160
+msgid "Yesterday"
+msgstr "昨日"
+
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:164
+msgid "Tomorrow"
+msgstr "明日"
