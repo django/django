@@ -1,0 +1,110 @@
+==============
+Sending e-mail
+==============
+
+Although Python makes sending e-mail relatively easy via the `smtplib library`_,
+Django provides a couple of light wrappers over it, to make sending e-mail
+extra quick.
+
+The code lives in a single module: ``django.core.mail``.
+
+.. _smtplib library: http://www.python.org/doc/current/lib/module-smtplib.html
+
+Quick example
+=============
+
+In two lines::
+
+    from django.core.mail import send_mail
+
+    send_mail('Subject here', 'Here is the message.', 'from@example.com',
+        ['to@example.com'], fail_silently=False)
+
+The send_mail function
+======================
+
+The simplest way to send e-mail is using the function
+``django.core.mail.send_mail``. Here's its definition::
+
+    send_mail(subject, message, from_email, recipient_list, fail_silently=False)
+
+All parameters are required except for ``fail_silently``, which is ``False`` by
+default.
+
+    * ``subject``: A string.
+    * ``message``: A string.
+    * ``from_email``: A string.
+    * ``recipient_list``: A list of strings, each an e-mail address. Each
+      member of ``recipient_list`` will see the other recipients in the "To:"
+      field of the e-mail message.
+    * ``fail_silently``: A boolean. If it's ``False``, ``send_mail`` will raise
+      an ``smtplib.SMTPException``. See the `smtplib docs`_ for a list of
+      possible exceptions, all of which are subclasses of ``SMTPException``.
+
+.. _smtplib docs: http://www.python.org/doc/current/lib/module-smtplib.html
+
+The send_mass_mail function
+===========================
+
+``django.core.mail.send_mass_mail`` is intended to handle mass e-mailing.
+Here's the definition::
+
+    send_mass_mail(datatuple, fail_silently=False):
+
+``datatuple`` is a tuple in which each element is in this format::
+
+    (subject, message, from_email, recipient_list)
+
+``fail_silently`` has the same function as in ``send_mail()``.
+
+Each separate element of ``datatuple`` results in a separate e-mail message.
+As in ``send_mail()``, recipients in the same ``recipient_list`` will all see
+the other addresses in the e-mail messages's "To:" field.
+
+send_mass_mail vs. send_mail
+----------------------------
+
+The main difference between ``send_mass_mail()`` and ``send_mail()`` is that
+``send_mail()`` opens a connection to the mail server each time it's executed,
+while ``send_mass_mail()`` uses a single connection for each of its messages.
+This makes ``send_mass_mail()`` slightly more efficient.
+
+The mail_admins function
+========================
+
+``django.core.mail.mail_admins`` is a shortcut for sending an e-mail to the
+site admins, as defined in the `ADMINS setting`_. Here's the definition::
+
+    mail_admins(subject, message, fail_silently=False)
+
+``mail_admins()`` prefixes the subject with the value of the
+`EMAIL_SUBJECT_PREFIX setting`_, which is ``"[Django] "`` by default.
+
+.. _ADMINS setting: http://www.djangoproject.com/documentation/settings/#admins
+.. _EMAIL_SUBJECT_PREFIX setting: http://www.djangoproject.com/documentation/settings/#email-subject-prefix
+
+The mail_managers function
+==========================
+
+``django.core.mail.mail_managers`` is just like ``mail_admins``, except it
+sends an e-mail to the site managers, as defined in the `MANAGERS setting`_.
+
+.. _MANAGERS setting: http://www.djangoproject.com/documentation/settings/#managers
+
+Examples
+========
+
+This sends a single e-mail to john@example.com and jane@example.com, with them
+both appearing in the "To:"::
+
+    send_mail('Subject', 'Message.', 'from@example.com',
+        ['john@example.com', 'jane@example.com'])
+
+This sends a message to john@example.com and jane@example.com, with them both
+receiving a separate e-mail::
+
+    datatuple = (
+        ('Subject', 'Message.', 'from@example.com', ['john@example.com'],
+        ('Subject', 'Message.', 'from@example.com', ['jane@example.com'],
+    )
+    send_mass_mail(datatuple)
