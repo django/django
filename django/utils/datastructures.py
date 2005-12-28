@@ -63,6 +63,9 @@ class MultiValueDict(dict):
     def __init__(self, key_to_list_mapping=()):
         dict.__init__(self, key_to_list_mapping)
 
+    def __repr__(self):
+        return "<MultiValueDict: %s>" % dict.__repr__(self)
+
     def __getitem__(self, key):
         """
         Returns the last data value for this key, or [] if it's an empty list;
