@@ -45,6 +45,7 @@ LANGUAGES = (
     ('gl', _('Galician')),
     ('is', _('Icelandic')),
     ('it', _('Italian')),
+    ('ja', _('Japanese')),
     ('no', _('Norwegian')),
     ('pt-br', _('Brazilian')),
     ('ro', _('Romanian')),
@@ -53,6 +54,7 @@ LANGUAGES = (
     ('sr', _('Serbian')),
     ('sv', _('Swedish')),
     ('zh-cn', _('Simplified Chinese')),
+    ('zh-tw', _('Traditional Chinese')),
 )
 
 # Not-necessarily-technical managers of the site. They get broken link
