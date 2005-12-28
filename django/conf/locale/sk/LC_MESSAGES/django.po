@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2005-12-26 12:35+0100\n"
+"POT-Creation-Date: 2005-12-29 00:05+0100\n"
 "PO-Revision-Date: 2005-11-10 23:22-0500\n"
 "Last-Translator: Vladimir Labath <vlado@labath.org>\n"
 "Language-Team: Slovak <sk@li.org>\n"
@@ -1438,36 +1438,44 @@ msgid "Italian"
 msgstr "Taliansky"
 
 #: conf/global_settings.py:48
+msgid "Japanese"
+msgstr ""
+
+#: conf/global_settings.py:49
 msgid "Norwegian"
 msgstr "Nórsky"
 
-#: conf/global_settings.py:49
+#: conf/global_settings.py:50
 msgid "Brazilian"
 msgstr "Brazílsky"
 
-#: conf/global_settings.py:50
+#: conf/global_settings.py:51
 msgid "Romanian"
 msgstr "Rumúnsky"
 
-#: conf/global_settings.py:51
+#: conf/global_settings.py:52
 msgid "Russian"
 msgstr "Ruský"
 
-#: conf/global_settings.py:52
+#: conf/global_settings.py:53
 msgid "Slovak"
 msgstr "Slovenský"
 
-#: conf/global_settings.py:53
+#: conf/global_settings.py:54
 msgid "Serbian"
 msgstr "Srbský"
 
-#: conf/global_settings.py:54
+#: conf/global_settings.py:55
 msgid "Swedish"
 msgstr "Švédsky"
 
-#: conf/global_settings.py:55
+#: conf/global_settings.py:56
 msgid "Simplified Chinese"
 msgstr "Zjednodušená činština "
+
+#: conf/global_settings.py:57
+msgid "Traditional Chinese"
+msgstr ""
 
 #: core/formfields.py:59 core/meta/fields.py:285 core/meta/fields.py:488
 #: core/meta/fields.py:499

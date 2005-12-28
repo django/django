@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django v1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2005-12-26 12:34+0100\n"
+"POT-Creation-Date: 2005-12-29 00:03+0100\n"
 "PO-Revision-Date: 2005-12-10 22:08+0800\n"
 "Last-Translator: Hiweed Leng <hiweed@gmail.com>\n"
 "Language-Team: Simplified Chinese <limodou@gmail.com>\n"
@@ -1403,36 +1403,44 @@ msgid "Italian"
 msgstr "意大利语"
 
 #: conf/global_settings.py:48
+msgid "Japanese"
+msgstr ""
+
+#: conf/global_settings.py:49
 msgid "Norwegian"
 msgstr "挪威语"
 
-#: conf/global_settings.py:49
+#: conf/global_settings.py:50
 msgid "Brazilian"
 msgstr "巴西语"
 
-#: conf/global_settings.py:50
+#: conf/global_settings.py:51
 msgid "Romanian"
 msgstr "罗马尼亚语"
 
-#: conf/global_settings.py:51
+#: conf/global_settings.py:52
 msgid "Russian"
 msgstr "俄语"
 
-#: conf/global_settings.py:52
+#: conf/global_settings.py:53
 msgid "Slovak"
 msgstr "斯洛伐克语"
 
-#: conf/global_settings.py:53
+#: conf/global_settings.py:54
 msgid "Serbian"
 msgstr "塞尔维亚语"
 
-#: conf/global_settings.py:54
+#: conf/global_settings.py:55
 msgid "Swedish"
 msgstr "瑞典语"
 
-#: conf/global_settings.py:55
+#: conf/global_settings.py:56
 msgid "Simplified Chinese"
 msgstr "简体中文"
+
+#: conf/global_settings.py:57
+msgid "Traditional Chinese"
+msgstr ""
 
 #: core/formfields.py:59 core/meta/fields.py:285 core/meta/fields.py:488
 #: core/meta/fields.py:499

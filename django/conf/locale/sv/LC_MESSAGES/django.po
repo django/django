@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2005-12-26 12:35+0100\n"
+"POT-Creation-Date: 2005-12-29 00:05+0100\n"
 "PO-Revision-Date: 2005-12-04 16:20+0100\n"
 "Last-Translator: Robin Sonefors <ozamosi@blinkenlights.se>\n"
 "Language-Team: Django translators <djangoi18n@googlegroups.com>\n"
@@ -1439,36 +1439,44 @@ msgid "Italian"
 msgstr "Italienska"
 
 #: conf/global_settings.py:48
+msgid "Japanese"
+msgstr ""
+
+#: conf/global_settings.py:49
 msgid "Norwegian"
 msgstr "Norska"
 
-#: conf/global_settings.py:49
+#: conf/global_settings.py:50
 msgid "Brazilian"
 msgstr "Brasilianska"
 
-#: conf/global_settings.py:50
+#: conf/global_settings.py:51
 msgid "Romanian"
 msgstr "Rumänska"
 
-#: conf/global_settings.py:51
+#: conf/global_settings.py:52
 msgid "Russian"
 msgstr "Ryska"
 
-#: conf/global_settings.py:52
+#: conf/global_settings.py:53
 msgid "Slovak"
 msgstr "Slovakiska"
 
-#: conf/global_settings.py:53
+#: conf/global_settings.py:54
 msgid "Serbian"
 msgstr "Serbiska"
 
-#: conf/global_settings.py:54
+#: conf/global_settings.py:55
 msgid "Swedish"
 msgstr "Svenska"
 
-#: conf/global_settings.py:55
+#: conf/global_settings.py:56
 msgid "Simplified Chinese"
 msgstr "Förenklad kinesiska"
+
+#: conf/global_settings.py:57
+msgid "Traditional Chinese"
+msgstr ""
 
 #: core/formfields.py:59 core/meta/fields.py:285 core/meta/fields.py:488
 #: core/meta/fields.py:499

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2005-12-26 12:56+0100\n"
+"POT-Creation-Date: 2005-12-29 00:04+0100\n"
 "PO-Revision-Date: 2005-10-08 00:03+0200\n"
 "Last-Translator: Georg Bauer <gb@bofh.ms>\n"
 "MIME-Version: 1.0\n"
@@ -1450,36 +1450,44 @@ msgid "Italian"
 msgstr "Italienisch"
 
 #: conf/global_settings.py:48
+msgid "Japanese"
+msgstr "Japanisch"
+
+#: conf/global_settings.py:49
 msgid "Norwegian"
 msgstr "Norwegisch"
 
-#: conf/global_settings.py:49
+#: conf/global_settings.py:50
 msgid "Brazilian"
 msgstr "Brasilianisch"
 
-#: conf/global_settings.py:50
+#: conf/global_settings.py:51
 msgid "Romanian"
 msgstr "Rumänisch"
 
-#: conf/global_settings.py:51
+#: conf/global_settings.py:52
 msgid "Russian"
 msgstr "Russisch"
 
-#: conf/global_settings.py:52
+#: conf/global_settings.py:53
 msgid "Slovak"
 msgstr "Slowakisch"
 
-#: conf/global_settings.py:53
+#: conf/global_settings.py:54
 msgid "Serbian"
 msgstr "Serbisch"
 
-#: conf/global_settings.py:54
+#: conf/global_settings.py:55
 msgid "Swedish"
 msgstr "Schwedisch"
 
-#: conf/global_settings.py:55
+#: conf/global_settings.py:56
 msgid "Simplified Chinese"
 msgstr "Vereinfachtes Chinesisch"
+
+#: conf/global_settings.py:57
+msgid "Traditional Chinese"
+msgstr "Traditionelles Chinesisch"
 
 #: core/formfields.py:59 core/meta/fields.py:285 core/meta/fields.py:488
 #: core/meta/fields.py:499
@@ -1842,6 +1850,6 @@ msgstr "Ja,Nein,Vielleicht"
 msgid ""
 "Your Web browser doesn't appear to have cookies enabled. Cookies are "
 "required for logging in."
-msgstr "Der Webbrowser scheint keine Cookies aktiviert zu haben. Cookies "
-"sind für die Anmeldung zwingend notwendig."
-
+msgstr ""
+"Der Webbrowser scheint keine Cookies aktiviert zu haben. Cookies sind für "
+"die Anmeldung zwingend notwendig."

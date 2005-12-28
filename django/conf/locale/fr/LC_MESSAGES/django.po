@@ -7,9 +7,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2005-12-26 12:35+0100\n"
+"POT-Creation-Date: 2005-12-29 00:04+0100\n"
 "PO-Revision-Date: 2005-10-18 12:27+0200\n"
-"Last-Translator: Mikaël Barbero <mikael.barbero nospam at nospam free.fr>\n" 
+"Last-Translator: Mikaël Barbero <mikael.barbero nospam at nospam free.fr>\n"
 "Language-Team: français <fr@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=ISO-8859-1\n"
@@ -91,8 +91,8 @@ msgid ""
 "Check this box if the comment is inappropriate. A \"This comment has been "
 "removed\" message will be displayed instead."
 msgstr ""
-"Cochez cette case si le commentaire est inadéquat. Un message type \"Ce commentaire a été "
-"supprimé\" sera affiché en lieu et place de celui-ci."
+"Cochez cette case si le commentaire est inadéquat. Un message type \"Ce "
+"commentaire a été supprimé\" sera affiché en lieu et place de celui-ci."
 
 #: contrib/comments/models/comments.py:31
 msgid "Comment"
@@ -285,7 +285,9 @@ msgstr "Un ou plusieurs champs requis n'ont pas été remplis"
 #: contrib/comments/views/comments.py:194
 #: contrib/comments/views/comments.py:283
 msgid "Somebody tampered with the comment form (security violation)"
-msgstr "Quelqu'un a trifouillé le formulaire de commentaire (violation des règles de sécurité)"
+msgstr ""
+"Quelqu'un a trifouillé le formulaire de commentaire (violation des règles de "
+"sécurité)"
 
 #: contrib/comments/views/comments.py:204
 #: contrib/comments/views/comments.py:289
@@ -293,15 +295,15 @@ msgid ""
 "The comment form had an invalid 'target' parameter -- the object ID was "
 "invalid"
 msgstr ""
-"Ce formulaire de commentaire avait un paramètre cible invalide ; l'ID de l'objet "
-"était invalide"
+"Ce formulaire de commentaire avait un paramètre cible invalide ; l'ID de "
+"l'objet était invalide"
 
 #: contrib/comments/views/comments.py:254
 #: contrib/comments/views/comments.py:318
 msgid "The comment form didn't provide either 'preview' or 'post'"
 msgstr ""
-"Le formulaire de commentaire ne proposait ni les options de "
-"prévisualisation ni d'envoi"
+"Le formulaire de commentaire ne proposait ni les options de prévisualisation "
+"ni d'envoi"
 
 #: contrib/admin/filterspecs.py:40
 #, python-format
@@ -390,8 +392,8 @@ msgid ""
 "sensitive."
 msgstr ""
 "Saisissez s'il vous plaut un nom d'utilisateur et un mot de passe valide. "
-"Remarquez que chacun de ces champs est sensible à la casse (différenciation des "
-"majuscules/minuscules)."
+"Remarquez que chacun de ces champs est sensible à la casse (différenciation "
+"des majuscules/minuscules)."
 
 #: contrib/admin/views/decorators.py:23
 #: contrib/admin/templates/admin/login.html:24
@@ -403,8 +405,8 @@ msgid ""
 "Please log in again, because your session has expired. Don't worry: Your "
 "submission has been saved."
 msgstr ""
-"Votre session a expiré, connectez-vous de nouveau s'il vous plaît. Ne vous inquiétez "
-"pas, votre travail précédement éffectué a été sauvé."
+"Votre session a expiré, connectez-vous de nouveau s'il vous plaît. Ne vous "
+"inquiétez pas, votre travail précédement éffectué a été sauvé."
 
 #: contrib/admin/views/decorators.py:64
 msgid ""
@@ -421,7 +423,8 @@ msgstr "Les noms d'utilisateur ne peuvent contenir le caractère '@'"
 #: contrib/admin/views/decorators.py:80
 #, python-format
 msgid "Your e-mail address is not your username. Try '%s' instead."
-msgstr "Votre courriel n'est pas votre nom d'utilisateur. Essayez '%s' à la place."
+msgstr ""
+"Votre courriel n'est pas votre nom d'utilisateur. Essayez '%s' à la place."
 
 #: contrib/admin/views/main.py:52
 #, fuzzy
@@ -491,8 +494,8 @@ msgstr "L'objet %(name)s \"%(obj)s\" a été modifié avec succès."
 msgid ""
 "The %(name)s \"%(obj)s\" was added successfully. You may edit it again below."
 msgstr ""
-"L'objet %(name)s \"%(obj)s\" a été ajouté avec succès.Vous pouvez continuez de "
-"l'éditez ci-dessous."
+"L'objet %(name)s \"%(obj)s\" a été ajouté avec succès.Vous pouvez continuez "
+"de l'éditez ci-dessous."
 
 #: contrib/admin/views/main.py:536
 #, fuzzy, python-format
@@ -774,9 +777,9 @@ msgid ""
 "objects, but your account doesn't have permission to delete the following "
 "types of objects:"
 msgstr ""
-"Supprimer l'objet %(object_name)s '%(object)s' provoquerait la suppression des "
-"objets qui lui sont liés mais votre compte ne possède pas la permission de "
-"supprimer les types d'objets suivants :"
+"Supprimer l'objet %(object_name)s '%(object)s' provoquerait la suppression "
+"des objets qui lui sont liés mais votre compte ne possède pas la permission "
+"de supprimer les types d'objets suivants :"
 
 #: contrib/admin/templates/admin/delete_confirmation.html:13
 #, python-format
@@ -784,8 +787,8 @@ msgid ""
 "Are you sure you want to delete the %(object_name)s \"%(object)s\"? All of "
 "the following related items will be deleted:"
 msgstr ""
-"Êtes vous certain de vouloir supprimer l'objet %(object_name)s \"%(object)s\" ? "
-"Les éléments suivant sont liés à celui-ci et seront aussi supprimés :"
+"Êtes vous certain de vouloir supprimer l'objet %(object_name)s \"%(object)s"
+"\" ? Les éléments suivant sont liés à celui-ci et seront aussi supprimés :"
 
 #: contrib/admin/templates/admin/delete_confirmation.html:17
 msgid "Yes, I'm sure"
@@ -989,8 +992,8 @@ msgid ""
 "Jumps you from any page to the documentation for the view that generates "
 "that page."
 msgstr ""
-"Vous envoie de n'importe quelle page vers la documentation de la vue qui a généré "
-"cette page."
+"Vous envoie de n'importe quelle page vers la documentation de la vue qui a "
+"généré cette page."
 
 #: contrib/admin/templates/admin_doc/bookmarklets.html:22
 #, fuzzy
@@ -1002,8 +1005,8 @@ msgid ""
 "Shows the content-type and unique ID for pages that represent a single "
 "object."
 msgstr ""
-"Montre le content-type et l'ID unique pour les pages qui représente "
-"un objet unique."
+"Montre le content-type et l'ID unique pour les pages qui représente un objet "
+"unique."
 
 #: contrib/admin/templates/admin_doc/bookmarklets.html:25
 msgid "Edit this object (current window)"
@@ -1019,7 +1022,9 @@ msgstr "Editer cette objet (nouvelle fenêtre)"
 
 #: contrib/admin/templates/admin_doc/bookmarklets.html:29
 msgid "As above, but opens the admin page in a new window."
-msgstr "Comme ci-dessus, mais ouvre la page d'administration dans une nouvelle fenêtre."
+msgstr ""
+"Comme ci-dessus, mais ouvre la page d'administration dans une nouvelle "
+"fenêtre."
 
 #: contrib/admin/templates/widget/date_time.html:3
 msgid "Date:"
@@ -1473,37 +1478,45 @@ msgid "Italian"
 msgstr "Italien"
 
 #: conf/global_settings.py:48
+msgid "Japanese"
+msgstr ""
+
+#: conf/global_settings.py:49
 msgid "Norwegian"
 msgstr "Norvégien"
 
-#: conf/global_settings.py:49
+#: conf/global_settings.py:50
 msgid "Brazilian"
 msgstr "Brésilien"
 
-#: conf/global_settings.py:50
+#: conf/global_settings.py:51
 msgid "Romanian"
 msgstr "Roumain"
 
-#: conf/global_settings.py:51
+#: conf/global_settings.py:52
 msgid "Russian"
 msgstr "Russe"
 
-#: conf/global_settings.py:52
+#: conf/global_settings.py:53
 msgid "Slovak"
 msgstr "Slovaque"
 
-#: conf/global_settings.py:53
+#: conf/global_settings.py:54
 #, fuzzy
 msgid "Serbian"
 msgstr "Serbe"
 
-#: conf/global_settings.py:54
+#: conf/global_settings.py:55
 msgid "Swedish"
 msgstr "Suédois"
 
-#: conf/global_settings.py:55
+#: conf/global_settings.py:56
 msgid "Simplified Chinese"
 msgstr "Chinois simplifié"
+
+#: conf/global_settings.py:57
+msgid "Traditional Chinese"
+msgstr "Chinois traditionnel"
 
 #: core/formfields.py:59 core/meta/fields.py:285 core/meta/fields.py:488
 #: core/meta/fields.py:499
@@ -1550,13 +1563,14 @@ msgstr "Entrez un nombre entier entre 0 et 32 767."
 #: core/validators.py:62
 msgid "This value must contain only letters, numbers and underscores."
 msgstr ""
-"Ce champ ne doit contenir que des lettres, des nombres et des tirets bas ('_')."
+"Ce champ ne doit contenir que des lettres, des nombres et des tirets bas "
+"('_')."
 
 #: core/validators.py:66
 msgid "This value must contain only letters, numbers, underscores and slashes."
 msgstr ""
-"Ce champ ne doit contenir que des lettres, des nombres, des tirets bas ('_') et "
-"des '/'."
+"Ce champ ne doit contenir que des lettres, des nombres, des tirets bas ('_') "
+"et des '/'."
 
 #: core/validators.py:74
 msgid "Uppercase letters are not allowed here."
@@ -1689,7 +1703,8 @@ msgstr "Saisissez au moins une valeur dans un des champs s'il vous plaît."
 
 #: core/validators.py:266 core/validators.py:277
 msgid "Please enter both fields or leave them both empty."
-msgstr "Renseignez chacun des champs ou laissez les deux vides s'il vous plaît."
+msgstr ""
+"Renseignez chacun des champs ou laissez les deux vides s'il vous plaît."
 
 #: core/validators.py:284
 #, python-format
@@ -1844,8 +1859,8 @@ msgstr "Séparez les ID par des virgules."
 msgid ""
 " Hold down \"Control\", or \"Command\" on a Mac, to select more than one."
 msgstr ""
-"Maintenez \"Contrôle (ctrl)\", ou \"Commande (touche pomme)\" sur un Mac, pour en sélectionner "
-"plusieurs."
+"Maintenez \"Contrôle (ctrl)\", ou \"Commande (touche pomme)\" sur un Mac, "
+"pour en sélectionner plusieurs."
 
 #: core/meta/fields.py:508
 #, fuzzy
@@ -1858,7 +1873,8 @@ msgid "Please enter valid %(self)s IDs. The value %(value)r is invalid."
 msgid_plural ""
 "Please enter valid %(self)s IDs. The values %(value)r are invalid."
 msgstr[0] "Entrez un ID %(self)s valide. La valeur %(value)r est invalide."
-msgstr[1] "Entrez des ID %(self)s valides. Les valeurs %(value)r sont invalides."
+msgstr[1] ""
+"Entrez des ID %(self)s valides. Les valeurs %(value)r sont invalides."
 
 #: core/template/defaultfilters.py:371
 msgid "yes,no,maybe"
@@ -1871,9 +1887,6 @@ msgid ""
 msgstr ""
 "Votre navigateur ne semble pas avoir activé les cookies. Les cookies sont "
 "nécessaire pour se connecter"
-
-#~ msgid "Traditional Chinese"
-#~ msgstr "Chinois traditionnel"
 
 #~ msgid "Messages"
 #~ msgstr "Messages"

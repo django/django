@@ -8,13 +8,1357 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django v1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2005-12-28 23:21+0800\n"
+"POT-Creation-Date: 2005-12-29 00:05+0100\n"
 "PO-Revision-Date: 2005-12-28 23:30+0800\n"
 "Last-Translator: yungyuc <yyc@seety.org>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+
+#: contrib/comments/models/comments.py:8
+#: contrib/comments/models/comments.py:161
+msgid "object ID"
+msgstr "物件 ID"
+
+#: contrib/comments/models/comments.py:9
+msgid "headline"
+msgstr "頭條"
+
+#: contrib/comments/models/comments.py:10
+#: contrib/comments/models/comments.py:162
+msgid "comment"
+msgstr "評論"
+
+#: contrib/comments/models/comments.py:11
+msgid "rating #1"
+msgstr "等級 #1"
+
+#: contrib/comments/models/comments.py:12
+msgid "rating #2"
+msgstr "等級 #2"
+
+#: contrib/comments/models/comments.py:13
+msgid "rating #3"
+msgstr "等級 #3"
+
+#: contrib/comments/models/comments.py:14
+msgid "rating #4"
+msgstr "等級 #4"
+
+#: contrib/comments/models/comments.py:15
+msgid "rating #5"
+msgstr "等級 #5"
+
+#: contrib/comments/models/comments.py:16
+msgid "rating #6"
+msgstr "等級 #6"
+
+#: contrib/comments/models/comments.py:17
+msgid "rating #7"
+msgstr "等級 #7"
+
+#: contrib/comments/models/comments.py:18
+msgid "rating #8"
+msgstr "等級 #8"
+
+#: contrib/comments/models/comments.py:23
+msgid "is valid rating"
+msgstr "是有效的等級"
+
+#: contrib/comments/models/comments.py:24
+#: contrib/comments/models/comments.py:164
+msgid "date/time submitted"
+msgstr "日期/時間已發送"
+
+#: contrib/comments/models/comments.py:25
+#: contrib/comments/models/comments.py:165
+msgid "is public"
+msgstr "是公開的"
+
+#: contrib/comments/models/comments.py:26 contrib/admin/views/doc.py:256
+msgid "IP address"
+msgstr "IP 位址"
+
+#: contrib/comments/models/comments.py:27
+msgid "is removed"
+msgstr "已移除"
+
+#: contrib/comments/models/comments.py:27
+msgid ""
+"Check this box if the comment is inappropriate. A \"This comment has been "
+"removed\" message will be displayed instead."
+msgstr "如果此評論不恰當則選取這個方塊，其將以 \"此評論已被移除\" 訊息取代。"
+
+#: contrib/comments/models/comments.py:31
+msgid "Comment"
+msgstr "評論"
+
+#: contrib/comments/models/comments.py:32
+msgid "Comments"
+msgstr "評論"
+
+#: contrib/comments/models/comments.py:85
+#: contrib/comments/models/comments.py:204
+msgid "Content object"
+msgstr "內容物件"
+
+#: contrib/comments/models/comments.py:113
+#, python-format
+msgid ""
+"Posted by %(user)s at %(date)s\n"
+"\n"
+"%(comment)s\n"
+"\n"
+"http://%(domain)s%(url)s"
+msgstr ""
+"由 %(user)s 在 %(date)s 張貼\n"
+"\n"
+"%(comment)s\n"
+"\n"
+"http://%(domain)s%(url)s"
+
+#: contrib/comments/models/comments.py:163
+msgid "person's name"
+msgstr "人名"
+
+#: contrib/comments/models/comments.py:166
+msgid "ip address"
+msgstr "ip 位址"
+
+#: contrib/comments/models/comments.py:168
+msgid "approved by staff"
+msgstr "由工作人員核准"
+
+#: contrib/comments/models/comments.py:172
+msgid "Free comment"
+msgstr "自由評論"
+
+#: contrib/comments/models/comments.py:173
+msgid "Free comments"
+msgstr "自由評論"
+
+#: contrib/comments/models/comments.py:209
+msgid "score"
+msgstr "分數"
+
+#: contrib/comments/models/comments.py:210
+msgid "score date"
+msgstr "分數日期"
+
+#: contrib/comments/models/comments.py:213
+msgid "Karma score"
+msgstr "Karma 分數"
+
+#: contrib/comments/models/comments.py:214
+msgid "Karma scores"
+msgstr "Karma 分數"
+
+#: contrib/comments/models/comments.py:223
+#, python-format
+msgid "%(score)d rating by %(user)s"
+msgstr "被 %(user)s 評定為 %(score)d 等級"
+
+#: contrib/comments/models/comments.py:248
+msgid "flag date"
+msgstr "標識日期"
+
+#: contrib/comments/models/comments.py:251
+msgid "User flag"
+msgstr "使用者旗標"
+
+#: contrib/comments/models/comments.py:252
+msgid "User flags"
+msgstr "使用者旗標"
+
+#: contrib/comments/models/comments.py:256
+#, python-format
+msgid "Flag by %r"
+msgstr "被 %r 標識"
+
+#: contrib/comments/models/comments.py:271
+#, python-format
+msgid ""
+"This comment was flagged by %(user)s:\n"
+"\n"
+"%(text)s"
+msgstr ""
+"此評論被 %(user)s 標識:\n"
+"\n"
+"%(text)s"
+
+#: contrib/comments/models/comments.py:278
+msgid "deletion date"
+msgstr "刪除日期"
+
+#: contrib/comments/models/comments.py:281
+msgid "Moderator deletion"
+msgstr "仲裁刪除"
+
+#: contrib/comments/models/comments.py:282
+msgid "Moderator deletions"
+msgstr "仲裁刪除"
+
+#: contrib/comments/models/comments.py:286
+#, python-format
+msgid "Moderator deletion by %r"
+msgstr "由 %r 仲裁刪除"
+
+#: contrib/comments/views/karma.py:18
+msgid "Anonymous users cannot vote"
+msgstr "匿名使用者不可投票"
+
+#: contrib/comments/views/karma.py:22
+msgid "Invalid comment ID"
+msgstr "無效的評論 ID"
+
+#: contrib/comments/views/karma.py:24
+msgid "No voting for yourself"
+msgstr "不要投票給你自己"
+
+#: contrib/comments/views/comments.py:25
+msgid ""
+"This rating is required because you've entered at least one other rating."
+msgstr "此等級被要求是因為你至少輸入了一個其它的等級。"
+
+#: contrib/comments/views/comments.py:109
+#, python-format
+msgid ""
+"This comment was posted by a user who has posted fewer than %(count)s "
+"comment:\n"
+"\n"
+"%(text)s"
+msgid_plural ""
+"This comment was posted by a user who has posted fewer than %(count)s "
+"comments:\n"
+"\n"
+"%(text)s"
+msgstr[0] ""
+"張貼此評論的使用者之所有評論少於 %(count)s:\n"
+"\n"
+"%(text)s"
+msgstr[1] ""
+"張貼此評論的使用者之所有評論少於 %(count)s:\n"
+"\n"
+"%(text)s"
+
+#: contrib/comments/views/comments.py:114
+#, python-format
+msgid ""
+"This comment was posted by a sketchy user:\n"
+"\n"
+"%(text)s"
+msgstr ""
+"此評論被一個隨便的使用者所張貼:\n"
+"\n"
+"%(text)s"
+
+#: contrib/comments/views/comments.py:186
+#: contrib/comments/views/comments.py:277
+msgid "Only POSTs are allowed"
+msgstr "只允許 POST"
+
+#: contrib/comments/views/comments.py:190
+#: contrib/comments/views/comments.py:281
+msgid "One or more of the required fields wasn't submitted"
+msgstr "一個或多個所需的欄位沒有送出"
+
+#: contrib/comments/views/comments.py:194
+#: contrib/comments/views/comments.py:283
+msgid "Somebody tampered with the comment form (security violation)"
+msgstr "有人篡改了評論表單 (違反保全)"
+
+#: contrib/comments/views/comments.py:204
+#: contrib/comments/views/comments.py:289
+msgid ""
+"The comment form had an invalid 'target' parameter -- the object ID was "
+"invalid"
+msgstr "此評論表單有一個無效的 'target' 參數 -- 物件 ID 是無效的"
+
+#: contrib/comments/views/comments.py:254
+#: contrib/comments/views/comments.py:318
+msgid "The comment form didn't provide either 'preview' or 'post'"
+msgstr "此評論表單沒有提供 'preview' 或 'post'"
+
+#: contrib/admin/filterspecs.py:40
+#, python-format
+msgid ""
+"<h3>By %s:</h3>\n"
+"<ul>\n"
+msgstr ""
+"<h3>由 %s:</h3>\n"
+"<ul>\n"
+
+#: contrib/admin/filterspecs.py:70 contrib/admin/filterspecs.py:88
+#: contrib/admin/filterspecs.py:143
+msgid "All"
+msgstr "全部"
+
+#: contrib/admin/filterspecs.py:109
+msgid "Any date"
+msgstr "任何日期"
+
+#: contrib/admin/filterspecs.py:110
+msgid "Today"
+msgstr "本日"
+
+#: contrib/admin/filterspecs.py:113
+msgid "Past 7 days"
+msgstr "過去 7 天"
+
+#: contrib/admin/filterspecs.py:115
+msgid "This month"
+msgstr "本月"
+
+#: contrib/admin/filterspecs.py:117
+msgid "This year"
+msgstr "本年"
+
+#: contrib/admin/filterspecs.py:143
+msgid "Yes"
+msgstr "是"
+
+#: contrib/admin/filterspecs.py:143
+msgid "No"
+msgstr "否"
+
+#: contrib/admin/filterspecs.py:150
+msgid "Unknown"
+msgstr "未知"
+
+#: contrib/admin/models/admin.py:6
+msgid "action time"
+msgstr "動作時間"
+
+#: contrib/admin/models/admin.py:9
+msgid "object id"
+msgstr "物件 id"
+
+#: contrib/admin/models/admin.py:10
+msgid "object repr"
+msgstr "物件 repr"
+
+#: contrib/admin/models/admin.py:11
+msgid "action flag"
+msgstr "動作旗標"
+
+#: contrib/admin/models/admin.py:12
+msgid "change message"
+msgstr "變更訊息"
+
+#: contrib/admin/models/admin.py:15
+msgid "log entry"
+msgstr "紀錄項目"
+
+#: contrib/admin/models/admin.py:16
+msgid "log entries"
+msgstr "紀錄項目"
+
+#: contrib/admin/templatetags/admin_list.py:245
+msgid "All dates"
+msgstr "所有日期"
+
+#: contrib/admin/views/decorators.py:9 parts/auth/formfields.py:33
+#: parts/auth/formfields.py:38
+msgid ""
+"Please enter a correct username and password. Note that both fields are case-"
+"sensitive."
+msgstr "請輸入一個正確的使用者名稱與密碼。注意此二欄位都是大小寫有別的。"
+
+#: contrib/admin/views/decorators.py:23
+#: contrib/admin/templates/admin/login.html:24
+msgid "Log in"
+msgstr "登入"
+
+#: contrib/admin/views/decorators.py:57
+msgid ""
+"Please log in again, because your session has expired. Don't worry: Your "
+"submission has been saved."
+msgstr "請再登入一次，因為你的 session 已經到期。不必擔心: 你的提交已被儲存。"
+
+#: contrib/admin/views/decorators.py:64
+msgid ""
+"Looks like your browser isn't configured to accept cookies. Please enable "
+"cookies, reload this page, and try again."
+msgstr ""
+"看起來你的瀏覽器沒有組態成允許 cookie。請啟用 cookie、重新載入此頁，然後再試"
+"一次。"
+
+#: contrib/admin/views/decorators.py:78
+msgid "Usernames cannot contain the '@' character."
+msgstr "使用者名稱不能包含 '@' 字元。"
+
+#: contrib/admin/views/decorators.py:80
+#, python-format
+msgid "Your e-mail address is not your username. Try '%s' instead."
+msgstr "你的電子郵件地址不是你的使用者名稱。試著改用 '%s'。"
+
+#: contrib/admin/views/main.py:52
+msgid "Site administration"
+msgstr "網站管理"
+
+#: contrib/admin/views/main.py:67
+#, python-format
+msgid "Select %s"
+msgstr "選擇 %s"
+
+#: contrib/admin/views/main.py:68
+#, python-format
+msgid "Select %s to change"
+msgstr "選擇 %s 來變更"
+
+#: contrib/admin/views/main.py:410
+#, python-format
+msgid "The %(name)s \"%(obj)s\" was added successfully."
+msgstr "%(name)s \"%(obj)s\" 已成功新增。"
+
+#: contrib/admin/views/main.py:415 contrib/admin/views/main.py:492
+msgid "You may edit it again below."
+msgstr "你可以在下面再次編輯。"
+
+#: contrib/admin/views/main.py:423 contrib/admin/views/main.py:501
+#, python-format
+msgid "You may add another %s below."
+msgstr "你可以在下面新增另一個 %s。"
+
+#: contrib/admin/views/main.py:441
+#, python-format
+msgid "Add %s"
+msgstr "新增 %s"
+
+#: contrib/admin/views/main.py:457
+#, python-format
+msgid "Added %s."
+msgstr "%s 已新增。"
+
+#: contrib/admin/views/main.py:457 contrib/admin/views/main.py:459
+#: contrib/admin/views/main.py:461
+msgid "and"
+msgstr "和"
+
+#: contrib/admin/views/main.py:459
+#, python-format
+msgid "Changed %s."
+msgstr "%s 已變更。"
+
+#: contrib/admin/views/main.py:461
+#, python-format
+msgid "Deleted %s."
+msgstr "%s 已刪除。"
+
+#: contrib/admin/views/main.py:464
+msgid "No fields changed."
+msgstr "沒有欄位被變更。"
+
+#: contrib/admin/views/main.py:489
+#, python-format
+msgid "The %(name)s \"%(obj)s\" was changed successfully."
+msgstr "%(name)s \"%(obj)s\" 已成功變更。"
+
+#: contrib/admin/views/main.py:498
+#, python-format
+msgid ""
+"The %(name)s \"%(obj)s\" was added successfully. You may edit it again below."
+msgstr "%(name)s \"%(obj)s\" 已成功新增。你可以在下面再次編輯。"
+
+#: contrib/admin/views/main.py:536
+#, python-format
+msgid "Change %s"
+msgstr "變更 %s"
+
+#: contrib/admin/views/main.py:614
+#, python-format
+msgid "One or more %(fieldname)s in %(name)s: %(obj)s"
+msgstr "在 %(name) 裡的一個或多個 %(fieldname)s: %(obj)s"
+
+#: contrib/admin/views/main.py:619
+#, python-format
+msgid "One or more %(fieldname)s in %(name)s:"
+msgstr "在 %(name)s 裡的一個或多個 %(fieldname)s:"
+
+#: contrib/admin/views/main.py:648
+#, python-format
+msgid "The %(name)s \"%(obj)s\" was deleted successfully."
+msgstr "%(name)s \"%(obj)s\" 已成功刪除。"
+
+#: contrib/admin/views/main.py:651
+msgid "Are you sure?"
+msgstr "你確定？"
+
+#: contrib/admin/views/main.py:666
+#, python-format
+msgid "Change history: %s"
+msgstr "變更歷史: %s"
+
+#: contrib/admin/views/doc.py:244 contrib/admin/views/doc.py:253
+#: contrib/admin/views/doc.py:255 contrib/admin/views/doc.py:261
+#: contrib/admin/views/doc.py:262 contrib/admin/views/doc.py:264
+msgid "Integer"
+msgstr "整數"
+
+#: contrib/admin/views/doc.py:245
+msgid "Boolean (Either True or False)"
+msgstr "布林值 (True 或 False)"
+
+#: contrib/admin/views/doc.py:246
+#, python-format
+msgid "String (up to %(maxlength)s)"
+msgstr "字串 (最長到 %(maxlength)s)"
+
+#: contrib/admin/views/doc.py:247
+msgid "Comma-separated integers"
+msgstr "逗號分隔的整數"
+
+#: contrib/admin/views/doc.py:248
+msgid "Date (without time)"
+msgstr "日期 (不包括時間)"
+
+#: contrib/admin/views/doc.py:249
+msgid "Date (with time)"
+msgstr "日期 (包括時間)"
+
+#: contrib/admin/views/doc.py:250
+msgid "E-mail address"
+msgstr "電子郵件地址"
+
+#: contrib/admin/views/doc.py:251 contrib/admin/views/doc.py:254
+msgid "File path"
+msgstr "檔案路徑"
+
+#: contrib/admin/views/doc.py:252
+msgid "Decimal number"
+msgstr "小數"
+
+#: contrib/admin/views/doc.py:258
+msgid "Boolean (Either True, False or None)"
+msgstr "布林值 (True, False 或 None)"
+
+#: contrib/admin/views/doc.py:259
+msgid "Relation to parent model"
+msgstr "與父模型的關係"
+
+#: contrib/admin/views/doc.py:260
+msgid "Phone number"
+msgstr "電話號碼"
+
+#: contrib/admin/views/doc.py:263
+msgid "String (up to 50)"
+msgstr "字串 (最長到 50)"
+
+#: contrib/admin/views/doc.py:265
+msgid "Text"
+msgstr "文字"
+
+#: contrib/admin/views/doc.py:266
+msgid "Time"
+msgstr "時間"
+
+#: contrib/admin/views/doc.py:267 contrib/flatpages/models/flatpages.py:6
+msgid "URL"
+msgstr "URL"
+
+#: contrib/admin/views/doc.py:268
+msgid "U.S. state (two uppercase letters)"
+msgstr "U.S. 州名 (兩個大寫字母)"
+
+#: contrib/admin/views/doc.py:269
+msgid "XML text"
+msgstr "XML 文字"
+
+#: contrib/admin/templates/admin/object_history.html:3
+#: contrib/admin/templates/admin/change_list.html:4
+#: contrib/admin/templates/admin/base.html:23
+#: contrib/admin/templates/admin/delete_confirmation.html:3
+#: contrib/admin/templates/admin/change_form.html:9
+#: contrib/admin/templates/admin_doc/bookmarklets.html:4
+#: contrib/admin/templates/admin_doc/view_detail.html:4
+#: contrib/admin/templates/admin_doc/template_tag_index.html:5
+#: contrib/admin/templates/admin_doc/template_detail.html:4
+#: contrib/admin/templates/admin_doc/template_filter_index.html:5
+#: contrib/admin/templates/admin_doc/missing_docutils.html:4
+#: contrib/admin/templates/admin_doc/view_index.html:5
+#: contrib/admin/templates/admin_doc/model_detail.html:3
+#: contrib/admin/templates/admin_doc/index.html:4
+#: contrib/admin/templates/admin_doc/model_index.html:5
+msgid "Change password"
+msgstr "變更密碼"
+
+#: contrib/admin/templates/admin/object_history.html:3
+#: contrib/admin/templates/admin/change_list.html:4
+#: contrib/admin/templates/admin/base.html:23
+#: contrib/admin/templates/admin/delete_confirmation.html:3
+#: contrib/admin/templates/admin/change_form.html:9
+#: contrib/admin/templates/admin_doc/bookmarklets.html:4
+#: contrib/admin/templates/admin_doc/view_detail.html:4
+#: contrib/admin/templates/admin_doc/template_tag_index.html:5
+#: contrib/admin/templates/admin_doc/template_detail.html:4
+#: contrib/admin/templates/admin_doc/template_filter_index.html:5
+#: contrib/admin/templates/admin_doc/missing_docutils.html:4
+#: contrib/admin/templates/admin_doc/view_index.html:5
+#: contrib/admin/templates/admin_doc/model_detail.html:3
+#: contrib/admin/templates/admin_doc/index.html:4
+#: contrib/admin/templates/admin_doc/model_index.html:5
+msgid "Log out"
+msgstr "登出"
+
+#: contrib/admin/templates/admin/object_history.html:5
+#: contrib/admin/templates/admin/500.html:4
+#: contrib/admin/templates/admin/change_list.html:5
+#: contrib/admin/templates/admin/base.html:29
+#: contrib/admin/templates/admin/change_form.html:12
+#: contrib/admin/templates/registration/password_change_done.html:4
+#: contrib/admin/templates/registration/password_reset_form.html:4
+#: contrib/admin/templates/registration/logged_out.html:4
+#: contrib/admin/templates/registration/password_reset_done.html:4
+#: contrib/admin/templates/registration/password_change_form.html:4
+#: contrib/admin/templates/admin_doc/bookmarklets.html:3
+msgid "Home"
+msgstr "首頁"
+
+#: contrib/admin/templates/admin/object_history.html:5
+#: contrib/admin/templates/admin/change_form.html:19
+msgid "History"
+msgstr "歷史"
+
+#: contrib/admin/templates/admin/object_history.html:18
+msgid "Date/time"
+msgstr "日期/時間"
+
+#: contrib/admin/templates/admin/object_history.html:19 models/auth.py:47
+msgid "User"
+msgstr "使用者"
+
+#: contrib/admin/templates/admin/object_history.html:20
+msgid "Action"
+msgstr "動作"
+
+#: contrib/admin/templates/admin/object_history.html:26
+msgid "DATE_WITH_TIME_FULL"
+msgstr "DATE_WITH_TIME_FULL"
+
+#: contrib/admin/templates/admin/object_history.html:36
+msgid ""
+"This object doesn't have a change history. It probably wasn't added via this "
+"admin site."
+msgstr "這個物件沒有變更的歷蜜。它可能不是透過這個管理網站新增的。"
+
+#: contrib/admin/templates/admin/base_site.html:4
+msgid "Django site admin"
+msgstr "Django 網站管理"
+
+#: contrib/admin/templates/admin/base_site.html:7
+msgid "Django administration"
+msgstr "Django 管理"
+
+#: contrib/admin/templates/admin/500.html:4
+msgid "Server error"
+msgstr "伺服器錯誤"
+
+#: contrib/admin/templates/admin/500.html:6
+msgid "Server error (500)"
+msgstr "伺服器錯誤 (500)"
+
+#: contrib/admin/templates/admin/500.html:9
+msgid "Server Error <em>(500)</em>"
+msgstr "伺服器錯誤 <em>(500)</em>"
+
+#: contrib/admin/templates/admin/500.html:10
+msgid ""
+"There's been an error. It's been reported to the site administrators via e-"
+"mail and should be fixed shortly. Thanks for your patience."
+msgstr ""
+"有一個錯誤。它已經被透過電子郵件報告給了網站管理員，應該不久就會解決。感謝你"
+"的忍耐。"
+
+#: contrib/admin/templates/admin/404.html:4
+#: contrib/admin/templates/admin/404.html:8
+msgid "Page not found"
+msgstr "找不到頁面"
+
+#: contrib/admin/templates/admin/404.html:10
+msgid "We're sorry, but the requested page could not be found."
+msgstr "我們很抱歉，不過被要求的頁面找不到"
+
+#: contrib/admin/templates/admin/index.html:27
+#: contrib/admin/templates/admin/change_form.html:14
+msgid "Add"
+msgstr "新增"
+
+#: contrib/admin/templates/admin/index.html:33
+msgid "Change"
+msgstr "變更"
+
+#: contrib/admin/templates/admin/index.html:43
+msgid "You don't have permission to edit anything."
+msgstr "你沒有編輯任何東西的權限"
+
+#: contrib/admin/templates/admin/index.html:51
+msgid "Recent Actions"
+msgstr "最近的動作"
+
+#: contrib/admin/templates/admin/index.html:52
+msgid "My Actions"
+msgstr "我的動作"
+
+#: contrib/admin/templates/admin/index.html:56
+msgid "None available"
+msgstr "沒有可用的"
+
+#: contrib/admin/templates/admin/change_list.html:10
+#, python-format
+msgid "Add %(name)s"
+msgstr "新增 %(name)s"
+
+#: contrib/admin/templates/admin/login.html:15
+msgid "Username:"
+msgstr "使用者名稱:"
+
+#: contrib/admin/templates/admin/login.html:18
+msgid "Password:"
+msgstr "密碼:"
+
+#: contrib/admin/templates/admin/login.html:20
+msgid "Have you <a href=\"/password_reset/\">forgotten your password</a>?"
+msgstr "你 <a href=\"/password_reset/\">忘記你的密碼了嗎</a>？"
+
+#: contrib/admin/templates/admin/base.html:23
+msgid "Welcome,"
+msgstr "歡迎,"
+
+#: contrib/admin/templates/admin/delete_confirmation.html:6
+#, python-format
+msgid ""
+"Deleting the %(object_name)s '%(object)s' would result in deleting related "
+"objects, but your account doesn't have permission to delete the following "
+"types of objects:"
+msgstr ""
+"刪除 %(object_name)s '%(object)s' 會把相關的物件也刪除，不過你的帳號並沒有刪"
+"除以下型態物件的權限:"
+
+#: contrib/admin/templates/admin/delete_confirmation.html:13
+#, python-format
+msgid ""
+"Are you sure you want to delete the %(object_name)s \"%(object)s\"? All of "
+"the following related items will be deleted:"
+msgstr ""
+"你確定想要刪除 %(object_name)s \"%(object)s\"？以下所有的相關項目都會被刪除:"
+
+#: contrib/admin/templates/admin/delete_confirmation.html:17
+msgid "Yes, I'm sure"
+msgstr "是的，我確定"
+
+#: contrib/admin/templates/admin/filter.html:2
+#, python-format
+msgid " By %(title)s "
+msgstr " 根據 %(title)s "
+
+#: contrib/admin/templates/admin/search_form.html:7
+msgid "Go"
+msgstr "去"
+
+#: contrib/admin/templates/admin/change_form.html:20
+msgid "View on site"
+msgstr "在網站上檢視"
+
+#: contrib/admin/templates/admin/change_form.html:28
+msgid "Please correct the error below."
+msgid_plural "Please correct the errors below."
+msgstr[0] "請更正以下的錯誤。"
+msgstr[1] "請更正以下的錯誤。"
+
+#: contrib/admin/templates/admin/change_form.html:45
+msgid "Ordering"
+msgstr "排序中"
+
+#: contrib/admin/templates/admin/change_form.html:48
+msgid "Order:"
+msgstr "順序:"
+
+#: contrib/admin/templates/admin/submit_line.html:3
+msgid "Delete"
+msgstr "刪除"
+
+#: contrib/admin/templates/admin/submit_line.html:4
+msgid "Save as new"
+msgstr "儲存為新的"
+
+#: contrib/admin/templates/admin/submit_line.html:5
+msgid "Save and add another"
+msgstr "儲存並新增另一個"
+
+#: contrib/admin/templates/admin/submit_line.html:6
+msgid "Save and continue editing"
+msgstr "儲存並繼續編輯"
+
+#: contrib/admin/templates/admin/submit_line.html:7
+msgid "Save"
+msgstr "儲存"
+
+#: contrib/admin/templates/registration/password_change_done.html:4
+#: contrib/admin/templates/registration/password_change_form.html:4
+#: contrib/admin/templates/registration/password_change_form.html:6
+#: contrib/admin/templates/registration/password_change_form.html:10
+msgid "Password change"
+msgstr "密碼變更"
+
+#: contrib/admin/templates/registration/password_change_done.html:6
+#: contrib/admin/templates/registration/password_change_done.html:10
+msgid "Password change successful"
+msgstr "密碼成功地變更"
+
+#: contrib/admin/templates/registration/password_change_done.html:12
+msgid "Your password was changed."
+msgstr "你的密碼已變更。"
+
+#: contrib/admin/templates/registration/password_reset_form.html:4
+#: contrib/admin/templates/registration/password_reset_form.html:6
+#: contrib/admin/templates/registration/password_reset_form.html:10
+#: contrib/admin/templates/registration/password_reset_done.html:4
+msgid "Password reset"
+msgstr "密碼重設"
+
+#: contrib/admin/templates/registration/password_reset_form.html:12
+msgid ""
+"Forgotten your password? Enter your e-mail address below, and we'll reset "
+"your password and e-mail the new one to you."
+msgstr ""
+"忘記你的密碼了？在下面輸入你的電子郵件地址，我們就會重設你的密碼並把新的用電"
+"子郵件寄給你。"
+
+#: contrib/admin/templates/registration/password_reset_form.html:16
+msgid "E-mail address:"
+msgstr "電子郵件地址:"
+
+#: contrib/admin/templates/registration/password_reset_form.html:16
+msgid "Reset my password"
+msgstr "重設我的密碼"
+
+#: contrib/admin/templates/registration/logged_out.html:8
+msgid "Thanks for spending some quality time with the Web site today."
+msgstr "感謝你今天花了重要的時間留在本網站。"
+
+#: contrib/admin/templates/registration/logged_out.html:10
+msgid "Log in again"
+msgstr "再次登入"
+
+#: contrib/admin/templates/registration/password_reset_done.html:6
+#: contrib/admin/templates/registration/password_reset_done.html:10
+msgid "Password reset successful"
+msgstr "密碼成功地重設"
+
+#: contrib/admin/templates/registration/password_reset_done.html:12
+msgid ""
+"We've e-mailed a new password to the e-mail address you submitted. You "
+"should be receiving it shortly."
+msgstr "我們已經把新的密碼寄到你送出的電子郵件地址。你應該不久就能收到。"
+
+#: contrib/admin/templates/registration/password_change_form.html:12
+msgid ""
+"Please enter your old password, for security's sake, and then enter your new "
+"password twice so we can verify you typed it in correctly."
+msgstr ""
+"為了安全上的考慮，請輸入你的舊密碼，再輸入新密碼兩次，讓我們核驗你已正確地輸"
+"入。"
+
+#: contrib/admin/templates/registration/password_change_form.html:17
+msgid "Old password:"
+msgstr "舊密碼:"
+
+#: contrib/admin/templates/registration/password_change_form.html:19
+msgid "New password:"
+msgstr "新密碼:"
+
+#: contrib/admin/templates/registration/password_change_form.html:21
+msgid "Confirm password:"
+msgstr "確認密碼:"
+
+#: contrib/admin/templates/registration/password_change_form.html:23
+msgid "Change my password"
+msgstr "變更我的密碼"
+
+#: contrib/admin/templates/registration/password_reset_email.html:2
+msgid "You're receiving this e-mail because you requested a password reset"
+msgstr "因為你要求重設密碼，所以收到了這封電子郵件"
+
+#: contrib/admin/templates/registration/password_reset_email.html:3
+#, python-format
+msgid "for your user account at %(site_name)s"
+msgstr "你在 %(site_name)s 裡的使用者帳號"
+
+#: contrib/admin/templates/registration/password_reset_email.html:5
+#, python-format
+msgid "Your new password is: %(new_password)s"
+msgstr "你的新密碼是: %(new_password)s"
+
+#: contrib/admin/templates/registration/password_reset_email.html:7
+msgid "Feel free to change this password by going to this page:"
+msgstr "放心地到此頁面變更密碼:"
+
+#: contrib/admin/templates/registration/password_reset_email.html:11
+msgid "Your username, in case you've forgotten:"
+msgstr "你的使用者名稱，萬一你已經忘記的話:"
+
+#: contrib/admin/templates/registration/password_reset_email.html:13
+msgid "Thanks for using our site!"
+msgstr "感謝使用本網站！"
+
+#: contrib/admin/templates/registration/password_reset_email.html:15
+#, python-format
+msgid "The %(site_name)s team"
+msgstr "%(site_name)s 團隊"
+
+#: contrib/admin/templates/admin_doc/bookmarklets.html:3
+msgid "Documentation"
+msgstr "文件"
+
+#: contrib/admin/templates/admin_doc/bookmarklets.html:3
+msgid "Bookmarklets"
+msgstr "Bookmarklets"
+
+#: contrib/admin/templates/admin_doc/bookmarklets.html:5
+msgid "Documentation bookmarklets"
+msgstr "文件 bookmarklets"
+
+#: contrib/admin/templates/admin_doc/bookmarklets.html:9
+msgid ""
+"\n"
+"<p class=\"help\">To install bookmarklets, drag the link to your bookmarks\n"
+"toolbar, or right-click the link and add it to your bookmarks. Now you can\n"
+"select the bookmarklet from any page in the site.  Note that some of these\n"
+"bookmarklets require you to be viewing the site from a computer designated\n"
+"as \"internal\" (talk to your system administrator if you aren't sure if\n"
+"your computer is \"internal\").</p>\n"
+msgstr ""
+"\n"
+"<p class=\"help\">要安裝 bookmarklet，把連結拖進你的書籤工具列，或右擊該連結"
+"後新增到你的書籤裡。現在你可以從網站的任何頁面來選擇 bookmarklet。注意其中某"
+"些 bookmarklet 要求你必須是從被稱為 \"內部\" 的電腦來檢視網站的 (如果你不確定"
+"你的電腦是否在 \"內部\"，那就和你的系統管理員談談)。</p>\n"
+
+#: contrib/admin/templates/admin_doc/bookmarklets.html:19
+msgid "Documentation for this page"
+msgstr "本頁面的文件"
+
+#: contrib/admin/templates/admin_doc/bookmarklets.html:20
+msgid ""
+"Jumps you from any page to the documentation for the view that generates "
+"that page."
+msgstr "讓你跳到用來產生該頁面之檢視的任何一頁文件。"
+
+#: contrib/admin/templates/admin_doc/bookmarklets.html:22
+msgid "Show object ID"
+msgstr "顯示物件 ID"
+
+#: contrib/admin/templates/admin_doc/bookmarklets.html:23
+msgid ""
+"Shows the content-type and unique ID for pages that represent a single "
+"object."
+msgstr "顯示用來表示單一物件的頁面 content-type 與唯一 ID。"
+
+#: contrib/admin/templates/admin_doc/bookmarklets.html:25
+msgid "Edit this object (current window)"
+msgstr "編輯此物件 (目前視窗)"
+
+#: contrib/admin/templates/admin_doc/bookmarklets.html:26
+msgid "Jumps to the admin page for pages that represent a single object."
+msgstr "跳到用來表示單一物件的管理頁面。"
+
+#: contrib/admin/templates/admin_doc/bookmarklets.html:28
+msgid "Edit this object (new window)"
+msgstr "編輯此物件 (新視窗)"
+
+#: contrib/admin/templates/admin_doc/bookmarklets.html:29
+msgid "As above, but opens the admin page in a new window."
+msgstr "如上，但在新視窗裡開啟管理頁面。"
+
+#: contrib/admin/templates/widget/date_time.html:3
+msgid "Date:"
+msgstr "日期:"
+
+#: contrib/admin/templates/widget/date_time.html:4
+msgid "Time:"
+msgstr "時間:"
+
+#: contrib/admin/templates/widget/file.html:2
+msgid "Currently:"
+msgstr "目前:"
+
+#: contrib/admin/templates/widget/file.html:3
+msgid "Change:"
+msgstr "變更:"
+
+#: contrib/redirects/models/redirects.py:7
+msgid "redirect from"
+msgstr "重導向自"
+
+#: contrib/redirects/models/redirects.py:8
+msgid ""
+"This should be an absolute path, excluding the domain name. Example: '/"
+"events/search/'."
+msgstr "此應為一絕對路徑，但不包括網域名稱。範例: '/events/search/'。"
+
+#: contrib/redirects/models/redirects.py:9
+msgid "redirect to"
+msgstr "重導向至"
+
+#: contrib/redirects/models/redirects.py:10
+msgid ""
+"This can be either an absolute path (as above) or a full URL starting with "
+"'http://'."
+msgstr "此可為一絕對路徑 (如上) 或一個以 'http://' 開頭的完整 URL. "
+
+#: contrib/redirects/models/redirects.py:12
+msgid "redirect"
+msgstr "重導向"
+
+#: contrib/redirects/models/redirects.py:13
+msgid "redirects"
+msgstr "重導向"
+
+#: contrib/flatpages/models/flatpages.py:7
+msgid ""
+"Example: '/about/contact/'. Make sure to have leading and trailing slashes."
+msgstr "範例: '/about/contact/'。開頭與結束都一定要有斜線。"
+
+#: contrib/flatpages/models/flatpages.py:8
+msgid "title"
+msgstr "標題"
+
+#: contrib/flatpages/models/flatpages.py:9
+msgid "content"
+msgstr "內容"
+
+#: contrib/flatpages/models/flatpages.py:10
+msgid "enable comments"
+msgstr "允許評論"
+
+#: contrib/flatpages/models/flatpages.py:11
+msgid "template name"
+msgstr "模板名稱"
+
+#: contrib/flatpages/models/flatpages.py:12
+msgid ""
+"Example: 'flatpages/contact_page'. If this isn't provided, the system will "
+"use 'flatpages/default'."
+msgstr ""
+"範例: 'flatpages/contact_page'。如果沒有提供它，系統會使用 'flatpages/"
+"default'。"
+
+#: contrib/flatpages/models/flatpages.py:13
+msgid "registration required"
+msgstr "需要註冊"
+
+#: contrib/flatpages/models/flatpages.py:13
+msgid "If this is checked, only logged-in users will be able to view the page."
+msgstr "如果此項被選取，則只有登入的使用者可以檢視頁面。"
+
+#: contrib/flatpages/models/flatpages.py:17
+msgid "flat page"
+msgstr "簡平頁面"
+
+#: contrib/flatpages/models/flatpages.py:18
+msgid "flat pages"
+msgstr "簡平頁面"
+
+#: utils/translation.py:350
+msgid "DATE_FORMAT"
+msgstr "DATE_FORMAT"
+
+#: utils/translation.py:351
+msgid "DATETIME_FORMAT"
+msgstr "DATETIME_FORMAT"
+
+#: utils/translation.py:352
+msgid "TIME_FORMAT"
+msgstr "TIME_FORMAT"
+
+#: utils/dates.py:6
+msgid "Monday"
+msgstr "星期一"
+
+#: utils/dates.py:6
+msgid "Tuesday"
+msgstr "星期二"
+
+#: utils/dates.py:6
+msgid "Wednesday"
+msgstr "星期三"
+
+#: utils/dates.py:6
+msgid "Thursday"
+msgstr "星期四"
+
+#: utils/dates.py:6
+msgid "Friday"
+msgstr "星期五"
+
+#: utils/dates.py:7
+msgid "Saturday"
+msgstr "星期六"
+
+#: utils/dates.py:7
+msgid "Sunday"
+msgstr "星期日"
+
+#: utils/dates.py:14
+msgid "January"
+msgstr "一月"
+
+#: utils/dates.py:14
+msgid "February"
+msgstr "二月"
+
+#: utils/dates.py:14 utils/dates.py:27
+msgid "March"
+msgstr "三月"
+
+#: utils/dates.py:14 utils/dates.py:27
+msgid "April"
+msgstr "四月"
+
+#: utils/dates.py:14 utils/dates.py:27
+msgid "May"
+msgstr "五月"
+
+#: utils/dates.py:14 utils/dates.py:27
+msgid "June"
+msgstr "六月"
+
+#: utils/dates.py:15 utils/dates.py:27
+msgid "July"
+msgstr "七月"
+
+#: utils/dates.py:15
+msgid "August"
+msgstr "八月"
+
+#: utils/dates.py:15
+msgid "September"
+msgstr "九月"
+
+#: utils/dates.py:15
+msgid "October"
+msgstr "十月"
+
+#: utils/dates.py:15
+msgid "November"
+msgstr "十一月"
+
+#: utils/dates.py:16
+msgid "December"
+msgstr "十二月"
+
+#: utils/dates.py:27
+msgid "Jan."
+msgstr "一月"
+
+#: utils/dates.py:27
+msgid "Feb."
+msgstr "二月"
+
+#: utils/dates.py:28
+msgid "Aug."
+msgstr "八月"
+
+#: utils/dates.py:28
+msgid "Sept."
+msgstr "九月"
+
+#: utils/dates.py:28
+msgid "Oct."
+msgstr "十月"
+
+#: utils/dates.py:28
+msgid "Nov."
+msgstr "十一月"
+
+#: utils/dates.py:28
+msgid "Dec."
+msgstr "十二月"
+
+#: utils/timesince.py:12
+msgid "year"
+msgid_plural "years"
+msgstr[0] "年"
+msgstr[1] "年"
+
+#: utils/timesince.py:13
+msgid "month"
+msgid_plural "months"
+msgstr[0] "月"
+msgstr[1] "月"
+
+#: utils/timesince.py:14
+msgid "day"
+msgid_plural "days"
+msgstr[0] "日"
+msgstr[1] "日"
+
+#: utils/timesince.py:15
+msgid "hour"
+msgid_plural "hours"
+msgstr[0] "時"
+msgstr[1] "時"
+
+#: utils/timesince.py:16
+msgid "minute"
+msgid_plural "minutes"
+msgstr[0] "分"
+msgstr[1] "分"
+
+#: models/core.py:7
+msgid "domain name"
+msgstr "網域名稱"
+
+#: models/core.py:8
+msgid "display name"
+msgstr "顯示名稱"
+
+#: models/core.py:10
+msgid "site"
+msgstr "網站"
+
+#: models/core.py:11
+msgid "sites"
+msgstr "網站"
+
+#: models/core.py:28
+msgid "label"
+msgstr "標示"
+
+#: models/core.py:29 models/core.py:40 models/auth.py:6 models/auth.py:19
+msgid "name"
+msgstr "名稱"
+
+#: models/core.py:31
+msgid "package"
+msgstr "套件"
+
+#: models/core.py:32
+msgid "packages"
+msgstr "套件"
+
+#: models/core.py:42
+msgid "python module name"
+msgstr "python 模組名稱"
+
+#: models/core.py:44
+msgid "content type"
+msgstr "內容型態"
+
+#: models/core.py:45
+msgid "content types"
+msgstr "內容型態"
+
+#: models/core.py:67
+msgid "session key"
+msgstr "session 鍵"
+
+#: models/core.py:68
+msgid "session data"
+msgstr "session 資料"
+
+#: models/core.py:69
+msgid "expire date"
+msgstr "到期日期"
+
+#: models/core.py:71
+msgid "session"
+msgstr "session"
+
+#: models/core.py:72
+msgid "sessions"
+msgstr "sessions"
+
+#: models/auth.py:8
+msgid "codename"
+msgstr "codename"
+
+#: models/auth.py:10
+msgid "Permission"
+msgstr "權限"
+
+#: models/auth.py:11 models/auth.py:58
+msgid "Permissions"
+msgstr "權限"
+
+#: models/auth.py:22
+msgid "Group"
+msgstr "群組"
+
+#: models/auth.py:23 models/auth.py:60
+msgid "Groups"
+msgstr "群組"
+
+#: models/auth.py:33
+msgid "username"
+msgstr "使用者名稱"
+
+#: models/auth.py:34
+msgid "first name"
+msgstr "名字"
+
+#: models/auth.py:35
+msgid "last name"
+msgstr "姓氏"
+
+#: models/auth.py:36
+msgid "e-mail address"
+msgstr "電子郵件地址"
+
+#: models/auth.py:37
+msgid "password"
+msgstr "密碼"
+
+#: models/auth.py:37
+msgid "Use '[algo]$[salt]$[hexdigest]'"
+msgstr "使用 '[algo]$[salt]$[hexdigest]'"
+
+#: models/auth.py:38
+msgid "staff status"
+msgstr "工作人員狀態"
+
+#: models/auth.py:38
+msgid "Designates whether the user can log into this admin site."
+msgstr "指明何使用者可以登入此管理網站。"
+
+#: models/auth.py:39
+msgid "active"
+msgstr "活動中"
+
+#: models/auth.py:40
+msgid "superuser status"
+msgstr "超級使用者狀態"
+
+#: models/auth.py:41
+msgid "last login"
+msgstr "上次登入"
+
+#: models/auth.py:42
+msgid "date joined"
+msgstr "加入日期"
+
+#: models/auth.py:44
+msgid ""
+"In addition to the permissions manually assigned, this user will also get "
+"all permissions granted to each group he/she is in."
+msgstr "除了手動指定的權限之外，這個使用者也會得到其群組擁有的所有權限。"
+
+#: models/auth.py:48
+msgid "Users"
+msgstr "使用者"
+
+#: models/auth.py:57
+msgid "Personal info"
+msgstr "個人資訊"
+
+#: models/auth.py:59
+msgid "Important dates"
+msgstr "重要日期"
+
+#: models/auth.py:216
+msgid "Message"
+msgstr "訊息"
 
 #: conf/global_settings.py:37
 msgid "Bengali"
@@ -61,40 +1405,82 @@ msgid "Italian"
 msgstr "義大利文"
 
 #: conf/global_settings.py:48
+msgid "Japanese"
+msgstr ""
+
+#: conf/global_settings.py:49
 msgid "Norwegian"
 msgstr "挪威文"
 
-#: conf/global_settings.py:49
+#: conf/global_settings.py:50
 msgid "Brazilian"
 msgstr "巴西文"
 
-#: conf/global_settings.py:50
+#: conf/global_settings.py:51
 msgid "Romanian"
 msgstr "羅馬尼亞文"
 
-#: conf/global_settings.py:51
+#: conf/global_settings.py:52
 msgid "Russian"
 msgstr "俄文"
 
-#: conf/global_settings.py:52
+#: conf/global_settings.py:53
 msgid "Slovak"
 msgstr "斯洛伐克文"
 
-#: conf/global_settings.py:53
+#: conf/global_settings.py:54
 msgid "Serbian"
 msgstr "塞爾維亞文"
 
-#: conf/global_settings.py:54
+#: conf/global_settings.py:55
 msgid "Swedish"
 msgstr "瑞典文"
 
-#: conf/global_settings.py:55
+#: conf/global_settings.py:56
 msgid "Simplified Chinese"
 msgstr "簡體中文"
 
-#: conf/global_settings.py:56
-msgid "Tranditional Chinese"
+#: conf/global_settings.py:57
+#, fuzzy
+msgid "Traditional Chinese"
 msgstr "繁體中文"
+
+#: core/formfields.py:59 core/meta/fields.py:285 core/meta/fields.py:488
+#: core/meta/fields.py:499
+msgid "This field is required."
+msgstr "此欄位是必需的。"
+
+#: core/formfields.py:338
+#, python-format
+msgid "Ensure your text is less than %s character."
+msgid_plural "Ensure your text is less than %s characters."
+msgstr[0] "確定你的文字少於 %s 個字元。"
+msgstr[1] "確定你的文字少於 %s 個字元。"
+
+#: core/formfields.py:343
+msgid "Line breaks are not allowed here."
+msgstr "此處不允許斷行。"
+
+#: core/formfields.py:438 core/formfields.py:509 core/formfields.py:547
+#, python-format
+msgid "Select a valid choice; '%(data)s' is not in %(choices)s."
+msgstr "進行有效的選擇: '%(data)s' 不在 %(choices)s 裡。"
+
+#: core/formfields.py:603
+msgid "The submitted file is empty."
+msgstr "提交的檔案是空的。"
+
+#: core/formfields.py:657
+msgid "Enter a whole number between -32,768 and 32,767."
+msgstr "輸入一個介於 -32,768 與 32,767 之間的整數。"
+
+#: core/formfields.py:666
+msgid "Enter a positive number."
+msgstr "輸入一個正數。"
+
+#: core/formfields.py:675
+msgid "Enter a whole number between 0 and 32,767."
+msgstr "輸入一個介於 0 與 32,767 之間的整數。"
 
 #: core/validators.py:62
 msgid "This value must contain only letters, numbers and underscores."
@@ -347,42 +1733,10 @@ msgid ""
 msgstr ""
 "在第 %(line)s 的 \"%(attr)s\" 屬性有一個無效值 (行開始於 \"%(start)s\")。"
 
-#: core/formfields.py:59 core/meta/fields.py:285 core/meta/fields.py:488
-#: core/meta/fields.py:499
-msgid "This field is required."
-msgstr "此欄位是必需的。"
-
-#: core/formfields.py:338
+#: core/meta/__init__.py:1947
 #, python-format
-msgid "Ensure your text is less than %s character."
-msgid_plural "Ensure your text is less than %s characters."
-msgstr[0] "確定你的文字少於 %s 個字元。"
-msgstr[1] "確定你的文字少於 %s 個字元。"
-
-#: core/formfields.py:343
-msgid "Line breaks are not allowed here."
-msgstr "此處不允許斷行。"
-
-#: core/formfields.py:438 core/formfields.py:509 core/formfields.py:547
-#, python-format
-msgid "Select a valid choice; '%(data)s' is not in %(choices)s."
-msgstr "進行有效的選擇: '%(data)s' 不在 %(choices)s 裡。"
-
-#: core/formfields.py:603
-msgid "The submitted file is empty."
-msgstr "提交的檔案是空的。"
-
-#: core/formfields.py:657
-msgid "Enter a whole number between -32,768 and 32,767."
-msgstr "輸入一個介於 -32,768 與 32,767 之間的整數。"
-
-#: core/formfields.py:666
-msgid "Enter a positive number."
-msgstr "輸入一個正數。"
-
-#: core/formfields.py:675
-msgid "Enter a whole number between 0 and 32,767."
-msgstr "輸入一個介於 0 與 32,767 之間的整數。"
+msgid "%(object)s with this %(type)s already exists for the given %(field)s."
+msgstr "此 %(type)s 的 %(object)s 已存在於給定的 %(field)s 裡。"
 
 #: core/meta/fields.py:46
 #, python-format
@@ -415,1361 +1769,12 @@ msgid_plural ""
 msgstr[0] "請輸入有效的 %(self)s ID。%(value)r 是無效的。"
 msgstr[1] "請輸入有效的 %(self)s ID。%(value)r 是無效的。"
 
-#: core/meta/__init__.py:1947
-#, python-format
-msgid "%(object)s with this %(type)s already exists for the given %(field)s."
-msgstr "此 %(type)s 的 %(object)s 已存在於給定的 %(field)s 裡。"
-
 #: core/template/defaultfilters.py:371
 msgid "yes,no,maybe"
 msgstr "是,否,也許"
-
-#: contrib/admin/filterspecs.py:40
-#, python-format
-msgid ""
-"<h3>By %s:</h3>\n"
-"<ul>\n"
-msgstr ""
-"<h3>由 %s:</h3>\n"
-"<ul>\n"
-
-#: contrib/admin/filterspecs.py:70 contrib/admin/filterspecs.py:88
-#: contrib/admin/filterspecs.py:143
-msgid "All"
-msgstr "全部"
-
-#: contrib/admin/filterspecs.py:109
-msgid "Any date"
-msgstr "任何日期"
-
-#: contrib/admin/filterspecs.py:110
-msgid "Today"
-msgstr "本日"
-
-#: contrib/admin/filterspecs.py:113
-msgid "Past 7 days"
-msgstr "過去 7 天"
-
-#: contrib/admin/filterspecs.py:115
-msgid "This month"
-msgstr "本月"
-
-#: contrib/admin/filterspecs.py:117
-msgid "This year"
-msgstr "本年"
-
-#: contrib/admin/filterspecs.py:143
-msgid "Yes"
-msgstr "是"
-
-#: contrib/admin/filterspecs.py:143
-msgid "No"
-msgstr "否"
-
-#: contrib/admin/filterspecs.py:150
-msgid "Unknown"
-msgstr "未知"
-
-#: contrib/admin/views/decorators.py:9 parts/auth/formfields.py:33
-#: parts/auth/formfields.py:38
-msgid ""
-"Please enter a correct username and password. Note that both fields are case-"
-"sensitive."
-msgstr "請輸入一個正確的使用者名稱與密碼。注意此二欄位都是大小寫有別的。"
-
-#: contrib/admin/views/decorators.py:23
-#: contrib/admin/templates/admin/login.html:24
-msgid "Log in"
-msgstr "登入"
-
-#: contrib/admin/views/decorators.py:57
-msgid ""
-"Please log in again, because your session has expired. Don't worry: Your "
-"submission has been saved."
-msgstr "請再登入一次，因為你的 session 已經到期。不必擔心: 你的提交已被儲存。"
-
-#: contrib/admin/views/decorators.py:64
-msgid ""
-"Looks like your browser isn't configured to accept cookies. Please enable "
-"cookies, reload this page, and try again."
-msgstr ""
-"看起來你的瀏覽器沒有組態成允許 cookie。請啟用 cookie、重新載入此頁，然後再試"
-"一次。"
-
-#: contrib/admin/views/decorators.py:78
-msgid "Usernames cannot contain the '@' character."
-msgstr "使用者名稱不能包含 '@' 字元。"
-
-#: contrib/admin/views/decorators.py:80
-#, python-format
-msgid "Your e-mail address is not your username. Try '%s' instead."
-msgstr "你的電子郵件地址不是你的使用者名稱。試著改用 '%s'。"
-
-#: contrib/admin/views/main.py:52
-msgid "Site administration"
-msgstr "網站管理"
-
-#: contrib/admin/views/main.py:67
-#, python-format
-msgid "Select %s"
-msgstr "選擇 %s"
-
-#: contrib/admin/views/main.py:68
-#, python-format
-msgid "Select %s to change"
-msgstr "選擇 %s 來變更"
-
-#: contrib/admin/views/main.py:410
-#, python-format
-msgid "The %(name)s \"%(obj)s\" was added successfully."
-msgstr "%(name)s \"%(obj)s\" 已成功新增。"
-
-#: contrib/admin/views/main.py:415 contrib/admin/views/main.py:492
-msgid "You may edit it again below."
-msgstr "你可以在下面再次編輯。"
-
-#: contrib/admin/views/main.py:423 contrib/admin/views/main.py:501
-#, python-format
-msgid "You may add another %s below."
-msgstr "你可以在下面新增另一個 %s。"
-
-#: contrib/admin/views/main.py:441
-#, python-format
-msgid "Add %s"
-msgstr "新增 %s"
-
-#: contrib/admin/views/main.py:457
-#, python-format
-msgid "Added %s."
-msgstr "%s 已新增。"
-
-#: contrib/admin/views/main.py:457 contrib/admin/views/main.py:459
-#: contrib/admin/views/main.py:461
-msgid "and"
-msgstr "和"
-
-#: contrib/admin/views/main.py:459
-#, python-format
-msgid "Changed %s."
-msgstr "%s 已變更。"
-
-#: contrib/admin/views/main.py:461
-#, python-format
-msgid "Deleted %s."
-msgstr "%s 已刪除。"
-
-#: contrib/admin/views/main.py:464
-msgid "No fields changed."
-msgstr "沒有欄位被變更。"
-
-#: contrib/admin/views/main.py:489
-#, python-format
-msgid "The %(name)s \"%(obj)s\" was changed successfully."
-msgstr "%(name)s \"%(obj)s\" 已成功變更。"
-
-#: contrib/admin/views/main.py:498
-#, python-format
-msgid ""
-"The %(name)s \"%(obj)s\" was added successfully. You may edit it again below."
-msgstr "%(name)s \"%(obj)s\" 已成功新增。你可以在下面再次編輯。"
-
-#: contrib/admin/views/main.py:536
-#, python-format
-msgid "Change %s"
-msgstr "變更 %s"
-
-#: contrib/admin/views/main.py:614
-#, python-format
-msgid "One or more %(fieldname)s in %(name)s: %(obj)s"
-msgstr "在 %(name) 裡的一個或多個 %(fieldname)s: %(obj)s"
-
-#: contrib/admin/views/main.py:619
-#, python-format
-msgid "One or more %(fieldname)s in %(name)s:"
-msgstr "在 %(name)s 裡的一個或多個 %(fieldname)s:"
-
-#: contrib/admin/views/main.py:648
-#, python-format
-msgid "The %(name)s \"%(obj)s\" was deleted successfully."
-msgstr "%(name)s \"%(obj)s\" 已成功刪除。"
-
-#: contrib/admin/views/main.py:651
-msgid "Are you sure?"
-msgstr "你確定？"
-
-#: contrib/admin/views/main.py:666
-#, python-format
-msgid "Change history: %s"
-msgstr "變更歷史: %s"
-
-#: contrib/admin/views/doc.py:244 contrib/admin/views/doc.py:253
-#: contrib/admin/views/doc.py:255 contrib/admin/views/doc.py:261
-#: contrib/admin/views/doc.py:262 contrib/admin/views/doc.py:264
-msgid "Integer"
-msgstr "整數"
-
-#: contrib/admin/views/doc.py:245
-msgid "Boolean (Either True or False)"
-msgstr "布林值 (True 或 False)"
-
-#: contrib/admin/views/doc.py:246
-#, python-format
-msgid "String (up to %(maxlength)s)"
-msgstr "字串 (最長到 %(maxlength)s)"
-
-#: contrib/admin/views/doc.py:247
-msgid "Comma-separated integers"
-msgstr "逗號分隔的整數"
-
-#: contrib/admin/views/doc.py:248
-msgid "Date (without time)"
-msgstr "日期 (不包括時間)"
-
-#: contrib/admin/views/doc.py:249
-msgid "Date (with time)"
-msgstr "日期 (包括時間)"
-
-#: contrib/admin/views/doc.py:250
-msgid "E-mail address"
-msgstr "電子郵件地址"
-
-#: contrib/admin/views/doc.py:251 contrib/admin/views/doc.py:254
-msgid "File path"
-msgstr "檔案路徑"
-
-#: contrib/admin/views/doc.py:252
-msgid "Decimal number"
-msgstr "小數"
-
-#: contrib/admin/views/doc.py:256 contrib/comments/models/comments.py:26
-msgid "IP address"
-msgstr "IP 位址"
-
-#: contrib/admin/views/doc.py:258
-msgid "Boolean (Either True, False or None)"
-msgstr "布林值 (True, False 或 None)"
-
-#: contrib/admin/views/doc.py:259
-msgid "Relation to parent model"
-msgstr "與父模型的關係"
-
-#: contrib/admin/views/doc.py:260
-msgid "Phone number"
-msgstr "電話號碼"
-
-#: contrib/admin/views/doc.py:263
-msgid "String (up to 50)"
-msgstr "字串 (最長到 50)"
-
-#: contrib/admin/views/doc.py:265
-msgid "Text"
-msgstr "文字"
-
-#: contrib/admin/views/doc.py:266
-msgid "Time"
-msgstr "時間"
-
-#: contrib/admin/views/doc.py:267 contrib/flatpages/models/flatpages.py:6
-msgid "URL"
-msgstr "URL"
-
-#: contrib/admin/views/doc.py:268
-msgid "U.S. state (two uppercase letters)"
-msgstr "U.S. 州名 (兩個大寫字母)"
-
-#: contrib/admin/views/doc.py:269
-msgid "XML text"
-msgstr "XML 文字"
-
-#: contrib/admin/models/admin.py:6
-msgid "action time"
-msgstr "動作時間"
-
-#: contrib/admin/models/admin.py:9
-msgid "object id"
-msgstr "物件 id"
-
-#: contrib/admin/models/admin.py:10
-msgid "object repr"
-msgstr "物件 repr"
-
-#: contrib/admin/models/admin.py:11
-msgid "action flag"
-msgstr "動作旗標"
-
-#: contrib/admin/models/admin.py:12
-msgid "change message"
-msgstr "變更訊息"
-
-#: contrib/admin/models/admin.py:15
-msgid "log entry"
-msgstr "紀錄項目"
-
-#: contrib/admin/models/admin.py:16
-msgid "log entries"
-msgstr "紀錄項目"
-
-#: contrib/admin/templatetags/admin_list.py:245
-msgid "All dates"
-msgstr "所有日期"
-
-#: contrib/admin/templates/admin/delete_confirmation.html:3
-#: contrib/admin/templates/admin/change_form.html:9
-#: contrib/admin/templates/admin/change_list.html:4
-#: contrib/admin/templates/admin/object_history.html:3
-#: contrib/admin/templates/admin/base.html:23
-#: contrib/admin/templates/admin_doc/template_filter_index.html:5
-#: contrib/admin/templates/admin_doc/bookmarklets.html:4
-#: contrib/admin/templates/admin_doc/template_tag_index.html:5
-#: contrib/admin/templates/admin_doc/index.html:4
-#: contrib/admin/templates/admin_doc/model_detail.html:3
-#: contrib/admin/templates/admin_doc/missing_docutils.html:4
-#: contrib/admin/templates/admin_doc/template_detail.html:4
-#: contrib/admin/templates/admin_doc/view_index.html:5
-#: contrib/admin/templates/admin_doc/model_index.html:5
-#: contrib/admin/templates/admin_doc/view_detail.html:4
-msgid "Change password"
-msgstr "變更密碼"
-
-#: contrib/admin/templates/admin/delete_confirmation.html:3
-#: contrib/admin/templates/admin/change_form.html:9
-#: contrib/admin/templates/admin/change_list.html:4
-#: contrib/admin/templates/admin/object_history.html:3
-#: contrib/admin/templates/admin/base.html:23
-#: contrib/admin/templates/admin_doc/template_filter_index.html:5
-#: contrib/admin/templates/admin_doc/bookmarklets.html:4
-#: contrib/admin/templates/admin_doc/template_tag_index.html:5
-#: contrib/admin/templates/admin_doc/index.html:4
-#: contrib/admin/templates/admin_doc/model_detail.html:3
-#: contrib/admin/templates/admin_doc/missing_docutils.html:4
-#: contrib/admin/templates/admin_doc/template_detail.html:4
-#: contrib/admin/templates/admin_doc/view_index.html:5
-#: contrib/admin/templates/admin_doc/model_index.html:5
-#: contrib/admin/templates/admin_doc/view_detail.html:4
-msgid "Log out"
-msgstr "登出"
-
-#: contrib/admin/templates/admin/delete_confirmation.html:6
-#, python-format
-msgid ""
-"Deleting the %(object_name)s '%(object)s' would result in deleting related "
-"objects, but your account doesn't have permission to delete the following "
-"types of objects:"
-msgstr ""
-"刪除 %(object_name)s '%(object)s' 會把相關的物件也刪除，不過你的帳號並沒有刪"
-"除以下型態物件的權限:"
-
-#: contrib/admin/templates/admin/delete_confirmation.html:13
-#, python-format
-msgid ""
-"Are you sure you want to delete the %(object_name)s \"%(object)s\"? All of "
-"the following related items will be deleted:"
-msgstr ""
-"你確定想要刪除 %(object_name)s \"%(object)s\"？以下所有的相關項目都會被刪除:"
-
-#: contrib/admin/templates/admin/delete_confirmation.html:17
-msgid "Yes, I'm sure"
-msgstr "是的，我確定"
-
-#: contrib/admin/templates/admin/404.html:4
-#: contrib/admin/templates/admin/404.html:8
-msgid "Page not found"
-msgstr "找不到頁面"
-
-#: contrib/admin/templates/admin/404.html:10
-msgid "We're sorry, but the requested page could not be found."
-msgstr "我們很抱歉，不過被要求的頁面找不到"
-
-#: contrib/admin/templates/admin/change_form.html:12
-#: contrib/admin/templates/admin/change_list.html:5
-#: contrib/admin/templates/admin/object_history.html:5
-#: contrib/admin/templates/admin/500.html:4
-#: contrib/admin/templates/admin/base.html:29
-#: contrib/admin/templates/admin_doc/bookmarklets.html:3
-#: contrib/admin/templates/registration/password_reset_form.html:4
-#: contrib/admin/templates/registration/logged_out.html:4
-#: contrib/admin/templates/registration/password_reset_done.html:4
-#: contrib/admin/templates/registration/password_change_form.html:4
-#: contrib/admin/templates/registration/password_change_done.html:4
-msgid "Home"
-msgstr "首頁"
-
-#: contrib/admin/templates/admin/change_form.html:14
-#: contrib/admin/templates/admin/index.html:27
-msgid "Add"
-msgstr "新增"
-
-#: contrib/admin/templates/admin/change_form.html:19
-#: contrib/admin/templates/admin/object_history.html:5
-msgid "History"
-msgstr "歷史"
-
-#: contrib/admin/templates/admin/change_form.html:20
-msgid "View on site"
-msgstr "在網站上檢視"
-
-#: contrib/admin/templates/admin/change_form.html:28
-msgid "Please correct the error below."
-msgid_plural "Please correct the errors below."
-msgstr[0] "請更正以下的錯誤。"
-msgstr[1] "請更正以下的錯誤。"
-
-#: contrib/admin/templates/admin/change_form.html:45
-msgid "Ordering"
-msgstr "排序中"
-
-#: contrib/admin/templates/admin/change_form.html:48
-msgid "Order:"
-msgstr "順序:"
-
-#: contrib/admin/templates/admin/filter.html:2
-#, python-format
-msgid " By %(title)s "
-msgstr " 根據 %(title)s "
-
-#: contrib/admin/templates/admin/submit_line.html:3
-msgid "Delete"
-msgstr "刪除"
-
-#: contrib/admin/templates/admin/submit_line.html:4
-msgid "Save as new"
-msgstr "儲存為新的"
-
-#: contrib/admin/templates/admin/submit_line.html:5
-msgid "Save and add another"
-msgstr "儲存並新增另一個"
-
-#: contrib/admin/templates/admin/submit_line.html:6
-msgid "Save and continue editing"
-msgstr "儲存並繼續編輯"
-
-#: contrib/admin/templates/admin/submit_line.html:7
-msgid "Save"
-msgstr "儲存"
-
-#: contrib/admin/templates/admin/change_list.html:10
-#, python-format
-msgid "Add %(name)s"
-msgstr "新增 %(name)s"
-
-#: contrib/admin/templates/admin/index.html:33
-msgid "Change"
-msgstr "變更"
-
-#: contrib/admin/templates/admin/index.html:43
-msgid "You don't have permission to edit anything."
-msgstr "你沒有編輯任何東西的權限"
-
-#: contrib/admin/templates/admin/index.html:51
-msgid "Recent Actions"
-msgstr "最近的動作"
-
-#: contrib/admin/templates/admin/index.html:52
-msgid "My Actions"
-msgstr "我的動作"
-
-#: contrib/admin/templates/admin/index.html:56
-msgid "None available"
-msgstr "沒有可用的"
-
-#: contrib/admin/templates/admin/base_site.html:4
-msgid "Django site admin"
-msgstr "Django 網站管理"
-
-#: contrib/admin/templates/admin/base_site.html:7
-msgid "Django administration"
-msgstr "Django 管理"
-
-#: contrib/admin/templates/admin/object_history.html:18
-msgid "Date/time"
-msgstr "日期/時間"
-
-#: contrib/admin/templates/admin/object_history.html:19 models/auth.py:47
-msgid "User"
-msgstr "使用者"
-
-#: contrib/admin/templates/admin/object_history.html:20
-msgid "Action"
-msgstr "動作"
-
-#: contrib/admin/templates/admin/object_history.html:26
-msgid "DATE_WITH_TIME_FULL"
-msgstr "DATE_WITH_TIME_FULL"
-
-#: contrib/admin/templates/admin/object_history.html:36
-msgid ""
-"This object doesn't have a change history. It probably wasn't added via this "
-"admin site."
-msgstr "這個物件沒有變更的歷蜜。它可能不是透過這個管理網站新增的。"
-
-#: contrib/admin/templates/admin/500.html:4
-msgid "Server error"
-msgstr "伺服器錯誤"
-
-#: contrib/admin/templates/admin/500.html:6
-msgid "Server error (500)"
-msgstr "伺服器錯誤 (500)"
-
-#: contrib/admin/templates/admin/500.html:9
-msgid "Server Error <em>(500)</em>"
-msgstr "伺服器錯誤 <em>(500)</em>"
-
-#: contrib/admin/templates/admin/500.html:10
-msgid ""
-"There's been an error. It's been reported to the site administrators via e-"
-"mail and should be fixed shortly. Thanks for your patience."
-msgstr ""
-"有一個錯誤。它已經被透過電子郵件報告給了網站管理員，應該不久就會解決。感謝你"
-"的忍耐。"
-
-#: contrib/admin/templates/admin/search_form.html:7
-msgid "Go"
-msgstr "去"
-
-#: contrib/admin/templates/admin/login.html:15
-msgid "Username:"
-msgstr "使用者名稱:"
-
-#: contrib/admin/templates/admin/login.html:18
-msgid "Password:"
-msgstr "密碼:"
-
-#: contrib/admin/templates/admin/login.html:20
-msgid "Have you <a href=\"/password_reset/\">forgotten your password</a>?"
-msgstr "你 <a href=\"/password_reset/\">忘記你的密碼了嗎</a>？"
-
-#: contrib/admin/templates/admin/base.html:23
-msgid "Welcome,"
-msgstr "歡迎,"
-
-#: contrib/admin/templates/admin_doc/bookmarklets.html:3
-msgid "Documentation"
-msgstr "文件"
-
-#: contrib/admin/templates/admin_doc/bookmarklets.html:3
-msgid "Bookmarklets"
-msgstr "Bookmarklets"
-
-#: contrib/admin/templates/admin_doc/bookmarklets.html:5
-msgid "Documentation bookmarklets"
-msgstr "文件 bookmarklets"
-
-#: contrib/admin/templates/admin_doc/bookmarklets.html:9
-msgid ""
-"\n"
-"<p class=\"help\">To install bookmarklets, drag the link to your bookmarks\n"
-"toolbar, or right-click the link and add it to your bookmarks. Now you can\n"
-"select the bookmarklet from any page in the site.  Note that some of these\n"
-"bookmarklets require you to be viewing the site from a computer designated\n"
-"as \"internal\" (talk to your system administrator if you aren't sure if\n"
-"your computer is \"internal\").</p>\n"
-msgstr ""
-"\n"
-"<p class=\"help\">要安裝 bookmarklet，把連結拖進你的書籤工具列，或右擊該連結"
-"後新增到你的書籤裡。現在你可以從網站的任何頁面來選擇 bookmarklet。注意其中某"
-"些 bookmarklet 要求你必須是從被稱為 \"內部\" 的電腦來檢視網站的 (如果你不確定"
-"你的電腦是否在 \"內部\"，那就和你的系統管理員談談)。</p>\n"
-
-#: contrib/admin/templates/admin_doc/bookmarklets.html:19
-msgid "Documentation for this page"
-msgstr "本頁面的文件"
-
-#: contrib/admin/templates/admin_doc/bookmarklets.html:20
-msgid ""
-"Jumps you from any page to the documentation for the view that generates "
-"that page."
-msgstr "讓你跳到用來產生該頁面之檢視的任何一頁文件。"
-
-#: contrib/admin/templates/admin_doc/bookmarklets.html:22
-msgid "Show object ID"
-msgstr "顯示物件 ID"
-
-#: contrib/admin/templates/admin_doc/bookmarklets.html:23
-msgid ""
-"Shows the content-type and unique ID for pages that represent a single "
-"object."
-msgstr "顯示用來表示單一物件的頁面 content-type 與唯一 ID。"
-
-#: contrib/admin/templates/admin_doc/bookmarklets.html:25
-msgid "Edit this object (current window)"
-msgstr "編輯此物件 (目前視窗)"
-
-#: contrib/admin/templates/admin_doc/bookmarklets.html:26
-msgid "Jumps to the admin page for pages that represent a single object."
-msgstr "跳到用來表示單一物件的管理頁面。"
-
-#: contrib/admin/templates/admin_doc/bookmarklets.html:28
-msgid "Edit this object (new window)"
-msgstr "編輯此物件 (新視窗)"
-
-#: contrib/admin/templates/admin_doc/bookmarklets.html:29
-msgid "As above, but opens the admin page in a new window."
-msgstr "如上，但在新視窗裡開啟管理頁面。"
-
-#: contrib/admin/templates/widget/date_time.html:3
-msgid "Date:"
-msgstr "日期:"
-
-#: contrib/admin/templates/widget/date_time.html:4
-msgid "Time:"
-msgstr "時間:"
-
-#: contrib/admin/templates/widget/file.html:2
-msgid "Currently:"
-msgstr "目前:"
-
-#: contrib/admin/templates/widget/file.html:3
-msgid "Change:"
-msgstr "變更:"
-
-#: contrib/admin/templates/registration/password_reset_form.html:4
-#: contrib/admin/templates/registration/password_reset_form.html:6
-#: contrib/admin/templates/registration/password_reset_form.html:10
-#: contrib/admin/templates/registration/password_reset_done.html:4
-msgid "Password reset"
-msgstr "密碼重設"
-
-#: contrib/admin/templates/registration/password_reset_form.html:12
-msgid ""
-"Forgotten your password? Enter your e-mail address below, and we'll reset "
-"your password and e-mail the new one to you."
-msgstr ""
-"忘記你的密碼了？在下面輸入你的電子郵件地址，我們就會重設你的密碼並把新的用電"
-"子郵件寄給你。"
-
-#: contrib/admin/templates/registration/password_reset_form.html:16
-msgid "E-mail address:"
-msgstr "電子郵件地址:"
-
-#: contrib/admin/templates/registration/password_reset_form.html:16
-msgid "Reset my password"
-msgstr "重設我的密碼"
-
-#: contrib/admin/templates/registration/password_reset_email.html:2
-msgid "You're receiving this e-mail because you requested a password reset"
-msgstr "因為你要求重設密碼，所以收到了這封電子郵件"
-
-#: contrib/admin/templates/registration/password_reset_email.html:3
-#, python-format
-msgid "for your user account at %(site_name)s"
-msgstr "你在 %(site_name)s 裡的使用者帳號"
-
-#: contrib/admin/templates/registration/password_reset_email.html:5
-#, python-format
-msgid "Your new password is: %(new_password)s"
-msgstr "你的新密碼是: %(new_password)s"
-
-#: contrib/admin/templates/registration/password_reset_email.html:7
-msgid "Feel free to change this password by going to this page:"
-msgstr "放心地到此頁面變更密碼:"
-
-#: contrib/admin/templates/registration/password_reset_email.html:11
-msgid "Your username, in case you've forgotten:"
-msgstr "你的使用者名稱，萬一你已經忘記的話:"
-
-#: contrib/admin/templates/registration/password_reset_email.html:13
-msgid "Thanks for using our site!"
-msgstr "感謝使用本網站！"
-
-#: contrib/admin/templates/registration/password_reset_email.html:15
-#, python-format
-msgid "The %(site_name)s team"
-msgstr "%(site_name)s 團隊"
-
-#: contrib/admin/templates/registration/logged_out.html:8
-msgid "Thanks for spending some quality time with the Web site today."
-msgstr "感謝你今天花了重要的時間留在本網站。"
-
-#: contrib/admin/templates/registration/logged_out.html:10
-msgid "Log in again"
-msgstr "再次登入"
-
-#: contrib/admin/templates/registration/password_reset_done.html:6
-#: contrib/admin/templates/registration/password_reset_done.html:10
-msgid "Password reset successful"
-msgstr "密碼成功地重設"
-
-#: contrib/admin/templates/registration/password_reset_done.html:12
-msgid ""
-"We've e-mailed a new password to the e-mail address you submitted. You "
-"should be receiving it shortly."
-msgstr "我們已經把新的密碼寄到你送出的電子郵件地址。你應該不久就能收到。"
-
-#: contrib/admin/templates/registration/password_change_form.html:4
-#: contrib/admin/templates/registration/password_change_form.html:6
-#: contrib/admin/templates/registration/password_change_form.html:10
-#: contrib/admin/templates/registration/password_change_done.html:4
-msgid "Password change"
-msgstr "密碼變更"
-
-#: contrib/admin/templates/registration/password_change_form.html:12
-msgid ""
-"Please enter your old password, for security's sake, and then enter your new "
-"password twice so we can verify you typed it in correctly."
-msgstr ""
-"為了安全上的考慮，請輸入你的舊密碼，再輸入新密碼兩次，讓我們核驗你已正確地輸"
-"入。"
-
-#: contrib/admin/templates/registration/password_change_form.html:17
-msgid "Old password:"
-msgstr "舊密碼:"
-
-#: contrib/admin/templates/registration/password_change_form.html:19
-msgid "New password:"
-msgstr "新密碼:"
-
-#: contrib/admin/templates/registration/password_change_form.html:21
-msgid "Confirm password:"
-msgstr "確認密碼:"
-
-#: contrib/admin/templates/registration/password_change_form.html:23
-msgid "Change my password"
-msgstr "變更我的密碼"
-
-#: contrib/admin/templates/registration/password_change_done.html:6
-#: contrib/admin/templates/registration/password_change_done.html:10
-msgid "Password change successful"
-msgstr "密碼成功地變更"
-
-#: contrib/admin/templates/registration/password_change_done.html:12
-msgid "Your password was changed."
-msgstr "你的密碼已變更。"
-
-#: contrib/flatpages/models/flatpages.py:7
-msgid ""
-"Example: '/about/contact/'. Make sure to have leading and trailing slashes."
-msgstr "範例: '/about/contact/'。開頭與結束都一定要有斜線。"
-
-#: contrib/flatpages/models/flatpages.py:8
-msgid "title"
-msgstr "標題"
-
-#: contrib/flatpages/models/flatpages.py:9
-msgid "content"
-msgstr "內容"
-
-#: contrib/flatpages/models/flatpages.py:10
-msgid "enable comments"
-msgstr "允許評論"
-
-#: contrib/flatpages/models/flatpages.py:11
-msgid "template name"
-msgstr "模板名稱"
-
-#: contrib/flatpages/models/flatpages.py:12
-msgid ""
-"Example: 'flatpages/contact_page'. If this isn't provided, the system will "
-"use 'flatpages/default'."
-msgstr ""
-"範例: 'flatpages/contact_page'。如果沒有提供它，系統會使用 'flatpages/"
-"default'。"
-
-#: contrib/flatpages/models/flatpages.py:13
-msgid "registration required"
-msgstr "需要註冊"
-
-#: contrib/flatpages/models/flatpages.py:13
-msgid "If this is checked, only logged-in users will be able to view the page."
-msgstr "如果此項被選取，則只有登入的使用者可以檢視頁面。"
-
-#: contrib/flatpages/models/flatpages.py:17
-msgid "flat page"
-msgstr "簡平頁面"
-
-#: contrib/flatpages/models/flatpages.py:18
-msgid "flat pages"
-msgstr "簡平頁面"
-
-#: contrib/redirects/models/redirects.py:7
-msgid "redirect from"
-msgstr "重導向自"
-
-#: contrib/redirects/models/redirects.py:8
-msgid ""
-"This should be an absolute path, excluding the domain name. Example: '/"
-"events/search/'."
-msgstr "此應為一絕對路徑，但不包括網域名稱。範例: '/events/search/'。"
-
-#: contrib/redirects/models/redirects.py:9
-msgid "redirect to"
-msgstr "重導向至"
-
-#: contrib/redirects/models/redirects.py:10
-msgid ""
-"This can be either an absolute path (as above) or a full URL starting with "
-"'http://'."
-msgstr "此可為一絕對路徑 (如上) 或一個以 'http://' 開頭的完整 URL. "
-
-#: contrib/redirects/models/redirects.py:12
-msgid "redirect"
-msgstr "重導向"
-
-#: contrib/redirects/models/redirects.py:13
-msgid "redirects"
-msgstr "重導向"
-
-#: contrib/comments/views/karma.py:18
-msgid "Anonymous users cannot vote"
-msgstr "匿名使用者不可投票"
-
-#: contrib/comments/views/karma.py:22
-msgid "Invalid comment ID"
-msgstr "無效的評論 ID"
-
-#: contrib/comments/views/karma.py:24
-msgid "No voting for yourself"
-msgstr "不要投票給你自己"
-
-#: contrib/comments/views/comments.py:25
-msgid ""
-"This rating is required because you've entered at least one other rating."
-msgstr "此等級被要求是因為你至少輸入了一個其它的等級。"
-
-#: contrib/comments/views/comments.py:109
-#, python-format
-msgid ""
-"This comment was posted by a user who has posted fewer than %(count)s "
-"comment:\n"
-"\n"
-"%(text)s"
-msgid_plural ""
-"This comment was posted by a user who has posted fewer than %(count)s "
-"comments:\n"
-"\n"
-"%(text)s"
-msgstr[0] ""
-"張貼此評論的使用者之所有評論少於 %(count)s:\n"
-"\n"
-"%(text)s"
-msgstr[1] ""
-"張貼此評論的使用者之所有評論少於 %(count)s:\n"
-"\n"
-"%(text)s"
-
-#: contrib/comments/views/comments.py:114
-#, python-format
-msgid ""
-"This comment was posted by a sketchy user:\n"
-"\n"
-"%(text)s"
-msgstr ""
-"此評論被一個隨便的使用者所張貼:\n"
-"\n"
-"%(text)s"
-
-#: contrib/comments/views/comments.py:186
-#: contrib/comments/views/comments.py:277
-msgid "Only POSTs are allowed"
-msgstr "只允許 POST"
-
-#: contrib/comments/views/comments.py:190
-#: contrib/comments/views/comments.py:281
-msgid "One or more of the required fields wasn't submitted"
-msgstr "一個或多個所需的欄位沒有送出"
-
-#: contrib/comments/views/comments.py:194
-#: contrib/comments/views/comments.py:283
-msgid "Somebody tampered with the comment form (security violation)"
-msgstr "有人篡改了評論表單 (違反保全)"
-
-#: contrib/comments/views/comments.py:204
-#: contrib/comments/views/comments.py:289
-msgid ""
-"The comment form had an invalid 'target' parameter -- the object ID was "
-"invalid"
-msgstr "此評論表單有一個無效的 'target' 參數 -- 物件 ID 是無效的"
-
-#: contrib/comments/views/comments.py:254
-#: contrib/comments/views/comments.py:318
-msgid "The comment form didn't provide either 'preview' or 'post'"
-msgstr "此評論表單沒有提供 'preview' 或 'post'"
-
-#: contrib/comments/models/comments.py:8
-#: contrib/comments/models/comments.py:161
-msgid "object ID"
-msgstr "物件 ID"
-
-#: contrib/comments/models/comments.py:9
-msgid "headline"
-msgstr "頭條"
-
-#: contrib/comments/models/comments.py:10
-#: contrib/comments/models/comments.py:162
-msgid "comment"
-msgstr "評論"
-
-#: contrib/comments/models/comments.py:11
-msgid "rating #1"
-msgstr "等級 #1"
-
-#: contrib/comments/models/comments.py:12
-msgid "rating #2"
-msgstr "等級 #2"
-
-#: contrib/comments/models/comments.py:13
-msgid "rating #3"
-msgstr "等級 #3"
-
-#: contrib/comments/models/comments.py:14
-msgid "rating #4"
-msgstr "等級 #4"
-
-#: contrib/comments/models/comments.py:15
-msgid "rating #5"
-msgstr "等級 #5"
-
-#: contrib/comments/models/comments.py:16
-msgid "rating #6"
-msgstr "等級 #6"
-
-#: contrib/comments/models/comments.py:17
-msgid "rating #7"
-msgstr "等級 #7"
-
-#: contrib/comments/models/comments.py:18
-msgid "rating #8"
-msgstr "等級 #8"
-
-#: contrib/comments/models/comments.py:23
-msgid "is valid rating"
-msgstr "是有效的等級"
-
-#: contrib/comments/models/comments.py:24
-#: contrib/comments/models/comments.py:164
-msgid "date/time submitted"
-msgstr "日期/時間已發送"
-
-#: contrib/comments/models/comments.py:25
-#: contrib/comments/models/comments.py:165
-msgid "is public"
-msgstr "是公開的"
-
-#: contrib/comments/models/comments.py:27
-msgid "is removed"
-msgstr "已移除"
-
-#: contrib/comments/models/comments.py:27
-msgid ""
-"Check this box if the comment is inappropriate. A \"This comment has been "
-"removed\" message will be displayed instead."
-msgstr "如果此評論不恰當則選取這個方塊，其將以 \"此評論已被移除\" 訊息取代。"
-
-#: contrib/comments/models/comments.py:31
-msgid "Comment"
-msgstr "評論"
-
-#: contrib/comments/models/comments.py:32
-msgid "Comments"
-msgstr "評論"
-
-#: contrib/comments/models/comments.py:85
-#: contrib/comments/models/comments.py:204
-msgid "Content object"
-msgstr "內容物件"
-
-#: contrib/comments/models/comments.py:113
-#, python-format
-msgid ""
-"Posted by %(user)s at %(date)s\n"
-"\n"
-"%(comment)s\n"
-"\n"
-"http://%(domain)s%(url)s"
-msgstr ""
-"由 %(user)s 在 %(date)s 張貼\n"
-"\n"
-"%(comment)s\n"
-"\n"
-"http://%(domain)s%(url)s"
-
-#: contrib/comments/models/comments.py:163
-msgid "person's name"
-msgstr "人名"
-
-#: contrib/comments/models/comments.py:166
-msgid "ip address"
-msgstr "ip 位址"
-
-#: contrib/comments/models/comments.py:168
-msgid "approved by staff"
-msgstr "由工作人員核准"
-
-#: contrib/comments/models/comments.py:172
-msgid "Free comment"
-msgstr "自由評論"
-
-#: contrib/comments/models/comments.py:173
-msgid "Free comments"
-msgstr "自由評論"
-
-#: contrib/comments/models/comments.py:209
-msgid "score"
-msgstr "分數"
-
-#: contrib/comments/models/comments.py:210
-msgid "score date"
-msgstr "分數日期"
-
-#: contrib/comments/models/comments.py:213
-msgid "Karma score"
-msgstr "Karma 分數"
-
-#: contrib/comments/models/comments.py:214
-msgid "Karma scores"
-msgstr "Karma 分數"
-
-#: contrib/comments/models/comments.py:223
-#, python-format
-msgid "%(score)d rating by %(user)s"
-msgstr "被 %(user)s 評定為 %(score)d 等級"
-
-#: contrib/comments/models/comments.py:248
-msgid "flag date"
-msgstr "標識日期"
-
-#: contrib/comments/models/comments.py:251
-msgid "User flag"
-msgstr "使用者旗標"
-
-#: contrib/comments/models/comments.py:252
-msgid "User flags"
-msgstr "使用者旗標"
-
-#: contrib/comments/models/comments.py:256
-#, python-format
-msgid "Flag by %r"
-msgstr "被 %r 標識"
-
-#: contrib/comments/models/comments.py:271
-#, python-format
-msgid ""
-"This comment was flagged by %(user)s:\n"
-"\n"
-"%(text)s"
-msgstr ""
-"此評論被 %(user)s 標識:\n"
-"\n"
-"%(text)s"
-
-#: contrib/comments/models/comments.py:278
-msgid "deletion date"
-msgstr "刪除日期"
-
-#: contrib/comments/models/comments.py:281
-msgid "Moderator deletion"
-msgstr "仲裁刪除"
-
-#: contrib/comments/models/comments.py:282
-msgid "Moderator deletions"
-msgstr "仲裁刪除"
-
-#: contrib/comments/models/comments.py:286
-#, python-format
-msgid "Moderator deletion by %r"
-msgstr "由 %r 仲裁刪除"
 
 #: parts/auth/formfields.py:27
 msgid ""
 "Your Web browser doesn't appear to have cookies enabled. Cookies are "
 "required for logging in."
 msgstr "你的網頁瀏覽器看來沒有啟用 cookie。若要登入則需使用 cookie。"
-
-#: utils/dates.py:6
-msgid "Monday"
-msgstr "星期一"
-
-#: utils/dates.py:6
-msgid "Tuesday"
-msgstr "星期二"
-
-#: utils/dates.py:6
-msgid "Wednesday"
-msgstr "星期三"
-
-#: utils/dates.py:6
-msgid "Thursday"
-msgstr "星期四"
-
-#: utils/dates.py:6
-msgid "Friday"
-msgstr "星期五"
-
-#: utils/dates.py:7
-msgid "Saturday"
-msgstr "星期六"
-
-#: utils/dates.py:7
-msgid "Sunday"
-msgstr "星期日"
-
-#: utils/dates.py:14
-msgid "January"
-msgstr "一月"
-
-#: utils/dates.py:14
-msgid "February"
-msgstr "二月"
-
-#: utils/dates.py:14 utils/dates.py:27
-msgid "March"
-msgstr "三月"
-
-#: utils/dates.py:14 utils/dates.py:27
-msgid "April"
-msgstr "四月"
-
-#: utils/dates.py:14 utils/dates.py:27
-msgid "May"
-msgstr "五月"
-
-#: utils/dates.py:14 utils/dates.py:27
-msgid "June"
-msgstr "六月"
-
-#: utils/dates.py:15 utils/dates.py:27
-msgid "July"
-msgstr "七月"
-
-#: utils/dates.py:15
-msgid "August"
-msgstr "八月"
-
-#: utils/dates.py:15
-msgid "September"
-msgstr "九月"
-
-#: utils/dates.py:15
-msgid "October"
-msgstr "十月"
-
-#: utils/dates.py:15
-msgid "November"
-msgstr "十一月"
-
-#: utils/dates.py:16
-msgid "December"
-msgstr "十二月"
-
-#: utils/dates.py:27
-msgid "Jan."
-msgstr "一月"
-
-#: utils/dates.py:27
-msgid "Feb."
-msgstr "二月"
-
-#: utils/dates.py:28
-msgid "Aug."
-msgstr "八月"
-
-#: utils/dates.py:28
-msgid "Sept."
-msgstr "九月"
-
-#: utils/dates.py:28
-msgid "Oct."
-msgstr "十月"
-
-#: utils/dates.py:28
-msgid "Nov."
-msgstr "十一月"
-
-#: utils/dates.py:28
-msgid "Dec."
-msgstr "十二月"
-
-#: utils/translation.py:350
-msgid "DATE_FORMAT"
-msgstr "DATE_FORMAT"
-
-#: utils/translation.py:351
-msgid "DATETIME_FORMAT"
-msgstr "DATETIME_FORMAT"
-
-#: utils/translation.py:352
-msgid "TIME_FORMAT"
-msgstr "TIME_FORMAT"
-
-#: utils/timesince.py:12
-msgid "year"
-msgid_plural "years"
-msgstr[0] "年"
-msgstr[1] "年"
-
-#: utils/timesince.py:13
-msgid "month"
-msgid_plural "months"
-msgstr[0] "月"
-msgstr[1] "月"
-
-#: utils/timesince.py:14
-msgid "day"
-msgid_plural "days"
-msgstr[0] "日"
-msgstr[1] "日"
-
-#: utils/timesince.py:15
-msgid "hour"
-msgid_plural "hours"
-msgstr[0] "時"
-msgstr[1] "時"
-
-#: utils/timesince.py:16
-msgid "minute"
-msgid_plural "minutes"
-msgstr[0] "分"
-msgstr[1] "分"
-
-#: models/core.py:7
-msgid "domain name"
-msgstr "網域名稱"
-
-#: models/core.py:8
-msgid "display name"
-msgstr "顯示名稱"
-
-#: models/core.py:10
-msgid "site"
-msgstr "網站"
-
-#: models/core.py:11
-msgid "sites"
-msgstr "網站"
-
-#: models/core.py:28
-msgid "label"
-msgstr "標示"
-
-#: models/core.py:29 models/core.py:40 models/auth.py:6 models/auth.py:19
-msgid "name"
-msgstr "名稱"
-
-#: models/core.py:31
-msgid "package"
-msgstr "套件"
-
-#: models/core.py:32
-msgid "packages"
-msgstr "套件"
-
-#: models/core.py:42
-msgid "python module name"
-msgstr "python 模組名稱"
-
-#: models/core.py:44
-msgid "content type"
-msgstr "內容型態"
-
-#: models/core.py:45
-msgid "content types"
-msgstr "內容型態"
-
-#: models/core.py:67
-msgid "session key"
-msgstr "session 鍵"
-
-#: models/core.py:68
-msgid "session data"
-msgstr "session 資料"
-
-#: models/core.py:69
-msgid "expire date"
-msgstr "到期日期"
-
-#: models/core.py:71
-msgid "session"
-msgstr "session"
-
-#: models/core.py:72
-msgid "sessions"
-msgstr "sessions"
-
-#: models/auth.py:8
-msgid "codename"
-msgstr "codename"
-
-#: models/auth.py:10
-msgid "Permission"
-msgstr "權限"
-
-#: models/auth.py:11 models/auth.py:58
-msgid "Permissions"
-msgstr "權限"
-
-#: models/auth.py:22
-msgid "Group"
-msgstr "群組"
-
-#: models/auth.py:23 models/auth.py:60
-msgid "Groups"
-msgstr "群組"
-
-#: models/auth.py:33
-msgid "username"
-msgstr "使用者名稱"
-
-#: models/auth.py:34
-msgid "first name"
-msgstr "名字"
-
-#: models/auth.py:35
-msgid "last name"
-msgstr "姓氏"
-
-#: models/auth.py:36
-msgid "e-mail address"
-msgstr "電子郵件地址"
-
-#: models/auth.py:37
-msgid "password"
-msgstr "密碼"
-
-#: models/auth.py:37
-msgid "Use '[algo]$[salt]$[hexdigest]'"
-msgstr "使用 '[algo]$[salt]$[hexdigest]'"
-
-#: models/auth.py:38
-msgid "staff status"
-msgstr "工作人員狀態"
-
-#: models/auth.py:38
-msgid "Designates whether the user can log into this admin site."
-msgstr "指明何使用者可以登入此管理網站。"
-
-#: models/auth.py:39
-msgid "active"
-msgstr "活動中"
-
-#: models/auth.py:40
-msgid "superuser status"
-msgstr "超級使用者狀態"
-
-#: models/auth.py:41
-msgid "last login"
-msgstr "上次登入"
-
-#: models/auth.py:42
-msgid "date joined"
-msgstr "加入日期"
-
-#: models/auth.py:44
-msgid ""
-"In addition to the permissions manually assigned, this user will also get "
-"all permissions granted to each group he/she is in."
-msgstr "除了手動指定的權限之外，這個使用者也會得到其群組擁有的所有權限。"
-
-#: models/auth.py:48
-msgid "Users"
-msgstr "使用者"
-
-#: models/auth.py:57
-msgid "Personal info"
-msgstr "個人資訊"
-
-#: models/auth.py:59
-msgid "Important dates"
-msgstr "重要日期"
-
-#: models/auth.py:216
-msgid "Message"
-msgstr "訊息"

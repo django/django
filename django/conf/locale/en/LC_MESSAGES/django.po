@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2005-12-26 12:34+0100\n"
+"POT-Creation-Date: 2005-12-29 00:04+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1368,35 +1368,43 @@ msgid "Italian"
 msgstr ""
 
 #: conf/global_settings.py:48
-msgid "Norwegian"
+msgid "Japanese"
 msgstr ""
 
 #: conf/global_settings.py:49
-msgid "Brazilian"
+msgid "Norwegian"
 msgstr ""
 
 #: conf/global_settings.py:50
-msgid "Romanian"
+msgid "Brazilian"
 msgstr ""
 
 #: conf/global_settings.py:51
-msgid "Russian"
+msgid "Romanian"
 msgstr ""
 
 #: conf/global_settings.py:52
-msgid "Slovak"
+msgid "Russian"
 msgstr ""
 
 #: conf/global_settings.py:53
-msgid "Serbian"
+msgid "Slovak"
 msgstr ""
 
 #: conf/global_settings.py:54
-msgid "Swedish"
+msgid "Serbian"
 msgstr ""
 
 #: conf/global_settings.py:55
+msgid "Swedish"
+msgstr ""
+
+#: conf/global_settings.py:56
 msgid "Simplified Chinese"
+msgstr ""
+
+#: conf/global_settings.py:57
+msgid "Traditional Chinese"
 msgstr ""
 
 #: core/formfields.py:59 core/meta/fields.py:285 core/meta/fields.py:488
