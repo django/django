@@ -726,7 +726,7 @@ class OrderingField(IntegerField):
         return "IntegerField"
     
     def get_manipulator_fields(self, opts, manipulator, change, name_prefix='', rel=False, follow=True):
-        return [HiddenField(name_prefix + self.name)  ]
+        return [formfields.HiddenField(name_prefix + self.name)  ]
 
     def contribute_to_class(self, cls, name):
         super(OrderingField, self ).contribute_to_class(cls, name)
@@ -819,3 +819,6 @@ class Admin:
             line_specs = fs_options['fields']
             new_fieldset_list.append(FieldSet(name, classes, opts.get_field, line_specs))
         return new_fieldset_list
+
+    def contribute_to_class(self, cls, name):
+        cls._meta.admin = self

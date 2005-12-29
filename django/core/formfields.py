@@ -55,26 +55,35 @@ class Manipulator(object):
         "Returns dictionary mapping field_names to error-message lists"
         errors = {}
         for field in self.fields:
-            if field.is_required and not new_data.get(field.field_name, False):
-                errors.setdefault(field.field_name, []).append(gettext_lazy('This field is required.'))
-                continue
-            try:
-                validator_list = field.validator_list
-                if hasattr(self, 'validate_%s' % field.field_name):
-                    validator_list.append(getattr(self, 'validate_%s' % field.field_name))
-                for validator in validator_list:
-                    if field.is_required or new_data.get(field.field_name, False) or hasattr(validator, 'always_test'):
-                        try:
-                            if hasattr(field, 'requires_data_list'):
-                                validator(new_data.getlist(field.field_name), new_data)
-                            else:
-                                validator(new_data.get(field.field_name, ''), new_data)
-                        except validators.ValidationError, e:
-                            errors.setdefault(field.field_name, []).extend(e.messages)
-            # If a CriticalValidationError is raised, ignore any other ValidationErrors
-            # for this particular field
-            except validators.CriticalValidationError, e:
-                errors.setdefault(field.field_name, []).extend(e.messages)
+            errors.update(field.get_validation_errors(new_data))
+            val_name = 'validate_%s' % field.field_name
+            if hasattr(self, val_name):
+                val = getattr(self, val_name)
+                try:
+                    field.run_validator(new_data, val)
+                except (validators.ValidationError, validators.CriticalValidationError), e:
+                    errors.setdefault(field.field_name, []).extend(e.messages)
+                
+#            if field.is_required and not new_data.get(field.field_name, False):
+#                errors.setdefault(field.field_name, []).append(gettext_lazy('This field is required.'))
+#                continue
+#            try:
+#                validator_list = field.validator_list
+#                if hasattr(self, 'validate_%s' % field.field_name):
+#                    validator_list.append(getattr(self, 'validate_%s' % field.field_name))
+#                for validator in validator_list:
+#                    if field.is_required or new_data.get(field.field_name, False) or hasattr(validator, 'always_test'):
+#                        try:
+#                            if hasattr(field, 'requires_data_list'):
+#                                validator(new_data.getlist(field.field_name), new_data)
+#                            else:
+#                                validator(new_data.get(field.field_name, ''), new_data)
+#                        except validators.ValidationError, e:
+#                            errors.setdefault(field.field_name, []).extend(e.messages)
+#            # If a CriticalValidationError is raised, ignore any other ValidationErrors
+#            # for this particular field
+#            except validators.CriticalValidationError, e:
+#                errors.setdefault(field.field_name, []).extend(e.messages)
         return errors
 
     def save(self, new_data):
@@ -89,6 +98,7 @@ class Manipulator(object):
         must happen after validation because html2python functions aren't
         expected to deal with invalid input.
         """
+        print "converting for ", self, self.fields
         for field in self.fields:
             field.convert_post_data(new_data)
 
@@ -314,12 +324,37 @@ class FormField:
             except ValueError:
                 converted_data = d
             new_data.setlist(name, converted_data)
-#        else:
-#            try:
-#               # individual fields deal with None values themselves
-#               new_data.setlist(name, [self.__class__.html2python(None)])
-#            except EmptyValue:
-#               new_data.setlist(name, [])
+        else:
+            try:
+               #individual fields deal with None values themselves
+               new_data.setlist(name, [self.__class__.html2python(None)])
+            except EmptyValue:
+               new_data.setlist(name, [])
+
+
+    def run_validator(self, new_data, validator):
+        if self.is_required or new_data.get(self.field_name, False) or hasattr(validator, 'always_test'):
+            if hasattr(self, 'requires_data_list'):
+                validator(new_data.getlist(self.field_name), new_data)
+            else:
+                validator(new_data.get(self.field_name, ''), new_data)
+
+    def get_validation_errors(self, new_data):
+        errors = {}
+        if self.is_required and not new_data.get(self.field_name, False):
+            errors.setdefault(self.field_name, []).append(gettext_lazy('This field is required.'))
+            return errors
+        try:
+            for validator in self.validator_list:
+                try:
+                   self.run_validator(new_data, validator)
+                except validators.ValidationError, e:
+                    errors.setdefault(self.field_name, []).extend(e.messages)
+        # If a CriticalValidationError is raised, ignore any other ValidationErrors
+        # for this particular field
+        except validators.CriticalValidationError, e:
+            errors.setdefault(self.field_name, []).extend(e.messages)
+        return errors
 
     def get_id(self):
         "Returns the HTML 'id' attribute for this form field."

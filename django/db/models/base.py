@@ -1,6 +1,6 @@
 import django.db.models.manipulators
 import django.db.models.manager
-from django.db.models.fields import AutoField, ImageField
+from django.db.models.fields import AutoField, ImageField, Admin
 from django.db.models.fields.related import OneToOne, ManyToOne
 from django.db.models.related import RelatedObject
 from django.db.models.query import orderlist2sql
@@ -20,7 +20,7 @@ import os
 if not hasattr(__builtins__, 'set'):
     from sets import Set as set
 
-attribute_transforms = {}
+attribute_transforms = { 'Admin': lambda cls: Admin(**cls.__dict__) }
 
 class ModelBase(type):
     "Metaclass for all models"

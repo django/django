@@ -99,19 +99,37 @@ class AutomaticManipulator(Manipulator, Naming):
             if manipulators != None:
                 self.children[f] = manipulators
         self.needs_deletion = False
+        self.ignore_errors = False
 
     def get_fields(self):
-        if self.needs_deletion:
+        if self.needs_deletion :
             return []
         else:
-            l = list(self.fields_)
-            for child_manips in self.children.values():
-                for manip in child_manips:
-                    if manip: 
-                        l.extend(manip.fields)
-            return l
+            return self.fields_
+            #l = list(self.fields_)
+            #for child_manips in self.children.values():
+            #    for manip in child_manips:
+            #        if manip: 
+            #            l.extend(manip.fields)
+            #return l
 
     fields = property(get_fields)
+
+    def get_validation_errors(self, new_data):
+        "Returns dictionary mapping field_names to error-message lists"
+        if self.needs_deletion or self.ignore_errors: 
+            return {}
+        
+        errors = super(AutomaticManipulator, self).get_validation_errors(new_data)
+        
+        for manips in self.children.values():
+            errors.update(manips.get_validation_errors(new_data))
+        return errors
+    
+    def do_html2python(self, new_data):
+        super(AutomaticManipulator, self).do_html2python(new_data)
+        for child in self.children.values():
+            child.do_html2python(new_data)
 
     def get_original_value(self, field):
         raise NotImplemented
@@ -358,6 +376,8 @@ class ManipulatorCollection(list, Naming):
             items.sort(cmp = lambda x, y: cmp(x[0], y[0]))
             for index, obj_data in items:
                 child_manip = self.add_child(index)
+                #HACK: this data will not have been converted to python form yet. 
+                #child_manip.do_html2python(obj_data)
                 child_manip._fill_data(obj_data)
     
     def _do_command_expanded(self, command_parts):
@@ -384,7 +404,9 @@ class ManipulatorCollection(list, Naming):
         # add. 
         # TODO: page.forward, page.back, page.n, swap.n.m
             if command_name == "add":
-                self.add_child()
+                child_manip = self.add_child()
+                # Don't show validation stuff for things just added. 
+                child_manip.ignore_errors = True
             elif command_name == "swap":
                 order_field = self.model._meta.order_with_respect_to
                 if not order_field:
@@ -417,6 +439,7 @@ class ManipulatorCollection(list, Naming):
         
         prefix = '%s%s.' % (self.name_prefix, index )
         child_manip = man_class(self.follow, self.name_parts + ( str(index), )  )
+        
         self[index] = child_manip
         return child_manip
 
@@ -427,6 +450,20 @@ class ManipulatorCollection(list, Naming):
                 manip_data = manip.flatten_data()
                 new_data.update(manip_data)
         return new_data
+    
+    def get_validation_errors(self, new_data):
+        "Returns dictionary mapping field_names to error-message lists"
+        errors = {}
+        for manip in self:
+            if manip:
+                errors.update(manip.get_validation_errors(new_data))
+        return errors
+    
+    def do_html2python(self, new_data):
+        print "coll: ", self
+        for manip in self:
+            if manip:
+                manip.do_html2python(new_data)
 
 def manipulator_validator_unique_together(field_name_list, opts, self, field_data, all_data):
     from django.db.models.fields.related import ManyToOne
