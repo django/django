@@ -45,7 +45,7 @@ def orderlist2sql(order_list, opts, prefix=''):
             output.append('%s%s ASC' % (prefix, backend.quote_name(orderfield2column(f, opts))))
     return ', '.join(output)
 
-class QBase:
+class QOperator:
     "Base class for QAnd and QOr"
     def __init__(self, *args):
         self.args = args
@@ -53,17 +53,17 @@ class QBase:
     def __repr__(self):
         return '(%s)' % self.operator.join([repr(el) for el in self.args])
 
-    def get_sql(self, opts, table_count):
-        tables, join_where, where, params = [], [], [], []
+    def get_sql(self, opts):
+        tables, joins, where, params = [], {}, [], []
         for val in self.args:
-            tables2, join_where2, where2, params2, table_count = val.get_sql(opts, table_count)
+            tables2, joins2, where2, params2 = val.get_sql(opts)
             tables.extend(tables2)
-            join_where.extend(join_where2)
+            joins.update(joins2)
             where.extend(where2)
             params.extend(params2)
-        return tables, join_where, ['(%s)' % self.operator.join(where)], params, table_count
+        return tables, joins, ['(%s)' % self.operator.join(where)], params
 
-class QAnd(QBase):
+class QAnd(QOperator):
     "Encapsulates a combined query that uses 'AND'."
     operator = ' AND '
     def __or__(self, other):
@@ -80,7 +80,7 @@ class QAnd(QBase):
         else:
             raise TypeError, other
 
-class QOr(QBase):
+class QOr(QOperator):
     "Encapsulates a combined query that uses 'OR'."
     operator = ' OR '
     def __and__(self, other):
@@ -117,8 +117,8 @@ class Q:
         else:
             raise TypeError, other
 
-    def get_sql(self, opts, table_count):
-        return parse_lookup(self.kwargs.items(), opts, table_count)
+    def get_sql(self, opts):
+        return parse_lookup(self.kwargs.items(), opts)
 
 
 def get_where_clause(lookup_type, table_prefix, field_name, value):
@@ -174,33 +174,40 @@ def throw_bad_kwarg_error(kwarg):
     # Helper function to remove redundancy.
     raise TypeError, "got unexpected keyword argument '%s'" % kwarg
 
-def parse_lookup(kwarg_items, opts, table_count=0):
+def parse_lookup(kwarg_items, opts):
     # Helper function that handles converting API kwargs (e.g.
     # "name__exact": "tom") to SQL.
 
-    # Note that there is a distinction between where and join_where. The latter
-    # is specifically a list of where clauses to use for JOINs. This
-    # distinction is necessary because of support for "_or".
-
-    # table_count is used to ensure table aliases are unique.
-    tables, join_where, where, params = [], [], [], []
+    # 'joins' is a dictionary describing the tables that must be joined to complete the query.
+    # Each key-value pair follows the form
+    #   alias: (table, join_type, condition)
+    # where
+    #   alias is the AS alias for the joined table
+    #   table is the actual table name to be joined
+    #   join_type is the type of join (INNER JOIN, LEFT OUTER JOIN, etc)
+    #   condition is the where-like statement over which narrows the join.
+    #
+    # alias will be derived from the lookup list name.
+    # At present, this method only every returns INNER JOINs; the option is there for others
+    # to implement custom Q()s, etc that return other join types.
+    tables, joins, where, params = [], {}, [], []
     for kwarg, kwarg_value in kwarg_items:
         if kwarg in ('order_by', 'limit', 'offset', 'select_related', 'distinct', 'select', 'tables', 'where', 'params'):
             continue
         if kwarg_value is None:
             continue
         if kwarg == 'complex':
-            tables2, join_where2, where2, params2, table_count = kwarg_value.get_sql(opts, table_count)
+            tables2, joins2, where2, params2 = kwarg_value.get_sql(opts)
             tables.extend(tables2)
-            join_where.extend(join_where2)
+            joins.update(joins2)
             where.extend(where2)
             params.extend(params2)
             continue
         if kwarg == '_or':
             for val in kwarg_value:
-                tables2, join_where2, where2, params2, table_count = parse_lookup(val, opts, table_count)
+                tables2, joins2, where2, params2 = parse_lookup(val, opts)
                 tables.extend(tables2)
-                join_where.extend(join_where2)
+                joins.update(joins2)
                 where.append('(%s)' % ' OR '.join(where2))
                 params.extend(params2)
             continue
@@ -212,17 +219,16 @@ def parse_lookup(kwarg_items, opts, table_count=0):
             else:
                 lookup_list = lookup_list[:-1] + [opts.pk.name, 'exact']
         if len(lookup_list) == 1:
-            _throw_bad_kwarg_error(kwarg)
+            throw_bad_kwarg_error(kwarg)
         lookup_type = lookup_list.pop()
         current_opts = opts # We'll be overwriting this, so keep a reference to the original opts.
         current_table_alias = current_opts.db_table
         param_required = False
         while lookup_list or param_required:
-            table_count += 1
             try:
                 # "current" is a piece of the lookup list. For example, in
                 # choices.get_list(poll__sites__id__exact=5), lookup_list is
-                # ["polls", "sites", "id"], and the first current is "polls".
+                # ["poll", "sites", "id"], and the first current is "poll".
                 try:
                     current = lookup_list.pop(0)
                 except IndexError:
@@ -233,15 +239,18 @@ def parse_lookup(kwarg_items, opts, table_count=0):
                 # Try many-to-many relationships first...
                 for f in current_opts.many_to_many:
                     if f.name == current:
-                        rel_table_alias = backend.quote_name('t%s' % table_count)
-                        table_count += 1
-                        tables.append('%s %s' % \
-                            (backend.quote_name(f.get_m2m_db_table(current_opts)), rel_table_alias))
-                        join_where.append('%s.%s = %s.%s' % \
-                            (backend.quote_name(current_table_alias),
-                            backend.quote_name(current_opts.pk.column),
-                            rel_table_alias,
-                            backend.quote_name(current_opts.object_name.lower() + '_id')))
+                        rel_table_alias = backend.quote_name(current_table_alias + LOOKUP_SEPARATOR + current)
+
+                        joins[rel_table_alias] = (
+                            backend.quote_name(f.get_m2m_db_table(current_opts)),
+                            "INNER JOIN",
+                            '%s.%s = %s.%s' %
+                                (backend.quote_name(current_table_alias),
+                                backend.quote_name(current_opts.pk.column),
+                                rel_table_alias,
+                                backend.quote_name(current_opts.object_name.lower() + '_id'))
+                        )
+
                         # Optimization: In the case of primary-key lookups, we
                         # don't have to do an extra join.
                         if lookup_list and lookup_list[0] == f.rel.to._meta.pk.name and lookup_type == 'exact':
@@ -251,14 +260,17 @@ def parse_lookup(kwarg_items, opts, table_count=0):
                             lookup_list.pop()
                             param_required = False
                         else:
-                            new_table_alias = 't%s' % table_count
-                            tables.append('%s %s' % (backend.quote_name(f.rel.to._meta.db_table),
-                                backend.quote_name(new_table_alias)))
-                            join_where.append('%s.%s = %s.%s' % \
-                                (backend.quote_name(rel_table_alias),
-                                backend.quote_name(f.rel.to._meta.object_name.lower() + '_id'),
-                                backend.quote_name(new_table_alias),
-                                backend.quote_name(f.rel.to._meta.pk.column)))
+                            new_table_alias = current_table_alias + LOOKUP_SEPARATOR + current
+
+                            joins[backend.quote_name(new_table_alias)] = (
+                                backend.quote_name(f.rel.to._meta.db_table),
+                                "INNER JOIN",
+                                '%s.%s = %s.%s' %
+                                    (rel_table_alias,
+                                    backend.quote_name(f.rel.to._meta.object_name.lower() + '_id'),
+                                    backend.quote_name(new_table_alias),
+                                    backend.quote_name(f.rel.to._meta.pk.column))
+                            )
                             current_table_alias = new_table_alias
                             param_required = True
                         current_opts = f.rel.to._meta
@@ -280,12 +292,17 @@ def parse_lookup(kwarg_items, opts, table_count=0):
                             where.append(get_where_clause(lookup_type, current_table_alias+'.', f.column, kwarg_value))
                             params.extend(f.get_db_prep_lookup(lookup_type, kwarg_value))
                         else:
-                            new_table_alias = 't%s' % table_count
-                            tables.append('%s %s' % \
-                                (backend.quote_name(f.rel.to._meta.db_table), backend.quote_name(new_table_alias)))
-                            join_where.append('%s.%s = %s.%s' % \
-                                (backend.quote_name(current_table_alias), backend.quote_name(f.column),
-                                backend.quote_name(new_table_alias), backend.quote_name(f.rel.to._meta.pk.column)))
+                            new_table_alias = current_table_alias + LOOKUP_SEPARATOR + current
+
+                            joins[backend.quote_name(new_table_alias)] = (
+                                backend.quote_name(f.rel.to._meta.db_table),
+                                "INNER JOIN",
+                                '%s.%s = %s.%s' %
+                                    (backend.quote_name(current_table_alias),
+                                    backend.quote_name(f.column),
+                                    backend.quote_name(new_table_alias),
+                                    backend.quote_name(f.rel.to._meta.pk.column))
+                            )
                             current_table_alias = new_table_alias
                             param_required = True
                         current_opts = f.rel.to._meta
@@ -301,4 +318,4 @@ def parse_lookup(kwarg_items, opts, table_count=0):
                 throw_bad_kwarg_error(kwarg)
             except StopIteration:
                 continue
-    return tables, join_where, where, params, table_count
+    return tables, joins, where, params

@@ -33,7 +33,7 @@ class Manager(object):
         self.creation_counter = Manager.creation_counter
         Manager.creation_counter += 1
         self.klass = None
-    
+
     def _prepare(self):
         if self.klass._meta.get_latest_by:
             self.get_latest = self.__get_latest
@@ -49,7 +49,7 @@ class Manager(object):
         if not hasattr(klass, '_default_manager') or \
            self.creation_counter < klass._default_manager.creation_counter:
                 klass._default_manager = self
-        
+
     def _get_sql_clause(self, **kwargs):
         def quote_only_if_word(word):
             if ' ' in word:
@@ -61,15 +61,14 @@ class Manager(object):
 
         # Construct the fundamental parts of the query: SELECT X FROM Y WHERE Z.
         select = ["%s.%s" % (backend.quote_name(opts.db_table), backend.quote_name(f.column)) for f in opts.fields]
-        tables = [opts.db_table] + (kwargs.get('tables') and kwargs['tables'][:] or [])
-        tables = [quote_only_if_word(t) for t in tables]
+        tables = (kwargs.get('tables') and [quote_only_if_word(t) for t in kwargs['tables']] or [])
         where = kwargs.get('where') and kwargs['where'][:] or []
         params = kwargs.get('params') and kwargs['params'][:] or []
 
         # Convert the kwargs into SQL.
-        tables2, join_where2, where2, params2, _ = parse_lookup(kwargs.items(), opts)
+        tables2, joins, where2, params2 = parse_lookup(kwargs.items(), opts)
         tables.extend(tables2)
-        where.extend(join_where2 + where2)
+        where.extend(where2)
         params.extend(params2)
 
         # Add any additional constraints from the "where_constraints" parameter.
@@ -82,6 +81,22 @@ class Manager(object):
         # Add any additional SELECTs passed in via kwargs.
         if kwargs.get('select'):
             select.extend(['(%s) AS %s' % (quote_only_if_word(s[1]), backend.quote_name(s[0])) for s in kwargs['select']])
+
+        # Start composing the body of the SQL statement.
+        sql = [" FROM", backend.quote_name(opts.db_table)]
+
+        # Compose the join dictionary into SQL describing the joins.
+        if joins:
+            sql.append(" ".join(["%s %s AS %s ON %s" % (join_type, table, alias, condition)
+                                for (alias, (table, join_type, condition)) in joins.items()]))
+
+        # Compose the tables clause into SQL.
+        if tables:
+            sql.append(", " + ", ".join(tables))
+
+        # Compose the where clause into SQL.
+        if where:
+            sql.append(where and "WHERE " + " AND ".join(where))
 
         # ORDER BY clause
         order_by = []
@@ -106,16 +121,16 @@ class Manager(object):
                     else:
                         table_prefix = ''
                 order_by.append('%s%s %s' % (table_prefix, backend.quote_name(orderfield2column(col_name, opts)), order))
-        order_by = ", ".join(order_by)
+        if order_by:
+            sql.append("ORDER BY " + ", ".join(order_by))
 
         # LIMIT and OFFSET clauses
         if kwargs.get('limit') is not None:
-            limit_sql = " %s " % backend.get_limit_offset_sql(kwargs['limit'], kwargs.get('offset'))
+            sql.append("%s " % backend.get_limit_offset_sql(kwargs['limit'], kwargs.get('offset')))
         else:
             assert kwargs.get('offset') is None, "'offset' is not allowed without 'limit'"
-            limit_sql = ""
 
-        return select, " FROM " + ",".join(tables) + (where and " WHERE " + " AND ".join(where) or "") + (order_by and " ORDER BY " + order_by or "") + limit_sql, params
+        return select, " ".join(sql), params
 
     def get_iterator(self, **kwargs):
         # kwargs['select'] is a dictionary, and dictionaries' key order is
@@ -220,7 +235,7 @@ class Manager(object):
         # We have to manually run typecast_timestamp(str()) on the results, because
         # MySQL doesn't automatically cast the result of date functions as datetime
         # objects -- MySQL returns the values as strings, instead.
-        return [typecast_timestamp(str(row[0])) for row in cursor.fetchall()] 
+        return [typecast_timestamp(str(row[0])) for row in cursor.fetchall()]
 
 class ManagerDescriptor(object):
     def __init__(self, manager):

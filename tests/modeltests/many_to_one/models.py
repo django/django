@@ -67,6 +67,19 @@ This is a test
 >>> Article.objects.get_list(reporter__first_name__exact='John', order_by=['pub_date'])
 [This is a test, John's second story]
 
+# Query twice over the related field.
+>>> Article.objects.get_list(reporter__first_name__exact='John', reporter__last_name__exact='Smith')
+[This is a test, John's second story]
+
+# The underlying query only makes one join when a related table is referenced twice.
+>>> null, sql, null = Article.objects._get_sql_clause(reporter__first_name__exact='John', reporter__last_name__exact='Smith')
+>>> sql.count('INNER JOIN')
+1
+
+# The automatically joined table has a predictable name.
+>>> Article.objects.get_list(reporter__first_name__exact='John', where=["many_to_one_articles__reporter.last_name='Smith'"])
+[This is a test, John's second story]
+
 # Find all Articles for the Reporter whose ID is 1.
 >>> Article.objects.get_list(reporter__id__exact=1, order_by=['pub_date'])
 [This is a test, John's second story]
@@ -95,4 +108,5 @@ John Smith
 >>> a4.save()
 >>> a4.get_reporter()
 John Smith
+
 """
