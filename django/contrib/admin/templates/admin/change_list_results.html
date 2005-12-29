@@ -1,3 +1,4 @@
+{% if results %}
 <table cellspacing="0">
 <thead>
 <tr>
@@ -7,7 +8,10 @@
 {% if header.sortable %}</a>{% endif %}</th>{% endfor %}
 </tr>
 </thead>
+<tbody>
 {% for result in results %}
 <tr class="{% cycle row1,row2 %}">{% for item in result %}{{ item }}{% endfor %}</tr>
 {% endfor %}
+</tbody>
 </table>
+{% endif %}

@@ -11,6 +11,9 @@ class SessionWrapper(object):
         self.session_key = session_key
         self.modified = False
 
+    def __contains__(self, key):
+        return key in self._session
+
     def __getitem__(self, key):
         return self._session[key]
 

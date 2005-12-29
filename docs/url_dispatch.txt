@@ -148,11 +148,6 @@ The matching/grouping algorithm
 Here's the algorithm the URLconf parser follows, with respect to named groups
 vs. non-named groups in a regular expression:
 
-    * If there are any named groups, it will use those as keyword arguments,
-      ignoring any non-named groups.
-    * Otherwise, it will pass all non-named groups as positional arguments.
-    * In both cases, it will pass any extra
-
 If there are any named arguments, it will use those, ignoring non-named arguments.
 Otherwise, it will pass all non-named arguments as positional arguments.
 

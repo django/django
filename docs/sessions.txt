@@ -34,6 +34,9 @@ it and write to it.
 
 It implements the following standard dictionary methods:
 
+    * ``__contains__(key)``
+      **New in Django development version.** Example: ``'fav_color' in request.session``
+
     * ``__getitem__(key)``
       Example: ``fav_color = request.session['fav_color']``
 

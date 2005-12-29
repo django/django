@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2005-12-17 22:26+0100\n"
+"POT-Creation-Date: 2005-12-29 00:05+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: Espen Grndhaug <espen@grindhaug.org>\n"
 "Language-Team: Norwegian\n"
@@ -373,12 +373,19 @@ msgstr "logg innlegg"
 msgid "All dates"
 msgstr "Alle datoer"
 
-#: contrib/admin/views/decorators.py:22
+#: contrib/admin/views/decorators.py:9 parts/auth/formfields.py:33
+#: parts/auth/formfields.py:38
+msgid ""
+"Please enter a correct username and password. Note that both fields are case-"
+"sensitive."
+msgstr ""
+
+#: contrib/admin/views/decorators.py:23
 #: contrib/admin/templates/admin/login.html:24
 msgid "Log in"
 msgstr "Log inn"
 
-#: contrib/admin/views/decorators.py:56
+#: contrib/admin/views/decorators.py:57
 msgid ""
 "Please log in again, because your session has expired. Don't worry: Your "
 "submission has been saved."
@@ -386,7 +393,7 @@ msgstr ""
 "Du må logge inn igjen, fordi sesjonen din har gått ut på dato, men ikke ikke "
 "bekjymr deg informasjonen du sendte ble lagret."
 
-#: contrib/admin/views/decorators.py:63
+#: contrib/admin/views/decorators.py:64
 msgid ""
 "Looks like your browser isn't configured to accept cookies. Please enable "
 "cookies, reload this page, and try again."
@@ -395,11 +402,11 @@ msgstr ""
 "('cookies'). Vennligst omkonfigurer nettleseren din, last siden på ny og "
 "prøv igjen."
 
-#: contrib/admin/views/decorators.py:77
+#: contrib/admin/views/decorators.py:78
 msgid "Usernames cannot contain the '@' character."
 msgstr "Brukernavnet kan ikke inneholde '@'"
 
-#: contrib/admin/views/decorators.py:79
+#: contrib/admin/views/decorators.py:80
 #, python-format
 msgid "Your e-mail address is not your username. Try '%s' instead."
 msgstr "Epost adressen din er ikke brukernavnet ditt, prøv '%s' i stede."
@@ -424,80 +431,80 @@ msgstr "Velg %s for å endre"
 msgid "The %(name)s \"%(obj)s\" was added successfully."
 msgstr "%(name)s \"%(obj)s\" ble lagt inn i databasen."
 
-#: contrib/admin/views/main.py:415 contrib/admin/views/main.py:491
+#: contrib/admin/views/main.py:415 contrib/admin/views/main.py:492
 msgid "You may edit it again below."
 msgstr "Du kan endre under"
 
-#: contrib/admin/views/main.py:423 contrib/admin/views/main.py:500
+#: contrib/admin/views/main.py:423 contrib/admin/views/main.py:501
 #, python-format
 msgid "You may add another %s below."
 msgstr "Du kan legge til en ny %s under."
 
-#: contrib/admin/views/main.py:440
+#: contrib/admin/views/main.py:441
 #, python-format
 msgid "Add %s"
 msgstr "Ny %s"
 
-#: contrib/admin/views/main.py:456
+#: contrib/admin/views/main.py:457
 #, python-format
 msgid "Added %s."
 msgstr "La til %s"
 
-#: contrib/admin/views/main.py:456 contrib/admin/views/main.py:458
-#: contrib/admin/views/main.py:460
+#: contrib/admin/views/main.py:457 contrib/admin/views/main.py:459
+#: contrib/admin/views/main.py:461
 msgid "and"
 msgstr "og"
 
-#: contrib/admin/views/main.py:458
+#: contrib/admin/views/main.py:459
 #, python-format
 msgid "Changed %s."
 msgstr "Endret %s."
 
-#: contrib/admin/views/main.py:460
+#: contrib/admin/views/main.py:461
 #, python-format
 msgid "Deleted %s."
 msgstr "Slettet %s."
 
-#: contrib/admin/views/main.py:463
+#: contrib/admin/views/main.py:464
 msgid "No fields changed."
 msgstr "Ingen felt endret."
 
-#: contrib/admin/views/main.py:488
+#: contrib/admin/views/main.py:489
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was changed successfully."
 msgstr "%(name)s \"%(obj)s\" ble endret."
 
-#: contrib/admin/views/main.py:497
+#: contrib/admin/views/main.py:498
 #, python-format
 msgid ""
 "The %(name)s \"%(obj)s\" was added successfully. You may edit it again below."
 msgstr "%(name)s \"%(obj)s\" ble endret. Du kan endre det igjen under."
 
-#: contrib/admin/views/main.py:535
+#: contrib/admin/views/main.py:536
 #, python-format
 msgid "Change %s"
 msgstr "Endre %s"
 
-#: contrib/admin/views/main.py:613
+#: contrib/admin/views/main.py:614
 #, python-format
 msgid "One or more %(fieldname)s in %(name)s: %(obj)s"
 msgstr "En eller flere %(fieldname)s i %(name)s: %(obj)s"
 
-#: contrib/admin/views/main.py:618
+#: contrib/admin/views/main.py:619
 #, python-format
 msgid "One or more %(fieldname)s in %(name)s:"
 msgstr "En eller flere %(fieldname)s i %(name)s:"
 
-#: contrib/admin/views/main.py:647
+#: contrib/admin/views/main.py:648
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was deleted successfully."
 msgstr "%(name)s \"%(obj)s\" ble slettet."
 
-#: contrib/admin/views/main.py:650
+#: contrib/admin/views/main.py:651
 msgid "Are you sure?"
 msgstr "Er du sikker?"
 
-#: contrib/admin/views/main.py:665
+#: contrib/admin/views/main.py:666
 #, fuzzy, python-format
 msgid "Change history: %s"
 msgstr "Endre historien: %s"
@@ -1439,36 +1446,44 @@ msgid "Italian"
 msgstr "Italiensk"
 
 #: conf/global_settings.py:48
+msgid "Japanese"
+msgstr ""
+
+#: conf/global_settings.py:49
 msgid "Norwegian"
 msgstr "Norsk"
 
-#: conf/global_settings.py:49
+#: conf/global_settings.py:50
 msgid "Brazilian"
 msgstr "Brasiliansk"
 
-#: conf/global_settings.py:50
+#: conf/global_settings.py:51
 msgid "Romanian"
 msgstr "Romansk"
 
-#: conf/global_settings.py:51
+#: conf/global_settings.py:52
 msgid "Russian"
 msgstr "Russisk"
 
-#: conf/global_settings.py:52
+#: conf/global_settings.py:53
 msgid "Slovak"
 msgstr "Slovakisk"
 
-#: conf/global_settings.py:53
+#: conf/global_settings.py:54
 msgid "Serbian"
 msgstr "Serbisk"
 
-#: conf/global_settings.py:54
+#: conf/global_settings.py:55
 msgid "Swedish"
 msgstr "Svensk"
 
-#: conf/global_settings.py:55
+#: conf/global_settings.py:56
 msgid "Simplified Chinese"
 msgstr "Simplifisert Kinesisk"
+
+#: conf/global_settings.py:57
+msgid "Traditional Chinese"
+msgstr ""
 
 #: core/formfields.py:59 core/meta/fields.py:285 core/meta/fields.py:488
 #: core/meta/fields.py:499
@@ -1815,6 +1830,12 @@ msgstr[1] ""
 
 #: core/template/defaultfilters.py:371
 msgid "yes,no,maybe"
+msgstr ""
+
+#: parts/auth/formfields.py:27
+msgid ""
+"Your Web browser doesn't appear to have cookies enabled. Cookies are "
+"required for logging in."
 msgstr ""
 
 #~ msgid "Error in Template"

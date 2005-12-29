@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django v1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2005-12-17 22:25+0100\n"
+"POT-Creation-Date: 2005-12-29 00:03+0100\n"
 "PO-Revision-Date: 2005-12-10 22:08+0800\n"
 "Last-Translator: Hiweed Leng <hiweed@gmail.com>\n"
 "Language-Team: Simplified Chinese <limodou@gmail.com>\n"
@@ -358,18 +358,25 @@ msgstr "日志记录"
 msgid "All dates"
 msgstr "全有日期"
 
-#: contrib/admin/views/decorators.py:22
+#: contrib/admin/views/decorators.py:9 parts/auth/formfields.py:33
+#: parts/auth/formfields.py:38
+msgid ""
+"Please enter a correct username and password. Note that both fields are case-"
+"sensitive."
+msgstr ""
+
+#: contrib/admin/views/decorators.py:23
 #: contrib/admin/templates/admin/login.html:24
 msgid "Log in"
 msgstr "登录"
 
-#: contrib/admin/views/decorators.py:56
+#: contrib/admin/views/decorators.py:57
 msgid ""
 "Please log in again, because your session has expired. Don't worry: Your "
 "submission has been saved."
 msgstr "请重新登录，因为你的会话已经过期。不用担心：你的提交已经被保存。"
 
-#: contrib/admin/views/decorators.py:63
+#: contrib/admin/views/decorators.py:64
 msgid ""
 "Looks like your browser isn't configured to accept cookies. Please enable "
 "cookies, reload this page, and try again."
@@ -377,11 +384,11 @@ msgstr ""
 "看上去你的浏览器没有配置成接受 cookie 。请允许 cookie，重新装入本页面，再试一"
 "次。"
 
-#: contrib/admin/views/decorators.py:77
+#: contrib/admin/views/decorators.py:78
 msgid "Usernames cannot contain the '@' character."
 msgstr "用户名不能包含 '@' 字符。"
 
-#: contrib/admin/views/decorators.py:79
+#: contrib/admin/views/decorators.py:80
 #, python-format
 msgid "Your e-mail address is not your username. Try '%s' instead."
 msgstr "你的邮箱地址不是你的用户名。换 '%s' 试试。"
@@ -405,80 +412,80 @@ msgstr "选择 %s 来修改"
 msgid "The %(name)s \"%(obj)s\" was added successfully."
 msgstr "%(name)s \"%(obj)s\" 添加成功。"
 
-#: contrib/admin/views/main.py:415 contrib/admin/views/main.py:491
+#: contrib/admin/views/main.py:415 contrib/admin/views/main.py:492
 msgid "You may edit it again below."
 msgstr "你可以在下面再次编辑它。"
 
-#: contrib/admin/views/main.py:423 contrib/admin/views/main.py:500
+#: contrib/admin/views/main.py:423 contrib/admin/views/main.py:501
 #, python-format
 msgid "You may add another %s below."
 msgstr "你可以在下面增加另一个 %s 。"
 
-#: contrib/admin/views/main.py:440
+#: contrib/admin/views/main.py:441
 #, python-format
 msgid "Add %s"
 msgstr "增加 %s"
 
-#: contrib/admin/views/main.py:456
+#: contrib/admin/views/main.py:457
 #, python-format
 msgid "Added %s."
 msgstr "%s 已增加。"
 
-#: contrib/admin/views/main.py:456 contrib/admin/views/main.py:458
-#: contrib/admin/views/main.py:460
+#: contrib/admin/views/main.py:457 contrib/admin/views/main.py:459
+#: contrib/admin/views/main.py:461
 msgid "and"
 msgstr "和"
 
-#: contrib/admin/views/main.py:458
+#: contrib/admin/views/main.py:459
 #, python-format
 msgid "Changed %s."
 msgstr "已修改 %s 。"
 
-#: contrib/admin/views/main.py:460
+#: contrib/admin/views/main.py:461
 #, python-format
 msgid "Deleted %s."
 msgstr "%s 已删除。"
 
-#: contrib/admin/views/main.py:463
+#: contrib/admin/views/main.py:464
 msgid "No fields changed."
 msgstr "没有字段被修改。"
 
-#: contrib/admin/views/main.py:488
+#: contrib/admin/views/main.py:489
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was changed successfully."
 msgstr "%(name)s \"%(obj)s\" 修改成功。"
 
-#: contrib/admin/views/main.py:497
+#: contrib/admin/views/main.py:498
 #, python-format
 msgid ""
 "The %(name)s \"%(obj)s\" was added successfully. You may edit it again below."
 msgstr "%(name)s \"%(obj)s\" 添加成功。你可以在下面再次编辑它。"
 
-#: contrib/admin/views/main.py:535
+#: contrib/admin/views/main.py:536
 #, python-format
 msgid "Change %s"
 msgstr "修改 %s"
 
-#: contrib/admin/views/main.py:613
+#: contrib/admin/views/main.py:614
 #, python-format
 msgid "One or more %(fieldname)s in %(name)s: %(obj)s"
 msgstr "一个或多个 %(fieldname)s 在 %(name)s 中: %(obj)s"
 
-#: contrib/admin/views/main.py:618
+#: contrib/admin/views/main.py:619
 #, python-format
 msgid "One or more %(fieldname)s in %(name)s:"
 msgstr "一个或多个 %(fieldname)s 在 %(name)s 中:"
 
-#: contrib/admin/views/main.py:647
+#: contrib/admin/views/main.py:648
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was deleted successfully."
 msgstr "%(name)s \"%(obj)s\" 删除成功。"
 
-#: contrib/admin/views/main.py:650
+#: contrib/admin/views/main.py:651
 msgid "Are you sure?"
 msgstr "你确信吗？"
 
-#: contrib/admin/views/main.py:665
+#: contrib/admin/views/main.py:666
 #, python-format
 msgid "Change history: %s"
 msgstr "修改历史： %s"
@@ -1396,36 +1403,44 @@ msgid "Italian"
 msgstr "意大利语"
 
 #: conf/global_settings.py:48
+msgid "Japanese"
+msgstr ""
+
+#: conf/global_settings.py:49
 msgid "Norwegian"
 msgstr "挪威语"
 
-#: conf/global_settings.py:49
+#: conf/global_settings.py:50
 msgid "Brazilian"
 msgstr "巴西语"
 
-#: conf/global_settings.py:50
+#: conf/global_settings.py:51
 msgid "Romanian"
 msgstr "罗马尼亚语"
 
-#: conf/global_settings.py:51
+#: conf/global_settings.py:52
 msgid "Russian"
 msgstr "俄语"
 
-#: conf/global_settings.py:52
+#: conf/global_settings.py:53
 msgid "Slovak"
 msgstr "斯洛伐克语"
 
-#: conf/global_settings.py:53
+#: conf/global_settings.py:54
 msgid "Serbian"
 msgstr "塞尔维亚语"
 
-#: conf/global_settings.py:54
+#: conf/global_settings.py:55
 msgid "Swedish"
 msgstr "瑞典语"
 
-#: conf/global_settings.py:55
+#: conf/global_settings.py:56
 msgid "Simplified Chinese"
 msgstr "简体中文"
+
+#: conf/global_settings.py:57
+msgid "Traditional Chinese"
+msgstr ""
 
 #: core/formfields.py:59 core/meta/fields.py:285 core/meta/fields.py:488
 #: core/meta/fields.py:499
@@ -1751,6 +1766,12 @@ msgstr[0] "请输入有效的 %(self)s ID。值 %(value)r 无效。"
 #: core/template/defaultfilters.py:371
 msgid "yes,no,maybe"
 msgstr "是、否、也许"
+
+#: parts/auth/formfields.py:27
+msgid ""
+"Your Web browser doesn't appear to have cookies enabled. Cookies are "
+"required for logging in."
+msgstr ""
 
 #, fuzzy
 #~ msgid "count"

@@ -398,7 +398,11 @@ which rows are returned.  Both ``limit`` and ``offset`` should be integers which
 will be directly passed to the SQL ``LIMIT``/``OFFSET`` commands.
 
 If ``distinct`` is True, only distinct rows will be returned. This is equivalent
-to a ``SELECT DISTINCT`` SQL clause.
+to a ``SELECT DISTINCT`` SQL clause. You can use this with ``get_values()`` to
+get distinct values. For example, this returns the distinct first_names::
+
+    >>> people.get_values(fields=['first_name'], distinct=True)
+    [{'first_name': 'Adrian'}, {'first_name': 'Jacob'}, {'first_name': 'Simon'}]
 
 Other lookup options
 ====================
