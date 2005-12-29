@@ -114,3 +114,41 @@ receiving a separate e-mail::
         ('Subject', 'Message.', 'from@example.com', ['jane@example.com'],
     )
     send_mass_mail(datatuple)
+
+Preventing header injection
+===========================
+
+**New in Django development version.**
+
+`Header injection`_ is a security exploit in which an attacker inserts extra
+e-mail headers to control the "To:" and "From:" in e-mail messages that your
+scripts generate.
+
+The Django e-mail functions outlined above all protect against header injection
+by forbidding newlines in header values. If any ``subject``, ``from_email`` or
+``recipient_list`` contains a newline, the e-mail function (e.g.
+``send_mail()``) will raise ``ValueError`` and, hence, will not send the
+e-mail. It's your responsibility to validate all data before passing it to the
+e-mail functions.
+
+Here's an example view that takes a ``subject``, ``message`` and ``from_email``
+from the request's POST data, sends that to admin@example.com and redirects to
+"/contact/thanks/" when it's done::
+
+    from django.core.mail import send_mail
+
+    def send_email(request):
+        subject = request.POST.get('subject', '')
+        message = request.POST.get('message', '')
+        from_email = request.POST.get('from_email', '')
+        if subject and message and from_email \
+                and '\n' not in subject and '\n' not in message
+                and '\n' not in from_email:
+            send_mail(subject, message, from_email, ['admin@example.com'])
+            return HttpResponseRedirect('/contact/thanks/')
+        else:
+            # In reality we'd use a manipulator
+            # to get proper validation errors.
+            return HttpResponse('Make sure all fields are entered and valid.')
+
+.. _Header injection: http://securephp.damonkohler.com/index.php/Email_Injection

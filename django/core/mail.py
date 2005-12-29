@@ -4,6 +4,13 @@ from django.conf.settings import DEFAULT_FROM_EMAIL, EMAIL_HOST, EMAIL_SUBJECT_P
 from email.MIMEText import MIMEText
 import smtplib
 
+class SafeMIMEText(MIMEText):
+    def __setitem__(self, name, val):
+        "Forbids multi-line headers, to prevent header injection."
+        if '\n' in val or '\r' in val:
+            raise ValueError, "Header values can't contain newlines (got %r for header %r)" % (val, name)
+        MIMEText.__setitem__(self, name, val)
+
 def send_mail(subject, message, from_email, recipient_list, fail_silently=False):
     """
     Easy wrapper for sending a single message to a recipient list. All members
@@ -29,7 +36,7 @@ def send_mass_mail(datatuple, fail_silently=False):
         if not recipient_list:
             continue
         from_email = from_email or DEFAULT_FROM_EMAIL
-        msg = MIMEText(message)
+        msg = SafeMIMEText(message)
         msg['Subject'] = subject
         msg['From'] = from_email
         msg['To'] = ', '.join(recipient_list)
