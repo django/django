@@ -4,11 +4,14 @@ from django.conf.settings import DEFAULT_FROM_EMAIL, EMAIL_HOST, EMAIL_SUBJECT_P
 from email.MIMEText import MIMEText
 import smtplib
 
+class BadHeaderError(ValueError):
+    pass
+
 class SafeMIMEText(MIMEText):
     def __setitem__(self, name, val):
         "Forbids multi-line headers, to prevent header injection."
         if '\n' in val or '\r' in val:
-            raise ValueError, "Header values can't contain newlines (got %r for header %r)" % (val, name)
+            raise BadHeaderError, "Header values can't contain newlines (got %r for header %r)" % (val, name)
         MIMEText.__setitem__(self, name, val)
 
 def send_mail(subject, message, from_email, recipient_list, fail_silently=False):
