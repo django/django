@@ -18,11 +18,8 @@ except ImportError, e:
     raise ImproperlyConfigured, "Could not load database backend: %s. Is your DATABASE_ENGINE setting (currently, %r) spelled correctly? Available options are: %s" % \
         (e, DATABASE_ENGINE, ", ".join(map(repr, available_backends)))
 
-def get_introspection_module():
-    return __import__('django.db.backends.%s.introspection' % DATABASE_ENGINE, '', '', [''])
-
-def get_creation_module():
-    return __import__('django.db.backends.%s.creation' % DATABASE_ENGINE, '', '', [''])
+get_introspection_module = lambda: __import__('django.db.backends.%s.introspection' % DATABASE_ENGINE, '', '', [''])
+get_creation_module = lambda: __import__('django.db.backends.%s.creation' % DATABASE_ENGINE, '', '', [''])
 
 connection = backend.DatabaseWrapper()
 DatabaseError = backend.DatabaseError
