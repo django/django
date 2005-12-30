@@ -63,7 +63,7 @@ class Manipulator(object):
                     field.run_validator(new_data, val)
                 except (validators.ValidationError, validators.CriticalValidationError), e:
                     errors.setdefault(field.field_name, []).extend(e.messages)
-                
+
 #            if field.is_required and not new_data.get(field.field_name, False):
 #                errors.setdefault(field.field_name, []).append(gettext_lazy('This field is required.'))
 #                continue
@@ -98,7 +98,6 @@ class Manipulator(object):
         must happen after validation because html2python functions aren't
         expected to deal with invalid input.
         """
-        print "converting for ", self, self.fields
         for field in self.fields:
             field.convert_post_data(new_data)
 
@@ -255,7 +254,7 @@ class InlineObjectCollection:
             cols = {}
             #orig = hasattr(self.parent_manipulator, 'original_object') and self.parent_manipulator.original_object  or None
             #orig_list = self.rel_obj.get_list(orig)
-            
+
             for i, manip in enumerate(self.child_manips) :
                 if manip and not manip.needs_deletion:
                     collection = {'original': manip.original_object}
@@ -264,7 +263,7 @@ class InlineObjectCollection:
                         data = field.extract_data(self.data)
                         last_part = field.field_name[field.field_name.rindex('.') + 1:]
                         collection[last_part] = FormFieldWrapper(field, data, errors)
-             
+
                     cols[i] = FormFieldCollection(collection)
             self._collections = cols
 

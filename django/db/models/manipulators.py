@@ -44,22 +44,22 @@ class ManipulatorDescriptor(object):
 class Naming(object):
     def __init__(self, name_parts):
         self.name_parts = name_parts
-        
+
     def _get_dotted_name(self):
         if len(self.name_parts) == 0:
             return ""
         else:
             return ".".join(self.name_parts) + "."
-    
+
     dotted_name = property(_get_dotted_name)
     name_prefix = dotted_name
-    
+
     def _get_name(self):
         if len(self.name_parts) == 0:
             return ""
         else:
             return self.name[-1]
-    
+
     name = property(_get_name)
 
 class AutomaticManipulator(Manipulator, Naming):
@@ -93,7 +93,7 @@ class AutomaticManipulator(Manipulator, Naming):
         for f in self.opts.get_data_holders(self.follow):
             fol = self.follow[f.name]
             fields,manipulators = f.get_fields_and_manipulators(self.opts, self, follow=fol)
-            
+
             if fields != None:
                 self.fields_.extend(fields)
             if manipulators != None:
@@ -109,7 +109,7 @@ class AutomaticManipulator(Manipulator, Naming):
             #l = list(self.fields_)
             #for child_manips in self.children.values():
             #    for manip in child_manips:
-            #        if manip: 
+            #        if manip:
             #            l.extend(manip.fields)
             #return l
 
@@ -117,15 +117,15 @@ class AutomaticManipulator(Manipulator, Naming):
 
     def get_validation_errors(self, new_data):
         "Returns dictionary mapping field_names to error-message lists"
-        if self.needs_deletion or self.ignore_errors: 
+        if self.needs_deletion or self.ignore_errors:
             return {}
-        
+
         errors = super(AutomaticManipulator, self).get_validation_errors(new_data)
-        
+
         for manips in self.children.values():
             errors.update(manips.get_validation_errors(new_data))
         return errors
-    
+
     def do_html2python(self, new_data):
         super(AutomaticManipulator, self).do_html2python(new_data)
         for child in self.children.values():
@@ -154,7 +154,7 @@ class AutomaticManipulator(Manipulator, Naming):
         return self.model(**params)
 
     def _fill_data(self, expanded_data):
-        if self.needs_deletion: 
+        if self.needs_deletion:
             raise BadCommand, "Filling %s with %r when it needs deletion" % (self, expanded_data)
         self.original_object = self.get_new_object(expanded_data)
         # TODO: many_to_many
@@ -166,7 +166,7 @@ class AutomaticManipulator(Manipulator, Naming):
         expanded_data = dot_expand(new_data, MultiValueDict)
         # Deal with the effects of previous commands
         self._fill_data(expanded_data)
-        
+
     def save_from_update(self, parent_key=None):
         if self.needs_deletion:
             if self.original_object != None:
@@ -176,10 +176,10 @@ class AutomaticManipulator(Manipulator, Naming):
         self.original_object.save()
         if not hasattr(self, 'obj_key'):
             self.obj_key = getattr(self.original_object, self.opts.pk.attname)
-        
+
         for related, manips in self.children.items():
             manips.save_from_update(self.obj_key)
-            
+
         return self.original_object
 
     def do_command(self, command):
@@ -197,30 +197,30 @@ class AutomaticManipulator(Manipulator, Naming):
         else:
             # must be the name of a child manipulator collection
             child_manips = None
-            for rel,manips in self.children.items(): 
+            for rel,manips in self.children.items():
                 if rel.var_name == part:
                     child_manips = manips
                     break
-            if child_manips == None: 
+            if child_manips == None:
                 raise BadCommand, "'%s' : unknown manipulator collection name." % (part,)
             else:
                 child_manips._do_command_expanded(command_parts)
-        
-    
+
+
     def save(self, new_data):
         self.update(new_data)
         self.save_from_update()
         return self.original_object
-        
-#    def _save_expanded(self, expanded_data, overrides = None):        
+
+#    def _save_expanded(self, expanded_data, overrides = None):
 #        add, change, opts, klass = self.add, self.change, self.opts, self.model
-#        
+#
 #        new_object = self.get_new_object(expanded_data, overrides)
 #
 #        # First, save the basic object itself.
 #        new_object.save()
 #
-#        # Save the key for use in creating new related objects. 
+#        # Save the key for use in creating new related objects.
 #        if not hasattr(self, 'obj_key'):
 #            self.obj_key = getattr(new_object, self.opts.pk.attname)
 #
@@ -230,8 +230,8 @@ class AutomaticManipulator(Manipulator, Naming):
 #                f.save_file(new_data, new_object, change and self.original_object or None, change)
 #
 #        # Calculate which primary fields have changed.
-#        
-#            
+#
+#
 #        #    for f in opts.fields:
 #        #        if not f.primary_key and str(getattr(self.original_object, f.attname)) != str(getattr(new_object, f.attname)):
 #        #            self.fields_changed.append(f.verbose_name)
@@ -247,10 +247,10 @@ class AutomaticManipulator(Manipulator, Naming):
 #                    was_changed = getattr(new_object, 'set_%s' % f.name)(new_vals)
 #                    if change and was_changed:
 #                        self.fields_changed.append(f.verbose_name)
-#        
+#
 #        # Save inline edited objects
 #        self._fill_related_objects(expanded_data,SaveHelper)
-#        
+#
 #        return new_object
 #
 #        # Save the order, if applicable.
@@ -264,17 +264,17 @@ class AutomaticManipulator(Manipulator, Naming):
 
     def flatten_data(self):
         new_data = {}
-    
-        for f in self.opts.fields + self.opts.many_to_many: 
+
+        for f in self.opts.fields + self.opts.many_to_many:
             fol = self.follow.get(f.name, None)
             if fol:
                 new_data.update(f.flatten_data(fol, self.original_object))
         for rel, child_manips in self.children.items():
             child_data = child_manips.flatten_data()
             new_data.update(child_data)
-            
+
         prefix = self.name_prefix
-        new_data = dict([(prefix + k, v) for k,v in new_data.items()])  
+        new_data = dict([(prefix + k, v) for k,v in new_data.items()])
         return new_data
 
 class ModelAddManipulator(AutomaticManipulator):
@@ -285,7 +285,7 @@ class ModelAddManipulator(AutomaticManipulator):
 
     def get_original_value(self, field):
         return field.get_default()
-    
+
     def __repr__(self):
         return "<Automatic AddManipulator '%s' for %s>" % (self.name_prefix, self.model.__name__, )
 
@@ -320,7 +320,7 @@ class ModelChangeManipulator(AutomaticManipulator):
                     original_object = opts.get_model_module().Klass(**params)
                 else:
                     raise
-        
+
         super(ModelChangeManipulator, self).__init__(original_object=original_object, follow=follow, name_parts=name_parts)
         #self.original_object = original_object
 
@@ -330,7 +330,7 @@ class ModelChangeManipulator(AutomaticManipulator):
         self.fields_added, self.fields_changed, self.fields_deleted = [], [], []
 
     def get_original_value(self, field):
-        return getattr(self.original_object, field.attname) 
+        return getattr(self.original_object, field.attname)
 
     def __repr__(self):
         return "<Automatic ChangeManipulator '%s' for %s:%r >" % (self.name_prefix, self.model.__name__, self.obj_key)
@@ -341,24 +341,24 @@ class ManipulatorCollection(list, Naming):
         self.model = model
         self.follow = follow
         self._load()
-    
+
     def _get_list(self):
         return self.model._default_manager.get_list()
 
     def _load(self):
         man_class = self.model.ChangeManipulator
-        
+
         for i,obj in enumerate(self._get_list()):
             self.append(man_class(obj,self.follow, self.name_parts + (str(i),)  ))
-    
+
     def _save_child(self, manip, parent_key):
         manip.save_from_update()
-    
+
     def save_from_update(self, parent_key=None):
         for manip in self:
             if manip:
                 self._save_child(manip, parent_key)
-    
+
     def _fill_data(self, expanded_data):
         for index,manip in enumerate(self):
             obj_data = expanded_data.get(str(index), None)
@@ -376,10 +376,10 @@ class ManipulatorCollection(list, Naming):
             items.sort(cmp = lambda x, y: cmp(x[0], y[0]))
             for index, obj_data in items:
                 child_manip = self.add_child(index)
-                #HACK: this data will not have been converted to python form yet. 
+                #HACK: this data will not have been converted to python form yet.
                 #child_manip.do_html2python(obj_data)
                 child_manip._fill_data(obj_data)
-    
+
     def _do_command_expanded(self, command_parts):
         # The next part could be an index of a manipulator,
         # or it could be a command on the collection.
@@ -393,24 +393,24 @@ class ManipulatorCollection(list, Naming):
                 manip = self[index]
             except IndexError:
                 raise BadCommand, "No %s manipulator found for index %s in command." % (part, index)
-            
+
             if manip == None:
                 raise BadCommand, "No %s manipulator found for index %s in command." % (part, index)
-            
+
             manip._do_command_expanded(command_parts)
         except ValueError:
             command_name = index_part
-        # Must be a command on the collection. Possible commands: 
-        # add. 
+        # Must be a command on the collection. Possible commands:
+        # add.
         # TODO: page.forward, page.back, page.n, swap.n.m
             if command_name == "add":
                 child_manip = self.add_child()
-                # Don't show validation stuff for things just added. 
+                # Don't show validation stuff for things just added.
                 child_manip.ignore_errors = True
             elif command_name == "swap":
                 order_field = self.model._meta.order_with_respect_to
                 if not order_field:
-                    raise BadCommand, "Swap command recieved on unordered ManipulatorCollection" 
+                    raise BadCommand, "Swap command recieved on unordered ManipulatorCollection"
                 try:
                     manip1 = self[int(command_parts.pop(0))]
                     manip2 = self[int(command_parts.pop(0))]
@@ -421,14 +421,14 @@ class ManipulatorCollection(list, Naming):
                 else:
                     # Set the ordering field value on the objects in the manipulators.
                     # This will make sure they are put in a different when rendered on the form.
-                    # The indices in this collection will stay the same.  
+                    # The indices in this collection will stay the same.
                     temp = getattr(manip1.original_object, order_field.attname)
-                    setattr(manip1.original_object, order_field.attname, 
+                    setattr(manip1.original_object, order_field.attname,
                              getattr(manip2.original_object, order_field.attname))
                     setattr(manip2.original_object, order_field.attname, temp)
             else:
                 raise BadCommand, "%s, unknown command" % (command_name)
-    
+
     def add_child(self, index = None):
         man_class = self.model.AddManipulator
         if index == None:
@@ -436,10 +436,10 @@ class ManipulatorCollection(list, Naming):
         # Make sure that we are going to put this in the right index, by prefilling with Nones.
         for i in range(len(self), index + 1):
             self.append(None)
-        
+
         prefix = '%s%s.' % (self.name_prefix, index )
         child_manip = man_class(self.follow, self.name_parts + ( str(index), )  )
-        
+
         self[index] = child_manip
         return child_manip
 
@@ -450,7 +450,7 @@ class ManipulatorCollection(list, Naming):
                 manip_data = manip.flatten_data()
                 new_data.update(manip_data)
         return new_data
-    
+
     def get_validation_errors(self, new_data):
         "Returns dictionary mapping field_names to error-message lists"
         errors = {}
@@ -458,9 +458,8 @@ class ManipulatorCollection(list, Naming):
             if manip:
                 errors.update(manip.get_validation_errors(new_data))
         return errors
-    
+
     def do_html2python(self, new_data):
-        print "coll: ", self
         for manip in self:
             if manip:
                 manip.do_html2python(new_data)
