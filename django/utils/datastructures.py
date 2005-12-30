@@ -74,7 +74,7 @@ class MultiValueDict(dict):
         try:
             list_ = dict.__getitem__(self, key)
         except KeyError:
-            raise MultiValueDictKeyError, "Key %r not found in MultiValueDict %r" % (key, self)
+            raise MultiValueDictKeyError, "Key %r not found in %r" % (key, self)
         try:
             return list_[-1]
         except IndexError:
@@ -189,10 +189,10 @@ class DotExpandedDict(dict):
                 current[bits[-1]] = v
             except TypeError: # Special-case if current isn't a dict.
                 current = {bits[-1] : v}
-                
-def dot_expand(key_to_list_mapping, dict_factory=dict):                
+
+def dot_expand(key_to_list_mapping, dict_factory=dict):
     top = dict_factory()
-    
+
     for k, v in key_to_list_mapping.items():
         current = top
         bits = k.split('.')
@@ -203,4 +203,4 @@ def dot_expand(key_to_list_mapping, dict_factory=dict):
             current[bits[-1]] = v
         except TypeError: # Special-case if current isn't a dict.
             current = dict_factory( (bits[-1], v) )
-    return top    
+    return top
