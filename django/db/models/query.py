@@ -236,10 +236,11 @@ def parse_lookup(kwarg_items, opts):
                     # is set to True, which means the kwarg was bad.
                     # Example: choices.get_list(poll__exact='foo')
                     throw_bad_kwarg_error(kwarg)
-                # Try many-to-many relationships first...
+                # Try many-to-many relationships in the direction in which they are
+                # originally defined (i.e., the class that defines the ManyToManyField)
                 for f in current_opts.many_to_many:
                     if f.name == current:
-                        rel_table_alias = backend.quote_name(current_table_alias + LOOKUP_SEPARATOR + current)
+                        rel_table_alias = backend.quote_name("m2m_" + current_table_alias + LOOKUP_SEPARATOR + current)
 
                         joins[rel_table_alias] = (
                             backend.quote_name(f.get_m2m_db_table(current_opts)),
@@ -274,6 +275,46 @@ def parse_lookup(kwarg_items, opts):
                             current_table_alias = new_table_alias
                             param_required = True
                         current_opts = f.rel.to._meta
+                        raise StopIteration
+                # Try many-to-many relationships first in the reverse direction
+                # (i.e., from the class does not have the ManyToManyField)
+                for f in current_opts.get_all_related_many_to_many_objects():
+                    if f.name == current:
+                        rel_table_alias = backend.quote_name("m2m_" + current_table_alias + LOOKUP_SEPARATOR + current)
+
+                        joins[rel_table_alias] = (
+                            backend.quote_name(f.field.get_m2m_db_table(f.opts)),
+                            "INNER JOIN",
+                            '%s.%s = %s.%s' %
+                                (backend.quote_name(current_table_alias),
+                                backend.quote_name(current_opts.pk.column),
+                                rel_table_alias,
+                                backend.quote_name(current_opts.object_name.lower() + '_id'))
+                        )
+
+                        # Optimization: In the case of primary-key lookups, we
+                        # don't have to do an extra join.
+                        if lookup_list and lookup_list[0] == f.opts.pk.name and lookup_type == 'exact':
+                            where.append(get_where_clause(lookup_type, rel_table_alias+'.',
+                                f.opts.object_name.lower()+'_id', kwarg_value))
+                            params.extend(f.field.get_db_prep_lookup(lookup_type, kwarg_value))
+                            lookup_list.pop()
+                            param_required = False
+                        else:
+                            new_table_alias = current_table_alias + LOOKUP_SEPARATOR + current
+
+                            joins[backend.quote_name(new_table_alias)] = (
+                                backend.quote_name(f.opts.db_table),
+                                "INNER JOIN",
+                                '%s.%s = %s.%s' %
+                                    (rel_table_alias,
+                                    backend.quote_name(f.opts.object_name.lower() + '_id'),
+                                    backend.quote_name(new_table_alias),
+                                    backend.quote_name(f.opts.pk.column))
+                            )
+                            current_table_alias = new_table_alias
+                            param_required = True
+                        current_opts = f.opts
                         raise StopIteration
                 for f in current_opts.fields:
                     # Try many-to-one relationships...

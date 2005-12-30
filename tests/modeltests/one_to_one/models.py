@@ -66,6 +66,8 @@ DoesNotExist: Restaurant does not exist for {'place__id__exact': ...}
 
 >>> Restaurant.objects.get_object(place__id__exact=1)
 Demon Dogs the restaurant
+>>> Restaurant.objects.get_object(place__name__startswith="Demon")
+Demon Dogs the restaurant
 >>> Restaurant.objects.get_object(pk=1)
 Demon Dogs the restaurant
 
