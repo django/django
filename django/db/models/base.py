@@ -187,7 +187,7 @@ class Model(object):
         connection.commit()
 
         # Run any post-save hooks.
-        dispatcher.send(signal=signals.pre_save, sender = self.__class__, instance = self )
+        dispatcher.send(signal=signals.pre_save, sender=self.__class__, instance=self)
 
         if hasattr(self, '_post_save'):
             self._post_save()
