@@ -584,8 +584,10 @@ TEMPLATE_DIRS
 
 Default: ``()`` (Empty tuple)
 
-List of locations of the template source files, in search order. See the
-`template documentation`_.
+List of locations of the template source files, in search order. Note that
+these paths should use Unix-style forward slashes, even on Windows.
+
+See the `template documentation`_.
 
 TEMPLATE_FILE_EXTENSION
 -----------------------
