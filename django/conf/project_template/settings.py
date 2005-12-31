@@ -60,6 +60,7 @@ ROOT_URLCONF = '{{ project_name }}.urls'
 
 TEMPLATE_DIRS = (
     # Put strings here, like "/home/html/django_templates".
+    # Always use forward slashes, even on Windows.
 )
 
 INSTALLED_APPS = (
