@@ -1,4 +1,6 @@
 from django.conf.settings import DATABASE_ENGINE
+from django.core import signals
+from django.dispatch import dispatcher
 
 __all__ = ('backend', 'connection', 'DatabaseError')
 
@@ -23,3 +25,17 @@ get_creation_module = lambda: __import__('django.db.backends.%s.creation' % DATA
 
 connection = backend.DatabaseWrapper()
 DatabaseError = backend.DatabaseError
+
+# Register an event that closes the database connection
+# when a Django request is finished.
+dispatcher.connect(lambda: connection.close(), signal=signals.request_finished)
+
+# Register an event that resets connection.queries
+# when a Django request is started.
+def reset_queries():
+    connection.queries = []
+dispatcher.connect(reset_queries, signal=signals.request_started)
+
+# Register an event that rolls back the connection
+# when a Django request has an exception.
+dispatcher.connect(lambda: connection.rollback(), signal=signals.got_request_exception)

@@ -1,4 +1,6 @@
 from django.core.handlers.base import BaseHandler
+from django.core import signals
+from django.dispatch import dispatcher
 from django.utils import datastructures, httpwrappers
 from pprint import pformat
 
@@ -143,18 +145,18 @@ class WSGIRequest(httpwrappers.HttpRequest):
 class WSGIHandler(BaseHandler):
     def __call__(self, environ, start_response):
         from django.conf import settings
-        from django.db import connection
 
         # Set up middleware if needed. We couldn't do this earlier, because
         # settings weren't available.
         if self._request_middleware is None:
             self.load_middleware()
 
+        dispatcher.send(signal=signals.request_started)
         try:
             request = WSGIRequest(environ)
             response = self.get_response(request.path, request)
         finally:
-            connection.close()
+            dispatcher.send(signal=signals.request_finished)
 
         # Apply response middleware
         for middleware_method in self._response_middleware:
