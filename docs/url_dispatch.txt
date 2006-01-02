@@ -328,7 +328,7 @@ the following example is valid::
     )
 
     # In foo/urls/blog.py
-    urlpatterns = patterns('foo.views'
+    urlpatterns = patterns('foo.views',
         (r'^$', 'blog.index'),
         (r'^archive/$', 'blog.archive'),
     )
