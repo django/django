@@ -46,7 +46,7 @@ class CommonMiddleware:
                 newurl = new_url[1]
             if request.GET:
                 newurl += '?' + request.GET.urlencode()
-            return httpwrappers.HttpResponseRedirect(newurl)
+            return httpwrappers.HttpResponsePermanentRedirect(newurl)
 
         return None
 

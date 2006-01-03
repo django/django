@@ -212,6 +212,12 @@ class HttpResponseRedirect(HttpResponse):
         self['Location'] = redirect_to
         self.status_code = 302
 
+class HttpResponsePermanentRedirect(HttpResponse):
+    def __init__(self, redirect_to):
+        HttpResponse.__init__(self)
+        self['Location'] = redirect_to
+        self.status_code = 301
+
 class HttpResponseNotModified(HttpResponse):
     def __init__(self):
         HttpResponse.__init__(self)
