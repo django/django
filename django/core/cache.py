@@ -32,6 +32,9 @@ The CACHE_BACKEND setting is a quasi-URI; examples are:
     locmem:///                      A more sophisticaed local memory cache;
                                     this is multi-process- and thread-safe.
 
+    dummy:///                       Doesn't actually cache. For use in test
+                                    environments.
+
 All caches may take arguments; these are given in query-string style.  Valid
 arguments are:
 
@@ -275,6 +278,29 @@ class _LocMemCache(_SimpleCache):
         finally:
             self._lock.writer_leaves()
 
+###############
+# Dummy cache #
+###############
+
+class _DummyCache(_Cache):
+    def __init__(self, *args, **kwargs):
+        pass
+
+    def get(self, *args, **kwargs):
+        pass
+
+    def set(self, *args, **kwargs):
+        pass
+
+    def delete(self, *args, **kwargs):
+        pass
+
+    def get_many(self, *args, **kwargs):
+        pass
+
+    def has_key(self, *args, **kwargs):
+        return False
+
 ####################
 # File-based cache #
 ####################
@@ -443,11 +469,12 @@ class _DBCache(_Cache):
 from cgi import parse_qsl
 
 _BACKENDS = {
-    'memcached' : _MemcachedCache,
-    'simple'    : _SimpleCache,
-    'locmem'    : _LocMemCache,
-    'file'      : _FileCache,
-    'db'        : _DBCache,
+    'memcached': _MemcachedCache,
+    'simple': _SimpleCache,
+    'locmem': _LocMemCache,
+    'file': _FileCache,
+    'db': _DBCache,
+    'dummy': _DummyCache,
 }
 
 def get_cache(backend_uri):
