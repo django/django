@@ -117,7 +117,8 @@ def urlize(value):
 
 def urlizetrunc(value, limit):
     """
-    Converts URLs into clickable links, truncating URLs to the given character limit
+    Converts URLs into clickable links, truncating URLs to the given character limit,
+    and adding 'rel=nofollow' attribute to discourage spamming.
 
     Argument: Length to truncate URLs to.
     """
@@ -254,7 +255,14 @@ def slice_(value, arg):
     for an introduction.
     """
     try:
-        return value[slice(*[x and int(x) or None for x in arg.split(':')])]
+        bits = []
+        for x in arg.split(':'):
+            if len(x) == 0:
+                bits.append(None)
+            else:
+                bits.append(int(x))
+        return value[slice(*bits)]
+
     except (ValueError, TypeError):
         return value # Fail silently.
 

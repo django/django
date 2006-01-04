@@ -118,7 +118,7 @@ for lang in languages:
                     os.unlink(os.path.join(dirpath, thefile))
 
     if os.path.exists(potfile):
-        (stdin, stdout, stderr) = os.popen3('msguniq %s' % potfile, 'b')
+        (stdin, stdout, stderr) = os.popen3('msguniq "%s"' % potfile, 'b')
         msgs = stdout.read()
         errors = stderr.read()
         if errors:
@@ -127,7 +127,7 @@ for lang in languages:
             sys.exit(8)
         open(potfile, 'w').write(msgs)
         if os.path.exists(pofile):
-            (stdin, stdout, stderr) = os.popen3('msgmerge -q %s %s' % (pofile, potfile), 'b')
+            (stdin, stdout, stderr) = os.popen3('msgmerge -q "%s" "%s"' % (pofile, potfile), 'b')
             msgs = stdout.read()
             errors = stderr.read()
             if errors:

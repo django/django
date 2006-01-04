@@ -24,14 +24,16 @@ def timesince(d, now=None):
     else:
         tz = None
     now = datetime.datetime(t[0], t[1], t[2], t[3], t[4], t[5], tzinfo=tz)
-    delta = now - d
+    
+    # ignore microsecond part of 'd' since we removed it from 'now'
+    delta = now - (d - datetime.timedelta(0, 0, d.microsecond))
     since = delta.days * 24 * 60 * 60 + delta.seconds
     for i, (seconds, name) in enumerate(chunks):
         count = since / seconds
         if count != 0:
             break
     if count < 0:
-        return '%d milliseconds' % math.floor(delta.microseconds / 1000)
+        return '%d milliseconds' % math.floor((now - d).microseconds / 1000)
     s = '%d %s' % (count, name(count))
     if i + 1 < len(chunks):
         # Now get the second item

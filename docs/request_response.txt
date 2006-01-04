@@ -357,7 +357,14 @@ types of HTTP responses. Like ``HttpResponse``, these subclasses live in
 ``HttpResponseRedirect``
     The constructor takes a single argument -- the path to redirect to. This
     can be a fully qualified URL (e.g. ``"http://www.yahoo.com/search/"``) or an
-    absolute URL with no domain (e.g. ``"/search/"``).
+    absolute URL with no domain (e.g. ``"/search/"``). Note that this returns
+    an HTTP status code 302.
+
+``HttpResponsePermanentRedirect``
+    **New in Django development version.***
+
+    Like ``HttpResponseRedirect``, but it returns a permanent redirect (HTTP
+    status code 301) instead of a "found" redirect (status code 302).
 
 ``HttpResponseNotModified``
     The constructor doesn't take any arguments. Use this to designate that a
