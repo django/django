@@ -74,7 +74,7 @@ class MultiValueDict(dict):
         try:
             list_ = dict.__getitem__(self, key)
         except KeyError:
-            raise MultiValueDictKeyError, "Key %r not found in MultiValueDict %r" % (key, self)
+            raise MultiValueDictKeyError, "Key %r not found in %r" % (key, self)
         try:
             return list_[-1]
         except IndexError:
