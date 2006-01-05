@@ -36,7 +36,7 @@ def manipulator_validator_unique(f, opts, self, field_data, all_data):
     "Validates that the value is unique for this field."
     lookup_type = f.get_validator_unique_lookup_type()
     try:
-        old_obj = self.__class__._default_manager.get_object(**{lookup_type: field_data})
+        old_obj = self.manager.get_object(**{lookup_type: field_data})
     except ObjectDoesNotExist:
         return
     if hasattr(self, 'original_object') and getattr(self.original_object, opts.pk.attname) == getattr(old_obj, opts.pk.attname):
@@ -216,13 +216,13 @@ class Field(object):
             params['choices'] = self.get_choices_default()
         else:
             field_objs = self.get_manipulator_field_objs()
-        return (field_objs,params)
+        return (field_objs, params)
 
     def get_fields_and_manipulators(self, opts, manipulator, follow):
         change = manipulator.change
         rel = manipulator.name_prefix != ''
         name_prefix = manipulator.name_prefix
-        return (self.get_manipulator_fields(opts, manipulator, change,name_prefix, rel, follow), None )
+        return (self.get_manipulator_fields(opts, manipulator, change, name_prefix, rel, follow), None)
 
     def get_manipulator_fields(self, opts, manipulator, change, name_prefix='', rel=False, follow=True):
         """

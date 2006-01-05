@@ -80,7 +80,7 @@ class AutomaticManipulator(Manipulator, Naming):
         setattr(other_cls, name, ManipulatorDescriptor(name, cls))
     contribute_to_class = classmethod(contribute_to_class)
 
-    def __init__(self, original_object=None, follow=None, name_parts=() ):
+    def __init__(self, original_object=None, follow=None, name_parts=()):
         Naming.__init__(self, name_parts)
         if name_parts == ():
             self.follow = self.model._meta.get_follow(follow)
@@ -100,7 +100,7 @@ class AutomaticManipulator(Manipulator, Naming):
         self.ignore_errors = False
 
     def get_fields(self):
-        if self.needs_deletion :
+        if self.needs_deletion:
             return []
         else:
             return self.fields_
@@ -130,7 +130,7 @@ class AutomaticManipulator(Manipulator, Naming):
             child.do_html2python(new_data)
 
     def get_original_value(self, field):
-        raise NotImplemented
+        raise NotImplementedError
 
     def get_new_object(self, expanded_data, overrides=None):
         params = {}
@@ -200,10 +200,9 @@ class AutomaticManipulator(Manipulator, Naming):
                     child_manips = manips
                     break
             if child_manips == None:
-                raise BadCommand, "'%s' : unknown manipulator collection name." % (part,)
+                raise BadCommand, "'%s': unknown manipulator collection name." % (part,)
             else:
                 child_manips._do_command_expanded(command_parts)
-
 
     def save(self, new_data):
         self.update(new_data)
@@ -285,7 +284,7 @@ class ModelAddManipulator(AutomaticManipulator):
         return field.get_default()
 
     def __repr__(self):
-        return "<Automatic AddManipulator '%s' for %s>" % (self.name_prefix, self.model.__name__, )
+        return "<Automatic AddManipulator '%s' for %s>" % (self.name_prefix, self.model.__name__)
 
 class ModelChangeManipulator(AutomaticManipulator):
     change = True
@@ -318,6 +317,10 @@ class ModelChangeManipulator(AutomaticManipulator):
                     original_object = opts.get_model_module().Klass(**params)
                 else:
                     raise
+            else:
+                # Save the obj_key even though we already have it, in case it's
+                # currently a string and needs to be an integer.
+                self.obj_key = getattr(original_object, self.model._meta.pk.attname)
 
         super(ModelChangeManipulator, self).__init__(original_object=original_object, follow=follow, name_parts=name_parts)
         #self.original_object = original_object
@@ -347,7 +350,7 @@ class ManipulatorCollection(list, Naming):
         man_class = self.model.ChangeManipulator
 
         for i,obj in enumerate(self._get_list()):
-            self.append(man_class(obj,self.follow, self.name_parts + (str(i),)  ))
+            self.append(man_class(obj, self.follow, self.name_parts + (str(i),)))
 
     def _save_child(self, manip, parent_key):
         manip.save_from_update()
@@ -370,7 +373,7 @@ class ManipulatorCollection(list, Naming):
                     manip.needs_deletion = True
         if expanded_data:
             # There are new objects in the data
-            items = [ (int(k),v ) for k,v in expanded_data.items() ]
+            items = [(int(k), v) for k, v in expanded_data.items()]
             items.sort(cmp = lambda x, y: cmp(x[0], y[0]))
             for index, obj_data in items:
                 child_manip = self.add_child(index)
