@@ -68,6 +68,15 @@ def get_sql_create(app):
     from django.db import backend, get_creation_module, models
 
     data_types = get_creation_module().DATA_TYPES
+
+    if not data_types:
+        # This must be the "dummy" database backend, which means the user
+        # hasn't set DATABASE_ENGINE.
+        sys.stderr.write("Error: Django doesn't know which syntax to use for your SQL statements,\n" +
+            "because you haven't specified the DATABASE_ENGINE setting.\n" +
+            "Edit your settings file and change DATABASE_ENGINE to something like 'postgresql' or 'mysql'.\n")
+        sys.exit(1)
+
     final_output = []
     models_output = set()
     pending_references = {}
