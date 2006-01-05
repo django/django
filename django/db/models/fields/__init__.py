@@ -110,11 +110,11 @@ class Field(object):
 
         # Set db_index to True if the field has a relationship and doesn't explicitly set db_index.
         self.db_index = db_index
-        
-        self.deprecated_args = [] 
-        if core: 
+
+        self.deprecated_args = []
+        if core:
             self.deprecated_args.append('core')
-        
+
         # Increase the creation counter, and save our local copy.
         self.creation_counter = Field.creation_counter
         Field.creation_counter += 1
@@ -218,7 +218,7 @@ class Field(object):
             field_objs = self.get_manipulator_field_objs()
         return (field_objs,params)
 
-    def get_fields_and_manipulators(self, opts, manipulator, follow ):
+    def get_fields_and_manipulators(self, opts, manipulator, follow):
         change = manipulator.change
         rel = manipulator.name_prefix != ''
         name_prefix = manipulator.name_prefix
@@ -251,7 +251,7 @@ class Field(object):
 
         # Only add is_required=True if the field cannot be blank. Primary keys
         # are a special case.
-        params['is_required'] = not self.blank and not self.primary_key 
+        params['is_required'] = not self.blank and not self.primary_key
 
         # If this field is in a related context, check whether any other fields
         # in the related object have core=True. If so, add a validator --
@@ -276,7 +276,7 @@ class Field(object):
         return [man(field_name=field_names[i], **params) for i, man in enumerate(field_objs)]
 
     def get_validator_unique_lookup_type(self):
-        return '%s__exact' % f.name
+        return '%s__exact' % self.name
 
     def get_manipulator_new_data(self, new_data, rel=False):
         """
@@ -353,7 +353,7 @@ class AutoField(Field):
 
     def contribute_to_class(self, cls, name):
         if cls._meta.has_auto_field:
-            raise AssertionError, "A model can't have more than one AutoField." 
+            raise AssertionError, "A model can't have more than one AutoField."
         super(AutoField, self).contribute_to_class(cls, name)
         cls._meta.has_auto_field = True
 
@@ -516,8 +516,8 @@ class FileField(Field):
         setattr(cls, 'get_%s_filename' % self.name, curry(cls._get_FIELD_filename, field=self))
         setattr(cls, 'get_%s_url' % self.name, curry(cls._get_FIELD_url, field=self))
         setattr(cls, 'get_%s_size' % self.name, curry(cls._get_FIELD_size, field=self))
-        setattr(cls, 'save_%s_file' % self.name, 
-                 lambda instance, filename, raw_contents: 
+        setattr(cls, 'save_%s_file' % self.name,
+                 lambda instance, filename, raw_contents:
                      instance._save_FIELD_file(self,filename, raw_contents)
                  )
         dispatcher.connect(
@@ -721,10 +721,10 @@ class OrderingField(IntegerField):
         self.wrt = with_respect_to
         kwargs['null'] = True
         IntegerField.__init__(self, **kwargs )
-    
+
     def get_internal_type(self):
         return "IntegerField"
-    
+
     def get_manipulator_fields(self, opts, manipulator, change, name_prefix='', rel=False, follow=True):
         return [formfields.HiddenField(name_prefix + self.name)  ]
 

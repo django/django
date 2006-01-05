@@ -2,13 +2,11 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.core import formfields
 from django.core.formfields import Manipulator
 from django.db.models.fields import FileField, AutoField
-
 from django.db.models.exceptions import BadCommand
 from django.dispatch import dispatcher
 from django.db.models import signals
 from django.utils.functional import curry
 from django.utils.datastructures import dot_expand, MultiValueDict
-
 import types
 
 def add_manipulators(sender):
@@ -34,7 +32,7 @@ class ManipulatorDescriptor(object):
             if not self.man:
                 # Create a class which inherits from the MANIPULATOR class given in the class,
                 # and the appropriate automatic manipulator,
-                bases = [ self.base ]
+                bases = [self.base]
                 if hasattr(type, 'MANIPULATOR'):
                     bases = [type.MANIPULATOR] + bases
                 self.man = types.ClassType(self.name, tuple(bases), {})

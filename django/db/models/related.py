@@ -7,11 +7,11 @@ class RelatedManipulatorCollection(ManipulatorCollection):
         self.related = related
         super(RelatedManipulatorCollection, self).__init__(
             related.model,follow,name_parts)
-        
+
     def _save_child(self, manip, parent_key):
         setattr(manip.original_object, self.related.field.attname, parent_key)
         super(RelatedManipulatorCollection, self)._save_child(manip, parent_key)
-        
+
     def _get_list(self):
         if self.instance != None:
             meth_name = 'get_%s_list' % self.related.get_method_name_part()
@@ -92,17 +92,16 @@ class RelatedObject(object):
 
         over[self.field.name] = False
         return self.opts.get_follow(over)
-        
+
     def __repr__(self):
         return "<RelatedObject: %s related to %s>" % (self.name, self.field.name)
 
-    def get_fields_and_manipulators(self, opts, manipulator, follow ):
-        return ([], self.get_manipulators(manipulator, follow)  )
+    def get_fields_and_manipulators(self, opts, manipulator, follow):
+        return ([], self.get_manipulators(manipulator, follow))
 
-    def get_manipulators(self,parent_manipulator, follow):
+    def get_manipulators(self, parent_manipulator, follow):
         name_parts = parent_manipulator.name_parts
         obj = parent_manipulator.original_object
-        
         return RelatedManipulatorCollection(self, name_parts, obj, follow)
 
     def bind(self, field_mapping, original, bound_related_object_class=BoundRelatedObject):
