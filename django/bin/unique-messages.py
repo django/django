@@ -19,7 +19,7 @@ for (dirpath, dirnames, filenames) in os.walk(basedir):
         if file.endswith('.po'):
             sys.stderr.write('processing file %s in %s\n' % (file, dirpath))
             pf = os.path.splitext(os.path.join(dirpath, file))[0]
-            cmd = 'msguniq %s.po' % pf
+            cmd = 'msguniq "%s.po"' % pf
             stdout = os.popen(cmd)
             msg = stdout.read()
             open('%s.po' % pf, 'w').write(msg)
