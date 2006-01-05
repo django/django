@@ -280,7 +280,7 @@ TECHNICAL_500_TEMPLATE = """
 
 <div id="summary">
   <h1>{{ exception_type }} at {{ request.path }}</h1>
-  <h2>{{ exception_value }}</h2>
+  <h2>{{ exception_value|escape }}</h2>
   <table class="meta">
     <tr>
       <th>Request Method:</th>

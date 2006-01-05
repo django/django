@@ -8,8 +8,8 @@ msgstr ""
 "Project-Id-Version: django v1.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2005-12-29 00:03+0100\n"
-"PO-Revision-Date: 2005-12-10 22:08+0800\n"
-"Last-Translator: Hiweed Leng <hiweed@gmail.com>\n"
+"PO-Revision-Date: 2006-01-05 13:46+0800\n"
+"Last-Translator: limodou <limodou@gmail.com>\n"
 "Language-Team: Simplified Chinese <limodou@gmail.com>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
@@ -79,7 +79,8 @@ msgstr "日期/时间已提交"
 msgid "is public"
 msgstr "公开"
 
-#: contrib/comments/models/comments.py:26 contrib/admin/views/doc.py:256
+#: contrib/comments/models/comments.py:26
+#: contrib/admin/views/doc.py:256
 msgid "IP address"
 msgstr "IP地址"
 
@@ -88,11 +89,8 @@ msgid "is removed"
 msgstr "被删除"
 
 #: contrib/comments/models/comments.py:27
-msgid ""
-"Check this box if the comment is inappropriate. A \"This comment has been "
-"removed\" message will be displayed instead."
-msgstr ""
-"如果评论不适合选中这个检查框。评论将被一条\"此评论已经被删除\"的消息所替换。"
+msgid "Check this box if the comment is inappropriate. A \"This comment has been removed\" message will be displayed instead."
+msgstr "如果评论不适合选中这个检查框。评论将被一条\"此评论已经被删除\"的消息所替换。"
 
 #: contrib/comments/models/comments.py:31
 msgid "Comment"
@@ -221,20 +219,17 @@ msgid "No voting for yourself"
 msgstr "不能给自已投票"
 
 #: contrib/comments/views/comments.py:25
-msgid ""
-"This rating is required because you've entered at least one other rating."
+msgid "This rating is required because you've entered at least one other rating."
 msgstr "要求此等级，因为你已经输入了至少一个等级。"
 
 #: contrib/comments/views/comments.py:109
 #, python-format
 msgid ""
-"This comment was posted by a user who has posted fewer than %(count)s "
-"comment:\n"
+"This comment was posted by a user who has posted fewer than %(count)s comment:\n"
 "\n"
 "%(text)s"
 msgid_plural ""
-"This comment was posted by a user who has posted fewer than %(count)s "
-"comments:\n"
+"This comment was posted by a user who has posted fewer than %(count)s comments:\n"
 "\n"
 "%(text)s"
 msgstr[0] ""
@@ -270,9 +265,7 @@ msgstr "有人篡改了评论表格(安全侵害)"
 
 #: contrib/comments/views/comments.py:204
 #: contrib/comments/views/comments.py:289
-msgid ""
-"The comment form had an invalid 'target' parameter -- the object ID was "
-"invalid"
+msgid "The comment form had an invalid 'target' parameter -- the object ID was invalid"
 msgstr "评论表格有一个无效的 'target' 参数 -- 对象 ID 无效"
 
 #: contrib/comments/views/comments.py:254
@@ -289,7 +282,8 @@ msgstr ""
 "<h3>由 %s:</h3>\n"
 "<ul>\n"
 
-#: contrib/admin/filterspecs.py:70 contrib/admin/filterspecs.py:88
+#: contrib/admin/filterspecs.py:70
+#: contrib/admin/filterspecs.py:88
 #: contrib/admin/filterspecs.py:143
 msgid "All"
 msgstr "全部"
@@ -358,12 +352,11 @@ msgstr "日志记录"
 msgid "All dates"
 msgstr "全有日期"
 
-#: contrib/admin/views/decorators.py:9 parts/auth/formfields.py:33
+#: contrib/admin/views/decorators.py:9
+#: parts/auth/formfields.py:33
 #: parts/auth/formfields.py:38
-msgid ""
-"Please enter a correct username and password. Note that both fields are case-"
-"sensitive."
-msgstr ""
+msgid "Please enter a correct username and password. Note that both fields are case-sensitive."
+msgstr "请输入正确的用户名和口令。请注意两个域都是大小写敏感的。"
 
 #: contrib/admin/views/decorators.py:23
 #: contrib/admin/templates/admin/login.html:24
@@ -371,18 +364,12 @@ msgid "Log in"
 msgstr "登录"
 
 #: contrib/admin/views/decorators.py:57
-msgid ""
-"Please log in again, because your session has expired. Don't worry: Your "
-"submission has been saved."
+msgid "Please log in again, because your session has expired. Don't worry: Your submission has been saved."
 msgstr "请重新登录，因为你的会话已经过期。不用担心：你的提交已经被保存。"
 
 #: contrib/admin/views/decorators.py:64
-msgid ""
-"Looks like your browser isn't configured to accept cookies. Please enable "
-"cookies, reload this page, and try again."
-msgstr ""
-"看上去你的浏览器没有配置成接受 cookie 。请允许 cookie，重新装入本页面，再试一"
-"次。"
+msgid "Looks like your browser isn't configured to accept cookies. Please enable cookies, reload this page, and try again."
+msgstr "看上去你的浏览器没有配置成接受 cookie 。请允许 cookie，重新装入本页面，再试一次。"
 
 #: contrib/admin/views/decorators.py:78
 msgid "Usernames cannot contain the '@' character."
@@ -412,11 +399,13 @@ msgstr "选择 %s 来修改"
 msgid "The %(name)s \"%(obj)s\" was added successfully."
 msgstr "%(name)s \"%(obj)s\" 添加成功。"
 
-#: contrib/admin/views/main.py:415 contrib/admin/views/main.py:492
+#: contrib/admin/views/main.py:415
+#: contrib/admin/views/main.py:492
 msgid "You may edit it again below."
 msgstr "你可以在下面再次编辑它。"
 
-#: contrib/admin/views/main.py:423 contrib/admin/views/main.py:501
+#: contrib/admin/views/main.py:423
+#: contrib/admin/views/main.py:501
 #, python-format
 msgid "You may add another %s below."
 msgstr "你可以在下面增加另一个 %s 。"
@@ -431,7 +420,8 @@ msgstr "增加 %s"
 msgid "Added %s."
 msgstr "%s 已增加。"
 
-#: contrib/admin/views/main.py:457 contrib/admin/views/main.py:459
+#: contrib/admin/views/main.py:457
+#: contrib/admin/views/main.py:459
 #: contrib/admin/views/main.py:461
 msgid "and"
 msgstr "和"
@@ -457,8 +447,7 @@ msgstr "%(name)s \"%(obj)s\" 修改成功。"
 
 #: contrib/admin/views/main.py:498
 #, python-format
-msgid ""
-"The %(name)s \"%(obj)s\" was added successfully. You may edit it again below."
+msgid "The %(name)s \"%(obj)s\" was added successfully. You may edit it again below."
 msgstr "%(name)s \"%(obj)s\" 添加成功。你可以在下面再次编辑它。"
 
 #: contrib/admin/views/main.py:536
@@ -490,9 +479,12 @@ msgstr "你确信吗？"
 msgid "Change history: %s"
 msgstr "修改历史： %s"
 
-#: contrib/admin/views/doc.py:244 contrib/admin/views/doc.py:253
-#: contrib/admin/views/doc.py:255 contrib/admin/views/doc.py:261
-#: contrib/admin/views/doc.py:262 contrib/admin/views/doc.py:264
+#: contrib/admin/views/doc.py:244
+#: contrib/admin/views/doc.py:253
+#: contrib/admin/views/doc.py:255
+#: contrib/admin/views/doc.py:261
+#: contrib/admin/views/doc.py:262
+#: contrib/admin/views/doc.py:264
 msgid "Integer"
 msgstr "整数"
 
@@ -521,7 +513,8 @@ msgstr "日期(带时间)"
 msgid "E-mail address"
 msgstr "邮箱地址"
 
-#: contrib/admin/views/doc.py:251 contrib/admin/views/doc.py:254
+#: contrib/admin/views/doc.py:251
+#: contrib/admin/views/doc.py:254
 msgid "File path"
 msgstr "文件路径"
 
@@ -553,7 +546,8 @@ msgstr "文本"
 msgid "Time"
 msgstr "时间"
 
-#: contrib/admin/views/doc.py:267 contrib/flatpages/models/flatpages.py:6
+#: contrib/admin/views/doc.py:267
+#: contrib/flatpages/models/flatpages.py:6
 msgid "URL"
 msgstr "URL"
 
@@ -624,7 +618,8 @@ msgstr "历史"
 msgid "Date/time"
 msgstr "日期/时间"
 
-#: contrib/admin/templates/admin/object_history.html:19 models/auth.py:47
+#: contrib/admin/templates/admin/object_history.html:19
+#: models/auth.py:47
 msgid "User"
 msgstr "用户"
 
@@ -637,9 +632,7 @@ msgid "DATE_WITH_TIME_FULL"
 msgstr "N j, Y, P"
 
 #: contrib/admin/templates/admin/object_history.html:36
-msgid ""
-"This object doesn't have a change history. It probably wasn't added via this "
-"admin site."
+msgid "This object doesn't have a change history. It probably wasn't added via this admin site."
 msgstr "此对象没有修改历史。可能不能通过这个管理站点来增加。"
 
 #: contrib/admin/templates/admin/base_site.html:4
@@ -663,12 +656,8 @@ msgid "Server Error <em>(500)</em>"
 msgstr "服务器错误 <em>(500)</em>"
 
 #: contrib/admin/templates/admin/500.html:10
-msgid ""
-"There's been an error. It's been reported to the site administrators via e-"
-"mail and should be fixed shortly. Thanks for your patience."
-msgstr ""
-"存在一个错误。它已经通过电子邮件被报告给站点管理员了，并且应该很快被改正。谢"
-"谢你的关心。"
+msgid "There's been an error. It's been reported to the site administrators via e-mail and should be fixed shortly. Thanks for your patience."
+msgstr "存在一个错误。它已经通过电子邮件被报告给站点管理员了，并且应该很快被改正。谢谢你的关心。"
 
 #: contrib/admin/templates/admin/404.html:4
 #: contrib/admin/templates/admin/404.html:8
@@ -727,21 +716,13 @@ msgstr "欢迎，"
 
 #: contrib/admin/templates/admin/delete_confirmation.html:6
 #, python-format
-msgid ""
-"Deleting the %(object_name)s '%(object)s' would result in deleting related "
-"objects, but your account doesn't have permission to delete the following "
-"types of objects:"
-msgstr ""
-"删除 %(object_name)s  '%(object)s' 会导致删除相关的对象，但你的帐号无权删除下"
-"列类型的对象："
+msgid "Deleting the %(object_name)s '%(object)s' would result in deleting related objects, but your account doesn't have permission to delete the following types of objects:"
+msgstr "删除 %(object_name)s  '%(object)s' 会导致删除相关的对象，但你的帐号无权删除下列类型的对象："
 
 #: contrib/admin/templates/admin/delete_confirmation.html:13
 #, python-format
-msgid ""
-"Are you sure you want to delete the %(object_name)s \"%(object)s\"? All of "
-"the following related items will be deleted:"
-msgstr ""
-"你确信相要删除 %(object_name)s \"%(object)s\"？所有相关的项目都将被删除："
+msgid "Are you sure you want to delete the %(object_name)s \"%(object)s\"? All of the following related items will be deleted:"
+msgstr "你确信相要删除 %(object_name)s \"%(object)s\"？所有相关的项目都将被删除："
 
 #: contrib/admin/templates/admin/delete_confirmation.html:17
 msgid "Yes, I'm sure"
@@ -817,12 +798,8 @@ msgid "Password reset"
 msgstr "口令重设"
 
 #: contrib/admin/templates/registration/password_reset_form.html:12
-msgid ""
-"Forgotten your password? Enter your e-mail address below, and we'll reset "
-"your password and e-mail the new one to you."
-msgstr ""
-"忘记你的口令？在下面输入你的邮箱地址，我们将重设你的口令并且将新的口令通过邮"
-"件发送给你。"
+msgid "Forgotten your password? Enter your e-mail address below, and we'll reset your password and e-mail the new one to you."
+msgstr "忘记你的口令？在下面输入你的邮箱地址，我们将重设你的口令并且将新的口令通过邮件发送给你。"
 
 #: contrib/admin/templates/registration/password_reset_form.html:16
 msgid "E-mail address:"
@@ -846,19 +823,12 @@ msgid "Password reset successful"
 msgstr "口令重设成功"
 
 #: contrib/admin/templates/registration/password_reset_done.html:12
-msgid ""
-"We've e-mailed a new password to the e-mail address you submitted. You "
-"should be receiving it shortly."
-msgstr ""
-"我们已经按你所提交的邮箱地址发送了一个新的口令给你。你应该很会收到这封邮件。"
+msgid "We've e-mailed a new password to the e-mail address you submitted. You should be receiving it shortly."
+msgstr "我们已经按你所提交的邮箱地址发送了一个新的口令给你。你应该很会收到这封邮件。"
 
 #: contrib/admin/templates/registration/password_change_form.html:12
-msgid ""
-"Please enter your old password, for security's sake, and then enter your new "
-"password twice so we can verify you typed it in correctly."
-msgstr ""
-"请输入你的旧口令，为了安全起见，接着要输入你的新口令两遍，这样我们可以校验你"
-"输入的是否正确。"
+msgid "Please enter your old password, for security's sake, and then enter your new password twice so we can verify you typed it in correctly."
+msgstr "请输入你的旧口令，为了安全起见，接着要输入你的新口令两遍，这样我们可以校验你输入的是否正确。"
 
 #: contrib/admin/templates/registration/password_change_form.html:17
 msgid "Old password:"
@@ -942,9 +912,7 @@ msgid "Documentation for this page"
 msgstr "本页面的文档"
 
 #: contrib/admin/templates/admin_doc/bookmarklets.html:20
-msgid ""
-"Jumps you from any page to the documentation for the view that generates "
-"that page."
+msgid "Jumps you from any page to the documentation for the view that generates that page."
 msgstr "对于任何页面跳转到生成这个页面的view所在的文件。"
 
 #: contrib/admin/templates/admin_doc/bookmarklets.html:22
@@ -952,9 +920,7 @@ msgid "Show object ID"
 msgstr "显示对象ID"
 
 #: contrib/admin/templates/admin_doc/bookmarklets.html:23
-msgid ""
-"Shows the content-type and unique ID for pages that represent a single "
-"object."
+msgid "Shows the content-type and unique ID for pages that represent a single object."
 msgstr "用于那些表现单个对象的页面显示 content-type 和唯一ID。"
 
 #: contrib/admin/templates/admin_doc/bookmarklets.html:25
@@ -983,21 +949,18 @@ msgstr "时间："
 
 #: contrib/admin/templates/widget/file.html:2
 msgid "Currently:"
-msgstr ""
+msgstr "当前："
 
 #: contrib/admin/templates/widget/file.html:3
-#, fuzzy
 msgid "Change:"
-msgstr "修改"
+msgstr "改动："
 
 #: contrib/redirects/models/redirects.py:7
 msgid "redirect from"
 msgstr "重定向自"
 
 #: contrib/redirects/models/redirects.py:8
-msgid ""
-"This should be an absolute path, excluding the domain name. Example: '/"
-"events/search/'."
+msgid "This should be an absolute path, excluding the domain name. Example: '/events/search/'."
 msgstr "应该是一个绝对路径，不包括域名。例如：'/events/search/'。"
 
 #: contrib/redirects/models/redirects.py:9
@@ -1005,9 +968,7 @@ msgid "redirect to"
 msgstr "重定向到"
 
 #: contrib/redirects/models/redirects.py:10
-msgid ""
-"This can be either an absolute path (as above) or a full URL starting with "
-"'http://'."
+msgid "This can be either an absolute path (as above) or a full URL starting with 'http://'."
 msgstr "可以是绝对路径(同上)或以'http://'开始的全URL。"
 
 #: contrib/redirects/models/redirects.py:12
@@ -1019,8 +980,7 @@ msgid "redirects"
 msgstr "重定向"
 
 #: contrib/flatpages/models/flatpages.py:7
-msgid ""
-"Example: '/about/contact/'. Make sure to have leading and trailing slashes."
+msgid "Example: '/about/contact/'. Make sure to have leading and trailing slashes."
 msgstr "例如：'/about/contact/'。请确保前导和结尾的除号。"
 
 #: contrib/flatpages/models/flatpages.py:8
@@ -1040,11 +1000,8 @@ msgid "template name"
 msgstr "模板名称"
 
 #: contrib/flatpages/models/flatpages.py:12
-msgid ""
-"Example: 'flatpages/contact_page'. If this isn't provided, the system will "
-"use 'flatpages/default'."
-msgstr ""
-"例如：'flatfiles/contact_page'。如果未提供，系统将使用'flatfiles/default'。"
+msgid "Example: 'flatpages/contact_page'. If this isn't provided, the system will use 'flatpages/default'."
+msgstr "例如：'flatfiles/contact_page'。如果未提供，系统将使用'flatfiles/default'。"
 
 #: contrib/flatpages/models/flatpages.py:13
 msgid "registration required"
@@ -1110,23 +1067,28 @@ msgstr "一月"
 msgid "February"
 msgstr "二月"
 
-#: utils/dates.py:14 utils/dates.py:27
+#: utils/dates.py:14
+#: utils/dates.py:27
 msgid "March"
 msgstr "三月"
 
-#: utils/dates.py:14 utils/dates.py:27
+#: utils/dates.py:14
+#: utils/dates.py:27
 msgid "April"
 msgstr "四月"
 
-#: utils/dates.py:14 utils/dates.py:27
+#: utils/dates.py:14
+#: utils/dates.py:27
 msgid "May"
 msgstr "五月"
 
-#: utils/dates.py:14 utils/dates.py:27
+#: utils/dates.py:14
+#: utils/dates.py:27
 msgid "June"
 msgstr "六月"
 
-#: utils/dates.py:15 utils/dates.py:27
+#: utils/dates.py:15
+#: utils/dates.py:27
 msgid "July"
 msgstr "七月"
 
@@ -1223,7 +1185,10 @@ msgstr "站点"
 msgid "label"
 msgstr "标签"
 
-#: models/core.py:29 models/core.py:40 models/auth.py:6 models/auth.py:19
+#: models/core.py:29
+#: models/core.py:40
+#: models/auth.py:6
+#: models/auth.py:19
 msgid "name"
 msgstr "名称"
 
@@ -1275,7 +1240,8 @@ msgstr "代码名称"
 msgid "Permission"
 msgstr "许可"
 
-#: models/auth.py:11 models/auth.py:58
+#: models/auth.py:11
+#: models/auth.py:58
 msgid "Permissions"
 msgstr "许可"
 
@@ -1283,7 +1249,8 @@ msgstr "许可"
 msgid "Group"
 msgstr "组"
 
-#: models/auth.py:23 models/auth.py:60
+#: models/auth.py:23
+#: models/auth.py:60
 msgid "Groups"
 msgstr "组"
 
@@ -1336,11 +1303,8 @@ msgid "date joined"
 msgstr "加入日期"
 
 #: models/auth.py:44
-msgid ""
-"In addition to the permissions manually assigned, this user will also get "
-"all permissions granted to each group he/she is in."
-msgstr ""
-"除了手动设置权限以外，用户也会从他(她)所在的小组获得所赋组小组的所有权限。"
+msgid "In addition to the permissions manually assigned, this user will also get all permissions granted to each group he/she is in."
+msgstr "除了手动设置权限以外，用户也会从他(她)所在的小组获得所赋组小组的所有权限。"
 
 #: models/auth.py:48
 msgid "Users"
@@ -1404,7 +1368,7 @@ msgstr "意大利语"
 
 #: conf/global_settings.py:48
 msgid "Japanese"
-msgstr ""
+msgstr "日语"
 
 #: conf/global_settings.py:49
 msgid "Norwegian"
@@ -1440,9 +1404,11 @@ msgstr "简体中文"
 
 #: conf/global_settings.py:57
 msgid "Traditional Chinese"
-msgstr ""
+msgstr "繁体中文"
 
-#: core/formfields.py:59 core/meta/fields.py:285 core/meta/fields.py:488
+#: core/formfields.py:59
+#: core/meta/fields.py:285
+#: core/meta/fields.py:488
 #: core/meta/fields.py:499
 msgid "This field is required."
 msgstr "这个字段是必输项。"
@@ -1457,7 +1423,9 @@ msgstr[0] "确定你输入的文本少于 %s 个字符。"
 msgid "Line breaks are not allowed here."
 msgstr "这里不允许换行符。"
 
-#: core/formfields.py:438 core/formfields.py:509 core/formfields.py:547
+#: core/formfields.py:438
+#: core/formfields.py:509
+#: core/formfields.py:547
 #, python-format
 msgid "Select a valid choice; '%(data)s' is not in %(choices)s."
 msgstr "选择一个有效的选项： '%(data)s' 不在 %(choices)s 中。"
@@ -1543,9 +1511,7 @@ msgid "Enter a valid e-mail address."
 msgstr "输入一个有效的邮件地址。"
 
 #: core/validators.py:150
-msgid ""
-"Upload a valid image. The file you uploaded was either not an image or a "
-"corrupted image."
+msgid "Upload a valid image. The file you uploaded was either not an image or a corrupted image."
 msgstr "上传一个有效的图片。您所上传的文件或者不是图片或是一个破坏的图片。"
 
 #: core/validators.py:157
@@ -1586,7 +1552,8 @@ msgstr "格式错误的 XML: %s"
 msgid "Invalid URL: %s"
 msgstr "无效 URL: %s"
 
-#: core/validators.py:208 core/validators.py:210
+#: core/validators.py:208
+#: core/validators.py:210
 #, python-format
 msgid "The URL %s is a broken link."
 msgstr "URL %s 是一个断开的链接。"
@@ -1610,7 +1577,8 @@ msgstr "这个字段必须与 '%s' 字段相匹配。"
 msgid "Please enter something for at least one field."
 msgstr "请至少在一个字段上输入些什么。"
 
-#: core/validators.py:266 core/validators.py:277
+#: core/validators.py:266
+#: core/validators.py:277
 msgid "Please enter both fields or leave them both empty."
 msgstr "请要么两个字段都输入或者两个字段都空着。"
 
@@ -1640,15 +1608,13 @@ msgstr "请输入一个有效的小数。"
 #: core/validators.py:351
 #, python-format
 msgid "Please enter a valid decimal number with at most %s total digit."
-msgid_plural ""
-"Please enter a valid decimal number with at most %s total digits."
+msgid_plural "Please enter a valid decimal number with at most %s total digits."
 msgstr[0] "请输入一个有效的小数，最多 %s 个数字。 "
 
 #: core/validators.py:354
 #, python-format
 msgid "Please enter a valid decimal number with at most %s decimal place."
-msgid_plural ""
-"Please enter a valid decimal number with at most %s decimal places."
+msgid_plural "Please enter a valid decimal number with at most %s decimal places."
 msgstr[0] "请输入一个有效的小数，最多 %s 个小数位。 "
 
 #: core/validators.py:364
@@ -1676,62 +1642,43 @@ msgstr "不能从 %s 得到任何东西。"
 
 #: core/validators.py:431
 #, python-format
-msgid ""
-"The URL %(url)s returned the invalid Content-Type header '%(contenttype)s'."
+msgid "The URL %(url)s returned the invalid Content-Type header '%(contenttype)s'."
 msgstr "URL %(url)s 返回了无效的 Content-Type 头 '%(contenttype)s'。"
 
 #: core/validators.py:464
 #, python-format
-msgid ""
-"Please close the unclosed %(tag)s tag from line %(line)s. (Line starts with "
-"\"%(start)s\".)"
-msgstr ""
-"请关闭未关闭的 %(tag)s 标签从第 %(line)s 行。(行开始于 \"%(start)s\"。)"
+msgid "Please close the unclosed %(tag)s tag from line %(line)s. (Line starts with \"%(start)s\".)"
+msgstr "请关闭未关闭的 %(tag)s 标签从第 %(line)s 行。(行开始于 \"%(start)s\"。)"
 
 #: core/validators.py:468
 #, python-format
-msgid ""
-"Some text starting on line %(line)s is not allowed in that context. (Line "
-"starts with \"%(start)s\".)"
-msgstr ""
-"在 %(line)s 行开始的一些文本不允许在那个上下文中。(行开始于 \"%(start)s\"。)"
+msgid "Some text starting on line %(line)s is not allowed in that context. (Line starts with \"%(start)s\".)"
+msgstr "在 %(line)s 行开始的一些文本不允许在那个上下文中。(行开始于 \"%(start)s\"。)"
 
 #: core/validators.py:473
 #, python-format
-msgid ""
-"\"%(attr)s\" on line %(line)s is an invalid attribute. (Line starts with \"%"
-"(start)s\".)"
-msgstr ""
-"在 %(line)s 行的\"%(attr)s\"不是一个有效的属性。(行开始于 \"%(start)s\"。)"
+msgid "\"%(attr)s\" on line %(line)s is an invalid attribute. (Line starts with \"%(start)s\".)"
+msgstr "在 %(line)s 行的\"%(attr)s\"不是一个有效的属性。(行开始于 \"%(start)s\"。)"
 
 #: core/validators.py:478
 #, python-format
-msgid ""
-"\"<%(tag)s>\" on line %(line)s is an invalid tag. (Line starts with \"%"
-"(start)s\".)"
-msgstr ""
-"在 %(line)s 行的\"<%(tag)s>\"不是一个有效的标签。(行开始于 \"%(start)s\"。)"
+msgid "\"<%(tag)s>\" on line %(line)s is an invalid tag. (Line starts with \"%(start)s\".)"
+msgstr "在 %(line)s 行的\"<%(tag)s>\"不是一个有效的标签。(行开始于 \"%(start)s\"。)"
 
 #: core/validators.py:482
 #, python-format
-msgid ""
-"A tag on line %(line)s is missing one or more required attributes. (Line "
-"starts with \"%(start)s\".)"
-msgstr ""
-"在行 %(line)s 的标签少了一个或多个必须的属性。(行开始于 \"%(start)s\"。)"
+msgid "A tag on line %(line)s is missing one or more required attributes. (Line starts with \"%(start)s\".)"
+msgstr "在行 %(line)s 的标签少了一个或多个必须的属性。(行开始于 \"%(start)s\"。)"
 
 #: core/validators.py:487
 #, python-format
-msgid ""
-"The \"%(attr)s\" attribute on line %(line)s has an invalid value. (Line "
-"starts with \"%(start)s\".)"
-msgstr ""
-"在行 %(line)s 的\"%(attr)s\"属性有一个无效的值。(行开始于 \"%(start)s\"。)"
+msgid "The \"%(attr)s\" attribute on line %(line)s has an invalid value. (Line starts with \"%(start)s\".)"
+msgstr "在行 %(line)s 的\"%(attr)s\"属性有一个无效的值。(行开始于 \"%(start)s\"。)"
 
 #: core/meta/__init__.py:1947
-#, fuzzy, python-format
+#, python-format
 msgid "%(object)s with this %(type)s already exists for the given %(field)s."
-msgstr "%(optname)s 带有 %(fieldname)s 已经存在。"
+msgstr "带有这个 %(type)s 的 %(object)s 对于给定的 %(field)s 已经存在了。"
 
 #: core/meta/fields.py:46
 #, python-format
@@ -1748,8 +1695,7 @@ msgid " Separate multiple IDs with commas."
 msgstr " 用逗号分隔多个ID。"
 
 #: core/meta/fields.py:132
-msgid ""
-" Hold down \"Control\", or \"Command\" on a Mac, to select more than one."
+msgid " Hold down \"Control\", or \"Command\" on a Mac, to select more than one."
 msgstr " 按下 \"Control\"，或者在Mac上按 \"Command\" 来选择一个或多个值。"
 
 #: core/meta/fields.py:508
@@ -1759,8 +1705,7 @@ msgstr "输入一个有效的文件名。"
 #: core/meta/fields.py:782
 #, python-format
 msgid "Please enter valid %(self)s IDs. The value %(value)r is invalid."
-msgid_plural ""
-"Please enter valid %(self)s IDs. The values %(value)r are invalid."
+msgid_plural "Please enter valid %(self)s IDs. The values %(value)r are invalid."
 msgstr[0] "请输入有效的 %(self)s ID。值 %(value)r 无效。"
 
 #: core/template/defaultfilters.py:371
@@ -1768,11 +1713,10 @@ msgid "yes,no,maybe"
 msgstr "是、否、也许"
 
 #: parts/auth/formfields.py:27
-msgid ""
-"Your Web browser doesn't appear to have cookies enabled. Cookies are "
-"required for logging in."
-msgstr ""
+msgid "Your Web browser doesn't appear to have cookies enabled. Cookies are required for logging in."
+msgstr "你的Web浏览器好象不允许使用cookie。登录需要使用cookie。"
 
 #, fuzzy
 #~ msgid "count"
 #~ msgstr "内容"
+
