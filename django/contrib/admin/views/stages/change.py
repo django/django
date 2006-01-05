@@ -104,3 +104,4 @@ def change_stage(request, path, object_id):
         'path': path ,
     })
     return render_change_form(model, manipulator, app_label, c, change=True)
+change_stage = staff_member_required(change_stage)
