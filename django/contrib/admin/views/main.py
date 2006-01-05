@@ -58,18 +58,17 @@ def find_model(mod, remaining):
 
 def get_app_label(mod):
     #HACK
-    modcomps = mod.__name__.split('.')
-    return modcomps[-2]
+    return mod.__name__.split('.')[-2]
 
 def get_model_and_app(path):
     comps = path.split('/')
     comps = comps[:-1] # remove '' after final /
     for mod in models.get_installed_models():
-        remaining, matched =  matches_app(mod, comps)
+        remaining, matched = matches_app(mod, comps)
         if matched and len(remaining) > 0:
            # print "matched ", mod
            # print "left", remaining
-            return ( find_model(mod, remaining), get_app_label(mod) )
+            return (find_model(mod, remaining), get_app_label(mod))
 
     raise Http404 # Couldn't find app
 
@@ -83,11 +82,11 @@ def url_for_model(model):
         for mod in models.get_installed_models():
             remaining, matched =  matches_app(mod, comps)
             if matched and len(remaining) > 0:
-                comps = comps[: - len(remaining)] + remaining[1:]
-                url = "%s%s/%s/" % (ADMIN_PREFIX, '/'.join(comps) , model.__name__.lower() )
+                comps = comps[:-len(remaining)] + remaining[1:]
+                url = "%s%s/%s/" % (ADMIN_PREFIX, '/'.join(comps) , model.__name__.lower())
                 _model_urls[model] = url
                 return url
-        raise ImproperlyConfigured('%s is not a model in an installed app' % model.__name__ )
+        raise ImproperlyConfigured, '%s is not a model in an installed app' % model.__name__
 
 def index(request):
     return render_to_response('admin/index', {'title': _('Site administration')}, context_instance=Context(request))

@@ -1,5 +1,6 @@
 from django.contrib.admin.views.main import get_model_and_app
 from django.core import formfields, template
+from django.core.exceptions import Http404, ImproperlyConfigured, ObjectDoesNotExist, PermissionDenied
 from django.core.extensions import DjangoContext as Context
 from django.contrib.admin.views.stages.modify import render_change_form
 from django.db import models
@@ -10,8 +11,6 @@ try:
     from django.contrib.admin.models import LogEntry, ADDITION, CHANGE, DELETION
 except ImportError:
     raise ImproperlyConfigured, "You don't have 'django.contrib.admin' in INSTALLED_APPS."
-
-from django.core.exceptions import Http404, ImproperlyConfigured, ObjectDoesNotExist
 
 def log_change_message(user, opts, manipulator, new_object):
     pk_value = getattr(new_object, opts.pk.column)
@@ -36,7 +35,7 @@ def change_stage(request, path, object_id):
         raise PermissionDenied
     if request.POST and request.POST.has_key("_saveasnew"):
         return add_stage(request, path, form_url='../../add/')
-    
+
     try:
         manipulator = model.ChangeManipulator(object_id)
     except ObjectDoesNotExist:
@@ -46,15 +45,15 @@ def change_stage(request, path, object_id):
         new_data = request.POST.copy()
         if opts.has_field_type(models.FileField):
             new_data.update(request.FILES)
-        
-        #save a copy of the data to use for errors later. 
+
+        #save a copy of the data to use for errors later.
         data = new_data.copy()
         manipulator.do_html2python(new_data)
         #update the manipulator with the effects of previous commands.
         manipulator.update(new_data)
         #get the errors on the updated shape of the manipulator
-        #HACK - validators should not work on POSTED data directly... 
-        
+        #HACK - validators should not work on POSTED data directly...
+
         if request.POST.has_key("_preview"):
             errors = manipulator.get_validation_errors(data)
         elif request.POST.has_key("command"):
@@ -86,11 +85,11 @@ def change_stage(request, path, object_id):
                 else:
                     request.user.add_message(msg)
                     return HttpResponseRedirect("../../")
-    else: 
+    else:
         # Populate new_data with a "flattened" version of the current data.
         new_data = manipulator.flatten_data()
         errors = {}
-        
+
     # Populate the FormWrapper.
     form = formfields.FormWrapper(manipulator, new_data, errors)
     form.original = manipulator.original_object

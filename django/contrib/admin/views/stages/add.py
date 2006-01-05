@@ -3,6 +3,7 @@ from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.admin.views.main import get_model_and_app
 from django.contrib.admin.views.stages.modify import render_change_form
 from django.core import formfields, template
+from django.core.exceptions import Http404, ImproperlyConfigured, ObjectDoesNotExist, PermissionDenied
 from django.core.extensions import DjangoContext as Context
 from django.db import models
 from django.utils.httpwrappers import HttpResponse, HttpResponseRedirect
@@ -27,15 +28,15 @@ def add_stage(request, path, show_delete=False, form_url='', post_url='../', pos
         new_data = request.POST.copy()
         if opts.has_field_type(models.FileField):
             new_data.update(request.FILES)
-        
-        #save a copy of the data to use for errors later. 
+
+        #save a copy of the data to use for errors later.
         data = new_data.copy()
-        
+
         manipulator.do_html2python(new_data)
         #update the manipulator with the effects of previous commands.
         manipulator.update(new_data)
         #get the errors on the updated shape of the manipulator
-        #HACK - validators should not work on POSTED data directly... 
+        #HACK - validators should not work on POSTED data directly...
         errors = manipulator.get_validation_errors(data)
         if request.POST.has_key("_preview"):
             pass
