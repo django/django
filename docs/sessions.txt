@@ -16,11 +16,6 @@ You can turn session functionality on and off by editing the
 ``MIDDLEWARE_CLASSES`` setting. To activate sessions, make sure
 ``MIDDLEWARE_CLASSES`` contains ``"django.middleware.sessions.SessionMiddleware"``.
 
-If you're dealing with an admin site, make sure the ``SessionMiddleware`` line
-appears before the ``AdminUserRequired`` line. (The middleware classes are
-applied in order, and the admin middleware requires that the session middleware
-come first.)
-
 If you don't want to use sessions, you might as well remove the
 ``SessionMiddleware`` line from ``MIDDLEWARE_CLASSES``. It'll save you a small
 bit of overhead.
@@ -146,11 +141,11 @@ Using sessions out of views
 ===========================
 
 Internally, each session is just a normal Django model. The ``Session`` model
-is defined in ``django/models/core.py``. Because it's a normal model, you can
-access sessions using the normal Django database API::
+is defined in ``django/contrib/sessions/models.py``. Because it's a normal
+model, you can access sessions using the normal Django database API::
 
-    >>> from django.models.core import sessions
-    >>> s = sessions.get_object(pk='2b1189a188b44ad18c35e113ac6ceead')
+    >>> from django.contrib.sessions.models import Session
+    >>> s = Session.objects.get_object(pk='2b1189a188b44ad18c35e113ac6ceead')
     >>> s.expire_date
     datetime.datetime(2005, 8, 20, 13, 35, 12)
 
