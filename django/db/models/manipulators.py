@@ -374,7 +374,7 @@ class ManipulatorCollection(list, Naming):
         if expanded_data:
             # There are new objects in the data
             items = [(int(k), v) for k, v in expanded_data.items()]
-            items.sort(cmp = lambda x, y: cmp(x[0], y[0]))
+            items.sort(lambda x, y: cmp(x[0], y[0]))
             for index, obj_data in items:
                 child_manip = self.add_child(index)
                 #HACK: this data will not have been converted to python form yet.
