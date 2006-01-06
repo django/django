@@ -948,6 +948,7 @@ DEFAULT_ACTION_MAPPING = {
     'createcachetable' : createcachetable,
 #     'dbcheck': database_check,
     'init': init,
+    'init-minimal': init_minimal,
     'inspectdb': inspectdb,
     'install': install,
     'installperms': installperms,
@@ -1032,7 +1033,7 @@ def execute_from_command_line(action_mapping=DEFAULT_ACTION_MAPPING):
                 sys.exit(1)
         else:
             action_mapping[action](username, email, password)
-    elif action in ('init', 'validate'):
+    elif action in ('init', 'init-minimal', 'validate'):
         action_mapping[action]()
     elif action == 'inspectdb':
         try:
