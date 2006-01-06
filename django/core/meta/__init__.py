@@ -1649,7 +1649,7 @@ def function_get_sql_clause(opts, **kwargs):
     return select, " FROM " + ",".join(tables) + (where and " WHERE " + " AND ".join(where) or "") + (order_by and " ORDER BY " + order_by or "") + limit_sql, params
 
 def function_get_in_bulk(opts, klass, *args, **kwargs):
-    id_list = args and args[0] or kwargs['id_list']
+    id_list = args and args[0] or kwargs.get('id_list', [])
     assert id_list != [], "get_in_bulk() cannot be passed an empty list."
     kwargs['where'] = ["%s.%s IN (%s)" % (db.db.quote_name(opts.db_table), db.db.quote_name(opts.pk.column), ",".join(['%s'] * len(id_list)))]
     kwargs['params'] = id_list

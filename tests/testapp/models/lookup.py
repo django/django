@@ -65,6 +65,10 @@ Article 4
 {3: Article 3}
 >>> articles.get_in_bulk([1000])
 {}
+>>> articles.get_in_bulk([])
+Traceback (most recent call last):
+    ...
+AssertionError: get_in_bulk() cannot be passed an empty list.
 
 # get_values() is just like get_list(), except it returns a list of
 # dictionaries instead of object instances -- and you can specify which fields
