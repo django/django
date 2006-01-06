@@ -1,5 +1,5 @@
 from django.conf.settings import SESSION_COOKIE_NAME, SESSION_COOKIE_AGE, SESSION_COOKIE_DOMAIN, SESSION_SAVE_EVERY_REQUEST
-from django.models.core import Session
+from django.contrib.sessions.models import Session
 from django.utils.cache import patch_vary_headers
 import datetime
 
