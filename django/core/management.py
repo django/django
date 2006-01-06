@@ -453,8 +453,30 @@ def get_admin_index(app):
 get_admin_index.help_doc = "Prints the admin-index template snippet for the given app name(s)."
 get_admin_index.args = APP_ARGS
 
+def init_minimal():
+    "Initializes the database."
+    try:
+        from django.db import backend, connection, models
+        from django.models import auth, core
+        cursor = connection.cursor()
+        for sql in get_sql_create(core) + get_sql_create(auth) + get_sql_initial_data(core) + get_sql_initial_data(auth):
+            cursor.execute(sql)
+
+    except Exception, e:
+        import traceback
+        sys.stderr.write("Error: The database couldn't be initialized.\n")
+        sys.stderr.write('\n'.join(traceback.format_exception(*sys.exc_info())) + "\n")
+        try:
+            connection.rollback()
+        except UnboundLocalError:
+            pass
+        sys.exit(1)
+    else:
+        connection.commit()
+init_minimal.args = ''
+
 def init():
-    "Initializes the database with auth and core."
+    "Initializes the database with sessions, sites, auth and core."
     try:
         from django.db import backend, connection, models
         from django.models import auth, core
@@ -462,15 +484,15 @@ def init():
         cursor = connection.cursor()
         for sql in get_sql_create(core) + get_sql_create(auth) + get_sql_initial_data(core) + get_sql_initial_data(auth):
             cursor.execute(sql)
-        # XXX: commented out for now because it breaks the model tests. Will
-        # fix when the command init-minimal is added.
-
+        # Install django.contrib.sessions.
+        sessions_app = models.get_app('sessions')
+        install(sessions_app)
         # Install django.contrib.sites and create an example site.
-        #sites_app = models.get_app('sites')
-        #install(sites_app)
-        #cursor.execute("INSERT INTO %s (%s, %s) VALUES ('example.com', 'Example site')" % \
-        #    (backend.quote_name(Site._meta.db_table), backend.quote_name('domain'),
-        #    backend.quote_name('name')))
+        sites_app = models.get_app('sites')
+        install(sites_app)
+        cursor.execute("INSERT INTO %s (%s, %s) VALUES ('example.com', 'Example site')" % \
+            (backend.quote_name(Site._meta.db_table), backend.quote_name('domain'),
+            backend.quote_name('name')))
 
     except Exception, e:
         import traceback

@@ -117,7 +117,7 @@ class TestRunner:
         # Initialize the test database.
         cursor = connection.cursor()
         self.output(1, "Initializing test database")
-        management.init()
+        management.init_minimal()
 
         # Run the tests for each test model.
         self.output(1, "Running app tests")
