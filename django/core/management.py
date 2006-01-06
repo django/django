@@ -457,9 +457,9 @@ def init_minimal():
     "Initializes the database."
     try:
         from django.db import backend, connection, models
-        from django.models import auth, core
+        from django.models import core
         cursor = connection.cursor()
-        for sql in get_sql_create(core) + get_sql_create(auth) + get_sql_initial_data(core) + get_sql_initial_data(auth):
+        for sql in get_sql_create(core) + get_sql_initial_data(core):
             cursor.execute(sql)
 
     except Exception, e:
@@ -476,14 +476,17 @@ def init_minimal():
 init_minimal.args = ''
 
 def init():
-    "Initializes the database with sessions, sites, auth and core."
+    "Initializes the database with auth, sessions, sites and core."
     try:
         from django.db import backend, connection, models
-        from django.models import auth, core
+        from django.models import core
         from django.contrib.sites.models import Site
         cursor = connection.cursor()
-        for sql in get_sql_create(core) + get_sql_create(auth) + get_sql_initial_data(core) + get_sql_initial_data(auth):
+        for sql in get_sql_create(core) + get_sql_initial_data(core):
             cursor.execute(sql)
+        # Install django.contrib.auth.
+        auth_app = models.get_app('auth')
+        install(auth_app)
         # Install django.contrib.sessions.
         sessions_app = models.get_app('sessions')
         install(sessions_app)
@@ -544,7 +547,7 @@ install.args = APP_ARGS
 
 def installperms(app):
     "Installs any permissions for the given app, if needed."
-    from django.models.auth import Permission
+    from django.contrib.auth.models import Permission
     from django.models.core import Package
     from django.db.models import get_models
     num_added = 0
@@ -625,7 +628,7 @@ startapp.args = "[appname]"
 def createsuperuser(username=None, email=None, password=None):
     "Creates a superuser account."
     from django.core import validators
-    from django.models.auth import User
+    from django.contrib.auth.models import User
     import getpass
     try:
         while 1:
