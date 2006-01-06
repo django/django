@@ -458,12 +458,20 @@ def init():
     try:
         from django.db import backend, connection, models
         from django.models import auth, core
+        from django.contrib.sites.models import Site
         cursor = connection.cursor()
         for sql in get_sql_create(core) + get_sql_create(auth) + get_sql_initial_data(core) + get_sql_initial_data(auth):
             cursor.execute(sql)
-        cursor.execute("INSERT INTO %s (%s, %s) VALUES ('example.com', 'Example site')" % \
-            (backend.quote_name(core.Site._meta.db_table), backend.quote_name('domain'),
-            backend.quote_name('name')))
+        # XXX: commented out for now because it breaks the model tests. Will
+        # fix when the command init-minimal is added.
+
+        # Install django.contrib.sites and create an example site.
+        #sites_app = models.get_app('sites')
+        #install(sites_app)
+        #cursor.execute("INSERT INTO %s (%s, %s) VALUES ('example.com', 'Example site')" % \
+        #    (backend.quote_name(Site._meta.db_table), backend.quote_name('domain'),
+        #    backend.quote_name('name')))
+
     except Exception, e:
         import traceback
         sys.stderr.write("Error: The database couldn't be initialized.\n")

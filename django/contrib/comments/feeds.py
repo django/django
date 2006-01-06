@@ -2,7 +2,7 @@ from django.conf import settings
 from django.contrib.comments.models import Comment, FreeComment
 from django.contrib.syndication.feeds import Feed
 from django.core.exceptions import ObjectDoesNotExist
-from django.models.core import Site
+from django.contrib.sites.models import Site
 
 class LatestFreeCommentsFeed(Feed):
     """Feed of latest comments on the current site"""

@@ -1,6 +1,7 @@
 from django.core.exceptions import Http404, ObjectDoesNotExist
 from django.core.template import Context, loader
-from django.models.core import ContentType, Site
+from django.models.core import ContentType
+from django.contrib.sites.models import Site
 from django.utils import httpwrappers
 
 def shortcut(request, content_type_id, object_id):

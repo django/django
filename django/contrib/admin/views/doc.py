@@ -6,7 +6,7 @@ from django.core.extensions import DjangoContext, render_to_response
 from django.core.exceptions import Http404, ViewDoesNotExist
 from django.core import template, urlresolvers
 from django.contrib.admin import utils
-from django.models.core import Site
+from django.contrib.sites.models import Site
 import inspect, os, re
 
 # Exclude methods starting with these strings from documentation
