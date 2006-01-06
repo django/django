@@ -10,7 +10,7 @@ def authenhandler(req, **kwargs):
     # that so that the following import works
     os.environ.update(req.subprocess_env)
 
-    from django.models.auth import User
+    from django.contrib.auth.models import User
 
     # check for PythonOptions
     _str_to_bool = lambda s: s.lower() in '1', 'true', 'on', 'yes'

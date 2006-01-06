@@ -120,7 +120,7 @@ class WSGIRequest(httpwrappers.HttpRequest):
 
     def _get_user(self):
         if not hasattr(self, '_user'):
-            from django.models.auth import User, SESSION_KEY
+            from django.contrib.auth.models import User, SESSION_KEY
             try:
                 user_id = self.session[SESSION_KEY]
                 if not user_id:

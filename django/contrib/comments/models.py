@@ -1,5 +1,6 @@
 from django.db import models
-from django.models import auth, core
+from django.models import core
+from django.contrib.auth.models import User
 from django.utils.translation import gettext_lazy as _
 import datetime
 
@@ -60,7 +61,7 @@ class CommentManager(models.Manager):
         return False
 
 class Comment(models.Model):
-    user = models.ForeignKey(auth.User, raw_id_admin=True)
+    user = models.ForeignKey(User, raw_id_admin=True)
     content_type = models.ForeignKey(core.ContentType)
     object_id = models.IntegerField(_('object ID'))
     headline = models.CharField(_('headline'), maxlength=255, blank=True)
@@ -230,7 +231,7 @@ class KarmaScoreManager(models.Manager):
         return int(round((4.5 * score) + 5.5))
 
 class KarmaScore(models.Model):
-    user = models.ForeignKey(auth.User)
+    user = models.ForeignKey(User)
     comment = models.ForeignKey(Comment)
     score = models.SmallIntegerField(_('score'), db_index=True)
     scored_date = models.DateTimeField(_('score date'), auto_now=True)
@@ -262,7 +263,7 @@ class UserFlagManager(models.Manager):
             f.save()
 
 class UserFlag(models.Model):
-    user = models.ForeignKey(auth.User)
+    user = models.ForeignKey(User)
     comment = models.ForeignKey(Comment)
     flag_date = models.DateTimeField(_('flag date'), auto_now_add=True)
     objects = UserFlagManager()
@@ -276,7 +277,7 @@ class UserFlag(models.Model):
         return _("Flag by %r") % self.get_user()
 
 class ModeratorDeletion(models.Model):
-    user = models.ForeignKey(auth.User, verbose_name='moderator')
+    user = models.ForeignKey(User, verbose_name='moderator')
     comment = models.ForeignKey(Comment)
     deletion_date = models.DateTimeField(_('deletion date'), auto_now_add=True)
     class Meta:

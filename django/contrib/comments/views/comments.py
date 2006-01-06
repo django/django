@@ -2,7 +2,7 @@ from django.core import formfields, validators
 from django.core.mail import mail_admins, mail_managers
 from django.core.exceptions import Http404, ObjectDoesNotExist
 from django.core.extensions import DjangoContext, render_to_response
-from django.models.auth import SESSION_KEY
+from django.contrib.auth.models import SESSION_KEY
 from django.contrib.comments.models import Comment, FreeComment, PHOTOS_REQUIRED, PHOTOS_OPTIONAL, RATINGS_REQUIRED, RATINGS_OPTIONAL, IS_PUBLIC
 from django.models.core import ContentType
 from django.parts.auth.formfields import AuthenticationForm

@@ -1,6 +1,6 @@
 from django.core.extensions import DjangoContext, render_to_response
 from django.conf.settings import SECRET_KEY
-from django.models.auth import User, SESSION_KEY
+from django.contrib.auth.models import User, SESSION_KEY
 from django.utils import httpwrappers
 from django.utils.translation import gettext_lazy
 import base64, md5
