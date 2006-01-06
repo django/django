@@ -1,4 +1,50 @@
 {% load admin_modify %}
+
+<fieldset class="module editinline">
+    <h2>{{ bound_related_object.relation.opts.verbose_name_plural|capfirst }}</h2>
+	<table>
+		<thead>
+			<tr>
+			    {% for fw in bound_related_object.field_wrapper_list %}
+			        {% if fw.needs_header %}
+			            <th{{ fw.header_class_attribute }}>{{ fw.field.verbose_name|capfirst }}</th>
+			        {% endif %}
+			    {% endfor %}
+				<th>&nbsp;</th>
+			</tr> 
+		</thead>
+		<tfoot>
+			<tr>
+				<td colspan='{{ num_headers }}'>
+				    <button class="addlink" name="command" value="{{ bound_related_object.relation.var_name }}.add">
+				        Add another {{ bound_related_object.relation.opts.verbose_name }}
+				    </button>
+				</td>
+			</tr>
+		</tfoot>
+		<tbody>
+            {% for fcw in bound_related_object.form_field_collection_wrappers %}
+                <tr class="{% cycle row1,row2 %}{% if fcw.obj.errors %} error{% endif %}">
+                    {% for bound_field in fcw.bound_fields %}
+                        {% if not bound_field.hidden %}
+                            <td {{ bound_field.cell_class_attribute }}>
+                                {{ bound_field.html_error_list }}
+                                {% field_widget bound_field %}
+                            </td>
+                        {% endif %}
+                    {% endfor %}
+                    <td class="controls" >
+                    	<button class="inline-deletelink" name="command" value="{{ bound_related_object.relation.var_name }}.{{ fcw.index }}.delete">
+                    	    Delete {{ bound_related_object.relation.opts.verbose_name }}
+                    	</button>
+                    </td>
+                </tr>
+            {% endfor %}
+		</tbody>
+	</table>
+</fieldset>
+	
+<!--
 <fieldset class="module">
    <h2>{{ bound_related_object.relation.opts.verbose_name_plural|capfirst }}</h2><table>
    <thead><tr>
@@ -12,7 +58,7 @@
    {% for fcw in bound_related_object.form_field_collection_wrappers %}
       {% if change %}{% if original_row_needed %}
          {% if fcw.obj.original %}
-            <tr class="row-label {% cycle row1,row2 %}"><td colspan="{{ num_headers }}"><strong>{{ fcw.obj.original }}</strong></tr>
+            <tr class="row-label {% cycle row1,row2 %}"><td colspan="{{ num_headers }}"></tr>
          {% endif %}
       {% endif %}{% endif %}
       {% if fcw.obj.errors %}
@@ -48,3 +94,4 @@
       {% endfor %}
    {% endfor %}
 </fieldset>
+-->
