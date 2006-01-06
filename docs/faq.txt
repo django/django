@@ -213,10 +213,10 @@ For production use, though, we recommend mod_python. The Django developers have
 been running it on mod_python for about two years, and it's quite stable.
 
 However, if you don't want to use mod_python, you can use a different server,
-as long as that server has WSGI_ hooks. More information on alternate server
-arrangements is forthcoming.
+as long as that server has WSGI_ hooks. See the `server arrangements wiki page`_.
 
 .. _WSGI: http://www.python.org/peps/pep-0333.html
+.. _server arrangements wiki page: http://code.djangoproject.com/wiki/ServerArrangements
 
 How do I install mod_python on Windows?
 ---------------------------------------
@@ -230,8 +230,6 @@ How do I install mod_python on Windows?
 .. _`guide to mod_python & Python 2.3`: http://www.lehuen.com/nicolas/index.php/2005/02/21/39-win32-build-of-mod_python-314-for-python-24
 .. _`Running mod_python on Apache on Windows2000`: http://groups-beta.google.com/group/comp.lang.python/msg/139af8c83a5a9d4f
 .. _`guide to getting mod_python working`: http://www.dscpl.com.au/articles/modpython-001.html
-
-(Thanks to deelan for this info.)
 
 Will Django run under shared hosting (like TextDrive or Dreamhost)?
 -------------------------------------------------------------------
@@ -306,7 +304,9 @@ Using a ``FileField`` or an ``ImageField`` in a model takes a few steps:
 If I make changes to a model, how do I update the database?
 -----------------------------------------------------------
 
-If you don't care about clearing data, just do this::
+If you don't care about clearing data, just pipe the output of the
+appropriate ``django-admin.py sqlreset`` command into your database's
+command-line utility. For example::
 
     django-admin.py sqlreset appname | psql dbname
 

@@ -19,13 +19,10 @@ def ensure_default_manager(sender):
         cls.add_to_class('objects',  Manager())
         cls.objects._prepare()
 
-dispatcher.connect(
-    ensure_default_manager,
-    signal=signals.class_prepared
-)
+dispatcher.connect(ensure_default_manager, signal=signals.class_prepared)
 
 class Manager(object):
-        # Tracks each time a Manager instance is created. Used to retain order.
+    # Tracks each time a Manager instance is created. Used to retain order.
     creation_counter = 0
 
     def __init__(self):
@@ -176,7 +173,7 @@ class Manager(object):
         return obj_list[0]
 
     def get_in_bulk(self, *args, **kwargs):
-        id_list = args and args[0] or kwargs['id_list']
+        id_list = args and args[0] or kwargs.get('id_list', [])
         assert id_list != [], "get_in_bulk() cannot be passed an empty list."
         kwargs['where'] = ["%s.%s IN (%s)" % (backend.quote_name(self.klass._meta.db_table), backend.quote_name(self.klass._meta.pk.column), ",".join(['%s'] * len(id_list)))]
         kwargs['params'] = id_list
