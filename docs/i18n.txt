@@ -288,6 +288,10 @@ marked for translation. It creates (or updates) a message file in the directory
 ``conf/locale``. In the ``de`` example, the file will be
 ``conf/locale/de/LC_MESSAGES/django.po``.
 
+If run over your project source tree or your appliation source tree, it will
+do the same, but the location of the locale directory is ``locale/LANG/LC_MESSAGES``
+(note the missing ``conf`` prefix).
+
 .. admonition:: No gettext?
 
     If you don't have the ``gettext`` utilities installed, ``make-messages.py``
