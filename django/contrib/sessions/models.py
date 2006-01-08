@@ -17,7 +17,7 @@ class SessionManager(models.Manager):
         # The random module is seeded when this Apache child is created.
         # Use person_id and SECRET_KEY as added salt.
         while 1:
-            session_key = md5.new(str(random.randint(0, sys.maxint - 1)) + SECRET_KEY).hexdigest()
+            session_key = md5.new(str(random.randint(0, sys.maxint - 1)) + str(random.randint(0, sys.maxint - 1)) + SECRET_KEY).hexdigest()
             try:
                 self.get_object(session_key__exact=session_key)
             except self.klass.DoesNotExist:

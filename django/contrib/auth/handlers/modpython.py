@@ -13,7 +13,7 @@ def authenhandler(req, **kwargs):
     from django.contrib.auth.models import User
 
     # check for PythonOptions
-    _str_to_bool = lambda s: s.lower() in '1', 'true', 'on', 'yes'
+    _str_to_bool = lambda s: s.lower() in ('1', 'true', 'on', 'yes')
 
     options = req.get_options()
     permission_name = options.get('DjangoPermissionName', None)
