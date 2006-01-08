@@ -408,7 +408,7 @@ msgstr "Вы снова можете редактировать их внизу"
 #: contrib/admin/views/main.py:423 contrib/admin/views/main.py:501
 #, python-format
 msgid "You may add another %s below."
-msgstr "Вы можете добавить % внизу."
+msgstr "Вы можете добавить %s внизу."
 
 #: contrib/admin/views/main.py:441
 #, python-format
