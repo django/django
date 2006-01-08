@@ -14,10 +14,9 @@ class Site(models.Model):
         verbose_name = _('site')
         verbose_name_plural = _('sites')
         ordering = ('domain',)
-        admin = models.Admin(
-            list_display = ('domain', 'name'),
-            search_fields = ('domain', 'name'),
-        )
+    class Admin:
+        list_display = ('domain', 'name')
+        search_fields = ('domain', 'name')
 
     def __repr__(self):
         return self.domain

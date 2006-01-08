@@ -18,14 +18,13 @@ class FlatPage(models.Model):
         verbose_name = _('flat page')
         verbose_name_plural = _('flat pages')
         ordering = ('url',)
-        admin = models.Admin(
-            fields = (
-                (None, {'fields': ('url', 'title', 'content', 'sites')}),
-                ('Advanced options', {'classes': 'collapse', 'fields': ('enable_comments', 'registration_required', 'template_name')}),
-            ),
-            list_filter = ('sites',),
-            search_fields = ('url', 'title'),
+    class Admin:
+        fields = (
+            (None, {'fields': ('url', 'title', 'content', 'sites')}),
+            ('Advanced options', {'classes': 'collapse', 'fields': ('enable_comments', 'registration_required', 'template_name')}),
         )
+        list_filter = ('sites',)
+        search_fields = ('url', 'title')
 
     def __repr__(self):
         return "%s -- %s" % (self.url, self.title)

@@ -790,35 +790,3 @@ class FieldSet(object):
 
     def __len__(self):
         return len(self.field_lines)
-
-class Admin:
-    def __init__(self, fields=None, js=None, list_display=None, list_filter=None, date_hierarchy=None,
-        save_as=False, ordering=None, search_fields=None, save_on_top=False, list_select_related=False):
-        self.fields = fields
-        self.js = js or []
-        self.list_display = list_display or ['__repr__']
-        self.list_filter = list_filter or []
-        self.date_hierarchy = date_hierarchy
-        self.save_as, self.ordering = save_as, ordering
-        self.search_fields = search_fields or []
-        self.save_on_top = save_on_top
-        self.list_select_related = list_select_related
-
-    def get_field_sets(self, opts):
-        if self.fields is None:
-            field_struct = ((None, {
-                'fields': [f.name for f in opts.fields + opts.many_to_many if f.editable and not isinstance(f, AutoField)]
-                }),)
-        else:
-            field_struct = self.fields
-        new_fieldset_list = []
-        for fieldset in field_struct:
-            name = fieldset[0]
-            fs_options = fieldset[1]
-            classes = fs_options.get('classes', ())
-            line_specs = fs_options['fields']
-            new_fieldset_list.append(FieldSet(name, classes, opts.get_field, line_specs))
-        return new_fieldset_list
-
-    def contribute_to_class(self, cls, name):
-        cls._meta.admin = self

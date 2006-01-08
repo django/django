@@ -14,10 +14,9 @@ class Redirect(models.Model):
         db_table = 'django_redirects'
         unique_together=(('site', 'old_path'),)
         ordering = ('old_path',)
-        admin = models.Admin(
-            list_filter = ('site',),
-            search_fields = ('old_path', 'new_path'),
-        )
+    class Admin:
+        list_filter = ('site',)
+        search_fields = ('old_path', 'new_path')
 
     def __repr__(self):
         return "%s ---> %s" % (self.old_path, self.new_path)

@@ -91,18 +91,17 @@ class Comment(models.Model):
         verbose_name = _('Comment')
         verbose_name_plural = _('Comments')
         ordering = ('-submit_date',)
-        admin = models.Admin(
-            fields = (
-                (None, {'fields': ('content_type', 'object_id', 'site')}),
-                ('Content', {'fields': ('user', 'headline', 'comment')}),
-                ('Ratings', {'fields': ('rating1', 'rating2', 'rating3', 'rating4', 'rating5', 'rating6', 'rating7', 'rating8', 'valid_rating')}),
-                ('Meta', {'fields': ('is_public', 'is_removed', 'ip_address')}),
-            ),
-            list_display = ('user', 'submit_date', 'content_type', 'get_content_object'),
-            list_filter = ('submit_date',),
-            date_hierarchy = 'submit_date',
-            search_fields = ('comment', 'user__username'),
+    class Admin:
+        fields = (
+            (None, {'fields': ('content_type', 'object_id', 'site')}),
+            ('Content', {'fields': ('user', 'headline', 'comment')}),
+            ('Ratings', {'fields': ('rating1', 'rating2', 'rating3', 'rating4', 'rating5', 'rating6', 'rating7', 'rating8', 'valid_rating')}),
+            ('Meta', {'fields': ('is_public', 'is_removed', 'ip_address')}),
         )
+        list_display = ('user', 'submit_date', 'content_type', 'get_content_object')
+        list_filter = ('submit_date',)
+        date_hierarchy = 'submit_date'
+        search_fields = ('comment', 'user__username')
 
     def __repr__(self):
         return "%s: %s..." % (self.get_user().username, self.comment[:100])
@@ -179,17 +178,16 @@ class FreeComment(models.Model):
         verbose_name = _('Free comment')
         verbose_name_plural = _('Free comments')
         ordering = ('-submit_date',)
-        admin = models.Admin(
-            fields = (
-                (None, {'fields': ('content_type', 'object_id', 'site')}),
-                ('Content', {'fields': ('person_name', 'comment')}),
-                ('Meta', {'fields': ('submit_date', 'is_public', 'ip_address', 'approved')}),
-            ),
-            list_display = ('person_name', 'submit_date', 'content_type', 'get_content_object'),
-            list_filter = ('submit_date',),
-            date_hierarchy = 'submit_date',
-            search_fields = ('comment', 'person_name'),
+    class Admin:
+        fields = (
+            (None, {'fields': ('content_type', 'object_id', 'site')}),
+            ('Content', {'fields': ('person_name', 'comment')}),
+            ('Meta', {'fields': ('submit_date', 'is_public', 'ip_address', 'approved')}),
         )
+        list_display = ('person_name', 'submit_date', 'content_type', 'get_content_object')
+        list_filter = ('submit_date',)
+        date_hierarchy = 'submit_date'
+        search_fields = ('comment', 'person_name')
 
     def __repr__(self):
         return "%s: %s..." % (self.person_name, self.comment[:100])

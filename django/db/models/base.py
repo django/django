@@ -1,10 +1,10 @@
 import django.db.models.manipulators
 import django.db.models.manager
-from django.db.models.fields import AutoField, ImageField, Admin
+from django.db.models.fields import AutoField, ImageField
 from django.db.models.fields.related import OneToOne, ManyToOne
 from django.db.models.related import RelatedObject
 from django.db.models.query import orderlist2sql
-from django.db.models.options import Options
+from django.db.models.options import Options, AdminOptions
 from django.db import connection, backend
 from django.db.models import signals
 from django.dispatch import dispatcher
@@ -20,7 +20,7 @@ import os
 if not hasattr(__builtins__, 'set'):
     from sets import Set as set
 
-attribute_transforms = {'Admin': lambda cls: Admin(**cls.__dict__)}
+attribute_transforms = {'Admin': lambda cls: AdminOptions(**dict([(k,v) for (k,v) in cls.__dict__.items() if not k.startswith('_')]))}
 
 class ModelBase(type):
     "Metaclass for all models"

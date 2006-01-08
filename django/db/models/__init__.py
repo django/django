@@ -9,7 +9,7 @@ from django.utils.text import capfirst
 from django.db.models.loading import get_installed_models, get_installed_model_modules
 from django.db.models.query import Q
 from django.db.models.manager import Manager
-from django.db.models.base import Model
+from django.db.models.base import Model, AdminOptions
 
 from django.db.models.fields import *
 from django.db.models.fields.related import *

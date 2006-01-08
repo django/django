@@ -26,9 +26,8 @@ class Group(models.Model):
         verbose_name = _('Group')
         verbose_name_plural = _('Groups')
         ordering = ('name',)
-        admin = models.Admin(
-            search_fields = ('name',),
-        )
+    class Admin:
+        search_fields = ('name',)
 
     def __repr__(self):
         return self.name
@@ -69,18 +68,17 @@ class User(models.Model):
         verbose_name_plural = _('Users')
         ordering = ('username',)
         exceptions = ('SiteProfileNotAvailable',)
-        admin = models.Admin(
-            fields = (
-                (None, {'fields': ('username', 'password')}),
-                (_('Personal info'), {'fields': ('first_name', 'last_name', 'email')}),
-                (_('Permissions'), {'fields': ('is_staff', 'is_active', 'is_superuser', 'user_permissions')}),
-                (_('Important dates'), {'fields': ('last_login', 'date_joined')}),
-                (_('Groups'), {'fields': ('groups',)}),
-            ),
-            list_display = ('username', 'email', 'first_name', 'last_name', 'is_staff'),
-            list_filter = ('is_staff', 'is_superuser'),
-            search_fields = ('username', 'first_name', 'last_name', 'email'),
+    class Admin:
+        fields = (
+            (None, {'fields': ('username', 'password')}),
+            (_('Personal info'), {'fields': ('first_name', 'last_name', 'email')}),
+            (_('Permissions'), {'fields': ('is_staff', 'is_active', 'is_superuser', 'user_permissions')}),
+            (_('Important dates'), {'fields': ('last_login', 'date_joined')}),
+            (_('Groups'), {'fields': ('groups',)}),
         )
+        list_display = ('username', 'email', 'first_name', 'last_name', 'is_staff')
+        list_filter = ('is_staff', 'is_superuser')
+        search_fields = ('username', 'first_name', 'last_name', 'email')
 
     def __repr__(self):
         return self.username

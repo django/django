@@ -806,8 +806,8 @@ def get_validation_errors(outfile):
 
             # Check admin attribute.
             if opts.admin is not None:
-                if not isinstance(opts.admin, models.Admin):
-                    e.add(opts, '"admin" attribute, if given, must be set to a models.Admin() instance.')
+                if not isinstance(opts.admin, models.AdminOptions):
+                    e.add(opts, '"admin" attribute, if given, must be set to a models.AdminOptions() instance.')
                 else:
                     # list_display
                     if not isinstance(opts.admin.list_display, (list, tuple)):
