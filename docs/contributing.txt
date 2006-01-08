@@ -205,11 +205,11 @@ repository:
       first, then the "Fixed #abc." For example:
       "magic-removal: Fixed #123 -- Added whizbang feature."
 
-    * If your commit references a ticket in the Django `ticket tracker`_,
-      include the phrase "Refs #abc", where "abc" is the number of the ticket
-      your commit references. We've rigged Subversion and Trac so that any
-      commit message in that format will automatically post a comment to the
-      appropriate ticket.
+    * If your commit references a ticket in the Django `ticket tracker`_ but
+      does *not* close the ticket, include the phrase "Refs #abc", where "abc"
+      is the number of the ticket your commit references. We've rigged
+      Subversion and Trac so that any commit message in that format will
+      automatically post a comment to the appropriate ticket.
 
 Requesting features
 ===================
