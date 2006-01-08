@@ -166,14 +166,18 @@ class Options:
         return follow
 
     def get_all_related_many_to_many_objects(self):
-        module_list = get_installed_model_modules()
-        rel_objs = []
-        for mod in module_list:
-            for klass in mod._MODELS:
-                for f in klass._meta.many_to_many:
-                    if f.rel and self == f.rel.to._meta:
-                        rel_objs.append(RelatedObject(self, klass, f))
-        return rel_objs
+        try: # Try the cache first.
+            return self._all_related_many_to_many_objects
+        except AttributeError:
+            module_list = get_installed_model_modules()
+            rel_objs = []
+            for mod in module_list:
+                for klass in mod._MODELS:
+                    for f in klass._meta.many_to_many:
+                        if f.rel and self == f.rel.to._meta:
+                            rel_objs.append(RelatedObject(self, klass, f))
+            self._all_related_many_to_many_objects = rel_objs
+            return rel_objs
 
     def get_ordered_objects(self):
         "Returns a list of Options objects that are ordered with respect to this object."
