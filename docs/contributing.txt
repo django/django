@@ -180,9 +180,9 @@ repository:
 
     * Write detailed commit messages in the past tense, not present tense.
 
-          * Good: "Fixed bug in RSS API."
-          * Bad: "Fixes bug in RSS API."
-          * Bad: "Fixing bug in RSS API."
+          * Good: "Fixed Unicode bug in RSS API."
+          * Bad: "Fixes Unicode bug in RSS API."
+          * Bad: "Fixing Unicode bug in RSS API."
 
     * For commits to a branch, prefix the commit message with the branch name.
       For example: "magic-removal: Added support for mind reading."
