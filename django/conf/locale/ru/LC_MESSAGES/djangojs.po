@@ -19,7 +19,7 @@ msgstr ""
 #: contrib/admin/media/js/SelectFilter2.js:33
 #, perl-format
 msgid "Available %s"
-msgstr "Доступен %s"
+msgstr "Доступные %s"
 
 #: contrib/admin/media/js/SelectFilter2.js:41
 msgid "Choose all"
@@ -36,7 +36,7 @@ msgstr "Удалить"
 #: contrib/admin/media/js/SelectFilter2.js:53
 #, perl-format
 msgid "Chosen %s"
-msgstr "Выбран %s"
+msgstr "Выбранные %s"
 
 #: contrib/admin/media/js/SelectFilter2.js:54
 msgid "Select your choice(s) and click "
@@ -51,7 +51,8 @@ msgstr "Очистить всё"
 msgid ""
 "January February March April May June July August September October November "
 "December"
-msgstr "Январь Февраль Март Апрель Май Июнь Июль Август Сентябрь Октябрь Ноябрь "
+msgstr ""
+"Январь Февраль Март Апрель Май Июнь Июль Август Сентябрь Октябрь Ноябрь "
 "Декабрь"
 
 #: contrib/admin/media/js/dateparse.js:27
