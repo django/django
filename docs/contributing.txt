@@ -174,6 +174,10 @@ Committing code
 Please follow these guidelines when committing code to Django's Subversion
 repository:
 
+    * For any medium-to-big changes, where "medium-to-big" is according to your
+      judgment, please bring things up on the `django-developers`_ mailing list
+      before making the change.
+
     * Write detailed commit messages in the past tense, not present tense.
 
           * Good: "Fixed bug in RSS API."
@@ -190,9 +194,22 @@ repository:
       commit. This goes a *long way* in helping all core Django developers
       follow your changes.
 
-    * For any medium-to-big changes, where "medium-to-big" is according to your
-      judgment, please bring things up on the `django-developers`_ mailing list
-      before making the change.
+    * If your commit closes a ticket in the Django `ticket tracker`_, begin
+      your commit message with the text "Fixed #abc", where "abc" is the number
+      of the ticket your commit fixes. Example: "Fixed #123 -- Added support
+      for foo". We've rigged Subversion and Trac so that any commit message
+      in that format will automatically close the referenced ticket and post a
+      comment to it with the full commit message.
+
+      If your commit closes a ticket and is in a branch, use the branch name
+      first, then the "Fixed #abc." For example:
+      "magic-removal: Fixed #123 -- Added whizbang feature."
+
+    * If your commit references a ticket in the Django `ticket tracker`_,
+      include the phrase "Refs #abc", where "abc" is the number of the ticket
+      your commit references. We've rigged Subversion and Trac so that any
+      commit message in that format will automatically post a comment to the
+      appropriate ticket.
 
 Requesting features
 ===================
