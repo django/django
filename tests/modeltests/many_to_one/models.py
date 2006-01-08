@@ -22,6 +22,7 @@ class Article(models.Model):
     def __repr__(self):
         return self.headline
 
+
 API_TESTS = """
 # Create a Reporter.
 >>> r = Reporter(first_name='John', last_name='Smith', email='john@example.com')
@@ -60,6 +61,16 @@ This is a test
 >>> r.get_article_count()
 2
 
+# Get articles by id
+>>> Article.objects.get_list(id__exact=1)
+[This is a test]
+>>> Article.objects.get_list(pk=1)
+[This is a test]
+
+# Query on an article property
+>>> Article.objects.get_list(headline__startswith='This')
+[This is a test]
+
 # The API automatically follows relationships as far as you need.
 # Use double underscores to separate relationships.
 # This works as many levels deep as you want. There's no limit.
@@ -83,12 +94,20 @@ This is a test
 # Find all Articles for the Reporter whose ID is 1.
 >>> Article.objects.get_list(reporter__id__exact=1, order_by=['pub_date'])
 [This is a test, John's second story]
+>>> Article.objects.get_list(reporter__pk=1, order_by=['pub_date'])
+[This is a test, John's second story]
 
-# Note you need two underscores between "reporter" and "id" -- not one.
+# You need two underscores between "reporter" and "id" -- not one.
 >>> Article.objects.get_list(reporter_id__exact=1)
 Traceback (most recent call last):
     ...
-TypeError: got unexpected keyword argument 'reporter_id__exact'
+TypeError: Cannot resolve keyword 'reporter_id' into field
+
+# You need to specify a comparison clause
+>>> Article.objects.get_list(reporter_id=1)
+Traceback (most recent call last):
+    ...
+TypeError: Cannot parse keyword query 'reporter_id'
 
 # "pk" shortcut syntax works in a related context, too.
 >>> Article.objects.get_list(reporter__pk=1, order_by=['pub_date'])
@@ -108,5 +127,29 @@ John Smith
 >>> a4.save()
 >>> a4.get_reporter()
 John Smith
+
+# Reporters can be queried
+>>> Reporter.objects.get_list(id__exact=1)
+[John Smith]
+>>> Reporter.objects.get_list(pk=1)
+[John Smith]
+>>> Reporter.objects.get_list(first_name__startswith='John')
+[John Smith]
+
+# Reporters can query in opposite direction of ForeignKey definition
+>>> Reporter.objects.get_list(articles__id__exact=1)
+[John Smith]
+>>> Reporter.objects.get_list(articles__pk=1)
+[John Smith]
+>>> Reporter.objects.get_list(articles__headline__startswith='This')
+[John Smith, John Smith, John Smith]
+>>> Reporter.objects.get_list(articles__headline__startswith='This', distinct=True)
+[John Smith]
+
+# Queries can go round in circles.
+>>> Reporter.objects.get_list(articles__reporter__first_name__startswith='John')
+[John Smith, John Smith, John Smith, John Smith]
+>>> Reporter.objects.get_list(articles__reporter__first_name__startswith='John', distinct=True)
+[John Smith]
 
 """

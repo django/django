@@ -66,10 +66,23 @@ DoesNotExist: Restaurant does not exist for {'place__id__exact': ...}
 
 >>> Restaurant.objects.get_object(place__id__exact=1)
 Demon Dogs the restaurant
->>> Restaurant.objects.get_object(place__name__startswith="Demon")
-Demon Dogs the restaurant
 >>> Restaurant.objects.get_object(pk=1)
 Demon Dogs the restaurant
+>>> Restaurant.objects.get_object(place__exact=1)
+Demon Dogs the restaurant
+>>> Restaurant.objects.get_object(place__pk=1)
+Demon Dogs the restaurant
+>>> Restaurant.objects.get_object(place__name__startswith="Demon")
+Demon Dogs the restaurant
+
+>>> Place.objects.get_object(id__exact=1)
+Demon Dogs the place
+>>> Place.objects.get_object(pk=1)
+Demon Dogs the place
+>>> Place.objects.get_object(restaurants__place__exact=1)
+Demon Dogs the place
+>>> Place.objects.get_object(restaurants__pk=1)
+Demon Dogs the place
 
 # Add a Waiter to the Restaurant.
 >>> w = r.add_waiter(name='Joe')
@@ -77,6 +90,17 @@ Demon Dogs the restaurant
 >>> w
 Joe the waiter at Demon Dogs the restaurant
 
+# Query the waiters
+>>> Waiter.objects.get_list(restaurant__place__exact=1)
+[Joe the waiter at Demon Dogs the restaurant]
+>>> Waiter.objects.get_list(restaurant__pk=1)
+[Joe the waiter at Demon Dogs the restaurant]
+>>> Waiter.objects.get_list(id__exact=1)
+[Joe the waiter at Demon Dogs the restaurant]
+>>> Waiter.objects.get_list(pk=1)
+[Joe the waiter at Demon Dogs the restaurant]
+
+# Delete the restaurant; the waiter should also be removed
 >>> r = Restaurant.objects.get_object(pk=1)
 >>> r.delete()
 """

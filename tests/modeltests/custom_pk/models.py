@@ -47,6 +47,10 @@ Traceback (most recent call last):
     ...
 DoesNotExist: Employee does not exist for {'pk': 'foo'}
 
+# Use the name of the primary key, rather than pk.
+>>> Employee.objects.get_object(employee_code__exact='ABC123')
+Dan Jones
+
 # Fran got married and changed her last name.
 >>> fran = Employee.objects.get_object(pk='XYZ456')
 >>> fran.last_name = 'Jones'
@@ -66,4 +70,23 @@ True
 [Sears]
 >>> Business.objects.get_in_bulk(['Sears'])
 {'Sears': Sears}
+
+>>> Business.objects.get_list(name__exact='Sears')
+[Sears]
+>>> Business.objects.get_list(pk='Sears')
+[Sears]
+
+# Queries across tables, involving primary key
+>>> Employee.objects.get_list(businesses__name__exact='Sears')
+[Dan Jones, Fran Jones]
+>>> Employee.objects.get_list(businesses__pk='Sears')
+[Dan Jones, Fran Jones]
+
+>>> Business.objects.get_list(employees__employee_code__exact='ABC123')
+[Sears]
+>>> Business.objects.get_list(employees__pk='ABC123')
+[Sears]
+>>> Business.objects.get_list(employees__first_name__startswith='Fran')
+[Sears]
+
 """

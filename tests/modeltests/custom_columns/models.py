@@ -35,7 +35,7 @@ John Smith
 >>> Person.objects.get_list(firstname__exact='John')
 Traceback (most recent call last):
     ...
-TypeError: got unexpected keyword argument 'firstname__exact'
+TypeError: Cannot resolve keyword 'firstname' into field
 
 >>> p = Person.objects.get_object(last_name__exact='Smith')
 >>> p.first_name

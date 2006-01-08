@@ -1,5 +1,6 @@
 from django.db import backend, connection
 from django.db.models.exceptions import *
+from django.utils.datastructures import SortedDict
 
 LOOKUP_SEPARATOR = '__'
 
@@ -170,15 +171,14 @@ def fill_table_cache(opts, select, tables, where, old_prefix, cache_tables_seen)
             select.extend(['%s.%s' % (backend.quote_name(db_table), backend.quote_name(f2.column)) for f2 in f.rel.to._meta.fields])
             fill_table_cache(f.rel.to._meta, select, tables, where, db_table, cache_tables_seen)
 
-def throw_bad_kwarg_error(kwarg):
-    # Helper function to remove redundancy.
-    raise TypeError, "got unexpected keyword argument '%s'" % kwarg
-
 def parse_lookup(kwarg_items, opts):
-    # Helper function that handles converting API kwargs (e.g.
-    # "name__exact": "tom") to SQL.
+    # Helper function that handles converting API kwargs
+    # (e.g. "name__exact": "tom") to SQL.
 
-    # 'joins' is a dictionary describing the tables that must be joined to complete the query.
+    # 'joins' is a sorted dictionary describing the tables that must be joined
+    # to complete the query. The dictionary is sorted because creation order
+    # is significant; it is a dictionary to ensure uniqueness of alias names.
+    #
     # Each key-value pair follows the form
     #   alias: (table, join_type, condition)
     # where
@@ -186,177 +186,203 @@ def parse_lookup(kwarg_items, opts):
     #   table is the actual table name to be joined
     #   join_type is the type of join (INNER JOIN, LEFT OUTER JOIN, etc)
     #   condition is the where-like statement over which narrows the join.
+    #   alias will be derived from the lookup list name.
     #
-    # alias will be derived from the lookup list name.
-    # At present, this method only every returns INNER JOINs; the option is there for others
-    # to implement custom Q()s, etc that return other join types.
-    tables, joins, where, params = [], {}, [], []
-    for kwarg, kwarg_value in kwarg_items:
+    # At present, this method only every returns INNER JOINs; the option is
+    # there for others to implement custom Q()s, etc that return other join
+    # types.
+    tables, joins, where, params = [], SortedDict(), [], []
+    for kwarg, value in kwarg_items:
         if kwarg in ('order_by', 'limit', 'offset', 'select_related', 'distinct', 'select', 'tables', 'where', 'params'):
-            continue
-        if kwarg_value is None:
-            continue
-        if kwarg == 'complex':
-            tables2, joins2, where2, params2 = kwarg_value.get_sql(opts)
+            pass
+        elif value is None:
+            pass
+        elif kwarg == 'complex':
+            tables2, joins2, where2, params2 = value.get_sql(opts)
             tables.extend(tables2)
             joins.update(joins2)
             where.extend(where2)
             params.extend(params2)
-            continue
-        if kwarg == '_or':
-            for val in kwarg_value:
+        elif kwarg == '_or':
+            for val in value:
                 tables2, joins2, where2, params2 = parse_lookup(val, opts)
                 tables.extend(tables2)
                 joins.update(joins2)
                 where.append('(%s)' % ' OR '.join(where2))
                 params.extend(params2)
-            continue
-        lookup_list = kwarg.split(LOOKUP_SEPARATOR)
-        # pk="value" is shorthand for (primary key)__exact="value"
-        if lookup_list[-1] == 'pk':
-            if opts.pk.rel:
-                lookup_list = lookup_list[:-1] + [opts.pk.name, opts.pk.rel.field_name, 'exact']
-            else:
-                lookup_list = lookup_list[:-1] + [opts.pk.name, 'exact']
-        if len(lookup_list) == 1:
-            throw_bad_kwarg_error(kwarg)
-        lookup_type = lookup_list.pop()
-        current_opts = opts # We'll be overwriting this, so keep a reference to the original opts.
-        current_table_alias = current_opts.db_table
-        param_required = False
-        while lookup_list or param_required:
-            try:
-                # "current" is a piece of the lookup list. For example, in
-                # choices.get_list(poll__sites__id__exact=5), lookup_list is
-                # ["poll", "sites", "id"], and the first current is "poll".
-                try:
-                    current = lookup_list.pop(0)
-                except IndexError:
-                    # If we're here, lookup_list is empty but param_required
-                    # is set to True, which means the kwarg was bad.
-                    # Example: choices.get_list(poll__exact='foo')
-                    throw_bad_kwarg_error(kwarg)
-                # Try many-to-many relationships in the direction in which they are
-                # originally defined (i.e., the class that defines the ManyToManyField)
-                for f in current_opts.many_to_many:
-                    if f.name == current:
-                        rel_table_alias = backend.quote_name("m2m_" + current_table_alias + LOOKUP_SEPARATOR + current)
+        else: # Must be a search parameter.
+            path = kwarg.split(LOOKUP_SEPARATOR)
 
-                        joins[rel_table_alias] = (
-                            backend.quote_name(f.get_m2m_db_table(current_opts)),
-                            "INNER JOIN",
-                            '%s.%s = %s.%s' %
-                                (backend.quote_name(current_table_alias),
-                                backend.quote_name(current_opts.pk.column),
-                                rel_table_alias,
-                                backend.quote_name(current_opts.object_name.lower() + '_id'))
-                        )
+            # Extract the last elements of the kwarg.
+            # The very-last is the clause (equals, like, etc).
+            # The second-last is the table column on which the clause is
+            # to be performed.
+            # The only exception to this is "pk", which is an implicit
+            # id__exact; if we find "pk", make the clause "exact', and
+            # insert a dummy name of None, which we will replace when
+            # we know which table column to grab as the primary key.
+            clause = path.pop()
+            if clause == 'pk':
+                clause = 'exact'
+                path.append(None)
+            if len(path) < 1:
+                raise TypeError, "Cannot parse keyword query %r" % kwarg
 
-                        # Optimization: In the case of primary-key lookups, we
-                        # don't have to do an extra join.
-                        if lookup_list and lookup_list[0] == f.rel.to._meta.pk.name and lookup_type == 'exact':
-                            where.append(get_where_clause(lookup_type, rel_table_alias+'.',
-                                f.rel.to._meta.object_name.lower()+'_id', kwarg_value))
-                            params.extend(f.get_db_prep_lookup(lookup_type, kwarg_value))
-                            lookup_list.pop()
-                            param_required = False
-                        else:
-                            new_table_alias = current_table_alias + LOOKUP_SEPARATOR + current
+            tables2, joins2, where2, params2 = lookup_inner(path, clause, value, opts, opts.db_table, None)
+            tables.extend(tables2)
+            joins.update(joins2)
+            where.extend(where2)
+            params.extend(params2)
+    return tables, joins, where, params
 
-                            joins[backend.quote_name(new_table_alias)] = (
-                                backend.quote_name(f.rel.to._meta.db_table),
-                                "INNER JOIN",
-                                '%s.%s = %s.%s' %
-                                    (rel_table_alias,
-                                    backend.quote_name(f.rel.to._meta.object_name.lower() + '_id'),
-                                    backend.quote_name(new_table_alias),
-                                    backend.quote_name(f.rel.to._meta.pk.column))
-                            )
-                            current_table_alias = new_table_alias
-                            param_required = True
-                        current_opts = f.rel.to._meta
-                        raise StopIteration
-                # Try many-to-many relationships first in the reverse direction
-                # (i.e., from the class does not have the ManyToManyField)
-                for f in current_opts.get_all_related_many_to_many_objects():
-                    if f.name == current:
-                        rel_table_alias = backend.quote_name("m2m_" + current_table_alias + LOOKUP_SEPARATOR + current)
+class FieldFound(Exception):
+    "Exception used to short circuit field-finding operations."
+    pass
 
-                        joins[rel_table_alias] = (
-                            backend.quote_name(f.field.get_m2m_db_table(f.opts)),
-                            "INNER JOIN",
-                            '%s.%s = %s.%s' %
-                                (backend.quote_name(current_table_alias),
-                                backend.quote_name(current_opts.pk.column),
-                                rel_table_alias,
-                                backend.quote_name(current_opts.object_name.lower() + '_id'))
-                        )
+def find_field(name, field_list):
+    """
+    Finds a field with a specific name in a list of field instances.
+    Returns None if there are no matches, or several matches.
+    """
+    matches = [f for f in field_list if f.name == name]
+    if len(matches) != 1:
+        return None
+    return matches[0]
 
-                        # Optimization: In the case of primary-key lookups, we
-                        # don't have to do an extra join.
-                        if lookup_list and lookup_list[0] == f.opts.pk.name and lookup_type == 'exact':
-                            where.append(get_where_clause(lookup_type, rel_table_alias+'.',
-                                f.opts.object_name.lower()+'_id', kwarg_value))
-                            params.extend(f.field.get_db_prep_lookup(lookup_type, kwarg_value))
-                            lookup_list.pop()
-                            param_required = False
-                        else:
-                            new_table_alias = current_table_alias + LOOKUP_SEPARATOR + current
+def lookup_inner(path, clause, value, opts, table, column):
+    tables, joins, where, params = [], SortedDict(), [], []
+    current_opts = opts
+    current_table = table
+    current_column = column
+    intermediate_table = None
+    join_required = False
 
-                            joins[backend.quote_name(new_table_alias)] = (
-                                backend.quote_name(f.opts.db_table),
-                                "INNER JOIN",
-                                '%s.%s = %s.%s' %
-                                    (rel_table_alias,
-                                    backend.quote_name(f.opts.object_name.lower() + '_id'),
-                                    backend.quote_name(new_table_alias),
-                                    backend.quote_name(f.opts.pk.column))
-                            )
-                            current_table_alias = new_table_alias
-                            param_required = True
-                        current_opts = f.opts
-                        raise StopIteration
-                for f in current_opts.fields:
-                    # Try many-to-one relationships...
-                    if f.rel and f.name == current:
-                        # Optimization: In the case of primary-key lookups, we
-                        # don't have to do an extra join.
-                        if lookup_list and lookup_list[0] == f.rel.to._meta.pk.name and lookup_type == 'exact':
-                            where.append(get_where_clause(lookup_type, current_table_alias+'.', f.column, kwarg_value))
-                            params.extend(f.get_db_prep_lookup(lookup_type, kwarg_value))
-                            lookup_list.pop()
-                            param_required = False
-                        # 'isnull' lookups in many-to-one relationships are a special case,
-                        # because we don't want to do a join. We just want to find out
-                        # whether the foreign key field is NULL.
-                        elif lookup_type == 'isnull' and not lookup_list:
-                            where.append(get_where_clause(lookup_type, current_table_alias+'.', f.column, kwarg_value))
-                            params.extend(f.get_db_prep_lookup(lookup_type, kwarg_value))
-                        else:
-                            new_table_alias = current_table_alias + LOOKUP_SEPARATOR + current
+    name = path.pop(0)
+    # Has the primary key been requested? If so, expand it out
+    # to be the name of the current class' primary key
+    if name is None:
+        name = current_opts.pk.name
 
-                            joins[backend.quote_name(new_table_alias)] = (
-                                backend.quote_name(f.rel.to._meta.db_table),
-                                "INNER JOIN",
-                                '%s.%s = %s.%s' %
-                                    (backend.quote_name(current_table_alias),
-                                    backend.quote_name(f.column),
-                                    backend.quote_name(new_table_alias),
-                                    backend.quote_name(f.rel.to._meta.pk.column))
-                            )
-                            current_table_alias = new_table_alias
-                            param_required = True
-                        current_opts = f.rel.to._meta
-                        raise StopIteration
-                    # Try direct field-name lookups...
-                    if f.name == current:
-                        where.append(get_where_clause(lookup_type, current_table_alias+'.', f.column, kwarg_value))
-                        params.extend(f.get_db_prep_lookup(lookup_type, kwarg_value))
-                        param_required = False
-                        raise StopIteration
-                # If we haven't hit StopIteration at this point, "current" must be
-                # an invalid lookup, so raise an exception.
-                throw_bad_kwarg_error(kwarg)
-            except StopIteration:
-                continue
+    # Try to find the name in the fields associated with the current class
+    try:
+        # Does the name belong to a defined many-to-many field?
+        field = find_field(name, current_opts.many_to_many)
+        if field:
+            new_table = current_table + LOOKUP_SEPARATOR + name
+            new_opts = field.rel.to._meta
+            new_column = new_opts.pk.column
+
+            # Need to create an intermediate table join over the m2m table
+            # This process hijacks current_table/column to point to the
+            # intermediate table.
+            current_table = "m2m_" + new_table
+            join_column = new_opts.object_name.lower() + '_id'
+            intermediate_table = field.get_m2m_db_table(current_opts)
+
+            raise FieldFound()
+
+        # Does the name belong to a reverse defined many-to-many field?
+        field = find_field(name, current_opts.get_all_related_many_to_many_objects())
+        if field:
+            new_table = current_table + LOOKUP_SEPARATOR + name
+            new_opts = field.opts
+            new_column = new_opts.pk.column
+
+            # Need to create an intermediate table join over the m2m table.
+            # This process hijacks current_table/column to point to the
+            # intermediate table.
+            current_table = "m2m_" + new_table
+            join_column = new_opts.object_name.lower() + '_id'
+            intermediate_table = field.field.get_m2m_db_table(new_opts)
+
+            raise FieldFound()
+
+        # Does the name belong to a one-to-many field?
+        field = find_field(name, opts.get_all_related_objects())
+        if field:
+            new_table = table + LOOKUP_SEPARATOR + name
+            new_opts = field.opts
+            new_column = field.field.column
+            join_column = opts.pk.column
+
+            # 1-N fields MUST be joined, regardless of any other conditions.
+            join_required = True
+
+            raise FieldFound()
+
+        # Does the name belong to a one-to-one, many-to-one, or regular field?
+        field = find_field(name, current_opts.fields)
+        if field:
+            if field.rel: # One-to-One/Many-to-one field
+                new_table = current_table + LOOKUP_SEPARATOR + name
+                new_opts = field.rel.to._meta
+                new_column = new_opts.pk.column
+                join_column = field.column
+
+            raise FieldFound()
+
+    except FieldFound: # Match found, loop has been shortcut.
+        pass
+    except: # Any other exception; rethrow
+        raise
+    else: # No match found.
+        raise TypeError, "Cannot resolve keyword '%s' into field" % name
+
+    # Check to see if an intermediate join is required between current_table
+    # and new_table.
+    if intermediate_table:
+        joins[backend.quote_name(current_table)] = (
+            backend.quote_name(intermediate_table),
+            "INNER JOIN",
+            "%s.%s = %s.%s" % \
+                (backend.quote_name(table),
+                backend.quote_name(current_opts.pk.column),
+                backend.quote_name(current_table),
+                backend.quote_name(current_opts.object_name.lower() + '_id'))
+        )
+
+    if path:
+        if len(path) == 1 and path[0] in (new_opts.pk.name, None) \
+            and clause in ('exact', 'isnull') and not join_required:
+            # If the last name query is for a key, and the search is for
+            # isnull/exact, then the current (for N-1) or intermediate
+            # (for N-N) table can be used for the search - no need to join an
+            # extra table just to check the primary key.
+            new_table = current_table
+        else:
+            # There are 1 or more name queries pending, and we have ruled out
+            # any shortcuts; therefore, a join is required.
+            joins[backend.quote_name(new_table)] = (
+                backend.quote_name(new_opts.db_table),
+                "INNER JOIN",
+                "%s.%s = %s.%s" %
+                    (backend.quote_name(current_table),
+                    backend.quote_name(join_column),
+                    backend.quote_name(new_table),
+                    backend.quote_name(new_column))
+            )
+            # If we have made the join, we don't need to tell subsequent
+            # recursive calls about the column name we joined on.
+            join_column = None
+
+        # There are name queries remaining. Recurse deeper.
+        tables2, joins2, where2, params2 = lookup_inner(path, clause, value, new_opts, new_table, join_column)
+
+        tables.extend(tables2)
+        joins.update(joins2)
+        where.extend(where2)
+        params.extend(params2)
+    else:
+        # Evaluate clause on current table.
+        if name in (current_opts.pk.name, None) and clause in ('exact', 'isnull') and current_column:
+            # If this is an exact/isnull key search, and the last pass
+            # found/introduced a current/intermediate table that we can use to
+            # optimize the query, then use that column name.
+            column = current_column
+        else:
+            column = field.column
+
+        where.append(get_where_clause(clause, current_table + '.', column, value))
+        params.extend(field.get_db_prep_lookup(clause, value))
+
     return tables, joins, where, params

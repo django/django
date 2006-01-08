@@ -68,6 +68,8 @@ True
 [Django lets you build Web apps easily, NASA uses Python]
 
 # We can perform kwarg queries across m2m relationships
+>>> Article.objects.get_list(publications__id__exact=1)
+[Django lets you build Web apps easily, NASA uses Python]
 >>> Article.objects.get_list(publications__pk=1)
 [Django lets you build Web apps easily, NASA uses Python]
 
@@ -78,8 +80,16 @@ True
 [NASA uses Python]
 
 # Reverse m2m queries (i.e., start at the table that doesn't have a ManyToManyField)
+>>> Publication.objects.get_list(id__exact=1)
+[The Python Journal]
+>>> Publication.objects.get_list(pk=1)
+[The Python Journal]
+
 >>> Publication.objects.get_list(articles__headline__startswith="NASA")
 [The Python Journal, Science News, Science Weekly]
+
+>>> Publication.objects.get_list(articles__id__exact=1)
+[The Python Journal]
 
 >>> Publication.objects.get_list(articles__pk=1)
 [The Python Journal]
