@@ -14,7 +14,7 @@ Session functionality is enabled by default.
 
 You can turn session functionality on and off by editing the
 ``MIDDLEWARE_CLASSES`` setting. To activate sessions, make sure
-``MIDDLEWARE_CLASSES`` contains ``"django.middleware.sessions.SessionMiddleware"``.
+``MIDDLEWARE_CLASSES`` contains ``"django.contrib.sessions.middleware.SessionMiddleware"``.
 
 If you don't want to use sessions, you might as well remove the
 ``SessionMiddleware`` line from ``MIDDLEWARE_CLASSES``. It'll save you a small

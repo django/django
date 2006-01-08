@@ -95,7 +95,7 @@ Handles conditional GET operations. If the response has a ``ETag`` or
 Also removes the content from any response to a HEAD request and sets the
 ``Date`` and ``Content-Length`` response-headers.
 
-django.middleware.sessions.SessionMiddleware
+django.contrib.sessions.middleware.SessionMiddleware
 --------------------------------------------
 
 Enables session support. See the `session documentation`_.
@@ -176,8 +176,8 @@ Guidelines
       to it.
 
     * Feel free to look at Django's available middleware for examples. The
-      default Django middleware classes are in ``django/middleware/`` in the
-      Django distribution.
+      core Django middleware classes are in ``django/middleware/`` in the
+      Django distribution. The session middleware is in ``django/contrib/sessions``.
 
     * If you write a middleware component that you think would be useful to
       other people, contribute to the community! Let us know, and we'll
