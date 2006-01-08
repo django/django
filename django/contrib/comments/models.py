@@ -1,5 +1,6 @@
 from django.db import models
-from django.models import core
+from django.models.core import ContentType
+from django.contrib.sites.models import Site
 from django.contrib.auth.models import User
 from django.utils.translation import gettext_lazy as _
 import datetime
@@ -62,7 +63,7 @@ class CommentManager(models.Manager):
 
 class Comment(models.Model):
     user = models.ForeignKey(User, raw_id_admin=True)
-    content_type = models.ForeignKey(core.ContentType)
+    content_type = models.ForeignKey(ContentType)
     object_id = models.IntegerField(_('object ID'))
     headline = models.CharField(_('headline'), maxlength=255, blank=True)
     comment = models.TextField(_('comment'), maxlength=3000)
@@ -83,7 +84,7 @@ class Comment(models.Model):
     is_public = models.BooleanField(_('is public'))
     ip_address = models.IPAddressField(_('IP address'), blank=True, null=True)
     is_removed = models.BooleanField(_('is removed'), help_text=_('Check this box if the comment is inappropriate. A "This comment has been removed" message will be displayed instead.'))
-    site = models.ForeignKey(core.Site)
+    site = models.ForeignKey(Site)
     objects = CommentManager()
     class Meta:
         db_table = 'comments'
@@ -163,7 +164,7 @@ class Comment(models.Model):
 
 class FreeComment(models.Model):
     # A FreeComment is a comment by a non-registered user.
-    content_type = models.ForeignKey(core.ContentType)
+    content_type = models.ForeignKey(ContentType)
     object_id = models.IntegerField(_('object ID'))
     comment = models.TextField(_('comment'), maxlength=3000)
     person_name = models.CharField(_("person's name"), maxlength=50)
@@ -172,7 +173,7 @@ class FreeComment(models.Model):
     ip_address = models.IPAddressField(_('ip address'))
     # TODO: Change this to is_removed, like Comment
     approved = models.BooleanField(_('approved by staff'))
-    site = models.ForeignKey(core.Site)
+    site = models.ForeignKey(Site)
     class Meta:
         db_table = 'comments_free'
         verbose_name = _('Free comment')
