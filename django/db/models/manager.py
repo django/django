@@ -5,6 +5,7 @@ from django.db.models.query import Q, parse_lookup, fill_table_cache, get_cached
 from django.db.models.query import handle_legacy_orderlist, orderlist2sql, orderfield2column
 from django.dispatch import dispatcher
 from django.db.models import signals
+from django.utils.datastructures import SortedDict
 
 # Size of each "chunk" for get_iterator calls.
 # Larger values are slightly faster at the expense of more storage space.
@@ -47,7 +48,7 @@ class Manager(object):
            self.creation_counter < klass._default_manager.creation_counter:
                 klass._default_manager = self
 
-    def _get_sql_clause(self, **kwargs):
+    def _get_sql_clause(self, *args, **kwargs):
         def quote_only_if_word(word):
             if ' ' in word:
                 return word
@@ -59,12 +60,28 @@ class Manager(object):
         # Construct the fundamental parts of the query: SELECT X FROM Y WHERE Z.
         select = ["%s.%s" % (backend.quote_name(opts.db_table), backend.quote_name(f.column)) for f in opts.fields]
         tables = (kwargs.get('tables') and [quote_only_if_word(t) for t in kwargs['tables']] or [])
+        joins = SortedDict()
         where = kwargs.get('where') and kwargs['where'][:] or []
         params = kwargs.get('params') and kwargs['params'][:] or []
 
+        # Convert all the args into SQL.
+        table_count = 0
+        for arg in args:
+            # check that the provided argument is a Query (i.e., it has a get_sql method)
+            if not hasattr(arg, 'get_sql'):
+                raise TypeError, "'%s' is not a valid query argument" % str(arg)
+
+            tables2, joins2, where2, params2 = arg.get_sql(opts)
+            tables.extend(tables2)
+            joins.update(joins2)
+            where.extend(where2)
+            params.extend(params2)
+
+
         # Convert the kwargs into SQL.
-        tables2, joins, where2, params2 = parse_lookup(kwargs.items(), opts)
+        tables2, joins2, where2, params2 = parse_lookup(kwargs.items(), opts)
         tables.extend(tables2)
+        joins.update(joins2)
         where.extend(where2)
         params.extend(params2)
 
@@ -129,13 +146,13 @@ class Manager(object):
 
         return select, " ".join(sql), params
 
-    def get_iterator(self, **kwargs):
+    def get_iterator(self, *args, **kwargs):
         # kwargs['select'] is a dictionary, and dictionaries' key order is
         # undefined, so we convert it to a list of tuples internally.
         kwargs['select'] = kwargs.get('select', {}).items()
 
         cursor = connection.cursor()
-        select, sql, params = self._get_sql_clause(**kwargs)
+        select, sql, params = self._get_sql_clause(*args, **kwargs)
         cursor.execute("SELECT " + (kwargs.get('distinct') and "DISTINCT " or "") + ",".join(select) + sql, params)
         fill_cache = kwargs.get('select_related')
         index_end = len(self.klass._meta.fields)
@@ -152,35 +169,41 @@ class Manager(object):
                     setattr(obj, k[0], row[index_end+i])
                 yield obj
 
-    def get_list(self, **kwargs):
-        return list(self.get_iterator(**kwargs))
+    def get_list(self, *args, **kwargs):
+        return list(self.get_iterator(*args, **kwargs))
 
-    def get_count(self, **kwargs):
+    def get_count(self, *args, **kwargs):
         kwargs['order_by'] = []
         kwargs['offset'] = None
         kwargs['limit'] = None
         kwargs['select_related'] = False
-        _, sql, params = self._get_sql_clause(**kwargs)
+        _, sql, params = self._get_sql_clause(*args, **kwargs)
         cursor = connection.cursor()
         cursor.execute("SELECT COUNT(*)" + sql, params)
         return cursor.fetchone()[0]
 
-    def get_object(self, **kwargs):
-        obj_list = self.get_list(**kwargs)
+    def get_object(self, *args, **kwargs):
+        obj_list = self.get_list(*args, **kwargs)
         if len(obj_list) < 1:
             raise self.klass.DoesNotExist, "%s does not exist for %s" % (self.klass._meta.object_name, kwargs)
         assert len(obj_list) == 1, "get_object() returned more than one %s -- it returned %s! Lookup parameters were %s" % (self.klass._meta.object_name, len(obj_list), kwargs)
         return obj_list[0]
 
     def get_in_bulk(self, *args, **kwargs):
-        id_list = args and args[0] or kwargs.get('id_list', [])
-        assert id_list != [], "get_in_bulk() cannot be passed an empty list."
+        # Separate any list arguments: the first list will be used as the id list; subsequent
+        # lists will be ignored.
+        id_args = filter(lambda arg: isinstance(arg, list), args)
+        # Separate any non-list arguments: these are assumed to be query arguments
+        sql_args = filter(lambda arg: not isinstance(arg, list), args)
+
+        id_list = id_args and id_args[0] or kwargs.get('id_list', [])
+        assert id_list != [], "get_in_bulk() cannot be passed an empty ID list."        
         kwargs['where'] = ["%s.%s IN (%s)" % (backend.quote_name(self.klass._meta.db_table), backend.quote_name(self.klass._meta.pk.column), ",".join(['%s'] * len(id_list)))]
         kwargs['params'] = id_list
-        obj_list = self.get_list(**kwargs)
+        obj_list = self.get_list(*sql_args, **kwargs)
         return dict([(getattr(o, self.klass._meta.pk.attname), o) for o in obj_list])
 
-    def get_values_iterator(self, **kwargs):
+    def get_values_iterator(self, *args, **kwargs):
         # select_related and select aren't supported in get_values().
         kwargs['select_related'] = False
         kwargs['select'] = {}
@@ -192,7 +215,7 @@ class Manager(object):
             fields = [f.column for f in self.klass._meta.fields]
 
         cursor = connection.cursor()
-        _, sql, params = self._get_sql_clause(**kwargs)
+        _, sql, params = self._get_sql_clause(*args, **kwargs)
         select = ['%s.%s' % (backend.quote_name(self.klass._meta.db_table), backend.quote_name(f)) for f in fields]
         cursor.execute("SELECT " + (kwargs.get('distinct') and "DISTINCT " or "") + ",".join(select) + sql, params)
         while 1:
@@ -202,17 +225,22 @@ class Manager(object):
             for row in rows:
                 yield dict(zip(fields, row))
 
-    def get_values(self, **kwargs):
-        return list(self.get_values_iterator(**kwargs))
+    def get_values(self, *args, **kwargs):
+        return list(self.get_values_iterator(*args, **kwargs))
 
-    def __get_latest(self, **kwargs):
+    def __get_latest(self, *args, **kwargs):
         kwargs['order_by'] = ('-' + self.klass._meta.get_latest_by,)
         kwargs['limit'] = 1
-        return self.get_object(**kwargs)
+        return self.get_object(*args, **kwargs)
 
     def __get_date_list(self, field, *args, **kwargs):
+        # Separate any string arguments: the first will be used as the kind
+        kind_args = filter(lambda arg: isinstance(arg, str), args)
+        # Separate any non-list arguments: these are assumed to be query arguments
+        sql_args = filter(lambda arg: not isinstance(arg, str), args)
+        
         from django.db.backends.util import typecast_timestamp
-        kind = args and args[0] or kwargs['kind']
+        kind = kind_args and kind_args[0] or kwargs.get(['kind'],"")
         assert kind in ("month", "year", "day"), "'kind' must be one of 'year', 'month' or 'day'."
         order = 'ASC'
         if kwargs.has_key('order'):
@@ -223,7 +251,7 @@ class Manager(object):
         if field.null:
             kwargs.setdefault('where', []).append('%s.%s IS NOT NULL' % \
                 (backend.quote_name(self.klass._meta.db_table), backend.quote_name(field.column)))
-        select, sql, params = self._get_sql_clause(**kwargs)
+        select, sql, params = self._get_sql_clause(*sql_args, **kwargs)
         sql = 'SELECT %s %s GROUP BY 1 ORDER BY 1 %s' % \
             (backend.get_date_trunc_sql(kind, '%s.%s' % (backend.quote_name(self.klass._meta.db_table),
             backend.quote_name(field.column))), sql, order)

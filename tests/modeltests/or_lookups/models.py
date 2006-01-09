@@ -3,7 +3,7 @@
 
 To perform an OR lookup, or a lookup that combines ANDs and ORs, use the
 ``complex`` keyword argument, and pass it an expression of clauses using the
-variable ``django.db.models.Q``.
+variable ``django.db.models.Q`` (or any object with a get_sql method).
 """
 
 from django.db import models
@@ -53,5 +53,34 @@ API_TESTS = """
 
 >>> Article.objects.get_list(complex=(Q(pk=1) | Q(pk=2) | Q(pk=3)))
 [Hello, Goodbye, Hello and goodbye]
+
+# Queries can use Q objects as args
+>>> Article.objects.get_list(Q(headline__startswith='Hello'))
+[Hello, Hello and goodbye]
+
+# Q arg objects are ANDed 
+>>> Article.objects.get_list(Q(headline__startswith='Hello'), Q(headline__contains='bye'))
+[Hello and goodbye]
+
+# Q arg AND order is irrelevant
+>>> Article.objects.get_list(Q(headline__contains='bye'), headline__startswith='Hello')
+[Hello and goodbye]
+
+# QOrs are ok, as they ultimately resolve to a Q 
+>>> Article.objects.get_list(Q(headline__contains='Hello') | Q(headline__contains='bye'))
+[Hello, Goodbye, Hello and goodbye]
+
+# Try some arg queries with operations other than get_list
+>>> Article.objects.get_object(Q(headline__startswith='Hello'), Q(headline__contains='bye'))
+Hello and goodbye
+
+>>> Article.objects.get_count(Q(headline__startswith='Hello') | Q(headline__contains='bye'))
+3
+
+>>> Article.objects.get_values(Q(headline__startswith='Hello'), Q(headline__contains='bye'))
+[{'headline': 'Hello and goodbye', 'pub_date': datetime.datetime(2005, 11, 29, 0, 0), 'id': 3}]
+
+>>> Article.objects.get_in_bulk([1,2], Q(headline__startswith='Hello'))
+{1: Hello}
 
 """

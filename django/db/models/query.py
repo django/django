@@ -198,6 +198,8 @@ def parse_lookup(kwarg_items, opts):
         elif value is None:
             pass
         elif kwarg == 'complex':
+            if not hasattr(value, 'get_sql'):
+                raise TypeError, "'%s' is not a valid query argument" % str(arg)
             tables2, joins2, where2, params2 = value.get_sql(opts)
             tables.extend(tables2)
             joins.update(joins2)

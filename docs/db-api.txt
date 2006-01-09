@@ -224,32 +224,67 @@ OR lookups
 
 **New in Django development version.**
 
-By default, multiple lookups are "AND"ed together. If you'd like to use ``OR``
-statements in your queries, use the ``complex`` lookup type.
+By default, keyword argument queries are "AND"ed together. If you have more complex query 
+requirements (for example, you need to include an ``OR`` statement in your query), you need 
+to use ``Q`` objects.
 
-``complex`` takes an expression of clauses, each of which is an instance of
-``django.core.meta.Q``. ``Q`` takes an arbitrary number of keyword arguments in
-the standard Django lookup format. And you can use Python's "and" (``&``) and
-"or" (``|``) operators to combine ``Q`` instances. For example::
+A ``Q`` object is an instance of ``django.core.meta.Q``, used to encapsulate a collection of 
+keyword arguments. These keyword arguments are specified in the same way as keyword arguments to
+the basic lookup functions like get_object() and get_list(). For example::
 
-    from django.core.meta import Q
-    polls.get_object(complex=(Q(question__startswith='Who') | Q(question__startswith='What')))
+    Q(question__startswith='What')
 
-The ``|`` symbol signifies an "OR", so this (roughly) translates into::
+``Q`` objects can be combined using the ``&`` and ``|`` operators. When an operator is used on two
+``Q`` objects, it yields a new ``Q`` object. For example the statement::
 
-    SELECT * FROM polls
-    WHERE question LIKE 'Who%' OR question LIKE 'What%';
+    Q(question__startswith='Who') | Q(question__startswith='What')
 
-You can use ``&`` and ``|`` operators together, and use parenthetical grouping.
-Example::
+... yields a single ``Q`` object that represents the "OR" of two "question__startswith" queries, equivalent to the SQL WHERE clause::
 
-    polls.get_object(complex=(Q(question__startswith='Who') & (Q(pub_date__exact=date(2005, 5, 2)) | Q(pub_date__exact=date(2005, 5, 6))))
+    ... WHERE question LIKE 'Who%' OR question LIKE 'What%'
 
-This roughly translates into::
+You can compose statements of arbitrary complexity by combining ``Q`` objects with the ``&`` and ``|`` operators. Parenthetical grouping can also be used. 
 
-    SELECT * FROM polls
-    WHERE question LIKE 'Who%'
-        AND (pub_date = '2005-05-02' OR pub_date = '2005-05-06');
+One or more ``Q`` objects can then provided as arguments to the lookup functions. If multiple 
+``Q`` object arguments are provided to a lookup function, they will be "AND"ed together. 
+For example::
+
+    polls.get_object(
+        Q(question__startswith='Who'), 
+        Q(pub_date__exact=date(2005, 5, 2)) | Q(pub_date__exact=date(2005, 5, 6))
+    )
+
+... roughly translates into the SQL::
+
+    SELECT * from polls WHERE question LIKE 'Who%'
+        AND (pub_date = '2005-05-02' OR pub_date = '2005-05-06')
+
+If necessary, lookup functions can mix the use of ``Q`` objects and keyword arguments. All arguments
+provided to a lookup function (be they keyword argument or ``Q`` object) are "AND"ed together. 
+However, if a ``Q`` object is provided, it must precede the definition of any keyword arguments. 
+For example::
+
+    polls.get_object(
+        Q(pub_date__exact=date(2005, 5, 2)) | Q(pub_date__exact=date(2005, 5, 6)),
+        question__startswith='Who')
+
+... would be a valid query, equivalent to the previous example; but::
+
+    # INVALID QUERY
+    polls.get_object(
+        question__startswith='Who', 
+        Q(pub_date__exact=date(2005, 5, 2)) | Q(pub_date__exact=date(2005, 5, 6)))
+
+... would not be valid. 
+
+A ``Q`` objects can also be provided to the ``complex`` keyword argument. For example::
+
+    polls.get_object(
+        complex=Q(question__startswith='Who') & 
+            (Q(pub_date__exact=date(2005, 5, 2)) | 
+             Q(pub_date__exact=date(2005, 5, 6))
+        )
+    )
 
 See the `OR lookups examples page`_ for more examples.
 

@@ -68,7 +68,7 @@ Article 4
 >>> Article.objects.get_in_bulk([])
 Traceback (most recent call last):
     ...
-AssertionError: get_in_bulk() cannot be passed an empty list.
+AssertionError: get_in_bulk() cannot be passed an empty ID list.
 
 # get_values() is just like get_list(), except it returns a list of
 # dictionaries instead of object instances -- and you can specify which fields
