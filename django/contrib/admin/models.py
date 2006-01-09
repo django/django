@@ -1,5 +1,5 @@
 from django.db import models
-from django.models import core
+from django.contrib.contenttypes.models import ContentType
 from django.contrib.auth.models import User
 from django.utils.translation import gettext_lazy as _
 
@@ -15,7 +15,7 @@ class LogEntryManager(models.Manager):
 class LogEntry(models.Model):
     action_time = models.DateTimeField(_('action time'), auto_now=True)
     user = models.ForeignKey(User)
-    content_type = models.ForeignKey(core.ContentType, blank=True, null=True)
+    content_type = models.ForeignKey(ContentType, blank=True, null=True)
     object_id = models.TextField(_('object id'), blank=True, null=True)
     object_repr = models.CharField(_('object repr'), maxlength=200)
     action_flag = models.PositiveSmallIntegerField(_('action flag'))

@@ -4,7 +4,7 @@ from django.core.exceptions import Http404, ObjectDoesNotExist
 from django.core.extensions import DjangoContext, render_to_response
 from django.contrib.auth.models import SESSION_KEY
 from django.contrib.comments.models import Comment, FreeComment, PHOTOS_REQUIRED, PHOTOS_OPTIONAL, RATINGS_REQUIRED, RATINGS_OPTIONAL, IS_PUBLIC
-from django.models.core import ContentType
+from django.contrib.contenttypes.models import ContentType
 from django.parts.auth.formfields import AuthenticationForm
 from django.utils.httpwrappers import HttpResponseRedirect
 from django.utils.text import normalize_newlines

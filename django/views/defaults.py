@@ -1,6 +1,6 @@
 from django.core.exceptions import Http404, ObjectDoesNotExist
 from django.core.template import Context, loader
-from django.models.core import ContentType
+from django.contrib.contenttypes.models import ContentType
 from django.contrib.sites.models import Site
 from django.utils import httpwrappers
 

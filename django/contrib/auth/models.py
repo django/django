@@ -1,6 +1,6 @@
 from django.core import validators
 from django.db import backend, connection, models
-from django.models import core
+from django.contrib.contenttypes.models import Package
 from django.utils.translation import gettext_lazy as _
 import datetime
 
@@ -8,7 +8,7 @@ SESSION_KEY = '_auth_user_id'
 
 class Permission(models.Model):
     name = models.CharField(_('name'), maxlength=50)
-    package = models.ForeignKey(core.Package, db_column='package')
+    package = models.ForeignKey(Package, db_column='package')
     codename = models.CharField(_('codename'), maxlength=100)
     class Meta:
         verbose_name = _('Permission')
