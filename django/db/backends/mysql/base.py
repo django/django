@@ -64,9 +64,12 @@ class DatabaseWrapper:
             if DATABASE_PORT:
                 kwargs['port'] = DATABASE_PORT
             self.connection = Database.connect(**kwargs)
+        cursor = self.connection.cursor()
+        if self.connection.get_server_info() >= '4.1':
+            cursor.execute("SET NAMES utf8")
         if DEBUG:
-            return util.CursorDebugWrapper(MysqlDebugWrapper(self.connection.cursor()), self)
-        return self.connection.cursor()
+            return base.CursorDebugWrapper(MysqlDebugWrapper(cursor), self)
+        return cursor
 
     def commit(self):
         self.connection.commit()
