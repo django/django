@@ -3,7 +3,7 @@ from django.contrib.comments.models import PHOTOS_REQUIRED, PHOTOS_OPTIONAL, RAT
 from django.contrib.comments.models import MIN_PHOTO_DIMENSION, MAX_PHOTO_DIMENSION
 from django.core import template
 from django.core.exceptions import ObjectDoesNotExist
-from django.models.core import contenttypes
+from django.contrib.contenttypes.models import ContentType
 import re
 
 register = template.Library()
@@ -204,8 +204,8 @@ class DoCommentForm:
         except ValueError: # unpack list of wrong size
             raise template.TemplateSyntaxError, "Third argument in %r tag must be in the format 'package.module'" % tokens[0]
         try:
-            content_type = contenttypes.get_object(package__label__exact=package, python_module_name__exact=module)
-        except contenttypes.ContentTypeDoesNotExist:
+            content_type = ContentType.objects.get_object(package__label__exact=package, python_module_name__exact=module)
+        except ContentType.DoesNotExist:
             raise template.TemplateSyntaxError, "%r tag has invalid content-type '%s.%s'" % (tokens[0], package, module)
         obj_id_lookup_var, obj_id = None, None
         if tokens[3].isdigit():
@@ -284,8 +284,8 @@ class DoCommentCount:
         except ValueError: # unpack list of wrong size
             raise template.TemplateSyntaxError, "Third argument in %r tag must be in the format 'package.module'" % tokens[0]
         try:
-            content_type = contenttypes.get_object(package__label__exact=package, python_module_name__exact=module)
-        except contenttypes.ContentTypeDoesNotExist:
+            content_type = ContentType.objects.get_object(package__label__exact=package, python_module_name__exact=module)
+        except ContentType.DoesNotExist:
             raise template.TemplateSyntaxError, "%r tag has invalid content-type '%s.%s'" % (tokens[0], package, module)
         var_name, obj_id = None, None
         if tokens[3].isdigit():
@@ -339,8 +339,8 @@ class DoGetCommentList:
         except ValueError: # unpack list of wrong size
             raise template.TemplateSyntaxError, "Third argument in %r tag must be in the format 'package.module'" % tokens[0]
         try:
-            content_type = contenttypes.get_object(package__label__exact=package, python_module_name__exact=module)
-        except contenttypes.ContentTypeDoesNotExist:
+            content_type = ContentType.objects.get_object(package__label__exact=package, python_module_name__exact=module)
+        except ContentType.DoesNotExist:
             raise template.TemplateSyntaxError, "%r tag has invalid content-type '%s.%s'" % (tokens[0], package, module)
         var_name, obj_id = None, None
         if tokens[3].isdigit():
