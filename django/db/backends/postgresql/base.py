@@ -69,7 +69,7 @@ def dictfetchall(cursor):
     return cursor.dictfetchall()
 
 def get_last_insert_id(cursor, table_name, pk_name):
-    cursor.execute("SELECT CURRVAL('%s_%s_seq')" % (table_name, pk_name))
+    cursor.execute("SELECT CURRVAL('\"%s_%s_seq\"')" % (table_name, pk_name))
     return cursor.fetchone()[0]
 
 def get_date_extract_sql(lookup_type, table_name):
