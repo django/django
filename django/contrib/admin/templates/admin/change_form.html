@@ -9,7 +9,8 @@
 {% block userlinks %}<a href="../../../password_change/">{% trans 'Change password' %}</a> / <a href="../../../logout/">{% trans 'Log out' %}</a>{% endblock %}
 {% block breadcrumbs %}{% if not is_popup %}
 <div class="breadcrumbs">
-  {% path_breadcrumbs path "Home" "1" "1" %}
+  {% if add %}{% path_breadcrumbs path "Home" "1" "0" %}{% endif %}
+  {% if change %}{% path_breadcrumbs path "Home" "1" "1" %}{% endif %}
   {% if add %}{% trans "Add" %} {{ bound_manipulator.verbose_name }}{% else %}{{ bound_manipulator.original|striptags|truncatewords:"18" }}{% endif %}
 </div>
 {% endif %}{% endblock %}
