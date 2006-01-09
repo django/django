@@ -11,6 +11,7 @@ class Site(models.Model):
     name = models.CharField(_('display name'), maxlength=50)
     objects = SiteManager()
     class Meta:
+        db_table = 'sites'
         verbose_name = _('site')
         verbose_name_plural = _('sites')
         ordering = ('domain',)
