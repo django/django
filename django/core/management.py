@@ -457,10 +457,15 @@ def init_minimal():
     "Initializes the database."
     try:
         from django.db import backend, connection, models
-        from django.models import core
         cursor = connection.cursor()
-        for sql in get_sql_create(core) + get_sql_initial_data(core):
-            cursor.execute(sql)
+        # This should probably be done in the test runner, or the test itself.
+        from django.conf.settings import INSTALLED_APPS
+        INSTALLED_APPS += ('django.contrib.contenttypes',)
+        # Install django.contrib.contenttypes. The tests require Packages to
+        # to be installed. This ought to be fixed (tests should probably 
+        # install their dependencies)
+        contenttypes_app = models.get_app('contenttypes')
+        install(contenttypes_app)
 
     except Exception, e:
         import traceback
@@ -479,11 +484,11 @@ def init():
     "Initializes the database with auth, sessions, sites and core."
     try:
         from django.db import backend, connection, models
-        from django.models import core
         from django.contrib.sites.models import Site
         cursor = connection.cursor()
-        for sql in get_sql_create(core) + get_sql_initial_data(core):
-            cursor.execute(sql)
+        # Install django.contrib.contenttypes.
+        contenttypes_app = models.get_app('contenttypes')
+        install(contenttypes_app)
         # Install django.contrib.auth.
         auth_app = models.get_app('auth')
         install(auth_app)
@@ -548,7 +553,7 @@ install.args = APP_ARGS
 def installperms(app):
     "Installs any permissions for the given app, if needed."
     from django.contrib.auth.models import Permission
-    from django.models.core import Package
+    from django.contrib.contenttypes.models import Package
     from django.db.models import get_models
     num_added = 0
     app_models = get_models(app)
