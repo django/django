@@ -471,7 +471,7 @@ a template loader. Here are the built-in template loaders:
     directories, in this order:
 
         * ``/path/to/myproject/polls/templates/foo.html``
-        * ``/path/to/myproject/music/templates/music.html``
+        * ``/path/to/myproject/music/templates/foo.html``
 
     Note that the loader performs an optimization when it is first imported:
     It caches a list of which ``INSTALLED_APPS`` packages have a ``templates``

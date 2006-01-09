@@ -26,11 +26,11 @@ this document, we'll be working with the following model, a "place" object::
     )
 
     class Place(meta.Model):
-        name = meta.CharField(maxlength=100),
-        address = meta.CharField(maxlength=100, blank=True),
-        city = meta.CharField(maxlength=50, blank=True),
-        state = meta.USStateField(),
-        zip_code = meta.CharField(maxlength=5, blank=True),
+        name = meta.CharField(maxlength=100)
+        address = meta.CharField(maxlength=100, blank=True)
+        city = meta.CharField(maxlength=50, blank=True)
+        state = meta.USStateField()
+        zip_code = meta.CharField(maxlength=5, blank=True)
         place_type = meta.IntegerField(choices=PLACE_TYPES)
         class Meta:
             admin = meta.Admin()

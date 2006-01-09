@@ -786,7 +786,7 @@ class DateField(TextField):
 
 class TimeField(TextField):
     """A FormField that automatically converts its data to a datetime.time object.
-    The data should be in the format HH:MM:SS."""
+    The data should be in the format HH:MM:SS or HH:MM:SS.mmmmmm."""
     def __init__(self, field_name, is_required=False, validator_list=[]):
         validator_list = [self.isValidTime] + validator_list
         TextField.__init__(self, field_name, length=8, maxlength=8,
@@ -802,11 +802,15 @@ class TimeField(TextField):
         "Converts the field into a datetime.time object"
         import time, datetime
         try:
+            part_list = data.split('.')
             try:
-                time_tuple = time.strptime(data, '%H:%M:%S')
+                time_tuple = time.strptime(part_list[0], '%H:%M:%S')
             except ValueError: # seconds weren't provided
-                time_tuple = time.strptime(data, '%H:%M')
-            return datetime.time(*time_tuple[3:6])
+                time_tuple = time.strptime(part_list[0], '%H:%M')
+            t = datetime.time(*time_tuple[3:6])
+            if (len(part_list) == 2):
+                t = t.replace(microsecond=int(part_list[1]))
+            return t
         except (ValueError, TypeError):
             return None
     html2python = staticmethod(html2python)

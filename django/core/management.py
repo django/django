@@ -786,7 +786,7 @@ def get_validation_errors(outfile):
                     try:
                         from PIL import Image
                     except ImportError:
-                        e.add(opts, '"%s" field: To use ImageFields, you need to install the Python Imaging Library. Get it at http://www.pythonware.com/products/pil/ .')
+                        e.add(opts, '"%s" field: To use ImageFields, you need to install the Python Imaging Library. Get it at http://www.pythonware.com/products/pil/ .' % f.name)
                 if f.prepopulate_from is not None and type(f.prepopulate_from) not in (list, tuple):
                     e.add(opts, '"%s" field: prepopulate_from should be a list or tuple.' % f.name)
                 if f.choices:

@@ -17,9 +17,10 @@ of the community, so there are many ways you can help Django's development:
     * Submit patches for new and/or fixed behavior.  Please read `Submitting
       patches`_, below, for details on how to submit a patch.
 
-    * Join the `django-dev`_ mailing list and share your ideas for how to improve
-      Django.  We're always open to suggestions, although we're likely to be skeptical
-      of large-scale suggestions without some code to back it up.
+    * Join the `django-developers`_ mailing list and share your ideas for how
+      to improve Django.  We're always open to suggestions, although we're
+      likely to be skeptical of large-scale suggestions without some code to
+      back it up.
 
 That's all you need to know if you'd like to join the Django development
 community. The rest of this document describes the details of how our community
@@ -50,16 +51,16 @@ particular:
       `django-users`_ list, or the `#django`_ IRC channel for that.
 
     * **Don't** use the ticket system to make large-scale feature requests.
-      We like to discuss any big changes to Django's core on the `django-dev`_
+      We like to discuss any big changes to Django's core on the `django-developers`_
       list before actually working on them.
 
     * **Don't** reopen issues that have been marked "wontfix". This mark means
       that the decision has been made that we can't or won't fix this particular
-      issue.  If you're not sure why, please ask on `django-dev`_.
+      issue.  If you're not sure why, please ask on `django-developers`_.
 
     * **Don't** use the ticket tracker for lengthy discussions, because they're
       likely to get lost. If a particular ticket is controversial, please move
-      discussion to `django-dev`_.
+      discussion to `django-developers`_.
 
 Reporting security issues
 =========================
@@ -167,14 +168,57 @@ Please follow these coding standards when writing code for inclusion in Django:
 
           {{foo}}
 
+Committing code
+===============
+
+Please follow these guidelines when committing code to Django's Subversion
+repository:
+
+    * For any medium-to-big changes, where "medium-to-big" is according to your
+      judgment, please bring things up on the `django-developers`_ mailing list
+      before making the change.
+
+    * Write detailed commit messages in the past tense, not present tense.
+
+          * Good: "Fixed Unicode bug in RSS API."
+          * Bad: "Fixes Unicode bug in RSS API."
+          * Bad: "Fixing Unicode bug in RSS API."
+
+    * For commits to a branch, prefix the commit message with the branch name.
+      For example: "magic-removal: Added support for mind reading."
+
+    * Limit commits to the most granular change that makes sense. This means,
+      use frequent small commits rather than infrequent large commits. For
+      example, if implementing feature X requires a small change to library Y,
+      first commit the change to library Y, then commit feature X in a separate
+      commit. This goes a *long way* in helping all core Django developers
+      follow your changes.
+
+    * If your commit closes a ticket in the Django `ticket tracker`_, begin
+      your commit message with the text "Fixed #abc", where "abc" is the number
+      of the ticket your commit fixes. Example: "Fixed #123 -- Added support
+      for foo". We've rigged Subversion and Trac so that any commit message
+      in that format will automatically close the referenced ticket and post a
+      comment to it with the full commit message.
+
+      If your commit closes a ticket and is in a branch, use the branch name
+      first, then the "Fixed #abc." For example:
+      "magic-removal: Fixed #123 -- Added whizbang feature."
+
+    * If your commit references a ticket in the Django `ticket tracker`_ but
+      does *not* close the ticket, include the phrase "Refs #abc", where "abc"
+      is the number of the ticket your commit references. We've rigged
+      Subversion and Trac so that any commit message in that format will
+      automatically post a comment to the appropriate ticket.
+
 Requesting features
 ===================
 
 We're always trying to make Django better, and your feature requests are a key
 part of that. Here are some tips on how to most effectively make a request:
 
-    * Request the feature on `django-dev`_, not in the ticket tracker; it'll get
-      read more closely if it's on the mailing list.
+    * Request the feature on `django-developers`_, not in the ticket tracker;
+      it'll get read more closely if it's on the mailing list.
 
     * Describe clearly and concisely what the missing feature is and how you'd
       like to see it implemented. Include example code (non-functional is OK)
@@ -201,9 +245,9 @@ trunk at any time.
 Thus, large architectural changes -- that is, changes too large to be
 encapsulated in a single patch, or changes that need multiple eyes on them --
 will have dedicated branches. See, for example, the `i18n branch`_. If you
-have a change of this nature that you'd like to work on, ask on `django-dev`_ for
-a branch to be created for you. We'll create a branch for pretty much any kind of
-experimenting you'd like to do.
+have a change of this nature that you'd like to work on, ask on
+`django-developers`_ for a branch to be created for you. We'll create a branch
+for pretty much any kind of experimenting you'd like to do.
 
 We will only branch entire copies of the Django tree, even if work is only
 happening on part of that tree. This makes it painless to switch to a branch.
@@ -213,7 +257,7 @@ into the branch. Please merge at least once a week. Every time you merge from
 the trunk, note the merge and revision numbers in the commit message.
 
 Once the branch is stable and ready to be merged into the trunk, alert
-`django-dev`_.
+`django-developers`_.
 
 After a branch has been merged, it should be considered "dead"; write access to
 it will be disabled, and old branches will be periodically "trimmed." To keep
@@ -285,9 +329,9 @@ Once a feature's been requested and discussed, eventually we'll have a decision
 about whether to include the feature or drop it.
 
 Whenever possible, we strive for a rough consensus. To that end, we'll often
-have informal votes on django-dev about a feature. In these votes we follow the
-voting style invented by Apache and used on Python itself, where votes are given
-as +1, +0, -0, or -1.  Roughly translated, these votes mean:
+have informal votes on `django-developers`_ about a feature. In these votes we
+follow the voting style invented by Apache and used on Python itself, where
+votes are given as +1, +0, -0, or -1.  Roughly translated, these votes mean:
 
     * +1: "I love the idea and I'm strongly committed to it."
 
@@ -298,7 +342,7 @@ as +1, +0, -0, or -1.  Roughly translated, these votes mean:
     * -1: "I strongly disagree and would be very unhappy to see the idea turn
       into reality."
 
-Although these votes on django-dev are informal, they'll be taken very
+Although these votes on django-developers are informal, they'll be taken very
 seriously. After a suitable voting period, if an obvious consensus arises
 we'll follow the votes.
 
@@ -337,7 +381,7 @@ requests for commit access are potential flame-war starters, and will be ignored
 
 .. _community page: http://www.djangoproject.com/community/
 .. _ticket tracker: http://code.djangoproject.com/newticket
-.. _django-dev: http://groups.google.com/group/django-developers
+.. _django-developers: http://groups.google.com/group/django-developers
 .. _FAQ: http://www.djangoproject.com/documentation/faq/
 .. _search the tracker: http://code.djangoproject.com/search
 .. _django-users: http://groups.google.com/group/django-users

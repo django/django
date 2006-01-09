@@ -149,7 +149,7 @@ subclass of dictionary. Exceptions are outlined here:
     * ``__setitem__(key, value)`` -- Sets the given key to ``[value]``
       (a Python list whose single element is ``value``). Note that this, as
       other dictionary functions that have side effects, can only be called on
-      an immutable ``QueryDict`` (one that was created via ``copy()``).
+      a mutable ``QueryDict`` (one that was created via ``copy()``).
 
     * ``__contains__(key)`` -- **New in Django development version.** Returns
       ``True`` if the given key is set. This lets you do, e.g.,

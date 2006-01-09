@@ -31,49 +31,49 @@ msgstr "комментарий"
 
 #: contrib/comments/models/comments.py:11
 msgid "rating #1"
-msgstr ""
+msgstr "рейтинг #1"
 
 #: contrib/comments/models/comments.py:12
 msgid "rating #2"
-msgstr ""
+msgstr "рейтинг #2"
 
 #: contrib/comments/models/comments.py:13
 msgid "rating #3"
-msgstr ""
+msgstr "рейтинг #3"
 
 #: contrib/comments/models/comments.py:14
 msgid "rating #4"
-msgstr ""
+msgstr "рейтинг #4"
 
 #: contrib/comments/models/comments.py:15
 msgid "rating #5"
-msgstr ""
+msgstr "рейтинг #5"
 
 #: contrib/comments/models/comments.py:16
 msgid "rating #6"
-msgstr ""
+msgstr "рейтинг #6"
 
 #: contrib/comments/models/comments.py:17
 msgid "rating #7"
-msgstr ""
+msgstr "рейтинг #7"
 
 #: contrib/comments/models/comments.py:18
 msgid "rating #8"
-msgstr ""
+msgstr "рейтинг #8"
 
 #: contrib/comments/models/comments.py:23
 msgid "is valid rating"
-msgstr ""
+msgstr "доступный рейтинг"
 
 #: contrib/comments/models/comments.py:24
 #: contrib/comments/models/comments.py:164
 msgid "date/time submitted"
-msgstr ""
+msgstr "дата/время добавления"
 
 #: contrib/comments/models/comments.py:25
 #: contrib/comments/models/comments.py:165
 msgid "is public"
-msgstr ""
+msgstr "публичный"
 
 #: contrib/comments/models/comments.py:26 contrib/admin/views/doc.py:256
 msgid "IP address"
@@ -139,11 +139,11 @@ msgstr "Свободные комментарии"
 
 #: contrib/comments/models/comments.py:209
 msgid "score"
-msgstr ""
+msgstr "счёт"
 
 #: contrib/comments/models/comments.py:210
 msgid "score date"
-msgstr ""
+msgstr "счёт времени"
 
 #: contrib/comments/models/comments.py:213
 msgid "Karma score"
@@ -163,19 +163,17 @@ msgid "flag date"
 msgstr ""
 
 #: contrib/comments/models/comments.py:251
-#, fuzzy
 msgid "User flag"
-msgstr "Пользователь"
+msgstr "Признак пользователя"
 
 #: contrib/comments/models/comments.py:252
-#, fuzzy
 msgid "User flags"
-msgstr "Пользователь"
+msgstr "Признаки ользователя"
 
 #: contrib/comments/models/comments.py:256
 #, python-format
 msgid "Flag by %r"
-msgstr ""
+msgstr "Отмечен %r"
 
 #: contrib/comments/models/comments.py:271
 #, python-format
@@ -184,6 +182,9 @@ msgid ""
 "\n"
 "%(text)s"
 msgstr ""
+"Этот комментарий был отмечен %(user)s:\n"
+"\n"
+"%(text)s"
 
 #: contrib/comments/models/comments.py:278
 msgid "deletion date"
@@ -966,18 +967,16 @@ msgid "Date:"
 msgstr ""
 
 #: contrib/admin/templates/widget/date_time.html:4
-#, fuzzy
 msgid "Time:"
-msgstr "Время"
+msgstr "Время:"
 
 #: contrib/admin/templates/widget/file.html:2
 msgid "Currently:"
-msgstr ""
+msgstr "Современно:"
 
 #: contrib/admin/templates/widget/file.html:3
-#, fuzzy
 msgid "Change:"
-msgstr "Изменить"
+msgstr "Изменить:"
 
 #: contrib/redirects/models/redirects.py:7
 msgid "redirect from"
@@ -1009,7 +1008,7 @@ msgstr "перенаправить"
 
 #: contrib/redirects/models/redirects.py:13
 msgid "redirects"
-msgstr "перенапровления"
+msgstr "перенаправления"
 
 #: contrib/flatpages/models/flatpages.py:7
 msgid ""
@@ -1045,7 +1044,7 @@ msgstr "регистрация обязательна"
 
 #: contrib/flatpages/models/flatpages.py:13
 msgid "If this is checked, only logged-in users will be able to view the page."
-msgstr "Если отмечено, только вошедшие пользователи смогут видеть страницу"
+msgstr "Если отмечено, только вошедшие пользователи смогут видеть страницу."
 
 #: contrib/flatpages/models/flatpages.py:17
 msgid "flat page"
@@ -1776,7 +1775,7 @@ msgstr[1] ""
 
 #: core/template/defaultfilters.py:371
 msgid "yes,no,maybe"
-msgstr ""
+msgstr "да,нет,может быть"
 
 #: parts/auth/formfields.py:27
 msgid ""
