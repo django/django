@@ -312,7 +312,7 @@ method. For example::
         the_place = meta.OneToOneField(places.Place)
 
 In the above example, each ``Place`` will have a ``get_restaurant()`` method,
-and each ``Restaurant`` will have a ``get_theplace()`` method.
+and each ``Restaurant`` will have a ``get_the_place()`` method.
 
 Many-to-one relations
 ---------------------
