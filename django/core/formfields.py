@@ -771,7 +771,7 @@ class TimeField(TextField):
             if (len(part_list) == 2):
                 t = t.replace(microsecond=int(part_list[1]))
             return t
-        except (ValueError, TypeError):
+        except (ValueError, TypeError, AttributeError):
             return None
     html2python = staticmethod(html2python)
 
