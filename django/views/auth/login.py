@@ -1,8 +1,8 @@
 from django.parts.auth.formfields import AuthenticationForm
 from django.core import formfields
 from django.core.extensions import DjangoContext, render_to_response
-from django.models.auth import SESSION_KEY
-from django.models.core import Site
+from django.contrib.auth.models import SESSION_KEY
+from django.contrib.sites.models import Site
 from django.utils.httpwrappers import HttpResponse, HttpResponseRedirect
 
 REDIRECT_FIELD_NAME = 'next'
