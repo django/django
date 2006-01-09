@@ -69,6 +69,18 @@ Article 4
 Traceback (most recent call last):
     ...
 AssertionError: get_in_bulk() cannot be passed an empty ID list.
+>>> Article.objects.get_in_bulk('foo')
+Traceback (most recent call last):
+    ...
+AssertionError: get_in_bulk() must be provided with a list of IDs.
+>>> Article.objects.get_in_bulk()
+Traceback (most recent call last):
+    ...
+TypeError: get_in_bulk() takes at least 2 arguments (1 given)
+>>> Article.objects.get_in_bulk(headline__startswith='Blah')
+Traceback (most recent call last):
+    ...
+TypeError: get_in_bulk() takes at least 2 non-keyword arguments (1 given)
 
 # get_values() is just like get_list(), except it returns a list of
 # dictionaries instead of object instances -- and you can specify which fields

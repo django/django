@@ -180,6 +180,17 @@ False
 >>> Article.objects.get_pub_date_list('day', order='DESC')
 [datetime.datetime(2005, 7, 31, 0, 0), datetime.datetime(2005, 7, 30, 0, 0), datetime.datetime(2005, 7, 29, 0, 0), datetime.datetime(2005, 7, 28, 0, 0)]
 
+# Try some bad arguments to __get_date_list
+>>> Article.objects.get_pub_date_list('badarg')
+Traceback (most recent call last):
+    ...
+AssertionError: 'kind' must be one of 'year', 'month' or 'day'.
+>>> Article.objects.get_pub_date_list(order='ASC')
+Traceback (most recent call last):
+    ...
+TypeError: __get_date_list() takes at least 3 non-keyword arguments (2 given)
+
+
 # An Article instance doesn't have access to the "objects" attribute.
 # That is only available as a class method.
 >>> a7.objects.get_list()

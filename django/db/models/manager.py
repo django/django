@@ -189,18 +189,12 @@ class Manager(object):
         assert len(obj_list) == 1, "get_object() returned more than one %s -- it returned %s! Lookup parameters were %s" % (self.klass._meta.object_name, len(obj_list), kwargs)
         return obj_list[0]
 
-    def get_in_bulk(self, *args, **kwargs):
-        # Separate any list arguments: the first list will be used as the id list; subsequent
-        # lists will be ignored.
-        id_args = filter(lambda arg: isinstance(arg, list), args)
-        # Separate any non-list arguments: these are assumed to be query arguments
-        sql_args = filter(lambda arg: not isinstance(arg, list), args)
-
-        id_list = id_args and id_args[0] or kwargs.get('id_list', [])
+    def get_in_bulk(self, id_list, *args, **kwargs):
+        assert isinstance(id_list, list), "get_in_bulk() must be provided with a list of IDs."
         assert id_list != [], "get_in_bulk() cannot be passed an empty ID list."        
         kwargs['where'] = ["%s.%s IN (%s)" % (backend.quote_name(self.klass._meta.db_table), backend.quote_name(self.klass._meta.pk.column), ",".join(['%s'] * len(id_list)))]
         kwargs['params'] = id_list
-        obj_list = self.get_list(*sql_args, **kwargs)
+        obj_list = self.get_list(*args, **kwargs)
         return dict([(getattr(o, self.klass._meta.pk.attname), o) for o in obj_list])
 
     def get_values_iterator(self, *args, **kwargs):
@@ -233,14 +227,8 @@ class Manager(object):
         kwargs['limit'] = 1
         return self.get_object(*args, **kwargs)
 
-    def __get_date_list(self, field, *args, **kwargs):
-        # Separate any string arguments: the first will be used as the kind
-        kind_args = filter(lambda arg: isinstance(arg, str), args)
-        # Separate any non-list arguments: these are assumed to be query arguments
-        sql_args = filter(lambda arg: not isinstance(arg, str), args)
-        
+    def __get_date_list(self, field, kind, *args, **kwargs):
         from django.db.backends.util import typecast_timestamp
-        kind = kind_args and kind_args[0] or kwargs.get(['kind'],"")
         assert kind in ("month", "year", "day"), "'kind' must be one of 'year', 'month' or 'day'."
         order = 'ASC'
         if kwargs.has_key('order'):
@@ -251,7 +239,7 @@ class Manager(object):
         if field.null:
             kwargs.setdefault('where', []).append('%s.%s IS NOT NULL' % \
                 (backend.quote_name(self.klass._meta.db_table), backend.quote_name(field.column)))
-        select, sql, params = self._get_sql_clause(*sql_args, **kwargs)
+        select, sql, params = self._get_sql_clause(*args, **kwargs)
         sql = 'SELECT %s %s GROUP BY 1 ORDER BY 1 %s' % \
             (backend.get_date_trunc_sql(kind, '%s.%s' % (backend.quote_name(self.klass._meta.db_table),
             backend.quote_name(field.column))), sql, order)
