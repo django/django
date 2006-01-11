@@ -131,7 +131,7 @@ QueryDict objects
 -----------------
 
 In an ``HttpRequest`` object, the ``GET`` and ``POST`` attributes are instances
-of ``django.utils.httpwrappers.QueryDict``. ``QueryDict`` is a dictionary-like
+of ``django.http.QueryDict``. ``QueryDict`` is a dictionary-like
 class customized to deal with multiple values for the same key. This is
 necessary because some HTML form elements, notably ``<select multiple>``, pass
 multiple values for the same key.
@@ -269,7 +269,7 @@ In contrast to ``HttpRequest`` objects, which are created automatically by
 Django, ``HttpResponse`` objects are your responsibility. Each view you write
 is responsible for instantiating, populating and returning an ``HttpResponse``.
 
-The ``HttpResponse`` class lives at ``django.utils.httpwrappers.HttpResponse``.
+The ``HttpResponse`` class lives at ``django.http.HttpResponse``.
 
 Usage
 -----
@@ -351,7 +351,7 @@ HttpResponse subclasses
 
 Django includes a number of ``HttpResponse`` subclasses that handle different
 types of HTTP responses. Like ``HttpResponse``, these subclasses live in
-``django.utils.httpwrappers``.
+``django.http``.
 
 ``HttpResponseRedirect``
     The constructor takes a single argument -- the path to redirect to. This

@@ -237,7 +237,7 @@ The raw way
 The simple, raw way to limit access to pages is to check
 ``request.user.is_anonymous()`` and either redirect to a login page::
 
-    from django.utils.httpwrappers import HttpResponseRedirect
+    from django.http import HttpResponseRedirect
 
     def my_view(request):
         if request.user.is_anonymous():

@@ -30,7 +30,7 @@ and Django's ``HttpResponse`` objects are file-like objects.
 Here's an example::
 
     import csv
-    from django.utils.httpwrappers import HttpResponse
+    from django.http import HttpResponse
 
     def some_view(request):
         # Create the HttpResponse object with the appropriate CSV header.
@@ -79,7 +79,7 @@ template output the commas in a ``{% for %}`` loop.
 
 Here's an example, which generates the same CSV file as above::
 
-    from django.utils.httpwrappers import HttpResponse
+    from django.http import HttpResponse
     from django.core.template import loader, Context
 
     def some_view(request):

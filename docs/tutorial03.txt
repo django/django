@@ -148,7 +148,7 @@ haven't written any views yet).
 Time to write the first view. Open the file ``myproject/polls/views.py``
 and put the following Python code in it::
 
-    from django.utils.httpwrappers import HttpResponse
+    from django.http import HttpResponse
 
     def index(request):
         return HttpResponse("Hello, world. You're at the poll index.")
@@ -186,7 +186,7 @@ latest 5 poll questions in the system, separated by commas, according to
 publication date::
 
     from django.models.polls import polls
-    from django.utils.httpwrappers import HttpResponse
+    from django.http import HttpResponse
 
     def index(request):
         latest_poll_list = polls.get_list(order_by=['-pub_date'], limit=5)
@@ -199,7 +199,7 @@ So let's use Django's template system to separate the design from Python::
 
     from django.core.template import Context, loader
     from django.models.polls import polls
-    from django.utils.httpwrappers import HttpResponse
+    from django.http import HttpResponse
 
     def index(request):
         latest_poll_list = polls.get_list(order_by=['-pub_date'], limit=5)
