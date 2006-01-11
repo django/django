@@ -764,7 +764,6 @@ class ModelErrorCollection:
 
 def get_validation_errors(outfile):
     "Validates all installed models. Writes errors, if any, to outfile. Returns number of errors."
-    import django.models
     from django.db import models
     e = ModelErrorCollection(outfile)
     module_list = models.get_installed_model_modules()
