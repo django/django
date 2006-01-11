@@ -48,8 +48,7 @@ Examples:
     locmem:///                      A more sophisticated local memory cache;
                                     this is multi-process- and thread-safe.
 
-    dummy:///                       **New in Django development version.**
-                                    Doesn't actually cache; just implements the
+    dummy:///                       Doesn't actually cache; just implements the
                                     cache backend interface and doesn't do
                                     anything. This is an easy way to turn off
                                     caching for a test environment.

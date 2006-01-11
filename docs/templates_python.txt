@@ -282,11 +282,6 @@ optional, third positional argument, ``processors``. In this example, the
             'foo': 'bar',
         }, [ip_address_processor])
 
-Note: The concept of template-context processors is new in the Django
-development version. In Django 0.90, ``DjangoContext`` automatically populates
-the context with all of the values explained below, but it's not possible to
-add and remove processors.
-
 Here's what each of the default processors does:
 
 .. _HttpRequest object: http://www.djangoproject.com/documentation/request_response/#httprequest-objects
@@ -540,8 +535,6 @@ filters are registered. So, near the top of your module, put the following::
 Writing custom template filters
 -------------------------------
 
-**This section applies to the Django development version.**
-
 Custom filters are just Python functions that take one or two arguments:
 
     * The value of the variable (input) -- not necessarily a string.
@@ -600,8 +593,6 @@ will use the function's name as the filter name.
 
 Writing custom template tags
 ----------------------------
-
-**This section applies to the Django development version.**
 
 Tags are more complex than filters, because tags can do anything.
 

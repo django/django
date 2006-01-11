@@ -6,14 +6,29 @@ The django-admin.py utility
 This document outlines all it can do.
 
 The ``django-admin.py`` script should be on your system path if you installed
-Django via its setup.py utility. If it's not on your path, you can find it in
+Django via its ``setup.py`` utility. If it's not on your path, you can find it in
 ``site-packages/django/bin`` within your Python installation. Consider
 symlinking to it from some place on your path, such as ``/usr/local/bin``.
+
+In addition, ``manage.py`` is automatically created in each Django project.
+``manage.py`` is a thin wrapper around ``django-admin.py`` that takes care of
+two things for you before delegating to ``django-admin.py``:
+
+    * It puts your project's package on ``sys.path``.
+
+    * It sets the ``DJANGO_SETTINGS_MODULE`` environment variable so that it
+      points to your project's ``settings.py`` file.
+
+Generally, when working on a single Django project, it's easier to use
+``manage.py``. Use ``django-admin.py`` with ``DJANGO_SETTINGS_MODULE``, or the
+``--settings`` command line option, if you need to switch between multiple
+Django settings files.
 
 Usage
 =====
 
 ``django-admin.py action [options]``
+``manage.py action [options]``
 
 ``action`` should be one of the actions listed in this document. ``options``,
 which is optional, should be zero or more of the options listed in this
@@ -54,9 +69,8 @@ createsuperuser
 Creates a superuser account interactively. It asks you for a username, e-mail
 address and password.
 
-**New in Django development version:** You can specify
-``username email password`` on the command line, for convenient use in shell
-scripts. Example::
+You can specify ``username email password`` on the command line, for convenient
+use in shell scripts. Example::
 
     django-admin.py createsuperuser john john@example.com mypassword
 
@@ -211,6 +225,9 @@ Explicitly specifies the settings module to use. The settings module should be
 in Python path syntax, e.g. "myproject.settings". If this isn't provided,
 ``django-admin.py`` will use the DJANGO_SETTINGS_MODULE environment variable.
 
+Note that this option is unnecessary in ``manage.py``, because it takes care of
+setting ``DJANGO_SETTINGS_MODULE`` for you.
+
 --pythonpath
 ------------
 
@@ -221,6 +238,9 @@ Example usage::
 Adds the given filesystem path to the Python `import search path`_. If this
 isn't provided, ``django-admin.py`` will use the ``PYTHONPATH`` environment
 variable.
+
+Note that this option is unnecessary in ``manage.py``, because it takes care of
+setting the Python path for you.
 
 .. _import search path: http://diveintopython.org/getting_to_know_python/everything_is_an_object.html
 

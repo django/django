@@ -222,8 +222,6 @@ If you pass an invalid keyword argument, the function will raise ``TypeError``.
 OR lookups
 ----------
 
-**New in Django development version.**
-
 By default, keyword argument queries are "AND"ed together. If you have more complex query 
 requirements (for example, you need to include an ``OR`` statement in your query), you need 
 to use ``Q`` objects.

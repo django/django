@@ -34,15 +34,15 @@ on your path, such as /usr/local/bin.)
 
 .. admonition:: Where should this code live?
 
-   If your background is in PHP, you're probably used to putting code under the
-   Web server's document root (in a place such as ``/var/www``). With Django,
-   you don't do that. It's not a good idea to put any of this Python code within
-   your Web server's document root, because it risks the possibility that
-   people may be able to view your code over the Web. That's not good for
-   security.
+    If your background is in PHP, you're probably used to putting code under the
+    Web server's document root (in a place such as ``/var/www``). With Django,
+    you don't do that. It's not a good idea to put any of this Python code within
+    your Web server's document root, because it risks the possibility that
+    people may be able to view your code over the Web. That's not good for
+    security.
 
-   Put your code in some directory **outside** of the document root, such as
-   ``/home/mycode``.
+    Put your code in some directory **outside** of the document root, such as
+    ``/home/mycode``.
 
 A project is a collection of settings for an instance of Django -- including
 database configuration, Django-specific options and application-specific
@@ -50,24 +50,68 @@ settings. Let's look at what ``startproject`` created::
 
     myproject/
         __init__.py
-        apps/
-            __init__.py
+        manage.py
         settings.py
         urls.py
 
-First, edit ``myproject/settings.py``. It's a normal Python module with
-module-level variables representing Django settings. Edit the file and change
-these settings to match your database's connection parameters:
+These files are:
+
+    * ``manage.py``: A command-line utility that lets you interact with this
+      Django project in various ways.
+    * ``settings.py``: Settings/configuration for this Django project.
+    * ``urls.py``: The URL declarations for this Django project; a "table of
+      contents" of your Django-powered site.
+
+The development server
+----------------------
+
+Change into the ``myproject`` directory, if you haven't already, and run the
+command ``python manage.py runserver``. You'll see the following output on the
+command line::
+
+    Validating models...
+    0 errors found.
+
+    Starting server on port 8000 with settings module 'myproject.settings'.
+    Go to http://127.0.0.1:8000/ for Django.
+    Quit the server with CONTROL-C (Unix) or CTRL-BREAK (Windows).
+
+You've started the Django development server, a lightweight, pure-Python Web
+server that builds on the BaseHTTPServer included in Python's standard library.
+We've included this with Django so you can develop things rapidly, without
+having to deal with configuring Apache until you're ready for production.
+
+DON'T use this server in anything resembling a production environment. It's
+intended only for use while developing.
+
+.. admonition:: Changing the port
+
+    By default, the ``runserver`` command starts the development server on port
+    8000. If you want to change the server's port, pass it as a command-line
+    argument::
+
+        python manage.py runserver 8080
+
+Now that the server's running, visit http://127.0.0.1:8000/ with your Web
+browser. You'll see a "Welcome to Django" page, in pleasant, light-blue pastel.
+It worked!
+
+Database setup
+--------------
+
+Now, edit ``settings.py``. It's a normal Python module with module-level
+variables representing Django settings. Change these settings to match your
+database's connection parameters:
 
     * ``DATABASE_ENGINE`` -- Either 'postgresql', 'mysql' or 'sqlite3'.
       More coming soon.
     * ``DATABASE_NAME`` -- The name of your database, or the full (absolute)
-      path to the database file if you're using sqlite.
-    * ``DATABASE_USER`` -- Your database username (not used for sqlite).
-    * ``DATABASE_PASSWORD`` -- Your database password (not used for sqlite).
+      path to the database file if you're using SQLite.
+    * ``DATABASE_USER`` -- Your database username (not used for SQLite).
+    * ``DATABASE_PASSWORD`` -- Your database password (not used for SQLite).
     * ``DATABASE_HOST`` -- The host your database is on. Leave this as an
       empty string if your database server is on the same physical machine
-      (not used for sqlite).
+      (not used for SQLite).
 
 .. admonition:: Note
 
@@ -75,67 +119,55 @@ these settings to match your database's connection parameters:
     point. Do that with "``CREATE DATABASE database_name;``" within your
     database's interactive prompt.
 
-Now, take a second to make sure ``myproject`` is on your Python path. You
-can do this by copying ``myproject`` to Python's ``site-packages`` directory,
-or you can do it by altering the ``PYTHONPATH`` environment variable. See the
-`Python path documentation`_ for more information. If you opt to set the
-``PYTHONPATH`` environment variable, note that you'll need to set it to the
-*parent* directory of ``myproject``. (You can test this by typing
-"import myproject" into the Python interactive prompt.)
+Run the following command to initialize your database with Django's core
+database tables::
 
-Run the following command::
+    python manage.py init
 
-    django-admin.py init --settings=myproject.settings
+If you don't see any errors, it worked.
 
-The ``django-admin.py`` utility generally needs to know which settings module
-you're using. Here, we're doing that by specifying ``settings=`` on the command
-line, but that can get tedious. If you don't want to type ``settings=`` each
-time, you can set the ``DJANGO_SETTINGS_MODULE`` environment variable. Here's
-how you do that in the Bash shell on Unix::
+If you're interested, run the command-line client for your database and type
+``\dt`` (PostgreSQL), ``SHOW TABLES;`` (MySQL), or ``.schema`` (SQLite) to
+display the tables Django created.
 
-    export DJANGO_SETTINGS_MODULE=myproject.settings
+.. admonition:: About those database tables
 
-On Windows, you'd use ``set`` instead::
-
-    set DJANGO_SETTINGS_MODULE=myproject.settings
-
-If you don't see any errors after running ``django-admin.py init``, you know it
-worked. That command initialized your database with Django's core database
-tables. If you're interested, run the command-line client for your database and
-type ``\dt`` (PostgreSQL), ``SHOW TABLES;`` (MySQL), or ``.schema`` (SQLite) to
-display the tables.
-
-.. _`Python path documentation`: http://docs.python.org/tut/node8.html#SECTION008110000000000000000
+    The tables created by ``manage.py init`` are for sessions, authentication
+    and other features Django provides. The next release of Django will have
+    a "lite" version of the ``init`` command that won't install any database
+    tables if you don't want them.
 
 Creating models
 ===============
 
 Now that your environment -- a "project" -- is set up, you're set to start
-doing work. (You won't have to take care of this boring administrative stuff
+doing work. (You won't have to take care of that boring administrative stuff
 again.)
 
-Each application you write in Django -- e.g., a weblog system, a database of
-public records or a simple poll app -- consists of a Python package, somewhere
-on your Python path, that follows a certain convention. Django comes with a
+Each application you write in Django consists of a Python package, somewhere
+on your `Python path`_, that follows a certain convention. Django comes with a
 utility that automatically generates the basic directory structure of an app,
 so you can focus on writing code rather than creating directories.
 
-In this tutorial, we'll create our poll app in the ``myproject/apps``
-directory, for simplicity. As a consequence, the app will be coupled to the
-project -- that is, Python code within the poll app will refer to
-``myproject.apps.polls``. Later in this tutorial, we'll discuss decoupling
-your apps for distribution.
+.. admonition:: Projects vs. apps
 
-To create your app, change into the ``myproject/apps`` directory and type this
-command::
+    What's the difference between a project and an app? An app is a Web
+    application that does something -- e.g., a weblog system, a database of
+    public records or a simple poll app. A project is a collection of
+    configuration and apps for a particular Web site. A project can contain
+    multiple apps. An app can be in multiple projects.
 
-    django-admin.py startapp polls
+In this tutorial, we'll create our poll app in the ``myproject`` directory,
+for simplicity. As a consequence, the app will be coupled to the project --
+that is, Python code within the poll app will refer to ``myproject.polls``.
+Later in this tutorial, we'll discuss decoupling your apps for distribution.
 
-(From now on, this tutorial will leave out the ``--settings`` parameter and
-will assume you've either set your ``DJANGO_SETTINGS_MODULE`` environment
-variable or included the ``--settings`` option in your call to the command.)
+To create your app, make sure you're in the ``myproject`` directory and type
+this command::
 
-That'll create a directory structure like this::
+    python manage.py startapp polls
+
+That'll create a directory ``polls``, which is laid out like this::
 
     polls/
         __init__.py
@@ -201,6 +233,7 @@ Finally, note a relationship is defined, using ``meta.ForeignKey``. That tells
 Django each Choice is related to a single Poll. Django supports all the common
 database relationships: many-to-ones, many-to-manys and one-to-ones.
 
+.. _`Python path`: http://docs.python.org/tut/node8.html#SECTION008110000000000000000
 .. _DRY Principle: http://c2.com/cgi/wiki?DontRepeatYourself
 
 Activating models
@@ -209,32 +242,30 @@ Activating models
 That small bit of model code gives Django a lot of information. With it, Django
 is able to:
 
-* Create a database schema (``CREATE TABLE`` statements) for this app.
-* Create a Python database-access API for accessing Poll and Choice objects.
+    * Create a database schema (``CREATE TABLE`` statements) for this app.
+    * Create a Python database-access API for accessing Poll and Choice objects.
 
 But first we need to tell our project that the ``polls`` app is installed.
 
 .. admonition:: Philosophy
 
-   Django apps are "pluggable": You can use an app in multiple
-   projects, and you can distribute apps, because they don't have to be tied to
-   a given Django installation.
+    Django apps are "pluggable": You can use an app in multiple projects, and
+    you can distribute apps, because they don't have to be tied to a given
+    Django installation.
 
-Edit the myproject/settings.py file again, and change the ``INSTALLED_APPS``
-setting to include the string "myproject.apps.polls". So it'll look like this::
+Edit the ``settings.py`` file again, and change the ``INSTALLED_APPS`` setting
+to include the string ``'myproject.polls'``. So it'll look like this::
 
     INSTALLED_APPS = (
-        'myproject.apps.polls',
+        'myproject.polls',
     )
 
-(Don't forget the trailing comma because of Python's rules about single-value
-tuples.)
+(Don't forget the trailing comma, because of Python's rule about single-value
+tuples: Without a trailing comma, Python wouldn't know this was a tuple.)
 
-Now Django knows myproject includes the polls app. Let's run another command::
+Now Django knows ``myproject`` includes the ``polls`` app. Let's run another command::
 
-    django-admin.py sql polls
-
-(Note that it doesn't matter which directory you're in when you run this command.)
+    python manage.py sql polls
 
 You should see the following (the CREATE TABLE SQL statements for the polls app)::
 
@@ -255,8 +286,8 @@ You should see the following (the CREATE TABLE SQL statements for the polls app)
 Note the following:
 
     * Table names are automatically generated by combining the name of the app
-      (polls) with a plural version of the object name (polls and choices). (You
-      can override this behavior.)
+      (``polls``) with a plural version of the object name (polls and choices).
+      (You can override this behavior.)
 
     * Primary keys (IDs) are added automatically. (You can override this, too.)
 
@@ -265,26 +296,26 @@ Note the following:
 
     * The foreign key relationship is made explicit by a ``REFERENCES`` statement.
 
-    * It's tailored to the database you're using, so database-specific field types
-      such as ``auto_increment`` (MySQL), ``serial`` (PostgreSQL), or ``integer
-      primary key`` (SQLite) are handled for you automatically. Same goes for
-      quoting of field names -- e.g., using double quotes or single quotes. The
-      author of this tutorial runs PostgreSQL, so the example output is in
-      PostgreSQL syntax.
+    * It's tailored to the database you're using, so database-specific field
+      types such as ``auto_increment`` (MySQL), ``serial`` (PostgreSQL), or
+      ``integer primary key`` (SQLite) are handled for you automatically. Same
+      goes for quoting of field names -- e.g., using double quotes or single
+      quotes. The author of this tutorial runs PostgreSQL, so the example
+      output is inPostgreSQL syntax.
 
 If you're interested, also run the following commands:
 
-    * ``django-admin.py sqlinitialdata polls`` -- Outputs the initial-data
+    * ``python manage.py sqlinitialdata polls`` -- Outputs the initial-data
       inserts required for Django's admin framework.
 
-    * ``django-admin.py sqlclear polls`` -- Outputs the necessary ``DROP
+    * ``python manage.py sqlclear polls`` -- Outputs the necessary ``DROP
       TABLE`` statements for this app, according to which tables already exist
       in your database (if any).
 
-    * ``django-admin.py sqlindexes polls`` -- Outputs the ``CREATE INDEX``
+    * ``python manage.py sqlindexes polls`` -- Outputs the ``CREATE INDEX``
       statements for this app.
 
-    * ``django-admin.py sqlall polls`` -- A combination of 'sql' and
+    * ``python manage.py sqlall polls`` -- A combination of 'sql' and
       'sqlinitialdata'.
 
 Looking at the output of those commands can help you understand what's actually
@@ -293,23 +324,50 @@ happening under the hood.
 Now, run this command to create the database tables for the polls app
 automatically::
 
-    django-admin.py install polls
+    python manage.py install polls
 
 Behind the scenes, all that command does is take the output of
-``django-admin.py sqlall polls`` and execute it in the database pointed-to by
+``python manage.py sqlall polls`` and execute it in the database pointed-to by
 your Django settings file.
 
-Read the `django-admin.py documentation`_ for full information on what this
-utility can do.
+Read the `django-admin.py documentation`_ for full information on what the
+``manage.py`` utility can do.
 
 .. _django-admin.py documentation: http://www.djangoproject.com/documentation/django_admin/
 
 Playing with the API
 ====================
 
-Now, make sure your DJANGO_SETTINGS_MODULE environment variable is set (as
-explained above), and open the Python interactive shell to play around with the
-free Python API Django gives you::
+Now, let's hop into the interactive Python shell and play around with the free
+API Django gives you. To invoke the Python shell, use this command::
+
+    python manage.py shell
+
+We're using this instead of simply typing "python", because ``manage.py`` sets
+up the project's environment for you. "Setting up the environment" involves two
+things:
+
+    * Putting ``myproject`` on ``sys.path``. For flexibility, several pieces of
+      Django refer to projects in Python dotted-path notation (e.g.
+      ``'myproject.polls.models'``). In order for this to work, the
+      ``myproject`` package has to be on ``sys.path``.
+
+      We've already seen one example of this: the ``INSTALLED_APPS`` setting is
+      a list of packages in dotted-path notation.
+
+    * Setting the ``DJANGO_SETTINGS_MODULE`` environment variable, which gives
+      Django the path to your ``settings.py`` file.
+
+.. admonition:: Bypassing manage.py
+
+    If you'd rather not use ``manage.py``, no problem. Just make sure
+    ``myproject`` is at the root level on the Python path (i.e.,
+    ``import myproject`` works) and set the ``DJANGO_SETTINGS_MODULE``
+    environment variable to ``myproject.settings``.
+
+    For more information on all of this, see the `django-admin.py documentation`_.
+
+Once you're in the shell, explore the database API::
 
     # Modules are dynamically created within django.models.
     # Their names are plural versions of the model class names.
@@ -326,7 +384,10 @@ free Python API Django gives you::
     # Save the object into the database. You have to call save() explicitly.
     >>> p.save()
 
-    # Now it has an ID.
+    # Now it has an ID. Note that this might say "1L" instead of "1", depending
+    # on which database you're using. That's no biggie; it just means your
+    # database backend prefers to return integers as Python long integer
+    # objects.
     >>> p.id
     1
 
@@ -375,7 +436,8 @@ Note ``import datetime`` wasn't necessary. Each model method has access to
 a handful of commonly-used variables for convenience, including the
 ``datetime`` module from the Python standard library.
 
-Let's jump back into the Python interactive shell::
+Let's jump back into the Python interactive shell by running
+``python manage.py shell`` again::
 
     >>> from django.models.polls import polls, choices
     # Make sure our __repr__() addition worked.

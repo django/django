@@ -945,6 +945,12 @@ def createcachetable(tablename):
     connection.commit()
 createcachetable.args = "[tablename]"
 
+def run_shell():
+    "Runs a Python interactive interpreter"
+    import code
+    code.interact()
+run_shell.args = ''
+
 # Utilities for command-line script
 
 DEFAULT_ACTION_MAPPING = {
@@ -958,6 +964,7 @@ DEFAULT_ACTION_MAPPING = {
     'install': install,
     'installperms': installperms,
     'runserver': runserver,
+    'shell': run_shell,
     'sql': get_sql_create,
     'sqlall': get_sql_all,
     'sqlclear': get_sql_delete,
@@ -1038,7 +1045,7 @@ def execute_from_command_line(action_mapping=DEFAULT_ACTION_MAPPING):
                 sys.exit(1)
         else:
             action_mapping[action](username, email, password)
-    elif action in ('init', 'init-minimal', 'validate'):
+    elif action in ('init', 'init-minimal', 'shell', 'validate'):
         action_mapping[action]()
     elif action == 'inspectdb':
         try:

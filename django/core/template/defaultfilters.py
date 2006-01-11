@@ -136,7 +136,7 @@ def wordwrap(value, arg):
     Argument: number of words to wrap the text at.
     """
     from django.utils.text import wrap
-    return wrap(value, int(arg))
+    return wrap(str(value), int(arg))
 
 def ljust(value, arg):
     """

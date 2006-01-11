@@ -278,8 +278,8 @@ In the above, the ``load`` tag loads the ``comments`` tag library, which then
 makes the ``comment_form`` tag available for use. Consult the documentation
 area in your admin to find the list of custom libraries in your installation.
 
-**New in Django development version:** The ``{% load %}`` tag can take multiple
-library names, separated by spaces. Example::
+The ``{% load %}`` tag can take multiple library names, separated by spaces.
+Example::
 
     {% load comments i18n %}
 
@@ -499,8 +499,6 @@ Just like ``ifequal``, except it tests that the two arguments are not equal.
 
 include
 ~~~~~~~
-
-**Only available in Django development version.**
 
 Loads a template and renders it with the current context. This is a way of
 "including" other templates within a template.

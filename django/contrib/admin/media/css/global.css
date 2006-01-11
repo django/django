@@ -122,7 +122,7 @@ textarea { vertical-align:top !important; }
 input[type=text], input[type=password], textarea, select, .vTextField { border:1px solid #ccc; }
 
 /* FORM BUTTONS */
-input[type=submit], input[type=button], .submit-row input { border:1px solid #ccc; background:white url(../img/admin/nav-bg.gif) bottom repeat-x; }
+input[type=submit], input[type=button], .submit-row input { border:1px solid #ccc; background:white url(../img/admin/nav-bg.gif) bottom repeat-x; color:black; }
 input[type=submit]:active, input[type=button]:active { background-image:url(../img/admin/nav-bg-reverse.gif); background-position:top; }
 input[type=submit].default, .submit-row input.default { border:2px solid #5b80b2; padding:3px; background:white url(../img/admin/default-bg.gif) bottom repeat-x; font-weight:bold; color:white; }
 input[type=submit].default:active { background-image:url(../img/admin/default-bg-reverse.gif); background-position:top; }

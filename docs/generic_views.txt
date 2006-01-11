@@ -129,9 +129,9 @@ arguments:
     ``extra_context``        A dictionary of extra data to put into the
                              template's context.
 
-    ``processors``           **New in Django development version.** A tuple of
-                             processors to apply to the ``DjangoContext`` of
-                             this view's template. See the `DjangoContext docs`_
+    ``processors``           A tuple of processors to apply to the
+                             ``DjangoContext`` of this view's template. See the
+                             `DjangoContext docs`_
     =======================  ==================================================
 
 .. _database API docs: http://www.djangoproject.com/documentation/db_api/
@@ -150,8 +150,7 @@ The date-based generic functions are:
         ``num_latest``           The number of items to display on the page.
                                  Defaults to 15.
 
-        ``allow_empty``          **New in Django development version.**
-                                 If ``False`` and there are no objects to display,
+        ``allow_empty``          If ``False`` and there are no objects to display,
                                  the view will raise a 404 instead of displaying
                                  an empty index page. ``False`` is default.
         =======================  =================================================

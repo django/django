@@ -151,9 +151,8 @@ subclass of dictionary. Exceptions are outlined here:
       other dictionary functions that have side effects, can only be called on
       a mutable ``QueryDict`` (one that was created via ``copy()``).
 
-    * ``__contains__(key)`` -- **New in Django development version.** Returns
-      ``True`` if the given key is set. This lets you do, e.g.,
-      ``if "foo" in request.GET``.
+    * ``__contains__(key)`` -- Returns ``True`` if the given key is set. This
+      lets you do, e.g., ``if "foo" in request.GET``.
 
     * ``get(key, default)`` -- Uses the same logic as ``__getitem__()`` above,
       with a hook for returning a default value if the key doesn't exist.
@@ -361,8 +360,6 @@ types of HTTP responses. Like ``HttpResponse``, these subclasses live in
     an HTTP status code 302.
 
 ``HttpResponsePermanentRedirect``
-    **New in Django development version.***
-
     Like ``HttpResponseRedirect``, but it returns a permanent redirect (HTTP
     status code 301) instead of a "found" redirect (status code 302).
 
