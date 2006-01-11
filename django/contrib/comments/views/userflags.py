@@ -1,5 +1,5 @@
 from django.core.extensions import DjangoContext, render_to_response
-from django.core.exceptions import Http404
+from django.http import Http404
 from django.models.comments import comments, moderatordeletions, userflags
 from django.views.decorators.auth import login_required
 from django.http import HttpResponseRedirect

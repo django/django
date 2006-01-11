@@ -86,7 +86,7 @@ class BaseHandler:
                 raise ValueError, "The view %s.%s didn't return an HttpResponse object." % (callback.__module__, callback.func_name)
 
             return response
-        except exceptions.Http404, e:
+        except http.Http404, e:
             if DEBUG:
                 return self.get_technical_error_response(request, is404=True, exception=e)
             else:

@@ -2,10 +2,10 @@
 # of MVC. In other words, these functions/classes introduce controlled coupling
 # for convenience's sake.
 
-from django.core.exceptions import Http404, ImproperlyConfigured
+from django.core.exceptions import ImproperlyConfigured
 from django.core.template import Context, loader
 from django.conf.settings import TEMPLATE_CONTEXT_PROCESSORS
-from django.http import HttpResponse
+from django.http import HttpResponse, Http404
 
 _standard_context_processors = None
 

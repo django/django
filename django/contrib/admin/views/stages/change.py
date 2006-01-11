@@ -1,6 +1,7 @@
 from django.contrib.admin.views.main import get_model_and_app
 from django.core import formfields, template
-from django.core.exceptions import Http404, ImproperlyConfigured, ObjectDoesNotExist, PermissionDenied
+from django.http import Http404
+from django.core.exceptions import ImproperlyConfigured, ObjectDoesNotExist, PermissionDenied
 from django.core.extensions import DjangoContext as Context
 from django.contrib.admin.views.stages.modify import render_change_form
 from django.db import models

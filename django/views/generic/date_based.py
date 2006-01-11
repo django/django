@@ -1,9 +1,9 @@
 from django.core.template import loader
-from django.core.exceptions import Http404, ObjectDoesNotExist
+from django.core.exceptions import ObjectDoesNotExist
 from django.core.extensions import DjangoContext
 from django.core.xheaders import populate_xheaders
 from django.models import get_module
-from django.http import HttpResponse
+from django.http import Http404, HttpResponse
 import datetime, time
 
 def archive_index(request, app_label, module_name, date_field, num_latest=15,

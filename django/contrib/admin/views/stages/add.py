@@ -3,7 +3,8 @@ from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.admin.views.main import get_model_and_app
 from django.contrib.admin.views.stages.modify import render_change_form
 from django.core import formfields, template
-from django.core.exceptions import Http404, ImproperlyConfigured, ObjectDoesNotExist, PermissionDenied
+from django.http import Http404
+from django.core.exceptions import ImproperlyConfigured, ObjectDoesNotExist, PermissionDenied
 from django.core.extensions import DjangoContext as Context
 from django.db import models
 from django.http import HttpResponse, HttpResponseRedirect

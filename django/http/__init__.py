@@ -9,6 +9,9 @@ try:
 except ImportError:
     from cgi import parse_qsl
 
+class Http404(Exception):
+    pass
+
 class HttpRequest(object): # needs to be new-style class because subclasses define "property"s
     "A basic HTTP request"
     def __init__(self):

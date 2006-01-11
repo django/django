@@ -1,10 +1,10 @@
 from django import models
 from django.core.template import loader
-from django.http import HttpResponse
+from django.http import Http404, HttpResponse
 from django.core.xheaders import populate_xheaders
 from django.core.extensions import DjangoContext
 from django.core.paginator import ObjectPaginator, InvalidPage
-from django.core.exceptions import Http404, ObjectDoesNotExist
+from django.core.exceptions import ObjectDoesNotExist
 
 def object_list(request, app_label, module_name, paginate_by=None, allow_empty=False,
         template_name=None, template_loader=loader, extra_lookup_kwargs={},

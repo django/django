@@ -1,4 +1,4 @@
-from django.core.exceptions import Http404
+from django.http import Http404
 from django.core.extensions import DjangoContext, render_to_response
 from django.models.comments import comments, karma
 

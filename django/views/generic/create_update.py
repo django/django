@@ -5,8 +5,8 @@ from django.core import formfields, meta
 from django.views.auth.login import redirect_to_login
 from django.core.extensions import DjangoContext
 from django.core.paginator import ObjectPaginator, InvalidPage
-from django.http import HttpResponse, HttpResponseRedirect
-from django.core.exceptions import Http404, ObjectDoesNotExist, ImproperlyConfigured
+from django.http import Http404, HttpResponse, HttpResponseRedirect
+from django.core.exceptions import ObjectDoesNotExist, ImproperlyConfigured
 
 def create_object(request, app_label, module_name, template_name=None,
         template_loader=loader, extra_context={}, post_save_redirect=None,

@@ -4,7 +4,8 @@ from django.contrib.admin.views.decorators import staff_member_required
 from django.core import formfields, template
 from django.core.template import loader
 from django.db import models
-from django.core.exceptions import Http404, ImproperlyConfigured, ObjectDoesNotExist, PermissionDenied
+from django.http import Http404
+from django.core.exceptions import ImproperlyConfigured, ObjectDoesNotExist, PermissionDenied
 from django.core.extensions import DjangoContext as Context
 from django.core.extensions import get_object_or_404, render_to_response
 from django.utils import dateformat

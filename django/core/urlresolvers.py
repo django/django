@@ -7,7 +7,8 @@ a string) and returns a tuple in this format:
     (view_function, function_args, function_kwargs)
 """
 
-from django.core.exceptions import Http404, ImproperlyConfigured, ViewDoesNotExist
+from django.http import Http404
+from django.core.exceptions import ImproperlyConfigured, ViewDoesNotExist
 import re
 
 class Resolver404(Http404):
