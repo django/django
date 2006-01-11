@@ -272,7 +272,7 @@ optional, third positional argument, ``processors``. In this example, the
 
     def some_view(request):
         # ...
-        return DjangoContext({
+        return DjangoContext(request, {
             'foo': 'bar',
         }, [ip_address_processor])
 
