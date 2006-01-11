@@ -65,9 +65,8 @@ Using the ``AddManipulator``
 We'll start with the ``AddManipulator``.  Here's a very simple view that takes
 POSTed data from the browser and creates a new ``Place`` object::
 
-    from django.core.exceptions import Http404
     from django.core.extensions import render_to_response
-    from django.http import HttpResponse, HttpResponseRedirect
+    from django.http import Http404, HttpResponse, HttpResponseRedirect
     from django.models.places import places
     from django.core import formfields
 
