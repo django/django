@@ -12,7 +12,7 @@ symlinking to it from some place on your path, such as ``/usr/local/bin``.
 
 In addition, ``manage.py`` is automatically created in each Django project.
 ``manage.py`` is a thin wrapper around ``django-admin.py`` that takes care of
-two things for you before delegating to ``django-admin.py``::
+two things for you before delegating to ``django-admin.py``:
 
     * It puts your project's package on ``sys.path``.
 
