@@ -351,7 +351,7 @@ AttributeError: This QueryDict instance is immutable
 
 """
 
-from django.utils.httpwrappers import QueryDict
+from django.http import QueryDict
 
 if __name__ == "__main__":
     import doctest
