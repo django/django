@@ -50,7 +50,7 @@ So let's create a ``vote()`` function in ``myproject/polls/views.py``::
 
     from django.core.extensions import get_object_or_404, render_to_response
     from django.models.polls import choices, polls
-    from django.utils.httpwrappers import HttpResponseRedirect
+    from django.http import HttpResponseRedirect
 
     def vote(request, poll_id):
         p = get_object_or_404(polls, pk=poll_id)
