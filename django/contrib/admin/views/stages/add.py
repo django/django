@@ -6,7 +6,7 @@ from django.core import formfields, template
 from django.core.exceptions import Http404, ImproperlyConfigured, ObjectDoesNotExist, PermissionDenied
 from django.core.extensions import DjangoContext as Context
 from django.db import models
-from django.utils.httpwrappers import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponse, HttpResponseRedirect
 from django.utils.text import capfirst, get_text_list
 try:
     from django.contrib.admin.models import LogEntry, ADDITION, CHANGE, DELETION

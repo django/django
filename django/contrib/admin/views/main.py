@@ -9,7 +9,7 @@ from django.core.extensions import DjangoContext as Context
 from django.core.extensions import get_object_or_404, render_to_response
 from django.utils import dateformat
 from django.utils.html import escape, strip_tags
-from django.utils.httpwrappers import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponse, HttpResponseRedirect
 from django.utils.text import capfirst, get_text_list
 import operator
 from itertools import izip

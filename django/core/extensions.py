@@ -5,7 +5,7 @@
 from django.core.exceptions import Http404, ImproperlyConfigured
 from django.core.template import Context, loader
 from django.conf.settings import TEMPLATE_CONTEXT_PROCESSORS
-from django.utils.httpwrappers import HttpResponse
+from django.http import HttpResponse
 
 _standard_context_processors = None
 

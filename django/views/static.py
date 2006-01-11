@@ -4,7 +4,7 @@ import posixpath
 import mimetypes
 from django.core import template_loader
 from django.core.exceptions import Http404, ImproperlyConfigured
-from django.utils.httpwrappers import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponse, HttpResponseRedirect
 from django.core.template import Template, Context, TemplateDoesNotExist
 
 def serve(request, path, document_root=None, show_indexes=False):

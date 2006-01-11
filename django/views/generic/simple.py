@@ -1,5 +1,5 @@
 from django.core.extensions import DjangoContext, render_to_response
-from django.utils.httpwrappers import HttpResponse, HttpResponsePermanentRedirect, HttpResponseGone
+from django.http import HttpResponse, HttpResponsePermanentRedirect, HttpResponseGone
 
 def direct_to_template(request, template, **kwargs):
     """

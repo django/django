@@ -6,7 +6,7 @@ from django.contrib.auth.models import SESSION_KEY
 from django.contrib.comments.models import Comment, FreeComment, PHOTOS_REQUIRED, PHOTOS_OPTIONAL, RATINGS_REQUIRED, RATINGS_OPTIONAL, IS_PUBLIC
 from django.contrib.contenttypes.models import ContentType
 from django.parts.auth.formfields import AuthenticationForm
-from django.utils.httpwrappers import HttpResponseRedirect
+from django.http import HttpResponseRedirect
 from django.utils.text import normalize_newlines
 from django.conf.settings import BANNED_IPS, COMMENTS_ALLOW_PROFANITIES, COMMENTS_SKETCHY_USERS_GROUP, COMMENTS_FIRST_FEW, SITE_ID
 from django.utils.translation import ngettext

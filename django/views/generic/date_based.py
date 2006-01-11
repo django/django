@@ -3,7 +3,7 @@ from django.core.exceptions import Http404, ObjectDoesNotExist
 from django.core.extensions import DjangoContext
 from django.core.xheaders import populate_xheaders
 from django.models import get_module
-from django.utils.httpwrappers import HttpResponse
+from django.http import HttpResponse
 import datetime, time
 
 def archive_index(request, app_label, module_name, date_field, num_latest=15,

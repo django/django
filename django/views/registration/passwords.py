@@ -4,7 +4,7 @@ from django.core.template import Context, loader
 from django.models.auth import User
 from django.models.core import Site
 from django.views.decorators.auth import login_required
-from django.utils.httpwrappers import HttpResponseRedirect
+from django.http import HttpResponseRedirect
 
 class PasswordResetForm(formfields.Manipulator):
     "A form that lets a user request a password reset"

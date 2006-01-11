@@ -1,5 +1,5 @@
 from django.conf import settings
-from django.utils import httpwrappers
+from django import http
 
 class XViewMiddleware:
     """
@@ -12,6 +12,6 @@ class XViewMiddleware:
         documentation module to lookup the view function for an arbitrary page.
         """
         if request.META['REQUEST_METHOD'] == 'HEAD' and request.META.get('REMOTE_ADDR') in settings.INTERNAL_IPS:
-            response = httpwrappers.HttpResponse()
+            response = http.HttpResponse()
             response['X-View'] = "%s.%s" % (view_func.__module__, view_func.__name__)
             return response

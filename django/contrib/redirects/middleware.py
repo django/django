@@ -1,5 +1,5 @@
 from django.contrib.redirects.models import Redirect
-from django.utils import httpwrappers
+from django import http
 from django.conf.settings import APPEND_SLASH, SITE_ID
 
 class RedirectFallbackMiddleware:
@@ -20,8 +20,8 @@ class RedirectFallbackMiddleware:
                 pass
         if r is not None:
             if r == '':
-                return httpwrappers.HttpResponseGone()
-            return httpwrappers.HttpResponsePermanentRedirect(r.new_path)
+                return http.HttpResponseGone()
+            return http.HttpResponsePermanentRedirect(r.new_path)
 
         # No redirect was found. Return the response.
         return response

@@ -1,7 +1,7 @@
 from django.contrib.flatpages.models import FlatPage
 from django.core import template_loader
 from django.core.extensions import get_object_or_404, DjangoContext
-from django.utils.httpwrappers import HttpResponse
+from django.http import HttpResponse
 from django.conf.settings import SITE_ID
 
 DEFAULT_TEMPLATE = 'flatpages/default'

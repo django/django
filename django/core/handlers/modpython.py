@@ -1,7 +1,8 @@
 from django.core.handlers.base import BaseHandler
 from django.core import signals
 from django.dispatch import dispatcher
-from django.utils import datastructures, httpwrappers
+from django.utils import datastructures
+from djang import http
 from pprint import pformat
 import os
 
@@ -9,7 +10,7 @@ import os
 # settings) until after ModPythonHandler has been called; otherwise os.environ
 # won't be set up correctly (with respect to settings).
 
-class ModPythonRequest(httpwrappers.HttpRequest):
+class ModPythonRequest(http.HttpRequest):
     def __init__(self, req):
         self._req = req
         self.path = req.uri
@@ -25,9 +26,9 @@ class ModPythonRequest(httpwrappers.HttpRequest):
     def _load_post_and_files(self):
         "Populates self._post and self._files"
         if self._req.headers_in.has_key('content-type') and self._req.headers_in['content-type'].startswith('multipart'):
-            self._post, self._files = httpwrappers.parse_file_upload(self._req.headers_in, self.raw_post_data)
+            self._post, self._files = http.parse_file_upload(self._req.headers_in, self.raw_post_data)
         else:
-            self._post, self._files = httpwrappers.QueryDict(self.raw_post_data), datastructures.MultiValueDict()
+            self._post, self._files = http.QueryDict(self.raw_post_data), datastructures.MultiValueDict()
 
     def _get_request(self):
         if not hasattr(self, '_request'):
@@ -36,7 +37,7 @@ class ModPythonRequest(httpwrappers.HttpRequest):
 
     def _get_get(self):
         if not hasattr(self, '_get'):
-            self._get = httpwrappers.QueryDict(self._req.args)
+            self._get = http.QueryDict(self._req.args)
         return self._get
 
     def _set_get(self, get):
@@ -52,7 +53,7 @@ class ModPythonRequest(httpwrappers.HttpRequest):
 
     def _get_cookies(self):
         if not hasattr(self, '_cookies'):
-            self._cookies = httpwrappers.parse_cookie(self._req.headers_in.get('cookie', ''))
+            self._cookies = http.parse_cookie(self._req.headers_in.get('cookie', ''))
         return self._cookies
 
     def _set_cookies(self, cookies):

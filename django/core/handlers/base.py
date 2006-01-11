@@ -1,6 +1,6 @@
 from django.core import signals
 from django.dispatch import dispatcher
-from django.utils import httpwrappers
+from django import http
 
 class BaseHandler:
     def __init__(self):
@@ -93,7 +93,7 @@ class BaseHandler:
                 callback, param_dict = resolver.resolve404()
                 return callback(request, **param_dict)
         except exceptions.PermissionDenied:
-            return httpwrappers.HttpResponseForbidden('<h1>Permission denied</h1>')
+            return http.HttpResponseForbidden('<h1>Permission denied</h1>')
         except: # Handle everything else, including SuspiciousOperation, etc.
             if DEBUG:
                 return self.get_technical_error_response(request)

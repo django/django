@@ -5,7 +5,7 @@ from django.core.extensions import DjangoContext as Context
 from django.contrib.admin.views.stages.modify import render_change_form
 from django.db import models
 from django.utils.text import capfirst, get_text_list
-from django.utils.httpwrappers import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponse, HttpResponseRedirect
 from django.contrib.admin.views.decorators import staff_member_required
 try:
     from django.contrib.admin.models import LogEntry, ADDITION, CHANGE, DELETION

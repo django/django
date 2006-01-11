@@ -2,7 +2,7 @@ from django.core.exceptions import Http404, ObjectDoesNotExist
 from django.core.template import Context, loader
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.sites.models import Site
-from django.utils import httpwrappers
+from django import http
 
 def shortcut(request, content_type_id, object_id):
     "Redirect to an object's page based on a content-type ID and an object ID."
@@ -22,7 +22,7 @@ def shortcut(request, content_type_id, object_id):
 
     # If the object actually defines a domain, we're done.
     if absurl.startswith('http://'):
-        return httpwrappers.HttpResponseRedirect(absurl)
+        return http.HttpResponseRedirect(absurl)
 
     object_domain = None
 
@@ -45,8 +45,8 @@ def shortcut(request, content_type_id, object_id):
             object_domain = Site.objects.get_current().domain
         except Site.DoesNotExist:
             # Finally, give up and use a URL without the domain name
-            return httpwrappers.HttpResponseRedirect(obj.get_absolute_url())
-    return httpwrappers.HttpResponseRedirect('http://%s%s' % (object_domain, obj.get_absolute_url()))
+            return http.HttpResponseRedirect(obj.get_absolute_url())
+    return http.HttpResponseRedirect('http://%s%s' % (object_domain, obj.get_absolute_url()))
 
 def page_not_found(request, template_name='404'):
     """
@@ -57,7 +57,7 @@ def page_not_found(request, template_name='404'):
     Context: None
     """
     t = loader.get_template(template_name)
-    return httpwrappers.HttpResponseNotFound(t.render(Context()))
+    return http.HttpResponseNotFound(t.render(Context()))
 
 def server_error(request, template_name='500'):
     """
@@ -67,4 +67,4 @@ def server_error(request, template_name='500'):
     Context: None
     """
     t = loader.get_template(template_name)
-    return httpwrappers.HttpResponseServerError(t.render(Context()))
+    return http.HttpResponseServerError(t.render(Context()))

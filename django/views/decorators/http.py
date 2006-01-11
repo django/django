@@ -4,7 +4,7 @@ Decorators for views based on HTTP headers.
 
 from django.utils.decorators import decorator_from_middleware
 from django.middleware.http import ConditionalGetMiddleware
-from django.utils.httpwrappers import HttpResponseForbidden
+from django.http import HttpResponseForbidden
 
 conditional_page = decorator_from_middleware(ConditionalGetMiddleware)
 

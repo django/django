@@ -3,7 +3,7 @@ import os
 
 import gettext as gettext_module
 
-from django.utils import httpwrappers
+from django import http
 from django.utils.translation import check_for_language, activate, to_locale, get_language
 from django.utils.text import javascript_quote
 from django.conf import settings
@@ -20,7 +20,7 @@ def set_language(request):
         next = request.META.get('HTTP_REFERER', None)
     if not next:
         next = '/'
-    response = httpwrappers.HttpResponseRedirect(next)
+    response = http.HttpResponseRedirect(next)
     if check_for_language(lang_code):
         if hasattr(request, 'session'):
             request.session['django_language'] = lang_code
@@ -193,5 +193,5 @@ def javascript_catalog(request, domain='djangojs', packages=None):
     src.append(LibFoot)
     src.append(InterPolate)
     src = ''.join(src)
-    return httpwrappers.HttpResponse(src, 'text/javascript')
+    return http.HttpResponse(src, 'text/javascript')
 

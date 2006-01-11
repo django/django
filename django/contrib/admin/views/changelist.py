@@ -3,7 +3,7 @@ from django.contrib.admin.views.main import get_model_and_app
 from django.contrib.admin.filterspecs import FilterSpec
 from django.db import models
 from django.db.models.query import handle_legacy_orderlist
-from django.utils.httpwrappers import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponse, HttpResponseRedirect
 from django.core.paginator import ObjectPaginator, InvalidPage
 from django.core.extensions import DjangoContext as Context
 from django.core.extensions import render_to_response

@@ -1,6 +1,6 @@
 from django import models
 from django.core.template import loader
-from django.utils.httpwrappers import HttpResponse
+from django.http import HttpResponse
 from django.core.xheaders import populate_xheaders
 from django.core.extensions import DjangoContext
 from django.core.paginator import ObjectPaginator, InvalidPage

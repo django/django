@@ -1,7 +1,7 @@
 from django.core.extensions import DjangoContext, render_to_response
 from django.conf.settings import SECRET_KEY
 from django.contrib.auth.models import User, SESSION_KEY
-from django.utils import httpwrappers
+from django import http
 from django.utils.translation import gettext_lazy
 import base64, md5
 import cPickle as pickle
@@ -93,7 +93,7 @@ def staff_member_required(view_func):
                         return view_func(request, *args, **kwargs)
                     else:
                         request.session.delete_test_cookie()
-                        return httpwrappers.HttpResponseRedirect(request.path)
+                        return http.HttpResponseRedirect(request.path)
             else:
                 return _display_login_form(request, ERROR_MESSAGE)
 

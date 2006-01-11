@@ -1,6 +1,6 @@
 from django.contrib.syndication import feeds
 from django.core.exceptions import Http404
-from django.utils.httpwrappers import HttpResponse
+from django.http import HttpResponse
 
 def feed(request, url, feed_dict=None):
     if not feed_dict:

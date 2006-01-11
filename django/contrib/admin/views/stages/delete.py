@@ -9,7 +9,7 @@ try:
     from django.contrib.admin.models import LogEntry, ADDITION, CHANGE, DELETION
 except ImportError:
     raise ImproperlyConfigured, "You don't have 'django.contrib.admin' in INSTALLED_APPS."
-from django.utils.httpwrappers import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponse, HttpResponseRedirect
 
 def _nest_help(obj, depth, val):
     current = obj
