@@ -44,9 +44,9 @@ Now, let's create a Django view that handles the submitted data and does
 something with it. Remember, in `Tutorial 3`_, we create a URLconf that
 included this line::
 
-    (r'^polls/(?P<poll_id>\d+)/vote/$', 'myproject.apps.polls.views.vote'),
+    (r'^polls/(?P<poll_id>\d+)/vote/$', 'myproject.polls.views.vote'),
 
-So let's create a ``vote()`` function in ``myproject/apps/polls/views.py``::
+So let's create a ``vote()`` function in ``myproject/polls/views.py``::
 
     from django.core.extensions import get_object_or_404, render_to_response
     from django.models.polls import choices, polls
@@ -158,7 +158,7 @@ so far::
 
     from django.conf.urls.defaults import *
 
-    urlpatterns = patterns('myproject.apps.polls.views',
+    urlpatterns = patterns('myproject.polls.views',
         (r'^$', 'index'),
         (r'^(?P<poll_id>\d+)/$', 'detail'),
         (r'^(?P<poll_id>\d+)/results/$', 'results'),
@@ -178,7 +178,7 @@ Change it like so::
         (r'^$', 'django.views.generic.list_detail.object_list', info_dict),
         (r'^(?P<object_id>\d+)/$', 'django.views.generic.list_detail.object_detail', info_dict),
         (r'^(?P<object_id>\d+)/results/$', 'django.views.generic.list_detail.object_detail', dict(info_dict, template_name='polls/results')),
-        (r'^(?P<poll_id>\d+)/vote/$', 'myproject.apps.polls.views.vote'),
+        (r'^(?P<poll_id>\d+)/vote/$', 'myproject.polls.views.vote'),
     )
 
 We're using two generic views here: ``object_list`` and ``object_detail``.

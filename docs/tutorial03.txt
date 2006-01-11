@@ -62,7 +62,7 @@ arguments from the dictionary (an optional third item in the tuple).
 For more on ``HTTPRequest`` objects, see the `request and response documentation`_.
 For more details on URLconfs, see the `URLconf documentation`_.
 
-When you ran ``django-admin.py startproject myproject`` at the beginning of
+When you ran ``python manage.py startproject myproject`` at the beginning of
 Tutorial 1, it created a default URLconf in ``myproject/urls.py``. It also
 automatically set your ``ROOT_URLCONF`` setting to point at that file::
 
@@ -73,33 +73,33 @@ Time for an example. Edit ``myproject/urls.py`` so it looks like this::
     from django.conf.urls.defaults import *
 
     urlpatterns = patterns('',
-        (r'^polls/$', 'myproject.apps.polls.views.index'),
-        (r'^polls/(?P<poll_id>\d+)/$', 'myproject.apps.polls.views.detail'),
-        (r'^polls/(?P<poll_id>\d+)/results/$', 'myproject.apps.polls.views.results'),
-        (r'^polls/(?P<poll_id>\d+)/vote/$', 'myproject.apps.polls.views.vote'),
+        (r'^polls/$', 'myproject.polls.views.index'),
+        (r'^polls/(\d+)/$', 'myproject.polls.views.detail'),
+        (r'^polls/(\d+)/results/$', 'myproject.polls.views.results'),
+        (r'^polls/(\d+)/vote/$', 'myproject.polls.views.vote'),
     )
 
 This is worth a review. When somebody requests a page from your Web site --
 say, "/polls/23/", Django will load this Python module, because it's pointed to
 by the ``ROOT_URLCONF`` setting. It finds the variable named ``urlpatterns``
 and traverses the regular expressions in order. When it finds a regular
-expression that matches -- ``r'^polls/(?P<poll_id>\d+)/$'`` -- it loads the
-associated Python package/module: ``myproject.apps.polls.views.detail``. That
-corresponds to the function ``detail()`` in ``myproject/apps/polls/views.py``.
+expression that matches -- ``r'^polls/(\d+)/$'`` -- it loads the
+associated Python package/module: ``myproject.polls.views.detail``. That
+corresponds to the function ``detail()`` in ``myproject/polls/views.py``.
 Finally, it calls that ``detail()`` function like so::
 
     detail(request=<HttpRequest object>, poll_id='23')
 
-The ``poll_id='23'`` part comes from ``(?P<poll_id>\d+)``. Using
-``(?P<name>pattern)`` "captures" the text matched by ``pattern`` and sends it
-as a keyword argument to the view function.
+The ``poll_id='23'`` part comes from ``(\d+)``. Using parenthesis around a
+pattern "captures" the text matched by that pattern and sends it as an argument
+to the view function.
 
 Because the URL patterns are regular expressions, there really is no limit on
 what you can do with them. And there's no need to add URL cruft such as
 ``.php`` -- unless you have a sick sense of humor, in which case you can do
 something like this::
 
-    (r'^polls/latest\.php$', 'myproject.apps.polls.views.index'),
+    (r'^polls/latest\.php$', 'myproject.polls.views.index'),
 
 But, don't do that. It's silly.
 
@@ -128,24 +128,24 @@ make sure Django is following the URLconf properly.
 
 Fire up the Django development Web server::
 
-    django-admin.py runserver --settings=myproject.settings
+    python manage.py runserver
 
 Now go to "http://localhost:8000/polls/" on your domain in your Web browser.
 You should get a pleasantly-colored error page with the following message::
 
     ViewDoesNotExist at /polls/
 
-    Tried index in module myproject.apps.polls.views. Error was: 'module'
+    Tried index in module myproject.polls.views. Error was: 'module'
     object has no attribute 'index'
 
 This error happened because you haven't written a function ``index()`` in the
-module ``myproject/apps/polls/views.py``.
+module ``myproject/polls/views.py``.
 
 Try "/polls/23/", "/polls/23/results/" and "/polls/23/vote/". The error
 messages tell you which view Django tried (and failed to find, because you
 haven't written any views yet).
 
-Time to write the first view. Open the file ``myproject/apps/polls/views.py``
+Time to write the first view. Open the file ``myproject/polls/views.py``
 and put the following Python code in it::
 
     from django.utils.httpwrappers import HttpResponse
@@ -222,9 +222,9 @@ filesystem, whose contents Django can access. (Django runs as whatever user
 your server runs.) Don't put them under your document root, though. You
 probably shouldn't make them public, just for security's sake.
 
-Then edit ``TEMPLATE_DIRS`` in your settings file (``settings.py``) to tell
-Django where it can find templates -- just as you did in the "Customize the
-admin look and feel" section of Tutorial 2.
+Then edit ``TEMPLATE_DIRS`` in your ``settings.py`` to tell Django where it can
+find templates -- just as you did in the "Customize the admin look and feel"
+section of Tutorial 2.
 
 When you've done that, create a directory ``polls`` in your template directory.
 Within that, create a file called ``index.html``. Django requires that
@@ -385,19 +385,19 @@ Take some time to play around with the views and template system. As you edit
 the URLconf, you may notice there's a fair bit of redundancy in it::
 
     urlpatterns = patterns('',
-        (r'^polls/$', 'myproject.apps.polls.views.index'),
-        (r'^polls/(?P<poll_id>\d+)/$', 'myproject.apps.polls.views.detail'),
-        (r'^polls/(?P<poll_id>\d+)/results/$', 'myproject.apps.polls.views.results'),
-        (r'^polls/(?P<poll_id>\d+)/vote/$', 'myproject.apps.polls.views.vote'),
+        (r'^polls/$', 'myproject.polls.views.index'),
+        (r'^polls/(?P<poll_id>\d+)/$', 'myproject.polls.views.detail'),
+        (r'^polls/(?P<poll_id>\d+)/results/$', 'myproject.polls.views.results'),
+        (r'^polls/(?P<poll_id>\d+)/vote/$', 'myproject.polls.views.vote'),
     )
 
-Namely, ``myproject.apps.polls.views`` is in every callback.
+Namely, ``myproject.polls.views`` is in every callback.
 
 Because this is a common case, the URLconf framework provides a shortcut for
 common prefixes. You can factor out the common prefixes and add them as the
 first argument to ``patterns()``, like so::
 
-    urlpatterns = patterns('myproject.apps.polls.views',
+    urlpatterns = patterns('myproject.polls.views',
         (r'^polls/$', 'index'),
         (r'^polls/(?P<poll_id>\d+)/$', 'detail'),
         (r'^polls/(?P<poll_id>\d+)/results/$', 'results'),
@@ -416,18 +416,18 @@ is, each particular app should be transferrable to another Django installation
 with minimal fuss.
 
 Our poll app is pretty decoupled at this point, thanks to the strict directory
-structure that ``django-admin.py startapp`` created, but one part of it is
+structure that ``python manage.py startapp`` created, but one part of it is
 coupled to the Django settings: The URLconf.
 
 We've been editing the URLs in ``myproject/urls.py``, but the URL design of an
 app is specific to the app, not to the Django installation -- so let's move the
 URLs within the app directory.
 
-Copy the file ``myproject/urls.py`` to ``myproject/apps/polls/urls.py``. Then,
+Copy the file ``myproject/urls.py`` to ``myproject/polls/urls.py``. Then,
 change ``myproject/urls.py`` to remove the poll-specific URLs and insert an
 ``include()``::
 
-    (r'^polls/', include('myproject.apps.polls.urls')),
+    (r'^polls/', include('myproject.polls.urls')),
 
 ``include()``, simply, references another URLconf. Note that the regular
 expression doesn't have a ``$`` (end-of-string match character) but has the
@@ -439,14 +439,14 @@ Here's what happens if a user goes to "/polls/34/" in this system:
 
 * Django will find the match at ``'^polls/'``
 * It will strip off the matching text (``"polls/"``) and send the remaining
-  text -- ``"34/"`` -- to the 'myproject.apps.polls.urls' urlconf for
+  text -- ``"34/"`` -- to the 'myproject.polls.urls' urlconf for
   further processing.
 
 Now that we've decoupled that, we need to decouple the
-'myproject.apps.polls.urls' urlconf by removing the leading "polls/" from each
+'myproject.polls.urls' urlconf by removing the leading "polls/" from each
 line::
 
-    urlpatterns = patterns('myproject.apps.polls.views',
+    urlpatterns = patterns('myproject.polls.views',
         (r'^$', 'index'),
         (r'^(?P<poll_id>\d+)/$', 'detail'),
         (r'^(?P<poll_id>\d+)/results/$', 'results'),
