@@ -70,7 +70,6 @@ var SelectFilter = {
         addEvent(filter_input, 'keyup', function(e) { SelectFilter.filter_key_up(e, field_id); });
         addEvent(filter_input, 'keydown', function(e) { SelectFilter.filter_key_down(e, field_id); });
         addEvent(from_box, 'dblclick', function() { SelectBox.move(field_id + '_from', field_id + '_to'); });
-        addEvent(from_box, 'focus', function() { filter_input.focus(); });
         addEvent(to_box, 'dblclick', function() { SelectBox.move(field_id + '_to', field_id + '_from'); });
         addEvent(findForm(from_box), 'submit', function() { SelectBox.select_all(field_id + '_to'); });
         SelectBox.init(field_id + '_from');
