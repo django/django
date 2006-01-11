@@ -28,6 +28,7 @@ Usage
 =====
 
 ``django-admin.py action [options]``
+
 ``manage.py action [options]``
 
 ``action`` should be one of the actions listed in this document. ``options``,
