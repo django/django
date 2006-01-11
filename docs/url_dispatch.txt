@@ -51,9 +51,6 @@ algorithm the system follows to determine which Python code to execute:
 Example
 =======
 
-**This syntax is new in the Django development version.** See "Named groups"
-below if you're using Django 0.90.
-
 Here's a sample URLconf::
 
     from django.conf.urls.defaults import *
@@ -109,9 +106,6 @@ parenthesis) to capture bits of the URL and pass them as *positional* arguments
 to a view. In more advanced usage, it's possible to use *named*
 regular-expression groups to capture URL bits and pass them as *keyword*
 arguments to a view.
-
-(Note that support for non-named regex groups is a new feature in the Django
-development version. Django 0.90 requires named groups.)
 
 In Python regular expressions, the syntax for named regular-expression groups
 is ``(?P<name>pattern)``, where ``name`` is the name of the group and

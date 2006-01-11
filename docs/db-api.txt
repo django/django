@@ -222,8 +222,6 @@ If you pass an invalid keyword argument, the function will raise ``TypeError``.
 OR lookups
 ----------
 
-**New in Django development version.**
-
 By default, multiple lookups are "AND"ed together. If you'd like to use ``OR``
 statements in your queries, use the ``complex`` lookup type.
 

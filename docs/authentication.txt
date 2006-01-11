@@ -170,8 +170,8 @@ Change a password with ``set_password()``::
 Passwords
 ---------
 
-**This only applies to the Django development version.** Previous versions,
-such as Django 0.90, used simple MD5 hashes without password salts.
+Previous versions, such as Django 0.90, used simple MD5 hashes without password
+salts.
 
 The ``password`` field of a ``User`` object is a string in this format::
 
@@ -314,9 +314,8 @@ Here's the same thing, using Python 2.4's decorator syntax::
 Note that ``user_passes_test`` does not automatically check that the ``User``
 is not anonymous.
 
-**New in the Django development version**: ``user_passes_test()`` takes an
-optional ``login_url`` argument, which lets you specify the URL for your login
-page (``/accounts/login/`` by default).
+``user_passes_test()`` takes an optional ``login_url`` argument, which lets you
+specify the URL for your login page (``/accounts/login/`` by default).
 
 Example in Python 2.3 syntax::
 

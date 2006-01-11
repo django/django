@@ -35,7 +35,7 @@ it and write to it.
 It implements the following standard dictionary methods:
 
     * ``__contains__(key)``
-      **New in Django development version.** Example: ``'fav_color' in request.session``
+      Example: ``'fav_color' in request.session``
 
     * ``__getitem__(key)``
       Example: ``fav_color = request.session['fav_color']``
@@ -182,10 +182,9 @@ deleted::
     # request.session['foo'] instead of request.session.
     request.session['foo']['bar'] = 'baz'
 
-**Only available in Django development version.** To change this default
-behavior, set the ``SESSION_SAVE_EVERY_REQUEST`` setting  to ``True``. If
-``SESSION_SAVE_EVERY_REQUEST`` is ``True``, Django will save the session to the
-database on every single request.
+To change this default behavior, set the ``SESSION_SAVE_EVERY_REQUEST`` setting
+to ``True``. If ``SESSION_SAVE_EVERY_REQUEST`` is ``True``, Django will save
+the session to the database on every single request.
 
 Note that the session cookie is only sent when a session has been created or
 modified. If ``SESSION_SAVE_EVERY_REQUEST`` is ``True``, the session cookie
@@ -218,8 +217,7 @@ domain cookie.
 SESSION_COOKIE_NAME
 -------------------
 
-Default: ``'sessionid'`` (**Django development version.** Previous default was
-``'hotclub'``, which was deemed too pornish.)
+Default: ``'sessionid'``
 
 The name of the cookie to use for sessions. This can be whatever you want.
 
@@ -227,8 +225,6 @@ SESSION_SAVE_EVERY_REQUEST
 --------------------------
 
 Default: ``False``
-
-**Only available in Django development version.**
 
 Whether to save the session data on every request. If this is ``False``
 (default), then the session data will only be saved if it has been modified --

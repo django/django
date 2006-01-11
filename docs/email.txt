@@ -118,8 +118,6 @@ receiving a separate e-mail::
 Preventing header injection
 ===========================
 
-**New in Django development version.**
-
 `Header injection`_ is a security exploit in which an attacker inserts extra
 e-mail headers to control the "To:" and "From:" in e-mail messages that your
 scripts generate.
