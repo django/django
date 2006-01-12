@@ -361,7 +361,8 @@ Here are all available field types:
 
         meta.FloatField(..., max_digits=5, decimal_places=2)
 
-    And to store numbers up to one million with a resolution of 10 decimal places::
+    And to store numbers up to approximately one billion with a resolution of 10
+    decimal places::
 
         meta.FloatField(..., max_digits=19, decimal_places=10)
 
