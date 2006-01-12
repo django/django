@@ -29,7 +29,7 @@ The CACHE_BACKEND setting is a quasi-URI; examples are:
                                     testing. Note that this cache backend is
                                     NOT threadsafe!
 
-    locmem:///                      A more sophisticaed local memory cache;
+    locmem:///                      A more sophisticated local memory cache;
                                     this is multi-process- and thread-safe.
 
     dummy:///                       Doesn't actually cache. For use in test
@@ -350,7 +350,7 @@ class _FileCache(_SimpleCache):
             pickle.dump(now + timeout, f, 2)
             pickle.dump(value, f, 2)
         except (IOError, OSError):
-            raise
+            pass
 
     def delete(self, key):
         try:
