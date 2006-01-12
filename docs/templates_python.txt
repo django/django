@@ -329,28 +329,6 @@ See the `internationalization docs`_ for more.
 .. _LANGUAGE_CODE setting: http://www.djangoproject.com/documentation/settings/#language-code
 .. _internationalization docs: http://www.djangoproject.com/documentation/i18n/
 
-Subclassing Context: Custom subclasses
---------------------------------------
-
-Feel free to subclass ``Context`` yourself if you find yourself wanting to give
-each template something "automatically." For instance, if you want to give
-every template automatic access to the current time, use something like this::
-
-    from django.core.template import Context
-    import datetime
-    class TimeContext(Context):
-        def __init__(self, *args, **kwargs):
-            Context.__init__(self, *args, **kwargs)
-            self['current_time'] = datetime.datetime.now()
-
-This technique has two caveats:
-
-    * You'll have to remember to use ``TimeContext`` instead of ``Context`` in
-      your template-loading code.
-
-    * You'll have to be careful not to set the variable ``current_time`` when
-      you populate this context. If you do, you'll override the other one.
-
 Loading templates
 -----------------
 
