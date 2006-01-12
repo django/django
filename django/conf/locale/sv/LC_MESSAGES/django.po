@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2005-12-29 00:05+0100\n"
+"POT-Creation-Date: 2006-01-12 23:12+0100\n"
 "PO-Revision-Date: 2005-12-04 16:20+0100\n"
 "Last-Translator: Robin Sonefors <ozamosi@blinkenlights.se>\n"
 "Language-Team: Django translators <djangoi18n@googlegroups.com>\n"
@@ -580,6 +580,15 @@ msgstr "XML-text"
 #: contrib/admin/templates/admin/base.html:23
 #: contrib/admin/templates/admin/delete_confirmation.html:3
 #: contrib/admin/templates/admin/change_form.html:9
+#: contrib/admin/templates/admin_doc/bookmarklets.html:3
+msgid "Documentation"
+msgstr "Dokumentation"
+
+#: contrib/admin/templates/admin/object_history.html:3
+#: contrib/admin/templates/admin/change_list.html:4
+#: contrib/admin/templates/admin/base.html:23
+#: contrib/admin/templates/admin/delete_confirmation.html:3
+#: contrib/admin/templates/admin/change_form.html:9
 #: contrib/admin/templates/admin_doc/bookmarklets.html:4
 #: contrib/admin/templates/admin_doc/view_detail.html:4
 #: contrib/admin/templates/admin_doc/template_tag_index.html:5
@@ -766,7 +775,7 @@ msgstr "Ja, jag är säker"
 msgid " By %(title)s "
 msgstr " Efter %(title)s "
 
-#: contrib/admin/templates/admin/search_form.html:7
+#: contrib/admin/templates/admin/search_form.html:8
 msgid "Go"
 msgstr "Utför"
 
@@ -924,10 +933,6 @@ msgstr "Tack för att du använder vår sida!"
 #, python-format
 msgid "The %(site_name)s team"
 msgstr "%(site_name)s-laget"
-
-#: contrib/admin/templates/admin_doc/bookmarklets.html:3
-msgid "Documentation"
-msgstr "Dokumentation"
 
 #: contrib/admin/templates/admin_doc/bookmarklets.html:3
 msgid "Bookmarklets"
@@ -1443,38 +1448,42 @@ msgid "Japanese"
 msgstr ""
 
 #: conf/global_settings.py:49
+msgid "Dutch"
+msgstr ""
+
+#: conf/global_settings.py:50
 msgid "Norwegian"
 msgstr "Norska"
 
-#: conf/global_settings.py:50
+#: conf/global_settings.py:51
 msgid "Brazilian"
 msgstr "Brasilianska"
 
-#: conf/global_settings.py:51
+#: conf/global_settings.py:52
 msgid "Romanian"
 msgstr "Rumänska"
 
-#: conf/global_settings.py:52
+#: conf/global_settings.py:53
 msgid "Russian"
 msgstr "Ryska"
 
-#: conf/global_settings.py:53
+#: conf/global_settings.py:54
 msgid "Slovak"
 msgstr "Slovakiska"
 
-#: conf/global_settings.py:54
+#: conf/global_settings.py:55
 msgid "Serbian"
 msgstr "Serbiska"
 
-#: conf/global_settings.py:55
+#: conf/global_settings.py:56
 msgid "Swedish"
 msgstr "Svenska"
 
-#: conf/global_settings.py:56
+#: conf/global_settings.py:57
 msgid "Simplified Chinese"
 msgstr "Förenklad kinesiska"
 
-#: conf/global_settings.py:57
+#: conf/global_settings.py:58
 msgid "Traditional Chinese"
 msgstr ""
 
@@ -1819,7 +1828,7 @@ msgstr[0] "Var god och fyll giltiga %(self)s ID. Värdet %(value)r är ogiltigt.
 msgstr[1] ""
 "Var god och fyll giltiga %(self)s ID. Värdena %(value)r är ogiltigt."
 
-#: core/template/defaultfilters.py:371
+#: core/template/defaultfilters.py:379
 msgid "yes,no,maybe"
 msgstr "ja,nej,kanske"
 

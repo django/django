@@ -46,6 +46,7 @@ LANGUAGES = (
     ('is', _('Icelandic')),
     ('it', _('Italian')),
     ('ja', _('Japanese')),
+    ('nl', _('Dutch')),
     ('no', _('Norwegian')),
     ('pt-br', _('Brazilian')),
     ('ro', _('Romanian')),

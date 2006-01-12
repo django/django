@@ -8,45 +8,13 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2005-12-29 19:46+0000\n"
+"POT-Creation-Date: 2006-01-12 23:12+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: Johan C. Stöver <johan@nilling.nl>\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-
-#: contrib/redirects/models/redirects.py:7
-msgid "redirect from"
-msgstr "omgeleid van"
-
-#: contrib/redirects/models/redirects.py:8
-msgid ""
-"This should be an absolute path, excluding the domain name. Example: '/"
-"events/search/'."
-msgstr ""
-"Dit moet een absoluut pad zijn, zonder de domein naam. Bijvoorbeeld: '/"
-"events/search/'."
-
-#: contrib/redirects/models/redirects.py:9
-msgid "redirect to"
-msgstr "omleiden naar"
-
-#: contrib/redirects/models/redirects.py:10
-msgid ""
-"This can be either an absolute path (as above) or a full URL starting with "
-"'http://'."
-msgstr ""
-"Dit kan een absoluut pad (zoals boven) of een volledige URL beginnend met "
-"'http://'."
-
-#: contrib/redirects/models/redirects.py:12
-msgid "redirect"
-msgstr "omleiding"
-
-#: contrib/redirects/models/redirects.py:13
-msgid "redirects"
-msgstr "omleidingen"
 
 #: contrib/comments/models/comments.py:8
 #: contrib/comments/models/comments.py:161
@@ -320,57 +288,6 @@ msgstr ""
 msgid "The comment form didn't provide either 'preview' or 'post'"
 msgstr "Het opmerkingenformulier heeft geen 'voorbeeld' of 'post'"
 
-#: contrib/flatpages/models/flatpages.py:6 contrib/admin/views/doc.py:267
-msgid "URL"
-msgstr ""
-
-#: contrib/flatpages/models/flatpages.py:7
-msgid ""
-"Example: '/about/contact/'. Make sure to have leading and trailing slashes."
-msgstr "Voorbeeld: '/about/contact/'. Zorg voor slashes aan begin en eind"
-
-#: contrib/flatpages/models/flatpages.py:8
-msgid "title"
-msgstr "titel"
-
-#: contrib/flatpages/models/flatpages.py:9
-msgid "content"
-msgstr "inhoud"
-
-#: contrib/flatpages/models/flatpages.py:10
-msgid "enable comments"
-msgstr "opmerkingen toestaan"
-
-#: contrib/flatpages/models/flatpages.py:11
-msgid "template name"
-msgstr "Naam sjabloon"
-
-#: contrib/flatpages/models/flatpages.py:12
-msgid ""
-"Example: 'flatpages/contact_page'. If this isn't provided, the system will "
-"use 'flatpages/default'."
-msgstr ""
-"Voorbeeld: 'flatpages/contact_page'. Als deze niet is opgegeven, dan wordt "
-"'flatpages/default' gebruikt."
-
-#: contrib/flatpages/models/flatpages.py:13
-msgid "registration required"
-msgstr "registratie verplicht"
-
-#: contrib/flatpages/models/flatpages.py:13
-msgid "If this is checked, only logged-in users will be able to view the page."
-msgstr ""
-"Alleen ingelogde gebruikers kunnen deze pagina zien, indien dit is "
-"aangekruist."
-
-#: contrib/flatpages/models/flatpages.py:17
-msgid "flat page"
-msgstr "platte pagina"
-
-#: contrib/flatpages/models/flatpages.py:18
-msgid "flat pages"
-msgstr "platte pagina's"
-
 #: contrib/admin/filterspecs.py:40
 #, python-format
 msgid ""
@@ -457,8 +374,8 @@ msgid ""
 "Please enter a correct username and password. Note that both fields are case-"
 "sensitive."
 msgstr ""
-"Geef een correcte gebruikersnaam en wachtwoord. Let op de velden zijn hoofdletter-"
-"gevoelig"
+"Geef een correcte gebruikersnaam en wachtwoord. Let op de velden zijn "
+"hoofdletter-gevoelig"
 
 #: contrib/admin/views/decorators.py:23
 #: contrib/admin/templates/admin/login.html:24
@@ -470,16 +387,16 @@ msgid ""
 "Please log in again, because your session has expired. Don't worry: Your "
 "submission has been saved."
 msgstr ""
-"Uw sessie is verlopen, meldt u opnieuw aan. Maakt u geen zorgen: Uw "
-"bijdrage is opgeslagen."
+"Uw sessie is verlopen, meldt u opnieuw aan. Maakt u geen zorgen: Uw bijdrage "
+"is opgeslagen."
 
 #: contrib/admin/views/decorators.py:64
 msgid ""
 "Looks like your browser isn't configured to accept cookies. Please enable "
 "cookies, reload this page, and try again."
 msgstr ""
-"Lijkt erop dat uw browser geen cookies accepteerd. Accepteer cookies, en laad "
-"deze pagina nogmaals en probeer het opnieuw"
+"Lijkt erop dat uw browser geen cookies accepteerd. Accepteer cookies, en "
+"laad deze pagina nogmaals en probeer het opnieuw"
 
 #: contrib/admin/views/decorators.py:78
 msgid "Usernames cannot contain the '@' character."
@@ -557,8 +474,7 @@ msgstr "Wijzigen %(name)s \"%(obj)s\" is geslaagd."
 #, python-format
 msgid ""
 "The %(name)s \"%(obj)s\" was added successfully. You may edit it again below."
-msgstr ""
-"De %(name)s \"%(obj)s\" toegevoegd. U mag het hieronder wijzigen."
+msgstr "De %(name)s \"%(obj)s\" toegevoegd. U mag het hieronder wijzigen."
 
 #: contrib/admin/views/main.py:536
 #, fuzzy, python-format
@@ -652,6 +568,10 @@ msgstr "Tekst"
 msgid "Time"
 msgstr "Tijd"
 
+#: contrib/admin/views/doc.py:267 contrib/flatpages/models/flatpages.py:6
+msgid "URL"
+msgstr ""
+
 #: contrib/admin/views/doc.py:268
 msgid "U.S. state (two uppercase letters)"
 msgstr "US Staat (twee hoofdletters)"
@@ -659,6 +579,15 @@ msgstr "US Staat (twee hoofdletters)"
 #: contrib/admin/views/doc.py:269
 msgid "XML text"
 msgstr "XML Tekst"
+
+#: contrib/admin/templates/admin/object_history.html:3
+#: contrib/admin/templates/admin/change_list.html:4
+#: contrib/admin/templates/admin/base.html:23
+#: contrib/admin/templates/admin/delete_confirmation.html:3
+#: contrib/admin/templates/admin/change_form.html:9
+#: contrib/admin/templates/admin_doc/bookmarklets.html:3
+msgid "Documentation"
+msgstr "Documentatie"
 
 #: contrib/admin/templates/admin/object_history.html:3
 #: contrib/admin/templates/admin/change_list.html:4
@@ -1008,10 +937,6 @@ msgid "The %(site_name)s team"
 msgstr "Het %(site_name)s team"
 
 #: contrib/admin/templates/admin_doc/bookmarklets.html:3
-msgid "Documentation"
-msgstr "Documentatie"
-
-#: contrib/admin/templates/admin_doc/bookmarklets.html:3
 msgid "Bookmarklets"
 msgstr ""
 
@@ -1030,11 +955,16 @@ msgid ""
 "your computer is \"internal\").</p>\n"
 msgstr ""
 "\n"
-"<p class=\"help\">Om bookamrklets te installereb, sleep de link naar uw bladwijzers\n"
-"werkbalk, of rechtermuis klik op de link en voeg het toe aan de bladwijzer. Nu kan\n"
-"de bookmarklet vanuit elke pagina op de stek worden gekozen. Let erop dat het soms\n"
-"noodzakelijk is dat de computer vanwaaruit de pagina wordt bekeken intern is\n"
-"Raadpleeg uw systeembeheerder of uw computer zich op het interne netwerk bevind.<p>\n"
+"<p class=\"help\">Om bookamrklets te installereb, sleep de link naar uw "
+"bladwijzers\n"
+"werkbalk, of rechtermuis klik op de link en voeg het toe aan de bladwijzer. "
+"Nu kan\n"
+"de bookmarklet vanuit elke pagina op de stek worden gekozen. Let erop dat "
+"het soms\n"
+"noodzakelijk is dat de computer vanwaaruit de pagina wordt bekeken intern "
+"is\n"
+"Raadpleeg uw systeembeheerder of uw computer zich op het interne netwerk "
+"bevind.<p>\n"
 
 #: contrib/admin/templates/admin_doc/bookmarklets.html:19
 msgid "Documentation for this page"
@@ -1093,6 +1023,85 @@ msgstr "Huidige:"
 #, fuzzy
 msgid "Change:"
 msgstr "Wijzigen:"
+
+#: contrib/redirects/models/redirects.py:7
+msgid "redirect from"
+msgstr "omgeleid van"
+
+#: contrib/redirects/models/redirects.py:8
+msgid ""
+"This should be an absolute path, excluding the domain name. Example: '/"
+"events/search/'."
+msgstr ""
+"Dit moet een absoluut pad zijn, zonder de domein naam. Bijvoorbeeld: '/"
+"events/search/'."
+
+#: contrib/redirects/models/redirects.py:9
+msgid "redirect to"
+msgstr "omleiden naar"
+
+#: contrib/redirects/models/redirects.py:10
+msgid ""
+"This can be either an absolute path (as above) or a full URL starting with "
+"'http://'."
+msgstr ""
+"Dit kan een absoluut pad (zoals boven) of een volledige URL beginnend met "
+"'http://'."
+
+#: contrib/redirects/models/redirects.py:12
+msgid "redirect"
+msgstr "omleiding"
+
+#: contrib/redirects/models/redirects.py:13
+msgid "redirects"
+msgstr "omleidingen"
+
+#: contrib/flatpages/models/flatpages.py:7
+msgid ""
+"Example: '/about/contact/'. Make sure to have leading and trailing slashes."
+msgstr "Voorbeeld: '/about/contact/'. Zorg voor slashes aan begin en eind"
+
+#: contrib/flatpages/models/flatpages.py:8
+msgid "title"
+msgstr "titel"
+
+#: contrib/flatpages/models/flatpages.py:9
+msgid "content"
+msgstr "inhoud"
+
+#: contrib/flatpages/models/flatpages.py:10
+msgid "enable comments"
+msgstr "opmerkingen toestaan"
+
+#: contrib/flatpages/models/flatpages.py:11
+msgid "template name"
+msgstr "Naam sjabloon"
+
+#: contrib/flatpages/models/flatpages.py:12
+msgid ""
+"Example: 'flatpages/contact_page'. If this isn't provided, the system will "
+"use 'flatpages/default'."
+msgstr ""
+"Voorbeeld: 'flatpages/contact_page'. Als deze niet is opgegeven, dan wordt "
+"'flatpages/default' gebruikt."
+
+#: contrib/flatpages/models/flatpages.py:13
+msgid "registration required"
+msgstr "registratie verplicht"
+
+#: contrib/flatpages/models/flatpages.py:13
+msgid "If this is checked, only logged-in users will be able to view the page."
+msgstr ""
+"Alleen ingelogde gebruikers kunnen deze pagina zien, indien dit is "
+"aangekruist."
+
+#: contrib/flatpages/models/flatpages.py:17
+msgid "flat page"
+msgstr "platte pagina"
+
+#: contrib/flatpages/models/flatpages.py:18
+msgid "flat pages"
+msgstr "platte pagina's"
 
 #: utils/translation.py:350
 msgid "DATE_FORMAT"
@@ -1445,38 +1454,42 @@ msgid "Japanese"
 msgstr "Japans"
 
 #: conf/global_settings.py:49
+msgid "Dutch"
+msgstr ""
+
+#: conf/global_settings.py:50
 msgid "Norwegian"
 msgstr "Noors"
 
-#: conf/global_settings.py:50
+#: conf/global_settings.py:51
 msgid "Brazilian"
 msgstr "Braziliaans"
 
-#: conf/global_settings.py:51
+#: conf/global_settings.py:52
 msgid "Romanian"
 msgstr "Roemeens"
 
-#: conf/global_settings.py:52
+#: conf/global_settings.py:53
 msgid "Russian"
 msgstr "Russisch"
 
-#: conf/global_settings.py:53
+#: conf/global_settings.py:54
 msgid "Slovak"
 msgstr "Slovaaks"
 
-#: conf/global_settings.py:54
+#: conf/global_settings.py:55
 msgid "Serbian"
 msgstr "Servisch"
 
-#: conf/global_settings.py:55
+#: conf/global_settings.py:56
 msgid "Swedish"
 msgstr "Zweeds"
 
-#: conf/global_settings.py:56
+#: conf/global_settings.py:57
 msgid "Simplified Chinese"
 msgstr "Vereenvoudigd Chinees"
 
-#: conf/global_settings.py:57
+#: conf/global_settings.py:58
 msgid "Traditional Chinese"
 msgstr "Traditioneel Chinees"
 
@@ -1826,7 +1839,7 @@ msgid_plural ""
 msgstr[0] "Geef een geldig %(self)s IDs. De waarde %(value)r is ongeldig."
 msgstr[1] "Geef een geldig %(self)s IDs. de waarden %(value)r zijn ongeldig."
 
-#: core/template/defaultfilters.py:371
+#: core/template/defaultfilters.py:379
 msgid "yes,no,maybe"
 msgstr "ja,nee,misschien"
 
@@ -1835,5 +1848,5 @@ msgid ""
 "Your Web browser doesn't appear to have cookies enabled. Cookies are "
 "required for logging in."
 msgstr ""
-"Lijkt erop dat uw browser geen cookies accepteerd. Om aan te melden "
-"moeten cookies worden geaccepteerd."
+"Lijkt erop dat uw browser geen cookies accepteerd. Om aan te melden moeten "
+"cookies worden geaccepteerd."
