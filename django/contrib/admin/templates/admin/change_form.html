@@ -6,7 +6,7 @@
 {% endblock %}
 {% block coltype %}{{ bound_manipulator.coltype }}{% endblock %}
 {% block bodyclass %}{{ app_label }}-{{ bound_manipulator.object_name.lower }} change-form{% endblock %}
-{% block userlinks %}<a href="../../../password_change/">{% trans 'Change password' %}</a> / <a href="../../../logout/">{% trans 'Log out' %}</a>{% endblock %}
+{% block userlinks %}<a href="../../../doc/">{% trans 'Documentation' %}</a> / <a href="../../../password_change/">{% trans 'Change password' %}</a> / <a href="../../../logout/">{% trans 'Log out' %}</a>{% endblock %}
 {% block breadcrumbs %}{% if not is_popup %}
 <div class="breadcrumbs">
      <a href="../../../">{% trans "Home" %}</a> &rsaquo;
