@@ -156,6 +156,19 @@ Port 7000 on IP address 1.2.3.4::
 
     django-admin.py runserver 1.2.3.4:7000
 
+shell
+-----
+
+Starts the Python interactive interpreter.
+
+**New in Django development version:** Uses IPython_, if it's installed. If you
+have IPython installed and want to force use of the "plain" Python interpreter,
+use the ``--plain`` option, like so::
+
+    django-admin.py shell --plain
+
+.. _IPython: http://ipython.scipy.org/
+
 sql [modelmodule modelmodule ...]
 ---------------------------------
 

@@ -814,11 +814,19 @@ def createcachetable(tablename):
     db.db.commit()
 createcachetable.args = "[tablename]"
 
-def run_shell():
-    "Runs a Python interactive interpreter"
-    import code
-    code.interact()
-run_shell.args = ''
+def run_shell(use_plain=False):
+    "Runs a Python interactive interpreter. Tries to use IPython, if it's available."
+    try:
+        if use_plain:
+            # Don't bother loading IPython, because the user wants plain Python.
+            raise ImportError
+        import IPython
+        shell = IPython.Shell.IPShell()
+        shell.mainloop()
+    except ImportError:
+        import code
+        code.interact()
+run_shell.args = '[--plain]'
 
 # Utilities for command-line script
 
@@ -878,6 +886,8 @@ def execute_from_command_line(action_mapping=DEFAULT_ACTION_MAPPING):
         help='Python path to settings module, e.g. "myproject.settings.main". If this isn\'t provided, the DJANGO_SETTINGS_MODULE environment variable will be used.')
     parser.add_option('--pythonpath',
         help='Lets you manually add a directory the Python path, e.g. "/home/djangoprojects/myproject".')
+    parser.add_option('--plain', action='store_true', dest='plain',
+        help='Tells Django to use plain Python, not IPython, for "shell" command.')
     options, args = parser.parse_args()
 
     # Take care of options.
@@ -913,7 +923,9 @@ def execute_from_command_line(action_mapping=DEFAULT_ACTION_MAPPING):
                 sys.exit(1)
         else:
             action_mapping[action](username, email, password)
-    elif action in ('init', 'shell', 'validate'):
+    elif action == 'shell':
+        action_mapping[action](options.plain is True)
+    elif action in ('init', 'validate'):
         action_mapping[action]()
     elif action == 'inspectdb':
         try:
