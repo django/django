@@ -124,10 +124,14 @@ scripts generate.
 
 The Django e-mail functions outlined above all protect against header injection
 by forbidding newlines in header values. If any ``subject``, ``from_email`` or
-``recipient_list`` contains a newline, the e-mail function (e.g.
-``send_mail()``) will raise ``django.core.mail.BadHeaderError`` (a subclass of
-``ValueError``) and, hence, will not send the e-mail. It's your responsibility
-to validate all data before passing it to the e-mail functions.
+``recipient_list`` contains a newline (in either Unix, Windows or Mac style),
+the e-mail function (e.g. ``send_mail()``) will raise
+``django.core.mail.BadHeaderError`` (a subclass of ``ValueError``) and, hence,
+will not send the e-mail. It's your responsibility to validate all data before
+passing it to the e-mail functions.
+
+If a ``message`` contains headers at the start of the string, the headers will
+simply be printed as the first bit of the e-mail message.
 
 Here's an example view that takes a ``subject``, ``message`` and ``from_email``
 from the request's POST data, sends that to admin@example.com and redirects to
