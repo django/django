@@ -3,7 +3,7 @@ from django.db.models.fields import AutoField, Field, IntegerField
 from django.db.models.related import RelatedObject
 from django.utils.translation import gettext_lazy, string_concat
 from django.utils.functional import curry
-from django.core import formfields
+from django.core import formfields, validators
 from django.dispatch import dispatcher
 
 # Values for Relation.edit_inline.
@@ -27,6 +27,14 @@ def do_pending_lookups(sender):
         field.do_related_class(other_cls, rel_cls)
 
 dispatcher.connect(do_pending_lookups, signal=signals.class_prepared)
+
+def manipulator_valid_rel_key(f, self, field_data, all_data):
+    "Validates that the value is a valid foreign key"
+    klass = f.rel.to
+    try:
+        klass._default_manager.get_object(pk=field_data)
+    except klass.DoesNotExist:
+        raise validators.ValidationError, _("Please enter a valid %s.") % f.verbose_name
 
 #HACK
 class RelatedField(object):

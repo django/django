@@ -24,14 +24,6 @@ prep_for_like_query = lambda x: str(x).replace("%", "\%").replace("_", "\_")
 # returns the <ul> class for a given radio_admin value
 get_ul_class = lambda x: 'radiolist%s' % ((x == HORIZONTAL) and ' inline' or '')
 
-def manipulator_valid_rel_key(f, self, field_data, all_data):
-    "Validates that the value is a valid foreign key"
-    klass = f.rel.to
-    try:
-        klass._default_manager.get_object(pk=field_data)
-    except klass.DoesNotExist:
-        raise validators.ValidationError, _("Please enter a valid %s.") % f.verbose_name
-
 def manipulator_validator_unique(f, opts, self, field_data, all_data):
     "Validates that the value is unique for this field."
     lookup_type = f.get_validator_unique_lookup_type()
