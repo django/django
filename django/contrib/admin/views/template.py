@@ -1,6 +1,6 @@
 from django.contrib.admin.views.decorators import staff_member_required
-from django.core import formfields, validators
-from django import template
+from django.core import validators
+from django import template, forms
 from django.template import loader
 from django.template import RequestContext as Context
 from django.core.extensions import render_to_response
@@ -26,17 +26,17 @@ def template_validator(request):
             request.user.add_message('The template is valid.')
     return render_to_response('admin/template_validator', {
         'title': 'Template validator',
-        'form': formfields.FormWrapper(manipulator, new_data, errors),
+        'form': forms.FormWrapper(manipulator, new_data, errors),
     }, context_instance=RequestContext(request))
 template_validator = staff_member_required(template_validator)
 
-class TemplateValidator(formfields.Manipulator):
+class TemplateValidator(forms.Manipulator):
     def __init__(self, settings_modules):
         self.settings_modules = settings_modules
         site_list = Site.objects.get_in_bulk(settings_modules.keys()).values()
         self.fields = (
-            formfields.SelectField('site', is_required=True, choices=[(s.id, s.name) for s in site_list]),
-            formfields.LargeTextField('template', is_required=True, rows=25, validator_list=[self.isValidTemplate]),
+            forms.SelectField('site', is_required=True, choices=[(s.id, s.name) for s in site_list]),
+            forms.LargeTextField('template', is_required=True, rows=25, validator_list=[self.isValidTemplate]),
         )
 
     def isValidTemplate(self, field_data, all_data):

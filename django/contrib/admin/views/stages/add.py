@@ -2,7 +2,7 @@ from django.contrib.admin.models import LogEntry
 from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.admin.views.main import get_model_and_app
 from django.contrib.admin.views.stages.modify import render_change_form
-from django.core import formfields
+from django import forms
 from django import template
 from django.http import Http404
 from django.core.exceptions import ImproperlyConfigured, ObjectDoesNotExist, PermissionDenied
@@ -79,7 +79,7 @@ def add_stage(request, path, show_delete=False, form_url='', post_url='../', pos
         errors = {}
 
     # Populate the FormWrapper.
-    form = formfields.FormWrapper(manipulator, new_data, errors)
+    form = forms.FormWrapper(manipulator, new_data, errors)
 
     c = Context(request, {
         'title': _('Add %s') % opts.verbose_name,

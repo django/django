@@ -1,6 +1,6 @@
 from django.core.exceptions import ObjectDoesNotExist
-from django.core import formfields
-from django.core.formfields import Manipulator
+from django import forms
+from django.forms import Manipulator
 from django.db.models.fields import FileField, AutoField
 from django.db.models.exceptions import BadCommand
 from django.dispatch import dispatcher
@@ -497,7 +497,7 @@ def manipulator_validator_unique_together(field_name_list, opts, self, field_dat
 def manipulator_validator_unique_for_date(from_field, date_field, opts, lookup_type, self, field_data, all_data):
     from django.db.models.fields.related import ManyToOne
     date_str = all_data.get(date_field.get_manipulator_field_names('')[0], None)
-    date_val = formfields.DateField.html2python(date_str)
+    date_val = forms.DateField.html2python(date_str)
     if date_val is None:
         return # Date was invalid. This will be caught by another validator.
     lookup_kwargs = {'%s__year' % date_field.name: date_val.year}

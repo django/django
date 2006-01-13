@@ -1,6 +1,6 @@
 from django.core.xheaders import populate_xheaders
 from django.template import loader
-from django.core import formfields, meta
+from django import forms
 from django.views.auth.login import redirect_to_login
 from django.template import RequestContext
 from django.core.paginator import ObjectPaginator, InvalidPage
@@ -54,7 +54,7 @@ def create_object(request, model, template_name=None,
         new_data = manipulator.flatten_data()
 
     # Create the FormWrapper, template, context, response
-    form = formfields.FormWrapper(manipulator, new_data, errors)
+    form = forms.FormWrapper(manipulator, new_data, errors)
     if not template_name:
         template_name = "%s/%s_form" % (model._meta.app_label, model._meta.object_name.lower())
     t = template_loader.get_template(template_name)
@@ -123,7 +123,7 @@ def update_object(request, model, object_id=None, slug=None,
         # This makes sure the form acurate represents the fields of the place.
         new_data = manipulator.flatten_data()
 
-    form = formfields.FormWrapper(manipulator, new_data, errors)
+    form = forms.FormWrapper(manipulator, new_data, errors)
     if not template_name:
         template_name = "%s/%s_form" % (model._meta.app_label, model._meta.object_name.lower())
     t = template_loader.get_template(template_name)

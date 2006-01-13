@@ -1,5 +1,5 @@
 from django.contrib.admin.views.main import get_model_and_app
-from django.core import formfields
+from django import forms
 from django import template
 from django.http import Http404
 from django.core.exceptions import ImproperlyConfigured, ObjectDoesNotExist, PermissionDenied
@@ -93,7 +93,7 @@ def change_stage(request, path, object_id):
         errors = {}
 
     # Populate the FormWrapper.
-    form = formfields.FormWrapper(manipulator, new_data, errors)
+    form = forms.FormWrapper(manipulator, new_data, errors)
     form.original = manipulator.original_object
     form.order_objects = []
 

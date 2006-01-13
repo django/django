@@ -1,7 +1,6 @@
 # Generic admin views.
 from django.conf import settings
 from django.contrib.admin.views.decorators import staff_member_required
-from django.core import formfields
 from django import template
 from django.template import loader
 from django.db import models

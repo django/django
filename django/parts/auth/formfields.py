@@ -1,7 +1,8 @@
 from django.models.auth import User
-from django.core import formfields, validators
+from django.core import validators
+from django import forms
 
-class AuthenticationForm(formfields.Manipulator):
+class AuthenticationForm(forms.Manipulator):
     """
     Base class for authenticating users. Extend this to get a form that accepts
     username/password logins.
@@ -15,9 +16,9 @@ class AuthenticationForm(formfields.Manipulator):
         """
         self.request = request
         self.fields = [
-            formfields.TextField(field_name="username", length=15, maxlength=30, is_required=True,
+            forms.TextField(field_name="username", length=15, maxlength=30, is_required=True,
                 validator_list=[self.isValidUser, self.hasCookiesEnabled]),
-            formfields.PasswordField(field_name="password", length=15, maxlength=30, is_required=True,
+            forms.PasswordField(field_name="password", length=15, maxlength=30, is_required=True,
                 validator_list=[self.isValidPasswordForUser]),
         ]
         self.user_cache = None

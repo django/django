@@ -1,4 +1,5 @@
-from django.core import formfields, validators
+from django import forms
+from django.core import validators
 from django.core.extensions import render_to_response
 from django.template import Context, RequestContext, loader
 from django.models.auth import User
@@ -6,11 +7,11 @@ from django.models.core import Site
 from django.views.decorators.auth import login_required
 from django.http import HttpResponseRedirect
 
-class PasswordResetForm(formfields.Manipulator):
+class PasswordResetForm(forms.Manipulator):
     "A form that lets a user request a password reset"
     def __init__(self):
         self.fields = (
-            formfields.EmailField(field_name="email", length=40, is_required=True,
+            forms.EmailField(field_name="email", length=40, is_required=True,
                 validator_list=[self.isValidUserEmail]),
         )
 
@@ -43,16 +44,16 @@ class PasswordResetForm(formfields.Manipulator):
         }
         send_mail('Password reset on %s' % site_name, t.render(Context(c)), None, [self.user_cache.email])
 
-class PasswordChangeForm(formfields.Manipulator):
+class PasswordChangeForm(forms.Manipulator):
     "A form that lets a user change his password."
     def __init__(self, user):
         self.user = user
         self.fields = (
-            formfields.PasswordField(field_name="old_password", length=30, maxlength=30, is_required=True,
+            forms.PasswordField(field_name="old_password", length=30, maxlength=30, is_required=True,
                 validator_list=[self.isValidOldPassword]),
-            formfields.PasswordField(field_name="new_password1", length=30, maxlength=30, is_required=True,
+            forms.PasswordField(field_name="new_password1", length=30, maxlength=30, is_required=True,
                 validator_list=[validators.AlwaysMatchesOtherField('new_password2', "The two 'new password' fields didn't match.")]),
-            formfields.PasswordField(field_name="new_password2", length=30, maxlength=30, is_required=True),
+            forms.PasswordField(field_name="new_password2", length=30, maxlength=30, is_required=True),
         )
 
     def isValidOldPassword(self, new_data, all_data):
@@ -77,7 +78,7 @@ def password_reset(request, is_admin_site=False):
             else:
                 form.save()
             return HttpResponseRedirect('%sdone/' % request.path)
-    return render_to_response('registration/password_reset_form', {'form': formfields.FormWrapper(form, new_data, errors)},
+    return render_to_response('registration/password_reset_form', {'form': forms.FormWrapper(form, new_data, errors)},
         context_instance=RequestContext(request))
 
 def password_reset_done(request):
@@ -92,7 +93,7 @@ def password_change(request):
         if not errors:
             form.save(new_data)
             return HttpResponseRedirect('%sdone/' % request.path)
-    return render_to_response('registration/password_change_form', {'form': formfields.FormWrapper(form, new_data, errors)},
+    return render_to_response('registration/password_change_form', {'form': forms.FormWrapper(form, new_data, errors)},
         context_instance=RequestContext(request))
 password_change = login_required(password_change)
 

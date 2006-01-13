@@ -1,5 +1,5 @@
 from django.parts.auth.formfields import AuthenticationForm
-from django.core import formfields
+from django import forms
 from django.core.extensions import render_to_response
 from django.template import RequestContext
 from django.contrib.auth.models import SESSION_KEY
@@ -26,7 +26,7 @@ def login(request):
         errors = {}
     request.session.set_test_cookie()
     return render_to_response('registration/login', {
-        'form': formfields.FormWrapper(manipulator, request.POST, errors),
+        'form': forms.FormWrapper(manipulator, request.POST, errors),
         REDIRECT_FIELD_NAME: redirect_to,
         'site_name': Site.objects.get_current().name,
     }, context_instance=RequestContext(request))

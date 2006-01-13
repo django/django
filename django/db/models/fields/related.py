@@ -3,7 +3,8 @@ from django.db.models.fields import AutoField, Field, IntegerField
 from django.db.models.related import RelatedObject
 from django.utils.translation import gettext_lazy, string_concat
 from django.utils.functional import curry
-from django.core import formfields, validators
+from django.core import validators
+from django import forms
 from django.dispatch import dispatcher
 
 # Values for Relation.edit_inline.
@@ -115,13 +116,13 @@ class ForeignKey(SharedMethods, Field):
             params['validator_list'].append(curry(manipulator_valid_rel_key, self, manipulator))
         else:
             if self.radio_admin:
-                field_objs = [formfields.RadioSelectField]
+                field_objs = [forms.RadioSelectField]
                 params['ul_class'] = get_ul_class(self.radio_admin)
             else:
                 if self.null:
-                    field_objs = [formfields.NullSelectField]
+                    field_objs = [forms.NullSelectField]
                 else:
-                    field_objs = [formfields.SelectField]
+                    field_objs = [forms.SelectField]
             params['choices'] = self.get_choices_default()
         return (field_objs, params)
 
@@ -130,7 +131,7 @@ class ForeignKey(SharedMethods, Field):
         if self.rel.raw_id_admin and not isinstance(rel_field, AutoField):
             return rel_field.get_manipulator_field_objs()
         else:
-            return [formfields.IntegerField]
+            return [forms.IntegerField]
 
     def get_db_prep_save(self, value):
         if value == '' or value == None:
@@ -233,10 +234,10 @@ class ManyToManyField(RelatedField, Field):
 
     def get_manipulator_field_objs(self):
         if self.rel.raw_id_admin:
-            return [formfields.RawIdAdminField]
+            return [forms.RawIdAdminField]
         else:
             choices = self.get_choices_default()
-            return [curry(formfields.SelectMultipleField, size=min(max(len(choices), 5), 15), choices=choices)]
+            return [curry(forms.SelectMultipleField, size=min(max(len(choices), 5), 15), choices=choices)]
 
     def get_choices_default(self):
         return Field.get_choices(self, include_blank=False)

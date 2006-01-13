@@ -1,4 +1,5 @@
-from django.core import formfields, validators
+from django.core import validators
+from django import forms
 from django.core.mail import mail_admins, mail_managers
 from django.http import Http404
 from django.core.exceptions import ObjectDoesNotExist
@@ -28,37 +29,37 @@ class PublicCommentManipulator(AuthenticationForm):
             else:
                 return []
         self.fields.extend([
-            formfields.LargeTextField(field_name="comment", maxlength=3000, is_required=True,
+            forms.LargeTextField(field_name="comment", maxlength=3000, is_required=True,
                 validator_list=[self.hasNoProfanities]),
-            formfields.RadioSelectField(field_name="rating1", choices=choices,
+            forms.RadioSelectField(field_name="rating1", choices=choices,
                 is_required=ratings_required and num_rating_choices > 0,
                 validator_list=get_validator_list(1),
             ),
-            formfields.RadioSelectField(field_name="rating2", choices=choices,
+            forms.RadioSelectField(field_name="rating2", choices=choices,
                 is_required=ratings_required and num_rating_choices > 1,
                 validator_list=get_validator_list(2),
             ),
-            formfields.RadioSelectField(field_name="rating3", choices=choices,
+            forms.RadioSelectField(field_name="rating3", choices=choices,
                 is_required=ratings_required and num_rating_choices > 2,
                 validator_list=get_validator_list(3),
             ),
-            formfields.RadioSelectField(field_name="rating4", choices=choices,
+            forms.RadioSelectField(field_name="rating4", choices=choices,
                 is_required=ratings_required and num_rating_choices > 3,
                 validator_list=get_validator_list(4),
             ),
-            formfields.RadioSelectField(field_name="rating5", choices=choices,
+            forms.RadioSelectField(field_name="rating5", choices=choices,
                 is_required=ratings_required and num_rating_choices > 4,
                 validator_list=get_validator_list(5),
             ),
-            formfields.RadioSelectField(field_name="rating6", choices=choices,
+            forms.RadioSelectField(field_name="rating6", choices=choices,
                 is_required=ratings_required and num_rating_choices > 5,
                 validator_list=get_validator_list(6),
             ),
-            formfields.RadioSelectField(field_name="rating7", choices=choices,
+            forms.RadioSelectField(field_name="rating7", choices=choices,
                 is_required=ratings_required and num_rating_choices > 6,
                 validator_list=get_validator_list(7),
             ),
-            formfields.RadioSelectField(field_name="rating8", choices=choices,
+            forms.RadioSelectField(field_name="rating8", choices=choices,
                 is_required=ratings_required and num_rating_choices > 7,
                 validator_list=get_validator_list(8),
             ),
@@ -117,13 +118,13 @@ class PublicCommentManipulator(AuthenticationForm):
             mail_managers("Comment posted by sketchy user (%s)" % self.user_cache.username, c.get_as_text())
         return c
 
-class PublicFreeCommentManipulator(formfields.Manipulator):
+class PublicFreeCommentManipulator(forms.Manipulator):
     "Manipulator that handles public free (unregistered) comments"
     def __init__(self):
         self.fields = (
-            formfields.TextField(field_name="person_name", maxlength=50, is_required=True,
+            forms.TextField(field_name="person_name", maxlength=50, is_required=True,
                 validator_list=[self.hasNoProfanities]),
-            formfields.LargeTextField(field_name="comment", maxlength=3000, is_required=True,
+            forms.LargeTextField(field_name="comment", maxlength=3000, is_required=True,
                 validator_list=[self.hasNoProfanities]),
         )
 
@@ -220,9 +221,9 @@ def post_comment(request):
     if manipulator.get_user() and new_data.has_key('password') and manipulator.get_user().check_password(new_data['password']):
         request.session[SESSION_KEY] = manipulator.get_user_id()
     if errors or request.POST.has_key('preview'):
-        class CommentFormWrapper(formfields.FormWrapper):
+        class CommentFormWrapper(forms.FormWrapper):
             def __init__(self, manipulator, new_data, errors, rating_choices):
-                formfields.FormWrapper.__init__(self, manipulator, new_data, errors)
+                forms.FormWrapper.__init__(self, manipulator, new_data, errors)
                 self.rating_choices = rating_choices
             def ratings(self):
                 field_list = [self['rating%d' % (i+1)] for i in range(len(rating_choices))]
@@ -301,7 +302,7 @@ def post_free_comment(request):
         comment = errors and '' or manipulator.get_comment(new_data)
         return render_to_response('comments/free_preview', {
             'comment': comment,
-            'comment_form': formfields.FormWrapper(manipulator, new_data, errors),
+            'comment_form': forms.FormWrapper(manipulator, new_data, errors),
             'options': options,
             'target': target,
             'hash': security_hash,
