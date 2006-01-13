@@ -1,8 +1,8 @@
 from django.conf import settings
 
 
-from django.core import template
-from django.core.template import loader
+from django import template
+from django.template import loader
 from django.utils.translation import activate, deactivate, install
 import traceback
 

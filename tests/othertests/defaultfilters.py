@@ -322,7 +322,7 @@ False
 
 """
 
-from django.core.template.defaultfilters import *
+from django.template.defaultfilters import *
 import datetime
 
 if __name__ == '__main__':

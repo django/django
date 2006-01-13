@@ -1,6 +1,6 @@
 # Quick tests for the markup templatetags (django.contrib.markup)
 
-from django.core.template import Template, Context, add_to_builtins
+from django.template import Template, Context, add_to_builtins
 
 add_to_builtins('django.contrib.markup.templatetags.markup')
 
