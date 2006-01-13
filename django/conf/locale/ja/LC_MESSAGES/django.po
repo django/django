@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2006-01-12 23:12+0100\n"
+"POT-Creation-Date: 2006-01-13 15:53+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -423,7 +423,7 @@ msgstr "この下で再び変更可能です。"
 #: contrib/admin/views/main.py:423 contrib/admin/views/main.py:501
 #, python-format
 msgid "You may add another %s below."
-msgstr "この下で他を追加可能です。"
+msgstr "この下で他の%sを追加可能です。"
 
 #: contrib/admin/views/main.py:441
 #, python-format
