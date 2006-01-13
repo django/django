@@ -1,6 +1,7 @@
 from django.core.xheaders import populate_xheaders
 from django.template import loader
 from django import forms
+from django.db.models import FileField
 from django.views.auth.login import redirect_to_login
 from django.template import RequestContext
 from django.core.paginator import ObjectPaginator, InvalidPage
@@ -26,7 +27,7 @@ def create_object(request, model, template_name=None,
         # If data was POSTed, we're trying to create a new object
         new_data = request.POST.copy()
 
-        if model._meta.has_field_type(meta.FileField):
+        if model._meta.has_field_type(FileField):
             new_data.update(request.FILES)
 
         # Check for errors
