@@ -38,6 +38,7 @@ class Session(models.Model):
     expire_date = models.DateTimeField(_('expire date'))
     objects = SessionManager()
     class Meta:
+        db_table = 'django_sessions'
         verbose_name = _('session')
         verbose_name_plural = _('sessions')
         module_constants = {
