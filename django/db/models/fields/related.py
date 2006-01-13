@@ -1,5 +1,5 @@
 from django.db.models import signals
-from django.db.models.fields import Field, IntegerField
+from django.db.models.fields import AutoField, Field, IntegerField
 from django.db.models.related import RelatedObject
 from django.utils.translation import gettext_lazy, string_concat
 from django.utils.functional import curry
@@ -26,14 +26,10 @@ def do_pending_lookups(sender):
         field.rel.to = other_cls
         field.do_related_class(other_cls, rel_cls)
 
-dispatcher.connect(
-    do_pending_lookups,
-    signal = signals.class_prepared
-)
+dispatcher.connect(do_pending_lookups, signal=signals.class_prepared)
 
 #HACK
 class RelatedField(object):
-
     def contribute_to_class(self, cls, name):
         sup = super(RelatedField, self)
         if hasattr(sup, 'contribute_to_class'):
@@ -92,7 +88,7 @@ class ForeignKey(SharedMethods, Field):
             related_name=kwargs.pop('related_name', None),
             limit_choices_to=kwargs.pop('limit_choices_to', None),
             lookup_overrides=kwargs.pop('lookup_overrides', None),
-            raw_id_admin=kwargs.pop('raw_id_admin', False))            
+            raw_id_admin=kwargs.pop('raw_id_admin', False))
         Field.__init__(self, **kwargs)
 
         for name in ('num_in_admin', 'min_num_in_admin', 'max_num_in_admin', 'num_extra_on_change'):
@@ -183,14 +179,14 @@ class OneToOneField(SharedMethods, IntegerField):
             related_name=kwargs.pop('related_name', None),
             limit_choices_to=kwargs.pop('limit_choices_to', None),
             lookup_overrides=kwargs.pop('lookup_overrides', None),
-            raw_id_admin=kwargs.pop('raw_id_admin', False))    
+            raw_id_admin=kwargs.pop('raw_id_admin', False))
         kwargs['primary_key'] = True
         IntegerField.__init__(self, **kwargs)
-        
+
         for name in ('num_in_admin'):
             if name in kwargs:
                 self.deprecated_args.append(name)
-        
+
         if not self.db_index:
            self.db_index = True
 
@@ -203,7 +199,7 @@ class OneToOneField(SharedMethods, IntegerField):
                       rel_class=related.model, rel_field=related.field))
         if not cls._meta.one_to_one_field:
            cls._meta.one_to_one_field = self
-           
+
 class ManyToManyField(RelatedField, Field):
     def __init__(self, to, **kwargs):
         kwargs['verbose_name'] = kwargs.get('verbose_name', None)
@@ -218,8 +214,8 @@ class ManyToManyField(RelatedField, Field):
         for name in ('num_in_admin'):
             if name in kwargs:
                 self.deprecated_args.append(name)
-        
-        
+
+
         if self.rel.raw_id_admin:
             msg = gettext_lazy(' Separate multiple IDs with commas.')
         else:
@@ -321,11 +317,7 @@ class ManyToManyFieldNew(RelatedField):
         #Now we know both classes exist.
         self.to = cls
         # We need to wait until the class we were in was fully defined
-        dispatcher.connect(
-            self.from_prepared,
-            signal = signals.class_prepared,
-            sender = self.from_
-        )
+        dispatcher.connect(self.from_prepared, signal=signals.class_prepared, sender=self.from_)
 
     def from_prepared(self):
         from django.db.models.base import Model

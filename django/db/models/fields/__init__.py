@@ -520,11 +520,7 @@ class FileField(Field):
                  lambda instance, filename, raw_contents:
                      instance._save_FIELD_file(self,filename, raw_contents)
                  )
-        dispatcher.connect(
-            self.delete_file,
-            signal = signals.post_delete,
-            sender = cls
-        )
+        dispatcher.connect(self.delete_file, signal=signals.post_delete, sender=cls)
 
     def delete_file(self, instance):
          if getattr(instance, f.attname):

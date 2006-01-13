@@ -14,10 +14,7 @@ def add_manipulators(sender):
     cls.add_to_class('AddManipulator', ModelAddManipulator)
     cls.add_to_class('ChangeManipulator', ModelChangeManipulator)
 
-dispatcher.connect(
-    add_manipulators,
-    signal=signals.class_prepared
-)
+dispatcher.connect(add_manipulators, signal=signals.class_prepared)
 
 class ManipulatorDescriptor(object):
     def __init__(self, name, base):
