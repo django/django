@@ -404,7 +404,7 @@ should follow these guidelines:
 For example, your ``MIDDLEWARE_CLASSES`` might look like this::
 
     MIDDLEWARE_CLASSES = (
-       'django.middleware.sessions.SessionMiddleware',
+       'django.contrib.sessions.middleware.SessionMiddleware',
        'django.middleware.locale.LocaleMiddleware',
        'django.middleware.common.CommonMiddleware',
     )

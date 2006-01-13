@@ -193,7 +193,7 @@ TIME_FORMAT = 'P'
 # this middleware classes will be applied in the order given, and in the
 # response phase the middleware will be applied in reverse order.
 MIDDLEWARE_CLASSES = (
-    "django.middleware.sessions.SessionMiddleware",
+    "django.contrib.sessions.middleware.SessionMiddleware",
 #     "django.middleware.http.ConditionalGetMiddleware",
 #     "django.middleware.gzip.GZipMiddleware",
     "django.middleware.common.CommonMiddleware",

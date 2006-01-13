@@ -49,7 +49,7 @@ def staff_member_required(view_func):
             # The user is valid. Continue to the admin page.
             return view_func(request, *args, **kwargs)
 
-        assert hasattr(request, 'session'), "The Django admin requires session middleware to be installed. Edit your MIDDLEWARE_CLASSES setting to insert 'django.middleware.sessions.SessionMiddleware'."
+        assert hasattr(request, 'session'), "The Django admin requires session middleware to be installed. Edit your MIDDLEWARE_CLASSES setting to insert 'django.contrib.sessions.middleware.SessionMiddleware'."
 
         # If this isn't already the login page, display it.
         if not request.POST.has_key(LOGIN_FORM_KEY):
