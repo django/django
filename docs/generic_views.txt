@@ -5,7 +5,7 @@ Using generic views
 Writing Web applications can be monotonous, because we repeat certain patterns
 again and again. In Django, the most common of these patterns have been
 abstracted into "generic views" that let you quickly provide common views of
-an object without actually needing to write any views.
+an object without actually needing to write any Python code.
 
 Django's generic views contain the following:
 
@@ -32,10 +32,10 @@ URLconf tuple. For example, here's the URLconf for the simple weblog app that
 drives the blog on djangoproject.com::
 
     from django.conf.urls.defaults import *
+    from django_website.apps.blog.models import Entry
 
     info_dict = {
-        'app_label': 'blog',
-        'module_name': 'entries',
+        'model': Entry,
         'date_field': 'pub_date',
     }
 
@@ -47,26 +47,18 @@ drives the blog on djangoproject.com::
        (r'^/?$',                                                                  'archive_index', info_dict),
     )
 
-As you can see, this URLconf defines a few options in ``info_dict`` that tell
-the generic view which model to use (``blog.entries`` in this case), as well as
+As you can see, this URLconf defines a few options in ``info_dict``. ``'model'``
+tells the generic view which model to use (``Entry``, in this case), as well as
 some extra information.
 
 Documentation of each generic view follows, along with a list of all keyword
 arguments that a generic view expects. Remember that as in the example above,
 arguments may either come from the URL pattern (as ``month``, ``day``,
 ``year``, etc. do above) or from the additional-information dictionary (as for
-``app_label``, ``module_name``, etc.).
+``model``, ``date_field``, etc.).
 
-Most of the generic views that follow require the ``app_label`` and
-``module_name`` keys. These values are easiest to explain through example::
-
-    >>> from django.models.blog import entries
-
-In the above line, ``blog`` is the ``app_label`` (the name of the file that
-holds all your model definitions) and ``entries`` is the ``module_name``
-(either a pluralized, lowercased version of the model class name, or the value
-of the ``module_name`` option of your model). In the docs below, these keys
-will not be repeated, but each generic view requires them.
+Most generic views require the ``model`` key, which is your model class (*not*
+an instance of the class).
 
 Using "simple" generic views
 ============================
@@ -109,10 +101,9 @@ Using date-based generic views
 ==============================
 
 Date-based generic views (in the module ``django.views.generic.date_based``)
-feature six functions for dealing with date-based data. Besides ``app_label``
-and ``module_name``, all date-based generic views require that the
-``date_field`` argument be passed to them. This is the name of the field that
-stores the date the objects should key off of.
+feature six functions for dealing with date-based data. Besides ``model``, all
+date-based generic views require the ``date_field`` argument. This is the name
+of the field that stores the date the objects should key off of.
 
 Additionally, all date-based generic views have the following optional
 arguments:
@@ -155,7 +146,14 @@ The date-based generic functions are:
                                  an empty index page. ``False`` is default.
         =======================  =================================================
 
-    Uses the template ``app_label/module_name_archive`` by default.
+    Uses the template ``<app_label>/<model_name>_archive`` by default, where:
+
+        * ``<model_name>`` is your model's name in all lowercase. For a model
+          ``StaffMember``, that'd be ``staffmember``.
+
+        * ``<app_label>`` is the right-most part of the full Python path to
+          your model's app. For example, if your model lives in
+          ``apps/blog/models.py``, that'd be ``blog``.
 
     Has the following template context:
 
@@ -168,7 +166,7 @@ The date-based generic functions are:
     Yearly archive. Requires that the ``year`` argument be present in the URL
     pattern.
 
-    Uses the template ``app_label/module_name_archive_year`` by default.
+    Uses the template ``<app_label>/<model_name>_archive_year`` by default.
 
     Has the following template context:
 
@@ -187,7 +185,7 @@ The date-based generic functions are:
     default, which is a three-letter month abbreviation. To change it to use
     numbers, use ``"%m"``.
 
-    Uses the template ``app_label/module_name_archive_month`` by default.
+    Uses the template ``<app_label>/<model_name>_archive_month`` by default.
 
     Has the following template context:
 
@@ -204,7 +202,7 @@ The date-based generic functions are:
     also pass ``day_format``, which defaults to ``"%d"`` (day of the month as a
     decimal number, 1-31).
 
-    Uses the template ``app_label/module_name_archive_day`` by default.
+    Uses the template ``<app_label>/<model_name>_archive_day`` by default.
 
     Has the following template context:
 
@@ -274,7 +272,7 @@ Individual views are:
                                  an empty index page. ``False`` is default.
         =======================  =================================================
 
-    Uses the template ``app_label/module_name_list`` by default.
+    Uses the template ``<app_label>/<model_name>_list`` by default.
 
     Has the following template context:
 
@@ -327,7 +325,7 @@ The create/update/delete views are:
     be interpolated against the object's field attributes. For example, you
     could use ``post_save_redirect="/polls/%(slug)s/"``.
 
-    Uses the template ``app_label/module_name_form`` by default. This is the
+    Uses the template ``<app_label>/<model_name>_form`` by default. This is the
     same template as the ``update_object`` view below. Your template can tell
     the different by the presence or absence of ``{{ object }}`` in the
     context.
@@ -349,7 +347,7 @@ The create/update/delete views are:
     ``list_detail.object_detail`` does (see above), and the same
     ``post_save_redirect`` as ``create_object`` does.
 
-    Uses the template ``app_label/module_name_form`` by default.
+    Uses the template ``<app_label>/<model_name>_form`` by default.
 
     Has the following template context:
 
@@ -368,7 +366,7 @@ The create/update/delete views are:
     that the view knows where to go after the object is deleted.
 
     If fetched with GET, it uses the template
-    ``app_label/module_name_confirm_delete`` by default. It uses no template
+    ``<app_label>/<model_name>_confirm_delete`` by default. It uses no template
     if POSTed -- it simply deletes the object and redirects.
 
     Has the following template context:

@@ -1,4 +1,3 @@
-from django import models
 from django.core.template import loader
 from django.http import Http404, HttpResponse
 from django.core.xheaders import populate_xheaders
@@ -6,13 +5,13 @@ from django.core.extensions import DjangoContext
 from django.core.paginator import ObjectPaginator, InvalidPage
 from django.core.exceptions import ObjectDoesNotExist
 
-def object_list(request, app_label, module_name, paginate_by=None, allow_empty=False,
+def object_list(request, model, paginate_by=None, allow_empty=False,
         template_name=None, template_loader=loader, extra_lookup_kwargs={},
         extra_context={}, context_processors=None):
     """
     Generic list of objects.
 
-    Templates: ``<app_label>/<module_name>_list``
+    Templates: ``<app_label>/<model_name>_list``
     Context:
         object_list
             list of objects
@@ -35,10 +34,9 @@ def object_list(request, app_label, module_name, paginate_by=None, allow_empty=F
         hits
             number of objects, total
     """
-    mod = models.get_module(app_label, module_name)
     lookup_kwargs = extra_lookup_kwargs.copy()
     if paginate_by:
-        paginator = ObjectPaginator(mod, lookup_kwargs, paginate_by)
+        paginator = ObjectPaginator(model, lookup_kwargs, paginate_by)
         page = request.GET.get('page', 0)
         try:
             object_list = paginator.get_page(page)
@@ -61,7 +59,7 @@ def object_list(request, app_label, module_name, paginate_by=None, allow_empty=F
             'hits' : paginator.hits,
         }, context_processors)
     else:
-        object_list = mod.get_list(**lookup_kwargs)
+        object_list = model._default_manager.get_list(**lookup_kwargs)
         c = DjangoContext(request, {
             'object_list': object_list,
             'is_paginated': False
@@ -74,37 +72,36 @@ def object_list(request, app_label, module_name, paginate_by=None, allow_empty=F
         else:
             c[key] = value
     if not template_name:
-        template_name = "%s/%s_list" % (app_label, module_name)
+        template_name = "%s/%s_list" % (model._meta.app_label, model._meta.object_name.lower())
     t = template_loader.get_template(template_name)
     return HttpResponse(t.render(c))
 
-def object_detail(request, app_label, module_name, object_id=None, slug=None,
+def object_detail(request, model, object_id=None, slug=None,
         slug_field=None, template_name=None, template_name_field=None,
         template_loader=loader, extra_lookup_kwargs={}, extra_context={},
         context_processors=None):
     """
     Generic list of objects.
 
-    Templates: ``<app_label>/<module_name>_detail``
+    Templates: ``<app_label>/<model_name>_detail``
     Context:
         object
             the object
     """
-    mod = models.get_module(app_label, module_name)
     lookup_kwargs = {}
     if object_id:
         lookup_kwargs['pk'] = object_id
     elif slug and slug_field:
         lookup_kwargs['%s__exact' % slug_field] = slug
     else:
-        raise AttributeError("Generic detail view must be called with either an object_id or a slug/slug_field")
+        raise AttributeError, "Generic detail view must be called with either an object_id or a slug/slug_field."
     lookup_kwargs.update(extra_lookup_kwargs)
     try:
-        object = mod.get_object(**lookup_kwargs)
+        object = model._default_manager.get_object(**lookup_kwargs)
     except ObjectDoesNotExist:
-        raise Http404("%s.%s does not exist for %s" % (app_label, module_name, lookup_kwargs))
+        raise Http404, "No %s found for %s" % (model._meta.verbose_name, lookup_kwargs)
     if not template_name:
-        template_name = "%s/%s_detail" % (app_label, module_name)
+        template_name = "%s/%s_detail" % (model._meta.app_label, model._meta.object_name.lower())
     if template_name_field:
         template_name_list = [getattr(object, template_name_field), template_name]
         t = template_loader.select_template(template_name_list)
@@ -119,5 +116,5 @@ def object_detail(request, app_label, module_name, object_id=None, slug=None,
         else:
             c[key] = value
     response = HttpResponse(t.render(c))
-    populate_xheaders(request, response, app_label, module_name, getattr(object, object._meta.pk.name))
+    populate_xheaders(request, response, model, getattr(object, object._meta.pk.name))
     return response

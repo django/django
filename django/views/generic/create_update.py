@@ -1,4 +1,3 @@
-from django import models
 from django.core.xheaders import populate_xheaders
 from django.core.template import loader
 from django.core import formfields, meta
@@ -8,13 +7,13 @@ from django.core.paginator import ObjectPaginator, InvalidPage
 from django.http import Http404, HttpResponse, HttpResponseRedirect
 from django.core.exceptions import ObjectDoesNotExist, ImproperlyConfigured
 
-def create_object(request, app_label, module_name, template_name=None,
+def create_object(request, model, template_name=None,
         template_loader=loader, extra_context={}, post_save_redirect=None,
         login_required=False, follow=None, context_processors=None):
     """
     Generic object-creation function.
 
-    Templates: ``<app_label>/<module_name>_form``
+    Templates: ``<app_label>/<model_name>_form``
     Context:
         form
             the form wrapper for the object
@@ -22,13 +21,12 @@ def create_object(request, app_label, module_name, template_name=None,
     if login_required and request.user.is_anonymous():
         return redirect_to_login(request.path)
 
-    mod = models.get_module(app_label, module_name)
-    manipulator = mod.AddManipulator(follow=follow)
+    manipulator = model.AddManipulator(follow=follow)
     if request.POST:
         # If data was POSTed, we're trying to create a new object
         new_data = request.POST.copy()
 
-        if mod.Klass._meta.has_field_type(meta.FileField):
+        if model._meta.has_field_type(meta.FileField):
             new_data.update(request.FILES)
 
         # Check for errors
@@ -40,7 +38,7 @@ def create_object(request, app_label, module_name, template_name=None,
             new_object = manipulator.save(new_data)
 
             if not request.user.is_anonymous():
-                request.user.add_message("The %s was created sucessfully." % mod.Klass._meta.verbose_name)
+                request.user.add_message("The %s was created sucessfully." % model._meta.verbose_name)
 
             # Redirect to the new object: first by trying post_save_redirect,
             # then by obj.get_absolute_url; fail if neither works.
@@ -58,7 +56,7 @@ def create_object(request, app_label, module_name, template_name=None,
     # Create the FormWrapper, template, context, response
     form = formfields.FormWrapper(manipulator, new_data, errors)
     if not template_name:
-        template_name = "%s/%s_form" % (app_label, module_name)
+        template_name = "%s/%s_form" % (model._meta.app_label, model._meta.object_name.lower())
     t = template_loader.get_template(template_name)
     c = DjangoContext(request, {
         'form': form,
@@ -70,14 +68,14 @@ def create_object(request, app_label, module_name, template_name=None,
             c[key] = value
     return HttpResponse(t.render(c))
 
-def update_object(request, app_label, module_name, object_id=None, slug=None,
+def update_object(request, model, object_id=None, slug=None,
         slug_field=None, template_name=None, template_loader=loader,
         extra_lookup_kwargs={}, extra_context={}, post_save_redirect=None,
         login_required=False, follow=None, context_processors=None):
     """
     Generic object-update function.
 
-    Templates: ``<app_label>/<module_name>_form``
+    Templates: ``<app_label>/<model_name>_form``
     Context:
         form
             the form wrapper for the object
@@ -87,23 +85,21 @@ def update_object(request, app_label, module_name, object_id=None, slug=None,
     if login_required and request.user.is_anonymous():
         return redirect_to_login(request.path)
 
-    mod = models.get_module(app_label, module_name)
-
     # Look up the object to be edited
     lookup_kwargs = {}
     if object_id:
-        lookup_kwargs['%s__exact' % mod.Klass._meta.pk.name] = object_id
+        lookup_kwargs['%s__exact' % model._meta.pk.name] = object_id
     elif slug and slug_field:
         lookup_kwargs['%s__exact' % slug_field] = slug
     else:
         raise AttributeError("Generic edit view must be called with either an object_id or a slug/slug_field")
     lookup_kwargs.update(extra_lookup_kwargs)
     try:
-        object = mod.get_object(**lookup_kwargs)
+        object = model._default_manager.get_object(**lookup_kwargs)
     except ObjectDoesNotExist:
-        raise Http404("%s.%s does not exist for %s" % (app_label, module_name, lookup_kwargs))
+        raise Http404, "No %s found for %s" % (model._meta.verbose_name, lookup_kwargs)
 
-    manipulator = mod.ChangeManipulator(object.id, follow=follow)
+    manipulator = model.ChangeManipulator(object.id, follow=follow)
 
     if request.POST:
         new_data = request.POST.copy()
@@ -113,7 +109,7 @@ def update_object(request, app_label, module_name, object_id=None, slug=None,
             manipulator.save(new_data)
 
             if not request.user.is_anonymous():
-                request.user.add_message("The %s was updated sucessfully." % mod.Klass._meta.verbose_name)
+                request.user.add_message("The %s was updated sucessfully." % model._meta.verbose_name)
 
             # Do a post-after-redirect so that reload works, etc.
             if post_save_redirect:
@@ -129,7 +125,7 @@ def update_object(request, app_label, module_name, object_id=None, slug=None,
 
     form = formfields.FormWrapper(manipulator, new_data, errors)
     if not template_name:
-        template_name = "%s/%s_form" % (app_label, module_name)
+        template_name = "%s/%s_form" % (model._meta.app_label, model._meta.object_name.lower())
     t = template_loader.get_template(template_name)
     c = DjangoContext(request, {
         'form': form,
@@ -141,10 +137,10 @@ def update_object(request, app_label, module_name, object_id=None, slug=None,
         else:
             c[key] = value
     response = HttpResponse(t.render(c))
-    populate_xheaders(request, response, app_label, module_name, getattr(object, object._meta.pk.name))
+    populate_xheaders(request, response, model, getattr(object, object._meta.pk.name))
     return response
 
-def delete_object(request, app_label, module_name, post_delete_redirect,
+def delete_object(request, model, post_delete_redirect,
         object_id=None, slug=None, slug_field=None, template_name=None,
         template_loader=loader, extra_lookup_kwargs={}, extra_context={},
         login_required=False, context_processors=None):
@@ -155,7 +151,7 @@ def delete_object(request, app_label, module_name, post_delete_redirect,
     fetched using GET; for safty, deletion will only be performed if this
     view is POSTed.
 
-    Templates: ``<app_label>/<module_name>_confirm_delete``
+    Templates: ``<app_label>/<model_name>_confirm_delete``
     Context:
         object
             the original object being deleted
@@ -163,30 +159,28 @@ def delete_object(request, app_label, module_name, post_delete_redirect,
     if login_required and request.user.is_anonymous():
         return redirect_to_login(request.path)
 
-    mod = models.get_module(app_label, module_name)
-
     # Look up the object to be edited
     lookup_kwargs = {}
     if object_id:
-        lookup_kwargs['%s__exact' % mod.Klass._meta.pk.name] = object_id
+        lookup_kwargs['%s__exact' % model._meta.pk.name] = object_id
     elif slug and slug_field:
         lookup_kwargs['%s__exact' % slug_field] = slug
     else:
         raise AttributeError("Generic delete view must be called with either an object_id or a slug/slug_field")
     lookup_kwargs.update(extra_lookup_kwargs)
     try:
-        object = mod.get_object(**lookup_kwargs)
+        object = model._default_manager.get_object(**lookup_kwargs)
     except ObjectDoesNotExist:
-        raise Http404("%s.%s does not exist for %s" % (app_label, module_name, lookup_kwargs))
+        raise Http404, "No %s found for %s" % (model._meta.app_label, lookup_kwargs)
 
     if request.META['REQUEST_METHOD'] == 'POST':
         object.delete()
         if not request.user.is_anonymous():
-            request.user.add_message("The %s was deleted." % mod.Klass._meta.verbose_name)
+            request.user.add_message("The %s was deleted." % model._meta.verbose_name)
         return HttpResponseRedirect(post_delete_redirect)
     else:
         if not template_name:
-            template_name = "%s/%s_confirm_delete" % (app_label, module_name)
+            template_name = "%s/%s_confirm_delete" % (model._meta.app_label, model._meta.object_name.lower())
         t = template_loader.get_template(template_name)
         c = DjangoContext(request, {
             'object': object,
@@ -197,5 +191,5 @@ def delete_object(request, app_label, module_name, post_delete_redirect,
             else:
                 c[key] = value
         response = HttpResponse(t.render(c))
-        populate_xheaders(request, response, app_label, module_name, getattr(object, object._meta.pk.name))
+        populate_xheaders(request, response, model, getattr(object, object._meta.pk.name))
         return response
