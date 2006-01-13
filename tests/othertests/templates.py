@@ -152,14 +152,48 @@ TEMPLATE_TESTS = {
     # the exception propogates
     'basic-syntax34': (r'1{{ var.method4 }}2', {"var": SomeClass()}, SomeOtherException),
 
-    ### IF TAG ################################################################
-    'if-tag01': ("{% if foo %}yes{% else %}no{% endif %}", {"foo": True}, "yes"),
-    'if-tag02': ("{% if foo %}yes{% else %}no{% endif %}", {"foo": False}, "no"),
-    'if-tag03': ("{% if foo %}yes{% else %}no{% endif %}", {}, "no"),
-
     ### COMMENT TAG ###########################################################
     'comment-tag01': ("{% comment %}this is hidden{% endcomment %}hello", {}, "hello"),
     'comment-tag02': ("{% comment %}this is hidden{% endcomment %}hello{% comment %}foo{% endcomment %}", {}, "hello"),
+
+    ### CYCLE TAG #############################################################
+    #'cycleXX': ('', {}, ''),
+    'cycle01': ('{% cycle a, %}', {}, 'a'),
+    'cycle02': ('{% cycle a,b,c as abc %}{% cycle abc %}', {}, 'ab'),
+    'cycle03': ('{% cycle a,b,c as abc %}{% cycle abc %}{% cycle abc %}', {}, 'abc'),
+    'cycle04': ('{% cycle a,b,c as abc %}{% cycle abc %}{% cycle abc %}{% cycle abc %}', {}, 'abca'),
+    'cycle05': ('{% cycle %}', {}, template.TemplateSyntaxError),
+    'cycle06': ('{% cycle a %}', {}, template.TemplateSyntaxError),
+    'cycle07': ('{% cycle a,b,c as foo %}{% cycle bar %}', {}, template.TemplateSyntaxError),
+
+    ### EXCEPTIONS ############################################################
+
+    # Raise exception for invalid template name
+    'exception01': ("{% extends 'nonexistent' %}", {}, template.TemplateSyntaxError),
+
+    # Raise exception for invalid template name (in variable)
+    'exception02': ("{% extends nonexistent %}", {}, template.TemplateSyntaxError),
+
+    # Raise exception for extra {% extends %} tags
+    'exception03': ("{% extends 'inheritance01' %}{% block first %}2{% endblock %}{% extends 'inheritance16' %}", {}, template.TemplateSyntaxError),
+
+    # Raise exception for custom tags used in child with {% load %} tag in parent, not in child
+    'exception04': ("{% extends 'inheritance17' %}{% block first %}{% echo 400 %}5678{% endblock %}", {}, template.TemplateSyntaxError),
+
+    ### FILTER TAG ############################################################
+    #'filterXX': ('', {}, ''),
+    'filter01': ('{% filter upper %}{% endfilter %}', {}, ''),
+    'filter02': ('{% filter upper %}django{% endfilter %}', {}, 'DJANGO'),
+    'filter03': ('{% filter upper|lower %}django{% endfilter %}', {}, 'django'),
+
+    ### FIRSTOF TAG ###########################################################
+    #'firstofXX': ('', {}, ''),
+    'firstof01': ('{% firstof a b c %}', {'a':0,'b':0,'c':0}, ''),
+    'firstof02': ('{% firstof a b c %}', {'a':1,'b':0,'c':0}, '1'),
+    'firstof03': ('{% firstof a b c %}', {'a':0,'b':2,'c':0}, '2'),
+    'firstof04': ('{% firstof a b c %}', {'a':0,'b':0,'c':3}, '3'),
+    'firstof05': ('{% firstof a b c %}', {'a':1,'b':2,'c':3}, '1'),
+    'firstof06': ('{% firstof %}', {}, template.TemplateSyntaxError),
 
     ### FOR TAG ###############################################################
     'for-tag01': ("{% for val in values %}{{ val }}{% endfor %}", {"values": [1, 2, 3]}, "123"),
@@ -168,6 +202,17 @@ TEMPLATE_TESTS = {
     'for-tag-vars02': ("{% for val in values %}{{ forloop.counter0 }}{% endfor %}", {"values": [6, 6, 6]}, "012"),
     'for-tag-vars03': ("{% for val in values %}{{ forloop.revcounter }}{% endfor %}", {"values": [6, 6, 6]}, "321"),
     'for-tag-vars04': ("{% for val in values %}{{ forloop.revcounter0 }}{% endfor %}", {"values": [6, 6, 6]}, "210"),
+
+    ### IF TAG ################################################################
+    'if-tag01': ("{% if foo %}yes{% else %}no{% endif %}", {"foo": True}, "yes"),
+    'if-tag02': ("{% if foo %}yes{% else %}no{% endif %}", {"foo": False}, "no"),
+    'if-tag03': ("{% if foo %}yes{% else %}no{% endif %}", {}, "no"),
+
+    ### IFCHANGED TAG #########################################################
+    #'ifchangedXX': ('', {}, ''),
+    'ifchanged01': ('{% for n in num %}{% ifchanged %}{{ n }}{% endifchanged %}{% endfor %}', { 'num': (1,2,3) }, '123'),
+    'ifchanged02': ('{% for n in num %}{% ifchanged %}{{ n }}{% endifchanged %}{% endfor %}', { 'num': (1,1,3) }, '13'),
+    'ifchanged03': ('{% for n in num %}{% ifchanged %}{{ n }}{% endifchanged %}{% endfor %}', { 'num': (1,1,1) }, '1'),
 
     ### IFEQUAL TAG ###########################################################
     'ifequal01': ("{% ifequal a b %}yes{% endifequal %}", {"a": 1, "b": 2}, ""),
@@ -264,37 +309,7 @@ TEMPLATE_TESTS = {
     # Three-level inheritance with {{ block.super }} from parent and grandparent
     'inheritance23': ("{% extends 'inheritance20' %}{% block first %}{{ block.super }}b{% endblock %}", {}, '1_ab3_'),
 
-    ### EXCEPTIONS ############################################################
-
-    # Raise exception for invalid template name
-    'exception01': ("{% extends 'nonexistent' %}", {}, template.TemplateSyntaxError),
-
-    # Raise exception for invalid template name (in variable)
-    'exception02': ("{% extends nonexistent %}", {}, template.TemplateSyntaxError),
-
-    # Raise exception for extra {% extends %} tags
-    'exception03': ("{% extends 'inheritance01' %}{% block first %}2{% endblock %}{% extends 'inheritance16' %}", {}, template.TemplateSyntaxError),
-
-    # Raise exception for custom tags used in child with {% load %} tag in parent, not in child
-    'exception04': ("{% extends 'inheritance17' %}{% block first %}{% echo 400 %}5678{% endblock %}", {}, template.TemplateSyntaxError),
-
-    'multiline01': ("""
-                    Hello,
-                    boys.
-                    How
-                    are
-                    you
-                    gentlemen.
-                    """,
-                    {},
-                    """
-                    Hello,
-                    boys.
-                    How
-                    are
-                    you
-                    gentlemen.
-                    """),
+    ### I18N ##################################################################
 
     # simple translation of a string delimited by '
     'i18n01': ("{% load i18n %}{% trans 'xxxyyyxxx' %}", {}, "xxxyyyxxx"),
@@ -334,6 +349,80 @@ TEMPLATE_TESTS = {
 
     # translation of a constant string
     'i18n13': ('{{ _("Page not found") }}', {'LANGUAGE_CODE': 'de'}, 'Seite nicht gefunden'),
+
+    ### MULTILINE #############################################################
+
+    'multiline01': ("""
+                    Hello,
+                    boys.
+                    How
+                    are
+                    you
+                    gentlemen.
+                    """,
+                    {},
+                    """
+                    Hello,
+                    boys.
+                    How
+                    are
+                    you
+                    gentlemen.
+                    """),
+
+    ### REGROUP TAG ###########################################################
+    #'regroupXX': ('', {}, ''),
+    'regroup01': ('{% regroup data by bar as grouped %}' + \
+                  '{% for group in grouped %}' + \
+                  '{{ group.grouper }}:' + \
+                  '{% for item in group.list %}' + \
+                  '{{ item.foo }}' + \
+                  '{% endfor %},' + \
+                  '{% endfor %}',
+                  {'data': [ {'foo':'c', 'bar':1},
+                             {'foo':'d', 'bar':1},
+                             {'foo':'a', 'bar':2},
+                             {'foo':'b', 'bar':2},
+                             {'foo':'x', 'bar':3}  ]},
+                  '1:cd,2:ab,3:x,'),
+
+    # Test for silent failure when target variable isn't found
+    'regroup02': ('{% regroup data by bar as grouped %}' + \
+                  '{% for group in grouped %}' + \
+                  '{{ group.grouper }}:' + \
+                  '{% for item in group.list %}' + \
+                  '{{ item.foo }}' + \
+                  '{% endfor %},' + \
+                  '{% endfor %}',
+                  {}, ''),
+
+    ### TEMPLATETAG TAG #######################################################
+    #'templatetagXX': ('', {}, ''),
+    'templatetag01': ('{% templatetag openblock %}', {}, '{%'),
+    'templatetag02': ('{% templatetag closeblock %}', {}, '%}'),
+    'templatetag03': ('{% templatetag openvariable %}', {}, '{{'),
+    'templatetag04': ('{% templatetag closevariable %}', {}, '}}'),
+    'templatetag05': ('{% templatetag %}', {}, template.TemplateSyntaxError),
+    'templatetag06': ('{% templatetag foo %}', {}, template.TemplateSyntaxError),
+
+    ### WIDTHRATIO TAG ########################################################
+    #'widthratioXX': ('', {}, ''),
+    'widthratio01': ('{% widthratio a b 0 %}', {'a':50,'b':100}, '0'),
+    'widthratio02': ('{% widthratio a b 100 %}', {'a':0,'b':0}, ''),
+    'widthratio03': ('{% widthratio a b 100 %}', {'a':0,'b':100}, '0'),
+    'widthratio04': ('{% widthratio a b 100 %}', {'a':50,'b':100}, '50'),
+    'widthratio05': ('{% widthratio a b 100 %}', {'a':100,'b':100}, '100'),
+
+    # 62.5 should round to 63
+    'widthratio06': ('{% widthratio a b 100 %}', {'a':50,'b':80}, '63'),
+
+    # 71.4 should round to 71
+    'widthratio07': ('{% widthratio a b 100 %}', {'a':50,'b':70}, '71'),
+
+    # Raise exception if we don't have 3 args, last one an integer
+    'widthratio08': ('{% widthratio %}', {}, template.TemplateSyntaxError),
+    'widthratio09': ('{% widthratio a b %}', {'a':50,'b':100}, template.TemplateSyntaxError),
+    'widthratio10': ('{% widthratio a b 100.0 %}', {'a':50,'b':100}, template.TemplateSyntaxError),
 }
 
 def test_template_loader(template_name, template_dirs=None):
