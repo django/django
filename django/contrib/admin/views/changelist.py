@@ -127,7 +127,7 @@ class ChangeList(object):
                   full_result_count, result_list, can_show_all, multi_page, paginator )
 
     def url_for_result(self, result):
-        return "%s/change" % getattr(result, self.pk_attname)
+        return "%s/change/" % getattr(result, self.pk_attname)
 
     def get_ordering(self):
         lookup_opts, params = self.lookup_opts, self.params

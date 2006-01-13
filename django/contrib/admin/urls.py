@@ -24,5 +24,5 @@ urlpatterns = patterns('',
     ('^((?:[^/]+/)+?)([^/]+)/history/$', 'django.contrib.admin.views.main.history'),
     ('^((?:[^/]+/)+?)([^/]+)/delete/$', 'django.contrib.admin.views.stages.delete.delete_stage'),
     ('^((?:[^/]+/)+?)([^/]+)/change/$', 'django.contrib.admin.views.stages.change.change_stage'),
-    ('^((?:[^/]+/)+?)$', 'django.contrib.admin.views.changelist.change_list' ),
+    ('^((?:[^/]+/)+?)$', 'django.contrib.admin.views.changelist.change_list'),
 )
