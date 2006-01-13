@@ -49,7 +49,7 @@ If it finds a match, it follows this algorithm:
     * If the flatpage has a custom template, it loads that template. Otherwise,
       it loads the template ``flatpages/default``.
     * It passes that template a single context variable, ``flatpage``, which is
-      the flatpage object. It uses DjangoContext_ in rendering the template.
+      the flatpage object. It uses RequestContext_ in rendering the template.
 
 If it doesn't find a match, the request continues to be processed as usual.
 
@@ -63,7 +63,7 @@ resort.
 For more on middleware, read the `middleware docs`_.
 
 .. _SITE_ID: http://www.djangoproject.com/documentation/settings/#site-id
-.. _DjangoContext: http://www.djangoproject.com/documentation/templates_python/#subclassing-context-djangocontext
+.. _RequestContext: http://www.djangoproject.com/documentation/templates_python/#subclassing-context-djangocontext
 .. _middleware docs: http://www.djangoproject.com/documentation/middleware/
 
 How to add, change and delete flatpages

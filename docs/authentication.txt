@@ -435,16 +435,16 @@ Authentication data in templates
 ================================
 
 The currently logged-in user and his/her permissions are made available in the
-`template context`_ when you use ``DjangoContext``.
+`template context`_ when you use ``RequestContext``.
 
 .. admonition:: Technicality
 
    Technically, these variables are only made available in the template context
-   if you use ``DjangoContext`` *and* your ``TEMPLATE_CONTEXT_PROCESSORS``
+   if you use ``RequestContext`` *and* your ``TEMPLATE_CONTEXT_PROCESSORS``
    setting contains ``"django.core.context_processors.auth"``, which is default.
-   For more, see the `DjangoContext docs`_.
+   For more, see the `RequestContext docs`_.
 
-   .. _DjangoContext docs: http://www.djangoproject.com/documentation/templates_python/#subclassing-context-djangocontext
+   .. _RequestContext docs: http://www.djangoproject.com/documentation/templates_python/#subclassing-context-djangocontext
 
 Users
 -----
@@ -533,9 +533,9 @@ a playlist::
         # Create the playlist with the given songs.
         # ...
         request.user.add_message("Your playlist was added successfully.")
-        return render_to_response("playlists/create", context_instance=DjangoContext(request))
+        return render_to_response("playlists/create", context_instance=RequestContext(request))
 
-When you use ``DjangoContext``, the currently logged-in user and his/her
+When you use ``RequestContext``, the currently logged-in user and his/her
 messages are made available in the `template context`_ as the template variable
 ``{{ messages }}``. Here's an example of template code that displays messages::
 
@@ -547,7 +547,7 @@ messages are made available in the `template context`_ as the template variable
     </ul>
     {% endif %}
 
-Note that ``DjangoContext`` calls ``get_and_delete_messages`` behind the
+Note that ``RequestContext`` calls ``get_and_delete_messages`` behind the
 scenes, so any messages will be deleted even if you don't display them.
 
 Finally, note that this messages framework only works with users in the user

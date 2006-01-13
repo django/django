@@ -121,16 +121,16 @@ arguments:
                              template's context.
 
     ``processors``           A tuple of processors to apply to the
-                             ``DjangoContext`` of this view's template. See the
-                             `DjangoContext docs`_
+                             ``RequestContext`` of this view's template. See the
+                             `RequestContext docs`_
     =======================  ==================================================
 
 .. _database API docs: http://www.djangoproject.com/documentation/db_api/
-.. _DjangoContext docs: http://www.djangoproject.com/documentation/templates_python/#subclassing-context-djangocontext
+.. _RequestContext docs: http://www.djangoproject.com/documentation/templates_python/#subclassing-context-djangocontext
 
 The date-based generic functions are:
 
-``archive_index``
+``archive_index``RequestContext
     A top-level index page showing the "latest" objects.
 
     Takes the following optional arguments:

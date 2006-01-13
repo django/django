@@ -224,14 +224,14 @@ To pluralize, specify both the singular and plural forms with the
 Internally, all block and inline translations use the appropriate
 ``gettext`` / ``ngettext`` call.
 
-Each ``DjangoContext`` has access to two translation-specific variables:
+Each ``RequestContext`` has access to two translation-specific variables:
 
     * ``LANGUAGES`` is a list of tuples in which the first element is the
       language code and the second is the language name (in that language).
     * ``LANGUAGE_CODE`` is the current user's preferred language, as a string.
       Example: ``en-us``. (See "How language preference is discovered", below.)
 
-If you don't use the ``DjangoContext`` extension, you can get those values with
+If you don't use the ``RequestContext`` extension, you can get those values with
 two tags::
 
     {% get_current_language as LANGUAGE_CODE %}

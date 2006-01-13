@@ -241,15 +241,15 @@ If you ``pop()`` too much, it'll raise
 Using a ``Context`` as a stack comes in handy in some custom template tags, as
 you'll see below.
 
-Subclassing Context: DjangoContext
+Subclassing Context: RequestContext
 ----------------------------------
 
 Django comes with a special ``Context`` class,
-``django.core.extensions.DjangoContext``, that acts slightly differently than
+``django.template.RequestContext``, that acts slightly differently than
 the normal ``django.template.Context``. The first difference is that takes
 an `HttpRequest object`_ as its first argument. For example::
 
-    c = DjangoContext(request, {
+    c = RequestContext(request, {
         'foo': 'bar',
     }
 
@@ -269,16 +269,16 @@ variable to the context and a second processor adds a variable with the same
 name, the second will override the first. The default processors are explained
 below.
 
-Also, you can give ``DjangoContext`` a list of additional processors, using the
+Also, you can give ``RequestContext`` a list of additional processors, using the
 optional, third positional argument, ``processors``. In this example, the
-``DjangoContext`` instance gets a ``ip_address`` variable::
+``RequestContext`` instance gets a ``ip_address`` variable::
 
     def ip_address_processor(request):
         return {'ip_address': request.META['REMOTE_ADDR']}
 
     def some_view(request):
         # ...
-        return DjangoContext({
+        return RequestContext({
             'foo': 'bar',
         }, [ip_address_processor])
 
@@ -291,7 +291,7 @@ django.core.context_processors.auth
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 If ``TEMPLATE_CONTEXT_PROCESSORS`` contains this processor, every
-``DjangoContext`` will contain these three variables:
+``RequestContext`` will contain these three variables:
 
     * ``user`` -- An ``auth.User`` instance representing the currently
       logged-in user (or an ``AnonymousUser`` instance, if the client isn't
@@ -309,7 +309,7 @@ django.core.context_processors.debug
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 If ``TEMPLATE_CONTEXT_PROCESSORS`` contains this processor, every
-``DjangoContext`` will contain these two variables -- but only if your
+``RequestContext`` will contain these two variables -- but only if your
 ``DEBUG`` setting is set to ``True`` and the request's IP address
 (``request.META['REMOTE_ADDR']``) is in the ``INTERNAL_IPS`` setting:
 
@@ -323,7 +323,7 @@ django.core.context_processors.i18n
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 If ``TEMPLATE_CONTEXT_PROCESSORS`` contains this processor, every
-``DjangoContext`` will contain these two variables:
+``RequestContext`` will contain these two variables:
 
     * ``LANGUAGES`` -- The value of the `LANGUAGES setting`_.
     * ``LANGUAGE_CODE`` -- ``request.LANGUAGE_CODE``, if it exists. Otherwise,

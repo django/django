@@ -463,7 +463,7 @@ MIDDLEWARE_CLASSES
 
 Default::
 
-    ("django.contrib.sessions.middleware.SessionMiddleware",
+    ("django.middleware.sessions.SessionMiddleware",
      "django.middleware.common.CommonMiddleware",
      "django.middleware.doc.XViewMiddleware")
 
@@ -555,7 +555,7 @@ Default::
     "django.core.context_processors.debug",
     "django.core.context_processors.i18n")
 
-A tuple of callables that are used to populate the context in ``DjangoContext``.
+A tuple of callables that are used to populate the context in ``RequestContext``.
 These callables take a request object as their argument and return a dictionary
 of items to be merged into the context.
 
@@ -595,7 +595,7 @@ templates. See the `template documentation`_.
 TEMPLATE_LOADERS
 ----------------
 
-Default: ``('django.core.template.loaders.filesystem.load_template_source',)``
+Default: ``('django.template.loaders.filesystem.load_template_source',)``
 
 A tuple of callables (as strings) that know how to import templates from
 various sources. See the `template documentation`_.
