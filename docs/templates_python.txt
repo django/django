@@ -55,13 +55,13 @@ Compiling a string
 ------------------
 
 The easiest way to create a ``Template`` object is by instantiating it
-directly. The class lives at ``django.core.template.Template``. The constructor
+directly. The class lives at ``django.template.Template``. The constructor
 takes one argument -- the raw template code::
 
-    >>> from django.core.template import Template
+    >>> from django.template import Template
     >>> t = Template("My name is {{ my_name }}.")
     >>> print t
-    <django.core.template.Template instance>
+    <django.template.Template instance>
 
 .. admonition:: Behind the scenes
 
@@ -77,12 +77,12 @@ Rendering a context
 
 Once you have a compiled ``Template`` object, you can render a context -- or
 multiple contexts -- with it. The ``Context`` class lives at
-``django.core.template.Context``, and the constructor takes one (optional)
+``django.template.Context``, and the constructor takes one (optional)
 argument: a dictionary mapping variable names to variable values. Call the
 ``Template`` object's ``render()`` method with the context to "fill" the
 template::
 
-    >>> from django.core.template import Context, Template
+    >>> from django.template import Context, Template
     >>> t = Template("My name is {{ my_name }}.")
 
     >>> c = Context({"my_name": "Adrian"})
@@ -110,7 +110,7 @@ logic.
 
 Here are a few examples::
 
-    >>> from django.core.template import Context, Template
+    >>> from django.template import Context, Template
     >>> t = Template("My name is {{ person.first_name }}.")
     >>> d = {"person": {"first_name": "Joe", "last_name": "Johnson"}}
     >>> t.render(Context(d))
@@ -219,7 +219,7 @@ dictionary syntax::
 
 A ``Context`` object is a stack. That is, you can ``push()`` and ``pop()`` it.
 If you ``pop()`` too much, it'll raise
-``django.core.template.ContextPopException``::
+``django.template.ContextPopException``::
 
     >>> c = Context()
     >>> c['foo'] = 'first level'
@@ -236,7 +236,7 @@ If you ``pop()`` too much, it'll raise
     >>> c.pop()
     Traceback (most recent call last):
     ...
-    django.core.template.ContextPopException
+    django.template.ContextPopException
 
 Using a ``Context`` as a stack comes in handy in some custom template tags, as
 you'll see below.
@@ -246,7 +246,7 @@ Subclassing Context: DjangoContext
 
 Django comes with a special ``Context`` class,
 ``django.core.extensions.DjangoContext``, that acts slightly differently than
-the normal ``django.core.template.Context``. The first difference is that takes
+the normal ``django.template.Context``. The first difference is that takes
 an `HttpRequest object`_ as its first argument. For example::
 
     c = DjangoContext(request, {
@@ -342,7 +342,7 @@ Feel free to subclass ``Context`` yourself if you find yourself wanting to give
 each template something "automatically." For instance, if you want to give
 every template automatic access to the current time, use something like this::
 
-    from django.core.template import Context
+    from django.template import Context
     import datetime
     class TimeContext(Context):
         def __init__(self, *args, **kwargs):
@@ -390,12 +390,12 @@ The Python API
 
 Django has two ways to load templates from files:
 
-``django.core.template.loader.get_template(template_name)``
+``django.template.loader.get_template(template_name)``
     ``get_template`` returns the compiled template (a ``Template`` object) for
     the template with the given name. If the template doesn't exist, it raises
-    ``django.core.template.TemplateDoesNotExist``.
+    ``django.template.TemplateDoesNotExist``.
 
-``django.core.template.loader.select_template(template_name_list)``
+``django.template.loader.select_template(template_name_list)``
     ``select_template`` is just like ``get_template``, except it takes a list
     of template names. Of the list, it returns the first template that exists.
 
@@ -447,10 +447,10 @@ activate them by editing your ``TEMPLATE_LOADERS`` setting.
 ``TEMPLATE_LOADERS`` should be a tuple of strings, where each string represents
 a template loader. Here are the built-in template loaders:
 
-``django.core.template.loaders.filesystem.load_template_source``
+``django.template.loaders.filesystem.load_template_source``
     Loads templates from the filesystem, according to ``TEMPLATE_DIRS``.
 
-``django.core.template.loaders.app_directories.load_template_source``
+``django.template.loaders.app_directories.load_template_source``
     Loads templates from Django apps on the filesystem. For each app in
     ``INSTALLED_APPS``, the loader looks for a ``templates`` subdirectory. If
     the directory exists, Django looks for templates in there.
@@ -472,7 +472,7 @@ a template loader. Here are the built-in template loaders:
     It caches a list of which ``INSTALLED_APPS`` packages have a ``templates``
     subdirectory.
 
-``django.core.template.loaders.eggs.load_template_source``
+``django.template.loaders.eggs.load_template_source``
     Just like ``app_directories`` above, but it loads templates from Python
     eggs rather than from the filesystem.
 
@@ -604,7 +604,7 @@ process: compiling and rendering. To define a custom template tag, you specify
 how the compilation works and how the rendering works.
 
 When Django compiles a template, it splits the raw template text into
-''nodes''. Each node is an instance of ``django.core.template.Node`` and has
+''nodes''. Each node is an instance of ``django.template.Node`` and has
 a ``render()`` method. A compiled template is, simply, a list of ``Node``
 objects. When you call ``render()`` on a compiled template object, the template
 calls ``render()`` on each ``Node`` in its node list, with the given context.
@@ -653,7 +653,7 @@ Notes:
       example, it's ``'current_time "%Y-%M-%d %I:%M %p"'``.
 
     * This function is responsible for raising
-      ``django.core.template.TemplateSyntaxError``, with helpful messages, for
+      ``django.template.TemplateSyntaxError``, with helpful messages, for
       any syntax error.
 
     * The ``TemplateSyntaxError`` exceptions use the ``tag_name`` variable.
@@ -818,7 +818,7 @@ Here's how the standard ``{% comment %}`` tag is implemented::
             return ''
 
 ``parser.parse()`` takes a tuple of names of block tags ''to parse until''. It
-returns an instance of ``django.core.template.NodeList``, which is a list of
+returns an instance of ``django.template.NodeList``, which is a list of
 all ``Node`` objects that the parser encountered ''before'' it encountered
 any of the tags named in the tuple.
 

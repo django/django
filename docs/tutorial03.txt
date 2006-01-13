@@ -197,7 +197,7 @@ There's a problem here, though: The page's design is hard-coded in the view. If
 you want to change the way the page looks, you'll have to edit this Python code.
 So let's use Django's template system to separate the design from Python::
 
-    from django.core.template import Context, loader
+    from django.template import Context, loader
     from django.models.polls import polls
     from django.http import HttpResponse
 
