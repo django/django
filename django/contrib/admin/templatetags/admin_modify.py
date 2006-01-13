@@ -1,5 +1,5 @@
 from django import template
-from djang.core import template_loader
+from django.template import loader
 from django.utils.html import escape
 from django.utils.text import capfirst
 from django.utils.functional import curry
@@ -72,14 +72,14 @@ class FieldWidgetNode(template.Node):
                 field_class_name = klass.__name__
                 template_name = "widget/%s" % \
                     class_name_to_underscored(field_class_name)
-                nodelist = template_loader.get_template(template_name).nodelist
+                nodelist = loader.get_template(template_name).nodelist
             except template.TemplateDoesNotExist:
                 super_klass = bool(klass.__bases__) and klass.__bases__[0] or None
                 if super_klass and super_klass != Field:
                     nodelist = cls.get_nodelist(super_klass)
                 else:
                     if not cls.default:
-                        cls.default = template_loader.get_template("widget/default").nodelist
+                        cls.default = loader.get_template("widget/default").nodelist
                     nodelist = cls.default
 
             cls.nodelists[klass] = nodelist
@@ -169,7 +169,7 @@ class EditInlineNode(template.Node):
         bound_related_object = relation.bind(context['form'], original, bound_related_object_class)
         context['bound_related_object'] = bound_related_object
 
-        t = template_loader.get_template(bound_related_object.template_name())
+        t = loader.get_template(bound_related_object.template_name())
 
         output = t.render(context)
 

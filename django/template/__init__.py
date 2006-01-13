@@ -882,7 +882,7 @@ class Library(object):
                     dict = func(*args)
 
                     if not getattr(self, 'nodelist', False):
-                        from django.core.template_loader import get_template
+                        from django.template.loader import get_template
                         t = get_template(file_name)
                         self.nodelist = t.nodelist
                     return self.nodelist.render(context_class(dict))

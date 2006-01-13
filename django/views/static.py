@@ -2,7 +2,7 @@ import os
 import urllib
 import posixpath
 import mimetypes
-from django.core import template_loader
+from django.template import loader
 from django.core.exceptions import ImproperlyConfigured
 from django.http import Http404, HttpResponse, HttpResponseRedirect
 from django.template import Template, Context, TemplateDoesNotExist
@@ -71,7 +71,7 @@ DEFAULT_DIRECTORY_INDEX_TEMPLATE = """
 
 def directory_index(path, fullpath):
     try:
-        t = template_loader.get_template('static/directory_index')
+        t = loader.get_template('static/directory_index')
     except TemplateDoesNotExist:
         t = Template(DEFAULT_DIRECTORY_INDEX_TEMPLATE)
     files = []

@@ -1,5 +1,5 @@
 from django.contrib.flatpages.models import FlatPage
-from django.core import template_loader
+from django.template import loader
 from django.core.extensions import get_object_or_404, DjangoContext
 from django.http import HttpResponse
 from django.conf.settings import SITE_ID
@@ -26,9 +26,9 @@ def flatpage(request, url):
         from django.views.auth.login import redirect_to_login
         return redirect_to_login(request.path)
     if f.template_name:
-        t = template_loader.select_template((f.template_name, DEFAULT_TEMPLATE))
+        t = loader.select_template((f.template_name, DEFAULT_TEMPLATE))
     else:
-        t = template_loader.get_template(DEFAULT_TEMPLATE)
+        t = loader.get_template(DEFAULT_TEMPLATE)
     c = DjangoContext(request, {
         'flatpage': f,
     })
