@@ -3,7 +3,7 @@ from django.core.xheaders import populate_xheaders
 from django.template import loader
 from django.core import formfields, meta
 from django.views.auth.login import redirect_to_login
-from django.core.extensions import DjangoContext
+from django.template import RequestContext
 from django.core.paginator import ObjectPaginator, InvalidPage
 from django.http import Http404, HttpResponse, HttpResponseRedirect
 from django.core.exceptions import ObjectDoesNotExist, ImproperlyConfigured
@@ -60,7 +60,7 @@ def create_object(request, app_label, module_name, template_name=None,
     if not template_name:
         template_name = "%s/%s_form" % (app_label, module_name)
     t = template_loader.get_template(template_name)
-    c = DjangoContext(request, {
+    c = RequestContext(request, {
         'form': form,
     }, context_processors)
     for key, value in extra_context.items():
@@ -131,7 +131,7 @@ def update_object(request, app_label, module_name, object_id=None, slug=None,
     if not template_name:
         template_name = "%s/%s_form" % (app_label, module_name)
     t = template_loader.get_template(template_name)
-    c = DjangoContext(request, {
+    c = RequestContext(request, {
         'form': form,
         'object': object,
     }, context_processors)
@@ -188,7 +188,7 @@ def delete_object(request, app_label, module_name, post_delete_redirect,
         if not template_name:
             template_name = "%s/%s_confirm_delete" % (app_label, module_name)
         t = template_loader.get_template(template_name)
-        c = DjangoContext(request, {
+        c = RequestContext(request, {
             'object': object,
         }, context_processors)
         for key, value in extra_context.items():

@@ -2,7 +2,8 @@ from django.core import formfields, validators
 from django.core.mail import mail_admins, mail_managers
 from django.http import Http404
 from django.core.exceptions import ObjectDoesNotExist
-from django.core.extensions import DjangoContext, render_to_response
+from django.core.extensions import render_to_response
+from django.template import RequestContext
 from django.contrib.auth.models import SESSION_KEY
 from django.contrib.comments.models import Comment, FreeComment, PHOTOS_REQUIRED, PHOTOS_OPTIONAL, RATINGS_REQUIRED, RATINGS_OPTIONAL, IS_PUBLIC
 from django.contrib.contenttypes.models import ContentType
@@ -241,7 +242,7 @@ def post_comment(request):
             'ratings_required': RATINGS_REQUIRED in option_list,
             'rating_range': rating_range,
             'rating_choices': rating_choices,
-        }, context_instance=DjangoContext(request))
+        }, context_instance=RequestContext(request))
     elif request.POST.has_key('post'):
         # If the IP is banned, mail the admins, do NOT save the comment, and
         # serve up the "Thanks for posting" page as if the comment WAS posted.
@@ -304,7 +305,7 @@ def post_free_comment(request):
             'options': options,
             'target': target,
             'hash': security_hash,
-        }, context_instance=DjangoContext(request))
+        }, context_instance=RequestContext(request))
     elif request.POST.has_key('post'):
         # If the IP is banned, mail the admins, do NOT save the comment, and
         # serve up the "Thanks for posting" page as if the comment WAS posted.
@@ -335,4 +336,4 @@ def comment_was_posted(request):
             obj = content_type.get_object_for_this_type(pk=object_id)
         except ObjectDoesNotExist:
             pass
-    return render_to_response('comments/posted', {'object': obj}, context_instance=DjangoContext(request))
+    return render_to_response('comments/posted', {'object': obj}, context_instance=RequestContext(request))

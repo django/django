@@ -1,6 +1,7 @@
 from django.parts.auth.formfields import AuthenticationForm
 from django.core import formfields
-from django.core.extensions import DjangoContext, render_to_response
+from django.core.extensions import render_to_response
+from django.template import RequestContext
 from django.contrib.auth.models import SESSION_KEY
 from django.contrib.sites.models import Site
 from django.http import HttpResponse, HttpResponseRedirect
@@ -28,14 +29,14 @@ def login(request):
         'form': formfields.FormWrapper(manipulator, request.POST, errors),
         REDIRECT_FIELD_NAME: redirect_to,
         'site_name': Site.objects.get_current().name,
-    }, context_instance=DjangoContext(request))
+    }, context_instance=RequestContext(request))
 
 def logout(request, next_page=None):
     "Logs out the user and displays 'You are logged out' message."
     try:
         del request.session[SESSION_KEY]
     except KeyError:
-        return render_to_response('registration/logged_out', context_instance=DjangoContext(request))
+        return render_to_response('registration/logged_out', context_instance=RequestContext(request))
     else:
         # Redirect to this page until the session has been cleared.
         return HttpResponseRedirect(next_page or request.path)

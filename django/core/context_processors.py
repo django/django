@@ -4,7 +4,7 @@ template context. Each function takes the request object as its only parameter
 and returns a dictionary to add to the context.
 
 These are referenced from the setting TEMPLATE_CONTEXT_PROCESSORS and used by
-DjangoContext.
+RequestContext.
 """
 
 from django.conf.settings import DEBUG, INTERNAL_IPS, LANGUAGES, LANGUAGE_CODE

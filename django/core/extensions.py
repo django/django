@@ -2,33 +2,9 @@
 # of MVC. In other words, these functions/classes introduce controlled coupling
 # for convenience's sake.
 
-from django.core.exceptions import ImproperlyConfigured
-from django.template import Context, loader
-from django.conf.settings import TEMPLATE_CONTEXT_PROCESSORS
+from django.template import loader
 from django.http import HttpResponse, Http404
 
-_standard_context_processors = None
-
-# This is a function rather than module-level procedural code because we only
-# want it to execute if somebody uses DjangoContext.
-def get_standard_processors():
-    global _standard_context_processors
-    if _standard_context_processors is None:
-        processors = []
-        for path in TEMPLATE_CONTEXT_PROCESSORS:
-            i = path.rfind('.')
-            module, attr = path[:i], path[i+1:]
-            try:
-                mod = __import__(module, '', '', [attr])
-            except ImportError, e:
-                raise ImproperlyConfigured, 'Error importing request processor module %s: "%s"' % (module, e)
-            try:
-                func = getattr(mod, attr)
-            except AttributeError:
-                raise ImproperlyConfigured, 'Module "%s" does not define a "%s" callable request processor' % (module, attr)
-            processors.append(func)
-        _standard_context_processors = tuple(processors)
-    return _standard_context_processors
 
 def render_to_response(*args, **kwargs):
     return HttpResponse(loader.render_to_string(*args, **kwargs))
@@ -45,22 +21,6 @@ def get_list_or_404(klass, **kwargs):
     if not obj_list:
         raise Http404
     return obj_list
-
-class DjangoContext(Context):
-    """
-    This subclass of template.Context automatically populates itself using
-    the processors defined in TEMPLATE_CONTEXT_PROCESSORS.
-    Additional processors can be specified as a list of callables
-    using the "processors" keyword argument.
-    """
-    def __init__(self, request, dict=None, processors=None):
-        Context.__init__(self, dict)
-        if processors is None:
-            processors = ()
-        else:
-            processors = tuple(processors)
-        for processor in get_standard_processors() + processors:
-            self.update(processor(request))
 
 # PermWrapper and PermLookupDict proxy the permissions system into objects that
 # the template system can understand.

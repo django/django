@@ -59,8 +59,9 @@ from inspect import getargspec
 from django.utils.functional import curry
 from django.conf.settings import DEFAULT_CHARSET
 from django.conf import settings
+from django.template.context import Context, RequestContext
 
-__all__ = ('Template','Context','compile_string')
+__all__ = ('Template', 'Context', 'RequestContext', 'compile_string')
 
 TOKEN_TEXT = 0
 TOKEN_VAR = 1
@@ -147,58 +148,6 @@ def compile_string(template_string, origin):
     lexer = lexer_factory(template_string, origin)
     parser = parser_factory(lexer.tokenize())
     return parser.parse()
-
-class Context:
-    "A stack container for variable context"
-    def __init__(self, dict=None):
-        dict = dict or {}
-        self.dicts = [dict]
-
-    def __repr__(self):
-        return repr(self.dicts)
-
-    def __iter__(self):
-        for d in self.dicts:
-            yield d
-
-    def push(self):
-        self.dicts = [{}] + self.dicts
-
-    def pop(self):
-        if len(self.dicts) == 1:
-            raise ContextPopException
-        del self.dicts[0]
-
-    def __setitem__(self, key, value):
-        "Set a variable in the current context"
-        self.dicts[0][key] = value
-
-    def __getitem__(self, key):
-        "Get a variable's value, starting at the current context and going upward"
-        for dict in self.dicts:
-            if dict.has_key(key):
-                return dict[key]
-        return ''
-
-    def __delitem__(self, key):
-        "Delete a variable from the current context"
-        del self.dicts[0][key]
-
-    def has_key(self, key):
-        for dict in self.dicts:
-            if dict.has_key(key):
-                return True
-        return False
-
-    def get(self, key, otherwise):
-        for dict in self.dicts:
-            if dict.has_key(key):
-                return dict[key]
-        return otherwise
-
-    def update(self, other_dict):
-        "Like dict.update(). Pushes an entire dictionary's keys and values onto the context."
-        self.dicts = [other_dict] + self.dicts
 
 class Token:
     def __init__(self, token_type, contents):

@@ -1,7 +1,7 @@
 from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.admin.views.main import get_model_and_app
 from django.core.extensions import get_object_or_404,render_to_response
-from django.core.extensions import DjangoContext as Context
+from django.template import RequestContext as Context
 from django.utils.text import capfirst
 from django.utils.html import escape, strip_tags
 from django.db import models

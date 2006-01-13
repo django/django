@@ -1,4 +1,5 @@
-from django.core.extensions import DjangoContext, render_to_response
+from django.core.extensions import render_to_response
+from django.template import RequestContext
 from django.conf.settings import SECRET_KEY
 from django.contrib.auth.models import User, SESSION_KEY
 from django import http
@@ -24,7 +25,7 @@ def _display_login_form(request, error_message=''):
         'app_path': request.path,
         'post_data': post_data,
         'error_message': error_message
-    }, context_instance=DjangoContext(request))
+    }, context_instance=RequestContext(request))
 
 def _encode_post_data(post_data):
     pickled = pickle.dumps(post_data)

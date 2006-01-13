@@ -1,6 +1,6 @@
 from django.contrib.flatpages.models import FlatPage
-from django.template import loader
-from django.core.extensions import get_object_or_404, DjangoContext
+from django.template import loader, RequestContext
+from django.core.extensions import get_object_or_404
 from django.http import HttpResponse
 from django.conf.settings import SITE_ID
 
@@ -29,7 +29,7 @@ def flatpage(request, url):
         t = loader.select_template((f.template_name, DEFAULT_TEMPLATE))
     else:
         t = loader.get_template(DEFAULT_TEMPLATE)
-    c = DjangoContext(request, {
+    c = RequestContext(request, {
         'flatpage': f,
     })
     return HttpResponse(t.render(c))

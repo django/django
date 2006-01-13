@@ -1,6 +1,5 @@
-from django.template import loader
+from django.template import loader, RequestContext
 from django.core.exceptions import ObjectDoesNotExist
-from django.core.extensions import DjangoContext
 from django.core.xheaders import populate_xheaders
 from django.models import get_module
 from django.http import Http404, HttpResponse
@@ -38,7 +37,7 @@ def archive_index(request, app_label, module_name, date_field, num_latest=15,
     if not template_name:
         template_name = "%s/%s_archive" % (app_label, module_name)
     t = template_loader.get_template(template_name)
-    c = DjangoContext(request, {
+    c = RequestContext(request, {
         'date_list' : date_list,
         'latest' : latest,
     }, context_processors)
@@ -75,7 +74,7 @@ def archive_year(request, year, app_label, module_name, date_field,
     if not template_name:
         template_name = "%s/%s_archive_year" % (app_label, module_name)
     t = template_loader.get_template(template_name)
-    c = DjangoContext(request, {
+    c = RequestContext(request, {
         'date_list': date_list,
         'year': year,
     }, context_processors)
@@ -123,7 +122,7 @@ def archive_month(request, year, month, app_label, module_name, date_field,
     if not template_name:
         template_name = "%s/%s_archive_month" % (app_label, module_name)
     t = template_loader.get_template(template_name)
-    c = DjangoContext(request, {
+    c = RequestContext(request, {
         'object_list': object_list,
         'month': date,
     }, context_processors)
@@ -172,7 +171,7 @@ def archive_day(request, year, month, day, app_label, module_name, date_field,
     if not template_name:
         template_name = "%s/%s_archive_day" % (app_label, module_name)
     t = template_loader.get_template(template_name)
-    c = DjangoContext(request, {
+    c = RequestContext(request, {
         'object_list': object_list,
         'day': date,
         'previous_day': date - datetime.timedelta(days=1),
@@ -241,7 +240,7 @@ def object_detail(request, year, month, day, app_label, module_name, date_field,
         t = template_loader.select_template(template_name_list)
     else:
         t = template_loader.get_template(template_name)
-    c = DjangoContext(request, {
+    c = RequestContext(request, {
         'object': object,
     }, context_processors)
     for key, value in extra_context.items():

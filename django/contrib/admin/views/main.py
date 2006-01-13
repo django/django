@@ -7,7 +7,7 @@ from django.template import loader
 from django.db import models
 from django.http import Http404
 from django.core.exceptions import ImproperlyConfigured, ObjectDoesNotExist, PermissionDenied
-from django.core.extensions import DjangoContext as Context
+from django.template import RequestContext as Context
 from django.core.extensions import get_object_or_404, render_to_response
 from django.utils import dateformat
 from django.utils.html import escape, strip_tags

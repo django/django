@@ -1,8 +1,9 @@
 from django import template, templatetags
+from django.template import RequestContext
 from django.conf import settings
 from django.contrib.admin.views.decorators import staff_member_required
 from django.db import models
-from django.core.extensions import DjangoContext, render_to_response
+from django.core.extensions import render_to_response
 from django.core.exceptions import ViewDoesNotExist
 from django.http import Http404
 from django.core import urlresolvers
@@ -16,7 +17,7 @@ MODEL_METHODS_EXCLUDE = ('_', 'add_', 'delete', 'save', 'set_')
 def doc_index(request):
     if not utils.docutils_is_available:
         return missing_docutils_page(request)
-    return render_to_response('admin_doc/index', context_instance=DjangoContext(request))
+    return render_to_response('admin_doc/index', context_instance=RequestContext(request))
 doc_index = staff_member_required(doc_index)
 
 def bookmarklets(request):
@@ -24,7 +25,7 @@ def bookmarklets(request):
     admin_root = request.path[:-len('doc/bookmarklets/')]
     return render_to_response('admin_doc/bookmarklets', {
         'admin_url': "%s://%s%s" % (os.environ.get('HTTPS') == 'on' and 'https' or 'http', request.META['HTTP_HOST'], admin_root),
-    }, context_instance=DjangoContext(request))
+    }, context_instance=RequestContext(request))
 bookmarklets = staff_member_required(bookmarklets)
 
 def template_tag_index(request):
@@ -55,7 +56,7 @@ def template_tag_index(request):
                 'library': tag_library,
             })
 
-    return render_to_response('admin_doc/template_tag_index', {'tags': tags}, context_instance=DjangoContext(request))
+    return render_to_response('admin_doc/template_tag_index', {'tags': tags}, context_instance=RequestContext(request))
 template_tag_index = staff_member_required(template_tag_index)
 
 def template_filter_index(request):
@@ -85,7 +86,7 @@ def template_filter_index(request):
                 'meta': metadata,
                 'library': tag_library,
             })
-    return render_to_response('admin_doc/template_filter_index', {'filters': filters}, context_instance=DjangoContext(request))
+    return render_to_response('admin_doc/template_filter_index', {'filters': filters}, context_instance=RequestContext(request))
 template_filter_index = staff_member_required(template_filter_index)
 
 def view_index(request):
@@ -105,7 +106,7 @@ def view_index(request):
                 'site': Site.objects.get_object(pk=settings_mod.SITE_ID),
                 'url': simplify_regex(regex),
             })
-    return render_to_response('admin_doc/view_index', {'views': views}, context_instance=DjangoContext(request))
+    return render_to_response('admin_doc/view_index', {'views': views}, context_instance=RequestContext(request))
 view_index = staff_member_required(view_index)
 
 def view_detail(request, view):
@@ -129,7 +130,7 @@ def view_detail(request, view):
         'summary': title,
         'body': body,
         'meta': metadata,
-    }, context_instance=DjangoContext(request))
+    }, context_instance=RequestContext(request))
 view_detail = staff_member_required(view_detail)
 
 def model_index(request):
@@ -145,7 +146,7 @@ def model_index(request):
                 'module': opts.app_label,
                 'class': opts.module_name,
             })
-    return render_to_response('admin_doc/model_index', {'models': models}, context_instance=DjangoContext(request))
+    return render_to_response('admin_doc/model_index', {'models': models}, context_instance=RequestContext(request))
 model_index = staff_member_required(model_index)
 
 def model_detail(request, model):
@@ -187,7 +188,7 @@ def model_detail(request, model):
         'name': '%s.%s' % (opts.app_label, opts.module_name),
         'summary': "Fields on %s objects" % opts.verbose_name,
         'fields': fields,
-    }, context_instance=DjangoContext(request))
+    }, context_instance=RequestContext(request))
 model_detail = staff_member_required(model_detail)
 
 def template_detail(request, template):
@@ -207,7 +208,7 @@ def template_detail(request, template):
     return render_to_response('admin_doc/template_detail', {
         'name': template,
         'templates': templates,
-    }, context_instance=DjangoContext(request))
+    }, context_instance=RequestContext(request))
 template_detail = staff_member_required(template_detail)
 
 ####################

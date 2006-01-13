@@ -1,8 +1,7 @@
 from django import models
-from django.template import loader
+from django.template import loader, RequestContext
 from django.http import Http404, HttpResponse
 from django.core.xheaders import populate_xheaders
-from django.core.extensions import DjangoContext
 from django.core.paginator import ObjectPaginator, InvalidPage
 from django.core.exceptions import ObjectDoesNotExist
 
@@ -48,7 +47,7 @@ def object_list(request, app_label, module_name, paginate_by=None, allow_empty=F
             else:
                 raise Http404
         page = int(page)
-        c = DjangoContext(request, {
+        c = RequestContext(request, {
             'object_list': object_list,
             'is_paginated': paginator.pages > 1,
             'results_per_page': paginate_by,
@@ -62,7 +61,7 @@ def object_list(request, app_label, module_name, paginate_by=None, allow_empty=F
         }, context_processors)
     else:
         object_list = mod.get_list(**lookup_kwargs)
-        c = DjangoContext(request, {
+        c = RequestContext(request, {
             'object_list': object_list,
             'is_paginated': False
         }, context_processors)
@@ -110,7 +109,7 @@ def object_detail(request, app_label, module_name, object_id=None, slug=None,
         t = template_loader.select_template(template_name_list)
     else:
         t = template_loader.get_template(template_name)
-    c = DjangoContext(request, {
+    c = RequestContext(request, {
         'object': object,
     }, context_processors)
     for key, value in extra_context.items():

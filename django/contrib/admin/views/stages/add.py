@@ -6,7 +6,7 @@ from django.core import formfields
 from django import template
 from django.http import Http404
 from django.core.exceptions import ImproperlyConfigured, ObjectDoesNotExist, PermissionDenied
-from django.core.extensions import DjangoContext as Context
+from django.template import RequestContext as Context
 from django.db import models
 from django.http import HttpResponse, HttpResponseRedirect
 from django.utils.text import capfirst, get_text_list
