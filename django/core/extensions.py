@@ -3,7 +3,7 @@
 # for convenience's sake.
 
 from django.core.exceptions import ImproperlyConfigured
-from django.core.template import Context, loader
+from django.template import Context, loader
 from django.conf.settings import TEMPLATE_CONTEXT_PROCESSORS
 from django.http import HttpResponse, Http404
 

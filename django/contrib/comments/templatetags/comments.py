@@ -1,7 +1,7 @@
 from django.contrib.comments.models import Comment, FreeComment
 from django.contrib.comments.models import PHOTOS_REQUIRED, PHOTOS_OPTIONAL, RATINGS_REQUIRED, RATINGS_OPTIONAL, IS_PUBLIC
 from django.contrib.comments.models import MIN_PHOTO_DIMENSION, MAX_PHOTO_DIMENSION
-from django.core import template
+from django import template
 from django.core.exceptions import ObjectDoesNotExist
 from django.contrib.contenttypes.models import ContentType
 import re

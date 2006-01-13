@@ -1,5 +1,5 @@
 from django.contrib.admin.models import LogEntry
-from django.core import template
+from django import template
 
 register = template.Library()
 

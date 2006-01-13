@@ -1,7 +1,7 @@
 from django.contrib.admin.views.changelist import MAX_SHOW_ALL_ALLOWED, DEFAULT_RESULTS_PER_PAGE, ALL_VAR
 from django.contrib.admin.views.changelist import ORDER_VAR, ORDER_TYPE_VAR, PAGE_VAR, SEARCH_VAR
 from django.contrib.admin.views.changelist import IS_POPUP_VAR, EMPTY_CHANGELIST_VALUE, MONTHS
-from django.core import template
+from django import template
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import models
 from django.utils import dateformat
@@ -9,7 +9,7 @@ from django.utils.html import strip_tags, escape
 from django.utils.text import capfirst
 from django.utils.translation import get_date_formats
 from django.conf.settings import ADMIN_MEDIA_PREFIX
-from django.core.template import Library
+from django.template import Library
 
 register = Library()
 

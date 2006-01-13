@@ -1,4 +1,5 @@
-from django.core import template, template_loader
+from django import template
+from djang.core import template_loader
 from django.utils.html import escape
 from django.utils.text import capfirst
 from django.utils.functional import curry

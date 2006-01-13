@@ -1,7 +1,7 @@
 from django.contrib.admin.views.decorators import staff_member_required
 from django.core import formfields, validators
-from django.core import template
-from django.core.template import loader
+from django import template
+from django.template import loader
 from django.core.extensions import DjangoContext, render_to_response
 from django.contrib.sites.models import Site
 from django.conf import settings

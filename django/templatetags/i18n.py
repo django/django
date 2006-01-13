@@ -1,6 +1,6 @@
-from django.core.template import Node, NodeList, Template, Context, resolve_variable
-from django.core.template import TemplateSyntaxError, TokenParser, Library
-from django.core.template import TOKEN_BLOCK, TOKEN_TEXT, TOKEN_VAR
+from django.template import Node, NodeList, Template, Context, resolve_variable
+from django.template import TemplateSyntaxError, TokenParser, Library
+from django.template import TOKEN_BLOCK, TOKEN_TEXT, TOKEN_VAR
 from django.utils import translation
 import re, sys
 

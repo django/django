@@ -1,6 +1,6 @@
 from django.core import formfields, validators
 from django.core.extensions import DjangoContext, render_to_response
-from django.core.template import Context, loader
+from django.template import Context, loader
 from django.models.auth import User
 from django.models.core import Site
 from django.views.decorators.auth import login_required

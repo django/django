@@ -1,7 +1,7 @@
 # This module is DEPRECATED!
 #
-# You should no longer be using django.core.template_loader.
+# You should no longer be using django.template_loader.
 #
-# Use django.core.template.loader instead.
+# Use django.template.loader instead.
 
-from django.core.template.loader import *
+from django.template.loader import *

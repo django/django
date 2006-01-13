@@ -14,7 +14,7 @@ In each case, if the required library is not installed, the filter will
 silently fail and return the un-marked-up text.
 """
 
-from django.core import template
+from django import template
 
 register = template.Library()
 

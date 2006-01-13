@@ -384,7 +384,7 @@ def templateize(src):
     does so by translating the Django translation tags into standard gettext
     function invocations.
     """
-    from django.core.template import Lexer, TOKEN_TEXT, TOKEN_VAR, TOKEN_BLOCK
+    from django.template import Lexer, TOKEN_TEXT, TOKEN_VAR, TOKEN_BLOCK
     out = StringIO()
     intrans = False
     inplural = False

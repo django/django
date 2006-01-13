@@ -5,7 +5,7 @@ import mimetypes
 from django.core import template_loader
 from django.core.exceptions import ImproperlyConfigured
 from django.http import Http404, HttpResponse, HttpResponseRedirect
-from django.core.template import Template, Context, TemplateDoesNotExist
+from django.template import Template, Context, TemplateDoesNotExist
 
 def serve(request, path, document_root=None, show_indexes=False):
     """

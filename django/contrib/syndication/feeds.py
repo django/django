@@ -1,5 +1,5 @@
 from django.core.exceptions import ImproperlyConfigured, ObjectDoesNotExist
-from django.core.template import Context, loader, Template, TemplateDoesNotExist
+from django.template import Context, loader, Template, TemplateDoesNotExist
 from django.contrib.sites.models import Site
 from django.utils import feedgenerator
 from django.conf.settings import LANGUAGE_CODE, SETTINGS_MODULE

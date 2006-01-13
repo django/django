@@ -1,8 +1,9 @@
 # Generic admin views.
 from django.conf import settings
 from django.contrib.admin.views.decorators import staff_member_required
-from django.core import formfields, template
-from django.core.template import loader
+from django.core import formfields
+from django import template
+from django.template import loader
 from django.db import models
 from django.http import Http404
 from django.core.exceptions import ImproperlyConfigured, ObjectDoesNotExist, PermissionDenied

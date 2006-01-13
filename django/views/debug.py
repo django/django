@@ -1,5 +1,5 @@
 from django.conf import settings
-from django.core.template import Template, Context, TemplateDoesNotExist
+from django.template import Template, Context, TemplateDoesNotExist
 from django.utils.html import escape
 from django.http import HttpResponseServerError, HttpResponseNotFound
 import inspect, os, re, sys
@@ -72,7 +72,7 @@ def technical_500_response(request, exc_type, exc_value, tb):
     template_does_not_exist = False
     loader_debug_info = None
     if issubclass(exc_type, TemplateDoesNotExist):
-        from django.core.template.loader import template_source_loaders
+        from django.template.loader import template_source_loaders
         template_does_not_exist = True
         loader_debug_info = []
         for loader in template_source_loaders:
