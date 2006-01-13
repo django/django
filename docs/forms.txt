@@ -68,7 +68,7 @@ POSTed data from the browser and creates a new ``Place`` object::
     from django.core.extensions import render_to_response
     from django.http import Http404, HttpResponse, HttpResponseRedirect
     from django.models.places import places
-    from django.core import formfields
+    from django import forms
 
     def naive_create_place(request):
         """A naive approach to creating places; don't actually use this!"""
@@ -109,13 +109,13 @@ view with a form that submits to this flawed creation view::
         """Simplistic place form view; don't actually use anything like this!"""
         # Create a FormWrapper object that the template can use. Ignore
         # the last two arguments to FormWrapper for now.
-        form = formfields.FormWrapper(places.AddManipulator(), {}, {})
+        form = forms.FormWrapper(places.AddManipulator(), {}, {})
         return render_to_response('places/naive_create_form', {'form': form})
 
 (This view, as well as all the following ones, has the same imports as in the
 first example above.)
 
-The ``formfields.FormWrapper`` object is a wrapper that templates can
+The ``forms.FormWrapper`` object is a wrapper that templates can
 easily deal with to create forms. Here's the ``naive_create_form`` template::
 
     {% extends "base" %}
@@ -232,7 +232,7 @@ Below is the finished view::
             errors = new_data = {}
 
         # Create the FormWrapper, template, context, response.
-        form = formfields.FormWrapper(manipulator, new_data, errors)
+        form = forms.FormWrapper(manipulator, new_data, errors)
         return render_to_response('places/create_form', {'form': form})
 
 and here's the ``create_form`` template::
@@ -321,7 +321,7 @@ about editing an existing one? It's shockingly similar to creating a new one::
             # This makes sure the form accurate represents the fields of the place.
             new_data = place.__dict__
 
-        form = formfields.FormWrapper(manipulator, new_data, errors)
+        form = forms.FormWrapper(manipulator, new_data, errors)
         return render_to_response('places/edit_form', {'form': form, 'place': place})
 
 The only real differences are:
@@ -361,7 +361,7 @@ your own custom manipulators for handling custom forms.
 Custom manipulators are pretty simple. Here's a manipulator that you might use
 for a "contact" form on a website::
 
-    from django.core import formfields
+    from django import forms
 
     urgency_choices = (
         (1, "Extremely urgent"),
@@ -370,18 +370,18 @@ for a "contact" form on a website::
         (4, "Unimportant"),
     )
 
-    class ContactManipulator(formfields.Manipulator):
+    class ContactManipulator(forms.Manipulator):
         def __init__(self):
             self.fields = (
-                formfields.EmailField(field_name="from", is_required=True),
-                formfields.TextField(field_name="subject", length=30, maxlength=200, is_required=True),
-                formfields.SelectField(field_name="urgency", choices=urgency_choices),
-                formfields.LargeTextField(field_name="contents", is_required=True),
+                forms.EmailField(field_name="from", is_required=True),
+                forms.TextField(field_name="subject", length=30, maxlength=200, is_required=True),
+                forms.SelectField(field_name="urgency", choices=urgency_choices),
+                forms.LargeTextField(field_name="contents", is_required=True),
             )
 
 A certain similarity to Django's models should be apparent. The only required
 method of a custom manipulator is ``__init__`` which must define the fields
-present in the manipulator.  See the ``django.core.formfields`` module for
+present in the manipulator.  See the ``django.forms`` module for
 all the form fields provided by Django.
 
 You use this custom manipulator exactly as you would use an auto-generated one.
@@ -400,7 +400,7 @@ Here's a simple function that might drive the above form::
                 return HttpResponseRedirect("/contact/thankyou/")
         else:
             errors = new_data = {}
-        form = formfields.FormWrapper(manipulator, new_data, errors)
+        form = forms.FormWrapper(manipulator, new_data, errors)
         return render_to_response('contact_form', {'form': form})
 
 Validators
@@ -412,13 +412,14 @@ done using a simple validation API: A validator is a callable that raises a
 ``django.core.validators`` defines a host of validator functions, but defining
 your own couldn't be easier::
 
-    from django.core import validators, formfields
+    from django.core import validators
+    from django import forms
 
-    class ContactManipulator(formfields.Manipulator):
+    class ContactManipulator(forms.Manipulator):
         def __init__(self):
             self.fields = (
                 # ... snip fields as above ...
-                formfields.EmailField(field_name="to", validator_list=[self.isValidToAddress])
+                forms.EmailField(field_name="to", validator_list=[self.isValidToAddress])
             )
 
         def isValidToAddress(self, field_data, all_data):
