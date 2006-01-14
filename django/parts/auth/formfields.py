@@ -1,4 +1,4 @@
-from django.models.auth import User
+from django.contrib.auth.models import User
 from django.core import validators
 from django import forms
 

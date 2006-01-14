@@ -2,8 +2,8 @@ from django import forms
 from django.core import validators
 from django.core.extensions import render_to_response
 from django.template import Context, RequestContext, loader
-from django.models.auth import User
-from django.models.core import Site
+from django.contrib.auth.models import User
+from django.contrib.sites.models import Site
 from django.views.decorators.auth import login_required
 from django.http import HttpResponseRedirect
 
