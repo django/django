@@ -413,7 +413,7 @@ class Model(object):
         return getattr(self, cache_var)
 
     def _set_many_to_many_objects(self, id_list, field_with_rel):
-        current_ids = [obj.id for obj in self._get_many_to_many_objects(field_with_rel)]
+        current_ids = [getattr(obj, obj._meta.pk.attname) for obj in self._get_many_to_many_objects(field_with_rel)]
         ids_to_add, ids_to_delete = dict([(i, 1) for i in id_list]), []
         for current_id in current_ids:
             if current_id in id_list:
