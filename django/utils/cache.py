@@ -75,7 +75,7 @@ def patch_response_headers(response, cache_timeout=None):
     now = datetime.datetime.utcnow()
     expires = now + datetime.timedelta(0, cache_timeout)
     if not response.has_header('ETag'):
-        response['ETag'] = md5.new(response.content).hexdigest()
+        response['ETag'] = md5.new(response.get_content_as_string('utf8')).hexdigest()
     if not response.has_header('Last-Modified'):
         response['Last-Modified'] = now.strftime('%a, %d %b %Y %H:%M:%S GMT')
     if not response.has_header('Expires'):
