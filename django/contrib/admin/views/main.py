@@ -13,7 +13,7 @@ try:
     from django.models.admin import log
 except ImportError:
     raise ImproperlyConfigured, "You don't have 'django.contrib.admin' in INSTALLED_APPS."
-from django.utils.html import strip_tags
+from django.utils.html import escape
 from django.utils.httpwrappers import HttpResponse, HttpResponseRedirect
 from django.utils.text import capfirst, get_text_list
 from django.utils import dateformat
@@ -588,11 +588,11 @@ def _get_deleted_objects(deleted_objects, perms_needed, user, obj, opts, current
                 if related.field.rel.edit_inline or not related.opts.admin:
                     # Don't display link to edit, because it either has no
                     # admin or is edited inline.
-                    nh(deleted_objects, current_depth, ['%s: %s' % (capfirst(related.opts.verbose_name), strip_tags(str(sub_obj))), []])
+                    nh(deleted_objects, current_depth, ['%s: %s' % (capfirst(related.opts.verbose_name), escape(str(sub_obj))), []])
                 else:
                     # Display a link to the admin page.
                     nh(deleted_objects, current_depth, ['%s: <a href="../../../../%s/%s/%s/">%s</a>' % \
-                        (capfirst(related.opts.verbose_name), related.opts.app_label, related.opts.module_name, getattr(sub_obj, related.opts.pk.attname), strip_tags(str(sub_obj))), []])
+                        (capfirst(related.opts.verbose_name), related.opts.app_label, related.opts.module_name, getattr(sub_obj, related.opts.pk.attname), escape(str(sub_obj))), []])
                 _get_deleted_objects(deleted_objects, perms_needed, user, sub_obj, related.opts, current_depth+2)
             # If there were related objects, and the user doesn't have
             # permission to delete them, add the missing perm to perms_needed.
@@ -612,13 +612,13 @@ def _get_deleted_objects(deleted_objects, perms_needed, user, obj, opts, current
                 # Don't display link to edit, because it either has no
                 # admin or is edited inline.
                 nh(deleted_objects, current_depth, [_('One or more %(fieldname)s in %(name)s: %(obj)s') % \
-                    {'fieldname': related.field.name, 'name': related.opts.verbose_name, 'obj': strip_tags(str(sub_obj))}, []])
+                    {'fieldname': related.field.name, 'name': related.opts.verbose_name, 'obj': escape(str(sub_obj))}, []])
             else:
                 # Display a link to the admin page.
                 nh(deleted_objects, current_depth, [
                     (_('One or more %(fieldname)s in %(name)s:') % {'fieldname': related.field.name, 'name':related.opts.verbose_name}) + \
                     (' <a href="../../../../%s/%s/%s/">%s</a>' % \
-                        (related.opts.app_label, related.opts.module_name, getattr(sub_obj, related.opts.pk.attname), strip_tags(str(sub_obj)))), []])
+                        (related.opts.app_label, related.opts.module_name, getattr(sub_obj, related.opts.pk.attname), escape(str(sub_obj)))), []])
         # If there were related objects, and the user doesn't have
         # permission to change them, add the missing perm to perms_needed.
         if related.opts.admin and has_related_objs:
@@ -635,7 +635,7 @@ def delete_stage(request, app_label, module_name, object_id):
 
     # Populate deleted_objects, a data structure of all related objects that
     # will also be deleted.
-    deleted_objects = ['%s: <a href="../../%s/">%s</a>' % (capfirst(opts.verbose_name), object_id, strip_tags(str(obj))), []]
+    deleted_objects = ['%s: <a href="../../%s/">%s</a>' % (capfirst(opts.verbose_name), object_id, escape(str(obj))), []]
     perms_needed = sets.Set()
     _get_deleted_objects(deleted_objects, perms_needed, request.user, obj, opts, 1)
 
