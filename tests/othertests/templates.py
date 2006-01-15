@@ -144,6 +144,11 @@ TEMPLATE_TESTS = {
     'comment-tag01': ("{% comment %}this is hidden{% endcomment %}hello", {}, "hello"),
     'comment-tag02': ("{% comment %}this is hidden{% endcomment %}hello{% comment %}foo{% endcomment %}", {}, "hello"),
 
+    # Comment tag can contain invalid stuff.
+    'comment-tag03': ("foo{% comment %} {% if %} {% endcomment %}", {}, "foo"),
+    'comment-tag04': ("foo{% comment %} {% endblock %} {% endcomment %}", {}, "foo"),
+    'comment-tag05': ("foo{% comment %} {% somerandomtag %} {% endcomment %}", {}, "foo"),
+
     ### FOR TAG ###############################################################
     'for-tag01': ("{% for val in values %}{{ val }}{% endfor %}", {"values": [1, 2, 3]}, "123"),
     'for-tag02': ("{% for val in values reversed %}{{ val }}{% endfor %}", {"values": [1, 2, 3]}, "321"),
