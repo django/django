@@ -370,6 +370,8 @@ msgid ""
 "Please enter a correct username and password. Note that both fields are case-"
 "sensitive."
 msgstr ""
+"Prosím, vložte spávne meno užvateľa ako aj heslo. Pripomínam, že obe polia"
+"rozlišujú malé a veľké písmena"
 
 #: contrib/admin/views/decorators.py:23
 #: contrib/admin/templates/admin/login.html:24
@@ -728,7 +730,7 @@ msgstr "Nepovolené"
 #: contrib/admin/templates/admin/change_list.html:10
 #, python-format
 msgid "Add %(name)s"
-msgstr ""
+msgstr "Pridaj %(name)s"
 
 #: contrib/admin/templates/admin/login.html:15
 msgid "Username:"
@@ -1003,7 +1005,7 @@ msgstr "Ako vyššie, ale stranka admina sa otvorí v novom okne."
 
 #: contrib/admin/templates/widget/date_time.html:3
 msgid "Date:"
-msgstr ""
+msgstr "Dátum:"
 
 #: contrib/admin/templates/widget/date_time.html:4
 msgid "Time:"
@@ -1011,7 +1013,7 @@ msgstr "Čas"
 
 #: contrib/admin/templates/widget/file.html:2
 msgid "Currently:"
-msgstr ""
+msgstr "Aktuálny:"
 
 #: contrib/admin/templates/widget/file.html:3
 msgid "Change:"
@@ -1444,11 +1446,11 @@ msgstr "Taliansky"
 
 #: conf/global_settings.py:48
 msgid "Japanese"
-msgstr ""
+msgstr "Japónsky"
 
 #: conf/global_settings.py:49
 msgid "Dutch"
-msgstr ""
+msgstr "Holándsky"
 
 #: conf/global_settings.py:50
 msgid "Norwegian"
@@ -1484,7 +1486,7 @@ msgstr "Zjednodušená činština "
 
 #: conf/global_settings.py:58
 msgid "Traditional Chinese"
-msgstr ""
+msgstr "Tradičná čínština"
 
 #: core/formfields.py:59 core/meta/fields.py:285 core/meta/fields.py:488
 #: core/meta/fields.py:499
