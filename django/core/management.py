@@ -58,10 +58,11 @@ def _get_contenttype_insert(opts):
 def _is_valid_dir_name(s):
     return bool(re.search(r'^\w+$', s))
 
-# If the foreign key points to an AutoField, the foreign key should be an
-# IntegerField, not an AutoField. Otherwise, the foreign key should be the same
-# type of field as the field to which it points.
-get_rel_data_type = lambda f: (f.get_internal_type() == 'AutoField') and 'IntegerField' or f.get_internal_type()
+# If the foreign key points to an AutoField, a PositiveIntegerField or a
+# PositiveSmallIntegerField, the foreign key should be an IntegerField, not the
+# referred field type. Otherwise, the foreign key should be the same type of
+# field as the field to which it points.
+get_rel_data_type = lambda f: (f.get_internal_type() in ('AutoField', 'PositiveIntegerField', 'PositiveSmallIntegerField')) and 'IntegerField' or f.get_internal_type()
 
 def get_sql_create(app):
     "Returns a list of the CREATE TABLE SQL statements for the given app."
