@@ -462,7 +462,7 @@ def init_minimal():
         from django.conf.settings import INSTALLED_APPS
         INSTALLED_APPS += ('django.contrib.contenttypes',)
         # Install django.contrib.contenttypes. The tests require Packages to
-        # to be installed. This ought to be fixed (tests should probably 
+        # to be installed. This ought to be fixed (tests should probably
         # install their dependencies)
         contenttypes_app = models.get_app('contenttypes')
         install(contenttypes_app)
@@ -526,7 +526,7 @@ def install(app):
     s = StringIO()
     num_errors = get_validation_errors(s)
     if num_errors:
-        sys.stderr.write("Error: %s couldn't be installed, because there were errors in your model:\n" % mod_name)
+        sys.stderr.write("Error: %s couldn't be installed, because there were errors in your model:\n" % app_name)
         s.seek(0)
         sys.stderr.write(s.read())
         sys.exit(1)
