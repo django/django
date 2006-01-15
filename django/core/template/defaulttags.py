@@ -249,6 +249,14 @@ class NowNode(Node):
         df = DateFormat(datetime.now())
         return df.format(self.format_string)
 
+class SpacelessNode(Node):
+    def __init__(self, nodelist):
+        self.nodelist = nodelist
+
+    def render(self, context):
+        from django.utils.html import strip_spaces_between_tags
+        return strip_spaces_between_tags(self.nodelist.render(context).strip())
+
 class TemplateTagNode(Node):
     mapping = {'openblock': BLOCK_TAG_START,
                'closeblock': BLOCK_TAG_END,
@@ -725,6 +733,12 @@ def regroup(parser, token):
     var_name = lastbits_reversed[0][::-1]
     return RegroupNode(target, expression, var_name)
 regroup = register.tag(regroup)
+
+def spaceless(parser, token):
+    nodelist = parser.parse(('endspaceless',))
+    parser.delete_first_token()
+    return SpacelessNode(nodelist)
+spaceless = register.tag(spaceless)
 
 #@register.tag
 def templatetag(parser, token):

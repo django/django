@@ -37,6 +37,10 @@ def strip_tags(value):
     "Returns the given HTML with all tags stripped"
     return re.sub(r'<[^>]*?>', '', value)
 
+def strip_spaces_between_tags(value):
+    "Returns the given HTML with spaces between tags stripped"
+    return re.sub(r'>\s+<', '><', value)
+
 def strip_entities(value):
     "Returns the given HTML with all entities (&something;) stripped"
     return re.sub(r'&(?:\w+|#\d);', '', value)
