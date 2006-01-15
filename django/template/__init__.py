@@ -257,6 +257,13 @@ class Parser(object):
             self.unclosed_block_tag(parse_until)
         return nodelist
 
+    def skip_past(self, endtag):
+        while self.tokens:
+            token = self.next_token()
+            if token.token_type == TOKEN_BLOCK and token.contents == endtag:
+                return
+        self.unclosed_block_tag([endtag])
+
     def create_variable_node(self, filter_expression):
         return VariableNode(filter_expression)
 
@@ -363,8 +370,8 @@ def parser_factory(*args, **kwargs):
         return DebugParser(*args, **kwargs)
     else:
         return Parser(*args, **kwargs)
-        
-        
+
+
 class TokenParser:
     """
     Subclass this and implement the top() method to parse a template line. When

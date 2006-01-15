@@ -156,6 +156,11 @@ TEMPLATE_TESTS = {
     'comment-tag01': ("{% comment %}this is hidden{% endcomment %}hello", {}, "hello"),
     'comment-tag02': ("{% comment %}this is hidden{% endcomment %}hello{% comment %}foo{% endcomment %}", {}, "hello"),
 
+    # Comment tag can contain invalid stuff.
+    'comment-tag03': ("foo{% comment %} {% if %} {% endcomment %}", {}, "foo"),
+    'comment-tag04': ("foo{% comment %} {% endblock %} {% endcomment %}", {}, "foo"),
+    'comment-tag05': ("foo{% comment %} {% somerandomtag %} {% endcomment %}", {}, "foo"),
+
     ### CYCLE TAG #############################################################
     #'cycleXX': ('', {}, ''),
     'cycle01': ('{% cycle a, %}', {}, 'a'),
@@ -440,7 +445,7 @@ def run_tests(verbosity=0, standalone=False):
     failed_tests = []
     tests = TEMPLATE_TESTS.items()
     tests.sort()
-    
+
     # Turn TEMPLATE_DEBUG off, because tests assume that.
     old_td, settings.TEMPLATE_DEBUG = settings.TEMPLATE_DEBUG, False
     for name, vals in tests:
@@ -473,7 +478,7 @@ def run_tests(verbosity=0, standalone=False):
     loader.template_source_loaders = old_template_loaders
     deactivate()
     settings.TEMPLATE_DEBUG = old_td
-    
+
     if failed_tests and not standalone:
         msg = "Template tests %s failed." % failed_tests
         if not verbosity:
