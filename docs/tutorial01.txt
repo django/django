@@ -455,8 +455,12 @@ Let's jump back into the Python interactive shell by running
     What's up?
     >>> polls.get_object(question__startswith='What')
     What's up?
+
+    # Get the poll whose year is 2005. Of course, if you're going through this
+    # tutorial in another year, change as appropriate.
     >>> polls.get_object(pub_date__year=2005)
     What's up?
+
     >>> polls.get_object(id__exact=2)
     Traceback (most recent call last):
         ...
