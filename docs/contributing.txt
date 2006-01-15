@@ -211,6 +211,38 @@ repository:
       Subversion and Trac so that any commit message in that format will
       automatically post a comment to the appropriate ticket.
 
+Unit tests
+==========
+
+Django comes with a test suite of its own, in the ``tests`` directory of the
+Django tarball. It's our policy to make sure all tests pass at all times.
+
+The tests cover:
+
+    * Models and the database API (``tests/testapp/models``).
+    * The cache system (``tests/otherthests/cache.py``).
+    * The ``django.utils.dateformat`` module (``tests/othertests/dateformat.py``).
+    * Database typecasts (``tests/othertests/db_typecasts.py``).
+    * The template system (``tests/othertests/templates.py`` and
+      ``tests/othertests/defaultfilters.py``).
+    * ``QueryDict`` objects (``tests/othertests/httpwrappers.py``).
+    * Markup template tags (``tests/othertests/markup.py``).
+    * The ``django.utils.timesince`` module (``tests/othertests/timesince.py``).
+
+We appreciate any and all contributions to the test suite!
+
+Running the unit tests
+----------------------
+
+To run the tests, ``cd`` to the ``tests/`` directory and type::
+
+    ./runtests.py --settings=path.to.django.settings
+
+Yes, the unit tests need a settings module, but only for database connection
+info -- the ``DATABASE_ENGINE``, ``DATABASE_USER`` and ``DATABASE_PASSWORD``.
+The unit tests will not touch your database; they create a new database, called
+``django_test_db``, which is deleted when the tests are finished.
+
 Requesting features
 ===================
 

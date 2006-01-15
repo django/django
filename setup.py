@@ -5,7 +5,7 @@ from setuptools import setup, find_packages
 
 setup(
     name = "Django",
-    version = "0.90",
+    version = "0.91",
     url = 'http://www.djangoproject.com/',
     author = 'Lawrence Journal-World',
     author_email = 'holovaty@gmail.com',
@@ -25,6 +25,8 @@ setup(
                         'locale/gl/LC_MESSAGES/*',
                         'locale/is/LC_MESSAGES/*',
                         'locale/it/LC_MESSAGES/*',
+                        'locale/ja/LC_MESSAGES/*',
+                        'locale/nl/LC_MESSAGES/*',
                         'locale/no/LC_MESSAGES/*',
                         'locale/pt_BR/LC_MESSAGES/*',
                         'locale/ro/LC_MESSAGES/*',
@@ -32,7 +34,8 @@ setup(
                         'locale/sk/LC_MESSAGES/*',
                         'locale/sr/LC_MESSAGES/*',
                         'locale/sv/LC_MESSAGES/*',
-                        'locale/zh_CN/LC_MESSAGES/*'],
+                        'locale/zh_CN/LC_MESSAGES/*',
+                        'locale/zh_TW/LC_MESSAGES/*'],
         'django.contrib.admin': ['templates/admin/*.html',
                                  'templates/admin_doc/*.html',
                                  'templates/registration/*.html',

@@ -117,7 +117,7 @@ def translation(language):
 
     globalpath = os.path.join(os.path.dirname(settings.__file__), 'locale')
 
-    parts = os.environ['DJANGO_SETTINGS_MODULE'].split('.')
+    parts = settings.SETTINGS_MODULE.split('.')
     project = __import__(parts[0], {}, {}, [])
     projectpath = os.path.join(os.path.dirname(project.__file__), 'locale')
 

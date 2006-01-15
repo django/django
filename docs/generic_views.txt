@@ -327,7 +327,7 @@ The create/update/delete views are:
 
     Uses the template ``<app_label>/<model_name>_form`` by default. This is the
     same template as the ``update_object`` view below. Your template can tell
-    the different by the presence or absence of ``{{ object }}`` in the
+    the difference by the presence or absence of ``{{ object }}`` in the
     context.
 
     Has the following template context:

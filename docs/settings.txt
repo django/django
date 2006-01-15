@@ -478,6 +478,16 @@ Whether to prepend the "www." subdomain to URLs that don't have it. This is
 only used if ``CommonMiddleware`` is installed (see the `middleware docs`_).
 See also ``APPEND_SLASH``.
 
+ROOT_URLCONF
+------------
+
+Default: Not defined
+
+A string representing the full Python import path to your root URLconf. For example:
+``"mydjangoapps.urls"``. See `How Django processes a request`_.
+
+.. _How Django processes a request: http://www.djangoproject.com/documentation/url_dispatch/#how-django-processes-a-request
+
 SECRET_KEY
 ----------
 

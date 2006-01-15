@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2005-12-29 00:04+0100\n"
+"POT-Creation-Date: 2006-01-12 23:11+0100\n"
 "PO-Revision-Date: 2005-11-28 15:28+0000\n"
 "Last-Translator: Ricardo Javier Cardenes Medina <ricardo.cardenes@gmail."
 "com>\n"
@@ -584,6 +584,15 @@ msgstr "Texto XML"
 #: contrib/admin/templates/admin/base.html:23
 #: contrib/admin/templates/admin/delete_confirmation.html:3
 #: contrib/admin/templates/admin/change_form.html:9
+#: contrib/admin/templates/admin_doc/bookmarklets.html:3
+msgid "Documentation"
+msgstr "Documentación"
+
+#: contrib/admin/templates/admin/object_history.html:3
+#: contrib/admin/templates/admin/change_list.html:4
+#: contrib/admin/templates/admin/base.html:23
+#: contrib/admin/templates/admin/delete_confirmation.html:3
+#: contrib/admin/templates/admin/change_form.html:9
 #: contrib/admin/templates/admin_doc/bookmarklets.html:4
 #: contrib/admin/templates/admin_doc/view_detail.html:4
 #: contrib/admin/templates/admin_doc/template_tag_index.html:5
@@ -771,7 +780,7 @@ msgstr "Sí, estoy seguro"
 msgid " By %(title)s "
 msgstr " Por %(title)s "
 
-#: contrib/admin/templates/admin/search_form.html:7
+#: contrib/admin/templates/admin/search_form.html:8
 msgid "Go"
 msgstr "Buscar"
 
@@ -927,10 +936,6 @@ msgstr "¡Gracias por usar nuestro sitio!"
 #, python-format
 msgid "The %(site_name)s team"
 msgstr "El equipo de %(site_name)s"
-
-#: contrib/admin/templates/admin_doc/bookmarklets.html:3
-msgid "Documentation"
-msgstr "Documentación"
 
 #: contrib/admin/templates/admin_doc/bookmarklets.html:3
 msgid "Bookmarklets"
@@ -1451,38 +1456,42 @@ msgid "Japanese"
 msgstr ""
 
 #: conf/global_settings.py:49
+msgid "Dutch"
+msgstr ""
+
+#: conf/global_settings.py:50
 msgid "Norwegian"
 msgstr "Noruego"
 
-#: conf/global_settings.py:50
+#: conf/global_settings.py:51
 msgid "Brazilian"
 msgstr "Brasileño"
 
-#: conf/global_settings.py:51
+#: conf/global_settings.py:52
 msgid "Romanian"
 msgstr "Rumano"
 
-#: conf/global_settings.py:52
+#: conf/global_settings.py:53
 msgid "Russian"
 msgstr "Ruso"
 
-#: conf/global_settings.py:53
+#: conf/global_settings.py:54
 msgid "Slovak"
 msgstr "Eslovaco"
 
-#: conf/global_settings.py:54
+#: conf/global_settings.py:55
 msgid "Serbian"
 msgstr "Serbio"
 
-#: conf/global_settings.py:55
+#: conf/global_settings.py:56
 msgid "Swedish"
 msgstr "Sueco"
 
-#: conf/global_settings.py:56
+#: conf/global_settings.py:57
 msgid "Simplified Chinese"
 msgstr "Chino simplificado"
 
-#: conf/global_settings.py:57
+#: conf/global_settings.py:58
 msgid "Traditional Chinese"
 msgstr ""
 
@@ -1837,7 +1846,7 @@ msgstr[1] ""
 "Por favor, introduzca IDs de %(self)s válidos. Los valores %(value)r no son "
 "válidos."
 
-#: core/template/defaultfilters.py:371
+#: core/template/defaultfilters.py:379
 msgid "yes,no,maybe"
 msgstr "si,no,tal vez"
 

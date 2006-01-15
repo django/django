@@ -156,7 +156,14 @@ We've documented our philosophies on the `design philosophies page`_.
 Do you have any of those nifty "screencast" things?
 ---------------------------------------------------
 
-They're in the works. It's amazing how much time those things take! Stay tuned...
+You can bet your bottom they're on the way. But, since we're still hammering
+out a few points, we want to make sure they reflect the final state of things
+at Django 1.0, not some intermediary step. In other words, we don't want to
+spend a lot of energy creating screencasts yet, because Django APIs will shift.
+
+In the meantime, though, check out this `unofficial Django screencast`_.
+
+.. _unofficial Django screencast: http://www.throwingbeans.org/django_screencasts.html
 
 Installation questions
 ======================

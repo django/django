@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2005-12-29 00:04+0100\n"
+"POT-Creation-Date: 2006-01-12 23:11+0100\n"
 "PO-Revision-Date: 2005-10-08 00:03+0200\n"
 "Last-Translator: Georg Bauer <gb@bofh.ms>\n"
 "MIME-Version: 1.0\n"
@@ -586,6 +586,15 @@ msgstr "XML Text"
 #: contrib/admin/templates/admin/base.html:23
 #: contrib/admin/templates/admin/delete_confirmation.html:3
 #: contrib/admin/templates/admin/change_form.html:9
+#: contrib/admin/templates/admin_doc/bookmarklets.html:3
+msgid "Documentation"
+msgstr "Dokumentation"
+
+#: contrib/admin/templates/admin/object_history.html:3
+#: contrib/admin/templates/admin/change_list.html:4
+#: contrib/admin/templates/admin/base.html:23
+#: contrib/admin/templates/admin/delete_confirmation.html:3
+#: contrib/admin/templates/admin/change_form.html:9
 #: contrib/admin/templates/admin_doc/bookmarklets.html:4
 #: contrib/admin/templates/admin_doc/view_detail.html:4
 #: contrib/admin/templates/admin_doc/template_tag_index.html:5
@@ -774,7 +783,7 @@ msgstr "Ja, ich bin sicher"
 msgid " By %(title)s "
 msgstr " Nach %(title)s "
 
-#: contrib/admin/templates/admin/search_form.html:7
+#: contrib/admin/templates/admin/search_form.html:8
 msgid "Go"
 msgstr "Los"
 
@@ -931,10 +940,6 @@ msgstr "Vielen Dank, das Sie unsere Seiten benutzen!"
 #, python-format
 msgid "The %(site_name)s team"
 msgstr "Das Team von %(site_name)s"
-
-#: contrib/admin/templates/admin_doc/bookmarklets.html:3
-msgid "Documentation"
-msgstr "Dokumentation"
 
 #: contrib/admin/templates/admin_doc/bookmarklets.html:3
 msgid "Bookmarklets"
@@ -1454,38 +1459,42 @@ msgid "Japanese"
 msgstr "Japanisch"
 
 #: conf/global_settings.py:49
+msgid "Dutch"
+msgstr "Holländisch"
+
+#: conf/global_settings.py:50
 msgid "Norwegian"
 msgstr "Norwegisch"
 
-#: conf/global_settings.py:50
+#: conf/global_settings.py:51
 msgid "Brazilian"
 msgstr "Brasilianisch"
 
-#: conf/global_settings.py:51
+#: conf/global_settings.py:52
 msgid "Romanian"
 msgstr "Rumänisch"
 
-#: conf/global_settings.py:52
+#: conf/global_settings.py:53
 msgid "Russian"
 msgstr "Russisch"
 
-#: conf/global_settings.py:53
+#: conf/global_settings.py:54
 msgid "Slovak"
 msgstr "Slowakisch"
 
-#: conf/global_settings.py:54
+#: conf/global_settings.py:55
 msgid "Serbian"
 msgstr "Serbisch"
 
-#: conf/global_settings.py:55
+#: conf/global_settings.py:56
 msgid "Swedish"
 msgstr "Schwedisch"
 
-#: conf/global_settings.py:56
+#: conf/global_settings.py:57
 msgid "Simplified Chinese"
 msgstr "Vereinfachtes Chinesisch"
 
-#: conf/global_settings.py:57
+#: conf/global_settings.py:58
 msgid "Traditional Chinese"
 msgstr "Traditionelles Chinesisch"
 
@@ -1842,7 +1851,7 @@ msgstr[0] ""
 msgstr[1] ""
 "Bitte gültige IDs für %(self)s eingeben. Die Werte %(value)r sind ungültig."
 
-#: core/template/defaultfilters.py:371
+#: core/template/defaultfilters.py:379
 msgid "yes,no,maybe"
 msgstr "Ja,Nein,Vielleicht"
 

@@ -100,7 +100,7 @@ def javascript_quote(s):
         return r"\u%04x" % ord(match.group(1))
 
     if type(s) == str:
-        s = s.decode(DEFAULT_ENCODING)
+        s = s.decode(DEFAULT_CHARSET)
     elif type(s) != unicode:
         raise TypeError, s
     s = s.replace('\\', '\\\\')

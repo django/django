@@ -97,7 +97,7 @@ view has a number of problems:
       because that field is required. Ugly.
 
     * Even if you *do* perform validation, there's still no way to give that
-      information to the user is any sort of useful way.
+      information to the user in any sort of useful way.
 
     * You'll have to separately create a form (and view) that submits to this
       page, which is a pain and is redundant.

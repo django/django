@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2005-12-29 00:05+0100\n"
+"POT-Creation-Date: 2006-01-12 23:12+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: Espen Grndhaug <espen@grindhaug.org>\n"
 "Language-Team: Norwegian\n"
@@ -591,6 +591,15 @@ msgstr "XML tekst"
 #: contrib/admin/templates/admin/base.html:23
 #: contrib/admin/templates/admin/delete_confirmation.html:3
 #: contrib/admin/templates/admin/change_form.html:9
+#: contrib/admin/templates/admin_doc/bookmarklets.html:3
+msgid "Documentation"
+msgstr "Dokumentasjon"
+
+#: contrib/admin/templates/admin/object_history.html:3
+#: contrib/admin/templates/admin/change_list.html:4
+#: contrib/admin/templates/admin/base.html:23
+#: contrib/admin/templates/admin/delete_confirmation.html:3
+#: contrib/admin/templates/admin/change_form.html:9
 #: contrib/admin/templates/admin_doc/bookmarklets.html:4
 #: contrib/admin/templates/admin_doc/view_detail.html:4
 #: contrib/admin/templates/admin_doc/template_tag_index.html:5
@@ -776,7 +785,7 @@ msgstr "Ja, jeg er sikker"
 msgid " By %(title)s "
 msgstr "Av %(title)s "
 
-#: contrib/admin/templates/admin/search_form.html:7
+#: contrib/admin/templates/admin/search_form.html:8
 msgid "Go"
 msgstr ""
 
@@ -933,10 +942,6 @@ msgstr "Takk for at du bruker vår side!"
 #, python-format
 msgid "The %(site_name)s team"
 msgstr "Hilsen %(site_name)s"
-
-#: contrib/admin/templates/admin_doc/bookmarklets.html:3
-msgid "Documentation"
-msgstr "Dokumentasjon"
 
 #: contrib/admin/templates/admin_doc/bookmarklets.html:3
 msgid "Bookmarklets"
@@ -1450,38 +1455,42 @@ msgid "Japanese"
 msgstr ""
 
 #: conf/global_settings.py:49
+msgid "Dutch"
+msgstr ""
+
+#: conf/global_settings.py:50
 msgid "Norwegian"
 msgstr "Norsk"
 
-#: conf/global_settings.py:50
+#: conf/global_settings.py:51
 msgid "Brazilian"
 msgstr "Brasiliansk"
 
-#: conf/global_settings.py:51
+#: conf/global_settings.py:52
 msgid "Romanian"
 msgstr "Romansk"
 
-#: conf/global_settings.py:52
+#: conf/global_settings.py:53
 msgid "Russian"
 msgstr "Russisk"
 
-#: conf/global_settings.py:53
+#: conf/global_settings.py:54
 msgid "Slovak"
 msgstr "Slovakisk"
 
-#: conf/global_settings.py:54
+#: conf/global_settings.py:55
 msgid "Serbian"
 msgstr "Serbisk"
 
-#: conf/global_settings.py:55
+#: conf/global_settings.py:56
 msgid "Swedish"
 msgstr "Svensk"
 
-#: conf/global_settings.py:56
+#: conf/global_settings.py:57
 msgid "Simplified Chinese"
 msgstr "Simplifisert Kinesisk"
 
-#: conf/global_settings.py:57
+#: conf/global_settings.py:58
 msgid "Traditional Chinese"
 msgstr ""
 
@@ -1828,7 +1837,7 @@ msgid_plural ""
 msgstr[0] ""
 msgstr[1] ""
 
-#: core/template/defaultfilters.py:371
+#: core/template/defaultfilters.py:379
 msgid "yes,no,maybe"
 msgstr ""
 

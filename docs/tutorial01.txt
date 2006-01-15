@@ -76,6 +76,11 @@ command line::
     Go to http://127.0.0.1:8000/ for Django.
     Quit the server with CONTROL-C (Unix) or CTRL-BREAK (Windows).
 
+(If you get an error about ``DATABASE_ENGINE``, edit your ``settings.py`` file
+to change the ``DATABASE_ENGINE`` setting to point to the correct database, and
+make sure you have the right database libraries installed -- such as PostgreSQL's
+psycopg or MySQL's MySQLdb.)
+
 You've started the Django development server, a lightweight, pure-Python Web
 server that builds on the BaseHTTPServer included in Python's standard library.
 We've included this with Django so you can develop things rapidly, without
