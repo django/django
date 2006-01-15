@@ -5,7 +5,7 @@ from django import template
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import models
 from django.utils import dateformat
-from django.utils.html import strip_tags, escape
+from django.utils.html import escape
 from django.utils.text import capfirst
 from django.utils.translation import get_date_formats
 from django.conf.settings import ADMIN_MEDIA_PREFIX
@@ -123,7 +123,7 @@ def items_for_result(cl, result):
                 # Strip HTML tags in the resulting text, except if the
                 # function has an "allow_tags" attribute set to True.
                 if not getattr(func, 'allow_tags', False):
-                    result_repr = strip_tags(result_repr)
+                    result_repr = escape(result_repr)
         else:
             field_val = getattr(result, f.attname)
 
@@ -164,7 +164,7 @@ def items_for_result(cl, result):
             elif f.choices:
                 result_repr = dict(f.choices).get(field_val, EMPTY_CHANGELIST_VALUE)
             else:
-                result_repr = strip_tags(str(field_val))
+                result_repr = escape(str(field_val))
         if result_repr == '':
                 result_repr = '&nbsp;'
         if first: # First column is a special case
