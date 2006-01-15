@@ -800,6 +800,8 @@ def get_validation_errors(outfile):
                         for c in f.choices:
                             if not type(c) in (tuple, list) or len(c) != 2:
                                 e.add(opts, '"%s" field: "choices" should be a sequence of two-tuples.' % f.name)
+                if f.db_index not in (None, True, False):
+                    e.add(opts, '"%s" field: "db_index" should be either None, True or False.' % f.name)
 
             # Check for multiple ManyToManyFields to the same object, and
             # verify "singular" is set in that case.

@@ -316,6 +316,11 @@ TEMPLATE_TESTS = {
 
     ### I18N ##################################################################
 
+    # {% spaceless %} tag
+    'spaceless01': ("{% spaceless %} <b> <i> text </i> </b> {% endspaceless %}", {}, "<b><i> text </i></b>"),
+    'spaceless02': ("{% spaceless %} <b> \n <i> text </i> \n </b> {% endspaceless %}", {}, "<b><i> text </i></b>"),
+    'spaceless03': ("{% spaceless %}<b><i>text</i></b>{% endspaceless %}", {}, "<b><i>text</i></b>"),
+
     # simple translation of a string delimited by '
     'i18n01': ("{% load i18n %}{% trans 'xxxyyyxxx' %}", {}, "xxxyyyxxx"),
 

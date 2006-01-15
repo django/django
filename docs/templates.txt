@@ -663,6 +663,34 @@ i.e.::
 
     {% regroup people|dictsort:"gender" by gender as grouped %}
 
+spaceless
+~~~~~~~~~
+
+**New in Django development version.**
+
+Strips whitespace between HTML tags. This includes tab characters and newlines.
+
+Example usage::
+
+    {% spaceless %}
+        <p>
+            <a href="foo/">Foo</a>
+        </p>
+    {% spaceless %}
+
+This example would return this HTML::
+
+    <p><a href="foo/">Foo</a></p>
+
+Only space between *tags* is stripped -- not space between tags and text. In
+this example, the space around ``Hello`` won't be stripped::
+
+    {% spaceless %}
+        <strong>
+            Hello
+        </strong>
+    {% spaceless %}
+
 ssi
 ~~~
 
