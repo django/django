@@ -69,12 +69,13 @@ class SessionMiddleware:
         try:
             modified = request.session.modified
         except AttributeError:
-            modified = False
-        if modified or SESSION_SAVE_EVERY_REQUEST:
-            session_key = request.session.session_key or Session.objects.get_new_session_key()
-            new_session = Session.objects.save(session_key, request.session._session,
-                datetime.datetime.now() + datetime.timedelta(seconds=SESSION_COOKIE_AGE))
-            expires = datetime.datetime.strftime(datetime.datetime.utcnow() + datetime.timedelta(seconds=SESSION_COOKIE_AGE), "%a, %d-%b-%Y %H:%M:%S GMT")
-            response.set_cookie(SESSION_COOKIE_NAME, session_key,
-                max_age=SESSION_COOKIE_AGE, expires=expires, domain=SESSION_COOKIE_DOMAIN)
+            pass
+        else:
+            if modified or SESSION_SAVE_EVERY_REQUEST:
+                session_key = request.session.session_key or Session.objects.get_new_session_key()
+                new_session = Session.objects.save(session_key, request.session._session,
+                    datetime.datetime.now() + datetime.timedelta(seconds=SESSION_COOKIE_AGE))
+                expires = datetime.datetime.strftime(datetime.datetime.utcnow() + datetime.timedelta(seconds=SESSION_COOKIE_AGE), "%a, %d-%b-%Y %H:%M:%S GMT")
+                response.set_cookie(SESSION_COOKIE_NAME, session_key,
+                    max_age=SESSION_COOKIE_AGE, expires=expires, domain=SESSION_COOKIE_DOMAIN)
         return response
