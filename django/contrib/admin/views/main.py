@@ -541,6 +541,7 @@ def change_stage(request, app_label, module_name, object_id):
     })
 
     return render_change_form(opts,manipulator, app_label, c, change=True)
+change_stage = staff_member_required(change_stage)
 
 def _nest_help(obj, depth, val):
     current = obj
