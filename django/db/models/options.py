@@ -50,7 +50,7 @@ class Options:
     def contribute_to_class(self, cls, name):
         cls._meta = self
         self.object_name = cls.__name__
-        self.module_name = get_module_name(self.object_name )
+        self.module_name = get_module_name(self.object_name)
         # If the verbose_name wasn't given, use the class name,
         # converted from "InitialCaps" to "lowercase with spaces".
         self.verbose_name = get_verbose_name(self.object_name)
@@ -89,7 +89,7 @@ class Options:
                 self.pk = field
 
     def __repr__(self):
-        return '<Options for %s>' % self.module_name
+        return '<Options for %s>' % self.object_name
 
     def get_content_type_id(self):
         "Returns the content-type ID for this object type."
@@ -101,9 +101,7 @@ class Options:
         return self._content_type_id
 
     def get_field(self, name, many_to_many=True):
-        """
-        Returns the requested field by name. Raises FieldDoesNotExist on error.
-        """
+        "Returns the requested field by name. Raises FieldDoesNotExist on error."
         to_search = many_to_many and (self.fields + self.many_to_many) or self.fields
         for f in to_search:
             if f.name == name:
