@@ -209,8 +209,8 @@ def get_language():
         except AttributeError:
             pass
     # If we don't have a real translation object, assume it's the default language.
-    from django.conf.settings import LANGUAGE_CODE
-    return LANGUAGE_CODE
+    from django.conf import settings
+    return settings.LANGUAGE_CODE
 
 def catalog():
     """
@@ -346,16 +346,16 @@ def get_date_formats():
     technical message ID to store date and time formats. If it doesn't contain
     one, the formats provided in the settings will be used.
     """
-    from django.conf.settings import DATE_FORMAT, DATETIME_FORMAT, TIME_FORMAT
+    from django.conf import settings
     date_format = _('DATE_FORMAT')
     datetime_format = _('DATETIME_FORMAT')
     time_format = _('TIME_FORMAT')
     if date_format == 'DATE_FORMAT':
-        date_format = DATE_FORMAT
+        date_format = settings.DATE_FORMAT
     if datetime_format == 'DATETIME_FORMAT':
-        datetime_format = DATETIME_FORMAT
+        datetime_format = settings.DATETIME_FORMAT
     if time_format == 'TIME_FORMAT':
-        time_format = TIME_FORMAT
+        time_format = settings.TIME_FORMAT
     return (date_format, datetime_format, time_format)
 
 def install():

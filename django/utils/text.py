@@ -1,6 +1,6 @@
 import re
 
-from django.conf.settings import DEFAULT_CHARSET
+from django.conf import settings
 
 # Capitalizes the first letter of a string.
 capfirst = lambda x: x and x[0].upper() + x[1:]
@@ -100,7 +100,7 @@ def javascript_quote(s):
         return r"\u%04x" % ord(match.group(1))
 
     if type(s) == str:
-        s = s.decode(DEFAULT_CHARSET)
+        s = s.decode(settings.DEFAULT_CHARSET)
     elif type(s) != unicode:
         raise TypeError, s
     s = s.replace('\\', '\\\\')
