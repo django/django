@@ -8,7 +8,7 @@ from django.utils import dateformat
 from django.utils.html import escape
 from django.utils.text import capfirst
 from django.utils.translation import get_date_formats
-from django.conf.settings import ADMIN_MEDIA_PREFIX
+from django.conf import settings
 from django.template import Library
 
 register = Library()
@@ -148,7 +148,7 @@ def items_for_result(cl, result):
             # Booleans are special: We use images.
             elif isinstance(f, models.BooleanField) or isinstance(f, models.NullBooleanField):
                 BOOLEAN_MAPPING = {True: 'yes', False: 'no', None: 'unknown'}
-                result_repr = '<img src="%simg/admin/icon-%s.gif" alt="%s" />' % (ADMIN_MEDIA_PREFIX, BOOLEAN_MAPPING[field_val], field_val)
+                result_repr = '<img src="%simg/admin/icon-%s.gif" alt="%s" />' % (settings.ADMIN_MEDIA_PREFIX, BOOLEAN_MAPPING[field_val], field_val)
             # ImageFields are special: Use a thumbnail.
             elif isinstance(f, models.ImageField):
                 from django.parts.media.photos import get_thumbnail_url

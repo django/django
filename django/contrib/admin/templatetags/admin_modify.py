@@ -8,7 +8,7 @@ from django.db.models.fields import BoundField, Field
 from django.db.models.related import BoundRelatedObject
 from django.db.models import TABULAR, STACKED
 from django.db import models
-from django.conf.settings import ADMIN_MEDIA_PREFIX
+from django.conf import settings
 import re
 
 register = template.Library()
@@ -20,7 +20,7 @@ def class_name_to_underscored(name):
 
 #@register.simple_tag
 def include_admin_script(script_path):
-    return '<script type="text/javascript" src="%s%s"></script>' % (ADMIN_MEDIA_PREFIX, script_path)
+    return '<script type="text/javascript" src="%s%s"></script>' % (settings.ADMIN_MEDIA_PREFIX, script_path)
 include_admin_script = register.simple_tag(include_admin_script)
 
 #@register.inclusion_tag('admin/submit_line', takes_context=True)
@@ -205,7 +205,7 @@ def filter_interface_script_maybe(bound_field):
     if f.rel and isinstance(f.rel, models.ManyToMany) and f.rel.filter_interface:
        return '<script type="text/javascript">addEvent(window, "load", function(e) {' \
               ' SelectFilter.init("id_%s", "%s", %s, "%s"); });</script>\n' % (
-              f.name, f.verbose_name, f.rel.filter_interface-1, ADMIN_MEDIA_PREFIX)
+              f.name, f.verbose_name, f.rel.filter_interface-1, settings.ADMIN_MEDIA_PREFIX)
     else:
         return ''
 filter_interface_script_maybe = register.simple_tag(filter_interface_script_maybe)

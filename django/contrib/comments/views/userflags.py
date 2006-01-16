@@ -4,7 +4,7 @@ from django.http import Http404
 from django.models.comments import comments, moderatordeletions, userflags
 from django.views.decorators.auth import login_required
 from django.http import HttpResponseRedirect
-from django.conf.settings import SITE_ID
+from django.conf import settings
 
 def flag(request, comment_id):
     """
@@ -16,7 +16,7 @@ def flag(request, comment_id):
             the flagged `comments.comments` object
     """
     try:
-        comment = comments.get_object(pk=comment_id, site__id__exact=SITE_ID)
+        comment = comments.get_object(pk=comment_id, site__id__exact=settings.SITE_ID)
     except comments.CommentDoesNotExist:
         raise Http404
     if request.POST:
@@ -27,7 +27,7 @@ flag = login_required(flag)
 
 def flag_done(request, comment_id):
     try:
-        comment = comments.get_object(pk=comment_id, site__id__exact=SITE_ID)
+        comment = comments.get_object(pk=comment_id, site__id__exact=settings.SITE_ID)
     except comments.CommentDoesNotExist:
         raise Http404
     return render_to_response('comments/flag_done', {'comment': comment}, context_instance=RequestContext(request))
@@ -42,7 +42,7 @@ def delete(request, comment_id):
             the flagged `comments.comments` object
     """
     try:
-        comment = comments.get_object(pk=comment_id, site__id__exact=SITE_ID)
+        comment = comments.get_object(pk=comment_id, site__id__exact=settings.SITE_ID)
     except comments.CommentDoesNotExist:
         raise Http404
     if not comments.user_is_moderator(request.user):
@@ -60,7 +60,7 @@ delete = login_required(delete)
 
 def delete_done(request, comment_id):
     try:
-        comment = comments.get_object(pk=comment_id, site__id__exact=SITE_ID)
+        comment = comments.get_object(pk=comment_id, site__id__exact=settings.SITE_ID)
     except comments.CommentDoesNotExist:
         raise Http404
     return render_to_response('comments/delete_done', {'comment': comment}, context_instance=RequestContext(request))

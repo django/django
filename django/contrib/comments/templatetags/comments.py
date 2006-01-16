@@ -123,13 +123,13 @@ class CommentCountNode(template.Node):
         self.var_name, self.free = var_name, free
 
     def render(self, context):
-        from django.conf.settings import SITE_ID
+        from django.conf import settings
         get_count_function = self.free and FreeComment.objects.get_count or Comment.objects.get_count
         if self.context_var_name is not None:
             self.obj_id = template.resolve_variable(self.context_var_name, context)
         comment_count = get_count_function(object_id__exact=self.obj_id,
             content_type__package__label__exact=self.package,
-            content_type__python_module_name__exact=self.module, site__id__exact=SITE_ID)
+            content_type__python_module_name__exact=self.module, site__id__exact=settings.SITE_ID)
         context[self.var_name] = comment_count
         return ''
 
@@ -142,7 +142,7 @@ class CommentListNode(template.Node):
         self.extra_kwargs = extra_kwargs or {}
 
     def render(self, context):
-        from django.conf.settings import COMMENTS_BANNED_USERS_GROUP, SITE_ID
+        from django.conf import settings
         get_list_function = self.free and FreeComment.objects.get_list or Comment.objects.get_list_with_karma
         if self.context_var_name is not None:
             try:
@@ -153,13 +153,13 @@ class CommentListNode(template.Node):
             'object_id__exact': self.obj_id,
             'content_type__package__label__exact': self.package,
             'content_type__python_module_name__exact': self.module,
-            'site__id__exact': SITE_ID,
+            'site__id__exact': settings.SITE_ID,
             'select_related': True,
             'order_by': (self.ordering + 'submit_date',),
         }
         kwargs.update(self.extra_kwargs)
-        if not self.free and COMMENTS_BANNED_USERS_GROUP:
-            kwargs['select'] = {'is_hidden': 'user_id IN (SELECT user_id FROM auth_users_groups WHERE group_id = %s)' % COMMENTS_BANNED_USERS_GROUP}
+        if not self.free and settings.COMMENTS_BANNED_USERS_GROUP:
+            kwargs['select'] = {'is_hidden': 'user_id IN (SELECT user_id FROM auth_users_groups WHERE group_id = %s)' % settings.COMMENTS_BANNED_USERS_GROUP}
         comment_list = get_list_function(**kwargs)
 
         if not self.free:
@@ -170,7 +170,7 @@ class CommentListNode(template.Node):
                 user_id = None
                 context['user_can_moderate_comments'] = False
             # Only display comments by banned users to those users themselves.
-            if COMMENTS_BANNED_USERS_GROUP:
+            if settings.COMMENTS_BANNED_USERS_GROUP:
                 comment_list = [c for c in comment_list if not c.is_hidden or (user_id == c.user_id)]
 
         context[self.var_name] = comment_list

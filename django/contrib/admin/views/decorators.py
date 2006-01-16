@@ -1,6 +1,6 @@
 from django.core.extensions import render_to_response
 from django.template import RequestContext
-from django.conf.settings import SECRET_KEY
+from django.conf import settings
 from django.contrib.auth.models import User, SESSION_KEY
 from django import http
 from django.utils.translation import gettext_lazy
@@ -29,13 +29,13 @@ def _display_login_form(request, error_message=''):
 
 def _encode_post_data(post_data):
     pickled = pickle.dumps(post_data)
-    pickled_md5 = md5.new(pickled + SECRET_KEY).hexdigest()
+    pickled_md5 = md5.new(pickled + settings.SECRET_KEY).hexdigest()
     return base64.encodestring(pickled + pickled_md5)
 
 def _decode_post_data(encoded_data):
     encoded_data = base64.decodestring(encoded_data)
     pickled, tamper_check = encoded_data[:-32], encoded_data[-32:]
-    if md5.new(pickled + SECRET_KEY).hexdigest() != tamper_check:
+    if md5.new(pickled + settings.SECRET_KEY).hexdigest() != tamper_check:
         from django.core.exceptions import SuspiciousOperation
         raise SuspiciousOperation, "User may have tampered with session cookie."
     return pickle.loads(pickled)

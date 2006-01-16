@@ -11,7 +11,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.parts.auth.formfields import AuthenticationForm
 from django.http import HttpResponseRedirect
 from django.utils.text import normalize_newlines
-from django.conf.settings import BANNED_IPS, COMMENTS_ALLOW_PROFANITIES, COMMENTS_SKETCHY_USERS_GROUP, COMMENTS_FIRST_FEW, SITE_ID
+from django.conf import settings
 from django.utils.translation import ngettext
 import base64, datetime
 
@@ -72,7 +72,7 @@ class PublicCommentManipulator(AuthenticationForm):
             self.user_cache = user
 
     def hasNoProfanities(self, field_data, all_data):
-        if COMMENTS_ALLOW_PROFANITIES:
+        if settings.COMMENTS_ALLOW_PROFANITIES:
             return
         return validators.hasNoProfanities(field_data, all_data)
 
@@ -85,7 +85,7 @@ class PublicCommentManipulator(AuthenticationForm):
             new_data.get("rating4", None), new_data.get("rating5", None),
             new_data.get("rating6", None), new_data.get("rating7", None),
             new_data.get("rating8", None), new_data.get("rating1", None) is not None,
-            datetime.datetime.now(), new_data["is_public"], new_data["ip_address"], False, SITE_ID)
+            datetime.datetime.now(), new_data["is_public"], new_data["ip_address"], False, settings.SITE_ID)
 
     def save(self, new_data):
         today = datetime.date.today()
@@ -108,12 +108,12 @@ class PublicCommentManipulator(AuthenticationForm):
         c.save()
         # If the commentor has posted fewer than COMMENTS_FIRST_FEW comments,
         # send the comment to the managers.
-        if self.user_cache.get_comments_comment_count() <= COMMENTS_FIRST_FEW:
+        if self.user_cache.get_comments_comment_count() <= settings.COMMENTS_FIRST_FEW:
             message = ngettext('This comment was posted by a user who has posted fewer than %(count)s comment:\n\n%(text)s',
                 'This comment was posted by a user who has posted fewer than %(count)s comments:\n\n%(text)s') % \
-                {'count': COMMENTS_FIRST_FEW, 'text': c.get_as_text()}
+                {'count': settings.COMMENTS_FIRST_FEW, 'text': c.get_as_text()}
             mail_managers("Comment posted by rookie user", message)
-        if COMMENTS_SKETCHY_USERS_GROUP and COMMENTS_SKETCHY_USERS_GROUP in [g.id for g in self.user_cache.get_group_list()]:
+        if settings.COMMENTS_SKETCHY_USERS_GROUP and settings.COMMENTS_SKETCHY_USERS_GROUP in [g.id for g in self.user_cache.get_group_list()]:
             message = _('This comment was posted by a sketchy user:\n\n%(text)s') % {'text': c.get_as_text()}
             mail_managers("Comment posted by sketchy user (%s)" % self.user_cache.username, c.get_as_text())
         return c
@@ -129,7 +129,7 @@ class PublicFreeCommentManipulator(forms.Manipulator):
         )
 
     def hasNoProfanities(self, field_data, all_data):
-        if COMMENTS_ALLOW_PROFANITIES:
+        if settings.COMMENTS_ALLOW_PROFANITIES:
             return
         return validators.hasNoProfanities(field_data, all_data)
 
@@ -138,7 +138,7 @@ class PublicFreeCommentManipulator(forms.Manipulator):
         return FreeComment(None, new_data["content_type_id"],
             new_data["object_id"], new_data["comment"].strip(),
             new_data["person_name"].strip(), datetime.datetime.now(), new_data["is_public"],
-            new_data["ip_address"], False, SITE_ID)
+            new_data["ip_address"], False, settings.SITE_ID)
 
     def save(self, new_data):
         today = datetime.date.today()
@@ -247,7 +247,7 @@ def post_comment(request):
     elif request.POST.has_key('post'):
         # If the IP is banned, mail the admins, do NOT save the comment, and
         # serve up the "Thanks for posting" page as if the comment WAS posted.
-        if request.META['REMOTE_ADDR'] in BANNED_IPS:
+        if request.META['REMOTE_ADDR'] in settings.BANNED_IPS:
             mail_admins("Banned IP attempted to post comment", str(request.POST) + "\n\n" + str(request.META))
         else:
             manipulator.do_html2python(new_data)
@@ -310,7 +310,7 @@ def post_free_comment(request):
     elif request.POST.has_key('post'):
         # If the IP is banned, mail the admins, do NOT save the comment, and
         # serve up the "Thanks for posting" page as if the comment WAS posted.
-        if request.META['REMOTE_ADDR'] in BANNED_IPS:
+        if request.META['REMOTE_ADDR'] in settings.BANNED_IPS:
             from django.core.mail import mail_admins
             mail_admins("Practical joker", str(request.POST) + "\n\n" + str(request.META))
         else:

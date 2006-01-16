@@ -3,6 +3,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.contrib.sites.models import Site
 from django.contrib.auth.models import User
 from django.utils.translation import gettext_lazy as _
+from django.conf import settings
 import datetime
 
 MIN_PHOTO_DIMENSION = 5
@@ -26,9 +27,8 @@ class CommentManager(models.Manager):
         'pa,ra') and target (something like 'lcom.eventtimes:5157'). Used to
         validate that submitted form options have not been tampered-with.
         """
-        from django.conf.settings import SECRET_KEY
         import md5
-        return md5.new(options + photo_options + rating_options + target + SECRET_KEY).hexdigest()
+        return md5.new(options + photo_options + rating_options + target + settings.SECRET_KEY).hexdigest()
 
     def get_rating_options(self, rating_string):
         """
@@ -53,11 +53,10 @@ class CommentManager(models.Manager):
         return self.get_list(**kwargs)
 
     def user_is_moderator(self, user):
-        from django.conf.settings import COMMENTS_MODERATORS_GROUP
         if user.is_superuser:
             return True
         for g in user.get_group_list():
-            if g.id == COMMENTS_MODERATORS_GROUP:
+            if g.id == settings.COMMENTS_MODERATORS_GROUP:
                 return True
         return False
 
