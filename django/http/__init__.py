@@ -143,8 +143,8 @@ class HttpResponse:
     "A basic HTTP response, with content and dictionary-accessed headers"
     def __init__(self, content='', mimetype=None):
         if not mimetype:
-            from django.conf.settings import DEFAULT_CONTENT_TYPE, DEFAULT_CHARSET
-            mimetype = "%s; charset=%s" % (DEFAULT_CONTENT_TYPE, DEFAULT_CHARSET)
+            from django.conf import settings
+            mimetype = "%s; charset=%s" % (settings.DEFAULT_CONTENT_TYPE, settings.DEFAULT_CHARSET)
         self.content = content
         self.headers = {'Content-Type':mimetype}
         self.cookies = SimpleCookie()
