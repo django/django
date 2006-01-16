@@ -1,6 +1,6 @@
 from django.contrib.redirects.models import Redirect
 from django import http
-from django.conf.settings import APPEND_SLASH, SITE_ID
+from django.conf import settings
 
 class RedirectFallbackMiddleware:
     def process_response(self, request, response):
@@ -8,13 +8,13 @@ class RedirectFallbackMiddleware:
             return response # No need to check for a redirect for non-404 responses.
         path = request.get_full_path()
         try:
-            r = Redirect.objects.get_object(site__id__exact=SITE_ID, old_path__exact=path)
+            r = Redirect.objects.get_object(site__id__exact=settings.SITE_ID, old_path__exact=path)
         except Redirect.DoesNotExist:
             r = None
-        if r is None and APPEND_SLASH:
+        if r is None and settings.APPEND_SLASH:
             # Try removing the trailing slash.
             try:
-                r = Redirect.objects.get_object(site__id__exact=SITE_ID,
+                r = Redirect.objects.get_object(site__id__exact=settings.SITE_ID,
                     old_path__exact=path[:path.rfind('/')]+path[path.rfind('/')+1:])
             except Redirect.DoesNotExist:
                 pass
