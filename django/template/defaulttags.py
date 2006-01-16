@@ -744,7 +744,7 @@ def spaceless(parser, token):
             <p>
                 <a href="foo/">Foo</a>
             </p>
-        {% spaceless %}
+        {% endspaceless %}
 
     This example would return this HTML::
 
@@ -757,7 +757,7 @@ def spaceless(parser, token):
             <strong>
                 Hello
             </strong>
-        {% spaceless %}
+        {% endspaceless %}
     """
     nodelist = parser.parse(('endspaceless',))
     parser.delete_first_token()

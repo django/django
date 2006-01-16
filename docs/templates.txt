@@ -677,7 +677,7 @@ Example usage::
         <p>
             <a href="foo/">Foo</a>
         </p>
-    {% spaceless %}
+    {% endspaceless %}
 
 This example would return this HTML::
 
@@ -690,7 +690,7 @@ this example, the space around ``Hello`` won't be stripped::
         <strong>
             Hello
         </strong>
-    {% spaceless %}
+    {% endspaceless %}
 
 ssi
 ~~~
