@@ -213,7 +213,6 @@ class Options:
                 self._field_types[field_type] = False
         return self._field_types[field_type]
 
-
 class AdminOptions:
     def __init__(self, fields=None, js=None, list_display=None, list_filter=None, date_hierarchy=None,
         save_as=False, ordering=None, search_fields=None, save_on_top=False, list_select_related=False):
