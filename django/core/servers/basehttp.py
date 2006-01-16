@@ -532,8 +532,8 @@ class WSGIRequestHandler(BaseHTTPRequestHandler):
     server_version = "WSGIServer/" + __version__
 
     def __init__(self, *args, **kwargs):
-        from django.conf.settings import ADMIN_MEDIA_PREFIX
-        self.admin_media_prefix = ADMIN_MEDIA_PREFIX
+        from django.conf import settings
+        self.admin_media_prefix = settings.ADMIN_MEDIA_PREFIX
         BaseHTTPRequestHandler.__init__(self, *args, **kwargs)
 
     def get_environ(self):
