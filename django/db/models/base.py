@@ -20,8 +20,6 @@ import os
 if not hasattr(__builtins__, 'set'):
     from sets import Set as set
 
-attribute_transforms = {'Admin': lambda cls: AdminOptions(**dict([(k,v) for (k,v) in cls.__dict__.items() if not k.startswith('_')]))}
-
 class ModelBase(type):
     "Metaclass for all models"
     def __new__(cls, name, bases, attrs):
@@ -109,9 +107,8 @@ class Model(object):
         dispatcher.send(signal=signals.post_init, sender=self.__class__, instance=self)
 
     def add_to_class(cls, name, attribute):
-        transform = attribute_transforms.get(name, None)
-        if transform:
-            attribute = transform(attribute)
+        if name == 'Admin':
+            attribute = AdminOptions(**dict([(k, v) for k, v in attribute.__dict__.items() if not k.startswith('_')]))
         if hasattr(attribute, 'contribute_to_class'):
             attribute.contribute_to_class(cls, name)
         else:
