@@ -1,7 +1,7 @@
 "Default variable filters"
 
 from django.template import resolve_variable, Library
-from django.conf.settings import DATE_FORMAT, TIME_FORMAT
+from django.conf import settings
 from django.utils.translation import gettext
 import re
 import random as random_module
@@ -327,12 +327,12 @@ def get_digit(value, arg):
 # DATES           #
 ###################
 
-def date(value, arg=DATE_FORMAT):
+def date(value, arg=settings.DATE_FORMAT):
     "Formats a date according to the given format"
     from django.utils.dateformat import format
     return format(value, arg)
 
-def time(value, arg=TIME_FORMAT):
+def time(value, arg=settings.TIME_FORMAT):
     "Formats a time according to the given format"
     from django.utils.dateformat import time_format
     return time_format(value, arg)

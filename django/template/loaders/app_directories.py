@@ -1,13 +1,13 @@
 # Wrapper for loading templates from "template" directories in installed app packages.
 
-from django.conf.settings import INSTALLED_APPS, TEMPLATE_FILE_EXTENSION
+from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.template import TemplateDoesNotExist
 import os
 
 # At compile time, cache the directories to search.
 app_template_dirs = []
-for app in INSTALLED_APPS:
+for app in settings.INSTALLED_APPS:
     i = app.rfind('.')
     if i == -1:
         m, a = app, None
@@ -29,7 +29,7 @@ app_template_dirs = tuple(app_template_dirs)
 
 def get_template_sources(template_name, template_dirs=None):
     for template_dir in app_template_dirs:
-        yield os.path.join(template_dir, template_name) + TEMPLATE_FILE_EXTENSION
+        yield os.path.join(template_dir, template_name) + settings.TEMPLATE_FILE_EXTENSION
 
 def load_template_source(template_name, template_dirs=None):
     for filepath in get_template_sources(template_name, template_dirs):

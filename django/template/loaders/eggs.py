@@ -6,7 +6,7 @@ except ImportError:
     resource_string = None
 
 from django.template import TemplateDoesNotExist
-from django.conf.settings import INSTALLED_APPS, TEMPLATE_FILE_EXTENSION
+from django.conf import settings
 
 def load_template_source(template_name, template_dirs=None):
     """
@@ -15,8 +15,8 @@ def load_template_source(template_name, template_dirs=None):
     For every installed app, it tries to get the resource (app, template_name).
     """
     if resource_string is not None:
-        pkg_name = 'templates/' + template_name + TEMPLATE_FILE_EXTENSION
-        for app in INSTALLED_APPS:
+        pkg_name = 'templates/' + template_name + settings.TEMPLATE_FILE_EXTENSION
+        for app in settings.INSTALLED_APPS:
             try:
                 return (resource_string(app, pkg_name), 'egg:%s:%s ' % (app, pkg_name))
             except:

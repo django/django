@@ -22,11 +22,11 @@
 
 from django.core.exceptions import ImproperlyConfigured
 from django.template import Origin, StringOrigin, Template, Context, TemplateDoesNotExist, add_to_builtins
-from django.conf.settings import TEMPLATE_LOADERS
+from django.conf import settings
 from django.conf import settings
 
 template_source_loaders = []
-for path in TEMPLATE_LOADERS:
+for path in settings.TEMPLATE_LOADERS:
     i = path.rfind('.')
     module, attr = path[:i], path[i+1:]
     try:

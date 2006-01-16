@@ -1,4 +1,4 @@
-from django.conf.settings import TEMPLATE_CONTEXT_PROCESSORS
+from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 
 _standard_context_processors = None
@@ -61,7 +61,7 @@ def get_standard_processors():
     global _standard_context_processors
     if _standard_context_processors is None:
         processors = []
-        for path in TEMPLATE_CONTEXT_PROCESSORS:
+        for path in settings.TEMPLATE_CONTEXT_PROCESSORS:
             i = path.rfind('.')
             module, attr = path[:i], path[i+1:]
             try:

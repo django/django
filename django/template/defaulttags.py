@@ -3,6 +3,7 @@
 from django.template import Node, NodeList, Template, Context, resolve_variable
 from django.template import TemplateSyntaxError, VariableDoesNotExist, BLOCK_TAG_START, BLOCK_TAG_END, VARIABLE_TAG_START, VARIABLE_TAG_END
 from django.template import get_library, Library, InvalidTemplateLibrary
+from django.conf import settings
 import sys
 
 register = Library()
@@ -201,8 +202,7 @@ class RegroupNode(Node):
         return ''
 
 def include_is_allowed(filepath):
-    from django.conf.settings import ALLOWED_INCLUDE_ROOTS
-    for root in ALLOWED_INCLUDE_ROOTS:
+    for root in settings.ALLOWED_INCLUDE_ROOTS:
         if filepath.startswith(root):
             return True
     return False
@@ -212,9 +212,8 @@ class SsiNode(Node):
         self.filepath, self.parsed = filepath, parsed
 
     def render(self, context):
-        from django.conf.settings import DEBUG
         if not include_is_allowed(self.filepath):
-            if DEBUG:
+            if settings.DEBUG:
                 return "[Didn't have permission to include file]"
             else:
                 return '' # Fail silently for invalid includes.
@@ -229,7 +228,7 @@ class SsiNode(Node):
                 t = Template(output)
                 return t.render(context)
             except TemplateSyntaxError, e:
-                if DEBUG:
+                if settings.DEBUG:
                     return "[Included template had syntax error: %s]" % e
                 else:
                     return '' # Fail silently for invalid included templates.

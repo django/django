@@ -57,7 +57,7 @@ times with multiple contexts)
 import re
 from inspect import getargspec
 from django.utils.functional import curry
-from django.conf.settings import DEFAULT_CHARSET
+from django.conf import settings
 from django.conf import settings
 from django.template.context import Context, RequestContext
 
@@ -714,7 +714,7 @@ class VariableNode(Node):
         if not isinstance(output, basestring):
             return str(output)
         elif isinstance(output, unicode):
-            return output.encode(DEFAULT_CHARSET)
+            return output.encode(settings.DEFAULT_CHARSET)
         else:
             return output
 
