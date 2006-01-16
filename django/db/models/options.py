@@ -15,7 +15,7 @@ get_verbose_name = lambda class_name: re.sub('([A-Z])', ' \\1', class_name).lowe
 
 DEFAULT_NAMES = ('module_name', 'verbose_name', 'verbose_name_plural', 'db_table', 'ordering',
                   'unique_together', 'admin','where_constraints', 'exceptions', 'permissions',
-                  'get_latest_by','order_with_respect_to', 'module_constants')
+                  'get_latest_by', 'order_with_respect_to', 'module_constants')
 
 class Options:
     def __init__(self, meta):
@@ -33,7 +33,6 @@ class Options:
         self.order_with_respect_to = None
         self.module_constants = {}
         self.admin = None
-
         self.meta = meta
         self.pk = None
         self.has_auto_field = False
@@ -91,9 +90,6 @@ class Options:
 
     def __repr__(self):
         return '<Options for %s>' % self.module_name
-
-   # def get_model_module(self):
-   #     return get_module(self.app_label, self.module_name)
 
     def get_content_type_id(self):
         "Returns the content-type ID for this object type."

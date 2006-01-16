@@ -281,7 +281,7 @@ def lookup_inner(path, clause, value, opts, table, column):
             join_column = new_opts.object_name.lower() + '_id'
             intermediate_table = field.get_m2m_db_table(current_opts)
 
-            raise FieldFound()
+            raise FieldFound
 
         # Does the name belong to a reverse defined many-to-many field?
         field = find_field(name, current_opts.get_all_related_many_to_many_objects())
@@ -297,7 +297,7 @@ def lookup_inner(path, clause, value, opts, table, column):
             join_column = new_opts.object_name.lower() + '_id'
             intermediate_table = field.field.get_m2m_db_table(new_opts)
 
-            raise FieldFound()
+            raise FieldFound
 
         # Does the name belong to a one-to-many field?
         field = find_field(name, opts.get_all_related_objects())
@@ -310,7 +310,7 @@ def lookup_inner(path, clause, value, opts, table, column):
             # 1-N fields MUST be joined, regardless of any other conditions.
             join_required = True
 
-            raise FieldFound()
+            raise FieldFound
 
         # Does the name belong to a one-to-one, many-to-one, or regular field?
         field = find_field(name, current_opts.fields)
@@ -321,7 +321,7 @@ def lookup_inner(path, clause, value, opts, table, column):
                 new_column = new_opts.pk.column
                 join_column = field.column
 
-            raise FieldFound()
+            raise FieldFound
 
     except FieldFound: # Match found, loop has been shortcut.
         pass

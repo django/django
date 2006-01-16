@@ -23,7 +23,7 @@ def add_model_module(mod, modules):
     if hasattr(mod, '_MODELS'):
         modules.append(mod)
     for name in getattr(mod, '__all__', []):
-        submod = __import__("%s.%s" % ( mod.__name__, name),'','',[''])
+        submod = __import__("%s.%s" % (mod.__name__, name), '', '', [''])
         add_model_module(submod, modules)
 
 def get_installed_model_modules(core_models=None):

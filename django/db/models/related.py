@@ -1,12 +1,11 @@
 from django.db.models.manipulators import ManipulatorCollection
 
 class RelatedManipulatorCollection(ManipulatorCollection):
-    def __init__(self,related, parent_name_parts , instance, follow):
-        name_parts = parent_name_parts + (related.var_name, )
+    def __init__(self, related, parent_name_parts, instance, follow):
+        name_parts = parent_name_parts + (related.var_name,)
         self.instance = instance
         self.related = related
-        super(RelatedManipulatorCollection, self).__init__(
-            related.model,follow,name_parts)
+        super(RelatedManipulatorCollection, self).__init__(related.model, follow, name_parts)
 
     def _save_child(self, manip, parent_key):
         setattr(manip.original_object, self.related.field.attname, parent_key)

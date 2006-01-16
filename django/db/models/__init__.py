@@ -1,28 +1,20 @@
 from django.conf import settings
+from django.core.exceptions import ObjectDoesNotExist, ImproperlyConfigured
 from django.core import validators
-
 from django.db import backend, connection
-
-from django.utils.functional import curry
-from django.utils.text import capfirst
-
 from django.db.models.loading import get_installed_models, get_installed_model_modules
 from django.db.models.query import Q
 from django.db.models.manager import Manager
 from django.db.models.base import Model, AdminOptions
-
 from django.db.models.fields import *
 from django.db.models.fields.related import *
-
-from django.core.exceptions import ObjectDoesNotExist, ImproperlyConfigured
 from django.db.models.exceptions import FieldDoesNotExist, BadKeywordArguments
 from django.db.models import signals
+from django.utils.functional import curry
+from django.utils.text import capfirst
 
 # Admin stages.
 ADD, CHANGE, BOTH = 1, 2, 3
-
-#def get_module(app_label, module_name):
-#    return __import__('%s.%s.%s' % (MODEL_PREFIX, app_label, module_name), '', '', [''])
 
 def get_models(app):
     models = []
