@@ -1,4 +1,4 @@
-from django.conf.settings import SESSION_COOKIE_NAME, SESSION_COOKIE_AGE, SESSION_COOKIE_DOMAIN, SESSION_SAVE_EVERY_REQUEST
+from django.conf import settings
 from django.contrib.sessions.models import Session
 from django.utils.cache import patch_vary_headers
 import datetime
@@ -60,7 +60,7 @@ class SessionWrapper(object):
 
 class SessionMiddleware:
     def process_request(self, request):
-        request.session = SessionWrapper(request.COOKIES.get(SESSION_COOKIE_NAME, None))
+        request.session = SessionWrapper(request.COOKIES.get(settings.SESSION_COOKIE_NAME, None))
 
     def process_response(self, request, response):
         # If request.session was modified, or if response.session was set, save
@@ -71,11 +71,11 @@ class SessionMiddleware:
         except AttributeError:
             pass
         else:
-            if modified or SESSION_SAVE_EVERY_REQUEST:
+            if modified or settings.SESSION_SAVE_EVERY_REQUEST:
                 session_key = request.session.session_key or Session.objects.get_new_session_key()
                 new_session = Session.objects.save(session_key, request.session._session,
-                    datetime.datetime.now() + datetime.timedelta(seconds=SESSION_COOKIE_AGE))
-                expires = datetime.datetime.strftime(datetime.datetime.utcnow() + datetime.timedelta(seconds=SESSION_COOKIE_AGE), "%a, %d-%b-%Y %H:%M:%S GMT")
-                response.set_cookie(SESSION_COOKIE_NAME, session_key,
-                    max_age=SESSION_COOKIE_AGE, expires=expires, domain=SESSION_COOKIE_DOMAIN)
+                    datetime.datetime.now() + datetime.timedelta(seconds=settings.SESSION_COOKIE_AGE))
+                expires = datetime.datetime.strftime(datetime.datetime.utcnow() + datetime.timedelta(seconds=settings.SESSION_COOKIE_AGE), "%a, %d-%b-%Y %H:%M:%S GMT")
+                response.set_cookie(settings.SESSION_COOKIE_NAME, session_key,
+                    max_age=settings.SESSION_COOKIE_AGE, expires=expires, domain=settings.SESSION_COOKIE_DOMAIN)
         return response
