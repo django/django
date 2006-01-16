@@ -51,7 +51,7 @@ class BaseHandler:
         "Returns an HttpResponse object for the given HttpRequest"
         from django.core import exceptions, urlresolvers
         from django.core.mail import mail_admins
-        from django.conf.settings import DEBUG, INTERNAL_IPS, ROOT_URLCONF
+        from django.conf import settings
 
         # Apply request middleware
         for middleware_method in self._request_middleware:
@@ -59,7 +59,7 @@ class BaseHandler:
             if response:
                 return response
 
-        resolver = urlresolvers.RegexURLResolver(r'^/', ROOT_URLCONF)
+        resolver = urlresolvers.RegexURLResolver(r'^/', settings.ROOT_URLCONF)
         try:
             callback, callback_args, callback_kwargs = resolver.resolve(path)
 
@@ -87,7 +87,7 @@ class BaseHandler:
 
             return response
         except http.Http404, e:
-            if DEBUG:
+            if settings.DEBUG:
                 return self.get_technical_error_response(request, is404=True, exception=e)
             else:
                 callback, param_dict = resolver.resolve404()
@@ -95,12 +95,12 @@ class BaseHandler:
         except exceptions.PermissionDenied:
             return http.HttpResponseForbidden('<h1>Permission denied</h1>')
         except: # Handle everything else, including SuspiciousOperation, etc.
-            if DEBUG:
+            if settings.DEBUG:
                 return self.get_technical_error_response(request)
             else:
                 receivers = dispatcher.send(signal=signals.got_request_exception)
                 # When DEBUG is False, send an error message to the admins.
-                subject = 'Error (%s IP): %s' % ((request.META.get('REMOTE_ADDR') in INTERNAL_IPS and 'internal' or 'EXTERNAL'), getattr(request, 'path', ''))
+                subject = 'Error (%s IP): %s' % ((request.META.get('REMOTE_ADDR') in settings.INTERNAL_IPS and 'internal' or 'EXTERNAL'), getattr(request, 'path', ''))
                 try:
                     request_repr = repr(request)
                 except:
