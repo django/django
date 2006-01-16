@@ -284,7 +284,7 @@ get_sql_reset.args = APP_ARGS
 
 def get_sql_initial_data(app):
     "Returns a list of the initial INSERT SQL statements for the given app."
-    from django.conf.settings import DATABASE_ENGINE
+    from django.conf import settings
     from django.db.models import get_models
     output = []
 
@@ -298,7 +298,7 @@ def get_sql_initial_data(app):
 
         # Add custom SQL, if it's available.
         # FIXME: THis probably needs changing
-        sql_files = [os.path.join(app_dir, opts.module_name + '.' + DATABASE_ENGINE +  '.sql'),
+        sql_files = [os.path.join(app_dir, opts.module_name + '.' + settings.DATABASE_ENGINE +  '.sql'),
                      os.path.join(app_dir, opts.module_name + '.sql')]
         for sql_file in sql_files:
             if os.path.exists(sql_file):
@@ -460,8 +460,8 @@ def init_minimal():
         from django.db import backend, connection, models
         cursor = connection.cursor()
         # This should probably be done in the test runner, or the test itself.
-        from django.conf.settings import INSTALLED_APPS
-        INSTALLED_APPS += ('django.contrib.contenttypes',)
+        from django.conf import settings
+        settings.INSTALLED_APPS += ('django.contrib.contenttypes',)
         # Install django.contrib.contenttypes. The tests require Packages to
         # to be installed. This ought to be fixed (tests should probably
         # install their dependencies)
@@ -884,10 +884,10 @@ def runserver(addr, port):
         sys.stderr.write("Error: %r is not a valid port number.\n" % port)
         sys.exit(1)
     def inner_run():
-        from django.conf.settings import SETTINGS_MODULE
+        from django.conf import settings
         print "Validating models..."
         validate()
-        print "\nStarting server on port %s with settings module %r." % (port, SETTINGS_MODULE)
+        print "\nStarting server on port %s with settings module %r." % (port, settings.SETTINGS_MODULE)
         print "Go to http://%s:%s/ for Django." % (addr, port)
         print "Quit the server with CONTROL-C (Unix) or CTRL-BREAK (Windows)."
         try:
