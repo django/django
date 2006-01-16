@@ -32,11 +32,11 @@ class ModelBase(type):
         new_class.add_to_class('_meta', Options(attrs.pop('Meta', None)))
         new_class.add_to_class('DoesNotExist', types.ClassType('DoesNotExist', (ObjectDoesNotExist,), {}))
 
-        #Figure out the app_label by looking one level up.
-        #FIXME: wrong for nested model modules
         app_package = sys.modules.get(new_class.__module__)
-        app_label = app_package.__name__.replace('.models', '')
-        app_label = app_label[app_label.rfind('.')+1:]
+
+        # Figure out the app_label by looking one level up.
+        # For 'django.contrib.sites.models', this would be 'sites'.
+        app_label = app_package.__name__.split('.')[-2]
 
         # Cache the app label.
         new_class._meta.app_label = app_label
@@ -108,6 +108,7 @@ class Model(object):
 
     def add_to_class(cls, name, value):
         if name == 'Admin':
+            assert type(value) == types.ClassType, "%r attribute of %s model must be a class, not a %s object" % (name, cls.__name__, type(value))
             value = AdminOptions(**dict([(k, v) for k, v in value.__dict__.items() if not k.startswith('_')]))
         if hasattr(value, 'contribute_to_class'):
             value.contribute_to_class(cls, name)
