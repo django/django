@@ -15,7 +15,7 @@ def populate_xheaders(request, response, model, object_id):
     HttpResponse according to the given model and object_id -- but only if the
     given HttpRequest object has an IP address within the INTERNAL_IPS setting.
     """
-    from django.conf.settings import INTERNAL_IPS
-    if request.META.get('REMOTE_ADDR') in INTERNAL_IPS:
+    from django.conf import settings
+    if request.META.get('REMOTE_ADDR') in settings.INTERNAL_IPS:
         response['X-Object-Type'] = "%s.%s" % (model._meta.app_label, model._meta.object_name.lower())
         response['X-Object-Id'] = str(object_id)
