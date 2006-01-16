@@ -498,5 +498,5 @@ def get_cache(backend_uri):
 
     return _BACKENDS[scheme](host, params)
 
-from django.conf.settings import CACHE_BACKEND
-cache = get_cache(CACHE_BACKEND)
+from django.conf import settings
+cache = get_cache(settings.CACHE_BACKEND)
