@@ -8,7 +8,7 @@ validator will *always* be run, regardless of whether its associated
 form field is required.
 """
 
-from django.conf.settings import JING_PATH
+from django.conf import settings
 from django.utils.translation import gettext, gettext_lazy, ngettext
 from django.utils.functional import Promise, lazy
 import re
@@ -447,9 +447,9 @@ class RelaxNGCompact:
         fp = open(filename, 'w')
         fp.write(field_data)
         fp.close()
-        if not os.path.exists(JING_PATH):
-            raise Exception, "%s not found!" % JING_PATH
-        p = os.popen('%s -c %s %s' % (JING_PATH, self.schema_path, filename))
+        if not os.path.exists(settings.JING_PATH):
+            raise Exception, "%s not found!" % settings.JING_PATH
+        p = os.popen('%s -c %s %s' % (settings.JING_PATH, self.schema_path, filename))
         errors = [line.strip() for line in p.readlines()]
         p.close()
         os.unlink(filename)
