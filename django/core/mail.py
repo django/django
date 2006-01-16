@@ -1,6 +1,6 @@
 # Use this module for e-mailing.
 
-from django.conf.settings import DEFAULT_FROM_EMAIL, EMAIL_HOST, EMAIL_SUBJECT_PREFIX
+from django.conf import settings
 from email.MIMEText import MIMEText
 import smtplib
 
@@ -29,7 +29,7 @@ def send_mass_mail(datatuple, fail_silently=False):
     If from_email is None, the DEFAULT_FROM_EMAIL setting is used.
     """
     try:
-        server = smtplib.SMTP(EMAIL_HOST)
+        server = smtplib.SMTP(settings.EMAIL_HOST)
     except:
         if fail_silently:
             return
@@ -38,7 +38,7 @@ def send_mass_mail(datatuple, fail_silently=False):
     for subject, message, from_email, recipient_list in datatuple:
         if not recipient_list:
             continue
-        from_email = from_email or DEFAULT_FROM_EMAIL
+        from_email = from_email or settings.DEFAULT_FROM_EMAIL
         msg = SafeMIMEText(message)
         msg['Subject'] = subject
         msg['From'] = from_email
@@ -50,10 +50,8 @@ def send_mass_mail(datatuple, fail_silently=False):
 
 def mail_admins(subject, message, fail_silently=False):
     "Sends a message to the admins, as defined by the ADMINS constant in settings.py."
-    from django.conf.settings import ADMINS, SERVER_EMAIL
-    send_mail(EMAIL_SUBJECT_PREFIX + subject, message, SERVER_EMAIL, [a[1] for a in ADMINS], fail_silently)
+    send_mail(settings.EMAIL_SUBJECT_PREFIX + subject, message, settings.SERVER_EMAIL, [a[1] for a in settings.ADMINS], fail_silently)
 
 def mail_managers(subject, message, fail_silently=False):
     "Sends a message to the managers, as defined by the MANAGERS constant in settings.py"
-    from django.conf.settings import MANAGERS, SERVER_EMAIL
-    send_mail(EMAIL_SUBJECT_PREFIX + subject, message, SERVER_EMAIL, [a[1] for a in MANAGERS], fail_silently)
+    send_mail(settings.EMAIL_SUBJECT_PREFIX + subject, message, settings.SERVER_EMAIL, [a[1] for a in settings.MANAGERS], fail_silently)
