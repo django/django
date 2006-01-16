@@ -106,13 +106,13 @@ class Model(object):
             setattr(self, self._meta.fields[i].attname, arg)
         dispatcher.send(signal=signals.post_init, sender=self.__class__, instance=self)
 
-    def add_to_class(cls, name, attribute):
+    def add_to_class(cls, name, value):
         if name == 'Admin':
-            attribute = AdminOptions(**dict([(k, v) for k, v in attribute.__dict__.items() if not k.startswith('_')]))
-        if hasattr(attribute, 'contribute_to_class'):
-            attribute.contribute_to_class(cls, name)
+            value = AdminOptions(**dict([(k, v) for k, v in value.__dict__.items() if not k.startswith('_')]))
+        if hasattr(value, 'contribute_to_class'):
+            value.contribute_to_class(cls, name)
         else:
-            setattr(cls, name, attribute)
+            setattr(cls, name, value)
     add_to_class = classmethod(add_to_class)
 
     def _prepare(cls):
