@@ -15,25 +15,25 @@ class DatabaseWrapper:
         self.queries = []
 
     def cursor(self):
-        from django.conf.settings import DATABASE_USER, DATABASE_NAME, DATABASE_HOST, DATABASE_PORT, DATABASE_PASSWORD, DEBUG, TIME_ZONE
+        from django.conf import settings
         if self.connection is None:
-            if DATABASE_NAME == '':
+            if settings.DATABASE_NAME == '':
                 from django.core.exceptions import ImproperlyConfigured
                 raise ImproperlyConfigured, "You need to specify DATABASE_NAME in your Django settings file."
-            conn_string = "dbname=%s" % DATABASE_NAME
-            if DATABASE_USER:
-                conn_string = "user=%s %s" % (DATABASE_USER, conn_string)
-            if DATABASE_PASSWORD:
-                conn_string += " password='%s'" % DATABASE_PASSWORD
-            if DATABASE_HOST:
-                conn_string += " host=%s" % DATABASE_HOST
-            if DATABASE_PORT:
-                conn_string += " port=%s" % DATABASE_PORT
+            conn_string = "dbname=%s" % settings.DATABASE_NAME
+            if settings.DATABASE_USER:
+                conn_string = "user=%s %s" % (settings.DATABASE_USER, conn_string)
+            if settings.DATABASE_PASSWORD:
+                conn_string += " password='%s'" % settings.DATABASE_PASSWORD
+            if settings.DATABASE_HOST:
+                conn_string += " host=%s" % settings.DATABASE_HOST
+            if settings.DATABASE_PORT:
+                conn_string += " port=%s" % settings.DATABASE_PORT
             self.connection = Database.connect(conn_string)
             self.connection.set_isolation_level(1) # make transactions transparent to all cursors
         cursor = self.connection.cursor()
-        cursor.execute("SET TIME ZONE %s", [TIME_ZONE])
-        if DEBUG:
+        cursor.execute("SET TIME ZONE %s", [settings.TIME_ZONE])
+        if settings.DEBUG:
             return util.CursorDebugWrapper(cursor, self)
         return cursor
 

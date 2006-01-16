@@ -49,18 +49,18 @@ class DatabaseWrapper:
         self.queries = []
 
     def cursor(self):
-        from django.conf.settings import DATABASE_USER, DATABASE_NAME, DATABASE_HOST, DATABASE_PORT, DATABASE_PASSWORD, DEBUG
+        from django.conf import settings
         if self.connection is None:
-            if DATABASE_NAME == '' or DATABASE_USER == '':
+            if settings.DATABASE_NAME == '' or settings.DATABASE_USER == '':
                 from django.core.exceptions import ImproperlyConfigured
                 raise ImproperlyConfigured, "You need to specify both DATABASE_NAME and DATABASE_USER in your Django settings file."
-            if not DATABASE_HOST:
-                DATABASE_HOST = "127.0.0.1"
+            if not settings.DATABASE_HOST:
+                settings.DATABASE_HOST = "127.0.0.1"
             # TODO: Handle DATABASE_PORT.
-            conn_string = "PROVIDER=SQLOLEDB;DATA SOURCE=%s;UID=%s;PWD=%s;DATABASE=%s" % (DATABASE_HOST, DATABASE_USER, DATABASE_PASSWORD, DATABASE_NAME)
+            conn_string = "PROVIDER=SQLOLEDB;DATA SOURCE=%s;UID=%s;PWD=%s;DATABASE=%s" % (settings.DATABASE_HOST, settings.DATABASE_USER, settings.DATABASE_PASSWORD, settings.DATABASE_NAME)
             self.connection = Database.connect(conn_string)
         cursor = self.connection.cursor()
-        if DEBUG:
+        if settings.DEBUG:
             return base.CursorDebugWrapper(cursor, self)
         return cursor
 

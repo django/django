@@ -26,15 +26,15 @@ class DatabaseWrapper:
         self.queries = []
 
     def cursor(self):
-        from django.conf.settings import DATABASE_NAME, DEBUG
+        from django.conf import settings
         if self.connection is None:
-            self.connection = Database.connect(DATABASE_NAME, detect_types=Database.PARSE_DECLTYPES)
+            self.connection = Database.connect(settings.DATABASE_NAME, detect_types=Database.PARSE_DECLTYPES)
             # register extract and date_trun functions
             self.connection.create_function("django_extract", 2, _sqlite_extract)
             self.connection.create_function("django_date_trunc", 2, _sqlite_date_trunc)
         cursor = self.connection.cursor(factory=SQLiteCursorWrapper)
         cursor.row_factory = utf8rowFactory
-        if DEBUG:
+        if settings.DEBUG:
             return util.CursorDebugWrapper(cursor, self)
         else:
             return cursor

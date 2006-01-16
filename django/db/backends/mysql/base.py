@@ -52,22 +52,22 @@ class DatabaseWrapper:
         self.queries = []
 
     def cursor(self):
-        from django.conf.settings import DATABASE_USER, DATABASE_NAME, DATABASE_HOST, DATABASE_PORT, DATABASE_PASSWORD, DEBUG
+        from django.conf import settings
         if self.connection is None:
             kwargs = {
-                'user': DATABASE_USER,
-                'db': DATABASE_NAME,
-                'passwd': DATABASE_PASSWORD,
-                'host': DATABASE_HOST,
+                'user': settings.DATABASE_USER,
+                'db': settings.DATABASE_NAME,
+                'passwd': settings.DATABASE_PASSWORD,
+                'host': settings.DATABASE_HOST,
                 'conv': django_conversions,
             }
-            if DATABASE_PORT:
-                kwargs['port'] = DATABASE_PORT
+            if settings.DATABASE_PORT:
+                kwargs['port'] = settings.DATABASE_PORT
             self.connection = Database.connect(**kwargs)
         cursor = self.connection.cursor()
         if self.connection.get_server_info() >= '4.1':
             cursor.execute("SET NAMES utf8")
-        if DEBUG:
+        if settings.DEBUG:
             return base.CursorDebugWrapper(MysqlDebugWrapper(cursor), self)
         return cursor
 
