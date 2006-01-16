@@ -544,6 +544,25 @@ deletes the object and has no return value. Example::
 
     >>> c.delete()
 
+Comparing objects
+=================
+
+To compare two model objects, just use the standard Python comparison operator,
+the double equals sign: ``==``. Behind the scenes, that compares the primary
+key values of two models.
+
+Using the ``Poll`` example above, the following two statements are equivalent::
+
+    some_poll == other_poll
+    some_poll.id == other_poll.id
+
+If a model's primary key isn't called ID, no problem. Comparisons will always
+use the primary key, whatever it's called. For example, if a model's primary
+key field is called ``name``, these two statements are equivalent::
+
+    some_obj == other_obj
+    some_obj.name == other_obj.name
+
 Extra instance methods
 ======================
 

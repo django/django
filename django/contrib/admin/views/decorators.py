@@ -4,7 +4,7 @@ from django.conf import settings
 from django.contrib.auth.models import User, SESSION_KEY
 from django import http
 from django.utils.translation import gettext_lazy
-import base64, md5
+import base64, datetime, md5
 import cPickle as pickle
 
 ERROR_MESSAGE = gettext_lazy("Please enter a correct username and password. Note that both fields are case-sensitive.")
@@ -48,6 +48,10 @@ def staff_member_required(view_func):
     def _checklogin(request, *args, **kwargs):
         if not request.user.is_anonymous() and request.user.is_staff:
             # The user is valid. Continue to the admin page.
+            if request.POST.has_key('post_data'):
+                # User must have re-authenticated through a different window
+                # or tab.
+                request.POST = _decode_post_data(request.POST['post_data'])
             return view_func(request, *args, **kwargs)
 
         assert hasattr(request, 'session'), "The Django admin requires session middleware to be installed. Edit your MIDDLEWARE_CLASSES setting to insert 'django.contrib.sessions.middleware.SessionMiddleware'."
@@ -85,6 +89,8 @@ def staff_member_required(view_func):
         else:
             if user.check_password(request.POST.get('password', '')):
                 request.session[SESSION_KEY] = user.id
+                user.last_login = datetime.datetime.now()
+                user.save()
                 if request.POST.has_key('post_data'):
                     post_data = _decode_post_data(request.POST['post_data'])
                     if post_data and not post_data.has_key(LOGIN_FORM_KEY):
