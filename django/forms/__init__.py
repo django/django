@@ -1,7 +1,7 @@
 from django.core import validators
 from django.core.exceptions import PermissionDenied
 from django.utils.html import escape
-from django.conf.settings import DEFAULT_CHARSET
+from django.conf import settings
 from django.utils.translation import gettext, gettext_lazy, ngettext
 
 FORM_FIELD_ID_PREFIX = 'id_'
@@ -374,7 +374,7 @@ class TextField(FormField):
             self.member_name = member_name
 
     def isValidLength(self, data, form):
-        if data and self.maxlength and len(data.decode(DEFAULT_CHARSET)) > self.maxlength:
+        if data and self.maxlength and len(data.decode(settings.DEFAULT_CHARSET)) > self.maxlength:
             raise validators.ValidationError, ngettext("Ensure your text is less than %s character.",
                 "Ensure your text is less than %s characters.", self.maxlength) % self.maxlength
 
@@ -389,7 +389,7 @@ class TextField(FormField):
         if self.maxlength:
             maxlength = 'maxlength="%s" ' % self.maxlength
         if isinstance(data, unicode):
-            data = data.encode(DEFAULT_CHARSET)
+            data = data.encode(settings.DEFAULT_CHARSET)
         return '<input type="%s" id="%s" class="v%s%s" name="%s" size="%s" value="%s" %s/>' % \
             (self.input_type, self.get_id(), self.__class__.__name__, self.is_required and ' required' or '',
             self.field_name, self.length, escape(data), maxlength)
@@ -414,7 +414,7 @@ class LargeTextField(TextField):
         if data is None:
             data = ''
         if isinstance(data, unicode):
-            data = data.encode(DEFAULT_CHARSET)
+            data = data.encode(settings.DEFAULT_CHARSET)
         return '<textarea id="%s" class="v%s%s" name="%s" rows="%s" cols="%s">%s</textarea>' % \
             (self.get_id(), self.__class__.__name__, self.is_required and ' required' or '',
             self.field_name, self.rows, self.cols, escape(data))
