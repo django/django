@@ -734,6 +734,31 @@ def regroup(parser, token):
 regroup = register.tag(regroup)
 
 def spaceless(parser, token):
+    """
+    Normalize whitespace between HTML tags to a single space. This includes tab
+    characters and newlines.
+
+    Example usage::
+
+        {% spaceless %}
+            <p>
+                <a href="foo/">Foo</a>
+            </p>
+        {% spaceless %}
+
+    This example would return this HTML::
+
+        <p> <a href="foo/">Foo</a> </p>
+
+    Only space between *tags* is normalized -- not space between tags and text. In
+    this example, the space around ``Hello`` won't be stripped::
+
+        {% spaceless %}
+            <strong>
+                Hello
+            </strong>
+        {% spaceless %}
+    """
     nodelist = parser.parse(('endspaceless',))
     parser.delete_first_token()
     return SpacelessNode(nodelist)
