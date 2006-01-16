@@ -197,16 +197,16 @@ class User(models.Model):
         SiteProfileNotAvailable if this site does not allow profiles.
         """
         if not hasattr(self, '_profile_cache'):
-            from django.conf.settings import AUTH_PROFILE_MODULE
-            if not AUTH_PROFILE_MODULE:
+            from django.conf import settings
+            if not settings.AUTH_PROFILE_MODULE:
                 raise SiteProfileNotAvailable
             try:
-                app, mod = AUTH_PROFILE_MODULE.split('.')
+                app, mod = settings.AUTH_PROFILE_MODULE.split('.')
                 module = __import__('ellington.%s.apps.%s' % (app, mod), [], [], [''])
                 self._profile_cache = module.get_object(user_id=self.id)
             except ImportError:
                 try:
-                    module = __import__('django.models.%s' % AUTH_PROFILE_MODULE, [], [], [''])
+                    module = __import__('django.models.%s' % settings.AUTH_PROFILE_MODULE, [], [], [''])
                     self._profile_cache = module.get_object(user__id__exact=self.id)
                 except ImportError:
                     raise SiteProfileNotAvailable
