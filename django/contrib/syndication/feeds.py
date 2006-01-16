@@ -2,7 +2,7 @@ from django.core.exceptions import ImproperlyConfigured, ObjectDoesNotExist
 from django.template import Context, loader, Template, TemplateDoesNotExist
 from django.contrib.sites.models import Site
 from django.utils import feedgenerator
-from django.conf.settings import LANGUAGE_CODE, SETTINGS_MODULE
+from django.conf import settings
 
 def add_domain(domain, url):
     if not url.startswith('http://'):
@@ -60,7 +60,7 @@ class Feed:
             title = self.__get_dynamic_attr('title', obj),
             link = link,
             description = self.__get_dynamic_attr('description', obj),
-            language = LANGUAGE_CODE.decode(),
+            language = settings.LANGUAGE_CODE.decode(),
             feed_url = add_domain(current_site, self.feed_url),
             author_name = self.__get_dynamic_attr('author_name', obj),
             author_link = self.__get_dynamic_attr('author_link', obj),
