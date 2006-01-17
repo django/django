@@ -127,7 +127,7 @@ class Model(object):
 
         # Give the class a docstring -- its definition.
         if cls.__doc__ is None:
-            cls.__doc__ = "%s.%s(%s)" % (opts.module_name, cls.__name__, ", ".join([f.name for f in opts.fields]))
+            cls.__doc__ = "%s(%s)" % (cls.__name__, ", ".join([f.attname for f in opts.fields]))
 
         if hasattr(cls, 'get_absolute_url'):
             cls.get_absolute_url = curry(get_absolute_url, opts, cls.get_absolute_url)
