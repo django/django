@@ -387,7 +387,7 @@ class DateField(Field):
             return datetime.datetime.now()
         return value
 
-    def contribute_to_class(self,cls, name ):
+    def contribute_to_class(self, cls, name):
         super(DateField,self).contribute_to_class(cls, name)
         if not self.null:
             setattr(cls, 'get_next_by_%s' % self.name,
@@ -711,7 +711,7 @@ class OrderingField(IntegerField):
         return "IntegerField"
 
     def get_manipulator_fields(self, opts, manipulator, change, name_prefix='', rel=False, follow=True):
-        return [forms.HiddenField(name_prefix + self.name)  ]
+        return [forms.HiddenField(name_prefix + self.name)]
 
 class BoundFieldLine(object):
     def __init__(self, field_line, field_mapping, original, bound_field_class=BoundField):
@@ -761,7 +761,7 @@ class FieldSet(object):
         self.classes = classes
 
     def __repr__(self):
-         return "FieldSet:(%s,%s)" % (self.name, self.field_lines)
+         return "FieldSet: (%s, %s)" % (self.name, self.field_lines)
 
     def bind(self, field_mapping, original, bound_field_set_class=BoundFieldSet):
         return bound_field_set_class(self, field_mapping, original)

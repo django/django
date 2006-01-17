@@ -23,7 +23,7 @@ def add_lookup(rel_cls, field):
 def do_pending_lookups(sender):
     other_cls = sender
     key = (other_cls.__module__, other_cls.__name__)
-    for rel_cls, field in pending_lookups.setdefault(key,[]):
+    for rel_cls, field in pending_lookups.setdefault(key, []):
         field.rel.to = other_cls
         field.do_related_class(other_cls, rel_cls)
 
@@ -100,17 +100,14 @@ class ForeignKey(SharedMethods, Field):
             raw_id_admin=kwargs.pop('raw_id_admin', False))
         Field.__init__(self, **kwargs)
 
+        self.db_index = True
+
         for name in ('num_in_admin', 'min_num_in_admin', 'max_num_in_admin', 'num_extra_on_change'):
             if name in kwargs:
                 self.deprecated_args.append(name)
 
-        if not self.db_index:
-            self.db_index = True
-
     def prepare_field_objs_and_params(self, manipulator, name_prefix):
-        params = {'validator_list': self.validator_list[:]}
-
-        params['member_name'] = name_prefix + self.attname
+        params = {'validator_list': self.validator_list[:], 'member_name': name_prefix + self.attname}
         if self.rel.raw_id_admin:
             field_objs = self.get_manipulator_field_objs()
             params['validator_list'].append(curry(manipulator_valid_rel_key, self, manipulator))
@@ -124,7 +121,7 @@ class ForeignKey(SharedMethods, Field):
                 else:
                     field_objs = [forms.SelectField]
             params['choices'] = self.get_choices_default()
-        return (field_objs, params)
+        return field_objs, params
 
     def get_manipulator_field_objs(self):
         rel_field = self.rel.get_related_field()
@@ -192,12 +189,11 @@ class OneToOneField(SharedMethods, IntegerField):
         kwargs['primary_key'] = True
         IntegerField.__init__(self, **kwargs)
 
+        self.db_index = True
+
         for name in ('num_in_admin'):
             if name in kwargs:
                 self.deprecated_args.append(name)
-
-        if not self.db_index:
-           self.db_index = True
 
     def contribute_to_related_class(self, cls, related):
         rel_obj_name = related.get_method_name_part()
@@ -224,13 +220,11 @@ class ManyToManyField(RelatedField, Field):
             if name in kwargs:
                 self.deprecated_args.append(name)
 
-
         if self.rel.raw_id_admin:
-            msg = gettext_lazy(' Separate multiple IDs with commas.')
+            msg = gettext_lazy('Separate multiple IDs with commas.')
         else:
-            msg = gettext_lazy(' Hold down "Control", or "Command" on a Mac, to select more than one.')
-        self.help_text = string_concat( self.help_text , msg )
-
+            msg = gettext_lazy('Hold down "Control", or "Command" on a Mac, to select more than one.')
+        self.help_text = string_concat(self.help_text, msg)
 
     def get_manipulator_field_objs(self):
         if self.rel.raw_id_admin:
@@ -293,7 +287,7 @@ class ManyToManyField(RelatedField, Field):
 
     def contribute_to_related_class(self, cls, related):
         rel_obj_name = related.get_method_name_part()
-        setattr(cls, 'get_%s' % rel_obj_name, curry(cls._get_related_many_to_many, method_name='get_object', rel_class=related.model , rel_field=related.field))
+        setattr(cls, 'get_%s' % rel_obj_name, curry(cls._get_related_many_to_many, method_name='get_object', rel_class=related.model, rel_field=related.field))
         setattr(cls, 'get_%s_count' % rel_obj_name, curry(cls._get_related_many_to_many, method_name='get_count', rel_class=related.model, rel_field=related.field))
         setattr(cls, 'get_%s_list' % rel_obj_name, curry(cls._get_related_many_to_many, method_name='get_list', rel_class=related.model, rel_field=related.field))
         if related.opts.app_label == cls._meta.app_label:
@@ -306,50 +300,13 @@ class ManyToManyField(RelatedField, Field):
     def set_attributes_from_rel(self):
         pass
 
-class ManyToManyFieldNew(RelatedField):
-    def __init__(self, to, **kwargs):
-        self.to = to
-        self.from_ = None
-        self.rel = self
-        self.edit_inline = False
-
-    def set_attributes_from_rel(self):
-        pass
-
-    def contribute_to_class(self, cls, name):
-        self.from_ = cls
-        self.name = name
-        super(ManyToManyFieldNew, self).contribute_to_class(cls, name)
-
-
-    def contribute_to_related_class(self, cls, name):
-        #Now we know both classes exist.
-        self.to = cls
-        # We need to wait until the class we were in was fully defined
-        dispatcher.connect(self.from_prepared, signal=signals.class_prepared, sender=self.from_)
-
-    def from_prepared(self):
-        from django.db.models.base import Model
-
-        class M2M(Model):
-            __module__ = self.from_.__module__
-
-        id_to =  self.from_._meta.db_table
-        id_from =  self.to._meta.db_table
-
-        M2M.add_to_class(id_from, ForeignKey(to=self.from_))
-        M2M.add_to_class(id_to, ForeignKey(to=self.to))
-        M2M._meta.db_table = '%s_%s' % (self.from_._meta.db_table, self.name)
-        M2M._meta.unique_together = ((id_to, id_from),)
-        M2M.__name__ = "M2M_%s_%s_%s" % (self.name, self.from_.__name__, self.to.__name__)
-
 class ManyToOne:
     def __init__(self, to, field_name, edit_inline=False,
         related_name=None, limit_choices_to=None, lookup_overrides=None, raw_id_admin=False):
         try:
             to._meta
         except AttributeError:
-            assert isinstance(to, basestring) , "'to' must be either a model, a model name or the string %r" % RECURSIVE_RELATIONSHIP_CONSTANT
+            assert isinstance(to, basestring), "'to' must be either a model, a model name or the string %r" % RECURSIVE_RELATIONSHIP_CONSTANT
         self.to, self.field_name = to, field_name
         self.edit_inline = edit_inline
         self.related_name = related_name

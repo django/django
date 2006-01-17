@@ -243,7 +243,7 @@ class AutomaticManipulator(Manipulator, Naming):
 #                        self.fields_changed.append(f.verbose_name)
 #
 #        # Save inline edited objects
-#        self._fill_related_objects(expanded_data,SaveHelper)
+#        self._fill_related_objects(expanded_data, SaveHelper)
 #
 #        return new_object
 #
@@ -436,7 +436,7 @@ class ManipulatorCollection(list, Naming):
             self.append(None)
 
         prefix = '%s%s.' % (self.name_prefix, index )
-        child_manip = man_class(self.follow, self.name_parts + ( str(index), )  )
+        child_manip = man_class(self.follow, self.name_parts + (str(index),))
 
         self[index] = child_manip
         return child_manip

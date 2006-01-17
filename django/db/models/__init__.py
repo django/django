@@ -26,14 +26,14 @@ def get_models_helper(mod, seen_models):
         seen_models.extend(mod._MODELS)
     if hasattr(mod, '__all__'):
         for name in mod.__all__:
-            sub_mod = __import__("%s.%s" % (mod.__name__, name), '','',[''])
+            sub_mod = __import__("%s.%s" % (mod.__name__, name), '', '', [''])
             get_models_helper(sub_mod, seen_models)
 
 def get_app(app_label):
     for app_name in settings.INSTALLED_APPS:
         comps = app_name.split('.')
         if app_label == comps[-1]:
-            app_models = __import__('%s.models' % app_name , '','',[''])
+            app_models = __import__('%s.models' % app_name, '', '', [''])
             return app_models
     raise ImproperlyConfigured, "App with label %s could not be found" % app_label
 
