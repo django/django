@@ -203,6 +203,13 @@ Traceback (most recent call last):
     ...
 AttributeError: Manager isn't accessible via Article instances
 
+# Bulk delete test: How many objects before and after the delete?
+>>> Article.objects.get_count()
+8L
+>>> Article.objects.delete(id__lte=4)
+>>> Article.objects.get_count()
+4L
+
 """
 
 from django.conf import settings

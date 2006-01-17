@@ -83,7 +83,7 @@ This is a test
 [This is a test, John's second story]
 
 # The underlying query only makes one join when a related table is referenced twice.
->>> null, sql, null = Article.objects._get_sql_clause(reporter__first_name__exact='John', reporter__last_name__exact='Smith')
+>>> null, sql, null = Article.objects._get_sql_clause(True, reporter__first_name__exact='John', reporter__last_name__exact='Smith')
 >>> sql.count('INNER JOIN')
 1
 
@@ -152,4 +152,9 @@ John Smith
 >>> Reporter.objects.get_list(articles__reporter__first_name__startswith='John', distinct=True)
 [John Smith]
 
+# Delete requiring join is prohibited
+>>> Article.objects.delete(reporter__first_name__startswith='Jo')
+Traceback (most recent call last):
+    ...
+TypeError: Joins are not allowed in this type of query
 """

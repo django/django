@@ -48,7 +48,7 @@ class Manager(object):
            self.creation_counter < klass._default_manager.creation_counter:
                 klass._default_manager = self
 
-    def _get_sql_clause(self, *args, **kwargs):
+    def _get_sql_clause(self, allow_joins, *args, **kwargs):
         def quote_only_if_word(word):
             if ' ' in word:
                 return word
@@ -63,7 +63,7 @@ class Manager(object):
         joins = SortedDict()
         where = kwargs.get('where') and kwargs['where'][:] or []
         params = kwargs.get('params') and kwargs['params'][:] or []
-
+        
         # Convert all the args into SQL.
         table_count = 0
         for arg in args:
@@ -76,7 +76,6 @@ class Manager(object):
             joins.update(joins2)
             where.extend(where2)
             params.extend(params2)
-
 
         # Convert the kwargs into SQL.
         tables2, joins2, where2, params2 = parse_lookup(kwargs.items(), opts)
@@ -99,10 +98,14 @@ class Manager(object):
         # Start composing the body of the SQL statement.
         sql = [" FROM", backend.quote_name(opts.db_table)]
 
+        # Check if extra tables are allowed. If not, throw an error
+        if (tables or joins) and not allow_joins:
+            raise TypeError("Joins are not allowed in this type of query")
+
         # Compose the join dictionary into SQL describing the joins.
         if joins:
             sql.append(" ".join(["%s %s AS %s ON %s" % (join_type, table, alias, condition)
-                                for (alias, (table, join_type, condition)) in joins.items()]))
+                            for (alias, (table, join_type, condition)) in joins.items()]))
 
         # Compose the tables clause into SQL.
         if tables:
@@ -146,13 +149,28 @@ class Manager(object):
 
         return select, " ".join(sql), params
 
+    def delete(self, *args, **kwargs):
+        # disable non-supported fields
+        kwargs['select_related'] = False
+        kwargs['select'] = {}
+        kwargs['order_by'] = []
+        kwargs['offset'] = None
+        kwargs['limit'] = None
+        
+        opts = self.klass._meta
+
+        # Perform the SQL delete
+        cursor = connection.cursor()
+        _, sql, params = self._get_sql_clause(False, *args, **kwargs)
+        cursor.execute("DELETE " + sql, params)
+        
     def get_iterator(self, *args, **kwargs):
         # kwargs['select'] is a dictionary, and dictionaries' key order is
         # undefined, so we convert it to a list of tuples internally.
         kwargs['select'] = kwargs.get('select', {}).items()
 
         cursor = connection.cursor()
-        select, sql, params = self._get_sql_clause(*args, **kwargs)
+        select, sql, params = self._get_sql_clause(True, *args, **kwargs)
         cursor.execute("SELECT " + (kwargs.get('distinct') and "DISTINCT " or "") + ",".join(select) + sql, params)
         fill_cache = kwargs.get('select_related')
         index_end = len(self.klass._meta.fields)
@@ -177,7 +195,7 @@ class Manager(object):
         kwargs['offset'] = None
         kwargs['limit'] = None
         kwargs['select_related'] = False
-        _, sql, params = self._get_sql_clause(*args, **kwargs)
+        _, sql, params = self._get_sql_clause(True, *args, **kwargs)
         cursor = connection.cursor()
         cursor.execute("SELECT COUNT(*)" + sql, params)
         return cursor.fetchone()[0]
@@ -209,7 +227,7 @@ class Manager(object):
             fields = [f.column for f in self.klass._meta.fields]
 
         cursor = connection.cursor()
-        _, sql, params = self._get_sql_clause(*args, **kwargs)
+        _, sql, params = self._get_sql_clause(True, *args, **kwargs)
         select = ['%s.%s' % (backend.quote_name(self.klass._meta.db_table), backend.quote_name(f)) for f in fields]
         cursor.execute("SELECT " + (kwargs.get('distinct') and "DISTINCT " or "") + ",".join(select) + sql, params)
         while 1:
@@ -239,7 +257,7 @@ class Manager(object):
         if field.null:
             kwargs.setdefault('where', []).append('%s.%s IS NOT NULL' % \
                 (backend.quote_name(self.klass._meta.db_table), backend.quote_name(field.column)))
-        select, sql, params = self._get_sql_clause(*args, **kwargs)
+        select, sql, params = self._get_sql_clause(True, *args, **kwargs)
         sql = 'SELECT %s %s GROUP BY 1 ORDER BY 1 %s' % \
             (backend.get_date_trunc_sql(kind, '%s.%s' % (backend.quote_name(self.klass._meta.db_table),
             backend.quote_name(field.column))), sql, order)
