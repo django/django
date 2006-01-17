@@ -1,13 +1,12 @@
 from django.contrib.admin.views.main import get_model_and_app
 from django import forms
 from django import template
-from django.http import Http404
+from django.http import Http404, HttpResponse, HttpResponseRedirect
 from django.core.exceptions import ImproperlyConfigured, ObjectDoesNotExist, PermissionDenied
 from django.template import RequestContext as Context
 from django.contrib.admin.views.stages.modify import render_change_form
 from django.db import models
 from django.utils.text import capfirst, get_text_list
-from django.http import HttpResponse, HttpResponseRedirect
 from django.contrib.admin.views.decorators import staff_member_required
 try:
     from django.contrib.admin.models import LogEntry, ADDITION, CHANGE, DELETION
@@ -32,7 +31,6 @@ def log_change_message(user, opts, manipulator, new_object):
 def change_stage(request, path, object_id):
     model, app_label = get_model_and_app(path)
     opts = model._meta
-    #mod, opts = _get_mod_opts(app_label, module_name)
     if not request.user.has_perm(app_label + '.' + opts.get_change_permission()):
         raise PermissionDenied
     if request.POST and request.POST.has_key("_saveasnew"):

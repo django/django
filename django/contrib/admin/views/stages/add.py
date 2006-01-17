@@ -4,11 +4,10 @@ from django.contrib.admin.views.main import get_model_and_app
 from django.contrib.admin.views.stages.modify import render_change_form
 from django import forms
 from django import template
-from django.http import Http404
+from django.http import Http404, HttpResponse, HttpResponseRedirect
 from django.core.exceptions import ImproperlyConfigured, ObjectDoesNotExist, PermissionDenied
 from django.template import RequestContext as Context
 from django.db import models
-from django.http import HttpResponse, HttpResponseRedirect
 from django.utils.text import capfirst, get_text_list
 try:
     from django.contrib.admin.models import LogEntry, ADDITION, CHANGE, DELETION

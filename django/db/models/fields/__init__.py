@@ -294,7 +294,7 @@ class Field(object):
                                for x in rel_model._default_manager.get_list(**rel_model._meta.limit_choices_to)]
 
     def get_choices_default(self):
-        if(self.radio_admin):
+        if self.radio_admin:
             return self.get_choices(include_blank=self.blank, blank_choice=BLANK_CHOICE_NONE)
         else:
             return self.get_choices()

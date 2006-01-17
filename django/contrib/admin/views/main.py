@@ -1,44 +1,28 @@
-# Generic admin views.
+from django import template
 from django.conf import settings
 from django.contrib.admin.views.decorators import staff_member_required
-from django import template
-from django.template import loader
-from django.db import models
-from django.http import Http404
 from django.core.exceptions import ImproperlyConfigured, ObjectDoesNotExist, PermissionDenied
-from django.template import RequestContext as Context
 from django.core.extensions import get_object_or_404, render_to_response
+from django.db import models
+from django.http import Http404, HttpResponse, HttpResponseRedirect
+from django.template import loader, RequestContext
 from django.utils import dateformat
 from django.utils.html import escape
-from django.http import HttpResponse, HttpResponseRedirect
 from django.utils.text import capfirst, get_text_list
 import operator
 from itertools import izip
 
 ADMIN_PREFIX = "/admin/"
 
-#def _get_mod_opts(app_label, module_name):
-#    "Helper function that returns a tuple of (module, opts), raising Http404 if necessary."
-#    try:
-#        mod = models.get_app(app_label)
-#    except ImportError:
-#        raise Http404 # Invalid app or module name. Maybe it's not in INSTALLED_APPS.
-#    opts = mod.Klass._meta
-#    if not opts.admin:
-#        raise Http404 # This object is valid but has no admin interface.
-#    return mod, opts
-
 def matches_app(mod, comps):
     modcomps = mod.__name__.split('.')[:-1] #HACK: leave off 'models'
     for c, mc in izip(comps, modcomps):
         if c != mc:
-            return ([], False)
-    return (comps[len(modcomps):], True)
+            return [], False
+    return comps[len(modcomps):], True
 
 def find_model(mod, remaining):
-   # print "finding ", mod, remaining
     if len(remaining) == 0:
-       # print "no comps left"
         raise Http404
     if len(remaining) == 1:
         if hasattr(mod, '_MODELS'):
@@ -51,7 +35,6 @@ def find_model(mod, remaining):
             raise Http404
     else:
         child = getattr(mod, remaining[0], None)
-       # print mod, remaining[0], child
         if child:
             return find_model(child, remaining[1:])
         else:
@@ -67,10 +50,7 @@ def get_model_and_app(path):
     for mod in models.get_installed_models():
         remaining, matched = matches_app(mod, comps)
         if matched and len(remaining) > 0:
-           # print "matched ", mod
-           # print "left", remaining
             return (find_model(mod, remaining), get_app_label(mod))
-
     raise Http404 # Couldn't find app
 
 _model_urls = {}
@@ -90,7 +70,7 @@ def url_for_model(model):
         raise ImproperlyConfigured, '%s is not a model in an installed app' % model.__name__
 
 def index(request):
-    return render_to_response('admin/index', {'title': _('Site administration')}, context_instance=Context(request))
+    return render_to_response('admin/index', {'title': _('Site administration')}, context_instance=RequestContext(request))
 index = staff_member_required(index)
 
 def history(request, app_label, module_name, object_id):
@@ -104,5 +84,5 @@ def history(request, app_label, module_name, object_id):
         'action_list': action_list,
         'module_name': capfirst(opts.verbose_name_plural),
         'object': obj,
-    }, context_instance=Context(request))
+    }, context_instance=RequestContext(request))
 history = staff_member_required(history)

@@ -1,6 +1,5 @@
 from django.db.models.fields import BoundField, BoundFieldLine, BoundFieldSet
 from django.db import models
-
 from django.core.extensions import render_to_response
 from django.contrib.admin.views.main import url_for_model
 
@@ -108,7 +107,7 @@ class BoundManipulator(object):
         self.model = model
         self.opts = model._meta
         self.inline_related_objects = self.opts.get_followed_related_objects(manipulator.follow)
-        self.original = hasattr(manipulator, 'original_object') and manipulator.original_object or None
+        self.original = getattr(manipulator, 'original_object', None)
         self.bound_field_sets = [field_set.bind(field_mapping, self.original, AdminBoundFieldSet)
                                  for field_set in self.opts.admin.get_field_sets(self.opts)]
         self.ordered_objects = self.opts.get_ordered_objects()[:]
@@ -123,8 +122,7 @@ class AdminBoundManipulator(BoundManipulator):
 
         self.coltype = self.ordered_objects and 'colMS' or 'colM'
         self.has_absolute_url = hasattr(model, 'get_absolute_url')
-        self.form_enc_attrib = self.opts.has_field_type(models.FileField) and \
-                                'enctype="multipart/form-data" ' or ''
+        self.form_enc_attrib = self.opts.has_field_type(models.FileField) and 'enctype="multipart/form-data" ' or ''
 
         self.first_form_field_id = self.bound_field_sets[0].bound_field_lines[0].bound_fields[0].form_fields[0].get_id();
         self.ordered_object_pk_names = [o.pk.name for o in self.ordered_objects]
