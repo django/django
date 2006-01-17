@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-import os, sys, time, traceback
+import os, re, sys, time, traceback
 
 # doctest is included in the same package as this module, because this testing
 # framework uses features only available in the Python 2.4 version of doctest,
@@ -43,14 +43,18 @@ class DjangoDoctestRunner(doctest.DocTestRunner):
         log_error(test.name, "API test raised an exception",
             "Code: %r\nLine: %s\nException: %s" % (example.source.strip(), example.lineno, tb))
 
+normalize_long_ints = lambda s: re.sub(r'(?<![\w])(\d+)L(?![\w])', '\\1', s)
+
 class DjangoDoctestOutputChecker(doctest.OutputChecker):
     def check_output(self, want, got, optionflags):
         ok = doctest.OutputChecker.check_output(self, want, got, optionflags)
-        if not ok and (want.strip().endswith("L") or got.strip().endswith("L")):
-            try:
-                return long(want.strip()) == long(got.strip())
-            except ValueError:
-                return False
+
+        # Doctest does an exact string comparison of output, which means long
+        # integers aren't equal to normal integers ("22L" vs. "22"). The
+        # following code normalizes long integers so that they equal normal
+        # integers.
+        if not ok:
+            return normalize_long_ints(want) == normalize_long_ints(got)
         return ok
 
 class TestRunner:
