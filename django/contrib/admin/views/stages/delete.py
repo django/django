@@ -46,8 +46,8 @@ def _get_deleted_objects(deleted_objects, perms_needed, user, obj, opts, current
                     nh(deleted_objects, current_depth, ['%s: %s' % (capfirst(related.opts.verbose_name), sub_obj), []])
                 else:
                     # Display a link to the admin page.
-                    nh(deleted_objects, current_depth, ['%s: <a href="../../../../%s/%s/%s/">%s</a>' % \
-                        (capfirst(related.opts.verbose_name), related.opts.app_label, related.opts.module_name,
+                    nh(deleted_objects, current_depth, ['%s: <a href="../../../../%s/%s/%s/change/">%s</a>' % \
+                        (capfirst(related.opts.verbose_name), related.opts.app_label, related.opts.object_name.lower(),
                         getattr(sub_obj, related.opts.pk.attname), sub_obj), []])
                 _get_deleted_objects(deleted_objects, perms_needed, user, sub_obj, related.opts, current_depth+2)
         else:
@@ -60,8 +60,8 @@ def _get_deleted_objects(deleted_objects, perms_needed, user, obj, opts, current
                     nh(deleted_objects, current_depth, ['%s: %s' % (capfirst(related.opts.verbose_name), escape(str(sub_obj))), []])
                 else:
                     # Display a link to the admin page.
-                    nh(deleted_objects, current_depth, ['%s: <a href="../../../../%s/%s/%s/">%s</a>' % \
-                        (capfirst(related.opts.verbose_name), related.opts.app_label, related.opts.module_name, getattr(sub_obj, related.opts.pk.attname), escape(str(sub_obj))), []])
+                    nh(deleted_objects, current_depth, ['%s: <a href="../../../../%s/%s/%s/change/">%s</a>' % \
+                        (capfirst(related.opts.verbose_name), related.opts.app_label, related.opts.object_name.lower(), getattr(sub_obj, related.opts.pk.attname), escape(str(sub_obj))), []])
                 _get_deleted_objects(deleted_objects, perms_needed, user, sub_obj, related.opts, current_depth+2)
             # If there were related objects, and the user doesn't have
             # permission to delete them, add the missing perm to perms_needed.
