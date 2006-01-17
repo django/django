@@ -24,9 +24,12 @@ class Article(models.Model):
 
 
 API_TESTS = """
-# Create a Reporter.
+# Create a few Reporters.
 >>> r = Reporter(first_name='John', last_name='Smith', email='john@example.com')
 >>> r.save()
+
+>>> r2 = Reporter(first_name='Paul', last_name='Jones', email='paul@example.com')
+>>> r2.save()
 
 # Create an Article.
 >>> from datetime import datetime
@@ -51,6 +54,10 @@ John's second story
 >>> new_article.reporter_id
 1
 
+>>> new_article2 = r2.add_article(headline="Paul's story", pub_date=datetime(2006, 1, 17))
+>>> new_article2.reporter_id
+2
+
 # Reporter objects have access to their related Article objects.
 >>> r.get_article_list(order_by=['pub_date'])
 [This is a test, John's second story]
@@ -60,6 +67,9 @@ This is a test
 
 >>> r.get_article_count()
 2
+
+>>> r2.get_article_count()
+1
 
 # Get articles by id
 >>> Article.objects.get_list(id__exact=1)
@@ -152,9 +162,21 @@ John Smith
 >>> Reporter.objects.get_list(articles__reporter__first_name__startswith='John', distinct=True)
 [John Smith]
 
-# Delete requiring join is prohibited
+# Deletes that require joins are prohibited.
 >>> Article.objects.delete(reporter__first_name__startswith='Jo')
 Traceback (most recent call last):
     ...
 TypeError: Joins are not allowed in this type of query
+
+# If you delete a reporter, his articles will be deleted.
+>>> Article.objects.get_list(order_by=['headline'])
+[John's second story, Paul's story, This is a test, This is a test, This is a test]
+>>> Reporter.objects.get_list(order_by=['first_name'])
+[John Smith, Paul Jones]
+>>> r.delete()
+>>> Article.objects.get_list(order_by=['headline'])
+[Paul's story]
+>>> Reporter.objects.get_list(order_by=['first_name'])
+[Paul Jones]
+
 """
