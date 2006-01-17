@@ -115,7 +115,7 @@ def translation(language):
     if sys.version_info < (2, 4):
         klass = DjangoTranslation23
 
-    globalpath = os.path.join(os.path.dirname(settings.__file__), 'locale')
+    globalpath = os.path.join(os.path.dirname(sys.modules[settings.__module__].__file__), 'locale')
 
     parts = settings.SETTINGS_MODULE.split('.')
     project = __import__(parts[0], {}, {}, [])
@@ -275,7 +275,7 @@ def check_for_language(lang_code):
     only used for language codes from either the cookies or session.
     """
     from django.conf import settings
-    globalpath = os.path.join(os.path.dirname(settings.__file__), 'locale')
+    globalpath = os.path.join(os.path.dirname(sys.modules[settings.__module__].__file__), 'locale')
     if gettext_module.find('django', globalpath, [to_locale(lang_code)]) is not None:
         return True
     else:
@@ -289,7 +289,7 @@ def get_language_from_request(request):
     """
     global _accepted
     from django.conf import settings
-    globalpath = os.path.join(os.path.dirname(settings.__file__), 'locale')
+    globalpath = os.path.join(os.path.dirname(sys.modules[settings.__module__].__file__), 'locale')
     supported = dict(settings.LANGUAGES)
 
     if hasattr(request, 'session'):
