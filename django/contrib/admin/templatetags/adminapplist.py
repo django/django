@@ -21,7 +21,6 @@ class AdminApplistNode(template.Node):
                 app_url = "/".join( [comp for comp in app.__name__.split('.') if comp != 'models' ])
                 for m in app._MODELS:
                     if m._meta.admin:
-                        module_name = m._meta.module_name
                         perms = {
                             'add': user.has_perm("%s.%s" % (app_label, m._meta.get_add_permission())),
                             'change': user.has_perm("%s.%s" % (app_label, m._meta.get_change_permission())),
