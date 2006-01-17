@@ -63,11 +63,14 @@ def cmp_cls(x, y):
 class Model(object):
     __metaclass__ = ModelBase
 
+    def _get_pk_val(self):
+        return getattr(self, self._meta.pk.attname)
+
     def __repr__(self):
         return '<%s object>' % self.__class__.__name__
 
     def __eq__(self, other):
-        return isinstance(other, self.__class__) and getattr(self, self._meta.pk.attname) == getattr(other, self._meta.pk.attname)
+        return isinstance(other, self.__class__) and self._get_pk_val() == other._get_pk_val()
 
     def __ne__(self, other):
         return not self.__eq__(other)
@@ -143,7 +146,7 @@ class Model(object):
         cursor = connection.cursor()
 
         # First, try an UPDATE. If that doesn't update anything, do an INSERT.
-        pk_val = getattr(self, self._meta.pk.attname)
+        pk_val = self._get_pk_val()
         pk_set = bool(pk_val)
         record_exists = True
         if pk_set:
@@ -186,11 +189,8 @@ class Model(object):
 
     save.alters_data = True
 
-    def __get_pk_val(self):
-        return str(getattr(self, self._meta.pk.attname))
-
     def __collect_sub_objects(self, seen_objs):
-        pk_val = self.__get_pk_val()
+        pk_val = self._get_pk_val()
 
         if pk_val in seen_objs.setdefault(self.__class__, {}):
             return
@@ -210,11 +210,11 @@ class Model(object):
                     sub_obj.__collect_sub_objects(seen_objs)
 
     def delete(self, ignore_objects=None):
-        assert getattr(self, self._meta.pk.attname) is not None, "%r can't be deleted because it doesn't have an ID."
+        assert self._get_pk_val() is not None, "%r can't be deleted because it doesn't have an ID."
         seen_objs = {}
         if ignore_objects:
             for obj in ignore_objects:
-                ignore_objs.setdefault(self.__class__,{})[obj.__get_pk_val()] = (obj, False)
+                ignore_objs.setdefault(self.__class__,{})[obj._get_pk_val()] = (obj, False)
 
         seen_objs = {}
         self.__collect_sub_objects(seen_objs)
@@ -230,7 +230,7 @@ class Model(object):
         for cls in cls_order:
             seen_objs[cls] = seen_objs[cls].items()
             seen_objs[cls].sort()
-            for pk_val,(instance, do_delete) in seen_objs[cls]:
+            for pk_val, (instance, do_delete) in seen_objs[cls]:
 
                 # Run any pre-delete hooks.
                 if do_delete:
@@ -297,7 +297,7 @@ class Model(object):
                     backend.quote_name(opts.db_table), backend.quote_name(opts.pk.column)),
                     '%s=%%s' % backend.quote_name(order_field.column)],
                 limit=1,
-                params=[getattr(self, opts.pk.attname), getattr(self, order_field.attname)])
+                params=[self._get_pk_val(), getattr(self, order_field.attname)])
             setattr(self, cachename, obj)
         return getattr(self, cachename)
 
@@ -394,12 +394,12 @@ class Model(object):
                 backend.quote_name(rel_opts.object_name.lower() + '_id'),
                 backend.quote_name(self._meta.object_name.lower() + '_id'), rel_opts.get_order_sql('a'))
             cursor = connection.cursor()
-            cursor.execute(sql, [getattr(self, self._meta.pk.attname)])
+            cursor.execute(sql, [self._get_pk_val()])
             setattr(self, cache_var, [field_with_rel.rel.to(*row) for row in cursor.fetchall()])
         return getattr(self, cache_var)
 
     def _set_many_to_many_objects(self, id_list, field_with_rel):
-        current_ids = [getattr(obj, obj._meta.pk.attname) for obj in self._get_many_to_many_objects(field_with_rel)]
+        current_ids = [obj._get_pk_val() for obj in self._get_many_to_many_objects(field_with_rel)]
         ids_to_add, ids_to_delete = dict([(i, 1) for i in id_list]), []
         for current_id in current_ids:
             if current_id in id_list:
@@ -413,7 +413,7 @@ class Model(object):
         rel = field_with_rel.rel.to._meta
         m2m_table = field_with_rel.get_m2m_db_table(self._meta)
         cursor = connection.cursor()
-        this_id = getattr(self, self._meta.pk.attname)
+        this_id = self._get_pk_val()
         if ids_to_delete:
             sql = "DELETE FROM %s WHERE %s = %%s AND %s IN (%s)" % \
                 (backend.quote_name(m2m_table),
@@ -456,7 +456,7 @@ class Model(object):
     # Handles related many-to-many object retrieval.
     # Examples: Album.get_song(), Album.get_song_list(), Album.get_song_count()
     def _get_related_many_to_many(self, method_name, rel_class, rel_field, **kwargs):
-        kwargs['%s__%s__exact' % (rel_field.name, self._meta.pk.name)] = getattr(self, self._meta.pk.attname)
+        kwargs['%s__%s__exact' % (rel_field.name, self._meta.pk.name)] = self._get_pk_val()
         return getattr(rel_class._default_manager, method_name)(**kwargs)
 
     # Handles setting many-to-many related objects.
@@ -465,7 +465,7 @@ class Model(object):
         id_list = map(int, id_list) # normalize to integers
         rel = rel_field.rel.to
         m2m_table = rel_field.get_m2m_db_table(rel_opts)
-        this_id = getattr(self, self._meta.pk.attname)
+        this_id = self._get_pk_val()
         cursor = connection.cursor()
         cursor.execute("DELETE FROM %s WHERE %s = %%s" % \
             (backend.quote_name(m2m_table),

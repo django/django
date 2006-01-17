@@ -63,7 +63,7 @@ class Manager(object):
         joins = SortedDict()
         where = kwargs.get('where') and kwargs['where'][:] or []
         params = kwargs.get('params') and kwargs['params'][:] or []
-        
+
         # Convert all the args into SQL.
         table_count = 0
         for arg in args:
@@ -156,14 +156,14 @@ class Manager(object):
         kwargs['order_by'] = []
         kwargs['offset'] = None
         kwargs['limit'] = None
-        
+
         opts = self.klass._meta
 
         # Perform the SQL delete
         cursor = connection.cursor()
         _, sql, params = self._get_sql_clause(False, *args, **kwargs)
         cursor.execute("DELETE " + sql, params)
-        
+
     def get_iterator(self, *args, **kwargs):
         # kwargs['select'] is a dictionary, and dictionaries' key order is
         # undefined, so we convert it to a list of tuples internally.
@@ -213,7 +213,7 @@ class Manager(object):
         kwargs['where'] = ["%s.%s IN (%s)" % (backend.quote_name(self.klass._meta.db_table), backend.quote_name(self.klass._meta.pk.column), ",".join(['%s'] * len(id_list)))]
         kwargs['params'] = id_list
         obj_list = self.get_list(*args, **kwargs)
-        return dict([(getattr(o, self.klass._meta.pk.attname), o) for o in obj_list])
+        return dict([(obj._get_pk_val(), obj) for obj in obj_list])
 
     def get_values_iterator(self, *args, **kwargs):
         # select_related and select aren't supported in get_values().

@@ -170,7 +170,7 @@ class AutomaticManipulator(Manipulator, Naming):
         # TODO: many to many
         self.original_object.save()
         if not hasattr(self, 'obj_key'):
-            self.obj_key = getattr(self.original_object, self.opts.pk.attname)
+            self.obj_key = self.original_object._get_pk_val()
 
         for related, manips in self.children.items():
             manips.save_from_update(self.obj_key)
@@ -292,7 +292,7 @@ class ModelChangeManipulator(AutomaticManipulator):
         opts = self.model._meta
         if isinstance(obj_key, self.model):
             original_object = obj_key
-            self.obj_key = getattr(original_object, self.model._meta.pk.attname)
+            self.obj_key = original_object._get_pk_val()
         else:
             self.obj_key = obj_key
             try:
@@ -317,7 +317,7 @@ class ModelChangeManipulator(AutomaticManipulator):
             else:
                 # Save the obj_key even though we already have it, in case it's
                 # currently a string and needs to be an integer.
-                self.obj_key = getattr(original_object, self.model._meta.pk.attname)
+                self.obj_key = original_object._get_pk_val()
 
         super(ModelChangeManipulator, self).__init__(original_object=original_object, follow=follow, name_parts=name_parts)
         #self.original_object = original_object
@@ -488,7 +488,7 @@ def manipulator_validator_unique_together(field_name_list, opts, self, field_dat
         old_obj = mod.get_object(**kwargs)
     except ObjectDoesNotExist:
         return
-    if hasattr(self, 'original_object') and getattr(self.original_object, opts.pk.attname) == getattr(old_obj, opts.pk.attname):
+    if hasattr(self, 'original_object') and self.original_object._get_pk_val() == old_obj._get_pk_val():
         pass
     else:
         raise validators.ValidationError, _("%(object)s with this %(type)s already exists for the given %(field)s.") % \
@@ -514,7 +514,7 @@ def manipulator_validator_unique_for_date(from_field, date_field, opts, lookup_t
     except ObjectDoesNotExist:
         return
     else:
-        if hasattr(self, 'original_object') and getattr(self.original_object, opts.pk.attname) == getattr(old_obj, opts.pk.attname):
+        if hasattr(self, 'original_object') and self.original_object._get_pk_val() == old_obj._get_pk_val():
             pass
         else:
             format_string = (lookup_type == 'date') and '%B %d, %Y' or '%B %Y'

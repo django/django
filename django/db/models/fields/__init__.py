@@ -32,7 +32,7 @@ def manipulator_validator_unique(f, opts, self, field_data, all_data):
         old_obj = self.manager.get_object(**{lookup_type: field_data})
     except ObjectDoesNotExist:
         return
-    if hasattr(self, 'original_object') and getattr(self.original_object, opts.pk.attname) == getattr(old_obj, opts.pk.attname):
+    if hasattr(self, 'original_object') and self.original_object._get_pk_val() == old_obj._get_pk_val():
         return
     raise validators.ValidationError, _("%(optname)s with this %(fieldname)s already exists.") % {'optname': capfirst(opts.verbose_name), 'fieldname': f.verbose_name}
 
@@ -290,7 +290,7 @@ class Field(object):
         if self.choices:
             return first_choice + list(self.choices)
         rel_model = self.rel.to
-        return first_choice + [(getattr(x, rel_model._meta.pk.attname), str(x))
+        return first_choice + [(x._get_pk_val(), str(x))
                                for x in rel_model._default_manager.get_list(**rel_model._meta.limit_choices_to)]
 
     def get_choices_default(self):
