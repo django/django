@@ -1022,25 +1022,6 @@ A few object methods have special meaning:
     It's good practice to use ``get_absolute_url()`` in templates, instead of
     hard-coding your objects' URLs.
 
-``_pre_save``
-    This method is called just before an object is saved to the database. For
-    example, you can use it to calculate aggregate values from other fields
-    before the object is saved.
-
-    See `Adding hooks before/after saving and deleting`_ for a full example.
-
-    .. _Adding hooks before/after saving and deleting: http://www.djangoproject.com/documentation/models/save_delete_hooks/
-
-``_post_save``
-    This method is called just after the object is saved to the database. This
-    could be used to update other tables, update cached information, etc.
-
-``_pre_delete``
-    Like ``_pre_save``, but for deletion.
-
-``_post_delete``
-    Like ``_post_save``, but for deletion.
-
 Module-level methods
 --------------------
 

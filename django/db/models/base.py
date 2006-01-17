@@ -118,7 +118,7 @@ class Model(object):
 
     def _prepare(cls):
         # Creates some methods once self._meta has been populated.
-        opts =  cls._meta
+        opts = cls._meta
         opts._prepare(cls)
 
         if opts.order_with_respect_to:
@@ -137,9 +137,6 @@ class Model(object):
     _prepare = classmethod(_prepare)
 
     def save(self):
-        # Run any pre-save hooks.
-        if hasattr(self, '_pre_save'):
-            self._pre_save()
         dispatcher.send(signal=signals.pre_save, sender=self.__class__, instance=self)
 
         non_pks = [f for f in self._meta.fields if not f.primary_key]
@@ -186,9 +183,6 @@ class Model(object):
 
         # Run any post-save hooks.
         dispatcher.send(signal=signals.pre_save, sender=self.__class__, instance=self)
-
-        if hasattr(self, '_post_save'):
-            self._post_save()
 
     save.alters_data = True
 
@@ -240,9 +234,6 @@ class Model(object):
 
                 # Run any pre-delete hooks.
                 if do_delete:
-                    if hasattr(instance, '_pre_delete'):
-                        instance._pre_delete()
-
                     dispatcher.send(signal=signals.pre_delete, sender=cls, instance=instance)
 
                     for related in cls._meta.get_all_related_many_to_many_objects():
@@ -275,9 +266,6 @@ class Model(object):
                     setattr(instance, cls._meta.pk.attname, None)
 
                     dispatcher.send(signal=signals.post_delete, sender=cls, instance=instance)
-
-                    if hasattr(instance, '_post_delete'):
-                        instance._post_delete()
 
         connection.commit()
 
