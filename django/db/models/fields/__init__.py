@@ -508,10 +508,7 @@ class FileField(Field):
         setattr(cls, 'get_%s_filename' % self.name, curry(cls._get_FIELD_filename, field=self))
         setattr(cls, 'get_%s_url' % self.name, curry(cls._get_FIELD_url, field=self))
         setattr(cls, 'get_%s_size' % self.name, curry(cls._get_FIELD_size, field=self))
-        setattr(cls, 'save_%s_file' % self.name,
-                 lambda instance, filename, raw_contents:
-                     instance._save_FIELD_file(self,filename, raw_contents)
-                 )
+        setattr(cls, 'save_%s_file' % self.name, lambda instance, filename, raw_contents: instance._save_FIELD_file(self, filename, raw_contents))
         dispatcher.connect(self.delete_file, signal=signals.post_delete, sender=cls)
 
     def delete_file(self, instance):
@@ -715,9 +712,6 @@ class OrderingField(IntegerField):
 
     def get_manipulator_fields(self, opts, manipulator, change, name_prefix='', rel=False, follow=True):
         return [forms.HiddenField(name_prefix + self.name)  ]
-
-    def contribute_to_class(self, cls, name):
-        super(OrderingField, self ).contribute_to_class(cls, name)
 
 class BoundFieldLine(object):
     def __init__(self, field_line, field_mapping, original, bound_field_class=BoundField):
