@@ -6,7 +6,7 @@ from django.core.extensions import get_object_or_404, render_to_response
 from django.db import models
 from django.db.models.fields import BoundField, BoundFieldLine, BoundFieldSet
 from django.http import Http404, HttpResponse, HttpResponseRedirect
-from django.template import loader, RequestContext
+from django.template import loader
 from django.utils import dateformat
 from django.utils.html import escape
 from django.utils.text import capfirst, get_text_list
@@ -235,7 +235,7 @@ def render_change_form(model, manipulator, app_label, context, add=False, change
                                "admin/change_form"], context_instance=context)
 
 def index(request):
-    return render_to_response('admin/index', {'title': _('Site administration')}, context_instance=RequestContext(request))
+    return render_to_response('admin/index', {'title': _('Site administration')}, context_instance=template.RequestContext(request))
 index = staff_member_required(index)
 
 def add_stage(request, path, show_delete=False, form_url='', post_url='../', post_url_continue='../%s/change', object_id_override=None):
@@ -300,7 +300,7 @@ def add_stage(request, path, show_delete=False, form_url='', post_url='../', pos
     # Populate the FormWrapper.
     form = forms.FormWrapper(manipulator, new_data, errors)
 
-    c = RequestContext(request, {
+    c = template.RequestContext(request, {
         'title': _('Add %s') % opts.verbose_name,
         'form': form,
         'is_popup': request.REQUEST.has_key('_popup'),
@@ -396,7 +396,7 @@ def change_stage(request, path, object_id):
     form.original = manipulator.original_object
     form.order_objects = []
 
-    c = RequestContext(request, {
+    c = template.RequestContext(request, {
         'title': _('Change %s') % opts.verbose_name,
         'form': form,
         'object_id': object_id,
@@ -520,7 +520,7 @@ def delete_stage(request, path, object_id):
         "object": obj,
         "deleted_objects": deleted_objects,
         "perms_lacking": perms_needed,
-    }, context_instance=RequestContext(request))
+    }, context_instance=template.RequestContext(request))
 delete_stage = staff_member_required(delete_stage)
 
 def history(request, app_label, module_name, object_id):
@@ -534,5 +534,5 @@ def history(request, app_label, module_name, object_id):
         'action_list': action_list,
         'module_name': capfirst(opts.verbose_name_plural),
         'object': obj,
-    }, context_instance=RequestContext(request))
+    }, context_instance=template.RequestContext(request))
 history = staff_member_required(history)
