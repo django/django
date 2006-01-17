@@ -68,7 +68,7 @@ class DatabaseWrapper:
         if self.connection.get_server_info() >= '4.1':
             cursor.execute("SET NAMES utf8")
         if settings.DEBUG:
-            return base.CursorDebugWrapper(MysqlDebugWrapper(cursor), self)
+            return util.CursorDebugWrapper(MysqlDebugWrapper(cursor), self)
         return cursor
 
     def commit(self):
