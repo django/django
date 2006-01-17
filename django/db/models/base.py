@@ -32,11 +32,11 @@ class ModelBase(type):
         new_class.add_to_class('_meta', Options(attrs.pop('Meta', None)))
         new_class.add_to_class('DoesNotExist', types.ClassType('DoesNotExist', (ObjectDoesNotExist,), {}))
 
-        app_package = sys.modules.get(new_class.__module__)
+        model_module = sys.modules[new_class.__module__]
 
         # Figure out the app_label by looking one level up.
         # For 'django.contrib.sites.models', this would be 'sites'.
-        app_label = app_package.__name__.split('.')[-2]
+        app_label = model_module.__name__.split('.')[-2]
 
         # Cache the app label.
         new_class._meta.app_label = app_label
@@ -48,7 +48,7 @@ class ModelBase(type):
         new_class._prepare()
 
         # Populate the _MODELS member on the module the class is in.
-        app_package.__dict__.setdefault('_MODELS', []).append(new_class)
+        model_module.__dict__.setdefault('_MODELS', []).append(new_class)
         return new_class
 
 def cmp_cls(x, y):
