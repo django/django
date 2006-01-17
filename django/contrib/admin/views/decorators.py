@@ -1,8 +1,7 @@
-from django.core.extensions import render_to_response
-from django.template import RequestContext
+from django import http, template
 from django.conf import settings
 from django.contrib.auth.models import User, SESSION_KEY
-from django import http
+from django.core.extensions import render_to_response
 from django.utils.translation import gettext_lazy
 import base64, datetime, md5
 import cPickle as pickle
@@ -25,7 +24,7 @@ def _display_login_form(request, error_message=''):
         'app_path': request.path,
         'post_data': post_data,
         'error_message': error_message
-    }, context_instance=RequestContext(request))
+    }, context_instance=template.RequestContext(request))
 
 def _encode_post_data(post_data):
     pickled = pickle.dumps(post_data)

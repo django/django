@@ -20,9 +20,11 @@ urlpatterns = patterns('',
     ('^doc/models/(?P<model>[^/]+)/$', 'django.contrib.admin.views.doc.model_detail'),
 #    ('^doc/templates/$', 'django.views.admin.doc.template_index'),
     ('^doc/templates/(?P<template>.*)/$', 'django.contrib.admin.views.doc.template_detail'),
-    ('^((?:[^/]+/)+?)add/$', 'django.contrib.admin.views.stages.add.add_stage'),
+
+    # Add/change/delete/history
+    ('^((?:[^/]+/)+?)add/$', 'django.contrib.admin.views.main.add_stage'),
     ('^((?:[^/]+/)+?)([^/]+)/history/$', 'django.contrib.admin.views.main.history'),
-    ('^((?:[^/]+/)+?)([^/]+)/delete/$', 'django.contrib.admin.views.stages.delete.delete_stage'),
-    ('^((?:[^/]+/)+?)([^/]+)/change/$', 'django.contrib.admin.views.stages.change.change_stage'),
+    ('^((?:[^/]+/)+?)([^/]+)/delete/$', 'django.contrib.admin.views.main.delete_stage'),
+    ('^((?:[^/]+/)+?)([^/]+)/change/$', 'django.contrib.admin.views.main.change_stage'),
     ('^((?:[^/]+/)+?)$', 'django.contrib.admin.views.changelist.change_list'),
 )

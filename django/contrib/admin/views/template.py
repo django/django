@@ -2,7 +2,6 @@ from django.contrib.admin.views.decorators import staff_member_required
 from django.core import validators
 from django import template, forms
 from django.template import loader
-from django.template import RequestContext as Context
 from django.core.extensions import render_to_response
 from django.contrib.sites.models import Site
 from django.conf import settings
@@ -27,7 +26,7 @@ def template_validator(request):
     return render_to_response('admin/template_validator', {
         'title': 'Template validator',
         'form': forms.FormWrapper(manipulator, new_data, errors),
-    }, context_instance=RequestContext(request))
+    }, context_instance=template.RequestContext(request))
 template_validator = staff_member_required(template_validator)
 
 class TemplateValidator(forms.Manipulator):

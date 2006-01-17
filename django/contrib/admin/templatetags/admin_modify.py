@@ -1,12 +1,12 @@
 from django import template
+from django.contrib.admin.views.main import AdminBoundField
 from django.template import loader
 from django.utils.html import escape
 from django.utils.text import capfirst
 from django.utils.functional import curry
-from django.contrib.admin.views.stages.modify import AdminBoundField
+from django.db.models import TABULAR, STACKED
 from django.db.models.fields import BoundField, Field
 from django.db.models.related import BoundRelatedObject
-from django.db.models import TABULAR, STACKED
 from django.db import models
 from django.conf import settings
 import re
@@ -126,7 +126,7 @@ class TabularBoundRelatedObject(BoundRelatedObject):
         self.field_wrapper_list = [FieldWrapper(field) for field in self.relation.editable_fields()]
 
         fields = self.relation.editable_fields()
-        
+
         self.form_field_collection_wrappers = [FormFieldCollectionWrapper(field_mapping, fields, i)
                                                for (i,field_mapping) in self.field_mappings.items() ]
         self.original_row_needed = max([fw.use_raw_id_admin() for fw in self.field_wrapper_list])

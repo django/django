@@ -1,4 +1,5 @@
 from django.template import Library
+
 register = Library()
 
 def admin_media_prefix():

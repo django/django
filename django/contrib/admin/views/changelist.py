@@ -8,6 +8,7 @@ from django.core.paginator import ObjectPaginator, InvalidPage
 from django.template import RequestContext as Context
 from django.core.extensions import render_to_response
 from django.utils.dates import MONTHS
+
 # The system will display a "Show all" link only if the total result count
 # is less than or equal to this setting.
 MAX_SHOW_ALL_ALLOWED = 200
@@ -67,7 +68,6 @@ class ChangeList(object):
 
     def resolve_model(self, path, request):
         self.model, self.app_label = get_model_and_app(path)
-        # _get_mod_opts(app_label, module_name)
         self.opts = self.model._meta
 
         if not request.user.has_perm(self.app_label + '.' + self.opts.get_change_permission()):

@@ -95,5 +95,5 @@ if docutils_is_available:
     docutils.parsers.rst.roles.register_canonical_role('cmsreference', default_reference_role)
     docutils.parsers.rst.roles.DEFAULT_INTERPRETED_ROLE = 'cmsreference'
 
-    for (name, urlbase) in ROLES.items():
+    for name, urlbase in ROLES.items():
         create_reference_role(name, urlbase)
