@@ -210,6 +210,15 @@ AttributeError: Manager isn't accessible via Article instances
 >>> Article.objects.get_count()
 4L
 
+>>> Article.objects.delete()
+Traceback (most recent call last):
+    ...
+TypeError: SAFTEY MECHANISM: Specify DELETE_ALL=True if you actually want to delete all data
+
+>>> Article.objects.delete(DELETE_ALL=True)
+>>> Article.objects.get_count()
+0L
+
 """
 
 from django.conf import settings
