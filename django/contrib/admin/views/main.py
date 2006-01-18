@@ -81,7 +81,6 @@ def log_add_message(user, opts, manipulator, new_object):
     pk_value = getattr(new_object, opts.pk.attname)
     LogEntry.objects.log_action(user.id, opts.get_content_type_id(), pk_value, str(new_object), ADDITION)
 
-
 def get_javascript_imports(opts, auto_populated_fields, ordered_objects, field_sets):
 # Put in any necessary JavaScript imports.
     js = ['js/core.js', 'js/admin/RelatedObjectLookups.js']
@@ -134,26 +133,15 @@ class AdminBoundField(BoundField):
         if field.rel:
             self.related_url = url_for_model(field.rel.to)
 
-    def _fetch_existing_display(self, func_name):
-        class_dict = self.original.__class__.__dict__
-        func = class_dict.get(func_name)
-        return func(self.original)
-
-    def _fill_existing_display(self):
-        if getattr(self, '_display_filled', False):
-            return
-        # HACK
-        if isinstance(self.field.rel, models.ManyToOne):
-             func_name = 'get_%s' % self.field.name
-             self._display = self._fetch_existing_display(func_name)
-        elif isinstance(self.field.rel, models.ManyToMany):
-            func_name = 'get_%s_list' % self.field.rel.singular
-            self._display =  ", ".join([str(obj) for obj in self._fetch_existing_display(func_name)])
-        self._display_filled = True
-
     def existing_display(self):
-        self._fill_existing_display()
-        return self._display
+        try:
+            return self._display
+        except AttributeError:
+            if isinstance(self.field.rel, models.ManyToOne):
+                self._display = getattr(self.original, 'get_%s' % self.field.name)()
+            elif isinstance(self.field.rel, models.ManyToMany):
+                self._display = ", ".join([str(obj) for obj in getattr(self.original, 'get_%s_list' % self.field.rel.singular)()])
+            return self._display
 
     def __repr__(self):
         return repr(self.__dict__)
