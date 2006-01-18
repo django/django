@@ -48,7 +48,7 @@ included this line::
 
 So let's create a ``vote()`` function in ``myproject/polls/views.py``::
 
-    from django.core.extensions import get_object_or_404, render_to_response
+    from django.shortcuts import get_object_or_404, render_to_response
     from django.models.polls import choices, polls
     from django.http import HttpResponseRedirect
 

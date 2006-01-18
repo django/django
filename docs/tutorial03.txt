@@ -254,7 +254,7 @@ It's a very common idiom to load a template, fill a context and return an
 ``HttpResponse`` object with the result of the rendered template. Django
 provides a shortcut. Here's the full ``index()`` view, rewritten::
 
-    from django.core.extensions import render_to_response
+    from django.shortcuts import render_to_response
     from django.models.polls import polls
 
     def index(request):
@@ -292,7 +292,7 @@ It's a very common idiom to use ``get_object()`` and raise ``Http404`` if the
 object doesn't exist. Django provides a shortcut. Here's the ``detail()`` view,
 rewritten::
 
-    from django.core.extensions import get_object_or_404
+    from django.shortcuts import get_object_or_404
     def detail(request, poll_id):
         p = get_object_or_404(polls, pk=poll_id)
         return render_to_response('polls/detail', {'poll': p})
