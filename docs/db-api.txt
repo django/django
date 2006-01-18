@@ -544,6 +544,22 @@ deletes the object and has no return value. Example::
 
     >>> c.delete()
 
+Objects can also be deleted in bulk using the same query parameters that are 
+used for get_object and other query methods. For example:: 
+
+    >>> Polls.objects.delete(pub_date__year=2005)
+
+would bulk delete all Polls with a year of 2005. A bulk delete call with no
+parameters would theoretically delete all data in the table. To prevent 
+accidental obliteration of a database, a bulk delete query with no parameters
+will throw an exception. If you actually want to delete all the data in a 
+table, you must add a ``DELETE_ALL=True`` argument to your query. 
+For example::
+
+    >>> Polls.objects.delete(DELETE_ALL=True)
+
+would remove all Poll instances from the database.
+
 Comparing objects
 =================
 
