@@ -3,7 +3,7 @@ from django.template import RequestContext
 from django.conf import settings
 from django.contrib.admin.views.decorators import staff_member_required
 from django.db import models
-from django.core.extensions import render_to_response
+from django.shortcuts import render_to_response
 from django.core.exceptions import ViewDoesNotExist
 from django.http import Http404
 from django.core import urlresolvers

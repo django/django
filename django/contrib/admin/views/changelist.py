@@ -6,7 +6,7 @@ from django.db.models.query import handle_legacy_orderlist
 from django.http import HttpResponse, HttpResponseRedirect
 from django.core.paginator import ObjectPaginator, InvalidPage
 from django.template import RequestContext as Context
-from django.core.extensions import render_to_response
+from django.shortcuts import render_to_response
 from django.utils.dates import MONTHS
 
 # The system will display a "Show all" link only if the total result count

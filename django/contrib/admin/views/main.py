@@ -2,7 +2,7 @@ from django import forms, template
 from django.conf import settings
 from django.contrib.admin.views.decorators import staff_member_required
 from django.core.exceptions import ImproperlyConfigured, ObjectDoesNotExist, PermissionDenied
-from django.core.extensions import get_object_or_404, render_to_response
+from django.shortcuts import get_object_or_404, render_to_response
 from django.db import models
 from django.db.models.fields import BoundField, BoundFieldLine, BoundFieldSet
 from django.http import Http404, HttpResponse, HttpResponseRedirect

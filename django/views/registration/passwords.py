@@ -1,6 +1,6 @@
 from django import forms
 from django.core import validators
-from django.core.extensions import render_to_response
+from django.shortcuts import render_to_response
 from django.template import Context, RequestContext, loader
 from django.contrib.auth.models import User
 from django.contrib.sites.models import Site

@@ -1,7 +1,7 @@
 from django import http, template
 from django.conf import settings
 from django.contrib.auth.models import User, SESSION_KEY
-from django.core.extensions import render_to_response
+from django.shortcuts import render_to_response
 from django.utils.translation import gettext_lazy
 import base64, datetime, md5
 import cPickle as pickle

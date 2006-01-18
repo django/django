@@ -1,4 +1,4 @@
-from django.core.extensions import render_to_response
+from django.shortcuts import render_to_response
 from django.template import RequestContext
 from django.http import Http404
 from django.models.comments import comments, moderatordeletions, userflags

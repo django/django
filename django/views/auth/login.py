@@ -1,6 +1,6 @@
 from django.parts.auth.formfields import AuthenticationForm
 from django import forms
-from django.core.extensions import render_to_response
+from django.shortcuts import render_to_response
 from django.template import RequestContext
 from django.contrib.auth.models import SESSION_KEY
 from django.contrib.sites.models import Site
