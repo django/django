@@ -2,7 +2,7 @@ from django.conf import settings
 from django.core.template import Template, Context, TemplateDoesNotExist
 from django.utils.html import escape
 from django.utils.httpwrappers import HttpResponseServerError, HttpResponseNotFound
-import inspect, os, re, sys
+import os, re
 from itertools import count, izip
 from os.path import dirname, join as pathjoin
 

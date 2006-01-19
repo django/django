@@ -12,13 +12,14 @@ DOTS = ['&middot;', '*', '\xe2\x80\xa2', '&#149;', '&bull;', '&#8226;']
 unencoded_ampersands_re = re.compile(r'&(?!(\w+|#\d+);)')
 word_split_re = re.compile(r'(\s+)')
 punctuation_re = re.compile('^(?P<lead>(?:%s)*)(?P<middle>.*?)(?P<trail>(?:%s)*)$' % \
-    ('|'.join([re.escape(p) for p in LEADING_PUNCTUATION]),
-    '|'.join([re.escape(p) for p in TRAILING_PUNCTUATION])))
+    ('|'.join([re.escape(x) for x in LEADING_PUNCTUATION]),
+    '|'.join([re.escape(x) for x in TRAILING_PUNCTUATION])))
 simple_email_re = re.compile(r'^\S+@[a-zA-Z0-9._-]+\.[a-zA-Z0-9._-]+$')
 link_target_attribute_re = re.compile(r'(<a [^>]*?)target=[^\s>]+')
 html_gunk_re = re.compile(r'(?:<br clear="all">|<i><\/i>|<b><\/b>|<em><\/em>|<strong><\/strong>|<\/?smallcaps>|<\/?uppercase>)', re.IGNORECASE)
-hard_coded_bullets_re = re.compile(r'((?:<p>(?:%s).*?[a-zA-Z].*?</p>\s*)+)' % '|'.join([re.escape(d) for d in DOTS]), re.DOTALL)
+hard_coded_bullets_re = re.compile(r'((?:<p>(?:%s).*?[a-zA-Z].*?</p>\s*)+)' % '|'.join([re.escape(x) for x in DOTS]), re.DOTALL)
 trailing_empty_content_re = re.compile(r'(?:<p>(?:&nbsp;|\s|<br \/>)*?</p>\s*)+\Z')
+del x # Temporary variable
 
 def escape(html):
     "Returns the given HTML with ampersands, quotes and carets encoded"
