@@ -1,6 +1,5 @@
 from django.core.exceptions import ObjectDoesNotExist
 from django import forms
-from django.forms import Manipulator
 from django.db.models.fields import FileField, AutoField
 from django.db.models.exceptions import BadCommand
 from django.dispatch import dispatcher
@@ -57,7 +56,7 @@ class Naming(object):
 
     name = property(_get_name)
 
-class AutomaticManipulator(Manipulator, Naming):
+class AutomaticManipulator(forms.Manipulator, Naming):
     def _prepare(cls, model):
         cls.model = model
         cls.manager = model._default_manager
