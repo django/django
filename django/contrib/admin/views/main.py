@@ -1,81 +1,54 @@
 from django import forms, template
 from django.conf import settings
+from django.contrib.admin.filterspecs import FilterSpec
 from django.contrib.admin.views.decorators import staff_member_required
 from django.core.exceptions import ImproperlyConfigured, ObjectDoesNotExist, PermissionDenied
+from django.core.paginator import ObjectPaginator, InvalidPage
 from django.shortcuts import get_object_or_404, render_to_response
 from django.db import models
 from django.db.models.fields import BoundField, BoundFieldLine, BoundFieldSet
+from django.db.models.query import handle_legacy_orderlist
 from django.http import Http404, HttpResponse, HttpResponseRedirect
 from django.template import loader
 from django.utils import dateformat
+from django.utils.dates import MONTHS
 from django.utils.html import escape
 from django.utils.text import capfirst, get_text_list
 import operator
-from itertools import izip
 
 try:
     from django.contrib.admin.models import LogEntry, ADDITION, CHANGE, DELETION
 except ImportError:
     raise ImproperlyConfigured, "You don't have 'django.contrib.admin' in INSTALLED_APPS."
 
-ADMIN_PREFIX = "/admin/"
+# The system will display a "Show all" link on the change list only if the
+# total result count is less than or equal to this setting.
+MAX_SHOW_ALL_ALLOWED = 200
+
+# Changelist settings
+DEFAULT_RESULTS_PER_PAGE = 100
+ALL_VAR = 'all'
+ORDER_VAR = 'o'
+ORDER_TYPE_VAR = 'ot'
+PAGE_VAR = 'p'
+SEARCH_VAR = 'q'
+IS_POPUP_VAR = 'pop'
+
+# Text to display within change-list table cells if the value is blank.
+EMPTY_CHANGELIST_VALUE = '(None)'
 
 use_raw_id_admin = lambda field: isinstance(field.rel, (models.ManyToOne, models.ManyToMany)) and field.rel.raw_id_admin
 
-def matches_app(mod, comps):
-    modcomps = mod.__name__.split('.')[:-1] #HACK: leave off 'models'
-    for c, mc in izip(comps, modcomps):
-        if c != mc:
-            return [], False
-    return comps[len(modcomps):], True
+class IncorrectLookupParameters(Exception):
+    pass
 
-def find_model(mod, remaining):
-    if len(remaining) == 0:
-        raise Http404
-    if len(remaining) == 1:
-        if hasattr(mod, '_MODELS'):
-            name = remaining[0]
-            for model in mod._MODELS:
-                if model.__name__.lower() == name:
+def get_model(app_label, model_name):
+    for module in models.get_installed_models():
+        if module.__name__.split('.')[-2] == app_label: # TODO: Refactor this logic.
+            for model in getattr(module, '_MODELS', ()):
+                if model._meta.object_name.lower() == model_name:
                     return model
-            raise Http404
-        else:
-            raise Http404
-    else:
-        child = getattr(mod, remaining[0], None)
-        if child:
-            return find_model(child, remaining[1:])
-        else:
-            raise Http404
-
-def get_app_label(mod):
-    #HACK
-    return mod.__name__.split('.')[-2]
-
-def get_model_and_app(path):
-    comps = path.split('/')
-    comps = comps[:-1] # remove '' after final /
-    for mod in models.get_installed_models():
-        remaining, matched = matches_app(mod, comps)
-        if matched and len(remaining) > 0:
-            return (find_model(mod, remaining), get_app_label(mod))
-    raise Http404 # Couldn't find app
-
-_model_urls = {}
-
-def url_for_model(model):
-    try:
-        return _model_urls[model]
-    except KeyError:
-        comps = model.__module__.split('.')
-        for mod in models.get_installed_models():
-            remaining, matched =  matches_app(mod, comps)
-            if matched and len(remaining) > 0:
-                comps = comps[:-len(remaining)] + remaining[1:]
-                url = "%s%s/%s/" % (ADMIN_PREFIX, '/'.join(comps) , model.__name__.lower())
-                _model_urls[model] = url
-                return url
-        raise ImproperlyConfigured, '%s is not a model in an installed app' % model.__name__
+    raise Http404, "App %r, model %r, not found" % (app_label, model_name)
 
 def get_javascript_imports(opts, auto_populated_fields, ordered_objects, field_sets):
 # Put in any necessary JavaScript imports.
@@ -127,7 +100,7 @@ class AdminBoundField(BoundField):
         self._repr_filled = False
 
         if field.rel:
-            self.related_url = url_for_model(field.rel.to)
+            self.related_url = '../../../%s/%s/' % (field.rel.to._meta.app_label, field.rel.to._meta.object_name.lower())
 
     def existing_display(self):
         try:
@@ -222,8 +195,8 @@ def index(request):
     return render_to_response('admin/index', {'title': _('Site administration')}, context_instance=template.RequestContext(request))
 index = staff_member_required(index)
 
-def add_stage(request, path, show_delete=False, form_url='', post_url='../', post_url_continue='../%s/change', object_id_override=None):
-    model, app_label = get_model_and_app(path)
+def add_stage(request, app_label, model_name, show_delete=False, form_url='', post_url='../', post_url_continue='../%s/change', object_id_override=None):
+    model = get_model(app_label, model_name)
     opts = model._meta
 
     if not request.user.has_perm(app_label + '.' + opts.get_add_permission()):
@@ -289,7 +262,6 @@ def add_stage(request, path, show_delete=False, form_url='', post_url='../', pos
         'form': form,
         'is_popup': request.REQUEST.has_key('_popup'),
         'show_delete': show_delete,
-        'path': path ,
     })
 
     if object_id_override is not None:
@@ -298,13 +270,13 @@ def add_stage(request, path, show_delete=False, form_url='', post_url='../', pos
     return render_change_form(model, manipulator, app_label, c, add=True)
 add_stage = staff_member_required(add_stage)
 
-def change_stage(request, path, object_id):
-    model, app_label = get_model_and_app(path)
+def change_stage(request, app_label, model_name, object_id):
+    model = get_model(app_label, model_name)
     opts = model._meta
     if not request.user.has_perm(app_label + '.' + opts.get_change_permission()):
         raise PermissionDenied
     if request.POST and request.POST.has_key("_saveasnew"):
-        return add_stage(request, path, form_url='../../add/')
+        return add_stage(request, app_label, model_name, form_url='../../add/')
 
     try:
         manipulator = model.ChangeManipulator(object_id)
@@ -384,7 +356,6 @@ def change_stage(request, path, object_id):
         'object_id': object_id,
         'original': manipulator.original_object,
         'is_popup': request.REQUEST.has_key('_popup'),
-        'path': path,
     })
     return render_change_form(model, manipulator, app_label, c, change=True)
 change_stage = staff_member_required(change_stage)
@@ -473,9 +444,9 @@ def _get_deleted_objects(deleted_objects, perms_needed, user, obj, opts, current
             if not user.has_perm(p):
                 perms_needed.add(related.opts.verbose_name)
 
-def delete_stage(request, path, object_id):
+def delete_stage(request, app_label, model_name, object_id):
     import sets
-    model, app_label = get_model_and_app(path)
+    model = get_model(app_label, model_name)
     opts = model._meta
     if not request.user.has_perm(app_label + '.' + opts.get_delete_permission()):
         raise PermissionDenied
@@ -504,15 +475,206 @@ def delete_stage(request, path, object_id):
     }, context_instance=template.RequestContext(request))
 delete_stage = staff_member_required(delete_stage)
 
-def history(request, app_label, module_name, object_id):
-    action_list = LogEntry.objects.get_list(object_id__exact=object_id, content_type__id__exact=opts.get_content_type_id(),
+def history(request, app_label, model_name, object_id):
+    model = get_model(app_label, model_name)
+    action_list = LogEntry.objects.get_list(object_id__exact=object_id, content_type__id__exact=model._meta.get_content_type_id(),
         order_by=("action_time",), select_related=True)
     # If no history was found, see whether this object even exists.
-    obj = get_object_or_404(mod, pk=object_id)
+    obj = get_object_or_404(model, pk=object_id)
     return render_to_response('admin/object_history', {
         'title': _('Change history: %s') % obj,
         'action_list': action_list,
-        'module_name': capfirst(opts.verbose_name_plural),
+        'module_name': capfirst(model._meta.verbose_name_plural),
         'object': obj,
     }, context_instance=template.RequestContext(request))
 history = staff_member_required(history)
+
+class ChangeList(object):
+    def __init__(self, request, model):
+        self.model = model
+        self.opts = self.model._meta
+        self.lookup_opts = self.opts
+        self.manager = self.model._default_manager
+        self.get_search_parameters(request)
+        self.get_ordering()
+        self.query = request.GET.get(SEARCH_VAR, '')
+        self.get_lookup_params()
+        self.get_results(request)
+        self.title = (self.is_popup
+                      and _('Select %s') % self.opts.verbose_name
+                      or _('Select %s to change') % self.opts.verbose_name)
+        self.get_filters(request)
+        self.pk_attname = self.lookup_opts.pk.attname
+
+    def get_filters(self, request):
+        self.filter_specs = []
+        if self.lookup_opts.admin.list_filter and not self.opts.one_to_one_field:
+            filter_fields = [self.lookup_opts.get_field(field_name) \
+                              for field_name in self.lookup_opts.admin.list_filter]
+            for f in filter_fields:
+                spec = FilterSpec.create(f, request, self.params)
+                if spec and spec.has_output():
+                    self.filter_specs.append(spec)
+        self.has_filters = bool(self.filter_specs)
+
+    def get_query_string(self, new_params={}, remove=[]):
+        p = self.params.copy()
+        for r in remove:
+            for k in p.keys():
+                if k.startswith(r):
+                    del p[k]
+        for k, v in new_params.items():
+            if p.has_key(k) and v is None:
+                del p[k]
+            elif v is not None:
+                p[k] = v
+        return '?' + '&amp;'.join(['%s=%s' % (k, v) for k, v in p.items()]).replace(' ', '%20')
+
+    def get_search_parameters(self, request):
+        # Get search parameters from the query string.
+        try:
+            self.page_num = int(request.GET.get(PAGE_VAR, 0))
+        except ValueError:
+            self.page_num = 0
+        self.show_all = request.GET.has_key(ALL_VAR)
+        self.is_popup = request.GET.has_key(IS_POPUP_VAR)
+        self.params = dict(request.GET.items())
+        if self.params.has_key(PAGE_VAR):
+            del self.params[PAGE_VAR]
+
+    def get_results(self, request):
+        manager, lookup_params = self.manager, self.lookup_params
+        show_all, page_num = self.show_all, self.page_num
+        # Get the results.
+        try:
+            paginator = ObjectPaginator(manager, lookup_params, DEFAULT_RESULTS_PER_PAGE)
+        # Naked except! Because we don't have any other way of validating "params".
+        # They might be invalid if the keyword arguments are incorrect, or if the
+        # values are not in the correct type (which would result in a database
+        # error).
+        except Exception:
+            raise IncorrectLookupParameters
+
+        # Get the total number of objects, with no filters applied.
+        real_lookup_params = lookup_params.copy()
+        del real_lookup_params['order_by']
+        if real_lookup_params:
+            full_result_count = manager.get_count()
+        else:
+            full_result_count = paginator.hits
+        del real_lookup_params
+        result_count = paginator.hits
+        can_show_all = result_count <= MAX_SHOW_ALL_ALLOWED
+        multi_page = result_count > DEFAULT_RESULTS_PER_PAGE
+
+        # Get the list of objects to display on this page.
+        if (show_all and can_show_all) or not multi_page:
+            result_list = manager.get_list(**lookup_params)
+        else:
+            try:
+                result_list = paginator.get_page(page_num)
+            except InvalidPage:
+                result_list = []
+        (self.result_count, self.full_result_count, self.result_list,
+            self.can_show_all, self.multi_page, self.paginator) = (result_count,
+                  full_result_count, result_list, can_show_all, multi_page, paginator )
+
+    def url_for_result(self, result):
+        return "%s/" % getattr(result, self.pk_attname)
+
+    def get_ordering(self):
+        lookup_opts, params = self.lookup_opts, self.params
+        # For ordering, first check the "ordering" parameter in the admin options,
+        # then check the object's default ordering. If neither of those exist,
+        # order descending by ID by default. Finally, look for manually-specified
+        # ordering from the query string.
+        ordering = lookup_opts.admin.ordering or lookup_opts.ordering or ['-' + lookup_opts.pk.name]
+
+        # Normalize it to new-style ordering.
+        ordering = handle_legacy_orderlist(ordering)
+
+        if ordering[0].startswith('-'):
+            order_field, order_type = ordering[0][1:], 'desc'
+        else:
+            order_field, order_type = ordering[0], 'asc'
+        if params.has_key(ORDER_VAR):
+            try:
+                try:
+                    f = lookup_opts.get_field(lookup_opts.admin.list_display[int(params[ORDER_VAR])])
+                except models.FieldDoesNotExist:
+                    pass
+                else:
+                    if not isinstance(f.rel, models.ManyToOne) or not f.null:
+                        order_field = f.name
+            except (IndexError, ValueError):
+                pass # Invalid ordering specified. Just use the default.
+        if params.has_key(ORDER_TYPE_VAR) and params[ORDER_TYPE_VAR] in ('asc', 'desc'):
+            order_type = params[ORDER_TYPE_VAR]
+        self.order_field, self.order_type = order_field, order_type
+
+    def get_lookup_params(self):
+        # Prepare the lookup parameters for the API lookup.
+        (params, order_field, lookup_opts, order_type, opts, query) = \
+           (self.params, self.order_field, self.lookup_opts, self.order_type, self.opts, self.query)
+
+        lookup_params = params.copy()
+        for i in (ALL_VAR, ORDER_VAR, ORDER_TYPE_VAR, SEARCH_VAR, IS_POPUP_VAR):
+            if lookup_params.has_key(i):
+                del lookup_params[i]
+        # If the order-by field is a field with a relationship, order by the value
+        # in the related table.
+        lookup_order_field = order_field
+        try:
+            f = lookup_opts.get_field(order_field)
+        except models.FieldDoesNotExist:
+            pass
+        else:
+            if isinstance(lookup_opts.get_field(order_field).rel, models.ManyToOne):
+                f = lookup_opts.get_field(order_field)
+                rel_ordering = f.rel.to._meta.ordering and f.rel.to._meta.ordering[0] or f.rel.to._meta.pk.column
+                lookup_order_field = '%s.%s' % (f.rel.to._meta.db_table, rel_ordering)
+        # Use select_related if one of the list_display options is a field with a
+        # relationship.
+        if lookup_opts.admin.list_select_related:
+            lookup_params['select_related'] = True
+        else:
+            for field_name in lookup_opts.admin.list_display:
+                try:
+                    f = lookup_opts.get_field(field_name)
+                except models.FieldDoesNotExist:
+                    pass
+                else:
+                    if isinstance(f.rel, models.ManyToOne):
+                        lookup_params['select_related'] = True
+                        break
+        lookup_params['order_by'] = ((order_type == 'desc' and '-' or '') + lookup_order_field,)
+        if lookup_opts.admin.search_fields and query:
+            complex_queries = []
+            for bit in query.split():
+                or_queries = []
+                for field_name in lookup_opts.admin.search_fields:
+                    or_queries.append(models.Q(**{'%s__icontains' % field_name: bit}))
+                complex_queries.append(reduce(operator.or_, or_queries))
+            lookup_params['complex'] = reduce(operator.and_, complex_queries)
+        if opts.one_to_one_field:
+            lookup_params.update(opts.one_to_one_field.rel.limit_choices_to)
+        self.lookup_params = lookup_params
+
+def change_list(request, app_label, model_name):
+    model = get_model(app_label, model_name)
+    if not request.user.has_perm(app_label + '.' + model._meta.get_change_permission()):
+        raise PermissionDenied
+    try:
+        cl = ChangeList(request, model)
+    except IncorrectLookupParameters:
+        return HttpResponseRedirect(request.path)
+    c = template.RequestContext(request, {
+        'title': cl.title,
+        'is_popup': cl.is_popup,
+        'cl': cl,
+    })
+    c.update({'has_add_permission': c['perms'][app_label][cl.opts.get_add_permission()]}),
+    return render_to_response(['admin/%s/%s/change_list' % (app_label, cl.opts.object_name.lower()),
+                               'admin/%s/change_list' % app_label,
+                               'admin/change_list'], context_instance=c)
+change_list = staff_member_required(change_list)

@@ -2,7 +2,7 @@
 {% load adminmedia admin_list i18n breadcrumbs %}
 {% block bodyclass %}change-list{% endblock %}
 {% block userlinks %}<a href="../../doc/">{% trans 'Documentation' %}</a> / <a href="../../password_change/">{% trans 'Change password' %}</a> / <a href="../../logout/">{% trans 'Log out' %}</a>{% endblock %}
-{% if not is_popup %}{% block breadcrumbs %}<div class="breadcrumbs">{% path_breadcrumbs path "Home" "1" "0" %}</div>{% endblock %}{% endif %}
+{% if not is_popup %}{% block breadcrumbs %}<div class="breadcrumbs">BREADCRUMBS</div>{% endblock %}{% endif %}
 {% block coltype %}flex{% endblock %}
 {% block content %}
 <div id="content-main">
