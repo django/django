@@ -26,7 +26,7 @@ def add_model_module(mod, modules):
         submod = __import__("%s.%s" % (mod.__name__, name), '', '', [''])
         add_model_module(submod, modules)
 
-def get_installed_model_modules(core_models=None):
+def get_installed_model_modules():
     """
     Returns a list of installed models, such as django.models.core,
     ellington.news.models.news, foo.models.bar, etc.
@@ -35,10 +35,6 @@ def get_installed_model_modules(core_models=None):
     if _installed_modules_cache is not None:
         return _installed_modules_cache
     _installed_modules_cache = []
-
-    # django.models is a special case.
-    for submodule in (core_models or []):
-        _installed_modules_cache.append(__import__('django.models.%s' % submodule, '', '', ['']))
     for mod in get_installed_models():
         add_model_module(mod, _installed_modules_cache)
     return _installed_modules_cache
