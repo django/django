@@ -32,7 +32,7 @@ def manipulator_validator_unique(f, opts, self, field_data, all_data):
         old_obj = self.manager.get_object(**{lookup_type: field_data})
     except ObjectDoesNotExist:
         return
-    if hasattr(self, 'original_object') and self.original_object._get_pk_val() == old_obj._get_pk_val():
+    if getattr(self, 'original_object', None) and self.original_object._get_pk_val() == old_obj._get_pk_val():
         return
     raise validators.ValidationError, _("%(optname)s with this %(fieldname)s already exists.") % {'optname': capfirst(opts.verbose_name), 'fieldname': f.verbose_name}
 
