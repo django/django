@@ -1,12 +1,9 @@
-import re
-import os
-
-import gettext as gettext_module
-
 from django import http
 from django.utils.translation import check_for_language, activate, to_locale, get_language
 from django.utils.text import javascript_quote
 from django.conf import settings
+import os
+import gettext as gettext_module
 
 def set_language(request):
     """
@@ -145,7 +142,7 @@ def javascript_catalog(request, domain='djangojs', packages=None):
         for path in paths:
             try:
                 catalog = gettext_module.translation(domain, path, [default_locale])
-            except IOError, e:
+            except IOError:
                 catalog = None
             if catalog is not None:
                 t.update(catalog._catalog)
@@ -154,7 +151,7 @@ def javascript_catalog(request, domain='djangojs', packages=None):
         for path in paths:
             try:
                 catalog = gettext_module.translation(domain, path, [locale])
-            except IOError, e:
+            except IOError:
                 catalog = None
             if catalog is not None:
                 t.update(catalog._catalog)
