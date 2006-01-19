@@ -285,7 +285,7 @@ optional, third positional argument, ``processors``. In this example, the
 Here's what each of the default processors does:
 
 .. _HttpRequest object: http://www.djangoproject.com/documentation/request_response/#httprequest-objects
-.. _TEMPLATE_CONTEXT_PROCESSORS setting: http://www.djangoproject.com/documentation/settings/#template-context_processors
+.. _TEMPLATE_CONTEXT_PROCESSORS setting: http://www.djangoproject.com/documentation/settings/#template-context-processors
 
 django.core.context_processors.auth
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
