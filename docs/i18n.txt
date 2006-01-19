@@ -447,24 +447,24 @@ Notes:
       en-us).
 
       .. _LANGUAGES setting: http://www.djangoproject.com/documentation/settings/#languages
-    * the LocaleMiddleware can only select languages for which there is a
-      django provided base translation. If you want to provide translations
+    * The ``LocaleMiddleware`` can only select languages for which there is a
+      Django-provided base translation. If you want to provide translations
       for your application that aren't already in the set of translations
-      in Djangos source tree, you will want to at least provide basic
-      translations for that language. For example Django uses technical
-      message IDs to translate date formats and time formats - so you will
+      in Django's source tree, you'll want to provide at least basic
+      translations for that language. For example, Django uses technical
+      message IDs to translate date formats and time formats -- so you will
       need at least those translations for the system to work correctly.
 
-      A good starting point is to just copy over the english ``.po`` file
-      and to translate at least the technical messages and maybe the validator
+      A good starting point is to copy the English ``.po`` file and to
+      translate at least the technical messages -- maybe the validator
       messages, too.
-      
-      Technical message IDs are easily recognized by them being all upper case.
-      You don't translate the message ID as with other messages, you provide
-      the correct local variant on the provided english value. For example with
+
+      Technical message IDs are easily recognized; they're all upper case. You
+      don't translate the message ID as with other messages, you provide the
+      correct local variant on the provided English value. For example, with
       ``DATETIME_FORMAT`` (or ``DATE_FORMAT`` or ``TIME_FORMAT``), this would
-      be the format string that you want to use in your language.  The format
-      is identical to the ``now`` tag date formattings.
+      be the format string that you want to use in your language. The format
+      is identical to the format strings used by the ``now`` template tag.
 
 Once ``LocaleMiddleware`` determines the user's preference, it makes this
 preference available as ``request.LANGUAGE_CODE`` for each `request object`_.
