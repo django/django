@@ -204,6 +204,7 @@ def add_stage(request, app_label, model_name, show_delete=False, form_url='', po
     manipulator = model.AddManipulator()
     if request.POST:
         new_data = request.POST.copy()
+
         if opts.has_field_type(models.FileField):
             new_data.update(request.FILES)
 
@@ -216,9 +217,7 @@ def add_stage(request, app_label, model_name, show_delete=False, form_url='', po
         #get the errors on the updated shape of the manipulator
         #HACK - validators should not work on POSTED data directly...
         errors = manipulator.get_validation_errors(data)
-        if request.POST.has_key("_preview"):
-            pass
-        elif request.POST.has_key("command"):
+        if request.POST.has_key("command"):
             command_name = request.POST.get("command")
             manipulator.do_command(command_name)
             new_data = manipulator.flatten_data()
@@ -296,9 +295,7 @@ def change_stage(request, app_label, model_name, object_id):
         #get the errors on the updated shape of the manipulator
         #HACK - validators should not work on POSTED data directly...
 
-        if request.POST.has_key("_preview"):
-            errors = manipulator.get_validation_errors(data)
-        elif request.POST.has_key("command"):
+        if request.POST.has_key("command"):
             command_name = request.POST.get("command")
             manipulator.do_command(command_name)
             errors = manipulator.get_validation_errors(data)
