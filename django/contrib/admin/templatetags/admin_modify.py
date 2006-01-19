@@ -221,13 +221,8 @@ def register_one_arg_tag(node):
     parse_func = curry(do_one_arg_tag, node)
     register.tag(tag_name, parse_func)
 
-one_arg_tag_nodes = (
-    FieldWidgetNode,
-    EditInlineNode,
-)
-
-for node in one_arg_tag_nodes:
-    register_one_arg_tag(node)
+register_one_arg_tag(FieldWidgetNode)
+register_one_arg_tag(EditInlineNode)
 
 #@register.inclusion_tag('admin/field_line', takes_context=True)
 def admin_field_line(context, argument_val):
