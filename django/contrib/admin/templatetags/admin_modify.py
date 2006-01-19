@@ -18,12 +18,10 @@ word_re = re.compile('[A-Z][a-z]+')
 def class_name_to_underscored(name):
     return '_'.join([s.lower() for s in word_re.findall(name)[:-1]])
 
-#@register.simple_tag
 def include_admin_script(script_path):
     return '<script type="text/javascript" src="%s%s"></script>' % (settings.ADMIN_MEDIA_PREFIX, script_path)
 include_admin_script = register.simple_tag(include_admin_script)
 
-#@register.inclusion_tag('admin/submit_line', takes_context=True)
 def submit_row(context, bound_manipulator):
     change = context['change']
     add = context['add']
@@ -42,7 +40,6 @@ def submit_row(context, bound_manipulator):
     }
 submit_row = register.inclusion_tag('admin/submit_line', takes_context=True)(submit_row)
 
-#@register.simple_tag
 def field_label(bound_field):
     class_names = []
     if isinstance(bound_field.field, models.BooleanField):
@@ -176,12 +173,10 @@ class EditInlineNode(template.Node):
         context.pop()
         return output
 
-#@register.simple_tag
 def output_all(form_fields):
     return ''.join([str(f) for f in form_fields])
 output_all = register.simple_tag(output_all)
 
-#@register.simple_tag
 def auto_populated_field_script(auto_pop_fields, change = False):
     for field in auto_pop_fields:
         t = []
@@ -199,7 +194,6 @@ def auto_populated_field_script(auto_pop_fields, change = False):
     return ''.join(t)
 auto_populated_field_script = register.simple_tag(auto_populated_field_script)
 
-#@register.simple_tag
 def filter_interface_script_maybe(bound_field):
     f = bound_field.field
     if f.rel and isinstance(f.rel, models.ManyToMany) and f.rel.filter_interface:
@@ -224,7 +218,6 @@ def register_one_arg_tag(node):
 register_one_arg_tag(FieldWidgetNode)
 register_one_arg_tag(EditInlineNode)
 
-#@register.inclusion_tag('admin/field_line', takes_context=True)
 def admin_field_line(context, argument_val):
     if (isinstance(argument_val, BoundField)):
         bound_fields = [argument_val]
@@ -252,8 +245,6 @@ def admin_field_line(context, argument_val):
     }
 admin_field_line = register.inclusion_tag('admin/field_line', takes_context=True)(admin_field_line)
 
-#@register.simple_tag
 def object_pk(bound_manip, ordered_obj):
     return bound_manip.get_ordered_object_pk(ordered_obj)
-
 object_pk = register.simple_tag(object_pk)

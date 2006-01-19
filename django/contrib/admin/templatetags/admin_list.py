@@ -15,7 +15,6 @@ register = Library()
 
 DOT = '.'
 
-#@register.simple_tag
 def paginator_number(cl,i):
     if i == DOT:
        return '... '
@@ -25,7 +24,6 @@ def paginator_number(cl,i):
        return '<a href="%s"%s>%d</a> ' % (cl.get_query_string({PAGE_VAR: i}), (i == cl.paginator.pages-1 and ' class="end"' or ''), i+1)
 paginator_number = register.simple_tag(paginator_number)
 
-#@register.inclusion_tag('admin/pagination')
 def pagination(cl):
     paginator, page_num = cl.paginator, cl.page_num
 
@@ -180,7 +178,6 @@ def results(cl):
     for res in cl.result_list:
         yield list(items_for_result(cl,res))
 
-#@register.inclusion_tag("admin/change_list_results")
 def result_list(cl):
     res = list(results(cl))
     return {'cl': cl,
@@ -188,7 +185,6 @@ def result_list(cl):
             'results': list(results(cl))}
 result_list = register.inclusion_tag("admin/change_list_results")(result_list)
 
-#@register.inclusion_tag("admin/date_hierarchy")
 def date_hierarchy(cl):
     lookup_opts, params, lookup_params, manager = \
       cl.lookup_opts, cl.params, cl.lookup_params, cl.manager
@@ -261,7 +257,6 @@ def date_hierarchy(cl):
             }
 date_hierarchy = register.inclusion_tag('admin/date_hierarchy')(date_hierarchy)
 
-#@register.inclusion_tag('admin/search_form')
 def search_form(cl):
     return {
         'cl': cl,
@@ -270,12 +265,10 @@ def search_form(cl):
     }
 search_form = register.inclusion_tag('admin/search_form')(search_form)
 
-#@register.inclusion_tag('admin/filter')
 def filter(cl, spec):
     return {'title': spec.title(), 'choices' : list(spec.choices(cl))}
 filter = register.inclusion_tag('admin/filter')(filter)
 
-#@register.inclusion_tag('admin/filters')
 def filters(cl):
     return {'cl': cl}
 filters = register.inclusion_tag('admin/filters')(filters)
