@@ -1,5 +1,5 @@
 {% extends "admin/base_site" %}
-{% load adminmedia admin_list i18n breadcrumbs %}
+{% load adminmedia admin_list i18n %}
 {% block bodyclass %}change-list{% endblock %}
 {% block userlinks %}<a href="../../doc/">{% trans 'Documentation' %}</a> / <a href="../../password_change/">{% trans 'Change password' %}</a> / <a href="../../logout/">{% trans 'Log out' %}</a>{% endblock %}
 {% if not is_popup %}{% block breadcrumbs %}<div class="breadcrumbs"><a href="../../">{% trans "Home" %}</a> &rsaquo; {{ cl.opts.verbose_name_plural|capfirst }}</div>{% endblock %}{% endif %}
