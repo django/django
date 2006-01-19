@@ -195,7 +195,7 @@ def index(request):
     return render_to_response('admin/index', {'title': _('Site administration')}, context_instance=template.RequestContext(request))
 index = staff_member_required(index)
 
-def add_stage(request, app_label, model_name, show_delete=False, form_url='', post_url='../', post_url_continue='../%s/change', object_id_override=None):
+def add_stage(request, app_label, model_name, show_delete=False, form_url='', post_url='../', post_url_continue='../%s/', object_id_override=None):
     model = get_model(app_label, model_name)
     opts = model._meta
 
