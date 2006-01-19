@@ -96,7 +96,7 @@ def get_javascript_imports(opts, auto_populated_fields, ordered_objects, field_s
     for field_set in field_sets:
         if not seen_collapse and 'collapse' in field_set.classes:
             seen_collapse = True
-            js.append('js/admin/CollapsedFieldsets.js' )
+            js.append('js/admin/CollapsedFieldsets.js')
 
         for field_line in field_set:
             try:
@@ -390,7 +390,7 @@ def change_stage(request, path, object_id):
         'object_id': object_id,
         'original': manipulator.original_object,
         'is_popup': request.REQUEST.has_key('_popup'),
-        'path': path ,
+        'path': path,
     })
     return render_change_form(model, manipulator, app_label, c, change=True)
 change_stage = staff_member_required(change_stage)
@@ -481,7 +481,6 @@ def _get_deleted_objects(deleted_objects, perms_needed, user, obj, opts, current
 
 def delete_stage(request, path, object_id):
     import sets
-    #mod, opts = _get_mod_opts(app_label, module_name)
     model, app_label = get_model_and_app(path)
     opts = model._meta
     if not request.user.has_perm(app_label + '.' + opts.get_delete_permission()):
@@ -512,7 +511,6 @@ def delete_stage(request, path, object_id):
 delete_stage = staff_member_required(delete_stage)
 
 def history(request, app_label, module_name, object_id):
-    mod, opts = _get_mod_opts(app_label, module_name)
     action_list = LogEntry.objects.get_list(object_id__exact=object_id, content_type__id__exact=opts.get_content_type_id(),
         order_by=("action_time",), select_related=True)
     # If no history was found, see whether this object even exists.
