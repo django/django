@@ -13,12 +13,11 @@ class AdminApplistNode(template.Node):
         user = context['user']
 
         for app in models.get_installed_model_modules():
-            app_label = app.__name__.split('.')[:-1][-1]
+            app_label = app.__name__.split('.')[-2] # TODO: Abstract this logic
             has_module_perms = user.has_module_perms(app_label)
+
             if has_module_perms:
                 model_list = []
-                #HACK
-                app_url = "/".join( [comp for comp in app.__name__.split('.') if comp != 'models' ])
                 for m in app._MODELS:
                     if m._meta.admin:
                         perms = {
@@ -32,7 +31,7 @@ class AdminApplistNode(template.Node):
                         if True in perms.values():
                             model_list.append({
                                 'name': capfirst(m._meta.verbose_name_plural),
-                                'admin_url':  '%s/%s/' % (app_url, m.__name__.lower()),
+                                'admin_url': '%s/%s/' % (app_label, m.__name__.lower()),
                                 'perms': perms,
                             })
 
