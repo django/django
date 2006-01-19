@@ -298,21 +298,6 @@ def add_stage(request, path, show_delete=False, form_url='', post_url='../', pos
     return render_change_form(model, manipulator, app_label, c, add=True)
 add_stage = staff_member_required(add_stage)
 
-def log_change_message(user, opts, manipulator, new_object):
-    pk_value = getattr(new_object, opts.pk.column)
-    # Construct the change message.
-    change_message = []
-    if manipulator.fields_added:
-        change_message.append(_('Added %s.') % get_text_list(manipulator.fields_added, _('and')))
-    if manipulator.fields_changed:
-        change_message.append(_('Changed %s.') % get_text_list(manipulator.fields_changed, _('and')))
-    if manipulator.fields_deleted:
-        change_message.append(_('Deleted %s.') % get_text_list(manipulator.fields_deleted, _('and')))
-    change_message = ' '.join(change_message)
-    if not change_message:
-        change_message = _('No fields changed.')
-    LogEntry.objects.log_action(user.id, opts.get_content_type_id(), pk_value, str(new_object), CHANGE, change_message)
-
 def change_stage(request, path, object_id):
     model, app_label = get_model_and_app(path)
     opts = model._meta
@@ -352,9 +337,22 @@ def change_stage(request, path, object_id):
                 new_data = manipulator.flatten_data()
             else:
                 new_object = manipulator.save_from_update()
-                log_change_message(request.user, opts, manipulator, new_object)
+                pk_value = new_object._get_pk_val()
+
+                # Construct the change message.
+                change_message = []
+                if manipulator.fields_added:
+                    change_message.append(_('Added %s.') % get_text_list(manipulator.fields_added, _('and')))
+                if manipulator.fields_changed:
+                    change_message.append(_('Changed %s.') % get_text_list(manipulator.fields_changed, _('and')))
+                if manipulator.fields_deleted:
+                    change_message.append(_('Deleted %s.') % get_text_list(manipulator.fields_deleted, _('and')))
+                change_message = ' '.join(change_message)
+                if not change_message:
+                    change_message = _('No fields changed.')
+                LogEntry.objects.log_action(request.user.id, opts.get_content_type_id(), pk_value, str(new_object), CHANGE, change_message)
+
                 msg = _('The %(name)s "%(obj)s" was changed successfully.') % {'name': opts.verbose_name, 'obj': new_object}
-                pk_value = getattr(new_object, opts.pk.attname)
                 if request.POST.has_key("_continue"):
                     request.user.add_message(msg + ' ' + _("You may edit it again below."))
                     if request.REQUEST.has_key('_popup'):
