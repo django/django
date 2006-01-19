@@ -205,13 +205,6 @@ def parse_lookup(kwarg_items, opts):
             joins.update(joins2)
             where.extend(where2)
             params.extend(params2)
-        elif kwarg == '_or':
-            for val in value:
-                tables2, joins2, where2, params2 = parse_lookup(val, opts)
-                tables.extend(tables2)
-                joins.update(joins2)
-                where.append('(%s)' % ' OR '.join(where2))
-                params.extend(params2)
         else: # Must be a search parameter.
             path = kwarg.split(LOOKUP_SEPARATOR)
 
