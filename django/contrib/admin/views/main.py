@@ -77,10 +77,6 @@ def url_for_model(model):
                 return url
         raise ImproperlyConfigured, '%s is not a model in an installed app' % model.__name__
 
-def log_add_message(user, opts, manipulator, new_object):
-    pk_value = getattr(new_object, opts.pk.attname)
-    LogEntry.objects.log_action(user.id, opts.get_content_type_id(), pk_value, str(new_object), ADDITION)
-
 def get_javascript_imports(opts, auto_populated_fields, ordered_objects, field_sets):
 # Put in any necessary JavaScript imports.
     js = ['js/core.js', 'js/admin/RelatedObjectLookups.js']
@@ -257,9 +253,9 @@ def add_stage(request, path, show_delete=False, form_url='', post_url='../', pos
             new_data = manipulator.flatten_data()
         else:
             new_object = manipulator.save_from_update()
-            log_add_message(request.user, opts, manipulator, new_object)
+            pk_value = new_object._get_pk_val()
+            LogEntry.objects.log_action(request.user.id, opts.get_content_type_id(), pk_value, str(new_object), ADDITION)
             msg = _('The %(name)s "%(obj)s" was added successfully.') % {'name': opts.verbose_name, 'obj': new_object}
-            pk_value = getattr(new_object, opts.pk.attname)
             # Here, we distinguish between different save types by checking for
             # the presence of keys in request.POST.
             if request.POST.has_key("_continue"):
