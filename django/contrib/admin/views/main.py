@@ -330,13 +330,13 @@ def change_stage(request, app_label, model_name, object_id):
                         return HttpResponseRedirect(request.path)
                 elif request.POST.has_key("_saveasnew"):
                     request.user.add_message(_('The %(name)s "%(obj)s" was added successfully. You may edit it again below.') % {'name': opts.verbose_name, 'obj': new_object})
-                    return HttpResponseRedirect("../../%s/" % pk_value)
+                    return HttpResponseRedirect("../%s/" % pk_value)
                 elif request.POST.has_key("_addanother"):
                     request.user.add_message(msg + ' ' + (_("You may add another %s below.") % opts.verbose_name))
-                    return HttpResponseRedirect("../../add/")
+                    return HttpResponseRedirect("../add/")
                 else:
                     request.user.add_message(msg)
-                    return HttpResponseRedirect("../../")
+                    return HttpResponseRedirect("../")
     else:
         # Populate new_data with a "flattened" version of the current data.
         new_data = manipulator.flatten_data()
