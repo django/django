@@ -355,6 +355,9 @@ that contain full paths to your template directory(ies). Example::
         "/home/html/templates/default",
     )
 
+Your templates can go anywhere you want, as long as the directories and
+templates are readable by the Web server.
+
 Note that these paths should use Unix-style forward slashes, even on Windows.
 
 The Python API
