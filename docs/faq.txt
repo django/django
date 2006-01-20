@@ -96,6 +96,7 @@ Lawrence, Kansas, USA.
 
 .. _`World Online`: http://code.djangoproject.com/wiki/WorldOnline
 .. _`Adrian Holovaty`: http://www.holovaty.com/
+.. _`washingtonpost.com`: http://www.washingtonpost.com/
 .. _`chicagocrime.org`: http://www.chicagocrime.org/
 .. _`Simon Willison`: http://simon.incutio.com/
 .. _`simon.incutio.com`: http://simon.incutio.com/
