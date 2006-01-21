@@ -8,18 +8,19 @@
 
 {% block content %}
 
-<h1>Models Documentation</h1>
+<h1>Model documentation</h1>
+
+{% regroup models by app_label as grouped_models %}
 
 <div id="content-main">
-{% regroup models|dictsort:"module" by module as grouped_models %}
 {% for group in grouped_models %}
 <div class="module">
-<h2 id='{{ group.grouper }}'>{{ group.grouper }}</h2>
+<h2 id="{{ group.grouper }}">{{ group.grouper|capfirst }}</h2>
 
 <table class="xfull">
 {% for model in group.list %}
 <tr>
-<th><a href="{{ model.name }}/">{{ model.class }}</a></th>
+<th><a href="{{ model.app_label }}.{{ model.object_name.lower }}/">{{ model.object_name }}</a></th>
 </tr>
 {% endfor %}
 </table>
@@ -32,11 +33,11 @@
 {% block sidebar %}
 <div id="content-related" class="sidebar">
 <div class="module">
-<h2>Model Groups Quick List</h2>
+<h2>Model groups</h2>
 <ul>
-{% regroup models|dictsort:"module" by module as grouped_models %}
+{% regroup models by app_label as grouped_models %}
 {% for group in grouped_models %}
-    <li><a href="#{{ group.grouper }}">{{ group.grouper }}</a></li>
+    <li><a href="#{{ group.grouper }}">{{ group.grouper|capfirst }}</a></li>
 {% endfor %}
 </ul>
 </div>

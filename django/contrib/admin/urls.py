@@ -17,7 +17,7 @@ urlpatterns = patterns('',
     ('^doc/views/jump/$', 'django.contrib.admin.views.doc.jump_to_view'),
     ('^doc/views/(?P<view>[^/]+)/$', 'django.contrib.admin.views.doc.view_detail'),
     ('^doc/models/$', 'django.contrib.admin.views.doc.model_index'),
-    ('^doc/models/(?P<model>[^/]+)/$', 'django.contrib.admin.views.doc.model_detail'),
+    ('^doc/models/(?P<app_label>[^\.]+)\.(?P<model_name>[^/]+)/$', 'django.contrib.admin.views.doc.model_detail'),
 #    ('^doc/templates/$', 'django.views.admin.doc.template_index'),
     ('^doc/templates/(?P<template>.*)/$', 'django.contrib.admin.views.doc.template_detail'),
 

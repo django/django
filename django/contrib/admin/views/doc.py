@@ -4,7 +4,7 @@ from django.conf import settings
 from django.contrib.admin.views.decorators import staff_member_required
 from django.db import models
 from django.shortcuts import render_to_response
-from django.core.exceptions import ViewDoesNotExist
+from django.core.exceptions import ImproperlyConfigured, ViewDoesNotExist
 from django.http import Http404
 from django.core import urlresolvers
 from django.contrib.admin import utils
@@ -140,26 +140,30 @@ def model_index(request):
     m_list = []
     for app in models.get_installed_model_modules():
         for model in app._MODELS:
-            opts = model._meta
-            m_list.append({
-                'name': '%s.%s' % (opts.app_label, opts.module_name),
-                'module': opts.app_label,
-                'class': opts.module_name,
-            })
+            m_list.append(model._meta)
     return render_to_response('admin_doc/model_index', {'models': m_list}, context_instance=RequestContext(request))
 model_index = staff_member_required(model_index)
 
-def model_detail(request, model):
+def model_detail(request, app_label, model_name):
     if not utils.docutils_is_available:
         return missing_docutils_page(request)
 
+    # Get the model class.
     try:
-        model = models.get_app(model)
-    except ImportError:
-        raise Http404
-    opts = model.Klass._meta
+        app_mod = models.get_app(app_label)
+    except ImproperlyConfigured:
+        raise Http404, "App %r not found" % app_label
+    model = None
+    for m in app_mod._MODELS:
+        if m._meta.object_name.lower() == model_name:
+            model = m
+            break
+    if model is None:
+        raise Http404, "Model %r not found in app %r" % (model_name, app_label)
 
-    # Gather fields/field descriptions
+    opts = model._meta
+
+    # Gather fields/field descriptions.
     fields = []
     for field in opts.fields:
         fields.append({
@@ -168,8 +172,10 @@ def model_detail(request, model):
             'verbose': field.verbose_name,
             'help': field.help_text,
         })
-    for func_name, func in model.Klass.__dict__.items():
-        if callable(func) and len(inspect.getargspec(func)[0]) == 0:
+
+    # Gather model methods.
+    for func_name, func in model.__dict__.items():
+        if (inspect.isfunction(func) or inspect.ismethod(func)) and len(inspect.getargspec(func)[0]) == 0:
             try:
                 for exclude in MODEL_METHODS_EXCLUDE:
                     if func_name.startswith(exclude):
@@ -184,6 +190,7 @@ def model_detail(request, model):
                 'data_type': get_return_data_type(func_name),
                 'verbose': verbose,
             })
+
     return render_to_response('admin_doc/model_detail', {
         'name': '%s.%s' % (opts.app_label, opts.module_name),
         'summary': "Fields on %s objects" % opts.verbose_name,
