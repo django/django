@@ -27,7 +27,7 @@ def submit_row(context, bound_manipulator):
     change = context['change']
     is_popup = context['is_popup']
     return {
-        'onclick_attrib': (opts.ordered_objects and change
+        'onclick_attrib': (opts.get_ordered_objects() and change
                             and 'onclick="submitOrderForm();"' or ''),
         'show_delete_link': (not is_popup and context['has_delete_permission']
                               and (change or context['show_delete'])),
