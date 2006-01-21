@@ -144,7 +144,6 @@ class BoundManipulator(object):
         self.original = getattr(manipulator, 'original_object', None)
         self.bound_field_sets = [field_set.bind(field_mapping, self.original, AdminBoundFieldSet)
                                  for field_set in self.opts.admin.get_field_sets(self.opts)]
-        self.ordered_objects = self.opts.get_ordered_objects()[:]
 
 class AdminBoundManipulator(BoundManipulator):
     def __init__(self, model, manipulator, field_mapping):
@@ -153,13 +152,10 @@ class AdminBoundManipulator(BoundManipulator):
 
         self.auto_populated_fields = [f for f in self.opts.fields if f.prepopulate_from]
         self.javascript_imports = get_javascript_imports(self.opts, self.auto_populated_fields, field_sets);
-        self.coltype = self.ordered_objects and 'colMS' or 'colM'
         self.has_absolute_url = hasattr(model, 'get_absolute_url')
         self.form_enc_attrib = self.opts.has_field_type(models.FileField) and 'enctype="multipart/form-data" ' or ''
         self.first_form_field_id = self.bound_field_sets[0].bound_field_lines[0].bound_fields[0].form_fields[0].get_id();
-        self.ordered_object_pk_names = [o.pk.name for o in self.ordered_objects]
-        self.save_as = self.opts.admin.save_as
-        self.verbose_name = self.opts.verbose_name
+        self.ordered_object_pk_names = [o.pk.name for o in self.opts.get_ordered_objects()]
 
     def get_ordered_object_pk(self, ordered_obj):
         for name in self.ordered_object_pk_names:

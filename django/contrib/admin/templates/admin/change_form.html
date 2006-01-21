@@ -4,7 +4,7 @@
 <script type="text/javascript" src="../../../jsi18n/"></script>
 {% for js in bound_manipulator.javascript_imports %}{% include_admin_script js %}{% endfor %}
 {% endblock %}
-{% block coltype %}{{ bound_manipulator.coltype }}{% endblock %}
+{% block coltype %}{% if opts.get_ordered_objects %}colMS{% else %}colM{% endif %}{% endblock %}
 {% block bodyclass %}{{ opts.app_label }}-{{ opts.object_name.lower }} change-form{% endblock %}
 {% block userlinks %}<a href="../../../doc/">{% trans 'Documentation' %}</a> / <a href="../../../password_change/">{% trans 'Change password' %}</a> / <a href="../../../logout/">{% trans 'Log out' %}</a>{% endblock %}
 {% block breadcrumbs %}{% if not is_popup %}
@@ -41,7 +41,7 @@
 {% endfor %}
 {% block after_field_sets %}{% endblock %}
 {% if change %}
-   {% if bound_manipulator.ordered_objects %}
+   {% if opts.get_ordered_objects %}
    <fieldset class="module"><h2>{% trans "Ordering" %}</h2>
    <div class="form-row{% if form.order_.errors %} error{% endif %} ">
    {% if form.order_.errors %}{{ form.order_.html_error_list }}{% endif %}
@@ -61,7 +61,7 @@
    </script>
 {% endif %}
 {% if change %}
-   {% if bound_manipulator.ordered_objects %}
+   {% if opts.get_ordered_objects %}
       {% if form.order_objects %}<ul id="orderthese">
           {% for object in form.order_objects %}
              <li id="p{% object_pk bound_manipulator object %}">
