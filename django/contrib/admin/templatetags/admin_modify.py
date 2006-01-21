@@ -21,7 +21,7 @@ def include_admin_script(script_path):
     return '<script type="text/javascript" src="%s%s"></script>' % (settings.ADMIN_MEDIA_PREFIX, script_path)
 include_admin_script = register.simple_tag(include_admin_script)
 
-def submit_row(context, bound_manipulator):
+def submit_row(context):
     opts = context['opts']
     change = context['change']
     is_popup = context['is_popup']
@@ -230,7 +230,3 @@ def admin_field_line(context, argument_val):
         'class_names': " ".join(class_names),
     }
 admin_field_line = register.inclusion_tag('admin/field_line', takes_context=True)(admin_field_line)
-
-def object_pk(bound_manip, ordered_obj):
-    return bound_manip.get_ordered_object_pk(ordered_obj)
-object_pk = register.simple_tag(object_pk)

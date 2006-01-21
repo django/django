@@ -156,37 +156,28 @@ class AdminBoundFieldSet(object):
     def __len__(self):
         return len(self.bound_field_lines)
 
-class AdminBoundManipulator(object):
-    def __init__(self, model, manipulator, field_mapping):
-        self.model = model
-        self.opts = model._meta
-        self.inline_related_objects = self.opts.get_followed_related_objects(manipulator.follow)
-        self.original = getattr(manipulator, 'original_object', None)
-        self.bound_field_sets = [field_set.bind(field_mapping, self.original, AdminBoundFieldSet)
-                                 for field_set in self.opts.admin.get_field_sets(self.opts)]
-        self.first_form_field_id = self.bound_field_sets[0].bound_field_lines[0].bound_fields[0].form_fields[0].get_id();
-        self.ordered_object_pk_names = [o.pk.name for o in self.opts.get_ordered_objects()]
-
-    def get_ordered_object_pk(self, ordered_obj):
-        for name in self.ordered_object_pk_names:
-            if hasattr(ordered_obj, name):
-                return str(getattr(ordered_obj, name))
-        return ""
-
 def render_change_form(model, manipulator, context, add=False, change=False, form_url=''):
     opts = model._meta
     app_label = opts.app_label
     auto_populated_fields = [f for f in opts.fields if f.prepopulate_from]
     field_sets = opts.admin.get_field_sets(opts)
+    original = getattr(manipulator, 'original_object', None)
+    bound_field_sets = [field_set.bind(context['form'], original, AdminBoundFieldSet) for field_set in field_sets]
+    first_form_field_id = bound_field_sets[0].bound_field_lines[0].bound_fields[0].form_fields[0].get_id();
+    ordered_objects = opts.get_ordered_objects()
+    inline_related_objects = opts.get_followed_related_objects(manipulator.follow)
     extra_context = {
         'add': add,
         'change': change,
-        'bound_manipulator': AdminBoundManipulator(model, manipulator, context['form']),
         'has_delete_permission': context['perms'][app_label][opts.get_delete_permission()],
         'has_file_field': opts.has_field_type(models.FileField),
         'has_absolute_url': hasattr(model, 'get_absolute_url'),
         'auto_populated_fields': auto_populated_fields,
+        'bound_field_sets': bound_field_sets,
+        'first_form_field_id': first_form_field_id,
         'javascript_imports': get_javascript_imports(opts, auto_populated_fields, field_sets),
+        'ordered_objects': ordered_objects,
+        'inline_related_objects': inline_related_objects,
         'form_url': form_url,
         'opts': opts,
     }

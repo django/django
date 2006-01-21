@@ -4,7 +4,7 @@
 <script type="text/javascript" src="../../../jsi18n/"></script>
 {% for js in javascript_imports %}{% include_admin_script js %}{% endfor %}
 {% endblock %}
-{% block coltype %}{% if opts.get_ordered_objects %}colMS{% else %}colM{% endif %}{% endblock %}
+{% block coltype %}{% if ordered_objects %}colMS{% else %}colM{% endif %}{% endblock %}
 {% block bodyclass %}{{ opts.app_label }}-{{ opts.object_name.lower }} change-form{% endblock %}
 {% block userlinks %}<a href="../../../doc/">{% trans 'Documentation' %}</a> / <a href="../../../password_change/">{% trans 'Change password' %}</a> / <a href="../../../logout/">{% trans 'Log out' %}</a>{% endblock %}
 {% block breadcrumbs %}{% if not is_popup %}
@@ -22,13 +22,13 @@
 {% endif %}{% endif %}
 <form {% if has_file_field %}enctype="multipart/form-data" {% endif %}action="{{ form_url }}" method="post">{% block form_top %}{% endblock %}
 {% if is_popup %}<input type="hidden" name="_popup" value="1">{% endif %}
-{% if opts.admin.save_on_top %}{% submit_row bound_manipulator %}{% endif %}
+{% if opts.admin.save_on_top %}{% submit_row %}{% endif %}
 {% if form.error_dict %}
     <p class="errornote">
     {% blocktrans count form.error_dict.items|length as counter %}Please correct the error below.{% plural %}Please correct the errors below.{% endblocktrans %}
     </p>
 {% endif %}
-{% for bound_field_set in bound_manipulator.bound_field_sets %}
+{% for bound_field_set in bound_field_sets %}
    <fieldset class="module aligned {{ bound_field_set.classes }}">
     {% if bound_field_set.name %}<h2>{{ bound_field_set.name }}</h2>{% endif %}
     {% for bound_field_line in bound_field_set %}
@@ -41,7 +41,7 @@
 {% endfor %}
 {% block after_field_sets %}{% endblock %}
 {% if change %}
-   {% if opts.get_ordered_objects %}
+   {% if ordered_objects %}
    <fieldset class="module"><h2>{% trans "Ordering" %}</h2>
    <div class="form-row{% if form.order_.errors %} error{% endif %} ">
    {% if form.order_.errors %}{{ form.order_.html_error_list }}{% endif %}
@@ -49,27 +49,16 @@
    </div></fieldset>
    {% endif %}
 {% endif %}
-{% for related_object in bound_manipulator.inline_related_objects %}{% edit_inline related_object %}{% endfor %}
+{% for related_object in inline_related_objects %}{% edit_inline related_object %}{% endfor %}
 {% block after_related_objects %}{% endblock %}
-{% submit_row bound_manipulator %}
+{% submit_row %}
 {% if add %}
-   <script type="text/javascript">document.getElementById("{{ bound_manipulator.first_form_field_id }}").focus();</script>
+   <script type="text/javascript">document.getElementById("{{ first_form_field_id }}").focus();</script>
 {% endif %}
 {% if auto_populated_fields %}
    <script type="text/javascript">
    {% auto_populated_field_script auto_populated_fields change %}
    </script>
-{% endif %}
-{% if change %}
-   {% if opts.get_ordered_objects %}
-      {% if form.order_objects %}<ul id="orderthese">
-          {% for object in form.order_objects %}
-             <li id="p{% object_pk bound_manipulator object %}">
-             <span id="handlep{% object_pk bound_manipulator object %}">{{ object|truncatewords:"5" }}</span>
-             </li>
-             {% endfor %}
-      </ul>{% endif %}
-   {% endif %}
 {% endif %}
 </form></div>
 {% endblock %}
