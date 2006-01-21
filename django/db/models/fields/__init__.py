@@ -40,13 +40,7 @@ class BoundField(object):
     def __init__(self, field, field_mapping, original):
         self.field = field
         self.original = original
-        self.form_fields = self.resolve_form_fields(field_mapping)
-
-    def resolve_form_fields(self, field_mapping):
-        return [field_mapping[name] for name in self.field.get_manipulator_field_names('')]
-
-    def as_field_list(self):
-        return [self.field]
+        self.form_fields = [field_mapping[name] for name in self.field.get_manipulator_field_names('')]
 
     def original_value(self):
         if self.original:
