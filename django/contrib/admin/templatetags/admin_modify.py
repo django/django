@@ -5,7 +5,7 @@ from django.utils.html import escape
 from django.utils.text import capfirst
 from django.utils.functional import curry
 from django.db import models
-from django.db.models.fields import BoundField, Field
+from django.db.models.fields import Field
 from django.db.models.related import BoundRelatedObject
 from django.conf import settings
 import re
@@ -205,7 +205,7 @@ def edit_inline(parser, token):
 edit_inline = register.tag(edit_inline)
 
 def admin_field_line(context, argument_val):
-    if isinstance(argument_val, BoundField):
+    if isinstance(argument_val, AdminBoundField):
         bound_fields = [argument_val]
     else:
         bound_fields = [bf for bf in argument_val]

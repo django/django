@@ -36,19 +36,6 @@ def manipulator_validator_unique(f, opts, self, field_data, all_data):
         return
     raise validators.ValidationError, _("%(optname)s with this %(fieldname)s already exists.") % {'optname': capfirst(opts.verbose_name), 'fieldname': f.verbose_name}
 
-class BoundField(object):
-    def __init__(self, field, field_mapping, original):
-        self.field = field
-        self.original = original
-        self.form_fields = [field_mapping[name] for name in self.field.get_manipulator_field_names('')]
-
-    def original_value(self):
-        if self.original:
-            return self.original.__dict__[self.field.column]
-
-    def __repr__(self):
-        return "BoundField:(%s, %s)" % (self.field.name, self.form_fields)
-
 # A guide to Field parameters:
 #
 #   * name:      The name of the field specifed in the model.
@@ -313,7 +300,7 @@ class Field(object):
         else:
             return self.editable
 
-    def bind(self, fieldmapping, original, bound_field_class=BoundField):
+    def bind(self, fieldmapping, original, bound_field_class):
         return bound_field_class(self, fieldmapping, original)
 
 class AutoField(Field):
@@ -706,63 +693,3 @@ class OrderingField(IntegerField):
 
     def get_manipulator_fields(self, opts, manipulator, change, name_prefix='', rel=False, follow=True):
         return [forms.HiddenField(name_prefix + self.name)]
-
-class BoundFieldLine(object):
-    def __init__(self, field_line, field_mapping, original, bound_field_class=BoundField):
-        self.bound_fields = [field.bind(field_mapping, original, bound_field_class) for field in field_line]
-
-    def __iter__(self):
-        for bound_field in self.bound_fields:
-            yield bound_field
-
-    def __len__(self):
-        return len(self.bound_fields)
-
-class FieldLine(object):
-    def __init__(self, field_locator_func, linespec):
-        if isinstance(linespec, basestring):
-            self.fields = [field_locator_func(linespec)]
-        else:
-            self.fields = [field_locator_func(field_name) for field_name in linespec]
-
-    def bind(self, field_mapping, original, bound_field_line_class=BoundFieldLine):
-        return bound_field_line_class(self, field_mapping, original)
-
-    def __iter__(self):
-        for field in self.fields:
-            yield field
-
-    def __len__(self):
-        return len(self.fields)
-
-class BoundFieldSet(object):
-    def __init__(self, field_set, field_mapping, original, bound_field_line_class=BoundFieldLine):
-        self.name = field_set.name
-        self.classes = field_set.classes
-        self.bound_field_lines = [field_line.bind(field_mapping,original, bound_field_line_class) for field_line in field_set]
-
-    def __iter__(self):
-        for bound_field_line in self.bound_field_lines:
-            yield bound_field_line
-
-    def __len__(self):
-        return len(self.bound_field_lines)
-
-class FieldSet(object):
-    def __init__(self, name, classes, field_locator_func, line_specs):
-        self.name = name
-        self.field_lines = [FieldLine(field_locator_func, line_spec) for line_spec in line_specs]
-        self.classes = classes
-
-    def __repr__(self):
-         return "FieldSet: (%s, %s)" % (self.name, self.field_lines)
-
-    def bind(self, field_mapping, original, bound_field_set_class=BoundFieldSet):
-        return bound_field_set_class(self, field_mapping, original)
-
-    def __iter__(self):
-        for field_line in self.field_lines:
-            yield field_line
-
-    def __len__(self):
-        return len(self.field_lines)

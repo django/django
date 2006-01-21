@@ -1,6 +1,6 @@
 from django.db.models.related import RelatedObject
 from django.db.models.fields.related import ManyToMany
-from django.db.models.fields import AutoField, FieldSet
+from django.db.models.fields import AutoField
 from django.db.models.loading import get_installed_model_modules
 from django.db.models.query import orderlist2sql
 from django.db.models.exceptions import FieldDoesNotExist
@@ -237,8 +237,44 @@ class AdminOptions:
             fs_options = fieldset[1]
             classes = fs_options.get('classes', ())
             line_specs = fs_options['fields']
-            new_fieldset_list.append(FieldSet(name, classes, opts.get_field, line_specs))
+            new_fieldset_list.append(AdminFieldSet(name, classes, opts.get_field, line_specs))
         return new_fieldset_list
 
     def contribute_to_class(self, cls, name):
         cls._meta.admin = self
+
+class AdminFieldLine(object):
+    def __init__(self, field_locator_func, linespec):
+        if isinstance(linespec, basestring):
+            self.fields = [field_locator_func(linespec)]
+        else:
+            self.fields = [field_locator_func(field_name) for field_name in linespec]
+
+    def bind(self, field_mapping, original, bound_field_line_class):
+        return bound_field_line_class(self, field_mapping, original)
+
+    def __iter__(self):
+        for field in self.fields:
+            yield field
+
+    def __len__(self):
+        return len(self.fields)
+
+class AdminFieldSet(object):
+    def __init__(self, name, classes, field_locator_func, line_specs):
+        self.name = name
+        self.field_lines = [AdminFieldLine(field_locator_func, line_spec) for line_spec in line_specs]
+        self.classes = classes
+
+    def __repr__(self):
+         return "FieldSet: (%s, %s)" % (self.name, self.field_lines)
+
+    def bind(self, field_mapping, original, bound_field_set_class):
+        return bound_field_set_class(self, field_mapping, original)
+
+    def __iter__(self):
+        for field_line in self.field_lines:
+            yield field_line
+
+    def __len__(self):
+        return len(self.field_lines)

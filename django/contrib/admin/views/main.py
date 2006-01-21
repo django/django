@@ -6,7 +6,6 @@ from django.core.exceptions import ImproperlyConfigured, ObjectDoesNotExist, Per
 from django.core.paginator import ObjectPaginator, InvalidPage
 from django.shortcuts import get_object_or_404, render_to_response
 from django.db import models
-from django.db.models.fields import BoundField, BoundFieldLine, BoundFieldSet
 from django.db.models.query import handle_legacy_orderlist
 from django.http import Http404, HttpResponse, HttpResponseRedirect
 from django.template import loader
@@ -77,10 +76,11 @@ def get_javascript_imports(opts, auto_populated_fields, field_sets):
                 break
     return js
 
-class AdminBoundField(BoundField):
+class AdminBoundField(object):
     def __init__(self, field, field_mapping, original):
-        super(AdminBoundField, self).__init__(field, field_mapping, original)
-
+        self.field = field
+        self.original = original
+        self.form_fields = [field_mapping[name] for name in self.field.get_manipulator_field_names('')]
         self.element_id = self.form_fields[0].get_id()
         self.has_label_first = not isinstance(self.field, models.BooleanField)
         self.raw_id_admin = use_raw_id_admin(field)
@@ -101,6 +101,10 @@ class AdminBoundField(BoundField):
 
         if field.rel:
             self.related_url = '../../../%s/%s/' % (field.rel.to._meta.app_label, field.rel.to._meta.object_name.lower())
+
+    def original_value(self):
+        if self.original:
+            return self.original.__dict__[self.field.column]
 
     def existing_display(self):
         try:
@@ -125,18 +129,34 @@ class AdminBoundField(BoundField):
                 return url_method()
         return ''
 
-class AdminBoundFieldLine(BoundFieldLine):
+class AdminBoundFieldLine(object):
     def __init__(self, field_line, field_mapping, original):
-        super(AdminBoundFieldLine, self).__init__(field_line, field_mapping, original, AdminBoundField)
+        self.bound_fields = [field.bind(field_mapping, original, AdminBoundField) for field in field_line]
         for bound_field in self:
             bound_field.first = True
             break
 
-class AdminBoundFieldSet(BoundFieldSet):
-    def __init__(self, field_set, field_mapping, original):
-        super(AdminBoundFieldSet, self).__init__(field_set, field_mapping, original, AdminBoundFieldLine)
+    def __iter__(self):
+        for bound_field in self.bound_fields:
+            yield bound_field
 
-class BoundManipulator(object):
+    def __len__(self):
+        return len(self.bound_fields)
+
+class AdminBoundFieldSet(object):
+    def __init__(self, field_set, field_mapping, original):
+        self.name = field_set.name
+        self.classes = field_set.classes
+        self.bound_field_lines = [field_line.bind(field_mapping, original, AdminBoundFieldLine) for field_line in field_set]
+
+    def __iter__(self):
+        for bound_field_line in self.bound_field_lines:
+            yield bound_field_line
+
+    def __len__(self):
+        return len(self.bound_field_lines)
+
+class AdminBoundManipulator(object):
     def __init__(self, model, manipulator, field_mapping):
         self.model = model
         self.opts = model._meta
@@ -144,10 +164,6 @@ class BoundManipulator(object):
         self.original = getattr(manipulator, 'original_object', None)
         self.bound_field_sets = [field_set.bind(field_mapping, self.original, AdminBoundFieldSet)
                                  for field_set in self.opts.admin.get_field_sets(self.opts)]
-
-class AdminBoundManipulator(BoundManipulator):
-    def __init__(self, model, manipulator, field_mapping):
-        super(AdminBoundManipulator, self).__init__(model, manipulator, field_mapping)
         self.first_form_field_id = self.bound_field_sets[0].bound_field_lines[0].bound_fields[0].form_fields[0].get_id();
         self.ordered_object_pk_names = [o.pk.name for o in self.opts.get_ordered_objects()]
 
