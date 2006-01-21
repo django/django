@@ -2,7 +2,7 @@
 {% load i18n admin_modify adminmedia %}
 {% block extrahead %}{{ block.super }}
 <script type="text/javascript" src="../../../jsi18n/"></script>
-{% for js in bound_manipulator.javascript_imports %}{% include_admin_script js %}{% endfor %}
+{% for js in javascript_imports %}{% include_admin_script js %}{% endfor %}
 {% endblock %}
 {% block coltype %}{% if opts.get_ordered_objects %}colMS{% else %}colM{% endif %}{% endblock %}
 {% block bodyclass %}{{ opts.app_label }}-{{ opts.object_name.lower }} change-form{% endblock %}
@@ -55,9 +55,9 @@
 {% if add %}
    <script type="text/javascript">document.getElementById("{{ bound_manipulator.first_form_field_id }}").focus();</script>
 {% endif %}
-{% if bound_manipulator.auto_populated_fields %}
+{% if auto_populated_fields %}
    <script type="text/javascript">
-   {% auto_populated_field_script bound_manipulator.auto_populated_fields change %}
+   {% auto_populated_field_script auto_populated_fields change %}
    </script>
 {% endif %}
 {% if change %}

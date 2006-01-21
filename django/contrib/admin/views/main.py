@@ -148,10 +148,6 @@ class BoundManipulator(object):
 class AdminBoundManipulator(BoundManipulator):
     def __init__(self, model, manipulator, field_mapping):
         super(AdminBoundManipulator, self).__init__(model, manipulator, field_mapping)
-        field_sets = self.opts.admin.get_field_sets(self.opts)
-
-        self.auto_populated_fields = [f for f in self.opts.fields if f.prepopulate_from]
-        self.javascript_imports = get_javascript_imports(self.opts, self.auto_populated_fields, field_sets);
         self.first_form_field_id = self.bound_field_sets[0].bound_field_lines[0].bound_fields[0].form_fields[0].get_id();
         self.ordered_object_pk_names = [o.pk.name for o in self.opts.get_ordered_objects()]
 
@@ -164,6 +160,8 @@ class AdminBoundManipulator(BoundManipulator):
 def render_change_form(model, manipulator, context, add=False, change=False, form_url=''):
     opts = model._meta
     app_label = opts.app_label
+    auto_populated_fields = [f for f in opts.fields if f.prepopulate_from]
+    field_sets = opts.admin.get_field_sets(opts)
     extra_context = {
         'add': add,
         'change': change,
@@ -171,6 +169,8 @@ def render_change_form(model, manipulator, context, add=False, change=False, for
         'has_delete_permission': context['perms'][app_label][opts.get_delete_permission()],
         'has_file_field': opts.has_field_type(models.FileField),
         'has_absolute_url': hasattr(model, 'get_absolute_url'),
+        'auto_populated_fields': auto_populated_fields,
+        'javascript_imports': get_javascript_imports(opts, auto_populated_fields, field_sets),
         'form_url': form_url,
         'opts': opts,
     }
