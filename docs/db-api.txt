@@ -308,6 +308,11 @@ so::
 
     polls.get_list(order_by=['?'])
 
+To order by a field in a different table, add the other table's name and a dot,
+like so::
+
+    choices.get_list(order_by=('polls.pub_date', 'choice'))
+
 There's no way to specify whether ordering should be case sensitive. With
 respect to case-sensitivity, Django will order results however your database
 backend normally orders them.
