@@ -50,14 +50,14 @@ def get_model(app_label, model_name):
                     return model
     raise Http404, "App %r, model %r, not found" % (app_label, model_name)
 
-def get_javascript_imports(opts, auto_populated_fields, ordered_objects, field_sets):
+def get_javascript_imports(opts, auto_populated_fields, field_sets):
 # Put in any necessary JavaScript imports.
     js = ['js/core.js', 'js/admin/RelatedObjectLookups.js']
     if auto_populated_fields:
         js.append('js/urlify.js')
     if opts.has_field_type(models.DateTimeField) or opts.has_field_type(models.TimeField) or opts.has_field_type(models.DateField):
         js.extend(['js/calendar.js', 'js/admin/DateTimeShortcuts.js'])
-    if ordered_objects:
+    if opts.get_ordered_objects():
         js.extend(['js/getElementsBySelector.js', 'js/dom-drag.js' , 'js/admin/ordering.js'])
     if opts.admin.js:
         js.extend(opts.admin.js)
@@ -152,7 +152,7 @@ class AdminBoundManipulator(BoundManipulator):
         field_sets = self.opts.admin.get_field_sets(self.opts)
 
         self.auto_populated_fields = [f for f in self.opts.fields if f.prepopulate_from]
-        self.javascript_imports = get_javascript_imports(self.opts, self.auto_populated_fields, self.ordered_objects, field_sets);
+        self.javascript_imports = get_javascript_imports(self.opts, self.auto_populated_fields, field_sets);
         self.coltype = self.ordered_objects and 'colMS' or 'colM'
         self.has_absolute_url = hasattr(model, 'get_absolute_url')
         self.form_enc_attrib = self.opts.has_field_type(models.FileField) and 'enctype="multipart/form-data" ' or ''
