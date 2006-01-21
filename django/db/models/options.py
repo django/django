@@ -212,8 +212,9 @@ class Options:
         return self._field_types[field_type]
 
 class AdminOptions:
-    def __init__(self, fields=None, js=None, list_display=None, list_filter=None, date_hierarchy=None,
-        save_as=False, ordering=None, search_fields=None, save_on_top=False, list_select_related=False):
+    def __init__(self, fields=None, js=None, list_display=None, list_filter=None,
+        date_hierarchy=None, save_as=False, ordering=None, search_fields=None,
+        save_on_top=False, list_select_related=False):
         self.fields = fields
         self.js = js or []
         self.list_display = list_display or ['__repr__']
@@ -225,40 +226,20 @@ class AdminOptions:
         self.list_select_related = list_select_related
 
     def get_field_sets(self, opts):
+        "Returns a list of AdminFieldSet objects for this AdminOptions object."
         if self.fields is None:
-            field_struct = ((None, {
-                'fields': [f.name for f in opts.fields + opts.many_to_many if f.editable and not isinstance(f, AutoField)]
-                }),)
+            field_struct = ((None, {'fields': [f.name for f in opts.fields + opts.many_to_many if f.editable and not isinstance(f, AutoField)]}),)
         else:
             field_struct = self.fields
         new_fieldset_list = []
         for fieldset in field_struct:
-            name = fieldset[0]
             fs_options = fieldset[1]
             classes = fs_options.get('classes', ())
-            line_specs = fs_options['fields']
-            new_fieldset_list.append(AdminFieldSet(name, classes, opts.get_field, line_specs))
+            new_fieldset_list.append(AdminFieldSet(fieldset[0], classes, opts.get_field, fs_options['fields']))
         return new_fieldset_list
 
     def contribute_to_class(self, cls, name):
         cls._meta.admin = self
-
-class AdminFieldLine(object):
-    def __init__(self, field_locator_func, linespec):
-        if isinstance(linespec, basestring):
-            self.fields = [field_locator_func(linespec)]
-        else:
-            self.fields = [field_locator_func(field_name) for field_name in linespec]
-
-    def bind(self, field_mapping, original, bound_field_line_class):
-        return bound_field_line_class(self, field_mapping, original)
-
-    def __iter__(self):
-        for field in self.fields:
-            yield field
-
-    def __len__(self):
-        return len(self.fields)
 
 class AdminFieldSet(object):
     def __init__(self, name, classes, field_locator_func, line_specs):
@@ -278,3 +259,20 @@ class AdminFieldSet(object):
 
     def __len__(self):
         return len(self.field_lines)
+
+class AdminFieldLine(object):
+    def __init__(self, field_locator_func, linespec):
+        if isinstance(linespec, basestring):
+            self.fields = [field_locator_func(linespec)]
+        else:
+            self.fields = [field_locator_func(field_name) for field_name in linespec]
+
+    def bind(self, field_mapping, original, bound_field_line_class):
+        return bound_field_line_class(self, field_mapping, original)
+
+    def __iter__(self):
+        for field in self.fields:
+            yield field
+
+    def __len__(self):
+        return len(self.fields)
