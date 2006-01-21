@@ -177,7 +177,7 @@ class Options:
         "Returns a list of Options objects that are ordered with respect to this object."
         if not hasattr(self, '_ordered_objects'):
             objects = []
-            #HACK
+            # TODO
             #for klass in get_app(self.app_label)._MODELS:
             #    opts = klass._meta
             #    if opts.order_with_respect_to and opts.order_with_respect_to.rel \
