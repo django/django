@@ -4,10 +4,9 @@ from django.template import loader
 from django.utils.html import escape
 from django.utils.text import capfirst
 from django.utils.functional import curry
-from django.db.models import TABULAR, STACKED
+from django.db import models
 from django.db.models.fields import BoundField, Field
 from django.db.models.related import BoundRelatedObject
-from django.db import models
 from django.conf import settings
 import re
 
@@ -65,8 +64,7 @@ class FieldWidgetNode(template.Node):
         if not cls.nodelists.has_key(klass):
             try:
                 field_class_name = klass.__name__
-                template_name = "widget/%s" % \
-                    class_name_to_underscored(field_class_name)
+                template_name = "widget/%s" % class_name_to_underscored(field_class_name)
                 nodelist = loader.get_template(template_name).nodelist
             except template.TemplateDoesNotExist:
                 super_klass = bool(klass.__bases__) and klass.__bases__[0] or None
@@ -142,32 +140,22 @@ class StackedBoundRelatedObject(BoundRelatedObject):
     def template_name(self):
         return "admin/edit_inline_stacked"
 
-bound_related_object_overrides = {
-    TABULAR: TabularBoundRelatedObject,
-    STACKED: StackedBoundRelatedObject,
-}
-
 class EditInlineNode(template.Node):
     def __init__(self, rel_var):
         self.rel_var = rel_var
 
     def render(self, context):
         relation = template.resolve_variable(self.rel_var, context)
-
         context.push()
-
-        klass = relation.field.rel.edit_inline
-        bound_related_object_class = bound_related_object_overrides.get(klass, klass)
-
+        if relation.field.rel.edit_inline == models.TABULAR:
+            bound_related_object_class = TabularBoundRelatedObject
+        else:
+            bound_related_object_class = StackedBoundRelatedObject
         original = context.get('original', None)
-
         bound_related_object = relation.bind(context['form'], original, bound_related_object_class)
         context['bound_related_object'] = bound_related_object
-
         t = loader.get_template(bound_related_object.template_name())
-
         output = t.render(context)
-
         context.pop()
         return output
 
@@ -202,22 +190,22 @@ def filter_interface_script_maybe(bound_field):
         return ''
 filter_interface_script_maybe = register.simple_tag(filter_interface_script_maybe)
 
-def do_one_arg_tag(node_factory, parser,token):
-    tokens = token.contents.split()
-    if len(tokens) != 2:
-        raise template.TemplateSyntaxError("%s takes 1 argument" % tokens[0])
-    return node_factory(tokens[1])
+def field_widget(parser, token):
+    bits = token.contents.split()
+    if len(bits) != 2:
+        raise template.TemplateSyntaxError, "%s takes 1 argument" % bits[0]
+    return FieldWidgetNode(bits[1])
+field_widget = register.tag(field_widget)
 
-def register_one_arg_tag(node):
-    tag_name = class_name_to_underscored(node.__name__)
-    parse_func = curry(do_one_arg_tag, node)
-    register.tag(tag_name, parse_func)
-
-register_one_arg_tag(FieldWidgetNode)
-register_one_arg_tag(EditInlineNode)
+def edit_inline(parser, token):
+    bits = token.contents.split()
+    if len(bits) != 2:
+        raise template.TemplateSyntaxError, "%s takes 1 argument" % bits[0]
+    return EditInlineNode(bits[1])
+edit_inline = register.tag(edit_inline)
 
 def admin_field_line(context, argument_val):
-    if (isinstance(argument_val, BoundField)):
+    if isinstance(argument_val, BoundField):
         bound_fields = [argument_val]
     else:
         bound_fields = [bf for bf in argument_val]

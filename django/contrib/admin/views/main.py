@@ -175,9 +175,10 @@ def render_change_form(model, manipulator, context, add=False, change=False, for
         'opts': opts,
     }
     context.update(extra_context)
-    return render_to_response(["admin/%s/%s/change_form" % (app_label, opts.object_name.lower() ),
-                               "admin/%s/change_form" % app_label ,
-                               "admin/change_form"], context_instance=context)
+    return render_to_response([
+        "admin/%s/%s/change_form" % (app_label, opts.object_name.lower()),
+        "admin/%s/change_form" % app_label,
+        "admin/change_form"], context_instance=context)
 
 def index(request):
     return render_to_response('admin/index', {'title': _('Site administration')}, context_instance=template.RequestContext(request))
