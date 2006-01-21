@@ -153,22 +153,13 @@ class AdminBoundManipulator(BoundManipulator):
 
         self.auto_populated_fields = [f for f in self.opts.fields if f.prepopulate_from]
         self.javascript_imports = get_javascript_imports(self.opts, self.auto_populated_fields, self.ordered_objects, field_sets);
-
         self.coltype = self.ordered_objects and 'colMS' or 'colM'
         self.has_absolute_url = hasattr(model, 'get_absolute_url')
         self.form_enc_attrib = self.opts.has_field_type(models.FileField) and 'enctype="multipart/form-data" ' or ''
-
         self.first_form_field_id = self.bound_field_sets[0].bound_field_lines[0].bound_fields[0].form_fields[0].get_id();
         self.ordered_object_pk_names = [o.pk.name for o in self.ordered_objects]
-
-        opts = self.opts
-        self.save_on_top = opts.admin.save_on_top
-        self.save_as = opts.admin.save_as
-
-        self.content_type_id = opts.get_content_type_id()
-        self.verbose_name_plural = opts.verbose_name_plural
-        self.verbose_name = opts.verbose_name
-        self.object_name = opts.object_name
+        self.save_as = self.opts.admin.save_as
+        self.verbose_name = self.opts.verbose_name
 
     def get_ordered_object_pk(self, ordered_obj):
         for name in self.ordered_object_pk_names:
@@ -176,15 +167,16 @@ class AdminBoundManipulator(BoundManipulator):
                 return str(getattr(ordered_obj, name))
         return ""
 
-def render_change_form(model, manipulator, app_label, context, add=False, change=False, show_delete=False, form_url=''):
+def render_change_form(model, manipulator, context, add=False, change=False, show_delete=False, form_url=''):
     opts = model._meta
+    app_label = opts.app_label
     extra_context = {
         'add': add,
         'change': change,
         'bound_manipulator': AdminBoundManipulator(model, manipulator, context['form']),
         'has_delete_permission': context['perms'][app_label][opts.get_delete_permission()],
         'form_url': form_url,
-        'app_label': app_label,
+        'opts': opts,
     }
     context.update(extra_context)
     return render_to_response(["admin/%s/%s/change_form" % (app_label, opts.object_name.lower() ),
@@ -266,7 +258,7 @@ def add_stage(request, app_label, model_name, show_delete=False, form_url='', po
     if object_id_override is not None:
         c['object_id'] = object_id_override
 
-    return render_change_form(model, manipulator, app_label, c, add=True)
+    return render_change_form(model, manipulator, c, add=True)
 add_stage = staff_member_required(add_stage)
 
 def change_stage(request, app_label, model_name, object_id):
@@ -354,7 +346,7 @@ def change_stage(request, app_label, model_name, object_id):
         'original': manipulator.original_object,
         'is_popup': request.REQUEST.has_key('_popup'),
     })
-    return render_change_form(model, manipulator, app_label, c, change=True)
+    return render_change_form(model, manipulator, c, change=True)
 change_stage = staff_member_required(change_stage)
 
 def _nest_help(obj, depth, val):
