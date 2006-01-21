@@ -26,11 +26,12 @@ class ManipulatorDescriptor(object):
             raise "Manipulator can not be accessed via instance"
         else:
             if not self.man:
-                # Create a class which inherits from the MANIPULATOR class given in the class,
-                # and the appropriate automatic manipulator,
+                # Create a class that inherits from the "Manipulator" class
+                # given in the model class (if specified) and the automatic
+                # manipulator.
                 bases = [self.base]
-                if hasattr(type, 'MANIPULATOR'):
-                    bases = [type.MANIPULATOR] + bases
+                if hasattr(type, 'Manipulator'):
+                    bases = [type.Manipulator] + bases
                 self.man = types.ClassType(self.name, tuple(bases), {})
                 self.man._prepare(type)
             return self.man
