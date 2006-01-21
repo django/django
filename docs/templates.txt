@@ -283,6 +283,20 @@ Example::
 
     {% load comments i18n %}
 
+Custom libraries and template inheritance
+-----------------------------------------
+
+When you load a custom tag or filter library, the tags/filters are only made
+available to the current template -- not any parent or child templates along
+the template-inheritance path.
+
+For example, if a template ``foo.html`` has ``{% load comments %}``, a child
+template (e.g., one that has ``{% extends foo %}`` will *not* have access to
+the comments template tags and filters. The child template is responsible for
+its own ``{% load comments %}``.
+
+This is a feature for the sake of maintainability and sanity.
+
 Built-in tag and filter reference
 =================================
 
