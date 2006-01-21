@@ -152,7 +152,6 @@ class AdminBoundManipulator(BoundManipulator):
 
         self.auto_populated_fields = [f for f in self.opts.fields if f.prepopulate_from]
         self.javascript_imports = get_javascript_imports(self.opts, self.auto_populated_fields, field_sets);
-        self.has_absolute_url = hasattr(model, 'get_absolute_url')
         self.first_form_field_id = self.bound_field_sets[0].bound_field_lines[0].bound_fields[0].form_fields[0].get_id();
         self.ordered_object_pk_names = [o.pk.name for o in self.opts.get_ordered_objects()]
 
@@ -171,6 +170,7 @@ def render_change_form(model, manipulator, context, add=False, change=False, for
         'bound_manipulator': AdminBoundManipulator(model, manipulator, context['form']),
         'has_delete_permission': context['perms'][app_label][opts.get_delete_permission()],
         'has_file_field': opts.has_field_type(models.FileField),
+        'has_absolute_url': hasattr(model, 'get_absolute_url'),
         'form_url': form_url,
         'opts': opts,
     }
