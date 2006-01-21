@@ -137,16 +137,16 @@ def model_index(request):
     if not utils.docutils_is_available:
         return missing_docutils_page(request)
 
-    models = []
+    m_list = []
     for app in models.get_installed_model_modules():
         for model in app._MODELS:
             opts = model._meta
-            models.append({
+            m_list.append({
                 'name': '%s.%s' % (opts.app_label, opts.module_name),
                 'module': opts.app_label,
                 'class': opts.module_name,
             })
-    return render_to_response('admin_doc/model_index', {'models': models}, context_instance=RequestContext(request))
+    return render_to_response('admin_doc/model_index', {'models': m_list}, context_instance=RequestContext(request))
 model_index = staff_member_required(model_index)
 
 def model_detail(request, model):
