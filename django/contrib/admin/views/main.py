@@ -163,7 +163,7 @@ class AdminBoundManipulator(BoundManipulator):
                 return str(getattr(ordered_obj, name))
         return ""
 
-def render_change_form(model, manipulator, context, add=False, change=False, show_delete=False, form_url=''):
+def render_change_form(model, manipulator, context, add=False, change=False, form_url=''):
     opts = model._meta
     app_label = opts.app_label
     extra_context = {
