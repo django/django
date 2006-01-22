@@ -5,7 +5,7 @@ from django.db.models.exceptions import BadCommand
 from django.dispatch import dispatcher
 from django.db.models import signals
 from django.utils.functional import curry
-from django.utils.datastructures import dot_expand, MultiValueDict
+from django.utils.datastructures import DotExpandedDict, MultiValueDict
 import types
 
 def add_manipulators(sender):
@@ -79,7 +79,6 @@ class AutomaticManipulator(forms.Manipulator):
 
     def save(self, new_data):
         # TODO: big cleanup when core fields go -> use recursive manipulators.
-        from django.utils.datastructures import DotExpandedDict
         params = {}
         for f in self.opts.fields:
             # Fields with auto_now_add should keep their original value in the change stage.
