@@ -192,12 +192,6 @@ class Field(object):
             field_objs = self.get_manipulator_field_objs()
         return (field_objs, params)
 
-    def get_fields_and_manipulators(self, opts, manipulator, follow):
-        change = manipulator.change
-        rel = manipulator.name_prefix != ''
-        name_prefix = manipulator.name_prefix
-        return (self.get_manipulator_fields(opts, manipulator, change, name_prefix, rel, follow), None)
-
     def get_manipulator_fields(self, opts, manipulator, change, name_prefix='', rel=False, follow=True):
         """
         Returns a list of forms.FormField instances for this field. It
@@ -226,19 +220,6 @@ class Field(object):
         # Only add is_required=True if the field cannot be blank. Primary keys
         # are a special case.
         params['is_required'] = not self.blank and not self.primary_key
-
-        # If this field is in a related context, check whether any other fields
-        # in the related object have core=True. If so, add a validator --
-        # RequiredIfOtherFieldsGiven -- to this FormField.
-        #if rel and not self.blank and not isinstance(self, AutoField) and not isinstance(self, FileField):
-            # First, get the core fields, if any.
-        #    core_field_names = []
-        #    for f in opts.fields:
-        #        if f.core and f != self:
-        #            core_field_names.extend(f.get_manipulator_field_names(name_prefix))
-            # Now, if there are any, add the validator to this FormField.
-        #    if core_field_names:
-        #        params['validator_list'].append(validators.RequiredIfOtherFieldsGiven(core_field_names, gettext_lazy("This field is required.")))
 
         # BooleanFields (CheckboxFields) are a special case. They don't take
         # is_required or validator_list.
