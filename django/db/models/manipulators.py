@@ -17,23 +17,23 @@ dispatcher.connect(add_manipulators, signal=signals.class_prepared)
 
 class ManipulatorDescriptor(object):
     def __init__(self, name, base):
-        self.man = None
+        self.man = None # Cache of the manipulator class.
         self.name = name
         self.base = base
 
-    def __get__(self, instance, type=None):
+    def __get__(self, instance, type_=None):
         if instance != None:
-            raise "Manipulator can not be accessed via instance"
+            raise "Manipulator cannot be accessed via instance"
         else:
             if not self.man:
                 # Create a class that inherits from the "Manipulator" class
                 # given in the model class (if specified) and the automatic
                 # manipulator.
                 bases = [self.base]
-                if hasattr(type, 'Manipulator'):
-                    bases = [type.Manipulator] + bases
+                if hasattr(type_, 'Manipulator'):
+                    bases = [type_.Manipulator] + bases
                 self.man = types.ClassType(self.name, tuple(bases), {})
-                self.man._prepare(type)
+                self.man._prepare(type_)
             return self.man
 
 class Naming(object):
