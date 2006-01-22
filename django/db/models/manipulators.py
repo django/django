@@ -21,7 +21,7 @@ class ManipulatorDescriptor(object):
         self.name = name
         self.base = base
 
-    def __get__(self, instance, type_=None):
+    def __get__(self, instance, model=None):
         if instance != None:
             raise "Manipulator cannot be accessed via instance"
         else:
@@ -30,10 +30,10 @@ class ManipulatorDescriptor(object):
                 # given in the model class (if specified) and the automatic
                 # manipulator.
                 bases = [self.base]
-                if hasattr(type_, 'Manipulator'):
-                    bases = [type_.Manipulator] + bases
+                if hasattr(model, 'Manipulator'):
+                    bases = [model.Manipulator] + bases
                 self.man = types.ClassType(self.name, tuple(bases), {})
-                self.man._prepare(type_)
+                self.man._prepare(model)
             return self.man
 
 class Naming(object):
