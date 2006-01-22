@@ -430,32 +430,31 @@ class FileField(Field):
 
     def get_manipulator_fields(self, opts, manipulator, change, name_prefix='', rel=False, follow=True):
         field_list = Field.get_manipulator_fields(self, opts, manipulator, change, name_prefix, rel, follow)
-
         if not self.blank:
-            #if rel:
+            if rel:
                 # This validator makes sure FileFields work in a related context.
-            #    class RequiredFileField:
-#                    def __init__(self, other_field_names, other_file_field_name):
-#                        self.other_field_names = other_field_names
-#                        self.other_file_field_name = other_file_field_name
-#                        self.always_test = True
-#                    def __call__(self, field_data, all_data):
-#                        if not all_data.get(self.other_file_field_name, False):
-#                            c = validators.RequiredIfOtherFieldsGiven(self.other_field_names, gettext_lazy("This field is required."))
-#                            c(field_data, all_data)
-#                # First, get the core fields, if any.
-#                core_field_names = []
-#                for f in opts.fields:
-#                    if f.core and f != self:
-#                        core_field_names.extend(f.get_manipulator_field_names(name_prefix))
-#                # Now, if there are any, add the validator to this FormField.
-#                if core_field_names:
-#                    field_list[0].validator_list.append(RequiredFileField(core_field_names, field_list[1].field_name))
-#            else:
-            v = validators.RequiredIfOtherFieldNotGiven(field_list[1].field_name, gettext_lazy("This field is required."))
-            v.always_test = True
-            field_list[0].validator_list.append(v)
-            field_list[0].is_required = field_list[1].is_required = False
+                class RequiredFileField:
+                    def __init__(self, other_field_names, other_file_field_name):
+                        self.other_field_names = other_field_names
+                        self.other_file_field_name = other_file_field_name
+                        self.always_test = True
+                    def __call__(self, field_data, all_data):
+                        if not all_data.get(self.other_file_field_name, False):
+                            c = validators.RequiredIfOtherFieldsGiven(self.other_field_names, gettext_lazy("This field is required."))
+                            c(field_data, all_data)
+                # First, get the core fields, if any.
+                core_field_names = []
+                for f in opts.fields:
+                    if f.core and f != self:
+                        core_field_names.extend(f.get_manipulator_field_names(name_prefix))
+                # Now, if there are any, add the validator to this FormField.
+                if core_field_names:
+                    field_list[0].validator_list.append(RequiredFileField(core_field_names, field_list[1].field_name))
+            else:
+                v = validators.RequiredIfOtherFieldNotGiven(field_list[1].field_name, gettext_lazy("This field is required."))
+                v.always_test = True
+                field_list[0].validator_list.append(v)
+                field_list[0].is_required = field_list[1].is_required = False
 
         # If the raw path is passed in, validate it's under the MEDIA_ROOT.
         def isWithinMediaRoot(field_data, all_data):
