@@ -1,5 +1,5 @@
 from django.db import backend, connection
-from django.db.models.exceptions import *
+from django.db.models.fields import FieldDoesNotExist
 from django.utils.datastructures import SortedDict
 
 LOOKUP_SEPARATOR = '__'

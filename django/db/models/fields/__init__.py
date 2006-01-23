@@ -25,6 +25,9 @@ prep_for_like_query = lambda x: str(x).replace("%", "\%").replace("_", "\_")
 # returns the <ul> class for a given radio_admin value
 get_ul_class = lambda x: 'radiolist%s' % ((x == HORIZONTAL) and ' inline' or '')
 
+class FieldDoesNotExist(Exception):
+    pass
+
 def manipulator_validator_unique(f, opts, self, field_data, all_data):
     "Validates that the value is unique for this field."
     lookup_type = f.get_validator_unique_lookup_type()

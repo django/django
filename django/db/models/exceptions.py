@@ -1,2 +1,0 @@
-class FieldDoesNotExist(Exception):
-    pass

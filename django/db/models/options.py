@@ -1,9 +1,8 @@
 from django.db.models.related import RelatedObject
 from django.db.models.fields.related import ManyToMany
-from django.db.models.fields import AutoField
+from django.db.models.fields import AutoField, FieldDoesNotExist
 from django.db.models.loading import get_models
 from django.db.models.query import orderlist2sql
-from django.db.models.exceptions import FieldDoesNotExist
 from bisect import bisect
 import re
 

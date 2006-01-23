@@ -8,7 +8,6 @@ from django.db.models.manager import Manager
 from django.db.models.base import Model, AdminOptions
 from django.db.models.fields import *
 from django.db.models.fields.related import *
-from django.db.models.exceptions import FieldDoesNotExist
 from django.db.models import signals
 from django.utils.functional import curry
 from django.utils.text import capfirst
