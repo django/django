@@ -6,9 +6,6 @@ from django.db.models.query import orderlist2sql
 from bisect import bisect
 import re
 
-# Calculate the module_name by converting to lowercase
-get_module_name = lambda class_name: class_name.lower()
-
 # Calculate the verbose_name by converting from InitialCaps to "lowercase with spaces".
 get_verbose_name = lambda class_name: re.sub('([A-Z])', ' \\1', class_name).lower().strip()
 
@@ -49,7 +46,7 @@ class Options:
     def contribute_to_class(self, cls, name):
         cls._meta = self
         self.object_name = cls.__name__
-        self.module_name = get_module_name(self.object_name)
+        self.module_name = self.object_name.lower()
         # If the verbose_name wasn't given, use the class name,
         # converted from "InitialCaps" to "lowercase with spaces".
         self.verbose_name = get_verbose_name(self.object_name)
