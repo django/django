@@ -735,13 +735,6 @@ Here's a list of all possible ``Meta`` options. No options are required. Adding
     that aren't allowed in Python variable names -- notably, the hyphen --
     that's OK. Django quotes column and table names behind the scenes.
 
-``exceptions``
-    Names of extra exception subclasses to include in the generated module.
-    These exceptions are available from instance methods and from module-level
-    methods::
-
-        exceptions = ("DisgustingToppingsException", "BurntCrust")
-
 ``get_latest_by``
     The name of a ``DateField`` or ``DateTimeField``. If given, the module will
     have a ``get_latest()`` function that fetches the "latest" object according
@@ -752,14 +745,6 @@ Here's a list of all possible ``Meta`` options. No options are required. Adding
     See `Getting the "latest" object`_ for a full example.
 
     .. _Getting the "latest" object: http://www.djangoproject.com/documentation/models/get_latest/
-
-``module_constants``
-    A dictionary of names/values to use as extra module-level constants::
-
-        module_constants = {
-            'MEAT_TYPE_PEPPERONI' : 1,
-            'MEAT_TYPE_SAUSAGE' : 2,
-        }
 
 ``module_name``
     The name of the module::
