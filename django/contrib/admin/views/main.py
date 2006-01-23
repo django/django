@@ -41,14 +41,6 @@ use_raw_id_admin = lambda field: isinstance(field.rel, (models.ManyToOne, models
 class IncorrectLookupParameters(Exception):
     pass
 
-def get_model(app_label, model_name):
-    for module in models.get_installed_models():
-        if module.__name__.split('.')[-2] == app_label: # TODO: Refactor this logic.
-            for model in getattr(module, '_MODELS', ()):
-                if model._meta.object_name.lower() == model_name:
-                    return model
-    raise Http404, "App %r, model %r, not found" % (app_label, model_name)
-
 def get_javascript_imports(opts, auto_populated_fields, field_sets):
 # Put in any necessary JavaScript imports.
     js = ['js/core.js', 'js/admin/RelatedObjectLookups.js']
@@ -192,7 +184,9 @@ def index(request):
 index = staff_member_required(index)
 
 def add_stage(request, app_label, model_name, show_delete=False, form_url='', post_url='../', post_url_continue='../%s/', object_id_override=None):
-    model = get_model(app_label, model_name)
+    model = models.get_model(app_label, model_name)
+    if model is None:
+        raise Http404, "App %r, model %r, not found" % (app_label, model_name)
     opts = model._meta
 
     if not request.user.has_perm(app_label + '.' + opts.get_add_permission()):
@@ -255,7 +249,9 @@ def add_stage(request, app_label, model_name, show_delete=False, form_url='', po
 add_stage = staff_member_required(add_stage)
 
 def change_stage(request, app_label, model_name, object_id):
-    model = get_model(app_label, model_name)
+    model = models.get_model(app_label, model_name)
+    if model is None:
+        raise Http404, "App %r, model %r, not found" % (app_label, model_name)
     opts = model._meta
 
     if not request.user.has_perm(app_label + '.' + opts.get_change_permission()):
@@ -436,7 +432,9 @@ def _get_deleted_objects(deleted_objects, perms_needed, user, obj, opts, current
 
 def delete_stage(request, app_label, model_name, object_id):
     import sets
-    model = get_model(app_label, model_name)
+    model = models.get_model(app_label, model_name)
+    if model is None:
+        raise Http404, "App %r, model %r, not found" % (app_label, model_name)
     opts = model._meta
     if not request.user.has_perm(app_label + '.' + opts.get_delete_permission()):
         raise PermissionDenied
@@ -466,7 +464,9 @@ def delete_stage(request, app_label, model_name, object_id):
 delete_stage = staff_member_required(delete_stage)
 
 def history(request, app_label, model_name, object_id):
-    model = get_model(app_label, model_name)
+    model = models.get_model(app_label, model_name)
+    if model is None:
+        raise Http404, "App %r, model %r, not found" % (app_label, model_name)
     action_list = LogEntry.objects.get_list(object_id__exact=object_id, content_type__id__exact=model._meta.get_content_type_id(),
         order_by=("action_time",), select_related=True)
     # If no history was found, see whether this object even exists.
@@ -651,7 +651,9 @@ class ChangeList(object):
         self.lookup_params = lookup_params
 
 def change_list(request, app_label, model_name):
-    model = get_model(app_label, model_name)
+    model = models.get_model(app_label, model_name)
+    if model is None:
+        raise Http404, "App %r, model %r, not found" % (app_label, model_name)
     if not request.user.has_perm(app_label + '.' + model._meta.get_change_permission()):
         raise PermissionDenied
     try:

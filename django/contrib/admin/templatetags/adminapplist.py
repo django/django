@@ -1,4 +1,5 @@
 from django import template
+from django.db.models import get_models
 
 register = template.Library()
 
@@ -12,13 +13,18 @@ class AdminApplistNode(template.Node):
         app_list = []
         user = context['user']
 
-        for app in models.get_installed_model_modules():
-            app_label = app.__name__.split('.')[-2] # TODO: Abstract this logic
+        for app in models.get_apps():
+            # Determine the app_label.
+            app_models = get_models(app)
+            if not app_models:
+                continue
+            app_label = app_models[0]._meta.app_label
+
             has_module_perms = user.has_module_perms(app_label)
 
             if has_module_perms:
                 model_list = []
-                for m in app._MODELS:
+                for m in app_models:
                     if m._meta.admin:
                         perms = {
                             'add': user.has_perm("%s.%s" % (app_label, m._meta.get_add_permission())),

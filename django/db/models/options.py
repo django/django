@@ -1,7 +1,7 @@
 from django.db.models.related import RelatedObject
 from django.db.models.fields.related import ManyToMany
 from django.db.models.fields import AutoField
-from django.db.models.loading import get_installed_model_modules
+from django.db.models.loading import get_models
 from django.db.models.query import orderlist2sql
 from django.db.models.exceptions import FieldDoesNotExist
 from bisect import bisect
@@ -127,13 +127,11 @@ class Options:
         try: # Try the cache first.
             return self._all_related_objects
         except AttributeError:
-            module_list = get_installed_model_modules()
             rel_objs = []
-            for mod in module_list:
-                for klass in mod._MODELS:
-                    for f in klass._meta.fields:
-                        if f.rel and self == f.rel.to._meta:
-                            rel_objs.append(RelatedObject(self, klass, f))
+            for klass in get_models():
+                for f in klass._meta.fields:
+                    if f.rel and self == f.rel.to._meta:
+                        rel_objs.append(RelatedObject(self, klass, f))
             self._all_related_objects = rel_objs
             return rel_objs
 
@@ -163,13 +161,11 @@ class Options:
         try: # Try the cache first.
             return self._all_related_many_to_many_objects
         except AttributeError:
-            module_list = get_installed_model_modules()
             rel_objs = []
-            for mod in module_list:
-                for klass in mod._MODELS:
-                    for f in klass._meta.many_to_many:
-                        if f.rel and self == f.rel.to._meta:
-                            rel_objs.append(RelatedObject(self, klass, f))
+            for klass in get_models():
+                for f in klass._meta.many_to_many:
+                    if f.rel and self == f.rel.to._meta:
+                        rel_objs.append(RelatedObject(self, klass, f))
             self._all_related_many_to_many_objects = rel_objs
             return rel_objs
 

@@ -767,101 +767,99 @@ def get_validation_errors(outfile):
     "Validates all installed models. Writes errors, if any, to outfile. Returns number of errors."
     from django.db import models
     e = ModelErrorCollection(outfile)
-    module_list = models.get_installed_model_modules()
-    for module in module_list:
-        for cls in module._MODELS:
-            opts = cls._meta
+    for cls in models.get_models():
+        opts = cls._meta
 
-            # Do field-specific validation.
-            for f in opts.fields:
-                # Check for deprecated args
-                dep_args = getattr(f, 'deprecated_args', None)
-                if dep_args:
-                    e.add(opts, "'%s' field: Initialised with deprecated args:%s" % (f.name, ",".join(dep_args)))
-                if isinstance(f, models.CharField) and f.maxlength in (None, 0):
-                    e.add(opts, '"%s" field: CharFields require a "maxlength" attribute.' % f.name)
-                if isinstance(f, models.FloatField):
-                    if f.decimal_places is None:
-                        e.add(opts, '"%s" field: FloatFields require a "decimal_places" attribute.' % f.name)
-                    if f.max_digits is None:
-                        e.add(opts, '"%s" field: FloatFields require a "max_digits" attribute.' % f.name)
-                if isinstance(f, models.FileField) and not f.upload_to:
-                    e.add(opts, '"%s" field: FileFields require an "upload_to" attribute.' % f.name)
-                if isinstance(f, models.ImageField):
-                    try:
-                        from PIL import Image
-                    except ImportError:
-                        e.add(opts, '"%s" field: To use ImageFields, you need to install the Python Imaging Library. Get it at http://www.pythonware.com/products/pil/ .' % f.name)
-                if f.prepopulate_from is not None and type(f.prepopulate_from) not in (list, tuple):
-                    e.add(opts, '"%s" field: prepopulate_from should be a list or tuple.' % f.name)
-                if f.choices:
-                    if not type(f.choices) in (tuple, list):
-                        e.add(opts, '"%s" field: "choices" should be either a tuple or list.' % f.name)
-                    else:
-                        for c in f.choices:
-                            if not type(c) in (tuple, list) or len(c) != 2:
-                                e.add(opts, '"%s" field: "choices" should be a sequence of two-tuples.' % f.name)
-                if f.db_index not in (None, True, False):
-                    e.add(opts, '"%s" field: "db_index" should be either None, True or False.' % f.name)
-
-            # Check for multiple ManyToManyFields to the same object, and
-            # verify "singular" is set in that case.
-            for i, f in enumerate(opts.many_to_many):
-                for previous_f in opts.many_to_many[:i]:
-                    if f.rel.to._meta == previous_f.rel.to._meta and f.rel.singular == previous_f.rel.singular:
-                        e.add(opts, 'The "%s" field requires a "singular" parameter, because the %s model has more than one ManyToManyField to the same model (%s).' % (f.name, opts.object_name, previous_f.rel.to._meta.object_name))
-
-            # Check admin attribute.
-            if opts.admin is not None:
-                if not isinstance(opts.admin, models.AdminOptions):
-                    e.add(opts, '"admin" attribute, if given, must be set to a models.AdminOptions() instance.')
+        # Do field-specific validation.
+        for f in opts.fields:
+            # Check for deprecated args
+            dep_args = getattr(f, 'deprecated_args', None)
+            if dep_args:
+                e.add(opts, "'%s' field: Initialised with deprecated args:%s" % (f.name, ",".join(dep_args)))
+            if isinstance(f, models.CharField) and f.maxlength in (None, 0):
+                e.add(opts, '"%s" field: CharFields require a "maxlength" attribute.' % f.name)
+            if isinstance(f, models.FloatField):
+                if f.decimal_places is None:
+                    e.add(opts, '"%s" field: FloatFields require a "decimal_places" attribute.' % f.name)
+                if f.max_digits is None:
+                    e.add(opts, '"%s" field: FloatFields require a "max_digits" attribute.' % f.name)
+            if isinstance(f, models.FileField) and not f.upload_to:
+                e.add(opts, '"%s" field: FileFields require an "upload_to" attribute.' % f.name)
+            if isinstance(f, models.ImageField):
+                try:
+                    from PIL import Image
+                except ImportError:
+                    e.add(opts, '"%s" field: To use ImageFields, you need to install the Python Imaging Library. Get it at http://www.pythonware.com/products/pil/ .' % f.name)
+            if f.prepopulate_from is not None and type(f.prepopulate_from) not in (list, tuple):
+                e.add(opts, '"%s" field: prepopulate_from should be a list or tuple.' % f.name)
+            if f.choices:
+                if not type(f.choices) in (tuple, list):
+                    e.add(opts, '"%s" field: "choices" should be either a tuple or list.' % f.name)
                 else:
-                    # list_display
-                    if not isinstance(opts.admin.list_display, (list, tuple)):
-                        e.add(opts, '"admin.list_display", if given, must be set to a list or tuple.')
-                    else:
-                        for fn in opts.admin.list_display:
-                            try:
-                                f = opts.get_field(fn)
-                            except models.FieldDoesNotExist:
-                                if not hasattr(cls, fn) or not callable(getattr(cls, fn)):
-                                    e.add(opts, '"admin.list_display" refers to %r, which isn\'t a field or method.' % fn)
-                            else:
-                                if isinstance(f, models.ManyToManyField):
-                                    e.add(opts, '"admin.list_display" doesn\'t support ManyToManyFields (%r).' % fn)
-                    # list_filter
-                    if not isinstance(opts.admin.list_filter, (list, tuple)):
-                        e.add(opts, '"admin.list_filter", if given, must be set to a list or tuple.')
-                    else:
-                        for fn in opts.admin.list_filter:
-                            try:
-                                f = opts.get_field(fn)
-                            except models.FieldDoesNotExist:
-                                e.add(opts, '"admin.list_filter" refers to %r, which isn\'t a field.' % fn)
+                    for c in f.choices:
+                        if not type(c) in (tuple, list) or len(c) != 2:
+                            e.add(opts, '"%s" field: "choices" should be a sequence of two-tuples.' % f.name)
+            if f.db_index not in (None, True, False):
+                e.add(opts, '"%s" field: "db_index" should be either None, True or False.' % f.name)
 
-            # Check ordering attribute.
-            if opts.ordering:
-                for field_name in opts.ordering:
-                    if field_name == '?': continue
-                    if field_name.startswith('-'):
-                        field_name = field_name[1:]
-                    if opts.order_with_respect_to and field_name == '_order':
-                        continue
-                    try:
-                        opts.get_field(field_name, many_to_many=False)
-                    except models.FieldDoesNotExist:
-                        e.add(opts, '"ordering" refers to "%s", a field that doesn\'t exist.' % field_name)
+        # Check for multiple ManyToManyFields to the same object, and
+        # verify "singular" is set in that case.
+        for i, f in enumerate(opts.many_to_many):
+            for previous_f in opts.many_to_many[:i]:
+                if f.rel.to._meta == previous_f.rel.to._meta and f.rel.singular == previous_f.rel.singular:
+                    e.add(opts, 'The "%s" field requires a "singular" parameter, because the %s model has more than one ManyToManyField to the same model (%s).' % (f.name, opts.object_name, previous_f.rel.to._meta.object_name))
 
-            # Check unique_together.
-            for ut in opts.unique_together:
-                for field_name in ut:
-                    try:
-                        f = opts.get_field(field_name, many_to_many=True)
-                    except models.FieldDoesNotExist:
-                        e.add(opts, '"unique_together" refers to %s, a field that doesn\'t exist. Check your syntax.' % field_name)
-                    else:
-                        if isinstance(f.rel, models.ManyToMany):
-                            e.add(opts, '"unique_together" refers to %s. ManyToManyFields are not supported in unique_together.' % f.name)
+        # Check admin attribute.
+        if opts.admin is not None:
+            if not isinstance(opts.admin, models.AdminOptions):
+                e.add(opts, '"admin" attribute, if given, must be set to a models.AdminOptions() instance.')
+            else:
+                # list_display
+                if not isinstance(opts.admin.list_display, (list, tuple)):
+                    e.add(opts, '"admin.list_display", if given, must be set to a list or tuple.')
+                else:
+                    for fn in opts.admin.list_display:
+                        try:
+                            f = opts.get_field(fn)
+                        except models.FieldDoesNotExist:
+                            if not hasattr(cls, fn) or not callable(getattr(cls, fn)):
+                                e.add(opts, '"admin.list_display" refers to %r, which isn\'t a field or method.' % fn)
+                        else:
+                            if isinstance(f, models.ManyToManyField):
+                                e.add(opts, '"admin.list_display" doesn\'t support ManyToManyFields (%r).' % fn)
+                # list_filter
+                if not isinstance(opts.admin.list_filter, (list, tuple)):
+                    e.add(opts, '"admin.list_filter", if given, must be set to a list or tuple.')
+                else:
+                    for fn in opts.admin.list_filter:
+                        try:
+                            f = opts.get_field(fn)
+                        except models.FieldDoesNotExist:
+                            e.add(opts, '"admin.list_filter" refers to %r, which isn\'t a field.' % fn)
+
+        # Check ordering attribute.
+        if opts.ordering:
+            for field_name in opts.ordering:
+                if field_name == '?': continue
+                if field_name.startswith('-'):
+                    field_name = field_name[1:]
+                if opts.order_with_respect_to and field_name == '_order':
+                    continue
+                try:
+                    opts.get_field(field_name, many_to_many=False)
+                except models.FieldDoesNotExist:
+                    e.add(opts, '"ordering" refers to "%s", a field that doesn\'t exist.' % field_name)
+
+        # Check unique_together.
+        for ut in opts.unique_together:
+            for field_name in ut:
+                try:
+                    f = opts.get_field(field_name, many_to_many=True)
+                except models.FieldDoesNotExist:
+                    e.add(opts, '"unique_together" refers to %s, a field that doesn\'t exist. Check your syntax.' % field_name)
+                else:
+                    if isinstance(f.rel, models.ManyToMany):
+                        e.add(opts, '"unique_together" refers to %s. ManyToManyFields are not supported in unique_together.' % f.name)
 
     return len(e.errors)
 

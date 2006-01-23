@@ -137,10 +137,7 @@ def model_index(request):
     if not utils.docutils_is_available:
         return missing_docutils_page(request)
 
-    m_list = []
-    for app in models.get_installed_model_modules():
-        for model in app._MODELS:
-            m_list.append(model._meta)
+    m_list = [m._meta for m in models.get_models()]
     return render_to_response('admin_doc/model_index', {'models': m_list}, context_instance=RequestContext(request))
 model_index = staff_member_required(model_index)
 

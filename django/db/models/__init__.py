@@ -2,7 +2,7 @@ from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist, ImproperlyConfigured
 from django.core import validators
 from django.db import backend, connection
-from django.db.models.loading import get_installed_models, get_installed_model_modules
+from django.db.models.loading import *
 from django.db.models.query import Q
 from django.db.models.manager import Manager
 from django.db.models.base import Model, AdminOptions
@@ -15,27 +15,6 @@ from django.utils.text import capfirst
 
 # Admin stages.
 ADD, CHANGE, BOTH = 1, 2, 3
-
-def get_models(app):
-    models = []
-    get_models_helper(app, models)
-    return models
-
-def get_models_helper(mod, seen_models):
-    if hasattr(mod, '_MODELS'):
-        seen_models.extend(mod._MODELS)
-    if hasattr(mod, '__all__'):
-        for name in mod.__all__:
-            sub_mod = __import__("%s.%s" % (mod.__name__, name), '', '', [''])
-            get_models_helper(sub_mod, seen_models)
-
-def get_app(app_label):
-    for app_name in settings.INSTALLED_APPS:
-        comps = app_name.split('.')
-        if app_label == comps[-1]:
-            app_models = __import__('%s.models' % app_name, '', '', [''])
-            return app_models
-    raise ImproperlyConfigured, "App with label %s could not be found" % app_label
 
 class LazyDate:
     """
