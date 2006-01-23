@@ -20,10 +20,9 @@
         {% block branding %}{% endblock %}
         </div>
         {% if not user.is_anonymous %}
-        <div id="user-tools">{% trans 'Welcome,' %} <strong>{% if user.first_name %}{{ user.first_name }}{% else %}{{ user.username }}{% endif %}</strong>. <br />{% block userlinks %}<a href="doc/">{% trans 'Documentation' %}</a> / <a href="password_change/">{% trans 'Change password' %}</a> / <a href="logout/">{% trans 'Log out' %}</a>{% endblock %}</div>
+        <div id="user-tools">{% trans 'Welcome,' %} <strong>{% if user.first_name %}{{ user.first_name }}{% else %}{{ user.username }}{% endif %}</strong>. {% block userlinks %}<a href="doc/">{% trans 'Documentation' %}</a> / <a href="password_change/">{% trans 'Change password' %}</a> / <a href="logout/">{% trans 'Log out' %}</a>{% endblock %}</div>
         {% endif %}
         {% block nav-global %}{% endblock %}
-        <br class="clear" />
     </div>
     <!-- END Header -->
     {% block breadcrumbs %}<div class="breadcrumbs"><a href="/">{% trans 'Home' %}</a>{% if title %} &rsaquo; {{ title }}{% endif %}</div>{% endblock %}
