@@ -150,10 +150,14 @@ class Manager(object):
         return select, " ".join(sql), params
 
     def delete(self, *args, **kwargs):
-        nArguments = len(args) + len(kwargs)
+        num_args = len(args) + len(kwargs)
 
-        # remove the DELETE_ALL argument, if it exists 
+        # Remove the DELETE_ALL argument, if it exists.
         delete_all = kwargs.pop('DELETE_ALL', False)
+
+        # Check for at least one query argument.
+        if num_args == 0 and not delete_all:
+            raise TypeError, "SAFETY MECHANISM: Specify DELETE_ALL=True if you actually want to delete all data."
 
         # disable non-supported fields
         kwargs['select_related'] = False
@@ -162,10 +166,6 @@ class Manager(object):
         kwargs['offset'] = None
         kwargs['limit'] = None
 
-        # Check that there at least one query argument
-        if nArguments == 0 and not delete_all:
-            raise TypeError, "SAFTEY MECHANISM: Specify DELETE_ALL=True if you actually want to delete all data"
-                        
         opts = self.klass._meta
 
         # Perform the SQL delete

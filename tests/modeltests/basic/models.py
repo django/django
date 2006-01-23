@@ -213,7 +213,7 @@ AttributeError: Manager isn't accessible via Article instances
 >>> Article.objects.delete()
 Traceback (most recent call last):
     ...
-TypeError: SAFTEY MECHANISM: Specify DELETE_ALL=True if you actually want to delete all data
+TypeError: SAFETY MECHANISM: Specify DELETE_ALL=True if you actually want to delete all data.
 
 >>> Article.objects.delete(DELETE_ALL=True)
 >>> Article.objects.get_count()
