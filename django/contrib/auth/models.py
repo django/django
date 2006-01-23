@@ -6,6 +6,9 @@ import datetime
 
 SESSION_KEY = '_auth_user_id'
 
+class SiteProfileNotAvailable(Exception):
+    pass
+
 class Permission(models.Model):
     name = models.CharField(_('name'), maxlength=50)
     package = models.ForeignKey(Package, db_column='package')
@@ -67,7 +70,6 @@ class User(models.Model):
         verbose_name = _('User')
         verbose_name_plural = _('Users')
         ordering = ('username',)
-        exceptions = ('SiteProfileNotAvailable',)
     class Admin:
         fields = (
             (None, {'fields': ('username', 'password')}),

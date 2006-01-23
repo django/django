@@ -40,13 +40,6 @@ class Session(models.Model):
         db_table = 'django_session'
         verbose_name = _('session')
         verbose_name_plural = _('sessions')
-        module_constants = {
-            'base64': base64,
-            'md5': md5,
-            'pickle': pickle,
-            'random': random,
-            'sys': sys,
-        }
 
     def get_decoded(self):
         encoded_data = base64.decodestring(self.session_data)
