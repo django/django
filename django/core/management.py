@@ -29,7 +29,7 @@ INVALID_PROJECT_NAMES = ('django', 'test')
 def _get_packages_insert(app_label):
     from django.db import backend
     return "INSERT INTO %s (%s, %s) VALUES ('%s', '%s');" % \
-        (backend.quote_name('packages'), backend.quote_name('label'), backend.quote_name('name'),
+        (backend.quote_name('django_package'), backend.quote_name('label'), backend.quote_name('name'),
         app_label, app_label)
 
 def _get_permission_codename(action, opts):
@@ -46,13 +46,13 @@ def _get_all_permissions(opts):
 def _get_permission_insert(name, codename, opts):
     from django.db import backend
     return "INSERT INTO %s (%s, %s, %s) VALUES ('%s', '%s', '%s');" % \
-        (backend.quote_name('auth_permissions'), backend.quote_name('name'), backend.quote_name('package'),
+        (backend.quote_name('auth_permission'), backend.quote_name('name'), backend.quote_name('package'),
         backend.quote_name('codename'), name.replace("'", "''"), opts.app_label, codename)
 
 def _get_contenttype_insert(opts):
     from django.db import backend
     return "INSERT INTO %s (%s, %s, %s) VALUES ('%s', '%s', '%s');" % \
-        (backend.quote_name('content_types'), backend.quote_name('name'), backend.quote_name('package'),
+        (backend.quote_name('django_content_type'), backend.quote_name('name'), backend.quote_name('package'),
         backend.quote_name('python_module_name'), opts.verbose_name, opts.app_label, opts.module_name)
 
 def _is_valid_dir_name(s):
@@ -249,18 +249,18 @@ def get_sql_delete(app):
 
     app_label = app_models[0]._meta.app_label
 
-    # Delete from packages, auth_permissions, content_types.
+    # Delete from django_package, auth_permission, django_content_type.
     output.append("DELETE FROM %s WHERE %s = '%s';" % \
-        (backend.quote_name('packages'), backend.quote_name('label'), app_label))
+        (backend.quote_name('django_package'), backend.quote_name('label'), app_label))
     output.append("DELETE FROM %s WHERE %s = '%s';" % \
-        (backend.quote_name('auth_permissions'), backend.quote_name('package'), app_label))
+        (backend.quote_name('auth_permission'), backend.quote_name('package'), app_label))
     output.append("DELETE FROM %s WHERE %s = '%s';" % \
-        (backend.quote_name('content_types'), backend.quote_name('package'), app_label))
+        (backend.quote_name('django_content_type'), backend.quote_name('package'), app_label))
 
     # Delete from the admin log.
     if cursor is not None:
         cursor.execute("SELECT %s FROM %s WHERE %s = %%s" % \
-            (backend.quote_name('id'), backend.quote_name('content_types'),
+            (backend.quote_name('id'), backend.quote_name('django_content_type'),
             backend.quote_name('package')), [app_label])
         if admin_log_exists:
             for row in cursor.fetchall():
@@ -373,7 +373,7 @@ def database_check(app):
 
     # Check that the package exists in the database.
     cursor.execute("SELECT 1 FROM %s WHERE %s = %%s" % \
-        (backend.quote_name('packages'), backend.quote_name('label')), [app_label])
+        (backend.quote_name('django_package'), backend.quote_name('label')), [app_label])
     if has_no_records(cursor):
 #         sys.stderr.write("The '%s' package isn't installed.\n" % app_label)
         print _get_packages_insert(app_label)
@@ -388,13 +388,13 @@ def database_check(app):
         contenttypes_seen[opts.module_name] = 1
         for codename, name in perms:
             cursor.execute("SELECT 1 FROM %s WHERE %s = %%s AND %s = %%s" % \
-                (backend.quote_name('auth_permissions'), backend.quote_name('package'),
+                (backend.quote_name('auth_permission'), backend.quote_name('package'),
                 backend.quote_name('codename')), (app_label, codename))
             if has_no_records(cursor):
 #                 sys.stderr.write("The '%s.%s' permission doesn't exist.\n" % (app_label, codename))
                 print _get_permission_insert(name, codename, opts)
         cursor.execute("SELECT 1 FROM %s WHERE %s = %%s AND %s = %%s" % \
-            (backend.quote_name('content_types'), backend.quote_name('package'),
+            (backend.quote_name('django_content_type'), backend.quote_name('package'),
             backend.quote_name('python_module_name')), (app_label, opts.module_name))
         if has_no_records(cursor):
 #             sys.stderr.write("The '%s.%s' content type doesn't exist.\n" % (app_label, opts.module_name))
@@ -403,7 +403,7 @@ def database_check(app):
     # Check that there aren't any *extra* permissions in the DB that the model
     # doesn't know about.
     cursor.execute("SELECT %s FROM %s WHERE %s = %%s" % \
-        (backend.quote_name('codename'), backend.quote_name('auth_permissions'),
+        (backend.quote_name('codename'), backend.quote_name('auth_permission'),
         backend.quote_name('package')), (app_label,))
     for row in cursor.fetchall():
         try:
@@ -411,13 +411,13 @@ def database_check(app):
         except KeyError:
 #             sys.stderr.write("A permission called '%s.%s' was found in the database but not in the model.\n" % (app_label, row[0]))
             print "DELETE FROM %s WHERE %s='%s' AND %s = '%s';" % \
-                (backend.quote_name('auth_permissions'), backend.quote_name('package'),
+                (backend.quote_name('auth_permission'), backend.quote_name('package'),
                 app_label, backend.quote_name('codename'), row[0])
 
     # Check that there aren't any *extra* content types in the DB that the
     # model doesn't know about.
     cursor.execute("SELECT %s FROM %s WHERE %s = %%s" % \
-        (backend.quote_name('python_module_name'), backend.quote_name('content_types'),
+        (backend.quote_name('python_module_name'), backend.quote_name('django_content_type'),
         backend.quote_name('package')), (app_label,))
     for row in cursor.fetchall():
         try:
@@ -425,7 +425,7 @@ def database_check(app):
         except KeyError:
 #             sys.stderr.write("A content type called '%s.%s' was found in the database but not in the model.\n" % (app_label, row[0]))
             print "DELETE FROM %s WHERE %s='%s' AND %s = '%s';" % \
-                (backend.quote_name('content_types'), backend.quote_name('package'),
+                (backend.quote_name('django_content_type'), backend.quote_name('package'),
                 app_label, backend.quote_name('python_module_name'), row[0])
 database_check.help_doc = "Checks that everything is installed in the database for the given model module name(s) and prints SQL statements if needed."
 database_check.args = APP_ARGS

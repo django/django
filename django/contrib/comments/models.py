@@ -86,7 +86,6 @@ class Comment(models.Model):
     site = models.ForeignKey(Site)
     objects = CommentManager()
     class Meta:
-        db_table = 'comments'
         verbose_name = _('Comment')
         verbose_name_plural = _('Comments')
         ordering = ('-submit_date',)
@@ -173,7 +172,6 @@ class FreeComment(models.Model):
     approved = models.BooleanField(_('approved by staff'))
     site = models.ForeignKey(Site)
     class Meta:
-        db_table = 'comments_free'
         verbose_name = _('Free comment')
         verbose_name_plural = _('Free comments')
         ordering = ('-submit_date',)
@@ -266,7 +264,6 @@ class UserFlag(models.Model):
     flag_date = models.DateTimeField(_('flag date'), auto_now_add=True)
     objects = UserFlagManager()
     class Meta:
-        db_table = 'comments_user_flags'
         verbose_name = _('User flag')
         verbose_name_plural = _('User flags')
         unique_together = (('user', 'comment'),)
@@ -279,7 +276,6 @@ class ModeratorDeletion(models.Model):
     comment = models.ForeignKey(Comment)
     deletion_date = models.DateTimeField(_('deletion date'), auto_now_add=True)
     class Meta:
-        db_table = 'comments_moderator_deletions'
         verbose_name = _('Moderator deletion')
         verbose_name_plural = _('Moderator deletions')
         unique_together = (('user', 'comment'),)

@@ -11,7 +11,7 @@ class Redirect(models.Model):
     class Meta:
         verbose_name = _('redirect')
         verbose_name_plural = _('redirects')
-        db_table = 'django_redirects'
+        db_table = 'django_redirect'
         unique_together=(('site', 'old_path'),)
         ordering = ('old_path',)
     class Admin:

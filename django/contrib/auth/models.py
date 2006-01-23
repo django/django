@@ -132,7 +132,7 @@ class User(models.Model):
             # The SQL below works out to the following, after DB quoting:
             # cursor.execute("""
             #     SELECT p.package, p.codename
-            #     FROM auth_permissions p, auth_groups_permissions gp, auth_users_groups ug
+            #     FROM auth_permission p, auth_group_permissions gp, auth_user_groups ug
             #     WHERE p.id = gp.permission_id
             #         AND gp.group_id = ug.group_id
             #         AND ug.user_id = %s""", [self.id])
@@ -143,7 +143,7 @@ class User(models.Model):
                     AND gp.%s = ug.%s
                     AND ug.%s = %%s""" % (
                 backend.quote_name('package'), backend.quote_name('codename'),
-                backend.quote_name('auth_permissions'), backend.quote_name('auth_groups_permissions'),
+                backend.quote_name('auth_permission'), backend.quote_name('auth_group_permissions'),
                 backend.quote_name('auth_users_groups'), backend.quote_name('id'),
                 backend.quote_name('permission_id'), backend.quote_name('group_id'),
                 backend.quote_name('group_id'), backend.quote_name('user_id'))

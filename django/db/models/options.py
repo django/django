@@ -6,8 +6,8 @@ from django.db.models.query import orderlist2sql
 from bisect import bisect
 import re
 
-# Calculate the module_name using a poor-man's pluralization.
-get_module_name = lambda class_name: class_name.lower() + 's'
+# Calculate the module_name by converting to lowercase
+get_module_name = lambda class_name: class_name.lower()
 
 # Calculate the verbose_name by converting from InitialCaps to "lowercase with spaces".
 get_verbose_name = lambda class_name: re.sub('([A-Z])', ' \\1', class_name).lower().strip()

@@ -7,7 +7,7 @@ class Package(models.Model):
     class Meta:
         verbose_name = _('package')
         verbose_name_plural = _('packages')
-        db_table = 'packages'
+        db_table = 'django_package'
         ordering = ('name',)
 
     def __repr__(self):
@@ -20,7 +20,7 @@ class ContentType(models.Model):
     class Meta:
         verbose_name = _('content type')
         verbose_name_plural = _('content types')
-        db_table = 'content_types'
+        db_table = 'django_content_type'
         ordering = ('package', 'name')
         unique_together = (('package', 'python_module_name'),)
 
