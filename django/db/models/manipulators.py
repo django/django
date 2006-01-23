@@ -1,5 +1,6 @@
 from django.core.exceptions import ObjectDoesNotExist
 from django import forms
+from django.core import validators
 from django.db.models.fields import FileField, AutoField
 from django.dispatch import dispatcher
 from django.db.models import signals
