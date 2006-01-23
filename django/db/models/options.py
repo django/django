@@ -9,8 +9,8 @@ import re
 # Calculate the verbose_name by converting from InitialCaps to "lowercase with spaces".
 get_verbose_name = lambda class_name: re.sub('([A-Z])', ' \\1', class_name).lower().strip()
 
-DEFAULT_NAMES = ('module_name', 'verbose_name', 'verbose_name_plural', 'db_table', 'ordering',
-                  'unique_together', 'admin','where_constraints', 'exceptions', 'permissions',
+DEFAULT_NAMES = ('verbose_name', 'verbose_name_plural', 'db_table', 'ordering',
+                  'unique_together', 'admin', 'where_constraints', 'exceptions', 'permissions',
                   'get_latest_by', 'order_with_respect_to', 'module_constants')
 
 class Options:
