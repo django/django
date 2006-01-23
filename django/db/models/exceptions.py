@@ -3,6 +3,3 @@ class FieldDoesNotExist(Exception):
 
 class BadKeywordArguments(Exception):
     pass
-
-class BadCommand(Exception):
-    pass

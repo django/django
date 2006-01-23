@@ -1,7 +1,6 @@
 from django.core.exceptions import ObjectDoesNotExist
 from django import forms
 from django.db.models.fields import FileField, AutoField
-from django.db.models.exceptions import BadCommand
 from django.dispatch import dispatcher
 from django.db.models import signals
 from django.utils.functional import curry
