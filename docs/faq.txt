@@ -406,6 +406,19 @@ If you're sure your username and password are correct, make sure your user
 account has ``is_active`` and ``is_staff`` set to True. The admin site only
 allows access to users with those two fields both set to True.
 
+How do I automatically set a field's value to the user who last edited the object in the admin?
+-----------------------------------------------------------------------------------------------
+
+At this point, you can't do this. But it's an oft-requested feature, so we're
+discussing how it can be implemented. The problem is we don't want to couple
+the model layer with the admin layer with the request layer (to get the current
+user). It's a tricky problem.
+
+How do I limit admin access so that objects can only be edited by the users who created them?
+---------------------------------------------------------------------------------------------
+
+See the answer to the previous question.
+
 My "list_filter" contains a ManyToManyField, but the filter doesn't display.
 ----------------------------------------------------------------------------
 
