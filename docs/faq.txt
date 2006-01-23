@@ -166,6 +166,22 @@ In the meantime, though, check out this `unofficial Django screencast`_.
 
 .. _unofficial Django screencast: http://www.throwingbeans.org/django_screencasts.html
 
+How can I download the Django documentation to read it offline?
+---------------------------------------------------------------
+
+The Django docs are available in the ``docs`` directory of each Django tarball
+release. These docs are in ReST (restructured text) format, and each text file
+corresponds to a Web page on the official Django site.
+
+Because the documentation is `stored in revision control`_, you can browse
+documentation changes just like you can browse code changes.
+
+Technically, the docs on Django's site are generated from the latest development
+versions of those ReST documents, so the docs on the Django site may offer more
+information than the docs that come with the latest Django release.
+
+.. _stored in revision control: http://code.djangoproject.com/browser/django/trunk/docs
+
 Installation questions
 ======================
 
