@@ -84,9 +84,6 @@ class Manager(object):
         where.extend(where2)
         params.extend(params2)
 
-        # Add any additional constraints from the "where_constraints" parameter.
-        where.extend(opts.where_constraints)
-
         # Add additional tables and WHERE clauses based on select_related.
         if kwargs.get('select_related') is True:
             fill_table_cache(opts, select, tables, where, opts.db_table, [opts.db_table])
