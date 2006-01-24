@@ -166,6 +166,22 @@ In the meantime, though, check out this `unofficial Django screencast`_.
 
 .. _unofficial Django screencast: http://www.throwingbeans.org/django_screencasts.html
 
+How can I download the Django documentation to read it offline?
+---------------------------------------------------------------
+
+The Django docs are available in the ``docs`` directory of each Django tarball
+release. These docs are in ReST (restructured text) format, and each text file
+corresponds to a Web page on the official Django site.
+
+Because the documentation is `stored in revision control`_, you can browse
+documentation changes just like you can browse code changes.
+
+Technically, the docs on Django's site are generated from the latest development
+versions of those ReST documents, so the docs on the Django site may offer more
+information than the docs that come with the latest Django release.
+
+.. _stored in revision control: http://code.djangoproject.com/browser/django/trunk/docs
+
 Installation questions
 ======================
 
@@ -389,6 +405,19 @@ I can't log in. When I enter a valid username and password, it brings up the log
 If you're sure your username and password are correct, make sure your user
 account has ``is_active`` and ``is_staff`` set to True. The admin site only
 allows access to users with those two fields both set to True.
+
+How do I automatically set a field's value to the user who last edited the object in the admin?
+-----------------------------------------------------------------------------------------------
+
+At this point, you can't do this. But it's an oft-requested feature, so we're
+discussing how it can be implemented. The problem is we don't want to couple
+the model layer with the admin layer with the request layer (to get the current
+user). It's a tricky problem.
+
+How do I limit admin access so that objects can only be edited by the users who created them?
+---------------------------------------------------------------------------------------------
+
+See the answer to the previous question.
 
 My "list_filter" contains a ManyToManyField, but the filter doesn't display.
 ----------------------------------------------------------------------------

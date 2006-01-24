@@ -41,7 +41,7 @@ hr { clear:both; color:#eee; background-color:#eee; height:1px; border:none; mar
 
 /* PAGE STRUCTURE */
 #container { position:relative; width:100%; min-width:658px; }
-#header	{ text-align:left; min-height:55px; }
+#header	{ text-align:left; }
 #content { margin:10px 15px; }
 #content-main, #content-related { float:left; }
 #footer	{ clear:both; padding:10px; }
@@ -54,13 +54,13 @@ hr { clear:both; color:#eee; background-color:#eee; height:1px; border:none; mar
 .colSM #content-related { margin-right:12px; width:30%; }
 
 /* HEADER */
-#header	{ background:#417690; color:#ffc; }
-#header a:link, #header a:visited	{ color:white; }
+#header	{ background:#417690; color:#ffc; min-height:2.5em; _height:2.5em; }
+#header a:link, #header a:visited { color:white; }
 #header a:hover { text-decoration:underline; }
-#branding { float:left; width:480px; }
-#branding h1 { padding:8px 0 0 10px; margin:0; font-size:18px; font-weight:normal; color:#f4f379; }
-#branding h2 { font-size:14px; padding:0 0 8px 10px; margin:0; font-weight:normal; color:#ffc; }
-#user-tools	{ font-size:11px; padding:8px 8px 0 5px; text-align:right; }
+#branding { float:left; width:18em; }
+#branding h1 { padding:0.5em 10px 0 10px; font-size:18px; margin:0; font-weight:normal; color:#f4f379; }
+#branding h2 { padding:0 10px 0.5em 10px; font-size:14px; margin:0; font-weight:normal; color:#ffc; }
+#user-tools { padding:1.2em 10px; font-size:11px; text-align:right; }
 
 /* SIDEBAR */
 #content-related h3 { font-size:12px; color:#666; margin-bottom:3px; }
