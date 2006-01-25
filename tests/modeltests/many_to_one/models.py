@@ -98,7 +98,7 @@ This is a test
 1
 
 # The automatically joined table has a predictable name.
->>> Article.objects.get_list(reporter__first_name__exact='John', where=["many_to_one_articles__reporter.last_name='Smith'"])
+>>> Article.objects.get_list(reporter__first_name__exact='John', where=["many_to_one_article__reporter.last_name='Smith'"])
 [This is a test, John's second story]
 
 # Find all Articles for the Reporter whose ID is 1.
@@ -147,19 +147,19 @@ John Smith
 [John Smith]
 
 # Reporters can query in opposite direction of ForeignKey definition
->>> Reporter.objects.get_list(articles__id__exact=1)
+>>> Reporter.objects.get_list(article__id__exact=1)
 [John Smith]
->>> Reporter.objects.get_list(articles__pk=1)
+>>> Reporter.objects.get_list(article__pk=1)
 [John Smith]
->>> Reporter.objects.get_list(articles__headline__startswith='This')
+>>> Reporter.objects.get_list(article__headline__startswith='This')
 [John Smith, John Smith, John Smith]
->>> Reporter.objects.get_list(articles__headline__startswith='This', distinct=True)
+>>> Reporter.objects.get_list(article__headline__startswith='This', distinct=True)
 [John Smith]
 
 # Queries can go round in circles.
->>> Reporter.objects.get_list(articles__reporter__first_name__startswith='John')
+>>> Reporter.objects.get_list(article__reporter__first_name__startswith='John')
 [John Smith, John Smith, John Smith, John Smith]
->>> Reporter.objects.get_list(articles__reporter__first_name__startswith='John', distinct=True)
+>>> Reporter.objects.get_list(article__reporter__first_name__startswith='John', distinct=True)
 [John Smith]
 
 # Deletes that require joins are prohibited.

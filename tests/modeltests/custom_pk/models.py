@@ -22,7 +22,6 @@ class Business(models.Model):
     employees = models.ManyToManyField(Employee)
     class Meta:
         verbose_name_plural = 'businesses'
-        module_name = 'businesses'
 
     def __repr__(self):
         return self.name
@@ -77,9 +76,9 @@ True
 [Sears]
 
 # Queries across tables, involving primary key
->>> Employee.objects.get_list(businesses__name__exact='Sears')
+>>> Employee.objects.get_list(business__name__exact='Sears')
 [Dan Jones, Fran Jones]
->>> Employee.objects.get_list(businesses__pk='Sears')
+>>> Employee.objects.get_list(business__pk='Sears')
 [Dan Jones, Fran Jones]
 
 >>> Business.objects.get_list(employees__employee_code__exact='ABC123')

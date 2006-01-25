@@ -88,7 +88,7 @@ Ultimate Ella
 datetime.date(2005, 2, 13)
 
 # Test follow (inline editing) functionality.
->>> man = Musician.ChangeManipulator(m1, follow={"albums": True})
+>>> man = Musician.ChangeManipulator(m1, follow={"album": True})
 >>> data = man.flatten_data()
 >>> sorted_list = data.items()
 >>> sorted_list.sort(lambda x, y: cmp(x[0], y[0]))

@@ -85,13 +85,13 @@ True
 >>> Publication.objects.get_list(pk=1)
 [The Python Journal]
 
->>> Publication.objects.get_list(articles__headline__startswith="NASA")
+>>> Publication.objects.get_list(article__headline__startswith="NASA")
 [The Python Journal, Science News, Science Weekly]
 
->>> Publication.objects.get_list(articles__id__exact=1)
+>>> Publication.objects.get_list(article__id__exact=1)
 [The Python Journal]
 
->>> Publication.objects.get_list(articles__pk=1)
+>>> Publication.objects.get_list(article__pk=1)
 [The Python Journal]
 
 # If we delete a Publication, its Articles won't be able to access it.

@@ -79,9 +79,9 @@ Demon Dogs the restaurant
 Demon Dogs the place
 >>> Place.objects.get_object(pk=1)
 Demon Dogs the place
->>> Place.objects.get_object(restaurants__place__exact=1)
+>>> Place.objects.get_object(restaurant__place__exact=1)
 Demon Dogs the place
->>> Place.objects.get_object(restaurants__pk=1)
+>>> Place.objects.get_object(restaurant__pk=1)
 Demon Dogs the place
 
 # Add a Waiter to the Restaurant.

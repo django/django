@@ -29,7 +29,7 @@ class Article(models.Model):
         cursor = connection.cursor()
         cursor.execute("""
             SELECT id, headline, pub_date
-            FROM custom_methods_articles
+            FROM custom_methods_article
             WHERE pub_date = %s
                 AND id != %s""", [str(self.pub_date), self.id])
         # The asterisk in "(*row)" tells Python to expand the list into
