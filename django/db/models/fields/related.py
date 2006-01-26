@@ -61,21 +61,7 @@ class RelatedField(object):
         related = RelatedObject(other, cls, self)
         self.contribute_to_related_class(other, related)
 
-#HACK
-class SharedMethods(RelatedField):
-    def get_attname(self):
-        return '%s_id' % self.name
-
-    def get_validator_unique_lookup_type(self):
-        return '%s__%s__exact' % (self.name, self.rel.get_related_field().name)
-
-    def contribute_to_class(self, cls, name):
-        super(SharedMethods, self).contribute_to_class(cls, name)
-        # Add methods for many-to-one related objects.
-        # EXAMPLES: Choice.get_poll(), Story.get_dateline()
-        setattr(cls, 'get_%s' % self.name, curry(cls._get_foreign_key_object, field_with_rel=self))
-
-class ForeignKey(SharedMethods, Field):
+class ForeignKey(RelatedField, Field):
     empty_strings_allowed = False
     def __init__(self, to, to_field=None, **kwargs):
         try:
@@ -105,6 +91,12 @@ class ForeignKey(SharedMethods, Field):
         for name in ('num_in_admin', 'min_num_in_admin', 'max_num_in_admin', 'num_extra_on_change'):
             if name in kwargs:
                 self.deprecated_args.append(name)
+
+    def get_attname(self):
+        return '%s_id' % self.name
+
+    def get_validator_unique_lookup_type(self):
+        return '%s__%s__exact' % (self.name, self.rel.get_related_field().name)
 
     def prepare_field_objs_and_params(self, manipulator, name_prefix):
         params = {'validator_list': self.validator_list[:], 'member_name': name_prefix + self.attname}
@@ -152,6 +144,12 @@ class ForeignKey(SharedMethods, Field):
                     return {self.attname: choice_list[1][0]}
         return Field.flatten_data(self, follow, obj)
 
+    def contribute_to_class(self, cls, name):
+        super(ForeignKey, self).contribute_to_class(cls, name)
+        # Add methods for many-to-one related objects.
+        # EXAMPLES: Choice.get_poll(), Story.get_dateline()
+        setattr(cls, 'get_%s' % self.name, curry(cls._get_foreign_key_object, field_with_rel=self))
+
     def contribute_to_related_class(self, cls, related):
         rel_obj_name = related.get_accessor_name()
         # Add "get_thingie" methods for many-to-one related objects.
@@ -170,7 +168,7 @@ class ForeignKey(SharedMethods, Field):
             func = lambda self, *args, **kwargs: self._add_related(related.model, related.field, *args, **kwargs)
             setattr(cls, 'add_%s' % rel_obj_name, func)
 
-class OneToOneField(SharedMethods, IntegerField):
+class OneToOneField(RelatedField, IntegerField):
     def __init__(self, to, to_field=None, **kwargs):
         kwargs['verbose_name'] = kwargs.get('verbose_name', 'ID')
         to_field = to_field or to._meta.pk.name
@@ -194,6 +192,18 @@ class OneToOneField(SharedMethods, IntegerField):
         for name in ('num_in_admin'):
             if name in kwargs:
                 self.deprecated_args.append(name)
+
+    def get_attname(self):
+        return '%s_id' % self.name
+
+    def get_validator_unique_lookup_type(self):
+        return '%s__%s__exact' % (self.name, self.rel.get_related_field().name)
+
+    def contribute_to_class(self, cls, name):
+        super(OneToOneField, self).contribute_to_class(cls, name)
+        # Add methods for many-to-one related objects.
+        # EXAMPLES: Choice.get_poll(), Story.get_dateline()
+        setattr(cls, 'get_%s' % self.name, curry(cls._get_foreign_key_object, field_with_rel=self))
 
     def contribute_to_related_class(self, cls, related):
         rel_obj_name = related.get_accessor_name()
