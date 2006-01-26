@@ -10,8 +10,8 @@ class BoundRelatedObject(object):
         return repr(self.__dict__)
 
 class RelatedObject(object):
-    def __init__(self, parent_opts, model, field):
-        self.parent_opts = parent_opts
+    def __init__(self, parent_model, model, field):
+        self.parent_model = parent_model
         self.model = model
         self.opts = model._meta
         self.field = field
@@ -94,6 +94,6 @@ class RelatedObject(object):
         #   # This method returns "lcom_bestofaward".
         #   Place.lcom_bestofaward_set # "lcom_bestofaward"
         rel_obj_name = self.field.rel.related_name or self.opts.object_name.lower()
-        if self.parent_opts.app_label != self.opts.app_label:
+        if self.parent_model._meta.app_label != self.opts.app_label:
             rel_obj_name = '%s_%s' % (self.opts.app_label, rel_obj_name)
         return rel_obj_name

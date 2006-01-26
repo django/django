@@ -58,7 +58,7 @@ class RelatedField(object):
 
     def do_related_class(self, other, cls):
         self.set_attributes_from_rel()
-        related = RelatedObject(other._meta, cls, self)
+        related = RelatedObject(other, cls, self)
         self.contribute_to_related_class(other, related)
 
 #HACK
