@@ -17,7 +17,7 @@ def ensure_default_manager(sender):
         # Create the default manager, if needed.
         if hasattr(cls, 'objects'):
             raise ValueError, "Model %s must specify a custom Manager, because it has a field named 'objects'" % name
-        cls.add_to_class('objects',  Manager())
+        cls.add_to_class('objects', Manager())
         cls.objects._prepare()
 
 dispatcher.connect(ensure_default_manager, signal=signals.class_prepared)
@@ -43,7 +43,7 @@ class Manager(object):
         # TODO: Use weakref because of possible memory leak / circular reference.
         self.klass = klass
         dispatcher.connect(self._prepare, signal=signals.class_prepared, sender=klass)
-        setattr(klass,name, ManagerDescriptor(self))
+        setattr(klass, name, ManagerDescriptor(self))
         if not hasattr(klass, '_default_manager') or \
            self.creation_counter < klass._default_manager.creation_counter:
                 klass._default_manager = self
