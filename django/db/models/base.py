@@ -202,7 +202,7 @@ class Model(object):
         seen_objs.setdefault(self.__class__, {})[pk_val] = self
 
         for related in self._meta.get_all_related_objects():
-            rel_opts_name = related.get_method_name_part()
+            rel_opts_name = related.get_accessor_name()
             if isinstance(related.field.rel, OneToOne):
                 try:
                     sub_obj = getattr(self, 'get_%s' % rel_opts_name)()

@@ -44,7 +44,7 @@ class RelatedObject(object):
     def get_list(self, parent_instance=None):
         "Get the list of this type of object from an instance of the parent class."
         if parent_instance != None:
-            func_name = 'get_%s_list' % self.get_method_name_part()
+            func_name = 'get_%s_list' % self.get_accessor_name()
             func = getattr(parent_instance, func_name)
             return func()
         else:
@@ -77,21 +77,22 @@ class RelatedObject(object):
     def bind(self, field_mapping, original, bound_related_object_class=BoundRelatedObject):
         return bound_related_object_class(self, field_mapping, original)
 
-    def get_method_name_part(self):
-        # This method encapsulates the logic that decides what name to give a
-        # method that retrieves related many-to-one or many-to-many objects.
-        # Usually it just uses the lower-cased object_name, but if the related
-        # object is in another app, the related object's app_label is appended.
+    def get_accessor_name(self):
+        # This method encapsulates the logic that decides what name to give an
+        # accessor descriptor that retrieves related many-to-one or
+        # many-to-many objects. Usually it just uses the lower-cased
+        # object_name, but if the related object is in another app, the related
+        # object's app_label is appended.
         #
         # Examples:
         #
         #   # Normal case -- a related object in the same app.
         #   # This method returns "choice".
-        #   Poll.get_choice_list()
+        #   Poll.choice_set
         #
         #   # A related object in a different app.
         #   # This method returns "lcom_bestofaward".
-        #   Place.get_lcom_bestofaward_list() # "lcom_bestofaward"
+        #   Place.lcom_bestofaward_set # "lcom_bestofaward"
         rel_obj_name = self.field.rel.related_name or self.opts.object_name.lower()
         if self.parent_opts.app_label != self.opts.app_label:
             rel_obj_name = '%s_%s' % (self.opts.app_label, rel_obj_name)

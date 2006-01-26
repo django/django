@@ -153,7 +153,7 @@ class ForeignKey(SharedMethods, Field):
         return Field.flatten_data(self, follow, obj)
 
     def contribute_to_related_class(self, cls, related):
-        rel_obj_name = related.get_method_name_part()
+        rel_obj_name = related.get_accessor_name()
         # Add "get_thingie" methods for many-to-one related objects.
         # EXAMPLE: Poll.get_choice()
         setattr(cls, 'get_%s' % rel_obj_name, curry(cls._get_related, method_name='get_object', rel_class=related.model, rel_field=related.field))
@@ -196,7 +196,7 @@ class OneToOneField(SharedMethods, IntegerField):
                 self.deprecated_args.append(name)
 
     def contribute_to_related_class(self, cls, related):
-        rel_obj_name = related.get_method_name_part()
+        rel_obj_name = related.get_accessor_name()
         # Add "get_thingie" methods for one-to-one related objects.
         # EXAMPLE: Place.get_restaurants_restaurant()
         setattr(cls, 'get_%s' % rel_obj_name,
@@ -286,7 +286,7 @@ class ManyToManyField(RelatedField, Field):
         setattr(cls, 'set_%s' % self.name, curry(cls._set_many_to_many_objects, field_with_rel=self))
 
     def contribute_to_related_class(self, cls, related):
-        rel_obj_name = related.get_method_name_part()
+        rel_obj_name = related.get_accessor_name()
         setattr(cls, 'get_%s' % rel_obj_name, curry(cls._get_related_many_to_many, method_name='get_object', rel_class=related.model, rel_field=related.field))
         setattr(cls, 'get_%s_count' % rel_obj_name, curry(cls._get_related_many_to_many, method_name='get_count', rel_class=related.model, rel_field=related.field))
         setattr(cls, 'get_%s_list' % rel_obj_name, curry(cls._get_related_many_to_many, method_name='get_list', rel_class=related.model, rel_field=related.field))

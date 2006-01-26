@@ -332,7 +332,7 @@ def change_stage(request, app_label, model_name, object_id):
         wrt = related.opts.order_with_respect_to
         if wrt and wrt.rel and wrt.rel.to == opts:
             func = getattr(manipulator.original_object, 'get_%s_list' %
-                    related.get_method_name_part())
+                    related.get_accessor_name())
             orig_list = func()
             form.order_objects.extend(orig_list)
 
@@ -362,7 +362,7 @@ def _get_deleted_objects(deleted_objects, perms_needed, user, obj, opts, current
         if related.opts in opts_seen:
             continue
         opts_seen.append(related.opts)
-        rel_opts_name = related.get_method_name_part()
+        rel_opts_name = related.get_accessor_name()
         if isinstance(related.field.rel, models.OneToOne):
             try:
                 sub_obj = getattr(obj, 'get_%s' % rel_opts_name)()
@@ -408,7 +408,7 @@ def _get_deleted_objects(deleted_objects, perms_needed, user, obj, opts, current
         if related.opts in opts_seen:
             continue
         opts_seen.append(related.opts)
-        rel_opts_name = related.get_method_name_part()
+        rel_opts_name = related.get_accessor_name()
         has_related_objs = False
         for sub_obj in getattr(obj, 'get_%s_list' % rel_opts_name)():
             has_related_objs = True
