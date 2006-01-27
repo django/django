@@ -329,6 +329,16 @@ See the `internationalization docs`_ for more.
 .. _LANGUAGE_CODE setting: http://www.djangoproject.com/documentation/settings/#language-code
 .. _internationalization docs: http://www.djangoproject.com/documentation/i18n/
 
+django.core.context_processors.request
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+**New in Django development version**
+
+If ``TEMPLATE_CONTEXT_PROCESSORS`` contains this processor, every
+``DjangoContext`` will contain a variable ``request``, which is the current
+`HttpRequest object`_. Note that this processor is not enabled by default;
+you'll have to activate it.
+
 Loading templates
 -----------------
 

@@ -38,6 +38,9 @@ def i18n(request):
         context_extras['LANGUAGE_CODE'] = LANGUAGE_CODE
     return context_extras
 
+def request(request):
+    return {'request': request}
+
 # PermWrapper and PermLookupDict proxy the permissions system into objects that
 # the template system can understand.
 
