@@ -13,7 +13,7 @@ from django.utils.translation import gettext, gettext_lazy, ngettext
 from django.utils.functional import Promise, lazy
 import re
 
-_datere = r'\d{4}-((?:0?[1-9])|(?:1[0-2]))-((?:0?[1-9])|(?:[12][0-9])|(?:3[0-1]))'
+_datere = r'(19|2\d)\d{2}-((?:0?[1-9])|(?:1[0-2]))-((?:0?[1-9])|(?:[12][0-9])|(?:3[0-1]))'
 _timere = r'(?:[01]?[0-9]|2[0-3]):[0-5][0-9](?::[0-5][0-9])?'
 alnum_re = re.compile(r'^\w+$')
 alnumurl_re = re.compile(r'^[\w/]+$')

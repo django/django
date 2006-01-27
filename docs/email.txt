@@ -110,8 +110,8 @@ This sends a message to john@example.com and jane@example.com, with them both
 receiving a separate e-mail::
 
     datatuple = (
-        ('Subject', 'Message.', 'from@example.com', ['john@example.com'],
-        ('Subject', 'Message.', 'from@example.com', ['jane@example.com'],
+        ('Subject', 'Message.', 'from@example.com', ['john@example.com']),
+        ('Subject', 'Message.', 'from@example.com', ['jane@example.com']),
     )
     send_mass_mail(datatuple)
 

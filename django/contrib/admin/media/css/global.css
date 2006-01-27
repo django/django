@@ -47,7 +47,7 @@ hr { clear:both; color:#eee; background-color:#eee; height:1px; border:none; mar
 #footer	{ clear:both; padding:10px; }
 
 /* COLUMN TYPES */
-.colSM #content-main { float:right; } 
+.colSM #content-main { float:right; }
 .colSM #content-related { float:left; }
 .colMS #content-main, .colSM #content-main { width:68%; }
 .colMS #content-related { margin-left:12px; width:30%; }
@@ -169,6 +169,9 @@ fieldset.collapsed h2, fieldset.collapsed .collapse-toggle  { display:block !imp
 fieldset.collapsed h2 { background-image:url(../img/admin/nav-bg.gif); background-position:bottom left; color:#999; }
 fieldset.collapsed .collapse-toggle { padding:3px 5px !important; background:#efefef; }
 fieldset.collapsed .collapse-toggle a { display:inline !important; }
+
+/* MONOSPACE TEXTAREAS */
+fieldset.monospace textarea { font-family:"Bitstream Vera Sans Mono",Monaco,"Courier New",Courier,monospace; }
 
 /* MESSAGES & ERRORS */
 ul.messagelist { padding:0 0 5px 0; margin:0; }

@@ -419,6 +419,14 @@ How do I limit admin access so that objects can only be edited by the users who 
 
 See the answer to the previous question.
 
+My admin-site CSS and images showed up fine using the development server, but they're not displaying when using mod_python.
+---------------------------------------------------------------------------------------------------------------------------
+
+See `serving the admin files`_ in the "How to use Django with mod_python"
+documentation.
+
+.. _serving the admin files: http://www.djangoproject.com/documentation/modpython/#serving-the-admin-files
+
 My "list_filter" contains a ManyToManyField, but the filter doesn't display.
 ----------------------------------------------------------------------------
 

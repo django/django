@@ -369,7 +369,7 @@ dot_re = re.compile(r'\S')
 def blankout(src, char):
     """
     Changes every non-whitespace character to the given char.
-    Used in the templateize function.
+    Used in the templatize function.
     """
     return dot_re.sub(char, src)
 
@@ -378,7 +378,7 @@ block_re = re.compile(r"""^\s*blocktrans(?:\s+|$)""")
 endblock_re = re.compile(r"""^\s*endblocktrans$""")
 plural_re = re.compile(r"""^\s*plural$""")
 constant_re = re.compile(r"""_\(((?:".*?")|(?:'.*?'))\)""")
-def templateize(src):
+def templatize(src):
     """
     Turns a Django template into something that is understood by xgettext. It
     does so by translating the Django translation tags into standard gettext
