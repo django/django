@@ -26,6 +26,9 @@ class Manager(object):
     # Tracks each time a Manager instance is created. Used to retain order.
     creation_counter = 0
 
+    # Dictionary of lookup parameters to apply to every _get_sql_clause().
+    core_filters = {}
+
     def __init__(self):
         # Increase the creation counter, and save our local copy.
         self.creation_counter = Manager.creation_counter
@@ -55,6 +58,9 @@ class Manager(object):
                 return backend.quote_name(word)
 
         opts = self.klass._meta
+
+        # Apply core filters.
+        kwargs.update(self.core_filters)
 
         # Construct the fundamental parts of the query: SELECT X FROM Y WHERE Z.
         select = ["%s.%s" % (backend.quote_name(opts.db_table), backend.quote_name(f.column)) for f in opts.fields]
