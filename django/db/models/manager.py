@@ -44,9 +44,8 @@ class Manager(object):
         self.klass = klass
         dispatcher.connect(self._prepare, signal=signals.class_prepared, sender=klass)
         setattr(klass, name, ManagerDescriptor(self))
-        if not hasattr(klass, '_default_manager') or \
-           self.creation_counter < klass._default_manager.creation_counter:
-                klass._default_manager = self
+        if not hasattr(klass, '_default_manager') or self.creation_counter < klass._default_manager.creation_counter:
+            klass._default_manager = self
 
     def _get_sql_clause(self, allow_joins, *args, **kwargs):
         def quote_only_if_word(word):
