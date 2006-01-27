@@ -1,6 +1,6 @@
 #!/usr/bin/python
 
-from django.utils.translation import templateize
+from django.utils.translation import templatize
 import re
 import os
 import sys
@@ -96,7 +96,7 @@ def make_messages():
                     thefile = file
                     if file.endswith('.html'):
                         src = open(os.path.join(dirpath, file), "rb").read()
-                        open(os.path.join(dirpath, '%s.py' % file), "wb").write(templateize(src))
+                        open(os.path.join(dirpath, '%s.py' % file), "wb").write(templatize(src))
                         thefile = '%s.py' % file
                     if verbose: sys.stdout.write('processing file %s in %s\n' % (file, dirpath))
                     cmd = 'xgettext %s -d %s -L Python --keyword=gettext_noop --keyword=gettext_lazy --keyword=ngettext_lazy -o - "%s"' % (
