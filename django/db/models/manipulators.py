@@ -26,7 +26,7 @@ class ManipulatorDescriptor(object):
 
     def __get__(self, instance, model=None):
         if instance != None:
-            raise "Manipulator cannot be accessed via instance"
+            raise AttributeError, "Manipulator cannot be accessed via instance"
         else:
             if not self.man:
                 # Create a class that inherits from the "Manipulator" class
