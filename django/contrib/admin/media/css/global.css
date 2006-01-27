@@ -184,6 +184,9 @@ fieldset.collapse h2 a.collapse-toggle { color:#ffc; }
 fieldset.collapse h2 a.collapse-toggle:hover { text-decoration:underline; }
 .hidden { display:none; }
 
+/* MONOSPACE TEXTAREAS */
+fieldset.monospace textarea { font-family:"Bitstream Vera Sans Mono",Monaco,"Courier New",Courier,monospace; }
+
 /* MESSAGES & ERRORS  */
 ul.messagelist { padding:0 0 5px 0; margin:0; }
 ul.messagelist li { font-size:12px; display:block; padding:4px 5px 4px 25px; margin:0 0 3px 0; border-bottom:1px solid #ddd; color:#666; background:#ffc url(../img/admin/icon_success.gif) 5px .3em no-repeat; }
