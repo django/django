@@ -146,7 +146,7 @@ class User(models.Model):
                     AND ug.%s = %%s""" % (
                 backend.quote_name('package'), backend.quote_name('codename'),
                 backend.quote_name('auth_permission'), backend.quote_name('auth_group_permissions'),
-                backend.quote_name('auth_users_groups'), backend.quote_name('id'),
+                backend.quote_name('auth_user_groups'), backend.quote_name('id'),
                 backend.quote_name('permission_id'), backend.quote_name('group_id'),
                 backend.quote_name('group_id'), backend.quote_name('user_id'))
             cursor.execute(sql, [self.id])
