@@ -62,11 +62,20 @@ class RelatedField(object):
         related = RelatedObject(other, cls, self)
         self.contribute_to_related_class(other, related)
 
-class RelatedObjectDescriptor(object):
+class SingleRelatedObjectDescriptor(object):
     # This class provides the functionality that makes the related-object
-    # managers available as attributes on a model class.
+    # managers available as attributes on a model class, for fields that have
+    # a single "remote" value.
+    # In the example "choice.poll", the poll attribute is a
+    # SingleRelatedObjectDescriptor instance.
+    pass # Not yet implemented
+
+class ManyRelatedObjectsDescriptor(object):
+    # This class provides the functionality that makes the related-object
+    # managers available as attributes on a model class, for fields that have
+    # multiple "remote" values.
     # In the example "poll.choice_set", the choice_set attribute is a
-    # RelatedObjectDescriptor instance.
+    # ManyRelatedObjectsDescriptor instance.
     def __init__(self, related, rel_type):
         self.related = related   # RelatedObject instance
         self.rel_type = rel_type # Either 'o2m' or 'm2m'
@@ -188,7 +197,7 @@ class ForeignKey(RelatedField, Field):
         setattr(cls, 'get_%s' % self.name, curry(cls._get_foreign_key_object, field_with_rel=self))
 
     def contribute_to_related_class(self, cls, related):
-        setattr(cls, related.get_accessor_name(), RelatedObjectDescriptor(related, 'o2m'))
+        setattr(cls, related.get_accessor_name(), ManyRelatedObjectsDescriptor(related, 'o2m'))
 
         # TODO: Delete the rest of this function and RelatedObject.OLD_get_accessor_name()
         # to remove support for old-style related lookup.
@@ -339,7 +348,7 @@ class ManyToManyField(RelatedField, Field):
         setattr(cls, 'set_%s' % self.name, curry(cls._set_many_to_many_objects, field_with_rel=self))
 
     def contribute_to_related_class(self, cls, related):
-        setattr(cls, related.get_accessor_name(), RelatedObjectDescriptor(related, 'm2m'))
+        setattr(cls, related.get_accessor_name(), ManyRelatedObjectsDescriptor(related, 'm2m'))
 
         # TODO: Delete the rest of this function and RelatedObject.OLD_get_accessor_name()
         # to remove support for old-style related lookup.
