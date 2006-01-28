@@ -68,7 +68,28 @@ class SingleRelatedObjectDescriptor(object):
     # a single "remote" value.
     # In the example "choice.poll", the poll attribute is a
     # SingleRelatedObjectDescriptor instance.
-    pass # Not yet implemented
+    def __init__(self, field_with_rel):
+        self.field = field_with_rel
+
+    def __get__(self, instance, instance_type=None):
+        if instance is None:
+            raise AttributeError, "%s must be accessed via instance" % self.field.name
+        else:
+            cache_name = self.field.get_cache_name()
+            try:
+                return getattr(instance, cache_name)
+            except AttributeError:
+                val = getattr(instance, self.field.attname)
+                if val is None:
+                    raise self.field.rel.to.DoesNotExist
+                other_field = self.field.rel.get_related_field()
+                if other_field.rel:
+                    params = {'%s__%s__exact' % (self.field.rel.field_name, other_field.rel.field_name): val}
+                else:
+                    params = {'%s__exact' % self.field.rel.field_name: val}
+                rel_obj = self.field.rel.to._default_manager.get_object(**params)
+                setattr(instance, cache_name, rel_obj)
+                return rel_obj
 
 class ManyRelatedObjectsDescriptor(object):
     # This class provides the functionality that makes the related-object
@@ -192,6 +213,12 @@ class ForeignKey(RelatedField, Field):
 
     def contribute_to_class(self, cls, name):
         super(ForeignKey, self).contribute_to_class(cls, name)
+
+        setattr(cls, self.name, SingleRelatedObjectDescriptor(self))
+
+        # TODO: Delete the rest of this function
+        # to remove support for old-style related lookup.
+
         # Add methods for many-to-one related objects.
         # EXAMPLES: Choice.get_poll(), Story.get_dateline()
         setattr(cls, 'get_%s' % self.name, curry(cls._get_foreign_key_object, field_with_rel=self))
