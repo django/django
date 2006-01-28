@@ -67,33 +67,36 @@ class RelatedObjectDescriptor(object):
     # managers available as attributes on a model class.
     # In the example "poll.choice_set", the choice_set attribute is a
     # RelatedObjectDescriptor instance.
-    def __init__(self, related):
-        self.related = related # RelatedObject instance
-        self.manager = None
+    def __init__(self, related, rel_type):
+        self.related = related   # RelatedObject instance
+        self.rel_type = rel_type # Either 'o2m' or 'm2m'
 
     def __get__(self, instance, instance_type=None):
         if instance is None:
             raise AttributeError, "Manager must be accessed via instance"
         else:
-            if not self.manager:
-                # Dynamically create a class that subclasses the related
-                # model's default manager.
-                self.manager = types.ClassType('RelatedManager', (self.related.model._default_manager.__class__,), {})()
+            # Dynamically create a class that subclasses the related
+            # model's default manager.
+            manager = types.ClassType('RelatedManager', (self.related.model._default_manager.__class__,), {})()
 
-                # Set core_filters on the new manager to limit it to the
-                # foreign-key relationship.
-                rel_field = self.related.field
-                self.manager.core_filters = {'%s__%s__exact' % (rel_field.name, rel_field.rel.to._meta.pk.name): getattr(instance, rel_field.rel.get_related_field().attname)}
+            # Set core_filters on the new manager to limit it to the
+            # foreign-key relationship.
+            rel_field = self.related.field
 
-                # Prepare the manager.
-                # TODO: Fix this hack?
-                # We're setting self.manager.klass here because
-                # self.manager._prepare() expects that self.manager.klass is
-                # set. This is slightly hackish.
-                self.manager.klass = self.related.model
-                self.manager._prepare()
+            if self.rel_type == 'o2m':
+                manager.core_filters = {'%s__%s__exact' % (rel_field.name, rel_field.rel.to._meta.pk.name): getattr(instance, rel_field.rel.get_related_field().attname)}
+            else:
+                manager.core_filters = {'%s__%s__exact' % (rel_field.name, instance_type._meta.pk.name): instance._get_pk_val()}
 
-            return self.manager
+            # Prepare the manager.
+            # TODO: Fix this hack?
+            # We're setting self.manager.klass here because
+            # self.manager._prepare() expects that self.manager.klass is
+            # set. This is slightly hackish.
+            manager.klass = self.related.model
+            manager._prepare()
+
+            return manager
 
 class ForeignKey(RelatedField, Field):
     empty_strings_allowed = False
@@ -185,12 +188,12 @@ class ForeignKey(RelatedField, Field):
         setattr(cls, 'get_%s' % self.name, curry(cls._get_foreign_key_object, field_with_rel=self))
 
     def contribute_to_related_class(self, cls, related):
-        setattr(cls, related.get_accessor_name(), RelatedObjectDescriptor(related))
+        setattr(cls, related.get_accessor_name(), RelatedObjectDescriptor(related, 'o2m'))
 
         # TODO: Delete the rest of this function and RelatedObject.OLD_get_accessor_name()
         # to remove support for old-style related lookup.
 
-        rel_obj_name = related.OLD_get_accessor_name
+        rel_obj_name = related.OLD_get_accessor_name()
 
         # Add "get_thingie" methods for many-to-one related objects.
         # EXAMPLE: Poll.get_choice()
@@ -336,7 +339,13 @@ class ManyToManyField(RelatedField, Field):
         setattr(cls, 'set_%s' % self.name, curry(cls._set_many_to_many_objects, field_with_rel=self))
 
     def contribute_to_related_class(self, cls, related):
+        setattr(cls, related.get_accessor_name(), RelatedObjectDescriptor(related, 'm2m'))
+
+        # TODO: Delete the rest of this function and RelatedObject.OLD_get_accessor_name()
+        # to remove support for old-style related lookup.
+
         rel_obj_name = related.OLD_get_accessor_name()
+
         setattr(cls, 'get_%s' % rel_obj_name, curry(cls._get_related_many_to_many, method_name='get_object', rel_class=related.model, rel_field=related.field))
         setattr(cls, 'get_%s_count' % rel_obj_name, curry(cls._get_related_many_to_many, method_name='get_count', rel_class=related.model, rel_field=related.field))
         setattr(cls, 'get_%s_list' % rel_obj_name, curry(cls._get_related_many_to_many, method_name='get_list', rel_class=related.model, rel_field=related.field))
