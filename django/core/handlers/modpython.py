@@ -2,7 +2,7 @@ from django.core.handlers.base import BaseHandler
 from django.core import signals
 from django.dispatch import dispatcher
 from django.utils import datastructures
-from djang import http
+from django import http
 from pprint import pformat
 import os
 
