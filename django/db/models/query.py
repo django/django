@@ -234,12 +234,16 @@ class FieldFound(Exception):
     "Exception used to short circuit field-finding operations."
     pass
 
-def find_field(name, field_list):
+def find_field(name, field_list, use_accessor=False):
     """
     Finds a field with a specific name in a list of field instances.
     Returns None if there are no matches, or several matches.
     """
-    matches = [f for f in field_list if f.name == name]
+
+    if use_accessor:
+        matches = [f for f in field_list if f.OLD_get_accessor_name() == name]
+    else:
+        matches = [f for f in field_list if f.name == name]
     if len(matches) != 1:
         return None
     return matches[0]
@@ -293,7 +297,7 @@ def lookup_inner(path, clause, value, opts, table, column):
             raise FieldFound
 
         # Does the name belong to a one-to-many field?
-        field = find_field(name, opts.get_all_related_objects())
+        field = find_field(name, current_opts.get_all_related_objects(), True)
         if field:
             new_table = table + LOOKUP_SEPARATOR + name
             new_opts = field.opts

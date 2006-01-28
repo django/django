@@ -8,7 +8,7 @@ from django.db.models import *
 
 class Parent(Model):
     name = CharField(maxlength=100)
-    bestchild = ForeignKey("Child", null=True)
+    bestchild = ForeignKey("Child", null=True, related_name="favoured_by")
     
 class Child(Model):
     name = CharField(maxlength=100)
