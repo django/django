@@ -6,6 +6,7 @@ from django.utils.functional import curry
 from django.core import validators
 from django import forms
 from django.dispatch import dispatcher
+import types
 
 # Values for Relation.edit_inline.
 TABULAR, STACKED = 1, 2
@@ -60,6 +61,38 @@ class RelatedField(object):
         self.set_attributes_from_rel()
         related = RelatedObject(other, cls, self)
         self.contribute_to_related_class(other, related)
+
+class RelatedObjectDescriptor(object):
+    # This class provides the functionality that makes the related-object
+    # managers available as attributes on a model class.
+    # In the example "poll.choice_set", the choice_set attribute is a
+    # RelatedObjectDescriptor instance.
+    def __init__(self, related):
+        self.related = related # RelatedObject instance
+        self.manager = None
+
+    def __get__(self, instance, instance_type=None):
+        if instance is None:
+            raise AttributeError, "Manager must be accessed via instance"
+        else:
+            if not self.manager:
+                # Dynamically create a class that subclasses the related
+                # model's default manager.
+                self.manager = types.ClassType('RelatedManager', (self.related.model._default_manager.__class__,), {})()
+
+                # Set core_filters on the new manager to limit it to the
+                # foreign-key relationship.
+                rel_field = self.related.field
+                self.manager.core_filters = {'%s__%s__exact' % (rel_field.name, rel_field.rel.to._meta.pk.name): getattr(instance, rel_field.rel.get_related_field().attname)}
+
+                # Prepare the manager.
+                # TODO: We need to set self.manager.klass because
+                # self.manager._prepare() expects that self.manager.klass is
+                # set. This is slightly hackish.
+                self.manager.klass = self.related.model
+                self.manager._prepare()
+
+            return self.manager
 
 class ForeignKey(RelatedField, Field):
     empty_strings_allowed = False
@@ -151,7 +184,13 @@ class ForeignKey(RelatedField, Field):
         setattr(cls, 'get_%s' % self.name, curry(cls._get_foreign_key_object, field_with_rel=self))
 
     def contribute_to_related_class(self, cls, related):
-        rel_obj_name = related.get_accessor_name()
+        setattr(cls, related.get_accessor_name(), RelatedObjectDescriptor(related))
+
+        # TODO: Delete the rest of this function and RelatedObject.OLD_get_accessor_name()
+        # to remove support for old-style related lookup.
+
+        rel_obj_name = related.OLD_get_accessor_name
+
         # Add "get_thingie" methods for many-to-one related objects.
         # EXAMPLE: Poll.get_choice()
         setattr(cls, 'get_%s' % rel_obj_name, curry(cls._get_related, method_name='get_object', rel_class=related.model, rel_field=related.field))
@@ -206,7 +245,7 @@ class OneToOneField(RelatedField, IntegerField):
         setattr(cls, 'get_%s' % self.name, curry(cls._get_foreign_key_object, field_with_rel=self))
 
     def contribute_to_related_class(self, cls, related):
-        rel_obj_name = related.get_accessor_name()
+        rel_obj_name = related.OLD_get_accessor_name()
         # Add "get_thingie" methods for one-to-one related objects.
         # EXAMPLE: Place.get_restaurants_restaurant()
         setattr(cls, 'get_%s' % rel_obj_name,
@@ -296,7 +335,7 @@ class ManyToManyField(RelatedField, Field):
         setattr(cls, 'set_%s' % self.name, curry(cls._set_many_to_many_objects, field_with_rel=self))
 
     def contribute_to_related_class(self, cls, related):
-        rel_obj_name = related.get_accessor_name()
+        rel_obj_name = related.OLD_get_accessor_name()
         setattr(cls, 'get_%s' % rel_obj_name, curry(cls._get_related_many_to_many, method_name='get_object', rel_class=related.model, rel_field=related.field))
         setattr(cls, 'get_%s_count' % rel_obj_name, curry(cls._get_related_many_to_many, method_name='get_count', rel_class=related.model, rel_field=related.field))
         setattr(cls, 'get_%s_list' % rel_obj_name, curry(cls._get_related_many_to_many, method_name='get_list', rel_class=related.model, rel_field=related.field))

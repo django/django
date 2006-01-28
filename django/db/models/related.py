@@ -44,7 +44,7 @@ class RelatedObject(object):
     def get_list(self, parent_instance=None):
         "Get the list of this type of object from an instance of the parent class."
         if parent_instance != None:
-            func_name = 'get_%s_list' % self.get_accessor_name()
+            func_name = 'get_%s_list' % self.OLD_get_accessor_name()
             func = getattr(parent_instance, func_name)
             return func()
         else:
@@ -80,19 +80,12 @@ class RelatedObject(object):
     def get_accessor_name(self):
         # This method encapsulates the logic that decides what name to give an
         # accessor descriptor that retrieves related many-to-one or
-        # many-to-many objects. Usually it just uses the lower-cased
-        # object_name, but if the related object is in another app, the related
-        # object's app_label is appended.
-        #
-        # Examples:
-        #
-        #   # Normal case -- a related object in the same app.
-        #   # This method returns "choice".
-        #   Poll.choice_set
-        #
-        #   # A related object in a different app.
-        #   # This method returns "lcom_bestofaward".
-        #   Place.lcom_bestofaward_set # "lcom_bestofaward"
+        # many-to-many objects. It uses the lower-cased object_name + "_set",
+        # but this can be overridden with the "related_name" option.
+        return self.field.rel.related_name or (self.opts.object_name.lower() + '_set')
+
+    # TODO: Remove this.
+    def OLD_get_accessor_name(self):
         rel_obj_name = self.field.rel.related_name or self.opts.object_name.lower()
         if self.parent_model._meta.app_label != self.opts.app_label:
             rel_obj_name = '%s_%s' % (self.opts.app_label, rel_obj_name)
