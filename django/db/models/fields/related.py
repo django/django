@@ -86,7 +86,8 @@ class RelatedObjectDescriptor(object):
                 self.manager.core_filters = {'%s__%s__exact' % (rel_field.name, rel_field.rel.to._meta.pk.name): getattr(instance, rel_field.rel.get_related_field().attname)}
 
                 # Prepare the manager.
-                # TODO: We need to set self.manager.klass because
+                # TODO: Fix this hack?
+                # We're setting self.manager.klass here because
                 # self.manager._prepare() expects that self.manager.klass is
                 # set. This is slightly hackish.
                 self.manager.klass = self.related.model
