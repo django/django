@@ -27,6 +27,8 @@ get_ul_class = lambda x: 'radiolist%s' % ((x == HORIZONTAL) and ' inline' or '')
 
 class FieldDoesNotExist(Exception):
     pass
+class FieldCollision(Exception):
+    pass
 
 def manipulator_validator_unique(f, opts, self, field_data, all_data):
     "Validates that the value is unique for this field."
