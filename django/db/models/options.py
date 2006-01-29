@@ -1,6 +1,6 @@
 from django.db.models.related import RelatedObject
 from django.db.models.fields.related import ManyToMany
-from django.db.models.fields import AutoField, FieldDoesNotExist, FieldCollision
+from django.db.models.fields import AutoField, FieldDoesNotExist
 from django.db.models.loading import get_models
 from django.db.models.query import orderlist2sql
 from bisect import bisect
@@ -123,23 +123,7 @@ class Options:
             for klass in get_models():
                 for f in klass._meta.fields:
                     if f.rel and self == f.rel.to._meta:
-                        rel_obj = RelatedObject(f.rel.to, klass, f)
-                        # Check to see if the new related field will clash with any
-                        # existing fields, m2m fields, m2m related objects or related objects
-                        if rel_obj.OLD_get_accessor_name() in [r.name for r in f.rel.to._meta.fields]:
-                            raise FieldCollision, 'Related field ' + klass._meta.object_name + \
-                                '.' + f.name + ' clashes with existing field on ' + self.object_name
-                        elif rel_obj.OLD_get_accessor_name() in [r.name for r in f.rel.to._meta.many_to_many]:
-                            raise FieldCollision, 'Related field ' + klass._meta.object_name + \
-                                '.' + f.name + ' clashes with existing m2m field on ' + self.object_name
-                        elif rel_obj.OLD_get_accessor_name() in [r.name for r in f.rel.to._meta.get_all_related_many_to_many_objects()]:
-                            raise FieldCollision, 'Related field ' + klass._meta.object_name + \
-                                '.' + f.name + ' clashes with existing related m2m field on ' + self.object_name
-                        elif rel_obj.OLD_get_accessor_name() in [r.OLD_get_accessor_name() for r in rel_objs]:
-                            raise FieldCollision, 'Related field ' + klass._meta.object_name + \
-                                '.' + f.name + ' clashes with existing related field on ' + self.object_name
-                        else:
-                            rel_objs.append(rel_obj)
+                        rel_objs.append(RelatedObject(f.rel.to, klass, f))
             self._all_related_objects = rel_objs
             return rel_objs
 
@@ -173,23 +157,7 @@ class Options:
             for klass in get_models():
                 for f in klass._meta.many_to_many:
                     if f.rel and self == f.rel.to._meta:
-                        rel_obj = RelatedObject(f.rel.to, klass, f)
-                        # Check to see if the new related field will clash with any
-                        # existing fields, m2m fields, m2m related objects or related objects
-                        if rel_obj.OLD_get_accessor_name() in [r.name for r in f.rel.to._meta.fields]:
-                            raise FieldCollision, 'Related field ' + klass._meta.object_name + \
-                                '.' + f.name + ' clashes with existing field on ' + self.object_name
-                        elif rel_obj.OLD_get_accessor_name() in [r.name for r in f.rel.to._meta.many_to_many]:
-                            raise FieldCollision, 'Related field ' + klass._meta.object_name + \
-                                '.' + f.name + ' clashes with existing m2m field on ' + self.object_name
-                        elif rel_obj.OLD_get_accessor_name() in [r.OLD_get_accessor_name() for r in f.rel.to._meta.get_all_related_objects()]:
-                            raise FieldCollision, 'Related field ' + klass._meta.object_name + \
-                                '.' + f.name + ' clashes with existing related field on ' + self.object_name
-                        elif rel_obj.OLD_get_accessor_name() in [r.name for r in rel_objs]:
-                            raise FieldCollision, 'Related field ' + klass._meta.object_name + \
-                                '.' + f.name + ' clashes with existing related m2m field on ' + self.object_name
-                        else:
-                            rel_objs.append(rel_obj)
+                        rel_objs.append(RelatedObject(f.rel.to, klass, f))
             self._all_related_many_to_many_objects = rel_objs
             return rel_objs
 

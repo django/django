@@ -1,7 +1,7 @@
 # Django management-related functions, including "CREATE TABLE" generation and
 # development-server initialization.
 
-import django
+import django 
 from django.core.exceptions import ImproperlyConfigured
 import os, re, sys, textwrap
 from optparse import OptionParser
@@ -766,6 +766,8 @@ class ModelErrorCollection:
 def get_validation_errors(outfile):
     "Validates all installed models. Writes errors, if any, to outfile. Returns number of errors."
     from django.db import models
+    from django.db.models.fields.related import RelatedObject
+    
     e = ModelErrorCollection(outfile)
     for cls in models.get_models():
         opts = cls._meta
@@ -802,12 +804,40 @@ def get_validation_errors(outfile):
             if f.db_index not in (None, True, False):
                 e.add(opts, '"%s" field: "db_index" should be either None, True or False.' % f.name)
 
+            # Check to see if the related field will clash with any
+            # existing fields, m2m fields, m2m related objects or related objects
+            if f.rel:
+                rel_opts = f.rel.to._meta
+                rel_name = RelatedObject(f.rel.to, cls, f).OLD_get_accessor_name()
+                if rel_name in [r.name for r in rel_opts.fields]:
+                    e.add(opts, "'%s.%s' related field: Clashes with field on '%s.%s'" % (opts.object_name, f.name, rel_opts.object_name, rel_name))
+                elif rel_name in [r.name for r in rel_opts.many_to_many]:
+                    e.add(opts, "'%s.%s' related field: Clashes with m2m field on '%s.%s'" % (opts.object_name, f.name, rel_opts.object_name, rel_name))
+                elif rel_name in [r.OLD_get_accessor_name() for r in rel_opts.get_all_related_many_to_many_objects()]:
+                    e.add(opts, "'%s.%s' related field: Clashes with related m2m field '%s.%s'" % (opts.object_name, f.name, rel_opts.object_name, rel_name))
+                elif rel_name in [r.OLD_get_accessor_name() for r in rel_opts.get_all_related_objects() if r.field is not f]:
+                    e.add(opts, "'%s.%s' related field: Clashes with related field on '%s.%s'" % (opts.object_name, f.name, rel_opts.object_name, rel_name))
+    
         # Check for multiple ManyToManyFields to the same object, and
         # verify "singular" is set in that case.
         for i, f in enumerate(opts.many_to_many):
             for previous_f in opts.many_to_many[:i]:
                 if f.rel.to._meta == previous_f.rel.to._meta and f.rel.singular == previous_f.rel.singular:
                     e.add(opts, 'The "%s" field requires a "singular" parameter, because the %s model has more than one ManyToManyField to the same model (%s).' % (f.name, opts.object_name, previous_f.rel.to._meta.object_name))
+
+            # Check to see if the related m2m field will clash with any
+            # existing fields, m2m fields, m2m related objects or related objects
+            if f.rel:
+                rel_opts = f.rel.to._meta
+                rel_name = RelatedObject(f.rel.to, cls, f).OLD_get_accessor_name()
+                if rel_name in [r.name for r in rel_opts.fields]:
+                    e.add(opts, "'%s.%s' related m2m field: Clashes with field on '%s.%s'" % (opts.object_name, f.name, rel_opts.object_name, rel_name))
+                elif rel_name in [r.name for r in rel_opts.many_to_many]:
+                    e.add(opts, "'%s.%s' related m2m field: Clashes with m2m field on '%s.%s'" % (opts.object_name, f.name, rel_opts.object_name, rel_name))
+                elif rel_name in [r.OLD_get_accessor_name() for r in rel_opts.get_all_related_many_to_many_objects() if r.field is not f]:
+                    e.add(opts, "'%s.%s' related m2m field: Clashes with related m2m field '%s.%s'" % (opts.object_name, f.name, rel_opts.object_name, rel_name))
+                elif rel_name in [r.OLD_get_accessor_name() for r in rel_opts.get_all_related_objects()]:
+                    e.add(opts, "'%s.%s' related m2m field: Clashes with related field on '%s.%s'" % (opts.object_name, f.name, rel_opts.object_name, rel_name))
 
         # Check admin attribute.
         if opts.admin is not None:
