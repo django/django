@@ -1,11 +1,13 @@
 from django.db.models.fields import DateField
 from django.utils.functional import curry
 from django.db import backend, connection
-from django.db.models.query import Q, parse_lookup, fill_table_cache, get_cached_row
+from django.db.models.query import QuerySet
+from django.db.models.query import Q, fill_table_cache, get_cached_row # TODO - remove lots of these
 from django.db.models.query import handle_legacy_orderlist, orderlist2sql, orderfield2column
 from django.dispatch import dispatcher
 from django.db.models import signals
 from django.utils.datastructures import SortedDict
+import copy
 
 # Size of each "chunk" for get_iterator calls.
 # Larger values are slightly faster at the expense of more storage space.
@@ -17,12 +19,90 @@ def ensure_default_manager(sender):
         # Create the default manager, if needed.
         if hasattr(cls, 'objects'):
             raise ValueError, "Model %s must specify a custom Manager, because it has a field named 'objects'" % name
+            
         cls.add_to_class('objects', Manager())
         cls.objects._prepare()
 
 dispatcher.connect(ensure_default_manager, signal=signals.class_prepared)
 
-class Manager(object):
+class Manager(QuerySet):
+    # Tracks each time a Manager instance is created. Used to retain order.
+    creation_counter = 0
+
+    def __init__(self):
+        super(Manager, self).__init__()
+        # Increase the creation counter, and save our local copy.
+        self.creation_counter = Manager.creation_counter
+        Manager.creation_counter += 1
+        self.klass = None
+        
+    def _prepare(self):
+        pass
+        # TODO
+        #if self.klass._meta.get_latest_by:
+        #    self.get_latest = self.__get_latest
+        #for f in self.klass._meta.fields:
+        #    if isinstance(f, DateField):
+        #        setattr(self, 'get_%s_list' % f.name, curry(self.__get_date_list, f))
+
+    def contribute_to_class(self, klass, name):
+        # TODO: Use weakref because of possible memory leak / circular reference.
+        self.klass = klass
+        dispatcher.connect(self._prepare, signal=signals.class_prepared, sender=klass)
+        setattr(klass, name, ManagerDescriptor(self))
+        if not hasattr(klass, '_default_manager') or self.creation_counter < klass._default_manager.creation_counter:
+            klass._default_manager = self
+
+    def get(self, **kwargs):
+        """Gets a single object, using a new query. Keyword arguments are filters."""
+        obj_list = list(self.filter(**kwargs))
+        if len(obj_list) < 1:
+            raise self.klass.DoesNotExist, "%s does not exist for %s" % (self.klass._meta.object_name, kwargs)
+        assert len(obj_list) == 1, "get_object() returned more than one %s -- it returned %s! Lookup parameters were %s" % (self.klass._meta.object_name, len(obj_list), kwargs)
+        return obj_list[0]
+        
+    def in_bulk(self, id_list, **kwargs):
+        assert isinstance(id_list, list), "in_bulk() must be provided with a list of IDs."
+        assert id_list != [], "in_bulk() cannot be passed an empty ID list."
+        new_query = self    # we have to do a copy later, so this is OK
+        if kwargs:
+            new_query = self.filter(**kwargs)
+        new_query = new_query.extras(where=
+                                      ["%s.%s IN (%s)" % (backend.quote_name(self.klass._meta.db_table), 
+                                                          backend.quote_name(self.klass._meta.pk.column), 
+                                                          ",".join(['%s'] * len(id_list)))],
+                                     params=id_list)
+        obj_list = list(new_query)
+        return dict([(obj._get_pk_val(), obj) for obj in obj_list])
+
+    def delete(self, **kwargs):
+        # Remove the DELETE_ALL argument, if it exists.
+        delete_all = kwargs.pop('DELETE_ALL', False)
+
+        # Check for at least one query argument.
+        if not kwargs and not delete_all:
+            raise TypeError, "SAFETY MECHANISM: Specify DELETE_ALL=True if you actually want to delete all data."
+        
+        if kwargs:
+            del_query = self.filter(**kwargs)
+        else:
+            del_query = self._clone()
+        # disable non-supported fields
+        del_query._select_related = False
+        del_query._select = {}
+        del_query._order_by = []
+        del_query._offset = None
+        del_query._limit = None
+
+        opts = self.klass._meta
+
+        # Perform the SQL delete
+        cursor = connection.cursor()
+        _, sql, params = del_query._get_sql_clause(False)
+        cursor.execute("DELETE " + sql, params)        
+             
+
+class OldManager(object):
     # Tracks each time a Manager instance is created. Used to retain order.
     creation_counter = 0
 
@@ -279,6 +359,9 @@ class Manager(object):
         # objects -- MySQL returns the values as strings, instead.
         return [typecast_timestamp(str(row[0])) for row in cursor.fetchall()]
 
+# DEBUG - to go back to old manager:
+# Manager = OldManager
+
 class ManagerDescriptor(object):
     def __init__(self, manager):
         self.manager = manager
@@ -286,4 +369,11 @@ class ManagerDescriptor(object):
     def __get__(self, instance, type=None):
         if instance != None:
             raise AttributeError, "Manager isn't accessible via %s instances" % type.__name__
-        return self.manager
+        
+        # HACK
+        # We need a new instance every time.  Otherwise, the cache that 
+        # the manager keeps never gets dropped, which is pain for memory usage, 
+        # and concurrency and means that queries don't get updated when you do 
+        # a model_obj.save(). (This hack helps some tests to pass, but isn't a real fix)
+        #return self.manager.__class__()
+        return copy.deepcopy(self.manager)
