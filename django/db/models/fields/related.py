@@ -87,7 +87,7 @@ class SingleRelatedObjectDescriptor(object):
                     params = {'%s__%s__exact' % (self.field.rel.field_name, other_field.rel.field_name): val}
                 else:
                     params = {'%s__exact' % self.field.rel.field_name: val}
-                rel_obj = self.field.rel.to._default_manager.get_object(**params)
+                rel_obj = self.field.rel.to._default_manager.get(**params)
                 setattr(instance, cache_name, rel_obj)
                 return rel_obj
 
@@ -108,6 +108,7 @@ class ManyRelatedObjectsDescriptor(object):
             # Dynamically create a class that subclasses the related
             # model's default manager.
             manager = types.ClassType('RelatedManager', (self.related.model._default_manager.__class__,), {})()
+            manager._use_cache = True
 
             # Set core_filters on the new manager to limit it to the
             # foreign-key relationship.
