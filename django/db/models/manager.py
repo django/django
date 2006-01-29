@@ -369,11 +369,5 @@ class ManagerDescriptor(object):
     def __get__(self, instance, type=None):
         if instance != None:
             raise AttributeError, "Manager isn't accessible via %s instances" % type.__name__
-        
-        # HACK
-        # We need a new instance every time.  Otherwise, the cache that 
-        # the manager keeps never gets dropped, which is pain for memory usage, 
-        # and concurrency and means that queries don't get updated when you do 
-        # a model_obj.save(). (This hack helps some tests to pass, but isn't a real fix)
-        #return self.manager.__class__()
-        return copy.deepcopy(self.manager)
+            
+        return self.manager

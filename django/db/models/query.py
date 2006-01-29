@@ -67,6 +67,7 @@ class QuerySet(object):
         self._tables = None
         self._offset = None
         self._limit = None
+        self._use_cache = False
         
     def filter(self, **kwargs):
         """Returns a new query instance with the query arguments
@@ -240,21 +241,24 @@ class QuerySet(object):
         return select, " ".join(sql), params    
         
     def _fetch_data(self):
-        if self._result_cache is None:            
-            self._result_cache = list(self.get_iterator())
+        if self._use_cache:
+            if self._result_cache is None:
+                self._result_cache = list(self.get_iterator())
+            return self._result_cache
+        else:
+            return list(self.get_iterator())
+                
             
     def __iter__(self):
         """Gets an iterator for the data"""
         # Fetch the data or use get_iterator?  If not, we can't
         # do sequence operations - or doing so will require re-fetching
-        # Also, lots of things in current template system break if
+        # Also, lots of things in current template system break if we
         # don't get it all.
-        self._fetch_data()
-        return iter(self._result_cache)
+        return iter(self._fetch_data())
         
     def __len__(self):
-        self._fetch_data()
-        return len(self._result_cache)
+        return len(self._fetch_data())
 
     def __getitem__(self, k):
         """Retrieve an item or slice from the set of results"""
@@ -278,8 +282,7 @@ class QuerySet(object):
         else:
             # TODO: possibly use a new query which just gets one item
             # if we haven't already got them all?
-            self._fetch_data()
-            return self._result_cache[k]
+            return self._fetch_data()[k]
         
     def get_iterator(self):
         # self._select is a dictionary, and dictionaries' key order is
