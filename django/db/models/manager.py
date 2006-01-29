@@ -7,7 +7,6 @@ from django.db.models.query import handle_legacy_orderlist, orderlist2sql, order
 from django.dispatch import dispatcher
 from django.db.models import signals
 from django.utils.datastructures import SortedDict
-import copy
 
 # Size of each "chunk" for get_iterator calls.
 # Larger values are slightly faster at the expense of more storage space.
@@ -19,7 +18,6 @@ def ensure_default_manager(sender):
         # Create the default manager, if needed.
         if hasattr(cls, 'objects'):
             raise ValueError, "Model %s must specify a custom Manager, because it has a field named 'objects'" % name
-            
         cls.add_to_class('objects', Manager())
         cls.objects._prepare()
 
@@ -35,7 +33,7 @@ class Manager(QuerySet):
         self.creation_counter = Manager.creation_counter
         Manager.creation_counter += 1
         self.klass = None
-        
+
     def _prepare(self):
         pass
         # TODO
@@ -60,7 +58,7 @@ class Manager(QuerySet):
             raise self.klass.DoesNotExist, "%s does not exist for %s" % (self.klass._meta.object_name, kwargs)
         assert len(obj_list) == 1, "get_object() returned more than one %s -- it returned %s! Lookup parameters were %s" % (self.klass._meta.object_name, len(obj_list), kwargs)
         return obj_list[0]
-        
+
     def in_bulk(self, id_list, **kwargs):
         assert isinstance(id_list, list), "in_bulk() must be provided with a list of IDs."
         assert id_list != [], "in_bulk() cannot be passed an empty ID list."
@@ -68,8 +66,8 @@ class Manager(QuerySet):
         if kwargs:
             new_query = self.filter(**kwargs)
         new_query = new_query.extras(where=
-                                      ["%s.%s IN (%s)" % (backend.quote_name(self.klass._meta.db_table), 
-                                                          backend.quote_name(self.klass._meta.pk.column), 
+                                      ["%s.%s IN (%s)" % (backend.quote_name(self.klass._meta.db_table),
+                                                          backend.quote_name(self.klass._meta.pk.column),
                                                           ",".join(['%s'] * len(id_list)))],
                                      params=id_list)
         obj_list = list(new_query)
@@ -82,7 +80,7 @@ class Manager(QuerySet):
         # Check for at least one query argument.
         if not kwargs and not delete_all:
             raise TypeError, "SAFETY MECHANISM: Specify DELETE_ALL=True if you actually want to delete all data."
-        
+
         if kwargs:
             del_query = self.filter(**kwargs)
         else:
@@ -99,8 +97,8 @@ class Manager(QuerySet):
         # Perform the SQL delete
         cursor = connection.cursor()
         _, sql, params = del_query._get_sql_clause(False)
-        cursor.execute("DELETE " + sql, params)        
-             
+        cursor.execute("DELETE " + sql, params)
+
 
 class OldManager(object):
     # Tracks each time a Manager instance is created. Used to retain order.
@@ -369,5 +367,4 @@ class ManagerDescriptor(object):
     def __get__(self, instance, type=None):
         if instance != None:
             raise AttributeError, "Manager isn't accessible via %s instances" % type.__name__
-            
         return self.manager

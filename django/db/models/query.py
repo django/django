@@ -68,7 +68,7 @@ class QuerySet(object):
         self._offset = None
         self._limit = None
         self._use_cache = False
-        
+
     def filter(self, **kwargs):
         """Returns a new query instance with the query arguments
         ANDed to the existing set"""
@@ -83,31 +83,30 @@ class QuerySet(object):
     def order_by(self, *field_names):
         """Returns a new query instance with the ordering changed."""
         return self._clone(_order_by=field_names)
-        
+
     def select_related(self, true_or_false):
         """Returns a new query instance with the 'related' qualifier modified"""
         return self._clone(_related=true_or_false)
-               
+
     def count(self):
         counter = self._clone()
         counter._order_by = []
-        
+
         # TODO - do we change these or not?
         # e.g. if someone does objects[0:10].count()
-        # (which 
+        # (which
         #counter._offset = None
         #counter._limit = None
         counter._select_related = False
         _, sql, params = counter._get_sql_clause(True)
         cursor = connection.cursor()
         cursor.execute("SELECT COUNT(*)" + sql, params)
-        return cursor.fetchone()[0]        
+        return cursor.fetchone()[0]
 
     # Convenience function for subclasses
     def _set_core_filter(self, **kwargs):
         """Sets the filters that should always be applied to queries"""
         self._filter = Q(**kwargs)
-        
 
     def _clone(self, **kwargs):
         """Gets a clone of the object, with optional kwargs to alter the clone"""
@@ -121,26 +120,26 @@ class QuerySet(object):
         # restore cache
         self._result_cache = _result_cache_save
         return clone
-        
+
     def _ensure_compatible(self, other):
         if self._distinct != other._distinct:
             raise ValueException, "Can't combine a unique query with a non-unique query"
-            
+
     def _combine(self, other):
         self._ensure_compatible(other)
         # get a deepcopy of 'other's order by
         #  (so that A.filter(args1) & A.filter(args2) does the same as
         #   A.filter(args1).filter(args2)
-        combined = other._clone() 
+        combined = other._clone()
         # If 'self' is ordered and 'other' isn't, propagate 'self's ordering
         if len(self._order_by) > 0 and len(combined._order_by == 0):
             combined._order_by = copy.deepcopy(self._order_by)
         return combined
-            
+
     def extras(self, params=None, select=None, where=None, tables=None):
         return self._clone(_params=params, _select=select, _where=where, _tables=tables)
-    
-    def __and__(self, other):        
+
+    def __and__(self, other):
         combined = self._combine(other)
         combined._filter = self._filter & other._filter
         return combined
@@ -149,7 +148,7 @@ class QuerySet(object):
         combined = self._combine(other)
         combined._filter = self._filter | other._filter
         return combined
-      
+
     # TODO - allow_joins - do we need it?
     def _get_sql_clause(self, allow_joins):
         def quote_only_if_word(word):
@@ -166,13 +165,13 @@ class QuerySet(object):
         select = ["%s.%s" % (backend.quote_name(opts.db_table), backend.quote_name(f.column)) for f in opts.fields]
 
         tables = [quote_only_if_word(t) for t in (self._tables or [])]
-        joins = SortedDict()        
+        joins = SortedDict()
         where = self._where or []
         params = self._params or []
 
         # Convert the Q object into SQL.
         tables2, joins2, where2, params2 = self._filter.get_sql(opts)
-        
+
         tables.extend(tables2)
         joins.update(joins2)
         where.extend(where2)
@@ -238,8 +237,8 @@ class QuerySet(object):
         else:
             assert self._offset is None, "'offset' is not allowed without 'limit'"
 
-        return select, " ".join(sql), params    
-        
+        return select, " ".join(sql), params
+
     def _fetch_data(self):
         if self._use_cache:
             if self._result_cache is None:
@@ -247,8 +246,7 @@ class QuerySet(object):
             return self._result_cache
         else:
             return list(self.get_iterator())
-                
-            
+
     def __iter__(self):
         """Gets an iterator for the data"""
         # Fetch the data or use get_iterator?  If not, we can't
@@ -256,13 +254,13 @@ class QuerySet(object):
         # Also, lots of things in current template system break if we
         # don't get it all.
         return iter(self._fetch_data())
-        
+
     def __len__(self):
         return len(self._fetch_data())
 
     def __getitem__(self, k):
         """Retrieve an item or slice from the set of results"""
-        # getitem can't return query instances, because  .filter() 
+        # getitem can't return query instances, because  .filter()
         # and .order_by() methods on the result would break badly.
         # This means we don't have to worry about arithmetic with
         # self._limit or self._offset - they will both be None
@@ -270,7 +268,7 @@ class QuerySet(object):
         if isinstance(k, slice):
             # Get a new query if we haven't already got data from db
             if self._result_cache is None:
-                # slice.stop and slice.start 
+                # slice.stop and slice.start
                 clone = self._clone(_offset=k.start, _limit=k.stop)
                 return list(clone)[::k.step]
                 # TODO - we are throwing away this retrieved data.
@@ -278,17 +276,17 @@ class QuerySet(object):
                 # list structure we could put it in.
             else:
                 return self._result_cache[k]
-            
+
         else:
             # TODO: possibly use a new query which just gets one item
             # if we haven't already got them all?
             return self._fetch_data()[k]
-        
+
     def get_iterator(self):
         # self._select is a dictionary, and dictionaries' key order is
         # undefined, so we convert it to a list of tuples.
         _extra_select = (self._select or {}).items()
-        
+
         cursor = connection.cursor()
         select, sql, params = self._get_sql_clause(True)
         cursor.execute("SELECT " + (self._distinct and "DISTINCT " or "") + ",".join(select) + sql, params)
@@ -306,7 +304,7 @@ class QuerySet(object):
                 for i, k in enumerate(_extra_select):
                     setattr(obj, k[0], row[index_end+i])
                 yield obj
-        
+
 class QOperator:
     "Base class for QAnd and QOr"
     def __init__(self, *args):
@@ -382,7 +380,6 @@ class Q:
     def get_sql(self, opts):
         return parse_lookup(self.kwargs.items(), opts)
 
-
 def get_where_clause(lookup_type, table_prefix, field_name, value):
     if table_prefix.endswith('.'):
         table_prefix = backend.quote_name(table_prefix[:-1])+'.'
@@ -453,19 +450,19 @@ def parse_lookup(kwarg_items, opts):
     # there for others to implement custom Q()s, etc that return other join
     # types.
     tables, joins, where, params = [], SortedDict(), [], []
-    
+
     for kwarg, value in kwarg_items:
         if value is None:
             pass
-        else:        
+        else:
             path = kwarg.split(LOOKUP_SEPARATOR)
             # Extract the last elements of the kwarg.
             # The very-last is the clause (equals, like, etc).
             # The second-last is the table column on which the clause is
             # to be performed.
             # The exceptions to this are:
-            # 1)  "pk", which is an implicit id__exact; 
-            #     if we find "pk", make the clause "exact', and insert 
+            # 1)  "pk", which is an implicit id__exact;
+            #     if we find "pk", make the clause "exact', and insert
             #     a dummy name of None, which we will replace when
             #     we know which table column to grab as the primary key.
             # 2)  If there is only one part, assume it to be an __exact
@@ -476,7 +473,7 @@ def parse_lookup(kwarg_items, opts):
             elif len(path) == 0:
                 path.append(clause)
                 clause = 'exact'
-                
+
             if len(path) < 1:
                 raise TypeError, "Cannot parse keyword query %r" % kwarg
 
