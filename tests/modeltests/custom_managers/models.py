@@ -8,7 +8,7 @@ from django.db import models
 
 class PersonManager(models.Manager):
     def get_fun_people(self):
-        return self.get_list(fun__exact=True)
+        return list(self.filter(fun=True))
 
 class Person(models.Model):
     first_name = models.CharField(maxlength=30)
@@ -22,9 +22,9 @@ class Person(models.Model):
 # An example of providing a custom manager that isn't called "objects".
 
 class PublishedBookManager(models.Manager):
-    def get_list(self, **kwargs):
-        kwargs['is_published__exact'] = True
-        return models.Manager.get_list(self, **kwargs)
+    def __init__(self):
+        super(PublishedBookManager, self).__init__()
+        self._set_core_filter(is_published__exact=True)
 
 class Book(models.Model):
     title = models.CharField(maxlength=50)
@@ -38,9 +38,9 @@ class Book(models.Model):
 # An example of providing multiple custom managers.
 
 class FastCarManager(models.Manager):
-    def get_list(self, **kwargs):
-        kwargs['top_speed__gt'] = 150
-        return models.Manager.get_list(self, **kwargs)
+    def __init__(self):
+        super(FastCarManager, self).__init__()
+        self._set_core_filter(top_speed__gt=150)
 
 class Car(models.Model):
     name = models.CharField(maxlength=10)
@@ -72,20 +72,20 @@ Traceback (most recent call last):
     ...
 AttributeError: type object 'Book' has no attribute 'objects'
 
->>> Book.published_objects.get_list()
+>>> list(Book.published_objects)
 [How to program]
 
 >>> c1 = Car(name='Corvette', mileage=21, top_speed=180)
 >>> c1.save()
 >>> c2 = Car(name='Neon', mileage=31, top_speed=100)
 >>> c2.save()
->>> Car.cars.get_list(order_by=('name',))
+>>> list(Car.cars.order_by('name'))
 [Corvette, Neon]
->>> Car.fast_cars.get_list()
+>>> list(Car.fast_cars)
 [Corvette]
 
 # Each model class gets a "_default_manager" attribute, which is a reference
 # to the first manager defined in the class. In this case, it's "cars".
->>> Car._default_manager.get_list(order_by=('name',))
+>>> list(Car._default_manager.order_by('name'))
 [Corvette, Neon]
 """

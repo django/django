@@ -11,8 +11,9 @@ class Article(models.Model):
     pub_date = models.DateTimeField()
 
 API_TESTS = """
+
 # No articles are in the system yet.
->>> Article.objects.get_list()
+>>> list(Article.objects)
 []
 
 # Create an Article.
@@ -37,52 +38,58 @@ datetime.datetime(2005, 7, 28, 0, 0)
 >>> a.headline = 'Area woman programs in Python'
 >>> a.save()
 
-# get_list() displays all the articles in the database. Note that the article
+# Listing objects displays all the articles in the database. Note that the article
 # is represented by "<Article object>", because we haven't given the Article
 # model a __repr__() method.
->>> Article.objects.get_list()
+>>> list(Article.objects)
 [<Article object>]
 
 # Django provides a rich database lookup API that's entirely driven by
 # keyword arguments.
->>> Article.objects.get_object(id__exact=1)
+>>> Article.objects.get(id__exact=1)
 <Article object>
->>> Article.objects.get_object(headline__startswith='Area woman')
+>>> Article.objects.get(headline__startswith='Area woman')
 <Article object>
->>> Article.objects.get_object(pub_date__year=2005)
+>>> Article.objects.get(pub_date__year=2005)
 <Article object>
->>> Article.objects.get_object(pub_date__year=2005, pub_date__month=7)
+>>> Article.objects.get(pub_date__year=2005, pub_date__month=7)
 <Article object>
->>> Article.objects.get_object(pub_date__year=2005, pub_date__month=7, pub_date__day=28)
+>>> Article.objects.get(pub_date__year=2005, pub_date__month=7, pub_date__day=28)
 <Article object>
 
->>> Article.objects.get_list(pub_date__year=2005)
+# You can omit __exact if you want
+>>> Article.objects.get(id=1)
+<Article object>
+>>> Article.objects.get(headline='Area woman programs in Python')
+<Article object>
+
+>>> list(Article.objects.filter(pub_date__year=2005))
 [<Article object>]
->>> Article.objects.get_list(pub_date__year=2004)
+>>> list(Article.objects.filter(pub_date__year=2004))
 []
->>> Article.objects.get_list(pub_date__year=2005, pub_date__month=7)
+>>> list(Article.objects.filter(pub_date__year=2005, pub_date__month=7))
 [<Article object>]
 
-# Django raises an ArticleDoesNotExist exception for get_object()
->>> Article.objects.get_object(id__exact=2)
+# Django raises an ArticleDoesNotExist exception for get()
+>>> Article.objects.get(id__exact=2)
 Traceback (most recent call last):
     ...
 DoesNotExist: Article does not exist for {'id__exact': 2}
 
->>> Article.objects.get_object(pub_date__year=2005, pub_date__month=8)
+>>> Article.objects.get(pub_date__year=2005, pub_date__month=8)
 Traceback (most recent call last):
     ...
 DoesNotExist: Article does not exist for ...
 
 # Lookup by a primary key is the most common case, so Django provides a
 # shortcut for primary-key exact lookups.
-# The following is identical to articles.get_object(id__exact=1).
->>> Article.objects.get_object(pk=1)
+# The following is identical to articles.get(id__exact=1).
+>>> Article.objects.get(pk=1)
 <Article object>
 
 # Model instances of the same type and same ID are considered equal.
->>> a = Article.objects.get_object(pk=1)
->>> b = Article.objects.get_object(pk=1)
+>>> a = Article.objects.get(pk=1)
+>>> b = Article.objects.get(pk=1)
 >>> a == b
 True
 
@@ -139,12 +146,12 @@ TypeError: 'foo' is an invalid keyword argument for this function
 # give it.
 >>> a7 = Article(headline='Article 7', pub_date=datetime(2005, 7, 31, 12, 30))
 >>> a7.save()
->>> Article.objects.get_object(id__exact=7).pub_date
+>>> Article.objects.get(id__exact=7).pub_date
 datetime.datetime(2005, 7, 31, 12, 30)
 
 >>> a8 = Article(headline='Article 8', pub_date=datetime(2005, 7, 31, 12, 30, 45))
 >>> a8.save()
->>> Article.objects.get_object(id__exact=8).pub_date
+>>> Article.objects.get(id__exact=8).pub_date
 datetime.datetime(2005, 7, 31, 12, 30, 45)
 >>> a8.id
 8L
@@ -160,40 +167,65 @@ datetime.datetime(2005, 7, 31, 12, 30, 45)
 
 >>> a7 == a8
 False
->>> a8 == Article.objects.get_object(id__exact=8)
+>>> a8 == Article.objects.get(id__exact=8)
 True
 >>> a7 != a8
 True
->>> Article.objects.get_object(id__exact=8) != Article.objects.get_object(id__exact=7)
+>>> Article.objects.get(id__exact=8) != Article.objects.get(id__exact=7)
 True
->>> Article.objects.get_object(id__exact=8) == Article.objects.get_object(id__exact=7)
+>>> Article.objects.get(id__exact=8) == Article.objects.get(id__exact=7)
 False
 
->>> Article.objects.get_pub_date_list('year')
-[datetime.datetime(2005, 1, 1, 0, 0)]
->>> Article.objects.get_pub_date_list('month')
-[datetime.datetime(2005, 7, 1, 0, 0)]
->>> Article.objects.get_pub_date_list('day')
-[datetime.datetime(2005, 7, 28, 0, 0), datetime.datetime(2005, 7, 29, 0, 0), datetime.datetime(2005, 7, 30, 0, 0), datetime.datetime(2005, 7, 31, 0, 0)]
->>> Article.objects.get_pub_date_list('day', order='ASC')
-[datetime.datetime(2005, 7, 28, 0, 0), datetime.datetime(2005, 7, 29, 0, 0), datetime.datetime(2005, 7, 30, 0, 0), datetime.datetime(2005, 7, 31, 0, 0)]
->>> Article.objects.get_pub_date_list('day', order='DESC')
-[datetime.datetime(2005, 7, 31, 0, 0), datetime.datetime(2005, 7, 30, 0, 0), datetime.datetime(2005, 7, 29, 0, 0), datetime.datetime(2005, 7, 28, 0, 0)]
+## TODO - what should these be converted to?
 
-# Try some bad arguments to __get_date_list
->>> Article.objects.get_pub_date_list('badarg')
-Traceback (most recent call last):
-    ...
-AssertionError: 'kind' must be one of 'year', 'month' or 'day'.
->>> Article.objects.get_pub_date_list(order='ASC')
-Traceback (most recent call last):
-    ...
-TypeError: __get_date_list() takes at least 3 non-keyword arguments (2 given)
+##>>> Article.objects.get_pub_date_list('year')
+##[datetime.datetime(2005, 1, 1, 0, 0)]
+##>>> Article.objects.get_pub_date_list('month')
+##[datetime.datetime(2005, 7, 1, 0, 0)]
+##>>> Article.objects.get_pub_date_list('day')
+##[datetime.datetime(2005, 7, 28, 0, 0), datetime.datetime(2005, 7, 29, 0, 0), datetime.datetime(2005, 7, 30, 0, 0), datetime.datetime(2005, 7, 31, 0, 0)]
+##>>> Article.objects.get_pub_date_list('day', order='ASC')
+##[datetime.datetime(2005, 7, 28, 0, 0), datetime.datetime(2005, 7, 29, 0, 0), datetime.datetime(2005, 7, 30, 0, 0), datetime.datetime(2005, 7, 31, 0, 0)]
+##>>> Article.objects.get_pub_date_list('day', order='DESC')
+##[datetime.datetime(2005, 7, 31, 0, 0), datetime.datetime(2005, 7, 30, 0, 0), datetime.datetime(2005, 7, 29, 0, 0), datetime.datetime(2005, 7, 28, 0, 0)]
+##
+### Try some bad arguments to __get_date_list
+##>>> Article.objects.get_pub_date_list('badarg')
+##Traceback (most recent call last):
+##    ...
+##AssertionError: 'kind' must be one of 'year', 'month' or 'day'.
+##>>> Article.objects.get_pub_date_list(order='ASC')
+##Traceback (most recent call last):
+##    ...
+##TypeError: __get_date_list() takes at least 3 non-keyword arguments (2 given)
+
+# You can combine queries with & and |
+>>> s1 = Article.objects.filter(id__exact=1)
+>>> s2 = Article.objects.filter(id__exact=2)
+>>> tmp = [a.id for a in list(s1 | s2)]
+>>> tmp.sort()
+>>> tmp
+[1L, 2L]
+>>> list(s1 & s2)
+[]
+
+# You can get the number of objects like this:
+>>> len(Article.objects.filter(id__exact=1))
+1
+
+# You can get items using index and slice notation:
+>>> Article.objects[0]
+<Article object>
+>>> Article.objects[1:2]
+[<Article object>, <Article object>]
+>>> s3 = Article.objects.filter(id__exact=3)
+>>> (s1 | s2 | s3)[::2]
+[<Article object>, <Article object>]
 
 
 # An Article instance doesn't have access to the "objects" attribute.
 # That is only available as a class method.
->>> a7.objects.get_list()
+>>> list(a7.objects)
 Traceback (most recent call last):
     ...
 AttributeError: Manager isn't accessible via Article instances
@@ -204,10 +236,10 @@ Traceback (most recent call last):
 AttributeError: Manager isn't accessible via Article instances
 
 # Bulk delete test: How many objects before and after the delete?
->>> Article.objects.get_count()
+>>> Article.objects.count()
 8L
 >>> Article.objects.delete(id__lte=4)
->>> Article.objects.get_count()
+>>> Article.objects.count()
 4L
 
 >>> Article.objects.delete()
@@ -216,7 +248,7 @@ Traceback (most recent call last):
 TypeError: SAFETY MECHANISM: Specify DELETE_ALL=True if you actually want to delete all data.
 
 >>> Article.objects.delete(DELETE_ALL=True)
->>> Article.objects.get_count()
+>>> Article.objects.count()
 0L
 
 """
@@ -230,7 +262,7 @@ if building_docs or settings.DATABASE_ENGINE == 'postgresql':
 # In PostgreSQL, microsecond-level precision is available.
 >>> a9 = Article(headline='Article 9', pub_date=datetime(2005, 7, 31, 12, 30, 45, 180))
 >>> a9.save()
->>> Article.objects.get_object(id__exact=9).pub_date
+>>> Article.objects.get(id__exact=9).pub_date
 datetime.datetime(2005, 7, 31, 12, 30, 45, 180)
 """
 
@@ -240,7 +272,7 @@ if building_docs or settings.DATABASE_ENGINE == 'mysql':
 # microsecond-level precision once the data is saved.
 >>> a9 = Article(headline='Article 9', pub_date=datetime(2005, 7, 31, 12, 30, 45, 180))
 >>> a9.save()
->>> Article.objects.get_object(id__exact=9).pub_date
+>>> Article.objects.get(id__exact=9).pub_date
 datetime.datetime(2005, 7, 31, 12, 30, 45)
 """
 
@@ -249,7 +281,7 @@ API_TESTS += """
 # You can manually specify the primary key when creating a new objet
 >>> a101 = Article(id=101, headline='Article 101', pub_date=datetime(2005, 7, 31, 12, 30, 45))
 >>> a101.save()
->>> a101 = Article.objects.get_object(pk=101)
+>>> a101 = Article.objects.get(pk=101)
 >>> a101.headline
 'Article 101'
 """

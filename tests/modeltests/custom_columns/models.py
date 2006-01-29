@@ -23,21 +23,21 @@ API_TESTS = """
 >>> p.id
 1
 
->>> Person.objects.get_list()
+>>> list(Person.objects)
 [John Smith]
 
->>> Person.objects.get_list(first_name__exact='John')
+>>> list(Person.objects.filter(first_name__exact='John'))
 [John Smith]
 
->>> Person.objects.get_object(first_name__exact='John')
+>>> Person.objects.get(first_name__exact='John')
 John Smith
 
->>> Person.objects.get_list(firstname__exact='John')
+>>> list(Person.objects.filter(firstname__exact='John'))
 Traceback (most recent call last):
     ...
 TypeError: Cannot resolve keyword 'firstname' into field
 
->>> p = Person.objects.get_object(last_name__exact='Smith')
+>>> p = Person.objects.get(last_name__exact='Smith')
 >>> p.first_name
 'John'
 >>> p.last_name
