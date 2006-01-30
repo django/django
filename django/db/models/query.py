@@ -66,7 +66,7 @@ class QuerySet(object):
     core_filters = {}
 
     def __init__(self):
-        self._filters = {}           # Dictionary of lookup parameters, e.g. {'foo__gt': 3}
+        self._filters = self.core_filters.copy()
         self._order_by = ()          # Ordering, e.g. ('date', '-name')
         self._select_related = False # Whether to fill cache for related objects.
         self._distinct = False       # Whether the query should use SELECT DISTINCT.
@@ -173,9 +173,6 @@ class QuerySet(object):
 
     def _get_sql_clause(self, allow_joins):
         opts = self.klass._meta
-
-        # Apply core filters.
-        self._filters.update(self.core_filters)
 
         # Construct the fundamental parts of the query: SELECT X FROM Y WHERE Z.
         select = ["%s.%s" % (backend.quote_name(opts.db_table), backend.quote_name(f.column)) for f in opts.fields]
