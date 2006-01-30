@@ -20,22 +20,6 @@ def ensure_default_manager(sender):
 
 dispatcher.connect(ensure_default_manager, signal=signals.class_prepared)
 
-# class OldSubmittedManager(QuerySet):
-#     def in_bulk(self, id_list, **kwargs):
-#         assert isinstance(id_list, list), "in_bulk() must be provided with a list of IDs."
-#         assert id_list != [], "in_bulk() cannot be passed an empty ID list."
-#         new_query = self    # we have to do a copy later, so this is OK
-#         if kwargs:
-#             new_query = self.filter(**kwargs)
-#         new_query = new_query.extras(where=
-#                                       ["%s.%s IN (%s)" % (backend.quote_name(self.klass._meta.db_table),
-#                                                           backend.quote_name(self.klass._meta.pk.column),
-#                                                           ",".join(['%s'] * len(id_list)))],
-#                                      params=id_list)
-#         obj_list = list(new_query)
-#         return dict([(obj._get_pk_val(), obj) for obj in obj_list])
-
-
 class Manager(QuerySet):
     # Tracks each time a Manager instance is created. Used to retain order.
     creation_counter = 0
@@ -58,14 +42,6 @@ class Manager(QuerySet):
         setattr(klass, name, ManagerDescriptor(self))
         if not hasattr(klass, '_default_manager') or self.creation_counter < klass._default_manager.creation_counter:
             klass._default_manager = self
-
-    def in_bulk(self, id_list, *args, **kwargs):
-        assert isinstance(id_list, list), "in_bulk() must be provided with a list of IDs."
-        assert id_list != [], "in_bulk() cannot be passed an empty ID list."
-        kwargs['where'] = ["%s.%s IN (%s)" % (backend.quote_name(self.klass._meta.db_table), backend.quote_name(self.klass._meta.pk.column), ",".join(['%s'] * len(id_list)))]
-        kwargs['params'] = id_list
-        obj_list = self.get_list(*args, **kwargs)
-        return dict([(obj._get_pk_val(), obj) for obj in obj_list])
 
     def get_values_iterator(self, *args, **kwargs):
         # select_related and select aren't supported in get_values().

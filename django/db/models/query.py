@@ -72,10 +72,10 @@ class QuerySet(object):
         self._order_by = None        # Ordering, e.g. ('date', '-name'). If None, use model's ordering.
         self._select_related = False # Whether to fill cache for related objects.
         self._distinct = False       # Whether the query should use SELECT DISTINCT.
-        self._select = None          # Dictionary of attname -> SQL.
-        self._where = None           # List of extra WHERE clauses to use.
-        self._params = None          # List of params to use for extra WHERE clauses.
-        self._tables = None          # List of extra tables to use.
+        self._select = {}            # Dictionary of attname -> SQL.
+        self._where = []             # List of extra WHERE clauses to use.
+        self._params = []            # List of params to use for extra WHERE clauses.
+        self._tables = []            # List of extra tables to use.
         self._offset = None          # OFFSET clause
         self._limit = None           # LIMIT clause
         self._result_cache = None
@@ -112,7 +112,7 @@ class QuerySet(object):
         "Performs the SELECT database lookup of this QuerySet."
         # self._select is a dictionary, and dictionaries' key order is
         # undefined, so we convert it to a list of tuples.
-        extra_select = (self._select or {}).items()
+        extra_select = self._select.items()
 
         cursor = connection.cursor()
         select, sql, params = self._get_sql_clause(True)
@@ -180,6 +180,14 @@ class QuerySet(object):
         _, sql, params = del_query._get_sql_clause(False)
         cursor.execute("DELETE " + sql, params)
 
+    def in_bulk(self, id_list):
+        assert isinstance(id_list, list), "in_bulk() must be provided with a list of IDs."
+        assert id_list != [], "in_bulk() cannot be passed an empty ID list."
+        bulk_query = self._clone()
+        bulk_query._where.append("%s.%s IN (%s)" % (backend.quote_name(self.klass._meta.db_table), backend.quote_name(self.klass._meta.pk.column), ",".join(['%s'] * len(id_list))))
+        bulk_query._params.extend(id_list)
+        return dict([(obj._get_pk_val(), obj) for obj in bulk_query.iterator()])
+
     def dates(self, field_name, kind, order='ASC'):
         """
         Returns a list of datetime objects representing all available dates
@@ -232,7 +240,12 @@ class QuerySet(object):
         return self._clone(_distinct=true_or_false)
 
     def extra(self, select=None, where=None, params=None, tables=None):
-        return self._clone(_select=select, _where=where, _params=params, _tables=tables)
+        clone = self._clone()
+        if select: clone._select.extend(select)
+        if where: clone._where.extend(where)
+        if params: clone._params.extend(params)
+        if tables: clone._tables.extend(tables)
+        return clone
 
     ###################
     # PRIVATE METHODS #
@@ -245,29 +258,30 @@ class QuerySet(object):
         c._order_by = self._order_by
         c._select_related = self._select_related
         c._distinct = self._distinct
-        c._select = self._select
-        c._where = self._where
-        c._params = self._params
-        c._tables = self._tables
+        c._select = self._select.copy()
+        c._where = self._where[:]
+        c._params = self._params[:]
+        c._tables = self._tables[:]
         c._offset = self._offset
         c._limit = self._limit
         c.__dict__.update(kwargs)
         return c
 
     def _get_data(self):
-        if self._result_cache is None:
-            self._result_cache = list(self.iterator())
-        return self._result_cache
+        return list(self.iterator())
+#         if self._result_cache is None:
+#             self._result_cache = list(self.iterator())
+#         return self._result_cache
 
     def _get_sql_clause(self, allow_joins):
         opts = self.klass._meta
 
         # Construct the fundamental parts of the query: SELECT X FROM Y WHERE Z.
         select = ["%s.%s" % (backend.quote_name(opts.db_table), backend.quote_name(f.column)) for f in opts.fields]
-        tables = [quote_only_if_word(t) for t in (self._tables or [])]
+        tables = [quote_only_if_word(t) for t in self._tables]
         joins = SortedDict()
-        where = self._where or []
-        params = self._params or []
+        where = self._where[:]
+        params = self._params[:]
 
         # Convert self._filters into SQL.
         tables2, joins2, where2, params2 = parse_lookup(self._filters.items(), opts)
