@@ -1,6 +1,7 @@
 "Utilities for loading models and the modules that contain them."
 
 from django.conf import settings
+from django.core.exceptions import ImproperlyConfigured
 
 __all__ = ('get_apps', 'get_app', 'get_models', 'get_model')
 
