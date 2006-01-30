@@ -245,7 +245,7 @@ class QuerySet(object):
     def filter(self, **kwargs):
         "Returns a new QuerySet instance with the args ANDed to the existing set."
         clone = self._clone()
-        clone._filters.update(**kwargs)
+        clone._filters.update(kwargs)
         return clone
 
     def select_related(self, true_or_false=True):
