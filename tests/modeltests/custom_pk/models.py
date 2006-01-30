@@ -29,12 +29,12 @@ class Business(models.Model):
 API_TESTS = """
 >>> dan = Employee(employee_code='ABC123', first_name='Dan', last_name='Jones')
 >>> dan.save()
->>> list(Employee.objects)
+>>> list(Employee.objects.all())
 [Dan Jones]
 
 >>> fran = Employee(employee_code='XYZ456', first_name='Fran', last_name='Bones')
 >>> fran.save()
->>> list(Employee.objects)
+>>> list(Employee.objects.all())
 [Fran Bones, Dan Jones]
 
 >>> Employee.objects.get(pk='ABC123')

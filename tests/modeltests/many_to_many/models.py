@@ -96,7 +96,7 @@ True
 
 # If we delete a Publication, its Articles won't be able to access it.
 >>> p1.delete()
->>> list(Publication.objects)
+>>> list(Publication.objects.all())
 [Science News, Science Weekly]
 >>> a1 = Article.objects.get(pk=1)
 >>> list(a1.publication_set)
@@ -104,7 +104,7 @@ True
 
 # If we delete an Article, its Publications won't be able to access it.
 >>> a2.delete()
->>> list(Article.objects)
+>>> list(Article.objects.all())
 [Django lets you build Web apps easily]
 >>> list(p1.article_set.order_by('headline'))
 [Django lets you build Web apps easily]

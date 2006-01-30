@@ -56,12 +56,12 @@ Traceback (most recent call last):
 DoesNotExist: Restaurant does not exist for {'place__id__exact': ...}
 
 # Restaurant.objects.get_list() just returns the Restaurants, not the Places.
->>> list(Restaurant.objects)
+>>> list(Restaurant.objects.all())
 [Demon Dogs the restaurant]
 
 # Place.objects.get_list() returns all Places, regardless of whether they have
 # Restaurants.
->>> list(Place.objects.filter(order_by=['name']))
+>>> list(Place.objects.order_by('name'))
 [Ace Hardware the place, Demon Dogs the place]
 
 >>> Restaurant.objects.get(place__id__exact=1)

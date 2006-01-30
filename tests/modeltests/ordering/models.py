@@ -36,9 +36,9 @@ API_TESTS = """
 >>> a4 = Article(headline='Article 4', pub_date=datetime(2005, 7, 28))
 >>> a4.save()
 
-# By default, articles.get_list() orders by pub_date descending, then
+# By default, Article.objects.all() orders by pub_date descending, then
 # headline ascending.
->>> list(Article.objects)
+>>> list(Article.objects.all())
 [Article 4, Article 2, Article 3, Article 1]
 
 # Override ordering with order_by, which is in the same format as the ordering

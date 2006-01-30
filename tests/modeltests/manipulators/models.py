@@ -32,9 +32,9 @@ API_TESTS = """
 >>> m1 = man.save(data)
 
 # Verify it worked.
->>> list(Musician.objects)
+>>> list(Musician.objects.all())
 [Ella Fitzgerald]
->>> [m1] == list(Musician.objects)
+>>> [m1] == list(Musician.objects.all())
 True
 
 # Attempt to add a Musician without a first_name.
@@ -66,7 +66,7 @@ True
 >>> a1 = man.save(data)
 
 # Verify it worked.
->>> list(Album.objects)
+>>> list(Album.objects.all())
 [Ella and Basie]
 >>> Album.objects.get().musician
 Ella Fitzgerald
@@ -79,7 +79,7 @@ Ella Fitzgerald
 >>> a2 = man.save(data)
 
 # Verify it worked.
->>> list(Album.objects.filter(order_by=['name']))
+>>> list(Album.objects.order_by('name'))
 [Ella and Basie, Ultimate Ella]
 >>> a2 = Album.objects.get(pk=2)
 >>> a2

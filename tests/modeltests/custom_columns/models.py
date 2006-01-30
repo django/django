@@ -23,7 +23,7 @@ API_TESTS = """
 >>> p.id
 1
 
->>> list(Person.objects)
+>>> list(Person.objects.all())
 [John Smith]
 
 >>> list(Person.objects.filter(first_name__exact='John'))

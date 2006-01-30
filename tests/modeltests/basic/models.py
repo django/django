@@ -13,7 +13,7 @@ class Article(models.Model):
 API_TESTS = """
 
 # No articles are in the system yet.
->>> list(Article.objects)
+>>> list(Article.objects.all())
 []
 
 # Create an Article.
@@ -40,7 +40,7 @@ datetime.datetime(2005, 7, 28, 0, 0)
 # Listing objects displays all the articles in the database. Note that the article
 # is represented by "<Article object>", because we haven't given the Article
 # model a __repr__() method.
->>> list(Article.objects)
+>>> list(Article.objects.all())
 [<Article object>]
 
 # Django provides a rich database lookup API that's entirely driven by
@@ -222,9 +222,9 @@ AssertionError: 'order' must be either 'ASC' or 'DESC'.
 1
 
 # You can get items using index and slice notation.
->>> Article.objects[0]
+>>> Article.objects.all()[0]
 <Article object>
->>> Article.objects[1:2]
+>>> Article.objects.all()[1:2]
 [<Article object>, <Article object>]
 >>> s3 = Article.objects.filter(id__exact=3)
 >>> (s1 | s2 | s3)[::2]
@@ -232,7 +232,7 @@ AssertionError: 'order' must be either 'ASC' or 'DESC'.
 
 # An Article instance doesn't have access to the "objects" attribute.
 # That is only available as a class method.
->>> list(a7.objects)
+>>> a7.objects.all()
 Traceback (most recent call last):
     ...
 AttributeError: Manager isn't accessible via Article instances
