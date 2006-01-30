@@ -34,7 +34,7 @@ API_TESTS = """
 # Verify it worked.
 >>> list(Musician.objects)
 [Ella Fitzgerald]
->>> [m1] == Musician.objects.get_list()
+>>> [m1] == list(Musician.objects)
 True
 
 # Attempt to add a Musician without a first_name.
