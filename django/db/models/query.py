@@ -59,11 +59,13 @@ def quote_only_if_word(word):
 
 class QuerySet(object):
     "Represents a lazy database lookup for a set of objects"
-    # Subclasses need to provide 'self.klass' attribute for this class
-    # to be able to function.
 
     # Dictionary of lookup parameters to apply to every _get_sql_clause().
     core_filters = {}
+
+    # Subclasses need to provide 'self.klass' attribute for this class
+    # to be able to function.
+    klass = None
 
     def __init__(self):
         self._filters = self.core_filters.copy()
@@ -162,6 +164,7 @@ class QuerySet(object):
 
     def _clone(self, **kwargs):
         c = QuerySet()
+        c.klass = self.klass
         c._filters = self._filters.copy()
         c._order_by = self._order_by
         c._select_related = self._select_related
