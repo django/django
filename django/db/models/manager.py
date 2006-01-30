@@ -34,28 +34,28 @@ class Manager(QuerySet):
         # Increase the creation counter, and save our local copy.
         self.creation_counter = Manager.creation_counter
         Manager.creation_counter += 1
-        self.klass = None
+        self.model = None
 
     def _prepare(self):
-        if self.klass._meta.get_latest_by:
+        if self.model._meta.get_latest_by:
             self.get_latest = self.__get_latest
 
-    def contribute_to_class(self, klass, name):
+    def contribute_to_class(self, model, name):
         # TODO: Use weakref because of possible memory leak / circular reference.
-        self.klass = klass
-        dispatcher.connect(self._prepare, signal=signals.class_prepared, sender=klass)
-        setattr(klass, name, ManagerDescriptor(self))
-        if not hasattr(klass, '_default_manager') or self.creation_counter < klass._default_manager.creation_counter:
-            klass._default_manager = self
+        self.model = model
+        dispatcher.connect(self._prepare, signal=signals.class_prepared, sender=model)
+        setattr(model, name, ManagerDescriptor(self))
+        if not hasattr(model, '_default_manager') or self.creation_counter < model._default_manager.creation_counter:
+            model._default_manager = self
 
     def __get_latest(self, *args, **kwargs):
-        kwargs['order_by'] = ('-' + self.klass._meta.get_latest_by,)
+        kwargs['order_by'] = ('-' + self.model._meta.get_latest_by,)
         kwargs['limit'] = 1
         return self.get_object(*args, **kwargs)
 
     def add(self, **kwargs):
         kwargs.update(self.core_values)
-        new_obj = self.klass(**kwargs)
+        new_obj = self.model(**kwargs)
         new_obj.save()
         return new_obj
     add.alters_data = True

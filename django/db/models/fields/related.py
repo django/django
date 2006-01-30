@@ -121,10 +121,10 @@ class ManyRelatedObjectsDescriptor(object):
 
             # Prepare the manager.
             # TODO: Fix this hack?
-            # We're setting self.manager.klass here because
-            # self.manager._prepare() expects that self.manager.klass is
+            # We're setting self.manager.model here because
+            # self.manager._prepare() expects that self.manager.model is
             # set. This is slightly hackish.
-            manager.klass = self.related.model
+            manager.model = self.related.model
             manager._prepare()
 
             return manager
