@@ -82,18 +82,16 @@ Traceback (most recent call last):
     ...
 TypeError: in_bulk() got an unexpected keyword argument 'headline__startswith'
 
-# get_values() is just like get_list(), except it returns a list of
-# dictionaries instead of object instances -- and you can specify which fields
-# you want to retrieve.
->>> Article.objects.get_values(fields=['headline'])
+# values() returns a list of dictionaries instead of object instances -- and
+# you can specify which fields you want to retrieve.
+>>> list(Article.objects.values('headline'))
 [{'headline': 'Article 5'}, {'headline': 'Article 6'}, {'headline': 'Article 4'}, {'headline': 'Article 2'}, {'headline': 'Article 3'}, {'headline': 'Article 7'}, {'headline': 'Article 1'}]
->>> Article.objects.get_values(pub_date__exact=datetime(2005, 7, 27), fields=['id'])
+>>> list(Article.objects.filter(pub_date__exact=datetime(2005, 7, 27)).values('id'))
 [{'id': 2}, {'id': 3}, {'id': 7}]
->>> Article.objects.get_values(fields=['id', 'headline']) == [{'id': 5, 'headline': 'Article 5'}, {'id': 6, 'headline': 'Article 6'}, {'id': 4, 'headline': 'Article 4'}, {'id': 2, 'headline': 'Article 2'}, {'id': 3, 'headline': 'Article 3'}, {'id': 7, 'headline': 'Article 7'}, {'id': 1, 'headline': 'Article 1'}]
+>>> list(Article.objects.values('id', 'headline')) == [{'id': 5, 'headline': 'Article 5'}, {'id': 6, 'headline': 'Article 6'}, {'id': 4, 'headline': 'Article 4'}, {'id': 2, 'headline': 'Article 2'}, {'id': 3, 'headline': 'Article 3'}, {'id': 7, 'headline': 'Article 7'}, {'id': 1, 'headline': 'Article 1'}]
 True
 
-# get_values_iterator() is just like get_values(), but it's a generator.
->>> for d in Article.objects.get_values_iterator(fields=['id', 'headline']):
+>>> for d in Article.objects.values('id', 'headline'):
 ...     i = d.items()
 ...     i.sort()
 ...     i

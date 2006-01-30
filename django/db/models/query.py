@@ -188,6 +188,27 @@ class QuerySet(object):
         bulk_query._params.extend(id_list)
         return dict([(obj._get_pk_val(), obj) for obj in bulk_query.iterator()])
 
+    def values(self, *fields):
+        # select_related and select aren't supported in values().
+        values_query = self._clone(_select_related=False, _select={})
+
+        # 'fields' is a list of field names to fetch.
+        if fields:
+            columns = [self.klass._meta.get_field(f, many_to_many=False).column for f in fields]
+        else: # Default to all fields.
+            columns = [f.column for f in self.klass._meta.fields]
+
+        cursor = connection.cursor()
+        select, sql, params = values_query._get_sql_clause(True)
+        select = ['%s.%s' % (backend.quote_name(self.klass._meta.db_table), backend.quote_name(c)) for c in columns]
+        cursor.execute("SELECT " + (self._distinct and "DISTINCT " or "") + ",".join(select) + sql, params)
+        while 1:
+            rows = cursor.fetchmany(GET_ITERATOR_CHUNK_SIZE)
+            if not rows:
+                raise StopIteration
+            for row in rows:
+                yield dict(zip(fields, row))
+
     def dates(self, field_name, kind, order='ASC'):
         """
         Returns a list of datetime objects representing all available dates

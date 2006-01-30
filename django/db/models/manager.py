@@ -43,31 +43,6 @@ class Manager(QuerySet):
         if not hasattr(klass, '_default_manager') or self.creation_counter < klass._default_manager.creation_counter:
             klass._default_manager = self
 
-    def get_values_iterator(self, *args, **kwargs):
-        # select_related and select aren't supported in get_values().
-        kwargs['select_related'] = False
-        kwargs['select'] = {}
-
-        # 'fields' is a list of field names to fetch.
-        try:
-            fields = [self.klass._meta.get_field(f).column for f in kwargs.pop('fields')]
-        except KeyError: # Default to all fields.
-            fields = [f.column for f in self.klass._meta.fields]
-
-        cursor = connection.cursor()
-        _, sql, params = self._get_sql_clause(True, *args, **kwargs)
-        select = ['%s.%s' % (backend.quote_name(self.klass._meta.db_table), backend.quote_name(f)) for f in fields]
-        cursor.execute("SELECT " + (kwargs.get('distinct') and "DISTINCT " or "") + ",".join(select) + sql, params)
-        while 1:
-            rows = cursor.fetchmany(GET_ITERATOR_CHUNK_SIZE)
-            if not rows:
-                raise StopIteration
-            for row in rows:
-                yield dict(zip(fields, row))
-
-    def get_values(self, *args, **kwargs):
-        return list(self.get_values_iterator(*args, **kwargs))
-
     def __get_latest(self, *args, **kwargs):
         kwargs['order_by'] = ('-' + self.klass._meta.get_latest_by,)
         kwargs['limit'] = 1
