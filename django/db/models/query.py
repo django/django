@@ -69,7 +69,7 @@ class QuerySet(object):
 
     def __init__(self):
         self._filters = self.core_filters.copy()
-        self._order_by = ()          # Ordering, e.g. ('date', '-name')
+        self._order_by = None        # Ordering, e.g. ('date', '-name'). If None, use model's ordering.
         self._select_related = False # Whether to fill cache for related objects.
         self._distinct = False       # Whether the query should use SELECT DISTINCT.
         self._select = None          # Dictionary of attname -> SQL.
@@ -135,11 +135,11 @@ class QuerySet(object):
     def count(self):
         "Performs a SELECT COUNT() and returns the number of records as an integer."
         counter = self._clone()
-        counter._order_by = []
+        counter._order_by = ()
         counter._offset = None
         counter._limit = None
         counter._select_related = False
-        _, sql, params = counter._get_sql_clause(True)
+        select, sql, params = counter._get_sql_clause(True)
         cursor = connection.cursor()
         cursor.execute("SELECT COUNT(*)" + sql, params)
         return cursor.fetchone()[0]
@@ -277,7 +277,11 @@ class QuerySet(object):
 
         # ORDER BY clause
         order_by = []
-        for f in handle_legacy_orderlist(self._order_by or opts.ordering):
+        if self._order_by is not None:
+            ordering_to_use = self._order_by
+        else:
+            ordering_to_use = opts.ordering
+        for f in handle_legacy_orderlist(ordering_to_use):
             if f == '?': # Special case.
                 order_by.append(backend.get_random_function_sql())
             else:
