@@ -51,139 +51,153 @@ def orderlist2sql(order_list, opts, prefix=''):
             output.append('%s%s ASC' % (prefix, backend.quote_name(orderfield2column(f, opts))))
     return ', '.join(output)
 
+def quote_only_if_word(word):
+    if ' ' in word:
+        return word
+    else:
+        return backend.quote_name(word)
+
 class QuerySet(object):
     "Represents a lazy database lookup for a set of objects"
-    # Sub classes need to provide 'opts' member for this class
+    # Subclasses need to provide 'self.klass' attribute for this class
     # to be able to function.
+
+    # Dictionary of lookup parameters to apply to every _get_sql_clause().
+    core_filters = {}
+
     def __init__(self):
-        self._filter = Q()
-        self._order_by = ()
-        self._select_related = False
-        self._distinct = True
-        self._result_cache = None
-        self._params = None
-        self._select = None
-        self._where = None
-        self._tables = None
-        self._offset = None
-        self._limit = None
-        self._use_cache = False
+        self._filters = {}           # Dictionary of lookup parameters, e.g. {'foo__gt': 3}
+        self._order_by = ()          # Ordering, e.g. ('date', '-name')
+        self._select_related = False # Whether to fill cache for related objects.
+        self._distinct = False       # Whether the query should use SELECT DISTINCT.
+#         self._result_cache = None
+        self._select = None          # Dictionary of attname -> SQL.
+        self._where = None           # List of extra WHERE clauses to use.
+        self._params = None          # List of params to use for extra WHERE clauses.
+        self._tables = None          # List of extra tables to use.
+        self._offset = None          # OFFSET clause
+        self._limit = None           # LIMIT clause
+#         self._use_cache = False
 
-    def filter(self, **kwargs):
-        """Returns a new query instance with the query arguments
-        ANDed to the existing set"""
-        clone = self._clone()
-        clone._filter = self._filter & Q(**kwargs)
-        return clone
+    ########################
+    # PYTHON MAGIC METHODS #
+    ########################
 
-    def unique(self, true_or_false):
-        """Returns a new query instance with the 'unique' qualifier modified"""
-        return self._clone(_distinct=true_or_false)
+#     def __len__(self):
+#         return len(list(self))
 
-    def order_by(self, *field_names):
-        """Returns a new query instance with the ordering changed."""
-        return self._clone(_order_by=field_names)
+    ###########################################
+    # PUBLIC METHODS THAT DO DATABASE QUERIES #
+    ###########################################
 
-    def select_related(self, true_or_false):
-        """Returns a new query instance with the 'related' qualifier modified"""
-        return self._clone(_related=true_or_false)
+    def __iter__(self):
+        "Performs the SELECT database lookup of this QuerySet."
+        # self._select is a dictionary, and dictionaries' key order is
+        # undefined, so we convert it to a list of tuples.
+        extra_select = (self._select or {}).items()
+
+        cursor = connection.cursor()
+        select, sql, params = self._get_sql_clause(True)
+        cursor.execute("SELECT " + (self._distinct and "DISTINCT " or "") + ",".join(select) + sql, params)
+        fill_cache = self._select_related
+        index_end = len(self.klass._meta.fields)
+        while 1:
+            rows = cursor.fetchmany(GET_ITERATOR_CHUNK_SIZE)
+            if not rows:
+                raise StopIteration
+            for row in rows:
+                if fill_cache:
+                    obj, index_end = get_cached_row(self.klass, row, 0)
+                else:
+                    obj = self.klass(*row[:index_end])
+                for i, k in enumerate(extra_select):
+                    setattr(obj, k[0], row[index_end+i])
+                yield obj
 
     def count(self):
+        "Performs a SELECT COUNT() and returns the number of records as an integer."
         counter = self._clone()
         counter._order_by = []
-
-        # TODO - do we change these or not?
-        # e.g. if someone does objects[0:10].count()
-        # (which
-        #counter._offset = None
-        #counter._limit = None
+        counter._offset = None
+        counter._limit = None
         counter._select_related = False
         _, sql, params = counter._get_sql_clause(True)
         cursor = connection.cursor()
         cursor.execute("SELECT COUNT(*)" + sql, params)
         return cursor.fetchone()[0]
 
-    # Convenience function for subclasses
-    def _set_core_filter(self, **kwargs):
-        """Sets the filters that should always be applied to queries"""
-        self._filter = Q(**kwargs)
+    def get(self, **kwargs):
+        "Performs the SELECT and returns a single object matching the given keyword arguments."
+        obj_list = list(self.filter(**kwargs))
+        if len(obj_list) < 1:
+            raise self.klass.DoesNotExist, "%s does not exist for %s" % (self.klass._meta.object_name, kwargs)
+        assert len(obj_list) == 1, "get() returned more than one %s -- it returned %s! Lookup parameters were %s" % (self.klass._meta.object_name, len(obj_list), kwargs)
+        return obj_list[0]
 
-    def _clone(self, **kwargs):
-        """Gets a clone of the object, with optional kwargs to alter the clone"""
-        # Don't clone (even temporarily) the cache
-        _result_cache_save = self._result_cache
-        self._result_cache = None
-        # Must ensure we get fully deep copies of all the query objects
-        clone = copy.deepcopy(self)
-        # apply changes to clone
-        clone.__dict__.update(kwargs)
-        # restore cache
-        self._result_cache = _result_cache_save
+    #############################################
+    # PUBLIC METHODS THAT RETURN A NEW QUERYSET #
+    #############################################
+
+    def filter(self, **kwargs):
+        "Returns a new QuerySet instance with the args ANDed to the existing set."
+        clone = self._clone()
+        clone._filters.update(**kwargs)
         return clone
 
-    def _ensure_compatible(self, other):
-        if self._distinct != other._distinct:
-            raise ValueException, "Can't combine a unique query with a non-unique query"
+    def select_related(self, true_or_false=True):
+        "Returns a new QuerySet instance with '_select_related' modified."
+        return self._clone(_select_related=true_or_false)
 
-    def _combine(self, other):
-        self._ensure_compatible(other)
-        # get a deepcopy of 'other's order by
-        #  (so that A.filter(args1) & A.filter(args2) does the same as
-        #   A.filter(args1).filter(args2)
-        combined = other._clone()
-        # If 'self' is ordered and 'other' isn't, propagate 'self's ordering
-        if len(self._order_by) > 0 and len(combined._order_by == 0):
-            combined._order_by = copy.deepcopy(self._order_by)
-        return combined
+    def order_by(self, *field_names):
+        "Returns a new QuerySet instance with the ordering changed."
+        return self._clone(_order_by=field_names)
 
-    def extras(self, params=None, select=None, where=None, tables=None):
-        return self._clone(_params=params, _select=select, _where=where, _tables=tables)
+    def distinct(self, true_or_false=True):
+        "Returns a new QuerySet instance with '_distinct' modified."
+        return self._clone(_distinct=true_or_false)
 
-    def __and__(self, other):
-        combined = self._combine(other)
-        combined._filter = self._filter & other._filter
-        return combined
+    ###################
+    # PRIVATE METHODS #
+    ###################
 
-    def __or__(self, other):
-        combined = self._combine(other)
-        combined._filter = self._filter | other._filter
-        return combined
+    def _clone(self, **kwargs):
+        c = QuerySet()
+        c._filters = self._filters.copy()
+        c._order_by = self._order_by
+        c._select_related = self._select_related
+        c._distinct = self._distinct
+        c._select = self._select
+        c._offset = self._offset
+        c._limit = self._limit
+        return c
 
-    # TODO - allow_joins - do we need it?
     def _get_sql_clause(self, allow_joins):
-        def quote_only_if_word(word):
-            if ' ' in word:
-                return word
-            else:
-                return backend.quote_name(word)
-
-        # This is defined by sub-classes
-        # TODO - define a better accessor
         opts = self.klass._meta
+
+        # Apply core filters.
+        self._filters.update(self.core_filters)
 
         # Construct the fundamental parts of the query: SELECT X FROM Y WHERE Z.
         select = ["%s.%s" % (backend.quote_name(opts.db_table), backend.quote_name(f.column)) for f in opts.fields]
-
         tables = [quote_only_if_word(t) for t in (self._tables or [])]
         joins = SortedDict()
         where = self._where or []
         params = self._params or []
 
-        # Convert the Q object into SQL.
-        tables2, joins2, where2, params2 = self._filter.get_sql(opts)
-
+        # Convert self._filters into SQL.
+        tables2, joins2, where2, params2 = parse_lookup(self._filters.items(), opts)
         tables.extend(tables2)
         joins.update(joins2)
         where.extend(where2)
         params.extend(params2)
 
         # Add additional tables and WHERE clauses based on select_related.
-        if self._select_related is True:
+        if self._select_related:
             fill_table_cache(opts, select, tables, where, opts.db_table, [opts.db_table])
 
         # Add any additional SELECTs.
         if self._select:
-            select.extend(['(%s) AS %s' % (quote_only_if_word(s[1]), backend.quote_name(s[0])) for s in self._select ])
+            select.extend(['(%s) AS %s' % (quote_only_if_word(s[1]), backend.quote_name(s[0])) for s in self._select])
 
         # Start composing the body of the SQL statement.
         sql = [" FROM", backend.quote_name(opts.db_table)]
@@ -207,7 +221,7 @@ class QuerySet(object):
 
         # ORDER BY clause
         order_by = []
-        for f in handle_legacy_orderlist(self._order_by):
+        for f in handle_legacy_orderlist(self._order_by or opts.ordering):
             if f == '?': # Special case.
                 order_by.append(backend.get_random_function_sql())
             else:
@@ -223,7 +237,7 @@ class QuerySet(object):
                 else:
                     # Use the database table as a column prefix if it wasn't given,
                     # and if the requested column isn't a custom SELECT.
-                    if "." not in col_name and col_name not in [k[0] for k in (self._select or []) ]:
+                    if "." not in col_name and col_name not in [k[0] for k in (self._select or ())]:
                         table_prefix = backend.quote_name(opts.db_table) + '.'
                     else:
                         table_prefix = ''
@@ -239,79 +253,71 @@ class QuerySet(object):
 
         return select, " ".join(sql), params
 
-    def _fetch_data(self):
-        if self._use_cache:
-            if self._result_cache is None:
-                self._result_cache = list(self.get_iterator())
-            return self._result_cache
-        else:
-            return list(self.get_iterator())
-
-    def __iter__(self):
-        """Gets an iterator for the data"""
-        # Fetch the data or use get_iterator?  If not, we can't
-        # do sequence operations - or doing so will require re-fetching
-        # Also, lots of things in current template system break if we
-        # don't get it all.
-        return iter(self._fetch_data())
-
-    def __len__(self):
-        return len(self._fetch_data())
-
-    def __getitem__(self, k):
-        """Retrieve an item or slice from the set of results"""
-        # getitem can't return query instances, because  .filter()
-        # and .order_by() methods on the result would break badly.
-        # This means we don't have to worry about arithmetic with
-        # self._limit or self._offset - they will both be None
-        # at this point
-        if isinstance(k, slice):
-            # Get a new query if we haven't already got data from db
-            if self._result_cache is None:
-                # slice.stop and slice.start
-                clone = self._clone(_offset=k.start, _limit=k.stop)
-                return list(clone)[::k.step]
-                # TODO - we are throwing away this retrieved data.
-                # We could cache it if we had some kind of sparse
-                # list structure we could put it in.
-            else:
-                return self._result_cache[k]
-
-        else:
-            # TODO: possibly use a new query which just gets one item
-            # if we haven't already got them all?
-            return self._fetch_data()[k]
-
-    def get_iterator(self):
-        # self._select is a dictionary, and dictionaries' key order is
-        # undefined, so we convert it to a list of tuples.
-        _extra_select = (self._select or {}).items()
-
-        cursor = connection.cursor()
-        select, sql, params = self._get_sql_clause(True)
-        cursor.execute("SELECT " + (self._distinct and "DISTINCT " or "") + ",".join(select) + sql, params)
-        fill_cache = self._select_related
-        index_end = len(self.klass._meta.fields)
-        while 1:
-            rows = cursor.fetchmany(GET_ITERATOR_CHUNK_SIZE)
-            if not rows:
-                raise StopIteration
-            for row in rows:
-                if fill_cache:
-                    obj, index_end = get_cached_row(self.klass, row, 0)
-                else:
-                    obj = self.klass(*row[:index_end])
-                for i, k in enumerate(_extra_select):
-                    setattr(obj, k[0], row[index_end+i])
-                yield obj
+# class QuerySet(object):
+#     def _ensure_compatible(self, other):
+#         if self._distinct != other._distinct:
+#             raise ValueException, "Can't combine a unique query with a non-unique query"
+#
+#     def _combine(self, other):
+#         self._ensure_compatible(other)
+#         # get a deepcopy of 'other's order by
+#         #  (so that A.filter(args1) & A.filter(args2) does the same as
+#         #   A.filter(args1).filter(args2)
+#         combined = other._clone()
+#         # If 'self' is ordered and 'other' isn't, propagate 'self's ordering
+#         if len(self._order_by) > 0 and len(combined._order_by == 0):
+#             combined._order_by = copy.deepcopy(self._order_by)
+#         return combined
+#
+#     def extras(self, params=None, select=None, where=None, tables=None):
+#         return self._clone(_params=params, _select=select, _where=where, _tables=tables)
+#
+#     def __and__(self, other):
+#         combined = self._combine(other)
+#         combined._filter = self._filter & other._filter
+#         return combined
+#
+#     def __or__(self, other):
+#         combined = self._combine(other)
+#         combined._filter = self._filter | other._filter
+#         return combined
+#
+#     def _fetch_data(self):
+#         if self._use_cache:
+#             if self._result_cache is None:
+#                 self._result_cache = list(self.get_iterator())
+#             return self._result_cache
+#         else:
+#             return list(self.get_iterator())
+#
+#     def __getitem__(self, k):
+#         """Retrieve an item or slice from the set of results"""
+#         # getitem can't return query instances, because  .filter()
+#         # and .order_by() methods on the result would break badly.
+#         # This means we don't have to worry about arithmetic with
+#         # self._limit or self._offset - they will both be None
+#         # at this point
+#         if isinstance(k, slice):
+#             # Get a new query if we haven't already got data from db
+#             if self._result_cache is None:
+#                 # slice.stop and slice.start
+#                 clone = self._clone(_offset=k.start, _limit=k.stop)
+#                 return list(clone)[::k.step]
+#                 # TODO - we are throwing away this retrieved data.
+#                 # We could cache it if we had some kind of sparse
+#                 # list structure we could put it in.
+#             else:
+#                 return self._result_cache[k]
+#
+#         else:
+#             # TODO: possibly use a new query which just gets one item
+#             # if we haven't already got them all?
+#             return self._fetch_data()[k]
 
 class QOperator:
     "Base class for QAnd and QOr"
     def __init__(self, *args):
         self.args = args
-
-    def __repr__(self):
-        return '(%s)' % self.operator.join([repr(el) for el in self.args])
 
     def get_sql(self, opts):
         tables, joins, where, params = [], {}, [], []
@@ -327,10 +333,7 @@ class QAnd(QOperator):
     "Encapsulates a combined query that uses 'AND'."
     operator = ' AND '
     def __or__(self, other):
-        if isinstance(other, (QAnd, QOr, Q)):
-            return QOr(self, other)
-        else:
-            raise TypeError, other
+        return QOr(self, other)
 
     def __and__(self, other):
         if isinstance(other, QAnd):
@@ -344,10 +347,7 @@ class QOr(QOperator):
     "Encapsulates a combined query that uses 'OR'."
     operator = ' OR '
     def __and__(self, other):
-        if isinstance(other, (QAnd, QOr, Q)):
-            return QAnd(self, other)
-        else:
-            raise TypeError, other
+        return QAnd(self, other)
 
     def __or__(self, other):
         if isinstance(other, QOr):
@@ -362,20 +362,11 @@ class Q:
     def __init__(self, **kwargs):
         self.kwargs = kwargs
 
-    def __repr__(self):
-        return 'Q%r' % self.kwargs
-
     def __and__(self, other):
-        if isinstance(other, (Q, QAnd, QOr)):
-            return QAnd(self, other)
-        else:
-            raise TypeError, other
+        return QAnd(self, other)
 
     def __or__(self, other):
-        if isinstance(other, (Q, QAnd, QOr)):
-            return QOr(self, other)
-        else:
-            raise TypeError, other
+        return QOr(self, other)
 
     def get_sql(self, opts):
         return parse_lookup(self.kwargs.items(), opts)
@@ -493,7 +484,6 @@ def find_field(name, field_list, use_accessor=False):
     Finds a field with a specific name in a list of field instances.
     Returns None if there are no matches, or several matches.
     """
-
     if use_accessor:
         matches = [f for f in field_list if f.OLD_get_accessor_name() == name]
     else:

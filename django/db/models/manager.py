@@ -2,8 +2,6 @@ from django.db.models.fields import DateField
 from django.utils.functional import curry
 from django.db import backend, connection
 from django.db.models.query import QuerySet
-from django.db.models.query import Q, fill_table_cache, get_cached_row # TODO - remove lots of these
-from django.db.models.query import handle_legacy_orderlist, orderlist2sql, orderfield2column
 from django.dispatch import dispatcher
 from django.db.models import signals
 from django.utils.datastructures import SortedDict
@@ -23,91 +21,53 @@ def ensure_default_manager(sender):
 
 dispatcher.connect(ensure_default_manager, signal=signals.class_prepared)
 
+# class OldSubmittedManager(QuerySet):
+#     def in_bulk(self, id_list, **kwargs):
+#         assert isinstance(id_list, list), "in_bulk() must be provided with a list of IDs."
+#         assert id_list != [], "in_bulk() cannot be passed an empty ID list."
+#         new_query = self    # we have to do a copy later, so this is OK
+#         if kwargs:
+#             new_query = self.filter(**kwargs)
+#         new_query = new_query.extras(where=
+#                                       ["%s.%s IN (%s)" % (backend.quote_name(self.klass._meta.db_table),
+#                                                           backend.quote_name(self.klass._meta.pk.column),
+#                                                           ",".join(['%s'] * len(id_list)))],
+#                                      params=id_list)
+#         obj_list = list(new_query)
+#         return dict([(obj._get_pk_val(), obj) for obj in obj_list])
+#
+#     def delete(self, **kwargs):
+#         # Remove the DELETE_ALL argument, if it exists.
+#         delete_all = kwargs.pop('DELETE_ALL', False)
+#
+#         # Check for at least one query argument.
+#         if not kwargs and not delete_all:
+#             raise TypeError, "SAFETY MECHANISM: Specify DELETE_ALL=True if you actually want to delete all data."
+#
+#         if kwargs:
+#             del_query = self.filter(**kwargs)
+#         else:
+#             del_query = self._clone()
+#         # disable non-supported fields
+#         del_query._select_related = False
+#         del_query._select = {}
+#         del_query._order_by = []
+#         del_query._offset = None
+#         del_query._limit = None
+#
+#         opts = self.klass._meta
+#
+#         # Perform the SQL delete
+#         cursor = connection.cursor()
+#         _, sql, params = del_query._get_sql_clause(False)
+#         cursor.execute("DELETE " + sql, params)
+
 class Manager(QuerySet):
     # Tracks each time a Manager instance is created. Used to retain order.
     creation_counter = 0
 
     def __init__(self):
         super(Manager, self).__init__()
-        # Increase the creation counter, and save our local copy.
-        self.creation_counter = Manager.creation_counter
-        Manager.creation_counter += 1
-        self.klass = None
-
-    def _prepare(self):
-        pass
-        # TODO
-        #if self.klass._meta.get_latest_by:
-        #    self.get_latest = self.__get_latest
-        #for f in self.klass._meta.fields:
-        #    if isinstance(f, DateField):
-        #        setattr(self, 'get_%s_list' % f.name, curry(self.__get_date_list, f))
-
-    def contribute_to_class(self, klass, name):
-        # TODO: Use weakref because of possible memory leak / circular reference.
-        self.klass = klass
-        dispatcher.connect(self._prepare, signal=signals.class_prepared, sender=klass)
-        setattr(klass, name, ManagerDescriptor(self))
-        if not hasattr(klass, '_default_manager') or self.creation_counter < klass._default_manager.creation_counter:
-            klass._default_manager = self
-
-    def get(self, **kwargs):
-        """Gets a single object, using a new query. Keyword arguments are filters."""
-        obj_list = list(self.filter(**kwargs))
-        if len(obj_list) < 1:
-            raise self.klass.DoesNotExist, "%s does not exist for %s" % (self.klass._meta.object_name, kwargs)
-        assert len(obj_list) == 1, "get_object() returned more than one %s -- it returned %s! Lookup parameters were %s" % (self.klass._meta.object_name, len(obj_list), kwargs)
-        return obj_list[0]
-
-    def in_bulk(self, id_list, **kwargs):
-        assert isinstance(id_list, list), "in_bulk() must be provided with a list of IDs."
-        assert id_list != [], "in_bulk() cannot be passed an empty ID list."
-        new_query = self    # we have to do a copy later, so this is OK
-        if kwargs:
-            new_query = self.filter(**kwargs)
-        new_query = new_query.extras(where=
-                                      ["%s.%s IN (%s)" % (backend.quote_name(self.klass._meta.db_table),
-                                                          backend.quote_name(self.klass._meta.pk.column),
-                                                          ",".join(['%s'] * len(id_list)))],
-                                     params=id_list)
-        obj_list = list(new_query)
-        return dict([(obj._get_pk_val(), obj) for obj in obj_list])
-
-    def delete(self, **kwargs):
-        # Remove the DELETE_ALL argument, if it exists.
-        delete_all = kwargs.pop('DELETE_ALL', False)
-
-        # Check for at least one query argument.
-        if not kwargs and not delete_all:
-            raise TypeError, "SAFETY MECHANISM: Specify DELETE_ALL=True if you actually want to delete all data."
-
-        if kwargs:
-            del_query = self.filter(**kwargs)
-        else:
-            del_query = self._clone()
-        # disable non-supported fields
-        del_query._select_related = False
-        del_query._select = {}
-        del_query._order_by = []
-        del_query._offset = None
-        del_query._limit = None
-
-        opts = self.klass._meta
-
-        # Perform the SQL delete
-        cursor = connection.cursor()
-        _, sql, params = del_query._get_sql_clause(False)
-        cursor.execute("DELETE " + sql, params)
-
-
-class OldManager(object):
-    # Tracks each time a Manager instance is created. Used to retain order.
-    creation_counter = 0
-
-    # Dictionary of lookup parameters to apply to every _get_sql_clause().
-    core_filters = {}
-
-    def __init__(self):
         # Increase the creation counter, and save our local copy.
         self.creation_counter = Manager.creation_counter
         Manager.creation_counter += 1
@@ -127,107 +87,6 @@ class OldManager(object):
         setattr(klass, name, ManagerDescriptor(self))
         if not hasattr(klass, '_default_manager') or self.creation_counter < klass._default_manager.creation_counter:
             klass._default_manager = self
-
-    def _get_sql_clause(self, allow_joins, *args, **kwargs):
-        def quote_only_if_word(word):
-            if ' ' in word:
-                return word
-            else:
-                return backend.quote_name(word)
-
-        opts = self.klass._meta
-
-        # Apply core filters.
-        kwargs.update(self.core_filters)
-
-        # Construct the fundamental parts of the query: SELECT X FROM Y WHERE Z.
-        select = ["%s.%s" % (backend.quote_name(opts.db_table), backend.quote_name(f.column)) for f in opts.fields]
-        tables = (kwargs.get('tables') and [quote_only_if_word(t) for t in kwargs['tables']] or [])
-        joins = SortedDict()
-        where = kwargs.get('where') and kwargs['where'][:] or []
-        params = kwargs.get('params') and kwargs['params'][:] or []
-
-        # Convert all the args into SQL.
-        table_count = 0
-        for arg in args:
-            # check that the provided argument is a Query (i.e., it has a get_sql method)
-            if not hasattr(arg, 'get_sql'):
-                raise TypeError, "'%s' is not a valid query argument" % str(arg)
-
-            tables2, joins2, where2, params2 = arg.get_sql(opts)
-            tables.extend(tables2)
-            joins.update(joins2)
-            where.extend(where2)
-            params.extend(params2)
-
-        # Convert the kwargs into SQL.
-        tables2, joins2, where2, params2 = parse_lookup(kwargs.items(), opts)
-        tables.extend(tables2)
-        joins.update(joins2)
-        where.extend(where2)
-        params.extend(params2)
-
-        # Add additional tables and WHERE clauses based on select_related.
-        if kwargs.get('select_related') is True:
-            fill_table_cache(opts, select, tables, where, opts.db_table, [opts.db_table])
-
-        # Add any additional SELECTs passed in via kwargs.
-        if kwargs.get('select'):
-            select.extend(['(%s) AS %s' % (quote_only_if_word(s[1]), backend.quote_name(s[0])) for s in kwargs['select']])
-
-        # Start composing the body of the SQL statement.
-        sql = [" FROM", backend.quote_name(opts.db_table)]
-
-        # Check if extra tables are allowed. If not, throw an error
-        if (tables or joins) and not allow_joins:
-            raise TypeError, "Joins are not allowed in this type of query"
-
-        # Compose the join dictionary into SQL describing the joins.
-        if joins:
-            sql.append(" ".join(["%s %s AS %s ON %s" % (join_type, table, alias, condition)
-                            for (alias, (table, join_type, condition)) in joins.items()]))
-
-        # Compose the tables clause into SQL.
-        if tables:
-            sql.append(", " + ", ".join(tables))
-
-        # Compose the where clause into SQL.
-        if where:
-            sql.append(where and "WHERE " + " AND ".join(where))
-
-        # ORDER BY clause
-        order_by = []
-        for f in handle_legacy_orderlist(kwargs.get('order_by', opts.ordering)):
-            if f == '?': # Special case.
-                order_by.append(backend.get_random_function_sql())
-            else:
-                if f.startswith('-'):
-                    col_name = f[1:]
-                    order = "DESC"
-                else:
-                    col_name = f
-                    order = "ASC"
-                if "." in col_name:
-                    table_prefix, col_name = col_name.split('.', 1)
-                    table_prefix = backend.quote_name(table_prefix) + '.'
-                else:
-                    # Use the database table as a column prefix if it wasn't given,
-                    # and if the requested column isn't a custom SELECT.
-                    if "." not in col_name and col_name not in [k[0] for k in kwargs.get('select', [])]:
-                        table_prefix = backend.quote_name(opts.db_table) + '.'
-                    else:
-                        table_prefix = ''
-                order_by.append('%s%s %s' % (table_prefix, backend.quote_name(orderfield2column(col_name, opts)), order))
-        if order_by:
-            sql.append("ORDER BY " + ", ".join(order_by))
-
-        # LIMIT and OFFSET clauses
-        if kwargs.get('limit') is not None:
-            sql.append("%s " % backend.get_limit_offset_sql(kwargs['limit'], kwargs.get('offset')))
-        else:
-            assert kwargs.get('offset') is None, "'offset' is not allowed without 'limit'"
-
-        return select, " ".join(sql), params
 
     def delete(self, *args, **kwargs):
         num_args = len(args) + len(kwargs)
@@ -253,50 +112,7 @@ class OldManager(object):
         _, sql, params = self._get_sql_clause(False, *args, **kwargs)
         cursor.execute("DELETE " + sql, params)
 
-    def get_iterator(self, *args, **kwargs):
-        # kwargs['select'] is a dictionary, and dictionaries' key order is
-        # undefined, so we convert it to a list of tuples internally.
-        kwargs['select'] = kwargs.get('select', {}).items()
-
-        cursor = connection.cursor()
-        select, sql, params = self._get_sql_clause(True, *args, **kwargs)
-        cursor.execute("SELECT " + (kwargs.get('distinct') and "DISTINCT " or "") + ",".join(select) + sql, params)
-        fill_cache = kwargs.get('select_related')
-        index_end = len(self.klass._meta.fields)
-        while 1:
-            rows = cursor.fetchmany(GET_ITERATOR_CHUNK_SIZE)
-            if not rows:
-                raise StopIteration
-            for row in rows:
-                if fill_cache:
-                    obj, index_end = get_cached_row(self.klass, row, 0)
-                else:
-                    obj = self.klass(*row[:index_end])
-                for i, k in enumerate(kwargs['select']):
-                    setattr(obj, k[0], row[index_end+i])
-                yield obj
-
-    def get_list(self, *args, **kwargs):
-        return list(self.get_iterator(*args, **kwargs))
-
-    def get_count(self, *args, **kwargs):
-        kwargs['order_by'] = []
-        kwargs['offset'] = None
-        kwargs['limit'] = None
-        kwargs['select_related'] = False
-        _, sql, params = self._get_sql_clause(True, *args, **kwargs)
-        cursor = connection.cursor()
-        cursor.execute("SELECT COUNT(*)" + sql, params)
-        return cursor.fetchone()[0]
-
-    def get_object(self, *args, **kwargs):
-        obj_list = self.get_list(*args, **kwargs)
-        if len(obj_list) < 1:
-            raise self.klass.DoesNotExist, "%s does not exist for %s" % (self.klass._meta.object_name, kwargs)
-        assert len(obj_list) == 1, "get_object() returned more than one %s -- it returned %s! Lookup parameters were %s" % (self.klass._meta.object_name, len(obj_list), kwargs)
-        return obj_list[0]
-
-    def get_in_bulk(self, id_list, *args, **kwargs):
+    def in_bulk(self, id_list, *args, **kwargs):
         assert isinstance(id_list, list), "get_in_bulk() must be provided with a list of IDs."
         assert id_list != [], "get_in_bulk() cannot be passed an empty ID list."
         kwargs['where'] = ["%s.%s IN (%s)" % (backend.quote_name(self.klass._meta.db_table), backend.quote_name(self.klass._meta.pk.column), ",".join(['%s'] * len(id_list)))]
@@ -356,9 +172,6 @@ class OldManager(object):
         # MySQL doesn't automatically cast the result of date functions as datetime
         # objects -- MySQL returns the values as strings, instead.
         return [typecast_timestamp(str(row[0])) for row in cursor.fetchall()]
-
-# DEBUG - to go back to old manager:
-# Manager = OldManager
 
 class ManagerDescriptor(object):
     def __init__(self, manager):

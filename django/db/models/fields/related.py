@@ -108,7 +108,6 @@ class ManyRelatedObjectsDescriptor(object):
             # Dynamically create a class that subclasses the related
             # model's default manager.
             manager = types.ClassType('RelatedManager', (self.related.model._default_manager.__class__,), {})()
-            manager._use_cache = True
 
             # Set core_filters on the new manager to limit it to the
             # foreign-key relationship.
