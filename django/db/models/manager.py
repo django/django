@@ -64,8 +64,8 @@ class Manager(QuerySet):
             klass._default_manager = self
 
     def in_bulk(self, id_list, *args, **kwargs):
-        assert isinstance(id_list, list), "get_in_bulk() must be provided with a list of IDs."
-        assert id_list != [], "get_in_bulk() cannot be passed an empty ID list."
+        assert isinstance(id_list, list), "in_bulk() must be provided with a list of IDs."
+        assert id_list != [], "in_bulk() cannot be passed an empty ID list."
         kwargs['where'] = ["%s.%s IN (%s)" % (backend.quote_name(self.klass._meta.db_table), backend.quote_name(self.klass._meta.pk.column), ",".join(['%s'] * len(id_list)))]
         kwargs['params'] = id_list
         obj_list = self.get_list(*args, **kwargs)
