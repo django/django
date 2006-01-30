@@ -33,8 +33,8 @@ API_TESTS = """
 >>> a7 = Article(headline='Article 7', pub_date=datetime(2005, 7, 27))
 >>> a7.save()
 
-# get_iterator() is just like get_list(), but it's a generator.
->>> for a in Article.objects.get_iterator():
+# iterator() is a generator.
+>>> for a in Article.objects.iterator():
 ...     print a.headline
 Article 5
 Article 6
@@ -44,8 +44,8 @@ Article 3
 Article 7
 Article 1
 
-# get_iterator() takes the same lookup arguments as get_list().
->>> for a in Article.objects.get_iterator(headline__endswith='4'):
+# iterator() can be used on any QuerySet.
+>>> for a in Article.objects.filter(headline__endswith='4').iterator():
 ...     print a.headline
 Article 4
 
@@ -76,11 +76,11 @@ AssertionError: in_bulk() must be provided with a list of IDs.
 >>> Article.objects.in_bulk()
 Traceback (most recent call last):
     ...
-TypeError: in_bulk() takes at least 2 arguments (1 given)
+TypeError: in_bulk() takes exactly 2 arguments (1 given)
 >>> Article.objects.in_bulk(headline__startswith='Blah')
 Traceback (most recent call last):
     ...
-TypeError: in_bulk() takes at least 2 non-keyword arguments (1 given)
+TypeError: in_bulk() got an unexpected keyword argument 'headline__startswith'
 
 # get_values() is just like get_list(), except it returns a list of
 # dictionaries instead of object instances -- and you can specify which fields
