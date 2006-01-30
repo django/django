@@ -72,27 +72,29 @@ class QuerySet(object):
         self._order_by = ()          # Ordering, e.g. ('date', '-name')
         self._select_related = False # Whether to fill cache for related objects.
         self._distinct = False       # Whether the query should use SELECT DISTINCT.
-#         self._result_cache = None
         self._select = None          # Dictionary of attname -> SQL.
         self._where = None           # List of extra WHERE clauses to use.
         self._params = None          # List of params to use for extra WHERE clauses.
         self._tables = None          # List of extra tables to use.
         self._offset = None          # OFFSET clause
         self._limit = None           # LIMIT clause
-#         self._use_cache = False
+        self._result_cache = None
 
     ########################
     # PYTHON MAGIC METHODS #
     ########################
 
-#     def __len__(self):
-#         return len(list(self))
-
-    ###########################################
-    # PUBLIC METHODS THAT DO DATABASE QUERIES #
-    ###########################################
+    def __len__(self):
+        return len(self._get_data())
 
     def __iter__(self):
+        return iter(self._get_data())
+
+    ####################################
+    # METHODS THAT DO DATABASE QUERIES #
+    ####################################
+
+    def iterator(self):
         "Performs the SELECT database lookup of this QuerySet."
         # self._select is a dictionary, and dictionaries' key order is
         # undefined, so we convert it to a list of tuples.
@@ -176,6 +178,11 @@ class QuerySet(object):
         c._offset = self._offset
         c._limit = self._limit
         return c
+
+    def _get_data(self):
+        if self._result_cache is None:
+            self._result_cache = list(self.iterator())
+        return self._result_cache
 
     def _get_sql_clause(self, allow_joins):
         opts = self.klass._meta
