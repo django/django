@@ -118,7 +118,7 @@ TypeError: Cannot resolve keyword 'reporter_id' into field
 >>> list(Article.objects.filter(reporter_id=1))
 Traceback (most recent call last):
     ...
-TypeError: Cannot parse keyword query 'reporter_id'
+TypeError: Cannot resolve keyword 'reporter_id' into field
 
 # "pk" shortcut syntax works in a related context, too.
 >>> list(Article.objects.filter(reporter__pk=1).order_by('pub_date'))

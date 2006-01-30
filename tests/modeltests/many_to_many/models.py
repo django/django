@@ -76,7 +76,7 @@ True
 >>> list(Article.objects.filter(publications__title__startswith="Science"))
 [NASA uses Python, NASA uses Python]
 
->>> list(Article.objects.filter(publications__title__startswith="Science", distinct=True))
+>>> list(Article.objects.filter(publications__title__startswith="Science").distinct())
 [NASA uses Python]
 
 # Reverse m2m queries (i.e., start at the table that doesn't have a ManyToManyField)
@@ -106,6 +106,6 @@ True
 >>> a2.delete()
 >>> list(Article.objects)
 [Django lets you build Web apps easily]
->>> list(p1.article_set.order_by=('headline'))
+>>> list(p1.article_set.order_by('headline'))
 [Django lets you build Web apps easily]
 """
