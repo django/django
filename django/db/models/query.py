@@ -63,9 +63,9 @@ class QuerySet(object):
     # Dictionary of lookup parameters to apply to every _get_sql_clause().
     core_filters = {}
 
-    # Subclasses need to provide 'self.klass' attribute for this class
+    # Subclasses need to provide 'self.model' attribute for this class
     # to be able to function.
-    klass = None
+    model = None
 
     def __init__(self):
         self._filters = Q(**(self.core_filters))
@@ -128,16 +128,16 @@ class QuerySet(object):
         select, sql, params = self._get_sql_clause(True)
         cursor.execute("SELECT " + (self._distinct and "DISTINCT " or "") + ",".join(select) + sql, params)
         fill_cache = self._select_related
-        index_end = len(self.klass._meta.fields)
+        index_end = len(self.model._meta.fields)
         while 1:
             rows = cursor.fetchmany(GET_ITERATOR_CHUNK_SIZE)
             if not rows:
                 raise StopIteration
             for row in rows:
                 if fill_cache:
-                    obj, index_end = get_cached_row(self.klass, row, 0)
+                    obj, index_end = get_cached_row(self.model, row, 0)
                 else:
-                    obj = self.klass(*row[:index_end])
+                    obj = self.model(*row[:index_end])
                 for i, k in enumerate(extra_select):
                     setattr(obj, k[0], row[index_end+i])
                 yield obj
@@ -158,8 +158,8 @@ class QuerySet(object):
         "Performs the SELECT and returns a single object matching the given keyword arguments."
         obj_list = list(self.filter(**kwargs))
         if len(obj_list) < 1:
-            raise self.klass.DoesNotExist, "%s does not exist for %s" % (self.klass._meta.object_name, kwargs)
-        assert len(obj_list) == 1, "get() returned more than one %s -- it returned %s! Lookup parameters were %s" % (self.klass._meta.object_name, len(obj_list), kwargs)
+            raise self.model.DoesNotExist, "%s does not exist for %s" % (self.model._meta.object_name, kwargs)
+        assert len(obj_list) == 1, "get() returned more than one %s -- it returned %s! Lookup parameters were %s" % (self.model._meta.object_name, len(obj_list), kwargs)
         return obj_list[0]
 
     def delete(self, **kwargs):
@@ -194,7 +194,7 @@ class QuerySet(object):
         assert isinstance(id_list, list), "in_bulk() must be provided with a list of IDs."
         assert id_list != [], "in_bulk() cannot be passed an empty ID list."
         bulk_query = self._clone()
-        bulk_query._where.append("%s.%s IN (%s)" % (backend.quote_name(self.klass._meta.db_table), backend.quote_name(self.klass._meta.pk.column), ",".join(['%s'] * len(id_list))))
+        bulk_query._where.append("%s.%s IN (%s)" % (backend.quote_name(self.model._meta.db_table), backend.quote_name(self.model._meta.pk.column), ",".join(['%s'] * len(id_list))))
         bulk_query._params.extend(id_list)
         return dict([(obj._get_pk_val(), obj) for obj in bulk_query.iterator()])
 
@@ -204,13 +204,13 @@ class QuerySet(object):
 
         # 'fields' is a list of field names to fetch.
         if fields:
-            columns = [self.klass._meta.get_field(f, many_to_many=False).column for f in fields]
+            columns = [self.model._meta.get_field(f, many_to_many=False).column for f in fields]
         else: # Default to all fields.
-            columns = [f.column for f in self.klass._meta.fields]
+            columns = [f.column for f in self.model._meta.fields]
 
         cursor = connection.cursor()
         select, sql, params = values_query._get_sql_clause(True)
-        select = ['%s.%s' % (backend.quote_name(self.klass._meta.db_table), backend.quote_name(c)) for c in columns]
+        select = ['%s.%s' % (backend.quote_name(self.model._meta.db_table), backend.quote_name(c)) for c in columns]
         cursor.execute("SELECT " + (self._distinct and "DISTINCT " or "") + ",".join(select) + sql, params)
         while 1:
             rows = cursor.fetchmany(GET_ITERATOR_CHUNK_SIZE)
@@ -229,17 +229,17 @@ class QuerySet(object):
         assert kind in ("month", "year", "day"), "'kind' must be one of 'year', 'month' or 'day'."
         assert order in ('ASC', 'DESC'), "'order' must be either 'ASC' or 'DESC'."
         # Let the FieldDoesNotExist exception propogate.
-        field = self.klass._meta.get_field(field_name, many_to_many=False)
+        field = self.model._meta.get_field(field_name, many_to_many=False)
         assert isinstance(field, DateField), "%r isn't a DateField." % field_name
 
         date_query = self._clone()
         date_query._order_by = () # Clear this because it'll mess things up otherwise.
         if field.null:
             date_query._where.append('%s.%s IS NOT NULL' % \
-                (backend.quote_name(self.klass._meta.db_table), backend.quote_name(field.column)))
+                (backend.quote_name(self.model._meta.db_table), backend.quote_name(field.column)))
         select, sql, params = date_query._get_sql_clause(True)
         sql = 'SELECT %s %s GROUP BY 1 ORDER BY 1 %s' % \
-            (backend.get_date_trunc_sql(kind, '%s.%s' % (backend.quote_name(self.klass._meta.db_table),
+            (backend.get_date_trunc_sql(kind, '%s.%s' % (backend.quote_name(self.model._meta.db_table),
             backend.quote_name(field.column))), sql, order)
         cursor = connection.cursor()
         cursor.execute(sql, params)
@@ -285,7 +285,7 @@ class QuerySet(object):
 
     def _clone(self, **kwargs):
         c = QuerySet()
-        c.klass = self.klass
+        c.model = self.model
         c._filters = self._filters
         c._order_by = self._order_by
         c._select_related = self._select_related
@@ -319,7 +319,7 @@ class QuerySet(object):
 #         return self._result_cache
 
     def _get_sql_clause(self, allow_joins):
-        opts = self.klass._meta
+        opts = self.model._meta
 
         # Construct the fundamental parts of the query: SELECT X FROM Y WHERE Z.
         select = ["%s.%s" % (backend.quote_name(opts.db_table), backend.quote_name(f.column)) for f in opts.fields]
