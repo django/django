@@ -117,6 +117,7 @@ class ManyRelatedObjectsDescriptor(object):
                 manager.core_filters.update({'%s__%s__exact' % (rel_field.name, rel_field.rel.to._meta.pk.name): getattr(instance, rel_field.rel.get_related_field().attname)})
             else:
                 manager.core_filters.update({'%s__%s__exact' % (rel_field.name, instance_type._meta.pk.name): instance._get_pk_val()})
+            manager.core_values = {rel_field.name: instance}
 
             # Prepare the manager.
             # TODO: Fix this hack?

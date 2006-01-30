@@ -24,6 +24,11 @@ class Manager(QuerySet):
     # Tracks each time a Manager instance is created. Used to retain order.
     creation_counter = 0
 
+    # Dictionary of field_name -> field_value that will always be used in add().
+    # For example, if this is {'name': 'adrian'}, each object created by add() will
+    # have name='adrian'.
+    core_values = {}
+
     def __init__(self):
         super(Manager, self).__init__()
         # Increase the creation counter, and save our local copy.
@@ -47,6 +52,13 @@ class Manager(QuerySet):
         kwargs['order_by'] = ('-' + self.klass._meta.get_latest_by,)
         kwargs['limit'] = 1
         return self.get_object(*args, **kwargs)
+
+    def add(self, **kwargs):
+        kwargs.update(self.core_values)
+        new_obj = self.klass(**kwargs)
+        new_obj.save()
+        return new_obj
+    add.alters_data = True
 
 class ManagerDescriptor(object):
     # This class ensures managers aren't accessible via model instances.
