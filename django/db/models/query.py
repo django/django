@@ -90,6 +90,20 @@ class QuerySet(object):
     def __iter__(self):
         return iter(self._get_data())
 
+    def __getitem__(self, k):
+        "Retrieve an item or slice from the set of results."
+        # __getitem__ can't return QuerySet instances, because filter() and
+        # order_by() on the result would break badly. This means we don't have
+        # to worry about arithmetic with self._limit or self._offset -- they'll
+        # both be None at this point.
+        if self._result_cache is None:
+            if isinstance(k, slice):
+                return list(self._clone(_offset=k.start, _limit=k.stop))[::k.step]
+            else:
+                return self._clone(_offset=k, _limit=1).get()
+        else:
+            return self._result_cache[k]
+
     ####################################
     # METHODS THAT DO DATABASE QUERIES #
     ####################################
@@ -205,6 +219,7 @@ class QuerySet(object):
         c._tables = self._tables
         c._offset = self._offset
         c._limit = self._limit
+        c.__dict__.update(kwargs)
         return c
 
     def _get_data(self):
@@ -319,30 +334,6 @@ class QuerySet(object):
 #         combined = self._combine(other)
 #         combined._filter = self._filter | other._filter
 #         return combined
-#
-#     def __getitem__(self, k):
-#         """Retrieve an item or slice from the set of results"""
-#         # getitem can't return query instances, because  .filter()
-#         # and .order_by() methods on the result would break badly.
-#         # This means we don't have to worry about arithmetic with
-#         # self._limit or self._offset - they will both be None
-#         # at this point
-#         if isinstance(k, slice):
-#             # Get a new query if we haven't already got data from db
-#             if self._result_cache is None:
-#                 # slice.stop and slice.start
-#                 clone = self._clone(_offset=k.start, _limit=k.stop)
-#                 return list(clone)[::k.step]
-#                 # TODO - we are throwing away this retrieved data.
-#                 # We could cache it if we had some kind of sparse
-#                 # list structure we could put it in.
-#             else:
-#                 return self._result_cache[k]
-#
-#         else:
-#             # TODO: possibly use a new query which just gets one item
-#             # if we haven't already got them all?
-#             return self._fetch_data()[k]
 
 class QOperator:
     "Base class for QAnd and QOr"
