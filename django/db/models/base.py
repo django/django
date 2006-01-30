@@ -267,14 +267,14 @@ class Model(object):
 
     def _get_next_or_previous_by_FIELD(self, field, is_next, **kwargs):
         op = is_next and '>' or '<'
-        kwargs.setdefault('where', []).append('(%s %s %%s OR (%s = %%s AND %s.%s %s %%s))' % \
+        where = '(%s %s %%s OR (%s = %%s AND %s.%s %s %%s))' % \
             (backend.quote_name(field.column), op, backend.quote_name(field.column),
-            backend.quote_name(self._meta.db_table), backend.quote_name(self._meta.pk.column), op))
+            backend.quote_name(self._meta.db_table), backend.quote_name(self._meta.pk.column), op)
         param = str(getattr(self, field.attname))
-        kwargs.setdefault('params', []).extend([param, param, getattr(self, self._meta.pk.attname)])
-        kwargs['order_by'] = [(not is_next and '-' or '') + field.name, (not is_next and '-' or '') + self._meta.pk.name]
-        kwargs['limit'] = 1
-        return self.__class__._default_manager.get(**kwargs)
+        q = self.__class__._default_manager
+        q = q.order_by((not is_next and '-' or '') + field.name, (not is_next and '-' or '') + self._meta.pk.name)
+        q = q.extra(where=where, params=[param, param, getattr(self, self._meta.pk.attname)])
+        return q[0]
 
     def _get_next_or_previous_in_order(self, is_next):
         cachename = "__%s_order_cache" % is_next
