@@ -167,6 +167,9 @@ class QuerySet(object):
         c._select_related = self._select_related
         c._distinct = self._distinct
         c._select = self._select
+        c._where = self._where
+        c._params = self._params
+        c._tables = self._tables
         c._offset = self._offset
         c._limit = self._limit
         return c
