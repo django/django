@@ -4,7 +4,7 @@
 
 from django.db import models
 
-# An example of providing a custom manager called "objects".
+# An example of a custom manager called "objects".
 
 class PersonManager(models.Manager):
     def get_fun_people(self):
@@ -19,12 +19,10 @@ class Person(models.Model):
     def __repr__(self):
         return "%s %s" % (self.first_name, self.last_name)
 
-# An example of providing a custom manager that isn't called "objects".
+# An example of a custom manager that sets a core_filter on its lookups.
 
 class PublishedBookManager(models.Manager):
-    def __init__(self):
-        super(PublishedBookManager, self).__init__()
-        self._set_core_filter(is_published__exact=True)
+    core_filters = {'is_published__exact': True}
 
 class Book(models.Model):
     title = models.CharField(maxlength=50)
@@ -38,9 +36,7 @@ class Book(models.Model):
 # An example of providing multiple custom managers.
 
 class FastCarManager(models.Manager):
-    def __init__(self):
-        super(FastCarManager, self).__init__()
-        self._set_core_filter(top_speed__gt=150)
+    core_filters = {'top_speed__gt': 150}
 
 class Car(models.Model):
     name = models.CharField(maxlength=10)
