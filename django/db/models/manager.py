@@ -35,32 +35,7 @@ dispatcher.connect(ensure_default_manager, signal=signals.class_prepared)
 #                                      params=id_list)
 #         obj_list = list(new_query)
 #         return dict([(obj._get_pk_val(), obj) for obj in obj_list])
-#
-#     def delete(self, **kwargs):
-#         # Remove the DELETE_ALL argument, if it exists.
-#         delete_all = kwargs.pop('DELETE_ALL', False)
-#
-#         # Check for at least one query argument.
-#         if not kwargs and not delete_all:
-#             raise TypeError, "SAFETY MECHANISM: Specify DELETE_ALL=True if you actually want to delete all data."
-#
-#         if kwargs:
-#             del_query = self.filter(**kwargs)
-#         else:
-#             del_query = self._clone()
-#         # disable non-supported fields
-#         del_query._select_related = False
-#         del_query._select = {}
-#         del_query._order_by = []
-#         del_query._offset = None
-#         del_query._limit = None
-#
-#         opts = self.klass._meta
-#
-#         # Perform the SQL delete
-#         cursor = connection.cursor()
-#         _, sql, params = del_query._get_sql_clause(False)
-#         cursor.execute("DELETE " + sql, params)
+
 
 class Manager(QuerySet):
     # Tracks each time a Manager instance is created. Used to retain order.
@@ -87,30 +62,6 @@ class Manager(QuerySet):
         setattr(klass, name, ManagerDescriptor(self))
         if not hasattr(klass, '_default_manager') or self.creation_counter < klass._default_manager.creation_counter:
             klass._default_manager = self
-
-    def delete(self, *args, **kwargs):
-        num_args = len(args) + len(kwargs)
-
-        # Remove the DELETE_ALL argument, if it exists.
-        delete_all = kwargs.pop('DELETE_ALL', False)
-
-        # Check for at least one query argument.
-        if num_args == 0 and not delete_all:
-            raise TypeError, "SAFETY MECHANISM: Specify DELETE_ALL=True if you actually want to delete all data."
-
-        # disable non-supported fields
-        kwargs['select_related'] = False
-        kwargs['select'] = {}
-        kwargs['order_by'] = []
-        kwargs['offset'] = None
-        kwargs['limit'] = None
-
-        opts = self.klass._meta
-
-        # Perform the SQL delete
-        cursor = connection.cursor()
-        _, sql, params = self._get_sql_clause(False, *args, **kwargs)
-        cursor.execute("DELETE " + sql, params)
 
     def in_bulk(self, id_list, *args, **kwargs):
         assert isinstance(id_list, list), "get_in_bulk() must be provided with a list of IDs."

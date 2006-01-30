@@ -138,6 +138,34 @@ class QuerySet(object):
         assert len(obj_list) == 1, "get() returned more than one %s -- it returned %s! Lookup parameters were %s" % (self.klass._meta.object_name, len(obj_list), kwargs)
         return obj_list[0]
 
+    def delete(self, **kwargs):
+        """
+        Deletes the records with the given kwargs. If no kwargs are given,
+        deletes records in the current QuerySet.
+        """
+        # Remove the DELETE_ALL argument, if it exists.
+        delete_all = kwargs.pop('DELETE_ALL', False)
+
+        # Check for at least one query argument.
+        if not kwargs and not delete_all:
+            raise TypeError, "SAFETY MECHANISM: Specify DELETE_ALL=True if you actually want to delete all data."
+
+        if kwargs:
+            del_query = self.filter(**kwargs)
+        else:
+            del_query = self._clone()
+        # disable non-supported fields
+        del_query._select_related = False
+        del_query._select = {}
+        del_query._order_by = []
+        del_query._offset = None
+        del_query._limit = None
+
+        # Perform the SQL delete
+        cursor = connection.cursor()
+        _, sql, params = del_query._get_sql_clause(False)
+        cursor.execute("DELETE " + sql, params)
+
     #############################################
     # PUBLIC METHODS THAT RETURN A NEW QUERYSET #
     #############################################
@@ -291,14 +319,6 @@ class QuerySet(object):
 #         combined = self._combine(other)
 #         combined._filter = self._filter | other._filter
 #         return combined
-#
-#     def _fetch_data(self):
-#         if self._use_cache:
-#             if self._result_cache is None:
-#                 self._result_cache = list(self.get_iterator())
-#             return self._result_cache
-#         else:
-#             return list(self.get_iterator())
 #
 #     def __getitem__(self, k):
 #         """Retrieve an item or slice from the set of results"""
