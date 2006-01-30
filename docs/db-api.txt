@@ -222,11 +222,11 @@ If you pass an invalid keyword argument, the function will raise ``TypeError``.
 OR lookups
 ----------
 
-By default, keyword argument queries are "AND"ed together. If you have more complex query 
-requirements (for example, you need to include an ``OR`` statement in your query), you need 
+By default, keyword argument queries are "AND"ed together. If you have more complex query
+requirements (for example, you need to include an ``OR`` statement in your query), you need
 to use ``Q`` objects.
 
-A ``Q`` object is an instance of ``django.core.meta.Q``, used to encapsulate a collection of 
+A ``Q`` object is an instance of ``django.core.meta.Q``, used to encapsulate a collection of
 keyword arguments. These keyword arguments are specified in the same way as keyword arguments to
 the basic lookup functions like get_object() and get_list(). For example::
 
@@ -241,14 +241,14 @@ the basic lookup functions like get_object() and get_list(). For example::
 
     ... WHERE question LIKE 'Who%' OR question LIKE 'What%'
 
-You can compose statements of arbitrary complexity by combining ``Q`` objects with the ``&`` and ``|`` operators. Parenthetical grouping can also be used. 
+You can compose statements of arbitrary complexity by combining ``Q`` objects with the ``&`` and ``|`` operators. Parenthetical grouping can also be used.
 
-One or more ``Q`` objects can then provided as arguments to the lookup functions. If multiple 
-``Q`` object arguments are provided to a lookup function, they will be "AND"ed together. 
+One or more ``Q`` objects can then provided as arguments to the lookup functions. If multiple
+``Q`` object arguments are provided to a lookup function, they will be "AND"ed together.
 For example::
 
     polls.get_object(
-        Q(question__startswith='Who'), 
+        Q(question__startswith='Who'),
         Q(pub_date__exact=date(2005, 5, 2)) | Q(pub_date__exact=date(2005, 5, 6))
     )
 
@@ -258,8 +258,8 @@ For example::
         AND (pub_date = '2005-05-02' OR pub_date = '2005-05-06')
 
 If necessary, lookup functions can mix the use of ``Q`` objects and keyword arguments. All arguments
-provided to a lookup function (be they keyword argument or ``Q`` object) are "AND"ed together. 
-However, if a ``Q`` object is provided, it must precede the definition of any keyword arguments. 
+provided to a lookup function (be they keyword argument or ``Q`` object) are "AND"ed together.
+However, if a ``Q`` object is provided, it must precede the definition of any keyword arguments.
 For example::
 
     polls.get_object(
@@ -270,16 +270,16 @@ For example::
 
     # INVALID QUERY
     polls.get_object(
-        question__startswith='Who', 
+        question__startswith='Who',
         Q(pub_date__exact=date(2005, 5, 2)) | Q(pub_date__exact=date(2005, 5, 6)))
 
-... would not be valid. 
+... would not be valid.
 
 A ``Q`` objects can also be provided to the ``complex`` keyword argument. For example::
 
     polls.get_object(
-        complex=Q(question__startswith='Who') & 
-            (Q(pub_date__exact=date(2005, 5, 2)) | 
+        complex=Q(question__startswith='Who') &
+            (Q(pub_date__exact=date(2005, 5, 2)) |
              Q(pub_date__exact=date(2005, 5, 6))
         )
     )
@@ -549,16 +549,16 @@ deletes the object and has no return value. Example::
 
     >>> c.delete()
 
-Objects can also be deleted in bulk using the same query parameters that are 
-used for get_object and other query methods. For example:: 
+Objects can also be deleted in bulk using the same query parameters that are
+used for get_object and other query methods. For example::
 
     >>> Polls.objects.delete(pub_date__year=2005)
 
 would bulk delete all Polls with a year of 2005. A bulk delete call with no
-parameters would theoretically delete all data in the table. To prevent 
+parameters would theoretically delete all data in the table. To prevent
 accidental obliteration of a database, a bulk delete query with no parameters
-will throw an exception. If you actually want to delete all the data in a 
-table, you must add a ``DELETE_ALL=True`` argument to your query. 
+will throw an exception. If you actually want to delete all the data in a
+table, you must add a ``DELETE_ALL=True`` argument to your query.
 For example::
 
     >>> Polls.objects.delete(DELETE_ALL=True)
@@ -681,41 +681,43 @@ Extra module functions
 In addition to every function described in "Basic lookup functions" above, a
 model module might get any or all of the following methods:
 
-get_FOO_list(kind, \**kwargs)
------------------------------
+dates(field, kind, order='ASC')
+-------------------------------
 
-For every ``DateField`` and ``DateTimeField``, the model module will have a
-``get_FOO_list()`` function, where ``FOO`` is the name of the field. This
-returns a list of ``datetime.datetime`` objects representing all available
-dates of the given scope, as defined by the ``kind`` argument. ``kind`` should
-be either ``"year"``, ``"month"`` or ``"day"``. Each ``datetime.datetime``
-object in the result list is "truncated" to the given ``type``.
+Every manager has a ``dates()`` method, which returns a list of
+``datetime.datetime`` objects representing all available dates with the given
+filters (if any) and of the given scope, as defined by the ``kind`` argument.
+
+``field`` should be the name of a ``DateField`` or ``DateTimeField`` of your
+model.
+
+``kind`` should be either ``"year"``, ``"month"`` or ``"day"``. Each
+``datetime.datetime`` object in the result list is "truncated" to the given
+``type``.
 
     * ``"year"`` returns a list of all distinct year values for the field.
     * ``"month"`` returns a list of all distinct year/month values for the field.
     * ``"day"`` returns a list of all distinct year/month/day values for the field.
 
-Additional, optional keyword arguments, in the format described in
-"Field lookups" above, are also accepted.
+``order``, which defaults to ``'ASC'``, should be either ``"ASC"`` or ``"DESC"``.
+This specifies how to order the results.
 
 Here's an example, using the ``Poll`` model defined above::
 
     >>> from datetime import datetime
-    >>> p1 = polls.Poll(slug='whatsup', question="What's up?",
+    >>> p1 = Poll(slug='whatsup', question="What's up?",
     ...     pub_date=datetime(2005, 2, 20), expire_date=datetime(2005, 3, 20))
     >>> p1.save()
-    >>> p2 = polls.Poll(slug='name', question="What's your name?",
+    >>> p2 = Poll(slug='name', question="What's your name?",
     ...     pub_date=datetime(2005, 3, 20), expire_date=datetime(2005, 4, 20))
     >>> p2.save()
-    >>> polls.get_pub_date_list('year')
+    >>> Poll.objects.dates('pub_date', 'year')
     [datetime.datetime(2005, 1, 1)]
-    >>> polls.get_pub_date_list('month')
+    >>> Poll.objects.dates('pub_date', 'month')
     [datetime.datetime(2005, 2, 1), datetime.datetime(2005, 3, 1)]
-    >>> polls.get_pub_date_list('day')
+    >>> Poll.objects.dates('pub_date', 'day')
     [datetime.datetime(2005, 2, 20), datetime.datetime(2005, 3, 20)]
-    >>> polls.get_pub_date_list('day', question__contains='name')
+    >>> Poll.objects.dates('pub_date', 'day', order='DESC')
+    [datetime.datetime(2005, 3, 20), datetime.datetime(2005, 2, 20)]
+    >>> Poll.objects.filter(question__contains='name').dates('pub_date', 'day')
     [datetime.datetime(2005, 3, 20)]
-
-``get_FOO_list()`` also accepts an optional keyword argument ``order``, which
-should be either ``"ASC"`` or ``"DESC"``. This specifies how to order the
-results. Default is ``"ASC"``.

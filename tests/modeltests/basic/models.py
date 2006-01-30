@@ -174,26 +174,38 @@ True
 >>> Article.objects.get(id__exact=8) == Article.objects.get(id__exact=7)
 False
 
->>> Article.objects.get_pub_date_list('year')
+>>> Article.objects.dates('pub_date', 'year')
 [datetime.datetime(2005, 1, 1, 0, 0)]
->>> Article.objects.get_pub_date_list('month')
+>>> Article.objects.dates('pub_date', 'month')
 [datetime.datetime(2005, 7, 1, 0, 0)]
->>> Article.objects.get_pub_date_list('day')
+>>> Article.objects.dates('pub_date', 'day')
 [datetime.datetime(2005, 7, 28, 0, 0), datetime.datetime(2005, 7, 29, 0, 0), datetime.datetime(2005, 7, 30, 0, 0), datetime.datetime(2005, 7, 31, 0, 0)]
->>> Article.objects.get_pub_date_list('day', order='ASC')
+>>> Article.objects.dates('pub_date', 'day', order='ASC')
 [datetime.datetime(2005, 7, 28, 0, 0), datetime.datetime(2005, 7, 29, 0, 0), datetime.datetime(2005, 7, 30, 0, 0), datetime.datetime(2005, 7, 31, 0, 0)]
->>> Article.objects.get_pub_date_list('day', order='DESC')
+>>> Article.objects.dates('pub_date', 'day', order='DESC')
 [datetime.datetime(2005, 7, 31, 0, 0), datetime.datetime(2005, 7, 30, 0, 0), datetime.datetime(2005, 7, 29, 0, 0), datetime.datetime(2005, 7, 28, 0, 0)]
 
-# Try some bad arguments to __get_date_list
->>> Article.objects.get_pub_date_list('badarg')
+# Try some bad arguments to dates().
+
+>>> Article.objects.dates()
+Traceback (most recent call last):
+   ...
+TypeError: dates() takes at least 3 arguments (1 given)
+
+>>> Article.objects.dates('invalid_field', 'year')
+Traceback (most recent call last):
+   ...
+FieldDoesNotExist: name=invalid_field
+
+>>> Article.objects.dates('pub_date', 'bad_kind')
 Traceback (most recent call last):
    ...
 AssertionError: 'kind' must be one of 'year', 'month' or 'day'.
->>> Article.objects.get_pub_date_list(order='ASC')
+
+>>> Article.objects.dates('pub_date', 'year', order='bad order')
 Traceback (most recent call last):
    ...
-TypeError: __get_date_list() takes at least 3 non-keyword arguments (2 given)
+AssertionError: 'order' must be either 'ASC' or 'DESC'.
 
 # You can combine queries with & and |
 >>> s1 = Article.objects.filter(id__exact=1)

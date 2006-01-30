@@ -1,4 +1,3 @@
-from django.db.models.fields import DateField
 from django.utils.functional import curry
 from django.db import backend, connection
 from django.db.models.query import QuerySet
@@ -51,9 +50,6 @@ class Manager(QuerySet):
     def _prepare(self):
         if self.klass._meta.get_latest_by:
             self.get_latest = self.__get_latest
-        for f in self.klass._meta.fields:
-            if isinstance(f, DateField):
-                setattr(self, 'get_%s_list' % f.name, curry(self.__get_date_list, f))
 
     def contribute_to_class(self, klass, name):
         # TODO: Use weakref because of possible memory leak / circular reference.
@@ -100,29 +96,6 @@ class Manager(QuerySet):
         kwargs['order_by'] = ('-' + self.klass._meta.get_latest_by,)
         kwargs['limit'] = 1
         return self.get_object(*args, **kwargs)
-
-    def __get_date_list(self, field, kind, *args, **kwargs):
-        from django.db.backends.util import typecast_timestamp
-        assert kind in ("month", "year", "day"), "'kind' must be one of 'year', 'month' or 'day'."
-        order = 'ASC'
-        if kwargs.has_key('order'):
-            order = kwargs['order']
-            del kwargs['order']
-        assert order in ('ASC', 'DESC'), "'order' must be either 'ASC' or 'DESC'"
-        kwargs['order_by'] = () # Clear this because it'll mess things up otherwise.
-        if field.null:
-            kwargs.setdefault('where', []).append('%s.%s IS NOT NULL' % \
-                (backend.quote_name(self.klass._meta.db_table), backend.quote_name(field.column)))
-        select, sql, params = self._get_sql_clause(True, *args, **kwargs)
-        sql = 'SELECT %s %s GROUP BY 1 ORDER BY 1 %s' % \
-            (backend.get_date_trunc_sql(kind, '%s.%s' % (backend.quote_name(self.klass._meta.db_table),
-            backend.quote_name(field.column))), sql, order)
-        cursor = connection.cursor()
-        cursor.execute(sql, params)
-        # We have to manually run typecast_timestamp(str()) on the results, because
-        # MySQL doesn't automatically cast the result of date functions as datetime
-        # objects -- MySQL returns the values as strings, instead.
-        return [typecast_timestamp(str(row[0])) for row in cursor.fetchall()]
 
 class ManagerDescriptor(object):
     # This class ensures managers aren't accessible via model instances.

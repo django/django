@@ -1,5 +1,5 @@
 from django.db import backend, connection
-from django.db.models.fields import FieldDoesNotExist
+from django.db.models.fields import DateField, FieldDoesNotExist
 from django.utils.datastructures import SortedDict
 import copy
 
@@ -179,6 +179,35 @@ class QuerySet(object):
         cursor = connection.cursor()
         _, sql, params = del_query._get_sql_clause(False)
         cursor.execute("DELETE " + sql, params)
+
+    def dates(self, field_name, kind, order='ASC'):
+        """
+        Returns a list of datetime objects representing all available dates
+        for the given field_name, scoped to 'kind'.
+        """
+        from django.db.backends.util import typecast_timestamp
+
+        assert kind in ("month", "year", "day"), "'kind' must be one of 'year', 'month' or 'day'."
+        assert order in ('ASC', 'DESC'), "'order' must be either 'ASC' or 'DESC'."
+        # Let the FieldDoesNotExist exception propogate.
+        field = self.klass._meta.get_field(field_name, many_to_many=False)
+        assert isinstance(field, DateField), "%r isn't a DateField." % field_name
+
+        date_query = self._clone()
+        date_query._order_by = () # Clear this because it'll mess things up otherwise.
+        if field.null:
+            date_query._where.append('%s.%s IS NOT NULL' % \
+                (backend.quote_name(self.klass._meta.db_table), backend.quote_name(field.column)))
+        select, sql, params = date_query._get_sql_clause(True)
+        sql = 'SELECT %s %s GROUP BY 1 ORDER BY 1 %s' % \
+            (backend.get_date_trunc_sql(kind, '%s.%s' % (backend.quote_name(self.klass._meta.db_table),
+            backend.quote_name(field.column))), sql, order)
+        cursor = connection.cursor()
+        cursor.execute(sql, params)
+        # We have to manually run typecast_timestamp(str()) on the results, because
+        # MySQL doesn't automatically cast the result of date functions as datetime
+        # objects -- MySQL returns the values as strings, instead.
+        return [typecast_timestamp(str(row[0])) for row in cursor.fetchall()]
 
     #############################################
     # PUBLIC METHODS THAT RETURN A NEW QUERYSET #
