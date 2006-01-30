@@ -174,6 +174,8 @@ class Manager(QuerySet):
         return [typecast_timestamp(str(row[0])) for row in cursor.fetchall()]
 
 class ManagerDescriptor(object):
+    # This class ensures managers aren't accessible via model instances.
+    # For example, Poll.objects works, but poll_obj.objects raises AttributeError.
     def __init__(self, manager):
         self.manager = manager
 
