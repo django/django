@@ -274,7 +274,7 @@ class Model(object):
         kwargs.setdefault('params', []).extend([param, param, getattr(self, self._meta.pk.attname)])
         kwargs['order_by'] = [(not is_next and '-' or '') + field.name, (not is_next and '-' or '') + self._meta.pk.name]
         kwargs['limit'] = 1
-        return self.__class__._default_manager.get_object(**kwargs)
+        return self.__class__._default_manager.get(**kwargs)
 
     def _get_next_or_previous_in_order(self, is_next):
         cachename = "__%s_order_cache" % is_next
