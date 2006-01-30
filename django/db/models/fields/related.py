@@ -114,9 +114,9 @@ class ManyRelatedObjectsDescriptor(object):
             rel_field = self.related.field
 
             if self.rel_type == 'o2m':
-                manager._set_core_filter(**{'%s__%s__exact' % (rel_field.name, rel_field.rel.to._meta.pk.name): getattr(instance, rel_field.rel.get_related_field().attname)})
+                manager.core_filters.update({'%s__%s__exact' % (rel_field.name, rel_field.rel.to._meta.pk.name): getattr(instance, rel_field.rel.get_related_field().attname)})
             else:
-                manager._set_core_filter(**{'%s__%s__exact' % (rel_field.name, instance_type._meta.pk.name): instance._get_pk_val()})
+                manager.core_filters.update({'%s__%s__exact' % (rel_field.name, instance_type._meta.pk.name): instance._get_pk_val()})
 
             # Prepare the manager.
             # TODO: Fix this hack?
