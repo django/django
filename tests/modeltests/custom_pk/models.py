@@ -29,63 +29,63 @@ class Business(models.Model):
 API_TESTS = """
 >>> dan = Employee(employee_code='ABC123', first_name='Dan', last_name='Jones')
 >>> dan.save()
->>> Employee.objects.get_list()
+>>> list(Employee.objects)
 [Dan Jones]
 
 >>> fran = Employee(employee_code='XYZ456', first_name='Fran', last_name='Bones')
 >>> fran.save()
->>> Employee.objects.get_list()
+>>> list(Employee.objects)
 [Fran Bones, Dan Jones]
 
->>> Employee.objects.get_object(pk='ABC123')
+>>> Employee.objects.get(pk='ABC123')
 Dan Jones
->>> Employee.objects.get_object(pk='XYZ456')
+>>> Employee.objects.get(pk='XYZ456')
 Fran Bones
->>> Employee.objects.get_object(pk='foo')
+>>> Employee.objects.get(pk='foo')
 Traceback (most recent call last):
     ...
 DoesNotExist: Employee does not exist for {'pk': 'foo'}
 
 # Use the name of the primary key, rather than pk.
->>> Employee.objects.get_object(employee_code__exact='ABC123')
+>>> Employee.objects.get(employee_code__exact='ABC123')
 Dan Jones
 
 # Fran got married and changed her last name.
->>> fran = Employee.objects.get_object(pk='XYZ456')
+>>> fran = Employee.objects.get(pk='XYZ456')
 >>> fran.last_name = 'Jones'
 >>> fran.save()
->>> Employee.objects.get_list(last_name__exact='Jones')
+>>> list(Employee.objects.filter(last_name__exact='Jones'))
 [Dan Jones, Fran Jones]
->>> Employee.objects.get_in_bulk(['ABC123', 'XYZ456'])
+>>> Employee.objects.in_bulk(['ABC123', 'XYZ456'])
 {'XYZ456': Fran Jones, 'ABC123': Dan Jones}
 
 >>> b = Business(name='Sears')
 >>> b.save()
 >>> b.set_employees([dan.employee_code, fran.employee_code])
 True
->>> b.get_employee_list()
+>>> list(b.employee_set)
 [Dan Jones, Fran Jones]
->>> fran.get_business_list()
+>>> list(fran.business_set)
 [Sears]
->>> Business.objects.get_in_bulk(['Sears'])
+>>> Business.objects.in_bulk(['Sears'])
 {'Sears': Sears}
 
->>> Business.objects.get_list(name__exact='Sears')
+>>> list(Business.objects.filter(name__exact='Sears'))
 [Sears]
->>> Business.objects.get_list(pk='Sears')
+>>> list(Business.objects.filter(pk='Sears'))
 [Sears]
 
 # Queries across tables, involving primary key
->>> Employee.objects.get_list(business__name__exact='Sears')
+>>> list(Employee.objects.filter(business__name__exact='Sears'))
 [Dan Jones, Fran Jones]
->>> Employee.objects.get_list(business__pk='Sears')
+>>> list(Employee.objects.filter(business__pk='Sears'))
 [Dan Jones, Fran Jones]
 
->>> Business.objects.get_list(employees__employee_code__exact='ABC123')
+>>> list(Business.objects.filter(employees__employee_code__exact='ABC123'))
 [Sears]
->>> Business.objects.get_list(employees__pk='ABC123')
+>>> list(Business.objects.filter(employees__pk='ABC123'))
 [Sears]
->>> Business.objects.get_list(employees__first_name__startswith='Fran')
+>>> list(Business.objects.filter(employees__first_name__startswith='Fran'))
 [Sears]
 
 """

@@ -9,22 +9,22 @@ from django.db.models import *
 class Parent(Model):
     name = CharField(maxlength=100)
     bestchild = ForeignKey("Child", null=True, related_name="favoured_by")
-    
+
 class Child(Model):
     name = CharField(maxlength=100)
     parent = ForeignKey(Parent)
-    
+
 API_TESTS = """
 # Create a Parent
 >>> q = Parent(name='Elizabeth')
 >>> q.save()
 
 # Create some children
->>> c = q.add_child(name='Charles') 
->>> e = q.add_child(name='Edward')
+>>> c = q.child_set.add(name='Charles')
+>>> e = q.child_set.add(name='Edward')
 
 # Set the best child
->>> q.bestchild_id = c.id
+>>> q.bestchild = c
 >>> q.save()
 
 >>> q.delete()

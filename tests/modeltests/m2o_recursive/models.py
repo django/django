@@ -26,17 +26,17 @@ API_TESTS = """
 >>> c = Category(id=None, name='Child category', parent=r)
 >>> c.save()
 
->>> r.get_child_list()
+>>> list(r.child_set)
 [Child category]
->>> r.get_child(name__startswith='Child')
+>>> r.child_set.get(name__startswith='Child')
 Child category
->>> r.get_parent()
+>>> r.parent
 Traceback (most recent call last):
     ...
 DoesNotExist
 
->>> c.get_child_list()
+>>> list(c.child_set)
 []
->>> c.get_parent()
+>>> c.parent
 Root category
 """

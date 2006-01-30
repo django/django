@@ -38,26 +38,26 @@ API_TESTS = """
 
 # By default, articles.get_list() orders by pub_date descending, then
 # headline ascending.
->>> Article.objects.get_list()
+>>> list(Article.objects)
 [Article 4, Article 2, Article 3, Article 1]
 
 # Override ordering with order_by, which is in the same format as the ordering
 # attribute in models.
->>> Article.objects.get_list(order_by=['headline'])
+>>> list(Article.objects.order_by('headline'))
 [Article 1, Article 2, Article 3, Article 4]
->>> Article.objects.get_list(order_by=['pub_date', '-headline'])
+>>> list(Article.objects.order_by('pub_date', '-headline')
 [Article 1, Article 3, Article 2, Article 4]
 
 # Use the "limit" parameter to limit the results.
->>> Article.objects.get_list(order_by=['headline'], limit=2)
+>>> list(Article.objects.order_by('headline')[:3])
 [Article 1, Article 2]
 
 # Use the "offset" parameter with "limit" to offset the result list.
->>> Article.objects.get_list(order_by=['headline'], offset=1, limit=2)
+>>> list(Article.objects.order_by('headline')[1:3])
 [Article 2, Article 3]
 
 # Use '?' to order randomly. (We're using [...] in the output to indicate we
 # don't know what order the output will be in.
->>> Article.objects.get_list(order_by=['?'])
+>>> list(Article.objects.order_by('?'))
 [...]
 """

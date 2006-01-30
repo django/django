@@ -18,8 +18,7 @@ API_TESTS = """
 
 # Create an Article.
 >>> from datetime import datetime
->>> a = Article(id=None, headline='Area man programs in Python',
-...     pub_date=datetime(2005, 7, 28))
+>>> a = Article(id=None, headline='Area man programs in Python', pub_date=datetime(2005, 7, 28))
 
 # Save it into the database. You have to call save() explicitly.
 >>> a.save()
@@ -105,8 +104,7 @@ True
 datetime.datetime(2005, 7, 29, 0, 0)
 
 # ...or, you can use keyword arguments.
->>> a3 = Article(id=None, headline='Third article',
-...    pub_date=datetime(2005, 7, 30))
+>>> a3 = Article(id=None, headline='Third article', pub_date=datetime(2005, 7, 30))
 >>> a3.save()
 >>> a3.id
 3L
@@ -176,28 +174,26 @@ True
 >>> Article.objects.get(id__exact=8) == Article.objects.get(id__exact=7)
 False
 
-## TODO - what should these be converted to?
+>>> Article.objects.get_pub_date_list('year')
+[datetime.datetime(2005, 1, 1, 0, 0)]
+>>> Article.objects.get_pub_date_list('month')
+[datetime.datetime(2005, 7, 1, 0, 0)]
+>>> Article.objects.get_pub_date_list('day')
+[datetime.datetime(2005, 7, 28, 0, 0), datetime.datetime(2005, 7, 29, 0, 0), datetime.datetime(2005, 7, 30, 0, 0), datetime.datetime(2005, 7, 31, 0, 0)]
+>>> Article.objects.get_pub_date_list('day', order='ASC')
+[datetime.datetime(2005, 7, 28, 0, 0), datetime.datetime(2005, 7, 29, 0, 0), datetime.datetime(2005, 7, 30, 0, 0), datetime.datetime(2005, 7, 31, 0, 0)]
+>>> Article.objects.get_pub_date_list('day', order='DESC')
+[datetime.datetime(2005, 7, 31, 0, 0), datetime.datetime(2005, 7, 30, 0, 0), datetime.datetime(2005, 7, 29, 0, 0), datetime.datetime(2005, 7, 28, 0, 0)]
 
-##>>> Article.objects.get_pub_date_list('year')
-##[datetime.datetime(2005, 1, 1, 0, 0)]
-##>>> Article.objects.get_pub_date_list('month')
-##[datetime.datetime(2005, 7, 1, 0, 0)]
-##>>> Article.objects.get_pub_date_list('day')
-##[datetime.datetime(2005, 7, 28, 0, 0), datetime.datetime(2005, 7, 29, 0, 0), datetime.datetime(2005, 7, 30, 0, 0), datetime.datetime(2005, 7, 31, 0, 0)]
-##>>> Article.objects.get_pub_date_list('day', order='ASC')
-##[datetime.datetime(2005, 7, 28, 0, 0), datetime.datetime(2005, 7, 29, 0, 0), datetime.datetime(2005, 7, 30, 0, 0), datetime.datetime(2005, 7, 31, 0, 0)]
-##>>> Article.objects.get_pub_date_list('day', order='DESC')
-##[datetime.datetime(2005, 7, 31, 0, 0), datetime.datetime(2005, 7, 30, 0, 0), datetime.datetime(2005, 7, 29, 0, 0), datetime.datetime(2005, 7, 28, 0, 0)]
-##
-### Try some bad arguments to __get_date_list
-##>>> Article.objects.get_pub_date_list('badarg')
-##Traceback (most recent call last):
-##    ...
-##AssertionError: 'kind' must be one of 'year', 'month' or 'day'.
-##>>> Article.objects.get_pub_date_list(order='ASC')
-##Traceback (most recent call last):
-##    ...
-##TypeError: __get_date_list() takes at least 3 non-keyword arguments (2 given)
+# Try some bad arguments to __get_date_list
+>>> Article.objects.get_pub_date_list('badarg')
+Traceback (most recent call last):
+   ...
+AssertionError: 'kind' must be one of 'year', 'month' or 'day'.
+>>> Article.objects.get_pub_date_list(order='ASC')
+Traceback (most recent call last):
+   ...
+TypeError: __get_date_list() takes at least 3 non-keyword arguments (2 given)
 
 # You can combine queries with & and |
 >>> s1 = Article.objects.filter(id__exact=1)
@@ -213,7 +209,7 @@ False
 >>> len(Article.objects.filter(id__exact=1))
 1
 
-# You can get items using index and slice notation:
+# You can get items using index and slice notation.
 >>> Article.objects[0]
 <Article object>
 >>> Article.objects[1:2]
@@ -221,7 +217,6 @@ False
 >>> s3 = Article.objects.filter(id__exact=3)
 >>> (s1 | s2 | s3)[::2]
 [<Article object>, <Article object>]
-
 
 # An Article instance doesn't have access to the "objects" attribute.
 # That is only available as a class method.

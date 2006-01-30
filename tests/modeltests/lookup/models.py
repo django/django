@@ -49,38 +49,38 @@ Article 1
 ...     print a.headline
 Article 4
 
-# get_count() returns the number of objects matching search criteria.
->>> Article.objects.get_count()
+# count() returns the number of objects matching search criteria.
+>>> Article.objects.count()
 7L
->>> Article.objects.get_count(pub_date__exact=datetime(2005, 7, 27))
+>>> Article.objects.filter(pub_date__exact=datetime(2005, 7, 27)).count()
 3L
->>> Article.objects.get_count(headline__startswith='Blah blah')
+>>> Article.objects.filter(headline__startswith='Blah blah').count()
 0L
 
-# get_in_bulk() takes a list of IDs and returns a dictionary mapping IDs
+# in_bulk() takes a list of IDs and returns a dictionary mapping IDs
 # to objects.
->>> Article.objects.get_in_bulk([1, 2])
+>>> Article.objects.in_bulk([1, 2])
 {1: Article 1, 2: Article 2}
->>> Article.objects.get_in_bulk([3])
+>>> Article.objects.in_bulk([3])
 {3: Article 3}
->>> Article.objects.get_in_bulk([1000])
+>>> Article.objects.in_bulk([1000])
 {}
->>> Article.objects.get_in_bulk([])
+>>> Article.objects.in_bulk([])
 Traceback (most recent call last):
     ...
-AssertionError: get_in_bulk() cannot be passed an empty ID list.
->>> Article.objects.get_in_bulk('foo')
+AssertionError: in_bulk() cannot be passed an empty ID list.
+>>> Article.objects.in_bulk('foo')
 Traceback (most recent call last):
     ...
-AssertionError: get_in_bulk() must be provided with a list of IDs.
->>> Article.objects.get_in_bulk()
+AssertionError: in_bulk() must be provided with a list of IDs.
+>>> Article.objects.in_bulk()
 Traceback (most recent call last):
     ...
-TypeError: get_in_bulk() takes at least 2 arguments (1 given)
->>> Article.objects.get_in_bulk(headline__startswith='Blah')
+TypeError: in_bulk() takes at least 2 arguments (1 given)
+>>> Article.objects.in_bulk(headline__startswith='Blah')
 Traceback (most recent call last):
     ...
-TypeError: get_in_bulk() takes at least 2 non-keyword arguments (1 given)
+TypeError: in_bulk() takes at least 2 non-keyword arguments (1 given)
 
 # get_values() is just like get_list(), except it returns a list of
 # dictionaries instead of object instances -- and you can specify which fields
@@ -143,14 +143,14 @@ Article 1
 # database library, but Django handles the quoting of them automatically.
 >>> a8 = Article(headline='Article_ with underscore', pub_date=datetime(2005, 11, 20))
 >>> a8.save()
->>> Article.objects.get_list(headline__startswith='Article')
+>>> list(Article.objects.filter(headline__startswith='Article'))
 [Article_ with underscore, Article 5, Article 6, Article 4, Article 2, Article 3, Article 7, Article 1]
->>> Article.objects.get_list(headline__startswith='Article_')
+>>> list(Article.objects.filter(headline__startswith='Article_'))
 [Article_ with underscore]
 >>> a9 = Article(headline='Article% with percent sign', pub_date=datetime(2005, 11, 21))
 >>> a9.save()
->>> Article.objects.get_list(headline__startswith='Article')
+>>> list(Article.objects.filter(headline__startswith='Article'))
 [Article% with percent sign, Article_ with underscore, Article 5, Article 6, Article 4, Article 2, Article 3, Article 7, Article 1]
->>> Article.objects.get_list(headline__startswith='Article%')
+>>> list(Article.objects.filter(headline__startswith='Article%'))
 [Article% with percent sign]
 """

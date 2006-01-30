@@ -28,16 +28,16 @@ API_TESTS = """
 >>> kid = Person(full_name='John Smith Junior', mother=mom, father=dad)
 >>> kid.save()
 
->>> kid.get_mother()
+>>> kid.mother
 Jane Smith
->>> kid.get_father()
+>>> kid.father
 John Smith Senior
->>> dad.get_fathers_child_list()
+>>> list(dad.fathers_child_set)
 [John Smith Junior]
->>> mom.get_mothers_child_list()
+>>> list(mom.mothers_child_set)
 [John Smith Junior]
->>> kid.get_mothers_child_list()
+>>> list(kid.mothers_child_set)
 []
->>> kid.get_fathers_child_list()
+>>> list(kid.fathers_child_set)
 []
 """

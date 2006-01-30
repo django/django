@@ -32,7 +32,7 @@ API_TESTS = """
 >>> m1 = man.save(data)
 
 # Verify it worked.
->>> Musician.objects.get_list()
+>>> list(Musician.objects)
 [Ella Fitzgerald]
 >>> [m1] == Musician.objects.get_list()
 True
@@ -66,9 +66,9 @@ True
 >>> a1 = man.save(data)
 
 # Verify it worked.
->>> Album.objects.get_list()
+>>> list(Album.objects)
 [Ella and Basie]
->>> Album.objects.get_object().get_musician()
+>>> Album.objects.get().musician
 Ella Fitzgerald
 
 # Create an Album with a release_date.
@@ -79,9 +79,9 @@ Ella Fitzgerald
 >>> a2 = man.save(data)
 
 # Verify it worked.
->>> Album.objects.get_list(order_by=['name'])
+>>> list(Album.objects.filter(order_by=['name']))
 [Ella and Basie, Ultimate Ella]
->>> a2 = Album.objects.get_object(pk=2)
+>>> a2 = Album.objects.get(pk=2)
 >>> a2
 Ultimate Ella
 >>> a2.release_date

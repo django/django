@@ -42,65 +42,65 @@ API_TESTS = """
 >>> r.save()
 
 # A Restaurant can access its place.
->>> r.get_place()
+>>> r.place
 Demon Dogs the place
 
 # A Place can access its restaurant, if available.
->>> p1.get_restaurant()
+>>> p1.restaurant
 Demon Dogs the restaurant
 
 # p2 doesn't have an associated restaurant.
->>> p2.get_restaurant()
+>>> p2.restaurant
 Traceback (most recent call last):
     ...
 DoesNotExist: Restaurant does not exist for {'place__id__exact': ...}
 
 # Restaurant.objects.get_list() just returns the Restaurants, not the Places.
->>> Restaurant.objects.get_list()
+>>> list(Restaurant.objects)
 [Demon Dogs the restaurant]
 
 # Place.objects.get_list() returns all Places, regardless of whether they have
 # Restaurants.
->>> Place.objects.get_list(order_by=['name'])
+>>> list(Place.objects.filter(order_by=['name']))
 [Ace Hardware the place, Demon Dogs the place]
 
->>> Restaurant.objects.get_object(place__id__exact=1)
+>>> Restaurant.objects.get(place__id__exact=1)
 Demon Dogs the restaurant
->>> Restaurant.objects.get_object(pk=1)
+>>> Restaurant.objects.get(pk=1)
 Demon Dogs the restaurant
->>> Restaurant.objects.get_object(place__exact=1)
+>>> Restaurant.objects.get(place__exact=1)
 Demon Dogs the restaurant
->>> Restaurant.objects.get_object(place__pk=1)
+>>> Restaurant.objects.get(place__pk=1)
 Demon Dogs the restaurant
->>> Restaurant.objects.get_object(place__name__startswith="Demon")
+>>> Restaurant.objects.get(place__name__startswith="Demon")
 Demon Dogs the restaurant
 
->>> Place.objects.get_object(id__exact=1)
+>>> Place.objects.get(id__exact=1)
 Demon Dogs the place
->>> Place.objects.get_object(pk=1)
+>>> Place.objects.get(pk=1)
 Demon Dogs the place
->>> Place.objects.get_object(restaurant__place__exact=1)
+>>> Place.objects.get(restaurant__place__exact=1)
 Demon Dogs the place
->>> Place.objects.get_object(restaurant__pk=1)
+>>> Place.objects.get(restaurant__pk=1)
 Demon Dogs the place
 
 # Add a Waiter to the Restaurant.
->>> w = r.add_waiter(name='Joe')
+>>> w = r.waiter_set.add(name='Joe')
 >>> w.save()
 >>> w
 Joe the waiter at Demon Dogs the restaurant
 
 # Query the waiters
->>> Waiter.objects.get_list(restaurant__place__exact=1)
+>>> list(Waiter.objects.filter(restaurant__place__exact=1))
 [Joe the waiter at Demon Dogs the restaurant]
->>> Waiter.objects.get_list(restaurant__pk=1)
+>>> list(Waiter.objects.filter(restaurant__pk=1))
 [Joe the waiter at Demon Dogs the restaurant]
->>> Waiter.objects.get_list(id__exact=1)
+>>> list(Waiter.objects.filter(id__exact=1))
 [Joe the waiter at Demon Dogs the restaurant]
->>> Waiter.objects.get_list(pk=1)
+>>> list(Waiter.objects.filter(pk=1))
 [Joe the waiter at Demon Dogs the restaurant]
 
 # Delete the restaurant; the waiter should also be removed
->>> r = Restaurant.objects.get_object(pk=1)
+>>> r = Restaurant.objects.get(pk=1)
 >>> r.delete()
 """

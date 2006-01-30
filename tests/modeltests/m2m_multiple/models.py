@@ -63,36 +63,36 @@ True
 # specified the "singular" parameter, Django would just use "category", which
 # would cause a conflict because the "primary_categories" and
 # "secondary_categories" fields both relate to Category.
->>> a1.get_primary_category_list()
+>>> list(a1.primary_category_set)
 [Crime, News]
 
 # Ditto for the "primary_category" here.
->>> a2.get_primary_category_list()
+>>> list(a2.primary_category_set)
 [News, Sports]
 
 # Ditto for the "secondary_category" here.
->>> a1.get_secondary_category_list()
+>>> list(a1.secondary_category_set)
 [Life]
 
 # Ditto for the "secondary_category" here.
->>> a2.get_secondary_category_list()
+>>> list(a2.secondary_category)
 [Life]
 
 
->>> c1.get_primary_article_list()
+>>> list(c1.primary_article_set)
 [Area man runs]
->>> c1.get_secondary_article_list()
+>>> list(c1.secondary_article_set)
 []
->>> c2.get_primary_article_list()
+>>> list(c2.primary_article_set)
 [Area man steals, Area man runs]
->>> c2.get_secondary_article_list()
+>>> list(c2.secondary_article_set)
 []
->>> c3.get_primary_article_list()
+>>> list(c3.primary_article_set)
 [Area man steals]
->>> c3.get_secondary_article_list()
+>>> list(c3.secondary_article_set)
 []
->>> c4.get_primary_article_list()
+>>> list(c4.primary_article_set)
 []
->>> c4.get_secondary_article_list()
+>>> list(c4.secondary_article_set)
 [Area man steals, Area man runs]
 """

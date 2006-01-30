@@ -29,28 +29,28 @@ API_TESTS = """
 >>> a = Article(headline="First", reporter=r)
 >>> a.save()
 
->>> a.reporter_id
+>>> a.reporter.id
 1
 
->>> a.get_reporter()
+>>> a.reporter
 John Smith
 
 # Article objects have access to their related Reporter objects.
->>> r = a.get_reporter()
+>>> r = a.reporter
 
 # Create an Article via the Reporter object.
->>> a2 = r.add_article(headline="Second")
+>>> a2 = r.article_set.add(headline="Second")
 >>> a2
 Second
->>> a2.reporter_id
+>>> a2.reporter.id
 1
 
 # Reporter objects have access to their related Article objects.
->>> r.get_article_list(order_by=['headline'])
+>>> list(r.article_set.order_by('headline'))
 [First, Second]
->>> r.get_article(headline__startswith='Fir')
+>>> list(r.article_set.filter(headline__startswith='Fir'))
 First
->>> r.get_article_count()
+>>> r.article_set.count()
 2
 
 # Create an Article with no Reporter by passing "reporter=None".
@@ -58,21 +58,21 @@ First
 >>> a3.save()
 >>> a3.id
 3
->>> a3.reporter_id
->>> print a3.reporter_id
+>>> a3.reporter.id
+>>> print a3.reporter.id
 None
->>> a3 = Article.objects.get_object(pk=3)
->>> print a3.reporter_id
+>>> a3 = Article.objects.get(pk=3)
+>>> print a3.reporter.id
 None
 
-# An article's get_reporter() method throws ReporterDoesNotExist
+# Accessing an article's 'reporter' attribute throws ReporterDoesNotExist
 # if the reporter is set to None.
->>> a3.get_reporter()
+>>> a3.reporter
 Traceback (most recent call last):
     ...
 DoesNotExist
 
 # To retrieve the articles with no reporters set, use "reporter__isnull=True".
->>> Article.objects.get_list(reporter__isnull=True)
+>>> list(Article.objects.filter(reporter__isnull=True))
 [Third]
 """

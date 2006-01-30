@@ -38,19 +38,19 @@ a
 >>> print u.when
 h
 
->>> Thing.objects.get_list(order_by=['when'])
+>>> list(Thing.objects.order_by('when'))
 [a, h]
->>> v = Thing.objects.get_object(pk='a')
+>>> v = Thing.objects.get(pk='a')
 >>> print v.join
 b
 >>> print v.where
 2005-01-01
->>> Thing.objects.get_list(order_by=['select.when'])
+>>> list(Thing.objects.order_by('select.when'))
 [a, h]
 
 >>> Thing.objects.get_where_list('year')
 [datetime.datetime(2005, 1, 1, 0, 0), datetime.datetime(2006, 1, 1, 0, 0)]
 
->>> Thing.objects.get_list(where__month=1)
+>>> list(Thing.objects.filter(where__month=1))
 [a]
 """

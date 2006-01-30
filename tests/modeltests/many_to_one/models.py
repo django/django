@@ -36,60 +36,60 @@ API_TESTS = """
 >>> a = Article(id=None, headline="This is a test", pub_date=datetime(2005, 7, 27), reporter=r)
 >>> a.save()
 
->>> a.reporter_id
+>>> a.reporter.id
 1
 
->>> a.get_reporter()
+>>> a.reporter
 John Smith
 
 # Article objects have access to their related Reporter objects.
->>> r = a.get_reporter()
+>>> r = a.reporter
 >>> r.first_name, r.last_name
 ('John', 'Smith')
 
 # Create an Article via the Reporter object.
->>> new_article = r.add_article(headline="John's second story", pub_date=datetime(2005, 7, 29))
+>>> new_article = r.article_set.add(headline="John's second story", pub_date=datetime(2005, 7, 29))
 >>> new_article
 John's second story
->>> new_article.reporter_id
+>>> new_article.reporter.id
 1
 
->>> new_article2 = r2.add_article(headline="Paul's story", pub_date=datetime(2006, 1, 17))
->>> new_article2.reporter_id
+>>> new_article2 = r2.article_set.add(headline="Paul's story", pub_date=datetime(2006, 1, 17))
+>>> new_article2.reporter.id
 2
 
 # Reporter objects have access to their related Article objects.
->>> r.get_article_list(order_by=['pub_date'])
+>>> list(r.article_set.order_by('pub_date'))
 [This is a test, John's second story]
 
->>> r.get_article(headline__startswith='This')
+>>> list(r.article_set.filter(headline__startswith='This'))
 This is a test
 
->>> r.get_article_count()
+>>> r.article_set.count()
 2
 
->>> r2.get_article_count()
+>>> r2.article_set.count()
 1
 
 # Get articles by id
->>> Article.objects.get_list(id__exact=1)
+>>> list(Article.objects.filter(id__exact=1))
 [This is a test]
->>> Article.objects.get_list(pk=1)
+>>> list(Article.objects.filter(pk=1))
 [This is a test]
 
 # Query on an article property
->>> Article.objects.get_list(headline__startswith='This')
+>>> list(Article.objects.filter(headline__startswith='This'))
 [This is a test]
 
 # The API automatically follows relationships as far as you need.
 # Use double underscores to separate relationships.
 # This works as many levels deep as you want. There's no limit.
 # Find all Articles for any Reporter whose first name is "John".
->>> Article.objects.get_list(reporter__first_name__exact='John', order_by=['pub_date'])
+>>> list(Article.objects.filter(reporter__first_name__exact='John').order_by('pub_date'))
 [This is a test, John's second story]
 
 # Query twice over the related field.
->>> Article.objects.get_list(reporter__first_name__exact='John', reporter__last_name__exact='Smith')
+>>> list(Article.objects.filter(reporter__first_name__exact='John', reporter__last_name__exact='Smith'))
 [This is a test, John's second story]
 
 # The underlying query only makes one join when a related table is referenced twice.
@@ -98,68 +98,68 @@ This is a test
 1
 
 # The automatically joined table has a predictable name.
->>> Article.objects.get_list(reporter__first_name__exact='John', where=["many_to_one_article__reporter.last_name='Smith'"])
+>>> list(Article.objects.filter(reporter__first_name__exact='John').extra(where=["many_to_one_article__reporter.last_name='Smith'"]))
 [This is a test, John's second story]
 
 # Find all Articles for the Reporter whose ID is 1.
->>> Article.objects.get_list(reporter__id__exact=1, order_by=['pub_date'])
+>>> list(Article.objects.filter(reporter__id__exact=1).order_by('pub_date'))
 [This is a test, John's second story]
->>> Article.objects.get_list(reporter__pk=1, order_by=['pub_date'])
+>>> list(Article.objects.filter(reporter__pk=1).order_by('pub_date'))
 [This is a test, John's second story]
 
 # You need two underscores between "reporter" and "id" -- not one.
->>> Article.objects.get_list(reporter_id__exact=1)
+>>> list(Article.objects.filter(reporter_id__exact=1))
 Traceback (most recent call last):
     ...
 TypeError: Cannot resolve keyword 'reporter_id' into field
 
 # You need to specify a comparison clause
->>> Article.objects.get_list(reporter_id=1)
+>>> list(Article.objects.filter(reporter_id=1))
 Traceback (most recent call last):
     ...
 TypeError: Cannot parse keyword query 'reporter_id'
 
 # "pk" shortcut syntax works in a related context, too.
->>> Article.objects.get_list(reporter__pk=1, order_by=['pub_date'])
+>>> list(Article.objects.filter(reporter__pk=1).order_by('pub_date'))
 [This is a test, John's second story]
 
 # You can also instantiate an Article by passing
 # the Reporter's ID instead of a Reporter object.
 >>> a3 = Article(id=None, headline="This is a test", pub_date=datetime(2005, 7, 27), reporter_id=r.id)
 >>> a3.save()
->>> a3.reporter_id
+>>> a3.reporter.id
 1
->>> a3.get_reporter()
+>>> a3.reporter
 John Smith
 
 # Similarly, the reporter ID can be a string.
 >>> a4 = Article(id=None, headline="This is a test", pub_date=datetime(2005, 7, 27), reporter_id="1")
 >>> a4.save()
->>> a4.get_reporter()
+>>> a4.reporter
 John Smith
 
 # Reporters can be queried
->>> Reporter.objects.get_list(id__exact=1)
+>>> list(Reporter.objects.filter(id__exact=1))
 [John Smith]
->>> Reporter.objects.get_list(pk=1)
+>>> list(Reporter.objects.filter(pk=1))
 [John Smith]
->>> Reporter.objects.get_list(first_name__startswith='John')
+>>> list(Reporter.objects.filter(first_name__startswith='John'))
 [John Smith]
 
 # Reporters can query in opposite direction of ForeignKey definition
->>> Reporter.objects.get_list(article__id__exact=1)
+>>> list(Reporter.objects.filter(article__id__exact=1))
 [John Smith]
->>> Reporter.objects.get_list(article__pk=1)
+>>> list(Reporter.objects.filter(article__pk=1))
 [John Smith]
->>> Reporter.objects.get_list(article__headline__startswith='This')
+>>> list(Reporter.objects.filter(article__headline__startswith='This'))
 [John Smith, John Smith, John Smith]
->>> Reporter.objects.get_list(article__headline__startswith='This', distinct=True)
+>>> list(Reporter.objects.filter(article__headline__startswith='This', distinct=True))
 [John Smith]
 
 # Queries can go round in circles.
->>> Reporter.objects.get_list(article__reporter__first_name__startswith='John')
+>>> list(Reporter.objects.filter(article__reporter__first_name__startswith='John'))
 [John Smith, John Smith, John Smith, John Smith]
->>> Reporter.objects.get_list(article__reporter__first_name__startswith='John', distinct=True)
+>>> list(Reporter.objects.filter(article__reporter__first_name__startswith='John', distinct=True))
 [John Smith]
 
 # Deletes that require joins are prohibited.
@@ -169,14 +169,14 @@ Traceback (most recent call last):
 TypeError: Joins are not allowed in this type of query
 
 # If you delete a reporter, his articles will be deleted.
->>> Article.objects.get_list(order_by=['headline'])
+>>> list(Article.objects.order_by('headline'))
 [John's second story, Paul's story, This is a test, This is a test, This is a test]
->>> Reporter.objects.get_list(order_by=['first_name'])
+>>> list(Reporter.objects.order_by('first_name'))
 [John Smith, Paul Jones]
 >>> r.delete()
->>> Article.objects.get_list(order_by=['headline'])
+>>> list(Article.objects.order_by('headline'))
 [Paul's story]
->>> Reporter.objects.get_list(order_by=['first_name'])
+>>> list(Reporter.objects.order_by('first_name'))
 [Paul Jones]
 
 """
