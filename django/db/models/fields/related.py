@@ -214,39 +214,10 @@ class ForeignKey(RelatedField, Field):
 
     def contribute_to_class(self, cls, name):
         super(ForeignKey, self).contribute_to_class(cls, name)
-
         setattr(cls, self.name, SingleRelatedObjectDescriptor(self))
-
-        # TODO: Delete the rest of this function
-        # to remove support for old-style related lookup.
-
-        # Add methods for many-to-one related objects.
-        # EXAMPLES: Choice.get_poll(), Story.get_dateline()
-        setattr(cls, 'get_%s' % self.name, curry(cls._get_foreign_key_object, field_with_rel=self))
 
     def contribute_to_related_class(self, cls, related):
         setattr(cls, related.get_accessor_name(), ManyRelatedObjectsDescriptor(related, 'o2m'))
-
-        # TODO: Delete the rest of this function and RelatedObject.OLD_get_accessor_name()
-        # to remove support for old-style related lookup.
-
-        rel_obj_name = related.OLD_get_accessor_name()
-
-        # Add "get_thingie" methods for many-to-one related objects.
-        # EXAMPLE: Poll.get_choice()
-        setattr(cls, 'get_%s' % rel_obj_name, curry(cls._get_related, method_name='get_object', rel_class=related.model, rel_field=related.field))
-        # Add "get_thingie_count" methods for many-to-one related objects.
-        # EXAMPLE: Poll.get_choice_count()
-        setattr(cls, 'get_%s_count' % rel_obj_name, curry(cls._get_related, method_name='get_count', rel_class=related.model, rel_field=related.field))
-        # Add "get_thingie_list" methods for many-to-one related objects.
-        # EXAMPLE: Poll.get_choice_list()
-        setattr(cls, 'get_%s_list' % rel_obj_name, curry(cls._get_related, method_name='get_list', rel_class=related.model, rel_field=related.field))
-        # Add "add_thingie" methods for many-to-one related objects,
-        # but only for related objects that are in the same app.
-        # EXAMPLE: Poll.add_choice()
-        if related.opts.app_label == cls._meta.app_label:
-            func = lambda self, *args, **kwargs: self._add_related(related.model, related.field, *args, **kwargs)
-            setattr(cls, 'add_%s' % rel_obj_name, func)
 
 class OneToOneField(RelatedField, IntegerField):
     def __init__(self, to, to_field=None, **kwargs):
@@ -281,17 +252,10 @@ class OneToOneField(RelatedField, IntegerField):
 
     def contribute_to_class(self, cls, name):
         super(OneToOneField, self).contribute_to_class(cls, name)
-        # Add methods for many-to-one related objects.
-        # EXAMPLES: Choice.get_poll(), Story.get_dateline()
-        setattr(cls, 'get_%s' % self.name, curry(cls._get_foreign_key_object, field_with_rel=self))
+        setattr(cls, self.name, SingleRelatedObjectDescriptor(self))
 
     def contribute_to_related_class(self, cls, related):
-        rel_obj_name = related.OLD_get_accessor_name()
-        # Add "get_thingie" methods for one-to-one related objects.
-        # EXAMPLE: Place.get_restaurants_restaurant()
-        setattr(cls, 'get_%s' % rel_obj_name,
-                curry(cls._get_related, method_name='get_object',
-                      rel_class=related.model, rel_field=related.field))
+        setattr(cls, related.get_accessor_name(), SingleRelatedObjectDescriptor(self))
         if not cls._meta.one_to_one_field:
            cls._meta.one_to_one_field = self
 
@@ -377,20 +341,6 @@ class ManyToManyField(RelatedField, Field):
 
     def contribute_to_related_class(self, cls, related):
         setattr(cls, related.get_accessor_name(), ManyRelatedObjectsDescriptor(related, 'm2m'))
-
-        # TODO: Delete the rest of this function and RelatedObject.OLD_get_accessor_name()
-        # to remove support for old-style related lookup.
-
-        rel_obj_name = related.OLD_get_accessor_name()
-
-        setattr(cls, 'get_%s' % rel_obj_name, curry(cls._get_related_many_to_many, method_name='get_object', rel_class=related.model, rel_field=related.field))
-        setattr(cls, 'get_%s_count' % rel_obj_name, curry(cls._get_related_many_to_many, method_name='get_count', rel_class=related.model, rel_field=related.field))
-        setattr(cls, 'get_%s_list' % rel_obj_name, curry(cls._get_related_many_to_many, method_name='get_list', rel_class=related.model, rel_field=related.field))
-        if related.opts.app_label == cls._meta.app_label:
-            func = curry(cls._set_related_many_to_many, cls, related.field)
-            func.alters_data = True
-            setattr(cls, 'set_%s' % related.opts.module_name, func)
-
         self.rel.singular = self.rel.singular or self.rel.to._meta.object_name.lower()
 
     def set_attributes_from_rel(self):

@@ -357,21 +357,6 @@ class Model(object):
             setattr(self, cachename, get_image_dimensions(filename))
         return getattr(self, cachename)
 
-    def _get_foreign_key_object(self, field_with_rel):
-        cache_var = field_with_rel.get_cache_name()
-        if not hasattr(self, cache_var):
-            val = getattr(self, field_with_rel.attname)
-            if val is None:
-                raise field_with_rel.rel.to.DoesNotExist
-            other_field = field_with_rel.rel.get_related_field()
-            if other_field.rel:
-                params = {'%s__%s__exact' % (field_with_rel.rel.field_name, other_field.rel.field_name): val}
-            else:
-                params = {'%s__exact' % field_with_rel.rel.field_name: val}
-            retrieved_obj = field_with_rel.rel.to._default_manager.get_object(**params)
-            setattr(self, cache_var, retrieved_obj)
-        return getattr(self, cache_var)
-
     def _get_many_to_many_objects(self, field_with_rel):
         cache_var = '_%s_cache' % field_with_rel.name
         if not hasattr(self, cache_var):
@@ -424,24 +409,6 @@ class Model(object):
         return True
 
     _set_many_to_many_objects.alters_data = True
-
-    def _get_related(self, method_name, rel_class, rel_field, **kwargs):
-        kwargs['%s__%s__exact' % (rel_field.name, rel_field.rel.to._meta.pk.name)] = getattr(self, rel_field.rel.get_related_field().attname)
-        kwargs.update(rel_field.rel.lookup_overrides)
-        return getattr(rel_class._default_manager, method_name)(**kwargs)
-
-    def _add_related(self, rel_class, rel_field, *args, **kwargs):
-        init_kwargs = dict(zip([f.attname for f in rel_class._meta.fields if f != rel_field and not isinstance(f, AutoField)], args))
-        init_kwargs.update(kwargs)
-        for f in rel_class._meta.fields:
-            if isinstance(f, AutoField):
-                init_kwargs[f.attname] = None
-        init_kwargs[rel_field.name] = self
-        obj = rel_class(**init_kwargs)
-        obj.save()
-        return obj
-
-    _add_related.alters_data = True
 
     # Handles related many-to-many object retrieval.
     # Examples: Album.get_song(), Album.get_song_list(), Album.get_song_count()
