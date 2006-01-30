@@ -93,7 +93,8 @@ This is a test
 [This is a test, John's second story]
 
 # The underlying query only makes one join when a related table is referenced twice.
->>> null, sql, null = Article.objects._get_sql_clause(True, reporter__first_name__exact='John', reporter__last_name__exact='Smith')
+>>> query = Article.objects.filter(reporter__first_name__exact='John', reporter__last_name__exact='Smith')
+>>> null, sql, null = query._get_sql_clause(True)
 >>> sql.count('INNER JOIN')
 1
 
