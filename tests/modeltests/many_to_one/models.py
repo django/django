@@ -154,13 +154,13 @@ John Smith
 [John Smith]
 >>> list(Reporter.objects.filter(article__headline__startswith='This'))
 [John Smith, John Smith, John Smith]
->>> list(Reporter.objects.filter(article__headline__startswith='This', distinct=True))
+>>> list(Reporter.objects.filter(article__headline__startswith='This').distinct())
 [John Smith]
 
 # Queries can go round in circles.
 >>> list(Reporter.objects.filter(article__reporter__first_name__startswith='John'))
 [John Smith, John Smith, John Smith, John Smith]
->>> list(Reporter.objects.filter(article__reporter__first_name__startswith='John', distinct=True))
+>>> list(Reporter.objects.filter(article__reporter__first_name__startswith='John').distinct())
 [John Smith]
 
 # Deletes that require joins are prohibited.
