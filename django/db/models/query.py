@@ -68,7 +68,7 @@ class QuerySet(object):
     klass = None
 
     def __init__(self):
-        self._filters = self.core_filters.copy()
+        self._filters = Q(**(self.core_filters))
         self._order_by = None        # Ordering, e.g. ('date', '-name'). If None, use model's ordering.
         self._select_related = False # Whether to fill cache for related objects.
         self._distinct = False       # Whether the query should use SELECT DISTINCT.
@@ -103,6 +103,16 @@ class QuerySet(object):
                 return self._clone(_offset=k, _limit=1).get()
         else:
             return self._result_cache[k]
+
+    def __and__(self, other):
+        combined = self._combine(other)
+        combined._filters = self._filters & other._filters
+        return combined
+
+    def __or__(self, other):
+        combined = self._combine(other)
+        combined._filters = self._filters | other._filters
+        return combined
 
     ####################################
     # METHODS THAT DO DATABASE QUERIES #
@@ -245,7 +255,8 @@ class QuerySet(object):
     def filter(self, **kwargs):
         "Returns a new QuerySet instance with the args ANDed to the existing set."
         clone = self._clone()
-        clone._filters.update(kwargs)
+        if len(kwargs) > 0:
+            clone._filters = clone._filters & Q(**kwargs)
         return clone
 
     def select_related(self, true_or_false=True):
@@ -275,7 +286,7 @@ class QuerySet(object):
     def _clone(self, **kwargs):
         c = QuerySet()
         c.klass = self.klass
-        c._filters = self._filters.copy()
+        c._filters = self._filters
         c._order_by = self._order_by
         c._select_related = self._select_related
         c._distinct = self._distinct
@@ -287,6 +298,19 @@ class QuerySet(object):
         c._limit = self._limit
         c.__dict__.update(kwargs)
         return c
+
+    def _combine(self, other):
+        if self._distinct != other._distinct:
+            raise ValueException, "Can't combine a unique query with a non-unique query"
+        #  use 'other's order by
+        #  (so that A.filter(args1) & A.filter(args2) does the same as
+        #   A.filter(args1).filter(args2)
+        combined = other._clone()
+        # If 'self' is ordered and 'other' isn't, propagate 'self's ordering
+        if (self._order_by is not None and len(self._order_by) > 0) and \
+           (combined._order_by is None or len(combined._order_by == 0)):
+            combined._order_by = self._order_by
+        return combined
 
     def _get_data(self):
         return list(self.iterator())
@@ -305,7 +329,7 @@ class QuerySet(object):
         params = self._params[:]
 
         # Convert self._filters into SQL.
-        tables2, joins2, where2, params2 = parse_lookup(self._filters.items(), opts)
+        tables2, joins2, where2, params2 = self._filters.get_sql(opts)
         tables.extend(tables2)
         joins.update(joins2)
         where.extend(where2)
@@ -376,32 +400,6 @@ class QuerySet(object):
             assert self._offset is None, "'offset' is not allowed without 'limit'"
 
         return select, " ".join(sql), params
-
-# class QuerySet(object):
-#     def _ensure_compatible(self, other):
-#         if self._distinct != other._distinct:
-#             raise ValueException, "Can't combine a unique query with a non-unique query"
-#
-#     def _combine(self, other):
-#         self._ensure_compatible(other)
-#         # get a deepcopy of 'other's order by
-#         #  (so that A.filter(args1) & A.filter(args2) does the same as
-#         #   A.filter(args1).filter(args2)
-#         combined = other._clone()
-#         # If 'self' is ordered and 'other' isn't, propagate 'self's ordering
-#         if len(self._order_by) > 0 and len(combined._order_by == 0):
-#             combined._order_by = copy.deepcopy(self._order_by)
-#         return combined
-#
-#     def __and__(self, other):
-#         combined = self._combine(other)
-#         combined._filter = self._filter & other._filter
-#         return combined
-#
-#     def __or__(self, other):
-#         combined = self._combine(other)
-#         combined._filter = self._filter | other._filter
-#         return combined
 
 class QOperator:
     "Base class for QAnd and QOr"
