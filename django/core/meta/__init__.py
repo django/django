@@ -1665,10 +1665,7 @@ def function_get_date_list(opts, field, *args, **kwargs):
     from django.core.db.typecasts import typecast_timestamp
     kind = args and args[0] or kwargs['kind']
     assert kind in ("month", "year", "day"), "'kind' must be one of 'year', 'month' or 'day'."
-    order = 'ASC'
-    if kwargs.has_key('_order'):
-        order = kwargs['_order']
-        del kwargs['_order']
+    order = kwargs.pop('_order', 'ASC')
     assert order in ('ASC', 'DESC'), "'order' must be either 'ASC' or 'DESC'"
     kwargs['order_by'] = [] # Clear this because it'll mess things up otherwise.
     if field.null:
