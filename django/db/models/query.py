@@ -202,6 +202,9 @@ class QuerySet(object):
         "Returns a new QuerySet instance with '_distinct' modified."
         return self._clone(_distinct=true_or_false)
 
+    def extra(self, select=None, where=None, params=None, tables=None):
+        return self._clone(_select=select, _where=where, _params=params, _tables=tables)
+
     ###################
     # PRIVATE METHODS #
     ###################
@@ -321,9 +324,6 @@ class QuerySet(object):
 #         if len(self._order_by) > 0 and len(combined._order_by == 0):
 #             combined._order_by = copy.deepcopy(self._order_by)
 #         return combined
-#
-#     def extras(self, params=None, select=None, where=None, tables=None):
-#         return self._clone(_params=params, _select=select, _where=where, _tables=tables)
 #
 #     def __and__(self, other):
 #         combined = self._combine(other)
