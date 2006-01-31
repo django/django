@@ -35,6 +35,7 @@ class Manager(QuerySet):
         self.creation_counter = Manager.creation_counter
         Manager.creation_counter += 1
         self.model = None
+        self._use_cache = False
 
     def _prepare(self):
         if self.model._meta.get_latest_by:
@@ -52,6 +53,10 @@ class Manager(QuerySet):
         kwargs['order_by'] = ('-' + self.model._meta.get_latest_by,)
         kwargs['limit'] = 1
         return self.get_object(*args, **kwargs)
+
+    def all(self):
+        # Returns a caching QuerySet.
+        return QuerySet(self.model)
 
     def add(self, **kwargs):
         kwargs.update(self.core_values)

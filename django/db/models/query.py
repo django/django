@@ -63,11 +63,8 @@ class QuerySet(object):
     # Dictionary of lookup parameters to apply to every _get_sql_clause().
     core_filters = {}
 
-    # Subclasses need to provide 'self.model' attribute for this class
-    # to be able to function.
-    model = None
-
-    def __init__(self):
+    def __init__(self, model=None):
+        self.model = model
         self._filters = Q(**(self.core_filters))
         self._order_by = None        # Ordering, e.g. ('date', '-name'). If None, use model's ordering.
         self._select_related = False # Whether to fill cache for related objects.
@@ -79,10 +76,14 @@ class QuerySet(object):
         self._offset = None          # OFFSET clause
         self._limit = None           # LIMIT clause
         self._result_cache = None
+        self._use_cache = True
 
     ########################
     # PYTHON MAGIC METHODS #
     ########################
+
+    def __repr__(self):
+        return repr(self._get_data())
 
     def __len__(self):
         return len(self._get_data())
@@ -313,10 +314,12 @@ class QuerySet(object):
         return combined
 
     def _get_data(self):
-        return list(self.iterator())
-#         if self._result_cache is None:
-#             self._result_cache = list(self.iterator())
-#         return self._result_cache
+        if self._use_cache:
+            if self._result_cache is None:
+                self._result_cache = list(self.iterator())
+            return self._result_cache
+        else:
+            return list(self.iterator())
 
     def _get_sql_clause(self, allow_joins):
         opts = self.model._meta
