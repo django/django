@@ -107,12 +107,13 @@ class ManyRelatedObjectsDescriptor(object):
         else:
             # Dynamically create a class that subclasses the related
             # model's default manager.
-            manager = types.ClassType('RelatedManager', (self.related.model._default_manager.__class__,), {})()
-
+            superclass = self.related.model._default_manager.__class__
+            class_ = types.ClassType('RelatedManager', (superclass,), {})
             # Override get_query_set on the RelatedManager
             def get_query_set(self):
-                return super(RelatedManager, self).filter(**core_filters)
-            manager.get_query_set = get_query_set
+                return superclass.get_query_set(self).filter(**(self.core_filters))
+            class_.get_query_set = get_query_set
+            manager = class_()
 
             # Set core_filters on the new manager to limit it to the
             # foreign-key relationship.
