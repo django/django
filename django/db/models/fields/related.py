@@ -69,25 +69,25 @@ class SingleRelatedObjectDescriptor(object):
     # In the example "choice.poll", the poll attribute is a
     # SingleRelatedObjectDescriptor instance.
     def __init__(self, field_with_rel):
-        self.field = field_with_rel
+        self._field = field_with_rel
 
     def __get__(self, instance, instance_type=None):
         if instance is None:
-            raise AttributeError, "%s must be accessed via instance" % self.field.name
+            raise AttributeError, "%s must be accessed via instance" % self._field.name
         else:
-            cache_name = self.field.get_cache_name()
+            cache_name = self._field.get_cache_name()
             try:
                 return getattr(instance, cache_name)
             except AttributeError:
-                val = getattr(instance, self.field.attname)
+                val = getattr(instance, self._field.attname)
                 if val is None:
-                    raise self.field.rel.to.DoesNotExist
-                other_field = self.field.rel.get_related_field()
+                    raise self._field.rel.to.DoesNotExist
+                other_field = self._field.rel.get_related_field()
                 if other_field.rel:
-                    params = {'%s__%s__exact' % (self.field.rel.field_name, other_field.rel.field_name): val}
+                    params = {'%s__%s__exact' % (self._field.rel.field_name, other_field.rel.field_name): val}
                 else:
-                    params = {'%s__exact' % self.field.rel.field_name: val}
-                rel_obj = self.field.rel.to._default_manager.get(**params)
+                    params = {'%s__exact' % self._field.rel.field_name: val}
+                rel_obj = self._field.rel.to._default_manager.get(**params)
                 setattr(instance, cache_name, rel_obj)
                 return rel_obj
 
