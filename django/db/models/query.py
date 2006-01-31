@@ -1,7 +1,7 @@
 from django.db import backend, connection
 from django.db.models.fields import DateField, FieldDoesNotExist
 from django.utils.datastructures import SortedDict
-import copy
+import operator
 
 LOOKUP_SEPARATOR = '__'
 
@@ -154,15 +154,15 @@ class QuerySet(object):
         cursor.execute("SELECT COUNT(*)" + sql, params)
         return cursor.fetchone()[0]
 
-    def get(self, **kwargs):
+    def get(self, *args, **kwargs):
         "Performs the SELECT and returns a single object matching the given keyword arguments."
-        obj_list = list(self.filter(**kwargs))
+        obj_list = list(self.filter(*args, **kwargs))
         if len(obj_list) < 1:
             raise self.model.DoesNotExist, "%s does not exist for %s" % (self.model._meta.object_name, kwargs)
         assert len(obj_list) == 1, "get() returned more than one %s -- it returned %s! Lookup parameters were %s" % (self.model._meta.object_name, len(obj_list), kwargs)
         return obj_list[0]
 
-    def delete(self, **kwargs):
+    def delete(self, *args, **kwargs):
         """
         Deletes the records with the given kwargs. If no kwargs are given,
         deletes records in the current QuerySet.
@@ -175,7 +175,7 @@ class QuerySet(object):
             raise TypeError, "SAFETY MECHANISM: Specify DELETE_ALL=True if you actually want to delete all data."
 
         if kwargs:
-            del_query = self.filter(**kwargs)
+            del_query = self.filter(*args, **kwargs)
         else:
             del_query = self._clone()
         # disable non-supported fields
@@ -252,11 +252,13 @@ class QuerySet(object):
     # PUBLIC METHODS THAT RETURN A NEW QUERYSET #
     #############################################
 
-    def filter(self, **kwargs):
+    def filter(self, *args, **kwargs):
         "Returns a new QuerySet instance with the args ANDed to the existing set."
         clone = self._clone()
         if len(kwargs) > 0:
             clone._filters = clone._filters & Q(**kwargs)
+        if len(args) > 0:
+            clone._filters = clone._filters & reduce(operator.and_, args)
         return clone
 
     def select_related(self, true_or_false=True):
