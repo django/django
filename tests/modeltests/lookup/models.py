@@ -103,6 +103,10 @@ True
 [('headline', 'Article 7'), ('id', 7)]
 [('headline', 'Article 1'), ('id', 1)]
 
+# if you don't specify which fields, all are returned
+>>> list(Article.objects.filter(id=5).values()) == [{'id': 5, 'headline': 'Article 5', 'pub_date': datetime(2005, 8, 1, 9, 0)}]
+True
+
 # Every DateField and DateTimeField creates get_next_by_FOO() and
 # get_previous_by_FOO() methods.
 # In the case of identical date values, these methods will use the ID as a

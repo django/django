@@ -217,7 +217,7 @@ class QuerySet(object):
             if not rows:
                 raise StopIteration
             for row in rows:
-                yield dict(zip(fields, row))
+                yield dict(zip(columns, row))
 
     def dates(self, field_name, kind, order='ASC'):
         """
