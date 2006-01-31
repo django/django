@@ -63,7 +63,7 @@ John's second story
 [This is a test, John's second story]
 
 >>> r.article_set.filter(headline__startswith='This')
-This is a test
+[This is a test]
 
 >>> r.article_set.count()
 2

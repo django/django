@@ -49,7 +49,7 @@ Second
 >>> r.article_set.order_by('headline')
 [First, Second]
 >>> r.article_set.filter(headline__startswith='Fir')
-First
+[First]
 >>> r.article_set.count()
 2
 
