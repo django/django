@@ -109,14 +109,19 @@ class ManyRelatedObjectsDescriptor(object):
             # model's default manager.
             manager = types.ClassType('RelatedManager', (self.related.model._default_manager.__class__,), {})()
 
+            # Override get_query_set on the RelatedManager
+            def get_query_set(self):
+                return super(RelatedManager, self).filter(**core_filters)
+            manager.get_query_set = get_query_set
+
             # Set core_filters on the new manager to limit it to the
             # foreign-key relationship.
             rel_field = self.related.field
 
             if self.rel_type == 'o2m':
-                manager.core_filters.update({'%s__%s__exact' % (rel_field.name, rel_field.rel.to._meta.pk.name): getattr(instance, rel_field.rel.get_related_field().attname)})
+                manager.core_filters = {'%s__%s__exact' % (rel_field.name, rel_field.rel.to._meta.pk.name): getattr(instance, rel_field.rel.get_related_field().attname)}
             else:
-                manager.core_filters.update({'%s__%s__exact' % (rel_field.name, instance_type._meta.pk.name): instance._get_pk_val()})
+                manager.core_filters = {'%s__%s__exact' % (rel_field.name, instance_type._meta.pk.name): instance._get_pk_val()}
             manager.core_values = {rel_field.name: instance}
 
             # Prepare the manager.
