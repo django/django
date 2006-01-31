@@ -395,7 +395,7 @@ class ValuesQuerySet(QuerySet):
         # self._fields is a list of field names to fetch.
         if self._fields:
             columns = [self.model._meta.get_field(f, many_to_many=False).column for f in self._fields]
-            field_names = [f.attname for f in self._fields]
+            field_names = self._fields
         else: # Default to all fields.
             columns = [f.column for f in self.model._meta.fields]
             field_names = [f.attname for f in self.model._meta.fields]
