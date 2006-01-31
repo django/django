@@ -20,7 +20,7 @@ def ensure_default_manager(sender):
 
 dispatcher.connect(ensure_default_manager, signal=signals.class_prepared)
 
-class Manager(QuerySet):
+class Manager(object):
     # Tracks each time a Manager instance is created. Used to retain order.
     creation_counter = 0
 
@@ -35,7 +35,6 @@ class Manager(QuerySet):
         self.creation_counter = Manager.creation_counter
         Manager.creation_counter += 1
         self.model = None
-        self._use_cache = False
 
     def _prepare(self):
         if self.model._meta.get_latest_by:
@@ -54,9 +53,50 @@ class Manager(QuerySet):
         kwargs['limit'] = 1
         return self.get_object(*args, **kwargs)
 
+    #######################
+    # PROXIES TO QUERYSET #
+    #######################
+
     def all(self):
         # Returns a caching QuerySet.
         return QuerySet(self.model)
+
+    def count(self):
+        return QuerySet(self.model).count()
+
+    def dates(self, *args, **kwargs):
+        return QuerySet(self.model).dates(*args, **kwargs)
+
+    def delete(self, *args, **kwargs):
+        return QuerySet(self.model).delete(*args, **kwargs)
+
+    def distinct(self, *args, **kwargs):
+        return QuerySet(self.model).distinct(*args, **kwargs)
+
+    def extra(self, *args, **kwargs):
+        return QuerySet(self.model).extra(*args, **kwargs)
+
+    def get(self, *args, **kwargs):
+        return QuerySet(self.model).get(*args, **kwargs)
+
+    def filter(self, *args, **kwargs):
+        return QuerySet(self.model).filter(*args, **kwargs)
+
+    def in_bulk(self, *args, **kwargs):
+        return QuerySet(self.model).in_bulk(*args, **kwargs)
+
+    def order_by(self, *args, **kwargs):
+        return QuerySet(self.model).order_by(*args, **kwargs)
+
+    def select_related(self, *args, **kwargs):
+        return QuerySet(self.model).select_related(*args, **kwargs)
+
+    def values(self, *args, **kwargs):
+        return QuerySet(self.model).values(*args, **kwargs)
+
+    #################
+    # OTHER METHODS #
+    #################
 
     def add(self, **kwargs):
         kwargs.update(self.core_values)

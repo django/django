@@ -76,7 +76,6 @@ class QuerySet(object):
         self._offset = None          # OFFSET clause
         self._limit = None           # LIMIT clause
         self._result_cache = None
-        self._use_cache = True
 
     ########################
     # PYTHON MAGIC METHODS #
@@ -314,12 +313,9 @@ class QuerySet(object):
         return combined
 
     def _get_data(self):
-        if self._use_cache:
-            if self._result_cache is None:
-                self._result_cache = list(self.iterator())
-            return self._result_cache
-        else:
-            return list(self.iterator())
+        if self._result_cache is None:
+            self._result_cache = list(self.iterator())
+        return self._result_cache
 
     def _get_sql_clause(self, allow_joins):
         opts = self.model._meta
