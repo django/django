@@ -98,7 +98,11 @@ class QuerySet(object):
         # both be None at this point.
         if self._result_cache is None:
             if isinstance(k, slice):
-                return list(self._clone(_offset=k.start, _limit=k.stop))[::k.step]
+                if k.stop is not None and k.start is not None:
+                    limit = k.stop - k.start
+                else:
+                    limit = k.stop
+                return list(self._clone(_offset=k.start, _limit=limit))[::k.step]
             else:
                 return self._clone(_offset=k, _limit=1).get()
         else:
