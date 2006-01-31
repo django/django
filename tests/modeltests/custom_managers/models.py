@@ -22,7 +22,8 @@ class Person(models.Model):
 # An example of a custom manager that sets a core_filter on its lookups.
 
 class PublishedBookManager(models.Manager):
-    core_filters = {'is_published__exact': True}
+    def get_query_set(self):
+        return super(PublishedBookManager, self).get_query_set().filter(is_published=True)
 
 class Book(models.Model):
     title = models.CharField(maxlength=50)
@@ -36,7 +37,8 @@ class Book(models.Model):
 # An example of providing multiple custom managers.
 
 class FastCarManager(models.Manager):
-    core_filters = {'top_speed__gt': 150}
+    def get_query_set(self):
+        return super(FastCarManager, self).get_query_set().filter(top_speed__gt=150)
 
 class Car(models.Model):
     name = models.CharField(maxlength=10)

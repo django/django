@@ -57,45 +57,51 @@ class Manager(object):
     # PROXIES TO QUERYSET #
     #######################
 
-    def all(self):
-        # Returns a caching QuerySet.
+    def get_query_set(self):
+        """Returns a new QuerySet object.  Subclasses can override this method
+        to easily customise the behaviour of the Manager.
+        """
         return QuerySet(self.model)
 
+    def all(self):
+        # Returns a caching QuerySet.
+        return self.get_query_set()
+
     def count(self):
-        return QuerySet(self.model).count()
+        return self.get_query_set().count()
 
     def dates(self, *args, **kwargs):
-        return QuerySet(self.model).dates(*args, **kwargs)
+        return self.get_query_set().dates(*args, **kwargs)
 
     def delete(self, *args, **kwargs):
-        return QuerySet(self.model).delete(*args, **kwargs)
+        return self.get_query_set().delete(*args, **kwargs)
 
     def distinct(self, *args, **kwargs):
-        return QuerySet(self.model).distinct(*args, **kwargs)
+        return self.get_query_set().distinct(*args, **kwargs)
 
     def extra(self, *args, **kwargs):
-        return QuerySet(self.model).extra(*args, **kwargs)
+        return self.get_query_set().extra(*args, **kwargs)
 
     def get(self, *args, **kwargs):
-        return QuerySet(self.model).get(*args, **kwargs)
+        return self.get_query_set().get(*args, **kwargs)
 
     def filter(self, *args, **kwargs):
-        return QuerySet(self.model).filter(*args, **kwargs)
+        return self.get_query_set().filter(*args, **kwargs)
 
     def in_bulk(self, *args, **kwargs):
-        return QuerySet(self.model).in_bulk(*args, **kwargs)
+        return self.get_query_set().in_bulk(*args, **kwargs)
 
     def iterator(self, *args, **kwargs):
-        return QuerySet(self.model).iterator(*args, **kwargs)
+        return self.get_query_set().iterator(*args, **kwargs)
 
     def order_by(self, *args, **kwargs):
-        return QuerySet(self.model).order_by(*args, **kwargs)
+        return self.get_query_set().order_by(*args, **kwargs)
 
     def select_related(self, *args, **kwargs):
-        return QuerySet(self.model).select_related(*args, **kwargs)
+        return self.get_query_set().select_related(*args, **kwargs)
 
     def values(self, *args, **kwargs):
-        return QuerySet(self.model).values(*args, **kwargs)
+        return self.get_query_set().values(*args, **kwargs)
 
     #################
     # OTHER METHODS #
