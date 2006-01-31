@@ -30,13 +30,13 @@ API_TESTS = """
 Before save
 After save
 
->>> list(Person.objects.all())
+>>> Person.objects.all()
 [John Smith]
 
 >>> p1.delete()
 Before deletion
 After deletion
 
->>> list(Person.objects.all())
+>>> Person.objects.all()
 []
 """

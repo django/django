@@ -55,13 +55,13 @@ Traceback (most recent call last):
     ...
 DoesNotExist: Restaurant does not exist for {'place__id__exact': ...}
 
-# Restaurant.objects.get_list() just returns the Restaurants, not the Places.
->>> list(Restaurant.objects.all())
+# Restaurant.objects.all() just returns the Restaurants, not the Places.
+>>> Restaurant.objects.all()
 [Demon Dogs the restaurant]
 
-# Place.objects.get_list() returns all Places, regardless of whether they have
+# Place.objects.all() returns all Places, regardless of whether they have
 # Restaurants.
->>> list(Place.objects.order_by('name'))
+>>> Place.objects.order_by('name')
 [Ace Hardware the place, Demon Dogs the place]
 
 >>> Restaurant.objects.get(place__id__exact=1)
@@ -91,13 +91,13 @@ Demon Dogs the place
 Joe the waiter at Demon Dogs the restaurant
 
 # Query the waiters
->>> list(Waiter.objects.filter(restaurant__place__exact=1))
+>>> Waiter.objects.filter(restaurant__place__exact=1)
 [Joe the waiter at Demon Dogs the restaurant]
->>> list(Waiter.objects.filter(restaurant__pk=1))
+>>> Waiter.objects.filter(restaurant__pk=1)
 [Joe the waiter at Demon Dogs the restaurant]
->>> list(Waiter.objects.filter(id__exact=1))
+>>> Waiter.objects.filter(id__exact=1)
 [Joe the waiter at Demon Dogs the restaurant]
->>> list(Waiter.objects.filter(pk=1))
+>>> Waiter.objects.filter(pk=1)
 [Joe the waiter at Demon Dogs the restaurant]
 
 # Delete the restaurant; the waiter should also be removed

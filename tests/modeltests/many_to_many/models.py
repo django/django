@@ -56,56 +56,56 @@ True
 True
 
 # Article objects have access to their related Publication objects.
->>> list(a1.publication_set)
+>>> a1.publication_set.all()
 [The Python Journal]
->>> list(a2.publication_set)
+>>> a2.publication_set.all()
 [The Python Journal, Science News, Science Weekly]
 
 # Publication objects have access to their related Article objects.
->>> list(p2.article_set)
+>>> p2.article_set.all()
 [NASA uses Python]
->>> list(p1.article_set.order_by('headline'))
+>>> p1.article_set.order_by('headline')
 [Django lets you build Web apps easily, NASA uses Python]
 
 # We can perform kwarg queries across m2m relationships
->>> list(Article.objects.filter(publications__id__exact=1))
+>>> Article.objects.filter(publications__id__exact=1)
 [Django lets you build Web apps easily, NASA uses Python]
->>> list(Article.objects.filter(publications__pk=1))
+>>> Article.objects.filter(publications__pk=1)
 [Django lets you build Web apps easily, NASA uses Python]
 
->>> list(Article.objects.filter(publications__title__startswith="Science"))
+>>> Article.objects.filter(publications__title__startswith="Science")
 [NASA uses Python, NASA uses Python]
 
->>> list(Article.objects.filter(publications__title__startswith="Science").distinct())
+>>> Article.objects.filter(publications__title__startswith="Science").distinct()
 [NASA uses Python]
 
 # Reverse m2m queries (i.e., start at the table that doesn't have a ManyToManyField)
->>> list(Publication.objects.filter(id__exact=1))
+>>> Publication.objects.filter(id__exact=1)
 [The Python Journal]
->>> list(Publication.objects.filter(pk=1))
+>>> Publication.objects.filter(pk=1)
 [The Python Journal]
 
->>> list(Publication.objects.filter(article__headline__startswith="NASA"))
+>>> Publication.objects.filter(article__headline__startswith="NASA")
 [The Python Journal, Science News, Science Weekly]
 
->>> list(Publication.objects.filter(article__id__exact=1))
+>>> Publication.objects.filter(article__id__exact=1)
 [The Python Journal]
 
->>> list(Publication.objects.filter(article__pk=1))
+>>> Publication.objects.filter(article__pk=1)
 [The Python Journal]
 
 # If we delete a Publication, its Articles won't be able to access it.
 >>> p1.delete()
->>> list(Publication.objects.all())
+>>> Publication.objects.all()
 [Science News, Science Weekly]
 >>> a1 = Article.objects.get(pk=1)
->>> list(a1.publication_set)
+>>> a1.publication_set.all()
 []
 
 # If we delete an Article, its Publications won't be able to access it.
 >>> a2.delete()
->>> list(Article.objects.all())
+>>> Article.objects.all()
 [Django lets you build Web apps easily]
->>> list(p1.article_set.order_by('headline'))
+>>> p1.article_set.order_by('headline')
 [Django lets you build Web apps easily]
 """

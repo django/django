@@ -53,7 +53,7 @@ API_TESTS = """
 >>> w2.save()
 
 # Play around with the API.
->>> list(a.writer_set.order_by('-position').extra(select_related=True))
+>>> a.writer_set.select_related().order_by('-position')
 [John Smith (Main writer), Jane Doe (Contributor)]
 >>> w1.reporter
 John Smith
@@ -63,6 +63,6 @@ Jane Doe
 This is a test
 >>> w2.article
 This is a test
->>> list(r1.writer_set)
+>>> r1.writer_set.all()
 [John Smith (Main writer)]
 """

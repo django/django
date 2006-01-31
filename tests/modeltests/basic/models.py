@@ -13,7 +13,7 @@ class Article(models.Model):
 API_TESTS = """
 
 # No articles are in the system yet.
->>> list(Article.objects.all())
+>>> Article.objects.all()
 []
 
 # Create an Article.
@@ -40,7 +40,7 @@ datetime.datetime(2005, 7, 28, 0, 0)
 # Listing objects displays all the articles in the database. Note that the article
 # is represented by "<Article object>", because we haven't given the Article
 # model a __repr__() method.
->>> list(Article.objects.all())
+>>> Article.objects.all()
 [<Article object>]
 
 # Django provides a rich database lookup API that's entirely driven by
@@ -62,11 +62,11 @@ datetime.datetime(2005, 7, 28, 0, 0)
 >>> Article.objects.get(headline='Area woman programs in Python')
 <Article object>
 
->>> list(Article.objects.filter(pub_date__year=2005))
+>>> Article.objects.filter(pub_date__year=2005)
 [<Article object>]
->>> list(Article.objects.filter(pub_date__year=2004))
+>>> Article.objects.filter(pub_date__year=2004)
 []
->>> list(Article.objects.filter(pub_date__year=2005, pub_date__month=7))
+>>> Article.objects.filter(pub_date__year=2005, pub_date__month=7)
 [<Article object>]
 
 # Django raises an ArticleDoesNotExist exception for get()

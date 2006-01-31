@@ -32,12 +32,12 @@ API_TESTS = """
 Jane Smith
 >>> kid.father
 John Smith Senior
->>> list(dad.fathers_child_set)
+>>> dad.fathers_child_set.all()
 [John Smith Junior]
->>> list(mom.mothers_child_set)
+>>> mom.mothers_child_set.all()
 [John Smith Junior]
->>> list(kid.mothers_child_set)
+>>> kid.mothers_child_set.all()
 []
->>> list(kid.fathers_child_set)
+>>> kid.fathers_child_set.all()
 []
 """

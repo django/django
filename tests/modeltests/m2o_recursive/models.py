@@ -26,7 +26,7 @@ API_TESTS = """
 >>> c = Category(id=None, name='Child category', parent=r)
 >>> c.save()
 
->>> list(r.child_set)
+>>> r.child_set.all()
 [Child category]
 >>> r.child_set.get(name__startswith='Child')
 Child category
@@ -35,7 +35,7 @@ Traceback (most recent call last):
     ...
 DoesNotExist
 
->>> list(c.child_set)
+>>> c.child_set.all()
 []
 >>> c.parent
 Root category

@@ -84,9 +84,9 @@ TypeError: in_bulk() got an unexpected keyword argument 'headline__startswith'
 
 # values() returns a list of dictionaries instead of object instances -- and
 # you can specify which fields you want to retrieve.
->>> list(Article.objects.values('headline'))
+>>> Article.objects.values('headline')
 [{'headline': 'Article 5'}, {'headline': 'Article 6'}, {'headline': 'Article 4'}, {'headline': 'Article 2'}, {'headline': 'Article 3'}, {'headline': 'Article 7'}, {'headline': 'Article 1'}]
->>> list(Article.objects.filter(pub_date__exact=datetime(2005, 7, 27)).values('id'))
+>>> Article.objects.filter(pub_date__exact=datetime(2005, 7, 27)).values('id')
 [{'id': 2}, {'id': 3}, {'id': 7}]
 >>> list(Article.objects.values('id', 'headline')) == [{'id': 5, 'headline': 'Article 5'}, {'id': 6, 'headline': 'Article 6'}, {'id': 4, 'headline': 'Article 4'}, {'id': 2, 'headline': 'Article 2'}, {'id': 3, 'headline': 'Article 3'}, {'id': 7, 'headline': 'Article 7'}, {'id': 1, 'headline': 'Article 1'}]
 True
@@ -141,14 +141,14 @@ Article 1
 # database library, but Django handles the quoting of them automatically.
 >>> a8 = Article(headline='Article_ with underscore', pub_date=datetime(2005, 11, 20))
 >>> a8.save()
->>> list(Article.objects.filter(headline__startswith='Article'))
+>>> Article.objects.filter(headline__startswith='Article')
 [Article_ with underscore, Article 5, Article 6, Article 4, Article 2, Article 3, Article 7, Article 1]
->>> list(Article.objects.filter(headline__startswith='Article_'))
+>>> Article.objects.filter(headline__startswith='Article_')
 [Article_ with underscore]
 >>> a9 = Article(headline='Article% with percent sign', pub_date=datetime(2005, 11, 21))
 >>> a9.save()
->>> list(Article.objects.filter(headline__startswith='Article'))
+>>> Article.objects.filter(headline__startswith='Article')
 [Article% with percent sign, Article_ with underscore, Article 5, Article 6, Article 4, Article 2, Article 3, Article 7, Article 1]
->>> list(Article.objects.filter(headline__startswith='Article%'))
+>>> Article.objects.filter(headline__startswith='Article%')
 [Article% with percent sign]
 """

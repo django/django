@@ -8,7 +8,7 @@ from django.db import models
 
 class PersonManager(models.Manager):
     def get_fun_people(self):
-        return list(self.filter(fun=True))
+        return self.filter(fun=True)
 
 class Person(models.Model):
     first_name = models.CharField(maxlength=30)
@@ -68,20 +68,20 @@ Traceback (most recent call last):
     ...
 AttributeError: type object 'Book' has no attribute 'objects'
 
->>> list(Book.published_objects)
+>>> Book.published_objects.all()
 [How to program]
 
 >>> c1 = Car(name='Corvette', mileage=21, top_speed=180)
 >>> c1.save()
 >>> c2 = Car(name='Neon', mileage=31, top_speed=100)
 >>> c2.save()
->>> list(Car.cars.order_by('name'))
+>>> Car.cars.order_by('name')
 [Corvette, Neon]
->>> list(Car.fast_cars)
+>>> Car.fast_cars.all()
 [Corvette]
 
 # Each model class gets a "_default_manager" attribute, which is a reference
 # to the first manager defined in the class. In this case, it's "cars".
->>> list(Car._default_manager.order_by('name'))
+>>> Car._default_manager.order_by('name')
 [Corvette, Neon]
 """

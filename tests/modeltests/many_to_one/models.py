@@ -59,10 +59,10 @@ John's second story
 2
 
 # Reporter objects have access to their related Article objects.
->>> list(r.article_set.order_by('pub_date'))
+>>> r.article_set.order_by('pub_date')
 [This is a test, John's second story]
 
->>> list(r.article_set.filter(headline__startswith='This'))
+>>> r.article_set.filter(headline__startswith='This')
 This is a test
 
 >>> r.article_set.count()
@@ -72,24 +72,24 @@ This is a test
 1
 
 # Get articles by id
->>> list(Article.objects.filter(id__exact=1))
+>>> Article.objects.filter(id__exact=1)
 [This is a test]
->>> list(Article.objects.filter(pk=1))
+>>> Article.objects.filter(pk=1)
 [This is a test]
 
 # Query on an article property
->>> list(Article.objects.filter(headline__startswith='This'))
+>>> Article.objects.filter(headline__startswith='This')
 [This is a test]
 
 # The API automatically follows relationships as far as you need.
 # Use double underscores to separate relationships.
 # This works as many levels deep as you want. There's no limit.
 # Find all Articles for any Reporter whose first name is "John".
->>> list(Article.objects.filter(reporter__first_name__exact='John').order_by('pub_date'))
+>>> Article.objects.filter(reporter__first_name__exact='John').order_by('pub_date')
 [This is a test, John's second story]
 
 # Query twice over the related field.
->>> list(Article.objects.filter(reporter__first_name__exact='John', reporter__last_name__exact='Smith'))
+>>> Article.objects.filter(reporter__first_name__exact='John', reporter__last_name__exact='Smith')
 [This is a test, John's second story]
 
 # The underlying query only makes one join when a related table is referenced twice.
@@ -99,29 +99,29 @@ This is a test
 1
 
 # The automatically joined table has a predictable name.
->>> list(Article.objects.filter(reporter__first_name__exact='John').extra(where=["many_to_one_article__reporter.last_name='Smith'"]))
+>>> Article.objects.filter(reporter__first_name__exact='John').extra(where=["many_to_one_article__reporter.last_name='Smith'"])
 [This is a test, John's second story]
 
 # Find all Articles for the Reporter whose ID is 1.
->>> list(Article.objects.filter(reporter__id__exact=1).order_by('pub_date'))
+>>> Article.objects.filter(reporter__id__exact=1).order_by('pub_date')
 [This is a test, John's second story]
->>> list(Article.objects.filter(reporter__pk=1).order_by('pub_date'))
+>>> Article.objects.filter(reporter__pk=1).order_by('pub_date')
 [This is a test, John's second story]
 
 # You need two underscores between "reporter" and "id" -- not one.
->>> list(Article.objects.filter(reporter_id__exact=1))
+>>> Article.objects.filter(reporter_id__exact=1)
 Traceback (most recent call last):
     ...
 TypeError: Cannot resolve keyword 'reporter_id' into field
 
 # You need to specify a comparison clause
->>> list(Article.objects.filter(reporter_id=1))
+>>> Article.objects.filter(reporter_id=1)
 Traceback (most recent call last):
     ...
 TypeError: Cannot resolve keyword 'reporter_id' into field
 
 # "pk" shortcut syntax works in a related context, too.
->>> list(Article.objects.filter(reporter__pk=1).order_by('pub_date'))
+>>> Article.objects.filter(reporter__pk=1).order_by('pub_date')
 [This is a test, John's second story]
 
 # You can also instantiate an Article by passing
@@ -140,27 +140,27 @@ John Smith
 John Smith
 
 # Reporters can be queried
->>> list(Reporter.objects.filter(id__exact=1))
+>>> Reporter.objects.filter(id__exact=1)
 [John Smith]
->>> list(Reporter.objects.filter(pk=1))
+>>> Reporter.objects.filter(pk=1)
 [John Smith]
->>> list(Reporter.objects.filter(first_name__startswith='John'))
+>>> Reporter.objects.filter(first_name__startswith='John')
 [John Smith]
 
 # Reporters can query in opposite direction of ForeignKey definition
->>> list(Reporter.objects.filter(article__id__exact=1))
+>>> Reporter.objects.filter(article__id__exact=1)
 [John Smith]
->>> list(Reporter.objects.filter(article__pk=1))
+>>> Reporter.objects.filter(article__pk=1)
 [John Smith]
->>> list(Reporter.objects.filter(article__headline__startswith='This'))
+>>> Reporter.objects.filter(article__headline__startswith='This')
 [John Smith, John Smith, John Smith]
->>> list(Reporter.objects.filter(article__headline__startswith='This').distinct())
+>>> Reporter.objects.filter(article__headline__startswith='This').distinct()
 [John Smith]
 
 # Queries can go round in circles.
->>> list(Reporter.objects.filter(article__reporter__first_name__startswith='John'))
+>>> Reporter.objects.filter(article__reporter__first_name__startswith='John')
 [John Smith, John Smith, John Smith, John Smith]
->>> list(Reporter.objects.filter(article__reporter__first_name__startswith='John').distinct())
+>>> Reporter.objects.filter(article__reporter__first_name__startswith='John').distinct()
 [John Smith]
 
 # Deletes that require joins are prohibited.
@@ -170,14 +170,14 @@ Traceback (most recent call last):
 TypeError: Joins are not allowed in this type of query
 
 # If you delete a reporter, his articles will be deleted.
->>> list(Article.objects.order_by('headline'))
+>>> Article.objects.order_by('headline')
 [John's second story, Paul's story, This is a test, This is a test, This is a test]
->>> list(Reporter.objects.order_by('first_name'))
+>>> Reporter.objects.order_by('first_name')
 [John Smith, Paul Jones]
 >>> r.delete()
->>> list(Article.objects.order_by('headline'))
+>>> Article.objects.order_by('headline')
 [Paul's story]
->>> list(Reporter.objects.order_by('first_name'))
+>>> Reporter.objects.order_by('first_name')
 [Paul Jones]
 
 """

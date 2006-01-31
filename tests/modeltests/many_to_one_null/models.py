@@ -46,9 +46,9 @@ Second
 1
 
 # Reporter objects have access to their related Article objects.
->>> list(r.article_set.order_by('headline'))
+>>> r.article_set.order_by('headline')
 [First, Second]
->>> list(r.article_set.filter(headline__startswith='Fir'))
+>>> r.article_set.filter(headline__startswith='Fir')
 First
 >>> r.article_set.count()
 2
@@ -73,6 +73,6 @@ Traceback (most recent call last):
 DoesNotExist
 
 # To retrieve the articles with no reporters set, use "reporter__isnull=True".
->>> list(Article.objects.filter(reporter__isnull=True))
+>>> Article.objects.filter(reporter__isnull=True)
 [Third]
 """
