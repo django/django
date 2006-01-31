@@ -85,6 +85,9 @@ class Manager(object):
     def in_bulk(self, *args, **kwargs):
         return QuerySet(self.model).in_bulk(*args, **kwargs)
 
+    def iterator(self, *args, **kwargs):
+        return QuerySet(self.model).iterator(*args, **kwargs)
+
     def order_by(self, *args, **kwargs):
         return QuerySet(self.model).order_by(*args, **kwargs)
 

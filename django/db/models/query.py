@@ -190,67 +190,33 @@ class QuerySet(object):
         _, sql, params = del_query._get_sql_clause(False)
         cursor.execute("DELETE " + sql, params)
 
+    ##################################################
+    # PUBLIC METHODS THAT RETURN A QUERYSET SUBCLASS #
+    ##################################################
+
     def in_bulk(self, id_list):
         assert isinstance(id_list, list), "in_bulk() must be provided with a list of IDs."
         assert id_list != [], "in_bulk() cannot be passed an empty ID list."
-        bulk_query = self._clone()
-        bulk_query._where.append("%s.%s IN (%s)" % (backend.quote_name(self.model._meta.db_table), backend.quote_name(self.model._meta.pk.column), ",".join(['%s'] * len(id_list))))
-        bulk_query._params.extend(id_list)
-        return dict([(obj._get_pk_val(), obj) for obj in bulk_query.iterator()])
+        return self._clone(klass=InBulkQuerySet, _id_list=id_list)
 
     def values(self, *fields):
-        # select_related and select aren't supported in values().
-        values_query = self._clone(_select_related=False, _select={})
-
-        # 'fields' is a list of field names to fetch.
-        if fields:
-            columns = [self.model._meta.get_field(f, many_to_many=False).column for f in fields]
-        else: # Default to all fields.
-            columns = [f.column for f in self.model._meta.fields]
-
-        cursor = connection.cursor()
-        select, sql, params = values_query._get_sql_clause(True)
-        select = ['%s.%s' % (backend.quote_name(self.model._meta.db_table), backend.quote_name(c)) for c in columns]
-        cursor.execute("SELECT " + (self._distinct and "DISTINCT " or "") + ",".join(select) + sql, params)
-        while 1:
-            rows = cursor.fetchmany(GET_ITERATOR_CHUNK_SIZE)
-            if not rows:
-                raise StopIteration
-            for row in rows:
-                yield dict(zip(columns, row))
+        return self._clone(klass=ValuesQuerySet, _fields=fields)
 
     def dates(self, field_name, kind, order='ASC'):
         """
         Returns a list of datetime objects representing all available dates
         for the given field_name, scoped to 'kind'.
         """
-        from django.db.backends.util import typecast_timestamp
-
         assert kind in ("month", "year", "day"), "'kind' must be one of 'year', 'month' or 'day'."
         assert order in ('ASC', 'DESC'), "'order' must be either 'ASC' or 'DESC'."
         # Let the FieldDoesNotExist exception propogate.
         field = self.model._meta.get_field(field_name, many_to_many=False)
         assert isinstance(field, DateField), "%r isn't a DateField." % field_name
+        return self._clone(klass=DateQuerySet, _field=field, _kind=kind, _order=order)
 
-        date_query = self._clone()
-        date_query._order_by = () # Clear this because it'll mess things up otherwise.
-        if field.null:
-            date_query._where.append('%s.%s IS NOT NULL' % \
-                (backend.quote_name(self.model._meta.db_table), backend.quote_name(field.column)))
-        select, sql, params = date_query._get_sql_clause(True)
-        sql = 'SELECT %s %s GROUP BY 1 ORDER BY 1 %s' % \
-            (backend.get_date_trunc_sql(kind, '%s.%s' % (backend.quote_name(self.model._meta.db_table),
-            backend.quote_name(field.column))), sql, order)
-        cursor = connection.cursor()
-        cursor.execute(sql, params)
-        # We have to manually run typecast_timestamp(str()) on the results, because
-        # MySQL doesn't automatically cast the result of date functions as datetime
-        # objects -- MySQL returns the values as strings, instead.
-        return [typecast_timestamp(str(row[0])) for row in cursor.fetchall()]
-
-    #############################################
-    # PUBLIC METHODS THAT RETURN A NEW QUERYSET #
-    #############################################
+    ##################################################################
+    # PUBLIC METHODS THAT ALTER ATTRIBUTES AND RETURN A NEW QUERYSET #
+    ##################################################################
 
     def filter(self, *args, **kwargs):
         "Returns a new QuerySet instance with the args ANDed to the existing set."
@@ -285,8 +251,10 @@ class QuerySet(object):
     # PRIVATE METHODS #
     ###################
 
-    def _clone(self, **kwargs):
-        c = QuerySet()
+    def _clone(self, klass=None, **kwargs):
+        if klass is None:
+            klass = self.__class__
+        c = klass()
         c.model = self.model
         c._filters = self._filters
         c._order_by = self._order_by
@@ -401,6 +369,61 @@ class QuerySet(object):
             assert self._offset is None, "'offset' is not allowed without 'limit'"
 
         return select, " ".join(sql), params
+
+class InBulkQuerySet(QuerySet):
+    def iterator(self):
+        self._where.append("%s.%s IN (%s)" % (backend.quote_name(self.model._meta.db_table), backend.quote_name(self.model._meta.pk.column), ",".join(['%s'] * len(self._id_list))))
+        self._params.extend(self._id_list)
+        yield dict([(obj._get_pk_val(), obj) for obj in QuerySet.iterator(self)])
+
+    def _get_data(self):
+        if self._result_cache is None:
+            for i in self.iterator():
+                self._result_cache = i
+        return self._result_cache
+
+class ValuesQuerySet(QuerySet):
+    def iterator(self):
+        # select_related and select aren't supported in values().
+        self._select_related = False
+        self._select = {}
+
+        # self._fields is a list of field names to fetch.
+        if self._fields:
+            columns = [self.model._meta.get_field(f, many_to_many=False).column for f in self._fields]
+            field_names = [f.attname for f in self._fields]
+        else: # Default to all fields.
+            columns = [f.column for f in self.model._meta.fields]
+            field_names = [f.attname for f in self.model._meta.fields]
+
+        cursor = connection.cursor()
+        select, sql, params = self._get_sql_clause(True)
+        select = ['%s.%s' % (backend.quote_name(self.model._meta.db_table), backend.quote_name(c)) for c in columns]
+        cursor.execute("SELECT " + (self._distinct and "DISTINCT " or "") + ",".join(select) + sql, params)
+        while 1:
+            rows = cursor.fetchmany(GET_ITERATOR_CHUNK_SIZE)
+            if not rows:
+                raise StopIteration
+            for row in rows:
+                yield dict(zip(field_names, row))
+
+class DateQuerySet(QuerySet):
+    def iterator(self):
+        from django.db.backends.util import typecast_timestamp
+        self._order_by = () # Clear this because it'll mess things up otherwise.
+        if self._field.null:
+            date_query._where.append('%s.%s IS NOT NULL' % \
+                (backend.quote_name(self.model._meta.db_table), backend.quote_name(self._field.column)))
+        select, sql, params = self._get_sql_clause(True)
+        sql = 'SELECT %s %s GROUP BY 1 ORDER BY 1 %s' % \
+            (backend.get_date_trunc_sql(self._kind, '%s.%s' % (backend.quote_name(self.model._meta.db_table),
+            backend.quote_name(self._field.column))), sql, self._order)
+        cursor = connection.cursor()
+        cursor.execute(sql, params)
+        # We have to manually run typecast_timestamp(str()) on the results, because
+        # MySQL doesn't automatically cast the result of date functions as datetime
+        # objects -- MySQL returns the values as strings, instead.
+        return [typecast_timestamp(str(row[0])) for row in cursor.fetchall()]
 
 class QOperator:
     "Base class for QAnd and QOr"

@@ -33,7 +33,8 @@ API_TESTS = """
 >>> a7 = Article(headline='Article 7', pub_date=datetime(2005, 7, 27))
 >>> a7.save()
 
-# iterator() is a generator.
+# Each QuerySet gets iterator(), which is a generator that "lazily" returns
+# results using database-level iteration.
 >>> for a in Article.objects.iterator():
 ...     print a.headline
 Article 5
@@ -92,6 +93,20 @@ TypeError: in_bulk() got an unexpected keyword argument 'headline__startswith'
 True
 
 >>> for d in Article.objects.values('id', 'headline'):
+...     i = d.items()
+...     i.sort()
+...     i
+[('headline', 'Article 5'), ('id', 5)]
+[('headline', 'Article 6'), ('id', 6)]
+[('headline', 'Article 4'), ('id', 4)]
+[('headline', 'Article 2'), ('id', 2)]
+[('headline', 'Article 3'), ('id', 3)]
+[('headline', 'Article 7'), ('id', 7)]
+[('headline', 'Article 1'), ('id', 1)]
+
+# You can use values() with iterator() for memory savings, because iterator()
+# uses database-level iteration.
+>>> for d in Article.objects.values('id', 'headline').iterator():
 ...     i = d.items()
 ...     i.sort()
 ...     i

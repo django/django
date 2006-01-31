@@ -37,14 +37,13 @@ datetime.datetime(2005, 7, 28, 0, 0)
 >>> a.headline = 'Area woman programs in Python'
 >>> a.save()
 
-# Listing objects displays all the articles in the database. Note that the article
-# is represented by "<Article object>", because we haven't given the Article
-# model a __repr__() method.
+# Article.objects.all() returns all the articles in the database. Note that
+# the article is represented by "<Article object>", because we haven't given
+# the Article model a __repr__() method.
 >>> Article.objects.all()
 [<Article object>]
 
-# Django provides a rich database lookup API that's entirely driven by
-# keyword arguments.
+# Django provides a rich database lookup API.
 >>> Article.objects.get(id__exact=1)
 <Article object>
 >>> Article.objects.get(headline__startswith='Area woman')
@@ -56,7 +55,7 @@ datetime.datetime(2005, 7, 28, 0, 0)
 >>> Article.objects.get(pub_date__year=2005, pub_date__month=7, pub_date__day=28)
 <Article object>
 
-# You can omit __exact if you want
+# The "__exact" lookup type can be omitted, as a shortcut.
 >>> Article.objects.get(id=1)
 <Article object>
 >>> Article.objects.get(headline='Area woman programs in Python')
@@ -69,7 +68,8 @@ datetime.datetime(2005, 7, 28, 0, 0)
 >>> Article.objects.filter(pub_date__year=2005, pub_date__month=7)
 [<Article object>]
 
-# Django raises an ArticleDoesNotExist exception for get()
+# Django raises an Article.DoesNotExist exception for get() if the parameters
+# don't match any object.
 >>> Article.objects.get(id__exact=2)
 Traceback (most recent call last):
     ...
@@ -82,7 +82,7 @@ DoesNotExist: Article does not exist for ...
 
 # Lookup by a primary key is the most common case, so Django provides a
 # shortcut for primary-key exact lookups.
-# The following is identical to articles.get(id__exact=1).
+# The following is identical to articles.get(id=1).
 >>> Article.objects.get(pk=1)
 <Article object>
 
@@ -93,7 +93,7 @@ DoesNotExist: Article does not exist for ...
 True
 
 # You can initialize a model instance using positional arguments, which should
-# match the field order as defined in the model...
+# match the field order as defined in the model.
 >>> a2 = Article(None, 'Second article', datetime(2005, 7, 29))
 >>> a2.save()
 >>> a2.id
@@ -126,7 +126,8 @@ Traceback (most recent call last):
     ...
 TypeError: 'foo' is an invalid keyword argument for this function
 
-# You can leave off the ID.
+# You can leave off the value for an AutoField when creating an object, because
+# it'll get filled in automatically when you save().
 >>> a5 = Article(headline='Article 6', pub_date=datetime(2005, 7, 31))
 >>> a5.save()
 >>> a5.id
@@ -154,7 +155,7 @@ datetime.datetime(2005, 7, 31, 12, 30, 45)
 >>> a8.id
 8L
 
-# Saving an object again shouldn't create a new object -- it just saves the old one.
+# Saving an object again doesn't create a new object -- it just saves the old one.
 >>> a8.save()
 >>> a8.id
 8L
@@ -174,6 +175,7 @@ True
 >>> Article.objects.get(id__exact=8) == Article.objects.get(id__exact=7)
 False
 
+# dates() returns a list of available dates of the given scope for the given field.
 >>> Article.objects.dates('pub_date', 'year')
 [datetime.datetime(2005, 1, 1, 0, 0)]
 >>> Article.objects.dates('pub_date', 'month')
@@ -185,7 +187,7 @@ False
 >>> Article.objects.dates('pub_date', 'day', order='DESC')
 [datetime.datetime(2005, 7, 31, 0, 0), datetime.datetime(2005, 7, 30, 0, 0), datetime.datetime(2005, 7, 29, 0, 0), datetime.datetime(2005, 7, 28, 0, 0)]
 
-# Try some bad arguments to dates().
+# dates() requires valid arguments.
 
 >>> Article.objects.dates()
 Traceback (most recent call last):
@@ -207,7 +209,16 @@ Traceback (most recent call last):
    ...
 AssertionError: 'order' must be either 'ASC' or 'DESC'.
 
-# You can combine queries with & and |
+# Use iterator() with dates() to return a generator that lazily requests each
+# result one at a time, to save memory.
+>>> for a in Article.objects.dates('pub_date', 'day', order='DESC').iterator():
+...     print repr(a)
+datetime.datetime(2005, 7, 31, 0, 0)
+datetime.datetime(2005, 7, 30, 0, 0)
+datetime.datetime(2005, 7, 29, 0, 0)
+datetime.datetime(2005, 7, 28, 0, 0)
+
+# You can combine queries with & and |.
 >>> s1 = Article.objects.filter(id__exact=1)
 >>> s2 = Article.objects.filter(id__exact=2)
 >>> tmp = [a.id for a in list(s1 | s2)]
@@ -231,7 +242,7 @@ AssertionError: 'order' must be either 'ASC' or 'DESC'.
 [<Article object>, <Article object>]
 
 # An Article instance doesn't have access to the "objects" attribute.
-# That is only available as a class method.
+# That's only available on the class.
 >>> a7.objects.all()
 Traceback (most recent call last):
     ...
