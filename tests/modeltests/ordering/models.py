@@ -48,11 +48,11 @@ API_TESTS = """
 >>> Article.objects.order_by('pub_date', '-headline')
 [Article 1, Article 3, Article 2, Article 4]
 
-# Use the "limit" parameter to limit the results.
->>> Article.objects.order_by('headline')[:3]
+# Use the 'stop' part of slicing notation to limit the results.
+>>> Article.objects.order_by('headline')[:2]
 [Article 1, Article 2]
 
-# Use the "offset" parameter with "limit" to offset the result list.
+# Use the 'stop' and 'start' parts of slicing notation to offset the result list.
 >>> Article.objects.order_by('headline')[1:3]
 [Article 2, Article 3]
 
