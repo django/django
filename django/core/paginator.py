@@ -16,7 +16,7 @@ class ObjectPaginator:
     Finally, check if a page number has a next/prev page using
     has_next_page(page_number) and has_previous_page(page_number).
     """
-    def __init__(self, manager_or_model, args, num_per_page, count_method='get_count', list_method='get_list'):
+    def __init__(self, manager_or_model, args, num_per_page, count_method='count', list_method='all'):
         if hasattr(manager_or_model, '_default_manager'):
             manager = manager_or_model._default_manager
         else:

@@ -559,12 +559,12 @@ def installperms(app):
     num_added = 0
     app_models = get_models(app)
     app_label = app_models[0]._meta.app_label
-    package = Package.objects.get_object(pk=app_label)
+    package = Package.objects.get(pk=app_label)
     for klass in app_models:
         opts = klass._meta
         for codename, name in _get_all_permissions(opts):
             try:
-                Permission.objects.get_object(name__exact=name, codename__exact=codename, package__label__exact=package.label)
+                Permission.objects.get(name=name, codename=codename, package__label__exact=package.label)
             except Permission.DoesNotExist:
                 p = Permission(name=name, package=package, codename=codename)
                 p.save()
@@ -644,7 +644,7 @@ def createsuperuser(username=None, email=None, password=None):
                 sys.stderr.write("Error: That username is invalid.\n")
                 username = None
             try:
-                User.objects.get_object(username__exact=username)
+                User.objects.get(username=username)
             except User.DoesNotExist:
                 break
             else:

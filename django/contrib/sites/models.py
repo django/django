@@ -4,7 +4,7 @@ from django.utils.translation import gettext_lazy as _
 class SiteManager(models.Manager):
     def get_current(self):
         from django.conf import settings
-        return self.get_object(pk=settings.SITE_ID)
+        return self.get(pk=settings.SITE_ID)
 
 class Site(models.Model):
     domain = models.CharField(_('domain name'), maxlength=100)

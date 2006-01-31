@@ -29,7 +29,7 @@ class AuthenticationForm(forms.Manipulator):
 
     def isValidUser(self, field_data, all_data):
         try:
-            self.user_cache = User.objects.get_object(username__exact=field_data)
+            self.user_cache = User.objects.get(username=field_data)
         except User.DoesNotExist:
             raise validators.ValidationError, _("Please enter a correct username and password. Note that both fields are case-sensitive.")
 

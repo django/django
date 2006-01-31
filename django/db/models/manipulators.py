@@ -250,7 +250,7 @@ class AutomaticChangeManipulator(AutomaticManipulator):
     def __init__(self, obj_key, follow=None):
         self.obj_key = obj_key
         try:
-            self.original_object = self.manager.get_object(pk=obj_key)
+            self.original_object = self.manager.get(pk=obj_key)
         except ObjectDoesNotExist:
             # If the object doesn't exist, this might be a manipulator for a
             # one-to-one related object that hasn't created its subobject yet.

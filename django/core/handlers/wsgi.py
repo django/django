@@ -126,7 +126,7 @@ class WSGIRequest(http.HttpRequest):
                 user_id = self.session[SESSION_KEY]
                 if not user_id:
                     raise ValueError
-                self._user = User.objects.get_object(pk=user_id)
+                self._user = User.objects.get(pk=user_id)
             except (AttributeError, KeyError, ValueError, User.DoesNotExist):
                 from django.parts.auth import anonymoususers
                 self._user = anonymoususers.AnonymousUser()

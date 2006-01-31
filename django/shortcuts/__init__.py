@@ -12,7 +12,7 @@ load_and_render = render_to_response # For backwards compatibility.
 
 def get_object_or_404(klass, **kwargs):
     try:
-        return klass._default_manager.get_object(**kwargs)
+        return klass._default_manager.get(**kwargs)
     except klass.DoesNotExist:
         raise Http404
 

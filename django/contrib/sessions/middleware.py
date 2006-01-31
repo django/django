@@ -46,7 +46,7 @@ class SessionWrapper(object):
                 self._session_cache = {}
             else:
                 try:
-                    s = Session.objects.get_object(session_key__exact=self.session_key,
+                    s = Session.objects.get(session_key=self.session_key,
                         expire_date__gt=datetime.datetime.now())
                     self._session_cache = s.get_decoded()
                 except Session.DoesNotExist:

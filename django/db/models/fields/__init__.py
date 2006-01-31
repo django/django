@@ -256,7 +256,7 @@ class Field(object):
             return first_choice + list(self.choices)
         rel_model = self.rel.to
         return first_choice + [(x._get_pk_val(), str(x))
-                               for x in rel_model._default_manager.get_list(**rel_model._meta.limit_choices_to)]
+                               for x in rel_model._default_manager.filter(**rel_model._meta.limit_choices_to)]
 
     def get_choices_default(self):
         if self.radio_admin:

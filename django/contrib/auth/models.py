@@ -183,7 +183,7 @@ class User(models.Model):
 
     def get_and_delete_messages(self):
         messages = []
-        for m in self.get_message_list():
+        for m in self.message_set.all():
             messages.append(m.message)
             m.delete()
         return messages
@@ -205,11 +205,11 @@ class User(models.Model):
             try:
                 app, mod = settings.AUTH_PROFILE_MODULE.split('.')
                 module = __import__('ellington.%s.apps.%s' % (app, mod), [], [], [''])
-                self._profile_cache = module.get_object(user_id=self.id)
+                self._profile_cache = module.get(user_id=self.id)
             except ImportError:
                 try:
                     module = __import__('django.models.%s' % settings.AUTH_PROFILE_MODULE, [], [], [''])
-                    self._profile_cache = module.get_object(user__id__exact=self.id)
+                    self._profile_cache = module.get(user__id__exact=self.id)
                 except ImportError:
                     raise SiteProfileNotAvailable
         return self._profile_cache

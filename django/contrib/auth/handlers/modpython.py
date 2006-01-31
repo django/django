@@ -21,13 +21,13 @@ def authenhandler(req, **kwargs):
     superuser_only = _str_to_bool(options.get('DjangoRequireSuperuserStatus', "off"))
 
     # check that the username is valid
-    kwargs = {'username__exact': req.user, 'is_active__exact': True}
+    kwargs = {'username': req.user, 'is_active': True}
     if staff_only:
-        kwargs['is_staff__exact'] = True
+        kwargs['is_staff'] = True
     if superuser_only:
-        kwargs['is_superuser__exact'] = True
+        kwargs['is_superuser'] = True
     try:
-        user = User.objects.get_object(**kwargs)
+        user = User.objects.get(**kwargs)
     except User.DoesNotExist:
         return apache.HTTP_UNAUTHORIZED
 

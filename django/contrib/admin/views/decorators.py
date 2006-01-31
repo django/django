@@ -71,13 +71,13 @@ def staff_member_required(view_func):
         # Check the password.
         username = request.POST.get('username', '')
         try:
-            user = User.objects.get_object(username__exact=username, is_staff__exact=True)
+            user = User.objects.get(username=username, is_staff=True)
         except User.DoesNotExist:
             message = ERROR_MESSAGE
             if '@' in username:
                 # Mistakenly entered e-mail address instead of username? Look it up.
                 try:
-                    user = User.objects.get_object(email__exact=username)
+                    user = User.objects.get(email=username)
                 except User.DoesNotExist:
                     message = _("Usernames cannot contain the '@' character.")
                 else:
