@@ -235,7 +235,7 @@ datetime.datetime(2005, 7, 28, 0, 0)
 # You can get items using index and slice notation.
 >>> Article.objects.all()[0]
 <Article object>
->>> Article.objects.all()[1:2]
+>>> Article.objects.all()[1:3]
 [<Article object>, <Article object>]
 >>> s3 = Article.objects.filter(id__exact=3)
 >>> (s1 | s2 | s3)[::2]
