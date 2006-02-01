@@ -39,7 +39,7 @@ class UserManager(models.Manager):
     def create_user(self, username, email, password):
         "Creates and saves a User with the given username, e-mail and password."
         now = datetime.datetime.now()
-        user = self.klass(None, username, '', '', email.strip().lower(), 'placeholder', False, True, False, now, now)
+        user = self.model(None, username, '', '', email.strip().lower(), 'placeholder', False, True, False, now, now)
         user.set_password(password)
         user.save()
         return user
