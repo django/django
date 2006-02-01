@@ -297,7 +297,7 @@ def get_sql_initial_data(app):
         opts = klass._meta
 
         # Add custom SQL, if it's available.
-        # FIXME: THis probably needs changing
+        # FIXME: This probably needs changing
         sql_files = [os.path.join(app_dir, opts.module_name + '.' + settings.DATABASE_ENGINE +  '.sql'),
                      os.path.join(app_dir, opts.module_name + '.sql')]
         for sql_file in sql_files:
@@ -314,7 +314,6 @@ def get_sql_initial_data(app):
     return output
 get_sql_initial_data.help_doc = "Prints the initial INSERT SQL statements for the given app name(s)."
 get_sql_initial_data.args = APP_ARGS
-
 
 def get_sql_sequence_reset(app):
     "Returns a list of the SQL statements to reset PostgreSQL sequences for the given app."
@@ -551,6 +550,50 @@ The full error: %s\n""" % \
 install.help_doc = "Executes ``sqlall`` for the given app(s) in the current database."
 install.args = APP_ARGS
 
+def reset(app):
+    "Executes the equivalent of 'get_sql_reset' in the current database."
+    from django.db import connection
+    from cStringIO import StringIO
+    app_name = app.__name__[app.__name__.rindex('.')+1:]
+    app_label = app_name.split('.')[-1]
+
+    # First, try validating the models.
+    s = StringIO()
+    num_errors = get_validation_errors(s)
+    if num_errors:
+        sys.stderr.write("Error: %s couldn't be installed, because there were errors in your model:\n" % app_name)
+        s.seek(0)
+        sys.stderr.write(s.read())
+        sys.exit(1)
+    sql_list = get_sql_reset(app)
+
+    confirm = raw_input("""
+You have requested a database reset.
+This will IRREVERSIBLY DESTROY any data in your database.
+Are you sure you want to do this?
+
+Type 'yes' to continue, or 'no' to cancel: """)
+    if confirm == 'yes':
+        try:
+            cursor = connection.cursor()
+            for sql in sql_list:
+                cursor.execute(sql)
+        except Exception, e:
+            sys.stderr.write("""Error: %s couldn't be installed. Possible reasons:
+  * The database isn't running or isn't configured correctly.
+  * At least one of the database tables already exists.
+  * The SQL was invalid.
+Hint: Look at the output of 'django-admin.py sqlreset %s'. That's the SQL this command wasn't able to run.
+The full error: %s\n""" % \
+                (app_name, app_label, e))
+            connection.rollback()
+            sys.exit(1)
+        connection.commit()
+    else:
+        print "Reset cancelled."
+reset.help_doc = "Executes ``sqlreset`` for the given app(s) in the current database."
+reset.args = APP_ARGS
+
 def installperms(app):
     "Installs any permissions for the given app, if needed."
     from django.contrib.auth.models import Permission
@@ -720,9 +763,9 @@ def inspectdb(db_name):
                 rel = relations[i]
                 rel_to = rel[1] == table_name and "'self'" or table2model(rel[1])
                 if column_name.endswith('_id'):
-                    field_desc = '%s = models.ForeignKey(%s' % (column_name[:-3], rel_to)
+                    field_desc = '%s = models.ForeignKey(%s)' % (column_name[:-3], rel_to)
                 else:
-                    field_desc = '%s = models.ForeignKey(%s, db_column=%r' % (column_name, rel_to, column_name)
+                    field_desc = '%s = models.ForeignKey(%s, db_column=%r)' % (column_name, rel_to, column_name)
             else:
                 try:
                     field_type = introspection_module.DATA_TYPES_REVERSE[row[1]]
@@ -1001,6 +1044,7 @@ DEFAULT_ACTION_MAPPING = {
     'inspectdb': inspectdb,
     'install': install,
     'installperms': installperms,
+    'reset': reset,
     'runserver': runserver,
     'shell': run_shell,
     'sql': get_sql_create,
@@ -1015,7 +1059,15 @@ DEFAULT_ACTION_MAPPING = {
     'validate': validate,
 }
 
-NO_SQL_TRANSACTION = ('adminindex', 'createcachetable', 'dbcheck', 'install', 'installperms', 'sqlindexes')
+NO_SQL_TRANSACTION = (
+    'adminindex', 
+    'createcachetable', 
+    'dbcheck', 
+    'install', 
+    'installperms', 
+    'reset',
+    'sqlindexes'
+)
 
 class DjangoOptionParser(OptionParser):
     def print_usage_and_exit(self):
