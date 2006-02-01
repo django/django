@@ -209,8 +209,8 @@ class KarmaScoreManager(models.Manager):
     def vote(self, user_id, comment_id, score):
         try:
             karma = self.get_object(comment__id__exact=comment_id, user__id__exact=user_id)
-        except self.klass.DoesNotExist:
-            karma = self.klass(None, user_id, comment_id, score, datetime.datetime.now())
+        except self.model.DoesNotExist:
+            karma = self.model(None, user_id, comment_id, score, datetime.datetime.now())
             karma.save()
         else:
             karma.score = score
@@ -251,9 +251,9 @@ class UserFlagManager(models.Manager):
             return # A user can't flag his own comment. Fail silently.
         try:
             f = self.get_object(user__id__exact=user.id, comment__id__exact=comment.id)
-        except self.klass.DoesNotExist:
+        except self.model.DoesNotExist:
             from django.core.mail import mail_managers
-            f = self.klass(None, user.id, comment.id, None)
+            f = self.model(None, user.id, comment.id, None)
             message = _('This comment was flagged by %(user)s:\n\n%(text)s') % {'user': user.username, 'text': comment.get_as_text()}
             mail_managers('Comment flagged', message, fail_silently=True)
             f.save()
