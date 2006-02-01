@@ -127,7 +127,7 @@ def items_for_result(cl, result):
 
             if isinstance(f.rel, models.ManyToOne):
                 if field_val is not None:
-                    result_repr = getattr(result, 'get_%s' % f.name)()
+                    result_repr = getattr(result, f.name)
                 else:
                     result_repr = EMPTY_CHANGELIST_VALUE
             # Dates and times are special: They're formatted in a certain way.
@@ -186,25 +186,17 @@ def result_list(cl):
 result_list = register.inclusion_tag("admin/change_list_results")(result_list)
 
 def date_hierarchy(cl):
-    lookup_opts, params, lookup_params, manager = \
-      cl.lookup_opts, cl.params, cl.lookup_params, cl.manager
-
-    if lookup_opts.admin.date_hierarchy:
-        field_name = lookup_opts.admin.date_hierarchy
-
+    if cl.lookup_opts.admin.date_hierarchy:
+        field_name = cl.lookup_opts.admin.date_hierarchy
         year_field = '%s__year' % field_name
         month_field = '%s__month' % field_name
         day_field = '%s__day' % field_name
         field_generic = '%s__' % field_name
-        year_lookup = params.get(year_field)
-        month_lookup = params.get(month_field)
-        day_lookup = params.get(day_field)
+        year_lookup = cl.params.get(year_field)
+        month_lookup = cl.params.get(month_field)
+        day_lookup = cl.params.get(day_field)
 
-        def link(d):
-            return cl.get_query_string(d, [field_generic])
-
-        def get_dates(unit, params):
-            return getattr(manager, 'get_%s_list' % field_name)(unit, **params)
+        link = lambda d: cl.get_query_string(d, [field_generic])
 
         if year_lookup and month_lookup and day_lookup:
             month_name = MONTHS[int(month_lookup)]
@@ -217,9 +209,7 @@ def date_hierarchy(cl):
                 'choices': [{'title': "%s %s" % (month_name, day_lookup)}]
             }
         elif year_lookup and month_lookup:
-            date_lookup_params = lookup_params.copy()
-            date_lookup_params.update({year_field: year_lookup, month_field: month_lookup})
-            days = get_dates('day', date_lookup_params)
+            days = cl.query_set.filter(**{year_field: year_lookup, month_field: month_lookup}).dates(field_name, 'day')
             return {
                 'show': True,
                 'back': {
@@ -232,9 +222,7 @@ def date_hierarchy(cl):
                 } for day in days]
             }
         elif year_lookup:
-            date_lookup_params = lookup_params.copy()
-            date_lookup_params.update({year_field: year_lookup})
-            months = get_dates('month', date_lookup_params)
+            months = cl.query_set.filter(**{year_field: year_lookup}).dates(field_name, 'month')
             return {
                 'show' : True,
                 'back': {
@@ -242,18 +230,18 @@ def date_hierarchy(cl):
                     'title': _('All dates')
                 },
                 'choices': [{
-                    'link': link( {year_field: year_lookup, month_field: month.month}),
-                    'title': "%s %s" % (month.strftime('%B') ,  month.year)
+                    'link': link({year_field: year_lookup, month_field: month.month}),
+                    'title': "%s %s" % (month.strftime('%B'), month.year)
                 } for month in months]
             }
         else:
-            years = get_dates('year', lookup_params)
+            years = cl.query_set.dates(field_name, 'year')
             return {
                 'show': True,
                 'choices': [{
                     'link': link({year_field: year.year}),
                     'title': year.year
-                } for year in years ]
+                } for year in years]
             }
 date_hierarchy = register.inclusion_tag('admin/date_hierarchy')(date_hierarchy)
 

@@ -6,7 +6,7 @@ from django.core.exceptions import ImproperlyConfigured, ObjectDoesNotExist, Per
 from django.core.paginator import ObjectPaginator, InvalidPage
 from django.shortcuts import get_object_or_404, render_to_response
 from django.db import models
-from django.db.models.query import handle_legacy_orderlist
+from django.db.models.query import handle_legacy_orderlist, QuerySet
 from django.http import Http404, HttpResponse, HttpResponseRedirect
 from django.template import loader
 from django.utils import dateformat
@@ -467,8 +467,8 @@ def history(request, app_label, model_name, object_id):
     model = models.get_model(app_label, model_name)
     if model is None:
         raise Http404, "App %r, model %r, not found" % (app_label, model_name)
-    action_list = LogEntry.objects.get_list(object_id__exact=object_id, content_type__id__exact=model._meta.get_content_type_id(),
-        order_by=("action_time",), select_related=True)
+    action_list = LogEntry.objects.filter(object_id=object_id,
+        content_type__id__exact=model._meta.get_content_type_id()).select_related().order_by('action_time')
     # If no history was found, see whether this object even exists.
     obj = get_object_or_404(model, pk=object_id)
     return render_to_response('admin/object_history', {
@@ -482,30 +482,39 @@ history = staff_member_required(history)
 class ChangeList(object):
     def __init__(self, request, model):
         self.model = model
-        self.opts = self.model._meta
+        self.opts = model._meta
         self.lookup_opts = self.opts
-        self.manager = self.model._default_manager
-        self.get_search_parameters(request)
-        self.get_ordering()
+        self.manager = model._default_manager
+
+        # Get search parameters from the query string.
+        try:
+            self.page_num = int(request.GET.get(PAGE_VAR, 0))
+        except ValueError:
+            self.page_num = 0
+        self.show_all = request.GET.has_key(ALL_VAR)
+        self.is_popup = request.GET.has_key(IS_POPUP_VAR)
+        self.params = dict(request.GET.items())
+        if self.params.has_key(PAGE_VAR):
+            del self.params[PAGE_VAR]
+
+        self.order_field, self.order_type = self.get_ordering()
         self.query = request.GET.get(SEARCH_VAR, '')
-        self.get_lookup_params()
+        self.query_set = self.get_query_set()
         self.get_results(request)
-        self.title = (self.is_popup
-                      and _('Select %s') % self.opts.verbose_name
-                      or _('Select %s to change') % self.opts.verbose_name)
-        self.get_filters(request)
+        self.title = (self.is_popup and _('Select %s') % self.opts.verbose_name or _('Select %s to change') % self.opts.verbose_name)
+        self.filter_specs, self.has_filters = self.get_filters(request)
         self.pk_attname = self.lookup_opts.pk.attname
 
     def get_filters(self, request):
-        self.filter_specs = []
+        filter_specs = []
         if self.lookup_opts.admin.list_filter and not self.opts.one_to_one_field:
             filter_fields = [self.lookup_opts.get_field(field_name) \
                               for field_name in self.lookup_opts.admin.list_filter]
             for f in filter_fields:
                 spec = FilterSpec.create(f, request, self.params)
                 if spec and spec.has_output():
-                    self.filter_specs.append(spec)
-        self.has_filters = bool(self.filter_specs)
+                    filter_specs.append(spec)
+        return filter_specs, bool(filter_specs)
 
     def get_query_string(self, new_params={}, remove=[]):
         p = self.params.copy()
@@ -520,57 +529,46 @@ class ChangeList(object):
                 p[k] = v
         return '?' + '&amp;'.join(['%s=%s' % (k, v) for k, v in p.items()]).replace(' ', '%20')
 
-    def get_search_parameters(self, request):
-        # Get search parameters from the query string.
-        try:
-            self.page_num = int(request.GET.get(PAGE_VAR, 0))
-        except ValueError:
-            self.page_num = 0
-        self.show_all = request.GET.has_key(ALL_VAR)
-        self.is_popup = request.GET.has_key(IS_POPUP_VAR)
-        self.params = dict(request.GET.items())
-        if self.params.has_key(PAGE_VAR):
-            del self.params[PAGE_VAR]
-
     def get_results(self, request):
-        manager, lookup_params = self.manager, self.lookup_params
-        show_all, page_num = self.show_all, self.page_num
-        # Get the results.
+        paginator = ObjectPaginator(self.query_set, DEFAULT_RESULTS_PER_PAGE)
+
+        # Get the number of objects, with admin filters applied.
         try:
-            paginator = ObjectPaginator(manager, lookup_params, DEFAULT_RESULTS_PER_PAGE)
-        # Naked except! Because we don't have any other way of validating "params".
-        # They might be invalid if the keyword arguments are incorrect, or if the
-        # values are not in the correct type (which would result in a database
-        # error).
-        except Exception:
+            result_count = paginator.hits
+        # Naked except! Because we don't have any other way of validating
+        # "params". They might be invalid if the keyword arguments are
+        # incorrect, or if the values are not in the correct type (which would
+        # result in a database error).
+        except:
             raise IncorrectLookupParameters
 
-        # Get the total number of objects, with no filters applied.
-        real_lookup_params = lookup_params.copy()
-        del real_lookup_params['order_by']
-        if real_lookup_params:
-            full_result_count = manager.get_count()
+        # Get the total number of objects, with no admin filters applied.
+        # Perform a slight optimization: Check to see whether any filters were
+        # given. If not, use paginator.hits to calculate the number of objects,
+        # because we've already done paginator.hits and the value is cached.
+        if isinstance(self.query_set._filters, models.Q) and not self.query_set._filters.kwargs:
+            full_result_count = result_count
         else:
-            full_result_count = paginator.hits
-        del real_lookup_params
-        result_count = paginator.hits
+            full_result_count = self.model._default_manager.count()
+
         can_show_all = result_count <= MAX_SHOW_ALL_ALLOWED
         multi_page = result_count > DEFAULT_RESULTS_PER_PAGE
 
         # Get the list of objects to display on this page.
-        if (show_all and can_show_all) or not multi_page:
-            result_list = manager.get_list(**lookup_params)
+        if (self.show_all and can_show_all) or not multi_page:
+            result_list = list(self.query_set)
         else:
             try:
-                result_list = paginator.get_page(page_num)
+                result_list = paginator.get_page(self.page_num)
             except InvalidPage:
-                result_list = []
-        (self.result_count, self.full_result_count, self.result_list,
-            self.can_show_all, self.multi_page, self.paginator) = (result_count,
-                  full_result_count, result_list, can_show_all, multi_page, paginator )
+                result_list = ()
 
-    def url_for_result(self, result):
-        return "%s/" % getattr(result, self.pk_attname)
+        self.result_count = result_count
+        self.full_result_count = full_result_count
+        self.result_list = result_list
+        self.can_show_all = can_show_all
+        self.multi_page = multi_page
+        self.paginator = paginator
 
     def get_ordering(self):
         lookup_opts, params = self.lookup_opts, self.params
@@ -600,55 +598,64 @@ class ChangeList(object):
                 pass # Invalid ordering specified. Just use the default.
         if params.has_key(ORDER_TYPE_VAR) and params[ORDER_TYPE_VAR] in ('asc', 'desc'):
             order_type = params[ORDER_TYPE_VAR]
-        self.order_field, self.order_type = order_field, order_type
+        return order_field, order_type
 
-    def get_lookup_params(self):
-        # Prepare the lookup parameters for the API lookup.
-        (params, order_field, lookup_opts, order_type, opts, query) = \
-           (self.params, self.order_field, self.lookup_opts, self.order_type, self.opts, self.query)
-
-        lookup_params = params.copy()
+    def get_query_set(self):
+        qs = self.model._default_manager.get_query_set()
+        lookup_params = self.params.copy() # a dictionary of the query string
         for i in (ALL_VAR, ORDER_VAR, ORDER_TYPE_VAR, SEARCH_VAR, IS_POPUP_VAR):
             if lookup_params.has_key(i):
                 del lookup_params[i]
-        # If the order-by field is a field with a relationship, order by the value
-        # in the related table.
-        lookup_order_field = order_field
-        try:
-            f = lookup_opts.get_field(order_field)
-        except models.FieldDoesNotExist:
-            pass
+
+        # Apply lookup parameters from the query string.
+        qs = qs.filter(**lookup_params)
+
+        # Use select_related() if one of the list_display options is a field
+        # with a relationship.
+        if self.lookup_opts.admin.list_select_related:
+            qs = qs.select_related()
         else:
-            if isinstance(lookup_opts.get_field(order_field).rel, models.ManyToOne):
-                f = lookup_opts.get_field(order_field)
-                rel_ordering = f.rel.to._meta.ordering and f.rel.to._meta.ordering[0] or f.rel.to._meta.pk.column
-                lookup_order_field = '%s.%s' % (f.rel.to._meta.db_table, rel_ordering)
-        # Use select_related if one of the list_display options is a field with a
-        # relationship.
-        if lookup_opts.admin.list_select_related:
-            lookup_params['select_related'] = True
-        else:
-            for field_name in lookup_opts.admin.list_display:
+            for field_name in self.lookup_opts.admin.list_display:
                 try:
-                    f = lookup_opts.get_field(field_name)
+                    f = self.lookup_opts.get_field(field_name)
                 except models.FieldDoesNotExist:
                     pass
                 else:
                     if isinstance(f.rel, models.ManyToOne):
-                        lookup_params['select_related'] = True
+                        qs = qs.select_related()
                         break
-        lookup_params['order_by'] = ((order_type == 'desc' and '-' or '') + lookup_order_field,)
-        if lookup_opts.admin.search_fields and query:
-            complex_queries = []
-            for bit in query.split():
-                or_queries = []
-                for field_name in lookup_opts.admin.search_fields:
-                    or_queries.append(models.Q(**{'%s__icontains' % field_name: bit}))
-                complex_queries.append(reduce(operator.or_, or_queries))
-            lookup_params['complex'] = reduce(operator.and_, complex_queries)
-        if opts.one_to_one_field:
-            lookup_params.update(opts.one_to_one_field.rel.limit_choices_to)
-        self.lookup_params = lookup_params
+
+        # Calculate lookup_order_field.
+        # If the order-by field is a field with a relationship, order by the
+        # value in the related table.
+        lookup_order_field = self.order_field
+        try:
+            f = self.lookup_opts.get_field(self.order_field, many_to_many=False)
+        except models.FieldDoesNotExist:
+            pass
+        else:
+            if isinstance(f.rel, models.ManyToOne):
+                rel_ordering = f.rel.to._meta.ordering and f.rel.to._meta.ordering[0] or f.rel.to._meta.pk.column
+                lookup_order_field = '%s.%s' % (f.rel.to._meta.db_table, rel_ordering)
+
+        # Set ordering.
+        qs = qs.order_by((self.order_type == 'desc' and '-' or '') + lookup_order_field)
+
+        # Apply keyword searches.
+        if self.lookup_opts.admin.search_fields and self.query:
+            for bit in self.query.split():
+                or_queries = [models.Q(**{'%s__icontains' % field_name: bit}) for field_name in self.lookup_opts.admin.search_fields]
+                other_qs = QuerySet(self.model)
+                other_qs = other_qs.filter(reduce(operator.or_, or_queries))
+                qs = qs & other_qs
+
+        if self.opts.one_to_one_field:
+            qs = qs.filter(**self.opts.one_to_one_field.rel.limit_choices_to)
+
+        return qs
+
+    def url_for_result(self, result):
+        return "%s/" % getattr(result, self.pk_attname)
 
 def change_list(request, app_label, model_name):
     model = models.get_model(app_label, model_name)
