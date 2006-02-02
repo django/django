@@ -281,7 +281,7 @@ ul.timelist, .timelist li { list-style-type:none; margin:0; padding:0; }
 .timelist a { padding:2px; }
 
 /*  ORDERING WIDGET  */
-ul#orderthese { padding:0; margin:0; list-style-type:none; }
+ul#orderthese { position:absolute; top:8em; right:0; width:240px; padding:0; margin:0; list-style-type:none; }
 ul#orderthese li { list-style-type:none; display:block; padding:0; margin:6px 0; width:214px; background:#f6f6f6; white-space:nowrap; overflow:hidden; }
 ul#orderthese li span { display:block; border:1px solid #e7e7e7; background:transparent url(../img/admin/nav-bg-grabber.gif) top left repeat-y; font-size:10px !important; padding:4px 6px 4px 12px; }
 ul#orderthese span:hover { background-color:#efefef; }

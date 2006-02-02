@@ -1,8 +1,8 @@
 addEvent(window, 'load', reorder_init);
 
 var lis;
-var top = 90;
-var left = 545;
+var top = 0;
+var left = 0;
 var height = 30;
 
 function reorder_init() {
