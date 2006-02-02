@@ -48,4 +48,4 @@ class LogEntry(models.Model):
         Returns the admin URL to edit the object represented by this log entry.
         This is relative to the Django admin index page.
         """
-        return "%s/%s/%s/" % (self.content_type.get_package(), self.content_type.python_module_name, self.object_id)
+        return "%s/%s/%s/" % (self.content_type.package, self.content_type.python_module_name, self.object_id)
