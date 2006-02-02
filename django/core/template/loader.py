@@ -24,23 +24,7 @@ from django.core.exceptions import ImproperlyConfigured
 from django.core.template import Origin, StringOrigin, Template, Context, TemplateDoesNotExist, add_to_builtins
 from django.conf.settings import TEMPLATE_LOADERS, TEMPLATE_DEBUG
 
-template_source_loaders = []
-for path in TEMPLATE_LOADERS:
-    i = path.rfind('.')
-    module, attr = path[:i], path[i+1:]
-    try:
-        mod = __import__(module, globals(), locals(), [attr])
-    except ImportError, e:
-        raise ImproperlyConfigured, 'Error importing template source loader %s: "%s"' % (module, e)
-    try:
-        func = getattr(mod, attr)
-    except AttributeError:
-        raise ImproperlyConfigured, 'Module "%s" does not define a "%s" callable template source loader' % (module, attr)
-    if not func.is_usable:
-        import warnings
-        warnings.warn("Your TEMPLATE_LOADERS setting includes %r, but your Python installation doesn't support that type of template loading. Consider removing that line from TEMPLATE_LOADERS." % path)
-    else:
-        template_source_loaders.append(func)
+template_source_loaders = None
 
 class LoaderOrigin(Origin):
     def __init__(self, display_name, loader, name, dirs):
@@ -57,6 +41,28 @@ def make_origin(display_name, loader, name, dirs):
         return None
 
 def find_template_source(name, dirs=None):
+    # Calculate template_source_loaders the first time the function is executed
+    # because putting this logic in the module-level namespace may cause
+    # circular import errors. See Django ticket #1292.
+    global template_source_loaders
+    if template_source_loaders is None:
+        template_source_loaders = []
+        for path in TEMPLATE_LOADERS:
+            i = path.rfind('.')
+            module, attr = path[:i], path[i+1:]
+            try:
+                mod = __import__(module, globals(), locals(), [attr])
+            except ImportError, e:
+                raise ImproperlyConfigured, 'Error importing template source loader %s: "%s"' % (module, e)
+            try:
+                func = getattr(mod, attr)
+            except AttributeError:
+                raise ImproperlyConfigured, 'Module "%s" does not define a "%s" callable template source loader' % (module, attr)
+            if not func.is_usable:
+                import warnings
+                warnings.warn("Your TEMPLATE_LOADERS setting includes %r, but your Python installation doesn't support that type of template loading. Consider removing that line from TEMPLATE_LOADERS." % path)
+            else:
+                template_source_loaders.append(func)
     for loader in template_source_loaders:
         try:
             source, display_name = loader(name, dirs)
