@@ -210,7 +210,7 @@ def add_stage(request, app_label, model_name, show_delete=False, form_url='', po
             # Here, we distinguish between different save types by checking for
             # the presence of keys in request.POST.
             if request.POST.has_key("_continue"):
-                request.user.add_message(msg + ' ' + _("You may edit it again below."))
+                request.user.message_set.add(msg + ' ' + _("You may edit it again below."))
                 if request.POST.has_key("_popup"):
                     post_url_continue += "?_popup=1"
                 return HttpResponseRedirect(post_url_continue % pk_value)
@@ -387,7 +387,7 @@ def _get_deleted_objects(deleted_objects, perms_needed, user, obj, opts, current
                 _get_deleted_objects(deleted_objects, perms_needed, user, sub_obj, related.opts, current_depth+2)
         else:
             has_related_objs = False
-            for sub_obj in getattr(obj, 'get_%s_list' % rel_opts_name)():
+            for sub_obj in getattr(obj, rel_opts_name).all():
                 has_related_objs = True
                 if related.field.rel.edit_inline or not related.opts.admin:
                     # Don't display link to edit, because it either has no
@@ -410,7 +410,7 @@ def _get_deleted_objects(deleted_objects, perms_needed, user, obj, opts, current
         opts_seen.append(related.opts)
         rel_opts_name = related.get_accessor_name()
         has_related_objs = False
-        for sub_obj in getattr(obj, 'get_%s_list' % rel_opts_name)():
+        for sub_obj in getattr(obj, rel_opts_name).all():
             has_related_objs = True
             if related.field.rel.edit_inline or not related.opts.admin:
                 # Don't display link to edit, because it either has no
@@ -452,7 +452,7 @@ def delete_stage(request, app_label, model_name, object_id):
         obj_display = str(obj)
         obj.delete()
         LogEntry.objects.log_action(request.user.id, opts.get_content_type_id(), object_id, obj_display, DELETION)
-        request.user.add_message(_('The %(name)s "%(obj)s" was deleted successfully.') % {'name':opts.verbose_name, 'obj':obj_display})
+        request.user.message_set.add(_('The %(name)s "%(obj)s" was deleted successfully.') % {'name': opts.verbose_name, 'obj': obj_display})
         return HttpResponseRedirect("../../")
     return render_to_response('admin/delete_confirmation', {
         "title": _("Are you sure?"),
