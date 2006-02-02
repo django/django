@@ -1,6 +1,7 @@
 "Custom template tags for user comments"
 
-from django.core import template, template_loader
+from django.core import template
+from django.core.template import loader
 from django.core.exceptions import ObjectDoesNotExist
 from django.models.comments import comments, freecomments
 from django.models.core import contenttypes
@@ -56,14 +57,14 @@ class CommentFormNode(template.Node):
         context['options'] = ','.join(options)
         if self.free:
             context['hash'] = comments.get_security_hash(context['options'], '', '', context['target'])
-            default_form = template_loader.get_template(FREE_COMMENT_FORM)
+            default_form = loader.get_template(FREE_COMMENT_FORM)
         else:
             context['photo_options'] = self.photo_options
             context['rating_options'] = normalize_newlines(base64.encodestring(self.rating_options).strip())
             if self.rating_options:
                 context['rating_range'], context['rating_choices'] = comments.get_rating_options(self.rating_options)
             context['hash'] = comments.get_security_hash(context['options'], context['photo_options'], context['rating_options'], context['target'])
-            default_form = template_loader.get_template(COMMENT_FORM)
+            default_form = loader.get_template(COMMENT_FORM)
         output = default_form.render(context)
         context.pop()
         return output
