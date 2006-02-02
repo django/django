@@ -191,8 +191,9 @@ def get_sql_delete(mod):
 
     # Close database connection explicitly, in case this output is being piped
     # directly into a database client, to avoid locking issues.
-    cursor.close()
-    db.db.close()
+    if cursor is not None:
+        cursor.close()
+        db.db.close()
 
     return output[::-1] # Reverse it, to deal with table dependencies.
 get_sql_delete.help_doc = "Prints the DROP TABLE SQL statements for the given model module name(s)."
