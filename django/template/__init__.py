@@ -605,7 +605,13 @@ def resolve_variable(path, context):
 
     (The example assumes VARIABLE_ATTRIBUTE_SEPARATOR is '.')
     """
-    if path[0] in ('"', "'") and path[0] == path[-1]:
+    if path[0] in '0123456789':
+        number_type = '.' in path and float or int
+        try:
+           current = number_type(path)
+        except ValueError:
+           current = ''
+    elif path[0] in ('"', "'") and path[0] == path[-1]:
         current = path[1:-1]
     else:
         current = context
