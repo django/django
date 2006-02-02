@@ -363,6 +363,18 @@ avoid automating. That said, there's some work being done to add a
 ``django-admin.py updatedb`` command, which would output the necessary
 ``ALTER TABLE`` statements, if any.
 
+Do Django models support multiple-column primary keys?
+------------------------------------------------------
+
+No. Only single-column primary keys are supported.
+
+But this isn't an issue in practice, because there's nothing stopping you from
+adding other constraints (using the ``unique_together`` model option or
+creating the constraint directly in your database), and enforcing the
+uniqueness at that level. Single-column primary keys are needed for things such
+as the admin interface to work; e.g., you need a simple way of being able to
+specify an object to edit or delete.
+
 The database API
 ================
 

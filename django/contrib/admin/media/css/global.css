@@ -40,27 +40,29 @@ code strong	{ color:#930; }
 hr { clear:both; color:#eee; background-color:#eee; height:1px; border:none; margin:0; padding:0; font-size:1px; line-height:1px; }
 
 /* PAGE STRUCTURE */
-#container { position:relative; width:100%; min-width:658px; }
-#header	{ text-align:left; }
+#container { position:relative; width:100%; min-width:760px; }
 #content { margin:10px 15px; }
-#content-main, #content-related { float:left; }
+#header { width:100%; }
+#content-main { float:left; width:100%; }
+#content-related { float:right; width:220px; position:relative; margin-right:-230px; }
 #footer	{ clear:both; padding:10px; }
 
-/* COLUMN TYPES */
+/*  COLUMN TYPES  */
+.colMS { margin-right:245px !important; }
+.colSM { margin-left:245px !important; }
+.colSM #content-related { float:left; margin-right:0; margin-left:-230px; }
 .colSM #content-main { float:right; }
-.colSM #content-related { float:left; }
-.colMS #content-main, .colSM #content-main { width:68%; }
-.colMS #content-related { margin-left:12px; width:30%; }
-.colSM #content-related { margin-right:12px; width:30%; }
+.popup .colM { width:95%; }
+.subcol { float:left; width:46%; margin-right:15px; }
+.dashboard #content { width:500px; }
 
 /* HEADER */
-#header	{ background:#417690; color:#ffc; min-height:2.5em; _height:2.5em; }
+#header	{ background:#417690; color:#ffc; min-height:2.4em; overflow:hidden; }
 #header a:link, #header a:visited { color:white; }
 #header a:hover { text-decoration:underline; }
-#branding { float:left; width:18em; }
 #branding h1 { padding:0.5em 10px 0 10px; font-size:18px; margin:0; font-weight:normal; color:#f4f379; }
-#branding h2 { padding:0 10px 0.5em 10px; font-size:14px; margin:0; font-weight:normal; color:#ffc; }
-#user-tools { padding:1.2em 10px; font-size:11px; text-align:right; }
+#branding h2 { padding:0 10px 0.8em 10px; font-size:14px; margin:0; font-weight:normal; color:#ffc; }
+#user-tools	{ position:absolute; top:0; right:0; padding:1.2em 10px; font-size:11px; text-align:right; }
 
 /* SIDEBAR */
 #content-related h3 { font-size:12px; color:#666; margin-bottom:3px; }
@@ -183,6 +185,8 @@ td ul.errorlist { margin:0 !important; padding:0 !important; }
 td ul.errorlist li { margin:0 !important; }
 .error { background:#ffc; }
 .error input, .error select { border:1px solid red; }
+div.system-message { background: #ffc; margin: 10px; padding: 6px 8px; font-size: .8em; }
+div.system-message p.system-message-title { padding:4px 5px 4px 25px; margin:0; color:red; background:#ffc url(../img/admin/icon_error.gif) 5px .3em no-repeat; }
 
 /* ACTION ICONS */
 .addlink { padding-left:12px; background:url(../img/admin/icon_addlink.gif) 0 .2em no-repeat; }
