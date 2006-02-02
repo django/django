@@ -415,6 +415,11 @@ class ValuesQuerySet(QuerySet):
             for row in rows:
                 yield dict(zip(field_names, row))
 
+    def _clone(self, klass=None, **kwargs):
+        c = super(ValuesQuerySet, self)._clone(klass, **kwargs)
+        c._fields = self._fields[:]
+        return c
+
 class DateQuerySet(QuerySet):
     def iterator(self):
         from django.db.backends.util import typecast_timestamp
@@ -432,6 +437,13 @@ class DateQuerySet(QuerySet):
         # MySQL doesn't automatically cast the result of date functions as datetime
         # objects -- MySQL returns the values as strings, instead.
         return [typecast_timestamp(str(row[0])) for row in cursor.fetchall()]
+
+    def _clone(self, klass=None, **kwargs):
+        c = super(DateQuerySet, self)._clone(klass, **kwargs)
+        c._field = self._field
+        c._kind = self._kind
+        c._order = self._order
+        return c
 
 class QOperator:
     "Base class for QAnd and QOr"
