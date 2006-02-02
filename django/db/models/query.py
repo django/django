@@ -199,7 +199,11 @@ class QuerySet(object):
     ##################################################
 
     def in_bulk(self, id_list):
-        assert isinstance(id_list, list), "in_bulk() must be provided with a list of IDs."
+        try:
+            iter(id_list)
+        except TypeError:
+            assert False, "in_bulk() must be provided with a list of IDs."
+        id_list = list(id_list)
         assert id_list != [], "in_bulk() cannot be passed an empty ID list."
         return self._clone(klass=InBulkQuerySet, _id_list=id_list)
 
