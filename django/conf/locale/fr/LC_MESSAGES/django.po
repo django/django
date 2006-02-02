@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2006-01-12 23:11+0100\n"
+"POT-Creation-Date: 2006-02-02 11:25+0100\n"
 "PO-Revision-Date: 2005-10-18 12:27+0200\n"
 "Last-Translator: Mikaël Barbero <mikael.barbero nospam at nospam free.fr>\n"
 "Language-Team: français <fr@li.org>\n"
@@ -305,6 +305,78 @@ msgstr ""
 "Le formulaire de commentaire ne proposait ni les options de prévisualisation "
 "ni d'envoi"
 
+#: contrib/comments/templates/comments/form.html:6
+#: contrib/comments/templates/comments/form.html:8
+#: contrib/admin/templates/admin/login.html:15
+msgid "Username:"
+msgstr "Nom d'utilisateur"
+
+#: contrib/comments/templates/comments/form.html:6
+#: contrib/admin/templates/admin/login.html:18
+msgid "Password:"
+msgstr "Mot de passe"
+
+#: contrib/comments/templates/comments/form.html:6
+#, fuzzy
+msgid "Forgotten your password?"
+msgstr "Modifier mon mot de passe"
+
+#: contrib/comments/templates/comments/form.html:8
+#: contrib/admin/templates/admin/object_history.html:3
+#: contrib/admin/templates/admin/change_list.html:4
+#: contrib/admin/templates/admin/base.html:23
+#: contrib/admin/templates/admin/delete_confirmation.html:3
+#: contrib/admin/templates/admin/change_form.html:9
+#: contrib/admin/templates/registration/password_change_form.html:3
+#: contrib/admin/templates/admin_doc/bookmarklets.html:4
+#: contrib/admin/templates/admin_doc/view_detail.html:4
+#: contrib/admin/templates/admin_doc/template_tag_index.html:5
+#: contrib/admin/templates/admin_doc/template_detail.html:4
+#: contrib/admin/templates/admin_doc/template_filter_index.html:5
+#: contrib/admin/templates/admin_doc/missing_docutils.html:4
+#: contrib/admin/templates/admin_doc/view_index.html:5
+#: contrib/admin/templates/admin_doc/model_detail.html:3
+#: contrib/admin/templates/admin_doc/index.html:4
+#: contrib/admin/templates/admin_doc/model_index.html:5
+msgid "Log out"
+msgstr "Déconnection"
+
+#: contrib/comments/templates/comments/form.html:12
+#, fuzzy
+msgid "Ratings"
+msgstr "vote n°1"
+
+#: contrib/comments/templates/comments/form.html:12
+#: contrib/comments/templates/comments/form.html:23
+msgid "Required"
+msgstr ""
+
+#: contrib/comments/templates/comments/form.html:12
+#: contrib/comments/templates/comments/form.html:23
+msgid "Optional"
+msgstr ""
+
+#: contrib/comments/templates/comments/form.html:23
+msgid "Post a photo"
+msgstr ""
+
+#: contrib/comments/templates/comments/form.html:27
+#: contrib/comments/templates/comments/freeform.html:5
+#, fuzzy
+msgid "Comment:"
+msgstr "Commentaire"
+
+#: contrib/comments/templates/comments/form.html:32
+#: contrib/comments/templates/comments/freeform.html:9
+#, fuzzy
+msgid "Preview comment"
+msgstr "Commentaire libre"
+
+#: contrib/comments/templates/comments/freeform.html:4
+#, fuzzy
+msgid "Your name:"
+msgstr "nom d'utilisateur"
+
 #: contrib/admin/filterspecs.py:40
 #, python-format
 msgid ""
@@ -381,7 +453,7 @@ msgstr "entrée d'historique"
 msgid "log entries"
 msgstr "entrées d'historique"
 
-#: contrib/admin/templatetags/admin_list.py:245
+#: contrib/admin/templatetags/admin_list.py:241
 msgid "All dates"
 msgstr "Toutes les dates"
 
@@ -400,7 +472,7 @@ msgstr ""
 msgid "Log in"
 msgstr "Connectez-vous"
 
-#: contrib/admin/views/decorators.py:57
+#: contrib/admin/views/decorators.py:61
 msgid ""
 "Please log in again, because your session has expired. Don't worry: Your "
 "submission has been saved."
@@ -408,7 +480,7 @@ msgstr ""
 "Votre session a expiré, connectez-vous de nouveau s'il vous plaît. Ne vous "
 "inquiétez pas, votre travail précédement éffectué a été sauvé."
 
-#: contrib/admin/views/decorators.py:64
+#: contrib/admin/views/decorators.py:68
 msgid ""
 "Looks like your browser isn't configured to accept cookies. Please enable "
 "cookies, reload this page, and try again."
@@ -416,11 +488,11 @@ msgstr ""
 "Il semblerait que votre navigateur n'accepte pas les cookies. Activez-les, "
 "rechargez cette page et rééssayez s'il vous plaît."
 
-#: contrib/admin/views/decorators.py:78
+#: contrib/admin/views/decorators.py:82
 msgid "Usernames cannot contain the '@' character."
 msgstr "Les noms d'utilisateur ne peuvent contenir le caractère '@'"
 
-#: contrib/admin/views/decorators.py:80
+#: contrib/admin/views/decorators.py:84
 #, python-format
 msgid "Your e-mail address is not your username. Try '%s' instead."
 msgstr ""
@@ -502,26 +574,26 @@ msgstr ""
 msgid "Change %s"
 msgstr "Changement %s"
 
-#: contrib/admin/views/main.py:614
+#: contrib/admin/views/main.py:615
 #, python-format
 msgid "One or more %(fieldname)s in %(name)s: %(obj)s"
 msgstr "Un ou plusieurs %(fieldname)s dans %(name)s: %(obj)s"
 
-#: contrib/admin/views/main.py:619
+#: contrib/admin/views/main.py:620
 #, python-format
 msgid "One or more %(fieldname)s in %(name)s:"
 msgstr "Un ou plusieurs %(fieldname)s dans %(name)s:"
 
-#: contrib/admin/views/main.py:648
+#: contrib/admin/views/main.py:649
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was deleted successfully."
 msgstr "L'objet %(name)s \"%(obj)s\" a été supprimé avec succès."
 
-#: contrib/admin/views/main.py:651
+#: contrib/admin/views/main.py:652
 msgid "Are you sure?"
 msgstr "Êtes-vous sûr ?"
 
-#: contrib/admin/views/main.py:666
+#: contrib/admin/views/main.py:667
 #, fuzzy, python-format
 msgid "Change history: %s"
 msgstr "Historique des changements : %s"
@@ -611,6 +683,7 @@ msgstr "Texte XML"
 #: contrib/admin/templates/admin/base.html:23
 #: contrib/admin/templates/admin/delete_confirmation.html:3
 #: contrib/admin/templates/admin/change_form.html:9
+#: contrib/admin/templates/registration/password_change_form.html:3
 #: contrib/admin/templates/admin_doc/bookmarklets.html:3
 msgid "Documentation"
 msgstr "Documentation"
@@ -620,6 +693,7 @@ msgstr "Documentation"
 #: contrib/admin/templates/admin/base.html:23
 #: contrib/admin/templates/admin/delete_confirmation.html:3
 #: contrib/admin/templates/admin/change_form.html:9
+#: contrib/admin/templates/registration/password_change_form.html:3
 #: contrib/admin/templates/admin_doc/bookmarklets.html:4
 #: contrib/admin/templates/admin_doc/view_detail.html:4
 #: contrib/admin/templates/admin_doc/template_tag_index.html:5
@@ -633,28 +707,10 @@ msgstr "Documentation"
 msgid "Change password"
 msgstr "Modifier votre mot de passe"
 
-#: contrib/admin/templates/admin/object_history.html:3
-#: contrib/admin/templates/admin/change_list.html:4
-#: contrib/admin/templates/admin/base.html:23
-#: contrib/admin/templates/admin/delete_confirmation.html:3
-#: contrib/admin/templates/admin/change_form.html:9
-#: contrib/admin/templates/admin_doc/bookmarklets.html:4
-#: contrib/admin/templates/admin_doc/view_detail.html:4
-#: contrib/admin/templates/admin_doc/template_tag_index.html:5
-#: contrib/admin/templates/admin_doc/template_detail.html:4
-#: contrib/admin/templates/admin_doc/template_filter_index.html:5
-#: contrib/admin/templates/admin_doc/missing_docutils.html:4
-#: contrib/admin/templates/admin_doc/view_index.html:5
-#: contrib/admin/templates/admin_doc/model_detail.html:3
-#: contrib/admin/templates/admin_doc/index.html:4
-#: contrib/admin/templates/admin_doc/model_index.html:5
-msgid "Log out"
-msgstr "Déconnection"
-
 #: contrib/admin/templates/admin/object_history.html:5
 #: contrib/admin/templates/admin/500.html:4
 #: contrib/admin/templates/admin/change_list.html:5
-#: contrib/admin/templates/admin/base.html:29
+#: contrib/admin/templates/admin/base.html:28
 #: contrib/admin/templates/admin/change_form.html:12
 #: contrib/admin/templates/registration/password_change_done.html:4
 #: contrib/admin/templates/registration/password_reset_form.html:4
@@ -762,14 +818,6 @@ msgstr "Aucun(e) disponible"
 #, fuzzy, python-format
 msgid "Add %(name)s"
 msgstr "Ajouter %(name)s"
-
-#: contrib/admin/templates/admin/login.html:15
-msgid "Username:"
-msgstr "Nom d'utilisateur"
-
-#: contrib/admin/templates/admin/login.html:18
-msgid "Password:"
-msgstr "Mot de passe"
 
 #: contrib/admin/templates/admin/login.html:20
 msgid "Have you <a href=\"/password_reset/\">forgotten your password</a>?"
@@ -1845,7 +1893,7 @@ msgstr ""
 "La valeur de l'attribut \"%(attr)s\" de la ligne %(line)s n'est pas valide. "
 "(Ligne débutant par \"%(start)s\".)"
 
-#: core/meta/__init__.py:1947
+#: core/meta/__init__.py:1944
 #, python-format
 msgid "%(object)s with this %(type)s already exists for the given %(field)s."
 msgstr ""
