@@ -41,11 +41,11 @@ class LogEntry(models.Model):
 
     def get_edited_object(self):
         "Returns the edited object represented by this log entry"
-        return self.get_content_type().get_object_for_this_type(pk=self.object_id)
+        return self.content_type.get_object_for_this_type(pk=self.object_id)
 
     def get_admin_url(self):
         """
         Returns the admin URL to edit the object represented by this log entry.
         This is relative to the Django admin index page.
         """
-        return "%s/%s/%s/" % (self.get_content_type().get_package(), self.get_content_type().python_module_name, self.object_id)
+        return "%s/%s/%s/" % (self.content_type.get_package(), self.content_type.python_module_name, self.object_id)
