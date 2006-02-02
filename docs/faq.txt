@@ -342,9 +342,9 @@ Using a ``FileField`` or an ``ImageField`` in a model takes a few steps:
 If I make changes to a model, how do I update the database?
 -----------------------------------------------------------
 
-If you don't care about clearing data, just pipe the output of the
-appropriate ``django-admin.py sqlreset`` command into your database's
-command-line utility. For example::
+If you don't mind clearing data, just pipe the output of the appropriate
+``django-admin.py sqlreset`` command into your database's command-line utility.
+For example::
 
     django-admin.py sqlreset appname | psql dbname
 
