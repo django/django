@@ -32,7 +32,7 @@ def manipulator_validator_unique(f, opts, self, field_data, all_data):
     "Validates that the value is unique for this field."
     lookup_type = f.get_validator_unique_lookup_type()
     try:
-        old_obj = self.manager.get_object(**{lookup_type: field_data})
+        old_obj = self.manager.get(**{lookup_type: field_data})
     except ObjectDoesNotExist:
         return
     if getattr(self, 'original_object', None) and self.original_object._get_pk_val() == old_obj._get_pk_val():
