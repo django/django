@@ -5,9 +5,6 @@ In this example, an Article can have many Categories (as "primary") and many
 Categories (as "secondary").
 
 Set ``related_name`` to designate what the reverse relationship is called.
-
-Set ``singular`` to designate what the category object is called. This is
-required if a model has multiple ``ManyToManyFields`` to the same object.
 """
 
 from django.db import models
@@ -23,10 +20,8 @@ class Category(models.Model):
 class Article(models.Model):
     headline = models.CharField(maxlength=50)
     pub_date = models.DateTimeField()
-    primary_categories = models.ManyToManyField(Category,
-        singular='primary_category', related_name='primary_article')
-    secondary_categories = models.ManyToManyField(Category,
-        singular='secondary_category', related_name='secondary_article')
+    primary_categories = models.ManyToManyField(Category, related_name='primary_article_set')
+    secondary_categories = models.ManyToManyField(Category, related_name='secondary_article_set')
     class Meta:
        ordering = ('pub_date',)
 
@@ -63,15 +58,15 @@ True
 # specified the "singular" parameter, Django would just use "category", which
 # would cause a conflict because the "primary_categories" and
 # "secondary_categories" fields both relate to Category.
->>> a1.primary_category_set.all()
+>>> a1.primary_categories.all()
 [Crime, News]
 
 # Ditto for the "primary_category" here.
->>> a2.primary_category_set.all()
+>>> a2.primary_categories.all()
 [News, Sports]
 
 # Ditto for the "secondary_category" here.
->>> a1.secondary_category_set.all()
+>>> a1.secondary_categories.all()
 [Life]
 
 

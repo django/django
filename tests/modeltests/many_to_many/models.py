@@ -56,9 +56,9 @@ True
 True
 
 # Article objects have access to their related Publication objects.
->>> a1.publication_set.all()
+>>> a1.publications.all()
 [The Python Journal]
->>> a2.publication_set.all()
+>>> a2.publications.all()
 [The Python Journal, Science News, Science Weekly]
 
 # Publication objects have access to their related Article objects.
@@ -99,7 +99,7 @@ True
 >>> Publication.objects.all()
 [Science News, Science Weekly]
 >>> a1 = Article.objects.get(pk=1)
->>> a1.publication_set.all()
+>>> a1.publications.all()
 []
 
 # If we delete an Article, its Publications won't be able to access it.
