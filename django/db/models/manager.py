@@ -24,11 +24,6 @@ class Manager(object):
     # Tracks each time a Manager instance is created. Used to retain order.
     creation_counter = 0
 
-    # Dictionary of field_name -> field_value that will always be used in add().
-    # For example, if this is {'name': 'adrian'}, each object created by add() will
-    # have name='adrian'.
-    core_values = {}
-
     def __init__(self):
         super(Manager, self).__init__()
         # Increase the creation counter, and save our local copy.
@@ -108,7 +103,6 @@ class Manager(object):
     #################
 
     def add(self, **kwargs):
-        kwargs.update(self.core_values)
         new_obj = self.model(**kwargs)
         new_obj.save()
         return new_obj

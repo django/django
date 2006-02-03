@@ -7,7 +7,6 @@ from django.utils.functional import curry
 from django.core import validators
 from django import forms
 from django.dispatch import dispatcher
-import types
 
 # Values for Relation.edit_inline.
 TABULAR, STACKED = 1, 2
@@ -105,25 +104,26 @@ class ManyRelatedObjectsDescriptor(object):
     def __get__(self, instance, instance_type=None):
         if instance is None:
             raise AttributeError, "Manager must be accessed via instance"
+
+        rel_field = self.related.field
+
         # Dynamically create a class that subclasses the related
         # model's default manager.
         superclass = self.related.model._default_manager.__class__
-        class_ = types.ClassType('RelatedManager', (superclass,), {})
-        # Override get_query_set on the RelatedManager
-        def get_query_set(self):
-            return superclass.get_query_set(self).filter(**(self.core_filters))
-        class_.get_query_set = get_query_set
-        manager = class_()
 
-        # Set core_filters on the new manager to limit it to the
-        # foreign-key relationship.
-        rel_field = self.related.field
+        class RelatedManager(superclass):
+            def get_query_set(self):
+                return superclass.get_query_set(self).filter(**(self.core_filters))
+            def add(self, **kwargs):
+                kwargs.update({rel_field.name: instance})
+                return superclass.add(self, **kwargs)
+
+        manager = RelatedManager()
 
         if self.rel_type == 'o2m':
             manager.core_filters = {'%s__%s__exact' % (rel_field.name, rel_field.rel.to._meta.pk.name): getattr(instance, rel_field.rel.get_related_field().attname)}
         else:
             manager.core_filters = {'%s__%s__exact' % (rel_field.name, instance_type._meta.pk.name): instance._get_pk_val()}
-        manager.core_values = {rel_field.name: instance}
 
         # Prepare the manager.
         # TODO: Fix this hack?
@@ -157,19 +157,19 @@ class ReverseManyRelatedObjectsDescriptor(object):
         # Dynamically create a class that subclasses the related
         # model's default manager.
         superclass = self.rel_model._default_manager.__class__
-        class_ = types.ClassType('RelatedManager', (superclass,), {})
-        # Override get_query_set on the RelatedManager
-        def get_query_set(self):
-            return superclass.get_query_set(self).extra(
-                tables=(join_table,),
-                where=[
-                    '%s.%s = %s.%s' % (qn(rel_opts.db_table), qn(rel_opts.pk.column), join_table, rel_opts.object_name.lower() + '_id'),
-                    '%s.%s = %%s' % (join_table, this_opts.object_name.lower() + '_id')
-                ],
-                params = [instance._get_pk_val()]
-            )
-        class_.get_query_set = get_query_set
-        manager = class_()
+
+        class RelatedManager(superclass):
+            def get_query_set(self):
+                return superclass.get_query_set(self).extra(
+                    tables=(join_table,),
+                    where=[
+                        '%s.%s = %s.%s' % (qn(rel_opts.db_table), qn(rel_opts.pk.column), join_table, rel_opts.object_name.lower() + '_id'),
+                        '%s.%s = %%s' % (join_table, this_opts.object_name.lower() + '_id')
+                    ],
+                    params = [instance._get_pk_val()]
+                )
+
+        manager = RelatedManager()
 
         # Prepare the manager.
         # TODO: Fix this hack?
