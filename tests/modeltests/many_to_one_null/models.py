@@ -58,12 +58,16 @@ Second
 >>> a3.save()
 >>> a3.id
 3
->>> a3.reporter.id
->>> print a3.reporter.id
-None
+>>> a3.reporter
+Traceback (most recent call last):
+    ...
+DoesNotExist
+
 >>> a3 = Article.objects.get(pk=3)
 >>> print a3.reporter.id
-None
+Traceback (most recent call last):
+    ...
+DoesNotExist
 
 # Accessing an article's 'reporter' attribute throws ReporterDoesNotExist
 # if the reporter is set to None.
