@@ -1,4 +1,4 @@
-from django.db import backend
+from django.db import backend, connection
 from django.db.models import signals
 from django.db.models.fields import AutoField, Field, IntegerField
 from django.db.models.related import RelatedObject
@@ -117,6 +117,7 @@ class ManyRelatedObjectsDescriptor(object):
             def add(self, **kwargs):
                 kwargs.update({rel_field.name: instance})
                 return superclass.add(self, **kwargs)
+            add.alters_data = True
 
         manager = RelatedManager()
 
@@ -151,8 +152,11 @@ class ReverseManyRelatedObjectsDescriptor(object):
 
         qn = backend.quote_name
         this_opts = instance.__class__._meta
+        rel_model = self.rel_model
         rel_opts = self.rel_model._meta
         join_table = backend.quote_name(self.field.get_m2m_db_table(this_opts))
+        this_col_name = this_opts.object_name.lower() + '_id'
+        rel_col_name = rel_opts.object_name.lower() + '_id'
 
         # Dynamically create a class that subclasses the related
         # model's default manager.
@@ -163,11 +167,31 @@ class ReverseManyRelatedObjectsDescriptor(object):
                 return superclass.get_query_set(self).extra(
                     tables=(join_table,),
                     where=[
-                        '%s.%s = %s.%s' % (qn(rel_opts.db_table), qn(rel_opts.pk.column), join_table, rel_opts.object_name.lower() + '_id'),
-                        '%s.%s = %%s' % (join_table, this_opts.object_name.lower() + '_id')
+                        '%s.%s = %s.%s' % (qn(rel_opts.db_table), qn(rel_opts.pk.column), join_table, rel_col_name),
+                        '%s.%s = %%s' % (join_table, this_col_name)
                     ],
                     params = [instance._get_pk_val()]
                 )
+            def add(self, *objs, **kwargs):
+                from django.db import connection
+                # Create the related object.
+                if kwargs:
+                    assert len(objs) == 0, "add() can't be passed both positional and keyword arguments"
+                    objs = [superclass.add(self, **kwargs)]
+                else:
+                    assert len(objs) > 0, "add() must be passed either positional or keyword arguments"
+                    for obj in objs:
+                        if not isinstance(obj, rel_model):
+                            raise ValueError, "positional arguments to add() must be %s instances" % rel_opts.object_name
+                # Add the newly created object to the join table.
+                # TODO: Check to make sure the object isn't already in the join table.
+                cursor = connection.cursor()
+                for obj in objs:
+                    cursor.execute("INSERT INTO %s (%s, %s) VALUES (%%s, %%s)" % \
+                        (join_table, this_col_name, rel_col_name),
+                        [instance._get_pk_val(), obj._get_pk_val()])
+                connection.commit()
+            add.alters_data = True
 
         manager = RelatedManager()
 
@@ -383,10 +407,6 @@ class ManyToManyField(RelatedField, Field):
     def contribute_to_class(self, cls, name):
         super(ManyToManyField, self).contribute_to_class(cls, name)
         setattr(cls, self.name, ReverseManyRelatedObjectsDescriptor(self))
-
-        # Add "set_thingie" methods for many-to-many related objects.
-        # EXAMPLES: Poll.set_sites(), Story.set_bylines()
-        setattr(cls, 'set_%s' % self.name, curry(cls._set_many_to_many_objects, field_with_rel=self))
 
     def contribute_to_related_class(self, cls, related):
         setattr(cls, related.get_accessor_name(), ManyRelatedObjectsDescriptor(related, 'm2m'))

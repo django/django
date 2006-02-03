@@ -357,43 +357,6 @@ class Model(object):
             setattr(self, cachename, get_image_dimensions(filename))
         return getattr(self, cachename)
 
-    def _set_many_to_many_objects(self, id_list, field_with_rel):
-        current_ids = [obj._get_pk_val() for obj in self._get_many_to_many_objects(field_with_rel)]
-        ids_to_add, ids_to_delete = dict([(i, 1) for i in id_list]), []
-        for current_id in current_ids:
-            if current_id in id_list:
-                del ids_to_add[current_id]
-            else:
-                ids_to_delete.append(current_id)
-        ids_to_add = ids_to_add.keys()
-        # Now ids_to_add is a list of IDs to add, and ids_to_delete is a list of IDs to delete.
-        if not ids_to_delete and not ids_to_add:
-            return False # No change
-        rel = field_with_rel.rel.to._meta
-        m2m_table = field_with_rel.get_m2m_db_table(self._meta)
-        cursor = connection.cursor()
-        this_id = self._get_pk_val()
-        if ids_to_delete:
-            sql = "DELETE FROM %s WHERE %s = %%s AND %s IN (%s)" % \
-                (backend.quote_name(m2m_table),
-                backend.quote_name(self._meta.object_name.lower() + '_id'),
-                backend.quote_name(rel.object_name.lower() + '_id'), ','.join(map(str, ids_to_delete)))
-            cursor.execute(sql, [this_id])
-        if ids_to_add:
-            sql = "INSERT INTO %s (%s, %s) VALUES (%%s, %%s)" % \
-                (backend.quote_name(m2m_table),
-                backend.quote_name(self._meta.object_name.lower() + '_id'),
-                backend.quote_name(rel.object_name.lower() + '_id'))
-            cursor.executemany(sql, [(this_id, i) for i in ids_to_add])
-        connection.commit()
-        try:
-            delattr(self, '_%s_cache' % field_with_rel.name) # clear cache, if it exists
-        except AttributeError:
-            pass
-        return True
-
-    _set_many_to_many_objects.alters_data = True
-
     # Handles setting many-to-many related objects.
     # Example: Album.set_songs()
     def _set_related_many_to_many(self, rel_class, rel_field, id_list):
