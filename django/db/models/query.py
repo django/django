@@ -451,7 +451,9 @@ class QOperator:
             joins.update(joins2)
             where.extend(where2)
             params.extend(params2)
-        return tables, joins, ['(%s)' % self.operator.join(where)], params
+        if where:
+            return tables, joins, ['(%s)' % self.operator.join(where)], params
+        return tables, joins, [], params
 
 class QAnd(QOperator):
     "Encapsulates a combined query that uses 'AND'."
