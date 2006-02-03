@@ -61,9 +61,8 @@ Dan Jones
 
 >>> b = Business(name='Sears')
 >>> b.save()
->>> b.set_employees([dan.employee_code, fran.employee_code])
-True
->>> b.employee_set.all()
+>>> b.employees.add(dan, fran)
+>>> b.employees.all()
 [Dan Jones, Fran Jones]
 >>> fran.business_set.all()
 [Sears]
