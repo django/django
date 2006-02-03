@@ -396,6 +396,7 @@ dictionaries in order of query execution. Each dictionary has the following::
     ``time`` -- How long the statement took to execute, in seconds.
 
 ``db.queries`` includes all SQL statements -- INSERTs, UPDATES, SELECTs, etc.
+Each time your app hits the database, the query will be recorded.
 
 Can I use Django with a pre-existing database?
 ----------------------------------------------
