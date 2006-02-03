@@ -202,16 +202,16 @@ class Model(object):
         seen_objs.setdefault(self.__class__, {})[pk_val] = self
 
         for related in self._meta.get_all_related_objects():
-            rel_opts_name = related.OLD_get_accessor_name()
+            rel_opts_name = related.get_accessor_name()
             if isinstance(related.field.rel, OneToOne):
                 try:
-                    sub_obj = getattr(self, 'get_%s' % rel_opts_name)()
+                    sub_obj = getattr(self, rel_opts_name)
                 except ObjectDoesNotExist:
                     pass
                 else:
                     sub_obj.__collect_sub_objects(seen_objs)
             else:
-                for sub_obj in getattr(self, 'get_%s_list' % rel_opts_name)():
+                for sub_obj in getattr(self, rel_opts_name).all():
                     sub_obj.__collect_sub_objects(seen_objs)
 
     def delete(self):
