@@ -11,8 +11,8 @@ from django.db import models
 
 class Person(models.Model):
     full_name = models.CharField(maxlength=20)
-    mother = models.ForeignKey('self', null=True, related_name='mothers_child')
-    father = models.ForeignKey('self', null=True, related_name='fathers_child')
+    mother = models.ForeignKey('self', null=True, related_name='mothers_child_set')
+    father = models.ForeignKey('self', null=True, related_name='fathers_child_set')
 
     def __repr__(self):
         return self.full_name
