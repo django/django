@@ -74,27 +74,27 @@ class SingleRelatedObjectDescriptor(object):
     def __get__(self, instance, instance_type=None):
         if instance is None:
             raise AttributeError, "%s must be accessed via instance" % self._field.name
-        else:
-            cache_name = self._field.get_cache_name()
-            try:
-                return getattr(instance, cache_name)
-            except AttributeError:
-                val = getattr(instance, self._field.attname)
-                if val is None:
-                    raise self._field.rel.to.DoesNotExist
-                other_field = self._field.rel.get_related_field()
-                if other_field.rel:
-                    params = {'%s__%s__exact' % (self._field.rel.field_name, other_field.rel.field_name): val}
-                else:
-                    params = {'%s__exact' % self._field.rel.field_name: val}
-                rel_obj = self._field.rel.to._default_manager.get(**params)
-                setattr(instance, cache_name, rel_obj)
-                return rel_obj
+        cache_name = self._field.get_cache_name()
+        try:
+            return getattr(instance, cache_name)
+        except AttributeError:
+            val = getattr(instance, self._field.attname)
+            if val is None:
+                raise self._field.rel.to.DoesNotExist
+            other_field = self._field.rel.get_related_field()
+            if other_field.rel:
+                params = {'%s__%s__exact' % (self._field.rel.field_name, other_field.rel.field_name): val}
+            else:
+                params = {'%s__exact' % self._field.rel.field_name: val}
+            rel_obj = self._field.rel.to._default_manager.get(**params)
+            setattr(instance, cache_name, rel_obj)
+            return rel_obj
 
 class ManyRelatedObjectsDescriptor(object):
     # This class provides the functionality that makes the related-object
     # managers available as attributes on a model class, for fields that have
-    # multiple "remote" values.
+    # multiple "remote" values and have a ManyToManyField pointed at them by
+    # some other model (rather than having a ManyToManyField themselves).
     # In the example "poll.choice_set", the choice_set attribute is a
     # ManyRelatedObjectsDescriptor instance.
     def __init__(self, related, rel_type):
@@ -104,36 +104,35 @@ class ManyRelatedObjectsDescriptor(object):
     def __get__(self, instance, instance_type=None):
         if instance is None:
             raise AttributeError, "Manager must be accessed via instance"
+        # Dynamically create a class that subclasses the related
+        # model's default manager.
+        superclass = self.related.model._default_manager.__class__
+        class_ = types.ClassType('RelatedManager', (superclass,), {})
+        # Override get_query_set on the RelatedManager
+        def get_query_set(self):
+            return superclass.get_query_set(self).filter(**(self.core_filters))
+        class_.get_query_set = get_query_set
+        manager = class_()
+
+        # Set core_filters on the new manager to limit it to the
+        # foreign-key relationship.
+        rel_field = self.related.field
+
+        if self.rel_type == 'o2m':
+            manager.core_filters = {'%s__%s__exact' % (rel_field.name, rel_field.rel.to._meta.pk.name): getattr(instance, rel_field.rel.get_related_field().attname)}
         else:
-            # Dynamically create a class that subclasses the related
-            # model's default manager.
-            superclass = self.related.model._default_manager.__class__
-            class_ = types.ClassType('RelatedManager', (superclass,), {})
-            # Override get_query_set on the RelatedManager
-            def get_query_set(self):
-                return superclass.get_query_set(self).filter(**(self.core_filters))
-            class_.get_query_set = get_query_set
-            manager = class_()
+            manager.core_filters = {'%s__%s__exact' % (rel_field.name, instance_type._meta.pk.name): instance._get_pk_val()}
+        manager.core_values = {rel_field.name: instance}
 
-            # Set core_filters on the new manager to limit it to the
-            # foreign-key relationship.
-            rel_field = self.related.field
+        # Prepare the manager.
+        # TODO: Fix this hack?
+        # We're setting self.manager.model here because
+        # self.manager._prepare() expects that self.manager.model is
+        # set. This is slightly hackish.
+        manager.model = self.related.model
+        manager._prepare()
 
-            if self.rel_type == 'o2m':
-                manager.core_filters = {'%s__%s__exact' % (rel_field.name, rel_field.rel.to._meta.pk.name): getattr(instance, rel_field.rel.get_related_field().attname)}
-            else:
-                manager.core_filters = {'%s__%s__exact' % (rel_field.name, instance_type._meta.pk.name): instance._get_pk_val()}
-            manager.core_values = {rel_field.name: instance}
-
-            # Prepare the manager.
-            # TODO: Fix this hack?
-            # We're setting self.manager.model here because
-            # self.manager._prepare() expects that self.manager.model is
-            # set. This is slightly hackish.
-            manager.model = self.related.model
-            manager._prepare()
-
-            return manager
+        return manager
 
 class ForeignKey(RelatedField, Field):
     empty_strings_allowed = False
