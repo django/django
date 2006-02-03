@@ -32,7 +32,7 @@ class Writer(models.Model):
     position = models.CharField(maxlength=100)
 
     def __repr__(self):
-        return '%r (%s)' % (self.get_reporter(), self.position)
+        return '%r (%s)' % (self.reporter, self.position)
 
 API_TESTS = """
 # Create a few Reporters.
