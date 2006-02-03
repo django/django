@@ -14,7 +14,7 @@ from django.db import models
 
 class Category(models.Model):
     name = models.CharField(maxlength=20)
-    parent = models.ForeignKey('self', null=True, related_name='child')
+    parent = models.ForeignKey('self', null=True, related_name='child_set')
 
     def __repr__(self):
         return self.name
