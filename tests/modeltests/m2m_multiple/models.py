@@ -42,30 +42,22 @@ API_TESTS = """
 
 >>> a1 = Article(headline='Area man steals', pub_date=datetime(2005, 11, 27))
 >>> a1.save()
->>> a1.set_primary_categories([c2.id, c3.id])
-True
->>> a1.set_secondary_categories([c4.id])
+>>> a1.primary_categories.add(c2, c3)
+>>> a1.secondary_categories.add(c4)
 True
 
 >>> a2 = Article(headline='Area man runs', pub_date=datetime(2005, 11, 28))
 >>> a2.save()
->>> a2.set_primary_categories([c1.id, c2.id])
-True
->>> a2.set_secondary_categories([c4.id])
+>>> a2.primary_categories.add(c1, c2)
+>>> a2.secondary_categories.add(c4)
 True
 
-# The "primary_category" here comes from the "singular" parameter. If we hadn't
-# specified the "singular" parameter, Django would just use "category", which
-# would cause a conflict because the "primary_categories" and
-# "secondary_categories" fields both relate to Category.
 >>> a1.primary_categories.all()
 [Crime, News]
 
-# Ditto for the "primary_category" here.
 >>> a2.primary_categories.all()
 [News, Sports]
 
-# Ditto for the "secondary_category" here.
 >>> a1.secondary_categories.all()
 [Life]
 
