@@ -145,6 +145,10 @@ class WSGIHandler(BaseHandler):
         from django.conf import settings
         from django.core import db
 
+        if settings.ENABLE_PSYCO:
+            import psyco
+            psyco.profile()
+
         # Set up middleware if needed. We couldn't do this earlier, because
         # settings weren't available.
         if self._request_middleware is None:

@@ -187,6 +187,10 @@ DATETIME_FORMAT = 'N j, Y, P'
 # http://www.djangoproject.com/documentation/templates/#now
 TIME_FORMAT = 'P'
 
+# Whether to enable Psyco, which optimizes Python code. Requires Psyco.
+# http://psyco.sourceforge.net/
+ENABLE_PSYCO = False
+
 ##############
 # MIDDLEWARE #
 ##############

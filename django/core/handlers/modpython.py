@@ -130,6 +130,10 @@ class ModPythonHandler(BaseHandler):
         from django.conf import settings
         from django.core import db
 
+        if settings.ENABLE_PSYCO:
+            import psyco
+            psyco.profile()
+
         # if we need to set up middleware, now that settings works we can do it now.
         if self._request_middleware is None:
             self.load_middleware()
