@@ -21,14 +21,14 @@ class Restaurant(models.Model):
     serves_pizza = models.BooleanField()
 
     def __repr__(self):
-        return "%s the restaurant" % self.get_place().name
+        return "%s the restaurant" % self.place.name
 
 class Waiter(models.Model):
     restaurant = models.ForeignKey(Restaurant)
     name = models.CharField(maxlength=50)
 
     def __repr__(self):
-        return "%s the waiter at %r" % (self.name, self.get_restaurant())
+        return "%s the waiter at %r" % (self.name, self.restaurant)
 
 API_TESTS = """
 # Create a couple of Places.
