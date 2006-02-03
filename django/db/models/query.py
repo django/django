@@ -59,13 +59,9 @@ def quote_only_if_word(word):
 
 class QuerySet(object):
     "Represents a lazy database lookup for a set of objects"
-
-    # Dictionary of lookup parameters to apply to every _get_sql_clause().
-    core_filters = {}
-
     def __init__(self, model=None):
         self.model = model
-        self._filters = Q(**(self.core_filters))
+        self._filters = Q()
         self._order_by = None        # Ordering, e.g. ('date', '-name'). If None, use model's ordering.
         self._select_related = False # Whether to fill cache for related objects.
         self._distinct = False       # Whether the query should use SELECT DISTINCT.
