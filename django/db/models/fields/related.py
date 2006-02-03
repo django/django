@@ -1,3 +1,4 @@
+from django.db import backend
 from django.db.models import signals
 from django.db.models.fields import AutoField, Field, IntegerField
 from django.db.models.related import RelatedObject
@@ -126,10 +127,55 @@ class ManyRelatedObjectsDescriptor(object):
 
         # Prepare the manager.
         # TODO: Fix this hack?
-        # We're setting self.manager.model here because
-        # self.manager._prepare() expects that self.manager.model is
-        # set. This is slightly hackish.
+        # We're setting manager.model here because manager._prepare() expects
+        # that manager.model is set. This is slightly hackish.
         manager.model = self.related.model
+        manager._prepare()
+
+        return manager
+
+class ReverseManyRelatedObjectsDescriptor(object):
+    # This class provides the functionality that makes the related-object
+    # managers available as attributes on a model class, for fields that have
+    # multiple "remote" values and have a ManyToManyField defined in their
+    # model (rather than having another model pointed *at* them).
+    # In the example "poll.sites", the sites attribute is a
+    # ManyRelatedObjectsDescriptor instance.
+    def __init__(self, m2m_field):
+        self.field = m2m_field
+        self.rel_model = m2m_field.rel.to
+
+    def __get__(self, instance, instance_type=None):
+        if instance is None:
+            raise AttributeError, "Manager must be accessed via instance"
+
+        qn = backend.quote_name
+        this_opts = instance.__class__._meta
+        rel_opts = self.rel_model._meta
+        join_table = backend.quote_name(self.field.get_m2m_db_table(this_opts))
+
+        # Dynamically create a class that subclasses the related
+        # model's default manager.
+        superclass = self.rel_model._default_manager.__class__
+        class_ = types.ClassType('RelatedManager', (superclass,), {})
+        # Override get_query_set on the RelatedManager
+        def get_query_set(self):
+            return superclass.get_query_set(self).extra(
+                tables=(join_table,),
+                where=[
+                    '%s.%s = %s.%s' % (qn(rel_opts.db_table), qn(rel_opts.pk.column), join_table, rel_opts.object_name.lower() + '_id'),
+                    '%s.%s = %%s' % (join_table, this_opts.object_name.lower() + '_id')
+                ],
+                params = [instance._get_pk_val()]
+            )
+        class_.get_query_set = get_query_set
+        manager = class_()
+
+        # Prepare the manager.
+        # TODO: Fix this hack?
+        # We're setting manager.model here because manager._prepare() expects
+        # that manager.model is set. This is slightly hackish.
+        manager.model = self.rel_model
         manager._prepare()
 
         return manager
@@ -336,9 +382,7 @@ class ManyToManyField(RelatedField, Field):
 
     def contribute_to_class(self, cls, name):
         super(ManyToManyField, self).contribute_to_class(cls, name)
-        # Add "get_thingie" methods for many-to-many related objects.
-        # EXAMPLES: Poll.get_site_list(), Story.get_byline_list()
-        setattr(cls, 'get_%s_list' % self.rel.singular, curry(cls._get_many_to_many_objects, field_with_rel=self))
+        setattr(cls, self.name, ReverseManyRelatedObjectsDescriptor(self))
 
         # Add "set_thingie" methods for many-to-many related objects.
         # EXAMPLES: Poll.set_sites(), Story.set_bylines()

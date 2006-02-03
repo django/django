@@ -357,22 +357,6 @@ class Model(object):
             setattr(self, cachename, get_image_dimensions(filename))
         return getattr(self, cachename)
 
-    def _get_many_to_many_objects(self, field_with_rel):
-        cache_var = '_%s_cache' % field_with_rel.name
-        if not hasattr(self, cache_var):
-            rel_opts = field_with_rel.rel.to._meta
-            sql = "SELECT %s FROM %s a, %s b WHERE a.%s = b.%s AND b.%s = %%s %s" % \
-                (','.join(['a.%s' % backend.quote_name(f.column) for f in rel_opts.fields]),
-                backend.quote_name(rel_opts.db_table),
-                backend.quote_name(field_with_rel.get_m2m_db_table(self._meta)),
-                backend.quote_name(rel_opts.pk.column),
-                backend.quote_name(rel_opts.object_name.lower() + '_id'),
-                backend.quote_name(self._meta.object_name.lower() + '_id'), rel_opts.get_order_sql('a'))
-            cursor = connection.cursor()
-            cursor.execute(sql, [self._get_pk_val()])
-            setattr(self, cache_var, [field_with_rel.rel.to(*row) for row in cursor.fetchall()])
-        return getattr(self, cache_var)
-
     def _set_many_to_many_objects(self, id_list, field_with_rel):
         current_ids = [obj._get_pk_val() for obj in self._get_many_to_many_objects(field_with_rel)]
         ids_to_add, ids_to_delete = dict([(i, 1) for i in id_list]), []
