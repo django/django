@@ -394,12 +394,6 @@ class Model(object):
 
     _set_many_to_many_objects.alters_data = True
 
-    # Handles related many-to-many object retrieval.
-    # Examples: Album.get_song(), Album.get_song_list(), Album.get_song_count()
-    def _get_related_many_to_many(self, method_name, rel_class, rel_field, **kwargs):
-        kwargs['%s__%s__exact' % (rel_field.name, self._meta.pk.name)] = self._get_pk_val()
-        return getattr(rel_class._default_manager, method_name)(**kwargs)
-
     # Handles setting many-to-many related objects.
     # Example: Album.set_songs()
     def _set_related_many_to_many(self, rel_class, rel_field, id_list):
