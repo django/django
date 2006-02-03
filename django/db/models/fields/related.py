@@ -246,7 +246,7 @@ class OneToOneField(RelatedField, IntegerField):
 
         self.db_index = True
 
-        for name in ('num_in_admin'):
+        for name in ('num_in_admin',):
             if name in kwargs:
                 self.deprecated_args.append(name)
 
