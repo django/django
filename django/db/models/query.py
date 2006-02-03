@@ -574,9 +574,7 @@ def parse_lookup(kwarg_items, opts):
     tables, joins, where, params = [], SortedDict(), [], []
 
     for kwarg, value in kwarg_items:
-        if value is None:
-            pass
-        else:
+        if value is not None:
             path = kwarg.split(LOOKUP_SEPARATOR)
             # Extract the last elements of the kwarg.
             # The very-last is the clause (equals, like, etc).
@@ -599,11 +597,11 @@ def parse_lookup(kwarg_items, opts):
             if len(path) < 1:
                 raise TypeError, "Cannot parse keyword query %r" % kwarg
 
-        tables2, joins2, where2, params2 = lookup_inner(path, clause, value, opts, opts.db_table, None)
-        tables.extend(tables2)
-        joins.update(joins2)
-        where.extend(where2)
-        params.extend(params2)
+            tables2, joins2, where2, params2 = lookup_inner(path, clause, value, opts, opts.db_table, None)
+            tables.extend(tables2)
+            joins.update(joins2)
+            where.extend(where2)
+            params.extend(params2)
     return tables, joins, where, params
 
 class FieldFound(Exception):
