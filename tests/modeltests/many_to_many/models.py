@@ -35,37 +35,31 @@ API_TESTS = """
 >>> a1 = Article(id=None, headline='Django lets you build Web apps easily')
 >>> a1.save()
 
-# Associate the Article with one Publication. set_publications() returns a
-# boolean, representing whether any records were added or deleted.
->>> a1.set_publications([p1.id])
-True
-
-# If we set it again, it'll return False, because the list of Publications
-# hasn't changed.
->>> a1.set_publications([p1.id])
-False
+# Associate the Article with a Publication.
+>>> a1.publications.add(p1)
 
 # Create another Article, and set it to appear in both Publications.
 >>> a2 = Article(id=None, headline='NASA uses Python')
 >>> a2.save()
->>> a2.set_publications([p1.id, p2.id])
-True
->>> a2.set_publications([p1.id])
-True
->>> a2.set_publications([p1.id, p2.id, p3.id])
-True
+>>> a2.publications.add(p1, p2)
+>>> a2.publications.add(p3)
+
+# Add a Publication directly via publications.add by using keyword arguments.
+>>> a2.publications.add(title='Highlights for Children')
 
 # Article objects have access to their related Publication objects.
 >>> a1.publications.all()
 [The Python Journal]
 >>> a2.publications.all()
-[The Python Journal, Science News, Science Weekly]
+[The Python Journal, Science News, Science Weekly, Highlights for Children]
 
 # Publication objects have access to their related Article objects.
 >>> p2.article_set.all()
 [NASA uses Python]
 >>> p1.article_set.order_by('headline')
 [Django lets you build Web apps easily, NASA uses Python]
+>>> Publication.objects.get(id=4).article_set.all()
+[NASA uses Python]
 
 # We can perform kwarg queries across m2m relationships
 >>> Article.objects.filter(publications__id__exact=1)
@@ -79,14 +73,15 @@ True
 >>> Article.objects.filter(publications__title__startswith="Science").distinct()
 [NASA uses Python]
 
-# Reverse m2m queries (i.e., start at the table that doesn't have a ManyToManyField)
+# Reverse m2m queries are supported (i.e., starting at the table that doesn't
+# have a ManyToManyField).
 >>> Publication.objects.filter(id__exact=1)
 [The Python Journal]
 >>> Publication.objects.filter(pk=1)
 [The Python Journal]
 
 >>> Publication.objects.filter(article__headline__startswith="NASA")
-[The Python Journal, Science News, Science Weekly]
+[The Python Journal, Science News, Science Weekly, Highlights for Children]
 
 >>> Publication.objects.filter(article__id__exact=1)
 [The Python Journal]
@@ -97,7 +92,7 @@ True
 # If we delete a Publication, its Articles won't be able to access it.
 >>> p1.delete()
 >>> Publication.objects.all()
-[Science News, Science Weekly]
+[Science News, Science Weekly, Highlights for Children]
 >>> a1 = Article.objects.get(pk=1)
 >>> a1.publications.all()
 []
