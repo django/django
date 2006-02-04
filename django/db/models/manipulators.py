@@ -154,7 +154,7 @@ class AutomaticManipulator(forms.Manipulator):
                     if self.change:
                         if rel_new_data[related.opts.pk.name][0]:
                             try:
-                                old_rel_obj = getattr(self.original_object, 'get_%s' % related.OLD_get_accessor_name() )(**{'%s__exact' % related.opts.pk.name: rel_new_data[related.opts.pk.attname][0]})
+                                old_rel_obj = getattr(self.original_object, related.get_accessor_name()).get(**{'%s__exact' % related.opts.pk.name: rel_new_data[related.opts.pk.attname][0]})
                             except ObjectDoesNotExist:
                                 pass
 
