@@ -562,12 +562,11 @@ def inspectdb(db_name):
     "Generator that introspects the tables in the given database name and returns a Django model, one line at a time."
     from django.core import db
     from django.conf import settings
+    import keyword
 
     def table2model(table_name):
         object_name = table_name.title().replace('_', '')
         return object_name.endswith('s') and object_name[:-1] or object_name
-
-    reserved_python_words = set(['and', 'assert', 'break', 'class', 'continue', 'def', 'del', 'elif', 'else', 'except', 'exec', 'finally', 'for', 'from', 'global', 'if', 'import', 'in', 'is', 'lambda', 'not', 'or', 'pass', 'print', 'raise', 'return', 'try', 'while'])
 
     settings.DATABASE_NAME = db_name
     cursor = db.db.cursor()
@@ -593,7 +592,7 @@ def inspectdb(db_name):
             comment_notes = [] # Holds Field notes, to be displayed in a Python comment.
             extra_params = {}  # Holds Field parameters such as 'db_column'.
 
-            if column_name in reserved_python_words:
+            if keyword.iskeyword(column_name):
                 extra_params['db_column'] = column_name
                 column_name += '_field'
                 comment_notes.append('Field renamed because it was a Python reserved word.')
