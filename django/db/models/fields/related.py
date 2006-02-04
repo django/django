@@ -126,12 +126,7 @@ class ManyRelatedObjectsDescriptor(object):
         else:
             manager.core_filters = {'%s__%s__exact' % (rel_field.name, instance_type._meta.pk.name): instance._get_pk_val()}
 
-        # Prepare the manager.
-        # TODO: Fix this hack?
-        # We're setting manager.model here because manager._prepare() expects
-        # that manager.model is set. This is slightly hackish.
         manager.model = self.related.model
-        manager._prepare()
 
         return manager
 
@@ -194,13 +189,7 @@ class ReverseManyRelatedObjectsDescriptor(object):
             add.alters_data = True
 
         manager = RelatedManager()
-
-        # Prepare the manager.
-        # TODO: Fix this hack?
-        # We're setting manager.model here because manager._prepare() expects
-        # that manager.model is set. This is slightly hackish.
         manager.model = self.rel_model
-        manager._prepare()
 
         return manager
 

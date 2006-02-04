@@ -162,6 +162,15 @@ class QuerySet(object):
         assert len(obj_list) == 1, "get() returned more than one %s -- it returned %s! Lookup parameters were %s" % (self.model._meta.object_name, len(obj_list), kwargs)
         return obj_list[0]
 
+    def latest(self, field_name=None):
+        """
+        Returns the latest object, according to the model's 'get_latest_by'
+        option or optional given field_name.
+        """
+        latest_by = field_name or self.model._meta.get_latest_by
+        assert bool(latest_by), "latest() requires either a field_name parameter or 'get_latest_by' in the model"
+        return self._clone(_limit=1, _order_by=('-'+latest_by,)).get()
+
     def delete(self, *args, **kwargs):
         """
         Deletes the records with the given kwargs. If no kwargs are given,

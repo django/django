@@ -16,7 +16,6 @@ def ensure_default_manager(sender):
         if hasattr(cls, 'objects'):
             raise ValueError, "Model %s must specify a custom Manager, because it has a field named 'objects'" % name
         cls.add_to_class('objects', Manager())
-        cls.objects._prepare()
 
 dispatcher.connect(ensure_default_manager, signal=signals.class_prepared)
 
@@ -31,22 +30,12 @@ class Manager(object):
         Manager.creation_counter += 1
         self.model = None
 
-    def _prepare(self):
-        if self.model._meta.get_latest_by:
-            self.get_latest = self.__get_latest
-
     def contribute_to_class(self, model, name):
         # TODO: Use weakref because of possible memory leak / circular reference.
         self.model = model
-        dispatcher.connect(self._prepare, signal=signals.class_prepared, sender=model)
         setattr(model, name, ManagerDescriptor(self))
         if not hasattr(model, '_default_manager') or self.creation_counter < model._default_manager.creation_counter:
             model._default_manager = self
-
-    def __get_latest(self, *args, **kwargs):
-        kwargs['order_by'] = ('-' + self.model._meta.get_latest_by,)
-        kwargs['limit'] = 1
-        return self.get_object(*args, **kwargs)
 
     #######################
     # PROXIES TO QUERYSET #
@@ -88,6 +77,9 @@ class Manager(object):
 
     def iterator(self, *args, **kwargs):
         return self.get_query_set().iterator(*args, **kwargs)
+
+    def latest(self, *args, **kwargs):
+        return self.get_query_set().latest(*args, **kwargs)
 
     def order_by(self, *args, **kwargs):
         return self.get_query_set().order_by(*args, **kwargs)
