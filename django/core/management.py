@@ -5,6 +5,10 @@ import django
 import os, re, sys, textwrap
 from optparse import OptionParser
 
+# For Python 2.3
+if not hasattr(__builtins__, 'set'):
+    from sets import Set as set
+
 MODULE_TEMPLATE = '''    {%% if perms.%(app)s.%(addperm)s or perms.%(app)s.%(changeperm)s %%}
     <tr>
         <th>{%% if perms.%(app)s.%(changeperm)s %%}<a href="%(app)s/%(mod)s/">{%% endif %%}%(name)s{%% if perms.%(app)s.%(changeperm)s %%}</a>{%% endif %%}</th>
@@ -563,6 +567,8 @@ def inspectdb(db_name):
         object_name = table_name.title().replace('_', '')
         return object_name.endswith('s') and object_name[:-1] or object_name
 
+    reserved_python_words = set(['and', 'assert', 'break', 'class', 'continue', 'def', 'del', 'elif', 'else', 'except', 'exec', 'finally', 'for', 'from', 'global', 'if', 'import', 'in', 'is', 'lambda', 'not', 'or', 'pass', 'print', 'raise', 'return', 'try', 'while'])
+
     settings.DATABASE_NAME = db_name
     cursor = db.db.cursor()
     yield "# This is an auto-generated Django model module."
@@ -584,37 +590,47 @@ def inspectdb(db_name):
             relations = {}
         for i, row in enumerate(db.get_table_description(cursor, table_name)):
             column_name = row[0]
+            comment_notes = [] # Holds Field notes, to be displayed in a Python comment.
+            extra_params = {}  # Holds Field parameters such as 'db_column'.
+
+            if column_name in reserved_python_words:
+                extra_params['db_column'] = column_name
+                column_name += '_field'
+                comment_notes.append('Field renamed because it was a Python reserved word.')
+
             if relations.has_key(i):
-                rel = relations[i]
-                rel_to = rel[1] == table_name and "'self'" or table2model(rel[1])
+                rel_to = relations[i][1] == table_name and "'self'" or table2model(relations[i][1])
+                field_type = 'ForeignKey(%s' % rel_to
                 if column_name.endswith('_id'):
-                    field_desc = '%s = meta.ForeignKey(%s' % (column_name[:-3], rel_to)
+                    column_name = column_name[:-3]
                 else:
-                    field_desc = '%s = meta.ForeignKey(%s, db_column=%r' % (column_name, rel_to, column_name)
+                    extra_params['db_column'] = column_name
             else:
                 try:
                     field_type = db.DATA_TYPES_REVERSE[row[1]]
                 except KeyError:
                     field_type = 'TextField'
-                    field_type_was_guessed = True
-                else:
-                    field_type_was_guessed = False
+                    comment_notes.append('This field type is a guess.')
 
                 # This is a hook for DATA_TYPES_REVERSE to return a tuple of
                 # (field_type, extra_params_dict).
                 if type(field_type) is tuple:
-                    field_type, extra_params = field_type
-                else:
-                    extra_params = {}
+                    field_type, new_params = field_type
+                    extra_params.update(new_params)
 
                 if field_type == 'CharField' and row[3]:
                     extra_params['maxlength'] = row[3]
 
-                field_desc = '%s = meta.%s(' % (column_name, field_type)
-                field_desc += ', '.join(['%s=%s' % (k, v) for k, v in extra_params.items()])
-                field_desc += ')'
-                if field_type_was_guessed:
-                    field_desc += ' # This is a guess!'
+                field_type += '('
+
+            field_desc = '%s = meta.%s' % (column_name, field_type)
+            if extra_params:
+                if not field_desc.endswith('('):
+                    field_desc += ', '
+                field_desc += ', '.join(['%s=%r' % (k, v) for k, v in extra_params.items()])
+            field_desc += ')'
+            if comment_notes:
+                field_desc += ' # ' + ' '.join(comment_notes)
             yield '    %s' % field_desc
         yield '    class META:'
         yield '        db_table = %r' % table_name
