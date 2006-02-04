@@ -58,7 +58,7 @@ def object_list(request, model, paginate_by=None, allow_empty=False,
             'hits' : paginator.hits,
         }, context_processors)
     else:
-        object_list = model._default_manager.get_list(**lookup_kwargs)
+        object_list = model._default_manager.filter(**lookup_kwargs)
         c = RequestContext(request, {
             'object_list': object_list,
             'is_paginated': False
@@ -96,7 +96,7 @@ def object_detail(request, model, object_id=None, slug=None,
         raise AttributeError, "Generic detail view must be called with either an object_id or a slug/slug_field."
     lookup_kwargs.update(extra_lookup_kwargs)
     try:
-        object = model._default_manager.get_object(**lookup_kwargs)
+        object = model._default_manager.get(**lookup_kwargs)
     except ObjectDoesNotExist:
         raise Http404, "No %s found for %s" % (model._meta.verbose_name, lookup_kwargs)
     if not template_name:
