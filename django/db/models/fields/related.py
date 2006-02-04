@@ -136,7 +136,7 @@ class ReverseManyRelatedObjectsDescriptor(object):
     # multiple "remote" values and have a ManyToManyField defined in their
     # model (rather than having another model pointed *at* them).
     # In the example "poll.sites", the sites attribute is a
-    # ManyRelatedObjectsDescriptor instance.
+    # ReverseManyRelatedObjectsDescriptor instance.
     def __init__(self, m2m_field):
         self.field = m2m_field
         self.rel_model = m2m_field.rel.to
