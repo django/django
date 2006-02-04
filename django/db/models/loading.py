@@ -47,5 +47,6 @@ def get_model(app_label, model_name):
     """
     for app_mod in get_apps():
         for model in get_models(app_mod):
-            if model._meta.object_name.lower() == model_name:
+            if model._meta.object_name.lower() == model_name and \
+                    model._meta.app_label == app_label:
                 return model
