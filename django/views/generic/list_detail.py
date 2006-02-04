@@ -4,8 +4,8 @@ from django.core.xheaders import populate_xheaders
 from django.core.paginator import ObjectPaginator, InvalidPage
 from django.core.exceptions import ObjectDoesNotExist
 
-def object_list(request, model, paginate_by=None, allow_empty=False,
-        template_name=None, template_loader=loader, extra_lookup_kwargs={},
+def object_list(request, queryset, paginate_by=None, allow_empty=False,
+        template_name=None, template_loader=loader,
         extra_context={}, context_processors=None):
     """
     Generic list of objects.
@@ -33,9 +33,10 @@ def object_list(request, model, paginate_by=None, allow_empty=False,
         hits
             number of objects, total
     """
-    lookup_kwargs = extra_lookup_kwargs.copy()
+    queryset = queryset._clone()
+    model = queryset.model
     if paginate_by:
-        paginator = ObjectPaginator(model, lookup_kwargs, paginate_by)
+        paginator = ObjectPaginator(queryset, paginate_by)
         page = request.GET.get('page', 0)
         try:
             object_list = paginator.get_page(page)
@@ -58,12 +59,11 @@ def object_list(request, model, paginate_by=None, allow_empty=False,
             'hits' : paginator.hits,
         }, context_processors)
     else:
-        object_list = model._default_manager.filter(**lookup_kwargs)
         c = RequestContext(request, {
-            'object_list': object_list,
+            'object_list': queryset,
             'is_paginated': False
         }, context_processors)
-        if len(object_list) == 0 and not allow_empty:
+        if not allow_empty and len(queryset) == 0:
             raise Http404
     for key, value in extra_context.items():
         if callable(value):
@@ -75,9 +75,9 @@ def object_list(request, model, paginate_by=None, allow_empty=False,
     t = template_loader.get_template(template_name)
     return HttpResponse(t.render(c))
 
-def object_detail(request, model, object_id=None, slug=None,
+def object_detail(request, queryset, object_id=None, slug=None,
         slug_field=None, template_name=None, template_name_field=None,
-        template_loader=loader, extra_lookup_kwargs={}, extra_context={},
+        template_loader=loader, extra_context={},
         context_processors=None):
     """
     Generic list of objects.
@@ -87,18 +87,17 @@ def object_detail(request, model, object_id=None, slug=None,
         object
             the object
     """
-    lookup_kwargs = {}
+    model = queryset.model
     if object_id:
-        lookup_kwargs['pk'] = object_id
+        queryset = queryset.filter(pk=object_id)
     elif slug and slug_field:
-        lookup_kwargs['%s__exact' % slug_field] = slug
+        queryset = queryset.filter(**{slug_field: slug})
     else:
         raise AttributeError, "Generic detail view must be called with either an object_id or a slug/slug_field."
-    lookup_kwargs.update(extra_lookup_kwargs)
     try:
-        object = model._default_manager.get(**lookup_kwargs)
+        object = queryset.get()
     except ObjectDoesNotExist:
-        raise Http404, "No %s found for %s" % (model._meta.verbose_name, lookup_kwargs)
+        raise Http404, "No %s found matching the query" % (model._meta.verbose_name)
     if not template_name:
         template_name = "%s/%s_detail" % (model._meta.app_label, model._meta.object_name.lower())
     if template_name_field:
