@@ -103,4 +103,61 @@ API_TESTS = """
 [Django lets you build Web apps easily]
 >>> p1.article_set.order_by('headline')
 [Django lets you build Web apps easily]
+
+# Adding via the 'other' end of an m2m
+>>> a4 = Article(headline='NASA finds intelligent life on Earth')
+>>> a4.save()
+>>> p2.article_set.add(a4)
+>>> p2.article_set.all()
+[NASA finds intelligent life on Earth]
+>>> a4.publications.all()
+[Science News]
+
+# Adding via the other end using keywords
+>>> a5 = p1.article_set.add(headline='Oxygen-free diet works wonders')
+>>> p2.article_set.all().order_by('headline')
+[NASA finds intelligent life on Earth, Oxygen-free diet works wonders]
+>>> a5.publications.all()
+[Science News]
+
+# Removing publication from an article:
+>>> a4.publications.remove(p2)
+>>> p2.article_set.all().order_by('headline')
+[Oxygen-free diet works wonders]
+>>> a4.publications.all()
+[]
+
+# And from the other end
+>>> p2.article_set.remove(a5)
+>>> p2.article_set.order_by('headline')
+[]
+>>> a5.publications.all()
+[]
+
+# You can clear the whole lot:
+# (put some back first)
+>>> p2.article_set.add(a4, a5)
+>>> a4.publications.add(p3)
+>>> a4.publications.order_by('title')
+[Science News, Science Weekly]
+>>> p2.article_set.clear()
+>>> p2.article_set.all()
+[]
+>>> a4.publications.all()
+[Science Weekly]
+
+# And you can clear from the other end
+>>> p2.article_set.add(a4, a5)
+>>> p2.article_set.all().order_by('headline')
+[NASA finds intelligent life on Earth, Oxygen-free diet works wonders]
+>>> a4.publications.order_by('title')
+[Science News, Science Weekly]
+>>> a4.publications.clear()
+>>> a4.publications.all()
+[]
+>>> p2.article_set.all().order_by('headline')
+[Oxygen-free diet works wonders]
+
+
+
 """
