@@ -41,15 +41,6 @@ class RelatedObject(object):
         """
         return data # TODO
 
-    def get_list(self, parent_instance=None):
-        "Get the list of this type of object from an instance of the parent class."
-        if parent_instance != None:
-            func_name = 'get_%s_list' % self.OLD_get_accessor_name()
-            func = getattr(parent_instance, func_name)
-            return func()
-        else:
-            return []
-
     def editable_fields(self):
         "Get the fields in this class that should be edited inline."
         return [f for f in self.opts.fields + self.opts.many_to_many if f.editable and f != self.field]
