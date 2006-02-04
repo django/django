@@ -90,6 +90,38 @@ class SingleRelatedObjectDescriptor(object):
             setattr(instance, cache_name, rel_obj)
             return rel_obj
 
+def do_m2m_add(rel_manager_inst, managerclass, rel_model, join_table, this_col_name,
+        rel_col_name, this_pk_val, *objs, **kwargs):
+    # Utility function used by the ManyRelatedObjectsDescriptors
+    # to do addition to a many-to-many field.
+    # rel_manager_inst: the RelatedManager instance
+    # managerclass: class that can create and save new objects
+    # rel_model: the model class of the 'related' object
+    # join_table: name of the m2m link table 
+    # this_col_name: the PK colname in join_table for 'this' object
+    # rel_col_name: the PK colname in join_table for the related object
+    # this_pk_val: the primary key for 'this' object
+    # *objs - objects to add, or **kwargs to create new objects
+
+    from django.db import connection
+    # Create the related object.
+    if kwargs:
+        assert len(objs) == 0, "add() can't be passed both positional and keyword arguments"
+        objs = [managerclass.add(rel_manager_inst, **kwargs)]
+    else:
+        assert len(objs) > 0, "add() must be passed either positional or keyword arguments"
+        for obj in objs:
+            if not isinstance(obj, rel_model):
+                raise ValueError, "positional arguments to add() must be %s instances" % rel_opts.object_name
+    # Add the newly created object to the join table.
+    # TODO: Check to make sure the object isn't already in the join table.
+    cursor = connection.cursor()
+    for obj in objs:
+        cursor.execute("INSERT INTO %s (%s, %s) VALUES (%%s, %%s)" % \
+            (join_table, this_col_name, rel_col_name),
+            [this_pk_val, obj._get_pk_val()])
+    connection.commit()    
+
 class ManyRelatedObjectsDescriptor(object):
     # This class provides the functionality that makes the related-object
     # managers available as attributes on a model class, for fields that have
@@ -106,6 +138,16 @@ class ManyRelatedObjectsDescriptor(object):
             raise AttributeError, "Manager must be accessed via instance"
 
         rel_field = self.related.field
+        rel_type = self.rel_type
+        rel_model = self.related.model
+
+        if rel_type == "m2m":
+            qn = backend.quote_name
+            this_opts = instance.__class__._meta
+            rel_opts = rel_model._meta
+            join_table = backend.quote_name(self.related.field.get_m2m_db_table(rel_opts))
+            this_col_name = this_opts.object_name.lower() + '_id'
+            rel_col_name = rel_opts.object_name.lower() + '_id'
 
         # Dynamically create a class that subclasses the related
         # model's default manager.
@@ -114,9 +156,14 @@ class ManyRelatedObjectsDescriptor(object):
         class RelatedManager(superclass):
             def get_query_set(self):
                 return superclass.get_query_set(self).filter(**(self.core_filters))
-            def add(self, **kwargs):
-                kwargs.update({rel_field.name: instance})
-                return superclass.add(self, **kwargs)
+            if rel_type == "o2m":
+                def add(self, **kwargs):
+                    kwargs.update({rel_field.name: instance})
+                    return superclass.add(self, **kwargs)
+            else:
+                def add(self, *objs, **kwargs):
+                    do_m2m_add(self, superclass, rel_model, join_table, this_col_name,
+                        rel_col_name, instance._get_pk_val(), *objs, **kwargs)
             add.alters_data = True
 
         manager = RelatedManager()
@@ -168,24 +215,8 @@ class ReverseManyRelatedObjectsDescriptor(object):
                     params = [instance._get_pk_val()]
                 )
             def add(self, *objs, **kwargs):
-                from django.db import connection
-                # Create the related object.
-                if kwargs:
-                    assert len(objs) == 0, "add() can't be passed both positional and keyword arguments"
-                    objs = [superclass.add(self, **kwargs)]
-                else:
-                    assert len(objs) > 0, "add() must be passed either positional or keyword arguments"
-                    for obj in objs:
-                        if not isinstance(obj, rel_model):
-                            raise ValueError, "positional arguments to add() must be %s instances" % rel_opts.object_name
-                # Add the newly created object to the join table.
-                # TODO: Check to make sure the object isn't already in the join table.
-                cursor = connection.cursor()
-                for obj in objs:
-                    cursor.execute("INSERT INTO %s (%s, %s) VALUES (%%s, %%s)" % \
-                        (join_table, this_col_name, rel_col_name),
-                        [instance._get_pk_val(), obj._get_pk_val()])
-                connection.commit()
+                do_m2m_add(self, superclass, rel_model, join_table, this_col_name,
+                    rel_col_name, instance._get_pk_val(), *objs, **kwargs)
             add.alters_data = True
 
         manager = RelatedManager()
