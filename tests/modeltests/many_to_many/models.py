@@ -114,9 +114,10 @@ API_TESTS = """
 [Science News]
 
 # Adding via the other end using keywords
->>> a5 = p1.article_set.add(headline='Oxygen-free diet works wonders')
+>>> p2.article_set.add(headline='Oxygen-free diet works wonders')
 >>> p2.article_set.all().order_by('headline')
 [NASA finds intelligent life on Earth, Oxygen-free diet works wonders]
+>>> a5 = p2.article_set.all().order_by('headline')[1]
 >>> a5.publications.all()
 [Science News]
 
