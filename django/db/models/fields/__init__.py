@@ -481,7 +481,7 @@ class FileField(Field):
             # If the file exists and no other object of this type references it,
             # delete it from the filesystem.
             if os.path.exists(file_name) and \
-                not instance.__class__._default_manager.get_list(**{'%s__exact' % self.name: getattr(instance, self.attname)}):
+                not instance.__class__._default_manager.filter(**{'%s__exact' % self.name: getattr(instance, self.attname)}):
                 os.remove(file_name)
 
     def get_manipulator_field_objs(self):
