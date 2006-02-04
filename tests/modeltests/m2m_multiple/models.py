@@ -44,13 +44,11 @@ API_TESTS = """
 >>> a1.save()
 >>> a1.primary_categories.add(c2, c3)
 >>> a1.secondary_categories.add(c4)
-True
 
 >>> a2 = Article(headline='Area man runs', pub_date=datetime(2005, 11, 28))
 >>> a2.save()
 >>> a2.primary_categories.add(c1, c2)
 >>> a2.secondary_categories.add(c4)
-True
 
 >>> a1.primary_categories.all()
 [Crime, News]
