@@ -21,7 +21,8 @@
   </ul>
 {% endif %}{% endif %}
 <form {% if has_file_field %}enctype="multipart/form-data" {% endif %}action="{{ form_url }}" method="post">{% block form_top %}{% endblock %}
-{% if is_popup %}<input type="hidden" name="_popup" value="1">{% endif %}
+<div>
+{% if is_popup %}<input type="hidden" name="_popup" value="1" />{% endif %}
 {% if opts.admin.save_on_top %}{% submit_row %}{% endif %}
 {% if form.error_dict %}
     <p class="errornote">
@@ -60,5 +61,6 @@
    {% auto_populated_field_script auto_populated_fields change %}
    </script>
 {% endif %}
+</div>
 </form></div>
 {% endblock %}
