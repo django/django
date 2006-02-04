@@ -731,6 +731,7 @@ def inspectdb(db_name):
     "Generator that introspects the tables in the given database name and returns a Django model, one line at a time."
     from django.db import connection, get_introspection_module
     from django.conf import settings
+    import keyword
 
     introspection_module = get_introspection_module()
 
@@ -759,37 +760,49 @@ def inspectdb(db_name):
             relations = {}
         for i, row in enumerate(introspection_module.get_table_description(cursor, table_name)):
             column_name = row[0]
+            comment_notes = [] # Holds Field notes, to be displayed in a Python comment.
+            extra_params = {}  # Holds Field parameters such as 'db_column'.
+
+            if keyword.iskeyword(column_name):
+                extra_params['db_column'] = column_name
+                column_name += '_field'
+                comment_notes.append('Field renamed because it was a Python reserved word.')
+
             if relations.has_key(i):
-                rel = relations[i]
-                rel_to = rel[1] == table_name and "'self'" or table2model(rel[1])
+                rel_to = relations[i][1] == table_name and "'self'" or table2model(relations[i][1])
+                field_type = 'ForeignKey(%s' % rel_to
                 if column_name.endswith('_id'):
-                    field_desc = '%s = models.ForeignKey(%s)' % (column_name[:-3], rel_to)
+                    column_name = column_name[:-3]
                 else:
-                    field_desc = '%s = models.ForeignKey(%s, db_column=%r)' % (column_name, rel_to, column_name)
+                    extra_params['db_column'] = column_name
             else:
                 try:
                     field_type = introspection_module.DATA_TYPES_REVERSE[row[1]]
                 except KeyError:
                     field_type = 'TextField'
-                    field_type_was_guessed = True
-                else:
-                    field_type_was_guessed = False
+                    comment_notes.append('This field type is a guess.')
 
                 # This is a hook for DATA_TYPES_REVERSE to return a tuple of
                 # (field_type, extra_params_dict).
                 if type(field_type) is tuple:
                     field_type, extra_params = field_type
-                else:
-                    extra_params = {}
+                    field_type, new_params = field_type
+                    extra_params.update(new_params)
 
                 if field_type == 'CharField' and row[3]:
                     extra_params['maxlength'] = row[3]
 
-                field_desc = '%s = models.%s(' % (column_name, field_type)
-                field_desc += ', '.join(['%s=%s' % (k, v) for k, v in extra_params.items()])
-                field_desc += ')'
-                if field_type_was_guessed:
-                    field_desc += ' # This is a guess!'
+                field_type += '('
+
+
+            field_desc = '%s = models.%s' % (column_name, field_type)
+            if extra_params:
+                if not field_desc.endswith('('):
+                    field_desc += ', '
+                field_desc += ', '.join(['%s=%r' % (k, v) for k, v in extra_params.items()])
+            field_desc += ')'
+            if comment_notes:
+                field_desc += ' # ' + ' '.join(comment_notes)
             yield '    %s' % field_desc
         yield '    class Meta:'
         yield '        db_table = %r' % table_name

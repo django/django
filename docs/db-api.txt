@@ -329,7 +329,7 @@ Given an instance of an object, related objects can be looked-up directly using
 convenience functions. For example, if ``p`` is a ``Poll`` instance,
 ``p.get_choice_list()`` will return a list of all associated choices. Astute
 readers will note that this is the same as
-``choices.get_list(poll_id__exact=p.id)``, except clearer.
+``choices.get_list(poll__id__exact=p.id)``, except clearer.
 
 Each type of relationship creates a set of methods on each object in the
 relationship. These methods are created in both directions, so objects that are

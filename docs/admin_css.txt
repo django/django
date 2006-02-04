@@ -26,10 +26,13 @@ whole group.
 Column Types
 ============
 
+.. admonition:: Note
+
+    In the Django development version, all admin pages (except the dashboard) are fluid-width. All fixed-width classes have been removed.
+
 The base template for each admin page has a block that defines the column
 structure for the page. This sets a class on the page content area
-(``div#content``) so everything on the page knows how wide it should be. So far
-there are three options available, and one special hybrid option.
+(``div#content``) so everything on the page knows how wide it should be. There are three column types available.
 
 colM
     This is the default column setting for all pages. The "M" stands for "main".
@@ -43,26 +46,24 @@ colMS
 colSM
     Same as above, with the sidebar on the left. The source order of the columns
     doesn't matter.
-colM superwide
+colM superwide (removed in Django development version)
     This is for ridiculously wide pages. Doesn't really work very well for
     anything but colM. With superwide, you've got 1000px to work with. Don't
     waste them.
-flex
+flex (removed in Django development version)
     This is for liquid-width pages, such as changelists. Currently only works
     with single-column pages (does not combine with ``.colMS`` or ``.colSM``).
     Form pages should never use ``.flex``.
 
-For instance, you could stick this in a template to make a superwide page::
+For instance, you could stick this in a template to make a two-column page with the sidebar on the right::
 
-    {% block coltype %}colM superwide{% endblock %}
+    {% block coltype %}colMS{% endblock %}
 
-or this to make a liquid-width page (note that ``flex`` replaces ``colM``, so
-both classes are not required)::
-
-    {% block coltype %}flex{% endblock %}
 
 Widths
 ======
+
+**Removed in Django development version (see note above).**
 
 There's a whole mess of classes in the stylesheet for custom pixel widths on
 objects. They come in handy for tables and table cells, if you want to avoid

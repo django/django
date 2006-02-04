@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2006-01-12 23:11+0100\n"
+"POT-Creation-Date: 2006-02-02 11:26+0100\n"
 "PO-Revision-Date: 2005-11-05 HO:MI+ZONE\n"
 "Last-Translator: Jason Davies <jason@jasondavies.com>\n"
 "Language-Team: Cymraeg <cy@li.org>\n"
@@ -268,6 +268,78 @@ msgstr ""
 msgid "The comment form didn't provide either 'preview' or 'post'"
 msgstr ""
 
+#: contrib/comments/templates/comments/form.html:6
+#: contrib/comments/templates/comments/form.html:8
+#: contrib/admin/templates/admin/login.html:15
+msgid "Username:"
+msgstr "Enw defnyddiwr:"
+
+#: contrib/comments/templates/comments/form.html:6
+#: contrib/admin/templates/admin/login.html:18
+msgid "Password:"
+msgstr "Cyfrinair:"
+
+#: contrib/comments/templates/comments/form.html:6
+#, fuzzy
+msgid "Forgotten your password?"
+msgstr "Newidio fy nghyfrinair"
+
+#: contrib/comments/templates/comments/form.html:8
+#: contrib/admin/templates/admin/object_history.html:3
+#: contrib/admin/templates/admin/change_list.html:4
+#: contrib/admin/templates/admin/base.html:23
+#: contrib/admin/templates/admin/delete_confirmation.html:3
+#: contrib/admin/templates/admin/change_form.html:9
+#: contrib/admin/templates/registration/password_change_form.html:3
+#: contrib/admin/templates/admin_doc/bookmarklets.html:4
+#: contrib/admin/templates/admin_doc/view_detail.html:4
+#: contrib/admin/templates/admin_doc/template_tag_index.html:5
+#: contrib/admin/templates/admin_doc/template_detail.html:4
+#: contrib/admin/templates/admin_doc/template_filter_index.html:5
+#: contrib/admin/templates/admin_doc/missing_docutils.html:4
+#: contrib/admin/templates/admin_doc/view_index.html:5
+#: contrib/admin/templates/admin_doc/model_detail.html:3
+#: contrib/admin/templates/admin_doc/index.html:4
+#: contrib/admin/templates/admin_doc/model_index.html:5
+msgid "Log out"
+msgstr "Allgofnodi"
+
+#: contrib/comments/templates/comments/form.html:12
+#, fuzzy
+msgid "Ratings"
+msgstr "cyfraddiad #1"
+
+#: contrib/comments/templates/comments/form.html:12
+#: contrib/comments/templates/comments/form.html:23
+msgid "Required"
+msgstr ""
+
+#: contrib/comments/templates/comments/form.html:12
+#: contrib/comments/templates/comments/form.html:23
+msgid "Optional"
+msgstr ""
+
+#: contrib/comments/templates/comments/form.html:23
+msgid "Post a photo"
+msgstr ""
+
+#: contrib/comments/templates/comments/form.html:27
+#: contrib/comments/templates/comments/freeform.html:5
+#, fuzzy
+msgid "Comment:"
+msgstr "Sylw"
+
+#: contrib/comments/templates/comments/form.html:32
+#: contrib/comments/templates/comments/freeform.html:9
+#, fuzzy
+msgid "Preview comment"
+msgstr "Sylw rhydd"
+
+#: contrib/comments/templates/comments/freeform.html:4
+#, fuzzy
+msgid "Your name:"
+msgstr "enw defnyddiwr"
+
 #: contrib/admin/filterspecs.py:40
 #, python-format
 msgid ""
@@ -340,7 +412,7 @@ msgstr "cofnod"
 msgid "log entries"
 msgstr "cofnodion"
 
-#: contrib/admin/templatetags/admin_list.py:245
+#: contrib/admin/templatetags/admin_list.py:241
 msgid "All dates"
 msgstr "Dyddiadau i gyd"
 
@@ -356,23 +428,23 @@ msgstr ""
 msgid "Log in"
 msgstr "Mewngofnodi"
 
-#: contrib/admin/views/decorators.py:57
+#: contrib/admin/views/decorators.py:61
 msgid ""
 "Please log in again, because your session has expired. Don't worry: Your "
 "submission has been saved."
 msgstr ""
 
-#: contrib/admin/views/decorators.py:64
+#: contrib/admin/views/decorators.py:68
 msgid ""
 "Looks like your browser isn't configured to accept cookies. Please enable "
 "cookies, reload this page, and try again."
 msgstr ""
 
-#: contrib/admin/views/decorators.py:78
+#: contrib/admin/views/decorators.py:82
 msgid "Usernames cannot contain the '@' character."
 msgstr ""
 
-#: contrib/admin/views/decorators.py:80
+#: contrib/admin/views/decorators.py:84
 #, python-format
 msgid "Your e-mail address is not your username. Try '%s' instead."
 msgstr ""
@@ -450,26 +522,26 @@ msgstr ""
 msgid "Change %s"
 msgstr "Newidio %s"
 
-#: contrib/admin/views/main.py:614
+#: contrib/admin/views/main.py:615
 #, python-format
 msgid "One or more %(fieldname)s in %(name)s: %(obj)s"
 msgstr ""
 
-#: contrib/admin/views/main.py:619
+#: contrib/admin/views/main.py:620
 #, python-format
 msgid "One or more %(fieldname)s in %(name)s:"
 msgstr ""
 
-#: contrib/admin/views/main.py:648
+#: contrib/admin/views/main.py:649
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was deleted successfully."
 msgstr ""
 
-#: contrib/admin/views/main.py:651
+#: contrib/admin/views/main.py:652
 msgid "Are you sure?"
 msgstr "Ydych yn sicr?"
 
-#: contrib/admin/views/main.py:666
+#: contrib/admin/views/main.py:667
 #, python-format
 msgid "Change history: %s"
 msgstr "Hanes newid: %s"
@@ -554,6 +626,7 @@ msgstr "Testun XML"
 #: contrib/admin/templates/admin/base.html:23
 #: contrib/admin/templates/admin/delete_confirmation.html:3
 #: contrib/admin/templates/admin/change_form.html:9
+#: contrib/admin/templates/registration/password_change_form.html:3
 #: contrib/admin/templates/admin_doc/bookmarklets.html:3
 msgid "Documentation"
 msgstr "Dogfennaeth"
@@ -563,6 +636,7 @@ msgstr "Dogfennaeth"
 #: contrib/admin/templates/admin/base.html:23
 #: contrib/admin/templates/admin/delete_confirmation.html:3
 #: contrib/admin/templates/admin/change_form.html:9
+#: contrib/admin/templates/registration/password_change_form.html:3
 #: contrib/admin/templates/admin_doc/bookmarklets.html:4
 #: contrib/admin/templates/admin_doc/view_detail.html:4
 #: contrib/admin/templates/admin_doc/template_tag_index.html:5
@@ -576,28 +650,10 @@ msgstr "Dogfennaeth"
 msgid "Change password"
 msgstr "Newid cyfrinair"
 
-#: contrib/admin/templates/admin/object_history.html:3
-#: contrib/admin/templates/admin/change_list.html:4
-#: contrib/admin/templates/admin/base.html:23
-#: contrib/admin/templates/admin/delete_confirmation.html:3
-#: contrib/admin/templates/admin/change_form.html:9
-#: contrib/admin/templates/admin_doc/bookmarklets.html:4
-#: contrib/admin/templates/admin_doc/view_detail.html:4
-#: contrib/admin/templates/admin_doc/template_tag_index.html:5
-#: contrib/admin/templates/admin_doc/template_detail.html:4
-#: contrib/admin/templates/admin_doc/template_filter_index.html:5
-#: contrib/admin/templates/admin_doc/missing_docutils.html:4
-#: contrib/admin/templates/admin_doc/view_index.html:5
-#: contrib/admin/templates/admin_doc/model_detail.html:3
-#: contrib/admin/templates/admin_doc/index.html:4
-#: contrib/admin/templates/admin_doc/model_index.html:5
-msgid "Log out"
-msgstr "Allgofnodi"
-
 #: contrib/admin/templates/admin/object_history.html:5
 #: contrib/admin/templates/admin/500.html:4
 #: contrib/admin/templates/admin/change_list.html:5
-#: contrib/admin/templates/admin/base.html:29
+#: contrib/admin/templates/admin/base.html:28
 #: contrib/admin/templates/admin/change_form.html:12
 #: contrib/admin/templates/registration/password_change_done.html:4
 #: contrib/admin/templates/registration/password_reset_form.html:4
@@ -703,14 +759,6 @@ msgstr "Dim ar gael"
 #, python-format
 msgid "Add %(name)s"
 msgstr "Ychwanegu %(name)s"
-
-#: contrib/admin/templates/admin/login.html:15
-msgid "Username:"
-msgstr "Enw defnyddiwr:"
-
-#: contrib/admin/templates/admin/login.html:18
-msgid "Password:"
-msgstr "Cyfrinair:"
 
 #: contrib/admin/templates/admin/login.html:20
 msgid "Have you <a href=\"/password_reset/\">forgotten your password</a>?"
@@ -1753,7 +1801,7 @@ msgstr ""
 "Mae gan y priodoledd \"%(attr)s\" ar lein %(line)s gwerth annilydd. (Linell "
 "yn ddechrau â \"%(start)s\".)"
 
-#: core/meta/__init__.py:1947
+#: core/meta/__init__.py:1944
 #, python-format
 msgid "%(object)s with this %(type)s already exists for the given %(field)s."
 msgstr ""

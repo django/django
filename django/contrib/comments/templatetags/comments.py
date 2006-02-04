@@ -2,62 +2,15 @@ from django.contrib.comments.models import Comment, FreeComment
 from django.contrib.comments.models import PHOTOS_REQUIRED, PHOTOS_OPTIONAL, RATINGS_REQUIRED, RATINGS_OPTIONAL, IS_PUBLIC
 from django.contrib.comments.models import MIN_PHOTO_DIMENSION, MAX_PHOTO_DIMENSION
 from django import template
+from django.core.template import loader
 from django.core.exceptions import ObjectDoesNotExist
 from django.contrib.contenttypes.models import ContentType
 import re
 
 register = template.Library()
 
-COMMENT_FORM = '''
-{% load i18n %}
-{% if display_form %}
-<form {% if photos_optional or photos_required %}enctype="multipart/form-data" {% endif %}action="/comments/post/" method="post">
-
-{% if user.is_anonymous %}
-<p>{% trans "Username:" %} <input type="text" name="username" id="id_username" /><br />{% trans "Password:" %} <input type="password" name="password" id="id_password" /> (<a href="/accounts/password_reset/">{% trans "Forgotten your password?" %}</a>)</p>
-{% else %}
-<p>{% trans "Username:" %} <strong>{{ user.username }}</strong> (<a href="/accounts/logout/">{% trans "Log out" %}</a>)</p>
-{% endif %}
-
-{% if ratings_optional or ratings_required %}
-<p>{% trans "Ratings" %} ({% if ratings_required %}{% trans "Required" %}{% else %}{% trans "Optional" %}{% endif %}):</p>
-<table>
-<tr><th>&nbsp;</th>{% for value in rating_range %}<th>{{ value }}</th>{% endfor %}</tr>
-{% for rating in rating_choices %}
-<tr><th>{{ rating }}</th>{% for value in rating_range %}<th><input type="radio" name="rating{{ forloop.parentloop.counter }}" value="{{ value }}" /></th>{% endfor %}</tr>
-{% endfor %}
-</table>
-<input type="hidden" name="rating_options" value="{{ rating_options }}" />
-{% endif %}
-
-{% if photos_optional or photos_required %}
-<p>{% trans "Post a photo" %} ({% if photos_required %}{% trans "Required" %}{% else %}{% trans "Optional" %}{% endif %}): <input type="file" name="photo" /></p>
-<input type="hidden" name="photo_options" value="{{ photo_options }}" />
-{% endif %}
-
-<p>{% trans "Comment:" %}<br /><textarea name="comment" id="id_comment" rows="10" cols="60"></textarea></p>
-
-<input type="hidden" name="options" value="{{ options }}" />
-<input type="hidden" name="target" value="{{ target }}" />
-<input type="hidden" name="gonzo" value="{{ hash }}" />
-<p><input type="submit" name="preview" value="{% trans "Preview comment" %}" /></p>
-</form>
-{% endif %}
-'''
-
-FREE_COMMENT_FORM = '''
-{% load i18n %}
-{% if display_form %}
-<form action="/comments/postfree/" method="post">
-<p>{% trans "Your name:" %} <input type="text" id="id_person_name" name="person_name" /></p>
-<p>{% trans "Comment:" %}<br /><textarea name="comment" id="id_comment" rows="10" cols="60"></textarea></p>
-<input type="hidden" name="options" value="{{ options }}" />
-<input type="hidden" name="target" value="{{ target }}" />
-<input type="hidden" name="gonzo" value="{{ hash }}" />
-<p><input type="submit" name="preview" value="{% trans "Preview comment" %}" /></p>
-</form>
-{% endif %}
-'''
+COMMENT_FORM = 'comments/form'
+FREE_COMMENT_FORM = 'comments/freeform'
 
 class CommentFormNode(template.Node):
     def __init__(self, content_type, obj_id_lookup_var, obj_id, free,
@@ -104,15 +57,15 @@ class CommentFormNode(template.Node):
         context['options'] = ','.join(options)
         if self.free:
             context['hash'] = Comment.objects.get_security_hash(context['options'], '', '', context['target'])
-            default_form = FREE_COMMENT_FORM
+            default_form = loader.get_template(FREE_COMMENT_FORM)
         else:
             context['photo_options'] = self.photo_options
             context['rating_options'] = normalize_newlines(base64.encodestring(self.rating_options).strip())
             if self.rating_options:
                 context['rating_range'], context['rating_choices'] = Comment.objects.get_rating_options(self.rating_options)
             context['hash'] = Comment.objects.get_security_hash(context['options'], context['photo_options'], context['rating_options'], context['target'])
-            default_form = COMMENT_FORM
-        output = template.Template(default_form).render(context)
+            default_form = loader.get_template(COMMENT_FORM)
+        output = default_form.render(context)
         context.pop()
         return output
 

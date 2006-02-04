@@ -342,9 +342,9 @@ Using a ``FileField`` or an ``ImageField`` in a model takes a few steps:
 If I make changes to a model, how do I update the database?
 -----------------------------------------------------------
 
-If you don't care about clearing data, just pipe the output of the
-appropriate ``django-admin.py sqlreset`` command into your database's
-command-line utility. For example::
+If you don't mind clearing data, just pipe the output of the appropriate
+``django-admin.py sqlreset`` command into your database's command-line utility.
+For example::
 
     django-admin.py sqlreset appname | psql dbname
 
@@ -396,6 +396,7 @@ dictionaries in order of query execution. Each dictionary has the following::
     ``time`` -- How long the statement took to execute, in seconds.
 
 ``db.queries`` includes all SQL statements -- INSERTs, UPDATES, SELECTs, etc.
+Each time your app hits the database, the query will be recorded.
 
 Can I use Django with a pre-existing database?
 ----------------------------------------------

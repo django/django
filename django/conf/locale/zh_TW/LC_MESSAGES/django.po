@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django v1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2006-01-12 23:12+0100\n"
+"POT-Creation-Date: 2006-02-02 11:26+0100\n"
 "PO-Revision-Date: 2005-12-28 23:30+0800\n"
 "Last-Translator: yungyuc <yyc@seety.org>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -280,6 +280,78 @@ msgstr "此評論表單有一個無效的 'target' 參數 -- 物件 ID 是無效
 msgid "The comment form didn't provide either 'preview' or 'post'"
 msgstr "此評論表單沒有提供 'preview' 或 'post'"
 
+#: contrib/comments/templates/comments/form.html:6
+#: contrib/comments/templates/comments/form.html:8
+#: contrib/admin/templates/admin/login.html:15
+msgid "Username:"
+msgstr "使用者名稱:"
+
+#: contrib/comments/templates/comments/form.html:6
+#: contrib/admin/templates/admin/login.html:18
+msgid "Password:"
+msgstr "密碼:"
+
+#: contrib/comments/templates/comments/form.html:6
+#, fuzzy
+msgid "Forgotten your password?"
+msgstr "變更我的密碼"
+
+#: contrib/comments/templates/comments/form.html:8
+#: contrib/admin/templates/admin/object_history.html:3
+#: contrib/admin/templates/admin/change_list.html:4
+#: contrib/admin/templates/admin/base.html:23
+#: contrib/admin/templates/admin/delete_confirmation.html:3
+#: contrib/admin/templates/admin/change_form.html:9
+#: contrib/admin/templates/registration/password_change_form.html:3
+#: contrib/admin/templates/admin_doc/bookmarklets.html:4
+#: contrib/admin/templates/admin_doc/view_detail.html:4
+#: contrib/admin/templates/admin_doc/template_tag_index.html:5
+#: contrib/admin/templates/admin_doc/template_detail.html:4
+#: contrib/admin/templates/admin_doc/template_filter_index.html:5
+#: contrib/admin/templates/admin_doc/missing_docutils.html:4
+#: contrib/admin/templates/admin_doc/view_index.html:5
+#: contrib/admin/templates/admin_doc/model_detail.html:3
+#: contrib/admin/templates/admin_doc/index.html:4
+#: contrib/admin/templates/admin_doc/model_index.html:5
+msgid "Log out"
+msgstr "登出"
+
+#: contrib/comments/templates/comments/form.html:12
+#, fuzzy
+msgid "Ratings"
+msgstr "等級 #1"
+
+#: contrib/comments/templates/comments/form.html:12
+#: contrib/comments/templates/comments/form.html:23
+msgid "Required"
+msgstr ""
+
+#: contrib/comments/templates/comments/form.html:12
+#: contrib/comments/templates/comments/form.html:23
+msgid "Optional"
+msgstr ""
+
+#: contrib/comments/templates/comments/form.html:23
+msgid "Post a photo"
+msgstr ""
+
+#: contrib/comments/templates/comments/form.html:27
+#: contrib/comments/templates/comments/freeform.html:5
+#, fuzzy
+msgid "Comment:"
+msgstr "評論"
+
+#: contrib/comments/templates/comments/form.html:32
+#: contrib/comments/templates/comments/freeform.html:9
+#, fuzzy
+msgid "Preview comment"
+msgstr "自由評論"
+
+#: contrib/comments/templates/comments/freeform.html:4
+#, fuzzy
+msgid "Your name:"
+msgstr "使用者名稱"
+
 #: contrib/admin/filterspecs.py:40
 #, python-format
 msgid ""
@@ -354,7 +426,7 @@ msgstr "紀錄項目"
 msgid "log entries"
 msgstr "紀錄項目"
 
-#: contrib/admin/templatetags/admin_list.py:245
+#: contrib/admin/templatetags/admin_list.py:241
 msgid "All dates"
 msgstr "所有日期"
 
@@ -370,13 +442,13 @@ msgstr "請輸入一個正確的使用者名稱與密碼。注意此二欄位都
 msgid "Log in"
 msgstr "登入"
 
-#: contrib/admin/views/decorators.py:57
+#: contrib/admin/views/decorators.py:61
 msgid ""
 "Please log in again, because your session has expired. Don't worry: Your "
 "submission has been saved."
 msgstr "請再登入一次，因為你的 session 已經到期。不必擔心: 你的提交已被儲存。"
 
-#: contrib/admin/views/decorators.py:64
+#: contrib/admin/views/decorators.py:68
 msgid ""
 "Looks like your browser isn't configured to accept cookies. Please enable "
 "cookies, reload this page, and try again."
@@ -384,11 +456,11 @@ msgstr ""
 "看起來你的瀏覽器沒有組態成允許 cookie。請啟用 cookie、重新載入此頁，然後再試"
 "一次。"
 
-#: contrib/admin/views/decorators.py:78
+#: contrib/admin/views/decorators.py:82
 msgid "Usernames cannot contain the '@' character."
 msgstr "使用者名稱不能包含 '@' 字元。"
 
-#: contrib/admin/views/decorators.py:80
+#: contrib/admin/views/decorators.py:84
 #, python-format
 msgid "Your e-mail address is not your username. Try '%s' instead."
 msgstr "你的電子郵件地址不是你的使用者名稱。試著改用 '%s'。"
@@ -466,26 +538,26 @@ msgstr "%(name)s \"%(obj)s\" 已成功新增。你可以在下面再次編輯。
 msgid "Change %s"
 msgstr "變更 %s"
 
-#: contrib/admin/views/main.py:614
+#: contrib/admin/views/main.py:615
 #, python-format
 msgid "One or more %(fieldname)s in %(name)s: %(obj)s"
 msgstr "在 %(name) 裡的一個或多個 %(fieldname)s: %(obj)s"
 
-#: contrib/admin/views/main.py:619
+#: contrib/admin/views/main.py:620
 #, python-format
 msgid "One or more %(fieldname)s in %(name)s:"
 msgstr "在 %(name)s 裡的一個或多個 %(fieldname)s:"
 
-#: contrib/admin/views/main.py:648
+#: contrib/admin/views/main.py:649
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was deleted successfully."
 msgstr "%(name)s \"%(obj)s\" 已成功刪除。"
 
-#: contrib/admin/views/main.py:651
+#: contrib/admin/views/main.py:652
 msgid "Are you sure?"
 msgstr "你確定？"
 
-#: contrib/admin/views/main.py:666
+#: contrib/admin/views/main.py:667
 #, python-format
 msgid "Change history: %s"
 msgstr "變更歷史: %s"
@@ -570,6 +642,7 @@ msgstr "XML 文字"
 #: contrib/admin/templates/admin/base.html:23
 #: contrib/admin/templates/admin/delete_confirmation.html:3
 #: contrib/admin/templates/admin/change_form.html:9
+#: contrib/admin/templates/registration/password_change_form.html:3
 #: contrib/admin/templates/admin_doc/bookmarklets.html:3
 msgid "Documentation"
 msgstr "文件"
@@ -579,6 +652,7 @@ msgstr "文件"
 #: contrib/admin/templates/admin/base.html:23
 #: contrib/admin/templates/admin/delete_confirmation.html:3
 #: contrib/admin/templates/admin/change_form.html:9
+#: contrib/admin/templates/registration/password_change_form.html:3
 #: contrib/admin/templates/admin_doc/bookmarklets.html:4
 #: contrib/admin/templates/admin_doc/view_detail.html:4
 #: contrib/admin/templates/admin_doc/template_tag_index.html:5
@@ -592,28 +666,10 @@ msgstr "文件"
 msgid "Change password"
 msgstr "變更密碼"
 
-#: contrib/admin/templates/admin/object_history.html:3
-#: contrib/admin/templates/admin/change_list.html:4
-#: contrib/admin/templates/admin/base.html:23
-#: contrib/admin/templates/admin/delete_confirmation.html:3
-#: contrib/admin/templates/admin/change_form.html:9
-#: contrib/admin/templates/admin_doc/bookmarklets.html:4
-#: contrib/admin/templates/admin_doc/view_detail.html:4
-#: contrib/admin/templates/admin_doc/template_tag_index.html:5
-#: contrib/admin/templates/admin_doc/template_detail.html:4
-#: contrib/admin/templates/admin_doc/template_filter_index.html:5
-#: contrib/admin/templates/admin_doc/missing_docutils.html:4
-#: contrib/admin/templates/admin_doc/view_index.html:5
-#: contrib/admin/templates/admin_doc/model_detail.html:3
-#: contrib/admin/templates/admin_doc/index.html:4
-#: contrib/admin/templates/admin_doc/model_index.html:5
-msgid "Log out"
-msgstr "登出"
-
 #: contrib/admin/templates/admin/object_history.html:5
 #: contrib/admin/templates/admin/500.html:4
 #: contrib/admin/templates/admin/change_list.html:5
-#: contrib/admin/templates/admin/base.html:29
+#: contrib/admin/templates/admin/base.html:28
 #: contrib/admin/templates/admin/change_form.html:12
 #: contrib/admin/templates/registration/password_change_done.html:4
 #: contrib/admin/templates/registration/password_reset_form.html:4
@@ -717,14 +773,6 @@ msgstr "沒有可用的"
 #, python-format
 msgid "Add %(name)s"
 msgstr "新增 %(name)s"
-
-#: contrib/admin/templates/admin/login.html:15
-msgid "Username:"
-msgstr "使用者名稱:"
-
-#: contrib/admin/templates/admin/login.html:18
-msgid "Password:"
-msgstr "密碼:"
 
 #: contrib/admin/templates/admin/login.html:20
 msgid "Have you <a href=\"/password_reset/\">forgotten your password</a>?"
@@ -1742,7 +1790,7 @@ msgid ""
 msgstr ""
 "在第 %(line)s 的 \"%(attr)s\" 屬性有一個無效值 (行開始於 \"%(start)s\")。"
 
-#: core/meta/__init__.py:1947
+#: core/meta/__init__.py:1944
 #, python-format
 msgid "%(object)s with this %(type)s already exists for the given %(field)s."
 msgstr "此 %(type)s 的 %(object)s 已存在於給定的 %(field)s 裡。"
