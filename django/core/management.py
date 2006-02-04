@@ -889,8 +889,8 @@ def get_validation_errors(outfile):
                         try:
                             f = opts.get_field(fn)
                         except models.FieldDoesNotExist:
-                            if not hasattr(cls, fn) or not callable(getattr(cls, fn)):
-                                e.add(opts, '"admin.list_display" refers to %r, which isn\'t a field or method.' % fn)
+                            if not hasattr(cls, fn):
+                                e.add(opts, '"admin.list_display" refers to %r, which isn\'t an attribute, method or property.' % fn)
                         else:
                             if isinstance(f, models.ManyToManyField):
                                 e.add(opts, '"admin.list_display" doesn\'t support ManyToManyFields (%r).' % fn)

@@ -80,11 +80,11 @@ def result_headers(cl):
             if field_name == '__repr__':
                 header = lookup_opts.verbose_name
             else:
-                func = getattr(cl.model, field_name) # Let AttributeErrors propogate.
+                attr = getattr(cl.model, field_name) # Let AttributeErrors propogate.
                 try:
-                    header = func.short_description
+                    header = attr.short_description
                 except AttributeError:
-                    header = func.__name__.replace('_', ' ')
+                    header = field_name.replace('_', ' ')
             # Non-field list_display values don't get ordering capability.
             yield {"text": header}
         else:
@@ -110,17 +110,19 @@ def items_for_result(cl, result):
         try:
             f = cl.lookup_opts.get_field(field_name)
         except models.FieldDoesNotExist:
-            # For non-field list_display values, the value is a method
-            # name. Execute the method.
+            # For non-field list_display values, the value is either a method
+            # or a property.
             try:
-                func = getattr(result, field_name)
-                result_repr = str(func())
+                attr = getattr(result, field_name)
+                if callable(attr):
+                    attr = attr()
+                result_repr = str(attr)
             except AttributeError, ObjectDoesNotExist:
                 result_repr = EMPTY_CHANGELIST_VALUE
             else:
                 # Strip HTML tags in the resulting text, except if the
                 # function has an "allow_tags" attribute set to True.
-                if not getattr(func, 'allow_tags', False):
+                if not getattr(attr, 'allow_tags', False):
                     result_repr = escape(result_repr)
         else:
             field_val = getattr(result, f.attname)
