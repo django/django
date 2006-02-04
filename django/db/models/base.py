@@ -34,12 +34,11 @@ class ModelBase(type):
 
         model_module = sys.modules[new_class.__module__]
 
-        # Figure out the app_label by looking one level up.
-        # For 'django.contrib.sites.models', this would be 'sites'.
-        app_label = model_module.__name__.split('.')[-2]
-
-        # Cache the app label.
-        new_class._meta.app_label = app_label
+        if not hasattr(new_class._meta, 'app_label') or \
+                new_class._meta.app_label is None:
+            # Figure out the app_label by looking one level up.
+            # For 'django.contrib.sites.models', this would be 'sites'.
+            new_class._meta.app_label = model_module.__name__.split('.')[-2]
 
         # Add all attributes to the class.
         for obj_name, obj in attrs.items():

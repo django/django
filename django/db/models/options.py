@@ -10,7 +10,8 @@ import re
 get_verbose_name = lambda class_name: re.sub('([A-Z])', ' \\1', class_name).lower().strip()
 
 DEFAULT_NAMES = ('verbose_name', 'verbose_name_plural', 'db_table', 'ordering',
-                 'unique_together', 'permissions', 'get_latest_by', 'order_with_respect_to')
+                 'unique_together', 'permissions', 'get_latest_by', 
+                 'order_with_respect_to', 'app_label')
 
 class Options:
     def __init__(self, meta):
