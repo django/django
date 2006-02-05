@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 
 import os, re, sys, time, traceback
-import django.db.models
 
 # doctest is included in the same package as this module, because this testing
 # framework uses features only available in the Python 2.4 version of doctest,
@@ -79,6 +78,7 @@ class TestRunner:
 
         from django.db import connection
         from django.core import management
+        import django.db.models
 
         # Determine which models we're going to test.
         test_models = get_test_models()
