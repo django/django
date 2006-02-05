@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 import os, re, sys, time, traceback
+import django.db.models
 
 # doctest is included in the same package as this module, because this testing
 # framework uses features only available in the Python 2.4 version of doctest,
@@ -142,7 +143,8 @@ class TestRunner:
 
             # Run the API tests.
             p = doctest.DocTestParser()
-            test_namespace = dict([(m._meta.object_name, m) for m in mod._MODELS])
+            test_namespace = dict([(m._meta.object_name, m) \
+                                    for m in django.db.models.get_models(mod)])
             dtest = p.get_doctest(mod.API_TESTS, test_namespace, model_name, None, None)
             # Manually set verbose=False, because "-v" command-line parameter
             # has side effects on doctest TestRunner class.

@@ -438,7 +438,7 @@ def get_admin_index(app):
     app_label = app_models[0]._meta.app_label
     output.append('{%% if perms.%s %%}' % app_label)
     output.append('<div class="module"><h2>%s</h2><table>' % app_label.title())
-    for klass in mod._MODELS:
+    for klass in app_models:
         if klass._meta.admin:
             output.append(MODULE_TEMPLATE % {
                 'app': app_label,

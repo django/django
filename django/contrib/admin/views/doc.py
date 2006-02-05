@@ -151,7 +151,7 @@ def model_detail(request, app_label, model_name):
     except ImproperlyConfigured:
         raise Http404, "App %r not found" % app_label
     model = None
-    for m in app_mod._MODELS:
+    for m in models.get_models(app_mod):
         if m._meta.object_name.lower() == model_name:
             model = m
             break

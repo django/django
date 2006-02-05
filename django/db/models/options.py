@@ -167,7 +167,7 @@ class Options:
         if not hasattr(self, '_ordered_objects'):
             objects = []
             # TODO
-            #for klass in get_app(self.app_label)._MODELS:
+            #for klass in get_models(get_app(self.app_label)):
             #    opts = klass._meta
             #    if opts.order_with_respect_to and opts.order_with_respect_to.rel \
             #        and self == opts.order_with_respect_to.rel.to._meta:

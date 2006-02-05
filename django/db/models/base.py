@@ -7,6 +7,7 @@ from django.db.models.query import orderlist2sql
 from django.db.models.options import Options, AdminOptions
 from django.db import connection, backend
 from django.db.models import signals
+from django.db.models.loading import register_models
 from django.dispatch import dispatcher
 from django.core.exceptions import ObjectDoesNotExist
 from django.utils.functional import curry
@@ -46,8 +47,7 @@ class ModelBase(type):
 
         new_class._prepare()
 
-        # Populate the _MODELS member on the module the class is in.
-        model_module.__dict__.setdefault('_MODELS', []).append(new_class)
+        register_models(new_class._meta.app_label, new_class)
         return new_class
 
 def cmp_cls(x, y):

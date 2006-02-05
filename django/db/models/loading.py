@@ -6,6 +6,7 @@ from django.core.exceptions import ImproperlyConfigured
 __all__ = ('get_apps', 'get_app', 'get_models', 'get_model', 'register_models')
 
 _app_list = None # Cache of installed apps.
+_app_models = {} # Dictionary of models against app module name
 
 def get_apps():
     "Returns a list of all installed modules that contain models."
@@ -33,11 +34,11 @@ def get_models(app_mod=None):
     returns a list of all installed models.
     """
     if app_mod:
-        return getattr(app_mod, '_MODELS', ())
+        return _app_models.get(app_mod.__name__.split('.')[-2], ())
     else:
         model_list = []
         for app_mod in get_apps():
-            model_list.extend(getattr(app_mod, '_MODELS', ()))
+            model_list.extend(get_models(app_mod))
         return model_list
 
 def get_model(app_label, model_name):
@@ -51,13 +52,8 @@ def get_model(app_label, model_name):
                     model._meta.app_label == app_label:
                 return model
 
-def register_models(app_mod, *models):
+def register_models(app_label, *models):
     """
-    Use this from an app's models.py module to register imported Model classes
-    as belonging to the app. e.g.:
-    
-    register_models(sys.modules[__name__], Article, Reporter)
+    Register a set of models as belonging to an app.
     """
-    if not hasattr(app_mod, '_MODELS'):
-        app_mod._MODELS = []
-    app_mod._MODELS.extend(models)
+    _app_models.setdefault(app_label, []).extend(models)
