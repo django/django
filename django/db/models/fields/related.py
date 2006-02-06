@@ -409,8 +409,7 @@ class ManyToManyField(RelatedField, Field):
     def flatten_data(self, follow, obj = None):
         new_data = {}
         if obj:
-            get_list_func = getattr(obj, 'get_%s_list' % self.rel.singular)
-            instance_ids = [instance._get_pk_val() for instance in get_list_func()]
+            instance_ids = [instance._get_pk_val() for instance in getattr(obj, self.name).all()]
             if self.rel.raw_id_admin:
                  new_data[self.name] = ",".join([str(id) for id in instance_ids])
             else:
