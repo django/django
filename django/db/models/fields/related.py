@@ -8,6 +8,10 @@ from django.core import validators
 from django import forms
 from django.dispatch import dispatcher
 
+# For Python 2.3
+if not hasattr(__builtins__, 'set'):
+    from sets import Set as set
+
 # Values for Relation.edit_inline.
 TABULAR, STACKED = 1, 2
 
@@ -114,13 +118,22 @@ def _add_m2m_items(rel_manager_inst, managerclass, rel_model, join_table, this_c
         for obj in objs:
             if not isinstance(obj, rel_model):
                 raise ValueError, "positional arguments to add() must be %s instances" % rel_opts.object_name
+
     # Add the newly created or already existing objects to the join table.
-    # TODO: Check to make sure the object isn't already in the join table.
+    # First find out which items are already added, to avoid adding them twice
+    new_ids = set([obj._get_pk_val() for obj in objs])
     cursor = connection.cursor()
-    for obj in objs:
+    rowcount = cursor.execute("SELECT %s FROM %s WHERE %s = %%s AND %s IN (%s)" % \
+        (rel_col_name, join_table, this_col_name,
+        rel_col_name, ",".join(['%s'] * len(new_ids))), 
+        [this_pk_val] + list(new_ids))
+    existing_ids = set([row[0] for row in cursor.fetchmany(rowcount)])
+    
+    # Add the ones that aren't there already
+    for obj_id in (new_ids - existing_ids):
         cursor.execute("INSERT INTO %s (%s, %s) VALUES (%%s, %%s)" % \
             (join_table, this_col_name, rel_col_name),
-            [this_pk_val, obj._get_pk_val()])
+            [this_pk_val, obj_id])
     connection.commit()
 
 def _remove_m2m_items(rel_model, join_table, this_col_name,
