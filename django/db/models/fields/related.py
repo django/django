@@ -128,7 +128,7 @@ def _add_m2m_items(rel_manager_inst, managerclass, rel_model, join_table, this_c
         rel_col_name, ",".join(['%s'] * len(new_ids))), 
         [this_pk_val] + list(new_ids))
     existing_ids = set([row[0] for row in cursor.fetchmany(rowcount)])
-    
+
     # Add the ones that aren't there already
     for obj_id in (new_ids - existing_ids):
         cursor.execute("INSERT INTO %s (%s, %s) VALUES (%%s, %%s)" % \
