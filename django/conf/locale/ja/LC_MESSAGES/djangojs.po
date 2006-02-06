@@ -55,7 +55,7 @@ msgstr "選択された %s"
 
 #: contrib/admin/media/js/SelectFilter2.js:54
 msgid "Select your choice(s) and click "
-msgstr ""
+msgstr "選択してクリック"
 
 #: contrib/admin/media/js/SelectFilter2.js:59
 msgid "Clear all"
