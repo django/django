@@ -160,6 +160,19 @@ def _remove_m2m_items(rel_model, join_table, this_col_name,
             [this_pk_val, obj._get_pk_val()])
     connection.commit()
 
+def _clear_m2m_items(join_table, this_col_name, this_pk_val):
+    # Utility function used by the ManyRelatedObjectsDescriptors
+    # to clear all from a many-to-many field.
+    # join_table: name of the m2m link table 
+    # this_col_name: the PK colname in join_table for 'this' object
+    # this_pk_val: the primary key for 'this' object
+    from django.db import connection
+    cursor = connection.cursor()
+    cursor.execute("DELETE FROM %s WHERE %s = %%s" % \
+        (join_table, this_col_name),
+        [this_pk_val])
+    connection.commit()
+
 class ManyRelatedObjectsDescriptor(object):
     # This class provides the functionality that makes the related-object
     # managers available as attributes on a model class, for fields that have
@@ -203,6 +216,7 @@ class ManyRelatedObjectsDescriptor(object):
                     _add_m2m_items(self, superclass, rel_model, join_table, this_col_name,
                         rel_col_name, instance._get_pk_val(), *objs, **kwargs)
             add.alters_data = True
+
             if rel_type == "o2m":
                 def remove(self, *objs):
                     pass # TODO
@@ -211,6 +225,14 @@ class ManyRelatedObjectsDescriptor(object):
                     _remove_m2m_items(rel_model, join_table, this_col_name,
                         rel_col_name, instance._get_pk_val(), *objs)
             remove.alters_data = True
+
+            if rel_type == "o2m":
+                def clear(self):
+                    pass # TODO
+            else:
+                def clear(self):
+                    _clear_m2m_items(join_table, this_col_name, instance._get_pk_val())
+            clear.alters_data = True
 
         manager = RelatedManager()
 
@@ -264,11 +286,15 @@ class ReverseManyRelatedObjectsDescriptor(object):
                 _add_m2m_items(self, superclass, rel_model, join_table, this_col_name,
                     rel_col_name, instance._get_pk_val(), *objs, **kwargs)
             add.alters_data = True
-            
+
             def remove(self, *objs):
                 _remove_m2m_items(rel_model, join_table, this_col_name,
                     rel_col_name, instance._get_pk_val(), *objs)
             remove.alters_data = True
+
+            def clear(self):
+                _clear_m2m_items(join_table, this_col_name, instance._get_pk_val())
+            clear.alters_data = True
 
         manager = RelatedManager()
         manager.model = self.rel_model
