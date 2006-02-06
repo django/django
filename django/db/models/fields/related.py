@@ -90,7 +90,7 @@ class SingleRelatedObjectDescriptor(object):
             setattr(instance, cache_name, rel_obj)
             return rel_obj
 
-def do_m2m_add(rel_manager_inst, managerclass, rel_model, join_table, this_col_name,
+def _add_m2m_items(rel_manager_inst, managerclass, rel_model, join_table, this_col_name,
         rel_col_name, this_pk_val, *objs, **kwargs):
     # Utility function used by the ManyRelatedObjectsDescriptors
     # to do addition to a many-to-many field.
@@ -104,6 +104,7 @@ def do_m2m_add(rel_manager_inst, managerclass, rel_model, join_table, this_col_n
     # *objs - objects to add, or **kwargs to create new objects
 
     from django.db import connection
+    rel_opts = rel_model._meta
     # Create the related object.
     if kwargs:
         assert len(objs) == 0, "add() can't be passed both positional and keyword arguments"
@@ -113,14 +114,38 @@ def do_m2m_add(rel_manager_inst, managerclass, rel_model, join_table, this_col_n
         for obj in objs:
             if not isinstance(obj, rel_model):
                 raise ValueError, "positional arguments to add() must be %s instances" % rel_opts.object_name
-    # Add the newly created object to the join table.
+    # Add the newly created or already existing objects to the join table.
     # TODO: Check to make sure the object isn't already in the join table.
     cursor = connection.cursor()
     for obj in objs:
         cursor.execute("INSERT INTO %s (%s, %s) VALUES (%%s, %%s)" % \
             (join_table, this_col_name, rel_col_name),
             [this_pk_val, obj._get_pk_val()])
-    connection.commit()    
+    connection.commit()
+
+def _remove_m2m_items(rel_model, join_table, this_col_name,
+        rel_col_name, this_pk_val, *objs):
+    # Utility function used by the ManyRelatedObjectsDescriptors
+    # to do removal from a many-to-many field.
+    # rel_model: the model class of the 'related' object
+    # join_table: name of the m2m link table 
+    # this_col_name: the PK colname in join_table for 'this' object
+    # rel_col_name: the PK colname in join_table for the related object
+    # this_pk_val: the primary key for 'this' object
+    # *objs - objects to remove
+
+    from django.db import connection
+    rel_opts = rel_model._meta
+    for obj in objs:
+        if not isinstance(obj, rel_model):
+            raise ValueError, "objects to remove() must be %s instances" % rel_opts.object_name
+    # Remove the specified objects from the join table
+    cursor = connection.cursor()
+    for obj in objs:
+        cursor.execute("DELETE FROM %s WHERE %s = %%s AND %s = %%s" % \
+            (join_table, this_col_name, rel_col_name),
+            [this_pk_val, obj._get_pk_val()])
+    connection.commit()
 
 class ManyRelatedObjectsDescriptor(object):
     # This class provides the functionality that makes the related-object
@@ -162,9 +187,17 @@ class ManyRelatedObjectsDescriptor(object):
                     return superclass.add(self, **kwargs)
             else:
                 def add(self, *objs, **kwargs):
-                    do_m2m_add(self, superclass, rel_model, join_table, this_col_name,
+                    _add_m2m_items(self, superclass, rel_model, join_table, this_col_name,
                         rel_col_name, instance._get_pk_val(), *objs, **kwargs)
             add.alters_data = True
+            if rel_type == "o2m":
+                def remove(self, *objs):
+                    pass # TODO
+            else:
+                def remove(self, *objs):
+                    _remove_m2m_items(rel_model, join_table, this_col_name,
+                        rel_col_name, instance._get_pk_val(), *objs)
+            remove.alters_data = True
 
         manager = RelatedManager()
 
@@ -215,9 +248,14 @@ class ReverseManyRelatedObjectsDescriptor(object):
                     params = [instance._get_pk_val()]
                 )
             def add(self, *objs, **kwargs):
-                do_m2m_add(self, superclass, rel_model, join_table, this_col_name,
+                _add_m2m_items(self, superclass, rel_model, join_table, this_col_name,
                     rel_col_name, instance._get_pk_val(), *objs, **kwargs)
             add.alters_data = True
+            
+            def remove(self, *objs):
+                _remove_m2m_items(rel_model, join_table, this_col_name,
+                    rel_col_name, instance._get_pk_val(), *objs)
+            remove.alters_data = True
 
         manager = RelatedManager()
         manager.model = self.rel_model
