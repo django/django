@@ -47,8 +47,6 @@ def get_model(app_label, model_name):
     Returns the model matching the given app_label and case-insensitive model_name.
     Returns None if no model is found.
     """
-    get_apps() # initialise
-
     try:
         model_dict = _app_models[app_label]
     except KeyError:
