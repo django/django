@@ -44,6 +44,9 @@ API_TESTS = """
 >>> a2.publications.add(p1, p2)
 >>> a2.publications.add(p3)
 
+# Adding a second time is OK
+>>> a2.publications.add(p3)
+
 # Add a Publication directly via publications.add by using keyword arguments.
 >>> a2.publications.add(title='Highlights for Children')
 
