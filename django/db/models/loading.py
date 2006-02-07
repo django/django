@@ -35,7 +35,7 @@ def get_models(app_mod=None):
     returns a list of all installed models.
     """
     if app_mod:
-        return _app_models.get(app_mod.__name__.split('.')[-2], ()).values()
+        return _app_models.get(app_mod.__name__.split('.')[-2], {}).values()
     else:
         model_list = []
         for app_mod in get_apps():
