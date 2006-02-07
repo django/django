@@ -288,7 +288,7 @@ class QuerySet(object):
         combined = other._clone()
         # If 'self' is ordered and 'other' isn't, propagate 'self's ordering
         if (self._order_by is not None and len(self._order_by) > 0) and \
-           (combined._order_by is None or len(combined._order_by == 0)):
+           (combined._order_by is None or len(combined._order_by) == 0):
             combined._order_by = self._order_by
         return combined
 
