@@ -6,7 +6,8 @@ from django.core.exceptions import ImproperlyConfigured
 __all__ = ('get_apps', 'get_app', 'get_models', 'get_model', 'register_models')
 
 _app_list = None # Cache of installed apps.
-_app_models = {} # Dictionary of models against app module name
+_app_models = {} # Dictionary of models against app label
+                 # Each value is a dictionary of model name: model class
 
 def get_apps():
     "Returns a list of all installed modules that contain models."
@@ -34,7 +35,7 @@ def get_models(app_mod=None):
     returns a list of all installed models.
     """
     if app_mod:
-        return _app_models.get(app_mod.__name__.split('.')[-2], ())
+        return _app_models.get(app_mod.__name__.split('.')[-2], ()).values()
     else:
         model_list = []
         for app_mod in get_apps():
@@ -46,14 +47,25 @@ def get_model(app_label, model_name):
     Returns the model matching the given app_label and case-insensitive model_name.
     Returns None if no model is found.
     """
-    for app_mod in get_apps():
-        for model in get_models(app_mod):
-            if model._meta.object_name.lower() == model_name and \
-                    model._meta.app_label == app_label:
-                return model
+    get_apps() # initialise
+
+    try:
+        model_dict = _app_models[app_label]
+    except KeyError:
+        return None
+
+    try:
+        return model_dict[model_name.lower()]
+    except KeyError:
+        return None
 
 def register_models(app_label, *models):
     """
     Register a set of models as belonging to an app.
     """
-    _app_models.setdefault(app_label, []).extend(models)
+    for model in models:
+        # Store as 'name: model' pair in a dictionary
+        # in the _app_models dictionary
+        model_name = model._meta.object_name.lower()
+        model_dict = _app_models.setdefault(app_label, {})
+        model_dict[model_name] = model
