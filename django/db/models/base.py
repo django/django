@@ -35,8 +35,7 @@ class ModelBase(type):
 
         model_module = sys.modules[new_class.__module__]
 
-        if not hasattr(new_class._meta, 'app_label') or \
-                new_class._meta.app_label is None:
+        if getattr(new_class._meta, 'app_label', None) is None:
             # Figure out the app_label by looking one level up.
             # For 'django.contrib.sites.models', this would be 'sites'.
             new_class._meta.app_label = model_module.__name__.split('.')[-2]
