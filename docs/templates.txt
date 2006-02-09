@@ -70,6 +70,12 @@ Use a dot (``.``) to access attributes of a variable.
 In the above example, ``{{ section.title }}`` will be replaced with the
 ``title`` attribute of the ``section`` object.
 
+In Django 0.91, if you use a variable that doesn't exist, it will be silently
+ignored; the variable will be replaced by nothingness. In the Django
+development version, if a variable doesn't exist, the template system inserts
+the value of the ``TEMPLATE_STRING_IF_INVALID`` setting, which is set to ``''``
+(the empty string) by default.
+
 If you use a variable that doesn't exist, it will be silently ignored. The
 variable will be replaced by nothingness.
 

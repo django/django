@@ -621,6 +621,18 @@ Default: ``('django.core.template.loaders.filesystem.load_template_source',)``
 A tuple of callables (as strings) that know how to import templates from
 various sources. See the `template documentation`_.
 
+TEMPLATE_STRING_IF_INVALID
+--------------------------
+
+Default: ``''`` (Empty string)
+
+**New in Django development version.**
+
+Output, as a string, that the template system should use for invalid (e.g.
+misspelled) variables. See `How invalid variables are handled`_.
+
+.. _How invalid variables are handled: http://www.djangoproject.com/documentation/templates_python/#how-invalid-variables-are-handled
+
 TIME_FORMAT
 -----------
 

@@ -113,6 +113,9 @@ TEMPLATE_CONTEXT_PROCESSORS = (
 #    'django.core.context_processors.request',
 )
 
+# Output to use in template system for invalid (e.g. misspelled) variables.
+TEMPLATE_STRING_IF_INVALID = ''
+
 # URL prefix for admin media -- CSS, JavaScript and images. Make sure to use a
 # trailing slash.
 # Examples: "http://foo.com/media/", "/media/".
