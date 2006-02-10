@@ -229,7 +229,7 @@ information.
 .. _session documentation: http://www.djangoproject.com/documentation/sessions/
 
 How to log a user in
-~~~~~~~~~~~~~~~~~~~~
+--------------------
 
 To log a user in, do the following within a view::
 
