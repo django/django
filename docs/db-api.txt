@@ -173,7 +173,7 @@ The DB API supports the following lookup types:
     in           In a given list: ``polls.get_list(id__in=[1, 3, 4])`` returns
                  a list of polls whose IDs are either 1, 3 or 4.
     startswith   Case-sensitive starts-with:
-                 ``polls.get_list(question_startswith="Would")``. (PostgreSQL
+                 ``polls.get_list(question__startswith="Would")``. (PostgreSQL
                  and MySQL only. SQLite doesn't support case-sensitive LIKE
                  statements; ``startswith`` will act like ``istartswith`` for
                  SQLite.)
