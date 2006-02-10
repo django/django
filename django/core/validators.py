@@ -26,7 +26,7 @@ integer_re = re.compile(r'^-?\d+$')
 ip4_re = re.compile(r'^(25[0-5]|2[0-4]\d|[0-1]?\d?\d)(\.(25[0-5]|2[0-4]\d|[0-1]?\d?\d)){3}$')
 phone_re = re.compile(r'^[A-PR-Y0-9]{3}-[A-PR-Y0-9]{3}-[A-PR-Y0-9]{4}$', re.IGNORECASE)
 slug_re = re.compile(r'^[-\w]+$')
-url_re = re.compile(r'^http://\S+$')
+url_re = re.compile(r'^https?://\S+$')
 
 lazy_inter = lazy(lambda a,b: str(a) % b, str)
 

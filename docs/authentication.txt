@@ -228,6 +228,21 @@ information.
 .. _request objects: http://www.djangoproject.com/documentation/request_response/#httprequest-objects
 .. _session documentation: http://www.djangoproject.com/documentation/sessions/
 
+How to log a user in
+--------------------
+
+To log a user in, do the following within a view::
+
+    from django.models.auth import users
+    request.session[users.SESSION_KEY] = some_user.id
+
+Because this uses sessions, you'll need to make sure you have
+``SessionMiddleware`` enabled. See the `session documentation`_ for more
+information.
+
+This assumes ``some_user`` is your ``User`` instance. Depending on your task,
+you'll probably want to make sure to validate the user's username and password.
+
 Limiting access to logged-in users
 ----------------------------------
 
