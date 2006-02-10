@@ -25,6 +25,12 @@ class SessionWrapper(object):
         del self._session[key]
         self.modified = True
 
+    def keys(self):
+        return self._session.keys()
+
+    def items(self):
+        return self._session.items()
+
     def get(self, key, default=None):
         return self._session.get(key, default)
 
