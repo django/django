@@ -224,7 +224,7 @@ def get_sql_delete(app):
              connection.rollback()
          else:
              output.append("DROP TABLE %s;" % backend.quote_name(klass._meta.db_table))
-             if references_to_delete.has_key(klass):
+             if backend.supports_constraints and references_to_delete.has_key(klass):
                  for rel_class, f in references_to_delete[klass]:
                      table = rel_class._meta.db_table
                      col = f.column
