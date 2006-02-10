@@ -58,7 +58,6 @@ import re
 from inspect import getargspec
 from django.utils.functional import curry
 from django.conf import settings
-from django.conf import settings
 from django.template.context import Context, RequestContext
 
 __all__ = ('Template', 'Context', 'RequestContext', 'compile_string')
@@ -541,7 +540,7 @@ class FilterExpression(object):
         try:
             obj = resolve_variable(self.var, context)
         except VariableDoesNotExist:
-            obj = ''
+            obj = settings.TEMPLATE_STRING_IF_INVALID
         for func, args in self.filters:
             arg_vals = []
             for lookup, arg in args:
@@ -610,7 +609,7 @@ def resolve_variable(path, context):
         try:
            current = number_type(path)
         except ValueError:
-           current = ''
+           current = settings.TEMPLATE_STRING_IF_INVALID
     elif path[0] in ('"', "'") and path[0] == path[-1]:
         current = path[1:-1]
     else:
@@ -624,17 +623,17 @@ def resolve_variable(path, context):
                     current = getattr(current, bits[0])
                     if callable(current):
                         if getattr(current, 'alters_data', False):
-                            current = ''
+                            current = settings.TEMPLATE_STRING_IF_INVALID
                         else:
                             try: # method call (assuming no args required)
                                 current = current()
                             except TypeError: # arguments *were* required
                                 # GOTCHA: This will also catch any TypeError
                                 # raised in the function itself.
-                                current = '' # invalid method call
+                                current = settings.TEMPLATE_STRING_IF_INVALID # invalid method call
                             except Exception, e:
                                 if getattr(e, 'silent_variable_failure', False):
-                                    current = ''
+                                    current = settings.TEMPLATE_STRING_IF_INVALID
                                 else:
                                     raise
                 except (TypeError, AttributeError):

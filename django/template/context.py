@@ -33,7 +33,7 @@ class Context:
         for dict in self.dicts:
             if dict.has_key(key):
                 return dict[key]
-        return ''
+        return settings.TEMPLATE_STRING_IF_INVALID
 
     def __delitem__(self, key):
         "Delete a variable from the current context"
