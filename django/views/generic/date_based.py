@@ -4,8 +4,8 @@ from django.core.xheaders import populate_xheaders
 from django.http import Http404, HttpResponse
 import datetime, time
 
-def archive_index(request, model, date_field, num_latest=15,
-        template_name=None, template_loader=loader, extra_lookup_kwargs={},
+def archive_index(request, queryset, date_field, num_latest=15,
+        template_name=None, template_loader=loader,
         extra_context={}, allow_empty=False, context_processors=None):
     """
     Generic top-level archive of date-based objects.
@@ -17,18 +17,14 @@ def archive_index(request, model, date_field, num_latest=15,
         latest
             Latest N (defaults to 15) objects by date
     """
-    lookup_kwargs = {'%s__lte' % date_field: datetime.datetime.now()}
-    lookup_kwargs.update(extra_lookup_kwargs)
-    date_list = getattr(model._default_manager, "get_%s_list" % date_field)('year', **lookup_kwargs)[::-1]
+    model = queryset.model
+    queryset = queryset.filter(**{'%s__lte' % date_field: datetime.datetime.now()})
+    date_list = queryset.dates(date_field, 'year')[::-1]
     if not date_list and not allow_empty:
         raise Http404, "No %s available" % model._meta.verbose_name
 
     if date_list and num_latest:
-        lookup_kwargs.update({
-            'limit': num_latest,
-            'order_by': ('-' + date_field,),
-        })
-        latest = model._default_manager.get_list(**lookup_kwargs)
+        latest = queryset.order_by('-'+date_field)[:num_latest]
     else:
         latest = None
 
@@ -46,9 +42,8 @@ def archive_index(request, model, date_field, num_latest=15,
             c[key] = value
     return HttpResponse(t.render(c))
 
-def archive_year(request, year, model, date_field,
-        template_name=None, template_loader=loader, extra_lookup_kwargs={},
-        extra_context={}, context_processors=None):
+def archive_year(request, year, queryset, date_field, template_name=None,
+        template_loader=loader, extra_context={}, context_processors=None):
     """
     Generic yearly archive view.
 
@@ -59,13 +54,13 @@ def archive_year(request, year, model, date_field,
         year
             This year
     """
+    model = queryset.model
     now = datetime.datetime.now()
     lookup_kwargs = {'%s__year' % date_field: year}
     # Only bother to check current date if the year isn't in the past.
     if int(year) >= now.year:
         lookup_kwargs['%s__lte' % date_field] = now
-    lookup_kwargs.update(extra_lookup_kwargs)
-    date_list = getattr(model._default_manager, "get_%s_list" % date_field)('month', **lookup_kwargs)
+    date_list = queryset.filter(**lookup_kwargs).dates(date_field, 'month')
     if not date_list:
         raise Http404
     if not template_name:
@@ -82,9 +77,9 @@ def archive_year(request, year, model, date_field,
             c[key] = value
     return HttpResponse(t.render(c))
 
-def archive_month(request, year, month, model, date_field,
+def archive_month(request, year, month, queryset, date_field,
         month_format='%b', template_name=None, template_loader=loader,
-        extra_lookup_kwargs={}, extra_context={}, context_processors=None):
+        extra_context={}, context_processors=None):
     """
     Generic monthly archive view.
 
@@ -100,6 +95,7 @@ def archive_month(request, year, month, model, date_field,
     except ValueError:
         raise Http404
 
+    model = queryset.model
     now = datetime.datetime.now()
     # Calculate first and last day of month, for use in a date-range lookup.
     first_day = date.replace(day=1)
@@ -111,8 +107,7 @@ def archive_month(request, year, month, model, date_field,
     # Only bother to check current date if the month isn't in the past.
     if last_day >= now.date():
         lookup_kwargs['%s__lte' % date_field] = now
-    lookup_kwargs.update(extra_lookup_kwargs)
-    object_list = model._default_manager.get_list(**lookup_kwargs)
+    object_list = queryset.filter(**lookup_kwargs)
     if not object_list:
         raise Http404
     if not template_name:
@@ -129,10 +124,10 @@ def archive_month(request, year, month, model, date_field,
             c[key] = value
     return HttpResponse(t.render(c))
 
-def archive_day(request, year, month, day, model, date_field,
+def archive_day(request, year, month, day, queryset, date_field,
         month_format='%b', day_format='%d', template_name=None,
-        template_loader=loader, extra_lookup_kwargs={}, extra_context={},
-        allow_empty=False, context_processors=None):
+        template_loader=loader, extra_context={}, allow_empty=False,
+        context_processors=None):
     """
     Generic daily archive view.
 
@@ -152,6 +147,7 @@ def archive_day(request, year, month, day, model, date_field,
     except ValueError:
         raise Http404
 
+    model = queryset.model
     now = datetime.datetime.now()
     lookup_kwargs = {
         '%s__range' % date_field: (datetime.datetime.combine(date, datetime.time.min), datetime.datetime.combine(date, datetime.time.max)),
@@ -159,8 +155,7 @@ def archive_day(request, year, month, day, model, date_field,
     # Only bother to check current date if the date isn't in the past.
     if date >= now.date():
         lookup_kwargs['%s__lte' % date_field] = now
-    lookup_kwargs.update(extra_lookup_kwargs)
-    object_list = model._default_manager.get_list(**lookup_kwargs)
+    object_list = queryset.filter(**lookup_kwargs)
     if not allow_empty and not object_list:
         raise Http404
     if not template_name:
@@ -191,11 +186,10 @@ def archive_today(request, **kwargs):
     })
     return archive_day(request, **kwargs)
 
-def object_detail(request, year, month, day, model, date_field,
+def object_detail(request, year, month, day, queryset, date_field,
         month_format='%b', day_format='%d', object_id=None, slug=None,
         slug_field=None, template_name=None, template_name_field=None,
-        template_loader=loader, extra_lookup_kwargs={}, extra_context={},
-        context_processors=None):
+        template_loader=loader, extra_context={}, context_processors=None):
     """
     Generic detail view from year/month/day/slug or year/month/day/id structure.
 
@@ -209,6 +203,7 @@ def object_detail(request, year, month, day, model, date_field,
     except ValueError:
         raise Http404
 
+    model = queryset.model
     now = datetime.datetime.now()
     lookup_kwargs = {
         '%s__range' % date_field: (datetime.datetime.combine(date, datetime.time.min), datetime.datetime.combine(date, datetime.time.max)),
@@ -222,11 +217,10 @@ def object_detail(request, year, month, day, model, date_field,
         lookup_kwargs['%s__exact' % slug_field] = slug
     else:
         raise AttributeError, "Generic detail view must be called with either an object_id or a slug/slugfield"
-    lookup_kwargs.update(extra_lookup_kwargs)
     try:
-        object = model._default_manager.get_object(**lookup_kwargs)
+        object = queryset.get(**lookup_kwargs)
     except ObjectDoesNotExist:
-        raise Http404, "No %s found for %s" % (model._meta.verbose_name, lookup_kwargs)
+        raise Http404, "No %s found for" % model._meta.verbose_name
     if not template_name:
         template_name = "%s/%s_detail" % (model._meta.app_label, model._meta.object_name.lower())
     if template_name_field:
