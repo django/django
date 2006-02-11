@@ -453,7 +453,7 @@ class QOperator:
         self.args = args
 
     def get_sql(self, opts):
-        tables, joins, where, params = [], {}, [], []
+        tables, joins, where, params = [], SortedDict(), [], []
         for val in self.args:
             tables2, joins2, where2, params2 = val.get_sql(opts)
             tables.extend(tables2)
