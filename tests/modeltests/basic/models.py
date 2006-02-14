@@ -9,7 +9,9 @@ from django.db import models
 class Article(models.Model):
     headline = models.CharField(maxlength=100, default='Default headline')
     pub_date = models.DateTimeField()
-
+    
+    def __repr__(self):
+        return self.headline
 API_TESTS = """
 
 # No articles are in the system yet.
@@ -37,36 +39,34 @@ datetime.datetime(2005, 7, 28, 0, 0)
 >>> a.headline = 'Area woman programs in Python'
 >>> a.save()
 
-# Article.objects.all() returns all the articles in the database. Note that
-# the article is represented by "<Article object>", because we haven't given
-# the Article model a __repr__() method.
+# Article.objects.all() returns all the articles in the database. 
 >>> Article.objects.all()
-[<Article object>]
+[Area woman programs in Python]
 
 # Django provides a rich database lookup API.
 >>> Article.objects.get(id__exact=1)
-<Article object>
+Area woman programs in Python
 >>> Article.objects.get(headline__startswith='Area woman')
-<Article object>
+Area woman programs in Python
 >>> Article.objects.get(pub_date__year=2005)
-<Article object>
+Area woman programs in Python
 >>> Article.objects.get(pub_date__year=2005, pub_date__month=7)
-<Article object>
+Area woman programs in Python
 >>> Article.objects.get(pub_date__year=2005, pub_date__month=7, pub_date__day=28)
-<Article object>
+Area woman programs in Python
 
 # The "__exact" lookup type can be omitted, as a shortcut.
 >>> Article.objects.get(id=1)
-<Article object>
+Area woman programs in Python
 >>> Article.objects.get(headline='Area woman programs in Python')
-<Article object>
+Area woman programs in Python
 
 >>> Article.objects.filter(pub_date__year=2005)
-[<Article object>]
+[Area woman programs in Python]
 >>> Article.objects.filter(pub_date__year=2004)
 []
 >>> Article.objects.filter(pub_date__year=2005, pub_date__month=7)
-[<Article object>]
+[Area woman programs in Python]
 
 # Django raises an Article.DoesNotExist exception for get() if the parameters
 # don't match any object.
@@ -84,7 +84,7 @@ DoesNotExist: Article does not exist for ...
 # shortcut for primary-key exact lookups.
 # The following is identical to articles.get(id=1).
 >>> Article.objects.get(pk=1)
-<Article object>
+Area woman programs in Python
 
 # Model instances of the same type and same ID are considered equal.
 >>> a = Article.objects.get(pk=1)
@@ -234,12 +234,12 @@ datetime.datetime(2005, 7, 28, 0, 0)
 
 # You can get items using index and slice notation.
 >>> Article.objects.all()[0]
-<Article object>
+Area woman programs in Python
 >>> Article.objects.all()[1:3]
-[<Article object>, <Article object>]
+[Second article, Third article]
 >>> s3 = Article.objects.filter(id__exact=3)
 >>> (s1 | s2 | s3)[::2]
-[<Article object>, <Article object>]
+[Area woman programs in Python, Third article]
 
 # An Article instance doesn't have access to the "objects" attribute.
 # That's only available on the class.
@@ -254,20 +254,11 @@ Traceback (most recent call last):
 AttributeError: Manager isn't accessible via Article instances
 
 # Bulk delete test: How many objects before and after the delete?
->>> Article.objects.count()
-8L
->>> Article.objects.delete(id__lte=4)
->>> Article.objects.count()
-4L
-
->>> Article.objects.delete()
-Traceback (most recent call last):
-    ...
-TypeError: SAFETY MECHANISM: Specify DELETE_ALL=True if you actually want to delete all data.
-
->>> Article.objects.delete(DELETE_ALL=True)
->>> Article.objects.count()
-0L
+>>> Article.objects.all()
+[Area woman programs in Python, Second article, Third article, Fourth article, Article 6, Default headline, Article 7, Updated article 8]
+>>> Article.objects.filter(id__lte=4).delete()
+>>> Article.objects.all()
+[Article 6, Default headline, Article 7, Updated article 8]
 
 """
 

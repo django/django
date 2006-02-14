@@ -57,9 +57,6 @@ class Manager(object):
     def dates(self, *args, **kwargs):
         return self.get_query_set().dates(*args, **kwargs)
 
-    def delete(self, *args, **kwargs):
-        return self.get_query_set().delete(*args, **kwargs)
-
     def distinct(self, *args, **kwargs):
         return self.get_query_set().distinct(*args, **kwargs)
 

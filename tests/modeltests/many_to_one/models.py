@@ -94,7 +94,7 @@ John's second story
 
 # The underlying query only makes one join when a related table is referenced twice.
 >>> query = Article.objects.filter(reporter__first_name__exact='John', reporter__last_name__exact='Smith')
->>> null, sql, null = query._get_sql_clause(True)
+>>> null, sql, null = query._get_sql_clause()
 >>> sql.count('INNER JOIN')
 1
 
@@ -163,21 +163,22 @@ John Smith
 >>> Reporter.objects.filter(article__reporter__first_name__startswith='John').distinct()
 [John Smith]
 
-# Deletes that require joins are prohibited.
->>> Article.objects.delete(reporter__first_name__startswith='Jo')
-Traceback (most recent call last):
-    ...
-TypeError: Joins are not allowed in this type of query
-
 # If you delete a reporter, his articles will be deleted.
 >>> Article.objects.order_by('headline')
 [John's second story, Paul's story, This is a test, This is a test, This is a test]
 >>> Reporter.objects.order_by('first_name')
 [John Smith, Paul Jones]
->>> r.delete()
+>>> r2.delete()
 >>> Article.objects.order_by('headline')
-[Paul's story]
+[John's second story, This is a test, This is a test, This is a test]
 >>> Reporter.objects.order_by('first_name')
-[Paul Jones]
+[John Smith]
+
+# Deletes using a join in the query
+>>> Reporter.objects.filter(article__headline__startswith='This').delete()
+>>> Reporter.objects.all()
+[]
+>>> Article.objects.all()
+[]
 
 """

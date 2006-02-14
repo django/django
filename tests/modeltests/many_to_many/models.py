@@ -162,6 +162,33 @@ API_TESTS = """
 >>> p2.article_set.all().order_by('headline')
 [Oxygen-free diet works wonders]
 
+# Recreate the article and Publication we just deleted.
+>>> p1 = Publication(id=None, title='The Python Journal')
+>>> p1.save()
+>>> a2 = Article(id=None, headline='NASA uses Python')
+>>> a2.save()
+>>> a2.publications.add(p1, p2, p3)
+
+# Bulk delete some Publications - references to deleted publications should go
+>>> Publication.objects.filter(title__startswith='Science').delete()
+>>> Publication.objects.all()
+[Highlights for Children, The Python Journal]
+>>> Article.objects.all()
+[Django lets you build Web apps easily, NASA finds intelligent life on Earth, Oxygen-free diet works wonders, NASA uses Python]
+>>> a2.publications.all()
+[The Python Journal]
+
+# Bulk delete some articles - references to deleted objects should go
+>>> q = Article.objects.filter(headline__startswith='Django')
+>>> print q
+[Django lets you build Web apps easily]
+>>> q.delete()
+
+# After the delete, the QuerySet cache needs to be cleared, and the referenced objects should be gone
+>>> print q
+[]
+>>> p1.article_set.all()
+[NASA uses Python]
 
 
 """

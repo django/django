@@ -3,7 +3,7 @@ import django.db.models.manager
 from django.db.models.fields import AutoField, ImageField
 from django.db.models.fields.related import OneToOne, ManyToOne
 from django.db.models.related import RelatedObject
-from django.db.models.query import orderlist2sql
+from django.db.models.query import orderlist2sql, delete_objects
 from django.db.models.options import Options, AdminOptions
 from django.db import connection, backend
 from django.db.models import signals
@@ -48,15 +48,6 @@ class ModelBase(type):
 
         register_models(new_class._meta.app_label, new_class)
         return new_class
-
-def cmp_cls(x, y):
-    for field in x._meta.fields:
-        if field.rel and not field.null and field.rel.to == y:
-            return -1
-    for field in y._meta.fields:
-        if field.rel and not field.null and field.rel.to == x:
-            return 1
-    return 0
 
 class Model(object):
     __metaclass__ = ModelBase
@@ -187,7 +178,7 @@ class Model(object):
 
     save.alters_data = True
 
-    def __collect_sub_objects(self, seen_objs):
+    def _collect_sub_objects(self, seen_objs):
         """
         Recursively populates seen_objs with all objects related to this object.
         When done, seen_objs will be in the format:
@@ -207,56 +198,21 @@ class Model(object):
                 except ObjectDoesNotExist:
                     pass
                 else:
-                    sub_obj.__collect_sub_objects(seen_objs)
+                    sub_obj._collect_sub_objects(seen_objs)
             else:
                 for sub_obj in getattr(self, rel_opts_name).all():
-                    sub_obj.__collect_sub_objects(seen_objs)
+                    sub_obj._collect_sub_objects(seen_objs)
 
     def delete(self):
         assert self._get_pk_val() is not None, "%s object can't be deleted because its %s attribute is set to None." % (self._meta.object_name, self._meta.pk.attname)
+        
+        # Find all the objects than need to be deleted
         seen_objs = {}
-        self.__collect_sub_objects(seen_objs)
-
-        seen_classes = set(seen_objs.keys())
-        ordered_classes = list(seen_classes)
-        ordered_classes.sort(cmp_cls)
-
-        cursor = connection.cursor()
-
-        for cls in ordered_classes:
-            seen_objs[cls] = seen_objs[cls].items()
-            seen_objs[cls].sort()
-            for pk_val, instance in seen_objs[cls]:
-                dispatcher.send(signal=signals.pre_delete, sender=cls, instance=instance)
-
-                for related in cls._meta.get_all_related_many_to_many_objects():
-                    cursor.execute("DELETE FROM %s WHERE %s=%%s" % \
-                        (backend.quote_name(related.field.get_m2m_db_table(related.opts)),
-                        backend.quote_name(cls._meta.object_name.lower() + '_id')),
-                        [pk_val])
-                for f in cls._meta.many_to_many:
-                    cursor.execute("DELETE FROM %s WHERE %s=%%s" % \
-                        (backend.quote_name(f.get_m2m_db_table(cls._meta)),
-                        backend.quote_name(cls._meta.object_name.lower() + '_id')),
-                        [pk_val])
-                for field in cls._meta.fields:
-                    if field.rel and field.null and field.rel.to in seen_classes:
-                        cursor.execute("UPDATE %s SET %s=NULL WHERE %s=%%s" % \
-                            (backend.quote_name(cls._meta.db_table), backend.quote_name(field.column),
-                            backend.quote_name(cls._meta.pk.column)), [pk_val])
-                        setattr(instance, field.attname, None)
-
-        for cls in ordered_classes:
-            seen_objs[cls].reverse()
-            for pk_val, instance in seen_objs[cls]:
-                cursor.execute("DELETE FROM %s WHERE %s=%%s" % \
-                    (backend.quote_name(cls._meta.db_table), backend.quote_name(cls._meta.pk.column)),
-                    [pk_val])
-                setattr(instance, cls._meta.pk.attname, None)
-                dispatcher.send(signal=signals.post_delete, sender=cls, instance=instance)
-
-        connection.commit()
-
+        self._collect_sub_objects(seen_objs)
+        
+        # Actually delete the objects
+        delete_objects(seen_objs)
+        
     delete.alters_data = True
 
     def _get_FIELD_display(self, field):

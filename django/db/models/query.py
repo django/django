@@ -1,6 +1,9 @@
 from django.db import backend, connection
 from django.db.models.fields import DateField, FieldDoesNotExist
+from django.db.models import signals
+from django.dispatch import dispatcher
 from django.utils.datastructures import SortedDict
+
 import operator
 
 LOOKUP_SEPARATOR = '__'
@@ -125,7 +128,7 @@ class QuerySet(object):
         extra_select = self._select.items()
 
         cursor = connection.cursor()
-        select, sql, params = self._get_sql_clause(True)
+        select, sql, params = self._get_sql_clause()
         cursor.execute("SELECT " + (self._distinct and "DISTINCT " or "") + ",".join(select) + sql, params)
         fill_cache = self._select_related
         index_end = len(self.model._meta.fields)
@@ -149,7 +152,7 @@ class QuerySet(object):
         counter._offset = None
         counter._limit = None
         counter._select_related = False
-        select, sql, params = counter._get_sql_clause(True)
+        select, sql, params = counter._get_sql_clause()
         cursor = connection.cursor()
         cursor.execute("SELECT COUNT(*)" + sql, params)
         return cursor.fetchone()[0]
@@ -171,34 +174,31 @@ class QuerySet(object):
         assert bool(latest_by), "latest() requires either a field_name parameter or 'get_latest_by' in the model"
         return self._clone(_limit=1, _order_by=('-'+latest_by,)).get()
 
-    def delete(self, *args, **kwargs):
+    def delete(self):
         """
-        Deletes the records with the given kwargs. If no kwargs are given,
-        deletes records in the current QuerySet.
+        Deletes the records in the current QuerySet.
         """
-        # Remove the DELETE_ALL argument, if it exists.
-        delete_all = kwargs.pop('DELETE_ALL', False)
+        del_query = self._clone()        
 
-        # Check for at least one query argument.
-        if not kwargs and not delete_all:
-            raise TypeError, "SAFETY MECHANISM: Specify DELETE_ALL=True if you actually want to delete all data."
-
-        if kwargs:
-            del_query = self.filter(*args, **kwargs)
-        else:
-            del_query = self._clone()
         # disable non-supported fields
         del_query._select_related = False
-        del_query._select = {}
         del_query._order_by = []
         del_query._offset = None
         del_query._limit = None
 
-        # Perform the SQL delete
-        cursor = connection.cursor()
-        _, sql, params = del_query._get_sql_clause(False)
-        cursor.execute("DELETE " + sql, params)
-
+        # Collect all the objects to be deleted, and all the objects that are related to 
+        # the objects that are to be deleted
+        seen_objs = {}
+        for object in del_query:
+            object._collect_sub_objects(seen_objs)
+        
+        # Delete the objects    
+        delete_objects(seen_objs)
+        
+        # Clear the result cache, in case this QuerySet gets reused.
+        self._result_cache = None
+    delete.alters_data = True
+        
     ##################################################
     # PUBLIC METHODS THAT RETURN A QUERYSET SUBCLASS #
     ##################################################
@@ -297,7 +297,7 @@ class QuerySet(object):
             self._result_cache = list(self.iterator())
         return self._result_cache
 
-    def _get_sql_clause(self, allow_joins):
+    def _get_sql_clause(self):
         opts = self.model._meta
 
         # Construct the fundamental parts of the query: SELECT X FROM Y WHERE Z.
@@ -324,10 +324,6 @@ class QuerySet(object):
 
         # Start composing the body of the SQL statement.
         sql = [" FROM", backend.quote_name(opts.db_table)]
-
-        # Check if extra tables are allowed. If not, throw an error
-        if (tables or joins) and not allow_joins:
-            raise TypeError, "Joins are not allowed in this type of query"
 
         # Compose the join dictionary into SQL describing the joins.
         if joins:
@@ -407,7 +403,7 @@ class ValuesQuerySet(QuerySet):
             field_names = [f.attname for f in self.model._meta.fields]
 
         cursor = connection.cursor()
-        select, sql, params = self._get_sql_clause(True)
+        select, sql, params = self._get_sql_clause()
         select = ['%s.%s' % (backend.quote_name(self.model._meta.db_table), backend.quote_name(c)) for c in columns]
         cursor.execute("SELECT " + (self._distinct and "DISTINCT " or "") + ",".join(select) + sql, params)
         while 1:
@@ -429,7 +425,7 @@ class DateQuerySet(QuerySet):
         if self._field.null:
             date_query._where.append('%s.%s IS NOT NULL' % \
                 (backend.quote_name(self.model._meta.db_table), backend.quote_name(self._field.column)))
-        select, sql, params = self._get_sql_clause(True)
+        select, sql, params = self._get_sql_clause()
         sql = 'SELECT %s %s GROUP BY 1 ORDER BY 1 %s' % \
             (backend.get_date_trunc_sql(self._kind, '%s.%s' % (backend.quote_name(self.model._meta.db_table),
             backend.quote_name(self._field.column))), sql, self._order)
@@ -762,3 +758,74 @@ def lookup_inner(path, clause, value, opts, table, column):
         params.extend(field.get_db_prep_lookup(clause, value))
 
     return tables, joins, where, params
+
+def compare_models(x, y):
+    "Comparator for Models that puts models in an order where dependencies are easily resolved."
+    for field in x._meta.fields:
+        if field.rel and not field.null and field.rel.to == y:
+            return -1
+    for field in y._meta.fields:
+        if field.rel and not field.null and field.rel.to == x:
+            return 1
+    return 0
+
+def delete_objects(seen_objs):
+    "Iterate through a list of seen classes, and remove any instances that are referred to"
+    seen_classes = set(seen_objs.keys())
+    ordered_classes = list(seen_classes)
+    ordered_classes.sort(compare_models)
+
+    cursor = connection.cursor()
+     
+    for cls in ordered_classes:
+        seen_objs[cls] = seen_objs[cls].items()
+        seen_objs[cls].sort()
+    
+        # Pre notify all instances to be deleted
+        for pk_val, instance in seen_objs[cls]:
+            dispatcher.send(signal=signals.pre_delete, sender=cls, instance=instance)
+
+        pk_list = [pk for pk,instance in seen_objs[cls]]
+        for related in cls._meta.get_all_related_many_to_many_objects():
+            cursor.execute("DELETE FROM %s WHERE %s IN (%s)" % \
+                (backend.quote_name(related.field.get_m2m_db_table(related.opts)),
+                    backend.quote_name(cls._meta.object_name.lower() + '_id'),
+                    ','.join('%s' for pk in pk_list)), 
+                pk_list)
+        for f in cls._meta.many_to_many:
+            cursor.execute("DELETE FROM %s WHERE %s IN (%s)" % \
+                (backend.quote_name(f.get_m2m_db_table(cls._meta)),
+                    backend.quote_name(cls._meta.object_name.lower() + '_id'),
+                    ','.join(['%s' for pk in pk_list])), 
+                pk_list)
+        for field in cls._meta.fields:
+            if field.rel and field.null and field.rel.to in seen_classes:
+                cursor.execute("UPDATE %s SET %s=NULL WHERE %s IN (%s)" % \
+                    (backend.quote_name(cls._meta.db_table), 
+                        backend.quote_name(field.column),
+                        backend.quote_name(cls._meta.pk.column), 
+                        ','.join(['%s' for pk in pk_list])), 
+                    pk_list)
+
+    # Now delete the actual data
+    for cls in ordered_classes:
+        seen_objs[cls].reverse()
+        pk_list = [pk for pk,instance in seen_objs[cls]]
+        
+        cursor.execute("DELETE FROM %s WHERE %s IN (%s)" % \
+            (backend.quote_name(cls._meta.db_table), 
+                backend.quote_name(cls._meta.pk.column),
+                ','.join(['%s' for pk in pk_list])),
+            pk_list)
+                
+        # Last cleanup; set NULLs where there once was a reference to the object,
+        # NULL the primary key of the found objects, and perform post-notification.
+        for pk_val, instance in seen_objs[cls]:
+            for field in cls._meta.fields:
+                if field.rel and field.null and field.rel.to in seen_classes:
+                    setattr(instance, field.attname, None)
+
+            setattr(instance, cls._meta.pk.attname, None)
+            dispatcher.send(signal=signals.post_delete, sender=cls, instance=instance)
+
+    connection.commit()
