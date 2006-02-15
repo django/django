@@ -178,7 +178,7 @@ class QuerySet(object):
         """
         Deletes the records in the current QuerySet.
         """
-        del_query = self._clone()        
+        del_query = self._clone()
 
         # disable non-supported fields
         del_query._select_related = False
@@ -186,19 +186,19 @@ class QuerySet(object):
         del_query._offset = None
         del_query._limit = None
 
-        # Collect all the objects to be deleted, and all the objects that are related to 
+        # Collect all the objects to be deleted, and all the objects that are related to
         # the objects that are to be deleted
         seen_objs = {}
         for object in del_query:
             object._collect_sub_objects(seen_objs)
-        
-        # Delete the objects    
+
+        # Delete the objects
         delete_objects(seen_objs)
-        
+
         # Clear the result cache, in case this QuerySet gets reused.
         self._result_cache = None
     delete.alters_data = True
-        
+
     ##################################################
     # PUBLIC METHODS THAT RETURN A QUERYSET SUBCLASS #
     ##################################################
@@ -776,11 +776,11 @@ def delete_objects(seen_objs):
     ordered_classes.sort(compare_models)
 
     cursor = connection.cursor()
-     
+
     for cls in ordered_classes:
         seen_objs[cls] = seen_objs[cls].items()
         seen_objs[cls].sort()
-    
+
         # Pre notify all instances to be deleted
         for pk_val, instance in seen_objs[cls]:
             dispatcher.send(signal=signals.pre_delete, sender=cls, instance=instance)
@@ -790,34 +790,33 @@ def delete_objects(seen_objs):
             cursor.execute("DELETE FROM %s WHERE %s IN (%s)" % \
                 (backend.quote_name(related.field.get_m2m_db_table(related.opts)),
                     backend.quote_name(cls._meta.object_name.lower() + '_id'),
-                    ','.join('%s' for pk in pk_list)), 
+                    ','.join(['%s' for pk in pk_list])),
                 pk_list)
         for f in cls._meta.many_to_many:
             cursor.execute("DELETE FROM %s WHERE %s IN (%s)" % \
                 (backend.quote_name(f.get_m2m_db_table(cls._meta)),
                     backend.quote_name(cls._meta.object_name.lower() + '_id'),
-                    ','.join(['%s' for pk in pk_list])), 
+                    ','.join(['%s' for pk in pk_list])),
                 pk_list)
         for field in cls._meta.fields:
             if field.rel and field.null and field.rel.to in seen_classes:
                 cursor.execute("UPDATE %s SET %s=NULL WHERE %s IN (%s)" % \
-                    (backend.quote_name(cls._meta.db_table), 
+                    (backend.quote_name(cls._meta.db_table),
                         backend.quote_name(field.column),
-                        backend.quote_name(cls._meta.pk.column), 
-                        ','.join(['%s' for pk in pk_list])), 
+                        backend.quote_name(cls._meta.pk.column),
+                        ','.join(['%s' for pk in pk_list])),
                     pk_list)
 
     # Now delete the actual data
     for cls in ordered_classes:
         seen_objs[cls].reverse()
         pk_list = [pk for pk,instance in seen_objs[cls]]
-        
         cursor.execute("DELETE FROM %s WHERE %s IN (%s)" % \
-            (backend.quote_name(cls._meta.db_table), 
+            (backend.quote_name(cls._meta.db_table),
                 backend.quote_name(cls._meta.pk.column),
                 ','.join(['%s' for pk in pk_list])),
             pk_list)
-                
+
         # Last cleanup; set NULLs where there once was a reference to the object,
         # NULL the primary key of the found objects, and perform post-notification.
         for pk_val, instance in seen_objs[cls]:
