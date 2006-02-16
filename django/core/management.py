@@ -524,7 +524,7 @@ def install(app):
 
     # First, try validating the models.
     s = StringIO()
-    num_errors = get_validation_errors(s)
+    num_errors = get_validation_errors(s, app)
     if num_errors:
         sys.stderr.write("Error: %s couldn't be installed, because there were errors in your model:\n" % app_name)
         s.seek(0)
@@ -559,7 +559,7 @@ def reset(app):
 
     # First, try validating the models.
     s = StringIO()
-    num_errors = get_validation_errors(s)
+    num_errors = get_validation_errors(s, app)
     if num_errors:
         sys.stderr.write("Error: %s couldn't be installed, because there were errors in your model:\n" % app_name)
         s.seek(0)
@@ -819,13 +819,17 @@ class ModelErrorCollection:
         self.errors.append((opts, error))
         self.outfile.write("%s.%s: %s\n" % (opts.app_label, opts.module_name, error))
 
-def get_validation_errors(outfile):
-    "Validates all installed models. Writes errors, if any, to outfile. Returns number of errors."
+def get_validation_errors(outfile, app=None):
+    """
+    Validates all models that are part of the specified app. If no app name is provided, 
+    validates all models of all installed apps. Writes errors, if any, to outfile. 
+    Returns number of errors.
+    """
     from django.db import models
     from django.db.models.fields.related import RelatedObject
 
     e = ModelErrorCollection(outfile)
-    for cls in models.get_models():
+    for cls in models.get_models(app):
         opts = cls._meta
 
         # Do field-specific validation.
@@ -864,6 +868,9 @@ def get_validation_errors(outfile):
             # existing fields, m2m fields, m2m related objects or related objects
             if f.rel:
                 rel_opts = f.rel.to._meta
+                if f.rel.to not in models.get_models():
+                     e.add(opts, "'%s' field: relates to uninstalled model %s" % (f.name, rel_opts.object_name))
+                    
                 rel_name = RelatedObject(f.rel.to, cls, f).OLD_get_accessor_name()
                 if rel_name in [r.name for r in rel_opts.fields]:
                     e.add(opts, "'%s.%s' related field: Clashes with field on '%s.%s'" % (opts.object_name, f.name, rel_opts.object_name, rel_name))
@@ -879,6 +886,9 @@ def get_validation_errors(outfile):
             # existing fields, m2m fields, m2m related objects or related objects
             if f.rel:
                 rel_opts = f.rel.to._meta
+                if f.rel.to not in models.get_models():
+                    e.add(opts, "'%s' field: has m2m relation with uninstalled model %s" % (f.name, rel_opts.object_name))
+
                 rel_name = RelatedObject(f.rel.to, cls, f).OLD_get_accessor_name()
                 if rel_name in [r.name for r in rel_opts.fields]:
                     e.add(opts, "'%s.%s' related m2m field: Clashes with field on '%s.%s'" % (opts.object_name, f.name, rel_opts.object_name, rel_name))

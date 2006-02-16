@@ -82,6 +82,14 @@ class TestRunner:
 
         # Determine which models we're going to test.
         test_models = get_test_models()
+        if 'othertests' in self.which_tests:
+            self.which_tests.remove('othertests')
+            run_othertests = True
+            if not self.which_tests:
+                test_models = []
+        else:
+            run_othertests = not self.which_tests
+            
         if self.which_tests:
             # Only run the specified tests.
             bad_models = [m for m in self.which_tests if m not in test_models]
@@ -138,21 +146,39 @@ class TestRunner:
             except Exception, e:
                 log_error(model_name, "Error while importing", ''.join(traceback.format_exception(*sys.exc_info())[1:]))
                 continue
-            self.output(1, "%s model: Installing" % model_name)
-            management.install(mod)
+                
+            if not getattr(mod, 'error_log', None):
+                # Model is not marked as an invalid model
+                self.output(1, "%s model: Installing" % model_name)
+                management.install(mod)
 
-            # Run the API tests.
-            p = doctest.DocTestParser()
-            test_namespace = dict([(m._meta.object_name, m) \
-                                    for m in django.db.models.get_models(mod)])
-            dtest = p.get_doctest(mod.API_TESTS, test_namespace, model_name, None, None)
-            # Manually set verbose=False, because "-v" command-line parameter
-            # has side effects on doctest TestRunner class.
-            runner = DjangoDoctestRunner(verbosity_level=verbosity_level, verbose=False)
-            self.output(1, "%s model: Running tests" % model_name)
-            runner.run(dtest, clear_globs=True, out=sys.stdout.write)
+                # Run the API tests.
+                p = doctest.DocTestParser()
+                test_namespace = dict([(m._meta.object_name, m) \
+                                        for m in django.db.models.get_models(mod)])
+                dtest = p.get_doctest(mod.API_TESTS, test_namespace, model_name, None, None)
+                # Manually set verbose=False, because "-v" command-line parameter
+                # has side effects on doctest TestRunner class.
+                runner = DjangoDoctestRunner(verbosity_level=verbosity_level, verbose=False)
+                self.output(1, "%s model: Running tests" % model_name)
+                runner.run(dtest, clear_globs=True, out=sys.stdout.write)
+            else: 
+                # Check that model known to be invalid is invalid for the right reasons.
+                self.output(1, "%s model: Validating" % model_name)
+            
+                from cStringIO import StringIO
+                s = StringIO()
+                count = management.get_validation_errors(s, mod)
+                s.seek(0)
+                error_log = s.read()
+                expected = len(mod.error_log.split('\n')) - 1
+                if error_log != mod.error_log:
+                    log_error(model_name,
+                        "Validator found %d validation errors, %d expected" % (count, expected),
+                        "Expected errors:\n%s\n\nActual errors:\n%s" % (mod.error_log, error_log))
 
-        if not self.which_tests:
+
+        if run_othertests:
             # Run the non-model tests in the other tests dir
             self.output(1, "Running other tests")
             other_tests_dir = os.path.join(os.path.dirname(__file__), OTHER_TESTS_DIR)
