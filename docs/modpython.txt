@@ -198,3 +198,13 @@ that case, you'll see an "Internal Server Error" page in your browser and the
 full Python traceback in your Apache ``error_log`` file. The ``error_log``
 traceback is spread over multiple lines. (Yes, this is ugly and rather hard to
 read, but it's how mod_python does things.)
+
+If you get a segmentation fault
+===============================
+
+If Apache causes a segmentation fault, it's probably because you're running
+mod_python and mod_php in the same Apache instance, with MySQL as your database
+backend. This is a known mod_python issue, not a Django issue, and there's more
+information in the `mod_python FAQ entry`.
+
+.. _mod_python FAQ entry: http://modpython.org/FAQ/faqw.py?req=show&file=faq02.013.htp
