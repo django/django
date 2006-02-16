@@ -220,13 +220,13 @@ an easy way to isolate mod_python-specific problems. `Getting mod_python Working
 details this procedure.
 
 The next step should be to edit your test code and add an import of any
-Django-specific you're using -- your views, your models, your URLconf, your RSS
-configuration, etc. Put these imports in your test handler function and access
-your test URL in a browser. If this causes a crash, you've confirmed it's the
-importing of Django code that causes the problem. Gradually reduce the set of
-imports until it stops crashing, so as to find the specific module that causes
-the problem. Drop down further into modules and look into their imports, as
-necessary.
+Django-specific code you're using -- your views, your models, your URLconf,
+your RSS configuration, etc. Put these imports in your test handler function
+and access your test URL in a browser. If this causes a crash, you've confirmed
+it's the importing of Django code that causes the problem. Gradually reduce the
+set of imports until it stops crashing, so as to find the specific module that
+causes the problem. Drop down further into modules and look into their imports,
+as necessary.
 
 .. _Expat Causing Apache Crash: http://www.dscpl.com.au/articles/modpython-006.html
 .. _mod_python FAQ entry: http://modpython.org/FAQ/faqw.py?req=show&file=faq02.013.htp
