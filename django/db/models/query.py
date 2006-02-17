@@ -6,6 +6,10 @@ from django.utils.datastructures import SortedDict
 
 import operator
 
+# For Python 2.3
+if not hasattr(__builtins__, 'set'):
+    from sets import Set as set
+
 LOOKUP_SEPARATOR = '__'
 
 # Size of each "chunk" for get_iterator calls.

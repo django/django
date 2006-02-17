@@ -17,10 +17,6 @@ import types
 import sys
 import os
 
-# For Python 2.3
-if not hasattr(__builtins__, 'set'):
-    from sets import Set as set
-
 class ModelBase(type):
     "Metaclass for all models"
     def __new__(cls, name, bases, attrs):
