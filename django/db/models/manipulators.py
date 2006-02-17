@@ -318,7 +318,7 @@ def manipulator_validator_unique_for_date(from_field, date_field, opts, lookup_t
     if lookup_type == 'date':
         lookup_kwargs['%s__day' % date_field.name] = date_val.day
     try:
-        old_obj = self.manager.get_object(**lookup_kwargs)
+        old_obj = self.manager.get(**lookup_kwargs)
     except ObjectDoesNotExist:
         return
     else:
