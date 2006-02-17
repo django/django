@@ -6,6 +6,7 @@ from django.dispatch import dispatcher
 from django.db.models import signals
 from django.utils.functional import curry
 from django.utils.datastructures import DotExpandedDict, MultiValueDict
+from django.utils.text import capfirst
 import types
 
 def add_manipulators(sender):
@@ -291,9 +292,8 @@ def manipulator_validator_unique_together(field_name_list, opts, self, field_dat
             kwargs['%s__pk' % f.name] = field_val
         else:
             kwargs['%s__iexact' % f.name] = field_val
-    mod = opts.get_model_module()
     try:
-        old_obj = mod.get_object(**kwargs)
+        old_obj = self.manager.get(**kwargs)
     except ObjectDoesNotExist:
         return
     if hasattr(self, 'original_object') and self.original_object._get_pk_val() == old_obj._get_pk_val():
