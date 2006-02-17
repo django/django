@@ -63,6 +63,14 @@ def _is_valid_dir_name(s):
 # field as the field to which it points.
 get_rel_data_type = lambda f: (f.get_internal_type() in ('AutoField', 'PositiveIntegerField', 'PositiveSmallIntegerField')) and 'IntegerField' or f.get_internal_type()
 
+def get_version():
+    "Returns the version as a human-format string."
+    from django import VERSION
+    v = '.'.join([str(i) for i in VERSION[:-1]])
+    if VERSION[3]:
+        v += ' (%s)' % VERSION[3]
+    return v
+
 def get_sql_create(mod):
     "Returns a list of the CREATE TABLE SQL statements for the given module."
     from django.core import db, meta
@@ -900,7 +908,7 @@ def print_error(msg, cmd):
 
 def execute_from_command_line(action_mapping=DEFAULT_ACTION_MAPPING):
     # Parse the command-line arguments. optparse handles the dirty work.
-    parser = DjangoOptionParser(get_usage(action_mapping))
+    parser = DjangoOptionParser(usage=get_usage(action_mapping), version=get_version())
     parser.add_option('--settings',
         help='Python path to settings module, e.g. "myproject.settings.main". If this isn\'t provided, the DJANGO_SETTINGS_MODULE environment variable will be used.')
     parser.add_option('--pythonpath',
