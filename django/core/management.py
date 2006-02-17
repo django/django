@@ -845,7 +845,7 @@ def get_validation_errors(outfile, app=None):
             # Check for deprecated args
             dep_args = getattr(f, 'deprecated_args', None)
             if dep_args:
-                e.add(opts, "'%s' Initialised with deprecated args:%s" % (f.name, ",".join(dep_args)))
+                e.add(opts, "'%s' Initialized with deprecated args:%s" % (f.name, ",".join(dep_args)))
             if isinstance(f, models.CharField) and f.maxlength in (None, 0):
                 e.add(opts, '"%s": CharFields require a "maxlength" attribute.' % f.name)
             if isinstance(f, models.FloatField):
