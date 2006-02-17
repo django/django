@@ -467,7 +467,7 @@ class SelectField(FormField):
             selected_html = ''
             if str(value) == str_data:
                 selected_html = ' selected="selected"'
-            output.append('    <option value="%s"%s>%s</option>' % (escape(value), selected_html, display_name))
+            output.append('    <option value="%s"%s>%s</option>' % (escape(value), selected_html, escape(display_name)))
         output.append('  </select>')
         return '\n'.join(output)
 

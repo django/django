@@ -86,7 +86,11 @@ def archive_month(request, year, month, queryset, date_field,
     Templates: ``<app_label>/<model_name>_archive_month``
     Context:
         month:
-            this month
+            (date) this month
+        next_month:
+            (date) the first day of the next month, or None if the next month is in the future
+        previous_month:
+            (date) the first day of the previous month
         object_list:
             list of objects published in the given month
     """
@@ -116,6 +120,8 @@ def archive_month(request, year, month, queryset, date_field,
     c = RequestContext(request, {
         'object_list': object_list,
         'month': date,
+        'next_month': (last_day < datetime.date.today()) and (last_day + datetime.timedelta(days=1)) or None,
+        'previous_month': first_day - datetime.timedelta(days=1),
     }, context_processors)
     for key, value in extra_context.items():
         if callable(value):

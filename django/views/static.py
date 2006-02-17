@@ -56,13 +56,13 @@ DEFAULT_DIRECTORY_INDEX_TEMPLATE = """
     <meta http-equiv="Content-type" content="text/html; charset=utf-8" />
     <meta http-equiv="Content-Language" content="en-us" />
     <meta name="robots" content="NONE,NOARCHIVE" />
-    <title>Index of {{ directory }}</title>
+    <title>Index of {{ directory|escape }}</title>
   </head>
   <body>
-    <h1>Index of {{ directory }}</h1>
+    <h1>Index of {{ directory|escape }}</h1>
     <ul>
       {% for f in file_list %}
-      <li><a href="{{ f }}">{{ f }}</a></li>
+      <li><a href="{{ f|urlencode }}">{{ f|escape }}</a></li>
       {% endfor %}
     </ul>
   </body>
