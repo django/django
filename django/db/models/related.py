@@ -75,9 +75,3 @@ class RelatedObject(object):
         # but this can be overridden with the "related_name" option.
         return self.field.rel.related_name or (self.opts.object_name.lower() + '_set')
 
-    # TODO: Remove this.
-    def OLD_get_accessor_name(self):
-        rel_obj_name = self.field.rel.related_name or self.opts.object_name.lower()
-        if self.parent_model._meta.app_label != self.opts.app_label:
-            rel_obj_name = '%s_%s' % (self.opts.app_label, rel_obj_name)
-        return rel_obj_name

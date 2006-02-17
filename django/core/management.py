@@ -837,67 +837,74 @@ def get_validation_errors(outfile, app=None):
             # Check for deprecated args
             dep_args = getattr(f, 'deprecated_args', None)
             if dep_args:
-                e.add(opts, "'%s' field: Initialised with deprecated args:%s" % (f.name, ",".join(dep_args)))
+                e.add(opts, "'%s' Initialised with deprecated args:%s" % (f.name, ",".join(dep_args)))
             if isinstance(f, models.CharField) and f.maxlength in (None, 0):
-                e.add(opts, '"%s" field: CharFields require a "maxlength" attribute.' % f.name)
+                e.add(opts, '"%s": CharFields require a "maxlength" attribute.' % f.name)
             if isinstance(f, models.FloatField):
                 if f.decimal_places is None:
-                    e.add(opts, '"%s" field: FloatFields require a "decimal_places" attribute.' % f.name)
+                    e.add(opts, '"%s": FloatFields require a "decimal_places" attribute.' % f.name)
                 if f.max_digits is None:
-                    e.add(opts, '"%s" field: FloatFields require a "max_digits" attribute.' % f.name)
+                    e.add(opts, '"%s": FloatFields require a "max_digits" attribute.' % f.name)
             if isinstance(f, models.FileField) and not f.upload_to:
-                e.add(opts, '"%s" field: FileFields require an "upload_to" attribute.' % f.name)
+                e.add(opts, '"%s": FileFields require an "upload_to" attribute.' % f.name)
             if isinstance(f, models.ImageField):
                 try:
                     from PIL import Image
                 except ImportError:
-                    e.add(opts, '"%s" field: To use ImageFields, you need to install the Python Imaging Library. Get it at http://www.pythonware.com/products/pil/ .' % f.name)
+                    e.add(opts, '"%s": To use ImageFields, you need to install the Python Imaging Library. Get it at http://www.pythonware.com/products/pil/ .' % f.name)
             if f.prepopulate_from is not None and type(f.prepopulate_from) not in (list, tuple):
-                e.add(opts, '"%s" field: prepopulate_from should be a list or tuple.' % f.name)
+                e.add(opts, '"%s": prepopulate_from should be a list or tuple.' % f.name)
             if f.choices:
                 if not type(f.choices) in (tuple, list):
-                    e.add(opts, '"%s" field: "choices" should be either a tuple or list.' % f.name)
+                    e.add(opts, '"%s": "choices" should be either a tuple or list.' % f.name)
                 else:
                     for c in f.choices:
                         if not type(c) in (tuple, list) or len(c) != 2:
-                            e.add(opts, '"%s" field: "choices" should be a sequence of two-tuples.' % f.name)
+                            e.add(opts, '"%s": "choices" should be a sequence of two-tuples.' % f.name)
             if f.db_index not in (None, True, False):
-                e.add(opts, '"%s" field: "db_index" should be either None, True or False.' % f.name)
+                e.add(opts, '"%s": "db_index" should be either None, True or False.' % f.name)
 
             # Check to see if the related field will clash with any
             # existing fields, m2m fields, m2m related objects or related objects
             if f.rel:
                 rel_opts = f.rel.to._meta
                 if f.rel.to not in models.get_models():
-                     e.add(opts, "'%s' field: relates to uninstalled model %s" % (f.name, rel_opts.object_name))
-                    
-                rel_name = RelatedObject(f.rel.to, cls, f).OLD_get_accessor_name()
-                if rel_name in [r.name for r in rel_opts.fields]:
-                    e.add(opts, "'%s.%s' related field: Clashes with field on '%s.%s'" % (opts.object_name, f.name, rel_opts.object_name, rel_name))
-                elif rel_name in [r.name for r in rel_opts.many_to_many]:
-                    e.add(opts, "'%s.%s' related field: Clashes with m2m field on '%s.%s'" % (opts.object_name, f.name, rel_opts.object_name, rel_name))
-                elif rel_name in [r.OLD_get_accessor_name() for r in rel_opts.get_all_related_many_to_many_objects()]:
-                    e.add(opts, "'%s.%s' related field: Clashes with related m2m field '%s.%s'" % (opts.object_name, f.name, rel_opts.object_name, rel_name))
-                elif rel_name in [r.OLD_get_accessor_name() for r in rel_opts.get_all_related_objects() if r.field is not f]:
-                    e.add(opts, "'%s.%s' related field: Clashes with related field on '%s.%s'" % (opts.object_name, f.name, rel_opts.object_name, rel_name))
-
+                     e.add(opts, "'%s' relates to uninstalled model %s" % (f.name, rel_opts.object_name))
+                                    
+                rel_name = RelatedObject(f.rel.to, cls, f).get_accessor_name()
+                for r in rel_opts.fields:
+                    if r.name == rel_name:
+                        e.add(opts, "'%s' accessor name '%s.%s' clashes with another field" % (f.name, rel_opts.object_name, r.name))
+                for r in rel_opts.many_to_many:
+                    if r.name == rel_name:
+                        e.add(opts, "'%s' accessor name '%s.%s' clashes with a m2m field" % (f.name, rel_opts.object_name, r.name))
+                for r in rel_opts.get_all_related_many_to_many_objects():
+                    if r.get_accessor_name() == rel_name:                            
+                        e.add(opts, "'%s' accessor name '%s.%s' clashes with a related m2m field" % (f.name, rel_opts.object_name, r.get_accessor_name()))
+                for r in rel_opts.get_all_related_objects():
+                    if r.get_accessor_name() == rel_name and r.field is not f:
+                        e.add(opts, "'%s' accessor name '%s.%s' clashes with a related field" % (f.name, rel_opts.object_name, r.get_accessor_name()))
+                
         for i, f in enumerate(opts.many_to_many):
             # Check to see if the related m2m field will clash with any
             # existing fields, m2m fields, m2m related objects or related objects
-            if f.rel:
-                rel_opts = f.rel.to._meta
-                if f.rel.to not in models.get_models():
-                    e.add(opts, "'%s' field: has m2m relation with uninstalled model %s" % (f.name, rel_opts.object_name))
+            rel_opts = f.rel.to._meta
+            if f.rel.to not in models.get_models():
+                e.add(opts, "'%s' has m2m relation with uninstalled model %s" % (f.name, rel_opts.object_name))
 
-                rel_name = RelatedObject(f.rel.to, cls, f).OLD_get_accessor_name()
-                if rel_name in [r.name for r in rel_opts.fields]:
-                    e.add(opts, "'%s.%s' related m2m field: Clashes with field on '%s.%s'" % (opts.object_name, f.name, rel_opts.object_name, rel_name))
-                elif rel_name in [r.name for r in rel_opts.many_to_many]:
-                    e.add(opts, "'%s.%s' related m2m field: Clashes with m2m field on '%s.%s'" % (opts.object_name, f.name, rel_opts.object_name, rel_name))
-                elif rel_name in [r.OLD_get_accessor_name() for r in rel_opts.get_all_related_many_to_many_objects() if r.field is not f]:
-                    e.add(opts, "'%s.%s' related m2m field: Clashes with related m2m field '%s.%s'" % (opts.object_name, f.name, rel_opts.object_name, rel_name))
-                elif rel_name in [r.OLD_get_accessor_name() for r in rel_opts.get_all_related_objects()]:
-                    e.add(opts, "'%s.%s' related m2m field: Clashes with related field on '%s.%s'" % (opts.object_name, f.name, rel_opts.object_name, rel_name))
+            rel_name = RelatedObject(f.rel.to, cls, f).get_accessor_name()
+            for r in rel_opts.fields:
+                if r.name == rel_name:
+                    e.add(opts, "'%s' m2m accessor name '%s.%s' clashes with another field" % (f.name, rel_opts.object_name, r.name))
+            for r in rel_opts.many_to_many:
+                if r.name == rel_name:
+                    e.add(opts, "'%s' m2m accessor name '%s.%s' clashes with a m2m field" % (f.name, rel_opts.object_name, r.name))
+            for r in rel_opts.get_all_related_many_to_many_objects():
+                if r.get_accessor_name() == rel_name and r.field is not f:                            
+                    e.add(opts, "'%s' m2m accessor name '%s.%s' clashes with a related m2m field" % (f.name, rel_opts.object_name, r.get_accessor_name()))
+            for r in rel_opts.get_all_related_objects():
+                if r.get_accessor_name() == rel_name:
+                    e.add(opts, "'%s' m2m accessor name '%s.%s' clashes with a related field" % (f.name, rel_opts.object_name, r.get_accessor_name()))
 
         # Check admin attribute.
         if opts.admin is not None:

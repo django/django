@@ -614,7 +614,7 @@ def find_field(name, field_list, use_accessor=False):
     Returns None if there are no matches, or several matches.
     """
     if use_accessor:
-        matches = [f for f in field_list if f.OLD_get_accessor_name() == name]
+        matches = [f for f in field_list if (f.field.rel.related_name or f.opts.object_name.lower()) == name]
     else:
         matches = [f for f in field_list if f.name == name]
     if len(matches) != 1:

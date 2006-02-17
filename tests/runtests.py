@@ -171,12 +171,18 @@ class TestRunner:
                 count = management.get_validation_errors(s, mod)
                 s.seek(0)
                 error_log = s.read()
-                expected = len(mod.error_log.split('\n')) - 1
-                if error_log != mod.error_log:
+                actual = error_log.split('\n')
+                expected = mod.error_log.split('\n')
+                                    
+                unexpected = [err for err in actual if err not in expected]    
+                missing = [err for err in expected if err not in actual]
+                
+                if unexpected or missing:
+                    unexpected_log = '\n'.join(unexpected)
+                    missing_log = '\n'.join(missing)
                     log_error(model_name,
-                        "Validator found %d validation errors, %d expected" % (count, expected),
-                        "Expected errors:\n%s\n\nActual errors:\n%s" % (mod.error_log, error_log))
-
+                        "Validator found %d validation errors, %d expected" % (count, len(expected) - 1),
+                        "Missing errors:\n%s\n\nUnexpected errors:\n%s" % (missing_log, unexpected_log))
 
         if run_othertests:
             # Run the non-model tests in the other tests dir
