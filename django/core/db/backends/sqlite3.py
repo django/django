@@ -177,7 +177,7 @@ DATA_TYPES = {
     'PhoneNumberField':             'varchar(20)',
     'PositiveIntegerField':         'integer unsigned',
     'PositiveSmallIntegerField':    'smallint unsigned',
-    'SlugField':                    'varchar(50)',
+    'SlugField':                    'varchar(%(maxlength)s)',
     'SmallIntegerField':            'smallint',
     'TextField':                    'text',
     'TimeField':                    'time',

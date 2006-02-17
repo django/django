@@ -260,7 +260,7 @@ DATA_TYPE_MAPPING = {
     'PhoneNumberField'          : _('Phone number'),
     'PositiveIntegerField'      : _('Integer'),
     'PositiveSmallIntegerField' : _('Integer'),
-    'SlugField'                 : _('String (up to 50)'),
+    'SlugField'                 : _('String (up to %(maxlength)s)'),
     'SmallIntegerField'         : _('Integer'),
     'TextField'                 : _('Text'),
     'TimeField'                 : _('Time'),

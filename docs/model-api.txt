@@ -410,7 +410,11 @@ Here are all available field types:
     containing only letters, numbers, underscores or hyphens. They're generally
     used in URLs.
 
-    Implies ``maxlength=50`` and ``db_index=True``.
+    In the Django development version, you can specify ``maxlength``. If
+    ``maxlength`` is not specified, Django will use a default length of 50. In
+    previous Django versions, there's no way to override the length of 50.
+
+    Implies ``db_index=True``.
 
     Accepts an extra option, ``prepopulate_from``, which is a list of fields
     from which to auto-populate the slug, via JavaScript, in the object's admin
