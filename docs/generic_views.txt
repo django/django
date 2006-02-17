@@ -192,7 +192,14 @@ The date-based generic functions are:
     Has the following template context:
 
         ``month``
-            The given month (a datetime.datetime object)
+            The given month (a datetime.date object)
+        ``next_month``
+            **New in Django development version.** The first day of the next
+            month, or None if the next month is in the future (a datetime.date
+            object)
+        ``previous_month``
+            **New in Django development version.** The first day of the
+            previous month (a datetime.date object)
         ``object_list``
             List of objects published in the given month
 
