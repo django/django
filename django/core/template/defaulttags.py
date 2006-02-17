@@ -121,12 +121,7 @@ class IfChangedNode(Node):
     def render(self, context):
         content = self.nodelist.render(context)
         if content != self._last_seen:
-            firstloop = (self._last_seen == None)
             self._last_seen = content
-            context.push()
-            context['ifchanged'] = {'firstloop': firstloop}
-            content = self.nodelist.render(context)
-            context.pop()
             return content
         else:
             return ''
