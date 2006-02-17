@@ -64,6 +64,14 @@ def _is_valid_dir_name(s):
 # field as the field to which it points.
 get_rel_data_type = lambda f: (f.get_internal_type() in ('AutoField', 'PositiveIntegerField', 'PositiveSmallIntegerField')) and 'IntegerField' or f.get_internal_type()
 
+def get_version():
+    "Returns the version as a human-format string."
+    from django import VERSION
+    v = '.'.join([str(i) for i in VERSION[:-1]])
+    if VERSION[3]:
+        v += ' (%s)' % VERSION[3]
+    return v
+
 def get_sql_create(app):
     "Returns a list of the CREATE TABLE SQL statements for the given app."
     from django.db import backend, get_creation_module, models
@@ -821,8 +829,8 @@ class ModelErrorCollection:
 
 def get_validation_errors(outfile, app=None):
     """
-    Validates all models that are part of the specified app. If no app name is provided, 
-    validates all models of all installed apps. Writes errors, if any, to outfile. 
+    Validates all models that are part of the specified app. If no app name is provided,
+    validates all models of all installed apps. Writes errors, if any, to outfile.
     Returns number of errors.
     """
     from django.db import models
@@ -870,7 +878,7 @@ def get_validation_errors(outfile, app=None):
                 rel_opts = f.rel.to._meta
                 if f.rel.to not in models.get_models():
                      e.add(opts, "'%s' relates to uninstalled model %s" % (f.name, rel_opts.object_name))
-                                    
+
                 rel_name = RelatedObject(f.rel.to, cls, f).get_accessor_name()
                 for r in rel_opts.fields:
                     if r.name == rel_name:
@@ -879,12 +887,12 @@ def get_validation_errors(outfile, app=None):
                     if r.name == rel_name:
                         e.add(opts, "'%s' accessor name '%s.%s' clashes with a m2m field" % (f.name, rel_opts.object_name, r.name))
                 for r in rel_opts.get_all_related_many_to_many_objects():
-                    if r.get_accessor_name() == rel_name:                            
+                    if r.get_accessor_name() == rel_name:
                         e.add(opts, "'%s' accessor name '%s.%s' clashes with a related m2m field" % (f.name, rel_opts.object_name, r.get_accessor_name()))
                 for r in rel_opts.get_all_related_objects():
                     if r.get_accessor_name() == rel_name and r.field is not f:
                         e.add(opts, "'%s' accessor name '%s.%s' clashes with a related field" % (f.name, rel_opts.object_name, r.get_accessor_name()))
-                
+
         for i, f in enumerate(opts.many_to_many):
             # Check to see if the related m2m field will clash with any
             # existing fields, m2m fields, m2m related objects or related objects
@@ -900,7 +908,7 @@ def get_validation_errors(outfile, app=None):
                 if r.name == rel_name:
                     e.add(opts, "'%s' m2m accessor name '%s.%s' clashes with a m2m field" % (f.name, rel_opts.object_name, r.name))
             for r in rel_opts.get_all_related_many_to_many_objects():
-                if r.get_accessor_name() == rel_name and r.field is not f:                            
+                if r.get_accessor_name() == rel_name and r.field is not f:
                     e.add(opts, "'%s' m2m accessor name '%s.%s' clashes with a related m2m field" % (f.name, rel_opts.object_name, r.get_accessor_name()))
             for r in rel_opts.get_all_related_objects():
                 if r.get_accessor_name() == rel_name:
@@ -1119,7 +1127,7 @@ def print_error(msg, cmd):
 
 def execute_from_command_line(action_mapping=DEFAULT_ACTION_MAPPING):
     # Parse the command-line arguments. optparse handles the dirty work.
-    parser = DjangoOptionParser(get_usage(action_mapping))
+    parser = DjangoOptionParser(usage=get_usage(action_mapping), version=get_version())
     parser.add_option('--settings',
         help='Python path to settings module, e.g. "myproject.settings.main". If this isn\'t provided, the DJANGO_SETTINGS_MODULE environment variable will be used.')
     parser.add_option('--pythonpath',

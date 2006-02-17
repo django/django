@@ -403,7 +403,7 @@ def _get_deleted_objects(deleted_objects, perms_needed, user, obj, opts, current
             if related.opts.admin and has_related_objs:
                 p = '%s.%s' % (related.opts.app_label, related.opts.get_delete_permission())
                 if not user.has_perm(p):
-                    perms_needed.add(rel_opts.verbose_name)
+                    perms_needed.add(rel_opts_name)
     for related in opts.get_all_related_many_to_many_objects():
         if related.opts in opts_seen:
             continue

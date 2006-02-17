@@ -17,7 +17,7 @@ DATA_TYPES = {
     'PhoneNumberField':  'varchar(20)',
     'PositiveIntegerField': 'int CONSTRAINT [CK_int_pos_%(column)s] CHECK ([%(column)s] > 0)',
     'PositiveSmallIntegerField': 'smallint CONSTRAINT [CK_smallint_pos_%(column)s] CHECK ([%(column)s] > 0)',
-    'SlugField':         'varchar(50)',
+    'SlugField':         'varchar(%(maxlength)s)',
     'SmallIntegerField': 'smallint',
     'TextField':         'text',
     'TimeField':         'time',

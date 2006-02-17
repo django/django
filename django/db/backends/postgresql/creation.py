@@ -21,7 +21,7 @@ DATA_TYPES = {
     'PhoneNumberField':  'varchar(20)',
     'PositiveIntegerField': 'integer CHECK ("%(column)s" >= 0)',
     'PositiveSmallIntegerField': 'smallint CHECK ("%(column)s" >= 0)',
-    'SlugField':         'varchar(50)',
+    'SlugField':         'varchar(%(maxlength)s)',
     'SmallIntegerField': 'smallint',
     'TextField':         'text',
     'TimeField':         'time',
