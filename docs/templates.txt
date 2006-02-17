@@ -243,7 +243,11 @@ Using the built-in reference
 Because Django can be used to develop any sort of site, the tags, filters and
 variables available are different depending on the application. To make it
 easy to figure out what's available in a given site, the admin interface has a
-complete reference of all the template goodies available to that site.
+complete reference of all the template goodies available to that site. To get
+that reference, go to your Django admin interface and append ``'doc'`` onto the
+admin URL. Example: ``http://127.0.0.1/admin/doc/``. In the Django development
+version, you'll see a "Documentation" link in the upper right of every
+admin-site page.
 
 The reference is integrated into the administration interface for your site(s)
 and is divided into 4 sections: tags, filters, models, and views.
@@ -924,7 +928,12 @@ digits. For a string, it's a list of characters.
 phone2numeric
 ~~~~~~~~~~~~~
 
-Converts a phone number to its numerical equivalent.
+Converts a phone number (possibly containing letters) to its numerical
+equivalent. For example, ``'800-COLLECT'`` will be converted to
+``'800-2655328'``.
+
+The input doesn't have to be a valid phone number. This will happily convert
+any string.
 
 pluralize
 ~~~~~~~~~

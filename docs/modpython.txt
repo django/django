@@ -198,3 +198,36 @@ that case, you'll see an "Internal Server Error" page in your browser and the
 full Python traceback in your Apache ``error_log`` file. The ``error_log``
 traceback is spread over multiple lines. (Yes, this is ugly and rather hard to
 read, but it's how mod_python does things.)
+
+If you get a segmentation fault
+===============================
+
+If Apache causes a segmentation fault, there are two probable causes, neither
+of which has to do with Django itself.
+
+    1. It may be because your Python code is importing the "pyexpat" module,
+       which may conflict with the version embedded in Apache. For full
+       information, see `Expat Causing Apache Crash`_.
+    2. It may be because you're running mod_python and mod_php in the same
+       Apache instance, with MySQL as your database backend. In some cases,
+       this causes a known mod_python issue due to version conflicts in PHP and
+       the Python MySQL backend. There's full information in the
+       `mod_python FAQ entry`_.
+
+If you continue to have problems setting up mod_python, a good thing to do is
+get a barebones mod_python site working, without the Django framework. This is
+an easy way to isolate mod_python-specific problems. `Getting mod_python Working`_
+details this procedure.
+
+The next step should be to edit your test code and add an import of any
+Django-specific code you're using -- your views, your models, your URLconf,
+your RSS configuration, etc. Put these imports in your test handler function
+and access your test URL in a browser. If this causes a crash, you've confirmed
+it's the importing of Django code that causes the problem. Gradually reduce the
+set of imports until it stops crashing, so as to find the specific module that
+causes the problem. Drop down further into modules and look into their imports,
+as necessary.
+
+.. _Expat Causing Apache Crash: http://www.dscpl.com.au/articles/modpython-006.html
+.. _mod_python FAQ entry: http://modpython.org/FAQ/faqw.py?req=show&file=faq02.013.htp
+.. _Getting mod_python Working: http://www.dscpl.com.au/articles/modpython-001.html
