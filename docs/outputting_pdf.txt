@@ -79,6 +79,15 @@ mention:
       whatever you want. It'll be used by browsers in the "Save as..."
       dialogue, etc.
 
+    * The ``Content-Disposition`` header starts with ``'attachment; '`` in this
+      example. This forces Web browsers to pop-up a dialog box
+      prompting/confirming how to handle the document even if a default is set
+      on the machine. If you leave off ``'attachment;'``, browsers will handle
+      the PDF using whatever program/plugin they've been configured to use for
+      PDFs. Here's what that code would look like::
+
+          response['Content-Disposition'] = 'filename=somefilename.pdf'
+
     * Hooking into the ReportLab API is easy: Just pass ``response`` as the
       first argument to ``canvas.Canvas``. The ``Canvas`` class expects a
       file-like object, and ``HttpResponse`` objects fit the bill.
@@ -88,3 +97,56 @@ mention:
 
     * Finally, it's important to call ``showPage()`` and ``save()`` on the PDF
       file.
+
+Complex PDFs
+============
+
+If you're creating a complex PDF document with ReportLab, consider using the
+cStringIO_ library as a temporary holding place for your PDF file. The
+cStringIO library provides a file-like object interface that is particularly
+efficient. Here's the above "Hello World" example rewritten to use
+``cStringIO``::
+
+    from cStringIO import StringIO
+    from reportlab.pdfgen import canvas
+    from django.utils.httpwrappers import HttpResponse
+
+    def some_view(request):
+        # Create the HttpResponse object with the appropriate PDF headers.
+        response = HttpResponse(mimetype='application/pdf')
+        response['Content-Disposition'] = 'attachment; filename=somefilename.pdf'
+
+        buffer = String()
+
+        # Create the PDF object, using the StringIO object as its "file."
+        p = canvas.Canvas(buffer)
+
+        # Draw things on the PDF. Here's where the PDF generation happens.
+        # See the ReportLab documentation for the full list of functionality.
+        p.drawString(100, 100, "Hello world.")
+
+        # Close the PDF object cleanly.
+        p.showPage()
+        p.save()
+
+        # Get the value of the StringIO buffer and write it to the response.
+        pdf = buffer.getvalue()
+        buffer.close()
+        response.write(pdf)
+        return response
+
+.. cStringIO: http://www.python.org/doc/current/lib/module-cStringIO.html
+
+Further resources
+=================
+
+    * PDFlib_ is another PDF-generation library that has Python bindings. To
+      use it with Django, just use the same concepts explained in this article.
+    * HTMLdoc_ is a command-line script that can convert HTML to PDF. It
+      doesn't have a Python interface, but you can escape out to the shell
+      using ``system`` or ``popen`` and retrieve the output in Python.
+    * `forge_fdf in Python`_ is a library that fills in PDF forms.
+
+.. _PDFlib: http://www.pdflib.org/
+.. _HTMLdoc: http://www.htmldoc.org/
+.. _forge_fdf in Python: http://www.accesspdf.com/article.php/20050421092951834
