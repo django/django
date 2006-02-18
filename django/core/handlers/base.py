@@ -85,6 +85,10 @@ class BaseHandler:
             if response is None:
                 raise ValueError, "The view %s.%s didn't return an HttpResponse object." % (callback.__module__, callback.func_name)
 
+            # Apply response middleware
+            for middleware_method in self._response_middleware:
+                response = middleware_method(request, response)
+
             return response
         except http.Http404, e:
             if settings.DEBUG:

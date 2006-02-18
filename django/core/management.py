@@ -1011,8 +1011,8 @@ def runserver(addr, port):
         from django.conf import settings
         print "Validating models..."
         validate()
-        print "\nStarting server on port %s with settings module %r." % (port, settings.SETTINGS_MODULE)
-        print "Go to http://%s:%s/ for Django." % (addr, port)
+        print "\nDjango version %s, using settings %r" % (get_version(), settings.SETTINGS_MODULE)
+        print "Development server is running at http://%s:%s/" % (addr, port)
         print "Quit the server with CONTROL-C (Unix) or CTRL-BREAK (Windows)."
         try:
             run(addr, int(port), AdminMediaHandler(WSGIHandler()))
