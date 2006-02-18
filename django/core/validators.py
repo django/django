@@ -13,7 +13,7 @@ import re
 _datere = r'(19|2\d)\d{2}-((?:0?[1-9])|(?:1[0-2]))-((?:0?[1-9])|(?:[12][0-9])|(?:3[0-1]))'
 _timere = r'(?:[01]?[0-9]|2[0-3]):[0-5][0-9](?::[0-5][0-9])?'
 alnum_re = re.compile(r'^\w+$')
-alnumurl_re = re.compile(r'^[\w/]+$')
+alnumurl_re = re.compile(r'^[-\w/]+$')
 ansi_date_re = re.compile('^%s$' % _datere)
 ansi_time_re = re.compile('^%s$' % _timere)
 ansi_datetime_re = re.compile('^%s %s$' % (_datere, _timere))
@@ -63,7 +63,7 @@ def isAlphaNumeric(field_data, all_data):
 
 def isAlphaNumericURL(field_data, all_data):
     if not alnumurl_re.search(field_data):
-        raise ValidationError, _("This value must contain only letters, numbers, underscores and slashes.")
+        raise ValidationError, _("This value must contain only letters, numbers, underscores, dashes or slashes.")
 
 def isSlug(field_data, all_data):
     if not slug_re.search(field_data):
