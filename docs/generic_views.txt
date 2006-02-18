@@ -166,6 +166,8 @@ The date-based generic functions are:
     Yearly archive. Requires that the ``year`` argument be present in the URL
     pattern.
 
+    Takes an optional ``allow_empty`` parameter, as ``archive_index``.
+
     Uses the template ``<app_label>/<model_name>_archive_year`` by default.
 
     Has the following template context:
@@ -184,6 +186,8 @@ The date-based generic functions are:
     ``time.strftime``. (See the `strftime docs`_.) It's set to ``"%b"`` by
     default, which is a three-letter month abbreviation. To change it to use
     numbers, use ``"%m"``.
+
+    Takes an optional ``allow_empty`` parameter, as ``archive_index``.
 
     Uses the template ``<app_label>/<model_name>_archive_month`` by default.
 

@@ -43,7 +43,8 @@ def archive_index(request, queryset, date_field, num_latest=15,
     return HttpResponse(t.render(c))
 
 def archive_year(request, year, queryset, date_field, template_name=None,
-        template_loader=loader, extra_context={}, context_processors=None):
+        template_loader=loader, extra_context={}, allow_empty=False,
+        context_processors=None):
     """
     Generic yearly archive view.
 
@@ -61,7 +62,7 @@ def archive_year(request, year, queryset, date_field, template_name=None,
     if int(year) >= now.year:
         lookup_kwargs['%s__lte' % date_field] = now
     date_list = queryset.filter(**lookup_kwargs).dates(date_field, 'month')
-    if not date_list:
+    if not date_list and not allow_empty:
         raise Http404
     if not template_name:
         template_name = "%s/%s_archive_year" % (model._meta.app_label, model._meta.object_name.lower())
@@ -79,7 +80,7 @@ def archive_year(request, year, queryset, date_field, template_name=None,
 
 def archive_month(request, year, month, queryset, date_field,
         month_format='%b', template_name=None, template_loader=loader,
-        extra_context={}, context_processors=None):
+        extra_context={}, allow_empty=False, context_processors=None):
     """
     Generic monthly archive view.
 
@@ -112,7 +113,7 @@ def archive_month(request, year, month, queryset, date_field,
     if last_day >= now.date():
         lookup_kwargs['%s__lte' % date_field] = now
     object_list = queryset.filter(**lookup_kwargs)
-    if not object_list:
+    if not object_list and not allow_empty:
         raise Http404
     if not template_name:
         template_name = "%s/%s_archive_month" % (model._meta.app_label, model._meta.object_name.lower())

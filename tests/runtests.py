@@ -241,7 +241,7 @@ class TestRunner:
 if __name__ == "__main__":
     from optparse import OptionParser
     usage = "%prog [options] [model model model ...]"
-    parser = OptionParser()
+    parser = OptionParser(usage=usage)
     parser.add_option('-v', help='How verbose should the output be? Choices are 0, 1 and 2, where 2 is most verbose. Default is 0.',
         type='choice', choices=['0', '1', '2'])
     parser.add_option('--settings',
