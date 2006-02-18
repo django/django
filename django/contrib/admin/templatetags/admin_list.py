@@ -76,8 +76,8 @@ def result_headers(cl):
         except models.FieldDoesNotExist:
             # For non-field list_display values, check for the function
             # attribute "short_description". If that doesn't exist, fall
-            # back to the method name. And __repr__ is a special-case.
-            if field_name == '__repr__':
+            # back to the method name. And __str__ is a special-case.
+            if field_name == '__str__':
                 header = lookup_opts.verbose_name
             else:
                 attr = getattr(cl.model, field_name) # Let AttributeErrors propogate.

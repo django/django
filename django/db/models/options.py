@@ -10,7 +10,7 @@ import re
 get_verbose_name = lambda class_name: re.sub('([A-Z])', ' \\1', class_name).lower().strip()
 
 DEFAULT_NAMES = ('verbose_name', 'verbose_name_plural', 'db_table', 'ordering',
-                 'unique_together', 'permissions', 'get_latest_by', 
+                 'unique_together', 'permissions', 'get_latest_by',
                  'order_with_respect_to', 'app_label')
 
 class Options:
@@ -206,7 +206,7 @@ class AdminOptions:
         save_on_top=False, list_select_related=False):
         self.fields = fields
         self.js = js or []
-        self.list_display = list_display or ['__repr__']
+        self.list_display = list_display or ['__str__']
         self.list_filter = list_filter or []
         self.date_hierarchy = date_hierarchy
         self.save_as, self.ordering = save_as, ordering
