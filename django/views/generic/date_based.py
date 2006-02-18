@@ -51,7 +51,7 @@ def archive_index(request, app_label, module_name, date_field, num_latest=15,
 
 def archive_year(request, year, app_label, module_name, date_field,
         template_name=None, template_loader=loader, extra_lookup_kwargs={},
-        extra_context={}, context_processors=None):
+        extra_context={}, allow_empty=False, context_processors=None):
     """
     Generic yearly archive view.
 
@@ -70,7 +70,7 @@ def archive_year(request, year, app_label, module_name, date_field,
         lookup_kwargs['%s__lte' % date_field] = now
     lookup_kwargs.update(extra_lookup_kwargs)
     date_list = getattr(mod, "get_%s_list" % date_field)('month', **lookup_kwargs)
-    if not date_list:
+    if not date_list and not allow_empty:
         raise Http404
     if not template_name:
         template_name = "%s/%s_archive_year" % (app_label, module_name)
@@ -88,7 +88,8 @@ def archive_year(request, year, app_label, module_name, date_field,
 
 def archive_month(request, year, month, app_label, module_name, date_field,
         month_format='%b', template_name=None, template_loader=loader,
-        extra_lookup_kwargs={}, extra_context={}, context_processors=None):
+        extra_lookup_kwargs={}, extra_context={}, allow_empty=False,
+        context_processors=None):
     """
     Generic monthly archive view.
 
@@ -122,7 +123,7 @@ def archive_month(request, year, month, app_label, module_name, date_field,
         lookup_kwargs['%s__lte' % date_field] = now
     lookup_kwargs.update(extra_lookup_kwargs)
     object_list = mod.get_list(**lookup_kwargs)
-    if not object_list:
+    if not object_list and not allow_empty:
         raise Http404
     if not template_name:
         template_name = "%s/%s_archive_month" % (app_label, module_name)
