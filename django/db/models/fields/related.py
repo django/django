@@ -101,7 +101,7 @@ def _add_m2m_items(rel_manager_inst, managerclass, rel_model, join_table, this_c
     # rel_manager_inst: the RelatedManager instance
     # managerclass: class that can create and save new objects
     # rel_model: the model class of the 'related' object
-    # join_table: name of the m2m link table 
+    # join_table: name of the m2m link table
     # this_col_name: the PK colname in join_table for 'this' object
     # rel_col_name: the PK colname in join_table for the related object
     # this_pk_val: the primary key for 'this' object
@@ -125,7 +125,7 @@ def _add_m2m_items(rel_manager_inst, managerclass, rel_model, join_table, this_c
     cursor = connection.cursor()
     cursor.execute("SELECT %s FROM %s WHERE %s = %%s AND %s IN (%s)" % \
         (rel_col_name, join_table, this_col_name,
-        rel_col_name, ",".join(['%s'] * len(new_ids))), 
+        rel_col_name, ",".join(['%s'] * len(new_ids))),
         [this_pk_val] + list(new_ids))
     if cursor.rowcount is not None and cursor.rowcount > 0:
         existing_ids = set([row[0] for row in cursor.fetchmany(cursor.rowcount)])
@@ -144,7 +144,7 @@ def _remove_m2m_items(rel_model, join_table, this_col_name,
     # Utility function used by the ManyRelatedObjectsDescriptors
     # to do removal from a many-to-many field.
     # rel_model: the model class of the 'related' object
-    # join_table: name of the m2m link table 
+    # join_table: name of the m2m link table
     # this_col_name: the PK colname in join_table for 'this' object
     # rel_col_name: the PK colname in join_table for the related object
     # this_pk_val: the primary key for 'this' object
@@ -166,7 +166,7 @@ def _remove_m2m_items(rel_model, join_table, this_col_name,
 def _clear_m2m_items(join_table, this_col_name, this_pk_val):
     # Utility function used by the ManyRelatedObjectsDescriptors
     # to clear all from a many-to-many field.
-    # join_table: name of the m2m link table 
+    # join_table: name of the m2m link table
     # this_col_name: the PK colname in join_table for 'this' object
     # this_pk_val: the primary key for 'this' object
     from django.db import connection
@@ -311,10 +311,9 @@ class ForeignKey(RelatedField, Field):
             to_name = to._meta.object_name.lower()
         except AttributeError: # to._meta doesn't exist, so it must be RECURSIVE_RELATIONSHIP_CONSTANT
             assert isinstance(to, basestring), "ForeignKey(%r) is invalid. First parameter to ForeignKey must be either a model, a model name, or the string %r" % (to, RECURSIVE_RELATIONSHIP_CONSTANT)
-            kwargs['verbose_name'] = kwargs.get('verbose_name', '')
         else:
             to_field = to_field or to._meta.pk.name
-            kwargs['verbose_name'] = kwargs.get('verbose_name', to._meta.verbose_name)
+        kwargs['verbose_name'] = kwargs.get('verbose_name', '')
 
         if kwargs.has_key('edit_inline_type'):
             import warnings
