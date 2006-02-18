@@ -11,6 +11,9 @@ def get_table_description(cursor, table_name):
 def get_relations(cursor, table_name):
     raise NotImplementedError
 
+def get_indexes(cursor, table_name):
+    raise NotImplementedError
+
 # Maps SQL types to Django Field types. Some of the SQL types have multiple
 # entries here because SQLite allows for anything and doesn't normalize the
 # field type; it uses whatever was given.

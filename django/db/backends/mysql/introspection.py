@@ -14,6 +14,19 @@ def get_table_description(cursor, table_name):
 def get_relations(cursor, table_name):
     raise NotImplementedError
 
+def get_indexes(cursor, table_name):
+    """
+    Returns a dictionary of fieldname -> infodict for the given table,
+    where each infodict is in the format:
+        {'primary_key': boolean representing whether it's the primary key,
+         'unique': boolean representing whether it's a unique index}
+    """
+    cursor.execute("SHOW INDEX FROM %s" % quote_name(table_name))
+    indexes = {}
+    for row in cursor.fetchall():
+        indexes[row[4]] = {'primary_key': (row[2] == 'PRIMARY'), 'unique': not bool(row[1])}
+    return indexes
+
 DATA_TYPES_REVERSE = {
     FIELD_TYPE.BLOB: 'TextField',
     FIELD_TYPE.CHAR: 'CharField',

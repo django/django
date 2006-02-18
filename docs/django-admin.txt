@@ -112,12 +112,13 @@ output:
 
 This feature is meant as a shortcut, not as definitive model generation. After
 you run it, you'll want to look over the generated models yourself to make
-customizations. In particular, you'll need to do this:
+customizations. In particular, you'll need to rearrange models' order, so that
+models that refer to other models are ordered properly.
 
-    * Rearrange models' order, so that models that refer to other models are
-      ordered properly.
-    * Add ``primary_key=True`` to one field in each model. The ``inspectdb``
-      doesn't yet introspect primary keys.
+If you're using Django 0.90 or 0.91, you'll need to add ``primary_key=True`` to
+one field in each model. In the Django development version, primary keys are
+automatically introspected for PostgreSQL and MySQL, and Django puts in the
+``primary_key=True`` where needed.
 
 ``inspectdb`` works with PostgreSQL, MySQL and SQLite. Foreign-key detection
 only works in PostgreSQL.
