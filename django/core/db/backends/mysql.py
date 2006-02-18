@@ -139,13 +139,13 @@ def get_indexes(cursor, table_name):
     """
     Returns a dictionary of fieldname -> infodict for the given table,
     where each infodict is in the format:
-        {'keyname': 'name of key',
+        {'primary_key': boolean representing whether it's the primary key,
          'unique': boolean representing whether it's a unique index}
     """
     cursor.execute("SHOW INDEX FROM %s" % DatabaseWrapper().quote_name(table_name))
     indexes = {}
     for row in cursor.fetchall():
-        indexes[row[4]] = {'keyname': row[2], 'unique': not bool(row[1])}
+        indexes[row[4]] = {'primary_key': (row[2] == 'PRIMARY'), 'unique': not bool(row[1])}
     return indexes
 
 OPERATOR_MAPPING = {

@@ -636,7 +636,7 @@ def inspectdb(db_name):
                 # Add primary_key and unique, if necessary.
                 column_name = extra_params.get('db_column', att_name)
                 if column_name in indexes:
-                    if indexes[column_name]['keyname'] == 'PRIMARY':
+                    if indexes[column_name]['primary_key']:
                         extra_params['primary_key'] = True
                     elif indexes[column_name]['unique']:
                         extra_params['unique'] = True
