@@ -692,7 +692,7 @@ class ForeignKey(Field):
             kwargs['verbose_name'] = kwargs.get('verbose_name', '')
         else:
             to_field = to_field or to._meta.pk.name
-            kwargs['verbose_name'] = kwargs.get('verbose_name', to._meta.verbose_name)
+        kwargs['verbose_name'] = kwargs.get('verbose_name', '')
 
         if kwargs.has_key('edit_inline_type'):
             import warnings
