@@ -178,6 +178,19 @@ class QuerySet(object):
         assert bool(latest_by), "latest() requires either a field_name parameter or 'get_latest_by' in the model"
         return self._clone(_limit=1, _order_by=('-'+latest_by,)).get()
 
+    def in_bulk(self, id_list):
+        """
+        Returns a dictionary mapping each of the given IDs to the object with
+        that ID.
+        """
+        assert isinstance(id_list, (tuple,  list)), "in_bulk() must be provided with a list of IDs."
+        id_list = list(id_list)
+        assert id_list != [], "in_bulk() cannot be passed an empty ID list."
+        qs = self._clone()
+        qs._where.append("%s.%s IN (%s)" % (backend.quote_name(self.model._meta.db_table), backend.quote_name(self.model._meta.pk.column), ",".join(['%s'] * len(id_list))))
+        qs._params.extend(id_list)
+        return dict([(obj._get_pk_val(), obj) for obj in qs.iterator()])
+
     def delete(self):
         """
         Deletes the records in the current QuerySet.
@@ -206,12 +219,6 @@ class QuerySet(object):
     ##################################################
     # PUBLIC METHODS THAT RETURN A QUERYSET SUBCLASS #
     ##################################################
-
-    def in_bulk(self, id_list):
-        assert isinstance(id_list, (tuple,  list)), "in_bulk() must be provided with a list of IDs."
-        id_list = list(id_list)
-        assert id_list != [], "in_bulk() cannot be passed an empty ID list."
-        return self._clone(klass=InBulkQuerySet, _id_list=id_list)
 
     def values(self, *fields):
         return self._clone(klass=ValuesQuerySet, _fields=fields)
@@ -379,18 +386,6 @@ class QuerySet(object):
             assert self._offset is None, "'offset' is not allowed without 'limit'"
 
         return select, " ".join(sql), params
-
-class InBulkQuerySet(QuerySet):
-    def iterator(self):
-        self._where.append("%s.%s IN (%s)" % (backend.quote_name(self.model._meta.db_table), backend.quote_name(self.model._meta.pk.column), ",".join(['%s'] * len(self._id_list))))
-        self._params.extend(self._id_list)
-        yield dict([(obj._get_pk_val(), obj) for obj in QuerySet.iterator(self)])
-
-    def _get_data(self):
-        if self._result_cache is None:
-            for i in self.iterator():
-                self._result_cache = i
-        return self._result_cache
 
 class ValuesQuerySet(QuerySet):
     def iterator(self):
