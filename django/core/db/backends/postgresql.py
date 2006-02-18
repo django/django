@@ -126,6 +126,9 @@ def get_relations(cursor, table_name):
             continue
     return relations
 
+def get_indexes(cursor, table_name):
+    raise NotImplementedError
+
 # Register these custom typecasts, because Django expects dates/times to be
 # in Python's native (standard-library) datetime/time format, whereas psycopg
 # use mx.DateTime by default.

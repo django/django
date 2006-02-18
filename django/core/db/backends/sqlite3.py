@@ -134,6 +134,9 @@ def get_table_description(cursor, table_name):
 def get_relations(cursor, table_name):
     raise NotImplementedError
 
+def get_indexes(cursor, table_name):
+    raise NotImplementedError
+
 # Operators and fields ########################################################
 
 # SQLite requires LIKE statements to include an ESCAPE clause if the value

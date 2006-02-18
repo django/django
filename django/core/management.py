@@ -595,23 +595,27 @@ def inspectdb(db_name):
             relations = db.get_relations(cursor, table_name)
         except NotImplementedError:
             relations = {}
+        try:
+            indexes = db.get_indexes(cursor, table_name)
+        except NotImplementedError:
+            indexes = {}
         for i, row in enumerate(db.get_table_description(cursor, table_name)):
-            column_name = row[0]
+            att_name = row[0]
             comment_notes = [] # Holds Field notes, to be displayed in a Python comment.
             extra_params = {}  # Holds Field parameters such as 'db_column'.
 
-            if keyword.iskeyword(column_name):
-                extra_params['db_column'] = column_name
-                column_name += '_field'
+            if keyword.iskeyword(att_name):
+                extra_params['db_column'] = att_name
+                att_name += '_field'
                 comment_notes.append('Field renamed because it was a Python reserved word.')
 
             if relations.has_key(i):
                 rel_to = relations[i][1] == table_name and "'self'" or table2model(relations[i][1])
                 field_type = 'ForeignKey(%s' % rel_to
-                if column_name.endswith('_id'):
-                    column_name = column_name[:-3]
+                if att_name.endswith('_id'):
+                    att_name = att_name[:-3]
                 else:
-                    extra_params['db_column'] = column_name
+                    extra_params['db_column'] = att_name
             else:
                 try:
                     field_type = db.DATA_TYPES_REVERSE[row[1]]
@@ -625,12 +629,26 @@ def inspectdb(db_name):
                     field_type, new_params = field_type
                     extra_params.update(new_params)
 
+                # Add maxlength for all CharFields.
                 if field_type == 'CharField' and row[3]:
                     extra_params['maxlength'] = row[3]
 
+                # Add primary_key and unique, if necessary.
+                column_name = extra_params.get('db_column', att_name)
+                if column_name in indexes:
+                    if indexes[column_name]['keyname'] == 'PRIMARY':
+                        extra_params['primary_key'] = True
+                    elif indexes[column_name]['unique']:
+                        extra_params['unique'] = True
+
                 field_type += '('
 
-            field_desc = '%s = meta.%s' % (column_name, field_type)
+            # Don't output 'id = meta.AutoField(primary_key=True)', because
+            # that's assumed if it doesn't exist.
+            if att_name == 'id' and field_type == 'AutoField(' and extra_params == {'primary_key': True}:
+                continue
+
+            field_desc = '%s = meta.%s' % (att_name, field_type)
             if extra_params:
                 if not field_desc.endswith('('):
                     field_desc += ', '

@@ -135,6 +135,14 @@ def get_table_description(cursor, table_name):
 def get_relations(cursor, table_name):
     raise NotImplementedError
 
+def get_indexes(cursor, table_name):
+    "Returns a dict of indexes for given table"
+    cursor.execute("SHOW INDEX FROM %s" % DatabaseWrapper().quote_name(table_name))
+    indexes = {}
+    for row in cursor.fetchall():
+        indexes[row[4]] = {'keyname': row[2], 'unique': not bool(row[1])}
+    return indexes
+
 OPERATOR_MAPPING = {
     'exact': '= %s',
     'iexact': 'LIKE %s',

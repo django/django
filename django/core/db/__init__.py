@@ -37,6 +37,7 @@ get_random_function_sql = dbmod.get_random_function_sql
 get_table_list = dbmod.get_table_list
 get_table_description = dbmod.get_table_description
 get_relations = dbmod.get_relations
+get_indexes = dbmod.get_indexes
 OPERATOR_MAPPING = dbmod.OPERATOR_MAPPING
 DATA_TYPES = dbmod.DATA_TYPES
 DATA_TYPES_REVERSE = dbmod.DATA_TYPES_REVERSE
