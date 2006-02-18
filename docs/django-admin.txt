@@ -117,7 +117,7 @@ models that refer to other models are ordered properly.
 
 If you're using Django 0.90 or 0.91, you'll need to add ``primary_key=True`` to
 one field in each model. In the Django development version, primary keys are
-automatically introspected for MySQL, and Django puts in the
+automatically introspected for PostgreSQL and MySQL, and Django puts in the
 ``primary_key=True`` where needed.
 
 ``inspectdb`` works with PostgreSQL, MySQL and SQLite. Foreign-key detection

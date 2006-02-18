@@ -127,7 +127,34 @@ def get_relations(cursor, table_name):
     return relations
 
 def get_indexes(cursor, table_name):
-    raise NotImplementedError
+    """
+    Returns a dictionary of fieldname -> infodict for the given table,
+    where each infodict is in the format:
+        {'primary_key': boolean representing whether it's the primary key,
+         'unique': boolean representing whether it's a unique index}
+    """
+    # Get the table description because we only have the column indexes, and we
+    # need the column names.
+    desc = get_table_description(cursor, table_name)
+    # This query retrieves each index on the given table.
+    cursor.execute("""
+        SELECT idx.indkey, idx.indisunique, idx.indisprimary
+        FROM pg_catalog.pg_class c, pg_catalog.pg_class c2,
+            pg_catalog.pg_index idx
+        WHERE c.oid = idx.indrelid
+            AND idx.indexrelid = c2.oid
+            AND c.relname = %s""", [table_name])
+    indexes = {}
+    for row in cursor.fetchall():
+        # row[0] (idx.indkey) is stored in the DB as an array. It comes out as
+        # a string of space-separated integers. This designates the field
+        # indexes (1-based) of the fields that have indexes on the table.
+        # Here, we skip any indexes across multiple fields.
+        if ' ' in row[0]:
+            continue
+        col_name = desc[int(row[0])-1][0]
+        indexes[col_name] = {'primary_key': row[2], 'unique': row[1]}
+    return indexes
 
 # Register these custom typecasts, because Django expects dates/times to be
 # in Python's native (standard-library) datetime/time format, whereas psycopg
