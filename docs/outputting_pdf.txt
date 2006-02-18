@@ -135,7 +135,7 @@ efficient. Here's the above "Hello World" example rewritten to use
         response.write(pdf)
         return response
 
-.. cStringIO: http://www.python.org/doc/current/lib/module-cStringIO.html
+.. _cStringIO: http://www.python.org/doc/current/lib/module-cStringIO.html
 
 Further resources
 =================
