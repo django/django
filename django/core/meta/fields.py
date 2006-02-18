@@ -689,7 +689,6 @@ class ForeignKey(Field):
             to_name = to._meta.object_name.lower()
         except AttributeError: # to._meta doesn't exist, so it must be RECURSIVE_RELATIONSHIP_CONSTANT
             assert to == 'self', "ForeignKey(%r) is invalid. First parameter to ForeignKey must be either a model or the string %r" % (to, RECURSIVE_RELATIONSHIP_CONSTANT)
-            kwargs['verbose_name'] = kwargs.get('verbose_name', '')
         else:
             to_field = to_field or to._meta.pk.name
         kwargs['verbose_name'] = kwargs.get('verbose_name', '')
