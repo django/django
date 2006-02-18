@@ -581,7 +581,7 @@ def inspectdb(db_name):
     yield "# This is an auto-generated Django model module."
     yield "# You'll have to do the following manually to clean this up:"
     yield "#     * Rearrange models' order"
-    yield "#     * Add primary_key=True to one field in each model."
+    yield "#     * Make sure each model has one field with primary_key=True"
     yield "# Feel free to rename the models, but don't rename db_table values or field names."
     yield "#"
     yield "# Also note: You'll have to insert the output of 'django-admin.py sqlinitialdata [appname]'"
