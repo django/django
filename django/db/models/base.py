@@ -201,14 +201,14 @@ class Model(object):
 
     def delete(self):
         assert self._get_pk_val() is not None, "%s object can't be deleted because its %s attribute is set to None." % (self._meta.object_name, self._meta.pk.attname)
-        
+
         # Find all the objects than need to be deleted
         seen_objs = {}
         self._collect_sub_objects(seen_objs)
-        
+
         # Actually delete the objects
         delete_objects(seen_objs)
-        
+
     delete.alters_data = True
 
     def _get_FIELD_display(self, field):
