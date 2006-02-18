@@ -1343,9 +1343,9 @@ def _get_where_clause(lookup_type, table_prefix, field_name, value):
         pass
     if lookup_type == 'in':
         return '%s%s IN (%s)' % (table_prefix, field_name, ','.join(['%s' for v in value]))
-    elif lookup_type in ('range', 'year'):
+    elif lookup_type == 'range':
         return '%s%s BETWEEN %%s AND %%s' % (table_prefix, field_name)
-    elif lookup_type in ('month', 'day'):
+    elif lookup_type in ('year', 'month', 'day'):
         return "%s = %%s" % db.get_date_extract_sql(lookup_type, table_prefix + field_name)
     elif lookup_type == 'isnull':
         return "%s%s IS %sNULL" % (table_prefix, field_name, (not value and 'NOT ' or ''))

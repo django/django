@@ -175,12 +175,10 @@ class Field(object):
 
     def get_db_prep_lookup(self, lookup_type, value):
         "Returns field's value prepared for database lookup."
-        if lookup_type in ('exact', 'gt', 'gte', 'lt', 'lte', 'ne', 'month', 'day'):
+        if lookup_type in ('exact', 'gt', 'gte', 'lt', 'lte', 'ne', 'year', 'month', 'day'):
             return [value]
         elif lookup_type in ('range', 'in'):
             return value
-        elif lookup_type == 'year':
-            return ['%s-01-01' % value, '%s-12-31' % value]
         elif lookup_type in ('contains', 'icontains'):
             return ["%%%s%%" % prep_for_like_query(value)]
         elif lookup_type == 'iexact':
