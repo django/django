@@ -136,7 +136,12 @@ def get_relations(cursor, table_name):
     raise NotImplementedError
 
 def get_indexes(cursor, table_name):
-    "Returns a dict of indexes for given table"
+    """
+    Returns a dictionary of fieldname -> infodict for the given table,
+    where each infodict is in the format:
+        {'keyname': 'name of key',
+         'unique': boolean representing whether it's a unique index}
+    """
     cursor.execute("SHOW INDEX FROM %s" % DatabaseWrapper().quote_name(table_name))
     indexes = {}
     for row in cursor.fetchall():
