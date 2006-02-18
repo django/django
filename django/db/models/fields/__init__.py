@@ -476,8 +476,8 @@ class FileField(Field):
         dispatcher.connect(self.delete_file, signal=signals.post_delete, sender=cls)
 
     def delete_file(self, instance):
-         if getattr(instance, f.attname):
-            file_name = getattr(instance, 'get_%s_filename' % f.name)()
+         if getattr(instance, self.attname):
+            file_name = getattr(instance, 'get_%s_filename' % self.name)()
             # If the file exists and no other object of this type references it,
             # delete it from the filesystem.
             if os.path.exists(file_name) and \
