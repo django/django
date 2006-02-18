@@ -10,11 +10,12 @@ The advantage of generating PDF files dynamically is that you can create
 customized PDFs for different purposes -- say, for different users or different
 pieces of content.
 
-For example, Django was used at kusports.com to generate customized,
+For example, Django was used at kusports.com_ to generate customized,
 printer-friendly NCAA tournament brackets, as PDF files, for people
 participating in a March Madness contest.
 
 .. _ReportLab: http://www.reportlab.org/rl_toolkit.html
+.. _kusports.com: http://www.kusports.com/
 
 Install ReportLab
 =================
