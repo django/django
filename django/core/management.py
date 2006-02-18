@@ -805,6 +805,10 @@ def inspectdb(db_name):
                 if field_type == 'CharField' and row[3]:
                     extra_params['maxlength'] = row[3]
 
+                if field_type == 'FloatField':
+                    extra_params['max_digits'] = row[4]
+                    extra_params['decimal_places'] = row[5]
+
                 # Add primary_key and unique, if necessary.
                 column_name = extra_params.get('db_column', att_name)
                 if column_name in indexes:
