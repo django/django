@@ -199,9 +199,9 @@ class ManyRelatedObjectsDescriptor(object):
             qn = backend.quote_name
             this_opts = instance.__class__._meta
             rel_opts = rel_model._meta
-            join_table = backend.quote_name(self.related.field.get_m2m_db_table(rel_opts))
-            this_col_name = this_opts.object_name.lower() + '_id'
-            rel_col_name = rel_opts.object_name.lower() + '_id'
+            join_table = qn(self.related.field.m2m_db_table())
+            this_col_name = qn(self.related.field.m2m_reverse_name())
+            rel_col_name = qn(self.related.field.m2m_column_name())
 
         # Dynamically create a class that subclasses the related
         # model's default manager.
@@ -210,6 +210,7 @@ class ManyRelatedObjectsDescriptor(object):
         class RelatedManager(superclass):
             def get_query_set(self):
                 return superclass.get_query_set(self).filter(**(self.core_filters))
+                
             if rel_type == "o2m":
                 def add(self, **kwargs):
                     kwargs.update({rel_field.name: instance})
@@ -257,7 +258,6 @@ class ReverseManyRelatedObjectsDescriptor(object):
     # ReverseManyRelatedObjectsDescriptor instance.
     def __init__(self, m2m_field):
         self.field = m2m_field
-        self.rel_model = m2m_field.rel.to
 
     def __get__(self, instance, instance_type=None):
         if instance is None:
@@ -265,15 +265,15 @@ class ReverseManyRelatedObjectsDescriptor(object):
 
         qn = backend.quote_name
         this_opts = instance.__class__._meta
-        rel_model = self.rel_model
-        rel_opts = self.rel_model._meta
-        join_table = backend.quote_name(self.field.get_m2m_db_table(this_opts))
-        this_col_name = this_opts.object_name.lower() + '_id'
-        rel_col_name = rel_opts.object_name.lower() + '_id'
+        rel_model = self.field.rel.to
+        rel_opts = rel_model._meta
+        join_table = qn(self.field.m2m_db_table())
+        this_col_name = qn(self.field.m2m_column_name())
+        rel_col_name = qn(self.field.m2m_reverse_name())
 
         # Dynamically create a class that subclasses the related
         # model's default manager.
-        superclass = self.rel_model._default_manager.__class__
+        superclass = rel_model._default_manager.__class__
 
         class RelatedManager(superclass):
             def get_query_set(self):
@@ -300,7 +300,7 @@ class ReverseManyRelatedObjectsDescriptor(object):
             clear.alters_data = True
 
         manager = RelatedManager()
-        manager.model = self.rel_model
+        manager.model = rel_model
 
         return manager
 
@@ -464,9 +464,17 @@ class ManyToManyField(RelatedField, Field):
     def get_choices_default(self):
         return Field.get_choices(self, include_blank=False)
 
-    def get_m2m_db_table(self, original_opts):
-        "Returns the name of the many-to-many 'join' table."
-        return '%s_%s' % (original_opts.db_table, self.name)
+    def _get_m2m_db_table(self, opts):
+        "Function that can be curried to provide the m2m table name for this relation"
+        return '%s_%s' % (opts.db_table, self.name)
+
+    def _get_m2m_column_name(self, related):
+        "Function that can be curried to provide the source column name for the m2m table"
+        return related.model._meta.object_name.lower() + '_id'
+            
+    def _get_m2m_reverse_name(self, related):
+        "Function that can be curried to provide the related column name for the m2m table"
+        return related.parent_model._meta.object_name.lower() + '_id'
 
     def isValidIDList(self, field_data, all_data):
         "Validates that the value is a valid list of foreign keys"
@@ -504,12 +512,21 @@ class ManyToManyField(RelatedField, Field):
 
     def contribute_to_class(self, cls, name):
         super(ManyToManyField, self).contribute_to_class(cls, name)
+        # Add the descriptor for the m2m relation
         setattr(cls, self.name, ReverseManyRelatedObjectsDescriptor(self))
-
+        
+        # Set up the accessor for the m2m table name for the relation
+        self.m2m_db_table = curry(self._get_m2m_db_table, cls._meta)
+        
     def contribute_to_related_class(self, cls, related):
         setattr(cls, related.get_accessor_name(), ManyRelatedObjectsDescriptor(related, 'm2m'))
+        # Add the descriptor for the m2m relation
         self.rel.singular = self.rel.singular or self.rel.to._meta.object_name.lower()
 
+        # Set up the accessors for the column names on the m2m table
+        self.m2m_column_name = curry(self._get_m2m_column_name, related)
+        self.m2m_reverse_name = curry(self._get_m2m_reverse_name, related)
+        
     def set_attributes_from_rel(self):
         pass
 

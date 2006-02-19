@@ -156,21 +156,21 @@ def get_sql_create(app):
     for klass in app_models:
         opts = klass._meta
         for f in opts.many_to_many:
-            table_output = ['CREATE TABLE %s (' % backend.quote_name(f.get_m2m_db_table(opts))]
+            table_output = ['CREATE TABLE %s (' % backend.quote_name(f.m2m_db_table())]
             table_output.append('    %s %s NOT NULL PRIMARY KEY,' % (backend.quote_name('id'), data_types['AutoField']))
             table_output.append('    %s %s NOT NULL REFERENCES %s (%s),' % \
-                (backend.quote_name(opts.object_name.lower() + '_id'),
+                (backend.quote_name(f.m2m_column_name()),
                 data_types[get_rel_data_type(opts.pk)] % opts.pk.__dict__,
                 backend.quote_name(opts.db_table),
                 backend.quote_name(opts.pk.column)))
             table_output.append('    %s %s NOT NULL REFERENCES %s (%s),' % \
-                (backend.quote_name(f.rel.to._meta.object_name.lower() + '_id'),
+                (backend.quote_name(f.m2m_reverse_name()),
                 data_types[get_rel_data_type(f.rel.to._meta.pk)] % f.rel.to._meta.pk.__dict__,
                 backend.quote_name(f.rel.to._meta.db_table),
                 backend.quote_name(f.rel.to._meta.pk.column)))
             table_output.append('    UNIQUE (%s, %s)' % \
-                (backend.quote_name(opts.object_name.lower() + '_id'),
-                backend.quote_name(f.rel.to._meta.object_name.lower() + '_id')))
+                (backend.quote_name(f.m2m_column_name()),
+                backend.quote_name(f.m2m_reverse_name())))
             table_output.append(');')
             final_output.append('\n'.join(table_output))
     return final_output
@@ -249,11 +249,11 @@ def get_sql_delete(app):
         for f in opts.many_to_many:
             try:
                 if cursor is not None:
-                    cursor.execute("SELECT 1 FROM %s LIMIT 1" % backend.quote_name(f.get_m2m_db_table(opts)))
+                    cursor.execute("SELECT 1 FROM %s LIMIT 1" % backend.quote_name(f.m2m_db_table()))
             except:
                 connection.rollback()
             else:
-                output.append("DROP TABLE %s;" % backend.quote_name(f.get_m2m_db_table(opts)))
+                output.append("DROP TABLE %s;" % backend.quote_name(f.m2m_db_table()))
 
     app_label = app_models[0]._meta.app_label
 
@@ -335,7 +335,7 @@ def get_sql_sequence_reset(app):
                     backend.quote_name(klass._meta.db_table)))
         for f in klass._meta.many_to_many:
             output.append("SELECT setval('%s_id_seq', (SELECT max(%s) FROM %s));" % \
-                (f.get_m2m_db_table(klass._meta), backend.quote_name('id'), f.get_m2m_db_table(klass._meta)))
+                (f.m2m_db_table(), backend.quote_name('id'), f.m2m_db_table()))
     return output
 get_sql_sequence_reset.help_doc = "Prints the SQL statements for resetting PostgreSQL sequences for the given app name(s)."
 get_sql_sequence_reset.args = APP_ARGS

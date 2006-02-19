@@ -647,9 +647,10 @@ def lookup_inner(path, clause, value, opts, table, column):
             # This process hijacks current_table/column to point to the
             # intermediate table.
             current_table = "m2m_" + new_table
-            join_column = new_opts.object_name.lower() + '_id'
-            intermediate_table = field.get_m2m_db_table(current_opts)
-
+            intermediate_table = field.m2m_db_table()
+            join_column = field.m2m_reverse_name()
+            intermediate_column = field.m2m_column_name()
+            
             raise FieldFound
 
         # Does the name belong to a reverse defined many-to-many field?
@@ -663,9 +664,10 @@ def lookup_inner(path, clause, value, opts, table, column):
             # This process hijacks current_table/column to point to the
             # intermediate table.
             current_table = "m2m_" + new_table
-            join_column = new_opts.object_name.lower() + '_id'
-            intermediate_table = field.field.get_m2m_db_table(new_opts)
-
+            intermediate_table = field.field.m2m_db_table()
+            join_column = field.field.m2m_column_name()
+            intermediate_column = field.field.m2m_reverse_name()
+            
             raise FieldFound
 
         # Does the name belong to a one-to-many field?
@@ -709,7 +711,7 @@ def lookup_inner(path, clause, value, opts, table, column):
                 (backend.quote_name(table),
                 backend.quote_name(current_opts.pk.column),
                 backend.quote_name(current_table),
-                backend.quote_name(current_opts.object_name.lower() + '_id'))
+                backend.quote_name(intermediate_column))
         )
 
     if path:
@@ -787,14 +789,14 @@ def delete_objects(seen_objs):
         pk_list = [pk for pk,instance in seen_objs[cls]]
         for related in cls._meta.get_all_related_many_to_many_objects():
             cursor.execute("DELETE FROM %s WHERE %s IN (%s)" % \
-                (backend.quote_name(related.field.get_m2m_db_table(related.opts)),
-                    backend.quote_name(cls._meta.object_name.lower() + '_id'),
+                (backend.quote_name(related.field.m2m_db_table()),
+                    backend.quote_name(related.field.m2m_reverse_name()),
                     ','.join(['%s' for pk in pk_list])),
                 pk_list)
         for f in cls._meta.many_to_many:
             cursor.execute("DELETE FROM %s WHERE %s IN (%s)" % \
-                (backend.quote_name(f.get_m2m_db_table(cls._meta)),
-                    backend.quote_name(cls._meta.object_name.lower() + '_id'),
+                (backend.quote_name(f.m2m_db_table()),
+                    backend.quote_name(f.m2m_column_name()),
                     ','.join(['%s' for pk in pk_list])),
                 pk_list)
         for field in cls._meta.fields:
