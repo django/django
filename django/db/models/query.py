@@ -607,13 +607,13 @@ class FieldFound(Exception):
     "Exception used to short circuit field-finding operations."
     pass
 
-def find_field(name, field_list, use_accessor=False):
+def find_field(name, field_list, related_query):
     """
     Finds a field with a specific name in a list of field instances.
     Returns None if there are no matches, or several matches.
     """
-    if use_accessor:
-        matches = [f for f in field_list if (f.field.rel.related_name or f.opts.object_name.lower()) == name]
+    if related_query:
+        matches = [f for f in field_list if f.get_query_name() == name]
     else:
         matches = [f for f in field_list if f.name == name]
     if len(matches) != 1:
@@ -637,7 +637,7 @@ def lookup_inner(path, clause, value, opts, table, column):
     # Try to find the name in the fields associated with the current class
     try:
         # Does the name belong to a defined many-to-many field?
-        field = find_field(name, current_opts.many_to_many)
+        field = find_field(name, current_opts.many_to_many, False)
         if field:
             new_table = current_table + LOOKUP_SEPARATOR + name
             new_opts = field.rel.to._meta
@@ -654,7 +654,7 @@ def lookup_inner(path, clause, value, opts, table, column):
             raise FieldFound
 
         # Does the name belong to a reverse defined many-to-many field?
-        field = find_field(name, current_opts.get_all_related_many_to_many_objects())
+        field = find_field(name, current_opts.get_all_related_many_to_many_objects(), True)
         if field:
             new_table = current_table + LOOKUP_SEPARATOR + name
             new_opts = field.opts
@@ -684,7 +684,7 @@ def lookup_inner(path, clause, value, opts, table, column):
             raise FieldFound
 
         # Does the name belong to a one-to-one, many-to-one, or regular field?
-        field = find_field(name, current_opts.fields)
+        field = find_field(name, current_opts.fields, False)
         if field:
             if field.rel: # One-to-One/Many-to-one field
                 new_table = current_table + LOOKUP_SEPARATOR + name

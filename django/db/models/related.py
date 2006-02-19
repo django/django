@@ -75,3 +75,8 @@ class RelatedObject(object):
         # but this can be overridden with the "related_name" option.
         return self.field.rel.related_name or (self.opts.object_name.lower() + '_set')
 
+    def get_query_name(self):
+        # This method defines the name that can be used to identify this related object
+        # in a table-spanning query. It uses the lower-cased object_name by default,
+        # but this can be overridden with the "related_name" option.
+        return self.field.rel.related_name or self.opts.object_name.lower()
