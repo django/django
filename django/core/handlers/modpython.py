@@ -144,6 +144,10 @@ class ModPythonHandler(BaseHandler):
         finally:
             db.db.close()
 
+        # Apply response middleware
+        for middleware_method in self._response_middleware:
+            response = middleware_method(request, response)
+
         # Convert our custom HttpResponse object back into the mod_python req.
         populate_apache_request(response, req)
         return 0 # mod_python.apache.OK
