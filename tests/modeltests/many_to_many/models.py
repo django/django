@@ -15,12 +15,18 @@ class Publication(models.Model):
     def __repr__(self):
         return self.title
 
+    class Meta:
+        ordering = ('title',)
+
 class Article(models.Model):
     headline = models.CharField(maxlength=100)
     publications = models.ManyToManyField(Publication)
 
     def __repr__(self):
         return self.headline
+
+    class Meta:
+        ordering = ('headline',)
 
 API_TESTS = """
 # Create a couple of Publications.
@@ -54,12 +60,12 @@ API_TESTS = """
 >>> a1.publications.all()
 [The Python Journal]
 >>> a2.publications.all()
-[The Python Journal, Science News, Science Weekly, Highlights for Children]
+[Highlights for Children, Science News, Science Weekly, The Python Journal]
 
 # Publication objects have access to their related Article objects.
 >>> p2.article_set.all()
 [NASA uses Python]
->>> p1.article_set.order_by('headline')
+>>> p1.article_set.all()
 [Django lets you build Web apps easily, NASA uses Python]
 >>> Publication.objects.get(id=4).article_set.all()
 [NASA uses Python]
@@ -84,7 +90,7 @@ API_TESTS = """
 [The Python Journal]
 
 >>> Publication.objects.filter(article__headline__startswith="NASA")
-[The Python Journal, Science News, Science Weekly, Highlights for Children]
+[Highlights for Children, Science News, Science Weekly, The Python Journal]
 
 >>> Publication.objects.filter(article__id__exact=1)
 [The Python Journal]
@@ -95,7 +101,7 @@ API_TESTS = """
 # If we delete a Publication, its Articles won't be able to access it.
 >>> p1.delete()
 >>> Publication.objects.all()
-[Science News, Science Weekly, Highlights for Children]
+[Highlights for Children, Science News, Science Weekly]
 >>> a1 = Article.objects.get(pk=1)
 >>> a1.publications.all()
 []
@@ -104,7 +110,7 @@ API_TESTS = """
 >>> a2.delete()
 >>> Article.objects.all()
 [Django lets you build Web apps easily]
->>> p1.article_set.order_by('headline')
+>>> p1.article_set.all()
 [Django lets you build Web apps easily]
 
 # Adding via the 'other' end of an m2m
@@ -118,22 +124,22 @@ API_TESTS = """
 
 # Adding via the other end using keywords
 >>> p2.article_set.add(headline='Oxygen-free diet works wonders')
->>> p2.article_set.all().order_by('headline')
+>>> p2.article_set.all()
 [NASA finds intelligent life on Earth, Oxygen-free diet works wonders]
->>> a5 = p2.article_set.all().order_by('headline')[1]
+>>> a5 = p2.article_set.all()[1]
 >>> a5.publications.all()
 [Science News]
 
 # Removing publication from an article:
 >>> a4.publications.remove(p2)
->>> p2.article_set.all().order_by('headline')
+>>> p2.article_set.all()
 [Oxygen-free diet works wonders]
 >>> a4.publications.all()
 []
 
 # And from the other end
 >>> p2.article_set.remove(a5)
->>> p2.article_set.order_by('headline')
+>>> p2.article_set.all()
 []
 >>> a5.publications.all()
 []
@@ -142,7 +148,7 @@ API_TESTS = """
 # (put some back first)
 >>> p2.article_set.add(a4, a5)
 >>> a4.publications.add(p3)
->>> a4.publications.order_by('title')
+>>> a4.publications.all()
 [Science News, Science Weekly]
 >>> p2.article_set.clear()
 >>> p2.article_set.all()
@@ -152,14 +158,14 @@ API_TESTS = """
 
 # And you can clear from the other end
 >>> p2.article_set.add(a4, a5)
->>> p2.article_set.all().order_by('headline')
+>>> p2.article_set.all()
 [NASA finds intelligent life on Earth, Oxygen-free diet works wonders]
->>> a4.publications.order_by('title')
+>>> a4.publications.all()
 [Science News, Science Weekly]
 >>> a4.publications.clear()
 >>> a4.publications.all()
 []
->>> p2.article_set.all().order_by('headline')
+>>> p2.article_set.all()
 [Oxygen-free diet works wonders]
 
 # Recreate the article and Publication we just deleted.
@@ -174,7 +180,7 @@ API_TESTS = """
 >>> Publication.objects.all()
 [Highlights for Children, The Python Journal]
 >>> Article.objects.all()
-[Django lets you build Web apps easily, NASA finds intelligent life on Earth, Oxygen-free diet works wonders, NASA uses Python]
+[Django lets you build Web apps easily, NASA finds intelligent life on Earth, NASA uses Python, Oxygen-free diet works wonders]
 >>> a2.publications.all()
 [The Python Journal]
 
