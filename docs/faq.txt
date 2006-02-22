@@ -103,6 +103,14 @@ Lawrence, Kansas, USA.
 .. _`Jacob Kaplan-Moss`: http://www.jacobian.org/
 .. _`Wilson Miner`: http://www.wilsonminer.com/live/
 
+Which sites use Django?
+-----------------------
+
+The Django wiki features a `list of Django-powered sites`_. Feel free to add
+your Django-powered site to the list.
+
+.. _list of Django-powered sites: http://code.djangoproject.com/wiki/DjangoPoweredSites
+
 Django appears to be a MVC framework, but you call the Controller the "view", and the View the "template". How come you don't use the standard names?
 -----------------------------------------------------------------------------------------------------------------------------------------------------
 
