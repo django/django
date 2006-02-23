@@ -112,7 +112,7 @@ class AutomaticManipulator(forms.Manipulator):
                 if not f.primary_key and str(getattr(self.original_object, f.attname)) != str(getattr(new_object, f.attname)):
                     self.fields_changed.append(f.verbose_name)
 
-        # Save many-to-many objects. Example: Poll.set_sites()
+        # Save many-to-many objects. Example: Set sites for a poll.
         for f in self.opts.many_to_many:
             if self.follow.get(f.name, None):
                 if not f.rel.edit_inline:
@@ -120,9 +120,12 @@ class AutomaticManipulator(forms.Manipulator):
                         new_vals = new_data.get(f.name, ())
                     else:
                         new_vals = new_data.getlist(f.name)
-                    was_changed = getattr(new_object, 'set_%s' % f.name)(new_vals)
-                    if self.change and was_changed:
-                        self.fields_changed.append(f.verbose_name)
+                    # First, clear the existing values.
+                    rel_manager = getattr(new_object, f.name)
+                    rel_manager.clear()
+                    # Then, set the new values.
+                    for n in new_vals:
+                        rel_manager.add(f.rel.to._default_manager.get(pk=n))
 
         expanded_data = DotExpandedDict(dict(new_data))
         # Save many-to-one objects. Example: Add the Choice objects for a Poll.

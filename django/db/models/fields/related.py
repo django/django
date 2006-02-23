@@ -210,7 +210,7 @@ class ManyRelatedObjectsDescriptor(object):
         class RelatedManager(superclass):
             def get_query_set(self):
                 return superclass.get_query_set(self).filter(**(self.core_filters))
-                
+
             if rel_type == "o2m":
                 def add(self, **kwargs):
                     kwargs.update({rel_field.name: instance})
@@ -471,20 +471,20 @@ class ManyToManyField(RelatedField, Field):
     def _get_m2m_column_name(self, related):
         "Function that can be curried to provide the source column name for the m2m table"
         return related.model._meta.object_name.lower() + '_id'
-            
+
     def _get_m2m_reverse_name(self, related):
         "Function that can be curried to provide the related column name for the m2m table"
         return related.parent_model._meta.object_name.lower() + '_id'
 
     def isValidIDList(self, field_data, all_data):
         "Validates that the value is a valid list of foreign keys"
-        mod = self.rel.to._meta.get_model_module()
+        mod = self.rel.to
         try:
             pks = map(int, field_data.split(','))
         except ValueError:
             # the CommaSeparatedIntegerField validator will catch this error
             return
-        objects = mod.get_in_bulk(pks)
+        objects = mod._default_manager.in_bulk(pks)
         if len(objects) != len(pks):
             badkeys = [k for k in pks if k not in objects]
             raise validators.ValidationError, ngettext("Please enter valid %(self)s IDs. The value %(value)r is invalid.",
@@ -514,10 +514,10 @@ class ManyToManyField(RelatedField, Field):
         super(ManyToManyField, self).contribute_to_class(cls, name)
         # Add the descriptor for the m2m relation
         setattr(cls, self.name, ReverseManyRelatedObjectsDescriptor(self))
-        
+
         # Set up the accessor for the m2m table name for the relation
         self.m2m_db_table = curry(self._get_m2m_db_table, cls._meta)
-        
+
     def contribute_to_related_class(self, cls, related):
         setattr(cls, related.get_accessor_name(), ManyRelatedObjectsDescriptor(related, 'm2m'))
         # Add the descriptor for the m2m relation
@@ -526,7 +526,7 @@ class ManyToManyField(RelatedField, Field):
         # Set up the accessors for the column names on the m2m table
         self.m2m_column_name = curry(self._get_m2m_column_name, related)
         self.m2m_reverse_name = curry(self._get_m2m_reverse_name, related)
-        
+
     def set_attributes_from_rel(self):
         pass
 
