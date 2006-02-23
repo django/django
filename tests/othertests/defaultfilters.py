@@ -237,6 +237,10 @@ False
 >>> timesince(datetime.datetime.now() - datetime.timedelta(1))
 '1 day'
 
+# datetime.date compataibility with timesince
+>>> timesince(datetime.date.today() - datetime.timedelta(1))
+'1 day, 23 hours'
+
 >>> default("val", "default")
 'val'
 
