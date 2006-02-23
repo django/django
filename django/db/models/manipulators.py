@@ -126,6 +126,7 @@ class AutomaticManipulator(forms.Manipulator):
                     # Then, set the new values.
                     for n in new_vals:
                         rel_manager.add(f.rel.to._default_manager.get(pk=n))
+                    # TODO: Add to 'fields_changed'
 
         expanded_data = DotExpandedDict(dict(new_data))
         # Save many-to-one objects. Example: Add the Choice objects for a Poll.
