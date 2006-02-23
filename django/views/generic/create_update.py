@@ -96,7 +96,7 @@ def update_object(request, model, object_id=None, slug=None,
         raise AttributeError("Generic edit view must be called with either an object_id or a slug/slug_field")
     lookup_kwargs.update(extra_lookup_kwargs)
     try:
-        object = model._default_manager.get_object(**lookup_kwargs)
+        object = model.objects.get(**lookup_kwargs)
     except ObjectDoesNotExist:
         raise Http404, "No %s found for %s" % (model._meta.verbose_name, lookup_kwargs)
 
