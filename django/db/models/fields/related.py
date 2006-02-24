@@ -288,14 +288,6 @@ class ReverseManyRelatedObjectsDescriptor(object):
 
         class RelatedManager(superclass):
             def get_query_set(self):
-                return superclass.get_query_set(self).extra(
-                    tables=(join_table,),
-                    where=[
-                        '%s.%s = %s.%s' % (qn(rel_opts.db_table), qn(rel_opts.pk.column), join_table, target_col_name),
-                        '%s.%s = %%s' % (join_table, source_col_name)
-                    ],
-                    params = [instance._get_pk_val()]
-                )
                 return superclass.get_query_set(self).filter(**(self.core_filters))
 
             def add(self, *objs, **kwargs):
