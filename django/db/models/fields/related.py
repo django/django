@@ -275,6 +275,7 @@ class ReverseManyRelatedObjectsDescriptor(object):
 
         qn = backend.quote_name
         this_opts = instance.__class__._meta
+        symmetrical = self.field.rel.symmetrical
         rel_model = self.field.rel.to
         rel_opts = rel_model._meta
         join_table = qn(self.field.m2m_db_table())
@@ -301,8 +302,8 @@ class ReverseManyRelatedObjectsDescriptor(object):
                 _add_m2m_items(self, superclass, rel_model, join_table, source_col_name,
                     target_col_name, instance._get_pk_val(), *objs, **kwargs)
 
-                # If this is an m2m relation to self, add the mirror entry in the m2m table
-                if instance.__class__ == rel_model:
+                # If this is a symmmetrical m2m relation to self, add the mirror entry in the m2m table
+                if instance.__class__ == rel_model and symmetrical:
                     _add_m2m_items(self, superclass, rel_model, join_table, target_col_name,
                         source_col_name, instance._get_pk_val(), *objs, **kwargs)                    
 
@@ -312,8 +313,8 @@ class ReverseManyRelatedObjectsDescriptor(object):
                 _remove_m2m_items(rel_model, join_table, source_col_name,
                     target_col_name, instance._get_pk_val(), *objs)
                     
-                # If this is an m2m relation to self, remove the mirror entry in the m2m table
-                if instance.__class__ == rel_model:
+                # If this is a symmmetrical m2m relation to self, remove the mirror entry in the m2m table
+                if instance.__class__ == rel_model and symmetrical:
                     _remove_m2m_items(rel_model, join_table, target_col_name,
                         source_col_name, instance._get_pk_val(), *objs)
                     
@@ -322,8 +323,8 @@ class ReverseManyRelatedObjectsDescriptor(object):
             def clear(self):
                 _clear_m2m_items(join_table, source_col_name, instance._get_pk_val())
     
-                # If this is an m2m relation to self, clear the mirror entry in the m2m table                
-                if instance.__class__ == rel_model:
+                # If this is a symmmetrical m2m relation to self, clear the mirror entry in the m2m table                
+                if instance.__class__ == rel_model and symmetrical:
                     _clear_m2m_items(join_table, target_col_name, instance._get_pk_val())
                 
             clear.alters_data = True
@@ -472,7 +473,8 @@ class ManyToManyField(RelatedField, Field):
             related_name=kwargs.pop('related_name', None),
             filter_interface=kwargs.pop('filter_interface', None),
             limit_choices_to=kwargs.pop('limit_choices_to', None),
-            raw_id_admin=kwargs.pop('raw_id_admin', False))
+            raw_id_admin=kwargs.pop('raw_id_admin', False),
+            symmetrical=kwargs.pop('symmetrical', True))
         if kwargs["rel"].raw_id_admin:
             kwargs.setdefault("validator_list", []).append(self.isValidIDList)
         Field.__init__(self, **kwargs)
@@ -559,8 +561,12 @@ class ManyToManyField(RelatedField, Field):
         self.m2m_db_table = curry(self._get_m2m_db_table, cls._meta)
 
     def contribute_to_related_class(self, cls, related):
-        setattr(cls, related.get_accessor_name(), ManyRelatedObjectsDescriptor(related, 'm2m'))
-        # Add the descriptor for the m2m relation
+        # m2m relations to self do not have a ManyRelatedObjectsDescriptor, 
+        # as it would be redundant - unless the field is non-symmetrical. 
+        if related.model != related.parent_model or not self.rel.symmetrical:
+            # Add the descriptor for the m2m relation
+            setattr(cls, related.get_accessor_name(), ManyRelatedObjectsDescriptor(related, 'm2m'))
+            
         self.rel.singular = self.rel.singular or self.rel.to._meta.object_name.lower()
 
         # Set up the accessors for the column names on the m2m table
@@ -601,7 +607,7 @@ class OneToOne(ManyToOne):
 
 class ManyToMany:
     def __init__(self, to, singular=None, related_name=None,
-        filter_interface=None, limit_choices_to=None, raw_id_admin=False):
+        filter_interface=None, limit_choices_to=None, raw_id_admin=False, symmetrical=True):
         self.to = to
         self.singular = singular or None
         self.related_name = related_name
@@ -609,4 +615,5 @@ class ManyToMany:
         self.limit_choices_to = limit_choices_to or {}
         self.edit_inline = False
         self.raw_id_admin = raw_id_admin
+        self.symmetrical = symmetrical
         assert not (self.raw_id_admin and self.filter_interface), "ManyToMany relationships may not use both raw_id_admin and filter_interface"
