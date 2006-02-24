@@ -300,15 +300,32 @@ class ReverseManyRelatedObjectsDescriptor(object):
             def add(self, *objs, **kwargs):
                 _add_m2m_items(self, superclass, rel_model, join_table, source_col_name,
                     target_col_name, instance._get_pk_val(), *objs, **kwargs)
+
+                # If this is an m2m relation to self, add the mirror entry in the m2m table
+                if instance.__class__ == rel_model:
+                    _add_m2m_items(self, superclass, rel_model, join_table, target_col_name,
+                        source_col_name, instance._get_pk_val(), *objs, **kwargs)                    
+
             add.alters_data = True
 
             def remove(self, *objs):
                 _remove_m2m_items(rel_model, join_table, source_col_name,
                     target_col_name, instance._get_pk_val(), *objs)
+                    
+                # If this is an m2m relation to self, remove the mirror entry in the m2m table
+                if instance.__class__ == rel_model:
+                    _remove_m2m_items(rel_model, join_table, target_col_name,
+                        source_col_name, instance._get_pk_val(), *objs)
+                    
             remove.alters_data = True
 
             def clear(self):
                 _clear_m2m_items(join_table, source_col_name, instance._get_pk_val())
+    
+                # If this is an m2m relation to self, clear the mirror entry in the m2m table                
+                if instance.__class__ == rel_model:
+                    _clear_m2m_items(join_table, target_col_name, instance._get_pk_val())
+                
             clear.alters_data = True
 
         manager = RelatedManager()
