@@ -46,6 +46,10 @@ def manipulator_valid_rel_key(f, self, field_data, all_data):
 class RelatedField(object):
     def contribute_to_class(self, cls, name):
         sup = super(RelatedField, self)
+
+        # Add an accessor to allow easy determination of the related query path for this field
+        self.related_query_name = curry(self._get_related_query_name, cls._meta)
+
         if hasattr(sup, 'contribute_to_class'):
             sup.contribute_to_class(cls, name)
         other = self.rel.to
@@ -65,6 +69,12 @@ class RelatedField(object):
         self.set_attributes_from_rel()
         related = RelatedObject(other, cls, self)
         self.contribute_to_related_class(other, related)
+
+    def _get_related_query_name(self, opts):
+        # This method defines the name that can be used to identify this related object
+        # in a table-spanning query. It uses the lower-cased object_name by default,
+        # but this can be overridden with the "related_name" option.
+        return self.rel.related_name or opts.object_name.lower()
 
 class SingleRelatedObjectDescriptor(object):
     # This class provides the functionality that makes the related-object
@@ -241,9 +251,9 @@ class ManyRelatedObjectsDescriptor(object):
         manager = RelatedManager()
 
         if self.rel_type == 'o2m':
-            manager.core_filters = {'%s__%s__exact' % (rel_field.name, rel_field.rel.to._meta.pk.name): getattr(instance, rel_field.rel.get_related_field().attname)}
+            manager.core_filters = {'%s__pk' % rel_field.name: getattr(instance, rel_field.rel.get_related_field().attname)}
         else:
-            manager.core_filters = {'%s__%s__exact' % (rel_field.name, instance_type._meta.pk.name): instance._get_pk_val()}
+            manager.core_filters = {'%s__pk' % rel_field.name: instance._get_pk_val()}
 
         manager.model = self.related.model
 
@@ -285,6 +295,8 @@ class ReverseManyRelatedObjectsDescriptor(object):
                     ],
                     params = [instance._get_pk_val()]
                 )
+                return superclass.get_query_set(self).filter(**(self.core_filters))
+
             def add(self, *objs, **kwargs):
                 _add_m2m_items(self, superclass, rel_model, join_table, source_col_name,
                     target_col_name, instance._get_pk_val(), *objs, **kwargs)
@@ -300,6 +312,9 @@ class ReverseManyRelatedObjectsDescriptor(object):
             clear.alters_data = True
 
         manager = RelatedManager()
+        
+        manager.core_filters = {'%s__pk' % self.field.related_query_name() : instance._get_pk_val()}
+        
         manager.model = rel_model
 
         return manager
@@ -470,11 +485,19 @@ class ManyToManyField(RelatedField, Field):
 
     def _get_m2m_column_name(self, related):
         "Function that can be curried to provide the source column name for the m2m table"
-        return related.model._meta.object_name.lower() + '_id'
-
+        # If this is an m2m relation to self, avoid the inevitable name clash 
+        if related.model == related.parent_model:
+            return 'from_' + related.model._meta.object_name.lower() + '_id'
+        else:
+            return related.model._meta.object_name.lower() + '_id'
+        
     def _get_m2m_reverse_name(self, related):
         "Function that can be curried to provide the related column name for the m2m table"
-        return related.parent_model._meta.object_name.lower() + '_id'
+        # If this is an m2m relation to self, avoid the inevitable name clash 
+        if related.model == related.parent_model:
+            return 'to_' + related.parent_model._meta.object_name.lower() + '_id'        
+        else:
+            return related.parent_model._meta.object_name.lower() + '_id'
 
     def isValidIDList(self, field_data, all_data):
         "Validates that the value is a valid list of foreign keys"

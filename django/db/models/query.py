@@ -613,7 +613,7 @@ def find_field(name, field_list, related_query):
     Returns None if there are no matches, or several matches.
     """
     if related_query:
-        matches = [f for f in field_list if f.get_query_name() == name]
+        matches = [f for f in field_list if f.field.related_query_name() == name]
     else:
         matches = [f for f in field_list if f.name == name]
     if len(matches) != 1:
