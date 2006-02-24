@@ -33,6 +33,9 @@ Examples:
                                     multiple memcached servers by separating
                                     them with semicolons.
 
+                                    This backend requires the
+                                    `Python memcached bindings`_.
+
     db://tablename/                 A database backend in a table named
                                     "tablename". This table should be created
                                     with "django-admin createcachetable".
@@ -82,6 +85,7 @@ Invalid arguments are silently ignored, as are invalid values of known
 arguments.
 
 .. _memcached: http://www.danga.com/memcached/
+.. _Python memcached bindings: ftp://ftp.tummy.com/pub/python-memcached/
 
 The per-site cache
 ==================
