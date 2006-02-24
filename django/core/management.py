@@ -461,33 +461,6 @@ def get_admin_index(app):
 get_admin_index.help_doc = "Prints the admin-index template snippet for the given app name(s)."
 get_admin_index.args = APP_ARGS
 
-def init_minimal():
-    "Initializes the database."
-    try:
-        from django.db import backend, connection, models
-        cursor = connection.cursor()
-        # This should probably be done in the test runner, or the test itself.
-        from django.conf import settings
-        settings.INSTALLED_APPS += ('django.contrib.contenttypes',)
-        # Install django.contrib.contenttypes. The tests require Packages to
-        # to be installed. This ought to be fixed (tests should probably
-        # install their dependencies)
-        contenttypes_app = models.get_app('contenttypes')
-        install(contenttypes_app)
-
-    except Exception, e:
-        import traceback
-        sys.stderr.write("Error: The database couldn't be initialized.\n")
-        sys.stderr.write('\n'.join(traceback.format_exception(*sys.exc_info())) + "\n")
-        try:
-            connection.rollback()
-        except UnboundLocalError:
-            pass
-        sys.exit(1)
-    else:
-        connection.commit()
-init_minimal.args = ''
-
 def init():
     "Initializes the database with auth, sessions, sites and core."
     try:
@@ -1093,7 +1066,6 @@ DEFAULT_ACTION_MAPPING = {
     'createcachetable' : createcachetable,
 #     'dbcheck': database_check,
     'init': init,
-    'init-minimal': init_minimal,
     'inspectdb': inspectdb,
     'install': install,
     'installperms': installperms,
