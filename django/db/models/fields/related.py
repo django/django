@@ -294,7 +294,7 @@ class ReverseManyRelatedObjectsDescriptor(object):
                 _add_m2m_items(self, superclass, rel_model, join_table, source_col_name,
                     target_col_name, instance._get_pk_val(), *objs, **kwargs)
 
-                # If this is a symmmetrical m2m relation to self, add the mirror entry in the m2m table
+                # If this is a symmetrical m2m relation to self, add the mirror entry in the m2m table
                 if instance.__class__ == rel_model and symmetrical:
                     _add_m2m_items(self, superclass, rel_model, join_table, target_col_name,
                         source_col_name, instance._get_pk_val(), *objs, **kwargs)                    
@@ -305,7 +305,7 @@ class ReverseManyRelatedObjectsDescriptor(object):
                 _remove_m2m_items(rel_model, join_table, source_col_name,
                     target_col_name, instance._get_pk_val(), *objs)
                     
-                # If this is a symmmetrical m2m relation to self, remove the mirror entry in the m2m table
+                # If this is a symmetrical m2m relation to self, remove the mirror entry in the m2m table
                 if instance.__class__ == rel_model and symmetrical:
                     _remove_m2m_items(rel_model, join_table, target_col_name,
                         source_col_name, instance._get_pk_val(), *objs)
@@ -315,7 +315,7 @@ class ReverseManyRelatedObjectsDescriptor(object):
             def clear(self):
                 _clear_m2m_items(join_table, source_col_name, instance._get_pk_val())
     
-                # If this is a symmmetrical m2m relation to self, clear the mirror entry in the m2m table                
+                # If this is a symmetrical m2m relation to self, clear the mirror entry in the m2m table                
                 if instance.__class__ == rel_model and symmetrical:
                     _clear_m2m_items(join_table, target_col_name, instance._get_pk_val())
                 
