@@ -84,15 +84,6 @@ class Options:
     def __repr__(self):
         return '<Options for %s>' % self.object_name
 
-    def get_content_type_id(self):
-        "Returns the content-type ID for this object type."
-        if not hasattr(self, '_content_type_id'):
-            from django.contrib.contenttypes.models import ContentType
-            self._content_type_id = ContentType.objects.get(
-                python_module_name__exact=self.module_name,
-                package__label__exact=self.app_label).id
-        return self._content_type_id
-
     def get_field(self, name, many_to_many=True):
         "Returns the requested field by name. Raises FieldDoesNotExist on error."
         to_search = many_to_many and (self.fields + self.many_to_many) or self.fields

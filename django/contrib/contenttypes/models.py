@@ -13,10 +13,30 @@ class Package(models.Model):
     def __repr__(self):
         return self.name
 
+class ContentTypeManager(models.Manager):
+    def get_for_model(self, model):
+        """
+        Returns the ContentType object for the given model, creating the
+        ContentType if necessary.
+        """
+        opts = model._meta
+        try:
+            return self.model._default_manager.get(python_module_name__exact=opts.module_name,
+                package__label__exact=opts.app_label)
+        except self.model.DoesNotExist:
+            # The str() is needed around opts.verbose_name because it's a
+            # django.utils.functional.__proxy__ object.
+            ct = self.model(name=str(opts.verbose_name),
+                package=Package.objects.get(label=opts.app_label),
+                python_module_name=opts.module_name)
+            ct.save()
+            return ct
+
 class ContentType(models.Model):
     name = models.CharField(_('name'), maxlength=100)
     package = models.ForeignKey(Package, db_column='package')
     python_module_name = models.CharField(_('python module name'), maxlength=50)
+    objects = ContentTypeManager()
     class Meta:
         verbose_name = _('content type')
         verbose_name_plural = _('content types')

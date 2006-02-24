@@ -2,6 +2,7 @@ from django import forms, template
 from django.conf import settings
 from django.contrib.admin.filterspecs import FilterSpec
 from django.contrib.admin.views.decorators import staff_member_required
+from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ImproperlyConfigured, ObjectDoesNotExist, PermissionDenied
 from django.core.paginator import ObjectPaginator, InvalidPage
 from django.shortcuts import get_object_or_404, render_to_response
@@ -172,6 +173,7 @@ def render_change_form(model, manipulator, context, add=False, change=False, for
         'inline_related_objects': inline_related_objects,
         'form_url': form_url,
         'opts': opts,
+        'content_type_id': ContentType.objects.get_for_model(model).id,
     }
     context.update(extra_context)
     return render_to_response([
@@ -205,7 +207,7 @@ def add_stage(request, app_label, model_name, show_delete=False, form_url='', po
         if not errors:
             new_object = manipulator.save(new_data)
             pk_value = new_object._get_pk_val()
-            LogEntry.objects.log_action(request.user.id, opts.get_content_type_id(), pk_value, str(new_object), ADDITION)
+            LogEntry.objects.log_action(request.user.id, ContentType.objects.get_for_model(model).id, pk_value, str(new_object), ADDITION)
             msg = _('The %(name)s "%(obj)s" was added successfully.') % {'name': opts.verbose_name, 'obj': new_object}
             # Here, we distinguish between different save types by checking for
             # the presence of keys in request.POST.
@@ -289,7 +291,7 @@ def change_stage(request, app_label, model_name, object_id):
             change_message = ' '.join(change_message)
             if not change_message:
                 change_message = _('No fields changed.')
-            LogEntry.objects.log_action(request.user.id, opts.get_content_type_id(), pk_value, str(new_object), CHANGE, change_message)
+            LogEntry.objects.log_action(request.user.id, ContentType.objects.get_for_model(model).id, pk_value, str(new_object), CHANGE, change_message)
 
             msg = _('The %(name)s "%(obj)s" was changed successfully.') % {'name': opts.verbose_name, 'obj': new_object}
             if request.POST.has_key("_continue"):
@@ -451,7 +453,7 @@ def delete_stage(request, app_label, model_name, object_id):
             raise PermissionDenied
         obj_display = str(obj)
         obj.delete()
-        LogEntry.objects.log_action(request.user.id, opts.get_content_type_id(), object_id, obj_display, DELETION)
+        LogEntry.objects.log_action(request.user.id, ContentType.objects.get_for_model(model).id, object_id, obj_display, DELETION)
         request.user.message_set.add(message=_('The %(name)s "%(obj)s" was deleted successfully.') % {'name': opts.verbose_name, 'obj': obj_display})
         return HttpResponseRedirect("../../")
     return render_to_response('admin/delete_confirmation', {
@@ -468,7 +470,7 @@ def history(request, app_label, model_name, object_id):
     if model is None:
         raise Http404, "App %r, model %r, not found" % (app_label, model_name)
     action_list = LogEntry.objects.filter(object_id=object_id,
-        content_type__id__exact=model._meta.get_content_type_id()).select_related().order_by('action_time')
+        content_type__id__exact=ContentType.objects.get_for_model(model).id).select_related().order_by('action_time')
     # If no history was found, see whether this object even exists.
     obj = get_object_or_404(model, pk=object_id)
     return render_to_response('admin/object_history', {
