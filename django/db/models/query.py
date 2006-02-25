@@ -163,7 +163,10 @@ class QuerySet(object):
 
     def get(self, *args, **kwargs):
         "Performs the SELECT and returns a single object matching the given keyword arguments."
-        obj_list = list(self.filter(*args, **kwargs))
+        clone = self.filter(*args, **kwargs)
+        if not clone._order_by:
+            clone._order_by = ()
+        obj_list = list(clone)
         if len(obj_list) < 1:
             raise self.model.DoesNotExist, "%s does not exist for %s" % (self.model._meta.object_name, kwargs)
         assert len(obj_list) == 1, "get() returned more than one %s -- it returned %s! Lookup parameters were %s" % (self.model._meta.object_name, len(obj_list), kwargs)
@@ -650,7 +653,7 @@ def lookup_inner(path, clause, value, opts, table, column):
             intermediate_table = field.m2m_db_table()
             join_column = field.m2m_reverse_name()
             intermediate_column = field.m2m_column_name()
-            
+
             raise FieldFound
 
         # Does the name belong to a reverse defined many-to-many field?
@@ -667,7 +670,7 @@ def lookup_inner(path, clause, value, opts, table, column):
             intermediate_table = field.field.m2m_db_table()
             join_column = field.field.m2m_column_name()
             intermediate_column = field.field.m2m_reverse_name()
-            
+
             raise FieldFound
 
         # Does the name belong to a one-to-many field?
