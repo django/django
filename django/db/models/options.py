@@ -222,9 +222,8 @@ class AdminOptions:
 
     def contribute_to_class(self, cls, name):
         cls._meta.admin = self
-        
-        # Register the admin manager with the class as Model._admin_manager
-        self.manager.contribute_to_class(cls, '_admin_manager')
+        # Make sure the admin manager has access to the model
+        self.manager.model = cls
 
 class AdminFieldSet(object):
     def __init__(self, name, classes, field_locator_func, line_specs):
