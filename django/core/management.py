@@ -72,6 +72,51 @@ def get_version():
         v += ' (%s)' % VERSION[3]
     return v
 
+def sql_for_table(model):
+    from django.db import backend, get_creation_module, models
+
+    data_types = get_creation_module().DATA_TYPES
+
+    if not data_types:
+        # This must be the "dummy" database backend, which means the user
+        # hasn't set DATABASE_ENGINE.
+        sys.stderr.write("Error: Django doesn't know which syntax to use for your SQL statements,\n" +
+            "because you haven't specified the DATABASE_ENGINE setting.\n" +
+            "Edit your settings file and change DATABASE_ENGINE to something like 'postgresql' or 'mysql'.\n")
+        sys.exit(1)
+
+    opts = model._meta
+
+    field_metadata = []
+    references = []
+    for f in opts.fields:
+        if isinstance(f, models.ForeignKey):
+            rel_field = f.rel.get_related_field()
+            data_type = get_rel_data_type(rel_field)
+        else:
+            rel_field = f
+            data_type = f.get_internal_type()
+        col_type = data_types[data_type]
+        if col_type is not None:
+            # Make the definition (e.g. 'foo VARCHAR(30)') for this field.
+            field_output = [backend.quote_name(f.column), col_type % rel_field.__dict__]
+            field_output.append('%sNULL' % (not f.null and 'NOT ' or ''))
+            if f.unique:
+                field_output.append('UNIQUE')
+            if f.primary_key:
+                field_output.append('PRIMARY KEY')
+            if f.rel:
+                references.append((f.rel.to, model, f))
+            field_metadata.append(field_output)
+    if opts.order_with_respect_to:
+        field_metadata.append((backend.quote_name('_order'), data_types['IntegerField'], 'NULL'))
+
+    table_metadata = []
+    for field_constraints in opts.unique_together:
+        table_metadata.append(['UNIQUE (%s)' % \
+            ", ".join([backend.quote_name(opts.get_field(f).column) for f in field_constraints])])
+    return field_metadata, table_metadata, references
+
 def get_sql_create(app):
     "Returns a list of the CREATE TABLE SQL statements for the given app."
     from django.db import backend, get_creation_module, models
@@ -365,16 +410,74 @@ get_sql_all.args = APP_ARGS
 
 def syncdb():
     "Creates the database tables for all apps in INSTALLED_APPS whose tables haven't already been created."
-    from django.db import connection, models, get_introspection_module
+    from django.db import backend, connection, models, get_creation_module, get_introspection_module
     introspection_module = get_introspection_module()
+    data_types = get_creation_module().DATA_TYPES
 
     cursor = connection.cursor()
+    # Get a list of all existing database tables,
+    # so we know what needs to be added.
     table_list = introspection_module.get_table_list(cursor)
-    for cls in models.get_models():
-        db_table = cls._meta.db_table
-        if db_table not in table_list:
-            print "      Need to create %s" % db_table
-    print "Done"
+
+    pending_references = []
+
+    for app in models.get_apps():
+        model_list = models.get_models(app)
+        for model in model_list:
+            # Create the model's database table, if it doesn't already exist.
+            if model._meta.db_table in table_list:
+                continue
+            field_metadata, table_metadata, references = sql_for_table(model)
+            pending_references.extend(references)
+            sql = "CREATE TABLE %s (\n    %s\n)" % \
+                (backend.quote_name(model._meta.db_table),
+                ",\n    ".join([' '.join(i) for i in field_metadata + table_metadata]))
+            print "Creating table %s" % model._meta.db_table
+            cursor.execute(sql)
+
+        for model in model_list:
+            # Create the many-to-many join table, if it doesn't already exist.
+            for f in model._meta.many_to_many:
+                if f.m2m_db_table() in table_list:
+                    continue
+                # This table doesn't exist yet and needs to be created.
+                table_output = ['CREATE TABLE %s (' % backend.quote_name(f.m2m_db_table())]
+                table_output.append('    %s %s NOT NULL PRIMARY KEY,' % (backend.quote_name('id'), data_types['AutoField']))
+                table_output.append('    %s %s NOT NULL REFERENCES %s (%s),' % \
+                    (backend.quote_name(f.m2m_column_name()),
+                    data_types[get_rel_data_type(model._meta.pk)] % model._meta.pk.__dict__,
+                    backend.quote_name(model._meta.db_table),
+                    backend.quote_name(model._meta.pk.column)))
+                table_output.append('    %s %s NOT NULL REFERENCES %s (%s),' % \
+                    (backend.quote_name(f.m2m_reverse_name()),
+                    data_types[get_rel_data_type(f.rel.to._meta.pk)] % f.rel.to._meta.pk.__dict__,
+                    backend.quote_name(f.rel.to._meta.db_table),
+                    backend.quote_name(f.rel.to._meta.pk.column)))
+                table_output.append('    UNIQUE (%s, %s)' % \
+                    (backend.quote_name(f.m2m_column_name()),
+                    backend.quote_name(f.m2m_reverse_name())))
+                table_output.append(')')
+                sql = '\n'.join(table_output)
+                print "Creating table %s" % f.m2m_db_table()
+                cursor.execute(sql)
+
+    # Create the pending references.
+    # Take care of any ALTER TABLE statements to add constraints
+    # after the fact.
+    if backend.supports_constraints:
+        for model, rel_class, field in pending_references:
+            rel_opts = rel_class._meta
+            r_table = rel_opts.db_table
+            r_col = field.column
+            table = model._meta.db_table
+            col = model._meta.get_field(field.rel.field_name).column
+            sql = 'ALTER TABLE %s ADD CONSTRAINT %s FOREIGN KEY (%s) REFERENCES %s (%s);' % \
+                (backend.quote_name(r_table),
+                backend.quote_name("%s_referencing_%s_%s" % (r_col, table, col)),
+                backend.quote_name(r_col), backend.quote_name(table), backend.quote_name(col))
+            cursor.execute(sql)
+
+    connection.commit()
 syncdb.args = ''
 
 def has_no_records(cursor):
