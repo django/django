@@ -408,6 +408,9 @@ def get_sql_all(app):
 get_sql_all.help_doc = "Prints the CREATE TABLE and initial-data SQL statements for the given model module name(s)."
 get_sql_all.args = APP_ARGS
 
+# TODO: syncdb() should include initial SQL data
+# TODO: Put "example.com" site in initial SQL data for sites app
+# TODO: Check for model validation errors before executing SQL
 def syncdb():
     "Creates the database tables for all apps in INSTALLED_APPS whose tables haven't already been created."
     from django.db import backend, connection, models, get_creation_module, get_introspection_module
@@ -503,41 +506,6 @@ def get_admin_index(app):
     return output
 get_admin_index.help_doc = "Prints the admin-index template snippet for the given app name(s)."
 get_admin_index.args = APP_ARGS
-
-def init():
-    "Initializes the database with auth, sessions, sites and core."
-    try:
-        from django.db import backend, connection, models
-        from django.contrib.sites.models import Site
-        cursor = connection.cursor()
-        # Install django.contrib.contenttypes.
-        contenttypes_app = models.get_app('contenttypes')
-        install(contenttypes_app)
-        # Install django.contrib.auth.
-        auth_app = models.get_app('auth')
-        install(auth_app)
-        # Install django.contrib.sessions.
-        sessions_app = models.get_app('sessions')
-        install(sessions_app)
-        # Install django.contrib.sites and create an example site.
-        sites_app = models.get_app('sites')
-        install(sites_app)
-        cursor.execute("INSERT INTO %s (%s, %s) VALUES ('example.com', 'Example site')" % \
-            (backend.quote_name(Site._meta.db_table), backend.quote_name('domain'),
-            backend.quote_name('name')))
-
-    except Exception, e:
-        import traceback
-        sys.stderr.write("Error: The database couldn't be initialized.\n")
-        sys.stderr.write('\n'.join(traceback.format_exception(*sys.exc_info())) + "\n")
-        try:
-            connection.rollback()
-        except UnboundLocalError:
-            pass
-        sys.exit(1)
-    else:
-        connection.commit()
-init.args = ''
 
 def install(app):
     "Executes the equivalent of 'get_sql_all' in the current database."
