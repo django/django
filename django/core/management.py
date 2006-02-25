@@ -297,15 +297,13 @@ def get_sql_initial_data(app):
     output = []
 
     app_models = get_models(app)
-    app_label = app_models[0]._meta.app_label
-    output.append(_get_packages_insert(app_label))
     app_dir = os.path.normpath(os.path.join(os.path.dirname(app.__file__), 'sql'))
 
     for klass in app_models:
         opts = klass._meta
 
         # Add custom SQL, if it's available.
-        # FIXME: This probably needs changing
+        # TODO: This probably needs changing
         sql_files = [os.path.join(app_dir, opts.module_name + '.' + settings.DATABASE_ENGINE +  '.sql'),
                      os.path.join(app_dir, opts.module_name + '.sql')]
         for sql_file in sql_files:
@@ -314,11 +312,14 @@ def get_sql_initial_data(app):
                 output.append(fp.read())
                 fp.close()
 
-        # Content types.
-        output.append(_get_contenttype_insert(opts))
-        # Permissions.
-        for codename, name in _get_all_permissions(opts):
-            output.append(_get_permission_insert(name, codename, opts))
+        # TODO: This is temporarily commented out until we come up
+        # with a better way of letting people initialize content types and
+        # permissions.
+#         # Content types.
+#         output.append(_get_contenttype_insert(opts))
+#         # Permissions.
+#         for codename, name in _get_all_permissions(opts):
+#             output.append(_get_permission_insert(name, codename, opts))
     return output
 get_sql_initial_data.help_doc = "Prints the initial INSERT SQL statements for the given app name(s)."
 get_sql_initial_data.args = APP_ARGS
@@ -1164,7 +1165,7 @@ def execute_from_command_line(action_mapping=DEFAULT_ACTION_MAPPING):
             action_mapping[action](username, email, password)
     elif action == 'shell':
         action_mapping[action](options.plain is True)
-    elif action in ('init', 'init-minimal', 'validate'):
+    elif action in ('init', 'validate'):
         action_mapping[action]()
     elif action == 'inspectdb':
         try:

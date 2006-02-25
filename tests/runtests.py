@@ -89,7 +89,7 @@ class TestRunner:
                 test_models = []
         else:
             run_othertests = not self.which_tests
-            
+
         if self.which_tests:
             # Only run the specified tests.
             bad_models = [m for m in self.which_tests if m not in test_models]
@@ -133,8 +133,6 @@ class TestRunner:
 
         # Initialize the test database.
         cursor = connection.cursor()
-        self.output(1, "Initializing test database")
-        management.init_minimal()
 
         # Run the tests for each test model.
         self.output(1, "Running app tests")
@@ -146,7 +144,7 @@ class TestRunner:
             except Exception, e:
                 log_error(model_name, "Error while importing", ''.join(traceback.format_exception(*sys.exc_info())[1:]))
                 continue
-                
+
             if not getattr(mod, 'error_log', None):
                 # Model is not marked as an invalid model
                 self.output(1, "%s model: Installing" % model_name)
@@ -162,10 +160,10 @@ class TestRunner:
                 runner = DjangoDoctestRunner(verbosity_level=verbosity_level, verbose=False)
                 self.output(1, "%s model: Running tests" % model_name)
                 runner.run(dtest, clear_globs=True, out=sys.stdout.write)
-            else: 
+            else:
                 # Check that model known to be invalid is invalid for the right reasons.
                 self.output(1, "%s model: Validating" % model_name)
-            
+
                 from cStringIO import StringIO
                 s = StringIO()
                 count = management.get_validation_errors(s, mod)
@@ -173,10 +171,10 @@ class TestRunner:
                 error_log = s.read()
                 actual = error_log.split('\n')
                 expected = mod.error_log.split('\n')
-                                    
-                unexpected = [err for err in actual if err not in expected]    
+
+                unexpected = [err for err in actual if err not in expected]
                 missing = [err for err in expected if err not in actual]
-                
+
                 if unexpected or missing:
                     unexpected_log = '\n'.join(unexpected)
                     missing_log = '\n'.join(missing)
