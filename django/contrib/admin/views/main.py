@@ -486,7 +486,7 @@ class ChangeList(object):
         self.model = model
         self.opts = model._meta
         self.lookup_opts = self.opts
-        self.manager = model._default_manager
+        self.manager = self.opts.admin.manager
 
         # Get search parameters from the query string.
         try:
@@ -551,7 +551,7 @@ class ChangeList(object):
         if isinstance(self.query_set._filters, models.Q) and not self.query_set._filters.kwargs:
             full_result_count = result_count
         else:
-            full_result_count = self.model._default_manager.count()
+            full_result_count = self.manager.count()
 
         can_show_all = result_count <= MAX_SHOW_ALL_ALLOWED
         multi_page = result_count > DEFAULT_RESULTS_PER_PAGE
@@ -603,7 +603,7 @@ class ChangeList(object):
         return order_field, order_type
 
     def get_query_set(self):
-        qs = self.model._default_manager.get_query_set()
+        qs = self.manager.get_query_set()
         lookup_params = self.params.copy() # a dictionary of the query string
         for i in (ALL_VAR, ORDER_VAR, ORDER_TYPE_VAR, SEARCH_VAR, IS_POPUP_VAR):
             if lookup_params.has_key(i):

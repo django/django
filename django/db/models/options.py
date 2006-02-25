@@ -3,6 +3,7 @@ from django.db.models.fields.related import ManyToMany
 from django.db.models.fields import AutoField, FieldDoesNotExist
 from django.db.models.loading import get_models
 from django.db.models.query import orderlist2sql
+from django.db.models import Manager
 from bisect import bisect
 import re
 
@@ -194,7 +195,7 @@ class Options:
 class AdminOptions:
     def __init__(self, fields=None, js=None, list_display=None, list_filter=None,
         date_hierarchy=None, save_as=False, ordering=None, search_fields=None,
-        save_on_top=False, list_select_related=False):
+        save_on_top=False, list_select_related=False, manager=None):
         self.fields = fields
         self.js = js or []
         self.list_display = list_display or ['__str__']
@@ -204,6 +205,7 @@ class AdminOptions:
         self.search_fields = search_fields or []
         self.save_on_top = save_on_top
         self.list_select_related = list_select_related
+        self.manager = manager or Manager()
 
     def get_field_sets(self, opts):
         "Returns a list of AdminFieldSet objects for this AdminOptions object."
@@ -220,6 +222,9 @@ class AdminOptions:
 
     def contribute_to_class(self, cls, name):
         cls._meta.admin = self
+        
+        # Register the admin manager with the class as Model._admin_manager
+        self.manager.contribute_to_class(cls, '_admin_manager')
 
 class AdminFieldSet(object):
     def __init__(self, name, classes, field_locator_func, line_specs):
