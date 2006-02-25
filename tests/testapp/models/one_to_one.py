@@ -53,7 +53,7 @@ Demon Dogs the restaurant
 >>> p2.get_restaurant()
 Traceback (most recent call last):
     ...
-RestaurantDoesNotExist: Restaurant does not exist for {'place__id__exact': ...}
+RestaurantDoesNotExist: Restaurant does not exist for {'order_by': (), 'place__id__exact': ...}
 
 # restaurants.get_list() just returns the Restaurants, not the Places.
 >>> restaurants.get_list()

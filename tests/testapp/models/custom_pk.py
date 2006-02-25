@@ -45,7 +45,7 @@ Fran Bones
 >>> employees.get_object(pk='foo')
 Traceback (most recent call last):
     ...
-EmployeeDoesNotExist: Employee does not exist for {'pk': 'foo'}
+EmployeeDoesNotExist: Employee does not exist for {'pk': 'foo', 'order_by': ()}
 
 # Fran got married and changed her last name.
 >>> fran = employees.get_object(pk='XYZ456')

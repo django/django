@@ -67,7 +67,7 @@ datetime.datetime(2005, 7, 28, 0, 0)
 >>> articles.get_object(id__exact=2)
 Traceback (most recent call last):
     ...
-ArticleDoesNotExist: Article does not exist for {'id__exact': 2}
+ArticleDoesNotExist: Article does not exist for {'order_by': (), 'id__exact': 2}
 
 >>> articles.get_object(pub_date__year=2005, pub_date__month=8)
 Traceback (most recent call last):
