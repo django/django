@@ -1352,7 +1352,6 @@ def _get_where_clause(lookup_type, table_prefix, field_name, value):
     raise TypeError, "Got invalid lookup_type: %s" % repr(lookup_type)
 
 def function_get_object(opts, klass, does_not_exist_exception, **kwargs):
-    kwargs['order_by'] = ()
     obj_list = function_get_list(opts, klass, **kwargs)
     if len(obj_list) < 1:
         raise does_not_exist_exception, "%s does not exist for %s" % (opts.object_name, kwargs)
