@@ -49,12 +49,6 @@ def _get_permission_insert(name, codename, opts):
         (backend.quote_name('auth_permission'), backend.quote_name('name'), backend.quote_name('package'),
         backend.quote_name('codename'), name.replace("'", "''"), opts.app_label, codename)
 
-def _get_contenttype_insert(opts):
-    from django.db import backend
-    return "INSERT INTO %s (%s, %s, %s) VALUES ('%s', '%s', '%s');" % \
-        (backend.quote_name('django_content_type'), backend.quote_name('name'), backend.quote_name('package'),
-        backend.quote_name('python_module_name'), opts.verbose_name, opts.app_label, opts.module_name)
-
 def _is_valid_dir_name(s):
     return bool(re.search(r'^\w+$', s))
 
@@ -358,10 +352,7 @@ def get_sql_initial_data(app):
                 fp.close()
 
         # TODO: This is temporarily commented out until we come up
-        # with a better way of letting people initialize content types and
-        # permissions.
-#         # Content types.
-#         output.append(_get_contenttype_insert(opts))
+        # with a better way of letting people initialize permissions.
 #         # Permissions.
 #         for codename, name in _get_all_permissions(opts):
 #             output.append(_get_permission_insert(name, codename, opts))
