@@ -1066,7 +1066,6 @@ DEFAULT_ACTION_MAPPING = {
     'adminindex': get_admin_index,
     'createsuperuser': createsuperuser,
     'createcachetable' : createcachetable,
-    'init': init,
     'inspectdb': inspectdb,
     'install': install,
     'installperms': installperms,
@@ -1166,7 +1165,7 @@ def execute_from_command_line(action_mapping=DEFAULT_ACTION_MAPPING):
             action_mapping[action](username, email, password)
     elif action == 'shell':
         action_mapping[action](options.plain is True)
-    elif action in ('init', 'syncdb', 'validate'):
+    elif action in ('syncdb', 'validate'):
         action_mapping[action]()
     elif action == 'inspectdb':
         try:
