@@ -16,6 +16,9 @@ def timesince(d, now=None):
       (60 * 60, lambda n: ngettext('hour', 'hours', n)),
       (60, lambda n: ngettext('minute', 'minutes', n))
     )
+    # Convert datetime.date to datetime.datetime for comparison
+    if d.__class__ is not datetime.datetime:
+        d = datetime.datetime(d.year, d.month, d.day)
     if now:
         t = now.timetuple()
     else:
@@ -25,7 +28,7 @@ def timesince(d, now=None):
     else:
         tz = None
     now = datetime.datetime(t[0], t[1], t[2], t[3], t[4], t[5], tzinfo=tz)
-    
+
     # ignore microsecond part of 'd' since we removed it from 'now'
     delta = now - (d - datetime.timedelta(0, 0, d.microsecond))
     since = delta.days * 24 * 60 * 60 + delta.seconds
