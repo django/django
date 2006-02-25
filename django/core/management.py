@@ -363,6 +363,20 @@ def get_sql_all(app):
 get_sql_all.help_doc = "Prints the CREATE TABLE and initial-data SQL statements for the given model module name(s)."
 get_sql_all.args = APP_ARGS
 
+def syncdb():
+    "Creates the database tables for all apps in INSTALLED_APPS whose tables haven't already been created."
+    from django.db import connection, models, get_introspection_module
+    introspection_module = get_introspection_module()
+
+    cursor = connection.cursor()
+    table_list = introspection_module.get_table_list(cursor)
+    for cls in models.get_models():
+        db_table = cls._meta.db_table
+        if db_table not in table_list:
+            print "      Need to create %s" % db_table
+    print "Done"
+syncdb.args = ''
+
 def has_no_records(cursor):
     "Returns True if the cursor, having executed a query, returned no records."
     # This is necessary due to an inconsistency in the DB-API spec.
@@ -1082,6 +1096,7 @@ DEFAULT_ACTION_MAPPING = {
     'sqlsequencereset': get_sql_sequence_reset,
     'startapp': startapp,
     'startproject': startproject,
+    'syncdb': syncdb,
     'validate': validate,
 }
 
@@ -1165,7 +1180,7 @@ def execute_from_command_line(action_mapping=DEFAULT_ACTION_MAPPING):
             action_mapping[action](username, email, password)
     elif action == 'shell':
         action_mapping[action](options.plain is True)
-    elif action in ('init', 'validate'):
+    elif action in ('init', 'syncdb', 'validate'):
         action_mapping[action]()
     elif action == 'inspectdb':
         try:
