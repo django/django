@@ -34,11 +34,12 @@ def get_models(app_mod=None):
     Given a module containing models, returns a list of the models. Otherwise
     returns a list of all installed models.
     """
+    app_list = get_apps() # Run get_apps() to populate the _app_list cache. Slightly hackish.
     if app_mod:
         return _app_models.get(app_mod.__name__.split('.')[-2], {}).values()
     else:
         model_list = []
-        for app_mod in get_apps():
+        for app_mod in app_list:
             model_list.extend(get_models(app_mod))
         return model_list
 
@@ -47,6 +48,7 @@ def get_model(app_label, model_name):
     Returns the model matching the given app_label and case-insensitive model_name.
     Returns None if no model is found.
     """
+    get_apps() # Run get_apps() to populate the _app_list cache. Slightly hackish.
     try:
         model_dict = _app_models[app_label]
     except KeyError:
