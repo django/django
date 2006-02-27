@@ -1,18 +1,6 @@
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
-class Package(models.Model):
-    label = models.CharField(_('label'), maxlength=20, primary_key=True)
-    name = models.CharField(_('name'), maxlength=30, unique=True)
-    class Meta:
-        verbose_name = _('package')
-        verbose_name_plural = _('packages')
-        db_table = 'django_package'
-        ordering = ('name',)
-
-    def __repr__(self):
-        return self.name
-
 class ContentTypeManager(models.Manager):
     def get_for_model(self, model):
         """
@@ -21,35 +9,34 @@ class ContentTypeManager(models.Manager):
         """
         opts = model._meta
         try:
-            return self.model._default_manager.get(python_module_name__exact=opts.module_name,
-                package__label__exact=opts.app_label)
+            return self.model._default_manager.get(app_label=opts.app_label,
+                model=opts.object_name.lower())
         except self.model.DoesNotExist:
             # The str() is needed around opts.verbose_name because it's a
             # django.utils.functional.__proxy__ object.
             ct = self.model(name=str(opts.verbose_name),
-                package=Package.objects.get(label=opts.app_label),
-                python_module_name=opts.module_name)
+                app_label=opts.app_label, model=opts.object_name.lower())
             ct.save()
             return ct
 
 class ContentType(models.Model):
-    name = models.CharField(_('name'), maxlength=100)
-    package = models.ForeignKey(Package, db_column='package')
-    python_module_name = models.CharField(_('python module name'), maxlength=50)
+    name = models.CharField(maxlength=100)
+    app_label = models.CharField(maxlength=100)
+    model = models.CharField(_('python model class name'), maxlength=100, unique=True)
     objects = ContentTypeManager()
     class Meta:
         verbose_name = _('content type')
         verbose_name_plural = _('content types')
         db_table = 'django_content_type'
-        ordering = ('package', 'name')
-        unique_together = (('package', 'python_module_name'),)
+        ordering = ('name',)
 
     def __repr__(self):
-        return "%s | %s" % (self.package_id, self.name)
+        return self.name
 
-    def get_model_module(self):
-        "Returns the Python model module for accessing this type of content."
-        return __import__('django.models.%s.%s' % (self.package_id, self.python_module_name), '', '', [''])
+    def model_class(self):
+        "Returns the Python model class for this type of content."
+        from django.db import models
+        return models.get_model(self.app_label, self.model)
 
     def get_object_for_this_type(self, **kwargs):
         """
@@ -58,4 +45,4 @@ class ContentType(models.Model):
         method. The ObjectNotExist exception, if thrown, will not be caught,
         so code that calls this method should catch it.
         """
-        return self.get_model_module().get_object(**kwargs)
+        return self.model_class()._default_manager.get(**kwargs)

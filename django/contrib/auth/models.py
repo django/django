@@ -1,6 +1,6 @@
 from django.core import validators
 from django.db import backend, connection, models
-from django.contrib.contenttypes.models import Package
+from django.contrib.contenttypes.models import ContentType
 from django.utils.translation import gettext_lazy as _
 import datetime
 
@@ -11,16 +11,16 @@ class SiteProfileNotAvailable(Exception):
 
 class Permission(models.Model):
     name = models.CharField(_('name'), maxlength=50)
-    package = models.ForeignKey(Package, db_column='package')
+    content_type = models.ForeignKey(ContentType)
     codename = models.CharField(_('codename'), maxlength=100)
     class Meta:
         verbose_name = _('Permission')
         verbose_name_plural = _('Permissions')
-        unique_together = (('package', 'codename'),)
-        ordering = ('package', 'codename')
+        unique_together = (('content_type', 'codename'),)
+        ordering = ('content_type', 'codename')
 
     def __repr__(self):
-        return "%s | %s" % (self.package_id, self.name)
+        return "%r | %s" % (self.content_type, self.name)
 
 class Group(models.Model):
     name = models.CharField(_('name'), maxlength=80, unique=True)
@@ -133,7 +133,7 @@ class User(models.Model):
             cursor = connection.cursor()
             # The SQL below works out to the following, after DB quoting:
             # cursor.execute("""
-            #     SELECT p.package, p.codename
+            #     SELECT p.content_type_id, p.codename
             #     FROM auth_permission p, auth_group_permissions gp, auth_user_groups ug
             #     WHERE p.id = gp.permission_id
             #         AND gp.group_id = ug.group_id
@@ -144,7 +144,7 @@ class User(models.Model):
                 WHERE p.%s = gp.%s
                     AND gp.%s = ug.%s
                     AND ug.%s = %%s""" % (
-                backend.quote_name('package'), backend.quote_name('codename'),
+                backend.quote_name('content_type_id'), backend.quote_name('codename'),
                 backend.quote_name('auth_permission'), backend.quote_name('auth_group_permissions'),
                 backend.quote_name('auth_user_groups'), backend.quote_name('id'),
                 backend.quote_name('permission_id'), backend.quote_name('group_id'),
@@ -156,7 +156,7 @@ class User(models.Model):
     def get_all_permissions(self):
         if not hasattr(self, '_perm_cache'):
             import sets
-            self._perm_cache = sets.Set(["%s.%s" % (p.package_id, p.codename) for p in self.user_permissions.all()])
+            self._perm_cache = sets.Set(["%s.%s" % (p.content_type, p.codename) for p in self.user_permissions.all()])
             self._perm_cache.update(self.get_group_permissions())
         return self._perm_cache
 
@@ -175,11 +175,11 @@ class User(models.Model):
                 return False
         return True
 
-    def has_module_perms(self, package_name):
-        "Returns True if the user has any permissions in the given package."
+    def has_module_perms(self, app_label):
+        "Returns True if the user has any permissions in the given app label."
         if self.is_superuser:
             return True
-        return bool(len([p for p in self.get_all_permissions() if p[:p.index('.')] == package_name]))
+        return bool(len([p for p in self.get_all_permissions() if p[:p.index('.')] == app_label]))
 
     def get_and_delete_messages(self):
         messages = []
