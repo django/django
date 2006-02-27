@@ -23,7 +23,6 @@
 from django.core.exceptions import ImproperlyConfigured
 from django.template import Origin, StringOrigin, Template, Context, TemplateDoesNotExist, add_to_builtins
 from django.conf import settings
-from django.conf import settings
 
 template_source_loaders = None
 
