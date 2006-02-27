@@ -661,13 +661,32 @@ def createsuperuser(username=None, email=None, password=None):
     "Creates a superuser account."
     from django.core import validators
     from django.contrib.auth.models import User
-    import getpass
+    import getpass, pwd
+
+    # Determine the current system user's username, to use as a default.
+    default_username = pwd.getpwuid(os.getuid())[0].replace(' ', '').lower()
+
+    # Determine whether the default username is taken, so we don't display
+    # it as an option.
+    if default_username:
+        try:
+            User.objects.get(username=default_username)
+        except User.DoesNotExist:
+            pass
+        else:
+            default_username = ''
+
     try:
         while 1:
             if not username:
-                username = raw_input('Username (only letters, digits and underscores): ')
+                input_msg = 'Username'
+                if default_username:
+                    input_msg += ' (Leave blank to use %r)' % default_username
+                username = raw_input(input_msg + ': ')
+            if default_username and username == '':
+                username = default_username
             if not username.isalnum():
-                sys.stderr.write("Error: That username is invalid.\n")
+                sys.stderr.write("Error: That username is invalid. Use only letters, digits and underscores.\n")
                 username = None
             try:
                 User.objects.get(username=username)
@@ -1088,7 +1107,6 @@ DEFAULT_ACTION_MAPPING = {
 NO_SQL_TRANSACTION = (
     'adminindex',
     'createcachetable',
-    'dbcheck',
     'install',
     'installperms',
     'reset',
@@ -1201,16 +1219,13 @@ def execute_from_command_line(action_mapping=DEFAULT_ACTION_MAPPING):
         action_mapping[action](addr, port)
     else:
         from django.db import models
-        if action == 'dbcheck':
-            mod_list = models.get_all_installed_modules()
-        else:
-            try:
-                mod_list = [models.get_app(app_label) for app_label in args[1:]]
-            except ImportError, e:
-                sys.stderr.write("Error: %s. Are you sure your INSTALLED_APPS setting is correct?\n" % e)
-                sys.exit(1)
-            if not mod_list:
-                parser.print_usage_and_exit()
+        try:
+            mod_list = [models.get_app(app_label) for app_label in args[1:]]
+        except ImportError, e:
+            sys.stderr.write("Error: %s. Are you sure your INSTALLED_APPS setting is correct?\n" % e)
+            sys.exit(1)
+        if not mod_list:
+            parser.print_usage_and_exit()
         if action not in NO_SQL_TRANSACTION:
             print "BEGIN;"
         for mod in mod_list:
