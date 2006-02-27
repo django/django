@@ -24,8 +24,14 @@ class ModelBase(type):
         if not bases or bases == (object,):
             return type.__new__(cls, name, bases, attrs)
 
+        mod = attrs.pop('__module__')
+
+        # Raise ImportError if this model isn't in INSTALLED_APPS.
+        if re.sub('\.models$', '', mod) not in settings.INSTALLED_APPS:
+            raise ImportError, "INSTALLED_APPS must contain %r in order for you to use this model." % mod
+
         # Create the class.
-        new_class = type.__new__(cls, name, bases, {'__module__': attrs.pop('__module__')})
+        new_class = type.__new__(cls, name, bases, {'__module__': mod})
         new_class.add_to_class('_meta', Options(attrs.pop('Meta', None)))
         new_class.add_to_class('DoesNotExist', types.ClassType('DoesNotExist', (ObjectDoesNotExist,), {}))
 
