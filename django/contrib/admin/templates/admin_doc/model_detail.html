@@ -16,6 +16,10 @@
 <div id="content-main">
 <h1>{{ summary }}</h1>
 
+{% if description %}
+  <p>{% filter escape|linebreaksbr %}{% trans description %}{% endfilter %}</p>
+{% endif %}
+
 <div class="module">
 <table class="model">
 <thead>
