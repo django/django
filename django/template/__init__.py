@@ -58,7 +58,7 @@ import re
 from inspect import getargspec
 from django.utils.functional import curry
 from django.conf import settings
-from django.template.context import Context, RequestContext
+from django.template.context import Context, RequestContext, ContextPopException
 
 __all__ = ('Template', 'Context', 'RequestContext', 'compile_string')
 
@@ -91,10 +91,6 @@ libraries = {}
 builtins = []
 
 class TemplateSyntaxError(Exception):
-    pass
-
-class ContextPopException(Exception):
-    "pop() has been called more times than push()"
     pass
 
 class TemplateDoesNotExist(Exception):

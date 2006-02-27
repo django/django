@@ -3,11 +3,15 @@ from django.core.exceptions import ImproperlyConfigured
 
 _standard_context_processors = None
 
+class ContextPopException(Exception):
+    "pop() has been called more times than push()"
+    pass
+
 class Context:
     "A stack container for variable context"
-    def __init__(self, dict=None):
-        dict = dict or {}
-        self.dicts = [dict]
+    def __init__(self, dict_=None):
+        dict_ = dict_ or {}
+        self.dicts = [dict_]
 
     def __repr__(self):
         return repr(self.dicts)
@@ -30,9 +34,9 @@ class Context:
 
     def __getitem__(self, key):
         "Get a variable's value, starting at the current context and going upward"
-        for dict in self.dicts:
-            if dict.has_key(key):
-                return dict[key]
+        for d in self.dicts:
+            if d.has_key(key):
+                return d[key]
         return settings.TEMPLATE_STRING_IF_INVALID
 
     def __delitem__(self, key):
@@ -40,15 +44,15 @@ class Context:
         del self.dicts[0][key]
 
     def has_key(self, key):
-        for dict in self.dicts:
-            if dict.has_key(key):
+        for d in self.dicts:
+            if d.has_key(key):
                 return True
         return False
 
     def get(self, key, otherwise):
-        for dict in self.dicts:
-            if dict.has_key(key):
-                return dict[key]
+        for d in self.dicts:
+            if d.has_key(key):
+                return d[key]
         return otherwise
 
     def update(self, other_dict):
