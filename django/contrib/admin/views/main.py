@@ -42,6 +42,43 @@ use_raw_id_admin = lambda field: isinstance(field.rel, (models.ManyToOne, models
 class IncorrectLookupParameters(Exception):
     pass
 
+def quote(s):
+    """
+    Ensure that primary key values do not confuse the admin URLs by escaping
+    any '/', '_' and ':' characters. Similar to urllib.quote, except that the
+	quoting is slightly different so that it doesn't get autoamtically
+	unquoted by the web browser.
+    """
+    if type(s) != type(''):
+        return s
+    res = list(s)
+    for i in range(len(res)):
+        c = res[i]
+        if c in ':/_':
+            res[i] = '_%02X' % ord(c)
+    return ''.join(res)
+
+def unquote(s):
+    """
+    Undo the effects of quote(). Based heavily on urllib.unquote().
+    """
+    mychr = chr
+    myatoi = int
+    list = s.split('_')
+    res = [list[0]]
+    myappend = res.append
+    del list[0]
+    for item in list:
+        if item[1:2]:
+            try:
+                myappend(mychr(myatoi(item[:2], 16))
+                     + item[2:])
+            except ValueError:
+                myappend('_' + item)
+        else:
+            myappend('_' + item)
+    return "".join(res)
+
 def get_javascript_imports(opts, auto_populated_fields, field_sets):
 # Put in any necessary JavaScript imports.
     js = ['js/core.js', 'js/admin/RelatedObjectLookups.js']
@@ -252,6 +289,7 @@ add_stage = staff_member_required(add_stage)
 
 def change_stage(request, app_label, model_name, object_id):
     model = models.get_model(app_label, model_name)
+    object_id = unquote(object_id)
     if model is None:
         raise Http404, "App %r, model %r, not found" % (app_label, model_name)
     opts = model._meta
@@ -435,6 +473,7 @@ def _get_deleted_objects(deleted_objects, perms_needed, user, obj, opts, current
 def delete_stage(request, app_label, model_name, object_id):
     import sets
     model = models.get_model(app_label, model_name)
+    object_id = unquote(object_id)
     if model is None:
         raise Http404, "App %r, model %r, not found" % (app_label, model_name)
     opts = model._meta
@@ -470,6 +509,7 @@ delete_stage = staff_member_required(delete_stage)
 
 def history(request, app_label, model_name, object_id):
     model = models.get_model(app_label, model_name)
+    object_id = unquote(object_id)
     if model is None:
         raise Http404, "App %r, model %r, not found" % (app_label, model_name)
     action_list = LogEntry.objects.filter(object_id=object_id,
@@ -663,7 +703,7 @@ class ChangeList(object):
         return qs
 
     def url_for_result(self, result):
-        return "%s/" % getattr(result, self.pk_attname)
+        return "%s/" % quote(getattr(result, self.pk_attname))
 
 def change_list(request, app_label, model_name):
     model = models.get_model(app_label, model_name)
