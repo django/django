@@ -170,4 +170,12 @@ Article 1
 [Article% with percent sign, Article_ with underscore, Article 5, Article 6, Article 4, Article 2, Article 3, Article 7, Article 1]
 >>> Article.objects.filter(headline__startswith='Article%')
 [Article% with percent sign]
+
+# exclude() is the opposite of filter() when doing lookups:
+>>> Article.objects.filter(headline__contains='Article').exclude(headline__contains='with')
+[Article 5, Article 6, Article 4, Article 2, Article 3, Article 7, Article 1]
+>>> Article.objects.exclude(headline__startswith="Article_")
+[Article% with percent sign, Article 5, Article 6, Article 4, Article 2, Article 3, Article 7, Article 1]
+>>> Article.objects.exclude(headline="Article 7")
+[Article% with percent sign, Article_ with underscore, Article 5, Article 6, Article 4, Article 2, Article 3, Article 1]cl
 """

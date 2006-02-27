@@ -131,7 +131,6 @@ OPERATOR_MAPPING = {
     'iexact': "LIKE %s ESCAPE '\\'",
     'contains': "LIKE %s ESCAPE '\\'",
     'icontains': "LIKE %s ESCAPE '\\'",
-    'ne': '!= %s',
     'gt': '> %s',
     'gte': '>= %s',
     'lt': '< %s',

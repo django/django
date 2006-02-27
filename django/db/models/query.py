@@ -244,9 +244,16 @@ class QuerySet(object):
 
     def filter(self, *args, **kwargs):
         "Returns a new QuerySet instance with the args ANDed to the existing set."
+        return self._filter_or_exclude(Q, *args, **kwargs)    
+        
+    def exclude(self, *args, **kwargs):
+        "Returns a new QuerySet instance with NOT (arsg) ANDed to the existing set."
+        return self._filter_or_exclude(QNot, *args, **kwargs)
+        
+    def _filter_or_exclude(self, qtype, *args, **kwargs):
         clone = self._clone()
         if len(kwargs) > 0:
-            clone._filters = clone._filters & Q(**kwargs)
+            clone._filters = clone._filters & qtype(**kwargs)
         if len(args) > 0:
             clone._filters = clone._filters & reduce(operator.and_, args)
         return clone
@@ -490,7 +497,7 @@ class QOr(QOperator):
         else:
             raise TypeError, other
 
-class Q:
+class Q(object):
     "Encapsulates queries as objects that can be combined logically."
     def __init__(self, **kwargs):
         self.kwargs = kwargs
@@ -503,6 +510,14 @@ class Q:
 
     def get_sql(self, opts):
         return parse_lookup(self.kwargs.items(), opts)
+
+class QNot(Q):
+    "Encapsulates NOT (...) queries as objects"
+    
+    def get_sql(self, opts):
+        tables, joins, where, params = super(QNot, self).get_sql(opts)
+        where2 = ['(NOT (%s))' % " AND ".join(where)]
+        return tables, joins, where2, params
 
 def get_where_clause(lookup_type, table_prefix, field_name, value):
     if table_prefix.endswith('.'):

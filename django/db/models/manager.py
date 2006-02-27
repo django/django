@@ -69,6 +69,9 @@ class Manager(object):
     def filter(self, *args, **kwargs):
         return self.get_query_set().filter(*args, **kwargs)
 
+    def exclude(self, *args, **kwargs):
+        return self.get_query_set().exclude(*args, **kwargs)
+
     def in_bulk(self, *args, **kwargs):
         return self.get_query_set().in_bulk(*args, **kwargs)
 
