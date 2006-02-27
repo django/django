@@ -98,22 +98,6 @@ class ModPythonRequest(http.HttpRequest):
             self._raw_post_data = self._req.read()
             return self._raw_post_data
 
-    def _get_user(self):
-        if not hasattr(self, '_user'):
-            from django.contrib.auth.models import User, SESSION_KEY
-            try:
-                user_id = self.session[SESSION_KEY]
-                if not user_id:
-                    raise ValueError
-                self._user = User.objects.get(pk=user_id)
-            except (AttributeError, KeyError, ValueError, User.DoesNotExist):
-                from django.parts.auth import anonymoususers
-                self._user = anonymoususers.AnonymousUser()
-        return self._user
-
-    def _set_user(self, user):
-        self._user = user
-
     GET = property(_get_get, _set_get)
     POST = property(_get_post, _set_post)
     COOKIES = property(_get_cookies, _set_cookies)
@@ -121,7 +105,6 @@ class ModPythonRequest(http.HttpRequest):
     META = property(_get_meta)
     REQUEST = property(_get_request)
     raw_post_data = property(_get_raw_post_data)
-    user = property(_get_user, _set_user)
 
 class ModPythonHandler(BaseHandler):
     def __call__(self, req):
