@@ -163,8 +163,8 @@ class Field(object):
     def get_default(self):
         "Returns the default value for this field."
         if self.default != NOT_PROVIDED:
-            if hasattr(self.default, '__get_value__'):
-                return self.default.__get_value__()
+            if callable(self.default):
+                return self.default()
             return self.default
         if not self.empty_strings_allowed or self.null:
             return None
