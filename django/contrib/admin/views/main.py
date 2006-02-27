@@ -456,13 +456,16 @@ def delete_stage(request, app_label, model_name, object_id):
         LogEntry.objects.log_action(request.user.id, ContentType.objects.get_for_model(model).id, object_id, obj_display, DELETION)
         request.user.message_set.add(message=_('The %(name)s "%(obj)s" was deleted successfully.') % {'name': opts.verbose_name, 'obj': obj_display})
         return HttpResponseRedirect("../../")
-    return render_to_response('admin/delete_confirmation', {
+    extra_context = {
         "title": _("Are you sure?"),
         "object_name": opts.verbose_name,
         "object": obj,
         "deleted_objects": deleted_objects,
         "perms_lacking": perms_needed,
-    }, context_instance=template.RequestContext(request))
+    }
+    return render_to_response(["admin/%s/%s/delete_confirmation" % (app_label, opts.object_name.lower() ),
+                               "admin/%s/delete_confirmation" % app_label ,
+                               "admin/delete_confirmation"], extra_context, context_instance=Context(request)) 
 delete_stage = staff_member_required(delete_stage)
 
 def history(request, app_label, model_name, object_id):
@@ -473,12 +476,15 @@ def history(request, app_label, model_name, object_id):
         content_type__id__exact=ContentType.objects.get_for_model(model).id).select_related().order_by('action_time')
     # If no history was found, see whether this object even exists.
     obj = get_object_or_404(model, pk=object_id)
-    return render_to_response('admin/object_history', {
+    extra_context = {
         'title': _('Change history: %s') % obj,
         'action_list': action_list,
         'module_name': capfirst(model._meta.verbose_name_plural),
         'object': obj,
-    }, context_instance=template.RequestContext(request))
+    }
+    return render_to_response(["admin/%s/%s/object_history" % (app_label, opts.object_name.lower() ),
+                               "admin/%s/object_history" % app_label ,
+                               "admin/object_history"], extra_context, context_instance=Context(request)) 
 history = staff_member_required(history)
 
 class ChangeList(object):
