@@ -176,7 +176,7 @@ class Model(object):
         connection.commit()
 
         # Run any post-save hooks.
-        dispatcher.send(signal=signals.pre_save, sender=self.__class__, instance=self)
+        dispatcher.send(signal=signals.post_save, sender=self.__class__, instance=self)
 
     save.alters_data = True
 
