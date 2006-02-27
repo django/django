@@ -54,7 +54,7 @@ API_TESTS = """
 >>> a2.publications.add(p3)
 
 # Add a Publication directly via publications.add by using keyword arguments.
->>> a2.publications.add(title='Highlights for Children')
+>>> new_publication = a2.publications.create(title='Highlights for Children')
 
 # Article objects have access to their related Publication objects.
 >>> a1.publications.all()
@@ -123,7 +123,7 @@ API_TESTS = """
 [Science News]
 
 # Adding via the other end using keywords
->>> p2.article_set.add(headline='Oxygen-free diet works wonders')
+>>> new_article = p2.article_set.create(headline='Oxygen-free diet works wonders')
 >>> p2.article_set.all()
 [NASA finds intelligent life on Earth, Oxygen-free diet works wonders]
 >>> a5 = p2.article_set.all()[1]

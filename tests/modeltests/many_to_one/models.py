@@ -48,15 +48,28 @@ John Smith
 ('John', 'Smith')
 
 # Create an Article via the Reporter object.
->>> new_article = r.article_set.add(headline="John's second story", pub_date=datetime(2005, 7, 29))
+>>> new_article = r.article_set.create(headline="John's second story", pub_date=datetime(2005, 7, 29))
 >>> new_article
 John's second story
 >>> new_article.reporter.id
 1
 
->>> new_article2 = r2.article_set.add(headline="Paul's story", pub_date=datetime(2006, 1, 17))
+# Create a new article, and add it to the article set.
+>>> new_article2 = Article(headline="Paul's story", pub_date=datetime(2006, 1, 17))
+>>> r.article_set.add(new_article2)
+>>> new_article2.reporter.id
+1
+>>> r.article_set.all()
+[This is a test, John's second story, Paul's story]
+
+# Add the same article to a different article set - check that it moves.
+>>> r2.article_set.add(new_article2)
 >>> new_article2.reporter.id
 2
+>>> r.article_set.all()
+[This is a test, John's second story]
+>>> r2.article_set.all()
+[Paul's story]
 
 # Reporter objects have access to their related Article objects.
 >>> r.article_set.order_by('pub_date')

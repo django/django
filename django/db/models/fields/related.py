@@ -97,15 +97,58 @@ class SingleRelatedObjectDescriptor(object):
                 raise self._field.rel.to.DoesNotExist
             other_field = self._field.rel.get_related_field()
             if other_field.rel:
-                params = {'%s__%s__exact' % (self._field.rel.field_name, other_field.rel.field_name): val}
+                params = {'%s__pk' % self._field.rel.field_name: val}
             else:
                 params = {'%s__exact' % self._field.rel.field_name: val}
             rel_obj = self._field.rel.to._default_manager.get(**params)
             setattr(instance, cache_name, rel_obj)
             return rel_obj
 
+class ForeignRelatedObjectsDescriptor(object):
+    # This class provides the functionality that makes the related-object
+    # managers available as attributes on a model class, for fields that have
+    # multiple "remote" values and have a ForeignKey pointed at them by
+    # some other model. In the example "poll.choice_set", the choice_set 
+    # attribute is a ForeignRelatedObjectsDescriptor instance.
+    def __init__(self, related):
+        self.related = related   # RelatedObject instance
+
+    def __get__(self, instance, instance_type=None):
+        if instance is None:
+            raise AttributeError, "Manager must be accessed via instance"
+
+        rel_field = self.related.field
+        rel_model = self.related.model
+
+        # Dynamically create a class that subclasses the related
+        # model's default manager.
+        superclass = self.related.model._default_manager.__class__
+
+        class RelatedManager(superclass):
+            def get_query_set(self):
+                return superclass.get_query_set(self).filter(**(self.core_filters))
+
+            def add(self, *objs):
+                for obj in objs:
+                    val = getattr(instance, rel_field.rel.get_related_field().attname)
+                    setattr(obj, rel_field.attname, val)
+                    obj.save()
+            add.alters_data = True
+
+            def create(self, **kwargs):
+                new_obj = self.model(**kwargs)
+                self.add(new_obj)
+                return new_obj
+            create.alters_data = True
+
+        manager = RelatedManager()
+        manager.core_filters = {'%s__pk' % rel_field.name: getattr(instance, rel_field.rel.get_related_field().attname)}
+        manager.model = self.related.model
+
+        return manager
+
 def _add_m2m_items(rel_manager_inst, managerclass, rel_model, join_table, source_col_name,
-        target_col_name, source_pk_val, *objs, **kwargs):
+        target_col_name, source_pk_val, *objs):
     # Utility function used by the ManyRelatedObjectsDescriptors
     # to do addition to a many-to-many field.
     # rel_manager_inst: the RelatedManager instance
@@ -115,19 +158,10 @@ def _add_m2m_items(rel_manager_inst, managerclass, rel_model, join_table, source
     # source_col_name: the PK colname in join_table for the source object
     # target_col_name: the PK colname in join_table for the target object
     # source_pk_val: the primary key for the source object
-    # *objs - objects to add, or **kwargs to create new objects
+    # *objs - objects to add
 
     from django.db import connection
     rel_opts = rel_model._meta
-    # Create the related object.
-    if kwargs:
-        assert len(objs) == 0, "add() can't be passed both positional and keyword arguments"
-        objs = [managerclass.add(rel_manager_inst, **kwargs)]
-    else:
-        assert len(objs) > 0, "add() must be passed either positional or keyword arguments"
-        for obj in objs:
-            if not isinstance(obj, rel_model):
-                raise ValueError, "positional arguments to add() must be %s instances" % rel_opts.object_name
 
     # Add the newly created or already existing objects to the join table.
     # First find out which items are already added, to avoid adding them twice
@@ -191,27 +225,24 @@ class ManyRelatedObjectsDescriptor(object):
     # managers available as attributes on a model class, for fields that have
     # multiple "remote" values and have a ManyToManyField pointed at them by
     # some other model (rather than having a ManyToManyField themselves).
-    # In the example "poll.choice_set", the choice_set attribute is a
+    # In the example "publication.article_set", the article_set attribute is a
     # ManyRelatedObjectsDescriptor instance.
-    def __init__(self, related, rel_type):
+    def __init__(self, related):
         self.related = related   # RelatedObject instance
-        self.rel_type = rel_type # Either 'o2m' or 'm2m'
 
     def __get__(self, instance, instance_type=None):
         if instance is None:
             raise AttributeError, "Manager must be accessed via instance"
 
         rel_field = self.related.field
-        rel_type = self.rel_type
         rel_model = self.related.model
 
-        if rel_type == "m2m":
-            qn = backend.quote_name
-            this_opts = instance.__class__._meta
-            rel_opts = rel_model._meta
-            join_table = qn(self.related.field.m2m_db_table())
-            source_col_name = qn(self.related.field.m2m_reverse_name())
-            target_col_name = qn(self.related.field.m2m_column_name())
+        qn = backend.quote_name
+        this_opts = instance.__class__._meta
+        rel_opts = rel_model._meta
+        join_table = qn(self.related.field.m2m_db_table())
+        source_col_name = qn(self.related.field.m2m_reverse_name())
+        target_col_name = qn(self.related.field.m2m_column_name())
 
         # Dynamically create a class that subclasses the related
         # model's default manager.
@@ -221,40 +252,29 @@ class ManyRelatedObjectsDescriptor(object):
             def get_query_set(self):
                 return superclass.get_query_set(self).filter(**(self.core_filters))
 
-            if rel_type == "o2m":
-                def add(self, **kwargs):
-                    kwargs.update({rel_field.name: instance})
-                    return superclass.add(self, **kwargs)
-            else:
-                def add(self, *objs, **kwargs):
-                    _add_m2m_items(self, superclass, rel_model, join_table, source_col_name,
-                        target_col_name, instance._get_pk_val(), *objs, **kwargs)
+            def add(self, *objs):
+                _add_m2m_items(self, superclass, rel_model, join_table, source_col_name,
+                    target_col_name, instance._get_pk_val(), *objs)
             add.alters_data = True
 
-            if rel_type == "o2m":
-                def remove(self, *objs):
-                    pass # TODO
-            else:
-                def remove(self, *objs):
-                    _remove_m2m_items(rel_model, join_table, source_col_name,
-                        target_col_name, instance._get_pk_val(), *objs)
+            def remove(self, *objs):
+                _remove_m2m_items(rel_model, join_table, source_col_name,
+                    target_col_name, instance._get_pk_val(), *objs)
             remove.alters_data = True
 
-            if rel_type == "o2m":
-                def clear(self):
-                    pass # TODO
-            else:
-                def clear(self):
-                    _clear_m2m_items(join_table, source_col_name, instance._get_pk_val())
+            def clear(self):
+                _clear_m2m_items(join_table, source_col_name, instance._get_pk_val())
             clear.alters_data = True
 
+            def create(self, **kwargs):
+                new_obj = self.model(**kwargs)
+                new_obj.save()
+                self.add(new_obj)
+                return new_obj
+            create.alters_data = True
+            
         manager = RelatedManager()
-
-        if self.rel_type == 'o2m':
-            manager.core_filters = {'%s__pk' % rel_field.name: getattr(instance, rel_field.rel.get_related_field().attname)}
-        else:
-            manager.core_filters = {'%s__pk' % rel_field.name: instance._get_pk_val()}
-
+        manager.core_filters = {'%s__pk' % rel_field.name: instance._get_pk_val()}
         manager.model = self.related.model
 
         return manager
@@ -264,7 +284,7 @@ class ReverseManyRelatedObjectsDescriptor(object):
     # managers available as attributes on a model class, for fields that have
     # multiple "remote" values and have a ManyToManyField defined in their
     # model (rather than having another model pointed *at* them).
-    # In the example "poll.sites", the sites attribute is a
+    # In the example "article.publications", the publications attribute is a
     # ReverseManyRelatedObjectsDescriptor instance.
     def __init__(self, m2m_field):
         self.field = m2m_field
@@ -290,26 +310,24 @@ class ReverseManyRelatedObjectsDescriptor(object):
             def get_query_set(self):
                 return superclass.get_query_set(self).filter(**(self.core_filters))
 
-            def add(self, *objs, **kwargs):
+            def add(self, *objs):
                 _add_m2m_items(self, superclass, rel_model, join_table, source_col_name,
-                    target_col_name, instance._get_pk_val(), *objs, **kwargs)
+                    target_col_name, instance._get_pk_val(), *objs)
 
                 # If this is a symmetrical m2m relation to self, add the mirror entry in the m2m table
                 if instance.__class__ == rel_model and symmetrical:
                     _add_m2m_items(self, superclass, rel_model, join_table, target_col_name,
-                        source_col_name, instance._get_pk_val(), *objs, **kwargs)                    
-
+                        source_col_name, instance._get_pk_val(), *objs)
             add.alters_data = True
 
             def remove(self, *objs):
                 _remove_m2m_items(rel_model, join_table, source_col_name,
                     target_col_name, instance._get_pk_val(), *objs)
-                    
+
                 # If this is a symmetrical m2m relation to self, remove the mirror entry in the m2m table
                 if instance.__class__ == rel_model and symmetrical:
                     _remove_m2m_items(rel_model, join_table, target_col_name,
-                        source_col_name, instance._get_pk_val(), *objs)
-                    
+                        source_col_name, instance._get_pk_val(), *objs)  
             remove.alters_data = True
 
             def clear(self):
@@ -318,13 +336,17 @@ class ReverseManyRelatedObjectsDescriptor(object):
                 # If this is a symmetrical m2m relation to self, clear the mirror entry in the m2m table                
                 if instance.__class__ == rel_model and symmetrical:
                     _clear_m2m_items(join_table, target_col_name, instance._get_pk_val())
-                
             clear.alters_data = True
 
+            def create(self, **kwargs):
+                new_obj = self.model(**kwargs)
+                new_obj.save()
+                self.add(new_obj)
+                return new_obj
+            create.alters_data = True
+
         manager = RelatedManager()
-        
         manager.core_filters = {'%s__pk' % self.field.related_query_name() : instance._get_pk_val()}
-        
         manager.model = rel_model
 
         return manager
@@ -416,7 +438,7 @@ class ForeignKey(RelatedField, Field):
         setattr(cls, self.name, SingleRelatedObjectDescriptor(self))
 
     def contribute_to_related_class(self, cls, related):
-        setattr(cls, related.get_accessor_name(), ManyRelatedObjectsDescriptor(related, 'o2m'))
+        setattr(cls, related.get_accessor_name(), ForeignRelatedObjectsDescriptor(related))
 
 class OneToOneField(RelatedField, IntegerField):
     def __init__(self, to, to_field=None, **kwargs):
@@ -557,7 +579,7 @@ class ManyToManyField(RelatedField, Field):
         # as it would be redundant - unless the field is non-symmetrical. 
         if related.model != related.parent_model or not self.rel.symmetrical:
             # Add the descriptor for the m2m relation
-            setattr(cls, related.get_accessor_name(), ManyRelatedObjectsDescriptor(related, 'm2m'))
+            setattr(cls, related.get_accessor_name(), ManyRelatedObjectsDescriptor(related))
             
         self.rel.singular = self.rel.singular or self.rel.to._meta.object_name.lower()
 

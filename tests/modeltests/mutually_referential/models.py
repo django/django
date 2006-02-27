@@ -20,8 +20,8 @@ API_TESTS = """
 >>> q.save()
 
 # Create some children
->>> c = q.child_set.add(name='Charles')
->>> e = q.child_set.add(name='Edward')
+>>> c = q.child_set.create(name='Charles')
+>>> e = q.child_set.create(name='Edward')
 
 # Set the best child
 >>> q.bestchild = c

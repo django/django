@@ -87,16 +87,6 @@ class Manager(object):
     def values(self, *args, **kwargs):
         return self.get_query_set().values(*args, **kwargs)
 
-    #################
-    # OTHER METHODS #
-    #################
-
-    def add(self, **kwargs):
-        new_obj = self.model(**kwargs)
-        new_obj.save()
-        return new_obj
-    add.alters_data = True
-
 class ManagerDescriptor(object):
     # This class ensures managers aren't accessible via model instances.
     # For example, Poll.objects works, but poll_obj.objects raises AttributeError.

@@ -39,7 +39,7 @@ John Smith
 >>> r = a.reporter
 
 # Create an Article via the Reporter object.
->>> a2 = r.article_set.add(headline="Second")
+>>> a2 = r.article_set.create(headline="Second")
 >>> a2
 Second
 >>> a2.reporter.id

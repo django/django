@@ -85,7 +85,7 @@ Demon Dogs the place
 Demon Dogs the place
 
 # Add a Waiter to the Restaurant.
->>> w = r.waiter_set.add(name='Joe')
+>>> w = r.waiter_set.create(name='Joe')
 >>> w.save()
 >>> w
 Joe the waiter at Demon Dogs the restaurant
