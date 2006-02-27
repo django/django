@@ -29,12 +29,20 @@ function showAddAnotherPopup(triggeringLink) {
 function dismissAddAnotherPopup(win, newId, newRepr) {
     var name = win.name.replace(/___/g, '.')
     var elem = document.getElementById(name);
-    if (elem.nodeName == 'SELECT') {
+    if (elem) {
+        if (elem.nodeName == 'SELECT') {
+            var o = new Option(newRepr, newId);
+            elem.options[elem.options.length] = o
+            elem.selectedIndex = elem.length - 1;
+        } else if (elem.nodeName == 'INPUT') {
+            elem.value = newId;
+        }
+    } else {
+        var toId = name + "_to";
+        elem = document.getElementById(toId);
         var o = new Option(newRepr, newId);
-        elem.options[elem.options.length] = o
-        elem.selectedIndex = elem.length - 1;
-    } else if (elem.nodeName == 'INPUT') {
-        elem.value = newId;
+        SelectBox.add_to_cache(toId, o);
+        SelectBox.redisplay(toId);
     }
     win.close();
 }
