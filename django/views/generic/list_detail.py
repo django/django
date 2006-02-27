@@ -95,18 +95,18 @@ def object_detail(request, queryset, object_id=None, slug=None,
     else:
         raise AttributeError, "Generic detail view must be called with either an object_id or a slug/slug_field."
     try:
-        object = queryset.get()
+        obj = queryset.get()
     except ObjectDoesNotExist:
         raise Http404, "No %s found matching the query" % (model._meta.verbose_name)
     if not template_name:
         template_name = "%s/%s_detail" % (model._meta.app_label, model._meta.object_name.lower())
     if template_name_field:
-        template_name_list = [getattr(object, template_name_field), template_name]
+        template_name_list = [getattr(obj, template_name_field), template_name]
         t = template_loader.select_template(template_name_list)
     else:
         t = template_loader.get_template(template_name)
     c = RequestContext(request, {
-        'object': object,
+        'object': obj,
     }, context_processors)
     for key, value in extra_context.items():
         if callable(value):
@@ -114,5 +114,5 @@ def object_detail(request, queryset, object_id=None, slug=None,
         else:
             c[key] = value
     response = HttpResponse(t.render(c))
-    populate_xheaders(request, response, model, getattr(object, object._meta.pk.name))
+    populate_xheaders(request, response, model, getattr(obj, obj._meta.pk.name))
     return response
