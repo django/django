@@ -185,6 +185,7 @@ def model_detail(request, model):
     return render_to_response('admin_doc/model_detail', {
         'name': '%s.%s' % (opts.app_label, opts.module_name),
         'summary': "Fields on %s objects" % opts.verbose_name,
+        'description' : model.__doc__,
         'fields': fields,
     }, context_instance=DjangoContext(request))
 model_detail = staff_member_required(model_detail)
