@@ -25,19 +25,12 @@ Internal attributes:
 		deletion, (considerably speeds up the cleanup process
 		vs. the original code.)
 """
-from __future__ import generators
 import types, weakref
 from django.dispatch import saferef, robustapply, errors
 
 __author__ = "Patrick K. O'Brien <pobrien@orbtech.com>"
 __cvsid__ = "$Id: dispatcher.py,v 1.8 2004/11/26 06:37:33 mcfletch Exp $"
 __version__ = "$Revision: 1.8 $"[11:-2]
-
-try:
-    True
-except NameError:
-    True = 1==1
-    False = 1==0
 
 class _Parameter:
 	"""Used to represent default parameter values."""
@@ -91,7 +84,7 @@ def connect(receiver, signal=Any, sender=Any, weak=True):
 		if weak is True, then receiver must be weak-referencable
 		(more precisely saferef.safeRef() must be able to create
 		a reference to the receiver).
-	
+
 		Receivers are fairly flexible in their specification,
 		as the machinery in the robustApply module takes care
 		of most of the details regarding figuring out appropriate
@@ -107,25 +100,25 @@ def connect(receiver, signal=Any, sender=Any, weak=True):
 			pre-weakrefed receiver references.
 
 	signal -- the signal to which the receiver should respond
-	
+
 		if Any, receiver will receive any signal from the
 		indicated sender (which might also be Any, but is not
 		necessarily Any).
-		
+
 		Otherwise must be a hashable Python object other than
 		None (DispatcherError raised on None).
-		
+
 	sender -- the sender to which the receiver should respond
-	
+
 		if Any, receiver will receive the indicated signals
 		from any sender.
-		
+
 		if Anonymous, receiver will only receive indicated
 		signals from send/sendExact which do not specify a
 		sender, or specify Anonymous explicitly as the sender.
 
 		Otherwise can be any python object.
-		
+
 	weak -- whether to use weak references to the receiver
 		By default, the module will attempt to use weak
 		references to the receiver objects.  If this parameter
@@ -156,7 +149,7 @@ def connect(receiver, signal=Any, sender=Any, weak=True):
 			senders[senderkey] = weakSender
 		except:
 			pass
-		
+
 	receiverID = id(receiver)
 	# get current set, remove any current references to
 	# this receiver in the set, including back-references
@@ -200,7 +193,7 @@ def disconnect(receiver, signal=Any, sender=Any, weak=True):
 		will remove routes for deleted objects
 		automatically.  It's only necessary to disconnect
 		if you want to stop routing to a live object.
-		
+
 	returns None, may raise DispatcherTypeError or
 		DispatcherKeyError
 	"""
@@ -305,11 +298,11 @@ def getAllReceivers( sender = Any, signal = Any ):
 
 def send(signal=Any, sender=Anonymous, *arguments, **named):
 	"""Send signal from sender to all connected receivers.
-	
+
 	signal -- (hashable) signal value, see connect for details
 
 	sender -- the sender of the signal
-	
+
 		if Any, only receivers registered for Any will receive
 		the message.
 
@@ -369,7 +362,7 @@ def sendExact( signal=Any, sender=Anonymous, *arguments, **named ):
 		)
 		responses.append((receiver, response))
 	return responses
-	
+
 
 def _removeReceiver(receiver):
 	"""Remove receiver from connections."""
@@ -395,7 +388,7 @@ def _removeReceiver(receiver):
 		del sendersBack[ backKey ]
 	except KeyError:
 		pass
-			
+
 def _cleanupConnections(senderkey, signal):
 	"""Delete any empty signals for senderkey. Delete senderkey if empty."""
 	try:
@@ -422,7 +415,7 @@ def _removeSender(senderkey):
 		del connections[senderkey]
 	except KeyError:
 		pass
-	# Senderkey will only be in senders dictionary if sender 
+	# Senderkey will only be in senders dictionary if sender
 	# could be weakly referenced.
 	try: del senders[senderkey]
 	except: pass
@@ -473,8 +466,8 @@ def _removeOldBackRefs(senderkey, signal, receiver, receivers):
 			_killBackref( oldReceiver, senderkey )
 			return True
 		return False
-		
-		
+
+
 def _killBackref( receiver, senderkey ):
 	"""Do the actual removal of back reference from receiver to senderkey"""
 	receiverkey = id(receiver)
