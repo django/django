@@ -28,7 +28,7 @@ class ModelBase(type):
 
         # Raise ImportError if this model isn't in INSTALLED_APPS.
         if re.sub('\.models$', '', mod) not in settings.INSTALLED_APPS:
-            raise ImportError, "INSTALLED_APPS must contain %r in order for you to use this model." % mod
+            raise ImportError, "INSTALLED_APPS must contain %r in order for you to use this model." % re.sub('\.models$', '', mod)
 
         # Create the class.
         new_class = type.__new__(cls, name, bases, {'__module__': mod})
