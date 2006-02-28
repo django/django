@@ -71,6 +71,22 @@ John's second story
 >>> r2.article_set.all()
 [Paul's story]
 
+# Assign the article to the reporter directly using the descriptor
+>>> new_article2.reporter = r
+>>> new_article2.save()
+>>> new_article2.reporter
+John Smith
+>>> new_article2.reporter.id
+1
+>>> r.article_set.all()
+[This is a test, John's second story, Paul's story]
+>>> r2.article_set.all()
+[]
+
+# Set the article back again.
+>>> new_article2.reporter = r2
+>>> new_article2.save()
+
 # Reporter cannot be null - there should not be a clear or remove method
 >>> hasattr(r2.article_set, 'remove')
 False

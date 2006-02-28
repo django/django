@@ -104,6 +104,17 @@ class SingleRelatedObjectDescriptor(object):
             setattr(instance, cache_name, rel_obj)
             return rel_obj
 
+    def __set__(self, instance, value):
+        # Set the value of the related field
+        if value:
+            val = getattr(value, self._field.rel.get_related_field().attname)
+        else:
+            val = None
+        setattr(instance, self._field.attname, val)
+            
+        # Set the cache to point to the new object
+        setattr(instance, self._field.get_cache_name(), value)
+        
 class ForeignRelatedObjectsDescriptor(object):
     # This class provides the functionality that makes the related-object
     # managers available as attributes on a model class, for fields that have
@@ -130,8 +141,7 @@ class ForeignRelatedObjectsDescriptor(object):
 
             def add(self, *objs):
                 for obj in objs:
-                    val = getattr(instance, rel_field.rel.get_related_field().attname)
-                    setattr(obj, rel_field.attname, val)
+                    setattr(obj, rel_field.name, instance)
                     obj.save()
             add.alters_data = True
 
@@ -146,8 +156,9 @@ class ForeignRelatedObjectsDescriptor(object):
                 def remove(self, *objs):
                     val = getattr(instance, rel_field.rel.get_related_field().attname)
                     for obj in objs:
+                        # Is obj actually part of this descriptor set? 
                         if getattr(obj, rel_field.attname) == val:
-                            setattr(obj, rel_field.attname, None)
+                            setattr(obj, rel_field.name, None)
                             obj.save()
                         else:
                             raise rel_field.rel.to.DoesNotExist, "'%s' is not related to '%s'." % (obj, instance)
@@ -155,7 +166,7 @@ class ForeignRelatedObjectsDescriptor(object):
                 
                 def clear(self):
                     for obj in self.all():
-                        setattr(obj, rel_field.attname, None)
+                        setattr(obj, rel_field.name, None)
                         obj.save()
                 add.alters_data = True
                     
