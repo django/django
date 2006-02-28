@@ -297,12 +297,11 @@ def get_sql_delete(app):
     app_label = app_models[0]._meta.app_label
 
     # Delete from django_package, auth_permission, django_content_type.
+    # TODO: fix this when permissions are activated again
+    # output.append("DELETE FROM %s WHERE %s = '%s';" % \
+    #     (backend.quote_name('auth_permission'), backend.quote_name('package'), app_label))
     output.append("DELETE FROM %s WHERE %s = '%s';" % \
-        (backend.quote_name('django_package'), backend.quote_name('label'), app_label))
-    output.append("DELETE FROM %s WHERE %s = '%s';" % \
-        (backend.quote_name('auth_permission'), backend.quote_name('package'), app_label))
-    output.append("DELETE FROM %s WHERE %s = '%s';" % \
-        (backend.quote_name('django_content_type'), backend.quote_name('package'), app_label))
+        (backend.quote_name('django_content_type'), backend.quote_name('app_label'), app_label))
 
     # Delete from the admin log.
     if cursor is not None:
