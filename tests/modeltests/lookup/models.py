@@ -177,5 +177,5 @@ Article 1
 >>> Article.objects.exclude(headline__startswith="Article_")
 [Article% with percent sign, Article 5, Article 6, Article 4, Article 2, Article 3, Article 7, Article 1]
 >>> Article.objects.exclude(headline="Article 7")
-[Article% with percent sign, Article_ with underscore, Article 5, Article 6, Article 4, Article 2, Article 3, Article 1]cl
+[Article% with percent sign, Article_ with underscore, Article 5, Article 6, Article 4, Article 2, Article 3, Article 1]
 """
