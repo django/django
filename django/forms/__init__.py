@@ -781,7 +781,7 @@ class DateField(TextField):
             time_tuple = time.strptime(data, '%Y-%m-%d')
             return datetime.date(*time_tuple[0:3])
         except (ValueError, TypeError):
-            return None
+            return data
     html2python = staticmethod(html2python)
 
 class TimeField(TextField):
