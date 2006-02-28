@@ -53,7 +53,7 @@ Demon Dogs the restaurant
 >>> p2.restaurant
 Traceback (most recent call last):
     ...
-DoesNotExist: Restaurant does not exist for {'place__id__exact': ...}
+DoesNotExist: Restaurant does not exist for {'place__pk': ...}
 
 # Restaurant.objects.all() just returns the Restaurants, not the Places.
 >>> Restaurant.objects.all()

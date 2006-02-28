@@ -73,4 +73,7 @@ class RelatedObject(object):
         # accessor descriptor that retrieves related many-to-one or
         # many-to-many objects. It uses the lower-cased object_name + "_set",
         # but this can be overridden with the "related_name" option.
-        return self.field.rel.related_name or (self.opts.object_name.lower() + '_set')
+        if self.field.rel.multiple:
+            return self.field.rel.related_name or (self.opts.object_name.lower() + '_set')
+        else:
+            return self.field.rel.related_name or (self.opts.object_name.lower())

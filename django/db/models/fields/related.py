@@ -79,41 +79,62 @@ class RelatedField(object):
 class SingleRelatedObjectDescriptor(object):
     # This class provides the functionality that makes the related-object
     # managers available as attributes on a model class, for fields that have
-    # a single "remote" value.
-    # In the example "choice.poll", the poll attribute is a
+    # a single "remote" value, on the class pointed to by a related field.
+    # In the example "place.restaurant", the restaurant attribute is a
     # SingleRelatedObjectDescriptor instance.
+    def __init__(self, related):
+        self.related = related
+
+    def __get__(self, instance, instance_type=None):
+        if instance is None:
+            raise AttributeError, "%s must be accessed via instance" % self.related.opts.object_name
+
+        params = {'%s__pk' % self.related.field.name: instance._get_pk_val()}        
+        rel_obj = self.related.model._default_manager.get(**params)
+        return rel_obj
+        
+    def __set__(self, instance, value):
+        # Set the value of the related field
+        setattr(value, self.related.field.attname, instance)
+            
+class ReverseSingleRelatedObjectDescriptor(object):
+    # This class provides the functionality that makes the related-object
+    # managers available as attributes on a model class, for fields that have
+    # a single "remote" value, on the class that defines the related field.
+    # In the example "choice.poll", the poll attribute is a
+    # ReverseSingleRelatedObjectDescriptor instance.
     def __init__(self, field_with_rel):
-        self._field = field_with_rel
+        self.field = field_with_rel
 
     def __get__(self, instance, instance_type=None):
         if instance is None:
             raise AttributeError, "%s must be accessed via instance" % self._field.name
-        cache_name = self._field.get_cache_name()
+        cache_name = self.field.get_cache_name()
         try:
             return getattr(instance, cache_name)
         except AttributeError:
-            val = getattr(instance, self._field.attname)
+            val = getattr(instance, self.field.attname)
             if val is None:
-                raise self._field.rel.to.DoesNotExist
-            other_field = self._field.rel.get_related_field()
+                raise self.field.rel.to.DoesNotExist
+            other_field = self.field.rel.get_related_field()
             if other_field.rel:
-                params = {'%s__pk' % self._field.rel.field_name: val}
+                params = {'%s__pk' % self.field.rel.field_name: val}
             else:
-                params = {'%s__exact' % self._field.rel.field_name: val}
-            rel_obj = self._field.rel.to._default_manager.get(**params)
+                params = {'%s__exact' % self.field.rel.field_name: val}
+            rel_obj = self.field.rel.to._default_manager.get(**params)
             setattr(instance, cache_name, rel_obj)
             return rel_obj
 
     def __set__(self, instance, value):
         # Set the value of the related field
         try:
-            val = getattr(value, self._field.rel.get_related_field().attname)
+            val = getattr(value, self.field.rel.get_related_field().attname)
         except AttributeError:
             val = None
-        setattr(instance, self._field.attname, val)
+        setattr(instance, self.field.attname, val)
             
         # Set the cache to point to the new object
-        setattr(instance, self._field.get_cache_name(), value)
+        setattr(instance, self.field.get_cache_name(), value)
         
 class ForeignRelatedObjectsDescriptor(object):
     # This class provides the functionality that makes the related-object
@@ -464,7 +485,7 @@ class ForeignKey(RelatedField, Field):
 
     def contribute_to_class(self, cls, name):
         super(ForeignKey, self).contribute_to_class(cls, name)
-        setattr(cls, self.name, SingleRelatedObjectDescriptor(self))
+        setattr(cls, self.name, ReverseSingleRelatedObjectDescriptor(self))
 
     def contribute_to_related_class(self, cls, related):
         setattr(cls, related.get_accessor_name(), ForeignRelatedObjectsDescriptor(related))
@@ -499,13 +520,13 @@ class OneToOneField(RelatedField, IntegerField):
 
     def get_validator_unique_lookup_type(self):
         return '%s__%s__exact' % (self.name, self.rel.get_related_field().name)
-
+        
     def contribute_to_class(self, cls, name):
         super(OneToOneField, self).contribute_to_class(cls, name)
-        setattr(cls, self.name, SingleRelatedObjectDescriptor(self))
+        setattr(cls, self.name, ReverseSingleRelatedObjectDescriptor(self))
 
     def contribute_to_related_class(self, cls, related):
-        setattr(cls, related.get_accessor_name(), SingleRelatedObjectDescriptor(self))
+        setattr(cls, related.get_accessor_name(), SingleRelatedObjectDescriptor(related))
         if not cls._meta.one_to_one_field:
            cls._meta.one_to_one_field = self
 
@@ -632,6 +653,7 @@ class ManyToOne:
         self.limit_choices_to = limit_choices_to or {}
         self.lookup_overrides = lookup_overrides or {}
         self.raw_id_admin = raw_id_admin
+        self.multiple = True
 
     def get_related_field(self):
         "Returns the Field in the 'to' object to which this relationship is tied."
@@ -647,7 +669,8 @@ class OneToOne(ManyToOne):
         self.limit_choices_to = limit_choices_to or {}
         self.lookup_overrides = lookup_overrides or {}
         self.raw_id_admin = raw_id_admin
-
+        self.multiple = False
+        
 class ManyToMany:
     def __init__(self, to, singular=None, related_name=None,
         filter_interface=None, limit_choices_to=None, raw_id_admin=False, symmetrical=True):
@@ -659,4 +682,6 @@ class ManyToMany:
         self.edit_inline = False
         self.raw_id_admin = raw_id_admin
         self.symmetrical = symmetrical
+        self.multiple = True
+
         assert not (self.raw_id_admin and self.filter_interface), "ManyToMany relationships may not use both raw_id_admin and filter_interface"
