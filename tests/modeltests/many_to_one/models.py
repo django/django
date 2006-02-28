@@ -71,6 +71,12 @@ John's second story
 >>> r2.article_set.all()
 [Paul's story]
 
+# Reporter cannot be null - there should not be a clear or remove method
+>>> hasattr(r2.article_set, 'remove')
+False
+>>> hasattr(r2.article_set, 'clear')
+False
+
 # Reporter objects have access to their related Article objects.
 >>> r.article_set.order_by('pub_date')
 [This is a test, John's second story]

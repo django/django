@@ -141,6 +141,24 @@ class ForeignRelatedObjectsDescriptor(object):
                 return new_obj
             create.alters_data = True
 
+            # remove() and clear() are only provided if the ForeignKey can have a value of null.
+            if rel_field.null:
+                def remove(self, *objs):
+                    val = getattr(instance, rel_field.rel.get_related_field().attname)
+                    for obj in objs:
+                        if getattr(obj, rel_field.attname) == val:
+                            setattr(obj, rel_field.attname, None)
+                            obj.save()
+                        else:
+                            raise rel_field.rel.to.DoesNotExist, "'%s' is not related to '%s'." % (obj, instance)
+                add.alters_data = True
+                
+                def clear(self):
+                    for obj in self.all():
+                        setattr(obj, rel_field.attname, None)
+                        obj.save()
+                add.alters_data = True
+                    
         manager = RelatedManager()
         manager.core_filters = {'%s__pk' % rel_field.name: getattr(instance, rel_field.rel.get_related_field().attname)}
         manager.model = self.related.model

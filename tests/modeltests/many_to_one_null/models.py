@@ -20,6 +20,9 @@ class Article(models.Model):
     def __repr__(self):
         return self.headline
 
+    class Meta:
+        ordering = ('headline',)
+        
 API_TESTS = """
 # Create a Reporter.
 >>> r = Reporter(name='John Smith')
@@ -79,4 +82,40 @@ DoesNotExist
 # To retrieve the articles with no reporters set, use "reporter__isnull=True".
 >>> Article.objects.filter(reporter__isnull=True)
 [Third]
+
+# Set the reporter for the Third article
+>>> r.article_set.add(a3)
+>>> r.article_set.all()
+[First, Second, Third]
+
+# Remove an article from the set, and check that it was removed.
+>>> r.article_set.remove(a3)
+>>> r.article_set.all()
+[First, Second]
+>>> Article.objects.filter(reporter__isnull=True)
+[Third]
+
+# Create another article and reporter
+>>> r2 = Reporter(name='Paul Jones')
+>>> r2.save()
+>>> a4 = r2.article_set.create(headline='Fourth')
+>>> r2.article_set.all()
+[Fourth]
+
+# Try to remove a4 from a set it does not belong to
+>>> r.article_set.remove(a4)
+Traceback (most recent call last):
+...
+DoesNotExist: 'Fourth' is not related to 'John Smith'.
+
+>>> r2.article_set.all()
+[Fourth]
+
+# Clear the rest of the set
+>>> r.article_set.clear()
+>>> r.article_set.all()
+[]
+>>> Article.objects.filter(reporter__isnull=True)
+[First, Second, Third]
+
 """
