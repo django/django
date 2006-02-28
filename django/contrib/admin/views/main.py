@@ -249,7 +249,7 @@ def add_stage(request, app_label, model_name, show_delete=False, form_url='', po
             # Here, we distinguish between different save types by checking for
             # the presence of keys in request.POST.
             if request.POST.has_key("_continue"):
-                request.user.message_set.add(message=msg + ' ' + _("You may edit it again below."))
+                request.user.message_set.create(message=msg + ' ' + _("You may edit it again below."))
                 if request.POST.has_key("_popup"):
                     post_url_continue += "?_popup=1"
                 return HttpResponseRedirect(post_url_continue % pk_value)
@@ -257,10 +257,10 @@ def add_stage(request, app_label, model_name, show_delete=False, form_url='', po
                 return HttpResponse('<script type="text/javascript">opener.dismissAddAnotherPopup(window, %s, "%s");</script>' % \
                     (pk_value, str(new_object).replace('"', '\\"')))
             elif request.POST.has_key("_addanother"):
-                request.user.message_set.add(message=msg + ' ' + (_("You may add another %s below.") % opts.verbose_name))
+                request.user.message_set.create(message=msg + ' ' + (_("You may add another %s below.") % opts.verbose_name))
                 return HttpResponseRedirect(request.path)
             else:
-                request.user.message_set.add(message=msg)
+                request.user.message_set.create(message=msg)
                 return HttpResponseRedirect(post_url)
     else:
         # Add default data.
@@ -333,19 +333,19 @@ def change_stage(request, app_label, model_name, object_id):
 
             msg = _('The %(name)s "%(obj)s" was changed successfully.') % {'name': opts.verbose_name, 'obj': new_object}
             if request.POST.has_key("_continue"):
-                request.user.message_set.add(message=msg + ' ' + _("You may edit it again below."))
+                request.user.message_set.create(message=msg + ' ' + _("You may edit it again below."))
                 if request.REQUEST.has_key('_popup'):
                     return HttpResponseRedirect(request.path + "?_popup=1")
                 else:
                     return HttpResponseRedirect(request.path)
             elif request.POST.has_key("_saveasnew"):
-                request.user.message_set.add(message=_('The %(name)s "%(obj)s" was added successfully. You may edit it again below.') % {'name': opts.verbose_name, 'obj': new_object})
+                request.user.message_set.create(message=_('The %(name)s "%(obj)s" was added successfully. You may edit it again below.') % {'name': opts.verbose_name, 'obj': new_object})
                 return HttpResponseRedirect("../%s/" % pk_value)
             elif request.POST.has_key("_addanother"):
-                request.user.message_set.add(message=msg + ' ' + (_("You may add another %s below.") % opts.verbose_name))
+                request.user.message_set.create(message=msg + ' ' + (_("You may add another %s below.") % opts.verbose_name))
                 return HttpResponseRedirect("../add/")
             else:
-                request.user.message_set.add(message=msg)
+                request.user.message_set.create(message=msg)
                 return HttpResponseRedirect("../")
     else:
         # Populate new_data with a "flattened" version of the current data.
@@ -493,7 +493,7 @@ def delete_stage(request, app_label, model_name, object_id):
         obj_display = str(obj)
         obj.delete()
         LogEntry.objects.log_action(request.user.id, ContentType.objects.get_for_model(model).id, object_id, obj_display, DELETION)
-        request.user.message_set.add(message=_('The %(name)s "%(obj)s" was deleted successfully.') % {'name': opts.verbose_name, 'obj': obj_display})
+        request.user.message_set.create(message=_('The %(name)s "%(obj)s" was deleted successfully.') % {'name': opts.verbose_name, 'obj': obj_display})
         return HttpResponseRedirect("../../")
     extra_context = {
         "title": _("Are you sure?"),
@@ -504,7 +504,7 @@ def delete_stage(request, app_label, model_name, object_id):
     }
     return render_to_response(["admin/%s/%s/delete_confirmation" % (app_label, opts.object_name.lower() ),
                                "admin/%s/delete_confirmation" % app_label ,
-                               "admin/delete_confirmation"], extra_context, context_instance=Context(request)) 
+                               "admin/delete_confirmation"], extra_context, context_instance=template.RequestContext(request))
 delete_stage = staff_member_required(delete_stage)
 
 def history(request, app_label, model_name, object_id):
@@ -522,9 +522,9 @@ def history(request, app_label, model_name, object_id):
         'module_name': capfirst(model._meta.verbose_name_plural),
         'object': obj,
     }
-    return render_to_response(["admin/%s/%s/object_history" % (app_label, opts.object_name.lower() ),
+    return render_to_response(["admin/%s/%s/object_history" % (app_label, model._meta.object_name.lower()),
                                "admin/%s/object_history" % app_label ,
-                               "admin/object_history"], extra_context, context_instance=Context(request)) 
+                               "admin/object_history"], extra_context, context_instance=template.RequestContext(request))
 history = staff_member_required(history)
 
 class ChangeList(object):
