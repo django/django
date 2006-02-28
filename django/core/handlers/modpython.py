@@ -98,6 +98,14 @@ class ModPythonRequest(http.HttpRequest):
             self._raw_post_data = self._req.read()
             return self._raw_post_data
 
+    def _get_user(self):
+        if not hasattr(self, '_user'):
+            self._user = self._user_source.get_user(self)
+        return self._user
+
+    def _set_user(self, value):
+        self._user = value
+
     GET = property(_get_get, _set_get)
     POST = property(_get_post, _set_post)
     COOKIES = property(_get_cookies, _set_cookies)
@@ -105,6 +113,7 @@ class ModPythonRequest(http.HttpRequest):
     META = property(_get_meta)
     REQUEST = property(_get_request)
     raw_post_data = property(_get_raw_post_data)
+    user = property(_get_user, _set_user)
 
 class ModPythonHandler(BaseHandler):
     def __call__(self, req):
