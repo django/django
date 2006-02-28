@@ -915,7 +915,10 @@ class USStateField(TextField):
             raise validators.CriticalValidationError, e.messages
 
     def html2python(data):
-        return data.upper() # Should always be stored in upper case
+        if data:
+            return data.upper() # Should always be stored in upper case
+        else:
+            return None
     html2python = staticmethod(html2python)
 
 class CommaSeparatedIntegerField(TextField):
