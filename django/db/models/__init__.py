@@ -35,3 +35,6 @@ class LazyDate:
 
     def __get_value__(self):
         return datetime.datetime.now() + self.delta
+
+    def __getattr__(self, attr):
+        return getattr(self.__get_value__(), attr)
