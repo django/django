@@ -106,9 +106,9 @@ class SingleRelatedObjectDescriptor(object):
 
     def __set__(self, instance, value):
         # Set the value of the related field
-        if value:
+        try:
             val = getattr(value, self._field.rel.get_related_field().attname)
-        else:
+        except AttributeError:
             val = None
         setattr(instance, self._field.attname, val)
             
