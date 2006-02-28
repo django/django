@@ -35,6 +35,12 @@ class ModelBase(type):
         new_class.add_to_class('_meta', Options(attrs.pop('Meta', None)))
         new_class.add_to_class('DoesNotExist', types.ClassType('DoesNotExist', (ObjectDoesNotExist,), {}))
 
+        # Build complete list of parents
+        for base in bases:
+            if '_meta' in dir(base):
+                new_class._meta.parents.append(base)
+                new_class._meta.parents.extend(base._meta.parents)
+
         model_module = sys.modules[new_class.__module__]
 
         if getattr(new_class._meta, 'app_label', None) is None:
@@ -45,6 +51,11 @@ class ModelBase(type):
         # Add all attributes to the class.
         for obj_name, obj in attrs.items():
             new_class.add_to_class(obj_name, obj)
+
+        # Add Fields inherited from parents
+        for parent in new_class._meta.parents:
+            for field in parent._meta.fields:
+                field.contribute_to_class(new_class, field.name)
 
         new_class._prepare()
 

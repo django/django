@@ -31,6 +31,7 @@ class Options:
         self.pk = None
         self.has_auto_field = False
         self.one_to_one_field = None
+        self.parents = []
 
     def merge_meta(self):
         meta_attrs = self.meta.__dict__
