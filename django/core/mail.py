@@ -47,9 +47,8 @@ def send_mass_mail(datatuple, fail_silently=False):
             server.sendmail(from_email, recipient_list, msg.as_string())
             num_sent += 1
         except:
-            if fail_silently:
-                return
-            raise
+            if not fail_silently:
+                raise
     try:
         server.quit()
     except:
