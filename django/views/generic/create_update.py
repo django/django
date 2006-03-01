@@ -73,7 +73,8 @@ def create_object(request, app_label, module_name, template_name=None,
 def update_object(request, app_label, module_name, object_id=None, slug=None,
         slug_field=None, template_name=None, template_loader=loader,
         extra_lookup_kwargs={}, extra_context={}, post_save_redirect=None,
-        login_required=False, follow=None, context_processors=None):
+        login_required=False, follow=None, context_processors=None,
+        template_object_name='object'):
     """
     Generic object-update function.
 
@@ -133,7 +134,7 @@ def update_object(request, app_label, module_name, object_id=None, slug=None,
     t = template_loader.get_template(template_name)
     c = DjangoContext(request, {
         'form': form,
-        'object': object,
+        template_object_name: object,
     }, context_processors)
     for key, value in extra_context.items():
         if callable(value):
@@ -147,7 +148,7 @@ def update_object(request, app_label, module_name, object_id=None, slug=None,
 def delete_object(request, app_label, module_name, post_delete_redirect,
         object_id=None, slug=None, slug_field=None, template_name=None,
         template_loader=loader, extra_lookup_kwargs={}, extra_context={},
-        login_required=False, context_processors=None):
+        login_required=False, context_processors=None, template_object_name='object'):
     """
     Generic object-delete function.
 
@@ -189,7 +190,7 @@ def delete_object(request, app_label, module_name, post_delete_redirect,
             template_name = "%s/%s_confirm_delete" % (app_label, module_name)
         t = template_loader.get_template(template_name)
         c = DjangoContext(request, {
-            'object': object,
+            template_object_name: object,
         }, context_processors)
         for key, value in extra_context.items():
             if callable(value):

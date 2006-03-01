@@ -89,7 +89,7 @@ def archive_year(request, year, app_label, module_name, date_field,
 def archive_month(request, year, month, app_label, module_name, date_field,
         month_format='%b', template_name=None, template_loader=loader,
         extra_lookup_kwargs={}, extra_context={}, allow_empty=False,
-        context_processors=None):
+        context_processors=None, template_object_name='object'):
     """
     Generic monthly archive view.
 
@@ -129,7 +129,7 @@ def archive_month(request, year, month, app_label, module_name, date_field,
         template_name = "%s/%s_archive_month" % (app_label, module_name)
     t = template_loader.get_template(template_name)
     c = DjangoContext(request, {
-        'object_list': object_list,
+        '%s_list' % template_object_name: object_list,
         'month': date,
         'next_month': (last_day < datetime.date.today()) and (last_day + datetime.timedelta(days=1)) or None,
         'previous_month': first_day - datetime.timedelta(days=1),
@@ -144,7 +144,7 @@ def archive_month(request, year, month, app_label, module_name, date_field,
 def archive_day(request, year, month, day, app_label, module_name, date_field,
         month_format='%b', day_format='%d', template_name=None,
         template_loader=loader, extra_lookup_kwargs={}, extra_context={},
-        allow_empty=False, context_processors=None):
+        allow_empty=False, context_processors=None, template_object_name='object'):
     """
     Generic daily archive view.
 
@@ -180,7 +180,7 @@ def archive_day(request, year, month, day, app_label, module_name, date_field,
         template_name = "%s/%s_archive_day" % (app_label, module_name)
     t = template_loader.get_template(template_name)
     c = DjangoContext(request, {
-        'object_list': object_list,
+        '%s_list' % template_object_name: object_list,
         'day': date,
         'previous_day': date - datetime.timedelta(days=1),
         'next_day': (date < datetime.date.today()) and (date + datetime.timedelta(days=1)) or None,
@@ -208,7 +208,7 @@ def object_detail(request, year, month, day, app_label, module_name, date_field,
         month_format='%b', day_format='%d', object_id=None, slug=None,
         slug_field=None, template_name=None, template_name_field=None,
         template_loader=loader, extra_lookup_kwargs={}, extra_context={},
-        context_processors=None):
+        context_processors=None, template_object_name='object'):
     """
     Generic detail view from year/month/day/slug or year/month/day/id structure.
 
@@ -249,7 +249,7 @@ def object_detail(request, year, month, day, app_label, module_name, date_field,
     else:
         t = template_loader.get_template(template_name)
     c = DjangoContext(request, {
-        'object': object,
+        template_object_name: object,
     }, context_processors)
     for key, value in extra_context.items():
         if callable(value):

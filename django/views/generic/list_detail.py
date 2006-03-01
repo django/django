@@ -8,7 +8,7 @@ from django.core.exceptions import Http404, ObjectDoesNotExist
 
 def object_list(request, app_label, module_name, paginate_by=None, allow_empty=False,
         template_name=None, template_loader=loader, extra_lookup_kwargs={},
-        extra_context={}, context_processors=None):
+        extra_context={}, context_processors=None, template_object_name='object'):
     """
     Generic list of objects.
 
@@ -49,7 +49,7 @@ def object_list(request, app_label, module_name, paginate_by=None, allow_empty=F
             else:
                 raise Http404
         c = DjangoContext(request, {
-            'object_list': object_list,
+            '%s_list' % template_object_name: object_list,
             'is_paginated': paginator.pages > 1,
             'results_per_page': paginate_by,
             'has_next': paginator.has_next_page(page - 1),
@@ -63,7 +63,7 @@ def object_list(request, app_label, module_name, paginate_by=None, allow_empty=F
     else:
         object_list = mod.get_list(**lookup_kwargs)
         c = DjangoContext(request, {
-            'object_list': object_list,
+            '%s_list' % template_object_name: object_list,
             'is_paginated': False
         }, context_processors)
         if len(object_list) == 0 and not allow_empty:
@@ -81,7 +81,7 @@ def object_list(request, app_label, module_name, paginate_by=None, allow_empty=F
 def object_detail(request, app_label, module_name, object_id=None, slug=None,
         slug_field=None, template_name=None, template_name_field=None,
         template_loader=loader, extra_lookup_kwargs={}, extra_context={},
-        context_processors=None):
+        context_processors=None, template_object_name='object'):
     """
     Generic list of objects.
 
@@ -111,7 +111,7 @@ def object_detail(request, app_label, module_name, object_id=None, slug=None,
     else:
         t = template_loader.get_template(template_name)
     c = DjangoContext(request, {
-        'object': object,
+        template_object_name: object,
     }, context_processors)
     for key, value in extra_context.items():
         if callable(value):
