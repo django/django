@@ -70,7 +70,7 @@ function findPosX(obj) {
     var curleft = 0;
     if (obj.offsetParent) {
         while (obj.offsetParent) {
-            curleft += obj.offsetLeft
+            curleft += obj.offsetLeft;
             obj = obj.offsetParent;
         }
     } else if (obj.x) {
@@ -83,7 +83,7 @@ function findPosY(obj) {
     var curtop = 0;
     if (obj.offsetParent) {
         while (obj.offsetParent) {
-            curtop += obj.offsetTop
+            curtop += obj.offsetTop;
             obj = obj.offsetParent;
         }
     } else if (obj.y) {
@@ -130,7 +130,7 @@ Date.prototype.getHourMinute = function() {
 // String object extensions
 // ----------------------------------------------------------------------------
 String.prototype.pad_left = function(pad_length, pad_string) {
-    new_string = this;
+    var new_string = this;
     for (var i = 0; new_string.length < pad_length; i++) {
         new_string = pad_string + new_string;
     }
