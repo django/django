@@ -127,6 +127,15 @@ Article 2
 >>> a2.get_previous_by_pub_date()
 Article 1
 
+# Every DateField and DateTimeField give their model module a get_FOO_list
+# function.
+>>> articles.get_pub_date_list('year')
+[datetime.datetime(2005, 1, 1, 0, 0)]
+>>> articles.get_pub_date_list('month')
+[datetime.datetime(2005, 7, 1, 0, 0), datetime.datetime(2005, 8, 1, 0, 0)]
+>>> articles.get_pub_date_list('day')
+[datetime.datetime(2005, 7, 26, 0, 0), datetime.datetime(2005, 7, 27, 0, 0), datetime.datetime(2005, 7, 28, 0, 0), datetime.datetime(2005, 8, 1, 0, 0)]
+
 # Underscores and percent signs have special meaning in the underlying
 # database library, but Django handles the quoting of them automatically.
 >>> a8 = articles.Article(headline='Article_ with underscore', pub_date=datetime(2005, 11, 20))
