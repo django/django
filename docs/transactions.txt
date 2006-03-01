@@ -105,8 +105,11 @@ Manual transaction management looks like::
     @transaction.commit_manually
     def viewfunc(request):
         ...
-        transaction.commit()
+        # You can commit/rollback however and whenever you want
+        transaction.commit()    
         ...
+        
+        # But you've got to remember to do it yourself!
         try:
             ...
         except:
