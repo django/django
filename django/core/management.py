@@ -660,10 +660,15 @@ def createsuperuser(username=None, email=None, password=None):
     "Creates a superuser account."
     from django.core import validators
     from django.contrib.auth.models import User
-    import getpass, pwd
+    import getpass
 
-    # Determine the current system user's username, to use as a default.
-    default_username = pwd.getpwuid(os.getuid())[0].replace(' ', '').lower()
+    try:
+        import pwd
+    except ImportError:
+        default_username = ''
+    else:
+        # Determine the current system user's username, to use as a default.
+        default_username = pwd.getpwuid(os.getuid())[0].replace(' ', '').lower()
 
     # Determine whether the default username is taken, so we don't display
     # it as an option.
