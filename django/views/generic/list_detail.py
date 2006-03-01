@@ -6,7 +6,7 @@ from django.core.exceptions import ObjectDoesNotExist
 
 def object_list(request, queryset, paginate_by=None, allow_empty=False,
         template_name=None, template_loader=loader,
-        extra_context={}, context_processors=None):
+        extra_context={}, context_processors=None, template_object_name='object'):
     """
     Generic list of objects.
 
@@ -47,7 +47,7 @@ def object_list(request, queryset, paginate_by=None, allow_empty=False,
             else:
                 raise Http404
         c = RequestContext(request, {
-            'object_list': object_list,
+            '%s_list' % template_object_name: object_list,
             'is_paginated': paginator.pages > 1,
             'results_per_page': paginate_by,
             'has_next': paginator.has_next_page(page - 1),
@@ -60,7 +60,7 @@ def object_list(request, queryset, paginate_by=None, allow_empty=False,
         }, context_processors)
     else:
         c = RequestContext(request, {
-            'object_list': queryset,
+            '%s_list' % template_object_name: queryset,
             'is_paginated': False
         }, context_processors)
         if not allow_empty and len(queryset) == 0:
@@ -78,7 +78,7 @@ def object_list(request, queryset, paginate_by=None, allow_empty=False,
 def object_detail(request, queryset, object_id=None, slug=None,
         slug_field=None, template_name=None, template_name_field=None,
         template_loader=loader, extra_context={},
-        context_processors=None):
+        context_processors=None, template_object_name='object'):
     """
     Generic list of objects.
 
@@ -106,7 +106,7 @@ def object_detail(request, queryset, object_id=None, slug=None,
     else:
         t = template_loader.get_template(template_name)
     c = RequestContext(request, {
-        'object': obj,
+        template_object_name: obj,
     }, context_processors)
     for key, value in extra_context.items():
         if callable(value):

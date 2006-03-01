@@ -9,8 +9,8 @@ from django.utils.text import capfirst
 from django.utils.translation import gettext_lazy, ngettext
 import datetime, os
 
-# Random entropy string used by "default" param.
-NOT_PROVIDED = 'oijpwojefiojpanv'
+class NOT_PROVIDED:
+    pass
 
 # Values for filter_interface.
 HORIZONTAL, VERTICAL = 1, 2
@@ -158,11 +158,11 @@ class Field(object):
 
     def has_default(self):
         "Returns a boolean of whether this field has a default value."
-        return self.default != NOT_PROVIDED
+        return self.default is not NOT_PROVIDED
 
     def get_default(self):
         "Returns the default value for this field."
-        if self.default != NOT_PROVIDED:
+        if self.default is not NOT_PROVIDED:
             if callable(self.default):
                 return self.default()
             return self.default
