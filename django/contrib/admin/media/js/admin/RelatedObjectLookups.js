@@ -3,11 +3,11 @@
 
 function showRelatedObjectLookupPopup(triggeringLink) {
     var name = triggeringLink.id.replace(/^lookup_/, '');
-    var href
+    var href;
     if (triggeringLink.href.search(/\?/) >= 0) {
         href = triggeringLink.href + '&pop=1';
     } else {
-        href = triggeringLink.href + '?pop=1'
+        href = triggeringLink.href + '?pop=1';
     }
     var win = window.open(href, name, 'height=500,width=740,resizable=yes,scrollbars=yes');
     win.focus();
@@ -33,12 +33,12 @@ function showAddAnotherPopup(triggeringLink) {
 }
 
 function dismissAddAnotherPopup(win, newId, newRepr) {
-    var name = win.name.replace(/___/g, '.')
+    var name = win.name.replace(/___/g, '.');
     var elem = document.getElementById(name);
     if (elem) {
         if (elem.nodeName == 'SELECT') {
             var o = new Option(newRepr, newId);
-            elem.options[elem.options.length] = o
+            elem.options[elem.options.length] = o;
             elem.selectedIndex = elem.length - 1;
         } else if (elem.nodeName == 'INPUT') {
             elem.value = newId;

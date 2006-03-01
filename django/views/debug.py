@@ -255,6 +255,7 @@ TECHNICAL_500_TEMPLATE = """
       hideAll(getElementsByClassName(document, 'table', 'vars'));
       hideAll(getElementsByClassName(document, 'ol', 'pre-context'));
       hideAll(getElementsByClassName(document, 'ol', 'post-context'));
+      hideAll(getElementsByClassName(document, 'div', 'pastebin'));
     }
     function toggle() {
       for (var i = 0; i < arguments.length; i++) {
@@ -271,6 +272,13 @@ TECHNICAL_500_TEMPLATE = """
       var uarr = String.fromCharCode(0x25b6);
       var darr = String.fromCharCode(0x25bc);
       s.innerHTML = s.innerHTML == uarr ? darr : uarr;
+      return false;
+    }
+    function switchPastebinFriendly(link) {
+      s1 = "Switch to copy-and-paste view";
+      s2 = "Switch back to interactive view";
+      link.innerHTML = link.innerHTML == s1 ? s2 : s1;
+      toggle('browserTraceback', 'pastebinTraceback');
       return false;
     }
     //-->
@@ -341,47 +349,71 @@ TECHNICAL_500_TEMPLATE = """
 {% endif %}
 <div id="traceback">
   <h2>Traceback <span>(innermost last)</span></h2>
-  <ul class="traceback">
-    {% for frame in frames %}
-      <li class="frame">
-        <code>{{ frame.filename }}</code> in <code>{{ frame.function }}</code>
+  <div class="commands"><a href="#" onclick="return switchPastebinFriendly(this);">Switch to copy-and-paste view</a></div>
+  <br/>
+  <div id="browserTraceback">
+    <ul class="traceback">
+      {% for frame in frames %}
+        <li class="frame">
+          <code>{{ frame.filename }}</code> in <code>{{ frame.function }}</code>
 
-        {% if frame.context_line %}
-          <div class="context" id="c{{ frame.id }}">
-            {% if frame.pre_context %}
-              <ol start="{{ frame.pre_context_lineno|add:"1" }}" class="pre-context" id="pre{{ frame.id }}">{% for line in frame.pre_context %}<li onclick="toggle('pre{{ frame.id }}', 'post{{ frame.id }}')">{{ line|escape }}</li>{% endfor %}</ol>
-            {% endif %}
-            <ol start="{{ frame.lineno|add:"1" }}" class="context-line"><li onclick="toggle('pre{{ frame.id }}', 'post{{ frame.id }}')">{{ frame.context_line|escape }} <span>...</span></li></ol>
-            {% if frame.post_context %}
-              <ol start='{{ frame.lineno|add:"2" }}' class="post-context" id="post{{ frame.id }}">{% for line in frame.post_context %}<li onclick="toggle('pre{{ frame.id }}', 'post{{ frame.id }}')">{{ line|escape }}</li>{% endfor %}</ol>
-            {% endif %}
-          </div>
-        {% endif %}
+          {% if frame.context_line %}
+            <div class="context" id="c{{ frame.id }}">
+              {% if frame.pre_context %}
+                <ol start="{{ frame.pre_context_lineno|add:"1" }}" class="pre-context" id="pre{{ frame.id }}">{% for line in frame.pre_context %}<li onclick="toggle('pre{{ frame.id }}', 'post{{ frame.id }}')">{{ line|escape }}</li>{% endfor %}</ol>
+              {% endif %}
+              <ol start="{{ frame.lineno|add:"1" }}" class="context-line"><li onclick="toggle('pre{{ frame.id }}', 'post{{ frame.id }}')">{{ frame.context_line|escape }} <span>...</span></li></ol>
+              {% if frame.post_context %}
+                <ol start='{{ frame.lineno|add:"2" }}' class="post-context" id="post{{ frame.id }}">{% for line in frame.post_context %}<li onclick="toggle('pre{{ frame.id }}', 'post{{ frame.id }}')">{{ line|escape }}</li>{% endfor %}</ol>
+              {% endif %}
+            </div>
+          {% endif %}
 
-        {% if frame.vars %}
-          <div class="commands">
-              <a href="#" onclick="return varToggle(this, '{{ frame.id }}')"><span>&#x25b6;</span> Local vars</a>
-          </div>
-          <table class="vars" id="v{{ frame.id }}">
-            <thead>
-              <tr>
-                <th>Variable</th>
-                <th>Value</th>
-              </tr>
-            </thead>
-            <tbody>
-              {% for var in frame.vars|dictsort:"0" %}
+          {% if frame.vars %}
+            <div class="commands">
+                <a href="#" onclick="return varToggle(this, '{{ frame.id }}')"><span>&#x25b6;</span> Local vars</a>
+            </div>
+            <table class="vars" id="v{{ frame.id }}">
+              <thead>
                 <tr>
-                  <td>{{ var.0 }}</td>
-                  <td class="code"><div>{{ var.1|pprint|escape }}</div></td>
+                  <th>Variable</th>
+                  <th>Value</th>
                 </tr>
-              {% endfor %}
-            </tbody>
-          </table>
-        {% endif %}
-      </li>
-    {% endfor %}
-  </ul>
+              </thead>
+              <tbody>
+                {% for var in frame.vars|dictsort:"0" %}
+                  <tr>
+                    <td>{{ var.0 }}</td>
+                    <td class="code"><div>{{ var.1|pprint|escape }}</div></td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          {% endif %}
+        </li>
+      {% endfor %}
+    </ul>
+  </div>
+  <div id="pastebinTraceback" class="pastebin">
+    <table>
+      <tbody>
+        <tr>
+          <td>
+            <code>
+Traceback (most recent call last):<br/>
+{% for frame in frames %}
+  File "{{ frame.filename }}" in {{ frame.function }}<br/>
+  {% if frame.context_line %}
+    &nbsp;&nbsp;{{ frame.lineno|add:"1" }}. {{ frame.context_line|escape }}<br/>
+  {% endif %}
+{% endfor %}<br/>
+&nbsp;&nbsp;{{ exception_type }} at {{ request.path }}<br/>
+&nbsp;&nbsp;{{ exception_value|escape }}</code>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
 </div>
 
 <div id="requestinfo">

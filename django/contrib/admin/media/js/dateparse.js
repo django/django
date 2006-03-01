@@ -4,24 +4,30 @@
 */
 
 /* Finds the index of the first occurence of item in the array, or -1 if not found */
-Array.prototype.indexOf = function(item) {
-    for (var i = 0; i < this.length; i++) {
-        if (this[i] == item) {
-            return i;
+if (typeof Array.prototype.indexOf == 'undefined') {
+    Array.prototype.indexOf = function(item) {
+        var len = this.length;
+        for (var i = 0; i < len; i++) {
+            if (this[i] == item) {
+                return i;
+            }
         }
-    }
-    return -1;
-};
+        return -1;
+    };
+}
 /* Returns an array of items judged 'true' by the passed in test function */
-Array.prototype.filter = function(test) {
-    var matches = [];
-    for (var i = 0; i < this.length; i++) {
-        if (test(this[i])) {
-            matches[matches.length] = this[i];
+if (typeof Array.prototype.filter == 'undefined') {
+    Array.prototype.filter = function(test) {
+        var matches = [];
+        var len = this.length;
+        for (var i = 0; i < len; i++) {
+            if (test(this[i])) {
+                matches[matches.length] = this[i];
+            }
         }
-    }
-    return matches;
-};
+        return matches;
+    };
+}
 
 var monthNames = gettext("January February March April May June July August September October November December").split(" ");
 var weekdayNames = gettext("Sunday Monday Tuesday Wednesday Thursday Friday Saturday").split(" ");
