@@ -106,6 +106,9 @@ def get_date_trunc_sql(lookup_type, field_name):
     # http://dev.mysql.com/doc/mysql/en/date-and-time-functions.html
     # MySQL doesn't support DATE_TRUNC, so we fake it by subtracting intervals.
     # If you know of a better way to do this, please file a Django ticket.
+    # Note that we can't use DATE_FORMAT directly because that causes the output
+    # to be a string rather than a datetime object, and we need MySQL to return
+    # a date so that it's typecasted properly into a Python datetime object.
     subtractions = ["interval (DATE_FORMAT(%s, '%%%%s')) second - interval (DATE_FORMAT(%s, '%%%%i')) minute - interval (DATE_FORMAT(%s, '%%%%H')) hour" % (field_name, field_name, field_name)]
     if lookup_type in ('year', 'month'):
         subtractions.append(" - interval (DATE_FORMAT(%s, '%%%%e')-1) day" % field_name)
