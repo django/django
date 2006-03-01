@@ -37,10 +37,10 @@ class DatabaseWrapper:
             return util.CursorDebugWrapper(cursor, self)
         return cursor
 
-    def commit(self):
+    def _commit(self):
         return self.connection.commit()
 
-    def rollback(self):
+    def _rollback(self):
         if self.connection:
             return self.connection.rollback()
 

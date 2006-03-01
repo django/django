@@ -1,7 +1,7 @@
 "Database cache backend."
 
 from django.core.cache.backends.base import BaseCache
-from django.db import connection
+from django.db import connection, transaction
 import base64, time
 from datetime import datetime
 try:
@@ -33,7 +33,7 @@ class CacheClass(BaseCache):
         now = datetime.now()
         if row[2] < now:
             cursor.execute("DELETE FROM %s WHERE cache_key = %%s" % self._table, [key])
-            connection.commit()
+            transaction.commit_unless_managed()
             return default
         return pickle.loads(base64.decodestring(row[1]))
 
@@ -58,12 +58,12 @@ class CacheClass(BaseCache):
             # To be threadsafe, updates/inserts are allowed to fail silently
             pass
         else:
-            connection.commit()
+            transaction.commit_unless_managed()
 
     def delete(self, key):
         cursor = connection.cursor()
         cursor.execute("DELETE FROM %s WHERE cache_key = %%s" % self._table, [key])
-        connection.commit()
+        transaction.commit_unless_managed()
 
     def has_key(self, key):
         cursor = connection.cursor()

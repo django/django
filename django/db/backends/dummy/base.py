@@ -17,8 +17,8 @@ class DatabaseError(Exception):
 
 class DatabaseWrapper:
     cursor = complain
-    commit = complain
-    rollback = complain
+    _commit = complain
+    _rollback = complain
 
     def close(self):
         pass # close()

@@ -1,0 +1,138 @@
+==============================
+Managing database transactions
+==============================
+
+Django gives you a few ways to control how database transactions are managed.
+
+Django's default transaction behavior
+=====================================
+
+The default behavior of Django is to commit on special model functions. If you
+call ``model.save()`` or ``model.delete()``, that change will be committed immediately. 
+
+This is much like the auto-commit setting for most databases: as soon as you
+perform an action that needs to write to the database, Django produces the
+insert/update/delete statements and then does the commit. There is no implicit
+rollback in Django.
+
+Tying transactions to HTTP requests
+===================================
+
+A useful way to handle transactions is to tie them to the request and response
+phases. 
+
+When a request starts, you start a transaction. If the response is produced
+without problems, any transactions are committed. If the view function produces
+and exception, a rollback happens. This is one of the more intuitive ways to
+handle transactions. To activate this feature, just add the
+``TransactionMiddleware`` middleware to your stack::
+
+    MIDDLEWARE_CLASSES = (
+        "django.middleware.common.CommonMiddleware",
+        "django.middleware.sessions.SessionMiddleware",
+        "django.middleware.cache.CacheMiddleware",
+        "django.middleware.transaction.TransactionMiddleware",
+    )
+
+The order is quite important: the transaction middleware will be relevant not
+only for the view functions called, but for all middleware modules that come
+after it. So if you use the session middleware after the transaction middleware,
+session creation will be part of the transaction.
+
+The cache middleware isn't affected as it uses it's own database cursor (that is
+mapped to it's own database connection internally) and only the database based
+cache is affected.
+
+Controlling transaction management in views
+===========================================
+
+For many people, implicit request-based transactions will work wonderfully. 
+However, if you need to control the way that transactions are managed, 
+there are a set of decorators that you can apply to a function to change
+the way transactions are handled.
+
+.. note::
+
+    Although the examples below use view functions as examples, these
+    decorators can be applied to non-view functions as well.
+
+``autocommit``
+--------------
+
+You can use the ``autocommit`` decorator to switch a view function to the
+default commit behavior of Django, regardless of the global setting. Just use
+the decorator like this::
+
+    from django.db.transaction import autocommit
+ 
+    @transaction.autocommit
+    def viewfunc(request):
+        ....
+
+Within ``viewfunc`` transactions will be comitted as soon as you call
+``model.save()``, ``model.delete()``, or any similar function that writes to the
+database.
+
+``commit_on_success``
+---------------------
+
+You can use the ``commit_on_success`` decorator to use a single transaction for 
+all the work done in a function::
+
+    from django.db.transaction import commit_on_success
+
+    @commit_on_success
+    def viewfunc(request):
+        ....
+
+If the function returns successfully then all work done will be committed. If an
+exception is raised beyond the function, however, the transaction will be rolled
+back.
+
+``commit_manually``
+-------------------
+
+Sometimes you need full control over your transactions. In that case, you can use the
+``commit_manually`` decorator which will make you run your own transaction management.
+
+If you don't commit or rollback and did change data (so that the current transaction
+is marked as dirty), you will get a ``TransactionManagementError`` exception saying so. 
+
+Manual transaction management looks like::
+
+    from django.db import transaction
+
+    @transaction.commit_manually
+    def viewfunc(request):
+        ...
+        transaction.commit()
+        ...
+        try:
+            ...
+        except:
+            transaction.rollback()
+        else:
+            transaction.commit()
+
+..admonition:: An important note to users of earlier django releases: 
+    
+    The database ``connection.commit`` and ``connection.rollback`` functions
+    (also called ``db.commit`` and ``db.rollback`` in 0.91 and earlier), no
+    longer exist and have been replaced by the ``transaction.commit`` and
+    ``transaction.rollback`` commands.
+
+How to globally deactivate transaction management
+=================================================
+
+Control freaks can totally disable all transaction management by setting
+``DISABLE_TRANSACTION_MANAGEMENT`` to ``True`` in your settings file.
+
+If you do this, there will be no management whatsoever. The middleware will no
+longer implicitly commit transactions, and you'll need to roll management
+yourself. This even will require you to commit changes done by middleware
+somewhere else.
+
+Thus, this is best used in situations where you want to run your own transaction
+controlling middleware or do something really strange. In almost all situations
+you'll be better off using the default behavior or the transaction middleware
+and only modify selected functions as needed.

@@ -71,10 +71,10 @@ class DatabaseWrapper:
             return util.CursorDebugWrapper(MysqlDebugWrapper(cursor), self)
         return cursor
 
-    def commit(self):
+    def _commit(self):
         self.connection.commit()
 
-    def rollback(self):
+    def _rollback(self):
         if self.connection:
             try:
                 self.connection.rollback()

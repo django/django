@@ -194,6 +194,10 @@ TIME_FORMAT = 'P'
 # http://psyco.sourceforge.net/
 ENABLE_PSYCO = False
 
+# Do you want to manage transactions manually?
+# Hint: you really don't!
+TRANSACTIONS_MANAGED = False
+
 ##############
 # MIDDLEWARE #
 ##############

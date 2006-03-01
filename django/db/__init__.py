@@ -38,4 +38,7 @@ dispatcher.connect(reset_queries, signal=signals.request_started)
 
 # Register an event that rolls back the connection
 # when a Django request has an exception.
-dispatcher.connect(lambda: connection.rollback(), signal=signals.got_request_exception)
+def _rollback_on_exception():
+    from django.db import transaction
+    transaction.rollback_unless_managed()
+dispatcher.connect(_rollback_on_exception, signal=signals.got_request_exception)

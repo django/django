@@ -218,7 +218,7 @@ get_sql_create.args = APP_ARGS
 
 def get_sql_delete(app):
     "Returns a list of the DROP TABLE SQL statements for the given app."
-    from django.db import backend, connection, models
+    from django.db import backend, connection, models, transaction
 
     try:
         cursor = connection.cursor()
@@ -233,7 +233,7 @@ def get_sql_delete(app):
             cursor.execute("SELECT 1 FROM %s LIMIT 1" % backend.quote_name('django_admin_log'))
     except:
         # The table doesn't exist, so it doesn't need to be dropped.
-        connection.rollback()
+        transaction.rollback_unless_managed()
         admin_log_exists = False
     else:
         admin_log_exists = True
@@ -252,7 +252,7 @@ def get_sql_delete(app):
                 cursor.execute("SELECT 1 FROM %s LIMIT 1" % backend.quote_name(klass._meta.db_table))
         except:
             # The table doesn't exist, so it doesn't need to be dropped.
-            connection.rollback()
+            transaction.rollback_unless_managed()
         else:
             opts = klass._meta
             for f in opts.fields:
@@ -268,7 +268,7 @@ def get_sql_delete(app):
                  cursor.execute("SELECT 1 FROM %s LIMIT 1" % backend.quote_name(klass._meta.db_table))
          except:
              # The table doesn't exist, so it doesn't need to be dropped.
-             connection.rollback()
+             transaction.rollback_unless_managed()
          else:
              output.append("DROP TABLE %s;" % backend.quote_name(klass._meta.db_table))
              if backend.supports_constraints and references_to_delete.has_key(klass):
@@ -290,7 +290,7 @@ def get_sql_delete(app):
                 if cursor is not None:
                     cursor.execute("SELECT 1 FROM %s LIMIT 1" % backend.quote_name(f.m2m_db_table()))
             except:
-                connection.rollback()
+                transaction.rollback_unless_managed()
             else:
                 output.append("DROP TABLE %s;" % backend.quote_name(f.m2m_db_table()))
 
@@ -403,7 +403,7 @@ get_sql_all.args = APP_ARGS
 # TODO: Check for model validation errors before executing SQL
 def syncdb():
     "Creates the database tables for all apps in INSTALLED_APPS whose tables haven't already been created."
-    from django.db import backend, connection, models, get_creation_module, get_introspection_module
+    from django.db import backend, connection, transaction, models, get_creation_module, get_introspection_module
     introspection_module = get_introspection_module()
     data_types = get_creation_module().DATA_TYPES
 
@@ -470,7 +470,7 @@ def syncdb():
                 backend.quote_name(r_col), backend.quote_name(table), backend.quote_name(col))
             cursor.execute(sql)
 
-    connection.commit()
+    transaction.commit_unless_managed()
 syncdb.args = ''
 
 def get_admin_index(app):
@@ -499,7 +499,7 @@ get_admin_index.args = APP_ARGS
 
 def install(app):
     "Executes the equivalent of 'get_sql_all' in the current database."
-    from django.db import connection
+    from django.db import connection, transaction
     from cStringIO import StringIO
     app_name = app.__name__[app.__name__.rindex('.')+1:]
     app_label = app_name.split('.')[-1]
@@ -526,15 +526,15 @@ def install(app):
 Hint: Look at the output of 'django-admin.py sqlall %s'. That's the SQL this command wasn't able to run.
 The full error: %s\n""" % \
             (app_name, app_label, e))
-        connection.rollback()
+        transaction.rollback_unless_managed()
         sys.exit(1)
-    connection.commit()
+    transaction.commit_unless_managed()
 install.help_doc = "Executes ``sqlall`` for the given app(s) in the current database."
 install.args = APP_ARGS
 
 def reset(app):
     "Executes the equivalent of 'get_sql_reset' in the current database."
-    from django.db import connection
+    from django.db import connection, transaction
     from cStringIO import StringIO
     app_name = app.__name__[app.__name__.rindex('.')+1:]
     app_label = app_name.split('.')[-1]
@@ -568,9 +568,9 @@ Type 'yes' to continue, or 'no' to cancel: """)
 Hint: Look at the output of 'django-admin.py sqlreset %s'. That's the SQL this command wasn't able to run.
 The full error: %s\n""" % \
                 (app_name, app_label, e))
-            connection.rollback()
+            transaction.rollback_unless_managed()
             sys.exit(1)
-        connection.commit()
+        transaction.commit_unless_managed()
     else:
         print "Reset cancelled."
 reset.help_doc = "Executes ``sqlreset`` for the given app(s) in the current database."
@@ -1035,7 +1035,7 @@ runserver.args = '[optional port number, or ipaddr:port]'
 
 def createcachetable(tablename):
     "Creates the table needed to use the SQL cache backend"
-    from django.db import backend, get_creation_module, models
+    from django.db import backend, connection, transaction, get_creation_module, models
     data_types = get_creation_module().DATA_TYPES
     fields = (
         # "key" is a reserved word in MySQL, so use "cache_key" instead.
@@ -1066,7 +1066,7 @@ def createcachetable(tablename):
     curs.execute("\n".join(full_statement))
     for statement in index_output:
         curs.execute(statement)
-    connection.commit()
+    transaction.commit_unless_managed()
 createcachetable.args = "[tablename]"
 
 def run_shell(use_plain=False):

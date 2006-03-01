@@ -5,7 +5,7 @@ from django.db.models.fields.related import OneToOne, ManyToOne
 from django.db.models.related import RelatedObject
 from django.db.models.query import orderlist2sql, delete_objects
 from django.db.models.options import Options, AdminOptions
-from django.db import connection, backend
+from django.db import connection, backend, transaction
 from django.db.models import signals
 from django.db.models.loading import register_models
 from django.dispatch import dispatcher
@@ -184,7 +184,7 @@ class Model(object):
                 ','.join(placeholders)), db_values)
             if self._meta.has_auto_field and not pk_set:
                 setattr(self, self._meta.pk.attname, backend.get_last_insert_id(cursor, self._meta.db_table, self._meta.pk.column))
-        connection.commit()
+        transaction.commit_unless_managed()
 
         # Run any post-save hooks.
         dispatcher.send(signal=signals.post_save, sender=self.__class__, instance=self)
@@ -340,7 +340,7 @@ class Model(object):
             backend.quote_name(rel_field.m2m_column_name()),
             backend.quote_name(rel_field.m2m_reverse_name()))
         cursor.executemany(sql, [(this_id, i) for i in id_list])
-        connection.commit()
+        transaction.commit_unless_managed()
 
 ############################################
 # HELPER FUNCTIONS (CURRIED MODEL METHODS) #
@@ -357,7 +357,7 @@ def method_set_order(ordered_obj, self, id_list):
         backend.quote_name(ordered_obj.pk.column))
     rel_val = getattr(self, ordered_obj.order_with_respect_to.rel.field_name)
     cursor.executemany(sql, [(i, rel_val, j) for i, j in enumerate(id_list)])
-    connection.commit()
+    transaction.commit_unless_managed()
 
 def method_get_order(ordered_obj, self):
     cursor = connection.cursor()

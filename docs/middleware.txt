@@ -102,6 +102,23 @@ Enables session support. See the `session documentation`_.
 
 .. _`session documentation`: http://www.djangoproject.com/documentation/sessions/
 
+django.middleware.transaction.TransactionMiddleware
+---------------------------------------------------
+
+Binds commit and rollback to the request/response phase. If a view function runs
+successfully, a commit is done. If it fails with an exception, a rollback is
+done.
+
+The order of this middleware in the stack is important: middleware modules
+running outside of it run with commit-on-save - the default Django behavior.
+Middleware modules running inside it (coming later in the stack) will be under
+the same transaction control as the view functions.
+
+See the `transaction management documentation`_.
+
+.. _`transaction management documentation`: http://www.djangoproject.com/documentation/transaction/
+
+
 Writing your own middleware
 ===========================
 

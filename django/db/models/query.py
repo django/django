@@ -1,4 +1,4 @@
-from django.db import backend, connection
+from django.db import backend, connection, transaction
 from django.db.models.fields import DateField, FieldDoesNotExist
 from django.db.models import signals
 from django.dispatch import dispatcher
@@ -846,4 +846,4 @@ def delete_objects(seen_objs):
             setattr(instance, cls._meta.pk.attname, None)
             dispatcher.send(signal=signals.post_delete, sender=cls, instance=instance)
 
-    connection.commit()
+    transaction.commit_unless_managed()

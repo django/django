@@ -39,13 +39,13 @@ class DjangoDoctestRunner(doctest.DocTestRunner):
             "Code: %r\nLine: %s\nExpected: %r\nGot: %r" % (example.source.strip(), example.lineno, example.want, got))
 
     def report_unexpected_exception(self, out, test, example, exc_info):
-        from django.db import connection
+        from django.db import transaction
         tb = ''.join(traceback.format_exception(*exc_info)[1:])
         log_error(test.name, "API test raised an exception",
             "Code: %r\nLine: %s\nException: %s" % (example.source.strip(), example.lineno, tb))
         # Rollback, in case of database errors. Otherwise they'd have
         # side effects on other tests.
-        connection.rollback()
+        transaction.rollback_unless_managed()
 
 normalize_long_ints = lambda s: re.sub(r'(?<![\w])(\d+)L(?![\w])', '\\1', s)
 

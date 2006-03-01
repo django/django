@@ -39,10 +39,10 @@ class DatabaseWrapper:
         else:
             return cursor
 
-    def commit(self):
+    def _commit(self):
         self.connection.commit()
 
-    def rollback(self):
+    def _rollback(self):
         if self.connection:
             self.connection.rollback()
 
@@ -67,7 +67,6 @@ class SQLiteCursorWrapper(Database.Cursor):
         return Database.Cursor.executemany(self, query, params)
 
     def convert_query(self, query, num_params):
-        # XXX this seems too simple to be correct... is this right?
         return query % tuple("?" * num_params)
 
 supports_constraints = False

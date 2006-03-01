@@ -1,4 +1,4 @@
-from django.db import backend, connection
+from django.db import backend, connection, transaction
 from django.db.models import signals
 from django.db.models.fields import AutoField, Field, IntegerField
 from django.db.models.related import RelatedObject
@@ -231,7 +231,7 @@ def _add_m2m_items(rel_manager_inst, managerclass, rel_model, join_table, source
         cursor.execute("INSERT INTO %s (%s, %s) VALUES (%%s, %%s)" % \
             (join_table, source_col_name, target_col_name),
             [source_pk_val, obj_id])
-    connection.commit()
+    transaction.commit_unless_managed()
 
 def _remove_m2m_items(rel_model, join_table, source_col_name,
         target_col_name, source_pk_val, *objs):
@@ -255,7 +255,7 @@ def _remove_m2m_items(rel_model, join_table, source_col_name,
         cursor.execute("DELETE FROM %s WHERE %s = %%s AND %s = %%s" % \
             (join_table, source_col_name, target_col_name),
             [source_pk_val, obj._get_pk_val()])
-    connection.commit()
+    transaction.commit_unless_managed()
 
 def _clear_m2m_items(join_table, source_col_name, source_pk_val):
     # Utility function used by the ManyRelatedObjectsDescriptors
@@ -268,7 +268,7 @@ def _clear_m2m_items(join_table, source_col_name, source_pk_val):
     cursor.execute("DELETE FROM %s WHERE %s = %%s" % \
         (join_table, source_col_name),
         [source_pk_val])
-    connection.commit()
+    transaction.commit_unless_managed()
 
 class ManyRelatedObjectsDescriptor(object):
     # This class provides the functionality that makes the related-object
