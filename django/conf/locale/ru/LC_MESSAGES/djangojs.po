@@ -8,43 +8,43 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2005-12-24 19:24+0300\n"
+"POT-Creation-Date: 2006-03-01 17:11+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=koi8-r\n"
+"Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
 #: contrib/admin/media/js/SelectFilter2.js:33
 #, perl-format
 msgid "Available %s"
-msgstr "Доступные %s"
+msgstr "п■п╬я│я┌я┐п©п╫я▀п╣ %s"
 
 #: contrib/admin/media/js/SelectFilter2.js:41
 msgid "Choose all"
-msgstr "Выбрать все"
+msgstr "п▓я▀п╠я─п╟я┌я▄ п╡я│п╣"
 
 #: contrib/admin/media/js/SelectFilter2.js:46
 msgid "Add"
-msgstr "Добавить"
+msgstr "п■п╬п╠п╟п╡п╦я┌я▄"
 
 #: contrib/admin/media/js/SelectFilter2.js:48
 msgid "Remove"
-msgstr "Удалить"
+msgstr "пёп╢п╟п╩п╦я┌я▄"
 
 #: contrib/admin/media/js/SelectFilter2.js:53
 #, perl-format
 msgid "Chosen %s"
-msgstr "Выбранные %s"
+msgstr "п▓я▀п╠я─п╟п╫п╫я▀п╣ %s"
 
 #: contrib/admin/media/js/SelectFilter2.js:54
 msgid "Select your choice(s) and click "
-msgstr "Выберите и нажмите "
+msgstr "п▓я▀п╠п╣я─п╦я┌п╣ п╦ п╫п╟п╤п╪п╦я┌п╣ "
 
 #: contrib/admin/media/js/SelectFilter2.js:59
 msgid "Clear all"
-msgstr "Очистить всё"
+msgstr "п·я┤п╦я│я┌п╦я┌я▄ п╡я│я▒"
 
 #: contrib/admin/media/js/dateparse.js:26
 #: contrib/admin/media/js/calendar.js:24
@@ -52,60 +52,60 @@ msgid ""
 "January February March April May June July August September October November "
 "December"
 msgstr ""
-"Январь Февраль Март Апрель Май Июнь Июль Август Сентябрь Октябрь Ноябрь "
-"Декабрь"
+"п╞п╫п╡п╟я─я▄ п╓п╣п╡я─п╟п╩я▄ п°п╟я─я┌ п░п©я─п╣п╩я▄ п°п╟п╧ п≤я▌п╫я▄ п≤я▌п╩я▄ п░п╡пЁя┐я│я┌ п║п╣п╫я┌я▐п╠я─я▄ п·п╨я┌я▐п╠я─я▄ п²п╬я▐п╠я─я▄ "
+"п■п╣п╨п╟п╠я─я▄"
 
 #: contrib/admin/media/js/dateparse.js:27
 msgid "Sunday Monday Tuesday Wednesday Thursday Friday Saturday"
-msgstr "Воскресенье Понедельник Вторник Среда Четверг Пятница Суббота"
+msgstr "п▓п╬я│п╨я─п╣я│п╣п╫я▄п╣ п÷п╬п╫п╣п╢п╣п╩я▄п╫п╦п╨ п▓я┌п╬я─п╫п╦п╨ п║я─п╣п╢п╟ п╖п╣я┌п╡п╣я─пЁ п÷я▐я┌п╫п╦я├п╟ п║я┐п╠п╠п╬я┌п╟"
 
 #: contrib/admin/media/js/calendar.js:25
 msgid "S M T W T F S"
-msgstr "В П В С Ч П С"
+msgstr "п▓ п÷ п▓ п║ п╖ п÷ п║"
 
 #: contrib/admin/media/js/admin/DateTimeShortcuts.js:45
 #: contrib/admin/media/js/admin/DateTimeShortcuts.js:80
 msgid "Now"
-msgstr "Сейчас"
+msgstr "п║п╣п╧я┤п╟я│"
 
 #: contrib/admin/media/js/admin/DateTimeShortcuts.js:48
 msgid "Clock"
-msgstr "Часы"
+msgstr "п╖п╟я│я▀"
 
 #: contrib/admin/media/js/admin/DateTimeShortcuts.js:77
 msgid "Choose a time"
-msgstr "Выбирите время"
+msgstr "п▓я▀п╠п╦я─п╦я┌п╣ п╡я─п╣п╪я▐"
 
 #: contrib/admin/media/js/admin/DateTimeShortcuts.js:81
 msgid "Midnight"
-msgstr "Полночь"
+msgstr "п÷п╬п╩п╫п╬я┤я▄"
 
 #: contrib/admin/media/js/admin/DateTimeShortcuts.js:82
 msgid "6 a.m."
-msgstr "6 часов"
+msgstr "6 я┤п╟я│п╬п╡"
 
 #: contrib/admin/media/js/admin/DateTimeShortcuts.js:83
 msgid "Noon"
-msgstr "Полдень"
+msgstr "п÷п╬п╩п╢п╣п╫я▄"
 
 #: contrib/admin/media/js/admin/DateTimeShortcuts.js:87
 #: contrib/admin/media/js/admin/DateTimeShortcuts.js:168
 msgid "Cancel"
-msgstr "Отмена"
+msgstr "п·я┌п╪п╣п╫п╟"
 
 #: contrib/admin/media/js/admin/DateTimeShortcuts.js:111
 #: contrib/admin/media/js/admin/DateTimeShortcuts.js:162
 msgid "Today"
-msgstr "Сегодня"
+msgstr "п║п╣пЁп╬п╢п╫я▐"
 
 #: contrib/admin/media/js/admin/DateTimeShortcuts.js:114
 msgid "Calendar"
-msgstr "Календарь"
+msgstr "п п╟п╩п╣п╫п╢п╟я─я▄"
 
 #: contrib/admin/media/js/admin/DateTimeShortcuts.js:160
 msgid "Yesterday"
-msgstr "Вчера"
+msgstr "п▓я┤п╣я─п╟"
 
 #: contrib/admin/media/js/admin/DateTimeShortcuts.js:164
 msgid "Tomorrow"
-msgstr "Завтра"
+msgstr "п≈п╟п╡я┌я─п╟"
