@@ -418,17 +418,17 @@ def syncdb():
             created_models.add(model)
             pending_references.update(references)
             sql.extend(_get_sql_for_pending_references(model, pending_references))
-            sql = "\n".join(sql)
             print "Creating table %s" % model._meta.db_table
-            cursor.execute(sql)
+            for statement in sql:
+                cursor.execute(statement)
 
         for model in model_list:
             if model in created_models:
                 sql = _get_many_to_many_sql_for_model(model)
                 if sql:
-                    sql = '\n'.join(sql).strip()
                     print "Creating many-to-many tables for %s model" % model.__name__
-                    cursor.execute(sql)
+                    for statement in sql:
+                        cursor.execute(statement)
 
     transaction.commit_unless_managed()
 syncdb.args = ''
