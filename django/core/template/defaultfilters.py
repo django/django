@@ -133,7 +133,7 @@ def wordwrap(value, arg):
     """
     Wraps words at specified line length
 
-    Argument: number of words to wrap the text at.
+    Argument: number of characters at which to wrap the text
     """
     from django.utils.text import wrap
     return wrap(str(value), int(arg))
