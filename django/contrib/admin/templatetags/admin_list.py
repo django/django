@@ -178,7 +178,6 @@ def results(cl):
         yield list(items_for_result(cl,res))
 
 def result_list(cl):
-    res = list(results(cl))
     return {'cl': cl,
             'result_headers': list(result_headers(cl)),
             'results': list(results(cl))}
