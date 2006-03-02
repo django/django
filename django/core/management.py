@@ -847,21 +847,21 @@ def get_validation_errors(outfile, app=None):
             if f.rel:
                 rel_opts = f.rel.to._meta
                 if f.rel.to not in models.get_models():
-                     e.add(opts, "'%s' relates to uninstalled model %s" % (f.name, rel_opts.object_name))
+                     e.add(opts, "'%s' has relation with uninstalled model %s" % (f.name, rel_opts.object_name))
 
                 rel_name = RelatedObject(f.rel.to, cls, f).get_accessor_name()
                 for r in rel_opts.fields:
                     if r.name == rel_name:
-                        e.add(opts, "'%s' accessor name '%s.%s' clashes with another field" % (f.name, rel_opts.object_name, r.name))
+                        e.add(opts, "'%s' accessor name '%s.%s' clashes with another field. Add a related_name argument to the definition for '%s'." % (f.name, rel_opts.object_name, r.name, f.name))
                 for r in rel_opts.many_to_many:
                     if r.name == rel_name:
-                        e.add(opts, "'%s' accessor name '%s.%s' clashes with a m2m field" % (f.name, rel_opts.object_name, r.name))
+                        e.add(opts, "'%s' accessor name '%s.%s' clashes with a m2m field. Add a related_name argument to the definition for '%s'." % (f.name, rel_opts.object_name, r.name, f.name))
                 for r in rel_opts.get_all_related_many_to_many_objects():
                     if r.get_accessor_name() == rel_name:
-                        e.add(opts, "'%s' accessor name '%s.%s' clashes with a related m2m field" % (f.name, rel_opts.object_name, r.get_accessor_name()))
+                        e.add(opts, "'%s' accessor name '%s.%s' clashes with a related m2m field. Add a related_name argument to the definition for '%s'." % (f.name, rel_opts.object_name, r.get_accessor_name(), f.name))
                 for r in rel_opts.get_all_related_objects():
                     if r.get_accessor_name() == rel_name and r.field is not f:
-                        e.add(opts, "'%s' accessor name '%s.%s' clashes with a related field" % (f.name, rel_opts.object_name, r.get_accessor_name()))
+                        e.add(opts, "'%s' accessor name '%s.%s' clashes with another related field. Add a related_name argument to the definition for '%s'." % (f.name, rel_opts.object_name, r.get_accessor_name(), f.name))
 
         for i, f in enumerate(opts.many_to_many):
             # Check to see if the related m2m field will clash with any
@@ -873,16 +873,16 @@ def get_validation_errors(outfile, app=None):
             rel_name = RelatedObject(f.rel.to, cls, f).get_accessor_name()
             for r in rel_opts.fields:
                 if r.name == rel_name:
-                    e.add(opts, "'%s' m2m accessor name '%s.%s' clashes with another field" % (f.name, rel_opts.object_name, r.name))
+                    e.add(opts, "'%s' m2m accessor name '%s.%s' clashes with another field. Add a related_name argument to the definition for '%s'." % (f.name, rel_opts.object_name, r.name, f.name))
             for r in rel_opts.many_to_many:
                 if r.name == rel_name:
-                    e.add(opts, "'%s' m2m accessor name '%s.%s' clashes with a m2m field" % (f.name, rel_opts.object_name, r.name))
+                    e.add(opts, "'%s' m2m accessor name '%s.%s' clashes with a m2m field. Add a related_name argument to the definition for '%s'." % (f.name, rel_opts.object_name, r.name, f.name))
             for r in rel_opts.get_all_related_many_to_many_objects():
                 if r.get_accessor_name() == rel_name and r.field is not f:
-                    e.add(opts, "'%s' m2m accessor name '%s.%s' clashes with a related m2m field" % (f.name, rel_opts.object_name, r.get_accessor_name()))
+                    e.add(opts, "'%s' m2m accessor name '%s.%s' clashes with a related m2m field. Add a related_name argument to the definition for '%s'." % (f.name, rel_opts.object_name, r.get_accessor_name(), f.name))
             for r in rel_opts.get_all_related_objects():
                 if r.get_accessor_name() == rel_name:
-                    e.add(opts, "'%s' m2m accessor name '%s.%s' clashes with a related field" % (f.name, rel_opts.object_name, r.get_accessor_name()))
+                    e.add(opts, "'%s' m2m accessor name '%s.%s' clashes with another related field. Add a related_name argument to the definition for '%s'." % (f.name, rel_opts.object_name, r.get_accessor_name(), f.name))
 
         # Check admin attribute.
         if opts.admin is not None:
