@@ -461,8 +461,7 @@ def install(app):
     "Executes the equivalent of 'get_sql_all' in the current database."
     from django.db import connection, transaction
 
-    app_name = app.__name__[app.__name__.rindex('.')+1:]
-    app_label = app_name.split('.')[-1]
+    app_name = app.__name__.split('.')[-2]
 
     # First, try validating the models.
     _check_for_validation_errors(app)
@@ -479,8 +478,7 @@ def install(app):
   * At least one of the database tables already exists.
   * The SQL was invalid.
 Hint: Look at the output of 'django-admin.py sqlall %s'. That's the SQL this command wasn't able to run.
-The full error: %s\n""" % \
-            (app_name, app_label, e))
+The full error: %s\n""" % (app_name, app_name, e))
         transaction.rollback_unless_managed()
         sys.exit(1)
     transaction.commit_unless_managed()
@@ -491,8 +489,7 @@ def reset(app):
     "Executes the equivalent of 'get_sql_reset' in the current database."
     from django.db import connection, transaction
     from cStringIO import StringIO
-    app_name = app.__name__[app.__name__.rindex('.')+1:]
-    app_label = app_name.split('.')[-1]
+    app_name = app.__name__.split('.')[-2]
 
     # First, try validating the models.
     s = StringIO()
@@ -521,8 +518,7 @@ Type 'yes' to continue, or 'no' to cancel: """)
   * At least one of the database tables already exists.
   * The SQL was invalid.
 Hint: Look at the output of 'django-admin.py sqlreset %s'. That's the SQL this command wasn't able to run.
-The full error: %s\n""" % \
-                (app_name, app_label, e))
+The full error: %s\n""" % (app_name, app_name, e))
             transaction.rollback_unless_managed()
             sys.exit(1)
         transaction.commit_unless_managed()
