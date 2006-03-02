@@ -26,12 +26,6 @@ PROJECT_TEMPLATE_DIR = os.path.join(django.__path__[0], 'conf', '%s_template')
 
 INVALID_PROJECT_NAMES = ('django', 'test')
 
-def _get_packages_insert(app_label):
-    from django.db import backend
-    return "INSERT INTO %s (%s, %s) VALUES ('%s', '%s');" % \
-        (backend.quote_name('django_package'), backend.quote_name('label'), backend.quote_name('name'),
-        app_label, app_label)
-
 def _get_permission_codename(action, opts):
     return '%s_%s' % (action, opts.object_name.lower())
 
@@ -65,7 +59,7 @@ def get_version():
     if VERSION[3]:
         v += ' (%s)' % VERSION[3]
     return v
-    
+
 def get_sql_create(app):
     "Returns a list of the CREATE TABLE SQL statements for the given app."
     from django.db import get_creation_module, models
@@ -104,12 +98,12 @@ get_sql_create.args = APP_ARGS
 def _get_sql_model_create(klass, models_already_seen=set()):
     """
     Get the SQL required to create a single model.
-    
+
     Returns list_of_sql, pending_references_dict
     """
     from django.db import backend, get_creation_module, models
     data_types = get_creation_module().DATA_TYPES
-    
+
     opts = klass._meta
     final_output = []
     table_output = []
@@ -151,7 +145,7 @@ def _get_sql_model_create(klass, models_already_seen=set()):
         full_statement.append('    %s%s' % (line, i < len(table_output)-1 and ',' or ''))
     full_statement.append(');')
     final_output.append('\n'.join(full_statement))
-    
+
     return final_output, pending_references
 
 def _get_sql_for_pending_references(klass, pending_references):
@@ -160,7 +154,7 @@ def _get_sql_for_pending_references(klass, pending_references):
     """
     from django.db import backend, get_creation_module
     data_types = get_creation_module().DATA_TYPES
-    
+
     final_output = []
     if backend.supports_constraints:
         opts = klass._meta
@@ -399,11 +393,11 @@ def syncdb():
     data_types = get_creation_module().DATA_TYPES
 
     cursor = connection.cursor()
-    
+
     # Get a list of all existing database tables,
     # so we know what needs to be added.
     table_list = introspection_module.get_table_list(cursor)
-    
+
     # Get a list of already installed *models* so that references work right.
     all_models = []
     for app in models.get_apps():
