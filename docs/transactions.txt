@@ -79,9 +79,9 @@ database.
 You can use the ``commit_on_success`` decorator to use a single transaction for
 all the work done in a function::
 
-    from django.db.transaction import commit_on_success
+    from django.db import transaction
 
-    @commit_on_success
+    @transaction.commit_on_success
     def viewfunc(request):
         ....
 
