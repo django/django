@@ -1,3 +1,4 @@
+from django.db import transaction
 from django.db.backends.postgresql.base import quote_name
 
 def get_table_list(cursor):
@@ -66,6 +67,16 @@ def get_indexes(cursor, table_name):
         col_name = desc[int(row[0])-1][0]
         indexes[col_name] = {'primary_key': row[2], 'unique': row[1]}
     return indexes
+    
+def table_exists(cursor, table_name):
+    """Returns True if the given table exists."""
+    try:
+        cursor.execute("SELECT 1 FROM %s LIMIT 1" % quote_name(table_name))
+    except:
+        transaction.rollback_unless_managed()
+        return False
+    else:
+        return True
 
 # Maps type codes to Django Field types.
 DATA_TYPES_REVERSE = {

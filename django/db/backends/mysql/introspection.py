@@ -1,3 +1,4 @@
+from django.db import transaction
 from django.db.backends.mysql.base import quote_name
 from MySQLdb.constants import FIELD_TYPE
 
@@ -26,7 +27,17 @@ def get_indexes(cursor, table_name):
     for row in cursor.fetchall():
         indexes[row[4]] = {'primary_key': (row[2] == 'PRIMARY'), 'unique': not bool(row[1])}
     return indexes
-
+    
+def table_exists(cursor, table_name):
+    """Returns True if the given table exists."""
+    try:
+        cursor.execute("SELECT 1 FROM %s LIMIT 1" % quote_name(table_name))
+    except:
+        transaction.rollback_unless_managed()
+        return False
+    else:
+        return True
+        
 DATA_TYPES_REVERSE = {
     FIELD_TYPE.BLOB: 'TextField',
     FIELD_TYPE.CHAR: 'CharField',

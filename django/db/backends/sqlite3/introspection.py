@@ -1,3 +1,4 @@
+from django.db import transaction
 from django.db.backends.sqlite3.base import quote_name
 
 def get_table_list(cursor):
@@ -13,6 +14,16 @@ def get_relations(cursor, table_name):
 
 def get_indexes(cursor, table_name):
     raise NotImplementedError
+
+def table_exists(cursor, table_name):
+    """Returns True if the given table exists."""
+    try:
+        cursor.execute("SELECT 1 FROM %s LIMIT 1" % quote_name(table_name))
+    except:
+        transaction.rollback_unless_managed()
+        return False
+    else:
+        return True
 
 # Maps SQL types to Django Field types. Some of the SQL types have multiple
 # entries here because SQLite allows for anything and doesn't normalize the
