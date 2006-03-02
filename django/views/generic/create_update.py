@@ -171,7 +171,7 @@ def delete_object(request, model, post_delete_redirect,
         raise AttributeError("Generic delete view must be called with either an object_id or a slug/slug_field")
     lookup_kwargs.update(extra_lookup_kwargs)
     try:
-        object = model._default_manager.get_object(**lookup_kwargs)
+        object = model._default_manager.get(**lookup_kwargs)
     except ObjectDoesNotExist:
         raise Http404, "No %s found for %s" % (model._meta.app_label, lookup_kwargs)
 

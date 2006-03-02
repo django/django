@@ -18,7 +18,7 @@ class PasswordResetForm(forms.Manipulator):
     def isValidUserEmail(self, new_data, all_data):
         "Validates that a user exists with the given e-mail address"
         try:
-            self.user_cache = User.objects.get_object(email__iexact=new_data)
+            self.user_cache = User.objects.get(email__iexact=new_data)
         except User.DoesNotExist:
             raise validators.ValidationError, "That e-mail address doesn't have an associated user acount. Are you sure you've registered?"
 

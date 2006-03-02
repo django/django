@@ -8,7 +8,7 @@ def shortcut(request, content_type_id, object_id):
     "Redirect to an object's page based on a content-type ID and an object ID."
     # Look up the object, making sure it's got a get_absolute_url() function.
     try:
-        content_type = ContentType.objects.get_object(pk=content_type_id)
+        content_type = ContentType.objects.get(pk=content_type_id)
         obj = content_type.get_object_for_this_type(pk=object_id)
     except ObjectDoesNotExist:
         raise http.Http404, "Content type %s object %s doesn't exist" % (content_type_id, object_id)
