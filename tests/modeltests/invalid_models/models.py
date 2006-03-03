@@ -76,42 +76,42 @@ invalid_models.fielderrors: "choices": "choices" should be either a tuple or lis
 invalid_models.fielderrors: "choices2": "choices" should be a sequence of two-tuples.
 invalid_models.fielderrors: "choices2": "choices" should be a sequence of two-tuples.
 invalid_models.fielderrors: "index": "db_index" should be either None, True or False.
-invalid_models.clash1: 'foreign' accessor name 'Target.clash1_set' clashes with another field
-invalid_models.clash1: 'foreign' accessor name 'Target.clash1_set' clashes with a related m2m field
-invalid_models.clash1: 'm2m' m2m accessor name 'Target.clash1_set' clashes with another field
-invalid_models.clash1: 'm2m' m2m accessor name 'Target.clash1_set' clashes with a related field
-invalid_models.clash2: 'foreign_1' accessor name 'Target.id' clashes with another field
-invalid_models.clash2: 'foreign_1' accessor name 'Target.id' clashes with a related m2m field
-invalid_models.clash2: 'foreign_2' accessor name 'Target.src_safe' clashes with a related m2m field
-invalid_models.clash2: 'm2m_1' m2m accessor name 'Target.id' clashes with another field
-invalid_models.clash2: 'm2m_1' m2m accessor name 'Target.id' clashes with a related field
-invalid_models.clash2: 'm2m_2' m2m accessor name 'Target.src_safe' clashes with a related field
-invalid_models.clash3: 'foreign_1' accessor name 'Target2.foreign_tgt' clashes with another field
-invalid_models.clash3: 'foreign_1' accessor name 'Target2.foreign_tgt' clashes with a related m2m field
-invalid_models.clash3: 'foreign_2' accessor name 'Target2.m2m_tgt' clashes with a m2m field
-invalid_models.clash3: 'foreign_2' accessor name 'Target2.m2m_tgt' clashes with a related m2m field
-invalid_models.clash3: 'm2m_1' m2m accessor name 'Target2.foreign_tgt' clashes with another field
-invalid_models.clash3: 'm2m_1' m2m accessor name 'Target2.foreign_tgt' clashes with a related field
-invalid_models.clash3: 'm2m_2' m2m accessor name 'Target2.m2m_tgt' clashes with a m2m field
-invalid_models.clash3: 'm2m_2' m2m accessor name 'Target2.m2m_tgt' clashes with a related field
-invalid_models.clashforeign: 'foreign' accessor name 'Target2.clashforeign_set' clashes with another field
-invalid_models.clashm2m: 'm2m' m2m accessor name 'Target2.clashm2m_set' clashes with a m2m field
-invalid_models.target2: 'foreign_tgt' accessor name 'Target.target2_set' clashes with a related m2m field
-invalid_models.target2: 'foreign_tgt' accessor name 'Target.target2_set' clashes with a related m2m field
-invalid_models.target2: 'foreign_tgt' accessor name 'Target.target2_set' clashes with a related field
-invalid_models.target2: 'clashforeign_set' accessor name 'Target.target2_set' clashes with a related m2m field
-invalid_models.target2: 'clashforeign_set' accessor name 'Target.target2_set' clashes with a related m2m field
-invalid_models.target2: 'clashforeign_set' accessor name 'Target.target2_set' clashes with a related field
-invalid_models.target2: 'm2m_tgt' m2m accessor name 'Target.target2_set' clashes with a related m2m field
-invalid_models.target2: 'm2m_tgt' m2m accessor name 'Target.target2_set' clashes with a related field
-invalid_models.target2: 'm2m_tgt' m2m accessor name 'Target.target2_set' clashes with a related field
-invalid_models.target2: 'clashm2m_set' m2m accessor name 'Target.target2_set' clashes with a related m2m field
-invalid_models.target2: 'clashm2m_set' m2m accessor name 'Target.target2_set' clashes with a related field
-invalid_models.target2: 'clashm2m_set' m2m accessor name 'Target.target2_set' clashes with a related field
-invalid_models.selfclashforeign: 'selfclashforeign_set' accessor name 'SelfClashForeign.selfclashforeign_set' clashes with another field
-invalid_models.selfclashforeign: 'foreign_1' accessor name 'SelfClashForeign.id' clashes with another field
-invalid_models.selfclashforeign: 'foreign_2' accessor name 'SelfClashForeign.src_safe' clashes with another field
-invalid_models.selfclashm2m: 'selfclashm2m_set' m2m accessor name 'SelfClashM2M.selfclashm2m_set' clashes with a m2m field
-invalid_models.selfclashm2m: 'm2m_1' m2m accessor name 'SelfClashM2M.id' clashes with another field
-invalid_models.selfclashm2m: 'm2m_2' m2m accessor name 'SelfClashM2M.src_safe' clashes with another field
+invalid_models.clash1: 'foreign' accessor name 'Target.clash1_set' clashes with another field. Add a related_name argument to the definition for 'foreign'.
+invalid_models.clash1: 'foreign' accessor name 'Target.clash1_set' clashes with a related m2m field. Add a related_name argument to the definition for 'foreign'.
+invalid_models.clash1: 'm2m' m2m accessor name 'Target.clash1_set' clashes with another field. Add a related_name argument to the definition for 'm2m'.
+invalid_models.clash1: 'm2m' m2m accessor name 'Target.clash1_set' clashes with another related field. Add a related_name argument to the definition for 'm2m'.
+invalid_models.clash2: 'foreign_1' accessor name 'Target.id' clashes with another field. Add a related_name argument to the definition for 'foreign_1'.
+invalid_models.clash2: 'foreign_1' accessor name 'Target.id' clashes with a related m2m field. Add a related_name argument to the definition for 'foreign_1'.
+invalid_models.clash2: 'foreign_2' accessor name 'Target.src_safe' clashes with a related m2m field. Add a related_name argument to the definition for 'foreign_2'.
+invalid_models.clash2: 'm2m_1' m2m accessor name 'Target.id' clashes with another field. Add a related_name argument to the definition for 'm2m_1'.
+invalid_models.clash2: 'm2m_1' m2m accessor name 'Target.id' clashes with another related field. Add a related_name argument to the definition for 'm2m_1'.
+invalid_models.clash2: 'm2m_2' m2m accessor name 'Target.src_safe' clashes with another related field. Add a related_name argument to the definition for 'm2m_2'.
+invalid_models.clash3: 'foreign_1' accessor name 'Target2.foreign_tgt' clashes with another field. Add a related_name argument to the definition for 'foreign_1'.
+invalid_models.clash3: 'foreign_1' accessor name 'Target2.foreign_tgt' clashes with a related m2m field. Add a related_name argument to the definition for 'foreign_1'.
+invalid_models.clash3: 'foreign_2' accessor name 'Target2.m2m_tgt' clashes with a m2m field. Add a related_name argument to the definition for 'foreign_2'.
+invalid_models.clash3: 'foreign_2' accessor name 'Target2.m2m_tgt' clashes with a related m2m field. Add a related_name argument to the definition for 'foreign_2'.
+invalid_models.clash3: 'm2m_1' m2m accessor name 'Target2.foreign_tgt' clashes with another field. Add a related_name argument to the definition for 'm2m_1'.
+invalid_models.clash3: 'm2m_1' m2m accessor name 'Target2.foreign_tgt' clashes with another related field. Add a related_name argument to the definition for 'm2m_1'.
+invalid_models.clash3: 'm2m_2' m2m accessor name 'Target2.m2m_tgt' clashes with a m2m field. Add a related_name argument to the definition for 'm2m_2'.
+invalid_models.clash3: 'm2m_2' m2m accessor name 'Target2.m2m_tgt' clashes with another related field. Add a related_name argument to the definition for 'm2m_2'.
+invalid_models.clashforeign: 'foreign' accessor name 'Target2.clashforeign_set' clashes with another field. Add a related_name argument to the definition for 'foreign'.
+invalid_models.clashm2m: 'm2m' m2m accessor name 'Target2.clashm2m_set' clashes with a m2m field. Add a related_name argument to the definition for 'm2m'.
+invalid_models.target2: 'foreign_tgt' accessor name 'Target.target2_set' clashes with a related m2m field. Add a related_name argument to the definition for 'foreign_tgt'.
+invalid_models.target2: 'foreign_tgt' accessor name 'Target.target2_set' clashes with a related m2m field. Add a related_name argument to the definition for 'foreign_tgt'.
+invalid_models.target2: 'foreign_tgt' accessor name 'Target.target2_set' clashes with another related field. Add a related_name argument to the definition for 'foreign_tgt'.
+invalid_models.target2: 'clashforeign_set' accessor name 'Target.target2_set' clashes with a related m2m field. Add a related_name argument to the definition for 'clashforeign_set'.
+invalid_models.target2: 'clashforeign_set' accessor name 'Target.target2_set' clashes with a related m2m field. Add a related_name argument to the definition for 'clashforeign_set'.
+invalid_models.target2: 'clashforeign_set' accessor name 'Target.target2_set' clashes with another related field. Add a related_name argument to the definition for 'clashforeign_set'.
+invalid_models.target2: 'm2m_tgt' m2m accessor name 'Target.target2_set' clashes with a related m2m field. Add a related_name argument to the definition for 'm2m_tgt'.
+invalid_models.target2: 'm2m_tgt' m2m accessor name 'Target.target2_set' clashes with another related field. Add a related_name argument to the definition for 'm2m_tgt'.
+invalid_models.target2: 'm2m_tgt' m2m accessor name 'Target.target2_set' clashes with another related field. Add a related_name argument to the definition for 'm2m_tgt'.
+invalid_models.target2: 'clashm2m_set' m2m accessor name 'Target.target2_set' clashes with a related m2m field. Add a related_name argument to the definition for 'clashm2m_set'.
+invalid_models.target2: 'clashm2m_set' m2m accessor name 'Target.target2_set' clashes with another related field. Add a related_name argument to the definition for 'clashm2m_set'.
+invalid_models.target2: 'clashm2m_set' m2m accessor name 'Target.target2_set' clashes with another related field. Add a related_name argument to the definition for 'clashm2m_set'.
+invalid_models.selfclashforeign: 'selfclashforeign_set' accessor name 'SelfClashForeign.selfclashforeign_set' clashes with another field. Add a related_name argument to the definition for 'selfclashforeign_set'.
+invalid_models.selfclashforeign: 'foreign_1' accessor name 'SelfClashForeign.id' clashes with another field. Add a related_name argument to the definition for 'foreign_1'.
+invalid_models.selfclashforeign: 'foreign_2' accessor name 'SelfClashForeign.src_safe' clashes with another field. Add a related_name argument to the definition for 'foreign_2'.
+invalid_models.selfclashm2m: 'selfclashm2m_set' m2m accessor name 'SelfClashM2M.selfclashm2m_set' clashes with a m2m field. Add a related_name argument to the definition for 'selfclashm2m_set'.
+invalid_models.selfclashm2m: 'm2m_1' m2m accessor name 'SelfClashM2M.id' clashes with another field. Add a related_name argument to the definition for 'm2m_1'.
+invalid_models.selfclashm2m: 'm2m_2' m2m accessor name 'SelfClashM2M.src_safe' clashes with another field. Add a related_name argument to the definition for 'm2m_2'.
 """
