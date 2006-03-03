@@ -458,6 +458,15 @@ def syncdb():
         print "Creating example site object"
         ex = Site(domain="example.com", name="example.com")
         ex.save()
+        
+    # If we just installed the User model, ask about creating a superuser
+    from django.contrib.auth.models import User
+    if User in created_models:
+        msg = "\nIt looks like you just installed Django's auth system which means you don't have " \
+              "any superusers defined.\nWould you like to create one now? (yes/no): "
+        confirm = raw_input(msg)
+        if confirm.lower().startswith('y'):
+            createsuperuser()
     
 syncdb.args = ''
 
