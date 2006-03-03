@@ -391,7 +391,8 @@ def syncdb():
     seen_models = set([m for m in all_models if m._meta.db_table in table_list])
     created_models = set()
     pending_references = {}
-
+    install_permissions = True
+    
     for app in models.get_apps():
         model_list = models.get_models(app)
         for model in model_list:
@@ -415,7 +416,21 @@ def syncdb():
                     for statement in sql:
                         cursor.execute(statement)
 
-    transaction.commit_unless_managed()
+        transaction.commit_unless_managed()
+
+        # Install permissions (first checking that they're installed)
+        if install_permissions:
+            try:
+                installperms(app)
+            except Exception, e:
+                sys.stderr.write("Permissions will not be installed because it "\
+                                 "appears that you are not using Django's auth framework. "\
+                                 "If you want to install them in the future, re-run syncdb."\
+                                 "\n(The full error was: %s)" % (app_name, app_name, e))
+                transaction.rollback_unless_managed()
+            else:
+                transaction.commit_unless_managed()
+    
 syncdb.args = ''
 
 def get_admin_index(app):
@@ -445,6 +460,7 @@ get_admin_index.args = APP_ARGS
 def install(app):
     "Executes the equivalent of 'get_sql_all' in the current database."
     from django.db import connection, transaction
+    from django.conf import settings
 
     app_name = app.__name__.split('.')[-2]
 
@@ -466,7 +482,7 @@ Hint: Look at the output of 'django-admin.py sqlall %s'. That's the SQL this com
 The full error: %s\n""" % (app_name, app_name, e))
         transaction.rollback_unless_managed()
         sys.exit(1)
-    transaction.commit_unless_managed()
+    transaction.commit_unless_managed()        
 install.help_doc = "Executes ``sqlall`` for the given app(s) in the current database."
 install.args = APP_ARGS
 
@@ -523,10 +539,8 @@ def installperms(app):
             except Permission.DoesNotExist:
                 p = Permission(name=name, codename=codename, content_type=ctype)
                 p.save()
-                print "Added permission '%r'." % p
+                print "Adding permission '%r'." % p
                 num_added += 1
-    if not num_added:
-        print "No permissions were added, because all necessary permissions were already installed."
 installperms.help_doc = "Installs any permissions for the given model module name(s), if needed."
 installperms.args = APP_ARGS
 
