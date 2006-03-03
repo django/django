@@ -200,42 +200,31 @@ def _get_many_to_many_sql_for_model(klass):
 
 def get_sql_delete(app):
     "Returns a list of the DROP TABLE SQL statements for the given app."
-    from django.db import backend, connection, models, transaction
-
+    from django.db import backend, connection, models, get_introspection_module
+    introspection = get_introspection_module()
+    
+    # This should work even if a connecton isn't available
     try:
         cursor = connection.cursor()
     except:
         cursor = None
-
-    # Determine whether the admin log table exists. It only exists if the
-    # person has installed the admin app.
-    try:
-        if cursor is not None:
-            # Check whether the table exists.
-            cursor.execute("SELECT 1 FROM %s LIMIT 1" % backend.quote_name('django_admin_log'))
-    except:
-        # The table doesn't exist, so it doesn't need to be dropped.
-        transaction.rollback_unless_managed()
-        admin_log_exists = False
+        
+    # Figure out which tables already exist
+    if cursor:
+        table_names = introspection.get_table_list(cursor)
     else:
-        admin_log_exists = True
+        table_names = []
 
     output = []
-
+    
     # Output DROP TABLE statements for standard application tables.
     to_delete = set()
 
     references_to_delete = {}
     app_models = models.get_models(app)
     for klass in app_models:
-        try:
-            if cursor is not None:
-                # Check whether the table exists.
-                cursor.execute("SELECT 1 FROM %s LIMIT 1" % backend.quote_name(klass._meta.db_table))
-        except:
-            # The table doesn't exist, so it doesn't need to be dropped.
-            transaction.rollback_unless_managed()
-        else:
+        if cursor and klass._meta.db_table in table_names:
+            # The table exists, so it needs to be dropped
             opts = klass._meta
             for f in opts.fields:
                 if f.rel and f.rel.to not in to_delete:
@@ -244,61 +233,57 @@ def get_sql_delete(app):
             to_delete.add(klass)
 
     for klass in app_models:
-         try:
-             if cursor is not None:
-                 # Check whether the table exists.
-                 cursor.execute("SELECT 1 FROM %s LIMIT 1" % backend.quote_name(klass._meta.db_table))
-         except:
-             # The table doesn't exist, so it doesn't need to be dropped.
-             transaction.rollback_unless_managed()
-         else:
-             output.append("DROP TABLE %s;" % backend.quote_name(klass._meta.db_table))
-             if backend.supports_constraints and references_to_delete.has_key(klass):
-                 for rel_class, f in references_to_delete[klass]:
-                     table = rel_class._meta.db_table
-                     col = f.column
-                     r_table = klass._meta.db_table
-                     r_col = klass._meta.get_field(f.rel.field_name).column
-                     output.append('ALTER TABLE %s DROP CONSTRAINT %s;' % \
-                        (backend.quote_name(table),
-                         backend.quote_name("%s_referencing_%s_%s" % (col, r_table, r_col))))
-                 del references_to_delete[klass]
+        if cursor and klass._meta.db_table in table_names:
+            # Drop the able now
+            output.append("DROP TABLE %s;" % backend.quote_name(klass._meta.db_table))
+            if backend.supports_constraints and references_to_delete.has_key(klass):
+                for rel_class, f in references_to_delete[klass]:
+                    table = rel_class._meta.db_table
+                    col = f.column
+                    r_table = klass._meta.db_table
+                    r_col = klass._meta.get_field(f.rel.field_name).column
+                    output.append('ALTER TABLE %s DROP CONSTRAINT %s;' % \
+                       (backend.quote_name(table),
+                        backend.quote_name("%s_referencing_%s_%s" % (col, r_table, r_col))))
+                del references_to_delete[klass]
 
     # Output DROP TABLE statements for many-to-many tables.
     for klass in app_models:
         opts = klass._meta
         for f in opts.many_to_many:
-            try:
-                if cursor is not None:
-                    cursor.execute("SELECT 1 FROM %s LIMIT 1" % backend.quote_name(f.m2m_db_table()))
-            except:
-                transaction.rollback_unless_managed()
-            else:
+            if cursor and f.m2m_db_table() in table_names:
                 output.append("DROP TABLE %s;" % backend.quote_name(f.m2m_db_table()))
 
     app_label = app_models[0]._meta.app_label
 
     # Delete from django_package, auth_permission, django_content_type.
-    # TODO: fix this when permissions are activated again
-    # output.append("DELETE FROM %s WHERE %s = '%s';" % \
-    #     (backend.quote_name('auth_permission'), backend.quote_name('package'), app_label))
-    output.append("DELETE FROM %s WHERE %s = '%s';" % \
-        (backend.quote_name('django_content_type'), backend.quote_name('app_label'), app_label))
+    if cursor and "django_content_type" in table_names:
 
-    # Delete from the admin log.
-    if cursor is not None:
-        cursor.execute("SELECT %s FROM %s WHERE %s = %%s" % \
-            (backend.quote_name('id'), backend.quote_name('django_content_type'),
-            backend.quote_name('package')), [app_label])
-        if admin_log_exists:
-            for row in cursor.fetchall():
+        # Grab a list of affected content-types
+        cursor.execute("SELECT id FROM django_content_type WHERE app_label = %s", [app_label])
+        affected_content_types = [r[0] for r in cursor.fetchall()]
+        
+        # Remember do this this business in reverse order since the returned 
+        # values are reversed below
+        output.append("DELETE FROM %s WHERE %s = '%s';" % \
+            (backend.quote_name('django_content_type'), backend.quote_name('app_label'), app_label))
+        
+        if "auth_permission" in table_names:
+            for ctype_id in affected_content_types:
                 output.append("DELETE FROM %s WHERE %s = %s;" % \
-                    (backend.quote_name('django_admin_log'), backend.quote_name('content_type_id'), row[0]))
+                    (backend.quote_name("auth_permission"), backend.quote_name("content_type_id"), ctype_id))
 
+        # Delete from the admin log.
+        if "django_admin_log" in table_names:
+            for ctype_id in affected_content_types:
+                output.append("DELETE FROM %s WHERE %s = %s;" % \
+                    (backend.quote_name("django_admin_log"), backend.quote_name("content_type_id"), ctype_id))
+                     
     # Close database connection explicitly, in case this output is being piped
     # directly into a database client, to avoid locking issues.
-    cursor.close()
-    connection.close()
+    if cursor:
+        cursor.close()
+        connection.close()
 
     return output[::-1] # Reverse it, to deal with table dependencies.
 get_sql_delete.help_doc = "Prints the DROP TABLE SQL statements for the given app name(s)."
@@ -492,13 +477,7 @@ def reset(app):
     app_name = app.__name__.split('.')[-2]
 
     # First, try validating the models.
-    s = StringIO()
-    num_errors = get_validation_errors(s, app)
-    if num_errors:
-        sys.stderr.write("Error: %s couldn't be installed, because there were errors in your model:\n" % app_name)
-        s.seek(0)
-        sys.stderr.write(s.read())
-        sys.exit(1)
+    _check_for_validation_errors(app)
     sql_list = get_sql_reset(app)
 
     confirm = raw_input("""
