@@ -221,11 +221,9 @@ datetime.datetime(2005, 7, 28, 0, 0)
 # You can combine queries with & and |.
 >>> s1 = Article.objects.filter(id__exact=1)
 >>> s2 = Article.objects.filter(id__exact=2)
->>> tmp = [a.id for a in list(s1 | s2)]
->>> tmp.sort()
->>> tmp
-[1L, 2L]
->>> list(s1 & s2)
+>>> s1 | s2
+[Area woman programs in Python, Second article]
+>>> s1 & s2
 []
 
 # You can get the number of objects like this:
