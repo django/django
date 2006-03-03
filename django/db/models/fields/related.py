@@ -221,7 +221,7 @@ def _add_m2m_items(rel_manager_inst, managerclass, rel_model, join_table, source
         (target_col_name, join_table, source_col_name,
         target_col_name, ",".join(['%s'] * len(new_ids))),
         [source_pk_val] + list(new_ids))
-    if cursor.rowcount is not None and cursor.rowcount > 0:
+    if cursor.rowcount is not None and cursor.rowcount != 0:
         existing_ids = set([row[0] for row in cursor.fetchmany(cursor.rowcount)])
     else:
         existing_ids = set()
