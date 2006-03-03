@@ -368,7 +368,6 @@ def get_sql_all(app):
 get_sql_all.help_doc = "Prints the CREATE TABLE and initial-data SQL statements for the given model module name(s)."
 get_sql_all.args = APP_ARGS
 
-# TODO: Put "example.com" site in initial SQL data for sites app
 def syncdb():
     "Creates the database tables for all apps in INSTALLED_APPS whose tables haven't already been created."
     from django.db import connection, transaction, models, get_creation_module, get_introspection_module
@@ -420,7 +419,8 @@ def syncdb():
 
         transaction.commit_unless_managed()
 
-        # Install permissions (first checking that they're installed)
+    # Install permissions and initial data (first checking that they're installed)
+    for app in models.get_apps():
         if install_permissions:
             try:
                 installperms(app)
@@ -437,7 +437,7 @@ def syncdb():
                 
         # Install initial data for the app (but only if this is a model we've 
         # just created)
-        for model in model_list:
+        for model in models.get_models(app):
             if model in created_models:
                 initial_sql = get_sql_initial_data_for_model(model)
                 if initial_sql:
@@ -451,6 +451,13 @@ def syncdb():
                         transaction.rollback_unless_managed()
                     else:
                         transaction.commit_unless_managed()
+    
+    # Create an initial "example.com" site (if we need to)
+    from django.contrib.sites.models import Site
+    if Site in created_models:
+        print "Creating example site object"
+        ex = Site(domain="example.com", name="example.com")
+        ex.save()
     
 syncdb.args = ''
 
