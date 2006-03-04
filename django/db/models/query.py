@@ -232,15 +232,23 @@ class QuerySet(object):
         del_query._select_related = False
         del_query._order_by = []
 
-        # Collect all the objects to be deleted, and all the objects that are related to
-        # the objects that are to be deleted
-        seen_objs = SortedDict()
-        for object in del_query:
-            object._collect_sub_objects(seen_objs)
-
-        # Delete the objects
-        delete_objects(seen_objs)
-
+        # Delete objects in chunks to prevent an the list of 
+        # related objects from becoming too long
+        more_objects = True
+        while more_objects:
+            # Collect all the objects to be deleted in this chunk, and all the objects 
+            # that are related to the objects that are to be deleted
+            seen_objs = SortedDict()
+            more_objects = False
+            for object in del_query[0:GET_ITERATOR_CHUNK_SIZE]:
+                more_objects = True
+                object._collect_sub_objects(seen_objs)
+            
+            # If one or more objects were found, delete them. 
+            # Otherwise, stop looping.
+            if more_objects:
+                delete_objects(seen_objs)
+            
         # Clear the result cache, in case this QuerySet gets reused.
         self._result_cache = None
     delete.alters_data = True
@@ -832,35 +840,39 @@ def delete_objects(seen_objs):
 
         pk_list = [pk for pk,instance in seen_objs[cls]]
         for related in cls._meta.get_all_related_many_to_many_objects():
-            cursor.execute("DELETE FROM %s WHERE %s IN (%s)" % \
-                (backend.quote_name(related.field.m2m_db_table()),
-                    backend.quote_name(related.field.m2m_reverse_name()),
-                    ','.join(['%s' for pk in pk_list])),
-                pk_list)
+            for offset in range(0, len(pk_list), GET_ITERATOR_CHUNK_SIZE):
+                cursor.execute("DELETE FROM %s WHERE %s IN (%s)" % \
+                    (backend.quote_name(related.field.m2m_db_table()),
+                        backend.quote_name(related.field.m2m_reverse_name()),
+                        ','.join(['%s' for pk in pk_list[offset:offset+GET_ITERATOR_CHUNK_SIZE]])),
+                    pk_list[offset:offset+GET_ITERATOR_CHUNK_SIZE])
         for f in cls._meta.many_to_many:
-            cursor.execute("DELETE FROM %s WHERE %s IN (%s)" % \
-                (backend.quote_name(f.m2m_db_table()),
-                    backend.quote_name(f.m2m_column_name()),
-                    ','.join(['%s' for pk in pk_list])),
-                pk_list)
+            for offset in range(0, len(pk_list), GET_ITERATOR_CHUNK_SIZE):
+                cursor.execute("DELETE FROM %s WHERE %s IN (%s)" % \
+                    (backend.quote_name(f.m2m_db_table()),
+                        backend.quote_name(f.m2m_column_name()),
+                        ','.join(['%s' for pk in pk_list[offset:offset+GET_ITERATOR_CHUNK_SIZE]])),
+                    pk_list[offset:offset+GET_ITERATOR_CHUNK_SIZE])
         for field in cls._meta.fields:
             if field.rel and field.null and field.rel.to in seen_objs:
-                cursor.execute("UPDATE %s SET %s=NULL WHERE %s IN (%s)" % \
-                    (backend.quote_name(cls._meta.db_table),
-                        backend.quote_name(field.column),
-                        backend.quote_name(cls._meta.pk.column),
-                        ','.join(['%s' for pk in pk_list])),
-                    pk_list)
+                for offset in range(0, len(pk_list), GET_ITERATOR_CHUNK_SIZE):
+                    cursor.execute("UPDATE %s SET %s=NULL WHERE %s IN (%s)" % \
+                        (backend.quote_name(cls._meta.db_table),
+                            backend.quote_name(field.column),
+                            backend.quote_name(cls._meta.pk.column),
+                            ','.join(['%s' for pk in pk_list[offset:offset+GET_ITERATOR_CHUNK_SIZE]])),
+                        pk_list[offset:offset+GET_ITERATOR_CHUNK_SIZE])
 
     # Now delete the actual data
     for cls in ordered_classes:
         seen_objs[cls].reverse()
         pk_list = [pk for pk,instance in seen_objs[cls]]
-        cursor.execute("DELETE FROM %s WHERE %s IN (%s)" % \
-            (backend.quote_name(cls._meta.db_table),
-                backend.quote_name(cls._meta.pk.column),
-                ','.join(['%s' for pk in pk_list])),
-            pk_list)
+        for offset in range(0, len(pk_list), GET_ITERATOR_CHUNK_SIZE):
+            cursor.execute("DELETE FROM %s WHERE %s IN (%s)" % \
+                (backend.quote_name(cls._meta.db_table),
+                    backend.quote_name(cls._meta.pk.column),
+                    ','.join(['%s' for pk in pk_list[offset:offset+GET_ITERATOR_CHUNK_SIZE]])),
+                pk_list[offset:offset+GET_ITERATOR_CHUNK_SIZE])
 
         # Last cleanup; set NULLs where there once was a reference to the object,
         # NULL the primary key of the found objects, and perform post-notification.
