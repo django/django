@@ -239,6 +239,51 @@ Area woman programs in Python
 >>> (s1 | s2 | s3)[::2]
 [Area woman programs in Python, Third article]
 
+# Slices (without step) are lazy:
+>>> Article.objects.all()[0:5].filter()
+[Area woman programs in Python, Second article, Third article, Fourth article, Article 6]
+
+# Slicing again works:
+>>> Article.objects.all()[0:5][0:2]
+[Area woman programs in Python, Second article]
+>>> Article.objects.all()[0:5][:2]
+[Area woman programs in Python, Second article]
+>>> Article.objects.all()[0:5][4:]
+[Article 6]
+>>> Article.objects.all()[0:5][5:]
+[]
+
+# Some more tests!
+>>> Article.objects.all()[2:][0:2]
+[Third article, Fourth article]
+>>> Article.objects.all()[2:][:2]
+[Third article, Fourth article]
+>>> Article.objects.all()[2:][2:3]
+[Article 6]
+
+# Note that you can't use 'offset' without 'limit' (on some dbs), so this doesn't work:
+>>> Article.objects.all()[2:]
+Traceback (most recent call last):
+    ...
+AssertionError: 'offset' is not allowed without 'limit'
+
+# Also, once you have sliced you can't filter, re-order or combine
+>>> Article.objects.all()[0:5].filter(id=1)
+Traceback (most recent call last):
+    ...
+AssertionError: Cannot filter a query once a slice has been taken.
+
+>>> Article.objects.all()[0:5].order_by('id')
+Traceback (most recent call last):
+    ...
+AssertionError: Cannot reorder a query once a slice has been taken.
+
+>>> Article.objects.all()[0:1] & Article.objects.all()[4:5]
+Traceback (most recent call last):
+    ...
+AssertionError: Cannot combine queries once a slice has been taken.
+
+
 # An Article instance doesn't have access to the "objects" attribute.
 # That's only available on the class.
 >>> a7.objects.all()

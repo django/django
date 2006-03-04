@@ -95,17 +95,38 @@ class QuerySet(object):
 
     def __getitem__(self, k):
         "Retrieve an item or slice from the set of results."
-        # __getitem__ can't return QuerySet instances, because filter() and
-        # order_by() on the result would break badly. This means we don't have
-        # to worry about arithmetic with self._limit or self._offset -- they'll
-        # both be None at this point.
         if self._result_cache is None:
             if isinstance(k, slice):
-                if k.stop is not None and k.start is not None:
-                    limit = k.stop - k.start
+                # Offset:
+                if self._offset is None:
+                    offset = k.start
+                elif k.start is None:
+                    offset = self._offset
                 else:
-                    limit = k.stop
-                return list(self._clone(_offset=k.start, _limit=limit))[::k.step]
+                    offset = self._offset + k.start
+                # Now adjust offset to the bounds of any existing limit:
+                if self._limit is not None and k.start is not None:
+                    limit = self._limit - k.start
+                else:
+                    limit = self._limit
+
+                # Limit:
+                if k.stop is not None and k.start is not None:
+                    if limit is None:
+                        limit = k.stop - k.start
+                    else:
+                        limit = min((k.stop - k.start), limit)
+                else:
+                    if limit is None:
+                        limit = k.stop
+                    else:
+                        if k.stop is not None:
+                            limit = min(k.stop, limit)
+
+                if k.step is None:
+                    return self._clone(_offset=offset, _limit=limit)
+                else:
+                    return list(self._clone(_offset=offset, _limit=limit))[::k.step]
             else:
                 return self._clone(_offset=k, _limit=1).get()
         else:
@@ -179,6 +200,8 @@ class QuerySet(object):
         """
         latest_by = field_name or self.model._meta.get_latest_by
         assert bool(latest_by), "latest() requires either a field_name parameter or 'get_latest_by' in the model"
+        assert self._limit is None and self._offset is None, \
+                "Cannot change a query once a slice has been taken."
         return self._clone(_limit=1, _order_by=('-'+latest_by,)).get()
 
     def in_bulk(self, id_list):
@@ -186,6 +209,8 @@ class QuerySet(object):
         Returns a dictionary mapping each of the given IDs to the object with
         that ID.
         """
+        assert self._limit is None and self._offset is None, \
+                "Cannot use 'limit' or 'offset' with in_bulk"
         assert isinstance(id_list, (tuple,  list)), "in_bulk() must be provided with a list of IDs."
         id_list = list(id_list)
         assert id_list != [], "in_bulk() cannot be passed an empty ID list."
@@ -198,13 +223,14 @@ class QuerySet(object):
         """
         Deletes the records in the current QuerySet.
         """
+        assert self._limit is None and self._offset is None, \
+            "Cannot use 'limit' or 'offset' with delete."
+
         del_query = self._clone()
 
         # disable non-supported fields
         del_query._select_related = False
         del_query._order_by = []
-        del_query._offset = None
-        del_query._limit = None
 
         # Collect all the objects to be deleted, and all the objects that are related to
         # the objects that are to be deleted
@@ -251,6 +277,10 @@ class QuerySet(object):
         return self._filter_or_exclude(QNot, *args, **kwargs)
         
     def _filter_or_exclude(self, qtype, *args, **kwargs):
+        if len(args) > 0 or len(kwargs) > 0:
+            assert self._limit is None and self._offset is None, \
+                "Cannot filter a query once a slice has been taken."
+
         clone = self._clone()
         if len(kwargs) > 0:
             clone._filters = clone._filters & qtype(**kwargs)
@@ -264,6 +294,8 @@ class QuerySet(object):
 
     def order_by(self, *field_names):
         "Returns a new QuerySet instance with the ordering changed."
+        assert self._limit is None and self._offset is None, \
+                "Cannot reorder a query once a slice has been taken."
         return self._clone(_order_by=field_names)
 
     def distinct(self, true_or_false=True):
@@ -271,6 +303,8 @@ class QuerySet(object):
         return self._clone(_distinct=true_or_false)
 
     def extra(self, select=None, where=None, params=None, tables=None):
+        assert self._limit is None and self._offset is None, \
+                "Cannot change a query once a slice has been taken"
         clone = self._clone()
         if select: clone._select.extend(select)
         if where: clone._where.extend(where)
@@ -301,8 +335,11 @@ class QuerySet(object):
         return c
 
     def _combine(self, other):
-        if self._distinct != other._distinct:
-            raise ValueException, "Can't combine a unique query with a non-unique query"
+        assert self._limit is None and self._offset is None \
+            and other._limit is None and other._offset is None, \
+            "Cannot combine queries once a slice has been taken."
+        assert self._distinct == other._distinct, \
+            "Cannot combine a unique query with a non-unique query"
         #  use 'other's order by
         #  (so that A.filter(args1) & A.filter(args2) does the same as
         #   A.filter(args1).filter(args2)
