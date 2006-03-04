@@ -60,20 +60,22 @@ class SortedDict(dict):
             yield k
 
     def items(self):
-        for k in self.keyOrder:
-            yield k, dict.__getitem__(self, k)
+        return zip(self.keyOrder, self.values())
 
     def keys(self):
-        for k in self.keyOrder:
-            yield k
+        return self.keyOrder[:]
 
     def values(self):
-        for k in self.keyOrder:
-            yield dict.__getitem__(self, k)
+        return [dict.__getitem__(self,k) for k in self.keyOrder]
 
     def update(self, dict):
         for k, v in dict.items():
             self.__setitem__(k, v)
+
+    def setdefault(self, key, default):
+        if key not in self.keyOrder:
+            self.keyOrder.append(key)
+        return dict.setdefault(self, key, default)
 
 class MultiValueDictKeyError(KeyError):
     pass

@@ -234,7 +234,7 @@ class QuerySet(object):
 
         # Collect all the objects to be deleted, and all the objects that are related to
         # the objects that are to be deleted
-        seen_objs = {}
+        seen_objs = SortedDict()
         for object in del_query:
             object._collect_sub_objects(seen_objs)
 
@@ -815,22 +815,11 @@ def lookup_inner(path, clause, value, opts, table, column):
 
     return tables, joins, where, params
 
-def compare_models(x, y):
-    "Comparator for Models that puts models in an order where dependencies are easily resolved."
-    for field in x._meta.fields:
-        if field.rel and not field.null and field.rel.to == y:
-            return -1
-    for field in y._meta.fields:
-        if field.rel and not field.null and field.rel.to == x:
-            return 1
-    return 0
-
 def delete_objects(seen_objs):
     "Iterate through a list of seen classes, and remove any instances that are referred to"
-    seen_classes = set(seen_objs.keys())
-    ordered_classes = list(seen_classes)
-    ordered_classes.sort(compare_models)
-
+    ordered_classes = seen_objs.keys()
+    ordered_classes.reverse()
+    
     cursor = connection.cursor()
 
     for cls in ordered_classes:
@@ -855,7 +844,7 @@ def delete_objects(seen_objs):
                     ','.join(['%s' for pk in pk_list])),
                 pk_list)
         for field in cls._meta.fields:
-            if field.rel and field.null and field.rel.to in seen_classes:
+            if field.rel and field.null and field.rel.to in seen_objs:
                 cursor.execute("UPDATE %s SET %s=NULL WHERE %s IN (%s)" % \
                     (backend.quote_name(cls._meta.db_table),
                         backend.quote_name(field.column),
@@ -877,7 +866,7 @@ def delete_objects(seen_objs):
         # NULL the primary key of the found objects, and perform post-notification.
         for pk_val, instance in seen_objs[cls]:
             for field in cls._meta.fields:
-                if field.rel and field.null and field.rel.to in seen_classes:
+                if field.rel and field.null and field.rel.to in seen_objs:
                     setattr(instance, field.attname, None)
 
             setattr(instance, cls._meta.pk.attname, None)

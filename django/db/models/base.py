@@ -10,6 +10,7 @@ from django.db.models import signals
 from django.db.models.loading import register_models
 from django.dispatch import dispatcher
 from django.core.exceptions import ObjectDoesNotExist
+from django.utils.datastructures import SortedDict
 from django.utils.functional import curry
 from django.conf import settings
 import re
@@ -220,7 +221,7 @@ class Model(object):
         assert self._get_pk_val() is not None, "%s object can't be deleted because its %s attribute is set to None." % (self._meta.object_name, self._meta.pk.attname)
 
         # Find all the objects than need to be deleted
-        seen_objs = {}
+        seen_objs = SortedDict()
         self._collect_sub_objects(seen_objs)
 
         # Actually delete the objects
