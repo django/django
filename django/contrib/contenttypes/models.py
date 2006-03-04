@@ -22,13 +22,14 @@ class ContentTypeManager(models.Manager):
 class ContentType(models.Model):
     name = models.CharField(maxlength=100)
     app_label = models.CharField(maxlength=100)
-    model = models.CharField(_('python model class name'), maxlength=100, unique=True)
+    model = models.CharField(_('python model class name'), maxlength=100)
     objects = ContentTypeManager()
     class Meta:
         verbose_name = _('content type')
         verbose_name_plural = _('content types')
         db_table = 'django_content_type'
         ordering = ('name',)
+        unique_together = (('app_label', 'model'),)
 
     def __repr__(self):
         return self.name
