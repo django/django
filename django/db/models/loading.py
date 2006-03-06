@@ -17,7 +17,7 @@ def get_apps():
     _app_list = []
     for app_name in settings.INSTALLED_APPS:
         try:
-            _app_list.append(__import__(app_name + '.models', '', '', ['']))
+            _app_list.append(__import__(app_name, '', '', ['models']).models)
         except ImportError, e:
             pass
     return _app_list
@@ -26,7 +26,7 @@ def get_app(app_label):
     "Returns the module containing the models for the given app_label."
     for app_name in settings.INSTALLED_APPS:
         if app_label == app_name.split('.')[-1]:
-            return __import__('%s.models' % app_name, '', '', [''])
+            return __import__(app_name, '', '', ['models']).models
     raise ImproperlyConfigured, "App with label %s could not be found" % app_label
 
 def get_models(app_mod=None):
