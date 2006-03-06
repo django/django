@@ -18,7 +18,7 @@ def get_apps():
     for app_name in settings.INSTALLED_APPS:
         try:
             _app_list.append(__import__(app_name, '', '', ['models']).models)
-        except ImportError, e:
+        except (ImportError, AttributeError), e:
             pass
     return _app_list
 
