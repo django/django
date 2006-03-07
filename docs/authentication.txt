@@ -271,7 +271,7 @@ The login_required decorator
 
 As a shortcut, you can use the convenient ``login_required`` decorator::
 
-    from django.views.decorators.auth import login_required
+    from django.contrib.auth.decorators import login_required
 
     def my_view(request):
         # ...
@@ -279,7 +279,7 @@ As a shortcut, you can use the convenient ``login_required`` decorator::
 
 Here's the same thing, using Python 2.4's decorator syntax::
 
-    from django.views.decorators.auth import login_required
+    from django.contrib.auth.decorators import login_required
 
     @login_required
     def my_view(request):
@@ -310,7 +310,7 @@ permission ``polls.can_vote``::
 
 As a shortcut, you can use the convenient ``user_passes_test`` decorator::
 
-    from django.views.decorators.auth import user_passes_test
+    from django.contrib.auth.decorators import user_passes_test
 
     def my_view(request):
         # ...
@@ -318,7 +318,7 @@ As a shortcut, you can use the convenient ``user_passes_test`` decorator::
 
 Here's the same thing, using Python 2.4's decorator syntax::
 
-    from django.views.decorators.auth import user_passes_test
+    from django.contrib.auth.decorators import user_passes_test
 
     @user_passes_test(lambda u: u.has_perm('polls.can_vote'))
     def my_view(request):
@@ -334,7 +334,7 @@ specify the URL for your login page (``/accounts/login/`` by default).
 
 Example in Python 2.3 syntax::
 
-    from django.views.decorators.auth import user_passes_test
+    from django.contrib.auth.decorators import user_passes_test
 
     def my_view(request):
         # ...
@@ -342,7 +342,7 @@ Example in Python 2.3 syntax::
 
 Example in Python 2.4 syntax::
 
-    from django.views.decorators.auth import user_passes_test
+    from django.contrib.auth.decorators import user_passes_test
 
     @user_passes_test(lambda u: u.has_perm('polls.can_vote'), login_url='/login/')
     def my_view(request):

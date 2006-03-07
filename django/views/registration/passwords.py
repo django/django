@@ -4,7 +4,7 @@ from django.shortcuts import render_to_response
 from django.template import Context, RequestContext, loader
 from django.contrib.auth.models import User
 from django.contrib.sites.models import Site
-from django.views.decorators.auth import login_required
+from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseRedirect
 
 class PasswordResetForm(forms.Manipulator):
