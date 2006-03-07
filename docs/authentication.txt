@@ -192,7 +192,7 @@ the setting and checking of these values behind the scenes.
 Anonymous users
 ---------------
 
-``django.parts.auth.anonymoususers.AnonymousUser`` is a class that implements
+``django.contrib.auth.models.AnonymousUser`` is a class that implements
 the ``django.models.auth.users.User`` interface, with these differences:
 
     * ``id`` is always ``None``.

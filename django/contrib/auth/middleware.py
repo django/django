@@ -25,6 +25,6 @@ class AuthenticationMiddleware:
             user_id = request.session[SESSION_KEY]
             request.user = UserWrapper(user_id)
         except KeyError:
-            from django.parts.auth.anonymoususers import AnonymousUser
+            from django.contrib.auth.models import AnonymousUser
             request.user = AnonymousUser()
         return None

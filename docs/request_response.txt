@@ -88,7 +88,7 @@ All attributes except ``session`` should be considered read-only.
 ``user``
     A ``django.models.auth.users.User`` object representing the currently
     logged-in user. If the user isn't currently logged in, ``user`` will be set
-    to an instance of ``django.parts.auth.anonymoususers.AnonymousUser``. You
+    to an instance of ``django.contrib.auth.models.AnonymousUser``. You
     can tell them apart with ``is_anonymous()``, like so::
 
         if request.user.is_anonymous():
