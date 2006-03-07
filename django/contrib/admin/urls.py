@@ -4,8 +4,8 @@ urlpatterns = patterns('',
     ('^$', 'django.contrib.admin.views.main.index'),
     ('^jsi18n/$', 'django.views.i18n.javascript_catalog', {'packages': 'django.conf'}),
     ('^logout/$', 'django.contrib.auth.views.logout'),
-    ('^password_change/$', 'django.views.registration.passwords.password_change'),
-    ('^password_change/done/$', 'django.views.registration.passwords.password_change_done'),
+    ('^password_change/$', 'django.contrib.auth.views.password_change'),
+    ('^password_change/done/$', 'django.contrib.auth.views.password_change_done'),
     ('^template_validator/$', 'django.contrib.admin.views.template.template_validator'),
 
     # Documentation

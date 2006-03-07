@@ -12,8 +12,8 @@ urlpatterns = patterns('',
     (r'^profile/welcome/$', 'ellington.registration.views.profile.profile_welcome'),
     (r'^profile/edit/$', 'ellington.registration.views.profile.edit_profile'),
 
-    (r'^password_reset/$', 'django.views.registration.passwords.password_reset'),
-    (r'^password_reset/done/$', 'django.views.registration.passwords.password_reset_done'),
-    (r'^password_change/$', 'django.views.registration.passwords.password_change'),
-    (r'^password_change/done/$', 'django.views.registration.passwords.password_change_done'),
+    (r'^password_reset/$', 'django.contrib.auth.views.password_reset'),
+    (r'^password_reset/done/$', 'django.contrib.auth.views.password_reset_done'),
+    (r'^password_change/$', 'django.contrib.auth.views.password_change'),
+    (r'^password_change/done/$', 'django.contrib.auth.views.password_change_done'),
 )

@@ -1,13 +1,13 @@
 from django.contrib.auth.forms import AuthenticationForm
+from django.contrib.auth.forms import PasswordResetForm, PasswordChangeForm
 from django import forms
 from django.shortcuts import render_to_response
 from django.template import RequestContext
 from django.contrib.auth.models import SESSION_KEY
 from django.contrib.sites.models import Site
 from django.http import HttpResponse, HttpResponseRedirect
-
-REDIRECT_FIELD_NAME = 'next'
-LOGIN_URL = '/accounts/login/'
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth import LOGIN_URL, REDIRECT_FIELD_NAME
 
 def login(request):
     "Displays the login form and handles the login action."
@@ -48,3 +48,37 @@ def logout_then_login(request, login_url=LOGIN_URL):
 def redirect_to_login(next, login_url=LOGIN_URL):
     "Redirects the user to the login page, passing the given 'next' page"
     return HttpResponseRedirect('%s?%s=%s' % (login_url, REDIRECT_FIELD_NAME, next))
+
+def password_reset(request, is_admin_site=False):
+    new_data, errors = {}, {}
+    form = PasswordResetForm()
+    if request.POST:
+        new_data = request.POST.copy()
+        errors = form.get_validation_errors(new_data)
+        if not errors:
+            if is_admin_site:
+                form.save(request.META['HTTP_HOST'])
+            else:
+                form.save()
+            return HttpResponseRedirect('%sdone/' % request.path)
+    return render_to_response('registration/password_reset_form', {'form': forms.FormWrapper(form, new_data, errors)},
+        context_instance=RequestContext(request))
+
+def password_reset_done(request):
+    return render_to_response('registration/password_reset_done', context_instance=RequestContext(request))
+
+def password_change(request):
+    new_data, errors = {}, {}
+    form = PasswordChangeForm(request.user)
+    if request.POST:
+        new_data = request.POST.copy()
+        errors = form.get_validation_errors(new_data)
+        if not errors:
+            form.save(new_data)
+            return HttpResponseRedirect('%sdone/' % request.path)
+    return render_to_response('registration/password_change_form', {'form': forms.FormWrapper(form, new_data, errors)},
+        context_instance=RequestContext(request))
+password_change = login_required(password_change)
+
+def password_change_done(request):
+    return render_to_response('registration/password_change_done', context_instance=RequestContext(request))
