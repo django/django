@@ -8,25 +8,25 @@ class CursorDebugWrapper:
 
     def execute(self, sql, params=[]):
         start = time()
-		try:
-        	return self.cursor.execute(sql, params)
-		finally:
-	        stop = time()
-	        self.db.queries.append({
-	            'sql': sql % tuple(params),
-	            'time': "%.3f" % (stop - start),
-	        })
+        try:
+            return self.cursor.execute(sql, params)
+        finally:
+            stop = time()
+            self.db.queries.append({
+                'sql': sql % tuple(params),
+                'time': "%.3f" % (stop - start),
+            })
 
     def executemany(self, sql, param_list):
         start = time()
-		try:
-         	return self.cursor.executemany(sql, param_list)
+        try:
+            return self.cursor.executemany(sql, param_list)
         finally:
-	        stop = time()
-	        self.db.queries.append({
-	            'sql': 'MANY: ' + sql + ' ' + str(tuple(param_list)),
-	            'time': "%.3f" % (stop - start),
-	        })
+            stop = time()
+            self.db.queries.append({
+                'sql': 'MANY: ' + sql + ' ' + str(tuple(param_list)),
+                'time': "%.3f" % (stop - start),
+            })
 
     def __getattr__(self, attr):
         if self.__dict__.has_key(attr):
