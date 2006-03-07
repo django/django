@@ -8,7 +8,7 @@ from django.template import RequestContext
 from django.contrib.auth.models import SESSION_KEY
 from django.contrib.comments.models import Comment, FreeComment, PHOTOS_REQUIRED, PHOTOS_OPTIONAL, RATINGS_REQUIRED, RATINGS_OPTIONAL, IS_PUBLIC
 from django.contrib.contenttypes.models import ContentType
-from django.parts.auth.formfields import AuthenticationForm
+from django.contrib.auth.forms import AuthenticationForm
 from django.http import HttpResponseRedirect
 from django.utils.text import normalize_newlines
 from django.conf import settings

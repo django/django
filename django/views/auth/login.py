@@ -1,4 +1,4 @@
-from django.parts.auth.formfields import AuthenticationForm
+from django.contrib.auth.forms import AuthenticationForm
 from django import forms
 from django.shortcuts import render_to_response
 from django.template import RequestContext
