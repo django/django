@@ -1,9 +1,9 @@
 from django.conf.urls.defaults import *
 
 urlpatterns = patterns('',
-    (r'^login/$', 'django.views.auth.login.login'),
-    (r'^logout/$', 'django.views.auth.login.logout'),
-    (r'^login_another/$', 'django.views.auth.login.logout_then_login'),
+    (r'^login/$', 'django.contrib.auth.view.login'),
+    (r'^logout/$', 'django.contrib.auth.views.logout'),
+    (r'^login_another/$', 'django.contrib.auth.views.logout_then_login'),
 
     (r'^register/$', 'ellington.registration.views.registration.signup'),
     (r'^register/(?P<challenge_string>\w{32})/$', 'ellington.registration.views.registration.register_form'),

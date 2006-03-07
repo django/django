@@ -1,4 +1,4 @@
-from django.views.auth import login
+from django.contrib.auth.views import redirect_to_login
 
 def user_passes_test(test_func, login_url=login.LOGIN_URL):
     """
@@ -10,7 +10,7 @@ def user_passes_test(test_func, login_url=login.LOGIN_URL):
         def _checklogin(request, *args, **kwargs):
             if test_func(request.user):
                 return view_func(request, *args, **kwargs)
-            return login.redirect_to_login(request.path, login_url)
+            return redirect_to_login(request.path, login_url)
         return _checklogin
     return _dec
 

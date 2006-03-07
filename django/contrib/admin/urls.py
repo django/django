@@ -3,7 +3,7 @@ from django.conf.urls.defaults import *
 urlpatterns = patterns('',
     ('^$', 'django.contrib.admin.views.main.index'),
     ('^jsi18n/$', 'django.views.i18n.javascript_catalog', {'packages': 'django.conf'}),
-    ('^logout/$', 'django.views.auth.login.logout'),
+    ('^logout/$', 'django.contrib.auth.views.logout'),
     ('^password_change/$', 'django.views.registration.passwords.password_change'),
     ('^password_change/done/$', 'django.views.registration.passwords.password_change_done'),
     ('^template_validator/$', 'django.contrib.admin.views.template.template_validator'),

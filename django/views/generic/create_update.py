@@ -2,7 +2,7 @@ from django.core.xheaders import populate_xheaders
 from django.template import loader
 from django import forms
 from django.db.models import FileField
-from django.views.auth.login import redirect_to_login
+from django.contrib.auth.views import redirect_to_login
 from django.template import RequestContext
 from django.core.paginator import ObjectPaginator, InvalidPage
 from django.http import Http404, HttpResponse, HttpResponseRedirect
