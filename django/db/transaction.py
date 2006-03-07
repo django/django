@@ -192,7 +192,7 @@ def commit_on_success(func):
             except Exception, e:
                 if is_dirty():
                     rollback()
-                raise e
+                raise
             else:
                 if is_dirty():
                     commit()
