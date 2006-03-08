@@ -34,4 +34,19 @@ API_TESTS = """
 >>> [f.name for f in ItalianRestaurant._meta.fields]
 ['id', 'name', 'address', 'serves_hot_dogs', 'serves_pizza', 'serves_gnocchi']
 
+# Create a couple of Places.
+>>> p1 = Place(name='Master Shakes', address='666 W. Jersey')
+>>> p1.save()
+>>> p2 = Place(name='Ace Hardware', address='1013 N. Ashland')
+>>> p2.save()
+
+# Test constructor for Restaurant.
+>>> r = Restaurant(name='Demon Dogs', address='944 W. Fullerton', serves_hot_dogs=True, serves_pizza=False)
+>>> r.save()
+
+# Test the constructor for ItalianRestaurant.
+>>> ir = ItalianRestaurant(name='Ristorante Miron', address='1234 W. Elm', serves_hot_dogs=False, serves_pizza=False, serves_gnocchi=True)
+>>> ir.save()
+
+
 """
