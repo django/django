@@ -12,11 +12,5 @@
             {% admin_field_line bound_field %}
          {% endif %}
       {% endfor %}
-      <div class="item actions">
-      <button class="deletebutton" name="command" value="{{bound_related_object.relation.var_name}}.{{fcw.index}}.delete">Delete</button>
-      </div>
     {% endfor %}
-    <div class="collection actions">
-    <button class="addbutton" name="command" value="{{bound_related_object.relation.var_name}}.add">Add</button>
-	</div>
 </fieldset>

@@ -139,6 +139,9 @@ class AutomaticManipulator(forms.Manipulator):
 
             if child_follow:
                 obj_list = expanded_data[related.var_name].items()
+                if not obj_list:
+                    continue
+
                 obj_list.sort(lambda x, y: cmp(int(x[0]), int(y[0])))
 
                 # For each related item...
@@ -187,15 +190,8 @@ class AutomaticManipulator(forms.Manipulator):
                         if param != None:
                             params[f.attname] = param
 
-                        # Related links are a special case, because we have to
-                        # manually set the "content_type_id" and "object_id" fields.
-                        if self.opts.has_related_links and related.opts.module_name == 'relatedlinks':
-                            contenttypes_mod = get_module('core', 'contenttypes')
-                            params['content_type_id'] = contenttypes_mod.get_object(package__label__exact=self.opts.app_label, python_module_name__exact=self.opts.module_name).id
-                            params['object_id'] = new_object.id
-
                     # Create the related item.
-                    new_rel_obj = related.opts.get_model_module().Klass(**params)
+                    new_rel_obj = related.model(**params)
 
                     # If all the core fields were provided (non-empty), save the item.
                     if all_cores_given:

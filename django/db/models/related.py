@@ -41,6 +41,35 @@ class RelatedObject(object):
         """
         return data # TODO
 
+    def get_list(self, parent_instance=None):
+        "Get the list of this type of object from an instance of the parent class."
+        if parent_instance is not None:
+            attr = getattr(parent_instance, self.get_accessor_name())
+            if self.field.rel.multiple:
+                # For many-to-many relationships, return a list of objects
+                # corresponding to the xxx_num_in_admin options of the field
+                objects = list(attr.all())
+
+                count = len(objects) + self.field.rel.num_extra_on_change
+                if self.field.rel.min_num_in_admin:
+                   count = max(count, self.field.rel.min_num_in_admin)
+                if self.field.rel.max_num_in_admin:
+                   count = min(count, self.field.rel.max_num_in_admin)
+
+                change = count - len(objects)
+                if change > 0:
+                    return objects + [None for _ in range(change)]
+                if change < 0:
+                    return objects[:change]
+                else: # Just right
+                    return objects
+            else:
+                # A one-to-one relationship, so just return the single related
+                # object
+                return [attr]
+        else:
+            return [None for _ in range(self.field.rel.num_in_admin)]
+
     def editable_fields(self):
         "Get the fields in this class that should be edited inline."
         return [f for f in self.opts.fields + self.opts.many_to_many if f.editable and f != self.field]
@@ -61,6 +90,30 @@ class RelatedObject(object):
 
         over[self.field.name] = False
         return self.opts.get_follow(over)
+
+    def get_manipulator_fields(self, opts, manipulator, change, follow):
+        if self.field.rel.multiple:
+            if change:
+                attr = getattr(manipulator.original_object, self.get_accessor_name())
+                count = attr.count()
+                count += self.field.rel.num_extra_on_change
+                if self.field.rel.min_num_in_admin:
+                    count = max(count, self.field.rel.min_num_in_admin)
+                if self.field.rel.max_num_in_admin:
+                    count = min(count, self.field.rel.max_num_in_admin)
+            else:
+                count = self.field.rel.num_in_admin
+        else:
+            count = 1
+
+        fields = []
+        for i in range(count):
+            for f in self.opts.fields + self.opts.many_to_many:
+                if follow.get(f.name, False):
+                    prefix = '%s.%d.' % (self.var_name, i)
+                    fields.extend(f.get_manipulator_fields(self.opts, manipulator, change,
+                                                           name_prefix=prefix, rel=True))
+        return fields
 
     def __repr__(self):
         return "<RelatedObject: %s related to %s>" % (self.name, self.field.name)

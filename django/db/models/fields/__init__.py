@@ -74,7 +74,7 @@ class Field(object):
         self.primary_key = primary_key
         self.maxlength, self.unique = maxlength, unique
         self.blank, self.null = blank, null
-        self.rel, self.default = rel, default
+        self.core, self.rel, self.default = core, rel, default
         self.editable = editable
         self.validator_list = validator_list or []
         self.prepopulate_from = prepopulate_from
@@ -87,10 +87,6 @@ class Field(object):
 
         # Set db_index to True if the field has a relationship and doesn't explicitly set db_index.
         self.db_index = db_index
-
-        self.deprecated_args = []
-        if core:
-            self.deprecated_args.append('core')
 
         # Increase the creation counter, and save our local copy.
         self.creation_counter = Field.creation_counter
@@ -219,13 +215,28 @@ class Field(object):
             params['validator_list'].append(curry(manipulator_validator_unique, self, opts, manipulator))
 
         # Only add is_required=True if the field cannot be blank. Primary keys
-        # are a special case.
-        params['is_required'] = not self.blank and not self.primary_key
+        # are a special case, and fields in a related context should set this
+        # as False, because they'll be caught by a separate validator --
+        # RequiredIfOtherFieldGiven.
+        params['is_required'] = not self.blank and not self.primary_key and not rel
 
         # BooleanFields (CheckboxFields) are a special case. They don't take
         # is_required or validator_list.
         if isinstance(self, BooleanField):
             del params['validator_list'], params['is_required']
+
+        # If this field is in a related context, check whether any other fields
+        # in the related object have core=True. If so, add a validator --
+        # RequiredIfOtherFieldsGiven -- to this FormField.
+        if rel and not self.blank and not isinstance(self, AutoField) and not isinstance(self, FileField):
+            # First, get the core fields, if any.
+            core_field_names = []
+            for f in opts.fields:
+                if f.core and f != self:
+                    core_field_names.extend(f.get_manipulator_field_names(name_prefix))
+            # Now, if there are any, add the validator to this FormField.
+            if core_field_names:
+                params['validator_list'].append(validators.RequiredIfOtherFieldsGiven(core_field_names, gettext_lazy("This field is required.")))
 
         # Finally, add the field_names.
         field_names = self.get_manipulator_field_names(name_prefix)
@@ -239,9 +250,8 @@ class Field(object):
         Given the full new_data dictionary (from the manipulator), returns this
         field's data.
         """
-        #if rel:
-        #    return new_data.get(self.name, [self.get_default()])[0]
-        #else:
+        if rel:
+            return new_data.get(self.name, [self.get_default()])[0]
         val = new_data.get(self.name, self.get_default())
         if not self.empty_strings_allowed and val == '' and self.null:
             val = None
@@ -397,12 +407,12 @@ class DateTimeField(DateField):
 
     def get_manipulator_new_data(self, new_data, rel=False):
         date_field, time_field = self.get_manipulator_field_names('')
-        #if rel:
-        #    d = new_data.get(date_field, [None])[0]
-        #    t = new_data.get(time_field, [None])[0]
-        #else:
-        d = new_data.get(date_field, None)
-        t = new_data.get(time_field, None)
+        if rel:
+            d = new_data.get(date_field, [None])[0]
+            t = new_data.get(time_field, [None])[0]
+        else:
+            d = new_data.get(date_field, None)
+            t = new_data.get(time_field, None)
         if d is not None and t is not None:
             return datetime.datetime.combine(d, t)
         return self.get_default()
@@ -492,7 +502,10 @@ class FileField(Field):
         upload_field_name = self.get_manipulator_field_names('')[0]
         if new_data.get(upload_field_name, False):
             func = getattr(new_object, 'save_%s_file' % self.name)
-            func(new_data[upload_field_name]["filename"], new_data[upload_field_name]["content"])
+            if rel:
+                func(new_data[upload_field_name][0]["filename"], new_data[upload_field_name][0]["content"])
+            else:
+                func(new_data[upload_field_name]["filename"], new_data[upload_field_name]["content"])
 
     def get_directory_name(self):
         return os.path.normpath(datetime.datetime.now().strftime(self.upload_to))
