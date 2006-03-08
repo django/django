@@ -19,9 +19,19 @@ class Restaurant(Place):
     def __repr__(self):
         return "%s the restaurant" % self.name
 
+class ItalianRestaurant(Restaurant):
+    serves_gnocchi = models.BooleanField()
+
+    def __repr__(self):
+        return "%s the italian restaurant" % self.name
+
 API_TESTS = """
 # Make sure Restaurant has the right fields in the right order.
 >>> [f.name for f in Restaurant._meta.fields]
 ['id', 'name', 'address', 'serves_hot_dogs', 'serves_pizza']
+
+# Make sure ItalianRestaurant has the right fields in the right order.
+>>> [f.name for f in ItalianRestaurant._meta.fields]
+['id', 'name', 'address', 'serves_hot_dogs', 'serves_pizza', 'serves_gnocchi']
 
 """

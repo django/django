@@ -1,6 +1,6 @@
 import django.db.models.manipulators
 import django.db.models.manager
-from django.db.models.fields import AutoField, ImageField
+from django.db.models.fields import AutoField, ImageField, FieldDoesNotExist
 from django.db.models.fields.related import OneToOne, ManyToOne
 from django.db.models.related import RelatedObject
 from django.db.models.query import orderlist2sql, delete_objects
@@ -56,7 +56,11 @@ class ModelBase(type):
         # Add Fields inherited from parents
         for parent in new_class._meta.parents:
             for field in parent._meta.fields:
-                field.contribute_to_class(new_class, field.name)
+                # Only add parent fields if they aren't defined for this class.
+                try:
+                    new_class._meta.get_field(field.name)
+                except FieldDoesNotExist:
+                    field.contribute_to_class(new_class, field.name)
 
         new_class._prepare()
 
