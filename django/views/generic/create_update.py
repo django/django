@@ -39,7 +39,7 @@ def create_object(request, model, template_name=None,
             new_object = manipulator.save(new_data)
 
             if not request.user.is_anonymous():
-                request.user.message_set.add(message="The %s was created sucessfully." % model._meta.verbose_name)
+                request.user.message_set.create(message="The %s was created sucessfully." % model._meta.verbose_name)
 
             # Redirect to the new object: first by trying post_save_redirect,
             # then by obj.get_absolute_url; fail if neither works.
@@ -111,7 +111,7 @@ def update_object(request, model, object_id=None, slug=None,
             manipulator.save(new_data)
 
             if not request.user.is_anonymous():
-                request.user.message_set.add(message="The %s was updated sucessfully." % model._meta.verbose_name)
+                request.user.message_set.create(message="The %s was updated sucessfully." % model._meta.verbose_name)
 
             # Do a post-after-redirect so that reload works, etc.
             if post_save_redirect:
@@ -178,7 +178,7 @@ def delete_object(request, model, post_delete_redirect,
     if request.META['REQUEST_METHOD'] == 'POST':
         object.delete()
         if not request.user.is_anonymous():
-            request.user.message_set.add(message="The %s was deleted." % model._meta.verbose_name)
+            request.user.message_set.create(message="The %s was deleted." % model._meta.verbose_name)
         return HttpResponseRedirect(post_delete_redirect)
     else:
         if not template_name:
