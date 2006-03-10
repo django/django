@@ -75,7 +75,7 @@ settings file to use. Do that with ``SetEnv``::
 
 Read the `Django mod_python documentation`_ for more information.
 
-.. _Django mod_python documentation: http://www.djangoproject.com/documentation/mod_python/
+.. _Django mod_python documentation: http://www.djangoproject.com/documentation/modpython/
 
 Default settings
 ================
