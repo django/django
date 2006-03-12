@@ -1,4 +1,5 @@
 from django.contrib.auth import LOGIN_URL, REDIRECT_FIELD_NAME
+from django.http import HttpResponseRedirect
 
 def user_passes_test(test_func, login_url=LOGIN_URL):
     """
@@ -11,7 +12,7 @@ def user_passes_test(test_func, login_url=LOGIN_URL):
             if test_func(request.user):
                 return view_func(request, *args, **kwargs)
             return HttpResponseRedirect('%s?%s=%s' % (login_url, REDIRECT_FIELD_NAME, request.path))
-            
+
         return _checklogin
     return _dec
 
