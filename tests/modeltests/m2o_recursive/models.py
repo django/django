@@ -30,10 +30,8 @@ API_TESTS = """
 [Child category]
 >>> r.child_set.get(name__startswith='Child')
 Child category
->>> r.parent
-Traceback (most recent call last):
-    ...
-DoesNotExist
+>>> print r.parent
+None
 
 >>> c.child_set.all()
 []

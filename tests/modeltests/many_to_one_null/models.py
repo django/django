@@ -61,23 +61,20 @@ Second
 >>> a3.save()
 >>> a3.id
 3
->>> a3.reporter
-Traceback (most recent call last):
-    ...
-DoesNotExist
+>>> print a3.reporter
+None
 
+# Need to reget a3 to refresh the cache
 >>> a3 = Article.objects.get(pk=3)
 >>> print a3.reporter.id
 Traceback (most recent call last):
     ...
-DoesNotExist
+AttributeError: 'NoneType' object has no attribute 'id'
 
-# Accessing an article's 'reporter' attribute throws ReporterDoesNotExist
+# Accessing an article's 'reporter' attribute returns None
 # if the reporter is set to None.
->>> a3.reporter
-Traceback (most recent call last):
-    ...
-DoesNotExist
+>>> print a3.reporter
+None
 
 # To retrieve the articles with no reporters set, use "reporter__isnull=True".
 >>> Article.objects.filter(reporter__isnull=True)
