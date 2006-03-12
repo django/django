@@ -83,9 +83,20 @@ John Smith
 >>> r2.article_set.all()
 []
 
-# Set the article back again.
->>> new_article2.reporter = r2
->>> new_article2.save()
+# Set the article back again using set descriptor.
+>>> r2.article_set = [new_article, new_article2]
+>>> r.article_set.all()
+[This is a test]
+>>> r2.article_set.all()
+[John's second story, Paul's story]
+
+# Funny case - assignment notation can only go so far; because the 
+# ForeignKey cannot be null, existing members of the set must remain
+>>> r.article_set = [new_article]
+>>> r.article_set.all()
+[This is a test, John's second story]
+>>> r2.article_set.all()
+[Paul's story]
 
 # Reporter cannot be null - there should not be a clear or remove method
 >>> hasattr(r2.article_set, 'remove')

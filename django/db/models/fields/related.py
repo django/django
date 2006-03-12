@@ -94,6 +94,8 @@ class SingleRelatedObjectDescriptor(object):
         return rel_obj
         
     def __set__(self, instance, value):
+        if instance is None:
+            raise AttributeError, "%s must be accessed via instance" % self.related.opts.object_name
         # Set the value of the related field
         setattr(value, self.related.field.attname, instance)
             
@@ -126,6 +128,8 @@ class ReverseSingleRelatedObjectDescriptor(object):
             return rel_obj
 
     def __set__(self, instance, value):
+        if instance is None:
+            raise AttributeError, "%s must be accessed via instance" % self._field.name
         # Set the value of the related field
         try:
             val = getattr(value, self.field.rel.get_related_field().attname)
@@ -196,6 +200,18 @@ class ForeignRelatedObjectsDescriptor(object):
         manager.model = self.related.model
 
         return manager
+
+    def __set__(self, instance, value):
+        if instance is None:
+            raise AttributeError, "Manager must be accessed via instance"
+
+        manager = self.__get__(instance)        
+        # If the foreign key can support nulls, then completely clear the related set.
+        # Otherwise, just move the named objects into the set. 
+        if self.related.field.null:
+            manager.clear()            
+        for obj in value:
+            manager.add(obj)
 
 def _add_m2m_items(rel_manager_inst, managerclass, rel_model, join_table, source_col_name,
         target_col_name, source_pk_val, *objs):
@@ -329,6 +345,15 @@ class ManyRelatedObjectsDescriptor(object):
 
         return manager
 
+    def __set__(self, instance, value):
+        if instance is None:
+            raise AttributeError, "Manager must be accessed via instance"
+        
+        manager = self.__get__(instance)
+        manager.clear()
+        for obj in value:
+            manager.add(obj)
+
 class ReverseManyRelatedObjectsDescriptor(object):
     # This class provides the functionality that makes the related-object
     # managers available as attributes on a model class, for fields that have
@@ -400,6 +425,15 @@ class ReverseManyRelatedObjectsDescriptor(object):
         manager.model = rel_model
 
         return manager
+
+    def __set__(self, instance, value):
+        if instance is None:
+            raise AttributeError, "Manager must be accessed via instance"
+            
+        manager = self.__get__(instance)
+        manager.clear()
+        for obj in value:
+            manager.add(obj)
 
 class ForeignKey(RelatedField, Field):
     empty_strings_allowed = False

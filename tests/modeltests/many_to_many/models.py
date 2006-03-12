@@ -144,12 +144,19 @@ API_TESTS = """
 >>> a5.publications.all()
 []
 
-# You can clear the whole lot:
-# (put some back first)
->>> p2.article_set.add(a4, a5)
->>> a4.publications.add(p3)
+# Relation sets can be assigned. Assignment clears any existing set members
+>>> p2.article_set = [a4, a5]
+>>> p2.article_set.all()
+[NASA finds intelligent life on Earth, Oxygen-free diet works wonders]
 >>> a4.publications.all()
-[Science News, Science Weekly]
+[Science News]
+>>> a4.publications = [p3]
+>>> p2.article_set.all()
+[Oxygen-free diet works wonders]
+>>> a4.publications.all()
+[Science Weekly]
+
+# Relation sets can be cleared:
 >>> p2.article_set.clear()
 >>> p2.article_set.all()
 []
@@ -195,6 +202,5 @@ API_TESTS = """
 []
 >>> p1.article_set.all()
 [NASA uses Python]
-
 
 """

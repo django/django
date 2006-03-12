@@ -49,7 +49,7 @@ Second
 1
 
 # Reporter objects have access to their related Article objects.
->>> r.article_set.order_by('headline')
+>>> r.article_set.all()
 [First, Second]
 >>> r.article_set.filter(headline__startswith='Fir')
 [First]
@@ -111,11 +111,17 @@ DoesNotExist: 'Fourth' is not related to 'John Smith'.
 >>> r2.article_set.all()
 [Fourth]
 
+# Use descriptor assignment to allocate ForeignKey. Null is legal, so
+# existing members of set that are not in the assignment set are set null
+>>> r2.article_set = [a2, a3]
+>>> r2.article_set.all()
+[Second, Third]
+
 # Clear the rest of the set
 >>> r.article_set.clear()
 >>> r.article_set.all()
 []
 >>> Article.objects.filter(reporter__isnull=True)
-[First, Second, Third]
+[First, Fourth]
 
 """
