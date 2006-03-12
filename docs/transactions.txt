@@ -63,7 +63,7 @@ You can use the ``autocommit`` decorator to switch a view function to the
 default commit behavior of Django, regardless of the global setting. Just use
 the decorator like this::
 
-    from django.db.transaction import autocommit
+    from django.db import transaction
 
     @transaction.autocommit
     def viewfunc(request):
