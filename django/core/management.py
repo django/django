@@ -202,13 +202,13 @@ def get_sql_delete(app):
     "Returns a list of the DROP TABLE SQL statements for the given app."
     from django.db import backend, connection, models, get_introspection_module
     introspection = get_introspection_module()
-    
+
     # This should work even if a connecton isn't available
     try:
         cursor = connection.cursor()
     except:
         cursor = None
-        
+
     # Figure out which tables already exist
     if cursor:
         table_names = introspection.get_table_list(cursor)
@@ -216,7 +216,7 @@ def get_sql_delete(app):
         table_names = []
 
     output = []
-    
+
     # Output DROP TABLE statements for standard application tables.
     to_delete = set()
 
@@ -262,12 +262,12 @@ def get_sql_delete(app):
         # Grab a list of affected content-types
         cursor.execute("SELECT id FROM django_content_type WHERE app_label = %s", [app_label])
         affected_content_types = [r[0] for r in cursor.fetchall()]
-        
-        # Remember do this this business in reverse order since the returned 
+
+        # Remember do this this business in reverse order since the returned
         # values are reversed below
         output.append("DELETE FROM %s WHERE %s = '%s';" % \
             (backend.quote_name('django_content_type'), backend.quote_name('app_label'), app_label))
-        
+
         if "auth_permission" in table_names:
             for ctype_id in affected_content_types:
                 output.append("DELETE FROM %s WHERE %s = %s;" % \
@@ -278,7 +278,7 @@ def get_sql_delete(app):
             for ctype_id in affected_content_types:
                 output.append("DELETE FROM %s WHERE %s = %s;" % \
                     (backend.quote_name("django_admin_log"), backend.quote_name("content_type_id"), ctype_id))
-                     
+
     # Close database connection explicitly, in case this output is being piped
     # directly into a database client, to avoid locking issues.
     if cursor:
@@ -298,11 +298,11 @@ get_sql_reset.args = APP_ARGS
 def get_sql_initial_data_for_model(model):
     from django.db import models
     from django.conf import settings
-    
+
     opts = model._meta
     app_dir = os.path.normpath(os.path.join(os.path.dirname(models.get_app(model._meta.app_label).__file__), 'sql'))
     output = []
-    
+
     # Find custom SQL, if it's available.
     sql_files = [os.path.join(app_dir, "%s.%s.sql" % (opts.object_name.lower(), settings.DATABASE_ENGINE)),
                  os.path.join(app_dir, "%s.sql" % opts.object_name.lower())]
@@ -311,7 +311,7 @@ def get_sql_initial_data_for_model(model):
             fp = open(sql_file)
             output.append(fp.read())
             fp.close()
-    
+
     return output
 
 def get_sql_initial_data(app):
@@ -393,7 +393,7 @@ def syncdb():
     created_models = set()
     pending_references = {}
     install_permissions = True
-    
+
     for app in models.get_apps():
         model_list = models.get_models(app)
         for model in model_list:
@@ -430,12 +430,12 @@ def syncdb():
                 sys.stderr.write("Permissions will not be installed because it "\
                                  "appears that you are not using Django's auth framework. "\
                                  "If you want to install them in the future, re-run syncdb."\
-                                 "\n(The full error was: %s)" % e)
+                                 "\n(The full error was: %s)\n" % e)
                 transaction.rollback_unless_managed()
             else:
                 transaction.commit_unless_managed()
-                
-        # Install initial data for the app (but only if this is a model we've 
+
+        # Install initial data for the app (but only if this is a model we've
         # just created)
         for model in models.get_models(app):
             if model in created_models:
@@ -451,14 +451,14 @@ def syncdb():
                         transaction.rollback_unless_managed()
                     else:
                         transaction.commit_unless_managed()
-    
+
     # Create an initial "example.com" site (if we need to)
     from django.contrib.sites.models import Site
     if Site in created_models:
         print "Creating example site object"
         ex = Site(domain="example.com", name="example.com")
         ex.save()
-        
+
     # If we just installed the User model, ask about creating a superuser
     from django.contrib.auth.models import User
     if User in created_models:
@@ -467,7 +467,7 @@ def syncdb():
         confirm = raw_input(msg)
         if confirm.lower().startswith('y'):
             createsuperuser()
-    
+
 syncdb.args = ''
 
 def get_admin_index(app):
@@ -518,7 +518,7 @@ Hint: Look at the output of 'django-admin.py sqlall %s'. That's the SQL this com
 The full error: %s\n""" % (app_name, app_name, e))
         transaction.rollback_unless_managed()
         sys.exit(1)
-    transaction.commit_unless_managed()        
+    transaction.commit_unless_managed()
 install.help_doc = "Executes ``sqlall`` for the given app(s) in the current database."
 install.args = APP_ARGS
 
@@ -563,9 +563,11 @@ def installperms(app):
     from django.contrib.contenttypes.models import ContentType
     from django.contrib.auth.models import Permission
     from django.db.models import get_models
-    num_added = 0
     app_models = get_models(app)
+    if not app_models:
+        return
     app_label = app_models[0]._meta.app_label
+    num_added = 0
     for klass in app_models:
         opts = klass._meta
         ctype = ContentType.objects.get_for_model(klass)
