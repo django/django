@@ -1,5 +1,7 @@
 import django.db.models.manipulators
 import django.db.models.manager
+from django.core import validators
+from django.core.exceptions import ObjectDoesNotExist
 from django.db.models.fields import AutoField, ImageField, FieldDoesNotExist
 from django.db.models.fields.related import OneToOne, ManyToOne
 from django.db.models.related import RelatedObject
@@ -9,7 +11,6 @@ from django.db import connection, backend, transaction
 from django.db.models import signals
 from django.db.models.loading import register_models
 from django.dispatch import dispatcher
-from django.core.exceptions import ObjectDoesNotExist
 from django.utils.datastructures import SortedDict
 from django.utils.functional import curry
 from django.conf import settings
@@ -38,6 +39,7 @@ class ModelBase(type):
 
         # Build complete list of parents
         for base in bases:
+            # TODO: Checking for the presence of '_meta' is hackish.
             if '_meta' in dir(base):
                 new_class._meta.parents.append(base)
                 new_class._meta.parents.extend(base._meta.parents)
@@ -195,6 +197,28 @@ class Model(object):
         dispatcher.send(signal=signals.post_save, sender=self.__class__, instance=self)
 
     save.alters_data = True
+
+    def validate(self):
+        """
+        First coerces all fields on this instance to their proper Python types.
+        Then runs validation on every field. Returns a dictionary of
+        field_name -> error_list.
+        """
+        error_dict = {}
+        invalid_python = {}
+        for f in self._meta.fields:
+            try:
+                setattr(self, f.attname, f.to_python(getattr(self, f.attname, f.get_default())))
+            except validators.ValidationError, e:
+                error_dict[f.name] = e.messages
+                invalid_python[f.name] = 1
+        for f in self._meta.fields:
+            if f.name in invalid_python:
+                continue
+            errors = f.validate_full(getattr(self, f.attname, f.get_default()), self.__dict__)
+            if errors:
+                error_dict[f.name] = errors
+        return error_dict
 
     def _collect_sub_objects(self, seen_objs):
         """

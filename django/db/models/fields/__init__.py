@@ -6,8 +6,8 @@ from django import forms
 from django.core.exceptions import ObjectDoesNotExist
 from django.utils.functional import curry, lazy
 from django.utils.text import capfirst
-from django.utils.translation import gettext_lazy, ngettext
-import datetime, os
+from django.utils.translation import gettext, gettext_lazy, ngettext
+import datetime, os, time
 
 class NOT_PROVIDED:
     pass
@@ -37,7 +37,7 @@ def manipulator_validator_unique(f, opts, self, field_data, all_data):
         return
     if getattr(self, 'original_object', None) and self.original_object._get_pk_val() == old_obj._get_pk_val():
         return
-    raise validators.ValidationError, _("%(optname)s with this %(fieldname)s already exists.") % {'optname': capfirst(opts.verbose_name), 'fieldname': f.verbose_name}
+    raise validators.ValidationError, gettext("%(optname)s with this %(fieldname)s already exists.") % {'optname': capfirst(opts.verbose_name), 'fieldname': f.verbose_name}
 
 # A guide to Field parameters:
 #
@@ -95,6 +95,37 @@ class Field(object):
     def __cmp__(self, other):
         # This is needed because bisect does not take a comparison function.
         return cmp(self.creation_counter, other.creation_counter)
+
+    def to_python(self, value):
+        """
+        Converts the input value into the expected Python data type, raising
+        validators.ValidationError if the data can't be converted. Returns the
+        converted value. Subclasses should override this.
+        """
+        return value
+
+    def validate_full(self, field_data, all_data):
+        """
+        Returns a list of errors for this field. This is the main interface,
+        as it encapsulates some basic validation logic used by all fields.
+        Subclasses should implement validate(), not validate_full().
+        """
+        if not self.blank and not field_data:
+            return [gettext_lazy('This field is required.')]
+        try:
+            self.validate(field_data, all_data)
+        except validators.ValidationError, e:
+            return e.messages
+        return []
+
+    def validate(self, field_data, all_data):
+        """
+        Raises validators.ValidationError if field_data has any errors.
+        Subclasses should override this to specify field-specific validation
+        logic. This method should assume field_data has already been converted
+        into the appropriate data type by Field.to_python().
+        """
+        pass
 
     def set_attributes_from_name(self, name):
         self.name = name
@@ -299,7 +330,16 @@ class AutoField(Field):
     empty_strings_allowed = False
     def __init__(self, *args, **kwargs):
         assert kwargs.get('primary_key', False) is True, "%ss must have primary_key=True." % self.__class__.__name__
+        kwargs['blank'] = True
         Field.__init__(self, *args, **kwargs)
+
+    def to_python(self, value):
+        if value is None:
+            return value
+        try:
+            return int(value)
+        except (TypeError, ValueError):
+            raise validators.ValidationError, gettext("This value must be an integer.")
 
     def get_manipulator_fields(self, opts, manipulator, change, name_prefix='', rel=False, follow=True):
         if not rel:
@@ -327,6 +367,12 @@ class BooleanField(Field):
         kwargs['blank'] = True
         Field.__init__(self, *args, **kwargs)
 
+    def to_python(self, value):
+        if value in (True, False): return value
+        if value is 't': return True
+        if value is 'f': return False
+        raise validators.ValidationError, gettext("This value must be either True or False.")
+
     def get_manipulator_field_objs(self):
         return [forms.CheckboxField]
 
@@ -334,6 +380,17 @@ class CharField(Field):
     def get_manipulator_field_objs(self):
         return [forms.TextField]
 
+    def to_python(self, value):
+        if isinstance(value, basestring):
+            return value
+        if value is None:
+            if self.null:
+                return value
+            else:
+                raise validators.ValidationError, gettext_lazy("This field cannot be null.")
+        return str(value)
+
+# TODO: Maybe move this into contrib, because it's specialized.
 class CommaSeparatedIntegerField(CharField):
     def get_manipulator_field_objs(self):
         return [forms.CommaSeparatedIntegerField]
@@ -347,6 +404,14 @@ class DateField(Field):
             kwargs['editable'] = False
             kwargs['blank'] = True
         Field.__init__(self, verbose_name, name, **kwargs)
+
+    def to_python(self, value):
+        if isinstance(value, datetime.datetime):
+            return value.date()
+        if isinstance(value, datetime.date):
+            return value
+        validators.isValidANSIDate(value, None)
+        return datetime.date(*time.strptime(value, '%Y-%m-%d')[:3])
 
     def get_db_prep_lookup(self, lookup_type, value):
         if lookup_type == 'range':
@@ -391,6 +456,22 @@ class DateField(Field):
         return {self.attname: (val is not None and val.strftime("%Y-%m-%d") or '')}
 
 class DateTimeField(DateField):
+    def to_python(self, value):
+        if isinstance(value, datetime.datetime):
+            return value
+        if isinstance(value, datetime.date):
+            return datetime.datetime(value.year, value.month, value.day)
+        try: # Seconds are optional, so try converting seconds first.
+            return datetime.datetime(*time.strptime(value, '%Y-%m-%d %H:%M:%S')[:6])
+        except ValueError:
+            try: # Try without seconds.
+                return datetime.datetime(*time.strptime(value, '%Y-%m-%d %H:%M')[:5])
+            except ValueError: # Try without hour/minutes/seconds.
+                try:
+                    return datetime.datetime(*time.strptime(value, '%Y-%m-%d')[:3])
+                except ValueError:
+                    raise validators.ValidationError, gettext('Enter a valid date/time in YYYY-MM-DD HH:MM format.')
+
     def get_db_prep_save(self, value):
         # Casts dates into string format for entry into database.
         if value is not None:
@@ -432,16 +513,19 @@ class DateTimeField(DateField):
         return {date_field: (val is not None and val.strftime("%Y-%m-%d") or ''),
                 time_field: (val is not None and val.strftime("%H:%M:%S") or '')}
 
-class EmailField(Field):
+class EmailField(CharField):
     def __init__(self, *args, **kwargs):
         kwargs['maxlength'] = 75
-        Field.__init__(self, *args, **kwargs)
+        CharField.__init__(self, *args, **kwargs)
 
     def get_internal_type(self):
         return "CharField"
 
     def get_manipulator_field_objs(self):
         return [forms.EmailField]
+
+    def validate(self, field_data, all_data):
+        validators.isValidEmail(field_data, all_data)
 
 class FileField(Field):
     def __init__(self, verbose_name=None, name=None, upload_to='', **kwargs):
@@ -583,6 +667,9 @@ class IPAddressField(Field):
     def get_manipulator_field_objs(self):
         return [forms.IPAddressField]
 
+    def validate(self, field_data, all_data):
+        validators.isValidIPAddress4(field_data, None)
+
 class NullBooleanField(Field):
     def __init__(self, *args, **kwargs):
         kwargs['null'] = True
@@ -594,6 +681,9 @@ class NullBooleanField(Field):
 class PhoneNumberField(IntegerField):
     def get_manipulator_field_objs(self):
         return [forms.PhoneNumberField]
+
+    def validate(self, field_data, all_data):
+        validators.isValidPhone(field_data, all_data)
 
 class PositiveIntegerField(IntegerField):
     def get_manipulator_field_objs(self):
@@ -626,7 +716,7 @@ class TextField(Field):
 class TimeField(Field):
     empty_strings_allowed = False
     def __init__(self, verbose_name=None, name=None, auto_now=False, auto_now_add=False, **kwargs):
-        self.auto_now, self.auto_now_add  = auto_now, auto_now_add
+        self.auto_now, self.auto_now_add = auto_now, auto_now_add
         if auto_now or auto_now_add:
             kwargs['editable'] = False
         Field.__init__(self, verbose_name, name, **kwargs)
