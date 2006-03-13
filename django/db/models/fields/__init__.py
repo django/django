@@ -351,6 +351,8 @@ class DateField(Field):
     def get_db_prep_lookup(self, lookup_type, value):
         if lookup_type == 'range':
             value = [str(v) for v in value]
+        elif lookup_type in ('exact', 'gt', 'gte', 'lt', 'lte', 'ne'):
+            value = value.strftime('%Y-%m-%d')
         else:
             value = str(value)
         return Field.get_db_prep_lookup(self, lookup_type, value)
@@ -398,6 +400,13 @@ class DateTimeField(DateField):
                 value = value.replace(microsecond=0)
             value = str(value)
         return Field.get_db_prep_save(self, value)
+
+    def get_db_prep_lookup(self, lookup_type, value):
+        if lookup_type == 'range':
+            value = [str(v) for v in value]
+        else:
+            value = str(value)
+        return Field.get_db_prep_lookup(self, lookup_type, value)
 
     def get_manipulator_field_objs(self):
         return [forms.DateField, forms.TimeField]
