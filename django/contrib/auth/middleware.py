@@ -15,6 +15,8 @@ class UserWrapper(object):
     _user = property(_get_user)
 
     def __getattr__(self, name):
+        if name == '__setstate__': # slight hack to allow object to be unpickled
+            return None 
         return getattr(self._user, name)
 
 class AuthenticationMiddleware:
