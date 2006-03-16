@@ -21,7 +21,7 @@ Here are some examples of flatpages on Django-powered sites:
 Installation
 ============
 
-To install the flatpages app, follow these two steps:
+To install the flatpages app, follow these steps:
 
     1. Add ``"django.contrib.flatpages"`` to your INSTALLED_APPS_ setting.
     2. Add ``"django.contrib.flatpages.middleware.FlatpageFallbackMiddleware"``
