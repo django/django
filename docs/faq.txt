@@ -181,7 +181,7 @@ Short answer: When we're comfortable with Django's APIs, have added all
 features that we feel are necessary to earn a "1.0" status, and are ready to
 begin maintaining backwards compatibility. This should happen in a couple of
 months or so, although it's entirely possible that it could happen earlier.
-That translates into February or March 2006.
+That translates into summer 2006.
 
 Of course, you should note that `quite a few production sites`_ use Django in
 its current status. Don't let the lack of a 1.0 turn you off.
