@@ -1071,7 +1071,7 @@ wordwrap
 
 Wraps words at specified line length.
 
-**Argument:** number of words at which to wrap the text
+**Argument:** number of characters at which to wrap the text
 
 yesno
 ~~~~~

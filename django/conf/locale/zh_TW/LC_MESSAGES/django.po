@@ -324,16 +324,16 @@ msgstr "等級 #1"
 #: contrib/comments/templates/comments/form.html:12
 #: contrib/comments/templates/comments/form.html:23
 msgid "Required"
-msgstr ""
+msgstr "必需的"
 
 #: contrib/comments/templates/comments/form.html:12
 #: contrib/comments/templates/comments/form.html:23
 msgid "Optional"
-msgstr ""
+msgstr "可選擇的"
 
 #: contrib/comments/templates/comments/form.html:23
 msgid "Post a photo"
-msgstr ""
+msgstr "張貼照片"
 
 #: contrib/comments/templates/comments/form.html:27
 #: contrib/comments/templates/comments/freeform.html:5
@@ -486,7 +486,7 @@ msgstr "%(name)s \"%(obj)s\" 已成功新增。"
 
 #: contrib/admin/views/main.py:415 contrib/admin/views/main.py:492
 msgid "You may edit it again below."
-msgstr "你可以在下面再次編輯。"
+msgstr "你可以在下面再編輯一次。"
 
 #: contrib/admin/views/main.py:423 contrib/admin/views/main.py:501
 #, python-format
@@ -705,7 +705,7 @@ msgstr "DATE_WITH_TIME_FULL"
 msgid ""
 "This object doesn't have a change history. It probably wasn't added via this "
 "admin site."
-msgstr "這個物件沒有變更的歷蜜。它可能不是透過這個管理網站新增的。"
+msgstr "這個物件沒有變更的歷史。它可能不是透過這個管理網站新增的。"
 
 #: contrib/admin/templates/admin/base_site.html:4
 msgid "Django site admin"
@@ -742,7 +742,7 @@ msgstr "找不到頁面"
 
 #: contrib/admin/templates/admin/404.html:10
 msgid "We're sorry, but the requested page could not be found."
-msgstr "我們很抱歉，不過被要求的頁面找不到"
+msgstr "我們很抱歉，不過被要求的頁面找不到。"
 
 #: contrib/admin/templates/admin/index.html:27
 #: contrib/admin/templates/admin/change_form.html:14
@@ -755,7 +755,7 @@ msgstr "變更"
 
 #: contrib/admin/templates/admin/index.html:43
 msgid "You don't have permission to edit anything."
-msgstr "你沒有編輯任何東西的權限"
+msgstr "你沒有編輯任何東西的權限。"
 
 #: contrib/admin/templates/admin/index.html:51
 msgid "Recent Actions"
@@ -776,7 +776,7 @@ msgstr "新增 %(name)s"
 
 #: contrib/admin/templates/admin/login.html:20
 msgid "Have you <a href=\"/password_reset/\">forgotten your password</a>?"
-msgstr "你 <a href=\"/password_reset/\">忘記你的密碼了嗎</a>？"
+msgstr "你 <a href=\"/password_reset/\">忘記密碼了嗎</a>？"
 
 #: contrib/admin/templates/admin/base.html:23
 msgid "Welcome,"
@@ -1083,7 +1083,7 @@ msgstr "內容"
 
 #: contrib/flatpages/models/flatpages.py:10
 msgid "enable comments"
-msgstr "允許評論"
+msgstr "啟用評論"
 
 #: contrib/flatpages/models/flatpages.py:11
 msgid "template name"
@@ -1127,31 +1127,31 @@ msgstr "TIME_FORMAT"
 
 #: utils/dates.py:6
 msgid "Monday"
-msgstr "星期一"
+msgstr "週一"
 
 #: utils/dates.py:6
 msgid "Tuesday"
-msgstr "星期二"
+msgstr "週二"
 
 #: utils/dates.py:6
 msgid "Wednesday"
-msgstr "星期三"
+msgstr "週三"
 
 #: utils/dates.py:6
 msgid "Thursday"
-msgstr "星期四"
+msgstr "週四"
 
 #: utils/dates.py:6
 msgid "Friday"
-msgstr "星期五"
+msgstr "週五"
 
 #: utils/dates.py:7
 msgid "Saturday"
-msgstr "星期六"
+msgstr "週六"
 
 #: utils/dates.py:7
 msgid "Sunday"
-msgstr "星期日"
+msgstr "週日"
 
 #: utils/dates.py:14
 msgid "January"
@@ -1305,7 +1305,7 @@ msgstr "內容型態"
 
 #: models/core.py:67
 msgid "session key"
-msgstr "session 鍵"
+msgstr "session 鍵值"
 
 #: models/core.py:68
 msgid "session data"
@@ -1459,11 +1459,11 @@ msgstr "義大利文"
 
 #: conf/global_settings.py:48
 msgid "Japanese"
-msgstr ""
+msgstr "日文"
 
 #: conf/global_settings.py:49
 msgid "Dutch"
-msgstr ""
+msgstr "荷蘭文"
 
 #: conf/global_settings.py:50
 msgid "Norwegian"
@@ -1660,7 +1660,7 @@ msgstr "輸入有效的 U.S. 州名簡稱。"
 #, python-format
 msgid "Watch your mouth! The word %s is not allowed here."
 msgid_plural "Watch your mouth! The words %s are not allowed here."
-msgstr[0] "看住你的嘴！%s 不允許出現在這裡。"
+msgstr[0] "看管口舌！此處不允許 %s 這樣的字眼。"
 
 #: core/validators.py:238
 #, python-format

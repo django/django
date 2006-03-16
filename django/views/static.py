@@ -1,11 +1,14 @@
-import os
-import urllib
-import posixpath
-import mimetypes
 from django.template import loader
 from django.core.exceptions import ImproperlyConfigured
-from django.http import Http404, HttpResponse, HttpResponseRedirect
+from django.http import Http404, HttpResponse, HttpResponseRedirect, HttpResponseNotModified
 from django.template import Template, Context, TemplateDoesNotExist
+import mimetypes
+import os
+import posixpath
+import re
+import rfc822
+import stat
+import urllib
 
 def serve(request, path, document_root=None, show_indexes=False):
     """
@@ -41,13 +44,19 @@ def serve(request, path, document_root=None, show_indexes=False):
     if os.path.isdir(fullpath):
         if show_indexes:
             return directory_index(newpath, fullpath)
-        else:
-            raise Http404, "Directory indexes are not allowed here."
-    elif not os.path.exists(fullpath):
+        raise Http404, "Directory indexes are not allowed here."
+    if not os.path.exists(fullpath):
         raise Http404, '"%s" does not exist' % fullpath
-    else:
-        mimetype = mimetypes.guess_type(fullpath)[0]
-        return HttpResponse(open(fullpath, 'rb').read(), mimetype=mimetype)
+    # Respect the If-Modified-Since header.
+    statobj = os.stat(fullpath)
+    if not was_modified_since(request.META.get('HTTP_IF_MODIFIED_SINCE'),
+                              statobj[stat.ST_MTIME], statobj[stat.ST_SIZE]):
+        return HttpResponseNotModified()
+    mimetype = mimetypes.guess_type(fullpath)[0]
+    contents = open(fullpath, 'rb').read()
+    response = HttpResponse(contents, mimetype=mimetype)
+    response["Last-Modified"] = rfc822.formatdate(statobj[stat.ST_MTIME])
+    return response
 
 DEFAULT_DIRECTORY_INDEX_TEMPLATE = """
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
@@ -85,3 +94,33 @@ def directory_index(path, fullpath):
         'file_list' : files,
     })
     return HttpResponse(t.render(c))
+
+def was_modified_since(header=None, mtime=0, size=0):
+    """
+    Was something modified since the user last downloaded it?
+
+    header
+      This is the value of the If-Modified-Since header.  If this is None,
+      I'll just return True.
+
+    mtime
+      This is the modification time of the item we're talking about.
+
+    size
+      This is the size of the item we're talking about.
+    """
+    try:
+        if header is None:
+            raise ValueError
+        matches = re.match(r"^([^;]+)(; length=([0-9]+))?$", header,
+                           re.IGNORECASE)
+        header_mtime = rfc822.mktime_tz(rfc822.parsedate_tz(
+            matches.group(1)))
+        header_len = matches.group(3)
+        if header_len and int(header_len) != size:
+            raise ValueError
+        if mtime > header_mtime:
+            raise ValueError
+    except (AttributeError, ValueError):
+        return True
+    return False
