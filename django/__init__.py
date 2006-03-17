@@ -1,1 +1,1 @@
-VERSION = (0, 9, 1, 'magic-removal')
+VERSION = (0, 91, 'magic-removal')

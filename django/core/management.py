@@ -56,8 +56,8 @@ def get_version():
     "Returns the version as a human-format string."
     from django import VERSION
     v = '.'.join([str(i) for i in VERSION[:-1]])
-    if VERSION[3]:
-        v += ' (%s)' % VERSION[3]
+    if VERSION[-1]:
+        v += ' (%s)' % VERSION[-1]
     return v
 
 def get_sql_create(app):
