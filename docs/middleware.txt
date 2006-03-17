@@ -96,7 +96,7 @@ Also removes the content from any response to a HEAD request and sets the
 ``Date`` and ``Content-Length`` response-headers.
 
 django.contrib.sessions.middleware.SessionMiddleware
---------------------------------------------
+----------------------------------------------------
 
 Enables session support. See the `session documentation`_.
 

@@ -256,7 +256,7 @@ Using a ``Context`` as a stack comes in handy in some custom template tags, as
 you'll see below.
 
 Subclassing Context: RequestContext
-----------------------------------
+-----------------------------------
 
 Django comes with a special ``Context`` class,
 ``django.template.RequestContext``, that acts slightly differently than
