@@ -421,7 +421,7 @@ def _get_deleted_objects(deleted_objects, perms_needed, user, obj, opts, current
                     nh(deleted_objects, current_depth, ['%s: %s' % (capfirst(related.opts.verbose_name), sub_obj), []])
                 else:
                     # Display a link to the admin page.
-                    nh(deleted_objects, current_depth, ['%s: <a href="../../../../%s/%s/%s/change/">%s</a>' % \
+                    nh(deleted_objects, current_depth, ['%s: <a href="../../../../%s/%s/%s/">%s</a>' % \
                         (capfirst(related.opts.verbose_name), related.opts.app_label, related.opts.object_name.lower(),
                         sub_obj._get_pk_val(), sub_obj), []])
                 _get_deleted_objects(deleted_objects, perms_needed, user, sub_obj, related.opts, current_depth+2)
@@ -435,7 +435,7 @@ def _get_deleted_objects(deleted_objects, perms_needed, user, obj, opts, current
                     nh(deleted_objects, current_depth, ['%s: %s' % (capfirst(related.opts.verbose_name), escape(str(sub_obj))), []])
                 else:
                     # Display a link to the admin page.
-                    nh(deleted_objects, current_depth, ['%s: <a href="../../../../%s/%s/%s/change/">%s</a>' % \
+                    nh(deleted_objects, current_depth, ['%s: <a href="../../../../%s/%s/%s/">%s</a>' % \
                         (capfirst(related.opts.verbose_name), related.opts.app_label, related.opts.object_name.lower(), sub_obj._get_pk_val(), escape(str(sub_obj))), []])
                 _get_deleted_objects(deleted_objects, perms_needed, user, sub_obj, related.opts, current_depth+2)
             # If there were related objects, and the user doesn't have
