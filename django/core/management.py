@@ -46,6 +46,21 @@ def _get_permission_insert(name, codename, opts):
 def _is_valid_dir_name(s):
     return bool(re.search(r'^\w+$', s))
 
+def _get_installed_models(table_list):
+    "Gets a set of all models that are installed, given a list of existing tables"
+    from django.db import models
+    all_models = []
+    for app in models.get_apps():
+        for model in models.get_models(app):
+            all_models.append(model)
+    return set([m for m in all_models if m._meta.db_table in table_list])
+
+def _get_table_list():
+    "Gets a list of all db tables that are physically installed."
+    from django.db import connection, get_introspection_module
+    cursor = connection.cursor()
+    return get_introspection_module().get_table_list(cursor)
+
 # If the foreign key points to an AutoField, a PositiveIntegerField or a
 # PositiveSmallIntegerField, the foreign key should be an IntegerField, not the
 # referred field type. Otherwise, the foreign key should be the same type of
@@ -73,8 +88,11 @@ def get_sql_create(app):
             "Edit your settings file and change DATABASE_ENGINE to something like 'postgresql' or 'mysql'.\n")
         sys.exit(1)
 
+    # Get installed models, so we generate REFERENCES right
+    installed_models = _get_installed_models(_get_table_list())
+    
     final_output = []
-    models_output = set()
+    models_output = set(installed_models)
     pending_references = {}
 
     app_models = models.get_models(app)
@@ -90,6 +108,15 @@ def get_sql_create(app):
     # Create the many-to-many join tables.
     for klass in app_models:
         final_output.extend(_get_many_to_many_sql_for_model(klass))
+
+    # Handle references to tables that are from other apps
+    # but don't exist physically
+    not_installed_models = set(pending_references.keys())
+    if not_installed_models:
+        final_output.append('-- The following references should be added but depend on non-existant tables:')
+        for klass in not_found_models:
+            final_output.extend(['-- ' + sql for sql in 
+                _get_sql_for_pending_references(klass, pending_references)])
 
     return final_output
 get_sql_create.help_doc = "Prints the CREATE TABLE SQL statements for the given app name(s)."
@@ -370,26 +397,21 @@ get_sql_all.args = APP_ARGS
 
 def syncdb():
     "Creates the database tables for all apps in INSTALLED_APPS whose tables haven't already been created."
-    from django.db import connection, transaction, models, get_creation_module, get_introspection_module
+    from django.db import connection, transaction, models, get_creation_module
 
     # Check that there are no validation errors before continuing
     _check_for_validation_errors()
 
-    introspection_module = get_introspection_module()
     data_types = get_creation_module().DATA_TYPES
 
     cursor = connection.cursor()
 
     # Get a list of all existing database tables,
     # so we know what needs to be added.
-    table_list = introspection_module.get_table_list(cursor)
+    table_list = _get_table_list()
 
     # Get a list of already installed *models* so that references work right.
-    all_models = []
-    for app in models.get_apps():
-        for model in models.get_models(app):
-            all_models.append(model)
-    seen_models = set([m for m in all_models if m._meta.db_table in table_list])
+    seen_models = _get_installed_models(table_list)
     created_models = set()
     pending_references = {}
     install_permissions = True
