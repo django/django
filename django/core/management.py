@@ -114,7 +114,7 @@ def get_sql_create(app):
     not_installed_models = set(pending_references.keys())
     if not_installed_models:
         final_output.append('-- The following references should be added but depend on non-existant tables:')
-        for klass in not_found_models:
+        for klass in not_installed_models:
             final_output.extend(['-- ' + sql for sql in 
                 _get_sql_for_pending_references(klass, pending_references)])
 
