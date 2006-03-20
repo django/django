@@ -52,6 +52,7 @@ LANGUAGES = (
     ('ro', _('Romanian')),
     ('ru', _('Russian')),
     ('sk', _('Slovak')),
+    ('sl', _('Slovenian')),
     ('sr', _('Serbian')),
     ('sv', _('Swedish')),
     ('zh-cn', _('Simplified Chinese')),
