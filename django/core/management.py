@@ -90,7 +90,7 @@ def get_sql_create(app):
 
     # Get installed models, so we generate REFERENCES right
     installed_models = _get_installed_models(_get_table_list())
-    
+
     final_output = []
     models_output = set(installed_models)
     pending_references = {}
@@ -115,7 +115,7 @@ def get_sql_create(app):
     if not_installed_models:
         final_output.append('-- The following references should be added but depend on non-existant tables:')
         for klass in not_installed_models:
-            final_output.extend(['-- ' + sql for sql in 
+            final_output.extend(['-- ' + sql for sql in
                 _get_sql_for_pending_references(klass, pending_references)])
 
     return final_output
@@ -484,11 +484,16 @@ def syncdb():
     # If we just installed the User model, ask about creating a superuser
     from django.contrib.auth.models import User
     if User in created_models:
-        msg = "\nIt looks like you just installed Django's auth system which means you don't have " \
+        msg = "\nYou just installed Django's auth system, which means you don't have " \
               "any superusers defined.\nWould you like to create one now? (yes/no): "
         confirm = raw_input(msg)
-        if confirm.lower().startswith('y'):
-            createsuperuser()
+        while 1:
+            if confirm not in ('yes', 'no'):
+                confirm = raw_input('Please enter either "yes" or "no": ')
+                continue
+            if confirm == 'yes':
+                createsuperuser()
+            break
 
 syncdb.args = ''
 
