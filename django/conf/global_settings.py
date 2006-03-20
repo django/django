@@ -39,6 +39,7 @@ LANGUAGES = (
     ('cy', _('Welsh')),
     ('da', _('Danish')),
     ('de', _('German')),
+    ('el', _('Greek')),
     ('en', _('English')),
     ('es', _('Spanish')),
     ('fr', _('French')),
