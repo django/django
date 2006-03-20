@@ -405,7 +405,7 @@ def _get_deleted_objects(deleted_objects, perms_needed, user, obj, opts, current
         rel_opts_name = related.get_accessor_name()
         if isinstance(related.field.rel, models.OneToOne):
             try:
-                sub_obj = getattr(obj, 'get_%s' % rel_opts_name)()
+                sub_obj = getattr(obj, rel_opts_name)
             except ObjectDoesNotExist:
                 pass
             else:
