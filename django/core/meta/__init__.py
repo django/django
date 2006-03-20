@@ -205,13 +205,13 @@ class RelatedObject(object):
 
             change = count - len(list)
             if change > 0:
-                return list + [None] * len(change)
+                return list + [None] * change
             if change < 0:
                 return list[:change]
             else: # Just right
                 return list
         else:
-            return [None] * len(self.field.rel.num_in_admin)
+            return [None] * self.field.rel.num_in_admin
 
     def editable_fields(self):
         "Get the fields in this class that should be edited inline."
