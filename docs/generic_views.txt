@@ -261,7 +261,7 @@ The date-based generic functions are:
     your URLconf, and you'll need to pass a ``slug_field`` key in your info
     dictionary to indicate the name of the slug field.
 
-    If your using the object_id-style URLs, you'll just need to give the URL
+    If you're using the object_id-style URLs, you'll just need to give the URL
     pattern an ``object_id`` field.
 
     You can also pass the ``template_name_field`` argument to indicate that the
