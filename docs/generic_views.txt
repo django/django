@@ -294,21 +294,22 @@ Individual views are:
 
     Takes the following optional arguments:
 
-        =======================  =================================================
-        Argument                 Description
-        =======================  =================================================
-        ``paginate_by``          If set to an integer, the view will paginate
-                                 objects with ``paginate_by`` objects per page.
-                                 The view will expect a ``page`` GET param with
-                                 the (zero-indexed) page number.
+        ========================  =================================================
+        Argument                  Description
+        ========================  =================================================
+        ``paginate_by``           If set to an integer, the view will paginate
+                                  objects with ``paginate_by`` objects per page.
+                                  The view will expect a ``page`` GET param with
+                                  the (zero-indexed) page number.
 
-        ``allow_empty``          If ``False`` and there are no objects to display,
-                                 the view will raise a 404 instead of displaying
-                                 an empty index page. ``False`` is default.
-        ``template_object_name`` **New in Django development version.** Designates
-                                 the name of the object template variable. Default
-                                 is ``'object'``.
-        =======================  =================================================
+        ``allow_empty``           If ``False`` and there are no objects to display,
+                                  the view will raise a 404 instead of displaying
+                                  an empty index page. ``False`` is default.
+
+        ``template_object_name``  **New in Django development version.** Designates
+                                  the name of the object template variable. Default
+                                  is ``'object'``.
+        ========================  =================================================
 
     Uses the template ``app_label/module_name_list`` by default.
 
