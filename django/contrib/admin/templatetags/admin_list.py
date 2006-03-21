@@ -114,6 +114,7 @@ def items_for_result(cl, result):
             # or a property.
             try:
                 attr = getattr(result, field_name)
+                allow_tags = getattr(attr, 'allow_tags', False)
                 if callable(attr):
                     attr = attr()
                 result_repr = str(attr)
@@ -122,7 +123,7 @@ def items_for_result(cl, result):
             else:
                 # Strip HTML tags in the resulting text, except if the
                 # function has an "allow_tags" attribute set to True.
-                if not getattr(attr, 'allow_tags', False):
+                if not allow_tags:
                     result_repr = escape(result_repr)
         else:
             field_val = getattr(result, f.attname)
