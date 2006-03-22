@@ -1118,7 +1118,12 @@ directly within the SQL. If you use this technique, the underlying database
 library will automatically add quotes and escaping to your parameter(s) as
 necessary.
 
+A final note: If all you want to do is a custom ``WHERE`` clause, you can just
+just the ``where``, ``tables`` and ``params`` arguments to the standard lookup
+API. See `Other lookup options`_.
+
 .. _Python DB-API: http://www.python.org/peps/pep-0249.html
+.. _Other lookup options: http://www.djangoproject.com/documentation/db_api/#other-lookup-options
 
 Using models
 ============
