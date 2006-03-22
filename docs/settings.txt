@@ -334,6 +334,30 @@ Default: ``'localhost'``
 
 The host to use for sending e-mail.
 
+EMAIL_HOST_PASSWORD
+-------------------
+
+Default: ``''`` (Empty string)
+
+**New in Django development version.**
+
+Username to use for the SMTP server defined in ``EMAIL_HOST``. If empty,
+Django won't attempt authentication.
+
+See also ``EMAIL_HOST_USER``.
+
+EMAIL_HOST_USER
+---------------
+
+Default: ``''`` (Empty string)
+
+**New in Django development version.**
+
+Username to use for the SMTP server defined in ``EMAIL_HOST``. If empty,
+Django won't attempt authentication.
+
+See also ``EMAIL_HOST_PASSWORD``.
+
 EMAIL_SUBJECT_PREFIX
 --------------------
 

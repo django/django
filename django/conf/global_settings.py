@@ -39,6 +39,7 @@ LANGUAGES = (
     ('cy', _('Welsh')),
     ('da', _('Danish')),
     ('de', _('German')),
+    ('el', _('Greek')),
     ('en', _('English')),
     ('es', _('Spanish')),
     ('fr', _('French')),
@@ -52,6 +53,7 @@ LANGUAGES = (
     ('ro', _('Romanian')),
     ('ru', _('Russian')),
     ('sk', _('Slovak')),
+    ('sl', _('Slovenian')),
     ('sr', _('Serbian')),
     ('sv', _('Swedish')),
     ('zh-cn', _('Simplified Chinese')),
@@ -84,6 +86,10 @@ DATABASE_PORT = ''             # Set to empty string for default. Not used with 
 
 # Host for sending e-mail.
 EMAIL_HOST = 'localhost'
+
+# Optional SMTP authentication information for EMAIL_HOST.
+EMAIL_HOST_USER = ''
+EMAIL_HOST_PASSWORD = ''
 
 # List of strings representing installed apps.
 INSTALLED_APPS = ()
