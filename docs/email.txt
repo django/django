@@ -26,10 +26,12 @@ The send_mail function
 The simplest way to send e-mail is using the function
 ``django.core.mail.send_mail``. Here's its definition::
 
-    send_mail(subject, message, from_email, recipient_list, fail_silently=False)
+    send_mail(subject, message, from_email, recipient_list,
+        fail_silently=False, auth_user=EMAIL_HOST_USER,
+        auth_password=EMAIL_HOST_PASSWORD)
 
-All parameters are required except for ``fail_silently``, which is ``False`` by
-default.
+The ``subject``, ``message``, ``from_email`` and ``recipient_list`` parameters
+are required.
 
     * ``subject``: A string.
     * ``message``: A string.
@@ -40,6 +42,13 @@ default.
     * ``fail_silently``: A boolean. If it's ``False``, ``send_mail`` will raise
       an ``smtplib.SMTPException``. See the `smtplib docs`_ for a list of
       possible exceptions, all of which are subclasses of ``SMTPException``.
+    * ``auth_user``: **New in Django development version.** The optional
+      username to use to authenticate to the SMTP server. If this isn't
+      provided, Django will use the value of the ``EMAIL_HOST_USER`` setting.
+    * ``auth_password``: **New in Django development version.** The optional
+      password to use to authenticate to the SMTP server. If this isn't
+      provided, Django will use the value of the ``EMAIL_HOST_PASSWORD``
+      setting.
 
 .. _smtplib docs: http://www.python.org/doc/current/lib/module-smtplib.html
 
@@ -49,13 +58,16 @@ The send_mass_mail function
 ``django.core.mail.send_mass_mail`` is intended to handle mass e-mailing.
 Here's the definition::
 
-    send_mass_mail(datatuple, fail_silently=False):
+    send_mass_mail(datatuple, fail_silently=False,
+        auth_user=EMAIL_HOST_USER, auth_password=EMAIL_HOST_PASSWORD):
 
 ``datatuple`` is a tuple in which each element is in this format::
 
     (subject, message, from_email, recipient_list)
 
-``fail_silently`` has the same function as in ``send_mail()``.
+``fail_silently``, ``auth_user`` and ``auth_password`` have the same functions
+as in ``send_mail()``. Note that ``auth_user`` and ``auth_password`` are only
+available in the Django development version.
 
 Each separate element of ``datatuple`` results in a separate e-mail message.
 As in ``send_mail()``, recipients in the same ``recipient_list`` will all see

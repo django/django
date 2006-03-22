@@ -87,6 +87,10 @@ DATABASE_PORT = ''             # Set to empty string for default. Not used with 
 # Host for sending e-mail.
 EMAIL_HOST = 'localhost'
 
+# Optional SMTP authentication information for EMAIL_HOST.
+EMAIL_HOST_USER = ''
+EMAIL_HOST_PASSWORD = ''
+
 # List of strings representing installed apps.
 INSTALLED_APPS = ()
 
