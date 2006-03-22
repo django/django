@@ -20,7 +20,7 @@ class LazyDate:
     Use in limit_choices_to to compare the field to dates calculated at run time
     instead of when the model is loaded.  For example::
 
-        ... limit_choices_to = {'date__gt' : meta.LazyDate(days=-3)} ...
+        ... limit_choices_to = {'date__gt' : models.LazyDate(days=-3)} ...
 
     which will limit the choices to dates greater than three days ago.
     """
