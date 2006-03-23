@@ -64,24 +64,6 @@ backend.  See the `cache documentation`_ for more information.
 
 .. _cache documentation: http://www.djangoproject.com/documentation/cache/
 
-createsuperuser
----------------
-
-Creates a superuser account interactively. It asks you for a username, e-mail
-address and password.
-
-You can specify ``username email password`` on the command line, for convenient
-use in shell scripts. Example::
-
-    django-admin.py createsuperuser john john@example.com mypassword
-
-init
-----
-
-Initializes the database with the tables and data Django needs by default.
-Specifically, these are the database tables from the ``auth`` and ``core``
-models.
-
 inspectdb [dbname]
 ------------------
 
@@ -127,13 +109,6 @@ install [modelmodule modelmodule ...]
 -------------------------------------
 
 Executes the equivalent of ``sqlall`` for the given model module(s).
-
-installperms [modelmodule modelmodule ...]
-------------------------------------------
-
-Installs any admin permissions for the given model module(s) that aren't
-already installed in the database. Outputs a message telling how many
-permissions were added, if any.
 
 runserver [optional port number, or ipaddr:port]
 ------------------------------------------------

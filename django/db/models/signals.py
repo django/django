@@ -8,3 +8,5 @@ post_save = object()
 
 pre_delete = object()
 post_delete = object()
+
+post_syncdb = object()

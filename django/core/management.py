@@ -26,23 +26,6 @@ PROJECT_TEMPLATE_DIR = os.path.join(django.__path__[0], 'conf', '%s_template')
 
 INVALID_PROJECT_NAMES = ('django', 'test')
 
-def _get_permission_codename(action, opts):
-    return '%s_%s' % (action, opts.object_name.lower())
-
-def _get_all_permissions(opts):
-    "Returns (codename, name) for all permissions in the given opts."
-    perms = []
-    if opts.admin:
-        for action in ('add', 'change', 'delete'):
-            perms.append((_get_permission_codename(action, opts), 'Can %s %s' % (action, opts.verbose_name)))
-    return perms + list(opts.permissions)
-
-def _get_permission_insert(name, codename, opts):
-    from django.db import backend
-    return "INSERT INTO %s (%s, %s, %s) VALUES ('%s', '%s', '%s');" % \
-        (backend.quote_name('auth_permission'), backend.quote_name('name'), backend.quote_name('package'),
-        backend.quote_name('codename'), name.replace("'", "''"), opts.app_label, codename)
-
 def _is_valid_dir_name(s):
     return bool(re.search(r'^\w+$', s))
 
@@ -398,9 +381,20 @@ get_sql_all.args = APP_ARGS
 def syncdb():
     "Creates the database tables for all apps in INSTALLED_APPS whose tables haven't already been created."
     from django.db import connection, transaction, models, get_creation_module
+    from django.db.models import signals
+    from django.conf import settings
+    from django.dispatch import dispatcher
 
     # Check that there are no validation errors before continuing
     _check_for_validation_errors()
+
+    # Import the 'management' module within each installed app, to register
+    # dispatcher events.
+    for app_name in settings.INSTALLED_APPS:
+        try:
+            __import__(app_name + '.management', '', '', [''])
+        except ImportError:
+            pass
 
     data_types = get_creation_module().DATA_TYPES
 
@@ -414,7 +408,6 @@ def syncdb():
     seen_models = _get_installed_models(table_list)
     created_models = set()
     pending_references = {}
-    install_permissions = True
 
     for app in models.get_apps():
         model_list = models.get_models(app)
@@ -441,21 +434,11 @@ def syncdb():
 
         transaction.commit_unless_managed()
 
-    # Install permissions and initial data (first checking that they're installed)
+    # Send the post_syncdb signal, so individual apps can do whatever they need
+    # to do at this point.
     for app in models.get_apps():
-        if install_permissions:
-            try:
-                installperms(app)
-            except Exception, e:
-                # stop trying to install permissions
-                install_permissions = False
-                sys.stderr.write("Permissions will not be installed because it "\
-                                 "appears that you are not using Django's auth framework. "\
-                                 "If you want to install them in the future, re-run syncdb."\
-                                 "\n(The full error was: %s)\n" % e)
-                transaction.rollback_unless_managed()
-            else:
-                transaction.commit_unless_managed()
+        dispatcher.send(signal=signals.post_syncdb, sender=app,
+            app=app, created_models=created_models)
 
         # Install initial data for the app (but only if this is a model we've
         # just created)
@@ -473,27 +456,6 @@ def syncdb():
                         transaction.rollback_unless_managed()
                     else:
                         transaction.commit_unless_managed()
-
-    # Create an initial "example.com" site (if we need to)
-    from django.contrib.sites.models import Site
-    if Site in created_models:
-        print "Creating example site object"
-        ex = Site(domain="example.com", name="example.com")
-        ex.save()
-
-    # If we just installed the User model, ask about creating a superuser
-    from django.contrib.auth.models import User
-    if User in created_models:
-        msg = "\nYou just installed Django's auth system, which means you don't have " \
-              "any superusers defined.\nWould you like to create one now? (yes/no): "
-        confirm = raw_input(msg)
-        while 1:
-            if confirm not in ('yes', 'no'):
-                confirm = raw_input('Please enter either "yes" or "no": ')
-                continue
-            if confirm == 'yes':
-                createsuperuser()
-            break
 
 syncdb.args = ''
 
@@ -585,30 +547,6 @@ The full error: %s\n""" % (app_name, app_name, e))
 reset.help_doc = "Executes ``sqlreset`` for the given app(s) in the current database."
 reset.args = APP_ARGS
 
-def installperms(app):
-    "Installs any permissions for the given app, if needed."
-    from django.contrib.contenttypes.models import ContentType
-    from django.contrib.auth.models import Permission
-    from django.db.models import get_models
-    app_models = get_models(app)
-    if not app_models:
-        return
-    app_label = app_models[0]._meta.app_label
-    num_added = 0
-    for klass in app_models:
-        opts = klass._meta
-        ctype = ContentType.objects.get_for_model(klass)
-        for codename, name in _get_all_permissions(opts):
-            try:
-                Permission.objects.get(name=name, codename=codename, content_type__pk=ctype.id)
-            except Permission.DoesNotExist:
-                p = Permission(name=name, codename=codename, content_type=ctype)
-                p.save()
-                print "Adding permission '%r'." % p
-                num_added += 1
-installperms.help_doc = "Installs any permissions for the given model module name(s), if needed."
-installperms.args = APP_ARGS
-
 def _start_helper(app_or_project, name, directory, other_name=''):
     other = {'project': 'app', 'app': 'project'}[app_or_project]
     if not _is_valid_dir_name(name):
@@ -664,83 +602,6 @@ def startapp(app_name, directory):
     _start_helper('app', app_name, directory, project_name)
 startapp.help_doc = "Creates a Django app directory structure for the given app name in the current directory."
 startapp.args = "[appname]"
-
-def createsuperuser(username=None, email=None, password=None):
-    "Creates a superuser account."
-    from django.core import validators
-    from django.contrib.auth.models import User
-    import getpass
-
-    try:
-        import pwd
-    except ImportError:
-        default_username = ''
-    else:
-        # Determine the current system user's username, to use as a default.
-        default_username = pwd.getpwuid(os.getuid())[0].replace(' ', '').lower()
-
-    # Determine whether the default username is taken, so we don't display
-    # it as an option.
-    if default_username:
-        try:
-            User.objects.get(username=default_username)
-        except User.DoesNotExist:
-            pass
-        else:
-            default_username = ''
-
-    try:
-        while 1:
-            if not username:
-                input_msg = 'Username'
-                if default_username:
-                    input_msg += ' (Leave blank to use %r)' % default_username
-                username = raw_input(input_msg + ': ')
-            if default_username and username == '':
-                username = default_username
-            if not username.isalnum():
-                sys.stderr.write("Error: That username is invalid. Use only letters, digits and underscores.\n")
-                username = None
-            try:
-                User.objects.get(username=username)
-            except User.DoesNotExist:
-                break
-            else:
-                sys.stderr.write("Error: That username is already taken.\n")
-                username = None
-        while 1:
-            if not email:
-                email = raw_input('E-mail address: ')
-            try:
-                validators.isValidEmail(email, None)
-            except validators.ValidationError:
-                sys.stderr.write("Error: That e-mail address is invalid.\n")
-                email = None
-            else:
-                break
-        while 1:
-            if not password:
-                password = getpass.getpass()
-                password2 = getpass.getpass('Password (again): ')
-                if password != password2:
-                    sys.stderr.write("Error: Your passwords didn't match.\n")
-                    password = None
-                    continue
-            if password.strip() == '':
-                sys.stderr.write("Error: Blank passwords aren't allowed.\n")
-                password = None
-                continue
-            break
-    except KeyboardInterrupt:
-        sys.stderr.write("\nOperation cancelled.\n")
-        sys.exit(1)
-    u = User.objects.create_user(username, email, password)
-    u.is_staff = True
-    u.is_active = True
-    u.is_superuser = True
-    u.save()
-    print "User created successfully."
-createsuperuser.args = '[username] [email] [password] (Either all or none)'
 
 def inspectdb(db_name):
     "Generator that introspects the tables in the given database name and returns a Django model, one line at a time."
@@ -1120,11 +981,9 @@ run_shell.args = '[--plain]'
 
 DEFAULT_ACTION_MAPPING = {
     'adminindex': get_admin_index,
-    'createsuperuser': createsuperuser,
     'createcachetable' : createcachetable,
     'inspectdb': inspectdb,
     'install': install,
-    'installperms': installperms,
     'reset': reset,
     'runserver': runserver,
     'shell': run_shell,
@@ -1145,7 +1004,6 @@ NO_SQL_TRANSACTION = (
     'adminindex',
     'createcachetable',
     'install',
-    'installperms',
     'reset',
     'sqlindexes'
 )
@@ -1207,18 +1065,7 @@ def execute_from_command_line(action_mapping=DEFAULT_ACTION_MAPPING):
         from django.utils import translation
         translation.activate('en-us')
 
-    if action == 'createsuperuser':
-        try:
-            username, email, password = args[1], args[2], args[3]
-        except IndexError:
-            if len(args) == 1: # We got no arguments, just the action.
-                action_mapping[action]()
-            else:
-                sys.stderr.write("Error: %r requires arguments of 'username email password' or no argument at all.\n")
-                sys.exit(1)
-        else:
-            action_mapping[action](username, email, password)
-    elif action == 'shell':
+    if action == 'shell':
         action_mapping[action](options.plain is True)
     elif action in ('syncdb', 'validate'):
         action_mapping[action]()
