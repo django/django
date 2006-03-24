@@ -133,22 +133,26 @@ class User(models.Model):
             cursor = connection.cursor()
             # The SQL below works out to the following, after DB quoting:
             # cursor.execute("""
-            #     SELECT p.content_type_id, p.codename
-            #     FROM auth_permission p, auth_group_permissions gp, auth_user_groups ug
-            #     WHERE p.id = gp.permission_id
-            #         AND gp.group_id = ug.group_id
-            #         AND ug.user_id = %s""", [self.id])
+            #     SELECT ct."app_label", p."codename"
+            #     FROM "auth_permission" p, "auth_group_permissions" gp, "auth_user_groups" ug, "django_content_type" ct
+            #     WHERE p."id" = gp."permission_id"
+            #         AND gp."group_id" = ug."group_id"
+            #         AND ct."id" = p."content_type_id"
+            #         AND ug."user_id" = %s, [self.id])
             sql = """
-                SELECT p.%s, p.%s
-                FROM %s p, %s gp, %s ug
+                SELECT ct.%s, p.%s
+                FROM %s p, %s gp, %s ug, %s ct
                 WHERE p.%s = gp.%s
                     AND gp.%s = ug.%s
+                    AND ct.%s = p.%s
                     AND ug.%s = %%s""" % (
-                backend.quote_name('content_type_id'), backend.quote_name('codename'),
+                backend.quote_name('app_label'), backend.quote_name('codename'),
                 backend.quote_name('auth_permission'), backend.quote_name('auth_group_permissions'),
-                backend.quote_name('auth_user_groups'), backend.quote_name('id'),
-                backend.quote_name('permission_id'), backend.quote_name('group_id'),
-                backend.quote_name('group_id'), backend.quote_name('user_id'))
+                backend.quote_name('auth_user_groups'), backend.quote_name('django_content_type'), 
+                backend.quote_name('id'), backend.quote_name('permission_id'), 
+                backend.quote_name('group_id'), backend.quote_name('group_id'), 
+                backend.quote_name('id'), backend.quote_name('content_type_id'),
+                backend.quote_name('user_id'),)
             cursor.execute(sql, [self.id])
             self._group_perm_cache = sets.Set(["%s.%s" % (row[0], row[1]) for row in cursor.fetchall()])
         return self._group_perm_cache
