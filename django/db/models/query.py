@@ -314,7 +314,7 @@ class QuerySet(object):
         assert self._limit is None and self._offset is None, \
                 "Cannot change a query once a slice has been taken"
         clone = self._clone()
-        if select: clone._select.extend(select)
+        if select: clone._select.update(select)
         if where: clone._where.extend(where)
         if params: clone._params.extend(params)
         if tables: clone._tables.extend(tables)
@@ -386,7 +386,7 @@ class QuerySet(object):
 
         # Add any additional SELECTs.
         if self._select:
-            select.extend(['(%s) AS %s' % (quote_only_if_word(s[1]), backend.quote_name(s[0])) for s in self._select])
+            select.extend(['(%s) AS %s' % (quote_only_if_word(s[1]), backend.quote_name(s[0])) for s in self._select.items()])
 
         # Start composing the body of the SQL statement.
         sql = [" FROM", backend.quote_name(opts.db_table)]
