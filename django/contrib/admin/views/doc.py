@@ -93,9 +93,13 @@ def view_index(request):
     if not utils.docutils_is_available:
         return missing_docutils_page(request)
 
-    views = []
-    for site_settings_module in settings.ADMIN_FOR:
-        settings_mod = __import__(site_settings_module, '', '', [''])
+    if settings.ADMIN_FOR:
+        settings_modules = [__import__(m, '', '', ['']) for m in settings.ADMIN_FOR]
+    else:
+        settings_modules = [settings]
+    
+    views = []        
+    for settings_mod in settings_modules:
         urlconf = __import__(settings_mod.ROOT_URLCONF, '', '', [''])
         view_functions = extract_views_from_urlpatterns(urlconf.urlpatterns)
         for (func, regex) in view_functions:
@@ -163,10 +167,19 @@ def model_detail(request, app_label, model_name):
     # Gather fields/field descriptions.
     fields = []
     for field in opts.fields:
+        # ForeignKey is a special case since the field will actually be a 
+        # descriptor that returns the other object 
+        if isinstance(field, models.ForeignKey):
+            data_type = related_object_name = field.rel.to.__name__
+            app_label = field.rel.to._meta.app_label
+            verbose = utils.parse_rst(("the related `%s.%s` object"  % (app_label, data_type)), 'model', 'model:' + data_type) 
+        else:
+            data_type = get_readable_field_data_type(field)
+            verbose = field.verbose_name
         fields.append({
             'name': field.name,
-            'data_type': get_readable_field_data_type(field),
-            'verbose': field.verbose_name,
+            'data_type': data_type,
+            'verbose': verbose,
             'help': field.help_text,
         })
 
@@ -187,6 +200,19 @@ def model_detail(request, app_label, model_name):
                 'data_type': get_return_data_type(func_name),
                 'verbose': verbose,
             })
+            
+    # Gather related objects
+    for rel in opts.get_all_related_objects():
+        verbose = "related `%s.%s` objects" % (rel.opts.app_label, rel.opts.object_name)
+        accessor = rel.get_accessor_name()
+        fields.append({
+            'name' : "%s.all" % accessor,
+            'verbose' : utils.parse_rst("all " + verbose , 'model', 'model:' + opts.module_name),
+        })
+        fields.append({
+            'name' : "%s.count" % accessor,
+            'verbose' : utils.parse_rst("number of " + verbose , 'model', 'model:' + opts.module_name),
+        })
 
     return render_to_response('admin_doc/model_detail', {
         'name': '%s.%s' % (opts.app_label, opts.object_name),
@@ -277,9 +303,6 @@ DATA_TYPE_MAPPING = {
 }
 
 def get_readable_field_data_type(field):
-    # ForeignKey is a special case. Use the field type of the relation.
-    if field.get_internal_type() == 'ForeignKey':
-        field = field.rel.get_related_field()
     return DATA_TYPE_MAPPING[field.get_internal_type()] % field.__dict__
 
 def extract_views_from_urlpatterns(urlpatterns, base=''):
@@ -301,15 +324,23 @@ def extract_views_from_urlpatterns(urlpatterns, base=''):
             raise TypeError, "%s does not appear to be a urlpattern object" % p
     return views
 
-# Clean up urlpattern regexes into something somewhat readable by Mere Humans:
-# turns something like "^(?P<sport_slug>\w+)/athletes/(?P<athlete_slug>\w+)/$"
-# into "<sport_slug>/athletes/<athlete_slug>/"
-
 named_group_matcher = re.compile(r'\(\?P(<\w+>).+?\)')
+non_named_group_matcher = re.compile(r'\(.*?\)')
 
 def simplify_regex(pattern):
+    """
+    Clean up urlpattern regexes into something somewhat readable by Mere Humans:
+    turns something like "^(?P<sport_slug>\w+)/athletes/(?P<athlete_slug>\w+)/$"
+    into "<sport_slug>/athletes/<athlete_slug>/"
+    """
+    # handle named groups first
     pattern = named_group_matcher.sub(lambda m: m.group(1), pattern)
-    pattern = pattern.replace('^', '').replace('$', '').replace('?', '').replace('//', '/')
+    
+    # handle non-named groups
+    pattern = non_named_group_matcher.sub("<var>", pattern)
+        
+    # clean up any outstanding regex-y characters.    
+    pattern = pattern.replace('^', '').replace('$', '').replace('?', '').replace('//', '/').replace('\\', '')
     if not pattern.startswith('/'):
         pattern = '/' + pattern
     return pattern
