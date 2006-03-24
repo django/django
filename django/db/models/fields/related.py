@@ -190,13 +190,13 @@ class ForeignRelatedObjectsDescriptor(object):
                             obj.save()
                         else:
                             raise rel_field.rel.to.DoesNotExist, "'%s' is not related to '%s'." % (obj, instance)
-                add.alters_data = True
+                remove.alters_data = True
                 
                 def clear(self):
                     for obj in self.all():
                         setattr(obj, rel_field.name, None)
                         obj.save()
-                add.alters_data = True
+                clear.alters_data = True
                     
         manager = RelatedManager()
         manager.core_filters = {'%s__pk' % rel_field.name: getattr(instance, rel_field.rel.get_related_field().attname)}
