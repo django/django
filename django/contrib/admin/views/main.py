@@ -223,7 +223,7 @@ def index(request):
     return render_to_response('admin/index', {'title': _('Site administration')}, context_instance=template.RequestContext(request))
 index = staff_member_required(index)
 
-def add_stage(request, app_label, model_name, show_delete=False, form_url='', post_url='../', post_url_continue='../%s/', object_id_override=None):
+def add_stage(request, app_label, model_name, show_delete=False, form_url='', post_url=None, post_url_continue='../%s/', object_id_override=None):
     model = models.get_model(app_label, model_name)
     if model is None:
         raise Http404, "App %r, model %r, not found" % (app_label, model_name)
@@ -231,6 +231,14 @@ def add_stage(request, app_label, model_name, show_delete=False, form_url='', po
 
     if not request.user.has_perm(app_label + '.' + opts.get_add_permission()):
         raise PermissionDenied
+
+    if post_url is None:
+        if request.user.has_perm(app_label + '.' + opts.get_change_permission()):
+            # redirect to list view
+            post_url = '../'
+        else:
+            # Object list will give 'Permission Denied', so go back to admin home
+            post_url = '../../../'
 
     manipulator = model.AddManipulator()
     if request.POST:
