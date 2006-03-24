@@ -117,7 +117,7 @@ efficient. Here's the above "Hello World" example rewritten to use
         response = HttpResponse(mimetype='application/pdf')
         response['Content-Disposition'] = 'attachment; filename=somefilename.pdf'
 
-        buffer = String()
+        buffer = StringIO()
 
         # Create the PDF object, using the StringIO object as its "file."
         p = canvas.Canvas(buffer)
