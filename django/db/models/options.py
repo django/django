@@ -66,8 +66,6 @@ class Options:
             auto.creation_counter = -1
             model.add_to_class('id', auto)
 
-        self.limit_choices_to = {}
-
         # If the db_table wasn't provided, use the app_label + module_name.
         if not self.db_table:
             self.db_table = "%s_%s" % (self.app_label, self.module_name)
