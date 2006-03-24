@@ -186,6 +186,7 @@ td ul.errorlist li { margin:0 !important; }
 .error input, .error select { border:1px solid red; }
 div.system-message { background: #ffc; margin: 10px; padding: 6px 8px; font-size: .8em; }
 div.system-message p.system-message-title { padding:4px 5px 4px 25px; margin:0; color:red; background:#ffc url(../img/admin/icon_error.gif) 5px .3em no-repeat; }
+.description { font-size:12px; padding:5px 0 0 12px; }
 
 /* ACTION ICONS */
 .addlink { padding-left:12px; background:url(../img/admin/icon_addlink.gif) 0 .2em no-repeat; }

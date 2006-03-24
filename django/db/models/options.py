@@ -218,7 +218,9 @@ class AdminOptions:
         for fieldset in field_struct:
             fs_options = fieldset[1]
             classes = fs_options.get('classes', ())
-            new_fieldset_list.append(AdminFieldSet(fieldset[0], classes, opts.get_field, fs_options['fields']))
+            description = fs_options.get('description', '')
+            new_fieldset_list.append(AdminFieldSet(fieldset[0], classes, 
+                opts.get_field, fs_options['fields'], description))
         return new_fieldset_list
 
     def contribute_to_class(self, cls, name):
@@ -227,10 +229,11 @@ class AdminOptions:
         self.manager.model = cls
 
 class AdminFieldSet(object):
-    def __init__(self, name, classes, field_locator_func, line_specs):
+    def __init__(self, name, classes, field_locator_func, line_specs, description):
         self.name = name
         self.field_lines = [AdminFieldLine(field_locator_func, line_spec) for line_spec in line_specs]
         self.classes = classes
+        self.description = description
 
     def __repr__(self):
          return "FieldSet: (%s, %s)" % (self.name, self.field_lines)

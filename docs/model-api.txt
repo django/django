@@ -855,6 +855,12 @@ object, which takes the following parameters. All are optional.
             "click to expand" link.  Fieldsets with the ``wide`` style will be
             given extra horizontal space.
 
+        ``description``
+            Optional extra text to be displayed at the top of each fieldset,
+            underneath the heading of the fieldset.  It is used verbatim,
+            so you can use any HTML and you must escape any special HTML
+            characters (such as ampersand) yourself.
+
     For example (taken from the ``django.contrib.flatpages`` model)::
 
         fields = (

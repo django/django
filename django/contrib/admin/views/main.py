@@ -177,6 +177,7 @@ class AdminBoundFieldSet(object):
     def __init__(self, field_set, field_mapping, original):
         self.name = field_set.name
         self.classes = field_set.classes
+        self.description = field_set.description
         self.bound_field_lines = [field_line.bind(field_mapping, original, AdminBoundFieldLine) for field_line in field_set]
 
     def __iter__(self):

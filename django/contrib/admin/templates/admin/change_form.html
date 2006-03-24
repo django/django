@@ -32,6 +32,7 @@
 {% for bound_field_set in bound_field_sets %}
    <fieldset class="module aligned {{ bound_field_set.classes }}">
     {% if bound_field_set.name %}<h2>{{ bound_field_set.name }}</h2>{% endif %}
+    {% if bound_field_set.description %}<div class="description">{{ bound_field_set.description }}</div>{% endif %}
     {% for bound_field_line in bound_field_set %}
         {% admin_field_line bound_field_line %}
         {% for bound_field in bound_field_line %}
