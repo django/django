@@ -798,7 +798,6 @@ class ManyToManyField(Field):
             if not self.blank and not self.rel.edit_inline and not self.rel.raw_id_admin:
                choices_list = self.get_choices_default()
                if len(choices_list) == 1:
-                   print self.name, choices_list[0][0]
                    new_data[self.name] = [choices_list[0][0]]
         return new_data
 
