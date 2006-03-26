@@ -55,9 +55,33 @@ Traceback (most recent call last):
     ...
 DoesNotExist: Restaurant does not exist for {'place__pk': ...}
 
+# Set the place using assignment notation. Because place is the primary key on Restaurant,
+# the save will create a new restaurant
+>>> r.place = p2
+>>> r.save()
+>>> p2.restaurant
+Ace Hardware the restaurant
+>>> r.place
+Ace Hardware the place
+
+# Set the place back again, using assignment in the reverse direction
+# Need to reget restaurant object first, because the reverse set 
+# can't update the existing restaurant instance
+>>> p1.restaurant = r
+>>> r.save()
+>>> p1.restaurant
+Demon Dogs the restaurant
+
+>>> r = Restaurant.objects.get(pk=1)
+>>> r.place
+Demon Dogs the place
+
 # Restaurant.objects.all() just returns the Restaurants, not the Places.
+# Note that there are two restaurants - Ace Hardware the Restaurant was created
+# in the call to r.place = p2. This means there are multiple restaurants referencing 
+# a single place...
 >>> Restaurant.objects.all()
-[Demon Dogs the restaurant]
+[Demon Dogs the restaurant, Ace Hardware the restaurant]
 
 # Place.objects.all() returns all Places, regardless of whether they have
 # Restaurants.

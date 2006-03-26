@@ -97,8 +97,11 @@ class SingleRelatedObjectDescriptor(object):
         if instance is None:
             raise AttributeError, "%s must be accessed via instance" % self.related.opts.object_name
         # Set the value of the related field
-        setattr(value, self.related.field.attname, instance)
-            
+        setattr(value, self.related.field.rel.get_related_field().attname, instance)
+
+        # Set the cache on the provided object to point to the new object
+        setattr(value, self.related.field.get_cache_name(), instance)
+
 class ReverseSingleRelatedObjectDescriptor(object):
     # This class provides the functionality that makes the related-object
     # managers available as attributes on a model class, for fields that have
@@ -142,7 +145,7 @@ class ReverseSingleRelatedObjectDescriptor(object):
             
         # Set the cache to point to the new object
         setattr(instance, self.field.get_cache_name(), value)
-        
+
 class ForeignRelatedObjectsDescriptor(object):
     # This class provides the functionality that makes the related-object
     # managers available as attributes on a model class, for fields that have
