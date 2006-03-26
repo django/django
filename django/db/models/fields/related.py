@@ -1,6 +1,6 @@
 from django.db import backend, connection, transaction
 from django.db.models import signals
-from django.db.models.fields import AutoField, Field, IntegerField
+from django.db.models.fields import AutoField, Field, IntegerField, get_ul_class
 from django.db.models.related import RelatedObject
 from django.utils.translation import gettext_lazy, string_concat
 from django.utils.functional import curry
@@ -89,10 +89,10 @@ class SingleRelatedObjectDescriptor(object):
         if instance is None:
             raise AttributeError, "%s must be accessed via instance" % self.related.opts.object_name
 
-        params = {'%s__pk' % self.related.field.name: instance._get_pk_val()}        
+        params = {'%s__pk' % self.related.field.name: instance._get_pk_val()}
         rel_obj = self.related.model._default_manager.get(**params)
         return rel_obj
-        
+
     def __set__(self, instance, value):
         if instance is None:
             raise AttributeError, "%s must be accessed via instance" % self.related.opts.object_name
@@ -142,7 +142,7 @@ class ReverseSingleRelatedObjectDescriptor(object):
         except AttributeError:
             val = None
         setattr(instance, self.field.attname, val)
-            
+
         # Set the cache to point to the new object
         setattr(instance, self.field.get_cache_name(), value)
 
@@ -150,7 +150,7 @@ class ForeignRelatedObjectsDescriptor(object):
     # This class provides the functionality that makes the related-object
     # managers available as attributes on a model class, for fields that have
     # multiple "remote" values and have a ForeignKey pointed at them by
-    # some other model. In the example "poll.choice_set", the choice_set 
+    # some other model. In the example "poll.choice_set", the choice_set
     # attribute is a ForeignRelatedObjectsDescriptor instance.
     def __init__(self, related):
         self.related = related   # RelatedObject instance
@@ -187,20 +187,20 @@ class ForeignRelatedObjectsDescriptor(object):
                 def remove(self, *objs):
                     val = getattr(instance, rel_field.rel.get_related_field().attname)
                     for obj in objs:
-                        # Is obj actually part of this descriptor set? 
+                        # Is obj actually part of this descriptor set?
                         if getattr(obj, rel_field.attname) == val:
                             setattr(obj, rel_field.name, None)
                             obj.save()
                         else:
                             raise rel_field.rel.to.DoesNotExist, "'%s' is not related to '%s'." % (obj, instance)
                 remove.alters_data = True
-                
+
                 def clear(self):
                     for obj in self.all():
                         setattr(obj, rel_field.name, None)
                         obj.save()
                 clear.alters_data = True
-                    
+
         manager = RelatedManager()
         manager.core_filters = {'%s__pk' % rel_field.name: getattr(instance, rel_field.rel.get_related_field().attname)}
         manager.model = self.related.model
@@ -211,11 +211,11 @@ class ForeignRelatedObjectsDescriptor(object):
         if instance is None:
             raise AttributeError, "Manager must be accessed via instance"
 
-        manager = self.__get__(instance)        
+        manager = self.__get__(instance)
         # If the foreign key can support nulls, then completely clear the related set.
-        # Otherwise, just move the named objects into the set. 
+        # Otherwise, just move the named objects into the set.
         if self.related.field.null:
-            manager.clear()            
+            manager.clear()
         for obj in value:
             manager.add(obj)
 
@@ -344,7 +344,7 @@ class ManyRelatedObjectsDescriptor(object):
                 self.add(new_obj)
                 return new_obj
             create.alters_data = True
-            
+
         manager = RelatedManager()
         manager.core_filters = {'%s__pk' % rel_field.name: instance._get_pk_val()}
         manager.model = self.related.model
@@ -354,7 +354,7 @@ class ManyRelatedObjectsDescriptor(object):
     def __set__(self, instance, value):
         if instance is None:
             raise AttributeError, "Manager must be accessed via instance"
-        
+
         manager = self.__get__(instance)
         manager.clear()
         for obj in value:
@@ -408,13 +408,13 @@ class ReverseManyRelatedObjectsDescriptor(object):
                 # If this is a symmetrical m2m relation to self, remove the mirror entry in the m2m table
                 if instance.__class__ == rel_model and symmetrical:
                     _remove_m2m_items(rel_model, join_table, target_col_name,
-                        source_col_name, instance._get_pk_val(), *objs)  
+                        source_col_name, instance._get_pk_val(), *objs)
             remove.alters_data = True
 
             def clear(self):
                 _clear_m2m_items(join_table, source_col_name, instance._get_pk_val())
-    
-                # If this is a symmetrical m2m relation to self, clear the mirror entry in the m2m table                
+
+                # If this is a symmetrical m2m relation to self, clear the mirror entry in the m2m table
                 if instance.__class__ == rel_model and symmetrical:
                     _clear_m2m_items(join_table, target_col_name, instance._get_pk_val())
             clear.alters_data = True
@@ -435,7 +435,7 @@ class ReverseManyRelatedObjectsDescriptor(object):
     def __set__(self, instance, value):
         if instance is None:
             raise AttributeError, "Manager must be accessed via instance"
-            
+
         manager = self.__get__(instance)
         manager.clear()
         for obj in value:
@@ -557,7 +557,7 @@ class OneToOneField(RelatedField, IntegerField):
 
     def get_validator_unique_lookup_type(self):
         return '%s__%s__exact' % (self.name, self.rel.get_related_field().name)
-        
+
     def contribute_to_class(self, cls, name):
         super(OneToOneField, self).contribute_to_class(cls, name)
         setattr(cls, self.name, ReverseSingleRelatedObjectDescriptor(self))
@@ -603,17 +603,17 @@ class ManyToManyField(RelatedField, Field):
 
     def _get_m2m_column_name(self, related):
         "Function that can be curried to provide the source column name for the m2m table"
-        # If this is an m2m relation to self, avoid the inevitable name clash 
+        # If this is an m2m relation to self, avoid the inevitable name clash
         if related.model == related.parent_model:
             return 'from_' + related.model._meta.object_name.lower() + '_id'
         else:
             return related.model._meta.object_name.lower() + '_id'
-        
+
     def _get_m2m_reverse_name(self, related):
         "Function that can be curried to provide the related column name for the m2m table"
-        # If this is an m2m relation to self, avoid the inevitable name clash 
+        # If this is an m2m relation to self, avoid the inevitable name clash
         if related.model == related.parent_model:
-            return 'to_' + related.parent_model._meta.object_name.lower() + '_id'        
+            return 'to_' + related.parent_model._meta.object_name.lower() + '_id'
         else:
             return related.parent_model._meta.object_name.lower() + '_id'
 
@@ -660,12 +660,12 @@ class ManyToManyField(RelatedField, Field):
         self.m2m_db_table = curry(self._get_m2m_db_table, cls._meta)
 
     def contribute_to_related_class(self, cls, related):
-        # m2m relations to self do not have a ManyRelatedObjectsDescriptor, 
-        # as it would be redundant - unless the field is non-symmetrical. 
+        # m2m relations to self do not have a ManyRelatedObjectsDescriptor,
+        # as it would be redundant - unless the field is non-symmetrical.
         if related.model != related.parent_model or not self.rel.symmetrical:
             # Add the descriptor for the m2m relation
             setattr(cls, related.get_accessor_name(), ManyRelatedObjectsDescriptor(related))
-            
+
         self.rel.singular = self.rel.singular or self.rel.to._meta.object_name.lower()
 
         # Set up the accessors for the column names on the m2m table
