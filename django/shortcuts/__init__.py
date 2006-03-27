@@ -21,22 +21,3 @@ def get_list_or_404(klass, **kwargs):
     if not obj_list:
         raise Http404
     return obj_list
-
-# PermWrapper and PermLookupDict proxy the permissions system into objects that
-# the template system can understand.
-
-class PermLookupDict:
-    def __init__(self, user, module_name):
-        self.user, self.module_name = user, module_name
-    def __repr__(self):
-        return str(self.user.get_permission_list())
-    def __getitem__(self, perm_name):
-        return self.user.has_perm("%s.%s" % (self.module_name, perm_name))
-    def __nonzero__(self):
-        return self.user.has_module_perms(self.module_name)
-
-class PermWrapper:
-    def __init__(self, user):
-        self.user = user
-    def __getitem__(self, module_name):
-        return PermLookupDict(self.user, module_name)
