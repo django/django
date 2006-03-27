@@ -374,7 +374,7 @@ get_sql_indexes.args = APP_ARGS
 
 def get_sql_all(app):
     "Returns a list of CREATE TABLE SQL, initial-data inserts, and CREATE INDEX SQL for the given module."
-    return get_sql_create(mod) + get_sql_initial_data(mod) + get_sql_indexes(mod)    
+    return get_sql_create(app) + get_sql_initial_data(app) + get_sql_indexes(app)    
 get_sql_all.help_doc = "Prints the CREATE TABLE, initial-data and CREATE INDEX SQL statements for the given model module name(s)."
 get_sql_all.args = APP_ARGS
 
