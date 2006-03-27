@@ -33,15 +33,6 @@ class Options:
         self.one_to_one_field = None
         self.parents = []
 
-    def merge_meta(self):
-        meta_attrs = self.meta.__dict__
-        del meta_attrs['__module__']
-        del meta_attrs['__doc__']
-        for attr_name in DEFAULT_NAMES:
-            setattr(self, attr_name, meta_attrs.pop(attr_name, getattr(self, attr_name)))
-        if meta_attrs != {}:
-            raise TypeError, "'class Meta' got invalid attribute(s): %s" % ','.join(meta_attrs.keys())
-
     def contribute_to_class(self, cls, name):
         cls._meta = self
         self.object_name = cls.__name__
@@ -51,7 +42,13 @@ class Options:
         self.verbose_name = get_verbose_name(self.object_name)
         self.verbose_name_plural = self.verbose_name + 's'
         if self.meta:
-            self.merge_meta()
+            meta_attrs = self.meta.__dict__
+            del meta_attrs['__module__']
+            del meta_attrs['__doc__']
+            for attr_name in DEFAULT_NAMES:
+                setattr(self, attr_name, meta_attrs.pop(attr_name, getattr(self, attr_name)))
+            if meta_attrs != {}:
+                raise TypeError, "'class Meta' got invalid attribute(s): %s" % ','.join(meta_attrs.keys())
         del self.meta
 
     def _prepare(self, model):
@@ -217,7 +214,7 @@ class AdminOptions:
             fs_options = fieldset[1]
             classes = fs_options.get('classes', ())
             description = fs_options.get('description', '')
-            new_fieldset_list.append(AdminFieldSet(fieldset[0], classes, 
+            new_fieldset_list.append(AdminFieldSet(fieldset[0], classes,
                 opts.get_field, fs_options['fields'], description))
         return new_fieldset_list
 
