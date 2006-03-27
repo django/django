@@ -10,7 +10,7 @@ import re
 # Calculate the verbose_name by converting from InitialCaps to "lowercase with spaces".
 get_verbose_name = lambda class_name: re.sub('([A-Z])', ' \\1', class_name).lower().strip()
 
-DEFAULT_NAMES = ('verbose_name', 'verbose_name_plural', 'db_table', 'ordering',
+DEFAULT_NAMES = ('verbose_name', 'db_table', 'ordering',
                  'unique_together', 'permissions', 'get_latest_by',
                  'order_with_respect_to', 'app_label')
 
@@ -35,18 +35,21 @@ class Options:
 
     def contribute_to_class(self, cls, name):
         cls._meta = self
+        # First, construct the default values for these options.
         self.object_name = cls.__name__
         self.module_name = self.object_name.lower()
-        # If the verbose_name wasn't given, use the class name,
-        # converted from "InitialCaps" to "lowercase with spaces".
         self.verbose_name = get_verbose_name(self.object_name)
-        self.verbose_name_plural = self.verbose_name + 's'
+        # Next, apply any overridden values from 'class Meta'.
         if self.meta:
             meta_attrs = self.meta.__dict__
             del meta_attrs['__module__']
             del meta_attrs['__doc__']
             for attr_name in DEFAULT_NAMES:
                 setattr(self, attr_name, meta_attrs.pop(attr_name, getattr(self, attr_name)))
+            # verbose_name_plural is a special case because it uses a 's'
+            # by default.
+            setattr(self, 'verbose_name_plural', meta_attrs.pop('verbose_name_plural', self.verbose_name + 's'))
+            # Any leftover attributes must be invalid.
             if meta_attrs != {}:
                 raise TypeError, "'class Meta' got invalid attribute(s): %s" % ','.join(meta_attrs.keys())
         del self.meta
