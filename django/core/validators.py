@@ -378,7 +378,7 @@ class MatchesRegularExpression:
         self.error_message = error_message
 
     def __call__(self, field_data, all_data):
-        if not self.regexp.match(field_data):
+        if not self.regexp.search(field_data):
             raise ValidationError(self.error_message)
 
 class AnyValidator:

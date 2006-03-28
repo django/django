@@ -137,25 +137,16 @@ Basic usage
 Creating users
 ~~~~~~~~~~~~~~
 
-The most basic way to create users is to use the standard Django
-`database API`_. Just create and save a ``User`` object::
+The most basic way to create users is to use the ``create_user`` helper
+function that comes with Django::
 
     >>> from django.models.auth import users
-    >>> import md5
-    >>> p = md5.new('johnpassword').hexdigest()
-    >>> u = users.User(username='john', first_name='John', last_name='lennon',
-    ...     email='lennon@thebeatles.com', password_md5=p, is_staff=True,
-    ...     is_active=True, is_superuser=False)
-    >>> u.save()
+    >>> user = users.create_user('john', 'lennon@thebeatles.com', 'johnpassword')
 
-Note that ``password_md5`` requires the raw MD5 hash (as created by
-``md5.new().hexdigest()``). Because that's a pain, there's a ``create_user``
-helper function::
-
-    >>> from django.models.auth import users
-    >>> u = users.create_user('john', 'lennon@thebeatles.com', 'johnpassword')
-
-.. _database API: http://www.djangoproject.com/documentation/db_api/
+    # Now, user is a User object already saved to the database.
+    # You can continue to change its attributes if you want to change other fields.
+    >>> user.is_staff = True
+    >>> user.save()
 
 Changing passwords
 ~~~~~~~~~~~~~~~~~~
@@ -166,6 +157,9 @@ Change a password with ``set_password()``::
     >>> u = users.get_object(username__exact='john')
     >>> u.set_password('new password')
     >>> u.save()
+
+Don't set the password field directly unless you know what you're doing. This
+is explained in the next section.
 
 Passwords
 ---------
