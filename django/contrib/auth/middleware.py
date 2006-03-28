@@ -1,32 +1,22 @@
-class UserWrapper(object):
-    """
-    Proxy to lazily load a user object.
-    """
-    def __init__(self, login):
-        self._login = login
-        self._cached_user = None
+class LazyUser(object):
+    def __init__(self, session):
+        self.session = session
+        self._user = None
 
-    def _get_user(self):
-        from django.contrib.auth.models import User
-        if not self._cached_user:
-            self._cached_user = User.objects.get(pk=self._login)
-        return self._cached_user
-
-    _user = property(_get_user)
-
-    def __getattr__(self, name):
-        if name == '__setstate__': # slight hack to allow object to be unpickled
-            return None 
-        return getattr(self._user, name)
+    def __get__(self, request, obj_type=None):
+        if self._user is None:
+            from django.contrib.auth.models import User, AnonymousUser, SESSION_KEY
+            try:
+                user_id = self.session[SESSION_KEY]
+                self._user = User.objects.get(pk=user_id)
+            except (KeyError, User.DoesNotExist):
+                self._user = AnonymousUser()
+            del self.session # We don't need to keep this around anymore.
+        return self._user
 
 class AuthenticationMiddleware:
     def process_request(self, request):
         from django.contrib.auth.models import SESSION_KEY
         assert hasattr(request, 'session'), "The Django authentication middleware requires session middleware to be installed. Edit your MIDDLEWARE_CLASSES setting to insert 'django.contrib.sessions.middleware.SessionMiddleware'."
-        try:
-            user_id = request.session[SESSION_KEY]
-            request.user = UserWrapper(user_id)
-        except KeyError:
-            from django.contrib.auth.models import AnonymousUser
-            request.user = AnonymousUser()
+        request.__class__.user = LazyUser(request.session)
         return None
