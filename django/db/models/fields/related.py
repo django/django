@@ -120,7 +120,7 @@ class ReverseSingleRelatedObjectDescriptor(object):
         except AttributeError:
             val = getattr(instance, self.field.attname)
             if val is None:
-                # If Null is an allowed value, return it.
+                # If NULL is an allowed value, return it.
                 if self.field.null:
                     return None
                 raise self.field.rel.to.DoesNotExist
