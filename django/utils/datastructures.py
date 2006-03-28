@@ -80,9 +80,19 @@ class MultiValueDict(dict):
         except IndexError:
             return []
 
-    def _setitem_list(self, key, value):
+    def __setitem__(self, key, value):
         dict.__setitem__(self, key, [value])
-    __setitem__ = _setitem_list
+
+    def __copy__(self):
+        return self.__class__(dict.items(self))
+
+    def __deepcopy__(self, memo={}):
+        import copy
+        result = self.__class__()
+        memo[id(self)] = result
+        for key, value in dict.items(self):
+            dict.__setitem__(result, copy.deepcopy(key, memo), copy.deepcopy(value, memo))
+        return result
 
     def get(self, key, default=None):
         "Returns the default value if the requested data doesn't exist"
@@ -136,12 +146,7 @@ class MultiValueDict(dict):
 
     def copy(self):
         "Returns a copy of this object."
-        import copy
-        # Our custom __setitem__ must be disabled for copying machinery.
-        MultiValueDict.__setitem__ = dict.__setitem__
-        cp = copy.deepcopy(self)
-        MultiValueDict.__setitem__ = MultiValueDict._setitem_list
-        return cp
+        return self.__deepcopy__()
 
     def update(self, other_dict):
         "update() extends rather than replaces existing key lists."

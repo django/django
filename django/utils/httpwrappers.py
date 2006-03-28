@@ -66,21 +66,34 @@ def parse_file_upload(header_dict, post_data):
 class QueryDict(MultiValueDict):
     """A specialized MultiValueDict that takes a query string when initialized.
     This is immutable unless you create a copy of it."""
-    def __init__(self, query_string):
+    def __init__(self, query_string, mutable=False):
         MultiValueDict.__init__(self)
         self._mutable = True
         for key, value in parse_qsl((query_string or ''), True): # keep_blank_values=True
             self.appendlist(key, value)
-        self._mutable = False
+        self._mutable = mutable
 
     def _assert_mutable(self):
         if not self._mutable:
             raise AttributeError, "This QueryDict instance is immutable"
 
-    def _setitem_if_mutable(self, key, value):
+    def __setitem__(self, key, value):
         self._assert_mutable()
         MultiValueDict.__setitem__(self, key, value)
-    __setitem__ = _setitem_if_mutable
+
+    def __copy__(self):
+        result = self.__class__('', mutable=True)
+        for key, value in dict.items(self):
+            dict.__setitem__(result, key, value)
+        return result
+
+    def __deepcopy__(self, memo={}):
+        import copy
+        result = self.__class__('', mutable=True)
+        memo[id(self)] = result
+        for key, value in dict.items(self):
+            dict.__setitem__(result, copy.deepcopy(key, memo), copy.deepcopy(value, memo))
+        return result
 
     def setlist(self, key, list_):
         self._assert_mutable()
@@ -112,13 +125,7 @@ class QueryDict(MultiValueDict):
 
     def copy(self):
         "Returns a mutable copy of this object."
-        import copy
-        # Our custom __setitem__ must be disabled for copying machinery.
-        QueryDict.__setitem__ = dict.__setitem__
-        cp = copy.deepcopy(self)
-        QueryDict.__setitem__ = QueryDict._setitem_if_mutable
-        cp._mutable = True
-        return cp
+        return self.__deepcopy__()
 
     def urlencode(self):
         output = []
