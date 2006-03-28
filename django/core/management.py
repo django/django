@@ -374,7 +374,7 @@ get_sql_indexes.args = APP_ARGS
 
 def get_sql_all(app):
     "Returns a list of CREATE TABLE SQL, initial-data inserts, and CREATE INDEX SQL for the given module."
-    return get_sql_create(app) + get_sql_initial_data(app) + get_sql_indexes(app)    
+    return get_sql_create(app) + get_sql_initial_data(app) + get_sql_indexes(app)
 get_sql_all.help_doc = "Prints the CREATE TABLE, initial-data and CREATE INDEX SQL statements for the given model module name(s)."
 get_sql_all.args = APP_ARGS
 
@@ -1018,7 +1018,7 @@ def get_usage(action_mapping):
     Returns a usage string. Doesn't do the options stuff, because optparse
     takes care of that.
     """
-    usage = ["usage: %prog action [options]\nactions:"]
+    usage = ["%prog action [options]\nactions:"]
     available_actions = action_mapping.keys()
     available_actions.sort()
     for a in available_actions:
