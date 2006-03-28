@@ -232,23 +232,23 @@ class QuerySet(object):
         del_query._select_related = False
         del_query._order_by = []
 
-        # Delete objects in chunks to prevent an the list of 
+        # Delete objects in chunks to prevent an the list of
         # related objects from becoming too long
         more_objects = True
         while more_objects:
-            # Collect all the objects to be deleted in this chunk, and all the objects 
+            # Collect all the objects to be deleted in this chunk, and all the objects
             # that are related to the objects that are to be deleted
             seen_objs = SortedDict()
             more_objects = False
             for object in del_query[0:GET_ITERATOR_CHUNK_SIZE]:
                 more_objects = True
                 object._collect_sub_objects(seen_objs)
-            
-            # If one or more objects were found, delete them. 
+
+            # If one or more objects were found, delete them.
             # Otherwise, stop looping.
             if more_objects:
                 delete_objects(seen_objs)
-            
+
         # Clear the result cache, in case this QuerySet gets reused.
         self._result_cache = None
     delete.alters_data = True
@@ -278,12 +278,12 @@ class QuerySet(object):
 
     def filter(self, *args, **kwargs):
         "Returns a new QuerySet instance with the args ANDed to the existing set."
-        return self._filter_or_exclude(Q, *args, **kwargs)    
-        
+        return self._filter_or_exclude(Q, *args, **kwargs)
+
     def exclude(self, *args, **kwargs):
         "Returns a new QuerySet instance with NOT (arsg) ANDed to the existing set."
         return self._filter_or_exclude(QNot, *args, **kwargs)
-        
+
     def _filter_or_exclude(self, qtype, *args, **kwargs):
         if len(args) > 0 or len(kwargs) > 0:
             assert self._limit is None and self._offset is None, \
@@ -558,7 +558,7 @@ class Q(object):
 
 class QNot(Q):
     "Encapsulates NOT (...) queries as objects"
-    
+
     def get_sql(self, opts):
         tables, joins, where, params = super(QNot, self).get_sql(opts)
         where2 = ['(NOT (%s))' % " AND ".join(where)]
@@ -827,7 +827,7 @@ def delete_objects(seen_objs):
     "Iterate through a list of seen classes, and remove any instances that are referred to"
     ordered_classes = seen_objs.keys()
     ordered_classes.reverse()
-    
+
     cursor = connection.cursor()
 
     for cls in ordered_classes:

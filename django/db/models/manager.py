@@ -48,7 +48,6 @@ class Manager(object):
         return QuerySet(self.model)
 
     def all(self):
-        # Returns a caching QuerySet.
         return self.get_query_set()
 
     def count(self):

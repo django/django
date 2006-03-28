@@ -78,7 +78,7 @@ send_mass_mail vs. send_mail
 
 The main difference between ``send_mass_mail()`` and ``send_mail()`` is that
 ``send_mail()`` opens a connection to the mail server each time it's executed,
-while ``send_mass_mail()`` uses a single connection for each of its messages.
+while ``send_mass_mail()`` uses a single connection for all of its messages.
 This makes ``send_mass_mail()`` slightly more efficient.
 
 The mail_admins function
