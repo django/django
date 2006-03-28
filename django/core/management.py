@@ -5,6 +5,7 @@ import django
 from django.core.exceptions import ImproperlyConfigured
 import os, re, sys, textwrap
 from optparse import OptionParser
+from django.utils import termcolors
 
 # For Python 2.3
 if not hasattr(__builtins__, 'set'):
@@ -25,6 +26,28 @@ APP_ARGS = '[modelmodule ...]'
 PROJECT_TEMPLATE_DIR = os.path.join(django.__path__[0], 'conf', '%s_template')
 
 INVALID_PROJECT_NAMES = ('django', 'test')
+
+# Set up the terminal color scheme.
+class dummy: pass
+style = dummy()
+style.ERROR = termcolors.make_style(fg='red', opts=('bold',))
+style.ERROR_OUTPUT = termcolors.make_style(fg='red', opts=('bold',))
+style.SQL_FIELD = termcolors.make_style(fg='green', opts=('bold',))
+style.SQL_COLTYPE = termcolors.make_style(fg='green')
+style.SQL_KEYWORD = termcolors.make_style(fg='yellow')
+style.SQL_TABLE = termcolors.make_style(opts=('bold',))
+del dummy
+
+def disable_termcolors():
+    class dummy:
+        def __getattr__(self, attr):
+            return lambda x: x
+    global style
+    style = dummy()
+
+# Disable terminal coloring if somebody's piping the output.
+if (not sys.stdout.isatty()) or (sys.platform == 'win32'):
+    disable_termcolors()
 
 def _is_valid_dir_name(s):
     return bool(re.search(r'^\w+$', s))
@@ -66,9 +89,9 @@ def get_sql_create(app):
     if not data_types:
         # This must be the "dummy" database backend, which means the user
         # hasn't set DATABASE_ENGINE.
-        sys.stderr.write("Error: Django doesn't know which syntax to use for your SQL statements,\n" +
+        sys.stderr.write(style.ERROR("Error: Django doesn't know which syntax to use for your SQL statements,\n" +
             "because you haven't specified the DATABASE_ENGINE setting.\n" +
-            "Edit your settings file and change DATABASE_ENGINE to something like 'postgresql' or 'mysql'.\n")
+            "Edit your settings file and change DATABASE_ENGINE to something like 'postgresql' or 'mysql'.\n"))
         sys.exit(1)
 
     # Get installed models, so we generate REFERENCES right
@@ -128,29 +151,33 @@ def _get_sql_model_create(klass, models_already_seen=set()):
         col_type = data_types[data_type]
         if col_type is not None:
             # Make the definition (e.g. 'foo VARCHAR(30)') for this field.
-            field_output = [backend.quote_name(f.column), col_type % rel_field.__dict__]
-            field_output.append('%sNULL' % (not f.null and 'NOT ' or ''))
+            field_output = [style.SQL_FIELD(backend.quote_name(f.column)),
+                style.SQL_COLTYPE(col_type % rel_field.__dict__)]
+            field_output.append(style.SQL_KEYWORD('%sNULL' % (not f.null and 'NOT ' or '')))
             if f.unique:
-                field_output.append('UNIQUE')
+                field_output.append(style.SQL_KEYWORD('UNIQUE'))
             if f.primary_key:
-                field_output.append('PRIMARY KEY')
+                field_output.append(style.SQL_KEYWORD('PRIMARY KEY'))
             if f.rel:
                  if f.rel.to in models_already_seen:
-                     field_output.append('REFERENCES %s (%s)' % \
-                         (backend.quote_name(f.rel.to._meta.db_table),
-                         backend.quote_name(f.rel.to._meta.get_field(f.rel.field_name).column)))
+                     field_output.append(style.SQL_KEYWORD('REFERENCES') + ' ' + \
+                         style.SQL_TABLE(backend.quote_name(f.rel.to._meta.db_table)) + ' (' + \
+                         style.SQL_FIELD(backend.quote_name(f.rel.to._meta.get_field(f.rel.field_name).column)) + ')'
+                     )
                  else:
                      # We haven't yet created the table to which this field
                      # is related, so save it for later.
                      pr = pending_references.setdefault(f.rel.to, []).append((klass, f))
             table_output.append(' '.join(field_output))
     if opts.order_with_respect_to:
-        table_output.append('%s %s NULL' % (backend.quote_name('_order'), data_types['IntegerField']))
+        table_output.append(style.SQL_FIELD(backend.quote_name('_order')) + ' ' + \
+            style.SQL_COLTYPE(data_types['IntegerField']) + ' ' + \
+            style.SQL_KEYWORD('NULL'))
     for field_constraints in opts.unique_together:
-        table_output.append('UNIQUE (%s)' % \
-            ", ".join([backend.quote_name(opts.get_field(f).column) for f in field_constraints]))
+        table_output.append(style.SQL_KEYWORD('UNIQUE') + ' (%s)' % \
+            ", ".join([backend.quote_name(style.SQL_FIELD(opts.get_field(f).column)) for f in field_constraints]))
 
-    full_statement = ['CREATE TABLE %s (' % backend.quote_name(opts.db_table)]
+    full_statement = [style.SQL_KEYWORD('CREATE TABLE') + ' ' + style.SQL_TABLE(backend.quote_name(opts.db_table)) + ' (']
     for i, line in enumerate(table_output): # Combine and add commas.
         full_statement.append('    %s%s' % (line, i < len(table_output)-1 and ',' or ''))
     full_statement.append(');')
@@ -175,9 +202,9 @@ def _get_sql_for_pending_references(klass, pending_references):
                 r_col = f.column
                 table = opts.db_table
                 col = opts.get_field(f.rel.field_name).column
-                final_output.append('ALTER TABLE %s ADD CONSTRAINT %s FOREIGN KEY (%s) REFERENCES %s (%s);' % \
+                final_output.append(style.SQL_KEYWORD('ALTER TABLE') + ' %s ADD CONSTRAINT %s FOREIGN KEY (%s) REFERENCES %s (%s);' % \
                     (backend.quote_name(r_table),
-                    backend.quote_name("%s_referencing_%s_%s" % (r_col, table, col)),
+                    backend.quote_name('%s_referencing_%s_%s' % (r_col, table, col)),
                     backend.quote_name(r_col), backend.quote_name(table), backend.quote_name(col)))
             del pending_references[klass]
     return final_output
@@ -189,21 +216,28 @@ def _get_many_to_many_sql_for_model(klass):
     opts = klass._meta
     final_output = []
     for f in opts.many_to_many:
-        table_output = ['CREATE TABLE %s (' % backend.quote_name(f.m2m_db_table())]
-        table_output.append('    %s %s NOT NULL PRIMARY KEY,' % (backend.quote_name('id'), data_types['AutoField']))
-        table_output.append('    %s %s NOT NULL REFERENCES %s (%s),' % \
-            (backend.quote_name(f.m2m_column_name()),
-            data_types[get_rel_data_type(opts.pk)] % opts.pk.__dict__,
-            backend.quote_name(opts.db_table),
-            backend.quote_name(opts.pk.column)))
-        table_output.append('    %s %s NOT NULL REFERENCES %s (%s),' % \
-            (backend.quote_name(f.m2m_reverse_name()),
-            data_types[get_rel_data_type(f.rel.to._meta.pk)] % f.rel.to._meta.pk.__dict__,
-            backend.quote_name(f.rel.to._meta.db_table),
-            backend.quote_name(f.rel.to._meta.pk.column)))
-        table_output.append('    UNIQUE (%s, %s)' % \
-            (backend.quote_name(f.m2m_column_name()),
-            backend.quote_name(f.m2m_reverse_name())))
+        table_output = [style.SQL_KEYWORD('CREATE TABLE') + ' ' + \
+            style.SQL_TABLE(backend.quote_name(f.m2m_db_table())) + ' (']
+        table_output.append('    %s %s %s,' % \
+            (style.SQL_FIELD(backend.quote_name('id')),
+            style.SQL_COLTYPE(data_types['AutoField']),
+            style.SQL_KEYWORD('NOT NULL PRIMARY KEY')))
+        table_output.append('    %s %s %s %s (%s),' % \
+            (style.SQL_FIELD(backend.quote_name(f.m2m_column_name())),
+            style.SQL_COLTYPE(data_types[get_rel_data_type(opts.pk)] % opts.pk.__dict__),
+            style.SQL_KEYWORD('NOT NULL REFERENCES'),
+            style.SQL_TABLE(backend.quote_name(opts.db_table)),
+            style.SQL_FIELD(backend.quote_name(opts.pk.column))))
+        table_output.append('    %s %s %s %s (%s),' % \
+            (style.SQL_FIELD(backend.quote_name(f.m2m_reverse_name())),
+            style.SQL_COLTYPE(data_types[get_rel_data_type(f.rel.to._meta.pk)] % f.rel.to._meta.pk.__dict__),
+            style.SQL_KEYWORD('NOT NULL REFERENCES'),
+            style.SQL_TABLE(backend.quote_name(f.rel.to._meta.db_table)),
+            style.SQL_FIELD(backend.quote_name(f.rel.to._meta.pk.column))))
+        table_output.append('    %s (%s, %s)' % \
+            (style.SQL_KEYWORD('UNIQUE'),
+            style.SQL_FIELD(backend.quote_name(f.m2m_column_name())),
+            style.SQL_FIELD(backend.quote_name(f.m2m_reverse_name()))))
         table_output.append(');')
         final_output.append('\n'.join(table_output))
     return final_output
@@ -244,17 +278,20 @@ def get_sql_delete(app):
 
     for klass in app_models:
         if cursor and klass._meta.db_table in table_names:
-            # Drop the able now
-            output.append("DROP TABLE %s;" % backend.quote_name(klass._meta.db_table))
+            # Drop the table now
+            output.append('%s %s;' % (style.SQL_KEYWORD('DROP TABLE'),
+                style.SQL_TABLE(backend.quote_name(klass._meta.db_table))))
             if backend.supports_constraints and references_to_delete.has_key(klass):
                 for rel_class, f in references_to_delete[klass]:
                     table = rel_class._meta.db_table
                     col = f.column
                     r_table = klass._meta.db_table
                     r_col = klass._meta.get_field(f.rel.field_name).column
-                    output.append('ALTER TABLE %s DROP CONSTRAINT %s;' % \
-                       (backend.quote_name(table),
-                        backend.quote_name("%s_referencing_%s_%s" % (col, r_table, r_col))))
+                    output.append('%s %s %s %s;' % \
+                        (style.SQL_KEYWORD('ALTER TABLE'),
+                        style.SQL_TABLE(backend.quote_name(table)),
+                        style.SQL_KEYWORD('DROP CONSTRAINT'),
+                        style.SQL_FIELD(backend.quote_name("%s_referencing_%s_%s" % (col, r_table, r_col)))))
                 del references_to_delete[klass]
 
     # Output DROP TABLE statements for many-to-many tables.
@@ -262,9 +299,12 @@ def get_sql_delete(app):
         opts = klass._meta
         for f in opts.many_to_many:
             if cursor and f.m2m_db_table() in table_names:
-                output.append("DROP TABLE %s;" % backend.quote_name(f.m2m_db_table()))
+                output.append("%s %s;" % (style.SQL_KEYWORD('DROP TABLE'),
+                    style.SQL_TABLE(backend.quote_name(f.m2m_db_table()))))
 
     app_label = app_models[0]._meta.app_label
+
+    # TODO: Remove the following section.
 
     # Delete from django_package, auth_permission, django_content_type.
     if cursor and "django_content_type" in table_names:
@@ -346,12 +386,22 @@ def get_sql_sequence_reset(app):
     for klass in models.get_models(app):
         for f in klass._meta.fields:
             if isinstance(f, models.AutoField):
-                output.append("SELECT setval('%s_%s_seq', (SELECT max(%s) FROM %s));" % \
-                    (klass._meta.db_table, f.column, backend.quote_name(f.column),
-                    backend.quote_name(klass._meta.db_table)))
+                output.append("%s setval('%s', (%s max(%s) %s %s));" % \
+                    (style.SQL_KEYWORD('SELECT'),
+                    style.SQL_FIELD('%s_%s_seq' % (klass._meta.db_table, f.column)),
+                    style.SQL_KEYWORD('SELECT'),
+                    style.SQL_FIELD(backend.quote_name(f.column)),
+                    style.SQL_KEYWORD('FROM'),
+                    style.SQL_TABLE(backend.quote_name(klass._meta.db_table))))
+                break # Only one AutoField is allowed per model, so don't bother continuing.
         for f in klass._meta.many_to_many:
-            output.append("SELECT setval('%s_id_seq', (SELECT max(%s) FROM %s));" % \
-                (f.m2m_db_table(), backend.quote_name('id'), f.m2m_db_table()))
+            output.append("%s setval('%s', (%s max(%s) %s %s));" % \
+                (style.SQL_KEYWORD('SELECT'),
+                style.SQL_FIELD('%s_id_seq' % f.m2m_db_table()),
+                style.SQL_KEYWORD('SELECT'),
+                style.SQL_FIELD(backend.quote_name('id')),
+                style.SQL_KEYWORD('FROM'),
+                style.SQL_TABLE(f.m2m_db_table())))
     return output
 get_sql_sequence_reset.help_doc = "Prints the SQL statements for resetting PostgreSQL sequences for the given app name(s)."
 get_sql_sequence_reset.args = APP_ARGS
@@ -364,10 +414,14 @@ def get_sql_indexes(app):
     for klass in models.get_models(app):
         for f in klass._meta.fields:
             if f.db_index:
-                unique = f.unique and "UNIQUE " or ""
-                output.append("CREATE %sINDEX %s_%s ON %s (%s);" % \
-                    (unique, klass._meta.db_table, f.column,
-                    backend.quote_name(klass._meta.db_table), backend.quote_name(f.column)))
+                unique = f.unique and 'UNIQUE ' or ''
+                output.append(
+                    style.SQL_KEYWORD('CREATE %sINDEX' % unique) + ' ' + \
+                    style.SQL_TABLE('%s_%s' % (klass._meta.db_table, f.column)) + ' ' + \
+                    style.SQL_KEYWORD('ON') + ' ' + \
+                    style.SQL_TABLE(backend.quote_name(klass._meta.db_table)) + ' ' + \
+                    "(%s);" % style.SQL_FIELD(backend.quote_name(f.column))
+                )
     return output
 get_sql_indexes.help_doc = "Prints the CREATE INDEX SQL statements for the given model module name(s)."
 get_sql_indexes.args = APP_ARGS
@@ -385,7 +439,9 @@ def syncdb():
     from django.conf import settings
     from django.dispatch import dispatcher
 
-    # Check that there are no validation errors before continuing
+    disable_termcolors()
+
+    # First, try validating the models.
     _check_for_validation_errors()
 
     # Import the 'management' module within each installed app, to register
@@ -489,6 +545,8 @@ def install(app):
 
     app_name = app.__name__.split('.')[-2]
 
+    disable_termcolors()
+
     # First, try validating the models.
     _check_for_validation_errors(app)
 
@@ -499,12 +557,12 @@ def install(app):
         for sql in sql_list:
             cursor.execute(sql)
     except Exception, e:
-        sys.stderr.write("""Error: %s couldn't be installed. Possible reasons:
+        sys.stderr.write(style.ERROR("""Error: %s couldn't be installed. Possible reasons:
   * The database isn't running or isn't configured correctly.
   * At least one of the database tables already exists.
   * The SQL was invalid.
 Hint: Look at the output of 'django-admin.py sqlall %s'. That's the SQL this command wasn't able to run.
-The full error: %s\n""" % (app_name, app_name, e))
+The full error: """ % (app_name, app_name)) + style.ERROR_OUTPUT(e) + '\n')
         transaction.rollback_unless_managed()
         sys.exit(1)
     transaction.commit_unless_managed()
@@ -516,6 +574,8 @@ def reset(app):
     from django.db import connection, transaction
     from cStringIO import StringIO
     app_name = app.__name__.split('.')[-2]
+
+    disable_termcolors()
 
     # First, try validating the models.
     _check_for_validation_errors(app)
@@ -533,12 +593,12 @@ Type 'yes' to continue, or 'no' to cancel: """)
             for sql in sql_list:
                 cursor.execute(sql)
         except Exception, e:
-            sys.stderr.write("""Error: %s couldn't be installed. Possible reasons:
+            sys.stderr.write(style.ERROR("""Error: %s couldn't be installed. Possible reasons:
   * The database isn't running or isn't configured correctly.
   * At least one of the database tables already exists.
   * The SQL was invalid.
 Hint: Look at the output of 'django-admin.py sqlreset %s'. That's the SQL this command wasn't able to run.
-The full error: %s\n""" % (app_name, app_name, e))
+The full error: """ % (app_name, app_name)) + style.ERROR_OUTPUT(e) + '\n')
             transaction.rollback_unless_managed()
             sys.exit(1)
         transaction.commit_unless_managed()
@@ -550,13 +610,13 @@ reset.args = APP_ARGS
 def _start_helper(app_or_project, name, directory, other_name=''):
     other = {'project': 'app', 'app': 'project'}[app_or_project]
     if not _is_valid_dir_name(name):
-        sys.stderr.write("Error: %r is not a valid %s name. Please use only numbers, letters and underscores.\n" % (name, app_or_project))
+        sys.stderr.write(style.ERROR("Error: %r is not a valid %s name. Please use only numbers, letters and underscores.\n" % (name, app_or_project)))
         sys.exit(1)
     top_dir = os.path.join(directory, name)
     try:
         os.mkdir(top_dir)
     except OSError, e:
-        sys.stderr.write("Error: %s\n" % e)
+        sys.stderr.write(style.ERROR("Error: %s\n" % e))
         sys.exit(1)
     template_dir = PROJECT_TEMPLATE_DIR % app_or_project
     for d, subdirs, files in os.walk(template_dir):
@@ -579,7 +639,7 @@ def startproject(project_name, directory):
     "Creates a Django project for the given project_name in the given directory."
     from random import choice
     if project_name in INVALID_PROJECT_NAMES:
-        sys.stderr.write("Error: %r isn't a valid project name. Please try another.\n" % project_name)
+        sys.stderr.write(style.ERROR("Error: %r isn't a valid project name. Please try another.\n" % project_name))
         sys.exit(1)
     _start_helper('project', project_name, directory)
     # Create a random SECRET_KEY hash, and put it in the main settings.
@@ -714,7 +774,7 @@ class ModelErrorCollection:
 
     def add(self, opts, error):
         self.errors.append((opts, error))
-        self.outfile.write("%s.%s: %s\n" % (opts.app_label, opts.module_name, error))
+        self.outfile.write(style.ERROR("%s.%s: %s\n" % (opts.app_label, opts.module_name, error)))
 
 def get_validation_errors(outfile, app=None):
     """
@@ -885,7 +945,7 @@ def _check_for_validation_errors(app=None):
     s = StringIO()
     num_errors = get_validation_errors(s, app)
     if num_errors:
-        sys.stderr.write("Error: %s couldn't be installed, because there were errors in your model:\n" % app)
+        sys.stderr.write(style.ERROR("Error: %s couldn't be installed, because there were errors in your model:\n" % app))
         s.seek(0)
         sys.stderr.write(s.read())
         sys.exit(1)
@@ -897,7 +957,7 @@ def runserver(addr, port):
     if not addr:
         addr = '127.0.0.1'
     if not port.isdigit():
-        sys.stderr.write("Error: %r is not a valid port number.\n" % port)
+        sys.stderr.write(style.ERROR("Error: %r is not a valid port number.\n" % port))
         sys.exit(1)
     def inner_run():
         from django.conf import settings
@@ -919,7 +979,7 @@ def runserver(addr, port):
                 error_text = ERRORS[e.args[0].args[0]]
             except (AttributeError, KeyError):
                 error_text = str(e)
-            sys.stderr.write("Error: %s\n" % error_text)
+            sys.stderr.write(style.ERROR("Error: %s" % error_text) + '\n')
             sys.exit(1)
         except KeyboardInterrupt:
             sys.exit(0)
@@ -1005,7 +1065,8 @@ NO_SQL_TRANSACTION = (
     'createcachetable',
     'install',
     'reset',
-    'sqlindexes'
+    'sqlindexes',
+    'syncdb'
 )
 
 class DjangoOptionParser(OptionParser):
@@ -1029,7 +1090,7 @@ def get_usage(action_mapping):
     return '\n'.join(usage[:-1]) # Cut off last list element, an empty space.
 
 def print_error(msg, cmd):
-    sys.stderr.write('Error: %s\nRun "%s --help" for help.\n' % (msg, cmd))
+    sys.stderr.write(style.ERROR('Error: %s' % msg) + '\nRun "%s --help" for help.\n' % cmd)
     sys.exit(1)
 
 def execute_from_command_line(action_mapping=DEFAULT_ACTION_MAPPING):
@@ -1078,7 +1139,7 @@ def execute_from_command_line(action_mapping=DEFAULT_ACTION_MAPPING):
             for line in action_mapping[action](param):
                 print line
         except NotImplementedError:
-            sys.stderr.write("Error: %r isn't supported for the currently selected database backend.\n" % action)
+            sys.stderr.write(style.ERROR("Error: %r isn't supported for the currently selected database backend.\n" % action))
             sys.exit(1)
     elif action == 'createcachetable':
         try:
@@ -1106,18 +1167,18 @@ def execute_from_command_line(action_mapping=DEFAULT_ACTION_MAPPING):
         try:
             mod_list = [models.get_app(app_label) for app_label in args[1:]]
         except ImportError, e:
-            sys.stderr.write("Error: %s. Are you sure your INSTALLED_APPS setting is correct?\n" % e)
+            sys.stderr.write(style.ERROR("Error: %s. Are you sure your INSTALLED_APPS setting is correct?\n" % e))
             sys.exit(1)
         if not mod_list:
             parser.print_usage_and_exit()
         if action not in NO_SQL_TRANSACTION:
-            print "BEGIN;"
+            print style.SQL_KEYWORD("BEGIN;")
         for mod in mod_list:
             output = action_mapping[action](mod)
             if output:
                 print '\n'.join(output)
         if action not in NO_SQL_TRANSACTION:
-            print "COMMIT;"
+            print style.SQL_KEYWORD("COMMIT;")
 
 def execute_manager(settings_mod):
     # Add this project to sys.path so that it's importable in the conventional
