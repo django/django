@@ -47,14 +47,31 @@ class MysqlDebugWrapper:
         else:
             return getattr(self.cursor, attr)
 
-class DatabaseWrapper:
+try:
+    # Only exists in python 2.4+
+    from threading import local
+except ImportError:
+    # Import copy of _thread_local.py from python 2.4
+    from django.utils._threading_local import local
+
+class DatabaseWrapper(local):
     def __init__(self):
         self.connection = None
         self.queries = []
 
+    def _valid_connection(self):
+        if self.connection is not None:
+            try:
+                self.connection.ping()
+                return True
+            except DatabaseError:
+                self.connection.close()
+                self.connection = None
+        return False
+
     def cursor(self):
         from django.conf.settings import DATABASE_USER, DATABASE_NAME, DATABASE_HOST, DATABASE_PORT, DATABASE_PASSWORD, DEBUG
-        if self.connection is None:
+        if not self._valid_connection():
             kwargs = {
                 'user': DATABASE_USER,
                 'db': DATABASE_NAME,
