@@ -1176,7 +1176,18 @@ def method_get_related(method_name, rel_mod, rel_field, self, **kwargs):
     else:
         kwargs['%s__%s__exact' % (rel_field.name, rel_field.rel.to.pk.name)] = getattr(self, rel_field.rel.get_related_field().attname)
     kwargs.update(rel_field.rel.lookup_overrides)
-    return getattr(rel_mod, method_name)(**kwargs)
+    related = getattr(rel_mod, method_name)(**kwargs)
+
+    # Cache the 'self' object for backward links.
+    # Example: Each choice in Poll.get_choice_list() will have its poll cache filled.
+    # Pre-cache the self object, for following links back.
+    if method_name == 'get_list':
+        cache_name = rel_field.get_cache_name()
+        for obj in related:
+            setattr(obj, cache_name, self)
+    elif method_name == 'get_object':
+        setattr(related, rel_field.get_cache_name(), self)
+    return related
 
 # Handles adding related objects.
 # Example: Poll.add_choice()
