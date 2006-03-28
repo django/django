@@ -3,7 +3,7 @@
 # be interpolated against the values of Field.__dict__ before being output.
 # If a column type is set to None, it won't be included in the output.
 DATA_TYPES = {
-    'AutoField':         'mediumint(9) unsigned auto_increment',
+    'AutoField':         'integer AUTO_INCREMENT',
     'BooleanField':      'bool',
     'CharField':         'varchar(%(maxlength)s)',
     'CommaSeparatedIntegerField': 'varchar(%(maxlength)s)',
