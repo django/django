@@ -304,31 +304,6 @@ def get_sql_delete(app):
 
     app_label = app_models[0]._meta.app_label
 
-    # TODO: Remove the following section.
-
-    # Delete from django_package, auth_permission, django_content_type.
-    if cursor and "django_content_type" in table_names:
-
-        # Grab a list of affected content-types
-        cursor.execute("SELECT id FROM django_content_type WHERE app_label = %s", [app_label])
-        affected_content_types = [r[0] for r in cursor.fetchall()]
-
-        # Remember do this this business in reverse order since the returned
-        # values are reversed below
-        output.append("DELETE FROM %s WHERE %s = '%s';" % \
-            (backend.quote_name('django_content_type'), backend.quote_name('app_label'), app_label))
-
-        if "auth_permission" in table_names:
-            for ctype_id in affected_content_types:
-                output.append("DELETE FROM %s WHERE %s = %s;" % \
-                    (backend.quote_name("auth_permission"), backend.quote_name("content_type_id"), ctype_id))
-
-        # Delete from the admin log.
-        if "django_admin_log" in table_names:
-            for ctype_id in affected_content_types:
-                output.append("DELETE FROM %s WHERE %s = %s;" % \
-                    (backend.quote_name("django_admin_log"), backend.quote_name("content_type_id"), ctype_id))
-
     # Close database connection explicitly, in case this output is being piped
     # directly into a database client, to avoid locking issues.
     if cursor:
