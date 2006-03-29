@@ -14,7 +14,6 @@ class LazyUser(object):
 
 class AuthenticationMiddleware:
     def process_request(self, request):
-        from django.contrib.auth.models import SESSION_KEY
         assert hasattr(request, 'session'), "The Django authentication middleware requires session middleware to be installed. Edit your MIDDLEWARE_CLASSES setting to insert 'django.contrib.sessions.middleware.SessionMiddleware'."
         request.__class__.user = LazyUser()
         return None
