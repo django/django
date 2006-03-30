@@ -13,8 +13,9 @@ account on caching -- just like the middleware does.
 import re
 
 from django.utils.decorators import decorator_from_middleware
-from django.utils.cache import patch_cache_control
+from django.utils.cache import patch_cache_control, patch_response_headers
 from django.middleware.cache import CacheMiddleware
+import datetime
 
 cache_page = decorator_from_middleware(CacheMiddleware)
 
@@ -31,3 +32,14 @@ def cache_control(**kwargs):
 
     return _cache_controller
 
+
+def never_cache(view_func):
+    """
+    Decorator that adds headers to a response so that it will
+    never be cached.
+    """
+    def _wrapped_view_func(request, *args, **kwargs):
+        response = view_func(request, *args, **kwargs)
+        patch_response_headers(response, cache_timeout=-1)
+        return response
+    return _wrapped_view_func

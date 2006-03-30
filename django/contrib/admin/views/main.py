@@ -2,6 +2,7 @@ from django import forms, template
 from django.conf import settings
 from django.contrib.admin.filterspecs import FilterSpec
 from django.contrib.admin.views.decorators import staff_member_required
+from django.views.decorators.cache import never_cache
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ImproperlyConfigured, ObjectDoesNotExist, PermissionDenied
 from django.core.paginator import ObjectPaginator, InvalidPage
@@ -394,7 +395,7 @@ def change_stage(request, app_label, model_name, object_id):
         'is_popup': request.REQUEST.has_key('_popup'),
     })
     return render_change_form(model, manipulator, c, change=True)
-change_stage = staff_member_required(change_stage)
+change_stage = staff_member_required(never_cache(change_stage))
 
 def _nest_help(obj, depth, val):
     current = obj
@@ -515,7 +516,7 @@ def delete_stage(request, app_label, model_name, object_id):
     return render_to_response(["admin/%s/%s/delete_confirmation" % (app_label, opts.object_name.lower() ),
                                "admin/%s/delete_confirmation" % app_label ,
                                "admin/delete_confirmation"], extra_context, context_instance=template.RequestContext(request))
-delete_stage = staff_member_required(delete_stage)
+delete_stage = staff_member_required(never_cache(delete_stage))
 
 def history(request, app_label, model_name, object_id):
     model = models.get_model(app_label, model_name)
