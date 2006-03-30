@@ -40,7 +40,7 @@ def create_object(request, app_label, module_name, template_name=None,
             new_object = manipulator.save(new_data)
 
             if not request.user.is_anonymous():
-                request.user.add_message("The %s was created sucessfully." % mod.Klass._meta.verbose_name)
+                request.user.add_message("The %s was created successfully." % mod.Klass._meta.verbose_name)
 
             # Redirect to the new object: first by trying post_save_redirect,
             # then by obj.get_absolute_url; fail if neither works.
@@ -114,7 +114,7 @@ def update_object(request, app_label, module_name, object_id=None, slug=None,
             manipulator.save(new_data)
 
             if not request.user.is_anonymous():
-                request.user.add_message("The %s was updated sucessfully." % mod.Klass._meta.verbose_name)
+                request.user.add_message("The %s was updated successfully." % mod.Klass._meta.verbose_name)
 
             # Do a post-after-redirect so that reload works, etc.
             if post_save_redirect:
