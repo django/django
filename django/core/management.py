@@ -537,7 +537,7 @@ def install(app):
   * At least one of the database tables already exists.
   * The SQL was invalid.
 Hint: Look at the output of 'django-admin.py sqlall %s'. That's the SQL this command wasn't able to run.
-The full error: """ % (app_name, app_name)) + style.ERROR_OUTPUT(e) + '\n')
+The full error: """ % (app_name, app_name)) + style.ERROR_OUTPUT(str(e)) + '\n')
         transaction.rollback_unless_managed()
         sys.exit(1)
     transaction.commit_unless_managed()
@@ -573,7 +573,7 @@ Type 'yes' to continue, or 'no' to cancel: """)
   * At least one of the database tables already exists.
   * The SQL was invalid.
 Hint: Look at the output of 'django-admin.py sqlreset %s'. That's the SQL this command wasn't able to run.
-The full error: """ % (app_name, app_name)) + style.ERROR_OUTPUT(e) + '\n')
+The full error: """ % (app_name, app_name)) + style.ERROR_OUTPUT(str(e)) + '\n')
             transaction.rollback_unless_managed()
             sys.exit(1)
         transaction.commit_unless_managed()
