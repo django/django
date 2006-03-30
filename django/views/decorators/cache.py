@@ -15,7 +15,6 @@ import re
 from django.utils.decorators import decorator_from_middleware
 from django.utils.cache import patch_cache_control, patch_response_headers
 from django.middleware.cache import CacheMiddleware
-import datetime
 
 cache_page = decorator_from_middleware(CacheMiddleware)
 
