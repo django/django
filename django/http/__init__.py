@@ -252,3 +252,10 @@ class HttpResponseServerError(HttpResponse):
     def __init__(self, *args, **kwargs):
         HttpResponse.__init__(self, *args, **kwargs)
         self.status_code = 500
+
+def get_host(request):
+    """Gets the HTTP host from the environment or request headers."""
+    host = request.META.get('HTTP_X_FORWARDED_HOST', '')
+    if not host:
+        host = request.META.get('HTTP_HOST', '')
+    return host
