@@ -332,6 +332,18 @@ the value of the ``CACHE_MIDDLEWARE_SETTINGS`` setting. If you use a custom
 ``max_age`` in a ``cache_control`` decorator, the decorator will take
 precedence, and the header values will be merged correctly.)
 
+If you want to use headers to disable caching altogether, two utility functions
+are provided.  `django.utils.cache.add_never_cache_headers`` is a
+function that takes a single HttpResponse object as its argument and adds
+headers to ensure the response won't be cached by browsers or other caches.
+``django.views.decorators.never_cache`` is a view decorator that does the same
+thing but can be applied to a view function for convenience.  Example::
+
+    from django.views.decorators.cache import never_cache
+    @never_cache
+    def myview(request):
+        ...
+
 .. _`Cache-Control spec`: http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.9
 
 Other optimizations
