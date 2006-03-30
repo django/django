@@ -99,8 +99,11 @@ class SingleRelatedObjectDescriptor(object):
         # Set the value of the related field
         setattr(value, self.related.field.rel.get_related_field().attname, instance)
 
-        # Set the cache on the provided object to point to the new object
-        setattr(value, self.related.field.get_cache_name(), instance)
+        # Clear the cache, if it exists
+        try:
+            delattr(value, self.related.field.get_cache_name())
+        except AttributeError:
+            pass
 
 class ReverseSingleRelatedObjectDescriptor(object):
     # This class provides the functionality that makes the related-object
@@ -143,8 +146,11 @@ class ReverseSingleRelatedObjectDescriptor(object):
             val = None
         setattr(instance, self.field.attname, val)
 
-        # Set the cache to point to the new object
-        setattr(instance, self.field.get_cache_name(), value)
+        # Clear the cache, if it exists
+        try:
+            delattr(instance, self.field.get_cache_name())
+        except AttributeError:
+            pass
 
 class ForeignRelatedObjectsDescriptor(object):
     # This class provides the functionality that makes the related-object
