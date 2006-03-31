@@ -223,7 +223,7 @@ def render_change_form(model, manipulator, context, add=False, change=False, for
 
 def index(request):
     return render_to_response('admin/index', {'title': _('Site administration')}, context_instance=template.RequestContext(request))
-index = staff_member_required(index)
+index = staff_member_required(never_cache(index))
 
 def add_stage(request, app_label, model_name, show_delete=False, form_url='', post_url=None, post_url_continue='../%s/', object_id_override=None):
     model = models.get_model(app_label, model_name)
@@ -296,7 +296,7 @@ def add_stage(request, app_label, model_name, show_delete=False, form_url='', po
         c['object_id'] = object_id_override
 
     return render_change_form(model, manipulator, c, add=True)
-add_stage = staff_member_required(add_stage)
+add_stage = staff_member_required(never_cache(add_stage))
 
 def change_stage(request, app_label, model_name, object_id):
     model = models.get_model(app_label, model_name)
@@ -536,7 +536,7 @@ def history(request, app_label, model_name, object_id):
     return render_to_response(["admin/%s/%s/object_history" % (app_label, model._meta.object_name.lower()),
                                "admin/%s/object_history" % app_label ,
                                "admin/object_history"], extra_context, context_instance=template.RequestContext(request))
-history = staff_member_required(history)
+history = staff_member_required(never_cache(history))
 
 class ChangeList(object):
     def __init__(self, request, model):
@@ -735,4 +735,4 @@ def change_list(request, app_label, model_name):
     return render_to_response(['admin/%s/%s/change_list' % (app_label, cl.opts.object_name.lower()),
                                'admin/%s/change_list' % app_label,
                                'admin/change_list'], context_instance=c)
-change_list = staff_member_required(change_list)
+change_list = staff_member_required(never_cache(change_list))
