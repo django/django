@@ -603,9 +603,9 @@ def resolve_variable(path, context):
     if path[0] in '0123456789':
         number_type = '.' in path and float or int
         try:
-           current = number_type(path)
+            current = number_type(path)
         except ValueError:
-           current = settings.TEMPLATE_STRING_IF_INVALID
+            current = settings.TEMPLATE_STRING_IF_INVALID
     elif path[0] in ('"', "'") and path[0] == path[-1]:
         current = path[1:-1]
     else:
@@ -637,6 +637,11 @@ def resolve_variable(path, context):
                         current = current[int(bits[0])]
                     except (IndexError, ValueError, KeyError):
                         raise VariableDoesNotExist, "Failed lookup for key [%s] in %r" % (bits[0], current) # missing attribute
+                except Exception, e:
+                    if getattr(e, 'silent_variable_failure', False):
+                        current = settings.TEMPLATE_STRING_IF_INVALID
+                    else:
+                        raise        
             del bits[0]
     return current
 
