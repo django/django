@@ -225,78 +225,111 @@ class ForeignRelatedObjectsDescriptor(object):
         for obj in value:
             manager.add(obj)
 
-def _add_m2m_items(rel_manager_inst, managerclass, rel_model, join_table, source_col_name,
-        target_col_name, source_pk_val, *objs):
-    # Utility function used by the ManyRelatedObjectsDescriptors
-    # to do addition to a many-to-many field.
-    # rel_manager_inst: the RelatedManager instance
-    # managerclass: class that can create and save new objects
-    # rel_model: the model class of the 'related' object
-    # join_table: name of the m2m link table
-    # source_col_name: the PK colname in join_table for the source object
-    # target_col_name: the PK colname in join_table for the target object
-    # source_pk_val: the primary key for the source object
-    # *objs - objects to add
+def create_many_related_manager(superclass):
+    """Creates a manager that subclasses 'superclass' (which is a Manager)
+    and adds behaviour for many-to-many related objects."""
+    class ManyRelatedManager(superclass):
+        def __init__(self, model=None, core_filters=None, instance=None, symmetrical=None,
+                join_table=None, source_col_name=None, target_col_name=None):
+            super(ManyRelatedManager, self).__init__()
+            self.core_filters = core_filters
+            self.model = model
+            self.symmetrical = symmetrical
+            self.instance = instance
+            self.join_table = join_table
+            self.source_col_name = source_col_name
+            self.target_col_name = target_col_name
+            if instance:
+                self._pk_val = self.instance._get_pk_val()
 
-    from django.db import connection
-    rel_opts = rel_model._meta
+        def get_query_set(self):
+            return superclass.get_query_set(self).filter(**(self.core_filters))
 
-    # Add the newly created or already existing objects to the join table.
-    # First find out which items are already added, to avoid adding them twice
-    new_ids = set([obj._get_pk_val() for obj in objs])
-    cursor = connection.cursor()
-    cursor.execute("SELECT %s FROM %s WHERE %s = %%s AND %s IN (%s)" % \
-        (target_col_name, join_table, source_col_name,
-        target_col_name, ",".join(['%s'] * len(new_ids))),
-        [source_pk_val] + list(new_ids))
-    if cursor.rowcount is not None and cursor.rowcount != 0:
-        existing_ids = set([row[0] for row in cursor.fetchmany(cursor.rowcount)])
-    else:
-        existing_ids = set()
+        def add(self, *objs):
+            self._add_items(self.source_col_name, self.target_col_name, *objs)
 
-    # Add the ones that aren't there already
-    for obj_id in (new_ids - existing_ids):
-        cursor.execute("INSERT INTO %s (%s, %s) VALUES (%%s, %%s)" % \
-            (join_table, source_col_name, target_col_name),
-            [source_pk_val, obj_id])
-    transaction.commit_unless_managed()
+            # If this is a symmetrical m2m relation to self, add the mirror entry in the m2m table
+            if self.symmetrical:
+                self._add_items(self.target_col_name, self.source_col_name, *objs)
+        add.alters_data = True
 
-def _remove_m2m_items(rel_model, join_table, source_col_name,
-        target_col_name, source_pk_val, *objs):
-    # Utility function used by the ManyRelatedObjectsDescriptors
-    # to do removal from a many-to-many field.
-    # rel_model: the model class of the 'related' object
-    # join_table: name of the m2m link table
-    # source_col_name: the PK colname in join_table for the source object
-    # target_col_name: the PK colname in join_table for the target object
-    # source_pk_val: the primary key for the source object
-    # *objs - objects to remove
+        def remove(self, *objs):
+            self._remove_items(self.source_col_name, self.target_col_name, *objs)
 
-    from django.db import connection
-    rel_opts = rel_model._meta
-    for obj in objs:
-        if not isinstance(obj, rel_model):
-            raise ValueError, "objects to remove() must be %s instances" % rel_opts.object_name
-    # Remove the specified objects from the join table
-    cursor = connection.cursor()
-    for obj in objs:
-        cursor.execute("DELETE FROM %s WHERE %s = %%s AND %s = %%s" % \
-            (join_table, source_col_name, target_col_name),
-            [source_pk_val, obj._get_pk_val()])
-    transaction.commit_unless_managed()
+            # If this is a symmetrical m2m relation to self, remove the mirror entry in the m2m table
+            if self.symmetrical:
+                self._remove_items(self.target_col_name, self.source_col_name, *objs)
+        remove.alters_data = True
 
-def _clear_m2m_items(join_table, source_col_name, source_pk_val):
-    # Utility function used by the ManyRelatedObjectsDescriptors
-    # to clear all from a many-to-many field.
-    # join_table: name of the m2m link table
-    # source_col_name: the PK colname in join_table for the source object
-    # source_pk_val: the primary key for the source object
-    from django.db import connection
-    cursor = connection.cursor()
-    cursor.execute("DELETE FROM %s WHERE %s = %%s" % \
-        (join_table, source_col_name),
-        [source_pk_val])
-    transaction.commit_unless_managed()
+        def clear(self):
+            self._clear_items(self.source_col_name)
+
+            # If this is a symmetrical m2m relation to self, clear the mirror entry in the m2m table
+            if self.symmetrical:
+                self._clear_items(self.target_col_name)
+        clear.alters_data = True
+
+        def create(self, **kwargs):
+            new_obj = self.model(**kwargs)
+            new_obj.save()
+            self.add(new_obj)
+            return new_obj
+        create.alters_data = True
+
+        def _add_items(self, source_col_name, target_col_name, *objs):
+            # join_table: name of the m2m link table
+            # source_col_name: the PK colname in join_table for the source object
+            # target_col_name: the PK colname in join_table for the target object
+            # *objs - objects to add
+            from django.db import connection
+
+            # Add the newly created or already existing objects to the join table.
+            # First find out which items are already added, to avoid adding them twice
+            new_ids = set([obj._get_pk_val() for obj in objs])
+            cursor = connection.cursor()
+            cursor.execute("SELECT %s FROM %s WHERE %s = %%s AND %s IN (%s)" % \
+                (target_col_name, self.join_table, source_col_name,
+                target_col_name, ",".join(['%s'] * len(new_ids))),
+                [self._pk_val] + list(new_ids))
+            if cursor.rowcount is not None and cursor.rowcount != 0:
+                existing_ids = set([row[0] for row in cursor.fetchmany(cursor.rowcount)])
+            else:
+                existing_ids = set()
+
+            # Add the ones that aren't there already
+            for obj_id in (new_ids - existing_ids):
+                cursor.execute("INSERT INTO %s (%s, %s) VALUES (%%s, %%s)" % \
+                    (self.join_table, source_col_name, target_col_name),
+                    [self._pk_val, obj_id])
+            transaction.commit_unless_managed()
+
+        def _remove_items(self, source_col_name, target_col_name, *objs):
+            # source_col_name: the PK colname in join_table for the source object
+            # target_col_name: the PK colname in join_table for the target object
+            # *objs - objects to remove
+            from django.db import connection
+
+            for obj in objs:
+                if not isinstance(obj, self.model):
+                    raise ValueError, "objects to remove() must be %s instances" % self.model._meta.object_name
+            # Remove the specified objects from the join table
+            cursor = connection.cursor()
+            for obj in objs:
+                cursor.execute("DELETE FROM %s WHERE %s = %%s AND %s = %%s" % \
+                    (self.join_table, source_col_name, target_col_name),
+                    [self._pk_val, obj._get_pk_val()])
+            transaction.commit_unless_managed()
+
+        def _clear_items(self, source_col_name):
+            # source_col_name: the PK colname in join_table for the source object
+            from django.db import connection
+            cursor = connection.cursor()
+            cursor.execute("DELETE FROM %s WHERE %s = %%s" % \
+                (self.join_table, source_col_name),
+                [self._pk_val])
+            transaction.commit_unless_managed()
+
+    return ManyRelatedManager
 
 class ManyRelatedObjectsDescriptor(object):
     # This class provides the functionality that makes the related-object
@@ -312,48 +345,22 @@ class ManyRelatedObjectsDescriptor(object):
         if instance is None:
             raise AttributeError, "Manager must be accessed via instance"
 
-        rel_field = self.related.field
-        rel_model = self.related.model
-
-        qn = backend.quote_name
-        this_opts = instance.__class__._meta
-        rel_opts = rel_model._meta
-        join_table = qn(self.related.field.m2m_db_table())
-        source_col_name = qn(self.related.field.m2m_reverse_name())
-        target_col_name = qn(self.related.field.m2m_column_name())
-
         # Dynamically create a class that subclasses the related
         # model's default manager.
-        superclass = self.related.model._default_manager.__class__
+        rel_model = self.related.model
+        superclass = rel_model._default_manager.__class__
+        RelatedManager = create_many_related_manager(superclass)
 
-        class RelatedManager(superclass):
-            def get_query_set(self):
-                return superclass.get_query_set(self).filter(**(self.core_filters))
-
-            def add(self, *objs):
-                _add_m2m_items(self, superclass, rel_model, join_table, source_col_name,
-                    target_col_name, instance._get_pk_val(), *objs)
-            add.alters_data = True
-
-            def remove(self, *objs):
-                _remove_m2m_items(rel_model, join_table, source_col_name,
-                    target_col_name, instance._get_pk_val(), *objs)
-            remove.alters_data = True
-
-            def clear(self):
-                _clear_m2m_items(join_table, source_col_name, instance._get_pk_val())
-            clear.alters_data = True
-
-            def create(self, **kwargs):
-                new_obj = self.model(**kwargs)
-                new_obj.save()
-                self.add(new_obj)
-                return new_obj
-            create.alters_data = True
-
-        manager = RelatedManager()
-        manager.core_filters = {'%s__pk' % rel_field.name: instance._get_pk_val()}
-        manager.model = self.related.model
+        qn = backend.quote_name
+        manager = RelatedManager(
+            model=rel_model,
+            core_filters={'%s__pk' % self.related.field.name: instance._get_pk_val()},
+            instance=instance,
+            symmetrical=False,
+            join_table=qn(self.related.field.m2m_db_table()),
+            source_col_name=qn(self.related.field.m2m_reverse_name()),
+            target_col_name=qn(self.related.field.m2m_column_name())
+        )
 
         return manager
 
@@ -380,61 +387,22 @@ class ReverseManyRelatedObjectsDescriptor(object):
         if instance is None:
             raise AttributeError, "Manager must be accessed via instance"
 
-        qn = backend.quote_name
-        this_opts = instance.__class__._meta
-        symmetrical = self.field.rel.symmetrical
-        rel_model = self.field.rel.to
-        rel_opts = rel_model._meta
-        join_table = qn(self.field.m2m_db_table())
-        source_col_name = qn(self.field.m2m_column_name())
-        target_col_name = qn(self.field.m2m_reverse_name())
-
         # Dynamically create a class that subclasses the related
         # model's default manager.
+        rel_model=self.field.rel.to
         superclass = rel_model._default_manager.__class__
-
-        class RelatedManager(superclass):
-            def get_query_set(self):
-                return superclass.get_query_set(self).filter(**(self.core_filters))
-
-            def add(self, *objs):
-                _add_m2m_items(self, superclass, rel_model, join_table, source_col_name,
-                    target_col_name, instance._get_pk_val(), *objs)
-
-                # If this is a symmetrical m2m relation to self, add the mirror entry in the m2m table
-                if instance.__class__ == rel_model and symmetrical:
-                    _add_m2m_items(self, superclass, rel_model, join_table, target_col_name,
-                        source_col_name, instance._get_pk_val(), *objs)
-            add.alters_data = True
-
-            def remove(self, *objs):
-                _remove_m2m_items(rel_model, join_table, source_col_name,
-                    target_col_name, instance._get_pk_val(), *objs)
-
-                # If this is a symmetrical m2m relation to self, remove the mirror entry in the m2m table
-                if instance.__class__ == rel_model and symmetrical:
-                    _remove_m2m_items(rel_model, join_table, target_col_name,
-                        source_col_name, instance._get_pk_val(), *objs)
-            remove.alters_data = True
-
-            def clear(self):
-                _clear_m2m_items(join_table, source_col_name, instance._get_pk_val())
-
-                # If this is a symmetrical m2m relation to self, clear the mirror entry in the m2m table
-                if instance.__class__ == rel_model and symmetrical:
-                    _clear_m2m_items(join_table, target_col_name, instance._get_pk_val())
-            clear.alters_data = True
-
-            def create(self, **kwargs):
-                new_obj = self.model(**kwargs)
-                new_obj.save()
-                self.add(new_obj)
-                return new_obj
-            create.alters_data = True
-
-        manager = RelatedManager()
-        manager.core_filters = {'%s__pk' % self.field.related_query_name() : instance._get_pk_val()}
-        manager.model = rel_model
+        RelatedManager = create_many_related_manager(superclass)
+        
+        qn = backend.quote_name
+        manager = RelatedManager(
+            model=rel_model,
+            core_filters={'%s__pk' % self.field.related_query_name() : instance._get_pk_val()},
+            instance=instance,
+            symmetrical=(self.field.rel.symmetrical and instance.__class__ == rel_model),
+            join_table=qn(self.field.m2m_db_table()),
+            source_col_name=qn(self.field.m2m_column_name()),
+            target_col_name=qn(self.field.m2m_reverse_name())
+        )
 
         return manager
 
