@@ -227,7 +227,7 @@ class ForeignRelatedObjectsDescriptor(object):
 
 def create_many_related_manager(superclass):
     """Creates a manager that subclasses 'superclass' (which is a Manager)
-    and adds behaviour for many-to-many related objects."""
+    and adds behavior for many-to-many related objects."""
     class ManyRelatedManager(superclass):
         def __init__(self, model=None, core_filters=None, instance=None, symmetrical=None,
                 join_table=None, source_col_name=None, target_col_name=None):
@@ -396,7 +396,7 @@ class ReverseManyRelatedObjectsDescriptor(object):
         qn = backend.quote_name
         manager = RelatedManager(
             model=rel_model,
-            core_filters={'%s__pk' % self.field.related_query_name() : instance._get_pk_val()},
+            core_filters={'%s__pk' % self.field.related_query_name(): instance._get_pk_val()},
             instance=instance,
             symmetrical=(self.field.rel.symmetrical and instance.__class__ == rel_model),
             join_table=qn(self.field.m2m_db_table()),
