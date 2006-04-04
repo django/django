@@ -27,9 +27,9 @@ Users
 =====
 
 Users are represented by a standard Django model, which lives in
-`django/models/auth.py`_.
+`django/contrib/auth/models.py`_.
 
-.. _django/models/auth.py: http://code.djangoproject.com/browser/django/trunk/django/models/auth.py
+.. _django/contrib/auth/models.py: http://code.djangoproject.com/browser/django/trunk/django/contrib/auth/models.py
 
 API reference
 -------------
@@ -62,13 +62,17 @@ Methods
 ~~~~~~~
 
 ``User`` objects have two many-to-many fields: ``groups`` and
-``user_permissions``. Because of those relationships, ``User`` objects get
-data-access methods like any other `Django model`_:
+``user_permissions``. ``User`` objects can access their related
+objects in the same way as any other `Django model`_:
 
-    * ``get_group_list(**kwargs)``
-    * ``set_groups(id_list)``
-    * ``get_permission_list(**kwargs)``
-    * ``set_user_permissions(id_list)``
+    * ``myuser.objects.groups = [group_list]``
+    * ``myuser.objects.groups.add(group, group,...)``
+    * ``myuser.objects.groups.remove(group, group,...)``
+    * ``myuser.objects.groups.clear()``
+    * ``myuser.objects.permissions = [permission_list]``
+    * ``myuser.objects.permissions.add(permission, permission, ...)``
+    * ``myuser.objects.permissions.remove(permission, permission, ...]``
+    * ``myuser.objects.permissions.clear()``
 
 In addition to those automatic API methods, ``User`` objects have the following
 methods:
@@ -116,10 +120,10 @@ methods:
 .. _Django model: http://www.djangoproject.com/documentation/model_api/
 .. _DEFAULT_FROM_EMAIL: http://www.djangoproject.com/documentation/settings/#default-from-email
 
-Module functions
-~~~~~~~~~~~~~~~~
+Manager functions
+~~~~~~~~~~~~~~~~~
 
-The ``django.models.auth.users`` module has the following helper functions:
+The ``User`` model has a custom manager that has the following helper functions:
 
     * ``create_user(username, email, password)`` -- Creates, saves and returns
       a ``User``. The ``username``, ``email`` and ``password`` are set as
@@ -140,10 +144,10 @@ Creating users
 The most basic way to create users is to use the ``create_user`` helper
 function that comes with Django::
 
-    >>> from django.models.auth import users
-    >>> user = users.create_user('john', 'lennon@thebeatles.com', 'johnpassword')
+    >>> from django.contrib.auth.models import User
+    >>> user = User.objects.create_user('john', 'lennon@thebeatles.com', 'johnpassword')
 
-    # Now, user is a User object already saved to the database.
+    # At this point, user is a User object ready to be saved to the database.
     # You can continue to change its attributes if you want to change other fields.
     >>> user.is_staff = True
     >>> user.save()
@@ -153,8 +157,8 @@ Changing passwords
 
 Change a password with ``set_password()``::
 
-    >>> from django.models.auth import users
-    >>> u = users.get_object(username__exact='john')
+    >>> from django.contrib.auth.models import User
+    >>> u = User.objects.get(username__exact='john')
     >>> u.set_password('new password')
     >>> u.save()
 
@@ -192,8 +196,8 @@ the ``django.models.auth.users.User`` interface, with these differences:
     * ``id`` is always ``None``.
     * ``is_anonymous()`` returns ``True`` instead of ``False``.
     * ``has_perm()`` always returns ``False``.
-    * ``set_password()``, ``check_password()``, ``set_groups()`` and
-      ``set_permissions()`` raise ``NotImplementedError``.
+    * ``set_password()``, ``check_password()``, ``save()``, ``delete()``,
+      ``set_groups()`` and ``set_permissions()`` raise ``NotImplementedError``.
 
 In practice, you probably won't need to use ``AnonymousUser`` objects on your
 own, but they're used by Web requests, as explained in the next section.
@@ -216,8 +220,8 @@ previous section). You can tell them apart with ``is_anonymous()``, like so::
         # Do something for logged-in users.
 
 If you want to use ``request.user`` in your view code, make sure you have
-``SessionMiddleware`` enabled. See the `session documentation`_ for more
-information.
+``SessionMiddleware`` and ``AuthenticationMiddleware`` enabled. See the 
+`session documentation`_ for more information.
 
 .. _request objects: http://www.djangoproject.com/documentation/request_response/#httprequest-objects
 .. _session documentation: http://www.djangoproject.com/documentation/sessions/
@@ -407,7 +411,7 @@ To create custom permissions for a given model object, use the ``permissions``
 
 This example model creates three custom permissions::
 
-    class USCitizen(meta.Model):
+    class USCitizen(models.Model):
         # ...
         class Meta:
             permissions = (
@@ -530,7 +534,7 @@ Messages are used by the Django admin after successful actions. For example,
 
 The API is simple::
 
-    * To add messages, use ``user.add_message(message_text)``.
+    * To create a new message, use ``user.message_set.create(message='message_text')``.
     * To retrieve/delete messages, use ``user.get_and_delete_messages()``,
       which returns a list of ``Message`` objects in the user's queue (if any)
       and deletes the messages from the queue.
@@ -541,7 +545,7 @@ a playlist::
     def create_playlist(request, songs):
         # Create the playlist with the given songs.
         # ...
-        request.user.add_message("Your playlist was added successfully.")
+        request.user.message_set.create(message="Your playlist was added successfully.")
         return render_to_response("playlists/create", context_instance=RequestContext(request))
 
 When you use ``RequestContext``, the currently logged-in user and his/her
