@@ -22,6 +22,8 @@ class Article(models.Model):
     def __repr__(self):
         return self.headline
 
+    class Meta:
+        ordering = ('headline',)
 
 API_TESTS = """
 # Create a few Reporters.
@@ -60,14 +62,14 @@ John's second story
 >>> new_article2.reporter.id
 1
 >>> r.article_set.all()
-[This is a test, John's second story, Paul's story]
+[John's second story, Paul's story, This is a test]
 
 # Add the same article to a different article set - check that it moves.
 >>> r2.article_set.add(new_article2)
 >>> new_article2.reporter.id
 2
 >>> r.article_set.all()
-[This is a test, John's second story]
+[John's second story, This is a test]
 >>> r2.article_set.all()
 [Paul's story]
 
@@ -79,7 +81,7 @@ John Smith
 >>> new_article2.reporter.id
 1
 >>> r.article_set.all()
-[This is a test, John's second story, Paul's story]
+[John's second story, Paul's story, This is a test]
 >>> r2.article_set.all()
 []
 
@@ -94,7 +96,7 @@ John Smith
 # ForeignKey cannot be null, existing members of the set must remain
 >>> r.article_set = [new_article]
 >>> r.article_set.all()
-[This is a test, John's second story]
+[John's second story, This is a test]
 >>> r2.article_set.all()
 [Paul's story]
 
@@ -105,8 +107,8 @@ False
 False
 
 # Reporter objects have access to their related Article objects.
->>> r.article_set.order_by('pub_date')
-[This is a test, John's second story]
+>>> r.article_set.all()
+[John's second story, This is a test]
 
 >>> r.article_set.filter(headline__startswith='This')
 [This is a test]
@@ -131,12 +133,12 @@ False
 # Use double underscores to separate relationships.
 # This works as many levels deep as you want. There's no limit.
 # Find all Articles for any Reporter whose first name is "John".
->>> Article.objects.filter(reporter__first_name__exact='John').order_by('pub_date')
-[This is a test, John's second story]
+>>> Article.objects.filter(reporter__first_name__exact='John')
+[John's second story, This is a test]
 
 # Query twice over the related field.
 >>> Article.objects.filter(reporter__first_name__exact='John', reporter__last_name__exact='Smith')
-[This is a test, John's second story]
+[John's second story, This is a test]
 
 # The underlying query only makes one join when a related table is referenced twice.
 >>> query = Article.objects.filter(reporter__first_name__exact='John', reporter__last_name__exact='Smith')
@@ -146,13 +148,13 @@ False
 
 # The automatically joined table has a predictable name.
 >>> Article.objects.filter(reporter__first_name__exact='John').extra(where=["many_to_one_article__reporter.last_name='Smith'"])
-[This is a test, John's second story]
+[John's second story, This is a test]
 
 # Find all Articles for the Reporter whose ID is 1.
->>> Article.objects.filter(reporter__id__exact=1).order_by('pub_date')
-[This is a test, John's second story]
->>> Article.objects.filter(reporter__pk=1).order_by('pub_date')
-[This is a test, John's second story]
+>>> Article.objects.filter(reporter__id__exact=1)
+[John's second story, This is a test]
+>>> Article.objects.filter(reporter__pk=1)
+[John's second story, This is a test]
 
 # You need two underscores between "reporter" and "id" -- not one.
 >>> Article.objects.filter(reporter_id__exact=1)
@@ -167,8 +169,8 @@ Traceback (most recent call last):
 TypeError: Cannot resolve keyword 'reporter_id' into field
 
 # "pk" shortcut syntax works in a related context, too.
->>> Article.objects.filter(reporter__pk=1).order_by('pub_date')
-[This is a test, John's second story]
+>>> Article.objects.filter(reporter__pk=1)
+[John's second story, This is a test]
 
 # You can also instantiate an Article by passing
 # the Reporter's ID instead of a Reporter object.
@@ -210,12 +212,12 @@ John Smith
 [John Smith]
 
 # If you delete a reporter, his articles will be deleted.
->>> Article.objects.order_by('headline')
+>>> Article.objects.all()
 [John's second story, Paul's story, This is a test, This is a test, This is a test]
 >>> Reporter.objects.order_by('first_name')
 [John Smith, Paul Jones]
 >>> r2.delete()
->>> Article.objects.order_by('headline')
+>>> Article.objects.all()
 [John's second story, This is a test, This is a test, This is a test]
 >>> Reporter.objects.order_by('first_name')
 [John Smith]
