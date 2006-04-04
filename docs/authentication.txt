@@ -388,7 +388,7 @@ Default permissions
 
 Three basic permissions -- add, create and delete -- are automatically created
 for each Django model that has ``admin`` set. Behind the scenes, these
-permissions are added to the ``auth_permissions`` database table when you run
+permissions are added to the ``auth_permission`` database table when you run
 ``django-admin.py install [app]``. You can view the exact SQL ``INSERT``
 statements by running ``django-admin.py sqlinitialdata [app]``.
 

@@ -239,7 +239,7 @@ Technical details
     * The session dictionary should accept any pickleable Python object. See
       `the pickle module`_ for more information.
 
-    * Session data is stored in a database table named ``core_sessions`` .
+    * Session data is stored in a database table named ``django_session`` .
 
     * Django only sends a cookie if it needs to. If you don't set any session
       data, it won't send a session cookie.

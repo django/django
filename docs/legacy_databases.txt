@@ -66,17 +66,16 @@ in your database::
 This won't work if your database already contains tables that have any of the
 following names:
 
-    * ``sites``
-    * ``packages``
-    * ``content_types``
-    * ``core_sessions``
-    * ``auth_permissions``
-    * ``auth_groups``
-    * ``auth_users``
-    * ``auth_messages``
-    * ``auth_groups_permissions``
-    * ``auth_users_groups``
-    * ``auth_users_user_permissions``
+    * ``django_site``
+    * ``django_content_type``
+    * ``django_sessions``
+    * ``auth_permission``
+    * ``auth_group``
+    * ``auth_user``
+    * ``auth_message``
+    * ``auth_group_permissions``
+    * ``auth_user_groups``
+    * ``auth_user_user_permission``
 
 If that's the case, try renaming one of your tables to resolve naming
 conflicts. Currently, there's no way of customizing the names of Django's

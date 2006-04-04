@@ -733,7 +733,7 @@ Here's a list of all possible ``Meta`` options. No options are required. Adding
 
         db_table = "pizza_orders"
 
-    If this isn't given, Django will use ``app_label + '_' + module_name``.
+    If this isn't given, Django will use ``app_label + '_' + model_class_name``.
 
     If your database table name is an SQL reserved word, or contains characters
     that aren't allowed in Python variable names -- notably, the hyphen --

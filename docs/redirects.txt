@@ -21,7 +21,7 @@ To install the redirects app, follow these two steps:
 How it works
 ============
 
-``django-admin.py install redirects`` creates a ``django_redirects`` table in
+``django-admin.py install redirects`` creates a ``django_redirect`` table in
 your database. This is a simple lookup table with ``site_id``, ``old_path`` and
 ``new_path`` fields.
 

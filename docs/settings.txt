@@ -587,9 +587,9 @@ SITE_ID
 
 Default: Not defined
 
-The ID, as an integer, of the current site in the ``sites`` database. This is
-used so that application data can hook into specific site(s) and a single
-database can manage content for multiple sites.
+The ID, as an integer, of the current site in the ``django_site`` database
+table. This is used so that application data can hook into specific site(s)
+and a single database can manage content for multiple sites.
 
 TEMPLATE_CONTEXT_PROCESSORS
 ---------------------------

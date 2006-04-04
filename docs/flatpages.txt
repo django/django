@@ -35,9 +35,9 @@ How it works
 ============
 
 ``django-admin.py install flatpages`` creates two tables in your database:
-``django_flatpages`` and ``django_flatpages_sites``. ``django_flatpages`` is a
+``django_flatpage`` and ``django_flatpage_sites``. ``django_flatpage`` is a
 simple lookup table that essentially maps a URL to a title and bunch of text
-content. ``django_flatpages_sites`` associates a flatpage with a site.
+content. ``django_flatpage_sites`` associates a flatpage with a site.
 
 The ``FlatpageFallbackMiddleware`` does all of the work. Each time any Django
 application raises a 404 error, this middleware checks the flatpages database
