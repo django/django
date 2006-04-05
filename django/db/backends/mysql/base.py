@@ -79,7 +79,7 @@ class DatabaseWrapper(local):
                 'conv': django_conversions,
             }
             if settings.DATABASE_PORT:
-                kwargs['port'] = settings.DATABASE_PORT
+                kwargs['port'] = int(settings.DATABASE_PORT)
             self.connection = Database.connect(**kwargs)
         cursor = self.connection.cursor()
         if self.connection.get_server_info() >= '4.1':
