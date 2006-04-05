@@ -26,28 +26,45 @@ def shortcut(request, content_type_id, object_id):
 
     object_domain = None
 
-    # Next, look for an many-to-many relationship to sites
-    if hasattr(obj, 'get_site_list'):
-        site_list = obj.get_site_list()
-        if site_list:
-            object_domain = site_list[0].domain
+    # Otherwise, we need to introspect the object's relationships for a 
+    # relation to the Site object
+    opts = obj._meta
 
-    # Next, look for a many-to-one relationship to sites
-    elif hasattr(obj, 'get_site'):
-        try:
-            object_domain = obj.get_site().domain
-        except Site.DoesNotExist:
-            pass
+    # First, look for an many-to-many relationship to sites
+    for field in opts.many_to_many:
+        if field.rel.to is Site:
+            try:
+                object_domain = getattr(obj, field.name).all()[0].domain
+            except Site.DoesNotExist:
+                pass
+            if object_domain is not None:
+                break
 
-    # Then, fall back to the current site (if possible)
-    else:
+    # Next look for a many-to-one relationship to site
+    if object_domain is None:
+        for field in obj._meta.fields:
+            if field.rel and field.rel.to is Site:
+                try:
+                    object_domain = getattr(obj, field.name).domain
+                except Site.DoesNotExist:
+                    pass
+                if object_domain is not None:
+                    break
+
+    # Fall back to the current site (if possible)
+    if object_domain is None:
         try:
             object_domain = Site.objects.get_current().domain
         except Site.DoesNotExist:
-            # Finally, give up and use a URL without the domain name
-            return http.HttpResponseRedirect(obj.get_absolute_url())
-    return http.HttpResponseRedirect('http://%s%s' % (object_domain, obj.get_absolute_url()))
-
+            pass
+            
+    # If all that malarky found an object domain, use it; otherwise fall back
+    # to whatever get_absolute_url() returned.
+    if object_domain is not None:
+        return http.HttpResponseRedirect('http://%s%s' % (object_domain, absurl))
+    else:
+        return http.HttpResponseRedirect(absurl)
+    
 def page_not_found(request, template_name='404'):
     """
     Default 404 handler, which looks for the requested URL in the redirects
