@@ -28,7 +28,7 @@ DatabaseError = backend.DatabaseError
 
 # Register an event that closes the database connection
 # when a Django request is finished.
-dispatcher.connect(lambda: connection.close(), signal=signals.request_finished)
+dispatcher.connect(connection.close, signal=signals.request_finished)
 
 # Register an event that resets connection.queries
 # when a Django request is started.
