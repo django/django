@@ -13,14 +13,14 @@
 {% if app_list %}
     {% for app in app_list %}
         <div class="module">
-        <h2>{{ app.name }}</h2>
-        <table>
+        <table summary="{% blocktrans %}Models available in {{ app.name }} application.{% endblocktrans %}">
         {% for model in app.models %}
+          <caption>{{ app.name }}</caption>
             <tr>
             {% if model.perms.change %}
-                <th><a href="{{ model.admin_url }}">{{ model.name }}</a></th>
+                <th scope="row"><a href="{{ model.admin_url }}">{{ model.name }}</a></th>
             {% else %}
-                <th>{{ model.name }}</th>
+                <th scope="row">{{ model.name }}</th>
             {% endif %}
 
             {% if model.perms.add %}
