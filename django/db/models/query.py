@@ -769,7 +769,7 @@ def lookup_inner(path, clause, value, opts, table, column):
     if intermediate_table:
         joins[backend.quote_name(current_table)] = (
             backend.quote_name(intermediate_table),
-            "INNER JOIN",
+            "LEFT OUTER JOIN",
             "%s.%s = %s.%s" % \
                 (backend.quote_name(table),
                 backend.quote_name(current_opts.pk.column),
