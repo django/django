@@ -1,16 +1,10 @@
-/*
-    DJANGO Admin Changelist Styles
-    by Wilson Miner wilson@lawrence.com
-    Copyright (c) 2005 Lawrence Journal-World
-*/
-
 #changelist { position:relative; width:100%; }
 #changelist table { width:100%; }
 .change-list .filtered table { border-right:1px solid #ddd;  }
 .change-list .filtered { min-height:400px; _height:400px; }
 .change-list .filtered { background:white url(../img/admin/changelist-bg.gif) top right repeat-y !important; }
 .change-list .filtered table, .change-list .filtered .paginator, .filtered #toolbar, .filtered div.xfull { margin-right:160px !important; width:auto !important; }
-.change-list .filtered table tbody th { padding-right:10px; }
+.change-list .filtered table tbody th { padding-right:1em; }
 #changelist .toplinks { border-bottom:1px solid #ccc !important; }
 #changelist .paginator { color:#666; border-top:1px solid #eee; border-bottom:1px solid #eee; background:white url(../img/admin/nav-bg.gif) 0 180% repeat-x; overflow:hidden; }
 .change-list .filtered .paginator { border-right:1px solid #ddd; }
