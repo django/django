@@ -21,8 +21,6 @@ http://diveintomark.org/archives/2004/02/04/incompatible-rss
 from django.utils.xmlutils import SimplerXMLGenerator
 import datetime, re, time
 import email.Utils
-from xml.dom import minidom
-from xml.parsers.expat import ExpatError
 
 def rfc2822_date(date):
     return email.Utils.formatdate(time.mktime(date.timetuple()))
