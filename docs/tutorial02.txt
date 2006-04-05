@@ -83,25 +83,25 @@ But where's our poll app? It's not displayed on the admin index page.
 
 Just one thing to do: We need to specify in the ``Poll`` model that ``Poll``
 objects have an admin interface. Edit the ``myproject/polls/models/polls.py``
-file and make the following change to add an inner ``Meta`` class with an
-``admin`` attribute::
+file and make the following change to add an inner ``Admin`` class::
 
-    class Poll(meta.Model):
+    class Poll(models.Model):
         # ...
-        class Meta:
-            admin = meta.Admin()
+        class Admin:
+            pass
 
-The ``class Meta`` contains all `non-field metadata`_ about this model.
+The ``class Admin`` will contain all the settings that control how this model
+appears in the Django admin.  All the settings are optional, however, so
+creating an empty class means "give this object an admin interface using
+all the default options."
 
 Now reload the Django admin page to see your changes. Note that you don't have
 to restart the development server -- it auto-reloads code.
 
-.. _non-field metadata: http://www.djangoproject.com/documentation/model_api/#meta-options
-
 Explore the free admin functionality
 ====================================
 
-Now that ``Poll`` has the ``admin`` attribute, Django knows that it should be
+Now that ``Poll`` has the inner ``Admin`` class, Django knows that it should be
 displayed on the admin index page:
 
 .. image:: http://media.djangoproject.com/img/doc/tutorial/admin03t.png
@@ -125,7 +125,7 @@ Click the "What's up?" poll to edit it:
 Things to note here:
 
 * The form is automatically generated from the Poll model.
-* The different model field types (``meta.DateTimeField``, ``meta.CharField``)
+* The different model field types (``models.DateTimeField``, ``models.CharField``)
   correspond to the appropriate HTML input widget. Each type of field knows
   how to display itself in the Django admin.
 * Each ``DateTimeField`` gets free JavaScript shortcuts. Dates get a "Today"
@@ -157,13 +157,12 @@ Customize the admin form
 Take a few minutes to marvel at all the code you didn't have to write.
 
 Let's customize this a bit. We can reorder the fields by explicitly adding a
-``fields`` parameter to ``meta.Admin``::
+``fields`` parameter to ``Admin``::
 
-        admin = meta.Admin(
+        class Admin:
             fields = (
                 (None, {'fields': ('pub_date', 'question')}),
-            ),
-        )
+            )
 
 That made the "Publication date" show up first instead of second:
 
@@ -176,12 +175,11 @@ of fields, choosing an intuitive order is an important usability detail.
 And speaking of forms with dozens of fields, you might want to split the form
 up into fieldsets::
 
-        admin = meta.Admin(
+        class Admin:
             fields = (
                 (None, {'fields': ('question',)}),
                 ('Date information', {'fields': ('pub_date',)}),
-            ),
-        )
+            )
 
 The first element of each tuple in ``fields`` is the title of the fieldset.
 Here's what our form looks like now:
@@ -195,12 +193,11 @@ You can assign arbitrary HTML classes to each fieldset. Django provides a
 This is useful when you have a long form that contains a number of fields that
 aren't commonly used::
 
-        admin = meta.Admin(
+        class Admin:
             fields = (
                 (None, {'fields': ('question',)}),
                 ('Date information', {'fields': ('pub_date',), 'classes': 'collapse'}),
-            ),
-        )
+            )
 
 .. image:: http://media.djangoproject.com/img/doc/tutorial/admin09.png
    :alt: Fieldset is initially collapsed
@@ -214,13 +211,13 @@ the admin page doesn't display choices.
 Yet.
 
 There are two ways to solve this problem. The first is to give the ``Choice``
-model its own ``admin`` attribute, just as we did with ``Poll``. Here's what
+model its own inner ``Admin`` class, just as we did with ``Poll``. Here's what
 that would look like::
 
-    class Choice(meta.Model):
+    class Choice(models.Model):
         # ...
-        class Meta:
-            admin = meta.Admin()
+        class Admin:
+            pass
 
 Now "Choices" is an available option in the Django admin. The "Add choice" form
 looks like this:
@@ -242,18 +239,18 @@ But, really, this is an inefficient way of adding Choice objects to the system.
 It'd be better if you could add a bunch of Choices directly when you create the
 Poll object. Let's make that happen.
 
-Remove the ``admin`` for the Choice model. Then, edit the ``ForeignKey(Poll)``
+Remove the ``Admin`` for the Choice model. Then, edit the ``ForeignKey(Poll)``
 field like so::
 
-    poll = meta.ForeignKey(Poll, edit_inline=meta.STACKED, num_in_admin=3)
+    poll = models.ForeignKey(Poll, edit_inline=models.STACKED, num_in_admin=3)
 
 This tells Django: "Choice objects are edited on the Poll admin page. By
 default, provide enough fields for 3 Choices."
 
 Then change the other fields in ``Choice`` to give them ``core=True``::
 
-    choice = meta.CharField(maxlength=200, core=True)
-    votes = meta.IntegerField(core=True)
+    choice = models.CharField(maxlength=200, core=True)
+    votes = models.IntegerField(core=True)
 
 This tells Django: "When you edit a Choice on the Poll admin page, the 'choice'
 and 'votes' fields are required. The presence of at least one of them signifies
@@ -277,9 +274,9 @@ One small problem, though. It takes a lot of screen space to display all the
 fields for entering related Choice objects. For that reason, Django offers an
 alternate way of displaying inline related objects::
 
-    poll = meta.ForeignKey(Poll, edit_inline=meta.TABULAR, num_in_admin=3)
+    poll = models.ForeignKey(Poll, edit_inline=models.TABULAR, num_in_admin=3)
 
-With that ``edit_inline=meta.TABULAR`` (instead of ``meta.STACKED``), the
+With that ``edit_inline=models.TABULAR`` (instead of ``models.STACKED``), the
 related objects are displayed in a more compact, table-based format:
 
 .. image:: http://media.djangoproject.com/img/doc/tutorial/admin12.png
@@ -302,18 +299,16 @@ helpful if we could display individual fields. To do that, use the
 ``list_display`` option, which is a tuple of field names to display, as columns,
 on the change list page for the object::
 
-    class Poll(meta.Model):
+    class Poll(models.Model):
         # ...
-        class Meta:
-            admin = meta.Admin(
-                # ...
-                list_display = ('question', 'pub_date'),
-            )
+        class Admin:
+            # ...
+            list_display = ('question', 'pub_date')
 
 Just for good measure, let's also include the ``was_published_today`` custom
 method from Tutorial 1::
 
-    list_display = ('question', 'pub_date', 'was_published_today'),
+    list_display = ('question', 'pub_date', 'was_published_today')
 
 Now the poll change list page looks like this:
 
@@ -336,7 +331,7 @@ method a ``short_description`` attribute::
 Let's add another improvement to the Poll change list page: Filters. Add the
 following line to ``Poll.admin``::
 
-    list_filter = ['pub_date'],
+    list_filter = ['pub_date']
 
 That adds a "Filter" sidebar that lets people filter the change list by the
 ``pub_date`` field:
@@ -352,7 +347,7 @@ filter options for DateTimeFields: "Any date," "Today," "Past 7 days,"
 
 This is shaping up well. Let's add some search capability::
 
-    search_fields = ['question'],
+    search_fields = ['question']
 
 That adds a search box at the top of the change list. When somebody enters
 search terms, Django will search the ``question`` field. You can use as many
@@ -362,7 +357,7 @@ scenes, keep it reasonable, to keep your database happy.
 Finally, because Poll objects have dates, it'd be convenient to be able to
 drill down by date. Add this line::
 
-    date_hierarchy = 'pub_date',
+    date_hierarchy = 'pub_date'
 
 That adds hierarchical navigation, by date, to the top of the change list page.
 At top level, it displays all available years. Then it drills down to months

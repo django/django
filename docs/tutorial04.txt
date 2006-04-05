@@ -49,13 +49,13 @@ included this line::
 So let's create a ``vote()`` function in ``myproject/polls/views.py``::
 
     from django.shortcuts import get_object_or_404, render_to_response
-    from django.models.polls import choices, polls
     from django.http import HttpResponseRedirect
+    from myproject.polls.models import Choice, Poll
 
     def vote(request, poll_id):
-        p = get_object_or_404(polls, pk=poll_id)
+        p = get_object_or_404(Poll, pk=poll_id)
         try:
-            selected_choice = p.get_choice(pk=request.POST['choice'])
+            selected_choice = p.choice_set.filter(pk=request.POST['choice'])
         except (KeyError, choices.ChoiceDoesNotExist):
             # Redisplay the poll voting form.
             return render_to_response('polls/detail', {
@@ -102,7 +102,7 @@ After somebody votes in a poll, the ``vote()`` view redirects to the results
 page for the poll. Let's write that view::
 
     def results(request, poll_id):
-        p = get_object_or_404(polls, pk=poll_id)
+        p = get_object_or_404(Poll, pk=poll_id)
         return render_to_response('polls/results', {'poll': p})
 
 This is almost exactly the same as the ``detail()`` view from `Tutorial 3`_.
@@ -168,10 +168,10 @@ so far::
 Change it like so::
 
     from django.conf.urls.defaults import *
-
+    from myproject.polls.models import Poll
+    
     info_dict = {
-        'app_label': 'polls',
-        'module_name': 'polls',
+        'queryset': Poll.objects.all(),
     }
 
     urlpatterns = patterns('',
@@ -185,10 +185,8 @@ We're using two generic views here: ``object_list`` and ``object_detail``.
 Respectively, those two views abstract the concepts of "display a list of
 objects" and "display a detail page for a particular type of object."
 
-    * Each generic view needs to know which ``app_label`` and ``module_name``
-      it's acting on. Thus, we've defined ``info_dict``, a dictionary that's
-      passed to each of the generic views via the third parameter to the URL
-      tuples.
+    * Each generic view needs to know which model its acting on. This 
+      is done using a QuerySet. 
 
     * The ``object_detail`` generic view expects that the ID value captured
       from the URL is called ``"object_id"``, so we've changed ``poll_id`` to
