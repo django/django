@@ -1,0 +1,13 @@
+@import url('base.css');
+@import url('layout.css');
+
+/* LOGIN FORM */
+body.login { background:#eee; }
+.login #container { background:white; border:1px solid #ccc; width:28em; min-width:300px; margin-left:auto; margin-right:auto; margin-top:100px; }
+.login #content-main { width:100%; }
+.login form { margin-top:1em; }
+.login .form-row { padding:4px 0; float:left; width:100%; }
+.login .form-row label { float:left; width:7em; padding-right:0.5em; line-height:2em; text-align:right; font-size:1em; color:#333; }
+.login .form-row #id_username, .login .form-row #id_password { width:16em; }
+.login span.help { font-size:10px; display:block; }
+.login .submit-row { clear:both; padding:1em 0 0 7.4em; }
