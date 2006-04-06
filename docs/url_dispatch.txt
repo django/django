@@ -173,8 +173,8 @@ your URLconf. This gives your module access to these objects:
 patterns
 --------
 
-A function that takes a prefix an arbitrary number of URL patterns and returns
-a list of URL patterns in the format Django needs.
+A function that takes a prefix, and an arbitrary number of URL patterns, and
+returns a list of URL patterns in the format Django needs.
 
 The first argument to ``patterns()`` is a string ``prefix``. See
 "The view prefix" below.
