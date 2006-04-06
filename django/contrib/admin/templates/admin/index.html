@@ -14,7 +14,7 @@
 {% if app_list %}
     {% for app in app_list %}
         <div class="module">
-        <table summary="{% blocktrans %}Models available in {{ app.name }} application.{% endblocktrans %}">
+				<table summary="{% blocktrans with app.name as name %}Models available in the {{ name }} application.{% endblocktrans %}"> 
         {% for model in app.models %}
           <caption>{{ app.name }}</caption>
             <tr>
