@@ -1,6 +1,7 @@
 {% extends "admin/base_site" %}
 {% load i18n %}
 
+{% block stylesheet %}{% load adminmedia %}{% admin_media_prefix %}css/dashboard.css{% endblock %}
 {% block coltype %}colMS{% endblock %}
 {% block bodyclass %}dashboard{% endblock %}
 {% block breadcrumbs %}{% endblock %}

@@ -1,8 +1,11 @@
+@import url('base.css');
+@import url('widgets.css');
+
 /* SUBMIT ROW */
-.submit-row { padding:5px 7px; text-align:right; background:white url(../img/admin/nav-bg.gif) 0 100% repeat-x;; border:1px solid #ccc; margin:5px 0; }
+.submit-row { padding:5px 7px; text-align:right; background:white url(../img/admin/nav-bg.gif) 0 100% repeat-x; border:1px solid #ccc; margin:5px 0; }
 .submit-row input { margin:0 0 0 5px; }
 .submit-row p { margin-top:0.3em; }
-.submit-row .deletelink { background:url(../img/admin/tool-delete.gif) 0 50% no-repeat; padding-left:18px; }
+.submit-row .deletelink { background:url(../img/admin/icon_deletelink.gif) 0 50% no-repeat; padding-left:14px; }
 
 /* FORM ROWS */
 .form-row { overflow:hidden; padding:8px 12px; font-size:11px; border-bottom:1px solid #eee; }

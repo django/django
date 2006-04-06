@@ -1,3 +1,5 @@
+@import url('base.css');
+
 /* DASHBOARD */
 .dashboard .module table th { width:100%; }
 .dashboard .module table td { white-space:nowrap; }
