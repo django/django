@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2006-03-20 11:44+0100\n"
+"POT-Creation-Date: 2006-04-06 11:52+0200\n"
 "PO-Revision-Date: 2005-10-08 00:03+0200\n"
 "Last-Translator: Georg Bauer <gb@bofh.ms>\n"
 "MIME-Version: 1.0\n"
@@ -1538,10 +1538,14 @@ msgid "Swedish"
 msgstr "Schwedisch"
 
 #: conf/global_settings.py:59
+msgid "Ukrainian"
+msgstr "Ukrainisch"
+
+#: conf/global_settings.py:60
 msgid "Simplified Chinese"
 msgstr "Vereinfachtes Chinesisch"
 
-#: conf/global_settings.py:60
+#: conf/global_settings.py:61
 msgid "Traditional Chinese"
 msgstr "Traditionelles Chinesisch"
 
@@ -1858,7 +1862,7 @@ msgstr ""
 "Das Attribut %(attr)s in Zeile %(line)s hat einen ungültigen Wert. Die Zeile "
 "beginnt mit \"%(start)s\"."
 
-#: core/meta/__init__.py:1944
+#: core/meta/__init__.py:1955
 #, python-format
 msgid "%(object)s with this %(type)s already exists for the given %(field)s."
 msgstr ""

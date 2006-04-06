@@ -56,6 +56,7 @@ LANGUAGES = (
     ('sl', _('Slovenian')),
     ('sr', _('Serbian')),
     ('sv', _('Swedish')),
+    ('uk', _('Ukrainian')),
     ('zh-cn', _('Simplified Chinese')),
     ('zh-tw', _('Traditional Chinese')),
 )
