@@ -14,9 +14,9 @@
 {% if app_list %}
     {% for app in app_list %}
         <div class="module">
-				<table summary="{% blocktrans with app.name as name %}Models available in the {{ name }} application.{% endblocktrans %}"> 
+        <table summary="{% blocktrans with app.name as name %}Models available in the {{ name }} application.{% endblocktrans %}"> 
+        <caption>{{ app.name }}</caption>
         {% for model in app.models %}
-          <caption>{{ app.name }}</caption>
             <tr>
             {% if model.perms.change %}
                 <th scope="row"><a href="{{ model.admin_url }}">{{ model.name }}</a></th>
