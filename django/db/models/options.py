@@ -196,7 +196,7 @@ class Options:
 class AdminOptions:
     def __init__(self, fields=None, js=None, list_display=None, list_filter=None,
         date_hierarchy=None, save_as=False, ordering=None, search_fields=None,
-        save_on_top=False, list_select_related=False, manager=None):
+        save_on_top=False, list_select_related=False, manager=None, list_per_page=100):
         self.fields = fields
         self.js = js or []
         self.list_display = list_display or ['__str__']
@@ -206,6 +206,7 @@ class AdminOptions:
         self.search_fields = search_fields or []
         self.save_on_top = save_on_top
         self.list_select_related = list_select_related
+        self.list_per_page = list_per_page
         self.manager = manager or Manager()
 
     def get_field_sets(self, opts):

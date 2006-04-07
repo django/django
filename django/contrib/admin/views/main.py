@@ -27,7 +27,6 @@ except ImportError:
 MAX_SHOW_ALL_ALLOWED = 200
 
 # Changelist settings
-DEFAULT_RESULTS_PER_PAGE = 100
 ALL_VAR = 'all'
 ORDER_VAR = 'o'
 ORDER_TYPE_VAR = 'ot'
@@ -589,7 +588,7 @@ class ChangeList(object):
         return '?' + '&amp;'.join(['%s=%s' % (k, v) for k, v in p.items()]).replace(' ', '%20')
 
     def get_results(self, request):
-        paginator = ObjectPaginator(self.query_set, DEFAULT_RESULTS_PER_PAGE)
+        paginator = ObjectPaginator(self.query_set, self.lookup_opts.admin.list_per_page)
 
         # Get the number of objects, with admin filters applied.
         try:
@@ -611,7 +610,7 @@ class ChangeList(object):
             full_result_count = self.manager.count()
 
         can_show_all = result_count <= MAX_SHOW_ALL_ALLOWED
-        multi_page = result_count > DEFAULT_RESULTS_PER_PAGE
+        multi_page = result_count > self.lookup_opts.admin.list_per_page
 
         # Get the list of objects to display on this page.
         if (self.show_all and can_show_all) or not multi_page:

@@ -1,6 +1,6 @@
 from django import template
 from django.conf import settings
-from django.contrib.admin.views.main import MAX_SHOW_ALL_ALLOWED, DEFAULT_RESULTS_PER_PAGE, ALL_VAR
+from django.contrib.admin.views.main import MAX_SHOW_ALL_ALLOWED, ALL_VAR
 from django.contrib.admin.views.main import ORDER_VAR, ORDER_TYPE_VAR, PAGE_VAR, SEARCH_VAR
 from django.contrib.admin.views.main import IS_POPUP_VAR, EMPTY_CHANGELIST_VALUE, MONTHS
 from django.core.exceptions import ObjectDoesNotExist
