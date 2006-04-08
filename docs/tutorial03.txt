@@ -187,29 +187,29 @@ in Tutorial 1. Here's one stab at the ``index()`` view, which displays the
 latest 5 poll questions in the system, separated by commas, according to
 publication date::
 
-	from myproject.polls.models import Poll
-	from django.http import HttpResponse
+    from myproject.polls.models import Poll
+    from django.http import HttpResponse
 
-	def index(request):
-		latest_poll_list = Poll.objects.all().order_by('-pub_date')
-		output = ', '.join([p.question for p in latest_poll_list])
-		return HttpResponse(output)
+    def index(request):
+        latest_poll_list = Poll.objects.all().order_by('-pub_date')
+        output = ', '.join([p.question for p in latest_poll_list])
+        return HttpResponse(output)
 
 There's a problem here, though: The page's design is hard-coded in the view. If
 you want to change the way the page looks, you'll have to edit this Python code.
 So let's use Django's template system to separate the design from Python::
 
-	from django.template import Context, loader
-	from myproject.polls.models import Poll
-	from django.http import HttpResponse
+    from django.template import Context, loader
+    from myproject.polls.models import Poll
+    from django.http import HttpResponse
 
-	def index(request):
-		latest_poll_list = Poll.objects.all().order_by('-pub_date')
-		t = loader.get_template('polls/index')
-		c = Context({
-		    'latest_poll_list': latest_poll_list,
-		})
-		return HttpResponse(t.render(c))
+    def index(request):
+        latest_poll_list = Poll.objects.all().order_by('-pub_date')
+        t = loader.get_template('polls/index')
+        c = Context({
+            'latest_poll_list': latest_poll_list,
+        })
+        return HttpResponse(t.render(c))
 
 That code loads the template called "polls/index" and passes it a context. The
 context is a dictionary mapping template variable names to Python objects.
@@ -256,11 +256,11 @@ It's a very common idiom to load a template, fill a context and return an
 ``HttpResponse`` object with the result of the rendered template. Django
 provides a shortcut. Here's the full ``index()`` view, rewritten::
 
-	from django.shortcuts import render_to_response
-	from myproject.polls.models import Poll
+    from django.shortcuts import render_to_response
+    from myproject.polls.models import Poll
 
-	def index(request):
-		latest_poll_list = Poll.objects.all().order_by('-pub_date')
+    def index(request):
+        latest_poll_list = Poll.objects.all().order_by('-pub_date')
         return render_to_response('polls/index', {'latest_poll_list': latest_poll_list})
 
 Note that we no longer need to import ``loader``, ``Context`` or
@@ -278,12 +278,12 @@ for a given poll. Here's the view::
 
     from django.http import Http404
     # ...
-	def detail(request, poll_id):
-	    try:
-	        p = Poll.objects.get(pk=poll_id)
-	    except Poll.DoesNotExist:
-	        raise Http404
-	    return render_to_response('polls/detail', {'poll': p})
+    def detail(request, poll_id):
+        try:
+            p = Poll.objects.get(pk=poll_id)
+        except Poll.DoesNotExist:
+            raise Http404
+        return render_to_response('polls/detail', {'poll': p})
 
 The new concept here: The view raises the ``django.http.Http404``
 exception if a poll with the requested ID doesn't exist.
