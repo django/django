@@ -16,9 +16,9 @@ class ModPythonRequest(http.HttpRequest):
         self.path = req.uri
 
     def __repr__(self):
-        return '<ModPythonRequest\npath:%s,\nGET:%s,\nPOST:%s,\nCOOKIES:%s,\nMETA:%s,\nuser:%s>' % \
+        return '<ModPythonRequest\npath:%s,\nGET:%s,\nPOST:%s,\nCOOKIES:%s,\nMETA:%s>' % \
             (self.path, pformat(self.GET), pformat(self.POST), pformat(self.COOKIES),
-            pformat(self.META), pformat(self.user))
+            pformat(self.META))
 
     def get_full_path(self):
         return '%s%s' % (self.path, self._req.args and ('?' + self._req.args) or '')
