@@ -24,7 +24,7 @@ Initial setup
 If this is your first time using Django, you'll have to take care of some
 initial setup.
 
-Run the command ``django-admin.py startproject myproject``. That'll create a
+Run the command ``django-admin.py startproject myproject``. This will create a
 ``myproject`` directory in your current directory.
 
 (``django-admin.py`` should be on your system path if you installed Django via
@@ -125,9 +125,10 @@ database's connection parameters:
     database's interactive prompt.
 
 While you're editing ``settings.py``, take note of the ``INSTALLED_APPS``
-setting. That variable holds the names of all Django applications that are
-activated in this Django instance. Apps can be used in multiple projects,
-and you can distribute them.
+setting towards the bottom of the file. That variable holds the names of all 
+Django applications that are activated in this Django instance. Apps can be 
+used in multiple projects, and you can package and distribute them for use
+by others in their projects.
 
 By default, ``INSTALLED_APPS`` contains the following apps, all of which come
 with Django::
@@ -285,11 +286,8 @@ to include the string ``'myproject.polls'``. So it'll look like this::
         'django.contrib.contenttypes',
         'django.contrib.sessions',
         'django.contrib.sites',
-        'myproject.polls',
+        'myproject.polls'
     )
-
-(Don't forget the trailing comma, because of Python's rule about single-value
-tuples: Without a trailing comma, Python wouldn't know this was a tuple.)
 
 Now Django knows ``myproject`` includes the ``polls`` app. Let's run another command::
 
@@ -331,6 +329,12 @@ Note the following:
       quotes. The author of this tutorial runs PostgreSQL, so the example
       output is in PostgreSQL syntax.
 
+    * The `sql` command doesn't actually run the SQL in your database - it just 
+      prints it to the screen so that you can see what SQL Django thinks is required.
+      If you wanted to, you could copy and paste this SQL into your database prompt.
+      However, as we will see shortly, Django provides an easier way of committing
+      the SQL to the database.
+
 If you're interested, also run the following commands:
 
     * ``python manage.py sqlinitialdata polls`` -- Outputs any initial data
@@ -343,8 +347,8 @@ If you're interested, also run the following commands:
     * ``python manage.py sqlindexes polls`` -- Outputs the ``CREATE INDEX``
       statements for this app.
 
-    * ``python manage.py sqlall polls`` -- A combination of 'sql' and
-      'sqlinitialdata'.
+    * ``python manage.py sqlall polls`` -- A combination of all the SQL from
+      the 'sql', 'sqlinitialdata', and 'sqlindexes' commands.
 
 Looking at the output of those commands can help you understand what's actually
 happening under the hood.
@@ -353,9 +357,11 @@ Now, run ``syncdb`` again to create those model tables in your database::
 
     python manage.py syncdb
 
-As a review, the ``syncdb`` command creates the tables for all apps in
-``INSTALLED_APPS`` that don't already exist in your database. So you can run it
-again and again, and it'll always just create the tables that don't exist.
+The ``syncdb`` command runs the sql from 'sqlall' on your database for all apps
+in ``INSTALLED_APPS`` that don't already exist in your database. This creates
+all the tables, initial data and indexes for any apps you have added to your 
+project since the last time you ran syncdb. ``syncdb`` can be called as often
+as you like, and it will only ever create the tables that don't exist.
 
 Read the `django-admin.py documentation`_ for full information on what the
 ``manage.py`` utility can do.
@@ -454,10 +460,11 @@ representations are used throughout Django's automatically-generated admin.
 Note these are normal Python methods. Let's add a custom method, just for
 demonstration::
 
+    import datetime
+    # ...
     class Poll(models.Model):
         # ...
         def was_published_today(self):
-            import datetime
             return self.pub_date.date() == datetime.date.today()
 
 Note the addition of ``import datetime`` to reference Python's standard
@@ -488,8 +495,6 @@ Let's jump back into the Python interactive shell by running
     Traceback (most recent call last):
         ...
     DoesNotExist: Poll does not exist for {'id': 2}
-    >>> Poll.objects.filter(question__startswith='What')
-    [What's up?]
 
     # Lookup by a primary key is the most common case, so Django provides a
     # shortcut for primary-key exact lookups.
@@ -502,14 +507,15 @@ Let's jump back into the Python interactive shell by running
     >>> p.was_published_today()
     False
 
-    # Give the Poll a couple of Choices. Each one of these method calls does an
-    # INSERT statement behind the scenes and returns the new Choice object.
+    # Give the Poll a couple of Choices. The create call constructs a new 
+    # choice object, does the INSERT statement, adds the choice to the set
+    # of available choices and returns the new Choice object.
     >>> p = Poll.objects.get(pk=1)
-    >>> p.choice_set.add(choice='Not much', votes=0)
+    >>> p.choice_set.create(choice='Not much', votes=0)
     Not much
-    >>> p.choice_set.add(choice='The sky', votes=0)
+    >>> p.choice_set.create(choice='The sky', votes=0)
     The sky
-    >>> c = p.choice_set.add(choice='Just hacking again', votes=0)
+    >>> c = p.choice_set.create(choice='Just hacking again', votes=0)
 
     # Choice objects have API access to their related Poll objects.
     >>> c.poll
@@ -518,7 +524,7 @@ Let's jump back into the Python interactive shell by running
     # And vice versa: Poll objects get access to Choice objects.
     >>> p.choice_set.all()
     [Not much, The sky, Just hacking again]
-    >>> p.choice_set.all().count()
+    >>> p.choice_set.count()
     3
 
     # The API automatically follows relationships as far as you need.

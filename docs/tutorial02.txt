@@ -31,21 +31,12 @@ The Django admin site is not activated by default -- it's an opt-in thing. To
 activate the admin site for your installation, do these three things:
 
     * Add ``"django.contrib.admin"`` to your ``INSTALLED_APPS`` setting.
-    * Run the command ``python manage.py install admin``. This will create an
-      extra database table that the admin needs.
+    * Run ``python manage.py syncdb``. Since you have added a new application
+      to ``INSTALLED_APPS``, the database tables need to be updated.
     * Edit your ``myproject/urls.py`` file and uncomment the line below
       "Uncomment this for admin:". This file is a URLconf; we'll dig into
       URLconfs in the next tutorial. For now, all you need to know is that it
       maps URL roots to applications.
-
-Create a user account
-=====================
-
-Run the following command to create a superuser account for your admin site::
-
-    python manage.py createsuperuser
-
-The script will prompt you for a username, e-mail address and password (twice).
 
 Start the development server
 ============================
@@ -96,7 +87,8 @@ creating an empty class means "give this object an admin interface using
 all the default options."
 
 Now reload the Django admin page to see your changes. Note that you don't have
-to restart the development server -- it auto-reloads code.
+to restart the development server -- the server will auto-reloads your project,
+so any modifications code will be seen immediately in your browser.
 
 Explore the free admin functionality
 ====================================
