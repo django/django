@@ -58,7 +58,7 @@ class BoundMethodWeakref(object):
 			short-circuit creation so that multiple references
 			to the same (object, function) pair produce the
 			same BoundMethodWeakref instance.
-		
+
 	"""
 	_allInstances = weakref.WeakValueDictionary()
 	def __new__( cls, target, onDelete=None, *arguments,**named ):
@@ -109,12 +109,19 @@ class BoundMethodWeakref(object):
 				try:
 					if callable( function ):
 						function( self )
-				except Exception:
-					traceback.print_exc()
+				except Exception, e:
+					try:
+						traceback.print_exc()
+					except AttributeError, err:
+						print '''Exception during saferef %s cleanup function %s: %s'''%(
+							self, function, e
+						)
 		self.deletionMethods = [onDelete]
 		self.key = self.calculateKey( target )
 		self.weakSelf = weakref.ref(target.im_self, remove)
 		self.weakFunc = weakref.ref(target.im_func, remove)
+		self.selfName = str(target.im_self)
+		self.funcName = str(target.im_func.__name__)
 	def calculateKey( cls, target ):
 		"""Calculate the reference key for this reference
 
@@ -127,8 +134,8 @@ class BoundMethodWeakref(object):
 		"""Give a friendly representation of the object"""
 		return """%s( %s.%s )"""%(
 			self.__class__.__name__,
-			self.weakSelf(),
-			self.weakFunc().__name__,
+			self.selfName,
+			self.funcName,
 		)
 	__repr__ = __str__
 	def __nonzero__( self ):
