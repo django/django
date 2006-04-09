@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2006-03-20 11:44+0100\n"
+"POT-Creation-Date: 2006-04-06 12:00+0200\n"
 "PO-Revision-Date: 2005-10-08 00:03+0200\n"
 "Last-Translator: Georg Bauer <gb@bofh.ms>\n"
 "MIME-Version: 1.0\n"
@@ -1490,58 +1490,66 @@ msgid "Galician"
 msgstr "Galicisch"
 
 #: conf/global_settings.py:47
+msgid "Hebrew"
+msgstr "Hebräisch"
+
+#: conf/global_settings.py:48
 msgid "Icelandic"
 msgstr "Isländisch"
 
-#: conf/global_settings.py:48
+#: conf/global_settings.py:49
 msgid "Italian"
 msgstr "Italienisch"
 
-#: conf/global_settings.py:49
+#: conf/global_settings.py:50
 msgid "Japanese"
 msgstr "Japanisch"
 
-#: conf/global_settings.py:50
+#: conf/global_settings.py:51
 msgid "Dutch"
 msgstr "Holländisch"
 
-#: conf/global_settings.py:51
+#: conf/global_settings.py:52
 msgid "Norwegian"
 msgstr "Norwegisch"
 
-#: conf/global_settings.py:52
+#: conf/global_settings.py:53
 msgid "Brazilian"
 msgstr "Brasilianisch"
 
-#: conf/global_settings.py:53
+#: conf/global_settings.py:54
 msgid "Romanian"
 msgstr "Rumänisch"
 
-#: conf/global_settings.py:54
+#: conf/global_settings.py:55
 msgid "Russian"
 msgstr "Russisch"
 
-#: conf/global_settings.py:55
+#: conf/global_settings.py:56
 msgid "Slovak"
 msgstr "Slowakisch"
 
-#: conf/global_settings.py:56
+#: conf/global_settings.py:57
 msgid "Slovenian"
 msgstr "Slowenisch"
 
-#: conf/global_settings.py:57
+#: conf/global_settings.py:58
 msgid "Serbian"
 msgstr "Serbisch"
 
-#: conf/global_settings.py:58
+#: conf/global_settings.py:59
 msgid "Swedish"
 msgstr "Schwedisch"
 
-#: conf/global_settings.py:59
+#: conf/global_settings.py:60
+msgid "Ukrainian"
+msgstr "Ukrainisch"
+
+#: conf/global_settings.py:61
 msgid "Simplified Chinese"
 msgstr "Vereinfachtes Chinesisch"
 
-#: conf/global_settings.py:60
+#: conf/global_settings.py:62
 msgid "Traditional Chinese"
 msgstr "Traditionelles Chinesisch"
 
@@ -1858,7 +1866,7 @@ msgstr ""
 "Das Attribut %(attr)s in Zeile %(line)s hat einen ungültigen Wert. Die Zeile "
 "beginnt mit \"%(start)s\"."
 
-#: core/meta/__init__.py:1944
+#: core/meta/__init__.py:1955
 #, python-format
 msgid "%(object)s with this %(type)s already exists for the given %(field)s."
 msgstr ""

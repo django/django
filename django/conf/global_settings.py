@@ -44,6 +44,7 @@ LANGUAGES = (
     ('es', _('Spanish')),
     ('fr', _('French')),
     ('gl', _('Galician')),
+    ('he', _('Hebrew')),
     ('is', _('Icelandic')),
     ('it', _('Italian')),
     ('ja', _('Japanese')),
@@ -56,6 +57,7 @@ LANGUAGES = (
     ('sl', _('Slovenian')),
     ('sr', _('Serbian')),
     ('sv', _('Swedish')),
+    ('uk', _('Ukrainian')),
     ('zh-cn', _('Simplified Chinese')),
     ('zh-tw', _('Traditional Chinese')),
 )
