@@ -426,7 +426,9 @@ API reference
 -------------
 
 Just like users, permissions are implemented in a Django model that lives in
-`django/models/auth.py`_.
+`django/contrib/auth/models.py`_.
+
+.. _django/contrib/auth/models.py: http://code.djangoproject.com/browser/django/trunk/django/contrib/auth/models.py
 
 Fields
 ~~~~~~
