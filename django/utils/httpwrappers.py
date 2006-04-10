@@ -146,10 +146,10 @@ def parse_cookie(cookie):
 class HttpResponse(object):
     "A basic HTTP response, with content and dictionary-accessed headers"
     def __init__(self, content='', mimetype=None):
-        from django.conf.settings import DEFAULT_CONTENT_TYPE, DEFAULT_CHARSET
-        self._charset = DEFAULT_CHARSET
+        from django.conf import settings
+        self._charset = settings.DEFAULT_CHARSET
         if not mimetype:
-            mimetype = "%s; charset=%s" % (DEFAULT_CONTENT_TYPE, DEFAULT_CHARSET)
+            mimetype = "%s; charset=%s" % (settings.DEFAULT_CONTENT_TYPE, settings.DEFAULT_CHARSET)
         if hasattr(content, '__iter__'):
             self.iterator = content
             self._is_string = False
