@@ -431,7 +431,7 @@ class ForeignKey(RelatedField, Field):
             warnings.warn("edit_inline_type is deprecated. Use edit_inline instead.")
             kwargs['edit_inline'] = kwargs.pop('edit_inline_type')
 
-        kwargs['rel'] = ManyToOne(to, to_field,
+        kwargs['rel'] = ManyToOneRel(to, to_field,
             num_in_admin=kwargs.pop('num_in_admin', 3),
             min_num_in_admin=kwargs.pop('min_num_in_admin', None),
             max_num_in_admin=kwargs.pop('max_num_in_admin', None),
@@ -514,7 +514,7 @@ class OneToOneField(RelatedField, IntegerField):
             warnings.warn("edit_inline_type is deprecated. Use edit_inline instead.")
             kwargs['edit_inline'] = kwargs.pop('edit_inline_type')
 
-        kwargs['rel'] = OneToOne(to, to_field,
+        kwargs['rel'] = OneToOneRel(to, to_field,
             num_in_admin=kwargs.pop('num_in_admin', 0),
             edit_inline=kwargs.pop('edit_inline', False),
             related_name=kwargs.pop('related_name', None),
@@ -544,7 +544,7 @@ class OneToOneField(RelatedField, IntegerField):
 class ManyToManyField(RelatedField, Field):
     def __init__(self, to, **kwargs):
         kwargs['verbose_name'] = kwargs.get('verbose_name', None)
-        kwargs['rel'] = ManyToMany(to, kwargs.pop('singular', None),
+        kwargs['rel'] = ManyToManyRel(to, kwargs.pop('singular', None),
             num_in_admin=kwargs.pop('num_in_admin', 0),
             related_name=kwargs.pop('related_name', None),
             filter_interface=kwargs.pop('filter_interface', None),
@@ -649,7 +649,7 @@ class ManyToManyField(RelatedField, Field):
     def set_attributes_from_rel(self):
         pass
 
-class ManyToOne:
+class ManyToOneRel:
     def __init__(self, to, field_name, num_in_admin=3, min_num_in_admin=None,
         max_num_in_admin=None, num_extra_on_change=1, edit_inline=False,
         related_name=None, limit_choices_to=None, lookup_overrides=None, raw_id_admin=False):
@@ -670,7 +670,7 @@ class ManyToOne:
         "Returns the Field in the 'to' object to which this relationship is tied."
         return self.to._meta.get_field(self.field_name)
 
-class OneToOne(ManyToOne):
+class OneToOneRel(ManyToOneRel):
     def __init__(self, to, field_name, num_in_admin=0, edit_inline=False,
         related_name=None, limit_choices_to=None, lookup_overrides=None,
         raw_id_admin=False):
@@ -682,7 +682,7 @@ class OneToOne(ManyToOne):
         self.raw_id_admin = raw_id_admin
         self.multiple = False
 
-class ManyToMany:
+class ManyToManyRel:
     def __init__(self, to, singular=None, num_in_admin=0, related_name=None,
         filter_interface=None, limit_choices_to=None, raw_id_admin=False, symmetrical=True):
         self.to = to
@@ -696,4 +696,4 @@ class ManyToMany:
         self.symmetrical = symmetrical
         self.multiple = True
 
-        assert not (self.raw_id_admin and self.filter_interface), "ManyToMany relationships may not use both raw_id_admin and filter_interface"
+        assert not (self.raw_id_admin and self.filter_interface), "ManyToManyRels may not use both raw_id_admin and filter_interface"

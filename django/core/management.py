@@ -896,7 +896,7 @@ def get_validation_errors(outfile, app=None):
                 except models.FieldDoesNotExist:
                     e.add(opts, '"unique_together" refers to %s, a field that doesn\'t exist. Check your syntax.' % field_name)
                 else:
-                    if isinstance(f.rel, models.ManyToMany):
+                    if isinstance(f.rel, models.ManyToManyRel):
                         e.add(opts, '"unique_together" refers to %s. ManyToManyFields are not supported in unique_together.' % f.name)
 
     return len(e.errors)

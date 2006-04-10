@@ -37,7 +37,7 @@ IS_POPUP_VAR = 'pop'
 # Text to display within change-list table cells if the value is blank.
 EMPTY_CHANGELIST_VALUE = '(None)'
 
-use_raw_id_admin = lambda field: isinstance(field.rel, (models.ManyToOne, models.ManyToMany)) and field.rel.raw_id_admin
+use_raw_id_admin = lambda field: isinstance(field.rel, (models.ManyToOneRel, models.ManyToManyRel)) and field.rel.raw_id_admin
 
 class IncorrectLookupParameters(Exception):
     pass
@@ -116,7 +116,7 @@ class AdminBoundField(object):
         self.raw_id_admin = use_raw_id_admin(field)
         self.is_date_time = isinstance(field, models.DateTimeField)
         self.is_file_field = isinstance(field, models.FileField)
-        self.needs_add_label = field.rel and isinstance(field.rel, models.ManyToOne) or isinstance(field.rel, models.ManyToMany) and field.rel.to._meta.admin
+        self.needs_add_label = field.rel and isinstance(field.rel, models.ManyToOneRel) or isinstance(field.rel, models.ManyToManyRel) and field.rel.to._meta.admin
         self.hidden = isinstance(self.field, models.AutoField)
         self.first = False
 
@@ -140,9 +140,9 @@ class AdminBoundField(object):
         try:
             return self._display
         except AttributeError:
-            if isinstance(self.field.rel, models.ManyToOne):
+            if isinstance(self.field.rel, models.ManyToOneRel):
                 self._display = getattr(self.original, 'get_%s' % self.field.name)()
-            elif isinstance(self.field.rel, models.ManyToMany):
+            elif isinstance(self.field.rel, models.ManyToManyRel):
                 self._display = ", ".join([str(obj) for obj in getattr(self.original, 'get_%s_list' % self.field.rel.singular)()])
             return self._display
 
@@ -413,7 +413,7 @@ def _get_deleted_objects(deleted_objects, perms_needed, user, obj, opts, current
             continue
         opts_seen.append(related.opts)
         rel_opts_name = related.get_accessor_name()
-        if isinstance(related.field.rel, models.OneToOne):
+        if isinstance(related.field.rel, models.OneToOneRel):
             try:
                 sub_obj = getattr(obj, rel_opts_name)
             except ObjectDoesNotExist:
@@ -650,7 +650,7 @@ class ChangeList(object):
                 except models.FieldDoesNotExist:
                     pass
                 else:
-                    if not isinstance(f.rel, models.ManyToOne) or not f.null:
+                    if not isinstance(f.rel, models.ManyToOneRel) or not f.null:
                         order_field = f.name
             except (IndexError, ValueError):
                 pass # Invalid ordering specified. Just use the default.
@@ -679,7 +679,7 @@ class ChangeList(object):
                 except models.FieldDoesNotExist:
                     pass
                 else:
-                    if isinstance(f.rel, models.ManyToOne):
+                    if isinstance(f.rel, models.ManyToOneRel):
                         qs = qs.select_related()
                         break
 
@@ -692,7 +692,7 @@ class ChangeList(object):
         except models.FieldDoesNotExist:
             pass
         else:
-            if isinstance(f.rel, models.ManyToOne):
+            if isinstance(f.rel, models.ManyToOneRel):
                 rel_ordering = f.rel.to._meta.ordering and f.rel.to._meta.ordering[0] or f.rel.to._meta.pk.column
                 lookup_order_field = '%s.%s' % (f.rel.to._meta.db_table, rel_ordering)
 

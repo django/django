@@ -1,5 +1,5 @@
 from django.db.models.related import RelatedObject
-from django.db.models.fields.related import ManyToMany
+from django.db.models.fields.related import ManyToManyRel
 from django.db.models.fields import AutoField, FieldDoesNotExist
 from django.db.models.loading import get_models
 from django.db.models.query import orderlist2sql
@@ -76,7 +76,7 @@ class Options:
         # Insert the given field in the order in which it was created, using
         # the "creation_counter" attribute of the field.
         # Move many-to-many related fields from self.fields into self.many_to_many.
-        if field.rel and isinstance(field.rel, ManyToMany):
+        if field.rel and isinstance(field.rel, ManyToManyRel):
             self.many_to_many.insert(bisect(self.many_to_many, field), field)
         else:
             self.fields.insert(bisect(self.fields, field), field)

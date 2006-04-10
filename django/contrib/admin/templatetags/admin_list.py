@@ -88,7 +88,7 @@ def result_headers(cl):
             # Non-field list_display values don't get ordering capability.
             yield {"text": header}
         else:
-            if isinstance(f.rel, models.ManyToOne) and f.null:
+            if isinstance(f.rel, models.ManyToOneRel) and f.null:
                 yield {"text": f.verbose_name}
             else:
                 th_classes = []
@@ -128,7 +128,7 @@ def items_for_result(cl, result):
         else:
             field_val = getattr(result, f.attname)
 
-            if isinstance(f.rel, models.ManyToOne):
+            if isinstance(f.rel, models.ManyToOneRel):
                 if field_val is not None:
                     result_repr = getattr(result, f.name)
                 else:

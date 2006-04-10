@@ -3,7 +3,7 @@ import django.db.models.manager
 from django.core import validators
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.models.fields import AutoField, ImageField, FieldDoesNotExist
-from django.db.models.fields.related import OneToOne, ManyToOne
+from django.db.models.fields.related import OneToOneRel, ManyToOneRel
 from django.db.models.related import RelatedObject
 from django.db.models.query import orderlist2sql, delete_objects
 from django.db.models.options import Options, AdminOptions
@@ -88,7 +88,7 @@ class Model(object):
         dispatcher.send(signal=signals.pre_init, sender=self.__class__, args=args, kwargs=kwargs)
         if kwargs:
             for f in self._meta.fields:
-                if isinstance(f.rel, ManyToOne):
+                if isinstance(f.rel, ManyToOneRel):
                     try:
                         # Assume object instance was passed in.
                         rel_obj = kwargs.pop(f.name)
@@ -234,7 +234,7 @@ class Model(object):
 
         for related in self._meta.get_all_related_objects():
             rel_opts_name = related.get_accessor_name()
-            if isinstance(related.field.rel, OneToOne):
+            if isinstance(related.field.rel, OneToOneRel):
                 try:
                     sub_obj = getattr(self, rel_opts_name)
                 except ObjectDoesNotExist:

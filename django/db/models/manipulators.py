@@ -272,10 +272,10 @@ class AutomaticChangeManipulator(AutomaticManipulator):
         super(AutomaticChangeManipulator, self).__init__(follow=follow)
 
 def manipulator_validator_unique_together(field_name_list, opts, self, field_data, all_data):
-    from django.db.models.fields.related import ManyToOne
+    from django.db.models.fields.related import ManyToOneRel
     from django.utils.text import get_text_list
     field_list = [opts.get_field(field_name) for field_name in field_name_list]
-    if isinstance(field_list[0].rel, ManyToOne):
+    if isinstance(field_list[0].rel, ManyToOneRel):
         kwargs = {'%s__%s__iexact' % (field_name_list[0], field_list[0].rel.field_name): field_data}
     else:
         kwargs = {'%s__iexact' % field_name_list[0]: field_data}
@@ -288,7 +288,7 @@ def manipulator_validator_unique_together(field_name_list, opts, self, field_dat
             # This will be caught by another validator, assuming the field
             # doesn't have blank=True.
             return
-        if isinstance(f.rel, ManyToOne):
+        if isinstance(f.rel, ManyToOneRel):
             kwargs['%s__pk' % f.name] = field_val
         else:
             kwargs['%s__iexact' % f.name] = field_val
@@ -303,13 +303,13 @@ def manipulator_validator_unique_together(field_name_list, opts, self, field_dat
             {'object': capfirst(opts.verbose_name), 'type': field_list[0].verbose_name, 'field': get_text_list(field_name_list[1:], 'and')}
 
 def manipulator_validator_unique_for_date(from_field, date_field, opts, lookup_type, self, field_data, all_data):
-    from django.db.models.fields.related import ManyToOne
+    from django.db.models.fields.related import ManyToOneRel
     date_str = all_data.get(date_field.get_manipulator_field_names('')[0], None)
     date_val = forms.DateField.html2python(date_str)
     if date_val is None:
         return # Date was invalid. This will be caught by another validator.
     lookup_kwargs = {'%s__year' % date_field.name: date_val.year}
-    if isinstance(from_field.rel, ManyToOne):
+    if isinstance(from_field.rel, ManyToOneRel):
         lookup_kwargs['%s__pk' % from_field.name] = field_data
     else:
         lookup_kwargs['%s__iexact' % from_field.name] = field_data
