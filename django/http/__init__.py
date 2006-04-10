@@ -146,14 +146,20 @@ def parse_cookie(cookie):
         cookiedict[key] = c.get(key).value
     return cookiedict
 
-class HttpResponse:
+class HttpResponse(object):
     "A basic HTTP response, with content and dictionary-accessed headers"
     def __init__(self, content='', mimetype=None):
+        from django.conf import settings
+        self._charset = settings.DEFAULT_CHARSET
         if not mimetype:
-            from django.conf import settings
             mimetype = "%s; charset=%s" % (settings.DEFAULT_CONTENT_TYPE, settings.DEFAULT_CHARSET)
-        self.content = content
-        self.headers = {'Content-Type':mimetype}
+        if hasattr(content, '__iter__'):
+            self.iterator = content
+            self._is_string = False
+        else:
+            self.iterator = [content]
+            self._is_string = True
+        self.headers = {'Content-Type': mimetype}
         self.cookies = SimpleCookie()
         self.status_code = 200
 
@@ -196,25 +202,32 @@ class HttpResponse:
         except KeyError:
             pass
 
-    def get_content_as_string(self, encoding):
-        """
-        Returns the content as a string, encoding it from a Unicode object if
-        necessary.
-        """
-        if isinstance(self.content, unicode):
-            return self.content.encode(encoding)
-        return self.content
+    def _get_content(self):
+        content = ''.join(self.iterator)
+        if isinstance(content, unicode):
+            content = content.encode(self._charset)
+        return content
+
+    def _set_content(self, value):
+        self.iterator = [value]
+        self._is_string = True
+
+    content = property(_get_content, _set_content)
 
     # The remaining methods partially implement the file-like object interface.
     # See http://docs.python.org/lib/bltin-file-objects.html
     def write(self, content):
-        self.content += content
+        if not self._is_string:
+            raise Exception, "This %s instance is not writable" % self.__class__
+        self.iterator.append(content)
 
     def flush(self):
         pass
 
     def tell(self):
-        return len(self.content)
+        if not self._is_string:
+            raise Exception, "This %s instance cannot tell its position" % self.__class__
+        return sum(len(chunk) for chunk in self.iterator)
 
 class HttpResponseRedirect(HttpResponse):
     def __init__(self, redirect_to):
