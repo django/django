@@ -560,7 +560,7 @@ def _get_deleted_objects(deleted_objects, perms_needed, user, obj, opts, current
             continue
         opts_seen.append(related.opts)
         rel_opts_name = related.get_method_name_part()
-        if isinstance(related.field.rel, meta.OneToOne):
+        if isinstance(related.field.rel, meta.OneToOneRel):
             try:
                 sub_obj = getattr(obj, 'get_%s' % rel_opts_name)()
             except ObjectDoesNotExist:

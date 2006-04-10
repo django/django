@@ -133,7 +133,7 @@ class Field(object):
 
         # Set db_index to True if the field has a relationship and doesn't explicitly set db_index.
         if db_index is None:
-            if isinstance(rel, OneToOne) or isinstance(rel, ManyToOneRel):
+            if isinstance(rel, OneToOneRel) or isinstance(rel, ManyToOneRel):
                 self.db_index = True
             else:
                 self.db_index = False
@@ -811,7 +811,7 @@ class OneToOneField(IntegerField):
             warnings.warn("edit_inline_type is deprecated. Use edit_inline instead.")
             kwargs['edit_inline'] = kwargs.pop('edit_inline_type')
 
-        kwargs['rel'] = OneToOne(to, to_field,
+        kwargs['rel'] = OneToOneRel(to, to_field,
             num_in_admin=kwargs.pop('num_in_admin', 0),
             edit_inline=kwargs.pop('edit_inline', False),
             related_name=kwargs.pop('related_name', None),
@@ -855,7 +855,7 @@ class ManyToManyRel:
         self.raw_id_admin = raw_id_admin
         assert not (self.raw_id_admin and self.filter_interface), "ManyToManyRels may not use both raw_id_admin and filter_interface"
 
-class OneToOne(ManyToOneRel):
+class OneToOneRel(ManyToOneRel):
     def __init__(self, to, field_name, num_in_admin=0, edit_inline=False,
         related_name=None, limit_choices_to=None, lookup_overrides=None,
         raw_id_admin=False):

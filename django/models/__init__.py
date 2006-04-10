@@ -26,7 +26,7 @@ for mod in modules:
             # generated.
             rel_mod = related.opts.get_model_module()
             rel_obj_name = related.get_method_name_part()
-            if isinstance(related.field.rel, meta.OneToOne):
+            if isinstance(related.field.rel, meta.OneToOneRel):
                 # Add "get_thingie" methods for one-to-one related objects.
                 # EXAMPLE: Place.get_restaurants_restaurant()
                 func = curry(meta.method_get_related, 'get_object', rel_mod, related.field)

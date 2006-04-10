@@ -410,7 +410,7 @@ class Options:
         # Calculate one_to_one_field.
         self.one_to_one_field = None
         for f in self.fields:
-            if isinstance(f.rel, OneToOne):
+            if isinstance(f.rel, OneToOneRel):
                 self.one_to_one_field = f
                 break
         # Cache the primary-key field.
@@ -1038,7 +1038,7 @@ def method_delete(opts, self):
     cursor = db.db.cursor()
     for related in opts.get_all_related_objects():
         rel_opts_name = related.get_method_name_part()
-        if isinstance(related.field.rel, OneToOne):
+        if isinstance(related.field.rel, OneToOneRel):
             try:
                 sub_obj = getattr(self, 'get_%s' % rel_opts_name)()
             except ObjectDoesNotExist:
