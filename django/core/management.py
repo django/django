@@ -700,7 +700,6 @@ def inspectdb(db_name):
                 # This is a hook for DATA_TYPES_REVERSE to return a tuple of
                 # (field_type, extra_params_dict).
                 if type(field_type) is tuple:
-                    field_type, extra_params = field_type
                     field_type, new_params = field_type
                     extra_params.update(new_params)
 
