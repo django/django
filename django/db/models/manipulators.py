@@ -263,7 +263,7 @@ class AutomaticChangeManipulator(AutomaticManipulator):
                 # Let the ObjectDoesNotExist exception propogate up.
                 lookup_kwargs = self.opts.one_to_one_field.rel.limit_choices_to
                 lookup_kwargs['%s__exact' % self.opts.one_to_one_field.rel.field_name] = obj_key
-                _ = self.opts.one_to_one_field.rel.to.get_model_module().get_object(**lookup_kwargs)
+                self.opts.one_to_one_field.rel.to.get_model_module().get(**lookup_kwargs)
                 params = dict([(f.attname, f.get_default()) for f in self.opts.fields])
                 params[self.opts.pk.attname] = obj_key
                 self.original_object = self.opts.get_model_module().Klass(**params)

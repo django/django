@@ -38,7 +38,7 @@ def manipulator_valid_rel_key(f, self, field_data, all_data):
     "Validates that the value is a valid foreign key"
     klass = f.rel.to
     try:
-        klass._default_manager.get_object(pk=field_data)
+        klass._default_manager.get(pk=field_data)
     except klass.DoesNotExist:
         raise validators.ValidationError, _("Please enter a valid %s.") % f.verbose_name
 
@@ -392,7 +392,7 @@ class ReverseManyRelatedObjectsDescriptor(object):
         rel_model=self.field.rel.to
         superclass = rel_model._default_manager.__class__
         RelatedManager = create_many_related_manager(superclass)
-        
+
         qn = backend.quote_name
         manager = RelatedManager(
             model=rel_model,
