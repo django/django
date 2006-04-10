@@ -47,7 +47,7 @@ def manipulator_valid_rel_key(f, self, field_data, all_data):
 
 def manipulator_validator_unique(f, opts, self, field_data, all_data):
     "Validates that the value is unique for this field."
-    if f.rel and isinstance(f.rel, ManyToOne):
+    if f.rel and isinstance(f.rel, ManyToOneRel):
         lookup_type = '%s__%s__exact' % (f.name, f.rel.get_related_field().name)
     else:
         lookup_type = '%s__exact' % f.name
@@ -133,7 +133,7 @@ class Field(object):
 
         # Set db_index to True if the field has a relationship and doesn't explicitly set db_index.
         if db_index is None:
-            if isinstance(rel, OneToOne) or isinstance(rel, ManyToOne):
+            if isinstance(rel, OneToOne) or isinstance(rel, ManyToOneRel):
                 self.db_index = True
             else:
                 self.db_index = False
@@ -152,7 +152,7 @@ class Field(object):
         self.attname, self.column = self.get_attname_column()
 
     def get_attname_column(self):
-        if isinstance(self.rel, ManyToOne):
+        if isinstance(self.rel, ManyToOneRel):
             attname = '%s_id' % self.name
         else:
             attname = self.name
@@ -222,7 +222,7 @@ class Field(object):
         params = {'validator_list': self.validator_list[:]}
         if self.maxlength and not self.choices: # Don't give SelectFields a maxlength parameter.
             params['maxlength'] = self.maxlength
-        if isinstance(self.rel, ManyToOne):
+        if isinstance(self.rel, ManyToOneRel):
             params['member_name'] = name_prefix + self.attname
             if self.rel.raw_id_admin:
                 field_objs = self.get_manipulator_field_objs()
@@ -698,7 +698,7 @@ class ForeignKey(Field):
             warnings.warn("edit_inline_type is deprecated. Use edit_inline instead.")
             kwargs['edit_inline'] = kwargs.pop('edit_inline_type')
 
-        kwargs['rel'] = ManyToOne(to, to_field,
+        kwargs['rel'] = ManyToOneRel(to, to_field,
             num_in_admin=kwargs.pop('num_in_admin', 3),
             min_num_in_admin=kwargs.pop('min_num_in_admin', None),
             max_num_in_admin=kwargs.pop('max_num_in_admin', None),
@@ -821,7 +821,7 @@ class OneToOneField(IntegerField):
         kwargs['primary_key'] = True
         IntegerField.__init__(self, **kwargs)
 
-class ManyToOne:
+class ManyToOneRel:
     def __init__(self, to, field_name, num_in_admin=3, min_num_in_admin=None,
         max_num_in_admin=None, num_extra_on_change=1, edit_inline=False,
         related_name=None, limit_choices_to=None, lookup_overrides=None, raw_id_admin=False):
@@ -855,7 +855,7 @@ class ManyToManyRel:
         self.raw_id_admin = raw_id_admin
         assert not (self.raw_id_admin and self.filter_interface), "ManyToManyRels may not use both raw_id_admin and filter_interface"
 
-class OneToOne(ManyToOne):
+class OneToOne(ManyToOneRel):
     def __init__(self, to, field_name, num_in_admin=0, edit_inline=False,
         related_name=None, limit_choices_to=None, lookup_overrides=None,
         raw_id_admin=False):

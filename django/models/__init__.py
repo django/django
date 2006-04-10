@@ -32,7 +32,7 @@ for mod in modules:
                 func = curry(meta.method_get_related, 'get_object', rel_mod, related.field)
                 func.__doc__ = "Returns the associated `%s.%s` object." % (related.opts.app_label, related.opts.module_name)
                 setattr(klass, 'get_%s' % rel_obj_name, func)
-            elif isinstance(related.field.rel, meta.ManyToOne):
+            elif isinstance(related.field.rel, meta.ManyToOneRel):
                 # Add "get_thingie" methods for many-to-one related objects.
                 # EXAMPLE: Poll.get_choice()
                 func = curry(meta.method_get_related, 'get_object', rel_mod, related.field)

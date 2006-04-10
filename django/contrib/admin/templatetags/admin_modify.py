@@ -103,7 +103,7 @@ class FieldWrapper(object):
         return self.field.blank and ' class="optional"' or ''
 
     def use_raw_id_admin(self):
-         return isinstance(self.field.rel, (meta.ManyToOne, meta.ManyToManyRel)) \
+         return isinstance(self.field.rel, (meta.ManyToOneRel, meta.ManyToManyRel)) \
             and self.field.rel.raw_id_admin
 
 class FormFieldCollectionWrapper(object):

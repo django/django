@@ -494,7 +494,7 @@ class Options:
                 # subsequently loaded object with related links will override this
                 # relationship we're adding.
                 link_field = copy.copy(relatedlinks.RelatedLink._meta.get_field('object_id'))
-                link_field.rel = ManyToOne(self.get_model_module().Klass, 'id',
+                link_field.rel = ManyToOneRel(self.get_model_module().Klass, 'id',
                     num_in_admin=3, min_num_in_admin=3, edit_inline=TABULAR,
                     lookup_overrides={
                         'content_type__package__label__exact': self.app_label,
@@ -748,7 +748,7 @@ class ModelBase(type):
                 f.rel.field_name = f.rel.field_name or f.rel.to.pk.name
             # Add "get_thingie" methods for many-to-one related objects.
             # EXAMPLES: Choice.get_poll(), Story.get_dateline()
-            if isinstance(f.rel, ManyToOne):
+            if isinstance(f.rel, ManyToOneRel):
                 func = curry(method_get_many_to_one, f)
                 func.__doc__ = "Returns the associated `%s.%s` object." % (f.rel.to.app_label, f.rel.to.module_name)
                 attrs['get_%s' % f.name] = func
@@ -946,7 +946,7 @@ class Model:
 def method_init(opts, self, *args, **kwargs):
     if kwargs:
         for f in opts.fields:
-            if isinstance(f.rel, ManyToOne):
+            if isinstance(f.rel, ManyToOneRel):
                 try:
                     # Assume object instance was passed in.
                     rel_obj = kwargs.pop(f.name)
@@ -1927,7 +1927,7 @@ def manipulator_flatten_data(opts, klass, add, change, self):
 def manipulator_validator_unique_together(field_name_list, opts, self, field_data, all_data):
     from django.utils.text import get_text_list
     field_list = [opts.get_field(field_name) for field_name in field_name_list]
-    if isinstance(field_list[0].rel, ManyToOne):
+    if isinstance(field_list[0].rel, ManyToOneRel):
         kwargs = {'%s__%s__iexact' % (field_name_list[0], field_list[0].rel.field_name): field_data}
     else:
         kwargs = {'%s__iexact' % field_name_list[0]: field_data}
@@ -1940,7 +1940,7 @@ def manipulator_validator_unique_together(field_name_list, opts, self, field_dat
             # This will be caught by another validator, assuming the field
             # doesn't have blank=True.
             return
-        if isinstance(f.rel, ManyToOne):
+        if isinstance(f.rel, ManyToOneRel):
             kwargs['%s__pk' % f.name] = field_val
         else:
             kwargs['%s__iexact' % f.name] = field_val
@@ -1962,7 +1962,7 @@ def manipulator_validator_unique_for_date(from_field, date_field, opts, lookup_t
     if date_val is None:
         return # Date was invalid. This will be caught by another validator.
     lookup_kwargs = {'%s__year' % date_field.name: date_val.year}
-    if isinstance(from_field.rel, ManyToOne):
+    if isinstance(from_field.rel, ManyToOneRel):
         lookup_kwargs['%s__pk' % from_field.name] = field_data
     else:
         lookup_kwargs['%s__iexact' % from_field.name] = field_data

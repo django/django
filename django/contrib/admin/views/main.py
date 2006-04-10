@@ -174,7 +174,7 @@ class ChangeList(object):
                 except meta.FieldDoesNotExist:
                     pass
                 else:
-                    if not isinstance(f.rel, meta.ManyToOne) or not f.null:
+                    if not isinstance(f.rel, meta.ManyToOneRel) or not f.null:
                         order_field = f.name
             except (IndexError, ValueError):
                 pass # Invalid ordering specified. Just use the default.
@@ -199,7 +199,7 @@ class ChangeList(object):
         except meta.FieldDoesNotExist:
             pass
         else:
-            if isinstance(lookup_opts.get_field(order_field).rel, meta.ManyToOne):
+            if isinstance(lookup_opts.get_field(order_field).rel, meta.ManyToOneRel):
                 f = lookup_opts.get_field(order_field)
                 rel_ordering = f.rel.to.ordering and f.rel.to.ordering[0] or f.rel.to.pk.column
                 lookup_order_field = '%s.%s' % (f.rel.to.db_table, rel_ordering)
@@ -214,7 +214,7 @@ class ChangeList(object):
                 except meta.FieldDoesNotExist:
                     pass
                 else:
-                    if isinstance(f.rel, meta.ManyToOne):
+                    if isinstance(f.rel, meta.ManyToOneRel):
                         lookup_params['select_related'] = True
                         break
         lookup_params['order_by'] = ((order_type == 'desc' and '-' or '') + lookup_order_field,)
@@ -247,7 +247,7 @@ def change_list(request, app_label, module_name):
                                'admin/change_list'], context_instance=c)
 change_list = staff_member_required(change_list)
 
-use_raw_id_admin = lambda field: isinstance(field.rel, (meta.ManyToOne, meta.ManyToManyRel)) and field.rel.raw_id_admin
+use_raw_id_admin = lambda field: isinstance(field.rel, (meta.ManyToOneRel, meta.ManyToManyRel)) and field.rel.raw_id_admin
 
 def get_javascript_imports(opts,auto_populated_fields, ordered_objects, field_sets):
 # Put in any necessary JavaScript imports.
@@ -285,7 +285,7 @@ class AdminBoundField(BoundField):
         self.raw_id_admin = use_raw_id_admin(field)
         self.is_date_time = isinstance(field, meta.DateTimeField)
         self.is_file_field = isinstance(field, meta.FileField)
-        self.needs_add_label = field.rel and isinstance(field.rel, meta.ManyToOne) or isinstance(field.rel, meta.ManyToManyRel) and field.rel.to.admin
+        self.needs_add_label = field.rel and isinstance(field.rel, meta.ManyToOneRel) or isinstance(field.rel, meta.ManyToManyRel) and field.rel.to.admin
         self.hidden = isinstance(self.field, meta.AutoField)
         self.first = False
 
@@ -307,7 +307,7 @@ class AdminBoundField(BoundField):
         if getattr(self, '_display_filled', False):
             return
         # HACK
-        if isinstance(self.field.rel, meta.ManyToOne):
+        if isinstance(self.field.rel, meta.ManyToOneRel):
              func_name = 'get_%s' % self.field.name
              self._display = self._fetch_existing_display(func_name)
         elif isinstance(self.field.rel, meta.ManyToManyRel):
