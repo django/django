@@ -42,10 +42,10 @@ p.file-upload { line-height:20px; margin:0; padding:0; color:#666; font-size:11p
 .file-upload .deletelink { margin-left:5px; }
 
 /* CALENDARS & CLOCKS */
-.calendarbox, .clockbox { margin:5px auto; width: 10em; text-align: center; background:white; position:relative; }
-.clockbox { width:6em; }
+.calendarbox, .clockbox { margin:5px auto; font-size:11px; width:16em; text-align:center; background:white; position:relative; }
+.clockbox { width:9em; }
 .calendar { margin:0; padding: 0; }
-.calendar table { margin: 0; padding: 0; border-collapse:collapse; background:white; width:99%; }
+.calendar table { margin:0; padding:0; border-collapse:collapse; background:white; width:99%; }
 .calendar caption, .calendarbox h2 { margin: 0; font-size:11px; text-align:center; border-top:none; }
 .calendar th { font-size:10px; color:#666; padding:2px 3px; text-align:center; background:#e1e1e1 url(../img/admin/nav-bg.gif) 0 50% repeat-x; border-bottom:1px solid #ddd; }
 .calendar td { font-size:11px; text-align: center; padding: 0; border-top:1px solid #eee; border-bottom:none; }
