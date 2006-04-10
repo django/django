@@ -224,7 +224,7 @@ class HttpResponse(object):
     def tell(self):
         if not self._is_string:
             raise Exception, "This %s instance cannot tell its position" % self.__class__
-        return sum(len(chunk) for chunk in self.iterator)
+        return sum([len(chunk) for chunk in self.iterator])
 
 class HttpResponseRedirect(HttpResponse):
     def __init__(self, redirect_to):
