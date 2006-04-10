@@ -115,8 +115,7 @@ dictfetchmany = util.dictfetchmany
 dictfetchall  = util.dictfetchall
 
 def get_last_insert_id(cursor, table_name, pk_name):
-    cursor.execute("SELECT LAST_INSERT_ID()")
-    return cursor.fetchone()[0]
+    return cursor.lastrowid
 
 def get_date_extract_sql(lookup_type, table_name):
     # lookup_type is 'year', 'month', 'day'
