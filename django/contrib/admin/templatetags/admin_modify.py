@@ -103,7 +103,7 @@ class FieldWrapper(object):
         return self.field.blank and ' class="optional"' or ''
 
     def use_raw_id_admin(self):
-         return isinstance(self.field.rel, (meta.ManyToOne, meta.ManyToMany)) \
+         return isinstance(self.field.rel, (meta.ManyToOne, meta.ManyToManyRel)) \
             and self.field.rel.raw_id_admin
 
 class FormFieldCollectionWrapper(object):
@@ -191,7 +191,7 @@ auto_populated_field_script = register.simple_tag(auto_populated_field_script)
 
 def filter_interface_script_maybe(bound_field):
     f = bound_field.field
-    if f.rel and isinstance(f.rel, meta.ManyToMany) and f.rel.filter_interface:
+    if f.rel and isinstance(f.rel, meta.ManyToManyRel) and f.rel.filter_interface:
        return '<script type="text/javascript">addEvent(window, "load", function(e) {' \
               ' SelectFilter.init("id_%s", "%s", %s, "%s"); });</script>\n' % (
               f.name, f.verbose_name, f.rel.filter_interface-1, ADMIN_MEDIA_PREFIX)

@@ -385,7 +385,7 @@ class Options:
         # Move many-to-many related fields from self.fields into self.many_to_many.
         self.fields, self.many_to_many = [], []
         for field in (fields or []):
-            if field.rel and isinstance(field.rel, ManyToMany):
+            if field.rel and isinstance(field.rel, ManyToManyRel):
                 self.many_to_many.append(field)
             else:
                 self.fields.append(field)

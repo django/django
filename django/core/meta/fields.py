@@ -123,7 +123,7 @@ class Field(object):
         self.radio_admin = radio_admin
         self.help_text = help_text
         self.db_column = db_column
-        if rel and isinstance(rel, ManyToMany):
+        if rel and isinstance(rel, ManyToManyRel):
             if rel.raw_id_admin:
                 self.help_text = string_concat(self.help_text,
                     gettext_lazy(' Separate multiple IDs with commas.'))
@@ -742,7 +742,7 @@ class ForeignKey(Field):
 class ManyToManyField(Field):
     def __init__(self, to, **kwargs):
         kwargs['verbose_name'] = kwargs.get('verbose_name', to._meta.verbose_name_plural)
-        kwargs['rel'] = ManyToMany(to, kwargs.pop('singular', None),
+        kwargs['rel'] = ManyToManyRel(to, kwargs.pop('singular', None),
             num_in_admin=kwargs.pop('num_in_admin', 0),
             related_name=kwargs.pop('related_name', None),
             filter_interface=kwargs.pop('filter_interface', None),
@@ -842,7 +842,7 @@ class ManyToOne:
         "Returns the Field in the 'to' object to which this relationship is tied."
         return self.to.get_field(self.field_name)
 
-class ManyToMany:
+class ManyToManyRel:
     def __init__(self, to, singular=None, num_in_admin=0, related_name=None,
         filter_interface=None, limit_choices_to=None, raw_id_admin=False):
         self.to = to._meta
@@ -853,7 +853,7 @@ class ManyToMany:
         self.limit_choices_to = limit_choices_to or {}
         self.edit_inline = False
         self.raw_id_admin = raw_id_admin
-        assert not (self.raw_id_admin and self.filter_interface), "ManyToMany relationships may not use both raw_id_admin and filter_interface"
+        assert not (self.raw_id_admin and self.filter_interface), "ManyToManyRels may not use both raw_id_admin and filter_interface"
 
 class OneToOne(ManyToOne):
     def __init__(self, to, field_name, num_in_admin=0, edit_inline=False,

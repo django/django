@@ -247,7 +247,7 @@ def change_list(request, app_label, module_name):
                                'admin/change_list'], context_instance=c)
 change_list = staff_member_required(change_list)
 
-use_raw_id_admin = lambda field: isinstance(field.rel, (meta.ManyToOne, meta.ManyToMany)) and field.rel.raw_id_admin
+use_raw_id_admin = lambda field: isinstance(field.rel, (meta.ManyToOne, meta.ManyToManyRel)) and field.rel.raw_id_admin
 
 def get_javascript_imports(opts,auto_populated_fields, ordered_objects, field_sets):
 # Put in any necessary JavaScript imports.
@@ -285,7 +285,7 @@ class AdminBoundField(BoundField):
         self.raw_id_admin = use_raw_id_admin(field)
         self.is_date_time = isinstance(field, meta.DateTimeField)
         self.is_file_field = isinstance(field, meta.FileField)
-        self.needs_add_label = field.rel and isinstance(field.rel, meta.ManyToOne) or isinstance(field.rel, meta.ManyToMany) and field.rel.to.admin
+        self.needs_add_label = field.rel and isinstance(field.rel, meta.ManyToOne) or isinstance(field.rel, meta.ManyToManyRel) and field.rel.to.admin
         self.hidden = isinstance(self.field, meta.AutoField)
         self.first = False
 
@@ -310,7 +310,7 @@ class AdminBoundField(BoundField):
         if isinstance(self.field.rel, meta.ManyToOne):
              func_name = 'get_%s' % self.field.name
              self._display = self._fetch_existing_display(func_name)
-        elif isinstance(self.field.rel, meta.ManyToMany):
+        elif isinstance(self.field.rel, meta.ManyToManyRel):
             func_name = 'get_%s_list' % self.field.rel.singular
             self._display =  ", ".join([str(obj) for obj in self._fetch_existing_display(func_name)])
         self._display_filled = True
