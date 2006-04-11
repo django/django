@@ -19,7 +19,10 @@ import operator
 
 from django.contrib.admin.models import LogEntry, ADDITION, CHANGE, DELETION
 if not LogEntry._meta.installed:
-    raise ImproperlyConfigured, "You'll need to put 'django.contrib.admin' in INSTALLED_APPS before you can use the admin application."
+    raise ImproperlyConfigured, "You'll need to put 'django.contrib.admin' in your INSTALLED_APPS setting before you can use the admin application."
+
+if 'django.core.context_processors.auth' not in settings.TEMPLATE_CONTEXT_PROCESSORS:
+    raise ImproperlyConfigured, "You'll need to put 'django.core.context_processors.auth' in your TEMPLATE_CONTEXT_PROCESSORS setting before you can use the admin application."
 
 # The system will display a "Show all" link on the change list only if the
 # total result count is less than or equal to this setting.
