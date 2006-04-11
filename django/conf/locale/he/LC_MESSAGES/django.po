@@ -200,11 +200,11 @@ msgstr "סוגי תוכן"
 
 #: models/core.py:67
 msgid "session key"
-msgstr "מפתח התחברות"
+msgstr "מפתח התחברות (session key)"
 
 #: models/core.py:68
 msgid "session data"
-msgstr "מידע התחברות"
+msgstr "מידע התחברות (session data)"
 
 #: models/core.py:69
 msgid "expire date"
@@ -291,7 +291,7 @@ msgid ""
 "In addition to the permissions manually assigned, this user will also get "
 "all permissions granted to each group he/she is in."
 msgstr ""
-"בנוסף לכל ההרשאות שהוקצו ידנית, יוענקו למשתמש/ת גםכל ההרשאות של כל קבוצה "
+"בנוסף לכל ההרשאות שהוקצו ידנית, יוענקו למשתמש/ת גם כל ההרשאות של כל קבוצה "
 "המשוייכת אליו/ה."
 
 #: models/auth.py:47 contrib/admin/templates/admin/object_history.html:19
@@ -849,7 +849,7 @@ msgstr "בחר/י %s לשינוי"
 #: contrib/admin/views/main.py:410
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was added successfully."
-msgstr "ה%(name)s \"%(obj)s\" נוסף בהצלחה."
+msgstr "הוספת %(name)s \"%(obj)s\" בוצעה בהצלחה."
 
 #: contrib/admin/views/main.py:415 contrib/admin/views/main.py:492
 msgid "You may edit it again below."
@@ -892,13 +892,13 @@ msgstr "אף שדה לא השתנה."
 #: contrib/admin/views/main.py:489
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was changed successfully."
-msgstr "ה-%(name)s \"%(obj)s\" שונה בהצלחה."
+msgstr "שינוי %(name)s \"%(obj)s\" בוצע בהצלחה."
 
 #: contrib/admin/views/main.py:498
 #, python-format
 msgid ""
 "The %(name)s \"%(obj)s\" was added successfully. You may edit it again below."
-msgstr "ה-%(name)s \"%(obj)s\" שונה בהצלחה ניתן לערוך אותו שוב מתחת."
+msgstr "הוספת %(name)s \"%(obj)s\" בוצעה בהצלחה. ניתן לערוך אותו שוב מתחת."
 
 #: contrib/admin/views/main.py:536
 #, python-format
@@ -918,7 +918,7 @@ msgstr "אחד או יותר %(fieldname)s ב%(name)s:"
 #: contrib/admin/views/main.py:649
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was deleted successfully."
-msgstr "%(name)s \"%(obj)s\" נמחק בהצלחה."
+msgstr "מחיקת %(name)s \"%(obj)s\" בוצעה בהצלחה."
 
 #: contrib/admin/views/main.py:652
 msgid "Are you sure?"

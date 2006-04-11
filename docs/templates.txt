@@ -210,6 +210,9 @@ is possible and, indeed, quite useful.
 
 Here are some tips for working with inheritance:
 
+    * If you use ``{% extends %}`` in a template, it must be the first template
+      tag in that template.
+
     * More ``{% block %}`` tags in your base templates are better. Remember,
       child templates don't have to define all parent blocks, so you can fill
       in reasonable defaults in a number of blocks, then only define the ones
