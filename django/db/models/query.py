@@ -213,7 +213,8 @@ class QuerySet(object):
                 "Cannot use 'limit' or 'offset' with in_bulk"
         assert isinstance(id_list, (tuple,  list)), "in_bulk() must be provided with a list of IDs."
         id_list = list(id_list)
-        assert id_list != [], "in_bulk() cannot be passed an empty ID list."
+        if id_list == []:
+            return {}
         qs = self._clone()
         qs._where.append("%s.%s IN (%s)" % (backend.quote_name(self.model._meta.db_table), backend.quote_name(self.model._meta.pk.column), ",".join(['%s'] * len(id_list))))
         qs._params.extend(id_list)

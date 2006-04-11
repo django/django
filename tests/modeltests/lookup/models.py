@@ -67,9 +67,7 @@ Article 4
 >>> Article.objects.in_bulk([1000])
 {}
 >>> Article.objects.in_bulk([])
-Traceback (most recent call last):
-    ...
-AssertionError: in_bulk() cannot be passed an empty ID list.
+{}
 >>> Article.objects.in_bulk('foo')
 Traceback (most recent call last):
     ...
