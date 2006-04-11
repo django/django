@@ -1,6 +1,7 @@
 from django.core import signals
 from django.dispatch import dispatcher
 from django import http
+import sys
 
 class BaseHandler:
     def __init__(self):
@@ -98,6 +99,8 @@ class BaseHandler:
             if settings.DEBUG:
                 return self.get_technical_error_response(request)
             else:
+                # Get the exception info now, in case another exception is thrown later.
+                exc_info = sys.exc_info()
                 receivers = dispatcher.send(signal=signals.got_request_exception)
                 # When DEBUG is False, send an error message to the admins.
                 subject = 'Error (%s IP): %s' % ((request.META.get('REMOTE_ADDR') in settings.INTERNAL_IPS and 'internal' or 'EXTERNAL'), getattr(request, 'path', ''))
@@ -105,7 +108,7 @@ class BaseHandler:
                     request_repr = repr(request)
                 except:
                     request_repr = "Request repr() unavailable"
-                message = "%s\n\n%s" % (self._get_traceback(), request_repr)
+                message = "%s\n\n%s" % (self._get_traceback(exc_info), request_repr)
                 mail_admins(subject, message, fail_silently=True)
                 return self.get_friendly_error_response(request, resolver)
 
@@ -123,14 +126,13 @@ class BaseHandler:
         Returns an HttpResponse that displays a TECHNICAL error message for a
         fundamental error.
         """
-        import sys
         from django.views import debug
         if is404:
             return debug.technical_404_response(request, exception)
         else:
             return debug.technical_500_response(request, *sys.exc_info())
 
-    def _get_traceback(self):
+    def _get_traceback(self, exc_info=None):
         "Helper function to return the traceback as a string"
-        import sys, traceback
-        return '\n'.join(traceback.format_exception(*sys.exc_info()))
+        import traceback
+        return '\n'.join(traceback.format_exception(*(exc_info or sys.exc_info())))
