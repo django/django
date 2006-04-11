@@ -1,4 +1,5 @@
 from django.utils import httpwrappers
+import sys
 
 class BaseHandler:
     def __init__(self):
@@ -108,12 +109,14 @@ class BaseHandler:
             if DEBUG:
                 return self.get_technical_error_response(request)
             else:
+                # Get the exception info now, in case another exception is thrown later.
+                exc_info = sys.exc_info()
                 subject = 'Coding error (%s IP): %s' % ((request.META.get('REMOTE_ADDR') in INTERNAL_IPS and 'internal' or 'EXTERNAL'), getattr(request, 'path', ''))
                 try:
                     request_repr = repr(request)
                 except:
                     request_repr = "Request repr() unavailable"
-                message = "%s\n\n%s" % (self._get_traceback(), request_repr)
+                message = "%s\n\n%s" % (self._get_traceback(exc_info), request_repr)
                 mail_admins(subject, message, fail_silently=True)
                 return self.get_friendly_error_response(request, resolver)
 
@@ -138,7 +141,7 @@ class BaseHandler:
         else:
             return debug.technical_500_response(request, *sys.exc_info())
 
-    def _get_traceback(self):
+    def _get_traceback(self, exc_info=None):
         "Helper function to return the traceback as a string"
-        import sys, traceback
-        return '\n'.join(traceback.format_exception(*sys.exc_info()))
+        import traceback
+        return '\n'.join(traceback.format_exception(*(exc_info or sys.exc_info())))
