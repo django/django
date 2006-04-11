@@ -30,7 +30,7 @@ def send_mass_mail(datatuple, fail_silently=False, auth_user=settings.EMAIL_HOST
     If auth_user and auth_password are set, they're used to log in.
     """
     try:
-        server = smtplib.SMTP(settings.EMAIL_HOST)
+        server = smtplib.SMTP(settings.EMAIL_HOST, settings.EMAIL_PORT)
         if auth_user and auth_password:
             server.login(auth_user, auth_password)
     except:
