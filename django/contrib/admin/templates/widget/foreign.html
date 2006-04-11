@@ -2,7 +2,7 @@
 {% output_all bound_field.form_fields %}
 {% if bound_field.raw_id_admin %}
     {% if bound_field.field.rel.limit_choices_to %}
-        <a href="../../../{{ bound_field.field.rel.to.app_label }}/{{ bound_field.field.rel.to.module_name }}/?{% for limit_choice in bound_field.field.rel.limit_choices_to.items %}{% if not forloop.first %}&amp;{% endif %}{{ limit_choice|join:"=" }}{% endfor %}" class="related-lookup" id="lookup_{{ bound_field.element_id }}" onclick="return showRelatedObjectLookupPopup(this);"> <img src="{% admin_media_prefix %}img/admin/selector-search.gif" width="16" height="16" alt="Lookup"></a>
+        <a href="{{ bound_field.related_url }}?{% for limit_choice in bound_field.field.rel.limit_choices_to.items %}{% if not forloop.first %}&amp;{% endif %}{{ limit_choice|join:"=" }}{% endfor %}" class="related-lookup" id="lookup_{{ bound_field.element_id }}" onclick="return showRelatedObjectLookupPopup(this);"> <img src="{% admin_media_prefix %}img/admin/selector-search.gif" width="16" height="16" alt="Lookup"></a>
     {% else %}
         <a href="{{ bound_field.related_url }}" class="related-lookup" id="lookup_{{ bound_field.element_id }}" onclick="return showRelatedObjectLookupPopup(this);"> <img src="{% admin_media_prefix %}img/admin/selector-search.gif" width="16" height="16" alt="Lookup"></a>
     {% endif %}
