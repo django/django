@@ -525,14 +525,15 @@ def diffsettings():
     followed by "###".
     """
     # Inspired by Postfix's "postconf -n".
-    from django.conf import settings
-    from django.conf import global_settings
+    from django.conf import settings, global_settings
 
     user_settings = _module_to_dict(settings)
     default_settings = _module_to_dict(global_settings)
 
     output = []
-    for key in sorted(user_settings):
+    keys = user_settings.keys()
+    keys.sort()
+    for key in keys:
         if key not in default_settings:
             output.append("%s = %s  ###" % (key, user_settings[key]))
         elif user_settings[key] != default_settings[key]:
