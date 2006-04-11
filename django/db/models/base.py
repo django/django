@@ -129,6 +129,8 @@ class Model(object):
         if opts.order_with_respect_to:
             cls.get_next_in_order = curry(cls._get_next_or_previous_in_order, is_next=True)
             cls.get_previous_in_order = curry(cls._get_next_or_previous_in_order, is_next=False)
+            setattr(opts.order_with_respect_to.rel.to, 'get_%s_order' % cls.__name__.lower(), curry(method_get_order, cls))
+            setattr(opts.order_with_respect_to.rel.to, 'set_%s_order' % cls.__name__.lower(), curry(method_set_order, cls))
 
         # Give the class a docstring -- its definition.
         if cls.__doc__ is None:
@@ -269,7 +271,7 @@ class Model(object):
         cachename = "__%s_order_cache" % is_next
         if not hasattr(self, cachename):
             op = is_next and '>' or '<'
-            order_field = self.order_with_respect_to
+            order_field = self._meta.order_with_respect_to
             where = ['%s %s (SELECT %s FROM %s WHERE %s=%%s)' % \
                 (backend.quote_name('_order'), op, backend.quote_name('_order'),
                 backend.quote_name(opts.db_table), backend.quote_name(opts.pk.column)),
@@ -384,11 +386,11 @@ def method_get_order(ordered_obj, self):
     cursor = connection.cursor()
     # Example: "SELECT id FROM poll_choices WHERE poll_id = %s ORDER BY _order"
     sql = "SELECT %s FROM %s WHERE %s = %%s ORDER BY %s" % \
-        (backend.quote_name(ordered_obj.pk.column),
-        backend.quote_name(ordered_obj.db_table),
-        backend.quote_name(ordered_obj.order_with_respect_to.column),
+        (backend.quote_name(ordered_obj._meta.pk.column),
+        backend.quote_name(ordered_obj._meta.db_table),
+        backend.quote_name(ordered_obj._meta.order_with_respect_to.column),
         backend.quote_name('_order'))
-    rel_val = getattr(self, ordered_obj.order_with_respect_to.rel.field_name)
+    rel_val = getattr(self, ordered_obj._meta.order_with_respect_to.rel.field_name)
     cursor.execute(sql, [rel_val])
     return [r[0] for r in cursor.fetchall()]
 
