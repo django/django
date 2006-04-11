@@ -514,6 +514,32 @@ def get_admin_index(app):
 get_admin_index.help_doc = "Prints the admin-index template snippet for the given app name(s)."
 get_admin_index.args = APP_ARGS
 
+def _module_to_dict(module, omittable=lambda k: k.startswith('_')):
+    "Converts a module namespace to a Python dictionary. Used by get_settings_diff."
+    return dict([(k, repr(v)) for k, v in module.__dict__.items() if not omittable(k)])
+
+def diffsettings():
+    """
+    Displays differences between the current settings.py and Django's
+    default settings. Settings that don't appear in the defaults are
+    followed by "###".
+    """
+    # Inspired by Postfix's "postconf -n".
+    from django.conf import settings
+    from django.conf import global_settings
+
+    user_settings = _module_to_dict(settings)
+    default_settings = _module_to_dict(global_settings)
+
+    output = []
+    for key in sorted(user_settings):
+        if key not in default_settings:
+            output.append("%s = %s  ###" % (key, user_settings[key]))
+        elif user_settings[key] != default_settings[key]:
+            output.append("%s = %s" % (key, user_settings[key]))
+    print '\n'.join(output)
+diffsettings.args = ""
+
 def install(app):
     "Executes the equivalent of 'get_sql_all' in the current database."
     from django.db import connection, transaction
@@ -1016,6 +1042,7 @@ run_shell.args = '[--plain]'
 DEFAULT_ACTION_MAPPING = {
     'adminindex': get_admin_index,
     'createcachetable' : createcachetable,
+    'diffsettings': diffsettings,
     'inspectdb': inspectdb,
     'install': install,
     'reset': reset,
@@ -1037,6 +1064,7 @@ DEFAULT_ACTION_MAPPING = {
 NO_SQL_TRANSACTION = (
     'adminindex',
     'createcachetable',
+    'diffsettings',
     'install',
     'reset',
     'sqlindexes',
@@ -1059,7 +1087,7 @@ def get_usage(action_mapping):
     for a in available_actions:
         func = action_mapping[a]
         usage.append("  %s %s" % (a, func.args))
-        usage.extend(textwrap.wrap(getattr(func, 'help_doc', func.__doc__), initial_indent='    ', subsequent_indent='    '))
+        usage.extend(textwrap.wrap(getattr(func, 'help_doc', textwrap.dedent(func.__doc__.strip())), initial_indent='    ', subsequent_indent='    '))
         usage.append("")
     return '\n'.join(usage[:-1]) # Cut off last list element, an empty space.
 
@@ -1102,7 +1130,7 @@ def execute_from_command_line(action_mapping=DEFAULT_ACTION_MAPPING):
 
     if action == 'shell':
         action_mapping[action](options.plain is True)
-    elif action in ('syncdb', 'validate'):
+    elif action in ('syncdb', 'validate', 'diffsettings'):
         action_mapping[action]()
     elif action == 'inspectdb':
         try:

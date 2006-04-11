@@ -93,6 +93,17 @@ Here's the algorithm Django uses in compiling settings:
 Note that a settings file should *not* import from ``global_settings``, because
 that's redundant.
 
+Seeing which settings you've changed
+------------------------------------
+
+There's an easy way to view which of your settings deviate from the default
+settings. The command ``python manage.py diffsettings`` displays differences
+between the current settings file and Django's default settings.
+
+For more, see the `diffsettings documentation`_.
+
+.. _diffsettings documentation: http://www.djangoproject.com/documentation/django_admin/#diffsettings
+
 Using settings in Python code
 =============================
 

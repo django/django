@@ -64,6 +64,18 @@ backend.  See the `cache documentation`_ for more information.
 
 .. _cache documentation: http://www.djangoproject.com/documentation/cache/
 
+diffsettings
+------------
+
+Displays differences between the current settings file and Django's default
+settings.
+
+Settings that don't appear in the defaults are followed by ``"###"``. For
+example, the default settings don't define ``ROOT_URLCONF``, so
+``ROOT_URLCONF`` is followed by ``"###"`` in the output of ``diffsettings``.
+
+Note that Django's default settings live in ``django/conf/global_settings.py``.
+
 inspectdb [dbname]
 ------------------
 
