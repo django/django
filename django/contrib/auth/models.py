@@ -148,9 +148,9 @@ class User(models.Model):
                     AND ug.%s = %%s""" % (
                 backend.quote_name('app_label'), backend.quote_name('codename'),
                 backend.quote_name('auth_permission'), backend.quote_name('auth_group_permissions'),
-                backend.quote_name('auth_user_groups'), backend.quote_name('django_content_type'), 
-                backend.quote_name('id'), backend.quote_name('permission_id'), 
-                backend.quote_name('group_id'), backend.quote_name('group_id'), 
+                backend.quote_name('auth_user_groups'), backend.quote_name('django_content_type'),
+                backend.quote_name('id'), backend.quote_name('permission_id'),
+                backend.quote_name('group_id'), backend.quote_name('group_id'),
                 backend.quote_name('id'), backend.quote_name('content_type_id'),
                 backend.quote_name('user_id'),)
             cursor.execute(sql, [self.id])
@@ -225,8 +225,9 @@ class Message(models.Model):
     def __repr__(self):
         return self.message
 
-class AnonymousUser:
+class AnonymousUser(object):
     id = None
+    username = ''
 
     def __init__(self):
         pass
@@ -246,17 +247,13 @@ class AnonymousUser:
     def check_password(self, raw_password):
         raise NotImplementedError
 
-    def get_group_list(self):
-        return []
-
-    def set_groups(self, group_id_list):
+    def _get_groups(self):
         raise NotImplementedError
+    groups = property(_get_groups)
 
-    def get_permission_list(self):
-        return []
-
-    def set_permissions(self, permission_id_list):
+    def _get_user_permissions(self):
         raise NotImplementedError
+    user_permissions = property(_get_user_permissions)
 
     def has_perm(self, perm):
         return False
