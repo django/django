@@ -17,10 +17,9 @@ from django.utils.html import escape
 from django.utils.text import capfirst, get_text_list
 import operator
 
-try:
-    from django.contrib.admin.models import LogEntry, ADDITION, CHANGE, DELETION
-except ImportError:
-    raise ImproperlyConfigured, "You don't have 'django.contrib.admin' in INSTALLED_APPS."
+from django.contrib.admin.models import LogEntry, ADDITION, CHANGE, DELETION
+if not LogEntry._meta.installed:
+    raise ImproperlyConfigured, "You'll need to put 'django.contrib.admin' in INSTALLED_APPS before you can use the admin application."
 
 # The system will display a "Show all" link on the change list only if the
 # total result count is less than or equal to this setting.
