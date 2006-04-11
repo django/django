@@ -15,15 +15,15 @@
     <table id="change-history">
         <thead>
         <tr>
-            <th>{% trans 'Date/time' %}</th>
-            <th>{% trans 'User' %}</th>
-            <th>{% trans 'Action' %}</th>
+            <th scope="col">{% trans 'Date/time' %}</th>
+            <th scope="col">{% trans 'User' %}</th>
+            <th scope="col">{% trans 'Action' %}</th>
         </tr>
         </thead>
         <tbody>
         {% for action in action_list %}
         <tr>
-            <th>{{ action.action_time|date:_("DATE_WITH_TIME_FULL") }}</th>
+            <th scope="row">{{ action.action_time|date:_("DATE_WITH_TIME_FULL") }}</th>
             <td>{{ action.user.username }}{% if action.user.first_name %} ({{ action.user.first_name }} {{ action.user.last_name }}){% endif %}</td>
             <td>{{ action.change_message}}</td>
         </tr>
