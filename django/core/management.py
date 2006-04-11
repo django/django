@@ -1204,6 +1204,7 @@ def execute_manager(settings_mod):
     # Override the startapp handler so that it always uses the
     # project_directory, not the current working directory (which is default).
     action_mapping['startapp'] = lambda app_name, directory: startapp(app_name, project_directory)
+    action_mapping['startapp'].__doc__ = startapp.__doc__
     action_mapping['startapp'].help_doc = startapp.help_doc
     action_mapping['startapp'].args = startapp.args
 
