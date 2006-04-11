@@ -513,6 +513,7 @@ def delete_stage(request, app_label, model_name, object_id):
         "object": obj,
         "deleted_objects": deleted_objects,
         "perms_lacking": perms_needed,
+        "opts": model._meta,
     }
     return render_to_response(["admin/%s/%s/delete_confirmation" % (app_label, opts.object_name.lower() ),
                                "admin/%s/delete_confirmation" % app_label ,
