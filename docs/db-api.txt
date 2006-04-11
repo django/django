@@ -655,14 +655,14 @@ returns an empty string.
 get_FOO_size()
 --------------
 
-For every ``FileField``, the object will have a ``get_FOO_filename()`` method,
+For every ``FileField``, the object will have a ``get_FOO_size()`` method,
 where ``FOO`` is the name of the field. This returns the size of the file, in
 bytes. (Behind the scenes, it uses ``os.path.getsize``.)
 
 save_FOO_file(filename, raw_contents)
 -------------------------------------
 
-For every ``FileField``, the object will have a ``get_FOO_filename()`` method,
+For every ``FileField``, the object will have a ``save_FOO_file()`` method,
 where ``FOO`` is the name of the field. This saves the given file to the
 filesystem, using the given filename. If a file with the given filename already
 exists, Django adds an underscore to the end of the filename (but before the
