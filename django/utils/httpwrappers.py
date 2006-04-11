@@ -151,10 +151,10 @@ class HttpResponse(object):
         if not mimetype:
             mimetype = "%s; charset=%s" % (settings.DEFAULT_CONTENT_TYPE, settings.DEFAULT_CHARSET)
         if hasattr(content, '__iter__'):
-            self.iterator = content
+            self._iterator = content
             self._is_string = False
         else:
-            self.iterator = [content]
+            self._iterator = [content]
             self._is_string = True
         self.headers = {'Content-Type': mimetype}
         self.cookies = SimpleCookie()
@@ -200,23 +200,32 @@ class HttpResponse(object):
             pass
 
     def _get_content(self):
-        content = ''.join(self.iterator)
+        content = ''.join(self._iterator)
         if isinstance(content, unicode):
             content = content.encode(self._charset)
         return content
 
     def _set_content(self, value):
-        self.iterator = [value]
+        self._iterator = [value]
         self._is_string = True
 
     content = property(_get_content, _set_content)
+
+    def _get_iterator(self):
+        "Output iterator. Converts data into client charset if necessary."
+        for chunk in self._iterator:
+            if isinstance(chunk, unicode):
+                chunk = chunk.encode(self._charset)
+            yield chunk
+
+    iterator = property(_get_iterator)
 
     # The remaining methods partially implement the file-like object interface.
     # See http://docs.python.org/lib/bltin-file-objects.html
     def write(self, content):
         if not self._is_string:
             raise Exception, "This %s instance is not writable" % self.__class__
-        self.iterator.append(content)
+        self._iterator.append(content)
 
     def flush(self):
         pass
@@ -224,7 +233,7 @@ class HttpResponse(object):
     def tell(self):
         if not self._is_string:
             raise Exception, "This %s instance cannot tell its position" % self.__class__
-        return sum([len(chunk) for chunk in self.iterator])
+        return sum([len(chunk) for chunk in self._iterator])
 
 class HttpResponseRedirect(HttpResponse):
     def __init__(self, redirect_to):
