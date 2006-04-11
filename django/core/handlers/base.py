@@ -134,7 +134,6 @@ class BaseHandler:
         Returns an HttpResponse that displays a TECHNICAL error message for a
         fundamental database or coding error.
         """
-        import sys
         from django.views import debug
         if is404:
             return debug.technical_404_response(request, exception)
