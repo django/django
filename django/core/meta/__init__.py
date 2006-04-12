@@ -1733,7 +1733,7 @@ def manipulator_init(opts, add, change, self, obj_key=None, follow=None):
             if opts.one_to_one_field:
                 # Sanity check -- Make sure the "parent" object exists.
                 # For example, make sure the Place exists for the Restaurant.
-                # Let the ObjectDoesNotExist exception propogate up.
+                # Let the ObjectDoesNotExist exception propagate up.
                 lookup_kwargs = opts.one_to_one_field.rel.limit_choices_to
                 lookup_kwargs['%s__exact' % opts.one_to_one_field.rel.field_name] = obj_key
                 _ = opts.one_to_one_field.rel.to.get_model_module().get_object(**lookup_kwargs)

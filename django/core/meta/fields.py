@@ -80,7 +80,7 @@ class BoundField(object):
 
 # A guide to Field parameters:
 #
-#   * name:      The name of the field specifed in the model.
+#   * name:      The name of the field specified in the model.
 #   * attname:   The attribute to use on the model object. This is the same as
 #                "name", except in the case of ForeignKeys, where "_id" is
 #                appended.

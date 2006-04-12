@@ -846,7 +846,7 @@ class DocTestFinder:
         if extraglobs is not None:
             globs.update(extraglobs)
 
-        # Recursively expore `obj`, extracting DocTests.
+        # Recursively explore `obj`, extracting DocTests.
         tests = []
         self._find(tests, obj, name, module, source_lines, globs, {})
         return tests
@@ -1210,7 +1210,7 @@ class DocTestRunner:
         # Process each example.
         for examplenum, example in enumerate(test.examples):
 
-            # If REPORT_ONLY_FIRST_FAILURE is set, then supress
+            # If REPORT_ONLY_FIRST_FAILURE is set, then suppress
             # reporting after the first failure.
             quiet = (self.optionflags & REPORT_ONLY_FIRST_FAILURE and
                      failures > 0)
