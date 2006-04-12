@@ -62,15 +62,14 @@ class SQLiteCursorWrapper(Database.Cursor):
     """
     Django uses "format" style placeholders, but pysqlite2 uses "qmark" style.
     This fixes it -- but note that if you want to use a literal "%s" in a query,
-    you'll need to use "%%s" (which I belive is true of other wrappers as well).
+    you'll need to use "%%s".
     """
-
-    def execute(self, query, params=[]):
+    def execute(self, query, params=()):
         query = self.convert_query(query, len(params))
         return Database.Cursor.execute(self, query, params)
 
-    def executemany(self, query, params=[]):
-        query = self.convert_query(query, len(params[0]))
+    def executemany(self, query, param_list):
+        query = self.convert_query(query, len(param_list[0]))
         return Database.Cursor.executemany(self, query, params)
 
     def convert_query(self, query, num_params):

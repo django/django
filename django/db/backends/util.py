@@ -6,7 +6,7 @@ class CursorDebugWrapper:
         self.cursor = cursor
         self.db = db
 
-    def execute(self, sql, params=[]):
+    def execute(self, sql, params=()):
         start = time()
         try:
             return self.cursor.execute(sql, params)
