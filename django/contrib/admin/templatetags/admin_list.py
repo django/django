@@ -80,7 +80,7 @@ def result_headers(cl):
             if field_name == '__str__':
                 header = lookup_opts.verbose_name
             else:
-                attr = getattr(cl.model, field_name) # Let AttributeErrors propogate.
+                attr = getattr(cl.model, field_name) # Let AttributeErrors propagate.
                 try:
                     header = attr.short_description
                 except AttributeError:

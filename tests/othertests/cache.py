@@ -15,7 +15,7 @@ class C:
 cache.set("key", "value")
 assert cache.get("key") == "value"
 
-# get with non-existant keys
+# get with non-existent keys
 assert cache.get("does not exist") is None
 assert cache.get("does not exist", "bang!") == "bang!"
 

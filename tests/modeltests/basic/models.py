@@ -330,7 +330,7 @@ datetime.datetime(2005, 7, 31, 12, 30, 45)
 
 API_TESTS += """
 
-# You can manually specify the primary key when creating a new objet
+# You can manually specify the primary key when creating a new object.
 >>> a101 = Article(id=101, headline='Article 101', pub_date=datetime(2005, 7, 31, 12, 30, 45))
 >>> a101.save()
 >>> a101 = Article.objects.get(pk=101)

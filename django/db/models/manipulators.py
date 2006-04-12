@@ -260,7 +260,7 @@ class AutomaticChangeManipulator(AutomaticManipulator):
             if self.opts.one_to_one_field:
                 # Sanity check -- Make sure the "parent" object exists.
                 # For example, make sure the Place exists for the Restaurant.
-                # Let the ObjectDoesNotExist exception propogate up.
+                # Let the ObjectDoesNotExist exception propagate up.
                 lookup_kwargs = self.opts.one_to_one_field.rel.limit_choices_to
                 lookup_kwargs['%s__exact' % self.opts.one_to_one_field.rel.field_name] = obj_key
                 self.opts.one_to_one_field.rel.to.get_model_module().get(**lookup_kwargs)

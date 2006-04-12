@@ -149,7 +149,7 @@ class _localbase(object):
             raise TypeError("Initialization arguments are not supported")
 
         # We need to create the thread dict in anticipation of
-        # __init__ being called, to make sire we don't cal it
+        # __init__ being called, to make sure we don't call it
         # again ourselves.
         dict = object.__getattribute__(self, '__dict__')
         currentThread().__dict__[key] = dict

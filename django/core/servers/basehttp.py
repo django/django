@@ -46,7 +46,7 @@ class FileWrapper:
         raise StopIteration
 
 # Regular expression that matches `special' characters in parameters, the
-# existance of which force quoting of the parameter value.
+# existence of which force quoting of the parameter value.
 tspecials = re.compile(r'[ \(\)<>@,;:\\"/\[\]\?=]')
 
 def _formatparam(param, value=None, quote=1):

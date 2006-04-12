@@ -268,7 +268,7 @@ class QuerySet(object):
         """
         assert kind in ("month", "year", "day"), "'kind' must be one of 'year', 'month' or 'day'."
         assert order in ('ASC', 'DESC'), "'order' must be either 'ASC' or 'DESC'."
-        # Let the FieldDoesNotExist exception propogate.
+        # Let the FieldDoesNotExist exception propagate.
         field = self.model._meta.get_field(field_name, many_to_many=False)
         assert isinstance(field, DateField), "%r isn't a DateField." % field_name
         return self._clone(klass=DateQuerySet, _field=field, _kind=kind, _order=order)
