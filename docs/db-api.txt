@@ -10,72 +10,150 @@ models, and how to create, retrieve and update objects.
 
 Throughout this reference, we'll refer to the following Poll application::
 
-    class Poll(meta.Model):
-        slug = meta.SlugField(unique_for_month='pub_date')
-        question = meta.CharField(maxlength=255)
-        pub_date = meta.DateTimeField()
-        expire_date = meta.DateTimeField()
+    class Poll(models.Model):
+        slug = models.SlugField(unique_for_month='pub_date')
+        question = models.CharField(maxlength=255)
+        pub_date = models.DateTimeField()
+        expire_date = models.DateTimeField()
 
         def __repr__(self):
             return self.question
 
-    class Choice(meta.Model):
-        poll = meta.ForeignKey(Poll, edit_inline=meta.TABULAR,
+    class Choice(models.Model):
+        poll = models.ForeignKey(Poll, edit_inline=meta.TABULAR,
             num_in_admin=10, min_num_in_admin=5)
-        choice = meta.CharField(maxlength=255, core=True)
-        votes = meta.IntegerField(editable=False, default=0)
+        choice = models.CharField(maxlength=255, core=True)
+        votes = models.IntegerField(editable=False, default=0)
 
         def __repr__(self):
             return self.choice
 
-Basic lookup functions
-======================
+How Queries Work
+================
 
-Each model exposes these module-level functions for lookups:
+Querying in Django is based upon the construction and evaluation of Query Sets. 
 
-get_object(\**kwargs)
----------------------
+A Query Set is a representation of a query.
+
+When you compose a query using Django, you construct a Query Set; when you want
+to evaluate the query, you iterate over or slice the Query Set that represents 
+your query.
+
+Every Django model has a Manager object that acts as a factory for new query sets.
+
+The manager has a special factory method for creating Suery Sets::
+
+    queryset = Poll.objects.all()
+
+This creates a new Query Set that matches all the objects of the given class.
+
+Query Set evaluation
+====================
+
+Once you have constructed a Query Set to meet your needs
+
+A Query Set is an iterable object::
+
+    queryset = Poll.objects.all()
+    for p in queryset:
+        print p
+        
+Query Sets can also be sliced::
+
+    fifth_poll = queryset[4]
+    all_polls_but_the_first_two = queryset[2:]
+
+Regardless of the method used to extract data from the Query Set, upon first 
+evaluation, the query will be executed on the database, and the results cached.
+Subsequent evaluations on the database will reuse the cached results. 
+
+As an alternative to iteration and slicing, you can use one of the 
+following functions. These functions do not populate or effect the cache:
+
+get(\**kwargs)
+--------------
 
 Returns the object matching the given lookup parameters, which should be in
 the format described in "Field lookups" below. Raises a module-level
-``*DoesNotExist`` exception if an object wasn't found for the given parameters.
+``DoesNotExist`` exception if an object wasn't found for the given parameters.
 Raises ``AssertionError`` if more than one object was found.
 
-get_list(\**kwargs)
--------------------
-
-Returns a list of objects matching the given lookup parameters, which should be
-in the format described in "Field lookups" below. If no objects match the given
-parameters, it returns an empty list. ``get_list()`` will always return a list.
-
-get_iterator(\**kwargs)
------------------------
-
-Just like ``get_list()``, except it returns an iterator instead of a list. This
-is more efficient for large result sets. This example shows the difference::
-
-    # get_list() loads all objects into memory.
-    for obj in foos.get_list():
-        print repr(obj)
-
-    # get_iterator() only loads a number of objects into memory at a time.
-    for obj in foos.get_iterator():
-        print repr(obj)
-
-get_count(\**kwargs)
---------------------
+count()
+-------
 
 Returns an integer representing the number of objects in the database matching
-the given lookup parameters, which should be in the format described in
-"Field lookups" below. ``get_count()`` never raises exceptions
+the Query Set. ``count()`` never raises exceptions
 
 Depending on which database you're using (e.g. PostgreSQL vs. MySQL), this may
 return a long integer instead of a normal Python integer.
 
-get_values(\**kwargs)
+in_bulk(id_list)
+----------------
+
+Takes a list of IDs and returns a dictionary mapping each ID to an instance of
+the object with the given ID. Also takes optional keyword lookup arguments,
+which should be in the format described in "Field lookups" below. Here's an
+example, using the ``Poll`` model defined above::
+
+    >>> from datetime import datetime
+    >>> p1 = Poll(slug='whatsup', question="What's up?",
+    ...     pub_date=datetime(2005, 2, 20), expire_date=datetime(2005, 3, 20))
+    >>> p1.save()
+    >>> p2 = Poll(slug='name', question="What's your name?",
+    ...     pub_date=datetime(2005, 3, 20), expire_date=datetime(2005, 4, 20))
+    >>> p2.save()
+    >>> Poll.objects.all()
+    [What's up?, What's your name?]
+    >>> Poll.objects.in_bulk([1])
+    {1: What's up?}
+    >>> Poll.objects.in_bulk([1, 2])
+    {1: What's up?, 2: What's your name?}
+    >>> Poll.objects.in_bulk([])
+    {}
+
+latest(field_name=None)
+-----------------------
+
+Returns the latest object, according to the model's 'get_latest_by'
+option or optional given field_name.
+
+delete()
+--------
+
+Delete the members of the query set.
+
+Query Set construction
+======================
+
+Any Query Set (evaluated or not) can be refined by calling one of the following methods:
+
+filter(\**kwargs)
+-------------------
+
+Returns a new Query Set containing objects that match the given lookup parameters. 
+Lookup parameters should be in the format described in "Field lookups" below. 
+
+``filter()`` will always return a list.
+
+exclude(\**kwargs)
+-------------------
+
+As for filter, but negated.
+
+distinct()
+----------
+
+If ``distinct`` is True, only distinct rows will be returned. This is equivalent
+to a ``SELECT DISTINCT`` SQL clause. You can use this with ``get_values()`` to
+get distinct values. For example, this returns the distinct first_names::
+
+    >>> people.get_values(fields=['first_name'], distinct=True)
+    [{'first_name': 'Adrian'}, {'first_name': 'Jacob'}, {'first_name': 'Simon'}]
+
+values(\*fields)
 ---------------------
 
-Just like ``get_list()``, except it returns a list of dictionaries instead of
+Just like ``filter()``, except it returns a list of dictionaries instead of
 model-instance objects.
 
 It accepts an optional parameter, ``fields``, which should be a list or tuple
@@ -86,51 +164,75 @@ field keys/values for the fields you specify. Here's an example, using the
 ``Poll`` model defined above::
 
     >>> from datetime import datetime
-    >>> p1 = polls.Poll(slug='whatsup', question="What's up?",
+    >>> p1 = Poll(slug='whatsup', question="What's up?",
     ...     pub_date=datetime(2005, 2, 20), expire_date=datetime(2005, 3, 20))
     >>> p1.save()
-    >>> p2 = polls.Poll(slug='name', question="What's your name?",
+    >>> p2 = Poll(slug='name', question="What's your name?",
     ...     pub_date=datetime(2005, 3, 20), expire_date=datetime(2005, 4, 20))
     >>> p2.save()
-    >>> polls.get_list()
+    >>> Poll.objects.all()
     [What's up?, What's your name?]
-    >>> polls.get_values()
+    >>> Poll.objects.get_values()
     [{'id': 1, 'slug': 'whatsup', 'question': "What's up?", 'pub_date': datetime.datetime(2005, 2, 20), 'expire_date': datetime.datetime(2005, 3, 20)},
      {'id': 2, 'slug': 'name', 'question': "What's your name?", 'pub_date': datetime.datetime(2005, 3, 20), 'expire_date': datetime.datetime(2005, 4, 20)}]
-    >>> polls.get_values(fields=['id', 'slug'])
+    >>> Poll.objects.get_values(fields=['id', 'slug'])
     [{'id': 1, 'slug': 'whatsup'}, {'id': 2, 'slug': 'name'}]
 
 Use ``get_values()`` when you know you're only going to need a couple of field
 values and you won't need the functionality of a model instance object. It's
 more efficient to select only the fields you need to use.
 
-get_values_iterator(\**kwargs)
-------------------------------
-
-Just like ``get_values()``, except it returns an iterator instead of a list.
-See the section on ``get_iterator()`` above.
-
-get_in_bulk(id_list, \**kwargs)
+dates(field, kind, order='ASC')
 -------------------------------
 
-Takes a list of IDs and returns a dictionary mapping each ID to an instance of
-the object with the given ID. Also takes optional keyword lookup arguments,
-which should be in the format described in "Field lookups" below. Here's an
-example, using the ``Poll`` model defined above::
+Every manager has a ``dates()`` method, which returns a list of
+``datetime.datetime`` objects representing all available dates with the given
+filters (if any) and of the given scope, as defined by the ``kind`` argument.
+
+``field`` should be the name of a ``DateField`` or ``DateTimeField`` of your
+model.
+
+``kind`` should be either ``"year"``, ``"month"`` or ``"day"``. Each
+``datetime.datetime`` object in the result list is "truncated" to the given
+``type``.
+
+    * ``"year"`` returns a list of all distinct year values for the field.
+    * ``"month"`` returns a list of all distinct year/month values for the field.
+    * ``"day"`` returns a list of all distinct year/month/day values for the field.
+
+``order``, which defaults to ``'ASC'``, should be either ``"ASC"`` or ``"DESC"``.
+This specifies how to order the results.
+
+Here's an example, using the ``Poll`` model defined above::
 
     >>> from datetime import datetime
-    >>> p1 = polls.Poll(slug='whatsup', question="What's up?",
+    >>> p1 = Poll(slug='whatsup', question="What's up?",
     ...     pub_date=datetime(2005, 2, 20), expire_date=datetime(2005, 3, 20))
     >>> p1.save()
-    >>> p2 = polls.Poll(slug='name', question="What's your name?",
+    >>> p2 = Poll(slug='name', question="What's your name?",
     ...     pub_date=datetime(2005, 3, 20), expire_date=datetime(2005, 4, 20))
     >>> p2.save()
-    >>> polls.get_list()
-    [What's up?, What's your name?]
-    >>> polls.get_in_bulk([1])
-    {1: What's up?}
-    >>> polls.get_in_bulk([1, 2])
-    {1: What's up?, 2: What's your name?}
+    >>> Poll.objects.dates('pub_date', 'year')
+    [datetime.datetime(2005, 1, 1)]
+    >>> Poll.objects.dates('pub_date', 'month')
+    [datetime.datetime(2005, 2, 1), datetime.datetime(2005, 3, 1)]
+    >>> Poll.objects.dates('pub_date', 'day')
+    [datetime.datetime(2005, 2, 20), datetime.datetime(2005, 3, 20)]
+    >>> Poll.objects.dates('pub_date', 'day', order='DESC')
+    [datetime.datetime(2005, 3, 20), datetime.datetime(2005, 2, 20)]
+    >>> Poll.objects.filter(question__contains='name').dates('pub_date', 'day')
+    [datetime.datetime(2005, 3, 20)]
+
+
+Manager Shortcuts
+=================
+
+As a convenient shortcut, all of these Query Set functions (with the 
+exception of delete) can be accessed from the Manager object itself.
+The following queries are identical::
+
+    Poll.objects.all().filter(question__startswith="What")
+    Poll.objects.filter(question__startswith="What")
 
 Field lookups
 =============
@@ -138,11 +240,11 @@ Field lookups
 Basic field lookups take the form ``field__lookuptype`` (that's a
 double-underscore). For example::
 
-    polls.get_list(pub_date__lte=datetime.datetime.now())
+    Poll.objects.filter(pub_date__lte=datetime.datetime.now())
 
 translates (roughly) into the following SQL::
 
-    SELECT * FROM polls_polls WHERE pub_date <= NOW();
+    SELECT * FROM polls_poll WHERE pub_date <= NOW();
 
 .. admonition:: How this is possible
 
@@ -155,25 +257,25 @@ The DB API supports the following lookup types:
     ===========  ==============================================================
     Type         Description
     ===========  ==============================================================
-    exact        Exact match: ``polls.get_object(id__exact=14)``.
+    exact        Exact match: ``Poll.objects.get(id__exact=14)`` returns all
+                 polls with an ID of exactly 14.
     iexact       Case-insensitive exact match:
-                 ``polls.get_list(slug__iexact="foo")`` matches a slug of
+                 ``Poll.objects.filter(slug__iexact="foo")`` matches a slug of
                  ``foo``, ``FOO``, ``fOo``, etc.
     contains     Case-sensitive containment test:
-                 ``polls.get_list(question__contains="spam")`` returns all polls
+                 ``Poll.objects.filter(question__contains="spam")`` returns all polls
                  that contain "spam" in the question. (PostgreSQL and MySQL
                  only. SQLite doesn't support case-sensitive LIKE statements;
                  ``contains`` will act like ``icontains`` for SQLite.)
     icontains    Case-insensitive containment test.
-    gt           Greater than: ``polls.get_list(id__gt=4)``.
+    gt           Greater than: ``Poll.objects.filter(id__gt=4)``.
     gte          Greater than or equal to.
     lt           Less than.
     lte          Less than or equal to.
-    ne           Not equal to.
-    in           In a given list: ``polls.get_list(id__in=[1, 3, 4])`` returns
+    in           In a given list: ``Poll.objects.filter(id__in=[1, 3, 4])`` returns
                  a list of polls whose IDs are either 1, 3 or 4.
     startswith   Case-sensitive starts-with:
-                 ``polls.get_list(question__startswith="Would")``. (PostgreSQL
+                 ``Poll.objects.filter(question__startswith="Would")``. (PostgreSQL
                  and MySQL only. SQLite doesn't support case-sensitive LIKE
                  statements; ``startswith`` will act like ``istartswith`` for
                  SQLite.)
@@ -181,39 +283,47 @@ The DB API supports the following lookup types:
     istartswith  Case-insensitive starts-with.
     iendswith    Case-insensitive ends-with.
     range        Range test:
-                 ``polls.get_list(pub_date__range=(start_date, end_date))``
+                 ``Poll.objects.filter(pub_date__range=(start_date, end_date))``
                  returns all polls with a pub_date between ``start_date``
                  and ``end_date`` (inclusive).
     year         For date/datetime fields, exact year match:
-                 ``polls.get_count(pub_date__year=2005)``.
+                 ``Poll.objects.count(pub_date__year=2005)``.
     month        For date/datetime fields, exact month match.
     day          For date/datetime fields, exact day match.
     isnull       True/False; does is IF NULL/IF NOT NULL lookup:
-                 ``polls.get_list(expire_date__isnull=True)``.
+                 ``Poll.objects.filter(expire_date__isnull=True)``.
     ===========  ==============================================================
 
-Multiple lookups are allowed, of course, and are translated as "AND"s::
+If no lookup type is provided, a type of ``exact`` is assumed. The following
+two statements are equivalent::
 
-    polls.get_list(
+    Poll.objects.get(id=14)
+    Poll.objects.get(id__exact=14)
+
+Multiple lookups are also allowed. When separated by commans, the list of lookups will be
+"AND"ed together::
+
+    Poll.objects.filter(
         pub_date__year=2005,
         pub_date__month=1,
         question__startswith="Would",
     )
 
-...retrieves all polls published in January 2005 that have a question starting with "Would."
+...retrieves all polls published in January 2005 that have a question starting 
+with "Would."
 
 For convenience, there's a ``pk`` lookup type, which translates into
-``(primary_key)__exact``. In the polls example, these two statements are
+``(primary_key)``. In the polls example, these two statements are
 equivalent::
 
-    polls.get_object(id__exact=3)
-    polls.get_object(pk=3)
+    Poll.objects.get(id__exact=3)
+    Poll.objects.get(pk=3)
 
 ``pk`` lookups also work across joins. In the polls example, these two
 statements are equivalent::
 
-    choices.get_list(poll__id__exact=3)
-    choices.get_list(poll__pk=3)
+    Choice.objects.filter(poll__id=3)
+    Choice.objects.filter(poll__pk=3)
 
 If you pass an invalid keyword argument, the function will raise ``TypeError``.
 
@@ -222,17 +332,19 @@ If you pass an invalid keyword argument, the function will raise ``TypeError``.
 OR lookups
 ----------
 
-By default, keyword argument queries are "AND"ed together. If you have more complex query
-requirements (for example, you need to include an ``OR`` statement in your query), you need
-to use ``Q`` objects.
+By default, keyword argument queries are "AND"ed together. If you have more 
+complex query requirements (for example, you need to include an ``OR`` 
+statement in your query), you need to use ``Q`` objects.
 
-A ``Q`` object is an instance of ``django.core.meta.Q``, used to encapsulate a collection of
-keyword arguments. These keyword arguments are specified in the same way as keyword arguments to
-the basic lookup functions like get_object() and get_list(). For example::
+A ``Q`` object (``django.db.models.Q``) is an object used to encapsulate a 
+collection of keyword arguments. These keyword arguments are specified in 
+the same way as keyword arguments to the basic lookup functions like get() 
+and filter(). For example::
 
     Q(question__startswith='What')
 
-``Q`` objects can be combined using the ``&`` and ``|`` operators. When an operator is used on two
+is a ``Q`` object encapsulating a single ``LIKE`` query. ``Q`` objects can be 
+combined using the ``&`` and ``|`` operators. When an operator is used on two 
 ``Q`` objects, it yields a new ``Q`` object. For example the statement::
 
     Q(question__startswith='Who') | Q(question__startswith='What')
@@ -247,9 +359,9 @@ One or more ``Q`` objects can then provided as arguments to the lookup functions
 ``Q`` object arguments are provided to a lookup function, they will be "AND"ed together.
 For example::
 
-    polls.get_object(
+    Poll.objects.get(
         Q(question__startswith='Who'),
-        Q(pub_date__exact=date(2005, 5, 2)) | Q(pub_date__exact=date(2005, 5, 6))
+        Q(pub_date=date(2005, 5, 2)) | Q(pub_date=date(2005, 5, 6))
     )
 
 ... roughly translates into the SQL::
@@ -262,25 +374,25 @@ provided to a lookup function (be they keyword argument or ``Q`` object) are "AN
 However, if a ``Q`` object is provided, it must precede the definition of any keyword arguments.
 For example::
 
-    polls.get_object(
-        Q(pub_date__exact=date(2005, 5, 2)) | Q(pub_date__exact=date(2005, 5, 6)),
+    Poll.objects.get(
+        Q(pub_date=date(2005, 5, 2)) | Q(pub_date=date(2005, 5, 6)),
         question__startswith='Who')
 
 ... would be a valid query, equivalent to the previous example; but::
 
     # INVALID QUERY
-    polls.get_object(
+    Poll.objects.get(
         question__startswith='Who',
-        Q(pub_date__exact=date(2005, 5, 2)) | Q(pub_date__exact=date(2005, 5, 6)))
+        Q(pub_date=date(2005, 5, 2)) | Q(pub_date=date(2005, 5, 6)))
 
 ... would not be valid.
 
 A ``Q`` objects can also be provided to the ``complex`` keyword argument. For example::
 
-    polls.get_object(
+    Poll.objects.get(
         complex=Q(question__startswith='Who') &
-            (Q(pub_date__exact=date(2005, 5, 2)) |
-             Q(pub_date__exact=date(2005, 5, 6))
+            (Q(pub_date=date(2005, 5, 2)) |
+             Q(pub_date=date(2005, 5, 6))
         )
     )
 
@@ -295,23 +407,20 @@ The results are automatically ordered by the ordering tuple given by the
 ``ordering`` key in the model, but the ordering may be explicitly
 provided by the ``order_by`` argument to a lookup::
 
-    polls.get_list(
-        pub_date__year=2005,
-        pub_date__month=1,
-        order_by=('-pub_date', 'question'),
-    )
+    Poll.objects.filter(pub_date__year=2005, 
+        pub_date__month=1).order_by('-pub_date', 'question')
 
 The result set above will be ordered by ``pub_date`` descending, then
 by ``question`` ascending. The negative sign in front of "-pub_date" indicates
 descending order. Ascending order is implied. To order randomly, use "?", like
 so::
 
-    polls.get_list(order_by=['?'])
+    Poll.objects.order_by=(['?'])
 
 To order by a field in a different table, add the other table's name and a dot,
 like so::
 
-    choices.get_list(order_by=('polls.pub_date', 'choice'))
+    Choice.objects.all().order_by=('Poll.pub_date', 'choice')
 
 There's no way to specify whether ordering should be case sensitive. With
 respect to case-sensitivity, Django will order results however your database
@@ -321,15 +430,15 @@ Relationships (joins)
 =====================
 
 Joins may implicitly be performed by following relationships:
-``choices.get_list(poll__slug__exact="eggs")`` fetches a list of ``Choice``
+``Choice.objects.filter(poll__slug="eggs")`` fetches a list of ``Choice``
 objects where the associated ``Poll`` has a slug of ``eggs``.  Multiple levels
 of joins are allowed.
 
 Given an instance of an object, related objects can be looked-up directly using
 convenience functions. For example, if ``p`` is a ``Poll`` instance,
-``p.get_choice_list()`` will return a list of all associated choices. Astute
+``p.choice_set.all()`` will return a list of all associated choices. Astute
 readers will note that this is the same as
-``choices.get_list(poll__id__exact=p.id)``, except clearer.
+``Choice.objects.filter(poll__id=p.id)``, except clearer.
 
 Each type of relationship creates a set of methods on each object in the
 relationship. These methods are created in both directions, so objects that are
@@ -342,12 +451,12 @@ One-to-one relations
 Each object in a one-to-one relationship will have a ``get_relatedobjectname()``
 method. For example::
 
-    class Place(meta.Model):
+    class Place(models.Model):
         # ...
 
-    class Restaurant(meta.Model):
+    class Restaurant(models.Model):
         # ...
-        the_place = meta.OneToOneField(places.Place)
+        the_place = models.OneToOneField(Place)
 
 In the above example, each ``Place`` will have a ``get_restaurant()`` method,
 and each ``Restaurant`` will have a ``get_the_place()`` method.
@@ -359,7 +468,7 @@ In each many-to-one relationship, the related object will have a
 ``get_relatedobject()`` method, and the related-to object will have
 ``get_relatedobject()``, ``get_relatedobject_list()``, and
 ``get_relatedobject_count()`` methods (the same as the module-level
-``get_object()``, ``get_list()``, and ``get_count()`` methods).
+``get_object()``, ``filter()``, and ``get_count()`` methods).
 
 In the poll example above, here are the available choice methods on a ``Poll`` object ``p``::
 
@@ -399,56 +508,44 @@ queries, but it means that later use of relationships is much faster.
 
 For example, using the Poll and Choice models from above, if you do the following::
 
-    c = choices.get_object(id__exact=5, select_related=True)
+    c = Choice.objects.get(id=5, select_related=True)
 
 Then subsequent calls to ``c.get_poll()`` won't hit the database.
 
 Note that ``select_related`` follows foreign keys as far as possible. If you have the
 following models::
 
-    class Poll(meta.Model):
+    class Poll(models.Model):
         # ...
 
-    class Choice(meta.Model):
+    class Choice(models.Model):
         # ...
-        poll = meta.ForeignKey(Poll)
+        poll = models.ForeignKey(Poll)
 
     class SingleVote(meta.Model):
         # ...
-        choice = meta.ForeignKey(Choice)
+        choice = models.ForeignKey(Choice)
 
-then a call to ``singlevotes.get_object(id__exact=4, select_related=True)`` will
+then a call to ``singlevotes.get_object(id=4, select_related=True)`` will
 cache the related choice *and* the related poll::
 
-    >>> sv = singlevotes.get_object(id__exact=4, select_related=True)
+    >>> sv = singlevotes.get_object(id=4, select_related=True)
     >>> c = sv.get_choice()        # Doesn't hit the database.
     >>> p = c.get_poll()           # Doesn't hit the database.
 
-    >>> sv = singlevotes.get_object(id__exact=4) # Note no "select_related".
+    >>> sv = singlevotes.get_object(id=4) # Note no "select_related".
     >>> c = sv.get_choice()        # Hits the database.
     >>> p = c.get_poll()           # Hits the database.
 
-Limiting selected rows
-======================
 
-The ``limit``, ``offset``, and ``distinct`` keywords can be used to control
-which rows are returned.  Both ``limit`` and ``offset`` should be integers which
-will be directly passed to the SQL ``LIMIT``/``OFFSET`` commands.
-
-If ``distinct`` is True, only distinct rows will be returned. This is equivalent
-to a ``SELECT DISTINCT`` SQL clause. You can use this with ``get_values()`` to
-get distinct values. For example, this returns the distinct first_names::
-
-    >>> people.get_values(fields=['first_name'], distinct=True)
-    [{'first_name': 'Adrian'}, {'first_name': 'Jacob'}, {'first_name': 'Simon'}]
-
-Other lookup options
+Extra lookup options
 ====================
 
 There are a few other ways of more directly controlling the generated SQL
 for the lookup.  Note that by definition these extra lookups may not be
 portable to different database engines (because you're explicitly writing
 SQL code) and should be avoided if possible.:
+
 
 ``params``
 ----------
@@ -465,7 +562,7 @@ The ``select`` keyword allows you to select extra fields.  This should be a
 dictionary mapping attribute names to a SQL clause to use to calculate that
 attribute. For example::
 
-    polls.get_list(
+    Poll.objects.extra(
         select={
             'choice_count': 'SELECT COUNT(*) FROM choices WHERE poll_id = polls.id'
         }
@@ -488,7 +585,8 @@ are "AND"ed to any other search criteria.
 
 For example::
 
-    polls.get_list(question__startswith='Who', where=['id IN (3, 4, 5, 20)'])
+    Poll.objects.filter(
+        question__startswith='Who').extra(where=['id IN (3, 4, 5, 20)'])
 
 ...translates (roughly) into the following SQL:
 
@@ -501,7 +599,7 @@ Once you've retrieved an object from the database using any of the above
 options, changing it is extremely easy.  Make changes directly to the
 objects fields, then call the object's ``save()`` method::
 
-    >>> p = polls.get_object(id__exact=15)
+    >>> p = Polls.objects.get(id__exact=15)
     >>> p.slug = "new_slug"
     >>> p.pub_date = datetime.datetime.now()
     >>> p.save()
@@ -512,7 +610,7 @@ Creating new objects
 Creating new objects (i.e. ``INSERT``) is done by creating new instances
 of objects then calling save() on them::
 
-    >>> p = polls.Poll(slug="eggs",
+    >>> p = Poll(slug="eggs",
     ...                question="How do you like your eggs?",
     ...                pub_date=datetime.datetime.now(),
     ...                expire_date=some_future_date)
@@ -532,7 +630,7 @@ Related objects (e.g. ``Choices``) are created using convenience functions::
 
 Each of those ``add_choice`` methods is equivalent to (but much simpler than)::
 
-    >>> c = polls.Choice(poll_id=p.id, choice="Over easy", votes=0)
+    >>> c = Choice(poll_id=p.id, choice="Over easy", votes=0)
     >>> c.save()
 
 Note that when using the `add_foo()`` methods, you do not give any value
@@ -554,16 +652,7 @@ used for get_object and other query methods. For example::
 
     >>> Polls.objects.delete(pub_date__year=2005)
 
-would bulk delete all Polls with a year of 2005. A bulk delete call with no
-parameters would theoretically delete all data in the table. To prevent
-accidental obliteration of a database, a bulk delete query with no parameters
-will throw an exception. If you actually want to delete all the data in a
-table, you must add a ``DELETE_ALL=True`` argument to your query.
-For example::
-
-    >>> Polls.objects.delete(DELETE_ALL=True)
-
-would remove all Poll instances from the database.
+would bulk delete all Polls with a year of 2005. 
 
 Comparing objects
 =================
@@ -655,14 +744,14 @@ returns an empty string.
 get_FOO_size()
 --------------
 
-For every ``FileField``, the object will have a ``get_FOO_size()`` method,
+For every ``FileField``, the object will have a ``get_FOO_filename()`` method,
 where ``FOO`` is the name of the field. This returns the size of the file, in
 bytes. (Behind the scenes, it uses ``os.path.getsize``.)
 
 save_FOO_file(filename, raw_contents)
 -------------------------------------
 
-For every ``FileField``, the object will have a ``save_FOO_file()`` method,
+For every ``FileField``, the object will have a ``get_FOO_filename()`` method,
 where ``FOO`` is the name of the field. This saves the given file to the
 filesystem, using the given filename. If a file with the given filename already
 exists, Django adds an underscore to the end of the filename (but before the
@@ -675,49 +764,3 @@ For every ``ImageField``, the object will have ``get_FOO_height()`` and
 ``get_FOO_width()`` methods, where ``FOO`` is the name of the field. This
 returns the height (or width) of the image, as an integer, in pixels.
 
-Extra module functions
-======================
-
-In addition to every function described in "Basic lookup functions" above, a
-model module might get any or all of the following methods:
-
-dates(field, kind, order='ASC')
--------------------------------
-
-Every manager has a ``dates()`` method, which returns a list of
-``datetime.datetime`` objects representing all available dates with the given
-filters (if any) and of the given scope, as defined by the ``kind`` argument.
-
-``field`` should be the name of a ``DateField`` or ``DateTimeField`` of your
-model.
-
-``kind`` should be either ``"year"``, ``"month"`` or ``"day"``. Each
-``datetime.datetime`` object in the result list is "truncated" to the given
-``type``.
-
-    * ``"year"`` returns a list of all distinct year values for the field.
-    * ``"month"`` returns a list of all distinct year/month values for the field.
-    * ``"day"`` returns a list of all distinct year/month/day values for the field.
-
-``order``, which defaults to ``'ASC'``, should be either ``"ASC"`` or ``"DESC"``.
-This specifies how to order the results.
-
-Here's an example, using the ``Poll`` model defined above::
-
-    >>> from datetime import datetime
-    >>> p1 = Poll(slug='whatsup', question="What's up?",
-    ...     pub_date=datetime(2005, 2, 20), expire_date=datetime(2005, 3, 20))
-    >>> p1.save()
-    >>> p2 = Poll(slug='name', question="What's your name?",
-    ...     pub_date=datetime(2005, 3, 20), expire_date=datetime(2005, 4, 20))
-    >>> p2.save()
-    >>> Poll.objects.dates('pub_date', 'year')
-    [datetime.datetime(2005, 1, 1)]
-    >>> Poll.objects.dates('pub_date', 'month')
-    [datetime.datetime(2005, 2, 1), datetime.datetime(2005, 3, 1)]
-    >>> Poll.objects.dates('pub_date', 'day')
-    [datetime.datetime(2005, 2, 20), datetime.datetime(2005, 3, 20)]
-    >>> Poll.objects.dates('pub_date', 'day', order='DESC')
-    [datetime.datetime(2005, 3, 20), datetime.datetime(2005, 2, 20)]
-    >>> Poll.objects.filter(question__contains='name').dates('pub_date', 'day')
-    [datetime.datetime(2005, 3, 20)]
