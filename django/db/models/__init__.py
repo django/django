@@ -2,12 +2,12 @@ from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist, ImproperlyConfigured
 from django.core import validators
 from django.db import backend, connection
-from django.db.models.loading import *
+from django.db.models.loading import get_apps, get_app, get_models, get_model, register_models
 from django.db.models.query import Q
 from django.db.models.manager import Manager
 from django.db.models.base import Model, AdminOptions
 from django.db.models.fields import *
-from django.db.models.fields.related import *
+from django.db.models.fields.related import ForeignKey, OneToOneField, ManyToManyField
 from django.db.models import signals
 from django.utils.functional import curry
 from django.utils.text import capfirst
