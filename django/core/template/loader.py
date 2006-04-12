@@ -78,7 +78,7 @@ def get_template(template_name):
     """
     return get_template_from_string(*find_template_source(template_name))
 
-def get_template_from_string(source, origin=None ):
+def get_template_from_string(source, origin=None):
     """
     Returns a compiled Template object for the given template code,
     handling template inheritance recursively.
