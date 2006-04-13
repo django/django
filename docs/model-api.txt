@@ -976,6 +976,11 @@ object, which takes the following parameters. All are optional.
     obviously, be some kind of text field, such as ``CharField`` or
     ``TextField``.
 
+Managers
+========
+
+... Need to describe managers here
+
 Model methods
 =============
 
