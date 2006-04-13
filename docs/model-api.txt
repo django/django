@@ -778,7 +778,22 @@ Here's a list of all possible ``Meta`` options. No options are required. Adding
     optional "-" prefix, which indicates descending order. Fields without a
     leading "-" will be ordered ascending. Use the string "?" to order randomly.
 
-    See `Specifying ordering`_ for a full example.
+    For example, to order by a ``pub_date`` field ascending, use this::
+
+        ordering = ['pub_date']
+
+    To order by ``pub_date`` descending, use this::
+
+        ordering = ['-pub_date']
+
+    To order by ``pub_date`` descending, then by ``author`` ascending, use this::
+
+        ordering = ['-pub_date', 'author']
+
+    See `Specifying ordering`_ for more examples.
+
+    Note that, regardless of how many fields are in ``ordering``, the admin
+    site uses only the first field.
 
     .. _Specifying ordering: http://www.djangoproject.com/documentation/models/ordering/
 
