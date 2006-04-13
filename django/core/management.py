@@ -1045,11 +1045,18 @@ def run_shell(use_plain=False):
         code.interact()
 run_shell.args = '[--plain]'
 
+def dbshell():
+    "Runs the command-line client for the current DATABASE_ENGINE."
+    from django.db import runshell
+    runshell()
+dbshell.args = ""
+
 # Utilities for command-line script
 
 DEFAULT_ACTION_MAPPING = {
     'adminindex': get_admin_index,
     'createcachetable' : createcachetable,
+    'dbshell': dbshell,
     'diffsettings': diffsettings,
     'inspectdb': inspectdb,
     'install': install,
@@ -1072,11 +1079,12 @@ DEFAULT_ACTION_MAPPING = {
 NO_SQL_TRANSACTION = (
     'adminindex',
     'createcachetable',
+    'dbshell',
     'diffsettings',
     'install',
     'reset',
     'sqlindexes',
-    'syncdb'
+    'syncdb',
 )
 
 class DjangoOptionParser(OptionParser):
@@ -1138,7 +1146,7 @@ def execute_from_command_line(action_mapping=DEFAULT_ACTION_MAPPING):
 
     if action == 'shell':
         action_mapping[action](options.plain is True)
-    elif action in ('syncdb', 'validate', 'diffsettings'):
+    elif action in ('syncdb', 'validate', 'diffsettings', 'dbshell'):
         action_mapping[action]()
     elif action == 'inspectdb':
         try:

@@ -64,6 +64,21 @@ backend.  See the `cache documentation`_ for more information.
 
 .. _cache documentation: http://www.djangoproject.com/documentation/cache/
 
+dbshell
+-------
+
+Runs the command-line client for the database engine specified in your
+``DATABASE_ENGINE`` setting, with the connection parameters specified in your
+``DATABASE_USER``, ``DATABASE_PASSWORD``, etc., settings.
+
+    * For PostgreSQL, this runs the ``psql`` command-line client.
+    * For MySQL, this runs the ``mysql`` command-line client.
+    * For SQLite, this runs the ``sqlite3`` command-line client.
+
+This command assumes the programs are on your PATH so that a simple call to
+the program name (``psql``, ``mysql``, ``sqlite3``) will find the program in
+the right place.
+
 diffsettings
 ------------
 
