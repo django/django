@@ -753,6 +753,13 @@ def inspectdb(db_name):
             if att_name == 'id' and field_type == 'AutoField(' and extra_params == {'primary_key': True}:
                 continue
 
+            # Add 'null' and 'blank', if the 'null_ok' flag was present in the
+            # table description.
+            if row[6]: # If it's NULL...
+                extra_params['blank'] = True
+                if not field_type in ('TextField', 'CharField'):
+                    extra_params['null'] = True
+
             field_desc = '%s = models.%s' % (att_name, field_type)
             if extra_params:
                 if not field_desc.endswith('('):
