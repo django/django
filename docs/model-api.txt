@@ -807,6 +807,9 @@ Here's a list of all possible ``META`` options. No options are required. Adding
 
     See `Specifying ordering`_ for more examples.
 
+    Note that, regardless of how many fields are in ``ordering``, the admin
+    site uses only the first field.
+
     .. _Specifying ordering: http://www.djangoproject.com/documentation/models/ordering/
 
 ``permissions``
