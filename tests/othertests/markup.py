@@ -46,7 +46,7 @@ markdown_content = """Paragraph 1
 
 t = Template("{{ markdown_content|markdown }}")
 rendered = t.render(Context(locals())).strip()
-if textile:
+if markdown:
     assert rendered == """<p>Paragraph 1</p><h2>An h2</h2>"""
 else:
     assert rendered == markdown_content
