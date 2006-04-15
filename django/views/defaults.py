@@ -26,7 +26,7 @@ def shortcut(request, content_type_id, object_id):
 
     object_domain = None
 
-    # Otherwise, we need to introspect the object's relationships for a 
+    # Otherwise, we need to introspect the object's relationships for a
     # relation to the Site object
     opts = obj._meta
 
@@ -57,30 +57,30 @@ def shortcut(request, content_type_id, object_id):
             object_domain = Site.objects.get_current().domain
         except Site.DoesNotExist:
             pass
-            
+
     # If all that malarky found an object domain, use it; otherwise fall back
     # to whatever get_absolute_url() returned.
     if object_domain is not None:
         return http.HttpResponseRedirect('http://%s%s' % (object_domain, absurl))
     else:
         return http.HttpResponseRedirect(absurl)
-    
-def page_not_found(request, template_name='404'):
+
+def page_not_found(request, template_name='404.html'):
     """
     Default 404 handler, which looks for the requested URL in the redirects
     table, redirects if found, and displays 404 page if not redirected.
 
-    Templates: `404`
+    Templates: `404.html`
     Context: None
     """
     t = loader.get_template(template_name)
     return http.HttpResponseNotFound(t.render(Context()))
 
-def server_error(request, template_name='500'):
+def server_error(request, template_name='500.html'):
     """
     500 error handler.
 
-    Templates: `500`
+    Templates: `500.html`
     Context: None
     """
     t = loader.get_template(template_name)
