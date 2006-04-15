@@ -2,8 +2,6 @@
 Writing your first Django app, part 3
 =====================================
 
-By Adrian Holovaty <holovaty@gmail.com>
-
 This tutorial begins where `Tutorial 2`_ left off. We're continuing the Web-poll
 application and will focus on creating the public interface -- "views."
 
@@ -62,21 +60,21 @@ arguments from the dictionary (an optional third item in the tuple).
 For more on ``HTTPRequest`` objects, see the `request and response documentation`_.
 For more details on URLconfs, see the `URLconf documentation`_.
 
-When you ran ``python manage.py startproject myproject`` at the beginning of
-Tutorial 1, it created a default URLconf in ``myproject/urls.py``. It also
+When you ran ``python manage.py startproject mysite`` at the beginning of
+Tutorial 1, it created a default URLconf in ``mysite/urls.py``. It also
 automatically set your ``ROOT_URLCONF`` setting to point at that file::
 
-    ROOT_URLCONF = 'myproject.urls'
+    ROOT_URLCONF = 'mysite.urls'
 
-Time for an example. Edit ``myproject/urls.py`` so it looks like this::
+Time for an example. Edit ``mysite/urls.py`` so it looks like this::
 
     from django.conf.urls.defaults import *
 
     urlpatterns = patterns('',
-        (r'^polls/$', 'myproject.polls.views.index'),
-        (r'^polls/(?P<poll_id>\d+)/$', 'myproject.polls.views.detail'),
-        (r'^polls/(?P<poll_id>\d+)/results/$', 'myproject.polls.views.results'),
-        (r'^polls/(?P<poll_id>\d+)/vote/$', 'myproject.polls.views.vote'),
+        (r'^polls/$', 'mysite.polls.views.index'),
+        (r'^polls/(?P<poll_id>\d+)/$', 'mysite.polls.views.detail'),
+        (r'^polls/(?P<poll_id>\d+)/results/$', 'mysite.polls.views.results'),
+        (r'^polls/(?P<poll_id>\d+)/vote/$', 'mysite.polls.views.vote'),
     )
 
 This is worth a review. When somebody requests a page from your Web site --
@@ -84,8 +82,8 @@ say, "/polls/23/", Django will load this Python module, because it's pointed to
 by the ``ROOT_URLCONF`` setting. It finds the variable named ``urlpatterns``
 and traverses the regular expressions in order. When it finds a regular
 expression that matches -- ``r'^polls/(?P<poll_id>\d+)/$'`` -- it loads the
-associated Python package/module: ``myproject.polls.views.detail``. That
-corresponds to the function ``detail()`` in ``myproject/polls/views.py``.
+associated Python package/module: ``mysite.polls.views.detail``. That
+corresponds to the function ``detail()`` in ``mysite/polls/views.py``.
 Finally, it calls that ``detail()`` function like so::
 
     detail(request=<HttpRequest object>, poll_id='23')
@@ -101,7 +99,7 @@ what you can do with them. And there's no need to add URL cruft such as
 ``.php`` -- unless you have a sick sense of humor, in which case you can do
 something like this::
 
-    (r'^polls/latest\.php$', 'myproject.polls.views.index'),
+    (r'^polls/latest\.php$', 'mysite.polls.views.index'),
 
 But, don't do that. It's silly.
 
@@ -137,17 +135,17 @@ You should get a pleasantly-colored error page with the following message::
 
     ViewDoesNotExist at /polls/
 
-    Tried index in module myproject.polls.views. Error was: 'module'
+    Tried index in module mysite.polls.views. Error was: 'module'
     object has no attribute 'index'
 
 This error happened because you haven't written a function ``index()`` in the
-module ``myproject/polls/views.py``.
+module ``mysite/polls/views.py``.
 
 Try "/polls/23/", "/polls/23/results/" and "/polls/23/vote/". The error
 messages tell you which view Django tried (and failed to find, because you
 haven't written any views yet).
 
-Time to write the first view. Open the file ``myproject/polls/views.py``
+Time to write the first view. Open the file ``mysite/polls/views.py``
 and put the following Python code in it::
 
     from django.http import HttpResponse
@@ -187,7 +185,7 @@ in Tutorial 1. Here's one stab at the ``index()`` view, which displays the
 latest 5 poll questions in the system, separated by commas, according to
 publication date::
 
-    from myproject.polls.models import Poll
+    from mysite.polls.models import Poll
     from django.http import HttpResponse
 
     def index(request):
@@ -200,7 +198,7 @@ you want to change the way the page looks, you'll have to edit this Python code.
 So let's use Django's template system to separate the design from Python::
 
     from django.template import Context, loader
-    from myproject.polls.models import Poll
+    from mysite.polls.models import Poll
     from django.http import HttpResponse
 
     def index(request):
@@ -257,7 +255,7 @@ It's a very common idiom to load a template, fill a context and return an
 provides a shortcut. Here's the full ``index()`` view, rewritten::
 
     from django.shortcuts import render_to_response
-    from myproject.polls.models import Poll
+    from mysite.polls.models import Poll
 
     def index(request):
         latest_poll_list = Poll.objects.all().order_by('-pub_date')
@@ -389,19 +387,19 @@ Take some time to play around with the views and template system. As you edit
 the URLconf, you may notice there's a fair bit of redundancy in it::
 
     urlpatterns = patterns('',
-        (r'^polls/$', 'myproject.polls.views.index'),
-        (r'^polls/(?P<poll_id>\d+)/$', 'myproject.polls.views.detail'),
-        (r'^polls/(?P<poll_id>\d+)/results/$', 'myproject.polls.views.results'),
-        (r'^polls/(?P<poll_id>\d+)/vote/$', 'myproject.polls.views.vote'),
+        (r'^polls/$', 'mysite.polls.views.index'),
+        (r'^polls/(?P<poll_id>\d+)/$', 'mysite.polls.views.detail'),
+        (r'^polls/(?P<poll_id>\d+)/results/$', 'mysite.polls.views.results'),
+        (r'^polls/(?P<poll_id>\d+)/vote/$', 'mysite.polls.views.vote'),
     )
 
-Namely, ``myproject.polls.views`` is in every callback.
+Namely, ``mysite.polls.views`` is in every callback.
 
 Because this is a common case, the URLconf framework provides a shortcut for
 common prefixes. You can factor out the common prefixes and add them as the
 first argument to ``patterns()``, like so::
 
-    urlpatterns = patterns('myproject.polls.views',
+    urlpatterns = patterns('mysite.polls.views',
         (r'^polls/$', 'index'),
         (r'^polls/(?P<poll_id>\d+)/$', 'detail'),
         (r'^polls/(?P<poll_id>\d+)/results/$', 'results'),
@@ -423,15 +421,15 @@ Our poll app is pretty decoupled at this point, thanks to the strict directory
 structure that ``python manage.py startapp`` created, but one part of it is
 coupled to the Django settings: The URLconf.
 
-We've been editing the URLs in ``myproject/urls.py``, but the URL design of an
+We've been editing the URLs in ``mysite/urls.py``, but the URL design of an
 app is specific to the app, not to the Django installation -- so let's move the
 URLs within the app directory.
 
-Copy the file ``myproject/urls.py`` to ``myproject/polls/urls.py``. Then,
-change ``myproject/urls.py`` to remove the poll-specific URLs and insert an
+Copy the file ``mysite/urls.py`` to ``mysite/polls/urls.py``. Then,
+change ``mysite/urls.py`` to remove the poll-specific URLs and insert an
 ``include()``::
 
-    (r'^polls/', include('myproject.polls.urls')),
+    (r'^polls/', include('mysite.polls.urls')),
 
 ``include()``, simply, references another URLconf. Note that the regular
 expression doesn't have a ``$`` (end-of-string match character) but has the
@@ -443,14 +441,14 @@ Here's what happens if a user goes to "/polls/34/" in this system:
 
 * Django will find the match at ``'^polls/'``
 * It will strip off the matching text (``"polls/"``) and send the remaining
-  text -- ``"34/"`` -- to the 'myproject.polls.urls' urlconf for
+  text -- ``"34/"`` -- to the 'mysite.polls.urls' urlconf for
   further processing.
 
 Now that we've decoupled that, we need to decouple the
-'myproject.polls.urls' urlconf by removing the leading "polls/" from each
+'mysite.polls.urls' urlconf by removing the leading "polls/" from each
 line::
 
-    urlpatterns = patterns('myproject.polls.views',
+    urlpatterns = patterns('mysite.polls.views',
         (r'^$', 'index'),
         (r'^(?P<poll_id>\d+)/$', 'detail'),
         (r'^(?P<poll_id>\d+)/results/$', 'results'),

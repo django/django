@@ -2,8 +2,6 @@
 Writing your first Django app, part 4
 =====================================
 
-By Adrian Holovaty <holovaty@gmail.com>
-
 This tutorial begins where `Tutorial 3`_ left off. We're continuing the Web-poll
 application and will focus on simple form processing and cutting down our code.
 
@@ -44,13 +42,13 @@ Now, let's create a Django view that handles the submitted data and does
 something with it. Remember, in `Tutorial 3`_, we create a URLconf for the
 polls application that includes this line::
 
-    (r'^(?P<poll_id>\d+)/vote/$', 'myproject.polls.views.vote'),
+    (r'^(?P<poll_id>\d+)/vote/$', 'mysite.polls.views.vote'),
 
-So let's create a ``vote()`` function in ``myproject/polls/views.py``::
+So let's create a ``vote()`` function in ``mysite/polls/views.py``::
 
     from django.shortcuts import get_object_or_404, render_to_response
     from django.http import Http404,HttpResponseRedirect
-    from myproject.polls.models import Choice, Poll
+    from mysite.polls.models import Choice, Poll
     # ...
     def vote(request, poll_id):
         p = get_object_or_404(Poll, pk=poll_id)
@@ -158,7 +156,7 @@ so far::
 
     from django.conf.urls.defaults import *
 
-    urlpatterns = patterns('myproject.polls.views',
+    urlpatterns = patterns('mysite.polls.views',
         (r'^$', 'index'),
         (r'^(?P<poll_id>\d+)/$', 'detail'),
         (r'^(?P<poll_id>\d+)/results/$', 'results'),
@@ -168,7 +166,7 @@ so far::
 Change it like so::
 
     from django.conf.urls.defaults import *
-    from myproject.polls.models import Poll
+    from mysite.polls.models import Poll
     
     info_dict = {
         'queryset': Poll.objects.all(),
@@ -178,7 +176,7 @@ Change it like so::
         (r'^$', 'django.views.generic.list_detail.object_list', info_dict),
         (r'^(?P<object_id>\d+)/$', 'django.views.generic.list_detail.object_detail', info_dict),
         (r'^(?P<object_id>\d+)/results/$', 'django.views.generic.list_detail.object_detail', dict(info_dict, template_name='polls/results')),
-        (r'^(?P<poll_id>\d+)/vote/$', 'myproject.polls.views.vote'),
+        (r'^(?P<poll_id>\d+)/vote/$', 'mysite.polls.views.vote'),
     )
 
 We're using two generic views here: ``object_list`` and ``object_detail``.

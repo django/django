@@ -2,8 +2,6 @@
 Writing your first Django app, part 1
 =====================================
 
-By Adrian Holovaty <holovaty@gmail.com>
-
 Let's learn by example.
 
 Throughout this tutorial, we'll walk you through the creation of a basic
@@ -11,26 +9,34 @@ blogging application.
 
 It'll consist of two parts:
 
-* A public site that lets people read your blog entries and submit comments.
-* An admin site that lets you add, change and delete entries and comments.
+    * A public site that lets people read your blog entries and submit
+      comments.
+    * An admin site that lets you add, change and delete entries and comments.
 
-We'll assume you have `Django installed`_ already.
+We'll assume you have `Django installed`_ already. You can tell Django is
+installed by running the Python interactive interpreter and typing
+``import django``. If that command runs successfully, with no errors, Django is
+installed.
 
 .. _`Django installed`: http://www.djangoproject.com/documentation/install/
 
-Initial setup
-=============
+Creating a project
+==================
 
 If this is your first time using Django, you'll have to take care of some
-initial setup.
+initial setup. Namely, you'll need to auto-generate some code that establishes
+a Django *project* -- a collection of settings for an instance of Django,
+including database configuration, Django-specific options and
+application-specific settings.
 
-Run the command ``django-admin.py startproject myproject``. This will create a
-``myproject`` directory in your current directory.
+From the command line, ``cd`` into a directory where you'd like to store your
+code, then run the command ``django-admin.py startproject mysite``. This
+will create a ``mysite`` directory in your current directory.
 
 (``django-admin.py`` should be on your system path if you installed Django via
-its setup.py utility. If it's not on your path, you can find it in
+its ``setup.py`` utility. If it's not on your path, you can find it in
 ``site-packages/django/bin``; consider symlinking to it from some place
-on your path, such as /usr/local/bin.)
+on your path, such as ``/usr/local/bin``.)
 
 .. admonition:: Where should this code live?
 
@@ -44,11 +50,9 @@ on your path, such as /usr/local/bin.)
     Put your code in some directory **outside** of the document root, such as
     ``/home/mycode``.
 
-A project is a collection of settings for an instance of Django -- including
-database configuration, Django-specific options and application-specific
-settings. Let's look at what ``startproject`` created::
+Let's look at what ``startproject`` created::
 
-    myproject/
+    mysite/
         __init__.py
         manage.py
         settings.py
@@ -65,24 +69,28 @@ These files are:
 The development server
 ----------------------
 
-Let's verify this worked. Change into the ``myproject`` directory, if you
+Let's verify this worked. Change into the ``mysite`` directory, if you
 haven't already, and run the command ``python manage.py runserver``. You'll see
 the following output on the command line::
 
     Validating models...
     0 errors found.
 
-    Django version 0.92, using settings 'myproject.settings'
+    Django version 0.92, using settings 'mysite.settings'
     Development server is running at http://127.0.0.1:8000/
     Quit the server with CONTROL-C (Unix) or CTRL-BREAK (Windows).
 
 You've started the Django development server, a lightweight, pure-Python Web
 server. We've included this with Django so you can develop things rapidly,
-without having to deal with configuring Apache until you're ready for
-production.
+without having to deal with configuring a production server -- such as
+Apache -- until you're ready for production.
 
 Now's a good time to note: DON'T use this server in anything resembling a
 production environment. It's intended only for use while developing.
+
+Now that the server's running, visit http://127.0.0.1:8000/ with your Web
+browser. You'll see a "Welcome to Django" page, in pleasant, light-blue pastel.
+It worked!
 
 .. admonition:: Changing the port
 
@@ -94,11 +102,15 @@ production environment. It's intended only for use while developing.
 
     Full docs for the development server are at `django-admin documentation`_.
 
-Now that the server's running, visit http://127.0.0.1:8000/ with your Web
-browser. You'll see a "Welcome to Django" page, in pleasant, light-blue pastel.
-It worked!
-
 .. django-admin documentation: http://www.djangoproject.com/documentation/django_admin/
+
+Your first page
+---------------
+
+Let's create our first Django-powered Web page, a classic "hello world" example.
+
+
+
 
 Database setup
 --------------
@@ -183,12 +195,12 @@ so you can focus on writing code rather than creating directories.
     configuration and apps for a particular Web site. A project can contain
     multiple apps. An app can be in multiple projects.
 
-In this tutorial, we'll create our poll app in the ``myproject`` directory,
+In this tutorial, we'll create our poll app in the ``mysite`` directory,
 for simplicity. As a consequence, the app will be coupled to the project --
-that is, Python code within the poll app will refer to ``myproject.polls``.
+that is, Python code within the poll app will refer to ``mysite.polls``.
 Later in this tutorial, we'll discuss decoupling your apps for distribution.
 
-To create your app, make sure you're in the ``myproject`` directory and type
+To create your app, make sure you're in the ``mysite`` directory and type
 this command::
 
     python manage.py startapp polls
@@ -278,17 +290,17 @@ But first we need to tell our project that the ``polls`` app is installed.
     Django installation.
 
 Edit the ``settings.py`` file again, and change the ``INSTALLED_APPS`` setting
-to include the string ``'myproject.polls'``. So it'll look like this::
+to include the string ``'mysite.polls'``. So it'll look like this::
 
     INSTALLED_APPS = (
         'django.contrib.auth',
         'django.contrib.contenttypes',
         'django.contrib.sessions',
         'django.contrib.sites',
-        'myproject.polls'
+        'mysite.polls'
     )
 
-Now Django knows ``myproject`` includes the ``polls`` app. Let's run another command::
+Now Django knows ``mysite`` includes the ``polls`` app. Let's run another command::
 
     python manage.py sql polls
 
@@ -379,10 +391,10 @@ We're using this instead of simply typing "python", because ``manage.py`` sets
 up the project's environment for you. "Setting up the environment" involves two
 things:
 
-    * Putting ``myproject`` on ``sys.path``. For flexibility, several pieces of
+    * Putting ``mysite`` on ``sys.path``. For flexibility, several pieces of
       Django refer to projects in Python dotted-path notation (e.g.
-      ``'myproject.polls.models'``). In order for this to work, the
-      ``myproject`` package has to be on ``sys.path``.
+      ``'mysite.polls.models'``). In order for this to work, the
+      ``mysite`` package has to be on ``sys.path``.
 
       We've already seen one example of this: the ``INSTALLED_APPS`` setting is
       a list of packages in dotted-path notation.
@@ -393,16 +405,16 @@ things:
 .. admonition:: Bypassing manage.py
 
     If you'd rather not use ``manage.py``, no problem. Just make sure
-    ``myproject`` is at the root level on the Python path (i.e.,
-    ``import myproject`` works) and set the ``DJANGO_SETTINGS_MODULE``
-    environment variable to ``myproject.settings``.
+    ``mysite`` is at the root level on the Python path (i.e.,
+    ``import mysite`` works) and set the ``DJANGO_SETTINGS_MODULE``
+    environment variable to ``mysite.settings``.
 
     For more information on all of this, see the `django-admin.py documentation`_.
 
 Once you're in the shell, explore the database API::
 
     # Import the model classes we just wrote.
-    >>> from myproject.polls.models import Poll, Choice
+    >>> from mysite.polls.models import Poll, Choice
 
     # No polls are in the system yet.
     >>> Poll.objects.all()
@@ -472,7 +484,7 @@ Note the addition of ``import datetime`` to reference Python's standard
 Let's jump back into the Python interactive shell by running
 ``python manage.py shell`` again::
 
-    >>> from myproject.polls.models import Poll, Choice
+    >>> from mysite.polls.models import Poll, Choice
 
     # Make sure our __repr__() addition worked.
     >>> Poll.objects.all()

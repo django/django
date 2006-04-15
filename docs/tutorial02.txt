@@ -2,8 +2,6 @@
 Writing your first Django app, part 2
 =====================================
 
-By Adrian Holovaty <holovaty@gmail.com>
-
 This tutorial begins where `Tutorial 1`_ left off. We're continuing the Web-poll
 application and will focus on Django's automatically-generated admin site.
 
@@ -33,7 +31,7 @@ activate the admin site for your installation, do these three things:
     * Add ``"django.contrib.admin"`` to your ``INSTALLED_APPS`` setting.
     * Run ``python manage.py syncdb``. Since you have added a new application
       to ``INSTALLED_APPS``, the database tables need to be updated.
-    * Edit your ``myproject/urls.py`` file and uncomment the line below
+    * Edit your ``mysite/urls.py`` file and uncomment the line below
       "Uncomment this for admin:". This file is a URLconf; we'll dig into
       URLconfs in the next tutorial. For now, all you need to know is that it
       maps URL roots to applications.
@@ -73,7 +71,7 @@ Make the poll app modifiable in the admin
 But where's our poll app? It's not displayed on the admin index page.
 
 Just one thing to do: We need to specify in the ``Poll`` model that ``Poll``
-objects have an admin interface. Edit the ``myproject/polls/models/polls.py``
+objects have an admin interface. Edit the ``mysite/polls/models/polls.py``
 file and make the following change to add an inner ``Admin`` class::
 
     class Poll(models.Model):
@@ -370,7 +368,7 @@ That's easy to change, though, using Django's template system. The Django admin
 is powered by Django itself, and its interfaces use Django's own template
 system. (How meta!)
 
-Open your settings file (``myproject/settings.py``, remember) and look at the
+Open your settings file (``mysite/settings.py``, remember) and look at the
 ``TEMPLATE_DIRS`` setting. ``TEMPLATE_DIRS`` is a tuple of filesystem
 directories to check when loading Django templates. It's a search path.
 
