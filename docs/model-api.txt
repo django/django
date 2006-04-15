@@ -286,7 +286,7 @@ Here are all available field types:
 
     The admin represents this as an ``<input type="file">`` (a file-upload widget).
 
-    Using a ``FileField` or an ``ImageField`` (see below) in a model takes a few
+    Using a ``FileField`` or an ``ImageField`` (see below) in a model takes a few
     steps:
 
         1. In your settings file, you'll need to define ``MEDIA_ROOT`` as the
