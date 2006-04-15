@@ -220,7 +220,7 @@ previous section). You can tell them apart with ``is_anonymous()``, like so::
         # Do something for logged-in users.
 
 If you want to use ``request.user`` in your view code, make sure you have
-``SessionMiddleware`` and ``AuthenticationMiddleware`` enabled. See the 
+``SessionMiddleware`` and ``AuthenticationMiddleware`` enabled. See the
 `session documentation`_ for more information.
 
 .. _request objects: http://www.djangoproject.com/documentation/request_response/#httprequest-objects
@@ -261,7 +261,7 @@ The simple, raw way to limit access to pages is to check
 
     def my_view(request):
         if request.user.is_anonymous():
-            return render_to_response('myapp/login_error')
+            return render_to_response('myapp/login_error.html')
         # ...
 
 The login_required decorator
@@ -548,7 +548,7 @@ a playlist::
         # Create the playlist with the given songs.
         # ...
         request.user.message_set.create(message="Your playlist was added successfully.")
-        return render_to_response("playlists/create", context_instance=RequestContext(request))
+        return render_to_response("playlists/create.html", context_instance=RequestContext(request))
 
 When you use ``RequestContext``, the currently logged-in user and his/her
 messages are made available in the `template context`_ as the template variable

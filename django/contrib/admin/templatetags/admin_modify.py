@@ -35,7 +35,7 @@ def submit_row(context):
         'show_save_and_continue': not is_popup and context['has_change_permission'],
         'show_save': True
     }
-submit_row = register.inclusion_tag('admin/submit_line', takes_context=True)(submit_row)
+submit_row = register.inclusion_tag('admin/submit_line.html', takes_context=True)(submit_row)
 
 def field_label(bound_field):
     class_names = []
@@ -64,7 +64,7 @@ class FieldWidgetNode(template.Node):
         if not cls.nodelists.has_key(klass):
             try:
                 field_class_name = klass.__name__
-                template_name = "widget/%s" % class_name_to_underscored(field_class_name)
+                template_name = "widget/%s.html" % class_name_to_underscored(field_class_name)
                 nodelist = loader.get_template(template_name).nodelist
             except template.TemplateDoesNotExist:
                 super_klass = bool(klass.__bases__) and klass.__bases__[0] or None
@@ -72,7 +72,7 @@ class FieldWidgetNode(template.Node):
                     nodelist = cls.get_nodelist(super_klass)
                 else:
                     if not cls.default:
-                        cls.default = loader.get_template("widget/default").nodelist
+                        cls.default = loader.get_template("widget/default.html").nodelist
                     nodelist = cls.default
 
             cls.nodelists[klass] = nodelist
@@ -126,7 +126,7 @@ class TabularBoundRelatedObject(BoundRelatedObject):
         self.show_url = original and hasattr(self.relation.opts, 'get_absolute_url')
 
     def template_name(self):
-        return "admin/edit_inline_tabular"
+        return "admin/edit_inline_tabular.html"
 
 class StackedBoundRelatedObject(BoundRelatedObject):
     def __init__(self, related_object, field_mapping, original):
@@ -138,7 +138,7 @@ class StackedBoundRelatedObject(BoundRelatedObject):
         self.show_url = original and hasattr(self.relation.opts, 'get_absolute_url')
 
     def template_name(self):
-        return "admin/edit_inline_stacked"
+        return "admin/edit_inline_stacked.html"
 
 class EditInlineNode(template.Node):
     def __init__(self, rel_var):
@@ -229,4 +229,4 @@ def admin_field_line(context, argument_val):
         'bound_fields': bound_fields,
         'class_names': " ".join(class_names),
     }
-admin_field_line = register.inclusion_tag('admin/field_line', takes_context=True)(admin_field_line)
+admin_field_line = register.inclusion_tag('admin/field_line.html', takes_context=True)(admin_field_line)

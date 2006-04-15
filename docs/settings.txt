@@ -651,14 +651,6 @@ these paths should use Unix-style forward slashes, even on Windows.
 
 See the `template documentation`_.
 
-TEMPLATE_FILE_EXTENSION
------------------------
-
-Default: ``'.html'``
-
-The file extension to append to all template names when searching for
-templates. See the `template documentation`_.
-
 TEMPLATE_LOADERS
 ----------------
 

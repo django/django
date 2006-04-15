@@ -17,13 +17,13 @@ MODEL_METHODS_EXCLUDE = ('_', 'add_', 'delete', 'save', 'set_')
 def doc_index(request):
     if not utils.docutils_is_available:
         return missing_docutils_page(request)
-    return render_to_response('admin_doc/index', context_instance=RequestContext(request))
+    return render_to_response('admin_doc/index.html', context_instance=RequestContext(request))
 doc_index = staff_member_required(doc_index)
 
 def bookmarklets(request):
     # Hack! This couples this view to the URL it lives at.
     admin_root = request.path[:-len('doc/bookmarklets/')]
-    return render_to_response('admin_doc/bookmarklets', {
+    return render_to_response('admin_doc/bookmarklets.html', {
         'admin_url': "%s://%s%s" % (os.environ.get('HTTPS') == 'on' and 'https' or 'http', get_host(request), admin_root),
     }, context_instance=RequestContext(request))
 bookmarklets = staff_member_required(bookmarklets)
@@ -56,7 +56,7 @@ def template_tag_index(request):
                 'library': tag_library,
             })
 
-    return render_to_response('admin_doc/template_tag_index', {'tags': tags}, context_instance=RequestContext(request))
+    return render_to_response('admin_doc/template_tag_index.html', {'tags': tags}, context_instance=RequestContext(request))
 template_tag_index = staff_member_required(template_tag_index)
 
 def template_filter_index(request):
@@ -86,7 +86,7 @@ def template_filter_index(request):
                 'meta': metadata,
                 'library': tag_library,
             })
-    return render_to_response('admin_doc/template_filter_index', {'filters': filters}, context_instance=RequestContext(request))
+    return render_to_response('admin_doc/template_filter_index.html', {'filters': filters}, context_instance=RequestContext(request))
 template_filter_index = staff_member_required(template_filter_index)
 
 def view_index(request):
@@ -97,8 +97,8 @@ def view_index(request):
         settings_modules = [__import__(m, '', '', ['']) for m in settings.ADMIN_FOR]
     else:
         settings_modules = [settings]
-    
-    views = []        
+
+    views = []
     for settings_mod in settings_modules:
         urlconf = __import__(settings_mod.ROOT_URLCONF, '', '', [''])
         view_functions = extract_views_from_urlpatterns(urlconf.urlpatterns)
@@ -110,7 +110,7 @@ def view_index(request):
                 'site': Site.objects.get(pk=settings_mod.SITE_ID),
                 'url': simplify_regex(regex),
             })
-    return render_to_response('admin_doc/view_index', {'views': views}, context_instance=RequestContext(request))
+    return render_to_response('admin_doc/view_index.html', {'views': views}, context_instance=RequestContext(request))
 view_index = staff_member_required(view_index)
 
 def view_detail(request, view):
@@ -129,7 +129,7 @@ def view_detail(request, view):
         body = utils.parse_rst(body, 'view', 'view:' + view)
     for key in metadata:
         metadata[key] = utils.parse_rst(metadata[key], 'model', 'view:' + view)
-    return render_to_response('admin_doc/view_detail', {
+    return render_to_response('admin_doc/view_detail.html', {
         'name': view,
         'summary': title,
         'body': body,
@@ -142,7 +142,7 @@ def model_index(request):
         return missing_docutils_page(request)
 
     m_list = [m._meta for m in models.get_models()]
-    return render_to_response('admin_doc/model_index', {'models': m_list}, context_instance=RequestContext(request))
+    return render_to_response('admin_doc/model_index.html', {'models': m_list}, context_instance=RequestContext(request))
 model_index = staff_member_required(model_index)
 
 def model_detail(request, app_label, model_name):
@@ -167,12 +167,12 @@ def model_detail(request, app_label, model_name):
     # Gather fields/field descriptions.
     fields = []
     for field in opts.fields:
-        # ForeignKey is a special case since the field will actually be a 
-        # descriptor that returns the other object 
+        # ForeignKey is a special case since the field will actually be a
+        # descriptor that returns the other object
         if isinstance(field, models.ForeignKey):
             data_type = related_object_name = field.rel.to.__name__
             app_label = field.rel.to._meta.app_label
-            verbose = utils.parse_rst(("the related `%s.%s` object"  % (app_label, data_type)), 'model', 'model:' + data_type) 
+            verbose = utils.parse_rst(("the related `%s.%s` object"  % (app_label, data_type)), 'model', 'model:' + data_type)
         else:
             data_type = get_readable_field_data_type(field)
             verbose = field.verbose_name
@@ -200,7 +200,7 @@ def model_detail(request, app_label, model_name):
                 'data_type': get_return_data_type(func_name),
                 'verbose': verbose,
             })
-            
+
     # Gather related objects
     for rel in opts.get_all_related_objects():
         verbose = "related `%s.%s` objects" % (rel.opts.app_label, rel.opts.object_name)
@@ -214,7 +214,7 @@ def model_detail(request, app_label, model_name):
             'verbose' : utils.parse_rst("number of " + verbose , 'model', 'model:' + opts.module_name),
         })
 
-    return render_to_response('admin_doc/model_detail', {
+    return render_to_response('admin_doc/model_detail.html', {
         'name': '%s.%s' % (opts.app_label, opts.object_name),
         'summary': "Fields on %s objects" % opts.object_name,
         'description': model.__doc__,
@@ -236,7 +236,7 @@ def template_detail(request, template):
                 'site': Site.objects.get(pk=settings_mod.SITE_ID),
                 'order': list(settings_mod.TEMPLATE_DIRS).index(dir),
             })
-    return render_to_response('admin_doc/template_detail', {
+    return render_to_response('admin_doc/template_detail.html', {
         'name': template,
         'templates': templates,
     }, context_instance=RequestContext(request))
@@ -248,7 +248,7 @@ template_detail = staff_member_required(template_detail)
 
 def missing_docutils_page(request):
     """Display an error message for people without docutils"""
-    return render_to_response('admin_doc/missing_docutils')
+    return render_to_response('admin_doc/missing_docutils.html')
 
 def load_all_installed_template_libraries():
     # Load/register all template tag libraries from installed apps.
@@ -335,11 +335,11 @@ def simplify_regex(pattern):
     """
     # handle named groups first
     pattern = named_group_matcher.sub(lambda m: m.group(1), pattern)
-    
+
     # handle non-named groups
     pattern = non_named_group_matcher.sub("<var>", pattern)
-        
-    # clean up any outstanding regex-y characters.    
+
+    # clean up any outstanding regex-y characters.
     pattern = pattern.replace('^', '').replace('$', '').replace('?', '').replace('//', '/').replace('\\', '')
     if not pattern.startswith('/'):
         pattern = '/' + pattern

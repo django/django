@@ -90,7 +90,7 @@ Finally, it calls that ``detail()`` function like so::
 
 The ``poll_id='23'`` part comes from ``(?P<poll_id>\d+)``. Using parenthesis around a
 pattern "captures" the text matched by that pattern and sends it as an argument
-to the view function; the ``?P<poll_id>`` defines the name that will be used to 
+to the view function; the ``?P<poll_id>`` defines the name that will be used to
 identify the matched pattern; and \d+ is a regular experession to match a sequence of
 digits (i.e., a number).
 
@@ -203,7 +203,7 @@ So let's use Django's template system to separate the design from Python::
 
     def index(request):
         latest_poll_list = Poll.objects.all().order_by('-pub_date')
-        t = loader.get_template('polls/index')
+        t = loader.get_template('polls/index.html')
         c = Context({
             'latest_poll_list': latest_poll_list,
         })
@@ -227,9 +227,8 @@ find templates -- just as you did in the "Customize the admin look and feel"
 section of Tutorial 2.
 
 When you've done that, create a directory ``polls`` in your template directory.
-Within that, create a file called ``index.html``. Django requires that
-templates have ".html" extension. Note that our
-``loader.get_template('polls/index')`` code from above maps to
+Within that, create a file called ``index.html``. Note that our
+``loader.get_template('polls/index.html')`` code from above maps to
 "[template_directory]/polls/index.html" on the filesystem.
 
 Put the following code in that template::

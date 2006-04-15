@@ -218,12 +218,12 @@ def render_change_form(model, manipulator, context, add=False, change=False, for
     }
     context.update(extra_context)
     return render_to_response([
-        "admin/%s/%s/change_form" % (app_label, opts.object_name.lower()),
-        "admin/%s/change_form" % app_label,
-        "admin/change_form"], context_instance=context)
+        "admin/%s/%s/change_form.html" % (app_label, opts.object_name.lower()),
+        "admin/%s/change_form.html" % app_label,
+        "admin/change_form.html"], context_instance=context)
 
 def index(request):
-    return render_to_response('admin/index', {'title': _('Site administration')}, context_instance=template.RequestContext(request))
+    return render_to_response('admin/index.html', {'title': _('Site administration')}, context_instance=template.RequestContext(request))
 index = staff_member_required(never_cache(index))
 
 def add_stage(request, app_label, model_name, show_delete=False, form_url='', post_url=None, post_url_continue='../%s/', object_id_override=None):
@@ -515,9 +515,9 @@ def delete_stage(request, app_label, model_name, object_id):
         "perms_lacking": perms_needed,
         "opts": model._meta,
     }
-    return render_to_response(["admin/%s/%s/delete_confirmation" % (app_label, opts.object_name.lower() ),
-                               "admin/%s/delete_confirmation" % app_label ,
-                               "admin/delete_confirmation"], extra_context, context_instance=template.RequestContext(request))
+    return render_to_response(["admin/%s/%s/delete_confirmation.html" % (app_label, opts.object_name.lower() ),
+                               "admin/%s/delete_confirmation.html" % app_label ,
+                               "admin/delete_confirmation.html"], extra_context, context_instance=template.RequestContext(request))
 delete_stage = staff_member_required(never_cache(delete_stage))
 
 def history(request, app_label, model_name, object_id):
@@ -535,9 +535,9 @@ def history(request, app_label, model_name, object_id):
         'module_name': capfirst(model._meta.verbose_name_plural),
         'object': obj,
     }
-    return render_to_response(["admin/%s/%s/object_history" % (app_label, model._meta.object_name.lower()),
-                               "admin/%s/object_history" % app_label ,
-                               "admin/object_history"], extra_context, context_instance=template.RequestContext(request))
+    return render_to_response(["admin/%s/%s/object_history.html" % (app_label, model._meta.object_name.lower()),
+                               "admin/%s/object_history.html" % app_label ,
+                               "admin/object_history.html"], extra_context, context_instance=template.RequestContext(request))
 history = staff_member_required(never_cache(history))
 
 class ChangeList(object):
@@ -734,7 +734,7 @@ def change_list(request, app_label, model_name):
         'cl': cl,
     })
     c.update({'has_add_permission': c['perms'][app_label][cl.opts.get_add_permission()]}),
-    return render_to_response(['admin/%s/%s/change_list' % (app_label, cl.opts.object_name.lower()),
-                               'admin/%s/change_list' % app_label,
-                               'admin/change_list'], context_instance=c)
+    return render_to_response(['admin/%s/%s/change_list.html' % (app_label, cl.opts.object_name.lower()),
+                               'admin/%s/change_list.html' % app_label,
+                               'admin/change_list.html'], context_instance=c)
 change_list = staff_member_required(never_cache(change_list))

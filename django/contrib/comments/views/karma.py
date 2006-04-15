@@ -26,4 +26,4 @@ def vote(request, comment_id, vote):
     karma.vote(request.user.id, comment_id, rating)
     # Reload comment to ensure we have up to date karma count
     comment = comments.get_object(pk=comment_id)
-    return render_to_response('comments/karma_vote_accepted', {'comment': comment}, context_instance=RequestContext(request))
+    return render_to_response('comments/karma_vote_accepted.html', {'comment': comment}, context_instance=RequestContext(request))

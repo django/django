@@ -8,7 +8,7 @@ def get_template_sources(template_name, template_dirs=None):
     if not template_dirs:
         template_dirs = settings.TEMPLATE_DIRS
     for template_dir in template_dirs:
-        yield os.path.join(template_dir, template_name) + settings.TEMPLATE_FILE_EXTENSION
+        yield os.path.join(template_dir, template_name)
 
 def load_template_source(template_name, template_dirs=None):
     tried = []

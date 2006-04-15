@@ -75,7 +75,7 @@ class PasswordResetForm(forms.Manipulator):
             domain = current_site.domain
         else:
             site_name = domain = domain_override
-        t = loader.get_template('registration/password_reset_email')
+        t = loader.get_template('registration/password_reset_email.html')
         c = {
             'new_password': new_pass,
             'email': self.user_cache.email,

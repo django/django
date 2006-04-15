@@ -76,11 +76,11 @@ class Feed:
         )
 
         try:
-            title_template = loader.get_template('feeds/%s_title' % self.slug)
+            title_template = loader.get_template('feeds/%s_title.html' % self.slug)
         except TemplateDoesNotExist:
             title_template = Template('{{ obj }}')
         try:
-            description_template = loader.get_template('feeds/%s_description' % self.slug)
+            description_template = loader.get_template('feeds/%s_description.html' % self.slug)
         except TemplateDoesNotExist:
             description_template = Template('{{ obj }}')
 

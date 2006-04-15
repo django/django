@@ -25,7 +25,7 @@ def login(request):
     else:
         errors = {}
     request.session.set_test_cookie()
-    return render_to_response('registration/login', {
+    return render_to_response('registration/login.html', {
         'form': forms.FormWrapper(manipulator, request.POST, errors),
         REDIRECT_FIELD_NAME: redirect_to,
         'site_name': Site.objects.get_current().name,
@@ -36,7 +36,7 @@ def logout(request, next_page=None):
     try:
         del request.session[SESSION_KEY]
     except KeyError:
-        return render_to_response('registration/logged_out', {'title': 'Logged out'}, context_instance=RequestContext(request))
+        return render_to_response('registration/logged_out.html', {'title': 'Logged out'}, context_instance=RequestContext(request))
     else:
         # Redirect to this page until the session has been cleared.
         return HttpResponseRedirect(next_page or request.path)
@@ -61,11 +61,11 @@ def password_reset(request, is_admin_site=False):
             else:
                 form.save()
             return HttpResponseRedirect('%sdone/' % request.path)
-    return render_to_response('registration/password_reset_form', {'form': forms.FormWrapper(form, new_data, errors)},
+    return render_to_response('registration/password_reset_form.html', {'form': forms.FormWrapper(form, new_data, errors)},
         context_instance=RequestContext(request))
 
 def password_reset_done(request):
-    return render_to_response('registration/password_reset_done', context_instance=RequestContext(request))
+    return render_to_response('registration/password_reset_done.html', context_instance=RequestContext(request))
 
 def password_change(request):
     new_data, errors = {}, {}
@@ -76,9 +76,9 @@ def password_change(request):
         if not errors:
             form.save(new_data)
             return HttpResponseRedirect('%sdone/' % request.path)
-    return render_to_response('registration/password_change_form', {'form': forms.FormWrapper(form, new_data, errors)},
+    return render_to_response('registration/password_change_form.html', {'form': forms.FormWrapper(form, new_data, errors)},
         context_instance=RequestContext(request))
 password_change = login_required(password_change)
 
 def password_change_done(request):
-    return render_to_response('registration/password_change_done', context_instance=RequestContext(request))
+    return render_to_response('registration/password_change_done.html', context_instance=RequestContext(request))

@@ -4,7 +4,7 @@ from django.shortcuts import get_object_or_404
 from django.http import HttpResponse
 from django.conf import settings
 
-DEFAULT_TEMPLATE = 'flatpages/default'
+DEFAULT_TEMPLATE = 'flatpages/default.html'
 
 def flatpage(request, url):
     """
@@ -12,7 +12,7 @@ def flatpage(request, url):
 
     Models: `flatpages.flatpages`
     Templates: Uses the template defined by the ``template_name`` field,
-        or `flatpages/default` if template_name is not defined.
+        or `flatpages/default.html` if template_name is not defined.
     Context:
         flatpage
             `flatpages.flatpages` object

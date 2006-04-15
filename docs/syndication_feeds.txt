@@ -120,10 +120,11 @@ One thing's left to do. In an RSS feed, each ``<item>`` has a ``<title>``,
 put into those elements.
 
     * To specify the contents of ``<title>`` and ``<description>``, create
-      `Django templates`_ called ``feeds/sitenews_title`` and
-      ``feeds/sitenews_description``, where ``sitenews`` is the ``slug``
-      specified in the URLconf for the given feed. The RSS system renders that
-      template for each item, passing it two template context variables:
+      `Django templates`_ called ``feeds/sitenews_title.html`` and
+      ``feeds/sitenews_description.html``, where ``sitenews`` is the ``slug``
+      specified in the URLconf for the given feed. Note the ``.html`` extension
+      is required. The RSS system renders that template for each item, passing
+      it two template context variables:
 
           * ``{{ obj }}`` -- The current object (one of whichever objects you
             returned in ``items()``).

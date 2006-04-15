@@ -65,7 +65,7 @@ def pagination(cl):
         'ALL_VAR': ALL_VAR,
         '1': 1,
     }
-pagination = register.inclusion_tag('admin/pagination')(pagination)
+pagination = register.inclusion_tag('admin/pagination.html')(pagination)
 
 def result_headers(cl):
     lookup_opts = cl.lookup_opts
@@ -185,7 +185,7 @@ def result_list(cl):
     return {'cl': cl,
             'result_headers': list(result_headers(cl)),
             'results': list(results(cl))}
-result_list = register.inclusion_tag("admin/change_list_results")(result_list)
+result_list = register.inclusion_tag("admin/change_list_results.html")(result_list)
 
 def date_hierarchy(cl):
     if cl.lookup_opts.admin.date_hierarchy:
@@ -245,7 +245,7 @@ def date_hierarchy(cl):
                     'title': year.year
                 } for year in years]
             }
-date_hierarchy = register.inclusion_tag('admin/date_hierarchy')(date_hierarchy)
+date_hierarchy = register.inclusion_tag('admin/date_hierarchy.html')(date_hierarchy)
 
 def search_form(cl):
     return {
@@ -253,12 +253,12 @@ def search_form(cl):
         'show_result_count': cl.result_count != cl.full_result_count and not cl.opts.one_to_one_field,
         'search_var': SEARCH_VAR
     }
-search_form = register.inclusion_tag('admin/search_form')(search_form)
+search_form = register.inclusion_tag('admin/search_form.html')(search_form)
 
 def filter(cl, spec):
     return {'title': spec.title(), 'choices' : list(spec.choices(cl))}
-filter = register.inclusion_tag('admin/filter')(filter)
+filter = register.inclusion_tag('admin/filter.html')(filter)
 
 def filters(cl):
     return {'cl': cl}
-filters = register.inclusion_tag('admin/filters')(filters)
+filters = register.inclusion_tag('admin/filters.html')(filters)

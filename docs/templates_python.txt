@@ -363,15 +363,8 @@ Loading templates
 -----------------
 
 Generally, you'll store templates in files on your filesystem rather than using
-the low-level ``Template`` API yourself. Save templates in a file with an
-".html" extension in a directory specified as a **template directory**.
-
-If you don't like the requirement that templates have an ".html" extension,
-change your ``TEMPLATE_FILE_EXTENSION`` setting. It's set to ``".html"`` by
-default.
-
-Also, the .html extension doesn't mean templates can contain only HTML. They
-can contain whatever textual content you want.
+the low-level ``Template`` API yourself. Save templates in a directory
+specified as a **template directory**.
 
 The TEMPLATE_DIRS setting
 ~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -386,7 +379,8 @@ that contain full paths to your template directory(ies). Example::
     )
 
 Your templates can go anywhere you want, as long as the directories and
-templates are readable by the Web server.
+templates are readable by the Web server. They can have any extension you want,
+such as ``.html`` or ``.txt`` or whatever.
 
 Note that these paths should use Unix-style forward slashes, even on Windows.
 
@@ -404,14 +398,15 @@ Django has two ways to load templates from files:
     ``select_template`` is just like ``get_template``, except it takes a list
     of template names. Of the list, it returns the first template that exists.
 
-For example, if you call ``get_template("story_detail")`` and have the above
-``TEMPLATE_DIRS`` setting, here are the files Django will look for, in order:
+For example, if you call ``get_template("story_detail.html")`` and have the
+above ``TEMPLATE_DIRS`` setting, here are the files Django will look for, in
+order:
 
     * ``/home/html/templates/lawrence.com/story_detail.html``
     * ``/home/html/templates/default/story_detail.html``
 
-If you call ``select_template(["story_253_detail", "story_detail"])``, here's
-what Django will look for:
+If you call ``select_template(["story_253_detail.html", "story_detail.html"])``,
+here's what Django will look for:
 
     * ``/home/html/templates/lawrence.com/story_253_detail.html``
     * ``/home/html/templates/default/story_253_detail.html``
@@ -425,7 +420,7 @@ When Django finds a template that exists, it stops looking.
     You can use ``select_template`` for super-flexible "templatability." For
     example, if you've written a news story and want some stories to have
     custom templates, use something like
-    ``select_template(["story_%s_detail" % story.id, "story_detail"])``.
+    ``select_template(["story_%s_detail.html" % story.id, "story_detail.html"])``.
     That'll allow you to use a custom template for an individual story, with a
     fallback template for stories that don't have custom templates.
 
@@ -441,7 +436,7 @@ single directory gets messy.
 
 To load a template that's within a subdirectory, just use a slash, like so::
 
-    get_template("news/story_detail")
+    get_template("news/story_detail.html")
 
 Loader types
 ~~~~~~~~~~~~
@@ -467,7 +462,7 @@ a template loader. Here are the built-in template loaders:
 
         INSTALLED_APPS = ('myproject.polls', 'myproject.music')
 
-    ...then ``get_template("foo")`` will look for templates in these
+    ...then ``get_template("foo.html")`` will look for templates in these
     directories, in this order:
 
         * ``/path/to/myproject/polls/templates/foo.html``

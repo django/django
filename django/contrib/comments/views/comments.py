@@ -232,7 +232,7 @@ def post_comment(request):
                 return field_list
         comment = errors and '' or manipulator.get_comment(new_data)
         comment_form = CommentFormWrapper(manipulator, new_data, errors, rating_choices)
-        return render_to_response('comments/preview', {
+        return render_to_response('comments/preview.html', {
             'comment': comment,
             'comment_form': comment_form,
             'options': options,
@@ -300,7 +300,7 @@ def post_free_comment(request):
     errors = manipulator.get_validation_errors(new_data)
     if errors or request.POST.has_key('preview'):
         comment = errors and '' or manipulator.get_comment(new_data)
-        return render_to_response('comments/free_preview', {
+        return render_to_response('comments/free_preview.html', {
             'comment': comment,
             'comment_form': forms.FormWrapper(manipulator, new_data, errors),
             'options': options,
@@ -337,4 +337,4 @@ def comment_was_posted(request):
             obj = content_type.get_object_for_this_type(pk=object_id)
         except ObjectDoesNotExist:
             pass
-    return render_to_response('comments/posted', {'object': obj}, context_instance=RequestContext(request))
+    return render_to_response('comments/posted.html', {'object': obj}, context_instance=RequestContext(request))

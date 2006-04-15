@@ -1,4 +1,4 @@
-{% extends "admin/base_site" %}
+{% extends "admin/base_site.html" %}
 {% load i18n %}
 
 {% block stylesheet %}{% load adminmedia %}{% admin_media_prefix %}css/dashboard.css{% endblock %}
@@ -14,7 +14,7 @@
 {% if app_list %}
     {% for app in app_list %}
         <div class="module">
-        <table summary="{% blocktrans with app.name as name %}Models available in the {{ name }} application.{% endblocktrans %}"> 
+        <table summary="{% blocktrans with app.name as name %}Models available in the {{ name }} application.{% endblocktrans %}">
         <caption>{{ app.name }}</caption>
         {% for model in app.models %}
             <tr>

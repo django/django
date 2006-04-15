@@ -533,9 +533,9 @@ Loads a template and renders it with the current context. This is a way of
 The template name can either be a variable or a hard-coded (quoted) string,
 in either single or double quotes.
 
-This example includes the contents of the template ``"foo/bar"``::
+This example includes the contents of the template ``"foo/bar.html"``::
 
-    {% include "foo/bar" %}
+    {% include "foo/bar.html" %}
 
 This example includes the contents of the template whose name is contained in
 the variable ``template_name``::
@@ -548,9 +548,9 @@ including it. This example produces the output ``"Hello, John"``:
     * Context: variable ``person`` is set to ``"john"``.
     * Template::
 
-        {% include "name_snippet" %}
+        {% include "name_snippet.html" %}
 
-    * The ``name_snippet`` template::
+    * The ``name_snippet.html`` template::
 
         Hello, {{ person }}
 
