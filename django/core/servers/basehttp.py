@@ -242,7 +242,7 @@ class ServerHandler:
 
     # Error handling (also per-subclass or per-instance)
     traceback_limit = None  # Print entire traceback to self.get_stderr()
-    error_status = "500 Dude, this is whack!"
+    error_status = "500 INTERNAL SERVER ERROR"
     error_headers = [('Content-Type','text/plain')]
 
     # State variables (don't mess with these)
