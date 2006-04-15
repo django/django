@@ -14,7 +14,7 @@ def create_object(request, model, template_name=None,
     """
     Generic object-creation function.
 
-    Templates: ``<app_label>/<model_name>_form``
+    Templates: ``<app_label>/<model_name>_form.html``
     Context:
         form
             the form wrapper for the object
@@ -57,7 +57,7 @@ def create_object(request, model, template_name=None,
     # Create the FormWrapper, template, context, response
     form = forms.FormWrapper(manipulator, new_data, errors)
     if not template_name:
-        template_name = "%s/%s_form" % (model._meta.app_label, model._meta.object_name.lower())
+        template_name = "%s/%s_form.html" % (model._meta.app_label, model._meta.object_name.lower())
     t = template_loader.get_template(template_name)
     c = RequestContext(request, {
         'form': form,
@@ -77,7 +77,7 @@ def update_object(request, model, object_id=None, slug=None,
     """
     Generic object-update function.
 
-    Templates: ``<app_label>/<model_name>_form``
+    Templates: ``<app_label>/<model_name>_form.html``
     Context:
         form
             the form wrapper for the object
@@ -127,7 +127,7 @@ def update_object(request, model, object_id=None, slug=None,
 
     form = forms.FormWrapper(manipulator, new_data, errors)
     if not template_name:
-        template_name = "%s/%s_form" % (model._meta.app_label, model._meta.object_name.lower())
+        template_name = "%s/%s_form.html" % (model._meta.app_label, model._meta.object_name.lower())
     t = template_loader.get_template(template_name)
     c = RequestContext(request, {
         'form': form,
@@ -153,7 +153,7 @@ def delete_object(request, model, post_delete_redirect,
     fetched using GET; for safty, deletion will only be performed if this
     view is POSTed.
 
-    Templates: ``<app_label>/<model_name>_confirm_delete``
+    Templates: ``<app_label>/<model_name>_confirm_delete.html``
     Context:
         object
             the original object being deleted
@@ -182,7 +182,7 @@ def delete_object(request, model, post_delete_redirect,
         return HttpResponseRedirect(post_delete_redirect)
     else:
         if not template_name:
-            template_name = "%s/%s_confirm_delete" % (model._meta.app_label, model._meta.object_name.lower())
+            template_name = "%s/%s_confirm_delete.html" % (model._meta.app_label, model._meta.object_name.lower())
         t = template_loader.get_template(template_name)
         c = RequestContext(request, {
             template_object_name: object,

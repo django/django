@@ -10,7 +10,7 @@ def archive_index(request, queryset, date_field, num_latest=15,
     """
     Generic top-level archive of date-based objects.
 
-    Templates: ``<app_label>/<model_name>_archive``
+    Templates: ``<app_label>/<model_name>_archive.html``
     Context:
         date_list
             List of years
@@ -29,7 +29,7 @@ def archive_index(request, queryset, date_field, num_latest=15,
         latest = None
 
     if not template_name:
-        template_name = "%s/%s_archive" % (model._meta.app_label, model._meta.object_name.lower())
+        template_name = "%s/%s_archive.html" % (model._meta.app_label, model._meta.object_name.lower())
     t = template_loader.get_template(template_name)
     c = RequestContext(request, {
         'date_list' : date_list,
@@ -48,7 +48,7 @@ def archive_year(request, year, queryset, date_field, template_name=None,
     """
     Generic yearly archive view.
 
-    Templates: ``<app_label>/<model_name>_archive_year``
+    Templates: ``<app_label>/<model_name>_archive_year.html``
     Context:
         date_list
             List of months in this year with objects
@@ -65,7 +65,7 @@ def archive_year(request, year, queryset, date_field, template_name=None,
     if not date_list and not allow_empty:
         raise Http404
     if not template_name:
-        template_name = "%s/%s_archive_year" % (model._meta.app_label, model._meta.object_name.lower())
+        template_name = "%s/%s_archive_year.html" % (model._meta.app_label, model._meta.object_name.lower())
     t = template_loader.get_template(template_name)
     c = RequestContext(request, {
         'date_list': date_list,
@@ -85,7 +85,7 @@ def archive_month(request, year, month, queryset, date_field,
     """
     Generic monthly archive view.
 
-    Templates: ``<app_label>/<model_name>_archive_month``
+    Templates: ``<app_label>/<model_name>_archive_month.html``
     Context:
         month:
             (date) this month
@@ -117,7 +117,7 @@ def archive_month(request, year, month, queryset, date_field,
     if not object_list and not allow_empty:
         raise Http404
     if not template_name:
-        template_name = "%s/%s_archive_month" % (model._meta.app_label, model._meta.object_name.lower())
+        template_name = "%s/%s_archive_month.html" % (model._meta.app_label, model._meta.object_name.lower())
     t = template_loader.get_template(template_name)
     c = RequestContext(request, {
         '%s_list' % template_object_name: object_list,
@@ -139,7 +139,7 @@ def archive_day(request, year, month, day, queryset, date_field,
     """
     Generic daily archive view.
 
-    Templates: ``<app_label>/<model_name>_archive_day``
+    Templates: ``<app_label>/<model_name>_archive_day.html``
     Context:
         object_list:
             list of objects published that day
@@ -167,7 +167,7 @@ def archive_day(request, year, month, day, queryset, date_field,
     if not allow_empty and not object_list:
         raise Http404
     if not template_name:
-        template_name = "%s/%s_archive_day" % (model._meta.app_label, model._meta.object_name.lower())
+        template_name = "%s/%s_archive_day.html" % (model._meta.app_label, model._meta.object_name.lower())
     t = template_loader.get_template(template_name)
     c = RequestContext(request, {
         '%s_list' % template_object_name: object_list,
@@ -202,7 +202,7 @@ def object_detail(request, year, month, day, queryset, date_field,
     """
     Generic detail view from year/month/day/slug or year/month/day/id structure.
 
-    Templates: ``<app_label>/<model_name>_detail``
+    Templates: ``<app_label>/<model_name>_detail.html``
     Context:
         object:
             the object to be detailed
@@ -231,7 +231,7 @@ def object_detail(request, year, month, day, queryset, date_field,
     except ObjectDoesNotExist:
         raise Http404, "No %s found for" % model._meta.verbose_name
     if not template_name:
-        template_name = "%s/%s_detail" % (model._meta.app_label, model._meta.object_name.lower())
+        template_name = "%s/%s_detail.html" % (model._meta.app_label, model._meta.object_name.lower())
     if template_name_field:
         template_name_list = [getattr(obj, template_name_field), template_name]
         t = template_loader.select_template(template_name_list)

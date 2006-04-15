@@ -10,7 +10,7 @@ def object_list(request, queryset, paginate_by=None, allow_empty=False,
     """
     Generic list of objects.
 
-    Templates: ``<app_label>/<model_name>_list``
+    Templates: ``<app_label>/<model_name>_list.html``
     Context:
         object_list
             list of objects
@@ -71,7 +71,7 @@ def object_list(request, queryset, paginate_by=None, allow_empty=False,
         else:
             c[key] = value
     if not template_name:
-        template_name = "%s/%s_list" % (model._meta.app_label, model._meta.object_name.lower())
+        template_name = "%s/%s_list.html" % (model._meta.app_label, model._meta.object_name.lower())
     t = template_loader.get_template(template_name)
     return HttpResponse(t.render(c))
 
@@ -82,7 +82,7 @@ def object_detail(request, queryset, object_id=None, slug=None,
     """
     Generic list of objects.
 
-    Templates: ``<app_label>/<model_name>_detail``
+    Templates: ``<app_label>/<model_name>_detail.html``
     Context:
         object
             the object
@@ -99,7 +99,7 @@ def object_detail(request, queryset, object_id=None, slug=None,
     except ObjectDoesNotExist:
         raise Http404, "No %s found matching the query" % (model._meta.verbose_name)
     if not template_name:
-        template_name = "%s/%s_detail" % (model._meta.app_label, model._meta.object_name.lower())
+        template_name = "%s/%s_detail.html" % (model._meta.app_label, model._meta.object_name.lower())
     if template_name_field:
         template_name_list = [getattr(obj, template_name_field), template_name]
         t = template_loader.select_template(template_name_list)

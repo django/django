@@ -146,7 +146,7 @@ The date-based generic functions are:
                                  an empty index page. ``False`` is default.
         =======================  =================================================
 
-    Uses the template ``<app_label>/<model_name>_archive`` by default, where:
+    Uses the template ``<app_label>/<model_name>_archive.html`` by default, where:
 
         * ``<model_name>`` is your model's name in all lowercase. For a model
           ``StaffMember``, that'd be ``staffmember``.
@@ -168,7 +168,7 @@ The date-based generic functions are:
 
     Takes an optional ``allow_empty`` parameter, as ``archive_index``.
 
-    Uses the template ``<app_label>/<model_name>_archive_year`` by default.
+    Uses the template ``<app_label>/<model_name>_archive_year.html`` by default.
 
     Has the following template context:
 
@@ -193,7 +193,7 @@ The date-based generic functions are:
     ``template_object_name`` parameter, which designates the name of the
     template variable to use. Default is ``'object'``.
 
-    Uses the template ``<app_label>/<model_name>_archive_month`` by default.
+    Uses the template ``<app_label>/<model_name>_archive_month.html`` by default.
 
     Has the following template context:
 
@@ -225,7 +225,7 @@ The date-based generic functions are:
     ``template_object_name`` parameter, which designates the name of the
     template variable to use. Default is ``'object'``.
 
-    Uses the template ``<app_label>/<model_name>_archive_day`` by default.
+    Uses the template ``<app_label>/<model_name>_archive_day.html`` by default.
 
     Has the following template context:
 
@@ -307,7 +307,7 @@ Individual views are:
                                   is ``'object'``.
         ========================  =================================================
 
-    Uses the template ``<app_label>/<module_name_list>`` by default.
+    Uses the template ``<app_label>/<module_name_list>.html`` by default.
 
     Has the following template context:
 
@@ -364,9 +364,9 @@ The create/update/delete views are:
     be interpolated against the object's field attributes. For example, you
     could use ``post_save_redirect="/polls/%(slug)s/"``.
 
-    Uses the template ``<app_label>/<model_name>_form`` by default. This is the
-    same template as the ``update_object`` view below. Your template can tell
-    the difference by the presence or absence of ``{{ object }}`` in the
+    Uses the template ``<app_label>/<model_name>_form.html`` by default. This
+    is the same template as the ``update_object`` view below. Your template can
+    tell the difference by the presence or absence of ``{{ object }}`` in the
     context.
 
     Has the following template context:
@@ -390,7 +390,7 @@ The create/update/delete views are:
     ``template_object_name`` parameter, which designates the name of the
     template variable to use. Default is ``'object'``.
 
-    Uses the template ``<app_label>/<model_name>_form`` by default.
+    Uses the template ``<app_label>/<model_name>_form.html`` by default.
 
     Has the following template context:
 
