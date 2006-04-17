@@ -3,7 +3,7 @@
 
 import django
 from django.core.exceptions import ImproperlyConfigured
-import os, re, sys, textwrap
+import os, re, shutil, sys, textwrap
 from optparse import OptionParser
 from django.utils import termcolors
 
@@ -631,11 +631,14 @@ def _start_helper(app_or_project, name, directory, other_name=''):
         for f in files:
             if f.endswith('.pyc'):
                 continue
-            fp_old = open(os.path.join(d, f), 'r')
-            fp_new = open(os.path.join(top_dir, relative_dir, f.replace('%s_name' % app_or_project, name)), 'w')
+            path_old = os.path.join(d, f)
+            path_new = os.path.join(top_dir, relative_dir, f.replace('%s_name' % app_or_project, name))
+            fp_old = open(path_old, 'r')
+            fp_new = open(path_new, 'w')
             fp_new.write(fp_old.read().replace('{{ %s_name }}' % app_or_project, name).replace('{{ %s_name }}' % other, other_name))
             fp_old.close()
             fp_new.close()
+            shutil.copymode(path_old, path_new)
 
 def startproject(project_name, directory):
     "Creates a Django project for the given project_name in the given directory."
