@@ -8,9 +8,10 @@ model maps to a single database table.
 
 The basics:
 
-    * Each model is a Python class that subclasses ``django.core.meta.Model``.
+    * Each model is a Python class that subclasses ``django.db.models.Model``.
     * Each attribute of the model represents a database field.
     * Model metadata (non-field information) goes in an inner class named ``Meta``.
+    * Metadata used for administration purposes goes into an inner class named ``Admin``.
 
 A companion to this document is the `official repository of model examples`_.
 
@@ -20,15 +21,13 @@ Field objects
 =============
 
 The most important part of a model is the list of database fields it defines.
-Fields are defined by class attributes. Each class attribute in a model, aside
-from the optional inner ``class Meta``, should be an instance of a
-``meta.Field`` subclass.
+Fields are defined by class attributes. 
 
 In this example, there are two fields, ``first_name`` and ``last_name`` ::
 
-    class Person(meta.Model):
-        first_name = meta.CharField(maxlength=30)
-        last_name = meta.CharField(maxlength=30)
+    class Person(models.Model):
+        first_name = models.CharField(maxlength=30)
+        last_name = models.CharField(maxlength=30)
 
 Django will use ``first_name`` and ``last_name`` as the database column names.
 
@@ -40,19 +39,19 @@ name, converting underscores to spaces.
 
 In this example, the human-readable name is ``"Person's first name"``::
 
-    first_name = meta.CharField("Person's first name", maxlength=30)
+    first_name = models.CharField("Person's first name", maxlength=30)
 
 In this example, the human-readable name is ``"first name"``::
 
-    first_name = meta.CharField(maxlength=30)
+    first_name = models.CharField(maxlength=30)
 
 ``ForeignKey``, ``ManyToManyField`` and ``OneToOneField`` require the first
 argument to be a model class, so use the ``verbose_name`` keyword argument to
 specify the human-readable name::
 
-    poll = meta.ForeignKey(Poll, verbose_name="the related poll")
-    sites = meta.ManyToManyField(Site, verbose_name="list of sites")
-    place = meta.OneToOneField(Place, verbose_name="related place")
+    poll = models.ForeignKey(Poll, verbose_name="the related poll")
+    sites = models.ManyToManyField(Site, verbose_name="list of sites")
+    place = models.OneToOneField(Place, verbose_name="related place")
 
 Convention is not to capitalize the first letter of the ``verbose_name``.
 Django will automatically capitalize the first letter where it needs to.
@@ -104,24 +103,23 @@ The following arguments are available to all field types. All are optional.
     The first element in each tuple is the actual value to be stored. The
     second element is the human-readable name for the option.
 
-    Define the choices list **outside** of your model class, not inside it.
-    For example, this is not valid::
+    The choices list can be defined either as part of your model class::
 
-        class Foo(meta.Model):
+        class Foo(models.Model):
             GENDER_CHOICES = (
                 ('M', 'Male'),
                 ('F', 'Female'),
             )
-            gender = meta.CharField(maxlength=1, choices=GENDER_CHOICES)
+            gender = models.CharField(maxlength=1, choices=GENDER_CHOICES)
 
-    But this is valid::
+    or outside your model class altogether::
 
         GENDER_CHOICES = (
             ('M', 'Male'),
             ('F', 'Female'),
         )
-        class Foo(meta.Model):
-            gender = meta.CharField(maxlength=1, choices=GENDER_CHOICES)
+        class Foo(models.Model):
+            gender = models.CharField(maxlength=1, choices=GENDER_CHOICES)
 
 ``core``
     For objects that are edited inline to a related object.
@@ -162,7 +160,7 @@ The following arguments are available to all field types. All are optional.
     If you don't specify ``primary_key=True`` for any fields in your model,
     Django will automatically add this field::
 
-        id = meta.AutoField('ID', primary_key=True)
+        id = models.AutoField('ID', primary_key=True)
 
     Thus, you don't need to set ``primary_key=True`` on any of your fields
     unless you want to override the default primary-key behavior.
@@ -359,12 +357,12 @@ Here are all available field types:
     For example, to store numbers up to 999 with a resolution of 2 decimal places,
     you'd use::
 
-        meta.FloatField(..., max_digits=5, decimal_places=2)
+        models.FloatField(..., max_digits=5, decimal_places=2)
 
     And to store numbers up to approximately one billion with a resolution of 10
     decimal places::
 
-        meta.FloatField(..., max_digits=19, decimal_places=10)
+        models.FloatField(..., max_digits=19, decimal_places=10)
 
     The admin represents this as an ``<input type="text">`` (a single-line input).
 
@@ -420,7 +418,7 @@ Here are all available field types:
     from which to auto-populate the slug, via JavaScript, in the object's admin
     form::
 
-        meta.SlugField(prepopulate_from=("pre_name", "name"))
+        models.SlugField(prepopulate_from=("pre_name", "name"))
 
     ``prepopulate_from`` doesn't accept DateTimeFields.
 
@@ -466,7 +464,7 @@ Relationships
 -------------
 
 Clearly, the power of relational databases lies in relating tables to each
-other. Django offers ways to define the most common types of database
+other. Django offers ways to define the three most common types of database
 relationships: Many-to-one, many-to-many and one-to-one.
 
 Many-to-one relationships
@@ -479,23 +477,34 @@ any other ``Field`` type: by including it as a class attribute of your model.
 related.
 
 For example, if a ``Place`` model is in a ``City`` -- that is, a ``City``
-contains multiple places but each ``Place`` is only in one ``City`` -- here's
-how you'd represent that::
+contains multiple places but each ``Place`` is only in one ``City`` -- use the
+following definitions::
 
-    class City(meta.Model):
+    class City(models.Model):
         # ...
 
-    class Place(meta.Model):
+    class Place(models.Model):
         # ...
-        city = meta.ForeignKey(City)
+        city = models.ForeignKey(City)
 
 To create a recursive relationship -- an object that has a many-to-one
-relationship with itself -- use ``meta.ForeignKey("self")``.
+relationship with itself -- use ``models.ForeignKey("self")``.
+
+If you need to create a relationship on a model that has not yet been defined,
+you can use the name of the model, rather than the model object itself:: 
+
+    class Place(models.Model):
+        # ...
+        city = models.ForeignKey("City")
+
+    class City(models.Model):
+        # ...
 
 The name of a ``ForeignKey`` (``city`` in the example above) generally should
-be the name of the model, singular. Behind the scenes, Django appends "_id" to
-the field name to create its database column name. But your code should never
-have to deal with the database column name, unless you write custom SQL.
+be the name of the model, in singular form. Behind the scenes, Django appends 
+"_id" to the field name to create its database column name. However, your code 
+should never have to deal with the database column name, unless you write 
+custom SQL.
 
 See the `Many-to-one relationship model example`_ for a full example.
 
@@ -510,7 +519,7 @@ relationship should work. All are optional:
     ``edit_inline``          If not ``False``, this related object is edited
                              "inline" on the related object's page. This means
                              that the object will not have its own admin
-                             interface. Use either ``meta.TABULAR`` or ``meta.STACKED``,
+                             interface. Use either ``models.TABULAR`` or ``models.STACKED``,
                              which, respectively, designate whether the inline-editable
                              objects are displayed as a table or as a "stack" of
                              fieldsets.
@@ -518,10 +527,10 @@ relationship should work. All are optional:
     ``limit_choices_to``     A dictionary of lookup arguments and values (see
                              the `Database API reference`_) that limit the
                              available admin choices for this object. Use this
-                             with ``meta.LazyDate`` to limit choices of objects
+                             with ``models.LazyDate`` to limit choices of objects
                              by date. For example::
 
-                                limit_choices_to = {'pub_date__lte' : meta.LazyDate()}
+                                limit_choices_to = {'pub_date__lte' : models.LazyDate()}
 
                              only allows the choice of related objects with a
                              ``pub_date`` before the current date/time to be
@@ -565,20 +574,18 @@ relationship should work. All are optional:
                              object back to this one.  For example, when if
                              ``Topping`` has this field::
 
-                                    meta.ForeignKey(Pizza)
+                                    models.ForeignKey(Pizza)
 
-                             the ``related_name`` will be "topping" (taken from
+                             the ``related_name`` will be "topping_set" (taken from
                              the class name), which will in turn give ``Pizza``
-                             the methods ``get_topping_list()`` and
-                             ``get_topping_count()``.
+                             a ``topping_set`` Object Set Descriptor.
 
                              If you instead were to use::
 
-                                    meta.ForeignKey(Pizza, related_name="munchie")
+                                    models.ForeignKey(Pizza, related_name="munchies")
 
-                             then the methods would be called
-                             ``get_munchie_list()``, ``get_munchie_count()``,
-                             etc.
+                             then the Object Set Descriptor on ``Topping`` would
+                             be called ``munchies``.
 
                              This is only really useful when you have a single
                              object that relates to the same object more than
@@ -587,12 +594,12 @@ relationship should work. All are optional:
                              fields, to make sure that the ``Category`` objects
                              have the correct methods, you'd use fields like::
 
-                                    meta.ForeignKey(Category, related_name="primary_story")
-                                    meta.ForeignKey(Category, related_name="secondary_story")
+                                    models.ForeignKey(Category, related_name="primary_stories")
+                                    models.ForeignKey(Category, related_name="secondary_stories")
 
-                             ...which would give the ``Category`` objects
-                             methods named ``get_primary_story_list()`` and
-                             ``get_secondary_story_list()``.
+                             ...which would give ``Category`` objects two Object Set
+                             descriptors - one called ``primary_stories`` and one 
+                             called ``secondary_stories``.
 
     ``to_field``             The field on the related object that the relation
                              is to. By default, Django uses the primary key of
@@ -615,15 +622,19 @@ For example, if a ``Pizza`` has multiple ``Topping`` objects -- that is, a
 ``Topping`` can be on multiple pizzas and each ``Pizza`` has multiple toppings --
 here's how you'd represent that::
 
-    class Topping(meta.Model):
+    class Topping(models.Model):
         # ...
 
-    class Pizza(meta.Model):
+    class Pizza(models.Model):
         # ...
-        toppings = meta.ManyToManyField(Topping)
+        toppings = models.ManyToManyField(Topping)
 
-The name of a ``ManyToManyField`` (``toppings`` in the example above) generally
-should be the name of the model, plural.
+As with ``ForeignKey``, a relationship to self can be defined by using the
+string ``"self"`` instead of the model name; references to as-yet undefined
+models can be made by using a string containing the model name.
+
+The name of a ``ManyToManyField`` (``toppings`` in the example above) should
+generally be a plural describing the set of related model objects.
 
 Behind the scenes, Django creates an intermediary join table to represent the
 many-to-many relationship.
@@ -654,7 +665,7 @@ the relationship should work. All are optional:
     ``filter_interface``     Use a nifty unobtrusive Javascript "filter" interface
                              instead of the usability-challenged ``<select multiple>``
                              in the admin form for this object. The value should be
-                             ``meta.HORIZONTAL`` or ``meta.VERTICAL`` (i.e.
+                             ``models.HORIZONTAL`` or ``models.VERTICAL`` (i.e.
                              should the interface be stacked horizontally or
                              vertically).
 
@@ -667,6 +678,24 @@ the relationship should work. All are optional:
                              version of the class being linked to.  Use the singular
                              parameter to change this, which is if you want one model to
                              have multiple ``ManyToMany`` relationships to another model.
+                             
+    ``symmetrical``          Only used in the definition of ManyToManyFields on self.
+                             Consider the following model:
+                             
+                             class Person(models.Model):
+                                 friends = models.ManyToManyField("self")
+                             
+                             When Django processes this model, it identifies that it has
+                             a ManyToManyField on itself, and as a result, it doesn't add
+                             a ``person_set`` attribute to the Person class. Instead, the
+                             ManyToManyField is assumed to be symmetrical - that is, if 
+                             I am your friend, then you are my friend. 
+                             
+                             If you do not want symmetry in ManyToMany relationships with 
+                             self, set ``symmetrical`` to False. This will force Django to 
+                             add the descriptor for the reverse relationship, allow 
+                             ManyToMany relationships to be non-symmetrical. 
+                             
     =======================  ============================================================
 
 One-to-one relationships
@@ -680,7 +709,7 @@ This is most useful on the primary key of an object when that object "extends"
 another object in some way.
 
 ``OneToOneField`` requires a positional argument: The class to which the
-model is related.
+model is related. 
 
 For example, if you're building a database of "places", you would build pretty
 standard stuff such as address, phone number, etc. in the database. Then, if you
@@ -688,6 +717,10 @@ wanted to build a database of restaurants on top of the places, instead of
 repeating yourself and replicating those fields in the ``Restaurant`` model, you
 could make ``Restaurant`` have a ``OneToOneField`` to ``Place`` (because a
 restaurant "is-a" place).
+
+As with ``ForeignKey``, a relationship to self can be defined by using the
+string ``"self"`` instead of the model name; references to as-yet undefined
+models can be made by using a string containing the model name.
 
 This ``OneToOneField`` will actually replace the primary key ``id`` field
 (since one-to-one relations share the same primary key), and has a few
@@ -710,23 +743,16 @@ Meta options
 
 Give your model metadata by using an inner ``"class Meta"``, like so::
 
-    class Foo(meta.Model):
-        bar = meta.CharField(maxlength=30)
+    class Foo(models.Model):
+        bar = models.CharField(maxlength=30)
         # ...
         class Meta:
-            admin = meta.Admin()
             # ...
 
-Model metadata is "anything that's not a field" -- ordering options, admin
-options, etc.
+Model metadata is "anything that's not a field" -- ordering options, etc.
 
 Here's a list of all possible ``Meta`` options. No options are required. Adding
 ``class Meta`` to a model is completely optional.
-
-``admin``
-    A ``meta.Admin`` object; see `Admin options`_. If this field is given, the
-    object will have an admin interface. If it isn't given, the object won't
-    have one.
 
 ``db_table``
     The name of the database table to use for the module::
@@ -755,9 +781,7 @@ Here's a list of all possible ``Meta`` options. No options are required. Adding
 
         module_name = "pizza_orders"
 
-    If this isn't given, Django will use a lowercased version of the class
-    name, plus ``"s"``. This "poor man's pluralization" is intentional: Any
-    other level of magic pluralization would get confusing.
+    If this isn't given, Django will use a lowercase version of the class name.
 
 ``order_with_respect_to``
     Marks this object as "orderable" with respect to the given field. This is
@@ -770,7 +794,7 @@ Here's a list of all possible ``Meta`` options. No options are required. Adding
     to allow the toppings to be ordered with respect to the associated pizza.
 
 ``ordering``
-    The default ordering for the object, for use by ``get_list`` and the admin::
+    The default ordering for the object, for use when obtaining lists of objects::
 
         ordering = ['-order_date']
 
@@ -836,9 +860,20 @@ Here's a list of all possible ``Meta`` options. No options are required. Adding
 Admin options
 =============
 
-The ``admin`` field in the model tells Django how to construct the admin
-interface for the object.  The field is an instance of the ``meta.Admin``
-object, which takes the following parameters. All are optional.
+If you want your model to be visible to the automatic Administration 
+system, your model must have an inner ``"class Admin"``, like so::
+
+    class Foo(models.Model):
+        bar = models.CharField(maxlength=30)
+        # ...
+        class Admin:
+            # ...
+
+The Admin class gives instructions to Django on how to display the Model 
+to the Administration system.
+
+Here's a list of all possible ``Admin`` options. No options are required. Adding
+``class Admin`` to a model is completely optional.
 
 ``date_hierarchy``
     To allow filtering of objects in the admin by date, set ``date_hierarchy``
@@ -892,8 +927,7 @@ object, which takes the following parameters. All are optional.
 
         .. image:: http://media.djangoproject.com/img/doc/flatfiles_admin.png
 
-    If ``fields`` isn't given but a model does define ``admin`` as a
-    ``meta.Admin`` object, Django will default to displaying each field that
+    If ``fields`` isn't given Django will default to displaying each field that
     isn't an ``AutoField`` and has ``editable=True``, in a single fieldset, in
     the same order as the fields are defined in the model.
 
@@ -979,7 +1013,80 @@ object, which takes the following parameters. All are optional.
 Managers
 ========
 
-... Need to describe managers here
+The Manager is the interface through which database query operations 
+are provided to Django applications. At least one Manager exists for
+every model in a Django application.
+
+By default, Django will add a Manager with the name of ``objects`` to 
+every Django model. However, if you wish to use ``objects`` as a field
+name, or if you wish to use a name other than ``objects`` for the Manager,
+you can rename the Manager on a per-model basis. To rename the Manager 
+for a given class, define a class attribute of type models.Manager() 
+on that model. For example::
+
+    from django.db import models
+    
+    class Person(models.Model):
+        #...
+        people = models.Manager()
+
+In this example, ``Person.objects.all()`` will generate an error, but 
+``Person.people.all()`` will provide a list of all ``Person`` objects.
+
+Managers can also be customized. This is achieved by extending the
+base Manager class, and instantiating the new Manager on your model.
+There are two reasons that you may want to customize a Manager: firstly, 
+to add utility methods to the Manager, and secondly, to modify the 
+initial Query Set provided by the Manager.
+
+To modify the initial Query Set provided by a Manager, override the
+``get_query_set()`` method to return a Query Set with the properties
+you require. For example::
+
+    class PersonManager(models.Manager):
+        # Add some custom behavior to the Manager
+        def move_house(self):
+            # Some logic to help a person move house
+            
+        # Modify the initial Query Set provided by the manager
+        def get_query_set(self):
+            return super(Manager, self).get_query_set().filter(name__startswith="Fred")
+        
+    class Person(models.Model):
+        #...
+        objects = PersonManager()
+
+In this example, ``Person.objects.all()`` will only return people whose name starts
+with "Fred"; ``Person.objects.move_house()`` will also be available.
+
+If required, you can add multiple Managers to a model. Every Manager attribute
+added to a model can be accessed and used as a manager. This is an easy way
+to define common filters types for your models. For example, the model::
+
+    class MaleManager(models.Manager):
+        def get_query_set(self):
+            return super(Manager, self).get_query_set().filter(sex='M')
+
+    class FemaleManager(models.Manager):
+        def get_query_set(self):
+            return super(Manager, self).get_query_set().filter(sex='F')
+            
+    class Person(models.Model):
+        #...
+        people = models.Manager()
+        men = MaleManager()
+        women = FemaleManager()
+
+... will allow end users to request ``Person.men.all()``, ``Person.women.all()``, 
+and ``Person.people.all()``, yielding predictable results.
+
+If you are going to install a customized Manager, be warned that the first
+Manager that Django encounters in a model definition has special status.
+Django interprets the first Manager defined in a class as the default Manager. 
+Certain operations use the default Manager to obtain lists of objects, so it 
+is generally a good idea for the first Manager to be relatively unfiltered.
+In the last example, ``people`` is defined first - so the default Manager
+will include everyone.
 
 Model methods
 =============
@@ -988,11 +1095,11 @@ There are a number of methods you can define on model objects to control the
 object's behavior.  First, any methods you define will be available as methods
 of object instances. For example::
 
-    class Pizza(meta.Model):
+    class Pizza(models.Model):
         # ...
 
         def is_disgusting(self):
-            return "anchovies" in [topping.name for topping in self.get_topping_list()]
+            return "anchovies" in [topping.name for topping in self.toppings.all()]
 
 Now, every ``Pizza`` object will have a ``is_disgusting()`` method.
 
@@ -1040,26 +1147,30 @@ A few object methods have special meaning:
 Module-level methods
 --------------------
 
-Since each data class effectively turns into a "magic" Python module under
-``django.models``, there are times you'll want to write methods that live in
-that module.  Any model method that begins with "_module_" is turned into a
-module-level function::
+If you want to add a method to the Model, rather than instances of the model, 
+you can use the Python ``staticmethod`` and ``classmethod`` operators. For
+example::
 
-    class Pizza(meta.Model):
+    class Pizza(models.Model):
         # ...
 
-        def _module_get_pizzas_to_deliver():
+        def get_pizzas_to_deliver():
             return get_list(delivered__exact=False)
-
+        get_pizzas_to_deliver = staticmethod(get_pizzas_to_deliver)
+        
+Or, using Python 2.4 decorators::
+    
+    # ...
+    @staticmethod
+    def get_pizzas_to_deliver():
+        # ...
+        
 This will make the top-level ``pizzas`` module have a ``get_pizzas_to_deliver()``
 method::
 
-    >>> from django.models.pizza_hut import pizzas
-    >>> pizzas.get_pizzas_to_deliver()
+    >>> from pizza_hut.models import Pizza
+    >>> Pizza.get_pizzas_to_deliver()
     [ ... ]
-
-Note that the scope of these methods is modified to be the same as the module
-scope. These methods do NOT have access to globals within your model's module.
 
 Manipulator methods
 -------------------
@@ -1069,7 +1180,7 @@ that being with "_manipulator_". This is most useful for providing custom
 validators for certain fields, because manipulators automatically call any
 method that begins with "validate"::
 
-    class Pizza(meta.Model):
+    class Pizza(models.Model):
         # ...
 
         def _manipulator_validate_customer_id(self, field_data, all_data):
@@ -1083,14 +1194,15 @@ Executing custom SQL
 --------------------
 
 Feel free to write custom SQL statements in custom model methods and
-module-level methods. Each custom method automatically has access to the
-variable ``db``, which is the current database connection. To use it, call
-``db.cursor()`` to get a cursor object. Then, call ``cursor.execute(sql, [params])``
+module-level methods. The object ``django.db.connection`` object represents
+the current database connection. To use it, call ``connection.cursor()`` to 
+get a cursor object. Then, call ``cursor.execute(sql, [params])``
 to execute the SQL and ``cursor.fetchone()`` or ``cursor.fetchall()`` to return
 the resulting rows. Example::
 
     def my_custom_sql(self):
-        cursor = db.cursor()
+        from django.db import connection
+        cursor = connection.cursor()
         cursor.execute("SELECT foo FROM bar WHERE baz = %s", [self.baz])
         row = cursor.fetchone()
         return row
@@ -1099,11 +1211,12 @@ If your custom SQL statement alters the data in your database -- for example,
 via a ``DELETE`` or ``UPDATE`` -- you'll need to call ``db.commit()``. Example::
 
     def my_custom_sql2(self):
-        cursor = db.cursor()
+        from django.db import connection
+        cursor = connection.cursor()
         cursor.execute("DELETE FROM bar WHERE baz = %s", [self.baz])
-        db.commit()
+        connection.commit()
 
-``db`` and ``cursor`` simply use the standard `Python DB-API`_. If you're not
+``connection`` and ``cursor`` simply use the standard `Python DB-API`_. If you're not
 familiar with the Python DB-API, note that the SQL statement in
 ``cursor.execute()`` uses placeholders, ``"%s"``, rather than adding parameters
 directly within the SQL. If you use this technique, the underlying database
@@ -1115,83 +1228,34 @@ just the ``where``, ``tables`` and ``params`` arguments to the standard lookup
 API. See `Other lookup options`_.
 
 .. _Python DB-API: http://www.python.org/peps/pep-0249.html
-.. _Other lookup options: http://www.djangoproject.com/documentation/db_api/#other-lookup-options
+.. _Other lookup options: http://www.djangoproject.com/documentation/db_api/#extra-params-select-where-tables
 
 Using models
 ============
 
-Once you've defined a model, you'll need to "enable" it in Django. This section
-explains how Django searches for available models.
+Once you have created your model, you have to tell Django about your new application.
+This is done by editing your settings file and adding the name of the module that 
+contains your models module to the ``INSTALLED_APPS`` tuple. 
 
-Save your models in a normal Python module. Put this module within a package
-called "models", which should itself be a subpackage of some other package on
-your Python path. The ``__init__.py`` in your ``models`` package should contain
-an ``__all__`` variable that is set to a list of all model module names within
-the ``models`` directory.
+For example, if the models for your application are contained in the module 
+``project.myapp.models`` (the package structure that is created for an application 
+by the ``django-admin.py startapp`` script), ``INSTALLED_APPS`` should read, in part::
 
-If this sounds confusing, just use ``django-admin.py startapp`` -- it'll create
-the proper directory structure and ``__init__.py`` files. (See the
-`django-admin.py documentation`_ .)
-
-For example, if you save your models in a module called ``mymodels.py``, here's
-a directory layout you might use::
-
-    myapp/
-        __init__.py          # Empty file
-        models/
-            __init__.py      # Contains "__all__ = ['mymodels']"
-            mymodels.py      # Contains your models
-
-Then, you'll have to tell Django that the ``myapp`` application is installed.
-Do this by editing your settings file and adding ``"myapp"`` to the
-``INSTALLED_APPS`` tuple.
-
-Again, if this sounds confusing, use ``django-admin.py startapp`` to take care
-of package creation for you. This documentation exists only to explain how
-Django works.
-
-Once you've added your app to ``INSTALLED_APPS``, you can open a Python
-interactive interpreter and play with your model::
-
-    >>> from django.models.mymodels import pizzas
-    >>> pizzas.get_list()
-
-Note that the import is from ``django.models``, not ``myapp.models``. Django
-creates a "magic" module within ``django.models`` for every installed
-application. Each of those magic modules has a dynamic API. See the
-`database API reference`_ for full information on how to use this API.
-
-.. admonition:: Why is the INSTALLED_APPS setting necessary?
-
-   Model relationships work both ways, and the dynamically-generated Django API
-   creates API lookups in both directions. Thus, for Django to figure out all
-   the other models related to a particular model, it has to know the complete
-   spectrum of installed apps.
-
-.. _`django-admin.py documentation`: http://www.djangoproject.com/documentation/django_admin/
-.. _`database API reference`: http://www.djangoproject.com/documentation/db_api/
+    INSTALLED_APPS = (
+        #...
+        project.myapp,
+        #...
+    )
 
 Models across files
 ===================
 
 It's perfectly OK to relate a model to one from another module. To do this,
-just import the model module at the top of your model module, like so::
+just import the model module at the top of your model module. Then, just 
+refer to the other model class wherever needed. For example::
 
-    from django.models import core
+    from myproject.otherapp import Site
 
-Make sure you're importing from ``django.models``, not directly from your model
-module.
-
-Then, just refer to the other model class wherever needed. For example::
-
-    class MyModel(meta.Model):
+    class MyModel(models.Model):
         # ...
-        sites = meta.ManyToManyField(core.Site)
-
-Models in multiple files
-========================
-
-If you want to have multiple model modules in a ``"models"`` directory, make
-sure you edit ``"models/__init__.py"`` and add the name of your model module
-to the ``__all__`` variable. If your ``models`` package doesn't have your model
-module in ``__all__``, Django won't see any of the models in that module.
+        sites = models.ManyToManyField(Site)
