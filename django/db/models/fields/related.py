@@ -116,7 +116,7 @@ class ReverseSingleRelatedObjectDescriptor(object):
 
     def __get__(self, instance, instance_type=None):
         if instance is None:
-            raise AttributeError, "%s must be accessed via instance" % self._field.name
+            raise AttributeError, "%s must be accessed via instance" % self.field.name
         cache_name = self.field.get_cache_name()
         try:
             return getattr(instance, cache_name)
