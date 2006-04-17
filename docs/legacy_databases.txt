@@ -18,6 +18,7 @@ You'll need to tell Django what your database connection parameters are, and
 what the name of the database is. Do that by editing these settings in your
 `settings file`_:
 
+    * `DATABASE_NAME`
     * `DATABASE_ENGINE`_
     * `DATABASE_USER`_
     * `DATABASE_PASSWORD`_
@@ -26,6 +27,7 @@ what the name of the database is. Do that by editing these settings in your
     * `DATABASE_PORT`_
 
 .. _settings file: http://www.djangoproject.com/documentation/settings/
+.. _DATABASE_NAME: http://www.djangoproject.com/documentation/settings/#database-name
 .. _DATABASE_ENGINE: http://www.djangoproject.com/documentation/settings/#database-engine
 .. _DATABASE_USER: http://www.djangoproject.com/documentation/settings/#database-user
 .. _DATABASE_PASSWORD: http://www.djangoproject.com/documentation/settings/#database-password
@@ -39,13 +41,11 @@ Auto-generate the models
 Django comes with a utility that can create models by introspecting an existing
 database. You can view the output by running this command::
 
-    django-admin.py inspectdb [databasename] --settings=path.to.settings
-
-...where "[databasename]" is the name of your database.
+    django-admin.py inspectdb --settings=path.to.settings
 
 Save this as a file by using standard Unix output redirection::
 
-    django-admin.py inspectdb [databasename] --settings=path.to.settings > appname.py
+    django-admin.py inspectdb --settings=path.to.settings > appname.py
 
 This feature is meant as a shortcut, not as definitive model generation. See
 the `django-admin.py documentation`_ for more information.

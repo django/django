@@ -668,7 +668,7 @@ def startapp(app_name, directory):
 startapp.help_doc = "Creates a Django app directory structure for the given app name in the current directory."
 startapp.args = "[appname]"
 
-def inspectdb(db_name):
+def inspectdb():
     "Generator that introspects the tables in the given database name and returns a Django model, one line at a time."
     from django.db import connection, get_introspection_module
     from django.conf import settings
@@ -680,7 +680,6 @@ def inspectdb(db_name):
         object_name = table_name.title().replace('_', '')
         return object_name.endswith('s') and object_name[:-1] or object_name
 
-    settings.DATABASE_NAME = db_name
     cursor = connection.cursor()
     yield "# This is an auto-generated Django model module."
     yield "# You'll have to do the following manually to clean this up:"
@@ -776,7 +775,7 @@ def inspectdb(db_name):
         yield '        db_table = %r' % table_name
         yield ''
 inspectdb.help_doc = "Introspects the database tables in the given database and outputs a Django model module."
-inspectdb.args = "[dbname]"
+inspectdb.args = ""
 
 class ModelErrorCollection:
     def __init__(self, outfile=sys.stdout):
@@ -1153,11 +1152,7 @@ def execute_from_command_line(action_mapping=DEFAULT_ACTION_MAPPING):
         action_mapping[action]()
     elif action == 'inspectdb':
         try:
-            param = args[1]
-        except IndexError:
-            parser.print_usage_and_exit()
-        try:
-            for line in action_mapping[action](param):
+            for line in action_mapping[action]():
                 print line
         except NotImplementedError:
             sys.stderr.write(style.ERROR("Error: %r isn't supported for the currently selected database backend.\n" % action))

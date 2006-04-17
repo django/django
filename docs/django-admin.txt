@@ -91,11 +91,11 @@ example, the default settings don't define ``ROOT_URLCONF``, so
 
 Note that Django's default settings live in ``django/conf/global_settings.py``.
 
-inspectdb [dbname]
-------------------
+inspectdb
+---------
 
-Introspects the database tables in the given database and outputs a Django
-model module to standard output.
+Introspects the database tables in the database pointed-to by the
+``DATABASE_NAME`` setting and outputs a Django model module to standard output.
 
 Use this if you have a legacy database with which you'd like to use Django.
 The script will inspect the database and create a model for each table within
@@ -124,13 +124,11 @@ you run it, you'll want to look over the generated models yourself to make
 customizations. In particular, you'll need to rearrange models' order, so that
 models that refer to other models are ordered properly.
 
-If you're using Django 0.90 or 0.91, you'll need to add ``primary_key=True`` to
-one field in each model. In the Django development version, primary keys are
-automatically introspected for PostgreSQL and MySQL, and Django puts in the
-``primary_key=True`` where needed.
+Primary keys are automatically introspected for PostgreSQL and MySQL, and
+Django puts in the ``primary_key=True`` where needed.
 
 ``inspectdb`` works with PostgreSQL, MySQL and SQLite. Foreign-key detection
-only works in PostgreSQL.
+only works in PostgreSQL and with certain types of MySQL tables.
 
 install [modelmodule modelmodule ...]
 -------------------------------------
