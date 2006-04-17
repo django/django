@@ -56,7 +56,7 @@ So let's create a ``vote()`` function in ``mysite/polls/views.py``::
             selected_choice = p.choice_set.filter(pk=request.POST['choice'])
         except (KeyError, Choice.DoesNotExist):
             # Redisplay the poll voting form.
-            return render_to_response('polls/detail', {
+            return render_to_response('polls/detail.html', {
                 'poll': p,
                 'error_message': "You didn't select a choice.",
             })
@@ -192,13 +192,13 @@ objects" and "display a detail page for a particular type of object."
       ``object_id`` for the generic views.
 
 By default, the ``object_detail`` generic view uses a template called
-``<app name>/<module name>_detail``. In our case, it'll use the template
-``"polls/poll_detail"``. Thus, rename your ``polls/detail.html`` template to
+``<app name>/<module name>_detail.html``. In our case, it'll use the template
+``"polls/poll_detail.html"``. Thus, rename your ``polls/detail.html`` template to
 ``polls/poll_detail.html``, and change the ``render_to_response()`` line in
 ``vote()``.
 
 Similarly, the ``object_list`` generic view uses a template called
-``<app name>/<module name>_list``. Thus, rename ``poll/index.html`` to
+``<app name>/<module name>_list.html``. Thus, rename ``poll/index.html`` to
 ``polls/poll_list.html``.
 
 Because we have more than one entry in the URLconf that uses ``object_detail``
