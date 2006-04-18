@@ -28,8 +28,8 @@ handle transactions. To activate this feature, just add the
 ``TransactionMiddleware`` middleware to your stack::
 
     MIDDLEWARE_CLASSES = (
+        "django.contrib.sessions.middleware.SessionMiddleware",
         "django.middleware.common.CommonMiddleware",
-        "django.middleware.sessions.SessionMiddleware",
         "django.middleware.cache.CacheMiddleware",
         "django.middleware.transaction.TransactionMiddleware",
     )

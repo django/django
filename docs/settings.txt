@@ -520,7 +520,8 @@ MIDDLEWARE_CLASSES
 
 Default::
 
-    ("django.middleware.sessions.SessionMiddleware",
+    ("django.contrib.sessions.middleware.SessionMiddleware",
+     "django.contrib.auth.middleware.AuthenticationMiddleware",
      "django.middleware.common.CommonMiddleware",
      "django.middleware.doc.XViewMiddleware")
 
