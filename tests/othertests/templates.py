@@ -4,6 +4,7 @@ from django.conf import settings
 from django import template
 from django.template import loader
 from django.utils.translation import activate, deactivate, install
+from datetime import datetime
 import traceback
 
 #################################
@@ -151,6 +152,12 @@ TEMPLATE_TESTS = {
     # In methods that raise an exception without a "silent_variable_attribute" set to True,
     # the exception propogates
     'basic-syntax34': (r'1{{ var.method4 }}2', {"var": SomeClass()}, SomeOtherException),
+
+    # Escaped backslash in argument
+    'basic-syntax35': (r'{{ var|default_if_none:"foo\bar" }}', {"var": None}, r'foo\bar'),
+
+    # Escaped backslash using known escape char
+    'basic-syntax35': (r'{{ var|default_if_none:"foo\now" }}', {"var": None}, r'foo\now'),
 
     ### COMMENT TAG ###########################################################
     'comment-tag01': ("{% comment %}this is hidden{% endcomment %}hello", {}, "hello"),
@@ -433,6 +440,15 @@ TEMPLATE_TESTS = {
     'widthratio08': ('{% widthratio %}', {}, template.TemplateSyntaxError),
     'widthratio09': ('{% widthratio a b %}', {'a':50,'b':100}, template.TemplateSyntaxError),
     'widthratio10': ('{% widthratio a b 100.0 %}', {'a':50,'b':100}, template.TemplateSyntaxError),
+    
+    ### NOW TAG ########################################################
+    # Simple case
+    'now01' : ('{% now "j n Y"%}', {}, str(datetime.now().day) + ' ' + str(datetime.now().month) + ' ' + str(datetime.now().year)),
+    
+    # Check parsing of escaped and special characters
+    'now02' : ('{% now "j "n" Y"%}', {}, template.TemplateSyntaxError),
+#    'now03' : ('{% now "j \"n\" Y"%}', {}, str(datetime.now().day) + '"' + str(datetime.now().month) + '"' + str(datetime.now().year)),
+#    'now04' : ('{% now "j \nn\n Y"%}', {}, str(datetime.now().day) + '\n' + str(datetime.now().month) + '\n' + str(datetime.now().year))
 }
 
 def test_template_loader(template_name, template_dirs=None):

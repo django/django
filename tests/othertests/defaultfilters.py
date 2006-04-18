@@ -1,4 +1,4 @@
-"""
+r"""
 >>> floatformat(7.7)
 '7.7'
 >>> floatformat(7.0)
@@ -12,8 +12,8 @@
 >>> floatformat(0.0)
 '0'
 
->>> addslashes('"double quotes" and \\'single quotes\\'')
-'\\\\"double quotes\\\\" and \\\\\\'single quotes\\\\\\''
+>>> addslashes('"double quotes" and \'single quotes\'')
+'\\"double quotes\\" and \\\'single quotes\\\''
 
 >>> capfirst('hello world')
 'Hello world'
@@ -21,17 +21,17 @@
 >>> fix_ampersands('Jack & Jill & Jeroboam')
 'Jack &amp; Jill &amp; Jeroboam'
 
->>> linenumbers('line 1\\nline 2')
-'1. line 1\\n2. line 2'
+>>> linenumbers('line 1\nline 2')
+'1. line 1\n2. line 2'
 
->>> linenumbers('\\n'.join(['x'] * 10))
-'01. x\\n02. x\\n03. x\\n04. x\\n05. x\\n06. x\\n07. x\\n08. x\\n09. x\\n10. x'
+>>> linenumbers('\n'.join(['x'] * 10))
+'01. x\n02. x\n03. x\n04. x\n05. x\n06. x\n07. x\n08. x\n09. x\n10. x'
 
 >>> lower('TEST')
 'test'
 
->>> lower(u'\\xcb') # uppercase E umlaut
-u'\\xeb'
+>>> lower(u'\xcb') # uppercase E umlaut
+u'\xeb'
 
 >>> make_list('abc')
 ['a', 'b', 'c']
@@ -48,7 +48,7 @@ u'\\xeb'
 >>> stringformat(1, 'z')
 ''
 
->>> title('a nice title, isn\\'t it?')
+>>> title('a nice title, isn\'t it?')
 "A Nice Title, Isn't It?"
 
 
@@ -68,8 +68,8 @@ u'\\xeb'
 >>> upper('Mixed case input')
 'MIXED CASE INPUT'
 
->>> upper(u'\\xeb') # lowercase e umlaut
-u'\\xcb'
+>>> upper(u'\xeb') # lowercase e umlaut
+u'\xcb'
 
 
 >>> urlencode('jack & jill')
@@ -91,8 +91,8 @@ u'\\xcb'
 >>> wordcount('lots of words')
 3
 
->>> wordwrap('this is a long paragraph of text that really needs to be wrapped I\\'m afraid', 14)
-"this is a long\\nparagraph of\\ntext that\\nreally needs\\nto be wrapped\\nI'm afraid"
+>>> wordwrap('this is a long paragraph of text that really needs to be wrapped I\'m afraid', 14)
+"this is a long\nparagraph of\ntext that\nreally needs\nto be wrapped\nI'm afraid"
 
 >>> ljust('test', 10)
 'test      '
@@ -124,7 +124,7 @@ u'\\xcb'
 >>> linebreaks('line 1')
 '<p>line 1</p>'
 
->>> linebreaks('line 1\\nline 2')
+>>> linebreaks('line 1\nline 2')
 '<p>line 1<br />line 2</p>'
 
 >>> removetags('some <b>html</b> with <script>alert("You smell")</script> disallowed <img /> tags', 'script img')
@@ -133,19 +133,15 @@ u'\\xcb'
 >>> striptags('some <b>html</b> with <script>alert("You smell")</script> disallowed <img /> tags')
 'some html with alert("You smell") disallowed  tags'
 
->>> dictsort([{'age': 23, 'name': 'Barbara-Ann'},\
-              {'age': 63, 'name': 'Ra Ra Rasputin'},\
-              {'name': 'Jonny B Goode', 'age': 18}], 'age')
-[{'age': 18, 'name': 'Jonny B Goode'},\
- {'age': 23, 'name': 'Barbara-Ann'},\
- {'age': 63, 'name': 'Ra Ra Rasputin'}]
+>>> dictsort([{'age': 23, 'name': 'Barbara-Ann'},
+...           {'age': 63, 'name': 'Ra Ra Rasputin'},
+...           {'name': 'Jonny B Goode', 'age': 18}], 'age')
+[{'age': 18, 'name': 'Jonny B Goode'}, {'age': 23, 'name': 'Barbara-Ann'}, {'age': 63, 'name': 'Ra Ra Rasputin'}]
 
->>> dictsortreversed([{'age': 23, 'name': 'Barbara-Ann'},\
-              {'age': 63, 'name': 'Ra Ra Rasputin'},\
-              {'name': 'Jonny B Goode', 'age': 18}], 'age')
-[{'age': 63, 'name': 'Ra Ra Rasputin'},\
- {'age': 23, 'name': 'Barbara-Ann'},\
- {'age': 18, 'name': 'Jonny B Goode'}]
+>>> dictsortreversed([{'age': 23, 'name': 'Barbara-Ann'},
+...           {'age': 63, 'name': 'Ra Ra Rasputin'},
+...           {'name': 'Jonny B Goode', 'age': 18}], 'age')
+[{'age': 63, 'name': 'Ra Ra Rasputin'}, {'age': 23, 'name': 'Barbara-Ann'}, {'age': 18, 'name': 'Jonny B Goode'}]
 
 >>> first([0,1,2])
 0
@@ -196,13 +192,13 @@ False
 'aceg'
 
 >>> unordered_list(['item 1', []])
-'\\t<li>item 1</li>'
+'\t<li>item 1</li>'
 
 >>> unordered_list(['item 1', [['item 1.1', []]]])
-'\\t<li>item 1\\n\\t<ul>\\n\\t\\t<li>item 1.1</li>\\n\\t</ul>\\n\\t</li>'
+'\t<li>item 1\n\t<ul>\n\t\t<li>item 1.1</li>\n\t</ul>\n\t</li>'
 
 >>> unordered_list(['item 1', [['item 1.1', []], ['item 1.2', []]]])
-'\\t<li>item 1\\n\\t<ul>\\n\\t\\t<li>item 1.1</li>\\n\\t\\t<li>item 1.2</li>\\n\\t</ul>\\n\\t</li>'
+'\t<li>item 1\n\t<ul>\n\t\t<li>item 1.1</li>\n\t\t<li>item 1.2</li>\n\t</ul>\n\t</li>'
 
 >>> add('1', '2')
 3
@@ -228,6 +224,8 @@ False
 # real testing of date() is in dateformat.py
 >>> date(datetime.datetime(2005, 12, 29), "d F Y")
 '29 December 2005'
+>>> date(datetime.datetime(2005, 12, 29), r'jS o\f F')
+'29th of December'
 
 # real testing of time() is done in dateformat.py
 >>> time(datetime.time(13), "h")

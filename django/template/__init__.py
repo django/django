@@ -519,9 +519,9 @@ class FilterExpression(object):
                 args = []
                 constant_arg, i18n_arg, var_arg = match.group("constant_arg", "i18n_arg", "var_arg")
                 if i18n_arg:
-                    args.append((False, _(i18n_arg.replace('\\', ''))))
+                    args.append((False, _(i18n_arg.replace(r'\"', '"'))))
                 elif constant_arg:
-                    args.append((False, constant_arg.replace('\\', '')))
+                    args.append((False, constant_arg.replace(r'\"', '"')))
                 elif var_arg:
                     args.append((True, var_arg))
                 filter_func = parser.find_filter(filter_name)
