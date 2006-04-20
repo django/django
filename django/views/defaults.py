@@ -58,7 +58,7 @@ def shortcut(request, content_type_id, object_id):
         except Site.DoesNotExist:
             pass
 
-    # If all that malarky found an object domain, use it; otherwise fall back
+    # If all that malarkey found an object domain, use it; otherwise fall back
     # to whatever get_absolute_url() returned.
     if object_domain is not None:
         return http.HttpResponseRedirect('http://%s%s' % (object_domain, absurl))
