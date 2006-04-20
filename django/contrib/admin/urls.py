@@ -2,6 +2,7 @@ from django.conf.urls.defaults import *
 
 urlpatterns = patterns('',
     ('^$', 'django.contrib.admin.views.main.index'),
+    ('^r/(\d+)/(\d+)/$', 'django.views.defaults.shortcut'),
     ('^jsi18n/$', 'django.views.i18n.javascript_catalog', {'packages': 'django.conf'}),
     ('^logout/$', 'django.contrib.auth.views.logout'),
     ('^password_change/$', 'django.contrib.auth.views.password_change'),
