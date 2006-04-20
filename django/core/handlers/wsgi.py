@@ -63,7 +63,7 @@ class WSGIRequest(http.HttpRequest):
             pformat(self.META))
 
     def get_full_path(self):
-        return '%s%s' % (self.path, self.environ['QUERY_STRING'] and ('?' + self.environ['QUERY_STRING']) or '')
+        return '%s%s' % (self.path, self.environ.get('QUERY_STRING', '') and ('?' + self.environ.get('QUERY_STRING', '')) or '')
 
     def _load_post_and_files(self):
         # Populates self._post and self._files
