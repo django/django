@@ -207,15 +207,11 @@ class User(models.Model):
             if not settings.AUTH_PROFILE_MODULE:
                 raise SiteProfileNotAvailable
             try:
-                app, mod = settings.AUTH_PROFILE_MODULE.split('.')
-                module = __import__('ellington.%s.apps.%s' % (app, mod), [], [], [''])
-                self._profile_cache = module.get(user_id=self.id)
-            except ImportError:
-                try:
-                    module = __import__('django.models.%s' % settings.AUTH_PROFILE_MODULE, [], [], [''])
-                    self._profile_cache = module.get(user__id__exact=self.id)
-                except ImportError:
-                    raise SiteProfileNotAvailable
+                app_label, model_name = settings.AUTH_PROFILE_MODULE.split('.')
+                model = models.get_model(app_label, model_name)
+                self._profile_cache = model._default_manager.get(user__id__exact=self.id)
+            except ImportError, ImproperlyConfigured:
+                raise SiteProfileNotAvailable
         return self._profile_cache
 
 class Message(models.Model):
