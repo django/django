@@ -393,15 +393,13 @@ Default permissions
 Three basic permissions -- add, create and delete -- are automatically created
 for each Django model that has ``admin`` set. Behind the scenes, these
 permissions are added to the ``auth_permission`` database table when you run
-``django-admin.py install [app]``. You can view the exact SQL ``INSERT``
-statements by running ``django-admin.py sqlinitialdata [app]``.
+``django-admin.py syncdb``.
 
 Note that if your model doesn't have ``admin`` set when you run
-``django-admin.py install``, the permissions won't be created. If you
+``django-admin.py syncdb``, the permissions won't be created. If you
 initialize your database and add ``admin`` to models after the fact, you'll
-need to add the permissions to the database manually. Do this by running
-``django-admin.py installperms [app]``, which creates any missing permissions
-for the given app.
+need to run ``django-admin.py syncdb`` again. It will create any missing 
+permissions for all of your installed apps.
 
 Custom permissions
 ------------------
@@ -436,8 +434,8 @@ Fields
 ``Permission`` objects have the following fields:
 
     * ``name`` -- Required. 50 characters or fewer. Example: ``'Can vote'``.
-    * ``package`` -- Required. A reference to the ``packages`` database table,
-      which contains a record for each installed Django application.
+    * ``content_type`` -- Required. A reference to the ``django_content_types`` 
+      database table, which contains a record for each installed Django model.
     * ``codename`` -- Required. 100 characters or fewer. Example: ``'can_vote'``.
 
 Methods
