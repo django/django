@@ -101,7 +101,7 @@ page for the poll. Let's write that view::
 
     def results(request, poll_id):
         p = get_object_or_404(Poll, pk=poll_id)
-        return render_to_response('polls/results', {'poll': p})
+        return render_to_response('polls/results.html', {'poll': p})
 
 This is almost exactly the same as the ``detail()`` view from `Tutorial 3`_.
 The only difference is the template name. We'll fix this redundancy later.

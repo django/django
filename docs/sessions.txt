@@ -141,7 +141,7 @@ Here's a typical usage example::
             else:
                 return HttpResponse("Please enable cookies and try again.")
         request.session.set_test_cookie()
-        return render_to_response('foo/login_form')
+        return render_to_response('foo/login_form.html')
 
 Using sessions out of views
 ===========================

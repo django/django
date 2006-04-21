@@ -110,7 +110,7 @@ view with a form that submits to this flawed creation view::
         # Create a FormWrapper object that the template can use. Ignore
         # the last two arguments to FormWrapper for now.
         form = forms.FormWrapper(places.AddManipulator(), {}, {})
-        return render_to_response('places/naive_create_form', {'form': form})
+        return render_to_response('places/naive_create_form.html', {'form': form})
 
 (This view, as well as all the following ones, has the same imports as in the
 first example above.)
@@ -161,7 +161,7 @@ creation view that takes validation into account::
         # Check for validation errors
         errors = manipulator.get_validation_errors(new_data)
         if errors:
-            return render_to_response('places/errors', {'errors': errors})
+            return render_to_response('places/errors.html', {'errors': errors})
         else:
             manipulator.do_html2python(request.POST)
             new_place = manipulator.save(request.POST)
@@ -233,7 +233,7 @@ Below is the finished view::
 
         # Create the FormWrapper, template, context, response.
         form = forms.FormWrapper(manipulator, new_data, errors)
-        return render_to_response('places/create_form', {'form': form})
+        return render_to_response('places/create_form.html', {'form': form})
 
 and here's the ``create_form`` template::
 
@@ -322,7 +322,7 @@ about editing an existing one? It's shockingly similar to creating a new one::
             new_data = place.__dict__
 
         form = forms.FormWrapper(manipulator, new_data, errors)
-        return render_to_response('places/edit_form', {'form': form, 'place': place})
+        return render_to_response('places/edit_form.html', {'form': form, 'place': place})
 
 The only real differences are:
 
@@ -401,7 +401,7 @@ Here's a simple function that might drive the above form::
         else:
             errors = new_data = {}
         form = forms.FormWrapper(manipulator, new_data, errors)
-        return render_to_response('contact_form', {'form': form})
+        return render_to_response('contact_form.html', {'form': form})
 
 Validators
 ==========
