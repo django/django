@@ -114,7 +114,7 @@ methods:
       `DEFAULT_FROM_EMAIL`_ setting.
 
     * ``get_profile()`` -- Returns a site-specific profile for this user.
-      Raises ``django.models.auth.SiteProfileNotAvailable`` if the current site
+      Raises ``django.contrib.auth.models.SiteProfileNotAvailable`` if the current site
       doesn't allow profiles.
 
 .. _Django model: http://www.djangoproject.com/documentation/model_api/
@@ -191,7 +191,7 @@ Anonymous users
 ---------------
 
 ``django.contrib.auth.models.AnonymousUser`` is a class that implements
-the ``django.models.auth.users.User`` interface, with these differences:
+the ``django.contirb.auth.models.User`` interface, with these differences:
 
     * ``id`` is always ``None``.
     * ``is_anonymous()`` returns ``True`` instead of ``False``.
@@ -231,8 +231,8 @@ How to log a user in
 
 To log a user in, do the following within a view::
 
-    from django.models.auth import users
-    request.session[users.SESSION_KEY] = some_user.id
+    from django.contrib.auth.models import SESSION_KEY
+    request.session[SESSION_KEY] = some_user.id
 
 Because this uses sessions, you'll need to make sure you have
 ``SessionMiddleware`` enabled. See the `session documentation`_ for more
