@@ -695,7 +695,10 @@ class ChangeList(object):
         except models.FieldDoesNotExist:
             pass
         else:
-            if isinstance(f.rel, models.ManyToOneRel):
+            if isinstance(f.rel, models.OneToOneRel):
+                # For OneToOneFields, don't try to order by the related object's ordering criteria.
+                pass
+            elif isinstance(f.rel, models.ManyToOneRel):
                 rel_ordering = f.rel.to._meta.ordering and f.rel.to._meta.ordering[0] or f.rel.to._meta.pk.column
                 lookup_order_field = '%s.%s' % (f.rel.to._meta.db_table, rel_ordering)
 
