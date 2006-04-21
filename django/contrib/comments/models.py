@@ -48,9 +48,9 @@ class CommentManager(models.Manager):
         _karma_total_good and _karma_total_bad filled.
         """
         kwargs.setdefault('select', {})
-        kwargs['select']['_karma_total_good'] = 'SELECT COUNT(*) FROM comments_karma WHERE comments_karma.comment_id=comments.id AND score=1'
-        kwargs['select']['_karma_total_bad'] = 'SELECT COUNT(*) FROM comments_karma WHERE comments_karma.comment_id=comments.id AND score=-1'
-        return self.get_list(**kwargs)
+        kwargs['select']['_karma_total_good'] = 'SELECT COUNT(*) FROM comments_karmascore WHERE comments_karmascore.comment_id=comments.id AND score=1'
+        kwargs['select']['_karma_total_bad'] = 'SELECT COUNT(*) FROM comments_karmascore WHERE comments_karmascore.comment_id=comments.id AND score=-1'
+        return self.filter(**kwargs)
 
     def user_is_moderator(self, user):
         if user.is_superuser:
@@ -102,7 +102,7 @@ class Comment(models.Model):
         search_fields = ('comment', 'user__username')
 
     def __repr__(self):
-        return "%s: %s..." % (self.get_user().username, self.comment[:100])
+        return "%s: %s..." % (self.user.username, self.comment[:100])
 
     def get_absolute_url(self):
         return self.get_content_object().get_absolute_url() + "#c" + str(self.id)
@@ -156,7 +156,7 @@ class Comment(models.Model):
 
     def get_as_text(self):
         return _('Posted by %(user)s at %(date)s\n\n%(comment)s\n\nhttp://%(domain)s%(url)s') % \
-            {'user': self.get_user().username, 'date': self.submit_date,
+            {'user': self.user.username, 'date': self.submit_date,
             'comment': self.comment, 'domain': self.get_site().domain, 'url': self.get_absolute_url()}
 
 class FreeComment(models.Model):
@@ -208,7 +208,7 @@ class FreeComment(models.Model):
 class KarmaScoreManager(models.Manager):
     def vote(self, user_id, comment_id, score):
         try:
-            karma = self.get_object(comment__id__exact=comment_id, user__id__exact=user_id)
+            karma = self.objects.get(comment__id__exact=comment_id, user__id__exact=user_id)
         except self.model.DoesNotExist:
             karma = self.model(None, user_id, comment_id, score, datetime.datetime.now())
             karma.save()
@@ -238,7 +238,7 @@ class KarmaScore(models.Model):
         unique_together = (('user', 'comment'),)
 
     def __repr__(self):
-        return _("%(score)d rating by %(user)s") % {'score': self.score, 'user': self.get_user()}
+        return _("%(score)d rating by %(user)s") % {'score': self.score, 'user': self.user}
 
 class UserFlagManager(models.Manager):
     def flag(self, comment, user):
@@ -250,7 +250,7 @@ class UserFlagManager(models.Manager):
         if int(comment.user_id) == int(user.id):
             return # A user can't flag his own comment. Fail silently.
         try:
-            f = self.get_object(user__id__exact=user.id, comment__id__exact=comment.id)
+            f = self.objects.get(user__id__exact=user.id, comment__id__exact=comment.id)
         except self.model.DoesNotExist:
             from django.core.mail import mail_managers
             f = self.model(None, user.id, comment.id, None)
@@ -269,7 +269,7 @@ class UserFlag(models.Model):
         unique_together = (('user', 'comment'),)
 
     def __repr__(self):
-        return _("Flag by %r") % self.get_user()
+        return _("Flag by %r") % self.user
 
 class ModeratorDeletion(models.Model):
     user = models.ForeignKey(User, verbose_name='moderator')
@@ -281,4 +281,4 @@ class ModeratorDeletion(models.Model):
         unique_together = (('user', 'comment'),)
 
     def __repr__(self):
-        return _("Moderator deletion by %r") % self.get_user()
+        return _("Moderator deletion by %r") % self.user

@@ -90,7 +90,7 @@ class PublicCommentManipulator(AuthenticationForm):
     def save(self, new_data):
         today = datetime.date.today()
         c = self.get_comment(new_data)
-        for old in Comment.objects.get_list(content_type__id__exact=new_data["content_type_id"],
+        for old in Comment.objects.filter(content_type__id__exact=new_data["content_type_id"],
             object_id__exact=new_data["object_id"], user__id__exact=self.get_user_id()):
             # Check that this comment isn't duplicate. (Sometimes people post
             # comments twice by mistake.) If it is, fail silently by pretending
@@ -146,7 +146,7 @@ class PublicFreeCommentManipulator(forms.Manipulator):
         # Check that this comment isn't duplicate. (Sometimes people post
         # comments twice by mistake.) If it is, fail silently by pretending
         # the comment was posted successfully.
-        for old_comment in FreeComment.objects.get_list(content_type__id__exact=new_data["content_type_id"],
+        for old_comment in FreeComment.objects.filter(content_type__id__exact=new_data["content_type_id"],
             object_id__exact=new_data["object_id"], person_name__exact=new_data["person_name"],
             submit_date__year=today.year, submit_date__month=today.month,
             submit_date__day=today.day):
@@ -202,7 +202,7 @@ def post_comment(request):
         rating_range, rating_choices = [], []
     content_type_id, object_id = target.split(':') # target is something like '52:5157'
     try:
-        obj = ContentType.objects.get_object(pk=content_type_id).get_object_for_this_type(pk=object_id)
+        obj = ContentType.objects.get(pk=content_type_id).get_object_for_this_type(pk=object_id)
     except ObjectDoesNotExist:
         raise Http404, _("The comment form had an invalid 'target' parameter -- the object ID was invalid")
     option_list = options.split(',') # options is something like 'pa,ra'
@@ -285,7 +285,7 @@ def post_free_comment(request):
     if Comment.objects.get_security_hash(options, '', '', target) != security_hash:
         raise Http404, _("Somebody tampered with the comment form (security violation)")
     content_type_id, object_id = target.split(':') # target is something like '52:5157'
-    content_type = ContentType.objects.get_object(pk=content_type_id)
+    content_type = ContentType.objects.get(pk=content_type_id)
     try:
         obj = content_type.get_object_for_this_type(pk=object_id)
     except ObjectDoesNotExist:
@@ -333,7 +333,7 @@ def comment_was_posted(request):
     if request.GET.has_key('c'):
         content_type_id, object_id = request.GET['c'].split(':')
         try:
-            content_type = ContentType.objects.get_object(pk=content_type_id)
+            content_type = ContentType.objects.get(pk=content_type_id)
             obj = content_type.get_object_for_this_type(pk=object_id)
         except ObjectDoesNotExist:
             pass

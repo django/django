@@ -2,15 +2,15 @@ from django.contrib.comments.models import Comment, FreeComment
 from django.contrib.comments.models import PHOTOS_REQUIRED, PHOTOS_OPTIONAL, RATINGS_REQUIRED, RATINGS_OPTIONAL, IS_PUBLIC
 from django.contrib.comments.models import MIN_PHOTO_DIMENSION, MAX_PHOTO_DIMENSION
 from django import template
-from django.core.template import loader
+from django.template import loader
 from django.core.exceptions import ObjectDoesNotExist
 from django.contrib.contenttypes.models import ContentType
 import re
 
 register = template.Library()
 
-COMMENT_FORM = 'comments/form'
-FREE_COMMENT_FORM = 'comments/freeform'
+COMMENT_FORM = 'comments/form.html'
+FREE_COMMENT_FORM = 'comments/freeform.html'
 
 class CommentFormNode(template.Node):
     def __init__(self, content_type, obj_id_lookup_var, obj_id, free,
@@ -77,12 +77,12 @@ class CommentCountNode(template.Node):
 
     def render(self, context):
         from django.conf import settings
-        get_count_function = self.free and FreeComment.objects.get_count or Comment.objects.get_count
+        manager = self.free and FreeComment.objects or Comment.objects
         if self.context_var_name is not None:
             self.obj_id = template.resolve_variable(self.context_var_name, context)
-        comment_count = get_count_function(object_id__exact=self.obj_id,
-            content_type__package__label__exact=self.package,
-            content_type__python_module_name__exact=self.module, site__id__exact=settings.SITE_ID)
+        comment_count = manager.filter(object_id__exact=self.obj_id,
+            content_type__app_label__exact=self.package,
+            content_type__model__exact=self.module, site__id__exact=settings.SITE_ID).count()
         context[self.var_name] = comment_count
         return ''
 
@@ -96,7 +96,7 @@ class CommentListNode(template.Node):
 
     def render(self, context):
         from django.conf import settings
-        get_list_function = self.free and FreeComment.objects.get_list or Comment.objects.get_list_with_karma
+        get_list_function = self.free and FreeComment.objects.filter or Comment.objects.get_list_with_karma
         if self.context_var_name is not None:
             try:
                 self.obj_id = template.resolve_variable(self.context_var_name, context)
@@ -104,16 +104,14 @@ class CommentListNode(template.Node):
                 return ''
         kwargs = {
             'object_id__exact': self.obj_id,
-            'content_type__package__label__exact': self.package,
-            'content_type__python_module_name__exact': self.module,
+            'content_type__app_label__exact': self.package,
+            'content_type__model__exact': self.module,
             'site__id__exact': settings.SITE_ID,
-            'select_related': True,
-            'order_by': (self.ordering + 'submit_date',),
         }
         kwargs.update(self.extra_kwargs)
         if not self.free and settings.COMMENTS_BANNED_USERS_GROUP:
-            kwargs['select'] = {'is_hidden': 'user_id IN (SELECT user_id FROM auth_users_groups WHERE group_id = %s)' % settings.COMMENTS_BANNED_USERS_GROUP}
-        comment_list = get_list_function(**kwargs)
+            kwargs['select'] = {'is_hidden': 'user_id IN (SELECT user_id FROM auth_user_groups WHERE group_id = %s)' % settings.COMMENTS_BANNED_USERS_GROUP}
+        comment_list = get_list_function(**kwargs).order_by(self.ordering + 'submit_date').select_related()
 
         if not self.free:
             if context.has_key('user') and not context['user'].is_anonymous():
@@ -157,7 +155,7 @@ class DoCommentForm:
         except ValueError: # unpack list of wrong size
             raise template.TemplateSyntaxError, "Third argument in %r tag must be in the format 'package.module'" % tokens[0]
         try:
-            content_type = ContentType.objects.get_object(package__label__exact=package, python_module_name__exact=module)
+            content_type = ContentType.objects.get(app_label__exact=package, model__exact=module)
         except ContentType.DoesNotExist:
             raise template.TemplateSyntaxError, "%r tag has invalid content-type '%s.%s'" % (tokens[0], package, module)
         obj_id_lookup_var, obj_id = None, None
@@ -237,7 +235,7 @@ class DoCommentCount:
         except ValueError: # unpack list of wrong size
             raise template.TemplateSyntaxError, "Third argument in %r tag must be in the format 'package.module'" % tokens[0]
         try:
-            content_type = ContentType.objects.get_object(package__label__exact=package, python_module_name__exact=module)
+            content_type = ContentType.objects.get(app_label__exact=package, model__exact=module)
         except ContentType.DoesNotExist:
             raise template.TemplateSyntaxError, "%r tag has invalid content-type '%s.%s'" % (tokens[0], package, module)
         var_name, obj_id = None, None
@@ -292,7 +290,7 @@ class DoGetCommentList:
         except ValueError: # unpack list of wrong size
             raise template.TemplateSyntaxError, "Third argument in %r tag must be in the format 'package.module'" % tokens[0]
         try:
-            content_type = ContentType.objects.get_object(package__label__exact=package, python_module_name__exact=module)
+            content_type = ContentType.objects.get(app_label__exact=package,model__exact=module)
         except ContentType.DoesNotExist:
             raise template.TemplateSyntaxError, "%r tag has invalid content-type '%s.%s'" % (tokens[0], package, module)
         var_name, obj_id = None, None

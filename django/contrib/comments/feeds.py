@@ -25,7 +25,7 @@ class LatestFreeCommentsFeed(Feed):
         return "Latest comments on %s" % self._site.name
 
     def items(self):
-        return self.comments_class.objects.get_list(**self._get_lookup_kwargs())
+        return self.comments_class.objects.filter(**self._get_lookup_kwargs())
 
     def _get_lookup_kwargs(self):
         return {
