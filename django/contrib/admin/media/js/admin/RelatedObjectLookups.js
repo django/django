@@ -39,7 +39,7 @@ function dismissAddAnotherPopup(win, newId, newRepr) {
         if (elem.nodeName == 'SELECT') {
             var o = new Option(newRepr, newId);
             elem.options[elem.options.length] = o;
-            elem.selectedIndex = elem.length - 1;
+            o.selected = true;
         } else if (elem.nodeName == 'INPUT') {
             elem.value = newId;
         }
