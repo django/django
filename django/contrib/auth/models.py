@@ -24,7 +24,7 @@ class Permission(models.Model):
 
 class Group(models.Model):
     name = models.CharField(_('name'), maxlength=80, unique=True)
-    permissions = models.ManyToManyField(_('permissions'), Permission, blank=True, filter_interface=models.HORIZONTAL)
+    permissions = models.ManyToManyField(Permission, verbose_name=_('permissions'), blank=True, filter_interface=models.HORIZONTAL)
     class Meta:
         verbose_name = _('Group')
         verbose_name_plural = _('Groups')
@@ -62,9 +62,9 @@ class User(models.Model):
     is_superuser = models.BooleanField(_('superuser status'))
     last_login = models.DateTimeField(_('last login'), default=models.LazyDate())
     date_joined = models.DateTimeField(_('date joined'), default=models.LazyDate())
-    groups = models.ManyToManyField(_('groups'), Group, blank=True,
+    groups = models.ManyToManyField(Group, verbose_name=_('groups'), blank=True,
         help_text=_("In addition to the permissions manually assigned, this user will also get all permissions granted to each group he/she is in."))
-    user_permissions = models.ManyToManyField(_('user permissions'), Permission, blank=True, filter_interface=models.HORIZONTAL)
+    user_permissions = models.ManyToManyField(Permission, verbose_name=_('user permissions'), blank=True, filter_interface=models.HORIZONTAL)
     objects = UserManager()
     class Meta:
         verbose_name = _('User')
