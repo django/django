@@ -101,7 +101,7 @@ def update_object(request, model, object_id=None, slug=None,
     except ObjectDoesNotExist:
         raise Http404, "No %s found for %s" % (model._meta.verbose_name, lookup_kwargs)
 
-    manipulator = model.ChangeManipulator(object.id, follow=follow)
+    manipulator = model.ChangeManipulator(getattr(object, object._meta.pk.name), follow=follow)
 
     if request.POST:
         new_data = request.POST.copy()
