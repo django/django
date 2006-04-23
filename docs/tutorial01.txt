@@ -60,11 +60,16 @@ Let's look at what ``startproject`` created::
 
 These files are:
 
+    * ``__init__.py``: An empty file that tells Python that this directory
+      should be considered a Python package. (Read `more about packages`_ in the
+      official Python docs if you're a Python beginner.)
     * ``manage.py``: A command-line utility that lets you interact with this
       Django project in various ways.
     * ``settings.py``: Settings/configuration for this Django project.
     * ``urls.py``: The URL declarations for this Django project; a "table of
       contents" of your Django-powered site.
+
+.. _more on packages: http://docs.python.org/tut/node8.html#packages
 
 The development server
 ----------------------
@@ -102,7 +107,7 @@ It worked!
 
     Full docs for the development server are at `django-admin documentation`_.
 
-.. django-admin documentation: http://www.djangoproject.com/documentation/django_admin/
+.. _django-admin documentation: http://www.djangoproject.com/documentation/django_admin/
 
 Your first page
 ---------------
@@ -136,8 +141,8 @@ database's connection parameters:
     database's interactive prompt.
 
 While you're editing ``settings.py``, take note of the ``INSTALLED_APPS``
-setting towards the bottom of the file. That variable holds the names of all 
-Django applications that are activated in this Django instance. Apps can be 
+setting towards the bottom of the file. That variable holds the names of all
+Django applications that are activated in this Django instance. Apps can be
 used in multiple projects, and you can package and distribute them for use
 by others in their projects.
 
@@ -340,7 +345,7 @@ Note the following:
       quotes. The author of this tutorial runs PostgreSQL, so the example
       output is in PostgreSQL syntax.
 
-    * The `sql` command doesn't actually run the SQL in your database - it just 
+    * The `sql` command doesn't actually run the SQL in your database - it just
       prints it to the screen so that you can see what SQL Django thinks is required.
       If you wanted to, you could copy and paste this SQL into your database prompt.
       However, as we will see shortly, Django provides an easier way of committing
@@ -370,7 +375,7 @@ Now, run ``syncdb`` again to create those model tables in your database::
 
 The ``syncdb`` command runs the sql from 'sqlall' on your database for all apps
 in ``INSTALLED_APPS`` that don't already exist in your database. This creates
-all the tables, initial data and indexes for any apps you have added to your 
+all the tables, initial data and indexes for any apps you have added to your
 project since the last time you ran syncdb. ``syncdb`` can be called as often
 as you like, and it will only ever create the tables that don't exist.
 
@@ -518,7 +523,7 @@ Let's jump back into the Python interactive shell by running
     >>> p.was_published_today()
     False
 
-    # Give the Poll a couple of Choices. The create call constructs a new 
+    # Give the Poll a couple of Choices. The create call constructs a new
     # choice object, does the INSERT statement, adds the choice to the set
     # of available choices and returns the new Choice object.
     >>> p = Poll.objects.get(pk=1)
