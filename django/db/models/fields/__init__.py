@@ -695,7 +695,7 @@ class PositiveSmallIntegerField(IntegerField):
 
 class SlugField(Field):
     def __init__(self, *args, **kwargs):
-        kwargs['maxlength'] = 50
+        kwargs['maxlength'] = kwargs.get('maxlength', 50)
         kwargs.setdefault('validator_list', []).append(validators.isSlug)
         # Set db_index=True unless it's been set manually.
         if not kwargs.has_key('db_index'):
