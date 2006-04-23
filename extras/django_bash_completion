@@ -1,0 +1,105 @@
+# #########################################################################
+# This bash script adds tab-completion feature to django-admin.py and
+# manage.py.
+#
+# Testing it out without installing
+# =================================
+#
+# To test out the completion without "installing" this, just run this file
+# directly, like so:
+#
+#     . ~/path/to/django_bash_completion
+#
+# Note: There's a dot ('.') at the beginning of that command.
+#
+# After you do that, tab completion will immediately be made available in your
+# current Bash shell. But it won't be available next time you log in.
+#
+# Installing
+# ==========
+#
+# To install this, point to this file from your .bash_profile, like so:
+#
+#     . ~/path/to/django_bash_completion
+#
+# Do the same in your .bashrc if .bashrc doesn't invoke .bash_profile.
+#
+# Settings will take effect the next time you log in.
+#
+# Uninstalling
+# ============
+#
+# To uninstall, just remove the line from your .bash_profile and .bashrc.
+
+_django_completion()
+{
+    local cur prev opts actions action_shell_opts
+    COMPREPLY=()
+    cur="${COMP_WORDS[COMP_CWORD]}"
+    prev="${COMP_WORDS[COMP_CWORD-1]}"
+
+    # Standalone options
+    opts="--help --settings --pythonpath --version"
+    # Actions
+    actions="adminindex createcachetable dbshell diffsettings \
+             inspectdb install reset runserver \
+             shell sql sqlall sqlclear sqlindexes sqlinitialdata \
+             sqlreset sqlsequencereset startapp startproject \
+             syncdb validate"
+    # Action's options
+    action_shell_opts="--plain"
+
+    if [[ # django-admin.py, ./manage, manage.py
+          ( ${COMP_CWORD} -eq 1 &&
+            ( ${COMP_WORDS[0]} == django-admin.py ||
+              ${COMP_WORDS[0]} == ./manage.py ||
+              ${COMP_WORDS[0]} == manage.py ) )
+          ||
+          # python manage.py, /some/path/python manage.py (if manage.py exists)
+          ( ${COMP_CWORD} -eq 2 &&
+            ( $( basename ${COMP_WORDS[0]} ) == python ) &&
+            ( $( basename ${COMP_WORDS[1]} ) == manage.py) &&
+            ( -r ${COMP_WORDS[1]} ) ) ]] ; then
+
+        case ${cur} in
+            -*)
+                COMPREPLY=( $(compgen -W "${opts}" -- ${cur}) )
+                return 0
+                ;;
+            *)
+                COMPREPLY=( $(compgen -W "${actions}" -- ${cur}) )
+                return 0
+                ;;
+        esac
+    else
+        case ${prev} in
+            adminindex|install|reset| \
+            sql|sqlall|sqlclear|sqlindexes| \
+            sqlinitialdata|sqlreset|sqlsequencereset)
+            # App completion isn't yet implemented, but here's where that
+            # would go.
+            # COMPREPLY=( $(compgen -W "auth core" -- ${cur}) )
+            COMPREPLY=()
+            return 0
+            ;;
+
+            createcachetable|dbshell|diffsettings| \
+            inspectdb|runserver|startapp|startproject|syncdb| \
+            validate)
+                COMPREPLY=()
+                return 0
+                ;;
+            shell)
+                COMPREPLY=( $(compgen -W "$action_shell_opts" -- ${cur}) )
+                return 0
+                ;;
+            *)
+                #COMPREPLY=( $(compgen -W "auth core" -- ${cur}) )
+                COMPREPLY=()
+                return 0
+                ;;
+        esac
+    fi
+}
+
+complete -F _django_completion django-admin.py manage.py
