@@ -146,6 +146,9 @@ def get_limit_offset_sql(limit, offset=None):
 def get_random_function_sql():
     return "RAND()"
 
+def get_drop_foreignkey_sql():
+    return "DROP FOREIGN KEY"
+
 OPERATOR_MAPPING = {
     'exact': '= %s',
     'iexact': 'LIKE %s',

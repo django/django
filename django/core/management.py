@@ -290,7 +290,7 @@ def get_sql_delete(app):
                     output.append('%s %s %s %s;' % \
                         (style.SQL_KEYWORD('ALTER TABLE'),
                         style.SQL_TABLE(backend.quote_name(table)),
-                        style.SQL_KEYWORD('DROP CONSTRAINT'),
+                        style.SQL_KEYWORD(backend.get_drop_foreignkey_sql()),
                         style.SQL_FIELD(backend.quote_name("%s_referencing_%s_%s" % (col, r_table, r_col)))))
                 del references_to_delete[klass]
 
