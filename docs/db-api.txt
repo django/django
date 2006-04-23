@@ -15,7 +15,7 @@ Throughout this reference, we'll refer to the following Poll application::
         question = models.CharField(maxlength=255)
         pub_date = models.DateTimeField()
         expire_date = models.DateTimeField()
-        
+
         def __repr__(self):
             return self.question
 
@@ -43,65 +43,65 @@ and the following Django sample session::
     >>> Poll.objects.all()
     [What's up?, What's your name?]
 
-How Queries Work
+How queries work
 ================
 
-Querying in Django is based upon the construction and evaluation of Query 
-Sets. 
+Querying in Django is based upon the construction and evaluation of Query
+Sets.
 
-A Query Set is a database-independent representation of a group of objects 
-that all meet a given set of criteria. However, the determination of which 
+A Query Set is a database-independent representation of a group of objects
+that all meet a given set of criteria. However, the determination of which
 objects are actually members of the Query Set is not made until you formally
 evaluate the Query Set.
 
 To construct a Query Set that meets your requirements, you start by obtaining
-an initial Query Set that describes all objects of a given type. This initial 
-Query Set can then be refined using a range of operations. Once you have 
-refined your Query Set to the point where it describes the group of objects 
-you require, it can be evaluated (using iterators, slicing, or one of a range 
-of other techniques), yielding an object or list of objects that meet the 
+an initial Query Set that describes all objects of a given type. This initial
+Query Set can then be refined using a range of operations. Once you have
+refined your Query Set to the point where it describes the group of objects
+you require, it can be evaluated (using iterators, slicing, or one of a range
+of other techniques), yielding an object or list of objects that meet the
 specifications of the Query Set.
 
-Obtaining an Initial Query Set
-==============================
+Obtaining an initial QuerySet
+=============================
 
-Every model has at least one Manager; by default, the Manager is called 
-``objects``. One of the most important roles of the Manager is as a source 
-of initial Query Sets. The Manager acts as a Query Set that describes all 
-objects of the type being managed; ``Polls.objects`` is the initial Query Set 
+Every model has at least one Manager; by default, the Manager is called
+``objects``. One of the most important roles of the Manager is as a source
+of initial Query Sets. The Manager acts as a Query Set that describes all
+objects of the type being managed; ``Polls.objects`` is the initial Query Set
 that contains all Polls in the database.
 
-The initial Query Set on the Manager behaves in the same way as every other 
-Query Set in every respect except one - it cannot be evaluated. To overcome 
+The initial Query Set on the Manager behaves in the same way as every other
+Query Set in every respect except one - it cannot be evaluated. To overcome
 this limitation, the Manager Query Set has an ``all()`` method. The ``all()``
-method produces a copy of the initial Query Set - a copy that *can* be 
+method produces a copy of the initial Query Set - a copy that *can* be
 evaluated::
 
     all_polls = Poll.objects.all()
 
-See the `Managers`_ section of the Model API for more details on the role 
+See the `Managers`_ section of the Model API for more details on the role
 and construction of Managers.
 
 .. _Managers: http://www.djangoproject.com/documentation/model_api/#managers
 
-Query Set Refinement
-====================
+QuerySet refinement
+===================
 
-The initial Query Set provided by the Manager describes all objects of a 
-given type. However, you will usually need to describe a subset of the 
-complete set of objects. 
+The initial Query Set provided by the Manager describes all objects of a
+given type. However, you will usually need to describe a subset of the
+complete set of objects.
 
 To create such a subset, you refine the initial Query Set, adding conditions
-until you have described a set that meets your needs. The two most common 
+until you have described a set that meets your needs. The two most common
 mechanisms for refining a Query Set are:
 
 ``filter(**kwargs)``
-    Returns a new Query Set containing objects that match the given lookup parameters. 
+    Returns a new Query Set containing objects that match the given lookup parameters.
 
 ``exclude(**kwargs)``
     Return a new Query Set containing objects that do not match the given lookup parameters.
 
-Lookup parameters should be in the format described in "Field lookups" below. 
+Lookup parameters should be in the format described in "Field lookups" below.
 
 The result of refining a Query Set is itself a Query Set; so it is possible to
 chain refinements together. For example::
@@ -111,27 +111,27 @@ chain refinements together. For example::
             pub_date__gte=datetime.now()).filter(
                 pub_date__gte=datetime(2005,1,1))
 
-...takes the initial Query Set, and adds a filter, then an exclusion, then 
-another filter to remove elements present in the initial Query Set. The 
-final result is a Query Set containing all Polls with a question that 
+...takes the initial Query Set, and adds a filter, then an exclusion, then
+another filter to remove elements present in the initial Query Set. The
+final result is a Query Set containing all Polls with a question that
 starts with "What", that were published between 1 Jan 2005 and today.
 
 Each Query Set is a unique object. The process of refinement is not one
-of adding a condition to the initial Query Set. Rather, each refinement 
-creates a separate and distinct Query Set that can be stored, used. and 
+of adding a condition to the initial Query Set. Rather, each refinement
+creates a separate and distinct Query Set that can be stored, used. and
 reused. For example::
 
     q1 = Poll.objects.filter(question__startswith="What")
     q2 = q1.exclude(pub_date__gte=datetime.now())
     q3 = q1.filter(pub_date__gte=datetime.now())
 
-will construct 3 Query Sets; a base query set containing all Polls with a 
+will construct 3 Query Sets; a base query set containing all Polls with a
 question that starts with "What", and two subsets of the base Query Set (one
-with an exlusion, one with a filter). The initial Query Set is unaffected by 
+with an exlusion, one with a filter). The initial Query Set is unaffected by
 the refinement process.
 
 It should be noted that the construction of a Query Set does not involve any
-activity on the database. The database is not consulted until a Query Set is 
+activity on the database. The database is not consulted until a Query Set is
 evaluated.
 
 Field lookups
@@ -200,7 +200,7 @@ two statements are equivalent::
     Poll.objects.get(id=14)
     Poll.objects.get(id__exact=14)
 
-Multiple lookup parameters are allowed. When separated by commans, the list of 
+Multiple lookup parameters are allowed. When separated by commans, the list of
 lookup parameters will be "AND"ed together::
 
     Poll.objects.filter(
@@ -209,7 +209,7 @@ lookup parameters will be "AND"ed together::
         question__startswith="Would",
     )
 
-...retrieves all polls published in January 2005 that have a question starting 
+...retrieves all polls published in January 2005 that have a question starting
 with "Would."
 
 For convenience, there's a ``pk`` lookup type, which translates into
@@ -232,33 +232,33 @@ If you pass an invalid keyword argument, the function will raise ``TypeError``.
 OR lookups
 ==========
 
-Keyword argument queries are "AND"ed together. If you have more 
-complex query requirements (for example, you need to include an ``OR`` 
+Keyword argument queries are "AND"ed together. If you have more
+complex query requirements (for example, you need to include an ``OR``
 statement in your query), you need to use ``Q`` objects.
 
-A ``Q`` object (``django.db.models.Q``) is an object used to encapsulate a 
-collection of keyword arguments. These keyword arguments are specified in 
-the same way as keyword arguments to the basic lookup functions like get() 
+A ``Q`` object (``django.db.models.Q``) is an object used to encapsulate a
+collection of keyword arguments. These keyword arguments are specified in
+the same way as keyword arguments to the basic lookup functions like get()
 and filter(). For example::
 
     Q(question__startswith='What')
 
-is a ``Q`` object encapsulating a single ``LIKE`` query. ``Q`` objects can be 
-combined using the ``&`` and ``|`` operators. When an operator is used on two 
+is a ``Q`` object encapsulating a single ``LIKE`` query. ``Q`` objects can be
+combined using the ``&`` and ``|`` operators. When an operator is used on two
 ``Q`` objects, it yields a new ``Q`` object. For example the statement::
 
     Q(question__startswith='Who') | Q(question__startswith='What')
 
-... yields a single ``Q`` object that represents the "OR" of two 
+... yields a single ``Q`` object that represents the "OR" of two
 "question__startswith" queries, equivalent to the SQL WHERE clause::
 
     ... WHERE question LIKE 'Who%' OR question LIKE 'What%'
 
-You can compose statements of arbitrary complexity by combining ``Q`` objects 
+You can compose statements of arbitrary complexity by combining ``Q`` objects
 with the ``&`` and ``|`` operators. Parenthetical grouping can also be used.
 
-One or more ``Q`` objects can then provided as arguments to the lookup 
-functions. If multiple ``Q`` object arguments are provided to a lookup 
+One or more ``Q`` objects can then provided as arguments to the lookup
+functions. If multiple ``Q`` object arguments are provided to a lookup
 function, they will be "AND"ed together. For example::
 
     Poll.objects.get(
@@ -271,10 +271,10 @@ function, they will be "AND"ed together. For example::
     SELECT * from polls WHERE question LIKE 'Who%'
         AND (pub_date = '2005-05-02' OR pub_date = '2005-05-06')
 
-If necessary, lookup functions can mix the use of ``Q`` objects and keyword 
-arguments. All arguments provided to a lookup function (be they keyword 
-argument or ``Q`` object) are "AND"ed together. However, if a ``Q`` object is 
-provided, it must precede the definition of any keyword arguments. For 
+If necessary, lookup functions can mix the use of ``Q`` objects and keyword
+arguments. All arguments provided to a lookup function (be they keyword
+argument or ``Q`` object) are "AND"ed together. However, if a ``Q`` object is
+provided, it must precede the definition of any keyword arguments. For
 example::
 
     Poll.objects.get(
@@ -303,10 +303,10 @@ See the `OR lookups examples page`_ for more examples.
 
 .. _OR lookups examples page: http://www.djangoproject.com/documentation/models/or_lookups/
 
-Query Set evaluation
-====================
+QuerySet evaluation
+===================
 
-A Query Set must be evaluated to return the objects that are contained in the 
+A Query Set must be evaluated to return the objects that are contained in the
 set. This can be achieved by iteration, slicing, or by specialist function.
 
 A Query Set is an iterable object. Therefore, it can be used in loop
@@ -314,16 +314,16 @@ constructs. For example::
 
     for p in Poll.objects.all():
         print p
-        
+
 will print all the Poll objects, using the ``__repr__()`` method of Poll.
-        
+
 A Query Set can also be sliced, using array notation::
 
     fifth_poll = Poll.objects.all()[4]
     all_polls_but_the_first_two = Poll.objects.all()[2:]
     every_second_poll = Poll.objects.all()[::2]
 
-Query Sets are lazy objects - that is, they are not *actually* sets (or 
+Query Sets are lazy objects - that is, they are not *actually* sets (or
 lists) that contain all the objects that they represent. Python protocol
 magic is used to make the Query Set *look* like an iterable, sliceable
 object, but behind the scenes, Django is using caching to only instantiate
@@ -337,16 +337,16 @@ lazy object::
 However - be warned; this could have a large memory overhead, as Django will
 create an in-memory representation of every element of the list.
 
-Caching and Query Sets
-======================
+Caching and QuerySets
+=====================
 
-Each Query Set contains a cache. In a newly created Query Set, this cache 
-is unpopulated. When a Query Set is evaluated for the first time, Django 
-makes a database query to populate the cache, and then returns the results 
-that have been explicitly requested (e.g., the next element if iteration 
+Each Query Set contains a cache. In a newly created Query Set, this cache
+is unpopulated. When a Query Set is evaluated for the first time, Django
+makes a database query to populate the cache, and then returns the results
+that have been explicitly requested (e.g., the next element if iteration
 is in use). Subsequent evaluations of the Query Set reuse the cached results.
 
-This caching behavior must be kept in mind when using Query Sets. For 
+This caching behavior must be kept in mind when using Query Sets. For
 example, the following will cause two temporary Query Sets to be created,
 evaluated, and thrown away::
 
@@ -354,10 +354,10 @@ evaluated, and thrown away::
     print [p for p in Poll.objects.all()] # Evaluate the Query Set again
 
 On a small, low-traffic website, this may not pose a serious problem. However,
-on a high traffic website, it effectively doubles your database load. In 
-addition, there is a possibility that the two lists may not be identical, 
-since a poll may be added or deleted by another user between making the two 
-requests. 
+on a high traffic website, it effectively doubles your database load. In
+addition, there is a possibility that the two lists may not be identical,
+since a poll may be added or deleted by another user between making the two
+requests.
 
 To avoid this problem, simply save the Query Set and reuse it::
 
@@ -365,12 +365,12 @@ To avoid this problem, simply save the Query Set and reuse it::
     print [p for p in queryset] # Evaluate the query set
     print [p for p in queryset] # Re-use the cache from the evaluation
 
-Specialist Query Set Evaluation
-===============================
+Specialist QuerySet evaluation
+==============================
 
-The following specialist functions can also be used to evaluate a Query Set. 
-Unlike iteration or slicing, these methods do not populate the cache; each 
-time one of these evaluation functions is used, the database will be queried. 
+The following specialist functions can also be used to evaluate a Query Set.
+Unlike iteration or slicing, these methods do not populate the cache; each
+time one of these evaluation functions is used, the database will be queried.
 
 ``get(**kwargs)``
 -----------------
@@ -409,48 +409,48 @@ Returns the latest object, according to the model's 'get_latest_by'
 Meta option, or using the field_name provided. For example::
 
     >>> Poll.objects.latest()
-    What's up?    
+    What's up?
     >>> Poll.objects.latest('expire_date')
     What's your name?
 
 Relationships (joins)
 =====================
 
-When you define a relationship in a model (i.e., a ForeignKey, 
+When you define a relationship in a model (i.e., a ForeignKey,
 OneToOneField, or ManyToManyField), Django uses the name of the
 relationship to add a descriptor_ on every instance of the model.
 This descriptor behaves just like a normal attribute, providing
-access to the related object or objects.  For example, 
-``mychoice.poll`` will return the poll object associated with a specific 
+access to the related object or objects.  For example,
+``mychoice.poll`` will return the poll object associated with a specific
 instance of ``Choice``.
 
 .. _descriptor: http://users.rcn.com/python/download/Descriptor.htm
 
 Django also adds a descriptor for the 'other' side of the relationship -
 the link from the related model to the model that defines the relationship.
-Since the related model has no explicit reference to the source model, 
-Django will automatically derive a name for this descriptor. The name that 
-Django chooses depends on the type of relation that is represented. However, 
+Since the related model has no explicit reference to the source model,
+Django will automatically derive a name for this descriptor. The name that
+Django chooses depends on the type of relation that is represented. However,
 if the definition of the relation has a `related_name` parameter, Django
 will use this name in preference to deriving a name.
 
-There are two types of descriptor that can be employed: Single Object 
-Descriptors and Object Set Descriptors. The following table describes 
-when each descriptor type is employed. The local model is the model on 
-which the relation is defined; the related model is the model referred 
+There are two types of descriptor that can be employed: Single Object
+Descriptors and Object Set Descriptors. The following table describes
+when each descriptor type is employed. The local model is the model on
+which the relation is defined; the related model is the model referred
 to by the relation.
 
     =============== ============= =============
     Relation Type   Local Model   Related Model
     =============== ============= =============
     OneToOneField   Single Object Single Object
-    
+
     ForeignKey      Single Object Object Set
-        
+
     ManyToManyField Object Set    Object Set
     =============== ============= =============
 
-Single Object Descriptor
+Single object descriptor
 ------------------------
 
 If the related object is a single object, the descriptor acts
@@ -463,16 +463,16 @@ just as if the related object were an attribute::
     # Save the change
     mychoice.save()
 
-Whenever a change is made to a Single Object Descriptor, save() 
+Whenever a change is made to a Single Object Descriptor, save()
 must be called to commit the change to the database.
 
-If no `related_name` parameter is defined, Django will use the 
+If no `related_name` parameter is defined, Django will use the
 lower case version of the source model name as the name for the
-related descriptor. For example, if the ``Choice`` model had 
+related descriptor. For example, if the ``Choice`` model had
 a field::
-    
+
     coordinator = models.OneToOneField(User)
-    
+
 ... instances of the model ``User`` would be able to call:
 
     old_choice = myuser.choice
@@ -480,54 +480,54 @@ a field::
 
 By default, relations do not allow values of None; if you attempt
 to assign None to a Single Object Descriptor, an AttributeError
-will be thrown. However, if the relation has 'null=True' set 
-(i.e., the database will allow NULLs for the relation), None can 
+will be thrown. However, if the relation has 'null=True' set
+(i.e., the database will allow NULLs for the relation), None can
 be assigned and returned by the descriptor to represent empty
 relations.
 
 Access to Single Object Descriptors is cached. The first time
 a descriptor on an instance is accessed, the database will be
-queried, and the result stored. Subsequent attempts to access 
+queried, and the result stored. Subsequent attempts to access
 the descriptor on the same instance will use the cached value.
 
-Object Set Descriptor
+Object set descriptor
 ---------------------
 
-An Object Set Descriptor acts just like the Manager - as an initial Query 
+An Object Set Descriptor acts just like the Manager - as an initial Query
 Set describing the set of objects related to an instance. As such, any
-query refining technique (filter, exclude, etc) can be used on the Object 
+query refining technique (filter, exclude, etc) can be used on the Object
 Set descriptor. This also means that Object Set Descriptor cannot be evaluated
 directly - the ``all()`` method must be used to produce a Query Set that
 can be evaluated.
 
-If no ``related_name`` parameter is defined, Django will use the lower case 
-version of the source model name appended with `_set` as the name for the 
-related descriptor. For example, every ``Poll`` object has a ``choice_set`` 
+If no ``related_name`` parameter is defined, Django will use the lower case
+version of the source model name appended with `_set` as the name for the
+related descriptor. For example, every ``Poll`` object has a ``choice_set``
 descriptor.
 
-The Object Set Descriptor has utility methods to add objects to the 
+The Object Set Descriptor has utility methods to add objects to the
 related object set:
 
 ``add(obj1, obj2, ...)``
-    Add the specified objects to the related object set. 
-    
+    Add the specified objects to the related object set.
+
 ``create(\**kwargs)``
-    Create a new object, and put it in the related object set. See 
+    Create a new object, and put it in the related object set. See
     _`Creating new objects`
 
 The Object Set Descriptor may also have utility methods to remove objects
 from the related object set:
 
 ``remove(obj1, obj2, ...)``
-    Remove the specified objects from the related object set. 
-    
+    Remove the specified objects from the related object set.
+
 ``clear()``
     Remove all objects from the related object set.
-    
-These two removal methods will not exist on ForeignKeys where ``Null=False`` 
+
+These two removal methods will not exist on ForeignKeys where ``Null=False``
 (such as in the Poll example). This is to prevent database inconsistency - if
 the related field cannot be set to None, then an object cannot be removed
-from one relation without adding it to another.  
+from one relation without adding it to another.
 
 The members of a related object set can be assigned from any iterable object.
 For example::
@@ -535,49 +535,49 @@ For example::
     mypoll.choice_set = [choice1, choice2]
 
 If the ``clear()`` method is available, any pre-existing objects will be removed
-from the Object Set before all objects in the iterable (in this case, a list) 
-are added to the choice set. If the ``clear()`` method is not available, all 
-objects in the iterable will be added without removing any existing elements. 
+from the Object Set before all objects in the iterable (in this case, a list)
+are added to the choice set. If the ``clear()`` method is not available, all
+objects in the iterable will be added without removing any existing elements.
 
 Each of these operations on the Object Set Descriptor has immediate effect
 on the database - every add, create and remove is immediately and
-automatically saved to the database. 
+automatically saved to the database.
 
-Relationships and Queries
+Relationships and queries
 =========================
 
 When composing a ``filter`` or ``exclude`` refinement, it may be necessary to
-include conditions that span relationships. Relations can be followed as deep 
-as required - just add descriptor names, separated by double underscores, to 
+include conditions that span relationships. Relations can be followed as deep
+as required - just add descriptor names, separated by double underscores, to
 describe the full path to the query attribute. The query::
 
     Foo.objects.filter(name1__name2__name3__attribute__lookup=value)
 
 ... is interpreted as 'get every Foo that has a name1 that has a name2 that
-has a name3 that has an attribute with lookup matching value'. In the Poll 
+has a name3 that has an attribute with lookup matching value'. In the Poll
 example::
 
     Choice.objects.filter(poll__slug__startswith="eggs")
 
-... describes the set of choices for which the related poll has a slug 
-attribute that starts with "eggs". Django automatically composes the joins 
+... describes the set of choices for which the related poll has a slug
+attribute that starts with "eggs". Django automatically composes the joins
 and conditions required for the SQL query.
 
-Specialist Query Sets Refinement 
-================================
+Specialist QuerySets refinement
+===============================
 
-In addition to ``filter`` and ``exclude()``, Django provides a range of 
-Query Set refinement methods that modify the types of results returned by 
+In addition to ``filter`` and ``exclude()``, Django provides a range of
+Query Set refinement methods that modify the types of results returned by
 the Query Set, or modify the way the SQL query is executed on the database.
 
 ``order_by(*fields)``
 ----------------------
 
-The results returned by a Query Set are automatically ordered by the ordering 
-tuple given by the ``ordering`` meta key in the model. However, ordering may be 
+The results returned by a Query Set are automatically ordered by the ordering
+tuple given by the ``ordering`` meta key in the model. However, ordering may be
 explicitly provided by using the ``order_by`` method::
 
-    Poll.objects.filter(pub_date__year=2005, 
+    Poll.objects.filter(pub_date__year=2005,
         pub_date__month=1).order_by('-pub_date', 'question')
 
 The result set above will be ordered by ``pub_date`` descending, then
@@ -599,21 +599,21 @@ backend normally orders them.
 ``distinct()``
 --------------
 
-By default, a Query Set will not eliminate duplicate rows. This will not 
+By default, a Query Set will not eliminate duplicate rows. This will not
 happen during simple queries; however, if your query spans relations,
 or you are using a Values Query Set with a ``fields`` clause, it is possible
-to get duplicated results when a Query Set is evaluated. 
+to get duplicated results when a Query Set is evaluated.
 
 ``distinct()`` returns a new Query Set that eliminates duplicate rows from the
-results returned by the Query Set. This is equivalent to a ``SELECT DISTINCT`` 
-SQL clause. 
+results returned by the Query Set. This is equivalent to a ``SELECT DISTINCT``
+SQL clause.
 
 ``values(*fields)``
 --------------------
 
-Returns a Values Query Set - a Query Set that evaluates to a list of 
-dictionaries instead of model-instance objects. Each dictionary in the 
-list will represent an object matching the query, with the keys matching 
+Returns a Values Query Set - a Query Set that evaluates to a list of
+dictionaries instead of model-instance objects. Each dictionary in the
+list will represent an object matching the query, with the keys matching
 the attribute names of the object.
 
 It accepts an optional parameter, ``fields``, which should be a list or tuple
@@ -623,25 +623,25 @@ database table. If you specify ``fields``, each dictionary will have only the
 field keys/values for the fields you specify. For example::
 
     >>> Poll.objects.values()
-    [{'id': 1, 'slug': 'whatsup', 'question': "What's up?", 
-            'pub_date': datetime.datetime(2005, 2, 20), 
+    [{'id': 1, 'slug': 'whatsup', 'question': "What's up?",
+            'pub_date': datetime.datetime(2005, 2, 20),
             'expire_date': datetime.datetime(2005, 3, 20)},
-     {'id': 2, 'slug': 'name', 'question': "What's your name?", 
-            'pub_date': datetime.datetime(2005, 3, 20), 
+     {'id': 2, 'slug': 'name', 'question': "What's your name?",
+            'pub_date': datetime.datetime(2005, 3, 20),
             'expire_date': datetime.datetime(2005, 4, 20)}]
     >>> Poll.objects.values('id', 'slug')
     [{'id': 1, 'slug': 'whatsup'}, {'id': 2, 'slug': 'name'}]
 
 A Values Query Set is useful when you know you're only going to need values
-from a small number of the available fields and you won't need the 
-functionality of a model instance object. It's more efficient to select only 
+from a small number of the available fields and you won't need the
+functionality of a model instance object. It's more efficient to select only
 the fields you need to use.
 
 ``dates(field, kind, order='ASC')``
 -----------------------------------
 
-Returns a Date Query Set - a Query Set that evaluates to a list of 
-``datetime.datetime`` objects representing all available dates of a 
+Returns a Date Query Set - a Query Set that evaluates to a list of
+``datetime.datetime`` objects representing all available dates of a
 particular kind within the contents of the Query Set.
 
 ``field`` should be the name of a ``DateField`` or ``DateTimeField`` of your
@@ -719,8 +719,8 @@ Sometimes, the Django query syntax by itself isn't quite enough. To cater for th
 edge cases, Django provides the ``extra()`` Query Set modifier - a mechanism
 for injecting specific clauses into the SQL generated by a Query Set.
 
-Note that by definition these extra lookups may not be portable to different 
-database engines (because you're explicitly writing SQL code) and should be 
+Note that by definition these extra lookups may not be portable to different
+database engines (because you're explicitly writing SQL code) and should be
 avoided if possible.:
 
 ``params``
@@ -827,7 +827,7 @@ would bulk delete all Polls with a year of 2005. Note that ``delete()`` is the
 only Query Set method that is not exposed on the Manager itself.
 
 This is a safety mechanism to prevent you from accidentally requesting
-``Polls.objects.delete()``, and deleting *all* the polls. 
+``Polls.objects.delete()``, and deleting *all* the polls.
 
 If you *actually* want to delete all the objects, then you have to explicitly
 request a complete query set::
@@ -856,7 +856,7 @@ key field is called ``name``, these two statements are equivalent::
 Extra instance methods
 ======================
 
-In addition to ``save()``, ``delete()``, a model object might get any or all 
+In addition to ``save()``, ``delete()``, a model object might get any or all
 of the following methods:
 
 get_FOO_display()
@@ -942,4 +942,3 @@ get_FOO_height() and get_FOO_width()
 For every ``ImageField``, the object will have ``get_FOO_height()`` and
 ``get_FOO_width()`` methods, where ``FOO`` is the name of the field. This
 returns the height (or width) of the image, as an integer, in pixels.
-
