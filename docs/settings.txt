@@ -167,6 +167,9 @@ Default: ``()`` (Empty list)
 Used for admin-site settings modules, this should be a tuple of settings
 modules (in the format ``'foo.bar.baz'``) for which this site is an admin.
 
+The admin site uses this in its automatically-introspected documentation of
+models, views and template tags.
+
 ADMIN_MEDIA_PREFIX
 ------------------
 
