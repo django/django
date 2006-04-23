@@ -76,6 +76,9 @@ class TestRunner:
         # Manually set INSTALLED_APPS to point to the test models.
         settings.INSTALLED_APPS = [MODEL_TESTS_DIR_NAME + '.' + a for a in get_test_models()]
 
+        # Manually set DEBUG = False.
+        settings.DEBUG = False
+
         from django.db import connection
         from django.core import management
         import django.db.models
