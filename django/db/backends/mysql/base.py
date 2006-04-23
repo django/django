@@ -124,18 +124,17 @@ def get_date_extract_sql(lookup_type, table_name):
 
 def get_date_trunc_sql(lookup_type, field_name):
     # lookup_type is 'year', 'month', 'day'
-    # http://dev.mysql.com/doc/mysql/en/date-and-time-functions.html
-    # MySQL doesn't support DATE_TRUNC, so we fake it by subtracting intervals.
-    # If you know of a better way to do this, please file a Django ticket.
-    # Note that we can't use DATE_FORMAT directly because that causes the output
-    # to be a string rather than a datetime object, and we need MySQL to return
-    # a date so that it's typecasted properly into a Python datetime object.
-    subtractions = ["interval (DATE_FORMAT(%s, '%%%%s')) second - interval (DATE_FORMAT(%s, '%%%%i')) minute - interval (DATE_FORMAT(%s, '%%%%H')) hour" % (field_name, field_name, field_name)]
-    if lookup_type in ('year', 'month'):
-        subtractions.append(" - interval (DATE_FORMAT(%s, '%%%%e')-1) day" % field_name)
-    if lookup_type == 'year':
-        subtractions.append(" - interval (DATE_FORMAT(%s, '%%%%m')-1) month" % field_name)
-    return "(%s - %s)" % (field_name, ''.join(subtractions))
+    fields = ['year', 'month', 'day', 'hour', 'minute', 'second']
+    format = ('%%Y-', '%%m', '-%%d', ' %%H:', '%%i', ':%%s') # Use double percents to escape.
+    format_def = ('0000-', '01', '-01', ' 00:', '00', ':00')
+    try:
+        i = fields.index(lookup_type) + 1
+    except ValueError:
+        sql = field_name
+    else:
+        format_str = ''.join([f for f in format[:i]] + [f for f in format_def[i:]])
+        sql = "CAST(DATE_FORMAT(%s, '%s') AS DATETIME)" % (field_name, format_str)
+    return sql
 
 def get_limit_offset_sql(limit, offset=None):
     sql = "LIMIT "
