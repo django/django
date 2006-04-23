@@ -53,7 +53,7 @@ So let's create a ``vote()`` function in ``mysite/polls/views.py``::
     def vote(request, poll_id):
         p = get_object_or_404(Poll, pk=poll_id)
         try:
-            selected_choice = p.choice_set.filter(pk=request.POST['choice'])
+            selected_choice = p.choice_set.get(pk=request.POST['choice'])
         except (KeyError, Choice.DoesNotExist):
             # Redisplay the poll voting form.
             return render_to_response('polls/detail.html', {
@@ -167,7 +167,7 @@ Change it like so::
 
     from django.conf.urls.defaults import *
     from mysite.polls.models import Poll
-    
+
     info_dict = {
         'queryset': Poll.objects.all(),
     }
@@ -207,18 +207,18 @@ for the polls app, we manually specify a template name for the results view:
 template. Note that we use ``dict()`` to return an altered dictionary in place.
 
 In previous versions of the tutorial, the templates have been provided with a context
-that contains the ``poll` and ``latest_poll_list`` context variables. However, 
-the generic views provide the variables ``object`` and ``object_list`` as context. 
-Therefore, you need to change your templates to match the new context variables. 
+that contains the ``poll` and ``latest_poll_list`` context variables. However,
+the generic views provide the variables ``object`` and ``object_list`` as context.
+Therefore, you need to change your templates to match the new context variables.
 Go through your templates, and modify any reference to ``latest_poll_list`` to
-``object_list``, and change any reference to ``poll`` to ``object``. 
+``object_list``, and change any reference to ``poll`` to ``object``.
 
 You can now delete the ``index()``, ``detail()`` and ``results()`` views
 from ``polls/views.py``. We don't need them anymore -- they have been replaced
 by generic views.
 
 The ``vote()`` view is still required. However, it must be modified to match
-the new templates and context variables. Change the template call from ``polls/detail`` 
+the new templates and context variables. Change the template call from ``polls/detail``
 to ``polls/polls_detail``, and pass ``object`` in the context instead of ``poll``.
 
 Run the server, and use your new polling app based on generic views.
