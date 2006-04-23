@@ -75,9 +75,12 @@ class DatabaseWrapper(local):
                 'user': settings.DATABASE_USER,
                 'db': settings.DATABASE_NAME,
                 'passwd': settings.DATABASE_PASSWORD,
-                'host': settings.DATABASE_HOST,
                 'conv': django_conversions,
             }
+            if settings.DATABASE_HOST.startswith('/'):
+                kwargs['unix_socket'] = settings.DATABASE_HOST
+            else:
+                kwargs['host'] = settings.DATABASE_HOST
             if settings.DATABASE_PORT:
                 kwargs['port'] = int(settings.DATABASE_PORT)
             self.connection = Database.connect(**kwargs)

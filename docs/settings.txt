@@ -239,6 +239,14 @@ Default: ``''`` (Empty string)
 Which host to use when connecting to the database. An empty string means
 localhost. Not used with SQLite.
 
+If this value starts with a forward slash (``'/'``) and you're using MySQL,
+MySQL will connect via a Unix socket to the specified socket. For example::
+
+    DATABASE_HOST = '/var/run/mysql'
+
+If you're using MySQL and this value *doesn't* start with a forward slash, then
+this value is assumed to be the host.
+
 DATABASE_NAME
 -------------
 
