@@ -25,7 +25,7 @@ def escape(html):
     "Returns the given HTML with ampersands, quotes and carets encoded"
     if not isinstance(html, basestring):
         html = str(html)
-    return html.replace('&', '&amp;').replace('<', '&lt;').replace('>', '&gt;').replace('"', '&quot;')
+    return html.replace('&', '&amp;').replace('<', '&lt;').replace('>', '&gt;').replace('"', '&quot;').replace("'", '&#39;')
 
 def linebreaks(value):
     "Converts newlines into <p> and <br />s"

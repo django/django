@@ -844,7 +844,8 @@ Escapes a string's HTML. Specifically, it makes these replacements:
     * ``"&"`` to ``"&amp;"``
     * ``<`` to ``"&lt;"``
     * ``>`` to ``"&gt;"``
-    * ``'"'`` (double quote) to ``"&quot;"``
+    * ``'"'`` (double quote) to ``'&quot;'``
+    * ``"'"`` (single quote) to ``'&#39;'``
 
 filesizeformat
 ~~~~~~~~~~~~~~
