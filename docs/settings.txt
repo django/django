@@ -363,8 +363,6 @@ EMAIL_HOST_PASSWORD
 
 Default: ``''`` (Empty string)
 
-**New in Django development version.**
-
 Username to use for the SMTP server defined in ``EMAIL_HOST``. If empty,
 Django won't attempt authentication.
 
@@ -375,8 +373,6 @@ EMAIL_HOST_USER
 
 Default: ``''`` (Empty string)
 
-**New in Django development version.**
-
 Username to use for the SMTP server defined in ``EMAIL_HOST``. If empty,
 Django won't attempt authentication.
 
@@ -386,8 +382,6 @@ EMAIL_PORT
 ----------
 
 Default: ``25``
-
-**New in Django development version.**
 
 Port to use for the SMTP server defined in ``EMAIL_HOST``.
 
@@ -404,8 +398,6 @@ ENABLE_PSYCO
 ------------
 
 Default: ``False``
-
-**New in Django development version.**
 
 Whether to enable Psyco, which optimizes Python code. Requires Psyco_.
 
@@ -675,8 +667,6 @@ TEMPLATE_STRING_IF_INVALID
 --------------------------
 
 Default: ``''`` (Empty string)
-
-**New in Django development version.**
 
 Output, as a string, that the template system should use for invalid (e.g.
 misspelled) variables. See `How invalid variables are handled`_.

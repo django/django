@@ -70,9 +70,7 @@ Use a dot (``.``) to access attributes of a variable.
 In the above example, ``{{ section.title }}`` will be replaced with the
 ``title`` attribute of the ``section`` object.
 
-In Django 0.91, if you use a variable that doesn't exist, it will be silently
-ignored; the variable will be replaced by nothingness. In the Django
-development version, if a variable doesn't exist, the template system inserts
+If you use a variable that doesn't exist, the template system will insert
 the value of the ``TEMPLATE_STRING_IF_INVALID`` setting, which is set to ``''``
 (the empty string) by default.
 
@@ -247,10 +245,8 @@ Because Django can be used to develop any sort of site, the tags, filters and
 variables available are different depending on the application. To make it
 easy to figure out what's available in a given site, the admin interface has a
 complete reference of all the template goodies available to that site. To get
-that reference, go to your Django admin interface and append ``'doc'`` onto the
-admin URL. Example: ``http://127.0.0.1/admin/doc/``. In the Django development
-version, you'll see a "Documentation" link in the upper right of every
-admin-site page.
+that reference, go to your Django admin interface and click the "Documentation"
+link in the upper right of any page.
 
 The reference is integrated into the administration interface for your site(s)
 and is divided into 4 sections: tags, filters, models, and views.
@@ -692,8 +688,6 @@ i.e.::
 
 spaceless
 ~~~~~~~~~
-
-**New in Django development version.**
 
 Normalizes whitespace between HTML tags to a single space. This includes tab
 characters and newlines.

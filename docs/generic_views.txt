@@ -189,9 +189,8 @@ The date-based generic functions are:
 
     Takes an optional ``allow_empty`` parameter, as ``archive_index``.
 
-    **New in Django development version:** Takes an optional
-    ``template_object_name`` parameter, which designates the name of the
-    template variable to use. Default is ``'object'``.
+    Takes an optional ``template_object_name`` parameter, which designates the
+    name of the template variable to use. Default is ``'object'``.
 
     Uses the template ``<app_label>/<model_name>_archive_month.html`` by default.
 
@@ -200,18 +199,17 @@ The date-based generic functions are:
         ``month``
             The given month (a datetime.date object)
         ``next_month``
-            **New in Django development version.** The first day of the next
-            month, or None if the next month is in the future (a datetime.date
-            object)
+            The first day of the next month, or None if the next month is in
+            the future (a datetime.date object)
         ``previous_month``
-            **New in Django development version.** The first day of the
-            previous month (a datetime.date object)
+            The first day of the previous month (a datetime.date object)
         ``object_list``
             List of objects published in the given month.
-            In the Django development version, you can change this variable
-            name from ``object_list`` by using the ``template_object_name``
-            parameter. (See above.) For example, if ``template_object_name`` is
-            ``foo``, the variable will be ``foo_list``.
+
+            You can change this variable name from ``object_list`` by using the
+            ``template_object_name`` parameter. (See above.) For example, if
+            ``template_object_name`` is ``foo``, the variable will be
+            ``foo_list``.
 
 ``archive_week``
     Weekly archive. Requires that ``year`` and ``week`` arguments be given. The
@@ -242,9 +240,8 @@ The date-based generic functions are:
     also pass ``day_format``, which defaults to ``"%d"`` (day of the month as a
     decimal number, 1-31).
 
-    **New in Django development version:** Takes an optional
-    ``template_object_name`` parameter, which designates the name of the
-    template variable to use. Default is ``'object'``.
+    Takes an optional ``template_object_name`` parameter, which designates the
+    name of the template variable to use. Default is ``'object'``.
 
     Uses the template ``<app_label>/<model_name>_archive_day.html`` by default.
 
@@ -252,10 +249,11 @@ The date-based generic functions are:
 
         ``object_list``
             List of objects published on the given day.
-            In the Django development version, you can change this variable
-            name from ``object_list`` by using the ``template_object_name``
-            parameter. (See above.) For example, if ``template_object_name`` is
-            ``foo``, the variable will be ``foo_list``.
+
+            You can change this variable name from ``object_list`` by using the
+            ``template_object_name`` parameter. (See above.) For example, if
+            ``template_object_name`` is ``foo``, the variable will be
+            ``foo_list``.
         ``day``
             The given day (a datetime.datetime object)
         ``previous_day``
@@ -287,9 +285,8 @@ The date-based generic functions are:
     As in ``archive_day``, ``object_detail`` takes optional ``month_format``
     and ``day_format`` parameters.
 
-    **New in Django development version:** Takes an optional
-    ``template_object_name`` parameter, which designates the name of the
-    template variable to use. Default is ``'object'``.
+    Takes an optional ``template_object_name`` parameter, which designates the
+    name of the template variable to use. Default is ``'object'``.
 
 .. _strftime docs: http://www.python.org/doc/current/lib/module-time.html#l2h-1941
 
@@ -323,9 +320,8 @@ Individual views are:
                                   the view will raise a 404 instead of displaying
                                   an empty index page. ``False`` is default.
 
-        ``template_object_name``  **New in Django development version.** Designates
-                                  the name of the object template variable. Default
-                                  is ``'object'``.
+        ``template_object_name``  Designates the name of the object template
+                                  variable. Default is ``'object'``.
         ========================  =================================================
 
     Uses the template ``<app_label>/<module_name_list>.html`` by default.
@@ -333,8 +329,9 @@ Individual views are:
     Has the following template context:
 
         ``object_list``
-            List of objects. In the Django development version, you can change
-            this variable name from ``object_list`` by using the
+            List of objects.
+
+            You can change this variable name from ``object_list`` by using the
             ``template_object_name`` parameter. (See above.) For example, if
             ``template_object_name`` is ``foo``, the variable will be
             ``foo_list``.
@@ -407,9 +404,8 @@ The create/update/delete views are:
     ``list_detail.object_detail`` does (see above), and the same
     ``post_save_redirect`` as ``create_object`` does.
 
-    **New in Django development version:** Takes an optional
-    ``template_object_name`` parameter, which designates the name of the
-    template variable to use. Default is ``'object'``.
+    Takes an optional ``template_object_name`` parameter, which designates the
+    name of the template variable to use. Default is ``'object'``.
 
     Uses the template ``<app_label>/<model_name>_form.html`` by default.
 
@@ -419,10 +415,11 @@ The create/update/delete views are:
             The form wrapper for the object
         object
             The original object being edited.
-            In the Django development version, you can change this variable
-            name from ``object`` by using the ``template_object_name``
-            parameter. (See above.) For example, if ``template_object_name`` is
-            ``foo``, the variable will be ``foo`` instead of ``object``.
+
+            You can change this variable name from ``object`` by using the
+            ``template_object_name`` parameter. (See above.) For example, if
+            ``template_object_name`` is ``foo``, the variable will be ``foo``
+            instead of ``object``.
 
 ``delete_object``
     Delete an existing object. The given object will only actually be deleted
@@ -437,15 +434,15 @@ The create/update/delete views are:
     ``<app_label>/<model_name>_confirm_delete`` by default. It uses no template
     if POSTed -- it simply deletes the object and redirects.
 
-    **New in Django development version:** Takes an optional
-    ``template_object_name`` parameter, which designates the name of the
-    template variable to use. Default is ``'object'``.
+    Takes an optional ``template_object_name`` parameter, which designates the
+    name of the template variable to use. Default is ``'object'``.
 
     Has the following template context:
 
         object
-            The object about to be deleted
-            In the Django development version, you can change this variable
-            name from ``object`` by using the ``template_object_name``
-            parameter. (See above.) For example, if ``template_object_name`` is
-            ``foo``, the variable will be ``foo`` instead of ``object``.
+            The object about to be deleted.
+
+            You can change this variable name from ``object`` by using the
+            ``template_object_name`` parameter. (See above.) For example, if
+            ``template_object_name`` is ``foo``, the variable will be ``foo``
+            instead of ``object``.

@@ -46,10 +46,8 @@ It implements the following standard dictionary methods:
       Example: ``fav_color = request.session.get('fav_color', 'red')``
 
     * ``keys()``
-      **New in Django development version.**
 
     * ``items()``
-      **New in Django development version.**
 
 It also has these three methods:
 

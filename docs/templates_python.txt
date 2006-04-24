@@ -209,9 +209,9 @@ This applies to any level of lookup::
     >>> t.render(c)
     "My name is Stan ."
 
-In the Django development version, if a variable doesn't exist, the template
-system inserts the value of the ``TEMPLATE_STRING_IF_INVALID`` setting, which
-is set to ``''`` (the empty string) by default.
+If a variable doesn't exist, the template system inserts the value of the
+``TEMPLATE_STRING_IF_INVALID`` setting, which is set to ``''`` (the empty
+string) by default.
 
 Playing with Context objects
 ----------------------------
@@ -351,8 +351,6 @@ See the `internationalization docs`_ for more.
 
 django.core.context_processors.request
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-**New in Django development version**
 
 If ``TEMPLATE_CONTEXT_PROCESSORS`` contains this processor, every
 ``DjangoContext`` will contain a variable ``request``, which is the current

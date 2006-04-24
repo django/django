@@ -28,11 +28,13 @@ Column Types
 
 .. admonition:: Note
 
-    In the Django development version, all admin pages (except the dashboard) are fluid-width. All fixed-width classes have been removed.
+    All admin pages (except the dashboard) are fluid-width. All fixed-width
+    classes from previous Django versions have been removed.
 
 The base template for each admin page has a block that defines the column
 structure for the page. This sets a class on the page content area
-(``div#content``) so everything on the page knows how wide it should be. There are three column types available.
+(``div#content``) so everything on the page knows how wide it should be. There
+are three column types available.
 
 colM
     This is the default column setting for all pages. The "M" stands for "main".
@@ -46,38 +48,11 @@ colMS
 colSM
     Same as above, with the sidebar on the left. The source order of the columns
     doesn't matter.
-colM superwide (removed in Django development version)
-    This is for ridiculously wide pages. Doesn't really work very well for
-    anything but colM. With superwide, you've got 1000px to work with. Don't
-    waste them.
-flex (removed in Django development version)
-    This is for liquid-width pages, such as changelists. Currently only works
-    with single-column pages (does not combine with ``.colMS`` or ``.colSM``).
-    Form pages should never use ``.flex``.
 
-For instance, you could stick this in a template to make a two-column page with the sidebar on the right::
+For instance, you could stick this in a template to make a two-column page with
+the sidebar on the right::
 
     {% block coltype %}colMS{% endblock %}
-
-
-Widths
-======
-
-**Removed in Django development version (see note above).**
-
-There's a whole mess of classes in the stylesheet for custom pixel widths on
-objects. They come in handy for tables and table cells, if you want to avoid
-using the ``width`` attribute. Each class sets the width to the number of pixels
-in the class, except ``.xfull`` which will always be the width of the column
-it's in. (This helps with tables that you want to always fill the horizontal
-width, without using ``width="100%"`` which makes IE 5's box model cry.)
-
-**Note:** Within a ``.flex`` page, the ``.xfull`` class will ``usually`` set
-to 100%, but there are exceptions and still some untested cases.
-
-Available width classes::
-
-    .x50 .x75 .x100 .x150 .x200 .x250 .x300 .x400 .x500 .xfull
 
 Text Styles
 ===========
@@ -107,17 +82,18 @@ There are also a few styles for styling text.
 .help
     This is a custom class for blocks of inline help text explaining the
     function of form elements. It makes text smaller and gray, and when applied
-    to ``p`` elements withing ``.form-row`` elements (see Form Styles below), it will
-    offset the text to align with the form field. Use this for help text,
-    instead of ``small quiet``. It works on other elements, but try to put the class
-    on a ``p`` whenever you can.
+    to ``p`` elements withing ``.form-row`` elements (see Form Styles below),
+    it will offset the text to align with the form field. Use this for help
+    text, instead of ``small quiet``. It works on other elements, but try to
+    put the class on a ``p`` whenever you can.
 .align-left
-    It aligns the text left. Only works on block elements containing inline elements.
+    It aligns the text left. Only works on block elements containing inline
+    elements.
 .align-right
     Are you paying attention?
 .nowrap
-    Keeps text and inline objects from wrapping. Comes in handy for table headers you want to stay
-    on one line.
+    Keeps text and inline objects from wrapping. Comes in handy for table
+    headers you want to stay on one line.
 
 Floats and Clears
 -----------------
@@ -173,9 +149,10 @@ Each fieldset can also take extra classes in addition to ``.module`` to apply
 appropriate formatting to the group of fields.
 
 .aligned
-    this will align the labels and inputs side by side on the same line.
+    This will align the labels and inputs side by side on the same line.
 .wide
-    used in combination with ``.aligned`` to widen the space available for the labels.
+    Used in combination with ``.aligned`` to widen the space available for the
+    labels.
 
 Form Rows
 ---------

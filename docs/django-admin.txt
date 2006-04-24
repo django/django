@@ -110,12 +110,12 @@ output:
       ``'This field type is a guess.'`` next to the field in the generated
       model.
 
-    * **New in Django development version.** If the database column name is a
-      Python reserved word (such as ``'pass'``, ``'class'`` or ``'for'``),
-      ``inspectdb`` will append ``'_field'`` to the attribute name. For
-      example, if a table has a column ``'for'``, the generated model will have
-      a field ``'for_field'``, with the ``db_column`` attribute set to
-      ``'for'``. ``inspectdb`` will insert the Python comment
+    * If the database column name is a Python reserved word (such as
+      ``'pass'``, ``'class'`` or ``'for'``), ``inspectdb`` will append
+      ``'_field'`` to the attribute name. For example, if a table has a column
+      ``'for'``, the generated model will have a field ``'for_field'``, with
+      the ``db_column`` attribute set to ``'for'``. ``inspectdb`` will insert
+      the Python comment
       ``'Field renamed because it was a Python reserved word.'`` next to the
       field.
 
@@ -180,9 +180,9 @@ shell
 
 Starts the Python interactive interpreter.
 
-**New in Django development version:** Uses IPython_, if it's installed. If you
-have IPython installed and want to force use of the "plain" Python interpreter,
-use the ``--plain`` option, like so::
+Django will use IPython_, if it's installed. If you have IPython installed and
+want to force use of the "plain" Python interpreter, use the ``--plain``
+option, like so::
 
     django-admin.py shell --plain
 

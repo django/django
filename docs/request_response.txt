@@ -304,9 +304,9 @@ Methods
     Instantiates an ``HttpResponse`` object with the given page content (a
     string) and MIME type. The ``DEFAULT_MIME_TYPE`` is ``"text/html"``.
 
-    **New in Django development version:** ``content`` can be an iterator
-    instead of a string. This iterator should return strings, and those strings
-    will be joined together to form the content of the response.
+    ``content`` can be an iterator or a string. If it's an iterator, it should
+    return strings, and those strings will be joined together to form the
+    content of the response.
 
 ``__setitem__(header, value)``
     Sets the given header name to the given value. Both ``header`` and
@@ -343,14 +343,10 @@ Methods
     Deletes the cookie with the given key. Fails silently if the key doesn't
     exist.
 
-``get_content_as_string(encoding)``
-    Returns the content as a Python string, encoding it from a Unicode object
-    if necessary. **Removed in Django development version.**
-
 ``content``
-    **New in Django development version.** Returns the content as a Python
-    string, encoding it from a Unicode object if necessary. Note this is a
-    property, not a method, so use ``r.content`` instead of ``r.content()``.
+    Returns the content as a Python string, encoding it from a Unicode object
+    if necessary. Note this is a property, not a method, so use ``r.content``
+    instead of ``r.content()``.
 
 ``write(content)``, ``flush()`` and ``tell()``
     These methods make an ``HttpResponse`` instance a file-like object.
