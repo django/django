@@ -86,8 +86,8 @@ class Comment(models.Model):
     site = models.ForeignKey(Site)
     objects = CommentManager()
     class Meta:
-        verbose_name = _('Comment')
-        verbose_name_plural = _('Comments')
+        verbose_name = _('comment')
+        verbose_name_plural = _('comments')
         ordering = ('-submit_date',)
     class Admin:
         fields = (
@@ -172,8 +172,8 @@ class FreeComment(models.Model):
     approved = models.BooleanField(_('approved by staff'))
     site = models.ForeignKey(Site)
     class Meta:
-        verbose_name = _('Free comment')
-        verbose_name_plural = _('Free comments')
+        verbose_name = _('free comment')
+        verbose_name_plural = _('free comments')
         ordering = ('-submit_date',)
     class Admin:
         fields = (
@@ -233,8 +233,8 @@ class KarmaScore(models.Model):
     scored_date = models.DateTimeField(_('score date'), auto_now=True)
     objects = KarmaScoreManager()
     class Meta:
-        verbose_name = _('Karma score')
-        verbose_name_plural = _('Karma scores')
+        verbose_name = _('karma score')
+        verbose_name_plural = _('karma scores')
         unique_together = (('user', 'comment'),)
 
     def __repr__(self):
@@ -264,8 +264,8 @@ class UserFlag(models.Model):
     flag_date = models.DateTimeField(_('flag date'), auto_now_add=True)
     objects = UserFlagManager()
     class Meta:
-        verbose_name = _('User flag')
-        verbose_name_plural = _('User flags')
+        verbose_name = _('user flag')
+        verbose_name_plural = _('user flags')
         unique_together = (('user', 'comment'),)
 
     def __repr__(self):
@@ -276,8 +276,8 @@ class ModeratorDeletion(models.Model):
     comment = models.ForeignKey(Comment)
     deletion_date = models.DateTimeField(_('deletion date'), auto_now_add=True)
     class Meta:
-        verbose_name = _('Moderator deletion')
-        verbose_name_plural = _('Moderator deletions')
+        verbose_name = _('moderator deletion')
+        verbose_name_plural = _('moderator deletions')
         unique_together = (('user', 'comment'),)
 
     def __repr__(self):

@@ -14,25 +14,25 @@ class Permission(models.Model):
     content_type = models.ForeignKey(ContentType)
     codename = models.CharField(_('codename'), maxlength=100)
     class Meta:
-        verbose_name = _('Permission')
-        verbose_name_plural = _('Permissions')
+        verbose_name = _('permission')
+        verbose_name_plural = _('permissions')
         unique_together = (('content_type', 'codename'),)
         ordering = ('content_type', 'codename')
 
-    def __repr__(self):
+    def __str__(self):
         return "%r | %s" % (self.content_type, self.name)
 
 class Group(models.Model):
     name = models.CharField(_('name'), maxlength=80, unique=True)
     permissions = models.ManyToManyField(Permission, verbose_name=_('permissions'), blank=True, filter_interface=models.HORIZONTAL)
     class Meta:
-        verbose_name = _('Group')
-        verbose_name_plural = _('Groups')
+        verbose_name = _('group')
+        verbose_name_plural = _('groups')
         ordering = ('name',)
     class Admin:
         search_fields = ('name',)
 
-    def __repr__(self):
+    def __str__(self):
         return self.name
 
 class UserManager(models.Manager):
@@ -67,8 +67,8 @@ class User(models.Model):
     user_permissions = models.ManyToManyField(Permission, verbose_name=_('user permissions'), blank=True, filter_interface=models.HORIZONTAL)
     objects = UserManager()
     class Meta:
-        verbose_name = _('User')
-        verbose_name_plural = _('Users')
+        verbose_name = _('user')
+        verbose_name_plural = _('users')
         ordering = ('username',)
     class Admin:
         fields = (
@@ -82,7 +82,7 @@ class User(models.Model):
         list_filter = ('is_staff', 'is_superuser')
         search_fields = ('username', 'first_name', 'last_name', 'email')
 
-    def __repr__(self):
+    def __str__(self):
         return self.username
 
     def get_absolute_url(self):
@@ -216,9 +216,9 @@ class User(models.Model):
 
 class Message(models.Model):
     user = models.ForeignKey(User)
-    message = models.TextField(_('Message'))
+    message = models.TextField(_('message'))
 
-    def __repr__(self):
+    def __str__(self):
         return self.message
 
 class AnonymousUser(object):
@@ -228,7 +228,7 @@ class AnonymousUser(object):
     def __init__(self):
         pass
 
-    def __repr__(self):
+    def __str__(self):
         return 'AnonymousUser'
 
     def save(self):
