@@ -223,7 +223,7 @@ The date-based generic functions are:
 
     As in ``archive_month``, you can pass an optional ``month_format``. You can
     also pass ``day_format``, which defaults to ``"%d"`` (day of the month as a
-    decimal number, 1-31).
+    decimal number, 01-31).
 
     **New in Django development version:** Takes an optional
     ``template_object_name`` parameter, which designates the name of the
