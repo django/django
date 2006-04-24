@@ -213,6 +213,27 @@ The date-based generic functions are:
             parameter. (See above.) For example, if ``template_object_name`` is
             ``foo``, the variable will be ``foo_list``.
 
+``archive_week``
+    Weekly archive. Requires that ``year`` and ``week`` arguments be given. The
+    ``week`` argument should be an integer (as a string) representing the week
+    number, where weeks start with Sunday.
+
+    Takes an optional ``template_object_name`` parameter, which designates the
+    name of the template variable to use. Default is ``'object'``.
+
+    Uses the template ``<app_label>/<model_name>_archive_week.html`` by default.
+
+    Has the following template context:
+
+        ``object_list``
+            List of objects published on the given day.
+
+            You can change this variable name from ``object_list`` by using the
+            ``template_object_name`` parameter. (See above.) For example, if
+            ``template_object_name`` is ``foo``, the variable will be ``foo_list``.
+        ``week``
+            The first day of the given week (a datetime.datetime object)
+
 ``archive_day``
     Daily archive. Requires that ``year``, ``month``, and ``day`` arguments be
     given.

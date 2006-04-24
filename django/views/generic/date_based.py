@@ -57,7 +57,9 @@ def archive_year(request, year, queryset, date_field, template_name=None,
     """
     model = queryset.model
     now = datetime.datetime.now()
+
     lookup_kwargs = {'%s__year' % date_field: year}
+
     # Only bother to check current date if the year isn't in the past.
     if int(year) >= now.year:
         lookup_kwargs['%s__lte' % date_field] = now
@@ -103,6 +105,7 @@ def archive_month(request, year, month, queryset, date_field,
 
     model = queryset.model
     now = datetime.datetime.now()
+
     # Calculate first and last day of month, for use in a date-range lookup.
     first_day = date.replace(day=1)
     if first_day.month == 12:
@@ -110,6 +113,7 @@ def archive_month(request, year, month, queryset, date_field,
     else:
         last_day = first_day.replace(month=first_day.month + 1)
     lookup_kwargs = {'%s__range' % date_field: (first_day, last_day)}
+
     # Only bother to check current date if the month isn't in the past.
     if last_day >= now.date():
         lookup_kwargs['%s__lte' % date_field] = now
@@ -125,6 +129,53 @@ def archive_month(request, year, month, queryset, date_field,
         'next_month': (last_day < datetime.date.today()) and (last_day + datetime.timedelta(days=1)) or None,
         'previous_month': first_day - datetime.timedelta(days=1),
     }, context_processors)
+    for key, value in extra_context.items():
+        if callable(value):
+            c[key] = value()
+        else:
+            c[key] = value
+    return HttpResponse(t.render(c))
+
+def archive_week(request, year, week, queryset, date_field,
+        template_name=None, template_loader=loader,
+        extra_context={}, allow_empty=True, context_processors=None,
+        template_object_name='object'):
+    """
+    Generic weekly archive view.
+
+    Templates: ``<app_label>/<model_name>_archive_week.html``
+    Context:
+        week:
+            (date) this week
+        object_list:
+            list of objects published in the given week
+    """
+    try:
+        date = datetime.date(*time.strptime(year+'-0-'+week, '%Y-%w-%U')[:3])
+    except ValueError:
+        raise Http404
+
+    model = queryset.model
+    now = datetime.datetime.now()
+
+    # Calculate first and last day of week, for use in a date-range lookup.
+    first_day = date
+    last_day = date + datetime.timedelta(days=7)
+    lookup_kwargs = {'%s__range' % date_field: (first_day, last_day)}
+
+    # Only bother to check current date if the week isn't in the past.
+    if last_day >= now.date():
+        lookup_kwargs['%s__lte' % date_field] = now
+    object_list = queryset.filter(**lookup_kwargs)
+    if not object_list and not allow_empty:
+        raise Http404
+    if not template_name:
+        template_name = "%s/%s_archive_week.html" % (model._meta.app_label, model._meta.object_name.lower())
+    t = template_loader.get_template(template_name)
+    c = RequestContext(request, {
+        '%s_list' % template_object_name: object_list,
+        'week': date,
+    })
     for key, value in extra_context.items():
         if callable(value):
             c[key] = value()
@@ -157,9 +208,11 @@ def archive_day(request, year, month, day, queryset, date_field,
 
     model = queryset.model
     now = datetime.datetime.now()
+
     lookup_kwargs = {
         '%s__range' % date_field: (datetime.datetime.combine(date, datetime.time.min), datetime.datetime.combine(date, datetime.time.max)),
     }
+
     # Only bother to check current date if the date isn't in the past.
     if date >= now.date():
         lookup_kwargs['%s__lte' % date_field] = now
@@ -214,9 +267,11 @@ def object_detail(request, year, month, day, queryset, date_field,
 
     model = queryset.model
     now = datetime.datetime.now()
+
     lookup_kwargs = {
         '%s__range' % date_field: (datetime.datetime.combine(date, datetime.time.min), datetime.datetime.combine(date, datetime.time.max)),
     }
+
     # Only bother to check current date if the date isn't in the past.
     if date >= now.date():
         lookup_kwargs['%s__lte' % date_field] = now
