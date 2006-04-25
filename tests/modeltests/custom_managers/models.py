@@ -30,6 +30,7 @@ class Book(models.Model):
     author = models.CharField(maxlength=30)
     is_published = models.BooleanField()
     published_objects = PublishedBookManager()
+    authors = models.ManyToManyField(Person, related_name='books')
 
     def __repr__(self):
         return self.title
@@ -58,6 +59,11 @@ API_TESTS = """
 >>> Person.objects.get_fun_people()
 [Bugs Bunny]
 
+# The RelatedManager used on the 'books' descriptor extends the default manager
+>>> from modeltests.custom_managers.models import PublishedBookManager
+>>> isinstance(p2.books, PublishedBookManager)
+True
+
 >>> b1 = Book(title='How to program', author='Rodney Dangerfield', is_published=True)
 >>> b1.save()
 >>> b2 = Book(title='How to be smart', author='Albert Einstein', is_published=False)
@@ -69,6 +75,11 @@ API_TESTS = """
 Traceback (most recent call last):
     ...
 AttributeError: type object 'Book' has no attribute 'objects'
+
+# The RelatedManager used on the 'authors' descriptor extends the default manager
+>>> from modeltests.custom_managers.models import PersonManager
+>>> isinstance(b2.authors, PersonManager)
+True
 
 >>> Book.published_objects.all()
 [How to program]
