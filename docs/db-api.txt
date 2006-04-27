@@ -753,6 +753,11 @@ translates (roughly) into the following SQL::
    arguments whose names and values are evaluated at runtime. For more
    information, see `Keyword Arguments`_ in the official Python tutorial.
 
+   .. _`Keyword Arguments`: http://docs.python.org/tut/node6.html#SECTION006720000000000000000
+
+If you pass an invalid keyword argument, a lookup function will raise
+``TypeError``.
+
 The database API supports the following lookup types:
 
 exact
@@ -936,7 +941,7 @@ numbers and even characters.
 year
 ~~~~
 
-For date/datetime fields, exact year match.
+For date/datetime fields, exact year match. Takes a four-digit year.
 
 Example::
 
@@ -948,62 +953,107 @@ SQL equivalent::
 
 (The exact SQL syntax varies for each database engine.)
 
+month
+~~~~~
 
-TODO: Left off here
+For date/datetime fields, exact month match. Takes an integer 1 (January)
+through 12 (December).
 
-    ===========  ==============================================================
-    Type         Description
-    ===========  ==============================================================
-    month        For date/datetime fields, exact month match.
-    day          For date/datetime fields, exact day match.
-    isnull       True/False; does is IF NULL/IF NOT NULL lookup:
-                 ``Poll.objects.filter(expire_date__isnull=True)``.
-    ===========  ==============================================================
+Example::
+
+    Entry.objects.filter(pub_date__month=12)
+
+SQL equivalent::
+
+    SELECT ... WHERE EXTRACT('month' FROM pub_date) = '12';
+
+(The exact SQL syntax varies for each database engine.)
+
+day
+~~~
+
+For date/datetime fields, exact day match.
+
+Example::
+
+    Entry.objects.filter(pub_date__day=3)
+
+SQL equivalent::
+
+    SELECT ... WHERE EXTRACT('day' FROM pub_date) = '3';
+
+(The exact SQL syntax varies for each database engine.)
+
+Note this will match any record with a pub_date on the third day of the month,
+such as January 3, July 3, etc.
+
+isnull
+~~~~~~
+
+``NULL`` or ``IS NOT NULL`` match. Takes either ``True`` or ``False``, which
+correspond to ``IS NULL`` and ``IS NOT NULL``, respectively.
+
+Example::
+
+    Entry.objects.filter(pub_date__isnull=True)
+
+SQL equivalent::
+
+    SELECT ... WHERE pub_date IS NULL;
+
+Default lookups are exact
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+If you don't provide a lookup type -- that is, if your keyword argument doesn't
+contain a double underscore -- the lookup type is assumed to be ``exact``.
+
+For example, the following two statements are equivalent::
+
+    Blog.objects.get(id=14)
+    Blog.objects.get(id__exact=14)
+
+This is for convenience, because ``exact`` lookups are the common case.
+
+The pk lookup shortcut
+~~~~~~~~~~~~~~~~~~~~~~
+
+For convenience, Django provides a ``pk`` lookup type, which stands for
+"primary_key". This is shorthand for "an exact lookup on the primary-key."
+
+In the example ``Blog`` model, the primary key is the ``id`` field, so these
+two statements are equivalent::
+
+    Blog.objects.get(id__exact=14)
+    Blog.objects.get(pk=14)
+
+``pk`` lookups also work across joins. For example, these two statements are
+equivalent::
+
+    Entry.objects.filter(blog__id__exact=3)
+    Entry.objects.filter(blog__pk=3)
 
 Escaping parenthesis and underscores in LIKE statements
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-As you may expect,
+The field lookups that equate to ``LIKE`` SQL statements will automatically
+escape the two special characters used in ``LIKE`` statements -- the percent
+sign and the underscore. (In a ``LIKE`` statement, the percent sign signifies
+a multiple-character wildcard and the underscore signifies a single-character
+wildcard.)
 
+This means things should work intuitively, so the abstraction doesn't leak.
+For example, to retrieve all the entries that contain a percent sign, just use
+the percent sign as any other character::
 
+    Entry.objects.filter(headline__contains='%')
 
+Django takes care of the quoting for you; the resulting SQL will look something
+like this::
 
+    SELECT ... WHERE headline LIKE '%\%%';
 
-
-If no lookup type is provided, a type of ``exact`` is assumed. The following
-two statements are equivalent::
-
-    Poll.objects.get(id=14)
-    Poll.objects.get(id__exact=14)
-
-Multiple lookup parameters are allowed. When separated by commans, the list of
-lookup parameters will be "AND"ed together::
-
-    Poll.objects.filter(
-        pub_date__year=2005,
-        pub_date__month=1,
-        question__startswith="Would",
-    )
-
-...retrieves all polls published in January 2005 that have a question starting
-with "Would."
-
-For convenience, there's a ``pk`` lookup type, which translates into
-``(primary_key)``. In the polls example, these two statements are
-equivalent::
-
-    Poll.objects.get(id__exact=3)
-    Poll.objects.get(pk=3)
-
-``pk`` lookups also work across joins. In the polls example, these two
-statements are equivalent::
-
-    Choice.objects.filter(poll__id=3)
-    Choice.objects.filter(poll__pk=3)
-
-If you pass an invalid keyword argument, the function will raise ``TypeError``.
-
-.. _`Keyword Arguments`: http://docs.python.org/tut/node6.html#SECTION006720000000000000000
+Same goes for underscores. Both percentage signs and underscores are handled
+for you transparently.
 
 Caching and QuerySets
 ---------------------
@@ -1036,12 +1086,31 @@ To avoid this problem, simply save the ``QuerySet`` and reuse it::
     print [p.headline for p in queryset] # Evaluate the query set.
     print [p.pub_date for p in queryset] # Re-use the cache from the evaluation.
 
+Comparing objects
+=================
+
+To compare two model instances, just use the standard Python comparison operator,
+the double equals sign: ``==``. Behind the scenes, that compares the primary
+key values of two models.
+
+Using the ``Entry`` example above, the following two statements are equivalent::
+
+    some_entry == other_entry
+    some_entry.id == other_entry.id
+
+If a model's primary key isn't called ``id``, no problem. Comparisons will
+always use the primary key, whatever it's called. For example, if a model's
+primary key field is called ``name``, these two statements are equivalent::
+
+    some_obj == other_obj
+    some_obj.name == other_obj.name
 
 
-Deleting objects
-================
 
 
+========================================
+THE REST OF THIS HAS NOT YET BEEN EDITED
+========================================
 
 
 OR lookups
@@ -1269,20 +1338,8 @@ example::
 attribute that starts with "eggs". Django automatically composes the joins
 and conditions required for the SQL query.
 
-Creating new objects
-====================
-
-Creating new objects (i.e. ``INSERT``) is done by creating new instances
-of objects then calling save() on them::
-
-    >>> p = Poll(slug="eggs",
-    ...                question="How do you like your eggs?",
-    ...                pub_date=datetime.datetime.now(),
-    ...                expire_date=some_future_date)
-    >>> p.save()
-
-Calling ``save()`` on an object with a primary key whose value is ``None``
-signifies to Django that the object is new and should be inserted.
+Creating new related objects
+============================
 
 Related objects are created using the ``create()`` convenience function on
 the descriptor Manager for relation::
@@ -1328,25 +1385,6 @@ If you *actually* want to delete all the objects, then you have to explicitly
 request a complete query set::
 
     Polls.objects.all().delete()
-
-Comparing objects
-=================
-
-To compare two model objects, just use the standard Python comparison operator,
-the double equals sign: ``==``. Behind the scenes, that compares the primary
-key values of two models.
-
-Using the ``Poll`` example above, the following two statements are equivalent::
-
-    some_poll == other_poll
-    some_poll.id == other_poll.id
-
-If a model's primary key isn't called ID, no problem. Comparisons will always
-use the primary key, whatever it's called. For example, if a model's primary
-key field is called ``name``, these two statements are equivalent::
-
-    some_obj == other_obj
-    some_obj.name == other_obj.name
 
 Extra instance methods
 ======================
