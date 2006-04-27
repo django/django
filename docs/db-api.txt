@@ -1035,11 +1035,12 @@ equivalent::
 Escaping parenthesis and underscores in LIKE statements
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The field lookups that equate to ``LIKE`` SQL statements will automatically
-escape the two special characters used in ``LIKE`` statements -- the percent
-sign and the underscore. (In a ``LIKE`` statement, the percent sign signifies
-a multiple-character wildcard and the underscore signifies a single-character
-wildcard.)
+The field lookups that equate to ``LIKE`` SQL statements (``iexact``,
+``contains``, ``icontains``, ``startswith``, ``istartswith``, ``endswith``
+and ``iendswith``) will automatically escape the two special characters used in
+``LIKE`` statements -- the percent sign and the underscore. (In a ``LIKE``
+statement, the percent sign signifies a multiple-character wildcard and the
+underscore signifies a single-character wildcard.)
 
 This means things should work intuitively, so the abstraction doesn't leak.
 For example, to retrieve all the entries that contain a percent sign, just use
