@@ -282,7 +282,7 @@ class QuerySet(object):
         return self._filter_or_exclude(Q, *args, **kwargs)
 
     def exclude(self, *args, **kwargs):
-        "Returns a new QuerySet instance with NOT (arsg) ANDed to the existing set."
+        "Returns a new QuerySet instance with NOT (args) ANDed to the existing set."
         return self._filter_or_exclude(QNot, *args, **kwargs)
 
     def _filter_or_exclude(self, qtype, *args, **kwargs):
