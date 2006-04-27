@@ -8,7 +8,8 @@ objects. This document explains that API.
 
 .. _`data models`: http://www.djangoproject.com/documentation/model_api/
 
-Throughout this reference, we'll refer to the following Blog application::
+Throughout this reference, we'll refer to the following models, which comprise
+a weblog application::
 
     class Blog(models.Model):
         name = models.CharField(maxlength=100)
@@ -37,11 +38,20 @@ Throughout this reference, we'll refer to the following Blog application::
 Creating objects
 ================
 
+To represent database-table data in Python objects, Django uses an intuitive
+system: A model class represents a database table, and an instance of that
+class represents a particular record in the database table.
+
 To create an object, instantiate it using keyword arguments to the model class,
 then call ``save()`` to save it to the database.
 
-Example::
+You import the model class from wherever it lives on the Python path, as you
+may expect. (We point this out here because previous Django versions required
+funky model importing.)
 
+Assuming models live in a file ``mysite/blog/models.py``, here's an example::
+
+    from mysite.blog.models import Blog
     b = Blog(name='Beatles Blog', tagline='All the latest Beatles news.')
     b.save()
 
@@ -98,7 +108,8 @@ the previous record in the database::
     b4 = Blog(id=3, name='Not Cheddar', tagline='Anything but cheese.')
     b4.save()  # Overrides the previous blog with ID=3!
 
-See also "How Django knows to UPDATE vs. INSERT", below.
+See _`How Django knows to UPDATE vs. INSERT`, below, for the reason this
+happens.
 
 Explicitly specifying auto-primary-key values is mostly useful for bulk-saving
 objects, when you're confident you won't have primary-key collision.
@@ -127,7 +138,8 @@ for creating and changing objects. Django abstracts the need to use ``INSERT``
 or ``UPDATE`` SQL statements. Specifically, when you call ``save()``, Django
 follows this algorithm:
 
-    * If the object's primary key attribute is set, Django executes a
+    * If the object's primary key attribute is set to a value that evaluates to
+      ``False`` (such as ``None`` or the empty string), Django executes a
       ``SELECT`` query to determine whether a record with the given primary key
       already exists.
     * If the record with the given primary key does already exist, Django
@@ -144,14 +156,12 @@ Retrieving objects
 ==================
 
 To retrieve objects from your database, you construct a ``QuerySet`` via a
-``Manager``.
+``Manager`` on your model class.
 
 A ``QuerySet`` represents a collection of objects from your database. It can
 have zero, one or many *filters* -- criteria that narrow down the collection
-based on given parameters.
-
-In SQL terms, a ``QuerySet`` equates to a ``SELECT`` statement, and a filter is
-a limiting clause such as ``WHERE`` or ``LIMIT``.
+based on given parameters. In SQL terms, a ``QuerySet`` equates to a ``SELECT``
+statement, and a filter is a limiting clause such as ``WHERE`` or ``LIMIT``.
 
 You get a ``QuerySet`` by using your model's ``Manager``. Each model has at
 least one ``Manager``, and it's called ``objects`` by default. Access it
@@ -206,7 +216,7 @@ conditions. The two most common ways to refine a ``QuerySet`` are:
     lookup parameters.
 
 The lookup parameters (``**kwargs`` in the above function definitions) should
-be in the format described in "Field lookups" below.
+be in the format described in _`Field lookups` below.
 
 For example, to get a ``QuerySet`` of blog entries from the year 2006, use
 ``filter()`` like so::
@@ -220,7 +230,7 @@ from the root ``QuerySet``.)
 Chaining filters
 ~~~~~~~~~~~~~~~~
 
-The result of refining a ``QuerySet`` is itself a ``Query Set``, so it's
+The result of refining a ``QuerySet`` is itself a ``QuerySet``, so it's
 possible to chain refinements together. For example::
 
     Entry.objects.filter(
@@ -283,7 +293,7 @@ You can evaluate a ``QuerySet`` in the following ways:
 
     * **repr().** A ``QuerySet`` is evaluated when you call ``repr()`` on it.
       This is for convenience in the Python interactive interpreter, so you can
-      immediately see your results.
+      immediately see your results when using the API interactively.
 
     * **len().** A ``QuerySet`` is evaluated when you call ``len()`` on it.
       This, as you might expect, returns the length of the result list.
@@ -304,8 +314,8 @@ You can evaluate a ``QuerySet`` in the following ways:
       iterating over a ``QuerySet`` will take advantage of your database to
       load data and instantiate objects only as you need them.
 
-Full list of QuerySet methods
------------------------------
+QuerySet methods that return new QuerySets
+------------------------------------------
 
 Django provides a range of ``QuerySet`` refinement methods that modify either
 the types of results returned by the ``QuerySet`` or the way its SQL query is
@@ -318,7 +328,7 @@ Returns a new ``QuerySet`` containing objects that match the given lookup
 parameters.
 
 The lookup parameters (``**kwargs``) should be in the format described in
-"Field lookups" below. Multiple parameters are joined via ``AND`` in the
+_`Field lookups` below. Multiple parameters are joined via ``AND`` in the
 underlying SQL statement.
 
 exclude(**kwargs)
@@ -328,18 +338,29 @@ Returns a new ``QuerySet`` containing objects that do *not* match the given
 lookup parameters.
 
 The lookup parameters (``**kwargs``) should be in the format described in
-"Field lookups" below. Multiple parameters are joined via ``AND`` in the
+_`Field lookups` below. Multiple parameters are joined via ``AND`` in the
 underlying SQL statement, and the whole thing is enclosed in a ``NOT()``.
 
 This example excludes all entries whose ``pub_date`` is the current date/time
 AND whose ``headline`` is "Hello"::
 
-    Entry.objects.exclude(pub_date__gt=datetime.now(), headline='Hello')
+    Entry.objects.exclude(pub_date__gt=datetime.date(2005, 1, 3), headline='Hello')
+
+In SQL terms, that evaluates to::
+
+    SELECT ...
+    WHERE NOT (pub_date > '2005-1-3' AND headline = 'Hello')
 
 This example excludes all entries whose ``pub_date`` is the current date/time
 OR whose ``headline`` is "Hello"::
 
-    Entry.objects.exclude(pub_date__gt=datetime.now()).exclude(headline='Hello')
+    Entry.objects.exclude(pub_date__gt=datetime.date(2005, 1, 3)).exclude(headline='Hello')
+
+In SQL terms, that evaluates to::
+
+    SELECT ...
+    WHERE NOT pub_date > '2005-1-3'
+    AND NOT headline = 'Hello'
 
 Note the second example is more restrictive.
 
@@ -370,8 +391,21 @@ There's no way to specify whether ordering should be case sensitive. With
 respect to case-sensitivity, Django will order results however your database
 backend normally orders them.
 
+distinct()
+~~~~~~~~~~
+
+Returns a new ``QuerySet`` that uses ``SELECT DISTINCT`` in its SQL query. This
+eliminates duplicate rows from the query results.
+
+By default, a ``QuerySet`` will not eliminate duplicate rows. In practice, this
+is rarely a problem, because simple queries such as ``Blog.objects.all()``
+don't introduce the possibility of duplicate result rows.
+
+However, if your query spans multiple tables, it's possible to get duplicate
+results when a ``QuerySet`` is evaluated. That's when you'd use ``distinct()``.
+
 values(*fields)
----------------
+~~~~~~~~~~~~~~~
 
 Returns a ``ValuesQuerySet`` -- a ``QuerySet`` that evaluates to a list of
 dictionaries instead of model-instance objects.
@@ -420,29 +454,12 @@ followed (optionally) by any output-affecting methods (such as ``values()``),
 but it doesn't really matter. This is your chance to really flaunt your
 individualism.
 
-distinct()
-~~~~~~~~~~
+dates(field, kind, order='ASC')
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The ``distinct()`` method returns a new ``QuerySet`` that uses
-``SELECT DISTINCT`` in its SQL query. This eliminates duplicate rows from the
-query results.
-
-By default, a ``QuerySet`` will not eliminate duplicate rows. In practice, this
-is rarely a problem, because simple queries such as ``Blog.objects.all()``
-don't introduce the possibility of duplicate result rows.
-
-However, if your query spans multiple tables, or you're using a
-``ValuesQuerySet`` with a ``fields`` clause, it's possible to get duplicate
-results when a ``QuerySet`` is evaluated. That's when you'd use ``distinct()``.
-
-TODO: Left off here
-
-``dates(field, kind, order='ASC')``
------------------------------------
-
-Returns a Date Query Set - a Query Set that evaluates to a list of
-``datetime.datetime`` objects representing all available dates of a
-particular kind within the contents of the Query Set.
+Returns a ``DateQuerySet`` -- a ``QuerySet`` that evaluates to a list of
+``datetime.datetime`` objects representing all available dates of a particular
+kind within the contents of the ``QuerySet``.
 
 ``field`` should be the name of a ``DateField`` or ``DateTimeField`` of your
 model.
@@ -455,212 +472,503 @@ model.
     * ``"month"`` returns a list of all distinct year/month values for the field.
     * ``"day"`` returns a list of all distinct year/month/day values for the field.
 
-``order``, which defaults to ``'ASC'``, should be either ``"ASC"`` or ``"DESC"``.
-This specifies how to order the results.
+``order``, which defaults to ``'ASC'``, should be either ``'ASC'`` or
+``'DESC'``. This specifies how to order the results.
 
-For example::
+Examples::
 
-    >>> Poll.objects.dates('pub_date', 'year')
+    >>> Entry.objects.dates('pub_date', 'year')
     [datetime.datetime(2005, 1, 1)]
-    >>> Poll.objects.dates('pub_date', 'month')
+    >>> Entry.objects.dates('pub_date', 'month')
     [datetime.datetime(2005, 2, 1), datetime.datetime(2005, 3, 1)]
-    >>> Poll.objects.dates('pub_date', 'day')
+    >>> Entry.objects.dates('pub_date', 'day')
     [datetime.datetime(2005, 2, 20), datetime.datetime(2005, 3, 20)]
-    >>> Poll.objects.dates('pub_date', 'day', order='DESC')
+    >>> Entry.objects.dates('pub_date', 'day', order='DESC')
     [datetime.datetime(2005, 3, 20), datetime.datetime(2005, 2, 20)]
-    >>> Poll.objects.filter(question__contains='name').dates('pub_date', 'day')
+    >>> Entry.objects.filter(headline__contains='Lennon').dates('pub_date', 'day')
     [datetime.datetime(2005, 3, 20)]
 
-``select_related()``
---------------------
+select_related()
+~~~~~~~~~~~~~~~~
 
-Relations are the bread and butter of databases, so there's an option to "follow"
-all relationships and pre-fill them in a simple cache so that later calls to
-objects with a one-to-many relationship don't have to hit the database. Do this by
-passing ``select_related=True`` to a lookup. This results in (sometimes much) larger
-queries, but it means that later use of relationships is much faster.
+Returns a ``QuerySet`` that will automatically "follow" foreign-key
+relationships, selecting that additional related-object data when it executes
+its query. This is a performance booster which results in (sometimes much)
+larger queries but means later use of foreign-key relationships won't require
+database queries.
 
-For example, using the Poll and Choice models from above, if you do the following::
+The following examples illustrate the difference between plain lookups and
+``select_related()`` lookups. Here's standard lookup::
 
-    c = Choice.objects.select_related().get(id=5)
+    # Hits the database.
+    e = Entry.objects.get(id=5)
 
-Then subsequent calls to ``c.poll`` won't hit the database.
+    # Hits the database again to get the related Blog object.
+    b = e.blog
 
-Note that ``select_related`` follows foreign keys as far as possible. If you have the
+And here's ``select_related`` lookup::
+
+    # Hits the database.
+    e = Entry.objects.select_related().get(id=5)
+
+    # Doesn't hit the database, because e.blog has been prepopulated
+    # in the previous query.
+    b = e.blog
+
+``select_related()`` follows foreign keys as far as possible. If you have the
 following models::
 
-    class Poll(models.Model):
+    class City(models.Model):
         # ...
 
-    class Choice(models.Model):
+    class Person(models.Model):
         # ...
-        poll = models.ForeignKey(Poll)
+        hometown = models.ForeignKey(City)
 
-    class SingleVote(meta.Model):
+    class Book(meta.Model):
         # ...
-        choice = models.ForeignKey(Choice)
+        author = models.ForeignKey(Person)
 
-then a call to ``SingleVotes.objects.select_related().get(id=4)`` will
-cache the related choice *and* the related poll::
+...then a call to ``Book.objects.select_related().get(id=4)`` will cache the
+related ``Person`` *and* the related ``City``::
 
-    >>> sv = SingleVotes.objects.select_related().get(id=4)
-    >>> c = sv.choice        # Doesn't hit the database.
-    >>> p = c.poll           # Doesn't hit the database.
+    b = Book.objects.select_related().get(id=4)
+    p = b.author         # Doesn't hit the database.
+    c = p.hometown       # Doesn't hit the database.
 
-    >>> sv = SingleVotes.objects.get(id=4)
-    >>> c = sv.choice        # Hits the database.
-    >>> p = c.poll           # Hits the database.
+    sv = Book.objects.get(id=4) # No select_related() in this example.
+    p = b.author         # Hits the database.
+    c = p.hometown       # Hits the database.
 
+extra(select=None, where=None, params=None, tables=None)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-``extra(params, select, where, tables)``
-----------------------------------------
+Sometimes, the Django query syntax by itself can't easily express a complex
+``WHERE`` clause. For these edge cases, Django provides the ``extra()``
+``QuerySet`` modifier -- a hook for injecting specific clauses into the SQL
+generated by a ``QuerySet``.
 
-Sometimes, the Django query syntax by itself isn't quite enough. To cater for these
-edge cases, Django provides the ``extra()`` Query Set modifier - a mechanism
-for injecting specific clauses into the SQL generated by a Query Set.
+By definition, these extra lookups may not be portable to different database
+engines (because you're explicitly writing SQL code) and violate the DRY
+principle, so you should avoid them if possible.
 
-Note that by definition these extra lookups may not be portable to different
-database engines (because you're explicitly writing SQL code) and should be
-avoided if possible.:
-
-``params``
-    All the extra-SQL params described below may use standard Python string
-    formatting codes to indicate parameters that the database engine will
-    automatically quote.  The ``params`` argument can contain any extra
-    parameters to be substituted.
+Specify one or more of ``params``, ``select``, ``where`` or ``tables``. None
+of the arguments is required, but you should use at least one of them.
 
 ``select``
-    The ``select`` keyword allows you to select extra fields.  This should be a
-    dictionary mapping attribute names to a SQL clause to use to calculate that
-    attribute. For example::
+    The ``select`` argument lets you put extra fields in the ``SELECT`` clause.
+    It should be a dictionary mapping attribute names to SQL clauses to use to
+    calculate that attribute.
 
-        Poll.objects.extra(
+    Example::
+
+        Entry.objects.extra(select={'is_recent': "pub_date > '2006-01-01'"})
+
+    As a result, each ``Entry`` object will have an extra attribute,
+    ``is_recent``, a boolean representing whether the entry's ``pub_date`` is
+    greater than Jan. 1, 2006.
+
+    Django inserts the given SQL snippet directly into the ``SELECT``
+    statement, so the resulting SQL of the above example would be::
+
+        SELECT blog_entry.*, (pub_date > '2006-01-01')
+        FROM blog_entry;
+
+
+    The next example is more advanced; it does a subquery to give each
+    resulting ``Blog`` object an ``entry_count`` attribute, an integer count
+    of associated ``Entry`` objects.
+
+        Blog.objects.extra(
             select={
-                'choice_count': 'SELECT COUNT(*) FROM choices WHERE poll_id = polls.id'
-            }
+                'entry_count': 'SELECT COUNT(*) FROM blog_entry WHERE blog_entry.blog_id = blog_blog.id'
+            },
         )
 
-    Each of the resulting ``Poll`` objects will have an extra attribute, ``choice_count``,
-    an integer count of associated ``Choice`` objects. Note that the parenthesis required by
-    most database engines around sub-selects are not required in Django's ``select``
-    clauses.
+    (In this particular case, we're exploiting the fact that the query will
+    already contain the ``blog_blog`` table in its ``FROM`` clause.)
+
+    The resulting SQL of the above example would be::
+
+        SELECT blog_blog.*, (SELECT COUNT(*) FROM blog_entry WHERE blog_entry.blog_id = blog_blog.id)
+        FROM blog_blog;
+
+    Note that the parenthesis required by most database engines around
+    subqueries are not required in Django's ``select`` clauses. Also note that
+    some database backends, such as some MySQL versions, don't support
+    subqueries.
 
 ``where`` / ``tables``
-    If you need to explicitly pass extra ``WHERE`` clauses -- perhaps to perform
-    non-explicit joins -- use the ``where`` keyword. If you need to
-    join other tables into your query, you can pass their names to ``tables``.
+    You can define explicit SQL ``WHERE`` clauses -- perhaps to perform
+    non-explicit joins -- by using ``where``. You can manually add tables to
+    the SQL ``FROM`` clause by using ``tables``.
 
-    ``where`` and ``tables`` both take a list of strings. All ``where`` parameters
-    are "AND"ed to any other search criteria.
+    ``where`` and ``tables`` both take a list of strings. All ``where``
+    parameters are "AND"ed to any other search criteria.
 
-    For example::
+    Example::
 
-        Poll.objects.filter(
-            question__startswith='Who').extra(where=['id IN (3, 4, 5, 20)'])
+        Entry.objects.extra(where=['id IN (3, 4, 5, 20)'])
 
     ...translates (roughly) into the following SQL::
 
-        SELECT * FROM polls_polls WHERE question LIKE 'Who%' AND id IN (3, 4, 5, 20);
+        SELECT * FROM blog_entry WHERE id IN (3, 4, 5, 20);
 
+``params``
+    The ``select`` and ``where`` parameters described above may use standard
+    Python database string placeholders -- ``'%s'`` to indicate parameters the
+    database engine should automatically quote. The ``params`` argument is a
+    list of any extra parameters to be substituted.
 
+    Example::
 
-Caching and QuerySets
----------------------
+        Entry.objects.extra(where=['headline=%s'], params=['Lennon'])
 
-Each ``QuerySet`` contains a cache, to minimize database access.
+    Always use ``params`` instead of embedding values directly into ``select``
+    or ``where`` because ``params`` will ensure values are quoted correctly
+    according to your particular backend. (For example, quotes will be escaped
+    correctly.)
 
-In a newly created ``QuerySet``, this cache is empty. The first time a
-``QuerySet`` is evaluated -- and, hence, a database query happens -- Django
-saves the query results in the ``QuerySet``'s cache and returns the results
-that have been explicitly requested (e.g., the next element, if the
-``QuerySet`` is being iterated over). Subsequent evaluations of the
-``QuerySet`` reuse the cached results.
+    Bad::
 
-Keep this caching behavior in mind, because it may bite you if you don't use
-your ``QuerySet``s correctly. For example, the following will create two
-``QuerySet``s, evaluate them, and throw them away::
+        Entry.objects.extra(where=["headline='Lennon'"])
 
-    print [e.headline for e in Entry.objects.all()]
-    print [e.pub_date for e in Entry.objects.all()]
+    Good::
 
-That means the same database query will be executed twice, effectively doubling
-your database load. Also, there's a possibility the two lists may not include
-the same database records, because an ``Entry`` may have been added or deleted
-in the split second between the two requests.
+        Entry.objects.extra(where=['headline=%s'], params=['Lennon'])
 
-To avoid this problem, simply save the ``QuerySet`` and reuse it::
+QuerySet methods that do not return QuerySets
+---------------------------------------------
 
-    queryset = Poll.objects.all()
-    print [p.headline for p in queryset] # Evaluate the query set.
-    print [p.pub_date for p in queryset] # Re-use the cache from the evaluation.
+The following ``QuerySet`` methods evaluate the ``QuerySet`` and return
+something *other than* a ``QuerySet``.
 
+These methods do not use a cache (see _`Caching and QuerySets` below). Rather,
+they query the database each time they're called.
 
+get(**kwargs)
+~~~~~~~~~~~~~
 
-Deleting objects
-================
+Returns the object matching the given lookup parameters, which should be in
+the format described in _`Field lookups`.
 
+``get()`` raises ``AssertionError`` if more than one object was found.
 
+``get()`` raises a ``DoesNotExist`` exception if an object wasn't found for the
+given parameters. The ``DoesNotExist`` exception is an attribute of the model
+class. Example::
 
+    Entry.objects.get(id='foo') # raises Entry.DoesNotExist
+
+The ``DoesNotExist`` exception inherits from
+``django.core.exceptions.ObjectDoesNotExist``, so you can target multiple
+``DoesNotExist`` exceptions. Example::
+
+    from django.core.exceptions import ObjectDoesNotExist
+    try:
+        e = Entry.objects.get(id=3)
+        b = Blog.objects.get(id=1)
+    except ObjectDoesNotExist:
+        print "Either the entry or blog doesn't exist."
+
+count()
+~~~~~~~
+
+Returns an integer representing the number of objects in the database matching
+the ``QuerySet``. ``count()`` never raises exceptions.
+
+Example::
+
+    # Returns the total number of entries in the database.
+    Entry.objects.count()
+
+    # Returns the number of entries whose headline contains 'Lennon'
+    Entry.objects.filter(headline__contains='Lennon').count()
+
+``count()`` performs a ``SELECT COUNT(*)`` behind the scenes, so you should
+always use ``count()`` rather than loading all of the record into Python
+objects and calling ``len()`` on the result.
+
+Depending on which database you're using (e.g. PostgreSQL vs. MySQL),
+``count()`` may return a long integer instead of a normal Python integer. This
+is an underlying implementation quirk that shouldn't pose any real-world
+problems.
+
+in_bulk(id_list)
+~~~~~~~~~~~~~~~~
+
+Takes a list of primary-key values and returns a dictionary mapping each
+primary-key value to an instance of the object with the given ID.
+
+Example::
+
+    >>> Blog.objects.in_bulk([1])
+    {1: Beatles Blog}
+    >>> Blog.objects.in_bulk([1, 2])
+    {1: Beatles Blog, 2: Cheddar Talk}
+    >>> Blog.objects.in_bulk([])
+    {}
+
+If you pass ``in_bulk()`` an empty list, you'll get an empty dictionary.
+
+latest(field_name=None)
+~~~~~~~~~~~~~~~~~~~~~~~
+
+Returns the latest object in the table, by date, using the ``field_name``
+provided as the date field.
+
+This example returns the latest ``Entry`` in the table, according to the
+``pub_date`` field::
+
+    Entry.objects.latest('pub_date')
+
+If your model's ``Meta`` specifies ``get_latest_by``, you can leave off the
+``field_name`` argument to ``latest()``. Django will use the field specified in
+``get_latest_by`` by default.
+
+Like ``get()``, ``latest()`` raises ``DoesNotExist`` if an object doesn't
+exist with the given parameters.
+
+Note ``latest()`` exists purely for convenience and readability.
 
 Field lookups
-=============
+-------------
 
-Basic field lookups take the form ``field__lookuptype`` (that's a
-double-underscore). For example::
+Field lookups are how you specify the meat of an SQL ``WHERE`` clause. They're
+specified as keyword arguments to the ``QuerySet`` methods ``filter()``,
+``exclude()`` and ``get()``.
 
-    Poll.objects.filter(pub_date__lte=datetime.now())
+Basic lookups keyword arguments take the form ``field__lookuptype=value``.
+(That's a double-underscore). For example::
+
+    Entry.objects.filter(pub_date__lte='2006-01-01')
 
 translates (roughly) into the following SQL::
 
-    SELECT * FROM polls_poll WHERE pub_date <= NOW();
+    SELECT * FROM blog_entry WHERE pub_date <= '2006-01-01';
 
 .. admonition:: How this is possible
 
    Python has the ability to define functions that accept arbitrary name-value
-   arguments whose names and values are evaluated at run time. For more
+   arguments whose names and values are evaluated at runtime. For more
    information, see `Keyword Arguments`_ in the official Python tutorial.
 
-The DB API supports the following lookup types:
+The database API supports the following lookup types:
+
+exact
+~~~~~
+
+Exact match.
+
+Example::
+
+    Entry.objects.get(id__exact=14)
+
+SQL equivalent::
+
+    SELECT ... WHERE id = 14;
+
+iexact
+~~~~~~
+
+Case-insensitive exact match.
+
+Example::
+
+    Blog.objects.get(name__iexact='beatles blog')
+
+SQL equivalent::
+
+    SELECT ... WHERE name ILIKE 'beatles blog';
+
+Note this will match ``'Beatles Blog'``, ``'beatles blog'``,
+``'BeAtLes BLoG'``, etc.
+
+contains
+~~~~~~~~
+
+Case-sensitive containment test.
+
+Example::
+
+    Entry.objects.get(headline__contains='Lennon')
+
+SQL equivalent::
+
+    SELECT ... WHERE headline LIKE '%Lennon%';
+
+Note this will match the headline ``'Today Lennon honored'`` but not
+``'today lennon honored'``.
+
+SQLite doesn't support case-sensitive ``LIKE`` statements; ``contains`` acts
+like ``icontains`` for SQLite.
+
+icontains
+~~~~~~~~~
+
+Case-insensitive containment test.
+
+Example::
+
+    Entry.objects.get(headline__icontains='Lennon')
+
+SQL equivalent::
+
+    SELECT ... WHERE headline ILIKE '%Lennon%';
+
+gt
+~~
+
+Greater than.
+
+Example::
+
+    Entry.objects.filter(id__gt=4)
+
+SQL equivalent::
+
+    SELECT ... WHERE id > 4;
+
+gte
+~~~
+
+Greater than or equal to.
+
+lt
+~~
+
+Less than.
+
+lte
+~~~
+
+Less than or equal to.
+
+in
+~~
+
+In a given list.
+
+Example::
+
+    Entry.objects.filter(id__in=[1, 3, 4])
+
+SQL equivalent::
+
+    SELECT ... WHERE id IN (1, 3, 4);
+
+startswith
+~~~~~~~~~~
+
+Case-sensitive starts-with.
+
+Example::
+
+    Entry.objects.filter(headline__startswith='Will')
+
+SQL equivalent::
+
+    SELECT ... WHERE headline LIKE 'Will%';
+
+SQLite doesn't support case-sensitive ``LIKE`` statements; ``startswith`` acts
+like ``istartswith`` for SQLite.
+
+istartswith
+~~~~~~~~~~~
+
+Case-insensitive starts-with.
+
+Example::
+
+    Entry.objects.filter(headline__istartswith='will')
+
+SQL equivalent::
+
+    SELECT ... WHERE headline ILIKE 'Will%';
+
+endswith
+~~~~~~~~
+
+Case-sensitive ends-with.
+
+Example::
+
+    Entry.objects.filter(headline__endswith='cats')
+
+SQL equivalent::
+
+    SELECT ... WHERE headline LIKE '%cats';
+
+SQLite doesn't support case-sensitive ``LIKE`` statements; ``endswith`` acts
+like ``iendswith`` for SQLite.
+
+iendswith
+~~~~~~~~~
+
+Case-insensitive ends-with.
+
+Example::
+
+    Entry.objects.filter(headline__iendswith='will')
+
+SQL equivalent::
+
+    SELECT ... WHERE headline ILIKE '%will'
+
+range
+~~~~~
+
+Range test (inclusive).
+
+Example::
+
+    start_date = datetime.date(2005, 1, 1)
+    end_date = datetime.date(2005, 3, 31)
+    Entry.objects.filter(pub_date__range=(start_date, end_date))
+
+SQL equivalent::
+
+    SELECT ... WHERE pub_date BETWEEN '2005-01-01' and '2005-03-31';
+
+You can use ``range`` anywhere you can use ``BETWEEN`` in SQL -- for dates,
+numbers and even characters.
+
+year
+~~~~
+
+For date/datetime fields, exact year match.
+
+Example::
+
+    Entry.objects.filter(pub_date__year=2005)
+
+SQL equivalent::
+
+    SELECT ... WHERE EXTRACT('year' FROM pub_date) = '2005';
+
+(The exact SQL syntax varies for each database engine.)
+
+
+TODO: Left off here
 
     ===========  ==============================================================
     Type         Description
     ===========  ==============================================================
-    exact        Exact match: ``Poll.objects.get(id__exact=14)`` returns all
-                 polls with an ID of exactly 14.
-    iexact       Case-insensitive exact match:
-                 ``Poll.objects.filter(slug__iexact="foo")`` matches a slug of
-                 ``foo``, ``FOO``, ``fOo``, etc.
-    contains     Case-sensitive containment test:
-                 ``Poll.objects.filter(question__contains="spam")`` returns all polls
-                 that contain "spam" in the question. (PostgreSQL and MySQL
-                 only. SQLite doesn't support case-sensitive LIKE statements;
-                 ``contains`` will act like ``icontains`` for SQLite.)
-    icontains    Case-insensitive containment test.
-    gt           Greater than: ``Poll.objects.filter(id__gt=4)``.
-    gte          Greater than or equal to.
-    lt           Less than.
-    lte          Less than or equal to.
-    in           In a given list: ``Poll.objects.filter(id__in=[1, 3, 4])`` returns
-                 a list of polls whose IDs are either 1, 3 or 4.
-    startswith   Case-sensitive starts-with:
-                 ``Poll.objects.filter(question__startswith="Would")``. (PostgreSQL
-                 and MySQL only. SQLite doesn't support case-sensitive LIKE
-                 statements; ``startswith`` will act like ``istartswith`` for
-                 SQLite.)
-    endswith     Case-sensitive ends-with. (PostgreSQL and MySQL only.)
-    istartswith  Case-insensitive starts-with.
-    iendswith    Case-insensitive ends-with.
-    range        Range test:
-                 ``Poll.objects.filter(pub_date__range=(start_date, end_date))``
-                 returns all polls with a pub_date between ``start_date``
-                 and ``end_date`` (inclusive).
-    year         For date/datetime fields, exact year match:
-                 ``Poll.objects.count(pub_date__year=2005)``.
     month        For date/datetime fields, exact month match.
     day          For date/datetime fields, exact day match.
     isnull       True/False; does is IF NULL/IF NOT NULL lookup:
                  ``Poll.objects.filter(expire_date__isnull=True)``.
     ===========  ==============================================================
+
+Escaping parenthesis and underscores in LIKE statements
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+As you may expect,
+
+
+
+
+
 
 If no lookup type is provided, a type of ``exact`` is assumed. The following
 two statements are equivalent::
@@ -696,6 +1004,45 @@ statements are equivalent::
 If you pass an invalid keyword argument, the function will raise ``TypeError``.
 
 .. _`Keyword Arguments`: http://docs.python.org/tut/node6.html#SECTION006720000000000000000
+
+Caching and QuerySets
+---------------------
+
+Each ``QuerySet`` contains a cache, to minimize database access. It's important
+to understand how it works, in order to write the most efficient code.
+
+In a newly created ``QuerySet``, the cache is empty. The first time a
+``QuerySet`` is evaluated -- and, hence, a database query happens -- Django
+saves the query results in the ``QuerySet``'s cache and returns the results
+that have been explicitly requested (e.g., the next element, if the
+``QuerySet`` is being iterated over). Subsequent evaluations of the
+``QuerySet`` reuse the cached results.
+
+Keep this caching behavior in mind, because it may bite you if you don't use
+your ``QuerySet``s correctly. For example, the following will create two
+``QuerySet``s, evaluate them, and throw them away::
+
+    print [e.headline for e in Entry.objects.all()]
+    print [e.pub_date for e in Entry.objects.all()]
+
+That means the same database query will be executed twice, effectively doubling
+your database load. Also, there's a possibility the two lists may not include
+the same database records, because an ``Entry`` may have been added or deleted
+in the split second between the two requests.
+
+To avoid this problem, simply save the ``QuerySet`` and reuse it::
+
+    queryset = Poll.objects.all()
+    print [p.headline for p in queryset] # Evaluate the query set.
+    print [p.pub_date for p in queryset] # Re-use the cache from the evaluation.
+
+
+
+Deleting objects
+================
+
+
+
 
 OR lookups
 ==========
@@ -771,54 +1118,6 @@ See the `OR lookups examples page`_ for more examples.
 
 .. _OR lookups examples page: http://www.djangoproject.com/documentation/models/or_lookups/
 
-
-Specialist QuerySet evaluation
-==============================
-
-The following specialist functions can also be used to evaluate a Query Set.
-Unlike iteration or slicing, these methods do not populate the cache; each
-time one of these evaluation functions is used, the database will be queried.
-
-``get(**kwargs)``
------------------
-
-Returns the object matching the given lookup parameters, which should be in
-the format described in _`Field lookups`. Raises a module-level
-``DoesNotExist`` exception if an object wasn't found for the given parameters.
-Raises ``AssertionError`` if more than one object was found.
-
-``count()``
------------
-
-Returns an integer representing the number of objects in the database matching
-the Query Set. ``count()`` never raises exceptions.
-
-Depending on which database you're using (e.g. PostgreSQL vs. MySQL), this may
-return a long integer instead of a normal Python integer.
-
-``in_bulk(id_list)``
---------------------
-
-Takes a list of IDs and returns a dictionary mapping each ID to an instance of
-the object with the given ID. For example::
-
-    >>> Poll.objects.in_bulk([1])
-    {1: What's up?}
-    >>> Poll.objects.in_bulk([1, 2])
-    {1: What's up?, 2: What's your name?}
-    >>> Poll.objects.in_bulk([])
-    {}
-
-``latest(field_name=None)``
----------------------------
-
-Returns the latest object, according to the model's 'get_latest_by'
-Meta option, or using the field_name provided. For example::
-
-    >>> Poll.objects.latest()
-    What's up?
-    >>> Poll.objects.latest('expire_date')
-    What's your name?
 
 Relationships (joins)
 =====================
