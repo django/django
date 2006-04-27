@@ -32,7 +32,7 @@ def create_permissions(app, created_models):
             except Permission.DoesNotExist:
                 p = Permission(name=name, codename=codename, content_type=ctype)
                 p.save()
-                print "Adding permission '%r'" % p
+                print "Adding permission '%s'" % p
 
 def create_superuser(app, created_models):
     from django.contrib.auth.models import User
