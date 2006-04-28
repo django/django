@@ -6,13 +6,8 @@ Django comes with a user authentication system. It handles user accounts,
 groups, permissions and cookie-based user sessions. This document explains how
 things work.
 
-The basics
-==========
-
-Django supports authentication out of the box. The ``django-admin.py init``
-command, used to initialize a database with Django's core database tables,
-creates the infrastructure for the auth system. You don't have to do anything
-else to use authentication.
+Overview
+========
 
 The auth system consists of:
 
@@ -22,6 +17,28 @@ The auth system consists of:
     * Groups: A generic way of applying labels and permissions to more than one
       user.
     * Messages: A simple way to queue messages for given users.
+
+Installation
+============
+
+Authentication support is bundled as a Django application in
+``django.contrib.auth``. To install it, do the following:
+
+    1. Put ``'django.contrib.auth'`` in your ``INSTALLED_APPS`` setting.
+    2. Run the command ``manage.py syncdb``.
+
+Note that the default ``settings.py`` file created by
+``django-admin.py startproject`` includes ``'django.contrib.auth'`` in
+``INSTALLED_APPS`` for convenience. If your ``INSTALLED_APPS`` already contains
+``'django.contrib.auth'``, feel free to run ``manage.py syncdb`` again; you
+can run that command as many times as you'd like, and each time it'll only
+install what's needed.
+
+The ``syncdb`` command creates the necessary database tables, creates
+permission objects for all installed apps that need 'em, and prompts you to
+create a superuser account.
+
+Once you've taken those steps, that's it.
 
 Users
 =====
@@ -63,19 +80,19 @@ Methods
 
 ``User`` objects have two many-to-many fields: ``groups`` and
 ``user_permissions``. ``User`` objects can access their related
-objects in the same way as any other `Django model`_:
+objects in the same way as any other `Django model`_::
 
-    * ``myuser.objects.groups = [group_list]``
-    * ``myuser.objects.groups.add(group, group,...)``
-    * ``myuser.objects.groups.remove(group, group,...)``
-    * ``myuser.objects.groups.clear()``
-    * ``myuser.objects.permissions = [permission_list]``
-    * ``myuser.objects.permissions.add(permission, permission, ...)``
-    * ``myuser.objects.permissions.remove(permission, permission, ...]``
-    * ``myuser.objects.permissions.clear()``
+    ``myuser.objects.groups = [group_list]``
+    ``myuser.objects.groups.add(group, group,...)``
+    ``myuser.objects.groups.remove(group, group,...)``
+    ``myuser.objects.groups.clear()``
+    ``myuser.objects.permissions = [permission_list]``
+    ``myuser.objects.permissions.add(permission, permission, ...)``
+    ``myuser.objects.permissions.remove(permission, permission, ...]``
+    ``myuser.objects.permissions.clear()``
 
 In addition to those automatic API methods, ``User`` objects have the following
-methods:
+custom methods:
 
     * ``is_anonymous()`` -- Always returns ``False``. This is a way of
       comparing ``User`` objects to anonymous users.
@@ -84,11 +101,12 @@ methods:
       with a space in between.
 
     * ``set_password(raw_password)`` -- Sets the user's password to the given
-      raw string, taking care of the MD5 hashing. Doesn't save the ``User``
-      object.
+      raw string, taking care of the password hashing. Doesn't save the
+      ``User`` object.
 
     * ``check_password(raw_password)`` -- Returns ``True`` if the given raw
-      string is the correct password for the user.
+      string is the correct password for the user. (This takes care of the
+      password hashing in making the comparison.)
 
     * ``get_group_permissions()`` -- Returns a list of permission strings that
       the user has, through his/her groups.
@@ -129,8 +147,10 @@ The ``User`` model has a custom manager that has the following helper functions:
       a ``User``. The ``username``, ``email`` and ``password`` are set as
       given, and the ``User`` gets ``is_active=True``.
 
+      See _`Creating users` for example usage.
+
     * ``make_random_password(length=10, allowed_chars='abcdefghjkmnpqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789')``
-      -- Returns a random password with the given length and given string of
+      Returns a random password with the given length and given string of
       allowed characters. (Note that the default value of ``allowed_chars``
       doesn't contain ``"I"`` or letters that look like it, to avoid user
       confusion.
@@ -147,8 +167,9 @@ function that comes with Django::
     >>> from django.contrib.auth.models import User
     >>> user = User.objects.create_user('john', 'lennon@thebeatles.com', 'johnpassword')
 
-    # At this point, user is a User object ready to be saved to the database.
-    # You can continue to change its attributes if you want to change other fields.
+    # At this point, user is a User object ready to be saved
+    # to the database. You can continue to change its attributes
+    # if you want to change other fields.
     >>> user.is_staff = True
     >>> user.save()
 
@@ -162,23 +183,21 @@ Change a password with ``set_password()``::
     >>> u.set_password('new password')
     >>> u.save()
 
-Don't set the password field directly unless you know what you're doing. This
-is explained in the next section.
+Don't set the ``password`` attribute directly unless you know what you're
+doing. This is explained in the next section.
 
 Passwords
 ---------
 
-Previous versions, such as Django 0.90, used simple MD5 hashes without password
-salts.
-
-The ``password`` field of a ``User`` object is a string in this format::
+The ``password`` attribute of a ``User`` object is a string in this format::
 
     hashtype$salt$hash
 
 That's hashtype, salt and hash, separated by the dollar-sign character.
 
-Hashtype is either ``sha1`` (default) or ``md5``. Salt is a random string
-used to salt the raw password to create the hash.
+Hashtype is either ``sha1`` (default) or ``md5`` -- the algorithm used to
+perform a one-way hash of the password. Salt is a random string used to salt
+the raw password to create the hash.
 
 For example::
 
@@ -186,6 +205,11 @@ For example::
 
 The ``User.set_password()`` and ``User.check_password()`` functions handle
 the setting and checking of these values behind the scenes.
+
+Previous Django versions, such as 0.90, used simple MD5 hashes without password
+salts. For backwards compatibility, those are still supported; they'll be
+converted automatically to the new style the first time ``check_password()``
+works correctly for a given user.
 
 Anonymous users
 ---------------
@@ -206,10 +230,15 @@ Authentication in Web requests
 ==============================
 
 Until now, this document has dealt with the low-level APIs for manipulating
-authentication-related objects. On a higher level, Django hooks this
+authentication-related objects. On a higher level, Django can hook this
 authentication framework into its system of `request objects`_.
 
-In any Django view, ``request.user`` will give you a ``User`` object
+First, install the ``SessionMiddleware`` and ``AuthenticationMiddleware``
+middlewares by adding them to your ``MIDDLEWARE_CLASSES`` setting. See the
+`session documentation`_ for more information.
+
+Once you have those middlewares installed, you'll be able to access
+``request.user`` in views. ``request.user`` will give you a ``User`` object
 representing the currently logged-in user. If a user isn't currently logged in,
 ``request.user`` will be set to an instance of ``AnonymousUser`` (see the
 previous section). You can tell them apart with ``is_anonymous()``, like so::
@@ -218,10 +247,6 @@ previous section). You can tell them apart with ``is_anonymous()``, like so::
         # Do something for anonymous users.
     else:
         # Do something for logged-in users.
-
-If you want to use ``request.user`` in your view code, make sure you have
-``SessionMiddleware`` and ``AuthenticationMiddleware`` enabled. See the
-`session documentation`_ for more information.
 
 .. _request objects: http://www.djangoproject.com/documentation/request_response/#httprequest-objects
 .. _session documentation: http://www.djangoproject.com/documentation/sessions/
@@ -275,7 +300,8 @@ As a shortcut, you can use the convenient ``login_required`` decorator::
         # ...
     my_view = login_required(my_view)
 
-Here's the same thing, using Python 2.4's decorator syntax::
+Here's an equivalent example, using the more compact decorator syntax
+introduced in Python 2.4::
 
     from django.contrib.auth.decorators import login_required
 
@@ -384,22 +410,22 @@ Permissions are set globally per type of object, not per specific object
 instance. For example, it's possible to say "Mary may change news stories," but
 it's not currently possible to say "Mary may change news stories, but only the
 ones she created herself" or "Mary may only change news stories that have a
-certain status or publication date." The latter functionality is something
+certain status, publication date or ID." The latter functionality is something
 Django developers are currently discussing.
 
 Default permissions
 -------------------
 
 Three basic permissions -- add, create and delete -- are automatically created
-for each Django model that has ``admin`` set. Behind the scenes, these
+for each Django model that has a ``class Admin`` set. Behind the scenes, these
 permissions are added to the ``auth_permission`` database table when you run
-``django-admin.py syncdb``.
+``manage.py syncdb``.
 
-Note that if your model doesn't have ``admin`` set when you run
-``django-admin.py syncdb``, the permissions won't be created. If you
-initialize your database and add ``admin`` to models after the fact, you'll
-need to run ``django-admin.py syncdb`` again. It will create any missing 
-permissions for all of your installed apps.
+Note that if your model doesn't have ``class Admin`` set when you run
+``syncdb``, the permissions won't be created. If you initialize your database
+and add ``class Admin`` to models after the fact, you'll need to run
+``django-admin.py syncdb`` again. It will create any missing permissions for
+all of your installed apps.
 
 Custom permissions
 ------------------
@@ -418,6 +444,9 @@ This example model creates three custom permissions::
                 ("can_drink", "Can drink alcohol"),
             )
 
+The only thing this does is create those extra permissions when you run
+``syncdb``.
+
 .. _model Meta attribute: http://www.djangoproject.com/documentation/model_api/#meta-options
 
 API reference
@@ -434,7 +463,7 @@ Fields
 ``Permission`` objects have the following fields:
 
     * ``name`` -- Required. 50 characters or fewer. Example: ``'Can vote'``.
-    * ``content_type`` -- Required. A reference to the ``django_content_types`` 
+    * ``content_type`` -- Required. A reference to the ``django_content_type``
       database table, which contains a record for each installed Django model.
     * ``codename`` -- Required. 100 characters or fewer. Example: ``'can_vote'``.
 
@@ -462,7 +491,7 @@ The currently logged-in user and his/her permissions are made available in the
 Users
 -----
 
-The currently logged-in user, either a ``User`` object or an``AnonymousUser``
+The currently logged-in user, either a ``User`` instance or an``AnonymousUser``
 instance, is stored in the template variable ``{{ user }}``::
 
     {% if user.is_anonymous %}
@@ -508,25 +537,25 @@ Thus, you can check permissions in template ``{% if %}`` statements::
 Groups
 ======
 
-Groups are a generic way of categorizing users to apply permissions, or some
-other label, to those users. A user can belong to any number of groups.
+Groups are a generic way of categorizing users so you can apply permissions, or
+some other label, to those users. A user can belong to any number of groups.
 
 A user in a group automatically has the permissions granted to that group. For
 example, if the group ``Site editors`` has the permission
 ``can_edit_home_page``, any user in that group will have that permission.
 
-Beyond permissions, groups are a convenient way to categorize users to apply
-some label, or extended functionality, to them. For example, you could create
-a group ``'Special users'``, and you could write code that would do special
-things to those users -- such as giving them access to a members-only portion
-of your site, or sending them members-only e-mail messages.
+Beyond permissions, groups are a convenient way to categorize users to give
+them some label, or extended functionality. For example, you could create a
+group ``'Special users'``, and you could write code that could, say, give them
+access to a members-only portion of your site, or send them members-only e-mail
+messages.
 
 Messages
 ========
 
 The message system is a lightweight way to queue messages for given users.
 
-A message is associated with a User. There's no concept of expiration or
+A message is associated with a ``User``. There's no concept of expiration or
 timestamps.
 
 Messages are used by the Django admin after successful actions. For example,
@@ -534,8 +563,9 @@ Messages are used by the Django admin after successful actions. For example,
 
 The API is simple::
 
-    * To create a new message, use ``user.message_set.create(message='message_text')``.
-    * To retrieve/delete messages, use ``user.get_and_delete_messages()``,
+    * To create a new message, use
+      ``user_obj.message_set.create(message='message_text')``.
+    * To retrieve/delete messages, use ``user_obj.get_and_delete_messages()``,
       which returns a list of ``Message`` objects in the user's queue (if any)
       and deletes the messages from the queue.
 
@@ -546,7 +576,8 @@ a playlist::
         # Create the playlist with the given songs.
         # ...
         request.user.message_set.create(message="Your playlist was added successfully.")
-        return render_to_response("playlists/create.html", context_instance=RequestContext(request))
+        return render_to_response("playlists/create.html",
+            context_instance=RequestContext(request))
 
 When you use ``RequestContext``, the currently logged-in user and his/her
 messages are made available in the `template context`_ as the template variable
