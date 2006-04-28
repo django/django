@@ -19,7 +19,7 @@ MODULE_TEMPLATE = '''    {%% if perms.%(app)s.%(addperm)s or perms.%(app)s.%(cha
     </tr>
     {%% endif %%}'''
 
-APP_ARGS = '[modelmodule ...]'
+APP_ARGS = '[appname ...]'
 
 # Use django.__path__[0] because we don't know which directory django into
 # which has been installed.
