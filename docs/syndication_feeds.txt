@@ -93,7 +93,7 @@ This simple example, taken from `chicagocrime.org`_, describes a feed of the
 latest five news items::
 
     from django.contrib.syndication.feeds import Feed
-    from django.models.chicagocrime import newsitems
+    from chicagocrime.models import NewsItem
 
     class SiteNewsFeed(Feed):
         title = "Chicagocrime.org site news"
@@ -101,7 +101,7 @@ latest five news items::
         description = "Updates on changes and additions to chicagocrime.org."
 
         def items(self):
-            return newsitems.get_list(order_by=('-pub_date',), limit=5)
+            return NewsItem.objects.order_by('-pub_date')[:5]
 
 Note:
 
@@ -176,7 +176,7 @@ An example makes this clear. Here's the code for these beat-specific feeds::
             # check that bits has only one member.
             if len(bits) != 1:
                 raise ObjectDoesNotExist
-            return beats.get_object(beat__exact=bits[0])
+            return Beat.objects.get(beat__exact=bits[0])
 
         def title(self, obj):
             return "Chicagocrime.org: Crimes for beat %s" % obj.beat
@@ -188,7 +188,7 @@ An example makes this clear. Here's the code for these beat-specific feeds::
             return "Crimes recently reported in police beat %s" % obj.beat
 
         def items(self, obj):
-            return crimes.get_list(beat__id__exact=obj.id, order_by=(('-crime_date'),), limit=30)
+            return Crime.objects.filter(beat__id__exact=obj.id).order_by('-crime_date')[:30]
 
 Here's the basic algorithm the RSS framework follows, given this class and a
 request to the URL ``/rss/beats/0613/``:
@@ -204,8 +204,8 @@ request to the URL ``/rss/beats/0613/``:
       the beat. Note that ``get_object()`` should raise
       ``django.core.exceptions.ObjectDoesNotExist`` if given invalid
       parameters. There's no ``try``/``except`` around the
-      ``beats.get_object()`` call, because it's not necessary; that function
-      raises ``BeatDoesNotExist`` on failure, and ``BeatDoesNotExist`` is a
+      ``Beat.objects.get()`` call, because it's not necessary; that function
+      raises ``Beat.DoesNotExist`` on failure, and ``Beat.DoesNotExist`` is a
       subclass of ``ObjectDoesNotExist``. Raising ``ObjectDoesNotExist`` in
       ``get_object()`` tells Django to produce a 404 error for that request.
     * To generate the feed's ``<title>``, ``<link>`` and ``<description>``,
@@ -293,7 +293,7 @@ URLconf to add the extra versions.
 Here's a full example::
 
     from django.contrib.syndication.feeds import Feed
-    from django.models.chicagocrime import newsitems
+    from chicagocrime.models import NewsItem
     from django.utils.feedgenerator import Atom1Feed
 
     class RssSiteNewsFeed(Feed):
@@ -302,7 +302,7 @@ Here's a full example::
         description = "Updates on changes and additions to chicagocrime.org."
 
         def items(self):
-            return newsitems.get_list(order_by=('-pub_date',), limit=5)
+            return NewsItem.objects.order_by('-pub_date')[:5]
 
     class AtomSiteNewsFeed(RssSiteNewsFeed):
         feed_type = Atom1Feed
@@ -328,7 +328,6 @@ Feed class reference
 --------------------
 
 This example illustrates all possible attributes and methods for a ``Feed`` class::
-
 
     from django.contrib.syndication.feeds import Feed
     from django.utils import feedgenerator
