@@ -539,7 +539,7 @@ class OneToOneField(RelatedField, IntegerField):
     def contribute_to_related_class(self, cls, related):
         setattr(cls, related.get_accessor_name(), SingleRelatedObjectDescriptor(related))
         if not cls._meta.one_to_one_field:
-           cls._meta.one_to_one_field = self
+            cls._meta.one_to_one_field = self
 
 class ManyToManyField(RelatedField, Field):
     def __init__(self, to, **kwargs):
@@ -613,16 +613,16 @@ class ManyToManyField(RelatedField, Field):
         if obj:
             instance_ids = [instance._get_pk_val() for instance in getattr(obj, self.name).all()]
             if self.rel.raw_id_admin:
-                 new_data[self.name] = ",".join([str(id) for id in instance_ids])
+                new_data[self.name] = ",".join([str(id) for id in instance_ids])
             else:
-                 new_data[self.name] = instance_ids
+                new_data[self.name] = instance_ids
         else:
             # In required many-to-many fields with only one available choice,
             # select that one available choice.
             if not self.blank and not self.rel.edit_inline and not self.rel.raw_id_admin:
-               choices_list = self.get_choices_default()
-               if len(choices_list) == 1:
-                   new_data[self.name] = [choices_list[0][0]]
+                choices_list = self.get_choices_default()
+                if len(choices_list) == 1:
+                    new_data[self.name] = [choices_list[0][0]]
         return new_data
 
     def contribute_to_class(self, cls, name):

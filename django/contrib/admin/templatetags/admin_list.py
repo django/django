@@ -17,11 +17,11 @@ DOT = '.'
 
 def paginator_number(cl,i):
     if i == DOT:
-       return '... '
+        return '... '
     elif i == cl.page_num:
-       return '<span class="this-page">%d</span> ' % (i+1)
+        return '<span class="this-page">%d</span> ' % (i+1)
     else:
-       return '<a href="%s"%s>%d</a> ' % (cl.get_query_string({PAGE_VAR: i}), (i == cl.paginator.pages-1 and ' class="end"' or ''), i+1)
+        return '<a href="%s"%s>%d</a> ' % (cl.get_query_string({PAGE_VAR: i}), (i == cl.paginator.pages-1 and ' class="end"' or ''), i+1)
 paginator_number = register.simple_tag(paginator_number)
 
 def pagination(cl):
@@ -167,7 +167,7 @@ def items_for_result(cl, result):
             else:
                 result_repr = escape(str(field_val))
         if result_repr == '':
-                result_repr = '&nbsp;'
+            result_repr = '&nbsp;'
         if first: # First column is a special case
             first = False
             url = cl.url_for_result(result)

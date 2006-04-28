@@ -327,10 +327,10 @@ class FormField:
             new_data.setlist(name, converted_data)
         else:
             try:
-               #individual fields deal with None values themselves
-               new_data.setlist(name, [self.__class__.html2python(None)])
+                #individual fields deal with None values themselves
+                new_data.setlist(name, [self.__class__.html2python(None)])
             except EmptyValue:
-               new_data.setlist(name, [])
+                new_data.setlist(name, [])
 
 
     def run_validator(self, new_data, validator):
@@ -348,7 +348,7 @@ class FormField:
         try:
             for validator in self.validator_list:
                 try:
-                   self.run_validator(new_data, validator)
+                    self.run_validator(new_data, validator)
                 except validators.ValidationError, e:
                     errors.setdefault(self.field_name, []).extend(e.messages)
         # If a CriticalValidationError is raised, ignore any other ValidationErrors

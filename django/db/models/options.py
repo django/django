@@ -239,7 +239,7 @@ class AdminFieldSet(object):
         self.description = description
 
     def __repr__(self):
-         return "FieldSet: (%s, %s)" % (self.name, self.field_lines)
+        return "FieldSet: (%s, %s)" % (self.name, self.field_lines)
 
     def bind(self, field_mapping, original, bound_field_set_class):
         return bound_field_set_class(self, field_mapping, original)

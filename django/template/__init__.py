@@ -198,7 +198,7 @@ class DebugLexer(Lexer):
             upto = end
         last_bit = self.template_string[upto:]
         if last_bit:
-           token_tups.append( (last_bit, (upto, upto + len(last_bit))) )
+            token_tups.append( (last_bit, (upto, upto + len(last_bit))) )
         return [self.create_token(tok, (self.origin, loc)) for tok, loc in token_tups]
 
     def create_token(self, token_string, source):
@@ -245,7 +245,7 @@ class Parser(object):
                     compiled_result = compile_func(self, token)
                 except TemplateSyntaxError, e:
                     if not self.compile_function_error(token, e):
-                       raise
+                        raise
                 self.extend_nodelist(nodelist, compiled_result, token)
                 self.exit_command()
         if parse_until:
@@ -731,7 +731,7 @@ class VariableNode(Node):
 class DebugVariableNode(VariableNode):
     def render(self, context):
         try:
-             output = self.filter_expression.resolve(context)
+            output = self.filter_expression.resolve(context)
         except TemplateSyntaxError, e:
             if not hasattr(e, 'source'):
                 e.source = self.source

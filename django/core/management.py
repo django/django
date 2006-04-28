@@ -159,15 +159,15 @@ def _get_sql_model_create(klass, models_already_seen=set()):
             if f.primary_key:
                 field_output.append(style.SQL_KEYWORD('PRIMARY KEY'))
             if f.rel:
-                 if f.rel.to in models_already_seen:
-                     field_output.append(style.SQL_KEYWORD('REFERENCES') + ' ' + \
-                         style.SQL_TABLE(backend.quote_name(f.rel.to._meta.db_table)) + ' (' + \
-                         style.SQL_FIELD(backend.quote_name(f.rel.to._meta.get_field(f.rel.field_name).column)) + ')'
-                     )
-                 else:
-                     # We haven't yet created the table to which this field
-                     # is related, so save it for later.
-                     pr = pending_references.setdefault(f.rel.to, []).append((klass, f))
+                if f.rel.to in models_already_seen:
+                    field_output.append(style.SQL_KEYWORD('REFERENCES') + ' ' + \
+                        style.SQL_TABLE(backend.quote_name(f.rel.to._meta.db_table)) + ' (' + \
+                        style.SQL_FIELD(backend.quote_name(f.rel.to._meta.get_field(f.rel.field_name).column)) + ')'
+                    )
+                else:
+                    # We haven't yet created the table to which this field
+                    # is related, so save it for later.
+                    pr = pending_references.setdefault(f.rel.to, []).append((klass, f))
             table_output.append(' '.join(field_output))
     if opts.order_with_respect_to:
         table_output.append(style.SQL_FIELD(backend.quote_name('_order')) + ' ' + \
@@ -836,7 +836,7 @@ def get_validation_errors(outfile, app=None):
             if f.rel:
                 rel_opts = f.rel.to._meta
                 if f.rel.to not in models.get_models():
-                     e.add(opts, "'%s' has relation with uninstalled model %s" % (f.name, rel_opts.object_name))
+                    e.add(opts, "'%s' has relation with uninstalled model %s" % (f.name, rel_opts.object_name))
 
                 rel_name = RelatedObject(f.rel.to, cls, f).get_accessor_name()
                 for r in rel_opts.fields:

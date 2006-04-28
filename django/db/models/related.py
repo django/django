@@ -52,9 +52,9 @@ class RelatedObject(object):
 
                 count = len(objects) + self.field.rel.num_extra_on_change
                 if self.field.rel.min_num_in_admin:
-                   count = max(count, self.field.rel.min_num_in_admin)
+                    count = max(count, self.field.rel.min_num_in_admin)
                 if self.field.rel.max_num_in_admin:
-                   count = min(count, self.field.rel.max_num_in_admin)
+                    count = min(count, self.field.rel.max_num_in_admin)
 
                 change = count - len(objects)
                 if change > 0:

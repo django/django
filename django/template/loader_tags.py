@@ -86,7 +86,7 @@ class ConstantIncludeNode(Node):
             self.template = t
         except:
             if settings.TEMPLATE_DEBUG:
-                 raise
+                raise
             self.template = None
 
     def render(self, context):
@@ -100,16 +100,16 @@ class IncludeNode(Node):
         self.template_name = template_name
 
     def render(self, context):
-         try:
-             template_name = resolve_variable(self.template_name, context)
-             t = get_template(template_name)
-             return t.render(context)
-         except TemplateSyntaxError, e:
-             if settings.TEMPLATE_DEBUG:
+        try:
+            template_name = resolve_variable(self.template_name, context)
+            t = get_template(template_name)
+            return t.render(context)
+        except TemplateSyntaxError, e:
+            if settings.TEMPLATE_DEBUG:
                 raise
-             return ''
-         except:
-             return '' # Fail silently for invalid included templates.
+            return ''
+        except:
+            return '' # Fail silently for invalid included templates.
 
 def do_block(parser, token):
     """

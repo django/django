@@ -32,7 +32,7 @@ class ModPythonRequest(http.HttpRequest):
 
     def _get_request(self):
         if not hasattr(self, '_request'):
-           self._request = datastructures.MergeDict(self.POST, self.GET)
+            self._request = datastructures.MergeDict(self.POST, self.GET)
         return self._request
 
     def _get_get(self):
