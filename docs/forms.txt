@@ -9,10 +9,7 @@ code. It is, and this document explains how the framework works.
     .. admonition:: A note to the lazy
 
         If all you want to do is present forms for a user to create and/or
-        update a given object, don't read any further. Instead, click thyself
-        to the `generic views`_ documentation. The following exercises are
-        for those interested in how Django's form framework works and those
-        needing to do more than simple creation/updating.
+        update a given object, you may be able to use `generic views`_.
 
 We'll take a top-down approach to examining Django's form validation framework,
 because much of the time you won't need to use the lower-level APIs. Throughout
@@ -32,13 +29,14 @@ this document, we'll be working with the following model, a "place" object::
         state = meta.USStateField()
         zip_code = meta.CharField(maxlength=5, blank=True)
         place_type = meta.IntegerField(choices=PLACE_TYPES)
-        class Meta:
-            admin = meta.Admin()
 
-        def __repr__(self):
+        class Admin:
+            pass
+
+        def __str__(self):
             return self.name
 
-Defining the above class is enough to create an admin interface to a ``place``,
+Defining the above class is enough to create an admin interface to a ``Place``,
 but what if you want to allow public users to submit places?
 
 Manipulators
@@ -53,11 +51,11 @@ similar, but the former knows how to create new instances of the model, while
 the later modifies existing instances.  Both types of classes are automatically
 created when you define a new class::
 
-    >>> from django.models.places import places
-    >>> places.AddManipulator
-    <class django.models.places.PlaceManipulatorAdd at 0x4c1540>
-    >>> places.ChangeManipulator
-    <class django.models.places.PlaceManipulatorChange at 0x4c1630>
+    >>> from mysite.myapp.models import Place
+    >>> Place.AddManipulator
+    <class Place.ManipulatorAdd at 0x4c1540>
+    >>> Place.ChangeManipulator
+    <class Place.ManipulatorChange at 0x4c1630>
 
 Using the ``AddManipulator``
 ----------------------------
@@ -67,13 +65,13 @@ POSTed data from the browser and creates a new ``Place`` object::
 
     from django.shortcuts import render_to_response
     from django.http import Http404, HttpResponse, HttpResponseRedirect
-    from django.models.places import places
+    from mysite.myapp.models import Place
     from django import forms
 
     def naive_create_place(request):
         """A naive approach to creating places; don't actually use this!"""
         # Create the AddManipulator.
-        manipulator = places.AddManipulator()
+        manipulator = Place.AddManipulator()
 
         # Make a copy of the POSTed data so that do_html2python can
         # modify it in place (request.POST is immutable).
@@ -109,16 +107,17 @@ view with a form that submits to this flawed creation view::
         """Simplistic place form view; don't actually use anything like this!"""
         # Create a FormWrapper object that the template can use. Ignore
         # the last two arguments to FormWrapper for now.
-        form = forms.FormWrapper(places.AddManipulator(), {}, {})
+        form = forms.FormWrapper(Place.AddManipulator(), {}, {})
         return render_to_response('places/naive_create_form.html', {'form': form})
 
 (This view, as well as all the following ones, has the same imports as in the
 first example above.)
 
 The ``forms.FormWrapper`` object is a wrapper that templates can
-easily deal with to create forms. Here's the ``naive_create_form`` template::
+easily deal with to create forms. Here's the ``naive_create_form.html``
+template::
 
-    {% extends "base" %}
+    {% extends "base.html" %}
 
     {% block content %}
     <h1>Create a place:</h1>
@@ -155,7 +154,7 @@ don't have any validation. Let's revise the validation issue by writing a new
 creation view that takes validation into account::
 
     def create_place_with_validation(request):
-        manipulator = places.AddManipulator()
+        manipulator = Place.AddManipulator()
         new_data = request.POST.copy()
 
         # Check for validation errors
@@ -171,7 +170,7 @@ In this new version, errors will be found -- ``manipulator.get_validation_errors
 handles all the validation for you -- and those errors can be nicely presented
 on an error page (templated, of course)::
 
-    {% extends "base" %}
+    {% extends "base.html" %}
 
     {% block content %}
 
@@ -208,7 +207,7 @@ context.
 Below is the finished view::
 
     def create_place(request):
-        manipulator = places.AddManipulator()
+        manipulator = Place.AddManipulator()
 
         if request.POST:
             # If data was POSTed, we're trying to create a new Place.
@@ -237,7 +236,7 @@ Below is the finished view::
 
 and here's the ``create_form`` template::
 
-    {% extends "base" %}
+    {% extends "base.html" %}
 
     {% block content %}
     <h1>Create a place:</h1>
@@ -300,8 +299,8 @@ about editing an existing one? It's shockingly similar to creating a new one::
         # Get the place in question from the database and create a
         # ChangeManipulator at the same time.
         try:
-            manipulator = places.ChangeManipulator(place_id)
-        except places.PlaceDoesNotExist:
+            manipulator = Place.ChangeManipulator(place_id)
+        except Place.DoesNotExist:
             raise Http404
 
         # Grab the Place object in question for future use.
