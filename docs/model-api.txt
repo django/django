@@ -921,15 +921,17 @@ Here's a list of all possible ``Admin`` options. No options are required. Adding
 
     For example (taken from the ``django.contrib.flatpages`` model)::
 
-        fields = (
-            (None, {
-                'fields': ('url', 'title', 'content', 'sites')
-            }),
-            ('Advanced options', {
-                'classes': 'collapse',
-                'fields' : ('enable_comments', 'registration_required', 'template_name')
-            }),
-        ),
+        class Admin:
+            ...
+            fields = (
+                (None, {
+                    'fields': ('url', 'title', 'content', 'sites')
+                }),
+                ('Advanced options', {
+                    'classes': 'collapse',
+                    'fields' : ('enable_comments', 'registration_required', 'template_name')
+                }),
+            )
 
     results in an admin that looks like:
 
@@ -978,8 +980,10 @@ Here's a list of all possible ``Admin`` options. No options are required. Adding
     Here's an example of how ``list_display`` and ``list_filter`` work (taken
     from the ``auth.user`` model)::
 
-        list_display = ('username', 'email', 'first_name', 'last_name', 'is_staff'),
-        list_filter = ('is_staff', 'is_superuser'),
+        class Admin:
+            #...
+            list_display = ('username', 'email', 'first_name', 'last_name', 'is_staff')
+            list_filter = ('is_staff', 'is_superuser')
 
     The above code results in an admin that looks like this:
 
