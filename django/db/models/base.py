@@ -255,7 +255,7 @@ class Model(object):
         value = getattr(self, field.attname)
         return dict(field.choices).get(value, value)
 
-    def _get_next_or_previous_by_FIELD(self, field, is_next, **kwargs):
+    def _get_next_or_previous_by_FIELD(self, field, is_next):
         op = is_next and '>' or '<'
         where = '(%s %s %%s OR (%s = %%s AND %s.%s %s %%s))' % \
             (backend.quote_name(field.column), op, backend.quote_name(field.column),
