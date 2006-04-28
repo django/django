@@ -51,8 +51,8 @@ class SortedDict(dict):
         if key not in self.keyOrder:
             self.keyOrder.append(key)
 
-    def __delitem__(self, key, value):
-        dict.__delitem__(self, key, value)
+    def __delitem__(self, key):
+        dict.__delitem__(self, key)
         self.keyOrder.remove(key)
 
     def __iter__(self):
