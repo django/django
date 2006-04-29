@@ -10,27 +10,29 @@ Cookies contain a session ID -- not the data itself.
 Enabling sessions
 =================
 
-Session functionality is enabled by default.
+Sessions are implemented via middleware_.
 
-You can turn session functionality on and off by editing the
-``MIDDLEWARE_CLASSES`` setting. To activate sessions, make sure
-``MIDDLEWARE_CLASSES`` contains ``"django.contrib.sessions.middleware.SessionMiddleware"``.
+Turn session functionality on and off by editing the ``MIDDLEWARE_CLASSES``
+setting. To activate sessions, make sure ``MIDDLEWARE_CLASSES`` contains
+``"django.contrib.sessions.middleware.SessionMiddleware"``.
+
+The default ``settings.py`` created by ``django-admin.py startproject`` has
+``SessionMiddleware`` activated.
 
 If you don't want to use sessions, you might as well remove the
 ``SessionMiddleware`` line from ``MIDDLEWARE_CLASSES``. It'll save you a small
 bit of overhead.
 
+.. _middleware: http://www.djangoproject.com/documentation/middleware/
+
 Using sessions in views
 =======================
 
-Each ``HttpRequest`` object -- the first argument to any Django view function --
-has a ``session`` attribute, which is a dictionary-like object. You can read
-it and write to it.
+When ``SessionMiddleware`` is activated, each ``HttpRequest`` object -- the
+first argument to any Django view function -- will have a ``session``
+attribute, which is a dictionary-like object. You can read it and write to it.
 
 It implements the following standard dictionary methods:
-
-    * ``__contains__(key)``
-      Example: ``'fav_color' in request.session``
 
     * ``__getitem__(key)``
       Example: ``fav_color = request.session['fav_color']``
@@ -41,6 +43,9 @@ It implements the following standard dictionary methods:
     * ``__delitem__(key)``
       Example: ``del request.session['fav_color']``. This raises ``KeyError``
       if the given ``key`` isn't already in the session.
+
+    * ``__contains__(key)``
+      Example: ``'fav_color' in request.session``
 
     * ``get(key, default=None)``
       Example: ``fav_color = request.session.get('fav_color', 'red')``
