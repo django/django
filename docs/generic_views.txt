@@ -35,7 +35,7 @@ drives the blog on djangoproject.com::
     from django_website.apps.blog.models import Entry
 
     info_dict = {
-        'model': Entry,
+        'queryset': Entry.objects.all(),
         'date_field': 'pub_date',
     }
 
@@ -47,18 +47,20 @@ drives the blog on djangoproject.com::
        (r'^/?$',                                                                  'archive_index', info_dict),
     )
 
-As you can see, this URLconf defines a few options in ``info_dict``. ``'model'``
-tells the generic view which model to use (``Entry``, in this case), as well as
-some extra information.
+As you can see, this URLconf defines a few options in ``info_dict``.
+``'queryset'`` tells the generic view which objects to use (all of the
+``Entry`` objects, in this case), as well as some extra information (it is
+used by the view to determine the model being used, for example).
 
 Documentation of each generic view follows, along with a list of all keyword
 arguments that a generic view expects. Remember that as in the example above,
 arguments may either come from the URL pattern (as ``month``, ``day``,
 ``year``, etc. do above) or from the additional-information dictionary (as for
-``model``, ``date_field``, etc.).
+``queryset``, ``date_field``, etc.).
 
-Most generic views require the ``model`` key, which is your model class (*not*
-an instance of the class).
+Most generic views require the ``queryset`` key, which is a ``QuerySet``
+instance (*not* an instance of the class); see the `database API docs`_
+for more information about query sets.
 
 Using "simple" generic views
 ============================
@@ -446,3 +448,4 @@ The create/update/delete views are:
             ``template_object_name`` parameter. (See above.) For example, if
             ``template_object_name`` is ``foo``, the variable will be ``foo``
             instead of ``object``.
+
