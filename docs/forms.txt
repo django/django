@@ -53,9 +53,9 @@ created when you define a new class::
 
     >>> from mysite.myapp.models import Place
     >>> Place.AddManipulator
-    <class Place.ManipulatorAdd at 0x4c1540>
+    <class 'django.models.manipulators.AddManipulator'>
     >>> Place.ChangeManipulator
-    <class Place.ManipulatorChange at 0x4c1630>
+    <class 'django.models.manipulators.ChangeManipulator'>
 
 Using the ``AddManipulator``
 ----------------------------
@@ -65,8 +65,8 @@ POSTed data from the browser and creates a new ``Place`` object::
 
     from django.shortcuts import render_to_response
     from django.http import Http404, HttpResponse, HttpResponseRedirect
-    from mysite.myapp.models import Place
     from django import forms
+    from mysite.myapp.models import Place
 
     def naive_create_place(request):
         """A naive approach to creating places; don't actually use this!"""
@@ -198,7 +198,7 @@ data is valid). An added bonus of this approach is that errors and the form will
 both be available on the same page, so errors with fields can be presented in
 context.
 
-.. admonition:: Philosophy::
+.. admonition:: Philosophy:
 
     Finally, for the HTTP purists in the audience (and the authorship), this
     nicely matches the "true" meanings of HTTP GET and HTTP POST: GET fetches
@@ -408,8 +408,8 @@ Validators
 One useful feature of manipulators is the automatic validation. Validation is
 done using a simple validation API: A validator is a callable that raises a
 ``ValidationError`` if there's something wrong with the data.
-``django.core.validators`` defines a host of validator functions, but defining
-your own couldn't be easier::
+``django.core.validators`` defines a host of validator functions (see below),
+but defining your own couldn't be easier::
 
     from django.core import validators
     from django import forms
@@ -431,10 +431,153 @@ the field's ``validator_list``.
 
 The arguments to a validator function take a little explanation.  ``field_data``
 is the value of the field in question, and ``all_data`` is a dictionary of all
-the data being validated.  Note that at the point validators are called all
-data will still be strings (as ``do_html2python`` hasn't been called yet).
+the data being validated.
+
+.. admonition:: Note::
+
+    At the point validators are called all data will still be
+    strings (as ``do_html2python`` hasn't been called yet).
 
 Also, because consistency in user interfaces is important, we strongly urge you
 to put punctuation at the end of your validation messages.
 
+Ready-made Validators
+---------------------
+
+Writing your own validator is not difficult, but there are some situations
+that come up over and over again. Django comes with a number of validators
+that can be used directly in your code. All of these functions and classes
+reside in ``django/core/validators.py``.
+
+The following validators should all be self-explanatory. Each one provides a
+check for the given property:
+
+    * isAlphaNumeric
+    * isAlphaNumericURL
+    * isSlug
+    * isLowerCase
+    * isUpperCase
+    * isCommaSeparatedIntegerList
+    * isCommaSeparatedEmailList
+    * isValidIPAddress4
+    * isNotEmpty
+    * isOnlyDigits
+    * isNotOnlyDigits
+    * isInteger
+    * isOnlyLetters
+    * isValidANSIDate
+    * isValidANSITime
+    * isValidEmail
+    * isValidImage
+    * isValidImageURL
+    * isValidPhone
+    * isValidQuicktimeVideoURL
+    * isValidURL
+    * isValidHTML
+    * isWellFormedXml
+    * isWellFormedXmlFragment
+    * isExistingURL
+    * isValidUSState
+    * hasNoProfanities
+
+There are also a group of validators that are slightly more flexible. For
+these validators, you create a validator instance, passing in the parameters
+described below. The returned object is a callable that can be used as a
+validator.
+
+For example::
+
+    from django.core import validators
+    from django import forms
+
+    power_validator = validators.IsAPowerOf(2)
+
+    class InstallationManipulator(forms.Manipulator)
+        def __init__(self):
+            self.fields = (
+                ...
+                forms.IntegerField(field_name = "size", validator_list=[power_validator])
+            )
+
+Here, ``validators.IsAPowerOf(...)`` returned something that could be used as
+a validator (in this case, a check that a number was a power of 2).
+
+Each of the standard validators that take parameters have an optional final
+argument (``error_message``) that is the message returned when validation
+fails. If no message is passed in, a default message is used.
+
+``AlwaysMatchesOtherField``
+    Takes a field name and the current field is valid if and only if its value
+    matches the contents of the other field.
+
+``ValidateIfOtherFieldEquals``
+    Takes three parameters: ``other_field``, ``other_value`` and
+    ``validator_list``, in that order. If ``other_field`` has a value of
+    ``other_vaue``, then the validators in ``validator_list`` are all run
+    against the current field.
+
+``RequiredIfOtherFieldNotGiven``
+    Takes the name of the other field and this field is only required if the
+    other field has no value.
+
+``RequiredIfOtherFieldsNotGiven``
+    Similar to ``RequiredIfOtherFieldNotGiven``, except that it takes a list
+    of field names and if any one of the supplied fields does not have a value
+    provided, the field being validated is required.
+
+``RequiredIfOtherFieldEquals`` and ``RequiredIfOtherFieldDoesNotEqual``
+    Each of these validator classes takes a field name and a value (in that
+    order). If the given field does (or does not have, in the latter case) the
+    given value, then the current field being validated is required.
+
+    Note that because validators are called before any ``do_html2python()``
+    functions, the value being compared against is a string. So
+    ``RequiredIfOtherFieldEquals('choice', '1')`` is correct, whilst
+    ``RequiredIfOtherFieldEquals('choice', 1)`` will never result in the
+    equality test succeeding.
+
+``IsLessThanOtherField``
+    Takes a field name and validates that the current field being validated
+    has a value that is less than (or equal to) the other field's value.
+    Again, comparisons are done using strings, so be cautious about using
+    this function to compare data that should be treated as another type. The
+    string "123" is less than the string "2", for example. If you don't want
+    string comparison here, you will need to write your own validator.
+
+``IsAPowerOf``
+    Takes an integer argument and when called as a validator, checks that the
+    field being validated is a power of the integer.
+
+``IsValidFloat``
+    Takes a maximum number of digits and number of decimal places (in that
+    order) and validates whether the field is a float with less than the
+    maximum number of digits and decimal place.
+
+``MatchesRegularExpression``
+    Takes a regular expression (a string) as a parameter and validates the
+    field value against it.
+
+``AnyValidator``
+    Takes a list of validators as a parameter. At validation time, if the
+    field successfully validates against any one of the validators, it passes
+    validation. The validators are tested in the order specified in the
+    original list.
+
+``URLMimeTypeCheck``
+    Used to validate URL fields. Takes a list of MIME types (such as
+    ``text/plain``) at creation time. At validation time, it verifies that the
+    field is indeed a URL and then tries to retrieve the content at the URL.
+    Validation succeeds if the content could be retrieved and it has a content
+    type from the list used to create the validator.
+
+``RelaxNGCompact``
+    Used to validate an XML document against a Relax NG compact schema. Takes
+    a file path to the location of the schema and an optional root element
+    (which is wrapped around the XML fragment before validation, if supplied).
+    At validation time, the XML fragment is validated against the schema using
+    the executable specified in the ``JING_PATH`` setting (see the settings_
+    document for more details).
+
 .. _`generic views`: http://www.djangoproject.com/documentation/generic_views/
+.. _`models API`: http://www.djangoproject.com/documentation/model_api/
+.. _settings: http://www.djangoproject.com/documentation/settings/
