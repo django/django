@@ -77,9 +77,9 @@ It's easy either way.
 Installing the official version
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-1. Download Django-0.91.tar.gz from our `download page`_.
-2. ``tar xzvf Django-0.91.tar.gz``
-3. ``cd Django-0.91``
+1. Download Django-0.92.tar.gz from our `download page`_.
+2. ``tar xzvf Django-0.92.tar.gz``
+3. ``cd Django-0.92``
 4. ``sudo python setup.py install``
 
 Note that the last command will automatically download and install setuptools_
