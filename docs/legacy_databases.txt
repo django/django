@@ -45,49 +45,24 @@ database. You can view the output by running this command::
 
 Save this as a file by using standard Unix output redirection::
 
-    django-admin.py inspectdb --settings=path.to.settings > appname.py
+    django-admin.py inspectdb --settings=path.to.settings > models.py
 
 This feature is meant as a shortcut, not as definitive model generation. See
 the `django-admin.py documentation`_ for more information.
 
-Once you've cleaned up the model, put the module in the ``models`` directory of
-your app, and add it to your ``INSTALLED_APPS`` setting.
+Once you've cleaned up your models, name the file ``models.py`` and put it in
+the Python package that holds your app. Then add the app to your
+``INSTALLED_APPS`` setting.
 
 .. _django-admin.py documentation: http://www.djangoproject.com/documentation/django_admin/
 
 Install the core Django tables
 ==============================
 
-Next, run the ``django-admin.py init`` command to install Django's core tables
-in your database::
+Next, run the ``manage.py syncdb`` command to install any extra needed database
+records such as admin permissions and content types::
 
     django-admin.py init --settings=path.to.settings
-
-This won't work if your database already contains tables that have any of the
-following names:
-
-    * ``django_site``
-    * ``django_content_type``
-    * ``django_sessions``
-    * ``auth_permission``
-    * ``auth_group``
-    * ``auth_user``
-    * ``auth_message``
-    * ``auth_group_permissions``
-    * ``auth_user_groups``
-    * ``auth_user_user_permission``
-
-If that's the case, try renaming one of your tables to resolve naming
-conflicts. Currently, there's no way of customizing the names of Django's
-database tables without editing Django's source code itself.
-
-Install metadata about your app
-===============================
-
-Django has a couple of database tables that contain metadata about your apps.
-You'll need to execute the SQL output by this command::
-
-    django-admin.py sqlinitialdata [appname] --settings=path.to.settings
 
 See whether it worked
 =====================
