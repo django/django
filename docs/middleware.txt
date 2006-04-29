@@ -24,6 +24,8 @@ name. For example, here's the default ``MIDDLEWARE_CLASSES`` created by
 
     MIDDLEWARE_CLASSES = (
         "django.middleware.common.CommonMiddleware",
+        "django.contrib.sessions.middleware.SessionMiddleware",
+        "django.contrib.auth.middleware.AuthenticationMiddleware",
         "django.middleware.doc.XViewMiddleware",
     )
 
@@ -102,6 +104,14 @@ Enables session support. See the `session documentation`_.
 
 .. _`session documentation`: http://www.djangoproject.com/documentation/sessions/
 
+django.contrib.auth.middleware.AuthenticationMiddleware
+-------------------------------------------------------
+
+Adds the ``user`` attribute, representing the currently-logged-in user, to
+every incoming ``HttpRequest`` object. See `Authentication in Web requests`_.
+
+.. _Authentication in Web requests: http://www.djangoproject.com/documentation/authentication/#authentication-in-web-requests
+
 django.middleware.transaction.TransactionMiddleware
 ---------------------------------------------------
 
@@ -117,7 +127,6 @@ the same transaction control as the view functions.
 See the `transaction management documentation`_.
 
 .. _`transaction management documentation`: http://www.djangoproject.com/documentation/transaction/
-
 
 Writing your own middleware
 ===========================
