@@ -108,7 +108,7 @@ class PublicCommentManipulator(AuthenticationForm):
         c.save()
         # If the commentor has posted fewer than COMMENTS_FIRST_FEW comments,
         # send the comment to the managers.
-        if self.user_cache.get_comments_comment_count() <= settings.COMMENTS_FIRST_FEW:
+        if self.user_cache.comment_set.count() <= settings.COMMENTS_FIRST_FEW:
             message = ngettext('This comment was posted by a user who has posted fewer than %(count)s comment:\n\n%(text)s',
                 'This comment was posted by a user who has posted fewer than %(count)s comments:\n\n%(text)s') % \
                 {'count': settings.COMMENTS_FIRST_FEW, 'text': c.get_as_text()}

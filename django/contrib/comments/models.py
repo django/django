@@ -47,10 +47,11 @@ class CommentManager(models.Manager):
         Returns a list of Comment objects matching the given lookup terms, with
         _karma_total_good and _karma_total_bad filled.
         """
-        kwargs.setdefault('select', {})
-        kwargs['select']['_karma_total_good'] = 'SELECT COUNT(*) FROM comments_karmascore WHERE comments_karmascore.comment_id=comments.id AND score=1'
-        kwargs['select']['_karma_total_bad'] = 'SELECT COUNT(*) FROM comments_karmascore WHERE comments_karmascore.comment_id=comments.id AND score=-1'
-        return self.filter(**kwargs)
+        extra_kwargs = {}
+        extra_kwargs.setdefault('select', {})
+        extra_kwargs['select']['_karma_total_good'] = 'SELECT COUNT(*) FROM comments_karmascore, comments_comment WHERE comments_karmascore.comment_id=comments_comment.id AND score=1'
+        extra_kwargs['select']['_karma_total_bad'] = 'SELECT COUNT(*) FROM comments_karmascore, comments_comment WHERE comments_karmascore.comment_id=comments_comment.id AND score=-1'
+	return self.filter(**kwargs).extra(**extra_kwargs)
 
     def user_is_moderator(self, user):
         if user.is_superuser:
