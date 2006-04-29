@@ -468,11 +468,11 @@ def _get_deleted_objects(deleted_objects, perms_needed, user, obj, opts, current
                 # Don't display link to edit, because it either has no
                 # admin or is edited inline.
                 nh(deleted_objects, current_depth, [_('One or more %(fieldname)s in %(name)s: %(obj)s') % \
-                    {'fieldname': related.field.name, 'name': related.opts.verbose_name, 'obj': escape(str(sub_obj))}, []])
+                    {'fieldname': related.field.verbose_name, 'name': related.opts.verbose_name, 'obj': escape(str(sub_obj))}, []])
             else:
                 # Display a link to the admin page.
                 nh(deleted_objects, current_depth, [
-                    (_('One or more %(fieldname)s in %(name)s:') % {'fieldname': related.field.name, 'name':related.opts.verbose_name}) + \
+                    (_('One or more %(fieldname)s in %(name)s:') % {'fieldname': related.field.verbose_name, 'name':related.opts.verbose_name}) + \
                     (' <a href="../../../../%s/%s/%s/">%s</a>' % \
                         (related.opts.app_label, related.opts.module_name, sub_obj._get_pk_val(), escape(str(sub_obj)))), []])
         # If there were related objects, and the user doesn't have
