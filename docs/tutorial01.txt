@@ -449,7 +449,7 @@ Once you're in the shell, explore the database API::
     >>> p.pub_date = datetime(2005, 4, 1, 0, 0)
     >>> p.save()
 
-    # get_list() displays all the polls in the database.
+    # objects.all() displays all the polls in the database.
     >>> Poll.objects.all()
     [<Poll object>]
 

@@ -39,7 +39,7 @@ A quick rundown:
       Django; it's just good Web development practice.
 
 Now, let's create a Django view that handles the submitted data and does
-something with it. Remember, in `Tutorial 3`_, we create a URLconf for the
+something with it. Remember, in `Tutorial 3`_, we created a URLconf for the
 polls application that includes this line::
 
     (r'^(?P<poll_id>\d+)/vote/$', 'mysite.polls.views.vote'),
@@ -151,8 +151,8 @@ conversion.
 
     You should know basic math before you start using a calculator.
 
-First, open the polls.py URLconf. It looks like this, according to the tutorial
-so far::
+First, open the polls/urls.py URLconf. It looks like this, according to the
+tutorial so far::
 
     from django.conf.urls.defaults import *
 
@@ -175,7 +175,7 @@ Change it like so::
     urlpatterns = patterns('',
         (r'^$', 'django.views.generic.list_detail.object_list', info_dict),
         (r'^(?P<object_id>\d+)/$', 'django.views.generic.list_detail.object_detail', info_dict),
-        (r'^(?P<object_id>\d+)/results/$', 'django.views.generic.list_detail.object_detail', dict(info_dict, template_name='polls/results')),
+        (r'^(?P<object_id>\d+)/results/$', 'django.views.generic.list_detail.object_detail', dict(info_dict, template_name='polls/results.html')),
         (r'^(?P<poll_id>\d+)/vote/$', 'mysite.polls.views.vote'),
     )
 
@@ -203,7 +203,7 @@ Similarly, the ``object_list`` generic view uses a template called
 
 Because we have more than one entry in the URLconf that uses ``object_detail``
 for the polls app, we manually specify a template name for the results view:
-``template_name='polls/results'``. Otherwise, both views would use the same
+``template_name='polls/results.html'``. Otherwise, both views would use the same
 template. Note that we use ``dict()`` to return an altered dictionary in place.
 
 In previous versions of the tutorial, the templates have been provided with a context

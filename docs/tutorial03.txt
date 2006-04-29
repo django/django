@@ -360,7 +360,7 @@ what the template might look like::
 
     <h1>{{ poll.question }}</h1>
     <ul>
-    {% for choice in poll.get_choice_list %}
+    {% for choice in poll.choice_set.all %}
         <li>{{ choice.choice }}</li>
     {% endfor %}
     </ul>
@@ -371,9 +371,9 @@ on the object ``poll``. Failing that, it tries attribute lookup -- which works,
 in this case. If attribute lookup had failed, it would've tried calling the
 method ``question()`` on the poll object.
 
-Method-calling happens in the ``{% for %}`` loop: ``poll.get_choice_list`` is
-interpreted as the Python code ``poll.get_choice_list()``, which returns a list
-of Choice objects and is suitable for iteration via the ``{% for %}`` tag.
+Method-calling happens in the ``{% for %}`` loop: ``poll.choice_set.all`` is
+interpreted as the Python code ``poll.choice_set.all()``, which returns an
+iterable of Choice objects and is suitable for use in the ``{% for %}`` tag.
 
 See the `template guide`_ for full details on how templates work.
 
