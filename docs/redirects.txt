@@ -8,12 +8,12 @@ redirects in a database and handles the redirecting for you.
 Installation
 ============
 
-To install the redirects app, follow these two steps:
+To install the redirects app, follow these steps:
 
-    1. Add ``"django.contrib.redirects"`` to your INSTALLED_APPS_ setting.
-    2. Add ``"django.contrib.redirects.middleware.RedirectFallbackMiddleware"``
+    1. Add ``'django.contrib.redirects'`` to your INSTALLED_APPS_ setting.
+    2. Add ``'django.contrib.redirects.middleware.RedirectFallbackMiddleware'``
        to your MIDDLEWARE_CLASSES_ setting.
-    3. Run the command ``django-admin.py install redirects``.
+    3. Run the command ``manage.py syncdb``.
 
 .. _INSTALLED_APPS: http://www.djangoproject.com/documentation/settings/#installed-apps
 .. _MIDDLEWARE_CLASSES: http://www.djangoproject.com/documentation/settings/#middleware-classes
@@ -21,9 +21,8 @@ To install the redirects app, follow these two steps:
 How it works
 ============
 
-``django-admin.py install redirects`` creates a ``django_redirect`` table in
-your database. This is a simple lookup table with ``site_id``, ``old_path`` and
-``new_path`` fields.
+``manage.py syncdb`` creates a ``django_redirect`` table in your database. This
+is a simple lookup table with ``site_id``, ``old_path`` and ``new_path`` fields.
 
 The ``RedirectFallbackMiddleware`` does all of the work. Each time any Django
 application raises a 404 error, this middleware checks the redirects database
