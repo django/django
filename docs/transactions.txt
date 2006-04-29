@@ -7,25 +7,29 @@ Django gives you a few ways to control how database transactions are managed.
 Django's default transaction behavior
 =====================================
 
-The default behavior of Django is to commit on special model functions. If you
-call ``model.save()`` or ``model.delete()``, that change will be committed immediately.
+Django's default behavior is to commit automatically when any built-in,
+data-altering model function is called. For example, if you call
+``model.save()`` or ``model.delete()``, the change will be committed
+immediately.
 
-This is much like the auto-commit setting for most databases: as soon as you
+This is much like the auto-commit setting for most databases. As soon as you
 perform an action that needs to write to the database, Django produces the
-insert/update/delete statements and then does the commit. There is no implicit
-rollback in Django.
+``INSERT``/``UPDATE``/``DELETE`` statements and then does the ``COMMIT``.
+There's no implicit ``ROLLBACK``.
 
 Tying transactions to HTTP requests
 ===================================
 
-A useful way to handle transactions is to tie them to the request and response
-phases.
+The recommended way to handle transactions in Web requests is to tie them to
+the request and response phases via Django's ``TransactionMiddleware``.
 
-When a request starts, you start a transaction. If the response is produced
-without problems, any transactions are committed. If the view function produces
-and exception, a rollback happens. This is one of the more intuitive ways to
-handle transactions. To activate this feature, just add the
-``TransactionMiddleware`` middleware to your stack::
+It works like this: When a request starts, Django starts a transaction. If the
+response is produced without problems, Django commits any pending transactions.
+If the view function produces an exception, Django rolls back any pending
+transactions.
+
+To activate this feature, just add the ``TransactionMiddleware`` middleware to
+your ``MIDDLEWARE_CLASSES`` setting::
 
     MIDDLEWARE_CLASSES = (
         "django.contrib.sessions.middleware.SessionMiddleware",
@@ -34,34 +38,35 @@ handle transactions. To activate this feature, just add the
         "django.middleware.transaction.TransactionMiddleware",
     )
 
-The order is quite important: the transaction middleware will be relevant not
-only for the view functions called, but for all middleware modules that come
-after it. So if you use the session middleware after the transaction middleware,
-session creation will be part of the transaction.
+The order is quite important. The transaction middleware applies not only to
+view functions, but also for all middleware modules that come after it. So if
+you use the session middleware after the transaction middleware, session
+creation will be part of the transaction.
 
-The cache middleware isn't affected, as it uses its own database cursor (which
-is mapped to its own database connection internally), and only the
-database-based cache is affected.
+An exception is ``CacheMiddleware``, which is never affected. The cache
+middleware uses its own database cursor (which is mapped to its own database
+connection internally).
 
 Controlling transaction management in views
 ===========================================
 
-For many people, implicit request-based transactions will work wonderfully.
-However, if you need to control the way that transactions are managed,
-you can use decorators that you can apply to a function to change the way
-transactions are handled.
+For most people, implicit request-based transactions work wonderfully. However,
+if you need more fine-grained control over how transactions are managed, you
+can use Python decorators to change the way transactions are handled by a
+particular view function.
 
 .. note::
 
     Although the examples below use view functions as examples, these
     decorators can be applied to non-view functions as well.
 
-``autocommit``
---------------
+``django.db.transaction.autocommit``
+------------------------------------
 
-You can use the ``autocommit`` decorator to switch a view function to the
-default commit behavior of Django, regardless of the global setting. Just use
-the decorator like this::
+Use the ``autocommit`` decorator to switch a view function to Django's default
+commit behavior, regardless of the global transaction setting.
+
+Example::
 
     from django.db import transaction
 
@@ -69,14 +74,14 @@ the decorator like this::
     def viewfunc(request):
         ....
 
-Within ``viewfunc`` transactions will be committed as soon as you call
+Within ``viewfunc()``, transactions will be committed as soon as you call
 ``model.save()``, ``model.delete()``, or any other function that writes to the
 database.
 
-``commit_on_success``
----------------------
+``django.db.transaction.commit_on_success``
+-------------------------------------------
 
-You can use the ``commit_on_success`` decorator to use a single transaction for
+Use the ``commit_on_success`` decorator to use a single transaction for
 all the work done in a function::
 
     from django.db import transaction
@@ -85,22 +90,20 @@ all the work done in a function::
     def viewfunc(request):
         ....
 
-If the function returns successfully, then all work done will be committed. If an
-exception is raised beyond the function, however, the transaction will be rolled
-back.
+If the function returns successfully, then Django will commit all work done
+within the function at that point. If the function raises an exception, though,
+Django will roll back the transaction.
 
-``commit_manually``
--------------------
+``django.db.transaction.commit_manually``
+-----------------------------------------
 
-Sometimes you need full control over your transactions. In that case, you can use the
-``commit_manually`` decorator, which tells Django you'll be managing the transaction
-on your own.
+Use the ``commit_manually`` decorator if you need full control over
+transactions. It tells Django you'll be managing the transaction on your own.
 
-If you don't commit or rollback and did change data (so that the current
-transaction is marked as dirty), you'll get a ``TransactionManagementError``
-exception.
+If your view changes data and doesn't ``commit()`` or ``rollback()``, Django
+will raise a ``TransactionManagementError`` exception.
 
-Manual transaction management looks like::
+Manual transaction management looks like this::
 
     from django.db import transaction
 
@@ -121,10 +124,10 @@ Manual transaction management looks like::
 
 ..admonition:: An important note to users of earlier Django releases:
 
-    The database ``connection.commit`` and ``connection.rollback`` functions
-    (also called ``db.commit`` and ``db.rollback`` in 0.91 and earlier), no
-    longer exist and have been replaced by the ``transaction.commit`` and
-    ``transaction.rollback`` commands.
+    The database ``connection.commit()`` and ``connection.rollback()`` methods
+    (called ``db.commit()`` and ``db.rollback()`` in 0.91 and earlier) no longer
+    exist. They've been replaced by ``transaction.commit()`` and
+    ``transaction.rollback()``.
 
 How to globally deactivate transaction management
 =================================================
@@ -132,12 +135,12 @@ How to globally deactivate transaction management
 Control freaks can totally disable all transaction management by setting
 ``DISABLE_TRANSACTION_MANAGEMENT`` to ``True`` in the Django settings file.
 
-If you do this, there will be no management whatsoever. The middleware will no
-longer implicitly commit transactions, and you'll need to roll management
-yourself. This even will require you to commit changes done by middleware
-somewhere else.
+If you do this, Django won't provide any automatic transaction management
+whatsoever. Middleware will no longer implicitly commit transactions, and
+you'll need to roll management yourself. This even requires you to commit
+changes done by middleware somewhere else.
 
-Thus, this is best used in situations where you want to run your own transaction
-controlling middleware or do something really strange. In almost all situations,
-you'll be better off using the default behavior or the transaction middleware
-and only modify selected functions as needed.
+Thus, this is best used in situations where you want to run your own
+transaction-controlling middleware or do something really strange. In almost
+all situations, you'll be better off using the default behavior, or the
+transaction middleware, and only modify selected functions as needed.
