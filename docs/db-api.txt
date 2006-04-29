@@ -1428,7 +1428,7 @@ previous object with respect to the date field, raising the appropriate
 ``DoesNotExist`` exception when appropriate.
 
 Both methods accept optional keyword arguments, which should be in the format
-described in "Field lookups" above.
+described in _`Field lookups` above.
 
 Note that in the case of identical date values, these methods will use the ID
 as a fallback check. This guarantees that no records are skipped or duplicated.
