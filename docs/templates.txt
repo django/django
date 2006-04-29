@@ -13,9 +13,8 @@ or CheetahTemplate_, you should feel right at home with Django's templates.
 Templates
 =========
 
-A template is simply a text file. All Django templates, by convention, have
-".html" extensions, but they can generate any text-based format (HTML, XML,
-CSV, etc.).
+A template is simply a text file. It can generate any text-based format (HTML,
+XML, CSV, etc.).
 
 A template contains **variables**, which get replaced with values when the
 template is evaluated, and **tags**, which control the logic of the template.
@@ -23,7 +22,7 @@ template is evaluated, and **tags**, which control the logic of the template.
 Below is a minimal template that illustrates a few basics. Each element will be
 explained later in this document.::
 
-    {% extends "base_generic" %}
+    {% extends "base_generic.html" %}
 
     {% block title %}{{ section.title }}{% endblock %}
 
@@ -47,6 +46,8 @@ explained later in this document.::
     just XML/HTML templates. At World Online, we use it for e-mails,
     JavaScript and CSV. You can use the template language for any text-based
     format.
+
+    Oh, and one more thing: Making humans edit XML is masochistic!
 
 Variables
 =========
@@ -74,26 +75,23 @@ If you use a variable that doesn't exist, the template system will insert
 the value of the ``TEMPLATE_STRING_IF_INVALID`` setting, which is set to ``''``
 (the empty string) by default.
 
-If you use a variable that doesn't exist, it will be silently ignored. The
-variable will be replaced by nothingness.
-
 See `Using the built-in reference`_, below, for help on finding what variables
 are available in a given template.
 
-You can modify variables for display by using **filters**.
-
 Filters
 =======
+
+You can modify variables for display by using **filters**.
 
 Filters look like this: ``{{ name|lower }}``. This displays the value of the
 ``{{ name }}`` variable after being filtered through the ``lower`` filter,
 which converts text to lowercase. Use a pipe (``|``) to apply a filter.
 
-Filters can be "chained." The output of one filter applied to the next:
-``{{ text|escape|linebreaks }}`` is a common idiom for escaping text contents
-and then converting line breaks to ``<p>`` tags.
+Filters can be "chained." The output of one filter is applied to the next.
+``{{ text|escape|linebreaks }}`` is a common idiom for escaping text contents,
+then converting line breaks to ``<p>`` tags.
 
-Certain filters take arguments. A filter argument looks like this:
+Some filters take arguments. A filter argument looks like this:
 ``{{ bio|truncatewords:"30" }}``. This will display the first 30 words of the
 ``bio`` variable. Filter arguments always are in double quotes.
 
@@ -154,7 +152,7 @@ engine that a child template may override those portions of the template.
 
 A child template might look like this::
 
-    {% extends "base" %}
+    {% extends "base.html" %}
 
     {% block title %}My amazing blog{% endblock %}
 
@@ -167,12 +165,12 @@ A child template might look like this::
 
 The ``{% extends %}`` tag is the key here. It tells the template engine that
 this template "extends" another template. When the template system evaluates
-this template, first it locates the parent -- in this case, "base" (note the
-lack of an ".html" extension in the ``{% extends %}`` tag).
+this template, first it locates the parent -- in this case, "base.html".
 
-At that point, the template engine will notice the three blocks in
-``base.html`` and replace those blocks with the contents of the child template.
-Depending on the value of ``blog_entries``, the output might look like::
+At that point, the template engine will notice the three ``{% block %}`` tags
+in ``base.html`` and replace those blocks with the contents of the child
+template. Depending on the value of ``blog_entries``, the output might look
+like::
 
     <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
         "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
@@ -203,28 +201,35 @@ Note that since the child template didn't define the ``sidebar`` block, the
 value from the parent template is used instead. Content within a ``{% block %}``
 tag in a parent template is always used as a fallback.
 
-Template inheritance isn't limited to a single level. Multi-level inheritance
-is possible and, indeed, quite useful.
+You can use as many levels of inheritance as needed. One common way of using
+inheritance is the following three-level approach:
+
+    * Create a ``base.html`` template that holds the main look-and-feel of your
+      site.
+    * Create a ``base_SECTIONNAME.html`` template for each "section" of your
+      site. For example, ``base_news.html``, ``base_sports.html``. These
+      templates all extend ``base.html`` and include section-specific
+      styles/design.
+    * Create individual templates for each type of page, such as a news
+      article or blog entry. These templates extend the appropriate section
+      template.
+
+This approach maximizes code reuse and makes it easy to add items to shared
+content areas, such as section-wide navigation.
 
 Here are some tips for working with inheritance:
 
     * If you use ``{% extends %}`` in a template, it must be the first template
-      tag in that template.
+      tag in that template. Template inheritance won't work, otherwise.
 
     * More ``{% block %}`` tags in your base templates are better. Remember,
       child templates don't have to define all parent blocks, so you can fill
       in reasonable defaults in a number of blocks, then only define the ones
-      you need later.
+      you need later. It's better to have more hooks than fewer hooks.
 
     * If you find yourself duplicating content in a number of templates, it
       probably means you should move that content to a ``{% block %}`` in a
       parent template.
-
-    * The recommended template layout is to use three levels: a single base
-      template for the entire site, a set of mid-level templates for each
-      section of the site, and then the individual templates for each view.
-      This maximizes code reuse and makes it easier to add items to shared
-      content areas (such as section-wide navigation).
 
     * If you need to get the content of the block from the parent template,
       the ``{{ block.super }}`` variable will do the trick. This is useful
@@ -241,15 +246,11 @@ wouldn't know which one of the blocks' content to use.
 Using the built-in reference
 ============================
 
-Because Django can be used to develop any sort of site, the tags, filters and
-variables available are different depending on the application. To make it
-easy to figure out what's available in a given site, the admin interface has a
-complete reference of all the template goodies available to that site. To get
-that reference, go to your Django admin interface and click the "Documentation"
-link in the upper right of any page.
+Django's admin interface includes a complete reference of all template tags and
+filters available for a given site. To see it, go to your admin interface and
+click the "Documentation" link in the upper right of the page.
 
-The reference is integrated into the administration interface for your site(s)
-and is divided into 4 sections: tags, filters, models, and views.
+The reference is divided into 4 sections: tags, filters, models, and views.
 
 The **tags** and **filters** sections describe all the built-in tags (in fact,
 the tag and filter references below come directly from those pages) as well as
@@ -260,13 +261,13 @@ entry here, and clicking on a URL will show you:
 
     * The name of the view function that generates that view.
     * A short description of what the view does.
-    * The **context**, or a list of variables available in the view.
+    * The **context**, or a list of variables available in the view's template.
     * The name of the template or templates that are used for that view.
 
 Each view documentation page also has a bookmarklet that you can use to jump
 from any page to the documentation page for that view.
 
-Because Django generally revolves around database objects, the **models**
+Because Django-powered sites usually use database objects, the **models**
 section of the documentation page describes each type of object in the system
 along with all the fields available on that object.
 
@@ -300,9 +301,9 @@ available to the current template -- not any parent or child templates along
 the template-inheritance path.
 
 For example, if a template ``foo.html`` has ``{% load comments %}``, a child
-template (e.g., one that has ``{% extends foo %}`` will *not* have access to
-the comments template tags and filters. The child template is responsible for
-its own ``{% load comments %}``.
+template (e.g., one that has ``{% extends "foo.html" %}``) will *not* have
+access to the comments template tags and filters. The child template is
+responsible for its own ``{% load comments %}``.
 
 This is a feature for the sake of maintainability and sanity.
 
@@ -362,10 +363,10 @@ extends
 
 Signal that this template extends a parent template.
 
-This tag may be used in two ways: ``{% extends "base" %}`` (with quotes) uses
-the literal value "base" as the name of the parent template to extend, or ``{%
-extends variable %}`` uses the value of ``variable`` as the name of the parent
-template to extend.
+This tag may be used in two ways: ``{% extends "base.html" %}`` (with quotes)
+uses the literal value "base.html" as the name of the parent template to
+extend, or ``{% extends variable %}`` uses the value of ``variable`` as the
+name of the parent template to extend.
 
 See `Template inheritance`_ for more information.
 
@@ -485,7 +486,7 @@ ifchanged
 
 Check if a value has changed from the last iteration of a loop.
 
-The 'ifchanged' block tag is used within a loop. It checks its own rendered
+The ``ifchanged`` block tag is used within a loop. It checks its own rendered
 contents against its previous state and only displays its content if the value
 has changed::
 
@@ -763,7 +764,7 @@ to a maximum value, and then applies that ratio to a constant.
 
 For example::
 
-    <img src='bar.gif' height='10' width='{% widthratio this_value max_value 100 %}' />
+    <img src="bar.gif" height="10" width="{% widthratio this_value max_value 100 %}" />
 
 Above, if ``this_value`` is 175 and ``max_value`` is 200, the the image in the
 above example will be 88 pixels wide (because 175/200 = .875; .875 * 100 = 87.5
@@ -844,8 +845,8 @@ Escapes a string's HTML. Specifically, it makes these replacements:
 filesizeformat
 ~~~~~~~~~~~~~~
 
-Format the value like a 'human-readable' file size (i.e. 13 KB, 4.1 MB, 102
-bytes, etc).
+Format the value like a 'human-readable' file size (i.e. ``'13 KB'``,
+``'4.1 MB'``, ``'102 bytes'``, etc).
 
 first
 ~~~~~
@@ -893,12 +894,12 @@ Returns a boolean of whether the value's length is the argument.
 linebreaks
 ~~~~~~~~~~
 
-Converts newlines into <p> and <br />s.
+Converts newlines into ``<p>`` and ``<br />``s.
 
 linebreaksbr
 ~~~~~~~~~~~~
 
-Converts newlines into <br />s.
+Converts newlines into ``<br />``s.
 
 linenumbers
 ~~~~~~~~~~~
@@ -936,7 +937,11 @@ any string.
 pluralize
 ~~~~~~~~~
 
-Returns 's' if the value is not 1, for '1 vote' vs. '2 votes'.
+Returns ``'s'`` if the value is not 1.
+
+Example::
+
+    You have {{ num_messages }} message{{ num_messages|pluralize }}.
 
 pprint
 ~~~~~~
