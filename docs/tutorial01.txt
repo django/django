@@ -456,20 +456,20 @@ Once you're in the shell, explore the database API::
 
 Wait a minute. ``<Poll object>`` is, utterly, an unhelpful representation of
 this object. Let's fix that by editing the polls model
-(in the ``polls/models.py`` file) and adding a ``__repr__()`` method to
+(in the ``polls/models.py`` file) and adding a ``__str__()`` method to
 both ``Poll`` and ``Choice``::
 
     class Poll(models.Model):
         # ...
-        def __repr__(self):
+        def __str__(self):
             return self.question
 
     class Choice(models.Model):
         # ...
-        def __repr__(self):
+        def __str__(self):
             return self.choice
 
-It's important to add ``__repr__()`` methods to your models, not only for your
+It's important to add ``__str__()`` methods to your models, not only for your
 own sanity when dealing with the interactive prompt, but also because objects'
 representations are used throughout Django's automatically-generated admin.
 
@@ -491,7 +491,7 @@ Let's jump back into the Python interactive shell by running
 
     >>> from mysite.polls.models import Poll, Choice
 
-    # Make sure our __repr__() addition worked.
+    # Make sure our __str__() addition worked.
     >>> Poll.objects.all()
     [What's up?]
 

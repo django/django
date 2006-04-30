@@ -966,9 +966,9 @@ Here's a list of all possible ``Admin`` options. No options are required. Adding
           ``short_description`` function attribute, for use as the header for
           the field.
 
-        * Use the string ``"__repr__"`` to output the representation of the
-          object, according to your model's ``__repr__()`` function. If you
-          don't define ``list_display``, Django will use the ``__repr__`` by
+        * Use the string ``"__str__"`` to output the representation of the
+          object, according to your model's ``__str__()`` function. If you
+          don't define ``list_display``, Django will use the ``__str__`` by
           default.
 
     See the example below.
@@ -1131,16 +1131,16 @@ See `Giving models custom methods`_ for a full example.
 
 A few object methods have special meaning:
 
-``__repr__``
-    Django uses ``repr(obj)`` in a number of places, most notably as the value
+``__str__``
+    Django uses ``str(obj)`` in a number of places, most notably as the value
     inserted into a template when it displays an object. Thus, you should always
-    return a nice, human-readable string for the object's ``__repr__``.
+    return a nice, human-readable string for the object's ``__str__``.
 
-    Although defining ``__repr__()`` isn't required, it's strongly encouraged.
+    Although defining ``__str__()`` isn't required, it's strongly encouraged.
 
-    See `Adding repr`_ for a full example.
+    See `Adding str`_ for a full example.
 
-    .. _Adding repr: http://www.djangoproject.com/documentation/models/repr/
+    .. _Adding str: http://www.djangoproject.com/documentation/models/repr/
 
 ``get_absolute_url``
     Define a ``get_absolute_url`` method to tell Django how to calculate the

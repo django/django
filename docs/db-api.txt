@@ -15,14 +15,14 @@ a weblog application::
         name = models.CharField(maxlength=100)
         tagline = models.TextField()
 
-        def __repr__(self):
+        def __str__(self):
             return self.name
 
     class Author(models.Model):
         name = models.CharField(maxlength=50)
         email = models.URLField()
 
-        class __repr__(self):
+        class __str__(self):
             return self.name
 
     class Entry(models.Model):
@@ -32,7 +32,7 @@ a weblog application::
         pub_date = models.DateTimeField()
         authors = models.ManyToManyField(Author)
 
-        def __repr__(self):
+        def __str__(self):
             return self.headline
 
 Creating objects
