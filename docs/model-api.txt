@@ -10,211 +10,97 @@ The basics:
 
     * Each model is a Python class that subclasses ``django.db.models.Model``.
     * Each attribute of the model represents a database field.
-    * Model metadata (non-field information) goes in an inner class named ``Meta``.
-    * Metadata used for administration purposes goes into an inner class named ``Admin``.
+    * Model metadata (non-field information) goes in an inner class named
+      ``Meta``.
+    * Metadata used for Django's admin site goes into an inner class named
+      ``Admin``.
+    * With all of this, Django gives you an automatically-generated
+      database-access API, which is explained in the `Database API reference`_.
 
 A companion to this document is the `official repository of model examples`_.
 
-.. _`official repository of model examples`: http://www.djangoproject.com/documentation/models/
+.. _Database API reference: http://www.djangoproject.com/documentation/db_api/
+.. _official repository of model examples: http://www.djangoproject.com/documentation/models/
 
-Field objects
+Quick example
 =============
 
-The most important part of a model is the list of database fields it defines.
-Fields are defined by class attributes.
+This example model defines a ``Person``, which has a ``first_name`` and
+``last_name``::
 
-In this example, there are two fields, ``first_name`` and ``last_name`` ::
+    from django.db import models
 
     class Person(models.Model):
         first_name = models.CharField(maxlength=30)
         last_name = models.CharField(maxlength=30)
 
-Django will use ``first_name`` and ``last_name`` as the database column names.
+``first_name`` and ``last_name`` are *fields* of the model. Each field is
+specified as a class attribute, and each attribute maps to a database column.
 
-Each field type, except for ``ForeignKey``, ``ManyToManyField`` and
-``OneToOneField``, takes an optional first positional argument -- a
-human-readable name. If the human-readable name isn't given, Django will
-automatically create the human-readable name by using the machine-readable
-name, converting underscores to spaces.
+The above ``Person`` model would create an SQL table like this::
 
-In this example, the human-readable name is ``"Person's first name"``::
+    CREATE TABLE myapp_person (
+        "id" serial NOT NULL PRIMARY KEY,
+        "first_name" varchar(30) NOT NULL,
+        "last_name" varchar(30) NOT NULL
+    );
 
-    first_name = models.CharField("Person's first name", maxlength=30)
+Three technical notes:
 
-In this example, the human-readable name is ``"first name"``::
+    * The name of the table, ``myapp_person``, is automatically derived from
+      some model metadata but can be overridden. See _`Table names` below.
+    * An ``id`` field is added automatically, but this behavior can be
+      overriden. See _`Automatic primary key fields` below.
+    * The ``CREATE TABLE`` SQL in this example is formatted using PostgreSQL
+      syntax, but it's worth noting Django uses SQL tailored to the database
+      backend specified in your `settings file`_.
 
-    first_name = models.CharField(maxlength=30)
+.. _settings file: http://www.djangoproject.com/documentation/settings/
 
-``ForeignKey``, ``ManyToManyField`` and ``OneToOneField`` require the first
-argument to be a model class, so use the ``verbose_name`` keyword argument to
-specify the human-readable name::
+Fields
+======
 
-    poll = models.ForeignKey(Poll, verbose_name="the related poll")
-    sites = models.ManyToManyField(Site, verbose_name="list of sites")
-    place = models.OneToOneField(Place, verbose_name="related place")
+The most important part of a model -- and the only required part of a model --
+is the list of database fields it defines. Fields are specified by class
+attributes.
 
-Convention is not to capitalize the first letter of the ``verbose_name``.
-Django will automatically capitalize the first letter where it needs to.
+Example::
+
+    class Musician(models.Model):
+        first_name = models.CharField(maxlength=50)
+        last_name = models.CharField(maxlength=50)
+        instrument = models.CharField(maxlength=100)
+
+    class Album(models.Model):
+        artist = models.ForeignKey(Musician)
+        name = models.CharField(maxlength=100)
+        release_date = models.DateField()
+        num_stars = models.IntegerField()
 
 Field name restrictions
 -----------------------
 
-TODO: Fill this section.
+Django places only two restrictions on model field names:
 
-    * Can't be Python reserved word.
-    * Can't have more than one underscore in a row, due to query lookup.
+    1. A field name cannot be a Python reserved word, because that would result
+       in a Python syntax error. For example::
 
-General field options
----------------------
+           class Example(models.Model):
+               pass = models.IntegerField() # 'pass' is a reserved word!
 
-The following arguments are available to all field types. All are optional.
+    2. A field name cannot contain more than one underscore in a row, due to
+       the way Django's query lookup syntax works. For example::
 
-``null``
-    If ``True``, Django will store empty values as ``NULL`` in the database.
-    Default is ``False``.
+           class Example(models.Model):
+               foo__bar = models.IntegerField() 'foo__bar' has two underscores!
 
-    Note that empty string values will always get stored as empty strings, not
-    as ``NULL`` -- so use ``null=True`` for non-string fields such as integers,
-    booleans and dates.
+These limitations can be worked around, though, because your field name doesn't
+necessarily have to match your database column name. See `db_column`_ below.
 
-    Avoid using ``null`` on string-based fields such as ``CharField`` and
-    ``TextField`` unless you have an excellent reason. If a string-based field
-    has ``null=True``, that means it has two possible values for "no data":
-    ``NULL``, and the empty string. In most cases, it's redundant to have two
-    possible values for "no data;" Django convention is to use the empty
-    string, not ``NULL``.
-
-``blank``
-    If ``True``, the field is allowed to be blank.
-
-    Note that this is different than ``null``. ``null`` is purely
-    database-related, whereas ``blank`` is validation-related. If a field has
-    ``blank=True``, validation on Django's admin site will allow entry of an
-    empty value. If a field has ``blank=False``, the field will be required.
-
-``choices``
-    A list of 2-tuples to use as choices for this field.
-
-    If this is given, Django's admin will use a select box instead of the
-    standard text field and will limit choices to the choices given.
-
-    A choices list looks like this::
-
-        YEAR_IN_SCHOOL_CHOICES = (
-            ('FR', 'Freshman'),
-            ('SO', 'Sophomore'),
-            ('JR', 'Junior'),
-            ('SR', 'Senior'),
-            ('GR', 'Graduate'),
-        )
-
-    The first element in each tuple is the actual value to be stored. The
-    second element is the human-readable name for the option.
-
-    The choices list can be defined either as part of your model class::
-
-        class Foo(models.Model):
-            GENDER_CHOICES = (
-                ('M', 'Male'),
-                ('F', 'Female'),
-            )
-            gender = models.CharField(maxlength=1, choices=GENDER_CHOICES)
-
-    or outside your model class altogether::
-
-        GENDER_CHOICES = (
-            ('M', 'Male'),
-            ('F', 'Female'),
-        )
-        class Foo(models.Model):
-            gender = models.CharField(maxlength=1, choices=GENDER_CHOICES)
-
-``core``
-    For objects that are edited inline to a related object.
-
-    In the Django admin, if all "core" fields in an inline-edited object are
-    cleared, the object will be deleted.
-
-    It is an error to have an inline-editable relation without at least one
-    ``core=True`` field.
-
-``db_column``
-    The name of the database column to use for this field. If this isn't given,
-    Django will use the field's name.
-
-    If your database column name is an SQL reserved word, or contains
-    characters that aren't allowed in Python variable names -- notably, the
-    hyphen -- that's OK. Django quotes column and table names behind the
-    scenes.
-
-``db_index``
-    If ``True``, ``django-admin.py sqlindexes`` will output a ``CREATE INDEX``
-    statement for this field.
-
-``default``
-    The default value for the field.
-
-``editable``
-    If ``False``, the field will not be editable in the admin. Default is  ``True``.
-
-``help_text``
-    Extra "help" text to be displayed under the field on the object's admin
-    form. It's useful for documentation even if your object doesn't have an
-    admin form.
-
-``primary_key``
-    If ``True``, this field is the primary key for the model.
-
-    If you don't specify ``primary_key=True`` for any fields in your model,
-    Django will automatically add this field::
-
-        id = models.AutoField('ID', primary_key=True)
-
-    Thus, you don't need to set ``primary_key=True`` on any of your fields
-    unless you want to override the default primary-key behavior.
-
-    ``primary_key=True`` implies ``blank=False``, ``null=False`` and
-    ``unique=True``. Only one primary key is allowed on an object.
-
-``radio_admin``
-    By default, Django's admin uses a select-box interface (<select>) for
-    fields that are ``ForeignKey`` or have ``choices`` set. If ``radio_admin``
-    is set to ``True``, Django will use a radio-button interface instead.
-
-    Don't use this for a field unless it's a ``ForeignKey`` or has ``choices``
-    set.
-
-``unique``
-    If ``True``, this field must be unique throughout the table.
-
-    This is enforced at the database level and at the Django admin-form level.
-
-``unique_for_date``
-    Set this to the name of a ``DateField`` or ``DateTimeField`` to require
-    that this field be unique for the value of the date field.
-
-    For example, if you have a field ``title`` that has
-    ``unique_for_date="pub_date"``, then Django wouldn't allow the entry of
-    two records with the same ``title`` and ``pub_date``.
-
-    This is enforced at the Django admin-form level but not at the database level.
-
-``unique_for_month``
-    Like ``unique_for_date``, but requires the field to be unique with respect
-    to the month.
-
-``unique_for_year``
-    Like ``unique_for_date`` and ``unique_for_month``.
-
-``validator_list``
-    A list of extra validators to apply to the field. Each should be a callable
-    that takes the parameters ``field_data, all_data`` and raises
-    ``django.core.validators.ValidationError`` for errors. (See the
-    `validator docs`_.)
-
-    Django comes with quite a few validators. They're in ``django.core.validators``.
-
-.. _validator docs: http://www.djangoproject.com/documentation/forms/#validators
+SQL reserved words, such as ``join``, ``where`` or ``select`, *are* allowed as
+model field names, because Django escapes all database table names and column
+names in every underlying SQL query. It uses the quoting syntax of your
+particular database engine.
 
 Field types
 -----------
@@ -223,250 +109,510 @@ Each field in your model should be an instance of the appropriate ``Field``
 class. Django uses the field class types to determine a few things:
 
     * The database column type (e.g. ``INTEGER``, ``VARCHAR``).
-    * The widget to use in Django's admin (e.g. ``<input type="text">``, ``<select>``).
-    * The minimal validation requirements, used in Django's admin and in manipulators.
+    * The widget to use in Django's admin interface, if you care to use it
+      (e.g. ``<input type="text">``, ``<select>``).
+    * The minimal validation requirements, used in Django's admin and in
+      manipulators.
 
 Here are all available field types:
 
 ``AutoField``
-    An ``IntegerField`` that automatically increments according to available
-    IDs. You usually won't need to use this directly; a primary key field will
-    automatically be added to your model if you don't specify otherwise. (See
-    ``primary_key`` in ``General field options`` above.)
+~~~~~~~~~~~~~
+
+An ``IntegerField`` that automatically increments according to available IDs.
+You usually won't need to use this directly; a primary key field will
+automatically be added to your model if you don't specify otherwise. See
+_`Automatic primary key fields`.
 
 ``BooleanField``
-    A true/false field.
+~~~~~~~~~~~~~~~~
 
-    The admin represents this as a checkbox.
+A true/false field.
+
+The admin represents this as a checkbox.
 
 ``CharField``
-    A string field, for small- to large-sized strings.
+~~~~~~~~~~~~~
 
-    For large amounts of text, use ``TextField``.
+A string field, for small- to large-sized strings.
 
-    The admin represents this as an ``<input type="text">`` (a single-line input).
+For large amounts of text, use ``TextField``.
 
-    ``CharField`` has an extra required argument, ``maxlength``, the maximum
-    length (in characters) of the field. The maxlength is enforced at the
-    database level and in Django's validation.
+The admin represents this as an ``<input type="text">`` (a single-line input).
+
+``CharField`` has an extra required argument, ``maxlength``, the maximum length
+(in characters) of the field. The maxlength is enforced at the database level
+and in Django's validation.
 
 ``CommaSeparatedIntegerField``
-    A field of integers separated by commas. As in ``CharField``, the
-    ``maxlength`` argument is required.
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+A field of integers separated by commas. As in ``CharField``, the ``maxlength``
+argument is required.
 
 ``DateField``
-    A date field. Has a few extra optional arguments:
+~~~~~~~~~~~~~
 
-        ======================  ===================================================
-        Argument                Description
-        ======================  ===================================================
-        ``auto_now``            Automatically set the field to now every time the
-                                object is saved. Useful for "last-modified"
-                                timestamps.
+A date field. Has a few extra optional arguments:
 
-        ``auto_now_add``        Automatically set the field to now when the object
-                                is first created. Useful for creation of
-                                timestamps.
-        ======================  ===================================================
+    ======================  ===================================================
+    Argument                Description
+    ======================  ===================================================
+    ``auto_now``            Automatically set the field to now every time the
+                            object is saved. Useful for "last-modified"
+                            timestamps.
 
-    The admin represents this as an ``<input type="text">`` with a JavaScript
-    calendar and a shortcut for "Today."
+    ``auto_now_add``        Automatically set the field to now when the object
+                            is first created. Useful for creation of
+                            timestamps.
+    ======================  ===================================================
+
+The admin represents this as an ``<input type="text">`` with a JavaScript
+calendar and a shortcut for "Today."
 
 ``DateTimeField``
-    A date and time field. Takes the same extra options as ``DateField``.
+~~~~~~~~~~~~~~~~~
 
-    The admin represents this as two ``<input type="text">`` fields, with
-    JavaScript shortcuts.
+A date and time field. Takes the same extra options as ``DateField``.
+
+The admin represents this as two ``<input type="text">`` fields, with
+JavaScript shortcuts.
 
 ``EmailField``
-    A ``CharField`` that checks that the value is a valid e-mail address.
-    This doesn't accept ``maxlength``.
+~~~~~~~~~~~~~~
+
+A ``CharField`` that checks that the value is a valid e-mail address.
+This doesn't accept ``maxlength``.
 
 ``FileField``
-    A file-upload field.
+~~~~~~~~~~~~~
 
-    Has an extra required argument, ``upload_to``, a local filesystem path to
-    which files should be upload. This path may contain `strftime formatting`_,
-    which will be replaced by the date/time of the file upload (so that
-    uploaded files don't fill up the given directory).
+A file-upload field.
 
-    The admin represents this as an ``<input type="file">`` (a file-upload widget).
+Has an extra required argument, ``upload_to``, a local filesystem path to
+which files should be upload. This path may contain `strftime formatting`_,
+which will be replaced by the date/time of the file upload (so that
+uploaded files don't fill up the given directory).
 
-    Using a ``FileField`` or an ``ImageField`` (see below) in a model takes a few
-    steps:
+The admin represents this as an ``<input type="file">`` (a file-upload widget).
 
-        1. In your settings file, you'll need to define ``MEDIA_ROOT`` as the
-           full path to a directory where you'd like Django to store uploaded
-           files. (For performance, these files are not stored in the database.)
-           Define ``MEDIA_URL`` as the base public URL of that directory. Make
-           sure that this directory is writable by the Web server's user
-           account.
+Using a ``FileField`` or an ``ImageField`` (see below) in a model takes a few
+steps:
 
-        2. Add the ``FileField`` or ``ImageField`` to your model, making sure
-           to define the ``upload_to`` option to tell Django to which
-           subdirectory of ``MEDIA_ROOT`` it should upload files.
+    1. In your settings file, you'll need to define ``MEDIA_ROOT`` as the
+        full path to a directory where you'd like Django to store uploaded
+        files. (For performance, these files are not stored in the database.)
+        Define ``MEDIA_URL`` as the base public URL of that directory. Make
+        sure that this directory is writable by the Web server's user
+        account.
 
-        3. All that will be stored in your database is a path to the file
-           (relative to ``MEDIA_ROOT``). You'll must likely want to use the
-           convenience ``get_<fieldname>_url`` function provided by Django. For
-           example, if your ``ImageField`` is called ``mug_shot``, you can get
-           the absolute URL to your image in a template with ``{{
-           object.get_mug_shot_url }}``.
+    2. Add the ``FileField`` or ``ImageField`` to your model, making sure
+        to define the ``upload_to`` option to tell Django to which
+        subdirectory of ``MEDIA_ROOT`` it should upload files.
 
-    .. _`strftime formatting`: http://docs.python.org/lib/module-time.html#l2h-1941
+    3. All that will be stored in your database is a path to the file
+        (relative to ``MEDIA_ROOT``). You'll must likely want to use the
+        convenience ``get_<fieldname>_url`` function provided by Django. For
+        example, if your ``ImageField`` is called ``mug_shot``, you can get
+        the absolute URL to your image in a template with ``{{
+        object.get_mug_shot_url }}``.
+
+.. _`strftime formatting`: http://docs.python.org/lib/module-time.html#l2h-1941
 
 ``FilePathField``
-    A field whose choices are limited to the filenames in a certain directory
-    on the filesystem. Has three special arguments, of which the first is
-    required:
+~~~~~~~~~~~~~~~~~
 
-        ======================  ===================================================
-        Argument                Description
-        ======================  ===================================================
-        ``path``                Required. The absolute filesystem path to a
-                                directory from which this ``FilePathField`` should
-                                get its choices. Example: ``"/home/images"``.
+A field whose choices are limited to the filenames in a certain directory
+on the filesystem. Has three special arguments, of which the first is
+required:
 
-        ``match``               Optional. A regular expression, as a string, that
-                                ``FilePathField`` will use to filter filenames.
-                                Note that the regex will be applied to the
-                                base filename, not the full path. Example:
-                                ``"foo.*\.txt^"``, which will match a file called
-                                ``foo23.txt`` but not ``bar.txt`` or ``foo23.gif``.
+    ======================  ===================================================
+    Argument                Description
+    ======================  ===================================================
+    ``path``                Required. The absolute filesystem path to a
+                            directory from which this ``FilePathField`` should
+                            get its choices. Example: ``"/home/images"``.
 
-        ``recursive``           Optional. Either ``True`` or ``False``. Default is
-                                ``False``. Specifies whether all subdirectories of
-                                ``path`` should be included.
-        ======================  ===================================================
+    ``match``               Optional. A regular expression, as a string, that
+                            ``FilePathField`` will use to filter filenames.
+                            Note that the regex will be applied to the
+                            base filename, not the full path. Example:
+                            ``"foo.*\.txt^"``, which will match a file called
+                            ``foo23.txt`` but not ``bar.txt`` or ``foo23.gif``.
 
-    Of course, these arguments can be used together.
+    ``recursive``           Optional. Either ``True`` or ``False``. Default is
+                            ``False``. Specifies whether all subdirectories of
+                            ``path`` should be included.
+    ======================  ===================================================
 
-    The one potential gotcha is that ``match`` applies to the base filename,
-    not the full path. So, this example::
+Of course, these arguments can be used together.
 
-        FilePathField(path="/home/images", match="foo.*", recursive=True)
+The one potential gotcha is that ``match`` applies to the base filename,
+not the full path. So, this example::
 
-    ...will match ``/home/images/foo.gif`` but not ``/home/images/foo/bar.gif``
-    because the ``match`` applies to the base filename (``foo.gif`` and
-    ``bar.gif``).
+    FilePathField(path="/home/images", match="foo.*", recursive=True)
+
+...will match ``/home/images/foo.gif`` but not ``/home/images/foo/bar.gif``
+because the ``match`` applies to the base filename (``foo.gif`` and
+``bar.gif``).
 
 ``FloatField``
-    A floating-point number. Has two **required** arguments:
+~~~~~~~~~~~~~~
 
-        ======================  ===================================================
-        Argument                Description
-        ======================  ===================================================
-        ``max_digits``          The maximum number of digits allowed in the number.
+A floating-point number. Has two **required** arguments:
 
-        ``decimal_places``      The number of decimal places to store with the
-                                number.
-        ======================  ===================================================
+    ======================  ===================================================
+    Argument                Description
+    ======================  ===================================================
+    ``max_digits``          The maximum number of digits allowed in the number.
 
-    For example, to store numbers up to 999 with a resolution of 2 decimal places,
-    you'd use::
+    ``decimal_places``      The number of decimal places to store with the
+                            number.
+    ======================  ===================================================
 
-        models.FloatField(..., max_digits=5, decimal_places=2)
+For example, to store numbers up to 999 with a resolution of 2 decimal places,
+you'd use::
 
-    And to store numbers up to approximately one billion with a resolution of 10
-    decimal places::
+    models.FloatField(..., max_digits=5, decimal_places=2)
 
-        models.FloatField(..., max_digits=19, decimal_places=10)
+And to store numbers up to approximately one billion with a resolution of 10
+decimal places::
 
-    The admin represents this as an ``<input type="text">`` (a single-line input).
+    models.FloatField(..., max_digits=19, decimal_places=10)
+
+The admin represents this as an ``<input type="text">`` (a single-line input).
 
 ``ImageField``
-    Like ``FileField``, but validates that the uploaded object is a valid
-    image. Has two extra optional arguments, ``height_field`` and
-    ``width_field``, which, if set, will be auto-populated with the height and
-    width of the image each time a model instance is saved.
+~~~~~~~~~~~~~~
 
-    Requires the `Python Imaging Library`_.
+Like ``FileField``, but validates that the uploaded object is a valid
+image. Has two extra optional arguments, ``height_field`` and
+``width_field``, which, if set, will be auto-populated with the height and
+width of the image each time a model instance is saved.
 
-    .. _Python Imaging Library: http://www.pythonware.com/products/pil/
+Requires the `Python Imaging Library`_.
+
+.. _Python Imaging Library: http://www.pythonware.com/products/pil/
 
 ``IntegerField``
-    An integer.
+~~~~~~~~~~~~~~~~
 
-    The admin represents this as an ``<input type="text">`` (a single-line input).
+An integer.
+
+The admin represents this as an ``<input type="text">`` (a single-line input).
 
 ``IPAddressField``
-    An IP address, in string format (i.e. "24.124.1.30").
+~~~~~~~~~~~~~~~~~~
 
-    The admin represents this as an ``<input type="text">`` (a single-line input).
+An IP address, in string format (i.e. "24.124.1.30").
+
+The admin represents this as an ``<input type="text">`` (a single-line input).
 
 ``NullBooleanField``
-    Like a ``BooleanField``, but allows ``NULL`` as one of the options.  Use this
-    instead of a ``BooleanField`` with ``null=True``.
+~~~~~~~~~~~~~~~~~~~~
 
-    The admin represents this as a ``<select>`` box with "Unknown", "Yes" and "No" choices.
+Like a ``BooleanField``, but allows ``NULL`` as one of the options.  Use this
+instead of a ``BooleanField`` with ``null=True``.
+
+The admin represents this as a ``<select>`` box with "Unknown", "Yes" and "No" choices.
 
 ``PhoneNumberField``
-    A ``CharField`` that checks that the value is a valid U.S.A.-style phone
-    number (in the format ``XXX-XXX-XXXX``).
+~~~~~~~~~~~~~~~~~~~~
+
+A ``CharField`` that checks that the value is a valid U.S.A.-style phone
+number (in the format ``XXX-XXX-XXXX``).
 
 ``PositiveIntegerField``
-    Like an ``IntegerField``, but must be positive.
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+Like an ``IntegerField``, but must be positive.
 
 ``PositiveSmallIntegerField``
-    Like a ``PositiveIntegerField``, but only allows values under a certain
-    (database-dependent) point.
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Like a ``PositiveIntegerField``, but only allows values under a certain
+(database-dependent) point.
 
 ``SlugField``
-    "Slug" is a newspaper term. A slug is a short label for something,
-    containing only letters, numbers, underscores or hyphens. They're generally
-    used in URLs.
+~~~~~~~~~~~~~
 
-    In the Django development version, you can specify ``maxlength``. If
-    ``maxlength`` is not specified, Django will use a default length of 50. In
-    previous Django versions, there's no way to override the length of 50.
+"Slug" is a newspaper term. A slug is a short label for something,
+containing only letters, numbers, underscores or hyphens. They're generally
+used in URLs.
 
-    Implies ``db_index=True``.
+In the Django development version, you can specify ``maxlength``. If
+``maxlength`` is not specified, Django will use a default length of 50. In
+previous Django versions, there's no way to override the length of 50.
 
-    Accepts an extra option, ``prepopulate_from``, which is a list of fields
-    from which to auto-populate the slug, via JavaScript, in the object's admin
-    form::
+Implies ``db_index=True``.
 
-        models.SlugField(prepopulate_from=("pre_name", "name"))
+Accepts an extra option, ``prepopulate_from``, which is a list of fields
+from which to auto-populate the slug, via JavaScript, in the object's admin
+form::
 
-    ``prepopulate_from`` doesn't accept DateTimeFields.
+    models.SlugField(prepopulate_from=("pre_name", "name"))
 
-    The admin represents ``SlugField`` as an ``<input type="text">`` (a
-    single-line input).
+``prepopulate_from`` doesn't accept DateTimeFields.
+
+The admin represents ``SlugField`` as an ``<input type="text">`` (a
+single-line input).
 
 ``SmallIntegerField``
-    Like an ``IntegerField``, but only allows values under a certain
-    (database-dependent) point.
+~~~~~~~~~~~~~~~~~~~~~
+
+Like an ``IntegerField``, but only allows values under a certain
+(database-dependent) point.
 
 ``TextField``
-    A large text field.
+~~~~~~~~~~~~~
 
-    The admin represents this as a ``<textarea>`` (a multi-line input).
+A large text field.
+
+The admin represents this as a ``<textarea>`` (a multi-line input).
 
 ``TimeField``
-    A time. Accepts the same auto-population options as ``DateField`` and
-    ``DateTimeField``.
+~~~~~~~~~~~~~
 
-    The admin represents this as an ``<input type="text">`` with some
-    JavaScript shortcuts.
+A time. Accepts the same auto-population options as ``DateField`` and
+``DateTimeField``.
+
+The admin represents this as an ``<input type="text">`` with some
+JavaScript shortcuts.
 
 ``URLField``
-    A field for a URL. If the ``verify_exists`` option is ``True`` (default),
-    the URL given will be checked for existence (i.e., the URL actually loads
-    and doesn't give a 404 response).
+~~~~~~~~~~~~
 
-    The admin represents this as an ``<input type="text">`` (a single-line input).
+A field for a URL. If the ``verify_exists`` option is ``True`` (default),
+the URL given will be checked for existence (i.e., the URL actually loads
+and doesn't give a 404 response).
+
+The admin represents this as an ``<input type="text">`` (a single-line input).
 
 ``USStateField``
-    A two-letter U.S. state abbreviation.
+~~~~~~~~~~~~~~~~
 
-    The admin represents this as an ``<input type="text">`` (a single-line input).
+A two-letter U.S. state abbreviation.
+
+The admin represents this as an ``<input type="text">`` (a single-line input).
 
 ``XMLField``
-    A ``TextField`` that checks that the value is valid XML that matches a
-    given schema. Takes one required argument, ``schema_path``, which is the
-    filesystem path to a RelaxNG_ schema against which to validate the field.
+~~~~~~~~~~~~
 
-    .. _RelaxNG: http://www.relaxng.org/
+A ``TextField`` that checks that the value is valid XML that matches a
+given schema. Takes one required argument, ``schema_path``, which is the
+filesystem path to a RelaxNG_ schema against which to validate the field.
+
+.. _RelaxNG: http://www.relaxng.org/
+
+Field options
+-------------
+
+The following arguments are available to all field types. All are optional.
+
+``null``
+~~~~~~~~
+
+If ``True``, Django will store empty values as ``NULL`` in the database.
+Default is ``False``.
+
+Note that empty string values will always get stored as empty strings, not
+as ``NULL`` -- so use ``null=True`` for non-string fields such as integers,
+booleans and dates.
+
+Avoid using ``null`` on string-based fields such as ``CharField`` and
+``TextField`` unless you have an excellent reason. If a string-based field
+has ``null=True``, that means it has two possible values for "no data":
+``NULL``, and the empty string. In most cases, it's redundant to have two
+possible values for "no data;" Django convention is to use the empty
+string, not ``NULL``.
+
+``blank``
+~~~~~~~~~
+
+If ``True``, the field is allowed to be blank.
+
+Note that this is different than ``null``. ``null`` is purely
+database-related, whereas ``blank`` is validation-related. If a field has
+``blank=True``, validation on Django's admin site will allow entry of an
+empty value. If a field has ``blank=False``, the field will be required.
+
+``choices``
+~~~~~~~~~~~
+
+A list of 2-tuples to use as choices for this field.
+
+If this is given, Django's admin will use a select box instead of the
+standard text field and will limit choices to the choices given.
+
+A choices list looks like this::
+
+    YEAR_IN_SCHOOL_CHOICES = (
+        ('FR', 'Freshman'),
+        ('SO', 'Sophomore'),
+        ('JR', 'Junior'),
+        ('SR', 'Senior'),
+        ('GR', 'Graduate'),
+    )
+
+The first element in each tuple is the actual value to be stored. The
+second element is the human-readable name for the option.
+
+The choices list can be defined either as part of your model class::
+
+    class Foo(models.Model):
+        GENDER_CHOICES = (
+            ('M', 'Male'),
+            ('F', 'Female'),
+        )
+        gender = models.CharField(maxlength=1, choices=GENDER_CHOICES)
+
+or outside your model class altogether::
+
+    GENDER_CHOICES = (
+        ('M', 'Male'),
+        ('F', 'Female'),
+    )
+    class Foo(models.Model):
+        gender = models.CharField(maxlength=1, choices=GENDER_CHOICES)
+
+``core``
+~~~~~~~~
+
+For objects that are edited inline to a related object.
+
+In the Django admin, if all "core" fields in an inline-edited object are
+cleared, the object will be deleted.
+
+It is an error to have an inline-editable relation without at least one
+``core=True`` field.
+
+``db_column``
+~~~~~~~~~~~~~
+
+The name of the database column to use for this field. If this isn't given,
+Django will use the field's name.
+
+If your database column name is an SQL reserved word, or contains
+characters that aren't allowed in Python variable names -- notably, the
+hyphen -- that's OK. Django quotes column and table names behind the
+scenes.
+
+``db_index``
+~~~~~~~~~~~~
+
+If ``True``, ``django-admin.py sqlindexes`` will output a ``CREATE INDEX``
+statement for this field.
+
+``default``
+~~~~~~~~~~~
+
+The default value for the field.
+
+``editable``
+~~~~~~~~~~~~
+
+If ``False``, the field will not be editable in the admin. Default is  ``True``.
+
+``help_text``
+~~~~~~~~~~~~~
+
+Extra "help" text to be displayed under the field on the object's admin
+form. It's useful for documentation even if your object doesn't have an
+admin form.
+
+``primary_key``
+~~~~~~~~~~~~~~~
+
+If ``True``, this field is the primary key for the model.
+
+If you don't specify ``primary_key=True`` for any fields in your model,
+Django will automatically add this field::
+
+    id = models.AutoField('ID', primary_key=True)
+
+Thus, you don't need to set ``primary_key=True`` on any of your fields
+unless you want to override the default primary-key behavior.
+
+``primary_key=True`` implies ``blank=False``, ``null=False`` and
+``unique=True``. Only one primary key is allowed on an object.
+
+``radio_admin``
+~~~~~~~~~~~~~~~
+
+By default, Django's admin uses a select-box interface (<select>) for
+fields that are ``ForeignKey`` or have ``choices`` set. If ``radio_admin``
+is set to ``True``, Django will use a radio-button interface instead.
+
+Don't use this for a field unless it's a ``ForeignKey`` or has ``choices``
+set.
+
+``unique``
+~~~~~~~~~~
+
+If ``True``, this field must be unique throughout the table.
+
+This is enforced at the database level and at the Django admin-form level.
+
+``unique_for_date``
+~~~~~~~~~~~~~~~~~~~
+
+Set this to the name of a ``DateField`` or ``DateTimeField`` to require
+that this field be unique for the value of the date field.
+
+For example, if you have a field ``title`` that has
+``unique_for_date="pub_date"``, then Django wouldn't allow the entry of
+two records with the same ``title`` and ``pub_date``.
+
+This is enforced at the Django admin-form level but not at the database level.
+
+``unique_for_month``
+~~~~~~~~~~~~~~~~~~~~
+
+Like ``unique_for_date``, but requires the field to be unique with respect
+to the month.
+
+``unique_for_year``
+~~~~~~~~~~~~~~~~~~~
+
+Like ``unique_for_date`` and ``unique_for_month``.
+
+``validator_list``
+~~~~~~~~~~~~~~~~~~
+
+A list of extra validators to apply to the field. Each should be a callable
+that takes the parameters ``field_data, all_data`` and raises
+``django.core.validators.ValidationError`` for errors. (See the
+`validator docs`_.)
+
+Django comes with quite a few validators. They're in ``django.core.validators``.
+
+.. _validator docs: http://www.djangoproject.com/documentation/forms/#validators
+
+Verbose field names
+-------------------
+
+Each field type, except for ``ForeignKey``, ``ManyToManyField`` and
+``OneToOneField``, takes an optional first positional argument -- a
+verbose name. If the verbose name isn't given, Django will automatically create
+it using the field's attribute name, converting underscores to spaces.
+
+In this example, the verbose name is ``"Person's first name"``::
+
+    first_name = models.CharField("Person's first name", maxlength=30)
+
+In this example, the verbose name is ``"first name"``::
+
+    first_name = models.CharField(maxlength=30)
+
+``ForeignKey``, ``ManyToManyField`` and ``OneToOneField`` require the first
+argument to be a model class, so use the ``verbose_name`` keyword argument::
+
+    poll = models.ForeignKey(Poll, verbose_name="the related poll")
+    sites = models.ManyToManyField(Site, verbose_name="list of sites")
+    place = models.OneToOneField(Place, verbose_name="related place")
+
+Convention is not to capitalize the first letter of the ``verbose_name``.
+Django will automatically capitalize the first letter where it needs to.
 
 Relationships
 -------------
@@ -496,7 +642,7 @@ following definitions::
         city = models.ForeignKey(City)
 
 To create a recursive relationship -- an object that has a many-to-one
-relationship with itself -- use ``models.ForeignKey("self")``.
+relationship with itself -- use ``models.ForeignKey('self')``.
 
 If you need to create a relationship on a model that has not yet been defined,
 you can use the name of the model, rather than the model object itself::
@@ -749,121 +895,145 @@ See the `One-to-one relationship model example`_ for a full example.
 Meta options
 ============
 
-Give your model metadata by using an inner ``"class Meta"``, like so::
+Give your model metadata by using an inner ``class Meta``, like so::
 
     class Foo(models.Model):
         bar = models.CharField(maxlength=30)
-        # ...
+
         class Meta:
             # ...
 
-Model metadata is "anything that's not a field" -- ordering options, etc.
+Model metadata is "anything that's not a field", such as ordering options, etc.
 
 Here's a list of all possible ``Meta`` options. No options are required. Adding
 ``class Meta`` to a model is completely optional.
 
 ``db_table``
-    The name of the database table to use for the module::
+------------
 
-        db_table = "pizza_orders"
+The name of the database table to use for the module::
 
-    If this isn't given, Django will use ``app_label + '_' + model_class_name``.
+    db_table = "pizza_orders"
 
-    If your database table name is an SQL reserved word, or contains characters
-    that aren't allowed in Python variable names -- notably, the hyphen --
-    that's OK. Django quotes column and table names behind the scenes.
+If this isn't given, Django will use ``app_label + '_' + model_class_name``.
+
+If your database table name is an SQL reserved word, or contains characters
+that aren't allowed in Python variable names -- notably, the hyphen --
+that's OK. Django quotes column and table names behind the scenes.
 
 ``get_latest_by``
-    The name of a ``DateField`` or ``DateTimeField``. If given, the module will
-    have a ``get_latest()`` function that fetches the "latest" object according
-    to that field::
+-----------------
 
-        get_latest_by = "order_date"
+The name of a ``DateField`` or ``DateTimeField``. If given, the module will
+have a ``get_latest()`` function that fetches the "latest" object according
+to that field::
 
-    See `Getting the "latest" object`_ for a full example.
+    get_latest_by = "order_date"
 
-    .. _Getting the "latest" object: http://www.djangoproject.com/documentation/models/get_latest/
+See `Getting the "latest" object`_ for a full example.
 
-``module_name``
-    The name of the module::
-
-        module_name = "pizza_orders"
-
-    If this isn't given, Django will use a lowercase version of the class name.
+.. _Getting the "latest" object: http://www.djangoproject.com/documentation/models/get_latest/
 
 ``order_with_respect_to``
-    Marks this object as "orderable" with respect to the given field. This is
-    almost always used with related objects to allow them to be ordered with
-    respect to a parent object. For example, if a ``PizzaToppping`` relates to
-    a ``Pizza`` object, you might use::
+-------------------------
 
-        order_with_respect_to = 'pizza'
+Marks this object as "orderable" with respect to the given field. This is
+almost always used with related objects to allow them to be ordered with
+respect to a parent object. For example, if a ``PizzaToppping`` relates to
+a ``Pizza`` object, you might use::
 
-    to allow the toppings to be ordered with respect to the associated pizza.
+    order_with_respect_to = 'pizza'
+
+...to allow the toppings to be ordered with respect to the associated pizza.
 
 ``ordering``
-    The default ordering for the object, for use when obtaining lists of objects::
+------------
 
-        ordering = ['-order_date']
+The default ordering for the object, for use when obtaining lists of objects::
 
-    This is a tuple or list of strings. Each string is a field name with an
-    optional "-" prefix, which indicates descending order. Fields without a
-    leading "-" will be ordered ascending. Use the string "?" to order randomly.
+    ordering = ['-order_date']
 
-    For example, to order by a ``pub_date`` field ascending, use this::
+This is a tuple or list of strings. Each string is a field name with an
+optional "-" prefix, which indicates descending order. Fields without a
+leading "-" will be ordered ascending. Use the string "?" to order randomly.
 
-        ordering = ['pub_date']
+For example, to order by a ``pub_date`` field ascending, use this::
 
-    To order by ``pub_date`` descending, use this::
+    ordering = ['pub_date']
 
-        ordering = ['-pub_date']
+To order by ``pub_date`` descending, use this::
 
-    To order by ``pub_date`` descending, then by ``author`` ascending, use this::
+    ordering = ['-pub_date']
 
-        ordering = ['-pub_date', 'author']
+To order by ``pub_date`` descending, then by ``author`` ascending, use this::
 
-    See `Specifying ordering`_ for more examples.
+    ordering = ['-pub_date', 'author']
 
-    Note that, regardless of how many fields are in ``ordering``, the admin
-    site uses only the first field.
+See `Specifying ordering`_ for more examples.
 
-    .. _Specifying ordering: http://www.djangoproject.com/documentation/models/ordering/
+Note that, regardless of how many fields are in ``ordering``, the admin
+site uses only the first field.
+
+.. _Specifying ordering: http://www.djangoproject.com/documentation/models/ordering/
 
 ``permissions``
-    Extra permissions to enter into the permissions table when creating this
-    object. Add, delete and change permissions are automatically created for
-    each object that has ``admin`` set. This example specifies an extra
-    permission, ``can_deliver_pizzas``::
+---------------
 
-        permissions = (("can_deliver_pizzas", "Can deliver pizzas"),)
+Extra permissions to enter into the permissions table when creating this
+object. Add, delete and change permissions are automatically created for
+each object that has ``admin`` set. This example specifies an extra
+permission, ``can_deliver_pizzas``::
 
-    This is a list or tuple of 2-tuples in the format
-    ``(permission_code, human_readable_permission_name)``.
+    permissions = (("can_deliver_pizzas", "Can deliver pizzas"),)
+
+This is a list or tuple of 2-tuples in the format
+``(permission_code, human_readable_permission_name)``.
 
 ``unique_together``
-    Sets of field names that, taken together, must be unique::
+-------------------
 
-        unique_together = (("driver", "restaurant"),)
+Sets of field names that, taken together, must be unique::
 
-    This is a list of lists of fields that must be unique when considered
-    together. It's used in the Django admin and is enforced at the database
-    level (i.e., the appropriate ``UNIQUE`` statements are included in the
-    ``CREATE TABLE`` statement).
+    unique_together = (("driver", "restaurant"),)
+
+This is a list of lists of fields that must be unique when considered
+together. It's used in the Django admin and is enforced at the database
+level (i.e., the appropriate ``UNIQUE`` statements are included in the
+``CREATE TABLE`` statement).
 
 ``verbose_name``
-    A human-readable name for the object, singular::
+----------------
 
-        verbose_name = "pizza"
+A human-readable name for the object, singular::
 
-    If this isn't given, Django will use a munged version of the class name:
-    ``CamelCase`` becomes ``camel case``.
+    verbose_name = "pizza"
+
+If this isn't given, Django will use a munged version of the class name:
+``CamelCase`` becomes ``camel case``.
 
 ``verbose_name_plural``
-    The plural name for the object::
+-----------------------
 
-        verbose_name_plural = "stories"
+The plural name for the object::
 
-    If this isn't given, Django will use ``verbose_name + "s"``.
+    verbose_name_plural = "stories"
+
+If this isn't given, Django will use ``verbose_name + "s"``.
+
+
+
+========================================
+THE REST OF THIS HAS NOT YET BEEN EDITED
+========================================
+
+
+
+Table names
+===========
+
+Automatic primary key fields
+============================
+
 
 Admin options
 =============
