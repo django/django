@@ -76,23 +76,6 @@ class RelatedField(object):
         # but this can be overridden with the "related_name" option.
         return self.rel.related_name or opts.object_name.lower()
 
-    def prepare_field_objs_and_params(self, manipulator, name_prefix):
-        params = {'validator_list': self.validator_list[:], 'member_name': name_prefix + self.attname}
-        if self.rel.raw_id_admin:
-            field_objs = self.get_manipulator_field_objs()
-            params['validator_list'].append(curry(manipulator_valid_rel_key, self, manipulator))
-        else:
-            if self.radio_admin:
-                field_objs = [forms.RadioSelectField]
-                params['ul_class'] = get_ul_class(self.radio_admin)
-            else:
-                if self.null:
-                    field_objs = [forms.NullSelectField]
-                else:
-                    field_objs = [forms.SelectField]
-            params['choices'] = self.get_choices_default()
-        return field_objs, params
-
 class SingleRelatedObjectDescriptor(object):
     # This class provides the functionality that makes the related-object
     # managers available as attributes on a model class, for fields that have
@@ -468,6 +451,23 @@ class ForeignKey(RelatedField, Field):
     def get_validator_unique_lookup_type(self):
         return '%s__%s__exact' % (self.name, self.rel.get_related_field().name)
 
+    def prepare_field_objs_and_params(self, manipulator, name_prefix):
+        params = {'validator_list': self.validator_list[:], 'member_name': name_prefix + self.attname}
+        if self.rel.raw_id_admin:
+            field_objs = self.get_manipulator_field_objs()
+            params['validator_list'].append(curry(manipulator_valid_rel_key, self, manipulator))
+        else:
+            if self.radio_admin:
+                field_objs = [forms.RadioSelectField]
+                params['ul_class'] = get_ul_class(self.radio_admin)
+            else:
+                if self.null:
+                    field_objs = [forms.NullSelectField]
+                else:
+                    field_objs = [forms.SelectField]
+            params['choices'] = self.get_choices_default()
+        return field_objs, params
+
     def get_manipulator_field_objs(self):
         rel_field = self.rel.get_related_field()
         if self.rel.raw_id_admin and not isinstance(rel_field, AutoField):
@@ -531,6 +531,25 @@ class OneToOneField(RelatedField, IntegerField):
 
     def get_validator_unique_lookup_type(self):
         return '%s__%s__exact' % (self.name, self.rel.get_related_field().name)
+
+    # TODO: Copied from ForeignKey... putting this in RelatedField adversely affects
+    # ManyToManyField. This works for now.
+    def prepare_field_objs_and_params(self, manipulator, name_prefix):
+        params = {'validator_list': self.validator_list[:], 'member_name': name_prefix + self.attname}
+        if self.rel.raw_id_admin:
+            field_objs = self.get_manipulator_field_objs()
+            params['validator_list'].append(curry(manipulator_valid_rel_key, self, manipulator))
+        else:
+            if self.radio_admin:
+                field_objs = [forms.RadioSelectField]
+                params['ul_class'] = get_ul_class(self.radio_admin)
+            else:
+                if self.null:
+                    field_objs = [forms.NullSelectField]
+                else:
+                    field_objs = [forms.SelectField]
+            params['choices'] = self.get_choices_default()
+        return field_objs, params
 
     def contribute_to_class(self, cls, name):
         super(OneToOneField, self).contribute_to_class(cls, name)
