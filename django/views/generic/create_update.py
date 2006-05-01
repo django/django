@@ -71,7 +71,7 @@ def create_object(request, model, template_name=None,
 
 def update_object(request, model, object_id=None, slug=None,
         slug_field=None, template_name=None, template_loader=loader,
-        extra_lookup_kwargs={}, extra_context={}, post_save_redirect=None,
+        extra_context={}, post_save_redirect=None,
         login_required=False, follow=None, context_processors=None,
         template_object_name='object'):
     """
@@ -95,7 +95,6 @@ def update_object(request, model, object_id=None, slug=None,
         lookup_kwargs['%s__exact' % slug_field] = slug
     else:
         raise AttributeError("Generic edit view must be called with either an object_id or a slug/slug_field")
-    lookup_kwargs.update(extra_lookup_kwargs)
     try:
         object = model.objects.get(**lookup_kwargs)
     except ObjectDoesNotExist:
@@ -144,7 +143,7 @@ def update_object(request, model, object_id=None, slug=None,
 
 def delete_object(request, model, post_delete_redirect,
         object_id=None, slug=None, slug_field=None, template_name=None,
-        template_loader=loader, extra_lookup_kwargs={}, extra_context={},
+        template_loader=loader, extra_context={},
         login_required=False, context_processors=None, template_object_name='object'):
     """
     Generic object-delete function.
@@ -169,7 +168,6 @@ def delete_object(request, model, post_delete_redirect,
         lookup_kwargs['%s__exact' % slug_field] = slug
     else:
         raise AttributeError("Generic delete view must be called with either an object_id or a slug/slug_field")
-    lookup_kwargs.update(extra_lookup_kwargs)
     try:
         object = model._default_manager.get(**lookup_kwargs)
     except ObjectDoesNotExist:
