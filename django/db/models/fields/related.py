@@ -506,7 +506,7 @@ class ForeignKey(RelatedField, Field):
 
 class OneToOneField(RelatedField, IntegerField):
     def __init__(self, to, to_field=None, **kwargs):
-        kwargs['verbose_name'] = kwargs.get('verbose_name', 'ID')
+        kwargs['verbose_name'] = kwargs.get('verbose_name', '')
         to_field = to_field or to._meta.pk.name
 
         if kwargs.has_key('edit_inline_type'):
