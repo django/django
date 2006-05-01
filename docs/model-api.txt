@@ -877,16 +877,8 @@ string ``"self"`` instead of the model name; references to as-yet undefined
 models can be made by using a string containing the model name.
 
 This ``OneToOneField`` will actually replace the primary key ``id`` field
-(since one-to-one relations share the same primary key), and has a few
-differences in the admin interface:
-
-    * No ``Place`` selection interface is displayed on ``Restaurant`` pages.
-      There will be one (and only one) ``Restaurant`` for each ``Place``.
-
-    * On the ``Restaurant`` change list, every ``Place`` -- whether it has an
-      associated ``Restaurant`` or not -- will be displayed. Adding a
-      ``Restaurant`` to a ``Place`` just means filling out the required
-      ``Restaurant`` fields.
+(since one-to-one relations share the same primary key), and will be displayed
+as a read-only field when you edit an object in the admin interface:
 
 See the `One-to-one relationship model example`_ for a full example.
 

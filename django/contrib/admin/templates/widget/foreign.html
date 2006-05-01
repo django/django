@@ -10,3 +10,11 @@
 {% if bound_field.needs_add_label %}
     <a href="{{ bound_field.related_url }}add/" class="add-another" id="add_{{ bound_field.element_id }}" onclick="return showAddAnotherPopup(this);"> <img src="{% admin_media_prefix %}img/admin/icon_addlink.gif" width="10" height="10" alt="Add Another"/></a>
 {% endif %}{% endif %}
+{% if change %}
+    {% if bound_field.field.primary_key %}
+        {{ bound_field.original_value }}
+    {% endif %}
+    {% if bound_field.raw_id_admin %}
+        {% if bound_field.existing_display %}&nbsp;<strong>{{ bound_field.existing_display|truncatewords:"14" }}</strong>{% endif %}
+    {% endif %}
+{% endif %}
