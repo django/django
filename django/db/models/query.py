@@ -427,7 +427,7 @@ class QuerySet(object):
                 else:
                     # Use the database table as a column prefix if it wasn't given,
                     # and if the requested column isn't a custom SELECT.
-                    if "." not in col_name and col_name not in [k[0] for k in (self._select or ())]:
+                    if "." not in col_name and col_name not in (self._select or ()):
                         table_prefix = backend.quote_name(opts.db_table) + '.'
                     else:
                         table_prefix = ''
