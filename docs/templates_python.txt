@@ -378,7 +378,7 @@ that contain full paths to your template directory(ies). Example::
 
 Your templates can go anywhere you want, as long as the directories and
 templates are readable by the Web server. They can have any extension you want,
-such as ``.html`` or ``.txt`` or whatever.
+such as ``.html`` or ``.txt``, or they can have no extension at all.
 
 Note that these paths should use Unix-style forward slashes, even on Windows.
 
@@ -396,14 +396,14 @@ Django has two ways to load templates from files:
     ``select_template`` is just like ``get_template``, except it takes a list
     of template names. Of the list, it returns the first template that exists.
 
-For example, if you call ``get_template("story_detail.html")`` and have the
+For example, if you call ``get_template('story_detail.html')`` and have the
 above ``TEMPLATE_DIRS`` setting, here are the files Django will look for, in
 order:
 
     * ``/home/html/templates/lawrence.com/story_detail.html``
     * ``/home/html/templates/default/story_detail.html``
 
-If you call ``select_template(["story_253_detail.html", "story_detail.html"])``,
+If you call ``select_template(['story_253_detail.html', 'story_detail.html'])``,
 here's what Django will look for:
 
     * ``/home/html/templates/lawrence.com/story_253_detail.html``
@@ -415,10 +415,10 @@ When Django finds a template that exists, it stops looking.
 
 .. admonition:: Tip
 
-    You can use ``select_template`` for super-flexible "templatability." For
+    You can use ``select_template()`` for super-flexible "templatability." For
     example, if you've written a news story and want some stories to have
     custom templates, use something like
-    ``select_template(["story_%s_detail.html" % story.id, "story_detail.html"])``.
+    ``select_template(['story_%s_detail.html' % story.id, 'story_detail.html'])``.
     That'll allow you to use a custom template for an individual story, with a
     fallback template for stories that don't have custom templates.
 
@@ -434,16 +434,25 @@ single directory gets messy.
 
 To load a template that's within a subdirectory, just use a slash, like so::
 
-    get_template("news/story_detail.html")
+    get_template('news/story_detail.html')
+
+Using the same ``TEMPLATE_DIRS`` setting from above, this example
+``get_template()`` call will attempt to load the following templates:
+
+    * ``/home/html/templates/lawrence.com/news/story_detail.html``
+    * ``/home/html/templates/default/news/story_detail.html``
 
 Loader types
 ~~~~~~~~~~~~
 
 By default, Django uses a filesystem-based template loader, but Django comes
-with a few other template loaders. They're disabled by default, but you can
-activate them by editing your ``TEMPLATE_LOADERS`` setting.
-``TEMPLATE_LOADERS`` should be a tuple of strings, where each string represents
-a template loader. Here are the built-in template loaders:
+with a few other template loaders, which know how to load templates from other
+sources.
+
+These other loaders are disabled by default, but you can activate them by
+editing your ``TEMPLATE_LOADERS`` setting. ``TEMPLATE_LOADERS`` should be a
+tuple of strings, where each string represents a template loader. Here are the
+template loaders that come with Django:
 
 ``django.template.loaders.filesystem.load_template_source``
     Loads templates from the filesystem, according to ``TEMPLATE_DIRS``.
@@ -460,7 +469,7 @@ a template loader. Here are the built-in template loaders:
 
         INSTALLED_APPS = ('myproject.polls', 'myproject.music')
 
-    ...then ``get_template("foo.html")`` will look for templates in these
+    ...then ``get_template('foo.html')`` will look for templates in these
     directories, in this order:
 
         * ``/path/to/myproject/polls/templates/foo.html``
@@ -520,15 +529,15 @@ To be a valid tag library, the module contain a module-level variable named
 ``register`` that is a ``template.Library`` instance, in which all the tags and
 filters are registered. So, near the top of your module, put the following::
 
-    from django.core import template
+    from django import template
 
     register = template.Library()
 
 .. admonition:: Behind the scenes
 
     For a ton of examples, read the source code for Django's default filters
-    and tags. They're in ``django/core/template/defaultfilters.py`` and
-    ``django/core/template/defaulttags.py``, respectively.
+    and tags. They're in ``django/template/defaultfilters.py`` and
+    ``django/template/defaulttags.py``, respectively.
 
 Writing custom template filters
 -------------------------------
@@ -631,7 +640,7 @@ else. In our case, let's say the tag should be used like this::
 The parser for this function should grab the parameter and create a ``Node``
 object::
 
-    from django.core import template
+    from django import template
     def do_current_time(parser, token):
         try:
             # Splitting by None == splitting by spaces.
@@ -678,7 +687,7 @@ has a ``render()`` method.
 
 Continuing the above example, we need to define ``CurrentTimeNode``::
 
-    from django.core import template
+    from django import template
     import datetime
     class CurrentTimeNode(template.Node):
         def __init__(self, format_string):
@@ -866,4 +875,4 @@ The only new concept here is the ``self.nodelist.render(context)`` in
 
 For more examples of complex rendering, see the source code for ``{% if %}``,
 ``{% for %}``, ``{% ifequal %}`` and ``{% ifchanged %}``. They live in
-``django/core/template/defaulttags.py``.
+``django/template/defaulttags.py``.
