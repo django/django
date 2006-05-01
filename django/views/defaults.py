@@ -71,10 +71,12 @@ def page_not_found(request, template_name='404.html'):
     table, redirects if found, and displays 404 page if not redirected.
 
     Templates: `404.html`
-    Context: None
+    Context:
+        request_path
+            The path of the requested URL (e.g., '/app/pages/bad_page/')
     """
     t = loader.get_template(template_name)
-    return http.HttpResponseNotFound(t.render(Context()))
+    return http.HttpResponseNotFound(t.render(Context({'request_path': request.path})))
 
 def server_error(request, template_name='500.html'):
     """
