@@ -100,13 +100,13 @@ def technical_500_response(request, exc_type, exc_value, tb):
             'tb': tb,
             'filename': filename,
             'function': function,
-            'lineno': lineno,
+            'lineno': lineno + 1,
             'vars': tb.tb_frame.f_locals.items(),
             'id': id(tb),
             'pre_context': pre_context,
             'context_line': context_line,
             'post_context': post_context,
-            'pre_context_lineno': pre_context_lineno,
+            'pre_context_lineno': pre_context_lineno + 1,
         })
         tb = tb.tb_next
 
@@ -360,11 +360,11 @@ TECHNICAL_500_TEMPLATE = """
           {% if frame.context_line %}
             <div class="context" id="c{{ frame.id }}">
               {% if frame.pre_context %}
-                <ol start="{{ frame.pre_context_lineno|add:"1" }}" class="pre-context" id="pre{{ frame.id }}">{% for line in frame.pre_context %}<li onclick="toggle('pre{{ frame.id }}', 'post{{ frame.id }}')">{{ line|escape }}</li>{% endfor %}</ol>
+                <ol start="{{ frame.pre_context_lineno }}" class="pre-context" id="pre{{ frame.id }}">{% for line in frame.pre_context %}<li onclick="toggle('pre{{ frame.id }}', 'post{{ frame.id }}')">{{ line|escape }}</li>{% endfor %}</ol>
               {% endif %}
-              <ol start="{{ frame.lineno|add:"1" }}" class="context-line"><li onclick="toggle('pre{{ frame.id }}', 'post{{ frame.id }}')">{{ frame.context_line|escape }} <span>...</span></li></ol>
+              <ol start="{{ frame.lineno }}" class="context-line"><li onclick="toggle('pre{{ frame.id }}', 'post{{ frame.id }}')">{{ frame.context_line|escape }} <span>...</span></li></ol>
               {% if frame.post_context %}
-                <ol start='{{ frame.lineno|add:"2" }}' class="post-context" id="post{{ frame.id }}">{% for line in frame.post_context %}<li onclick="toggle('pre{{ frame.id }}', 'post{{ frame.id }}')">{{ line|escape }}</li>{% endfor %}</ol>
+                <ol start='{{ frame.lineno|add:"1" }}' class="post-context" id="post{{ frame.id }}">{% for line in frame.post_context %}<li onclick="toggle('pre{{ frame.id }}', 'post{{ frame.id }}')">{{ line|escape }}</li>{% endfor %}</ol>
               {% endif %}
             </div>
           {% endif %}
@@ -404,7 +404,7 @@ Traceback (most recent call last):<br/>
 {% for frame in frames %}
   File "{{ frame.filename }}" in {{ frame.function }}<br/>
   {% if frame.context_line %}
-    &nbsp;&nbsp;{{ frame.lineno|add:"1" }}. {{ frame.context_line|escape }}<br/>
+    &nbsp;&nbsp;{{ frame.lineno }}. {{ frame.context_line|escape }}<br/>
   {% endif %}
 {% endfor %}<br/>
 &nbsp;&nbsp;{{ exception_type }} at {{ request.path }}<br/>
