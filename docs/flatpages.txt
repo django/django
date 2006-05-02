@@ -85,7 +85,7 @@ Flatpages are represented by a standard `Django model`_, which lives in
 `Django database API`_.
 
 .. _Django model: http://www.djangoproject.com/documentation/model_api/
-.. _django/contrib/flatpages/models/flatpages.py: http://code.djangoproject.com/browser/django/trunk/django/contrib/flatpages/models/flatpages.py
+.. _django/contrib/flatpages/models.py: http://code.djangoproject.com/browser/django/trunk/django/contrib/flatpages/models.py
 .. _Django database API: http://www.djangoproject.com/documentation/db_api/
 
 Flatpage templates
