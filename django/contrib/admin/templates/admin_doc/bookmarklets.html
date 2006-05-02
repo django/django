@@ -1,4 +1,4 @@
-{% extends "admin/base_site" %}
+{% extends "admin/base_site.html" %}
 
 {% block breadcrumbs %}{% load i18n %}<div class="breadcrumbs"><a href="../../">{% trans "Home" %}</a> &rsaquo; <a href="../">{% trans "Documentation" %}</a> &rsaquo; {% trans "Bookmarklets" %}</div>{% endblock %}
 {% block userlinks %}<a href="../../password_change/">{% trans 'Change password' %}</a> / <a href="../../logout/">{% trans 'Log out' %}</a>{% endblock %}

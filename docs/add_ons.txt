@@ -12,9 +12,9 @@ admin
 =====
 
 The automatic Django administrative interface. For more information, see
-`Tutorial 3`_.
+`Tutorial 2`_.
 
-.. _Tutorial 3: http://www.djangoproject.com/documentation/tutorial2/
+.. _Tutorial 2: http://www.djangoproject.com/documentation/tutorial2/
 
 comments
 ========

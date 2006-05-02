@@ -32,18 +32,18 @@ How Django processes a request
 When a user requests a page from your Django-powered site, this is the
 algorithm the system follows to determine which Python code to execute:
 
-    1. The system looks at the ``ROOT_URLCONF`` setting in your
-       `settings file`_. This should be a string representing the full Python
-       import path to your URLconf. For example: ``"mydjangoapps.urls"``.
-    2. The system loads that Python module and looks for the variable
-       ``urlpatterns``. This should be a Python list, in the format returned
-       by the function ``django.conf.urls.defaults.patterns()``.
-    3. The system runs through each URL pattern, in order, and stops at the
-       first one that matches the requested URL.
+    1. Django looks at the ``ROOT_URLCONF`` setting in your `settings file`_.
+       This should be a string representing the full Python import path to your
+       URLconf. For example: ``"mydjangoapps.urls"``.
+    2. Django loads that Python module and looks for the variable
+       ``urlpatterns``. This should be a Python list, in the format returned by
+       the function ``django.conf.urls.defaults.patterns()``.
+    3. Django runs through each URL pattern, in order, and stops at the first
+       one that matches the requested URL.
     4. Once one of the regexes matches, Django imports and calls the given
        view, which is a simple Python function. The view gets passed a
-       `request object`_ and any values captured in the regex as function
-       arguments.
+       `request object`_ as its first argument and any values captured in the
+       regex as remaining arguments.
 
 .. _settings file: http://www.djangoproject.com/documentation/settings/
 .. _request object: http://www.djangoproject.com/documentation/request_response/#httprequest-objects
@@ -64,7 +64,7 @@ Here's a sample URLconf::
 
 Notes:
 
-    * ``from django.conf.urls.defaults import *`` makes the ``patterns``
+    * ``from django.conf.urls.defaults import *`` makes the ``patterns()``
       function available.
 
     * To capture a value from the URL, just put parenthesis around it.
@@ -72,11 +72,11 @@ Notes:
     * There's no need to add a leading slash, because every URL has that. For
       example, it's ``^articles``, not ``^/articles``.
 
-    * The ``"r"`` in front of each regular expression string is optional but
+    * The ``'r'`` in front of each regular expression string is optional but
       recommended. It tells Python that a string is "raw" -- that nothing in
       the string should be escaped. See `Dive Into Python's explanation`_.
 
-Examples:
+Example requests:
 
     * A request to ``/articles/2005/03/`` would match the third entry in the
       list. Django would call the function
@@ -121,8 +121,8 @@ Here's the above example URLconf, rewritten to use named groups::
     )
 
 This accomplishes exactly the same thing as the previous example, with one
-subtle difference: The captured values are passed as keyword arguments rather
-than positional arguments. For example:
+subtle difference: The captured values are passed to view functions as keyword
+arguments rather than positional arguments. For example:
 
     * A request to ``/articles/2005/03/`` would call the function
       ``news.views.month_archive(request, year='2005', month='03')``, instead
@@ -134,7 +134,7 @@ than positional arguments. For example:
 In practice, this means your URLconfs are slightly more explicit and less prone
 to argument-order bugs -- and you can reorder the arguments in your views'
 function definitions. Of course, these benefits come at the cost of brevity;
-some folks find the named-group syntax ugly and too verbose.
+some developers find the named-group syntax ugly and too verbose.
 
 The matching/grouping algorithm
 -------------------------------
@@ -160,6 +160,10 @@ will look for ``/myapp/``.
 In a request to ``http://www.example.com/myapp/?page=3``, the URLconf will look
 for ``/myapp/``.
 
+The URLconf doesn't look at the request method. In other words, all request
+methods -- ``POST``, ``GET``, ``HEAD``, etc. -- will be routed to the same
+function for the same URL.
+
 Syntax of the urlpatterns variable
 ==================================
 
@@ -183,8 +187,8 @@ The remaining arguments should be tuples in this format::
 
     (regular expression, Python callback function [, optional dictionary])
 
-...where ``dictionary_of_extra_arguments`` is optional. (See
-"Passing extra options to view functions" below.)
+...where ``optional dictionary`` is optional. (See
+_`Passing extra options to view functions` below.)
 
 handler404
 ----------
@@ -209,7 +213,7 @@ include
 -------
 
 A function that takes a full Python import path to another URLconf that should
-be "included" in this place. See "Including other URLconfs" below.
+be "included" in this place. See _`Including other URLconfs` below.
 
 Notes on capturing text in URLs
 ===============================
@@ -259,12 +263,12 @@ Here's the example URLconf from the `Django overview`_::
     from django.conf.urls.defaults import *
 
     urlpatterns = patterns('',
-        (r'^articles/(?P<year>\d{4})/$', 'myproject.news.views.year_archive'),
-        (r'^articles/(?P<year>\d{4})/(?P<month>\d{2})/$', 'myproject.news.views.month_archive'),
-        (r'^articles/(?P<year>\d{4})/(?P<month>\d{2})/(?P<day>\d+)/$', 'myproject.news.views.article_detail'),
+        (r'^articles/(\d{4})/$', 'myproject.news.views.year_archive'),
+        (r'^articles/(\d{4})/(\d{2})/$', 'myproject.news.views.month_archive'),
+        (r'^articles/(\d{4})/(\d{2})/(\d+)/$', 'myproject.news.views.article_detail'),
     )
 
-In this example, each view has a common prefix -- ``"myproject.news.views"``.
+In this example, each view has a common prefix -- ``'myproject.news.views'``.
 Instead of typing that out for each entry in ``urlpatterns``, you can use the
 first argument to the ``patterns()`` function to specify a prefix to apply to
 each view function.
@@ -274,9 +278,9 @@ With this in mind, the above example can be written more concisely as::
     from django.conf.urls.defaults import *
 
     urlpatterns = patterns('myproject.news.views',
-        (r'^articles/(?P<year>\d{4})/$', 'year_archive'),
-        (r'^articles/(?P<year>\d{4})/(?P<month>\d{2})/$', 'month_archive'),
-        (r'^articles/(?P<year>\d{4})/(?P<month>\d{2})/(?P<day>\d+)/$', 'article_detail'),
+        (r'^articles/(\d{4})/$', 'year_archive'),
+        (r'^articles/(\d{4})/(\d{2})/$', 'month_archive'),
+        (r'^articles/(\d{4})/(\d{2})/(\d+)/$', 'article_detail'),
     )
 
 Note that you don't put a trailing dot (``"."``) in the prefix. Django puts
@@ -299,7 +303,6 @@ number of other URLconfs::
         (r'^weblog/',        include('django_website.apps.blog.urls.blog')),
         (r'^documentation/', include('django_website.apps.docs.urls.docs')),
         (r'^comments/',      include('django.contrib.comments.urls.comments')),
-        (r'^rss/',           include('django.conf.urls.rss')),
     )
 
 Note that the regular expressions in this example don't have a ``$``

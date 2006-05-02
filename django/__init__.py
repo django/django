@@ -1,1 +1,1 @@
-VERSION = (0, 9, 1, 'SVN')
+VERSION = (0, 95, 'post-magic-removal')

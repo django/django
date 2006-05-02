@@ -10,32 +10,29 @@ Cookies contain a session ID -- not the data itself.
 Enabling sessions
 =================
 
-Session functionality is enabled by default.
+Sessions are implemented via middleware_.
 
-You can turn session functionality on and off by editing the
-``MIDDLEWARE_CLASSES`` setting. To activate sessions, make sure
-``MIDDLEWARE_CLASSES`` contains ``"django.middleware.sessions.SessionMiddleware"``.
+Turn session functionality on and off by editing the ``MIDDLEWARE_CLASSES``
+setting. To activate sessions, make sure ``MIDDLEWARE_CLASSES`` contains
+``"django.contrib.sessions.middleware.SessionMiddleware"``.
 
-If you're dealing with an admin site, make sure the ``SessionMiddleware`` line
-appears before the ``AdminUserRequired`` line. (The middleware classes are
-applied in order, and the admin middleware requires that the session middleware
-come first.)
+The default ``settings.py`` created by ``django-admin.py startproject`` has
+``SessionMiddleware`` activated.
 
 If you don't want to use sessions, you might as well remove the
 ``SessionMiddleware`` line from ``MIDDLEWARE_CLASSES``. It'll save you a small
 bit of overhead.
 
+.. _middleware: http://www.djangoproject.com/documentation/middleware/
+
 Using sessions in views
 =======================
 
-Each ``HttpRequest`` object -- the first argument to any Django view function --
-has a ``session`` attribute, which is a dictionary-like object. You can read
-it and write to it.
+When ``SessionMiddleware`` is activated, each ``HttpRequest`` object -- the
+first argument to any Django view function -- will have a ``session``
+attribute, which is a dictionary-like object. You can read it and write to it.
 
 It implements the following standard dictionary methods:
-
-    * ``__contains__(key)``
-      Example: ``'fav_color' in request.session``
 
     * ``__getitem__(key)``
       Example: ``fav_color = request.session['fav_color']``
@@ -47,14 +44,15 @@ It implements the following standard dictionary methods:
       Example: ``del request.session['fav_color']``. This raises ``KeyError``
       if the given ``key`` isn't already in the session.
 
+    * ``__contains__(key)``
+      Example: ``'fav_color' in request.session``
+
     * ``get(key, default=None)``
       Example: ``fav_color = request.session.get('fav_color', 'red')``
 
     * ``keys()``
-      **New in Django development version.**
 
     * ``items()``
-      **New in Django development version.**
 
 It also has these three methods:
 
@@ -146,17 +144,17 @@ Here's a typical usage example::
             else:
                 return HttpResponse("Please enable cookies and try again.")
         request.session.set_test_cookie()
-        return render_to_response('foo/login_form')
+        return render_to_response('foo/login_form.html')
 
 Using sessions out of views
 ===========================
 
 Internally, each session is just a normal Django model. The ``Session`` model
-is defined in ``django/models/core.py``. Because it's a normal model, you can
-access sessions using the normal Django database API::
+is defined in ``django/contrib/sessions/models.py``. Because it's a normal
+model, you can access sessions using the normal Django database API::
 
-    >>> from django.models.core import sessions
-    >>> s = sessions.get_object(pk='2b1189a188b44ad18c35e113ac6ceead')
+    >>> from django.contrib.sessions.models import Session
+    >>> s = Session.objects.get_object(pk='2b1189a188b44ad18c35e113ac6ceead')
     >>> s.expire_date
     datetime.datetime(2005, 8, 20, 13, 35, 12)
 
@@ -244,7 +242,7 @@ Technical details
     * The session dictionary should accept any pickleable Python object. See
       `the pickle module`_ for more information.
 
-    * Session data is stored in a database table named ``core_sessions`` .
+    * Session data is stored in a database table named ``django_session`` .
 
     * Django only sends a cookie if it needs to. If you don't set any session
       data, it won't send a session cookie.

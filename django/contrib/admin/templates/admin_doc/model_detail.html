@@ -1,4 +1,4 @@
-{% extends "admin/base_site" %}
+{% extends "admin/base_site.html" %}
 {% load i18n %}
 {% block userlinks %}<a href="../../../password_change/">{% trans 'Change password' %}</a> / <a href="../../../logout/">{% trans 'Log out' %}</a>{% endblock %}
 {% block extrahead %}
@@ -41,6 +41,6 @@
 </table>
 </div>
 
-<p class="small"><a href="../">&lsaquo; Back to Models Documentation</p>
+<p class="small"><a href="../">&lsaquo; Back to Models Documentation</a></p>
 </div>
 {% endblock %}

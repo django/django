@@ -115,7 +115,7 @@ def translation(language):
     if sys.version_info < (2, 4):
         klass = DjangoTranslation23
 
-    globalpath = os.path.join(os.path.dirname(settings.__file__), 'locale')
+    globalpath = os.path.join(os.path.dirname(sys.modules[settings.__module__].__file__), 'locale')
 
     parts = settings.SETTINGS_MODULE.split('.')
     project = __import__(parts[0], {}, {}, [])
@@ -209,8 +209,8 @@ def get_language():
         except AttributeError:
             pass
     # If we don't have a real translation object, assume it's the default language.
-    from django.conf.settings import LANGUAGE_CODE
-    return LANGUAGE_CODE
+    from django.conf import settings
+    return settings.LANGUAGE_CODE
 
 def catalog():
     """
@@ -275,7 +275,7 @@ def check_for_language(lang_code):
     only used for language codes from either the cookies or session.
     """
     from django.conf import settings
-    globalpath = os.path.join(os.path.dirname(settings.__file__), 'locale')
+    globalpath = os.path.join(os.path.dirname(sys.modules[settings.__module__].__file__), 'locale')
     if gettext_module.find('django', globalpath, [to_locale(lang_code)]) is not None:
         return True
     else:
@@ -289,7 +289,7 @@ def get_language_from_request(request):
     """
     global _accepted
     from django.conf import settings
-    globalpath = os.path.join(os.path.dirname(settings.__file__), 'locale')
+    globalpath = os.path.join(os.path.dirname(sys.modules[settings.__module__].__file__), 'locale')
     supported = dict(settings.LANGUAGES)
 
     if hasattr(request, 'session'):
@@ -346,16 +346,16 @@ def get_date_formats():
     technical message ID to store date and time formats. If it doesn't contain
     one, the formats provided in the settings will be used.
     """
-    from django.conf.settings import DATE_FORMAT, DATETIME_FORMAT, TIME_FORMAT
+    from django.conf import settings
     date_format = _('DATE_FORMAT')
     datetime_format = _('DATETIME_FORMAT')
     time_format = _('TIME_FORMAT')
     if date_format == 'DATE_FORMAT':
-        date_format = DATE_FORMAT
+        date_format = settings.DATE_FORMAT
     if datetime_format == 'DATETIME_FORMAT':
-        datetime_format = DATETIME_FORMAT
+        datetime_format = settings.DATETIME_FORMAT
     if time_format == 'TIME_FORMAT':
-        time_format = TIME_FORMAT
+        time_format = settings.TIME_FORMAT
     return (date_format, datetime_format, time_format)
 
 def install():
@@ -384,7 +384,7 @@ def templatize(src):
     does so by translating the Django translation tags into standard gettext
     function invocations.
     """
-    from django.core.template import Lexer, TOKEN_TEXT, TOKEN_VAR, TOKEN_BLOCK
+    from django.template import Lexer, TOKEN_TEXT, TOKEN_VAR, TOKEN_BLOCK
     out = StringIO()
     intrans = False
     inplural = False
@@ -457,3 +457,13 @@ def templatize(src):
             else:
                 out.write(blankout(t.contents, 'X'))
     return out.getvalue()
+
+def string_concat(*strings):
+    """"
+    lazy variant of string concatenation, needed for translations that are
+    constructed from multiple parts. Handles lazy strings and non-strings by
+    first turning all arguments to strings, before joining them.
+    """
+    return ''.join([str(el) for el in strings])
+
+string_concat = lazy(string_concat, str)

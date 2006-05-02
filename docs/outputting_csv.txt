@@ -30,7 +30,7 @@ and Django's ``HttpResponse`` objects are file-like objects.
 Here's an example::
 
     import csv
-    from django.utils.httpwrappers import HttpResponse
+    from django.http import HttpResponse
 
     def some_view(request):
         # Create the HttpResponse object with the appropriate CSV header.
@@ -49,10 +49,10 @@ mention:
     * The response gets a special mimetype, ``text/csv``. This tells
       browsers that the document is a CSV file, rather than an HTML file. If
       you leave this off, browsers will probably interpret the output as HTML,
-      which would result in ugly, scary gobbledygook in the browser window.
+      which will result in ugly, scary gobbledygook in the browser window.
 
     * The response gets an additional ``Content-Disposition`` header, which
-      contains the name of the CSV file. This filename is arbitrary: Call it
+      contains the name of the CSV file. This filename is arbitrary; call it
       whatever you want. It'll be used by browsers in the "Save as..."
       dialogue, etc.
 
@@ -79,8 +79,8 @@ template output the commas in a ``{% for %}`` loop.
 
 Here's an example, which generates the same CSV file as above::
 
-    from django.utils.httpwrappers import HttpResponse
-    from django.core.template import loader, Context
+    from django.http import HttpResponse
+    from django.template import loader, Context
 
     def some_view(request):
         # Create the HttpResponse object with the appropriate CSV header.
@@ -94,7 +94,7 @@ Here's an example, which generates the same CSV file as above::
             ('Second row', 'A', 'B', 'C', '"Testing"', "Here's a quote"),
         )
 
-        t = loader.get_template('my_template_name')
+        t = loader.get_template('my_template_name.txt')
         c = Context({
             'data': csv_data,
         })
@@ -105,7 +105,7 @@ The only difference between this example and the previous example is that this
 one uses template loading instead of the CSV module. The rest of the code --
 such as the ``mimetype='text/csv'`` -- is the same.
 
-Then, create the template ``my_template_name``, with this template code::
+Then, create the template ``my_template_name.txt``, with this template code::
 
     {% for row in data %}"{{ row.0|addslashes }}", "{{ row.1|addslashes }}", "{{ row.2|addslashes }}", "{{ row.3|addslashes }}", "{{ row.4|addslashes }}"
     {% endfor %}

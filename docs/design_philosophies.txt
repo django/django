@@ -20,6 +20,9 @@ For example, the template system knows nothing about Web requests, the database
 layer knows nothing about data display and the view system doesn't care which
 template system a programmer uses.
 
+Although Django comes with a full stack for convenience, the pieces of the
+stack are independent of another wherever possible.
+
 .. _`loose coupling and tight cohesion`: http://c2.com/cgi/wiki?CouplingAndCohesion
 
 Less code
@@ -49,7 +52,10 @@ Explicit is better than implicit
 --------------------------------
 
 This, a `core Python principle`_, means Django shouldn't do too much "magic."
-Magic shouldn't happen unless there's a really good reason for it.
+Magic shouldn't happen unless there's a really good reason for it. Magic is
+worth using only if it creates a huge convenience unattainable in other ways,
+and it isn't implemented in a way that confuses developers who are trying to
+learn how to use the feature.
 
 .. _`core Python principle`: http://www.python.org/doc/Humor.html#zen
 
@@ -96,8 +102,9 @@ optimize statements internally.
 This is why developers need to call ``save()`` explicitly, rather than the
 framework saving things behind the scenes silently.
 
-This is also why the ``select_related`` argument exists. It's an optional
-performance booster for the common case of selecting "every related object."
+This is also why the ``select_related()`` ``QuerySet`` method exists. It's an
+optional performance booster for the common case of selecting "every related
+object."
 
 Terse, powerful syntax
 ----------------------
@@ -144,6 +151,8 @@ design pretty URLs than ugly ones.
 
 File extensions in Web-page URLs should be avoided.
 
+Vignette-style commas in URLs deserve severe punishment.
+
 Definitive URLs
 ---------------
 
@@ -185,6 +194,13 @@ Be decoupled from HTML
 The template system shouldn't be designed so that it only outputs HTML. It
 should be equally good at generating other text-based formats, or just plain
 text.
+
+XML should not be used for template languages
+---------------------------------------------
+
+Using an XML engine to parse templates introduces a whole new world of human
+error in editing templates -- and incurs an unacceptable level of overhead in
+template processing.
 
 Assume designer competence
 --------------------------

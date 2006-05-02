@@ -3,7 +3,7 @@
 {% if cl.lookup_opts.admin.search_fields %}
 <div id="toolbar"><form id="changelist-search" action="" method="get">
 <div><!-- DIV needed for valid HTML -->
-<label><img src="{% admin_media_prefix %}img/admin/icon_searchbox.png" alt="Search" /></label>
+<label for="searchbar"><img src="{% admin_media_prefix %}img/admin/icon_searchbox.png" alt="Search" /></label>
 <input type="text" size="40" name="{{ search_var }}" value="{{ cl.query|escape }}" id="searchbar" />
 <input type="submit" value="{% trans 'Go' %}" />
 {% if show_result_count %}

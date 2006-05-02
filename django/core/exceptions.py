@@ -1,13 +1,8 @@
 "Global Django exceptions"
 
-from django.core.template import SilentVariableFailure
-
-class Http404(Exception):
-    pass
-
-class ObjectDoesNotExist(SilentVariableFailure):
+class ObjectDoesNotExist(Exception):
     "The requested object does not exist"
-    pass
+    silent_variable_failure = True
 
 class SuspiciousOperation(Exception):
     "The user did something suspicious"

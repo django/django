@@ -79,7 +79,7 @@ SERVER_EMAIL = 'root@localhost'
 SEND_BROKEN_LINK_EMAILS = False
 
 # Database connection info.
-DATABASE_ENGINE = 'postgresql' # 'postgresql', 'mysql', 'sqlite3' or 'ado_mssql'.
+DATABASE_ENGINE = ''           # 'postgresql', 'mysql', 'sqlite3' or 'ado_mssql'.
 DATABASE_NAME = ''             # Or path to database file if using sqlite3.
 DATABASE_USER = ''             # Not used with sqlite3.
 DATABASE_PASSWORD = ''         # Not used with sqlite3.
@@ -102,19 +102,16 @@ INSTALLED_APPS = ()
 # List of locations of the template source files, in search order.
 TEMPLATE_DIRS = ()
 
-# Extension on all templates.
-TEMPLATE_FILE_EXTENSION = '.html'
-
 # List of callables that know how to import templates from various sources.
 # See the comments in django/core/template/loader.py for interface
 # documentation.
 TEMPLATE_LOADERS = (
-    'django.core.template.loaders.filesystem.load_template_source',
-    'django.core.template.loaders.app_directories.load_template_source',
-#     'django.core.template.loaders.eggs.load_template_source',
+    'django.template.loaders.filesystem.load_template_source',
+    'django.template.loaders.app_directories.load_template_source',
+#     'django.template.loaders.eggs.load_template_source',
 )
 
-# List of processors used by DjangoContext to populate the context.
+# List of processors used by RequestContext to populate the context.
 # Each one should be a callable that takes the request object as its
 # only parameter and returns a dictionary to add to the context.
 TEMPLATE_CONTEXT_PROCESSORS = (
@@ -205,6 +202,10 @@ TIME_FORMAT = 'P'
 # http://psyco.sourceforge.net/
 ENABLE_PSYCO = False
 
+# Do you want to manage transactions manually?
+# Hint: you really don't!
+TRANSACTIONS_MANAGED = False
+
 ##############
 # MIDDLEWARE #
 ##############
@@ -213,7 +214,8 @@ ENABLE_PSYCO = False
 # this middleware classes will be applied in the order given, and in the
 # response phase the middleware will be applied in reverse order.
 MIDDLEWARE_CLASSES = (
-    "django.middleware.sessions.SessionMiddleware",
+    "django.contrib.sessions.middleware.SessionMiddleware",
+    "django.contrib.auth.middleware.AuthenticationMiddleware",
 #     "django.middleware.http.ConditionalGetMiddleware",
 #     "django.middleware.gzip.GZipMiddleware",
     "django.middleware.common.CommonMiddleware",

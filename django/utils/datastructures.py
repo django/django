@@ -40,6 +40,43 @@ class MergeDict:
                 return True
         return False
 
+class SortedDict(dict):
+    "A dictionary that keeps its keys in the order in which they're inserted."
+    def __init__(self, data={}):
+        dict.__init__(self, data)
+        self.keyOrder = data.keys()
+
+    def __setitem__(self, key, value):
+        dict.__setitem__(self, key, value)
+        if key not in self.keyOrder:
+            self.keyOrder.append(key)
+
+    def __delitem__(self, key):
+        dict.__delitem__(self, key)
+        self.keyOrder.remove(key)
+
+    def __iter__(self):
+        for k in self.keyOrder:
+            yield k
+
+    def items(self):
+        return zip(self.keyOrder, self.values())
+
+    def keys(self):
+        return self.keyOrder[:]
+
+    def values(self):
+        return [dict.__getitem__(self,k) for k in self.keyOrder]
+
+    def update(self, dict):
+        for k, v in dict.items():
+            self.__setitem__(k, v)
+
+    def setdefault(self, key, default):
+        if key not in self.keyOrder:
+            self.keyOrder.append(key)
+        return dict.setdefault(self, key, default)
+
 class MultiValueDictKeyError(KeyError):
     pass
 
@@ -193,4 +230,4 @@ class DotExpandedDict(dict):
             try:
                 current[bits[-1]] = v
             except TypeError: # Special-case if current isn't a dict.
-                current = {bits[-1]: v}
+                current = {bits[-1] : v}

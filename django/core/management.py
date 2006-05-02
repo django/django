@@ -2,8 +2,10 @@
 # development-server initialization.
 
 import django
-import os, re, sys, textwrap
+from django.core.exceptions import ImproperlyConfigured
+import os, re, shutil, sys, textwrap
 from optparse import OptionParser
+from django.utils import termcolors
 
 # For Python 2.3
 if not hasattr(__builtins__, 'set'):
@@ -17,7 +19,7 @@ MODULE_TEMPLATE = '''    {%% if perms.%(app)s.%(addperm)s or perms.%(app)s.%(cha
     </tr>
     {%% endif %%}'''
 
-APP_ARGS = '[modelmodule ...]'
+APP_ARGS = '[appname ...]'
 
 # Use django.__path__[0] because we don't know which directory django into
 # which has been installed.
@@ -25,37 +27,45 @@ PROJECT_TEMPLATE_DIR = os.path.join(django.__path__[0], 'conf', '%s_template')
 
 INVALID_PROJECT_NAMES = ('django', 'test')
 
-def _get_packages_insert(app_label):
-    from django.core.db import db
-    return "INSERT INTO %s (%s, %s) VALUES ('%s', '%s');" % \
-        (db.quote_name('packages'), db.quote_name('label'), db.quote_name('name'),
-        app_label, app_label)
+# Set up the terminal color scheme.
+class dummy: pass
+style = dummy()
+style.ERROR = termcolors.make_style(fg='red', opts=('bold',))
+style.ERROR_OUTPUT = termcolors.make_style(fg='red', opts=('bold',))
+style.SQL_FIELD = termcolors.make_style(fg='green', opts=('bold',))
+style.SQL_COLTYPE = termcolors.make_style(fg='green')
+style.SQL_KEYWORD = termcolors.make_style(fg='yellow')
+style.SQL_TABLE = termcolors.make_style(opts=('bold',))
+del dummy
 
-def _get_permission_codename(action, opts):
-    return '%s_%s' % (action, opts.object_name.lower())
+def disable_termcolors():
+    class dummy:
+        def __getattr__(self, attr):
+            return lambda x: x
+    global style
+    style = dummy()
 
-def _get_all_permissions(opts):
-    "Returns (codename, name) for all permissions in the given opts."
-    perms = []
-    if opts.admin:
-        for action in ('add', 'change', 'delete'):
-            perms.append((_get_permission_codename(action, opts), 'Can %s %s' % (action, opts.verbose_name)))
-    return perms + list(opts.permissions)
-
-def _get_permission_insert(name, codename, opts):
-    from django.core.db import db
-    return "INSERT INTO %s (%s, %s, %s) VALUES ('%s', '%s', '%s');" % \
-        (db.quote_name('auth_permissions'), db.quote_name('name'), db.quote_name('package'),
-        db.quote_name('codename'), name.replace("'", "''"), opts.app_label, codename)
-
-def _get_contenttype_insert(opts):
-    from django.core.db import db
-    return "INSERT INTO %s (%s, %s, %s) VALUES ('%s', '%s', '%s');" % \
-        (db.quote_name('content_types'), db.quote_name('name'), db.quote_name('package'),
-        db.quote_name('python_module_name'), opts.verbose_name, opts.app_label, opts.module_name)
+# Disable terminal coloring if somebody's piping the output.
+if (not sys.stdout.isatty()) or (sys.platform == 'win32'):
+    disable_termcolors()
 
 def _is_valid_dir_name(s):
     return bool(re.search(r'^\w+$', s))
+
+def _get_installed_models(table_list):
+    "Gets a set of all models that are installed, given a list of existing tables"
+    from django.db import models
+    all_models = []
+    for app in models.get_apps():
+        for model in models.get_models(app):
+            all_models.append(model)
+    return set([m for m in all_models if m._meta.db_table in table_list])
+
+def _get_table_list():
+    "Gets a list of all db tables that are physically installed."
+    from django.db import connection, get_introspection_module
+    cursor = connection.cursor()
+    return get_introspection_module().get_table_list(cursor)
 
 # If the foreign key points to an AutoField, a PositiveIntegerField or a
 # PositiveSmallIntegerField, the foreign key should be an IntegerField, not the
@@ -67,304 +77,429 @@ def get_version():
     "Returns the version as a human-format string."
     from django import VERSION
     v = '.'.join([str(i) for i in VERSION[:-1]])
-    if VERSION[3]:
-        v += ' (%s)' % VERSION[3]
+    if VERSION[-1]:
+        v += ' (%s)' % VERSION[-1]
     return v
 
-def get_sql_create(mod):
-    "Returns a list of the CREATE TABLE SQL statements for the given module."
-    from django.core import db, meta
+def get_sql_create(app):
+    "Returns a list of the CREATE TABLE SQL statements for the given app."
+    from django.db import get_creation_module, models
+    data_types = get_creation_module().DATA_TYPES
+
+    if not data_types:
+        # This must be the "dummy" database backend, which means the user
+        # hasn't set DATABASE_ENGINE.
+        sys.stderr.write(style.ERROR("Error: Django doesn't know which syntax to use for your SQL statements,\n" +
+            "because you haven't specified the DATABASE_ENGINE setting.\n" +
+            "Edit your settings file and change DATABASE_ENGINE to something like 'postgresql' or 'mysql'.\n"))
+        sys.exit(1)
+
+    # Get installed models, so we generate REFERENCES right
+    installed_models = _get_installed_models(_get_table_list())
+
     final_output = []
-    for klass in mod._MODELS:
-        opts = klass._meta
-        table_output = []
-        for f in opts.fields:
-            if isinstance(f, meta.ForeignKey):
-                rel_field = f.rel.get_related_field()
-                data_type = get_rel_data_type(rel_field)
-            else:
-                rel_field = f
-                data_type = f.get_internal_type()
-            col_type = db.DATA_TYPES[data_type]
-            if col_type is not None:
-                field_output = [db.db.quote_name(f.column), col_type % rel_field.__dict__]
-                field_output.append('%sNULL' % (not f.null and 'NOT ' or ''))
-                if f.unique:
-                    field_output.append('UNIQUE')
-                if f.primary_key:
-                    field_output.append('PRIMARY KEY')
-                if f.rel:
-                    field_output.append('REFERENCES %s (%s)' % \
-                        (db.db.quote_name(f.rel.to.db_table),
-                        db.db.quote_name(f.rel.to.get_field(f.rel.field_name).column)))
-                table_output.append(' '.join(field_output))
-        if opts.order_with_respect_to:
-            table_output.append('%s %s NULL' % (db.db.quote_name('_order'), db.DATA_TYPES['IntegerField']))
-        for field_constraints in opts.unique_together:
-            table_output.append('UNIQUE (%s)' % \
-                ", ".join([db.db.quote_name(opts.get_field(f).column) for f in field_constraints]))
+    models_output = set(installed_models)
+    pending_references = {}
 
-        full_statement = ['CREATE TABLE %s (' % db.db.quote_name(opts.db_table)]
-        for i, line in enumerate(table_output): # Combine and add commas.
-            full_statement.append('    %s%s' % (line, i < len(table_output)-1 and ',' or ''))
-        full_statement.append(');')
-        final_output.append('\n'.join(full_statement))
+    app_models = models.get_models(app)
 
-    for klass in mod._MODELS:
-        opts = klass._meta
-        for f in opts.many_to_many:
-            table_output = ['CREATE TABLE %s (' % db.db.quote_name(f.get_m2m_db_table(opts))]
-            table_output.append('    %s %s NOT NULL PRIMARY KEY,' % (db.db.quote_name('id'), db.DATA_TYPES['AutoField']))
-            table_output.append('    %s %s NOT NULL REFERENCES %s (%s),' % \
-                (db.db.quote_name(opts.object_name.lower() + '_id'),
-                db.DATA_TYPES[get_rel_data_type(opts.pk)] % opts.pk.__dict__,
-                db.db.quote_name(opts.db_table),
-                db.db.quote_name(opts.pk.column)))
-            table_output.append('    %s %s NOT NULL REFERENCES %s (%s),' % \
-                (db.db.quote_name(f.rel.to.object_name.lower() + '_id'),
-                db.DATA_TYPES[get_rel_data_type(f.rel.to.pk)] % f.rel.to.pk.__dict__,
-                db.db.quote_name(f.rel.to.db_table),
-                db.db.quote_name(f.rel.to.pk.column)))
-            table_output.append('    UNIQUE (%s, %s)' % \
-                (db.db.quote_name(opts.object_name.lower() + '_id'),
-                db.db.quote_name(f.rel.to.object_name.lower() + '_id')))
-            table_output.append(');')
-            final_output.append('\n'.join(table_output))
+    for klass in app_models:
+        output, references = _get_sql_model_create(klass, models_output)
+        final_output.extend(output)
+        pending_references.update(references)
+        final_output.extend(_get_sql_for_pending_references(klass, pending_references))
+        # Keep track of the fact that we've created the table for this model.
+        models_output.add(klass)
+
+    # Create the many-to-many join tables.
+    for klass in app_models:
+        final_output.extend(_get_many_to_many_sql_for_model(klass))
+
+    # Handle references to tables that are from other apps
+    # but don't exist physically
+    not_installed_models = set(pending_references.keys())
+    if not_installed_models:
+        final_output.append('-- The following references should be added but depend on non-existant tables:')
+        for klass in not_installed_models:
+            final_output.extend(['-- ' + sql for sql in
+                _get_sql_for_pending_references(klass, pending_references)])
+
     return final_output
-get_sql_create.help_doc = "Prints the CREATE TABLE SQL statements for the given model module name(s)."
+get_sql_create.help_doc = "Prints the CREATE TABLE SQL statements for the given app name(s)."
 get_sql_create.args = APP_ARGS
 
-def get_sql_delete(mod):
-    "Returns a list of the DROP TABLE SQL statements for the given module."
-    from django.core import db
+def _get_sql_model_create(klass, models_already_seen=set()):
+    """
+    Get the SQL required to create a single model.
+
+    Returns list_of_sql, pending_references_dict
+    """
+    from django.db import backend, get_creation_module, models
+    data_types = get_creation_module().DATA_TYPES
+
+    opts = klass._meta
+    final_output = []
+    table_output = []
+    pending_references = {}
+    for f in opts.fields:
+        if isinstance(f, models.ForeignKey):
+            rel_field = f.rel.get_related_field()
+            data_type = get_rel_data_type(rel_field)
+        else:
+            rel_field = f
+            data_type = f.get_internal_type()
+        col_type = data_types[data_type]
+        if col_type is not None:
+            # Make the definition (e.g. 'foo VARCHAR(30)') for this field.
+            field_output = [style.SQL_FIELD(backend.quote_name(f.column)),
+                style.SQL_COLTYPE(col_type % rel_field.__dict__)]
+            field_output.append(style.SQL_KEYWORD('%sNULL' % (not f.null and 'NOT ' or '')))
+            if f.unique:
+                field_output.append(style.SQL_KEYWORD('UNIQUE'))
+            if f.primary_key:
+                field_output.append(style.SQL_KEYWORD('PRIMARY KEY'))
+            if f.rel:
+                if f.rel.to in models_already_seen:
+                    field_output.append(style.SQL_KEYWORD('REFERENCES') + ' ' + \
+                        style.SQL_TABLE(backend.quote_name(f.rel.to._meta.db_table)) + ' (' + \
+                        style.SQL_FIELD(backend.quote_name(f.rel.to._meta.get_field(f.rel.field_name).column)) + ')'
+                    )
+                else:
+                    # We haven't yet created the table to which this field
+                    # is related, so save it for later.
+                    pr = pending_references.setdefault(f.rel.to, []).append((klass, f))
+            table_output.append(' '.join(field_output))
+    if opts.order_with_respect_to:
+        table_output.append(style.SQL_FIELD(backend.quote_name('_order')) + ' ' + \
+            style.SQL_COLTYPE(data_types['IntegerField']) + ' ' + \
+            style.SQL_KEYWORD('NULL'))
+    for field_constraints in opts.unique_together:
+        table_output.append(style.SQL_KEYWORD('UNIQUE') + ' (%s)' % \
+            ", ".join([backend.quote_name(style.SQL_FIELD(opts.get_field(f).column)) for f in field_constraints]))
+
+    full_statement = [style.SQL_KEYWORD('CREATE TABLE') + ' ' + style.SQL_TABLE(backend.quote_name(opts.db_table)) + ' (']
+    for i, line in enumerate(table_output): # Combine and add commas.
+        full_statement.append('    %s%s' % (line, i < len(table_output)-1 and ',' or ''))
+    full_statement.append(');')
+    final_output.append('\n'.join(full_statement))
+
+    return final_output, pending_references
+
+def _get_sql_for_pending_references(klass, pending_references):
+    """
+    Get any ALTER TABLE statements to add constraints after the fact.
+    """
+    from django.db import backend, get_creation_module
+    data_types = get_creation_module().DATA_TYPES
+
+    final_output = []
+    if backend.supports_constraints:
+        opts = klass._meta
+        if klass in pending_references:
+            for rel_class, f in pending_references[klass]:
+                rel_opts = rel_class._meta
+                r_table = rel_opts.db_table
+                r_col = f.column
+                table = opts.db_table
+                col = opts.get_field(f.rel.field_name).column
+                final_output.append(style.SQL_KEYWORD('ALTER TABLE') + ' %s ADD CONSTRAINT %s FOREIGN KEY (%s) REFERENCES %s (%s);' % \
+                    (backend.quote_name(r_table),
+                    backend.quote_name('%s_referencing_%s_%s' % (r_col, table, col)),
+                    backend.quote_name(r_col), backend.quote_name(table), backend.quote_name(col)))
+            del pending_references[klass]
+    return final_output
+
+def _get_many_to_many_sql_for_model(klass):
+    from django.db import backend, get_creation_module
+    data_types = get_creation_module().DATA_TYPES
+
+    opts = klass._meta
+    final_output = []
+    for f in opts.many_to_many:
+        table_output = [style.SQL_KEYWORD('CREATE TABLE') + ' ' + \
+            style.SQL_TABLE(backend.quote_name(f.m2m_db_table())) + ' (']
+        table_output.append('    %s %s %s,' % \
+            (style.SQL_FIELD(backend.quote_name('id')),
+            style.SQL_COLTYPE(data_types['AutoField']),
+            style.SQL_KEYWORD('NOT NULL PRIMARY KEY')))
+        table_output.append('    %s %s %s %s (%s),' % \
+            (style.SQL_FIELD(backend.quote_name(f.m2m_column_name())),
+            style.SQL_COLTYPE(data_types[get_rel_data_type(opts.pk)] % opts.pk.__dict__),
+            style.SQL_KEYWORD('NOT NULL REFERENCES'),
+            style.SQL_TABLE(backend.quote_name(opts.db_table)),
+            style.SQL_FIELD(backend.quote_name(opts.pk.column))))
+        table_output.append('    %s %s %s %s (%s),' % \
+            (style.SQL_FIELD(backend.quote_name(f.m2m_reverse_name())),
+            style.SQL_COLTYPE(data_types[get_rel_data_type(f.rel.to._meta.pk)] % f.rel.to._meta.pk.__dict__),
+            style.SQL_KEYWORD('NOT NULL REFERENCES'),
+            style.SQL_TABLE(backend.quote_name(f.rel.to._meta.db_table)),
+            style.SQL_FIELD(backend.quote_name(f.rel.to._meta.pk.column))))
+        table_output.append('    %s (%s, %s)' % \
+            (style.SQL_KEYWORD('UNIQUE'),
+            style.SQL_FIELD(backend.quote_name(f.m2m_column_name())),
+            style.SQL_FIELD(backend.quote_name(f.m2m_reverse_name()))))
+        table_output.append(');')
+        final_output.append('\n'.join(table_output))
+    return final_output
+
+def get_sql_delete(app):
+    "Returns a list of the DROP TABLE SQL statements for the given app."
+    from django.db import backend, connection, models, get_introspection_module
+    introspection = get_introspection_module()
+
+    # This should work even if a connecton isn't available
     try:
-        cursor = db.db.cursor()
+        cursor = connection.cursor()
     except:
         cursor = None
 
-    # Determine whether the admin log table exists. It only exists if the
-    # person has installed the admin app.
-    try:
-        if cursor is not None:
-            # Check whether the table exists.
-            cursor.execute("SELECT 1 FROM %s LIMIT 1" % db.db.quote_name('django_admin_log'))
-    except:
-        # The table doesn't exist, so it doesn't need to be dropped.
-        db.db.rollback()
-        admin_log_exists = False
+    # Figure out which tables already exist
+    if cursor:
+        table_names = introspection.get_table_list(cursor)
     else:
-        admin_log_exists = True
+        table_names = []
 
     output = []
 
     # Output DROP TABLE statements for standard application tables.
-    for klass in mod._MODELS:
-        try:
-            if cursor is not None:
-                # Check whether the table exists.
-                cursor.execute("SELECT 1 FROM %s LIMIT 1" % db.db.quote_name(klass._meta.db_table))
-        except:
-            # The table doesn't exist, so it doesn't need to be dropped.
-            db.db.rollback()
-        else:
-            output.append("DROP TABLE %s;" % db.db.quote_name(klass._meta.db_table))
+    to_delete = set()
+
+    references_to_delete = {}
+    app_models = models.get_models(app)
+    for klass in app_models:
+        if cursor and klass._meta.db_table in table_names:
+            # The table exists, so it needs to be dropped
+            opts = klass._meta
+            for f in opts.fields:
+                if f.rel and f.rel.to not in to_delete:
+                    references_to_delete.setdefault(f.rel.to, []).append( (klass, f) )
+
+            to_delete.add(klass)
+
+    for klass in app_models:
+        if cursor and klass._meta.db_table in table_names:
+            # Drop the table now
+            output.append('%s %s;' % (style.SQL_KEYWORD('DROP TABLE'),
+                style.SQL_TABLE(backend.quote_name(klass._meta.db_table))))
+            if backend.supports_constraints and references_to_delete.has_key(klass):
+                for rel_class, f in references_to_delete[klass]:
+                    table = rel_class._meta.db_table
+                    col = f.column
+                    r_table = klass._meta.db_table
+                    r_col = klass._meta.get_field(f.rel.field_name).column
+                    output.append('%s %s %s %s;' % \
+                        (style.SQL_KEYWORD('ALTER TABLE'),
+                        style.SQL_TABLE(backend.quote_name(table)),
+                        style.SQL_KEYWORD(backend.get_drop_foreignkey_sql()),
+                        style.SQL_FIELD(backend.quote_name("%s_referencing_%s_%s" % (col, r_table, r_col)))))
+                del references_to_delete[klass]
 
     # Output DROP TABLE statements for many-to-many tables.
-    for klass in mod._MODELS:
+    for klass in app_models:
         opts = klass._meta
         for f in opts.many_to_many:
-            try:
-                if cursor is not None:
-                    cursor.execute("SELECT 1 FROM %s LIMIT 1" % db.db.quote_name(f.get_m2m_db_table(opts)))
-            except:
-                db.db.rollback()
-            else:
-                output.append("DROP TABLE %s;" % db.db.quote_name(f.get_m2m_db_table(opts)))
+            if cursor and f.m2m_db_table() in table_names:
+                output.append("%s %s;" % (style.SQL_KEYWORD('DROP TABLE'),
+                    style.SQL_TABLE(backend.quote_name(f.m2m_db_table()))))
 
-    app_label = mod._MODELS[0]._meta.app_label
-
-    # Delete from packages, auth_permissions, content_types.
-    output.append("DELETE FROM %s WHERE %s = '%s';" % \
-        (db.db.quote_name('packages'), db.db.quote_name('label'), app_label))
-    output.append("DELETE FROM %s WHERE %s = '%s';" % \
-        (db.db.quote_name('auth_permissions'), db.db.quote_name('package'), app_label))
-    output.append("DELETE FROM %s WHERE %s = '%s';" % \
-        (db.db.quote_name('content_types'), db.db.quote_name('package'), app_label))
-
-    # Delete from the admin log.
-    if cursor is not None:
-        cursor.execute("SELECT %s FROM %s WHERE %s = %%s" % \
-            (db.db.quote_name('id'), db.db.quote_name('content_types'),
-            db.db.quote_name('package')), [app_label])
-        if admin_log_exists:
-            for row in cursor.fetchall():
-                output.append("DELETE FROM %s WHERE %s = %s;" % \
-                    (db.db.quote_name('django_admin_log'), db.db.quote_name('content_type_id'), row[0]))
+    app_label = app_models[0]._meta.app_label
 
     # Close database connection explicitly, in case this output is being piped
     # directly into a database client, to avoid locking issues.
-    if cursor is not None:
+    if cursor:
         cursor.close()
-        db.db.close()
+        connection.close()
 
     return output[::-1] # Reverse it, to deal with table dependencies.
-get_sql_delete.help_doc = "Prints the DROP TABLE SQL statements for the given model module name(s)."
+get_sql_delete.help_doc = "Prints the DROP TABLE SQL statements for the given app name(s)."
 get_sql_delete.args = APP_ARGS
 
-def get_sql_reset(mod):
+def get_sql_reset(app):
     "Returns a list of the DROP TABLE SQL, then the CREATE TABLE SQL, for the given module."
-    return get_sql_delete(mod) + get_sql_all(mod)
-get_sql_reset.help_doc = "Prints the DROP TABLE SQL, then the CREATE TABLE SQL, for the given model module name(s)."
+    return get_sql_delete(app) + get_sql_all(app)
+get_sql_reset.help_doc = "Prints the DROP TABLE SQL, then the CREATE TABLE SQL, for the given app name(s)."
 get_sql_reset.args = APP_ARGS
 
-def get_sql_initial_data(mod):
-    "Returns a list of the initial INSERT SQL statements for the given module."
-    from django.core import db
+def get_sql_initial_data_for_model(model):
+    from django.db import models
+    from django.conf import settings
+
+    opts = model._meta
+    app_dir = os.path.normpath(os.path.join(os.path.dirname(models.get_app(model._meta.app_label).__file__), 'sql'))
     output = []
-    app_label = mod._MODELS[0]._meta.app_label
-    output.append(_get_packages_insert(app_label))
-    app_dir = os.path.normpath(os.path.join(os.path.dirname(mod.__file__), '..', 'sql'))
-    for klass in mod._MODELS:
-        opts = klass._meta
 
-        # Add custom SQL, if it's available.
-        sql_files = [os.path.join(app_dir, opts.module_name + '.' + db.DATABASE_ENGINE +  '.sql'),
-                     os.path.join(app_dir, opts.module_name + '.sql')]
-        for sql_file in sql_files:
-            if os.path.exists(sql_file):
-                fp = open(sql_file)
-                output.append(fp.read())
-                fp.close()
+    # Find custom SQL, if it's available.
+    sql_files = [os.path.join(app_dir, "%s.%s.sql" % (opts.object_name.lower(), settings.DATABASE_ENGINE)),
+                 os.path.join(app_dir, "%s.sql" % opts.object_name.lower())]
+    for sql_file in sql_files:
+        if os.path.exists(sql_file):
+            fp = open(sql_file)
+            output.append(fp.read())
+            fp.close()
 
-        # Content types.
-        output.append(_get_contenttype_insert(opts))
-        # Permissions.
-        for codename, name in _get_all_permissions(opts):
-            output.append(_get_permission_insert(name, codename, opts))
     return output
-get_sql_initial_data.help_doc = "Prints the initial INSERT SQL statements for the given model module name(s)."
+
+def get_sql_initial_data(app):
+    "Returns a list of the initial INSERT SQL statements for the given app."
+    from django.db.models import get_models
+    output = []
+
+    app_models = get_models(app)
+    app_dir = os.path.normpath(os.path.join(os.path.dirname(app.__file__), 'sql'))
+
+    for klass in app_models:
+        output.extend(get_sql_initial_data_for_model(klass))
+
+    return output
+get_sql_initial_data.help_doc = "Prints the initial INSERT SQL statements for the given app name(s)."
 get_sql_initial_data.args = APP_ARGS
 
-def get_sql_sequence_reset(mod):
-    "Returns a list of the SQL statements to reset PostgreSQL sequences for the given module."
-    from django.core import db, meta
+def get_sql_sequence_reset(app):
+    "Returns a list of the SQL statements to reset PostgreSQL sequences for the given app."
+    from django.db import backend, models
     output = []
-    for klass in mod._MODELS:
+    for klass in models.get_models(app):
         for f in klass._meta.fields:
-            if isinstance(f, meta.AutoField):
-                output.append("SELECT setval('%s_%s_seq', (SELECT max(%s) FROM %s));" % \
-                    (klass._meta.db_table, f.column, db.db.quote_name(f.column),
-                    db.db.quote_name(klass._meta.db_table)))
+            if isinstance(f, models.AutoField):
+                output.append("%s setval('%s', (%s max(%s) %s %s));" % \
+                    (style.SQL_KEYWORD('SELECT'),
+                    style.SQL_FIELD('%s_%s_seq' % (klass._meta.db_table, f.column)),
+                    style.SQL_KEYWORD('SELECT'),
+                    style.SQL_FIELD(backend.quote_name(f.column)),
+                    style.SQL_KEYWORD('FROM'),
+                    style.SQL_TABLE(backend.quote_name(klass._meta.db_table))))
+                break # Only one AutoField is allowed per model, so don't bother continuing.
         for f in klass._meta.many_to_many:
-            output.append("SELECT setval('%s_id_seq', (SELECT max(%s) FROM %s));" % \
-                (f.get_m2m_db_table(klass._meta), db.db.quote_name('id'), f.get_m2m_db_table(klass._meta)))
+            output.append("%s setval('%s', (%s max(%s) %s %s));" % \
+                (style.SQL_KEYWORD('SELECT'),
+                style.SQL_FIELD('%s_id_seq' % f.m2m_db_table()),
+                style.SQL_KEYWORD('SELECT'),
+                style.SQL_FIELD(backend.quote_name('id')),
+                style.SQL_KEYWORD('FROM'),
+                style.SQL_TABLE(f.m2m_db_table())))
     return output
-get_sql_sequence_reset.help_doc = "Prints the SQL statements for resetting PostgreSQL sequences for the given model module name(s)."
+get_sql_sequence_reset.help_doc = "Prints the SQL statements for resetting PostgreSQL sequences for the given app name(s)."
 get_sql_sequence_reset.args = APP_ARGS
 
-def get_sql_indexes(mod):
-    "Returns a list of the CREATE INDEX SQL statements for the given module."
-    from django.core.db import db
+def get_sql_indexes(app):
+    "Returns a list of the CREATE INDEX SQL statements for the given app."
+    from django.db import backend, models
     output = []
-    for klass in mod._MODELS:
+
+    for klass in models.get_models(app):
         for f in klass._meta.fields:
             if f.db_index:
-                unique = f.unique and "UNIQUE " or ""
-                output.append("CREATE %sINDEX %s_%s ON %s (%s);" % \
-                    (unique, klass._meta.db_table, f.column,
-                    db.quote_name(klass._meta.db_table), db.quote_name(f.column)))
+                unique = f.unique and 'UNIQUE ' or ''
+                output.append(
+                    style.SQL_KEYWORD('CREATE %sINDEX' % unique) + ' ' + \
+                    style.SQL_TABLE('%s_%s' % (klass._meta.db_table, f.column)) + ' ' + \
+                    style.SQL_KEYWORD('ON') + ' ' + \
+                    style.SQL_TABLE(backend.quote_name(klass._meta.db_table)) + ' ' + \
+                    "(%s);" % style.SQL_FIELD(backend.quote_name(f.column))
+                )
     return output
 get_sql_indexes.help_doc = "Prints the CREATE INDEX SQL statements for the given model module name(s)."
 get_sql_indexes.args = APP_ARGS
 
-def get_sql_all(mod):
-    "Returns a list of CREATE TABLE SQL and initial-data insert for the given module."
-    return get_sql_create(mod) + get_sql_initial_data(mod)
-get_sql_all.help_doc = "Prints the CREATE TABLE and initial-data SQL statements for the given model module name(s)."
+def get_sql_all(app):
+    "Returns a list of CREATE TABLE SQL, initial-data inserts, and CREATE INDEX SQL for the given module."
+    return get_sql_create(app) + get_sql_initial_data(app) + get_sql_indexes(app)
+get_sql_all.help_doc = "Prints the CREATE TABLE, initial-data and CREATE INDEX SQL statements for the given model module name(s)."
 get_sql_all.args = APP_ARGS
 
-def has_no_records(cursor):
-    "Returns True if the cursor, having executed a query, returned no records."
-    # This is necessary due to an inconsistency in the DB-API spec.
-    # cursor.rowcount can be -1 (undetermined), according to
-    # http://www.python.org/peps/pep-0249.html
-    if cursor.rowcount < 0:
-        return cursor.fetchone() is None
-    return cursor.rowcount < 1
+def syncdb():
+    "Creates the database tables for all apps in INSTALLED_APPS whose tables haven't already been created."
+    from django.db import connection, transaction, models, get_creation_module
+    from django.db.models import signals
+    from django.conf import settings
+    from django.dispatch import dispatcher
 
-def database_check(mod):
-    "Checks that everything is properly installed in the database for the given module."
-    from django.core import db
-    cursor = db.db.cursor()
-    app_label = mod._MODELS[0]._meta.app_label
+    disable_termcolors()
 
-    # Check that the package exists in the database.
-    cursor.execute("SELECT 1 FROM %s WHERE %s = %%s" % \
-        (db.db.quote_name('packages'), db.db.quote_name('label')), [app_label])
-    if has_no_records(cursor):
-#         sys.stderr.write("The '%s' package isn't installed.\n" % app_label)
-        print _get_packages_insert(app_label)
+    # First, try validating the models.
+    _check_for_validation_errors()
 
-    # Check that the permissions and content types are in the database.
-    perms_seen = {}
-    contenttypes_seen = {}
-    for klass in mod._MODELS:
-        opts = klass._meta
-        perms = _get_all_permissions(opts)
-        perms_seen.update(dict(perms))
-        contenttypes_seen[opts.module_name] = 1
-        for codename, name in perms:
-            cursor.execute("SELECT 1 FROM %s WHERE %s = %%s AND %s = %%s" % \
-                (db.db.quote_name('auth_permissions'), db.db.quote_name('package'),
-                db.db.quote_name('codename')), (app_label, codename))
-            if has_no_records(cursor):
-#                 sys.stderr.write("The '%s.%s' permission doesn't exist.\n" % (app_label, codename))
-                print _get_permission_insert(name, codename, opts)
-        cursor.execute("SELECT 1 FROM %s WHERE %s = %%s AND %s = %%s" % \
-            (db.db.quote_name('content_types'), db.db.quote_name('package'),
-            db.db.quote_name('python_module_name')), (app_label, opts.module_name))
-        if has_no_records(cursor):
-#             sys.stderr.write("The '%s.%s' content type doesn't exist.\n" % (app_label, opts.module_name))
-            print _get_contenttype_insert(opts)
-
-    # Check that there aren't any *extra* permissions in the DB that the model
-    # doesn't know about.
-    cursor.execute("SELECT %s FROM %s WHERE %s = %%s" % \
-        (db.db.quote_name('codename'), db.db.quote_name('auth_permissions'),
-        db.db.quote_name('package')), (app_label,))
-    for row in cursor.fetchall():
+    # Import the 'management' module within each installed app, to register
+    # dispatcher events.
+    for app_name in settings.INSTALLED_APPS:
         try:
-            perms_seen[row[0]]
-        except KeyError:
-#             sys.stderr.write("A permission called '%s.%s' was found in the database but not in the model.\n" % (app_label, row[0]))
-            print "DELETE FROM %s WHERE %s='%s' AND %s = '%s';" % \
-                (db.db.quote_name('auth_permissions'), db.db.quote_name('package'),
-                app_label, db.db.quote_name('codename'), row[0])
+            __import__(app_name + '.management', '', '', [''])
+        except ImportError:
+            pass
 
-    # Check that there aren't any *extra* content types in the DB that the
-    # model doesn't know about.
-    cursor.execute("SELECT %s FROM %s WHERE %s = %%s" % \
-        (db.db.quote_name('python_module_name'), db.db.quote_name('content_types'),
-        db.db.quote_name('package')), (app_label,))
-    for row in cursor.fetchall():
-        try:
-            contenttypes_seen[row[0]]
-        except KeyError:
-#             sys.stderr.write("A content type called '%s.%s' was found in the database but not in the model.\n" % (app_label, row[0]))
-            print "DELETE FROM %s WHERE %s='%s' AND %s = '%s';" % \
-                (db.db.quote_name('content_types'), db.db.quote_name('package'),
-                app_label, db.db.quote_name('python_module_name'), row[0])
-database_check.help_doc = "Checks that everything is installed in the database for the given model module name(s) and prints SQL statements if needed."
-database_check.args = APP_ARGS
+    data_types = get_creation_module().DATA_TYPES
 
-def get_admin_index(mod):
-    "Returns admin-index template snippet (in list form) for the given module."
+    cursor = connection.cursor()
+
+    # Get a list of all existing database tables,
+    # so we know what needs to be added.
+    table_list = _get_table_list()
+
+    # Get a list of already installed *models* so that references work right.
+    seen_models = _get_installed_models(table_list)
+    created_models = set()
+    pending_references = {}
+
+    for app in models.get_apps():
+        model_list = models.get_models(app)
+        for model in model_list:
+            # Create the model's database table, if it doesn't already exist.
+            if model._meta.db_table in table_list:
+                continue
+            sql, references = _get_sql_model_create(model, seen_models)
+            seen_models.add(model)
+            created_models.add(model)
+            pending_references.update(references)
+            sql.extend(_get_sql_for_pending_references(model, pending_references))
+            print "Creating table %s" % model._meta.db_table
+            for statement in sql:
+                cursor.execute(statement)
+
+        for model in model_list:
+            if model in created_models:
+                sql = _get_many_to_many_sql_for_model(model)
+                if sql:
+                    print "Creating many-to-many tables for %s model" % model.__name__
+                    for statement in sql:
+                        cursor.execute(statement)
+
+        transaction.commit_unless_managed()
+
+    # Send the post_syncdb signal, so individual apps can do whatever they need
+    # to do at this point.
+    for app in models.get_apps():
+        dispatcher.send(signal=signals.post_syncdb, sender=app,
+            app=app, created_models=created_models)
+
+        # Install initial data for the app (but only if this is a model we've
+        # just created)
+        for model in models.get_models(app):
+            if model in created_models:
+                initial_sql = get_sql_initial_data_for_model(model)
+                if initial_sql:
+                    print "Installing initial data for %s model" % model._meta.object_name
+                    try:
+                        for sql in initial_sql:
+                            cursor.execute(sql)
+                    except Exception, e:
+                        sys.stderr.write("Failed to install initial SQL data for %s model: %s" % \
+                                            (model._meta.object_name, e))
+                        transaction.rollback_unless_managed()
+                    else:
+                        transaction.commit_unless_managed()
+
+syncdb.args = ''
+
+def get_admin_index(app):
+    "Returns admin-index template snippet (in list form) for the given app."
     from django.utils.text import capfirst
+    from django.db.models import get_models
     output = []
-    app_label = mod._MODELS[0]._meta.app_label
+    app_models = get_models(app)
+    app_label = app_models[0]._meta.app_label
     output.append('{%% if perms.%s %%}' % app_label)
     output.append('<div class="module"><h2>%s</h2><table>' % app_label.title())
-    for klass in mod._MODELS:
+    for klass in app_models:
         if klass._meta.admin:
             output.append(MODULE_TEMPLATE % {
                 'app': app_label,
@@ -376,97 +511,114 @@ def get_admin_index(mod):
     output.append('</table></div>')
     output.append('{% endif %}')
     return output
-get_admin_index.help_doc = "Prints the admin-index template snippet for the given model module name(s)."
+get_admin_index.help_doc = "Prints the admin-index template snippet for the given app name(s)."
 get_admin_index.args = APP_ARGS
 
-def init():
-    "Initializes the database with auth and core."
-    try:
-        from django.core import db, meta
-        auth = meta.get_app('auth')
-        core = meta.get_app('core')
-        cursor = db.db.cursor()
-        for sql in get_sql_create(core) + get_sql_create(auth) + get_sql_initial_data(core) + get_sql_initial_data(auth):
-            cursor.execute(sql)
-        cursor.execute("INSERT INTO %s (%s, %s) VALUES ('example.com', 'Example site')" % \
-            (db.db.quote_name(core.Site._meta.db_table), db.db.quote_name('domain'),
-            db.db.quote_name('name')))
-    except Exception, e:
-        sys.stderr.write("Error: The database couldn't be initialized.\n%s\n" % e)
-        try:
-            db.db.rollback()
-        except UnboundLocalError:
-            pass
-        sys.exit(1)
-    else:
-        db.db.commit()
-init.args = ''
+def _module_to_dict(module, omittable=lambda k: k.startswith('_')):
+    "Converts a module namespace to a Python dictionary. Used by get_settings_diff."
+    return dict([(k, repr(v)) for k, v in module.__dict__.items() if not omittable(k)])
 
-def install(mod):
+def diffsettings():
+    """
+    Displays differences between the current settings.py and Django's
+    default settings. Settings that don't appear in the defaults are
+    followed by "###".
+    """
+    # Inspired by Postfix's "postconf -n".
+    from django.conf import settings, global_settings
+
+    user_settings = _module_to_dict(settings)
+    default_settings = _module_to_dict(global_settings)
+
+    output = []
+    keys = user_settings.keys()
+    keys.sort()
+    for key in keys:
+        if key not in default_settings:
+            output.append("%s = %s  ###" % (key, user_settings[key]))
+        elif user_settings[key] != default_settings[key]:
+            output.append("%s = %s" % (key, user_settings[key]))
+    print '\n'.join(output)
+diffsettings.args = ""
+
+def install(app):
     "Executes the equivalent of 'get_sql_all' in the current database."
-    from django.core import db
-    from cStringIO import StringIO
-    mod_name = mod.__name__[mod.__name__.rindex('.')+1:]
+    from django.db import connection, transaction
+
+    app_name = app.__name__.split('.')[-2]
+
+    disable_termcolors()
 
     # First, try validating the models.
-    s = StringIO()
-    num_errors = get_validation_errors(s)
-    if num_errors:
-        sys.stderr.write("Error: %s couldn't be installed, because there were errors in your model:\n" % mod_name)
-        s.seek(0)
-        sys.stderr.write(s.read())
-        sys.exit(1)
-    sql_list = get_sql_all(mod)
+    _check_for_validation_errors(app)
+
+    sql_list = get_sql_all(app)
 
     try:
-        cursor = db.db.cursor()
+        cursor = connection.cursor()
         for sql in sql_list:
             cursor.execute(sql)
     except Exception, e:
-        sys.stderr.write("""Error: %s couldn't be installed. Possible reasons:
+        sys.stderr.write(style.ERROR("""Error: %s couldn't be installed. Possible reasons:
   * The database isn't running or isn't configured correctly.
   * At least one of the database tables already exists.
   * The SQL was invalid.
 Hint: Look at the output of 'django-admin.py sqlall %s'. That's the SQL this command wasn't able to run.
-The full error: %s\n""" % \
-            (mod_name, mod_name, e))
-        db.db.rollback()
+The full error: """ % (app_name, app_name)) + style.ERROR_OUTPUT(str(e)) + '\n')
+        transaction.rollback_unless_managed()
         sys.exit(1)
-    db.db.commit()
-install.help_doc = "Executes ``sqlall`` for the given model module name(s) in the current database."
+    transaction.commit_unless_managed()
+install.help_doc = "Executes ``sqlall`` for the given app(s) in the current database."
 install.args = APP_ARGS
 
-def installperms(mod):
-    "Installs any permissions for the given model, if needed."
-    from django.models.auth import permissions
-    from django.models.core import packages
-    num_added = 0
-    package = packages.get_object(pk=mod._MODELS[0]._meta.app_label)
-    for klass in mod._MODELS:
-        opts = klass._meta
-        for codename, name in _get_all_permissions(opts):
-            try:
-                permissions.get_object(name__exact=name, codename__exact=codename, package__label__exact=package.label)
-            except permissions.PermissionDoesNotExist:
-                p = permissions.Permission(name=name, package=package, codename=codename)
-                p.save()
-                print "Added permission '%r'." % p
-                num_added += 1
-    if not num_added:
-        print "No permissions were added, because all necessary permissions were already installed."
-installperms.help_doc = "Installs any permissions for the given model module name(s), if needed."
-installperms.args = APP_ARGS
+def reset(app):
+    "Executes the equivalent of 'get_sql_reset' in the current database."
+    from django.db import connection, transaction
+    from cStringIO import StringIO
+    app_name = app.__name__.split('.')[-2]
+
+    disable_termcolors()
+
+    # First, try validating the models.
+    _check_for_validation_errors(app)
+    sql_list = get_sql_reset(app)
+
+    confirm = raw_input("""
+You have requested a database reset.
+This will IRREVERSIBLY DESTROY any data in your database.
+Are you sure you want to do this?
+
+Type 'yes' to continue, or 'no' to cancel: """)
+    if confirm == 'yes':
+        try:
+            cursor = connection.cursor()
+            for sql in sql_list:
+                cursor.execute(sql)
+        except Exception, e:
+            sys.stderr.write(style.ERROR("""Error: %s couldn't be installed. Possible reasons:
+  * The database isn't running or isn't configured correctly.
+  * At least one of the database tables already exists.
+  * The SQL was invalid.
+Hint: Look at the output of 'django-admin.py sqlreset %s'. That's the SQL this command wasn't able to run.
+The full error: """ % (app_name, app_name)) + style.ERROR_OUTPUT(str(e)) + '\n')
+            transaction.rollback_unless_managed()
+            sys.exit(1)
+        transaction.commit_unless_managed()
+    else:
+        print "Reset cancelled."
+reset.help_doc = "Executes ``sqlreset`` for the given app(s) in the current database."
+reset.args = APP_ARGS
 
 def _start_helper(app_or_project, name, directory, other_name=''):
     other = {'project': 'app', 'app': 'project'}[app_or_project]
     if not _is_valid_dir_name(name):
-        sys.stderr.write("Error: %r is not a valid %s name. Please use only numbers, letters and underscores.\n" % (name, app_or_project))
+        sys.stderr.write(style.ERROR("Error: %r is not a valid %s name. Please use only numbers, letters and underscores.\n" % (name, app_or_project)))
         sys.exit(1)
     top_dir = os.path.join(directory, name)
     try:
         os.mkdir(top_dir)
     except OSError, e:
-        sys.stderr.write("Error: %s\n" % e)
+        sys.stderr.write(style.ERROR("Error: %s\n" % e))
         sys.exit(1)
     template_dir = PROJECT_TEMPLATE_DIR % app_or_project
     for d, subdirs, files in os.walk(template_dir):
@@ -479,17 +631,20 @@ def _start_helper(app_or_project, name, directory, other_name=''):
         for f in files:
             if f.endswith('.pyc'):
                 continue
-            fp_old = open(os.path.join(d, f), 'r')
-            fp_new = open(os.path.join(top_dir, relative_dir, f.replace('%s_name' % app_or_project, name)), 'w')
+            path_old = os.path.join(d, f)
+            path_new = os.path.join(top_dir, relative_dir, f.replace('%s_name' % app_or_project, name))
+            fp_old = open(path_old, 'r')
+            fp_new = open(path_new, 'w')
             fp_new.write(fp_old.read().replace('{{ %s_name }}' % app_or_project, name).replace('{{ %s_name }}' % other, other_name))
             fp_old.close()
             fp_new.close()
+            shutil.copymode(path_old, path_new)
 
 def startproject(project_name, directory):
     "Creates a Django project for the given project_name in the given directory."
     from random import choice
     if project_name in INVALID_PROJECT_NAMES:
-        sys.stderr.write("Error: %r isn't a valid project name. Please try another.\n" % project_name)
+        sys.stderr.write(style.ERROR("Error: %r isn't a valid project name. Please try another.\n" % project_name))
         sys.exit(1)
     _start_helper('project', project_name, directory)
     # Create a random SECRET_KEY hash, and put it in the main settings.
@@ -513,71 +668,19 @@ def startapp(app_name, directory):
 startapp.help_doc = "Creates a Django app directory structure for the given app name in the current directory."
 startapp.args = "[appname]"
 
-def createsuperuser(username=None, email=None, password=None):
-    "Creates a superuser account."
-    from django.core import validators
-    from django.models.auth import users
-    import getpass
-    try:
-        while 1:
-            if not username:
-                username = raw_input('Username (only letters, digits and underscores): ')
-            if not username.isalnum():
-                sys.stderr.write("Error: That username is invalid.\n")
-                username = None
-            try:
-                users.get_object(username__exact=username)
-            except users.UserDoesNotExist:
-                break
-            else:
-                sys.stderr.write("Error: That username is already taken.\n")
-                username = None
-        while 1:
-            if not email:
-                email = raw_input('E-mail address: ')
-            try:
-                validators.isValidEmail(email, None)
-            except validators.ValidationError:
-                sys.stderr.write("Error: That e-mail address is invalid.\n")
-                email = None
-            else:
-                break
-        while 1:
-            if not password:
-                password = getpass.getpass()
-                password2 = getpass.getpass('Password (again): ')
-                if password != password2:
-                    sys.stderr.write("Error: Your passwords didn't match.\n")
-                    password = None
-                    continue
-            if password.strip() == '':
-                sys.stderr.write("Error: Blank passwords aren't allowed.\n")
-                password = None
-                continue
-            break
-    except KeyboardInterrupt:
-        sys.stderr.write("\nOperation cancelled.\n")
-        sys.exit(1)
-    u = users.create_user(username, email, password)
-    u.is_staff = True
-    u.is_active = True
-    u.is_superuser = True
-    u.save()
-    print "User created successfully."
-createsuperuser.args = '[username] [email] [password] (Either all or none)'
-
-def inspectdb(db_name):
+def inspectdb():
     "Generator that introspects the tables in the given database name and returns a Django model, one line at a time."
-    from django.core import db
+    from django.db import connection, get_introspection_module
     from django.conf import settings
     import keyword
+
+    introspection_module = get_introspection_module()
 
     def table2model(table_name):
         object_name = table_name.title().replace('_', '')
         return object_name.endswith('s') and object_name[:-1] or object_name
 
-    settings.DATABASE_NAME = db_name
-    cursor = db.db.cursor()
+    cursor = connection.cursor()
     yield "# This is an auto-generated Django model module."
     yield "# You'll have to do the following manually to clean this up:"
     yield "#     * Rearrange models' order"
@@ -587,19 +690,19 @@ def inspectdb(db_name):
     yield "# Also note: You'll have to insert the output of 'django-admin.py sqlinitialdata [appname]'"
     yield "# into your database."
     yield ''
-    yield 'from django.core import meta'
+    yield 'from django.db import models'
     yield ''
-    for table_name in db.get_table_list(cursor):
-        yield 'class %s(meta.Model):' % table2model(table_name)
+    for table_name in introspection_module.get_table_list(cursor):
+        yield 'class %s(models.Model):' % table2model(table_name)
         try:
-            relations = db.get_relations(cursor, table_name)
+            relations = introspection_module.get_relations(cursor, table_name)
         except NotImplementedError:
             relations = {}
         try:
-            indexes = db.get_indexes(cursor, table_name)
+            indexes = introspection_module.get_indexes(cursor, table_name)
         except NotImplementedError:
             indexes = {}
-        for i, row in enumerate(db.get_table_description(cursor, table_name)):
+        for i, row in enumerate(introspection_module.get_table_description(cursor, table_name)):
             att_name = row[0]
             comment_notes = [] # Holds Field notes, to be displayed in a Python comment.
             extra_params = {}  # Holds Field parameters such as 'db_column'.
@@ -618,7 +721,7 @@ def inspectdb(db_name):
                     extra_params['db_column'] = att_name
             else:
                 try:
-                    field_type = db.DATA_TYPES_REVERSE[row[1]]
+                    field_type = introspection_module.DATA_TYPES_REVERSE[row[1]]
                 except KeyError:
                     field_type = 'TextField'
                     comment_notes.append('This field type is a guess.')
@@ -652,7 +755,14 @@ def inspectdb(db_name):
             if att_name == 'id' and field_type == 'AutoField(' and extra_params == {'primary_key': True}:
                 continue
 
-            field_desc = '%s = meta.%s' % (att_name, field_type)
+            # Add 'null' and 'blank', if the 'null_ok' flag was present in the
+            # table description.
+            if row[6]: # If it's NULL...
+                extra_params['blank'] = True
+                if not field_type in ('TextField', 'CharField'):
+                    extra_params['null'] = True
+
+            field_desc = '%s = models.%s' % (att_name, field_type)
             if extra_params:
                 if not field_desc.endswith('('):
                     field_desc += ', '
@@ -661,11 +771,11 @@ def inspectdb(db_name):
             if comment_notes:
                 field_desc += ' # ' + ' '.join(comment_notes)
             yield '    %s' % field_desc
-        yield '    class META:'
+        yield '    class Meta:'
         yield '        db_table = %r' % table_name
         yield ''
 inspectdb.help_doc = "Introspects the database tables in the given database and outputs a Django model module."
-inspectdb.args = "[dbname]"
+inspectdb.args = ""
 
 class ModelErrorCollection:
     def __init__(self, outfile=sys.stdout):
@@ -674,122 +784,181 @@ class ModelErrorCollection:
 
     def add(self, opts, error):
         self.errors.append((opts, error))
-        self.outfile.write("%s.%s: %s\n" % (opts.app_label, opts.module_name, error))
+        self.outfile.write(style.ERROR("%s.%s: %s\n" % (opts.app_label, opts.module_name, error)))
 
-def get_validation_errors(outfile):
-    "Validates all installed models. Writes errors, if any, to outfile. Returns number of errors."
-    import django.models
-    from django.core import meta
+def get_validation_errors(outfile, app=None):
+    """
+    Validates all models that are part of the specified app. If no app name is provided,
+    validates all models of all installed apps. Writes errors, if any, to outfile.
+    Returns number of errors.
+    """
+    from django.db import models
+    from django.db.models.fields.related import RelatedObject
+
     e = ModelErrorCollection(outfile)
-    module_list = meta.get_installed_model_modules()
-    for module in module_list:
-        for mod in module._MODELS:
-            opts = mod._meta
+    for cls in models.get_models(app):
+        opts = cls._meta
 
-            # Do field-specific validation.
-            for f in opts.fields:
-                if isinstance(f, meta.CharField) and f.maxlength in (None, 0):
-                    e.add(opts, '"%s" field: CharFields require a "maxlength" attribute.' % f.name)
-                if isinstance(f, meta.FloatField):
-                    if f.decimal_places is None:
-                        e.add(opts, '"%s" field: FloatFields require a "decimal_places" attribute.' % f.name)
-                    if f.max_digits is None:
-                        e.add(opts, '"%s" field: FloatFields require a "max_digits" attribute.' % f.name)
-                if isinstance(f, meta.FileField) and not f.upload_to:
-                    e.add(opts, '"%s" field: FileFields require an "upload_to" attribute.' % f.name)
-                if isinstance(f, meta.ImageField):
-                    try:
-                        from PIL import Image
-                    except ImportError:
-                        e.add(opts, '"%s" field: To use ImageFields, you need to install the Python Imaging Library. Get it at http://www.pythonware.com/products/pil/ .' % f.name)
-                if f.prepopulate_from is not None and type(f.prepopulate_from) not in (list, tuple):
-                    e.add(opts, '"%s" field: prepopulate_from should be a list or tuple.' % f.name)
-                if f.choices:
-                    if not type(f.choices) in (tuple, list):
-                        e.add(opts, '"%s" field: "choices" should be either a tuple or list.' % f.name)
-                    else:
-                        for c in f.choices:
-                            if not type(c) in (tuple, list) or len(c) != 2:
-                                e.add(opts, '"%s" field: "choices" should be a sequence of two-tuples.' % f.name)
-                if f.db_index not in (None, True, False):
-                    e.add(opts, '"%s" field: "db_index" should be either None, True or False.' % f.name)
-
-            # Check for multiple ManyToManyFields to the same object, and
-            # verify "singular" is set in that case.
-            for i, f in enumerate(opts.many_to_many):
-                for previous_f in opts.many_to_many[:i]:
-                    if f.rel.to == previous_f.rel.to and f.rel.singular == previous_f.rel.singular:
-                        e.add(opts, 'The "%s" field requires a "singular" parameter, because the %s model has more than one ManyToManyField to the same model (%s).' % (f.name, opts.object_name, previous_f.rel.to.object_name))
-
-            # Check admin attribute.
-            if opts.admin is not None:
-                if not isinstance(opts.admin, meta.Admin):
-                    e.add(opts, '"admin" attribute, if given, must be set to a meta.Admin() instance.')
-                else:
-                    # list_display
-                    if not isinstance(opts.admin.list_display, (list, tuple)):
-                        e.add(opts, '"admin.list_display", if given, must be set to a list or tuple.')
-                    else:
-                        for fn in opts.admin.list_display:
-                            try:
-                                f = opts.get_field(fn)
-                            except meta.FieldDoesNotExist:
-                                klass = opts.get_model_module().Klass
-                                if not hasattr(klass, fn) or not callable(getattr(klass, fn)):
-                                    e.add(opts, '"admin.list_display" refers to %r, which isn\'t a field or method.' % fn)
-                            else:
-                                if isinstance(f, meta.ManyToManyField):
-                                    e.add(opts, '"admin.list_display" doesn\'t support ManyToManyFields (%r).' % fn)
-                    # list_filter
-                    if not isinstance(opts.admin.list_filter, (list, tuple)):
-                        e.add(opts, '"admin.list_filter", if given, must be set to a list or tuple.')
-                    else:
-                        for fn in opts.admin.list_filter:
-                            try:
-                                f = opts.get_field(fn)
-                            except meta.FieldDoesNotExist:
-                                e.add(opts, '"admin.list_filter" refers to %r, which isn\'t a field.' % fn)
-
-            # Check ordering attribute.
-            if opts.ordering:
-                for field_name in opts.ordering:
-                    if field_name == '?': continue
-                    if field_name.startswith('-'):
-                        field_name = field_name[1:]
-                    if opts.order_with_respect_to and field_name == '_order':
-                        continue
-                    try:
-                        opts.get_field(field_name, many_to_many=False)
-                    except meta.FieldDoesNotExist:
-                        e.add(opts, '"ordering" refers to "%s", a field that doesn\'t exist.' % field_name)
-
-            # Check core=True, if needed.
-            for related in opts.get_followed_related_objects():
+        # Do field-specific validation.
+        for f in opts.fields:
+            # Check for deprecated args
+            dep_args = getattr(f, 'deprecated_args', None)
+            if dep_args:
+                e.add(opts, "'%s' Initialized with deprecated args:%s" % (f.name, ",".join(dep_args)))
+            if isinstance(f, models.CharField) and f.maxlength in (None, 0):
+                e.add(opts, '"%s": CharFields require a "maxlength" attribute.' % f.name)
+            if isinstance(f, models.FloatField):
+                if f.decimal_places is None:
+                    e.add(opts, '"%s": FloatFields require a "decimal_places" attribute.' % f.name)
+                if f.max_digits is None:
+                    e.add(opts, '"%s": FloatFields require a "max_digits" attribute.' % f.name)
+            if isinstance(f, models.FileField) and not f.upload_to:
+                e.add(opts, '"%s": FileFields require an "upload_to" attribute.' % f.name)
+            if isinstance(f, models.ImageField):
                 try:
-                    for f in related.opts.fields:
-                        if f.core:
-                            raise StopIteration
-                    e.add(related.opts, "At least one field in %s should have core=True, because it's being edited inline by %s.%s." % (related.opts.object_name, opts.module_name, opts.object_name))
-                except StopIteration:
-                    pass
+                    from PIL import Image
+                except ImportError:
+                    e.add(opts, '"%s": To use ImageFields, you need to install the Python Imaging Library. Get it at http://www.pythonware.com/products/pil/ .' % f.name)
+            if f.prepopulate_from is not None and type(f.prepopulate_from) not in (list, tuple):
+                e.add(opts, '"%s": prepopulate_from should be a list or tuple.' % f.name)
+            if f.choices:
+                if not type(f.choices) in (tuple, list):
+                    e.add(opts, '"%s": "choices" should be either a tuple or list.' % f.name)
+                else:
+                    for c in f.choices:
+                        if not type(c) in (tuple, list) or len(c) != 2:
+                            e.add(opts, '"%s": "choices" should be a sequence of two-tuples.' % f.name)
+            if f.db_index not in (None, True, False):
+                e.add(opts, '"%s": "db_index" should be either None, True or False.' % f.name)
 
-            # Check unique_together.
-            for ut in opts.unique_together:
-                for field_name in ut:
-                    try:
-                        f = opts.get_field(field_name, many_to_many=True)
-                    except meta.FieldDoesNotExist:
-                        e.add(opts, '"unique_together" refers to %s, a field that doesn\'t exist. Check your syntax.' % field_name)
-                    else:
-                        if isinstance(f.rel, meta.ManyToManyRel):
-                            e.add(opts, '"unique_together" refers to %s. ManyToManyFields are not supported in unique_together.' % f.name)
+            # Check to see if the related field will clash with any
+            # existing fields, m2m fields, m2m related objects or related objects
+            if f.rel:
+                rel_opts = f.rel.to._meta
+                if f.rel.to not in models.get_models():
+                    e.add(opts, "'%s' has relation with uninstalled model %s" % (f.name, rel_opts.object_name))
+
+                rel_name = RelatedObject(f.rel.to, cls, f).get_accessor_name()
+                for r in rel_opts.fields:
+                    if r.name == rel_name:
+                        e.add(opts, "'%s' accessor name '%s.%s' clashes with another field. Add a related_name argument to the definition for '%s'." % (f.name, rel_opts.object_name, r.name, f.name))
+                for r in rel_opts.many_to_many:
+                    if r.name == rel_name:
+                        e.add(opts, "'%s' accessor name '%s.%s' clashes with a m2m field. Add a related_name argument to the definition for '%s'." % (f.name, rel_opts.object_name, r.name, f.name))
+                for r in rel_opts.get_all_related_many_to_many_objects():
+                    if r.get_accessor_name() == rel_name:
+                        e.add(opts, "'%s' accessor name '%s.%s' clashes with a related m2m field. Add a related_name argument to the definition for '%s'." % (f.name, rel_opts.object_name, r.get_accessor_name(), f.name))
+                for r in rel_opts.get_all_related_objects():
+                    if r.get_accessor_name() == rel_name and r.field is not f:
+                        e.add(opts, "'%s' accessor name '%s.%s' clashes with another related field. Add a related_name argument to the definition for '%s'." % (f.name, rel_opts.object_name, r.get_accessor_name(), f.name))
+
+        for i, f in enumerate(opts.many_to_many):
+            # Check to see if the related m2m field will clash with any
+            # existing fields, m2m fields, m2m related objects or related objects
+            rel_opts = f.rel.to._meta
+            if f.rel.to not in models.get_models():
+                e.add(opts, "'%s' has m2m relation with uninstalled model %s" % (f.name, rel_opts.object_name))
+
+            rel_name = RelatedObject(f.rel.to, cls, f).get_accessor_name()
+            for r in rel_opts.fields:
+                if r.name == rel_name:
+                    e.add(opts, "'%s' m2m accessor name '%s.%s' clashes with another field. Add a related_name argument to the definition for '%s'." % (f.name, rel_opts.object_name, r.name, f.name))
+            for r in rel_opts.many_to_many:
+                if r.name == rel_name:
+                    e.add(opts, "'%s' m2m accessor name '%s.%s' clashes with a m2m field. Add a related_name argument to the definition for '%s'." % (f.name, rel_opts.object_name, r.name, f.name))
+            for r in rel_opts.get_all_related_many_to_many_objects():
+                if r.get_accessor_name() == rel_name and r.field is not f:
+                    e.add(opts, "'%s' m2m accessor name '%s.%s' clashes with a related m2m field. Add a related_name argument to the definition for '%s'." % (f.name, rel_opts.object_name, r.get_accessor_name(), f.name))
+            for r in rel_opts.get_all_related_objects():
+                if r.get_accessor_name() == rel_name:
+                    e.add(opts, "'%s' m2m accessor name '%s.%s' clashes with another related field. Add a related_name argument to the definition for '%s'." % (f.name, rel_opts.object_name, r.get_accessor_name(), f.name))
+
+        # Check admin attribute.
+        if opts.admin is not None:
+            if not isinstance(opts.admin, models.AdminOptions):
+                e.add(opts, '"admin" attribute, if given, must be set to a models.AdminOptions() instance.')
+            else:
+                # list_display
+                if not isinstance(opts.admin.list_display, (list, tuple)):
+                    e.add(opts, '"admin.list_display", if given, must be set to a list or tuple.')
+                else:
+                    for fn in opts.admin.list_display:
+                        try:
+                            f = opts.get_field(fn)
+                        except models.FieldDoesNotExist:
+                            if not hasattr(cls, fn):
+                                e.add(opts, '"admin.list_display" refers to %r, which isn\'t an attribute, method or property.' % fn)
+                        else:
+                            if isinstance(f, models.ManyToManyField):
+                                e.add(opts, '"admin.list_display" doesn\'t support ManyToManyFields (%r).' % fn)
+                # list_filter
+                if not isinstance(opts.admin.list_filter, (list, tuple)):
+                    e.add(opts, '"admin.list_filter", if given, must be set to a list or tuple.')
+                else:
+                    for fn in opts.admin.list_filter:
+                        try:
+                            f = opts.get_field(fn)
+                        except models.FieldDoesNotExist:
+                            e.add(opts, '"admin.list_filter" refers to %r, which isn\'t a field.' % fn)
+
+        # Check ordering attribute.
+        if opts.ordering:
+            for field_name in opts.ordering:
+                if field_name == '?': continue
+                if field_name.startswith('-'):
+                    field_name = field_name[1:]
+                if opts.order_with_respect_to and field_name == '_order':
+                    continue
+                try:
+                    opts.get_field(field_name, many_to_many=False)
+                except models.FieldDoesNotExist:
+                    e.add(opts, '"ordering" refers to "%s", a field that doesn\'t exist.' % field_name)
+
+        # Check core=True, if needed.
+        for related in opts.get_followed_related_objects():
+            try:
+                for f in related.opts.fields:
+                    if f.core:
+                        raise StopIteration
+                e.add(related.opts, "At least one field in %s should have core=True, because it's being edited inline by %s.%s." % (related.opts.object_name, opts.module_name, opts.object_name))
+            except StopIteration:
+                pass
+
+        # Check unique_together.
+        for ut in opts.unique_together:
+            for field_name in ut:
+                try:
+                    f = opts.get_field(field_name, many_to_many=True)
+                except models.FieldDoesNotExist:
+                    e.add(opts, '"unique_together" refers to %s, a field that doesn\'t exist. Check your syntax.' % field_name)
+                else:
+                    if isinstance(f.rel, models.ManyToManyRel):
+                        e.add(opts, '"unique_together" refers to %s. ManyToManyFields are not supported in unique_together.' % f.name)
+
     return len(e.errors)
 
 def validate(outfile=sys.stdout):
     "Validates all installed models."
-    num_errors = get_validation_errors(outfile)
-    outfile.write('%s error%s found.\n' % (num_errors, num_errors != 1 and 's' or ''))
+    try:
+        num_errors = get_validation_errors(outfile)
+        outfile.write('%s error%s found.\n' % (num_errors, num_errors != 1 and 's' or ''))
+    except ImproperlyConfigured:
+        outfile.write("Skipping validation because things aren't configured properly.")
 validate.args = ''
+
+def _check_for_validation_errors(app=None):
+    """Check that an app has no validation errors, and exit with errors if it does."""
+    try:
+        from cStringIO import StringIO
+    except ImportError:
+        from StringIO import StringIO
+    s = StringIO()
+    num_errors = get_validation_errors(s, app)
+    if num_errors:
+        sys.stderr.write(style.ERROR("Error: %s couldn't be installed, because there were errors in your model:\n" % app))
+        s.seek(0)
+        sys.stderr.write(s.read())
+        sys.exit(1)
 
 def runserver(addr, port):
     "Starts a lightweight Web server for development."
@@ -798,13 +967,13 @@ def runserver(addr, port):
     if not addr:
         addr = '127.0.0.1'
     if not port.isdigit():
-        sys.stderr.write("Error: %r is not a valid port number.\n" % port)
+        sys.stderr.write(style.ERROR("Error: %r is not a valid port number.\n" % port))
         sys.exit(1)
     def inner_run():
-        from django.conf.settings import SETTINGS_MODULE
+        from django.conf import settings
         print "Validating models..."
         validate()
-        print "\nDjango version %s, using settings %r" % (get_version(), SETTINGS_MODULE)
+        print "\nDjango version %s, using settings %r" % (get_version(), settings.SETTINGS_MODULE)
         print "Development server is running at http://%s:%s/" % (addr, port)
         print "Quit the server with CONTROL-C (Unix) or CTRL-BREAK (Windows)."
         try:
@@ -820,7 +989,7 @@ def runserver(addr, port):
                 error_text = ERRORS[e.args[0].args[0]]
             except (AttributeError, KeyError):
                 error_text = str(e)
-            sys.stderr.write("Error: %s\n" % error_text)
+            sys.stderr.write(style.ERROR("Error: %s" % error_text) + '\n')
             sys.exit(1)
         except KeyboardInterrupt:
             sys.exit(0)
@@ -830,17 +999,18 @@ runserver.args = '[optional port number, or ipaddr:port]'
 
 def createcachetable(tablename):
     "Creates the table needed to use the SQL cache backend"
-    from django.core import db, meta
+    from django.db import backend, connection, transaction, get_creation_module, models
+    data_types = get_creation_module().DATA_TYPES
     fields = (
         # "key" is a reserved word in MySQL, so use "cache_key" instead.
-        meta.CharField(name='cache_key', maxlength=255, unique=True, primary_key=True),
-        meta.TextField(name='value'),
-        meta.DateTimeField(name='expires', db_index=True),
+        models.CharField(name='cache_key', maxlength=255, unique=True, primary_key=True),
+        models.TextField(name='value'),
+        models.DateTimeField(name='expires', db_index=True),
     )
     table_output = []
     index_output = []
     for f in fields:
-        field_output = [db.db.quote_name(f.column), db.DATA_TYPES[f.get_internal_type()] % f.__dict__]
+        field_output = [backend.quote_name(f.name), data_types[f.get_internal_type()] % f.__dict__]
         field_output.append("%sNULL" % (not f.null and "NOT " or ""))
         if f.unique:
             field_output.append("UNIQUE")
@@ -849,18 +1019,18 @@ def createcachetable(tablename):
         if f.db_index:
             unique = f.unique and "UNIQUE " or ""
             index_output.append("CREATE %sINDEX %s_%s ON %s (%s);" % \
-                (unique, tablename, f.column, db.db.quote_name(tablename),
-                db.db.quote_name(f.column)))
+                (unique, tablename, f.name, backend.quote_name(tablename),
+                backend.quote_name(f.name)))
         table_output.append(" ".join(field_output))
-    full_statement = ["CREATE TABLE %s (" % db.db.quote_name(tablename)]
+    full_statement = ["CREATE TABLE %s (" % backend.quote_name(tablename)]
     for i, line in enumerate(table_output):
         full_statement.append('    %s%s' % (line, i < len(table_output)-1 and ',' or ''))
     full_statement.append(');')
-    curs = db.db.cursor()
+    curs = connection.cursor()
     curs.execute("\n".join(full_statement))
     for statement in index_output:
         curs.execute(statement)
-    db.db.commit()
+    transaction.commit_unless_managed()
 createcachetable.args = "[tablename]"
 
 def run_shell(use_plain=False):
@@ -877,17 +1047,22 @@ def run_shell(use_plain=False):
         code.interact()
 run_shell.args = '[--plain]'
 
+def dbshell():
+    "Runs the command-line client for the current DATABASE_ENGINE."
+    from django.db import runshell
+    runshell()
+dbshell.args = ""
+
 # Utilities for command-line script
 
 DEFAULT_ACTION_MAPPING = {
     'adminindex': get_admin_index,
-    'createsuperuser': createsuperuser,
     'createcachetable' : createcachetable,
-#     'dbcheck': database_check,
-    'init': init,
+    'dbshell': dbshell,
+    'diffsettings': diffsettings,
     'inspectdb': inspectdb,
     'install': install,
-    'installperms': installperms,
+    'reset': reset,
     'runserver': runserver,
     'shell': run_shell,
     'sql': get_sql_create,
@@ -899,10 +1074,20 @@ DEFAULT_ACTION_MAPPING = {
     'sqlsequencereset': get_sql_sequence_reset,
     'startapp': startapp,
     'startproject': startproject,
+    'syncdb': syncdb,
     'validate': validate,
 }
 
-NO_SQL_TRANSACTION = ('adminindex', 'createcachetable', 'dbcheck', 'install', 'installperms', 'sqlindexes')
+NO_SQL_TRANSACTION = (
+    'adminindex',
+    'createcachetable',
+    'dbshell',
+    'diffsettings',
+    'install',
+    'reset',
+    'sqlindexes',
+    'syncdb',
+)
 
 class DjangoOptionParser(OptionParser):
     def print_usage_and_exit(self):
@@ -914,18 +1099,18 @@ def get_usage(action_mapping):
     Returns a usage string. Doesn't do the options stuff, because optparse
     takes care of that.
     """
-    usage = ["usage: %prog action [options]\nactions:"]
+    usage = ["%prog action [options]\nactions:"]
     available_actions = action_mapping.keys()
     available_actions.sort()
     for a in available_actions:
         func = action_mapping[a]
         usage.append("  %s %s" % (a, func.args))
-        usage.extend(textwrap.wrap(getattr(func, 'help_doc', func.__doc__), initial_indent='    ', subsequent_indent='    '))
+        usage.extend(textwrap.wrap(getattr(func, 'help_doc', textwrap.dedent(func.__doc__.strip())), initial_indent='    ', subsequent_indent='    '))
         usage.append("")
     return '\n'.join(usage[:-1]) # Cut off last list element, an empty space.
 
 def print_error(msg, cmd):
-    sys.stderr.write('Error: %s\nRun "%s --help" for help.\n' % (msg, cmd))
+    sys.stderr.write(style.ERROR('Error: %s' % msg) + '\nRun "%s --help" for help.\n' % cmd)
     sys.exit(1)
 
 def execute_from_command_line(action_mapping=DEFAULT_ACTION_MAPPING):
@@ -961,31 +1146,16 @@ def execute_from_command_line(action_mapping=DEFAULT_ACTION_MAPPING):
         from django.utils import translation
         translation.activate('en-us')
 
-    if action == 'createsuperuser':
-        try:
-            username, email, password = args[1], args[2], args[3]
-        except IndexError:
-            if len(args) == 1: # We got no arguments, just the action.
-                action_mapping[action]()
-            else:
-                sys.stderr.write("Error: %r requires arguments of 'username email password' or no argument at all.\n")
-                sys.exit(1)
-        else:
-            action_mapping[action](username, email, password)
-    elif action == 'shell':
+    if action == 'shell':
         action_mapping[action](options.plain is True)
-    elif action in ('init', 'validate'):
+    elif action in ('syncdb', 'validate', 'diffsettings', 'dbshell'):
         action_mapping[action]()
     elif action == 'inspectdb':
         try:
-            param = args[1]
-        except IndexError:
-            parser.print_usage_and_exit()
-        try:
-            for line in action_mapping[action](param):
+            for line in action_mapping[action]():
                 print line
         except NotImplementedError:
-            sys.stderr.write("Error: %r isn't supported for the currently selected database backend.\n" % action)
+            sys.stderr.write(style.ERROR("Error: %r isn't supported for the currently selected database backend.\n" % action))
             sys.exit(1)
     elif action == 'createcachetable':
         try:
@@ -1009,25 +1179,22 @@ def execute_from_command_line(action_mapping=DEFAULT_ACTION_MAPPING):
                 addr, port = '', args[1]
         action_mapping[action](addr, port)
     else:
-        from django.core import meta
-        if action == 'dbcheck':
-            mod_list = meta.get_all_installed_modules()
-        else:
-            try:
-                mod_list = [meta.get_app(app_label) for app_label in args[1:]]
-            except ImportError, e:
-                sys.stderr.write("Error: %s. Are you sure your INSTALLED_APPS setting is correct?\n" % e)
-                sys.exit(1)
-            if not mod_list:
-                parser.print_usage_and_exit()
+        from django.db import models
+        try:
+            mod_list = [models.get_app(app_label) for app_label in args[1:]]
+        except ImportError, e:
+            sys.stderr.write(style.ERROR("Error: %s. Are you sure your INSTALLED_APPS setting is correct?\n" % e))
+            sys.exit(1)
+        if not mod_list:
+            parser.print_usage_and_exit()
         if action not in NO_SQL_TRANSACTION:
-            print "BEGIN;"
+            print style.SQL_KEYWORD("BEGIN;")
         for mod in mod_list:
             output = action_mapping[action](mod)
             if output:
                 print '\n'.join(output)
         if action not in NO_SQL_TRANSACTION:
-            print "COMMIT;"
+            print style.SQL_KEYWORD("COMMIT;")
 
 def execute_manager(settings_mod):
     # Add this project to sys.path so that it's importable in the conventional
@@ -1042,10 +1209,18 @@ def execute_manager(settings_mod):
     # Set DJANGO_SETTINGS_MODULE appropriately.
     os.environ['DJANGO_SETTINGS_MODULE'] = '%s.settings' % project_name
 
+    action_mapping = DEFAULT_ACTION_MAPPING.copy()
+
     # Remove the "startproject" command from the action_mapping, because that's
     # a django-admin.py command, not a manage.py command.
-    action_mapping = DEFAULT_ACTION_MAPPING.copy()
     del action_mapping['startproject']
+
+    # Override the startapp handler so that it always uses the
+    # project_directory, not the current working directory (which is default).
+    action_mapping['startapp'] = lambda app_name, directory: startapp(app_name, project_directory)
+    action_mapping['startapp'].__doc__ = startapp.__doc__
+    action_mapping['startapp'].help_doc = startapp.help_doc
+    action_mapping['startapp'].args = startapp.args
 
     # Run the django-admin.py command.
     execute_from_command_line(action_mapping)

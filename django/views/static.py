@@ -1,15 +1,14 @@
-import os
-import urllib
-import posixpath
+from django.template import loader
+from django.core.exceptions import ImproperlyConfigured
+from django.http import Http404, HttpResponse, HttpResponseRedirect, HttpResponseNotModified
+from django.template import Template, Context, TemplateDoesNotExist
 import mimetypes
+import os
+import posixpath
 import re
 import rfc822
 import stat
-from django.core import template_loader
-from django.core.exceptions import Http404, ImproperlyConfigured
-from django.utils.httpwrappers import HttpResponse, HttpResponseRedirect, \
-                                      HttpResponseNotModified
-from django.core.template import Template, Context, TemplateDoesNotExist
+import urllib
 
 def serve(request, path, document_root=None, show_indexes=False):
     """
@@ -81,7 +80,7 @@ DEFAULT_DIRECTORY_INDEX_TEMPLATE = """
 
 def directory_index(path, fullpath):
     try:
-        t = template_loader.get_template('static/directory_index')
+        t = loader.get_template('static/directory_index')
     except TemplateDoesNotExist:
         t = Template(DEFAULT_DIRECTORY_INDEX_TEMPLATE)
     files = []

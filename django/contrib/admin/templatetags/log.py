@@ -1,5 +1,5 @@
-from django.models.admin import log
-from django.core import template
+from django import template
+from django.contrib.admin.models import LogEntry
 
 register = template.Library()
 
@@ -13,7 +13,7 @@ class AdminLogNode(template.Node):
     def render(self, context):
         if self.user is not None and not self.user.isdigit():
             self.user = context[self.user].id
-        context[self.varname] = log.get_list(user__id__exact=self.user, limit=self.limit, select_related=True)
+        context[self.varname] = LogEntry.objects.filter(user__id__exact=self.user).select_related()[:self.limit]
         return ''
 
 class DoGetAdminLog:

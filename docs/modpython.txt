@@ -31,11 +31,11 @@ Then edit your ``httpd.conf`` file and add the following::
     <Location "/mysite/">
         SetHandler python-program
         PythonHandler django.core.handlers.modpython
-        SetEnv DJANGO_SETTINGS_MODULE myproject.settings
+        SetEnv DJANGO_SETTINGS_MODULE mysite.settings
         PythonDebug On
     </Location>
 
-...and replace ``myproject.settings`` with the Python path to your settings file.
+...and replace ``mysite.settings`` with the Python path to your settings file.
 
 This tells Apache: "Use mod_python for any URL at or under '/mysite/', using the
 Django mod_python handler." It passes the value of ``DJANGO_SETTINGS_MODULE``
@@ -71,13 +71,13 @@ instance. Just use ``VirtualHost`` for that, like so::
     <VirtualHost *>
         ServerName www.example.com
         # ...
-        SetEnv DJANGO_SETTINGS_MODULE myproject.settings
+        SetEnv DJANGO_SETTINGS_MODULE mysite.settings
     </VirtualHost>
 
     <VirtualHost *>
         ServerName www2.example.com
         # ...
-        SetEnv DJANGO_SETTINGS_MODULE myproject.other_settings
+        SetEnv DJANGO_SETTINGS_MODULE mysite.other_settings
     </VirtualHost>
 
 If you need to put two Django installations within the same ``VirtualHost``,
@@ -89,13 +89,13 @@ mess things up. Use the ``PythonInterpreter`` directive to give different
         ServerName www.example.com
         # ...
         <Location "/something">
-            SetEnv DJANGO_SETTINGS_MODULE myproject.settings
-            PythonInterpreter myproject
+            SetEnv DJANGO_SETTINGS_MODULE mysite.settings
+            PythonInterpreter mysite
         </Location>
 
         <Location "/otherthing">
-            SetEnv DJANGO_SETTINGS_MODULE myproject.other_settings
-            PythonInterpreter myproject_other
+            SetEnv DJANGO_SETTINGS_MODULE mysite.other_settings
+            PythonInterpreter mysite_other
         </Location>
     </VirtualHost>
 
@@ -153,7 +153,7 @@ the ``media`` subdirectory and any URL that ends with ``.jpg``, ``.gif`` or
     <Location "/">
         SetHandler python-program
         PythonHandler django.core.handlers.modpython
-        SetEnv DJANGO_SETTINGS_MODULE myproject.settings
+        SetEnv DJANGO_SETTINGS_MODULE mysite.settings
     </Location>
 
     <Location "media">

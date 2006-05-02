@@ -19,7 +19,7 @@ Here are a couple of example settings::
 
 Because a settings file is a Python module, the following apply:
 
-    * It shouldn't have Python syntax errors.
+    * It doesn't allow for Python syntax errors.
     * It can assign settings dynamically using normal Python syntax.
       For example::
 
@@ -34,7 +34,7 @@ When you use Django, you have to tell it which settings you're using. Do this
 by using an environment variable, ``DJANGO_SETTINGS_MODULE``.
 
 The value of ``DJANGO_SETTINGS_MODULE`` should be in Python path syntax, e.g.
-``"myproject.settings"``. Note that the settings module should be on the
+``mysite.settings``. Note that the settings module should be on the
 Python `import search path`_.
 
 .. _import search path: http://diveintopython.org/getting_to_know_python/everything_is_an_object.html
@@ -47,17 +47,17 @@ once, or explicitly pass in the settings module each time you run the utility.
 
 Example (Unix Bash shell)::
 
-    export DJANGO_SETTINGS_MODULE=myproject.settings
+    export DJANGO_SETTINGS_MODULE=mysite.settings
     django-admin.py runserver
 
 Example (Windows shell)::
 
-    set DJANGO_SETTINGS_MODULE=myproject.settings
+    set DJANGO_SETTINGS_MODULE=mysite.settings
     django-admin.py runserver
 
 Use the ``--settings`` command-line argument to specify the settings manually::
 
-    django-admin.py runserver --settings=myproject.settings
+    django-admin.py runserver --settings=mysite.settings
 
 .. _django-admin.py: http://www.djangoproject.com/documentation/django_admin/
 
@@ -70,7 +70,7 @@ settings file to use. Do that with ``SetEnv``::
     <Location "/mysite/">
         SetHandler python-program
         PythonHandler django.core.handlers.modpython
-        SetEnv DJANGO_SETTINGS_MODULE myproject.settings
+        SetEnv DJANGO_SETTINGS_MODULE mysite.settings
     </Location>
 
 Read the `Django mod_python documentation`_ for more information.
@@ -93,6 +93,17 @@ Here's the algorithm Django uses in compiling settings:
 Note that a settings file should *not* import from ``global_settings``, because
 that's redundant.
 
+Seeing which settings you've changed
+------------------------------------
+
+There's an easy way to view which of your settings deviate from the default
+settings. The command ``python manage.py diffsettings`` displays differences
+between the current settings file and Django's default settings.
+
+For more, see the `diffsettings documentation`_.
+
+.. _diffsettings documentation: http://www.djangoproject.com/documentation/django_admin/#diffsettings
+
 Using settings in Python code
 =============================
 
@@ -107,6 +118,8 @@ In your Django apps, use settings by importing them from
 Note that your code should *not* import from either ``global_settings`` or
 your own settings file. ``django.conf.settings`` abstracts the concepts of
 default settings and site-specific settings; it presents a single interface.
+It also decouples the code that uses settings from the location of your
+settings.
 
 Altering settings at runtime
 ============================
@@ -155,6 +168,9 @@ Default: ``()`` (Empty list)
 
 Used for admin-site settings modules, this should be a tuple of settings
 modules (in the format ``'foo.bar.baz'``) for which this site is an admin.
+
+The admin site uses this in its automatically-introspected documentation of
+models, views and template tags.
 
 ADMIN_MEDIA_PREFIX
 ------------------
@@ -227,6 +243,14 @@ Default: ``''`` (Empty string)
 
 Which host to use when connecting to the database. An empty string means
 localhost. Not used with SQLite.
+
+If this value starts with a forward slash (``'/'``) and you're using MySQL,
+MySQL will connect via a Unix socket to the specified socket. For example::
+
+    DATABASE_HOST = '/var/run/mysql'
+
+If you're using MySQL and this value *doesn't* start with a forward slash, then
+this value is assumed to be the host.
 
 DATABASE_NAME
 -------------
@@ -341,8 +365,6 @@ EMAIL_HOST_PASSWORD
 
 Default: ``''`` (Empty string)
 
-**New in Django development version.**
-
 Username to use for the SMTP server defined in ``EMAIL_HOST``. If empty,
 Django won't attempt authentication.
 
@@ -353,8 +375,6 @@ EMAIL_HOST_USER
 
 Default: ``''`` (Empty string)
 
-**New in Django development version.**
-
 Username to use for the SMTP server defined in ``EMAIL_HOST``. If empty,
 Django won't attempt authentication.
 
@@ -364,8 +384,6 @@ EMAIL_PORT
 ----------
 
 Default: ``25``
-
-**New in Django development version.**
 
 Port to use for the SMTP server defined in ``EMAIL_HOST``.
 
@@ -382,8 +400,6 @@ ENABLE_PSYCO
 ------------
 
 Default: ``False``
-
-**New in Django development version.**
 
 Whether to enable Psyco, which optimizes Python code. Requires Psyco_.
 
@@ -509,7 +525,8 @@ MIDDLEWARE_CLASSES
 
 Default::
 
-    ("django.middleware.sessions.SessionMiddleware",
+    ("django.contrib.sessions.middleware.SessionMiddleware",
+     "django.contrib.auth.middleware.AuthenticationMiddleware",
      "django.middleware.common.CommonMiddleware",
      "django.middleware.doc.XViewMiddleware")
 
@@ -598,9 +615,9 @@ SITE_ID
 
 Default: Not defined
 
-The ID, as an integer, of the current site in the ``sites`` database. This is
-used so that application data can hook into specific site(s) and a single
-database can manage content for multiple sites.
+The ID, as an integer, of the current site in the ``django_site`` database
+table. This is used so that application data can hook into specific site(s)
+and a single database can manage content for multiple sites.
 
 TEMPLATE_CONTEXT_PROCESSORS
 ---------------------------
@@ -611,7 +628,7 @@ Default::
     "django.core.context_processors.debug",
     "django.core.context_processors.i18n")
 
-A tuple of callables that are used to populate the context in ``DjangoContext``.
+A tuple of callables that are used to populate the context in ``RequestContext``.
 These callables take a request object as their argument and return a dictionary
 of items to be merged into the context.
 
@@ -625,8 +642,8 @@ error page will display a detailed report for any ``TemplateSyntaxError``. This
 report contains the relevant snippet of the template, with the appropriate line
 highlighted.
 
-Note that Django only displays fancy error pages if ``DEBUG`` is ``True``, so you'll
-want to set that to take advantage of this setting.
+Note that Django only displays fancy error pages if ``DEBUG`` is ``True``, so
+you'll want to set that to take advantage of this setting.
 
 See also DEBUG.
 
@@ -640,18 +657,10 @@ these paths should use Unix-style forward slashes, even on Windows.
 
 See the `template documentation`_.
 
-TEMPLATE_FILE_EXTENSION
------------------------
-
-Default: ``'.html'``
-
-The file extension to append to all template names when searching for
-templates. See the `template documentation`_.
-
 TEMPLATE_LOADERS
 ----------------
 
-Default: ``('django.core.template.loaders.filesystem.load_template_source',)``
+Default: ``('django.template.loaders.filesystem.load_template_source',)``
 
 A tuple of callables (as strings) that know how to import templates from
 various sources. See the `template documentation`_.
@@ -660,8 +669,6 @@ TEMPLATE_STRING_IF_INVALID
 --------------------------
 
 Default: ``''`` (Empty string)
-
-**New in Django development version.**
 
 Output, as a string, that the template system should use for invalid (e.g.
 misspelled) variables. See `How invalid variables are handled`_.

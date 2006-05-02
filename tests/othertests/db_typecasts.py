@@ -1,6 +1,6 @@
-# Unit tests for django.core.db.typecasts
+# Unit tests for typecast functions in django.db.backends.util
 
-from django.core.db import typecasts
+from django.db.backends import util as typecasts
 import datetime
 
 TEST_CASES = {

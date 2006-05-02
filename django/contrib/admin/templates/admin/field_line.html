@@ -9,14 +9,6 @@
   {% if not bound_field.has_label_first %}
     {% field_label bound_field %}
   {% endif %}
-  {% if change %}
-    {% if bound_field.field.primary_key %}
-      {{ bound_field.original_value }}
-    {% endif %}
-    {% if bound_field.raw_id_admin %}
-      {% if bound_field.existing_display %}&nbsp;<strong>{{ bound_field.existing_display|truncatewords:"14" }}</strong>{% endif %}
-    {% endif %}
-  {% endif %}
   {% if bound_field.field.help_text %}<p class="help">{{ bound_field.field.help_text }}</p>{% endif %}
 {% endfor %}
 </div>

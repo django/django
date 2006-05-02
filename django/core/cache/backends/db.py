@@ -1,7 +1,7 @@
 "Database cache backend."
 
 from django.core.cache.backends.base import BaseCache
-from django.core.db import db, DatabaseError
+from django.db import connection, transaction
 import base64, time
 from datetime import datetime
 try:
@@ -25,7 +25,7 @@ class CacheClass(BaseCache):
             self._cull_frequency = 3
 
     def get(self, key, default=None):
-        cursor = db.cursor()
+        cursor = connection.cursor()
         cursor.execute("SELECT cache_key, value, expires FROM %s WHERE cache_key = %%s" % self._table, [key])
         row = cursor.fetchone()
         if row is None:
@@ -33,14 +33,14 @@ class CacheClass(BaseCache):
         now = datetime.now()
         if row[2] < now:
             cursor.execute("DELETE FROM %s WHERE cache_key = %%s" % self._table, [key])
-            db.commit()
+            transaction.commit_unless_managed()
             return default
         return pickle.loads(base64.decodestring(row[1]))
 
     def set(self, key, value, timeout=None):
         if timeout is None:
             timeout = self.default_timeout
-        cursor = db.cursor()
+        cursor = connection.cursor()
         cursor.execute("SELECT COUNT(*) FROM %s" % self._table)
         num = cursor.fetchone()[0]
         now = datetime.now().replace(microsecond=0)
@@ -58,15 +58,15 @@ class CacheClass(BaseCache):
             # To be threadsafe, updates/inserts are allowed to fail silently
             pass
         else:
-            db.commit()
+            transaction.commit_unless_managed()
 
     def delete(self, key):
-        cursor = db.cursor()
+        cursor = connection.cursor()
         cursor.execute("DELETE FROM %s WHERE cache_key = %%s" % self._table, [key])
-        db.commit()
+        transaction.commit_unless_managed()
 
     def has_key(self, key):
-        cursor = db.cursor()
+        cursor = connection.cursor()
         cursor.execute("SELECT cache_key FROM %s WHERE cache_key = %%s" % self._table, [key])
         return cursor.fetchone() is not None
 

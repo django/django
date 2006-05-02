@@ -8,14 +8,20 @@ General questions
 Why does this project exist?
 ----------------------------
 
-Django grew from a very practical need: in our fast-paced newsroom, we often
-have only a matter of hours to take a complicated Web application from
-concept to public launch.  Django was designed to not only allow us to
-build Web applications quickly, but to allow us to build them right.
+Django grew from a very practical need: World Online, a newspaper Web
+operation, is responsible for building intensive Web applications on journalism
+deadlines. In the fast-paced newsroom, World Online often has only a matter of
+hours to take a complicated Web application from concept to public launch.
+
+At the same time, the World Online Web developers have consistently been
+perfectionists when it comes to following best practices of Web development.
+
+Thus, Django was designed not only to allow fast Web development, but
+*best-practice* Web development.
 
 Django would not be possible without a whole host of open-source projects --
-`Apache`_, `Python`_, and `PostgreSQL`_ to name a few -- and we're thrilled to be
-able to give something back to the open-source community.
+`Apache`_, `Python`_, and `PostgreSQL`_ to name a few -- and we're thrilled to
+be able to give something back to the open-source community.
 
 .. _Apache: http://httpd.apache.org/
 .. _Python: http://www.python.org/
@@ -29,25 +35,28 @@ to early 1950s. To this day, he's considered one of the best guitarists of all t
 
 Listen to his music. You'll like it.
 
-According to Wikipedia_, "Django is pronounced **zhane**-go (with a long 'a')."
+Django is pronounced **JANG**-oh. Rhymes with FANG-oh.
 
 .. _Django Reinhardt: http://en.wikipedia.org/wiki/Django_Reinhardt
-.. _Wikipedia: http://en.wikipedia.org/wiki/Django_Reinhardt
 
 Is Django stable?
 -----------------
 
-We've been using Django for almost two years. Sites built on Django have
-weathered traffic spikes of over one million hits an hour, and at least
-one Slashdotting. Yes, it's quite stable.
+Yes. World Online has been using Django for more than two years. Sites built on
+Django have weathered traffic spikes of over one million hits an hour and at
+least one Slashdotting. Yes, it's quite stable.
 
 Does Django scale?
 ------------------
 
 Yes. Compared to development time, hardware is cheap, and so Django is
 designed to take advantage of as much hardware as you can throw at it.
-Django ships with clean separation of the database layer from the
-application layer and a simple-yet-powerful `cache framework`_.
+
+Django uses a "shared-nothing" architecture, which means you can add hardware
+at any level -- database servers, caching servers or Web/application servers.
+
+The framework cleanly separates components such as its database layer and
+application layer. And it ships with a simple-yet-powerful `cache framework`_.
 
 .. _`cache framework`: http://www.djangoproject.com/documentation/cache/
 
@@ -60,31 +69,33 @@ Lawrence, Kansas, USA.
 `Adrian Holovaty`_
     Adrian is a Web developer with a background in journalism. He was lead
     developer at World Online for 2.5 years, during which time Django was
-    developed and implemented on World Online's sites. Now he's editor of
-    editorial innovations at washingtonpost.com, and he continues to oversee
-    Django development. He likes playing guitar (Django Reinhardt style) and
-    hacking on side projects such as `chicagocrime.org`_. He lives in Chicago.
+    developed and implemented on World Online's sites. Now he works for
+    washingtonpost.com building rich, database-backed information sites, and
+    continues to oversee Django development. He likes playing guitar (Django
+    Reinhardt style) and hacking on side projects such as `chicagocrime.org`_.
+    He lives in Chicago.
 
     On IRC, Adrian goes by ``adrian_h``.
+
+`Jacob Kaplan-Moss`_
+    Jacob is a whipper-snapper from California who spends equal time coding and
+    cooking. He's lead developer at World Online and actively hacks on various
+    cool side projects. He's contributed to the Python-ObjC bindings and was
+    the first guy to figure out how to write Tivo apps in Python. Lately he's
+    been messing with Python on the PSP. He lives in Lawrence, Kansas.
+
+    On IRC, Jacob goes by ``jacobkm``.
 
 `Simon Willison`_
     Simon is a well-respected Web developer from England. He had a one-year
     internship at World Online, during which time he and Adrian developed
-    Django from scratch. He's enthusiastic, he's passionate about best
-    practices in Web development, and he really likes squirrels. Probably to a
-    fault. He went back to university to finish his degree and is poised to
-    continue doing big, exciting things on the Web. He lives in England.
+    Django from scratch. The most enthusiastic Brit you'll ever meet, he's
+    passionate about best practices in Web development and has maintained a
+    well-read Web-development blog for years at http://simon.incutio.com.
+    He works for Yahoo UK, where he managed to score the title "Hacker Liason."
+    He lives in London.
 
     On IRC, Simon goes by ``SimonW``.
-
-`Jacob Kaplan-Moss`_
-    Jacob is a whipper-snapper from California who spends equal time coding and
-    cooking. He does Web development for World Online and actively hacks on
-    various cool side projects. He's contributed to the Python-ObjC bindings and
-    was the first guy to figure out how to write Tivo apps in Python. Lately
-    he's been messing with Python on the PSP. He lives in Lawrence, Kansas.
-
-    On IRC, Jacob goes by ``jacobkm``.
 
 `Wilson Miner`_
     Wilson's design-fu makes us all look like rock stars. When not sneaking
@@ -106,18 +117,17 @@ Lawrence, Kansas, USA.
 Which sites use Django?
 -----------------------
 
-The Django wiki features a `list of Django-powered sites`_. Feel free to add
-your Django-powered site to the list.
+The Django wiki features a consistently growing `list of Django-powered sites`_.
+Feel free to add your Django-powered site to the list.
 
 .. _list of Django-powered sites: http://code.djangoproject.com/wiki/DjangoPoweredSites
 
 Django appears to be a MVC framework, but you call the Controller the "view", and the View the "template". How come you don't use the standard names?
 -----------------------------------------------------------------------------------------------------------------------------------------------------
 
-That's because Django isn't strictly a MVC framework. We don't really believe in
-any capital-M Methodologies; we do what "feels" right. If you squint the right
-way, you can call Django's ORM the "Model", the view functions the "View", and
-the dynamically-generated API the "Controller" -- but not really.
+That's because Django isn't strictly a MVC framework. If you squint the right
+way, you can call Django's database layer the "Model", the view functions the
+"View", and the URL dispatcher the "Controller" -- but not really.
 
 In fact, you might say that Django is a "MTV" framework -- that is, Model,
 Template, and View make much more sense to us.
@@ -183,9 +193,13 @@ begin maintaining backwards compatibility. This should happen in a couple of
 months or so, although it's entirely possible that it could happen earlier.
 That translates into summer 2006.
 
+The merging of Django's `magic-removal branch`_ went a long way toward Django
+1.0.
+
 Of course, you should note that `quite a few production sites`_ use Django in
 its current status. Don't let the lack of a 1.0 turn you off.
 
+.. _magic-removal branch: http://code.djangoproject.com/wiki/RemovingTheMagic
 .. _quite a few production sites: http://code.djangoproject.com/wiki/DjangoPoweredSites
 
 How can I download the Django documentation to read it offline?
@@ -225,12 +239,12 @@ How do I get started?
 How do I fix the "install a later version of setuptools" error?
 ---------------------------------------------------------------
 
-Just run the ``ex_setup.py`` script in the Django distribution.
+Just run the ``ez_setup.py`` script in the Django distribution.
 
 What are Django's prerequisites?
 --------------------------------
 
-Django requires Python_ 2.3 or later.
+Django requires Python_ 2.3 or later. No other Python libraries are required.
 
 For a development environment -- if you just want to experiment with Django --
 you don't need to have a separate Web server installed; Django comes with its
@@ -256,7 +270,7 @@ Not if you just want to play around and develop things on your local computer.
 Django comes with its own Web server, and things should Just Work.
 
 For production use, though, we recommend mod_python. The Django developers have
-been running it on mod_python for about two years, and it's quite stable.
+been running it on mod_python for more than two years, and it's quite stable.
 
 However, if you don't want to use mod_python, you can use a different server,
 as long as that server has WSGI_ hooks. See the `server arrangements wiki page`_.
@@ -325,6 +339,14 @@ but we recognize that choosing a template language runs close to religion.
 There's nothing about Django that requires using the template language, so
 if you're attached to ZPT, Cheetah, or whatever, feel free to use those.
 
+Do I have to use your model/database layer?
+-------------------------------------------
+
+Nope. Just like the template system, the model/database layer is decoupled from
+the rest of the framework. The one exception is: If you use a different
+database library, you won't get to use Django's automatically-generated admin
+site. That app is coupled to the Django database layer.
+
 How do I use image and file fields?
 -----------------------------------
 
@@ -367,9 +389,8 @@ input.
 If you do care about deleting data, you'll have to execute the ``ALTER TABLE``
 statements manually in your database. That's the way we've always done it,
 because dealing with data is a very sensitive operation that we've wanted to
-avoid automating. That said, there's some work being done to add a
-``django-admin.py updatedb`` command, which would output the necessary
-``ALTER TABLE`` statements, if any.
+avoid automating. That said, there's some work being done to add partially
+automated database-upgrade functionality.
 
 Do Django models support multiple-column primary keys?
 ------------------------------------------------------
@@ -392,19 +413,19 @@ How can I see the raw SQL queries Django is running?
 Make sure your Django ``DEBUG`` setting is set to ``True``. Then, just do
 this::
 
-    >>> from django.core.db import db
-    >>> db.queries
+    >>> from django.db import connection
+    >>> connection.queries
     [{'sql': 'SELECT polls_polls.id,polls_polls.question,polls_polls.pub_date FROM polls_polls',
     'time': '0.002'}]
 
-``db.queries`` is only available if ``DEBUG`` is ``True``. It's a list of
-dictionaries in order of query execution. Each dictionary has the following::
+``connection.queries`` is only available if ``DEBUG`` is ``True``. It's a list
+of dictionaries in order of query execution. Each dictionary has the following::
 
     ``sql`` -- The raw SQL statement
     ``time`` -- How long the statement took to execute, in seconds.
 
-``db.queries`` includes all SQL statements -- INSERTs, UPDATES, SELECTs, etc.
-Each time your app hits the database, the query will be recorded.
+``connection.queries`` includes all SQL statements -- INSERTs, UPDATES,
+SELECTs, etc. Each time your app hits the database, the query will be recorded.
 
 Can I use Django with a pre-existing database?
 ----------------------------------------------
@@ -465,8 +486,8 @@ documentation.
 My "list_filter" contains a ManyToManyField, but the filter doesn't display.
 ----------------------------------------------------------------------------
 
-Django won't bother displaying the filter for a ManyToManyField if there are
-fewer than two related objects.
+Django won't bother displaying the filter for a ``ManyToManyField`` if there
+are fewer than two related objects.
 
 For example, if your ``list_filter`` includes ``sites``, and there's only one
 site in your database, it won't display a "Site" filter. In that case,
@@ -477,9 +498,9 @@ How can I customize the functionality of the admin interface?
 
 You've got several options. If you want to piggyback on top of an add/change
 form that Django automatically generates, you can attach arbitrary JavaScript
-modules to the page via the model's ``admin.js`` parameter. That parameter is
-a list of URLs, as strings, pointing to JavaScript modules that will be
-included within the admin form via a <script> tag.
+modules to the page via the model's ``class Admin`` ``js`` parameter. That
+parameter is a list of URLs, as strings, pointing to JavaScript modules that
+will be included within the admin form via a ``<script>`` tag.
 
 If you want more flexibility than simply tweaking the auto-generated forms,
 feel free to write custom views for the admin. The admin is powered by Django
@@ -492,10 +513,23 @@ next question.
 The dynamically-generated admin site is ugly! How can I change it?
 ------------------------------------------------------------------
 
-We think it's very purty, but if you don't agree, you can modify the admin
-site's presentation by editing the CSS stylesheet and/or associated image files.
-The site is built using semantic HTML, so any changes you'd like to make should
-be possible by editing the CSS stylesheet. We've got a `guide to the CSS used in
-the admin`_ to get you started.
+We like it, but if you don't agree, you can modify the admin site's
+presentation by editing the CSS stylesheet and/or associated image files. The
+site is built using semantic HTML and plenty of CSS hooks, so any changes you'd
+like to make should be possible by editing the stylesheet. We've got a
+`guide to the CSS used in the admin`_ to get you started.
 
 .. _`guide to the CSS used in the admin`: http://www.djangoproject.com/documentation/admin_css/
+
+How do I create users without having to edit password hashes?
+-------------------------------------------------------------
+
+We don't recommend you create users via the admin interface, because at the
+moment it requires you to edit password hashes manually. (Passwords are hashed
+using one-way hash algorithms for security; there's currently no Web interface
+for changing passwords by entering the actual password rather than the hash.)
+
+To create a user, you'll have to use the Python API. See `creating users`_ for
+full info.
+
+.. _creating users: http://www.djangoproject.com/documentation/authentication/#creating-users

@@ -1,11 +1,13 @@
-from django.core import template, template_loader, meta
+from django import template
+from django.contrib.admin.views.main import AdminBoundField
+from django.template import loader
 from django.utils.html import escape
 from django.utils.text import capfirst
 from django.utils.functional import curry
-from django.contrib.admin.views.main import AdminBoundField
-from django.core.meta.fields import BoundField, Field
-from django.core.meta import BoundRelatedObject, TABULAR, STACKED
-from django.conf.settings import ADMIN_MEDIA_PREFIX
+from django.db import models
+from django.db.models.fields import Field
+from django.db.models.related import BoundRelatedObject
+from django.conf import settings
 import re
 
 register = template.Library()
@@ -16,30 +18,28 @@ def class_name_to_underscored(name):
     return '_'.join([s.lower() for s in word_re.findall(name)[:-1]])
 
 def include_admin_script(script_path):
-    return '<script type="text/javascript" src="%s%s"></script>' % (ADMIN_MEDIA_PREFIX, script_path)
+    return '<script type="text/javascript" src="%s%s"></script>' % (settings.ADMIN_MEDIA_PREFIX, script_path)
 include_admin_script = register.simple_tag(include_admin_script)
 
-def submit_row(context, bound_manipulator):
+def submit_row(context):
+    opts = context['opts']
     change = context['change']
-    add = context['add']
-    show_delete = context['show_delete']
-    has_delete_permission = context['has_delete_permission']
     is_popup = context['is_popup']
     return {
-        'onclick_attrib': (bound_manipulator.ordered_objects and change
+        'onclick_attrib': (opts.get_ordered_objects() and change
                             and 'onclick="submitOrderForm();"' or ''),
-        'show_delete_link': (not is_popup and has_delete_permission
-                              and (change or show_delete)),
-        'show_save_as_new': not is_popup and change and bound_manipulator.save_as,
-        'show_save_and_add_another': not is_popup and (not bound_manipulator.save_as or add),
-        'show_save_and_continue': not is_popup,
+        'show_delete_link': (not is_popup and context['has_delete_permission']
+                              and (change or context['show_delete'])),
+        'show_save_as_new': not is_popup and change and opts.admin.save_as,
+        'show_save_and_add_another': not is_popup and (not opts.admin.save_as or context['add']),
+        'show_save_and_continue': not is_popup and context['has_change_permission'],
         'show_save': True
     }
-submit_row = register.inclusion_tag('admin/submit_line', takes_context=True)(submit_row)
+submit_row = register.inclusion_tag('admin/submit_line.html', takes_context=True)(submit_row)
 
 def field_label(bound_field):
     class_names = []
-    if isinstance(bound_field.field, meta.BooleanField):
+    if isinstance(bound_field.field, models.BooleanField):
         class_names.append("vCheckboxLabel")
         colon = ""
     else:
@@ -64,16 +64,15 @@ class FieldWidgetNode(template.Node):
         if not cls.nodelists.has_key(klass):
             try:
                 field_class_name = klass.__name__
-                template_name = "widget/%s" % \
-                    class_name_to_underscored(field_class_name)
-                nodelist = template_loader.get_template(template_name).nodelist
+                template_name = "widget/%s.html" % class_name_to_underscored(field_class_name)
+                nodelist = loader.get_template(template_name).nodelist
             except template.TemplateDoesNotExist:
                 super_klass = bool(klass.__bases__) and klass.__bases__[0] or None
                 if super_klass and super_klass != Field:
                     nodelist = cls.get_nodelist(super_klass)
                 else:
                     if not cls.default:
-                        cls.default = template_loader.get_template("widget/default").nodelist
+                        cls.default = loader.get_template("widget/default.html").nodelist
                     nodelist = cls.default
 
             cls.nodelists[klass] = nodelist
@@ -97,21 +96,22 @@ class FieldWrapper(object):
         self.field = field
 
     def needs_header(self):
-        return not isinstance(self.field, meta.AutoField)
+        return not isinstance(self.field, models.AutoField)
 
     def header_class_attribute(self):
         return self.field.blank and ' class="optional"' or ''
 
     def use_raw_id_admin(self):
-         return isinstance(self.field.rel, (meta.ManyToOneRel, meta.ManyToManyRel)) \
+        return isinstance(self.field.rel, (models.ManyToOneRel, models.ManyToManyRel)) \
             and self.field.rel.raw_id_admin
 
 class FormFieldCollectionWrapper(object):
-    def __init__(self, field_mapping, fields):
+    def __init__(self, field_mapping, fields, index):
         self.field_mapping = field_mapping
         self.fields = fields
         self.bound_fields = [AdminBoundField(field, self.field_mapping, field_mapping['original'])
                              for field in self.fields]
+        self.index = index
 
 class TabularBoundRelatedObject(BoundRelatedObject):
     def __init__(self, related_object, field_mapping, original):
@@ -120,29 +120,25 @@ class TabularBoundRelatedObject(BoundRelatedObject):
 
         fields = self.relation.editable_fields()
 
-        self.form_field_collection_wrappers = [FormFieldCollectionWrapper(field_mapping, fields)
-                                               for field_mapping in self.field_mappings]
+        self.form_field_collection_wrappers = [FormFieldCollectionWrapper(field_mapping, fields, i)
+                                               for (i,field_mapping) in self.field_mappings.items() ]
         self.original_row_needed = max([fw.use_raw_id_admin() for fw in self.field_wrapper_list])
         self.show_url = original and hasattr(self.relation.opts, 'get_absolute_url')
 
     def template_name(self):
-        return "admin/edit_inline_tabular"
+        return "admin/edit_inline_tabular.html"
 
 class StackedBoundRelatedObject(BoundRelatedObject):
     def __init__(self, related_object, field_mapping, original):
         super(StackedBoundRelatedObject, self).__init__(related_object, field_mapping, original)
         fields = self.relation.editable_fields()
-        self.form_field_collection_wrappers = [FormFieldCollectionWrapper(field_mapping ,fields)
-                                               for field_mapping in self.field_mappings]
+        self.field_mappings.fill()
+        self.form_field_collection_wrappers = [FormFieldCollectionWrapper(field_mapping ,fields, i)
+                                               for (i,field_mapping) in self.field_mappings.items()]
         self.show_url = original and hasattr(self.relation.opts, 'get_absolute_url')
 
     def template_name(self):
-        return "admin/edit_inline_stacked"
-
-bound_related_object_overrides = {
-    TABULAR: TabularBoundRelatedObject,
-    STACKED: StackedBoundRelatedObject,
-}
+        return "admin/edit_inline_stacked.html"
 
 class EditInlineNode(template.Node):
     def __init__(self, rel_var):
@@ -150,21 +146,16 @@ class EditInlineNode(template.Node):
 
     def render(self, context):
         relation = template.resolve_variable(self.rel_var, context)
-
         context.push()
-
-        klass = relation.field.rel.edit_inline
-        bound_related_object_class = bound_related_object_overrides.get(klass, klass)
-
+        if relation.field.rel.edit_inline == models.TABULAR:
+            bound_related_object_class = TabularBoundRelatedObject
+        else:
+            bound_related_object_class = StackedBoundRelatedObject
         original = context.get('original', None)
-
         bound_related_object = relation.bind(context['form'], original, bound_related_object_class)
         context['bound_related_object'] = bound_related_object
-
-        t = template_loader.get_template(bound_related_object.template_name())
-
+        t = loader.get_template(bound_related_object.template_name())
         output = t.render(context)
-
         context.pop()
         return output
 
@@ -191,30 +182,30 @@ auto_populated_field_script = register.simple_tag(auto_populated_field_script)
 
 def filter_interface_script_maybe(bound_field):
     f = bound_field.field
-    if f.rel and isinstance(f.rel, meta.ManyToManyRel) and f.rel.filter_interface:
-       return '<script type="text/javascript">addEvent(window, "load", function(e) {' \
+    if f.rel and isinstance(f.rel, models.ManyToManyRel) and f.rel.filter_interface:
+        return '<script type="text/javascript">addEvent(window, "load", function(e) {' \
               ' SelectFilter.init("id_%s", "%s", %s, "%s"); });</script>\n' % (
-              f.name, f.verbose_name, f.rel.filter_interface-1, ADMIN_MEDIA_PREFIX)
+              f.name, f.verbose_name, f.rel.filter_interface-1, settings.ADMIN_MEDIA_PREFIX)
     else:
         return ''
 filter_interface_script_maybe = register.simple_tag(filter_interface_script_maybe)
 
-def do_one_arg_tag(node_factory, parser,token):
-    tokens = token.contents.split()
-    if len(tokens) != 2:
-        raise template.TemplateSyntaxError("%s takes 1 argument" % tokens[0])
-    return node_factory(tokens[1])
+def field_widget(parser, token):
+    bits = token.contents.split()
+    if len(bits) != 2:
+        raise template.TemplateSyntaxError, "%s takes 1 argument" % bits[0]
+    return FieldWidgetNode(bits[1])
+field_widget = register.tag(field_widget)
 
-def register_one_arg_tag(node):
-    tag_name = class_name_to_underscored(node.__name__)
-    parse_func = curry(do_one_arg_tag, node)
-    register.tag(tag_name, parse_func)
-
-register_one_arg_tag(FieldWidgetNode)
-register_one_arg_tag(EditInlineNode)
+def edit_inline(parser, token):
+    bits = token.contents.split()
+    if len(bits) != 2:
+        raise template.TemplateSyntaxError, "%s takes 1 argument" % bits[0]
+    return EditInlineNode(bits[1])
+edit_inline = register.tag(edit_inline)
 
 def admin_field_line(context, argument_val):
-    if (isinstance(argument_val, BoundField)):
+    if isinstance(argument_val, AdminBoundField):
         bound_fields = [argument_val]
     else:
         bound_fields = [bf for bf in argument_val]
@@ -229,7 +220,7 @@ def admin_field_line(context, argument_val):
                 break
 
     # Assumes BooleanFields won't be stacked next to each other!
-    if isinstance(bound_fields[0].field, meta.BooleanField):
+    if isinstance(bound_fields[0].field, models.BooleanField):
         class_names.append('checkbox-row')
 
     return {
@@ -238,8 +229,4 @@ def admin_field_line(context, argument_val):
         'bound_fields': bound_fields,
         'class_names': " ".join(class_names),
     }
-admin_field_line = register.inclusion_tag('admin/field_line', takes_context=True)(admin_field_line)
-
-def object_pk(bound_manip, ordered_obj):
-    return bound_manip.get_ordered_object_pk(ordered_obj)
-object_pk = register.simple_tag(object_pk)
+admin_field_line = register.inclusion_tag('admin/field_line.html', takes_context=True)(admin_field_line)

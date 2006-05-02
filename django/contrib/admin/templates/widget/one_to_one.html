@@ -1,1 +1,2 @@
-{% include "widget/foreign" %}
+{% if add %}{% include "widget/foreign.html" %}{% endif %}
+{% if change %}{% if bound_field.existing_display %}&nbsp;<strong>{{ bound_field.existing_display|truncatewords:"14" }}</strong>{% endif %}{% endif %}

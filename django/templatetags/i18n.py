@@ -1,6 +1,6 @@
-from django.core.template import Node, NodeList, Template, Context, resolve_variable
-from django.core.template import TemplateSyntaxError, TokenParser, Library
-from django.core.template import TOKEN_BLOCK, TOKEN_TEXT, TOKEN_VAR
+from django.template import Node, NodeList, Template, Context, resolve_variable
+from django.template import TemplateSyntaxError, TokenParser, Library
+from django.template import TOKEN_BLOCK, TOKEN_TEXT, TOKEN_VAR
 from django.utils import translation
 import re, sys
 
@@ -11,8 +11,8 @@ class GetAvailableLanguagesNode(Node):
         self.variable = variable
 
     def render(self, context):
-        from django.conf.settings import LANGUAGES
-        context[self.variable] = LANGUAGES
+        from django.conf import settings
+        context[self.variable] = settings.LANGUAGES
         return ''
 
 class GetCurrentLanguageNode(Node):

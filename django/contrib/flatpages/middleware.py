@@ -1,6 +1,6 @@
 from django.contrib.flatpages.views import flatpage
-from django.core.extensions import Http404
-from django.conf.settings import DEBUG
+from django.http import Http404
+from django.conf import settings
 
 class FlatpageFallbackMiddleware:
     def process_response(self, request, response):
@@ -13,6 +13,6 @@ class FlatpageFallbackMiddleware:
         except Http404:
             return response
         except:
-            if DEBUG:
+            if settings.DEBUG:
                 raise
             return response

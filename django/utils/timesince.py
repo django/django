@@ -11,6 +11,7 @@ def timesince(d, now=None):
     chunks = (
       (60 * 60 * 24 * 365, lambda n: ngettext('year', 'years', n)),
       (60 * 60 * 24 * 30, lambda n: ngettext('month', 'months', n)),
+      (60 * 60 * 24 * 7, lambda n : ngettext('week', 'weeks', n)),
       (60 * 60 * 24, lambda n : ngettext('day', 'days', n)),
       (60 * 60, lambda n: ngettext('hour', 'hours', n)),
       (60, lambda n: ngettext('minute', 'minutes', n))

@@ -24,6 +24,8 @@ name. For example, here's the default ``MIDDLEWARE_CLASSES`` created by
 
     MIDDLEWARE_CLASSES = (
         "django.middleware.common.CommonMiddleware",
+        "django.contrib.sessions.middleware.SessionMiddleware",
+        "django.contrib.auth.middleware.AuthenticationMiddleware",
         "django.middleware.doc.XViewMiddleware",
     )
 
@@ -95,12 +97,36 @@ Handles conditional GET operations. If the response has a ``ETag`` or
 Also removes the content from any response to a HEAD request and sets the
 ``Date`` and ``Content-Length`` response-headers.
 
-django.middleware.sessions.SessionMiddleware
---------------------------------------------
+django.contrib.sessions.middleware.SessionMiddleware
+----------------------------------------------------
 
 Enables session support. See the `session documentation`_.
 
 .. _`session documentation`: http://www.djangoproject.com/documentation/sessions/
+
+django.contrib.auth.middleware.AuthenticationMiddleware
+-------------------------------------------------------
+
+Adds the ``user`` attribute, representing the currently-logged-in user, to
+every incoming ``HttpRequest`` object. See `Authentication in Web requests`_.
+
+.. _Authentication in Web requests: http://www.djangoproject.com/documentation/authentication/#authentication-in-web-requests
+
+django.middleware.transaction.TransactionMiddleware
+---------------------------------------------------
+
+Binds commit and rollback to the request/response phase. If a view function runs
+successfully, a commit is done. If it fails with an exception, a rollback is
+done.
+
+The order of this middleware in the stack is important: middleware modules
+running outside of it run with commit-on-save - the default Django behavior.
+Middleware modules running inside it (coming later in the stack) will be under
+the same transaction control as the view functions.
+
+See the `transaction management documentation`_.
+
+.. _`transaction management documentation`: http://www.djangoproject.com/documentation/transaction/
 
 Writing your own middleware
 ===========================
@@ -176,8 +202,8 @@ Guidelines
       to it.
 
     * Feel free to look at Django's available middleware for examples. The
-      default Django middleware classes are in ``django/middleware/`` in the
-      Django distribution.
+      core Django middleware classes are in ``django/middleware/`` in the
+      Django distribution. The session middleware is in ``django/contrib/sessions``.
 
     * If you write a middleware component that you think would be useful to
       other people, contribute to the community! Let us know, and we'll

@@ -1,16 +1,13 @@
-/*
-    DJANGO Admin Changelist Styles
-    by Wilson Miner wilson@lawrence.com
-    Copyright (c) 2005 Lawrence Journal-World
-*/
+@import url('base.css');
 
+/* CHANGELISTS */
 #changelist { position:relative; width:100%; }
 #changelist table { width:100%; }
 .change-list .filtered table { border-right:1px solid #ddd;  }
 .change-list .filtered { min-height:400px; _height:400px; }
 .change-list .filtered { background:white url(../img/admin/changelist-bg.gif) top right repeat-y !important; }
 .change-list .filtered table, .change-list .filtered .paginator, .filtered #toolbar, .filtered div.xfull { margin-right:160px !important; width:auto !important; }
-.change-list .filtered table tbody th { padding-right:10px; }
+.change-list .filtered table tbody th { padding-right:1em; }
 #changelist .toplinks { border-bottom:1px solid #ccc !important; }
 #changelist .paginator { color:#666; border-top:1px solid #eee; border-bottom:1px solid #eee; background:white url(../img/admin/nav-bg.gif) 0 180% repeat-x; overflow:hidden; }
 .change-list .filtered .paginator { border-right:1px solid #ddd; }
@@ -42,3 +39,12 @@
 .change-list ul.toplinks li { float: left; width: 9em; padding:3px 6px; font-weight: bold; list-style-type:none; }
 .change-list ul.toplinks .date-back a { color:#999; }
 .change-list ul.toplinks .date-back a:hover { color:#036; }
+
+/* PAGINATOR */
+.paginator { font-size:11px; padding-top:10px; padding-bottom:10px; line-height:22px; margin:0; border-top:1px solid #ddd; }
+.paginator a:link, .paginator a:visited	{ padding:2px 6px; border:solid 1px #ccc; background:white; text-decoration:none; }
+.paginator a.showall { padding:0 !important; border:none !important; }
+.paginator a.showall:hover { color:#036 !important; background:transparent !important; }
+.paginator .end	{ border-width:2px !important; margin-right:6px; }
+.paginator .this-page { padding:2px 6px; font-weight:bold; font-size:13px; vertical-align:top; }
+.paginator a:hover { color:white; background:#5b80b2; border-color:#036; }

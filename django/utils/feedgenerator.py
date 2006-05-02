@@ -21,8 +21,6 @@ http://diveintomark.org/archives/2004/02/04/incompatible-rss
 from django.utils.xmlutils import SimplerXMLGenerator
 import datetime, re, time
 import email.Utils
-from xml.dom import minidom
-from xml.parsers.expat import ExpatError
 
 def rfc2822_date(date):
     return email.Utils.formatdate(time.mktime(date.timetuple()))
@@ -158,9 +156,11 @@ class Rss201rev2Feed(RssFeed):
                 handler.addQuickElement(u"description", item['description'])
 
             # Author information.
-            if item['author_email'] is not None and item['author_name'] is not None:
-                handler.addQuickElement(u"author", u"%s (%s)" % \
+            if item["author_name"] and item["author_email"]:
+                handler.addQuickElement(u"author", "%s (%s)" % \
                     (item['author_email'], item['author_name']))
+            elif item["author_email"]:
+                handler.addQuickElement(u"author", item["author_email"])
 
             if item['pubdate'] is not None:
                 handler.addQuickElement(u"pubDate", rfc2822_date(item['pubdate']).decode('ascii'))

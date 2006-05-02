@@ -1,7 +1,7 @@
 from django.conf import settings
-from django.core.template import Template, Context, TemplateDoesNotExist
+from django.template import Template, Context, TemplateDoesNotExist
 from django.utils.html import escape
-from django.utils.httpwrappers import HttpResponseServerError, HttpResponseNotFound
+from django.http import HttpResponseServerError, HttpResponseNotFound
 import os, re
 from itertools import count, izip
 from os.path import dirname, join as pathjoin
@@ -72,7 +72,7 @@ def technical_500_response(request, exc_type, exc_value, tb):
     template_does_not_exist = False
     loader_debug_info = None
     if issubclass(exc_type, TemplateDoesNotExist):
-        from django.core.template.loader import template_source_loaders
+        from django.template.loader import template_source_loaders
         template_does_not_exist = True
         loader_debug_info = []
         for loader in template_source_loaders:
@@ -641,8 +641,8 @@ EMPTY_URLCONF_TEMPLATE = """
 <div id="instructions">
   <p>Of course, you haven't actually done any work yet. Here's what to do next:</p>
   <ul>
-    <li>Edit the <code>DATABASE_*</code> settings in <code>{{ project_name }}/settings.py</code>.</li>
-    <li>Start your first app by running <code>{{ project_name }}/manage.py startapp [appname]</code>.</li>
+    <li>If you plan to use a database, edit the <code>DATABASE_*</code> settings in <code>{{ project_name }}/settings.py</code>.</li>
+    <li>Start your first app by running <code>python {{ project_name }}/manage.py startapp [appname]</code>.</li>
   </ul>
 </div>
 

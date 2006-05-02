@@ -1,12 +1,14 @@
-from django.core import meta
-from django import templatetags
+from django import template, templatetags
+from django.template import RequestContext
 from django.conf import settings
 from django.contrib.admin.views.decorators import staff_member_required
-from django.models.core import sites
-from django.core.extensions import DjangoContext, render_to_response
-from django.core.exceptions import Http404, ViewDoesNotExist
-from django.core import template, urlresolvers
+from django.db import models
+from django.shortcuts import render_to_response
+from django.core.exceptions import ImproperlyConfigured, ViewDoesNotExist
+from django.http import Http404, get_host
+from django.core import urlresolvers
 from django.contrib.admin import utils
+from django.contrib.sites.models import Site
 import inspect, os, re
 
 # Exclude methods starting with these strings from documentation
@@ -15,15 +17,15 @@ MODEL_METHODS_EXCLUDE = ('_', 'add_', 'delete', 'save', 'set_')
 def doc_index(request):
     if not utils.docutils_is_available:
         return missing_docutils_page(request)
-    return render_to_response('admin_doc/index', context_instance=DjangoContext(request))
+    return render_to_response('admin_doc/index.html', context_instance=RequestContext(request))
 doc_index = staff_member_required(doc_index)
 
 def bookmarklets(request):
     # Hack! This couples this view to the URL it lives at.
     admin_root = request.path[:-len('doc/bookmarklets/')]
-    return render_to_response('admin_doc/bookmarklets', {
-        'admin_url': "%s://%s%s" % (os.environ.get('HTTPS') == 'on' and 'https' or 'http', request.META['HTTP_HOST'], admin_root),
-    }, context_instance=DjangoContext(request))
+    return render_to_response('admin_doc/bookmarklets.html', {
+        'admin_url': "%s://%s%s" % (os.environ.get('HTTPS') == 'on' and 'https' or 'http', get_host(request), admin_root),
+    }, context_instance=RequestContext(request))
 bookmarklets = staff_member_required(bookmarklets)
 
 def template_tag_index(request):
@@ -54,7 +56,7 @@ def template_tag_index(request):
                 'library': tag_library,
             })
 
-    return render_to_response('admin_doc/template_tag_index', {'tags': tags}, context_instance=DjangoContext(request))
+    return render_to_response('admin_doc/template_tag_index.html', {'tags': tags}, context_instance=RequestContext(request))
 template_tag_index = staff_member_required(template_tag_index)
 
 def template_filter_index(request):
@@ -84,16 +86,20 @@ def template_filter_index(request):
                 'meta': metadata,
                 'library': tag_library,
             })
-    return render_to_response('admin_doc/template_filter_index', {'filters': filters}, context_instance=DjangoContext(request))
+    return render_to_response('admin_doc/template_filter_index.html', {'filters': filters}, context_instance=RequestContext(request))
 template_filter_index = staff_member_required(template_filter_index)
 
 def view_index(request):
     if not utils.docutils_is_available:
         return missing_docutils_page(request)
 
+    if settings.ADMIN_FOR:
+        settings_modules = [__import__(m, '', '', ['']) for m in settings.ADMIN_FOR]
+    else:
+        settings_modules = [settings]
+
     views = []
-    for site_settings_module in settings.ADMIN_FOR:
-        settings_mod = __import__(site_settings_module, '', '', [''])
+    for settings_mod in settings_modules:
         urlconf = __import__(settings_mod.ROOT_URLCONF, '', '', [''])
         view_functions = extract_views_from_urlpatterns(urlconf.urlpatterns)
         for (func, regex) in view_functions:
@@ -101,10 +107,10 @@ def view_index(request):
                 'name': func.__name__,
                 'module': func.__module__,
                 'site_id': settings_mod.SITE_ID,
-                'site': sites.get_object(pk=settings_mod.SITE_ID),
+                'site': Site.objects.get(pk=settings_mod.SITE_ID),
                 'url': simplify_regex(regex),
             })
-    return render_to_response('admin_doc/view_index', {'views': views}, context_instance=DjangoContext(request))
+    return render_to_response('admin_doc/view_index.html', {'views': views}, context_instance=RequestContext(request))
 view_index = staff_member_required(view_index)
 
 def view_detail(request, view):
@@ -123,51 +129,63 @@ def view_detail(request, view):
         body = utils.parse_rst(body, 'view', 'view:' + view)
     for key in metadata:
         metadata[key] = utils.parse_rst(metadata[key], 'model', 'view:' + view)
-    return render_to_response('admin_doc/view_detail', {
+    return render_to_response('admin_doc/view_detail.html', {
         'name': view,
         'summary': title,
         'body': body,
         'meta': metadata,
-    }, context_instance=DjangoContext(request))
+    }, context_instance=RequestContext(request))
 view_detail = staff_member_required(view_detail)
 
 def model_index(request):
     if not utils.docutils_is_available:
         return missing_docutils_page(request)
 
-    models = []
-    for app in meta.get_installed_model_modules():
-        for model in app._MODELS:
-            opts = model._meta
-            models.append({
-                'name': '%s.%s' % (opts.app_label, opts.module_name),
-                'module': opts.app_label,
-                'class': opts.module_name,
-            })
-    return render_to_response('admin_doc/model_index', {'models': models}, context_instance=DjangoContext(request))
+    m_list = [m._meta for m in models.get_models()]
+    return render_to_response('admin_doc/model_index.html', {'models': m_list}, context_instance=RequestContext(request))
 model_index = staff_member_required(model_index)
 
-def model_detail(request, model):
+def model_detail(request, app_label, model_name):
     if not utils.docutils_is_available:
         return missing_docutils_page(request)
 
+    # Get the model class.
     try:
-        model = meta.get_app(model)
-    except ImportError:
-        raise Http404
-    opts = model.Klass._meta
+        app_mod = models.get_app(app_label)
+    except ImproperlyConfigured:
+        raise Http404, "App %r not found" % app_label
+    model = None
+    for m in models.get_models(app_mod):
+        if m._meta.object_name.lower() == model_name:
+            model = m
+            break
+    if model is None:
+        raise Http404, "Model %r not found in app %r" % (model_name, app_label)
 
-    # Gather fields/field descriptions
+    opts = model._meta
+
+    # Gather fields/field descriptions.
     fields = []
     for field in opts.fields:
+        # ForeignKey is a special case since the field will actually be a
+        # descriptor that returns the other object
+        if isinstance(field, models.ForeignKey):
+            data_type = related_object_name = field.rel.to.__name__
+            app_label = field.rel.to._meta.app_label
+            verbose = utils.parse_rst(("the related `%s.%s` object"  % (app_label, data_type)), 'model', 'model:' + data_type)
+        else:
+            data_type = get_readable_field_data_type(field)
+            verbose = field.verbose_name
         fields.append({
             'name': field.name,
-            'data_type': get_readable_field_data_type(field),
-            'verbose': field.verbose_name,
+            'data_type': data_type,
+            'verbose': verbose,
             'help': field.help_text,
         })
-    for func_name, func in model.Klass.__dict__.items():
-        if callable(func) and len(inspect.getargspec(func)[0]) == 0:
+
+    # Gather model methods.
+    for func_name, func in model.__dict__.items():
+        if (inspect.isfunction(func) and len(inspect.getargspec(func)[0]) == 1):
             try:
                 for exclude in MODEL_METHODS_EXCLUDE:
                     if func_name.startswith(exclude):
@@ -182,12 +200,26 @@ def model_detail(request, model):
                 'data_type': get_return_data_type(func_name),
                 'verbose': verbose,
             })
-    return render_to_response('admin_doc/model_detail', {
-        'name': '%s.%s' % (opts.app_label, opts.module_name),
-        'summary': "Fields on %s objects" % opts.verbose_name,
+
+    # Gather related objects
+    for rel in opts.get_all_related_objects():
+        verbose = "related `%s.%s` objects" % (rel.opts.app_label, rel.opts.object_name)
+        accessor = rel.get_accessor_name()
+        fields.append({
+            'name' : "%s.all" % accessor,
+            'verbose' : utils.parse_rst("all " + verbose , 'model', 'model:' + opts.module_name),
+        })
+        fields.append({
+            'name' : "%s.count" % accessor,
+            'verbose' : utils.parse_rst("number of " + verbose , 'model', 'model:' + opts.module_name),
+        })
+
+    return render_to_response('admin_doc/model_detail.html', {
+        'name': '%s.%s' % (opts.app_label, opts.object_name),
+        'summary': "Fields on %s objects" % opts.object_name,
         'description': model.__doc__,
         'fields': fields,
-    }, context_instance=DjangoContext(request))
+    }, context_instance=RequestContext(request))
 model_detail = staff_member_required(model_detail)
 
 def template_detail(request, template):
@@ -201,13 +233,13 @@ def template_detail(request, template):
                 'exists': os.path.exists(template_file),
                 'contents': lambda: os.path.exists(template_file) and open(template_file).read() or '',
                 'site_id': settings_mod.SITE_ID,
-                'site': sites.get_object(pk=settings_mod.SITE_ID),
+                'site': Site.objects.get(pk=settings_mod.SITE_ID),
                 'order': list(settings_mod.TEMPLATE_DIRS).index(dir),
             })
-    return render_to_response('admin_doc/template_detail', {
+    return render_to_response('admin_doc/template_detail.html', {
         'name': template,
         'templates': templates,
-    }, context_instance=DjangoContext(request))
+    }, context_instance=RequestContext(request))
 template_detail = staff_member_required(template_detail)
 
 ####################
@@ -216,7 +248,7 @@ template_detail = staff_member_required(template_detail)
 
 def missing_docutils_page(request):
     """Display an error message for people without docutils"""
-    return render_to_response('admin_doc/missing_docutils')
+    return render_to_response('admin_doc/missing_docutils.html')
 
 def load_all_installed_template_libraries():
     # Load/register all template tag libraries from installed apps.
@@ -271,9 +303,6 @@ DATA_TYPE_MAPPING = {
 }
 
 def get_readable_field_data_type(field):
-    # ForeignKey is a special case. Use the field type of the relation.
-    if field.get_internal_type() == 'ForeignKey':
-        field = field.rel.get_related_field()
     return DATA_TYPE_MAPPING[field.get_internal_type()] % field.__dict__
 
 def extract_views_from_urlpatterns(urlpatterns, base=''):
@@ -295,15 +324,23 @@ def extract_views_from_urlpatterns(urlpatterns, base=''):
             raise TypeError, "%s does not appear to be a urlpattern object" % p
     return views
 
-# Clean up urlpattern regexes into something somewhat readable by Mere Humans:
-# turns something like "^(?P<sport_slug>\w+)/athletes/(?P<athlete_slug>\w+)/$"
-# into "<sport_slug>/athletes/<athlete_slug>/"
-
 named_group_matcher = re.compile(r'\(\?P(<\w+>).+?\)')
+non_named_group_matcher = re.compile(r'\(.*?\)')
 
 def simplify_regex(pattern):
+    """
+    Clean up urlpattern regexes into something somewhat readable by Mere Humans:
+    turns something like "^(?P<sport_slug>\w+)/athletes/(?P<athlete_slug>\w+)/$"
+    into "<sport_slug>/athletes/<athlete_slug>/"
+    """
+    # handle named groups first
     pattern = named_group_matcher.sub(lambda m: m.group(1), pattern)
-    pattern = pattern.replace('^', '').replace('$', '').replace('?', '').replace('//', '/')
+
+    # handle non-named groups
+    pattern = non_named_group_matcher.sub("<var>", pattern)
+
+    # clean up any outstanding regex-y characters.
+    pattern = pattern.replace('^', '').replace('$', '').replace('?', '').replace('//', '/').replace('\\', '')
     if not pattern.startswith('/'):
         pattern = '/' + pattern
     return pattern

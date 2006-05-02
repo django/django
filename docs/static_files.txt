@@ -31,7 +31,7 @@ How to do it
 
 Just put this in your URLconf_::
 
-    (r'^site_media/(?P<path>.*)$', 'django.views.static.serve', {'document_root': '/path/to/media'}),
+    (r'^site_media/(.*)$', 'django.views.static.serve', {'document_root': '/path/to/media'}),
 
 ...where ``site_media`` is the URL where your media will be rooted, and
 ``/path/to/media`` is the filesystem root for your media.
@@ -60,7 +60,7 @@ listings for directories.
 
 Example::
 
-    (r'^site_media/(?P<path>.*)$', 'django.views.static.serve', {'document_root': '/path/to/media', 'show_indexes': True}),
+    (r'^site_media/(.*)$', 'django.views.static.serve', {'document_root': '/path/to/media', 'show_indexes': True}),
 
 You can customize the index view by creating a template called
 ``static/directory_index``. That template gets two objects in its context:
@@ -100,7 +100,7 @@ Do this by wrapping an ``if DEBUG`` statement around the
 ``django.views.static.serve`` inclusion. Here's a full example URLconf::
 
     from django.conf.urls.defaults import *
-    from django.conf.settings import DEBUG
+    from django.conf import settings
 
     urlpatterns = patterns('',
         (r'^/articles/2003/$', 'news.views.special_case_2003'),
@@ -109,15 +109,15 @@ Do this by wrapping an ``if DEBUG`` statement around the
         (r'^/articles/(?P<year>\d{4})/(?P<month>\d{2})/(?P<day>\d+)/$', 'news.views.article_detail'),
     )
 
-    if DEBUG:
+    if settings.DEBUG:
         urlpatterns += patterns('',
             (r'^site_media/(?P<path>.*)$', 'django.views.static.serve', {'document_root': '/path/to/media'}),
         )
 
-This code is straightforward. It imports the `DEBUG setting`_ and checks its
-value. If it evaluates to ``True``, then ``site_media`` will be associated with
-the ``django.views.static.serve`` view. If not (``DEBUG == False``), then the
-view won't be made available.
+This code is straightforward. It imports the settings and checks the value of
+the ``DEBUG`` setting. If it evaluates to ``True``, then ``site_media`` will be
+associated with the ``django.views.static.serve`` view. If not
+(``DEBUG == False``), then the view won't be made available.
 
 Of course, the catch here is that you'll have to remember to set ``DEBUG=False``
 in your production settings file. But you should be doing that anyway.

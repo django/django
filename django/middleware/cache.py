@@ -1,7 +1,7 @@
 from django.conf import settings
 from django.core.cache import cache
 from django.utils.cache import get_cache_key, learn_cache_key, patch_response_headers
-from django.utils.httpwrappers import HttpResponseNotModified
+from django.http import HttpResponseNotModified
 
 class CacheMiddleware:
     """

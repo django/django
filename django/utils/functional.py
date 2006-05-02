@@ -24,14 +24,14 @@ def lazy(func, *resultclasses):
         # the evaluation and store the result. Afterwards, the result
         # is delivered directly. So the result is memoized.
         def __init__(self, args, kw):
-           self.__func = func
-           self.__args = args
-           self.__kw = kw
-           self.__dispatch = {}
-           for resultclass in resultclasses:
-               self.__dispatch[resultclass] = {}
-               for (k, v) in resultclass.__dict__.items():
-                   setattr(self, k, self.__promise__(resultclass, k, v))
+            self.__func = func
+            self.__args = args
+            self.__kw = kw
+            self.__dispatch = {}
+            for resultclass in resultclasses:
+                self.__dispatch[resultclass] = {}
+                for (k, v) in resultclass.__dict__.items():
+                    setattr(self, k, self.__promise__(resultclass, k, v))
 
         def __promise__(self, klass, funcname, func):
             # Builds a wrapper around some magic method and registers that magic

@@ -150,14 +150,14 @@ If you don't like the verbose name ``gettext_lazy``, you can just alias it as
 
 Always use lazy translations in `Django models`_. And it's a good idea to add
 translations for the field names and table names, too. This means writing
-explicit ``verbose_name`` and ``verbose_name_plural`` options in the ``META``
+explicit ``verbose_name`` and ``verbose_name_plural`` options in the ``Meta``
 class, though::
 
     from django.utils.translation import gettext_lazy as _
 
     class MyThing(meta.Model):
         name = meta.CharField(_('name'), help_text=_('This is the help text'))
-        class META:
+        class Meta:
             verbose_name = _('my thing')
             verbose_name_plural = _('mythings')
 
@@ -224,14 +224,14 @@ To pluralize, specify both the singular and plural forms with the
 Internally, all block and inline translations use the appropriate
 ``gettext`` / ``ngettext`` call.
 
-Each ``DjangoContext`` has access to two translation-specific variables:
+Each ``RequestContext`` has access to two translation-specific variables:
 
     * ``LANGUAGES`` is a list of tuples in which the first element is the
       language code and the second is the language name (in that language).
     * ``LANGUAGE_CODE`` is the current user's preferred language, as a string.
       Example: ``en-us``. (See "How language preference is discovered", below.)
 
-If you don't use the ``DjangoContext`` extension, you can get those values with
+If you don't use the ``RequestContext`` extension, you can get those values with
 two tags::
 
     {% get_current_language as LANGUAGE_CODE %}
@@ -404,7 +404,7 @@ should follow these guidelines:
 For example, your ``MIDDLEWARE_CLASSES`` might look like this::
 
     MIDDLEWARE_CLASSES = (
-       'django.middleware.sessions.SessionMiddleware',
+       'django.contrib.sessions.middleware.SessionMiddleware',
        'django.middleware.locale.LocaleMiddleware',
        'django.middleware.common.CommonMiddleware',
     )

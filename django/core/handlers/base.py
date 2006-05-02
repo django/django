@@ -1,4 +1,6 @@
-from django.utils import httpwrappers
+from django.core import signals
+from django.dispatch import dispatcher
+from django import http
 import sys
 
 class BaseHandler:
@@ -48,12 +50,9 @@ class BaseHandler:
 
     def get_response(self, path, request):
         "Returns an HttpResponse object for the given HttpRequest"
-        from django.core import db, exceptions, urlresolvers
+        from django.core import exceptions, urlresolvers
         from django.core.mail import mail_admins
-        from django.conf.settings import DEBUG, INTERNAL_IPS, ROOT_URLCONF
-
-        # Reset query list per request.
-        db.db.queries = []
+        from django.conf import settings
 
         # Apply request middleware
         for middleware_method in self._request_middleware:
@@ -61,7 +60,7 @@ class BaseHandler:
             if response:
                 return response
 
-        resolver = urlresolvers.RegexURLResolver(r'^/', ROOT_URLCONF)
+        resolver = urlresolvers.RegexURLResolver(r'^/', settings.ROOT_URLCONF)
         try:
             callback, callback_args, callback_kwargs = resolver.resolve(path)
 
@@ -88,30 +87,23 @@ class BaseHandler:
                 raise ValueError, "The view %s.%s didn't return an HttpResponse object." % (callback.__module__, callback.func_name)
 
             return response
-        except exceptions.Http404, e:
-            if DEBUG:
+        except http.Http404, e:
+            if settings.DEBUG:
                 return self.get_technical_error_response(request, is404=True, exception=e)
             else:
                 callback, param_dict = resolver.resolve404()
                 return callback(request, **param_dict)
-        except db.DatabaseError:
-            db.db.rollback()
-            if DEBUG:
-                return self.get_technical_error_response(request)
-            else:
-                subject = 'Database error (%s IP): %s' % ((request.META.get('REMOTE_ADDR') in INTERNAL_IPS and 'internal' or 'EXTERNAL'), getattr(request, 'path', ''))
-                message = "%s\n\n%s" % (self._get_traceback(), request)
-                mail_admins(subject, message, fail_silently=True)
-                return self.get_friendly_error_response(request, resolver)
         except exceptions.PermissionDenied:
-            return httpwrappers.HttpResponseForbidden('<h1>Permission denied</h1>')
+            return http.HttpResponseForbidden('<h1>Permission denied</h1>')
         except: # Handle everything else, including SuspiciousOperation, etc.
-            if DEBUG:
+            if settings.DEBUG:
                 return self.get_technical_error_response(request)
             else:
                 # Get the exception info now, in case another exception is thrown later.
                 exc_info = sys.exc_info()
-                subject = 'Coding error (%s IP): %s' % ((request.META.get('REMOTE_ADDR') in INTERNAL_IPS and 'internal' or 'EXTERNAL'), getattr(request, 'path', ''))
+                receivers = dispatcher.send(signal=signals.got_request_exception)
+                # When DEBUG is False, send an error message to the admins.
+                subject = 'Error (%s IP): %s' % ((request.META.get('REMOTE_ADDR') in settings.INTERNAL_IPS and 'internal' or 'EXTERNAL'), getattr(request, 'path', ''))
                 try:
                     request_repr = repr(request)
                 except:
@@ -123,7 +115,7 @@ class BaseHandler:
     def get_friendly_error_response(self, request, resolver):
         """
         Returns an HttpResponse that displays a PUBLIC error message for a
-        fundamental database or coding error.
+        fundamental error.
         """
         from django.core import urlresolvers
         callback, param_dict = resolver.resolve500()
@@ -132,7 +124,7 @@ class BaseHandler:
     def get_technical_error_response(self, request, is404=False, exception=None):
         """
         Returns an HttpResponse that displays a TECHNICAL error message for a
-        fundamental database or coding error.
+        fundamental error.
         """
         from django.views import debug
         if is404:

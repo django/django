@@ -242,7 +242,7 @@ class ServerHandler:
 
     # Error handling (also per-subclass or per-instance)
     traceback_limit = None  # Print entire traceback to self.get_stderr()
-    error_status = "500 Dude, this is whack!"
+    error_status = "500 INTERNAL SERVER ERROR"
     error_headers = [('Content-Type','text/plain')]
 
     # State variables (don't mess with these)
@@ -383,7 +383,7 @@ class ServerHandler:
         assert type(data) is StringType,"write() argument must be string"
 
         if not self.status:
-             raise AssertionError("write() before start_response()")
+            raise AssertionError("write() before start_response()")
 
         elif not self.headers_sent:
             # Before the first output, send the stored headers
@@ -532,8 +532,8 @@ class WSGIRequestHandler(BaseHTTPRequestHandler):
     server_version = "WSGIServer/" + __version__
 
     def __init__(self, *args, **kwargs):
-        from django.conf.settings import ADMIN_MEDIA_PREFIX
-        self.admin_media_prefix = ADMIN_MEDIA_PREFIX
+        from django.conf import settings
+        self.admin_media_prefix = settings.ADMIN_MEDIA_PREFIX
         BaseHTTPRequestHandler.__init__(self, *args, **kwargs)
 
     def get_environ(self):

@@ -37,6 +37,8 @@ All attributes except ``session`` should be considered read-only.
     A dictionary-like object containing all given HTTP POST parameters. See the
     ``QueryDict`` documentation below.
 
+    Note: ``POST`` does *not* include file-upload information. See ``FILES``.
+
 ``REQUEST``
     For convenience, a dictionary-like object that searches ``POST`` first,
     then ``GET``. Inspired by PHP's ``$_REQUEST``.
@@ -86,15 +88,21 @@ All attributes except ``session`` should be considered read-only.
         * ``SERVER_PORT`` -- The port of the server.
 
 ``user``
-    A ``django.models.auth.users.User`` object representing the currently
+    A ``django.contrib.auth.models.User`` object representing the currently
     logged-in user. If the user isn't currently logged in, ``user`` will be set
-    to an instance of ``django.parts.auth.anonymoususers.AnonymousUser``. You
+    to an instance of ``django.contrib.auth.models.AnonymousUser``. You
     can tell them apart with ``is_anonymous()``, like so::
 
         if request.user.is_anonymous():
             # Do something for anonymous users.
         else:
             # Do something for logged-in users.
+
+    ``user`` is only available if your Django installation has the
+    ``AuthenticationMiddleware`` activated. For more, see
+    `Authentication in Web requests`_.
+
+    .. Authentication in Web requests: http://www.djangoproject.com/documentation/authentication/#authentication-in-web-requests
 
 ``session``
     A readable-and-writable, dictionary-like object that represents the current
@@ -131,10 +139,10 @@ QueryDict objects
 -----------------
 
 In an ``HttpRequest`` object, the ``GET`` and ``POST`` attributes are instances
-of ``django.utils.httpwrappers.QueryDict``. ``QueryDict`` is a dictionary-like
+of ``django.http.QueryDict``. ``QueryDict`` is a dictionary-like
 class customized to deal with multiple values for the same key. This is
-necessary because some HTML form elements, notably ``<select multiple>``, pass
-multiple values for the same key.
+necessary because some HTML form elements, notably
+``<select multiple="multiple">``, pass multiple values for the same key.
 
 ``QueryDict`` instances are immutable, unless you create a ``copy()`` of them.
 That means you can't change attributes of ``request.POST`` and ``request.GET``
@@ -269,10 +277,13 @@ In contrast to ``HttpRequest`` objects, which are created automatically by
 Django, ``HttpResponse`` objects are your responsibility. Each view you write
 is responsible for instantiating, populating and returning an ``HttpResponse``.
 
-The ``HttpResponse`` class lives at ``django.utils.httpwrappers.HttpResponse``.
+The ``HttpResponse`` class lives at ``django.http.HttpResponse``.
 
 Usage
 -----
+
+Passing strings
+~~~~~~~~~~~~~~~
 
 Typical usage is to pass the contents of the page, as a string, to the
 ``HttpResponse`` constructor::
@@ -297,16 +308,27 @@ You can add and delete headers using dictionary syntax::
 
 Note that ``del`` doesn't raise ``KeyError`` if the header doesn't exist.
 
+Passing iterators
+~~~~~~~~~~~~~~~~~
+
+Finally, you can pass ``HttpResponse`` an iterator rather than passing it
+hard-coded strings. If you use this technique, follow these guidelines:
+
+    * The iterator should return strings.
+    * If an ``HttpResponse`` has been initialized with an iterator as its
+      content, you can't use the ``HttpResponse`` instance as a file-like
+      object. Doing so will raise ``Exception``.
+
 Methods
 -------
 
 ``__init__(content='', mimetype=DEFAULT_MIME_TYPE)``
     Instantiates an ``HttpResponse`` object with the given page content (a
-    string) and MIME type. The ``DEFAULT_MIME_TYPE`` is ``"text/html"``.
+    string) and MIME type. The ``DEFAULT_MIME_TYPE`` is ``'text/html'``.
 
-    **New in Django development version:** ``content`` can be an iterator
-    instead of a string. This iterator should return strings, and those strings
-    will be joined together to form the content of the response.
+    ``content`` can be an iterator or a string. If it's an iterator, it should
+    return strings, and those strings will be joined together to form the
+    content of the response.
 
 ``__setitem__(header, value)``
     Sets the given header name to the given value. Both ``header`` and
@@ -343,14 +365,10 @@ Methods
     Deletes the cookie with the given key. Fails silently if the key doesn't
     exist.
 
-``get_content_as_string(encoding)``
-    Returns the content as a Python string, encoding it from a Unicode object
-    if necessary. **Removed in Django development version.**
-
 ``content``
-    **New in Django development version.** Returns the content as a Python
-    string, encoding it from a Unicode object if necessary. Note this is a
-    property, not a method, so use ``r.content`` instead of ``r.content()``.
+    Returns the content as a Python string, encoding it from a Unicode object
+    if necessary. Note this is a property, not a method, so use ``r.content``
+    instead of ``r.content()``.
 
 ``write(content)``, ``flush()`` and ``tell()``
     These methods make an ``HttpResponse`` instance a file-like object.
@@ -360,12 +378,12 @@ HttpResponse subclasses
 
 Django includes a number of ``HttpResponse`` subclasses that handle different
 types of HTTP responses. Like ``HttpResponse``, these subclasses live in
-``django.utils.httpwrappers``.
+``django.http``.
 
 ``HttpResponseRedirect``
     The constructor takes a single argument -- the path to redirect to. This
-    can be a fully qualified URL (e.g. ``"http://www.yahoo.com/search/"``) or an
-    absolute URL with no domain (e.g. ``"/search/"``). Note that this returns
+    can be a fully qualified URL (e.g. ``'http://www.yahoo.com/search/'``) or an
+    absolute URL with no domain (e.g. ``'/search/'``). Note that this returns
     an HTTP status code 302.
 
 ``HttpResponsePermanentRedirect``

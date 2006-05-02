@@ -1,5 +1,8 @@
 from django.core.handlers.base import BaseHandler
-from django.utils import datastructures, httpwrappers
+from django.core import signals
+from django.dispatch import dispatcher
+from django.utils import datastructures
+from django import http
 from pprint import pformat
 
 # See http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html
@@ -47,7 +50,7 @@ STATUS_CODE_TEXT = {
     505: 'HTTP VERSION NOT SUPPORTED',
 }
 
-class WSGIRequest(httpwrappers.HttpRequest):
+class WSGIRequest(http.HttpRequest):
     def __init__(self, environ):
         self.environ = environ
         self.path = environ['PATH_INFO']
@@ -60,7 +63,7 @@ class WSGIRequest(httpwrappers.HttpRequest):
             pformat(self.META))
 
     def get_full_path(self):
-        return '%s%s' % (self.path, self.environ['QUERY_STRING'] and ('?' + self.environ['QUERY_STRING']) or '')
+        return '%s%s' % (self.path, self.environ.get('QUERY_STRING', '') and ('?' + self.environ.get('QUERY_STRING', '')) or '')
 
     def _load_post_and_files(self):
         # Populates self._post and self._files
@@ -68,21 +71,21 @@ class WSGIRequest(httpwrappers.HttpRequest):
             if self.environ.get('CONTENT_TYPE', '').startswith('multipart'):
                 header_dict = dict([(k, v) for k, v in self.environ.items() if k.startswith('HTTP_')])
                 header_dict['Content-Type'] = self.environ.get('CONTENT_TYPE', '')
-                self._post, self._files = httpwrappers.parse_file_upload(header_dict, self.raw_post_data)
+                self._post, self._files = http.parse_file_upload(header_dict, self.raw_post_data)
             else:
-                self._post, self._files = httpwrappers.QueryDict(self.raw_post_data), datastructures.MultiValueDict()
+                self._post, self._files = http.QueryDict(self.raw_post_data), datastructures.MultiValueDict()
         else:
-            self._post, self._files = httpwrappers.QueryDict(''), datastructures.MultiValueDict()
+            self._post, self._files = http.QueryDict(''), datastructures.MultiValueDict()
 
     def _get_request(self):
         if not hasattr(self, '_request'):
-           self._request = datastructures.MergeDict(self.POST, self.GET)
+            self._request = datastructures.MergeDict(self.POST, self.GET)
         return self._request
 
     def _get_get(self):
         if not hasattr(self, '_get'):
             # The WSGI spec says 'QUERY_STRING' may be absent.
-            self._get = httpwrappers.QueryDict(self.environ.get('QUERY_STRING', ''))
+            self._get = http.QueryDict(self.environ.get('QUERY_STRING', ''))
         return self._get
 
     def _set_get(self, get):
@@ -98,7 +101,7 @@ class WSGIRequest(httpwrappers.HttpRequest):
 
     def _get_cookies(self):
         if not hasattr(self, '_cookies'):
-            self._cookies = httpwrappers.parse_cookie(self.environ.get('HTTP_COOKIE', ''))
+            self._cookies = http.parse_cookie(self.environ.get('HTTP_COOKIE', ''))
         return self._cookies
 
     def _set_cookies(self, cookies):
@@ -116,34 +119,16 @@ class WSGIRequest(httpwrappers.HttpRequest):
             self._raw_post_data = self.environ['wsgi.input'].read(int(self.environ["CONTENT_LENGTH"]))
             return self._raw_post_data
 
-    def _get_user(self):
-        if not hasattr(self, '_user'):
-            from django.models.auth import users
-            try:
-                user_id = self.session[users.SESSION_KEY]
-                if not user_id:
-                    raise ValueError
-                self._user = users.get_object(pk=user_id)
-            except (AttributeError, KeyError, ValueError, users.UserDoesNotExist):
-                from django.parts.auth import anonymoususers
-                self._user = anonymoususers.AnonymousUser()
-        return self._user
-
-    def _set_user(self, user):
-        self._user = user
-
     GET = property(_get_get, _set_get)
     POST = property(_get_post, _set_post)
     COOKIES = property(_get_cookies, _set_cookies)
     FILES = property(_get_files)
     REQUEST = property(_get_request)
     raw_post_data = property(_get_raw_post_data)
-    user = property(_get_user, _set_user)
 
 class WSGIHandler(BaseHandler):
     def __call__(self, environ, start_response):
         from django.conf import settings
-        from django.core import db
 
         if settings.ENABLE_PSYCO:
             import psyco
@@ -154,15 +139,17 @@ class WSGIHandler(BaseHandler):
         if self._request_middleware is None:
             self.load_middleware()
 
+        dispatcher.send(signal=signals.request_started)
         try:
             request = WSGIRequest(environ)
             response = self.get_response(request.path, request)
-        finally:
-            db.db.close()
 
-        # Apply response middleware
-        for middleware_method in self._response_middleware:
-            response = middleware_method(request, response)
+            # Apply response middleware
+            for middleware_method in self._response_middleware:
+                response = middleware_method(request, response)
+
+        finally:
+            dispatcher.send(signal=signals.request_finished)
 
         try:
             status_text = STATUS_CODE_TEXT[response.status_code]

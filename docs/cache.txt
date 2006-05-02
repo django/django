@@ -2,63 +2,180 @@
 Django's cache framework
 ========================
 
-So, you got slashdotted_. Now what?
+A fundamental tradeoff in dynamic Web sites is, well, they're dynamic. Each
+time a user requests a page, the Web server makes all sorts of calculations --
+from database queries to template rendering to business logic -- to create the
+page that your site's visitor sees. This is a lot more expensive, from a
+processing-overhead perspective, than your standard read-a-file-off-the-filesystem
+server arrangement.
 
-Django's cache framework gives you three methods of caching dynamic pages in
-memory or in a database. You can cache the output of specific views, you can
-cache only the pieces that are difficult to produce, or you can cache your
-entire site.
+For most Web applications, this overhead isn't a big deal. Most Web
+applications aren't washingtonpost.com or slashdot.org; they're simply small-
+to medium-sized sites with so-so traffic. But for medium- to high-traffic
+sites, it's essential to cut as much overhead as possible.
 
-.. _slashdotted: http://en.wikipedia.org/wiki/Slashdot_effect
+That's where caching comes in.
+
+To cache something is to save the result of an expensive calculation so that
+you don't have to perform the calculation next time. Here's some pseudocode
+explaining how this would work for a dynamically generated Web page:
+
+    given a URL, try finding that page in the cache
+    if the page is in the cache:
+        return the cached page
+    else:
+        generate the page
+        save the generated page in the cache (for next time)
+        return the generated page
+
+Django comes with a robust cache system that lets you save dynamic pages so
+they don't have to be calculated for each request. For convenience, Django
+offers different levels of cache granularity: You can cache the output of
+specific views, you can cache only the pieces that are difficult to produce, or
+you can cache your entire site.
+
+Django also works well with "upstream" caches, such as Squid
+(http://www.squid-cache.org/) and browser-based caches. These are the types of
+caches that you don't directly control but to which you can provide hints (via
+HTTP headers) about which parts of your site should be cached, and how.
 
 Setting up the cache
 ====================
 
-The cache framework allows for different "backends" -- different methods of
-caching data. There's a simple single-process memory cache (mostly useful as a
-fallback) and a memcached_ backend (the fastest option, by far, if you've got
-the RAM).
+The cache system requires a small amount of setup. Namely, you have to tell it
+where your cached data should live -- whether in a database, on the filesystem
+or directly in memory. This is an important decision that affects your cache's
+performance; yes, some cache types are faster than others.
 
-Before using the cache, you'll need to tell Django which cache backend you'd
-like to use. Do this by setting the ``CACHE_BACKEND`` in your settings file.
+Your cache preference goes in the ``CACHE_BACKEND`` setting in your settings
+file. Here's an explanation of all available values for CACHE_BACKEND.
 
-The ``CACHE_BACKEND`` setting is a "fake" URI (really an unregistered scheme).
-Examples:
+Memcached
+---------
 
-    ==============================  ===========================================
-    CACHE_BACKEND                   Explanation
-    ==============================  ===========================================
-    memcached://127.0.0.1:11211/    A memcached backend; the server is running
-                                    on localhost port 11211.  You can use
-                                    multiple memcached servers by separating
-                                    them with semicolons.
+By far the fastest, most efficient type of cache available to Django, Memcached
+is an entirely memory-based cache framework originally developed to handle high
+loads at LiveJournal.com and subsequently open-sourced by Danga Interactive.
+It's used by sites such as Slashdot and Wikipedia to reduce database access and
+dramatically increase site performance.
 
-                                    This backend requires the
-                                    `Python memcached bindings`_.
+Memcached is available for free at http://danga.com/memcached/ . It runs as a
+daemon and is allotted a specified amount of RAM. All it does is provide an
+interface -- a *super-lightning-fast* interface -- for adding, retrieving and
+deleting arbitrary data in the cache. All data is stored directly in memory,
+so there's no overhead of database or filesystem usage.
 
-    db://tablename/                 A database backend in a table named
-                                    "tablename". This table should be created
-                                    with "django-admin createcachetable".
+After installing Memcached itself, you'll need to install the Memcached Python
+bindings. They're in a single Python module, memcache.py, available at
+ftp://ftp.tummy.com/pub/python-memcached/ . If that URL is no longer valid,
+just go to the Memcached Web site (http://www.danga.com/memcached/) and get the
+Python bindings from the "Client APIs" section.
 
-    file:///var/tmp/django_cache/   A file-based cache stored in the directory
-                                    /var/tmp/django_cache/.
+To use Memcached with Django, set ``CACHE_BACKEND`` to
+``memcached://ip:port/``, where ``ip`` is the IP address of the Memcached
+daemon and ``port`` is the port on which Memcached is running.
 
-    simple:///                      A simple single-process memory cache; you
-                                    probably don't want to use this except for
-                                    testing. Note that this cache backend is
-                                    NOT thread-safe!
+In this example, Memcached is running on localhost (127.0.0.1) port 11211::
 
-    locmem:///                      A more sophisticated local memory cache;
-                                    this is multi-process- and thread-safe.
+    CACHE_BACKEND = 'memcached://127.0.0.1:11211/'
 
-    dummy:///                       Doesn't actually cache; just implements the
-                                    cache backend interface and doesn't do
-                                    anything. This is an easy way to turn off
-                                    caching for a test environment.
-    ==============================  ===========================================
+One excellent feature of Memcached is its ability to share cache over multiple
+servers. To take advantage of this feature, include all server addresses in
+``CACHE_BACKEND``, separated by semicolons. In this example, the cache is
+shared over Memcached instances running on IP address 172.19.26.240 and
+172.19.26.242, both on port 11211::
 
-All caches may take arguments -- they're given in query-string style.  Valid
-arguments are:
+    CACHE_BACKEND = 'memcached://172.19.26.240:11211;172.19.26.242:11211/'
+
+Memory-based caching has one disadvantage: Because the cached data is stored in
+memory, the data will be lost if your server crashes. Clearly, memory isn't
+intended for permanent data storage, so don't rely on memory-based caching as
+your only data storage. Actually, none of the Django caching backends should be
+used for permanent storage -- they're all intended to be solutions for caching,
+not storage -- but we point this out here because memory-based caching is
+particularly temporary.
+
+Database caching
+----------------
+
+To use a database table as your cache backend, first create a cache table in
+your database by running this command::
+
+    python manage.py createcachetable [cache_table_name]
+
+...where ``[cache_table_name]`` is the name of the database table to create.
+(This name can be whatever you want, as long as it's a valid table name that's
+not already being used in your database.) This command creates a single table
+in your database that is in the proper format that Django's database-cache
+system expects.
+
+Once you've created that database table, set your ``CACHE_BACKEND`` setting to
+``"db://tablename/"``, where ``tablename`` is the name of the database table.
+In this example, the cache table's name is ``my_cache_table``:
+
+    CACHE_BACKEND = 'db://my_cache_table'
+
+Database caching works best if you've got a fast, well-indexed database server.
+
+Filesystem caching
+------------------
+
+To store cached items on a filesystem, use the ``"file://"`` cache type for
+``CACHE_BACKEND``. For example, to store cached data in ``/var/tmp/django_cache``,
+use this setting::
+
+    CACHE_BACKEND = 'file:///var/tmp/django_cache'
+
+Note that there are three forward slashes toward the beginning of that example.
+The first two are for ``file://``, and the third is the first character of the
+directory path, ``/var/tmp/django_cache``.
+
+The directory path should be absolute -- that is, it should start at the root
+of your filesystem. It doesn't matter whether you put a slash at the end of the
+setting.
+
+Make sure the directory pointed-to by this setting exists and is readable and
+writable by the system user under which your Web server runs. Continuing the
+above example, if your server runs as the user ``apache``, make sure the
+directory ``/var/tmp/django_cache`` exists and is readable and writable by the
+user ``apache``.
+
+Local-memory caching
+--------------------
+
+If you want the speed advantages of in-memory caching but don't have the
+capability of running Memcached, consider the local-memory cache backend. This
+cache is multi-process and thread-safe. To use it, set ``CACHE_BACKEND`` to
+``"locmem:///"``. For example::
+
+    CACHE_BACKEND = 'locmem:///'
+
+Simple caching (for development)
+--------------------------------
+
+A simple, single-process memory cache is available as ``"simple:///"``. This
+merely saves cached data in-process, which means it should only be used in
+development or testing environments. For example::
+
+    CACHE_BACKEND = 'simple:///'
+
+Dummy caching (for development)
+-------------------------------
+
+Finally, Django comes with a "dummy" cache that doesn't actually cache -- it
+just implements the cache interface without doing anything.
+
+This is useful if you have a production site that uses heavy-duty caching in
+various places but a development/test environment on which you don't want to
+cache. In that case, set ``CACHE_BACKEND`` to ``"dummy:///"`` in the settings
+file for your development environment. As a result, your development
+environment won't use caching and your production environment still will.
+
+CACHE_BACKEND arguments
+-----------------------
+
+All caches may take arguments. They're given in query-string style on the
+``CACHE_BACKEND`` setting. Valid arguments are:
 
     timeout
         Default timeout, in seconds, to use for the cache. Defaults to 5
@@ -66,7 +183,7 @@ arguments are:
 
     max_entries
         For the simple and database backends, the maximum number of entries
-        allowed in the cache before it is cleaned.  Defaults to 300.
+        allowed in the cache before it is cleaned. Defaults to 300.
 
     cull_percentage
         The percentage of entries that are culled when max_entries is reached.
@@ -77,20 +194,21 @@ arguments are:
         dumped when max_entries is reached. This makes culling *much* faster
         at the expense of more cache misses.
 
-For example::
+In this example, ``timeout`` is set to ``60``::
 
     CACHE_BACKEND = "memcached://127.0.0.1:11211/?timeout=60"
+
+In this example, ``timeout`` is ``30`` and ``max_entries`` is ``400``::
+
+    CACHE_BACKEND = "memcached://127.0.0.1:11211/?timeout=30&max_entries=400"
 
 Invalid arguments are silently ignored, as are invalid values of known
 arguments.
 
-.. _memcached: http://www.danga.com/memcached/
-.. _Python memcached bindings: ftp://ftp.tummy.com/pub/python-memcached/
-
 The per-site cache
 ==================
 
-Once the cache is set up, the simplest way to use the cache is to cache your
+Once the cache is set up, the simplest way to use caching is to cache your
 entire site. Just add ``django.middleware.cache.CacheMiddleware`` to your
 ``MIDDLEWARE_CLASSES`` setting, as in this example::
 
@@ -159,52 +277,100 @@ For example, you may find it's only necessary to cache the result of an
 intensive database query. In cases like this, you can use the low-level cache
 API to store objects in the cache with any level of granularity you like.
 
-The cache API is simple::
+The cache API is simple. The cache module, ``django.core.cache``, exports a
+``cache`` object that's automatically created from the ``CACHE_BACKEND``
+setting::
 
-    # The cache module exports a cache object that's automatically
-    # created from the CACHE_BACKEND setting.
     >>> from django.core.cache import cache
 
-    # The basic interface is set(key, value, timeout_seconds) and get(key).
+The basic interface is ``set(key, value, timeout_seconds)`` and ``get(key)``::
+
     >>> cache.set('my_key', 'hello, world!', 30)
     >>> cache.get('my_key')
     'hello, world!'
 
-    # (Wait 30 seconds...)
+The ``timeout_seconds`` argument is optional and defaults to the ``timeout``
+argument in the ``CACHE_BACKEND`` setting (explained above).
+
+If the object doesn't exist in the cache, ``cache.get()`` returns ``None``::
+
+    >>> cache.get('some_other_key')
+    None
+
+    # Wait 30 seconds for 'my_key' to expire...
+
     >>> cache.get('my_key')
     None
 
-    # get() can take a default argument.
-    >>> cache.get('my_key', 'has_expired')
-    'has_expired'
+get() can take a ``default`` argument::
 
-    # There's also a get_many() interface that only hits the cache once.
-    # Also, note that the timeout argument is optional and defaults to what
-    # you've given in the settings file.
+    >>> cache.get('my_key', 'has expired')
+    'has expired'
+
+There's also a get_many() interface that only hits the cache once. get_many()
+returns a dictionary with all the keys you asked for that actually exist in the
+cache (and haven't expired)::
+
     >>> cache.set('a', 1)
     >>> cache.set('b', 2)
     >>> cache.set('c', 3)
-
-    # get_many() returns a dictionary with all the keys you asked for that
-    # actually exist in the cache (and haven't expired).
     >>> cache.get_many(['a', 'b', 'c'])
     {'a': 1, 'b': 2, 'c': 3}
 
-    # There's also a way to delete keys explicitly.
+Finally, you can delete keys explicitly with ``delete()``. This is an easy way
+of clearing the cache for a particular object::
+
     >>> cache.delete('a')
 
 That's it. The cache has very few restrictions: You can cache any object that
 can be pickled safely, although keys must be strings.
 
-Controlling cache: Using Vary headers
-=====================================
+Upstream caches
+===============
 
-The Django cache framework works with `HTTP Vary headers`_ to allow developers
-to instruct caching mechanisms to differ their cache contents depending on
-request HTTP headers.
+So far, this document has focused on caching your *own* data. But another type
+of caching is relevant to Web development, too: caching performed by "upstream"
+caches. These are systems that cache pages for users even before the request
+reaches your Web site.
 
-Essentially, the ``Vary`` response HTTP header defines which request headers a
-cache mechanism should take into account when building its cache key.
+Here are a few examples of upstream caches:
+
+    * Your ISP may cache certain pages, so if you requested a page from
+      somedomain.com, your ISP would send you the page without having to access
+      somedomain.com directly.
+
+    * Your Django Web site may site behind a Squid Web proxy
+      (http://www.squid-cache.org/) that caches pages for performance. In this
+      case, each request first would be handled by Squid, and it'd only be
+      passed to your application if needed.
+
+    * Your Web browser caches pages, too. If a Web page sends out the right
+      headers, your browser will use the local (cached) copy for subsequent
+      requests to that page.
+
+Upstream caching is a nice efficiency boost, but there's a danger to it:
+Many Web pages' contents differ based on authentication and a host of other
+variables, and cache systems that blindly save pages based purely on URLs could
+expose incorrect or sensitive data to subsequent visitors to those pages.
+
+For example, say you operate a Web e-mail system, and the contents of the
+"inbox" page obviously depend on which user is logged in. If an ISP blindly
+cached your site, then the first user who logged in through that ISP would have
+his user-specific inbox page cached for subsequent visitors to the site. That's
+not cool.
+
+Fortunately, HTTP provides a solution to this problem: A set of HTTP headers
+exist to instruct caching mechanisms to differ their cache contents depending
+on designated variables, and to tell caching mechanisms not to cache particular
+pages.
+
+Using Vary headers
+==================
+
+One of these headers is ``Vary``. It defines which request headers a cache
+mechanism should take into account when building its cache key. For example, if
+the contents of a Web page depend on a user's language preference, the page is
+said to "vary on language."
 
 By default, Django's cache system creates its cache keys using the requested
 path -- e.g., ``"/stories/2005/jun/23/bank_robbed/"``. This means every request
@@ -241,7 +407,7 @@ setting the ``Vary`` header (using something like
 ``response['Vary'] = 'user-agent'``) is that the decorator adds to the ``Vary``
 header (which may already exist) rather than setting it from scratch.
 
-Note that you can pass multiple headers to ``vary_on_headers()``::
+You can pass multiple headers to ``vary_on_headers()``::
 
     @vary_on_headers('User-Agent', 'Cookie')
     def my_view(request):
@@ -261,7 +427,8 @@ decorator. These two views are equivalent::
 Also note that the headers you pass to ``vary_on_headers`` are not case
 sensitive. ``"User-Agent"`` is the same thing as ``"user-agent"``.
 
-You can also use a helper function, ``patch_vary_headers()``, directly::
+You can also use a helper function, ``django.utils.cache.patch_vary_headers``,
+directly::
 
     from django.utils.cache import patch_vary_headers
     def my_view(request):
@@ -273,7 +440,9 @@ You can also use a helper function, ``patch_vary_headers()``, directly::
 ``patch_vary_headers`` takes an ``HttpResponse`` instance as its first argument
 and a list/tuple of header names as its second argument.
 
-.. _`HTTP Vary headers`: http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.44
+For more on Vary headers, see the `official Vary spec`_.
+
+.. _`official Vary spec`: http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.44
 
 Controlling cache: Using other headers
 ======================================
@@ -317,15 +486,19 @@ cache on every access and to store cached versions for, at most, 3600 seconds::
     def my_view(request):
         ...
 
-Any valid ``Cache-Control`` directive is valid in ``cache_control()``. For a
-full list, see the `Cache-Control spec`_. Just pass the directives as keyword
-arguments to ``cache_control()``, substituting underscores for hyphens. For
-directives that don't take an argument, set the argument to ``True``.
+Any valid ``Cache-Control`` HTTP directive is valid in ``cache_control()``.
+Here's a full list:
 
-Examples:
+    * ``public=True``
+    * ``private=True``
+    * ``no_cache=True``
+    * ``no_transform=True``
+    * ``must_revalidate=True``
+    * ``proxy_revalidate=True``
+    * ``max_age=num_seconds``
+    * ``s_maxage=num_seconds``
 
-    * ``@cache_control(max_age=3600)`` turns into ``max-age=3600``.
-    * ``@cache_control(public=True)`` turns into ``public``.
+For explanation of Cache-Control HTTP directives, see the `Cache-Control spec`_.
 
 (Note that the caching middleware already sets the cache header's max-age with
 the value of the ``CACHE_MIDDLEWARE_SETTINGS`` setting. If you use a custom

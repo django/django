@@ -1,7 +1,6 @@
 * html #container { position:static; } /* keep header from flowing off the page */
 * html .colMS #content-related { margin-right:0; margin-left:10px; position:static; } /* put the right sidebars back on the page */
 * html .colSM #content-related { margin-right:10px; margin-left:-115px; position:static; } /* put the left sidebars back on the page */
+* html .form-row { height:1%; }
 * html .dashboard #content { width:768px; } /* proper fixed width for dashboard in IE6 */
 * html .dashboard #content-main { width:535px; } /* proper fixed width for dashboard in IE6 */
-* html #content { width /**/: 768px; } /* fixed width for IE5 */
-* html #content-main { width /**/: 535px; } /* fixed width for IE5 */

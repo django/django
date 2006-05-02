@@ -1,8 +1,8 @@
 from django.core.exceptions import ImproperlyConfigured, ObjectDoesNotExist
-from django.core.template import Context, loader, Template, TemplateDoesNotExist
-from django.models.core import sites
+from django.template import Context, loader, Template, TemplateDoesNotExist
+from django.contrib.sites.models import Site
 from django.utils import feedgenerator
-from django.conf.settings import LANGUAGE_CODE, SETTINGS_MODULE
+from django.conf import settings
 
 def add_domain(domain, url):
     if not url.startswith('http://'):
@@ -60,7 +60,7 @@ class Feed:
         else:
             obj = None
 
-        current_site = sites.get_current()
+        current_site = Site.objects.get_current()
         link = self.__get_dynamic_attr('link', obj)
         link = add_domain(current_site.domain, link)
 
@@ -68,7 +68,7 @@ class Feed:
             title = self.__get_dynamic_attr('title', obj),
             link = link,
             description = self.__get_dynamic_attr('description', obj),
-            language = LANGUAGE_CODE.decode(),
+            language = settings.LANGUAGE_CODE.decode(),
             feed_url = add_domain(current_site, self.feed_url),
             author_name = self.__get_dynamic_attr('author_name', obj),
             author_link = self.__get_dynamic_attr('author_link', obj),
@@ -76,11 +76,11 @@ class Feed:
         )
 
         try:
-            title_template = loader.get_template('feeds/%s_title' % self.slug)
+            title_template = loader.get_template('feeds/%s_title.html' % self.slug)
         except TemplateDoesNotExist:
             title_template = Template('{{ obj }}')
         try:
-            description_template = loader.get_template('feeds/%s_description' % self.slug)
+            description_template = loader.get_template('feeds/%s_description.html' % self.slug)
         except TemplateDoesNotExist:
             description_template = Template('{{ obj }}')
 

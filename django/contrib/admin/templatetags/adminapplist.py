@@ -1,4 +1,5 @@
-from django.core import template
+from django import template
+from django.db.models import get_models
 
 register = template.Library()
 
@@ -7,20 +8,24 @@ class AdminApplistNode(template.Node):
         self.varname = varname
 
     def render(self, context):
-        from django.core import meta
+        from django.db import models
         from django.utils.text import capfirst
         app_list = []
         user = context['user']
 
-        for app in meta.get_installed_model_modules():
-            app_label = app.__name__[app.__name__.rindex('.')+1:]
+        for app in models.get_apps():
+            # Determine the app_label.
+            app_models = get_models(app)
+            if not app_models:
+                continue
+            app_label = app_models[0]._meta.app_label
+
             has_module_perms = user.has_module_perms(app_label)
 
             if has_module_perms:
                 model_list = []
-                for m in app._MODELS:
+                for m in app_models:
                     if m._meta.admin:
-                        module_name = m._meta.module_name
                         perms = {
                             'add': user.has_perm("%s.%s" % (app_label, m._meta.get_add_permission())),
                             'change': user.has_perm("%s.%s" % (app_label, m._meta.get_change_permission())),
@@ -32,7 +37,7 @@ class AdminApplistNode(template.Node):
                         if True in perms.values():
                             model_list.append({
                                 'name': capfirst(m._meta.verbose_name_plural),
-                                'admin_url': '%s/%s/' % (app_label, m._meta.module_name),
+                                'admin_url': '%s/%s/' % (app_label, m.__name__.lower()),
                                 'perms': perms,
                             })
 

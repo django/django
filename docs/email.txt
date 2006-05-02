@@ -20,11 +20,11 @@ In two lines::
     send_mail('Subject here', 'Here is the message.', 'from@example.com',
         ['to@example.com'], fail_silently=False)
 
-The send_mail function
-======================
+send_mail()
+===========
 
 The simplest way to send e-mail is using the function
-``django.core.mail.send_mail``. Here's its definition::
+``django.core.mail.send_mail()``. Here's its definition::
 
     send_mail(subject, message, from_email, recipient_list,
         fail_silently=False, auth_user=EMAIL_HOST_USER,
@@ -42,20 +42,19 @@ are required.
     * ``fail_silently``: A boolean. If it's ``False``, ``send_mail`` will raise
       an ``smtplib.SMTPException``. See the `smtplib docs`_ for a list of
       possible exceptions, all of which are subclasses of ``SMTPException``.
-    * ``auth_user``: **New in Django development version.** The optional
-      username to use to authenticate to the SMTP server. If this isn't
-      provided, Django will use the value of the ``EMAIL_HOST_USER`` setting.
-    * ``auth_password``: **New in Django development version.** The optional
-      password to use to authenticate to the SMTP server. If this isn't
-      provided, Django will use the value of the ``EMAIL_HOST_PASSWORD``
-      setting.
+    * ``auth_user``: The optional username to use to authenticate to the SMTP
+      server. If this isn't provided, Django will use the value of the
+      ``EMAIL_HOST_USER`` setting.
+    * ``auth_password``: The optional password to use to authenticate to the
+      SMTP server. If this isn't provided, Django will use the value of the
+      ``EMAIL_HOST_PASSWORD`` setting.
 
 .. _smtplib docs: http://www.python.org/doc/current/lib/module-smtplib.html
 
-The send_mass_mail function
-===========================
+send_mass_mail()
+================
 
-``django.core.mail.send_mass_mail`` is intended to handle mass e-mailing.
+``django.core.mail.send_mass_mail()`` is intended to handle mass e-mailing.
 Here's the definition::
 
     send_mass_mail(datatuple, fail_silently=False,
@@ -66,25 +65,24 @@ Here's the definition::
     (subject, message, from_email, recipient_list)
 
 ``fail_silently``, ``auth_user`` and ``auth_password`` have the same functions
-as in ``send_mail()``. Note that ``auth_user`` and ``auth_password`` are only
-available in the Django development version.
+as in ``send_mail()``.
 
 Each separate element of ``datatuple`` results in a separate e-mail message.
 As in ``send_mail()``, recipients in the same ``recipient_list`` will all see
 the other addresses in the e-mail messages's "To:" field.
 
-send_mass_mail vs. send_mail
-----------------------------
+send_mass_mail() vs. send_mail()
+--------------------------------
 
 The main difference between ``send_mass_mail()`` and ``send_mail()`` is that
 ``send_mail()`` opens a connection to the mail server each time it's executed,
 while ``send_mass_mail()`` uses a single connection for all of its messages.
 This makes ``send_mass_mail()`` slightly more efficient.
 
-The mail_admins function
-========================
+mail_admins()
+=============
 
-``django.core.mail.mail_admins`` is a shortcut for sending an e-mail to the
+``django.core.mail.mail_admins()`` is a shortcut for sending an e-mail to the
 site admins, as defined in the `ADMINS setting`_. Here's the definition::
 
     mail_admins(subject, message, fail_silently=False)
@@ -94,14 +92,16 @@ site admins, as defined in the `ADMINS setting`_. Here's the definition::
 
 The "From:" header of the e-mail will be the value of the `SERVER_EMAIL setting`_.
 
+This method exists for convenience and readability.
+
 .. _ADMINS setting: http://www.djangoproject.com/documentation/settings/#admins
 .. _EMAIL_SUBJECT_PREFIX setting: http://www.djangoproject.com/documentation/settings/#email-subject-prefix
 .. _SERVER_EMAIL setting: http://www.djangoproject.com/documentation/settings/#server-email
 
-The mail_managers function
-==========================
+mail_managers() function
+========================
 
-``django.core.mail.mail_managers`` is just like ``mail_admins``, except it
+``django.core.mail.mail_managers()`` is just like ``mail_admins()``, except it
 sends an e-mail to the site managers, as defined in the `MANAGERS setting`_.
 Here's the definition::
 

@@ -2,8 +2,6 @@
 Writing your first Django app, part 4
 =====================================
 
-By Adrian Holovaty <holovaty@gmail.com>
-
 This tutorial begins where `Tutorial 3`_ left off. We're continuing the Web-poll
 application and will focus on simple form processing and cutting down our code.
 
@@ -18,7 +16,7 @@ template contains an HTML ``<form>`` element::
     {% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
 
     <form action="/polls/{{ poll.id }}/vote/" method="post">
-    {% for choice in poll.get_choice_list %}
+    {% for choice in poll.choice_set.all %}
         <input type="radio" name="choice" id="choice{{ forloop.counter }}" value="{{ choice.id }}" />
         <label for="choice{{ forloop.counter }}">{{ choice.choice }}</label><br />
     {% endfor %}
@@ -41,24 +39,24 @@ A quick rundown:
       Django; it's just good Web development practice.
 
 Now, let's create a Django view that handles the submitted data and does
-something with it. Remember, in `Tutorial 3`_, we create a URLconf that
-included this line::
+something with it. Remember, in `Tutorial 3`_, we created a URLconf for the
+polls application that includes this line::
 
-    (r'^polls/(?P<poll_id>\d+)/vote/$', 'myproject.polls.views.vote'),
+    (r'^(?P<poll_id>\d+)/vote/$', 'mysite.polls.views.vote'),
 
-So let's create a ``vote()`` function in ``myproject/polls/views.py``::
+So let's create a ``vote()`` function in ``mysite/polls/views.py``::
 
-    from django.core.extensions import get_object_or_404, render_to_response
-    from django.models.polls import choices, polls
-    from django.utils.httpwrappers import HttpResponseRedirect
-
+    from django.shortcuts import get_object_or_404, render_to_response
+    from django.http import HttpResponseRedirect
+    from mysite.polls.models import Choice, Poll
+    # ...
     def vote(request, poll_id):
-        p = get_object_or_404(polls, pk=poll_id)
+        p = get_object_or_404(Poll, pk=poll_id)
         try:
-            selected_choice = p.get_choice(pk=request.POST['choice'])
-        except (KeyError, choices.ChoiceDoesNotExist):
+            selected_choice = p.choice_set.get(pk=request.POST['choice'])
+        except (KeyError, Choice.DoesNotExist):
             # Redisplay the poll voting form.
-            return render_to_response('polls/detail', {
+            return render_to_response('polls/detail.html', {
                 'poll': p,
                 'error_message': "You didn't select a choice.",
             })
@@ -102,8 +100,8 @@ After somebody votes in a poll, the ``vote()`` view redirects to the results
 page for the poll. Let's write that view::
 
     def results(request, poll_id):
-        p = get_object_or_404(polls, pk=poll_id)
-        return render_to_response('polls/results', {'poll': p})
+        p = get_object_or_404(Poll, pk=poll_id)
+        return render_to_response('polls/results.html', {'poll': p})
 
 This is almost exactly the same as the ``detail()`` view from `Tutorial 3`_.
 The only difference is the template name. We'll fix this redundancy later.
@@ -113,7 +111,7 @@ Now, create a ``results.html`` template::
     <h1>{{ poll.question }}</h1>
 
     <ul>
-    {% for choice in poll.get_choice_list %}
+    {% for choice in poll.choice_set.all %}
         <li>{{ choice.choice }} -- {{ choice.votes }} vote{{ choice.votes|pluralize }}</li>
     {% endfor %}
     </ul>
@@ -153,12 +151,12 @@ conversion.
 
     You should know basic math before you start using a calculator.
 
-First, open the polls.py URLconf. It looks like this, according to the tutorial
-so far::
+First, open the polls/urls.py URLconf. It looks like this, according to the
+tutorial so far::
 
     from django.conf.urls.defaults import *
 
-    urlpatterns = patterns('myproject.polls.views',
+    urlpatterns = patterns('mysite.polls.views',
         (r'^$', 'index'),
         (r'^(?P<poll_id>\d+)/$', 'detail'),
         (r'^(?P<poll_id>\d+)/results/$', 'results'),
@@ -168,56 +166,62 @@ so far::
 Change it like so::
 
     from django.conf.urls.defaults import *
+    from mysite.polls.models import Poll
 
     info_dict = {
-        'app_label': 'polls',
-        'module_name': 'polls',
+        'queryset': Poll.objects.all(),
     }
 
     urlpatterns = patterns('',
         (r'^$', 'django.views.generic.list_detail.object_list', info_dict),
         (r'^(?P<object_id>\d+)/$', 'django.views.generic.list_detail.object_detail', info_dict),
-        (r'^(?P<object_id>\d+)/results/$', 'django.views.generic.list_detail.object_detail', dict(info_dict, template_name='polls/results')),
-        (r'^(?P<poll_id>\d+)/vote/$', 'myproject.polls.views.vote'),
+        (r'^(?P<object_id>\d+)/results/$', 'django.views.generic.list_detail.object_detail', dict(info_dict, template_name='polls/results.html')),
+        (r'^(?P<poll_id>\d+)/vote/$', 'mysite.polls.views.vote'),
     )
 
 We're using two generic views here: ``object_list`` and ``object_detail``.
 Respectively, those two views abstract the concepts of "display a list of
 objects" and "display a detail page for a particular type of object."
 
-    * Each generic view needs to know which ``app_label`` and ``module_name``
-      it's acting on. Thus, we've defined ``info_dict``, a dictionary that's
-      passed to each of the generic views via the third parameter to the URL
-      tuples.
+    * Each generic view needs to know what data it will be acting upon. This
+      data is provided in a dictionary. The ``queryset`` key in this dictionary
+      points to the list of objects to be manipulated by the generic view.
 
-    * The ``object_detail`` generic view expects that the ID value captured
-      from the URL is called ``"object_id"``, so we've changed ``poll_id`` to
+    * The ``object_detail`` generic view expects the ID value captured
+      from the URL to be called ``"object_id"``, so we've changed ``poll_id`` to
       ``object_id`` for the generic views.
 
 By default, the ``object_detail`` generic view uses a template called
-``<app_label>/<module_name>_detail``. In our case, it'll use the template
-``"polls/polls_detail"``. Thus, rename your ``polls/detail.html`` template to
-``polls/polls_detail.html``, and change the ``render_to_response()`` line in
+``<app name>/<module name>_detail.html``. In our case, it'll use the template
+``"polls/poll_detail.html"``. Thus, rename your ``polls/detail.html`` template to
+``polls/poll_detail.html``, and change the ``render_to_response()`` line in
 ``vote()``.
 
 Similarly, the ``object_list`` generic view uses a template called
-``<app_label>/<module_name>_list``. Thus, rename ``polls/index.html`` to
-``polls/polls_list.html``.
+``<app name>/<module name>_list.html``. Thus, rename ``poll/index.html`` to
+``polls/poll_list.html``.
 
 Because we have more than one entry in the URLconf that uses ``object_detail``
 for the polls app, we manually specify a template name for the results view:
-``template_name='polls/results'``. Otherwise, both views would use the same
+``template_name='polls/results.html'``. Otherwise, both views would use the same
 template. Note that we use ``dict()`` to return an altered dictionary in place.
 
-The generic views pass ``object`` and ``object_list`` to their templates, so
-change your templates so that ``latest_poll_list`` becomes ``object_list`` and
-``poll`` becomes ``object``.
+In previous versions of the tutorial, the templates have been provided with a context
+that contains the ``poll` and ``latest_poll_list`` context variables. However,
+the generic views provide the variables ``object`` and ``object_list`` as context.
+Therefore, you need to change your templates to match the new context variables.
+Go through your templates, and modify any reference to ``latest_poll_list`` to
+``object_list``, and change any reference to ``poll`` to ``object``.
 
-In the ``vote()`` view, change the template call from ``polls/detail`` to
-``polls/polls_detail``, and pass ``object`` in the context instead of ``poll``.
+You can now delete the ``index()``, ``detail()`` and ``results()`` views
+from ``polls/views.py``. We don't need them anymore -- they have been replaced
+by generic views.
 
-Finally, you can delete the ``index()``, ``detail()`` and ``results()`` views
-from ``polls/views.py``. We don't need them anymore.
+The ``vote()`` view is still required. However, it must be modified to match
+the new templates and context variables. Change the template call from ``polls/detail``
+to ``polls/polls_detail``, and pass ``object`` in the context instead of ``poll``.
+
+Run the server, and use your new polling app based on generic views.
 
 For full details on generic views, see the `generic views documentation`_.
 

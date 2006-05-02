@@ -1,5 +1,5 @@
 from django.conf import settings
-from django.utils import httpwrappers
+from django import http
 from django.core.mail import mail_managers
 import md5, os
 
@@ -27,10 +27,11 @@ class CommonMiddleware:
         if request.META.has_key('HTTP_USER_AGENT'):
             for user_agent_regex in settings.DISALLOWED_USER_AGENTS:
                 if user_agent_regex.search(request.META['HTTP_USER_AGENT']):
-                    return httpwrappers.HttpResponseForbidden('<h1>Forbidden</h1>')
+                    return http.HttpResponseForbidden('<h1>Forbidden</h1>')
 
         # Check for a redirect based on settings.APPEND_SLASH and settings.PREPEND_WWW
-        old_url = [request.META.get('HTTP_HOST', ''), request.path]
+        host = http.get_host(request)
+        old_url = [host, request.path]
         new_url = old_url[:]
         if settings.PREPEND_WWW and old_url[0] and not old_url[0].startswith('www.'):
             new_url[0] = 'www.' + old_url[0]
@@ -46,7 +47,7 @@ class CommonMiddleware:
                 newurl = new_url[1]
             if request.GET:
                 newurl += '?' + request.GET.urlencode()
-            return httpwrappers.HttpResponsePermanentRedirect(newurl)
+            return http.HttpResponsePermanentRedirect(newurl)
 
         return None
 
@@ -56,7 +57,7 @@ class CommonMiddleware:
             if settings.SEND_BROKEN_LINK_EMAILS:
                 # If the referrer was from an internal link or a non-search-engine site,
                 # send a note to the managers.
-                domain = request.META['HTTP_HOST']
+                domain = http.get_host(request)
                 referer = request.META.get('HTTP_REFERER', None)
                 is_internal = referer and (domain in referer)
                 path = request.get_full_path()
@@ -69,7 +70,7 @@ class CommonMiddleware:
         if settings.USE_ETAGS:
             etag = md5.new(response.content).hexdigest()
             if request.META.get('HTTP_IF_NONE_MATCH') == etag:
-                response = httpwrappers.HttpResponseNotModified()
+                response = http.HttpResponseNotModified()
             else:
                 response['ETag'] = etag
 

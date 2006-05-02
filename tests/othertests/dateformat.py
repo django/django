@@ -1,14 +1,16 @@
-"""
+r"""
 >>> format(my_birthday, '')
 ''
 >>> format(my_birthday, 'a')
 'p.m.'
 >>> format(my_birthday, 'A')
 'PM'
+>>> format(my_birthday, 'd')
+'08'
 >>> format(my_birthday, 'j')
-'7'
+'8'
 >>> format(my_birthday, 'l')
-'Saturday'
+'Sunday'
 >>> format(my_birthday, 'L')
 'False'
 >>> format(my_birthday, 'm')
@@ -24,7 +26,7 @@
 >>> format(my_birthday, 'P')
 '10 p.m.'
 >>> format(my_birthday, 'r')
-'Sat, 7 Jul 1979 22:00:00 +0100'
+'Sun, 8 Jul 1979 22:00:00 +0100'
 >>> format(my_birthday, 's')
 '00'
 >>> format(my_birthday, 'S')
@@ -34,9 +36,9 @@
 >>> format(my_birthday, 'T')
 'CET'
 >>> format(my_birthday, 'U')
-'300445200'
+'300531600'
 >>> format(my_birthday, 'w')
-'6'
+'0'
 >>> format(my_birthday, 'W')
 '27'
 >>> format(my_birthday, 'y')
@@ -44,7 +46,7 @@
 >>> format(my_birthday, 'Y')
 '1979'
 >>> format(my_birthday, 'z')
-'188'
+'189'
 >>> format(my_birthday, 'Z')
 '3600'
 
@@ -57,8 +59,11 @@
 >>> format(wintertime, 'O')
 '+0100'
 
->>> format(my_birthday, 'Y z \\C\\E\\T')
-'1979 188 CET'
+>>> format(my_birthday, r'Y z \C\E\T')
+'1979 189 CET'
+
+>>> format(my_birthday, r'jS o\f F')
+'8th of July'
 """
 
 from django.utils import dateformat, translation
@@ -70,6 +75,6 @@ translation.activate('en-us')
 
 time.tzset()
 
-my_birthday = datetime.datetime(1979, 7, 7, 22, 00)
+my_birthday = datetime.datetime(1979, 7, 8, 22, 00)
 summertime = datetime.datetime(2005, 10, 30, 1, 00)
 wintertime = datetime.datetime(2005, 10, 30, 4, 00)

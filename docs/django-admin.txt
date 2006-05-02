@@ -1,14 +1,9 @@
-===========================
-The django-admin.py utility
-===========================
+=============================
+django-admin.py and manage.py
+=============================
 
 ``django-admin.py`` is Django's command-line utility for administrative tasks.
 This document outlines all it can do.
-
-The ``django-admin.py`` script should be on your system path if you installed
-Django via its ``setup.py`` utility. If it's not on your path, you can find it in
-``site-packages/django/bin`` within your Python installation. Consider
-symlinking to it from some place on your path, such as ``/usr/local/bin``.
 
 In addition, ``manage.py`` is automatically created in each Django project.
 ``manage.py`` is a thin wrapper around ``django-admin.py`` that takes care of
@@ -18,6 +13,11 @@ two things for you before delegating to ``django-admin.py``:
 
     * It sets the ``DJANGO_SETTINGS_MODULE`` environment variable so that it
       points to your project's ``settings.py`` file.
+
+The ``django-admin.py`` script should be on your system path if you installed
+Django via its ``setup.py`` utility. If it's not on your path, you can find it in
+``site-packages/django/bin`` within your Python installation. Consider
+symlinking to it from some place on your path, such as ``/usr/local/bin``.
 
 Generally, when working on a single Django project, it's easier to use
 ``manage.py``. Use ``django-admin.py`` with ``DJANGO_SETTINGS_MODULE``, or the
@@ -38,18 +38,17 @@ document.
 Run ``django-admin.py --help`` to display a help message that includes a terse
 list of all available actions and options.
 
-Most actions take a list of "modelmodule"s. A "modelmodule," in this case, is
-the name of a file containing Django models. For example, if you have a model
-module called ``myproject/apps/polls/pollmodels.py``, the "modelmodule" in this
-case would be ``"pollmodels"``.
+Most actions take a list of ``appname``s. An ``appname`` is the basename of the
+package containing your models. For example, if your ``INSTALLED_APPS``
+contains the string ``'mysite.blog'``, the ``appname`` is ``blog``.
 
 Available actions
 =================
 
-adminindex [modelmodule modelmodule ...]
-----------------------------------------
+adminindex [appname appname ...]
+--------------------------------
 
-Prints the admin-index template snippet for the given model module(s).
+Prints the admin-index template snippet for the given appnames.
 
 Use admin-index template snippets if you want to customize the look and feel of
 your admin's index page. See `Tutorial 2`_ for more information.
@@ -64,29 +63,41 @@ backend.  See the `cache documentation`_ for more information.
 
 .. _cache documentation: http://www.djangoproject.com/documentation/cache/
 
-createsuperuser
----------------
+dbshell
+-------
 
-Creates a superuser account interactively. It asks you for a username, e-mail
-address and password.
+Runs the command-line client for the database engine specified in your
+``DATABASE_ENGINE`` setting, with the connection parameters specified in your
+``DATABASE_USER``, ``DATABASE_PASSWORD``, etc., settings.
 
-You can specify ``username email password`` on the command line, for convenient
-use in shell scripts. Example::
+    * For PostgreSQL, this runs the ``psql`` command-line client.
+    * For MySQL, this runs the ``mysql`` command-line client.
+    * For SQLite, this runs the ``sqlite3`` command-line client.
 
-    django-admin.py createsuperuser john john@example.com mypassword
+This command assumes the programs are on your ``PATH`` so that a simple call to
+the program name (``psql``, ``mysql``, ``sqlite3``) will find the program in
+the right place. There's no way to specify the location of the program
+manually.
 
-init
-----
+diffsettings
+------------
 
-Initializes the database with the tables and data Django needs by default.
-Specifically, these are the database tables from the ``auth`` and ``core``
-models.
+Displays differences between the current settings file and Django's default
+settings.
 
-inspectdb [dbname]
-------------------
+Settings that don't appear in the defaults are followed by ``"###"``. For
+example, the default settings don't define ``ROOT_URLCONF``, so
+``ROOT_URLCONF`` is followed by ``"###"`` in the output of ``diffsettings``.
 
-Introspects the database tables in the given database and outputs a Django
-model module to standard output.
+Note that Django's default settings live in ``django/conf/global_settings.py``,
+if you're ever curious to see the full list of defaults.
+
+inspectdb
+---------
+
+Introspects the database tables in the database pointed-to by the
+``DATABASE_NAME`` setting and outputs a Django model module (a ``models.py``
+file) to standard output.
 
 Use this if you have a legacy database with which you'd like to use Django.
 The script will inspect the database and create a model for each table within
@@ -101,12 +112,12 @@ output:
       ``'This field type is a guess.'`` next to the field in the generated
       model.
 
-    * **New in Django development version.** If the database column name is a
-      Python reserved word (such as ``'pass'``, ``'class'`` or ``'for'``),
-      ``inspectdb`` will append ``'_field'`` to the attribute name. For
-      example, if a table has a column ``'for'``, the generated model will have
-      a field ``'for_field'``, with the ``db_column`` attribute set to
-      ``'for'``. ``inspectdb`` will insert the Python comment
+    * If the database column name is a Python reserved word (such as
+      ``'pass'``, ``'class'`` or ``'for'``), ``inspectdb`` will append
+      ``'_field'`` to the attribute name. For example, if a table has a column
+      ``'for'``, the generated model will have a field ``'for_field'``, with
+      the ``db_column`` attribute set to ``'for'``. ``inspectdb`` will insert
+      the Python comment
       ``'Field renamed because it was a Python reserved word.'`` next to the
       field.
 
@@ -115,25 +126,16 @@ you run it, you'll want to look over the generated models yourself to make
 customizations. In particular, you'll need to rearrange models' order, so that
 models that refer to other models are ordered properly.
 
-If you're using Django 0.90 or 0.91, you'll need to add ``primary_key=True`` to
-one field in each model. In the Django development version, primary keys are
-automatically introspected for PostgreSQL and MySQL, and Django puts in the
-``primary_key=True`` where needed.
+Primary keys are automatically introspected for PostgreSQL and MySQL, in which
+case Django puts in the ``primary_key=True`` where needed.
 
 ``inspectdb`` works with PostgreSQL, MySQL and SQLite. Foreign-key detection
-only works in PostgreSQL.
+only works in PostgreSQL and with certain types of MySQL tables.
 
-install [modelmodule modelmodule ...]
--------------------------------------
+install [appname appname ...]
+-----------------------------
 
-Executes the equivalent of ``sqlall`` for the given model module(s).
-
-installperms [modelmodule modelmodule ...]
-------------------------------------------
-
-Installs any admin permissions for the given model module(s) that aren't
-already installed in the database. Outputs a message telling how many
-permissions were added, if any.
+Executes the equivalent of ``sqlall`` for the given appnames.
 
 runserver [optional port number, or ipaddr:port]
 ------------------------------------------------
@@ -144,7 +146,7 @@ IP address and port number explicitly.
 
 If you run this script as a user with normal privileges (recommended), you
 might not have access to start a port on a low port number. Low port numbers
-are reserved for superusers (root).
+are reserved for the superuser (root).
 
 DO NOT USE THIS SERVER IN A PRODUCTION SETTING.
 
@@ -153,7 +155,7 @@ needed. You don't need to restart the server for code changes to take effect.
 
 When you start the server, and each time you change Python code while the
 server is running, the server will validate all of your installed models. (See
-the "validate" option below.) If the validator finds errors, it will print
+the ``validate`` command below.) If the validator finds errors, it will print
 them to standard output, but it won't stop the server.
 
 You can run as many servers as you want, as long as they're on separate ports.
@@ -180,49 +182,49 @@ shell
 
 Starts the Python interactive interpreter.
 
-**New in Django development version:** Uses IPython_, if it's installed. If you
-have IPython installed and want to force use of the "plain" Python interpreter,
-use the ``--plain`` option, like so::
+Django will use IPython_, if it's installed. If you have IPython installed and
+want to force use of the "plain" Python interpreter, use the ``--plain``
+option, like so::
 
     django-admin.py shell --plain
 
 .. _IPython: http://ipython.scipy.org/
 
-sql [modelmodule modelmodule ...]
----------------------------------
+sql [appname appname ...]
+-------------------------
 
-Prints the CREATE TABLE SQL statements for the given model module(s).
+Prints the CREATE TABLE SQL statements for the given appnames.
 
-sqlall [modelmodule modelmodule ...]
-------------------------------------
+sqlall [appname appname ...]
+----------------------------
 
-Prints the CREATE TABLE and initial-data SQL statements for the given model module(s).
+Prints the CREATE TABLE and initial-data SQL statements for the given appnames.
 
-sqlclear [modelmodule modelmodule ...]
+sqlclear [appname appname ...]
 --------------------------------------
 
-Prints the DROP TABLE SQL statements for the given model module(s).
+Prints the DROP TABLE SQL statements for the given appnames.
 
-sqlindexes [modelmodule modelmodule ...]
+sqlindexes [appname appname ...]
 ----------------------------------------
 
-Prints the CREATE INDEX SQL statements for the given model module(s).
+Prints the CREATE INDEX SQL statements for the given appnames.
 
-sqlinitialdata [modelmodule modelmodule ...]
+sqlinitialdata [appname appname ...]
 --------------------------------------------
 
-Prints the initial INSERT SQL statements for the given model module(s).
+Prints the initial INSERT SQL statements for the given appnames.
 
-sqlreset [modelmodule modelmodule ...]
+sqlreset [appname appname ...]
 --------------------------------------
 
-Prints the DROP TABLE SQL, then the CREATE TABLE SQL, for the given model module(s).
+Prints the DROP TABLE SQL, then the CREATE TABLE SQL, for the given appnames.
 
-sqlsequencereset [modelmodule modelmodule ...]
+sqlsequencereset [appname appname ...]
 ----------------------------------------------
 
 Prints the SQL statements for resetting PostgreSQL sequences for the given
-model module(s).
+appnames.
 
 See http://simon.incutio.com/archive/2004/04/21/postgres for more information.
 
@@ -252,11 +254,12 @@ Available options
 
 Example usage::
 
-    django-admin.py init --settings=myproject.settings
+    django-admin.py syncdb --settings=mysite.settings
 
 Explicitly specifies the settings module to use. The settings module should be
-in Python path syntax, e.g. "myproject.settings". If this isn't provided,
-``django-admin.py`` will use the DJANGO_SETTINGS_MODULE environment variable.
+in Python package syntax, e.g. ``mysite.settings``. If this isn't provided,
+``django-admin.py`` will use the ``DJANGO_SETTINGS_MODULE`` environment
+variable.
 
 Note that this option is unnecessary in ``manage.py``, because it takes care of
 setting ``DJANGO_SETTINGS_MODULE`` for you.
@@ -266,7 +269,7 @@ setting ``DJANGO_SETTINGS_MODULE`` for you.
 
 Example usage::
 
-    django-admin.py init --pythonpath='/home/djangoprojects/myproject'
+    django-admin.py syncdb --pythonpath='/home/djangoprojects/myproject'
 
 Adds the given filesystem path to the Python `import search path`_. If this
 isn't provided, ``django-admin.py`` will use the ``PYTHONPATH`` environment
@@ -282,3 +285,27 @@ setting the Python path for you.
 
 Displays a help message that includes a terse list of all available actions and
 options.
+
+Extra niceties
+==============
+
+Syntax coloring
+---------------
+
+The ``django-admin.py`` / ``manage.py`` commands that output SQL to standard
+output will use pretty color-coded output if your terminal supports
+ANSI-colored output. It won't use the color codes if you're piping the
+command's output to another program.
+
+Bash completion
+---------------
+
+If you use the Bash shell, consider installing the Django bash completion
+script, which lives in ``extras/django_bash_completion`` in the Django
+distribution. It enables tab-completion of ``django-admin.py`` and
+``manage.py`` commands, so you can, for instance...
+
+    * Type ``django-admin.py``.
+    * Press [TAB] to see all available options.
+    * Type ``sql``, then [TAB], to see all available options whose names start
+      with ``sql``.

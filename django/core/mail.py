@@ -46,9 +46,18 @@ def send_mass_mail(datatuple, fail_silently=False, auth_user=settings.EMAIL_HOST
         msg['Subject'] = subject
         msg['From'] = from_email
         msg['To'] = ', '.join(recipient_list)
-        server.sendmail(from_email, recipient_list, msg.as_string())
-        num_sent += 1
-    server.quit()
+        try:
+            server.sendmail(from_email, recipient_list, msg.as_string())
+            num_sent += 1
+        except:
+            if not fail_silently:
+                raise
+    try:
+        server.quit()
+    except:
+        if fail_silently:
+            return
+        raise
     return num_sent
 
 def mail_admins(subject, message, fail_silently=False):

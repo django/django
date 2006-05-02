@@ -1,16 +1,16 @@
-"Custom template tags for user comments"
-
-from django.core import template
-from django.core.template import loader
+from django.contrib.comments.models import Comment, FreeComment
+from django.contrib.comments.models import PHOTOS_REQUIRED, PHOTOS_OPTIONAL, RATINGS_REQUIRED, RATINGS_OPTIONAL, IS_PUBLIC
+from django.contrib.comments.models import MIN_PHOTO_DIMENSION, MAX_PHOTO_DIMENSION
+from django import template
+from django.template import loader
 from django.core.exceptions import ObjectDoesNotExist
-from django.models.comments import comments, freecomments
-from django.models.core import contenttypes
+from django.contrib.contenttypes.models import ContentType
 import re
 
 register = template.Library()
 
-COMMENT_FORM = 'comments/form'
-FREE_COMMENT_FORM = 'comments/freeform'
+COMMENT_FORM = 'comments/form.html'
+FREE_COMMENT_FORM = 'comments/freeform.html'
 
 class CommentFormNode(template.Node):
     def __init__(self, content_type, obj_id_lookup_var, obj_id, free,
@@ -46,24 +46,24 @@ class CommentFormNode(template.Node):
             context['display_form'] = True
         context['target'] = '%s:%s' % (self.content_type.id, self.obj_id)
         options = []
-        for var, abbr in (('photos_required', comments.PHOTOS_REQUIRED),
-                          ('photos_optional', comments.PHOTOS_OPTIONAL),
-                          ('ratings_required', comments.RATINGS_REQUIRED),
-                          ('ratings_optional', comments.RATINGS_OPTIONAL),
-                          ('is_public', comments.IS_PUBLIC)):
+        for var, abbr in (('photos_required', PHOTOS_REQUIRED),
+                          ('photos_optional', PHOTOS_OPTIONAL),
+                          ('ratings_required', RATINGS_REQUIRED),
+                          ('ratings_optional', RATINGS_OPTIONAL),
+                          ('is_public', IS_PUBLIC)):
             context[var] = getattr(self, var)
             if getattr(self, var):
                 options.append(abbr)
         context['options'] = ','.join(options)
         if self.free:
-            context['hash'] = comments.get_security_hash(context['options'], '', '', context['target'])
+            context['hash'] = Comment.objects.get_security_hash(context['options'], '', '', context['target'])
             default_form = loader.get_template(FREE_COMMENT_FORM)
         else:
             context['photo_options'] = self.photo_options
             context['rating_options'] = normalize_newlines(base64.encodestring(self.rating_options).strip())
             if self.rating_options:
-                context['rating_range'], context['rating_choices'] = comments.get_rating_options(self.rating_options)
-            context['hash'] = comments.get_security_hash(context['options'], context['photo_options'], context['rating_options'], context['target'])
+                context['rating_range'], context['rating_choices'] = Comment.objects.get_rating_options(self.rating_options)
+            context['hash'] = Comment.objects.get_security_hash(context['options'], context['photo_options'], context['rating_options'], context['target'])
             default_form = loader.get_template(COMMENT_FORM)
         output = default_form.render(context)
         context.pop()
@@ -76,13 +76,13 @@ class CommentCountNode(template.Node):
         self.var_name, self.free = var_name, free
 
     def render(self, context):
-        from django.conf.settings import SITE_ID
-        get_count_function = self.free and freecomments.get_count or comments.get_count
+        from django.conf import settings
+        manager = self.free and FreeComment.objects or Comment.objects
         if self.context_var_name is not None:
             self.obj_id = template.resolve_variable(self.context_var_name, context)
-        comment_count = get_count_function(object_id__exact=self.obj_id,
-            content_type__package__label__exact=self.package,
-            content_type__python_module_name__exact=self.module, site__id__exact=SITE_ID)
+        comment_count = manager.filter(object_id__exact=self.obj_id,
+            content_type__app_label__exact=self.package,
+            content_type__model__exact=self.module, site__id__exact=settings.SITE_ID).count()
         context[self.var_name] = comment_count
         return ''
 
@@ -95,8 +95,8 @@ class CommentListNode(template.Node):
         self.extra_kwargs = extra_kwargs or {}
 
     def render(self, context):
-        from django.conf.settings import COMMENTS_BANNED_USERS_GROUP, SITE_ID
-        get_list_function = self.free and freecomments.get_list or comments.get_list_with_karma
+        from django.conf import settings
+        get_list_function = self.free and FreeComment.objects.filter or Comment.objects.get_list_with_karma
         if self.context_var_name is not None:
             try:
                 self.obj_id = template.resolve_variable(self.context_var_name, context)
@@ -104,26 +104,24 @@ class CommentListNode(template.Node):
                 return ''
         kwargs = {
             'object_id__exact': self.obj_id,
-            'content_type__package__label__exact': self.package,
-            'content_type__python_module_name__exact': self.module,
-            'site__id__exact': SITE_ID,
-            'select_related': True,
-            'order_by': (self.ordering + 'submit_date',),
+            'content_type__app_label__exact': self.package,
+            'content_type__model__exact': self.module,
+            'site__id__exact': settings.SITE_ID,
         }
         kwargs.update(self.extra_kwargs)
-        if not self.free and COMMENTS_BANNED_USERS_GROUP:
-            kwargs['select'] = {'is_hidden': 'user_id IN (SELECT user_id FROM auth_users_groups WHERE group_id = %s)' % COMMENTS_BANNED_USERS_GROUP}
-        comment_list = get_list_function(**kwargs)
+        if not self.free and settings.COMMENTS_BANNED_USERS_GROUP:
+            kwargs['select'] = {'is_hidden': 'user_id IN (SELECT user_id FROM auth_user_groups WHERE group_id = %s)' % settings.COMMENTS_BANNED_USERS_GROUP}
+        comment_list = get_list_function(**kwargs).order_by(self.ordering + 'submit_date').select_related()
 
         if not self.free:
             if context.has_key('user') and not context['user'].is_anonymous():
                 user_id = context['user'].id
-                context['user_can_moderate_comments'] = comments.user_is_moderator(context['user'])
+                context['user_can_moderate_comments'] = Comment.objects.user_is_moderator(context['user'])
             else:
                 user_id = None
                 context['user_can_moderate_comments'] = False
             # Only display comments by banned users to those users themselves.
-            if COMMENTS_BANNED_USERS_GROUP:
+            if settings.COMMENTS_BANNED_USERS_GROUP:
                 comment_list = [c for c in comment_list if not c.is_hidden or (user_id == c.user_id)]
 
         context[self.var_name] = comment_list
@@ -157,8 +155,8 @@ class DoCommentForm:
         except ValueError: # unpack list of wrong size
             raise template.TemplateSyntaxError, "Third argument in %r tag must be in the format 'package.module'" % tokens[0]
         try:
-            content_type = contenttypes.get_object(package__label__exact=package, python_module_name__exact=module)
-        except contenttypes.ContentTypeDoesNotExist:
+            content_type = ContentType.objects.get(app_label__exact=package, model__exact=module)
+        except ContentType.DoesNotExist:
             raise template.TemplateSyntaxError, "%r tag has invalid content-type '%s.%s'" % (tokens[0], package, module)
         obj_id_lookup_var, obj_id = None, None
         if tokens[3].isdigit():
@@ -183,8 +181,8 @@ class DoCommentForm:
                         if not opt.isalnum():
                             raise template.TemplateSyntaxError, "Invalid photo directory name in %r tag: '%s'" % (tokens[0], opt)
                     for opt in option_list[1::3] + option_list[2::3]:
-                        if not opt.isdigit() or not (comments.MIN_PHOTO_DIMENSION <= int(opt) <= comments.MAX_PHOTO_DIMENSION):
-                            raise template.TemplateSyntaxError, "Invalid photo dimension in %r tag: '%s'. Only values between %s and %s are allowed." % (tokens[0], opt, comments.MIN_PHOTO_DIMENSION, comments.MAX_PHOTO_DIMENSION)
+                        if not opt.isdigit() or not (MIN_PHOTO_DIMENSION <= int(opt) <= MAX_PHOTO_DIMENSION):
+                            raise template.TemplateSyntaxError, "Invalid photo dimension in %r tag: '%s'. Only values between %s and %s are allowed." % (tokens[0], opt, MIN_PHOTO_DIMENSION, MAX_PHOTO_DIMENSION)
                     # VALIDATION ENDS #########################################
                     kwargs[option] = True
                     kwargs['photo_options'] = args
@@ -237,8 +235,8 @@ class DoCommentCount:
         except ValueError: # unpack list of wrong size
             raise template.TemplateSyntaxError, "Third argument in %r tag must be in the format 'package.module'" % tokens[0]
         try:
-            content_type = contenttypes.get_object(package__label__exact=package, python_module_name__exact=module)
-        except contenttypes.ContentTypeDoesNotExist:
+            content_type = ContentType.objects.get(app_label__exact=package, model__exact=module)
+        except ContentType.DoesNotExist:
             raise template.TemplateSyntaxError, "%r tag has invalid content-type '%s.%s'" % (tokens[0], package, module)
         var_name, obj_id = None, None
         if tokens[3].isdigit():
@@ -292,8 +290,8 @@ class DoGetCommentList:
         except ValueError: # unpack list of wrong size
             raise template.TemplateSyntaxError, "Third argument in %r tag must be in the format 'package.module'" % tokens[0]
         try:
-            content_type = contenttypes.get_object(package__label__exact=package, python_module_name__exact=module)
-        except contenttypes.ContentTypeDoesNotExist:
+            content_type = ContentType.objects.get(app_label__exact=package,model__exact=module)
+        except ContentType.DoesNotExist:
             raise template.TemplateSyntaxError, "%r tag has invalid content-type '%s.%s'" % (tokens[0], package, module)
         var_name, obj_id = None, None
         if tokens[3].isdigit():

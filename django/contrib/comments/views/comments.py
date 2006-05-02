@@ -1,14 +1,17 @@
-from django.core import formfields, validators
+from django.core import validators
+from django import forms
 from django.core.mail import mail_admins, mail_managers
-from django.core.exceptions import Http404, ObjectDoesNotExist
-from django.core.extensions import DjangoContext, render_to_response
-from django.models.auth import users
-from django.models.comments import comments, freecomments
-from django.models.core import contenttypes
-from django.parts.auth.formfields import AuthenticationForm
-from django.utils.httpwrappers import HttpResponseRedirect
+from django.http import Http404
+from django.core.exceptions import ObjectDoesNotExist
+from django.shortcuts import render_to_response
+from django.template import RequestContext
+from django.contrib.auth.models import SESSION_KEY
+from django.contrib.comments.models import Comment, FreeComment, PHOTOS_REQUIRED, PHOTOS_OPTIONAL, RATINGS_REQUIRED, RATINGS_OPTIONAL, IS_PUBLIC
+from django.contrib.contenttypes.models import ContentType
+from django.contrib.auth.forms import AuthenticationForm
+from django.http import HttpResponseRedirect
 from django.utils.text import normalize_newlines
-from django.conf.settings import BANNED_IPS, COMMENTS_ALLOW_PROFANITIES, COMMENTS_SKETCHY_USERS_GROUP, COMMENTS_FIRST_FEW, SITE_ID
+from django.conf import settings
 from django.utils.translation import ngettext
 import base64, datetime
 
@@ -26,37 +29,37 @@ class PublicCommentManipulator(AuthenticationForm):
             else:
                 return []
         self.fields.extend([
-            formfields.LargeTextField(field_name="comment", maxlength=3000, is_required=True,
+            forms.LargeTextField(field_name="comment", maxlength=3000, is_required=True,
                 validator_list=[self.hasNoProfanities]),
-            formfields.RadioSelectField(field_name="rating1", choices=choices,
+            forms.RadioSelectField(field_name="rating1", choices=choices,
                 is_required=ratings_required and num_rating_choices > 0,
                 validator_list=get_validator_list(1),
             ),
-            formfields.RadioSelectField(field_name="rating2", choices=choices,
+            forms.RadioSelectField(field_name="rating2", choices=choices,
                 is_required=ratings_required and num_rating_choices > 1,
                 validator_list=get_validator_list(2),
             ),
-            formfields.RadioSelectField(field_name="rating3", choices=choices,
+            forms.RadioSelectField(field_name="rating3", choices=choices,
                 is_required=ratings_required and num_rating_choices > 2,
                 validator_list=get_validator_list(3),
             ),
-            formfields.RadioSelectField(field_name="rating4", choices=choices,
+            forms.RadioSelectField(field_name="rating4", choices=choices,
                 is_required=ratings_required and num_rating_choices > 3,
                 validator_list=get_validator_list(4),
             ),
-            formfields.RadioSelectField(field_name="rating5", choices=choices,
+            forms.RadioSelectField(field_name="rating5", choices=choices,
                 is_required=ratings_required and num_rating_choices > 4,
                 validator_list=get_validator_list(5),
             ),
-            formfields.RadioSelectField(field_name="rating6", choices=choices,
+            forms.RadioSelectField(field_name="rating6", choices=choices,
                 is_required=ratings_required and num_rating_choices > 5,
                 validator_list=get_validator_list(6),
             ),
-            formfields.RadioSelectField(field_name="rating7", choices=choices,
+            forms.RadioSelectField(field_name="rating7", choices=choices,
                 is_required=ratings_required and num_rating_choices > 6,
                 validator_list=get_validator_list(7),
             ),
-            formfields.RadioSelectField(field_name="rating8", choices=choices,
+            forms.RadioSelectField(field_name="rating8", choices=choices,
                 is_required=ratings_required and num_rating_choices > 7,
                 validator_list=get_validator_list(8),
             ),
@@ -69,25 +72,25 @@ class PublicCommentManipulator(AuthenticationForm):
             self.user_cache = user
 
     def hasNoProfanities(self, field_data, all_data):
-        if COMMENTS_ALLOW_PROFANITIES:
+        if settings.COMMENTS_ALLOW_PROFANITIES:
             return
         return validators.hasNoProfanities(field_data, all_data)
 
     def get_comment(self, new_data):
         "Helper function"
-        return comments.Comment(None, self.get_user_id(), new_data["content_type_id"],
+        return Comment(None, self.get_user_id(), new_data["content_type_id"],
             new_data["object_id"], new_data.get("headline", "").strip(),
             new_data["comment"].strip(), new_data.get("rating1", None),
             new_data.get("rating2", None), new_data.get("rating3", None),
             new_data.get("rating4", None), new_data.get("rating5", None),
             new_data.get("rating6", None), new_data.get("rating7", None),
             new_data.get("rating8", None), new_data.get("rating1", None) is not None,
-            datetime.datetime.now(), new_data["is_public"], new_data["ip_address"], False, SITE_ID)
+            datetime.datetime.now(), new_data["is_public"], new_data["ip_address"], False, settings.SITE_ID)
 
     def save(self, new_data):
         today = datetime.date.today()
         c = self.get_comment(new_data)
-        for old in comments.get_list(content_type__id__exact=new_data["content_type_id"],
+        for old in Comment.objects.filter(content_type__id__exact=new_data["content_type_id"],
             object_id__exact=new_data["object_id"], user__id__exact=self.get_user_id()):
             # Check that this comment isn't duplicate. (Sometimes people post
             # comments twice by mistake.) If it is, fail silently by pretending
@@ -105,37 +108,37 @@ class PublicCommentManipulator(AuthenticationForm):
         c.save()
         # If the commentor has posted fewer than COMMENTS_FIRST_FEW comments,
         # send the comment to the managers.
-        if self.user_cache.get_comments_comment_count() <= COMMENTS_FIRST_FEW:
+        if self.user_cache.comment_set.count() <= settings.COMMENTS_FIRST_FEW:
             message = ngettext('This comment was posted by a user who has posted fewer than %(count)s comment:\n\n%(text)s',
                 'This comment was posted by a user who has posted fewer than %(count)s comments:\n\n%(text)s') % \
-                {'count': COMMENTS_FIRST_FEW, 'text': c.get_as_text()}
+                {'count': settings.COMMENTS_FIRST_FEW, 'text': c.get_as_text()}
             mail_managers("Comment posted by rookie user", message)
-        if COMMENTS_SKETCHY_USERS_GROUP and COMMENTS_SKETCHY_USERS_GROUP in [g.id for g in self.user_cache.get_group_list()]:
+        if settings.COMMENTS_SKETCHY_USERS_GROUP and settings.COMMENTS_SKETCHY_USERS_GROUP in [g.id for g in self.user_cache.get_group_list()]:
             message = _('This comment was posted by a sketchy user:\n\n%(text)s') % {'text': c.get_as_text()}
             mail_managers("Comment posted by sketchy user (%s)" % self.user_cache.username, c.get_as_text())
         return c
 
-class PublicFreeCommentManipulator(formfields.Manipulator):
+class PublicFreeCommentManipulator(forms.Manipulator):
     "Manipulator that handles public free (unregistered) comments"
     def __init__(self):
         self.fields = (
-            formfields.TextField(field_name="person_name", maxlength=50, is_required=True,
+            forms.TextField(field_name="person_name", maxlength=50, is_required=True,
                 validator_list=[self.hasNoProfanities]),
-            formfields.LargeTextField(field_name="comment", maxlength=3000, is_required=True,
+            forms.LargeTextField(field_name="comment", maxlength=3000, is_required=True,
                 validator_list=[self.hasNoProfanities]),
         )
 
     def hasNoProfanities(self, field_data, all_data):
-        if COMMENTS_ALLOW_PROFANITIES:
+        if settings.COMMENTS_ALLOW_PROFANITIES:
             return
         return validators.hasNoProfanities(field_data, all_data)
 
     def get_comment(self, new_data):
         "Helper function"
-        return freecomments.FreeComment(None, new_data["content_type_id"],
+        return FreeComment(None, new_data["content_type_id"],
             new_data["object_id"], new_data["comment"].strip(),
             new_data["person_name"].strip(), datetime.datetime.now(), new_data["is_public"],
-            new_data["ip_address"], False, SITE_ID)
+            new_data["ip_address"], False, settings.SITE_ID)
 
     def save(self, new_data):
         today = datetime.date.today()
@@ -143,7 +146,7 @@ class PublicFreeCommentManipulator(formfields.Manipulator):
         # Check that this comment isn't duplicate. (Sometimes people post
         # comments twice by mistake.) If it is, fail silently by pretending
         # the comment was posted successfully.
-        for old_comment in freecomments.get_list(content_type__id__exact=new_data["content_type_id"],
+        for old_comment in FreeComment.objects.filter(content_type__id__exact=new_data["content_type_id"],
             object_id__exact=new_data["object_id"], person_name__exact=new_data["person_name"],
             submit_date__year=today.year, submit_date__month=today.month,
             submit_date__day=today.day):
@@ -190,16 +193,16 @@ def post_comment(request):
         raise Http404, _("One or more of the required fields wasn't submitted")
     photo_options = request.POST.get('photo_options', '')
     rating_options = normalize_newlines(request.POST.get('rating_options', ''))
-    if comments.get_security_hash(options, photo_options, rating_options, target) != security_hash:
+    if Comment.objects.get_security_hash(options, photo_options, rating_options, target) != security_hash:
         raise Http404, _("Somebody tampered with the comment form (security violation)")
     # Now we can be assured the data is valid.
     if rating_options:
-        rating_range, rating_choices = comments.get_rating_options(base64.decodestring(rating_options))
+        rating_range, rating_choices = Comment.objects.get_rating_options(base64.decodestring(rating_options))
     else:
         rating_range, rating_choices = [], []
     content_type_id, object_id = target.split(':') # target is something like '52:5157'
     try:
-        obj = contenttypes.get_object(pk=content_type_id).get_object_for_this_type(pk=object_id)
+        obj = ContentType.objects.get(pk=content_type_id).get_object_for_this_type(pk=object_id)
     except ObjectDoesNotExist:
         raise Http404, _("The comment form had an invalid 'target' parameter -- the object ID was invalid")
     option_list = options.split(',') # options is something like 'pa,ra'
@@ -207,20 +210,20 @@ def post_comment(request):
     new_data['content_type_id'] = content_type_id
     new_data['object_id'] = object_id
     new_data['ip_address'] = request.META.get('REMOTE_ADDR')
-    new_data['is_public'] = comments.IS_PUBLIC in option_list
+    new_data['is_public'] = IS_PUBLIC in option_list
     manipulator = PublicCommentManipulator(request.user,
-        ratings_required=comments.RATINGS_REQUIRED in option_list,
+        ratings_required=RATINGS_REQUIRED in option_list,
         ratings_range=rating_range,
         num_rating_choices=len(rating_choices))
     errors = manipulator.get_validation_errors(new_data)
     # If user gave correct username/password and wasn't already logged in, log them in
     # so they don't have to enter a username/password again.
     if manipulator.get_user() and new_data.has_key('password') and manipulator.get_user().check_password(new_data['password']):
-        request.session[users.SESSION_KEY] = manipulator.get_user_id()
+        request.session[SESSION_KEY] = manipulator.get_user_id()
     if errors or request.POST.has_key('preview'):
-        class CommentFormWrapper(formfields.FormWrapper):
+        class CommentFormWrapper(forms.FormWrapper):
             def __init__(self, manipulator, new_data, errors, rating_choices):
-                formfields.FormWrapper.__init__(self, manipulator, new_data, errors)
+                forms.FormWrapper.__init__(self, manipulator, new_data, errors)
                 self.rating_choices = rating_choices
             def ratings(self):
                 field_list = [self['rating%d' % (i+1)] for i in range(len(rating_choices))]
@@ -229,22 +232,22 @@ def post_comment(request):
                 return field_list
         comment = errors and '' or manipulator.get_comment(new_data)
         comment_form = CommentFormWrapper(manipulator, new_data, errors, rating_choices)
-        return render_to_response('comments/preview', {
+        return render_to_response('comments/preview.html', {
             'comment': comment,
             'comment_form': comment_form,
             'options': options,
             'target': target,
             'hash': security_hash,
             'rating_options': rating_options,
-            'ratings_optional': comments.RATINGS_OPTIONAL in option_list,
-            'ratings_required': comments.RATINGS_REQUIRED in option_list,
+            'ratings_optional': RATINGS_OPTIONAL in option_list,
+            'ratings_required': RATINGS_REQUIRED in option_list,
             'rating_range': rating_range,
             'rating_choices': rating_choices,
-        }, context_instance=DjangoContext(request))
+        }, context_instance=RequestContext(request))
     elif request.POST.has_key('post'):
         # If the IP is banned, mail the admins, do NOT save the comment, and
         # serve up the "Thanks for posting" page as if the comment WAS posted.
-        if request.META['REMOTE_ADDR'] in BANNED_IPS:
+        if request.META['REMOTE_ADDR'] in settings.BANNED_IPS:
             mail_admins("Banned IP attempted to post comment", str(request.POST) + "\n\n" + str(request.META))
         else:
             manipulator.do_html2python(new_data)
@@ -279,10 +282,10 @@ def post_free_comment(request):
         options, target, security_hash = request.POST['options'], request.POST['target'], request.POST['gonzo']
     except KeyError:
         raise Http404, _("One or more of the required fields wasn't submitted")
-    if comments.get_security_hash(options, '', '', target) != security_hash:
+    if Comment.objects.get_security_hash(options, '', '', target) != security_hash:
         raise Http404, _("Somebody tampered with the comment form (security violation)")
     content_type_id, object_id = target.split(':') # target is something like '52:5157'
-    content_type = contenttypes.get_object(pk=content_type_id)
+    content_type = ContentType.objects.get(pk=content_type_id)
     try:
         obj = content_type.get_object_for_this_type(pk=object_id)
     except ObjectDoesNotExist:
@@ -292,22 +295,22 @@ def post_free_comment(request):
     new_data['content_type_id'] = content_type_id
     new_data['object_id'] = object_id
     new_data['ip_address'] = request.META['REMOTE_ADDR']
-    new_data['is_public'] = comments.IS_PUBLIC in option_list
+    new_data['is_public'] = IS_PUBLIC in option_list
     manipulator = PublicFreeCommentManipulator()
     errors = manipulator.get_validation_errors(new_data)
     if errors or request.POST.has_key('preview'):
         comment = errors and '' or manipulator.get_comment(new_data)
-        return render_to_response('comments/free_preview', {
+        return render_to_response('comments/free_preview.html', {
             'comment': comment,
-            'comment_form': formfields.FormWrapper(manipulator, new_data, errors),
+            'comment_form': forms.FormWrapper(manipulator, new_data, errors),
             'options': options,
             'target': target,
             'hash': security_hash,
-        }, context_instance=DjangoContext(request))
+        }, context_instance=RequestContext(request))
     elif request.POST.has_key('post'):
         # If the IP is banned, mail the admins, do NOT save the comment, and
         # serve up the "Thanks for posting" page as if the comment WAS posted.
-        if request.META['REMOTE_ADDR'] in BANNED_IPS:
+        if request.META['REMOTE_ADDR'] in settings.BANNED_IPS:
             from django.core.mail import mail_admins
             mail_admins("Practical joker", str(request.POST) + "\n\n" + str(request.META))
         else:
@@ -330,8 +333,8 @@ def comment_was_posted(request):
     if request.GET.has_key('c'):
         content_type_id, object_id = request.GET['c'].split(':')
         try:
-            content_type = contenttypes.get_object(pk=content_type_id)
+            content_type = ContentType.objects.get(pk=content_type_id)
             obj = content_type.get_object_for_this_type(pk=object_id)
         except ObjectDoesNotExist:
             pass
-    return render_to_response('comments/posted', {'object': obj}, context_instance=DjangoContext(request))
+    return render_to_response('comments/posted.html', {'object': obj}, context_instance=RequestContext(request))

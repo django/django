@@ -80,7 +80,16 @@ def patch_response_headers(response, cache_timeout=None):
     if not response.has_header('Expires'):
         expires = now + datetime.timedelta(0, cache_timeout)
         response['Expires'] = expires.strftime('%a, %d %b %Y %H:%M:%S GMT')
+    if cache_timeout < 0:
+        cache_timeout = 0 # Can't have max-age negative
     patch_cache_control(response, max_age=cache_timeout)
+
+def add_never_cache_headers(response):
+    """
+    Add headers to a response to indicate that 
+    a page should never be cached.
+    """
+    patch_response_headers(response, cache_timeout=-1)
 
 def patch_vary_headers(response, newheaders):
     """

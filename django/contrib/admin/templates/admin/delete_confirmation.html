@@ -1,6 +1,14 @@
-{% extends "admin/base_site" %}
+{% extends "admin/base_site.html" %}
 {% load i18n %}
 {% block userlinks %}<a href="../../../../doc/">{% trans 'Documentation' %}</a> / <a href="../../../../password_change/">{% trans 'Change password' %}</a> / <a href="../../../../logout/">{% trans 'Log out' %}</a>{% endblock %}
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+     <a href="../../../../">{% trans "Home" %}</a> &rsaquo;
+     <a href="../../">{{ opts.verbose_name_plural|capfirst }}</a> &rsaquo;
+     <a href="../">{{ object|striptags|truncatewords:"18" }}</a> &rsaquo;
+     {% trans 'Delete' %}
+</div>
+{% endblock %}
 {% block content %}
 {% if perms_lacking %}
     <p>{% blocktrans %}Deleting the {{ object_name }} '{{ object }}' would result in deleting related objects, but your account doesn't have permission to delete the following types of objects:{% endblocktrans %}</p>
@@ -13,8 +21,10 @@
     <p>{% blocktrans %}Are you sure you want to delete the {{ object_name }} "{{ object }}"? All of the following related items will be deleted:{% endblocktrans %}</p>
     <ul>{{ deleted_objects|unordered_list }}</ul>
     <form action="" method="post">
+    <div>
     <input type="hidden" name="post" value="yes" />
     <input type="submit" value="{% trans "Yes, I'm sure" %}" />
+    </div>
     </form>
 {% endif %}
 {% endblock %}

@@ -1,9 +1,9 @@
 from django.contrib.admin.views.decorators import staff_member_required
-from django.core import formfields, validators
-from django.core import template
-from django.core.template import loader
-from django.core.extensions import DjangoContext, render_to_response
-from django.models.core import sites
+from django.core import validators
+from django import template, forms
+from django.template import loader
+from django.shortcuts import render_to_response
+from django.contrib.sites.models import Site
 from django.conf import settings
 
 def template_validator(request):
@@ -23,19 +23,19 @@ def template_validator(request):
         errors = manipulator.get_validation_errors(new_data)
         if not errors:
             request.user.add_message('The template is valid.')
-    return render_to_response('admin/template_validator', {
+    return render_to_response('admin/template_validator.html', {
         'title': 'Template validator',
-        'form': formfields.FormWrapper(manipulator, new_data, errors),
-    }, context_instance=DjangoContext(request))
+        'form': forms.FormWrapper(manipulator, new_data, errors),
+    }, context_instance=template.RequestContext(request))
 template_validator = staff_member_required(template_validator)
 
-class TemplateValidator(formfields.Manipulator):
+class TemplateValidator(forms.Manipulator):
     def __init__(self, settings_modules):
         self.settings_modules = settings_modules
-        site_list = sites.get_in_bulk(settings_modules.keys()).values()
+        site_list = Site.objects.get_in_bulk(settings_modules.keys()).values()
         self.fields = (
-            formfields.SelectField('site', is_required=True, choices=[(s.id, s.name) for s in site_list]),
-            formfields.LargeTextField('template', is_required=True, rows=25, validator_list=[self.isValidTemplate]),
+            forms.SelectField('site', is_required=True, choices=[(s.id, s.name) for s in site_list]),
+            forms.LargeTextField('template', is_required=True, rows=25, validator_list=[self.isValidTemplate]),
         )
 
     def isValidTemplate(self, field_data, all_data):
