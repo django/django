@@ -126,7 +126,7 @@ the same transaction control as the view functions.
 
 See the `transaction management documentation`_.
 
-.. _`transaction management documentation`: http://www.djangoproject.com/documentation/transaction/
+.. _`transaction management documentation`: http://www.djangoproject.com/documentation/transactions/
 
 Writing your own middleware
 ===========================
