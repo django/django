@@ -894,12 +894,12 @@ Returns a boolean of whether the value's length is the argument.
 linebreaks
 ~~~~~~~~~~
 
-Converts newlines into ``<p>`` and ``<br />``s.
+Converts newlines into ``<p>`` and ``<br />`` tags.
 
 linebreaksbr
 ~~~~~~~~~~~~
 
-Converts newlines into ``<br />``s.
+Converts newlines into ``<br />`` tags.
 
 linenumbers
 ~~~~~~~~~~~

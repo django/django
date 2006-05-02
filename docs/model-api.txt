@@ -97,7 +97,7 @@ Django places only two restrictions on model field names:
 These limitations can be worked around, though, because your field name doesn't
 necessarily have to match your database column name. See `db_column`_ below.
 
-SQL reserved words, such as ``join``, ``where`` or ``select`, *are* allowed as
+SQL reserved words, such as ``join``, ``where`` or ``select``, *are* allowed as
 model field names, because Django escapes all database table names and column
 names in every underlying SQL query. It uses the quoting syntax of your
 particular database engine.
