@@ -242,7 +242,7 @@ and here's the ``create_form`` template::
     <h1>Create a place:</h1>
 
     {% if form.has_errors %}
-    <h2>Please correct the following error{{ errors|pluralize }}:</h2>
+    <h2>Please correct the following error{{ form.error_dict|pluralize }}:</h2>
     {% endif %}
 
     <form method="post" action=".">
@@ -287,7 +287,8 @@ The second argument is the error list retrieved from
 this gives each field an ``errors`` item (which is a list of error messages
 associated with the field) as well as a ``html_error_list`` item, which is a
 ``<ul>`` of error messages. The above template uses these error items to
-display a simple error message next to each field.
+display a simple error message next to each field. The error list is saved as
+an ``error_dict`` attribute of the ``FormWrapper`` object.
 
 Using the ``ChangeManipulator``
 -------------------------------
