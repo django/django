@@ -239,8 +239,9 @@ def create_many_related_manager(superclass):
             self.join_table = join_table
             self.source_col_name = source_col_name
             self.target_col_name = target_col_name
-            if instance:
-                self._pk_val = self.instance._get_pk_val()
+            self._pk_val = self.instance._get_pk_val()
+            if self._pk_val is None:
+                raise ValueError("%r instance needs to have a primary key value before a many-to-many relationship can be used." % model)
 
         def get_query_set(self):
             return superclass.get_query_set(self).filter(**(self.core_filters))

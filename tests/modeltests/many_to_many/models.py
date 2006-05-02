@@ -110,8 +110,8 @@ API_TESTS = """
 >>> a2.delete()
 >>> Article.objects.all()
 [Django lets you build Web apps easily]
->>> p1.article_set.all()
-[Django lets you build Web apps easily]
+>>> p2.article_set.all()
+[]
 
 # Adding via the 'other' end of an m2m
 >>> a4 = Article(headline='NASA finds intelligent life on Earth')
