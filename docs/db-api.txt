@@ -577,7 +577,7 @@ of the arguments is required, but you should use at least one of them.
 
     The next example is more advanced; it does a subquery to give each
     resulting ``Blog`` object an ``entry_count`` attribute, an integer count
-    of associated ``Entry`` objects.
+    of associated ``Entry`` objects::
 
         Blog.objects.extra(
             select={
