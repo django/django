@@ -81,7 +81,7 @@ There's no way to tell what the value of an ID will be before you call
 unless you explicitly specify ``primary_key=True`` on a field. See the
 `AutoField documentation`_.)
 
-.. _AutoField documentation: TODO: Link
+.. _AutoField documentation: http://www.djangoproject.com/documentation/model_api/#autofield
 
 Explicitly specifying auto-primary-key values
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -321,8 +321,8 @@ Django provides a range of ``QuerySet`` refinement methods that modify either
 the types of results returned by the ``QuerySet`` or the way its SQL query is
 executed.
 
-filter(**kwargs)
-~~~~~~~~~~~~~~~~
+``filter(**kwargs)``
+~~~~~~~~~~~~~~~~~~~~
 
 Returns a new ``QuerySet`` containing objects that match the given lookup
 parameters.
@@ -331,8 +331,8 @@ The lookup parameters (``**kwargs``) should be in the format described in
 _`Field lookups` below. Multiple parameters are joined via ``AND`` in the
 underlying SQL statement.
 
-exclude(**kwargs)
-~~~~~~~~~~~~~~~~~
+``exclude(**kwargs)``
+~~~~~~~~~~~~~~~~~~~~~
 
 Returns a new ``QuerySet`` containing objects that do *not* match the given
 lookup parameters.
@@ -364,8 +364,8 @@ In SQL terms, that evaluates to::
 
 Note the second example is more restrictive.
 
-order_by(*fields)
-~~~~~~~~~~~~~~~~~
+``order_by(*fields)``
+~~~~~~~~~~~~~~~~~~~~~
 
 By default, results returned by a ``QuerySet`` are ordered by the ordering
 tuple given by the ``ordering`` option in the model's ``Meta``. You can
@@ -391,8 +391,8 @@ There's no way to specify whether ordering should be case sensitive. With
 respect to case-sensitivity, Django will order results however your database
 backend normally orders them.
 
-distinct()
-~~~~~~~~~~
+``distinct()``
+~~~~~~~~~~~~~~
 
 Returns a new ``QuerySet`` that uses ``SELECT DISTINCT`` in its SQL query. This
 eliminates duplicate rows from the query results.
@@ -404,8 +404,8 @@ don't introduce the possibility of duplicate result rows.
 However, if your query spans multiple tables, it's possible to get duplicate
 results when a ``QuerySet`` is evaluated. That's when you'd use ``distinct()``.
 
-values(*fields)
-~~~~~~~~~~~~~~~
+``values(*fields)``
+~~~~~~~~~~~~~~~~~~~
 
 Returns a ``ValuesQuerySet`` -- a ``QuerySet`` that evaluates to a list of
 dictionaries instead of model-instance objects.
@@ -454,8 +454,8 @@ followed (optionally) by any output-affecting methods (such as ``values()``),
 but it doesn't really matter. This is your chance to really flaunt your
 individualism.
 
-dates(field, kind, order='ASC')
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+``dates(field, kind, order='ASC')``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Returns a ``DateQuerySet`` -- a ``QuerySet`` that evaluates to a list of
 ``datetime.datetime`` objects representing all available dates of a particular
@@ -488,8 +488,8 @@ Examples::
     >>> Entry.objects.filter(headline__contains='Lennon').dates('pub_date', 'day')
     [datetime.datetime(2005, 3, 20)]
 
-select_related()
-~~~~~~~~~~~~~~~~
+``select_related()``
+~~~~~~~~~~~~~~~~~~~~
 
 Returns a ``QuerySet`` that will automatically "follow" foreign-key
 relationships, selecting that additional related-object data when it executes
@@ -540,8 +540,8 @@ related ``Person`` *and* the related ``City``::
     p = b.author         # Hits the database.
     c = p.hometown       # Hits the database.
 
-extra(select=None, where=None, params=None, tables=None)
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+``extra(select=None, where=None, params=None, tables=None)``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Sometimes, the Django query syntax by itself can't easily express a complex
 ``WHERE`` clause. For these edge cases, Django provides the ``extra()``
@@ -646,8 +646,8 @@ something *other than* a ``QuerySet``.
 These methods do not use a cache (see _`Caching and QuerySets` below). Rather,
 they query the database each time they're called.
 
-get(**kwargs)
-~~~~~~~~~~~~~
+``get(**kwargs)``
+~~~~~~~~~~~~~~~~~
 
 Returns the object matching the given lookup parameters, which should be in
 the format described in _`Field lookups`.
@@ -671,8 +671,8 @@ The ``DoesNotExist`` exception inherits from
     except ObjectDoesNotExist:
         print "Either the entry or blog doesn't exist."
 
-count()
-~~~~~~~
+``count()``
+~~~~~~~~~~~
 
 Returns an integer representing the number of objects in the database matching
 the ``QuerySet``. ``count()`` never raises exceptions.
@@ -694,8 +694,8 @@ Depending on which database you're using (e.g. PostgreSQL vs. MySQL),
 is an underlying implementation quirk that shouldn't pose any real-world
 problems.
 
-in_bulk(id_list)
-~~~~~~~~~~~~~~~~
+``in_bulk(id_list)``
+~~~~~~~~~~~~~~~~~~~~
 
 Takes a list of primary-key values and returns a dictionary mapping each
 primary-key value to an instance of the object with the given ID.
@@ -711,8 +711,8 @@ Example::
 
 If you pass ``in_bulk()`` an empty list, you'll get an empty dictionary.
 
-latest(field_name=None)
-~~~~~~~~~~~~~~~~~~~~~~~
+``latest(field_name=None)``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Returns the latest object in the table, by date, using the ``field_name``
 provided as the date field.
@@ -1105,14 +1105,6 @@ primary key field is called ``name``, these two statements are equivalent::
 
     some_obj == other_obj
     some_obj.name == other_obj.name
-
-
-
-
-========================================
-THE REST OF THIS HAS NOT YET BEEN EDITED
-========================================
-
 
 OR lookups
 ==========
