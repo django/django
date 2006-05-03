@@ -125,16 +125,32 @@ Feel free to add your Django-powered site to the list.
 Django appears to be a MVC framework, but you call the Controller the "view", and the View the "template". How come you don't use the standard names?
 -----------------------------------------------------------------------------------------------------------------------------------------------------
 
-That's because Django isn't strictly a MVC framework. If you squint the right
-way, you can call Django's database layer the "Model", the view functions the
-"View", and the URL dispatcher the "Controller" -- but not really.
+Well, the standard names are debatable.
 
-In fact, you might say that Django is a "MTV" framework -- that is, Model,
-Template, and View make much more sense to us.
+In our interpretation of MVC, the "view" describes the data that gets presented
+to the user. It's not necessarily *how* the data *looks*, but *which* data is
+presented. The view describes *which data you see*, not *how you see it.* It's
+a subtle distinction.
 
-So, although we've been strongly influenced by MVC -- especially in the
-separation-of-data-from-logic department -- we've also strayed from the path
-where it makes sense.
+So, in our case, a "view" is the Python callback function for a particular URL,
+because that callback function describes which data is presented.
+
+Furthermore, it's sensible to separate content from presentation -- which is
+where templates come in. In Django, a "view" describes which data is presented,
+but a view normally delegates to a template, which describes *how* the data is
+presented.
+
+Where does the "controller" fit in, then? In Django's case, it's probably the
+framework itself: the machinery that sends a request to the appropriate view,
+according to the Django URL configuration.
+
+If you're hungry for acronyms, you might say that Django is a "MTV" framework
+-- that is, "model", "template", and "view." That breakdown makes much more
+sense.
+
+At the end of the day, of course, it comes down to getting stuff done. And,
+regardless of how things are named, Django gets stuff done in a way that's most
+logical to us.
 
 <Framework X> does <feature Y> -- why doesn't Django?
 -----------------------------------------------------
