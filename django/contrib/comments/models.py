@@ -56,7 +56,7 @@ class CommentManager(models.Manager):
     def user_is_moderator(self, user):
         if user.is_superuser:
             return True
-        for g in user.get_group_list():
+        for g in user.group_set.all():
             if g.id == settings.COMMENTS_MODERATORS_GROUP:
                 return True
         return False
@@ -124,7 +124,7 @@ class Comment(models.Model):
         """
         from django.core.exceptions import ObjectDoesNotExist
         try:
-            return self.get_content_type().get_object_for_this_type(pk=self.object_id)
+            return self.content_type.get_object_for_this_type(pk=self.object_id)
         except ObjectDoesNotExist:
             return None
 
@@ -133,7 +133,7 @@ class Comment(models.Model):
     def _fill_karma_cache(self):
         "Helper function that populates good/bad karma caches"
         good, bad = 0, 0
-        for k in self.get_karmascore_list():
+        for k in self.karmascore_set:
             if k.score == -1:
                 bad +=1
             elif k.score == 1:
@@ -158,7 +158,7 @@ class Comment(models.Model):
     def get_as_text(self):
         return _('Posted by %(user)s at %(date)s\n\n%(comment)s\n\nhttp://%(domain)s%(url)s') % \
             {'user': self.user.username, 'date': self.submit_date,
-            'comment': self.comment, 'domain': self.get_site().domain, 'url': self.get_absolute_url()}
+            'comment': self.comment, 'domain': self.site.domain, 'url': self.get_absolute_url()}
 
 class FreeComment(models.Model):
     # A FreeComment is a comment by a non-registered user.
@@ -200,7 +200,7 @@ class FreeComment(models.Model):
         """
         from django.core.exceptions import ObjectDoesNotExist
         try:
-            return self.get_content_type().get_object_for_this_type(pk=self.object_id)
+            return self.content_type.get_object_for_this_type(pk=self.object_id)
         except ObjectDoesNotExist:
             return None
 
@@ -209,9 +209,9 @@ class FreeComment(models.Model):
 class KarmaScoreManager(models.Manager):
     def vote(self, user_id, comment_id, score):
         try:
-            karma = self.objects.get(comment__id__exact=comment_id, user__id__exact=user_id)
+            karma = self.objects.get(comment__pk=comment_id, user__pk=user_id)
         except self.model.DoesNotExist:
-            karma = self.model(None, user_id, comment_id, score, datetime.datetime.now())
+            karma = self.model(None, user_id=user_id, comment_id=comment_id, score=score, scored_date=datetime.datetime.now())
             karma.save()
         else:
             karma.score = score
@@ -251,7 +251,7 @@ class UserFlagManager(models.Manager):
         if int(comment.user_id) == int(user.id):
             return # A user can't flag his own comment. Fail silently.
         try:
-            f = self.objects.get(user__id__exact=user.id, comment__id__exact=comment.id)
+            f = self.objects.get(user__pk=user.id, comment__pk=comment.id)
         except self.model.DoesNotExist:
             from django.core.mail import mail_managers
             f = self.model(None, user.id, comment.id, None)
