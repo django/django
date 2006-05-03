@@ -11,7 +11,7 @@ setup(
     author_email = 'holovaty@gmail.com',
     description = 'A high-level Python Web framework that encourages rapid development and clean, pragmatic design.',
     license = 'BSD',
-    packages = find_packages(),
+    packages = find_packages(exclude=['examples']),
     package_data = {
         '': ['*.TXT'],
         'django.conf': ['locale/bn/LC_MESSAGES/*',
