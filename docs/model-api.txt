@@ -1277,16 +1277,6 @@ of object instances. For example::
 
 Now, every ``Pizza`` object will have a ``is_disgusting()`` method.
 
-Note that the scope of custom methods is modified to be the same as the module
-scope. These methods do NOT have access to globals within your model's module.
-Additionally, custom methods have access to a few commonly-used objects for
-convenience:
-
-    * The ``datetime`` module from Python's standard library.
-    * The ``db`` object from ``django.core.db``. This represents the database
-      connection, so you can do custom queries via a cursor object. See
-      "Executing custom SQL" below.
-
 See `Giving models custom methods`_ for a full example.
 
 .. _Giving models custom methods: http://www.djangoproject.com/documentation/models/custom_methods/
