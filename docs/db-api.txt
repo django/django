@@ -1032,6 +1032,30 @@ equivalent::
     Entry.objects.filter(blog__id__exact=3)
     Entry.objects.filter(blog__pk=3)
 
+Lookups that span relationships
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Django offers a powerful and intuitive way to "follow" relationships in
+lookups, taking care of the SQL ``JOIN``s for you automatically, behind the
+scenes. To span a relationship, just use the field name of related fields
+across models, separated by double underscores, until you get to the field you
+want.
+
+This example retrieves all ``Entry`` objects with a ``Blog`` whose ``name``
+is ``'Beatles Blog'``::
+
+    Entry.objects.filter(blog__name__exact='Beatles Blog')
+
+This spanning can be as deep as you'd like.
+
+It works backwards, too. To refer to a "reverse" relationship, just use the
+lowercase name of the model.
+
+This example retrieves all ``Blog`` objects who have at least one ``Entry``
+whose ``headline`` contains ``'Lennon'``::
+
+    Blog.objects.filter(entry__headline__contains='Lennon')
+
 Escaping parenthesis and underscores in LIKE statements
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -1106,37 +1130,41 @@ primary key field is called ``name``, these two statements are equivalent::
     some_obj == other_obj
     some_obj.name == other_obj.name
 
-OR lookups
-==========
+Complex lookups with Q objects
+==============================
 
-Keyword argument queries are "AND"ed together. If you have more
-complex query requirements (for example, you need to include an ``OR``
-statement in your query), you need to use ``Q`` objects.
+Keyword argument queries -- in ``filter()``, etc. -- are "AND"ed together. If
+you need to execute more more complex queries (for example, queries with ``OR``
+statements), you can use ``Q`` objects.
 
 A ``Q`` object (``django.db.models.Q``) is an object used to encapsulate a
-collection of keyword arguments. These keyword arguments are specified in
-the same way as keyword arguments to the basic lookup functions like get()
-and filter(). For example::
+collection of keyword arguments. These keyword arguments are specified as in
+"Field lookups" above.
+
+For example, this ``Q`` object encapsulates a single ``LIKE`` query::
 
     Q(question__startswith='What')
 
-is a ``Q`` object encapsulating a single ``LIKE`` query. ``Q`` objects can be
-combined using the ``&`` and ``|`` operators. When an operator is used on two
-``Q`` objects, it yields a new ``Q`` object. For example the statement::
+``Q`` objects can be combined using the ``&`` and ``|`` operators. When an
+operator is used on two ``Q`` objects, it yields a new ``Q`` object.
+
+For example, this statement yields a single ``Q`` object that represents the
+"OR" of two ``"question__startswith"`` queries::
 
     Q(question__startswith='Who') | Q(question__startswith='What')
 
-... yields a single ``Q`` object that represents the "OR" of two
-"question__startswith" queries, equivalent to the SQL WHERE clause::
+This is equivalent to the following SQL ``WHERE`` clause::
 
-    ... WHERE question LIKE 'Who%' OR question LIKE 'What%'
+    WHERE question LIKE 'Who%' OR question LIKE 'What%'
 
 You can compose statements of arbitrary complexity by combining ``Q`` objects
-with the ``&`` and ``|`` operators. Parenthetical grouping can also be used.
+with the ``&`` and ``|`` operators. You can also use parenthetical grouping.
 
-One or more ``Q`` objects can then provided as arguments to the lookup
-functions. If multiple ``Q`` object arguments are provided to a lookup
-function, they will be "AND"ed together. For example::
+Each lookup function that takes keyword-arguments (e.g. ``filter()``,
+``exclude()``, ``get()``) can also be passed one or more ``Q`` objects as
+positional (not-named) arguments. If you provide multiple ``Q`` object
+arguments to a lookup function, the arguments will be "AND"ed together. For
+example::
 
     Poll.objects.get(
         Q(question__startswith='Who'),
@@ -1148,11 +1176,10 @@ function, they will be "AND"ed together. For example::
     SELECT * from polls WHERE question LIKE 'Who%'
         AND (pub_date = '2005-05-02' OR pub_date = '2005-05-06')
 
-If necessary, lookup functions can mix the use of ``Q`` objects and keyword
-arguments. All arguments provided to a lookup function (be they keyword
-argument or ``Q`` object) are "AND"ed together. However, if a ``Q`` object is
-provided, it must precede the definition of any keyword arguments. For
-example::
+Lookup functions can mix the use of ``Q`` objects and keyword arguments. All
+arguments provided to a lookup function (be they keyword arguments or ``Q``
+objects) are "AND"ed together. However, if a ``Q`` object is provided, it must
+precede the definition of any keyword arguments. For example::
 
     Poll.objects.get(
         Q(pub_date=date(2005, 5, 2)) | Q(pub_date=date(2005, 5, 6)),
@@ -1167,193 +1194,242 @@ example::
 
 ... would not be valid.
 
-A ``Q`` objects can also be provided to the ``complex`` keyword argument. For example::
-
-    Poll.objects.get(
-        complex=Q(question__startswith='Who') &
-            (Q(pub_date=date(2005, 5, 2)) |
-             Q(pub_date=date(2005, 5, 6))
-        )
-    )
-
 See the `OR lookups examples page`_ for more examples.
 
 .. _OR lookups examples page: http://www.djangoproject.com/documentation/models/or_lookups/
 
+Related objects
+===============
 
-Relationships (joins)
-=====================
+When you define a relationship in a model (i.e., a ``ForeignKey``,
+``OneToOneField``, or ``ManyToManyField``), instances of that model will have
+a convenient API to access the related object(s).
 
-When you define a relationship in a model (i.e., a ForeignKey,
-OneToOneField, or ManyToManyField), Django uses the name of the
-relationship to add a descriptor_ on every instance of the model.
-This descriptor behaves just like a normal attribute, providing
-access to the related object or objects.  For example,
-``mychoice.poll`` will return the poll object associated with a specific
-instance of ``Choice``.
+Using the models at the top of this page, for example, an ``Entry`` object ``e``
+can get its associated ``Blog`` object by accessing the ``blog`` attribute:
+``e.blog``.
 
-.. _descriptor: http://users.rcn.com/python/download/Descriptor.htm
+(Behind the scenes, this functionality is implemented by Python descriptors_.
+This shouldn't really matter to you, but we point it out here for the curious.)
 
-Django also adds a descriptor for the 'other' side of the relationship -
+Django also creates API accessors for the "other" side of the relationship --
 the link from the related model to the model that defines the relationship.
-Since the related model has no explicit reference to the source model,
-Django will automatically derive a name for this descriptor. The name that
-Django chooses depends on the type of relation that is represented. However,
-if the definition of the relation has a `related_name` parameter, Django
-will use this name in preference to deriving a name.
+For example, a ``Blog`` object ``b`` has access to a list of all related
+``Entry`` objects via the ``entry_set`` attribute: ``b.entry_set.all()``.
 
-There are two types of descriptor that can be employed: Single Object
-Descriptors and Object Set Descriptors. The following table describes
-when each descriptor type is employed. The local model is the model on
-which the relation is defined; the related model is the model referred
-to by the relation.
+All examples in this section use the sample ``Blog``, ``Author`` and ``Entry``
+models defined at the top of this page.
 
-    =============== ============= =============
-    Relation Type   Local Model   Related Model
-    =============== ============= =============
-    OneToOneField   Single Object Single Object
+.. _descriptors: http://users.rcn.com/python/download/Descriptor.htm
 
-    ForeignKey      Single Object Object Set
+One-to-many relationships
+-------------------------
 
-    ManyToManyField Object Set    Object Set
-    =============== ============= =============
+Forward
+~~~~~~~
 
-Single object descriptor
-------------------------
+If a model has a ``ForeignKey``, instances of that model will have access to
+the related (foreign) object via a simple attribute of the model.
 
-If the related object is a single object, the descriptor acts
-just as if the related object were an attribute::
+Example::
 
-    # Obtain the existing poll
-    old_poll = mychoice.poll
-    # Set a new poll
-    mychoice.poll = new_poll
-    # Save the change
-    mychoice.save()
+    e = Entry.objects.get(id=2)
+    e.blog # Returns the related Blog object.
 
-Whenever a change is made to a Single Object Descriptor, save()
-must be called to commit the change to the database.
+You can get and set via a foreign-key attribute. As you may expect, changes to
+the foreign key aren't saved to the database until you call ``save()``.
+Example::
 
-If no `related_name` parameter is defined, Django will use the
-lower case version of the source model name as the name for the
-related descriptor. For example, if the ``Choice`` model had
-a field::
+    e = Entry.objects.get(id=2)
+    e.blog = some_blog
+    e.save()
 
-    coordinator = models.OneToOneField(User)
+If a ``ForeignKey`` field has ``null=True`` set (i.e., it allows ``NULL``
+values), you can assign ``None`` to it. Example::
 
-... instances of the model ``User`` would be able to call:
+    e = Entry.objects.get(id=2)
+    e.blog = None
+    e.save() # "UPDATE blog_entry SET blog_id = NULL ...;"
 
-    old_choice = myuser.choice
-    myuser.choice = new_choice
+Forward access to one-to-many relationships is cached the first time the
+related object is accessed. Subsequent accesses to the foreign key on the same
+object instance are cached. Example::
 
-By default, relations do not allow values of None; if you attempt
-to assign None to a Single Object Descriptor, an AttributeError
-will be thrown. However, if the relation has 'null=True' set
-(i.e., the database will allow NULLs for the relation), None can
-be assigned and returned by the descriptor to represent empty
-relations.
+    e = Entry.objects.get(id=2)
+    print e.blog  # Hits the database to retrieve the associated Blog.
+    print e.blog  # Doesn't hit the database; uses cached version.
 
-Access to Single Object Descriptors is cached. The first time
-a descriptor on an instance is accessed, the database will be
-queried, and the result stored. Subsequent attempts to access
-the descriptor on the same instance will use the cached value.
+Note that the ``select_related()`` ``QuerySet`` method recursively prepopulates
+the cache of all one-to-many relationships ahead of time. Example::
 
-Object set descriptor
----------------------
+    e = Entry.objects.select_related().get(id=2)
+    print e.blog  # Doesn't hit the database; uses cached version.
+    print e.blog  # Doesn't hit the database; uses cached version.
 
-An Object Set Descriptor acts just like the Manager - as an initial Query
-Set describing the set of objects related to an instance. As such, any
-query refining technique (filter, exclude, etc) can be used on the Object
-Set descriptor. This also means that Object Set Descriptor cannot be evaluated
-directly - the ``all()`` method must be used to produce a Query Set that
-can be evaluated.
+``select_related()`` is documented in the "QuerySet methods that return new
+QuerySets" section above.
 
-If no ``related_name`` parameter is defined, Django will use the lower case
-version of the source model name appended with `_set` as the name for the
-related descriptor. For example, every ``Poll`` object has a ``choice_set``
-descriptor.
+Backward
+~~~~~~~~
 
-The Object Set Descriptor has utility methods to add objects to the
-related object set:
+If a model has a ``ForeignKey``, instances of the foreign-key model will have
+access to a ``Manager`` that returns all instances of the first model. By
+default, this ``Manager`` is named ``FOO_set``, where ``FOO`` is the source
+model name, lowercased. This ``Manager`` returns ``QuerySets``, which can be
+filtered and manipulated as described in the "Retrieving objects" section
+above.
 
-``add(obj1, obj2, ...)``
-    Add the specified objects to the related object set.
+Example::
 
-``create(\**kwargs)``
-    Create a new object, and put it in the related object set. See
-    _`Creating new objects`
+    b = Blog.objects.get(id=1)
+    b.entry_set.all() # Returns all Entry objects related to Blog.
 
-The Object Set Descriptor may also have utility methods to remove objects
-from the related object set:
+    # b.entry_set is a Manager that returns QuerySets.
+    b.entry_set.filter(headline__contains='Lennon')
+    b.entry_set.count()
 
-``remove(obj1, obj2, ...)``
-    Remove the specified objects from the related object set.
+You can override the ``FOO_set`` name by setting the ``related_name``
+parameter in the ``ForeignKey()`` definition. For example, if the ``Entry``
+model was altered to ``blog = ForeignKey(Blog, related_name='entries')``, the
+above example code would look like this::
 
-``clear()``
-    Remove all objects from the related object set.
+    b = Blog.objects.get(id=1)
+    b.entries.all() # Returns all Entry objects related to Blog.
 
-These two removal methods will not exist on ForeignKeys where ``Null=False``
-(such as in the Poll example). This is to prevent database inconsistency - if
-the related field cannot be set to None, then an object cannot be removed
-from one relation without adding it to another.
+    # b.entries is a Manager that returns QuerySets.
+    b.entries.filter(headline__contains='Lennon')
+    b.entries.count()
 
-The members of a related object set can be assigned from any iterable object.
-For example::
+You cannot access a reverse ``ForeignKey`` ``Manager`` from the class; it must
+be accessed from an instance. Example::
 
-    mypoll.choice_set = [choice1, choice2]
+    Blog.entry_set # Raises AttributeError: "Manager must be accessed via instance".
 
-If the ``clear()`` method is available, any pre-existing objects will be removed
-from the Object Set before all objects in the iterable (in this case, a list)
-are added to the choice set. If the ``clear()`` method is not available, all
-objects in the iterable will be added without removing any existing elements.
+In addition to the ``QuerySet`` methods defined in "Retrieving objects" above,
+the ``ForeignKey`` ``Manager`` has these additional methods:
 
-Each of these operations on the Object Set Descriptor has immediate effect
-on the database - every add, create and remove is immediately and
+    * ``add(obj1, obj2, ...)``: Adds the specified model objects to the related
+      object set.
+
+      Example::
+
+          b = Blog.objects.get(id=1)
+          e = Entry.objects.get(id=234)
+          b.entry_set.add(e) # Associates Entry e with Blog b.
+
+    * ``create(**kwargs)``: Creates a new object, saves it and puts it in the
+      related object set. Returns the newly created object.
+
+      Example::
+
+          b = Blog.objects.get(id=1)
+          e = b.entry_set.create(headline='Hello', body_text='Hi', pub_date=datetime.date(2005, 1, 1))
+          # No need to call e.save() at this point -- it's already been saved.
+
+      This is equivalent to (but much simpler than)::
+
+          b = Blog.objects.get(id=1)
+          e = Entry(blog=b, headline='Hello', body_text='Hi', pub_date=datetime.date(2005, 1, 1))
+          e.save()
+
+      Note that there's no need to specify the keyword argument of the model
+      that defines the relationship. In the above example, we don't pass the
+      parameter ``blog`` to ``create()``. Django figures out that the new
+      ``Entry`` object's ``blog`` field should be set to ``b``.
+
+    * ``remove(obj1, obj2, ...)``: Removes the specified model objects from the
+      related object set.
+
+      Example::
+
+          b = Blog.objects.get(id=1)
+          e = Entry.objects.get(id=234)
+          b.entry_set.remove(e) # Disassociates Entry e from Blog b.
+
+      In order to prevent database inconsistency, this method only exists on
+      ``ForeignKey``s where ``null=True``. If the related field can't be set to
+      ``None`` (``NULL``), then an object can't be removed from a relation
+      without being added to another. In the above example, removing ``e`` from
+      ``b.entry_set()`` is equivalent to doing ``e.blog = None``, and because
+      the ``blog`` ``ForeignKey`` doesn't have ``null=True``, this is invalid.
+
+    * ``clear()``: Removes all objects from the related object set.
+
+      Example::
+
+          b = Blog.objects.get(id=1)
+          b.entry_set.clear()
+
+      Note this doesn't delete the related objects -- it just disassociates
+      them.
+
+      Just like ``remove()``, ``clear()`` is only available on ``ForeignKey``s
+      where ``null=True``.
+
+To assign the members of a related set in one fell swoop, just assign to it
+from any iterable object. Example::
+
+    b = Blog.objects.get(id=1)
+    b.entry_set = [e1, e2]
+
+If the ``clear()`` method is available, any pre-existing objects will be
+removed from the ``entry_set`` before all objects in the iterable (in this
+case, a list) are added to the set. If the ``clear()`` method is *not*
+available, all objects in the iterable will be added without removing any
+existing elements.
+
+Each "reverse" operation described in this section has an immediate effect on
+the database. Every addition, creation and deletion is immediately and
 automatically saved to the database.
 
-Relationships and queries
-=========================
+Many-to-many relationships
+--------------------------
 
-When composing a ``filter`` or ``exclude`` refinement, it may be necessary to
-include conditions that span relationships. Relations can be followed as deep
-as required - just add descriptor names, separated by double underscores, to
-describe the full path to the query attribute. The query::
+Both ends of a many-to-many relationship get automatic API access to the other
+end. The API works just as a "backward" one-to-many relationship. See _Backward
+above.
 
-    Foo.objects.filter(name1__name2__name3__attribute__lookup=value)
+The only difference is in the attribute naming: The model that defines the
+``ManyToManyField`` uses the attribute name of that field itself, whereas the
+"reverse" model uses the lowercased model name of the original model, plus
+``'_set'`` (just like reverse one-to-many relationships).
 
-... is interpreted as 'get every Foo that has a name1 that has a name2 that
-has a name3 that has an attribute with lookup matching value'. In the Poll
-example::
+An example makes this easier to understand::
 
-    Choice.objects.filter(poll__slug__startswith="eggs")
+    e = Entry.objects.get(id=3)
+    e.authors.all() # Returns all Author objects for this Entry.
+    e.authors.count()
+    e.authors.filter(name__contains='John')
 
-... describes the set of choices for which the related poll has a slug
-attribute that starts with "eggs". Django automatically composes the joins
-and conditions required for the SQL query.
+    a = Author.objects.get(id=5)
+    a.entry_set.all() # Returns all Entry objects for this Author.
 
-Creating new related objects
-============================
+Like ``ForeignKey``, ``ManyToManyField`` can specify ``related_name``. In the
+above example, if the ``ManyToManyField`` in ``Entry`` had specified
+``related_name='entries'``, then each ``Author`` instance would have an
+``entries`` attribute instead of ``entry_set``.
 
-Related objects are created using the ``create()`` convenience function on
-the descriptor Manager for relation::
+One-to-one relationships
+------------------------
 
-    >>> p.choice_set.create(choice="Over easy", votes=0)
-    >>> p.choice_set.create(choice="Scrambled", votes=0)
-    >>> p.choice_set.create(choice="Fertilized", votes=0)
-    >>> p.choice_set.create(choice="Poached", votes=0)
-    >>> p.choice_set.count()
-    4
+The semantics of one-to-one relationships will be changing soon, so we don't
+recommend you use them.
 
-Each of those ``create()`` methods is equivalent to (but much simpler than)::
+How are the backward relationships possible?
+--------------------------------------------
 
-    >>> c = Choice(poll_id=p.id, choice="Over easy", votes=0)
-    >>> c.save()
+Other object-relational mappers require you to define relationships on both
+sides. The Django developers believe this is a violation of the DRY (Don't
+Repeat Yourself) principle, so Django only requires you to define the
+relationship on one end.
 
-Note that when using the `create()`` method, you do not give any value
-for the ``id`` field, nor do you give a value for the field that stores
-the relation (``poll_id`` in this case).
+But how is this possible, given that a model class doesn't know which other
+model classes are related to it until those other model classes are loaded?
 
-The ``create()`` method always returns the newly created object.
+The answer lies in the ``INSTALLED_APPS`` setting. The first time any model is
+loaded, Django iterates over every model in ``INSTALLED_APPS`` and creates the
+backward relationships in memory as needed. Essentially, one of the functions
+of ``INSTALLED_APPS`` is to tell Django the entire model domain.
 
 Deleting objects
 ================
@@ -1361,23 +1437,23 @@ Deleting objects
 The delete method, conveniently, is named ``delete()``. This method immediately
 deletes the object and has no return value. Example::
 
-    >>> c.delete()
+    e.delete()
 
-Objects can also be deleted in bulk. Every Query Set has a ``delete()`` method
-that will delete all members of the query set. For example::
+You can also delete objects in bulk. Every ``QuerySet`` has a ``delete()``
+method, which deletes all members of that ``QuerySet``.
 
-    >>> Polls.objects.filter(pub_date__year=2005).delete()
+For example, this deletes all ``Entry`` objects with a ``pub_date`` year of
+2005::
 
-would bulk delete all Polls with a year of 2005. Note that ``delete()`` is the
-only Query Set method that is not exposed on the Manager itself.
+    Entry.objects.filter(pub_date__year=2005).delete()
 
-This is a safety mechanism to prevent you from accidentally requesting
-``Polls.objects.delete()``, and deleting *all* the polls.
+Note that ``delete()`` is the only ``QuerySet`` method that is not exposed on a
+``Manager`` itself. This is a safety mechanism to prevent you from accidentally
+requesting ``Entry.objects.delete()``, and deleting *all* the entries. If you
+*do* want to delete all the objects, then you have to explicitly request a
+complete query set::
 
-If you *actually* want to delete all the objects, then you have to explicitly
-request a complete query set::
-
-    Polls.objects.all().delete()
+    Entry.objects.all().delete()
 
 Extra instance methods
 ======================
@@ -1397,9 +1473,9 @@ following model::
         ('M', 'Male'),
         ('F', 'Female'),
     )
-    class Person
-        name = meta.CharField(maxlength=20)
-        gender = meta.CharField(maxlength=1, choices=GENDER_CHOICES)
+    class Person(models.Model):
+        name = models.CharField(maxlength=20)
+        gender = models.CharField(maxlength=1, choices=GENDER_CHOICES)
 
 ...each ``Person`` instance will have a ``get_gender_display()`` method. Example::
 
