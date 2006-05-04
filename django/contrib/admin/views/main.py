@@ -143,9 +143,9 @@ class AdminBoundField(object):
             return self._display
         except AttributeError:
             if isinstance(self.field.rel, models.ManyToOneRel):
-                self._display = getattr(self.original, 'get_%s' % self.field.name)()
+                self._display = getattr(self.original, self.field.attname)
             elif isinstance(self.field.rel, models.ManyToManyRel):
-                self._display = ", ".join([str(obj) for obj in getattr(self.original, 'get_%s_list' % self.field.rel.singular)()])
+                self._display = ", ".join([str(obj) for obj in getattr(self.original, self.field.attname).all()])
             return self._display
 
     def __repr__(self):
