@@ -178,6 +178,13 @@ repository:
       judgment, please bring things up on the `django-developers`_ mailing list
       before making the change.
 
+      If you bring something up on `django-developers`_ and nobody responds,
+      please don't take that to mean your idea is great and should be
+      implemented immediately because nobody contested it. Django's lead
+      developers don't have a lot of time to read mailing-list discussions
+      immediately, so you may have to wait a couple of days before getting a
+      response.
+
     * Write detailed commit messages in the past tense, not present tense.
 
           * Good: "Fixed Unicode bug in RSS API."
