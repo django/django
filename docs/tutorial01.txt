@@ -310,7 +310,7 @@ You should see the following (the CREATE TABLE SQL statements for the polls app)
     );
     CREATE TABLE "polls_choice" (
         "id" serial NOT NULL PRIMARY KEY,
-        "poll_id" integer NOT NULL REFERENCES "polls_polls" ("id"),
+        "poll_id" integer NOT NULL REFERENCES "polls_poll" ("id"),
         "choice" varchar(200) NOT NULL,
         "votes" integer NOT NULL
     );
