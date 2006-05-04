@@ -564,7 +564,7 @@ class OneToOneField(RelatedField, IntegerField):
 class ManyToManyField(RelatedField, Field):
     def __init__(self, to, **kwargs):
         kwargs['verbose_name'] = kwargs.get('verbose_name', None)
-        kwargs['rel'] = ManyToManyRel(to, kwargs.pop('singular', None),
+        kwargs['rel'] = ManyToManyRel(to,
             num_in_admin=kwargs.pop('num_in_admin', 0),
             related_name=kwargs.pop('related_name', None),
             filter_interface=kwargs.pop('filter_interface', None),
@@ -660,8 +660,6 @@ class ManyToManyField(RelatedField, Field):
             # Add the descriptor for the m2m relation
             setattr(cls, related.get_accessor_name(), ManyRelatedObjectsDescriptor(related))
 
-        self.rel.singular = self.rel.singular or self.rel.to._meta.object_name.lower()
-
         # Set up the accessors for the column names on the m2m table
         self.m2m_column_name = curry(self._get_m2m_column_name, related)
         self.m2m_reverse_name = curry(self._get_m2m_reverse_name, related)
@@ -703,10 +701,9 @@ class OneToOneRel(ManyToOneRel):
         self.multiple = False
 
 class ManyToManyRel:
-    def __init__(self, to, singular=None, num_in_admin=0, related_name=None,
+    def __init__(self, to, num_in_admin=0, related_name=None,
         filter_interface=None, limit_choices_to=None, raw_id_admin=False, symmetrical=True):
         self.to = to
-        self.singular = singular or None
         self.num_in_admin = num_in_admin
         self.related_name = related_name
         self.filter_interface = filter_interface
