@@ -37,7 +37,7 @@ This example model defines a ``Person``, which has a ``first_name`` and
 ``first_name`` and ``last_name`` are *fields* of the model. Each field is
 specified as a class attribute, and each attribute maps to a database column.
 
-The above ``Person`` model would create an SQL table like this::
+The above ``Person`` model would create a database table like this::
 
     CREATE TABLE myapp_person (
         "id" serial NOT NULL PRIMARY KEY,
@@ -45,7 +45,7 @@ The above ``Person`` model would create an SQL table like this::
         "last_name" varchar(30) NOT NULL
     );
 
-Three technical notes:
+Some technical notes:
 
     * The name of the table, ``myapp_person``, is automatically derived from
       some model metadata but can be overridden. See _`Table names` below.
@@ -630,16 +630,16 @@ any other ``Field`` type: by including it as a class attribute of your model.
 ``ForeignKey`` requires a positional argument: The class to which the model is
 related.
 
-For example, if a ``Place`` model is in a ``City`` -- that is, a ``City``
-contains multiple places but each ``Place`` is only in one ``City`` -- use the
-following definitions::
+For example, if a ``Car`` model has a ``Manufacturer`` -- that is, a
+``Manufacturer`` makes multiple cars but each ``Car`` only has one
+``Manufacturer`` -- use the following definitions::
 
-    class City(models.Model):
+    class Manufacturer(models.Model):
         # ...
 
-    class Place(models.Model):
+    class Car(models.Model):
+        manufacturer = models.ForeignKey(Manufacturer)
         # ...
-        city = models.ForeignKey(City)
 
 To create a recursive relationship -- an object that has a many-to-one
 relationship with itself -- use ``models.ForeignKey('self')``.
@@ -647,18 +647,30 @@ relationship with itself -- use ``models.ForeignKey('self')``.
 If you need to create a relationship on a model that has not yet been defined,
 you can use the name of the model, rather than the model object itself::
 
-    class Place(models.Model):
-        # ...
-        city = models.ForeignKey("City")
-
-    class City(models.Model):
+    class Car(models.Model):
+        manufacturer = models.ForeignKey('Manufacturer')
         # ...
 
-The name of a ``ForeignKey`` (``city`` in the example above) generally should
-be the name of the model, in singular form. Behind the scenes, Django appends
-"_id" to the field name to create its database column name. However, your code
+    class Manufacturer(models.Model):
+        # ...
+
+Note, however, that support for strings around model names in ``ForeignKey`` is
+quite new, and it can be buggy in some cases.
+
+Behind the scenes, Django appends ``"_id"`` to the field name to create its
+database column name. In the above example, the database table for the ``Car``
+model will have a ``manufacturer_id`` column. (You can change this explicitly
+by specifying ``db_column``; see ``db_column`` below.)  However, your code
 should never have to deal with the database column name, unless you write
-custom SQL.
+custom SQL. You'll always deal with the field names of your model object.
+
+It's suggested, but not required, that the name of a ``ForeignKey`` field
+(``manufacturer`` in the example above) be the name of the model, lowercase.
+You can, of course, call the field whatever you want. For example::
+
+    class Car(models.Model):
+        company_that_makes_it = models.ForeignKey(Manufacturer)
+        # ...
 
 See the `Many-to-one relationship model example`_ for a full example.
 
@@ -684,7 +696,7 @@ relationship should work. All are optional:
                              with ``models.LazyDate`` to limit choices of objects
                              by date. For example::
 
-                                limit_choices_to = {'pub_date__lte' : models.LazyDate()}
+                                limit_choices_to = {'pub_date__lte': models.LazyDate()}
 
                              only allows the choice of related objects with a
                              ``pub_date`` before the current date/time to be
@@ -699,8 +711,9 @@ relationship should work. All are optional:
                              that a user never enters more than 10 toppings.
 
                              Note that this doesn't ensure more than 10 related
-                             toppings ever get created. It just controls the
-                             interface.
+                             toppings ever get created. It simply controls the
+                             admin interface; it doesn't enforce things at the
+                             Python API level or database level.
 
     ``min_num_in_admin``     The minimum number of related objects displayed in
                              the admin. Normally, at the creation stage,
@@ -725,35 +738,9 @@ relationship should work. All are optional:
                              Not used with ``edit_inline``.
 
     ``related_name``         The name to use for the relation from the related
-                             object back to this one.  For example, when if
-                             ``Topping`` has this field::
-
-                                    models.ForeignKey(Pizza)
-
-                             the ``related_name`` will be "topping_set" (taken from
-                             the class name), which will in turn give ``Pizza``
-                             a ``topping_set`` Object Set Descriptor.
-
-                             If you instead were to use::
-
-                                    models.ForeignKey(Pizza, related_name="munchies")
-
-                             then the Object Set Descriptor on ``Topping`` would
-                             be called ``munchies``.
-
-                             This is only really useful when you have a single
-                             object that relates to the same object more than
-                             once.  For example, if a ``Story`` object has both
-                             ``primary_category`` and ``secondary_category``
-                             fields, to make sure that the ``Category`` objects
-                             have the correct methods, you'd use fields like::
-
-                                    models.ForeignKey(Category, related_name="primary_stories")
-                                    models.ForeignKey(Category, related_name="secondary_stories")
-
-                             ...which would give ``Category`` objects two Object Set
-                             descriptors - one called ``primary_stories`` and one
-                             called ``secondary_stories``.
+                             object back to this one. See the
+                             `related objects documentation`_ for a full
+                             explanation and example.
 
     ``to_field``             The field on the related object that the relation
                              is to. By default, Django uses the primary key of
@@ -761,6 +748,7 @@ relationship should work. All are optional:
     =======================  ============================================================
 
 .. _`Database API reference`: http://www.djangoproject.com/documentation/db_api/
+.. _related objects documentation: http://www.djangoproject.com/documentation/db_api/#related-objects
 
 Many-to-many relationships
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -784,11 +772,12 @@ here's how you'd represent that::
         toppings = models.ManyToManyField(Topping)
 
 As with ``ForeignKey``, a relationship to self can be defined by using the
-string ``"self"`` instead of the model name; references to as-yet undefined
-models can be made by using a string containing the model name.
+string ``'self'`` instead of the model name, and you can refer to as-yet
+undefined models by using a string containing the model name.
 
-The name of a ``ManyToManyField`` (``toppings`` in the example above) should
-generally be a plural describing the set of related model objects.
+It's suggested, but not required, that the name of a ``ManyToManyField``
+(``toppings`` in the example above) be a plural describing the set of related
+model objects.
 
 Behind the scenes, Django creates an intermediary join table to represent the
 many-to-many relationship.
@@ -797,11 +786,11 @@ It doesn't matter which model gets the ``ManyToManyField``, but you only need
 it in one of the models -- not in both.
 
 Generally, ``ManyToManyField`` instances should go in the object that's going
-to be edited in the admin. In the above example, ``toppings`` is in ``Pizza``
-(rather than ``Topping`` having a ``pizzas`` ``ManyToManyField`` ) because it's
-more natural to think about a ``Pizza`` having toppings than a topping being on
-multiple pizzas. The way it's set up above, the ``Pizza`` admin form would let
-users select the toppings.
+to be edited in the admin interface, if you're using Django's admin. In the
+above example, ``toppings`` is in ``Pizza`` (rather than ``Topping`` having a
+``pizzas`` ``ManyToManyField`` ) because it's more natural to think about a
+``Pizza`` having toppings than a topping being on multiple pizzas. The way it's
+set up above, the ``Pizza`` admin form would let users select the toppings.
 
 See the `Many-to-many relationship model example`_ for a full example.
 
@@ -813,8 +802,7 @@ the relationship should work. All are optional:
     =======================  ============================================================
     Argument                 Description
     =======================  ============================================================
-    ``related_name``         See the description of ``related_name`` in
-                             ``ForeignKey`` above.
+    ``related_name``         See the description under ``ForeignKey`` above.
 
     ``filter_interface``     Use a nifty unobtrusive Javascript "filter" interface
                              instead of the usability-challenged ``<select multiple>``
@@ -825,14 +813,6 @@ the relationship should work. All are optional:
 
     ``limit_choices_to``     See the description under ``ForeignKey`` above.
 
-    ``singular``             The singular name of the field.  Use to name the ``get_*``
-                             methods: in the example above, Django gives the ``Pizza``
-                             objects a ``get_topping_list()`` method, where ``topping``
-                             is the default ``singular`` value derived from the lowercase
-                             version of the class being linked to.  Use the singular
-                             parameter to change this, which is if you want one model to
-                             have multiple ``ManyToMany`` relationships to another model.
-
     ``symmetrical``          Only used in the definition of ManyToManyFields on self.
                              Consider the following model:
 
@@ -840,20 +820,25 @@ the relationship should work. All are optional:
                                  friends = models.ManyToManyField("self")
 
                              When Django processes this model, it identifies that it has
-                             a ManyToManyField on itself, and as a result, it doesn't add
-                             a ``person_set`` attribute to the Person class. Instead, the
-                             ManyToManyField is assumed to be symmetrical - that is, if
-                             I am your friend, then you are my friend.
+                             a ``ManyToManyField`` on itself, and as a result, it
+                             doesn't add a ``person_set`` attribute to the ``Person``
+                             class. Instead, the ``ManyToManyField`` is assumed to be
+                             symmetrical -- that is, if I am your friend, then you are
+                             my friend.
 
-                             If you do not want symmetry in ManyToMany relationships with
-                             self, set ``symmetrical`` to False. This will force Django to
-                             add the descriptor for the reverse relationship, allow
-                             ManyToMany relationships to be non-symmetrical.
+                             If you do not want symmetry in ``ManyToMany`` relationships
+                             with ``self``, set ``symmetrical`` to ``False``. This will
+                             force Django to add the descriptor for the reverse
+                             relationship, allowing ``ManyToMany`` relationships to be
+                             non-symmetrical.
 
     =======================  ============================================================
 
 One-to-one relationships
 ~~~~~~~~~~~~~~~~~~~~~~~~
+
+The semantics of one-to-one relationships will be changing soon, so we don't
+recommend you use them. If that doesn't scare you away, keep reading.
 
 To define a one-to-one relationship, use ``OneToOneField``. You use it just
 like any other ``Field`` type: by including it as a class attribute of your
@@ -903,11 +888,12 @@ Here's a list of all possible ``Meta`` options. No options are required. Adding
 ``db_table``
 ------------
 
-The name of the database table to use for the module::
+The name of the database table to use for the model::
 
-    db_table = "pizza_orders"
+    db_table = 'music_album'
 
 If this isn't given, Django will use ``app_label + '_' + model_class_name``.
+See "Table names" below for more.
 
 If your database table name is an SQL reserved word, or contains characters
 that aren't allowed in Python variable names -- notably, the hyphen --
@@ -916,27 +902,32 @@ that's OK. Django quotes column and table names behind the scenes.
 ``get_latest_by``
 -----------------
 
-The name of a ``DateField`` or ``DateTimeField``. If given, the module will
-have a ``get_latest()`` function that fetches the "latest" object according
-to that field::
+The name of a ``DateField`` or ``DateTimeField`` in the model. This specifies
+the default field to use in your model ``Manager``'s ``latest()`` method.
+
+Example::
 
     get_latest_by = "order_date"
 
-See `Getting the "latest" object`_ for a full example.
+See the `docs for latest()`_ for more.
 
-.. _Getting the "latest" object: http://www.djangoproject.com/documentation/models/get_latest/
+.. _docs for latest(): http://www.djangoproject.com/documentation/db_api/#latest-field-name-none
 
 ``order_with_respect_to``
 -------------------------
 
 Marks this object as "orderable" with respect to the given field. This is
 almost always used with related objects to allow them to be ordered with
-respect to a parent object. For example, if a ``PizzaToppping`` relates to
-a ``Pizza`` object, you might use::
+respect to a parent object. For example, if an ``Answer`` relates to a
+``Question`` object, and a question has more than one answer, and the order
+of answers matters, you'd do this::
 
-    order_with_respect_to = 'pizza'
+    class Answer(models.Model):
+        question = models.ForeignKey(Question)
+        # ...
 
-...to allow the toppings to be ordered with respect to the associated pizza.
+        class Meta:
+            order_with_respect_to = 'question'
 
 ``ordering``
 ------------
@@ -1012,177 +1003,297 @@ The plural name for the object::
 
 If this isn't given, Django will use ``verbose_name + "s"``.
 
-
-
-========================================
-THE REST OF THIS HAS NOT YET BEEN EDITED
-========================================
-
-
-
 Table names
 ===========
+
+To save you time, Django automatically derives the name of the database table
+from the name of your model class and the app that contains it. A model's
+database table name is constructed by joining the model's "app label" -- the
+name you used in ``manage.py startapp`` -- to the model's class name, with an
+underscore between them.
+
+For example, if you have an app ``bookstore`` (as created by
+``manage.py startapp bookstore``), a model defined as ``class Book`` will have
+a database table named ``bookstore_book``.
+
+To override the database table name, use the ``db_table`` parameter in
+``class Meta``.
 
 Automatic primary key fields
 ============================
 
+By default, Django gives each model the following field::
+
+    id = models.AutoField(primary_key=True)
+
+This is an auto-incrementing primary key.
+
+If you'd like to specify a custom primary key, just specify ``primary_key=True``
+on one of your fields. If Django sees you've explicitly set ``primary_key``, it
+won't add the automatic ``id`` column.
+
+Each model requires exactly one field to have ``primary_key=True``.
 
 Admin options
 =============
 
-If you want your model to be visible to the automatic Administration
-system, your model must have an inner ``"class Admin"``, like so::
+If you want your model to be visible to Django's admin site, give your model an
+inner ``"class Admin"``, like so::
 
-    class Foo(models.Model):
-        bar = models.CharField(maxlength=30)
-        # ...
+    class Person(models.Model):
+        first_name = models.CharField(maxlength=30)
+        last_name = models.CharField(maxlength=30)
+
         class Admin:
-            # ...
+            # Admin options go here
+            pass
 
-The Admin class gives instructions to Django on how to display the Model
-to the Administration system.
+The ``Admin`` class tells Django how to display the model in the admin site.
 
-Here's a list of all possible ``Admin`` options. No options are required. Adding
-``class Admin`` to a model is completely optional.
+Here's a list of all possible ``Admin`` options. None of these options are
+required. To use an admin interface without specifying any options, use
+``pass``, like so::
+
+    class Admin:
+        pass
+
+Adding ``class Admin`` to a model is completely optional.
 
 ``date_hierarchy``
-    To allow filtering of objects in the admin by date, set ``date_hierarchy``
-    to the name of the field to filter by::
+------------------
 
-        date_hierarchy = 'order_date'
+Set ``date_hierarchy`` to the name of a ``DateField`` or ``DateTimeField`` in
+your model, and the change list page will include a date-based drilldown
+navigation by that field.
+
+Example::
+
+    date_hierarchy = 'pub_date'
 
 ``fields``
-    A list of fieldsets to display on the admin page.  Each fieldset is a 2-tuple:
-    ``(name, field_options)``.  The ``name`` is a string to name the field set,
-    and ``field_options`` is a dictionary of information about the fields to be
-    displayed in that fieldset. This dictionary has the following keys:
+----------
 
-        ``fields``
-            A tuple of field names to display in this fieldset. To display
-            multiple fields on the same line, wrap those fields in their
-            own tuple.
+Set ``fields`` to control the layout of admin "add" and "change" pages.
 
-            This key is required in the dictionary.
+``fields`` is a list of two-tuples, in which each two-tuple represents a
+``<fieldset>`` on the admin form page. (A ``<fieldset>`` is a "section" of the
+form.)
 
-        ``classes``
-            Extra CSS classes to apply to the fieldset. This is a simple
-            string. You can apply multiple classes by separating them with
-            spaces.
+The two-tuples are in the format ``(name, field_options)``, where ``name`` is a
+string representing the title of the fieldset and ``field_options`` is a
+dictionary of information about the fieldset, including a list of fields to be
+displayed in it.
 
-            Two useful classes defined by the default stylesheet are
-            ``collapse`` and ``wide``.  Fieldsets with the ``collapse`` style
-            will be initially collapsed in the admin and replaced with a small
-            "click to expand" link.  Fieldsets with the ``wide`` style will be
-            given extra horizontal space.
+A full example, taken from the ``django.contrib.flatpages.FlatPage`` model::
 
-        ``description``
-            Optional extra text to be displayed at the top of each fieldset,
-            underneath the heading of the fieldset.  It is used verbatim,
-            so you can use any HTML and you must escape any special HTML
-            characters (such as ampersand) yourself.
+    class Admin:
+        fields = (
+            (None, {
+                'fields': ('url', 'title', 'content', 'sites')
+            }),
+            ('Advanced options', {
+                'classes': 'collapse',
+                'fields' : ('enable_comments', 'registration_required', 'template_name')
+            }),
+        )
 
-    For example (taken from the ``django.contrib.flatpages`` model)::
+This results in an admin page that looks like:
 
-        class Admin:
-            ...
-            fields = (
-                (None, {
-                    'fields': ('url', 'title', 'content', 'sites')
-                }),
-                ('Advanced options', {
-                    'classes': 'collapse',
-                    'fields' : ('enable_comments', 'registration_required', 'template_name')
-                }),
-            )
+    .. image:: http://media.djangoproject.com/img/doc/flatfiles_admin.png
 
-    results in an admin that looks like:
+If ``fields`` isn't given, Django will default to displaying each field that
+isn't an ``AutoField`` and has ``editable=True``, in a single fieldset, in
+the same order as the fields are defined in the model.
 
-        .. image:: http://media.djangoproject.com/img/doc/flatfiles_admin.png
+The ``field_options`` dictionary can have the following keys::
 
-    If ``fields`` isn't given Django will default to displaying each field that
-    isn't an ``AutoField`` and has ``editable=True``, in a single fieldset, in
-    the same order as the fields are defined in the model.
+``fields``
+~~~~~~~~~~
+
+A tuple of field names to display in this fieldset. This key is required.
+
+Example::
+
+    {
+    'fields': ('first_name', 'last_name', 'address', 'city', 'state'),
+    }
+
+To display multiple fields on the same line, wrap those fields in their own
+tuple. In this example, the ``first_name`` and ``last_name`` fields will
+display on the same line::
+
+    {
+    'fields': (('first_name', 'last_name'), 'address', 'city', 'state'),
+    }
+
+``classes``
+~~~~~~~~~~~
+
+A string containing extra CSS classes to apply to the fieldset.
+
+Example::
+
+    {
+    'classes': 'wide',
+    }
+
+Apply multiple classes by separating them with spaces. Example::
+
+    {
+    'classes': 'wide extrapretty',
+    }
+
+Two useful classes defined by the default admin-site stylesheet are
+``collapse`` and ``wide``. Fieldsets with the ``collapse`` style will be
+initially collapsed in the admin and replaced with a small "click to expand"
+link. Fieldsets with the ``wide`` style will be given extra horizontal space.
+
+``description``
+~~~~~~~~~~~~~~~
+
+A string of optional extra text to be displayed at the top of each fieldset,
+under the heading of the fieldset. It's used verbatim, so you can use any HTML
+and you must escape any special HTML characters (such as ampersands) yourself.
 
 ``js``
-    A list of strings representing URLs of JavaScript files to link into the
-    admin screen. This can be used to tweak a given type of admin page in JS or
-    to provide "quick links" to fill in default values for certain fields.
+------
+
+A list of strings representing URLs of JavaScript files to link into the admin
+screen via ``<script src="">`` tags. This can be used to tweak a given type of
+admin page in JavaScript or to provide "quick links" to fill in default values
+for certain fields.
 
 ``list_display``
-    List of fields to display on the list page in the admin.
+----------------
 
-    There are a few special cases that do other things besides displaying the
-    contents of the given fields:
+Set ``list_display`` to control which fields are displayed on the change list
+page of the admin.
 
-        * If the field given is a ``ForeignKey``, the ``repr()`` of the related
-          object will be displayed.
+Example::
 
-        * ``ManyToManyField`` fields aren't supported, because that would
-          entail executing a separate SQL statement for each row in the table.
+    list_display = ('first_name', 'last_name')
 
-        * If the field is a ``BooleanField``, a "on" or "off" icon will
-          be displayed instead of ``True`` or ``False``.
+If you don't set ``list_display``, the admin site will display a single column
+that displays the ``__str__()`` representation of each object.
 
-        * If the field name is a method of the model, it'll be called, and the
-          output will be displayed. This method should have a
-          ``short_description`` function attribute, for use as the header for
-          the field.
+A few special cases to note about ``list_display``:
 
-        * Use the string ``"__str__"`` to output the representation of the
-          object, according to your model's ``__str__()`` function. If you
-          don't define ``list_display``, Django will use the ``__str__`` by
-          default.
+    * If the field is a ``ForeignKey``, Django will display the ``__str__()``
+      of the related object.
 
-    See the example below.
+    * ``ManyToManyField`` fields aren't supported, because that would entail
+        executing a separate SQL statement for each row in the table.
+
+    * If the field is a ``BooleanField``, Django will display a pretty "on" or
+      "off" icon instead of ``True`` or ``False``.
+
+    * If the string given is a method of the model, Django will call it and
+      display the output. This method should have a ``short_description``
+      function attribute, for use as the header for the field.
+
+      Here's a full example model::
+
+          class Person(models.Model):
+              name = models.CharField(maxlength=50)
+              birthday = models.DateField()
+
+              class Admin:
+                  list_display = ('name', 'decade_born_in')
+
+              def decade_born_in(self):
+                  return self.birthday.strftime('%Y')[:3] + "0's"
+              decade_born_in.short_description = 'Birth decade'
 
 ``list_filter``
-    List of fields to filter by. Each field should either be a ``BooleanField``
-    or else a field with a ``ManyToOne`` relation.
+---------------
 
-    Here's an example of how ``list_display`` and ``list_filter`` work (taken
-    from the ``auth.user`` model)::
+Set ``list_filter`` to activate filters in the right sidebar of the change list
+page of the admin. This should be a list of field names, and each specified
+field should be either a ``BooleanField``, ``DateField``, ``DateTimeField``
+or ``ForeignKey``.
 
-        class Admin:
-            #...
-            list_display = ('username', 'email', 'first_name', 'last_name', 'is_staff')
-            list_filter = ('is_staff', 'is_superuser')
+This example, taken from the ``django.contrib.auth.models.User`` model, shows
+how both ``list_display`` and ``list_filter`` work::
 
-    The above code results in an admin that looks like this:
+    class Admin:
+        list_display = ('username', 'email', 'first_name', 'last_name', 'is_staff')
+        list_filter = ('is_staff', 'is_superuser')
 
-        .. image:: http://media.djangoproject.com/img/doc/users_changelist.png
+The above code results in an admin change list page that looks like this:
 
-    (This example also has ``search_fields`` defined; see below).
+    .. image:: http://media.djangoproject.com/img/doc/users_changelist.png
+
+(This example also has ``search_fields`` defined. See below.)
 
 ``list_select_related``
-    Either ``True`` or ``False``. Default is ``False``. If ``True``, the admin
-    change list page will use the ``select_related`` database-API parameter in
-    its query that retrieves the list of items.
+-----------------------
 
-    Note that Django will use ``select_related``, regardless of this setting,
-    if one of the ``list_display`` fields is a ``ForeignKey``.
+Set ``list_select_related`` to tell Django to use ``select_related()`` in
+retrieving the list of objects on the admin change list page. This can save you
+a bunch of database queries.
+
+The value should be either ``True`` or ``False``. Default is ``False``.
+
+Note that Django will use ``select_related()``, regardless of this setting,
+if one of the ``list_display`` fields is a ``ForeignKey``.
+
+For more on ``select_related()``, see `the select_related() docs`_.
+
+.. _the select_related() docs: http://www.djangoproject.com/documentation/db_api/#select-related
 
 ``ordering``
-    A list or tuple (see the `Meta options`_, above) that gives a
-    different ordering for the admin change list. If this isn't given, the
-    model's default ordering will be used.
+------------
+
+Set ``ordering`` to specify how objects on the admin change list page should be
+ordered. This should be a list or tuple in the same format as a model's
+``ordering`` parameter.
+
+If this isn't provided, the Django admin will use the model's default ordering.
 
 ``save_as``
-    Enables a "save as" feature on object pages.  Normally, objects have three
-    save options: "Save", "Save and continue editing" and "Save and add
-    another". If ``save_as`` is ``True``, "Save and add another" will be
-    replaced by a "Save as" button.
+-----------
 
-    "Save as" means the object will be saved as a new object (with a new ID),
-    rather than the old object.
+Set ``save_as`` to enable a "save as" feature on admin change forms.
+
+Normally, objects have three save options: "Save", "Save and continue editing"
+and "Save and add another". If ``save_as`` is ``True``, "Save and add another"
+will be replaced by a "Save as" button.
+
+"Save as" means the object will be saved as a new object (with a new ID),
+rather than the old object.
+
+By default, ``save_as`` is set to ``False``.
 
 ``save_on_top``
-    If this option is ``True``, object pages will have the save buttons across
-    the top as well as at the bottom of the page.
+---------------
+
+Set ``save_on_top`` to add save buttons across the top of your admin change
+forms.
+
+Normally, the save buttons appear only at the bottom of the forms. If you set
+``save_on_top``, the buttons will appear both on the top and the bottom.
+
+By default, ``save_on_top`` is set to ``False``.
 
 ``search_fields``
-    A list of field names to provide a text search for. These fields should,
-    obviously, be some kind of text field, such as ``CharField`` or
-    ``TextField``.
+-----------------
+
+Set ``search_fields`` to enable a search box on the admin change list page.
+This should be set to a list of field names that will be searched whenever
+somebody submits a search query in that text box.
+
+These fields should be some kind of text field, such as ``CharField`` or
+``TextField``.
+
+When somebody does a search in the admin search box, Django splits the search
+query into words and returns all objects that contain each of the words, case
+insensitive, where each word must be in at least one of ``search_fields``. For
+example, if ``search_fields`` is set to ``['first_name', 'last_name']`` and a
+user searches for ``john lennon``, Django will do the equivalent of this SQL
+``WHERE`` clause::
+
+    WHERE (first_name ILIKE '%john%' OR last_name ILIKE '%john%')
+    AND (first_name ILIKE '%lennon%' OR last_name ILIKE '%lennon%')
 
 Managers
 ========
@@ -1338,6 +1449,9 @@ method::
 
 Manipulator methods
 -------------------
+
+(The functionality in this section is going away soon. This documentation is
+provided only for legacy purposes at this point.)
 
 Similarly, you can add methods to the object's manipulators by defining methods
 that being with "_manipulator_". This is most useful for providing custom
