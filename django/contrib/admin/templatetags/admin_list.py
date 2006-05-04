@@ -150,10 +150,6 @@ def items_for_result(cl, result):
             elif isinstance(f, models.BooleanField) or isinstance(f, models.NullBooleanField):
                 BOOLEAN_MAPPING = {True: 'yes', False: 'no', None: 'unknown'}
                 result_repr = '<img src="%simg/admin/icon-%s.gif" alt="%s" />' % (settings.ADMIN_MEDIA_PREFIX, BOOLEAN_MAPPING[field_val], field_val)
-            # ImageFields are special: Use a thumbnail.
-            elif isinstance(f, models.ImageField):
-                from django.parts.media.photos import get_thumbnail_url
-                result_repr = '<img src="%s" alt="%s" title="%s" />' % (get_thumbnail_url(getattr(result, 'get_%s_url' % f.name)(), '120'), field_val, field_val)
             # FloatFields are special: Zero-pad the decimals.
             elif isinstance(f, models.FloatField):
                 if field_val is not None:
