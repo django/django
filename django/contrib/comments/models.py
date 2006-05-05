@@ -56,7 +56,7 @@ class CommentManager(models.Manager):
     def user_is_moderator(self, user):
         if user.is_superuser:
             return True
-        for g in user.group_set.all():
+        for g in user.groups.all():
             if g.id == settings.COMMENTS_MODERATORS_GROUP:
                 return True
         return False
