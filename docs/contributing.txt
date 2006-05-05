@@ -247,8 +247,10 @@ To run the tests, ``cd`` to the ``tests/`` directory and type::
 
 Yes, the unit tests need a settings module, but only for database connection
 info -- the ``DATABASE_ENGINE``, ``DATABASE_USER`` and ``DATABASE_PASSWORD``.
+
 The unit tests will not touch your database; they create a new database, called
-``django_test_db``, which is deleted when the tests are finished.
+``django_test_db``, which is deleted when the tests are finished. This means
+your user account needs permission to execute ``CREATE DATABASE``.
 
 Requesting features
 ===================
