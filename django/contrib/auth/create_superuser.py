@@ -1,5 +1,8 @@
 """
 Helper function for creating superusers in the authentication system.
+
+If run from the command line, this module lets you create a superuser
+interactively.
 """
 
 from django.core import validators
@@ -82,3 +85,6 @@ def createsuperuser(username=None, email=None, password=None):
     u.is_superuser = True
     u.save()
     print "Superuser created successfully."
+
+if __name__ == "__main__":
+    createsuperuser()

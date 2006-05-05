@@ -36,7 +36,7 @@ install what's needed.
 
 The ``syncdb`` command creates the necessary database tables, creates
 permission objects for all installed apps that need 'em, and prompts you to
-create a superuser account.
+create a superuser account the first time you run it.
 
 Once you've taken those steps, that's it.
 
@@ -225,6 +225,19 @@ the ``django.contirb.auth.models.User`` interface, with these differences:
 
 In practice, you probably won't need to use ``AnonymousUser`` objects on your
 own, but they're used by Web requests, as explained in the next section.
+
+Creating superusers
+-------------------
+
+``manage.py syncdb`` prompts you to create a superuser the first time you run
+it after adding ``'django.contrib.auth'`` to your ``INSTALLED_APPS``. But if
+you need to create a superuser after that via the command line, you can use the
+``create_superuser.py`` utility. Just run this command::
+
+    python /path/to/django/contrib/auth/create_superuser.py
+
+Make sure to substitute ``/path/to/`` with the path to the Django codebase on
+your filesystem.
 
 Authentication in Web requests
 ==============================
