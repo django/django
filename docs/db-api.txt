@@ -283,13 +283,11 @@ You can evaluate a ``QuerySet`` in the following ways:
           for e in Entry.objects.all():
               print e.headline
 
-    * **Slicing.** A ``QuerySet`` can be sliced, using Python's array-slicing
-      syntax, and it executes its database query the first time you slice it.
-      Examples::
-
-          fifth_entry = Entry.objects.all()[4]
-          all_entries_but_the_first_two = Entry.objects.all()[2:]
-          every_second_entry = Entry.objects.all()[::2]
+    * **Slicing.** As explained in `Limiting QuerySets`_ below, a ``QuerySet``
+      can be sliced, using Python's array-slicing syntax. Usually slicing a
+      ``QuerySet`` returns another (unevaluated )``QuerySet``, but Django will
+      execute the database query if you use the "step" parameter of slice
+      syntax.
 
     * **repr().** A ``QuerySet`` is evaluated when you call ``repr()`` on it.
       This is for convenience in the Python interactive interpreter, so you can
@@ -313,6 +311,35 @@ You can evaluate a ``QuerySet`` in the following ways:
       Django will load each element of the list into memory. In contrast,
       iterating over a ``QuerySet`` will take advantage of your database to
       load data and instantiate objects only as you need them.
+
+Limiting QuerySets
+------------------
+
+Use Python's array-slicing syntax to limit your ``QuerySet`` to a certain
+number of results. This is the equivalent of SQL's ``LIMIT`` and ``OFFSET``
+clauses.
+
+For example, this returns the first 5 objects (``LIMIT 5``)::
+
+    Entry.objects.all()[:5]
+
+This returns the fifth through tenth objects (``OFFSET 5 LIMIT 5``)::
+
+    Entry.objects.all()[5:10]
+
+Generally, slicing a ``QuerySet`` returns a new ``QuerySet`` -- it doesn't
+evaluate the query. An exception is if you use the "step" parameter of Python
+slice syntax. For example, this would actually execute the query in order to
+return a list of every *second* object of the first 10::
+
+    Entry.objects.all()[:10:2]
+
+To retrieve a *single* object rather than a list
+(e.g. ``SELECT foo FROM bar LIMIT 1``), slice the ``QuerySet`` to ``[:1]`` and
+call ``get()`` on that. For example, this returns the first ``Entry`` in the
+database, after ordering entries alphabetically by headline::
+
+    Entry.objects.order_by('headline')[:1].get()
 
 QuerySet methods that return new QuerySets
 ------------------------------------------
