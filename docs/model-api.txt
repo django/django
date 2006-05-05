@@ -18,6 +18,8 @@ The basics:
       database-access API, which is explained in the `Database API reference`_.
 
 A companion to this document is the `official repository of model examples`_.
+(In the Django source distribution, these examples are in the
+``tests/modeltests`` directory.)
 
 .. _Database API reference: http://www.djangoproject.com/documentation/db_api/
 .. _official repository of model examples: http://www.djangoproject.com/documentation/models/
