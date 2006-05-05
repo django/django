@@ -1298,16 +1298,22 @@ user searches for ``john lennon``, Django will do the equivalent of this SQL
 Managers
 ========
 
-The Manager is the interface through which database query operations
-are provided to Django applications. At least one Manager exists for
-every model in a Django application.
+A ``Manager`` is the interface through which database query operations are
+provided to Django models. At least one ``Manager`` exists for every model in
+a Django application.
 
-By default, Django will add a Manager with the name of ``objects`` to
-every Django model. However, if you wish to use ``objects`` as a field
-name, or if you wish to use a name other than ``objects`` for the Manager,
-you can rename the Manager on a per-model basis. To rename the Manager
-for a given class, define a class attribute of type models.Manager()
-on that model. For example::
+The way ``Manager`` classes work is documented in the `Retrieving objects`_
+section of the database API docs, but this section specifically touches on
+model options that customize ``Manager`` behavior.
+
+Manager names
+-------------
+
+By default, Django adds a ``Manager`` with the name ``objects`` to every Django
+model class. However, if you want to use ``objects`` as a field name, or if you
+want to use a name other than ``objects`` for the ``Manager``, you can rename
+it on a per-model basis. To rename the ``Manager`` for a given class, define a
+class attribute of type ``models.Manager()`` on that model. For example::
 
     from django.db import models
 
@@ -1315,38 +1321,118 @@ on that model. For example::
         #...
         people = models.Manager()
 
-In this example, ``Person.objects.all()`` will generate an error, but
-``Person.people.all()`` will provide a list of all ``Person`` objects.
+Using this example model, ``Person.objects`` will generate an
+``AttributeError`` exception, but ``Person.people.all()`` will provide a list
+of all ``Person`` objects.
 
-Managers can also be customized. This is achieved by extending the
-base Manager class, and instantiating the new Manager on your model.
-There are two reasons that you may want to customize a Manager: firstly,
-to add utility methods to the Manager, and secondly, to modify the
-initial Query Set provided by the Manager.
+Custom Managers
+---------------
 
-To modify the initial Query Set provided by a Manager, override the
-``get_query_set()`` method to return a Query Set with the properties
-you require. For example::
+You can use a custom ``Manager`` in a particular model by extending the base
+``Manager`` class and instantiating your custom ``Manager`` in your model.
 
-    class PersonManager(models.Manager):
-        # Add some custom behavior to the Manager
-        def move_house(self):
-            # Some logic to help a person move house
+There are two reasons you might want to customize a ``Manager``: to add extra
+``Manager`` methods, and/or to modify the initial ``QuerySet`` the ``Manager``
+returns.
 
-        # Modify the initial Query Set provided by the manager
+Adding extra Manager methods
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Adding extra ``Manager`` methods is the preferred way to add "table-level"
+functionality to your models. (For "row-level" functionality -- i.e., functions
+that act on a single instance of a model object -- use _`Model methods`, not
+custom ``Manager`` methods.)
+
+A custom ``Manager`` method can return anything you want. It doesn't have to
+return a ``QuerySet``.
+
+For example, this custom ``Manager`` offers a method ``with_counts()``, which
+returns a list of all ``OpinionPoll`` objects, each with an extra
+``num_responses`` attribute that is the result of an aggregate query::
+
+    class PollManager(models.Manager):
+        def with_counts(self):
+            from django.db import connection
+            cursor = connection.cursor()
+            cursor.execute("""
+                SELECT p.id, p.question, p.poll_date, COUNT(*)
+                FROM polls_opinionpoll p, polls_response r
+                WHERE p.id = r.poll_id
+                GROUP BY 1, 2, 3
+                ORDER BY 3 DESC""")
+            result_list = []
+            for row in cursor.fetchall():
+                p = self.model(id=row[0], question=row[1], poll_date=row[2])
+                p.num_responses = row[3]
+                result_list.append(p)
+            return result_list
+
+    class OpinionPoll(models.Model):
+        question = models.CharField(maxlength=200)
+        poll_date = models.DateField()
+        objects = PollManager()
+
+    class Response(models.Model):
+        poll = models.ForeignKey(Poll)
+        person_name = models.CharField(maxlength=50)
+        response = models.TextField()
+
+With this example, you'd use ``OpinionPoll.objects.with_counts()`` to return
+that list of ``OpinionPoll`` objects with ``num_responses`` attributes.
+
+Another thing to note about this example is that ``Manager`` methods can
+access ``self.model`` to get the model class to which they're attached.
+
+Modifying initial Manager QuerySets
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+A ``Manager``'s base ``QuerySet`` returns all objects in the system. For
+example, using this model::
+
+    class Book(models.Model):
+        title = models.CharField(maxlength=100)
+        author = models.CharField(maxlength=50)
+
+...the statement ``Book.objects.all()`` will return all books in the database.
+
+You can override a ``Manager``'s base ``QuerySet`` by overriding the
+``Manager.get_query_set()`` method. ``get_query_set()`` should return a
+``QuerySet`` with the properties you require.
+
+For example, the following model has *two* ``Manager``s -- one that returns
+all objects, and one that returns only the books by Roald Dahl::
+
+    # First, define the Manager subclass.
+    class DahlBookManager(models.Manager):
         def get_query_set(self):
-            return super(Manager, self).get_query_set().filter(name__startswith="Fred")
+            return super(Manager, self).get_query_set().filter(author='Roald Dahl')
 
-    class Person(models.Model):
-        #...
-        objects = PersonManager()
+    # Then hook it into the Book model explicitly.
+    class Book(models.Model):
+        title = models.CharField(maxlength=100)
+        author = models.CharField(maxlength=50)
 
-In this example, ``Person.objects.all()`` will only return people whose name starts
-with "Fred"; ``Person.objects.move_house()`` will also be available.
+        objects = models.Manager() # The default manager.
+        dahl_objects = DahlBookManager() # The Dahl-specific manager.
 
-If required, you can add multiple Managers to a model. Every Manager attribute
-added to a model can be accessed and used as a manager. This is an easy way
-to define common filters types for your models. For example, the model::
+With this sample model, ``Book.objects.all()`` will return all books in the
+database, but ``Book.dahl_objects.all()`` will only return the ones written by
+Roald Dahl.
+
+Of course, because ``get_query_set()`` returns a ``QuerySet`` object, you can
+use ``filter()``, ``exclude()`` and all the other ``QuerySet`` methods on it.
+So these statements are all legal::
+
+    Book.dahl_objects.all()
+    Book.dahl_objects.filter(title='Matilda')
+    Book.dahl_objects.count()
+
+This example also pointed out another interesting technique: using multiple
+managers on the same model. You can attach as many ``Manager()`` instances to
+a model as you'd like. This is an easy way to define common "filters" for your
+models.
+
+For example::
 
     class MaleManager(models.Manager):
         def get_query_set(self):
@@ -1357,126 +1443,130 @@ to define common filters types for your models. For example, the model::
             return super(Manager, self).get_query_set().filter(sex='F')
 
     class Person(models.Model):
-        #...
+        first_name = models.CharField(maxlength=50)
+        last_name = models.CharField(maxlength=50)
+        sex = models.CharField(maxlength=1, choices=(('M', 'Male'), ('F', 'Female')))
         people = models.Manager()
         men = MaleManager()
         women = FemaleManager()
 
-... will allow end users to request ``Person.men.all()``, ``Person.women.all()``,
+This example allows you to request ``Person.men.all()``, ``Person.women.all()``,
 and ``Person.people.all()``, yielding predictable results.
 
-If you are going to install a customized Manager, be warned that the first
-Manager that Django encounters in a model definition has special status.
-Django interprets the first Manager defined in a class as the default Manager.
-Certain operations use the default Manager to obtain lists of objects, so it
-is generally a good idea for the first Manager to be relatively unfiltered.
-In the last example, ``people`` is defined first - so the default Manager
-will include everyone.
+If you use custom ``Manager`` objects, take note that the first ``Manager``
+Django encounters (in order by which they're defined in the model) has a
+special status. Django interprets the first ``Manager`` defined in a class as
+the "default" ``Manager``. Certain operations -- such as Django's admin site --
+use the default ``Manager`` to obtain lists of objects, so it's generally a
+good idea for the first ``Manager`` to be relatively unfiltered. In the last
+example, the ``people`` ``Manager`` is defined first -- so it's the default
+``Manager``.
 
 Model methods
 =============
 
-There are a number of methods you can define on model objects to control the
-object's behavior.  First, any methods you define will be available as methods
-of object instances. For example::
+Define custom methods on a model to add custom "row-level" functionality to
+your objects. Whereas ``Manager`` methods are intended to do "table-wide"
+things, model methods should act on a particular model instance.
 
-    class Pizza(models.Model):
-        # ...
+This is a valuable technique for keeping business logic in one place -- the
+model.
 
-        def is_disgusting(self):
-            return "anchovies" in [topping.name for topping in self.toppings.all()]
+For example, this model has a few custom methods::
 
-Now, every ``Pizza`` object will have a ``is_disgusting()`` method.
+    class Person(models.Model):
+        first_name = models.CharField(maxlength=50)
+        last_name = models.CharField(maxlength=50)
+        birth_date = models.DateField()
+        address = models.CharField(maxlength=100)
+        city = models.CharField(maxlength=50)
+        state = models.USStateField() # Yes, this is America-centric...
 
-See `Giving models custom methods`_ for a full example.
+    def baby_boomer_status(self):
+        "Returns the person's baby-boomer status."
+        import datetime
+        if datetime.date(1945, 8, 1) <= self.birth_date <= datetime.date(1964, 12, 31):
+            return "Baby boomer"
+        if self.birth_date < datetime.date(1945, 8, 1):
+            return "Pre-boomer"
+        return "Post-boomer"
 
-.. _Giving models custom methods: http://www.djangoproject.com/documentation/models/custom_methods/
+    def is_midwestern(self):
+        "Returns True if this person is from the Midwest."
+        return self.state in ('IL', 'WI', 'MI', 'IN', 'OH', 'IA', 'MO')
+
+    def _get_full_name(self):
+        "Returns the person's full name."
+        return '%s %s' % (self.first_name, self.last_name)
+    full_name = property(_get_full_name)
+
+The last method in this example is a *property*. `Read more about properties`_.
+
+.. _Read more about properties: http://www.python.org/download/releases/2.2/descrintro/#property
 
 A few object methods have special meaning:
 
 ``__str__``
-    Django uses ``str(obj)`` in a number of places, most notably as the value
-    inserted into a template when it displays an object. Thus, you should always
-    return a nice, human-readable string for the object's ``__str__``.
+-----------
 
-    Although defining ``__str__()`` isn't required, it's strongly encouraged.
+``__str__()`` is a Python "magic method" that defines what should be returned
+if you call ``str()`` on the object. Django uses ``str(obj)`` in a number of
+places, most notably as the value displayed to render an object in the Django
+admin site and as the value inserted into a template when it displays an
+object. Thus, you should always return a nice, human-readable string for the
+object's ``__str__``. Although this isn't required, it's strongly encouraged.
 
-    See `Adding str`_ for a full example.
+For example::
 
-    .. _Adding str: http://www.djangoproject.com/documentation/models/repr/
+    class Person(models.Model):
+        first_name = models.CharField(maxlength=50)
+        last_name = models.CharField(maxlength=50)
+
+        def __str__(self):
+            return '%s %s' % (self.first_name, self.last_name)
 
 ``get_absolute_url``
-    Define a ``get_absolute_url`` method to tell Django how to calculate the
-    URL for an object. For example::
-
-        def get_absolute_url(self):
-            return "/pizzas/%i/" % self.id
-
-    Django uses this in its admin interface. If an object defines
-    ``get_absolute_url``, the object detail page will have a "View on site"
-    link that will jump you directly to the object's public view.
-
-    It's good practice to use ``get_absolute_url()`` in templates, instead of
-    hard-coding your objects' URLs.
-
-Module-level methods
 --------------------
 
-If you want to add a method to the Model, rather than instances of the model,
-you can use the Python ``staticmethod`` and ``classmethod`` operators. For
-example::
+Define a ``get_absolute_url()`` method to tell Django how to calculate the
+URL for an object. For example::
 
-    class Pizza(models.Model):
-        # ...
+    def get_absolute_url(self):
+        return "/people/%i/" % self.id
 
-        def get_pizzas_to_deliver():
-            return get_list(delivered__exact=False)
-        get_pizzas_to_deliver = staticmethod(get_pizzas_to_deliver)
+Django uses this in its admin interface. If an object defines
+``get_absolute_url()``, the object-editing page will have a "View on site"
+link that will jump you directly to the object's public view, according to
+``get_absolute_url()``.
 
-Or, using Python 2.4 decorators::
+Also, a couple of other bits of Django, such as the syndication-feed framework,
+use ``get_absolute_url()`` as a convenience to reward people who've defined the
+method.
 
-    # ...
-    @staticmethod
-    def get_pizzas_to_deliver():
-        # ...
+It's good practice to use ``get_absolute_url()`` in templates, instead of
+hard-coding your objects' URLs. For example, this template code is bad::
 
-This will make the top-level ``pizzas`` module have a ``get_pizzas_to_deliver()``
-method::
+    <a href="/people/{{ object.id }}/">{{ object.name }}</a>
 
-    >>> from pizza_hut.models import Pizza
-    >>> Pizza.get_pizzas_to_deliver()
-    [ ... ]
+But this template code is good::
 
-Manipulator methods
--------------------
+    <a href="{{ object.get_absolute_url }}">{{ object.name }}</a>
 
-(The functionality in this section is going away soon. This documentation is
-provided only for legacy purposes at this point.)
-
-Similarly, you can add methods to the object's manipulators by defining methods
-that being with "_manipulator_". This is most useful for providing custom
-validators for certain fields, because manipulators automatically call any
-method that begins with "validate"::
-
-    class Pizza(models.Model):
-        # ...
-
-        def _manipulator_validate_customer_id(self, field_data, all_data):
-            from django.core import validators
-            from django.conf.settings import BAD_CUSTOMER_IDS
-
-            if int(field_data) in BAD_CUSTOMER_IDS:
-                raise validators.ValidationError, "We don't deliver to this customer."
+(Yes, we know ``get_absolute_url()`` couples URLs to models, which violates the
+DRY principle, because URLs are defined both in a URLconf and in the model.
+This is a rare case in which we've intentionally violated that principle for
+the sake of convenience. With that said, we're working on an even cleaner way
+of specifying URLs in a more DRY fashion.)
 
 Executing custom SQL
 --------------------
 
 Feel free to write custom SQL statements in custom model methods and
-module-level methods. The object ``django.db.connection`` object represents
-the current database connection. To use it, call ``connection.cursor()`` to
-get a cursor object. Then, call ``cursor.execute(sql, [params])``
-to execute the SQL and ``cursor.fetchone()`` or ``cursor.fetchall()`` to return
-the resulting rows. Example::
+module-level methods. The object ``django.db.connection`` represents the
+current database connection. To use it, call ``connection.cursor()`` to get a
+cursor object. Then, call ``cursor.execute(sql, [params])`` to execute the SQL
+and ``cursor.fetchone()`` or ``cursor.fetchall()`` to return the resulting
+rows. Example::
 
     def my_custom_sql(self):
         from django.db import connection
@@ -1494,12 +1584,14 @@ via a ``DELETE`` or ``UPDATE`` -- you'll need to call ``db.commit()``. Example::
         cursor.execute("DELETE FROM bar WHERE baz = %s", [self.baz])
         connection.commit()
 
-``connection`` and ``cursor`` simply use the standard `Python DB-API`_. If you're not
-familiar with the Python DB-API, note that the SQL statement in
+``connection`` and ``cursor`` simply use the standard `Python DB-API`_. If
+you're not familiar with the Python DB-API, note that the SQL statement in
 ``cursor.execute()`` uses placeholders, ``"%s"``, rather than adding parameters
 directly within the SQL. If you use this technique, the underlying database
 library will automatically add quotes and escaping to your parameter(s) as
-necessary.
+necessary. (Also note that Django expects the ``"%s"`` placeholder, *not* the
+``"?"`` placeholder, which is used by the SQLite Python bindings. This is for
+the sake of consistency and sanity.)
 
 A final note: If all you want to do is a custom ``WHERE`` clause, you can just
 just the ``where``, ``tables`` and ``params`` arguments to the standard lookup
@@ -1508,32 +1600,35 @@ API. See `Other lookup options`_.
 .. _Python DB-API: http://www.python.org/peps/pep-0249.html
 .. _Other lookup options: http://www.djangoproject.com/documentation/db_api/#extra-params-select-where-tables
 
-Using models
-============
-
-Once you have created your model, you have to tell Django about your new application.
-This is done by editing your settings file and adding the name of the module that
-contains your models module to the ``INSTALLED_APPS`` tuple.
-
-For example, if the models for your application are contained in the module
-``project.myapp.models`` (the package structure that is created for an application
-by the ``django-admin.py startapp`` script), ``INSTALLED_APPS`` should read, in part::
-
-    INSTALLED_APPS = (
-        #...
-        project.myapp,
-        #...
-    )
-
 Models across files
 ===================
 
-It's perfectly OK to relate a model to one from another module. To do this,
-just import the model module at the top of your model module. Then, just
-refer to the other model class wherever needed. For example::
+It's perfectly OK to relate a model to one from another app. To do this, just
+import the related model at the top of the model that holds your model. Then,
+just refer to the other model class wherever needed. For example::
 
-    from myproject.otherapp import Site
+    from mysite.geography.models import ZipCode
 
-    class MyModel(models.Model):
+    class Restaurant(models.Model):
         # ...
-        sites = models.ManyToManyField(Site)
+        zip_code = models.ForeignKey(ZipCode)
+
+Using models
+============
+
+Once you have created your models, the final step is to tell Django you're
+going to *use* those models.
+
+Do this by editing your settings file and changing the ``INSTALLED_APPS``
+setting to add the name of the module that contains your ``models.py``.
+
+For example, if the models for your application live in the module
+``mysite.myapp.models`` (the package structure that is created for an
+application by the ``manage.py startapp`` script), ``INSTALLED_APPS`` should
+read, in part::
+
+    INSTALLED_APPS = (
+        #...
+        'mysite.myapp',
+        #...
+    )
