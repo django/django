@@ -1484,23 +1484,23 @@ For example, this model has a few custom methods::
         city = models.CharField(maxlength=50)
         state = models.USStateField() # Yes, this is America-centric...
 
-    def baby_boomer_status(self):
-        "Returns the person's baby-boomer status."
-        import datetime
-        if datetime.date(1945, 8, 1) <= self.birth_date <= datetime.date(1964, 12, 31):
-            return "Baby boomer"
-        if self.birth_date < datetime.date(1945, 8, 1):
-            return "Pre-boomer"
-        return "Post-boomer"
+        def baby_boomer_status(self):
+            "Returns the person's baby-boomer status."
+            import datetime
+            if datetime.date(1945, 8, 1) <= self.birth_date <= datetime.date(1964, 12, 31):
+                return "Baby boomer"
+            if self.birth_date < datetime.date(1945, 8, 1):
+                return "Pre-boomer"
+            return "Post-boomer"
 
-    def is_midwestern(self):
-        "Returns True if this person is from the Midwest."
-        return self.state in ('IL', 'WI', 'MI', 'IN', 'OH', 'IA', 'MO')
+        def is_midwestern(self):
+            "Returns True if this person is from the Midwest."
+            return self.state in ('IL', 'WI', 'MI', 'IN', 'OH', 'IA', 'MO')
 
-    def _get_full_name(self):
-        "Returns the person's full name."
-        return '%s %s' % (self.first_name, self.last_name)
-    full_name = property(_get_full_name)
+        def _get_full_name(self):
+            "Returns the person's full name."
+            return '%s %s' % (self.first_name, self.last_name)
+        full_name = property(_get_full_name)
 
 The last method in this example is a *property*. `Read more about properties`_.
 
