@@ -1045,6 +1045,15 @@ def run_shell(use_plain=False):
         shell.mainloop()
     except ImportError:
         import code
+        try: # Try activating rlcompleter, because it's handy.
+            import readline
+        except ImportError:
+            pass
+        else:
+            # We don't have to wrap the following import in a 'try', because
+            # we already know 'readline' was imported successfully.
+            import rlcompleter
+            readline.parse_and_bind("tab:complete")
         code.interact()
 run_shell.args = '[--plain]'
 
