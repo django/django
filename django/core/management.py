@@ -45,8 +45,8 @@ def disable_termcolors():
     global style
     style = dummy()
 
-# Disable terminal coloring if somebody's piping the output.
-if (not sys.stdout.isatty()) or (sys.platform == 'win32'):
+# Disable terminal coloring on Windows or if somebody's piping the output.
+if sys.platform == 'win32' or not sys.stdout.isatty():
     disable_termcolors()
 
 def _is_valid_dir_name(s):
