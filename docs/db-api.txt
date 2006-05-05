@@ -216,7 +216,7 @@ conditions. The two most common ways to refine a ``QuerySet`` are:
     lookup parameters.
 
 The lookup parameters (``**kwargs`` in the above function definitions) should
-be in the format described in _`Field lookups` below.
+be in the format described in `Field lookups`_ below.
 
 For example, to get a ``QuerySet`` of blog entries from the year 2006, use
 ``filter()`` like so::
@@ -298,7 +298,7 @@ You can evaluate a ``QuerySet`` in the following ways:
     * **len().** A ``QuerySet`` is evaluated when you call ``len()`` on it.
       This, as you might expect, returns the length of the result list.
 
-      Note: *Don't* use ``len()`` on ``QuerySet``s if all you want to do is
+      Note: *Don't* use ``len()`` on ``QuerySet``\s if all you want to do is
       determine the number of records in the set. It's much more efficient to
       handle a count at the database level, using SQL's ``SELECT COUNT(*)``,
       and Django provides a ``count()`` method for precisely this reason. See
@@ -328,7 +328,7 @@ Returns a new ``QuerySet`` containing objects that match the given lookup
 parameters.
 
 The lookup parameters (``**kwargs``) should be in the format described in
-_`Field lookups` below. Multiple parameters are joined via ``AND`` in the
+`Field lookups`_ below. Multiple parameters are joined via ``AND`` in the
 underlying SQL statement.
 
 ``exclude(**kwargs)``
@@ -338,7 +338,7 @@ Returns a new ``QuerySet`` containing objects that do *not* match the given
 lookup parameters.
 
 The lookup parameters (``**kwargs``) should be in the format described in
-_`Field lookups` below. Multiple parameters are joined via ``AND`` in the
+`Field lookups`_ below. Multiple parameters are joined via ``AND`` in the
 underlying SQL statement, and the whole thing is enclosed in a ``NOT()``.
 
 This example excludes all entries whose ``pub_date`` is the current date/time
@@ -650,7 +650,7 @@ they query the database each time they're called.
 ~~~~~~~~~~~~~~~~~
 
 Returns the object matching the given lookup parameters, which should be in
-the format described in _`Field lookups`.
+the format described in `Field lookups`_.
 
 ``get()`` raises ``AssertionError`` if more than one object was found.
 
@@ -1094,8 +1094,8 @@ that have been explicitly requested (e.g., the next element, if the
 ``QuerySet`` reuse the cached results.
 
 Keep this caching behavior in mind, because it may bite you if you don't use
-your ``QuerySet``s correctly. For example, the following will create two
-``QuerySet``s, evaluate them, and throw them away::
+your ``QuerySet``\s correctly. For example, the following will create two
+``QuerySet``\s, evaluate them, and throw them away::
 
     print [e.headline for e in Entry.objects.all()]
     print [e.pub_date for e in Entry.objects.all()]
@@ -1496,7 +1496,7 @@ previous object with respect to the date field, raising the appropriate
 ``DoesNotExist`` exception when appropriate.
 
 Both methods accept optional keyword arguments, which should be in the format
-described in _`Field lookups` above.
+described in `Field lookups`_ above.
 
 Note that in the case of identical date values, these methods will use the ID
 as a fallback check. This guarantees that no records are skipped or duplicated.
