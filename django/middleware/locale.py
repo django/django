@@ -19,6 +19,6 @@ class LocaleMiddleware:
 
     def process_response(self, request, response):
         patch_vary_headers(response, ('Accept-Language',))
+        response['Content-Language'] = translation.get_language()
         translation.deactivate()
         return response
-
