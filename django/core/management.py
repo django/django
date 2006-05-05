@@ -454,6 +454,7 @@ def syncdb():
             print "Creating table %s" % model._meta.db_table
             for statement in sql:
                 cursor.execute(statement)
+            table_list.append(model._meta.db_table)
 
         for model in model_list:
             if model in created_models:
