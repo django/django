@@ -281,7 +281,9 @@ class Model(object):
         return getattr(self, cachename)
 
     def _get_FIELD_filename(self, field):
-        return os.path.join(settings.MEDIA_ROOT, getattr(self, field.attname))
+        if getattr(self, field.attname): # value is not blank
+            return os.path.join(settings.MEDIA_ROOT, getattr(self, field.attname))
+        return ''
 
     def _get_FIELD_url(self, field):
         if getattr(self, field.attname): # value is not blank
