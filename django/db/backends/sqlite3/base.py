@@ -11,6 +11,8 @@ Database.register_converter("bool", lambda s: str(s) == '1')
 Database.register_converter("time", util.typecast_time)
 Database.register_converter("date", util.typecast_date)
 Database.register_converter("datetime", util.typecast_timestamp)
+Database.register_converter("timestamp", util.typecast_timestamp)
+Database.register_converter("TIMESTAMP", util.typecast_timestamp)
 
 def utf8rowFactory(cursor, row):
     def utf8(s):
@@ -35,8 +37,10 @@ class DatabaseWrapper(local):
     def cursor(self):
         from django.conf import settings
         if self.connection is None:
-            self.connection = Database.connect(settings.DATABASE_NAME, detect_types=Database.PARSE_DECLTYPES)
-            # register extract and date_trun functions
+            self.connection = Database.connect(settings.DATABASE_NAME,
+                detect_types=Database.PARSE_DECLTYPES | Database.PARSE_COLNAMES)
+
+            # Register extract and date_trunc functions.
             self.connection.create_function("django_extract", 2, _sqlite_extract)
             self.connection.create_function("django_date_trunc", 2, _sqlite_date_trunc)
         cursor = self.connection.cursor(factory=SQLiteCursorWrapper)
