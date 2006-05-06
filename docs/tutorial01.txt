@@ -5,12 +5,12 @@ Writing your first Django app, part 1
 Let's learn by example.
 
 Throughout this tutorial, we'll walk you through the creation of a basic
-blogging application.
+poll application.
 
 It'll consist of two parts:
 
     * A public site that lets people view polls and vote in them.
-    * An admin site that lets you add, change and delete polls.
+    * An admin site that lets you add, change and delete poll.
 
 We'll assume you have `Django installed`_ already. You can tell Django is
 installed by running the Python interactive interpreter and typing
@@ -33,9 +33,10 @@ code, then run the command ``django-admin.py startproject mysite``. This
 will create a ``mysite`` directory in your current directory.
 
 (``django-admin.py`` should be on your system path if you installed Django via
-its ``setup.py`` utility. If it's not on your path, you can find it in
-``site-packages/django/bin``; consider symlinking to it from some place
-on your path, such as ``/usr/local/bin``.)
+``python setup.py``. If it's not on your path, you can find it in
+``site-packages/django/bin``, where ``site-packages`` is a directory within
+your Python installation. Consider symlinking to ``django-admin.py`` from some
+place on your path, such as ``/usr/local/bin``.)
 
 .. admonition:: Where should this code live?
 
@@ -80,17 +81,18 @@ the following output on the command line::
     Validating models...
     0 errors found.
 
-    Django version 0.92, using settings 'mysite.settings'
+    Django version 0.95 (post-magic-removal), using settings 'mysite.settings'
     Development server is running at http://127.0.0.1:8000/
     Quit the server with CONTROL-C (Unix) or CTRL-BREAK (Windows).
 
-You've started the Django development server, a lightweight, pure-Python Web
-server. We've included this with Django so you can develop things rapidly,
-without having to deal with configuring a production server -- such as
+You've started the Django development server, a lightweight Web server written
+purely in Python. We've included this with Django so you can develop things
+rapidly, without having to deal with configuring a production server -- such as
 Apache -- until you're ready for production.
 
 Now's a good time to note: DON'T use this server in anything resembling a
-production environment. It's intended only for use while developing.
+production environment. It's intended only for use while developing. (We're in
+the business of making Web frameworks, not Web servers.)
 
 Now that the server's running, visit http://127.0.0.1:8000/ with your Web
 browser. You'll see a "Welcome to Django" page, in pleasant, light-blue pastel.
@@ -127,8 +129,8 @@ database's connection parameters:
 
 .. admonition:: Note
 
-    Make sure you've created a database within PostgreSQL or MySQL by this
-    point. Do that with "``CREATE DATABASE database_name;``" within your
+    If you're using PostgreSQL or MySQL, make sure you've created a database by
+    this point. Do that with "``CREATE DATABASE database_name;``" within your
     database's interactive prompt.
 
 While you're editing ``settings.py``, take note of the ``INSTALLED_APPS``
@@ -146,7 +148,8 @@ with Django:
     * ``django.contrib.sites`` -- A framework for managing multiple sites
       with one Django installation.
 
-These applications are included by default as a convenience for the common case.
+These applications are included by default as a convenience for the common
+case.
 
 Each of these applications makes use of at least one database table, though,
 so we need to create the tables in the database before we can use them. To do
