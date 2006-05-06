@@ -73,12 +73,12 @@ Area woman programs in Python
 >>> Article.objects.get(id__exact=2)
 Traceback (most recent call last):
     ...
-DoesNotExist: Article does not exist for {'id__exact': 2}
+DoesNotExist: Article matching query does not exist.
 
 >>> Article.objects.get(pub_date__year=2005, pub_date__month=8)
 Traceback (most recent call last):
     ...
-DoesNotExist: Article does not exist for ...
+DoesNotExist: Article matching query does not exist.
 
 # Lookup by a primary key is the most common case, so Django provides a
 # shortcut for primary-key exact lookups.

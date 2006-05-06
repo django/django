@@ -135,7 +135,7 @@ Article 6
 >>> a5.get_next_by_pub_date()
 Traceback (most recent call last):
     ...
-DoesNotExist: Article does not exist for ...
+DoesNotExist: Article matching query does not exist.
 >>> a6.get_next_by_pub_date()
 Article 5
 >>> a7.get_next_by_pub_date()

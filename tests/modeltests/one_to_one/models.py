@@ -53,7 +53,7 @@ Demon Dogs the restaurant
 >>> p2.restaurant
 Traceback (most recent call last):
     ...
-DoesNotExist: Restaurant does not exist for {'place__pk': ...}
+DoesNotExist: Restaurant matching query does not exist.
 
 # Set the place using assignment notation. Because place is the primary key on Restaurant,
 # the save will create a new restaurant

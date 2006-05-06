@@ -34,7 +34,7 @@ API_TESTS = """
 >>> Article.objects.latest()
 Traceback (most recent call last):
     ...
-DoesNotExist: Article does not exist for ...
+DoesNotExist: Article matching query does not exist.
 
 # Create a couple of Articles.
 >>> from datetime import datetime

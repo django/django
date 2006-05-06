@@ -44,7 +44,7 @@ Fran Bones
 >>> Employee.objects.get(pk='foo')
 Traceback (most recent call last):
     ...
-DoesNotExist: Employee does not exist for {'pk': 'foo'}
+DoesNotExist: Employee matching query does not exist.
 
 # Use the name of the primary key, rather than pk.
 >>> Employee.objects.get(employee_code__exact='ABC123')
