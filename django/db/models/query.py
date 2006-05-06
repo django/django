@@ -130,7 +130,10 @@ class QuerySet(object):
             else:
                 return self._clone(_offset=k, _limit=1).get()
         else:
-            return self._result_cache[k]
+            try:
+                return self._result_cache[k]
+            except IndexError:
+                raise self.model.DoesNotExist, "%s matching query does not exist." % self.model._meta.object_name
 
     def __and__(self, other):
         combined = self._combine(other)
@@ -189,7 +192,7 @@ class QuerySet(object):
             clone._order_by = ()
         obj_list = list(clone)
         if len(obj_list) < 1:
-            raise self.model.DoesNotExist, "%s does not exist for %s" % (self.model._meta.object_name, kwargs)
+            raise self.model.DoesNotExist, "%s matching query does not exist." % self.model._meta.object_name
         assert len(obj_list) == 1, "get() returned more than one %s -- it returned %s! Lookup parameters were %s" % (self.model._meta.object_name, len(obj_list), kwargs)
         return obj_list[0]
 
