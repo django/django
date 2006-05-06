@@ -42,6 +42,7 @@ class AdminApplistNode(template.Node):
                             })
 
                 if model_list:
+                    model_list.sort()
                     app_list.append({
                         'name': app_label.title(),
                         'has_module_perms': has_module_perms,
