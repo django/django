@@ -264,7 +264,10 @@ class Model(object):
         q = self.__class__._default_manager.order_by((not is_next and '-' or '') + field.name, (not is_next and '-' or '') + self._meta.pk.name)
         q._where.append(where)
         q._params.extend([param, param, getattr(self, self._meta.pk.attname)])
-        return q[0]
+        try:
+            return q[0]
+        except IndexError, e:
+            raise self.DoesNotExist, e.args
 
     def _get_next_or_previous_in_order(self, is_next):
         cachename = "__%s_order_cache" % is_next

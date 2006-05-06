@@ -128,12 +128,12 @@ class QuerySet(object):
                 else:
                     return list(self._clone(_offset=offset, _limit=limit))[::k.step]
             else:
-                return self._clone(_offset=k, _limit=1).get()
+                try:
+                    return self._clone(_offset=k, _limit=1).get()
+                except self.model.DoesNotExist, e:
+                    raise IndexError, e.args
         else:
-            try:
-                return self._result_cache[k]
-            except IndexError:
-                raise self.model.DoesNotExist, "%s matching query does not exist." % self.model._meta.object_name
+            return self._result_cache[k]
 
     def __and__(self, other):
         combined = self._combine(other)

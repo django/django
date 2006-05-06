@@ -35,7 +35,7 @@ def shortcut(request, content_type_id, object_id):
         if field.rel.to is Site:
             try:
                 object_domain = getattr(obj, field.name).all()[0].domain
-            except Site.DoesNotExist:
+            except IndexError:
                 pass
             if object_domain is not None:
                 break
