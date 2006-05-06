@@ -492,7 +492,7 @@ class DateQuerySet(QuerySet):
         from django.db.backends.util import typecast_timestamp
         self._order_by = () # Clear this because it'll mess things up otherwise.
         if self._field.null:
-            date_query._where.append('%s.%s IS NOT NULL' % \
+            self._where.append('%s.%s IS NOT NULL' % \
                 (backend.quote_name(self.model._meta.db_table), backend.quote_name(self._field.column)))
         select, sql, params = self._get_sql_clause()
         sql = 'SELECT %s %s GROUP BY 1 ORDER BY 1 %s' % \
