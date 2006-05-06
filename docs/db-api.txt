@@ -335,11 +335,18 @@ return a list of every *second* object of the first 10::
     Entry.objects.all()[:10:2]
 
 To retrieve a *single* object rather than a list
-(e.g. ``SELECT foo FROM bar LIMIT 1``), slice the ``QuerySet`` to ``[:1]`` and
-call ``get()`` on that. For example, this returns the first ``Entry`` in the
-database, after ordering entries alphabetically by headline::
+(e.g. ``SELECT foo FROM bar LIMIT 1``), using a simple index instead of a
+slice. For example, this returns the first ``Entry`` in the database, after
+ordering entries alphabetically by headline::
 
-    Entry.objects.order_by('headline')[:1].get()
+    Entry.objects.order_by('headline')[0]
+
+This is equivalent to::
+
+    Entry.objects.order_by('headline')[0:1].get()
+
+Note that either of these two examples will raise ``DoesNotExist`` if no
+objects match the given criteria.
 
 QuerySet methods that return new QuerySets
 ------------------------------------------
