@@ -86,4 +86,11 @@ Hello and goodbye
 >>> Article.objects.filter(Q(headline__startswith='Hello')).in_bulk([1,2])
 {1: Hello}
 
+# The 'complex_filter' method supports framework features such as 
+# 'limit_choices_to' which normally take a single dictionary of lookup arguments
+# but need to support arbitrary queries via Q objects too.
+>>> Article.objects.complex_filter({'pk': 1})
+[Hello]
+>>> Article.objects.complex_filter(Q(pk=1) | Q(pk=2))
+[Hello, Goodbye]
 """

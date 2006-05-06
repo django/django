@@ -261,9 +261,9 @@ class AutomaticChangeManipulator(AutomaticManipulator):
                 # Sanity check -- Make sure the "parent" object exists.
                 # For example, make sure the Place exists for the Restaurant.
                 # Let the ObjectDoesNotExist exception propagate up.
-                lookup_kwargs = self.opts.one_to_one_field.rel.limit_choices_to
-                lookup_kwargs['%s__exact' % self.opts.one_to_one_field.rel.field_name] = obj_key
-                self.opts.one_to_one_field.rel.to.get_model_module().get(**lookup_kwargs)
+                limit_choices_to = self.opts.one_to_one_field.rel.limit_choices_to
+                lookup_kwargs = {'%s__exact' % self.opts.one_to_one_field.rel.field_name: obj_key}
+                self.opts.one_to_one_field.rel.to.get_model_module().complex_filter(limit_choices_to).get(**lookup_kwargs)
                 params = dict([(f.attname, f.get_default()) for f in self.opts.fields])
                 params[self.opts.pk.attname] = obj_key
                 self.original_object = self.opts.get_model_module().Klass(**params)

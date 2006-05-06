@@ -68,6 +68,9 @@ class Manager(object):
     def filter(self, *args, **kwargs):
         return self.get_query_set().filter(*args, **kwargs)
 
+    def complex_filter(self, *args, **kwargs):
+        return self.get_query_set().complex_filter(*args, **kwargs)
+
     def exclude(self, *args, **kwargs):
         return self.get_query_set().exclude(*args, **kwargs)
 

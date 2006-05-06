@@ -297,6 +297,17 @@ class QuerySet(object):
             clone._filters = clone._filters & reduce(operator.and_, args)
         return clone
 
+    def complex_filter(self, filter_obj):
+        """Returns a new QuerySet instance with filter_obj added to the filters.
+        filter_obj can be a Q object (has 'get_sql' method) or a dictionary of 
+        keyword lookup arguments."""
+        # This exists to support framework features such as 'limit_choices_to',
+        # and usually it will be more natural to use other methods.
+        if hasattr(filter_obj, 'get_sql'):
+            return self._filter_or_exclude(None, filter_obj)
+        else:
+            return self._filter_or_exclude(Q, **filter_obj)
+
     def select_related(self, true_or_false=True):
         "Returns a new QuerySet instance with '_select_related' modified."
         return self._clone(_select_related=true_or_false)

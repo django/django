@@ -679,7 +679,9 @@ class ManyToOneRel:
         self.num_in_admin, self.edit_inline = num_in_admin, edit_inline
         self.min_num_in_admin, self.max_num_in_admin = min_num_in_admin, max_num_in_admin
         self.num_extra_on_change, self.related_name = num_extra_on_change, related_name
-        self.limit_choices_to = limit_choices_to or {}
+        if limit_choices_to is None:
+            limit_choices_to = {}
+        self.limit_choices_to = limit_choices_to
         self.lookup_overrides = lookup_overrides or {}
         self.raw_id_admin = raw_id_admin
         self.multiple = True
@@ -695,7 +697,9 @@ class OneToOneRel(ManyToOneRel):
         self.to, self.field_name = to, field_name
         self.num_in_admin, self.edit_inline = num_in_admin, edit_inline
         self.related_name = related_name
-        self.limit_choices_to = limit_choices_to or {}
+        if limit_choices_to is None:
+            limit_choices_to = {}
+        self.limit_choices_to = limit_choices_to
         self.lookup_overrides = lookup_overrides or {}
         self.raw_id_admin = raw_id_admin
         self.multiple = False
@@ -707,7 +711,9 @@ class ManyToManyRel:
         self.num_in_admin = num_in_admin
         self.related_name = related_name
         self.filter_interface = filter_interface
-        self.limit_choices_to = limit_choices_to or {}
+        if limit_choices_to is None:
+            limit_choices_to = {}        
+        self.limit_choices_to = limit_choices_to
         self.edit_inline = False
         self.raw_id_admin = raw_id_admin
         self.symmetrical = symmetrical

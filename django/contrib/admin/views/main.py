@@ -714,7 +714,7 @@ class ChangeList(object):
                 qs = qs & other_qs
 
         if self.opts.one_to_one_field:
-            qs = qs.filter(**self.opts.one_to_one_field.rel.limit_choices_to)
+            qs = qs.complex_filter(self.opts.one_to_one_field.rel.limit_choices_to)
 
         return qs
 

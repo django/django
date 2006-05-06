@@ -704,6 +704,10 @@ relationship should work. All are optional:
                              ``pub_date`` before the current date/time to be
                              chosen.
 
+                             Instead of a dictionary this can also be a ``Q`` object
+                             (an object with a ``get_sql()`` method) for more complex
+                             queries.
+
                              Not compatible with ``edit_inline``.
 
     ``max_num_in_admin``     For inline-edited objects, this is the maximum
