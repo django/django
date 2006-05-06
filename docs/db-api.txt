@@ -22,7 +22,7 @@ a weblog application::
         name = models.CharField(maxlength=50)
         email = models.URLField()
 
-        class __str__(self):
+        def __str__(self):
             return self.name
 
     class Entry(models.Model):
