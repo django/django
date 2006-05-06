@@ -138,11 +138,6 @@ class Field(object):
         if self.choices:
             setattr(cls, 'get_%s_display' % self.name, curry(cls._get_FIELD_display, field=self))
 
-    def set_name(self, name):
-        self.name = name
-        self.verbose_name = self.verbose_name or name.replace('_', ' ')
-        self.attname, self.column = self.get_attname_column()
-
     def get_attname(self):
         return self.name
 
