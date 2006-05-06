@@ -1581,15 +1581,6 @@ rows. Example::
         row = cursor.fetchone()
         return row
 
-If your custom SQL statement alters the data in your database -- for example,
-via a ``DELETE`` or ``UPDATE`` -- you'll need to call ``db.commit()``. Example::
-
-    def my_custom_sql2(self):
-        from django.db import connection
-        cursor = connection.cursor()
-        cursor.execute("DELETE FROM bar WHERE baz = %s", [self.baz])
-        connection.commit()
-
 ``connection`` and ``cursor`` simply use the standard `Python DB-API`_. If
 you're not familiar with the Python DB-API, note that the SQL statement in
 ``cursor.execute()`` uses placeholders, ``"%s"``, rather than adding parameters
