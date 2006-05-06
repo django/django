@@ -970,13 +970,14 @@ def runserver(addr, port):
     if not port.isdigit():
         sys.stderr.write(style.ERROR("Error: %r is not a valid port number.\n" % port))
         sys.exit(1)
+    quit_command = sys.platform == 'win32' and 'CTRL-BREAK' or 'CONTROL-C'
     def inner_run():
         from django.conf import settings
         print "Validating models..."
         validate()
         print "\nDjango version %s, using settings %r" % (get_version(), settings.SETTINGS_MODULE)
         print "Development server is running at http://%s:%s/" % (addr, port)
-        print "Quit the server with CONTROL-C (Unix) or CTRL-BREAK (Windows)."
+        print "Quit the server with %s." % quit_command
         try:
             run(addr, int(port), AdminMediaHandler(WSGIHandler()))
         except WSGIServerException, e:
