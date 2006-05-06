@@ -96,18 +96,19 @@ def technical_500_response(request, exc_type, exc_value, tb):
         function = tb.tb_frame.f_code.co_name
         lineno = tb.tb_lineno - 1
         pre_context_lineno, pre_context, context_line, post_context = _get_lines_from_file(filename, lineno, 7)
-        frames.append({
-            'tb': tb,
-            'filename': filename,
-            'function': function,
-            'lineno': lineno + 1,
-            'vars': tb.tb_frame.f_locals.items(),
-            'id': id(tb),
-            'pre_context': pre_context,
-            'context_line': context_line,
-            'post_context': post_context,
-            'pre_context_lineno': pre_context_lineno + 1,
-        })
+        if pre_context_lineno:
+            frames.append({
+                'tb': tb,
+                'filename': filename,
+                'function': function,
+                'lineno': lineno + 1,
+                'vars': tb.tb_frame.f_locals.items(),
+                'id': id(tb),
+                'pre_context': pre_context,
+                'context_line': context_line,
+                'post_context': post_context,
+                'pre_context_lineno': pre_context_lineno + 1,
+            })
         tb = tb.tb_next
 
     t = Template(TECHNICAL_500_TEMPLATE)
