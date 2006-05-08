@@ -1,0 +1,68 @@
+=====================================
+Cross Site Request Forgery Protection
+=====================================
+
+The CsrfMiddleware class provides easy-to-use protection against 
+`Cross Site Request Forgeries`_.  This type of attack occurs when a malicious 
+web site creates a link or form button that is intended to perform some action
+on your web site, using the credentials of a logged-in user who is tricked
+into clicking on the link in their browser.
+
+The first defense against CSRF attacks is to ensure that GET requests
+are side-effect free.  POST requests can then be protected by adding this
+middleware into your list of installed middleware.
+
+
+.. _Cross Site Request Forgeries:  http://www.squarefree.com/securitytips/web-developers.html#CSRF
+
+How to use it
+=============
+Add the middleware ``"django.contrib.csrf.middleware.CsrfMiddleware"`` to 
+your list of middleware classes, ``MIDDLEWARE_CLASSES``. It needs to process
+the response after the SessionMiddleware, so must come before it in the
+list. It also must process the response before things like compression
+happen to the response, so it must come after GZipMiddleware in the list.
+
+How it works
+============
+CsrfMiddleware does two things:
+
+1. It modifies outgoing requests by adding a hidden form field to all 
+   'POST' forms, with the name 'csrfmiddlewaretoken' and a value which is 
+   a hash of the session ID plus a secret. If there is no session ID set, 
+   this modification of the response isn't done, so there is very little 
+   performance penalty for those requests that don't have a session.
+
+2. On all incoming POST requests that have the session cookie set, it 
+   checks that the 'csrfmiddlewaretoken' is present and correct. If it 
+   isn't, the user will get a 403 error.
+
+This ensures that only forms that have originated from your web site
+can be used to POST data back.
+
+It deliberately only targets HTTP POST requests (and the corresponding
+POST forms). GET requests ought never to have side effects (if you are
+using HTTP GET and POST correctly), and so a CSRF attack with a GET
+request will always be harmless. 
+
+POST requests that are not accompanied by a session cookie are not protected,
+but they do not need to be protected, since the 'attacking' web site
+could make these kind of requests anyway.
+
+The Content-Type is checked before modifying the response, and only 
+pages that are served as 'text/html' or 'application/xml+xhtml'
+are modified.
+
+Limitations
+===========
+CsrfMiddleware requires Django's session framework to work. If you have
+a custom authentication system that manually sets cookies and the like,
+it won't help you.
+
+If your app creates HTML pages and forms in some unusual way, (e.g. 
+it sends fragments of HTML in javascript document.write statements) 
+you might bypass the filter that adds the hidden field to the form, 
+in which case form submission will always fail.  It may still be possible
+to use the middleware, provided you can find some way to get the
+CSRF token and ensure that is included when your form is submitted.
+

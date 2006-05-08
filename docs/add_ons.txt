@@ -57,6 +57,16 @@ See the `syndication documentation`_.
 
 .. _syndication documentation: http://www.djangoproject.com/documentation/syndication/
 
+csrf
+====
+
+A middleware for preventing Cross Site Request Forgeries
+
+See the `csrf documentation`_.
+
+.. _csrf documentation: http://www.djangoproject.com/documentation/csrf/
+
+
 Other add-ons
 =============
 
