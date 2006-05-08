@@ -183,7 +183,7 @@ is a simple Python function. Each view gets passed a request object --
 which contains request metadata -- and the values captured in the regex.
 
 For example, if a user requested the URL "/articles/2005/05/39323/", Django
-would call the function ``myproject.news.views.article_detail(request,
+would call the function ``mysite.news.views.article_detail(request,
 '2005', '05', '39323')``.
 
 Write your views
@@ -199,7 +199,7 @@ and renders the template with the retrieved data. Here's an example view for
 
     def year_archive(request, year):
         a_list = Article.objects.filter(pub_date__year=year)
-        return render_to_response('news/year_archive.html', {'article_list': a_list})
+        return render_to_response('news/year_archive.html', {'year': year, 'article_list': a_list})
 
 This example uses Django's template system, which has several powerful
 features but strives to stay simple enough for non-programmers to use.
@@ -219,13 +219,16 @@ might look like::
 
     {% extends "base.html" %}
 
-    {% block title %}{{ article.headline }}{% endblock %}
+    {% block title %}Articles for {{ year }}{% endblock %}
 
     {% block content %}
-    <h1>{{ article.headline }}</h1>
-    <p>By {{ article.get_reporter.full_name }}</p>
+    <h1>Articles for {{ year }}</h1>
+
+    {% for article in article_list %}
+    <p>{{ article.headline }}</p>
+    <p>By {{ article.reporter.full_name }}</p>
     <p>Published {{ article.pub_date|date:"F j, Y" }}</p>
-    {{ article.article }}
+    {% endfor %}
     {% endblock %}
 
 Variables are surrounded by double-curly braces. ``{{ article.headline }}``
