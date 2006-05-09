@@ -183,7 +183,7 @@ is a simple Python function. Each view gets passed a request object --
 which contains request metadata -- and the values captured in the regex.
 
 For example, if a user requested the URL "/articles/2005/05/39323/", Django
-would call the function ``mysite.news.views.article_detail(request,
+would call the function ``mysite.views.article_detail(request,
 '2005', '05', '39323')``.
 
 Write your views
@@ -234,7 +234,7 @@ might look like::
 Variables are surrounded by double-curly braces. ``{{ article.headline }}``
 means "Output the value of the article's headline attribute." But dots aren't
 used only for attribute lookup: They also can do dictionary-key lookup, index
-lookup and function calls (as is the case with ``article.get_reporter``).
+lookup and function calls.
 
 Note ``{{ article.pub_date|date:"F j, Y" }}`` uses a Unix-style "pipe" (the "|"
 character). This is called a template filter, and it's a way to filter the value
