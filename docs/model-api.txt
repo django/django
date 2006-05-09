@@ -1413,7 +1413,7 @@ all objects, and one that returns only the books by Roald Dahl::
     # First, define the Manager subclass.
     class DahlBookManager(models.Manager):
         def get_query_set(self):
-            return super(Manager, self).get_query_set().filter(author='Roald Dahl')
+            return super(DahlBookManager, self).get_query_set().filter(author='Roald Dahl')
 
     # Then hook it into the Book model explicitly.
     class Book(models.Model):
@@ -1444,11 +1444,11 @@ For example::
 
     class MaleManager(models.Manager):
         def get_query_set(self):
-            return super(Manager, self).get_query_set().filter(sex='M')
+            return super(MaleManager, self).get_query_set().filter(sex='M')
 
     class FemaleManager(models.Manager):
         def get_query_set(self):
-            return super(Manager, self).get_query_set().filter(sex='F')
+            return super(FemaleManager, self).get_query_set().filter(sex='F')
 
     class Person(models.Model):
         first_name = models.CharField(maxlength=50)
