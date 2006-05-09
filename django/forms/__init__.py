@@ -836,9 +836,9 @@ class EmailField(TextField):
 
 class URLField(TextField):
     "A convenience FormField for validating URLs"
-    def __init__(self, field_name, length=50, is_required=False, validator_list=[]):
+    def __init__(self, field_name, length=50, maxlength=200, is_required=False, validator_list=[]):
         validator_list = [self.isValidURL] + validator_list
-        TextField.__init__(self, field_name, length=length, maxlength=200,
+        TextField.__init__(self, field_name, length=length, maxlength=maxlength,
             is_required=is_required, validator_list=validator_list)
 
     def isValidURL(self, field_data, all_data):
