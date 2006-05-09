@@ -68,7 +68,7 @@ class DatabaseWrapper(local):
             self.connection = Database.connect(conn_string)
         cursor = self.connection.cursor()
         if settings.DEBUG:
-            return base.CursorDebugWrapper(cursor, self)
+            return util.CursorDebugWrapper(cursor, self)
         return cursor
 
     def _commit(self):
