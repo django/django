@@ -62,6 +62,8 @@ Most generic views require the ``queryset`` key, which is a ``QuerySet``
 instance; see the `database API docs`_ for more information about ``Queryset``
 objects.
 
+.. _database API docs: http://www.djangoproject.com/documentation/db_api/
+
 "Simple" generic views
 ======================
 

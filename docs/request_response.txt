@@ -102,7 +102,7 @@ All attributes except ``session`` should be considered read-only.
     ``AuthenticationMiddleware`` activated. For more, see
     `Authentication in Web requests`_.
 
-    .. Authentication in Web requests: http://www.djangoproject.com/documentation/authentication/#authentication-in-web-requests
+    .. _Authentication in Web requests: http://www.djangoproject.com/documentation/authentication/#authentication-in-web-requests
 
 ``session``
     A readable-and-writable, dictionary-like object that represents the current
