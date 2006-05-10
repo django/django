@@ -5,7 +5,6 @@ from django.http import Http404
 from django.core.exceptions import ObjectDoesNotExist
 from django.shortcuts import render_to_response
 from django.template import RequestContext
-from django.contrib.auth.models import SESSION_KEY
 from django.contrib.comments.models import Comment, FreeComment, PHOTOS_REQUIRED, PHOTOS_OPTIONAL, RATINGS_REQUIRED, RATINGS_OPTIONAL, IS_PUBLIC
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.auth.forms import AuthenticationForm
@@ -219,7 +218,8 @@ def post_comment(request):
     # If user gave correct username/password and wasn't already logged in, log them in
     # so they don't have to enter a username/password again.
     if manipulator.get_user() and new_data.has_key('password') and manipulator.get_user().check_password(new_data['password']):
-        request.session[SESSION_KEY] = manipulator.get_user_id()
+        from django.contrib.auth import login
+        login(request, manipulator.get_user())
     if errors or request.POST.has_key('preview'):
         class CommentFormWrapper(forms.FormWrapper):
             def __init__(self, manipulator, new_data, errors, rating_choices):
