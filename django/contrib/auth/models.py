@@ -4,8 +4,6 @@ from django.contrib.contenttypes.models import ContentType
 from django.utils.translation import gettext_lazy as _
 import datetime
 
-SESSION_KEY = '_auth_user_id'
-
 def check_password(raw_password, enc_password):
     """
     Returns a boolean of whether the raw_password was correct. Handles
