@@ -69,7 +69,10 @@ class Model(object):
         return getattr(self, self._meta.pk.attname)
 
     def __repr__(self):
-        return '<%s object>' % self.__class__.__name__
+        return '<%s: %s>' % (self.__class__.__name__, self)
+
+    def __str__(self):
+        return '%s object' % self.__class__.__name__
 
     def __eq__(self, other):
         return isinstance(other, self.__class__) and self._get_pk_val() == other._get_pk_val()
