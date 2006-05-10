@@ -6,6 +6,20 @@ import datetime
 
 SESSION_KEY = '_auth_user_id'
 
+def check_password(raw_password, enc_password):
+    """
+    Returns a boolean of whether the raw_password was correct. Handles
+    encryption formats behind the scenes.
+    """
+    algo, salt, hsh = enc_password.split('$')
+    if algo == 'md5':
+        import md5
+        return hsh == md5.new(salt+raw_password).hexdigest()
+    elif algo == 'sha1':
+        import sha
+        return hsh == sha.new(salt+raw_password).hexdigest()
+    raise ValueError, "Got unknown password algorithm type in password."
+
 class SiteProfileNotAvailable(Exception):
     pass
 
@@ -117,14 +131,7 @@ class User(models.Model):
                 self.set_password(raw_password)
                 self.save()
             return is_correct
-        algo, salt, hsh = self.password.split('$')
-        if algo == 'md5':
-            import md5
-            return hsh == md5.new(salt+raw_password).hexdigest()
-        elif algo == 'sha1':
-            import sha
-            return hsh == sha.new(salt+raw_password).hexdigest()
-        raise ValueError, "Got unknown password algorithm type in password."
+        return check_password(raw_password, self.password)
 
     def get_group_permissions(self):
         "Returns a list of permission strings that this user has through his/her groups."
