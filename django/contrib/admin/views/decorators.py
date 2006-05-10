@@ -1,6 +1,7 @@
 from django import http, template
 from django.conf import settings
-from django.contrib.auth.models import User, SESSION_KEY
+from django.contrib.auth.models import User
+from django.contrib.auth import authenticate, login
 from django.shortcuts import render_to_response
 from django.utils.translation import gettext_lazy
 import base64, datetime, md5
@@ -69,10 +70,10 @@ def staff_member_required(view_func):
             return _display_login_form(request, message)
 
         # Check the password.
-        username = request.POST.get('username', '')
-        try:
-            user = User.objects.get(username=username, is_staff=True)
-        except User.DoesNotExist:
+        username = request.POST.get('username', None)
+        password = request.POST.get('password', None)
+        user = authenticate(username=username, password=password)
+        if user is None:
             message = ERROR_MESSAGE
             if '@' in username:
                 # Mistakenly entered e-mail address instead of username? Look it up.
@@ -86,8 +87,9 @@ def staff_member_required(view_func):
 
         # The user data is correct; log in the user in and continue.
         else:
-            if user.check_password(request.POST.get('password', '')):
-                request.session[SESSION_KEY] = user.id
+            if user.is_staff:
+                login(request, user)
+                # TODO: set last_login with an event.
                 user.last_login = datetime.datetime.now()
                 user.save()
                 if request.POST.has_key('post_data'):
