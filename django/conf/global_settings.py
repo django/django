@@ -265,3 +265,9 @@ COMMENTS_FIRST_FEW = 0
 # A tuple of IP addresses that have been banned from participating in various
 # Django-powered features.
 BANNED_IPS = ()
+
+##################
+# AUTHENTICATION #
+##################
+
+AUTHENTICATION_BACKENDS = ('django.contrib.auth.backends.ModelBackend',)
