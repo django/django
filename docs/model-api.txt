@@ -52,7 +52,7 @@ Some technical notes:
     * The name of the table, ``myapp_person``, is automatically derived from
       some model metadata but can be overridden. See _`Table names` below.
     * An ``id`` field is added automatically, but this behavior can be
-      overriden. See _`Automatic primary key fields` below.
+      overriden. See `Automatic primary key fields`_ below.
     * The ``CREATE TABLE`` SQL in this example is formatted using PostgreSQL
       syntax, but it's worth noting Django uses SQL tailored to the database
       backend specified in your `settings file`_.
@@ -124,7 +124,7 @@ Here are all available field types:
 An ``IntegerField`` that automatically increments according to available IDs.
 You usually won't need to use this directly; a primary key field will
 automatically be added to your model if you don't specify otherwise. See
-_`Automatic primary key fields`.
+`Automatic primary key fields`_.
 
 ``BooleanField``
 ~~~~~~~~~~~~~~~~
@@ -1111,7 +1111,7 @@ If ``fields`` isn't given, Django will default to displaying each field that
 isn't an ``AutoField`` and has ``editable=True``, in a single fieldset, in
 the same order as the fields are defined in the model.
 
-The ``field_options`` dictionary can have the following keys::
+The ``field_options`` dictionary can have the following keys:
 
 ``fields``
 ~~~~~~~~~~
@@ -1312,6 +1312,8 @@ The way ``Manager`` classes work is documented in the `Retrieving objects`_
 section of the database API docs, but this section specifically touches on
 model options that customize ``Manager`` behavior.
 
+.. _Retrieving objects: http://www.djangoproject.com/documentation/db_api/#retrieving-objects
+
 Manager names
 -------------
 
@@ -1401,17 +1403,17 @@ example, using this model::
 
 ...the statement ``Book.objects.all()`` will return all books in the database.
 
-You can override a ``Manager``'s base ``QuerySet`` by overriding the
+You can override a ``Manager``\'s base ``QuerySet`` by overriding the
 ``Manager.get_query_set()`` method. ``get_query_set()`` should return a
 ``QuerySet`` with the properties you require.
 
-For example, the following model has *two* ``Manager``s -- one that returns
+For example, the following model has *two* ``Manager``\s -- one that returns
 all objects, and one that returns only the books by Roald Dahl::
 
     # First, define the Manager subclass.
     class DahlBookManager(models.Manager):
         def get_query_set(self):
-            return super(Manager, self).get_query_set().filter(author='Roald Dahl')
+            return super(DahlBookManager, self).get_query_set().filter(author='Roald Dahl')
 
     # Then hook it into the Book model explicitly.
     class Book(models.Model):
@@ -1442,11 +1444,11 @@ For example::
 
     class MaleManager(models.Manager):
         def get_query_set(self):
-            return super(Manager, self).get_query_set().filter(sex='M')
+            return super(MaleManager, self).get_query_set().filter(sex='M')
 
     class FemaleManager(models.Manager):
         def get_query_set(self):
-            return super(Manager, self).get_query_set().filter(sex='F')
+            return super(FemaleManager, self).get_query_set().filter(sex='F')
 
     class Person(models.Model):
         first_name = models.CharField(maxlength=50)

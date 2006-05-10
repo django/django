@@ -69,7 +69,7 @@ These files are:
     * ``urls.py``: The URL declarations for this Django project; a "table of
       contents" of your Django-powered site.
 
-.. _more on packages: http://docs.python.org/tut/node8.html#packages
+.. _more about packages: http://docs.python.org/tut/node8.html#packages
 
 The development server
 ----------------------

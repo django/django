@@ -6,28 +6,28 @@
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: PACKAGE VERSION\n"
-"Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2005-12-27 23:26+0900\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
-"Language-Team: LANGUAGE <LL@li.org>\n"
+"Project-Id-Version: Django 1.0\n"
+"Report-Msgid-Bugs-To: Django-users Japan <django-ja@googlegroups.com>\n"
+"POT-Creation-Date: 2006-05-02 23:06+0900\n"
+"PO-Revision-Date: 2006-05-08 13:39+0900\n"
+"Last-Translator: makoto tsuyuki <mtsuyuki@gmail.com>\n"
+"Language-Team: Japanese <django-ja@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
 #: contrib/admin/media/js/calendar.js:24
-#: contrib/admin/media/js/dateparse.js:26
+#: contrib/admin/media/js/dateparse.js:32
 msgid ""
 "January February March April May June July August September October November "
 "December"
-msgstr "一月 二月 三月 四月 五月 六月 七月 八月 九月 十月 十一月 十二月"
+msgstr "1月 2月 3月 4月 5月 6月 7月 8月 9月 10月 11月 12月"
 
 #: contrib/admin/media/js/calendar.js:25
 msgid "S M T W T F S"
 msgstr "日 月 火 水 木 金 土"
 
-#: contrib/admin/media/js/dateparse.js:27
+#: contrib/admin/media/js/dateparse.js:33
 msgid "Sunday Monday Tuesday Wednesday Thursday Friday Saturday"
 msgstr "日曜 月曜 火曜 水曜 木曜 金曜 土曜"
 
@@ -80,11 +80,11 @@ msgstr "夜中"
 
 #: contrib/admin/media/js/admin/DateTimeShortcuts.js:82
 msgid "6 a.m."
-msgstr "朝6時"
+msgstr "午前 6 時"
 
 #: contrib/admin/media/js/admin/DateTimeShortcuts.js:83
 msgid "Noon"
-msgstr "昼"
+msgstr "正午"
 
 #: contrib/admin/media/js/admin/DateTimeShortcuts.js:87
 #: contrib/admin/media/js/admin/DateTimeShortcuts.js:168
@@ -107,3 +107,4 @@ msgstr "昨日"
 #: contrib/admin/media/js/admin/DateTimeShortcuts.js:164
 msgid "Tomorrow"
 msgstr "明日"
+

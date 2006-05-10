@@ -267,17 +267,25 @@ previous section). You can tell them apart with ``is_anonymous()``, like so::
 How to log a user in
 --------------------
 
-To log a user in, do the following within a view::
+Depending on your task, you'll probably want to make sure to validate the 
+user's username and password before you log them in. The easiest way to do so 
+is to use the built-in ``authenticate`` and ``login`` functions from within a 
+view::
 
-    from django.contrib.auth.models import SESSION_KEY
-    request.session[SESSION_KEY] = some_user.id
+    from django.contrib.auth import authenticate, login
+    username = request.POST['username']
+    password = request.POST['password']
+    user = authenticate(username=username, password=password)
+    if user is not None:
+        login(request, user)
 
-Because this uses sessions, you'll need to make sure you have
-``SessionMiddleware`` enabled. See the `session documentation`_ for more
-information.
+``authenticate`` checks the username and password. If they are valid it 
+returns a user object, otherwise it returns ``None``. ``login`` makes it so 
+your users don't have send a username and password for every request. Because 
+the ``login`` function uses sessions, you'll need to make sure you have 
+``SessionMiddleware`` enabled. See the `session documentation`_ for 
+more information.
 
-This assumes ``some_user`` is your ``User`` instance. Depending on your task,
-you'll probably want to make sure to validate the user's username and password.
 
 Limiting access to logged-in users
 ----------------------------------
@@ -611,3 +619,53 @@ Finally, note that this messages framework only works with users in the user
 database. To send messages to anonymous users, use the `session framework`_.
 
 .. _session framework: http://www.djangoproject.com/documentation/sessions/
+
+Other Authentication Sources
+============================
+
+Django supports other authentication sources as well. You can even use 
+multiple sources at the same time.
+
+Using multiple backends
+-----------------------
+
+The list of backends to use is controlled by the ``AUTHENTICATION_BACKENDS`` 
+setting. This should be a tuple of python path names. It defaults to 
+``('django.contrib.auth.backends.ModelBackend',)``. To add additional backends
+just add them to your settings.py file. Ordering matters, so if the same
+username and password is valid in multiple backends, the first one in the
+list will return a user object, and the remaining ones won't even get a chance.
+
+Writing an authentication backend
+---------------------------------
+
+An authentication backend is a class that implements 2 methods: ``get_user(id)``
+and ``authenticate(**credentials)``. The ``get_user`` method takes an id, which 
+could be a username, and database id, whatever, and returns a user object. The 
+``authenticate`` method takes credentials as keyword arguments. Many times it 
+will just look like this::
+
+    class MyBackend:
+        def authenticate(username=None, password=None):
+            # check the username/password and return a user
+
+but it could also authenticate a token like so::
+
+    class MyBackend:
+        def authenticate(token=None):
+            # check the token and return a user
+
+Regardless, ``authenticate`` should check the credentials it gets, and if they 
+are valid, it should return a user object that matches those credentials.
+
+The Django admin system is tightly coupled to the Django User object described 
+at the beginning of this document. For now, the best way to deal with this is to
+create a Django User object for each user that exists for your backend (i.e.
+in your ldap directory, your external sql database, etc.) You can either 
+write a script to do this in advance, or your ``authenticate`` method can do 
+it the first time a user logs in. `django.contrib.auth.backends.SettingsBackend`_
+is an example of the latter approach. Note that you don't have to save a user's
+password in the Django User object. Your backend can still check the password
+against an external source, and return a Django User object.
+
+.. _django.contrib.auth.backends.SettingsBackend: http://code.djangoproject.com/browser/django/branches/magic-removal/django/contrib/auth/backends.py

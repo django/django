@@ -187,8 +187,8 @@ Here are two recommended approaches:
        **and** templates -- stay in one place, and you'll still be able to
        ``svn update`` your code to get the latest admin templates, if they
        change.
-    2. Or, copy the admin media files so that they live within your document
-       root.
+    2. Or, copy the admin media files so that they live within your Apache
+       document root.
 
 Error handling
 ==============

@@ -94,7 +94,7 @@ class Options:
         for f in to_search:
             if f.name == name:
                 return f
-        raise FieldDoesNotExist, "name=%s" % name
+        raise FieldDoesNotExist, '%s has no field named %r' % (self.object_name, name)
 
     def get_order_sql(self, table_prefix=''):
         "Returns the full 'ORDER BY' clause for this object, according to self.ordering."
