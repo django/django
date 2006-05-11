@@ -19,5 +19,5 @@ class Site(models.Model):
         list_display = ('domain', 'name')
         search_fields = ('domain', 'name')
 
-    def __repr__(self):
+    def __str__(self):
         return self.domain
