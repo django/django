@@ -78,7 +78,7 @@ class CsrfMiddleware(object):
            
             # Modify any POST forms
             extra_field = "<div style='display:none;'>" + \
-                "<input type='hidden' name='csrfmiddlewaretoken' value='" + \
+                "<input type='hidden' id='csrfmiddlewaretoken' name='csrfmiddlewaretoken' value='" + \
                 csrf_token + "' /></div>"
             response.content = _POST_FORM_RE.sub('\\1' + extra_field, response.content)
         return response
