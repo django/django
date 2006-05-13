@@ -2,6 +2,7 @@
 
 from django.conf import settings
 from email.MIMEText import MIMEText
+from email.Header import Header
 import smtplib
 
 class BadHeaderError(ValueError):
@@ -12,6 +13,8 @@ class SafeMIMEText(MIMEText):
         "Forbids multi-line headers, to prevent header injection."
         if '\n' in val or '\r' in val:
             raise BadHeaderError, "Header values can't contain newlines (got %r for header %r)" % (val, name)
+        if name == "Subject":
+            val = Header(val, settings.DEFAULT_CHARSET)
         MIMEText.__setitem__(self, name, val)
 
 def send_mail(subject, message, from_email, recipient_list, fail_silently=False, auth_user=settings.EMAIL_HOST_USER, auth_password=settings.EMAIL_HOST_PASSWORD):
@@ -42,7 +45,7 @@ def send_mass_mail(datatuple, fail_silently=False, auth_user=settings.EMAIL_HOST
         if not recipient_list:
             continue
         from_email = from_email or settings.DEFAULT_FROM_EMAIL
-        msg = SafeMIMEText(message)
+        msg = SafeMIMEText(message, 'plain', settings.DEFAULT_CHARSET)
         msg['Subject'] = subject
         msg['From'] = from_email
         msg['To'] = ', '.join(recipient_list)
