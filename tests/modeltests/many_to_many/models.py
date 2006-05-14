@@ -82,6 +82,13 @@ API_TESTS = """
 >>> Article.objects.filter(publications__title__startswith="Science").distinct()
 [NASA uses Python]
 
+# The count() function respects distinct() as well.
+>>> Article.objects.filter(publications__title__startswith="Science").count()
+2
+
+>>> Article.objects.filter(publications__title__startswith="Science").distinct().count()
+1
+
 # Reverse m2m queries are supported (i.e., starting at the table that doesn't
 # have a ManyToManyField).
 >>> Publication.objects.filter(id__exact=1)
