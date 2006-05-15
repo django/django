@@ -122,7 +122,7 @@ Manual transaction management looks like this::
         else:
             transaction.commit()
 
-..admonition:: An important note to users of earlier Django releases:
+.. admonition:: An important note to users of earlier Django releases:
 
     The database ``connection.commit()`` and ``connection.rollback()`` methods
     (called ``db.commit()`` and ``db.rollback()`` in 0.91 and earlier) no longer

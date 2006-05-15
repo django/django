@@ -215,7 +215,7 @@ Anonymous users
 ---------------
 
 ``django.contrib.auth.models.AnonymousUser`` is a class that implements
-the ``django.contirb.auth.models.User`` interface, with these differences:
+the ``django.contrib.auth.models.User`` interface, with these differences:
 
     * ``id`` is always ``None``.
     * ``is_anonymous()`` returns ``True`` instead of ``False``.
@@ -437,7 +437,7 @@ permissions are added to the ``auth_permission`` database table when you run
 Note that if your model doesn't have ``class Admin`` set when you run
 ``syncdb``, the permissions won't be created. If you initialize your database
 and add ``class Admin`` to models after the fact, you'll need to run
-``django-admin.py syncdb`` again. It will create any missing permissions for
+``manage.py syncdb`` again. It will create any missing permissions for
 all of your installed apps.
 
 Custom permissions
@@ -484,7 +484,7 @@ Methods
 ~~~~~~~
 
 ``Permission`` objects have the standard data-access methods like any other
-`Django model`_:
+`Django model`_.
 
 Authentication data in templates
 ================================

@@ -112,7 +112,7 @@ If you need help with regular expressions, see `Wikipedia's entry`_ and the
 `Python documentation`_. Also, the O'Reilly book "Mastering Regular
 Expressions" by Jeffrey Friedl is fantastic.
 
-Finally, a performance note: These regular expressions are compiled the first
+Finally, a performance note: these regular expressions are compiled the first
 time the URLconf module is loaded. They're super fast.
 
 .. _Wikipedia's entry: http://en.wikipedia.org/wiki/Regular_expression
