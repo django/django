@@ -66,7 +66,7 @@ def make_list(value):
 def slugify(value):
     "Converts to lowercase, removes non-alpha chars and converts spaces to hyphens"
     value = re.sub('[^\w\s-]', '', value).strip().lower()
-    return re.sub('\s+', '-', value)
+    return re.sub('[-\s]+', '-', value)
 
 def stringformat(value, arg):
     """
