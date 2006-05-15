@@ -31,7 +31,7 @@ class ContentType(models.Model):
         ordering = ('name',)
         unique_together = (('app_label', 'model'),)
 
-    def __repr__(self):
+    def __str__(self):
         return self.name
 
     def model_class(self):
