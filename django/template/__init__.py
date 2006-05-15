@@ -91,7 +91,20 @@ libraries = {}
 builtins = []
 
 class TemplateSyntaxError(Exception):
-    pass
+    def __str__(self):
+        try:
+            import cStringIO as StringIO
+        except ImportError:
+            import StringIO
+        output = StringIO.StringIO()
+        output.write(Exception.__str__(self))
+        # Check if we wrapped an exception and print that too.
+        if hasattr(self, 'exc_info'):
+            import traceback
+            output.write('\n\nOriginal ')
+            e = self.exc_info
+            traceback.print_exception(e[0], e[1], e[2], 500, output)
+        return output.getvalue()
 
 class TemplateDoesNotExist(Exception):
     pass
