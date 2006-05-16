@@ -44,6 +44,7 @@ LANGUAGES = (
     ('es', _('Spanish')),
     ('fr', _('French')),
     ('gl', _('Galician')),
+    ('hu', _('Hungarian')),
     ('he', _('Hebrew')),
     ('is', _('Icelandic')),
     ('it', _('Italian')),
