@@ -659,13 +659,14 @@ Regardless, ``authenticate`` should check the credentials it gets, and if they
 are valid, it should return a user object that matches those credentials.
 
 The Django admin system is tightly coupled to the Django User object described 
-at the beginning of this document. For now, the best way to deal with this is to
-create a Django User object for each user that exists for your backend (i.e.
-in your ldap directory, your external sql database, etc.) You can either 
+at the beginning of this document. For now, the best way to deal with this is 
+to create a Django User object for each user that exists for your backend 
+(i.e. in your ldap directory, your external sql database, etc.) You can either 
 write a script to do this in advance, or your ``authenticate`` method can do 
-it the first time a user logs in. `django.contrib.auth.backends.SettingsBackend`_
-is an example of the latter approach. Note that you don't have to save a user's
-password in the Django User object. Your backend can still check the password
-against an external source, and return a Django User object.
+it the first time a user logs in. 
+`django.contrib.auth.backends.SettingsBackend`_ is an example of the latter 
+approach. Note that you don't have to save a user's password in the Django 
+User object. Your backend can still check the password against an external 
+source, and return a Django User object.
 
 .. _django.contrib.auth.backends.SettingsBackend: http://code.djangoproject.com/browser/django/branches/magic-removal/django/contrib/auth/backends.py
