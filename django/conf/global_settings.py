@@ -62,6 +62,9 @@ LANGUAGES = (
     ('zh-tw', _('Traditional Chinese')),
 )
 
+# Languages using BiDi (right-to-left) layout
+LANGUAGES_BIDI = ("he",)
+
 # Not-necessarily-technical managers of the site. They get broken link
 # notifications and other various e-mails.
 MANAGERS = ADMINS
