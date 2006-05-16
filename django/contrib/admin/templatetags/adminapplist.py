@@ -53,7 +53,16 @@ class AdminApplistNode(template.Node):
 
 def get_admin_app_list(parser, token):
     """
-    {% get_admin_app_list as app_list %}
+    Returns a list of installed applications and models for which the current user
+    has at least one permission.
+
+    Syntax::
+    
+        {% get_admin_app_list as [context_var_containing_app_list] %}
+
+    Example usage::
+
+        {% get_admin_app_list as admin_app_list %}
     """
     tokens = token.contents.split()
     if len(tokens) < 3:

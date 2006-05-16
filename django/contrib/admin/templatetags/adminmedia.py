@@ -3,6 +3,9 @@ from django.template import Library
 register = Library()
 
 def admin_media_prefix():
+    """
+    Returns the string contained in the setting ADMIN_MEDIA_PREFIX.
+    """
     try:
         from django.conf import settings
     except ImportError:
