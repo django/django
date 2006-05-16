@@ -73,6 +73,10 @@ class TestRunner:
     def run_tests(self):
         from django.conf import settings
 
+	# An empty access of the settings to force the default options to be
+	# installed prior to assigning to them.
+	settings.INSTALLED_APPS
+
         # Manually set INSTALLED_APPS to point to the test models.
         settings.INSTALLED_APPS = [MODEL_TESTS_DIR_NAME + '.' + a for a in get_test_models()]
 

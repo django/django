@@ -7,6 +7,10 @@ perspective -- how it works and how to extend it. If you're just looking for
 reference on the language syntax, see
 `The Django template language: For template authors`_.
 
+If you're looking to use the Django template system as part of another
+application -- i.e., without the rest of the framework -- make sure to read
+the `configuration`_ section later in this document.
+
 .. _`The Django template language: For template authors`: http://www.djangoproject.com/documentation/templates/
 
 Basics
@@ -876,3 +880,37 @@ The only new concept here is the ``self.nodelist.render(context)`` in
 For more examples of complex rendering, see the source code for ``{% if %}``,
 ``{% for %}``, ``{% ifequal %}`` and ``{% ifchanged %}``. They live in
 ``django/template/defaulttags.py``.
+
+.. _configuration:
+
+Configuring the template system in standalone mode
+==================================================
+
+.. note::
+
+    This section is only of interest to people trying to use the template
+    system as an output component in another application. If you are using the
+    template system as part of a Django application, nothing here applies to
+    you.
+
+Normally, Django will load all the configuration information it needs from its
+own default configuration file, combined with the settings in the module given
+in the ``DJANGO_SETTINGS_MODULE`` environment variable. But if you're using the
+template system independently of the rest of Django, the environment variable
+approach isn't very convenient, because you probably want to configure the
+template system in line with the rest of your application rather than dealing
+with settings files and pointing to them via environment variables.
+
+To solve this problem, you need to use the manual configuration option
+described in the `settings file`_ documentation. Simply import the appropriate
+pieces of the templating system and then, *before* you call any of the
+templating functions, call ``django.conf.settings.configure()`` with any
+settings you wish to specify. You might want to consider setting at least
+``TEMPLATE_DIRS`` (if you are going to use template loaders),
+``DEFAULT_CHARSET`` (although the default of ``utf-8`` is probably fine) and
+``TEMPLATE_DEBUG``. All available settings are described in the
+`settings documentation`_, and any setting starting with *TEMPLATE_*
+is of obvious interest.
+
+.. _settings file: http://www.djangoproject.com/documentation/settings/#using-settings-without-the-django-settings-module-environment-variable
+.. _settings documentation: http://www.djangoproject.com/documentation/settings/

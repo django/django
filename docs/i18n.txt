@@ -540,6 +540,17 @@ you can override base translations in your project path. Or, you can just build
 a big project out of several apps and put all translations into one big project
 message file. The choice is yours.
 
+.. note::
+
+    If you're using manually configured settings, as described in the
+    `settings documentation`_, the ``locale`` directory in the project
+    directory will not be examined, since Django loses the ability to work out
+    the location of the project directory. (Django normally uses the location
+    of the settings file to determine this, and a settings file doesn't exist
+    if you're manually configuring your settings.)
+
+.. _settings documentation: http://www.djangoproject.com/documentation/settings/#using-settings-without-the-django-settings-module-environment-variable
+
 All message file repositories are structured the same way. They are:
 
     * ``$APPPATH/locale/<language>/LC_MESSAGES/django.(po|mo)``

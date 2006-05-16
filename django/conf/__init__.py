@@ -12,10 +12,61 @@ from django.conf import global_settings
 
 ENVIRONMENT_VARIABLE = "DJANGO_SETTINGS_MODULE"
 
+class LazySettings:
+    """
+    A lazy proxy for either global Django settings or a custom settings object.
+    The user can manually configure settings prior to using them. Otherwise,
+    Django uses the settings module pointed to by DJANGO_SETTINGS_MODULE.
+    """
+    def __init__(self):
+        # _target must be either None or something that supports attribute
+        # access (getattr, hasattr, etc).
+        self._target = None
+
+    def __getattr__(self, name):
+        if self._target is None:
+            self._import_settings()
+        if name == '__members__':
+            # Used to implement dir(obj), for example.
+            return self._target.get_all_members()
+        return getattr(self._target, name)
+
+    def __setattr__(self, name, value):
+        if name == '_target':
+            self.__dict__['_target'] = value
+        else:
+            setattr(self._target, name, value)
+
+    def _import_settings(self):
+        """
+        Load the settings module pointed to by the environment variable. This
+        is used the first time we need any settings at all, if the user has not
+        previously configured the settings manually.
+        """
+        try:
+            settings_module = os.environ[ENVIRONMENT_VARIABLE]
+            if not settings_module: # If it's set but is an empty string.
+                raise KeyError
+        except KeyError:
+            raise EnvironmentError, "Environment variable %s is undefined." % ENVIRONMENT_VARIABLE
+
+        self._target = Settings(settings_module)
+
+    def configure(self, default_settings=global_settings, **options):
+        """
+        Called to manually configure the settings. The 'default_settings'
+        parameter sets where to retrieve any unspecified values from (its
+        argument must support attribute access (__getattr__)).
+        """
+        if self._target != None:
+            raise EnvironmentError, 'Settings already configured.'
+        holder = UserSettingsHolder(default_settings)
+        for name, value in options.items():
+            setattr(holder, name, value)
+        self._target = holder
+
 class Settings:
-
     def __init__(self, settings_module):
-
         # update this dict from global settings (but only for ALL_CAPS settings)
         for setting in dir(global_settings):
             if setting == setting.upper():
@@ -27,7 +78,7 @@ class Settings:
         try:
             mod = __import__(self.SETTINGS_MODULE, '', '', [''])
         except ImportError, e:
-            raise EnvironmentError, "Could not import settings '%s' (is it on sys.path?): %s" % (self.SETTINGS_MODULE, e)
+            raise EnvironmentError, "Could not import settings '%s' (Is it on sys.path? Does it have syntax errors?): %s" % (self.SETTINGS_MODULE, e)
 
         # Settings that should be converted into tuples if they're mistakenly entered
         # as strings.
@@ -56,18 +107,32 @@ class Settings:
         # move the time zone info into os.environ
         os.environ['TZ'] = self.TIME_ZONE
 
-# try to load DJANGO_SETTINGS_MODULE
-try:
-    settings_module = os.environ[ENVIRONMENT_VARIABLE]
-    if not settings_module: # If it's set but is an empty string.
-        raise KeyError
-except KeyError:
-    raise EnvironmentError, "Environment variable %s is undefined." % ENVIRONMENT_VARIABLE
+    def get_all_members(self):
+        return dir(self)
 
-# instantiate the configuration object
-settings = Settings(settings_module)
+class UserSettingsHolder:
+    """
+    Holder for user configured settings.
+    """
+    # SETTINGS_MODULE does not really make sense in the manually configured
+    # (standalone) case.
+    SETTINGS_MODULE = None
+
+    def __init__(self, default_settings):
+        """
+        Requests for configuration variables not in this class are satisfied
+        from the module specified in default_settings (if possible).
+        """
+        self.default_settings = default_settings
+
+    def __getattr__(self, name):
+        return getattr(self.default_settings, name)
+
+    def get_all_members(self):
+        return dir(self) + dir(self.default_settings)
+
+settings = LazySettings()
 
 # install the translation machinery so that it is available
 from django.utils import translation
 translation.install()
-
