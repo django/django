@@ -218,8 +218,9 @@ from ``polls/views.py``. We don't need them anymore -- they have been replaced
 by generic views.
 
 The ``vote()`` view is still required. However, it must be modified to match
-the new templates and context variables. Change the template call from ``polls/detail``
-to ``polls/polls_detail``, and pass ``object`` in the context instead of ``poll``.
+the new templates and context variables. Change the template call from
+``polls/detail.html`` to ``polls/poll_detail.html``, and pass ``object`` in the
+context instead of ``poll``.
 
 Run the server, and use your new polling app based on generic views.
 

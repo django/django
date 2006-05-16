@@ -71,8 +71,8 @@ Make the poll app modifiable in the admin
 But where's our poll app? It's not displayed on the admin index page.
 
 Just one thing to do: We need to specify in the ``Poll`` model that ``Poll``
-objects have an admin interface. Edit the ``mysite/polls/models/polls.py``
-file and make the following change to add an inner ``Admin`` class::
+objects have an admin interface. Edit the ``mysite/polls/models.py`` file and
+make the following change to add an inner ``Admin`` class::
 
     class Poll(models.Model):
         # ...
