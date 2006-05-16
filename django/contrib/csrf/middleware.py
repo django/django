@@ -9,6 +9,7 @@ from django.conf import settings
 from django.http import HttpResponseForbidden
 import md5
 import re
+import itertools
 
 _ERROR_MSG = "<h1>403 Forbidden</h1><p>Cross Site Request Forgery detected.  Request aborted.</p>"
 
@@ -19,7 +20,7 @@ _HTML_TYPES = ('text/html', 'application/xhtml+xml')
 
 def _make_token(session_id):
     return md5.new(settings.SECRET_KEY + session_id).hexdigest()
-    
+
 class CsrfMiddleware(object):
     """Django middleware that adds protection against Cross Site
     Request Forgeries by adding hidden form fields to POST forms and 
@@ -57,7 +58,7 @@ class CsrfMiddleware(object):
                 return HttpResponseForbidden(_ERROR_MSG)
                 
         return None
-        
+
     def process_response(self, request, response):
         csrf_token = None
         try:
@@ -74,11 +75,18 @@ class CsrfMiddleware(object):
                 pass
             
         if csrf_token is not None and \
-           response['Content-Type'].split(';')[0] in _HTML_TYPES:
-           
+                response['Content-Type'].split(';')[0] in _HTML_TYPES:
+            
+            # ensure we don't add the 'id' attribute twice (HTML validity)
+            idattributes = itertools.chain(("id='csrfmiddlewaretoken'",), 
+                                            itertools.repeat(''))
+            def add_csrf_field(match):
+                """Returns the matched <form> tag plus the added <input> element"""
+                return match.group() + "<div style='display:none;'>" + \
+                "<input type='hidden' " + idattributes.next() + \
+                " name='csrfmiddlewaretoken' value='" + csrf_token + \
+                "' /></div>"
+
             # Modify any POST forms
-            extra_field = "<div style='display:none;'>" + \
-                "<input type='hidden' name='csrfmiddlewaretoken' value='" + \
-                csrf_token + "' /></div>"
-            response.content = _POST_FORM_RE.sub('\\1' + extra_field, response.content)
+            response.content = _POST_FORM_RE.sub(add_csrf_field, response.content)
         return response

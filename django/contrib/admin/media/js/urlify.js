@@ -9,7 +9,7 @@ function URLify(s, num_chars) {
     s = s.replace(r, '');
     s = s.replace(/[^-A-Z0-9\s]/gi, '');  // remove unneeded chars
     s = s.replace(/^\s+|\s+$/g, ''); // trim leading/trailing spaces
-    s = s.replace(/\s+/g, '-');      // convert spaces to hyphens
+    s = s.replace(/[-\s]+/g, '-');   // convert spaces to hyphens
     s = s.toLowerCase();             // convert to lowercase
     return s.substring(0, num_chars);// trim to first num_chars chars
 }

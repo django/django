@@ -19,6 +19,13 @@ In two lines::
 
     send_mail('Subject here', 'Here is the message.', 'from@example.com',
         ['to@example.com'], fail_silently=False)
+        
+.. note::
+
+    The character set of email sent with ``django.core.mail`` will be set to
+    the value of your `DEFAULT_CHARSET setting`_.
+    
+.. _DEFAULT_CHARSET setting: ../settings/#DEFAULT_CHARSET
 
 send_mail()
 ===========

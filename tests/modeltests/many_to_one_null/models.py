@@ -103,7 +103,7 @@ None
 >>> r.article_set.remove(a4)
 Traceback (most recent call last):
 ...
-DoesNotExist: 'Fourth' is not related to 'John Smith'.
+DoesNotExist: 'Article object' is not related to 'Reporter object'.
 
 >>> r2.article_set.all()
 [Fourth]

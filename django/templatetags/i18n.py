@@ -23,6 +23,14 @@ class GetCurrentLanguageNode(Node):
         context[self.variable] = translation.get_language()
         return ''
 
+class GetCurrentLanguageBidiNode(Node):
+    def __init__(self, variable):
+        self.variable = variable
+
+    def render(self, context):
+        context[self.variable] = translation.get_language_bidi()
+        return ''
+        
 class TranslateNode(Node):
     def __init__(self, value, noop):
         self.value = value
@@ -102,8 +110,25 @@ def do_get_current_language(parser, token):
     """
     args = token.contents.split()
     if len(args) != 3 or args[1] != 'as':
-        raise TemplateSyntaxError, "'get_available_languages' requires 'as variable' (got %r)" % args
+        raise TemplateSyntaxError, "'get_current_language' requires 'as variable' (got %r)" % args
     return GetCurrentLanguageNode(args[2])
+
+def do_get_current_language_bidi(parser, token):
+    """
+    This will store the current language layout in the context.
+
+    Usage::
+
+        {% get_current_language_bidi as bidi %}
+
+    This will fetch the currently active language's layout and
+    put it's value into the ``bidi`` context variable.
+    True indicates right-to-left layout, otherwise left-to-right
+    """
+    args = token.contents.split()
+    if len(args) != 3 or args[1] != 'as':
+        raise TemplateSyntaxError, "'get_current_language_bidi' requires 'as variable' (got %r)" % args
+    return GetCurrentLanguageBidiNode(args[2])
 
 def do_translate(parser, token):
     """
@@ -217,5 +242,6 @@ def do_block_translate(parser, token):
 
 register.tag('get_available_languages', do_get_available_languages)
 register.tag('get_current_language', do_get_current_language)
+register.tag('get_current_language_bidi', do_get_current_language_bidi)
 register.tag('trans', do_translate)
 register.tag('blocktrans', do_block_translate)

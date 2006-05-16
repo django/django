@@ -197,7 +197,7 @@ TypeError: dates() takes at least 3 arguments (1 given)
 >>> Article.objects.dates('invalid_field', 'year')
 Traceback (most recent call last):
    ...
-FieldDoesNotExist: name=invalid_field
+FieldDoesNotExist: Article has no field named 'invalid_field'
 
 >>> Article.objects.dates('pub_date', 'bad_kind')
 Traceback (most recent call last):

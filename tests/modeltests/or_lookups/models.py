@@ -44,10 +44,13 @@ API_TESTS = """
 >>> Article.objects.filter(Q(headline__startswith='Hello') & Q(headline__startswith='Goodbye'))
 []
 
->>> Article.objects.filter(headline__startswith='Hello') & Article.objects.filter(headline__startswith='Goodbye')
+# You can shorten this syntax with code like the following,
+# which is especially useful if building the query in stages:
+>>> articles = Article.objects.all()
+>>> articles.filter(headline__startswith='Hello') & articles.filter(headline__startswith='Goodbye')
 []
 
->>> Article.objects.filter(headline__startswith='Hello') & Article.objects.filter(headline__contains='bye')
+>>> articles.filter(headline__startswith='Hello') & articles.filter(headline__contains='bye')
 [Hello and goodbye]
 
 >>> Article.objects.filter(Q(headline__contains='bye'), headline__startswith='Hello')

@@ -212,6 +212,16 @@ def get_language():
     from django.conf import settings
     return settings.LANGUAGE_CODE
 
+def get_language_bidi():
+    """
+    Returns selected language's BiDi layout.
+    False = left-to-right layout
+    True = right-to-left layout
+    """
+    
+    from django.conf import settings
+    return get_language() in settings.LANGUAGES_BIDI
+    
 def catalog():
     """
     This function returns the current active catalog for further processing.

@@ -9,7 +9,7 @@ from bisect import bisect
 import re
 
 # Calculate the verbose_name by converting from InitialCaps to "lowercase with spaces".
-get_verbose_name = lambda class_name: re.sub('([A-Z])', ' \\1', class_name).lower().strip()
+get_verbose_name = lambda class_name: re.sub('(((?<=[a-z])[A-Z])|([A-Z](?![A-Z]|$)))', ' \\1', class_name).lower().strip()
 
 DEFAULT_NAMES = ('verbose_name', 'db_table', 'ordering',
                  'unique_together', 'permissions', 'get_latest_by',

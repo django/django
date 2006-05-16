@@ -44,6 +44,7 @@ LANGUAGES = (
     ('es', _('Spanish')),
     ('fr', _('French')),
     ('gl', _('Galician')),
+    ('hu', _('Hungarian')),
     ('he', _('Hebrew')),
     ('is', _('Icelandic')),
     ('it', _('Italian')),
@@ -61,6 +62,9 @@ LANGUAGES = (
     ('zh-cn', _('Simplified Chinese')),
     ('zh-tw', _('Traditional Chinese')),
 )
+
+# Languages using BiDi (right-to-left) layout
+LANGUAGES_BIDI = ("he",)
 
 # Not-necessarily-technical managers of the site. They get broken link
 # notifications and other various e-mails.

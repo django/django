@@ -182,7 +182,12 @@ class QuerySet(object):
         counter._select_related = False
         select, sql, params = counter._get_sql_clause()
         cursor = connection.cursor()
-        cursor.execute("SELECT COUNT(*)" + sql, params)
+        if self._distinct:
+            id_col = "%s.%s" % (backend.quote_name(self.model._meta.db_table),
+                    backend.quote_name(self.model._meta.pk.column))
+            cursor.execute("SELECT COUNT(DISTINCT(%s))" % id_col + sql, params)
+        else:
+            cursor.execute("SELECT COUNT(*)" + sql, params)
         return cursor.fetchone()[0]
 
     def get(self, *args, **kwargs):

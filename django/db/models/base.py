@@ -69,7 +69,10 @@ class Model(object):
         return getattr(self, self._meta.pk.attname)
 
     def __repr__(self):
-        return '<%s object>' % self.__class__.__name__
+        return '<%s: %s>' % (self.__class__.__name__, self)
+
+    def __str__(self):
+        return '%s object' % self.__class__.__name__
 
     def __eq__(self, other):
         return isinstance(other, self.__class__) and self._get_pk_val() == other._get_pk_val()
@@ -295,7 +298,7 @@ class Model(object):
         return ''
 
     def _get_FIELD_size(self, field):
-        return os.path.getsize(self.__get_FIELD_filename(field))
+        return os.path.getsize(self._get_FIELD_filename(field))
 
     def _save_FIELD_file(self, field, filename, raw_contents):
         directory = field.get_directory_name()

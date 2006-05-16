@@ -205,6 +205,12 @@ John Smith
 >>> Reporter.objects.filter(article__headline__startswith='This').distinct()
 [John Smith]
 
+# Counting in the opposite direction works in conjunction with distinct()
+>>> Reporter.objects.filter(article__headline__startswith='This').count()
+3
+>>> Reporter.objects.filter(article__headline__startswith='This').distinct().count()
+1
+
 # Queries can go round in circles.
 >>> Reporter.objects.filter(article__reporter__first_name__startswith='John')
 [John Smith, John Smith, John Smith, John Smith]

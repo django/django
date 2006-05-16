@@ -1085,7 +1085,7 @@ This spanning can be as deep as you'd like.
 It works backwards, too. To refer to a "reverse" relationship, just use the
 lowercase name of the model.
 
-This example retrieves all ``Blog`` objects who have at least one ``Entry``
+This example retrieves all ``Blog`` objects which have at least one ``Entry``
 whose ``headline`` contains ``'Lennon'``::
 
     Blog.objects.filter(entry__headline__contains='Lennon')
@@ -1168,7 +1168,7 @@ Complex lookups with Q objects
 ==============================
 
 Keyword argument queries -- in ``filter()``, etc. -- are "AND"ed together. If
-you need to execute more more complex queries (for example, queries with ``OR``
+you need to execute more complex queries (for example, queries with ``OR``
 statements), you can use ``Q`` objects.
 
 A ``Q`` object (``django.db.models.Q``) is an object used to encapsulate a
@@ -1534,7 +1534,7 @@ described in `Field lookups`_ above.
 
 Note that in the case of identical date values, these methods will use the ID
 as a fallback check. This guarantees that no records are skipped or duplicated.
-For a full example, see the `lookup API sample model_`.
+For a full example, see the `lookup API sample model`_.
 
 .. _lookup API sample model: http://www.djangoproject.com/documentation/models/lookup/
 

@@ -1,101 +1,104 @@
-# SOME DESCRIPTIVE TITLE.
-# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# translation of django.po to 
+# translation of django.po to
+# translation of django.po to
 # This file is distributed under the same license as the PACKAGE package.
-# Igor Kolar <ike@email.si), 2006.
-# Nena Kojadin <nena@kiberpipa.org), 2006
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER.
+# Nagy Károly <charlie@rendszergazda.com>, 2006.
+#
 msgid ""
 msgstr ""
-"Project-Id-Version: Django Slovenian 0.92+svn translation\n"
+"Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2006-05-16 10:13+0200\n"
-"PO-Revision-Date: 2006-03-19 17:30+0100\n"
-"Last-Translator: Jure Čuhalev <gandalf@owca.info>\n"
-"Language-Team: Slovenian <sl@li.org>\n"
+"POT-Creation-Date: 2006-05-16 10:14+0200\n"
+"PO-Revision-Date: 2006-05-10 12:13+0200\n"
+"Last-Translator: Nagy Károly <charlie@rendszergazda.com>\n"
+"Language-Team:  <hu@li.org>\n"
 "MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=utf-8\n"
+"Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"X-Generator: KBabel 1.9.1\n"
 
 #: contrib/comments/models.py:67 contrib/comments/models.py:166
 msgid "object ID"
-msgstr "ID objekta"
+msgstr "objektum ID"
 
 #: contrib/comments/models.py:68
 msgid "headline"
-msgstr "naslov"
+msgstr "címsor"
 
 #: contrib/comments/models.py:69 contrib/comments/models.py:90
 #: contrib/comments/models.py:167
 msgid "comment"
-msgstr "komentar"
+msgstr "megjegyzés"
 
 #: contrib/comments/models.py:70
 msgid "rating #1"
-msgstr "rating #1"
+msgstr "besorolás #1"
 
 #: contrib/comments/models.py:71
 msgid "rating #2"
-msgstr "rating #2"
+msgstr "besorolás #2"
 
 #: contrib/comments/models.py:72
 msgid "rating #3"
-msgstr "rating #3"
+msgstr "besorolás #3"
 
 #: contrib/comments/models.py:73
 msgid "rating #4"
-msgstr "rating #4"
+msgstr "besorolás #4"
 
 #: contrib/comments/models.py:74
 msgid "rating #5"
-msgstr "rating #5"
+msgstr "besorolás #5"
 
 #: contrib/comments/models.py:75
 msgid "rating #6"
-msgstr "rating #6"
+msgstr "besorolás #6"
 
 #: contrib/comments/models.py:76
 msgid "rating #7"
-msgstr "rating #7"
+msgstr "besorolás #7"
 
 #: contrib/comments/models.py:77
 msgid "rating #8"
-msgstr "rating #8"
+msgstr "besorolás #8"
 
 #: contrib/comments/models.py:82
 msgid "is valid rating"
-msgstr "je veljavni rating"
+msgstr "érvényes besorolás"
 
 #: contrib/comments/models.py:83 contrib/comments/models.py:169
 msgid "date/time submitted"
-msgstr "podatek datum/čas poslan"
+msgstr "dátum/idő beállítva"
 
 #: contrib/comments/models.py:84 contrib/comments/models.py:170
 msgid "is public"
-msgstr "je javno"
+msgstr "publikus"
 
 #: contrib/comments/models.py:85 contrib/admin/views/doc.py:289
 msgid "IP address"
-msgstr "IP naslov"
+msgstr "IP szám"
 
 #: contrib/comments/models.py:86
 msgid "is removed"
-msgstr "je odstranjen/-a"
+msgstr "eltávolítva"
 
 #: contrib/comments/models.py:86
 msgid ""
 "Check this box if the comment is inappropriate. A \"This comment has been "
 "removed\" message will be displayed instead."
 msgstr ""
-"Odkljukaj, če je komntar neprimeren. Namesto komentarja bo vidno obvestilo "
-"\"Ta komentar je bil odstranjen\"."
+"Jelöld be a négyzetet, ha a megjegyzés nem megfelelő. Az \"Ezt a megjegyzést "
+"törölték\" üzenet fog megjelenni helyette."
 
 #: contrib/comments/models.py:91
 #, fuzzy
 msgid "comments"
-msgstr "komentar"
+msgstr "megjegyzés"
 
 #: contrib/comments/models.py:131 contrib/comments/models.py:207
 msgid "Content object"
-msgstr "Objekt s vsebino"
+msgstr "Tartalom objektum"
 
 #: contrib/comments/models.py:159
 #, python-format
@@ -106,7 +109,7 @@ msgid ""
 "\n"
 "http://%(domain)s%(url)s"
 msgstr ""
-"Poslal uporabnik %(user)s ob %(date)s\n"
+"Beküldte %(user)s %(date)s -kor\n"
 "\n"
 "%(comment)s\n"
 "\n"
@@ -114,48 +117,48 @@ msgstr ""
 
 #: contrib/comments/models.py:168
 msgid "person's name"
-msgstr "ime osebe"
+msgstr "személy neve"
 
 #: contrib/comments/models.py:171
 msgid "ip address"
-msgstr "ip naslov"
+msgstr "IP cím"
 
 #: contrib/comments/models.py:173
 msgid "approved by staff"
-msgstr "potrjeno s strani osebja"
+msgstr "személyzet által elfogadva"
 
 #: contrib/comments/models.py:176
 #, fuzzy
 msgid "free comment"
-msgstr "Zastonj komentar"
+msgstr "Szabad megjegyzés"
 
 #: contrib/comments/models.py:177
 #, fuzzy
 msgid "free comments"
-msgstr "Zastonj komentarji"
+msgstr "Szabad megjegyzések"
 
 #: contrib/comments/models.py:233
 msgid "score"
-msgstr "ocena"
+msgstr "értékelés"
 
 #: contrib/comments/models.py:234
 msgid "score date"
-msgstr "datum ocene"
+msgstr "értékelés dátuma"
 
 #: contrib/comments/models.py:237
 #, fuzzy
 msgid "karma score"
-msgstr "Karma"
+msgstr "Karma értékelés"
 
 #: contrib/comments/models.py:238
 #, fuzzy
 msgid "karma scores"
-msgstr "Skrivnosti karme"
+msgstr "Karma értékelése"
 
 #: contrib/comments/models.py:242
 #, python-format
 msgid "%(score)d rating by %(user)s"
-msgstr "oceno %(score)d podelil %(user)s"
+msgstr "%(score)d értékelés %(user)s -tól"
 
 #: contrib/comments/models.py:258
 #, python-format
@@ -164,64 +167,64 @@ msgid ""
 "\n"
 "%(text)s"
 msgstr ""
-"Komentar je z zastavico označil %(user)s:\n"
+"Ezt a megjegyzést %(user)s jelölte meg:\n"
 "\n"
 "%(text)s"
 
 #: contrib/comments/models.py:265
 msgid "flag date"
-msgstr "datum označitve (zastavice)"
+msgstr "jelölés dátuma"
 
 #: contrib/comments/models.py:268
 #, fuzzy
 msgid "user flag"
-msgstr "Uporabniška zastavica"
+msgstr "Felhasználó jelölése"
 
 #: contrib/comments/models.py:269
 #, fuzzy
 msgid "user flags"
-msgstr "Uporabniške zastavice"
+msgstr "Felhasználó jelölései"
 
 #: contrib/comments/models.py:273
 #, python-format
 msgid "Flag by %r"
-msgstr "Avtor zastavice je %r"
+msgstr "Megjelölte %r"
 
 #: contrib/comments/models.py:278
 msgid "deletion date"
-msgstr "datum izbrisa"
+msgstr "törlés dátuma"
 
 #: contrib/comments/models.py:280
 #, fuzzy
 msgid "moderator deletion"
-msgstr "Izbris s strani moderatorja"
+msgstr "Moderátor törlése"
 
 #: contrib/comments/models.py:281
 #, fuzzy
 msgid "moderator deletions"
-msgstr "Izbrisi s strani moderatorja"
+msgstr "Moderátor törlései"
 
 #: contrib/comments/models.py:285
 #, python-format
 msgid "Moderator deletion by %r"
-msgstr "Izbris opravil moderator %r"
+msgstr "Moderátor törlés %r által"
 
 #: contrib/comments/views/karma.py:19
 msgid "Anonymous users cannot vote"
-msgstr "Anonimni upirabniki ne morejo glasovati"
+msgstr "Ismeretlen felhasználó nem szavazhat"
 
 #: contrib/comments/views/karma.py:23
 msgid "Invalid comment ID"
-msgstr "Neveljavni ID komentarja"
+msgstr "Érvénytelen megjegyzés ID"
 
 #: contrib/comments/views/karma.py:25
 msgid "No voting for yourself"
-msgstr "Ni mogoče glasovati zase"
+msgstr "Nem szavazhatsz magadra"
 
 #: contrib/comments/views/comments.py:28
 msgid ""
 "This rating is required because you've entered at least one other rating."
-msgstr "Moraš podati tole oceno, ker si podal vsaj še eno drugo oceno."
+msgstr "Ez az értékelés szükséges, mert legalább még egy értékelés kell."
 
 #: contrib/comments/views/comments.py:112
 #, python-format
@@ -236,13 +239,13 @@ msgid_plural ""
 "\n"
 "%(text)s"
 msgstr[0] ""
-"Ta komentar je poslal uporabnik, ki je do zdaj poslal manj kot %(count)s "
-"komentarjev Komentar:\n"
+"Ezt a megjegyzést olyan felhasználó küldte akinek kevesebb mint %(count)s "
+"megjegyzése van:\n"
 "\n"
 "%(text)s"
 msgstr[1] ""
-"Ta komentar je poslal uporabnik, ki je do zdaj poslal manj kot %(count)s "
-"komentarjev Komentar:\n"
+"Ezeket a megjegyzéseket olyan felhasználó küldte akinek kevesebb mint %"
+"(count)s megjegyzése van:\n"
 "\n"
 "%(text)s"
 
@@ -253,24 +256,24 @@ msgid ""
 "\n"
 "%(text)s"
 msgstr ""
-"Ta komentar je poslal sumljiv uporabnik:\n"
+"Ezt a megjegyzést egy nem értékelt felhasználó küldte:\n"
 "\n"
 "%(text)s"
 
 #: contrib/comments/views/comments.py:189
 #: contrib/comments/views/comments.py:280
 msgid "Only POSTs are allowed"
-msgstr "Dovoljena je le metoda HTTP POST"
+msgstr "Csak POST engedélyezett"
 
 #: contrib/comments/views/comments.py:193
 #: contrib/comments/views/comments.py:284
 msgid "One or more of the required fields wasn't submitted"
-msgstr "Eden ali več obveznih polj ni vpisanih"
+msgstr "Egy vagy több kötelező mező nincs kitöltve"
 
 #: contrib/comments/views/comments.py:197
 #: contrib/comments/views/comments.py:286
 msgid "Somebody tampered with the comment form (security violation)"
-msgstr "Nekdo se je poigraval z obrazcem za komentarje (varnostna kršitev)"
+msgstr "Valaki megváltoztatta a megjegyzés űrlapot (biztonság megsértése)"
 
 #: contrib/comments/views/comments.py:207
 #: contrib/comments/views/comments.py:292
@@ -278,28 +281,28 @@ msgid ""
 "The comment form had an invalid 'target' parameter -- the object ID was "
 "invalid"
 msgstr ""
-"Obrazec s komentarji ima neveljavni parameter 'target' -- ID objekta je "
-"neveljaven."
+"A megjegyzés űrlap érvénytelen 'target' paramétert tartalmaz -- az objektum "
+"ID-je érvénytelen volt"
 
 #: contrib/comments/views/comments.py:257
 #: contrib/comments/views/comments.py:321
 msgid "The comment form didn't provide either 'preview' or 'post'"
-msgstr "Obrazec s komentarji ne zahteva niti 'preview' niti 'post' akcije."
+msgstr "A megjegyzés űrlap nem biztosít sem 'preview' -t sem 'post' -ot."
 
 #: contrib/comments/templates/comments/form.html:6
 #: contrib/comments/templates/comments/form.html:8
 #: contrib/admin/templates/admin/login.html:17
 msgid "Username:"
-msgstr "Uporabniško ime:"
+msgstr "Felhasználó:"
 
 #: contrib/comments/templates/comments/form.html:6
 #: contrib/admin/templates/admin/login.html:20
 msgid "Password:"
-msgstr "Geslo:"
+msgstr "Jelszó:"
 
 #: contrib/comments/templates/comments/form.html:6
 msgid "Forgotten your password?"
-msgstr "Ste pozabili geslo?"
+msgstr "Elfelejtetted a jelszavad?"
 
 #: contrib/comments/templates/comments/form.html:8
 #: contrib/admin/templates/admin/object_history.html:3
@@ -320,39 +323,39 @@ msgstr "Ste pozabili geslo?"
 #: contrib/admin/templates/admin_doc/index.html:4
 #: contrib/admin/templates/admin_doc/model_index.html:5
 msgid "Log out"
-msgstr "Odjava"
+msgstr "Kijelentkezés"
 
 #: contrib/comments/templates/comments/form.html:12
 msgid "Ratings"
-msgstr "Ocene"
+msgstr "Értékelések"
 
 #: contrib/comments/templates/comments/form.html:12
 #: contrib/comments/templates/comments/form.html:23
 msgid "Required"
-msgstr "Obvezno"
+msgstr "Kötelező"
 
 #: contrib/comments/templates/comments/form.html:12
 #: contrib/comments/templates/comments/form.html:23
 msgid "Optional"
-msgstr "Neobvezno"
+msgstr "Opcionális"
 
 #: contrib/comments/templates/comments/form.html:23
 msgid "Post a photo"
-msgstr "Objavi sliko"
+msgstr "Fénykép beküldése"
 
 #: contrib/comments/templates/comments/form.html:27
 #: contrib/comments/templates/comments/freeform.html:5
 msgid "Comment:"
-msgstr "Komentar:"
+msgstr "Megjegyzés:"
 
 #: contrib/comments/templates/comments/form.html:32
 #: contrib/comments/templates/comments/freeform.html:9
 msgid "Preview comment"
-msgstr "Predogled komentarja"
+msgstr "Megjegyzés előnézete"
 
 #: contrib/comments/templates/comments/freeform.html:4
 msgid "Your name:"
-msgstr "Vaše ime:"
+msgstr "Neved:"
 
 #: contrib/admin/filterspecs.py:40
 #, python-format
@@ -360,77 +363,77 @@ msgid ""
 "<h3>By %s:</h3>\n"
 "<ul>\n"
 msgstr ""
-"<h3>Avtor: %s</h3>\n"
+"<h3>Szerző %s:</h3>\n"
 "<ul>\n"
 
 #: contrib/admin/filterspecs.py:70 contrib/admin/filterspecs.py:88
 #: contrib/admin/filterspecs.py:143
 msgid "All"
-msgstr "Vse"
+msgstr "Mind"
 
 #: contrib/admin/filterspecs.py:109
 msgid "Any date"
-msgstr "Kadarkoli"
+msgstr "Bármely dátum"
 
 #: contrib/admin/filterspecs.py:110
 msgid "Today"
-msgstr "Danes"
+msgstr "Ma"
 
 #: contrib/admin/filterspecs.py:113
 msgid "Past 7 days"
-msgstr "Zadnjih 7 dni"
+msgstr "Utolsó 7 nap"
 
 #: contrib/admin/filterspecs.py:115
 msgid "This month"
-msgstr "Ta mesec"
+msgstr "Ez a hónap"
 
 #: contrib/admin/filterspecs.py:117
 msgid "This year"
-msgstr "Letos"
+msgstr "Ez az év"
 
 #: contrib/admin/filterspecs.py:143
 msgid "Yes"
-msgstr "Ja"
+msgstr "Igen"
 
 #: contrib/admin/filterspecs.py:143
 msgid "No"
-msgstr "Ne"
+msgstr "Nem"
 
 #: contrib/admin/filterspecs.py:150
 msgid "Unknown"
-msgstr "Neznano"
+msgstr "Ismeretlen"
 
 #: contrib/admin/models.py:16
 msgid "action time"
-msgstr "čas oprave dejanja"
+msgstr "művelet időpontja"
 
 #: contrib/admin/models.py:19
 msgid "object id"
-msgstr "id objekta"
+msgstr "objektum id"
 
 #: contrib/admin/models.py:20
 msgid "object repr"
-msgstr "predstavitev objekta"
+msgstr "objektum repr"
 
 #: contrib/admin/models.py:21
 msgid "action flag"
-msgstr "zastavica za določeno dejanje"
+msgstr "művelet jelölés"
 
 #: contrib/admin/models.py:22
 msgid "change message"
-msgstr "spremeni sporočilo"
+msgstr "üzenet megváltoztatása"
 
 #: contrib/admin/models.py:25
 msgid "log entry"
-msgstr "vnos v dnevniku"
+msgstr "naplóbejegyzés"
 
 #: contrib/admin/models.py:26
 msgid "log entries"
-msgstr "vnosi v dnevniku"
+msgstr "naplóbejegyzések"
 
 #: contrib/admin/templatetags/admin_list.py:228
 msgid "All dates"
-msgstr "Vsi datumi"
+msgstr "Minden dátum"
 
 #: contrib/admin/views/decorators.py:9 contrib/auth/forms.py:36
 #: contrib/auth/forms.py:41
@@ -438,209 +441,207 @@ msgid ""
 "Please enter a correct username and password. Note that both fields are case-"
 "sensitive."
 msgstr ""
-"Prosimo, vnesite veljavno uporabniško ime in geslo. Opomba: obe polji sta "
-"občutljivi na velikost črk"
+"Kérlek írd be a helyes felhasználónevet és jelszót. Mindkét mező kisbetű-"
+"nagybetű érzékeny."
 
 #: contrib/admin/views/decorators.py:23
 #: contrib/admin/templates/admin/login.html:25
 msgid "Log in"
-msgstr "Prijate se"
+msgstr "Bejelentkezés"
 
 #: contrib/admin/views/decorators.py:61
 msgid ""
 "Please log in again, because your session has expired. Don't worry: Your "
 "submission has been saved."
 msgstr ""
-"Vaša seja je pretekla; prosimo, prijavite se znova. Opomba: Vse vaše objave "
-"so varno shranjene."
+"Kérlek jelentkezz be újra, mert a munkameneted végetért. Ne aggódj, minden "
+"beküldött adatod el van mentve."
 
 #: contrib/admin/views/decorators.py:68
 msgid ""
 "Looks like your browser isn't configured to accept cookies. Please enable "
 "cookies, reload this page, and try again."
 msgstr ""
-"Izgleda, da vaš brskalnik nima podpore za piškotke. Prosimo, vključite "
-"piškotke, znova naložite to stran in poskusite še enkrat."
+"Úgy tűnik a böngésződön nincs engedélyezve a cookie-k fogadása. Kérlek "
+"engedélyezd és töltsd újra az oldalt!"
 
 #: contrib/admin/views/decorators.py:82
 msgid "Usernames cannot contain the '@' character."
-msgstr "Uporabniška imena ne smejo vsebovati znaka '@'"
+msgstr "A felhasználónév nem tartalmazhat '@' karaktert."
 
 #: contrib/admin/views/decorators.py:84
 #, python-format
 msgid "Your e-mail address is not your username. Try '%s' instead."
-msgstr ""
-"Vaš e-mail naslov ne morete uporabljati kot uporabniško ime. Namesto tega "
-"uporabite '%s'"
+msgstr "Az email címed nem a felhasználóneved. Próbáld a(z) '%s' inkább."
 
 #: contrib/admin/views/main.py:226
 msgid "Site administration"
-msgstr "Administracija strani"
+msgstr "Honlap karbantartás"
 
 #: contrib/admin/views/main.py:260
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was added successfully."
-msgstr "%(name)s \"%(obj)s\" je bil uspešno dodan."
+msgstr "A(z) %(name)s \"%(obj)s\" sikeresen hozzáadva."
 
 #: contrib/admin/views/main.py:264 contrib/admin/views/main.py:348
 msgid "You may edit it again below."
-msgstr "Vsebino lahko znova uredite spodaj."
+msgstr "Alább ismét szerkesztheted."
 
 #: contrib/admin/views/main.py:272 contrib/admin/views/main.py:357
 #, python-format
 msgid "You may add another %s below."
-msgstr "Spodaj lahko dodate še en %s."
+msgstr "Alább hozzáadhatsz egy másik %s -t."
 
 #: contrib/admin/views/main.py:290
 #, python-format
 msgid "Add %s"
-msgstr "Dodaj %s"
+msgstr "%s hozzáadása"
 
 #: contrib/admin/views/main.py:336
 #, python-format
 msgid "Added %s."
-msgstr "Dodal %s."
+msgstr "%s hozzáadva."
 
 #: contrib/admin/views/main.py:336 contrib/admin/views/main.py:338
 #: contrib/admin/views/main.py:340
 msgid "and"
-msgstr "in"
+msgstr "és"
 
 #: contrib/admin/views/main.py:338
 #, python-format
 msgid "Changed %s."
-msgstr "Spremenil %s"
+msgstr "%s megváltoztatva."
 
 #: contrib/admin/views/main.py:340
 #, python-format
 msgid "Deleted %s."
-msgstr "Izbrisal %s."
+msgstr "%s törölve."
 
 #: contrib/admin/views/main.py:343
 msgid "No fields changed."
-msgstr "Nobeno polje ni bilo spremenjeno."
+msgstr "Egy mező sem változott."
 
 #: contrib/admin/views/main.py:346
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was changed successfully."
-msgstr "%(name)s \"%(obj)s\" je bilo uspešno spremenjeno."
+msgstr "A(z) %(name)s \"%(obj)s\" sikeresen megváltoztatva."
 
 #: contrib/admin/views/main.py:354
 #, python-format
 msgid ""
 "The %(name)s \"%(obj)s\" was added successfully. You may edit it again below."
 msgstr ""
-"%(name)s \"%(obj)s\" je bilo uspešno dodano. Znova ga lahko urejate spodaj."
+"A(z) %(name)s \"%(obj)s\" sikeresen hozzáadva. Alább ismét szerkesztheted."
 
 #: contrib/admin/views/main.py:392
 #, python-format
 msgid "Change %s"
-msgstr "Spremeni %s"
+msgstr "%s megváltoztatása"
 
 #: contrib/admin/views/main.py:470
 #, python-format
 msgid "One or more %(fieldname)s in %(name)s: %(obj)s"
-msgstr "Eden ali več %(fieldname)s v %(name)s: %(obj)s"
+msgstr "Egy vagy több %(fieldname)s a(z) %(name)s -ban: %(obj)s"
 
 #: contrib/admin/views/main.py:475
 #, python-format
 msgid "One or more %(fieldname)s in %(name)s:"
-msgstr "Eden ali več %(fieldname)s v %(name)s:"
+msgstr "Egy vagy több %(fieldname)s a(z) %(name)s:"
 
 #: contrib/admin/views/main.py:508
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was deleted successfully."
-msgstr "%(name)s \"%(obj)s\" je bilo uspešno izbrisano."
+msgstr "A(z) %(name)s \"%(obj)s\" sikeresen törölve."
 
 #: contrib/admin/views/main.py:511
 msgid "Are you sure?"
-msgstr "Ste prepričani?"
+msgstr "Biztos vagy benne?"
 
 #: contrib/admin/views/main.py:533
 #, python-format
 msgid "Change history: %s"
-msgstr "Zgodovina sprememb: %s"
+msgstr "Változások története: %s"
 
 #: contrib/admin/views/main.py:565
 #, python-format
 msgid "Select %s"
-msgstr "Izberi %s"
+msgstr "Kiválasztás %s"
 
 #: contrib/admin/views/main.py:565
 #, python-format
 msgid "Select %s to change"
-msgstr "Izberi %s, ki ga želite spremeniti"
+msgstr "Válaszd a(z) %s a változtatáshoz"
 
 #: contrib/admin/views/doc.py:277 contrib/admin/views/doc.py:286
 #: contrib/admin/views/doc.py:288 contrib/admin/views/doc.py:294
 #: contrib/admin/views/doc.py:295 contrib/admin/views/doc.py:297
 msgid "Integer"
-msgstr "Integer (število)"
+msgstr "Egész"
 
 #: contrib/admin/views/doc.py:278
 msgid "Boolean (Either True or False)"
-msgstr "Boolean (ali True ali False)"
+msgstr "Logikai (True vagy False)"
 
 #: contrib/admin/views/doc.py:279 contrib/admin/views/doc.py:296
 #, python-format
 msgid "String (up to %(maxlength)s)"
-msgstr "Niz (vse do %(maxlength)s)"
+msgstr "Karakterlánc (%(maxlength)s hosszig)"
 
 #: contrib/admin/views/doc.py:280
 msgid "Comma-separated integers"
-msgstr "Z vejico ločeni integerji"
+msgstr "Vesszővel elválasztott egészek"
 
 #: contrib/admin/views/doc.py:281
 msgid "Date (without time)"
-msgstr "Datum (brez časa)"
+msgstr "Dátum (idő nélkül)"
 
 #: contrib/admin/views/doc.py:282
 msgid "Date (with time)"
-msgstr "Datum (s časom)"
+msgstr "Dátum (idővel)"
 
 #: contrib/admin/views/doc.py:283
 msgid "E-mail address"
-msgstr "E-naslov"
+msgstr "E-mail cím"
 
 #: contrib/admin/views/doc.py:284 contrib/admin/views/doc.py:287
 msgid "File path"
-msgstr "Pot do datoteke"
+msgstr "Elérési út"
 
 #: contrib/admin/views/doc.py:285
 msgid "Decimal number"
-msgstr "Decimalno število"
+msgstr "Tizes számrendszerű szám"
 
 #: contrib/admin/views/doc.py:291
 msgid "Boolean (Either True, False or None)"
-msgstr "Boolean (ali True ali False ali None)"
+msgstr "Logikai (True, False vagy None)"
 
 #: contrib/admin/views/doc.py:292
 msgid "Relation to parent model"
-msgstr "Razmerje z starševskim modelom"
+msgstr "Szülőkapcsolat"
 
 #: contrib/admin/views/doc.py:293
 msgid "Phone number"
-msgstr "Telefonska številka"
+msgstr "Telefonszám"
 
 #: contrib/admin/views/doc.py:298
 msgid "Text"
-msgstr "Besedilo"
+msgstr "Szöveg"
 
 #: contrib/admin/views/doc.py:299
 msgid "Time"
-msgstr "Čas"
+msgstr "Idő"
 
 #: contrib/admin/views/doc.py:300 contrib/flatpages/models.py:7
 msgid "URL"
-msgstr "URL (spletni naslov)"
+msgstr "URL"
 
 #: contrib/admin/views/doc.py:301
 msgid "U.S. state (two uppercase letters)"
-msgstr "Koda ameriške zvezne države (dve veliki črki)"
+msgstr "USA állam (két nagybetű)"
 
 #: contrib/admin/views/doc.py:302
 msgid "XML text"
-msgstr "XML besedilo"
+msgstr "XML szöveg"
 
 #: contrib/admin/templates/admin/object_history.html:3
 #: contrib/admin/templates/admin/change_list.html:5
@@ -651,7 +652,7 @@ msgstr "XML besedilo"
 #: contrib/admin/templates/registration/password_change_form.html:3
 #: contrib/admin/templates/admin_doc/bookmarklets.html:3
 msgid "Documentation"
-msgstr "Dokumentacija"
+msgstr "Dokumentáció"
 
 #: contrib/admin/templates/admin/object_history.html:3
 #: contrib/admin/templates/admin/change_list.html:5
@@ -671,7 +672,7 @@ msgstr "Dokumentacija"
 #: contrib/admin/templates/admin_doc/index.html:4
 #: contrib/admin/templates/admin_doc/model_index.html:5
 msgid "Change password"
-msgstr "Spremeni geslo"
+msgstr "Jelszó megváltoztatása"
 
 #: contrib/admin/templates/admin/object_history.html:5
 #: contrib/admin/templates/admin/500.html:4
@@ -686,24 +687,24 @@ msgstr "Spremeni geslo"
 #: contrib/admin/templates/registration/password_change_form.html:4
 #: contrib/admin/templates/admin_doc/bookmarklets.html:3
 msgid "Home"
-msgstr "Domov"
+msgstr "Kezdőlap"
 
 #: contrib/admin/templates/admin/object_history.html:5
 #: contrib/admin/templates/admin/change_form.html:20
 msgid "History"
-msgstr "Zgodovina"
+msgstr "Történet"
 
 #: contrib/admin/templates/admin/object_history.html:18
 msgid "Date/time"
-msgstr "Datum/čas"
+msgstr "Dátum/idő"
 
 #: contrib/admin/templates/admin/object_history.html:19
 msgid "User"
-msgstr "Uporabnik"
+msgstr "Felhasználó"
 
 #: contrib/admin/templates/admin/object_history.html:20
 msgid "Action"
-msgstr "Dejanje"
+msgstr "Művelet"
 
 #: contrib/admin/templates/admin/object_history.html:26
 msgid "DATE_WITH_TIME_FULL"
@@ -714,45 +715,45 @@ msgid ""
 "This object doesn't have a change history. It probably wasn't added via this "
 "admin site."
 msgstr ""
-"Ta objekt nima zgodovine. Verjetno ni bil dodan preko te administratorske "
-"strani."
+"Az objektumnak nincs változási története. Valószínűleg nem ezen a "
+"karbantartó oldalon lett rögzítve."
 
 #: contrib/admin/templates/admin/base_site.html:4
 msgid "Django site admin"
-msgstr "Django site admin"
+msgstr "Django honlap adminisztráció"
 
 #: contrib/admin/templates/admin/base_site.html:7
 msgid "Django administration"
-msgstr "Django administracija"
+msgstr "Django adminisztráció"
 
 #: contrib/admin/templates/admin/500.html:4
 msgid "Server error"
-msgstr "Napaka strežnika"
+msgstr "Szerver hiba"
 
 #: contrib/admin/templates/admin/500.html:6
 msgid "Server error (500)"
-msgstr "Django napaka (500)"
+msgstr "Szerver hiba (500)"
 
 #: contrib/admin/templates/admin/500.html:9
 msgid "Server Error <em>(500)</em>"
-msgstr "Napaka strežnika <em>(500)</em>"
+msgstr "Szerver hiba <em>(500)</em>"
 
 #: contrib/admin/templates/admin/500.html:10
 msgid ""
 "There's been an error. It's been reported to the site administrators via e-"
 "mail and should be fixed shortly. Thanks for your patience."
 msgstr ""
-"Prišlo je do nepričakovane napake. Administratorji strani so že obveščeni "
-"prekoe-pošte in naj bi jo v kratkem odpravili. Hvala za vaše potrpljenje."
+"Hiba történt, melyet e-mailben jelentettünk az oldal karbantartójának. A "
+"rendszer remélhetően hamar megjavul, köszönjük a türelmedet."
 
 #: contrib/admin/templates/admin/404.html:4
 #: contrib/admin/templates/admin/404.html:8
 msgid "Page not found"
-msgstr "Strani ni mogoče najti"
+msgstr "Nincs ilyen oldal"
 
 #: contrib/admin/templates/admin/404.html:10
 msgid "We're sorry, but the requested page could not be found."
-msgstr "Se opraivčujemo, a zahtevane strani ni mogoče najti."
+msgstr "Sajnáljuk, a kért oldalt nem találjuk."
 
 #: contrib/admin/templates/admin/index.html:17
 #, python-format
@@ -762,45 +763,45 @@ msgstr ""
 #: contrib/admin/templates/admin/index.html:28
 #: contrib/admin/templates/admin/change_form.html:15
 msgid "Add"
-msgstr "Dodaj"
+msgstr "Hozzáadás"
 
 #: contrib/admin/templates/admin/index.html:34
 msgid "Change"
-msgstr "Spremeni"
+msgstr "Változtatás"
 
 #: contrib/admin/templates/admin/index.html:44
 msgid "You don't have permission to edit anything."
-msgstr "Nimate dovoljenja za urejanje česar koli."
+msgstr "Nincs jogod szerkeszteni."
 
 #: contrib/admin/templates/admin/index.html:52
 msgid "Recent Actions"
-msgstr "Zadnja dejanja"
+msgstr "Utóbbi műveletek"
 
 #: contrib/admin/templates/admin/index.html:53
 msgid "My Actions"
-msgstr "Moja dejanja"
+msgstr "Az én műveleteim"
 
 #: contrib/admin/templates/admin/index.html:57
 msgid "None available"
-msgstr "Ni na voljo"
+msgstr "Nincs elérhető"
 
 #: contrib/admin/templates/admin/change_list.html:11
 #, python-format
 msgid "Add %(name)s"
-msgstr "Dodaj %(name)s"
+msgstr "%(name)s hozzáadása"
 
 #: contrib/admin/templates/admin/login.html:22
 msgid "Have you <a href=\"/password_reset/\">forgotten your password</a>?"
-msgstr "Ste <a href=\"/password_reset/\">pozabili geslo</a>"
+msgstr "Csak nem <a href=\"/password_reset/\">elfelejtetted a jelszavadat</a>?"
 
 #: contrib/admin/templates/admin/base.html:23
 msgid "Welcome,"
-msgstr "Dobrodošli,"
+msgstr "Üdvözöllek,"
 
 #: contrib/admin/templates/admin/delete_confirmation.html:9
 #: contrib/admin/templates/admin/submit_line.html:3
 msgid "Delete"
-msgstr "Izbriši"
+msgstr "Törlés"
 
 #: contrib/admin/templates/admin/delete_confirmation.html:14
 #, python-format
@@ -809,8 +810,9 @@ msgid ""
 "objects, but your account doesn't have permission to delete the following "
 "types of objects:"
 msgstr ""
-"Izbris %(object_name)s '%(object)s' bi pomenil izbris povezanih objektov, "
-"vendarvi nimate dovoljenja za izbris naslednjih tipov objektov:"
+"A(z) %(object_name)s '%(object)s' törlése a kapcsolódó objektumok törlését "
+"is eredményezi, de a hozzáférésed nem engedi a következő típusú objektumok "
+"törlését:"
 
 #: contrib/admin/templates/admin/delete_confirmation.html:21
 #, python-format
@@ -818,176 +820,176 @@ msgid ""
 "Are you sure you want to delete the %(object_name)s \"%(object)s\"? All of "
 "the following related items will be deleted:"
 msgstr ""
-"Ste prepričani, da želite izbrisati %(object_name)s \"%(object)s\"?Vsi "
-"naslednji povezani elementi bodo izbrisani:"
+"Biztos hogy törlöd a(z) %(object_name)s \"%(object)s\"? A összes következő "
+"kapcsolódó elem is törlődik:"
 
 #: contrib/admin/templates/admin/delete_confirmation.html:26
 msgid "Yes, I'm sure"
-msgstr "Ja, sem prepričan"
+msgstr "Igen, biztos vagyok benne"
 
 #: contrib/admin/templates/admin/filter.html:2
 #, python-format
 msgid " By %(title)s "
-msgstr " Po %(title)s"
+msgstr " Szerző %(title)s "
 
 #: contrib/admin/templates/admin/search_form.html:8
 msgid "Go"
-msgstr "Pojdi"
+msgstr "Mehet"
 
 #: contrib/admin/templates/admin/change_form.html:21
 msgid "View on site"
-msgstr "Poglej na strani"
+msgstr "Megtekintés a honlapon"
 
 #: contrib/admin/templates/admin/change_form.html:30
 msgid "Please correct the error below."
 msgid_plural "Please correct the errors below."
-msgstr[0] "Prosimo, odpravite sledečo napako."
-msgstr[1] "Prosimo, odpravite sledeče napake."
+msgstr[0] "Kérlek javítsd az alábbi hibát."
+msgstr[1] "Kérlek javítsd az alábbi hibákat."
 
 #: contrib/admin/templates/admin/change_form.html:48
 msgid "Ordering"
-msgstr "Urejanje"
+msgstr "Rendezés"
 
 #: contrib/admin/templates/admin/change_form.html:51
 msgid "Order:"
-msgstr "Uredi:"
+msgstr "Rendezettség:"
 
 #: contrib/admin/templates/admin/submit_line.html:4
 msgid "Save as new"
-msgstr "Shrani kot novo"
+msgstr "Mentés újként"
 
 #: contrib/admin/templates/admin/submit_line.html:5
 msgid "Save and add another"
-msgstr "Shrani in dodaj še eno"
+msgstr "Mentés és másik hozzáadása"
 
 #: contrib/admin/templates/admin/submit_line.html:6
 msgid "Save and continue editing"
-msgstr "Shrani in nadaljuj z urejanjem"
+msgstr "Mentés és a szerkesztés folytatása"
 
 #: contrib/admin/templates/admin/submit_line.html:7
 msgid "Save"
-msgstr "Shrani"
+msgstr "Mentés"
 
 #: contrib/admin/templates/registration/password_change_done.html:4
 #: contrib/admin/templates/registration/password_change_form.html:4
 #: contrib/admin/templates/registration/password_change_form.html:6
 #: contrib/admin/templates/registration/password_change_form.html:10
 msgid "Password change"
-msgstr "Sprememba gesla"
+msgstr "Jelszó változtatása"
 
 #: contrib/admin/templates/registration/password_change_done.html:6
 #: contrib/admin/templates/registration/password_change_done.html:10
 msgid "Password change successful"
-msgstr "Geslo uspešno spremenjeno"
+msgstr "Sikeres jelszóváltoztatás"
 
 #: contrib/admin/templates/registration/password_change_done.html:12
 msgid "Your password was changed."
-msgstr "Vaše geslo je bilo spremenjeno."
+msgstr "Jelszavad megváltozott."
 
 #: contrib/admin/templates/registration/password_reset_form.html:4
 #: contrib/admin/templates/registration/password_reset_form.html:6
 #: contrib/admin/templates/registration/password_reset_form.html:10
 #: contrib/admin/templates/registration/password_reset_done.html:4
 msgid "Password reset"
-msgstr "Obnova gesla"
+msgstr "Jelszó törlés"
 
 #: contrib/admin/templates/registration/password_reset_form.html:12
 msgid ""
 "Forgotten your password? Enter your e-mail address below, and we'll reset "
 "your password and e-mail the new one to you."
 msgstr ""
-"Ste pozabili geslo? Vnesite vaš e-naslov spodaj in mi vam bomo poslali novo "
-"geslo."
+"Elfelejtetted a jelszavad? Írd be az e-mail címed, mi töröljük a jelszavad "
+"és az újat e-mailben elküldjük neked."
 
 #: contrib/admin/templates/registration/password_reset_form.html:16
 msgid "E-mail address:"
-msgstr "E-naslov"
+msgstr "E-mail cím:"
 
 #: contrib/admin/templates/registration/password_reset_form.html:16
 msgid "Reset my password"
-msgstr "Obnova gesla"
+msgstr "Jelszavam törlése"
 
 #: contrib/admin/templates/registration/logged_out.html:8
 msgid "Thanks for spending some quality time with the Web site today."
-msgstr "Hvala, ker ste si vzeli nekaj časa za to spletno stran."
+msgstr "Köszönjük hogy egy kis időt töltöttél a honlapunkon."
 
 #: contrib/admin/templates/registration/logged_out.html:10
 msgid "Log in again"
-msgstr "Ponovna prijava"
+msgstr "Jelentkezz be újra"
 
 #: contrib/admin/templates/registration/password_reset_done.html:6
 #: contrib/admin/templates/registration/password_reset_done.html:10
 msgid "Password reset successful"
-msgstr "Geslo je bilo uspešno obnovljeno"
+msgstr "Sikeres jelszótörlés"
 
 #: contrib/admin/templates/registration/password_reset_done.html:12
 msgid ""
 "We've e-mailed a new password to the e-mail address you submitted. You "
 "should be receiving it shortly."
-msgstr "Po e-pošti smo vam poslali novo geslo.Morali bi ga prejeti v kratkem"
+msgstr "Új jelszavadat elküldtük e-mailben. Hamarosan meg kell kapnod."
 
 #: contrib/admin/templates/registration/password_change_form.html:12
 msgid ""
 "Please enter your old password, for security's sake, and then enter your new "
 "password twice so we can verify you typed it in correctly."
 msgstr ""
-"Prosim, vnesite vaše staro geslo (zaradi varnosti) in nato še dvakrat novo"
-"(da preverimo, da se niste zatipkali)"
+"Írd be a régi jelszavad biztonsági okokból, majd az újat kétszer, hogy "
+"biztosan ne gépeld el."
 
 #: contrib/admin/templates/registration/password_change_form.html:17
 msgid "Old password:"
-msgstr "Staro geslo:"
+msgstr "Régi jelszó:"
 
 #: contrib/admin/templates/registration/password_change_form.html:19
 msgid "New password:"
-msgstr "Novo geslo:"
+msgstr "Új jelszó:"
 
 #: contrib/admin/templates/registration/password_change_form.html:21
 msgid "Confirm password:"
-msgstr "Potrditev gesla:"
+msgstr "Jelszó megerősítése:"
 
 #: contrib/admin/templates/registration/password_change_form.html:23
 msgid "Change my password"
-msgstr "Sprememba gesla"
+msgstr "Jelszavam megváltoztatása"
 
 #: contrib/admin/templates/registration/password_reset_email.html:2
 msgid "You're receiving this e-mail because you requested a password reset"
-msgstr "To pošto ste dobili, ker ste zahtevali spremembo gesla"
+msgstr "Ezt az e-mail-t azért kaptad, mert jelszótörlést kértél"
 
 #: contrib/admin/templates/registration/password_reset_email.html:3
 #, python-format
 msgid "for your user account at %(site_name)s"
-msgstr "za vaš uporabniški račun pri %(site_name)s"
+msgstr "hozzáférésedhez a következő honlapon: %(site_name)s"
 
 #: contrib/admin/templates/registration/password_reset_email.html:5
 #, python-format
 msgid "Your new password is: %(new_password)s"
-msgstr "Vaše novo geslo je: %(new_password)s"
+msgstr "Új jelszavad: %(new_password)s"
 
 #: contrib/admin/templates/registration/password_reset_email.html:7
 msgid "Feel free to change this password by going to this page:"
-msgstr "Geslo lahko spremenite z obiskom strani:"
+msgstr "Bármikor megváltoztathatod a jelszavad a következő oldalon:"
 
 #: contrib/admin/templates/registration/password_reset_email.html:11
 msgid "Your username, in case you've forgotten:"
-msgstr "Vaše uporabniško ime (za vsak primer)"
+msgstr "Felhasználóneved, ha elfelejtetted volna:"
 
 #: contrib/admin/templates/registration/password_reset_email.html:13
 msgid "Thanks for using our site!"
-msgstr "Hvala, ker uporabljate našo stran!"
+msgstr "Köszönjük, hogy használtad honlapunkat!"
 
 #: contrib/admin/templates/registration/password_reset_email.html:15
 #, python-format
 msgid "The %(site_name)s team"
-msgstr "Ekipa strani %(site_name)s"
+msgstr "A %(site_name)s csapata"
 
 #: contrib/admin/templates/admin_doc/bookmarklets.html:3
 msgid "Bookmarklets"
-msgstr "Zaznamkice"
+msgstr "Könyvjelzők"
 
 #: contrib/admin/templates/admin_doc/bookmarklets.html:5
 msgid "Documentation bookmarklets"
-msgstr "Dokumentacijske zaznamkice"
+msgstr "Dokumentum könyvjelzők"
 
 #: contrib/admin/templates/admin_doc/bookmarklets.html:9
 msgid ""
@@ -1000,323 +1002,324 @@ msgid ""
 "your computer is \"internal\").</p>\n"
 msgstr ""
 "\n"
-"<p class=\"help\">Za inštalacijo zaznamkic povlečite povezavo v orodno "
-"vrstico\n"
-"z zaznamki, ali kliknite z desno miškino tipko na povezavo in jo dodajte med "
-"zaznamkeZdaj lahko uporabite zaznamek s katere koli strani. Opomba: nekatere "
-"teh stranilahko gledate le z internega računalnika (preverite s sistemskim "
-"administratorjem)</p>\n"
+"<p class=\"help\">A könyvjelzők felvételéhez húzd a könyvjelzők linkjét az "
+"eszköztárra, vagy kattints rájuk jobb egérgombot és úgy add hozzá. Ezután \n"
+"már ki tudod választani a könyvjelzőt a honlap bármely oldaláról. A "
+"könyvjelzők között néhány oldal csak 'belső' gépekről nézhető meg.\n"
+"(Beszélj a rendszergazdával hogy a te géped 'belső' gép-e.).</p>\n"
 
 #: contrib/admin/templates/admin_doc/bookmarklets.html:19
 msgid "Documentation for this page"
-msgstr "Dokumentacija za to stran"
+msgstr "Az oldal dokumentációja"
 
 #: contrib/admin/templates/admin_doc/bookmarklets.html:20
 msgid ""
 "Jumps you from any page to the documentation for the view that generates "
 "that page."
 msgstr ""
-"Skok na stran z dokumentacijo za pogled (view), ki generira trenutno stran."
+"Bármely oldalról annak a nézetnek a dokumentációjára ugrik, mely a kérdéses "
+"oldalt generálta."
 
 #: contrib/admin/templates/admin_doc/bookmarklets.html:22
 msgid "Show object ID"
-msgstr "Pokaži ID objekta"
+msgstr "Az objektum ID kijelzése"
 
 #: contrib/admin/templates/admin_doc/bookmarklets.html:23
 msgid ""
 "Shows the content-type and unique ID for pages that represent a single "
 "object."
 msgstr ""
-"Pokaže content-type in unikatni ID za strani, ki predstavljajo en objekt."
+"Az objektum által reprezentált oldalak 'content-type' és 'unique ID' "
+"értékeit mutatja."
 
 #: contrib/admin/templates/admin_doc/bookmarklets.html:25
 msgid "Edit this object (current window)"
-msgstr "Uredi trenutni objekt (v trenutnem oknu)"
+msgstr "Objektum szerkesztése (aktuális ablakban)"
 
 #: contrib/admin/templates/admin_doc/bookmarklets.html:26
 msgid "Jumps to the admin page for pages that represent a single object."
-msgstr ""
-"Skok na administracijsko stran za vse strani, ki predstavljajo en objekt."
+msgstr "Az objektumhoz tartozó oldalak adminisztrációjához ugrik."
 
 #: contrib/admin/templates/admin_doc/bookmarklets.html:28
 msgid "Edit this object (new window)"
-msgstr "Uredi ta objekt (v novem oknu)"
+msgstr "Objektum szerkesztése (új ablakban)"
 
 #: contrib/admin/templates/admin_doc/bookmarklets.html:29
 msgid "As above, but opens the admin page in a new window."
-msgstr "Kot zgoraj, le da odpre administracijsko stran v novem oknu."
+msgstr "Mint fentebb, de az adminisztrációs oldalt új ablakban nyitja."
 
 #: contrib/admin/templates/widget/date_time.html:3
 msgid "Date:"
-msgstr "Datum:"
+msgstr "Dátum:"
 
 #: contrib/admin/templates/widget/date_time.html:4
 msgid "Time:"
-msgstr "Čas:"
+msgstr "Idő:"
 
 #: contrib/admin/templates/widget/file.html:2
 msgid "Currently:"
-msgstr "Trenutno:"
+msgstr "Éppen:"
 
 #: contrib/admin/templates/widget/file.html:3
 msgid "Change:"
-msgstr "Sprememba:"
+msgstr "Változás:"
 
 #: contrib/redirects/models.py:7
 msgid "redirect from"
-msgstr "preusmeritev iz"
+msgstr "átirányítva innen"
 
 #: contrib/redirects/models.py:8
 msgid ""
 "This should be an absolute path, excluding the domain name. Example: '/"
 "events/search/'."
 msgstr ""
-"To mora biti absolutna pot, izključujoč domeno. Primer: '/events/search'-"
+"Ennek abszolút elérési útnak kell lennie, a domén név nélkül. Példa: '/"
+"events/search/'"
 
 #: contrib/redirects/models.py:9
 msgid "redirect to"
-msgstr "preusmeri na"
+msgstr "átirányítva ide"
 
 #: contrib/redirects/models.py:10
 msgid ""
 "This can be either an absolute path (as above) or a full URL starting with "
 "'http://'."
 msgstr ""
-"To je ali absolutna pot (kot zgoraj) ali popoln URL naslov (začne se z "
-"'http://')"
+"Ennek vagy abszolút elérési útnak kell lennie (mint fentebb) vagy teljes URL-"
+"nek 'http://' -vel kezdve."
 
 #: contrib/redirects/models.py:12
 msgid "redirect"
-msgstr "preusmeritev"
+msgstr "átirányítás"
 
 #: contrib/redirects/models.py:13
 msgid "redirects"
-msgstr "preusmeritve"
+msgstr "átirányít"
 
 #: contrib/flatpages/models.py:8
 msgid ""
 "Example: '/about/contact/'. Make sure to have leading and trailing slashes."
-msgstr ""
-"Primer: '/about/contact/'. Mora vsebovati / (poševnico) na začetku in koncu."
+msgstr "Például: '/about/contact/'. Figyelj a nyitó és záró perjelre!"
 
 #: contrib/flatpages/models.py:9
 msgid "title"
-msgstr "naslov"
+msgstr "cím"
 
 #: contrib/flatpages/models.py:10
 msgid "content"
-msgstr "vsebina"
+msgstr "tartalom"
 
 #: contrib/flatpages/models.py:11
 msgid "enable comments"
-msgstr "omogoči komentarje"
+msgstr "megjegyzések engedélyezése"
 
 #: contrib/flatpages/models.py:12
 msgid "template name"
-msgstr "ime predloge"
+msgstr "sablon neve"
 
 #: contrib/flatpages/models.py:13
 msgid ""
 "Example: 'flatpages/contact_page'. If this isn't provided, the system will "
 "use 'flatpages/default'."
 msgstr ""
-"Primer: 'flatpages/contact_page'. Če to polje ni izpolnjeno, bo sistem "
-"uporabil 'flatpages/default'."
+"Példa: 'flatpages/contact_page'. Ha ez nem létezik, a rendszer a 'flatpages/"
+"default' -ot használja."
 
 #: contrib/flatpages/models.py:14
 msgid "registration required"
-msgstr "obvezna registracija"
+msgstr "regisztráció szükséges"
 
 #: contrib/flatpages/models.py:14
 msgid "If this is checked, only logged-in users will be able to view the page."
 msgstr ""
-"Če je to polje odkljukano, si lahko to stran ogledajo le registrirani "
-"uporabniki."
+"Ha ez be van jelölve, csak bejelentkezett felhasználó tudja az oldalt "
+"megnézni."
 
 #: contrib/flatpages/models.py:18
 msgid "flat page"
-msgstr "ploh stran :)"
+msgstr "egyszerű oldal"
 
 #: contrib/flatpages/models.py:19
 msgid "flat pages"
-msgstr "ploh strani :)"
+msgstr "egyszerű oldalak"
 
 #: contrib/auth/models.py:13 contrib/auth/models.py:26
 msgid "name"
-msgstr "ime"
+msgstr "név"
 
 #: contrib/auth/models.py:15
 msgid "codename"
-msgstr "kodno ime"
+msgstr "kódnév"
 
 #: contrib/auth/models.py:17
 #, fuzzy
 msgid "permission"
-msgstr "Dovoljenje"
+msgstr "Engedély"
 
 #: contrib/auth/models.py:18 contrib/auth/models.py:27
 #, fuzzy
 msgid "permissions"
-msgstr "Dovoljenja"
+msgstr "Engedélyek"
 
 #: contrib/auth/models.py:29
 #, fuzzy
 msgid "group"
-msgstr "Skupina"
+msgstr "Csoport"
 
 #: contrib/auth/models.py:30 contrib/auth/models.py:65
 #, fuzzy
 msgid "groups"
-msgstr "Skupine"
+msgstr "Csoportok"
 
 #: contrib/auth/models.py:55
 msgid "username"
-msgstr "uporabniško ime"
+msgstr "felhasználónév"
 
 #: contrib/auth/models.py:56
 msgid "first name"
-msgstr "ime"
+msgstr "keresztnév"
 
 #: contrib/auth/models.py:57
 msgid "last name"
-msgstr "priimek"
+msgstr "vezetéknév"
 
 #: contrib/auth/models.py:58
 msgid "e-mail address"
-msgstr "e-naslov"
+msgstr "e-mail cím"
 
 #: contrib/auth/models.py:59
 msgid "password"
-msgstr "geslo"
+msgstr "jelszó"
 
 #: contrib/auth/models.py:59
 msgid "Use '[algo]$[salt]$[hexdigest]'"
-msgstr "Uporabi '[algo]$[salt]$[hexdigest]'"
+msgstr "Használat '[algo]$[salt]$[hexdigest]'"
 
 #: contrib/auth/models.py:60
 msgid "staff status"
-msgstr "status osebja"
+msgstr "Személyzet státusa"
 
 #: contrib/auth/models.py:60
 msgid "Designates whether the user can log into this admin site."
-msgstr "Določi, če se sme uporabnik prijaviti v to administracijsko stran."
+msgstr ""
+"Megadja hogy a felhasználó bejelentkezhet-e erre az adminisztrációs oldalra."
 
 #: contrib/auth/models.py:61
 msgid "active"
-msgstr "aktiven"
+msgstr "aktív"
 
 #: contrib/auth/models.py:62
 msgid "superuser status"
-msgstr "status superuporabnika"
+msgstr "rendszergazda státusz"
 
 #: contrib/auth/models.py:63
 msgid "last login"
-msgstr "zadnja prijava"
+msgstr "utolsó bejelentkezés"
 
 #: contrib/auth/models.py:64
 msgid "date joined"
-msgstr "član od"
+msgstr "csatlakozás dátuma"
 
 #: contrib/auth/models.py:66
 msgid ""
 "In addition to the permissions manually assigned, this user will also get "
 "all permissions granted to each group he/she is in."
 msgstr ""
-"Polek ročno določenih dovoljenj bo ta uporabnik dobil tudi vsa dovoljenja,ki "
-"pripadajo vsem skupinah, v katerih je."
+"A kézzel beállított jogosultságok mellett a felhasználó a csoportjának a "
+"jogait is megkapja."
 
 #: contrib/auth/models.py:67
 #, fuzzy
 msgid "user permissions"
-msgstr "Dovoljenja"
+msgstr "Engedélyek"
 
 #: contrib/auth/models.py:70
 #, fuzzy
 msgid "user"
-msgstr "Uporabnik"
+msgstr "Felhasználó"
 
 #: contrib/auth/models.py:71
 #, fuzzy
 msgid "users"
-msgstr "Uporabniki"
+msgstr "Felhasználók"
 
 #: contrib/auth/models.py:76
 msgid "Personal info"
-msgstr "Osebni podatki"
+msgstr "Személyes információ"
 
 #: contrib/auth/models.py:77
 msgid "Permissions"
-msgstr "Dovoljenja"
+msgstr "Engedélyek"
 
 #: contrib/auth/models.py:78
 msgid "Important dates"
-msgstr "Pomembni datumi"
+msgstr "Fontos dátumok"
 
 #: contrib/auth/models.py:79
 msgid "Groups"
-msgstr "Skupine"
+msgstr "Csoportok"
 
 #: contrib/auth/models.py:219
 #, fuzzy
 msgid "message"
-msgstr "Sporočilo"
+msgstr "Üzenet"
 
 #: contrib/auth/forms.py:30
 msgid ""
 "Your Web browser doesn't appear to have cookies enabled. Cookies are "
 "required for logging in."
 msgstr ""
-"Izgleda, da vaš brskalnik nima omogočenih piškotkov. Piškotki so potrebni za "
-"prijavo."
+"A böngésződ úgy tűnik nem támogatja a cookie-kat. A cookie-k engedélyezése "
+"szükséges a bejelentkezéshez."
 
 #: contrib/contenttypes/models.py:25
 #, fuzzy
 msgid "python model class name"
-msgstr "python ime modula"
+msgstr "python modul név"
 
 #: contrib/contenttypes/models.py:28
 msgid "content type"
-msgstr "content type"
+msgstr "tartalom típusa"
 
 #: contrib/contenttypes/models.py:29
 msgid "content types"
-msgstr "content types"
+msgstr "tartalom típusok"
 
 #: contrib/sessions/models.py:35
 msgid "session key"
-msgstr "sejni ključ"
+msgstr "munkamenet kulcs"
 
 #: contrib/sessions/models.py:36
 msgid "session data"
-msgstr "podatki v seji"
+msgstr "munkamenet adat"
 
 #: contrib/sessions/models.py:37
 msgid "expire date"
-msgstr "čaz izteka"
+msgstr "lejárat dátuma"
 
 #: contrib/sessions/models.py:41
 msgid "session"
-msgstr "seja"
+msgstr "munkamenet"
 
 #: contrib/sessions/models.py:42
 msgid "sessions"
-msgstr "seje"
+msgstr "munkamenetek"
 
 #: contrib/sites/models.py:10
 msgid "domain name"
-msgstr "domena"
+msgstr "domén neve"
 
 #: contrib/sites/models.py:11
 msgid "display name"
-msgstr "prikazno ime"
+msgstr "megjelenő név"
 
 #: contrib/sites/models.py:15
 msgid "site"
-msgstr "stran"
+msgstr "honlap"
 
 #: contrib/sites/models.py:16
 msgid "sites"
-msgstr "strani"
+msgstr "honlapok"
 
 #: utils/translation.py:360
 msgid "DATE_FORMAT"
@@ -1332,89 +1335,88 @@ msgstr "P"
 
 #: utils/dates.py:6
 msgid "Monday"
-msgstr "ponedeljek"
+msgstr "Hétfő"
 
 #: utils/dates.py:6
 msgid "Tuesday"
-msgstr "torek"
+msgstr "Kedd"
 
 #: utils/dates.py:6
 msgid "Wednesday"
-msgstr "sreda"
+msgstr "Szerda"
 
 #: utils/dates.py:6
 msgid "Thursday"
-msgstr "četrtek"
+msgstr "Csütörtök"
 
 #: utils/dates.py:6
 msgid "Friday"
-msgstr "petek"
+msgstr "Péntek"
 
 #: utils/dates.py:7
 msgid "Saturday"
-msgstr "sobota"
+msgstr "Szombat"
 
 #: utils/dates.py:7
 msgid "Sunday"
-msgstr "nedelja"
+msgstr "Vasárnap"
 
 #: utils/dates.py:14
 msgid "January"
-msgstr "januar"
+msgstr "Január"
 
 #: utils/dates.py:14
 msgid "February"
-msgstr "februar"
+msgstr "Február"
 
 #: utils/dates.py:14 utils/dates.py:27
 msgid "March"
-msgstr "marec"
+msgstr "Március"
 
 #: utils/dates.py:14 utils/dates.py:27
 msgid "April"
-msgstr "april"
+msgstr "Április"
 
 #: utils/dates.py:14 utils/dates.py:27
 msgid "May"
-msgstr "maj"
+msgstr "Május"
 
 #: utils/dates.py:14 utils/dates.py:27
 msgid "June"
-msgstr "junij"
+msgstr "Június"
 
 #: utils/dates.py:15 utils/dates.py:27
 msgid "July"
-msgstr "julij"
+msgstr "Július"
 
 #: utils/dates.py:15
 msgid "August"
-msgstr "avgust"
+msgstr "Augusztus"
 
 #: utils/dates.py:15
 msgid "September"
-msgstr "september"
+msgstr "Szeptember"
 
 #: utils/dates.py:15
 msgid "October"
-msgstr "oktober"
+msgstr "Október"
 
 #: utils/dates.py:15
 msgid "November"
-msgstr "november"
+msgstr "November"
 
 #: utils/dates.py:16
 msgid "December"
-msgstr "december"
+msgstr "December"
 
 #: utils/dates.py:19
 #, fuzzy
 msgid "jan"
-msgstr "in"
+msgstr "és"
 
 #: utils/dates.py:19
-#, fuzzy
 msgid "feb"
-msgstr "feb."
+msgstr ""
 
 #: utils/dates.py:19
 msgid "mar"
@@ -1427,7 +1429,7 @@ msgstr ""
 #: utils/dates.py:19
 #, fuzzy
 msgid "may"
-msgstr "dan"
+msgstr "nap"
 
 #: utils/dates.py:19
 msgid "jun"
@@ -1459,44 +1461,43 @@ msgstr ""
 
 #: utils/dates.py:27
 msgid "Jan."
-msgstr "jan."
+msgstr "Jan."
 
 #: utils/dates.py:27
-#, fuzzy
 msgid "Feb."
-msgstr "feb."
+msgstr "Feb."
 
 #: utils/dates.py:28
 msgid "Aug."
-msgstr "avg."
+msgstr "Aug."
 
 #: utils/dates.py:28
 msgid "Sept."
-msgstr "sep."
+msgstr "Szept."
 
 #: utils/dates.py:28
 msgid "Oct."
-msgstr "okt."
+msgstr "Okt."
 
 #: utils/dates.py:28
 msgid "Nov."
-msgstr "nov."
+msgstr "Nov."
 
 #: utils/dates.py:28
 msgid "Dec."
-msgstr "dec."
+msgstr "Dec."
 
 #: utils/timesince.py:12
 msgid "year"
 msgid_plural "years"
-msgstr[0] "leto"
-msgstr[1] "let"
+msgstr[0] "év"
+msgstr[1] "évek"
 
 #: utils/timesince.py:13
 msgid "month"
 msgid_plural "months"
-msgstr[0] "mesec"
-msgstr[1] "mesecev"
+msgstr[0] "hónap"
+msgstr[1] "hónapok"
 
 #: utils/timesince.py:14
 msgid "week"
@@ -1507,40 +1508,40 @@ msgstr[1] ""
 #: utils/timesince.py:15
 msgid "day"
 msgid_plural "days"
-msgstr[0] "dan"
-msgstr[1] "dni"
+msgstr[0] "nap"
+msgstr[1] "napok"
 
 #: utils/timesince.py:16
 msgid "hour"
 msgid_plural "hours"
-msgstr[0] "ura"
-msgstr[1] "ur"
+msgstr[0] "óra"
+msgstr[1] "órák"
 
 #: utils/timesince.py:17
 msgid "minute"
 msgid_plural "minutes"
-msgstr[0] "minuta"
-msgstr[1] "minut"
+msgstr[0] "perc"
+msgstr[1] "percek"
 
 #: conf/global_settings.py:37
 msgid "Bengali"
-msgstr "Bengalski"
+msgstr "Bengáli"
 
 #: conf/global_settings.py:38
 msgid "Czech"
-msgstr "Češki"
+msgstr "Cseh"
 
 #: conf/global_settings.py:39
 msgid "Welsh"
-msgstr "Valežanski"
+msgstr "Walesi"
 
 #: conf/global_settings.py:40
 msgid "Danish"
-msgstr "Danski"
+msgstr "Dán"
 
 #: conf/global_settings.py:41
 msgid "German"
-msgstr "Nemški"
+msgstr "Német"
 
 #: conf/global_settings.py:42
 msgid "Greek"
@@ -1548,19 +1549,19 @@ msgstr ""
 
 #: conf/global_settings.py:43
 msgid "English"
-msgstr "Angleški"
+msgstr "Angol"
 
 #: conf/global_settings.py:44
 msgid "Spanish"
-msgstr "Španski"
+msgstr "Spanyol"
 
 #: conf/global_settings.py:45
 msgid "French"
-msgstr "Francoski"
+msgstr "Francia"
 
 #: conf/global_settings.py:46
 msgid "Galician"
-msgstr "Galičanski"
+msgstr "Gall"
 
 #: conf/global_settings.py:47
 msgid "Hungarian"
@@ -1572,161 +1573,161 @@ msgstr ""
 
 #: conf/global_settings.py:49
 msgid "Icelandic"
-msgstr "Islandski"
+msgstr "Izlandi"
 
 #: conf/global_settings.py:50
 msgid "Italian"
-msgstr "Italijanski"
+msgstr "Olasz"
 
 #: conf/global_settings.py:51
 msgid "Japanese"
-msgstr "Japonski"
+msgstr "Japán"
 
 #: conf/global_settings.py:52
 msgid "Dutch"
-msgstr "Nizozemski"
+msgstr "Holland"
 
 #: conf/global_settings.py:53
 msgid "Norwegian"
-msgstr "Norveški"
+msgstr "Norvég"
 
 #: conf/global_settings.py:54
 msgid "Brazilian"
-msgstr "Brazilski"
+msgstr "Brazil"
 
 #: conf/global_settings.py:55
 msgid "Romanian"
-msgstr "Romunski"
+msgstr "Román"
 
 #: conf/global_settings.py:56
 msgid "Russian"
-msgstr "Ruski"
+msgstr "Orosz"
 
 #: conf/global_settings.py:57
 msgid "Slovak"
-msgstr "Slovaški"
+msgstr "Szlovák"
 
 #: conf/global_settings.py:58
+#, fuzzy
 msgid "Slovenian"
-msgstr "Slovenski"
+msgstr "Szlovák"
 
 #: conf/global_settings.py:59
 msgid "Serbian"
-msgstr "Srbski"
+msgstr "Szerb"
 
 #: conf/global_settings.py:60
 msgid "Swedish"
-msgstr "Švedski"
+msgstr "Svéd"
 
 #: conf/global_settings.py:61
 #, fuzzy
 msgid "Ukrainian"
-msgstr "Brazilski"
+msgstr "Brazil"
 
 #: conf/global_settings.py:62
 msgid "Simplified Chinese"
-msgstr "Poenostavljen kitajski"
+msgstr "Egyszerű kínai"
 
 #: conf/global_settings.py:63
 msgid "Traditional Chinese"
-msgstr "Tradicionalni kitajski"
+msgstr "Hagyományos kínai"
 
 #: core/validators.py:60
 msgid "This value must contain only letters, numbers and underscores."
-msgstr "To polje lahko vsebuje le črke, števila in podčrtaje (_)."
+msgstr "Az érték csak betűket, számokat és alulvonást tartalmazhat."
 
 #: core/validators.py:64
 #, fuzzy
 msgid ""
 "This value must contain only letters, numbers, underscores, dashes or "
 "slashes."
-msgstr ""
-"To polje lahko vsebuje le črke, števila, podčrtaje (_) in poševnice (/)."
+msgstr "Az érték csak betűket, számokat, alulvonást és perjelet tartalmazhat."
 
 #: core/validators.py:72
 msgid "Uppercase letters are not allowed here."
-msgstr "Velike tiskane črke tu niso dovoljene."
+msgstr "Nagybetűk itt nem megengedettek."
 
 #: core/validators.py:76
 msgid "Lowercase letters are not allowed here."
-msgstr "Majhne tiskane črke tu niso dovoljene."
+msgstr "Kisbetűk itt nem megengedettek."
 
 #: core/validators.py:83
 msgid "Enter only digits separated by commas."
-msgstr "Vnesite števila, ločena z vejicami."
+msgstr "Csak számokat adj meg, vesszőkkel elválasztva."
 
 #: core/validators.py:95
 msgid "Enter valid e-mail addresses separated by commas."
-msgstr "Vnesite veljavne e-pošne naslove, ločene z vejicami."
+msgstr "Érvényes e-mail címeket adja meg, vesszőkkel elválasztva."
 
 #: core/validators.py:99
 msgid "Please enter a valid IP address."
-msgstr "Prosimo, vnesite veljavni IP naslov."
+msgstr "Írj be egy érvényes IP címet."
 
 #: core/validators.py:103
 msgid "Empty values are not allowed here."
-msgstr "Prazne vrednosti tu niso dovoljene."
+msgstr "Üres érték itt nem megengedett."
 
 #: core/validators.py:107
 msgid "Non-numeric characters aren't allowed here."
-msgstr "Nenumerične vrednosti tukaj niso dovoljne."
+msgstr "Nem szám karakterek itt nem megengedettek."
 
 #: core/validators.py:111
 msgid "This value can't be comprised solely of digits."
-msgstr "To polje ne sme vsebovati le števk."
+msgstr "Ez az érték nem tartalmazhat kizárólag számokat."
 
 #: core/validators.py:116
 msgid "Enter a whole number."
-msgstr "Vnesite celo število."
+msgstr "Adj meg egy egész számot."
 
 #: core/validators.py:120
 msgid "Only alphabetical characters are allowed here."
-msgstr "Le črke iz abecede so dovoljene tukaj."
+msgstr "Itt csak betűk megengedettek."
 
 #: core/validators.py:124
 msgid "Enter a valid date in YYYY-MM-DD format."
-msgstr "Vnesite veljavni datum v zapisu YYYY-MM-DD (leto-mesec-dan)."
+msgstr "Írj be egy érvényes dátumot 'ÉÉÉÉ-HH-NN' alakban."
 
 #: core/validators.py:128
 msgid "Enter a valid time in HH:MM format."
-msgstr "Vnesite veljavni čas v zapisu HH:MM (ura:minuta)."
+msgstr "Írj be egy érvényes időt 'ÓÓ:PP' alakban."
 
 #: core/validators.py:132 db/models/fields/__init__.py:468
 msgid "Enter a valid date/time in YYYY-MM-DD HH:MM format."
-msgstr ""
-"Vnesite veljavni datum/čas v zapisu YYYY-MM-DD HH:MM (leto-mesec-dan ura:"
-"minuta)"
+msgstr "Írj be egy érvényes dátumot/időt 'ÉÉÉÉ-HH-NN ÓÓ-PP' alakban."
 
 #: core/validators.py:136
 msgid "Enter a valid e-mail address."
-msgstr "Vnesite veljavni e-naslov."
+msgstr "Írj be egy érvényes e-mail címet."
 
 #: core/validators.py:148
 msgid ""
 "Upload a valid image. The file you uploaded was either not an image or a "
 "corrupted image."
 msgstr ""
-"Uploadjate veljavno sliko. Trenutna datoteka ni bila niti slika niti "
-"okvarjena slika."
+"Tölts fel egy érvényes képfájlt. A feltöltött fájl vagy nem kép volt vagy "
+"megsérült."
 
 #: core/validators.py:155
 #, python-format
 msgid "The URL %s does not point to a valid image."
-msgstr "URL %s ne kaže na veljavno sliko."
+msgstr "A(z) %s URL nem érvényes képfájlra mutat."
 
 #: core/validators.py:159
 #, python-format
 msgid "Phone numbers must be in XXX-XXX-XXXX format. \"%s\" is invalid."
-msgstr "Telefonska številka mora biti v zapisu XXX-XXX-XXXX. \"%s\" ni vredu."
+msgstr ""
+"A telefonszámoknak 'XXX-XXX-XXXX' formátumúnak kell lennie. \"%s\" "
+"érvénytelen."
 
 #: core/validators.py:167
 #, python-format
 msgid "The URL %s does not point to a valid QuickTime video."
-msgstr "URL %s ne kaže na veljavni QuickTime video."
+msgstr "A(z) %s URL nem érvényes QuickTime videóra mutat."
 
 #: core/validators.py:171
 msgid "A valid URL is required."
-msgstr "Potreben je veljavni URL naslov."
+msgstr "Érvényes URL szükséges."
 
 #: core/validators.py:185
 #, python-format
@@ -1734,78 +1735,78 @@ msgid ""
 "Valid HTML is required. Specific errors are:\n"
 "%s"
 msgstr ""
-"Potreben je veljavni HTML. Trenutni ima sledeče napake:\n"
+"Érvényes HTML kell. A hiba:\n"
 "%s"
 
 #: core/validators.py:192
 #, python-format
 msgid "Badly formed XML: %s"
-msgstr "Pokvarjen XML: %s"
+msgstr "Rosszul formázott XML: %s"
 
 #: core/validators.py:202
 #, python-format
 msgid "Invalid URL: %s"
-msgstr "Neveljavni URL naslov: %s"
+msgstr "Érvénytelen URL: %s"
 
 #: core/validators.py:206 core/validators.py:208
 #, python-format
 msgid "The URL %s is a broken link."
-msgstr "URL povezava %s je polomljena."
+msgstr "A(z) %s URL egy rossz link."
 
 #: core/validators.py:214
 msgid "Enter a valid U.S. state abbreviation."
-msgstr "Vnesi veljavno okrajšavo za ameriško zvezno državo."
+msgstr "Írj be egy érvényes USA állam rövidítést."
 
 #: core/validators.py:229
 #, python-format
 msgid "Watch your mouth! The word %s is not allowed here."
 msgid_plural "Watch your mouth! The words %s are not allowed here."
-msgstr[0] "Pazite na jezik! Beseda %s tu ni dovoljena."
-msgstr[1] "Pazite na jezik! Besede %s tu niso dovoljene."
+msgstr[0] "Vigyázz a szádra! Az ilyen szavak (%s) itt nem megengedettek."
+msgstr[1] "Vigyázz a szádra! Az ilyen szavak (%s) itt nem megengedettek."
 
 #: core/validators.py:236
 #, python-format
 msgid "This field must match the '%s' field."
-msgstr "To polje mora ustrezati polju '%s'."
+msgstr "A mezőnek egyeznie kell a(z) %s mezővel."
 
 #: core/validators.py:255
 msgid "Please enter something for at least one field."
-msgstr "Prosim, vnesite nekaj v vsaj eno od polj."
+msgstr "Írj be valamit legalább egy mezőbe."
 
 #: core/validators.py:264 core/validators.py:275
 msgid "Please enter both fields or leave them both empty."
-msgstr "Prosimo, izpolnite obe polji ali ju pustite obe prazni."
+msgstr "Töltsd ki mindkét mezőt vagy hagyd üresen mindkettőt."
 
 #: core/validators.py:282
 #, python-format
 msgid "This field must be given if %(field)s is %(value)s"
-msgstr "To polje mora biti izpolnjeno, če je %(field)s %(value)s"
+msgstr "Ezt a mezőt meg kell adni, ha %(field)s értéke %(value)s"
 
 #: core/validators.py:294
 #, python-format
 msgid "This field must be given if %(field)s is not %(value)s"
-msgstr "To polje mora biti izpolnjeno, če ni %(field)s %(value)s"
+msgstr "Ezt a mezőt meg kell adni, ha %(field)s értéke nem %(value)s"
 
 #: core/validators.py:313
 msgid "Duplicate values are not allowed."
-msgstr "Podvojitve niso dovoljene."
+msgstr "Ugyanazok az értékek nem megengedettek."
 
 #: core/validators.py:336
 #, python-format
 msgid "This value must be a power of %s."
-msgstr "Ta vrednost mora biti potenca od %s."
+msgstr "Az értéknek %s hatványának kell lennie."
 
 #: core/validators.py:347
 msgid "Please enter a valid decimal number."
-msgstr "Prosim vnesite decimalno število."
+msgstr "Írj be egy érvényes tizes számrendszerű számot."
 
 #: core/validators.py:349
 #, python-format
 msgid "Please enter a valid decimal number with at most %s total digit."
 msgid_plural ""
 "Please enter a valid decimal number with at most %s total digits."
-msgstr[0] "Prosimo, vnesite veljavno decimalno število z največ %s števkami."
-msgstr[1] "Prosimo, vnesite veljavno decimalno število z največ %s števkami."
+msgstr[0] "Írj be egy legalább %s jegyű érvényes tizes számrendszerű számot."
+msgstr[1] "Írj be egy legalább %s jegyű érvényes tizes számrendszerű számot."
 
 #: core/validators.py:352
 #, python-format
@@ -1813,38 +1814,40 @@ msgid "Please enter a valid decimal number with at most %s decimal place."
 msgid_plural ""
 "Please enter a valid decimal number with at most %s decimal places."
 msgstr[0] ""
-"Prosimo, vnesite veljavno decimalno število z največ %s decimalnimi mesti."
+"Írj be egy érvényes tizes számrendszerű számot, legfeljebb %s tizedessel."
 msgstr[1] ""
-"Prosimo, vnesite veljavno decimalno število z največ %s decimalnimi mesti."
+"Írj be egy érvényes tizes számrendszerű számot, legfeljebb %s tizedessel."
 
 #: core/validators.py:362
 #, python-format
 msgid "Make sure your uploaded file is at least %s bytes big."
-msgstr "Prosimo, poskrbite, da bo prenesena datoteka velika vsaj %s bajtov."
+msgstr "A feltöltött fájlod legalább %s bájt méretű legyen."
 
 #: core/validators.py:363
 #, python-format
 msgid "Make sure your uploaded file is at most %s bytes big."
-msgstr "Poskrbite, da bo prenesena datoteka velika največ %s bajtov."
+msgstr "A feltöltött fájlod legfeljebb %s bájt méretű legyen."
 
 #: core/validators.py:376
 msgid "The format for this field is wrong."
-msgstr "Format za to polje je napačen."
+msgstr "Ennek a mezőnek a formátuma rossz."
 
 #: core/validators.py:391
 msgid "This field is invalid."
-msgstr "To polje ni veljavno."
+msgstr "A mező érvénytelen."
 
 #: core/validators.py:426
 #, python-format
 msgid "Could not retrieve anything from %s."
-msgstr "Iz %s nisem mogel izločiti ničesar."
+msgstr "Nem lehet semmit kinyerni %s -ból."
 
 #: core/validators.py:429
 #, python-format
 msgid ""
 "The URL %(url)s returned the invalid Content-Type header '%(contenttype)s'."
-msgstr "URL %(url)s je vrnil neveljavni Content-Type '%(contenttype)s'."
+msgstr ""
+"A(z) %(url)s URL érvénytelen Content-Type fejlécet adott vissza '%"
+"(contenttype)s'."
 
 #: core/validators.py:462
 #, python-format
@@ -1852,8 +1855,8 @@ msgid ""
 "Please close the unclosed %(tag)s tag from line %(line)s. (Line starts with "
 "\"%(start)s\".)"
 msgstr ""
-"Prosimo, zaprite nezaprto %(tag)s oznako v vrstici %(line)s. (Vrstica se "
-"začne z \"%(start)s\".)"
+"Zárd le a nyitott %(tag)s címkét a %(line)s sorban. (A sor kezdete: \"%"
+"(start)s\".)"
 
 #: core/validators.py:466
 #, python-format
@@ -1861,16 +1864,16 @@ msgid ""
 "Some text starting on line %(line)s is not allowed in that context. (Line "
 "starts with \"%(start)s\".)"
 msgstr ""
-"Tekst z začetka vrstice %(line)s ni dovoljen v tem kontekstu. (Vrstica se "
-"začne z \"%(start)s\".)"
+"Valamely szöveg a(z) %(line)s sorban nem megengedett ebben a környezetben. "
+"(A sor kezdete: \"%(start)s\".)"
 
 #: core/validators.py:471
-#, fuzzy, python-format
+#, python-format
 msgid ""
 "\"%(attr)s\" on line %(line)s is an invalid attribute. (Line starts with \"%"
 "(start)s\".)"
 msgstr ""
-"\"<%(tag)s>\" v vrstici %(line)s je neveljavna oznaka. (Vrstica se začne z "
+"\"%(attr)s\" a(z) %(line)s sorban érvénytelen tulajdonság. (A sor kezdete: "
 "\"%(start)s\".)"
 
 #: core/validators.py:476
@@ -1879,8 +1882,8 @@ msgid ""
 "\"<%(tag)s>\" on line %(line)s is an invalid tag. (Line starts with \"%"
 "(start)s\".)"
 msgstr ""
-"\"<%(tag)s>\" v vrstici %(line)s je neveljavna oznaka. (Vrstica se začne z "
-"\"%(start)s\".)"
+"\"<%(tag)s>\" a(z) %(line)s sorban érvénytelen címke. (A sor kezdete: \"%"
+"(start)s\".)"
 
 #: core/validators.py:480
 #, python-format
@@ -1888,8 +1891,8 @@ msgid ""
 "A tag on line %(line)s is missing one or more required attributes. (Line "
 "starts with \"%(start)s\".)"
 msgstr ""
-"Oznaki v vrstici %(line)s manjka eden ali več nujnih atributov (Vrstica se "
-"začne z \"%(start)s\".)"
+"A %(line)s sorban lévő címkéről hiányzik egy vagy több kötelező tulajdonság. "
+"(A sor kezdete: \"%(start)s\".)"
 
 #: core/validators.py:485
 #, python-format
@@ -1897,60 +1900,61 @@ msgid ""
 "The \"%(attr)s\" attribute on line %(line)s has an invalid value. (Line "
 "starts with \"%(start)s\".)"
 msgstr ""
-"Atribut \"%(attr)s\" v vrstici %(line)s vsebuje neveljavno vrednost. "
-"(Vrstica se začne z \"%(start)s\".)"
+"A(z) \"%(attr)s\" jellemző a %(line)s sorban érvénytelen. (A sor kezdete: \"%"
+"(start)s\".)"
 
 #: db/models/manipulators.py:302
 #, python-format
 msgid "%(object)s with this %(type)s already exists for the given %(field)s."
-msgstr "%(object)s s tem %(type)s že obstaja za veljavno (%field)s."
+msgstr "%(object)s ezzel a(z) %(type)s már létezik az adott %(field)s -nél."
 
 #: db/models/fields/__init__.py:40
 #, python-format
 msgid "%(optname)s with this %(fieldname)s already exists."
-msgstr "%(optname)s s tem %(fieldname)s že obstaja."
+msgstr "%(optname)s ezzel a(z) %(fieldname)s már létezik."
 
 #: db/models/fields/__init__.py:114 db/models/fields/__init__.py:265
 #: db/models/fields/__init__.py:542 db/models/fields/__init__.py:553
 #: forms/__init__.py:346
 msgid "This field is required."
-msgstr "To polje je obvezno"
+msgstr "Kötelező mező."
 
 #: db/models/fields/__init__.py:337
 #, fuzzy
 msgid "This value must be an integer."
-msgstr "Ta vrednost mora biti potenca od %s."
+msgstr "Az értéknek %s hatványának kell lennie."
 
 #: db/models/fields/__init__.py:369
 #, fuzzy
 msgid "This value must be either True or False."
-msgstr "Ta vrednost mora biti potenca od %s."
+msgstr "Az értéknek %s hatványának kell lennie."
 
 #: db/models/fields/__init__.py:385
 #, fuzzy
 msgid "This field cannot be null."
-msgstr "To polje ni veljavno."
+msgstr "A mező érvénytelen."
 
 #: db/models/fields/__init__.py:562
 msgid "Enter a valid filename."
-msgstr "Vnesite veljavno ime datoteke."
+msgstr "Adj meg egy érvényes fájlnevet."
 
 #: db/models/fields/related.py:43
 #, python-format
 msgid "Please enter a valid %s."
-msgstr "Prosimo, vnesite veljaven %s."
+msgstr "Írj be érvényes %s -t."
 
 #: db/models/fields/related.py:579
 #, fuzzy
 msgid "Separate multiple IDs with commas."
-msgstr "Več ID-jev ločite z vejicami."
+msgstr "Az ID-ket vesszőkkel válaszd el."
 
 #: db/models/fields/related.py:581
 #, fuzzy
 msgid ""
 "Hold down \"Control\", or \"Command\" on a Mac, to select more than one."
 msgstr ""
-" Stisni \"Control\" (ali \"Command\" na Mac-u), da izbereš več kot enega."
+"Tartsd lenyomva a \"Control\"-t (vagy Mac-en a \"Command\"-ot) több elem "
+"kiválasztásához."
 
 #: db/models/fields/related.py:625
 #, python-format
@@ -1958,63 +1962,61 @@ msgid "Please enter valid %(self)s IDs. The value %(value)r is invalid."
 msgid_plural ""
 "Please enter valid %(self)s IDs. The values %(value)r are invalid."
 msgstr[0] ""
-"Prosimo, vnesite veljavni %(self)s ID-je. Vrednost %(value)r ni veljavna."
+"Kérlek írj be érvényes %(self)s ID-t. A mostani érték %(value)r érvénytelen."
 msgstr[1] ""
-"Prosimo, vnesite veljavni %(self)s ID-je. Vrednosti %(value)r niso veljavne."
+"Kérlek írj be érvényes %(self)s ID-ket. A mostani értékek %(value)r "
+"érvénytelenek."
 
 #: forms/__init__.py:380
 #, python-format
 msgid "Ensure your text is less than %s character."
 msgid_plural "Ensure your text is less than %s characters."
-msgstr[0] "Poskrbite, da bo tekst krajši do %s znakov."
-msgstr[1] "Poskrbite, da bo tekst krajši od %s znakov."
+msgstr[0] "A szövegnek kevesebbnek kell lennie %s karakternél."
+msgstr[1] "A szövegnek kevesebbnek kell lennie %s karakternél."
 
 #: forms/__init__.py:385
 msgid "Line breaks are not allowed here."
-msgstr "Prelomi vrstice tu niso dovoljeni."
+msgstr "Sortörések itt nem megengedettek."
 
 #: forms/__init__.py:480 forms/__init__.py:551 forms/__init__.py:589
 #, python-format
 msgid "Select a valid choice; '%(data)s' is not in %(choices)s."
-msgstr "Izberite veljavno možnost; '%(data)s' ni v %(choices)s."
+msgstr "Válassz érvényes elemet, '%(data)s' nincs a(z) %(choices)s között."
 
 #: forms/__init__.py:645
 msgid "The submitted file is empty."
-msgstr "Poslano polje je prazno."
+msgstr "A küldött fájl üres."
 
 #: forms/__init__.py:699
 msgid "Enter a whole number between -32,768 and 32,767."
-msgstr "Vnesite celo število med -32,768 in 32,767."
+msgstr "Írj be egy számot -32,768 és 32,767 között."
 
 #: forms/__init__.py:708
 msgid "Enter a positive number."
-msgstr "Vnesite pozitivno število."
+msgstr "Írj be egy pozitív számot."
 
 #: forms/__init__.py:717
 msgid "Enter a whole number between 0 and 32,767."
-msgstr "Vnesite celo število med 0 in 32,767."
+msgstr "Írj be egy egész számot 0 and 32,767 között."
 
 #: template/defaultfilters.py:379
 msgid "yes,no,maybe"
-msgstr "ja,ne,morda"
+msgstr "igen, nem, talán"
 
 #~ msgid "Comment"
-#~ msgstr "Komentar"
+#~ msgstr "Megjegyzés"
 
 #~ msgid "Comments"
-#~ msgstr "Komentarji"
+#~ msgstr "Megjegyzések"
 
 #~ msgid "String (up to 50)"
-#~ msgstr "Niz (do 50 znakov)"
+#~ msgstr "Karakterlánc (50 karakterig)"
 
 #~ msgid "label"
-#~ msgstr "oznaka"
+#~ msgstr "címke"
 
 #~ msgid "package"
-#~ msgstr "paket"
+#~ msgstr "csomag"
 
 #~ msgid "packages"
-#~ msgstr "paketi"
-
-#~ msgid "Slovene"
-#~ msgstr "Slovenski"
+#~ msgstr "csomagok"

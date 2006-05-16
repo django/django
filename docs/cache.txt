@@ -339,7 +339,7 @@ Here are a few examples of upstream caches:
       somedomain.com, your ISP would send you the page without having to access
       somedomain.com directly.
 
-    * Your Django Web site may site behind a Squid Web proxy
+    * Your Django Web site may sit behind a Squid Web proxy
       (http://www.squid-cache.org/) that caches pages for performance. In this
       case, each request first would be handled by Squid, and it'd only be
       passed to your application if needed.

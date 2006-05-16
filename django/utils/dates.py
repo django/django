@@ -16,8 +16,8 @@ MONTHS = {
     12:_('December')
 }
 MONTHS_3 = {
-    1:'jan', 2:'feb', 3:'mar', 4:'apr', 5:'may', 6:'jun', 7:'jul', 8:'aug',
-    9:'sep', 10:'oct', 11:'nov', 12:'dec'
+    1:_('jan'), 2:_('feb'), 3:_('mar'), 4:_('apr'), 5:_('may'), 6:_('jun'),
+    7:_('jul'), 8:_('aug'), 9:_('sep'), 10:_('oct'), 11:_('nov'), 12:_('dec')
 }
 MONTHS_3_REV = {
     'jan':1, 'feb':2, 'mar':3, 'apr':4, 'may':5, 'jun':6, 'jul':7, 'aug':8,
