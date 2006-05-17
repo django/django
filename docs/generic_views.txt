@@ -160,10 +160,14 @@ a date in the *future* are not included.
     * ``template_loader``: The template loader to use when loading the
       template. By default, it's ``django.template.loader``.
 
-    * ``extra_context``: A dictionary of values to add to the template context.
-      If a value in the dictionary is callable, the generic view will call it
-      just before rendering the template. By default, this is an empty
-      dictionary.
+    * ``extra_context``: A dictionary of values to add to the template
+      context. By default, this is an empty dictionary. If a value in the
+      dictionary is callable, the generic view will call it
+      just before rendering the template. If it is not callable, it will be
+      evaluated once, at import time. Note that QuerySets are not callable, so
+      if you want to pass in a QuerySet in ``extra_context`` and have it
+      evaluated at render time, you need to wrap it in a function (that
+      returns the QuerySet).
 
     * ``allow_empty``: A boolean specifying whether to display the page if no
       objects are available. If this is ``False`` and no objects are available,
@@ -225,10 +229,14 @@ with a date in the *future* are not displayed.
     * ``template_loader``: The template loader to use when loading the
       template. By default, it's ``django.template.loader``.
 
-    * ``extra_context``: A dictionary of values to add to the template context.
-      If a value in the dictionary is callable, the generic view will call it
-      just before rendering the template. By default, this is an empty
-      dictionary.
+    * ``extra_context``: A dictionary of values to add to the template
+      context. By default, this is an empty dictionary. If a value in the
+      dictionary is callable, the generic view will call it
+      just before rendering the template. If it is not callable, it will be
+      evaluated once, at import time. Note that QuerySets are not callable, so
+      if you want to pass in a QuerySet in ``extra_context`` and have it
+      evaluated at render time, you need to wrap it in a function (that
+      returns the QuerySet).
 
     * ``allow_empty``: A boolean specifying whether to display the page if no
       objects are available. If this is ``False`` and no objects are available,
@@ -287,10 +295,14 @@ date in the *future* are not displayed.
     * ``template_loader``: The template loader to use when loading the
       template. By default, it's ``django.template.loader``.
 
-    * ``extra_context``: A dictionary of values to add to the template context.
-      If a value in the dictionary is callable, the generic view will call it
-      just before rendering the template. By default, this is an empty
-      dictionary.
+    * ``extra_context``: A dictionary of values to add to the template
+      context. By default, this is an empty dictionary. If a value in the
+      dictionary is callable, the generic view will call it
+      just before rendering the template. If it is not callable, it will be
+      evaluated once, at import time. Note that QuerySets are not callable, so
+      if you want to pass in a QuerySet in ``extra_context`` and have it
+      evaluated at render time, you need to wrap it in a function (that
+      returns the QuerySet).
 
     * ``allow_empty``: A boolean specifying whether to display the page if no
       objects are available. If this is ``False`` and no objects are available,
@@ -360,10 +372,14 @@ in the *future* are not displayed.
     * ``template_loader``: The template loader to use when loading the
       template. By default, it's ``django.template.loader``.
 
-    * ``extra_context``: A dictionary of values to add to the template context.
-      If a value in the dictionary is callable, the generic view will call it
-      just before rendering the template. By default, this is an empty
-      dictionary.
+    * ``extra_context``: A dictionary of values to add to the template
+      context. By default, this is an empty dictionary. If a value in the
+      dictionary is callable, the generic view will call it
+      just before rendering the template. If it is not callable, it will be
+      evaluated once, at import time. Note that QuerySets are not callable, so
+      if you want to pass in a QuerySet in ``extra_context`` and have it
+      evaluated at render time, you need to wrap it in a function (that
+      returns the QuerySet).
 
     * ``allow_empty``: A boolean specifying whether to display the page if no
       objects are available. If this is ``False`` and no objects are available,
@@ -436,10 +452,14 @@ a 404 error, regardless of whether any objects exist for future days.
     * ``template_loader``: The template loader to use when loading the
       template. By default, it's ``django.template.loader``.
 
-    * ``extra_context``: A dictionary of values to add to the template context.
-      If a value in the dictionary is callable, the generic view will call it
-      just before rendering the template. By default, this is an empty
-      dictionary.
+    * ``extra_context``: A dictionary of values to add to the template
+      context. By default, this is an empty dictionary. If a value in the
+      dictionary is callable, the generic view will call it
+      just before rendering the template. If it is not callable, it will be
+      evaluated once, at import time. Note that QuerySets are not callable, so
+      if you want to pass in a QuerySet in ``extra_context`` and have it
+      evaluated at render time, you need to wrap it in a function (that
+      returns the QuerySet).
 
     * ``allow_empty``: A boolean specifying whether to display the page if no
       objects are available. If this is ``False`` and no objects are available,
@@ -543,10 +563,14 @@ A page representing an individual object.
     * ``template_loader``: The template loader to use when loading the
       template. By default, it's ``django.template.loader``.
 
-    * ``extra_context``: A dictionary of values to add to the template context.
-      If a value in the dictionary is callable, the generic view will call it
-      just before rendering the template. By default, this is an empty
-      dictionary.
+    * ``extra_context``: A dictionary of values to add to the template
+      context. By default, this is an empty dictionary. If a value in the
+      dictionary is callable, the generic view will call it
+      just before rendering the template. If it is not callable, it will be
+      evaluated once, at import time. Note that QuerySets are not callable, so
+      if you want to pass in a QuerySet in ``extra_context`` and have it
+      evaluated at render time, you need to wrap it in a function (that
+      returns the QuerySet).
 
     * ``context_processors``: A list of template-context processors to apply to
       the view's template. See the `RequestContext docs`_.
@@ -600,10 +624,14 @@ A page representing a list of objects.
     * ``template_loader``: The template loader to use when loading the
       template. By default, it's ``django.template.loader``.
 
-    * ``extra_context``: A dictionary of values to add to the template context.
-      If a value in the dictionary is callable, the generic view will call it
-      just before rendering the template. By default, this is an empty
-      dictionary.
+    * ``extra_context``: A dictionary of values to add to the template
+      context. By default, this is an empty dictionary. If a value in the
+      dictionary is callable, the generic view will call it
+      just before rendering the template. If it is not callable, it will be
+      evaluated once, at import time. Note that QuerySets are not callable, so
+      if you want to pass in a QuerySet in ``extra_context`` and have it
+      evaluated at render time, you need to wrap it in a function (that
+      returns the QuerySet).
 
     * ``allow_empty``: A boolean specifying whether to display the page if no
       objects are available. If this is ``False`` and no objects are available,
@@ -697,10 +725,14 @@ A page representing an individual object.
     * ``template_loader``: The template loader to use when loading the
       template. By default, it's ``django.template.loader``.
 
-    * ``extra_context``: A dictionary of values to add to the template context.
-      If a value in the dictionary is callable, the generic view will call it
-      just before rendering the template. By default, this is an empty
-      dictionary.
+    * ``extra_context``: A dictionary of values to add to the template
+      context. By default, this is an empty dictionary. If a value in the
+      dictionary is callable, the generic view will call it
+      just before rendering the template. If it is not callable, it will be
+      evaluated once, at import time. Note that QuerySets are not callable, so
+      if you want to pass in a QuerySet in ``extra_context`` and have it
+      evaluated at render time, you need to wrap it in a function (that
+      returns the QuerySet).
 
     * ``context_processors``: A list of template-context processors to apply to
       the view's template. See the `RequestContext docs`_.
@@ -764,10 +796,14 @@ automatic manipulators that come with Django models.
     * ``template_loader``: The template loader to use when loading the
       template. By default, it's ``django.template.loader``.
 
-    * ``extra_context``: A dictionary of values to add to the template context.
-      If a value in the dictionary is callable, the generic view will call it
-      just before rendering the template. By default, this is an empty
-      dictionary.
+    * ``extra_context``: A dictionary of values to add to the template
+      context. By default, this is an empty dictionary. If a value in the
+      dictionary is callable, the generic view will call it
+      just before rendering the template. If it is not callable, it will be
+      evaluated once, at import time. Note that QuerySets are not callable, so
+      if you want to pass in a QuerySet in ``extra_context`` and have it
+      evaluated at render time, you need to wrap it in a function (that
+      returns the QuerySet).
 
     * ``context_processors``: A list of template-context processors to apply to
       the view's template. See the `RequestContext docs`_.
@@ -843,10 +879,14 @@ object. This uses the automatic manipulators that come with Django models.
     * ``template_loader``: The template loader to use when loading the
       template. By default, it's ``django.template.loader``.
 
-    * ``extra_context``: A dictionary of values to add to the template context.
-      If a value in the dictionary is callable, the generic view will call it
-      just before rendering the template. By default, this is an empty
-      dictionary.
+    * ``extra_context``: A dictionary of values to add to the template
+      context. By default, this is an empty dictionary. If a value in the
+      dictionary is callable, the generic view will call it
+      just before rendering the template. If it is not callable, it will be
+      evaluated once, at import time. Note that QuerySets are not callable, so
+      if you want to pass in a QuerySet in ``extra_context`` and have it
+      evaluated at render time, you need to wrap it in a function (that
+      returns the QuerySet).
 
     * ``context_processors``: A list of template-context processors to apply to
       the view's template. See the `RequestContext docs`_.
@@ -924,10 +964,14 @@ contain a form that POSTs to the same URL.
     * ``template_loader``: The template loader to use when loading the
       template. By default, it's ``django.template.loader``.
 
-    * ``extra_context``: A dictionary of values to add to the template context.
-      If a value in the dictionary is callable, the generic view will call it
-      just before rendering the template. By default, this is an empty
-      dictionary.
+    * ``extra_context``: A dictionary of values to add to the template
+      context. By default, this is an empty dictionary. If a value in the
+      dictionary is callable, the generic view will call it
+      just before rendering the template. If it is not callable, it will be
+      evaluated once, at import time. Note that QuerySets are not callable, so
+      if you want to pass in a QuerySet in ``extra_context`` and have it
+      evaluated at render time, you need to wrap it in a function (that
+      returns the QuerySet).
 
     * ``context_processors``: A list of template-context processors to apply to
       the view's template. See the `RequestContext docs`_.
