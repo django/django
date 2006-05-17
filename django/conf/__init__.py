@@ -33,6 +33,8 @@ class LazySettings:
 
     def __setattr__(self, name, value):
         if name == '_target':
+            # Assign directly to self.__dict__, because otherwise we'd call
+            # __setattr__(), which would be an infinite loop.
             self.__dict__['_target'] = value
         else:
             setattr(self._target, name, value)
