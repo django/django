@@ -771,6 +771,13 @@ is equivalent::
 
     settings.configure(myapp_defaults, DEBUG = True)
 
+Normally, you will not need to override the defaults in this fashion. The
+Django defaults are sufficiently tame that you can safely use them. Be aware
+that if you do pass in a new default module, it entirely *replaces* the Django
+defaults, so you must specify a value for every possible setting that might be
+used in that code you are importing. Check in
+``django.conf.settings.global_settings`` for the full list.
+
 Either configure() or DJANGO_SETTINGS_MODULE is required
 --------------------------------------------------------
 
