@@ -206,12 +206,14 @@ def model_detail(request, app_label, model_name):
         verbose = "related `%s.%s` objects" % (rel.opts.app_label, rel.opts.object_name)
         accessor = rel.get_accessor_name()
         fields.append({
-            'name' : "%s.all" % accessor,
-            'verbose' : utils.parse_rst("all " + verbose , 'model', 'model:' + opts.module_name),
+            'name'      : "%s.all" % accessor,
+            'data_type' : 'List',
+            'verbose'   : utils.parse_rst("all " + verbose , 'model', 'model:' + opts.module_name),
         })
         fields.append({
-            'name' : "%s.count" % accessor,
-            'verbose' : utils.parse_rst("number of " + verbose , 'model', 'model:' + opts.module_name),
+            'name'      : "%s.count" % accessor,
+            'data_type' : 'Integer',
+            'verbose'   : utils.parse_rst("number of " + verbose , 'model', 'model:' + opts.module_name),
         })
 
     return render_to_response('admin_doc/model_detail.html', {
