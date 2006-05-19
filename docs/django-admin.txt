@@ -262,6 +262,21 @@ startproject [projectname]
 Creates a Django project directory structure for the given project name in the
 current directory.
 
+syncdb
+------
+
+Creates the database tables for all apps in INSTALLED_APPS whose tables
+have not already been created.
+
+This is the command to use when you have added new applications to your
+project and want to install them in the database. This includes any
+applications shipped with Django that might be in INSTALLED_APPS by default.
+When you start a new project, run this command to install the default apps.
+
+If you are installing the ``django.contrib.auth`` application, ``sycndb`` will
+give you the option of creating a superuser immediately, which will permit you
+to log into the admin interface, for example, when the time comes.
+
 validate
 --------
 
