@@ -1632,20 +1632,30 @@ read, in part::
         #...
     )
 
-Seeding models with initial data
-================================
+Providing initial SQL data
+==========================
 
-Sometimes, once the database tables for a model are created, you will want to
-populate them with some default records or perhaps some testing data. For each
-model you have like this, create a file named after the lower-cased version of
-the model's name, with an extension of ``.sql``. Put this file in a directory
-called ``sql/`` under your application directory (so, ``myapp/sql/poll.sql``
-for ``Poll`` model in the ``myapp`` application).
+Django provides a hook for passing the database arbitrary SQL that's executed
+just after the CREATE TABLE statements. Use this hook, for example, if you want
+to populate default records, or create SQL functions, automatically.
 
-This file should contain valid SQL statements that can be executed to create
-the initial data you would like to insert. These files are read by the
-``sqlinitialdata``, ``sqlreset``, ``sqlall`` and ``reset`` commands in
-``manage.py``. Refer to the `manage.py documentation`_ for more
-information.
+The hook is simple: Django just looks for a file called
+``<appname>/sql/<modelname>.sql``, where ``<appname>`` is your app directory and
+``<modelname>`` is the model's name in lowercase.
+
+In the ``Person`` example model at the top of this document, assuming it lives
+in an app called ``myapp``, you could add arbitrary SQL to the file
+``myapp/sql/person.sql``. Here's an example of what the file might contain::
+
+    INSERT INTO myapp_person (first_name, last_name) VALUES ('John', 'Lennon');
+    INSERT INTO myapp_person (first_name, last_name) VALUES ('Paul', 'McCartney');
+
+Each SQL file, if given, is expected to contain valid SQL. The SQL files are
+piped directly into the database after all of the models' table-creation
+statements have been executed.
+
+The SQL files are read by the ``sqlinitialdata``, ``sqlreset``, ``sqlall`` and
+``reset`` commands in ``manage.py``. Refer to the `manage.py documentation`_
+for more information.
 
 .. _`manage.py documentation`: http://www.djangoproject.com/documentation/django_admin/#sqlinitialdata-appname-appname

@@ -177,13 +177,12 @@ Port 7000 on IP address 1.2.3.4::
 
     django-admin.py runserver 1.2.3.4:7000
 
-Serving static files with the development server:
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Serving static files with the development server
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-By default, the development server will not be able to serve any static files
-for your site (such as CSS files, images, things under MEDIA_ROOT_URL and so
-forth). If you wish to configure your project to handle static media via the
-development server, read the instructions in the  `serving static files`_
+By default, the development server doesn't serve any static files for your site
+(such as CSS files, images, things under ``MEDIA_ROOT_URL`` and so forth). If
+you want to configure Django to serve static media, read the `serving static files`_
 documentation.
 
 .. _serving static files: http://www.djangoproject.com/documentation/static_files/
@@ -212,7 +211,7 @@ sqlall [appname appname ...]
 Prints the CREATE TABLE and initial-data SQL statements for the given appnames.
 
 Refer to the description of ``sqlinitialdata`` for an explanation of how to
-specify seed data.
+specify initial data.
 
 sqlclear [appname appname ...]
 --------------------------------------
@@ -229,13 +228,17 @@ sqlinitialdata [appname appname ...]
 
 Prints the initial INSERT SQL statements for the given appnames.
 
-This command will read any files under ``<appname>/sql/`` that have the same
-name as the lower-cased version of a model name (so if your app includes a
-model called ``Poll``, the file ``poll.sql`` will be read). These files are
-expected to be valid SQL files and their contents are piped into the database
-after all of the models' table creation statements have been executed. This
-can be used to populate the tables with any necessary initial records or test
-data.
+For each model in each specified app, this command looks for the file
+``<appname>/sql/<modelname>.sql``, where ``<appname>`` is the given appname and
+``<modelname>`` is the model's name in lowercase. For example, if you have an
+app ``news`` that includes a ``Story`` model, ``sqlinitialdata`` will attempt
+to read a file ``news/sql/story.sql`` and append it to the output of this
+command.
+
+Each of the SQL files, if given, is expected to contain valid SQL. The SQL
+files are piped directly into the database after all of the models'
+table-creation statements have been executed. Use this SQL hook to populate
+tables with any necessary initial records, SQL functions or test data.
 
 sqlreset [appname appname ...]
 --------------------------------------
@@ -265,17 +268,16 @@ current directory.
 syncdb
 ------
 
-Creates the database tables for all apps in INSTALLED_APPS whose tables
+Creates the database tables for all apps in ``INSTALLED_APPS`` whose tables
 have not already been created.
 
-This is the command to use when you have added new applications to your
-project and want to install them in the database. This includes any
-applications shipped with Django that might be in INSTALLED_APPS by default.
-When you start a new project, run this command to install the default apps.
+Use this command when you've added new applications to your project and want to
+install them in the database. This includes any apps shipped with Django that
+might be in ``INSTALLED_APPS`` by default. When you start a new project, run
+this command to install the default apps.
 
-If you are installing the ``django.contrib.auth`` application, ``sycndb`` will
-give you the option of creating a superuser immediately, which will permit you
-to log into the admin interface, for example, when the time comes.
+If you're installing the ``django.contrib.auth`` application, ``syncdb`` will
+give you the option of creating a superuser immediately.
 
 validate
 --------
