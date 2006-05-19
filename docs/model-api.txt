@@ -1631,3 +1631,21 @@ read, in part::
         'mysite.myapp',
         #...
     )
+
+Seeding models with initial data
+================================
+
+Sometimes, once the database tables for a model are created, you will want to
+populate them with some default records or perhaps some testing data. For each
+model you have like this, create a file named after the lower-cased version of
+the model's name, with an extension of ``.sql``. Put this file in a directory
+called ``sql/`` under your application directory (so, ``myapp/sql/poll.sql``
+for ``Poll`` model in the ``myapp`` application).
+
+This file should contain valid SQL statements that can be executed to create
+the initial data you would like to insert. These files are read by the
+``sqlinitialdata``, ``sqlreset``, ``sqlall`` and ``reset`` commands in
+``manage.py``. Refer to the `manage.py documentation`_ for more
+information.
+
+.. _`manage.py documentation`: http://www.djangoproject.com/documentation/django_admin/#sqlinitialdata-appname-appname

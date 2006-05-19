@@ -200,6 +200,9 @@ sqlall [appname appname ...]
 
 Prints the CREATE TABLE and initial-data SQL statements for the given appnames.
 
+Refer to the description of ``sqlinitialdata`` for an explanation of how to
+specify seed data.
+
 sqlclear [appname appname ...]
 --------------------------------------
 
@@ -214,6 +217,14 @@ sqlinitialdata [appname appname ...]
 --------------------------------------------
 
 Prints the initial INSERT SQL statements for the given appnames.
+
+This command will read any files under ``<appname>/sql/`` that have the same
+name as the lower-cased version of a model name (so if your app includes a
+model called ``Poll``, the file ``poll.sql`` will be read). These files are
+expected to be valid SQL files and their contents are piped into the database
+after all of the models' table creation statements have been executed. This
+can be used to populate the tables with any necessary initial records or test
+data.
 
 sqlreset [appname appname ...]
 --------------------------------------
