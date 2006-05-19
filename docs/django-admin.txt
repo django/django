@@ -177,6 +177,17 @@ Port 7000 on IP address 1.2.3.4::
 
     django-admin.py runserver 1.2.3.4:7000
 
+Serving static files with the development server:
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+By default, the development server will not be able to serve any static files
+for your site (such as CSS files, images, things under MEDIA_ROOT_URL and so
+forth). If you wish to configure your project to handle static media via the
+development server, read the instructions in the  `serving static files`_
+documentation.
+
+.. _serving static files: http://www.djangoproject.com/documentation/static_files/
+
 shell
 -----
 
