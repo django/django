@@ -325,6 +325,16 @@ setting the Python path for you.
 Displays a help message that includes a terse list of all available actions and
 options.
 
+--version
+---------
+
+Displays the current Django version.
+
+Example output::
+
+    0.9.1
+    0.9.1 (SVN)
+
 Extra niceties
 ==============
 
