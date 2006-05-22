@@ -284,6 +284,7 @@ DATA_TYPE_MAPPING = {
     'DateTimeField'             : _('Date (with time)'),
     'EmailField'                : _('E-mail address'),
     'FileField'                 : _('File path'),
+    'FilePathField',            : _('File path'),
     'FloatField'                : _('Decimal number'),
     'ForeignKey'                : _('Integer'),
     'ImageField'                : _('File path'),
