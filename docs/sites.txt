@@ -239,6 +239,11 @@ With this model, ``Photo.objects.all()`` will return all ``Photo`` objects in
 the database, but ``Photo.on_site.all()`` will return only the ``Photo``
 objects associated with the current site, according to the ``SITE_ID`` setting.
 
+Put another way, these two statements are equivalent::
+
+    Photo.objects.filter(site=settings.SITE_ID)
+    Photo.on_site.all()
+
 How did ``CurrentSiteManager`` know which field of ``Photo`` was the ``Site``?
 It defaults to looking for a field called ``site``. If your model has a
 ``ForeignKey`` or ``ManyToManyField`` called something *other* than ``site``,
