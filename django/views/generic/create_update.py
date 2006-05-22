@@ -107,7 +107,7 @@ def update_object(request, model, object_id=None, slug=None,
         errors = manipulator.get_validation_errors(new_data)
         manipulator.do_html2python(new_data)
         if not errors:
-            manipulator.save(new_data)
+            object = manipulator.save(new_data)
 
             if not request.user.is_anonymous():
                 request.user.message_set.create(message="The %s was updated successfully." % model._meta.verbose_name)
