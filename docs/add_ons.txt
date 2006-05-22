@@ -77,7 +77,11 @@ sites
 
 A light framework that lets you operate multiple Web sites off of the same
 database and Django installation. It gives you hooks for associating objects to
-one or more sites. This is not yet documented.
+one or more sites.
+
+See the `sites documentation`_.
+
+.. _sites documentation: http://www.djangoproject.com/documentation/sites/
 
 syndication
 ===========

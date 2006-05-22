@@ -355,7 +355,7 @@ variables:
     * ``next``: The URL to redirect to after successful login. This may contain
       a query string, too.
     * ``site_name``: The name of the current ``Site``, according to the
-      ``SITE_ID`` setting.
+      ``SITE_ID`` setting. See the `site framework docs`_.
 
 Here's a sample ``registration/login.html`` template you can use as a starting
 point. It assumes you have a ``base.html`` template that defines a ``content``
@@ -382,6 +382,7 @@ block::
     {% endblock %}
 
 .. _forms documentation: http://www.djangoproject.com/documentation/forms/
+.. _site framework docs: http://www.djangoproject.com/documentation/sites/
 
 Limiting access to logged-in users that pass a test
 ---------------------------------------------------

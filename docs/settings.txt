@@ -619,6 +619,10 @@ The ID, as an integer, of the current site in the ``django_site`` database
 table. This is used so that application data can hook into specific site(s)
 and a single database can manage content for multiple sites.
 
+See the `site framework docs`_.
+
+.. _site framework docs: http://www.djangoproject.com/documentation/sites/
+
 TEMPLATE_CONTEXT_PROCESSORS
 ---------------------------
 
