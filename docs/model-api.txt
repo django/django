@@ -1599,6 +1599,39 @@ API. See `Other lookup options`_.
 .. _Python DB-API: http://www.python.org/peps/pep-0249.html
 .. _Other lookup options: http://www.djangoproject.com/documentation/db_api/#extra-params-select-where-tables
 
+Overriding default model methods
+--------------------------------
+
+As explained in the `database API docs`_, each model gets a few methods
+automatically -- most notably, ``save()`` and ``delete()``. You can override
+these methods to alter behavior.
+
+A classic use-case for overriding the built-in methods is if you want something
+to happen whenever you save an object. For example::
+
+    class Blog(models.Model):
+        name = models.CharField(maxlength=100)
+        tagline = models.TextField()
+
+    def save(self):
+        do_something()
+        super(Blog, self).save() # Call the "real" save() method.
+        do_something_else()
+
+You can also prevent saving::
+
+    class Blog(models.Model):
+        name = models.CharField(maxlength=100)
+        tagline = models.TextField()
+
+    def save(self):
+        if self.name == "Yoko Ono's blog":
+            return # Yoko shall never have her own blog!
+        else:
+            super(Blog, self).save() # Call the "real" save() method.
+
+.. _database API docs: http://www.djangoproject.com/documentation/db_api/
+
 Models across files
 ===================
 

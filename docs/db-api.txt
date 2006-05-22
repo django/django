@@ -345,7 +345,7 @@ This is roughly equivalent to::
 
     Entry.objects.order_by('headline')[0:1].get()
 
-Note, however, that the first of these will raise ``IndexError`` while the 
+Note, however, that the first of these will raise ``IndexError`` while the
 second will raise ``DoesNotExist`` if no objects match the given criteria.
 
 QuerySet methods that return new QuerySets
