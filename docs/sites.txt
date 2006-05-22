@@ -213,6 +213,56 @@ To do this, you can use the sites framework. A simple example::
     >>> 'http://%s%s' % (Site.objects.get_current().domain, obj.get_absolute_url())
     'http://example.com/mymodel/objects/3/'
 
+The ``CurrentSiteManager``
+==========================
+
+If ``Site``s play a key role in your application, consider using the helpful
+``CurrentSiteManager`` in your model(s). It's a model manager_ that
+automatically filters its queries to include only objects associated with the
+current ``Site``.
+
+Use ``CurrentSiteManager`` by adding it to your model explicitly. For example::
+
+    from django.db import models
+    from django.contrib.sites.models import Site
+    from django.contrib.sites.managers import CurrentSiteManager
+
+    class Photo(models.Model):
+        photo = models.FileField(upload_to='/home/photos')
+        photographer_name = models.CharField(maxlength=100)
+        pub_date = models.DateField()
+        site = models.ForeignKey(Site)
+        objects = models.Manager()
+        on_site = CurrentSiteManager()
+
+With this model, ``Photo.objects.all()`` will return all ``Photo`` objects in
+the database, but ``Photo.on_site.all()`` will return only the ``Photo``
+objects associated with the current site, according to the ``SITE_ID`` setting.
+
+How did ``CurrentSiteManager`` know which field of ``Photo`` was the ``Site``?
+It defaults to looking for a field called ``site``. If your model has a
+``ForeignKey`` or ``ManyToManyField`` called something *other* than ``site``,
+you need to explicitly pass that as the parameter to ``CurrentSiteManager``.
+The following model, which has a field called ``publish_on``, demonstrates
+this::
+
+    from django.db import models
+    from django.contrib.sites.models import Site
+    from django.contrib.sites.managers import CurrentSiteManager
+
+    class Photo(models.Model):
+        photo = models.FileField(upload_to='/home/photos')
+        photographer_name = models.CharField(maxlength=100)
+        pub_date = models.DateField()
+        publish_on = models.ForeignKey(Site)
+        objects = models.Manager()
+        on_site = CurrentSiteManager('publish_on')
+
+If you attempt to use ``CurrentSiteManager`` and pass a field name that doesn't
+exist, Django will raise a ``ValueError``.
+
+.. _manager: http://www.djangoproject.com/documentation/model_api/#managers
+
 How Django uses the sites framework
 ===================================
 
