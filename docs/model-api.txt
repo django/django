@@ -1658,4 +1658,25 @@ The SQL files are read by the ``sqlinitialdata``, ``sqlreset``, ``sqlall`` and
 ``reset`` commands in ``manage.py``. Refer to the `manage.py documentation`_
 for more information.
 
+Note that if you have multiple SQL data files, there's no guarantee of the
+order in which they're executed. The only thing you can assume is that, by the
+time your custom data files are executed, all the database tables already will
+have been created.
+
 .. _`manage.py documentation`: http://www.djangoproject.com/documentation/django_admin/#sqlinitialdata-appname-appname
+
+Database-backend-specific SQL data
+----------------------------------
+
+There's also a hook for backend-specific SQL data. For example, you can have
+separate initial-data files for PostgreSQL and MySQL. For each app, Django
+looks for a file called ``<appname>/sql/<modelname>.<backend>.sql``, where
+``<appname>`` is your app directory, ``<modelname>`` is the model's name in
+lowercase and ``<backend>`` is the value of ``DATABASE_ENGINE`` in your
+settings file (e.g., ``postgresql``, ``mysql``).
+
+Backend-specific SQL data is executed before non-backend-specific SQL data. For
+example, if your app contains the files ``sql/person.sql`` and
+``sql/person.postgresql.sql`` and you're installing the app on PostgreSQL,
+Django will execute the contents of ``sql/person.postgresql.sql`` first, then
+``sql/person.sql``.
