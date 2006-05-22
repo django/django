@@ -216,7 +216,7 @@ To do this, you can use the sites framework. A simple example::
 The ``CurrentSiteManager``
 ==========================
 
-If ``Site``s play a key role in your application, consider using the helpful
+If ``Site``\s play a key role in your application, consider using the helpful
 ``CurrentSiteManager`` in your model(s). It's a model manager_ that
 automatically filters its queries to include only objects associated with the
 current ``Site``.
