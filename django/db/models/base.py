@@ -341,16 +341,16 @@ class Model(object):
     _save_FIELD_file.alters_data = True
 
     def _get_FIELD_width(self, field):
-        return self.__get_image_dimensions(field)[0]
+        return self._get_image_dimensions(field)[0]
 
     def _get_FIELD_height(self, field):
-        return self.__get_image_dimensions(field)[1]
+        return self._get_image_dimensions(field)[1]
 
     def _get_image_dimensions(self, field):
         cachename = "__%s_dimensions_cache" % field.name
         if not hasattr(self, cachename):
             from django.utils.images import get_image_dimensions
-            filename = self.__get_FIELD_filename(field)()
+            filename = self._get_FIELD_filename(field)()
             setattr(self, cachename, get_image_dimensions(filename))
         return getattr(self, cachename)
 

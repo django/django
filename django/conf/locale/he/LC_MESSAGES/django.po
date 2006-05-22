@@ -1,22 +1,19 @@
 # translation of Django.
 # Copyright (C) 2006 THE Django'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the Django package.
-# <>, 2006.
-# , fuzzy
-# <>, 2006.
 # 
 # 
 msgid ""
 msgstr ""
-"Project-Id-Version: Django 1.0\n"
+"Project-Id-Version: Django 0.95\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2006-05-16 10:14+0200\n"
-"PO-Revision-Date: 2006-04-04 14:29+0300\n"
+"PO-Revision-Date: 2006-05-16 15:48+0300\n"
 "Last-Translator: Meir Kriheli <meir@mksoft.co.il>\n"
 "Language-Team: Hebrew\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
-"Content-Transfer-Encoding: 8bit\n"
+"Content-Transfer-Encoding: 8bit"
 
 #: contrib/comments/models.py:67 contrib/comments/models.py:166
 msgid "object ID"
@@ -88,12 +85,11 @@ msgid ""
 "Check this box if the comment is inappropriate. A \"This comment has been "
 "removed\" message will be displayed instead."
 msgstr ""
-"יש לסמן תיבה זו עבור תגובה לא נאותה. הודעת \"תגובה זונמחקה\" תוצג במקום."
+"יש לסמן תיבה זו עבור תגובה לא נאותה. הודעת \"תגובה זו נמחקה\" תוצג במקום."
 
 #: contrib/comments/models.py:91
-#, fuzzy
 msgid "comments"
-msgstr "תגובה"
+msgstr "תגובות"
 
 #: contrib/comments/models.py:131 contrib/comments/models.py:207
 msgid "Content object"
@@ -127,12 +123,10 @@ msgid "approved by staff"
 msgstr "אושר ע\"י הצוות"
 
 #: contrib/comments/models.py:176
-#, fuzzy
 msgid "free comment"
 msgstr "הערה אנונימית"
 
 #: contrib/comments/models.py:177
-#, fuzzy
 msgid "free comments"
 msgstr "הערות אנונימיות"
 
@@ -145,14 +139,12 @@ msgid "score date"
 msgstr "תאריך ציון"
 
 #: contrib/comments/models.py:237
-#, fuzzy
 msgid "karma score"
-msgstr "ציון קארמה"
+msgstr "ניקוד קארמה"
 
 #: contrib/comments/models.py:238
-#, fuzzy
 msgid "karma scores"
-msgstr "ציוני קארמה"
+msgstr "ניקודי קארמה"
 
 #: contrib/comments/models.py:242
 #, python-format
@@ -175,14 +167,12 @@ msgid "flag date"
 msgstr "תאריך סימון"
 
 #: contrib/comments/models.py:268
-#, fuzzy
 msgid "user flag"
-msgstr "סימן משתמש"
+msgstr "סימון ע\"י משתמש"
 
 #: contrib/comments/models.py:269
-#, fuzzy
 msgid "user flags"
-msgstr "סימני משתמש"
+msgstr "סימונים ע\"י משתמש"
 
 #: contrib/comments/models.py:273
 #, python-format
@@ -194,14 +184,12 @@ msgid "deletion date"
 msgstr "תאריך מחיקה"
 
 #: contrib/comments/models.py:280
-#, fuzzy
 msgid "moderator deletion"
-msgstr "מחיקת מודרציה"
+msgstr "מחיקת מודרטור"
 
 #: contrib/comments/models.py:281
-#, fuzzy
 msgid "moderator deletions"
-msgstr "מחיקות מודרציה"
+msgstr "מחיקות מודרטור"
 
 #: contrib/comments/models.py:285
 #, python-format
@@ -226,23 +214,23 @@ msgid ""
 msgstr "הדירוג נדרש מאחר והזנת לפחות דרוג אחד אחר."
 
 #: contrib/comments/views/comments.py:112
-#, fuzzy, python-format
+#, python-format
 msgid ""
 "This comment was posted by a user who has posted fewer than %(count)s "
 "comment:\n"
 "\n"
 "%(text)s"
-msgid_plural ""
 "This comment was posted by a user who has posted fewer than %(count)s "
 "comments:\n"
 "\n"
 "%(text)s"
-msgstr[0] ""
-"ההודעה נשלחה ע\"י משתמש מפוקפק:\n"
+msgstr ""
+"תגובה זו נשלחה ע\"י משתמש אשר שלח פחות מ %(count)s "
+"תגובה:\n"
 "\n"
 "%(text)s"
-msgstr[1] ""
-"ההודעה נשלחה ע\"י משתמש מפוקפק:\n"
+"תגובה זו נשלחה ע\"י משתמש אשר שלח פחות מ %(count)s "
+"תגובות:\n"
 "\n"
 "%(text)s"
 
@@ -296,9 +284,8 @@ msgid "Password:"
 msgstr "סיסמה:"
 
 #: contrib/comments/templates/comments/form.html:6
-#, fuzzy
 msgid "Forgotten your password?"
-msgstr "שנה את סיסמתי"
+msgstr "שכחת את סיסמתך ?"
 
 #: contrib/comments/templates/comments/form.html:8
 #: contrib/admin/templates/admin/object_history.html:3
@@ -322,40 +309,36 @@ msgid "Log out"
 msgstr "יציאה"
 
 #: contrib/comments/templates/comments/form.html:12
-#, fuzzy
 msgid "Ratings"
-msgstr "דירוג #1"
+msgstr "דירוג"
 
 #: contrib/comments/templates/comments/form.html:12
 #: contrib/comments/templates/comments/form.html:23
 msgid "Required"
-msgstr ""
+msgstr "נדרש"
 
 #: contrib/comments/templates/comments/form.html:12
 #: contrib/comments/templates/comments/form.html:23
 msgid "Optional"
-msgstr ""
+msgstr "אופציונלי"
 
 #: contrib/comments/templates/comments/form.html:23
 msgid "Post a photo"
-msgstr ""
+msgstr "שליחת תמונה"
 
 #: contrib/comments/templates/comments/form.html:27
 #: contrib/comments/templates/comments/freeform.html:5
-#, fuzzy
 msgid "Comment:"
-msgstr "תגובה"
+msgstr "תגובה:"
 
 #: contrib/comments/templates/comments/form.html:32
 #: contrib/comments/templates/comments/freeform.html:9
-#, fuzzy
 msgid "Preview comment"
-msgstr "הערה אנונימית"
+msgstr "תצוגה מקדימה של התגובה"
 
 #: contrib/comments/templates/comments/freeform.html:4
-#, fuzzy
 msgid "Your name:"
-msgstr "שם משתמש"
+msgstr "שמך:"
 
 #: contrib/admin/filterspecs.py:40
 #, python-format
@@ -752,7 +735,7 @@ msgstr "אנו מצטערים, לא ניתן למצוא את הדף המבוקש
 #: contrib/admin/templates/admin/index.html:17
 #, python-format
 msgid "Models available in the %(name)s application."
-msgstr ""
+msgstr "מודלים זמינים ביישום %(name)s."
 
 #: contrib/admin/templates/admin/index.html:28
 #: contrib/admin/templates/admin/change_form.html:15
@@ -834,11 +817,8 @@ msgid "View on site"
 msgstr "צפיה באתר"
 
 #: contrib/admin/templates/admin/change_form.html:30
-#, fuzzy
 msgid "Please correct the error below."
-msgid_plural "Please correct the errors below."
-msgstr[0] "נא לתקן את השגיאה הבאה:"
-msgstr[1] "נא לתקן את השגיאה הבאה:"
+msgstr "נא לתקן את השגיאה המופיעה מתחת."
 
 #: contrib/admin/templates/admin/change_form.html:48
 msgid "Ordering"
@@ -1139,22 +1119,18 @@ msgid "codename"
 msgstr "שם קוד"
 
 #: contrib/auth/models.py:17
-#, fuzzy
 msgid "permission"
 msgstr "הרשאה"
 
 #: contrib/auth/models.py:18 contrib/auth/models.py:27
-#, fuzzy
 msgid "permissions"
 msgstr "הרשאות"
 
 #: contrib/auth/models.py:29
-#, fuzzy
 msgid "group"
 msgstr "קבוצה"
 
 #: contrib/auth/models.py:30 contrib/auth/models.py:65
-#, fuzzy
 msgid "groups"
 msgstr "קבוצות"
 
@@ -1215,17 +1191,14 @@ msgstr ""
 "המשוייכת אליו/ה."
 
 #: contrib/auth/models.py:67
-#, fuzzy
 msgid "user permissions"
-msgstr "הרשאות"
+msgstr "הרשאות משתמש"
 
 #: contrib/auth/models.py:70
-#, fuzzy
 msgid "user"
 msgstr "משתמש"
 
 #: contrib/auth/models.py:71
-#, fuzzy
 msgid "users"
 msgstr "משתמשים"
 
@@ -1246,7 +1219,6 @@ msgid "Groups"
 msgstr "קבוצות"
 
 #: contrib/auth/models.py:219
-#, fuzzy
 msgid "message"
 msgstr "הודעה"
 
@@ -1257,9 +1229,8 @@ msgid ""
 msgstr "נראה שעוגיות לא מאופשרות בדפדפן שלך.הן נדרשות כדי להתחבר."
 
 #: contrib/contenttypes/models.py:25
-#, fuzzy
 msgid "python model class name"
-msgstr "שם מודל פייתון"
+msgstr "שם ה-class של מודל פייתון"
 
 #: contrib/contenttypes/models.py:28
 msgid "content type"
@@ -1394,54 +1365,52 @@ msgid "December"
 msgstr "תצבר"
 
 #: utils/dates.py:19
-#, fuzzy
 msgid "jan"
-msgstr "ו"
+msgstr "יאנ"
 
 #: utils/dates.py:19
 msgid "feb"
-msgstr ""
+msgstr "פבר"
 
 #: utils/dates.py:19
 msgid "mar"
-msgstr ""
+msgstr "מרץ"
 
 #: utils/dates.py:19
 msgid "apr"
-msgstr ""
+msgstr "אפר"
 
 #: utils/dates.py:19
-#, fuzzy
 msgid "may"
-msgstr "יום"
+msgstr "מאי"
 
 #: utils/dates.py:19
 msgid "jun"
-msgstr ""
+msgstr "יונ"
 
 #: utils/dates.py:20
 msgid "jul"
-msgstr ""
+msgstr "יול"
 
 #: utils/dates.py:20
 msgid "aug"
-msgstr ""
+msgstr "אוג"
 
 #: utils/dates.py:20
 msgid "sep"
-msgstr ""
+msgstr "ספט"
 
 #: utils/dates.py:20
 msgid "oct"
-msgstr ""
+msgstr "אוק"
 
 #: utils/dates.py:20
 msgid "nov"
-msgstr ""
+msgstr "נוב"
 
 #: utils/dates.py:20
 msgid "dec"
-msgstr ""
+msgstr "דצמ"
 
 #: utils/dates.py:27
 msgid "Jan."
@@ -1472,46 +1441,28 @@ msgid "Dec."
 msgstr "דצמ'"
 
 #: utils/timesince.py:12
-#, fuzzy
 msgid "year"
-msgid_plural "years"
-msgstr[0] "שנה"
-msgstr[1] "שנה"
+msgstr "שנה"
 
 #: utils/timesince.py:13
-#, fuzzy
 msgid "month"
-msgid_plural "months"
-msgstr[0] "חודש"
-msgstr[1] "חודש"
+msgstr "חודש"
 
 #: utils/timesince.py:14
-#, fuzzy
 msgid "week"
-msgid_plural "weeks"
-msgstr[0] "יוונית - Greek"
-msgstr[1] "יוונית - Greek"
+msgstr "שבוע"
 
 #: utils/timesince.py:15
-#, fuzzy
 msgid "day"
-msgid_plural "days"
-msgstr[0] "יום"
-msgstr[1] "יום"
+msgstr "יום"
 
 #: utils/timesince.py:16
-#, fuzzy
 msgid "hour"
-msgid_plural "hours"
-msgstr[0] "שעה"
-msgstr[1] "שעה"
+msgstr "שעה"
 
 #: utils/timesince.py:17
-#, fuzzy
 msgid "minute"
-msgid_plural "minutes"
-msgstr[0] "דקה"
-msgstr[1] "דקה"
+msgstr "דקה"
 
 #: conf/global_settings.py:37
 msgid "Bengali"
@@ -1555,7 +1506,7 @@ msgstr "גאליצית - Galician"
 
 #: conf/global_settings.py:47
 msgid "Hungarian"
-msgstr ""
+msgstr "הונגרית (Hungarian)"
 
 #: conf/global_settings.py:48
 msgid "Hebrew"
@@ -1610,9 +1561,8 @@ msgid "Swedish"
 msgstr "שוודית - Swedish"
 
 #: conf/global_settings.py:61
-#, fuzzy
 msgid "Ukrainian"
-msgstr "ברזילאית - Brazilian"
+msgstr "אוקראינית - Ukrainian"
 
 #: conf/global_settings.py:62
 msgid "Simplified Chinese"
@@ -1742,11 +1692,9 @@ msgid "Enter a valid U.S. state abbreviation."
 msgstr "יש להזין קיצור חוקי למדינה בארה\"ב."
 
 #: core/validators.py:229
-#, fuzzy, python-format
+#, python-format
 msgid "Watch your mouth! The word %s is not allowed here."
-msgid_plural "Watch your mouth! The words %s are not allowed here."
-msgstr[0] "שמור על לשונך! המילה %s אינה מותרת לשימוש כאן."
-msgstr[1] "שמור על לשונך! המילה %s אינה מותרת לשימוש כאן."
+msgstr "שמור על לשונך! המילה %s אינה מותרת לשימוש כאן."
 
 #: core/validators.py:236
 #, python-format
@@ -1785,20 +1733,18 @@ msgid "Please enter a valid decimal number."
 msgstr "יש להזין מספר עשרוני חוקי."
 
 #: core/validators.py:349
-#, fuzzy, python-format
+#, python-format
 msgid "Please enter a valid decimal number with at most %s total digit."
-msgid_plural ""
 "Please enter a valid decimal number with at most %s total digits."
-msgstr[0] "יש להזין מספר עשרוני חוקי."
-msgstr[1] "יש להזין מספר עשרוני חוקי."
+msgstr "נא להזין מספר שלם המכיל %s ספרה לכל היותר."
+"נא להזין מספר שלם המכיל %s ספרות לכל היותר."
 
 #: core/validators.py:352
-#, fuzzy, python-format
+#, python-format
 msgid "Please enter a valid decimal number with at most %s decimal place."
-msgid_plural ""
 "Please enter a valid decimal number with at most %s decimal places."
-msgstr[0] "יש להזין מספר עשרוני חוקי."
-msgstr[1] "יש להזין מספר עשרוני חוקי."
+msgstr "נא·להזין·מספר·עשרוני·חוקי·המכיל·%s·ספרה·אחרי·הנקודה·לכל·היותר."
+"נא להזין מספר עשרוני חוקי המכיל %s ספרות אחרי הנקודה לכל היותר."
 
 #: core/validators.py:362
 #, python-format
@@ -1895,19 +1841,16 @@ msgid "This field is required."
 msgstr "יש להזין תוכן בשדה זה."
 
 #: db/models/fields/__init__.py:337
-#, fuzzy
 msgid "This value must be an integer."
-msgstr "ערך זה חייב להיות חזקה של %s."
+msgstr "ערך זה חייב להיות מספר שלם."
 
 #: db/models/fields/__init__.py:369
-#, fuzzy
 msgid "This value must be either True or False."
-msgstr "ערך זה חייב להיות חזקה של %s."
+msgstr "ערך זה חייב להיות אמת או שקר."
 
 #: db/models/fields/__init__.py:385
-#, fuzzy
 msgid "This field cannot be null."
-msgstr "שדה זה אינו חוקי."
+msgstr "שדה זה אינו יכול להכיל null."
 
 #: db/models/fields/__init__.py:562
 msgid "Enter a valid filename."
@@ -1919,35 +1862,26 @@ msgid "Please enter a valid %s."
 msgstr "יש להזין %s חוקי."
 
 #: db/models/fields/related.py:579
-#, fuzzy
 msgid "Separate multiple IDs with commas."
 msgstr "יש להפריד מזהים מרובים בפסיקים."
 
 #: db/models/fields/related.py:581
-#, fuzzy
 msgid ""
 "Hold down \"Control\", or \"Command\" on a Mac, to select more than one."
 msgstr ""
-" יש להחזיק לחוץ את \"Control\" או \"Command\" על מק, כדי לבחור יותר מאחד."
+"החזק את \"Control\", או \"Command\" על מק, לחוץ כדי לבחור יותר מאחד."
 
 #: db/models/fields/related.py:625
-#, fuzzy, python-format
+#, python-format
 msgid "Please enter valid %(self)s IDs. The value %(value)r is invalid."
-msgid_plural ""
 "Please enter valid %(self)s IDs. The values %(value)r are invalid."
-msgstr[0] ""
-"נא להזין זיהוי·%(self)s·חוקי.·הערך·%(value)r·אינו חוקי.נא להזין זיהויי·%"
-"(self)s·חוקיים.·הערכים·%(value)r·אינם חוקיים."
-msgstr[1] ""
-"נא להזין זיהוי·%(self)s·חוקי.·הערך·%(value)r·אינו חוקי.נא להזין זיהויי·%"
-"(self)s·חוקיים.·הערכים·%(value)r·אינם חוקיים."
+msgstr "נא להזין זיהוי %(self)s חוקי. הערך %(value)r אינו חוקי."
+"נא להזין זיהויי %(self)s חוקיים. הערכים %(value)r אינם חוקיים."
 
 #: forms/__init__.py:380
-#, fuzzy, python-format
+#, python-format
 msgid "Ensure your text is less than %s character."
-msgid_plural "Ensure your text is less than %s characters."
-msgstr[0] "יש לוודא שהטקסט שלך מכיל פחות מ %s תו."
-msgstr[1] "יש לוודא שהטקסט שלך מכיל פחות מ %s תו."
+msgstr "נא לוודא שהטקסט שלך מכיל פחות מ %s תו."
 
 #: forms/__init__.py:385
 msgid "Line breaks are not allowed here."
@@ -1978,61 +1912,3 @@ msgstr "יש להזין מספר שלם בין 0 ל- 32,767."
 msgid "yes,no,maybe"
 msgstr "כן,לא,אולי"
 
-#~ msgid "label"
-#~ msgstr "תווית"
-
-#~ msgid "package"
-#~ msgstr "חבילה"
-
-#~ msgid "packages"
-#~ msgstr "חבילות"
-
-#, fuzzy
-#~ msgid ""
-#~ "Please enter a valid decimal number with at most %s total digit.Please "
-#~ "enter a valid decimal number with at most %s total digits."
-#~ msgstr ""
-#~ "#-#-#-#-#  django.po (Django 1.0)  #-#-#-#-#\n"
-#~ "יש להזין מספר עשרוני חוקי עם %s ספרה לכל היותר.יש להזין מספר עשרוני חוקי "
-#~ "עם %s ספרות לכל היותר.\n"
-#~ "#-#-#-#-#  django.po (Django 1.0)  #-#-#-#-#\n"
-#~ "יש להזין מספר עשרוני הכולל %s ספרה לכל היותר.יש להזין מספר עשרוני הכולל  %"
-#~ "s ספרות לכל היותר."
-
-#, fuzzy
-#~ msgid ""
-#~ "Please enter a valid decimal number with at most %s decimal place.Please "
-#~ "enter a valid decimal number with at most %s decimal places."
-#~ msgstr ""
-#~ "#-#-#-#-#  django.po (Django 1.0)  #-#-#-#-#\n"
-#~ "יש להזין מספר עשרוני חוקי עם %s ספרה אחרי הנקודה לכל היותר."
-#~ "יש·להזין·מספר·עשרוני·חוקי·עם·%s·ספרות·אחרי·הנקודה·לכל·היותר.\n"
-#~ "#-#-#-#-#  django.po (Django 1.0)  #-#-#-#-#\n"
-#~ "יש להזין מספר עשרוני עם %s ספרה אחרי הנקודה העשרונית לכל היותר.יש להזין "
-#~ "מספר עשרוני עם %s ספרות אחרי הנקודה העשרונית לכל היותר."
-
-#~ msgid "Comments"
-#~ msgstr "תגובות"
-
-#, fuzzy
-#~ msgid ""
-#~ "This comment was posted by a user who has posted fewer than %(count)s "
-#~ "comment:\n"
-#~ "\n"
-#~ "%(text)sThis comment was posted by a user who has posted fewer than %"
-#~ "(count)s comments:\n"
-#~ "\n"
-#~ "%(text)s"
-#~ msgstr ""
-#~ "#-#-#-#-#  django.po (Django 1.0)  #-#-#-#-#\n"
-#~ "התגובה נשלחה ע\"י משתמש בעל פחות מ %(count)s תגובה:\n"
-#~ "\n"
-#~ "%(text)sהתגובה·נשלחה·ע\"י·משתמש·בעל·פחות·מ·%(count)s·תגובות:\n"
-#~ "\n"
-#~ "%(text)s\n"
-#~ "#-#-#-#-#  django.po (Django 1.0)  #-#-#-#-#\n"
-#~ "התגובה נשלח ע\"י משתמש ששלח פחות מ %(count)s·תגובה:\n"
-#~ "\n"
-#~ "%(text)sהתגובה נשלח ע\"י משתמש ששלח פחות מ %(count)s·תגובות:\n"
-#~ "\n"
-#~ "%(text)s"

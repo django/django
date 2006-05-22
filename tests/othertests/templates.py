@@ -507,4 +507,5 @@ def run_tests(verbosity=0, standalone=False):
         raise Exception, msg
 
 if __name__ == "__main__":
+    settings.configure()
     run_tests(1, True)

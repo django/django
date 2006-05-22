@@ -327,14 +327,18 @@ def get_digit(value, arg):
 # DATES           #
 ###################
 
-def date(value, arg=settings.DATE_FORMAT):
+def date(value, arg=None):
     "Formats a date according to the given format"
     from django.utils.dateformat import format
+    if arg is None:
+        arg = settings.DATE_FORMAT
     return format(value, arg)
 
-def time(value, arg=settings.TIME_FORMAT):
+def time(value, arg=None):
     "Formats a time according to the given format"
     from django.utils.dateformat import time_format
+    if arg is None:
+        arg = settings.TIME_FORMAT
     return time_format(value, arg)
 
 def timesince(value):
@@ -435,7 +439,7 @@ def pprint(value):
         return pformat(value)
     except Exception, e:
         return "Error in formatting:%s" % e
-    
+
 # Syntax: register.filter(name of filter, callback)
 register.filter(add)
 register.filter(addslashes)

@@ -73,6 +73,10 @@ class TestRunner:
     def run_tests(self):
         from django.conf import settings
 
+        # An empty access of the settings to force the default options to be
+        # installed prior to assigning to them.
+        settings.INSTALLED_APPS
+
         # Manually set INSTALLED_APPS to point to the test models.
         settings.INSTALLED_APPS = [MODEL_TESTS_DIR_NAME + '.' + a for a in get_test_models()]
 
@@ -110,14 +114,11 @@ class TestRunner:
             global TEST_DATABASE_NAME
             TEST_DATABASE_NAME = ":memory:"
         else:
-            # Create the test database and connect to it. We need autocommit()
-            # because PostgreSQL doesn't allow CREATE DATABASE statements
-            # within transactions.
+            # Create the test database and connect to it. We need to autocommit
+            # if the database supports it because PostgreSQL doesn't allow 
+            # CREATE/DROP DATABASE statements within transactions.
             cursor = connection.cursor()
-            try:
-                connection.connection.autocommit(1)
-            except AttributeError:
-                pass
+            self._set_autocommit(connection)
             self.output(1, "Creating test database")
             try:
                 cursor.execute("CREATE DATABASE %s" % TEST_DATABASE_NAME)
@@ -220,12 +221,8 @@ class TestRunner:
             settings.DATABASE_NAME = old_database_name
             cursor = connection.cursor()
             self.output(1, "Deleting test database")
-            try:
-                connection.connection.autocommit(1)
-            except AttributeError:
-                pass
-            else:
-                time.sleep(1) # To avoid "database is being accessed by other users" errors.
+            self._set_autocommit(connection)
+            time.sleep(1) # To avoid "database is being accessed by other users" errors.
             cursor.execute("DROP DATABASE %s" % TEST_DATABASE_NAME)
 
         # Display output.
@@ -238,6 +235,15 @@ class TestRunner:
             print "%s error%s:" % (len(error_list), len(error_list) != 1 and 's' or '')
         else:
             print "All tests passed."
+            
+    def _set_autocommit(self, connection):
+        """
+        Make sure a connection is in autocommit mode.
+        """
+        if hasattr(connection.connection, "autocommit"):
+            connection.connection.autocommit(True)
+        elif hasattr(connection.connection, "set_isolation_level"):
+            connection.connection.set_isolation_level(0)
 
 if __name__ == "__main__":
     from optparse import OptionParser

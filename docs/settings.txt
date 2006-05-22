@@ -619,6 +619,10 @@ The ID, as an integer, of the current site in the ``django_site`` database
 table. This is used so that application data can hook into specific site(s)
 and a single database can manage content for multiple sites.
 
+See the `site framework docs`_.
+
+.. _site framework docs: http://www.djangoproject.com/documentation/sites/
+
 TEMPLATE_CONTEXT_PROCESSORS
 ---------------------------
 
@@ -724,3 +728,77 @@ Django apps. Just follow these conventions:
     * For settings that are sequences, use tuples instead of lists. This is
       purely for performance.
     * Don't reinvent an already-existing setting.
+
+Using settings without setting DJANGO_SETTINGS_MODULE
+=====================================================
+
+In some cases, you might want to bypass the ``DJANGO_SETTINGS_MODULE``
+environment variable. For example, if you're using the template system by
+itself, you likely don't want to have to set up an environment variable
+pointing to a settings module.
+
+In these cases, you can configure Django's settings manually. Do this by
+calling ``django.conf.settings.configure()``.
+
+Example::
+
+    from django.conf import settings
+
+    settings.configure(DEBUG=True, TEMPLATE_DEBUG=True,
+        TEMPLATE_DIRS=('/home/web-apps/myapp', '/home/web-apps/base'))
+
+Pass ``configure()`` as many keyword arguments as you'd like, with each keyword
+argument representing a setting and its value. Each argument name should be all
+uppercase, with the same name as the settings described above. If a particular
+setting is not passed to ``configure()`` and is needed at some later point,
+Django will use the default setting value.
+
+Custom default settings
+-----------------------
+
+If you'd like default values to come from somewhere other than
+``django.conf.global_settings``, you can pass in a module or class that
+provides the default settings as the ``default_settings`` argument (or as the
+first positional argument) in the call to ``configure()``.
+
+In this example, default settings are taken from ``myapp_defaults``, and the
+``DEBUG`` setting is set to ``True``, regardless of its value in
+``myapp_defaults``::
+
+    from django.conf import settings
+    from myapp import myapp_defaults
+
+    settings.configure(default_settings=myapp_defaults, DEBUG=True)
+
+The following example, which uses ``myapp_defaults`` as a positional argument,
+is equivalent::
+
+    settings.configure(myapp_defaults, DEBUG = True)
+
+Normally, you will not need to override the defaults in this fashion. The
+Django defaults are sufficiently tame that you can safely use them. Be aware
+that if you do pass in a new default module, it entirely *replaces* the Django
+defaults, so you must specify a value for every possible setting that might be
+used in that code you are importing. Check in
+``django.conf.settings.global_settings`` for the full list.
+
+Either configure() or DJANGO_SETTINGS_MODULE is required
+--------------------------------------------------------
+
+If you're not setting the ``DJANGO_SETTINGS_MODULE`` environment variable, you
+*must* call ``configure()`` at some point before using any code that reads
+settings.
+
+If you don't set ``DJANGO_SETTINGS_MODULE`` and don't call ``configure()``,
+Django will raise an ``EnvironmentError`` exception the first time a setting
+is accessed.
+
+If you set ``DJANGO_SETTINGS_MODULE``, access settings values somehow, *then*
+call ``configure()``, Django will raise an ``EnvironmentError`` saying settings
+have already been configured.
+
+Also, it's an error to call ``configure()`` more than once, or to call
+``configure()`` after any setting has been accessed.
+
+It boils down to this: Use exactly one of either ``configure()`` or
+``DJANGO_SETTINGS_MODULE``. Not both, and not neither.

@@ -202,22 +202,22 @@ Using a ``FileField`` or an ``ImageField`` (see below) in a model takes a few
 steps:
 
     1. In your settings file, you'll need to define ``MEDIA_ROOT`` as the
-        full path to a directory where you'd like Django to store uploaded
-        files. (For performance, these files are not stored in the database.)
-        Define ``MEDIA_URL`` as the base public URL of that directory. Make
-        sure that this directory is writable by the Web server's user
-        account.
+       full path to a directory where you'd like Django to store uploaded
+       files. (For performance, these files are not stored in the database.)
+       Define ``MEDIA_URL`` as the base public URL of that directory. Make
+       sure that this directory is writable by the Web server's user
+       account.
 
     2. Add the ``FileField`` or ``ImageField`` to your model, making sure
-        to define the ``upload_to`` option to tell Django to which
-        subdirectory of ``MEDIA_ROOT`` it should upload files.
+       to define the ``upload_to`` option to tell Django to which
+       subdirectory of ``MEDIA_ROOT`` it should upload files.
 
     3. All that will be stored in your database is a path to the file
-        (relative to ``MEDIA_ROOT``). You'll must likely want to use the
-        convenience ``get_<fieldname>_url`` function provided by Django. For
-        example, if your ``ImageField`` is called ``mug_shot``, you can get
-        the absolute URL to your image in a template with ``{{
-        object.get_mug_shot_url }}``.
+       (relative to ``MEDIA_ROOT``). You'll must likely want to use the
+       convenience ``get_<fieldname>_url`` function provided by Django. For
+       example, if your ``ImageField`` is called ``mug_shot``, you can get
+       the absolute URL to your image in a template with ``{{
+       object.get_mug_shot_url }}``.
 
 .. _`strftime formatting`: http://docs.python.org/lib/module-time.html#l2h-1941
 
@@ -1599,6 +1599,39 @@ API. See `Other lookup options`_.
 .. _Python DB-API: http://www.python.org/peps/pep-0249.html
 .. _Other lookup options: http://www.djangoproject.com/documentation/db_api/#extra-params-select-where-tables
 
+Overriding default model methods
+--------------------------------
+
+As explained in the `database API docs`_, each model gets a few methods
+automatically -- most notably, ``save()`` and ``delete()``. You can override
+these methods to alter behavior.
+
+A classic use-case for overriding the built-in methods is if you want something
+to happen whenever you save an object. For example::
+
+    class Blog(models.Model):
+        name = models.CharField(maxlength=100)
+        tagline = models.TextField()
+
+    def save(self):
+        do_something()
+        super(Blog, self).save() # Call the "real" save() method.
+        do_something_else()
+
+You can also prevent saving::
+
+    class Blog(models.Model):
+        name = models.CharField(maxlength=100)
+        tagline = models.TextField()
+
+    def save(self):
+        if self.name == "Yoko Ono's blog":
+            return # Yoko shall never have her own blog!
+        else:
+            super(Blog, self).save() # Call the "real" save() method.
+
+.. _database API docs: http://www.djangoproject.com/documentation/db_api/
+
 Models across files
 ===================
 
@@ -1631,3 +1664,52 @@ read, in part::
         'mysite.myapp',
         #...
     )
+
+Providing initial SQL data
+==========================
+
+Django provides a hook for passing the database arbitrary SQL that's executed
+just after the CREATE TABLE statements. Use this hook, for example, if you want
+to populate default records, or create SQL functions, automatically.
+
+The hook is simple: Django just looks for a file called
+``<appname>/sql/<modelname>.sql``, where ``<appname>`` is your app directory and
+``<modelname>`` is the model's name in lowercase.
+
+In the ``Person`` example model at the top of this document, assuming it lives
+in an app called ``myapp``, you could add arbitrary SQL to the file
+``myapp/sql/person.sql``. Here's an example of what the file might contain::
+
+    INSERT INTO myapp_person (first_name, last_name) VALUES ('John', 'Lennon');
+    INSERT INTO myapp_person (first_name, last_name) VALUES ('Paul', 'McCartney');
+
+Each SQL file, if given, is expected to contain valid SQL. The SQL files are
+piped directly into the database after all of the models' table-creation
+statements have been executed.
+
+The SQL files are read by the ``sqlinitialdata``, ``sqlreset``, ``sqlall`` and
+``reset`` commands in ``manage.py``. Refer to the `manage.py documentation`_
+for more information.
+
+Note that if you have multiple SQL data files, there's no guarantee of the
+order in which they're executed. The only thing you can assume is that, by the
+time your custom data files are executed, all the database tables already will
+have been created.
+
+.. _`manage.py documentation`: http://www.djangoproject.com/documentation/django_admin/#sqlinitialdata-appname-appname
+
+Database-backend-specific SQL data
+----------------------------------
+
+There's also a hook for backend-specific SQL data. For example, you can have
+separate initial-data files for PostgreSQL and MySQL. For each app, Django
+looks for a file called ``<appname>/sql/<modelname>.<backend>.sql``, where
+``<appname>`` is your app directory, ``<modelname>`` is the model's name in
+lowercase and ``<backend>`` is the value of ``DATABASE_ENGINE`` in your
+settings file (e.g., ``postgresql``, ``mysql``).
+
+Backend-specific SQL data is executed before non-backend-specific SQL data. For
+example, if your app contains the files ``sql/person.sql`` and
+``sql/person.postgresql.sql`` and you're installing the app on PostgreSQL,
+Django will execute the contents of ``sql/person.postgresql.sql`` first, then
+``sql/person.sql``.

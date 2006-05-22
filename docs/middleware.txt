@@ -59,8 +59,12 @@ Adds a few conveniences for perfectionists:
 
 * Performs URL rewriting based on the ``APPEND_SLASH`` and ``PREPEND_WWW``
   settings. If ``APPEND_SLASH`` is ``True``, URLs that lack a trailing
-  slash will be redirected to the same URL with a trailing slash. If
-  ``PREPEND_WWW`` is ``True``, URLs that lack a leading "www." will be
+  slash will be redirected to the same URL with a trailing slash, unless the
+  last component in the path contains a period. So ``foo.com/bar`` is
+  redirected to ``foo.com/bar/``, but ``foo.com/bar/file.txt`` is passed
+  through unchanged.
+  
+  If ``PREPEND_WWW`` is ``True``, URLs that lack a leading "www." will be
   redirected to the same URL with a leading "www."
 
   Both of these options are meant to normalize URLs. The philosophy is that

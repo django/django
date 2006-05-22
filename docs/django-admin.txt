@@ -177,6 +177,16 @@ Port 7000 on IP address 1.2.3.4::
 
     django-admin.py runserver 1.2.3.4:7000
 
+Serving static files with the development server
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+By default, the development server doesn't serve any static files for your site
+(such as CSS files, images, things under ``MEDIA_ROOT_URL`` and so forth). If
+you want to configure Django to serve static media, read the `serving static files`_
+documentation.
+
+.. _serving static files: http://www.djangoproject.com/documentation/static_files/
+
 shell
 -----
 
@@ -200,6 +210,9 @@ sqlall [appname appname ...]
 
 Prints the CREATE TABLE and initial-data SQL statements for the given appnames.
 
+Refer to the description of ``sqlinitialdata`` for an explanation of how to
+specify initial data.
+
 sqlclear [appname appname ...]
 --------------------------------------
 
@@ -214,6 +227,18 @@ sqlinitialdata [appname appname ...]
 --------------------------------------------
 
 Prints the initial INSERT SQL statements for the given appnames.
+
+For each model in each specified app, this command looks for the file
+``<appname>/sql/<modelname>.sql``, where ``<appname>`` is the given appname and
+``<modelname>`` is the model's name in lowercase. For example, if you have an
+app ``news`` that includes a ``Story`` model, ``sqlinitialdata`` will attempt
+to read a file ``news/sql/story.sql`` and append it to the output of this
+command.
+
+Each of the SQL files, if given, is expected to contain valid SQL. The SQL
+files are piped directly into the database after all of the models'
+table-creation statements have been executed. Use this SQL hook to populate
+tables with any necessary initial records, SQL functions or test data.
 
 sqlreset [appname appname ...]
 --------------------------------------
@@ -239,6 +264,20 @@ startproject [projectname]
 
 Creates a Django project directory structure for the given project name in the
 current directory.
+
+syncdb
+------
+
+Creates the database tables for all apps in ``INSTALLED_APPS`` whose tables
+have not already been created.
+
+Use this command when you've added new applications to your project and want to
+install them in the database. This includes any apps shipped with Django that
+might be in ``INSTALLED_APPS`` by default. When you start a new project, run
+this command to install the default apps.
+
+If you're installing the ``django.contrib.auth`` application, ``syncdb`` will
+give you the option of creating a superuser immediately.
 
 validate
 --------
@@ -285,6 +324,16 @@ setting the Python path for you.
 
 Displays a help message that includes a terse list of all available actions and
 options.
+
+--version
+---------
+
+Displays the current Django version.
+
+Example output::
+
+    0.9.1
+    0.9.1 (SVN)
 
 Extra niceties
 ==============

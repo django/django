@@ -7,6 +7,10 @@ perspective -- how it works and how to extend it. If you're just looking for
 reference on the language syntax, see
 `The Django template language: For template authors`_.
 
+If you're looking to use the Django template system as part of another
+application -- i.e., without the rest of the framework -- make sure to read
+the `configuration`_ section later in this document.
+
 .. _`The Django template language: For template authors`: http://www.djangoproject.com/documentation/templates/
 
 Basics
@@ -739,6 +743,164 @@ Python 2.4 and above::
 If you leave off the ``name`` argument, as in the second example above, Django
 will use the function's name as the tag name.
 
+Shortcut for simple tags
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+Many template tags take a single argument -- a string or a template variable
+reference -- and return a string after doing some processing based solely on
+the input argument and some external information. For example, the
+``current_time`` tag we wrote above is of this variety: we give it a format
+string, it returns the time as a string.
+
+To ease the creation of the types of tags, Django provides a helper function,
+``simple_tag``. This function, which is a method of
+``django.template.Library``, takes a function that accepts one argument, wraps
+it in a ``render`` function and the other necessary bits mentioned above and
+registers it with the template system.
+
+Our earlier ``current_time`` function could thus be written like this::
+
+    # This version of do_current_time takes only a single argument and returns
+    # a string.
+
+    def do_current_time(token):
+        try:
+            # Splitting by None == splitting by spaces.
+            tag_name, format_string = token.contents.split(None, 1)
+        except ValueError:
+            raise template.TemplateSyntaxError, "%r tag requires an argument" % token.contents[0]
+        if not (format_string[0] == format_string[-1] and format_string[0] in ('"', "'")):
+            raise template.TemplateSyntaxError, "%r tag's argument should be in quotes" % tag_name
+        return datetime.datetime.now().strftime(self.format_string[1:-1])
+
+    register.simple_tag(do_current_time)
+
+In Python 2.4, the decorator syntax also works::
+
+    @simple_tag
+    def do_current_time(token):
+        ...
+
+Inclusion tags
+~~~~~~~~~~~~~~
+
+Another type of template tag that is sometimes useful is when you want to
+display some data that is computed at render time in a template fragment. For
+example, in Django's admin interface, there is a line of buttons along the
+bottom of the `create/edit record` screen. These buttons always look the same,
+but the link targets change depending upon the object being edited. So they
+are a perfect example for using a small template that is filled in with
+details from the current object. To save typing, it would also be nice if we
+could wrap this whole display up in a single tag (in the admin templates this
+is the ``submit_row`` tag).
+
+We call these sorts of tags `inclusion tags`. In your template, you pass in
+any appropriate arguments and the tag uses those arguments, together with the
+current context to render a template and include the result in the output.
+
+Writing inclusion tags is probably best demonstrated by example. We will write
+a tag that outputs a list of choices for a Poll object, such as was created in
+the tutorials_. We will use this tag like this::
+
+    {{ show_results poll }}
+
+and the output will be something like this::
+
+    <ul>
+      <li>First choice</li>
+      <li>Second choice</li>
+      <li>Third choice</li>
+    </ul>
+
+First, we define the function which takes the argument and produces a
+dictionary of data for the result. The important point here is we only need to
+return a dictionary, not anything more complex. This will be used to substitue
+for values in the template fragment, just as when templates are used
+elsewhere.
+
+::
+
+    def show_results(poll):
+        choices = poll.choice_set.all()
+        return {'choices': choices}
+
+We also need to create the template that is used to render the output. This
+template is a fixed feature of the tag: the tag writer specifies it, not the
+template designer. In our case, the template is very simple::
+
+    <ul>
+    {% for choice in choices %}
+        <li> {{ choice }} </li>
+    {% endfor %}
+    </ul>
+
+Now we can create the inclusion tag. Suppose the above template is in a file
+called ``results.html`` in a directory that is searched by the template
+loader. We register our new tag similarly to a normal tag.
+
+::
+
+    # Here, register is a django.template.Library instance, as before
+    register.inclusion_tag('results.html')(show_results)
+
+As always, Python 2.4 decorator syntax works as well, so we could have
+written
+
+::
+
+    @inclusion_tag('results.html')
+    def show_results(poll):
+        ...
+
+when first creating the function.
+
+In some cases, an inclusion tag might require a large number of arguments to
+display itself properly. In essence, it would depend largely on the current
+context it was being rendered with. We can make these sorts of tags easier to
+write by telling the ``inclusion_tag`` function that the whole context
+should be passed in as an argument to the function. This will be done
+invisibly as far as the template tag user is concerned: they will not need to
+do anything to pass in the context.
+
+For example, suppose we are writing an inclusion tag that will always be used
+in a context that contains ``home_link`` and ``home_title`` variables that
+point back to the main page. We can write a tag that is used like this::
+
+    {{ jump_link }}
+
+and renders this::
+
+    Jump directly to <a href="http://example.com/home">Home</a>
+
+The tag function is almost as simple as before. This time it takes no
+arguments except the ``context`` (and the parameter `must` be called
+``context`` in this case; the special parameter named is used internally by
+Django to fill in the values correctly).
+
+::
+
+    # The first argument *must* be called "context" here.
+    def jump_link(context):
+        return {
+            'link': context['home_link'],
+            'title': context['home_title'],
+        }
+
+Our template is very simple again::
+
+    Jump directly to <a href="{{ link }}">{{ title }}</a>.
+
+Assuming the template is in a file called ``link.html``, we register this new
+tag as follows::
+
+    register.inclusion_tag('link.html', takes_context = True)(jump_link)
+
+The ``takes_context`` parameter here defaults to *False*. When it is set to
+*True*, our tag is passed the implicit context as in this example. That is the
+only difference between this case and our previous use of ``inclusion_tag``.
+
+.. _tutorials: http://www.djangoproject.com/documentation/tutorial1/#creating-models
+
 Setting a variable in the context
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -876,3 +1038,37 @@ The only new concept here is the ``self.nodelist.render(context)`` in
 For more examples of complex rendering, see the source code for ``{% if %}``,
 ``{% for %}``, ``{% ifequal %}`` and ``{% ifchanged %}``. They live in
 ``django/template/defaulttags.py``.
+
+.. _configuration:
+
+Configuring the template system in standalone mode
+==================================================
+
+.. note::
+
+    This section is only of interest to people trying to use the template
+    system as an output component in another application. If you are using the
+    template system as part of a Django application, nothing here applies to
+    you.
+
+Normally, Django will load all the configuration information it needs from its
+own default configuration file, combined with the settings in the module given
+in the ``DJANGO_SETTINGS_MODULE`` environment variable. But if you're using the
+template system independently of the rest of Django, the environment variable
+approach isn't very convenient, because you probably want to configure the
+template system in line with the rest of your application rather than dealing
+with settings files and pointing to them via environment variables.
+
+To solve this problem, you need to use the manual configuration option
+described in the `settings file`_ documentation. Simply import the appropriate
+pieces of the templating system and then, *before* you call any of the
+templating functions, call ``django.conf.settings.configure()`` with any
+settings you wish to specify. You might want to consider setting at least
+``TEMPLATE_DIRS`` (if you are going to use template loaders),
+``DEFAULT_CHARSET`` (although the default of ``utf-8`` is probably fine) and
+``TEMPLATE_DEBUG``. All available settings are described in the
+`settings documentation`_, and any setting starting with *TEMPLATE_*
+is of obvious interest.
+
+.. _settings file: http://www.djangoproject.com/documentation/settings/#using-settings-without-the-django-settings-module-environment-variable
+.. _settings documentation: http://www.djangoproject.com/documentation/settings/

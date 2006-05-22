@@ -77,9 +77,9 @@ It's easy either way.
 Installing the official version
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-1. Download Django-0.92.tar.gz from our `download page`_.
-2. ``tar xzvf Django-0.92.tar.gz``
-3. ``cd Django-0.92``
+1. Download Django-0.91.tar.gz from our `download page`_.
+2. ``tar xzvf Django-0.91.tar.gz``
+3. ``cd Django-0.91``
 4. ``sudo python setup.py install``
 
 Note that the last command will automatically download and install setuptools_
@@ -88,6 +88,14 @@ connection.
 
 This will install Django in your Python installation's ``site-packages``
 directory.
+
+.. note::
+
+    Due to recent backwards-incompatible changes, it is strongly recommended
+    that you use the development version (below) for any new applications or
+    if you are just starting to work with Django. The 0.91 release is a
+    dead-end branch that is primarily of use for supporting legacy Django
+    applications.
 
 .. _setuptools: http://peak.telecommunity.com/DevCenter/setuptools
 

@@ -338,6 +338,60 @@ introduced in Python 2.4::
     * If the user is logged in, execute the view normally. The view code is
       free to assume the user is logged in.
 
+Note that you'll need to map the appropriate Django view to ``/accounts/login/``.
+To do this, add the following line to your URLconf::
+
+    (r'^accounts/login/$', 'django.contrib.auth.views.login'),
+
+Here's what ``django.contrib.auth.views.login`` does::
+
+    * If called via ``GET``, it displays a login form that POSTs to the same
+      URL. More on this in a bit.
+
+    * If called via ``POST``, it tries to log the user in. If login is
+      successful, the view redirects to the URL specified in ``next``. If
+      ``next`` isn't provided, it redirects to ``/accounts/profile/`` (which is
+      currently hard-coded). If login isn't successful, it redisplays the login
+      form.
+
+It's your responsibility to provide the login form in a template called
+``registration/login.html``. This template gets passed three template context
+variables:
+
+    * ``form``: A ``FormWrapper`` object representing the login form. See the
+      `forms documentation`_ for more on ``FormWrapper`` objects.
+    * ``next``: The URL to redirect to after successful login. This may contain
+      a query string, too.
+    * ``site_name``: The name of the current ``Site``, according to the
+      ``SITE_ID`` setting. See the `site framework docs`_.
+
+Here's a sample ``registration/login.html`` template you can use as a starting
+point. It assumes you have a ``base.html`` template that defines a ``content``
+block::
+
+    {% extends "base.html" %}
+
+    {% block content %}
+
+    {% if form.has_errors %}
+    <p>Your username and password didn't match. Please try again.</p>
+    {% endif %}
+
+    <form method="post" action=".">
+    <table>
+    <tr><td><label for="id_username">Username:</label></td><td>{{ form.username }}</td></tr>
+    <tr><td><label for="id_password">Password:</label></td><td>{{ form.password }}</td></tr>
+    </table>
+
+    <input type="submit" value="login" />
+    <input type="hidden" name="next" value="{{ next }}" />
+    </form>
+
+    {% endblock %}
+
+.. _forms documentation: http://www.djangoproject.com/documentation/forms/
+.. _site framework docs: http://www.djangoproject.com/documentation/sites/
+
 Limiting access to logged-in users that pass a test
 ---------------------------------------------------
 
