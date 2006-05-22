@@ -16,10 +16,34 @@ The automatic Django administrative interface. For more information, see
 
 .. _Tutorial 2: http://www.djangoproject.com/documentation/tutorial2/
 
+auth
+====
+
+Django's authentication framework.
+
+See the `authentication documentation`_.
+
+.. _authentication documentation: http://www.djangoproject.com/documentation/authentication/
+
 comments
 ========
 
 A simple yet flexible comments system. This is not yet documented.
+
+contenttypes
+============
+
+A light framework for hooking into "types" of content, where each installed
+Django model is a separate content type. This is not yet documented.
+
+csrf
+====
+
+A middleware for preventing Cross Site Request Forgeries
+
+See the `csrf documentation`_.
+
+.. _csrf documentation: http://www.djangoproject.com/documentation/csrf/
 
 flatpages
 =========
@@ -48,6 +72,13 @@ See the `redirects documentation`_.
 
 .. _redirects documentation: http://www.djangoproject.com/documentation/redirects/
 
+sites
+=====
+
+A light framework that lets you operate multiple Web sites off of the same
+database and Django installation. It gives you hooks for associating objects to
+one or more sites. This is not yet documented.
+
 syndication
 ===========
 
@@ -56,16 +87,6 @@ A framework for generating syndication feeds, in RSS and Atom, quite easily.
 See the `syndication documentation`_.
 
 .. _syndication documentation: http://www.djangoproject.com/documentation/syndication/
-
-csrf
-====
-
-A middleware for preventing Cross Site Request Forgeries
-
-See the `csrf documentation`_.
-
-.. _csrf documentation: http://www.djangoproject.com/documentation/csrf/
-
 
 Other add-ons
 =============
