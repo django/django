@@ -34,7 +34,6 @@ def object_list(request, queryset, paginate_by=None, allow_empty=False,
             number of objects, total
     """
     queryset = queryset._clone()
-    model = queryset.model
     if paginate_by:
         paginator = ObjectPaginator(queryset, paginate_by)
         page = request.GET.get('page', 1)
@@ -71,6 +70,7 @@ def object_list(request, queryset, paginate_by=None, allow_empty=False,
         else:
             c[key] = value
     if not template_name:
+        model = queryset.model
         template_name = "%s/%s_list.html" % (model._meta.app_label, model._meta.object_name.lower())
     t = template_loader.get_template(template_name)
     return HttpResponse(t.render(c))
