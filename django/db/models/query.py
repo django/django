@@ -129,7 +129,7 @@ class QuerySet(object):
                     return list(self._clone(_offset=offset, _limit=limit))[::k.step]
             else:
                 try:
-                    return self._clone(_offset=k, _limit=1).get()
+                    return list(self._clone(_offset=k, _limit=1))[0]
                 except self.model.DoesNotExist, e:
                     raise IndexError, e.args
         else:
@@ -193,6 +193,7 @@ class QuerySet(object):
     def get(self, *args, **kwargs):
         "Performs the SELECT and returns a single object matching the given keyword arguments."
         clone = self.filter(*args, **kwargs)
+        # clean up SQL by removing unneeded ORDER BY
         if not clone._order_by:
             clone._order_by = ()
         obj_list = list(clone)

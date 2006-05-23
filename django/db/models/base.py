@@ -269,8 +269,8 @@ class Model(object):
         q._params.extend([param, param, getattr(self, self._meta.pk.attname)])
         try:
             return q[0]
-        except IndexError, e:
-            raise self.DoesNotExist, e.args
+        except IndexError:
+            raise self.DoesNotExist, "%s matching query does not exist." % self.__class__._meta.object_name
 
     def _get_next_or_previous_in_order(self, is_next):
         cachename = "__%s_order_cache" % is_next
