@@ -284,8 +284,8 @@ Here's what it looks like at this point:
    :alt: Polls change list page
    :target: http://media.djangoproject.com/img/doc/tutorial/admin04.png
 
-By default, Django displays the ``repr()`` of each object. But it'd be more
-helpful if we could display individual fields. To do that, use the
+By default, Django displays the ``str()`` of each object. But sometimes it'd
+be more helpful if we could display individual fields. To do that, use the
 ``list_display`` option, which is a tuple of field names to display, as columns,
 on the change list page for the object::
 
