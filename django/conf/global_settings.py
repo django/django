@@ -42,6 +42,7 @@ LANGUAGES = (
     ('el', _('Greek')),
     ('en', _('English')),
     ('es', _('Spanish')),
+    ('es_AR', _('Argentinean Spanish')),
     ('fr', _('French')),
     ('gl', _('Galician')),
     ('hu', _('Hungarian')),
