@@ -90,9 +90,8 @@ msgstr ""
 "\" táto správa sa objaví namiesto neho."
 
 #: contrib/comments/models.py:91
-#, fuzzy
 msgid "comments"
-msgstr "komentár"
+msgstr "komentáre"
 
 #: contrib/comments/models.py:131 contrib/comments/models.py:207
 msgid "Content object"
@@ -126,14 +125,12 @@ msgid "approved by staff"
 msgstr "je zamestnancom"
 
 #: contrib/comments/models.py:176
-#, fuzzy
 msgid "free comment"
-msgstr "Voľný komentár"
+msgstr "voľný komentár"
 
 #: contrib/comments/models.py:177
-#, fuzzy
 msgid "free comments"
-msgstr "Voľné komentáre"
+msgstr "voľné komentáre"
 
 #: contrib/comments/models.py:233
 msgid "score"
@@ -144,14 +141,12 @@ msgid "score date"
 msgstr "údaje stavu"
 
 #: contrib/comments/models.py:237
-#, fuzzy
 msgid "karma score"
-msgstr "Karma údaj"
+msgstr "karma údaj"
 
 #: contrib/comments/models.py:238
-#, fuzzy
 msgid "karma scores"
-msgstr "Karma údaje"
+msgstr "karma údaje"
 
 #: contrib/comments/models.py:242
 #, python-format
@@ -174,14 +169,12 @@ msgid "flag date"
 msgstr "dátumové návestie"
 
 #: contrib/comments/models.py:268
-#, fuzzy
 msgid "user flag"
-msgstr "Návestie uživateľa"
+msgstr "návestie uživateľa"
 
 #: contrib/comments/models.py:269
-#, fuzzy
 msgid "user flags"
-msgstr "Návestia užívateľa"
+msgstr "návestia užívateľa"
 
 #: contrib/comments/models.py:273
 #, python-format
@@ -193,14 +186,12 @@ msgid "deletion date"
 msgstr "odstránené dátumy"
 
 #: contrib/comments/models.py:280
-#, fuzzy
 msgid "moderator deletion"
-msgstr "Moderátor odstránenia"
+msgstr "moderátor odstránenia"
 
 #: contrib/comments/models.py:281
-#, fuzzy
 msgid "moderator deletions"
-msgstr "Moderátor odstránení"
+msgstr "moderátor odstránení"
 
 #: contrib/comments/models.py:285
 #, python-format
@@ -1157,24 +1148,20 @@ msgid "codename"
 msgstr "codename"
 
 #: contrib/auth/models.py:17
-#, fuzzy
 msgid "permission"
-msgstr "Povolenie"
+msgstr "povolenie"
 
 #: contrib/auth/models.py:18 contrib/auth/models.py:27
-#, fuzzy
 msgid "permissions"
-msgstr "Povolenia"
+msgstr "povolenia"
 
 #: contrib/auth/models.py:29
-#, fuzzy
 msgid "group"
-msgstr "Skupina"
+msgstr "skupina"
 
 #: contrib/auth/models.py:30 contrib/auth/models.py:65
-#, fuzzy
 msgid "groups"
-msgstr "Skupiny"
+msgstr "skupiny"
 
 #: contrib/auth/models.py:55
 msgid "username"
@@ -1233,17 +1220,14 @@ msgstr ""
 "skupin, v ktorých sa nachádza."
 
 #: contrib/auth/models.py:67
-#, fuzzy
 msgid "user permissions"
-msgstr "Povolenia"
+msgstr "pridelené povolenia"
 
 #: contrib/auth/models.py:70
-#, fuzzy
 msgid "user"
 msgstr "Uživateľ"
 
 #: contrib/auth/models.py:71
-#, fuzzy
 msgid "users"
 msgstr "Užívatelia"
 
@@ -1264,9 +1248,8 @@ msgid "Groups"
 msgstr "Skupiny"
 
 #: contrib/auth/models.py:219
-#, fuzzy
 msgid "message"
-msgstr "Zpráva"
+msgstr "zpráva"
 
 #: contrib/auth/forms.py:30
 msgid ""
@@ -1277,9 +1260,8 @@ msgstr ""
 "nevýhnutné aby ste sa mohli prilásiť."
 
 #: contrib/contenttypes/models.py:25
-#, fuzzy
 msgid "python model class name"
-msgstr "meno python modulu"
+msgstr "pythonové meno triedy modelu"
 
 #: contrib/contenttypes/models.py:28
 msgid "content type"
@@ -1414,7 +1396,6 @@ msgid "December"
 msgstr "December"
 
 #: utils/dates.py:19
-#, fuzzy
 msgid "jan"
 msgstr "a"
 
@@ -1431,17 +1412,16 @@ msgid "apr"
 msgstr ""
 
 #: utils/dates.py:19
-#, fuzzy
 msgid "may"
-msgstr "ďeň"
+msgstr "máj"
 
 #: utils/dates.py:19
 msgid "jun"
-msgstr ""
+msgstr "jún"
 
 #: utils/dates.py:20
 msgid "jul"
-msgstr ""
+msgstr "júl"
 
 #: utils/dates.py:20
 msgid "aug"
@@ -1453,7 +1433,7 @@ msgstr ""
 
 #: utils/dates.py:20
 msgid "oct"
-msgstr ""
+msgstr "okt"
 
 #: utils/dates.py:20
 msgid "nov"
@@ -1624,9 +1604,8 @@ msgid "Swedish"
 msgstr "Švédsky"
 
 #: conf/global_settings.py:61
-#, fuzzy
 msgid "Ukrainian"
-msgstr "Brazílsky"
+msgstr "Ukrajínsky"
 
 #: conf/global_settings.py:62
 msgid "Simplified Chinese"
@@ -1922,19 +1901,16 @@ msgid "This field is required."
 msgstr "Toto pole  je nevyhnutné."
 
 #: db/models/fields/__init__.py:337
-#, fuzzy
 msgid "This value must be an integer."
-msgstr "Táto hodnota musí byť mocninou  %s."
+msgstr "Táto hodnota musí byť integer."
 
 #: db/models/fields/__init__.py:369
-#, fuzzy
 msgid "This value must be either True or False."
-msgstr "Táto hodnota musí byť mocninou  %s."
+msgstr "Táto hodnota musí byť buď True alebo False."
 
 #: db/models/fields/__init__.py:385
-#, fuzzy
 msgid "This field cannot be null."
-msgstr "Toto pole nie je platné."
+msgstr "Toto pole nemôže obsahovať null."
 
 #: db/models/fields/__init__.py:562
 msgid "Enter a valid filename."
@@ -1946,12 +1922,10 @@ msgid "Please enter a valid %s."
 msgstr "Prosím vložte platné %s."
 
 #: db/models/fields/related.py:579
-#, fuzzy
 msgid "Separate multiple IDs with commas."
-msgstr "Identifikátory oddeľte  čiarkami."
+msgstr "Oddeľte viacnásobné ID  čiarkami."
 
 #: db/models/fields/related.py:581
-#, fuzzy
 msgid ""
 "Hold down \"Control\", or \"Command\" on a Mac, to select more than one."
 msgstr ""
