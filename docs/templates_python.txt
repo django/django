@@ -784,27 +784,23 @@ In Python 2.4, the decorator syntax also works::
 Inclusion tags
 ~~~~~~~~~~~~~~
 
-Another type of template tag that is sometimes useful is when you want to
-display some data that is computed at render time in a template fragment. For
-example, in Django's admin interface, there is a line of buttons along the
-bottom of the `create/edit record` screen. These buttons always look the same,
-but the link targets change depending upon the object being edited. So they
-are a perfect example for using a small template that is filled in with
-details from the current object. To save typing, it would also be nice if we
-could wrap this whole display up in a single tag (in the admin templates this
-is the ``submit_row`` tag).
+Another common type of template tag is the type that displays some data by
+rendering *another* template. For example, Django's admin interface uses custom
+template tags to display the buttons along the botton of the "add/change" form
+pages. Those buttons always look the same, but the link targets change depending
+on the object being edited -- so they're a perfect case for using a small
+template that is filled with details from the current object. (In the admin's
+case, this is the ``submit_row`` tag.)
 
-We call these sorts of tags `inclusion tags`. In your template, you pass in
-any appropriate arguments and the tag uses those arguments, together with the
-current context to render a template and include the result in the output.
+These sorts of tags are called `inclusion tags`.
 
-Writing inclusion tags is probably best demonstrated by example. We will write
-a tag that outputs a list of choices for a Poll object, such as was created in
-the tutorials_. We will use this tag like this::
+Writing inclusion tags is probably best demonstrated by example. Let's write a
+tag that outputs a list of choices for a given ``Poll`` object, such as was
+created in the tutorials_. We'll use the tag like this::
 
     {% show_results poll %}
 
-and the output will be something like this::
+...and the output will be something like this::
 
     <ul>
       <li>First choice</li>
@@ -812,21 +808,18 @@ and the output will be something like this::
       <li>Third choice</li>
     </ul>
 
-First, we define the function which takes the argument and produces a
-dictionary of data for the result. The important point here is we only need to
-return a dictionary, not anything more complex. This will be used to substitue
-for values in the template fragment, just as when templates are used
-elsewhere.
-
-::
+First, define the function that takes the argument and produces a dictionary of
+data for the result. The important point here is we only need to return a
+dictionary, not anything more complex. This will be used as a template context
+for the template fragment. Example::
 
     def show_results(poll):
         choices = poll.choice_set.all()
         return {'choices': choices}
 
-We also need to create the template that is used to render the output. This
-template is a fixed feature of the tag: the tag writer specifies it, not the
-template designer. In our case, the template is very simple::
+Next, create the template used to render the tag's output. This template is a
+fixed feature of the tag: the tag writer specifies it, not the template
+designer. Following our example, the template is very simple::
 
     <ul>
     {% for choice in choices %}
@@ -834,50 +827,33 @@ template designer. In our case, the template is very simple::
     {% endfor %}
     </ul>
 
-Now we can create the inclusion tag. Suppose the above template is in a file
-called ``results.html`` in a directory that is searched by the template
-loader. We register our new tag similarly to a normal tag.
-
-::
+Now, create and register the inclusion tag by calling the ``inclusion_tag()``
+method on a ``Library`` object. Following our example, if the above template is
+in a file called ``results.html`` in a directory that's searched by the template
+loader, we'd register the tag like this::
 
     # Here, register is a django.template.Library instance, as before
     register.inclusion_tag('results.html')(show_results)
 
 As always, Python 2.4 decorator syntax works as well, so we could have
-written
-
-::
+written::
 
     @inclusion_tag('results.html')
     def show_results(poll):
         ...
 
-when first creating the function.
+...when first creating the function.
 
-In some cases, an inclusion tag might require a large number of arguments to
-display itself properly. In essence, it would depend largely on the current
-context it was being rendered with. We can make these sorts of tags easier to
-write by telling the ``inclusion_tag`` function that the whole context
-should be passed in as an argument to the function. This will be done
-invisibly as far as the template tag user is concerned: they will not need to
-do anything to pass in the context.
+Sometimes, your inclusion tags might require a large number of arguments,
+making it a pain for template authors to pass in all the arguments and remember
+their order. To solve this, Django provides a ``takes_context`` option for
+inclusion tags. If you specify ``takes_context`` in creating a template tag,
+the tag will have no required arguments, and the underlying Python function
+will have one argument -- the template context as of when the tag was called.
 
-For example, suppose we are writing an inclusion tag that will always be used
-in a context that contains ``home_link`` and ``home_title`` variables that
-point back to the main page. We can write a tag that is used like this::
-
-    {% jump_link %}
-
-and renders this::
-
-    Jump directly to <a href="http://example.com/home">Home</a>
-
-The tag function is almost as simple as before. This time it takes no
-arguments except the ``context`` (and the parameter `must` be called
-``context`` in this case; the special parameter named is used internally by
-Django to fill in the values correctly).
-
-::
+For example, say you're writing an inclusion tag that will always be used in a
+context that contains ``home_link`` and ``home_title`` variables that point
+back to the main page. Here's what the Python function would look like::
 
     # The first argument *must* be called "context" here.
     def jump_link(context):
@@ -885,19 +861,28 @@ Django to fill in the values correctly).
             'link': context['home_link'],
             'title': context['home_title'],
         }
+    # Register the custom tag as an inclusion tag with takes_context=True.
+    register.inclusion_tag('link.html', takes_context=True)(jump_link)
 
-Our template is very simple again::
+(Note that the first parameter to the function *must* be called ``context``.)
+
+In that ``register.inclusion_tag()`` line, we specified ``takes_context=True``
+and the name of the template. Here's what the template ``link.html`` might look
+like::
 
     Jump directly to <a href="{{ link }}">{{ title }}</a>.
 
-Assuming the template is in a file called ``link.html``, we register this new
-tag as follows::
+Then, any time you want to use that custom tag, load its library and call it
+without any arguments, like so::
 
-    register.inclusion_tag('link.html', takes_context = True)(jump_link)
+    {% jump_link %}
 
-The ``takes_context`` parameter here defaults to *False*. When it is set to
-*True*, our tag is passed the implicit context as in this example. That is the
-only difference between this case and our previous use of ``inclusion_tag``.
+Note that when you're using ``takes_context=True``, there's no need to pass
+arguments to the template tag. It automatically gets access to the context.
+
+The ``takes_context`` parameter defaults to ``False``. When it's set to *True*,
+the tag is passed the context object, as in this example. That's the only
+difference between this case and the previous ``inclusion_tag`` example.
 
 .. _tutorials: http://www.djangoproject.com/documentation/tutorial1/#creating-models
 
