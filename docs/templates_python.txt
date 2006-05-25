@@ -802,7 +802,7 @@ Writing inclusion tags is probably best demonstrated by example. We will write
 a tag that outputs a list of choices for a Poll object, such as was created in
 the tutorials_. We will use this tag like this::
 
-    {{ show_results poll }}
+    {% show_results poll %}
 
 and the output will be something like this::
 
@@ -866,7 +866,7 @@ For example, suppose we are writing an inclusion tag that will always be used
 in a context that contains ``home_link`` and ``home_title`` variables that
 point back to the main page. We can write a tag that is used like this::
 
-    {{ jump_link }}
+    {% jump_link %}
 
 and renders this::
 
