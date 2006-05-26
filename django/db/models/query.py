@@ -291,22 +291,26 @@ class QuerySet(object):
 
     def filter(self, *args, **kwargs):
         "Returns a new QuerySet instance with the args ANDed to the existing set."
-        return self._filter_or_exclude(Q, *args, **kwargs)
+        return self._filter_or_exclude(None, *args, **kwargs)
 
     def exclude(self, *args, **kwargs):
         "Returns a new QuerySet instance with NOT (args) ANDed to the existing set."
         return self._filter_or_exclude(QNot, *args, **kwargs)
 
-    def _filter_or_exclude(self, qtype, *args, **kwargs):
+    def _filter_or_exclude(self, mapper, *args, **kwargs):
+        # mapper is a callable used to transform Q objects,
+        # or None for identity transform
+        if mapper is None:
+            mapper = lambda x: x
         if len(args) > 0 or len(kwargs) > 0:
             assert self._limit is None and self._offset is None, \
                 "Cannot filter a query once a slice has been taken."
 
         clone = self._clone()
         if len(kwargs) > 0:
-            clone._filters = clone._filters & qtype(**kwargs)
+            clone._filters = clone._filters & mapper(Q(**kwargs))
         if len(args) > 0:
-            clone._filters = clone._filters & reduce(operator.and_, args)
+            clone._filters = clone._filters & reduce(operator.and_, map(mapper, args))
         return clone
 
     def complex_filter(self, filter_obj):
@@ -318,7 +322,7 @@ class QuerySet(object):
         if hasattr(filter_obj, 'get_sql'):
             return self._filter_or_exclude(None, filter_obj)
         else:
-            return self._filter_or_exclude(Q, **filter_obj)
+            return self._filter_or_exclude(None, **filter_obj)
 
     def select_related(self, true_or_false=True):
         "Returns a new QuerySet instance with '_select_related' modified."
@@ -582,9 +586,12 @@ class Q(object):
 
 class QNot(Q):
     "Encapsulates NOT (...) queries as objects"
+    def __init__(self, q):
+        "Creates a negation of the q object passed in."
+        self.q = q
 
     def get_sql(self, opts):
-        tables, joins, where, params = super(QNot, self).get_sql(opts)
+        tables, joins, where, params = self.q.get_sql(opts)
         where2 = ['(NOT (%s))' % " AND ".join(where)]
         return tables, joins, where2, params
 

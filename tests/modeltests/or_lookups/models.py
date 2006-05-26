@@ -89,6 +89,10 @@ Hello and goodbye
 >>> Article.objects.filter(Q(headline__startswith='Hello')).in_bulk([1,2])
 {1: Hello}
 
+# Demonstrating exclude with a Q object
+>>> Article.objects.exclude(Q(headline__startswith='Hello'))
+[Goodbye]
+
 # The 'complex_filter' method supports framework features such as 
 # 'limit_choices_to' which normally take a single dictionary of lookup arguments
 # but need to support arbitrary queries via Q objects too.
