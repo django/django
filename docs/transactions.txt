@@ -32,10 +32,10 @@ To activate this feature, just add the ``TransactionMiddleware`` middleware to
 your ``MIDDLEWARE_CLASSES`` setting::
 
     MIDDLEWARE_CLASSES = (
-        "django.contrib.sessions.middleware.SessionMiddleware",
-        "django.middleware.common.CommonMiddleware",
-        "django.middleware.cache.CacheMiddleware",
-        "django.middleware.transaction.TransactionMiddleware",
+        'django.contrib.sessions.middleware.SessionMiddleware',
+        'django.middleware.common.CommonMiddleware',
+        'django.middleware.cache.CacheMiddleware',
+        'django.middleware.transaction.TransactionMiddleware',
     )
 
 The order is quite important. The transaction middleware applies not only to

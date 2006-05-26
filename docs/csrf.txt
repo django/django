@@ -17,7 +17,7 @@ middleware into your list of installed middleware.
 
 How to use it
 =============
-Add the middleware ``"django.contrib.csrf.middleware.CsrfMiddleware"`` to 
+Add the middleware ``'django.contrib.csrf.middleware.CsrfMiddleware'`` to 
 your list of middleware classes, ``MIDDLEWARE_CLASSES``. It needs to process
 the response after the SessionMiddleware, so must come before it in the
 list. It also must process the response before things like compression

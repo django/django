@@ -209,12 +209,12 @@ The per-site cache
 ==================
 
 Once the cache is set up, the simplest way to use caching is to cache your
-entire site. Just add ``django.middleware.cache.CacheMiddleware`` to your
+entire site. Just add ``'django.middleware.cache.CacheMiddleware'`` to your
 ``MIDDLEWARE_CLASSES`` setting, as in this example::
 
     MIDDLEWARE_CLASSES = (
-        "django.middleware.cache.CacheMiddleware",
-        "django.middleware.common.CommonMiddleware",
+        'django.middleware.cache.CacheMiddleware',
+        'django.middleware.common.CommonMiddleware',
     )
 
 (The order of ``MIDDLEWARE_CLASSES`` matters. See "Order of MIDDLEWARE_CLASSES"
