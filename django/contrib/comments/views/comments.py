@@ -252,7 +252,7 @@ def post_comment(request):
         else:
             manipulator.do_html2python(new_data)
             comment = manipulator.save(new_data)
-        return HttpResponseRedirect("/comments/posted/?c=%s:%s" % (content_type_id, object_id))
+        return HttpResponseRedirect("../posted/?c=%s:%s" % (content_type_id, object_id))
     else:
         raise Http404, _("The comment form didn't provide either 'preview' or 'post'")
 
@@ -316,7 +316,7 @@ def post_free_comment(request):
         else:
             manipulator.do_html2python(new_data)
             comment = manipulator.save(new_data)
-        return HttpResponseRedirect("/comments/posted/?c=%s:%s" % (content_type_id, object_id))
+        return HttpResponseRedirect("../posted/?c=%s:%s" % (content_type_id, object_id))
     else:
         raise Http404, _("The comment form didn't provide either 'preview' or 'post'")
 
