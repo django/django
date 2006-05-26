@@ -3,7 +3,7 @@
 from django.conf import settings
 from email.MIMEText import MIMEText
 from email.Header import Header
-import smtplib
+import smtplib, rfc822
 
 class BadHeaderError(ValueError):
     pass
@@ -49,6 +49,7 @@ def send_mass_mail(datatuple, fail_silently=False, auth_user=settings.EMAIL_HOST
         msg['Subject'] = subject
         msg['From'] = from_email
         msg['To'] = ', '.join(recipient_list)
+        msg['Date'] = rfc822.formatdate()
         try:
             server.sendmail(from_email, recipient_list, msg.as_string())
             num_sent += 1
