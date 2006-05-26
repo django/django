@@ -5,7 +5,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.contrib.sites.models import Site
 
 class LatestFreeCommentsFeed(Feed):
-    """Feed of latest comments on the current site"""
+    "Feed of latest comments on the current site."
 
     comments_class = FreeComment
 
@@ -25,24 +25,18 @@ class LatestFreeCommentsFeed(Feed):
         return "Latest comments on %s" % self._site.name
 
     def items(self):
-        return self.comments_class.objects.filter(**self._get_lookup_kwargs())
-
-    def _get_lookup_kwargs(self):
-        return {
-            'site__pk': settings.SITE_ID,
-            'is_public__exact': True,
-            'limit': 40,
-        }
+        return self.comments_class.objects.filter(site__pk=settings.SITE_ID, is_public=True)[:40]
 
 class LatestCommentsFeed(LatestFreeCommentsFeed):
     """Feed of latest free comments on the current site"""
 
     comments_class = Comment
 
-    def _get_lookup_kwargs(self):
-        kwargs = LatestFreeCommentsFeed._get_lookup_kwargs(self)
-        kwargs['is_removed__exact'] = False
+    def items(self):
+        qs = LatestFreeCommentsFeed.items(self)
+        qs = qs.filter(is_removed=False)
         if settings.COMMENTS_BANNED_USERS_GROUP:
-            kwargs['where'] = ['user_id NOT IN (SELECT user_id FROM auth_users_group WHERE group_id = %s)']
-            kwargs['params'] = [COMMENTS_BANNED_USERS_GROUP]
-        return kwargs
+            where = ['user_id NOT IN (SELECT user_id FROM auth_users_group WHERE group_id = %s)']
+            params = [COMMENTS_BANNED_USERS_GROUP]
+            qs = qs.extra(where=where, params=params)
+        return qs
