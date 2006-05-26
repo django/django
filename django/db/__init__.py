@@ -17,8 +17,11 @@ except ImportError, e:
     backend_dir = os.path.join(__path__[0], 'backends')
     available_backends = [f for f in os.listdir(backend_dir) if not f.startswith('_') and not f.startswith('.') and not f.endswith('.py') and not f.endswith('.pyc')]
     available_backends.sort()
-    raise ImproperlyConfigured, "Could not load database backend: %s. Is your DATABASE_ENGINE setting (currently, %r) spelled correctly? Available options are: %s" % \
-        (e, settings.DATABASE_ENGINE, ", ".join(map(repr, available_backends)))
+    if settings.DATABASE_ENGINE not in available_backends:
+        raise ImproperlyConfigured, "%r isn't an available database backend. vailable options are: %s" % \
+            (settings.DATABASE_ENGINE, ", ".join(map(repr, available_backends)))
+    else:
+        raise # If there's some other error, this must be an error in Django itself.
 
 get_introspection_module = lambda: __import__('django.db.backends.%s.introspection' % settings.DATABASE_ENGINE, '', '', [''])
 get_creation_module = lambda: __import__('django.db.backends.%s.creation' % settings.DATABASE_ENGINE, '', '', [''])
