@@ -3,7 +3,11 @@ SQLite3 backend for django.  Requires pysqlite2 (http://pysqlite.org/).
 """
 
 from django.db.backends import util
-from pysqlite2 import dbapi2 as Database
+try:
+    from pysqlite2 import dbapi2 as Database
+except ImportError, e:
+    from django.core.exceptions import ImproperlyConfigured
+    raise ImproperlyConfigured, "Error loading pysqlite2 module: %s" % e
 
 DatabaseError = Database.DatabaseError
 

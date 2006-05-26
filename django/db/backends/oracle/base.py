@@ -5,7 +5,11 @@ Requires cx_Oracle: http://www.python.net/crew/atuining/cx_Oracle/
 """
 
 from django.db.backends import util
-import cx_Oracle as Database
+try:
+    import cx_Oracle as Database
+except ImportError, e:
+    from django.core.exceptions import ImproperlyConfigured
+    raise ImproperlyConfigured, "Error loading cx_Oracle module: %s" % e
 import types
 
 DatabaseError = Database.Error

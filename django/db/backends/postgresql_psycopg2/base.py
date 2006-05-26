@@ -5,7 +5,11 @@ Requires psycopg 2: http://initd.org/projects/psycopg2
 """
 
 from django.db.backends import util
-import psycopg2 as Database
+try:
+    import psycopg2 as Database
+except ImportError, e:
+    from django.core.exceptions import ImproperlyConfigured
+    raise ImproperlyConfigured, "Error loading psycopg2 module: %s" % e
 
 DatabaseError = Database.DatabaseError
 
