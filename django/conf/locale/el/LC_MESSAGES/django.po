@@ -18,81 +18,81 @@ msgstr ""
 
 #: contrib/comments/models.py:67 contrib/comments/models.py:166
 msgid "object ID"
-msgstr "ID αντικειμένου"
+msgstr "ID Ξ±Ξ½Ο„ΞΉΞΊΞµΞΉΞΌΞ­Ξ½ΞΏΟ…"
 
 #: contrib/comments/models.py:68
 msgid "headline"
-msgstr "Επικεφαλίδα"
+msgstr "Ξ•Ο€ΞΉΞΊΞµΟ†Ξ±Ξ»Ξ―Ξ΄Ξ±"
 
 #: contrib/comments/models.py:69 contrib/comments/models.py:90
 #: contrib/comments/models.py:167
 msgid "comment"
-msgstr "σχόλιο"
+msgstr "ΟƒΟ‡ΟΞ»ΞΉΞΏ"
 
 #: contrib/comments/models.py:70
 msgid "rating #1"
-msgstr "κατάταξη #1"
+msgstr "ΞΊΞ±Ο„Ξ¬Ο„Ξ±ΞΎΞ· #1"
 
 #: contrib/comments/models.py:71
 msgid "rating #2"
-msgstr "βαθμολογία #2"
+msgstr "Ξ²Ξ±ΞΈΞΌΞΏΞ»ΞΏΞ³Ξ―Ξ± #2"
 
 #: contrib/comments/models.py:72
 msgid "rating #3"
-msgstr "βαθμολογία #3"
+msgstr "Ξ²Ξ±ΞΈΞΌΞΏΞ»ΞΏΞ³Ξ―Ξ± #3"
 
 #: contrib/comments/models.py:73
 msgid "rating #4"
-msgstr "βαθμολογία #4"
+msgstr "Ξ²Ξ±ΞΈΞΌΞΏΞ»ΞΏΞ³Ξ―Ξ± #4"
 
 #: contrib/comments/models.py:74
 msgid "rating #5"
-msgstr "βαθμολογία #5"
+msgstr "Ξ²Ξ±ΞΈΞΌΞΏΞ»ΞΏΞ³Ξ―Ξ± #5"
 
 #: contrib/comments/models.py:75
 msgid "rating #6"
-msgstr "βαθμολογία #6"
+msgstr "Ξ²Ξ±ΞΈΞΌΞΏΞ»ΞΏΞ³Ξ―Ξ± #6"
 
 #: contrib/comments/models.py:76
 msgid "rating #7"
-msgstr "βαθμολογία #7"
+msgstr "Ξ²Ξ±ΞΈΞΌΞΏΞ»ΞΏΞ³Ξ―Ξ± #7"
 
 #: contrib/comments/models.py:77
 msgid "rating #8"
-msgstr "βαθμολογία #8"
+msgstr "Ξ²Ξ±ΞΈΞΌΞΏΞ»ΞΏΞ³Ξ―Ξ± #8"
 
 #: contrib/comments/models.py:82
 msgid "is valid rating"
-msgstr "είναι έγκυρη βαθμολογία"
+msgstr "ΞµΞ―Ξ½Ξ±ΞΉ Ξ­Ξ³ΞΊΟ…ΟΞ· Ξ²Ξ±ΞΈΞΌΞΏΞ»ΞΏΞ³Ξ―Ξ±"
 
 #: contrib/comments/models.py:83 contrib/comments/models.py:169
 msgid "date/time submitted"
-msgstr "ημερομηνία/ώρα υποβολής"
+msgstr "Ξ·ΞΌΞµΟΞΏΞΌΞ·Ξ½Ξ―Ξ±/ΟΟΞ± Ο…Ο€ΞΏΞ²ΞΏΞ»Ξ®Ο‚"
 
 #: contrib/comments/models.py:84 contrib/comments/models.py:170
 msgid "is public"
-msgstr "είναι δημόσιο"
+msgstr "ΞµΞ―Ξ½Ξ±ΞΉ Ξ΄Ξ·ΞΌΟΟƒΞΉΞΏ"
 
 #: contrib/comments/models.py:85 contrib/admin/views/doc.py:289
 msgid "IP address"
-msgstr "IP διεύθυνση"
+msgstr "IP Ξ΄ΞΉΞµΟΞΈΟ…Ξ½ΟƒΞ·"
 
 #: contrib/comments/models.py:86
 msgid "is removed"
-msgstr "είναι διεγραμμένο"
+msgstr "ΞµΞ―Ξ½Ξ±ΞΉ Ξ΄ΞΉΞµΞ³ΟΞ±ΞΌΞΌΞ­Ξ½ΞΏ"
 
 #: contrib/comments/models.py:86
 msgid ""
 "Check this box if the comment is inappropriate. A \"This comment has been "
 "removed\" message will be displayed instead."
 msgstr ""
-"Σημειώστε αυτό το κουτί εάν το σχόλιο είναι ανάρμοστο. Ένα Αυτό το σχόλιο "
-"εσβήσθει\" μήνυμα θα εμφανιστεί αντί αυτού."
+"Ξ£Ξ·ΞΌΞµΞΉΟΟƒΟ„Ξµ Ξ±Ο…Ο„Ο Ο„ΞΏ ΞΊΞΏΟ…Ο„Ξ― ΞµΞ¬Ξ½ Ο„ΞΏ ΟƒΟ‡ΟΞ»ΞΉΞΏ ΞµΞ―Ξ½Ξ±ΞΉ Ξ±Ξ½Ξ¬ΟΞΌΞΏΟƒΟ„ΞΏ. ΞΞ½Ξ± Ξ‘Ο…Ο„Ο Ο„ΞΏ ΟƒΟ‡ΟΞ»ΞΉΞΏ "
+"ΞµΟƒΞ²Ξ®ΟƒΞΈΞµΞΉ\" ΞΌΞ®Ξ½Ο…ΞΌΞ± ΞΈΞ± ΞµΞΌΟ†Ξ±Ξ½ΞΉΟƒΟ„ΞµΞ― Ξ±Ξ½Ο„Ξ― Ξ±Ο…Ο„ΞΏΟ."
 
 #: contrib/comments/models.py:91
 #, fuzzy
 msgid "comments"
-msgstr "σχόλιο"
+msgstr "ΟƒΟ‡ΟΞ»ΞΉΞΏ"
 
 #: contrib/comments/models.py:131 contrib/comments/models.py:207
 msgid "Content object"
@@ -110,38 +110,38 @@ msgstr ""
 
 #: contrib/comments/models.py:168
 msgid "person's name"
-msgstr "όνομα ατόμου"
+msgstr "ΟΞ½ΞΏΞΌΞ± Ξ±Ο„ΟΞΌΞΏΟ…"
 
 #: contrib/comments/models.py:171
 msgid "ip address"
-msgstr "ip διεύθυνση"
+msgstr "ip Ξ΄ΞΉΞµΟΞΈΟ…Ξ½ΟƒΞ·"
 
 #: contrib/comments/models.py:173
 msgid "approved by staff"
-msgstr "εγκεκριμένο από το προσωπικό"
+msgstr "ΞµΞ³ΞΊΞµΞΊΟΞΉΞΌΞ­Ξ½ΞΏ Ξ±Ο€Ο Ο„ΞΏ Ο€ΟΞΏΟƒΟ‰Ο€ΞΉΞΊΟ"
 
 #: contrib/comments/models.py:176
 #, fuzzy
 msgid "free comment"
-msgstr "Ελεύθερο σχόλιο"
+msgstr "Ξ•Ξ»ΞµΟΞΈΞµΟΞΏ ΟƒΟ‡ΟΞ»ΞΉΞΏ"
 
 #: contrib/comments/models.py:177
 #, fuzzy
 msgid "free comments"
-msgstr "Ελεύθερα σχόλια"
+msgstr "Ξ•Ξ»ΞµΟΞΈΞµΟΞ± ΟƒΟ‡ΟΞ»ΞΉΞ±"
 
 #: contrib/comments/models.py:233
 msgid "score"
-msgstr "βαθμολογία"
+msgstr "Ξ²Ξ±ΞΈΞΌΞΏΞ»ΞΏΞ³Ξ―Ξ±"
 
 #: contrib/comments/models.py:234
 msgid "score date"
-msgstr "ημερομηνία βαθμολογίας"
+msgstr "Ξ·ΞΌΞµΟΞΏΞΌΞ·Ξ½Ξ―Ξ± Ξ²Ξ±ΞΈΞΌΞΏΞ»ΞΏΞ³Ξ―Ξ±Ο‚"
 
 #: contrib/comments/models.py:237
 #, fuzzy
 msgid "karma score"
-msgstr "βαθμολογία"
+msgstr "Ξ²Ξ±ΞΈΞΌΞΏΞ»ΞΏΞ³Ξ―Ξ±"
 
 #: contrib/comments/models.py:238
 msgid "karma scores"
@@ -159,9 +159,9 @@ msgid ""
 "\n"
 "%(text)s"
 msgstr ""
-"Αυτο το σχόλιο σημειώθει απο %(χρήστη)ες\n"
+"Ξ‘Ο…Ο„ΞΏ Ο„ΞΏ ΟƒΟ‡ΟΞ»ΞΉΞΏ ΟƒΞ·ΞΌΞµΞΉΟΞΈΞµΞΉ Ξ±Ο€ΞΏ %(Ο‡ΟΞ®ΟƒΟ„Ξ·)ΞµΟ‚\n"
 "\n"
-"%(κείμενο)α"
+"%(ΞΊΞµΞ―ΞΌΞµΞ½ΞΏ)Ξ±"
 
 #: contrib/comments/models.py:265
 msgid "flag date"
@@ -182,7 +182,7 @@ msgstr ""
 
 #: contrib/comments/models.py:278
 msgid "deletion date"
-msgstr "ημερομηνία διαγραφής"
+msgstr "Ξ·ΞΌΞµΟΞΏΞΌΞ·Ξ½Ξ―Ξ± Ξ΄ΞΉΞ±Ξ³ΟΞ±Ο†Ξ®Ο‚"
 
 #: contrib/comments/models.py:280
 msgid "moderator deletion"
@@ -199,7 +199,7 @@ msgstr ""
 
 #: contrib/comments/views/karma.py:19
 msgid "Anonymous users cannot vote"
-msgstr "Ανώνυμοι χρήστες δέν μπορούν να ψηφήσουν"
+msgstr "Ξ‘Ξ½ΟΞ½Ο…ΞΌΞΏΞΉ Ο‡ΟΞ®ΟƒΟ„ΞµΟ‚ Ξ΄Ξ­Ξ½ ΞΌΟ€ΞΏΟΞΏΟΞ½ Ξ½Ξ± ΟΞ·Ο†Ξ®ΟƒΞΏΟ…Ξ½"
 
 #: contrib/comments/views/karma.py:23
 msgid "Invalid comment ID"
@@ -212,7 +212,7 @@ msgstr ""
 #: contrib/comments/views/comments.py:28
 msgid ""
 "This rating is required because you've entered at least one other rating."
-msgstr "Αυτή η βαθμολογία απαιτείται επειδή τουλάχιστον ακόμα μια βαθμολογία"
+msgstr "Ξ‘Ο…Ο„Ξ® Ξ· Ξ²Ξ±ΞΈΞΌΞΏΞ»ΞΏΞ³Ξ―Ξ± Ξ±Ο€Ξ±ΞΉΟ„ΞµΞ―Ο„Ξ±ΞΉ ΞµΟ€ΞµΞΉΞ΄Ξ® Ο„ΞΏΟ…Ξ»Ξ¬Ο‡ΞΉΟƒΟ„ΞΏΞ½ Ξ±ΞΊΟΞΌΞ± ΞΌΞΉΞ± Ξ²Ξ±ΞΈΞΌΞΏΞ»ΞΏΞ³Ξ―Ξ±"
 
 #: contrib/comments/views/comments.py:112
 #, python-format
@@ -245,7 +245,7 @@ msgstr ""
 #: contrib/comments/views/comments.py:193
 #: contrib/comments/views/comments.py:284
 msgid "One or more of the required fields wasn't submitted"
-msgstr "Ένα ή περισσότερα από τα απαιτούμενα πεδία δεν υποβλίθει"
+msgstr "ΞΞ½Ξ± Ξ® Ο€ΞµΟΞΉΟƒΟƒΟΟ„ΞµΟΞ± Ξ±Ο€Ο Ο„Ξ± Ξ±Ο€Ξ±ΞΉΟ„ΞΏΟΞΌΞµΞ½Ξ± Ο€ΞµΞ΄Ξ―Ξ± Ξ΄ΞµΞ½ Ο…Ο€ΞΏΞ²Ξ»Ξ―ΞΈΞµΞΉ"
 
 #: contrib/comments/views/comments.py:197
 #: contrib/comments/views/comments.py:286
@@ -273,11 +273,11 @@ msgstr ""
 #: contrib/comments/templates/comments/form.html:6
 #: contrib/admin/templates/admin/login.html:20
 msgid "Password:"
-msgstr "Κωδικός"
+msgstr "ΞΟ‰Ξ΄ΞΉΞΊΟΟ‚"
 
 #: contrib/comments/templates/comments/form.html:6
 msgid "Forgotten your password?"
-msgstr "Ξεχάσατε τον κωδικό σας;"
+msgstr "ΞΞµΟ‡Ξ¬ΟƒΞ±Ο„Ξµ Ο„ΞΏΞ½ ΞΊΟ‰Ξ΄ΞΉΞΊΟ ΟƒΞ±Ο‚;"
 
 #: contrib/comments/templates/comments/form.html:8
 #: contrib/admin/templates/admin/object_history.html:3
@@ -321,7 +321,7 @@ msgstr ""
 #: contrib/comments/templates/comments/form.html:27
 #: contrib/comments/templates/comments/freeform.html:5
 msgid "Comment:"
-msgstr "Σχόλιο:"
+msgstr "Ξ£Ο‡ΟΞ»ΞΉΞΏ:"
 
 #: contrib/comments/templates/comments/form.html:32
 #: contrib/comments/templates/comments/freeform.html:9
@@ -350,7 +350,7 @@ msgstr ""
 
 #: contrib/admin/filterspecs.py:110
 msgid "Today"
-msgstr "Σήμερα"
+msgstr "Ξ£Ξ®ΞΌΞµΟΞ±"
 
 #: contrib/admin/filterspecs.py:113
 msgid "Past 7 days"
@@ -358,23 +358,23 @@ msgstr ""
 
 #: contrib/admin/filterspecs.py:115
 msgid "This month"
-msgstr "Αυτό το μήνα"
+msgstr "Ξ‘Ο…Ο„Ο Ο„ΞΏ ΞΌΞ®Ξ½Ξ±"
 
 #: contrib/admin/filterspecs.py:117
 msgid "This year"
-msgstr "Αυτό το χρόνο"
+msgstr "Ξ‘Ο…Ο„Ο Ο„ΞΏ Ο‡ΟΟΞ½ΞΏ"
 
 #: contrib/admin/filterspecs.py:143
 msgid "Yes"
-msgstr "Ναί"
+msgstr "ΞΞ±Ξ―"
 
 #: contrib/admin/filterspecs.py:143
 msgid "No"
-msgstr "Όχι"
+msgstr "ΞΟ‡ΞΉ"
 
 #: contrib/admin/filterspecs.py:150
 msgid "Unknown"
-msgstr "Άγνωστο"
+msgstr "β€™Ξ³Ξ½Ο‰ΟƒΟ„ΞΏ"
 
 #: contrib/admin/models.py:16
 msgid "action time"
@@ -394,7 +394,7 @@ msgstr ""
 
 #: contrib/admin/models.py:22
 msgid "change message"
-msgstr "αλλάξτε το μήνυμα"
+msgstr "Ξ±Ξ»Ξ»Ξ¬ΞΎΟ„Ξµ Ο„ΞΏ ΞΌΞ®Ξ½Ο…ΞΌΞ±"
 
 #: contrib/admin/models.py:25
 msgid "log entry"
@@ -406,7 +406,7 @@ msgstr ""
 
 #: contrib/admin/templatetags/admin_list.py:228
 msgid "All dates"
-msgstr "Όλες οι ημερομηνίες"
+msgstr "ΞΞ»ΞµΟ‚ ΞΏΞΉ Ξ·ΞΌΞµΟΞΏΞΌΞ·Ξ½Ξ―ΞµΟ‚"
 
 #: contrib/admin/views/decorators.py:9 contrib/auth/forms.py:36
 #: contrib/auth/forms.py:41
@@ -414,45 +414,45 @@ msgid ""
 "Please enter a correct username and password. Note that both fields are case-"
 "sensitive."
 msgstr ""
-"Παρακαλώ εισάγετε ένα σωστό όνομα χρήστη και κωδικό. Να σημειωθεί ότι και τα "
-"δύο πεδία είναι case-sensitive."
+"Ξ Ξ±ΟΞ±ΞΊΞ±Ξ»Ο ΞµΞΉΟƒΞ¬Ξ³ΞµΟ„Ξµ Ξ­Ξ½Ξ± ΟƒΟ‰ΟƒΟ„Ο ΟΞ½ΞΏΞΌΞ± Ο‡ΟΞ®ΟƒΟ„Ξ· ΞΊΞ±ΞΉ ΞΊΟ‰Ξ΄ΞΉΞΊΟ. ΞΞ± ΟƒΞ·ΞΌΞµΞΉΟ‰ΞΈΞµΞ― ΟΟ„ΞΉ ΞΊΞ±ΞΉ Ο„Ξ± "
+"Ξ΄ΟΞΏ Ο€ΞµΞ΄Ξ―Ξ± ΞµΞ―Ξ½Ξ±ΞΉ case-sensitive."
 
 #: contrib/admin/views/decorators.py:23
 #: contrib/admin/templates/admin/login.html:25
 msgid "Log in"
-msgstr "Συνδεθείτε"
+msgstr "Ξ£Ο…Ξ½Ξ΄ΞµΞΈΞµΞ―Ο„Ξµ"
 
 #: contrib/admin/views/decorators.py:61
 msgid ""
 "Please log in again, because your session has expired. Don't worry: Your "
 "submission has been saved."
 msgstr ""
-"Παρακαλώ ξανασυνδεθείτε, γιατί η session σας έληξε. Μην ανησυχείτε: Η "
-"submission σας έχει αποθηκευτεί."
+"Ξ Ξ±ΟΞ±ΞΊΞ±Ξ»Ο ΞΎΞ±Ξ½Ξ±ΟƒΟ…Ξ½Ξ΄ΞµΞΈΞµΞ―Ο„Ξµ, Ξ³ΞΉΞ±Ο„Ξ― Ξ· session ΟƒΞ±Ο‚ Ξ­Ξ»Ξ·ΞΎΞµ. ΞΞ·Ξ½ Ξ±Ξ½Ξ·ΟƒΟ…Ο‡ΞµΞ―Ο„Ξµ: Ξ— "
+"submission ΟƒΞ±Ο‚ Ξ­Ο‡ΞµΞΉ Ξ±Ο€ΞΏΞΈΞ·ΞΊΞµΟ…Ο„ΞµΞ―."
 
 #: contrib/admin/views/decorators.py:68
 msgid ""
 "Looks like your browser isn't configured to accept cookies. Please enable "
 "cookies, reload this page, and try again."
 msgstr ""
-"Απ'οτι φαίνεται, ο φυλλομετρητής σας δεν έχει ρυθμιστεί να δέχεται cookies. "
-"Παρακαλώ ενεργοποιείστε τα cookies, ξαναφορτώστε αυτή την σελίδα, και "
-"δοκιμάστε ξανά."
+"Ξ‘Ο€'ΞΏΟ„ΞΉ Ο†Ξ±Ξ―Ξ½ΞµΟ„Ξ±ΞΉ, ΞΏ Ο†Ο…Ξ»Ξ»ΞΏΞΌΞµΟ„ΟΞ·Ο„Ξ®Ο‚ ΟƒΞ±Ο‚ Ξ΄ΞµΞ½ Ξ­Ο‡ΞµΞΉ ΟΟ…ΞΈΞΌΞΉΟƒΟ„ΞµΞ― Ξ½Ξ± Ξ΄Ξ­Ο‡ΞµΟ„Ξ±ΞΉ cookies. "
+"Ξ Ξ±ΟΞ±ΞΊΞ±Ξ»Ο ΞµΞ½ΞµΟΞ³ΞΏΟ€ΞΏΞΉΞµΞ―ΟƒΟ„Ξµ Ο„Ξ± cookies, ΞΎΞ±Ξ½Ξ±Ο†ΞΏΟΟ„ΟΟƒΟ„Ξµ Ξ±Ο…Ο„Ξ® Ο„Ξ·Ξ½ ΟƒΞµΞ»Ξ―Ξ΄Ξ±, ΞΊΞ±ΞΉ "
+"Ξ΄ΞΏΞΊΞΉΞΌΞ¬ΟƒΟ„Ξµ ΞΎΞ±Ξ½Ξ¬."
 
 #: contrib/admin/views/decorators.py:82
 msgid "Usernames cannot contain the '@' character."
-msgstr "Τα ονόματα των Χρηστών δεν μπορόυν να περιέχουν τον χαρακτήρα '@'."
+msgstr "Ξ¤Ξ± ΞΏΞ½ΟΞΌΞ±Ο„Ξ± Ο„Ο‰Ξ½ Ξ§ΟΞ·ΟƒΟ„ΟΞ½ Ξ΄ΞµΞ½ ΞΌΟ€ΞΏΟΟΟ…Ξ½ Ξ½Ξ± Ο€ΞµΟΞΉΞ­Ο‡ΞΏΟ…Ξ½ Ο„ΞΏΞ½ Ο‡Ξ±ΟΞ±ΞΊΟ„Ξ®ΟΞ± '@'."
 
 #: contrib/admin/views/decorators.py:84
 #, python-format
 msgid "Your e-mail address is not your username. Try '%s' instead."
 msgstr ""
-"Η ηλεκτρονική σας διεύθυνση δεν είναι το ονόμα χρήστη σας. Δοκιμάστε '%s' "
-"έναντι αυτού."
+"Ξ— Ξ·Ξ»ΞµΞΊΟ„ΟΞΏΞ½ΞΉΞΊΞ® ΟƒΞ±Ο‚ Ξ΄ΞΉΞµΟΞΈΟ…Ξ½ΟƒΞ· Ξ΄ΞµΞ½ ΞµΞ―Ξ½Ξ±ΞΉ Ο„ΞΏ ΞΏΞ½ΟΞΌΞ± Ο‡ΟΞ®ΟƒΟ„Ξ· ΟƒΞ±Ο‚. Ξ”ΞΏΞΊΞΉΞΌΞ¬ΟƒΟ„Ξµ '%s' "
+"Ξ­Ξ½Ξ±Ξ½Ο„ΞΉ Ξ±Ο…Ο„ΞΏΟ."
 
 #: contrib/admin/views/main.py:226
 msgid "Site administration"
-msgstr "Διαχείριση του Διαδυκτιακού χώρου"
+msgstr "Ξ”ΞΉΞ±Ο‡ΞµΞ―ΟΞΉΟƒΞ· Ο„ΞΏΟ… Ξ”ΞΉΞ±Ξ΄Ο…ΞΊΟ„ΞΉΞ±ΞΊΞΏΟ Ο‡ΟΟΞΏΟ…"
 
 #: contrib/admin/views/main.py:260
 #, python-format
@@ -466,7 +466,7 @@ msgstr ""
 #: contrib/admin/views/main.py:272 contrib/admin/views/main.py:357
 #, python-format
 msgid "You may add another %s below."
-msgstr "Μπορείτε να προσθέσετε ακόμα ένα %s απο κάτω."
+msgstr "ΞΟ€ΞΏΟΞµΞ―Ο„Ξµ Ξ½Ξ± Ο€ΟΞΏΟƒΞΈΞ­ΟƒΞµΟ„Ξµ Ξ±ΞΊΟΞΌΞ± Ξ­Ξ½Ξ± %s Ξ±Ο€ΞΏ ΞΊΞ¬Ο„Ο‰."
 
 #: contrib/admin/views/main.py:290
 #, python-format
@@ -481,7 +481,7 @@ msgstr ""
 #: contrib/admin/views/main.py:336 contrib/admin/views/main.py:338
 #: contrib/admin/views/main.py:340
 msgid "and"
-msgstr "και"
+msgstr "ΞΊΞ±ΞΉ"
 
 #: contrib/admin/views/main.py:338
 #, python-format
@@ -530,7 +530,7 @@ msgstr ""
 
 #: contrib/admin/views/main.py:511
 msgid "Are you sure?"
-msgstr "Είστε σίγουρος;"
+msgstr "Ξ•Ξ―ΟƒΟ„Ξµ ΟƒΞ―Ξ³ΞΏΟ…ΟΞΏΟ‚;"
 
 #: contrib/admin/views/main.py:533
 #, python-format
@@ -551,11 +551,11 @@ msgstr ""
 #: contrib/admin/views/doc.py:288 contrib/admin/views/doc.py:294
 #: contrib/admin/views/doc.py:295 contrib/admin/views/doc.py:297
 msgid "Integer"
-msgstr "Ακέραιος"
+msgstr "Ξ‘ΞΊΞ­ΟΞ±ΞΉΞΏΟ‚"
 
 #: contrib/admin/views/doc.py:278
 msgid "Boolean (Either True or False)"
-msgstr "Boolean (Είτε Αλήθεια ή Ψέμα)"
+msgstr "Boolean (Ξ•Ξ―Ο„Ξµ Ξ‘Ξ»Ξ®ΞΈΞµΞΉΞ± Ξ® Ξ¨Ξ­ΞΌΞ±)"
 
 #: contrib/admin/views/doc.py:279 contrib/admin/views/doc.py:296
 #, python-format
@@ -568,15 +568,15 @@ msgstr ""
 
 #: contrib/admin/views/doc.py:281
 msgid "Date (without time)"
-msgstr "Ημερομηνία (χωρίς την ώρα)"
+msgstr "Ξ—ΞΌΞµΟΞΏΞΌΞ·Ξ½Ξ―Ξ± (Ο‡Ο‰ΟΞ―Ο‚ Ο„Ξ·Ξ½ ΟΟΞ±)"
 
 #: contrib/admin/views/doc.py:282
 msgid "Date (with time)"
-msgstr "Ημερομηνία (με την ώρα)"
+msgstr "Ξ—ΞΌΞµΟΞΏΞΌΞ·Ξ½Ξ―Ξ± (ΞΌΞµ Ο„Ξ·Ξ½ ΟΟΞ±)"
 
 #: contrib/admin/views/doc.py:283
 msgid "E-mail address"
-msgstr "Ηλεκτρονική διεύθυνση"
+msgstr "Ξ—Ξ»ΞµΞΊΟ„ΟΞΏΞ½ΞΉΞΊΞ® Ξ΄ΞΉΞµΟΞΈΟ…Ξ½ΟƒΞ·"
 
 #: contrib/admin/views/doc.py:284 contrib/admin/views/doc.py:287
 msgid "File path"
@@ -584,7 +584,7 @@ msgstr ""
 
 #: contrib/admin/views/doc.py:285
 msgid "Decimal number"
-msgstr "Δεκαδικός αριθμός"
+msgstr "Ξ”ΞµΞΊΞ±Ξ΄ΞΉΞΊΟΟ‚ Ξ±ΟΞΉΞΈΞΌΟΟ‚"
 
 #: contrib/admin/views/doc.py:291
 msgid "Boolean (Either True, False or None)"
@@ -596,15 +596,15 @@ msgstr ""
 
 #: contrib/admin/views/doc.py:293
 msgid "Phone number"
-msgstr "Αριθμός τηλεφώνου"
+msgstr "Ξ‘ΟΞΉΞΈΞΌΟΟ‚ Ο„Ξ·Ξ»ΞµΟ†ΟΞ½ΞΏΟ…"
 
 #: contrib/admin/views/doc.py:298
 msgid "Text"
-msgstr "Κείμενο"
+msgstr "ΞΞµΞ―ΞΌΞµΞ½ΞΏ"
 
 #: contrib/admin/views/doc.py:299
 msgid "Time"
-msgstr "Ώρα"
+msgstr "ΞΟΞ±"
 
 #: contrib/admin/views/doc.py:300 contrib/flatpages/models.py:7
 msgid "URL"
@@ -647,7 +647,7 @@ msgstr ""
 #: contrib/admin/templates/admin_doc/index.html:4
 #: contrib/admin/templates/admin_doc/model_index.html:5
 msgid "Change password"
-msgstr "Αλλαγή κωδικού"
+msgstr "Ξ‘Ξ»Ξ»Ξ±Ξ³Ξ® ΞΊΟ‰Ξ΄ΞΉΞΊΞΏΟ"
 
 #: contrib/admin/templates/admin/object_history.html:5
 #: contrib/admin/templates/admin/500.html:4
@@ -675,7 +675,7 @@ msgstr ""
 
 #: contrib/admin/templates/admin/object_history.html:19
 msgid "User"
-msgstr "Χρήστης"
+msgstr "Ξ§ΟΞ®ΟƒΟ„Ξ·Ο‚"
 
 #: contrib/admin/templates/admin/object_history.html:20
 msgid "Action"
@@ -693,7 +693,7 @@ msgstr ""
 
 #: contrib/admin/templates/admin/base_site.html:4
 msgid "Django site admin"
-msgstr "Διαχειριστής ιστοσελίδας Django"
+msgstr "Ξ”ΞΉΞ±Ο‡ΞµΞΉΟΞΉΟƒΟ„Ξ®Ο‚ ΞΉΟƒΟ„ΞΏΟƒΞµΞ»Ξ―Ξ΄Ξ±Ο‚ Django"
 
 #: contrib/admin/templates/admin/base_site.html:7
 msgid "Django administration"
@@ -750,7 +750,7 @@ msgstr ""
 
 #: contrib/admin/templates/admin/index.html:53
 msgid "My Actions"
-msgstr "Οι πράξεις μου"
+msgstr "ΞΞΉ Ο€ΟΞ¬ΞΎΞµΞΉΟ‚ ΞΌΞΏΟ…"
 
 #: contrib/admin/templates/admin/index.html:57
 msgid "None available"
@@ -767,7 +767,7 @@ msgstr ""
 
 #: contrib/admin/templates/admin/base.html:23
 msgid "Welcome,"
-msgstr "Καλωσήρθατε,"
+msgstr "ΞΞ±Ξ»Ο‰ΟƒΞ®ΟΞΈΞ±Ο„Ξµ,"
 
 #: contrib/admin/templates/admin/delete_confirmation.html:9
 #: contrib/admin/templates/admin/submit_line.html:3
@@ -791,7 +791,7 @@ msgstr ""
 
 #: contrib/admin/templates/admin/delete_confirmation.html:26
 msgid "Yes, I'm sure"
-msgstr "Ναι, είμαι σίγουρος"
+msgstr "ΞΞ±ΞΉ, ΞµΞ―ΞΌΞ±ΞΉ ΟƒΞ―Ξ³ΞΏΟ…ΟΞΏΟ‚"
 
 #: contrib/admin/templates/admin/filter.html:2
 #, python-format
@@ -834,7 +834,7 @@ msgstr ""
 
 #: contrib/admin/templates/admin/submit_line.html:7
 msgid "Save"
-msgstr "Αποθήκευση"
+msgstr "Ξ‘Ο€ΞΏΞΈΞ®ΞΊΞµΟ…ΟƒΞ·"
 
 #: contrib/admin/templates/registration/password_change_done.html:4
 #: contrib/admin/templates/registration/password_change_form.html:4
@@ -850,7 +850,7 @@ msgstr ""
 
 #: contrib/admin/templates/registration/password_change_done.html:12
 msgid "Your password was changed."
-msgstr "Ο κωδίκός σας άλλαξε."
+msgstr "Ξ ΞΊΟ‰Ξ΄Ξ―ΞΊΟΟ‚ ΟƒΞ±Ο‚ Ξ¬Ξ»Ξ»Ξ±ΞΎΞµ."
 
 #: contrib/admin/templates/registration/password_reset_form.html:4
 #: contrib/admin/templates/registration/password_reset_form.html:6
@@ -876,7 +876,7 @@ msgstr ""
 #: contrib/admin/templates/registration/logged_out.html:8
 msgid "Thanks for spending some quality time with the Web site today."
 msgstr ""
-"Ευχαριστούμε που διαθέσατε χρόνο στο να βελτίωσετε την ιστοσελίδα σήμερα."
+"Ξ•Ο…Ο‡Ξ±ΟΞΉΟƒΟ„ΞΏΟΞΌΞµ Ο€ΞΏΟ… Ξ΄ΞΉΞ±ΞΈΞ­ΟƒΞ±Ο„Ξµ Ο‡ΟΟΞ½ΞΏ ΟƒΟ„ΞΏ Ξ½Ξ± Ξ²ΞµΞ»Ο„Ξ―Ο‰ΟƒΞµΟ„Ξµ Ο„Ξ·Ξ½ ΞΉΟƒΟ„ΞΏΟƒΞµΞ»Ξ―Ξ΄Ξ± ΟƒΞ®ΞΌΞµΟΞ±."
 
 #: contrib/admin/templates/registration/logged_out.html:10
 msgid "Log in again"
@@ -901,11 +901,11 @@ msgstr ""
 
 #: contrib/admin/templates/registration/password_change_form.html:17
 msgid "Old password:"
-msgstr "Παλιός κωδικός:"
+msgstr "Ξ Ξ±Ξ»ΞΉΟΟ‚ ΞΊΟ‰Ξ΄ΞΉΞΊΟΟ‚:"
 
 #: contrib/admin/templates/registration/password_change_form.html:19
 msgid "New password:"
-msgstr "Νέος κωδικός:"
+msgstr "ΞΞ­ΞΏΟ‚ ΞΊΟ‰Ξ΄ΞΉΞΊΟΟ‚:"
 
 #: contrib/admin/templates/registration/password_change_form.html:21
 msgid "Confirm password:"
@@ -1173,12 +1173,12 @@ msgstr ""
 #: contrib/auth/models.py:70
 #, fuzzy
 msgid "user"
-msgstr "Χρήστης"
+msgstr "Ξ§ΟΞ®ΟƒΟ„Ξ·Ο‚"
 
 #: contrib/auth/models.py:71
 #, fuzzy
 msgid "users"
-msgstr "Χρήστης"
+msgstr "Ξ§ΟΞ®ΟƒΟ„Ξ·Ο‚"
 
 #: contrib/auth/models.py:76
 msgid "Personal info"
@@ -1199,15 +1199,15 @@ msgstr ""
 #: contrib/auth/models.py:219
 #, fuzzy
 msgid "message"
-msgstr "αλλάξτε το μήνυμα"
+msgstr "Ξ±Ξ»Ξ»Ξ¬ΞΎΟ„Ξµ Ο„ΞΏ ΞΌΞ®Ξ½Ο…ΞΌΞ±"
 
 #: contrib/auth/forms.py:30
 msgid ""
 "Your Web browser doesn't appear to have cookies enabled. Cookies are "
 "required for logging in."
 msgstr ""
-"Ο φυλλομετρητής σας δεν φαίνεται να έχει ενεργοποιημένα τα cookies. Τα "
-"cookies απαιτούνται για να συνδεθείτε"
+"Ξ Ο†Ο…Ξ»Ξ»ΞΏΞΌΞµΟ„ΟΞ·Ο„Ξ®Ο‚ ΟƒΞ±Ο‚ Ξ΄ΞµΞ½ Ο†Ξ±Ξ―Ξ½ΞµΟ„Ξ±ΞΉ Ξ½Ξ± Ξ­Ο‡ΞµΞΉ ΞµΞ½ΞµΟΞ³ΞΏΟ€ΞΏΞΉΞ·ΞΌΞ­Ξ½Ξ± Ο„Ξ± cookies. Ξ¤Ξ± "
+"cookies Ξ±Ο€Ξ±ΞΉΟ„ΞΏΟΞ½Ο„Ξ±ΞΉ Ξ³ΞΉΞ± Ξ½Ξ± ΟƒΟ…Ξ½Ξ΄ΞµΞΈΞµΞ―Ο„Ξµ"
 
 #: contrib/contenttypes/models.py:25
 msgid "python model class name"
@@ -1348,7 +1348,7 @@ msgstr ""
 #: utils/dates.py:19
 #, fuzzy
 msgid "jan"
-msgstr "και"
+msgstr "ΞΊΞ±ΞΉ"
 
 #: utils/dates.py:19
 msgid "feb"
@@ -1677,7 +1677,7 @@ msgstr ""
 #: core/validators.py:206 core/validators.py:208
 #, python-format
 msgid "The URL %s is a broken link."
-msgstr "Η διεύθυνση (URL) %s είναι χαλασμένη σύνδεση."
+msgstr "Ξ— Ξ΄ΞΉΞµΟΞΈΟ…Ξ½ΟƒΞ· (URL) %s ΞµΞ―Ξ½Ξ±ΞΉ Ο‡Ξ±Ξ»Ξ±ΟƒΞΌΞ­Ξ½Ξ· ΟƒΟΞ½Ξ΄ΞµΟƒΞ·."
 
 #: core/validators.py:214
 msgid "Enter a valid U.S. state abbreviation."
@@ -1701,7 +1701,7 @@ msgstr ""
 
 #: core/validators.py:264 core/validators.py:275
 msgid "Please enter both fields or leave them both empty."
-msgstr "Παρακαλώ συμπληρώστε και τα δύο πεδία ή αφήστε τα και τα δύο άδεια."
+msgstr "Ξ Ξ±ΟΞ±ΞΊΞ±Ξ»Ο ΟƒΟ…ΞΌΟ€Ξ»Ξ·ΟΟΟƒΟ„Ξµ ΞΊΞ±ΞΉ Ο„Ξ± Ξ΄ΟΞΏ Ο€ΞµΞ΄Ξ―Ξ± Ξ® Ξ±Ο†Ξ®ΟƒΟ„Ξµ Ο„Ξ± ΞΊΞ±ΞΉ Ο„Ξ± Ξ΄ΟΞΏ Ξ¬Ξ΄ΞµΞΉΞ±."
 
 #: core/validators.py:282
 #, python-format
@@ -1724,7 +1724,7 @@ msgstr ""
 
 #: core/validators.py:347
 msgid "Please enter a valid decimal number."
-msgstr "Παρακαλώ είσάγετε έναν έγκυρο δεκαδίκο αριθμό."
+msgstr "Ξ Ξ±ΟΞ±ΞΊΞ±Ξ»Ο ΞµΞ―ΟƒΞ¬Ξ³ΞµΟ„Ξµ Ξ­Ξ½Ξ±Ξ½ Ξ­Ξ³ΞΊΟ…ΟΞΏ Ξ΄ΞµΞΊΞ±Ξ΄Ξ―ΞΊΞΏ Ξ±ΟΞΉΞΈΞΌΟ."
 
 #: core/validators.py:349
 #, python-format
@@ -1745,7 +1745,7 @@ msgstr[1] ""
 #: core/validators.py:362
 #, python-format
 msgid "Make sure your uploaded file is at least %s bytes big."
-msgstr "Σιγουρευτείτε ότι το αρχείου που ανεβάζετε είναι %s bytes τουλάχιστον."
+msgstr "Ξ£ΞΉΞ³ΞΏΟ…ΟΞµΟ…Ο„ΞµΞ―Ο„Ξµ ΟΟ„ΞΉ Ο„ΞΏ Ξ±ΟΟ‡ΞµΞ―ΞΏΟ… Ο€ΞΏΟ… Ξ±Ξ½ΞµΞ²Ξ¬Ξ¶ΞµΟ„Ξµ ΞµΞ―Ξ½Ξ±ΞΉ %s bytes Ο„ΞΏΟ…Ξ»Ξ¬Ο‡ΞΉΟƒΟ„ΞΏΞ½."
 
 #: core/validators.py:363
 #, python-format
@@ -1754,11 +1754,11 @@ msgstr ""
 
 #: core/validators.py:376
 msgid "The format for this field is wrong."
-msgstr "Η διάταξη αυτού του πεδίου έιναι λάθος"
+msgstr "Ξ— Ξ΄ΞΉΞ¬Ο„Ξ±ΞΎΞ· Ξ±Ο…Ο„ΞΏΟ Ο„ΞΏΟ… Ο€ΞµΞ΄Ξ―ΞΏΟ… Ξ­ΞΉΞ½Ξ±ΞΉ Ξ»Ξ¬ΞΈΞΏΟ‚"
 
 #: core/validators.py:391
 msgid "This field is invalid."
-msgstr "Αυτό το πεδίο είναι άκυρο"
+msgstr "Ξ‘Ο…Ο„Ο Ο„ΞΏ Ο€ΞµΞ΄Ξ―ΞΏ ΞµΞ―Ξ½Ξ±ΞΉ Ξ¬ΞΊΟ…ΟΞΏ"
 
 #: core/validators.py:426
 #, python-format
@@ -1836,16 +1836,16 @@ msgstr ""
 #: db/models/fields/__init__.py:369
 #, fuzzy
 msgid "This value must be either True or False."
-msgstr "Boolean (Είτε Αλήθεια ή Ψέμα)"
+msgstr "Boolean (Ξ•Ξ―Ο„Ξµ Ξ‘Ξ»Ξ®ΞΈΞµΞΉΞ± Ξ® Ξ¨Ξ­ΞΌΞ±)"
 
 #: db/models/fields/__init__.py:385
 #, fuzzy
 msgid "This field cannot be null."
-msgstr "Αυτό το πεδίο είναι άκυρο"
+msgstr "Ξ‘Ο…Ο„Ο Ο„ΞΏ Ο€ΞµΞ΄Ξ―ΞΏ ΞµΞ―Ξ½Ξ±ΞΉ Ξ¬ΞΊΟ…ΟΞΏ"
 
 #: db/models/fields/__init__.py:562
 msgid "Enter a valid filename."
-msgstr "Εισάγετε ένα έγκυρο όνομα αρχείου"
+msgstr "Ξ•ΞΉΟƒΞ¬Ξ³ΞµΟ„Ξµ Ξ­Ξ½Ξ± Ξ­Ξ³ΞΊΟ…ΟΞΏ ΟΞ½ΞΏΞΌΞ± Ξ±ΟΟ‡ΞµΞ―ΞΏΟ…"
 
 #: db/models/fields/related.py:43
 #, python-format
@@ -1855,7 +1855,7 @@ msgstr ""
 #: db/models/fields/related.py:579
 #, fuzzy
 msgid "Separate multiple IDs with commas."
-msgstr "Ξεχωρίστε πολλαπλές ΙDs με κόμματα"
+msgstr "ΞΞµΟ‡Ο‰ΟΞ―ΟƒΟ„Ξµ Ο€ΞΏΞ»Ξ»Ξ±Ο€Ξ»Ξ­Ο‚ Ξ™Ds ΞΌΞµ ΞΊΟΞΌΞΌΞ±Ο„Ξ±"
 
 #: db/models/fields/related.py:581
 msgid ""
@@ -1904,10 +1904,10 @@ msgstr ""
 
 #: template/defaultfilters.py:379
 msgid "yes,no,maybe"
-msgstr "ναί,όχι,ίσως"
+msgstr "Ξ½Ξ±Ξ―,ΟΟ‡ΞΉ,Ξ―ΟƒΟ‰Ο‚"
 
 #~ msgid "Comment"
-#~ msgstr "Σχόλιο"
+#~ msgstr "Ξ£Ο‡ΟΞ»ΞΉΞΏ"
 
 #~ msgid "Comments"
-#~ msgstr "Σχόλια"
+#~ msgstr "Ξ£Ο‡ΟΞ»ΞΉΞ±"
