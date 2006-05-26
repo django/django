@@ -1,16 +1,16 @@
-# SOME DESCRIPTIVE TITLE.
-# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
-# This file is distributed under the same license as the PACKAGE package.
+# Dutch Javascript translations.
+# Copyright (C) 2006
+# This file is distributed under the same license as the Django package.
 # Rudolph Froger <rfroger@estrate.nl>, 2006.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2006-05-02 16:52+0200\n"
+"POT-Creation-Date: 2006-05-16 17:39+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
-"Language-Team: LANGUAGE <LL@li.org>\n"
+"Last-Translator: Rudolph Froger <rfroger@estrate.nl>\n"
+"Language-Team: nl <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -30,12 +30,12 @@ msgstr "Z M D W D V Z"
 
 #: contrib/admin/media/js/dateparse.js:33
 msgid "Sunday Monday Tuesday Wednesday Thursday Friday Saturday"
-msgstr "Zondag Maandag Dinsdag Woensdag Donderdag Vrijdag Zaterdag"
+msgstr "zondag maandag dinsdag woensdag donderdag vrijdag zaterdag"
 
 #: contrib/admin/media/js/SelectFilter2.js:33
 #, perl-format
 msgid "Available %s"
-msgstr "Beschikbaar"
+msgstr "Beschikbare %s"
 
 #: contrib/admin/media/js/SelectFilter2.js:41
 msgid "Choose all"
