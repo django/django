@@ -822,7 +822,7 @@ msgid ""
 "Are you sure you want to delete the %(object_name)s \"%(object)s\"? All of "
 "the following related items will be deleted:"
 msgstr ""
-"Er du sikker på at du vill slette %(object_name) \"%(object)s\"? Alle de "
+"Er du sikker på at du vill slette %(object_name)s \"%(object)s\"? Alle de "
 "følgende relaterte objektene vill bli slettet:"
 
 #: contrib/admin/templates/admin/delete_confirmation.html:26

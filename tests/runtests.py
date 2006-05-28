@@ -20,6 +20,17 @@ def log_error(model_name, title, description):
 
 MODEL_TEST_DIR = os.path.join(os.path.dirname(__file__), MODEL_TESTS_DIR_NAME)
 
+ALWAYS_INSTALLED_APPS = [
+    'django.contrib.admin',
+    'django.contrib.auth', 
+    'django.contrib.comments',
+    'django.contrib.contenttypes',
+    'django.contrib.flatpages',
+    'django.contrib.redirects',
+    'django.contrib.sessions',
+    'django.contrib.sites',
+]
+
 def get_test_models():
     return [f for f in os.listdir(MODEL_TEST_DIR) if not f.startswith('__init__') and not f.startswith('.')]
 
@@ -78,7 +89,7 @@ class TestRunner:
         settings.INSTALLED_APPS
 
         # Manually set INSTALLED_APPS to point to the test models.
-        settings.INSTALLED_APPS = [MODEL_TESTS_DIR_NAME + '.' + a for a in get_test_models()]
+        settings.INSTALLED_APPS = ALWAYS_INSTALLED_APPS + [MODEL_TESTS_DIR_NAME + '.' + a for a in get_test_models()]
 
         # Manually set DEBUG = False.
         settings.DEBUG = False

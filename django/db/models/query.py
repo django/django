@@ -95,6 +95,9 @@ class QuerySet(object):
 
     def __getitem__(self, k):
         "Retrieve an item or slice from the set of results."
+        assert (not isinstance(k, slice) and (k >= 0)) \
+            or (isinstance(k, slice) and (k.start is None or k.start >= 0) and (k.stop is None or k.stop >= 0)), \
+            "Negative indexing is not supported."
         if self._result_cache is None:
             if isinstance(k, slice):
                 # Offset:
@@ -129,7 +132,7 @@ class QuerySet(object):
                     return list(self._clone(_offset=offset, _limit=limit))[::k.step]
             else:
                 try:
-                    return self._clone(_offset=k, _limit=1).get()
+                    return list(self._clone(_offset=k, _limit=1))[0]
                 except self.model.DoesNotExist, e:
                     raise IndexError, e.args
         else:
@@ -193,6 +196,7 @@ class QuerySet(object):
     def get(self, *args, **kwargs):
         "Performs the SELECT and returns a single object matching the given keyword arguments."
         clone = self.filter(*args, **kwargs)
+        # clean up SQL by removing unneeded ORDER BY
         if not clone._order_by:
             clone._order_by = ()
         obj_list = list(clone)
@@ -287,22 +291,26 @@ class QuerySet(object):
 
     def filter(self, *args, **kwargs):
         "Returns a new QuerySet instance with the args ANDed to the existing set."
-        return self._filter_or_exclude(Q, *args, **kwargs)
+        return self._filter_or_exclude(None, *args, **kwargs)
 
     def exclude(self, *args, **kwargs):
         "Returns a new QuerySet instance with NOT (args) ANDed to the existing set."
         return self._filter_or_exclude(QNot, *args, **kwargs)
 
-    def _filter_or_exclude(self, qtype, *args, **kwargs):
+    def _filter_or_exclude(self, mapper, *args, **kwargs):
+        # mapper is a callable used to transform Q objects,
+        # or None for identity transform
+        if mapper is None:
+            mapper = lambda x: x
         if len(args) > 0 or len(kwargs) > 0:
             assert self._limit is None and self._offset is None, \
                 "Cannot filter a query once a slice has been taken."
 
         clone = self._clone()
         if len(kwargs) > 0:
-            clone._filters = clone._filters & qtype(**kwargs)
+            clone._filters = clone._filters & mapper(Q(**kwargs))
         if len(args) > 0:
-            clone._filters = clone._filters & reduce(operator.and_, args)
+            clone._filters = clone._filters & reduce(operator.and_, map(mapper, args))
         return clone
 
     def complex_filter(self, filter_obj):
@@ -314,7 +322,7 @@ class QuerySet(object):
         if hasattr(filter_obj, 'get_sql'):
             return self._filter_or_exclude(None, filter_obj)
         else:
-            return self._filter_or_exclude(Q, **filter_obj)
+            return self._filter_or_exclude(None, **filter_obj)
 
     def select_related(self, true_or_false=True):
         "Returns a new QuerySet instance with '_select_related' modified."
@@ -578,9 +586,12 @@ class Q(object):
 
 class QNot(Q):
     "Encapsulates NOT (...) queries as objects"
+    def __init__(self, q):
+        "Creates a negation of the q object passed in."
+        self.q = q
 
     def get_sql(self, opts):
-        tables, joins, where, params = super(QNot, self).get_sql(opts)
+        tables, joins, where, params = self.q.get_sql(opts)
         where2 = ['(NOT (%s))' % " AND ".join(where)]
         return tables, joins, where2, params
 

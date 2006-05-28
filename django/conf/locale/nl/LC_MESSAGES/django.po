@@ -9,13 +9,1412 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2006-05-16 10:13+0200\n"
+"POT-Creation-Date: 2006-05-16 17:21+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: Johan C. Stöver <johan@nilling.nl>\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+
+#: db/models/manipulators.py:302
+#, python-format
+msgid "%(object)s with this %(type)s already exists for the given %(field)s."
+msgstr ""
+"%(object)s van het type %(type)s bestaat al voor het gegeven %(field)s."
+
+#: db/models/fields/related.py:43
+#, python-format
+msgid "Please enter a valid %s."
+msgstr "Geef een geldig IP adres."
+
+#: db/models/fields/related.py:579
+msgid "Separate multiple IDs with commas."
+msgstr "Scheid meerdere ID's door komma's."
+
+#: db/models/fields/related.py:581
+msgid ""
+"Hold down \"Control\", or \"Command\" on a Mac, to select more than one."
+msgstr ""
+"Houd \"Control\", of \"Command\" op een Mac, ingedrukt om meerdere te "
+"selecteren."
+
+#: db/models/fields/related.py:625
+#, python-format
+msgid "Please enter valid %(self)s IDs. The value %(value)r is invalid."
+msgid_plural ""
+"Please enter valid %(self)s IDs. The values %(value)r are invalid."
+msgstr[0] "Geef een geldig %(self)s IDs. De waarde %(value)r is ongeldig."
+msgstr[1] "Geef een geldig %(self)s IDs. De waarden %(value)r zijn ongeldig."
+
+#: db/models/fields/__init__.py:40
+#, python-format
+msgid "%(optname)s with this %(fieldname)s already exists."
+msgstr "%(optname)s met deze %(fieldname)s bestaat al."
+
+#: db/models/fields/__init__.py:114 db/models/fields/__init__.py:265
+#: db/models/fields/__init__.py:542 db/models/fields/__init__.py:553
+#: forms/__init__.py:346
+msgid "This field is required."
+msgstr "Dit veld is verplicht."
+
+#: db/models/fields/__init__.py:337
+msgid "This value must be an integer."
+msgstr "De waarde moet een geheel getal zijn."
+
+#: db/models/fields/__init__.py:369
+msgid "This value must be either True or False."
+msgstr "De waarde moet of True (waar) of False (onwaar) zijn."
+
+#: db/models/fields/__init__.py:385
+msgid "This field cannot be null."
+msgstr "Dit veld mag niet leeg zijn."
+
+#: db/models/fields/__init__.py:468 core/validators.py:132
+msgid "Enter a valid date/time in YYYY-MM-DD HH:MM format."
+msgstr "Geef geldige datum/tijd in JJJJ-MM-DD HH:MM formaat."
+
+#: db/models/fields/__init__.py:562
+msgid "Enter a valid filename."
+msgstr "Geef een geldige bestandsnaam."
+
+#: conf/global_settings.py:37
+msgid "Bengali"
+msgstr "Bengaals"
+
+#: conf/global_settings.py:38
+msgid "Czech"
+msgstr "Tjechisch"
+
+#: conf/global_settings.py:39
+msgid "Welsh"
+msgstr "Wels"
+
+#: conf/global_settings.py:40
+msgid "Danish"
+msgstr "Deens"
+
+#: conf/global_settings.py:41
+msgid "German"
+msgstr "Duits"
+
+#: conf/global_settings.py:42
+msgid "Greek"
+msgstr "Grieks"
+
+#: conf/global_settings.py:43
+msgid "English"
+msgstr "Engels"
+
+#: conf/global_settings.py:44
+msgid "Spanish"
+msgstr "Spaans"
+
+#: conf/global_settings.py:45
+msgid "French"
+msgstr "Frans"
+
+#: conf/global_settings.py:46
+msgid "Galician"
+msgstr "Galisisch"
+
+#: conf/global_settings.py:47
+msgid "Hungarian"
+msgstr "Hongaars"
+
+#: conf/global_settings.py:48
+msgid "Hebrew"
+msgstr "Hebreews"
+
+#: conf/global_settings.py:49
+msgid "Icelandic"
+msgstr "IJslands"
+
+#: conf/global_settings.py:50
+msgid "Italian"
+msgstr "Italiaans"
+
+#: conf/global_settings.py:51
+msgid "Japanese"
+msgstr "Japans"
+
+#: conf/global_settings.py:52
+msgid "Dutch"
+msgstr "Nederlands"
+
+#: conf/global_settings.py:53
+msgid "Norwegian"
+msgstr "Noors"
+
+#: conf/global_settings.py:54
+msgid "Brazilian"
+msgstr "Braziliaans"
+
+#: conf/global_settings.py:55
+msgid "Romanian"
+msgstr "Roemeens"
+
+#: conf/global_settings.py:56
+msgid "Russian"
+msgstr "Russisch"
+
+#: conf/global_settings.py:57
+msgid "Slovak"
+msgstr "Slovaaks"
+
+#: conf/global_settings.py:58
+msgid "Slovenian"
+msgstr "Sloveens"
+
+#: conf/global_settings.py:59
+msgid "Serbian"
+msgstr "Servisch"
+
+#: conf/global_settings.py:60
+msgid "Swedish"
+msgstr "Zweeds"
+
+#: conf/global_settings.py:61
+msgid "Ukrainian"
+msgstr "Ukraiens"
+
+#: conf/global_settings.py:62
+msgid "Simplified Chinese"
+msgstr "Vereenvoudigd Chinees"
+
+#: conf/global_settings.py:63
+msgid "Traditional Chinese"
+msgstr "Traditioneel Chinees"
+
+#: core/validators.py:60
+msgid "This value must contain only letters, numbers and underscores."
+msgstr "Deze waarde mag alleen letters, getallen en liggende strepen bevatten."
+
+#: core/validators.py:64
+msgid ""
+"This value must contain only letters, numbers, underscores, dashes or "
+"slashes."
+msgstr ""
+"Deze waarde mag alleen letters, cijfers, liggende strepen en schuine strepen "
+"bevatten."
+
+#: core/validators.py:72
+msgid "Uppercase letters are not allowed here."
+msgstr "Hoofdletters zijn hier niet toegestaan."
+
+#: core/validators.py:76
+msgid "Lowercase letters are not allowed here."
+msgstr "Kleine letters zijn hier niet toegestaan."
+
+#: core/validators.py:83
+msgid "Enter only digits separated by commas."
+msgstr "Geef alleen cijfers op, gescheiden door komma's."
+
+#: core/validators.py:95
+msgid "Enter valid e-mail addresses separated by commas."
+msgstr "Geef geldige e-mailadressen op, gescheiden door komma's."
+
+#: core/validators.py:99
+msgid "Please enter a valid IP address."
+msgstr "Geef een geldig IP adres op."
+
+#: core/validators.py:103
+msgid "Empty values are not allowed here."
+msgstr "Lege waarden niet toegestaan."
+
+#: core/validators.py:107
+msgid "Non-numeric characters aren't allowed here."
+msgstr "Niet-numerieke karakters niet toegestaan."
+
+#: core/validators.py:111
+msgid "This value can't be comprised solely of digits."
+msgstr "Deze waarde kan niet alleen uit cijfers bestaan."
+
+#: core/validators.py:116
+msgid "Enter a whole number."
+msgstr "Geef een geheel getal op."
+
+#: core/validators.py:120
+msgid "Only alphabetical characters are allowed here."
+msgstr "Alleen alfabetische karakters zijn toegestaan"
+
+#: core/validators.py:124
+msgid "Enter a valid date in YYYY-MM-DD format."
+msgstr "Geef een geldige datum in JJJJ-MM-DD formaat."
+
+#: core/validators.py:128
+msgid "Enter a valid time in HH:MM format."
+msgstr "Geef een geldige tijd in HH:MM formaat."
+
+#: core/validators.py:136
+msgid "Enter a valid e-mail address."
+msgstr "Geef een geldig e-mailadres op."
+
+#: core/validators.py:148
+msgid ""
+"Upload a valid image. The file you uploaded was either not an image or a "
+"corrupted image."
+msgstr ""
+"Bestand ongeldig. Het bestand dat is gegeven is geen afbeelding of was "
+"beschadigd."
+
+#: core/validators.py:155
+#, python-format
+msgid "The URL %s does not point to a valid image."
+msgstr "De URL %s wijst niet naar een afbeelding."
+
+#: core/validators.py:159
+#, python-format
+msgid "Phone numbers must be in XXX-XXX-XXXX format. \"%s\" is invalid."
+msgstr ""
+"Telefoonnummers moeten volgens het XXX-XXX-XXXX formaat zijn. \"%s\" is "
+"ongeldig."
+
+#: core/validators.py:167
+#, python-format
+msgid "The URL %s does not point to a valid QuickTime video."
+msgstr "De URL %s wijst niet naar een QuickTime video."
+
+#: core/validators.py:171
+msgid "A valid URL is required."
+msgstr "Een geldige URL is vereist."
+
+#: core/validators.py:185
+#, python-format
+msgid ""
+"Valid HTML is required. Specific errors are:\n"
+"%s"
+msgstr ""
+"Geldige HTML is vereist. De specifieke fouten zijn:\n"
+"%s"
+
+#: core/validators.py:192
+#, python-format
+msgid "Badly formed XML: %s"
+msgstr "Foute XML: %s"
+
+#: core/validators.py:202
+#, python-format
+msgid "Invalid URL: %s"
+msgstr "Ongeldige URL: %s"
+
+#: core/validators.py:206 core/validators.py:208
+#, python-format
+msgid "The URL %s is a broken link."
+msgstr "De URL %s is een niet werkende link."
+
+#: core/validators.py:214
+msgid "Enter a valid U.S. state abbreviation."
+msgstr "Geef een geldige afkorting van een VS staat."
+
+#: core/validators.py:229
+#, python-format
+msgid "Watch your mouth! The word %s is not allowed here."
+msgid_plural "Watch your mouth! The words %s are not allowed here."
+msgstr[0] "Pas op uw taalgebruik! Gebruik van %s niet toegestaan."
+msgstr[1] "Pas op uw taalgebruik! Gebruik van de woorden %s niet toegestaan."
+
+#: core/validators.py:236
+#, python-format
+msgid "This field must match the '%s' field."
+msgstr "Dit veld moet overeenkomen met het '%s' veld."
+
+#: core/validators.py:255
+msgid "Please enter something for at least one field."
+msgstr "Geef in minimaal één veld een waarde."
+
+#: core/validators.py:264 core/validators.py:275
+msgid "Please enter both fields or leave them both empty."
+msgstr "Voer waarden in in beide velden of laat beide leeg."
+
+#: core/validators.py:282
+#, python-format
+msgid "This field must be given if %(field)s is %(value)s"
+msgstr "Dit veld moet opgegeven worden indien %(field)s %(value)s is"
+
+#: core/validators.py:294
+#, python-format
+msgid "This field must be given if %(field)s is not %(value)s"
+msgstr "Dit veld moet worden opgegeven indien %(field)s niet %(value)s is"
+
+#: core/validators.py:313
+msgid "Duplicate values are not allowed."
+msgstr "Dubbele waarden zijn niet toegestaan."
+
+#: core/validators.py:336
+#, python-format
+msgid "This value must be a power of %s."
+msgstr "De waarde moet een macht van %s zijn."
+
+#: core/validators.py:347
+msgid "Please enter a valid decimal number."
+msgstr "Geef een geldig decimaal getal."
+
+#: core/validators.py:349
+#, python-format
+msgid "Please enter a valid decimal number with at most %s total digit."
+msgid_plural ""
+"Please enter a valid decimal number with at most %s total digits."
+msgstr[0] "Geef een geldig decimaal getal met maximaal %s cijfer."
+msgstr[1] "Geef een geldig decimaal getal met maximaal %s cijfers."
+
+#: core/validators.py:352
+#, python-format
+msgid "Please enter a valid decimal number with at most %s decimal place."
+msgid_plural ""
+"Please enter a valid decimal number with at most %s decimal places."
+msgstr[0] "Geef een decimaal getal met maximaal %s cijfer achter de komma."
+msgstr[1] "Geef een decimaal getal met maximaal %s cijfers achter de komma."
+
+#: core/validators.py:362
+#, python-format
+msgid "Make sure your uploaded file is at least %s bytes big."
+msgstr "Zorg ervoor dat het bestand minimaal %s bytes groot is."
+
+#: core/validators.py:363
+#, python-format
+msgid "Make sure your uploaded file is at most %s bytes big."
+msgstr "Zorg ervoor dat het bestand maximaal %s bytes groot is."
+
+#: core/validators.py:376
+msgid "The format for this field is wrong."
+msgstr "Het formaat van dit veld is fout."
+
+#: core/validators.py:391
+msgid "This field is invalid."
+msgstr "Dit veld is ongeldig."
+
+#: core/validators.py:426
+#, python-format
+msgid "Could not retrieve anything from %s."
+msgstr "Kan niks ophalen van %s."
+
+#: core/validators.py:429
+#, python-format
+msgid ""
+"The URL %(url)s returned the invalid Content-Type header '%(contenttype)s'."
+msgstr ""
+"De geretourneerde URL %(url)s bevat een ongeldige Content-Type '%"
+"(contenttype)s."
+
+#: core/validators.py:462
+#, python-format
+msgid ""
+"Please close the unclosed %(tag)s tag from line %(line)s. (Line starts with "
+"\"%(start)s\".)"
+msgstr ""
+"Sluit de niet gesloten %(tag)s tag op regel %(line)s. (Regel start met \"%"
+"(start)s\".)"
+
+#: core/validators.py:466
+#, python-format
+msgid ""
+"Some text starting on line %(line)s is not allowed in that context. (Line "
+"starts with \"%(start)s\".)"
+msgstr ""
+"Tekst beginnend op regel %(line)s is in deze context niet toegestaan. (Regel "
+"start met \"%(start)s\".)"
+
+#: core/validators.py:471
+#, python-format
+msgid ""
+"\"%(attr)s\" on line %(line)s is an invalid attribute. (Line starts with \"%"
+"(start)s\".)"
+msgstr ""
+"\"%(attr)s\" op regel %(line)s is een ongeldig attribuut. (Regel start met "
+"\"%(start)s\".)"
+
+#: core/validators.py:476
+#, python-format
+msgid ""
+"\"<%(tag)s>\" on line %(line)s is an invalid tag. (Line starts with \"%"
+"(start)s\".)"
+msgstr ""
+"\"<%(tag)s>\" op regel %(line)s is een ongeldige tag. (Regel start met \"%"
+"(start)s\".)"
+
+#: core/validators.py:480
+#, python-format
+msgid ""
+"A tag on line %(line)s is missing one or more required attributes. (Line "
+"starts with \"%(start)s\".)"
+msgstr ""
+"Een of meerdere attributen ontbreken bij een tag op regel %(line)s. (Regel "
+"start met \"%(start)s\".)"
+
+#: core/validators.py:485
+#, python-format
+msgid ""
+"The \"%(attr)s\" attribute on line %(line)s has an invalid value. (Line "
+"starts with \"%(start)s\".)"
+msgstr ""
+"De \"%(attr)s\" attribuut op regel %(line)s heeft een ongeldige waarde. "
+"(Regel start met \"%(start)s\".)"
+
+#: contrib/auth/forms.py:30
+msgid ""
+"Your Web browser doesn't appear to have cookies enabled. Cookies are "
+"required for logging in."
+msgstr ""
+"Het lijkt erop dat uw browser geen cookies accepteerd. Om u aan te melden "
+"moeten cookies worden geaccepteerd."
+
+#: contrib/auth/forms.py:36 contrib/auth/forms.py:41
+#: contrib/admin/views/decorators.py:9
+msgid ""
+"Please enter a correct username and password. Note that both fields are case-"
+"sensitive."
+msgstr ""
+"Geef een correcte gebruikersnaam en wachtwoord. Let op de velden zijn "
+"hoofdletter-gevoelig."
+
+#: contrib/auth/models.py:13 contrib/auth/models.py:26
+msgid "name"
+msgstr "naam"
+
+#: contrib/auth/models.py:15
+msgid "codename"
+msgstr "codenaam"
+
+#: contrib/auth/models.py:17
+msgid "permission"
+msgstr "recht"
+
+#: contrib/auth/models.py:18 contrib/auth/models.py:27
+msgid "permissions"
+msgstr "rechten"
+
+#: contrib/auth/models.py:29
+msgid "group"
+msgstr "groep"
+
+#: contrib/auth/models.py:30 contrib/auth/models.py:65
+msgid "groups"
+msgstr "groepen"
+
+#: contrib/auth/models.py:55
+msgid "username"
+msgstr "gebruikersnaam"
+
+#: contrib/auth/models.py:56
+msgid "first name"
+msgstr "voornaam"
+
+#: contrib/auth/models.py:57
+msgid "last name"
+msgstr "achternaam"
+
+#: contrib/auth/models.py:58
+msgid "e-mail address"
+msgstr "e-mailadres"
+
+#: contrib/auth/models.py:59
+msgid "password"
+msgstr "wachtwoord"
+
+#: contrib/auth/models.py:59
+msgid "Use '[algo]$[salt]$[hexdigest]'"
+msgstr "Gebruik '[algo]$[salt]$[hexdigest]'"
+
+#: contrib/auth/models.py:60
+msgid "staff status"
+msgstr "staf status"
+
+#: contrib/auth/models.py:60
+msgid "Designates whether the user can log into this admin site."
+msgstr "Bepaalt of de gebruiker kan inloggen op deze admin site"
+
+#: contrib/auth/models.py:61
+msgid "active"
+msgstr "actief"
+
+#: contrib/auth/models.py:62
+msgid "superuser status"
+msgstr "supergebruiker status"
+
+#: contrib/auth/models.py:63
+msgid "last login"
+msgstr "laatste aanmelding"
+
+#: contrib/auth/models.py:64
+msgid "date joined"
+msgstr "datum toegetreden"
+
+#: contrib/auth/models.py:66
+msgid ""
+"In addition to the permissions manually assigned, this user will also get "
+"all permissions granted to each group he/she is in."
+msgstr ""
+"Bovenop de rechten welke handmatig zijn toegekend, krijgt deze gebruiker ook "
+"alle rechten van de groepen waar hij of zij deel van uitmaakt."
+
+#: contrib/auth/models.py:67
+msgid "user permissions"
+msgstr "gebruikersrechten"
+
+#: contrib/auth/models.py:70
+msgid "user"
+msgstr "gebruiker"
+
+#: contrib/auth/models.py:71
+msgid "users"
+msgstr "gebruikers"
+
+#: contrib/auth/models.py:76
+msgid "Personal info"
+msgstr "Persoonlijke informatie"
+
+#: contrib/auth/models.py:77
+msgid "Permissions"
+msgstr "Rechten"
+
+#: contrib/auth/models.py:78
+msgid "Important dates"
+msgstr "Belangrijke data"
+
+#: contrib/auth/models.py:79
+msgid "Groups"
+msgstr "Groepen"
+
+#: contrib/auth/models.py:219
+msgid "message"
+msgstr "bericht"
+
+#: contrib/admin/models.py:16
+msgid "action time"
+msgstr "actie tijd"
+
+#: contrib/admin/models.py:19
+msgid "object id"
+msgstr "object id"
+
+#: contrib/admin/models.py:20
+msgid "object repr"
+msgstr "object repr"
+
+#: contrib/admin/models.py:21
+msgid "action flag"
+msgstr "actie vlag"
+
+#: contrib/admin/models.py:22
+msgid "change message"
+msgstr "wijzig bericht"
+
+#: contrib/admin/models.py:25
+msgid "log entry"
+msgstr "log ingave"
+
+#: contrib/admin/models.py:26
+msgid "log entries"
+msgstr "log ingaves"
+
+#: contrib/admin/filterspecs.py:40
+#, python-format
+msgid ""
+"<h3>By %s:</h3>\n"
+"<ul>\n"
+msgstr ""
+"<h3>Door %s:</h3>\n"
+"<ul>\n"
+
+#: contrib/admin/filterspecs.py:70 contrib/admin/filterspecs.py:88
+#: contrib/admin/filterspecs.py:143
+msgid "All"
+msgstr "Alle"
+
+#: contrib/admin/filterspecs.py:109
+msgid "Any date"
+msgstr "Elke datum"
+
+#: contrib/admin/filterspecs.py:110
+msgid "Today"
+msgstr "Vandaag"
+
+#: contrib/admin/filterspecs.py:113
+msgid "Past 7 days"
+msgstr "Laatste 7 dagen"
+
+#: contrib/admin/filterspecs.py:115
+msgid "This month"
+msgstr "Deze maand"
+
+#: contrib/admin/filterspecs.py:117
+msgid "This year"
+msgstr "Dit jaar"
+
+#: contrib/admin/filterspecs.py:143
+msgid "Yes"
+msgstr "Ja"
+
+#: contrib/admin/filterspecs.py:143
+msgid "No"
+msgstr "Nee"
+
+#: contrib/admin/filterspecs.py:150
+msgid "Unknown"
+msgstr "Onbekend"
+
+#: contrib/admin/views/decorators.py:23
+#: contrib/admin/templates/admin/login.html:25
+msgid "Log in"
+msgstr "Aanmelden"
+
+#: contrib/admin/views/decorators.py:61
+msgid ""
+"Please log in again, because your session has expired. Don't worry: Your "
+"submission has been saved."
+msgstr ""
+"Uw sessie is verlopen, meldt u opnieuw aan. Maakt u geen zorgen: Uw bijdrage "
+"is opgeslagen."
+
+#: contrib/admin/views/decorators.py:68
+msgid ""
+"Looks like your browser isn't configured to accept cookies. Please enable "
+"cookies, reload this page, and try again."
+msgstr ""
+"Het lijkt erop dat uw browser geen cookies accepteerd. Zet het gebruik van "
+"cookies aan in uw browser, laad deze pagina nogmaals en probeer het opnieuw."
+
+#: contrib/admin/views/decorators.py:82
+msgid "Usernames cannot contain the '@' character."
+msgstr "Gebruikersnamen mogen geen '@' bevatten."
+
+#: contrib/admin/views/decorators.py:84
+#, python-format
+msgid "Your e-mail address is not your username. Try '%s' instead."
+msgstr "Uw e-mail adres is niet uw gebruikersnaam. Probeer '%s' eens."
+
+#: contrib/admin/views/main.py:226
+msgid "Site administration"
+msgstr "Site beheer"
+
+#: contrib/admin/views/main.py:260
+#, python-format
+msgid "The %(name)s \"%(obj)s\" was added successfully."
+msgstr "De %(name)s \"%(obj)s\" is toegevoegd."
+
+#: contrib/admin/views/main.py:264 contrib/admin/views/main.py:348
+msgid "You may edit it again below."
+msgstr "U kunt dit hieronder weer bewerken."
+
+#: contrib/admin/views/main.py:272 contrib/admin/views/main.py:357
+#, python-format
+msgid "You may add another %s below."
+msgstr "U kunt hieronder de volgende %s toevoegen."
+
+#: contrib/admin/views/main.py:290
+#, python-format
+msgid "Add %s"
+msgstr "Toevoegen %s"
+
+#: contrib/admin/views/main.py:336
+#, python-format
+msgid "Added %s."
+msgstr "%s toegevoegd."
+
+#: contrib/admin/views/main.py:336 contrib/admin/views/main.py:338
+#: contrib/admin/views/main.py:340
+msgid "and"
+msgstr "en"
+
+#: contrib/admin/views/main.py:338
+#, python-format
+msgid "Changed %s."
+msgstr "Gewijzigd %s"
+
+#: contrib/admin/views/main.py:340
+#, python-format
+msgid "Deleted %s."
+msgstr "%s verwijderd."
+
+#: contrib/admin/views/main.py:343
+msgid "No fields changed."
+msgstr "Geen velden gewijzigd."
+
+#: contrib/admin/views/main.py:346
+#, python-format
+msgid "The %(name)s \"%(obj)s\" was changed successfully."
+msgstr "Wijzigen %(name)s \"%(obj)s\" is geslaagd."
+
+#: contrib/admin/views/main.py:354
+#, python-format
+msgid ""
+"The %(name)s \"%(obj)s\" was added successfully. You may edit it again below."
+msgstr "De %(name)s \"%(obj)s\" toegevoegd. U kunt het hieronder wijzigen."
+
+#: contrib/admin/views/main.py:392
+#, python-format
+msgid "Change %s"
+msgstr "Wijzig %s"
+
+#: contrib/admin/views/main.py:470
+#, python-format
+msgid "One or more %(fieldname)s in %(name)s: %(obj)s"
+msgstr "Een of meer %(fieldname)s in %(name)s: %(obj)s"
+
+#: contrib/admin/views/main.py:475
+#, python-format
+msgid "One or more %(fieldname)s in %(name)s:"
+msgstr "Een of meer %(fieldname)s in %(name)s:"
+
+#: contrib/admin/views/main.py:508
+#, python-format
+msgid "The %(name)s \"%(obj)s\" was deleted successfully."
+msgstr "Verwijdering %(name)s \"%(obj)s\" is geslaagd."
+
+#: contrib/admin/views/main.py:511
+msgid "Are you sure?"
+msgstr "Weet u het zeker?"
+
+#: contrib/admin/views/main.py:533
+#, python-format
+msgid "Change history: %s"
+msgstr "Wijzigingshistorie: %s"
+
+#: contrib/admin/views/main.py:565
+#, python-format
+msgid "Select %s"
+msgstr "Selecteer %s"
+
+#: contrib/admin/views/main.py:565
+#, python-format
+msgid "Select %s to change"
+msgstr "Selecteer %s om te wijzigen"
+
+#: contrib/admin/views/doc.py:277 contrib/admin/views/doc.py:286
+#: contrib/admin/views/doc.py:288 contrib/admin/views/doc.py:294
+#: contrib/admin/views/doc.py:295 contrib/admin/views/doc.py:297
+msgid "Integer"
+msgstr "Geheel getal"
+
+#: contrib/admin/views/doc.py:278
+msgid "Boolean (Either True or False)"
+msgstr "Boolean (True of False)"
+
+#: contrib/admin/views/doc.py:279 contrib/admin/views/doc.py:296
+#, python-format
+msgid "String (up to %(maxlength)s)"
+msgstr "Karakterreeks (maximaal %(maxlength)s)"
+
+#: contrib/admin/views/doc.py:280
+msgid "Comma-separated integers"
+msgstr "Komma-gescheiden gehele getallen"
+
+#: contrib/admin/views/doc.py:281
+msgid "Date (without time)"
+msgstr "Datum (zonder tijd)"
+
+#: contrib/admin/views/doc.py:282
+msgid "Date (with time)"
+msgstr "Datum (met tijd)"
+
+#: contrib/admin/views/doc.py:283
+msgid "E-mail address"
+msgstr "E-mailadres"
+
+#: contrib/admin/views/doc.py:284 contrib/admin/views/doc.py:287
+msgid "File path"
+msgstr "Bestandspad"
+
+#: contrib/admin/views/doc.py:285
+msgid "Decimal number"
+msgstr "Decimaal getal"
+
+#: contrib/admin/views/doc.py:289 contrib/comments/models.py:85
+msgid "IP address"
+msgstr "IP adres"
+
+#: contrib/admin/views/doc.py:291
+msgid "Boolean (Either True, False or None)"
+msgstr "Boolean (True, False of None)"
+
+#: contrib/admin/views/doc.py:292
+msgid "Relation to parent model"
+msgstr "Relatie tot ouder model"
+
+#: contrib/admin/views/doc.py:293
+msgid "Phone number"
+msgstr "Telefoonnummer"
+
+#: contrib/admin/views/doc.py:298
+msgid "Text"
+msgstr "Tekst"
+
+#: contrib/admin/views/doc.py:299
+msgid "Time"
+msgstr "Tijd"
+
+#: contrib/admin/views/doc.py:300 contrib/flatpages/models.py:7
+msgid "URL"
+msgstr "URL"
+
+#: contrib/admin/views/doc.py:301
+msgid "U.S. state (two uppercase letters)"
+msgstr "Staat van de VS (twee hoofdletters)"
+
+#: contrib/admin/views/doc.py:302
+msgid "XML text"
+msgstr "XML Tekst"
+
+#: contrib/admin/templatetags/admin_list.py:228
+msgid "All dates"
+msgstr "Alle data"
+
+#: contrib/admin/templates/admin/delete_confirmation.html:3
+#: contrib/admin/templates/admin/change_form.html:10
+#: contrib/admin/templates/admin/change_list.html:5
+#: contrib/admin/templates/admin/object_history.html:3
+#: contrib/admin/templates/admin/base.html:23
+#: contrib/admin/templates/admin_doc/bookmarklets.html:3
+#: contrib/admin/templates/registration/password_change_form.html:3
+#: contrib/admin/templates/registration/password_change_done.html:3
+msgid "Documentation"
+msgstr "Documentatie"
+
+#: contrib/admin/templates/admin/delete_confirmation.html:3
+#: contrib/admin/templates/admin/change_form.html:10
+#: contrib/admin/templates/admin/change_list.html:5
+#: contrib/admin/templates/admin/object_history.html:3
+#: contrib/admin/templates/admin/base.html:23
+#: contrib/admin/templates/admin_doc/template_filter_index.html:5
+#: contrib/admin/templates/admin_doc/bookmarklets.html:4
+#: contrib/admin/templates/admin_doc/template_tag_index.html:5
+#: contrib/admin/templates/admin_doc/index.html:4
+#: contrib/admin/templates/admin_doc/model_detail.html:3
+#: contrib/admin/templates/admin_doc/missing_docutils.html:4
+#: contrib/admin/templates/admin_doc/template_detail.html:4
+#: contrib/admin/templates/admin_doc/view_index.html:5
+#: contrib/admin/templates/admin_doc/model_index.html:5
+#: contrib/admin/templates/admin_doc/view_detail.html:4
+#: contrib/admin/templates/registration/password_change_form.html:3
+#: contrib/admin/templates/registration/password_change_done.html:3
+msgid "Change password"
+msgstr "Wachtwoord wijzigen"
+
+#: contrib/admin/templates/admin/delete_confirmation.html:3
+#: contrib/admin/templates/admin/change_form.html:10
+#: contrib/admin/templates/admin/change_list.html:5
+#: contrib/admin/templates/admin/object_history.html:3
+#: contrib/admin/templates/admin/base.html:23
+#: contrib/admin/templates/admin_doc/template_filter_index.html:5
+#: contrib/admin/templates/admin_doc/bookmarklets.html:4
+#: contrib/admin/templates/admin_doc/template_tag_index.html:5
+#: contrib/admin/templates/admin_doc/index.html:4
+#: contrib/admin/templates/admin_doc/model_detail.html:3
+#: contrib/admin/templates/admin_doc/missing_docutils.html:4
+#: contrib/admin/templates/admin_doc/template_detail.html:4
+#: contrib/admin/templates/admin_doc/view_index.html:5
+#: contrib/admin/templates/admin_doc/model_index.html:5
+#: contrib/admin/templates/admin_doc/view_detail.html:4
+#: contrib/admin/templates/registration/password_change_form.html:3
+#: contrib/admin/templates/registration/password_change_done.html:3
+#: contrib/comments/templates/comments/form.html:8
+msgid "Log out"
+msgstr "Afmelden"
+
+#: contrib/admin/templates/admin/delete_confirmation.html:6
+#: contrib/admin/templates/admin/change_form.html:13
+#: contrib/admin/templates/admin/change_list.html:6
+#: contrib/admin/templates/admin/object_history.html:5
+#: contrib/admin/templates/admin/500.html:4
+#: contrib/admin/templates/admin/base.html:28
+#: contrib/admin/templates/admin_doc/bookmarklets.html:3
+#: contrib/admin/templates/registration/password_reset_form.html:4
+#: contrib/admin/templates/registration/logged_out.html:4
+#: contrib/admin/templates/registration/password_reset_done.html:4
+#: contrib/admin/templates/registration/password_change_form.html:4
+#: contrib/admin/templates/registration/password_change_done.html:4
+msgid "Home"
+msgstr "Voorpagina"
+
+#: contrib/admin/templates/admin/delete_confirmation.html:9
+#: contrib/admin/templates/admin/submit_line.html:3
+msgid "Delete"
+msgstr "Verwijderen"
+
+#: contrib/admin/templates/admin/delete_confirmation.html:14
+#, python-format
+msgid ""
+"Deleting the %(object_name)s '%(object)s' would result in deleting related "
+"objects, but your account doesn't have permission to delete the following "
+"types of objects:"
+msgstr ""
+"Verwijderen van %(object_name)s '%(object)s' zal ook gerelateerde objecten "
+"verwijderen. Echter u heeft geen rechten om de volgende typen objecten te "
+"verwijderen:"
+
+#: contrib/admin/templates/admin/delete_confirmation.html:21
+#, python-format
+msgid ""
+"Are you sure you want to delete the %(object_name)s \"%(object)s\"? All of "
+"the following related items will be deleted:"
+msgstr ""
+"Weet u zeker dat u %(object_name)s \"%(object)s\" wilt verwijderen? Alle "
+"volgende opjecten worden verwijderd:"
+
+#: contrib/admin/templates/admin/delete_confirmation.html:26
+msgid "Yes, I'm sure"
+msgstr "Ja, Ik weet het zeker"
+
+#: contrib/admin/templates/admin/404.html:4
+#: contrib/admin/templates/admin/404.html:8
+msgid "Page not found"
+msgstr "Pagina niet gevonden"
+
+#: contrib/admin/templates/admin/404.html:10
+msgid "We're sorry, but the requested page could not be found."
+msgstr "De gevraagde pagina komt niet voor."
+
+#: contrib/admin/templates/admin/change_form.html:15
+#: contrib/admin/templates/admin/index.html:28
+msgid "Add"
+msgstr "Toevoegen"
+
+#: contrib/admin/templates/admin/change_form.html:20
+#: contrib/admin/templates/admin/object_history.html:5
+msgid "History"
+msgstr "Geschiedenis"
+
+#: contrib/admin/templates/admin/change_form.html:21
+msgid "View on site"
+msgstr "Toon op site"
+
+#: contrib/admin/templates/admin/change_form.html:30
+msgid "Please correct the error below."
+msgid_plural "Please correct the errors below."
+msgstr[0] "Herstel de fout hieronder."
+msgstr[1] "Herstel de fouten hieronder."
+
+#: contrib/admin/templates/admin/change_form.html:48
+msgid "Ordering"
+msgstr "Sortering"
+
+#: contrib/admin/templates/admin/change_form.html:51
+msgid "Order:"
+msgstr "Sortering:"
+
+#: contrib/admin/templates/admin/filter.html:2
+#, python-format
+msgid " By %(title)s "
+msgstr " Op %(title)s "
+
+#: contrib/admin/templates/admin/submit_line.html:4
+msgid "Save as new"
+msgstr "Opslaan als nieuw item"
+
+#: contrib/admin/templates/admin/submit_line.html:5
+msgid "Save and add another"
+msgstr "Opslaan en nieuw item"
+
+#: contrib/admin/templates/admin/submit_line.html:6
+msgid "Save and continue editing"
+msgstr "Opslaan en bewerk opnieuw"
+
+#: contrib/admin/templates/admin/submit_line.html:7
+msgid "Save"
+msgstr "Opslaan"
+
+#: contrib/admin/templates/admin/change_list.html:11
+#, python-format
+msgid "Add %(name)s"
+msgstr "%(name)s toevoegen"
+
+#: contrib/admin/templates/admin/index.html:17
+#, python-format
+msgid "Models available in the %(name)s application."
+msgstr "Beschikbare modellen in de %(name)s toepassing."
+
+#: contrib/admin/templates/admin/index.html:34
+msgid "Change"
+msgstr "Wijzigen"
+
+#: contrib/admin/templates/admin/index.html:44
+msgid "You don't have permission to edit anything."
+msgstr "U heeft geen rechten om iets te wijzigen"
+
+#: contrib/admin/templates/admin/index.html:52
+msgid "Recent Actions"
+msgstr "Recente acties"
+
+#: contrib/admin/templates/admin/index.html:53
+msgid "My Actions"
+msgstr "Mijn acties"
+
+#: contrib/admin/templates/admin/index.html:57
+msgid "None available"
+msgstr "Geen beschikbaar"
+
+#: contrib/admin/templates/admin/base_site.html:4
+msgid "Django site admin"
+msgstr "Django site beheer"
+
+#: contrib/admin/templates/admin/base_site.html:7
+msgid "Django administration"
+msgstr "Django beheer"
+
+#: contrib/admin/templates/admin/object_history.html:18
+msgid "Date/time"
+msgstr "Datum/tijd"
+
+#: contrib/admin/templates/admin/object_history.html:19
+msgid "User"
+msgstr "Gebruiker"
+
+#: contrib/admin/templates/admin/object_history.html:20
+msgid "Action"
+msgstr "Actie"
+
+#: contrib/admin/templates/admin/object_history.html:26
+msgid "DATE_WITH_TIME_FULL"
+msgstr "d-n-Y H:i:s"
+
+#: contrib/admin/templates/admin/object_history.html:36
+msgid ""
+"This object doesn't have a change history. It probably wasn't added via this "
+"admin site."
+msgstr ""
+"Dit object heeft geen geschiedenis. Mogelijk niet via de admin site "
+"toegevoegd."
+
+#: contrib/admin/templates/admin/500.html:4
+msgid "Server error"
+msgstr "Server fout"
+
+#: contrib/admin/templates/admin/500.html:6
+msgid "Server error (500)"
+msgstr "Server fout (500)"
+
+#: contrib/admin/templates/admin/500.html:9
+msgid "Server Error <em>(500)</em>"
+msgstr "Server Fout <em>(500)</em>"
+
+#: contrib/admin/templates/admin/500.html:10
+msgid ""
+"There's been an error. It's been reported to the site administrators via e-"
+"mail and should be fixed shortly. Thanks for your patience."
+msgstr ""
+"Er is een fout opgetreden. Dit is inmiddels doorgegevens aan de "
+"sitebeheerder via e-mail en zal binnenkort worden gerepareerd. Bedankt voor "
+"uw geduld"
+
+#: contrib/admin/templates/admin/search_form.html:8
+msgid "Go"
+msgstr "Zoek"
+
+#: contrib/admin/templates/admin/login.html:17
+#: contrib/comments/templates/comments/form.html:6
+#: contrib/comments/templates/comments/form.html:8
+msgid "Username:"
+msgstr "Gebruikersnaam:"
+
+#: contrib/admin/templates/admin/login.html:20
+#: contrib/comments/templates/comments/form.html:6
+msgid "Password:"
+msgstr "Wachtwoord:"
+
+#: contrib/admin/templates/admin/login.html:22
+msgid "Have you <a href=\"/password_reset/\">forgotten your password</a>?"
+msgstr "Wachtwoord <a href=\"/password_reset/\">vergeten</a>?"
+
+#: contrib/admin/templates/admin/base.html:23
+msgid "Welcome,"
+msgstr "Welkom,"
+
+#: contrib/admin/templates/admin_doc/bookmarklets.html:3
+msgid "Bookmarklets"
+msgstr "Bookmarklets"
+
+#: contrib/admin/templates/admin_doc/bookmarklets.html:5
+msgid "Documentation bookmarklets"
+msgstr "Documentatie bookmarklets"
+
+#: contrib/admin/templates/admin_doc/bookmarklets.html:9
+msgid ""
+"\n"
+"<p class=\"help\">To install bookmarklets, drag the link to your bookmarks\n"
+"toolbar, or right-click the link and add it to your bookmarks. Now you can\n"
+"select the bookmarklet from any page in the site.  Note that some of these\n"
+"bookmarklets require you to be viewing the site from a computer designated\n"
+"as \"internal\" (talk to your system administrator if you aren't sure if\n"
+"your computer is \"internal\").</p>\n"
+msgstr ""
+"\n"
+"<p class=\"help\">Om bookmarklets te installeren, sleep de link naar uw "
+"bladwijzers\n"
+"werkbalk, of rechtermuis klik op de link en voeg het toe aan de bladwijzer. "
+"Nu kan\n"
+"de bookmarklet vanuit elke pagina op de site worden gekozen. Let erop dat "
+"het soms\n"
+"noodzakelijk is dat de computer van waaruit de pagina wordt bekeken intern "
+"is\n"
+"(Raadpleeg uw systeembeheerder of uw computer zich op het interne netwerk "
+"bevind).<p>\n"
+
+#: contrib/admin/templates/admin_doc/bookmarklets.html:19
+msgid "Documentation for this page"
+msgstr "Documentatie voor deze pagina"
+
+#: contrib/admin/templates/admin_doc/bookmarklets.html:20
+msgid ""
+"Jumps you from any page to the documentation for the view that generates "
+"that page."
+msgstr ""
+"Spring vanuit elke pagina naar de documentatie voor de view die gegenereerd "
+"wordt door die pagina"
+
+#: contrib/admin/templates/admin_doc/bookmarklets.html:22
+msgid "Show object ID"
+msgstr "Toon object ID"
+
+#: contrib/admin/templates/admin_doc/bookmarklets.html:23
+msgid ""
+"Shows the content-type and unique ID for pages that represent a single "
+"object."
+msgstr ""
+"Toont de content-type en unieke ID voor pagina's die een enkel object "
+"voorsteld."
+
+#: contrib/admin/templates/admin_doc/bookmarklets.html:25
+msgid "Edit this object (current window)"
+msgstr "Bewerk dit object (huidig venster)"
+
+#: contrib/admin/templates/admin_doc/bookmarklets.html:26
+msgid "Jumps to the admin page for pages that represent a single object."
+msgstr "Ga naar de beheerpagina voor pagina's die een enkel object weergeven."
+
+#: contrib/admin/templates/admin_doc/bookmarklets.html:28
+msgid "Edit this object (new window)"
+msgstr "Bewerk dit object (nieuwe pagina)"
+
+#: contrib/admin/templates/admin_doc/bookmarklets.html:29
+msgid "As above, but opens the admin page in a new window."
+msgstr "Als boven, maar opent de beheerpagina in een nieuw venster."
+
+#: contrib/admin/templates/widget/date_time.html:3
+msgid "Date:"
+msgstr "Datum:"
+
+#: contrib/admin/templates/widget/date_time.html:4
+msgid "Time:"
+msgstr "Tijd:"
+
+#: contrib/admin/templates/widget/file.html:2
+msgid "Currently:"
+msgstr "Huidige:"
+
+#: contrib/admin/templates/widget/file.html:3
+msgid "Change:"
+msgstr "Wijziging:"
+
+#: contrib/admin/templates/registration/password_reset_form.html:4
+#: contrib/admin/templates/registration/password_reset_form.html:6
+#: contrib/admin/templates/registration/password_reset_form.html:10
+#: contrib/admin/templates/registration/password_reset_done.html:4
+msgid "Password reset"
+msgstr "Wachtwoord hersteld"
+
+#: contrib/admin/templates/registration/password_reset_form.html:12
+msgid ""
+"Forgotten your password? Enter your e-mail address below, and we'll reset "
+"your password and e-mail the new one to you."
+msgstr ""
+"Wachtwoord vergeten? Geef u e-mail adres op en we herstellen uw wachtwoord "
+"en zullen u het nieuwe wachtwoord per e-mail toesturen."
+
+#: contrib/admin/templates/registration/password_reset_form.html:16
+msgid "E-mail address:"
+msgstr "E-mailadres:"
+
+#: contrib/admin/templates/registration/password_reset_form.html:16
+msgid "Reset my password"
+msgstr "Herstel mijn wachtwoord"
+
+#: contrib/admin/templates/registration/password_reset_email.html:2
+msgid "You're receiving this e-mail because you requested a password reset"
+msgstr "U krijgt een e-mail omdat u om een nieuw wachtwoord heeft gevraagd"
+
+#: contrib/admin/templates/registration/password_reset_email.html:3
+#, python-format
+msgid "for your user account at %(site_name)s"
+msgstr "voor uw gebruikersaccount op %(site_name)s"
+
+#: contrib/admin/templates/registration/password_reset_email.html:5
+#, python-format
+msgid "Your new password is: %(new_password)s"
+msgstr "Uw nieuwe wachtwoord is: %(new_password)s"
+
+#: contrib/admin/templates/registration/password_reset_email.html:7
+msgid "Feel free to change this password by going to this page:"
+msgstr "Aarzel niet om op deze pagina uw wachtwoord te wijzigen:"
+
+#: contrib/admin/templates/registration/password_reset_email.html:11
+msgid "Your username, in case you've forgotten:"
+msgstr "Uw gebruikersnaam, mocht u deze vergeten zijn:"
+
+#: contrib/admin/templates/registration/password_reset_email.html:13
+msgid "Thanks for using our site!"
+msgstr "Bedankt voor het gebruik van onze site!"
+
+#: contrib/admin/templates/registration/password_reset_email.html:15
+#, python-format
+msgid "The %(site_name)s team"
+msgstr "Het %(site_name)s team"
+
+#: contrib/admin/templates/registration/logged_out.html:8
+msgid "Thanks for spending some quality time with the Web site today."
+msgstr "Bedankt voor de aanwezigheid op de site vandaag."
+
+#: contrib/admin/templates/registration/logged_out.html:10
+msgid "Log in again"
+msgstr "Meld u opnieuw aan"
+
+#: contrib/admin/templates/registration/password_reset_done.html:6
+#: contrib/admin/templates/registration/password_reset_done.html:10
+msgid "Password reset successful"
+msgstr "Wachtwoord herstel geslaagd"
+
+#: contrib/admin/templates/registration/password_reset_done.html:12
+msgid ""
+"We've e-mailed a new password to the e-mail address you submitted. You "
+"should be receiving it shortly."
+msgstr ""
+"Een nieuw wachtwoord is per e-mail verstuurd. U zult het binnenkort "
+"ontvangen."
+
+#: contrib/admin/templates/registration/password_change_form.html:4
+#: contrib/admin/templates/registration/password_change_form.html:6
+#: contrib/admin/templates/registration/password_change_form.html:10
+#: contrib/admin/templates/registration/password_change_done.html:4
+msgid "Password change"
+msgstr "Wachtwoord wijziging"
+
+#: contrib/admin/templates/registration/password_change_form.html:12
+msgid ""
+"Please enter your old password, for security's sake, and then enter your new "
+"password twice so we can verify you typed it in correctly."
+msgstr ""
+"Geef voor de veiligheid uw oude wachtwoord op en twee keer een nieuw "
+"wachtwoord, zodat we kunnen controleren of er geen typefouten zijn gemaakt."
+
+#: contrib/admin/templates/registration/password_change_form.html:17
+msgid "Old password:"
+msgstr "Oud wachtwoord:"
+
+#: contrib/admin/templates/registration/password_change_form.html:19
+msgid "New password:"
+msgstr "Nieuw wachtwoord:"
+
+#: contrib/admin/templates/registration/password_change_form.html:21
+msgid "Confirm password:"
+msgstr "Bevestig wachtwoord:"
+
+#: contrib/admin/templates/registration/password_change_form.html:23
+msgid "Change my password"
+msgstr "Wijzig mijn wachtwoord"
+
+#: contrib/admin/templates/registration/password_change_done.html:6
+#: contrib/admin/templates/registration/password_change_done.html:10
+msgid "Password change successful"
+msgstr "Wachtwoord wijzigen is geslaagd"
+
+#: contrib/admin/templates/registration/password_change_done.html:12
+msgid "Your password was changed."
+msgstr "Uw wachtwoord is gewijzigd."
+
+#: contrib/sites/models.py:10
+msgid "domain name"
+msgstr "domeinnaam"
+
+#: contrib/sites/models.py:11
+msgid "display name"
+msgstr "weergavenaam"
+
+#: contrib/sites/models.py:15
+msgid "site"
+msgstr "site"
+
+#: contrib/sites/models.py:16
+msgid "sites"
+msgstr "sites"
+
+#: contrib/flatpages/models.py:8
+msgid ""
+"Example: '/about/contact/'. Make sure to have leading and trailing slashes."
+msgstr "Voorbeeld: '/about/contact/'. Zorg voor slashes aan begin en eind"
+
+#: contrib/flatpages/models.py:9
+msgid "title"
+msgstr "titel"
+
+#: contrib/flatpages/models.py:10
+msgid "content"
+msgstr "inhoud"
+
+#: contrib/flatpages/models.py:11
+msgid "enable comments"
+msgstr "opmerkingen toestaan"
+
+#: contrib/flatpages/models.py:12
+msgid "template name"
+msgstr "sjabloonnaam"
+
+#: contrib/flatpages/models.py:13
+msgid ""
+"Example: 'flatpages/contact_page'. If this isn't provided, the system will "
+"use 'flatpages/default'."
+msgstr ""
+"Voorbeeld: 'flatpages/contact_page'. Als deze niet is opgegeven, dan wordt "
+"'flatpages/default' gebruikt."
+
+#: contrib/flatpages/models.py:14
+msgid "registration required"
+msgstr "registratie verplicht"
+
+#: contrib/flatpages/models.py:14
+msgid "If this is checked, only logged-in users will be able to view the page."
+msgstr ""
+"Alleen ingelogde gebruikers kunnen deze pagina zien, indien dit is "
+"aangekruist."
+
+#: contrib/flatpages/models.py:18
+msgid "flat page"
+msgstr "platte pagina"
+
+#: contrib/flatpages/models.py:19
+msgid "flat pages"
+msgstr "platte pagina's"
+
+#: contrib/redirects/models.py:7
+msgid "redirect from"
+msgstr "omgeleid via"
+
+#: contrib/redirects/models.py:8
+msgid ""
+"This should be an absolute path, excluding the domain name. Example: '/"
+"events/search/'."
+msgstr ""
+"Dit moet een absoluut pad zijn, zonder de domein naam. Bijvoorbeeld: '/"
+"events/search/'."
+
+#: contrib/redirects/models.py:9
+msgid "redirect to"
+msgstr "omleiden naar"
+
+#: contrib/redirects/models.py:10
+msgid ""
+"This can be either an absolute path (as above) or a full URL starting with "
+"'http://'."
+msgstr ""
+"Dit kan een absoluut pad zijn (zoals boven) of een volledige URL beginnend "
+"met 'http://'."
+
+#: contrib/redirects/models.py:12
+msgid "redirect"
+msgstr "omleiding"
+
+#: contrib/redirects/models.py:13
+msgid "redirects"
+msgstr "omleidingen"
 
 #: contrib/comments/models.py:67 contrib/comments/models.py:166
 msgid "object ID"
@@ -73,10 +1472,6 @@ msgstr "datum/tijd toegevoegd"
 #: contrib/comments/models.py:84 contrib/comments/models.py:170
 msgid "is public"
 msgstr "is publiek"
-
-#: contrib/comments/models.py:85 contrib/admin/views/doc.py:289
-msgid "IP address"
-msgstr "IP adres"
 
 #: contrib/comments/models.py:86
 msgid "is removed"
@@ -231,13 +1626,13 @@ msgid_plural ""
 "\n"
 "%(text)s"
 msgstr[0] ""
-"Deze opmerking is gepost door een gebruiker welke minder dan %(count)s heeft "
-"gepostopmerking:\n"
+"Deze opmerking is gepost door een gebruiker welke minder dan %(count)s opmerking "
+"heeft gepost:\n"
 "\n"
 "%(text)s"
 msgstr[1] ""
-"Deze opmerking is gepost door een gebruiker welke minder dan %(count)s heeft "
-"gepostopmerkingen:\n"
+"Deze opmerking is gepost door een gebruiker welke minder dan %(count)s opmerkingen "
+"heeft gepost:\n"
 "\n"
 "%(text)s"
 
@@ -282,40 +1677,8 @@ msgid "The comment form didn't provide either 'preview' or 'post'"
 msgstr "Het opmerkingenformulier heeft geen 'voorbeeld' of 'post'"
 
 #: contrib/comments/templates/comments/form.html:6
-#: contrib/comments/templates/comments/form.html:8
-#: contrib/admin/templates/admin/login.html:17
-msgid "Username:"
-msgstr "Gebruikersnaam:"
-
-#: contrib/comments/templates/comments/form.html:6
-#: contrib/admin/templates/admin/login.html:20
-msgid "Password:"
-msgstr "Wachtwoord:"
-
-#: contrib/comments/templates/comments/form.html:6
 msgid "Forgotten your password?"
 msgstr "Uw wachtwoord vergeten?"
-
-#: contrib/comments/templates/comments/form.html:8
-#: contrib/admin/templates/admin/object_history.html:3
-#: contrib/admin/templates/admin/change_list.html:5
-#: contrib/admin/templates/admin/base.html:23
-#: contrib/admin/templates/admin/delete_confirmation.html:3
-#: contrib/admin/templates/admin/change_form.html:10
-#: contrib/admin/templates/registration/password_change_done.html:3
-#: contrib/admin/templates/registration/password_change_form.html:3
-#: contrib/admin/templates/admin_doc/bookmarklets.html:4
-#: contrib/admin/templates/admin_doc/view_detail.html:4
-#: contrib/admin/templates/admin_doc/template_tag_index.html:5
-#: contrib/admin/templates/admin_doc/template_detail.html:4
-#: contrib/admin/templates/admin_doc/template_filter_index.html:5
-#: contrib/admin/templates/admin_doc/missing_docutils.html:4
-#: contrib/admin/templates/admin_doc/view_index.html:5
-#: contrib/admin/templates/admin_doc/model_detail.html:3
-#: contrib/admin/templates/admin_doc/index.html:4
-#: contrib/admin/templates/admin_doc/model_index.html:5
-msgid "Log out"
-msgstr "Afmelden"
 
 #: contrib/comments/templates/comments/form.html:12
 msgid "Ratings"
@@ -349,930 +1712,6 @@ msgstr "Concept opmerking"
 msgid "Your name:"
 msgstr "Uw gebruikernaam:"
 
-#: contrib/admin/filterspecs.py:40
-#, python-format
-msgid ""
-"<h3>By %s:</h3>\n"
-"<ul>\n"
-msgstr ""
-"<h3>Door %s:</h3>\n"
-"<ul>\n"
-
-#: contrib/admin/filterspecs.py:70 contrib/admin/filterspecs.py:88
-#: contrib/admin/filterspecs.py:143
-msgid "All"
-msgstr "Alle"
-
-#: contrib/admin/filterspecs.py:109
-msgid "Any date"
-msgstr "Elke datum"
-
-#: contrib/admin/filterspecs.py:110
-msgid "Today"
-msgstr "Vandaag"
-
-#: contrib/admin/filterspecs.py:113
-msgid "Past 7 days"
-msgstr "Laatste 7 dagen"
-
-#: contrib/admin/filterspecs.py:115
-msgid "This month"
-msgstr "Deze maand"
-
-#: contrib/admin/filterspecs.py:117
-msgid "This year"
-msgstr "Dit jaar"
-
-#: contrib/admin/filterspecs.py:143
-msgid "Yes"
-msgstr "Ja"
-
-#: contrib/admin/filterspecs.py:143
-msgid "No"
-msgstr "Nee"
-
-#: contrib/admin/filterspecs.py:150
-msgid "Unknown"
-msgstr "Onbekend"
-
-#: contrib/admin/models.py:16
-msgid "action time"
-msgstr "actie tijd"
-
-#: contrib/admin/models.py:19
-msgid "object id"
-msgstr "object id"
-
-#: contrib/admin/models.py:20
-msgid "object repr"
-msgstr "object repr"
-
-#: contrib/admin/models.py:21
-msgid "action flag"
-msgstr "actie vlag"
-
-#: contrib/admin/models.py:22
-msgid "change message"
-msgstr "wijzig bericht"
-
-#: contrib/admin/models.py:25
-msgid "log entry"
-msgstr "log ingave"
-
-#: contrib/admin/models.py:26
-msgid "log entries"
-msgstr "log ingaves"
-
-#: contrib/admin/templatetags/admin_list.py:228
-msgid "All dates"
-msgstr "Alle data"
-
-#: contrib/admin/views/decorators.py:9 contrib/auth/forms.py:36
-#: contrib/auth/forms.py:41
-msgid ""
-"Please enter a correct username and password. Note that both fields are case-"
-"sensitive."
-msgstr ""
-"Geef een correcte gebruikersnaam en wachtwoord. Let op de velden zijn "
-"hoofdletter-gevoelig"
-
-#: contrib/admin/views/decorators.py:23
-#: contrib/admin/templates/admin/login.html:25
-msgid "Log in"
-msgstr "Aanmelden"
-
-#: contrib/admin/views/decorators.py:61
-msgid ""
-"Please log in again, because your session has expired. Don't worry: Your "
-"submission has been saved."
-msgstr ""
-"Uw sessie is verlopen, meldt u opnieuw aan. Maakt u geen zorgen: Uw bijdrage "
-"is opgeslagen."
-
-#: contrib/admin/views/decorators.py:68
-msgid ""
-"Looks like your browser isn't configured to accept cookies. Please enable "
-"cookies, reload this page, and try again."
-msgstr ""
-"Lijkt erop dat uw browser geen cookies accepteerd. Zet het gebruik van "
-"cookies aan in uw browser, en laad deze pagina nogmaals en probeer het "
-"opnieuw."
-
-#: contrib/admin/views/decorators.py:82
-msgid "Usernames cannot contain the '@' character."
-msgstr "Gebruikersnamen mogen geen '@' bevatten."
-
-#: contrib/admin/views/decorators.py:84
-#, python-format
-msgid "Your e-mail address is not your username. Try '%s' instead."
-msgstr "Uw e-mail adres is niet uw gebruikersnaam. Probeer '%s' eens."
-
-#: contrib/admin/views/main.py:226
-msgid "Site administration"
-msgstr "Site beheer"
-
-#: contrib/admin/views/main.py:260
-#, python-format
-msgid "The %(name)s \"%(obj)s\" was added successfully."
-msgstr "De %(name)s \"%(obj)s\" is toegevoegd."
-
-#: contrib/admin/views/main.py:264 contrib/admin/views/main.py:348
-msgid "You may edit it again below."
-msgstr "U mag dit hieronder weer bewerken."
-
-#: contrib/admin/views/main.py:272 contrib/admin/views/main.py:357
-#, python-format
-msgid "You may add another %s below."
-msgstr "U mag hieronder de volgende %s toevoegen."
-
-#: contrib/admin/views/main.py:290
-#, python-format
-msgid "Add %s"
-msgstr "Toevoegen %s"
-
-#: contrib/admin/views/main.py:336
-#, python-format
-msgid "Added %s."
-msgstr "%s toegevoegd."
-
-#: contrib/admin/views/main.py:336 contrib/admin/views/main.py:338
-#: contrib/admin/views/main.py:340
-msgid "and"
-msgstr "en"
-
-#: contrib/admin/views/main.py:338
-#, python-format
-msgid "Changed %s."
-msgstr "Gewijzigd %s"
-
-#: contrib/admin/views/main.py:340
-#, python-format
-msgid "Deleted %s."
-msgstr "%s verwijderd."
-
-#: contrib/admin/views/main.py:343
-msgid "No fields changed."
-msgstr "Geen velden gewijzigd."
-
-#: contrib/admin/views/main.py:346
-#, python-format
-msgid "The %(name)s \"%(obj)s\" was changed successfully."
-msgstr "Wijzigen %(name)s \"%(obj)s\" is geslaagd."
-
-#: contrib/admin/views/main.py:354
-#, python-format
-msgid ""
-"The %(name)s \"%(obj)s\" was added successfully. You may edit it again below."
-msgstr "De %(name)s \"%(obj)s\" toegevoegd. U mag het hieronder wijzigen."
-
-#: contrib/admin/views/main.py:392
-#, python-format
-msgid "Change %s"
-msgstr "Wijzig %s"
-
-#: contrib/admin/views/main.py:470
-#, python-format
-msgid "One or more %(fieldname)s in %(name)s: %(obj)s"
-msgstr "Een of meer %(fieldname)s in %(name)s: %(obj)s"
-
-#: contrib/admin/views/main.py:475
-#, python-format
-msgid "One or more %(fieldname)s in %(name)s:"
-msgstr "Een of meer %(fieldname)s in %(name)s:"
-
-#: contrib/admin/views/main.py:508
-#, python-format
-msgid "The %(name)s \"%(obj)s\" was deleted successfully."
-msgstr "Verwijdering %(name)s \"%(obj)s\" is geslaagd."
-
-#: contrib/admin/views/main.py:511
-msgid "Are you sure?"
-msgstr "Weet u het zeker?"
-
-#: contrib/admin/views/main.py:533
-#, python-format
-msgid "Change history: %s"
-msgstr "Wijzigingshistorie: %s"
-
-#: contrib/admin/views/main.py:565
-#, python-format
-msgid "Select %s"
-msgstr "Selecteer %s"
-
-#: contrib/admin/views/main.py:565
-#, python-format
-msgid "Select %s to change"
-msgstr "Selecteer %s om te wijzigen"
-
-#: contrib/admin/views/doc.py:277 contrib/admin/views/doc.py:286
-#: contrib/admin/views/doc.py:288 contrib/admin/views/doc.py:294
-#: contrib/admin/views/doc.py:295 contrib/admin/views/doc.py:297
-msgid "Integer"
-msgstr "Geheel getal"
-
-#: contrib/admin/views/doc.py:278
-msgid "Boolean (Either True or False)"
-msgstr "Boolean (True of False)"
-
-#: contrib/admin/views/doc.py:279 contrib/admin/views/doc.py:296
-#, python-format
-msgid "String (up to %(maxlength)s)"
-msgstr "Karakterreeks (maximaal %(maxlength)s)"
-
-#: contrib/admin/views/doc.py:280
-msgid "Comma-separated integers"
-msgstr "Komma-gescheiden gehele getallen"
-
-#: contrib/admin/views/doc.py:281
-msgid "Date (without time)"
-msgstr "Datum (zonder tijd)"
-
-#: contrib/admin/views/doc.py:282
-msgid "Date (with time)"
-msgstr "Datum (met tijd)"
-
-#: contrib/admin/views/doc.py:283
-msgid "E-mail address"
-msgstr "E-mailadres"
-
-#: contrib/admin/views/doc.py:284 contrib/admin/views/doc.py:287
-msgid "File path"
-msgstr "Bestandspad"
-
-#: contrib/admin/views/doc.py:285
-msgid "Decimal number"
-msgstr "Decimaal getal"
-
-#: contrib/admin/views/doc.py:291
-msgid "Boolean (Either True, False or None)"
-msgstr "Boolean (True, False of None)"
-
-#: contrib/admin/views/doc.py:292
-msgid "Relation to parent model"
-msgstr "Relatie tot ouder model"
-
-#: contrib/admin/views/doc.py:293
-msgid "Phone number"
-msgstr "Telefoonnummer"
-
-#: contrib/admin/views/doc.py:298
-msgid "Text"
-msgstr "Tekst"
-
-#: contrib/admin/views/doc.py:299
-msgid "Time"
-msgstr "Tijd"
-
-#: contrib/admin/views/doc.py:300 contrib/flatpages/models.py:7
-msgid "URL"
-msgstr "URL"
-
-#: contrib/admin/views/doc.py:301
-msgid "U.S. state (two uppercase letters)"
-msgstr "Staat van de VS (twee hoofdletters)"
-
-#: contrib/admin/views/doc.py:302
-msgid "XML text"
-msgstr "XML Tekst"
-
-#: contrib/admin/templates/admin/object_history.html:3
-#: contrib/admin/templates/admin/change_list.html:5
-#: contrib/admin/templates/admin/base.html:23
-#: contrib/admin/templates/admin/delete_confirmation.html:3
-#: contrib/admin/templates/admin/change_form.html:10
-#: contrib/admin/templates/registration/password_change_done.html:3
-#: contrib/admin/templates/registration/password_change_form.html:3
-#: contrib/admin/templates/admin_doc/bookmarklets.html:3
-msgid "Documentation"
-msgstr "Documentatie"
-
-#: contrib/admin/templates/admin/object_history.html:3
-#: contrib/admin/templates/admin/change_list.html:5
-#: contrib/admin/templates/admin/base.html:23
-#: contrib/admin/templates/admin/delete_confirmation.html:3
-#: contrib/admin/templates/admin/change_form.html:10
-#: contrib/admin/templates/registration/password_change_done.html:3
-#: contrib/admin/templates/registration/password_change_form.html:3
-#: contrib/admin/templates/admin_doc/bookmarklets.html:4
-#: contrib/admin/templates/admin_doc/view_detail.html:4
-#: contrib/admin/templates/admin_doc/template_tag_index.html:5
-#: contrib/admin/templates/admin_doc/template_detail.html:4
-#: contrib/admin/templates/admin_doc/template_filter_index.html:5
-#: contrib/admin/templates/admin_doc/missing_docutils.html:4
-#: contrib/admin/templates/admin_doc/view_index.html:5
-#: contrib/admin/templates/admin_doc/model_detail.html:3
-#: contrib/admin/templates/admin_doc/index.html:4
-#: contrib/admin/templates/admin_doc/model_index.html:5
-msgid "Change password"
-msgstr "Wachtwoord wijzigen"
-
-#: contrib/admin/templates/admin/object_history.html:5
-#: contrib/admin/templates/admin/500.html:4
-#: contrib/admin/templates/admin/change_list.html:6
-#: contrib/admin/templates/admin/base.html:28
-#: contrib/admin/templates/admin/delete_confirmation.html:6
-#: contrib/admin/templates/admin/change_form.html:13
-#: contrib/admin/templates/registration/password_change_done.html:4
-#: contrib/admin/templates/registration/password_reset_form.html:4
-#: contrib/admin/templates/registration/logged_out.html:4
-#: contrib/admin/templates/registration/password_reset_done.html:4
-#: contrib/admin/templates/registration/password_change_form.html:4
-#: contrib/admin/templates/admin_doc/bookmarklets.html:3
-msgid "Home"
-msgstr "Voorpagina"
-
-#: contrib/admin/templates/admin/object_history.html:5
-#: contrib/admin/templates/admin/change_form.html:20
-msgid "History"
-msgstr "Geschiedenis"
-
-#: contrib/admin/templates/admin/object_history.html:18
-msgid "Date/time"
-msgstr "Datum/tijd"
-
-#: contrib/admin/templates/admin/object_history.html:19
-msgid "User"
-msgstr "Gebruiker"
-
-#: contrib/admin/templates/admin/object_history.html:20
-msgid "Action"
-msgstr "Actie"
-
-#: contrib/admin/templates/admin/object_history.html:26
-msgid "DATE_WITH_TIME_FULL"
-msgstr "DATE_WITH_TIME_FULL"
-
-#: contrib/admin/templates/admin/object_history.html:36
-msgid ""
-"This object doesn't have a change history. It probably wasn't added via this "
-"admin site."
-msgstr ""
-"Dit object heeft geen geschiedenis. Mogelijk niet via de admin site "
-"toegevoegd."
-
-#: contrib/admin/templates/admin/base_site.html:4
-msgid "Django site admin"
-msgstr "Django site beheer"
-
-#: contrib/admin/templates/admin/base_site.html:7
-msgid "Django administration"
-msgstr "Django beheer"
-
-#: contrib/admin/templates/admin/500.html:4
-msgid "Server error"
-msgstr "Server fout"
-
-#: contrib/admin/templates/admin/500.html:6
-msgid "Server error (500)"
-msgstr "Server fout (500)"
-
-#: contrib/admin/templates/admin/500.html:9
-msgid "Server Error <em>(500)</em>"
-msgstr "Server Fout <em>(500)</em>"
-
-#: contrib/admin/templates/admin/500.html:10
-msgid ""
-"There's been an error. It's been reported to the site administrators via e-"
-"mail and should be fixed shortly. Thanks for your patience."
-msgstr ""
-"Er is een fout geweest. Dit is inmiddels doorgegevens aan de sitebeheerder "
-"via e-mail en zal binnenkort worden gerepareerd. Bedankt voor uw geduld"
-
-#: contrib/admin/templates/admin/404.html:4
-#: contrib/admin/templates/admin/404.html:8
-msgid "Page not found"
-msgstr "Pagina niet gevonden"
-
-#: contrib/admin/templates/admin/404.html:10
-msgid "We're sorry, but the requested page could not be found."
-msgstr "De gevraagde pagina komt niet voor."
-
-#: contrib/admin/templates/admin/index.html:17
-#, python-format
-msgid "Models available in the %(name)s application."
-msgstr "Beschikbare modellen in de %(name)s toepassing."
-
-#: contrib/admin/templates/admin/index.html:28
-#: contrib/admin/templates/admin/change_form.html:15
-msgid "Add"
-msgstr "Toevoegen"
-
-#: contrib/admin/templates/admin/index.html:34
-msgid "Change"
-msgstr "Wijzigen"
-
-#: contrib/admin/templates/admin/index.html:44
-msgid "You don't have permission to edit anything."
-msgstr "U heeft geen rechten om iets te wijzigen"
-
-#: contrib/admin/templates/admin/index.html:52
-msgid "Recent Actions"
-msgstr "Recente acties"
-
-#: contrib/admin/templates/admin/index.html:53
-msgid "My Actions"
-msgstr "Mijn acties"
-
-#: contrib/admin/templates/admin/index.html:57
-msgid "None available"
-msgstr "Geen beschikbaar"
-
-#: contrib/admin/templates/admin/change_list.html:11
-#, python-format
-msgid "Add %(name)s"
-msgstr "%(name)s toevoegen"
-
-#: contrib/admin/templates/admin/login.html:22
-msgid "Have you <a href=\"/password_reset/\">forgotten your password</a>?"
-msgstr "Wachtwoord <a href=\"/password_reset/\">vergeten</a>?"
-
-#: contrib/admin/templates/admin/base.html:23
-msgid "Welcome,"
-msgstr "Welkom,"
-
-#: contrib/admin/templates/admin/delete_confirmation.html:9
-#: contrib/admin/templates/admin/submit_line.html:3
-msgid "Delete"
-msgstr "Verwijderen"
-
-#: contrib/admin/templates/admin/delete_confirmation.html:14
-#, python-format
-msgid ""
-"Deleting the %(object_name)s '%(object)s' would result in deleting related "
-"objects, but your account doesn't have permission to delete the following "
-"types of objects:"
-msgstr ""
-"Verwijderen van %(object_name)s '%(object)s' zal ook gerelateerde objecten "
-"verwijderen. Echter u heeft geen rechten om de volgende typen objecten te "
-"verwijderen:"
-
-#: contrib/admin/templates/admin/delete_confirmation.html:21
-#, python-format
-msgid ""
-"Are you sure you want to delete the %(object_name)s \"%(object)s\"? All of "
-"the following related items will be deleted:"
-msgstr ""
-"Weet u zeker dat u %(object_name)s \"%(object)s\" wilt verwijderen? Alle "
-"volgende opjecten worden verwijderd:"
-
-#: contrib/admin/templates/admin/delete_confirmation.html:26
-msgid "Yes, I'm sure"
-msgstr "Ja, Ik weet het zeker"
-
-#: contrib/admin/templates/admin/filter.html:2
-#, python-format
-msgid " By %(title)s "
-msgstr "Op %(title)s"
-
-#: contrib/admin/templates/admin/search_form.html:8
-msgid "Go"
-msgstr "Zoek"
-
-#: contrib/admin/templates/admin/change_form.html:21
-msgid "View on site"
-msgstr "Toon op site"
-
-#: contrib/admin/templates/admin/change_form.html:30
-msgid "Please correct the error below."
-msgid_plural "Please correct the errors below."
-msgstr[0] "Herstel de fout hieronder."
-msgstr[1] "Herstel de fouten hieronder."
-
-#: contrib/admin/templates/admin/change_form.html:48
-msgid "Ordering"
-msgstr "Sortering"
-
-#: contrib/admin/templates/admin/change_form.html:51
-msgid "Order:"
-msgstr "Sortering:"
-
-#: contrib/admin/templates/admin/submit_line.html:4
-msgid "Save as new"
-msgstr "Opslaan als nieuw item"
-
-#: contrib/admin/templates/admin/submit_line.html:5
-msgid "Save and add another"
-msgstr "Opslaan en nieuw item"
-
-#: contrib/admin/templates/admin/submit_line.html:6
-msgid "Save and continue editing"
-msgstr "Opslaan en bewerk opnieuw"
-
-#: contrib/admin/templates/admin/submit_line.html:7
-msgid "Save"
-msgstr "Opslaan"
-
-#: contrib/admin/templates/registration/password_change_done.html:4
-#: contrib/admin/templates/registration/password_change_form.html:4
-#: contrib/admin/templates/registration/password_change_form.html:6
-#: contrib/admin/templates/registration/password_change_form.html:10
-msgid "Password change"
-msgstr "Wachtwoord wijziging"
-
-#: contrib/admin/templates/registration/password_change_done.html:6
-#: contrib/admin/templates/registration/password_change_done.html:10
-msgid "Password change successful"
-msgstr "Wachtwoord wijzigen geslaagd"
-
-#: contrib/admin/templates/registration/password_change_done.html:12
-msgid "Your password was changed."
-msgstr "Uw wachtwoord is gewijzigd."
-
-#: contrib/admin/templates/registration/password_reset_form.html:4
-#: contrib/admin/templates/registration/password_reset_form.html:6
-#: contrib/admin/templates/registration/password_reset_form.html:10
-#: contrib/admin/templates/registration/password_reset_done.html:4
-msgid "Password reset"
-msgstr "Wachtwoord hersteld"
-
-#: contrib/admin/templates/registration/password_reset_form.html:12
-msgid ""
-"Forgotten your password? Enter your e-mail address below, and we'll reset "
-"your password and e-mail the new one to you."
-msgstr ""
-"Wachtwoord vergeten? Geef u e-mail adres op en we herstellen uw wachtwoord "
-"en zullen een nieuwe toesturen."
-
-#: contrib/admin/templates/registration/password_reset_form.html:16
-msgid "E-mail address:"
-msgstr "E-mail adres:"
-
-#: contrib/admin/templates/registration/password_reset_form.html:16
-msgid "Reset my password"
-msgstr "Herstel mijn wachtwoord"
-
-#: contrib/admin/templates/registration/logged_out.html:8
-msgid "Thanks for spending some quality time with the Web site today."
-msgstr "Bedankt voor de aanwezigheid op de site vandaag."
-
-#: contrib/admin/templates/registration/logged_out.html:10
-msgid "Log in again"
-msgstr "Meld u opnieuw aan"
-
-#: contrib/admin/templates/registration/password_reset_done.html:6
-#: contrib/admin/templates/registration/password_reset_done.html:10
-msgid "Password reset successful"
-msgstr "Wachtwoord herstel geslaagd"
-
-#: contrib/admin/templates/registration/password_reset_done.html:12
-msgid ""
-"We've e-mailed a new password to the e-mail address you submitted. You "
-"should be receiving it shortly."
-msgstr ""
-"Een nieuw wachtwoord is per e-mail verstuurd. U zult het straks ontvangen."
-
-#: contrib/admin/templates/registration/password_change_form.html:12
-msgid ""
-"Please enter your old password, for security's sake, and then enter your new "
-"password twice so we can verify you typed it in correctly."
-msgstr ""
-"Vanwege de beveiliging geef uw oude wachtwword op en twee keer een nieuwe, "
-"zodat we kunnen controleren of er geen typefouten zijn gemaakt."
-
-#: contrib/admin/templates/registration/password_change_form.html:17
-msgid "Old password:"
-msgstr "Oude wachtwoord:"
-
-#: contrib/admin/templates/registration/password_change_form.html:19
-msgid "New password:"
-msgstr "Nieuw wachtwoord:"
-
-#: contrib/admin/templates/registration/password_change_form.html:21
-msgid "Confirm password:"
-msgstr "Bevestig wachtwoord:"
-
-#: contrib/admin/templates/registration/password_change_form.html:23
-msgid "Change my password"
-msgstr "Wijzig mijn wachtwoord"
-
-#: contrib/admin/templates/registration/password_reset_email.html:2
-msgid "You're receiving this e-mail because you requested a password reset"
-msgstr "U krijgt een e-mail omdat u om een nieuw wachtwoord heeft gevraagd"
-
-#: contrib/admin/templates/registration/password_reset_email.html:3
-#, python-format
-msgid "for your user account at %(site_name)s"
-msgstr "voor uw gebruikersaccount op %(site_name)s"
-
-#: contrib/admin/templates/registration/password_reset_email.html:5
-#, python-format
-msgid "Your new password is: %(new_password)s"
-msgstr "Uw nieuwe wachtwoord is: %(new_password)s"
-
-#: contrib/admin/templates/registration/password_reset_email.html:7
-msgid "Feel free to change this password by going to this page:"
-msgstr "Aarzel niet om op deze pagina uw wachtwoord te wijzigen:"
-
-#: contrib/admin/templates/registration/password_reset_email.html:11
-msgid "Your username, in case you've forgotten:"
-msgstr "Uw gebruikersnaam, mocht u deze vergeten zijn:"
-
-#: contrib/admin/templates/registration/password_reset_email.html:13
-msgid "Thanks for using our site!"
-msgstr "Bedankt voor het gebruik van onze site!"
-
-#: contrib/admin/templates/registration/password_reset_email.html:15
-#, python-format
-msgid "The %(site_name)s team"
-msgstr "Het %(site_name)s team"
-
-#: contrib/admin/templates/admin_doc/bookmarklets.html:3
-msgid "Bookmarklets"
-msgstr "Bookmarklets"
-
-#: contrib/admin/templates/admin_doc/bookmarklets.html:5
-msgid "Documentation bookmarklets"
-msgstr "Documentatie bookmarklets"
-
-#: contrib/admin/templates/admin_doc/bookmarklets.html:9
-msgid ""
-"\n"
-"<p class=\"help\">To install bookmarklets, drag the link to your bookmarks\n"
-"toolbar, or right-click the link and add it to your bookmarks. Now you can\n"
-"select the bookmarklet from any page in the site.  Note that some of these\n"
-"bookmarklets require you to be viewing the site from a computer designated\n"
-"as \"internal\" (talk to your system administrator if you aren't sure if\n"
-"your computer is \"internal\").</p>\n"
-msgstr ""
-"\n"
-"<p class=\"help\">Om bookmarklets te installeren, sleep de link naar uw "
-"bladwijzers\n"
-"werkbalk, of rechtermuis klik op de link en voeg het toe aan de bladwijzer. "
-"Nu kan\n"
-"de bookmarklet vanuit elke pagina op de site worden gekozen. Let erop dat "
-"het soms\n"
-"noodzakelijk is dat de computer vanwaaruit de pagina wordt bekeken intern "
-"is\n"
-"(Raadpleeg uw systeembeheerder of uw computer zich op het interne netwerk "
-"bevind).<p>\n"
-
-#: contrib/admin/templates/admin_doc/bookmarklets.html:19
-msgid "Documentation for this page"
-msgstr "Documentatie voor deze pagina"
-
-#: contrib/admin/templates/admin_doc/bookmarklets.html:20
-msgid ""
-"Jumps you from any page to the documentation for the view that generates "
-"that page."
-msgstr ""
-"Spring vanuit elke pagina naar de documentatie voor de view die gegenereerd "
-"wordt door die pagina"
-
-#: contrib/admin/templates/admin_doc/bookmarklets.html:22
-msgid "Show object ID"
-msgstr "Toon object ID"
-
-#: contrib/admin/templates/admin_doc/bookmarklets.html:23
-msgid ""
-"Shows the content-type and unique ID for pages that represent a single "
-"object."
-msgstr ""
-"Toont de content-type en unieke ID voor pagina's die een enkel object "
-"voorsteld."
-
-#: contrib/admin/templates/admin_doc/bookmarklets.html:25
-msgid "Edit this object (current window)"
-msgstr "Bewerk dit object (huidig venster)"
-
-#: contrib/admin/templates/admin_doc/bookmarklets.html:26
-msgid "Jumps to the admin page for pages that represent a single object."
-msgstr "Ga naar de beheerpagina voor pagina's die een enkel object weergeven."
-
-#: contrib/admin/templates/admin_doc/bookmarklets.html:28
-msgid "Edit this object (new window)"
-msgstr "Bewerk dit object (nieuwe pagina)"
-
-#: contrib/admin/templates/admin_doc/bookmarklets.html:29
-msgid "As above, but opens the admin page in a new window."
-msgstr "Als boven, maar opent de beheerpagina in een nieuw venster."
-
-#: contrib/admin/templates/widget/date_time.html:3
-msgid "Date:"
-msgstr "Datum:"
-
-#: contrib/admin/templates/widget/date_time.html:4
-msgid "Time:"
-msgstr "Tijd:"
-
-#: contrib/admin/templates/widget/file.html:2
-msgid "Currently:"
-msgstr "Huidige:"
-
-#: contrib/admin/templates/widget/file.html:3
-msgid "Change:"
-msgstr "Wijziging:"
-
-#: contrib/redirects/models.py:7
-msgid "redirect from"
-msgstr "omgeleid via"
-
-#: contrib/redirects/models.py:8
-msgid ""
-"This should be an absolute path, excluding the domain name. Example: '/"
-"events/search/'."
-msgstr ""
-"Dit moet een absoluut pad zijn, zonder de domein naam. Bijvoorbeeld: '/"
-"events/search/'."
-
-#: contrib/redirects/models.py:9
-msgid "redirect to"
-msgstr "omleiden naar"
-
-#: contrib/redirects/models.py:10
-msgid ""
-"This can be either an absolute path (as above) or a full URL starting with "
-"'http://'."
-msgstr ""
-"Dit kan een absoluut pad (zoals boven) of een volledige URL beginnend met "
-"'http://'."
-
-#: contrib/redirects/models.py:12
-msgid "redirect"
-msgstr "omleiding"
-
-#: contrib/redirects/models.py:13
-msgid "redirects"
-msgstr "omleidingen"
-
-#: contrib/flatpages/models.py:8
-msgid ""
-"Example: '/about/contact/'. Make sure to have leading and trailing slashes."
-msgstr "Voorbeeld: '/about/contact/'. Zorg voor slashes aan begin en eind"
-
-#: contrib/flatpages/models.py:9
-msgid "title"
-msgstr "titel"
-
-#: contrib/flatpages/models.py:10
-msgid "content"
-msgstr "inhoud"
-
-#: contrib/flatpages/models.py:11
-msgid "enable comments"
-msgstr "opmerkingen toestaan"
-
-#: contrib/flatpages/models.py:12
-msgid "template name"
-msgstr "Naam sjabloon"
-
-#: contrib/flatpages/models.py:13
-msgid ""
-"Example: 'flatpages/contact_page'. If this isn't provided, the system will "
-"use 'flatpages/default'."
-msgstr ""
-"Voorbeeld: 'flatpages/contact_page'. Als deze niet is opgegeven, dan wordt "
-"'flatpages/default' gebruikt."
-
-#: contrib/flatpages/models.py:14
-msgid "registration required"
-msgstr "registratie verplicht"
-
-#: contrib/flatpages/models.py:14
-msgid "If this is checked, only logged-in users will be able to view the page."
-msgstr ""
-"Alleen ingelogde gebruikers kunnen deze pagina zien, indien dit is "
-"aangekruist."
-
-#: contrib/flatpages/models.py:18
-msgid "flat page"
-msgstr "platte pagina"
-
-#: contrib/flatpages/models.py:19
-msgid "flat pages"
-msgstr "platte pagina's"
-
-#: contrib/auth/models.py:13 contrib/auth/models.py:26
-msgid "name"
-msgstr "naam"
-
-#: contrib/auth/models.py:15
-msgid "codename"
-msgstr "codenaam"
-
-#: contrib/auth/models.py:17
-msgid "permission"
-msgstr "recht"
-
-#: contrib/auth/models.py:18 contrib/auth/models.py:27
-msgid "permissions"
-msgstr "rechten"
-
-#: contrib/auth/models.py:29
-msgid "group"
-msgstr "groep"
-
-#: contrib/auth/models.py:30 contrib/auth/models.py:65
-msgid "groups"
-msgstr "groepen"
-
-#: contrib/auth/models.py:55
-msgid "username"
-msgstr "gebruikernaam"
-
-#: contrib/auth/models.py:56
-msgid "first name"
-msgstr "voornaam"
-
-#: contrib/auth/models.py:57
-msgid "last name"
-msgstr "achternaam"
-
-#: contrib/auth/models.py:58
-msgid "e-mail address"
-msgstr "e-mailadres"
-
-#: contrib/auth/models.py:59
-msgid "password"
-msgstr "wachtwoord"
-
-#: contrib/auth/models.py:59
-msgid "Use '[algo]$[salt]$[hexdigest]'"
-msgstr "Gebruik '[algo]$[salt]$[hexdigest]'"
-
-#: contrib/auth/models.py:60
-msgid "staff status"
-msgstr "staf status"
-
-#: contrib/auth/models.py:60
-msgid "Designates whether the user can log into this admin site."
-msgstr "Bepaalt of gebruiker kan inloggen op deze admin site"
-
-#: contrib/auth/models.py:61
-msgid "active"
-msgstr "actief"
-
-#: contrib/auth/models.py:62
-msgid "superuser status"
-msgstr "supergebruiker status"
-
-#: contrib/auth/models.py:63
-msgid "last login"
-msgstr "laatste aanmelding"
-
-#: contrib/auth/models.py:64
-msgid "date joined"
-msgstr "datum toegetreden"
-
-#: contrib/auth/models.py:66
-msgid ""
-"In addition to the permissions manually assigned, this user will also get "
-"all permissions granted to each group he/she is in."
-msgstr ""
-"Bovenop de rechten welke handmatig zijn toegekend, krijgt deze gebruiker ook "
-"alle rechten van de groepen waar hij of zij deel van uitmaakt."
-
-#: contrib/auth/models.py:67
-msgid "user permissions"
-msgstr "gebruikersrechten"
-
-#: contrib/auth/models.py:70
-msgid "user"
-msgstr "gebruiker"
-
-#: contrib/auth/models.py:71
-msgid "users"
-msgstr "gebruikers"
-
-#: contrib/auth/models.py:76
-msgid "Personal info"
-msgstr "Persoonlijke informatie"
-
-#: contrib/auth/models.py:77
-msgid "Permissions"
-msgstr "Rechten"
-
-#: contrib/auth/models.py:78
-msgid "Important dates"
-msgstr "Belangrijke data"
-
-#: contrib/auth/models.py:79
-msgid "Groups"
-msgstr "Groepen"
-
-#: contrib/auth/models.py:219
-msgid "message"
-msgstr "bericht"
-
-#: contrib/auth/forms.py:30
-msgid ""
-"Your Web browser doesn't appear to have cookies enabled. Cookies are "
-"required for logging in."
-msgstr ""
-"Lijkt erop dat uw browser geen cookies accepteerd. Om aan te melden moeten "
-"cookies worden geaccepteerd."
-
-#: contrib/contenttypes/models.py:25
-msgid "python model class name"
-msgstr "python model-class-naam"
-
-#: contrib/contenttypes/models.py:28
-msgid "content type"
-msgstr "inhoudtype"
-
-#: contrib/contenttypes/models.py:29
-msgid "content types"
-msgstr "inhoudtypen"
-
 #: contrib/sessions/models.py:35
 msgid "session key"
 msgstr "sessiesleutel"
@@ -1293,33 +1732,49 @@ msgstr "sessie"
 msgid "sessions"
 msgstr "sessies"
 
-#: contrib/sites/models.py:10
-msgid "domain name"
-msgstr "domeinnaam"
+#: contrib/contenttypes/models.py:25
+msgid "python model class name"
+msgstr "python model-class-naam"
 
-#: contrib/sites/models.py:11
-msgid "display name"
-msgstr "weergavenaam"
+#: contrib/contenttypes/models.py:28
+msgid "content type"
+msgstr "inhoudtype"
 
-#: contrib/sites/models.py:15
-msgid "site"
-msgstr "site"
+#: contrib/contenttypes/models.py:29
+msgid "content types"
+msgstr "inhoudtypen"
 
-#: contrib/sites/models.py:16
-msgid "sites"
-msgstr "sites"
+#: forms/__init__.py:380
+#, python-format
+msgid "Ensure your text is less than %s character."
+msgid_plural "Ensure your text is less than %s characters."
+msgstr[0] "Zorg ervoor dat uw tekst korter is dan %s teken."
+msgstr[1] "Zorg ervoor dat uw tekst korter is dan %S tekens."
 
-#: utils/translation.py:360
-msgid "DATE_FORMAT"
-msgstr "DATE_FORMAT"
+#: forms/__init__.py:385
+msgid "Line breaks are not allowed here."
+msgstr "Regeleindes zijn niet toegestaan."
 
-#: utils/translation.py:361
-msgid "DATETIME_FORMAT"
-msgstr "DATETIME_FORMAT"
+#: forms/__init__.py:480 forms/__init__.py:551 forms/__init__.py:589
+#, python-format
+msgid "Select a valid choice; '%(data)s' is not in %(choices)s."
+msgstr "Selecteer een geldige keuze; '%(data)s is niet in %(choices)s."
 
-#: utils/translation.py:362
-msgid "TIME_FORMAT"
-msgstr "TIME_FORMAT"
+#: forms/__init__.py:645
+msgid "The submitted file is empty."
+msgstr "Het gegeven bestand is leeg."
+
+#: forms/__init__.py:699
+msgid "Enter a whole number between -32,768 and 32,767."
+msgstr "Geef een geheel getal op tussen -32.768 en 32.767."
+
+#: forms/__init__.py:708
+msgid "Enter a positive number."
+msgstr "Geef een geheel getal op."
+
+#: forms/__init__.py:717
+msgid "Enter a whole number between 0 and 32,767."
+msgstr "Geef een geheel getal op tussen 0 en 32.767."
 
 #: utils/dates.py:6
 msgid "Monday"
@@ -1398,54 +1853,52 @@ msgid "December"
 msgstr "december"
 
 #: utils/dates.py:19
-#, fuzzy
 msgid "jan"
-msgstr "en"
+msgstr "jan"
 
 #: utils/dates.py:19
 msgid "feb"
-msgstr ""
+msgstr "feb"
 
 #: utils/dates.py:19
 msgid "mar"
-msgstr ""
+msgstr "mar"
 
 #: utils/dates.py:19
 msgid "apr"
-msgstr ""
+msgstr "apr"
 
 #: utils/dates.py:19
-#, fuzzy
 msgid "may"
-msgstr "dag"
+msgstr "mei"
 
 #: utils/dates.py:19
 msgid "jun"
-msgstr ""
+msgstr "jun"
 
 #: utils/dates.py:20
 msgid "jul"
-msgstr ""
+msgstr "jul"
 
 #: utils/dates.py:20
 msgid "aug"
-msgstr ""
+msgstr "aug"
 
 #: utils/dates.py:20
 msgid "sep"
-msgstr ""
+msgstr "sep"
 
 #: utils/dates.py:20
 msgid "oct"
-msgstr ""
+msgstr "oct"
 
 #: utils/dates.py:20
 msgid "nov"
-msgstr ""
+msgstr "nov"
 
 #: utils/dates.py:20
 msgid "dec"
-msgstr ""
+msgstr "dec"
 
 #: utils/dates.py:27
 msgid "Jan."
@@ -1474,6 +1927,18 @@ msgstr "nov."
 #: utils/dates.py:28
 msgid "Dec."
 msgstr "dec."
+
+#: utils/translation.py:360
+msgid "DATE_FORMAT"
+msgstr "d-n-Y"
+
+#: utils/translation.py:361
+msgid "DATETIME_FORMAT"
+msgstr "d-n-Y H:i"
+
+#: utils/translation.py:362
+msgid "TIME_FORMAT"
+msgstr "H:i"
 
 #: utils/timesince.py:12
 msgid "year"
@@ -1511,471 +1976,7 @@ msgid_plural "minutes"
 msgstr[0] "minuut"
 msgstr[1] "minuten"
 
-#: conf/global_settings.py:37
-msgid "Bengali"
-msgstr "Bengaals"
-
-#: conf/global_settings.py:38
-msgid "Czech"
-msgstr "Tjechisch"
-
-#: conf/global_settings.py:39
-msgid "Welsh"
-msgstr "Wels"
-
-#: conf/global_settings.py:40
-msgid "Danish"
-msgstr "Deens"
-
-#: conf/global_settings.py:41
-msgid "German"
-msgstr "Duits"
-
-#: conf/global_settings.py:42
-msgid "Greek"
-msgstr "Grieks"
-
-#: conf/global_settings.py:43
-msgid "English"
-msgstr "Engels"
-
-#: conf/global_settings.py:44
-msgid "Spanish"
-msgstr "Spaans"
-
-#: conf/global_settings.py:45
-msgid "French"
-msgstr "Frans"
-
-#: conf/global_settings.py:46
-msgid "Galician"
-msgstr "Galisisch"
-
-#: conf/global_settings.py:47
-msgid "Hungarian"
-msgstr ""
-
-#: conf/global_settings.py:48
-msgid "Hebrew"
-msgstr "Hebreews"
-
-#: conf/global_settings.py:49
-msgid "Icelandic"
-msgstr "IJslands"
-
-#: conf/global_settings.py:50
-msgid "Italian"
-msgstr "Italiaans"
-
-#: conf/global_settings.py:51
-msgid "Japanese"
-msgstr "Japans"
-
-#: conf/global_settings.py:52
-msgid "Dutch"
-msgstr "Nederlands"
-
-#: conf/global_settings.py:53
-msgid "Norwegian"
-msgstr "Noors"
-
-#: conf/global_settings.py:54
-msgid "Brazilian"
-msgstr "Braziliaans"
-
-#: conf/global_settings.py:55
-msgid "Romanian"
-msgstr "Roemeens"
-
-#: conf/global_settings.py:56
-msgid "Russian"
-msgstr "Russisch"
-
-#: conf/global_settings.py:57
-msgid "Slovak"
-msgstr "Slovaaks"
-
-#: conf/global_settings.py:58
-msgid "Slovenian"
-msgstr "Sloveens"
-
-#: conf/global_settings.py:59
-msgid "Serbian"
-msgstr "Servisch"
-
-#: conf/global_settings.py:60
-msgid "Swedish"
-msgstr "Zweeds"
-
-#: conf/global_settings.py:61
-msgid "Ukrainian"
-msgstr "Ukraiens"
-
-#: conf/global_settings.py:62
-msgid "Simplified Chinese"
-msgstr "Vereenvoudigd Chinees"
-
-#: conf/global_settings.py:63
-msgid "Traditional Chinese"
-msgstr "Traditioneel Chinees"
-
-#: core/validators.py:60
-msgid "This value must contain only letters, numbers and underscores."
-msgstr "Deze waarde mag alleen letters, getallen en liggende strepen bevatten."
-
-#: core/validators.py:64
-msgid ""
-"This value must contain only letters, numbers, underscores, dashes or "
-"slashes."
-msgstr ""
-"Deze waarde mag alleen letters, cijfers,  liggende strepen en schuine "
-"strepen bevatten."
-
-#: core/validators.py:72
-msgid "Uppercase letters are not allowed here."
-msgstr "Hoofdletters niet toegestaan."
-
-#: core/validators.py:76
-msgid "Lowercase letters are not allowed here."
-msgstr "Kleine letters niet toegestaan."
-
-#: core/validators.py:83
-msgid "Enter only digits separated by commas."
-msgstr "Geef alleen cijfers gescheiden door komma's."
-
-#: core/validators.py:95
-msgid "Enter valid e-mail addresses separated by commas."
-msgstr "Geef een geldig e-mail adres gescheiden door komma's."
-
-#: core/validators.py:99
-msgid "Please enter a valid IP address."
-msgstr "Geef een geldig IP adres."
-
-#: core/validators.py:103
-msgid "Empty values are not allowed here."
-msgstr "Lege waarden niet toegestaan."
-
-#: core/validators.py:107
-msgid "Non-numeric characters aren't allowed here."
-msgstr "Niet-numerieke karakters niet toegestaan."
-
-#: core/validators.py:111
-msgid "This value can't be comprised solely of digits."
-msgstr "Deze waarde kan niet alleen uit cijfers bestaan."
-
-#: core/validators.py:116
-msgid "Enter a whole number."
-msgstr "Geef geheel getal."
-
-#: core/validators.py:120
-msgid "Only alphabetical characters are allowed here."
-msgstr "Alleen alfabethische karakters zijn toegestaan"
-
-#: core/validators.py:124
-msgid "Enter a valid date in YYYY-MM-DD format."
-msgstr "Geef een geldige datum in JJJJ-MM-DD formaat."
-
-#: core/validators.py:128
-msgid "Enter a valid time in HH:MM format."
-msgstr "Geef een geldige tijd in HH:MM formaat."
-
-#: core/validators.py:132 db/models/fields/__init__.py:468
-msgid "Enter a valid date/time in YYYY-MM-DD HH:MM format."
-msgstr "Geef geldige datum/tijd in JJJJ-MM-DD HH:MM formaat."
-
-#: core/validators.py:136
-msgid "Enter a valid e-mail address."
-msgstr "Geef geldig e-mail adres."
-
-#: core/validators.py:148
-msgid ""
-"Upload a valid image. The file you uploaded was either not an image or a "
-"corrupted image."
-msgstr ""
-"Bestand ongeldig. Het bestand dat is gegeven is geen afbeelding of was "
-"beschadigd."
-
-#: core/validators.py:155
-#, python-format
-msgid "The URL %s does not point to a valid image."
-msgstr "De URL %s wijst niet naar een afbeelding."
-
-#: core/validators.py:159
-#, python-format
-msgid "Phone numbers must be in XXX-XXX-XXXX format. \"%s\" is invalid."
-msgstr ""
-"Telefoonnummers moeten in het XXX-XXX-XXXX formaat. \"%s\" is ongeldig."
-
-#: core/validators.py:167
-#, python-format
-msgid "The URL %s does not point to a valid QuickTime video."
-msgstr "De URL %s wijst niet naar een QuickTime video."
-
-#: core/validators.py:171
-msgid "A valid URL is required."
-msgstr "Een geldig URL is nodig."
-
-#: core/validators.py:185
-#, python-format
-msgid ""
-"Valid HTML is required. Specific errors are:\n"
-"%s"
-msgstr ""
-"Geldige HTML is vereist. De specifieke fouten zijn:\n"
-"%s"
-
-#: core/validators.py:192
-#, python-format
-msgid "Badly formed XML: %s"
-msgstr "Foute XML: %s"
-
-#: core/validators.py:202
-#, python-format
-msgid "Invalid URL: %s"
-msgstr "Ongeldige URL: %s"
-
-#: core/validators.py:206 core/validators.py:208
-#, python-format
-msgid "The URL %s is a broken link."
-msgstr "De URL %s is een gebroken link."
-
-#: core/validators.py:214
-msgid "Enter a valid U.S. state abbreviation."
-msgstr "Geef een geldige afkorting van een VS staat."
-
-#: core/validators.py:229
-#, python-format
-msgid "Watch your mouth! The word %s is not allowed here."
-msgid_plural "Watch your mouth! The words %s are not allowed here."
-msgstr[0] "Pas op uw taalgebruik! Gebruik van %s niet toegestaan."
-msgstr[1] "Pas op uw taalgebruik! Gebruik van de woorden %s niet toegestaan."
-
-#: core/validators.py:236
-#, python-format
-msgid "This field must match the '%s' field."
-msgstr "Dit veld moet overeenkomen met het '%s' veld."
-
-#: core/validators.py:255
-msgid "Please enter something for at least one field."
-msgstr "Geef in minimaal een veld een waarde."
-
-#: core/validators.py:264 core/validators.py:275
-msgid "Please enter both fields or leave them both empty."
-msgstr "Voer waarden in in beide velden of laat beide leeg."
-
-#: core/validators.py:282
-#, python-format
-msgid "This field must be given if %(field)s is %(value)s"
-msgstr "Dit veld moet opgegeven worden indien %(field)s is %(value)s"
-
-#: core/validators.py:294
-#, python-format
-msgid "This field must be given if %(field)s is not %(value)s"
-msgstr "Dit veld moet worden opgegeven indien %(field)s niet %(value)s is"
-
-#: core/validators.py:313
-msgid "Duplicate values are not allowed."
-msgstr "Dubbele waarden niet toegestaan."
-
-#: core/validators.py:336
-#, python-format
-msgid "This value must be a power of %s."
-msgstr "De waarde moet een macht van %s zijn."
-
-#: core/validators.py:347
-msgid "Please enter a valid decimal number."
-msgstr "Geef een geldig decimaal getal."
-
-#: core/validators.py:349
-#, python-format
-msgid "Please enter a valid decimal number with at most %s total digit."
-msgid_plural ""
-"Please enter a valid decimal number with at most %s total digits."
-msgstr[0] "Geef een geldig decimaal getal met maximaal %s cijfer."
-msgstr[1] "Geef een geldig decimaal getal met maximaal %s cijfers."
-
-#: core/validators.py:352
-#, python-format
-msgid "Please enter a valid decimal number with at most %s decimal place."
-msgid_plural ""
-"Please enter a valid decimal number with at most %s decimal places."
-msgstr[0] "Geef een decimaal getal met maximaal %s cijfer achter de komma."
-msgstr[1] "Geef een decimaal getal met maximaal %s cijfers achter de komma."
-
-#: core/validators.py:362
-#, python-format
-msgid "Make sure your uploaded file is at least %s bytes big."
-msgstr "Zorg ervoor dat het bestand minimaal %s bytes groot is."
-
-#: core/validators.py:363
-#, python-format
-msgid "Make sure your uploaded file is at most %s bytes big."
-msgstr "Zorg ervoor dat het bestand maximaal %s bytes groot is."
-
-#: core/validators.py:376
-msgid "The format for this field is wrong."
-msgstr "Het formaat van dit veld is fout."
-
-#: core/validators.py:391
-msgid "This field is invalid."
-msgstr "Dit veld is ongeldig."
-
-#: core/validators.py:426
-#, python-format
-msgid "Could not retrieve anything from %s."
-msgstr "Kan niks ophalen van %s."
-
-#: core/validators.py:429
-#, python-format
-msgid ""
-"The URL %(url)s returned the invalid Content-Type header '%(contenttype)s'."
-msgstr ""
-"De geretourneerde URL %(url)s bevat een ongeldige Content-Type '%"
-"(contenttype)s."
-
-#: core/validators.py:462
-#, python-format
-msgid ""
-"Please close the unclosed %(tag)s tag from line %(line)s. (Line starts with "
-"\"%(start)s\".)"
-msgstr ""
-"Sluit de niet gesloten %(tag)s tag op regel %(line)s. (Regel start met \"%"
-"(start)s\".)"
-
-#: core/validators.py:466
-#, python-format
-msgid ""
-"Some text starting on line %(line)s is not allowed in that context. (Line "
-"starts with \"%(start)s\".)"
-msgstr ""
-"Tekst beginnend op regel %(line)s is in deze context niet toegestaan. (Regel "
-"start met \"%(start)s\".)"
-
-#: core/validators.py:471
-#, python-format
-msgid ""
-"\"%(attr)s\" on line %(line)s is an invalid attribute. (Line starts with \"%"
-"(start)s\".)"
-msgstr ""
-"\"%(attr)s\" op regel %(line)s is een ongeldig attribuut. (Regel start met "
-"\"%(start)s\".)"
-
-#: core/validators.py:476
-#, python-format
-msgid ""
-"\"<%(tag)s>\" on line %(line)s is an invalid tag. (Line starts with \"%"
-"(start)s\".)"
-msgstr ""
-"\"<%(tag)s>\" op regel %(line)s is een ongeldige tag. (Regel start met \"%"
-"(start)s\".)"
-
-#: core/validators.py:480
-#, python-format
-msgid ""
-"A tag on line %(line)s is missing one or more required attributes. (Line "
-"starts with \"%(start)s\".)"
-msgstr ""
-"Een of meerdere attributen ontbreken bij een tag op regel %(line)s. (Regel "
-"start met \"%(start)s\".)"
-
-#: core/validators.py:485
-#, python-format
-msgid ""
-"The \"%(attr)s\" attribute on line %(line)s has an invalid value. (Line "
-"starts with \"%(start)s\".)"
-msgstr ""
-"De \"%(attr)s\" attribuut op regel %(line)s heeft een ongeldige waarde. "
-"(Regel start met \"%(start)s\".)"
-
-#: db/models/manipulators.py:302
-#, python-format
-msgid "%(object)s with this %(type)s already exists for the given %(field)s."
-msgstr ""
-"%(object)s van het type %(type)s bestaat al voor het gegeven %(field)s."
-
-#: db/models/fields/__init__.py:40
-#, python-format
-msgid "%(optname)s with this %(fieldname)s already exists."
-msgstr "%(optname)s met deze %(fieldname)s bestaat al."
-
-#: db/models/fields/__init__.py:114 db/models/fields/__init__.py:265
-#: db/models/fields/__init__.py:542 db/models/fields/__init__.py:553
-#: forms/__init__.py:346
-msgid "This field is required."
-msgstr "Dit veld is verplicht."
-
-#: db/models/fields/__init__.py:337
-msgid "This value must be an integer."
-msgstr "De waarde moet een geheel getal zijn."
-
-#: db/models/fields/__init__.py:369
-msgid "This value must be either True or False."
-msgstr "De waarde moet of True (waar) of False (onwaar) zijn."
-
-#: db/models/fields/__init__.py:385
-msgid "This field cannot be null."
-msgstr "Dit veld kan niet oningevuld zijn."
-
-#: db/models/fields/__init__.py:562
-msgid "Enter a valid filename."
-msgstr "Geef geldige bestandsnaam."
-
-#: db/models/fields/related.py:43
-#, python-format
-msgid "Please enter a valid %s."
-msgstr "Geef een geldig IP adres."
-
-#: db/models/fields/related.py:579
-msgid "Separate multiple IDs with commas."
-msgstr "Meerdere ID's door komma's gescheiden."
-
-#: db/models/fields/related.py:581
-msgid ""
-"Hold down \"Control\", or \"Command\" on a Mac, to select more than one."
-msgstr ""
-"Houd \"Control\", of \"Command\" op een Mac, ingedrukt om meerdere te "
-"selecteren."
-
-#: db/models/fields/related.py:625
-#, python-format
-msgid "Please enter valid %(self)s IDs. The value %(value)r is invalid."
-msgid_plural ""
-"Please enter valid %(self)s IDs. The values %(value)r are invalid."
-msgstr[0] "Geef een geldig %(self)s IDs. De waarde %(value)r is ongeldig."
-msgstr[1] "Geef een geldig %(self)s IDs. de waarden %(value)r zijn ongeldig."
-
-#: forms/__init__.py:380
-#, python-format
-msgid "Ensure your text is less than %s character."
-msgid_plural "Ensure your text is less than %s characters."
-msgstr[0] "Zorg ervoor dat uw tekst korter is dan %s."
-msgstr[1] "Zorg ervoor dat uw tekst korter is dan %S."
-
-#: forms/__init__.py:385
-msgid "Line breaks are not allowed here."
-msgstr "Regeleindes zijn niet toegestaan."
-
-#: forms/__init__.py:480 forms/__init__.py:551 forms/__init__.py:589
-#, python-format
-msgid "Select a valid choice; '%(data)s' is not in %(choices)s."
-msgstr "Selecteer een geldige keuze; '%(data)s is niet in %(choices)s."
-
-#: forms/__init__.py:645
-msgid "The submitted file is empty."
-msgstr "Het gegeven bestand is leeg."
-
-#: forms/__init__.py:699
-msgid "Enter a whole number between -32,768 and 32,767."
-msgstr "Geef geheel getal tussen -32.768 en 32.767."
-
-#: forms/__init__.py:708
-msgid "Enter a positive number."
-msgstr "Geef geheel getal."
-
-#: forms/__init__.py:717
-msgid "Enter a whole number between 0 and 32,767."
-msgstr "Geef geheel getal tussen 0 en 32.767."
-
 #: template/defaultfilters.py:379
 msgid "yes,no,maybe"
 msgstr "ja,nee,misschien"
+

@@ -95,6 +95,8 @@ class BaseHandler:
                 return callback(request, **param_dict)
         except exceptions.PermissionDenied:
             return http.HttpResponseForbidden('<h1>Permission denied</h1>')
+        except SystemExit:
+            pass # See http://code.djangoproject.com/ticket/1023
         except: # Handle everything else, including SuspiciousOperation, etc.
             if settings.DEBUG:
                 return self.get_technical_error_response(request)

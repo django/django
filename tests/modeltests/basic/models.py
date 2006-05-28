@@ -283,6 +283,16 @@ Traceback (most recent call last):
     ...
 AssertionError: Cannot combine queries once a slice has been taken.
 
+# Negative slices are not supported, due to database constraints.
+# (hint: inverting your ordering might do what you need).
+>>> Article.objects.all()[-1]
+Traceback (most recent call last):
+    ...
+AssertionError: Negative indexing is not supported.
+>>> Article.objects.all()[0:-5]
+Traceback (most recent call last):
+    ...
+AssertionError: Negative indexing is not supported.
 
 # An Article instance doesn't have access to the "objects" attribute.
 # That's only available on the class.

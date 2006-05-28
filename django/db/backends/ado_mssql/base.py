@@ -5,7 +5,11 @@ Requires adodbapi 2.0.1: http://adodbapi.sourceforge.net/
 """
 
 from django.db.backends import util
-import adodbapi as Database
+try:
+    import adodbapi as Database
+except ImportError, e:
+    from django.core.exceptions import ImproperlyConfigured
+    raise ImproperlyConfigured, "Error loading adodbapi module: %s" % e
 import datetime
 try:
     import mx

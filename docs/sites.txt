@@ -308,4 +308,4 @@ Here's how Django uses the sites framework:
 .. _redirects framework: http://www.djangoproject.com/documentation/redirects/
 .. _flatpages framework: http://www.djangoproject.com/documentation/flatpages/
 .. _syndication framework: http://www.djangoproject.com/documentation/syndication/
-.. _authentication framework: http://www.djangoproject.com/documentation/syndication/
+.. _authentication framework: http://www.djangoproject.com/documentation/authentication/

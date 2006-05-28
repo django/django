@@ -42,6 +42,7 @@ LANGUAGES = (
     ('el', _('Greek')),
     ('en', _('English')),
     ('es', _('Spanish')),
+    ('es_AR', _('Argentinean Spanish')),
     ('fr', _('French')),
     ('gl', _('Galician')),
     ('hu', _('Hungarian')),
@@ -218,12 +219,12 @@ TRANSACTIONS_MANAGED = False
 # this middleware classes will be applied in the order given, and in the
 # response phase the middleware will be applied in reverse order.
 MIDDLEWARE_CLASSES = (
-    "django.contrib.sessions.middleware.SessionMiddleware",
-    "django.contrib.auth.middleware.AuthenticationMiddleware",
-#     "django.middleware.http.ConditionalGetMiddleware",
-#     "django.middleware.gzip.GZipMiddleware",
-    "django.middleware.common.CommonMiddleware",
-    "django.middleware.doc.XViewMiddleware",
+    'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.contrib.auth.middleware.AuthenticationMiddleware',
+#     'django.middleware.http.ConditionalGetMiddleware',
+#     'django.middleware.gzip.GZipMiddleware',
+    'django.middleware.common.CommonMiddleware',
+    'django.middleware.doc.XViewMiddleware',
 )
 
 ############

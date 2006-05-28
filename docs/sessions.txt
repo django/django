@@ -14,7 +14,7 @@ Sessions are implemented via middleware_.
 
 Turn session functionality on and off by editing the ``MIDDLEWARE_CLASSES``
 setting. To activate sessions, make sure ``MIDDLEWARE_CLASSES`` contains
-``"django.contrib.sessions.middleware.SessionMiddleware"``.
+``'django.contrib.sessions.middleware.SessionMiddleware'``.
 
 The default ``settings.py`` created by ``django-admin.py startproject`` has
 ``SessionMiddleware`` activated.

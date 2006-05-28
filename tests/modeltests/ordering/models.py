@@ -56,6 +56,10 @@ API_TESTS = """
 >>> Article.objects.order_by('headline')[1:3]
 [Article 2, Article 3]
 
+# Getting a single item should work too:
+>>> Article.objects.all()[0]
+Article 4
+
 # Use '?' to order randomly. (We're using [...] in the output to indicate we
 # don't know what order the output will be in.
 >>> Article.objects.order_by('?')

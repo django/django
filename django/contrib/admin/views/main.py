@@ -118,7 +118,7 @@ class AdminBoundField(object):
         self.raw_id_admin = use_raw_id_admin(field)
         self.is_date_time = isinstance(field, models.DateTimeField)
         self.is_file_field = isinstance(field, models.FileField)
-        self.needs_add_label = field.rel and isinstance(field.rel, models.ManyToOneRel) or isinstance(field.rel, models.ManyToManyRel) and field.rel.to._meta.admin
+        self.needs_add_label = field.rel and (isinstance(field.rel, models.ManyToOneRel) or isinstance(field.rel, models.ManyToManyRel)) and field.rel.to._meta.admin
         self.hidden = isinstance(self.field, models.AutoField)
         self.first = False
 

@@ -17,9 +17,15 @@ def get_apps():
     _app_list = []
     for app_name in settings.INSTALLED_APPS:
         try:
-            _app_list.append(__import__(app_name, '', '', ['models']).models)
-        except (ImportError, AttributeError), e:
-            pass
+            mod = __import__(app_name, '', '', ['models'])
+        except ImportError:
+            pass # Assume this app doesn't have a models.py in it.
+                 # GOTCHA: It may have a models.py that raises ImportError.
+        else:
+            try:
+                _app_list.append(mod.models)
+            except AttributeError:
+                pass # This app doesn't have a models.py in it.
     return _app_list
 
 def get_app(app_label):

@@ -23,10 +23,10 @@ name. For example, here's the default ``MIDDLEWARE_CLASSES`` created by
 ``django-admin.py startproject``::
 
     MIDDLEWARE_CLASSES = (
-        "django.middleware.common.CommonMiddleware",
-        "django.contrib.sessions.middleware.SessionMiddleware",
-        "django.contrib.auth.middleware.AuthenticationMiddleware",
-        "django.middleware.doc.XViewMiddleware",
+        'django.middleware.common.CommonMiddleware',
+        'django.contrib.sessions.middleware.SessionMiddleware',
+        'django.contrib.auth.middleware.AuthenticationMiddleware',
+        'django.middleware.doc.XViewMiddleware',
     )
 
 Django applies middleware in the order it's defined in ``MIDDLEWARE_CLASSES``,
