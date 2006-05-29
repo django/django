@@ -13,7 +13,7 @@ msgstr ""
 "Last-Translator: panos laganakos <panos.laganakos@gmail.com>\n"
 "Language-Team: Greek\n"
 "MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=iso-8859-1\n"
+"Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
 #: contrib/comments/models.py:67 contrib/comments/models.py:166
