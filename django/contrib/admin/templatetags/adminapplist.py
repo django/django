@@ -42,7 +42,12 @@ class AdminApplistNode(template.Node):
                             })
 
                 if model_list:
-                    model_list.sort()
+                    # Sort using verbose decorate-sort-undecorate pattern
+                    # instead of key argument to sort() for python 2.3 compatibility
+                    decorated = [(x['name'], x) for x in model_list]
+                    decorated.sort()
+                    model_list = [x for key, x in decorated]
+
                     app_list.append({
                         'name': app_label.title(),
                         'has_module_perms': has_module_perms,
