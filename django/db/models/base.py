@@ -161,7 +161,7 @@ class Model(object):
                 (backend.quote_name(self._meta.db_table), backend.quote_name(self._meta.pk.column)), [pk_val])
             # If it does already exist, do an UPDATE.
             if cursor.fetchone():
-                db_values = [f.get_db_prep_save(f.pre_save(getattr(self, f.attname), False)) for f in non_pks]
+                db_values = [f.get_db_prep_save(f.pre_save(self, False)) for f in non_pks]
                 cursor.execute("UPDATE %s SET %s WHERE %s=%%s" % \
                     (backend.quote_name(self._meta.db_table),
                     ','.join(['%s=%%s' % backend.quote_name(f.column) for f in non_pks]),
@@ -171,11 +171,11 @@ class Model(object):
                 record_exists = False
         if not pk_set or not record_exists:
             field_names = [backend.quote_name(f.column) for f in self._meta.fields if not isinstance(f, AutoField)]
-            db_values = [f.get_db_prep_save(f.pre_save(getattr(self, f.attname), True)) for f in self._meta.fields if not isinstance(f, AutoField)]
+            db_values = [f.get_db_prep_save(f.pre_save(self, True)) for f in self._meta.fields if not isinstance(f, AutoField)]
             # If the PK has been manually set, respect that.
             if pk_set:
                 field_names += [f.column for f in self._meta.fields if isinstance(f, AutoField)]
-                db_values += [f.get_db_prep_save(f.pre_save(getattr(self, f.column), True)) for f in self._meta.fields if isinstance(f, AutoField)]
+                db_values += [f.get_db_prep_save(f.pre_save(self, True)) for f in self._meta.fields if isinstance(f, AutoField)]
             placeholders = ['%s'] * len(field_names)
             if self._meta.order_with_respect_to:
                 field_names.append(backend.quote_name('_order'))
