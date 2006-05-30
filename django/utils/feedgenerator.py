@@ -217,7 +217,7 @@ class Atom1Feed(SyndicationFeed):
         for item in self.items:
             handler.startElement(u"entry", {})
             handler.addQuickElement(u"title", item['title'])
-            handler.addQuickElement(u"link", u"", {u"href": item['link']})
+            handler.addQuickElement(u"link", u"", {u"href": item['link'], u"rel": u"alternate"})
             if item['pubdate'] is not None:
                 handler.addQuickElement(u"updated", rfc3339_date(item['pubdate']).decode('ascii'))
 
