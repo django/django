@@ -334,8 +334,8 @@ def get_sql_initial_data_for_model(model):
         r"""(           # each statement is...
         (?:             # one or more chunks of ...
             (?:[^;'"]+) # not the end of a statement or start of a quote
-          | (?:'[^']+') # something in single quotes
-          | (?:"[^"]+") # something in double quotes
+          | (?:'[^']*') # something in single quotes
+          | (?:"[^"]*") # something in double quotes
         )+)""", re.VERBOSE)
 
     # Find custom SQL, if it's available.
