@@ -577,7 +577,7 @@ class SelectMultipleField(SelectField):
             selected_html = ''
             if str(value) in str_data_list:
                 selected_html = ' selected="selected"'
-            output.append('    <option value="%s"%s>%s</option>' % (escape(value), selected_html, choice))
+            output.append('    <option value="%s"%s>%s</option>' % (escape(value), selected_html, escape(choice)))
         output.append('  </select>')
         return '\n'.join(output)
 
