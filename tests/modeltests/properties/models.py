@@ -1,5 +1,7 @@
 """
 22. Using properties on models
+
+Use properties on models just like on any other Python object.
 """
 
 from django.db import models

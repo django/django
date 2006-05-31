@@ -1,6 +1,7 @@
 """
 XX. Model inheritance
 
+Model inheritance isn't yet supported.
 """
 
 from django.db import models
