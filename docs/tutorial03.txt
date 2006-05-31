@@ -209,7 +209,7 @@ So let's use Django's template system to separate the design from Python::
         })
         return HttpResponse(t.render(c))
 
-That code loads the template called "polls/index" and passes it a context. The
+That code loads the template called "polls/index.html" and passes it a context. The
 context is a dictionary mapping template variable names to Python objects.
 
 Reload the page. Now you'll see an error::
