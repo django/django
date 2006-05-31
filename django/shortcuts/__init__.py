@@ -16,8 +16,8 @@ def get_object_or_404(klass, *args, **kwargs):
     except klass.DoesNotExist:
         raise Http404
 
-def get_list_or_404(klass, **kwargs):
-    obj_list = list(klass._default_manager.filter(**kwargs))
+def get_list_or_404(klass, *args, **kwargs):
+    obj_list = list(klass._default_manager.filter(*args, **kwargs))
     if not obj_list:
         raise Http404
     return obj_list
