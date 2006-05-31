@@ -12,7 +12,7 @@
 <div class="breadcrumbs">
      <a href="../../../">{% trans "Home" %}</a> &rsaquo;
      <a href="../">{{ opts.verbose_name_plural|capfirst }}</a> &rsaquo;
-     {% if add %}{% trans "Add" %} {{ opts.verbose_name }}{% else %}{{ original|striptags|truncatewords:"18" }}{% endif %}
+     {% if add %}{% trans "Add" %} {{ opts.verbose_name }}{% else %}{{ original|truncatewords:"18"|escape }}{% endif %}
 </div>
 {% endif %}{% endblock %}
 {% block content %}<div id="content-main">
