@@ -1,7 +1,12 @@
 """
-XXX. Callable defaults
+31. Callable defaults
 
-???
+You can pass callable objects as the ``default`` parameter to a field. When
+the object is created without an explicit value passed in, Django will call
+the method to determine the default value.
+
+This example uses ``datetime.datetime.now`` as the default for the ``pub_date``
+field.
 """
 
 from django.db import models
@@ -9,9 +14,9 @@ from datetime import datetime
 
 class Article(models.Model):
     headline = models.CharField(maxlength=100, default='Default headline')
-    pub_date = models.DateTimeField(default = datetime.now)
-    
-    def __repr__(self):
+    pub_date = models.DateTimeField(default=datetime.now)
+
+    def __str__(self):
         return self.headline
 
 API_TESTS = """
@@ -43,6 +48,4 @@ API_TESTS = """
 >>> d = now - a.pub_date
 >>> d.seconds < 5
 True
-
-
 """

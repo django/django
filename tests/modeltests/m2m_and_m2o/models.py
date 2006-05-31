@@ -1,8 +1,7 @@
 """
-27. Many-to-many and many-to-one relationships to the same table
+28. Many-to-many and many-to-one relationships to the same table
 
-This is a response to bug #1535
-
+Make sure to set ``related_name`` if you use relationships to the same table.
 """
 
 from django.db import models
@@ -14,8 +13,9 @@ class Issue(models.Model):
     num = models.IntegerField()
     cc = models.ManyToManyField(User, blank=True, related_name='test_issue_cc')
     client = models.ForeignKey(User, related_name='test_issue_client')
-    def __repr__(self):
-        return "<Issue %d>" % (self.num,)
+
+    def __str__(self):
+        return str(self.num)
 
     class Meta:
         ordering = ('num',)
