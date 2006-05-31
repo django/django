@@ -315,7 +315,7 @@ class QuerySet(object):
 
     def complex_filter(self, filter_obj):
         """Returns a new QuerySet instance with filter_obj added to the filters.
-        filter_obj can be a Q object (has 'get_sql' method) or a dictionary of 
+        filter_obj can be a Q object (has 'get_sql' method) or a dictionary of
         keyword lookup arguments."""
         # This exists to support framework features such as 'limit_choices_to',
         # and usually it will be more natural to use other methods.
@@ -380,6 +380,10 @@ class QuerySet(object):
         #  (so that A.filter(args1) & A.filter(args2) does the same as
         #   A.filter(args1).filter(args2)
         combined = other._clone()
+        if self._select: combined._select.update(self._select)
+        if self._where: combined._where.extend(self._where)
+        if self._params: combined._params.extend(self._params)
+        if self._tables: combined._tables.extend(self._tables)
         # If 'self' is ordered and 'other' isn't, propagate 'self's ordering
         if (self._order_by is not None and len(self._order_by) > 0) and \
            (combined._order_by is None or len(combined._order_by) == 0):
