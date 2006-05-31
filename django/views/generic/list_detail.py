@@ -6,7 +6,8 @@ from django.core.exceptions import ObjectDoesNotExist
 
 def object_list(request, queryset, paginate_by=None, allow_empty=False,
         template_name=None, template_loader=loader,
-        extra_context={}, context_processors=None, template_object_name='object'):
+        extra_context={}, context_processors=None, template_object_name='object',
+        mimetype=None):
     """
     Generic list of objects.
 
@@ -73,12 +74,13 @@ def object_list(request, queryset, paginate_by=None, allow_empty=False,
         model = queryset.model
         template_name = "%s/%s_list.html" % (model._meta.app_label, model._meta.object_name.lower())
     t = template_loader.get_template(template_name)
-    return HttpResponse(t.render(c))
+    return HttpResponse(t.render(c), mimetype=mimetype)
 
 def object_detail(request, queryset, object_id=None, slug=None,
         slug_field=None, template_name=None, template_name_field=None,
         template_loader=loader, extra_context={},
-        context_processors=None, template_object_name='object'):
+        context_processors=None, template_object_name='object',
+        mimetype=None):
     """
     Generic list of objects.
 
@@ -113,6 +115,6 @@ def object_detail(request, queryset, object_id=None, slug=None,
             c[key] = value()
         else:
             c[key] = value
-    response = HttpResponse(t.render(c))
+    response = HttpResponse(t.render(c), mimetype=mimetype)
     populate_xheaders(request, response, model, getattr(obj, obj._meta.pk.name))
     return response

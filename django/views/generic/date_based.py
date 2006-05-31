@@ -6,7 +6,8 @@ import datetime, time
 
 def archive_index(request, queryset, date_field, num_latest=15,
         template_name=None, template_loader=loader,
-        extra_context={}, allow_empty=False, context_processors=None):
+        extra_context={}, allow_empty=False, context_processors=None,
+        mimetype=None):
     """
     Generic top-level archive of date-based objects.
 
@@ -40,11 +41,11 @@ def archive_index(request, queryset, date_field, num_latest=15,
             c[key] = value()
         else:
             c[key] = value
-    return HttpResponse(t.render(c))
+    return HttpResponse(t.render(c), mimetype=mimetype)
 
 def archive_year(request, year, queryset, date_field, template_name=None,
         template_loader=loader, extra_context={}, allow_empty=False,
-        context_processors=None):
+        context_processors=None, mimetype=None):
     """
     Generic yearly archive view.
 
@@ -78,12 +79,12 @@ def archive_year(request, year, queryset, date_field, template_name=None,
             c[key] = value()
         else:
             c[key] = value
-    return HttpResponse(t.render(c))
+    return HttpResponse(t.render(c), mimetype=mimetype)
 
 def archive_month(request, year, month, queryset, date_field,
         month_format='%b', template_name=None, template_loader=loader,
         extra_context={}, allow_empty=False, context_processors=None,
-        template_object_name='object'):
+        template_object_name='object', mimetype=None):
     """
     Generic monthly archive view.
 
@@ -134,12 +135,12 @@ def archive_month(request, year, month, queryset, date_field,
             c[key] = value()
         else:
             c[key] = value
-    return HttpResponse(t.render(c))
+    return HttpResponse(t.render(c), mimetype=mimetype)
 
 def archive_week(request, year, week, queryset, date_field,
         template_name=None, template_loader=loader,
         extra_context={}, allow_empty=True, context_processors=None,
-        template_object_name='object'):
+        template_object_name='object', mimetype=None):
     """
     Generic weekly archive view.
 
@@ -181,12 +182,13 @@ def archive_week(request, year, week, queryset, date_field,
             c[key] = value()
         else:
             c[key] = value
-    return HttpResponse(t.render(c))
+    return HttpResponse(t.render(c), mimetype=mimetype)
 
 def archive_day(request, year, month, day, queryset, date_field,
         month_format='%b', day_format='%d', template_name=None,
         template_loader=loader, extra_context={}, allow_empty=False,
-        context_processors=None, template_object_name='object'):
+        context_processors=None, template_object_name='object',
+        mimetype=None):
     """
     Generic daily archive view.
 
@@ -233,7 +235,7 @@ def archive_day(request, year, month, day, queryset, date_field,
             c[key] = value()
         else:
             c[key] = value
-    return HttpResponse(t.render(c))
+    return HttpResponse(t.render(c), mimetype=mimetype)
 
 def archive_today(request, **kwargs):
     """
@@ -251,7 +253,7 @@ def object_detail(request, year, month, day, queryset, date_field,
         month_format='%b', day_format='%d', object_id=None, slug=None,
         slug_field=None, template_name=None, template_name_field=None,
         template_loader=loader, extra_context={}, context_processors=None,
-        template_object_name='object'):
+        template_object_name='object', mimetype=None):
     """
     Generic detail view from year/month/day/slug or year/month/day/id structure.
 
@@ -300,6 +302,6 @@ def object_detail(request, year, month, day, queryset, date_field,
             c[key] = value()
         else:
             c[key] = value
-    response = HttpResponse(t.render(c))
+    response = HttpResponse(t.render(c), mimetype=mimetype)
     populate_xheaders(request, response, model, getattr(obj, obj._meta.pk.name))
     return response
