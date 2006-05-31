@@ -1,5 +1,5 @@
 """
-3. Giving models custom methods and custom managers
+3. Giving models custom methods
 
 Any method you add to a model will be available to instances.
 """

@@ -1,5 +1,5 @@
 """
-27. Many-to-many and many-to-one relationships to the same table.
+27. Many-to-many and many-to-one relationships to the same table
 
 This is a response to bug #1535
 
@@ -16,7 +16,7 @@ class Issue(models.Model):
     client = models.ForeignKey(User, related_name='test_issue_client')
     def __repr__(self):
         return "<Issue %d>" % (self.num,)
-        
+
     class Meta:
         ordering = ('num',)
 
