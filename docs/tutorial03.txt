@@ -214,8 +214,8 @@ context is a dictionary mapping template variable names to Python objects.
 
 Reload the page. Now you'll see an error::
 
-    TemplateDoesNotExist: Your TEMPLATE_DIRS settings is empty.
-    Change it to point to at least one template directory.
+    TemplateDoesNotExist at /polls/
+    polls/index.html
 
 Ah. There's no template yet. First, create a directory, somewhere on your
 filesystem, whose contents Django can access. (Django runs as whatever user
