@@ -162,11 +162,15 @@ A date field. Has a few extra optional arguments:
     ======================  ===================================================
     ``auto_now``            Automatically set the field to now every time the
                             object is saved. Useful for "last-modified"
-                            timestamps.
+                            timestamps. Note that the current date is *always*
+                            used; it's not just a default value that you can
+                            override.
 
     ``auto_now_add``        Automatically set the field to now when the object
                             is first created. Useful for creation of
-                            timestamps.
+                            timestamps. Note that the current date is *always*
+                            used; it's not just a default value that you can
+                            override.
     ======================  ===================================================
 
 The admin represents this as an ``<input type="text">`` with a JavaScript
