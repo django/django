@@ -74,8 +74,7 @@ def unquote(s):
     for item in list:
         if item[1:2]:
             try:
-                myappend(mychr(myatoi(item[:2], 16))
-                     + item[2:])
+                myappend(mychr(myatoi(item[:2], 16)) + item[2:])
             except ValueError:
                 myappend('_' + item)
         else:
