@@ -20,7 +20,7 @@ class Permission(models.Model):
         ordering = ('content_type', 'codename')
 
     def __str__(self):
-        return "%r | %s" % (self.content_type, self.name)
+        return "%s | %s" % (self.content_type, self.name)
 
 class Group(models.Model):
     name = models.CharField(_('name'), maxlength=80, unique=True)
