@@ -488,6 +488,10 @@ cleared, the object will be deleted.
 It is an error to have an inline-editable relation without at least one
 ``core=True`` field.
 
+Please note that each field marked "core" is treated as a required field by the
+Django admin site. Essentially, this means you should put ``core=True`` on all
+required fields in your related object that is being edited inline.
+
 ``db_column``
 ~~~~~~~~~~~~~
 
