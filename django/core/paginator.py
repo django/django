@@ -54,6 +54,26 @@ class ObjectPaginator:
     def has_previous_page(self, page_number):
         return page_number > 0
 
+    def first_on_page(self, page_number):
+        """
+        Returns the 1-based index of the first object on the given page,
+        relative to total objects found (hits).
+        """
+        if page_number == 0:
+            return 1
+        return (self.num_per_page * page_number) + 1
+
+    def last_on_page(self, page_number):
+        """
+        Returns the 1-based index of the last object on the given page,
+        relative to total objects found (hits).
+        """
+        if page_number == 0 and self.num_per_page >= self._hits:
+            return self._hits
+        elif page_number == (self._pages - 1) and (page_number + 1) * self.num_per_page > self._hits:
+            return self._hits
+        return (page_number + 1) * self.num_per_page
+
     def _get_hits(self):
         if self._hits is None:
             self._hits = self.query_set.count()

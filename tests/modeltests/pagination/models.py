@@ -55,4 +55,13 @@ False
 >>> paginator.has_previous_page(1)
 True
 
+>>> paginator.first_on_page(0)
+1
+>>> paginator.first_on_page(1)
+6
+>>> paginator.last_on_page(0)
+5
+>>> paginator.last_on_page(1)
+9
+
 """
