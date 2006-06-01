@@ -146,7 +146,11 @@ def isValidImage(field_data, all_data):
     from PIL import Image
     from cStringIO import StringIO
     try:
-        Image.open(StringIO(field_data['content']))
+        content = field_data['content']
+    except TypeError:
+        raise ValidationError, gettext("No file was submitted. Check the encoding type on the form.")
+    try:
+        Image.open(StringIO(content))
     except IOError: # Python Imaging Library doesn't recognize it as an image
         raise ValidationError, gettext("Upload a valid image. The file you uploaded was either not an image or a corrupted image.")
 
@@ -366,9 +370,13 @@ class HasAllowableSize:
         self.max_error_message = max_error_message or lazy_inter(gettext_lazy("Make sure your uploaded file is at most %s bytes big."), max_size)
 
     def __call__(self, field_data, all_data):
-        if self.min_size is not None and len(field_data['content']) < self.min_size:
+        try:
+            content = field_data['content']
+        except TypeError:
+            raise ValidationError, gettext_lazy("No file was submitted. Check the encoding type on the form.")
+        if self.min_size is not None and len(content) < self.min_size:
             raise ValidationError, self.min_error_message
-        if self.max_size is not None and len(field_data['content']) > self.max_size:
+        if self.max_size is not None and len(content) > self.max_size:
             raise ValidationError, self.max_error_message
 
 class MatchesRegularExpression:

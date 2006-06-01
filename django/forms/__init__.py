@@ -641,7 +641,11 @@ class FileUploadField(FormField):
         self.validator_list = [self.isNonEmptyFile] + validator_list
 
     def isNonEmptyFile(self, field_data, all_data):
-        if not field_data['content']:
+        try:
+            content = field_data['content']
+        except TypeError:
+            raise validators.CriticalValidationError, gettext("No file was submitted. Check the encoding type on the form.")
+        if not content:
             raise validators.CriticalValidationError, gettext("The submitted file is empty.")
 
     def render(self, data):
