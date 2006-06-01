@@ -279,7 +279,7 @@ class Model(object):
             order_field = self._meta.order_with_respect_to
             where = ['%s %s (SELECT %s FROM %s WHERE %s=%%s)' % \
                 (backend.quote_name('_order'), op, backend.quote_name('_order'),
-                backend.quote_name(opts.db_table), backend.quote_name(opts.pk.column)),
+                backend.quote_name(self._meta.db_table), backend.quote_name(self._meta.pk.column)),
                 '%s=%%s' % backend.quote_name(order_field.column)]
             params = [self._get_pk_val(), getattr(self, order_field.attname)]
             obj = self._default_manager.order_by('_order').extra(where=where, params=params)[:1].get()
