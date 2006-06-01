@@ -45,7 +45,8 @@ def archive_index(request, queryset, date_field, num_latest=15,
 
 def archive_year(request, year, queryset, date_field, template_name=None,
         template_loader=loader, extra_context={}, allow_empty=False,
-        context_processors=None, mimetype=None):
+        context_processors=None, template_object_name='object', mimetype=None,
+        make_object_list=False):
     """
     Generic yearly archive view.
 
@@ -55,6 +56,9 @@ def archive_year(request, year, queryset, date_field, template_name=None,
             List of months in this year with objects
         year
             This year
+        object_list
+            List of objects published in the given month
+            (Only available if make_object_list argument is True)
     """
     model = queryset.model
     now = datetime.datetime.now()
@@ -67,12 +71,17 @@ def archive_year(request, year, queryset, date_field, template_name=None,
     date_list = queryset.filter(**lookup_kwargs).dates(date_field, 'month')
     if not date_list and not allow_empty:
         raise Http404
+    if make_object_list:
+        object_list = queryset.filter(**lookup_kwargs).order_by(date_field)
+    else:
+        object_list = []
     if not template_name:
         template_name = "%s/%s_archive_year.html" % (model._meta.app_label, model._meta.object_name.lower())
     t = template_loader.get_template(template_name)
     c = RequestContext(request, {
         'date_list': date_list,
         'year': year,
+        '%s_list' % template_object_name: object_list,
     }, context_processors)
     for key, value in extra_context.items():
         if callable(value):
