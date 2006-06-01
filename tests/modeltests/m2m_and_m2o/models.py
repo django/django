@@ -47,20 +47,20 @@ API_TESTS = """
 >>> i3.cc.add(r)
 >>> from django.db.models.query import Q
 >>> Issue.objects.filter(client=r.id)
-[<Issue 1>, <Issue 2>]
+[<Issue: 1>, <Issue: 2>]
 >>> Issue.objects.filter(client=g.id)
-[<Issue 3>]
+[<Issue: 3>]
 >>> Issue.objects.filter(cc__id__exact=g.id)
 []
 >>> Issue.objects.filter(cc__id__exact=r.id)
-[<Issue 2>, <Issue 3>]
+[<Issue: 2>, <Issue: 3>]
 
 # Queries that combine results from the m2m and the m2o relationship.
 # 3 ways of saying the same thing:
 >>> Issue.objects.filter(Q(cc__id__exact=r.id) | Q(client=r.id))
-[<Issue 1>, <Issue 2>, <Issue 3>]
+[<Issue: 1>, <Issue: 2>, <Issue: 3>]
 >>> Issue.objects.filter(cc__id__exact=r.id) | Issue.objects.filter(client=r.id)
-[<Issue 1>, <Issue 2>, <Issue 3>]
+[<Issue: 1>, <Issue: 2>, <Issue: 3>]
 >>> Issue.objects.filter(Q(client=r.id) | Q(cc__id__exact=r.id))
-[<Issue 1>, <Issue 2>, <Issue 3>]
+[<Issue: 1>, <Issue: 2>, <Issue: 3>]
 """
