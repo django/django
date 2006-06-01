@@ -3,8 +3,8 @@ from django.db.models.fields import DateField, FieldDoesNotExist
 from django.db.models import signals
 from django.dispatch import dispatcher
 from django.utils.datastructures import SortedDict
-
 import operator
+import re
 
 # For Python 2.3
 if not hasattr(__builtins__, 'set'):
@@ -59,7 +59,7 @@ def orderlist2sql(order_list, opts, prefix=''):
     return ', '.join(output)
 
 def quote_only_if_word(word):
-    if ' ' in word:
+    if re.search('\W', word): # Don't quote if there are spaces or non-word chars.
         return word
     else:
         return backend.quote_name(word)
