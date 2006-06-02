@@ -12,6 +12,10 @@ class CursorDebugWrapper:
             return self.cursor.execute(sql, params)
         finally:
             stop = time()
+            # If params was a list, convert it to a tuple, because string
+            # formatting with '%' only works with tuples or dicts.
+            if not isinstance(params, (tuple, dict)):
+                params = tuple(params)
             self.db.queries.append({
                 'sql': sql % tuple(params),
                 'time': "%.3f" % (stop - start),

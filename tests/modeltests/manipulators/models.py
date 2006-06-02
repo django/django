@@ -1,5 +1,7 @@
 """
-25. Default manipulators
+26. Default manipulators
+
+Each model gets an AddManipulator and ChangeManipulator by default.
 """
 
 from django.db import models

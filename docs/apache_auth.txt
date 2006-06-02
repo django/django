@@ -56,6 +56,15 @@ location to users marked as staff members.  You can use a set of
                                       required.
     ================================  =========================================
 
+Note that sometimes ``SetEnv`` doesn't play well in this mod_python
+configuration, for reasons unknown. If you're having problems getting
+mod_python to recognize your ``DJANGO_SETTINGS_MODULE``, you can set it using
+``PythonOption`` instead of ``SetEnv``. Therefore, these two Apache directives
+are equivalent::
+
+    SetEnv DJANGO_SETTINGS_MODULE mysite.settings
+    PythonOption DJANGO_SETTINGS_MODULE mysite.settings
+
 .. _authentication system: http://www.djangoproject.com/documentation/authentication/
 .. _Subversion: http://subversion.tigris.org/
 .. _mod_dav: http://httpd.apache.org/docs/2.0/mod/mod_dav.html

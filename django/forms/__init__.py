@@ -577,7 +577,7 @@ class SelectMultipleField(SelectField):
             selected_html = ''
             if str(value) in str_data_list:
                 selected_html = ' selected="selected"'
-            output.append('    <option value="%s"%s>%s</option>' % (escape(value), selected_html, choice))
+            output.append('    <option value="%s"%s>%s</option>' % (escape(value), selected_html, escape(choice)))
         output.append('  </select>')
         return '\n'.join(output)
 
@@ -641,7 +641,11 @@ class FileUploadField(FormField):
         self.validator_list = [self.isNonEmptyFile] + validator_list
 
     def isNonEmptyFile(self, field_data, all_data):
-        if not field_data['content']:
+        try:
+            content = field_data['content']
+        except TypeError:
+            raise validators.CriticalValidationError, gettext("No file was submitted. Check the encoding type on the form.")
+        if not content:
             raise validators.CriticalValidationError, gettext("The submitted file is empty.")
 
     def render(self, data):

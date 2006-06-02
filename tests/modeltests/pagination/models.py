@@ -1,21 +1,20 @@
 """
-20. Object Pagination
+29. Object pagination
 
-Django provides a framework for paginating a list of objects in a few.  
-This is often useful for dividing search results or long lists of objects
-in to easily readable pages.
-
-
+Django provides a framework for paginating a list of objects in a few lines
+of code. This is often useful for dividing search results or long lists of
+objects into easily readable pages.
 """
+
 from django.db import models
 
 class Article(models.Model):
     headline = models.CharField(maxlength=100, default='Default headline')
     pub_date = models.DateTimeField()
-    
+
     def __repr__(self):
-        return self.headline 
-        
+        return self.headline
+
 API_TESTS = """
 # prepare a list of objects for pagination
 >>> from datetime import datetime
@@ -34,8 +33,8 @@ API_TESTS = """
 >>> paginator.pages
 2
 
-# get the first page (zero-based)    
->>> paginator.get_page(0)  
+# get the first page (zero-based)
+>>> paginator.get_page(0)
 [Article 1, Article 2, Article 3, Article 4, Article 5]
 
 # get the second page
@@ -45,7 +44,7 @@ API_TESTS = """
 # does the first page have a next or previous page?
 >>> paginator.has_next_page(0)
 True
-                                                
+
 >>> paginator.has_previous_page(0)
 False
 
@@ -55,5 +54,14 @@ False
 
 >>> paginator.has_previous_page(1)
 True
- 
+
+>>> paginator.first_on_page(0)
+1
+>>> paginator.first_on_page(1)
+6
+>>> paginator.last_on_page(0)
+5
+>>> paginator.last_on_page(1)
+9
+
 """

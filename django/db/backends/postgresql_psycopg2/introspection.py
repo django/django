@@ -45,27 +45,26 @@ def get_indexes(cursor, table_name):
         {'primary_key': boolean representing whether it's the primary key,
          'unique': boolean representing whether it's a unique index}
     """
-    # Get the table description because we only have the column indexes, and we
-    # need the column names.
-    desc = get_table_description(cursor, table_name)
-    # This query retrieves each index on the given table.
+    # This query retrieves each index on the given table, including the
+    # first associated field name
     cursor.execute("""
-        SELECT idx.indkey, idx.indisunique, idx.indisprimary
+        SELECT attr.attname, idx.indkey, idx.indisunique, idx.indisprimary
         FROM pg_catalog.pg_class c, pg_catalog.pg_class c2,
-            pg_catalog.pg_index idx
+            pg_catalog.pg_index idx, pg_catalog.pg_attribute attr
         WHERE c.oid = idx.indrelid
             AND idx.indexrelid = c2.oid
+            AND attr.attrelid = c.oid
+            AND attr.attnum = idx.indkey[0]
             AND c.relname = %s""", [table_name])
     indexes = {}
     for row in cursor.fetchall():
-        # row[0] (idx.indkey) is stored in the DB as an array. It comes out as
+        # row[1] (idx.indkey) is stored in the DB as an array. It comes out as
         # a string of space-separated integers. This designates the field
         # indexes (1-based) of the fields that have indexes on the table.
         # Here, we skip any indexes across multiple fields.
-        if ' ' in row[0]:
+        if ' ' in row[1]:
             continue
-        col_name = desc[int(row[0])-1][0]
-        indexes[col_name] = {'primary_key': row[2], 'unique': row[1]}
+        indexes[row[0]] = {'primary_key': row[3], 'unique': row[2]}
     return indexes
 
 # Maps type codes to Django Field types.

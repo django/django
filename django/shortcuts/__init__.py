@@ -10,14 +10,14 @@ def render_to_response(*args, **kwargs):
     return HttpResponse(loader.render_to_string(*args, **kwargs))
 load_and_render = render_to_response # For backwards compatibility.
 
-def get_object_or_404(klass, **kwargs):
+def get_object_or_404(klass, *args, **kwargs):
     try:
-        return klass._default_manager.get(**kwargs)
+        return klass._default_manager.get(*args, **kwargs)
     except klass.DoesNotExist:
         raise Http404
 
-def get_list_or_404(klass, **kwargs):
-    obj_list = list(klass._default_manager.filter(**kwargs))
+def get_list_or_404(klass, *args, **kwargs):
+    obj_list = list(klass._default_manager.filter(*args, **kwargs))
     if not obj_list:
         raise Http404
     return obj_list

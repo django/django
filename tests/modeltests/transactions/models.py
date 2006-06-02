@@ -1,5 +1,5 @@
 """
-XXX. Transactions
+15. Transactions
 
 Django handles transactions in three different ways. The default is to commit
 each transaction upon a write, but you can decorate a function to get

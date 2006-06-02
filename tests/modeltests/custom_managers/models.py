@@ -1,5 +1,12 @@
 """
 23. Giving models a custom manager
+
+You can use a custom ``Manager`` in a particular model by extending the base
+``Manager`` class and instantiating your custom ``Manager`` in your model.
+
+There are two reasons you might want to customize a ``Manager``: to add extra
+``Manager`` methods, and/or to modify the initial ``QuerySet`` the ``Manager``
+returns.
 """
 
 from django.db import models
@@ -19,7 +26,7 @@ class Person(models.Model):
     def __repr__(self):
         return "%s %s" % (self.first_name, self.last_name)
 
-# An example of a custom manager that sets a core_filter on its lookups.
+# An example of a custom manager that sets get_query_set().
 
 class PublishedBookManager(models.Manager):
     def get_query_set(self):

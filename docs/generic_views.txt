@@ -182,6 +182,9 @@ a date in the *future* are not included.
     * ``context_processors``: A list of template-context processors to apply to
       the view's template. See the `RequestContext docs`_.
 
+    * ``mimetype``: The MIME type to use for the resulting document. Defaults
+      to the value of the ``DEFAULT_MIME_TYPE`` setting.
+
 **Template name:**
 
 If ``template_name`` isn't specified, this view will use the template
@@ -247,6 +250,21 @@ with a date in the *future* are not displayed.
     * ``context_processors``: A list of template-context processors to apply to
       the view's template. See the `RequestContext docs`_.
 
+    * ``template_object_name``:  Designates the name of the template variable
+       to use in the template context. By default, this is ``'object'``. The
+       view will append ``'_list'`` to the value of this parameter in
+       determining the variable's name.
+
+    * ``make_object_list``: A boolean specifying whether to retrieve the full
+      list of objects for this year and pass those to the template. If ``True``,
+      this list of objects will be made available to the template as
+      ``object_list``. (The name ``object_list`` may be different; see the docs
+      for ``object_list`` in the "Template context" section below.) By default,
+      this is ``False``.
+
+    * ``mimetype``: The MIME type to use for the resulting document. Defaults
+      to the value of the ``DEFAULT_MIME_TYPE`` setting.
+
 **Template name:**
 
 If ``template_name`` isn't specified, this view will use the template
@@ -259,7 +277,18 @@ In addition to ``extra_context``, the template's context will be:
     * ``date_list``: A list of ``datetime.date`` objects representing all
       months that have objects available in the given year, according to
       ``queryset``, in ascending order.
+
     * ``year``: The given year, as a four-character string.
+
+    * ``object_list``: If the ``make_object_list`` parameter is ``True``, this
+      will be set to a list of objects available for the given year, ordered by
+      the date field. This variable's name depends on the
+      ``template_object_name`` parameter, which is ``'object'`` by default. If
+      ``template_object_name`` is ``'foo'``, this variable's name will be
+      ``foo_list``.
+
+      If ``make_object_list`` is ``False``, ``object_list`` will be passed to
+      the template as an empty list.
 
 ``django.views.generic.date_based.archive_month``
 -------------------------------------------------
@@ -313,6 +342,9 @@ date in the *future* are not displayed.
        to use in the template context. By default, this is ``'object'``. The
        view will append ``'_list'`` to the value of this parameter in
        determining the variable's name.
+
+    * ``mimetype``: The MIME type to use for the resulting document. Defaults
+      to the value of the ``DEFAULT_MIME_TYPE`` setting.
 
 **Template name:**
 
@@ -386,6 +418,9 @@ in the *future* are not displayed.
        to use in the template context. By default, this is ``'object'``. The
        view will append ``'_list'`` to the value of this parameter in
        determining the variable's name.
+
+    * ``mimetype``: The MIME type to use for the resulting document. Defaults
+      to the value of the ``DEFAULT_MIME_TYPE`` setting.
 
 **Template name:**
 
@@ -462,6 +497,9 @@ a 404 error, regardless of whether any objects exist for future days.
        to use in the template context. By default, this is ``'object'``. The
        view will append ``'_list'`` to the value of this parameter in
        determining the variable's name.
+
+    * ``mimetype``: The MIME type to use for the resulting document. Defaults
+      to the value of the ``DEFAULT_MIME_TYPE`` setting.
 
 **Template name:**
 
@@ -563,6 +601,9 @@ A page representing an individual object.
     * ``template_object_name``:  Designates the name of the template variable
        to use in the template context. By default, this is ``'object'``.
 
+    * ``mimetype``: The MIME type to use for the resulting document. Defaults
+      to the value of the ``DEFAULT_MIME_TYPE`` setting.
+
 **Template name:**
 
 If ``template_name`` isn't specified, this view will use the template
@@ -626,6 +667,9 @@ A page representing a list of objects.
        to use in the template context. By default, this is ``'object'``. The
        view will append ``'_list'`` to the value of this parameter in
        determining the variable's name.
+
+    * ``mimetype``: The MIME type to use for the resulting document. Defaults
+      to the value of the ``DEFAULT_MIME_TYPE`` setting.
 
 **Template name:**
 
@@ -716,6 +760,9 @@ A page representing an individual object.
 
     * ``template_object_name``:  Designates the name of the template variable
        to use in the template context. By default, this is ``'object'``.
+
+    * ``mimetype``: The MIME type to use for the resulting document. Defaults
+      to the value of the ``DEFAULT_MIME_TYPE`` setting.
 
 **Template name:**
 

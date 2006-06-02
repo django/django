@@ -12,7 +12,10 @@ Managed transactions don't do those commits, but will need some kind of manual
 or implicit commits or rollbacks.
 """
 
-import thread
+try:
+    import thread
+except ImportError:
+    import dummy_thread as thread
 from django.db import connection
 from django.conf import settings
 

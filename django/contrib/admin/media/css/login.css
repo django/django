@@ -7,7 +7,7 @@ body.login { background:#eee; }
 .login #content-main { width:100%; }
 .login form { margin-top:1em; }
 .login .form-row { padding:4px 0; float:left; width:100%; }
-.login .form-row label { float:left; width:7em; padding-right:0.5em; line-height:2em; text-align:right; font-size:1em; color:#333; }
-.login .form-row #id_username, .login .form-row #id_password { width:16em; }
+.login .form-row label { float:left; width:9em; padding-right:0.5em; line-height:2em; text-align:right; font-size:1em; color:#333; }
+.login .form-row #id_username, .login .form-row #id_password { width:14em; }
 .login span.help { font-size:10px; display:block; }
-.login .submit-row { clear:both; padding:1em 0 0 7.4em; }
+.login .submit-row { clear:both; padding:1em 0 0 9.4em; }

@@ -1,5 +1,7 @@
 """
-XX. Validation
+30. Validation
+
+This is an experimental feature!
 
 Each model instance has a validate() method that returns a dictionary of
 validation errors in the instance's fields. This method has a side effect

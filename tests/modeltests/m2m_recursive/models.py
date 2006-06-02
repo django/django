@@ -1,15 +1,15 @@
 """
-26. Many-to-many relationships between the same two tables
+27. Many-to-many relationships between the same two tables
 
-In this example, A Person can have many friends, who are also people. Friendship is a 
+In this example, A Person can have many friends, who are also people. Friendship is a
 symmetrical relationshiup - if I am your friend, you are my friend.
 
 A person can also have many idols - but while I may idolize you, you may not think
-the same of me. 'Idols' is an example of a non-symmetrical m2m field. Only recursive 
+the same of me. 'Idols' is an example of a non-symmetrical m2m field. Only recursive
 m2m fields may be non-symmetrical, and they are symmetrical by default.
 
 This test validates that the m2m table will create a mangled name for the m2m table if
-there will be a clash, and tests that symmetry is preserved where appropriate. 
+there will be a clash, and tests that symmetry is preserved where appropriate.
 """
 
 from django.db import models
@@ -40,7 +40,7 @@ API_TESTS = """
 >>> d.friends.add(a,c)
 
 # Who is friends with Anne?
->>> a.friends.all() 
+>>> a.friends.all()
 [Bill, Chuck, David]
 
 # Who is friends with Bill?
@@ -52,14 +52,14 @@ API_TESTS = """
 [Anne, David]
 
 # Who is friends with David?
->>> d.friends.all() 
+>>> d.friends.all()
 [Anne, Chuck]
 
 # Bill is already friends with Anne - add Anne again, but in the reverse direction
 >>> b.friends.add(a)
 
 # Who is friends with Anne?
->>> a.friends.all() 
+>>> a.friends.all()
 [Bill, Chuck, David]
 
 # Who is friends with Bill?
@@ -70,7 +70,7 @@ API_TESTS = """
 >>> b.friends.remove(a)
 
 # Who is friends with Anne?
->>> a.friends.all() 
+>>> a.friends.all()
 [Chuck, David]
 
 # Who is friends with Bill?
@@ -81,7 +81,7 @@ API_TESTS = """
 >>> a.friends.clear()
 
 # Who is friends with Anne?
->>> a.friends.all() 
+>>> a.friends.all()
 []
 
 # Reverse relationships should also be gone
@@ -90,7 +90,7 @@ API_TESTS = """
 [David]
 
 # Who is friends with David?
->>> d.friends.all() 
+>>> d.friends.all()
 [Chuck]
 
 
@@ -105,7 +105,7 @@ API_TESTS = """
 >>> d.stalkers.add(a,c)
 
 # Who are Anne's idols?
->>> a.idols.all() 
+>>> a.idols.all()
 [Bill, Chuck, David]
 
 # Who is stalking Anne?
@@ -140,7 +140,7 @@ API_TESTS = """
 >>> b.stalkers.add(a)
 
 # Who are Anne's idols?
->>> a.idols.all() 
+>>> a.idols.all()
 [Bill, Chuck, David]
 
 # Who is stalking Anne?
@@ -158,7 +158,7 @@ API_TESTS = """
 >>> b.stalkers.remove(a)
 
 # Who are Anne's idols?
->>> a.idols.all() 
+>>> a.idols.all()
 [Chuck, David]
 
 # Who is stalking Anne?
@@ -177,7 +177,7 @@ API_TESTS = """
 >>> a.idols.clear()
 
 # Who are Anne's idols
->>> a.idols.all() 
+>>> a.idols.all()
 []
 
 # Reverse relationships should also be gone
@@ -186,7 +186,7 @@ API_TESTS = """
 []
 
 # Who is friends with David?
->>> d.stalkers.all() 
+>>> d.stalkers.all()
 [Chuck]
 
 """

@@ -162,11 +162,15 @@ A date field. Has a few extra optional arguments:
     ======================  ===================================================
     ``auto_now``            Automatically set the field to now every time the
                             object is saved. Useful for "last-modified"
-                            timestamps.
+                            timestamps. Note that the current date is *always*
+                            used; it's not just a default value that you can
+                            override.
 
     ``auto_now_add``        Automatically set the field to now when the object
                             is first created. Useful for creation of
-                            timestamps.
+                            timestamps. Note that the current date is *always*
+                            used; it's not just a default value that you can
+                            override.
     ======================  ===================================================
 
 The admin represents this as an ``<input type="text">`` with a JavaScript
@@ -487,6 +491,10 @@ cleared, the object will be deleted.
 
 It is an error to have an inline-editable relation without at least one
 ``core=True`` field.
+
+Please note that each field marked "core" is treated as a required field by the
+Django admin site. Essentially, this means you should put ``core=True`` on all
+required fields in your related object that is being edited inline.
 
 ``db_column``
 ~~~~~~~~~~~~~

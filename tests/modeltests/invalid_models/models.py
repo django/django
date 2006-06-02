@@ -1,5 +1,7 @@
 """
-26. A test to check that the model validator works can correctly identify errors in a model. 
+26. Invalid models
+
+This example exists purely to point out errors in models.
 """
 
 from django.db import models
@@ -11,16 +13,16 @@ class FieldErrors(models.Model):
     prepopulate = models.CharField(maxlength=10, prepopulate_from='bad')
     choices = models.CharField(maxlength=10, choices='bad')
     choices2 = models.CharField(maxlength=10, choices=[(1,2,3),(1,2,3)])
-    index = models.CharField(maxlength=10, db_index='bad')    
+    index = models.CharField(maxlength=10, db_index='bad')
 
 class Target(models.Model):
     tgt_safe = models.CharField(maxlength=10)
-    
+
     clash1_set = models.CharField(maxlength=10)
-    
+
 class Clash1(models.Model):
     src_safe = models.CharField(maxlength=10)
-    
+
     foreign = models.ForeignKey(Target)
     m2m = models.ManyToManyField(Target)
 
@@ -36,27 +38,27 @@ class Clash2(models.Model):
 class Target2(models.Model):
     foreign_tgt = models.ForeignKey(Target)
     clashforeign_set = models.ForeignKey(Target)
-    
+
     m2m_tgt = models.ManyToManyField(Target)
     clashm2m_set = models.ManyToManyField(Target)
 
 class Clash3(models.Model):
     foreign_1 = models.ForeignKey(Target2, related_name='foreign_tgt')
     foreign_2 = models.ForeignKey(Target2, related_name='m2m_tgt')
-    
+
     m2m_1 = models.ManyToManyField(Target2, related_name='foreign_tgt')
     m2m_2 = models.ManyToManyField(Target2, related_name='m2m_tgt')
-    
+
 class ClashForeign(models.Model):
     foreign = models.ForeignKey(Target2)
 
 class ClashM2M(models.Model):
     m2m = models.ManyToManyField(Target2)
-    
+
 class SelfClashForeign(models.Model):
     src_safe = models.CharField(maxlength=10)
-    
-    selfclashforeign_set = models.ForeignKey("SelfClashForeign") 
+
+    selfclashforeign_set = models.ForeignKey("SelfClashForeign")
     foreign_1 = models.ForeignKey("SelfClashForeign", related_name='id')
     foreign_2 = models.ForeignKey("SelfClashForeign", related_name='src_safe')
 

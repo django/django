@@ -603,6 +603,14 @@ Default: ``'sessionid'``
 The name of the cookie to use for sessions. This can be whatever you want.
 See the `session docs`_.
 
+SESSION_EXPIRE_AT_BROWSER_CLOSE
+-------------------------------
+
+Default: ``False``
+
+Whether to expire the session when the user closes his or her browser.
+See the `session docs`_.
+
 SESSION_SAVE_EVERY_REQUEST
 --------------------------
 

@@ -35,6 +35,7 @@ ORDER_TYPE_VAR = 'ot'
 PAGE_VAR = 'p'
 SEARCH_VAR = 'q'
 IS_POPUP_VAR = 'pop'
+ERROR_FLAG = 'e'
 
 # Text to display within change-list table cells if the value is blank.
 EMPTY_CHANGELIST_VALUE = '(None)'
@@ -73,8 +74,7 @@ def unquote(s):
     for item in list:
         if item[1:2]:
             try:
-                myappend(mychr(myatoi(item[:2], 16))
-                     + item[2:])
+                myappend(mychr(myatoi(item[:2], 16)) + item[2:])
             except ValueError:
                 myappend('_' + item)
         else:
@@ -143,9 +143,9 @@ class AdminBoundField(object):
             return self._display
         except AttributeError:
             if isinstance(self.field.rel, models.ManyToOneRel):
-                self._display = getattr(self.original, self.field.attname)
+                self._display = getattr(self.original, self.field.name)
             elif isinstance(self.field.rel, models.ManyToManyRel):
-                self._display = ", ".join([str(obj) for obj in getattr(self.original, self.field.attname).all()])
+                self._display = ", ".join([str(obj) for obj in getattr(self.original, self.field.name).all()])
             return self._display
 
     def __repr__(self):
@@ -557,6 +557,8 @@ class ChangeList(object):
         self.params = dict(request.GET.items())
         if self.params.has_key(PAGE_VAR):
             del self.params[PAGE_VAR]
+        if self.params.has_key(ERROR_FLAG):
+            del self.params[ERROR_FLAG]
 
         self.order_field, self.order_type = self.get_ordering()
         self.query = request.GET.get(SEARCH_VAR, '')
@@ -730,7 +732,14 @@ def change_list(request, app_label, model_name):
     try:
         cl = ChangeList(request, model)
     except IncorrectLookupParameters:
-        return HttpResponseRedirect(request.path)
+        # Wacky lookup parameters were given, so redirect to the main
+        # changelist page, without parameters, and pass an 'invalid=1'
+        # parameter via the query string. If wacky parameters were given and
+        # the 'invalid=1' parameter was already in the query string, something
+        # is screwed up with the database, so display an error page.
+        if ERROR_FLAG in request.GET.keys():
+            return render_to_response('admin/invalid_setup.html', {'title': _('Database error')})
+        return HttpResponseRedirect(request.path + '?' + ERROR_FLAG + '=1')
     c = template.RequestContext(request, {
         'title': cl.title,
         'is_popup': cl.is_popup,

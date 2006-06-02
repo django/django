@@ -85,7 +85,7 @@ creating an empty class means "give this object an admin interface using
 all the default options."
 
 Now reload the Django admin page to see your changes. Note that you don't have
-to restart the development server -- the server will auto-reloads your project,
+to restart the development server -- the server will auto-reload your project,
 so any modifications code will be seen immediately in your browser.
 
 Explore the free admin functionality

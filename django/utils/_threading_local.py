@@ -234,4 +234,7 @@ class local(_localbase):
         return __del__
     __del__ = __del__()
 
-from threading import currentThread, enumerate, RLock
+try:
+    from threading import currentThread, enumerate, RLock
+except ImportError:
+    from dummy_threading import currentThread, enumerate, RLock

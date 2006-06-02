@@ -152,9 +152,9 @@ class Field(object):
     def get_internal_type(self):
         return self.__class__.__name__
 
-    def pre_save(self, value, add):
+    def pre_save(self, model_instance, add):
         "Returns field's value just before saving."
-        return value
+        return getattr(model_instance, self.attname)
 
     def get_db_prep_save(self, value):
         "Returns field's value prepared for saving into a database."
@@ -417,10 +417,13 @@ class DateField(Field):
             value = str(value)
         return Field.get_db_prep_lookup(self, lookup_type, value)
 
-    def pre_save(self, value, add):
+    def pre_save(self, model_instance, add):
         if self.auto_now or (self.auto_now_add and add):
-            return datetime.datetime.now()
-        return value
+            value = datetime.datetime.now()
+            setattr(model_instance, self.attname, value)
+            return value
+        else:
+            return super(DateField, self).pre_save(model_instance, add)
 
     def contribute_to_class(self, cls, name):
         super(DateField,self).contribute_to_class(cls, name)
@@ -723,10 +726,13 @@ class TimeField(Field):
             value = str(value)
         return Field.get_db_prep_lookup(self, lookup_type, value)
 
-    def pre_save(self, value, add):
+    def pre_save(self, model_instance, add):
         if self.auto_now or (self.auto_now_add and add):
-            return datetime.datetime.now().time()
-        return value
+            value = datetime.datetime.now().time()
+            setattr(model_instance, self.attname, value)
+            return value
+        else:
+            return super(TimeField, self).pre_save(model_instance, add)
 
     def get_db_prep_save(self, value):
         # Casts dates into string format for entry into database.

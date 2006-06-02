@@ -1,8 +1,7 @@
 """
-27. Many-to-many and many-to-one relationships to the same table.
+28. Many-to-many and many-to-one relationships to the same table
 
-This is a response to bug #1535
-
+Make sure to set ``related_name`` if you use relationships to the same table.
 """
 
 from django.db import models
@@ -14,9 +13,10 @@ class Issue(models.Model):
     num = models.IntegerField()
     cc = models.ManyToManyField(User, blank=True, related_name='test_issue_cc')
     client = models.ForeignKey(User, related_name='test_issue_client')
-    def __repr__(self):
-        return "<Issue %d>" % (self.num,)
-        
+
+    def __str__(self):
+        return str(self.num)
+
     class Meta:
         ordering = ('num',)
 
@@ -47,20 +47,20 @@ API_TESTS = """
 >>> i3.cc.add(r)
 >>> from django.db.models.query import Q
 >>> Issue.objects.filter(client=r.id)
-[<Issue 1>, <Issue 2>]
+[<Issue: 1>, <Issue: 2>]
 >>> Issue.objects.filter(client=g.id)
-[<Issue 3>]
+[<Issue: 3>]
 >>> Issue.objects.filter(cc__id__exact=g.id)
 []
 >>> Issue.objects.filter(cc__id__exact=r.id)
-[<Issue 2>, <Issue 3>]
+[<Issue: 2>, <Issue: 3>]
 
 # Queries that combine results from the m2m and the m2o relationship.
 # 3 ways of saying the same thing:
 >>> Issue.objects.filter(Q(cc__id__exact=r.id) | Q(client=r.id))
-[<Issue 1>, <Issue 2>, <Issue 3>]
+[<Issue: 1>, <Issue: 2>, <Issue: 3>]
 >>> Issue.objects.filter(cc__id__exact=r.id) | Issue.objects.filter(client=r.id)
-[<Issue 1>, <Issue 2>, <Issue 3>]
+[<Issue: 1>, <Issue: 2>, <Issue: 3>]
 >>> Issue.objects.filter(Q(client=r.id) | Q(cc__id__exact=r.id))
-[<Issue 1>, <Issue 2>, <Issue 3>]
+[<Issue: 1>, <Issue: 2>, <Issue: 3>]
 """

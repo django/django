@@ -3,6 +3,6 @@
 <ul>
 {% for choice in choices %}
     <li{% if choice.selected %} class="selected"{% endif %}>
-    <a href="{{ choice.query_string }}">{{ choice.display }}</a></li>
+    <a href="{{ choice.query_string }}">{{ choice.display|escape }}</a></li>
 {% endfor %}
 </ul>

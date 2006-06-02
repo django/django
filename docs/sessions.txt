@@ -197,6 +197,22 @@ will be sent on every request.
 Similarly, the ``expires`` part of a session cookie is updated each time the
 session cookie is sent.
 
+Browser-length sessions vs. persistent sessions
+===============================================
+
+You can control whether the session framework uses browser-length sessions vs.
+persistent sessions with the ``SESSION_EXPIRE_AT_BROWSER_CLOSE`` setting.
+
+By default, ``SESSION_EXPIRE_AT_BROWSER_CLOSE`` is set to ``False``, which
+means session cookies will be stored in users' browsers for as long as
+``SESSION_COOKIE_AGE``. Use this if you don't want people to have to log in
+every time they open a browser.
+
+If ``SESSION_EXPIRE_AT_BROWSER_CLOSE`` is set to ``True``, Django will use
+browser-length cookies -- cookies that expire as soon as the user closes his or
+her browser. Use this if you want people to have to log in every time they open
+a browser.
+
 Settings
 ========
 
@@ -224,6 +240,14 @@ SESSION_COOKIE_NAME
 Default: ``'sessionid'``
 
 The name of the cookie to use for sessions. This can be whatever you want.
+
+SESSION_EXPIRE_AT_BROWSER_CLOSE
+-------------------------------
+
+Default: ``False``
+
+Whether to expire the session when the user closes his or her browser. See
+"Browser-length sessions vs. persistent sessions" above.
 
 SESSION_SAVE_EVERY_REQUEST
 --------------------------

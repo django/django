@@ -24,8 +24,8 @@
         {% for action in action_list %}
         <tr>
             <th scope="row">{{ action.action_time|date:_("DATE_WITH_TIME_FULL") }}</th>
-            <td>{{ action.user.username }}{% if action.user.first_name %} ({{ action.user.first_name }} {{ action.user.last_name }}){% endif %}</td>
-            <td>{{ action.change_message}}</td>
+            <td>{{ action.user.username }}{% if action.user.first_name %} ({{ action.user.first_name|escape }} {{ action.user.last_name|escape }}){% endif %}</td>
+            <td>{{ action.change_message|escape }}</td>
         </tr>
         {% endfor %}
         </tbody>
