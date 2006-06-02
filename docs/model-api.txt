@@ -1239,6 +1239,12 @@ The above code results in an admin change list page that looks like this:
 
 (This example also has ``search_fields`` defined. See below.)
 
+``list_per_page``
+-----------------
+
+Set ``list_per_page`` to control how many items appear on each paginated admin
+change list page. By default, this is set to ``100``.
+
 ``list_select_related``
 -----------------------
 
