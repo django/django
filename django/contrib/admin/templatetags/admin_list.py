@@ -2,14 +2,15 @@ from django import template
 from django.conf import settings
 from django.contrib.admin.views.main import MAX_SHOW_ALL_ALLOWED, ALL_VAR
 from django.contrib.admin.views.main import ORDER_VAR, ORDER_TYPE_VAR, PAGE_VAR, SEARCH_VAR
-from django.contrib.admin.views.main import IS_POPUP_VAR, EMPTY_CHANGELIST_VALUE, MONTHS
+from django.contrib.admin.views.main import IS_POPUP_VAR, EMPTY_CHANGELIST_VALUE
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import models
 from django.utils import dateformat
 from django.utils.html import escape
 from django.utils.text import capfirst
-from django.utils.translation import get_date_formats
+from django.utils.translation import get_date_formats, get_partial_date_formats
 from django.template import Library
+import datetime
 
 register = Library()
 
@@ -193,18 +194,19 @@ def date_hierarchy(cl):
         year_lookup = cl.params.get(year_field)
         month_lookup = cl.params.get(month_field)
         day_lookup = cl.params.get(day_field)
+        year_month_format, month_day_format = get_partial_date_formats()
 
         link = lambda d: cl.get_query_string(d, [field_generic])
 
         if year_lookup and month_lookup and day_lookup:
-            month_name = MONTHS[int(month_lookup)]
+            day = datetime.date(int(year_lookup), int(month_lookup), int(day_lookup))
             return {
                 'show': True,
                 'back': {
                     'link': link({year_field: year_lookup, month_field: month_lookup}),
-                    'title': "%s %s" % (month_name, year_lookup)
+                    'title': dateformat.format(day, year_month_format)
                 },
-                'choices': [{'title': "%s %s" % (month_name, day_lookup)}]
+                'choices': [{'title': dateformat.format(day, month_day_format)}]
             }
         elif year_lookup and month_lookup:
             days = cl.query_set.filter(**{year_field: year_lookup, month_field: month_lookup}).dates(field_name, 'day')
@@ -216,7 +218,7 @@ def date_hierarchy(cl):
                 },
                 'choices': [{
                     'link': link({year_field: year_lookup, month_field: month_lookup, day_field: day.day}),
-                    'title': day.strftime('%B %d')
+                    'title': dateformat.format(day, month_day_format)
                 } for day in days]
             }
         elif year_lookup:
@@ -229,7 +231,7 @@ def date_hierarchy(cl):
                 },
                 'choices': [{
                     'link': link({year_field: year_lookup, month_field: month.month}),
-                    'title': "%s %s" % (month.strftime('%B'), month.year)
+                    'title': dateformat.format(month, year_month_format)
                 } for month in months]
             }
         else:
