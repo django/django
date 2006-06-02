@@ -52,6 +52,7 @@ setup(
                                  'media/img/admin/*.png',
                                  'media/js/*.js',
                                  'media/js/admin/*js'],
+        'django.contrib.comments': ['templates/comments/*.html'],
     },
     scripts = ['django/bin/django-admin.py'],
     zip_safe = False,
