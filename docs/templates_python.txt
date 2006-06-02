@@ -368,6 +368,11 @@ Generally, you'll store templates in files on your filesystem rather than using
 the low-level ``Template`` API yourself. Save templates in a directory
 specified as a **template directory**.
 
+Django searches for template directories in a number of places, depending on
+your template-loader settings (see "Loader types" below), but the most basic
+way of specifying template directories is by using the ``TEMPLATE_DIRS``
+setting.
+
 The TEMPLATE_DIRS setting
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
