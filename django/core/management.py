@@ -1055,7 +1055,9 @@ def run_shell(use_plain=False):
             # Don't bother loading IPython, because the user wants plain Python.
             raise ImportError
         import IPython
-        shell = IPython.Shell.IPShell()
+        # Explicitly pass an empty list as arguments, because otherwise IPython
+        # would use sys.argv from this script.
+        shell = IPython.Shell.IPShell(argv=[])
         shell.mainloop()
     except ImportError:
         import code
