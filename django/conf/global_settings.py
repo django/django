@@ -203,6 +203,16 @@ DATETIME_FORMAT = 'N j, Y, P'
 # http://www.djangoproject.com/documentation/templates/#now
 TIME_FORMAT = 'P'
 
+# Default formatting for date objects when only the year and month are relevant.
+# See all available format strings here:
+# http://www.djangoproject.com/documentation/templates/#now
+YEAR_MONTH_FORMAT = 'F Y'
+
+# Default formatting for date objects when only the month and day are relevant.
+# See all available format strings here:
+# http://www.djangoproject.com/documentation/templates/#now
+MONTH_DAY_FORMAT = 'F j'
+
 # Whether to enable Psyco, which optimizes Python code. Requires Psyco.
 # http://psyco.sourceforge.net/
 ENABLE_PSYCO = False
