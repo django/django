@@ -4,3 +4,5 @@
 * html .form-row { height:1%; }
 * html .dashboard #content { width:768px; } /* proper fixed width for dashboard in IE6 */
 * html .dashboard #content-main { width:535px; } /* proper fixed width for dashboard in IE6 */
+* html #changelist-filter ul { margin-right:-10px; } /* fix right margin for changelist filters in IE6 */
+* html .change-list .filtered { height:400px; } /* IE ignores min-height, but treats height as if it were min-height */
