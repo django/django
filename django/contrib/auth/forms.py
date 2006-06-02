@@ -36,9 +36,13 @@ class AuthenticationForm(forms.Manipulator):
             raise validators.ValidationError, _("Please enter a correct username and password. Note that both fields are case-sensitive.")
 
     def isValidPasswordForUser(self, field_data, all_data):
-        if self.user_cache is not None and not self.user_cache.check_password(field_data):
+        if self.user_cache is None:
+            return
+        if not self.user_cache.check_password(field_data):
             self.user_cache = None
             raise validators.ValidationError, _("Please enter a correct username and password. Note that both fields are case-sensitive.")
+        elif not self.user_cache.is_active:
+            raise validators.ValidationError, _("This account is inactive.")
 
     def get_user_id(self):
         if self.user_cache:
