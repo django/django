@@ -641,8 +641,10 @@ A page representing a list of objects.
 
     * ``paginate_by``: An integer specifying how many objects should be
       displayed per page. If this is given, the view will paginate objects with
-      ``paginate_by`` objects per page. The view will expect a ``page`` query
-      string (GET) parameter containing a zero-indexed page number.
+      ``paginate_by`` objects per page. The view will expect either a ``page``
+      query string parameter (via ``GET``) containing a zero-indexed page
+      number, or a ``page`` variable specified in the URLconf. See
+      "Notes on pagination" below.
 
     * ``template_name``: The full name of a template to use in rendering the
       page. This lets you override the default template name (see below).
@@ -710,6 +712,25 @@ If the results are paginated, the context will contain these extra variables:
 
     * ``hits``: The total number of objects across *all* pages, not just this
       page.
+
+Notes on pagination
+~~~~~~~~~~~~~~~~~~~
+
+If ``paginate_by`` is specified, Django will paginate the results. You can
+specify the page number in the URL in one of two ways:
+
+    * Use the ``page`` parameter in the URLconf. For example, this is what
+      your URLconf might look like::
+
+        (r'^objects/page(?P<page>[0-9]+)/$', 'object_list', dict(info_dict))
+
+    * Pass the page number via the ``page`` query-string parameter. For
+      example, a URL would look like this:
+
+        /objects/?page=3
+
+In both cases, ``page`` is 1-based, not 0-based, so the first page would be
+represented as page ``1``.
 
 ``django.views.generic.list_detail.object_detail``
 --------------------------------------------------

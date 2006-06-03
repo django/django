@@ -4,8 +4,8 @@ from django.core.xheaders import populate_xheaders
 from django.core.paginator import ObjectPaginator, InvalidPage
 from django.core.exceptions import ObjectDoesNotExist
 
-def object_list(request, queryset, paginate_by=None, allow_empty=False,
-        template_name=None, template_loader=loader,
+def object_list(request, queryset, paginate_by=None, page=None,
+        allow_empty=False, template_name=None, template_loader=loader,
         extra_context=None, context_processors=None, template_object_name='object',
         mimetype=None):
     """
@@ -38,7 +38,8 @@ def object_list(request, queryset, paginate_by=None, allow_empty=False,
     queryset = queryset._clone()
     if paginate_by:
         paginator = ObjectPaginator(queryset, paginate_by)
-        page = request.GET.get('page', 1)
+        if not page:
+            page = request.GET.get('page', 1)
         try:
             page = int(page)
             object_list = paginator.get_page(page - 1)
