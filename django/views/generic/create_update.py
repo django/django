@@ -9,7 +9,7 @@ from django.http import Http404, HttpResponse, HttpResponseRedirect
 from django.core.exceptions import ObjectDoesNotExist, ImproperlyConfigured
 
 def create_object(request, model, template_name=None,
-        template_loader=loader, extra_context={}, post_save_redirect=None,
+        template_loader=loader, extra_context=None, post_save_redirect=None,
         login_required=False, follow=None, context_processors=None):
     """
     Generic object-creation function.
@@ -19,6 +19,7 @@ def create_object(request, model, template_name=None,
         form
             the form wrapper for the object
     """
+    if extra_context is None: extra_context = {}
     if login_required and request.user.is_anonymous():
         return redirect_to_login(request.path)
 
@@ -71,7 +72,7 @@ def create_object(request, model, template_name=None,
 
 def update_object(request, model, object_id=None, slug=None,
         slug_field=None, template_name=None, template_loader=loader,
-        extra_context={}, post_save_redirect=None,
+        extra_context=None, post_save_redirect=None,
         login_required=False, follow=None, context_processors=None,
         template_object_name='object'):
     """
@@ -84,6 +85,7 @@ def update_object(request, model, object_id=None, slug=None,
         object
             the original object being edited
     """
+    if extra_context is None: extra_context = {}
     if login_required and request.user.is_anonymous():
         return redirect_to_login(request.path)
 
@@ -143,7 +145,7 @@ def update_object(request, model, object_id=None, slug=None,
 
 def delete_object(request, model, post_delete_redirect,
         object_id=None, slug=None, slug_field=None, template_name=None,
-        template_loader=loader, extra_context={},
+        template_loader=loader, extra_context=None,
         login_required=False, context_processors=None, template_object_name='object'):
     """
     Generic object-delete function.
@@ -157,6 +159,7 @@ def delete_object(request, model, post_delete_redirect,
         object
             the original object being deleted
     """
+    if extra_context is None: extra_context = {}
     if login_required and request.user.is_anonymous():
         return redirect_to_login(request.path)
 

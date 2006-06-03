@@ -579,7 +579,9 @@ class ChangeList(object):
                     filter_specs.append(spec)
         return filter_specs, bool(filter_specs)
 
-    def get_query_string(self, new_params={}, remove=[]):
+    def get_query_string(self, new_params=None, remove=None):
+        if new_params is None: new_params = {}
+        if remove is None: remove = []
         p = self.params.copy()
         for r in remove:
             for k in p.keys():

@@ -42,7 +42,8 @@ class MergeDict:
 
 class SortedDict(dict):
     "A dictionary that keeps its keys in the order in which they're inserted."
-    def __init__(self, data={}):
+    def __init__(self, data=None):
+        if data is None: data = {}
         dict.__init__(self, data)
         self.keyOrder = data.keys()
 
@@ -123,7 +124,7 @@ class MultiValueDict(dict):
     def __copy__(self):
         return self.__class__(dict.items(self))
 
-    def __deepcopy__(self, memo={}):
+    def __deepcopy__(self, memo):
         import copy
         result = self.__class__()
         memo[id(self)] = result

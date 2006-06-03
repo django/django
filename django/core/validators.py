@@ -399,7 +399,8 @@ class AnyValidator:
     as a validation error. The message is rather unspecific, so it's best to
     specify one on instantiation.
     """
-    def __init__(self, validator_list=[], error_message=gettext_lazy("This field is invalid.")):
+    def __init__(self, validator_list=None, error_message=gettext_lazy("This field is invalid.")):
+        if validator_list is None: validator_list = []
         self.validator_list = validator_list
         self.error_message = error_message
         for v in validator_list:

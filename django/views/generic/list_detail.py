@@ -6,7 +6,7 @@ from django.core.exceptions import ObjectDoesNotExist
 
 def object_list(request, queryset, paginate_by=None, allow_empty=False,
         template_name=None, template_loader=loader,
-        extra_context={}, context_processors=None, template_object_name='object',
+        extra_context=None, context_processors=None, template_object_name='object',
         mimetype=None):
     """
     Generic list of objects.
@@ -34,6 +34,7 @@ def object_list(request, queryset, paginate_by=None, allow_empty=False,
         hits
             number of objects, total
     """
+    if extra_context is None: extra_context = {}
     queryset = queryset._clone()
     if paginate_by:
         paginator = ObjectPaginator(queryset, paginate_by)
@@ -78,7 +79,7 @@ def object_list(request, queryset, paginate_by=None, allow_empty=False,
 
 def object_detail(request, queryset, object_id=None, slug=None,
         slug_field=None, template_name=None, template_name_field=None,
-        template_loader=loader, extra_context={},
+        template_loader=loader, extra_context=None,
         context_processors=None, template_object_name='object',
         mimetype=None):
     """
@@ -89,6 +90,7 @@ def object_detail(request, queryset, object_id=None, slug=None,
         object
             the object
     """
+    if extra_context is None: extra_context = {}
     model = queryset.model
     if object_id:
         queryset = queryset.filter(pk=object_id)

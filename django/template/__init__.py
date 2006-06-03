@@ -227,7 +227,8 @@ class Parser(object):
         for lib in builtins:
             self.add_library(lib)
 
-    def parse(self, parse_until=[]):
+    def parse(self, parse_until=None):
+        if parse_until is None: parse_until = []
         nodelist = self.create_nodelist()
         while self.tokens:
             token = self.next_token()
