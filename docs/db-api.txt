@@ -1035,6 +1035,15 @@ SQL equivalent::
 
     SELECT ... WHERE pub_date IS NULL;
 
+search
+~~~~~~
+
+A boolean full-text search, taking advantage of full-text indexing. This is
+like ``contains`` but is significantly faster due to full-text indexing.
+
+Note this is only available in MySQL and requires direct manipulation of the
+database to add the full-text index.
+
 Default lookups are exact
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 

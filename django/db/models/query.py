@@ -615,6 +615,8 @@ def get_where_clause(lookup_type, table_prefix, field_name, value):
         return "%s = %%s" % backend.get_date_extract_sql(lookup_type, table_prefix + field_name)
     elif lookup_type == 'isnull':
         return "%s%s IS %sNULL" % (table_prefix, field_name, (not value and 'NOT ' or ''))
+    elif lookup_type == 'search':
+        return backend.get_fulltext_search_sql(table_prefix + field_name)
     raise TypeError, "Got invalid lookup_type: %s" % repr(lookup_type)
 
 def get_cached_row(klass, row, index_start):
