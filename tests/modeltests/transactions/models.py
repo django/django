@@ -19,7 +19,14 @@ class Reporter(models.Model):
 
 API_TESTS = """
 >>> from django.db import connection, transaction
+"""
 
+from django.conf import settings
+
+building_docs = getattr(settings, 'BUILDING_DOCS', False)
+
+if building_docs or settings.DATABASE_ENGINE != 'mysql':
+    API_TESTS += """
 # the default behavior is to autocommit after each save() action
 >>> def create_a_reporter_then_fail(first, last):
 ...     a = Reporter(first_name=first, last_name=last)
