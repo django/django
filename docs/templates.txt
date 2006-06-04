@@ -1091,3 +1091,27 @@ Value       Argument                Outputs
 ``None``    ``"yeah,no"``           ``"no"`` (converts None to False
                                     if no mapping for None is given)
 ==========  ======================  ==================================
+
+Other tags and filter libraries
+===============================
+
+Django comes with a couple of other template-tag libraries that you have to
+enable explicitly in your ``INSTALLED_APPS`` setting and enable in your
+template with the ``{% load %}`` tag.
+
+django.contrib.humanize
+-----------------------
+
+A set of Django template filters useful for adding a "human touch" to data. See
+the `humanize documentation`_.
+
+.. _humanize documentation: http://www.djangoproject.com/documentation/add_ons/#humanize
+
+django.contrib.markup
+---------------------
+
+A collection of template filters that implement these common markup languages:
+
+    * Textile
+    * Markdown
+    * ReST (ReStructured Text)

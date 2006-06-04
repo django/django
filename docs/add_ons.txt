@@ -45,6 +45,57 @@ See the `csrf documentation`_.
 
 .. _csrf documentation: http://www.djangoproject.com/documentation/csrf/
 
+humanize
+========
+
+A set of Django template filters useful for adding a "human touch" to data.
+To activate these filters, add ``'django.contrib.english'`` to your
+``INSTALLED_APPS`` setting. Once you've done that, use ``{% load english %}``
+in a template, and you'll have access to these filters:
+
+ordinal
+-------
+
+Converts an integer to its ordinal as a string.
+
+Examples:
+
+    * ``1`` becomes ``'1st'``.
+    * ``2`` becomes ``'2nd'``.
+    * ``3`` becomes ``'3rd'``.
+
+You can pass in either an integer or a string representation of an integer.
+
+intcomma
+--------
+
+Converts an integer to a string containing commas every three digits.
+
+Examples:
+
+    * ``4500`` becomes ``'4,500'``.
+    * ``45000`` becomes ``'45,000'``.
+    * ``450000`` becomes ``'450,000'``.
+    * ``4500000`` becomes ``'4,500,000'``.
+
+You can pass in either an integer or a string representation of an integer.
+
+intword
+-------
+
+Converts a large integer to a friendly text representation. Works best for
+numbers over 1 million.
+
+Examples:
+
+    * ``1000000`` becomes ``'1.0 million'``.
+    * ``1200000`` becomes ``'1.2 million'``.
+    * ``1200000000`` becomes ``'1.2 billion'``.
+
+Values up to 1000000000000000 (one quadrillion) are supported.
+
+You can pass in either an integer or a string representation of an integer.
+
 flatpages
 =========
 
