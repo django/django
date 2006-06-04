@@ -19,7 +19,7 @@ class Person(models.Model):
     friends = models.ManyToManyField('self')
     idols = models.ManyToManyField('self', symmetrical=False, related_name='stalkers')
 
-    def __repr__(self):
+    def __str__(self):
         return self.name
 
 API_TESTS = """
@@ -41,37 +41,37 @@ API_TESTS = """
 
 # Who is friends with Anne?
 >>> a.friends.all()
-[Bill, Chuck, David]
+[<Person: Bill>, <Person: Chuck>, <Person: David>]
 
 # Who is friends with Bill?
 >>> b.friends.all()
-[Anne]
+[<Person: Anne>]
 
 # Who is friends with Chuck?
 >>> c.friends.all()
-[Anne, David]
+[<Person: Anne>, <Person: David>]
 
 # Who is friends with David?
 >>> d.friends.all()
-[Anne, Chuck]
+[<Person: Anne>, <Person: Chuck>]
 
 # Bill is already friends with Anne - add Anne again, but in the reverse direction
 >>> b.friends.add(a)
 
 # Who is friends with Anne?
 >>> a.friends.all()
-[Bill, Chuck, David]
+[<Person: Bill>, <Person: Chuck>, <Person: David>]
 
 # Who is friends with Bill?
 >>> b.friends.all()
-[Anne]
+[<Person: Anne>]
 
 # Remove Anne from Bill's friends
 >>> b.friends.remove(a)
 
 # Who is friends with Anne?
 >>> a.friends.all()
-[Chuck, David]
+[<Person: Chuck>, <Person: David>]
 
 # Who is friends with Bill?
 >>> b.friends.all()
@@ -87,11 +87,11 @@ API_TESTS = """
 # Reverse relationships should also be gone
 # Who is friends with Chuck?
 >>> c.friends.all()
-[David]
+[<Person: David>]
 
 # Who is friends with David?
 >>> d.friends.all()
-[Chuck]
+[<Person: Chuck>]
 
 
 # Add some idols in the direction of field definition
@@ -106,27 +106,27 @@ API_TESTS = """
 
 # Who are Anne's idols?
 >>> a.idols.all()
-[Bill, Chuck, David]
+[<Person: Bill>, <Person: Chuck>, <Person: David>]
 
 # Who is stalking Anne?
 >>> a.stalkers.all()
-[Bill]
+[<Person: Bill>]
 
 # Who are Bill's idols?
 >>> b.idols.all()
-[Anne]
+[<Person: Anne>]
 
 # Who is stalking Bill?
 >>> b.stalkers.all()
-[Anne]
+[<Person: Anne>]
 
 # Who are Chuck's idols?
 >>> c.idols.all()
-[David]
+[<Person: David>]
 
 # Who is stalking Chuck?
 >>> c.stalkers.all()
-[Anne]
+[<Person: Anne>]
 
 # Who are David's idols?
 >>> d.idols.all()
@@ -134,40 +134,40 @@ API_TESTS = """
 
 # Who is stalking David
 >>> d.stalkers.all()
-[Anne, Chuck]
+[<Person: Anne>, <Person: Chuck>]
 
 # Bill is already being stalked by Anne - add Anne again, but in the reverse direction
 >>> b.stalkers.add(a)
 
 # Who are Anne's idols?
 >>> a.idols.all()
-[Bill, Chuck, David]
+[<Person: Bill>, <Person: Chuck>, <Person: David>]
 
 # Who is stalking Anne?
-[Bill]
+[<Person: Bill>]
 
 # Who are Bill's idols
 >>> b.idols.all()
-[Anne]
+[<Person: Anne>]
 
 # Who is stalking Bill?
 >>> b.stalkers.all()
-[Anne]
+[<Person: Anne>]
 
 # Remove Anne from Bill's list of stalkers
 >>> b.stalkers.remove(a)
 
 # Who are Anne's idols?
 >>> a.idols.all()
-[Chuck, David]
+[<Person: Chuck>, <Person: David>]
 
 # Who is stalking Anne?
 >>> a.stalkers.all()
-[Bill]
+[<Person: Bill>]
 
 # Who are Bill's idols?
 >>> b.idols.all()
-[Anne]
+[<Person: Anne>]
 
 # Who is stalking Bill?
 >>> b.stalkers.all()
@@ -187,6 +187,6 @@ API_TESTS = """
 
 # Who is friends with David?
 >>> d.stalkers.all()
-[Chuck]
+[<Person: Chuck>]
 
 """

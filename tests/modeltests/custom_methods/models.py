@@ -11,16 +11,16 @@ class Article(models.Model):
     headline = models.CharField(maxlength=100)
     pub_date = models.DateField()
 
-    def __repr__(self):
+    def __str__(self):
         return self.headline
 
     def was_published_today(self):
         return self.pub_date == datetime.date.today()
 
-    def get_articles_from_same_day_1(self):
+    def articles_from_same_day_1(self):
         return Article.objects.filter(pub_date=self.pub_date).exclude(id=self.id)
 
-    def get_articles_from_same_day_2(self):
+    def articles_from_same_day_2(self):
         """
         Verbose version of get_articles_from_same_day_1, which does a custom
         database query for the sake of demonstration.
@@ -47,12 +47,12 @@ API_TESTS = """
 # Test the custom methods.
 >>> a.was_published_today()
 False
->>> a.get_articles_from_same_day_1()
-[Beatles reunite]
->>> a.get_articles_from_same_day_2()
-[Beatles reunite]
->>> b.get_articles_from_same_day_1()
-[Area man programs in Python]
->>> b.get_articles_from_same_day_2()
-[Area man programs in Python]
+>>> a.articles_from_same_day_1()
+[<Article: Beatles reunite>]
+>>> a.articles_from_same_day_2()
+[<Article: Beatles reunite>]
+>>> b.articles_from_same_day_1()
+[<Article: Area man programs in Python>]
+>>> b.articles_from_same_day_2()
+[<Article: Area man programs in Python>]
 """

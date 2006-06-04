@@ -16,7 +16,7 @@ class Category(models.Model):
     name = models.CharField(maxlength=20)
     parent = models.ForeignKey('self', null=True, related_name='child_set')
 
-    def __repr__(self):
+    def __str__(self):
         return self.name
 
 API_TESTS = """
@@ -27,14 +27,14 @@ API_TESTS = """
 >>> c.save()
 
 >>> r.child_set.all()
-[Child category]
+[<Category: Child category>]
 >>> r.child_set.get(name__startswith='Child')
-Child category
+<Category: Child category>
 >>> print r.parent
 None
 
 >>> c.child_set.all()
 []
 >>> c.parent
-Root category
+<Category: Root category>
 """

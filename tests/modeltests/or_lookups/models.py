@@ -1,10 +1,10 @@
 """
 19. OR lookups
 
-To perform an OR lookup, or a lookup that combines ANDs and ORs, 
+To perform an OR lookup, or a lookup that combines ANDs and ORs,
 combine QuerySet objects using & and | operators.
 
-Alternatively, use positional arguments, and pass one or more expressions 
+Alternatively, use positional arguments, and pass one or more expressions
 of clauses using the variable ``django.db.models.Q`` (or any object with
 a get_sql method).
 
@@ -16,10 +16,11 @@ from django.db import models
 class Article(models.Model):
     headline = models.CharField(maxlength=50)
     pub_date = models.DateTimeField()
+
     class Meta:
        ordering = ('pub_date',)
 
-    def __repr__(self):
+    def __str__(self):
         return self.headline
 
 API_TESTS = """
@@ -36,10 +37,10 @@ API_TESTS = """
 >>> a3.save()
 
 >>> Article.objects.filter(headline__startswith='Hello') |  Article.objects.filter(headline__startswith='Goodbye')
-[Hello, Goodbye, Hello and goodbye]
+[<Article: Hello>, <Article: Goodbye>, <Article: Hello and goodbye>]
 
 >>> Article.objects.filter(Q(headline__startswith='Hello') | Q(headline__startswith='Goodbye'))
-[Hello, Goodbye, Hello and goodbye]
+[<Article: Hello>, <Article: Goodbye>, <Article: Hello and goodbye>]
 
 >>> Article.objects.filter(Q(headline__startswith='Hello') & Q(headline__startswith='Goodbye'))
 []
@@ -51,34 +52,34 @@ API_TESTS = """
 []
 
 >>> articles.filter(headline__startswith='Hello') & articles.filter(headline__contains='bye')
-[Hello and goodbye]
+[<Article: Hello and goodbye>]
 
 >>> Article.objects.filter(Q(headline__contains='bye'), headline__startswith='Hello')
-[Hello and goodbye]
+[<Article: Hello and goodbye>]
 
 >>> Article.objects.filter(headline__contains='Hello') | Article.objects.filter(headline__contains='bye')
-[Hello, Goodbye, Hello and goodbye]
+[<Article: Hello>, <Article: Goodbye>, <Article: Hello and goodbye>]
 
 >>> Article.objects.filter(headline__iexact='Hello') | Article.objects.filter(headline__contains='ood')
-[Hello, Goodbye, Hello and goodbye]
+[<Article: Hello>, <Article: Goodbye>, <Article: Hello and goodbye>]
 
 >>> Article.objects.filter(Q(pk=1) | Q(pk=2))
-[Hello, Goodbye]
+[<Article: Hello>, <Article: Goodbye>]
 
 >>> Article.objects.filter(Q(pk=1) | Q(pk=2) | Q(pk=3))
-[Hello, Goodbye, Hello and goodbye]
+[<Article: Hello>, <Article: Goodbye>, <Article: Hello and goodbye>]
 
-# Q arg objects are ANDed 
+# Q arg objects are ANDed
 >>> Article.objects.filter(Q(headline__startswith='Hello'), Q(headline__contains='bye'))
-[Hello and goodbye]
+[<Article: Hello and goodbye>]
 
 # Q arg AND order is irrelevant
 >>> Article.objects.filter(Q(headline__contains='bye'), headline__startswith='Hello')
-[Hello and goodbye]
+[<Article: Hello and goodbye>]
 
 # Try some arg queries with operations other than get_list
 >>> Article.objects.get(Q(headline__startswith='Hello'), Q(headline__contains='bye'))
-Hello and goodbye
+<Article: Hello and goodbye>
 
 >>> Article.objects.filter(Q(headline__startswith='Hello') | Q(headline__contains='bye')).count()
 3
@@ -87,17 +88,17 @@ Hello and goodbye
 [{'headline': 'Hello and goodbye', 'pub_date': datetime.datetime(2005, 11, 29, 0, 0), 'id': 3}]
 
 >>> Article.objects.filter(Q(headline__startswith='Hello')).in_bulk([1,2])
-{1: Hello}
+{1: <Article: Hello>}
 
 # Demonstrating exclude with a Q object
 >>> Article.objects.exclude(Q(headline__startswith='Hello'))
-[Goodbye]
+[<Article: Goodbye>]
 
-# The 'complex_filter' method supports framework features such as 
+# The 'complex_filter' method supports framework features such as
 # 'limit_choices_to' which normally take a single dictionary of lookup arguments
 # but need to support arbitrary queries via Q objects too.
 >>> Article.objects.complex_filter({'pk': 1})
-[Hello]
+[<Article: Hello>]
 >>> Article.objects.complex_filter(Q(pk=1) | Q(pk=2))
-[Hello, Goodbye]
+[<Article: Hello>, <Article: Goodbye>]
 """

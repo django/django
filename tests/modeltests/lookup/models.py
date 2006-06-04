@@ -12,7 +12,7 @@ class Article(models.Model):
     class Meta:
         ordering = ('-pub_date', 'headline')
 
-    def __repr__(self):
+    def __str__(self):
         return self.headline
 
 API_TESTS = """
@@ -61,9 +61,9 @@ Article 4
 # in_bulk() takes a list of IDs and returns a dictionary mapping IDs
 # to objects.
 >>> Article.objects.in_bulk([1, 2])
-{1: Article 1, 2: Article 2}
+{1: <Article: Article 1>, 2: <Article: Article 2>}
 >>> Article.objects.in_bulk([3])
-{3: Article 3}
+{3: <Article: Article 3>}
 >>> Article.objects.in_bulk([1000])
 {}
 >>> Article.objects.in_bulk([])
@@ -125,55 +125,55 @@ True
 # In the case of identical date values, these methods will use the ID as a
 # fallback check. This guarantees that no records are skipped or duplicated.
 >>> a1.get_next_by_pub_date()
-Article 2
+<Article: Article 2>
 >>> a2.get_next_by_pub_date()
-Article 3
+<Article: Article 3>
 >>> a3.get_next_by_pub_date()
-Article 7
+<Article: Article 7>
 >>> a4.get_next_by_pub_date()
-Article 6
+<Article: Article 6>
 >>> a5.get_next_by_pub_date()
 Traceback (most recent call last):
     ...
 DoesNotExist: Article matching query does not exist.
 >>> a6.get_next_by_pub_date()
-Article 5
+<Article: Article 5>
 >>> a7.get_next_by_pub_date()
-Article 4
+<Article: Article 4>
 
 >>> a7.get_previous_by_pub_date()
-Article 3
+<Article: Article 3>
 >>> a6.get_previous_by_pub_date()
-Article 4
+<Article: Article 4>
 >>> a5.get_previous_by_pub_date()
-Article 6
+<Article: Article 6>
 >>> a4.get_previous_by_pub_date()
-Article 7
+<Article: Article 7>
 >>> a3.get_previous_by_pub_date()
-Article 2
+<Article: Article 2>
 >>> a2.get_previous_by_pub_date()
-Article 1
+<Article: Article 1>
 
 # Underscores and percent signs have special meaning in the underlying
 # database library, but Django handles the quoting of them automatically.
 >>> a8 = Article(headline='Article_ with underscore', pub_date=datetime(2005, 11, 20))
 >>> a8.save()
 >>> Article.objects.filter(headline__startswith='Article')
-[Article_ with underscore, Article 5, Article 6, Article 4, Article 2, Article 3, Article 7, Article 1]
+[<Article: Article_ with underscore>, <Article: Article 5>, <Article: Article 6>, <Article: Article 4>, <Article: Article 2>, <Article: Article 3>, <Article: Article 7>, <Article: Article 1>]
 >>> Article.objects.filter(headline__startswith='Article_')
-[Article_ with underscore]
+[<Article: Article_ with underscore>]
 >>> a9 = Article(headline='Article% with percent sign', pub_date=datetime(2005, 11, 21))
 >>> a9.save()
 >>> Article.objects.filter(headline__startswith='Article')
-[Article% with percent sign, Article_ with underscore, Article 5, Article 6, Article 4, Article 2, Article 3, Article 7, Article 1]
+[<Article: Article% with percent sign>, <Article: Article_ with underscore>, <Article: Article 5>, <Article: Article 6>, <Article: Article 4>, <Article: Article 2>, <Article: Article 3>, <Article: Article 7>, <Article: Article 1>]
 >>> Article.objects.filter(headline__startswith='Article%')
-[Article% with percent sign]
+[<Article: Article% with percent sign>]
 
 # exclude() is the opposite of filter() when doing lookups:
 >>> Article.objects.filter(headline__contains='Article').exclude(headline__contains='with')
-[Article 5, Article 6, Article 4, Article 2, Article 3, Article 7, Article 1]
+[<Article: Article 5>, <Article: Article 6>, <Article: Article 4>, <Article: Article 2>, <Article: Article 3>, <Article: Article 7>, <Article: Article 1>]
 >>> Article.objects.exclude(headline__startswith="Article_")
-[Article% with percent sign, Article 5, Article 6, Article 4, Article 2, Article 3, Article 7, Article 1]
+[<Article: Article% with percent sign>, <Article: Article 5>, <Article: Article 6>, <Article: Article 4>, <Article: Article 2>, <Article: Article 3>, <Article: Article 7>, <Article: Article 1>]
 >>> Article.objects.exclude(headline="Article 7")
-[Article% with percent sign, Article_ with underscore, Article 5, Article 6, Article 4, Article 2, Article 3, Article 1]
+[<Article: Article% with percent sign>, <Article: Article_ with underscore>, <Article: Article 5>, <Article: Article 6>, <Article: Article 4>, <Article: Article 2>, <Article: Article 3>, <Article: Article 1>]
 """

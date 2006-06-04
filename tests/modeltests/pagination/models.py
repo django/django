@@ -12,7 +12,7 @@ class Article(models.Model):
     headline = models.CharField(maxlength=100, default='Default headline')
     pub_date = models.DateTimeField()
 
-    def __repr__(self):
+    def __str__(self):
         return self.headline
 
 API_TESTS = """
@@ -35,11 +35,11 @@ API_TESTS = """
 
 # get the first page (zero-based)
 >>> paginator.get_page(0)
-[Article 1, Article 2, Article 3, Article 4, Article 5]
+[<Article: Article 1>, <Article: Article 2>, <Article: Article 3>, <Article: Article 4>, <Article: Article 5>]
 
 # get the second page
 >>> paginator.get_page(1)
-[Article 6, Article 7, Article 8, Article 9]
+[<Article: Article 6>, <Article: Article 7>, <Article: Article 8>, <Article: Article 9>]
 
 # does the first page have a next or previous page?
 >>> paginator.has_next_page(0)

@@ -21,7 +21,7 @@ class Thing(models.Model):
     class Meta:
        db_table = 'select'
 
-    def __repr__(self):
+    def __str__(self):
         return self.when
 
 API_TESTS = """
@@ -39,18 +39,18 @@ a
 h
 
 >>> Thing.objects.order_by('when')
-[a, h]
+[<Thing: a>, <Thing: h>]
 >>> v = Thing.objects.get(pk='a')
 >>> print v.join
 b
 >>> print v.where
 2005-01-01
 >>> Thing.objects.order_by('select.when')
-[a, h]
+[<Thing: a>, <Thing: h>]
 
 >>> Thing.objects.dates('where', 'year')
 [datetime.datetime(2005, 1, 1, 0, 0), datetime.datetime(2006, 1, 1, 0, 0)]
 
 >>> Thing.objects.filter(where__month=1)
-[a]
+[<Thing: a>]
 """

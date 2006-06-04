@@ -10,7 +10,7 @@ class Musician(models.Model):
     first_name = models.CharField(maxlength=30)
     last_name = models.CharField(maxlength=30)
 
-    def __repr__(self):
+    def __str__(self):
         return "%s %s" % (self.first_name, self.last_name)
 
 class Album(models.Model):
@@ -18,7 +18,7 @@ class Album(models.Model):
     musician = models.ForeignKey(Musician)
     release_date = models.DateField(blank=True, null=True)
 
-    def __repr__(self):
+    def __str__(self):
         return self.name
 
 API_TESTS = """
@@ -35,7 +35,7 @@ API_TESTS = """
 
 # Verify it worked.
 >>> Musician.objects.all()
-[Ella Fitzgerald]
+[<Musician: Ella Fitzgerald>]
 >>> [m1] == list(Musician.objects.all())
 True
 
@@ -69,9 +69,9 @@ True
 
 # Verify it worked.
 >>> Album.objects.all()
-[Ella and Basie]
+[<Album: Ella and Basie>]
 >>> Album.objects.get().musician
-Ella Fitzgerald
+<Musician: Ella Fitzgerald>
 
 # Create an Album with a release_date.
 >>> data = MultiValueDict({'name': ['Ultimate Ella'], 'musician': ['1'], 'release_date': ['2005-02-13']})
@@ -82,10 +82,10 @@ Ella Fitzgerald
 
 # Verify it worked.
 >>> Album.objects.order_by('name')
-[Ella and Basie, Ultimate Ella]
+[<Album: Ella and Basie>, <Album: Ultimate Ella>]
 >>> a2 = Album.objects.get(pk=2)
 >>> a2
-Ultimate Ella
+<Album: Ultimate Ella>
 >>> a2.release_date
 datetime.date(2005, 2, 13)
 """

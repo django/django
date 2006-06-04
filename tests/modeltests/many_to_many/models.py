@@ -12,7 +12,7 @@ from django.db import models
 class Publication(models.Model):
     title = models.CharField(maxlength=30)
 
-    def __repr__(self):
+    def __str__(self):
         return self.title
 
     class Meta:
@@ -22,7 +22,7 @@ class Article(models.Model):
     headline = models.CharField(maxlength=100)
     publications = models.ManyToManyField(Publication)
 
-    def __repr__(self):
+    def __str__(self):
         return self.headline
 
     class Meta:
@@ -58,29 +58,29 @@ API_TESTS = """
 
 # Article objects have access to their related Publication objects.
 >>> a1.publications.all()
-[The Python Journal]
+[<Publication: The Python Journal>]
 >>> a2.publications.all()
-[Highlights for Children, Science News, Science Weekly, The Python Journal]
+[<Publication: Highlights for Children>, <Publication: Science News>, <Publication: Science Weekly>, <Publication: The Python Journal>]
 
 # Publication objects have access to their related Article objects.
 >>> p2.article_set.all()
-[NASA uses Python]
+[<Article: NASA uses Python>]
 >>> p1.article_set.all()
-[Django lets you build Web apps easily, NASA uses Python]
+[<Article: Django lets you build Web apps easily>, <Article: NASA uses Python>]
 >>> Publication.objects.get(id=4).article_set.all()
-[NASA uses Python]
+[<Article: NASA uses Python>]
 
 # We can perform kwarg queries across m2m relationships
 >>> Article.objects.filter(publications__id__exact=1)
-[Django lets you build Web apps easily, NASA uses Python]
+[<Article: Django lets you build Web apps easily>, <Article: NASA uses Python>]
 >>> Article.objects.filter(publications__pk=1)
-[Django lets you build Web apps easily, NASA uses Python]
+[<Article: Django lets you build Web apps easily>, <Article: NASA uses Python>]
 
 >>> Article.objects.filter(publications__title__startswith="Science")
-[NASA uses Python, NASA uses Python]
+[<Article: NASA uses Python>, <Article: NASA uses Python>]
 
 >>> Article.objects.filter(publications__title__startswith="Science").distinct()
-[NASA uses Python]
+[<Article: NASA uses Python>]
 
 # The count() function respects distinct() as well.
 >>> Article.objects.filter(publications__title__startswith="Science").count()
@@ -92,23 +92,23 @@ API_TESTS = """
 # Reverse m2m queries are supported (i.e., starting at the table that doesn't
 # have a ManyToManyField).
 >>> Publication.objects.filter(id__exact=1)
-[The Python Journal]
+[<Publication: The Python Journal>]
 >>> Publication.objects.filter(pk=1)
-[The Python Journal]
+[<Publication: The Python Journal>]
 
 >>> Publication.objects.filter(article__headline__startswith="NASA")
-[Highlights for Children, Science News, Science Weekly, The Python Journal]
+[<Publication: Highlights for Children>, <Publication: Science News>, <Publication: Science Weekly>, <Publication: The Python Journal>]
 
 >>> Publication.objects.filter(article__id__exact=1)
-[The Python Journal]
+[<Publication: The Python Journal>]
 
 >>> Publication.objects.filter(article__pk=1)
-[The Python Journal]
+[<Publication: The Python Journal>]
 
 # If we delete a Publication, its Articles won't be able to access it.
 >>> p1.delete()
 >>> Publication.objects.all()
-[Highlights for Children, Science News, Science Weekly]
+[<Publication: Highlights for Children>, <Publication: Science News>, <Publication: Science Weekly>]
 >>> a1 = Article.objects.get(pk=1)
 >>> a1.publications.all()
 []
@@ -116,7 +116,7 @@ API_TESTS = """
 # If we delete an Article, its Publications won't be able to access it.
 >>> a2.delete()
 >>> Article.objects.all()
-[Django lets you build Web apps easily]
+[<Article: Django lets you build Web apps easily>]
 >>> p2.article_set.all()
 []
 
@@ -125,22 +125,22 @@ API_TESTS = """
 >>> a4.save()
 >>> p2.article_set.add(a4)
 >>> p2.article_set.all()
-[NASA finds intelligent life on Earth]
+[<Article: NASA finds intelligent life on Earth>]
 >>> a4.publications.all()
-[Science News]
+[<Publication: Science News>]
 
 # Adding via the other end using keywords
 >>> new_article = p2.article_set.create(headline='Oxygen-free diet works wonders')
 >>> p2.article_set.all()
-[NASA finds intelligent life on Earth, Oxygen-free diet works wonders]
+[<Article: NASA finds intelligent life on Earth>, <Article: Oxygen-free diet works wonders>]
 >>> a5 = p2.article_set.all()[1]
 >>> a5.publications.all()
-[Science News]
+[<Publication: Science News>]
 
 # Removing publication from an article:
 >>> a4.publications.remove(p2)
 >>> p2.article_set.all()
-[Oxygen-free diet works wonders]
+[<Article: Oxygen-free diet works wonders>]
 >>> a4.publications.all()
 []
 
@@ -154,33 +154,33 @@ API_TESTS = """
 # Relation sets can be assigned. Assignment clears any existing set members
 >>> p2.article_set = [a4, a5]
 >>> p2.article_set.all()
-[NASA finds intelligent life on Earth, Oxygen-free diet works wonders]
+[<Article: NASA finds intelligent life on Earth>, <Article: Oxygen-free diet works wonders>]
 >>> a4.publications.all()
-[Science News]
+[<Publication: Science News>]
 >>> a4.publications = [p3]
 >>> p2.article_set.all()
-[Oxygen-free diet works wonders]
+[<Article: Oxygen-free diet works wonders>]
 >>> a4.publications.all()
-[Science Weekly]
+[<Publication: Science Weekly>]
 
 # Relation sets can be cleared:
 >>> p2.article_set.clear()
 >>> p2.article_set.all()
 []
 >>> a4.publications.all()
-[Science Weekly]
+[<Publication: Science Weekly>]
 
 # And you can clear from the other end
 >>> p2.article_set.add(a4, a5)
 >>> p2.article_set.all()
-[NASA finds intelligent life on Earth, Oxygen-free diet works wonders]
+[<Article: NASA finds intelligent life on Earth>, <Article: Oxygen-free diet works wonders>]
 >>> a4.publications.all()
-[Science News, Science Weekly]
+[<Publication: Science News>, <Publication: Science Weekly>]
 >>> a4.publications.clear()
 >>> a4.publications.all()
 []
 >>> p2.article_set.all()
-[Oxygen-free diet works wonders]
+[<Article: Oxygen-free diet works wonders>]
 
 # Recreate the article and Publication we just deleted.
 >>> p1 = Publication(id=None, title='The Python Journal')
@@ -192,22 +192,22 @@ API_TESTS = """
 # Bulk delete some Publications - references to deleted publications should go
 >>> Publication.objects.filter(title__startswith='Science').delete()
 >>> Publication.objects.all()
-[Highlights for Children, The Python Journal]
+[<Publication: Highlights for Children>, <Publication: The Python Journal>]
 >>> Article.objects.all()
-[Django lets you build Web apps easily, NASA finds intelligent life on Earth, NASA uses Python, Oxygen-free diet works wonders]
+[<Article: Django lets you build Web apps easily>, <Article: NASA finds intelligent life on Earth>, <Article: NASA uses Python>, <Article: Oxygen-free diet works wonders>]
 >>> a2.publications.all()
-[The Python Journal]
+[<Publication: The Python Journal>]
 
 # Bulk delete some articles - references to deleted objects should go
 >>> q = Article.objects.filter(headline__startswith='Django')
 >>> print q
-[Django lets you build Web apps easily]
+[<Article: Django lets you build Web apps easily>]
 >>> q.delete()
 
 # After the delete, the QuerySet cache needs to be cleared, and the referenced objects should be gone
 >>> print q
 []
 >>> p1.article_set.all()
-[NASA uses Python]
+[<Article: NASA uses Python>]
 
 """

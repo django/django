@@ -12,7 +12,7 @@ class Place(models.Model):
     name = models.CharField(maxlength=50)
     address = models.CharField(maxlength=80)
 
-    def __repr__(self):
+    def __str__(self):
         return "%s the place" % self.name
 
 class Restaurant(models.Model):
@@ -20,15 +20,15 @@ class Restaurant(models.Model):
     serves_hot_dogs = models.BooleanField()
     serves_pizza = models.BooleanField()
 
-    def __repr__(self):
+    def __str__(self):
         return "%s the restaurant" % self.place.name
 
 class Waiter(models.Model):
     restaurant = models.ForeignKey(Restaurant)
     name = models.CharField(maxlength=50)
 
-    def __repr__(self):
-        return "%s the waiter at %r" % (self.name, self.restaurant)
+    def __str__(self):
+        return "%s the waiter at %s" % (self.name, self.restaurant)
 
 API_TESTS = """
 # Create a couple of Places.
@@ -43,11 +43,11 @@ API_TESTS = """
 
 # A Restaurant can access its place.
 >>> r.place
-Demon Dogs the place
+<Place: Demon Dogs the place>
 
 # A Place can access its restaurant, if available.
 >>> p1.restaurant
-Demon Dogs the restaurant
+<Restaurant: Demon Dogs the restaurant>
 
 # p2 doesn't have an associated restaurant.
 >>> p2.restaurant
@@ -60,69 +60,69 @@ DoesNotExist: Restaurant matching query does not exist.
 >>> r.place = p2
 >>> r.save()
 >>> p2.restaurant
-Ace Hardware the restaurant
+<Restaurant: Ace Hardware the restaurant>
 >>> r.place
-Ace Hardware the place
+<Place: Ace Hardware the place>
 
 # Set the place back again, using assignment in the reverse direction
-# Need to reget restaurant object first, because the reverse set 
+# Need to reget restaurant object first, because the reverse set
 # can't update the existing restaurant instance
 >>> p1.restaurant = r
 >>> r.save()
 >>> p1.restaurant
-Demon Dogs the restaurant
+<Restaurant: Demon Dogs the restaurant>
 
 >>> r = Restaurant.objects.get(pk=1)
 >>> r.place
-Demon Dogs the place
+<Place: Demon Dogs the place>
 
 # Restaurant.objects.all() just returns the Restaurants, not the Places.
 # Note that there are two restaurants - Ace Hardware the Restaurant was created
-# in the call to r.place = p2. This means there are multiple restaurants referencing 
+# in the call to r.place = p2. This means there are multiple restaurants referencing
 # a single place...
 >>> Restaurant.objects.all()
-[Demon Dogs the restaurant, Ace Hardware the restaurant]
+[<Restaurant: Demon Dogs the restaurant>, <Restaurant: Ace Hardware the restaurant>]
 
 # Place.objects.all() returns all Places, regardless of whether they have
 # Restaurants.
 >>> Place.objects.order_by('name')
-[Ace Hardware the place, Demon Dogs the place]
+[<Place: Ace Hardware the place>, <Place: Demon Dogs the place>]
 
 >>> Restaurant.objects.get(place__id__exact=1)
-Demon Dogs the restaurant
+<Restaurant: Demon Dogs the restaurant>
 >>> Restaurant.objects.get(pk=1)
-Demon Dogs the restaurant
+<Restaurant: Demon Dogs the restaurant>
 >>> Restaurant.objects.get(place__exact=1)
-Demon Dogs the restaurant
+<Restaurant: Demon Dogs the restaurant>
 >>> Restaurant.objects.get(place__pk=1)
-Demon Dogs the restaurant
+<Restaurant: Demon Dogs the restaurant>
 >>> Restaurant.objects.get(place__name__startswith="Demon")
-Demon Dogs the restaurant
+<Restaurant: Demon Dogs the restaurant>
 
 >>> Place.objects.get(id__exact=1)
-Demon Dogs the place
+<Place: Demon Dogs the place>
 >>> Place.objects.get(pk=1)
-Demon Dogs the place
+<Place: Demon Dogs the place>
 >>> Place.objects.get(restaurant__place__exact=1)
-Demon Dogs the place
+<Place: Demon Dogs the place>
 >>> Place.objects.get(restaurant__pk=1)
-Demon Dogs the place
+<Place: Demon Dogs the place>
 
 # Add a Waiter to the Restaurant.
 >>> w = r.waiter_set.create(name='Joe')
 >>> w.save()
 >>> w
-Joe the waiter at Demon Dogs the restaurant
+<Waiter: Joe the waiter at Demon Dogs the restaurant>
 
 # Query the waiters
 >>> Waiter.objects.filter(restaurant__place__exact=1)
-[Joe the waiter at Demon Dogs the restaurant]
+[<Waiter: Joe the waiter at Demon Dogs the restaurant>]
 >>> Waiter.objects.filter(restaurant__pk=1)
-[Joe the waiter at Demon Dogs the restaurant]
+[<Waiter: Joe the waiter at Demon Dogs the restaurant>]
 >>> Waiter.objects.filter(id__exact=1)
-[Joe the waiter at Demon Dogs the restaurant]
+[<Waiter: Joe the waiter at Demon Dogs the restaurant>]
 >>> Waiter.objects.filter(pk=1)
-[Joe the waiter at Demon Dogs the restaurant]
+[<Waiter: Joe the waiter at Demon Dogs the restaurant>]
 
 # Delete the restaurant; the waiter should also be removed
 >>> r = Restaurant.objects.get(pk=1)

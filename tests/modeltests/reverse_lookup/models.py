@@ -8,20 +8,23 @@ from django.db import models
 
 class User(models.Model):
     name = models.CharField(maxlength=200)
-    def __repr__(self):
+
+    def __str__(self):
         return self.name
 
 class Poll(models.Model):
     question = models.CharField(maxlength=200)
     creator = models.ForeignKey(User)
-    def __repr__(self):
+
+    def __str__(self):
         return self.question
 
 class Choice(models.Model):
     name = models.CharField(maxlength=100)
     poll = models.ForeignKey(Poll, related_name="poll_choice")
     related_poll = models.ForeignKey(Poll, related_name="related_choice")
-    def __repr(self):
+
+    def __str(self):
         return self.name
 
 API_TESTS = """
@@ -38,15 +41,15 @@ API_TESTS = """
 
 >>> # Reverse lookups by field name:
 >>> User.objects.get(poll__question__exact="What's the first question?")
-John Doe
+<User: John Doe>
 >>> User.objects.get(poll__question__exact="What's the second question?")
-Jim Bo
+<User: Jim Bo>
 
 >>> # Reverse lookups by related_name:
 >>> Poll.objects.get(poll_choice__name__exact="This is the answer.")
-What's the first question?
+<Poll: What's the first question?>
 >>> Poll.objects.get(related_choice__name__exact="This is the answer.")
-What's the second question?
+<Poll: What's the second question?>
 
 >>> # If a related_name is given you can't use the field name instead:
 >>> Poll.objects.get(choice__name__exact="This is the answer")

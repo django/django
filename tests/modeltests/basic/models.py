@@ -9,9 +9,10 @@ from django.db import models
 class Article(models.Model):
     headline = models.CharField(maxlength=100, default='Default headline')
     pub_date = models.DateTimeField()
-    
-    def __repr__(self):
+
+    def __str__(self):
         return self.headline
+
 API_TESTS = """
 
 # No articles are in the system yet.
@@ -39,34 +40,34 @@ datetime.datetime(2005, 7, 28, 0, 0)
 >>> a.headline = 'Area woman programs in Python'
 >>> a.save()
 
-# Article.objects.all() returns all the articles in the database. 
+# Article.objects.all() returns all the articles in the database.
 >>> Article.objects.all()
-[Area woman programs in Python]
+[<Article: Area woman programs in Python>]
 
 # Django provides a rich database lookup API.
 >>> Article.objects.get(id__exact=1)
-Area woman programs in Python
+<Article: Area woman programs in Python>
 >>> Article.objects.get(headline__startswith='Area woman')
-Area woman programs in Python
+<Article: Area woman programs in Python>
 >>> Article.objects.get(pub_date__year=2005)
-Area woman programs in Python
+<Article: Area woman programs in Python>
 >>> Article.objects.get(pub_date__year=2005, pub_date__month=7)
-Area woman programs in Python
+<Article: Area woman programs in Python>
 >>> Article.objects.get(pub_date__year=2005, pub_date__month=7, pub_date__day=28)
-Area woman programs in Python
+<Article: Area woman programs in Python>
 
 # The "__exact" lookup type can be omitted, as a shortcut.
 >>> Article.objects.get(id=1)
-Area woman programs in Python
+<Article: Area woman programs in Python>
 >>> Article.objects.get(headline='Area woman programs in Python')
-Area woman programs in Python
+<Article: Area woman programs in Python>
 
 >>> Article.objects.filter(pub_date__year=2005)
-[Area woman programs in Python]
+[<Article: Area woman programs in Python>]
 >>> Article.objects.filter(pub_date__year=2004)
 []
 >>> Article.objects.filter(pub_date__year=2005, pub_date__month=7)
-[Area woman programs in Python]
+[<Article: Area woman programs in Python>]
 
 # Django raises an Article.DoesNotExist exception for get() if the parameters
 # don't match any object.
@@ -84,7 +85,7 @@ DoesNotExist: Article matching query does not exist.
 # shortcut for primary-key exact lookups.
 # The following is identical to articles.get(id=1).
 >>> Article.objects.get(pk=1)
-Area woman programs in Python
+<Article: Area woman programs in Python>
 
 # Model instances of the same type and same ID are considered equal.
 >>> a = Article.objects.get(pk=1)
@@ -222,7 +223,7 @@ datetime.datetime(2005, 7, 28, 0, 0)
 >>> s1 = Article.objects.filter(id__exact=1)
 >>> s2 = Article.objects.filter(id__exact=2)
 >>> s1 | s2
-[Area woman programs in Python, Second article]
+[<Article: Area woman programs in Python>, <Article: Second article>]
 >>> s1 & s2
 []
 
@@ -232,34 +233,34 @@ datetime.datetime(2005, 7, 28, 0, 0)
 
 # You can get items using index and slice notation.
 >>> Article.objects.all()[0]
-Area woman programs in Python
+<Article: Area woman programs in Python>
 >>> Article.objects.all()[1:3]
-[Second article, Third article]
+[<Article: Second article>, <Article: Third article>]
 >>> s3 = Article.objects.filter(id__exact=3)
 >>> (s1 | s2 | s3)[::2]
-[Area woman programs in Python, Third article]
+[<Article: Area woman programs in Python>, <Article: Third article>]
 
 # Slices (without step) are lazy:
 >>> Article.objects.all()[0:5].filter()
-[Area woman programs in Python, Second article, Third article, Fourth article, Article 6]
+[<Article: Area woman programs in Python>, <Article: Second article>, <Article: Third article>, <Article: Fourth article>, <Article: Article 6>]
 
 # Slicing again works:
 >>> Article.objects.all()[0:5][0:2]
-[Area woman programs in Python, Second article]
+[<Article: Area woman programs in Python>, <Article: Second article>]
 >>> Article.objects.all()[0:5][:2]
-[Area woman programs in Python, Second article]
+[<Article: Area woman programs in Python>, <Article: Second article>]
 >>> Article.objects.all()[0:5][4:]
-[Article 6]
+[<Article: Article 6>]
 >>> Article.objects.all()[0:5][5:]
 []
 
 # Some more tests!
 >>> Article.objects.all()[2:][0:2]
-[Third article, Fourth article]
+[<Article: Third article>, <Article: Fourth article>]
 >>> Article.objects.all()[2:][:2]
-[Third article, Fourth article]
+[<Article: Third article>, <Article: Fourth article>]
 >>> Article.objects.all()[2:][2:3]
-[Article 6]
+[<Article: Article 6>]
 
 # Note that you can't use 'offset' without 'limit' (on some dbs), so this doesn't work:
 >>> Article.objects.all()[2:]
@@ -308,10 +309,10 @@ AttributeError: Manager isn't accessible via Article instances
 
 # Bulk delete test: How many objects before and after the delete?
 >>> Article.objects.all()
-[Area woman programs in Python, Second article, Third article, Fourth article, Article 6, Default headline, Article 7, Updated article 8]
+[<Article: Area woman programs in Python>, <Article: Second article>, <Article: Third article>, <Article: Fourth article>, <Article: Article 6>, <Article: Default headline>, <Article: Article 7>, <Article: Updated article 8>]
 >>> Article.objects.filter(id__lte=4).delete()
 >>> Article.objects.all()
-[Article 6, Default headline, Article 7, Updated article 8]
+[<Article: Article 6>, <Article: Default headline>, <Article: Article 7>, <Article: Updated article 8>]
 
 """
 

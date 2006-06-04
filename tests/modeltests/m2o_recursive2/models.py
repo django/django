@@ -14,7 +14,7 @@ class Person(models.Model):
     mother = models.ForeignKey('self', null=True, related_name='mothers_child_set')
     father = models.ForeignKey('self', null=True, related_name='fathers_child_set')
 
-    def __repr__(self):
+    def __str__(self):
         return self.full_name
 
 API_TESTS = """
@@ -29,13 +29,13 @@ API_TESTS = """
 >>> kid.save()
 
 >>> kid.mother
-Jane Smith
+<Person: Jane Smith>
 >>> kid.father
-John Smith Senior
+<Person: John Smith Senior>
 >>> dad.fathers_child_set.all()
-[John Smith Junior]
+[<Person: John Smith Junior>]
 >>> mom.mothers_child_set.all()
-[John Smith Junior]
+[<Person: John Smith Junior>]
 >>> kid.mothers_child_set.all()
 []
 >>> kid.fathers_child_set.all()
