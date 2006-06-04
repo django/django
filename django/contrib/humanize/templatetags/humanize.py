@@ -48,3 +48,17 @@ def intword(value):
         return '%.1f trillion' % (value / 1000000000000.0)
     return value
 register.filter(intword)
+
+def apnumber(value):
+    """
+    For numbers 1-9, returns the number spelled out. Otherwise, returns the
+    number. This follows Associated Press style.
+    """
+    try:
+        value = int(value)
+    except ValueError:
+        return value
+    if not 0 < value < 10:
+        return value
+    return ('one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine')[value-1]
+register.filter(apnumber)

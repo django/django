@@ -53,16 +53,17 @@ To activate these filters, add ``'django.contrib.english'`` to your
 ``INSTALLED_APPS`` setting. Once you've done that, use ``{% load english %}``
 in a template, and you'll have access to these filters:
 
-ordinal
--------
+apnumber
+--------
 
-Converts an integer to its ordinal as a string.
+For numbers 1-9, returns the number spelled out. Otherwise, returns the
+number. This follows Associated Press style.
 
 Examples:
 
-    * ``1`` becomes ``'1st'``.
-    * ``2`` becomes ``'2nd'``.
-    * ``3`` becomes ``'3rd'``.
+    * ``1`` becomes ``'one'``.
+    * ``2`` becomes ``'two'``.
+    * ``10`` becomes ``10``.
 
 You can pass in either an integer or a string representation of an integer.
 
@@ -93,6 +94,19 @@ Examples:
     * ``1200000000`` becomes ``'1.2 billion'``.
 
 Values up to 1000000000000000 (one quadrillion) are supported.
+
+You can pass in either an integer or a string representation of an integer.
+
+ordinal
+-------
+
+Converts an integer to its ordinal as a string.
+
+Examples:
+
+    * ``1`` becomes ``'1st'``.
+    * ``2`` becomes ``'2nd'``.
+    * ``3`` becomes ``'3rd'``.
 
 You can pass in either an integer or a string representation of an integer.
 
