@@ -124,8 +124,9 @@ class MultiValueDict(dict):
     def __copy__(self):
         return self.__class__(dict.items(self))
 
-    def __deepcopy__(self, memo):
+    def __deepcopy__(self, memo=None):
         import copy
+        if memo is None: memo = {}
         result = self.__class__()
         memo[id(self)] = result
         for key, value in dict.items(self):
