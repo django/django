@@ -1152,7 +1152,7 @@ def execute_from_command_line(action_mapping=DEFAULT_ACTION_MAPPING, argv=None):
         help='Lets you manually add a directory the Python path, e.g. "/home/djangoprojects/myproject".')
     parser.add_option('--plain', action='store_true', dest='plain',
         help='Tells Django to use plain Python, not IPython, for "shell" command.')
-    options, args = parser.parse_args(argv)
+    options, args = parser.parse_args(argv[1:])
 
     # Take care of options.
     if options.settings:
