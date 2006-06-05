@@ -1139,7 +1139,11 @@ def print_error(msg, cmd):
     sys.stderr.write(style.ERROR('Error: %s' % msg) + '\nRun "%s --help" for help.\n' % cmd)
     sys.exit(1)
 
-def execute_from_command_line(action_mapping=DEFAULT_ACTION_MAPPING):
+def execute_from_command_line(action_mapping=DEFAULT_ACTION_MAPPING, argv=None):
+    # Use sys.argv if we've not passed in a custom argv
+    if argv is None:
+        argv = sys.argv
+
     # Parse the command-line arguments. optparse handles the dirty work.
     parser = DjangoOptionParser(usage=get_usage(action_mapping), version=get_version())
     parser.add_option('--settings',
@@ -1148,7 +1152,7 @@ def execute_from_command_line(action_mapping=DEFAULT_ACTION_MAPPING):
         help='Lets you manually add a directory the Python path, e.g. "/home/djangoprojects/myproject".')
     parser.add_option('--plain', action='store_true', dest='plain',
         help='Tells Django to use plain Python, not IPython, for "shell" command.')
-    options, args = parser.parse_args()
+    options, args = parser.parse_args(argv)
 
     # Take care of options.
     if options.settings:
@@ -1163,7 +1167,7 @@ def execute_from_command_line(action_mapping=DEFAULT_ACTION_MAPPING):
     except IndexError:
         parser.print_usage_and_exit()
     if not action_mapping.has_key(action):
-        print_error("Your action, %r, was invalid." % action, sys.argv[0])
+        print_error("Your action, %r, was invalid." % action, argv[0])
 
     # Switch to English, because django-admin.py creates database content
     # like permissions, and those shouldn't contain any translations.
@@ -1222,7 +1226,7 @@ def execute_from_command_line(action_mapping=DEFAULT_ACTION_MAPPING):
         if action not in NO_SQL_TRANSACTION:
             print style.SQL_KEYWORD("COMMIT;")
 
-def execute_manager(settings_mod):
+def execute_manager(settings_mod, argv=None):
     # Add this project to sys.path so that it's importable in the conventional
     # way. For example, if this file (manage.py) lives in a directory
     # "myproject", this code would add "/path/to/myproject" to sys.path.
@@ -1249,4 +1253,4 @@ def execute_manager(settings_mod):
     action_mapping['startapp'].args = startapp.args
 
     # Run the django-admin.py command.
-    execute_from_command_line(action_mapping)
+    execute_from_command_line(action_mapping, argv)
