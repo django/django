@@ -8,7 +8,6 @@ from django.db.models.manager import Manager
 from django.db.models.base import Model, AdminOptions
 from django.db.models.fields import *
 from django.db.models.fields.related import ForeignKey, OneToOneField, ManyToManyField, ManyToOneRel, ManyToManyRel, OneToOneRel, TABULAR, STACKED
-from django.db.models.fields.generic_relations import GenericRelation
 from django.db.models import signals
 from django.utils.functional import curry
 from django.utils.text import capfirst
