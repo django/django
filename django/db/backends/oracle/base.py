@@ -65,11 +65,13 @@ class FormatStylePlaceholderCursor(Database.Cursor):
     This fixes it -- but note that if you want to use a literal "%s" in a query,
     you'll need to use "%%s".
     """
-    def execute(self, query, params=[]):
+    def execute(self, query, params=None):
+        if params is None: params = []
         query = self.convert_arguments(query, len(params))
         return Database.Cursor.execute(self, query, params)
 
-    def executemany(self, query, params=[]):
+    def executemany(self, query, params=None):
+        if params is None: params = []
         query = self.convert_arguments(query, len(params[0]))
         return Database.Cursor.executemany(self, query, params)
 
@@ -105,6 +107,9 @@ def get_limit_offset_sql(limit, offset=None):
 
 def get_random_function_sql():
     return "DBMS_RANDOM.RANDOM"
+
+def get_fulltext_search_sql(field_name):
+    raise NotImplementedError
 
 def get_drop_foreignkey_sql():
     return "DROP FOREIGN KEY"

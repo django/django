@@ -124,6 +124,9 @@ def get_limit_offset_sql(limit, offset=None):
 def get_random_function_sql():
     return "RANDOM()"
 
+def get_fulltext_search_sql(field_name):
+    raise NotImplementedError
+
 def get_drop_foreignkey_sql():
     return ""
 

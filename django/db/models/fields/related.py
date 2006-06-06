@@ -198,7 +198,7 @@ class ForeignRelatedObjectsDescriptor(object):
                             setattr(obj, rel_field.name, None)
                             obj.save()
                         else:
-                            raise rel_field.rel.to.DoesNotExist, "'%s' is not related to '%s'." % (obj, instance)
+                            raise rel_field.rel.to.DoesNotExist, "%r is not related to %r." % (obj, instance)
                 remove.alters_data = True
 
                 def clear(self):
@@ -712,7 +712,7 @@ class ManyToManyRel:
         self.related_name = related_name
         self.filter_interface = filter_interface
         if limit_choices_to is None:
-            limit_choices_to = {}        
+            limit_choices_to = {}
         self.limit_choices_to = limit_choices_to
         self.edit_inline = False
         self.raw_id_admin = raw_id_admin

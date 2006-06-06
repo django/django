@@ -221,10 +221,10 @@ def get_language_bidi():
     False = left-to-right layout
     True = right-to-left layout
     """
-    
+
     from django.conf import settings
     return get_language() in settings.LANGUAGES_BIDI
-    
+
 def catalog():
     """
     This function returns the current active catalog for further processing.
@@ -369,7 +369,22 @@ def get_date_formats():
         datetime_format = settings.DATETIME_FORMAT
     if time_format == 'TIME_FORMAT':
         time_format = settings.TIME_FORMAT
-    return (date_format, datetime_format, time_format)
+    return date_format, datetime_format, time_format
+
+def get_partial_date_formats():
+    """
+    This function checks whether translation files provide a translation for some
+    technical message ID to store partial date formats. If it doesn't contain
+    one, the formats provided in the settings will be used.
+    """
+    from django.conf import settings
+    year_month_format = _('YEAR_MONTH_FORMAT')
+    month_day_format = _('MONTH_DAY_FORMAT')
+    if year_month_format == 'YEAR_MONTH_FORMAT':
+        year_month_format = settings.YEAR_MONTH_FORMAT
+    if month_day_format == 'MONTH_DAY_FORMAT':
+        month_day_format = settings.MONTH_DAY_FORMAT
+    return year_month_format, month_day_format
 
 def install():
     """

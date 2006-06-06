@@ -14,12 +14,19 @@ class Reporter(models.Model):
     last_name = models.CharField(maxlength=30)
     email = models.EmailField()
 
-    def __repr__(self):
+    def __str__(self):
         return "%s %s" % (self.first_name, self.last_name)
 
 API_TESTS = """
 >>> from django.db import connection, transaction
+"""
 
+from django.conf import settings
+
+building_docs = getattr(settings, 'BUILDING_DOCS', False)
+
+if building_docs or settings.DATABASE_ENGINE != 'mysql':
+    API_TESTS += """
 # the default behavior is to autocommit after each save() action
 >>> def create_a_reporter_then_fail(first, last):
 ...     a = Reporter(first_name=first, last_name=last)
@@ -33,7 +40,7 @@ Exception: I meant to do that
 
 # The object created before the exception still exists
 >>> Reporter.objects.all()
-[Alice Smith]
+[<Reporter: Alice Smith>]
 
 # the autocommit decorator works exactly the same as the default behavior
 >>> autocomitted_create_then_fail = transaction.autocommit(create_a_reporter_then_fail)
@@ -44,7 +51,7 @@ Exception: I meant to do that
 
 # Same behavior as before
 >>> Reporter.objects.all()
-[Alice Smith, Ben Jones]
+[<Reporter: Alice Smith>, <Reporter: Ben Jones>]
 
 # With the commit_on_success decorator, the transaction is only comitted if the
 # function doesn't throw an exception
@@ -56,7 +63,7 @@ Exception: I meant to do that
 
 # This time the object never got saved
 >>> Reporter.objects.all()
-[Alice Smith, Ben Jones]
+[<Reporter: Alice Smith>, <Reporter: Ben Jones>]
 
 # If there aren't any exceptions, the data will get saved
 >>> def remove_a_reporter():
@@ -66,7 +73,7 @@ Exception: I meant to do that
 >>> remove_comitted_on_success = transaction.commit_on_success(remove_a_reporter)
 >>> remove_comitted_on_success()
 >>> Reporter.objects.all()
-[Ben Jones]
+[<Reporter: Ben Jones>]
 
 # You can manually manage transactions if you really want to, but you
 # have to remember to commit/rollback
@@ -77,7 +84,7 @@ Exception: I meant to do that
 >>> manually_managed = transaction.commit_manually(manually_managed)
 >>> manually_managed()
 >>> Reporter.objects.all()
-[Ben Jones, Carol Doe]
+[<Reporter: Ben Jones>, <Reporter: Carol Doe>]
 
 # If you forget, you'll get bad errors
 >>> def manually_managed_mistake():

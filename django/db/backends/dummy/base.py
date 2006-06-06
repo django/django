@@ -33,5 +33,6 @@ get_date_extract_sql = complain
 get_date_trunc_sql = complain
 get_limit_offset_sql = complain
 get_random_function_sql = complain
+get_fulltext_search_sql = complain
 get_drop_foreignkey_sql = complain
 OPERATOR_MAPPING = {}

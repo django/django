@@ -11,7 +11,7 @@ class Person(models.Model):
     first_name = models.CharField(maxlength=20)
     last_name = models.CharField(maxlength=20)
 
-    def __repr__(self):
+    def __str__(self):
         return "%s %s" % (self.first_name, self.last_name)
 
     def save(self):
@@ -31,7 +31,7 @@ Before save
 After save
 
 >>> Person.objects.all()
-[John Smith]
+[<Person: John Smith>]
 
 >>> p1.delete()
 Before deletion

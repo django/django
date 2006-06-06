@@ -112,7 +112,7 @@ Lawrence, Kansas, USA.
 .. _`Simon Willison`: http://simon.incutio.com/
 .. _`simon.incutio.com`: http://simon.incutio.com/
 .. _`Jacob Kaplan-Moss`: http://www.jacobian.org/
-.. _`Wilson Miner`: http://www.wilsonminer.com/live/
+.. _`Wilson Miner`: http://www.wilsonminer.com/
 
 Which sites use Django?
 -----------------------

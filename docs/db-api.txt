@@ -1035,6 +1035,15 @@ SQL equivalent::
 
     SELECT ... WHERE pub_date IS NULL;
 
+search
+~~~~~~
+
+A boolean full-text search, taking advantage of full-text indexing. This is
+like ``contains`` but is significantly faster due to full-text indexing.
+
+Note this is only available in MySQL and requires direct manipulation of the
+database to add the full-text index.
+
 Default lookups are exact
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -1578,3 +1587,23 @@ get_FOO_height() and get_FOO_width()
 For every ``ImageField``, the object will have ``get_FOO_height()`` and
 ``get_FOO_width()`` methods, where ``FOO`` is the name of the field. This
 returns the height (or width) of the image, as an integer, in pixels.
+
+Falling back to raw SQL
+=======================
+
+If you find yourself needing to write an SQL query that is too complex for
+Django's database-mapper to handle, you can fall back into raw-SQL statement
+mode.
+
+The preferred way to do this is by giving your model custom methods or custom
+manager methods that execute queries. Although there's nothing in Django that
+*requires* database queries to live in the model layer, this approach keeps all
+your data-access logic in one place, which is smart from an code-organization
+standpoint. For instructions, see `Executing custom SQL`_.
+
+Finally, it's important to note that the Django database layer is merely an
+interface to your database. You can access your database via other tools,
+programming languages or database frameworks; there's nothing Django-specific
+about your database.
+
+.. _Executing custom SQL: http://www.djangoproject.com/documentation/model_api/#executing-custom-sql

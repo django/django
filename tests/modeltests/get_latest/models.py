@@ -17,7 +17,7 @@ class Article(models.Model):
     class Meta:
         get_latest_by = 'pub_date'
 
-    def __repr__(self):
+    def __str__(self):
         return self.headline
 
 class Person(models.Model):
@@ -26,7 +26,7 @@ class Person(models.Model):
 
     # Note that this model doesn't have "get_latest_by" set.
 
-    def __repr__(self):
+    def __str__(self):
         return self.name
 
 API_TESTS = """
@@ -49,19 +49,19 @@ DoesNotExist: Article matching query does not exist.
 
 # Get the latest Article.
 >>> Article.objects.latest()
-Article 4
+<Article: Article 4>
 
 # Get the latest Article that matches certain filters.
 >>> Article.objects.filter(pub_date__lt=datetime(2005, 7, 27)).latest()
-Article 1
+<Article: Article 1>
 
 # Pass a custom field name to latest() to change the field that's used to
 # determine the latest object.
 >>> Article.objects.latest('expire_date')
-Article 1
+<Article: Article 1>
 
 >>> Article.objects.filter(pub_date__gt=datetime(2005, 7, 26)).latest('expire_date')
-Article 3
+<Article: Article 3>
 
 # You can still use latest() with a model that doesn't have "get_latest_by"
 # set -- just pass in the field name manually.
@@ -75,5 +75,5 @@ Traceback (most recent call last):
 AssertionError: latest() requires either a field_name parameter or 'get_latest_by' in the model
 
 >>> Person.objects.latest('birthday')
-Stephanie
+<Person: Stephanie>
 """

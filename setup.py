@@ -5,7 +5,7 @@ from setuptools import setup, find_packages
 
 setup(
     name = "Django",
-    version = "0.91",
+    version = "0.95",
     url = 'http://www.djangoproject.com/',
     author = 'Lawrence Journal-World',
     author_email = 'holovaty@gmail.com',
@@ -52,6 +52,7 @@ setup(
                                  'media/img/admin/*.png',
                                  'media/js/*.js',
                                  'media/js/admin/*js'],
+        'django.contrib.comments': ['templates/comments/*.html'],
     },
     scripts = ['django/bin/django-admin.py'],
     zip_safe = False,

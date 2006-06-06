@@ -23,7 +23,7 @@ class Person(models.Model):
     fun = models.BooleanField()
     objects = PersonManager()
 
-    def __repr__(self):
+    def __str__(self):
         return "%s %s" % (self.first_name, self.last_name)
 
 # An example of a custom manager that sets get_query_set().
@@ -39,7 +39,7 @@ class Book(models.Model):
     published_objects = PublishedBookManager()
     authors = models.ManyToManyField(Person, related_name='books')
 
-    def __repr__(self):
+    def __str__(self):
         return self.title
 
 # An example of providing multiple custom managers.
@@ -55,7 +55,7 @@ class Car(models.Model):
     cars = models.Manager()
     fast_cars = FastCarManager()
 
-    def __repr__(self):
+    def __str__(self):
         return self.name
 
 API_TESTS = """
@@ -64,7 +64,7 @@ API_TESTS = """
 >>> p2 = Person(first_name='Droopy', last_name='Dog', fun=False)
 >>> p2.save()
 >>> Person.objects.get_fun_people()
-[Bugs Bunny]
+[<Person: Bugs Bunny>]
 
 # The RelatedManager used on the 'books' descriptor extends the default manager
 >>> from modeltests.custom_managers.models import PublishedBookManager
@@ -89,19 +89,19 @@ AttributeError: type object 'Book' has no attribute 'objects'
 True
 
 >>> Book.published_objects.all()
-[How to program]
+[<Book: How to program>]
 
 >>> c1 = Car(name='Corvette', mileage=21, top_speed=180)
 >>> c1.save()
 >>> c2 = Car(name='Neon', mileage=31, top_speed=100)
 >>> c2.save()
 >>> Car.cars.order_by('name')
-[Corvette, Neon]
+[<Car: Corvette>, <Car: Neon>]
 >>> Car.fast_cars.all()
-[Corvette]
+[<Car: Corvette>]
 
 # Each model class gets a "_default_manager" attribute, which is a reference
 # to the first manager defined in the class. In this case, it's "cars".
 >>> Car._default_manager.order_by('name')
-[Corvette, Neon]
+[<Car: Corvette>, <Car: Neon>]
 """

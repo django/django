@@ -21,7 +21,7 @@ class Article(models.Model):
     class Meta:
         ordering = ('-pub_date', 'headline')
 
-    def __repr__(self):
+    def __str__(self):
         return self.headline
 
 API_TESTS = """
@@ -39,26 +39,26 @@ API_TESTS = """
 # By default, Article.objects.all() orders by pub_date descending, then
 # headline ascending.
 >>> Article.objects.all()
-[Article 4, Article 2, Article 3, Article 1]
+[<Article: Article 4>, <Article: Article 2>, <Article: Article 3>, <Article: Article 1>]
 
 # Override ordering with order_by, which is in the same format as the ordering
 # attribute in models.
 >>> Article.objects.order_by('headline')
-[Article 1, Article 2, Article 3, Article 4]
+[<Article: Article 1>, <Article: Article 2>, <Article: Article 3>, <Article: Article 4>]
 >>> Article.objects.order_by('pub_date', '-headline')
-[Article 1, Article 3, Article 2, Article 4]
+[<Article: Article 1>, <Article: Article 3>, <Article: Article 2>, <Article: Article 4>]
 
 # Use the 'stop' part of slicing notation to limit the results.
 >>> Article.objects.order_by('headline')[:2]
-[Article 1, Article 2]
+[<Article: Article 1>, <Article: Article 2>]
 
 # Use the 'stop' and 'start' parts of slicing notation to offset the result list.
 >>> Article.objects.order_by('headline')[1:3]
-[Article 2, Article 3]
+[<Article: Article 2>, <Article: Article 3>]
 
 # Getting a single item should work too:
 >>> Article.objects.all()[0]
-Article 4
+<Article: Article 4>
 
 # Use '?' to order randomly. (We're using [...] in the output to indicate we
 # don't know what order the output will be in.

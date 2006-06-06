@@ -291,7 +291,7 @@ The default formatting to use for date fields on Django admin change-list
 pages -- and, possibly, by other parts of the system. See
 `allowed date format strings`_.
 
-See also DATETIME_FORMAT and TIME_FORMAT.
+See also DATETIME_FORMAT, TIME_FORMAT, YEAR_MONTH_FORMAT and MONTH_DAY_FORMAT.
 
 .. _allowed date format strings: http://www.djangoproject.com/documentation/templates/#now
 
@@ -304,7 +304,7 @@ The default formatting to use for datetime fields on Django admin change-list
 pages -- and, possibly, by other parts of the system. See
 `allowed date format strings`_.
 
-See also DATE_FORMAT and TIME_FORMAT.
+See also DATE_FORMAT, DATETIME_FORMAT, TIME_FORMAT, YEAR_MONTH_FORMAT and MONTH_DAY_FORMAT.
 
 .. _allowed date format strings: http://www.djangoproject.com/documentation/templates/#now
 
@@ -532,6 +532,23 @@ Default::
 
 A tuple of middleware classes to use. See the `middleware docs`_.
 
+MONTH_DAY_FORMAT
+----------------
+
+Default: ``'F j'``
+
+The default formatting to use for date fields on Django admin change-list
+pages -- and, possibly, by other parts of the system -- in cases when only the
+month and day are displayed.
+
+For example, when a Django admin change-list page is being filtered by a date
+drilldown, the header for a given day displays the day and month. Different
+locales have different formats. For example, U.S. English would say
+"January 1," whereas Spanish might say "1 Enero."
+
+See `allowed date format strings`_. See also DATE_FORMAT, DATETIME_FORMAT,
+TIME_FORMAT and YEAR_MONTH_FORMAT.
+
 PREPEND_WWW
 -----------
 
@@ -696,7 +713,8 @@ The default formatting to use for time fields on Django admin change-list
 pages -- and, possibly, by other parts of the system. See
 `allowed date format strings`_.
 
-See also DATE_FORMAT and DATETIME_FORMAT.
+See also DATE_FORMAT, DATETIME_FORMAT, TIME_FORMAT, YEAR_MONTH_FORMAT and
+MONTH_DAY_FORMAT.
 
 .. _allowed date format strings: http://www.djangoproject.com/documentation/templates/#now
 
@@ -719,6 +737,23 @@ Default: ``False``
 A boolean that specifies whether to output the "Etag" header. This saves
 bandwidth but slows down performance. This is only used if ``CommonMiddleware``
 is installed (see the `middleware docs`_).
+
+YEAR_MONTH_FORMAT
+-----------------
+
+Default: ``'F Y'``
+
+The default formatting to use for date fields on Django admin change-list
+pages -- and, possibly, by other parts of the system -- in cases when only the
+year and month are displayed.
+
+For example, when a Django admin change-list page is being filtered by a date
+drilldown, the header for a given month displays the month and the year.
+Different locales have different formats. For example, U.S. English would say
+"January 2006," whereas another locale might say "2006/January."
+
+See `allowed date format strings`_. See also DATE_FORMAT, DATETIME_FORMAT,
+TIME_FORMAT and MONTH_DAY_FORMAT.
 
 .. _cache docs: http://www.djangoproject.com/documentation/cache/
 .. _middleware docs: http://www.djangoproject.com/documentation/middleware/

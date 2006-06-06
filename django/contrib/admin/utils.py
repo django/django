@@ -81,12 +81,16 @@ ROLES = {
 }
 
 def create_reference_role(rolename, urlbase):
-    def _role(name, rawtext, text, lineno, inliner, options={}, content=[]):
+    def _role(name, rawtext, text, lineno, inliner, options=None, content=None):
+        if options is None: options = {}
+        if content is None: content = []
         node = docutils.nodes.reference(rawtext, text, refuri=(urlbase % (inliner.document.settings.link_base, text.lower())), **options)
         return [node], []
     docutils.parsers.rst.roles.register_canonical_role(rolename, _role)
 
-def default_reference_role(name, rawtext, text, lineno, inliner, options={}, content=[]):
+def default_reference_role(name, rawtext, text, lineno, inliner, options=None, content=None):
+    if options is None: options = {}
+    if content is None: content = []
     context = inliner.document.settings.default_reference_context
     node = docutils.nodes.reference(rawtext, text, refuri=(ROLES[context] % (inliner.document.settings.link_base, text.lower())), **options)
     return [node], []

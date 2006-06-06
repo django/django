@@ -23,6 +23,25 @@ def get_mod_func(callback):
     dot = callback.rindex('.')
     return callback[:dot], callback[dot+1:]
 
+def reverse_helper(regex, *args, **kwargs):
+    """
+    Does a "reverse" lookup -- returns the URL for the given args/kwargs.
+    The args/kwargs are applied to the given compiled regular expression.
+    For example:
+
+        >>> reverse_helper(re.compile('^places/(\d+)/$'), 3)
+        'places/3/'
+        >>> reverse_helper(re.compile('^places/(?P<id>\d+)/$'), id=3)
+        'places/3/'
+        >>> reverse_helper(re.compile('^people/(?P<state>\w\w)/(\w+)/$'), 'adrian', state='il')
+        'people/il/adrian/'
+
+    Raises NoReverseMatch if the args/kwargs aren't valid for the regex.
+    """
+    # TODO: Handle nested parenthesis in the following regex.
+    result = re.sub(r'\(([^)]+)\)', MatchChecker(args, kwargs), regex.pattern)
+    return result.replace('^', '').replace('$', '')
+
 class MatchChecker(object):
     "Class used in reverse RegexURLPattern lookup."
     def __init__(self, args, kwargs):
@@ -108,23 +127,7 @@ class RegexURLPattern:
         return self.reverse_helper(*args, **kwargs)
 
     def reverse_helper(self, *args, **kwargs):
-        """
-        Does a "reverse" lookup -- returns the URL for the given args/kwargs.
-        The args/kwargs are applied to the regular expression in this
-        RegexURLPattern. For example:
-
-            >>> RegexURLPattern('^places/(\d+)/$').reverse_helper(3)
-            'places/3/'
-            >>> RegexURLPattern('^places/(?P<id>\d+)/$').reverse_helper(id=3)
-            'places/3/'
-            >>> RegexURLPattern('^people/(?P<state>\w\w)/(\w+)/$').reverse_helper('adrian', state='il')
-            'people/il/adrian/'
-
-        Raises NoReverseMatch if the args/kwargs aren't valid for the RegexURLPattern.
-        """
-        # TODO: Handle nested parenthesis in the following regex.
-        result = re.sub(r'\(([^)]+)\)', MatchChecker(args, kwargs), self.regex.pattern)
-        return result.replace('^', '').replace('$', '')
+        return reverse_helper(self.regex, *args, **kwargs)
 
 class RegexURLResolver(object):
     def __init__(self, regex, urlconf_name):
@@ -182,9 +185,19 @@ class RegexURLResolver(object):
 
     def reverse(self, viewname, *args, **kwargs):
         for pattern in self.urlconf_module.urlpatterns:
-            if pattern.callback == viewname:
+            if isinstance(pattern, RegexURLResolver):
+                try:
+                    return pattern.reverse_helper(viewname, *args, **kwargs)
+                except NoReverseMatch:
+                    continue
+            elif pattern.callback == viewname:
                 try:
                     return pattern.reverse_helper(*args, **kwargs)
                 except NoReverseMatch:
                     continue
         raise NoReverseMatch
+
+    def reverse_helper(self, viewname, *args, **kwargs):
+        sub_match = self.reverse(viewname, *args, **kwargs)
+        result = reverse_helper(self.regex, *args, **kwargs)
+        return result + sub_match

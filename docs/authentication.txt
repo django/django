@@ -82,14 +82,14 @@ Methods
 ``user_permissions``. ``User`` objects can access their related
 objects in the same way as any other `Django model`_::
 
-    ``myuser.objects.groups = [group_list]``
-    ``myuser.objects.groups.add(group, group,...)``
-    ``myuser.objects.groups.remove(group, group,...)``
-    ``myuser.objects.groups.clear()``
-    ``myuser.objects.permissions = [permission_list]``
-    ``myuser.objects.permissions.add(permission, permission, ...)``
-    ``myuser.objects.permissions.remove(permission, permission, ...]``
-    ``myuser.objects.permissions.clear()``
+    myuser.objects.groups = [group_list]
+    myuser.objects.groups.add(group, group,...)
+    myuser.objects.groups.remove(group, group,...)
+    myuser.objects.groups.clear()
+    myuser.objects.permissions = [permission_list]
+    myuser.objects.permissions.add(permission, permission, ...)
+    myuser.objects.permissions.remove(permission, permission, ...]
+    myuser.objects.permissions.clear()
 
 In addition to those automatic API methods, ``User`` objects have the following
 custom methods:

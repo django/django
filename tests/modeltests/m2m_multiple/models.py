@@ -14,7 +14,7 @@ class Category(models.Model):
     class Meta:
        ordering = ('name',)
 
-    def __repr__(self):
+    def __str__(self):
         return self.name
 
 class Article(models.Model):
@@ -25,7 +25,7 @@ class Article(models.Model):
     class Meta:
        ordering = ('pub_date',)
 
-    def __repr__(self):
+    def __str__(self):
         return self.headline
 
 API_TESTS = """
@@ -51,29 +51,29 @@ API_TESTS = """
 >>> a2.secondary_categories.add(c4)
 
 >>> a1.primary_categories.all()
-[Crime, News]
+[<Category: Crime>, <Category: News>]
 
 >>> a2.primary_categories.all()
-[News, Sports]
+[<Category: News>, <Category: Sports>]
 
 >>> a1.secondary_categories.all()
-[Life]
+[<Category: Life>]
 
 
 >>> c1.primary_article_set.all()
-[Area man runs]
+[<Article: Area man runs>]
 >>> c1.secondary_article_set.all()
 []
 >>> c2.primary_article_set.all()
-[Area man steals, Area man runs]
+[<Article: Area man steals>, <Article: Area man runs>]
 >>> c2.secondary_article_set.all()
 []
 >>> c3.primary_article_set.all()
-[Area man steals]
+[<Article: Area man steals>]
 >>> c3.secondary_article_set.all()
 []
 >>> c4.primary_article_set.all()
 []
 >>> c4.secondary_article_set.all()
-[Area man steals, Area man runs]
+[<Article: Area man steals>, <Article: Area man runs>]
 """

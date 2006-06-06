@@ -17,7 +17,7 @@ class Person(models.Model):
     favorite_moment = models.DateTimeField()
     email = models.EmailField()
 
-    def __repr__(self):
+    def __str__(self):
         return self.name
 
 API_TESTS = """

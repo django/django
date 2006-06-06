@@ -16,14 +16,14 @@ class Reporter(models.Model):
     first_name = models.CharField(maxlength=30)
     last_name = models.CharField(maxlength=30)
 
-    def __repr__(self):
+    def __str__(self):
         return "%s %s" % (self.first_name, self.last_name)
 
 class Article(models.Model):
     headline = models.CharField(maxlength=100)
     pub_date = models.DateField()
 
-    def __repr__(self):
+    def __str__(self):
         return self.headline
 
 class Writer(models.Model):
@@ -31,8 +31,8 @@ class Writer(models.Model):
     article = models.ForeignKey(Article)
     position = models.CharField(maxlength=100)
 
-    def __repr__(self):
-        return '%r (%s)' % (self.reporter, self.position)
+    def __str__(self):
+        return '%s (%s)' % (self.reporter, self.position)
 
 API_TESTS = """
 # Create a few Reporters.
@@ -54,15 +54,15 @@ API_TESTS = """
 
 # Play around with the API.
 >>> a.writer_set.select_related().order_by('-position')
-[John Smith (Main writer), Jane Doe (Contributor)]
+[<Writer: John Smith (Main writer)>, <Writer: Jane Doe (Contributor)>]
 >>> w1.reporter
-John Smith
+<Reporter: John Smith>
 >>> w2.reporter
-Jane Doe
+<Reporter: Jane Doe>
 >>> w1.article
-This is a test
+<Article: This is a test>
 >>> w2.article
-This is a test
+<Article: This is a test>
 >>> r1.writer_set.all()
-[John Smith (Main writer)]
+[<Writer: John Smith (Main writer)>]
 """

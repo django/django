@@ -10,19 +10,19 @@ from django.db import models
 class Reporter(models.Model):
     name = models.CharField(maxlength=30)
 
-    def __repr__(self):
+    def __str__(self):
         return self.name
 
 class Article(models.Model):
     headline = models.CharField(maxlength=100)
     reporter = models.ForeignKey(Reporter, null=True)
 
-    def __repr__(self):
-        return self.headline
-
     class Meta:
         ordering = ('headline',)
-        
+
+    def __str__(self):
+        return self.headline
+
 API_TESTS = """
 # Create a Reporter.
 >>> r = Reporter(name='John Smith')
@@ -36,7 +36,7 @@ API_TESTS = """
 1
 
 >>> a.reporter
-John Smith
+<Reporter: John Smith>
 
 # Article objects have access to their related Reporter objects.
 >>> r = a.reporter
@@ -44,15 +44,15 @@ John Smith
 # Create an Article via the Reporter object.
 >>> a2 = r.article_set.create(headline="Second")
 >>> a2
-Second
+<Article: Second>
 >>> a2.reporter.id
 1
 
 # Reporter objects have access to their related Article objects.
 >>> r.article_set.all()
-[First, Second]
+[<Article: First>, <Article: Second>]
 >>> r.article_set.filter(headline__startswith='Fir')
-[First]
+[<Article: First>]
 >>> r.article_set.count()
 2
 
@@ -78,47 +78,47 @@ None
 
 # To retrieve the articles with no reporters set, use "reporter__isnull=True".
 >>> Article.objects.filter(reporter__isnull=True)
-[Third]
+[<Article: Third>]
 
 # Set the reporter for the Third article
 >>> r.article_set.add(a3)
 >>> r.article_set.all()
-[First, Second, Third]
+[<Article: First>, <Article: Second>, <Article: Third>]
 
 # Remove an article from the set, and check that it was removed.
 >>> r.article_set.remove(a3)
 >>> r.article_set.all()
-[First, Second]
+[<Article: First>, <Article: Second>]
 >>> Article.objects.filter(reporter__isnull=True)
-[Third]
+[<Article: Third>]
 
 # Create another article and reporter
 >>> r2 = Reporter(name='Paul Jones')
 >>> r2.save()
 >>> a4 = r2.article_set.create(headline='Fourth')
 >>> r2.article_set.all()
-[Fourth]
+[<Article: Fourth>]
 
 # Try to remove a4 from a set it does not belong to
 >>> r.article_set.remove(a4)
 Traceback (most recent call last):
 ...
-DoesNotExist: 'Article object' is not related to 'Reporter object'.
+DoesNotExist: <Article: Fourth> is not related to <Reporter: John Smith>.
 
 >>> r2.article_set.all()
-[Fourth]
+[<Article: Fourth>]
 
 # Use descriptor assignment to allocate ForeignKey. Null is legal, so
 # existing members of set that are not in the assignment set are set null
 >>> r2.article_set = [a2, a3]
 >>> r2.article_set.all()
-[Second, Third]
+[<Article: Second>, <Article: Third>]
 
 # Clear the rest of the set
 >>> r.article_set.clear()
 >>> r.article_set.all()
 []
 >>> Article.objects.filter(reporter__isnull=True)
-[First, Fourth]
+[<Article: First>, <Article: Fourth>]
 
 """

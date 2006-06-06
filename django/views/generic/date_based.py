@@ -6,7 +6,7 @@ import datetime, time
 
 def archive_index(request, queryset, date_field, num_latest=15,
         template_name=None, template_loader=loader,
-        extra_context={}, allow_empty=False, context_processors=None,
+        extra_context=None, allow_empty=False, context_processors=None,
         mimetype=None):
     """
     Generic top-level archive of date-based objects.
@@ -18,6 +18,7 @@ def archive_index(request, queryset, date_field, num_latest=15,
         latest
             Latest N (defaults to 15) objects by date
     """
+    if extra_context is None: extra_context = {}
     model = queryset.model
     queryset = queryset.filter(**{'%s__lte' % date_field: datetime.datetime.now()})
     date_list = queryset.dates(date_field, 'year')[::-1]
@@ -44,7 +45,7 @@ def archive_index(request, queryset, date_field, num_latest=15,
     return HttpResponse(t.render(c), mimetype=mimetype)
 
 def archive_year(request, year, queryset, date_field, template_name=None,
-        template_loader=loader, extra_context={}, allow_empty=False,
+        template_loader=loader, extra_context=None, allow_empty=False,
         context_processors=None, template_object_name='object', mimetype=None,
         make_object_list=False):
     """
@@ -60,6 +61,7 @@ def archive_year(request, year, queryset, date_field, template_name=None,
             List of objects published in the given month
             (Only available if make_object_list argument is True)
     """
+    if extra_context is None: extra_context = {}
     model = queryset.model
     now = datetime.datetime.now()
 
@@ -92,7 +94,7 @@ def archive_year(request, year, queryset, date_field, template_name=None,
 
 def archive_month(request, year, month, queryset, date_field,
         month_format='%b', template_name=None, template_loader=loader,
-        extra_context={}, allow_empty=False, context_processors=None,
+        extra_context=None, allow_empty=False, context_processors=None,
         template_object_name='object', mimetype=None):
     """
     Generic monthly archive view.
@@ -108,6 +110,7 @@ def archive_month(request, year, month, queryset, date_field,
         object_list:
             list of objects published in the given month
     """
+    if extra_context is None: extra_context = {}
     try:
         date = datetime.date(*time.strptime(year+month, '%Y'+month_format)[:3])
     except ValueError:
@@ -148,7 +151,7 @@ def archive_month(request, year, month, queryset, date_field,
 
 def archive_week(request, year, week, queryset, date_field,
         template_name=None, template_loader=loader,
-        extra_context={}, allow_empty=True, context_processors=None,
+        extra_context=None, allow_empty=True, context_processors=None,
         template_object_name='object', mimetype=None):
     """
     Generic weekly archive view.
@@ -160,6 +163,7 @@ def archive_week(request, year, week, queryset, date_field,
         object_list:
             list of objects published in the given week
     """
+    if extra_context is None: extra_context = {}
     try:
         date = datetime.date(*time.strptime(year+'-0-'+week, '%Y-%w-%U')[:3])
     except ValueError:
@@ -195,7 +199,7 @@ def archive_week(request, year, week, queryset, date_field,
 
 def archive_day(request, year, month, day, queryset, date_field,
         month_format='%b', day_format='%d', template_name=None,
-        template_loader=loader, extra_context={}, allow_empty=False,
+        template_loader=loader, extra_context=None, allow_empty=False,
         context_processors=None, template_object_name='object',
         mimetype=None):
     """
@@ -212,6 +216,7 @@ def archive_day(request, year, month, day, queryset, date_field,
         next_day
             (datetime) the next day, or None if the current day is today
     """
+    if extra_context is None: extra_context = {}
     try:
         date = datetime.date(*time.strptime(year+month+day, '%Y'+month_format+day_format)[:3])
     except ValueError:
@@ -261,7 +266,7 @@ def archive_today(request, **kwargs):
 def object_detail(request, year, month, day, queryset, date_field,
         month_format='%b', day_format='%d', object_id=None, slug=None,
         slug_field=None, template_name=None, template_name_field=None,
-        template_loader=loader, extra_context={}, context_processors=None,
+        template_loader=loader, extra_context=None, context_processors=None,
         template_object_name='object', mimetype=None):
     """
     Generic detail view from year/month/day/slug or year/month/day/id structure.
@@ -271,6 +276,7 @@ def object_detail(request, year, month, day, queryset, date_field,
         object:
             the object to be detailed
     """
+    if extra_context is None: extra_context = {}
     try:
         date = datetime.date(*time.strptime(year+month+day, '%Y'+month_format+day_format)[:3])
     except ValueError:
