@@ -12,7 +12,7 @@ msgstr ""
 "Last-Translator: Gaël Chardon <gael.dev_at_nospam_4now.net>\n"
 "Language-Team: français <fr@li.org>\n"
 "MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=ISO-8859-1\n"
+"Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
 #: contrib/comments/models.py:67 contrib/comments/models.py:166
