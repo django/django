@@ -1,0 +1,7 @@
+@import url('login.css');
+@import url('base_rtl.css');
+@import url('layout_rtl.css');
+
+.login .form-row { float:right; }
+.login .form-row label { float:right; padding-left:0.5em; padding-right:0; text-align:left;}
+.login .submit-row { clear:both; padding:1em 9.4em 0 0; }

@@ -36,6 +36,10 @@ def i18n(request):
         context_extras['LANGUAGE_CODE'] = request.LANGUAGE_CODE
     else:
         context_extras['LANGUAGE_CODE'] = settings.LANGUAGE_CODE
+    
+    from django.utils import translation
+    context_extras['LANGUAGE_BIDI'] = translation.get_language_bidi()
+
     return context_extras
 
 def request(request):

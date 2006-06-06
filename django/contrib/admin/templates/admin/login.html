@@ -1,7 +1,7 @@
 {% extends "admin/base_site.html" %}
 {% load i18n %}
 
-{% block stylesheet %}{% load adminmedia %}{% admin_media_prefix %}css/login.css{% endblock %}
+{% block stylesheet %}{% load adminmedia %}{% admin_media_prefix %}css/login{% if LANGUAGE_BIDI %}_rtl{% endif %}.css{% endblock %}
 {% block bodyclass %}login{% endblock %}
 {% block content_title %}{% endblock %}
 {% block breadcrumbs %}{% endblock %}

@@ -230,12 +230,17 @@ Each ``RequestContext`` has access to two translation-specific variables:
       language code and the second is the language name (in that language).
     * ``LANGUAGE_CODE`` is the current user's preferred language, as a string.
       Example: ``en-us``. (See "How language preference is discovered", below.)
+    * ``LANGUAGE_BIDI`` is the current language's direction. If True, it's a
+      right-to-left language, e.g: Hebrew, Arabic. If False it's a
+      left-to-right language, e.g: English, French, German etc.
+
 
 If you don't use the ``RequestContext`` extension, you can get those values with
-two tags::
+three tags::
 
     {% get_current_language as LANGUAGE_CODE %}
     {% get_available_languages as LANGUAGES %}
+    {% get_current_language_bidi as LANGUAGE_BIDI %}
 
 These tags also require a ``{% load i18n %}``.
 
