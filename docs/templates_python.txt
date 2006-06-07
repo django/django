@@ -502,12 +502,13 @@ Although the Django template language comes with several default tags and
 filters, you might want to write your own. It's easy to do.
 
 First, create a ``templatetags`` package in the appropriate Django app's
-package. It should be on the same level as ``models``, ``views.py``, etc. For
+package. It should be on the same level as ``models.py``, ``views.py``, etc. For
 example::
 
     polls/
-        models/
+        models.py
         templatetags/
+        views.py
 
 Add two files to the ``templatetags`` package: an ``__init__.py`` file and a
 file that will contain your custom tag/filter definitions. The name of the
