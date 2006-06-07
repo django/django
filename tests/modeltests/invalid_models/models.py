@@ -74,7 +74,7 @@ invalid_models.fielderrors: "floatfield": FloatFields require a "decimal_places"
 invalid_models.fielderrors: "floatfield": FloatFields require a "max_digits" attribute.
 invalid_models.fielderrors: "filefield": FileFields require an "upload_to" attribute.
 invalid_models.fielderrors: "prepopulate": prepopulate_from should be a list or tuple.
-invalid_models.fielderrors: "choices": "choices" should be either a tuple or list.
+invalid_models.fielderrors: "choices": "choices" should be iterable (e.g., a tuple or list).
 invalid_models.fielderrors: "choices2": "choices" should be a sequence of two-tuples.
 invalid_models.fielderrors: "choices2": "choices" should be a sequence of two-tuples.
 invalid_models.fielderrors: "index": "db_index" should be either None, True or False.
