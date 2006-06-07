@@ -445,7 +445,8 @@ empty value. If a field has ``blank=False``, the field will be required.
 ``choices``
 ~~~~~~~~~~~
 
-A list of 2-tuples to use as choices for this field.
+An iterable (e.g., a list or tuple) of 2-tuples to use as choices for this
+field.
 
 If this is given, Django's admin will use a select box instead of the
 standard text field and will limit choices to the choices given.
@@ -480,6 +481,12 @@ or outside your model class altogether::
     )
     class Foo(models.Model):
         gender = models.CharField(maxlength=1, choices=GENDER_CHOICES)
+
+Finally, note that choices can be any iterable object -- not necessarily a
+list or tuple. This lets you construct choices dynamically. But if you find
+yourself hacking ``choices`` to be dynamic, you're probably better off using
+a proper database table with a ``ForeignKey``. ``choices`` is meant for static
+data that doesn't change much, if ever.
 
 ``core``
 ~~~~~~~~
