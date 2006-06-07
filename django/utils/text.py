@@ -109,3 +109,13 @@ def javascript_quote(s):
     s = s.replace("'", "\\'")
     return str(ustring_re.sub(fix, s))
 
+smart_split_re = re.compile('("(?:[^"\\\\]*(?:\\\\.[^"\\\\]*)*)"|\'(?:[^\'\\\\]*(?:\\\\.[^\'\\\\]*)*)\'|[^\\s]+)')
+def smart_split(text):
+    for bit in smart_split_re.finditer(text):
+        bit = bit.group(0)
+        if bit[0] == '"':
+            yield (bit[1:-1].replace('\\"', '"').replace('\\\\', '\\'), True)
+        elif bit[0] == "'":
+            yield (bit[1:-1].replace("\\'", "'").replace("\\\\", "\\"), True)
+        else:
+            yield (bit, False)
