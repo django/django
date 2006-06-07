@@ -815,6 +815,8 @@ def get_validation_errors(outfile, app=None):
 
         # Do field-specific validation.
         for f in opts.fields:
+            if f.name == 'id' and not f.primary_key and opts.pk.name == 'id':
+                e.add(opts, '"%s": You can\'t use "id" as a field name, because each model automatically gets an "id" field if none of the fields have primary_key=True. You need to either remove/rename your "id" field or add primary_key=True to a field.' % f.name)
             if isinstance(f, models.CharField) and f.maxlength in (None, 0):
                 e.add(opts, '"%s": CharFields require a "maxlength" attribute.' % f.name)
             if isinstance(f, models.FloatField):
