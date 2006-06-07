@@ -544,7 +544,7 @@ class FilterExpression(object):
                 upto = match.end()
         if upto != len(token):
             raise TemplateSyntaxError, "Could not parse the remainder: %s" % token[upto:]
-        self.var , self.filters = var, filters
+        self.var, self.filters = var, filters
 
     def resolve(self, context):
         try:
@@ -614,7 +614,7 @@ def resolve_variable(path, context):
 
     (The example assumes VARIABLE_ATTRIBUTE_SEPARATOR is '.')
     """
-    if path[0] in '0123456789':
+    if path[0].isdigit():
         number_type = '.' in path and float or int
         try:
             current = number_type(path)
@@ -655,7 +655,7 @@ def resolve_variable(path, context):
                     if getattr(e, 'silent_variable_failure', False):
                         current = settings.TEMPLATE_STRING_IF_INVALID
                     else:
-                        raise        
+                        raise
             del bits[0]
     return current
 
