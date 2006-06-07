@@ -705,6 +705,53 @@ The ``DoesNotExist`` exception inherits from
     except ObjectDoesNotExist:
         print "Either the entry or blog doesn't exist."
 
+``get_or_create(**kwargs)``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+A convenience method for looking up an object with the given kwargs, creating
+one if necessary.
+
+Returns a tuple of ``(object, created)``, where ``object`` is the retrieved or
+created object and ``created`` is a boolean specifying whether a new object was
+created.
+
+This is meant as a shortcut to boilerplatish code. For example::
+
+    try:
+        obj = Person.objects.get(first_name='John', last_name='Lennon')
+    except Person.DoesNotExist:
+        obj = Person(first_name='John', last_name='Lennon', birthday=date(1940, 10, 9))
+        obj.save()
+
+This pattern gets quite unwieldy as the number of fields in a model goes up.
+The above example can be rewritten using ``get_or_create()`` like so::
+
+    obj, created = Person.objects.get_or_create(first_name='John', last_name='Lennon',
+                      defaults={'birthday': date(1940, 10, 9)})
+
+Any keyword arguments passed to ``get_or_create()`` -- *except* an optional one
+called ``default`` -- will be used in a ``get()`` call. If an object is found,
+``get_or_create()`` returns a tuple of that object and ``False``. If an object
+is *not* found, ``get_or_create()`` will instantiate and save a new object,
+returning a tuple of the new object and ``True``. The new object will be
+created according to this algorithm::
+
+    defaults = kwargs.pop('defaults', {})
+    params = dict([(k, v) for k, v in kwargs.items() if '__' not in k])
+    params.update(defaults)
+    obj = self.model(**params)
+    obj.save()
+
+In English, that means start with any non-``'defaults'`` keyword argument that
+doesn't contain a double underscore (which would indicate a non-exact lookup).
+Then add the contents of ``defaults``, overriding any keys if necessary, and
+use the result as the keyword arguments to the model class.
+
+Finally, if you have a field named ``defaults`` and want to use it as an exact
+lookup in ``get_or_create()``, just use ``'defaults__exact'``, like so::
+
+    Foo.objects.get_or_create(defaults__exact='bar', defaults={'defaults': 'baz'})
+
 ``count()``
 ~~~~~~~~~~~
 

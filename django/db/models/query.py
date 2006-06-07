@@ -205,6 +205,23 @@ class QuerySet(object):
         assert len(obj_list) == 1, "get() returned more than one %s -- it returned %s! Lookup parameters were %s" % (self.model._meta.object_name, len(obj_list), kwargs)
         return obj_list[0]
 
+    def get_or_create(self, **kwargs):
+        """
+        Looks up an object with the given kwargs, creating one if necessary.
+        Returns a tuple of (object, created), where created is a boolean
+        specifying whether an object was created.
+        """
+        assert len(kwargs), 'get_or_create() must be passed at least one keyword argument'
+        defaults = kwargs.pop('defaults', {})
+        try:
+            return self.get(**kwargs), False
+        except self.model.DoesNotExist:
+            params = dict([(k, v) for k, v in kwargs.items() if '__' not in k])
+            params.update(defaults)
+            obj = self.model(**params)
+            obj.save()
+            return obj, True
+
     def latest(self, field_name=None):
         """
         Returns the latest object, according to the model's 'get_latest_by'

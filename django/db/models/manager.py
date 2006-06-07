@@ -65,6 +65,9 @@ class Manager(object):
     def get(self, *args, **kwargs):
         return self.get_query_set().get(*args, **kwargs)
 
+    def get_or_create(self, *args, **kwargs):
+        return self.get_query_set().get_or_create(*args, **kwargs)
+
     def filter(self, *args, **kwargs):
         return self.get_query_set().filter(*args, **kwargs)
 
