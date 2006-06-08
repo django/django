@@ -200,6 +200,23 @@ In the meantime, though, check out this `unofficial Django screencast`_.
 
 .. _unofficial Django screencast: http://www.throwingbeans.org/django_screencasts.html
 
+Is Django a content-management-system (CMS)?
+--------------------------------------------
+
+No, Django is not a CMS, or any sort of "turnkey product" in and of itself.
+It's a Web framework; it's a programming tool that lets you build Web sites.
+
+For example, it doesn't make much sense to compare Django to something like
+Drupal_, because Django is something you use to *create* things like Drupal.
+
+Of course, Django's automatic admin site is fantastic and timesaving -- but
+the admin site is one module of Django the framework. Furthermore, although
+Django has special conveniences for building "CMS-y" apps, that doesn't mean
+it's not just as appropriate for building "non-CMS-y" apps (whatever that
+means!).
+
+.. _Drupal: http://drupal.org/
+
 When will you release Django 1.0?
 ---------------------------------
 
@@ -222,7 +239,7 @@ How can I download the Django documentation to read it offline?
 ---------------------------------------------------------------
 
 The Django docs are available in the ``docs`` directory of each Django tarball
-release. These docs are in ReST (restructured text) format, and each text file
+release. These docs are in ReST (ReStructured Text) format, and each text file
 corresponds to a Web page on the official Django site.
 
 Because the documentation is `stored in revision control`_, you can browse
