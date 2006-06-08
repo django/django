@@ -183,11 +183,12 @@ class Model(object):
                 placeholders.append('(SELECT COUNT(*) FROM %s WHERE %s = %%s)' % \
                     (backend.quote_name(self._meta.db_table), backend.quote_name(self._meta.order_with_respect_to.column)))
                 db_values.append(getattr(self, self._meta.order_with_respect_to.attname))
-            cursor.execute("INSERT INTO %s (%s) VALUES (%s)" % \
-                (backend.quote_name(self._meta.db_table), ','.join(field_names),
-                ','.join(placeholders)), db_values)
-            if self._meta.has_auto_field and not pk_set:
-                setattr(self, self._meta.pk.attname, backend.get_last_insert_id(cursor, self._meta.db_table, self._meta.pk.column))
+            if db_values:
+                cursor.execute("INSERT INTO %s (%s) VALUES (%s)" % \
+                    (backend.quote_name(self._meta.db_table), ','.join(field_names),
+                    ','.join(placeholders)), db_values)
+                if self._meta.has_auto_field and not pk_set:
+                    setattr(self, self._meta.pk.attname, backend.get_last_insert_id(cursor, self._meta.db_table, self._meta.pk.column))
         transaction.commit_unless_managed()
 
         # Run any post-save hooks.
