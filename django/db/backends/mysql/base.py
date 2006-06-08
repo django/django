@@ -158,6 +158,9 @@ def get_fulltext_search_sql(field_name):
 def get_drop_foreignkey_sql():
     return "DROP FOREIGN KEY"
 
+def get_pk_default_value():
+    return "DEFAULT"
+
 OPERATOR_MAPPING = {
     'exact': '= %s',
     'iexact': 'LIKE %s',

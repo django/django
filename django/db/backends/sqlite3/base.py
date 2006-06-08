@@ -130,6 +130,9 @@ def get_fulltext_search_sql(field_name):
 def get_drop_foreignkey_sql():
     return ""
 
+def get_pk_default_value():
+    return "NULL"
+
 def _sqlite_date_trunc(lookup_type, dt):
     try:
         dt = util.typecast_timestamp(dt)
