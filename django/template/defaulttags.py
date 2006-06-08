@@ -502,7 +502,7 @@ def do_ifequal(parser, token, negate):
             ...
         {% endifnotequal %}
     """
-    bits = token.contents.split()
+    bits = list(token.split_contents())
     if len(bits) != 3:
         raise TemplateSyntaxError, "%r takes two arguments" % bits[0]
     end_tag = 'end' + bits[0]

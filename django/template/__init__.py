@@ -56,9 +56,10 @@ times with multiple contexts)
 """
 import re
 from inspect import getargspec
-from django.utils.functional import curry
 from django.conf import settings
 from django.template.context import Context, RequestContext, ContextPopException
+from django.utils.functional import curry
+from django.utils.text import smart_split
 
 __all__ = ('Template', 'Context', 'RequestContext', 'compile_string')
 
@@ -163,16 +164,12 @@ class Token:
         self.token_type, self.contents = token_type, contents
 
     def __str__(self):
-        return '<%s token: "%s...">' % (
-            {TOKEN_TEXT: 'Text', TOKEN_VAR: 'Var', TOKEN_BLOCK: 'Block'}[self.token_type],
-            self.contents[:20].replace('\n', '')
-            )
+        return '<%s token: "%s...">' % \
+            ({TOKEN_TEXT: 'Text', TOKEN_VAR: 'Var', TOKEN_BLOCK: 'Block'}[self.token_type],
+            self.contents[:20].replace('\n', ''))
 
-    def __repr__(self):
-        return '<%s token: "%s">' % (
-            {TOKEN_TEXT: 'Text', TOKEN_VAR: 'Var', TOKEN_BLOCK: 'Block'}[self.token_type],
-            self.contents[:].replace('\n', '')
-            )
+    def split_contents(self):
+        return smart_split(self.contents)
 
 class Lexer(object):
     def __init__(self, template_string, origin):
@@ -367,7 +364,6 @@ class DebugParser(Parser):
         if not hasattr(e, 'source'):
             e.source = token.source
 
-
 def lexer_factory(*args, **kwargs):
     if settings.TEMPLATE_DEBUG:
         return DebugLexer(*args, **kwargs)
@@ -379,7 +375,6 @@ def parser_factory(*args, **kwargs):
         return DebugParser(*args, **kwargs)
     else:
         return Parser(*args, **kwargs)
-
 
 class TokenParser:
     """
@@ -564,7 +559,7 @@ class FilterExpression(object):
     def args_check(name, func, provided):
         provided = list(provided)
         plen = len(provided)
-        (args, varargs, varkw, defaults) = getargspec(func)
+        args, varargs, varkw, defaults = getargspec(func)
         # First argument is filter input.
         args.pop(0)
         if defaults:
@@ -820,7 +815,7 @@ class Library(object):
         return func
 
     def simple_tag(self,func):
-        (params, xx, xxx, defaults) = getargspec(func)
+        params, xx, xxx, defaults = getargspec(func)
 
         class SimpleNode(Node):
             def __init__(self, vars_to_resolve):
@@ -837,7 +832,7 @@ class Library(object):
 
     def inclusion_tag(self, file_name, context_class=Context, takes_context=False):
         def dec(func):
-            (params, xx, xxx, defaults) = getargspec(func)
+            params, xx, xxx, defaults = getargspec(func)
             if takes_context:
                 if params[0] == 'context':
                     params = params[1:]
