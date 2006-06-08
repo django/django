@@ -4,7 +4,7 @@ from django.utils.cache import patch_vary_headers
 
 re_accepts_gzip = re.compile(r'\bgzip\b')
 
-class GZipMiddleware:
+class GZipMiddleware(object):
     """
     This middleware compresses content if the browser allows gzip compression.
     It sets the Vary header accordingly, so that caches will base their storage

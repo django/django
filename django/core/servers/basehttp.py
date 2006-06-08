@@ -21,7 +21,7 @@ software_version = server_version + ' ' + sys_version
 class WSGIServerException(Exception):
     pass
 
-class FileWrapper:
+class FileWrapper(object):
     """Wrapper to convert file-like objects to iterables"""
 
     def __init__(self, filelike, blksize=8192):
@@ -63,7 +63,7 @@ def _formatparam(param, value=None, quote=1):
     else:
         return param
 
-class Headers:
+class Headers(object):
     """Manage a collection of HTTP response headers"""
     def __init__(self,headers):
         if type(headers) is not ListType:
@@ -218,7 +218,7 @@ def is_hop_by_hop(header_name):
     """Return true if 'header_name' is an HTTP/1.1 "Hop-by-Hop" header"""
     return _hoppish(header_name.lower())
 
-class ServerHandler:
+class ServerHandler(object):
     """Manage the invocation of a WSGI application"""
 
     # Configuration parameters; can override per-subclass or per-instance
@@ -591,7 +591,7 @@ class WSGIRequestHandler(BaseHTTPRequestHandler):
             return
         sys.stderr.write("[%s] %s\n" % (self.log_date_time_string(), format % args))
 
-class AdminMediaHandler:
+class AdminMediaHandler(object):
     """
     WSGI middleware that intercepts calls to the admin media directory, as
     defined by the ADMIN_MEDIA_PREFIX setting, and serves those images.

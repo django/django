@@ -3,7 +3,7 @@ from django import http
 from django.core.mail import mail_managers
 import md5, os
 
-class CommonMiddleware:
+class CommonMiddleware(object):
     """
     "Common" middleware for taking care of some basic operations:
 

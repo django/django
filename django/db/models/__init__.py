@@ -15,7 +15,7 @@ from django.utils.text import capfirst
 # Admin stages.
 ADD, CHANGE, BOTH = 1, 2, 3
 
-class LazyDate:
+class LazyDate(object):
     """
     Use in limit_choices_to to compare the field to dates calculated at run time
     instead of when the model is loaded.  For example::

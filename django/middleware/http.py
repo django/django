@@ -1,6 +1,6 @@
 import datetime
 
-class ConditionalGetMiddleware:
+class ConditionalGetMiddleware(object):
     """
     Handles conditional GET operations. If the response has a ETag or
     Last-Modified header, and the request has If-None-Match or

@@ -667,7 +667,7 @@ class ManyToManyField(RelatedField, Field):
     def set_attributes_from_rel(self):
         pass
 
-class ManyToOneRel:
+class ManyToOneRel(object):
     def __init__(self, to, field_name, num_in_admin=3, min_num_in_admin=None,
         max_num_in_admin=None, num_extra_on_change=1, edit_inline=False,
         related_name=None, limit_choices_to=None, lookup_overrides=None, raw_id_admin=False):
@@ -704,7 +704,7 @@ class OneToOneRel(ManyToOneRel):
         self.raw_id_admin = raw_id_admin
         self.multiple = False
 
-class ManyToManyRel:
+class ManyToManyRel(object):
     def __init__(self, to, num_in_admin=0, related_name=None,
         filter_interface=None, limit_choices_to=None, raw_id_admin=False, symmetrical=True):
         self.to = to

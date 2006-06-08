@@ -134,7 +134,7 @@ class StringOrigin(Origin):
     def reload(self):
         return self.source
 
-class Template:
+class Template(object):
     def __init__(self, template_string, origin=None):
         "Compilation stage"
         if settings.TEMPLATE_DEBUG and origin == None:
@@ -158,7 +158,7 @@ def compile_string(template_string, origin):
     parser = parser_factory(lexer.tokenize())
     return parser.parse()
 
-class Token:
+class Token(object):
     def __init__(self, token_type, contents):
         "The token_type must be TOKEN_TEXT, TOKEN_VAR or TOKEN_BLOCK"
         self.token_type, self.contents = token_type, contents
@@ -376,7 +376,7 @@ def parser_factory(*args, **kwargs):
     else:
         return Parser(*args, **kwargs)
 
-class TokenParser:
+class TokenParser(object):
     """
     Subclass this and implement the top() method to parse a template line. When
     instantiating the parser, pass in the line from the Django template parser.
@@ -654,7 +654,7 @@ def resolve_variable(path, context):
             del bits[0]
     return current
 
-class Node:
+class Node(object):
     def render(self, context):
         "Return the node rendered as a string"
         pass

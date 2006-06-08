@@ -546,7 +546,7 @@ class DateQuerySet(QuerySet):
         c._order = self._order
         return c
 
-class QOperator:
+class QOperator(object):
     "Base class for QAnd and QOr"
     def __init__(self, *args):
         self.args = args

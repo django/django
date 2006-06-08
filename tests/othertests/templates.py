@@ -169,8 +169,7 @@ TEMPLATE_TESTS = {
     'comment-tag05': ("foo{% comment %} {% somerandomtag %} {% endcomment %}", {}, "foo"),
 
     ### CYCLE TAG #############################################################
-    #'cycleXX': ('', {}, ''),
-    'cycle01': ('{% cycle a, %}', {}, 'a'),
+    'cycle01': ('{% cycle a %}', {}, template.TemplateSyntaxError),
     'cycle02': ('{% cycle a,b,c as abc %}{% cycle abc %}', {}, 'ab'),
     'cycle03': ('{% cycle a,b,c as abc %}{% cycle abc %}{% cycle abc %}', {}, 'abc'),
     'cycle04': ('{% cycle a,b,c as abc %}{% cycle abc %}{% cycle abc %}{% cycle abc %}', {}, 'abca'),

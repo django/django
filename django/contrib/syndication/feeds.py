@@ -12,7 +12,7 @@ def add_domain(domain, url):
 class FeedDoesNotExist(ObjectDoesNotExist):
     pass
 
-class Feed:
+class Feed(object):
     item_pubdate = None
     item_enclosure_url = None
     feed_type = feedgenerator.DefaultFeed

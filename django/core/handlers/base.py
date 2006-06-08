@@ -3,7 +3,7 @@ from django.dispatch import dispatcher
 from django import http
 import sys
 
-class BaseHandler:
+class BaseHandler(object):
     def __init__(self):
         self._request_middleware = self._view_middleware = self._response_middleware = self._exception_middleware = None
 
