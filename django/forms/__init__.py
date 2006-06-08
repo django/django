@@ -613,9 +613,10 @@ class CheckboxSelectMultipleField(SelectMultipleField):
     back into the single list that validators, renderers and save() expect.
     """
     requires_data_list = True
-    def __init__(self, field_name, choices=None, validator_list=None):
+    def __init__(self, field_name, choices=None, ul_class='', validator_list=None):
         if validator_list is None: validator_list = []
         if choices is None: choices = []
+        self.ul_class = ul_class
         SelectMultipleField.__init__(self, field_name, choices, size=1, is_required=False, validator_list=validator_list)
 
     def prepare(self, new_data):
@@ -628,7 +629,7 @@ class CheckboxSelectMultipleField(SelectMultipleField):
         new_data.setlist(self.field_name, data_list)
 
     def render(self, data):
-        output = ['<ul>']
+        output = ['<ul%s>' % (self.ul_class and ' class="%s"' % self.ul_class or '')]
         str_data_list = map(str, data) # normalize to strings
         for value, choice in self.choices:
             checked_html = ''
