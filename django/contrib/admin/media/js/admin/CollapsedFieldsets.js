@@ -31,7 +31,7 @@ var CollapsedFieldsets = {
 				collapse_link.id = 'fieldsetcollapser' + i;
 				collapse_link.onclick = new Function('CollapsedFieldsets.show('+i+'); return false;');
 				collapse_link.href = '#';
-				collapse_link.innerHTML = 'Show';
+				collapse_link.innerHTML = gettext('Show');
 				var h2 = fs.getElementsByTagName('h2')[0];
 				h2.appendChild(document.createTextNode(' ('));
 				h2.appendChild(collapse_link);
@@ -60,7 +60,7 @@ var CollapsedFieldsets = {
 		// Toggle the "Show" link to a "Hide" link
 		var collapse_link = document.getElementById('fieldsetcollapser' + fieldset_index);
 		collapse_link.onclick = new Function('CollapsedFieldsets.hide('+fieldset_index+'); return false;');
-		collapse_link.innerHTML = 'Hide';
+		collapse_link.innerHTML = gettext('Hide');
 	},
 	hide: function(fieldset_index) {
 		var fs = document.getElementsByTagName('fieldset')[fieldset_index];
@@ -69,9 +69,9 @@ var CollapsedFieldsets = {
 		// Toggle the "Hide" link to a "Show" link
 		var collapse_link = document.getElementById('fieldsetcollapser' + fieldset_index);
         collapse_link.onclick = new Function('CollapsedFieldsets.show('+fieldset_index+'); return false;');
-		collapse_link.innerHTML = 'Show';
+		collapse_link.innerHTML = gettext('Show');
 	},
-	
+
 	uncollapse_all: function() {
 		var fieldsets = document.getElementsByTagName('fieldset');
 		for (var i=0; i<fieldsets.length; i++) {

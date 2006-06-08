@@ -36,7 +36,7 @@ def logout(request, next_page=None, template_name='registration/logged_out.html'
     try:
         del request.session[SESSION_KEY]
     except KeyError:
-        return render_to_response(template_name, {'title': 'Logged out'}, context_instance=RequestContext(request))
+        return render_to_response(template_name, {'title': _('Logged out')}, context_instance=RequestContext(request))
     else:
         # Redirect to this page until the session has been cleared.
         return HttpResponseRedirect(next_page or request.path)
