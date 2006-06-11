@@ -330,6 +330,8 @@ def get_digit(value, arg):
 def date(value, arg=None):
     "Formats a date according to the given format"
     from django.utils.dateformat import format
+    if not value:
+        return ''
     if arg is None:
         arg = settings.DATE_FORMAT
     return format(value, arg)
@@ -337,6 +339,8 @@ def date(value, arg=None):
 def time(value, arg=None):
     "Formats a time according to the given format"
     from django.utils.dateformat import time_format
+    if not value:
+        return ''
     if arg is None:
         arg = settings.TIME_FORMAT
     return time_format(value, arg)
@@ -344,6 +348,8 @@ def time(value, arg=None):
 def timesince(value):
     'Formats a date as the time since that date (i.e. "4 days, 6 hours")'
     from django.utils.timesince import timesince
+    if not value:
+        return ''
     return timesince(value)
 
 ###################
