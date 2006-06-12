@@ -1250,15 +1250,15 @@ msgstr "strony"
 
 #: utils/translation.py:360
 msgid "DATE_FORMAT"
-msgstr "FORMAT_DATY"
+msgstr "Y-m-d"
 
 #: utils/translation.py:361
 msgid "DATETIME_FORMAT"
-msgstr ""
+msgstr "Y-m-d H:i:s"
 
 #: utils/translation.py:362
 msgid "TIME_FORMAT"
-msgstr ""
+msgstr "H:i:s"
 
 #: utils/dates.py:6
 msgid "Monday"
