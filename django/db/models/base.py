@@ -187,14 +187,14 @@ class Model(object):
                 cursor.execute("INSERT INTO %s (%s) VALUES (%s)" % \
                     (backend.quote_name(self._meta.db_table), ','.join(field_names),
                     ','.join(placeholders)), db_values)
-                if self._meta.has_auto_field and not pk_set:
-                    setattr(self, self._meta.pk.attname, backend.get_last_insert_id(cursor, self._meta.db_table, self._meta.pk.column))
             else:
                 # Create a new record with defaults for everything.
                 cursor.execute("INSERT INTO %s (%s) VALUES (%s)" %
                     (backend.quote_name(self._meta.db_table), 
                      backend.quote_name(self._meta.pk.column),
                      backend.get_pk_default_value()))
+            if self._meta.has_auto_field and not pk_set:
+                setattr(self, self._meta.pk.attname, backend.get_last_insert_id(cursor, self._meta.db_table, self._meta.pk.column))
         transaction.commit_unless_managed()
 
         # Run any post-save hooks.
