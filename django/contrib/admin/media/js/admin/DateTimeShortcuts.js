@@ -69,7 +69,16 @@ var DateTimeShortcuts = {
         var clock_box = document.createElement('div');
         clock_box.style.display = 'none';
         clock_box.style.position = 'absolute';
-        clock_box.style.left = findPosX(clock_link) + 17 + 'px';
+        if (getStyle(document.body,'direction')!='rtl') {
+            clock_box.style.left = findPosX(clock_link) + 17 + 'px';
+        }
+        else {
+            // since style's width is in em, it'd be tough to calculate
+            // px value of it. let's use an estimated px for now
+            // TODO: IE returns wrong value for findPosX when in rtl mode
+            //       (it returns as it was left aligned), needs to be fixed.
+            clock_box.style.left = findPosX(clock_link) - 110 + 'px';
+        }
         clock_box.style.top = findPosY(clock_link) - 30 + 'px';
         clock_box.className = 'clockbox module';
         clock_box.setAttribute('id', DateTimeShortcuts.clockDivName + num);
@@ -140,7 +149,17 @@ var DateTimeShortcuts = {
         var cal_box = document.createElement('div');
         cal_box.style.display = 'none';
         cal_box.style.position = 'absolute';
-        cal_box.style.left = findPosX(cal_link) + 17 + 'px';
+        // is it left-to-right or right-to-left layout ?
+        if (getStyle(document.body,'direction')!='rtl') {
+            cal_box.style.left = findPosX(cal_link) + 17 + 'px';
+        }
+        else {
+            // since style's width is in em, it'd be tough to calculate
+            // px value of it. let's use an estimated px for now
+            // TODO: IE returns wrong value for findPosX when in rtl mode
+            //       (it returns as it was left aligned), needs to be fixed.
+            cal_box.style.left = findPosX(cal_link) - 180 + 'px';
+        }
         cal_box.style.top = findPosY(cal_link) - 75 + 'px';
         cal_box.className = 'calendarbox module';
         cal_box.setAttribute('id', DateTimeShortcuts.calendarDivName1 + num);
