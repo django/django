@@ -21,7 +21,7 @@
         {% block branding %}{% endblock %}
         </div>
         {% if not user.is_anonymous %}{% if user.is_staff %}
-        <div id="user-tools">{% trans 'Welcome,' %} <strong>{% if user.first_name %}{{ user.first_name }}{% else %}{{ user.username }}{% endif %}</strong>. {% block userlinks %}<a href="doc/">{% trans 'Documentation' %}</a> / <a href="password_change/">{% trans 'Change password' %}</a> / <a href="logout/">{% trans 'Log out' %}</a>{% endblock %}</div>
+        <div id="user-tools">{% trans 'Welcome,' %} <strong>{% if user.first_name %}{{ user.first_name|escape }}{% else %}{{ user.username }}{% endif %}</strong>. {% block userlinks %}<a href="doc/">{% trans 'Documentation' %}</a> / <a href="password_change/">{% trans 'Change password' %}</a> / <a href="logout/">{% trans 'Log out' %}</a>{% endblock %}</div>
         {% endif %}{% endif %}
         {% block nav-global %}{% endblock %}
     </div>
