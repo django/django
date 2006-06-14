@@ -133,8 +133,8 @@ For example, to translate a model's ``help_text``, do the following::
 
     from django.utils.translation import gettext_lazy
 
-    class MyThing(meta.Model):
-        name = meta.CharField(help_text=gettext_lazy('This is the help text'))
+    class MyThing(models.Model):
+        name = models.CharField(help_text=gettext_lazy('This is the help text'))
 
 In this example, ``gettext_lazy()`` stores a lazy reference to the string --
 not the actual translation. The translation itself will be done when the string
@@ -145,8 +145,8 @@ If you don't like the verbose name ``gettext_lazy``, you can just alias it as
 
     from django.utils.translation import gettext_lazy as _
 
-    class MyThing(meta.Model):
-        name = meta.CharField(help_text=_('This is the help text'))
+    class MyThing(models.Model):
+        name = models.CharField(help_text=_('This is the help text'))
 
 Always use lazy translations in `Django models`_. And it's a good idea to add
 translations for the field names and table names, too. This means writing
@@ -155,8 +155,8 @@ class, though::
 
     from django.utils.translation import gettext_lazy as _
 
-    class MyThing(meta.Model):
-        name = meta.CharField(_('name'), help_text=_('This is the help text'))
+    class MyThing(models.Model):
+        name = models.CharField(_('name'), help_text=_('This is the help text'))
         class Meta:
             verbose_name = _('my thing')
             verbose_name_plural = _('mythings')

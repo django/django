@@ -559,7 +559,7 @@ following models::
         # ...
         hometown = models.ForeignKey(City)
 
-    class Book(meta.Model):
+    class Book(models.Model):
         # ...
         author = models.ForeignKey(Person)
 

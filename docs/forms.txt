@@ -15,6 +15,8 @@ We'll take a top-down approach to examining Django's form validation framework,
 because much of the time you won't need to use the lower-level APIs. Throughout
 this document, we'll be working with the following model, a "place" object::
 
+    from django.db import models
+
     PLACE_TYPES = (
         (1, 'Bar'),
         (2, 'Restaurant'),
@@ -22,13 +24,13 @@ this document, we'll be working with the following model, a "place" object::
         (4, 'Secret Hideout'),
     )
 
-    class Place(meta.Model):
-        name = meta.CharField(maxlength=100)
-        address = meta.CharField(maxlength=100, blank=True)
-        city = meta.CharField(maxlength=50, blank=True)
-        state = meta.USStateField()
-        zip_code = meta.CharField(maxlength=5, blank=True)
-        place_type = meta.IntegerField(choices=PLACE_TYPES)
+    class Place(models.Model):
+        name = models.CharField(maxlength=100)
+        address = models.CharField(maxlength=100, blank=True)
+        city = models.CharField(maxlength=50, blank=True)
+        state = models.USStateField()
+        zip_code = models.CharField(maxlength=5, blank=True)
+        place_type = models.IntegerField(choices=PLACE_TYPES)
 
         class Admin:
             pass
