@@ -1634,10 +1634,10 @@ to happen whenever you save an object. For example::
         name = models.CharField(maxlength=100)
         tagline = models.TextField()
 
-    def save(self):
-        do_something()
-        super(Blog, self).save() # Call the "real" save() method.
-        do_something_else()
+        def save(self):
+            do_something()
+            super(Blog, self).save() # Call the "real" save() method.
+            do_something_else()
 
 You can also prevent saving::
 
@@ -1645,11 +1645,11 @@ You can also prevent saving::
         name = models.CharField(maxlength=100)
         tagline = models.TextField()
 
-    def save(self):
-        if self.name == "Yoko Ono's blog":
-            return # Yoko shall never have her own blog!
-        else:
-            super(Blog, self).save() # Call the "real" save() method.
+        def save(self):
+            if self.name == "Yoko Ono's blog":
+                return # Yoko shall never have her own blog!
+            else:
+                super(Blog, self).save() # Call the "real" save() method.
 
 .. _database API docs: http://www.djangoproject.com/documentation/db_api/
 
