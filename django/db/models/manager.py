@@ -3,6 +3,7 @@ from django.db import backend, connection
 from django.db.models.query import QuerySet
 from django.dispatch import dispatcher
 from django.db.models import signals
+from django.db.models.fields import FieldDoesNotExist
 from django.utils.datastructures import SortedDict
 
 # Size of each "chunk" for get_iterator calls.
@@ -13,8 +14,11 @@ def ensure_default_manager(sender):
     cls = sender
     if not hasattr(cls, '_default_manager'):
         # Create the default manager, if needed.
-        if hasattr(cls, 'objects'):
-            raise ValueError, "Model %s must specify a custom Manager, because it has a field named 'objects'" % name
+        try:
+            cls._meta.get_field('objects')
+            raise ValueError, "Model %s must specify a custom Manager, because it has a field named 'objects'" % cls.__name__
+        except FieldDoesNotExist:
+            pass
         cls.add_to_class('objects', Manager())
 
 dispatcher.connect(ensure_default_manager, signal=signals.class_prepared)
