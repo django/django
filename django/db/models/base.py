@@ -165,7 +165,7 @@ class Model(object):
                 cursor.execute("UPDATE %s SET %s WHERE %s=%%s" % \
                     (backend.quote_name(self._meta.db_table),
                     ','.join(['%s=%%s' % backend.quote_name(f.column) for f in non_pks]),
-                    backend.quote_name(self._meta.pk.attname)),
+                    backend.quote_name(self._meta.pk.column)),
                     db_values + [pk_val])
             else:
                 record_exists = False
