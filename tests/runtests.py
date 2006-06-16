@@ -21,14 +21,14 @@ def log_error(model_name, title, description):
 MODEL_TEST_DIR = os.path.join(os.path.dirname(__file__), MODEL_TESTS_DIR_NAME)
 
 ALWAYS_INSTALLED_APPS = [
-    'django.contrib.admin',
-    'django.contrib.auth', 
-    'django.contrib.comments',
     'django.contrib.contenttypes',
+    'django.contrib.auth', 
+    'django.contrib.sites',
     'django.contrib.flatpages',
     'django.contrib.redirects',
     'django.contrib.sessions',
-    'django.contrib.sites',
+    'django.contrib.comments',
+    'django.contrib.admin',
 ]
 
 def get_test_models():
@@ -148,6 +148,12 @@ class TestRunner:
 
         # Initialize the test database.
         cursor = connection.cursor()
+        
+        # Install the core always installed apps
+        for app in ALWAYS_INSTALLED_APPS:
+            self.output(1, "Installing contrib app %s" % app)
+            mod = __import__(app + ".models", '', '', [''])
+            management.install(mod)
 
         # Run the tests for each test model.
         self.output(1, "Running app tests")
