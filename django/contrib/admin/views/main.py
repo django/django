@@ -574,7 +574,7 @@ class ChangeList(object):
             filter_fields = [self.lookup_opts.get_field(field_name) \
                               for field_name in self.lookup_opts.admin.list_filter]
             for f in filter_fields:
-                spec = FilterSpec.create(f, request, self.params)
+                spec = FilterSpec.create(f, request, self.params, self.model)
                 if spec and spec.has_output():
                     filter_specs.append(spec)
         return filter_specs, bool(filter_specs)
