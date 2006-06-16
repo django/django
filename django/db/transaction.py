@@ -114,7 +114,7 @@ def is_managed():
 def managed(flag=True):
     """
     Puts the transaction manager into a manual state: managed transactions have
-    to be committed explicitely by the user. If you switch off transaction
+    to be committed explicitly by the user. If you switch off transaction
     management and there is a pending commit/rollback, the data will be
     commited.
     """
