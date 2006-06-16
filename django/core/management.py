@@ -211,35 +211,38 @@ def _get_sql_for_pending_references(klass, pending_references):
 
 def _get_many_to_many_sql_for_model(klass):
     from django.db import backend, get_creation_module
+    from django.db.models import GenericRel
+    
     data_types = get_creation_module().DATA_TYPES
 
     opts = klass._meta
     final_output = []
     for f in opts.many_to_many:
-        table_output = [style.SQL_KEYWORD('CREATE TABLE') + ' ' + \
-            style.SQL_TABLE(backend.quote_name(f.m2m_db_table())) + ' (']
-        table_output.append('    %s %s %s,' % \
-            (style.SQL_FIELD(backend.quote_name('id')),
-            style.SQL_COLTYPE(data_types['AutoField']),
-            style.SQL_KEYWORD('NOT NULL PRIMARY KEY')))
-        table_output.append('    %s %s %s %s (%s),' % \
-            (style.SQL_FIELD(backend.quote_name(f.m2m_column_name())),
-            style.SQL_COLTYPE(data_types[get_rel_data_type(opts.pk)] % opts.pk.__dict__),
-            style.SQL_KEYWORD('NOT NULL REFERENCES'),
-            style.SQL_TABLE(backend.quote_name(opts.db_table)),
-            style.SQL_FIELD(backend.quote_name(opts.pk.column))))
-        table_output.append('    %s %s %s %s (%s),' % \
-            (style.SQL_FIELD(backend.quote_name(f.m2m_reverse_name())),
-            style.SQL_COLTYPE(data_types[get_rel_data_type(f.rel.to._meta.pk)] % f.rel.to._meta.pk.__dict__),
-            style.SQL_KEYWORD('NOT NULL REFERENCES'),
-            style.SQL_TABLE(backend.quote_name(f.rel.to._meta.db_table)),
-            style.SQL_FIELD(backend.quote_name(f.rel.to._meta.pk.column))))
-        table_output.append('    %s (%s, %s)' % \
-            (style.SQL_KEYWORD('UNIQUE'),
-            style.SQL_FIELD(backend.quote_name(f.m2m_column_name())),
-            style.SQL_FIELD(backend.quote_name(f.m2m_reverse_name()))))
-        table_output.append(');')
-        final_output.append('\n'.join(table_output))
+        if not isinstance(f.rel, GenericRel):
+            table_output = [style.SQL_KEYWORD('CREATE TABLE') + ' ' + \
+                style.SQL_TABLE(backend.quote_name(f.m2m_db_table())) + ' (']
+            table_output.append('    %s %s %s,' % \
+                (style.SQL_FIELD(backend.quote_name('id')),
+                style.SQL_COLTYPE(data_types['AutoField']),
+                style.SQL_KEYWORD('NOT NULL PRIMARY KEY')))
+            table_output.append('    %s %s %s %s (%s),' % \
+                (style.SQL_FIELD(backend.quote_name(f.m2m_column_name())),
+                style.SQL_COLTYPE(data_types[get_rel_data_type(opts.pk)] % opts.pk.__dict__),
+                style.SQL_KEYWORD('NOT NULL REFERENCES'),
+                style.SQL_TABLE(backend.quote_name(opts.db_table)),
+                style.SQL_FIELD(backend.quote_name(opts.pk.column))))
+            table_output.append('    %s %s %s %s (%s),' % \
+                (style.SQL_FIELD(backend.quote_name(f.m2m_reverse_name())),
+                style.SQL_COLTYPE(data_types[get_rel_data_type(f.rel.to._meta.pk)] % f.rel.to._meta.pk.__dict__),
+                style.SQL_KEYWORD('NOT NULL REFERENCES'),
+                style.SQL_TABLE(backend.quote_name(f.rel.to._meta.db_table)),
+                style.SQL_FIELD(backend.quote_name(f.rel.to._meta.pk.column))))
+            table_output.append('    %s (%s, %s)' % \
+                (style.SQL_KEYWORD('UNIQUE'),
+                style.SQL_FIELD(backend.quote_name(f.m2m_column_name())),
+                style.SQL_FIELD(backend.quote_name(f.m2m_reverse_name()))))
+            table_output.append(');')
+            final_output.append('\n'.join(table_output))
     return final_output
 
 def get_sql_delete(app):
