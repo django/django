@@ -406,18 +406,16 @@ If I make changes to a model, how do I update the database?
 -----------------------------------------------------------
 
 If you don't mind clearing data, just pipe the output of the appropriate
-``django-admin.py sqlreset`` command into your database's command-line utility.
+``manage.py sqlreset`` command into your database's command-line utility.
 For example::
 
-    django-admin.py sqlreset appname | psql dbname
+    manage.py sqlreset appname | manage.py dbshell
 
-That "psql" assumes you're using PostgreSQL. If you're using MySQL, use the
-appropriate command-line utility, ``mysql``.
-
-``django-admin.py sqlreset`` outputs SQL that clears the app's database
+``manage.py sqlreset`` outputs SQL that clears the app's database
 table(s) and creates new ones. The above command uses a Unix pipe to send the
-SQL directly to the PostgreSQL command-line utility, which accepts SQL as
-input.
+SQL directly to the database command-line utility, which accepts SQL as
+input (``manage.py dbshell`` will launch the appropriate tool for the database
+configured in ``settings.py``).
 
 If you do care about deleting data, you'll have to execute the ``ALTER TABLE``
 statements manually in your database. That's the way we've always done it,
