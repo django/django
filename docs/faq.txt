@@ -405,17 +405,12 @@ Using a ``FileField`` or an ``ImageField`` in a model takes a few steps:
 If I make changes to a model, how do I update the database?
 -----------------------------------------------------------
 
-If you don't mind clearing data, just pipe the output of the appropriate
-``manage.py sqlreset`` command into your database's command-line utility.
-For example::
+If you don't mind clearing data, your project's ``manage.py`` utility has an
+option to reset the SQL for a particular application::
 
-    manage.py sqlreset appname | manage.py dbshell
+    manage.py reset appname
 
-``manage.py sqlreset`` outputs SQL that clears the app's database
-table(s) and creates new ones. The above command uses a Unix pipe to send the
-SQL directly to the database command-line utility, which accepts SQL as
-input (``manage.py dbshell`` will launch the appropriate tool for the database
-configured in ``settings.py``).
+This drops any tables associated with ``appname`` and recreates them.
 
 If you do care about deleting data, you'll have to execute the ``ALTER TABLE``
 statements manually in your database. That's the way we've always done it,
