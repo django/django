@@ -731,7 +731,7 @@ The above example can be rewritten using ``get_or_create()`` like so::
                       defaults={'birthday': date(1940, 10, 9)})
 
 Any keyword arguments passed to ``get_or_create()`` -- *except* an optional one
-called ``default`` -- will be used in a ``get()`` call. If an object is found,
+called ``defaults`` -- will be used in a ``get()`` call. If an object is found,
 ``get_or_create()`` returns a tuple of that object and ``False``. If an object
 is *not* found, ``get_or_create()`` will instantiate and save a new object,
 returning a tuple of the new object and ``True``. The new object will be
