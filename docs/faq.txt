@@ -314,13 +314,16 @@ as long as that server has WSGI_ hooks. See the `server arrangements wiki page`_
 How do I install mod_python on Windows?
 ---------------------------------------
 
-    * For Python 2.4, check out this `guide to mod_python & Python 2.3`_.
+    * For Python 2.4, grab mod_python from `win32 build of mod_python for
+      Python 2.4`_.
+    * For Python 2.4, check out this `Django on Windows howto`_.
     * For Python 2.3, grab mod_python from http://www.modpython.org/ and read
       `Running mod_python on Apache on Windows2000`_.
     * Also, try this (not Windows-specific) `guide to getting mod_python
       working`_.
 
-.. _`guide to mod_python & Python 2.3`: http://www.lehuen.com/nicolas/index.php/2005/02/21/39-win32-build-of-mod_python-314-for-python-24
+.. _`win32 build of mod_python for Python 2.4`: http://www.lehuen.com/nicolas/index.php/2005/02/21/39-win32-build-of-mod_python-314-for-python-24
+.. _`Django on Windows howto`: http://thinkhole.org/wp/2006/04/03/django-on-windows-howto/
 .. _`Running mod_python on Apache on Windows2000`: http://groups-beta.google.com/group/comp.lang.python/msg/139af8c83a5a9d4f
 .. _`guide to getting mod_python working`: http://www.dscpl.com.au/articles/modpython-001.html
 
