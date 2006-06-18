@@ -499,6 +499,10 @@ TEMPLATE_TESTS = {
     'templatetag04': ('{% templatetag closevariable %}', {}, '}}'),
     'templatetag05': ('{% templatetag %}', {}, template.TemplateSyntaxError),
     'templatetag06': ('{% templatetag foo %}', {}, template.TemplateSyntaxError),
+    'templatetag07': ('{% templatetag openbrace %}', {}, '{'),
+    'templatetag08': ('{% templatetag closebrace %}', {}, '}'),
+    'templatetag09': ('{% templatetag openbrace %}{% templatetag openbrace %}', {}, '{{'),
+    'templatetag10': ('{% templatetag closebrace %}{% templatetag closebrace %}', {}, '}}'),
 
     ### WIDTHRATIO TAG ########################################################
     'widthratio01': ('{% widthratio a b 0 %}', {'a':50,'b':100}, '0'),

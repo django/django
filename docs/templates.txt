@@ -766,6 +766,8 @@ The argument tells which template bit to output:
     ``closeblock``      ``%}``
     ``openvariable``    ``{{``
     ``closevariable``   ``}}``
+    ``openbrace``       ``{``
+    ``closebrace``      ``}``
     ==================  =======
 
 widthratio
