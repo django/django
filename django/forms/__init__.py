@@ -898,10 +898,11 @@ class FilePathField(SelectField):
     "A SelectField whose choices are the files in a given directory."
     def __init__(self, field_name, path, match=None, recursive=False, is_required=False, validator_list=None):
         import os
+        from django.db.models import BLANK_CHOICE_DASH
         if match is not None:
             import re
             match_re = re.compile(match)
-        choices = []
+        choices = not is_required and BLANK_CHOICE_DASH[:] or []
         if recursive:
             for root, dirs, files in os.walk(path):
                 for f in files:
