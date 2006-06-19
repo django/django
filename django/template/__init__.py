@@ -56,9 +56,10 @@ times with multiple contexts)
 """
 import re
 from inspect import getargspec
-from django.utils.functional import curry
 from django.conf import settings
 from django.template.context import Context, RequestContext, ContextPopException
+from django.utils.functional import curry
+from django.utils.text import smart_split
 
 __all__ = ('Template', 'Context', 'RequestContext', 'compile_string')
 
@@ -74,6 +75,8 @@ BLOCK_TAG_START = '{%'
 BLOCK_TAG_END = '%}'
 VARIABLE_TAG_START = '{{'
 VARIABLE_TAG_END = '}}'
+SINGLE_BRACE_START = '{'
+SINGLE_BRACE_END = '}'
 
 ALLOWED_VARIABLE_CHARS = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_.'
 
@@ -133,7 +136,7 @@ class StringOrigin(Origin):
     def reload(self):
         return self.source
 
-class Template:
+class Template(object):
     def __init__(self, template_string, origin=None):
         "Compilation stage"
         if settings.TEMPLATE_DEBUG and origin == None:
@@ -157,22 +160,18 @@ def compile_string(template_string, origin):
     parser = parser_factory(lexer.tokenize())
     return parser.parse()
 
-class Token:
+class Token(object):
     def __init__(self, token_type, contents):
         "The token_type must be TOKEN_TEXT, TOKEN_VAR or TOKEN_BLOCK"
         self.token_type, self.contents = token_type, contents
 
     def __str__(self):
-        return '<%s token: "%s...">' % (
-            {TOKEN_TEXT: 'Text', TOKEN_VAR: 'Var', TOKEN_BLOCK: 'Block'}[self.token_type],
-            self.contents[:20].replace('\n', '')
-            )
+        return '<%s token: "%s...">' % \
+            ({TOKEN_TEXT: 'Text', TOKEN_VAR: 'Var', TOKEN_BLOCK: 'Block'}[self.token_type],
+            self.contents[:20].replace('\n', ''))
 
-    def __repr__(self):
-        return '<%s token: "%s">' % (
-            {TOKEN_TEXT: 'Text', TOKEN_VAR: 'Var', TOKEN_BLOCK: 'Block'}[self.token_type],
-            self.contents[:].replace('\n', '')
-            )
+    def split_contents(self):
+        return smart_split(self.contents)
 
 class Lexer(object):
     def __init__(self, template_string, origin):
@@ -367,7 +366,6 @@ class DebugParser(Parser):
         if not hasattr(e, 'source'):
             e.source = token.source
 
-
 def lexer_factory(*args, **kwargs):
     if settings.TEMPLATE_DEBUG:
         return DebugLexer(*args, **kwargs)
@@ -380,8 +378,7 @@ def parser_factory(*args, **kwargs):
     else:
         return Parser(*args, **kwargs)
 
-
-class TokenParser:
+class TokenParser(object):
     """
     Subclass this and implement the top() method to parse a template line. When
     instantiating the parser, pass in the line from the Django template parser.
@@ -544,7 +541,7 @@ class FilterExpression(object):
                 upto = match.end()
         if upto != len(token):
             raise TemplateSyntaxError, "Could not parse the remainder: %s" % token[upto:]
-        self.var , self.filters = var, filters
+        self.var, self.filters = var, filters
 
     def resolve(self, context):
         try:
@@ -564,7 +561,7 @@ class FilterExpression(object):
     def args_check(name, func, provided):
         provided = list(provided)
         plen = len(provided)
-        (args, varargs, varkw, defaults) = getargspec(func)
+        args, varargs, varkw, defaults = getargspec(func)
         # First argument is filter input.
         args.pop(0)
         if defaults:
@@ -614,7 +611,7 @@ def resolve_variable(path, context):
 
     (The example assumes VARIABLE_ATTRIBUTE_SEPARATOR is '.')
     """
-    if path[0] in '0123456789':
+    if path[0].isdigit():
         number_type = '.' in path and float or int
         try:
             current = number_type(path)
@@ -655,11 +652,11 @@ def resolve_variable(path, context):
                     if getattr(e, 'silent_variable_failure', False):
                         current = settings.TEMPLATE_STRING_IF_INVALID
                     else:
-                        raise        
+                        raise
             del bits[0]
     return current
 
-class Node:
+class Node(object):
     def render(self, context):
         "Return the node rendered as a string"
         pass
@@ -820,7 +817,7 @@ class Library(object):
         return func
 
     def simple_tag(self,func):
-        (params, xx, xxx, defaults) = getargspec(func)
+        params, xx, xxx, defaults = getargspec(func)
 
         class SimpleNode(Node):
             def __init__(self, vars_to_resolve):
@@ -837,7 +834,7 @@ class Library(object):
 
     def inclusion_tag(self, file_name, context_class=Context, takes_context=False):
         def dec(func):
-            (params, xx, xxx, defaults) = getargspec(func)
+            params, xx, xxx, defaults = getargspec(func)
             if takes_context:
                 if params[0] == 'context':
                     params = params[1:]

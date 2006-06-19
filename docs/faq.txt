@@ -200,6 +200,23 @@ In the meantime, though, check out this `unofficial Django screencast`_.
 
 .. _unofficial Django screencast: http://www.throwingbeans.org/django_screencasts.html
 
+Is Django a content-management-system (CMS)?
+--------------------------------------------
+
+No, Django is not a CMS, or any sort of "turnkey product" in and of itself.
+It's a Web framework; it's a programming tool that lets you build Web sites.
+
+For example, it doesn't make much sense to compare Django to something like
+Drupal_, because Django is something you use to *create* things like Drupal.
+
+Of course, Django's automatic admin site is fantastic and timesaving -- but
+the admin site is one module of Django the framework. Furthermore, although
+Django has special conveniences for building "CMS-y" apps, that doesn't mean
+it's not just as appropriate for building "non-CMS-y" apps (whatever that
+means!).
+
+.. _Drupal: http://drupal.org/
+
 When will you release Django 1.0?
 ---------------------------------
 
@@ -222,7 +239,7 @@ How can I download the Django documentation to read it offline?
 ---------------------------------------------------------------
 
 The Django docs are available in the ``docs`` directory of each Django tarball
-release. These docs are in ReST (restructured text) format, and each text file
+release. These docs are in ReST (ReStructured Text) format, and each text file
 corresponds to a Web page on the official Django site.
 
 Because the documentation is `stored in revision control`_, you can browse
@@ -297,13 +314,16 @@ as long as that server has WSGI_ hooks. See the `server arrangements wiki page`_
 How do I install mod_python on Windows?
 ---------------------------------------
 
-    * For Python 2.4, check out this `guide to mod_python & Python 2.3`_.
+    * For Python 2.4, grab mod_python from `win32 build of mod_python for
+      Python 2.4`_.
+    * For Python 2.4, check out this `Django on Windows howto`_.
     * For Python 2.3, grab mod_python from http://www.modpython.org/ and read
       `Running mod_python on Apache on Windows2000`_.
     * Also, try this (not Windows-specific) `guide to getting mod_python
       working`_.
 
-.. _`guide to mod_python & Python 2.3`: http://www.lehuen.com/nicolas/index.php/2005/02/21/39-win32-build-of-mod_python-314-for-python-24
+.. _`win32 build of mod_python for Python 2.4`: http://www.lehuen.com/nicolas/index.php/2005/02/21/39-win32-build-of-mod_python-314-for-python-24
+.. _`Django on Windows howto`: http://thinkhole.org/wp/2006/04/03/django-on-windows-howto/
 .. _`Running mod_python on Apache on Windows2000`: http://groups-beta.google.com/group/comp.lang.python/msg/139af8c83a5a9d4f
 .. _`guide to getting mod_python working`: http://www.dscpl.com.au/articles/modpython-001.html
 
@@ -388,19 +408,12 @@ Using a ``FileField`` or an ``ImageField`` in a model takes a few steps:
 If I make changes to a model, how do I update the database?
 -----------------------------------------------------------
 
-If you don't mind clearing data, just pipe the output of the appropriate
-``django-admin.py sqlreset`` command into your database's command-line utility.
-For example::
+If you don't mind clearing data, your project's ``manage.py`` utility has an
+option to reset the SQL for a particular application::
 
-    django-admin.py sqlreset appname | psql dbname
+    manage.py reset appname
 
-That "psql" assumes you're using PostgreSQL. If you're using MySQL, use the
-appropriate command-line utility, ``mysql``.
-
-``django-admin.py sqlreset`` outputs SQL that clears the app's database
-table(s) and creates new ones. The above command uses a Unix pipe to send the
-SQL directly to the PostgreSQL command-line utility, which accepts SQL as
-input.
+This drops any tables associated with ``appname`` and recreates them.
 
 If you do care about deleting data, you'll have to execute the ``ALTER TABLE``
 statements manually in your database. That's the way we've always done it,

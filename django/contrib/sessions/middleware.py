@@ -64,7 +64,7 @@ class SessionWrapper(object):
 
     _session = property(_get_session)
 
-class SessionMiddleware:
+class SessionMiddleware(object):
     def process_request(self, request):
         request.session = SessionWrapper(request.COOKIES.get(settings.SESSION_COOKIE_NAME, None))
 

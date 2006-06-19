@@ -12,7 +12,7 @@ def add_domain(domain, url):
 class FeedDoesNotExist(ObjectDoesNotExist):
     pass
 
-class Feed:
+class Feed(object):
     item_pubdate = None
     item_enclosure_url = None
     feed_type = feedgenerator.DefaultFeed
@@ -73,6 +73,7 @@ class Feed:
             author_name = self.__get_dynamic_attr('author_name', obj),
             author_link = self.__get_dynamic_attr('author_link', obj),
             author_email = self.__get_dynamic_attr('author_email', obj),
+            categories = self.__get_dynamic_attr('categories', obj),
         )
 
         try:
@@ -110,5 +111,6 @@ class Feed:
                 author_name = author_name,
                 author_email = author_email,
                 author_link = author_link,
+                categories = self.__get_dynamic_attr('item_categories', item),
             )
         return feed

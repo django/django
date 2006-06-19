@@ -237,7 +237,7 @@ def hasNoProfanities(field_data, all_data):
             "Watch your mouth! The words %s are not allowed here.", plural) % \
             get_text_list(['"%s%s%s"' % (i[0], '-'*(len(i)-2), i[-1]) for i in words_seen], 'and')
 
-class AlwaysMatchesOtherField:
+class AlwaysMatchesOtherField(object):
     def __init__(self, other_field_name, error_message=None):
         self.other = other_field_name
         self.error_message = error_message or lazy_inter(gettext_lazy("This field must match the '%s' field."), self.other)
@@ -247,7 +247,7 @@ class AlwaysMatchesOtherField:
         if field_data != all_data[self.other]:
             raise ValidationError, self.error_message
 
-class ValidateIfOtherFieldEquals:
+class ValidateIfOtherFieldEquals(object):
     def __init__(self, other_field, other_value, validator_list):
         self.other_field, self.other_value = other_field, other_value
         self.validator_list = validator_list
@@ -258,7 +258,7 @@ class ValidateIfOtherFieldEquals:
             for v in self.validator_list:
                 v(field_data, all_data)
 
-class RequiredIfOtherFieldNotGiven:
+class RequiredIfOtherFieldNotGiven(object):
     def __init__(self, other_field_name, error_message=gettext_lazy("Please enter something for at least one field.")):
         self.other, self.error_message = other_field_name, error_message
         self.always_test = True
@@ -267,7 +267,7 @@ class RequiredIfOtherFieldNotGiven:
         if not all_data.get(self.other, False) and not field_data:
             raise ValidationError, self.error_message
 
-class RequiredIfOtherFieldsGiven:
+class RequiredIfOtherFieldsGiven(object):
     def __init__(self, other_field_names, error_message=gettext_lazy("Please enter both fields or leave them both empty.")):
         self.other, self.error_message = other_field_names, error_message
         self.always_test = True
@@ -282,7 +282,7 @@ class RequiredIfOtherFieldGiven(RequiredIfOtherFieldsGiven):
     def __init__(self, other_field_name, error_message=gettext_lazy("Please enter both fields or leave them both empty.")):
         RequiredIfOtherFieldsGiven.__init__(self, [other_field_name], error_message)
 
-class RequiredIfOtherFieldEquals:
+class RequiredIfOtherFieldEquals(object):
     def __init__(self, other_field, other_value, error_message=None):
         self.other_field = other_field
         self.other_value = other_value
@@ -294,7 +294,7 @@ class RequiredIfOtherFieldEquals:
         if all_data.has_key(self.other_field) and all_data[self.other_field] == self.other_value and not field_data:
             raise ValidationError(self.error_message)
 
-class RequiredIfOtherFieldDoesNotEqual:
+class RequiredIfOtherFieldDoesNotEqual(object):
     def __init__(self, other_field, other_value, error_message=None):
         self.other_field = other_field
         self.other_value = other_value
@@ -306,7 +306,7 @@ class RequiredIfOtherFieldDoesNotEqual:
         if all_data.has_key(self.other_field) and all_data[self.other_field] != self.other_value and not field_data:
             raise ValidationError(self.error_message)
 
-class IsLessThanOtherField:
+class IsLessThanOtherField(object):
     def __init__(self, other_field_name, error_message):
         self.other, self.error_message = other_field_name, error_message
 
@@ -314,7 +314,7 @@ class IsLessThanOtherField:
         if field_data > all_data[self.other]:
             raise ValidationError, self.error_message
 
-class UniqueAmongstFieldsWithPrefix:
+class UniqueAmongstFieldsWithPrefix(object):
     def __init__(self, field_name, prefix, error_message):
         self.field_name, self.prefix = field_name, prefix
         self.error_message = error_message or gettext_lazy("Duplicate values are not allowed.")
@@ -324,7 +324,7 @@ class UniqueAmongstFieldsWithPrefix:
             if field_name != self.field_name and value == field_data:
                 raise ValidationError, self.error_message
 
-class IsAPowerOf:
+class IsAPowerOf(object):
     """
     >>> v = IsAPowerOf(2)
     >>> v(4, None)
@@ -342,7 +342,7 @@ class IsAPowerOf:
         if val != int(val):
             raise ValidationError, gettext("This value must be a power of %s.") % self.power_of
 
-class IsValidFloat:
+class IsValidFloat(object):
     def __init__(self, max_digits, decimal_places):
         self.max_digits, self.decimal_places = max_digits, decimal_places
 
@@ -355,11 +355,14 @@ class IsValidFloat:
         if len(data) > (self.max_digits + 1):
             raise ValidationError, ngettext("Please enter a valid decimal number with at most %s total digit.",
                 "Please enter a valid decimal number with at most %s total digits.", self.max_digits) % self.max_digits
+        if (not '.' in data and len(data) > (self.max_digits - self.decimal_places)) or ('.' in data and len(data) > (self.max_digits - (self.decimal_places - len(data.split('.')[1])) + 1)):
+            raise ValidationError, ngettext( "Please enter a valid decimal number with a whole part of at most %s digit.",
+                "Please enter a valid decimal number with a whole part of at most %s digits.", str(self.max_digits-self.decimal_places)) % str(self.max_digits-self.decimal_places)
         if '.' in data and len(data.split('.')[1]) > self.decimal_places:
             raise ValidationError, ngettext("Please enter a valid decimal number with at most %s decimal place.",
                 "Please enter a valid decimal number with at most %s decimal places.", self.decimal_places) % self.decimal_places
 
-class HasAllowableSize:
+class HasAllowableSize(object):
     """
     Checks that the file-upload field data is a certain size. min_size and
     max_size are measurements in bytes.
@@ -379,7 +382,7 @@ class HasAllowableSize:
         if self.max_size is not None and len(content) > self.max_size:
             raise ValidationError, self.max_error_message
 
-class MatchesRegularExpression:
+class MatchesRegularExpression(object):
     """
     Checks that the field matches the given regular-expression. The regex
     should be in string format, not already compiled.
@@ -392,7 +395,7 @@ class MatchesRegularExpression:
         if not self.regexp.search(field_data):
             raise ValidationError(self.error_message)
 
-class AnyValidator:
+class AnyValidator(object):
     """
     This validator tries all given validators. If any one of them succeeds,
     validation passes. If none of them succeeds, the given message is thrown
@@ -416,7 +419,7 @@ class AnyValidator:
                 pass
         raise ValidationError(self.error_message)
 
-class URLMimeTypeCheck:
+class URLMimeTypeCheck(object):
     "Checks that the provided URL points to a document with a listed mime type"
     class CouldNotRetrieve(ValidationError):
         pass
@@ -441,7 +444,7 @@ class URLMimeTypeCheck:
             raise URLMimeTypeCheck.InvalidContentType, gettext("The URL %(url)s returned the invalid Content-Type header '%(contenttype)s'.") % {
                 'url': field_data, 'contenttype': content_type}
 
-class RelaxNGCompact:
+class RelaxNGCompact(object):
     "Validate against a Relax NG compact schema"
     def __init__(self, schema_path, additional_root_element=None):
         self.schema_path = schema_path

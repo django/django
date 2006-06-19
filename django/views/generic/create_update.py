@@ -106,6 +106,8 @@ def update_object(request, model, object_id=None, slug=None,
 
     if request.POST:
         new_data = request.POST.copy()
+        if model._meta.has_field_type(FileField): 
+            new_data.update(request.FILES)
         errors = manipulator.get_validation_errors(new_data)
         manipulator.do_html2python(new_data)
         if not errors:

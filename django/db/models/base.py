@@ -107,6 +107,12 @@ class Model(object):
             else:
                 val = kwargs.pop(f.attname, f.get_default())
                 setattr(self, f.attname, val)
+        for prop in kwargs.keys():
+            try:
+                if isinstance(getattr(self.__class__, prop), property):
+                    setattr(self, prop, kwargs.pop(prop))
+            except AttributeError:
+                pass
         if kwargs:
             raise TypeError, "'%s' is an invalid keyword argument for this function" % kwargs.keys()[0]
         for i, arg in enumerate(args):
@@ -165,7 +171,7 @@ class Model(object):
                 cursor.execute("UPDATE %s SET %s WHERE %s=%%s" % \
                     (backend.quote_name(self._meta.db_table),
                     ','.join(['%s=%%s' % backend.quote_name(f.column) for f in non_pks]),
-                    backend.quote_name(self._meta.pk.attname)),
+                    backend.quote_name(self._meta.pk.column)),
                     db_values + [pk_val])
             else:
                 record_exists = False
@@ -183,9 +189,16 @@ class Model(object):
                 placeholders.append('(SELECT COUNT(*) FROM %s WHERE %s = %%s)' % \
                     (backend.quote_name(self._meta.db_table), backend.quote_name(self._meta.order_with_respect_to.column)))
                 db_values.append(getattr(self, self._meta.order_with_respect_to.attname))
-            cursor.execute("INSERT INTO %s (%s) VALUES (%s)" % \
-                (backend.quote_name(self._meta.db_table), ','.join(field_names),
-                ','.join(placeholders)), db_values)
+            if db_values:
+                cursor.execute("INSERT INTO %s (%s) VALUES (%s)" % \
+                    (backend.quote_name(self._meta.db_table), ','.join(field_names),
+                    ','.join(placeholders)), db_values)
+            else:
+                # Create a new record with defaults for everything.
+                cursor.execute("INSERT INTO %s (%s) VALUES (%s)" %
+                    (backend.quote_name(self._meta.db_table), 
+                     backend.quote_name(self._meta.pk.column),
+                     backend.get_pk_default_value()))
             if self._meta.has_auto_field and not pk_set:
                 setattr(self, self._meta.pk.attname, backend.get_last_insert_id(cursor, self._meta.db_table, self._meta.pk.column))
         transaction.commit_unless_managed()

@@ -169,8 +169,7 @@ TEMPLATE_TESTS = {
     'comment-tag05': ("foo{% comment %} {% somerandomtag %} {% endcomment %}", {}, "foo"),
 
     ### CYCLE TAG #############################################################
-    #'cycleXX': ('', {}, ''),
-    'cycle01': ('{% cycle a, %}', {}, 'a'),
+    'cycle01': ('{% cycle a %}', {}, template.TemplateSyntaxError),
     'cycle02': ('{% cycle a,b,c as abc %}{% cycle abc %}', {}, 'ab'),
     'cycle03': ('{% cycle a,b,c as abc %}{% cycle abc %}{% cycle abc %}', {}, 'abc'),
     'cycle04': ('{% cycle a,b,c as abc %}{% cycle abc %}{% cycle abc %}{% cycle abc %}', {}, 'abca'),
@@ -193,13 +192,11 @@ TEMPLATE_TESTS = {
     'exception04': ("{% extends 'inheritance17' %}{% block first %}{% echo 400 %}5678{% endblock %}", {}, template.TemplateSyntaxError),
 
     ### FILTER TAG ############################################################
-    #'filterXX': ('', {}, ''),
     'filter01': ('{% filter upper %}{% endfilter %}', {}, ''),
     'filter02': ('{% filter upper %}django{% endfilter %}', {}, 'DJANGO'),
     'filter03': ('{% filter upper|lower %}django{% endfilter %}', {}, 'django'),
 
     ### FIRSTOF TAG ###########################################################
-    #'firstofXX': ('', {}, ''),
     'firstof01': ('{% firstof a b c %}', {'a':0,'b':0,'c':0}, ''),
     'firstof02': ('{% firstof a b c %}', {'a':1,'b':0,'c':0}, '1'),
     'firstof03': ('{% firstof a b c %}', {'a':0,'b':2,'c':0}, '2'),
@@ -220,8 +217,79 @@ TEMPLATE_TESTS = {
     'if-tag02': ("{% if foo %}yes{% else %}no{% endif %}", {"foo": False}, "no"),
     'if-tag03': ("{% if foo %}yes{% else %}no{% endif %}", {}, "no"),
 
+    # AND
+    'if-tag-and01': ("{% if foo and bar %}yes{% else %}no{% endif %}", {'foo': True, 'bar': True}, 'yes'),
+    'if-tag-and02': ("{% if foo and bar %}yes{% else %}no{% endif %}", {'foo': True, 'bar': False}, 'no'),
+    'if-tag-and03': ("{% if foo and bar %}yes{% else %}no{% endif %}", {'foo': False, 'bar': True}, 'no'),
+    'if-tag-and04': ("{% if foo and bar %}yes{% else %}no{% endif %}", {'foo': False, 'bar': False}, 'no'),
+    'if-tag-and05': ("{% if foo and bar %}yes{% else %}no{% endif %}", {'foo': False}, 'no'),
+    'if-tag-and06': ("{% if foo and bar %}yes{% else %}no{% endif %}", {'bar': False}, 'no'),
+    'if-tag-and07': ("{% if foo and bar %}yes{% else %}no{% endif %}", {'foo': True}, 'no'),
+    'if-tag-and08': ("{% if foo and bar %}yes{% else %}no{% endif %}", {'bar': True}, 'no'),
+
+    # OR
+    'if-tag-or01': ("{% if foo or bar %}yes{% else %}no{% endif %}", {'foo': True, 'bar': True}, 'yes'),
+    'if-tag-or02': ("{% if foo or bar %}yes{% else %}no{% endif %}", {'foo': True, 'bar': False}, 'yes'),
+    'if-tag-or03': ("{% if foo or bar %}yes{% else %}no{% endif %}", {'foo': False, 'bar': True}, 'yes'),
+    'if-tag-or04': ("{% if foo or bar %}yes{% else %}no{% endif %}", {'foo': False, 'bar': False}, 'no'),
+    'if-tag-or05': ("{% if foo or bar %}yes{% else %}no{% endif %}", {'foo': False}, 'no'),
+    'if-tag-or06': ("{% if foo or bar %}yes{% else %}no{% endif %}", {'bar': False}, 'no'),
+    'if-tag-or07': ("{% if foo or bar %}yes{% else %}no{% endif %}", {'foo': True}, 'yes'),
+    'if-tag-or08': ("{% if foo or bar %}yes{% else %}no{% endif %}", {'bar': True}, 'yes'),
+
+    # TODO: multiple ORs
+
+    # NOT
+    'if-tag-not01': ("{% if not foo %}no{% else %}yes{% endif %}", {'foo': True}, 'yes'),
+    'if-tag-not02': ("{% if not %}yes{% else %}no{% endif %}", {'foo': True}, 'no'),
+    'if-tag-not03': ("{% if not %}yes{% else %}no{% endif %}", {'not': True}, 'yes'),
+    'if-tag-not04': ("{% if not not %}no{% else %}yes{% endif %}", {'not': True}, 'yes'),
+    'if-tag-not05': ("{% if not not %}no{% else %}yes{% endif %}", {}, 'no'),
+
+    'if-tag-not06': ("{% if foo and not bar %}yes{% else %}no{% endif %}", {}, 'no'),
+    'if-tag-not07': ("{% if foo and not bar %}yes{% else %}no{% endif %}", {'foo': True, 'bar': True}, 'no'),
+    'if-tag-not08': ("{% if foo and not bar %}yes{% else %}no{% endif %}", {'foo': True, 'bar': False}, 'yes'),
+    'if-tag-not09': ("{% if foo and not bar %}yes{% else %}no{% endif %}", {'foo': False, 'bar': True}, 'no'),
+    'if-tag-not10': ("{% if foo and not bar %}yes{% else %}no{% endif %}", {'foo': False, 'bar': False}, 'no'),
+
+    'if-tag-not11': ("{% if not foo and bar %}yes{% else %}no{% endif %}", {}, 'no'),
+    'if-tag-not12': ("{% if not foo and bar %}yes{% else %}no{% endif %}", {'foo': True, 'bar': True}, 'no'),
+    'if-tag-not13': ("{% if not foo and bar %}yes{% else %}no{% endif %}", {'foo': True, 'bar': False}, 'no'),
+    'if-tag-not14': ("{% if not foo and bar %}yes{% else %}no{% endif %}", {'foo': False, 'bar': True}, 'yes'),
+    'if-tag-not15': ("{% if not foo and bar %}yes{% else %}no{% endif %}", {'foo': False, 'bar': False}, 'no'),
+
+    'if-tag-not16': ("{% if foo or not bar %}yes{% else %}no{% endif %}", {}, 'yes'),
+    'if-tag-not17': ("{% if foo or not bar %}yes{% else %}no{% endif %}", {'foo': True, 'bar': True}, 'yes'),
+    'if-tag-not18': ("{% if foo or not bar %}yes{% else %}no{% endif %}", {'foo': True, 'bar': False}, 'yes'),
+    'if-tag-not19': ("{% if foo or not bar %}yes{% else %}no{% endif %}", {'foo': False, 'bar': True}, 'no'),
+    'if-tag-not20': ("{% if foo or not bar %}yes{% else %}no{% endif %}", {'foo': False, 'bar': False}, 'yes'),
+
+    'if-tag-not21': ("{% if not foo or bar %}yes{% else %}no{% endif %}", {}, 'yes'),
+    'if-tag-not22': ("{% if not foo or bar %}yes{% else %}no{% endif %}", {'foo': True, 'bar': True}, 'yes'),
+    'if-tag-not23': ("{% if not foo or bar %}yes{% else %}no{% endif %}", {'foo': True, 'bar': False}, 'no'),
+    'if-tag-not24': ("{% if not foo or bar %}yes{% else %}no{% endif %}", {'foo': False, 'bar': True}, 'yes'),
+    'if-tag-not25': ("{% if not foo or bar %}yes{% else %}no{% endif %}", {'foo': False, 'bar': False}, 'yes'),
+
+    'if-tag-not26': ("{% if not foo and not bar %}yes{% else %}no{% endif %}", {}, 'yes'),
+    'if-tag-not27': ("{% if not foo and not bar %}yes{% else %}no{% endif %}", {'foo': True, 'bar': True}, 'no'),
+    'if-tag-not28': ("{% if not foo and not bar %}yes{% else %}no{% endif %}", {'foo': True, 'bar': False}, 'no'),
+    'if-tag-not29': ("{% if not foo and not bar %}yes{% else %}no{% endif %}", {'foo': False, 'bar': True}, 'no'),
+    'if-tag-not30': ("{% if not foo and not bar %}yes{% else %}no{% endif %}", {'foo': False, 'bar': False}, 'yes'),
+
+    'if-tag-not31': ("{% if not foo or not bar %}yes{% else %}no{% endif %}", {}, 'yes'),
+    'if-tag-not32': ("{% if not foo or not bar %}yes{% else %}no{% endif %}", {'foo': True, 'bar': True}, 'no'),
+    'if-tag-not33': ("{% if not foo or not bar %}yes{% else %}no{% endif %}", {'foo': True, 'bar': False}, 'yes'),
+    'if-tag-not34': ("{% if not foo or not bar %}yes{% else %}no{% endif %}", {'foo': False, 'bar': True}, 'yes'),
+    'if-tag-not35': ("{% if not foo or not bar %}yes{% else %}no{% endif %}", {'foo': False, 'bar': False}, 'yes'),
+
+    # AND and OR raises a TemplateSyntaxError
+    'if-tag-error01': ("{% if foo or bar and baz %}yes{% else %}no{% endif %}", {'foo': False, 'bar': False}, template.TemplateSyntaxError),
+    'if-tag-error02': ("{% if foo and %}yes{% else %}no{% endif %}", {'foo': True}, template.TemplateSyntaxError),
+    'if-tag-error03': ("{% if foo or %}yes{% else %}no{% endif %}", {'foo': True}, template.TemplateSyntaxError),
+    'if-tag-error04': ("{% if not foo and %}yes{% else %}no{% endif %}", {'foo': True}, template.TemplateSyntaxError),
+    'if-tag-error05': ("{% if not foo or %}yes{% else %}no{% endif %}", {'foo': True}, template.TemplateSyntaxError),
+
     ### IFCHANGED TAG #########################################################
-    #'ifchangedXX': ('', {}, ''),
     'ifchanged01': ('{% for n in num %}{% ifchanged %}{{ n }}{% endifchanged %}{% endfor %}', { 'num': (1,2,3) }, '123'),
     'ifchanged02': ('{% for n in num %}{% ifchanged %}{{ n }}{% endifchanged %}{% endfor %}', { 'num': (1,1,3) }, '13'),
     'ifchanged03': ('{% for n in num %}{% ifchanged %}{{ n }}{% endifchanged %}{% endfor %}', { 'num': (1,1,1) }, '1'),
@@ -237,6 +305,18 @@ TEMPLATE_TESTS = {
     'ifequal08': ('{% ifequal a "test" %}yes{% else %}no{% endifequal %}', {"a": "no"}, "no"),
     'ifequal09': ('{% ifequal a "test" %}yes{% else %}no{% endifequal %}', {}, "no"),
     'ifequal10': ('{% ifequal a b %}yes{% else %}no{% endifequal %}', {}, "yes"),
+
+    # SMART SPLITTING
+    'ifequal-split01': ('{% ifequal a "test man" %}yes{% else %}no{% endifequal %}', {}, "no"),
+    'ifequal-split02': ('{% ifequal a "test man" %}yes{% else %}no{% endifequal %}', {'a': 'foo'}, "no"),
+    'ifequal-split03': ('{% ifequal a "test man" %}yes{% else %}no{% endifequal %}', {'a': 'test man'}, "yes"),
+    'ifequal-split04': ("{% ifequal a 'test man' %}yes{% else %}no{% endifequal %}", {'a': 'test man'}, "yes"),
+    'ifequal-split05': ("{% ifequal a 'i \"love\" you' %}yes{% else %}no{% endifequal %}", {'a': ''}, "no"),
+    'ifequal-split06': ("{% ifequal a 'i \"love\" you' %}yes{% else %}no{% endifequal %}", {'a': 'i "love" you'}, "yes"),
+    'ifequal-split07': ("{% ifequal a 'i \"love\" you' %}yes{% else %}no{% endifequal %}", {'a': 'i love you'}, "no"),
+    'ifequal-split08': (r"{% ifequal a 'I\'m happy' %}yes{% else %}no{% endifequal %}", {'a': "I'm happy"}, "yes"),
+    'ifequal-split09': (r"{% ifequal a 'slash\man' %}yes{% else %}no{% endifequal %}", {'a': r"slash\man"}, "yes"),
+    'ifequal-split10': (r"{% ifequal a 'slash\man' %}yes{% else %}no{% endifequal %}", {'a': r"slashman"}, "no"),
 
     ### IFNOTEQUAL TAG ########################################################
     'ifnotequal01': ("{% ifnotequal a b %}yes{% endifnotequal %}", {"a": 1, "b": 2}, "yes"),
@@ -388,7 +468,6 @@ TEMPLATE_TESTS = {
                     """),
 
     ### REGROUP TAG ###########################################################
-    #'regroupXX': ('', {}, ''),
     'regroup01': ('{% regroup data by bar as grouped %}' + \
                   '{% for group in grouped %}' + \
                   '{{ group.grouper }}:' + \
@@ -414,16 +493,18 @@ TEMPLATE_TESTS = {
                   {}, ''),
 
     ### TEMPLATETAG TAG #######################################################
-    #'templatetagXX': ('', {}, ''),
     'templatetag01': ('{% templatetag openblock %}', {}, '{%'),
     'templatetag02': ('{% templatetag closeblock %}', {}, '%}'),
     'templatetag03': ('{% templatetag openvariable %}', {}, '{{'),
     'templatetag04': ('{% templatetag closevariable %}', {}, '}}'),
     'templatetag05': ('{% templatetag %}', {}, template.TemplateSyntaxError),
     'templatetag06': ('{% templatetag foo %}', {}, template.TemplateSyntaxError),
+    'templatetag07': ('{% templatetag openbrace %}', {}, '{'),
+    'templatetag08': ('{% templatetag closebrace %}', {}, '}'),
+    'templatetag09': ('{% templatetag openbrace %}{% templatetag openbrace %}', {}, '{{'),
+    'templatetag10': ('{% templatetag closebrace %}{% templatetag closebrace %}', {}, '}}'),
 
     ### WIDTHRATIO TAG ########################################################
-    #'widthratioXX': ('', {}, ''),
     'widthratio01': ('{% widthratio a b 0 %}', {'a':50,'b':100}, '0'),
     'widthratio02': ('{% widthratio a b 100 %}', {'a':0,'b':0}, ''),
     'widthratio03': ('{% widthratio a b 100 %}', {'a':0,'b':100}, '0'),
@@ -440,11 +521,11 @@ TEMPLATE_TESTS = {
     'widthratio08': ('{% widthratio %}', {}, template.TemplateSyntaxError),
     'widthratio09': ('{% widthratio a b %}', {'a':50,'b':100}, template.TemplateSyntaxError),
     'widthratio10': ('{% widthratio a b 100.0 %}', {'a':50,'b':100}, template.TemplateSyntaxError),
-    
+
     ### NOW TAG ########################################################
     # Simple case
     'now01' : ('{% now "j n Y"%}', {}, str(datetime.now().day) + ' ' + str(datetime.now().month) + ' ' + str(datetime.now().year)),
-    
+
     # Check parsing of escaped and special characters
     'now02' : ('{% now "j "n" Y"%}', {}, template.TemplateSyntaxError),
 #    'now03' : ('{% now "j \"n\" Y"%}', {}, str(datetime.now().day) + '"' + str(datetime.now().month) + '"' + str(datetime.now().year)),

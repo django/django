@@ -131,7 +131,7 @@ def items_for_result(cl, result):
 
             if isinstance(f.rel, models.ManyToOneRel):
                 if field_val is not None:
-                    result_repr = getattr(result, f.name)
+                    result_repr = escape(getattr(result, f.name))
                 else:
                     result_repr = EMPTY_CHANGELIST_VALUE
             # Dates and times are special: They're formatted in a certain way.

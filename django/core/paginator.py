@@ -4,7 +4,7 @@ from math import ceil
 class InvalidPage(Exception):
     pass
 
-class ObjectPaginator:
+class ObjectPaginator(object):
     """
     This class makes pagination easy. Feed it a QuerySet, plus the number of
     objects you want on each page. Then read the hits and pages properties to

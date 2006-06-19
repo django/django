@@ -1,7 +1,7 @@
 from django.conf import settings
 from django.db import transaction
 
-class TransactionMiddleware:
+class TransactionMiddleware(object):
     """
     Transaction middleware. If this is enabled, each view function will be run
     with commit_on_response activated - that way a save() doesn't do a direct

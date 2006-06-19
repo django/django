@@ -7,7 +7,7 @@ class ContextPopException(Exception):
     "pop() has been called more times than push()"
     pass
 
-class Context:
+class Context(object):
     "A stack container for variable context"
     def __init__(self, dict_=None):
         dict_ = dict_ or {}

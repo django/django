@@ -36,6 +36,10 @@ def i18n(request):
         context_extras['LANGUAGE_CODE'] = request.LANGUAGE_CODE
     else:
         context_extras['LANGUAGE_CODE'] = settings.LANGUAGE_CODE
+
+    from django.utils import translation
+    context_extras['LANGUAGE_BIDI'] = translation.get_language_bidi()
+
     return context_extras
 
 def request(request):
@@ -44,7 +48,7 @@ def request(request):
 # PermWrapper and PermLookupDict proxy the permissions system into objects that
 # the template system can understand.
 
-class PermLookupDict:
+class PermLookupDict(object):
     def __init__(self, user, module_name):
         self.user, self.module_name = user, module_name
     def __repr__(self):
@@ -54,7 +58,7 @@ class PermLookupDict:
     def __nonzero__(self):
         return self.user.has_module_perms(self.module_name)
 
-class PermWrapper:
+class PermWrapper(object):
     def __init__(self, user):
         self.user = user
     def __getitem__(self, module_name):

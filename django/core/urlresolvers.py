@@ -83,7 +83,7 @@ class MatchChecker(object):
             raise NoReverseMatch("Value %r didn't match regular expression %r" % (value, test_regex))
         return str(value) # TODO: Unicode?
 
-class RegexURLPattern:
+class RegexURLPattern(object):
     def __init__(self, regex, callback, default_args=None):
         # regex is a string representing a regular expression.
         # callback is something like 'foo.views.news.stories.story_detail',

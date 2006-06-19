@@ -15,7 +15,7 @@ DEFAULT_NAMES = ('verbose_name', 'db_table', 'ordering',
                  'unique_together', 'permissions', 'get_latest_by',
                  'order_with_respect_to', 'app_label')
 
-class Options:
+class Options(object):
     def __init__(self, meta):
         self.fields, self.many_to_many = [], []
         self.module_name, self.verbose_name = None, None
@@ -195,7 +195,7 @@ class Options:
                 self._field_types[field_type] = False
         return self._field_types[field_type]
 
-class AdminOptions:
+class AdminOptions(object):
     def __init__(self, fields=None, js=None, list_display=None, list_filter=None,
         date_hierarchy=None, save_as=False, ordering=None, search_fields=None,
         save_on_top=False, list_select_related=False, manager=None, list_per_page=100):

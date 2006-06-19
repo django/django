@@ -1,7 +1,7 @@
 "Default tags used by the template system, available to all templates."
 
 from django.template import Node, NodeList, Template, Context, resolve_variable
-from django.template import TemplateSyntaxError, VariableDoesNotExist, BLOCK_TAG_START, BLOCK_TAG_END, VARIABLE_TAG_START, VARIABLE_TAG_END
+from django.template import TemplateSyntaxError, VariableDoesNotExist, BLOCK_TAG_START, BLOCK_TAG_END, VARIABLE_TAG_START, VARIABLE_TAG_END, SINGLE_BRACE_START, SINGLE_BRACE_END
 from django.template import get_library, Library, InvalidTemplateLibrary
 from django.conf import settings
 import sys
@@ -149,9 +149,10 @@ class IfEqualNode(Node):
         return self.nodelist_false.render(context)
 
 class IfNode(Node):
-    def __init__(self, bool_exprs, nodelist_true, nodelist_false):
+    def __init__(self, bool_exprs, nodelist_true, nodelist_false, link_type):
         self.bool_exprs = bool_exprs
         self.nodelist_true, self.nodelist_false = nodelist_true, nodelist_false
+        self.link_type = link_type
 
     def __repr__(self):
         return "<If node>"
@@ -171,14 +172,28 @@ class IfNode(Node):
         return nodes
 
     def render(self, context):
-        for ifnot, bool_expr in self.bool_exprs:
-            try:
-                value = bool_expr.resolve(context)
-            except VariableDoesNotExist:
-                value = None
-            if (value and not ifnot) or (ifnot and not value):
-                return self.nodelist_true.render(context)
-        return self.nodelist_false.render(context)
+        if self.link_type == IfNode.LinkTypes.or_:
+            for ifnot, bool_expr in self.bool_exprs:
+                try:
+                    value = bool_expr.resolve(context)
+                except VariableDoesNotExist:
+                    value = None
+                if (value and not ifnot) or (ifnot and not value):
+                    return self.nodelist_true.render(context)
+            return self.nodelist_false.render(context)
+        else:
+            for ifnot, bool_expr in self.bool_exprs:
+                try:
+                    value = bool_expr.resolve(context)
+                except VariableDoesNotExist:
+                    value = None
+                if not ((value and not ifnot) or (ifnot and not value)):
+                    return self.nodelist_false.render(context)
+            return self.nodelist_true.render(context)
+
+    class LinkTypes:
+        and_ = 0,
+        or_ = 1
 
 class RegroupNode(Node):
     def __init__(self, target, expression, var_name):
@@ -260,7 +275,10 @@ class TemplateTagNode(Node):
     mapping = {'openblock': BLOCK_TAG_START,
                'closeblock': BLOCK_TAG_END,
                'openvariable': VARIABLE_TAG_START,
-               'closevariable': VARIABLE_TAG_END}
+               'closevariable': VARIABLE_TAG_END,
+               'openbrace': SINGLE_BRACE_START,
+               'closebrace': SINGLE_BRACE_END,
+               }
 
     def __init__(self, tagtype):
         self.tagtype = tagtype
@@ -487,7 +505,7 @@ def do_ifequal(parser, token, negate):
             ...
         {% endifnotequal %}
     """
-    bits = token.contents.split()
+    bits = list(token.split_contents())
     if len(bits) != 3:
         raise TemplateSyntaxError, "%r takes two arguments" % bits[0]
     end_tag = 'end' + bits[0]
@@ -561,11 +579,22 @@ def do_if(parser, token):
     if not bits:
         raise TemplateSyntaxError, "'if' statement requires at least one argument"
     # bits now looks something like this: ['a', 'or', 'not', 'b', 'or', 'c.d']
-    boolpairs = ' '.join(bits).split(' or ')
+    bitstr = ' '.join(bits)
+    boolpairs = bitstr.split(' and ')
     boolvars = []
+    if len(boolpairs) == 1:
+        link_type = IfNode.LinkTypes.or_
+        boolpairs = bitstr.split(' or ')
+    else:
+        link_type = IfNode.LinkTypes.and_
+        if ' or ' in bitstr:
+            raise TemplateSyntaxError, "'if' tags can't mix 'and' and 'or'"
     for boolpair in boolpairs:
         if ' ' in boolpair:
-            not_, boolvar = boolpair.split()
+            try:
+                not_, boolvar = boolpair.split()
+            except ValueError:
+                raise TemplateSyntaxError, "'if' statement improperly formatted"
             if not_ != 'not':
                 raise TemplateSyntaxError, "Expected 'not' in if statement"
             boolvars.append((True, parser.compile_filter(boolvar)))
@@ -578,7 +607,7 @@ def do_if(parser, token):
         parser.delete_first_token()
     else:
         nodelist_false = NodeList()
-    return IfNode(boolvars, nodelist_true, nodelist_false)
+    return IfNode(boolvars, nodelist_true, nodelist_false, link_type)
 do_if = register.tag("if", do_if)
 
 #@register.tag
@@ -783,6 +812,8 @@ def templatetag(parser, token):
         ``closeblock``      ``%}``
         ``openvariable``    ``{{``
         ``closevariable``   ``}}``
+        ``openbrace``       ``{``
+        ``closebrace``      ``}``
         ==================  =======
     """
     bits = token.contents.split()

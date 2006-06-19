@@ -1,0 +1,46 @@
+body { direction: rtl; }
+
+/* login styles */
+
+.login .form-row { float:right; }
+.login .form-row label { float:right; padding-left:0.5em; padding-right:0; text-align:left;}
+.login .submit-row { clear:both; padding:1em 9.4em 0 0; }
+
+
+/* global styles */
+th { text-align: right; }
+.module h2, .module caption { text-align: right; }
+.addlink, .changelink { padding-left:0px; padding-right:12px; background-position:100% 0.2em; }
+.deletelink { padding-left:0px; padding-right:12px; background-position:100% 0.25em; }
+.object-tools { float:left; }
+
+
+/* layout styles */
+#user-tools	{ right:auto; left:0; text-align:left; }
+div.breadcrumbs { text-align:right; }
+#content-main { float:right;}
+#content-related { float:left; margin-left:-19em; margin-right:auto;}
+.colMS { margin-left:20em !important; margin-right:10px !important;}
+
+/* dashboard styles */
+.dashboard .module table td a { padding-left:.6em; padding-right:12px; }
+
+/* changelists styles */
+.change-list .filtered { background:white url(../img/admin/changelist-bg_rtl.gif) top left repeat-y !important; }
+.change-list .filtered table { border-left:1px solid #ddd; border-right:0px none; }
+#changelist-filter { right:auto; left:0; border-left:0px none; border-right:1px solid #ddd;}
+.change-list .filtered table, .change-list .filtered .paginator, .filtered #toolbar, .filtered div.xfull { margin-right:0px !important; margin-left:160px !important; }
+#changelist-filter li.selected { border-left:0px none; padding-left:0px; margin-left:0; border-right:5px solid #ccc; padding-right:5px;margin-right:-10px; }
+
+/* fomrs styles */
+.aligned label { padding:0 0 3px 1em;  float:right; }
+.submit-row { text-align: left }
+.vDateField, .vTimeField { margin-left:2px; }
+
+/* widget styles */
+.calendarnav-previous { top:0; left:auto; right:0; }
+.calendarnav-next { top:0; right:auto; left:0;}
+.calendar caption, .calendarbox h2 { text-align:center; }
+
+.selector { float: right;}
+.selector .selector-filter { text-align: right;}

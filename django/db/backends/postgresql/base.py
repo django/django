@@ -108,6 +108,9 @@ def get_fulltext_search_sql(field_name):
 def get_drop_foreignkey_sql():
     return "DROP CONSTRAINT"
 
+def get_pk_default_value():
+    return "DEFAULT"
+
 # Register these custom typecasts, because Django expects dates/times to be
 # in Python's native (standard-library) datetime/time format, whereas psycopg
 # use mx.DateTime by default.

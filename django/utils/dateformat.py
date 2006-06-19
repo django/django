@@ -19,7 +19,7 @@ import re, time
 re_formatchars = re.compile(r'(?<!\\)([aABdDfFgGhHiIjlLmMnNOPrsStTUwWyYzZ])')
 re_escaped = re.compile(r'\\(.)')
 
-class Formatter:
+class Formatter(object):
     def format(self, formatstr):
         pieces = []
         for i, piece in enumerate(re_formatchars.split(formatstr)):

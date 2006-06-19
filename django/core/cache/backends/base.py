@@ -5,7 +5,7 @@ from django.core.exceptions import ImproperlyConfigured
 class InvalidCacheBackendError(ImproperlyConfigured):
     pass
 
-class BaseCache:
+class BaseCache(object):
     def __init__(self, params):
         timeout = params.get('timeout', 300)
         try:

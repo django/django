@@ -101,7 +101,7 @@ class Manipulator(object):
         for field in self.fields:
             field.convert_post_data(new_data)
 
-class FormWrapper:
+class FormWrapper(object):
     """
     A wrapper linking a Manipulator to the template system.
     This allows dictionary-style lookups of formfields. It also handles feeding
@@ -150,7 +150,7 @@ class FormWrapper:
 
     fields = property(_get_fields)
 
-class FormFieldWrapper:
+class FormFieldWrapper(object):
     "A bridge between the template system and an individual form field. Used by FormWrapper."
     def __init__(self, formfield, data, error_list):
         self.formfield, self.data, self.error_list = formfield, data, error_list
@@ -211,7 +211,7 @@ class FormFieldCollection(FormFieldWrapper):
     def html_combined_error_list(self):
         return ''.join([field.html_error_list() for field in self.formfield_dict.values() if hasattr(field, 'errors')])
 
-class InlineObjectCollection:
+class InlineObjectCollection(object):
     "An object that acts like a sparse list of form field collections."
     def __init__(self, parent_manipulator, rel_obj, data, errors):
         self.parent_manipulator = parent_manipulator
@@ -269,7 +269,7 @@ class InlineObjectCollection:
             self._collections = collections
 
 
-class FormField:
+class FormField(object):
     """Abstract class representing a form field.
 
     Classes that extend FormField should define the following attributes:
@@ -613,9 +613,10 @@ class CheckboxSelectMultipleField(SelectMultipleField):
     back into the single list that validators, renderers and save() expect.
     """
     requires_data_list = True
-    def __init__(self, field_name, choices=None, validator_list=None):
+    def __init__(self, field_name, choices=None, ul_class='', validator_list=None):
         if validator_list is None: validator_list = []
         if choices is None: choices = []
+        self.ul_class = ul_class
         SelectMultipleField.__init__(self, field_name, choices, size=1, is_required=False, validator_list=validator_list)
 
     def prepare(self, new_data):
@@ -628,7 +629,7 @@ class CheckboxSelectMultipleField(SelectMultipleField):
         new_data.setlist(self.field_name, data_list)
 
     def render(self, data):
-        output = ['<ul>']
+        output = ['<ul%s>' % (self.ul_class and ' class="%s"' % self.ul_class or '')]
         str_data_list = map(str, data) # normalize to strings
         for value, choice in self.choices:
             checked_html = ''
@@ -897,10 +898,11 @@ class FilePathField(SelectField):
     "A SelectField whose choices are the files in a given directory."
     def __init__(self, field_name, path, match=None, recursive=False, is_required=False, validator_list=None):
         import os
+        from django.db.models import BLANK_CHOICE_DASH
         if match is not None:
             import re
             match_re = re.compile(match)
-        choices = []
+        choices = not is_required and BLANK_CHOICE_DASH[:] or []
         if recursive:
             for root, dirs, files in os.walk(path):
                 for f in files:

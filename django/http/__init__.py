@@ -265,6 +265,12 @@ class HttpResponseForbidden(HttpResponse):
         HttpResponse.__init__(self, *args, **kwargs)
         self.status_code = 403
 
+class HttpResponseNotAllowed(HttpResponse):
+    def __init__(self, permitted_methods):
+        HttpResponse.__init__(self)
+        self['Allow'] = ', '.join(permitted_methods)
+        self.status_code = 405
+
 class HttpResponseGone(HttpResponse):
     def __init__(self, *args, **kwargs):
         HttpResponse.__init__(self, *args, **kwargs)

@@ -355,8 +355,8 @@ Here's what ``django.contrib.auth.views.login`` does::
       form.
 
 It's your responsibility to provide the login form in a template called
-``registration/login.html``. This template gets passed three template context
-variables:
+``registration/login.html`` by default. This template gets passed three
+template context variables:
 
     * ``form``: A ``FormWrapper`` object representing the login form. See the
       `forms documentation`_ for more on ``FormWrapper`` objects.
@@ -364,6 +364,13 @@ variables:
       a query string, too.
     * ``site_name``: The name of the current ``Site``, according to the
       ``SITE_ID`` setting. See the `site framework docs`_.
+
+If you'd prefer not to call the template ``registration/login.html``, you can
+pass the ``template_name`` parameter via the extra arguments to the view in
+your URLconf. For example, this URLconf line would use ``myapp/login.html``
+instead::
+
+    (r'^accounts/login/$', 'django.contrib.auth.views.login', {'template_name': 'myapp/login.html'}),
 
 Here's a sample ``registration/login.html`` template you can use as a starting
 point. It assumes you have a ``base.html`` template that defines a ``content``

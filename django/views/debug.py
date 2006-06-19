@@ -111,6 +111,12 @@ def technical_500_response(request, exc_type, exc_value, tb):
             })
         tb = tb.tb_next
 
+    if not frames:
+        frames = [{
+            'filename': '&lt;unknown&gt;',
+            'function': '?',
+            'lineno': '?',
+        }]
     t = Template(TECHNICAL_500_TEMPLATE)
     c = Context({
         'exception_type': exc_type.__name__,

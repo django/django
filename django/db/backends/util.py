@@ -1,7 +1,7 @@
 import datetime
 from time import time
 
-class CursorDebugWrapper:
+class CursorDebugWrapper(object):
     def __init__(self, cursor, db):
         self.cursor = cursor
         self.db = db

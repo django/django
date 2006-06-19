@@ -1,4 +1,4 @@
-class MergeDict:
+class MergeDict(object):
     """
     A simple class for creating new "virtual" dictionaries that actualy look
     up values in more than one dictionary, passed in the constructor.

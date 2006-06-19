@@ -211,35 +211,38 @@ def _get_sql_for_pending_references(klass, pending_references):
 
 def _get_many_to_many_sql_for_model(klass):
     from django.db import backend, get_creation_module
+    from django.db.models import GenericRel
+    
     data_types = get_creation_module().DATA_TYPES
 
     opts = klass._meta
     final_output = []
     for f in opts.many_to_many:
-        table_output = [style.SQL_KEYWORD('CREATE TABLE') + ' ' + \
-            style.SQL_TABLE(backend.quote_name(f.m2m_db_table())) + ' (']
-        table_output.append('    %s %s %s,' % \
-            (style.SQL_FIELD(backend.quote_name('id')),
-            style.SQL_COLTYPE(data_types['AutoField']),
-            style.SQL_KEYWORD('NOT NULL PRIMARY KEY')))
-        table_output.append('    %s %s %s %s (%s),' % \
-            (style.SQL_FIELD(backend.quote_name(f.m2m_column_name())),
-            style.SQL_COLTYPE(data_types[get_rel_data_type(opts.pk)] % opts.pk.__dict__),
-            style.SQL_KEYWORD('NOT NULL REFERENCES'),
-            style.SQL_TABLE(backend.quote_name(opts.db_table)),
-            style.SQL_FIELD(backend.quote_name(opts.pk.column))))
-        table_output.append('    %s %s %s %s (%s),' % \
-            (style.SQL_FIELD(backend.quote_name(f.m2m_reverse_name())),
-            style.SQL_COLTYPE(data_types[get_rel_data_type(f.rel.to._meta.pk)] % f.rel.to._meta.pk.__dict__),
-            style.SQL_KEYWORD('NOT NULL REFERENCES'),
-            style.SQL_TABLE(backend.quote_name(f.rel.to._meta.db_table)),
-            style.SQL_FIELD(backend.quote_name(f.rel.to._meta.pk.column))))
-        table_output.append('    %s (%s, %s)' % \
-            (style.SQL_KEYWORD('UNIQUE'),
-            style.SQL_FIELD(backend.quote_name(f.m2m_column_name())),
-            style.SQL_FIELD(backend.quote_name(f.m2m_reverse_name()))))
-        table_output.append(');')
-        final_output.append('\n'.join(table_output))
+        if not isinstance(f.rel, GenericRel):
+            table_output = [style.SQL_KEYWORD('CREATE TABLE') + ' ' + \
+                style.SQL_TABLE(backend.quote_name(f.m2m_db_table())) + ' (']
+            table_output.append('    %s %s %s,' % \
+                (style.SQL_FIELD(backend.quote_name('id')),
+                style.SQL_COLTYPE(data_types['AutoField']),
+                style.SQL_KEYWORD('NOT NULL PRIMARY KEY')))
+            table_output.append('    %s %s %s %s (%s),' % \
+                (style.SQL_FIELD(backend.quote_name(f.m2m_column_name())),
+                style.SQL_COLTYPE(data_types[get_rel_data_type(opts.pk)] % opts.pk.__dict__),
+                style.SQL_KEYWORD('NOT NULL REFERENCES'),
+                style.SQL_TABLE(backend.quote_name(opts.db_table)),
+                style.SQL_FIELD(backend.quote_name(opts.pk.column))))
+            table_output.append('    %s %s %s %s (%s),' % \
+                (style.SQL_FIELD(backend.quote_name(f.m2m_reverse_name())),
+                style.SQL_COLTYPE(data_types[get_rel_data_type(f.rel.to._meta.pk)] % f.rel.to._meta.pk.__dict__),
+                style.SQL_KEYWORD('NOT NULL REFERENCES'),
+                style.SQL_TABLE(backend.quote_name(f.rel.to._meta.db_table)),
+                style.SQL_FIELD(backend.quote_name(f.rel.to._meta.pk.column))))
+            table_output.append('    %s (%s, %s)' % \
+                (style.SQL_KEYWORD('UNIQUE'),
+                style.SQL_FIELD(backend.quote_name(f.m2m_column_name())),
+                style.SQL_FIELD(backend.quote_name(f.m2m_reverse_name()))))
+            table_output.append(');')
+            final_output.append('\n'.join(table_output))
     return final_output
 
 def get_sql_delete(app):
@@ -815,10 +818,8 @@ def get_validation_errors(outfile, app=None):
 
         # Do field-specific validation.
         for f in opts.fields:
-            # Check for deprecated args
-            dep_args = getattr(f, 'deprecated_args', None)
-            if dep_args:
-                e.add(opts, "'%s' Initialized with deprecated args:%s" % (f.name, ",".join(dep_args)))
+            if f.name == 'id' and not f.primary_key and opts.pk.name == 'id':
+                e.add(opts, '"%s": You can\'t use "id" as a field name, because each model automatically gets an "id" field if none of the fields have primary_key=True. You need to either remove/rename your "id" field or add primary_key=True to a field.' % f.name)
             if isinstance(f, models.CharField) and f.maxlength in (None, 0):
                 e.add(opts, '"%s": CharFields require a "maxlength" attribute.' % f.name)
             if isinstance(f, models.FloatField):
@@ -836,8 +837,8 @@ def get_validation_errors(outfile, app=None):
             if f.prepopulate_from is not None and type(f.prepopulate_from) not in (list, tuple):
                 e.add(opts, '"%s": prepopulate_from should be a list or tuple.' % f.name)
             if f.choices:
-                if not type(f.choices) in (tuple, list):
-                    e.add(opts, '"%s": "choices" should be either a tuple or list.' % f.name)
+                if not hasattr(f.choices, '__iter__'):
+                    e.add(opts, '"%s": "choices" should be iterable (e.g., a tuple or list).' % f.name)
                 else:
                     for c in f.choices:
                         if not type(c) in (tuple, list) or len(c) != 2:
@@ -923,6 +924,7 @@ def get_validation_errors(outfile, app=None):
                     field_name = field_name[1:]
                 if opts.order_with_respect_to and field_name == '_order':
                     continue
+                if '.' in field_name: continue # Skip ordering in the format 'table.field'.
                 try:
                     opts.get_field(field_name, many_to_many=False)
                 except models.FieldDoesNotExist:

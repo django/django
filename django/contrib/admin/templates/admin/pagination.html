@@ -1,4 +1,5 @@
 {% load admin_list %}
+{% load i18n %}
 <p class="paginator">
 {% if pagination_required %}
 {% for i in page_range %}
@@ -6,5 +7,5 @@
 {% endfor %}
 {% endif %}
 {{ cl.result_count }} {% ifequal cl.result_count 1 %}{{ cl.opts.verbose_name }}{% else %}{{ cl.opts.verbose_name_plural }}{% endifequal %}
-{% if show_all_url %}&nbsp;&nbsp;<a href="{{ show_all_url }}" class="showall">Show all</a>{% endif %}
+{% if show_all_url %}&nbsp;&nbsp;<a href="{{ show_all_url }}" class="showall">{% trans 'Show all' %}</a>{% endif %}
 </p>

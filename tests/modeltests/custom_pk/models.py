@@ -8,7 +8,8 @@ this behavior by explicitly adding ``primary_key=True`` to a field.
 from django.db import models
 
 class Employee(models.Model):
-    employee_code = models.CharField(maxlength=10, primary_key=True)
+    employee_code = models.CharField(maxlength=10, primary_key=True,
+            db_column = 'code')
     first_name = models.CharField(maxlength=20)
     last_name = models.CharField(maxlength=20)
     class Meta:

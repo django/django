@@ -12,7 +12,7 @@ from django.conf import global_settings
 
 ENVIRONMENT_VARIABLE = "DJANGO_SETTINGS_MODULE"
 
-class LazySettings:
+class LazySettings(object):
     """
     A lazy proxy for either global Django settings or a custom settings object.
     The user can manually configure settings prior to using them. Otherwise,
@@ -67,7 +67,7 @@ class LazySettings:
             setattr(holder, name, value)
         self._target = holder
 
-class Settings:
+class Settings(object):
     def __init__(self, settings_module):
         # update this dict from global settings (but only for ALL_CAPS settings)
         for setting in dir(global_settings):
@@ -112,7 +112,7 @@ class Settings:
     def get_all_members(self):
         return dir(self)
 
-class UserSettingsHolder:
+class UserSettingsHolder(object):
     """
     Holder for user configured settings.
     """

@@ -535,7 +535,7 @@ class FileField(Field):
         if not self.blank:
             if rel:
                 # This validator makes sure FileFields work in a related context.
-                class RequiredFileField:
+                class RequiredFileField(object):
                     def __init__(self, other_field_names, other_file_field_name):
                         self.other_field_names = other_field_names
                         self.other_file_field_name = other_file_field_name
