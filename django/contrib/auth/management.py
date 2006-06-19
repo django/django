@@ -23,8 +23,6 @@ def create_permissions(app, created_models):
     if not app_models:
         return
     for klass in app_models:
-        if not klass._meta.admin:
-            continue
         ctype = ContentType.objects.get_for_model(klass)
         for codename, name in _get_all_permissions(klass._meta):
             try:
