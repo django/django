@@ -125,12 +125,10 @@ msgid "approved by staff"
 msgstr "одобрено администрацией"
 
 #: contrib/comments/models.py:176
-#, fuzzy
 msgid "free comment"
 msgstr "Свободный комментарий"
 
 #: contrib/comments/models.py:177
-#, fuzzy
 msgid "free comments"
 msgstr "Свободные комментарии"
 
@@ -143,13 +141,12 @@ msgid "score date"
 msgstr "счёт времени"
 
 #: contrib/comments/models.py:237
-#, fuzzy
 msgid "karma score"
-msgstr "счёт"
+msgstr "Карма счёт"
 
 #: contrib/comments/models.py:238
 msgid "karma scores"
-msgstr ""
+msgstr "Карма счета"
 
 #: contrib/comments/models.py:242
 #, python-format
@@ -172,12 +169,10 @@ msgid "flag date"
 msgstr "отметка даты"
 
 #: contrib/comments/models.py:268
-#, fuzzy
 msgid "user flag"
 msgstr "Признак пользователя"
 
 #: contrib/comments/models.py:269
-#, fuzzy
 msgid "user flags"
 msgstr "Признаки пользователя"
 
@@ -191,14 +186,12 @@ msgid "deletion date"
 msgstr "дата удаления"
 
 #: contrib/comments/models.py:280
-#, fuzzy
 msgid "moderator deletion"
-msgstr "Удалено модератором"
+msgstr "Удаленно модератором"
 
 #: contrib/comments/models.py:281
-#, fuzzy
 msgid "moderator deletions"
-msgstr "Удалено модератором"
+msgstr "Удаления модератором"
 
 #: contrib/comments/models.py:285
 #, python-format
@@ -742,7 +735,7 @@ msgstr "К сожалению, запрашиваемая вами страни�
 #: contrib/admin/templates/admin/index.html:17
 #, python-format
 msgid "Models available in the %(name)s application."
-msgstr ""
+msgstr "Модели доступны в %(name)s приложении."
 
 #: contrib/admin/templates/admin/index.html:28
 #: contrib/admin/templates/admin/change_form.html:15
@@ -818,11 +811,11 @@ msgstr ""
 
 #: contrib/admin/templates/admin/search_form.html:8
 msgid "Go"
-msgstr ""
+msgstr "Вперёд"
 
 #: contrib/admin/templates/admin/change_form.html:21
 msgid "View on site"
-msgstr ""
+msgstr "Смотреть сайт"
 
 #: contrib/admin/templates/admin/change_form.html:30
 msgid "Please correct the error below."
@@ -832,7 +825,7 @@ msgstr[1] "Пожалуйста исправьте ошибки ниже."
 
 #: contrib/admin/templates/admin/change_form.html:48
 msgid "Ordering"
-msgstr ""
+msgstr "Очерёдность"
 
 #: contrib/admin/templates/admin/change_form.html:51
 msgid "Order:"
@@ -967,11 +960,11 @@ msgstr "Спасибо за посещение нашего сайта!"
 #: contrib/admin/templates/registration/password_reset_email.html:15
 #, python-format
 msgid "The %(site_name)s team"
-msgstr "Команда сайта di %(site_name)s"
+msgstr "Команда сайта %(site_name)s"
 
 #: contrib/admin/templates/admin_doc/bookmarklets.html:3
 msgid "Bookmarklets"
-msgstr ""
+msgstr "Закладки"
 
 #: contrib/admin/templates/admin_doc/bookmarklets.html:5
 msgid "Documentation bookmarklets"
@@ -1018,7 +1011,7 @@ msgstr "Редактировать данный обьект (в текущем 
 
 #: contrib/admin/templates/admin_doc/bookmarklets.html:26
 msgid "Jumps to the admin page for pages that represent a single object."
-msgstr ""
+msgstr "Перейти на страницу администратор для страниц представляющих один объект."
 
 #: contrib/admin/templates/admin_doc/bookmarklets.html:28
 msgid "Edit this object (new window)"
@@ -1129,22 +1122,18 @@ msgid "codename"
 msgstr "код"
 
 #: contrib/auth/models.py:17
-#, fuzzy
 msgid "permission"
 msgstr "Права"
 
 #: contrib/auth/models.py:18 contrib/auth/models.py:27
-#, fuzzy
 msgid "permissions"
 msgstr "Права"
 
 #: contrib/auth/models.py:29
-#, fuzzy
 msgid "group"
 msgstr "Группа"
 
 #: contrib/auth/models.py:30 contrib/auth/models.py:65
-#, fuzzy
 msgid "groups"
 msgstr "Группы"
 
@@ -1205,17 +1194,14 @@ msgstr ""
 "все права группы, к которой он принадлежит."
 
 #: contrib/auth/models.py:67
-#, fuzzy
 msgid "user permissions"
-msgstr "Права"
+msgstr "Права пользователя"
 
 #: contrib/auth/models.py:70
-#, fuzzy
 msgid "user"
 msgstr "Пользователь"
 
 #: contrib/auth/models.py:71
-#, fuzzy
 msgid "users"
 msgstr "Пользователи"
 
@@ -1236,7 +1222,6 @@ msgid "Groups"
 msgstr "Группы"
 
 #: contrib/auth/models.py:219
-#, fuzzy
 msgid "message"
 msgstr "Сообщение"
 
@@ -1247,9 +1232,8 @@ msgid ""
 msgstr ""
 
 #: contrib/contenttypes/models.py:25
-#, fuzzy
 msgid "python model class name"
-msgstr "имя python модуля"
+msgstr "имя класса python модуля"
 
 #: contrib/contenttypes/models.py:28
 msgid "content type"
@@ -1384,54 +1368,52 @@ msgid "December"
 msgstr "Декабрь"
 
 #: utils/dates.py:19
-#, fuzzy
 msgid "jan"
-msgstr "и"
+msgstr "янв"
 
 #: utils/dates.py:19
 msgid "feb"
-msgstr ""
+msgstr "фев"
 
 #: utils/dates.py:19
 msgid "mar"
-msgstr ""
+msgstr "мар"
 
 #: utils/dates.py:19
 msgid "apr"
-msgstr ""
+msgstr "апр"
 
 #: utils/dates.py:19
-#, fuzzy
 msgid "may"
-msgstr "Май"
+msgstr "май"
 
 #: utils/dates.py:19
 msgid "jun"
-msgstr ""
+msgstr "июнь"
 
 #: utils/dates.py:20
 msgid "jul"
-msgstr ""
+msgstr "июль"
 
 #: utils/dates.py:20
 msgid "aug"
-msgstr ""
+msgstr "авг"
 
 #: utils/dates.py:20
 msgid "sep"
-msgstr ""
+msgstr "сен"
 
 #: utils/dates.py:20
 msgid "oct"
-msgstr ""
+msgstr "окт"
 
 #: utils/dates.py:20
 msgid "nov"
-msgstr ""
+msgstr "нояб"
 
 #: utils/dates.py:20
 msgid "dec"
-msgstr ""
+msgstr "дек"
 
 #: utils/dates.py:27
 msgid "Jan."
@@ -1476,8 +1458,8 @@ msgstr[1] "месяцев"
 #: utils/timesince.py:14
 msgid "week"
 msgid_plural "weeks"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "неделя"
+msgstr[1] "недель"
 
 #: utils/timesince.py:15
 msgid "day"
@@ -1610,11 +1592,11 @@ msgid "This value must contain only letters, numbers and underscores."
 msgstr "Значение может содержать только буквы, цифры и подчеркивания."
 
 #: core/validators.py:64
-#, fuzzy
 msgid ""
 "This value must contain only letters, numbers, underscores, dashes or "
 "slashes."
-msgstr "Значение может содержать только буквы, цифры и подчеркивания."
+msgstr "Значение может содержать только буквы, цифры, подчеркивания, дифисы или "
+"тере."
 
 #: core/validators.py:72
 msgid "Uppercase letters are not allowed here."
