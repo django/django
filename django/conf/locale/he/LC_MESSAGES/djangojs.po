@@ -2,7 +2,6 @@
 # Copyright (C) 2006 THE djangojs'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the djangojs package.
 # Meir Kriheli <meir@mksoft.co.il>, 2006.
-# , fuzzy
 # 
 # 
 msgid ""
@@ -53,7 +52,7 @@ msgstr "%s נבחרות"
 
 #: contrib/admin/media/js/SelectFilter2.js:54
 msgid "Select your choice(s) and click "
-msgstr "יש לסמן את ההרשאות המבוקשות וללחוץ על"
+msgstr "יש לסמן את ההרשאות המבוקשות וללחוץ על "
 
 #: contrib/admin/media/js/SelectFilter2.js:59
 msgid "Clear all"
