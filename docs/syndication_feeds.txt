@@ -439,6 +439,23 @@ This example illustrates all possible attributes and methods for a ``Feed`` clas
 
         author_link = 'http://www.example.com/' # Hard-coded author URL.
 
+        # CATEGORIES -- One of the following three is optional. The framework
+        # looks for them in this order. In each case, the method/attribute
+        # should return an iterable object that returns strings.
+
+        def categories(self, obj):
+            """
+            Takes the object returned by get_object() and returns the feed's
+            categories as iterable over strings.
+            """
+
+        def categories(self):
+            """
+            Returns the feed's categories as iterable over strings.
+            """
+
+        categories = ("python", "django") # Hard-coded list of categories.
+
         # ITEMS -- One of the following three is required. The framework looks
         # for them in this order.
 
@@ -601,6 +618,25 @@ This example illustrates all possible attributes and methods for a ``Feed`` clas
             """
 
         item_pubdate = datetime.datetime(2005, 5, 3) # Hard-coded pubdate.
+
+        # ITEM CATEGORIES -- It's optional to use one of these three. This is
+        # a hook that specifies how to get the list of categories for a given
+        # item. In each case, the method/attribute should return an iterable
+        # object that returns strings.
+
+        def item_categories(self, item):
+            """
+            Takes an item, as returned by items(), and returns the item's
+            categories.
+            """
+
+        def item_categories(self):
+            """
+            Returns the categories for every item in the feed.
+            """
+
+        item_categories = ("python", "django") # Hard-coded categories.
+
 
 The low-level framework
 =======================

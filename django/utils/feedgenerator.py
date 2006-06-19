@@ -126,6 +126,8 @@ class RssFeed(SyndicationFeed):
         handler.addQuickElement(u"description", self.feed['description'])
         if self.feed['language'] is not None:
             handler.addQuickElement(u"language", self.feed['language'])
+        for cat in self.feed['categories']:
+            handler.addQuickElement(u"category", cat)
         self.write_items(handler)
         self.endChannelElement(handler)
         handler.endElement(u"rss")
