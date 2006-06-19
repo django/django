@@ -64,7 +64,7 @@ API_TESTS = """
 ...     o.save()
 
 # Objects with declared GenericRelations can be tagged directly -- the API
-# mimics the many-to-many API
+# mimics the many-to-many API.
 >>> lion.tags.create(tag="yellow")
 <TaggedItem: yellow>
 >>> lion.tags.create(tag="hairy")
@@ -79,26 +79,26 @@ API_TESTS = """
 >>> bacon.tags.all()
 [<TaggedItem: fatty>, <TaggedItem: salty>]
 
-# You can easily access the content object like a foreign key
+# You can easily access the content object like a foreign key.
 >>> t = TaggedItem.objects.get(tag="salty")
 >>> t.content_object
 <Vegetable: Bacon>
 
 # Recall that the Mineral class doesn't have an explicit GenericRelation
-# defined. That's OK since you can create TaggedItems explicitally.
+# defined. That's OK, because you can create TaggedItems explicitly.
 >>> tag1 = TaggedItem(content_object=quartz, tag="shiny")
 >>> tag2 = TaggedItem(content_object=quartz, tag="clearish")
 >>> tag1.save()
 >>> tag2.save()
 
-# However, not having the convience takes a small toll when it comes
-# to do lookups
+# However, excluding GenericRelations means your lookups have to be a bit more
+# explicit.
 >>> from django.contrib.contenttypes.models import ContentType
 >>> ctype = ContentType.objects.get_for_model(quartz)
 >>> TaggedItem.objects.filter(content_type__pk=ctype.id, object_id=quartz.id)
 [<TaggedItem: clearish>, <TaggedItem: shiny>]
 
-# You can set a generic foreign key in the way you'd expect
+# You can set a generic foreign key in the way you'd expect.
 >>> tag1.content_object = platypus
 >>> tag1.save()
 >>> platypus.tags.all()
