@@ -400,6 +400,10 @@ types of HTTP responses. Like ``HttpResponse``, these subclasses live in
 ``HttpResponseForbidden``
     Acts just like ``HttpResponse`` but uses a 403 status code.
 
+``HttpResponseNotAllowed``
+    Like ``HttpResponse``, but uses a 405 status code. Takes a single,
+    required argument: a list of permitted methods (e.g. ``['GET', 'POST']``).
+
 ``HttpResponseGone``
     Acts just like ``HttpResponse`` but uses a 410 status code.
 
