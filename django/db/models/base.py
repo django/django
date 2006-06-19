@@ -107,6 +107,12 @@ class Model(object):
             else:
                 val = kwargs.pop(f.attname, f.get_default())
                 setattr(self, f.attname, val)
+        for prop in kwargs.keys():
+            try:
+                if isinstance(getattr(self.__class__, prop), property):
+                    setattr(self, prop, kwargs.pop(prop))
+            except AttributeError:
+                pass
         if kwargs:
             raise TypeError, "'%s' is an invalid keyword argument for this function" % kwargs.keys()[0]
         for i, arg in enumerate(args):
