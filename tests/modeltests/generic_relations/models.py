@@ -5,7 +5,7 @@ Generic relations let an object have a foreign key to any object through a
 content-type/object-id field. A generic foreign key can point to any object,
 be it animal, vegetable, or mineral.
 
-The cannonical example is tags (although this example implementation is *far*
+The canonical example is tags (although this example implementation is *far*
 from complete).
 """
 
