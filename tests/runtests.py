@@ -9,6 +9,7 @@ import doctest
 
 MODEL_TESTS_DIR_NAME = 'modeltests'
 OTHER_TESTS_DIR = "othertests"
+REGRESSION_TESTS_DIR_NAME = 'regressiontests'
 TEST_DATABASE_NAME = 'django_test_db'
 
 error_list = []
@@ -19,6 +20,7 @@ def log_error(model_name, title, description):
     })
 
 MODEL_TEST_DIR = os.path.join(os.path.dirname(__file__), MODEL_TESTS_DIR_NAME)
+REGRESSION_TEST_DIR = os.path.join(os.path.dirname(__file__), REGRESSION_TESTS_DIR_NAME)
 
 ALWAYS_INSTALLED_APPS = [
     'django.contrib.contenttypes',
@@ -32,7 +34,8 @@ ALWAYS_INSTALLED_APPS = [
 ]
 
 def get_test_models():
-    return [f for f in os.listdir(MODEL_TEST_DIR) if not f.startswith('__init__') and not f.startswith('.')]
+    return [(MODEL_TESTS_DIR_NAME, f) for f in os.listdir(MODEL_TEST_DIR) if not f.startswith('__init__') and not f.startswith('.')] +\
+        [(REGRESSION_TESTS_DIR_NAME, f) for f in os.listdir(REGRESSION_TEST_DIR) if not f.startswith('__init__') and not f.startswith('.')]
 
 class DjangoDoctestRunner(doctest.DocTestRunner):
     def __init__(self, verbosity_level, *args, **kwargs):
@@ -89,7 +92,7 @@ class TestRunner:
         settings.INSTALLED_APPS
 
         # Manually set INSTALLED_APPS to point to the test models.
-        settings.INSTALLED_APPS = ALWAYS_INSTALLED_APPS + [MODEL_TESTS_DIR_NAME + '.' + a for a in get_test_models()]
+        settings.INSTALLED_APPS = ALWAYS_INSTALLED_APPS + ['.'.join(a) for a in get_test_models()]
 
         # Manually set DEBUG = False.
         settings.DEBUG = False
@@ -110,12 +113,17 @@ class TestRunner:
 
         if self.which_tests:
             # Only run the specified tests.
-            bad_models = [m for m in self.which_tests if m not in test_models]
+            bad_models = [m for m in self.which_tests if (MODEL_TESTS_DIR_NAME, m) not in test_models and (REGRESSION_TESTS_DIR_NAME, m) not in test_models]
             if bad_models:
                 sys.stderr.write("Models not found: %s\n" % bad_models)
                 sys.exit(1)
             else:
-                test_models = self.which_tests
+                all_tests = []
+                for test in self.which_tests:
+                    for loc in MODEL_TESTS_DIR_NAME, REGRESSION_TESTS_DIR_NAME:
+                        if (loc, test) in test_models:
+                            all_tests.append((loc, test))
+                test_models = all_tests
 
         self.output(0, "Running tests with database %r" % settings.DATABASE_ENGINE)
 
@@ -157,18 +165,18 @@ class TestRunner:
 
         # Run the tests for each test model.
         self.output(1, "Running app tests")
-        for model_name in test_models:
+        for model_dir, model_name in test_models:
             self.output(1, "%s model: Importing" % model_name)
             try:
                 # TODO: Abstract this into a meta.get_app() replacement?
-                mod = __import__(MODEL_TESTS_DIR_NAME + '.' + model_name + '.models', '', '', [''])
+                mod = __import__(model_dir + '.' + model_name + '.models', '', '', [''])
             except Exception, e:
                 log_error(model_name, "Error while importing", ''.join(traceback.format_exception(*sys.exc_info())[1:]))
                 continue
 
             if not getattr(mod, 'error_log', None):
                 # Model is not marked as an invalid model
-                self.output(1, "%s model: Installing" % model_name)
+                self.output(1, "%s.%s model: Installing" % (model_dir, model_name))
                 management.install(mod)
 
                 # Run the API tests.
@@ -179,11 +187,11 @@ class TestRunner:
                 # Manually set verbose=False, because "-v" command-line parameter
                 # has side effects on doctest TestRunner class.
                 runner = DjangoDoctestRunner(verbosity_level=verbosity_level, verbose=False)
-                self.output(1, "%s model: Running tests" % model_name)
+                self.output(1, "%s.%s model: Running tests" % (model_dir, model_name))
                 runner.run(dtest, clear_globs=True, out=sys.stdout.write)
             else:
                 # Check that model known to be invalid is invalid for the right reasons.
-                self.output(1, "%s model: Validating" % model_name)
+                self.output(1, "%s.%s model: Validating" % (model_dir, model_name))
 
                 from cStringIO import StringIO
                 s = StringIO()
