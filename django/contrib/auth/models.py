@@ -160,7 +160,7 @@ class User(models.Model):
     def get_all_permissions(self):
         if not hasattr(self, '_perm_cache'):
             import sets
-            self._perm_cache = sets.Set(["%s.%s" % (p.content_type.app_label, p.codename) for p in self.user_permissions.all()])
+            self._perm_cache = sets.Set(["%s.%s" % (p.content_type.app_label, p.codename) for p in self.user_permissions.select_related()])
             self._perm_cache.update(self.get_group_permissions())
         return self._perm_cache
 
