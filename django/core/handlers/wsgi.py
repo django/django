@@ -55,6 +55,7 @@ class WSGIRequest(http.HttpRequest):
         self.environ = environ
         self.path = environ['PATH_INFO']
         self.META = environ
+        self.method = environ['REQUEST_METHOD'].upper()
 
     def __repr__(self):
         from pprint import pformat

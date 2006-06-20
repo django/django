@@ -12,11 +12,12 @@ except ImportError:
 class Http404(Exception):
     pass
 
-class HttpRequest(object): # needs to be new-style class because subclasses define "property"s
+class HttpRequest(object):
     "A basic HTTP request"
     def __init__(self):
         self.GET, self.POST, self.COOKIES, self.META, self.FILES = {}, {}, {}, {}, {}
         self.path = ''
+        self.method = None
 
     def __repr__(self):
         return '<HttpRequest\nGET:%s,\nPOST:%s,\nCOOKIES:%s,\nMETA:%s>' % \
@@ -282,7 +283,7 @@ class HttpResponseServerError(HttpResponse):
         self.status_code = 500
 
 def get_host(request):
-    """Gets the HTTP host from the environment or request headers."""
+    "Gets the HTTP host from the environment or request headers."
     host = request.META.get('HTTP_X_FORWARDED_HOST', '')
     if not host:
         host = request.META.get('HTTP_HOST', '')

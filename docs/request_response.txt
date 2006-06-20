@@ -29,6 +29,15 @@ All attributes except ``session`` should be considered read-only.
 
     Example: ``"/music/bands/the_beatles/"``
 
+``method``
+    A string representing the HTTP method used in the request. This is
+    guaranteed to be uppercase. Example::
+
+        if request.method == 'GET':
+            do_something()
+        elif request.method == 'POST':
+            do_something_else()
+
 ``GET``
     A dictionary-like object containing all given HTTP GET parameters. See the
     ``QueryDict`` documentation below.
@@ -36,6 +45,11 @@ All attributes except ``session`` should be considered read-only.
 ``POST``
     A dictionary-like object containing all given HTTP POST parameters. See the
     ``QueryDict`` documentation below.
+
+    It's possible that a request can come in via POST with an empty ``POST``
+    dictionary -- if, say, a form is requested via the POST HTTP method but
+    does not include form data. Therefore, you shouldn't use ``if request.POST``
+    to check for use of the POST method; instead, check `method`_.
 
     Note: ``POST`` does *not* include file-upload information. See ``FILES``.
 
