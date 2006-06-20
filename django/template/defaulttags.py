@@ -88,6 +88,8 @@ class ForNode(Node):
             values = []
         if values is None:
             values = []
+        if not hasattr(values, '__len__'):
+            values = list(values)
         len_values = len(values)
         if self.reversed:
             # From http://www.python.org/doc/current/tut/node11.html
