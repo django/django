@@ -10,6 +10,18 @@ class SiteProfileNotAvailable(Exception):
     pass
 
 class Permission(models.Model):
+    """The permissions system provides a way to assign permissions to specific users and groups of users.
+
+    The permission system is used by the Django admin site, but may also be useful in your own code. The Django admin site uses permissions as follows:
+
+        - The "add" permission limits the user's ability to view the "add" form and add an object.
+        - The "change" permission limits a user's ability to view the change list, view the "change" form and change an object.
+        - The "delete" permission limits the ability to delete an object.
+        
+    Permissions are set globally per type of object, not per specific object instance. It is possible to say "Mary may change news stories," but it's not currently possible to say "Mary may change news stories, but only the ones she created herself" or "Mary may only change news stories that have a certain status or publication date."
+
+    Three basic permissions -- add, create and delete -- are automatically created for each Django model.
+    """
     name = models.CharField(_('name'), maxlength=50)
     content_type = models.ForeignKey(ContentType)
     codename = models.CharField(_('codename'), maxlength=100)
@@ -23,6 +35,12 @@ class Permission(models.Model):
         return "%s | %s" % (self.content_type, self.name)
 
 class Group(models.Model):
+    """Groups are a generic way of categorizing users to apply permissions, or some other label, to those users. A user can belong to any number of groups.
+
+    A user in a group automatically has all the permissions granted to that group. For example, if the group Site editors has the permission can_edit_home_page, any user in that group will have that permission.
+
+    Beyond permissions, groups are a convenient way to categorize users to apply some label, or extended functionality, to them. For example, you could create a group 'Special users', and you could write code that would do special things to those users -- such as giving them access to a members-only portion of your site, or sending them members-only e-mail messages.
+    """
     name = models.CharField(_('name'), maxlength=80, unique=True)
     permissions = models.ManyToManyField(Permission, verbose_name=_('permissions'), blank=True, filter_interface=models.HORIZONTAL)
     class Meta:
@@ -52,14 +70,18 @@ class UserManager(models.Manager):
         return ''.join([choice(allowed_chars) for i in range(length)])
 
 class User(models.Model):
-    username = models.CharField(_('username'), maxlength=30, unique=True, validator_list=[validators.isAlphaNumeric])
+    """Users within the Django authentication system are represented by this model.
+
+    Username and password are required, other fields are optional.
+    """
+    username = models.CharField(_('username'), maxlength=30, unique=True, validator_list=[validators.isAlphaNumeric], help_text=_("Required. 30 characters or fewer. Alphanumeric characters only (letters, digits and underscores)."))
     first_name = models.CharField(_('first name'), maxlength=30, blank=True)
     last_name = models.CharField(_('last name'), maxlength=30, blank=True)
     email = models.EmailField(_('e-mail address'), blank=True)
     password = models.CharField(_('password'), maxlength=128, help_text=_("Use '[algo]$[salt]$[hexdigest]'"))
     is_staff = models.BooleanField(_('staff status'), help_text=_("Designates whether the user can log into this admin site."))
-    is_active = models.BooleanField(_('active'), default=True)
-    is_superuser = models.BooleanField(_('superuser status'))
+    is_active = models.BooleanField(_('active'), default=True, help_text=_("Designates whether this user can log into the Django admin. Unselect this instead of deleting accounts."))
+    is_superuser = models.BooleanField(_('superuser status'), help_text=_("Designates that this user has all permissions without explicitly assigning them."))
     last_login = models.DateTimeField(_('last login'), default=models.LazyDate())
     date_joined = models.DateTimeField(_('date joined'), default=models.LazyDate())
     groups = models.ManyToManyField(Group, verbose_name=_('groups'), blank=True,
@@ -89,9 +111,11 @@ class User(models.Model):
         return "/users/%s/" % self.username
 
     def is_anonymous(self):
+        "Always returns False. This is a way of comparing User objects to anonymous users."
         return False
 
     def get_full_name(self):
+        "Returns the first_name plus the last_name, with a space in between."
         full_name = '%s %s' % (self.first_name, self.last_name)
         return full_name.strip()
 
@@ -215,6 +239,8 @@ class User(models.Model):
         return self._profile_cache
 
 class Message(models.Model):
+    """The message system is a lightweight way to queue messages for given users. A message is associated with a User instance (so it is only applicable for registered users). There's no concept of expiration or timestamps. Messages are created by the Django admin after successful actions. For example, "The poll Foo was created successfully." is a message.
+    """
     user = models.ForeignKey(User)
     message = models.TextField(_('message'))
 
