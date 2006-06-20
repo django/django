@@ -8,16 +8,11 @@ class ContentTypeManager(models.Manager):
         ContentType if necessary.
         """
         opts = model._meta
-        try:
-            return self.model._default_manager.get(app_label=opts.app_label,
-                model=opts.object_name.lower())
-        except self.model.DoesNotExist:
-            # The str() is needed around opts.verbose_name because it's a
-            # django.utils.functional.__proxy__ object.
-            ct = self.model(name=str(opts.verbose_name),
-                app_label=opts.app_label, model=opts.object_name.lower())
-            ct.save()
-            return ct
+        # The str() is needed around opts.verbose_name because it's a
+        # django.utils.functional.__proxy__ object.
+        ct, created = self.model._default_manager.get_or_create(app_label=opts.app_label,
+            model=opts.object_name.lower(), defaults={'name': str(opts.verbose_name)})
+        return ct
 
 class ContentType(models.Model):
     name = models.CharField(maxlength=100)
