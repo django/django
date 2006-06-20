@@ -571,7 +571,7 @@ class NullBooleanField(SelectField):
         return SelectField.render(self, data)
 
     def html2python(data):
-        return {'1': None, '2': True, '3': False}[data]
+        return {None: None, '1': None, '2': True, '3': False}[data]
     html2python = staticmethod(html2python)
 
 class SelectMultipleField(SelectField):
