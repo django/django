@@ -271,13 +271,13 @@ class Model(object):
         value = getattr(self, field.attname)
         return dict(field.choices).get(value, value)
 
-    def _get_next_or_previous_by_FIELD(self, field, is_next):
+    def _get_next_or_previous_by_FIELD(self, field, is_next, **kwargs):
         op = is_next and '>' or '<'
         where = '(%s %s %%s OR (%s = %%s AND %s.%s %s %%s))' % \
             (backend.quote_name(field.column), op, backend.quote_name(field.column),
             backend.quote_name(self._meta.db_table), backend.quote_name(self._meta.pk.column), op)
         param = str(getattr(self, field.attname))
-        q = self.__class__._default_manager.order_by((not is_next and '-' or '') + field.name, (not is_next and '-' or '') + self._meta.pk.name)
+        q = self.__class__._default_manager.filter(**kwargs).order_by((not is_next and '-' or '') + field.name, (not is_next and '-' or '') + self._meta.pk.name)
         q._where.append(where)
         q._params.extend([param, param, getattr(self, self._meta.pk.attname)])
         try:

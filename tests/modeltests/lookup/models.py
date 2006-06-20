@@ -128,6 +128,8 @@ True
 <Article: Article 2>
 >>> a2.get_next_by_pub_date()
 <Article: Article 3>
+>>> a2.get_next_by_pub_date( headline__endswith = '6' )
+<Article: Article 6>
 >>> a3.get_next_by_pub_date()
 <Article: Article 7>
 >>> a4.get_next_by_pub_date()
