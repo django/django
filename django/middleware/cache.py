@@ -33,7 +33,7 @@ class CacheMiddleware(object):
 
     def process_request(self, request):
         "Checks whether the page is already cached and returns the cached version if available."
-        if not request.META['REQUEST_METHOD'] in ('GET', 'HEAD') or request.GET:
+        if not request.method in ('GET', 'HEAD') or request.GET:
             request._cache_update_cache = False
             return None # Don't bother checking the cache.
 
@@ -55,7 +55,7 @@ class CacheMiddleware(object):
         if not hasattr(request, '_cache_update_cache') or not request._cache_update_cache:
             # We don't need to update the cache, just return.
             return response
-        if not request.META['REQUEST_METHOD'] == 'GET':
+        if request.method != 'GET':
             # This is a stronger requirement than above. It is needed
             # because of interactions between this middleware and the
             # HTTPMiddleware, which throws the body of a HEAD-request

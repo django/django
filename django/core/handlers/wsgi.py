@@ -68,7 +68,7 @@ class WSGIRequest(http.HttpRequest):
 
     def _load_post_and_files(self):
         # Populates self._post and self._files
-        if self.environ['REQUEST_METHOD'] == 'POST':
+        if self.method == 'POST':
             if self.environ.get('CONTENT_TYPE', '').startswith('multipart'):
                 header_dict = dict([(k, v) for k, v in self.environ.items() if k.startswith('HTTP_')])
                 header_dict['Content-Type'] = self.environ.get('CONTENT_TYPE', '')

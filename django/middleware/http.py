@@ -31,7 +31,7 @@ class ConditionalGetMiddleware(object):
                 response.content = ''
                 response['Content-Length'] = '0'
 
-        if request.META['REQUEST_METHOD'] == 'HEAD':
+        if request.method == 'HEAD':
             response.content = ''
 
         return response

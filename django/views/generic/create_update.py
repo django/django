@@ -106,7 +106,7 @@ def update_object(request, model, object_id=None, slug=None,
 
     if request.POST:
         new_data = request.POST.copy()
-        if model._meta.has_field_type(FileField): 
+        if model._meta.has_field_type(FileField):
             new_data.update(request.FILES)
         errors = manipulator.get_validation_errors(new_data)
         manipulator.do_html2python(new_data)
@@ -178,7 +178,7 @@ def delete_object(request, model, post_delete_redirect,
     except ObjectDoesNotExist:
         raise Http404, "No %s found for %s" % (model._meta.app_label, lookup_kwargs)
 
-    if request.META['REQUEST_METHOD'] == 'POST':
+    if request.method == 'POST':
         object.delete()
         if not request.user.is_anonymous():
             request.user.message_set.create(message="The %s was deleted." % model._meta.verbose_name)
