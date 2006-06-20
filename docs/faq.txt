@@ -476,7 +476,7 @@ sure your ``DEBUG`` setting is set to ``True``. If ``DEBUG`` is ``True``, then
 Django saves a copy of every SQL statement it has executed.
 
 (The queries are saved in ``django.db.connection.queries``. See
-_`How can I see the raw SQL queries Django is running?`.)
+`How can I see the raw SQL queries Django is running?`_.)
 
 To fix the problem, set ``DEBUG`` to ``False``.
 
