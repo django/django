@@ -35,7 +35,7 @@ to early 1950s. To this day, he's considered one of the best guitarists of all t
 
 Listen to his music. You'll like it.
 
-Django is pronounced **JANG**-oh. Rhymes with FANG-oh.
+Django is pronounced **JANG**-oh. Rhymes with FANG-oh. The "D" is silent.
 
 .. _Django Reinhardt: http://en.wikipedia.org/wiki/Django_Reinhardt
 
@@ -43,8 +43,8 @@ Is Django stable?
 -----------------
 
 Yes. World Online has been using Django for more than two years. Sites built on
-Django have weathered traffic spikes of over one million hits an hour and at
-least one Slashdotting. Yes, it's quite stable.
+Django have weathered traffic spikes of over one million hits an hour and a
+number of Slashdottings. Yes, it's quite stable.
 
 Does Django scale?
 ------------------
@@ -277,7 +277,8 @@ Just run the ``ez_setup.py`` script in the Django distribution.
 What are Django's prerequisites?
 --------------------------------
 
-Django requires Python_ 2.3 or later. No other Python libraries are required.
+Django requires Python_ 2.3 or later. No other Python libraries are required
+for basic Django usage.
 
 For a development environment -- if you just want to experiment with Django --
 you don't need to have a separate Web server installed; Django comes with its
@@ -285,8 +286,9 @@ own lightweight development server. For a production environment, we recommend
 `Apache 2`_ and mod_python_, although Django follows the WSGI_ spec, which
 means it can run on a variety of server platforms.
 
-You'll also need a database engine. PostgreSQL_ is recommended, and MySQL_
-and `SQLite 3`_ are supported.
+If you want to use Django with a database, which is probably the case, you'll
+also need a database engine. PostgreSQL_ is recommended, because we're
+PostgreSQL fans, and MySQL_ and `SQLite 3`_ are also supported.
 
 .. _Python: http://www.python.org/
 .. _Apache 2: http://httpd.apache.org/
@@ -303,7 +305,7 @@ Not if you just want to play around and develop things on your local computer.
 Django comes with its own Web server, and things should Just Work.
 
 For production use, though, we recommend mod_python. The Django developers have
-been running it on mod_python for more than two years, and it's quite stable.
+been running it on mod_python for several years, and it's quite stable.
 
 However, if you don't want to use mod_python, you can use a different server,
 as long as that server has WSGI_ hooks. See the `server arrangements wiki page`_.
@@ -379,9 +381,11 @@ Do I have to use your model/database layer?
 -------------------------------------------
 
 Nope. Just like the template system, the model/database layer is decoupled from
-the rest of the framework. The one exception is: If you use a different
-database library, you won't get to use Django's automatically-generated admin
-site. That app is coupled to the Django database layer.
+the rest of the framework.
+
+The one exception is: If you use a different database library, you won't get to
+use Django's automatically-generated admin site. That app is coupled to the
+Django database layer.
 
 How do I use image and file fields?
 -----------------------------------
@@ -462,6 +466,25 @@ Can I use Django with a pre-existing database?
 Yes. See `Integrating with a legacy database`_.
 
 .. _`Integrating with a legacy database`: http://www.djangoproject.com/documentation/legacy_databases/
+
+Why is Django leaking memory?
+-----------------------------
+
+Django isn't known to leak memory. If you find your Django processes are
+allocating more and more memory, with no sign of releasing it, check to make
+sure your ``DEBUG`` setting is set to ``True``. If ``DEBUG`` is ``True``, then
+Django saves a copy of every SQL statement it has executed.
+
+(The queries are saved in ``django.db.connection.queries``. See
+_`How can I see the raw SQL queries Django is running?`.)
+
+To fix the problem, set ``DEBUG`` to ``False``.
+
+If you need to clear the query list manually at any point in your functions,
+just call ``reset_queries()``, like this::
+
+    from django import db
+    db.reset_queries()
 
 The admin site
 ==============
