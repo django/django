@@ -1,0 +1,262 @@
+==============================
+How to use Django with FastCGI
+==============================
+
+Although the current preferred setup for running Django is Apache_ with
+`mod_python`_, many people use shared hosting, on which FastCGI_ is the only
+viable option. In some setups, FastCGI also allows better security -- and,
+possibly, better performance -- than mod_python.
+
+Essentially, FastCGI is an efficient way of letting an external application
+serve pages to a Web server. The Web server delegates the incoming Web requests
+(via a socket) to FastCGI, which executes the code and passes the response back
+to the Web server, which, in turn, passes it back to the client's Web browser.
+
+Like mod_python, FastCGI allows code to stay in memory, allowing requests to be
+served with no startup time. Unlike mod_python (or `mod_perl`_), a FastCGI
+process doesn't run inside the Web server process, but in a separate,
+persistent process.
+
+.. _Apache: http://httpd.apache.org/
+.. _mod_python: http://www.modpython.org/
+.. _mod_perl: http://perl.apache.org/
+
+.. admonition:: Why run code in a separate process?
+
+    The traditional ``mod_*`` arrangements in Apache embed various scripting
+    languages (most notably PHP, Python and Perl) inside the process space of
+    your Web server. Although this lowers startup time -- because code doesn't
+    have to be read off disk for every request -- it comes at the cost of
+    memory use. For mod_python, for example, every Apache process gets its own
+    Python interpreter, which uses up a considerable amount of RAM.
+
+    Due to the nature of FastCGI, it's even possible to have processes that run
+    under a different user account than the Web server process. That's a nice
+    security benefit on shared systems, because it means you can secure your
+    code from other users.
+
+Starting your FastCGI server
+============================
+
+FastCGI operates on a client-server model, and in most cases you'll be starting
+the FastCGI process on your own. Your Web server (be it Apache, lighttpd, or
+otherwise) only contacts your Django-FastCGI process when the server needs a
+dynamic page to be loaded. Because the daemon is already running with the code
+in memory, it's able to serve the response very quickly.
+
+.. admonition:: Note
+
+    If you're on a shared hosting system, you'll probably be forced to use
+    Web server-managed FastCGI processes. See the section below on running
+    Django with Web server-managed processes for more information.
+
+A Web server can connect to a FastCGI server in one of two ways: It can use
+either a Unix domain socket (a "named pipe" on Win32 systems), or it can use a
+TCP socket. What you choose is a manner of preference; a TCP socket is usually
+easier due to permissions issues.
+
+To start your server, first change into the directory of your project (wherever
+your ``manage.py`` is), and then run ``manage.py`` with the ``runfcgi`` option::
+
+    ./manage.py runfcgi [options]
+
+If you specify ``help`` as the only option after ``runfcgi``, it'll display a
+list of all the available options.
+
+You'll need to specify either a ``socket`` or both ``host`` and ``port``. Then,
+when you set up your Web server, you'll just need to point it at the host/port
+or socket you specified when starting the FastCGI server.
+
+Examples
+--------
+
+Running a threaded server on a TCP port::
+
+    ./manage.py runfcgi method=threaded host=127.0.0.1 port=3033
+
+Running a preforked server on a Unix domain socket::
+
+    ./manage.py runfcgi method=prefork socket=/home/user/mysite.sock pidfile=django.pid
+
+Run without daemonizing (backgrounding) the process (good for debugging)::
+
+    ./manage.py runfcgi daemonize=false socket=/tmp/mysite.sock
+
+Stopping the FastCGI daemon
+---------------------------
+
+If you have the process running in the foreground, it's easy enough to stop it:
+Simply hitting ``Ctrl-C`` will stop and quit the FastCGI server. However, when
+you're dealing with background processes, you'll need to resort to the Unix
+``kill`` command.
+
+If you specify the ``pidfile`` option to your ``manage.py runfcgi``, you can
+kill the running FastCGI daemon like this::
+
+    kill `cat $PIDFILE`
+
+...where ``$PIDFILE`` is the ``pidfile`` you specified.
+
+To easily restart your FastCGI daemon on Unix, try this small shell script::
+
+    #!/bin/bash
+
+    # Replace these three settings.
+    PROJDIR="/home/user/myproject"
+    PIDFILE="$PROJDIR/mysite.pid"
+    SOCKET="$PROJDIR/mysite.sock"
+
+    cd $PROJDIR
+    if [ -f $PIDFILE ]; then
+        kill `cat -- $PIDFILE`
+        rm -f -- $PIDFILE
+    fi
+
+    exec /usr/bin/env - \
+      PYTHONPATH="../python:.." \
+      ./manage.py runfcgi socket=$SOCKET pidfile=$PIDFILE
+
+Apache setup
+============
+
+To use Django with Apache and FastCGI, you'll need Apache installed and
+configured, with mod_fastcgi installed and enabled. Consult the Apache
+documentation for instructions.
+
+Add the following to your ``httpd.conf``::
+
+    # Connect to FastCGI via a socket / named pipe
+    FastCGIExternalServer /home/user/public_html/mysite.fcgi -socket /home/user/mysite.sock
+    # Connect to FastCGI via a TCP host/port
+    # FastCGIExternalServer /home/user/public_html/mysite.fcgi -host 127.0.0.1:3033
+
+    <VirtualHost 64.92.160.91>
+      ServerName mysite.com
+      DocumentRoot /home/user/public_html
+      Alias /media /home/user/python/django/contrib/admin/media
+      RewriteEngine On
+      RewriteRule ^/(media.*)$ /$1 [QSA,L]
+      RewriteCond %{REQUEST_FILENAME} !-f
+      RewriteRule ^/(.*)$ /mysite.fcgi/$1 [QSA,L]
+    </VirtualHost>
+
+Note that while you have to specify a mysite.fcgi, that this file doesn't
+actually have to exist.  It is just an internal URL to the webserver which
+signifies that any requests to that URL will go to the external FastCGI
+server.
+
+LigHTTPd Setup
+==============
+
+LigHTTPd is a light-weight asynchronous web-server, which is commonly used
+for serving static files.  However, it supports FastCGI natively, and as such
+is a very good choice for serving both static and dynamic media, if your site
+does not have any apache-specific components.
+
+Make sure ``mod_fastcgi`` is in your modules list, somewhere after
+mod_rewrite and mod_access, but not after mod_accesslog.  You'll probably
+want mod_alias as well, for serving admin media.
+
+Add the following to your lighttpd config file::
+
+    server.document-root = "/home/user/public_html"
+    fastcgi.server = (
+        "/mysite.fcgi" => (
+            "main" => (
+                # Use host / port instead of socket for TCP fastcgi
+                # "host" => "127.0.0.1",
+                # "port"  => 3033,
+                "socket" => "/home/user/mysite.sock",
+                "check-local" => "disable",
+            )
+        ),
+    )
+    alias.url = (
+        "/media/" => "/home/user/django/contrib/admin/media/",
+    )
+
+    url.rewrite-once = (
+        "^(/media.*)$" => "$1",
+        "^/favicon\.ico$" => "/media/favicon.ico",
+        "^(/.*)$" => "/mysite.fcgi$1",
+    )
+
+Running multiple django sites on one LigHTTPd
+---------------------------------------------
+
+LigHTTPd allows you to use what is called conditional configuration to allow
+configuration to be customized per-host.  In order to specify multiple fastcgi
+sites, simply add a conditional block around your fastcgi config for each site::
+
+    $HTTP["host"] == "www.website1.com" {
+        server.document-root = "/foo/site1"
+        fastcgi.server = (
+           ...
+        )
+        ...
+    }
+
+    $HTTP["host"] == "www.website2.com" {
+        server.document-root = "/foo/site2"
+        fastcgi.server = (
+           ...
+        )
+        ...
+    }
+
+You can also run multiple django installations on the same site simply by
+specifying multiple entries in the ``fastcgi.server`` directive, add one
+fastcgi host for each.
+
+Running Django on a shared-hosting provider
+===========================================
+
+For many users on shared-hosting providers, you aren't able to run your own
+server daemons nor do they have access to the httpd.conf of their webserver.
+However, it is still possible to run Django using webserver-spawned processes.
+
+.. admonition:: Note
+
+    If you are using webserver-managed processes, there's no need for you
+    to start the FastCGI server on your own.  Apache will spawn a number
+    of processes, scaling as it needs to.
+
+In your web root directory, add this to a file named .htaccess ::
+
+    AddHandler fastcgi-script .fcgi
+    RewriteEngine On
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteRule ^/(.*)$ /mysite.fcgi/$1 [QSA,L]
+
+Now you must add a small shim script in order for apache to properly
+spawn your FastCGI program.  Create a mysite.fcgi and place it in your
+web directory, making it executable ::
+
+    #!/usr/bin/python
+    import sys, os
+
+    # add a custom pythonpath
+    sys.path.insert(0, "/home/user/python")
+
+    # switch to the directory of your project. (optional)
+    # os.chdir("/home/user/myproject")
+
+    # change to the name of your app's settings module
+    os.environ['DJANGO_SETTINGS_MODULE'] = "myproject.settings"
+
+    from django.core.servers.fastcgi import runfastcgi
+    runfastcgi(["method=threaded", "daemonize=false"])
+
+Restarting the spawned server
+-----------------------------
+
+If you change the code of your site, to make apache re-load your django
+application, you do not need to restart the server.  Simply re-upload or
+edit your ``mysite.fcgi`` in such a way that the timestamp on the file
+will change.  When apache sees that the file has been updated, it will
+restart your django application for you.
+
+If you have access to a command shell on a unix system, restarting the
+server can be done with the ``touch`` command::
+
+    touch mysite.fcgi
