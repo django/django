@@ -25,11 +25,9 @@ def create_permissions(app, created_models):
     for klass in app_models:
         ctype = ContentType.objects.get_for_model(klass)
         for codename, name in _get_all_permissions(klass._meta):
-            try:
-                Permission.objects.get(name=name, codename=codename, content_type__pk=ctype.id)
-            except Permission.DoesNotExist:
-                p = Permission(name=name, codename=codename, content_type=ctype)
-                p.save()
+            p, created = Permission.objects.get_or_create(codename=codename, content_type__pk=ctype.id,
+                defaults={'name': name, 'content_type': ctype})
+            if created:
                 print "Adding permission '%s'" % p
 
 def create_superuser(app, created_models):
