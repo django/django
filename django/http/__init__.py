@@ -1,7 +1,9 @@
 from Cookie import SimpleCookie
 from pprint import pformat
-from urllib import urlencode
+from urllib import urlencode, quote
 from django.utils.datastructures import MultiValueDict
+
+RESERVED_CHARS="!*'();:@&=+$,/?%#[]"
 
 try:
     # The mod_python version is more efficient, so try importing it first.
@@ -242,13 +244,13 @@ class HttpResponse(object):
 class HttpResponseRedirect(HttpResponse):
     def __init__(self, redirect_to):
         HttpResponse.__init__(self)
-        self['Location'] = redirect_to
+        self['Location'] = quote(redirect_to, safe=RESERVED_CHARS)
         self.status_code = 302
 
 class HttpResponsePermanentRedirect(HttpResponse):
     def __init__(self, redirect_to):
         HttpResponse.__init__(self)
-        self['Location'] = redirect_to
+        self['Location'] = quote(redirect_to, safe=RESERVED_CHARS)
         self.status_code = 301
 
 class HttpResponseNotModified(HttpResponse):
