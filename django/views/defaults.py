@@ -1,5 +1,5 @@
 from django.core.exceptions import ObjectDoesNotExist
-from django.template import Context, loader
+from django.template import RequestContext, loader
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.sites.models import Site
 from django import http
@@ -76,7 +76,7 @@ def page_not_found(request, template_name='404.html'):
             The path of the requested URL (e.g., '/app/pages/bad_page/')
     """
     t = loader.get_template(template_name)
-    return http.HttpResponseNotFound(t.render(Context({'request_path': request.path})))
+    return http.HttpResponseNotFound(t.render(RequestContext(request, {'request_path': request.path})))
 
 def server_error(request, template_name='500.html'):
     """
@@ -86,4 +86,4 @@ def server_error(request, template_name='500.html'):
     Context: None
     """
     t = loader.get_template(template_name)
-    return http.HttpResponseServerError(t.render(Context()))
+    return http.HttpResponseServerError(t.render(RequestContext(request)))
