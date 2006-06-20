@@ -1081,6 +1081,12 @@ def dbshell():
     runshell()
 dbshell.args = ""
 
+def runfcgi(args):
+    """Run this project as a FastCGI application. requires flup."""
+    from django.core.servers.fastcgi import runfastcgi
+    runfastcgi(args)
+runfcgi.args = '[various KEY=val options, use `runfcgi help` for help]'
+
 # Utilities for command-line script
 
 DEFAULT_ACTION_MAPPING = {
@@ -1091,6 +1097,7 @@ DEFAULT_ACTION_MAPPING = {
     'inspectdb': inspectdb,
     'install': install,
     'reset': reset,
+    'runfcgi': runfcgi,
     'runserver': runserver,
     'shell': run_shell,
     'sql': get_sql_create,
@@ -1210,6 +1217,8 @@ def execute_from_command_line(action_mapping=DEFAULT_ACTION_MAPPING, argv=None):
             except ValueError:
                 addr, port = '', args[1]
         action_mapping[action](addr, port)
+    elif action == 'runfcgi':
+        action_mapping[action](args[1:])
     else:
         from django.db import models
         try:
