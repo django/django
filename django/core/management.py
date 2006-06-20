@@ -333,14 +333,7 @@ def get_sql_initial_data_for_model(model):
 
     # Some backends can't execute more than one SQL statement at a time,
     # so split into separate statements.
-    sql_expr = re.compile(
-        r"""(           # each statement ...
-        [^\r\n;]        # starts with something other than a line ending or ';'
-        (?:             # then has one or more chunks of ...
-            (?:[^;'"]+) # not the end of a statement or start of a quote
-          | (?:'[^']*') # something in single quotes
-          | (?:"[^"]*") # something in double quotes
-        )+)""", re.VERBOSE)
+    statements = re.compile(r";[ \t]*$", re.M)
 
     # Find custom SQL, if it's available.
     sql_files = [os.path.join(app_dir, "%s.%s.sql" % (opts.object_name.lower(), settings.DATABASE_ENGINE)),
@@ -348,7 +341,9 @@ def get_sql_initial_data_for_model(model):
     for sql_file in sql_files:
         if os.path.exists(sql_file):
             fp = open(sql_file)
-            output.extend(sql_expr.findall(fp.read()))
+            for statement in statements.split(fp.read()):
+                if statement.strip():
+                    output.append(statement + ";")
             fp.close()
 
     return output
