@@ -24,7 +24,7 @@ REGRESSION_TEST_DIR = os.path.join(os.path.dirname(__file__), REGRESSION_TESTS_D
 
 ALWAYS_INSTALLED_APPS = [
     'django.contrib.contenttypes',
-    'django.contrib.auth', 
+    'django.contrib.auth',
     'django.contrib.sites',
     'django.contrib.flatpages',
     'django.contrib.redirects',
@@ -35,8 +35,8 @@ ALWAYS_INSTALLED_APPS = [
 
 def get_test_models():
     models = []
-    for loc in MODEL_TESTS_DIR_NAME, REGRESSION_TESTS_DIR_NAME:
-        for f in os.listdir(loc):
+    for loc, dirpath in (MODEL_TESTS_DIR_NAME, MODEL_TEST_DIR), (REGRESSION_TESTS_DIR_NAME, REGRESSION_TEST_DIR):
+        for f in os.listdir(dirpath):
             if f.startswith('__init__') or f.startswith('.') or f.startswith('sql'):
                 continue
             models.append((loc, f))
@@ -139,7 +139,7 @@ class TestRunner:
             TEST_DATABASE_NAME = ":memory:"
         else:
             # Create the test database and connect to it. We need to autocommit
-            # if the database supports it because PostgreSQL doesn't allow 
+            # if the database supports it because PostgreSQL doesn't allow
             # CREATE/DROP DATABASE statements within transactions.
             cursor = connection.cursor()
             self._set_autocommit(connection)
@@ -161,7 +161,7 @@ class TestRunner:
 
         # Initialize the test database.
         cursor = connection.cursor()
-        
+
         # Install the core always installed apps
         for app in ALWAYS_INSTALLED_APPS:
             self.output(1, "Installing contrib app %s" % app)
@@ -265,7 +265,7 @@ class TestRunner:
             print "%s error%s:" % (len(error_list), len(error_list) != 1 and 's' or '')
         else:
             print "All tests passed."
-            
+
     def _set_autocommit(self, connection):
         """
         Make sure a connection is in autocommit mode.
