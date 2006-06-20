@@ -17,7 +17,7 @@ class Permission(models.Model):
         - The "add" permission limits the user's ability to view the "add" form and add an object.
         - The "change" permission limits a user's ability to view the change list, view the "change" form and change an object.
         - The "delete" permission limits the ability to delete an object.
-        
+
     Permissions are set globally per type of object, not per specific object instance. It is possible to say "Mary may change news stories," but it's not currently possible to say "Mary may change news stories, but only the ones she created herself" or "Mary may only change news stories that have a certain status or publication date."
 
     Three basic permissions -- add, create and delete -- are automatically created for each Django model.
@@ -72,7 +72,7 @@ class UserManager(models.Manager):
 class User(models.Model):
     """Users within the Django authentication system are represented by this model.
 
-    Username and password are required, other fields are optional.
+    Username and password are required. Other fields are optional.
     """
     username = models.CharField(_('username'), maxlength=30, unique=True, validator_list=[validators.isAlphaNumeric], help_text=_("Required. 30 characters or fewer. Alphanumeric characters only (letters, digits and underscores)."))
     first_name = models.CharField(_('first name'), maxlength=30, blank=True)
