@@ -196,7 +196,7 @@ class Model(object):
             else:
                 # Create a new record with defaults for everything.
                 cursor.execute("INSERT INTO %s (%s) VALUES (%s)" %
-                    (backend.quote_name(self._meta.db_table), 
+                    (backend.quote_name(self._meta.db_table),
                      backend.quote_name(self._meta.pk.column),
                      backend.get_pk_default_value()))
             if self._meta.has_auto_field and not pk_set:
@@ -363,7 +363,7 @@ class Model(object):
         cachename = "__%s_dimensions_cache" % field.name
         if not hasattr(self, cachename):
             from django.utils.images import get_image_dimensions
-            filename = self._get_FIELD_filename(field)()
+            filename = self._get_FIELD_filename(field)
             setattr(self, cachename, get_image_dimensions(filename))
         return getattr(self, cachename)
 
