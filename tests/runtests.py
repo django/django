@@ -34,8 +34,13 @@ ALWAYS_INSTALLED_APPS = [
 ]
 
 def get_test_models():
-    return [(MODEL_TESTS_DIR_NAME, f) for f in os.listdir(MODEL_TEST_DIR) if not f.startswith('__init__') and not f.startswith('.')] +\
-        [(REGRESSION_TESTS_DIR_NAME, f) for f in os.listdir(REGRESSION_TEST_DIR) if not f.startswith('__init__') and not f.startswith('.')]
+    models = []
+    for loc in MODEL_TESTS_DIR_NAME, REGRESSION_TESTS_DIR_NAME:
+        for f in os.listdir(loc):
+            if f.startswith('__init__') or f.startswith('.') or f.startswith('sql'):
+                continue
+            models.append((loc, f))
+    return models
 
 class DjangoDoctestRunner(doctest.DocTestRunner):
     def __init__(self, verbosity_level, *args, **kwargs):
