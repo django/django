@@ -538,27 +538,27 @@ TEMPLATE_TESTS = {
 
     ### TIMESINCE TAG ##################################################
     # Default compare with datetime.now()
-    'timesince01' : ('{{ a|timesince }}', {'a':datetime.now()}, '0 minutes'),
+    'timesince01' : ('{{ a|timesince }}', {'a':datetime.now() + timedelta(minutes=-1)}, '1 minute'),
     'timesince02' : ('{{ a|timesince }}', {'a':(datetime.now() - timedelta(days=1))}, '1 day'),
     'timesince03' : ('{{ a|timesince }}', {'a':(datetime.now() -
         timedelta(hours=1, minutes=25))}, '1 hour, 25 minutes'),
 
     # Compare to a given parameter
     'timesince04' : ('{{ a|timesince:b }}', {'a':NOW + timedelta(days=2), 'b':NOW + timedelta(days=1)}, '1 day'),
-    'timesince05' : ('{{ a|timesince:b }}', {'a':NOW + timedelta(days=2), 'b':NOW + timedelta(days=2)}, '0 minutes'),
+    'timesince05' : ('{{ a|timesince:b }}', {'a':NOW + timedelta(days=2, minutes=1), 'b':NOW + timedelta(days=2)}, '1 minute'),
 
     # Check that timezone is respected
     'timesince06' : ('{{ a|timesince:b }}', {'a':NOW_tz + timedelta(hours=8), 'b':NOW_tz}, '8 hours'),
 
     ### TIMEUNTIL TAG ##################################################
     # Default compare with datetime.now()
-    'timeuntil01' : ('{{ a|timeuntil }}', {'a':datetime.now()}, '0 minutes'),
+    'timeuntil01' : ('{{ a|timeuntil }}', {'a':datetime.now() + timedelta(minutes=2)}, '2 minutes'),
     'timeuntil02' : ('{{ a|timeuntil }}', {'a':(datetime.now() + timedelta(days=1))}, '1 day'),
     'timeuntil03' : ('{{ a|timeuntil }}', {'a':(datetime.now() + timedelta(hours=8, minutes=10))}, '8 hours, 10 minutes'),
 
     # Compare to a given parameter
     'timeuntil04' : ('{{ a|timeuntil:b }}', {'a':NOW - timedelta(days=1), 'b':NOW - timedelta(days=2)}, '1 day'),
-    'timeuntil05' : ('{{ a|timeuntil:b }}', {'a':NOW - timedelta(days=2), 'b':NOW - timedelta(days=2)}, '0 minutes'),
+    'timeuntil05' : ('{{ a|timeuntil:b }}', {'a':NOW - timedelta(days=2), 'b':NOW - timedelta(days=2, minutes=1)}, '1 minute'),
 }
 
 def test_template_loader(template_name, template_dirs=None):
