@@ -47,10 +47,11 @@ def timesince(d, now=None):
             s += ', %d %s' % (count2, name2(count2))
     return s
 
-def timeuntil(d):
+def timeuntil(d, now=None):
     """
     Like timesince, but returns a string measuring the time until
     the given time.
     """
-    now = datetime.datetime.now()
+    if now == None:
+        now = datetime.datetime.now()
     return timesince(now, d)

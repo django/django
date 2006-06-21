@@ -4,7 +4,7 @@ from django.conf import settings
 from django import template
 from django.template import loader
 from django.utils.translation import activate, deactivate, install
-from datetime import datetime
+from datetime import datetime, timedelta
 import traceback
 
 #################################
@@ -56,6 +56,9 @@ class SomeClass:
 class OtherClass:
     def method(self):
         return "OtherClass.method"
+
+# NOW used by timesince tag tests.
+NOW = datetime.now()
 
 # SYNTAX --
 # 'template_name': ('template contents', 'context dict', 'expected string output' or Exception class)
@@ -530,6 +533,27 @@ TEMPLATE_TESTS = {
     'now02' : ('{% now "j "n" Y"%}', {}, template.TemplateSyntaxError),
 #    'now03' : ('{% now "j \"n\" Y"%}', {}, str(datetime.now().day) + '"' + str(datetime.now().month) + '"' + str(datetime.now().year)),
 #    'now04' : ('{% now "j \nn\n Y"%}', {}, str(datetime.now().day) + '\n' + str(datetime.now().month) + '\n' + str(datetime.now().year))
+
+    ### TIMESINCE TAG ##################################################
+    # Default compare with datetime.now()
+    'timesince01' : ('{{ a|timesince }}', {'a':datetime.now()}, '0 minutes'),
+    'timesince02' : ('{{ a|timesince }}', {'a':(datetime.now() - timedelta(days=1))}, '1 day'),
+    'timesince03' : ('{{ a|timesince }}', {'a':(datetime.now() -
+        timedelta(hours=1, minutes=25))}, '1 hour, 25 minutes'),
+
+    # Compare to a given parameter
+    'timesince04' : ('{{ a|timesince:b }}', {'a':NOW + timedelta(days=2), 'b':NOW + timedelta(days=1)}, '1 day'),
+    'timesince05' : ('{{ a|timesince:b }}', {'a':NOW + timedelta(days=2), 'b':NOW + timedelta(days=2)}, '0 minutes'),
+
+    ### TIMEUNTIL TAG ##################################################
+    # Default compare with datetime.now()
+    'timeuntil01' : ('{{ a|timeuntil }}', {'a':datetime.now()}, '0 minutes'),
+    'timeuntil02' : ('{{ a|timeuntil }}', {'a':(datetime.now() + timedelta(days=1))}, '1 day'),
+    'timeuntil03' : ('{{ a|timeuntil }}', {'a':(datetime.now() + timedelta(hours=8, minutes=10))}, '8 hours, 10 minutes'),
+
+    # Compare to a given parameter
+    'timeuntil04' : ('{{ a|timeuntil:b }}', {'a':NOW - timedelta(days=1), 'b':NOW - timedelta(days=2)}, '1 day'),
+    'timeuntil05' : ('{{ a|timeuntil:b }}', {'a':NOW - timedelta(days=2), 'b':NOW - timedelta(days=2)}, '0 minutes'),
 }
 
 def test_template_loader(template_name, template_dirs=None):

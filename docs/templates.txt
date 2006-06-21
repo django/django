@@ -1022,6 +1022,24 @@ timesince
 
 Formats a date as the time since that date (i.e. "4 days, 6 hours").
 
+Takes an optional argument that is a variable containing the date to use as
+the comparison point (without the argument, the comparison point is *now*).
+For example, if ``blog_date`` is a date instance representing midnight on 1
+June 2006, and ``comment_date`` is a date instanace for 08:00 on 1 June 2006,
+then ``{{ comment_date|timesince:blog_date }}`` would return "8 hours".
+
+timeuntil
+~~~~~~~~~
+
+Similar to ``timesince``, except that it measures the time from now until the
+given date or datetime. For example, if today is 1 June 2006 and
+``conference_date`` is a date instance holding 29 June 2006, then
+``{{ conference_date|timeuntil }}`` will return "28 days".
+
+Takes an optional argument that is a variable containing the date to use as
+the comparison point (instead of *now*). If ``from_date`` contains 22 June
+2006, then ``{{ conference_date|timeuntil:from_date }}`` will return "7 days".
+
 title
 ~~~~~
 

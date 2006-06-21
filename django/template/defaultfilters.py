@@ -345,12 +345,24 @@ def time(value, arg=None):
         arg = settings.TIME_FORMAT
     return time_format(value, arg)
 
-def timesince(value):
+def timesince(value, arg=None):
     'Formats a date as the time since that date (i.e. "4 days, 6 hours")'
     from django.utils.timesince import timesince
     if not value:
         return ''
+    if arg:
+        return timesince(arg, value)
     return timesince(value)
+
+def timeuntil(value, arg=None):
+    'Formats a date as the time until that date (i.e. "4 days, 6 hours")'
+    from django.utils.timesince import timesince
+    from datetime import datetime
+    if not value:
+        return ''
+    if arg:
+        return timesince(arg, value)
+    return timesince(datetime.now(), value)
 
 ###################
 # LOGIC           #
@@ -485,6 +497,7 @@ register.filter(stringformat)
 register.filter(striptags)
 register.filter(time)
 register.filter(timesince)
+register.filter(timeuntil)
 register.filter(title)
 register.filter(truncatewords)
 register.filter(unordered_list)
