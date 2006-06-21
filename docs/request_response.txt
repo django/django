@@ -49,7 +49,8 @@ All attributes except ``session`` should be considered read-only.
     It's possible that a request can come in via POST with an empty ``POST``
     dictionary -- if, say, a form is requested via the POST HTTP method but
     does not include form data. Therefore, you shouldn't use ``if request.POST``
-    to check for use of the POST method; instead, check `method`_.
+    to check for use of the POST method; instead, use ``if reuqest.method ==
+    "POST"`` (see above).
 
     Note: ``POST`` does *not* include file-upload information. See ``FILES``.
 
