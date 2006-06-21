@@ -322,6 +322,19 @@ instead of a ``BooleanField`` with ``null=True``.
 
 The admin represents this as a ``<select>`` box with "Unknown", "Yes" and "No" choices.
 
+``PasswordField``
+~~~~~~~~~~~~~~~~~  
+
+A ``PasswordField`` is like a ``TextField`` but the characters that are
+entered are masked, typically by asterisks (*), when entered into a form. Note
+that though the data is masked on entry, it is sent as clear text to the
+server and stored as plain text in the database. Additional measures (such as
+using HTTPS) are needed to ensure the security of data sent from a form. This
+field is probably more useful when used in a `custom manipulator`_ than
+directly in a model.
+
+.. _custom manipulator: http://www.djangoproject.com/documentation/forms/#custom-forms-and-manipulators
+
 ``PhoneNumberField``
 ~~~~~~~~~~~~~~~~~~~~
 
