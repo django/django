@@ -33,7 +33,7 @@
 
 _django_completion()
 {
-    local cur prev opts actions action_shell_opts
+    local cur prev opts actions action_shell_opts action_runfcgi_opts
     COMPREPLY=()
     cur="${COMP_WORDS[COMP_CWORD]}"
     prev="${COMP_WORDS[COMP_CWORD-1]}"
@@ -42,12 +42,13 @@ _django_completion()
     opts="--help --settings --pythonpath --version"
     # Actions
     actions="adminindex createcachetable dbshell diffsettings \
-             inspectdb install reset runserver \
+             inspectdb install reset runfcgi runserver \
              shell sql sqlall sqlclear sqlindexes sqlinitialdata \
              sqlreset sqlsequencereset startapp startproject \
              syncdb validate"
     # Action's options
     action_shell_opts="--plain"
+    action_runfcgi_opts="host port socket method maxspare minspare maxchildren daemonize pidfile workdir"
 
     if [[ # django-admin.py, ./manage, manage.py
           ( ${COMP_CWORD} -eq 1 &&
@@ -64,10 +65,12 @@ _django_completion()
         case ${cur} in
             -*)
                 COMPREPLY=( $(compgen -W "${opts}" -- ${cur}) )
+                action=$COMPREPLY
                 return 0
                 ;;
             *)
                 COMPREPLY=( $(compgen -W "${actions}" -- ${cur}) )
+                action=$COMPREPLY
                 return 0
                 ;;
         esac
@@ -91,6 +94,17 @@ _django_completion()
                 ;;
             shell)
                 COMPREPLY=( $(compgen -W "$action_shell_opts" -- ${cur}) )
+                return 0
+                ;;
+            runfcgi)
+                COMPREPLY=( $(compgen -W "$action_runfcgi_opts" -- ${cur}) )
+                return 0
+                ;;
+            host*|port*|socket*|method*|maxspare*|minspare*|maxchildren*|daemonize*|pidfile*|workdir*)
+                if [ "$action"  == "runfcgi" ] ; then
+                    COMPREPLY=( $(compgen -W "$action_runfcgi_opts" -- ${cur}) )
+                    return 0
+                fi
                 return 0
                 ;;
             *)
