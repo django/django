@@ -4,6 +4,7 @@ from django.conf import settings
 from django import template
 from django.template import loader
 from django.utils.translation import activate, deactivate, install
+from django.utils.tzinfo import LocalTimezone
 from datetime import datetime, timedelta
 import traceback
 
@@ -57,8 +58,9 @@ class OtherClass:
     def method(self):
         return "OtherClass.method"
 
-# NOW used by timesince tag tests.
+# NOW and NOW_tz are used by timesince tag tests.
 NOW = datetime.now()
+NOW_tz = datetime.now(LocalTimezone(datetime.now()))
 
 # SYNTAX --
 # 'template_name': ('template contents', 'context dict', 'expected string output' or Exception class)
@@ -544,6 +546,9 @@ TEMPLATE_TESTS = {
     # Compare to a given parameter
     'timesince04' : ('{{ a|timesince:b }}', {'a':NOW + timedelta(days=2), 'b':NOW + timedelta(days=1)}, '1 day'),
     'timesince05' : ('{{ a|timesince:b }}', {'a':NOW + timedelta(days=2), 'b':NOW + timedelta(days=2)}, '0 minutes'),
+
+    # Check that timezone is respected
+    'timesince06' : ('{{ a|timesince:b }}', {'a':NOW_tz + timedelta(hours=8), 'b':NOW_tz}, '8 hours'),
 
     ### TIMEUNTIL TAG ##################################################
     # Default compare with datetime.now()

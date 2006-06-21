@@ -24,7 +24,7 @@ def timesince(d, now=None):
     else:
         t = time.localtime()
     if d.tzinfo:
-        tz = LocalTimezone()
+        tz = LocalTimezone(d)
     else:
         tz = None
     now = datetime.datetime(t[0], t[1], t[2], t[3], t[4], t[5], tzinfo=tz)
