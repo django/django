@@ -106,7 +106,11 @@ def get_sql_create(app):
     for klass in app_models:
         output, references = _get_sql_model_create(klass, models_output)
         final_output.extend(output)
-        pending_references.update(references)
+        for refto, refs in references.items():
+            try:
+                pending_references[refto].extend(refs)
+            except KeyError:
+                pending_references[refto] = refs
         final_output.extend(_get_sql_for_pending_references(klass, pending_references))
         # Keep track of the fact that we've created the table for this model.
         models_output.add(klass)
@@ -458,7 +462,11 @@ def syncdb():
             sql, references = _get_sql_model_create(model, seen_models)
             seen_models.add(model)
             created_models.add(model)
-            pending_references.update(references)
+            for refto, refs in references.items():
+                try:
+                    pending_references[refto].extend(refs)
+                except KeyError:
+                    pending_references[refto] = refs
             sql.extend(_get_sql_for_pending_references(model, pending_references))
             print "Creating table %s" % model._meta.db_table
             for statement in sql:
