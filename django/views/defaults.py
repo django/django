@@ -1,5 +1,5 @@
 from django.core.exceptions import ObjectDoesNotExist
-from django.template import RequestContext, loader
+from django.template import Context, RequestContext, loader
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.sites.models import Site
 from django import http
@@ -86,4 +86,4 @@ def server_error(request, template_name='500.html'):
     Context: None
     """
     t = loader.get_template(template_name)
-    return http.HttpResponseServerError(t.render(RequestContext(request)))
+    return http.HttpResponseServerError(t.render(Context({})))
