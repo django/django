@@ -462,19 +462,23 @@ def _get_deleted_objects(deleted_objects, perms_needed, user, obj, opts, current
         opts_seen.append(related.opts)
         rel_opts_name = related.get_accessor_name()
         has_related_objs = False
-        for sub_obj in getattr(obj, rel_opts_name).all():
+        rel_objs = getattr(obj, rel_opts_name, None)
+        if rel_objs:
             has_related_objs = True
-            if related.field.rel.edit_inline or not related.opts.admin:
-                # Don't display link to edit, because it either has no
-                # admin or is edited inline.
-                nh(deleted_objects, current_depth, [_('One or more %(fieldname)s in %(name)s: %(obj)s') % \
-                    {'fieldname': related.field.verbose_name, 'name': related.opts.verbose_name, 'obj': escape(str(sub_obj))}, []])
-            else:
-                # Display a link to the admin page.
-                nh(deleted_objects, current_depth, [
-                    (_('One or more %(fieldname)s in %(name)s:') % {'fieldname': related.field.verbose_name, 'name':related.opts.verbose_name}) + \
-                    (' <a href="../../../../%s/%s/%s/">%s</a>' % \
-                        (related.opts.app_label, related.opts.module_name, sub_obj._get_pk_val(), escape(str(sub_obj)))), []])
+
+        if has_related_objs:
+            for sub_obj in rel_objs.all():
+                if related.field.rel.edit_inline or not related.opts.admin:
+                    # Don't display link to edit, because it either has no
+                    # admin or is edited inline.
+                    nh(deleted_objects, current_depth, [_('One or more %(fieldname)s in %(name)s: %(obj)s') % \
+                        {'fieldname': related.field.verbose_name, 'name': related.opts.verbose_name, 'obj': escape(str(sub_obj))}, []])
+                else:
+                    # Display a link to the admin page.
+                    nh(deleted_objects, current_depth, [
+                        (_('One or more %(fieldname)s in %(name)s:') % {'fieldname': related.field.verbose_name, 'name':related.opts.verbose_name}) + \
+                        (' <a href="../../../../%s/%s/%s/">%s</a>' % \
+                            (related.opts.app_label, related.opts.module_name, sub_obj._get_pk_val(), escape(str(sub_obj)))), []])
         # If there were related objects, and the user doesn't have
         # permission to change them, add the missing perm to perms_needed.
         if related.opts.admin and has_related_objs:
