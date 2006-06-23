@@ -1,5 +1,5 @@
 from django.db import backend, connection, transaction
-from django.db.models import signals
+from django.db.models import signals, get_model
 from django.db.models.fields import AutoField, Field, IntegerField, get_ul_class
 from django.db.models.related import RelatedObject
 from django.utils.translation import gettext_lazy, string_concat
@@ -23,7 +23,12 @@ def add_lookup(rel_cls, field):
     name = field.rel.to
     module = rel_cls.__module__
     key = (module, name)
-    pending_lookups.setdefault(key, []).append((rel_cls, field))
+    model = get_model(rel_cls._meta.app_label,field.rel.to)
+    if model:
+        field.rel.to = model
+        field.do_related_class(model, rel_cls)
+    else:
+        pending_lookups.setdefault(key, []).append((rel_cls, field))
 
 def do_pending_lookups(sender):
     other_cls = sender

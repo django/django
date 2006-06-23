@@ -162,10 +162,11 @@ class TestRunner:
         # Initialize the test database.
         cursor = connection.cursor()
 
+        from django.db.models.loading import load_app
         # Install the core always installed apps
         for app in ALWAYS_INSTALLED_APPS:
             self.output(1, "Installing contrib app %s" % app)
-            mod = __import__(app + ".models", '', '', [''])
+            mod = load_app(app)
             management.install(mod)
 
         # Run the tests for each test model.
@@ -173,8 +174,7 @@ class TestRunner:
         for model_dir, model_name in test_models:
             self.output(1, "%s model: Importing" % model_name)
             try:
-                # TODO: Abstract this into a meta.get_app() replacement?
-                mod = __import__(model_dir + '.' + model_name + '.models', '', '', [''])
+                mod = load_app(model_dir + '.' + model_name)
             except Exception, e:
                 log_error(model_name, "Error while importing", ''.join(traceback.format_exception(*sys.exc_info())[1:]))
                 continue

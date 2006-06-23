@@ -5,36 +5,45 @@ from django.core.exceptions import ImproperlyConfigured
 
 __all__ = ('get_apps', 'get_app', 'get_models', 'get_model', 'register_models')
 
-_app_list = None # Cache of installed apps.
+_app_list = []   # Cache of installed apps.
+                 # Entry is not placed in app_list cache until entire app is loaded.
 _app_models = {} # Dictionary of models against app label
                  # Each value is a dictionary of model name: model class
+                 # Applabel and Model entry exists in cache when individual model is loaded.
+_loaded = False  # Has the contents of settings.INSTALLED_APPS been loaded? 
+                 # i.e., has get_apps() been called?
 
 def get_apps():
     "Returns a list of all installed modules that contain models."
     global _app_list
-    if _app_list is not None:
-        return _app_list
-    _app_list = []
-    for app_name in settings.INSTALLED_APPS:
-        try:
-            mod = __import__(app_name, '', '', ['models'])
-        except ImportError:
-            pass # Assume this app doesn't have a models.py in it.
-                 # GOTCHA: It may have a models.py that raises ImportError.
-        else:
+    global _loaded
+    if not _loaded:
+        _loaded = True
+        for app_name in settings.INSTALLED_APPS:
             try:
-                _app_list.append(mod.models)
+                load_app(app_name)
+            except ImportError:
+                pass # Assume this app doesn't have a models.py in it.
+                     # GOTCHA: It may have a models.py that raises ImportError.
             except AttributeError:
                 pass # This app doesn't have a models.py in it.
     return _app_list
 
 def get_app(app_label):
     "Returns the module containing the models for the given app_label."
+    get_apps() # Run get_apps() to populate the _app_list cache. Slightly hackish.
     for app_name in settings.INSTALLED_APPS:
         if app_label == app_name.split('.')[-1]:
-            return __import__(app_name, '', '', ['models']).models
+            return load_app(app_name)
     raise ImproperlyConfigured, "App with label %s could not be found" % app_label
 
+def load_app(app_name):
+    "Loads the app with the provided fully qualified name, and returns the model module."
+    mod = __import__(app_name, '', '', ['models'])
+    if mod.models not in _app_list:
+        _app_list.append(mod.models)
+    return mod.models
+    
 def get_models(app_mod=None):
     """
     Given a module containing models, returns a list of the models. Otherwise
