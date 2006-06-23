@@ -515,8 +515,13 @@ class ForeignKey(RelatedField, Field):
 
 class OneToOneField(RelatedField, IntegerField):
     def __init__(self, to, to_field=None, **kwargs):
+        try:
+            to_name = to._meta.object_name.lower()
+        except AttributeError: # to._meta doesn't exist, so it must be RECURSIVE_RELATIONSHIP_CONSTANT
+            assert isinstance(to, basestring), "OneToOneField(%r) is invalid. First parameter to OneToOneField must be either a model, a model name, or the string %r" % (to, RECURSIVE_RELATIONSHIP_CONSTANT)
+        else:
+            to_field = to_field or to._meta.pk.name
         kwargs['verbose_name'] = kwargs.get('verbose_name', '')
-        to_field = to_field or to._meta.pk.name
 
         if kwargs.has_key('edit_inline_type'):
             import warnings
