@@ -23,11 +23,14 @@ def add_lookup(rel_cls, field):
     name = field.rel.to
     module = rel_cls.__module__
     key = (module, name)
+    # Has the model already been loaded? 
+    # If so, resolve the string reference right away
     model = get_model(rel_cls._meta.app_label,field.rel.to)
     if model:
         field.rel.to = model
         field.do_related_class(model, rel_cls)
     else:
+        # Mark the related field for later lookup
         pending_lookups.setdefault(key, []).append((rel_cls, field))
 
 def do_pending_lookups(sender):
