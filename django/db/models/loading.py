@@ -2,6 +2,8 @@
 
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
+import sys
+import os
 
 __all__ = ('get_apps', 'get_app', 'get_models', 'get_model', 'register_models')
 
@@ -91,4 +93,14 @@ def register_models(app_label, *models):
         # in the _app_models dictionary
         model_name = model._meta.object_name.lower()
         model_dict = _app_models.setdefault(app_label, {})
+        if model_dict.has_key(model_name):
+            # The same model may be imported via different paths (e.g.
+            # appname.models and project.appname.models). We use the source
+            # filename as a means to detect identity.
+            fname1 = os.path.normpath(sys.modules[model.__module__].__file__)
+            fname2 = os.path.normpath(sys.modules[model_dict[model_name].__module__].__file__)
+            # Since the filename extension could be .py the first time and .pyc
+            # or .pyo the second time, ignore the extension when comparing.
+            if os.path.splitext(fname1)[0] == os.path.splitext(fname2)[0]:
+                continue
         model_dict[model_name] = model
