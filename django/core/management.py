@@ -803,9 +803,9 @@ class ModelErrorCollection:
         self.errors = []
         self.outfile = outfile
 
-    def add(self, opts, error):
-        self.errors.append((opts, error))
-        self.outfile.write(style.ERROR("%s.%s: %s\n" % (opts.app_label, opts.module_name, error)))
+    def add(self, context, error):
+        self.errors.append((context, error))
+        self.outfile.write(style.ERROR("%s: %s\n" % (context, error)))
 
 def get_validation_errors(outfile, app=None):
     """
@@ -814,9 +814,14 @@ def get_validation_errors(outfile, app=None):
     Returns number of errors.
     """
     from django.db import models
+    from django.db.models.loading import get_app_errors
     from django.db.models.fields.related import RelatedObject
 
     e = ModelErrorCollection(outfile)
+    
+    for (app_name, error) in get_app_errors().items():
+        e.add(app_name, error)
+        
     for cls in models.get_models(app):
         opts = cls._meta
 

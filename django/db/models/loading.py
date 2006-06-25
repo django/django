@@ -10,6 +10,9 @@ _app_list = []   # Cache of installed apps.
 _app_models = {} # Dictionary of models against app label
                  # Each value is a dictionary of model name: model class
                  # Applabel and Model entry exists in cache when individual model is loaded.
+_app_errors = {} # Dictionary of errors that were experienced when loading the INSTALLED_APPS
+                 # Key is the app_name of the model, value is the exception that was raised
+                 # during model loading.
 _loaded = False  # Has the contents of settings.INSTALLED_APPS been loaded? 
                  # i.e., has get_apps() been called?
 
@@ -22,11 +25,9 @@ def get_apps():
         for app_name in settings.INSTALLED_APPS:
             try:
                 load_app(app_name)
-            except ImportError:
-                pass # Assume this app doesn't have a models.py in it.
-                     # GOTCHA: It may have a models.py that raises ImportError.
-            except AttributeError:
-                pass # This app doesn't have a models.py in it.
+            except Exception, e:
+                # Problem importing the app
+                _app_errors[app_name] = e
     return _app_list
 
 def get_app(app_label):
@@ -39,10 +40,17 @@ def get_app(app_label):
 
 def load_app(app_name):
     "Loads the app with the provided fully qualified name, and returns the model module."
+    global _app_list
     mod = __import__(app_name, '', '', ['models'])
     if mod.models not in _app_list:
         _app_list.append(mod.models)
     return mod.models
+
+def get_app_errors():
+    "Returns the map of known problems with the INSTALLED_APPS"
+    global _app_errors
+    get_apps() # Run get_apps() to populate the _app_list cache. Slightly hackish.
+    return _app_errors
     
 def get_models(app_mod=None):
     """
