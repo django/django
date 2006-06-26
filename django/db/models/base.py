@@ -9,7 +9,7 @@ from django.db.models.query import orderlist2sql, delete_objects
 from django.db.models.options import Options, AdminOptions
 from django.db import connection, backend, transaction
 from django.db.models import signals
-from django.db.models.loading import register_models
+from django.db.models.loading import register_models, get_model
 from django.dispatch import dispatcher
 from django.utils.datastructures import SortedDict
 from django.utils.functional import curry
@@ -60,7 +60,11 @@ class ModelBase(type):
         new_class._prepare()
 
         register_models(new_class._meta.app_label, new_class)
-        return new_class
+	# Because of the way imports happen (recursively), we may or may not be
+	# the first class for this model to register with the framework. There
+	# should only be one class for each model, so we must always return the
+	# registered version.
+        return get_model(new_class._meta.app_label, name)
 
 class Model(object):
     __metaclass__ = ModelBase
