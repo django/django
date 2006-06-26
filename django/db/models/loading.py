@@ -97,8 +97,8 @@ def register_models(app_label, *models):
             # The same model may be imported via different paths (e.g.
             # appname.models and project.appname.models). We use the source
             # filename as a means to detect identity.
-            fname1 = os.path.normpath(sys.modules[model.__module__].__file__)
-            fname2 = os.path.normpath(sys.modules[model_dict[model_name].__module__].__file__)
+            fname1 = os.path.abspath(sys.modules[model.__module__].__file__)
+            fname2 = os.path.abspath(sys.modules[model_dict[model_name].__module__].__file__)
             # Since the filename extension could be .py the first time and .pyc
             # or .pyo the second time, ignore the extension when comparing.
             if os.path.splitext(fname1)[0] == os.path.splitext(fname2)[0]:
