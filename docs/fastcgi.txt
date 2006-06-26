@@ -120,18 +120,53 @@ Apache setup
 ============
 
 To use Django with Apache and FastCGI, you'll need Apache installed and
-configured, with mod_fastcgi installed and enabled. Consult the Apache
+configured, with `mod_fastcgi`_ installed and enabled. Consult the Apache
 documentation for instructions.
 
-Add the following to your ``httpd.conf``::
+Once you've got that set up, point Apache at your Django FastCGI instance by
+editing the ``httpd.conf`` (Apache configuration) file. You'll need to do two
+things:
 
-    # Connect to FastCGI via a socket / named pipe
+    * Use the ``FastCGIExternalServer`` directive to specify the location of
+      your FastCGI server.
+    * Use ``mod_rewrite`` to point URLs at FastCGI as appropriate.
+
+.. _mod_fastcgi: http://www.fastcgi.com/mod_fastcgi/docs/mod_fastcgi.html
+
+Specifying the location of the FastCGI server
+---------------------------------------------
+
+The ``FastCGIExternalServer`` directive tells Apache how to find your FastCGI
+server. As the `FastCGIExternalServer docs`_ explain, you can specify either a
+``socket`` or a ``host``. Here are examples of both::
+
+    # Connect to FastCGI via a socket / named pipe.
     FastCGIExternalServer /home/user/public_html/mysite.fcgi -socket /home/user/mysite.sock
-    # Connect to FastCGI via a TCP host/port
-    # FastCGIExternalServer /home/user/public_html/mysite.fcgi -host 127.0.0.1:3033
 
-    <VirtualHost 64.92.160.91>
-      ServerName mysite.com
+    # Connect to FastCGI via a TCP host/port.
+    FastCGIExternalServer /home/user/public_html/mysite.fcgi -host 127.0.0.1:3033
+
+In either case, the file ``/home/user/public_html/mysite.fcgi`` doesn't
+actually have to exist. It's just a URL used by the Web server internally -- a
+hook for signifying which requests at a URL should be handled by FastCGI. (More
+on this in the next section.)
+
+.. _FastCGIExternalServer docs: http://www.fastcgi.com/mod_fastcgi/docs/mod_fastcgi.html#FastCgiExternalServer
+
+Using mod_rewrite to point URLs at FastCGI
+------------------------------------------
+
+The second step is telling Apache to use FastCGI for URLs that match a certain
+pattern. To do this, use the `mod_rewrite`_ module and rewrite URLs to
+``mysite.fcgi`` (or whatever you specified in the ``FastCGIExternalServer``
+directive, as explained in the previous section).
+
+In this example, we tell Apache to use FastCGI to handle any request that
+doesn't represent a file on the filesystem and doesn't start with ``/media/``.
+This is probably the most common case, if you're using Django's admin site::
+
+    <VirtualHost 12.34.56.78>
+      ServerName example.com
       DocumentRoot /home/user/public_html
       Alias /media /home/user/python/django/contrib/admin/media
       RewriteEngine On
@@ -140,18 +175,15 @@ Add the following to your ``httpd.conf``::
       RewriteRule ^/(.*)$ /mysite.fcgi/$1 [QSA,L]
     </VirtualHost>
 
-Note that while you have to specify a mysite.fcgi, that this file doesn't
-actually have to exist.  It is just an internal URL to the webserver which
-signifies that any requests to that URL will go to the external FastCGI
-server.
+.. _mod_rewrite: http://httpd.apache.org/docs/2.0/mod/mod_rewrite.html
 
-LigHTTPd Setup
+lighttpd setup
 ==============
 
-LigHTTPd is a light-weight asynchronous web-server, which is commonly used
-for serving static files.  However, it supports FastCGI natively, and as such
-is a very good choice for serving both static and dynamic media, if your site
-does not have any apache-specific components.
+lighttpd is a light-weight asynchronous Web server commonly used for serving
+static files. It supports FastCGI natively, though, and thus is a good choice
+for serving both static and dynamic pages, if your site doesn't have any
+Apache-specific components.
 
 Make sure ``mod_fastcgi`` is in your modules list, somewhere after
 mod_rewrite and mod_access, but not after mod_accesslog.  You'll probably
@@ -165,7 +197,7 @@ Add the following to your lighttpd config file::
             "main" => (
                 # Use host / port instead of socket for TCP fastcgi
                 # "host" => "127.0.0.1",
-                # "port"  => 3033,
+                # "port" => 3033,
                 "socket" => "/home/user/mysite.sock",
                 "check-local" => "disable",
             )
@@ -181,10 +213,10 @@ Add the following to your lighttpd config file::
         "^(/.*)$" => "/mysite.fcgi$1",
     )
 
-Running multiple django sites on one LigHTTPd
+Running multiple django sites on one lighttpd
 ---------------------------------------------
 
-LigHTTPd allows you to use what is called conditional configuration to allow
+lighttpd allows you to use what is called conditional configuration to allow
 configuration to be customized per-host.  In order to specify multiple fastcgi
 sites, simply add a conditional block around your fastcgi config for each site::
 
