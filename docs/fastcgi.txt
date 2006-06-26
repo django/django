@@ -36,6 +36,16 @@ persistent process.
     security benefit on shared systems, because it means you can secure your
     code from other users.
 
+Prerequisite: flup
+==================
+
+Before you can start using FastCGI with Django, you'll need to install flup_,
+which is a Python library for dealing with FastCGI. Make sure to use the latest
+Subversion snapshot of flup, as some users have reported stalled pages with
+older flup versions.
+
+.. _flup: http://www.saddi.com/software/flup/
+
 Starting your FastCGI server
 ============================
 
