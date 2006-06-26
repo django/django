@@ -14,6 +14,10 @@ import inspect, os, re
 # Exclude methods starting with these strings from documentation
 MODEL_METHODS_EXCLUDE = ('_', 'add_', 'delete', 'save', 'set_')
 
+class GenericSite(object):
+    domain = 'example.com'
+    name = 'my site'
+
 def doc_index(request):
     if not utils.docutils_is_available:
         return missing_docutils_page(request)
@@ -102,12 +106,16 @@ def view_index(request):
     for settings_mod in settings_modules:
         urlconf = __import__(settings_mod.ROOT_URLCONF, '', '', [''])
         view_functions = extract_views_from_urlpatterns(urlconf.urlpatterns)
+        if Site._meta.installed:
+            site_obj = Site.objects.get(pk=settings_mod.SITE_ID)
+        else:
+            site_obj = GenericSite()
         for (func, regex) in view_functions:
             views.append({
                 'name': func.__name__,
                 'module': func.__module__,
                 'site_id': settings_mod.SITE_ID,
-                'site': Site.objects.get(pk=settings_mod.SITE_ID),
+                'site': site_obj,
                 'url': simplify_regex(regex),
             })
     return render_to_response('admin_doc/view_index.html', {'views': views}, context_instance=RequestContext(request))
@@ -228,6 +236,10 @@ def template_detail(request, template):
     templates = []
     for site_settings_module in settings.ADMIN_FOR:
         settings_mod = __import__(site_settings_module, '', '', [''])
+        if Site._meta.installed:
+            site_obj = Site.objects.get(pk=settings_mod.SITE_ID)
+        else:
+            site_obj = GenericSite()
         for dir in settings_mod.TEMPLATE_DIRS:
             template_file = os.path.join(dir, "%s.html" % template)
             templates.append({
@@ -235,7 +247,7 @@ def template_detail(request, template):
                 'exists': os.path.exists(template_file),
                 'contents': lambda: os.path.exists(template_file) and open(template_file).read() or '',
                 'site_id': settings_mod.SITE_ID,
-                'site': Site.objects.get(pk=settings_mod.SITE_ID),
+                'site': site_obj,
                 'order': list(settings_mod.TEMPLATE_DIRS).index(dir),
             })
     return render_to_response('admin_doc/template_detail.html', {
