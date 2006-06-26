@@ -180,14 +180,13 @@ This is probably the most common case, if you're using Django's admin site::
 lighttpd setup
 ==============
 
-lighttpd is a light-weight asynchronous Web server commonly used for serving
-static files. It supports FastCGI natively, though, and thus is a good choice
-for serving both static and dynamic pages, if your site doesn't have any
-Apache-specific components.
+lighttpd is a lightweight Web server commonly used for serving static files. It
+supports FastCGI natively and, thus, is a good choice for serving both static
+and dynamic pages, if your site doesn't have any Apache-specific needs.
 
 Make sure ``mod_fastcgi`` is in your modules list, somewhere after
-mod_rewrite and mod_access, but not after mod_accesslog.  You'll probably
-want mod_alias as well, for serving admin media.
+``mod_rewrite`` and ``mod_access``, but not after ``mod_accesslog``. You'll
+probably want ``mod_alias`` as well, for serving admin media.
 
 Add the following to your lighttpd config file::
 
@@ -213,14 +212,15 @@ Add the following to your lighttpd config file::
         "^(/.*)$" => "/mysite.fcgi$1",
     )
 
-Running multiple django sites on one lighttpd
+Running multiple Django sites on one lighttpd
 ---------------------------------------------
 
-lighttpd allows you to use what is called conditional configuration to allow
-configuration to be customized per-host.  In order to specify multiple fastcgi
-sites, simply add a conditional block around your fastcgi config for each site::
+lighttpd lets you use "conditional configuration" to allow configuration to be
+customized per host. To specify multiple FastCGI sites, just add a conditional
+block around your FastCGI config for each site::
 
-    $HTTP["host"] == "www.website1.com" {
+    # If the hostname is 'www.example1.com'...
+    $HTTP["host"] == "www.example1.com" {
         server.document-root = "/foo/site1"
         fastcgi.server = (
            ...
@@ -228,7 +228,8 @@ sites, simply add a conditional block around your fastcgi config for each site::
         ...
     }
 
-    $HTTP["host"] == "www.website2.com" {
+    # If the hostname is 'www.example2.com'...
+    $HTTP["host"] == "www.example2.com" {
         server.document-root = "/foo/site2"
         fastcgi.server = (
            ...
@@ -236,44 +237,44 @@ sites, simply add a conditional block around your fastcgi config for each site::
         ...
     }
 
-You can also run multiple django installations on the same site simply by
-specifying multiple entries in the ``fastcgi.server`` directive, add one
-fastcgi host for each.
+You can also run multiple Django installations on the same site simply by
+specifying multiple entries in the ``fastcgi.server`` directive. Add one
+FastCGI host for each.
 
-Running Django on a shared-hosting provider
-===========================================
+Running Django on a shared-hosting provider with Apache
+=======================================================
 
-For many users on shared-hosting providers, you aren't able to run your own
-server daemons nor do they have access to the httpd.conf of their webserver.
-However, it is still possible to run Django using webserver-spawned processes.
+Many shared-hosting providers don't allow you to run your own server daemons or
+edit the ``httpd.conf`` file. In these cases, it's still possible to run Django
+using Web server-spawned processes.
 
 .. admonition:: Note
 
-    If you are using webserver-managed processes, there's no need for you
-    to start the FastCGI server on your own.  Apache will spawn a number
-    of processes, scaling as it needs to.
+    If you're using Web server-spawned processes, as explained in this section,
+    there's no need for you to start the FastCGI server on your own. Apache
+    will spawn a number of processes, scaling as it needs to.
 
-In your web root directory, add this to a file named .htaccess ::
+In your Web root directory, add this to a file named ``.htaccess`` ::
 
     AddHandler fastcgi-script .fcgi
     RewriteEngine On
     RewriteCond %{REQUEST_FILENAME} !-f
     RewriteRule ^/(.*)$ /mysite.fcgi/$1 [QSA,L]
 
-Now you must add a small shim script in order for apache to properly
-spawn your FastCGI program.  Create a mysite.fcgi and place it in your
-web directory, making it executable ::
+Then, create a small script that tells Apache how to spawn your FastCGI
+program. Create a file ``mysite.fcgi`` and place it in your Web directory, and
+be sure to make it executable ::
 
     #!/usr/bin/python
     import sys, os
 
-    # add a custom pythonpath
+    # Add a custom Python path.
     sys.path.insert(0, "/home/user/python")
 
-    # switch to the directory of your project. (optional)
+    # Switch to the directory of your project. (Optional.)
     # os.chdir("/home/user/myproject")
 
-    # change to the name of your app's settings module
+    # Set the DJANGO_SETTINGS_MODULE environment variable.
     os.environ['DJANGO_SETTINGS_MODULE'] = "myproject.settings"
 
     from django.core.servers.fastcgi import runfastcgi
@@ -282,13 +283,13 @@ web directory, making it executable ::
 Restarting the spawned server
 -----------------------------
 
-If you change the code of your site, to make apache re-load your django
-application, you do not need to restart the server.  Simply re-upload or
-edit your ``mysite.fcgi`` in such a way that the timestamp on the file
-will change.  When apache sees that the file has been updated, it will
-restart your django application for you.
+If you change any Python code on your site, you'll need to tell FastCGI the
+code has changed. But there's no need to restart Apache in this case. Rather,
+just reupload ``mysite.fcgi``, or edit the file, so that the timestamp on the
+file will change. When Apache sees the file has been updated, it will restart
+your Django application for you.
 
-If you have access to a command shell on a unix system, restarting the
-server can be done with the ``touch`` command::
+If you have access to a command shell on a Unix system, you can accomplish this
+easily by using the ``touch`` command::
 
     touch mysite.fcgi
