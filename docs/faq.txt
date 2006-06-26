@@ -301,16 +301,18 @@ PostgreSQL fans, and MySQL_ and `SQLite 3`_ are also supported.
 Do I have to use mod_python?
 ----------------------------
 
-Not if you just want to play around and develop things on your local computer.
-Django comes with its own Web server, and things should Just Work.
+Although we recommend mod_python for production use, you don't have to use it,
+thanks to the fact that Django uses an arrangement called WSGI_. Django can
+talk to any WSGI-enabled server. The most common non-mod_python deployment
+setup is FastCGI. See `How to use Django with FastCGI`_ for full information.
 
-For production use, though, we recommend mod_python. The Django developers have
-been running it on mod_python for several years, and it's quite stable.
+Also, see the `server arrangements wiki page`_ for other deployment strategies.
 
-However, if you don't want to use mod_python, you can use a different server,
-as long as that server has WSGI_ hooks. See the `server arrangements wiki page`_.
+If you just want to play around and develop things on your local computer, use
+the development Web server that comes with Django. Things should Just Work.
 
 .. _WSGI: http://www.python.org/peps/pep-0333.html
+.. _How to use Django with FastCGI: http://www.djangoproject.com/documentation/fastcgi/
 .. _server arrangements wiki page: http://code.djangoproject.com/wiki/ServerArrangements
 
 How do I install mod_python on Windows?

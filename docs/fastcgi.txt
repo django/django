@@ -2,7 +2,7 @@
 How to use Django with FastCGI
 ==============================
 
-Although the current preferred setup for running Django is Apache_ with
+Although the `current preferred setup`_ for running Django is Apache_ with
 `mod_python`_, many people use shared hosting, on which FastCGI is the only
 viable option. In some setups, FastCGI also allows better security -- and,
 possibly, better performance -- than mod_python.
@@ -17,6 +17,7 @@ served with no startup time. Unlike mod_python (or `mod_perl`_), a FastCGI
 process doesn't run inside the Web server process, but in a separate,
 persistent process.
 
+.. _current preferred setup: http://www.djangoproject.com/documentation/modpython/
 .. _Apache: http://httpd.apache.org/
 .. _mod_python: http://www.modpython.org/
 .. _mod_perl: http://perl.apache.org/
