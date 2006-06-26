@@ -783,7 +783,7 @@ Our earlier ``current_time`` function could thus be written like this::
 
 In Python 2.4, the decorator syntax also works::
 
-    @simple_tag
+    @register.simple_tag
     def do_current_time(token):
         ...
 
@@ -844,7 +844,7 @@ loader, we'd register the tag like this::
 As always, Python 2.4 decorator syntax works as well, so we could have
 written::
 
-    @inclusion_tag('results.html')
+    @register.inclusion_tag('results.html')
     def show_results(poll):
         ...
 
