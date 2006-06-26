@@ -134,7 +134,9 @@ put into those elements.
 
       If you don't create a template for either the title or description, the
       framework will use the template ``"{{ obj }}"`` by default -- that is,
-      the normal string representation of the object.
+      the normal string representation of the object. You can also change the
+      names of these two templates by specifying ``title_template`` and
+      ``description_template`` as attributes of your ``Feed`` class.
     * To specify the contents of ``<link>``, you have two options. For each
       item in ``items()``, Django first tries executing a
       ``get_absolute_url()`` method on that object. If that method doesn't
@@ -341,6 +343,16 @@ This example illustrates all possible attributes and methods for a ``Feed`` clas
         # This should be a class, not an instance of the class.
 
         feed_type = feedgenerator.Rss201rev2Feed
+
+        # TEMPLATE NAMES -- Optional. These should be strings representing
+        # names of Django templates that the system should use in rendering the
+        # title and description of your feed items. Both are optional.
+        # If you don't specify one, or either, Django will use the template
+        # 'feeds/SLUG_title.html' and 'feeds/SLUG_description.html', where SLUG
+        # is the slug you specify in the URL.
+
+        title_template = None
+        description_template = None
 
         # TITLE -- One of the following three is required. The framework looks
         # for them in this order.
