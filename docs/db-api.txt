@@ -60,6 +60,10 @@ the database until you explicitly call ``save()``.
 
 The ``save()`` method has no return value.
 
+To create an object and save it all in one step see the `create`__ method.
+
+__ `create(**kwargs)`_
+
 Auto-incrementing primary keys
 ------------------------------
 
@@ -704,6 +708,20 @@ The ``DoesNotExist`` exception inherits from
         b = Blog.objects.get(id=1)
     except ObjectDoesNotExist:
         print "Either the entry or blog doesn't exist."
+
+``create(**kwargs)``
+~~~~~~~~~~~~~~~~~~~~
+
+A convenience method for creating an object and saving it all in one step.  Thus::
+
+    p = Person.objects.create(first_name="Bruce", last_name="Springsteen")
+    
+and::
+
+    p = Person(first_name="Bruce", last_name="Springsteen")
+    p.save()
+    
+are equivalent.
 
 ``get_or_create(**kwargs)``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~

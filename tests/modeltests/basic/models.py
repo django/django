@@ -347,4 +347,9 @@ API_TESTS += """
 >>> a101 = Article.objects.get(pk=101)
 >>> a101.headline
 'Article 101'
+
+# You can create saved objects in a single step
+>>> a10 = Article.objects.create(headline="Article 10", pub_date=datetime(2005, 7, 31, 12, 30, 45))
+>>> Article.objects.get(headline="Article 10")
+<Article: Article 10>
 """
