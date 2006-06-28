@@ -3,7 +3,7 @@
 <form {% if photos_optional or photos_required %}enctype="multipart/form-data" {% endif %}action="/comments/post/" method="post">
 
 {% if user.is_anonymous %}
-<p>{% trans "Username:" %} <input type="text" name="username" id="id_username" /><br />{% trans "Password:" %} <input type="password" name="password" id="id_password" /> (<a href="/accounts/password_reset/">{% trans "Forgotten your password?" %}</a>)</p>
+<p><label for="id_username">{% trans "Username:" %}</label> <input type="text" name="username" id="id_username" /><br />{% trans "Password:" %} <input type="password" name="password" id="id_password" /> (<a href="/accounts/password_reset/">{% trans "Forgotten your password?" %}</a>)</p>
 {% else %}
 <p>{% trans "Username:" %} <strong>{{ user.username }}</strong> (<a href="/accounts/logout/">{% trans "Log out" %}</a>)</p>
 {% endif %}
@@ -20,11 +20,13 @@
 {% endif %}
 
 {% if photos_optional or photos_required %}
-<p>{% trans "Post a photo" %} ({% if photos_required %}{% trans "Required" %}{% else %}{% trans "Optional" %}{% endif %}): <input type="file" name="photo" /></p>
+<p><label for="id_photo">{% trans "Post a photo" %}</label> ({% if photos_required %}{% trans "Required" %}{% else %}{% trans "Optional" %}{% endif %}):
+<input type="file" name="photo" id="id_photo" /></p>
 <input type="hidden" name="photo_options" value="{{ photo_options }}" />
 {% endif %}
 
-<p>{% trans "Comment:" %}<br /><textarea name="comment" id="id_comment" rows="10" cols="60"></textarea></p>
+<p><label for="id_comment">{% trans "Comment:" %}</label><br />
+<textarea name="comment" id="id_comment" rows="10" cols="60"></textarea></p>
 
 <input type="hidden" name="options" value="{{ options }}" />
 <input type="hidden" name="target" value="{{ target }}" />

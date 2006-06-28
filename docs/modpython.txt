@@ -10,15 +10,17 @@ Python code into memory when the server starts. Code stays in memory throughout
 the life of an Apache process, which leads to significant performance gains over
 other server arrangements.
 
-Django requires Apache 2.x and mod_python 3.x.
+Django requires Apache 2.x and mod_python 3.x, and you should use Apache's
+`prefork MPM`_, as opposed to the `worker MPM`_.
 
-We recommend you use Apache's `prefork MPM`_, as opposed to the `worker MPM`_.
+You may also be interested in `How to use Django with FastCGI`_.
 
 .. _Apache: http://httpd.apache.org/
 .. _mod_python: http://www.modpython.org/
 .. _mod_perl: http://perl.apache.org/
 .. _prefork MPM: http://httpd.apache.org/docs/2.2/mod/prefork.html
 .. _worker MPM: http://httpd.apache.org/docs/2.2/mod/worker.html
+.. _How to use Django with FastCGI: http://www.djangoproject.com/documentation/fastcgi/
 
 Basic configuration
 ===================
