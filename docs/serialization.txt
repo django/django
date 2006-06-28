@@ -1,0 +1,85 @@
+==========================
+Serializing Django objects
+==========================
+
+.. note::
+    
+    This API is currently under heavy development and may change --
+    perhaps drastically -- in the future.
+    
+    You have been warned.
+    
+Django's serialization framework provides a mechanism for "translating" Django
+objects into other formats. Usually these other formats will be text-based and
+used for sending Django objects over a wire, but it's possible for a
+serializer to handle any format (text-based or not).
+
+Serializing data
+----------------
+
+At the highest level, serializing data is a very simple operation::
+
+    from django.core import serializers
+    data = serializers.serialize("xml", SomeModel.objects.all())
+    
+The arguments to the ``serialize`` function are the format to serialize the
+data to (see `Serialization formats`_) and a QuerySet_ to serialize.
+(Actually, the second argument can be any iterator that yields Django objects,
+but it'll almost always be a QuerySet).
+
+.. _QuerySet: ../db_api/#retrieving-objects
+
+You can also use a serializer object directly::
+
+    xml_serializer = serializers.get_serializer("xml")
+    xml_serializer.serialize(queryset)
+    data = xml_serializer.getvalue()
+    
+This is useful if you want to serialize data directly to a file-like object
+(which includes a HTTPResponse_)::
+
+    out = open("file.xml", "w")
+    xml_serializer.serialize(SomeModel.objects.all(), stream=out)
+
+.. _HTTPResponse: ../request_response/#httpresponse-objects
+
+Deserializing data
+------------------
+
+Deserializing data is also a fairly simple operation::
+
+    for obj in serializers.deserialize("xml", data):
+        do_something_with(obj)
+    
+As you can see, the ``deserialize`` function takes the same format argument as
+``serialize``, a string or stream of data, and returns an iterator.
+
+However, here it gets slightly complicated. The objects returned by the
+``deserialize`` iterator *aren't* simple Django objects. Instead, they are
+special ``DeserializedObject`` instances that wrap a created -- but unsaved --
+object and any associated relationship data.
+
+Calling ``DeserializedObject.save()`` saves the object to the database.
+
+This ensures that deserializing is a non-destructive operation even if the
+data in your serialized representation doesn't match what's currently in the
+database. Usually, working with these ``DeserializedObject`` instances looks
+something like::
+
+    for deserialized_object in serializers.deserialize("xml", data):
+        if object_should_be_saved(deserialized_object):
+            obj.save()
+            
+In other words, the usual use is to examine the deserialized objects to make
+sure that they are "appropriate" for saving before doing so.  Of course, if you trust your data source you could just save the object and move on.
+
+The Django object itself can be inspected as ``deserialized_object.object``.
+
+Serialization formats
+---------------------
+
+Django "ships" with a few included serializers, and there's a simple API for creating and registering your own...
+
+.. note::
+
+    ... which will be documented once the API is stable :)
