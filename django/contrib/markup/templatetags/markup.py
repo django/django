@@ -27,7 +27,7 @@ def textile(value):
             raise template.TemplateSyntaxError, "Error in {% textile %} filter: The Python textile library isn't installed."
         return value
     else:
-        return textile.textile(value)
+        return textile.textile(value, encoding=settings.DEFAULT_CHARSET, output=settings.DEFAULT_CHARSET)
 
 def markdown(value):
     try:
