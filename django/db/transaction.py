@@ -16,7 +16,7 @@ try:
     import thread
 except ImportError:
     import dummy_thread as thread
-from django.db import connection
+from django import db
 from django.conf import settings
 
 class TransactionManagementError(Exception):
@@ -116,48 +116,67 @@ def managed(flag=True):
     Puts the transaction manager into a manual state: managed transactions have
     to be committed explicitly by the user. If you switch off transaction
     management and there is a pending commit/rollback, the data will be
-    commited.
+    commited. Note that managed state applies across all connections.
     """
     thread_ident = thread.get_ident()
     top = state.get(thread_ident, None)
     if top:
         top[-1] = flag
         if not flag and is_dirty():
-            connection._commit()
+            for cx in all_connections():
+                cx._commit()
             set_clean()
     else:
         raise TransactionManagementError("This code isn't under transaction management")
 
-def commit_unless_managed():
+def commit_unless_managed(connections=None):
     """
     Commits changes if the system is not in managed transaction mode.
     """
     if not is_managed():
-        connection._commit()
+        if connections is None:
+            connections = all_connections()
+        else:
+            connections = ensure_connections(connections)
+        for cx in connections:
+            cx._commit()
     else:
         set_dirty()
 
-def rollback_unless_managed():
+def rollback_unless_managed(connections=None):
     """
     Rolls back changes if the system is not in managed transaction mode.
     """
     if not is_managed():
-        connection._rollback()
+        if connections is None:
+            connections = all_connections()
+        for cx in connections:
+            cx._rollback()
     else:
         set_dirty()
 
-def commit():
+def commit(connections=None):
     """
     Does the commit itself and resets the dirty flag.
     """
-    connection._commit()
+    if connections is None:
+        connections = all_connections()
+    else:
+        connections = ensure_connections(connections)
+    for cx in connections:
+        cx._commit()
     set_clean()
 
-def rollback():
+def rollback(connections=None):
     """
     This function does the rollback itself and resets the dirty flag.
     """
-    connection._rollback()
+    if connections is None:
+        connections = all_connections()
+    else:
+        connections = ensure_connections(connections)
+    for cx in connections:
+        cx._rollback()
     set_clean()
 
 ##############
@@ -179,7 +198,7 @@ def autocommit(func):
             leave_transaction_management()
     return _autocommit
 
-def commit_on_success(func):
+def commit_on_success(func, connections=None):
     """
     This decorator activates commit on response. This way, if the view function
     runs successfully, a commit is made; if the viewfunc produces an exception,
@@ -198,7 +217,7 @@ def commit_on_success(func):
                 raise
             else:
                 if is_dirty():
-                    commit()
+                    commit(connections)
             return res
         finally:
             leave_transaction_management()
@@ -220,3 +239,29 @@ def commit_manually(func):
             leave_transaction_management()
 
     return _commit_manually
+
+###########
+# HELPERS #
+###########
+
+def all_connections():
+    return [db.connection] + [ c.connection
+                               for c in db.connections.values() ]
+
+def ensure_connections(val):
+    connections = []
+    if isinstance(val, basestring):
+        val = [val]
+    try:
+        iter(val)
+    except:
+        val = [val]
+    for cx in val:
+        if hasattr(cx, 'cursor'):
+            connections.append(cx)
+        elif hasattr(cx, 'connection'):
+            connections.append(cx.connection)
+        elif isinstance(cx, basestring):
+            connections.append(db.connections[cx].connection)
+    return connections
+        
