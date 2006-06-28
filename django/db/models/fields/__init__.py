@@ -411,7 +411,7 @@ class DateField(Field):
     def get_db_prep_lookup(self, lookup_type, value):
         if lookup_type == 'range':
             value = [str(v) for v in value]
-        elif lookup_type in ('exact', 'gt', 'gte', 'lt', 'lte', 'ne'):
+        elif lookup_type in ('exact', 'gt', 'gte', 'lt', 'lte', 'ne') and hasattr(value, 'strftime'):
             value = value.strftime('%Y-%m-%d')
         else:
             value = str(value)

@@ -58,6 +58,10 @@ Article 4
 >>> Article.objects.filter(headline__startswith='Blah blah').count()
 0L
 
+# Date and date/time lookups can also be done with strings.
+>>> Article.objects.filter(pub_date__exact='2005-07-27 00:00:00').count()
+3L
+
 # in_bulk() takes a list of IDs and returns a dictionary mapping IDs
 # to objects.
 >>> Article.objects.in_bulk([1, 2])
