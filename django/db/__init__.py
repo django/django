@@ -98,11 +98,7 @@ class LazyConnectionManager(object):
         try:
             return self._connections[k]
         except KeyError:
-            try:
-                return self.connect(k)
-            except KeyError:
-                raise ImproperlyConfigured, \
-                      "No database connection '%s' has been configured" % k
+            return self.connect(k)
             
     def connect(self, name):
         """Return the connection with this name in
