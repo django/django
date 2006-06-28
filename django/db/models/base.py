@@ -399,10 +399,10 @@ def method_set_order(ordered_obj, self, id_list):
     cursor = connection.cursor()
     # Example: "UPDATE poll_choices SET _order = %s WHERE poll_id = %s AND id = %s"
     sql = "UPDATE %s SET %s = %%s WHERE %s = %%s AND %s = %%s" % \
-        (backend.quote_name(ordered_obj.db_table), backend.quote_name('_order'),
-        backend.quote_name(ordered_obj.order_with_respect_to.column),
-        backend.quote_name(ordered_obj.pk.column))
-    rel_val = getattr(self, ordered_obj.order_with_respect_to.rel.field_name)
+        (backend.quote_name(ordered_obj._meta.db_table), backend.quote_name('_order'),
+        backend.quote_name(ordered_obj._meta.order_with_respect_to.column),
+        backend.quote_name(ordered_obj._meta.pk.column))
+    rel_val = getattr(self, ordered_obj._meta.order_with_respect_to.rel.field_name)
     cursor.executemany(sql, [(i, rel_val, j) for i, j in enumerate(id_list)])
     transaction.commit_unless_managed()
 

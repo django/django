@@ -267,17 +267,25 @@ previous section). You can tell them apart with ``is_anonymous()``, like so::
 How to log a user in
 --------------------
 
-To log a user in, do the following within a view::
+Depending on your task, you'll probably want to make sure to validate the 
+user's username and password before you log them in. The easiest way to do so 
+is to use the built-in ``authenticate`` and ``login`` functions from within a 
+view::
 
-    from django.contrib.auth.models import SESSION_KEY
-    request.session[SESSION_KEY] = some_user.id
+    from django.contrib.auth import authenticate, login
+    username = request.POST['username']
+    password = request.POST['password']
+    user = authenticate(username=username, password=password)
+    if user is not None:
+        login(request, user)
 
-Because this uses sessions, you'll need to make sure you have
-``SessionMiddleware`` enabled. See the `session documentation`_ for more
-information.
+``authenticate`` checks the username and password. If they are valid it 
+returns a user object, otherwise it returns ``None``. ``login`` makes it so 
+your users don't have send a username and password for every request. Because 
+the ``login`` function uses sessions, you'll need to make sure you have 
+``SessionMiddleware`` enabled. See the `session documentation`_ for 
+more information.
 
-This assumes ``some_user`` is your ``User`` instance. Depending on your task,
-you'll probably want to make sure to validate the user's username and password.
 
 Limiting access to logged-in users
 ----------------------------------
@@ -672,3 +680,84 @@ Finally, note that this messages framework only works with users in the user
 database. To send messages to anonymous users, use the `session framework`_.
 
 .. _session framework: http://www.djangoproject.com/documentation/sessions/
+
+Other Authentication Sources
+============================
+
+Django supports other authentication sources as well. You can even use 
+multiple sources at the same time.
+
+Using multiple backends
+-----------------------
+
+The list of backends to use is controlled by the ``AUTHENTICATION_BACKENDS`` 
+setting. This should be a tuple of python path names. It defaults to 
+``('django.contrib.auth.backends.ModelBackend',)``. To add additional backends
+just add them to your settings.py file. Ordering matters, so if the same
+username and password is valid in multiple backends, the first one in the
+list will return a user object, and the remaining ones won't even get a chance.
+
+Writing an authentication backend
+---------------------------------
+
+An authentication backend is a class that implements 2 methods: 
+``get_user(id)`` and ``authenticate(**credentials)``. The ``get_user`` method 
+takes an id, which could be a username, and database id, whatever, and returns 
+a user object. The  ``authenticate`` method takes credentials as keyword 
+arguments. Many times it will just look like this::
+
+    class MyBackend:
+        def authenticate(username=None, password=None):
+            # check the username/password and return a user
+
+but it could also authenticate a token like so::
+
+    class MyBackend:
+        def authenticate(token=None):
+            # check the token and return a user
+
+Regardless, ``authenticate`` should check the credentials it gets, and if they 
+are valid, it should return a user object that matches those credentials.
+
+The Django admin system is tightly coupled to the Django User object described 
+at the beginning of this document. For now, the best way to deal with this is 
+to create a Django User object for each user that exists for your backend 
+(i.e. in your LDAP directory, your external SQL database, etc.) You can either 
+write a script to do this in advance, or your ``authenticate`` method can do 
+it the first time a user logs in.  Here's an example backend that 
+authenticates against a username and password variable defined in your 
+``settings.py`` file and creates a Django user object the first time they 
+authenticate::
+
+    from django.conf import settings
+    from django.contrib.auth.models import User, check_password
+
+    class SettingsBackend:
+        """
+        Authenticate against vars in settings.py Use the login name, and a hash 
+        of the password. For example:
+
+        ADMIN_LOGIN = 'admin'
+        ADMIN_PASSWORD = 'sha1$4e987$afbcf42e21bd417fb71db8c66b321e9fc33051de'
+        """
+        def authenticate(self, username=None, password=None):
+            login_valid = (settings.ADMIN_LOGIN == username)
+            pwd_valid = check_password(password, settings.ADMIN_PASSWORD)
+            if login_valid and pwd_valid:
+                try:
+                    user = User.objects.get(username=username)
+                except User.DoesNotExist:
+                    # Create a new user. Note that we can set password to anything
+                    # as it won't be checked, the password from settings.py will.
+                    user = User(username=username, password='get from settings.py')
+                    user.is_staff = True
+                    user.is_superuser = True
+                    user.save()
+                return user
+            return None
+
+        def get_user(self, user_id):
+            try:
+                return User.objects.get(pk=user_id)
+            except User.DoesNotExist:
+                return None

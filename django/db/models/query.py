@@ -204,6 +204,15 @@ class QuerySet(object):
             raise self.model.DoesNotExist, "%s matching query does not exist." % self.model._meta.object_name
         assert len(obj_list) == 1, "get() returned more than one %s -- it returned %s! Lookup parameters were %s" % (self.model._meta.object_name, len(obj_list), kwargs)
         return obj_list[0]
+        
+    def create(self, **kwargs):
+        """
+        Create a new object with the given kwargs, saving it to the database
+        and returning the created object.
+        """
+        obj = self.model(**kwargs)
+        obj.save()
+        return obj
 
     def get_or_create(self, **kwargs):
         """
