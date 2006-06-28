@@ -7,7 +7,7 @@ from django.db.models.fields.related import OneToOneRel, ManyToOneRel
 from django.db.models.related import RelatedObject
 from django.db.models.query import orderlist2sql, delete_objects
 from django.db.models.options import Options, AdminOptions
-from django.db import connection, backend, transaction
+from django.db import transaction
 from django.db.models import signals
 from django.db.models.loading import register_models, get_model
 from django.dispatch import dispatcher
@@ -158,6 +158,9 @@ class Model(object):
     def save(self):
         dispatcher.send(signal=signals.pre_save, sender=self.__class__, instance=self)
 
+        info = self._meta.connection_info
+        connection = info.connection
+        backend = info.backend
         non_pks = [f for f in self._meta.fields if not f.primary_key]
         cursor = connection.cursor()
 
@@ -205,7 +208,7 @@ class Model(object):
                      backend.get_pk_default_value()))
             if self._meta.has_auto_field and not pk_set:
                 setattr(self, self._meta.pk.attname, backend.get_last_insert_id(cursor, self._meta.db_table, self._meta.pk.column))
-        transaction.commit_unless_managed()
+        transaction.commit_unless_managed([connection])
 
         # Run any post-save hooks.
         dispatcher.send(signal=signals.post_save, sender=self.__class__, instance=self)
@@ -276,6 +279,7 @@ class Model(object):
         return dict(field.choices).get(value, value)
 
     def _get_next_or_previous_by_FIELD(self, field, is_next, **kwargs):
+        backend = self._meta.connection_info.backend
         op = is_next and '>' or '<'
         where = '(%s %s %%s OR (%s = %%s AND %s.%s %s %%s))' % \
             (backend.quote_name(field.column), op, backend.quote_name(field.column),
@@ -290,6 +294,7 @@ class Model(object):
             raise self.DoesNotExist, "%s matching query does not exist." % self.__class__._meta.object_name
 
     def _get_next_or_previous_in_order(self, is_next):
+        backend = self._meta.connection_info.backend
         cachename = "__%s_order_cache" % is_next
         if not hasattr(self, cachename):
             op = is_next and '>' or '<'
@@ -378,6 +383,9 @@ class Model(object):
         rel = rel_field.rel.to
         m2m_table = rel_field.m2m_db_table()
         this_id = self._get_pk_val()
+        info = self._meta.connection_info
+        connection = info.connection
+        backend = info.backend
         cursor = connection.cursor()
         cursor.execute("DELETE FROM %s WHERE %s = %%s" % \
             (backend.quote_name(m2m_table),
@@ -387,7 +395,7 @@ class Model(object):
             backend.quote_name(rel_field.m2m_column_name()),
             backend.quote_name(rel_field.m2m_reverse_name()))
         cursor.executemany(sql, [(this_id, i) for i in id_list])
-        transaction.commit_unless_managed()
+        transaction.commit_unless_managed([connection])
 
 ############################################
 # HELPER FUNCTIONS (CURRIED MODEL METHODS) #
@@ -396,6 +404,9 @@ class Model(object):
 # ORDERING METHODS #########################
 
 def method_set_order(ordered_obj, self, id_list):
+    connection_info = ordered_obj._meta.connection_info
+    connection = info.connection
+    backend = info.backend    
     cursor = connection.cursor()
     # Example: "UPDATE poll_choices SET _order = %s WHERE poll_id = %s AND id = %s"
     sql = "UPDATE %s SET %s = %%s WHERE %s = %%s AND %s = %%s" % \
@@ -404,9 +415,12 @@ def method_set_order(ordered_obj, self, id_list):
         backend.quote_name(ordered_obj._meta.pk.column))
     rel_val = getattr(self, ordered_obj._meta.order_with_respect_to.rel.field_name)
     cursor.executemany(sql, [(i, rel_val, j) for i, j in enumerate(id_list)])
-    transaction.commit_unless_managed()
+    transaction.commit_unless_managed([connection])
 
 def method_get_order(ordered_obj, self):
+    connection_info = ordered_obj.connection_info
+    connection = info.connection
+    backend = info.backend
     cursor = connection.cursor()
     # Example: "SELECT id FROM poll_choices WHERE poll_id = %s ORDER BY _order"
     sql = "SELECT %s FROM %s WHERE %s = %%s ORDER BY %s" % \

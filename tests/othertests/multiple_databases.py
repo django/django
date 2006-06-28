@@ -50,7 +50,7 @@ with the attributes: `DatabaseError`, `backend`,
 `runshell`. Access connections through the `connections` property of
 the `django.db` module:
 
-    >>> from django.db import connections
+    >>> from django.db import connection, connections
     >>> connections['a'].settings.DATABASE_NAME == db_a
     True
     >>> connections['b'].settings.DATABASE_NAME == db_b
@@ -62,6 +62,65 @@ Invalid connection names raise ImproperlyConfigured:
     Traceback (most recent call last):
         ...
     ImproperlyConfigured: No database connection 'bad' has been configured
+
+Models can define which connection to use, by name. To use a named
+connection, set the `db_connection` property in the model's Meta class
+to the name of the connection. The name used must be a key in
+settings.DATABASES, of course.
+
+    >>> from django.db import models
+    >>> class Artist(models.Model):
+    ...     name = models.CharField(maxlength=100)
+    ...     alive = models.BooleanField(default=True)
+    ...     
+    ...     def __str__(self):
+    ...         return self.name
+    ...    
+    ...     class Meta:
+    ...         app_label = 'mdb'
+    ...         db_connection = 'a'
+    ...
+    >>> class Widget(models.Model):
+    ...     code = models.CharField(maxlength=10, unique=True)
+    ...     weight = models.IntegerField()
+    ... 
+    ...     def __str__(self):
+    ...         return self.code
+    ... 
+    ...     class Meta:
+    ...         app_label = 'mdb'
+    ...         db_connection = 'b'
+    
+But they don't have to. Multiple database support is entirely optional
+and has no impact on your application if you don't use it.
+
+    >>> class Vehicle(models.Model):
+    ...     make = models.CharField(maxlength=20)
+    ...     model = models.CharField(maxlength=20)
+    ...     year = models.IntegerField()
+    ... 
+    ...     def __str__(self):
+    ...         return "%d %s %s" % (self.year, self.make, self.model)
+    ...     
+    ...     class Meta:
+    ...         app_label = 'mdb'
+
+    >>> Artist._meta.connection.settings.DATABASE_NAME == \
+    ...     connections['a'].connection.settings.DATABASE_NAME
+    True
+    >>> Widget._meta.connection.settings.DATABASE_NAME == \
+    ...     connections['b'].connection.settings.DATABASE_NAME
+    True
+    >>> Vehicle._meta.connection.settings.DATABASE_NAME == \
+    ...     connection.settings.DATABASE_NAME
+    True
+    >>> Artist._meta.connection.settings.DATABASE_NAME == \
+    ...     Widget._meta.connection.settings.DATABASE_NAME
+    False
+    >>> Artist._meta.connection.settings.DATABASE_NAME == \
+    ...     Vehicle._meta.connection.settings.DATABASE_NAME
+    False
+    
 """
 
 def cleanup():

@@ -1,4 +1,4 @@
-from django.db import backend, connection, transaction
+from django.db import transaction
 from django.db.models.fields import DateField, FieldDoesNotExist
 from django.db.models import signals
 from django.dispatch import dispatcher
@@ -157,8 +157,7 @@ class QuerySet(object):
         # self._select is a dictionary, and dictionaries' key order is
         # undefined, so we convert it to a list of tuples.
         extra_select = self._select.items()
-
-        cursor = connection.cursor()
+        cursor = self.model._meta.connection.cursor()
         select, sql, params = self._get_sql_clause()
         cursor.execute("SELECT " + (self._distinct and "DISTINCT " or "") + ",".join(select) + sql, params)
         fill_cache = self._select_related
@@ -178,6 +177,9 @@ class QuerySet(object):
 
     def count(self):
         "Performs a SELECT COUNT() and returns the number of records as an integer."
+        info = self.model._meta.connection_info
+        backend = info.backend
+        connection = info.connection        
         counter = self._clone()
         counter._order_by = ()
         counter._offset = None
@@ -247,6 +249,7 @@ class QuerySet(object):
         Returns a dictionary mapping each of the given IDs to the object with
         that ID.
         """
+        backend = self.model._meta.connection_info.backend
         assert self._limit is None and self._offset is None, \
                 "Cannot use 'limit' or 'offset' with in_bulk"
         assert isinstance(id_list, (tuple,  list)), "in_bulk() must be provided with a list of IDs."
@@ -423,7 +426,7 @@ class QuerySet(object):
 
     def _get_sql_clause(self):
         opts = self.model._meta
-
+        backend = opts.connection_info.backend
         # Construct the fundamental parts of the query: SELECT X FROM Y WHERE Z.
         select = ["%s.%s" % (backend.quote_name(opts.db_table), backend.quote_name(f.column)) for f in opts.fields]
         tables = [quote_only_if_word(t) for t in self._tables]
@@ -514,6 +517,9 @@ class ValuesQuerySet(QuerySet):
             columns = [f.column for f in self.model._meta.fields]
             field_names = [f.attname for f in self.model._meta.fields]
 
+        info = self.model._meta.connection_info
+        backend = info.backend
+        connection = info.connection
         cursor = connection.cursor()
         select, sql, params = self._get_sql_clause()
         select = ['%s.%s' % (backend.quote_name(self.model._meta.db_table), backend.quote_name(c)) for c in columns]
@@ -533,6 +539,10 @@ class ValuesQuerySet(QuerySet):
 class DateQuerySet(QuerySet):
     def iterator(self):
         from django.db.backends.util import typecast_timestamp
+        info = self.model._meta.connection_info
+        backend = info.backend
+        connection = info.connection
+        
         self._order_by = () # Clear this because it'll mess things up otherwise.
         if self._field.null:
             self._where.append('%s.%s IS NOT NULL' % \
@@ -625,7 +635,9 @@ class QNot(Q):
         where2 = ['(NOT (%s))' % " AND ".join(where)]
         return tables, joins, where2, params
 
-def get_where_clause(lookup_type, table_prefix, field_name, value):
+def get_where_clause(opts, lookup_type, table_prefix, field_name, value):
+    backend = opts.connection_info.backend
+    
     if table_prefix.endswith('.'):
         table_prefix = backend.quote_name(table_prefix[:-1])+'.'
     field_name = backend.quote_name(field_name)
@@ -660,6 +672,7 @@ def fill_table_cache(opts, select, tables, where, old_prefix, cache_tables_seen)
     Helper function that recursively populates the select, tables and where (in
     place) for fill-cache queries.
     """
+    backend = opts.connection_info.backend
     for f in opts.fields:
         if f.rel and not f.null:
             db_table = f.rel.to._meta.db_table
@@ -753,6 +766,9 @@ def lookup_inner(path, clause, value, opts, table, column):
     current_column = column
     intermediate_table = None
     join_required = False
+    info = current_opts.connection_info
+    backend = info.backend
+    connection = info.connection
 
     name = path.pop(0)
     # Has the primary key been requested? If so, expand it out
@@ -881,7 +897,7 @@ def lookup_inner(path, clause, value, opts, table, column):
         else:
             column = field.column
 
-        where.append(get_where_clause(clause, current_table + '.', column, value))
+        where.append(get_where_clause(current_opts, clause, current_table + '.', column, value))
         params.extend(field.get_db_prep_lookup(clause, value))
 
     return tables, joins, where, params
@@ -891,9 +907,12 @@ def delete_objects(seen_objs):
     ordered_classes = seen_objs.keys()
     ordered_classes.reverse()
 
-    cursor = connection.cursor()
-
     for cls in ordered_classes:
+        info = cls._meta.connection_info
+        backend = info.backend
+        connection = info.connection
+        cursor = connection.cursor()
+        
         seen_objs[cls] = seen_objs[cls].items()
         seen_objs[cls].sort()
 
@@ -927,7 +946,16 @@ def delete_objects(seen_objs):
                         pk_list[offset:offset+GET_ITERATOR_CHUNK_SIZE])
 
     # Now delete the actual data
+    dirty_conns = []
     for cls in ordered_classes:
+
+        info = cls._meta.connection_info
+        backend = info.backend
+        connection = info.connection
+        cursor = connection.cursor()
+        if connection not in dirty_conns:
+            dirty_conns.append(connection)
+            
         seen_objs[cls].reverse()
         pk_list = [pk for pk,instance in seen_objs[cls]]
         for offset in range(0, len(pk_list), GET_ITERATOR_CHUNK_SIZE):
@@ -947,4 +975,4 @@ def delete_objects(seen_objs):
             setattr(instance, cls._meta.pk.attname, None)
             dispatcher.send(signal=signals.post_delete, sender=cls, instance=instance)
 
-    transaction.commit_unless_managed()
+    transaction.commit_unless_managed(dirty_conns)

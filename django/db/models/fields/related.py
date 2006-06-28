@@ -1,4 +1,4 @@
-from django.db import backend, connection, transaction
+from django.db import transaction
 from django.db.models import signals, get_model
 from django.db.models.fields import AutoField, Field, IntegerField, get_ul_class
 from django.db.models.related import RelatedObject
@@ -290,7 +290,7 @@ def create_many_related_manager(superclass):
             # source_col_name: the PK colname in join_table for the source object
             # target_col_name: the PK colname in join_table for the target object
             # *objs - objects to add
-            from django.db import connection
+            connection = self.model._meta.connection
 
             # Add the newly created or already existing objects to the join table.
             # First find out which items are already added, to avoid adding them twice
@@ -310,13 +310,13 @@ def create_many_related_manager(superclass):
                 cursor.execute("INSERT INTO %s (%s, %s) VALUES (%%s, %%s)" % \
                     (self.join_table, source_col_name, target_col_name),
                     [self._pk_val, obj_id])
-            transaction.commit_unless_managed()
+            transaction.commit_unless_managed(connection)
 
         def _remove_items(self, source_col_name, target_col_name, *objs):
             # source_col_name: the PK colname in join_table for the source object
             # target_col_name: the PK colname in join_table for the target object
             # *objs - objects to remove
-            from django.db import connection
+            connection = self.model._meta.connection
 
             for obj in objs:
                 if not isinstance(obj, self.model):
@@ -327,16 +327,16 @@ def create_many_related_manager(superclass):
                 cursor.execute("DELETE FROM %s WHERE %s = %%s AND %s = %%s" % \
                     (self.join_table, source_col_name, target_col_name),
                     [self._pk_val, obj._get_pk_val()])
-            transaction.commit_unless_managed()
+            transaction.commit_unless_managed(connection)
 
         def _clear_items(self, source_col_name):
             # source_col_name: the PK colname in join_table for the source object
-            from django.db import connection
+            connection = self.model._meta.connection
             cursor = connection.cursor()
             cursor.execute("DELETE FROM %s WHERE %s = %%s" % \
                 (self.join_table, source_col_name),
                 [self._pk_val])
-            transaction.commit_unless_managed()
+            transaction.commit_unless_managed(connection)
 
     return ManyRelatedManager
 
@@ -360,6 +360,7 @@ class ManyRelatedObjectsDescriptor(object):
         superclass = rel_model._default_manager.__class__
         RelatedManager = create_many_related_manager(superclass)
 
+        backend = rel_model._meta.connection_info.backend
         qn = backend.quote_name
         manager = RelatedManager(
             model=rel_model,
@@ -402,6 +403,7 @@ class ReverseManyRelatedObjectsDescriptor(object):
         superclass = rel_model._default_manager.__class__
         RelatedManager = create_many_related_manager(superclass)
 
+        backend = rel_model._meta.connection_info.backend
         qn = backend.quote_name
         manager = RelatedManager(
             model=rel_model,

@@ -1,4 +1,5 @@
 from django.conf import settings
+from django.db import connection_info, connections
 from django.db.models.related import RelatedObject
 from django.db.models.fields.related import ManyToManyRel
 from django.db.models.fields import AutoField, FieldDoesNotExist
@@ -11,7 +12,7 @@ import re
 # Calculate the verbose_name by converting from InitialCaps to "lowercase with spaces".
 get_verbose_name = lambda class_name: re.sub('(((?<=[a-z])[A-Z])|([A-Z](?![A-Z]|$)))', ' \\1', class_name).lower().strip()
 
-DEFAULT_NAMES = ('verbose_name', 'db_table', 'ordering',
+DEFAULT_NAMES = ('verbose_name', 'db_connection', 'db_table', 'ordering',
                  'unique_together', 'permissions', 'get_latest_by',
                  'order_with_respect_to', 'app_label')
 
@@ -20,6 +21,7 @@ class Options(object):
         self.fields, self.many_to_many = [], []
         self.module_name, self.verbose_name = None, None
         self.verbose_name_plural = None
+        self.db_connection = None
         self.db_table = ''
         self.ordering = []
         self.unique_together =  []
@@ -90,6 +92,17 @@ class Options(object):
         
     def __str__(self):
         return "%s.%s" % (self.app_label, self.module_name)
+
+    def get_connection_info(self):
+        if self.db_connection:
+            return connections[self.db_connection]
+        return connection_info
+    connection_info = property(get_connection_info)
+            
+    def get_connection(self):
+        """Get the database connection for this object's model"""
+        return self.get_connection_info().connection
+    connection = property(get_connection)
         
     def get_field(self, name, many_to_many=True):
         "Returns the requested field by name. Raises FieldDoesNotExist on error."
