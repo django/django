@@ -32,18 +32,25 @@ def get_apps():
                 _app_errors[app_name] = e
     return _app_list
 
-def get_app(app_label):
-    "Returns the module containing the models for the given app_label."
+def get_app(app_label, emptyOK = False):
+    "Returns the module containing the models for the given app_label. If the app has no models in it and 'emptyOK' is True, returns None."
     get_apps() # Run get_apps() to populate the _app_list cache. Slightly hackish.
     for app_name in settings.INSTALLED_APPS:
         if app_label == app_name.split('.')[-1]:
-            return load_app(app_name)
+            mod = load_app(app_name)
+            if mod is None:
+                if emptyOK:
+                    return None
+            else:
+                return mod
     raise ImproperlyConfigured, "App with label %s could not be found" % app_label
 
 def load_app(app_name):
     "Loads the app with the provided fully qualified name, and returns the model module."
     global _app_list
     mod = __import__(app_name, '', '', ['models'])
+    if not hasattr(mod, 'models'):
+        return None
     if mod.models not in _app_list:
         _app_list.append(mod.models)
     return mod.models
