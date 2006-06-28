@@ -22,7 +22,8 @@ except ImportError:
     from django.utils._threading_local import local
 
 class DatabaseWrapper(local):
-    def __init__(self):
+    def __init__(self, settings):
+        self.settings = settings
         self.connection = None
         self.queries = []
 
@@ -30,7 +31,7 @@ class DatabaseWrapper(local):
         return self.connection is not None
 
     def cursor(self):
-        from django.conf import settings
+        settings = self.settings
         if not self._valid_connection():
             if len(settings.DATABASE_HOST.strip()) == 0:
                 settings.DATABASE_HOST = 'localhost'

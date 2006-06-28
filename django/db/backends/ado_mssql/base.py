@@ -55,12 +55,13 @@ except ImportError:
     from django.utils._threading_local import local
 
 class DatabaseWrapper(local):
-    def __init__(self):
+    def __init__(self, settings):
+        self.settings = settings
         self.connection = None
         self.queries = []
 
     def cursor(self):
-        from django.conf import settings
+        settings = self.settings
         if self.connection is None:
             if settings.DATABASE_NAME == '' or settings.DATABASE_USER == '':
                 from django.core.exceptions import ImproperlyConfigured

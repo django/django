@@ -58,7 +58,8 @@ except ImportError:
     from django.utils._threading_local import local
 
 class DatabaseWrapper(local):
-    def __init__(self):
+    def __init__(self, settings):
+        self.settings = settings
         self.connection = None
         self.queries = []
 
@@ -73,7 +74,7 @@ class DatabaseWrapper(local):
         return False
 
     def cursor(self):
-        from django.conf import settings
+        settings = self.settings
         if not self._valid_connection():
             kwargs = {
                 'user': settings.DATABASE_USER,

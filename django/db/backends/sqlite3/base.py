@@ -34,12 +34,13 @@ except ImportError:
     from django.utils._threading_local import local
 
 class DatabaseWrapper(local):
-    def __init__(self):
+    def __init__(self, settings):
+        self.settings = settings
         self.connection = None
         self.queries = []
 
     def cursor(self):
-        from django.conf import settings
+        settings = self.settings
         if self.connection is None:
             self.connection = Database.connect(settings.DATABASE_NAME,
                 detect_types=Database.PARSE_DECLTYPES | Database.PARSE_COLNAMES)
