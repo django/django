@@ -84,14 +84,80 @@ class TestRunner:
     def __init__(self, verbosity_level=0, which_tests=None):
         self.verbosity_level = verbosity_level
         self.which_tests = which_tests
-
+        self.created_dbs = []
+        self.sqlite_memory_db_used = False
+        self.cleanup_files = []
+        
     def output(self, required_level, message):
         if self.verbosity_level > required_level - 1:
             print message
 
-    def run_tests(self):
-        from django.conf import settings
+    def create_test_db(self, connection):
+        """Create a test db, returning a ConnectionInfo object holding
+        a connection to that db.
+        """
+        from django.db import connect
 
+        settings = connection.settings
+
+        # If we're using SQLite, it's more convenient to test against an
+        # in-memory database. But we can only do this for the first one; after
+        # that we have to use temp files. 
+        if settings.DATABASE_ENGINE == "sqlite3":
+            if self.sqlite_memory_db_used:
+                import tempfile
+                fd, filename = tempfile.mkstemp()
+                os.close(fd)
+                db_name = filename
+                self.cleanup_files.append(filename)
+            else:
+                db_name = ":memory:"
+                self.sqlite_memory_db_used = True
+        else:
+            db_name = TEST_DATABASE_NAME
+            if self.created_dbs:
+                db_name += "_%s" % (len(self.created_dbs))
+                
+            # Create the test database and connect to it. We need to autocommit
+            # if the database supports it because PostgreSQL doesn't allow
+            # CREATE/DROP DATABASE statements within transactions.            
+            cursor = connection.cursor()
+            self._set_autocommit(connection)
+            self.output(1, "Creating test database %s for %s" %
+                        (db_name, settings.DATABASE_NAME))
+            try:
+                cursor.execute("CREATE DATABASE %s" % db_name)
+            except Exception, e:
+                sys.stderr.write("Got an error creating the test database: %s\n" % e)
+                confirm = raw_input("It appears the test database, %s, already exists. Type 'yes' to delete it, or 'no' to cancel: " % db_name)
+                if confirm == 'yes':
+                    cursor.execute("DROP DATABASE %s" % db_name)
+                    cursor.execute("CREATE DATABASE %s" % db_name)
+                else:
+                    raise Exception("Tests cancelled.")
+
+        settings.DATABASE_NAME = db_name
+        connection.close()
+
+        # Initialize the test database.
+        info = connect(settings)
+        cursor = info.connection.cursor()
+        self.created_dbs.append((db_name, info))
+        return info
+
+    def run_tests(self):
+        self.setup()
+        try:
+            self._run_tests()
+        finally:
+            self.teardown()
+
+    def setup(self):
+        from django.conf import settings
+        from django.db import connection, connections
+        from django.core import management
+        from django.db.models.loading import load_app
+        
         # An empty access of the settings to force the default options to be
         # installed prior to assigning to them.
         settings.INSTALLED_APPS
@@ -102,9 +168,55 @@ class TestRunner:
         # Manually set DEBUG = False.
         settings.DEBUG = False
 
+        self.output(0, "Running tests with database %r" % settings.DATABASE_ENGINE)
+
+        # Create test dbs for the default connection and any named connections
+        # in settings. Remeber the original default db name so we can connect
+        # there to drop the created test dbs.
+        self._old_database_name = settings.DATABASE_NAME
+        self.create_test_db(connection)
+            
+        if hasattr(settings, 'DATABASES'):
+            for name, info in settings.DATABASES.items():
+                cx = connections[name]
+                test_connection = self.create_test_db(cx.connection)
+                connections[name] = test_connection
+
+        # Install the core always installed apps
+        for app in ALWAYS_INSTALLED_APPS:
+            self.output(1, "Installing contrib app %s" % app)
+            mod = load_app(app)
+            management.install(mod)
+
+    def teardown(self):
+        # Unless we're using SQLite, remove the test database to clean up after
+        # ourselves. Connect to the previous database (not the test database)
+        # to do so, because it's not allowed to delete a database while being
+        # connected to it.
         from django.db import connection
+        from django.conf import settings
+        connection.close()
+        settings.DATABASE_NAME = self._old_database_name
+        for db_name, cx in self.created_dbs:
+            settings = cx.settings
+            cx.close()
+            if settings.DATABASE_ENGINE != "sqlite3":
+                cursor = connection.cursor()
+                self.output(1, "Deleting test database %s" % db_name)
+                self._set_autocommit(connection)
+                time.sleep(1) # To avoid "database is being accessed by other users" errors.
+                cursor.execute("DROP DATABASE %s" % db_name)
+
+        # Clean up sqlite dbs created on the filesystem
+        for filename in self.cleanup_files:
+            if os.path.exists(filename):
+                os.unlink(filename)
+
+    def _run_tests(self):
+        # Run the tests for each test model.
         from django.core import management
-        import django.db.models
+        from django.db.models.loading import load_app
+        from django.db import models
 
         # Determine which models we're going to test.
         test_models = get_test_models()
@@ -130,46 +242,6 @@ class TestRunner:
                             all_tests.append((loc, test))
                 test_models = all_tests
 
-        self.output(0, "Running tests with database %r" % settings.DATABASE_ENGINE)
-
-        # If we're using SQLite, it's more convenient to test against an
-        # in-memory database.
-        if settings.DATABASE_ENGINE == "sqlite3":
-            global TEST_DATABASE_NAME
-            TEST_DATABASE_NAME = ":memory:"
-        else:
-            # Create the test database and connect to it. We need to autocommit
-            # if the database supports it because PostgreSQL doesn't allow
-            # CREATE/DROP DATABASE statements within transactions.
-            cursor = connection.cursor()
-            self._set_autocommit(connection)
-            self.output(1, "Creating test database")
-            try:
-                cursor.execute("CREATE DATABASE %s" % TEST_DATABASE_NAME)
-            except Exception, e:
-                sys.stderr.write("Got an error creating the test database: %s\n" % e)
-                confirm = raw_input("It appears the test database, %s, already exists. Type 'yes' to delete it, or 'no' to cancel: " % TEST_DATABASE_NAME)
-                if confirm == 'yes':
-                    cursor.execute("DROP DATABASE %s" % TEST_DATABASE_NAME)
-                    cursor.execute("CREATE DATABASE %s" % TEST_DATABASE_NAME)
-                else:
-                    print "Tests cancelled."
-                    return
-        connection.close()
-        old_database_name = settings.DATABASE_NAME
-        settings.DATABASE_NAME = TEST_DATABASE_NAME
-
-        # Initialize the test database.
-        cursor = connection.cursor()
-
-        from django.db.models.loading import load_app
-        # Install the core always installed apps
-        for app in ALWAYS_INSTALLED_APPS:
-            self.output(1, "Installing contrib app %s" % app)
-            mod = load_app(app)
-            management.install(mod)
-
-        # Run the tests for each test model.
         self.output(1, "Running app tests")
         for model_dir, model_name in test_models:
             self.output(1, "%s model: Importing" % model_name)
@@ -187,7 +259,7 @@ class TestRunner:
                 # Run the API tests.
                 p = doctest.DocTestParser()
                 test_namespace = dict([(m._meta.object_name, m) \
-                                        for m in django.db.models.get_models(mod)])
+                                        for m in models.get_models(mod)])
                 dtest = p.get_doctest(mod.API_TESTS, test_namespace, model_name, None, None)
                 # Manually set verbose=False, because "-v" command-line parameter
                 # has side effects on doctest TestRunner class.
@@ -241,19 +313,6 @@ class TestRunner:
                     except Exception, e:
                         log_error(module, "Exception running tests", ''.join(traceback.format_exception(*sys.exc_info())[1:]))
                         continue
-
-        # Unless we're using SQLite, remove the test database to clean up after
-        # ourselves. Connect to the previous database (not the test database)
-        # to do so, because it's not allowed to delete a database while being
-        # connected to it.
-        if settings.DATABASE_ENGINE != "sqlite3":
-            connection.close()
-            settings.DATABASE_NAME = old_database_name
-            cursor = connection.cursor()
-            self.output(1, "Deleting test database")
-            self._set_autocommit(connection)
-            time.sleep(1) # To avoid "database is being accessed by other users" errors.
-            cursor.execute("DROP DATABASE %s" % TEST_DATABASE_NAME)
 
         # Display output.
         if error_list:

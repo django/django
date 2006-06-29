@@ -96,9 +96,12 @@ class LazyConnectionManager(object):
 
     def __getitem__(self, k):
         try:
-            return self._connections[k]
+            return self.__dict__['_connections'][k]
         except KeyError:
             return self.connect(k)
+
+    def __setitem__(self, k, v):
+        self.__dict__['_connections'][k] = v
             
     def connect(self, name):
         """Return the connection with this name in
