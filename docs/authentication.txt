@@ -568,7 +568,7 @@ The currently logged-in user and his/her permissions are made available in the
    setting contains ``"django.core.context_processors.auth"``, which is default.
    For more, see the `RequestContext docs`_.
 
-   .. _RequestContext docs: http://www.djangoproject.com/documentation/templates_python/#subclassing-context-djangocontext
+   .. _RequestContext docs: http://www.djangoproject.com/documentation/templates_python/#subclassing-context-requestcontext
 
 Users
 -----
