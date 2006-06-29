@@ -91,4 +91,31 @@ API_TESTS = """
 >>> Article.objects.all()
 [<Article: Poker has no place on television>, <Article: Time to reform copyright>]
 
+# Django also ships with a built-in JSON serializers
+>>> json = serializers.serialize("json", Category.objects.filter(pk=2))
+>>> json
+'[{"pk": "2", "model": "serializers.category", "fields": {"name": "Music"}}]'
+
+# You can easily create new objects by deserializing data with an empty PK
+# (It's easier to demo this with JSON...)
+>>> new_author_json = '[{"pk": null, "model": "serializers.author", "fields": {"name": "Bill"}}]'
+>>> for obj in serializers.deserialize("json", new_author_json):
+...     obj.save()
+>>> Author.objects.all()
+[<Author: Bill>, <Author: Jane>, <Author: Joe>]
+
+# All the serializers work the same
+>>> json = serializers.serialize("json", Article.objects.all())
+>>> for obj in serializers.deserialize("json", json):
+...     print obj
+<DeserializedObject: Poker has no place on television>
+<DeserializedObject: Time to reform copyright>
+
+>>> json = json.replace("Poker has no place on television", "Just kidding; I love TV poker")
+>>> for obj in serializers.deserialize("json", json):
+...     obj.save()
+
+>>> Article.objects.all()
+[<Article: Just kidding; I love TV poker>, <Article: Time to reform copyright>]
+
 """

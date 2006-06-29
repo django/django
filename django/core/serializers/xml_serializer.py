@@ -2,10 +2,11 @@
 XML serializer.
 """
 
-from xml.dom import pulldom
-from django.utils.xmlutils import SimplerXMLGenerator
+from django.conf import settings
 from django.core.serializers import base
 from django.db import models
+from django.utils.xmlutils import SimplerXMLGenerator
+from xml.dom import pulldom
 
 class Serializer(base.Serializer):
     """
@@ -16,7 +17,7 @@ class Serializer(base.Serializer):
         """
         Start serialization -- open the XML document and the root element.
         """
-        self.xml = SimplerXMLGenerator(self.stream, self.options.get("encoding", "utf-8"))
+        self.xml = SimplerXMLGenerator(self.stream, self.options.get("encoding", settings.DEFAULT_CHARSET))
         self.xml.startDocument()
         self.xml.startElement("django-objects", {"version" : "1.0"})
         
@@ -58,9 +59,7 @@ class Serializer(base.Serializer):
         # Get a "string version" of the object's data (this is handled by the
         # serializer base class).  None is handled specially.
         value = self.get_string_value(obj, field)
-        if value is None:
-            self.xml.addQuickElement("None")
-        else:
+        if value is not None:
             self.xml.characters(str(value))
 
         self.xml.endElement("field")
@@ -106,7 +105,7 @@ class Deserializer(base.Deserializer):
     
     def __init__(self, stream_or_string, **options):
         super(Deserializer, self).__init__(stream_or_string, **options)
-        self.encoding = self.options.get("encoding", "utf-8")
+        self.encoding = self.options.get("encoding", settings.DEFAULT_CHARSET)
         self.event_stream = pulldom.parse(self.stream) 
     
     def next(self):
