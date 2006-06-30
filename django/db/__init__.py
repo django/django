@@ -56,8 +56,8 @@ class ConnectionInfo(object):
     def __repr__(self):
         return "Connection: %r (ENGINE=%s NAME=%s)" \
                % (self.connection,
-                  self.connection.settings.DATABASE_ENGINE,
-                  self.connection.settings.DATABASE_NAME)
+                  self.settings.DATABASE_ENGINE,
+                  self.settings.DATABASE_NAME)
 
     def close(self):
         """Close connection"""
@@ -118,7 +118,7 @@ class LazyConnectionManager(object):
         except AttributeError:
             raise ImproperlyConfigured, \
                   "No DATABASES in settings."
-        
+
         # In settings it's a dict, but connect() needs an object
         # pass global settings so that the default connection settings
         # can be defaults for the named connections
