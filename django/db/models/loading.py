@@ -15,7 +15,7 @@ _app_models = {} # Dictionary of models against app label
 _app_errors = {} # Dictionary of errors that were experienced when loading the INSTALLED_APPS
                  # Key is the app_name of the model, value is the exception that was raised
                  # during model loading.
-_loaded = False  # Has the contents of settings.INSTALLED_APPS been loaded? 
+_loaded = False  # Has the contents of settings.INSTALLED_APPS been loaded?
                  # i.e., has get_apps() been called?
 
 def get_apps():
@@ -60,7 +60,7 @@ def get_app_errors():
     global _app_errors
     get_apps() # Run get_apps() to populate the _app_list cache. Slightly hackish.
     return _app_errors
-    
+
 def get_models(app_mod=None):
     """
     Given a module containing models, returns a list of the models. Otherwise
