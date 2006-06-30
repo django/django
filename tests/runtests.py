@@ -85,39 +85,25 @@ class TestRunner:
         self.verbosity_level = verbosity_level
         self.which_tests = which_tests
         self.created_dbs = []
-        self.sqlite_memory_db_used = False
         self.cleanup_files = []
+        self.old_database_name = None
+        self.old_databases = None
+        self.sqlite_memory_db_used = False
         
     def output(self, required_level, message):
         if self.verbosity_level > required_level - 1:
             print message
 
-    def create_test_db(self, connection):
+    def create_test_db(self, db_name, connection):
         """Create a test db, returning a ConnectionInfo object holding
         a connection to that db.
         """
         from django.db import connect
 
+        # settings may be a dict or settings object
         settings = connection.settings
-
-        # If we're using SQLite, it's more convenient to test against an
-        # in-memory database. But we can only do this for the first one; after
-        # that we have to use temp files. 
-        if settings.DATABASE_ENGINE == "sqlite3":
-            if self.sqlite_memory_db_used:
-                import tempfile
-                fd, filename = tempfile.mkstemp()
-                os.close(fd)
-                db_name = filename
-                self.cleanup_files.append(filename)
-            else:
-                db_name = ":memory:"
-                self.sqlite_memory_db_used = True
-        else:
-            db_name = TEST_DATABASE_NAME
-            if self.created_dbs:
-                db_name += "_%s" % (len(self.created_dbs))
-                
+        
+        if settings.DATABASE_ENGINE != "sqlite3":
             # Create the test database and connect to it. We need to autocommit
             # if the database supports it because PostgreSQL doesn't allow
             # CREATE/DROP DATABASE statements within transactions.            
@@ -136,6 +122,7 @@ class TestRunner:
                 else:
                     raise Exception("Tests cancelled.")
 
+        
         settings.DATABASE_NAME = db_name
         connection.close()
 
@@ -153,6 +140,7 @@ class TestRunner:
             self.teardown()
 
     def setup(self):
+        global TEST_DATABASE_NAME
         from django.conf import settings
         from django.db import connection, connections
         from django.core import management
@@ -170,17 +158,38 @@ class TestRunner:
 
         self.output(0, "Running tests with database %r" % settings.DATABASE_ENGINE)
 
-        # Create test dbs for the default connection and any named connections
-        # in settings. Remeber the original default db name so we can connect
-        # there to drop the created test dbs.
-        self._old_database_name = settings.DATABASE_NAME
-        self.create_test_db(connection)
+        # Create test dbs for the default connection and two named connections,
+        # replacing any named connections defined in settings. All connections
+        # will use the default DATABASE_ENGINE
+        self.old_database_name = settings.DATABASE_NAME
+        self.old_databases = settings.DATABASES
+
+        db_a = TEST_DATABASE_NAME + '_a'
+        db_b = TEST_DATABASE_NAME + '_b'
+        if settings.DATABASE_ENGINE == 'sqlite3':
+            # If we're using SQLite, it's more convenient to test against an
+            # in-memory database. But we can only do this for the default; 
+            # after that we have to use temp files. 
+            TEST_DATABASE_NAME = ':memory:'
+            db_a_name = self._tempfile()
+            db_b_name = self._tempfile()
+            self.cleanup_files.append(db_a_name)
+            self.cleanup_files.append(db_b_name)           
+        else:
+            db_a_name = db_a
+            db_b_name = db_b
             
-        if hasattr(settings, 'DATABASES'):
-            for name, info in settings.DATABASES.items():
-                cx = connections[name]
-                test_connection = self.create_test_db(cx.connection)
-                connections[name] = test_connection
+        settings.DATABASES = {
+            db_a: { 'DATABASE_NAME': db_a_name },
+            db_b: { 'DATABASE_NAME': db_b_name }
+            }
+
+        self.create_test_db(TEST_DATABASE_NAME, connection)
+        for name, info in settings.DATABASES.items():
+            cx = connections[name]
+            test_connection = self.create_test_db(info['DATABASE_NAME'],
+                                                  cx.connection)
+            connections[name] = test_connection
 
         # Install the core always installed apps
         for app in ALWAYS_INSTALLED_APPS:
@@ -196,7 +205,8 @@ class TestRunner:
         from django.db import connection
         from django.conf import settings
         connection.close()
-        settings.DATABASE_NAME = self._old_database_name
+        settings.DATABASE_NAME = self.old_database_name
+        settings.DATABASES = self.old_databases
         for db_name, cx in self.created_dbs:
             settings = cx.settings
             cx.close()
@@ -333,6 +343,12 @@ class TestRunner:
             connection.connection.autocommit(True)
         elif hasattr(connection.connection, "set_isolation_level"):
             connection.connection.set_isolation_level(0)
+
+    def _tempfile(self):
+        import tempfile
+        fd, filename = tempfile.mkstemp()
+        os.close(fd)
+        return filename
 
 if __name__ == "__main__":
     from optparse import OptionParser
