@@ -406,7 +406,10 @@ class DateField(Field):
         if isinstance(value, datetime.date):
             return value
         validators.isValidANSIDate(value, None)
-        return datetime.date(*time.strptime(value, '%Y-%m-%d')[:3])
+        try:
+            return datetime.date(*time.strptime(value, '%Y-%m-%d')[:3])
+        except ValueError:
+            raise validators.ValidationError, gettext('Enter a valid date in YYYY-MM-DD format.')
 
     def get_db_prep_lookup(self, lookup_type, value):
         if lookup_type == 'range':
