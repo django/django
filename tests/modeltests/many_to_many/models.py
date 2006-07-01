@@ -75,6 +75,10 @@ API_TESTS = """
 [<Article: Django lets you build Web apps easily>, <Article: NASA uses Python>]
 >>> Article.objects.filter(publications__pk=1)
 [<Article: Django lets you build Web apps easily>, <Article: NASA uses Python>]
+>>> Article.objects.filter(publications=1)
+[<Article: Django lets you build Web apps easily>, <Article: NASA uses Python>]
+>>> Article.objects.filter(publications=p1)
+[<Article: Django lets you build Web apps easily>, <Article: NASA uses Python>]
 
 >>> Article.objects.filter(publications__title__startswith="Science")
 [<Article: NASA uses Python>, <Article: NASA uses Python>]
@@ -89,6 +93,13 @@ API_TESTS = """
 >>> Article.objects.filter(publications__title__startswith="Science").distinct().count()
 1
 
+>>> Article.objects.filter(publications__in=[1,2]).distinct()
+[<Article: Django lets you build Web apps easily>, <Article: NASA uses Python>]
+>>> Article.objects.filter(publications__in=[1,p2]).distinct()
+[<Article: Django lets you build Web apps easily>, <Article: NASA uses Python>]
+>>> Article.objects.filter(publications__in=[p1,p2]).distinct()
+[<Article: Django lets you build Web apps easily>, <Article: NASA uses Python>]
+
 # Reverse m2m queries are supported (i.e., starting at the table that doesn't
 # have a ManyToManyField).
 >>> Publication.objects.filter(id__exact=1)
@@ -101,9 +112,19 @@ API_TESTS = """
 
 >>> Publication.objects.filter(article__id__exact=1)
 [<Publication: The Python Journal>]
-
 >>> Publication.objects.filter(article__pk=1)
 [<Publication: The Python Journal>]
+>>> Publication.objects.filter(article=1)
+[<Publication: The Python Journal>]
+>>> Publication.objects.filter(article=a1)
+[<Publication: The Python Journal>]
+
+>>> Publication.objects.filter(article__in=[1,2]).distinct()
+[<Publication: Highlights for Children>, <Publication: Science News>, <Publication: Science Weekly>, <Publication: The Python Journal>]
+>>> Publication.objects.filter(article__in=[1,a2]).distinct()
+[<Publication: Highlights for Children>, <Publication: Science News>, <Publication: Science Weekly>, <Publication: The Python Journal>]
+>>> Publication.objects.filter(article__in=[a1,a2]).distinct()
+[<Publication: Highlights for Children>, <Publication: Science News>, <Publication: Science Weekly>, <Publication: The Python Journal>]
 
 # If we delete a Publication, its Articles won't be able to access it.
 >>> p1.delete()

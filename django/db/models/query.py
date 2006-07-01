@@ -841,12 +841,14 @@ def lookup_inner(path, clause, value, opts, table, column):
         )
 
     if path:
+        # There are elements left in the path. More joins are required.
         if len(path) == 1 and path[0] in (new_opts.pk.name, None) \
             and clause in ('exact', 'isnull') and not join_required:
-            # If the last name query is for a key, and the search is for
-            # isnull/exact, then the current (for N-1) or intermediate
-            # (for N-N) table can be used for the search - no need to join an
-            # extra table just to check the primary key.
+            # If the next and final name query is for a primary key, 
+            # and the search is for isnull/exact, then the current 
+            # (for N-1) or intermediate (for N-N) table can be used 
+            # for the search - no need to join an extra table just 
+            # to check the primary key.
             new_table = current_table
         else:
             # There are 1 or more name queries pending, and we have ruled out
@@ -872,13 +874,41 @@ def lookup_inner(path, clause, value, opts, table, column):
         where.extend(where2)
         params.extend(params2)
     else:
-        # Evaluate clause on current table.
-        if name in (current_opts.pk.name, None) and clause in ('exact', 'isnull') and current_column:
-            # If this is an exact/isnull key search, and the last pass
-            # found/introduced a current/intermediate table that we can use to
-            # optimize the query, then use that column name.
+        # No elements left in path. Current element is the element on which 
+        # the search is being performed. 
+        
+        if join_required:
+            # Last query term is a RelatedObject 
+            if field.field.rel.multiple:    
+                # RelatedObject is from a 1-N relation.
+                # Join is required; query operates on joined table.
+                column = new_opts.pk.name            
+                joins[backend.quote_name(new_table)] = (
+                    backend.quote_name(new_opts.db_table),
+                    "INNER JOIN",
+                    "%s.%s = %s.%s" %
+                        (backend.quote_name(current_table),
+                        backend.quote_name(join_column),
+                        backend.quote_name(new_table),
+                        backend.quote_name(new_column))
+                )
+                current_table = new_table
+            else:
+                # RelatedObject is from a 1-1 relation, 
+                # No need to join; get the pk value from the related object, 
+                # and compare using that.
+                column = current_opts.pk.name
+        elif intermediate_table: 
+            # Last query term is a related object from an N-N relation.
+            # Join from intermediate table is sufficient.
+            column = join_column
+        elif name == current_opts.pk.name and clause in ('exact', 'isnull') and current_column:
+            # Last query term is for a primary key. If previous iterations 
+            # introduced a current/intermediate table that can be used to
+            # optimize the query, then use that table and column name.
             column = current_column
         else:
+            # Last query term was a normal field.
             column = field.column
 
         where.append(get_where_clause(clause, current_table + '.', column, value))

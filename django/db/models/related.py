@@ -70,6 +70,10 @@ class RelatedObject(object):
         else:
             return [None] * self.field.rel.num_in_admin
 
+    def get_db_prep_lookup(self, lookup_type, value):
+        # Defer to the actual field definition for db prep
+        return self.field.get_db_prep_lookup(lookup_type, value)
+        
     def editable_fields(self):
         "Get the fields in this class that should be edited inline."
         return [f for f in self.opts.fields + self.opts.many_to_many if f.editable and f != self.field]

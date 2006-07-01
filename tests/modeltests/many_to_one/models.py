@@ -151,10 +151,20 @@ False
 [<Article: John's second story>, <Article: This is a test>]
 
 # Find all Articles for the Reporter whose ID is 1.
+# Use direct ID check, pk check, and object comparison 
 >>> Article.objects.filter(reporter__id__exact=1)
 [<Article: John's second story>, <Article: This is a test>]
 >>> Article.objects.filter(reporter__pk=1)
 [<Article: John's second story>, <Article: This is a test>]
+>>> Article.objects.filter(reporter=1)
+[<Article: John's second story>, <Article: This is a test>]
+>>> Article.objects.filter(reporter=r)
+[<Article: John's second story>, <Article: This is a test>]
+
+>>> Article.objects.filter(reporter__in=[1,2]).distinct()
+[<Article: John's second story>, <Article: Paul's story>, <Article: This is a test>]
+>>> Article.objects.filter(reporter__in=[r,r2]).distinct()
+[<Article: John's second story>, <Article: Paul's story>, <Article: This is a test>]
 
 # You need two underscores between "reporter" and "id" -- not one.
 >>> Article.objects.filter(reporter_id__exact=1)
@@ -167,10 +177,6 @@ TypeError: Cannot resolve keyword 'reporter_id' into field
 Traceback (most recent call last):
     ...
 TypeError: Cannot resolve keyword 'reporter_id' into field
-
-# "pk" shortcut syntax works in a related context, too.
->>> Article.objects.filter(reporter__pk=1)
-[<Article: John's second story>, <Article: This is a test>]
 
 # You can also instantiate an Article by passing
 # the Reporter's ID instead of a Reporter object.
@@ -200,6 +206,18 @@ TypeError: Cannot resolve keyword 'reporter_id' into field
 [<Reporter: John Smith>]
 >>> Reporter.objects.filter(article__pk=1)
 [<Reporter: John Smith>]
+>>> Reporter.objects.filter(article=1)
+[<Reporter: John Smith>]
+>>> Reporter.objects.filter(article=a)
+[<Reporter: John Smith>]
+
+>>> Reporter.objects.filter(article__in=[1,4]).distinct()
+[<Reporter: John Smith>]
+>>> Reporter.objects.filter(article__in=[1,a3]).distinct()
+[<Reporter: John Smith>]
+>>> Reporter.objects.filter(article__in=[a,a3]).distinct()
+[<Reporter: John Smith>]
+
 >>> Reporter.objects.filter(article__headline__startswith='This')
 [<Reporter: John Smith>, <Reporter: John Smith>, <Reporter: John Smith>]
 >>> Reporter.objects.filter(article__headline__startswith='This').distinct()
@@ -215,6 +233,8 @@ TypeError: Cannot resolve keyword 'reporter_id' into field
 >>> Reporter.objects.filter(article__reporter__first_name__startswith='John')
 [<Reporter: John Smith>, <Reporter: John Smith>, <Reporter: John Smith>, <Reporter: John Smith>]
 >>> Reporter.objects.filter(article__reporter__first_name__startswith='John').distinct()
+[<Reporter: John Smith>]
+>>> Reporter.objects.filter(article__reporter__exact=r).distinct()
 [<Reporter: John Smith>]
 
 # If you delete a reporter, his articles will be deleted.
