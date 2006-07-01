@@ -28,21 +28,9 @@ def set_language(request):
 NullSource = """
 /* gettext identity library */
 
-function gettext(msgid) {
-    return msgid;
-}
-
-function ngettext(singular, plural, count) {
-    if (count == 1) {
-        return singular;
-    } else {
-        return plural;
-    }
-}
-
-function gettext_noop(msgid) {
-    return msgid;
-}
+function gettext(msgid) { return msgid; }
+function ngettext(singular, plural, count) { return (count == 1) ? singular : plural; }
+function gettext_noop(msgid) { return msgid; }
 """
 
 LibHead = """
@@ -54,53 +42,37 @@ var catalog = new Array();
 LibFoot = """
 
 function gettext(msgid) {
-    var value = catalog[msgid];
-    if (typeof(value) == 'undefined') {
-        return msgid;
-    } else {
-        if (typeof(value) == 'string') {
-            return value;
-        } else {
-            return value[0];
-        }
-    }
+  var value = catalog[msgid];
+  if (typeof(value) == 'undefined') {
+    return msgid;
+  } else {
+    return (typeof(value) == 'string') ? value : value[0];
+  }
 }
 
 function ngettext(singular, plural, count) {
-    value = catalog[singular];
-    if (typeof(value) == 'undefined') {
-        if (count == 1) {
-            return singular;
-        } else {
-            return plural;
-        }
-    } else {
-        return value[pluralidx(count)];
-    }
+  value = catalog[singular];
+  if (typeof(value) == 'undefined') {
+    return (count == 1) ? singular : plural;
+  } else {
+    return value[pluralidx(count)];
+  }
 }
 
-function gettext_noop(msgid) {
-    return msgid;
-}
+function gettext_noop(msgid) { return msgid; }
 """
 
 SimplePlural = """
-function pluralidx(count) {
-    if (count == 1) {
-        return 0;
-    } else {
-        return 1;
-    }
-}
+function pluralidx(count) { return (count == 1) ? 0 : 1; }
 """
 
 InterPolate = r"""
 function interpolate(fmt, obj, named) {
-    if (named) {
-        return fmt.replace(/%\(\w+\)s/, function(match){return String(obj[match.slice(2,-2)])});
-    } else {
-        return fmt.replace(/%s/, function(match){return String(obj.shift())});
-    }
+  if (named) {
+    return fmt.replace(/%\(\w+\)s/, function(match){return String(obj[match.slice(2,-2)])});
+  } else {
+    return fmt.replace(/%s/, function(match){return String(obj.shift())});
+  }
 }
 """
 
