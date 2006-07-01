@@ -136,6 +136,10 @@ False
 >>> Article.objects.filter(reporter__first_name__exact='John')
 [<Article: John's second story>, <Article: This is a test>]
 
+# Check that implied __exact also works
+>>> Article.objects.filter(reporter__first_name='John')
+[<Article: John's second story>, <Article: This is a test>]
+
 # Query twice over the related field.
 >>> Article.objects.filter(reporter__first_name__exact='John', reporter__last_name__exact='Smith')
 [<Article: John's second story>, <Article: This is a test>]
@@ -235,6 +239,10 @@ TypeError: Cannot resolve keyword 'reporter_id' into field
 >>> Reporter.objects.filter(article__reporter__first_name__startswith='John').distinct()
 [<Reporter: John Smith>]
 >>> Reporter.objects.filter(article__reporter__exact=r).distinct()
+[<Reporter: John Smith>]
+
+# Check that implied __exact also works
+>>> Reporter.objects.filter(article__reporter=r).distinct()
 [<Reporter: John Smith>]
 
 # If you delete a reporter, his articles will be deleted.

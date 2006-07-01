@@ -10,7 +10,19 @@ import re
 if not hasattr(__builtins__, 'set'):
     from sets import Set as set
 
+# The string constant used to separate query parts
 LOOKUP_SEPARATOR = '__'
+
+# The list of valid query types 
+QUERY_TERMS=(
+    'exact', 'iexact',
+    'contains', 'icontains',
+    'gt', 'gte', 'lt', 'lte',
+    'in',
+    'startswith', 'istartswith', 'endswith', 'iendswith',
+    'range', 'year', 'month', 'day',
+    'isnull'
+)
 
 # Size of each "chunk" for get_iterator calls.
 # Larger values are slightly faster at the expense of more storage space.
@@ -710,12 +722,13 @@ def parse_lookup(kwarg_items, opts):
             #     if we find "pk", make the clause "exact', and insert
             #     a dummy name of None, which we will replace when
             #     we know which table column to grab as the primary key.
-            # 2)  If there is only one part, assume it to be an __exact
+            # 2)  If there is only one part, or the last part is not a query
+            #     term, assume that the query is an __exact            
             clause = path.pop()
             if clause == 'pk':
                 clause = 'exact'
                 path.append(None)
-            elif len(path) == 0:
+            elif len(path) == 0 or clause not in QUERY_TERMS:
                 path.append(clause)
                 clause = 'exact'
 
