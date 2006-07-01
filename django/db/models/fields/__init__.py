@@ -6,7 +6,7 @@ from django import forms
 from django.core.exceptions import ObjectDoesNotExist
 from django.utils.functional import curry, lazy
 from django.utils.text import capfirst
-from django.utils.translation import gettext, gettext_lazy, ngettext
+from django.utils.translation import gettext, gettext_lazy
 import datetime, os, time
 
 class NOT_PROVIDED:
