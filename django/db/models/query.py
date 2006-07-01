@@ -13,15 +13,12 @@ if not hasattr(__builtins__, 'set'):
 # The string constant used to separate query parts
 LOOKUP_SEPARATOR = '__'
 
-# The list of valid query types 
-QUERY_TERMS=(
-    'exact', 'iexact',
-    'contains', 'icontains',
-    'gt', 'gte', 'lt', 'lte',
-    'in',
+# The list of valid query types
+QUERY_TERMS = (
+    'exact', 'iexact', 'contains', 'icontains',
+    'gt', 'gte', 'lt', 'lte', 'in',
     'startswith', 'istartswith', 'endswith', 'iendswith',
-    'range', 'year', 'month', 'day',
-    'isnull'
+    'range', 'year', 'month', 'day', 'isnull',
 )
 
 # Size of each "chunk" for get_iterator calls.
@@ -216,7 +213,7 @@ class QuerySet(object):
             raise self.model.DoesNotExist, "%s matching query does not exist." % self.model._meta.object_name
         assert len(obj_list) == 1, "get() returned more than one %s -- it returned %s! Lookup parameters were %s" % (self.model._meta.object_name, len(obj_list), kwargs)
         return obj_list[0]
-        
+
     def create(self, **kwargs):
         """
         Create a new object with the given kwargs, saving it to the database
@@ -723,7 +720,7 @@ def parse_lookup(kwarg_items, opts):
             #     a dummy name of None, which we will replace when
             #     we know which table column to grab as the primary key.
             # 2)  If there is only one part, or the last part is not a query
-            #     term, assume that the query is an __exact            
+            #     term, assume that the query is an __exact
             clause = path.pop()
             if clause == 'pk':
                 clause = 'exact'
@@ -857,10 +854,10 @@ def lookup_inner(path, clause, value, opts, table, column):
         # There are elements left in the path. More joins are required.
         if len(path) == 1 and path[0] in (new_opts.pk.name, None) \
             and clause in ('exact', 'isnull') and not join_required:
-            # If the next and final name query is for a primary key, 
-            # and the search is for isnull/exact, then the current 
-            # (for N-1) or intermediate (for N-N) table can be used 
-            # for the search - no need to join an extra table just 
+            # If the next and final name query is for a primary key,
+            # and the search is for isnull/exact, then the current
+            # (for N-1) or intermediate (for N-N) table can be used
+            # for the search - no need to join an extra table just
             # to check the primary key.
             new_table = current_table
         else:
@@ -887,15 +884,15 @@ def lookup_inner(path, clause, value, opts, table, column):
         where.extend(where2)
         params.extend(params2)
     else:
-        # No elements left in path. Current element is the element on which 
-        # the search is being performed. 
-        
+        # No elements left in path. Current element is the element on which
+        # the search is being performed.
+
         if join_required:
-            # Last query term is a RelatedObject 
-            if field.field.rel.multiple:    
+            # Last query term is a RelatedObject
+            if field.field.rel.multiple:
                 # RelatedObject is from a 1-N relation.
                 # Join is required; query operates on joined table.
-                column = new_opts.pk.name            
+                column = new_opts.pk.name
                 joins[backend.quote_name(new_table)] = (
                     backend.quote_name(new_opts.db_table),
                     "INNER JOIN",
@@ -907,16 +904,16 @@ def lookup_inner(path, clause, value, opts, table, column):
                 )
                 current_table = new_table
             else:
-                # RelatedObject is from a 1-1 relation, 
-                # No need to join; get the pk value from the related object, 
+                # RelatedObject is from a 1-1 relation,
+                # No need to join; get the pk value from the related object,
                 # and compare using that.
                 column = current_opts.pk.name
-        elif intermediate_table: 
+        elif intermediate_table:
             # Last query term is a related object from an N-N relation.
             # Join from intermediate table is sufficient.
             column = join_column
         elif name == current_opts.pk.name and clause in ('exact', 'isnull') and current_column:
-            # Last query term is for a primary key. If previous iterations 
+            # Last query term is for a primary key. If previous iterations
             # introduced a current/intermediate table that can be used to
             # optimize the query, then use that table and column name.
             column = current_column
