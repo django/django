@@ -104,6 +104,13 @@ function interpolate(fmt, obj, named) {
 }
 """
 
+def null_javascript_catalog(request, domain=None, packages=None):
+    """
+    Returns "identity" versions of the JavaScript i18n functions -- i.e.,
+    versions that don't actually do anything.
+    """
+    return http.HttpResponse(NullSource + InterPolate, 'text/javascript')
+
 def javascript_catalog(request, domain='djangojs', packages=None):
     """
     Returns the selected language catalog as a javascript library.
@@ -191,4 +198,3 @@ def javascript_catalog(request, domain='djangojs', packages=None):
     src.append(InterPolate)
     src = ''.join(src)
     return http.HttpResponse(src, 'text/javascript')
-

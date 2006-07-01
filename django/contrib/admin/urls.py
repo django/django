@@ -1,9 +1,15 @@
+from django.conf import settings
 from django.conf.urls.defaults import *
+
+if settings.USE_I18N:
+    i18n_view = 'django.views.i18n.javascript_catalog'
+else:
+    i18n_view = 'django.views.i18n.null_javascript_catalog'
 
 urlpatterns = patterns('',
     ('^$', 'django.contrib.admin.views.main.index'),
     ('^r/(\d+)/(.*)/$', 'django.views.defaults.shortcut'),
-    ('^jsi18n/$', 'django.views.i18n.javascript_catalog', {'packages': 'django.conf'}),
+    ('^jsi18n/$', i18n_view, {'packages': 'django.conf'}),
     ('^logout/$', 'django.contrib.auth.views.logout'),
     ('^password_change/$', 'django.contrib.auth.views.password_change'),
     ('^password_change/done/$', 'django.contrib.auth.views.password_change_done'),
@@ -29,3 +35,5 @@ urlpatterns = patterns('',
     ('^([^/]+)/([^/]+)/(.+)/delete/$', 'django.contrib.admin.views.main.delete_stage'),
     ('^([^/]+)/([^/]+)/(.+)/$', 'django.contrib.admin.views.main.change_stage'),
 )
+
+del i18n_view
