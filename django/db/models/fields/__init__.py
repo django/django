@@ -162,7 +162,7 @@ class Field(object):
 
     def get_db_prep_lookup(self, lookup_type, value):
         "Returns field's value prepared for database lookup."
-        if lookup_type in ('exact', 'gt', 'gte', 'lt', 'lte', 'ne', 'year', 'month', 'day', 'search'):
+        if lookup_type in ('exact', 'gt', 'gte', 'lt', 'lte', 'year', 'month', 'day', 'search'):
             return [value]
         elif lookup_type in ('range', 'in'):
             return value
@@ -414,7 +414,7 @@ class DateField(Field):
     def get_db_prep_lookup(self, lookup_type, value):
         if lookup_type == 'range':
             value = [str(v) for v in value]
-        elif lookup_type in ('exact', 'gt', 'gte', 'lt', 'lte', 'ne') and hasattr(value, 'strftime'):
+        elif lookup_type in ('exact', 'gt', 'gte', 'lt', 'lte') and hasattr(value, 'strftime'):
             value = value.strftime('%Y-%m-%d')
         else:
             value = str(value)
