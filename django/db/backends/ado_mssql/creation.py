@@ -1,3 +1,6 @@
+from django.db.backends.ansi import sql
+builder = sql.SchemaBuilder()
+
 DATA_TYPES = {
     'AutoField':         'int IDENTITY (1, 1)',
     'BooleanField':      'bit',

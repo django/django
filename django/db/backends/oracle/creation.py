@@ -1,3 +1,6 @@
+from django.db.backends.ansi import sql
+builder = sql.SchemaBuilder()
+
 DATA_TYPES = {
     'AutoField':         'number(38)',
     'BooleanField':      'number(1)',

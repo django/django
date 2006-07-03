@@ -1,3 +1,6 @@
+from django.db.backends.ansi import sql
+builder = sql.SchemaBuilder()
+
 # SQLite doesn't actually support most of these types, but it "does the right
 # thing" given more verbose field definitions, so leave them as is so that
 # schema inspection is more useful.
