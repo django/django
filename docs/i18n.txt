@@ -35,11 +35,24 @@ How to internationalize your app: in three steps
        support.
     3. Activate the locale middleware in your Django settings.
 
-
 .. admonition:: Behind the scenes
 
     Django's translation machinery uses the standard ``gettext`` module that
     comes with Python.
+
+If you don't need internationalization
+======================================
+
+Django's internationalization hooks are on by default, and that means there's a
+bit of i18n-related overhead in certain places of the framework. If you don't
+use internationalization, you should take the two seconds to set
+``USE_I18N = False`` in your settings file. If ``USE_I18N`` is set to
+``False``, then Django will make some optimizations so as not to load the
+internationalization machinery.
+
+See the `documentation for USE_I18N`_.
+
+.. _documentation for USE_I18N: http://www.djangoproject.com/documentation/settings/#use-i18n
 
 How to specify translation strings
 ==================================

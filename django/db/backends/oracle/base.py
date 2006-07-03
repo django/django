@@ -123,7 +123,6 @@ OPERATOR_MAPPING = {
     'iexact': 'LIKE %s',
     'contains': 'LIKE %s',
     'icontains': 'LIKE %s',
-    'ne': '!= %s',
     'gt': '> %s',
     'gte': '>= %s',
     'lt': '< %s',

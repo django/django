@@ -411,6 +411,36 @@ Using a ``FileField`` or an ``ImageField`` in a model takes a few steps:
        absolute URL to your image in a template with
        ``{{ object.get_mug_shot_url }}``.
 
+Databases and models
+====================
+
+How can I see the raw SQL queries Django is running?
+----------------------------------------------------
+
+Make sure your Django ``DEBUG`` setting is set to ``True``. Then, just do
+this::
+
+    >>> from django.db import connection
+    >>> connection.queries
+    [{'sql': 'SELECT polls_polls.id,polls_polls.question,polls_polls.pub_date FROM polls_polls',
+    'time': '0.002'}]
+
+``connection.queries`` is only available if ``DEBUG`` is ``True``. It's a list
+of dictionaries in order of query execution. Each dictionary has the following::
+
+    ``sql`` -- The raw SQL statement
+    ``time`` -- How long the statement took to execute, in seconds.
+
+``connection.queries`` includes all SQL statements -- INSERTs, UPDATES,
+SELECTs, etc. Each time your app hits the database, the query will be recorded.
+
+Can I use Django with a pre-existing database?
+----------------------------------------------
+
+Yes. See `Integrating with a legacy database`_.
+
+.. _`Integrating with a legacy database`: http://www.djangoproject.com/documentation/legacy_databases/
+
 If I make changes to a model, how do I update the database?
 -----------------------------------------------------------
 
@@ -439,35 +469,24 @@ uniqueness at that level. Single-column primary keys are needed for things such
 as the admin interface to work; e.g., you need a simple way of being able to
 specify an object to edit or delete.
 
-The database API
-================
+How do I add database-specific options to my CREATE TABLE statements, such as specifying MyISAM as the table type?
+------------------------------------------------------------------------------------------------------------------
 
-How can I see the raw SQL queries Django is running?
-----------------------------------------------------
+We try to avoid adding special cases in the Django code to accomodate all the
+database-specific options such as table type, etc. If you'd like to use any of
+these options, create an `SQL initial data file`_ that contains ``ALTER TABLE``
+statements that do what you want to do. The initial data files are executed in
+your database after the ``CREATE TABLE`` statements.
 
-Make sure your Django ``DEBUG`` setting is set to ``True``. Then, just do
-this::
+For example, if you're using MySQL and want your tables to use the MyISAM table
+type, create an initial data file and put something like this in it::
 
-    >>> from django.db import connection
-    >>> connection.queries
-    [{'sql': 'SELECT polls_polls.id,polls_polls.question,polls_polls.pub_date FROM polls_polls',
-    'time': '0.002'}]
+    ALTER TABLE myapp_mytable ENGINE=MyISAM;
 
-``connection.queries`` is only available if ``DEBUG`` is ``True``. It's a list
-of dictionaries in order of query execution. Each dictionary has the following::
+As explained in the `SQL initial data file`_ documentation, this SQL file can
+contain arbitrary SQL, so you can make any sorts of changes you need to make.
 
-    ``sql`` -- The raw SQL statement
-    ``time`` -- How long the statement took to execute, in seconds.
-
-``connection.queries`` includes all SQL statements -- INSERTs, UPDATES,
-SELECTs, etc. Each time your app hits the database, the query will be recorded.
-
-Can I use Django with a pre-existing database?
-----------------------------------------------
-
-Yes. See `Integrating with a legacy database`_.
-
-.. _`Integrating with a legacy database`: http://www.djangoproject.com/documentation/legacy_databases/
+.. _SQL initial data file: http://www.djangoproject.com/documentation/model_api/#providing-initial-sql-data
 
 Why is Django leaking memory?
 -----------------------------

@@ -78,8 +78,25 @@ The Django object itself can be inspected as ``deserialized_object.object``.
 Serialization formats
 ---------------------
 
-Django "ships" with a few included serializers, and there's a simple API for creating and registering your own...
+Django "ships" with a few included serializers:
 
-.. note::
+    ==========  ==============================================================
+    Identifier  Information
+    ==========  ==============================================================
+    ``xml``     Serializes to and from a simple XML dialect.
 
-    ... which will be documented once the API is stable :)
+    ``json``    Serializes to and from JSON_ (using a version of simplejson_
+                bundled with Django).
+
+    ``python``  Translates to and from "simple" Python objects (lists, dicts,
+                strings, etc.).  Not really all that useful on its own, but 
+                used as a base for other serializers.
+    ==========  ==============================================================
+
+.. _json: http://json.org/
+.. _simplejson: http://undefined.org/python/#simplejson
+
+Writing custom serializers
+``````````````````````````
+
+XXX ...

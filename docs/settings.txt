@@ -107,15 +107,20 @@ For more, see the `diffsettings documentation`_.
 Using settings in Python code
 =============================
 
-In your Django apps, use settings by importing them from
+In your Django apps, use settings by importing the object
 ``django.conf.settings``. Example::
 
-    from django.conf.settings import DEBUG
+    from django.conf import settings
 
-    if DEBUG:
+    if settings.DEBUG:
         # Do something
 
-Note that your code should *not* import from either ``global_settings`` or
+Note that ``django.conf.settings`` isn't a module -- it's an object. So
+importing individual settings is not possible::
+
+    from django.conf.settings import DEBUG  # This won't work.
+
+Also note that your code should *not* import from either ``global_settings`` or
 your own settings file. ``django.conf.settings`` abstracts the concepts of
 default settings and site-specific settings; it presents a single interface.
 It also decouples the code that uses settings from the location of your
@@ -127,9 +132,9 @@ Altering settings at runtime
 You shouldn't alter settings in your applications at runtime. For example,
 don't do this in a view::
 
-    from django.conf.settings import DEBUG
+    from django.conf import settings
 
-    DEBUG = True   # Don't do this!
+    settings.DEBUG = True   # Don't do this!
 
 The only place you should assign to settings is in a settings file.
 
@@ -737,6 +742,16 @@ Default: ``False``
 A boolean that specifies whether to output the "Etag" header. This saves
 bandwidth but slows down performance. This is only used if ``CommonMiddleware``
 is installed (see the `middleware docs`_).
+
+USE_I18N
+--------
+
+Default: ``True``
+
+A boolean that specifies whether Django's internationalization system should be
+enabled. This provides an easy way to turn it off, for performance. If this is
+set to ``False, Django will make some optimizations so as not to load the
+internationalization machinery.
 
 YEAR_MONTH_FORMAT
 -----------------

@@ -78,6 +78,32 @@ class RelatedField(object):
         related = RelatedObject(other, cls, self)
         self.contribute_to_related_class(other, related)
 
+    def get_db_prep_lookup(self, lookup_type, value):
+        # If we are doing a lookup on a Related Field, we must be 
+        # comparing object instances. The value should be the PK of value, 
+        # not value itself.
+        def pk_trace(value):
+            # Value may be a primary key, or an object held in a relation. 
+            # If it is an object, then we need to get the primary key value for
+            # that object. In certain conditions (especially one-to-one relations),
+            # the primary key may itself be an object - so we need to keep drilling
+            # down until we hit a value that can be used for a comparison.
+            v = value
+            try:
+                while True:
+                    v = getattr(v, v._meta.pk.name)
+            except AttributeError:
+                pass
+            return v 
+            
+        if lookup_type == 'exact':
+            return [pk_trace(value)]
+        if lookup_type == 'in':
+            return [pk_trace(v) for v in value]
+        elif lookup_type == 'isnull':
+            return []
+        raise TypeError, "Related Field has invalid lookup: %s" % lookup_type
+            
     def _get_related_query_name(self, opts):
         # This method defines the name that can be used to identify this related object
         # in a table-spanning query. It uses the lower-cased object_name by default,

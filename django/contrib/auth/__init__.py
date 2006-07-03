@@ -27,17 +27,17 @@ def get_backends():
 
 def authenticate(**credentials):
     """
-    If the given credentials, return a user object.
+    If the given credentials are valid, return a User object.
     """
     for backend in get_backends():
         try:
             user = backend.authenticate(**credentials)
         except TypeError:
-            # this backend doesn't accept these credentials as arguments, try the next one.
+            # This backend doesn't accept these credentials as arguments. Try the next one.
             continue
         if user is None:
             continue
-        # annotate the user object with the path of the backend
+        # Annotate the user object with the path of the backend.
         user.backend = str(backend.__class__)
         return user
 
@@ -54,7 +54,7 @@ def login(request, user):
 
 def logout(request):
     """
-    Remove the authenticated user's id from request.
+    Remove the authenticated user's ID from the request.
     """
     del request.session[SESSION_KEY]
     del request.session[BACKEND_SESSION_KEY]

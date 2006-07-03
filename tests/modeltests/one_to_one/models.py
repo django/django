@@ -94,6 +94,12 @@ DoesNotExist: Restaurant matching query does not exist.
 <Restaurant: Demon Dogs the restaurant>
 >>> Restaurant.objects.get(place__exact=1)
 <Restaurant: Demon Dogs the restaurant>
+>>> Restaurant.objects.get(place__exact=p1)
+<Restaurant: Demon Dogs the restaurant>
+>>> Restaurant.objects.get(place=1)
+<Restaurant: Demon Dogs the restaurant>
+>>> Restaurant.objects.get(place=p1)
+<Restaurant: Demon Dogs the restaurant>
 >>> Restaurant.objects.get(place__pk=1)
 <Restaurant: Demon Dogs the restaurant>
 >>> Restaurant.objects.get(place__name__startswith="Demon")
@@ -105,7 +111,17 @@ DoesNotExist: Restaurant matching query does not exist.
 <Place: Demon Dogs the place>
 >>> Place.objects.get(restaurant__place__exact=1)
 <Place: Demon Dogs the place>
+>>> Place.objects.get(restaurant__place__exact=p1)
+<Place: Demon Dogs the place>
 >>> Place.objects.get(restaurant__pk=1)
+<Place: Demon Dogs the place>
+>>> Place.objects.get(restaurant=1)
+<Place: Demon Dogs the place>
+>>> Place.objects.get(restaurant=r)
+<Place: Demon Dogs the place>
+>>> Place.objects.get(restaurant__exact=1)
+<Place: Demon Dogs the place>
+>>> Place.objects.get(restaurant__exact=r)
 <Place: Demon Dogs the place>
 
 # Add a Waiter to the Restaurant.
@@ -115,13 +131,21 @@ DoesNotExist: Restaurant matching query does not exist.
 <Waiter: Joe the waiter at Demon Dogs the restaurant>
 
 # Query the waiters
+>>> Waiter.objects.filter(restaurant__place__pk=1)
+[<Waiter: Joe the waiter at Demon Dogs the restaurant>]
 >>> Waiter.objects.filter(restaurant__place__exact=1)
+[<Waiter: Joe the waiter at Demon Dogs the restaurant>]
+>>> Waiter.objects.filter(restaurant__place__exact=p1)
 [<Waiter: Joe the waiter at Demon Dogs the restaurant>]
 >>> Waiter.objects.filter(restaurant__pk=1)
 [<Waiter: Joe the waiter at Demon Dogs the restaurant>]
 >>> Waiter.objects.filter(id__exact=1)
 [<Waiter: Joe the waiter at Demon Dogs the restaurant>]
 >>> Waiter.objects.filter(pk=1)
+[<Waiter: Joe the waiter at Demon Dogs the restaurant>]
+>>> Waiter.objects.filter(restaurant=1)
+[<Waiter: Joe the waiter at Demon Dogs the restaurant>]
+>>> Waiter.objects.filter(restaurant=r)
 [<Waiter: Joe the waiter at Demon Dogs the restaurant>]
 
 # Delete the restaurant; the waiter should also be removed

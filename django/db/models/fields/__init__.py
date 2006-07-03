@@ -6,7 +6,7 @@ from django import forms
 from django.core.exceptions import ObjectDoesNotExist
 from django.utils.functional import curry, lazy
 from django.utils.text import capfirst
-from django.utils.translation import gettext, gettext_lazy, ngettext
+from django.utils.translation import gettext, gettext_lazy
 import datetime, os, time
 
 class NOT_PROVIDED:
@@ -162,7 +162,7 @@ class Field(object):
 
     def get_db_prep_lookup(self, lookup_type, value):
         "Returns field's value prepared for database lookup."
-        if lookup_type in ('exact', 'gt', 'gte', 'lt', 'lte', 'ne', 'year', 'month', 'day', 'search'):
+        if lookup_type in ('exact', 'gt', 'gte', 'lt', 'lte', 'year', 'month', 'day', 'search'):
             return [value]
         elif lookup_type in ('range', 'in'):
             return value
@@ -406,12 +406,15 @@ class DateField(Field):
         if isinstance(value, datetime.date):
             return value
         validators.isValidANSIDate(value, None)
-        return datetime.date(*time.strptime(value, '%Y-%m-%d')[:3])
+        try:
+            return datetime.date(*time.strptime(value, '%Y-%m-%d')[:3])
+        except ValueError:
+            raise validators.ValidationError, gettext('Enter a valid date in YYYY-MM-DD format.')
 
     def get_db_prep_lookup(self, lookup_type, value):
         if lookup_type == 'range':
             value = [str(v) for v in value]
-        elif lookup_type in ('exact', 'gt', 'gte', 'lt', 'lte', 'ne') and hasattr(value, 'strftime'):
+        elif lookup_type in ('exact', 'gt', 'gte', 'lt', 'lte') and hasattr(value, 'strftime'):
             value = value.strftime('%Y-%m-%d')
         else:
             value = str(value)

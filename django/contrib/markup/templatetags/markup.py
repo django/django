@@ -47,7 +47,8 @@ def restructuredtext(value):
             raise template.TemplateSyntaxError, "Error in {% restructuredtext %} filter: The Python docutils library isn't installed."
         return value
     else:
-        parts = publish_parts(source=value, writer_name="html4css1")
+        docutils_settings = getattr(settings, "RESTRUCTUREDTEXT_FILTER_SETTINGS", {})
+        parts = publish_parts(source=value, writer_name="html4css1", settings_overrides=docutils_settings)
         return parts["fragment"]
 
 register.filter(textile)

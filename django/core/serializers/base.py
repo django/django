@@ -33,7 +33,9 @@ class Serializer(object):
         for obj in queryset:
             self.start_object(obj)
             for field in obj._meta.fields:
-                if field.rel is None:
+                if field is obj._meta.pk:
+                    continue
+                elif field.rel is None:
                     self.handle_field(obj, field)
                 else:
                     self.handle_fk_field(obj, field)

@@ -67,6 +67,10 @@ LANGUAGES = (
 # Languages using BiDi (right-to-left) layout
 LANGUAGES_BIDI = ("he",)
 
+# If you set this to False, Django will make some optimizations so as not
+# to load the internationalization machinery.
+USE_I18N = True
+
 # Not-necessarily-technical managers of the site. They get broken link
 # notifications and other various e-mails.
 MANAGERS = ADMINS
