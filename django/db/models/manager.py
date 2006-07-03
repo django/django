@@ -20,7 +20,9 @@ def ensure_default_manager(sender):
         except FieldDoesNotExist:
             pass
         cls.add_to_class('objects', Manager())
-
+    elif cls._default_manager.model != cls:
+        # cls is an inherited model; don't want the parent manager
+        cls.add_to_class('objects', Manager())
 dispatcher.connect(ensure_default_manager, signal=signals.class_prepared)
 
 class Manager(object):
@@ -38,7 +40,9 @@ class Manager(object):
         # TODO: Use weakref because of possible memory leak / circular reference.
         self.model = model
         setattr(model, name, ManagerDescriptor(self))
-        if not hasattr(model, '_default_manager') or self.creation_counter < model._default_manager.creation_counter:
+        if not hasattr(model, '_default_manager') \
+            or self.creation_counter < model._default_manager.creation_counter \
+            or model._default_manager.model != model:
             model._default_manager = self
 
     #######################
@@ -102,6 +106,38 @@ class Manager(object):
     def values(self, *args, **kwargs):
         return self.get_query_set().values(*args, **kwargs)
 
+    #######################
+    # SCHEMA MANIPULATION #
+    #######################
+
+    def install(self, initial_data=False):
+        """Install my model's table, indexes and (if requested) initial data.
+
+        Returns a 2-tuple of the lists of statements executed and
+        statements pending. Pending statements are those that could
+        not yet be executed, such as foreign key constraints for
+        tables that don't exist at install time.
+        """
+        creator = self.model._meta.connection_info.get_creation_module()
+        run, pending = creator.builder.get_create_table(self.model)
+        run += creator.builder.get_create_indexes(self.model)
+        pending += creator.builder.get_create_many_to_many(self.model)
+        if initial_data:
+            run += creator.builder.get_initialdata(self.model)
+
+        for statement in run:
+            statement.execute()
+        return pending
+
+    def load_initial_data(self):
+        """Load initial data for my model into the database."""
+        pass # FIXME
+
+    def drop(self):
+        """Drop my model's table."""
+        pass # FIXME
+
+    
 class ManagerDescriptor(object):
     # This class ensures managers aren't accessible via model instances.
     # For example, Poll.objects works, but poll_obj.objects raises AttributeError.
