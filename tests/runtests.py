@@ -11,6 +11,7 @@ MODEL_TESTS_DIR_NAME = 'modeltests'
 OTHER_TESTS_DIR = "othertests"
 REGRESSION_TESTS_DIR_NAME = 'regressiontests'
 TEST_DATABASE_NAME = 'django_test_db'
+TEST_DATABASES = (TEST_DATABASE_NAME + '_a', TEST_DATABASE_NAME + '_b')
 
 error_list = []
 def log_error(model_name, title, description):
@@ -164,25 +165,23 @@ class TestRunner:
         self.old_database_name = settings.DATABASE_NAME
         self.old_databases = settings.DATABASES
 
-        db_a = TEST_DATABASE_NAME + '_a'
-        db_b = TEST_DATABASE_NAME + '_b'
         if settings.DATABASE_ENGINE == 'sqlite3':
             # If we're using SQLite, it's more convenient to test against an
             # in-memory database. But we can only do this for the default; 
             # after that we have to use temp files. 
             TEST_DATABASE_NAME = ':memory:'
-            db_a_name = self._tempfile()
-            db_b_name = self._tempfile()
-            self.cleanup_files.append(db_a_name)
-            self.cleanup_files.append(db_b_name)           
-        else:
-            db_a_name = db_a
-            db_b_name = db_b
-            
-        settings.DATABASES = {
-            db_a: { 'DATABASE_NAME': db_a_name },
-            db_b: { 'DATABASE_NAME': db_b_name }
-            }
+        
+        new_databases = {}
+        for db_name in TEST_DATABASES:
+            db_st = settings.DATABASES.setdefault(db_name, {})
+            engine = db_st.get('DATABASE_ENGINE', settings.DATABASE_ENGINE)
+            if engine == 'sqlite3':
+                db_st['DATABASE_NAME'] = self._tempfile()
+                self.cleanup_files.append(db_st['DATABASE_NAME'])
+            else:
+                db_st['DATABASE_NAME'] = db_name
+            new_databases[db_name] = db_st
+        settings.DATABASES = new_databases
 
         self.create_test_db(TEST_DATABASE_NAME, connection)
         for name, info in settings.DATABASES.items():
