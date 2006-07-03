@@ -4,11 +4,12 @@ import os
 import re
 from django.db import models
 
-# FIXME correct handling of styles,
-# allow style object to be passed in
+# default dummy style
 class dummy:
     def __getattr__(self, attr):
         return lambda x: x
+default_style = dummy()
+del dummy
 
 class BoundStatement(object):
     """Represents an SQL statement that is to be executed, at some point in
@@ -39,8 +40,8 @@ class SchemaBuilder(object):
     """
     def __init__(self):
         self.models_already_seen = []
-        
-    def get_create_table(self, model, style=dummy()):
+
+    def get_create_table(self, model, style=None):
         """Construct and return the SQL expression(s) needed to create the
         table for the given model, and any constraints on that
         table. The return value is a 2-tuple. The first element of the tuple
@@ -49,6 +50,8 @@ class SchemaBuilder(object):
         can't be executed immediately because (for instance) the referent
         table does not exist.
         """
+        if style is None:
+            style = default_style
         if model in self.models_already_seen:
             return ([], [])
         self.models_already_seen.append(model)
@@ -129,10 +132,12 @@ class SchemaBuilder(object):
                     pending.append(BoundStatement(sql, opts.connection))
         return (create, pending)    
 
-    def get_create_indexes(self, model, style=dummy()):
+    def get_create_indexes(self, model, style=None):
         """Construct and return SQL statements needed to create the indexes for
         a model. Returns a list of BoundStatements.
         """
+        if style is None:
+            style = default_style
         info = model._meta.connection_info
         backend = info.backend
         connection = info.connection
@@ -155,13 +160,15 @@ class SchemaBuilder(object):
                     )
         return output
 
-    def get_create_many_to_many(self, model, style=dummy()):
+    def get_create_many_to_many(self, model, style=None):
         """Construct and return SQL statements needed to create the
         tables and relationships for all many-to-many relations
         defined in the model. Returns a list of bound statments. Note
         that these statements should only be executed after all models
         for an app have been created.
         """
+        if style is None:
+            style = default_style
         info = model._meta.connection_info
         quote_name = info.backend.quote_name
         connection = info.connection
@@ -197,7 +204,9 @@ class SchemaBuilder(object):
                                              connection))
         return output
 
-    def get_initialdata(self, model, style=dummy()):
+    def get_initialdata(self, model, style=None):
+        if style is None:
+            style = default_style
         opts = model._meta
         info = opts.connection_info
         settings = info.connection.settings
