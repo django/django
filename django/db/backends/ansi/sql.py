@@ -60,7 +60,6 @@ class SchemaBuilder(object):
         info = opts.connection_info
         backend = info.backend
         quote_name = backend.quote_name
-
         data_types = info.get_creation_module().DATA_TYPES
         table_output = []
         pending_references = {}
@@ -177,8 +176,9 @@ class SchemaBuilder(object):
         output = []        
         for f in opts.many_to_many:
             if not isinstance(f.rel, models.GenericRel):
-                table_output = [style.SQL_KEYWORD('CREATE TABLE') + ' ' + \
-                                style.SQL_TABLE(quote_name(f.m2m_db_table())) + ' (']
+                table_output = [
+                    style.SQL_KEYWORD('CREATE TABLE') + ' ' + \
+                    style.SQL_TABLE(quote_name(f.m2m_db_table())) + ' (']
                 table_output.append('    %s %s %s,' % \
                     (style.SQL_FIELD(quote_name('id')),
                     style.SQL_COLTYPE(data_types['AutoField']),
@@ -204,6 +204,32 @@ class SchemaBuilder(object):
                                              connection))
         return output
 
+    def get_drop_table(self, model, cascade=False, style=None):
+        """Construct and return the SQL statment(s) needed to drop a model's
+        table. If cascade is true, then output additional statments to drop any
+        dependant man-many tables and drop any foreign keys that reference
+        this table.
+        """
+        if style is None:
+            style = default_style
+        opts = model._meta
+        info = opts.connection_info
+        db_table = opts.db_table
+        backend = info.backend
+        output = []
+        output.append(BoundStatement(
+                '%s %s;' % (style.SQL_KEYWORD('DROP TABLE'),
+                            style.SQL_TABLE(backend.quote_name(db_table))),
+                info.connection))
+
+        if cascade:
+            # FIXME deal with my foreign keys, others that might have a foreign
+            # key TO me, and many-many
+            pass
+        # Reverse it, to deal with table dependencies.        
+        output.reverse()
+        return output
+        
     def get_initialdata(self, model, style=None):
         if style is None:
             style = default_style
@@ -239,8 +265,7 @@ class SchemaBuilder(object):
         """Get the path from which to load sql initial data files for a model.
         """
         return os.path.normpath(os.path.join(os.path.dirname(models.get_app(model._meta.app_label).__file__), 'sql'))
-        
-    
+            
     def get_rel_data_type(self, f):
         return (f.get_internal_type() in ('AutoField', 'PositiveIntegerField',
                                           'PositiveSmallIntegerField')) \
