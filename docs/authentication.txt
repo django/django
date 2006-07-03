@@ -267,25 +267,54 @@ previous section). You can tell them apart with ``is_anonymous()``, like so::
 How to log a user in
 --------------------
 
-Depending on your task, you'll probably want to make sure to validate the
-user's username and password before you log them in. The easiest way to do so
-is to use the built-in ``authenticate`` and ``login`` functions from within a
-view::
+Django provides two functions in ``django.contrib.auth``: ``authenticate()``
+and ``login()``.
+
+To authenticate a given username and password, use ``authenticate()``. It
+takes two keyword arguments, ``username`` and ``password``, and it returns
+a ``User`` object if the password is valid for the given username. If the
+password is invalid, ``authenticate()`` returns ``None``. Example::
+
+    from django.contrib.auth import authenticate
+    user = authenticate(username='john', password='secret')
+    if user is not None:
+        print "You provided a correct username and password!"
+    else:
+        print "Your username and password were incorrect."
+
+To log a user in, in a view, use ``login()``. It takes an ``HttpRequest``
+object and a ``User`` object. ``login()`` saves the user's ID in the session,
+using Django's session framework, so, as mentioned above, you'll need to make
+sure to have the session middleware installed.
+
+This example shows how you might use both ``authenticate()`` and ``login()``::
 
     from django.contrib.auth import authenticate, login
-    username = request.POST['username']
-    password = request.POST['password']
-    user = authenticate(username=username, password=password)
-    if user is not None:
-        login(request, user)
 
-``authenticate`` checks the username and password. If they are valid it
-returns a user object, otherwise it returns ``None``. ``login`` makes it so
-your users don't have send a username and password for every request. Because
-the ``login`` function uses sessions, you'll need to make sure you have
-``SessionMiddleware`` enabled. See the `session documentation`_ for
-more information.
+    def my_view(request):
+        username = request.POST['username']
+        password = request.POST['password']
+        user = authenticate(username=username, password=password)
+        if user is not None:
+            login(request, user)
+            # Redirect to a success page.
+        else:
+            # Return an error message.
 
+How to log a user out
+---------------------
+
+To log out a user who has been logged in via ``django.contrib.auth.login()``,
+use ``django.contrib.auth.logout()`` within your view. It takes an
+``HttpRequest`` object and has no return value. Example::
+
+    from django.contrib.auth import logout
+
+    def logout_view(request):
+        logout(request)
+        # Redirect to a success page.
+
+Note that ``logout()`` doesn't throw any errors if the user wasn't logged in.
 
 Limiting access to logged-in users
 ----------------------------------
@@ -684,48 +713,77 @@ database. To send messages to anonymous users, use the `session framework`_.
 Other authentication sources
 ============================
 
-Django supports other authentication sources, as well. You can even use
-multiple sources at the same time.
+The authentication that comes with Django is good enough for most common cases,
+but you may have the need to hook into another authentication source -- that
+is, another source of usernames and passwords or authentication methods.
 
-Using multiple backends
------------------------
+For example, your company may already have an LDAP setup that stores a username
+and password for every employee. It'd be a hassle for both the network
+administrator and the users themselves if users had separate accounts in LDAP
+and the Django-based applications.
 
-The list of backends to use is controlled by the ``AUTHENTICATION_BACKENDS``
-setting. This should be a tuple of Python path names. It defaults to
-``('django.contrib.auth.backends.ModelBackend',)``. To add additional backends,
-just add them to your settings.py file. Ordering matters, so if the same
-username and password is valid in multiple backends, the first one in the
-list will return a ``User`` object, and the remaining ones won't even get a
-chance.
+So, to handle situations like this, the Django authentication system lets you
+plug in another authentication sources. You can override Django's default
+database-based scheme, or you can use the default system in tandem with other
+systems.
+
+Specifying authentication backends
+----------------------------------
+
+Behind the scenes, Django maintains a list of "authentication backends" that it
+checks for authentication. When somebody calls
+``django.contrib.auth.authenticate()`` -- as described in "How to log a user in"
+above -- Django tries authenticating across all of its authentication backends.
+If the first authentication method fails, Django tries the second one, and so
+on, until all backends have been attempted.
+
+The list of authentication backends to use is specified in the
+``AUTHENTICATION_BACKENDS`` setting. This should be a tuple of Python path
+names that point to Python classes that know how to authenticate. These classes
+can be anywhere on your Python path.
+
+By default, ``AUTHENTICATION_BACKENDS`` is set to::
+
+    ('django.contrib.auth.backends.ModelBackend',)
+
+That's the basic authentication scheme that checks the Django users database.
+
+The order of ``AUTHENTICATION_BACKENDS`` matters, so if the same username and
+password is valid in multiple backends, Django will stop processing at the
+first positive match.
 
 Writing an authentication backend
 ---------------------------------
 
 An authentication backend is a class that implements two methods:
-``get_user(id)`` and ``authenticate(**credentials)``. The ``get_user`` method
-takes an ``id`` -- which could be a username, database ID or whatever -- and
-returns a ``User`` object. The  ``authenticate`` method takes credentials as
-keyword arguments. Many times it will just look like this::
+``get_user(id)`` and ``authenticate(**credentials)``.
+
+The ``get_user`` method takes an ``id`` -- which could be a username, database
+ID or whatever -- and returns a ``User`` object.
+
+The  ``authenticate`` method takes credentials as keyword arguments. Most of
+the time, it'll just look like this::
 
     class MyBackend:
         def authenticate(username=None, password=None):
-            # check the username/password and return a User
+            # Check the username/password and return a User.
 
 But it could also authenticate a token, like so::
 
     class MyBackend:
         def authenticate(token=None):
-            # check the token and return a user
+            # Check the token and return a User.
 
-Regardless, ``authenticate`` should check the credentials it gets, and if they
-are valid, it should return a ``User`` object that matches those credentials.
+Either way, ``authenticate`` should check the credentials it gets, and it
+should return a ``User`` object that matches those credentials, if the
+credentials are valid. If they're not valid, it should return ``None``.
 
 The Django admin system is tightly coupled to the Django ``User`` object
 described at the beginning of this document. For now, the best way to deal with
 this is to create a Django ``User`` object for each user that exists for your
-backend (i.e. in your LDAP directory, your external SQL database, etc.) You can
-either write a script to do this in advance, or your ``authenticate`` method
-can do it the first time a user logs in.
+backend (e.g., in your LDAP directory, your external SQL database, etc.) You
+can either write a script to do this in advance, or your ``authenticate``
+method can do it the first time a user logs in.
 
 Here's an example backend that authenticates against a username and password
 variable defined in your ``settings.py`` file and creates a Django ``User``
@@ -736,8 +794,9 @@ object the first time a user authenticates::
 
     class SettingsBackend:
         """
-        Authenticate against vars in settings.py Use the login name, and a hash
-        of the password. For example:
+        Authenticate against the settings ADMIN_LOGIN and ADMIN_PASSWORD.
+
+        Use the login name, and a hash of the password. For example:
 
         ADMIN_LOGIN = 'admin'
         ADMIN_PASSWORD = 'sha1$4e987$afbcf42e21bd417fb71db8c66b321e9fc33051de'
