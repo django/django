@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2005-12-09 11:51+0100\n"
-"PO-Revision-Date: 2005-12-08 15:28+0100\n"
+"PO-Revision-Date: 2005-07-02 13:25+0200\n"
 "Last-Translator: Afonso Fernández Nogueira <fonzzo.django@gmail.com>\n"
 "Language-Team: Galego\n"
 "MIME-Version: 1.0\n"
@@ -18,33 +18,32 @@ msgstr ""
 #: contrib/admin/media/js/SelectFilter2.js:33
 #, perl-format
 msgid "Available %s"
-msgstr ""
+msgstr "%s dispoñíbeis"
 
 #: contrib/admin/media/js/SelectFilter2.js:41
-#, fuzzy
 msgid "Choose all"
-msgstr "Escolla unha hora"
+msgstr "Escoller todo"
 
 #: contrib/admin/media/js/SelectFilter2.js:46
 msgid "Add"
-msgstr ""
+msgstr "Engadir"
 
 #: contrib/admin/media/js/SelectFilter2.js:48
 msgid "Remove"
-msgstr ""
+msgstr "Quitar"
 
 #: contrib/admin/media/js/SelectFilter2.js:53
 #, perl-format
 msgid "Chosen %s"
-msgstr ""
+msgstr "%s escollido/a(s)"
 
 #: contrib/admin/media/js/SelectFilter2.js:54
 msgid "Select your choice(s) and click "
-msgstr ""
+msgstr "Seleccione unha ou varias entrada e faga clic "
 
 #: contrib/admin/media/js/SelectFilter2.js:59
 msgid "Clear all"
-msgstr ""
+msgstr "Quitar todo"
 
 #: contrib/admin/media/js/dateparse.js:26
 #: contrib/admin/media/js/calendar.js:24
@@ -52,7 +51,7 @@ msgid ""
 "January February March April May June July August September October November "
 "December"
 msgstr ""
-"xaneiro febeiro marzo abril maio xuño xullo agosto setembro outubro novembro "
+"xaneiro febreiro marzo abril maio xuño xullo agosto setembro outubro novembro "
 "decembro"
 
 #: contrib/admin/media/js/dateparse.js:27
