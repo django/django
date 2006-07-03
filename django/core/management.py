@@ -561,8 +561,9 @@ diffsettings.args = ""
 
 def install(app):
     "Executes the equivalent of 'get_sql_all' in the current database."
-    from django.db import connection, transaction
-
+    from django.db import connection, models, transaction
+    import sys
+    
     app_name = app.__name__.split('.')[-2]
 
     disable_termcolors()
@@ -570,12 +571,13 @@ def install(app):
     # First, try validating the models.
     _check_for_validation_errors(app)
 
-    sql_list = get_sql_all(app)
-
     try:
-        cursor = connection.cursor()
-        for sql in sql_list:
-            cursor.execute(sql)
+        pending = []
+        for model in models.get_models(app):
+            pending.extend(model._default_manager.install(True))
+        if pending:
+            for statement in pending:
+                statement.execute()
     except Exception, e:
         sys.stderr.write(style.ERROR("""Error: %s couldn't be installed. Possible reasons:
   * The database isn't running or isn't configured correctly.

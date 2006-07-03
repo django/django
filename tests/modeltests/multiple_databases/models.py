@@ -92,5 +92,18 @@ True
 False
 >>> Artist._meta.connection.settings == Vehicle._meta.connection.settings
 False
-    
+
+# Managers use their models' connections
+
+>>> a = Artist(name="Paul Klee", alive=False)
+>>> a.save()
+>>> w = Widget(code='100x2r', weight=1000)
+>>> w.save()
+>>> v = Vehicle(make='Chevy', model='Camaro', year='1966')
+>>> v.save()
+>>> artists = Artist.objects.all()
+>>> list(artists)
+[<Artist: Paul Klee>]
+>>> artists[0]._meta.connection.settings == connections['django_test_db_a'].settings
+True
 """
