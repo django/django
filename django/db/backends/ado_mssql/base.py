@@ -89,6 +89,7 @@ class DatabaseWrapper(local):
             self.connection = None
 
 supports_constraints = True
+supports_compound_statements = True
 
 def quote_name(name):
     if name.startswith('[') and name.endswith(']'):

@@ -85,6 +85,7 @@ class SQLiteCursorWrapper(Database.Cursor):
         return query % tuple("?" * num_params)
 
 supports_constraints = False
+supports_compound_statements = False
 
 def quote_name(name):
     if name.startswith('"') and name.endswith('"'):

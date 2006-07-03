@@ -59,6 +59,7 @@ class DatabaseWrapper(local):
             self.connection = None
 
 supports_constraints = True
+supports_compound_statements = True
 
 class FormatStylePlaceholderCursor(Database.Cursor):
     """
