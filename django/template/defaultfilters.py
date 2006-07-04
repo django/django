@@ -437,16 +437,13 @@ def pluralize(value, arg='s'):
     is used instead. If the provided argument contains a comma, the text before
     the comma is used for the singular case.
     """
+    if not ',' in arg: 
+	    arg = ',' + arg
     bits = arg.split(',')
-    if len(bits) == 2:
-        singular_suffix = bits[0]
-        plural_suffix = bits[1]
-    elif len(bits) == 1:
-        singular_suffix = ''
-        plural_suffix = bits[0]
-    else:
+    if len(bits) > 2:
         return ''
-    
+    singular_suffix, plural_suffix = bits[:2]
+
     try:
         if int(value) != 1:
             return plural_suffix
