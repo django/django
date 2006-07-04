@@ -614,7 +614,11 @@ def resolve_variable(path, context):
 
     (The example assumes VARIABLE_ATTRIBUTE_SEPARATOR is '.')
     """
-    if path[0].isdigit():
+    if path == 'False':
+        path = False
+    elif path == 'True':
+        path = True
+    elif path[0].isdigit():
         number_type = '.' in path and float or int
         try:
             current = number_type(path)
