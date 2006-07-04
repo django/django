@@ -962,6 +962,8 @@ def get_validation_errors(outfile, app=None):
 
         # Check core=True, if needed.
         for related in opts.get_followed_related_objects():
+            if not related.edit_inline:
+                continue
             try:
                 for f in related.opts.fields:
                     if f.core:
