@@ -45,7 +45,10 @@ class FirstOfNode(Node):
 
     def render(self, context):
         for var in self.vars:
-            value = resolve_variable(var, context)
+            try:
+                value = resolve_variable(var, context)
+            except VariableDoesNotExist:
+                continue
             if value:
                 return str(value)
         return ''
@@ -144,8 +147,14 @@ class IfEqualNode(Node):
         return "<IfEqualNode>"
 
     def render(self, context):
-        val1 = resolve_variable(self.var1, context)
-        val2 = resolve_variable(self.var2, context)
+        try:
+            val1 = resolve_variable(self.var1, context)
+        except VariableDoesNotExist:
+            val1 = None
+        try:
+            val2 = resolve_variable(self.var2, context)
+        except VariableDoesNotExist:
+            val2 = None
         if (self.negate and val1 != val2) or (not self.negate and val1 == val2):
             return self.nodelist_true.render(context)
         return self.nodelist_false.render(context)
@@ -177,7 +186,7 @@ class IfNode(Node):
         if self.link_type == IfNode.LinkTypes.or_:
             for ifnot, bool_expr in self.bool_exprs:
                 try:
-                    value = bool_expr.resolve(context)
+                    value = bool_expr.resolve(context, True)
                 except VariableDoesNotExist:
                     value = None
                 if (value and not ifnot) or (ifnot and not value):
@@ -186,7 +195,7 @@ class IfNode(Node):
         else:
             for ifnot, bool_expr in self.bool_exprs:
                 try:
-                    value = bool_expr.resolve(context)
+                    value = bool_expr.resolve(context, True)
                 except VariableDoesNotExist:
                     value = None
                 if not ((value and not ifnot) or (ifnot and not value)):

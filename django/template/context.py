@@ -37,7 +37,7 @@ class Context(object):
         for d in self.dicts:
             if d.has_key(key):
                 return d[key]
-        return settings.TEMPLATE_STRING_IF_INVALID
+        raise KeyError(key)
 
     def __delitem__(self, key):
         "Delete a variable from the current context"
@@ -49,7 +49,7 @@ class Context(object):
                 return True
         return False
 
-    def get(self, key, otherwise):
+    def get(self, key, otherwise=None):
         for d in self.dicts:
             if d.has_key(key):
                 return d[key]
