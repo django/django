@@ -12,7 +12,7 @@ class GetAvailableLanguagesNode(Node):
 
     def render(self, context):
         from django.conf import settings
-        context[self.variable] = settings.LANGUAGES
+        context[self.variable] = [(k, translation.gettext(v)) for k, v in settings.LANGUAGES]
         return ''
 
 class GetCurrentLanguageNode(Node):
@@ -30,7 +30,7 @@ class GetCurrentLanguageBidiNode(Node):
     def render(self, context):
         context[self.variable] = translation.get_language_bidi()
         return ''
-        
+
 class TranslateNode(Node):
     def __init__(self, value, noop):
         self.value = value
@@ -171,7 +171,7 @@ def do_translate(parser, token):
             else:
                 noop = False
             return (value, noop)
-    (value, noop) = TranslateParser(token.contents).top()
+    value, noop = TranslateParser(token.contents).top()
     return TranslateNode(value, noop)
 
 def do_block_translate(parser, token):
@@ -216,7 +216,7 @@ def do_block_translate(parser, token):
                     raise TemplateSyntaxError, "unknown subtag %s for 'blocktrans' found" % tag
             return (countervar, counter, extra_context)
 
-    (countervar, counter, extra_context) = BlockTranslateParser(token.contents).top()
+    countervar, counter, extra_context = BlockTranslateParser(token.contents).top()
 
     singular = []
     plural = []
