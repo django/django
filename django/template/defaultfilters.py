@@ -430,20 +430,35 @@ def filesizeformat(bytes):
         return "%.1f MB" % (bytes / (1024 * 1024))
     return "%.1f GB" % (bytes / (1024 * 1024 * 1024))
 
-def pluralize(value):
-    "Returns 's' if the value is not 1, for '1 vote' vs. '2 votes'"
+def pluralize(value, arg='s'):
+    """
+    Returns a plural suffix if the value is not 1, for '1 vote' vs. '2 votes'
+    By default, 's' is used as a suffix; if an argument is provided, that string
+    is used instead. If the provided argument contains a comma, the text before
+    the comma is used for the singular case.
+    """
+    bits = arg.split(',')
+    if len(bits) == 2:
+        singular_suffix = bits[0]
+        plural_suffix = bits[1]
+    elif len(bits) == 1:
+        singular_suffix = ''
+        plural_suffix = bits[0]
+    else:
+        return ''
+    
     try:
         if int(value) != 1:
-            return 's'
+            return plural_suffix
     except ValueError: # invalid string that's not a number
         pass
     except TypeError: # value isn't a string or a number; maybe it's a list?
         try:
             if len(value) != 1:
-                return 's'
+                return plural_suffix
         except TypeError: # len() of unsized object
             pass
-    return ''
+    return singular_suffix
 
 def phone2numeric(value):
     "Takes a phone number and converts it in to its numerical equivalent"
