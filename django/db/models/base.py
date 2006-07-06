@@ -44,6 +44,11 @@ class ModelBase(type):
             # For 'django.contrib.sites.models', this would be 'sites'.
             new_class._meta.app_label = model_module.__name__.split('.')[-2]
 
+        # Bail out early if we have already created this class.
+        m = get_model(new_class._meta.app_label, name)
+        if m is not None:
+            return m
+
         # Add all attributes to the class.
         for obj_name, obj in attrs.items():
             new_class.add_to_class(obj_name, obj)
