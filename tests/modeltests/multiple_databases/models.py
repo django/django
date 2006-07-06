@@ -40,6 +40,18 @@ class Artist(models.Model):
     class Meta:
         db_connection = 'django_test_db_a'
 
+class Opus(models.Model):
+    artist = models.ForeignKey(Artist)
+    name = models.CharField(maxlength=100)
+    year = models.IntegerField()
+    
+    def __str__(self):
+        return "%s (%s)" % (self.name, self.year)
+    
+    class Meta:
+        db_connection = 'django_test_db_a'
+
+
 class Widget(models.Model):
     code = models.CharField(maxlength=10, unique=True)
     weight = models.IntegerField()
@@ -49,6 +61,18 @@ class Widget(models.Model):
 
     class Meta:
         db_connection = 'django_test_db_b'
+
+
+class DooHickey(models.Model):
+    name = models.CharField(maxlength=50)
+    widgets = models.ManyToManyField(Widget, related_name='doohickeys')
+    
+    def __str__(self):
+        return self.name
+    
+    class Meta:
+        db_connection = 'django_test_db_b'
+
 
 class Vehicle(models.Model):
     make = models.CharField(maxlength=20)
@@ -106,4 +130,95 @@ False
 [<Artist: Paul Klee>]
 >>> artists[0]._meta.connection.settings == connections['django_test_db_a'].settings
 True
+
+# When not using transaction management, model save will commit only
+# for the model's connection.
+
+>>> from django.db import transaction
+>>> transaction.enter_transaction_management()
+>>> a = Artist(name="Joan Miro", alive=False)
+>>> w = Widget(code="99rbln", weight=1)
+>>> a.save()
+
+# Only connection 'django_test_db_a' is committed, so if we rollback
+# all connections we'll forget the new Widget.
+
+>>> transaction.rollback()
+>>> list(Artist.objects.all())
+[<Artist: Paul Klee>, <Artist: Joan Miro>]
+>>> list(Widget.objects.all())
+[<Widget: 100x2r>]
+
+# Managed transaction state applies across all connections.
+
+>>> transaction.managed(True)
+
+# When managed, just as when using a single connection, updates are
+# not committed until a commit is issued.
+
+>>> a = Artist(name="Pablo Picasso", alive=False)
+>>> a.save()
+>>> w = Widget(code="99rbln", weight=1)
+>>> w.save()
+>>> v = Vehicle(make='Pontiac', model='Fiero', year='1987')
+>>> v.save()
+
+# The connections argument may be passed to commit, rollback, and the
+# commit_on_success decorator as a keyword argument, as the first (for
+# commit and rollback) or second (for the decorator) positional
+# argument. It may be passed as a ConnectionInfo object, a connection
+# (DatabaseWrapper) object, a connection name, or a list or dict of
+# ConnectionInfo objects, connection objects, or connection names. If a
+# dict is passed, the keys are ignored and the values used as the list
+# of connections to commit, rollback, etc.
+
+>>> transaction.commit(connections['django_test_db_b'])
+>>> transaction.commit('django_test_db_b')
+>>> transaction.commit(connections='django_test_db_b')
+>>> transaction.commit(connections=['django_test_db_b'])
+>>> transaction.commit(['django_test_db_a', 'django_test_db_b'])
+>>> transaction.commit(connections)
+
+# When the connections argument is omitted entirely, the transaction
+# command applies to all connections. Here we have committed
+# connections 'django_test_db_a' and 'django_test_db_b', but not the
+# default connection, so the new vehicle is lost on rollback.
+
+>>> transaction.rollback()
+>>> list(Artist.objects.all())
+[<Artist: Paul Klee>, <Artist: Joan Miro>, <Artist: Pablo Picasso>]
+>>> list(Widget.objects.all())
+[<Widget: 100x2r>, <Widget: 99rbln>]
+>>> list(Vehicle.objects.all())
+[<Vehicle: 1966 Chevy Camaro>]
+>>> transaction.rollback()
+>>> transaction.managed(False)
+>>> transaction.leave_transaction_management()
+
+# Of course, relations and all other normal database operations work
+# with models that use named connections just the same as with models
+# that use the default connection. The only caveat is that you can't
+# use a relation between two models that are stored in different
+# databases. Note that that doesn't mean that two models using
+# different connection *names* can't be related; only that in the the
+# context in which they are used, if you use the relation, the
+# connections named by the two models must resolve to the same
+# database.
+
+>>> a = Artist.objects.get(name="Paul Klee")
+>>> list(a.opus_set.all())
+[]
+>>> a.opus_set.create(name="Magic Garden", year="1926")
+<Opus: Magic Garden (1926)>
+>>> list(a.opus_set.all())
+[<Opus: Magic Garden (1926)>]
+>>> d = DooHickey(name='Thing')
+>>> d.save()
+>>> d.widgets.create(code='d101', weight=92)
+<Widget: d101>
+>>> list(d.widgets.all())
+[<Widget: d101>]
+>>> w = Widget.objects.get(code='d101')
+>>> list(w.doohickeys.all())
+[<DooHickey: Thing>]
 """
