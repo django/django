@@ -4,6 +4,10 @@ import os
 import re
 from django.db import models
 
+# For Python 2.3
+if not hasattr(__builtins__, 'set'):
+    from sets import Set as set
+
 # default dummy style
 class dummy:
     def __getattr__(self, attr):
@@ -39,22 +43,20 @@ class SchemaBuilder(object):
     or other constraints.
     """
     def __init__(self):
-        self.models_already_seen = []
+        self.models_already_seen = set()
 
     def get_create_table(self, model, style=None):
         """Construct and return the SQL expression(s) needed to create the
         table for the given model, and any constraints on that
         table. The return value is a 2-tuple. The first element of the tuple
         is a list of BoundStatements that may be executed immediately. The
-        second is a list of BoundStatements representing constraints that
+        second is a dict of BoundStatements representing constraints that
         can't be executed immediately because (for instance) the referent
-        table does not exist.
+        table does not exist, keyed by the model class they reference.
         """
         if style is None:
             style = default_style
-        if model in self.models_already_seen:
-            return ([], [])
-        self.models_already_seen.append(model)
+        self.models_already_seen.add(model)
         
         opts = model._meta
         info = opts.connection_info
@@ -62,8 +64,14 @@ class SchemaBuilder(object):
         quote_name = backend.quote_name
         data_types = info.get_creation_module().DATA_TYPES
         table_output = []
+
+        # pending field references, keyed by the model class
+        # they reference
         pending_references = {}
-        pending = [] # actual pending statements to execute
+
+        # pending statements to execute, keyed by
+        # the model class they reference
+        pending = {}
         for f in opts.fields:
             if isinstance(f, models.ForeignKey):
                 rel_field = f.rel.get_related_field()
@@ -128,7 +136,8 @@ class SchemaBuilder(object):
                         (quote_name(table),
                         quote_name('%s_referencing_%s_%s' % (r_col, r_table, col)),
                         quote_name(r_col), quote_name(r_table), quote_name(col))
-                    pending.append(BoundStatement(sql, opts.connection))
+                    pending.setdefault(rel_class, []).append(
+                        BoundStatement(sql, opts.connection))
         return (create, pending)    
 
     def get_create_indexes(self, model, style=None):
@@ -173,7 +182,9 @@ class SchemaBuilder(object):
         connection = info.connection
         data_types = info.get_creation_module().DATA_TYPES
         opts = model._meta
-        output = []        
+
+        # statements to execute, keyed by the other model
+        output = {}       
         for f in opts.many_to_many:
             if not isinstance(f.rel, models.GenericRel):
                 table_output = [
@@ -200,8 +211,8 @@ class SchemaBuilder(object):
                     style.SQL_FIELD(quote_name(f.m2m_column_name())),
                     style.SQL_FIELD(quote_name(f.m2m_reverse_name()))))
                 table_output.append(');')
-                output.append(BoundStatement('\n'.join(table_output),
-                                             connection))
+                output.setdefault(f.rel.to, []).append(
+                    BoundStatement('\n'.join(table_output), connection))
         return output
 
     def get_drop_table(self, model, cascade=False, style=None):
@@ -271,3 +282,4 @@ class SchemaBuilder(object):
                                           'PositiveSmallIntegerField')) \
                                           and 'IntegerField' \
                                           or f.get_internal_type()
+        
