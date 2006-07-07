@@ -28,9 +28,11 @@
 <p><label for="id_comment">{% trans "Comment:" %}</label><br />
 <textarea name="comment" id="id_comment" rows="10" cols="60"></textarea></p>
 
+<p>
 <input type="hidden" name="options" value="{{ options }}" />
 <input type="hidden" name="target" value="{{ target }}" />
 <input type="hidden" name="gonzo" value="{{ hash }}" />
-<p><input type="submit" name="preview" value="{% trans "Preview comment" %}" /></p>
+<input type="submit" name="preview" value="{% trans "Preview comment" %}" />
+</p>
 </form>
 {% endif %}
