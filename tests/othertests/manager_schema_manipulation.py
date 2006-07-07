@@ -87,11 +87,11 @@
 # use the default connection or a named connection.
 
 >>> DA.objects.install()
-[]
+{}
 >>> QA.objects.install()
-[]
+{}
 >>> QB.objects.install()
-[]
+{}
 >>> DA.objects.all()
 []
 >>> list(QA.objects.all())
@@ -107,25 +107,28 @@
 # statements that could not be executed because (for instance) they are
 # meant to establish foreign key relationships to tables that don't
 # exist. These are bound to the model's connection and should
-# be executed after all models in the app have been installed.
+# be executed after all models in the app have been installed. The pending
+# statments are returned as a dict keyed by the model which must be installed
+# before the pending statements can be installed.
 
 # NOTE: pretend db supports constraints for this test
 >>> real_cnst = PA._meta.connection_info.backend.supports_constraints
 >>> PA._meta.connection_info.backend.supports_constraints = True
 >>> result = PA.objects.install()
 >>> result
-[BoundStatement('ALTER TABLE "othertests_pa" ADD CONSTRAINT "c_id_referencing_othertests_pc_id" FOREIGN KEY ("c_id") REFERENCES "othertests_pc" ("id");')]
+{<class 'othertests.manager_schema_manipulation.PC'>: [BoundStatement('ALTER TABLE "othertests_pa" ADD CONSTRAINT "c_id_referencing_othertests_pc_id" FOREIGN KEY ("c_id") REFERENCES "othertests_pc" ("id");')]}
 
 # NOTE: restore real constraint flag
 >>> PA._meta.connection_info.backend.supports_constraints = real_cnst
 
-# Models with many-many relationships will also have pending statement
+# Models with many-many relationships may also have pending statement
 # lists. Like other pending statements, these should be executed after
-# all models in the app have been installed.
+# all models in the app have been installed. If the related table's model
+# has already been created, then there will be no pending list.
 
 >>> QC.objects.install()
-[]
+{}
 >>> QD.objects.install()
-[BoundStatement('CREATE TABLE "othertests_qd_qcs" (...);')]
+{}
 
 """

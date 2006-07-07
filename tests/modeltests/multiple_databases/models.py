@@ -131,11 +131,12 @@ False
 >>> artists[0]._meta.connection.settings == connections['django_test_db_a'].settings
 True
 
-# When not using transaction management, model save will commit only
+# When transactions are not managed, model save will commit only
 # for the model's connection.
 
 >>> from django.db import transaction
 >>> transaction.enter_transaction_management()
+>>> transaction.managed(False)
 >>> a = Artist(name="Joan Miro", alive=False)
 >>> w = Widget(code="99rbln", weight=1)
 >>> a.save()

@@ -1,3 +1,7 @@
+# For Python 2.3
+if not hasattr(__builtins__, 'set'):
+    from sets import Set as set
+
 """
 >>> from django.db import models
 >>> from django.db.backends.ansi import sql
@@ -33,30 +37,30 @@
 ([BoundStatement('CREATE TABLE "ansi_sql_car" (...);')], [])
 >>> builder.models_already_seen
 [<class 'othertests.ansi_sql.Car'>]
->>> builder.models_already_seen = []
+>>> builder.models_already_seen = set()
 
 # test that styles are used
 >>> builder.get_create_table(Car, style=mockstyle())
 ([BoundStatement('SQL_KEYWORD(CREATE TABLE) SQL_TABLE("ansi_sql_car") (...SQL_FIELD("id")...);')], [])
 
 # test pending relationships
->>> builder.models_already_seen = []
+>>> builder.models_already_seen = set()
 >>> real_cnst = Mod._meta.connection_info.backend.supports_constraints
 >>> Mod._meta.connection_info.backend.supports_constraints = True
 >>> builder.get_create_table(Mod)
-([BoundStatement('CREATE TABLE "ansi_sql_mod" (..."car_id" integer NOT NULL,...);')], [BoundStatement('ALTER TABLE "ansi_sql_mod" ADD CONSTRAINT ... FOREIGN KEY ("car_id") REFERENCES "ansi_sql_car" ("id");')])
->>> builder.models_already_seen = []
+([BoundStatement('CREATE TABLE "ansi_sql_mod" (..."car_id" integer NOT NULL,...);')], {<class 'othertests.ansi_sql.Car'>: [BoundStatement('ALTER TABLE "ansi_sql_mod" ADD CONSTRAINT ... FOREIGN KEY ("car_id") REFERENCES "ansi_sql_car" ("id");')]})
+>>> builder.models_already_seen = set()
 >>> builder.get_create_table(Car)
-([BoundStatement('CREATE TABLE "ansi_sql_car" (...);')], [])
+([BoundStatement('CREATE TABLE "ansi_sql_car" (...);')], {})
 >>> builder.get_create_table(Mod)
-([BoundStatement('CREATE TABLE "ansi_sql_mod" (..."car_id" integer NOT NULL REFERENCES "ansi_sql_car" ("id"),...);')], [])
+([BoundStatement('CREATE TABLE "ansi_sql_mod" (..."car_id" integer NOT NULL REFERENCES "ansi_sql_car" ("id"),...);')], {})
 >>> Mod._meta.connection_info.backend.supports_constraints = real_cnst
 
 # test many-many
 >>> builder.get_create_table(Collector)
-([BoundStatement('CREATE TABLE "ansi_sql_collector" (...);')], [])
+([BoundStatement('CREATE TABLE "ansi_sql_collector" (...);')], {})
 >>> builder.get_create_many_to_many(Collector)
-[BoundStatement('CREATE TABLE "ansi_sql_collector_cars" (...);')]
+{<class 'othertests.ansi_sql.Car'>: [BoundStatement('CREATE TABLE "ansi_sql_collector_cars" (...);')]}
 
 # test indexes
 >>> builder.get_create_indexes(Car)
