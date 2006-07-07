@@ -83,51 +83,79 @@ def get_version():
 
 def get_sql_create(app):
     "Returns a list of the CREATE TABLE SQL statements for the given app."
-    from django.db import get_creation_module, models
-    data_types = get_creation_module().DATA_TYPES
+    from django.db import models
 
-    if not data_types:
-        # This must be the "dummy" database backend, which means the user
-        # hasn't set DATABASE_ENGINE.
-        sys.stderr.write(style.ERROR("Error: Django doesn't know which syntax to use for your SQL statements,\n" +
-            "because you haven't specified the DATABASE_ENGINE setting.\n" +
-            "Edit your settings file and change DATABASE_ENGINE to something like 'postgresql' or 'mysql'.\n"))
-        sys.exit(1)
+    # singleton representing the default connection
+    _default = object()
 
-    # Get installed models, so we generate REFERENCES right
-    installed_models = _get_installed_models(_get_table_list())
-
-    final_output = []
-    models_output = set(installed_models)
+    # final output will be divided by comments into sections for each
+    # named connection, if there are any named connections
+    connection_output = {}
     pending_references = {}
-
-    app_models = models.get_models(app)
-
+    final_output = []
+    
+    app_models = models.get_models(app, creation_order=True)
     for klass in app_models:
-        output, references = _get_sql_model_create(klass, models_output)
-        final_output.extend(output)
+        opts = klass._meta
+        connection_name = opts.db_connection or _default
+        output = connection_output.setdefault(connection_name, [])
+        info = opts.connection_info
+        creation = info.get_creation_module()
+        data_types = creation.DATA_TYPES
+        if not data_types:
+            # This must be the "dummy" database backend, which means the user
+            # hasn't set DATABASE_ENGINE.
+            sys.stderr.write(style.ERROR("Error: Django doesn't know which syntax to use for your SQL statements,\n" +
+                                         "because you haven't specified the DATABASE_ENGINE setting.\n" +
+                                         "Edit your settings file and change DATABASE_ENGINE to something like 'postgresql' or 'mysql'.\n"))
+            sys.exit(1)
+
+        # Get installed models, so we generate REFERENCES right
+        manager = klass._default_manager
+        tables = manager.get_table_list()
+        installed_models = manager.get_installed_models(tables)
+        models_output = set(installed_models) 
+        builder = creation.builder
+        builder.models_already_seen.update(models_output)
+        model_output, references = builder.get_create_table(klass, style)
+        output.extend(model_output)
         for refto, refs in references.items():
             try:
                 pending_references[refto].extend(refs)
             except KeyError:
                 pending_references[refto] = refs
-        final_output.extend(_get_sql_for_pending_references(klass, pending_references))
-        # Keep track of the fact that we've created the table for this model.
-        models_output.add(klass)
+        if klass in pending_references:
+            output.extend(pending_references.pop(klass))
 
-    # Create the many-to-many join tables.
-    for klass in app_models:
-        final_output.extend(_get_many_to_many_sql_for_model(klass))
+        # Create the many-to-many join tables.
+        many_many = builder.get_create_many_to_many(klass, style)
+        for refklass, statements in many_many.items():
+            output.extend(statements)
 
+    if len(connection_output.keys()) == 1:
+        # all for the default connection
+        for statements in connection_output.values():
+            final_output.extend(statements)
+    else:
+        for connection_name, statements in connection_output.items():
+            if connection_name == _default:
+                connection_name = '(default)'
+            final_output.append(' -- The following statements are for connection: %s' % connection_name)
+            final_output.extend(statements)
+            final_output.append(' -- END statements for %s\n' %
+                                connection_name)
+            
     # Handle references to tables that are from other apps
     # but don't exist physically
     not_installed_models = set(pending_references.keys())
     if not_installed_models:
         final_output.append('-- The following references should be added but depend on non-existant tables:')
         for klass in not_installed_models:
-            final_output.extend(['-- ' + sql for sql in
-                _get_sql_for_pending_references(klass, pending_references)])
+            final_output.extend(['-- ' + sql
+                                 for sql in pending_references.pop(klass)])
 
+    # convert BoundStatements into strings
+    final_output = map(str, final_output)
     return final_output
 get_sql_create.help_doc = "Prints the CREATE TABLE SQL statements for the given app name(s)."
 get_sql_create.args = APP_ARGS
@@ -572,12 +600,26 @@ def install(app):
     _check_for_validation_errors(app)
 
     try:
-        pending = []
-        for model in models.get_models(app):
-            pending.extend(model._default_manager.install(True))
-        if pending:
-            for statement in pending:
-                statement.execute()
+        pending = {}
+        for model in models.get_models(app, creation_order=True):
+            new_pending = model._default_manager.install(True)
+            for klass, statements in new_pending.items():
+                pending.setdefault(klass, []).extend(statements)
+            # execute any pending statements that were waiting for this model
+            if model in pending:
+                for statement in pending.pop(model):
+                    statement.execute()                
+        if pending:            
+            for klass, statements in pending.items():
+                tables = klass._default_manager.get_table_list()
+                models_installed = klass._default_manager.get_installed_models(tables)
+                if klass in models_installed:
+                    for statement in statements:
+                        statement.execute()
+                else:
+                    raise Exception("%s is not installed, but there are "
+                                    "pending statements that need it: %s"
+                                    % (klass, statements))
     except Exception, e:
         sys.stderr.write(style.ERROR("""Error: %s couldn't be installed. Possible reasons:
   * The database isn't running or isn't configured correctly.
