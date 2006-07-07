@@ -12,6 +12,9 @@ _app_list = []   # Cache of installed apps.
 _app_models = {} # Dictionary of models against app label
                  # Each value is a dictionary of model name: model class
                  # Applabel and Model entry exists in cache when individual model is loaded.
+_app_model_order = {} # Dictionary of models against app label
+                      # Each value is a list of model names, in the order in
+                      # which the models were created
 _app_errors = {} # Dictionary of errors that were experienced when loading the INSTALLED_APPS
                  # Key is the app_name of the model, value is the exception that was raised
                  # during model loading.
@@ -61,14 +64,19 @@ def get_app_errors():
     get_apps() # Run get_apps() to populate the _app_list cache. Slightly hackish.
     return _app_errors
 
-def get_models(app_mod=None):
+def get_models(app_mod=None, creation_order=False):
     """
     Given a module containing models, returns a list of the models. Otherwise
     returns a list of all installed models.
     """
     app_list = get_apps() # Run get_apps() to populate the _app_list cache. Slightly hackish.
     if app_mod:
-        return _app_models.get(app_mod.__name__.split('.')[-2], {}).values()
+        app_label = app_mod.__name__.split('.')[-2]
+        app_models = _app_models.get(app_label, {})
+        if creation_order:
+            return [ app_models[name]
+                     for name in _app_model_order.get(app_label, []) ]
+        return app_models.values()
     else:
         model_list = []
         for app_mod in app_list:
@@ -99,6 +107,8 @@ def register_models(app_label, *models):
         # in the _app_models dictionary
         model_name = model._meta.object_name.lower()
         model_dict = _app_models.setdefault(app_label, {})
+        model_list = _app_model_order.setdefault(app_label, [])
+        model_list.append(model_name)
         if model_dict.has_key(model_name):
             # The same model may be imported via different paths (e.g.
             # appname.models and project.appname.models). We use the source
