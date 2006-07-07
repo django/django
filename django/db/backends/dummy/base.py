@@ -16,9 +16,13 @@ class DatabaseError(Exception):
     pass
 
 class DatabaseWrapper:
+    
     cursor = complain
     _commit = complain
     _rollback = complain
+
+    def __init__(self, settings):
+        self.settings = settings
 
     def close(self):
         pass # close()
