@@ -2,7 +2,7 @@ from django.utils.functional import curry
 from django.db import backend, connection
 from django.db.models.query import QuerySet
 from django.dispatch import dispatcher
-from django.db.models import signals
+from django.db.models import signals, get_apps, get_models
 from django.db.models.fields import FieldDoesNotExist
 from django.utils.datastructures import SortedDict
 
@@ -113,20 +113,28 @@ class Manager(object):
     def install(self, initial_data=False):
         """Install my model's table, indexes and (if requested) initial data.
 
-        Returns a 2-tuple of the lists of statements executed and
-        statements pending. Pending statements are those that could
-        not yet be executed, such as foreign key constraints for
-        tables that don't exist at install time.
+        Returns a dict of pending statements, keyed by the model that
+        needs to be created before the statements can be executed.
+        (Pending statements are those that could not yet be executed,
+        such as foreign key constraints for tables that don't exist at
+        install time.)
         """
         creator = self.model._meta.connection_info.get_creation_module()
-        run, pending = creator.builder.get_create_table(self.model)
-        run += creator.builder.get_create_indexes(self.model)
-        pending += creator.builder.get_create_many_to_many(self.model)
+        builder = creator.builder            
+        run, pending = builder.get_create_table(self.model)
+        run += builder.get_create_indexes(self.model)
         if initial_data:
-            run += creator.builder.get_initialdata(self.model)
+            run += builder.get_initialdata(self.model)
+        many_many = builder.get_create_many_to_many(self.model)
 
         for statement in run:
             statement.execute()
+        for klass, statements in many_many.items():
+            if klass in builder.models_already_seen:
+                for statement in statements:
+                    statement.execute()
+            else:
+                pending.setdefault(klass, []).extend(statements)
         return pending
 
     def load_initial_data(self):
@@ -137,6 +145,23 @@ class Manager(object):
         """Drop my model's table."""
         pass # FIXME
 
+    def get_installed_models(self, table_list):
+        """Get list of models installed, given a list of tables
+        """
+        all_models = []
+        for app in get_apps():
+            for model in get_models(app):
+                all_models.append(model)
+                return set([m for m in all_models
+                            if m._meta.db_table in table_list])
+
+    def get_table_list(self):
+        """Get list of tables accessible via my model's connection.
+        """
+        info = self.model._meta.connection_info
+        cursor = info.connection.cursor()
+        introspect = info.get_introspection_module()
+        return introspect.get_table_list(cursor)
     
 class ManagerDescriptor(object):
     # This class ensures managers aren't accessible via model instances.
