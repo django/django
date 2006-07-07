@@ -750,7 +750,7 @@ Default: ``True``
 
 A boolean that specifies whether Django's internationalization system should be
 enabled. This provides an easy way to turn it off, for performance. If this is
-set to ``False, Django will make some optimizations so as not to load the
+set to ``False``, Django will make some optimizations so as not to load the
 internationalization machinery.
 
 YEAR_MONTH_FORMAT
