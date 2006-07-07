@@ -126,8 +126,9 @@ you run it, you'll want to look over the generated models yourself to make
 customizations. In particular, you'll need to rearrange models' order, so that
 models that refer to other models are ordered properly.
 
-Primary keys are automatically introspected for PostgreSQL and MySQL, in which
-case Django puts in the ``primary_key=True`` where needed.
+Primary keys are automatically introspected for PostgreSQL, MySQL and
+SQLite, in which case Django puts in the ``primary_key=True`` where
+needed.
 
 ``inspectdb`` works with PostgreSQL, MySQL and SQLite. Foreign-key detection
 only works in PostgreSQL and with certain types of MySQL tables.
