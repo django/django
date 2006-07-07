@@ -19,6 +19,7 @@ function removeEvent(obj, evType, fn) {
         return true;
     } else if (obj.detachEvent) {
         obj.detachEvent("on" + evType, fn);
+        return true;
     } else {
         return false;
     }

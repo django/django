@@ -217,7 +217,7 @@ var DateTimeShortcuts = {
        DateTimeShortcuts.dismissCalendar(num);
     },
     cancelEventPropagation: function(e) {
-        if (!e) var e = window.event;
+        if (!e) e = window.event;
         e.cancelBubble = true;
         if (e.stopPropagation) e.stopPropagation();
     }
