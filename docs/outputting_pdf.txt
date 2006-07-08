@@ -110,7 +110,7 @@ efficient. Here's the above "Hello World" example rewritten to use
 
     from cStringIO import StringIO
     from reportlab.pdfgen import canvas
-    from django.utils.httpwrappers import HttpResponse
+    from django.http import HttpResponse
 
     def some_view(request):
         # Create the HttpResponse object with the appropriate PDF headers.
