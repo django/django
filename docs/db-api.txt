@@ -1555,11 +1555,17 @@ of ``INSTALLED_APPS`` is to tell Django the entire model domain.
 Queries over related objects
 ----------------------------
 
-When specifying a query over a related object, you have the option of 
+Queries involving related objects follow the same rules as queries involving
+normal value fields. When specifying the the value for a query to match, you 
+may use either an object instance itself, or the primary key value for the 
+object.
 
-    b = Blog.objects.get(id=5)
-    e1 = Entry.objects.filter()
-
+For example, if you have a Blog object ``b`` with ``id=5``, the following
+three queries would be identical::
+     
+    Entry.objects.filter(blog=b) # Query using object instance
+    Entry.objects.filter(blog=b.id) # Query using id from instance
+    Entry.objects.filter(blog=5) # Query using id directly
 
 Deleting objects
 ================
