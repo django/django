@@ -1,4 +1,4 @@
-"translation helper functions"
+"Translation helper functions"
 
 import os, re, sys
 import gettext as gettext_module
@@ -221,7 +221,6 @@ def get_language_bidi():
     False = left-to-right layout
     True = right-to-left layout
     """
-
     from django.conf import settings
     return get_language() in settings.LANGUAGES_BIDI
 
@@ -389,7 +388,7 @@ def get_partial_date_formats():
 def install():
     """
     Installs the gettext function as the default translation function under
-    the name _.
+    the name '_'.
     """
     __builtins__['_'] = gettext
 

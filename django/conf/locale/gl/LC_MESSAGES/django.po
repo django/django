@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2006-05-16 10:11+0200\n"
-"PO-Revision-Date: 2005-12-20 10:48+0100\n"
+"PO-Revision-Date: 2006-07-03 14:06+0200\n"
 "Last-Translator: Afonso Fernández Nogueira <fonzzo.django@gmail.com>\n"
 "Language-Team: Galego\n"
 "MIME-Version: 1.0\n"
@@ -91,9 +91,8 @@ msgstr ""
 "comentario foi borrado\" no canto do seu contido."
 
 #: contrib/comments/models.py:91
-#, fuzzy
 msgid "comments"
-msgstr "comentario"
+msgstr "comentarios"
 
 #: contrib/comments/models.py:131 contrib/comments/models.py:207
 msgid "Content object"
@@ -120,21 +119,19 @@ msgstr "nome da persoa"
 
 #: contrib/comments/models.py:171
 msgid "ip address"
-msgstr "Enderezo IP"
+msgstr "enderezo IP"
 
 #: contrib/comments/models.py:173
 msgid "approved by staff"
 msgstr "aprobado polos moderadores"
 
 #: contrib/comments/models.py:176
-#, fuzzy
 msgid "free comment"
-msgstr "Comentario libre"
+msgstr "comentario libre"
 
 #: contrib/comments/models.py:177
-#, fuzzy
 msgid "free comments"
-msgstr "Comentarios libres"
+msgstr "comentarios libres"
 
 #: contrib/comments/models.py:233
 msgid "score"
@@ -145,14 +142,12 @@ msgid "score date"
 msgstr "data da puntuación"
 
 #: contrib/comments/models.py:237
-#, fuzzy
 msgid "karma score"
-msgstr "Puntuación de karma"
+msgstr "puntos de karma"
 
 #: contrib/comments/models.py:238
-#, fuzzy
 msgid "karma scores"
-msgstr "Puntuacións de karma"
+msgstr "puntos de karma"
 
 #: contrib/comments/models.py:242
 #, python-format
@@ -175,14 +170,12 @@ msgid "flag date"
 msgstr "data da marca"
 
 #: contrib/comments/models.py:268
-#, fuzzy
 msgid "user flag"
-msgstr "Marca de usuario"
+msgstr "marca de usuario"
 
 #: contrib/comments/models.py:269
-#, fuzzy
 msgid "user flags"
-msgstr "Marcas de usuario"
+msgstr "marcas de usuario"
 
 #: contrib/comments/models.py:273
 #, python-format
@@ -194,19 +187,17 @@ msgid "deletion date"
 msgstr "data de borrado"
 
 #: contrib/comments/models.py:280
-#, fuzzy
 msgid "moderator deletion"
-msgstr "Borrado de moderación"
+msgstr "borrado de moderador"
 
 #: contrib/comments/models.py:281
-#, fuzzy
 msgid "moderator deletions"
-msgstr "Borrados de moderación"
+msgstr "borrados de moderador"
 
 #: contrib/comments/models.py:285
 #, python-format
 msgid "Moderator deletion by %r"
-msgstr "Borrado de moderación por %r"
+msgstr "Borrado polo moderador %r"
 
 #: contrib/comments/views/karma.py:19
 msgid "Anonymous users cannot vote"
@@ -218,7 +209,7 @@ msgstr "ID de comentario non válida"
 
 #: contrib/comments/views/karma.py:25
 msgid "No voting for yourself"
-msgstr "Non se pode votar a si mesmo"
+msgstr "Vostede non se pode votar a si mesmo"
 
 #: contrib/comments/views/comments.py:28
 msgid ""
@@ -297,9 +288,8 @@ msgid "Password:"
 msgstr "Contrasinal:"
 
 #: contrib/comments/templates/comments/form.html:6
-#, fuzzy
 msgid "Forgotten your password?"
-msgstr "Cambiar o contrasinal"
+msgstr "Esqueceu o contrasinal?"
 
 #: contrib/comments/templates/comments/form.html:8
 #: contrib/admin/templates/admin/object_history.html:3
@@ -320,7 +310,7 @@ msgstr "Cambiar o contrasinal"
 #: contrib/admin/templates/admin_doc/index.html:4
 #: contrib/admin/templates/admin_doc/model_index.html:5
 msgid "Log out"
-msgstr "Saír"
+msgstr "Rematar sesión"
 
 #: contrib/comments/templates/comments/form.html:12
 msgid "Ratings"
@@ -329,33 +319,30 @@ msgstr ""
 #: contrib/comments/templates/comments/form.html:12
 #: contrib/comments/templates/comments/form.html:23
 msgid "Required"
-msgstr ""
+msgstr "Requirido"
 
 #: contrib/comments/templates/comments/form.html:12
 #: contrib/comments/templates/comments/form.html:23
 msgid "Optional"
-msgstr ""
+msgstr "Opcional"
 
 #: contrib/comments/templates/comments/form.html:23
 msgid "Post a photo"
-msgstr ""
+msgstr "Publicar unha foto"
 
 #: contrib/comments/templates/comments/form.html:27
 #: contrib/comments/templates/comments/freeform.html:5
-#, fuzzy
 msgid "Comment:"
-msgstr "Comentario"
+msgstr "Comentario:"
 
 #: contrib/comments/templates/comments/form.html:32
 #: contrib/comments/templates/comments/freeform.html:9
-#, fuzzy
 msgid "Preview comment"
-msgstr "Comentario libre"
+msgstr "Previsualizar comentario"
 
 #: contrib/comments/templates/comments/freeform.html:4
-#, fuzzy
 msgid "Your name:"
-msgstr "nome de usuario"
+msgstr "Nome:"
 
 #: contrib/admin/filterspecs.py:40
 #, python-format
@@ -440,12 +427,13 @@ msgstr "Todas as datas"
 msgid ""
 "Please enter a correct username and password. Note that both fields are case-"
 "sensitive."
-msgstr ""
+msgstr "Insira un nome de usuario e un contrasinal correctos. Teña en conta que "
+"nos dous campos se distingue entre maiúsculas e minúsculas."
 
 #: contrib/admin/views/decorators.py:23
 #: contrib/admin/templates/admin/login.html:25
 msgid "Log in"
-msgstr "Entrar"
+msgstr "Iniciar sesión"
 
 #: contrib/admin/views/decorators.py:61
 msgid ""
@@ -757,7 +745,7 @@ msgstr "Sentímolo, pero non se atopou a páxina solicitada."
 #: contrib/admin/templates/admin/index.html:17
 #, python-format
 msgid "Models available in the %(name)s application."
-msgstr ""
+msgstr "Modelos dispoñíbeis na aplicación %(name)s."
 
 #: contrib/admin/templates/admin/index.html:28
 #: contrib/admin/templates/admin/change_form.html:15
@@ -1061,12 +1049,11 @@ msgstr "Hora"
 
 #: contrib/admin/templates/widget/file.html:2
 msgid "Currently:"
-msgstr ""
+msgstr "Agora:"
 
 #: contrib/admin/templates/widget/file.html:3
-#, fuzzy
 msgid "Change:"
-msgstr "Modificar"
+msgstr "Modificar:"
 
 #: contrib/redirects/models.py:7
 msgid "redirect from"
@@ -1155,24 +1142,20 @@ msgid "codename"
 msgstr "código"
 
 #: contrib/auth/models.py:17
-#, fuzzy
 msgid "permission"
-msgstr "Permiso"
+msgstr "permiso"
 
 #: contrib/auth/models.py:18 contrib/auth/models.py:27
-#, fuzzy
 msgid "permissions"
-msgstr "Permisos"
+msgstr "permisos"
 
 #: contrib/auth/models.py:29
-#, fuzzy
 msgid "group"
-msgstr "Grupo"
+msgstr "grupo"
 
 #: contrib/auth/models.py:30 contrib/auth/models.py:65
-#, fuzzy
 msgid "groups"
-msgstr "Grupos"
+msgstr "grupos"
 
 #: contrib/auth/models.py:55
 msgid "username"
@@ -1231,19 +1214,16 @@ msgstr ""
 "permisos concedidos a cada un dos grupos aos que pertence."
 
 #: contrib/auth/models.py:67
-#, fuzzy
 msgid "user permissions"
-msgstr "Permisos"
+msgstr "permisos de usuario"
 
 #: contrib/auth/models.py:70
-#, fuzzy
 msgid "user"
-msgstr "Usuario"
+msgstr "usuario"
 
 #: contrib/auth/models.py:71
-#, fuzzy
 msgid "users"
-msgstr "Usuarios"
+msgstr "usuarios"
 
 #: contrib/auth/models.py:76
 msgid "Personal info"
@@ -1262,18 +1242,17 @@ msgid "Groups"
 msgstr "Grupos"
 
 #: contrib/auth/models.py:219
-#, fuzzy
 msgid "message"
-msgstr "Mensaxe"
+msgstr "mensaxe"
 
 #: contrib/auth/forms.py:30
 msgid ""
 "Your Web browser doesn't appear to have cookies enabled. Cookies are "
 "required for logging in."
-msgstr ""
+msgstr "Semella que o seu navegador non acepta 'cookies'. Requírense "
+"'cookies' para iniciar sesión."
 
 #: contrib/contenttypes/models.py:25
-#, fuzzy
 msgid "python model class name"
 msgstr "nome do módulo Python"
 
@@ -1410,54 +1389,52 @@ msgid "December"
 msgstr "decembro"
 
 #: utils/dates.py:19
-#, fuzzy
 msgid "jan"
-msgstr "e"
+msgstr "xan"
 
 #: utils/dates.py:19
 msgid "feb"
-msgstr ""
+msgstr "feb"
 
 #: utils/dates.py:19
 msgid "mar"
-msgstr ""
+msgstr "mar"
 
 #: utils/dates.py:19
 msgid "apr"
-msgstr ""
+msgstr "abr"
 
 #: utils/dates.py:19
-#, fuzzy
 msgid "may"
-msgstr "día"
+msgstr "mai"
 
 #: utils/dates.py:19
 msgid "jun"
-msgstr ""
+msgstr "xuñ"
 
 #: utils/dates.py:20
 msgid "jul"
-msgstr ""
+msgstr "xul"
 
 #: utils/dates.py:20
 msgid "aug"
-msgstr ""
+msgstr "ago"
 
 #: utils/dates.py:20
 msgid "sep"
-msgstr ""
+msgstr "set"
 
 #: utils/dates.py:20
 msgid "oct"
-msgstr ""
+msgstr "out"
 
 #: utils/dates.py:20
 msgid "nov"
-msgstr ""
+msgstr "nov"
 
 #: utils/dates.py:20
 msgid "dec"
-msgstr ""
+msgstr "dec"
 
 #: utils/dates.py:27
 msgid "Jan."
@@ -1502,8 +1479,8 @@ msgstr[1] "meses"
 #: utils/timesince.py:14
 msgid "week"
 msgid_plural "weeks"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "semana"
+msgstr[1] "semanas"
 
 #: utils/timesince.py:15
 msgid "day"
@@ -1545,7 +1522,7 @@ msgstr "alemán"
 
 #: conf/global_settings.py:42
 msgid "Greek"
-msgstr ""
+msgstr "grego"
 
 #: conf/global_settings.py:43
 msgid "English"
@@ -1565,11 +1542,11 @@ msgstr "galego"
 
 #: conf/global_settings.py:47
 msgid "Hungarian"
-msgstr ""
+msgstr "húngaro"
 
 #: conf/global_settings.py:48
 msgid "Hebrew"
-msgstr ""
+msgstr "hebreo"
 
 #: conf/global_settings.py:49
 msgid "Icelandic"
@@ -1581,11 +1558,11 @@ msgstr "italiano"
 
 #: conf/global_settings.py:51
 msgid "Japanese"
-msgstr ""
+msgstr "xaponés"
 
 #: conf/global_settings.py:52
 msgid "Dutch"
-msgstr ""
+msgstr "holandés"
 
 #: conf/global_settings.py:53
 msgid "Norwegian"
@@ -1608,9 +1585,8 @@ msgid "Slovak"
 msgstr "eslovaco"
 
 #: conf/global_settings.py:58
-#, fuzzy
 msgid "Slovenian"
-msgstr "eslovaco"
+msgstr "esloveno"
 
 #: conf/global_settings.py:59
 msgid "Serbian"
@@ -1621,9 +1597,8 @@ msgid "Swedish"
 msgstr "sueco"
 
 #: conf/global_settings.py:61
-#, fuzzy
 msgid "Ukrainian"
-msgstr "brasileiro"
+msgstr "ucraíno"
 
 #: conf/global_settings.py:62
 msgid "Simplified Chinese"
@@ -1631,20 +1606,19 @@ msgstr "chinés simplificado"
 
 #: conf/global_settings.py:63
 msgid "Traditional Chinese"
-msgstr ""
+msgstr "chinés tradicional"
 
 #: core/validators.py:60
 msgid "This value must contain only letters, numbers and underscores."
 msgstr "Este valor soamente pode conter letras, números e guións baixos (_)."
 
 #: core/validators.py:64
-#, fuzzy
 msgid ""
 "This value must contain only letters, numbers, underscores, dashes or "
 "slashes."
 msgstr ""
-"Este valor soamente pode conter letras, números, guións baixos (_) e barras "
-"inclinadas."
+"Este valor soamente pode conter letras, números, guións baixos (_), guións (-) e barras "
+"inclinadas (/)."
 
 #: core/validators.py:72
 msgid "Uppercase letters are not allowed here."
@@ -1903,9 +1877,9 @@ msgstr ""
 "comeza con \"%(start)s\")."
 
 #: db/models/manipulators.py:302
-#, fuzzy, python-format
+#, python-format
 msgid "%(object)s with this %(type)s already exists for the given %(field)s."
-msgstr "Xa existe un/ha %(optname)s con este/a %(fieldname)s."
+msgstr "Xa existe un obxecto %(object)s con este %(type)s para o campo %(field)s."
 
 #: db/models/fields/__init__.py:40
 #, python-format
@@ -1919,19 +1893,16 @@ msgid "This field is required."
 msgstr "Requírese este campo."
 
 #: db/models/fields/__init__.py:337
-#, fuzzy
 msgid "This value must be an integer."
-msgstr "Este valor ten que ser unha potencia de %s."
+msgstr "Este valor ten que ser un número enteiro."
 
 #: db/models/fields/__init__.py:369
-#, fuzzy
 msgid "This value must be either True or False."
-msgstr "Este valor ten que ser unha potencia de %s."
+msgstr "Este valor ten que verdadeiro ou falso."
 
 #: db/models/fields/__init__.py:385
-#, fuzzy
 msgid "This field cannot be null."
-msgstr "Este campo non é válido."
+msgstr "Este campo non pode ser nulo."
 
 #: db/models/fields/__init__.py:562
 msgid "Enter a valid filename."
@@ -1943,12 +1914,10 @@ msgid "Please enter a valid %s."
 msgstr "Insira un %s válido/a."
 
 #: db/models/fields/related.py:579
-#, fuzzy
 msgid "Separate multiple IDs with commas."
-msgstr " Separe IDs múltiplas con comas."
+msgstr "Separe IDs múltiplas con comas."
 
 #: db/models/fields/related.py:581
-#, fuzzy
 msgid ""
 "Hold down \"Control\", or \"Command\" on a Mac, to select more than one."
 msgstr ""

@@ -318,7 +318,7 @@ class Parser(object):
         self.tags.update(lib.tags)
         self.filters.update(lib.filters)
 
-    def compile_filter(self,token):
+    def compile_filter(self, token):
         "Convenient wrapper for FilterExpression"
         return FilterExpression(token, self)
 
@@ -543,11 +543,14 @@ class FilterExpression(object):
             raise TemplateSyntaxError, "Could not parse the remainder: %s" % token[upto:]
         self.var, self.filters = var, filters
 
-    def resolve(self, context):
+    def resolve(self, context, ignore_failures=False):
         try:
             obj = resolve_variable(self.var, context)
         except VariableDoesNotExist:
-            obj = settings.TEMPLATE_STRING_IF_INVALID
+            if ignore_failures:
+                return None
+            else:
+                return settings.TEMPLATE_STRING_IF_INVALID
         for func, args in self.filters:
             arg_vals = []
             for lookup, arg in args:
@@ -611,7 +614,11 @@ def resolve_variable(path, context):
 
     (The example assumes VARIABLE_ATTRIBUTE_SEPARATOR is '.')
     """
-    if path[0].isdigit():
+    if path == 'False':
+        current = False
+    elif path == 'True':
+        current = True
+    elif path[0].isdigit():
         number_type = '.' in path and float or int
         try:
             current = number_type(path)

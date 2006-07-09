@@ -10,18 +10,22 @@ Cookies contain a session ID -- not the data itself.
 Enabling sessions
 =================
 
-Sessions are implemented via middleware_.
+Sessions are implemented via a piece of middleware_ and a Django model.
 
-Turn session functionality on and off by editing the ``MIDDLEWARE_CLASSES``
-setting. To activate sessions, make sure ``MIDDLEWARE_CLASSES`` contains
-``'django.contrib.sessions.middleware.SessionMiddleware'``.
+To enable session functionality, do these two things:
 
-The default ``settings.py`` created by ``django-admin.py startproject`` has
-``SessionMiddleware`` activated.
+    * Edit the ``MIDDLEWARE_CLASSES`` setting and make sure
+      ``MIDDLEWARE_CLASSES`` contains ``'django.contrib.sessions.middleware.SessionMiddleware'``.
+      The default ``settings.py`` created by ``django-admin.py startproject`` has
+      ``SessionMiddleware`` activated.
+
+    * Add ``'django.contrib.sessions'`` to your ``INSTALLED_APPS`` setting, and
+      run ``manage.py syncdb`` to install the single database table that stores
+      session data.
 
 If you don't want to use sessions, you might as well remove the
-``SessionMiddleware`` line from ``MIDDLEWARE_CLASSES``. It'll save you a small
-bit of overhead.
+``SessionMiddleware`` line from ``MIDDLEWARE_CLASSES`` and ``'django.contrib.sessions'``
+from your ``INSTALLED_APPS``. It'll save you a small bit of overhead.
 
 .. _middleware: http://www.djangoproject.com/documentation/middleware/
 

@@ -44,6 +44,11 @@ class ModelBase(type):
             # For 'django.contrib.sites.models', this would be 'sites'.
             new_class._meta.app_label = model_module.__name__.split('.')[-2]
 
+        # Bail out early if we have already created this class.
+        m = get_model(new_class._meta.app_label, name)
+        if m is not None:
+            return m
+
         # Add all attributes to the class.
         for obj_name, obj in attrs.items():
             new_class.add_to_class(obj_name, obj)
@@ -60,10 +65,10 @@ class ModelBase(type):
         new_class._prepare()
 
         register_models(new_class._meta.app_label, new_class)
-	# Because of the way imports happen (recursively), we may or may not be
-	# the first class for this model to register with the framework. There
-	# should only be one class for each model, so we must always return the
-	# registered version.
+        # Because of the way imports happen (recursively), we may or may not be
+        # the first class for this model to register with the framework. There
+        # should only be one class for each model, so we must always return the
+        # registered version.
         return get_model(new_class._meta.app_label, name)
 
 class Model(object):

@@ -188,7 +188,7 @@ def model_detail(request, app_label, model_name):
             'name': field.name,
             'data_type': data_type,
             'verbose': verbose,
-            'help': field.help_text,
+            'help_text': field.help_text,
         })
 
     # Gather model methods.

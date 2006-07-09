@@ -729,6 +729,10 @@ TIME_ZONE
 Default: ``'America/Chicago'``
 
 A string representing the time zone for this installation. `See available choices`_.
+(Note that list of available choices lists more than one on the same line;
+you'll want to use just one of the choices for a given time zone. For instance,
+one line says ``'Europe/London GB GB-Eire'``, but you should use the first bit
+of that -- ``'Europe/London'`` -- as your ``TIME_ZONE`` setting.)
 
 Note that this is the time zone to which Django will convert all dates/times --
 not necessarily the timezone of the server. For example, one server may serve
@@ -750,7 +754,7 @@ Default: ``True``
 
 A boolean that specifies whether Django's internationalization system should be
 enabled. This provides an easy way to turn it off, for performance. If this is
-set to ``False, Django will make some optimizations so as not to load the
+set to ``False``, Django will make some optimizations so as not to load the
 internationalization machinery.
 
 YEAR_MONTH_FORMAT

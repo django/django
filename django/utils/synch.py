@@ -6,7 +6,10 @@ Synchronization primitives:
 (Contributed to Django by eugene@lazutkin.com)
 """
 
-import threading
+try:
+    import threading
+except ImportError:
+    import dummy_threading as threading
 
 class RWLock:
     """

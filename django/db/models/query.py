@@ -679,7 +679,7 @@ def get_cached_row(klass, row, index_start):
 def fill_table_cache(opts, select, tables, where, old_prefix, cache_tables_seen):
     """
     Helper function that recursively populates the select, tables and where (in
-    place) for fill-cache queries.
+    place) for select_related queries.
     """
     backend = opts.connection_info.backend
     for f in opts.fields:
@@ -701,6 +701,7 @@ def fill_table_cache(opts, select, tables, where, old_prefix, cache_tables_seen)
 def parse_lookup(kwarg_items, opts):
     # Helper function that handles converting API kwargs
     # (e.g. "name__exact": "tom") to SQL.
+    # Returns a tuple of (tables, joins, where, params).
 
     # 'joins' is a sorted dictionary describing the tables that must be joined
     # to complete the query. The dictionary is sorted because creation order

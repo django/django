@@ -1006,6 +1006,8 @@ def get_validation_errors(outfile, app=None):
 
         # Check core=True, if needed.
         for related in opts.get_followed_related_objects():
+            if not related.edit_inline:
+                continue
             try:
                 for f in related.opts.fields:
                     if f.core:
@@ -1045,7 +1047,10 @@ def _check_for_validation_errors(app=None):
     s = StringIO()
     num_errors = get_validation_errors(s, app)
     if num_errors:
-        sys.stderr.write(style.ERROR("Error: %s couldn't be installed, because there were errors in your model:\n" % app))
+        if app:
+            sys.stderr.write(style.ERROR("Error: %s couldn't be installed, because there were errors in your model:\n" % app))
+        else:
+            sys.stderr.write(style.ERROR("Error: Couldn't install apps, because there were errors in one or more models:\n"))
         s.seek(0)
         sys.stderr.write(s.read())
         sys.exit(1)

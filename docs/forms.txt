@@ -50,7 +50,7 @@ model that "knows" how to create or modify instances of that model and how to
 validate data for the object. Manipulators come in two flavors:
 ``AddManipulators`` and ``ChangeManipulators``. Functionally they are quite
 similar, but the former knows how to create new instances of the model, while
-the later modifies existing instances.  Both types of classes are automatically
+the latter modifies existing instances. Both types of classes are automatically
 created when you define a new class::
 
     >>> from mysite.myapp.models import Place

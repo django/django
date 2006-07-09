@@ -773,15 +773,18 @@ class DatetimeField(TextField):
     def html2python(data):
         "Converts the field into a datetime.datetime object"
         import datetime
-        date, time = data.split()
-        y, m, d = date.split('-')
-        timebits = time.split(':')
-        h, mn = timebits[:2]
-        if len(timebits) > 2:
-            s = int(timebits[2])
-        else:
-            s = 0
-        return datetime.datetime(int(y), int(m), int(d), int(h), int(mn), s)
+        try:
+            date, time = data.split()
+            y, m, d = date.split('-')
+            timebits = time.split(':')
+            h, mn = timebits[:2]
+            if len(timebits) > 2:
+                s = int(timebits[2])
+            else:
+                s = 0
+            return datetime.datetime(int(y), int(m), int(d), int(h), int(mn), s)
+        except ValueError:
+            return None
     html2python = staticmethod(html2python)
 
 class DateField(TextField):
@@ -806,7 +809,7 @@ class DateField(TextField):
             time_tuple = time.strptime(data, '%Y-%m-%d')
             return datetime.date(*time_tuple[0:3])
         except (ValueError, TypeError):
-            return data
+            return None
     html2python = staticmethod(html2python)
 
 class TimeField(TextField):

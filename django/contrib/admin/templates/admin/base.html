@@ -30,7 +30,7 @@
     {% endif %}
 
         {% if messages %}
-        <ul class="messagelist">{% for message in messages %}<li>{{ message }}</li>{% endfor %}</ul>
+        <ul class="messagelist">{% for message in messages %}<li>{{ message|escape }}</li>{% endfor %}</ul>
         {% endif %}
 
     <!-- Content -->
