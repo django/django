@@ -1121,35 +1121,37 @@ Note this is only available in MySQL and requires direct manipulation of the
 database to add the full-text index.
 
 Default lookups are exact
-~~~~~~~~~~~~~~~~~~~~~~~~~
+-------------------------
 
 If you don't provide a lookup type -- that is, if your keyword argument doesn't
 contain a double underscore -- the lookup type is assumed to be ``exact``.
 
 For example, the following two statements are equivalent::
 
-    Blog.objects.get(id=14)
-    Blog.objects.get(id__exact=14)
+    Blog.objects.get(id__exact=14) # Explicit form
+    Blog.objects.get(id=14) # __exact is implied
 
 This is for convenience, because ``exact`` lookups are the common case.
 
 The pk lookup shortcut
-~~~~~~~~~~~~~~~~~~~~~~
+----------------------
 
 For convenience, Django provides a ``pk`` lookup type, which stands for
 "primary_key". This is shorthand for "an exact lookup on the primary-key."
 
 In the example ``Blog`` model, the primary key is the ``id`` field, so these
-two statements are equivalent::
+three statements are equivalent::
 
-    Blog.objects.get(id__exact=14)
-    Blog.objects.get(pk=14)
+    Blog.objects.get(id__exact=14) # Explicit form
+    Blog.objects.get(id=14) # __exact is implied
+    Blog.objects.get(pk=14) # pk implies id__exact
 
-``pk`` lookups also work across joins. For example, these two statements are
+``pk`` lookups also work across joins. For example, these three statements are
 equivalent::
 
-    Entry.objects.filter(blog__id__exact=3)
-    Entry.objects.filter(blog__pk=3)
+    Entry.objects.filter(blog__id__exact=3) # Explicit form
+    Entry.objects.filter(blog__id=3) # __exact is implied
+    Entry.objects.filter(blog__pk=3) # __pk implies __id__exact
 
 Lookups that span relationships
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -1549,6 +1551,15 @@ The answer lies in the ``INSTALLED_APPS`` setting. The first time any model is
 loaded, Django iterates over every model in ``INSTALLED_APPS`` and creates the
 backward relationships in memory as needed. Essentially, one of the functions
 of ``INSTALLED_APPS`` is to tell Django the entire model domain.
+
+Queries over related objects
+----------------------------
+
+When specifying a query over a related object, you have the option of 
+
+    b = Blog.objects.get(id=5)
+    e1 = Entry.objects.filter()
+
 
 Deleting objects
 ================
