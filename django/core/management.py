@@ -49,6 +49,9 @@ def disable_termcolors():
 if sys.platform == 'win32' or not sys.stdout.isatty():
     disable_termcolors()
 
+# singleton representing the default connection
+_default = object()
+
 def _is_valid_dir_name(s):
     return bool(re.search(r'^\w+$', s))
 
@@ -84,9 +87,6 @@ def get_version():
 def get_sql_create(app):
     "Returns a list of the CREATE TABLE SQL statements for the given app."
     from django.db import models
-
-    # singleton representing the default connection
-    _default = object()
 
     # final output will be divided by comments into sections for each
     # named connection, if there are any named connections
@@ -134,19 +134,7 @@ def get_sql_create(app):
         for refklass, statements in many_many.items():
             output.extend(statements)
 
-    if len(connection_output.keys()) == 1:
-        # all for the default connection
-        for statements in connection_output.values():
-            final_output.extend(statements)
-    else:
-        for connection_name, statements in connection_output.items():
-            if connection_name is _default:
-                connection_name = '(default)'
-            final_output.append(' -- The following statements are for connection: %s' % connection_name)
-            final_output.extend(statements)
-            final_output.append(' -- END statements for %s\n' %
-                                connection_name)
-            
+    final_output = _collate(connection_output)
     # Handle references to tables that are from other apps
     # but don't exist physically
     not_installed_models = set(pending_references.keys())
@@ -426,13 +414,18 @@ get_sql_sequence_reset.args = APP_ARGS
 
 def get_sql_indexes(app):
     "Returns a list of the CREATE INDEX SQL statements for the given app."
-    from django.db import backend, models
-    output = []
+    from django.db import models
+    connection_output = {}
 
     for klass in models.get_models(app):
-        builder = klass._meta.connection_info.get_creation_module().builder
+        opts = klass._meta
+        connection_name = opts.db_connection or _default
+        output = connection_output.setdefault(connection_name, [])
+        info = opts.connection_info
+        builder = info.get_creation_module().builder
         output.extend(map(str, builder.get_create_indexes(klass, style)))
-    return output
+    return _collate(connection_output)
+
 get_sql_indexes.help_doc = "Prints the CREATE INDEX SQL statements for the given model module name(s)."
 get_sql_indexes.args = APP_ARGS
 
@@ -441,6 +434,24 @@ def get_sql_all(app):
     return get_sql_create(app) + get_sql_initial_data(app) + get_sql_indexes(app)
 get_sql_all.help_doc = "Prints the CREATE TABLE, initial-data and CREATE INDEX SQL statements for the given model module name(s)."
 get_sql_all.args = APP_ARGS
+
+def _collate(connection_output):
+    final_output = []
+    if len(connection_output.keys()) == 1:
+        # all for the default connection
+        for statements in connection_output.values():
+            final_output.extend(statements)
+    else:
+        for connection_name, statements in connection_output.items():
+            if not statements:
+                continue
+            if connection_name is _default:
+                connection_name = '(default)'
+            final_output.append(' -- The following statements are for connection: %s' % connection_name)
+            final_output.extend(statements)
+            final_output.append(' -- END statements for %s\n' %
+                                connection_name)
+    return map(str, final_output)
 
 def syncdb():
     "Creates the database tables for all apps in INSTALLED_APPS whose tables haven't already been created."
