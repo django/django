@@ -373,15 +373,18 @@ def get_sql_initial_data_for_model(model):
 def get_sql_initial_data(app):
     "Returns a list of the initial INSERT SQL statements for the given app."
     from django.db.models import get_models
-    output = []
+    connection_output = {}
 
     app_models = get_models(app)
-    app_dir = os.path.normpath(os.path.join(os.path.dirname(app.__file__), 'sql'))
-
     for klass in app_models:
-        output.extend(get_sql_initial_data_for_model(klass))
+        opts = klass._meta
+        connection_name = opts.db_connection or _default
+        output = connection_output.setdefault(connection_name, [])
+        info = opts.connection_info
+        builder = info.get_creation_module().builder
+        output.extend(builder.get_initialdata(klass))
 
-    return output
+    return _collate(connection_output)
 get_sql_initial_data.help_doc = "Prints the initial INSERT SQL statements for the given app name(s)."
 get_sql_initial_data.args = APP_ARGS
 
@@ -414,10 +417,10 @@ get_sql_sequence_reset.args = APP_ARGS
 
 def get_sql_indexes(app):
     "Returns a list of the CREATE INDEX SQL statements for the given app."
-    from django.db import models
+    from django.db.models import get_models
     connection_output = {}
 
-    for klass in models.get_models(app):
+    for klass in get_models(app):
         opts = klass._meta
         connection_name = opts.db_connection or _default
         output = connection_output.setdefault(connection_name, [])

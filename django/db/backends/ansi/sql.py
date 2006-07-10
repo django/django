@@ -241,9 +241,7 @@ class SchemaBuilder(object):
         output.reverse()
         return output
         
-    def get_initialdata(self, model, style=None):
-        if style is None:
-            style = default_style
+    def get_initialdata(self, model):
         opts = model._meta
         info = opts.connection_info
         settings = info.connection.settings
