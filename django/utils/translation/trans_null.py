@@ -14,5 +14,5 @@ string_concat = lambda *strings: ''.join([str(el) for el in strings])
 activate = lambda x: None
 deactivate = install = lambda: None
 get_language = lambda: settings.LANGUAGE_CODE
-get_date_formats = lambda: settings.DATE_FORMAT, settings.DATETIME_FORMAT, settings.TIME_FORMAT
-get_partial_date_formats = lambda: settings.YEAR_MONTH_FORMAT, settings.MONTH_DAY_FORMAT
+get_date_formats = lambda: (settings.DATE_FORMAT, settings.DATETIME_FORMAT, settings.TIME_FORMAT)
+get_partial_date_formats = lambda: (settings.YEAR_MONTH_FORMAT, settings.MONTH_DAY_FORMAT)
