@@ -36,6 +36,7 @@ LANGUAGE_CODE = 'en-us'
 # Languages we provide translations for, out of the box. The language name
 # should be the utf-8 encoded local name for the language.
 LANGUAGES = (
+    ('ar', gettext_noop('Arabic')),
     ('bn', gettext_noop('Bengali')),
     ('cs', gettext_noop('Czech')),
     ('cy', gettext_noop('Welsh')),
@@ -67,7 +68,7 @@ LANGUAGES = (
 )
 
 # Languages using BiDi (right-to-left) layout
-LANGUAGES_BIDI = ("he",)
+LANGUAGES_BIDI = ("he", "ar")
 
 # If you set this to False, Django will make some optimizations so as not
 # to load the internationalization machinery.
