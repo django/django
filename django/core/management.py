@@ -150,122 +150,6 @@ def get_sql_create(app):
 get_sql_create.help_doc = "Prints the CREATE TABLE SQL statements for the given app name(s)."
 get_sql_create.args = APP_ARGS
 
-def _get_sql_model_create(klass, models_already_seen=set()):
-    """
-    Get the SQL required to create a single model.
-
-    Returns list_of_sql, pending_references_dict
-    """
-    from django.db import backend, get_creation_module, models
-    data_types = get_creation_module().DATA_TYPES
-
-    opts = klass._meta
-    final_output = []
-    table_output = []
-    pending_references = {}
-    for f in opts.fields:
-        if isinstance(f, models.ForeignKey):
-            rel_field = f.rel.get_related_field()
-            data_type = get_rel_data_type(rel_field)
-        else:
-            rel_field = f
-            data_type = f.get_internal_type()
-        col_type = data_types[data_type]
-        if col_type is not None:
-            # Make the definition (e.g. 'foo VARCHAR(30)') for this field.
-            field_output = [style.SQL_FIELD(backend.quote_name(f.column)),
-                style.SQL_COLTYPE(col_type % rel_field.__dict__)]
-            field_output.append(style.SQL_KEYWORD('%sNULL' % (not f.null and 'NOT ' or '')))
-            if f.unique:
-                field_output.append(style.SQL_KEYWORD('UNIQUE'))
-            if f.primary_key:
-                field_output.append(style.SQL_KEYWORD('PRIMARY KEY'))
-            if f.rel:
-                if f.rel.to in models_already_seen:
-                    field_output.append(style.SQL_KEYWORD('REFERENCES') + ' ' + \
-                        style.SQL_TABLE(backend.quote_name(f.rel.to._meta.db_table)) + ' (' + \
-                        style.SQL_FIELD(backend.quote_name(f.rel.to._meta.get_field(f.rel.field_name).column)) + ')'
-                    )
-                else:
-                    # We haven't yet created the table to which this field
-                    # is related, so save it for later.
-                    pr = pending_references.setdefault(f.rel.to, []).append((klass, f))
-            table_output.append(' '.join(field_output))
-    if opts.order_with_respect_to:
-        table_output.append(style.SQL_FIELD(backend.quote_name('_order')) + ' ' + \
-            style.SQL_COLTYPE(data_types['IntegerField']) + ' ' + \
-            style.SQL_KEYWORD('NULL'))
-    for field_constraints in opts.unique_together:
-        table_output.append(style.SQL_KEYWORD('UNIQUE') + ' (%s)' % \
-            ", ".join([backend.quote_name(style.SQL_FIELD(opts.get_field(f).column)) for f in field_constraints]))
-
-    full_statement = [style.SQL_KEYWORD('CREATE TABLE') + ' ' + style.SQL_TABLE(backend.quote_name(opts.db_table)) + ' (']
-    for i, line in enumerate(table_output): # Combine and add commas.
-        full_statement.append('    %s%s' % (line, i < len(table_output)-1 and ',' or ''))
-    full_statement.append(');')
-    final_output.append('\n'.join(full_statement))
-
-    return final_output, pending_references
-
-def _get_sql_for_pending_references(klass, pending_references):
-    """
-    Get any ALTER TABLE statements to add constraints after the fact.
-    """
-    from django.db import backend, get_creation_module
-    data_types = get_creation_module().DATA_TYPES
-
-    final_output = []
-    if backend.supports_constraints:
-        opts = klass._meta
-        if klass in pending_references:
-            for rel_class, f in pending_references[klass]:
-                rel_opts = rel_class._meta
-                r_table = rel_opts.db_table
-                r_col = f.column
-                table = opts.db_table
-                col = opts.get_field(f.rel.field_name).column
-                final_output.append(style.SQL_KEYWORD('ALTER TABLE') + ' %s ADD CONSTRAINT %s FOREIGN KEY (%s) REFERENCES %s (%s);' % \
-                    (backend.quote_name(r_table),
-                    backend.quote_name('%s_referencing_%s_%s' % (r_col, table, col)),
-                    backend.quote_name(r_col), backend.quote_name(table), backend.quote_name(col)))
-            del pending_references[klass]
-    return final_output
-
-def _get_many_to_many_sql_for_model(klass):
-    from django.db import backend, get_creation_module
-    from django.db.models import GenericRel
-    
-    data_types = get_creation_module().DATA_TYPES
-
-    opts = klass._meta
-    final_output = []
-    for f in opts.many_to_many:
-        if not isinstance(f.rel, GenericRel):
-            table_output = [style.SQL_KEYWORD('CREATE TABLE') + ' ' + \
-                style.SQL_TABLE(backend.quote_name(f.m2m_db_table())) + ' (']
-            table_output.append('    %s %s %s,' % \
-                (style.SQL_FIELD(backend.quote_name('id')),
-                style.SQL_COLTYPE(data_types['AutoField']),
-                style.SQL_KEYWORD('NOT NULL PRIMARY KEY')))
-            table_output.append('    %s %s %s %s (%s),' % \
-                (style.SQL_FIELD(backend.quote_name(f.m2m_column_name())),
-                style.SQL_COLTYPE(data_types[get_rel_data_type(opts.pk)] % opts.pk.__dict__),
-                style.SQL_KEYWORD('NOT NULL REFERENCES'),
-                style.SQL_TABLE(backend.quote_name(opts.db_table)),
-                style.SQL_FIELD(backend.quote_name(opts.pk.column))))
-            table_output.append('    %s %s %s %s (%s),' % \
-                (style.SQL_FIELD(backend.quote_name(f.m2m_reverse_name())),
-                style.SQL_COLTYPE(data_types[get_rel_data_type(f.rel.to._meta.pk)] % f.rel.to._meta.pk.__dict__),
-                style.SQL_KEYWORD('NOT NULL REFERENCES'),
-                style.SQL_TABLE(backend.quote_name(f.rel.to._meta.db_table)),
-                style.SQL_FIELD(backend.quote_name(f.rel.to._meta.pk.column))))
-            table_output.append('    %s (%s, %s)' % \
-                (style.SQL_KEYWORD('UNIQUE'),
-                style.SQL_FIELD(backend.quote_name(f.m2m_column_name())),
-                style.SQL_FIELD(backend.quote_name(f.m2m_reverse_name()))))
-            table_output.append(');')
-            final_output.append('\n'.join(table_output))
-    return final_output
 
 def get_sql_delete(app):
     "Returns a list of the DROP TABLE SQL statements for the given app."
@@ -344,31 +228,6 @@ def get_sql_reset(app):
     return get_sql_delete(app) + get_sql_all(app)
 get_sql_reset.help_doc = "Prints the DROP TABLE SQL, then the CREATE TABLE SQL, for the given app name(s)."
 get_sql_reset.args = APP_ARGS
-
-def get_sql_initial_data_for_model(model):
-    from django.db import models
-    from django.conf import settings
-
-    opts = model._meta
-    app_dir = os.path.normpath(os.path.join(os.path.dirname(models.get_app(model._meta.app_label).__file__), 'sql'))
-    output = []
-
-    # Some backends can't execute more than one SQL statement at a time,
-    # so split into separate statements.
-    statements = re.compile(r";[ \t]*$", re.M)
-
-    # Find custom SQL, if it's available.
-    sql_files = [os.path.join(app_dir, "%s.%s.sql" % (opts.object_name.lower(), settings.DATABASE_ENGINE)),
-                 os.path.join(app_dir, "%s.sql" % opts.object_name.lower())]
-    for sql_file in sql_files:
-        if os.path.exists(sql_file):
-            fp = open(sql_file)
-            for statement in statements.split(fp.read()):
-                if statement.strip():
-                    output.append(statement + ";")
-            fp.close()
-
-    return output
 
 def get_sql_initial_data(app):
     "Returns a list of the initial INSERT SQL statements for the given app."
@@ -610,7 +469,7 @@ def install(app):
     try:
         pending = {}
         for model in models.get_models(app, creation_order=True):
-            new_pending = model._default_manager.install(True)
+            new_pending = model._default_manager.install(initial_data=True)
             for klass, statements in new_pending.items():
                 pending.setdefault(klass, []).extend(statements)
             # execute any pending statements that were waiting for this model
