@@ -105,6 +105,8 @@ def get_sql_create(app):
         if not data_types:
             # This must be the "dummy" database backend, which means the user
             # hasn't set DATABASE_ENGINE.
+
+            # FIXME diff error message for bad default v bad named
             sys.stderr.write(style.ERROR("Error: Django doesn't know which syntax to use for your SQL statements,\n" +
                                          "because you haven't specified the DATABASE_ENGINE setting.\n" +
                                          "Edit your settings file and change DATABASE_ENGINE to something like 'postgresql' or 'mysql'.\n"))
@@ -138,7 +140,7 @@ def get_sql_create(app):
             final_output.extend(statements)
     else:
         for connection_name, statements in connection_output.items():
-            if connection_name == _default:
+            if connection_name is _default:
                 connection_name = '(default)'
             final_output.append(' -- The following statements are for connection: %s' % connection_name)
             final_output.extend(statements)
@@ -428,16 +430,8 @@ def get_sql_indexes(app):
     output = []
 
     for klass in models.get_models(app):
-        for f in klass._meta.fields:
-            if f.db_index:
-                unique = f.unique and 'UNIQUE ' or ''
-                output.append(
-                    style.SQL_KEYWORD('CREATE %sINDEX' % unique) + ' ' + \
-                    style.SQL_TABLE('%s_%s' % (klass._meta.db_table, f.column)) + ' ' + \
-                    style.SQL_KEYWORD('ON') + ' ' + \
-                    style.SQL_TABLE(backend.quote_name(klass._meta.db_table)) + ' ' + \
-                    "(%s);" % style.SQL_FIELD(backend.quote_name(f.column))
-                )
+        builder = klass._meta.connection_info.get_creation_module().builder
+        output.extend(map(str, builder.get_create_indexes(klass, style)))
     return output
 get_sql_indexes.help_doc = "Prints the CREATE INDEX SQL statements for the given model module name(s)."
 get_sql_indexes.args = APP_ARGS
