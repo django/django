@@ -669,9 +669,11 @@ Notes:
     * ``token.contents`` is a string of the raw contents of the tag. In our
       example, it's ``'current_time "%Y-%m-%d %I:%M %p"'``.
 
-    * The ``token.split_contents()`` method separates the arguments on spaces,
-      whilst keeping quoted strings together. The more straightforward
-      ``token.contents.split()`` would be as robust.
+    * The ``token.split_contents()`` method separates the arguments on spaces
+      while keeping quoted strings together. The more straightforward
+      ``token.contents.split()`` wouldn't be as robust, as it would naively
+      split on *all* spaces, including those within quoted strings. It's a good
+      idea to always use ``token.split_contents()``.
 
     * This function is responsible for raising
       ``django.template.TemplateSyntaxError``, with helpful messages, for
