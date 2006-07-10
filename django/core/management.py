@@ -936,6 +936,19 @@ def get_validation_errors(outfile, app=None):
                         else:
                             if isinstance(f, models.ManyToManyField):
                                 e.add(opts, '"admin.list_display" doesn\'t support ManyToManyFields (%r).' % fn)
+                # list_display_links
+                if opts.admin.list_display_links and not opts.admin.list_display:
+                    e.add(opts, '"admin.list_display" must be defined for "admin.list_display_links" to be used.')
+                if not isinstance(opts.admin.list_display_links, (list, tuple)):
+                    e.add(opts, '"admin.list_display_links", if given, must be set to a list or tuple.')
+                else:
+                    for fn in opts.admin.list_display_links:
+                        try:
+                            f = opts.get_field(fn)
+                        except models.FieldDoesNotExist:
+                            e.add(opts, '"admin.list_filter" refers to %r, which isn\'t a field.' % fn)
+                        if fn not in opts.admin.list_display:
+                            e.add(opts, '"admin.list_display_links" refers to %r, which is not defined in "admin.list_display".' % fn)
                 # list_filter
                 if not isinstance(opts.admin.list_filter, (list, tuple)):
                     e.add(opts, '"admin.list_filter", if given, must be set to a list or tuple.')

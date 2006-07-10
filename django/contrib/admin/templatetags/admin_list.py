@@ -165,7 +165,8 @@ def items_for_result(cl, result):
                 result_repr = escape(str(field_val))
         if result_repr == '':
             result_repr = '&nbsp;'
-        if first: # First column is a special case
+        # If list_display_links not defined, add the link tag to the first field
+        if (first and not cl.lookup_opts.admin.list_display_links) or field_name in cl.lookup_opts.admin.list_display_links: 
             first = False
             url = cl.url_for_result(result)
             result_id = str(getattr(result, pk)) # str() is needed in case of 23L (long ints)
