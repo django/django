@@ -782,7 +782,7 @@ In Python 2.4, the decorator syntax also works::
         ...
 
 A couple of things to note about the ``simple_tag`` helper function:
-    * Only the (single) argument is passed into our function.i
+    * Only the (single) argument is passed into our function.
     * Checking for the required number of arguments, etc, has already been
       done by the time our function is called, so we don't need to do that.
     * The quotes around the argument (if any) have already been stripped away,
