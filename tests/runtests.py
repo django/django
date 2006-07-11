@@ -163,7 +163,7 @@ class TestRunner:
         # replacing any named connections defined in settings. All connections
         # will use the default DATABASE_ENGINE
         self.old_database_name = settings.DATABASE_NAME
-        self.old_databases = settings.DATABASES
+        self.old_databases = settings.OTHER_DATABASES
 
         if settings.DATABASE_ENGINE == 'sqlite3':
             # If we're using SQLite, it's more convenient to test against an
@@ -173,7 +173,7 @@ class TestRunner:
         
         new_databases = {}
         for db_name in TEST_DATABASES:
-            db_st = settings.DATABASES.setdefault(db_name, {})
+            db_st = settings.OTHER_DATABASES.setdefault(db_name, {})
             engine = db_st.get('DATABASE_ENGINE', settings.DATABASE_ENGINE)
             if engine == 'sqlite3':
                 db_st['DATABASE_NAME'] = self._tempfile()
@@ -181,10 +181,10 @@ class TestRunner:
             else:
                 db_st['DATABASE_NAME'] = db_name
             new_databases[db_name] = db_st
-        settings.DATABASES = new_databases
+        settings.OTHER_DATABASES = new_databases
 
         self.create_test_db(TEST_DATABASE_NAME, connection)
-        for name, info in settings.DATABASES.items():
+        for name, info in settings.OTHER_DATABASES.items():
             cx = connections[name]
             test_connection = self.create_test_db(info['DATABASE_NAME'],
                                                   cx.connection)
@@ -205,7 +205,7 @@ class TestRunner:
         from django.conf import settings
         connection.close()
         settings.DATABASE_NAME = self.old_database_name
-        settings.DATABASES = self.old_databases
+        settings.OTHER_DATABASES = self.old_databases
         for db_name, cx in self.created_dbs:
             settings = cx.settings
             cx.close()

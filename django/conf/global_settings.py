@@ -98,7 +98,7 @@ DATABASE_HOST = ''             # Set to empty string for localhost. Not used wit
 DATABASE_PORT = ''             # Set to empty string for default. Not used with sqlite3.
 
 # Optional named database connections in addition to the default.
-DATABASES = {}
+OTHER_DATABASES = {}
 
 # Host for sending e-mail.
 EMAIL_HOST = 'localhost'
