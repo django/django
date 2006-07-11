@@ -441,8 +441,7 @@ class QuerySet(object):
         params = self._params[:]
 
         # Convert self._filters into SQL.
-        tables2, joins2, where2, params2 = self._filters.get_sql(opts)
-        tables.extend(tables2)
+        joins2, where2, params2 = self._filters.get_sql(opts)
         joins.update(joins2)
         where.extend(where2)
         params.extend(params2)
@@ -570,16 +569,15 @@ class QOperator(object):
         self.args = args
 
     def get_sql(self, opts):
-        tables, joins, where, params = [], SortedDict(), [], []
+        joins, where, params = SortedDict(), [], []
         for val in self.args:
-            tables2, joins2, where2, params2 = val.get_sql(opts)
-            tables.extend(tables2)
+            joins2, where2, params2 = val.get_sql(opts)
             joins.update(joins2)
             where.extend(where2)
             params.extend(params2)
         if where:
-            return tables, joins, ['(%s)' % self.operator.join(where)], params
-        return tables, joins, [], params
+            return joins, ['(%s)' % self.operator.join(where)], params
+        return joins, [], params
 
 class QAnd(QOperator):
     "Encapsulates a combined query that uses 'AND'."
@@ -630,9 +628,9 @@ class QNot(Q):
         self.q = q
 
     def get_sql(self, opts):
-        tables, joins, where, params = self.q.get_sql(opts)
+        joins, where, params = self.q.get_sql(opts)
         where2 = ['(NOT (%s))' % " AND ".join(where)]
-        return tables, joins, where2, params
+        return joins, where2, params
 
 def get_where_clause(lookup_type, table_prefix, field_name, value):
     if table_prefix.endswith('.'):
@@ -706,7 +704,7 @@ def parse_lookup(kwarg_items, opts):
     # At present, this method only every returns INNER JOINs; the option is
     # there for others to implement custom Q()s, etc that return other join
     # types.
-    tables, joins, where, params = [], SortedDict(), [], []
+    joins, where, params = SortedDict(), [], []
 
     for kwarg, value in kwarg_items:
         if value is not None:
@@ -733,12 +731,11 @@ def parse_lookup(kwarg_items, opts):
             if len(path) < 1:
                 raise TypeError, "Cannot parse keyword query %r" % kwarg
 
-            tables2, joins2, where2, params2 = lookup_inner(path, clause, value, opts, opts.db_table, None)
-            tables.extend(tables2)
+            joins2, where2, params2 = lookup_inner(path, clause, value, opts, opts.db_table, None)
             joins.update(joins2)
             where.extend(where2)
             params.extend(params2)
-    return tables, joins, where, params
+    return joins, where, params
 
 class FieldFound(Exception):
     "Exception used to short circuit field-finding operations."
@@ -758,7 +755,7 @@ def find_field(name, field_list, related_query):
     return matches[0]
 
 def lookup_inner(path, clause, value, opts, table, column):
-    tables, joins, where, params = [], SortedDict(), [], []
+    joins, where, params = SortedDict(), [], []
     current_opts = opts
     current_table = table
     current_column = column
@@ -878,9 +875,8 @@ def lookup_inner(path, clause, value, opts, table, column):
             join_column = None
 
         # There are name queries remaining. Recurse deeper.
-        tables2, joins2, where2, params2 = lookup_inner(path, clause, value, new_opts, new_table, join_column)
+        joins2, where2, params2 = lookup_inner(path, clause, value, new_opts, new_table, join_column)
 
-        tables.extend(tables2)
         joins.update(joins2)
         where.extend(where2)
         params.extend(params2)
@@ -925,7 +921,7 @@ def lookup_inner(path, clause, value, opts, table, column):
         where.append(get_where_clause(clause, current_table + '.', column, value))
         params.extend(field.get_db_prep_lookup(clause, value))
 
-    return tables, joins, where, params
+    return joins, where, params
 
 def delete_objects(seen_objs):
     "Iterate through a list of seen classes, and remove any instances that are referred to"
