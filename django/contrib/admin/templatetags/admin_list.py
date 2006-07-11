@@ -167,11 +167,12 @@ def items_for_result(cl, result):
             result_repr = '&nbsp;'
         # If list_display_links not defined, add the link tag to the first field
         if (first and not cl.lookup_opts.admin.list_display_links) or field_name in cl.lookup_opts.admin.list_display_links: 
+            table_tag = {True:'th', False:'td'}[first]
             first = False
             url = cl.url_for_result(result)
             result_id = str(getattr(result, pk)) # str() is needed in case of 23L (long ints)
-            yield ('<th%s><a href="%s"%s>%s</a></th>' % \
-                (row_class, url, (cl.is_popup and ' onclick="opener.dismissRelatedLookupPopup(window, %r); return false;"' % result_id or ''), result_repr))
+            yield ('<%s%s><a href="%s"%s>%s</a></%s>' % \
+                (table_tag, row_class, url, (cl.is_popup and ' onclick="opener.dismissRelatedLookupPopup(window, %r); return false;"' % result_id or ''), result_repr, table_tag))
         else:
             yield ('<td%s>%s</td>' % (row_class, result_repr))
 
