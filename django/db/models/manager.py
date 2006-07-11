@@ -159,9 +159,8 @@ class Manager(object):
         """Get list of tables accessible via my model's connection.
         """
         info = self.model._meta.connection_info
-        cursor = info.connection.cursor()
-        introspect = info.get_introspection_module()
-        return introspect.get_table_list(cursor)
+        builder = info.get_creation_module.builder()
+        return builder.get_table_list(info)
     
 class ManagerDescriptor(object):
     # This class ensures managers aren't accessible via model instances.

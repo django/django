@@ -43,8 +43,13 @@ class SchemaBuilder(object):
     or other constraints.
     """
     def __init__(self):
+        # models that I have created
         self.models_already_seen = set()
-
+        # model references, keyed by the referrent model
+        self.references = {}
+        # table cache; set to short-circuit table lookups
+        self.tables = None
+        
     def get_create_table(self, model, style=None):
         """Construct and return the SQL expression(s) needed to create the
         table for the given model, and any constraints on that
@@ -218,8 +223,8 @@ class SchemaBuilder(object):
     def get_drop_table(self, model, cascade=False, style=None):
         """Construct and return the SQL statment(s) needed to drop a model's
         table. If cascade is true, then output additional statments to drop any
-        dependant man-many tables and drop any foreign keys that reference
-        this table.
+        many-to-many tables that this table created and any foreign keys that
+        reference this table.
         """
         if style is None:
             style = default_style
@@ -227,16 +232,45 @@ class SchemaBuilder(object):
         info = opts.connection_info
         db_table = opts.db_table
         backend = info.backend
+        qn = backend.quote_name
         output = []
         output.append(BoundStatement(
                 '%s %s;' % (style.SQL_KEYWORD('DROP TABLE'),
-                            style.SQL_TABLE(backend.quote_name(db_table))),
+                            style.SQL_TABLE(qn(db_table))),
                 info.connection))
 
         if cascade:
-            # FIXME deal with my foreign keys, others that might have a foreign
-            # key TO me, and many-many
-            pass
+            # deal with others that might have a foreign key TO me: alter
+            # their tables to drop the constraint
+            if backend.supports_constraints:
+                references_to_delete = self.get_references()
+                if model in references_to_delete:
+                    for rel_class, f in references_to_delete[model]:
+                        table = rel_class._meta.db_table
+                        if not self.table_exists(info, table):
+                            continue
+                        col = f.column
+                        r_table = opts.db_table
+                        r_col = opts.get_field(f.rel.field_name).column
+                        output.append(BoundStatement(
+                            '%s %s %s %s;' % 
+                            (style.SQL_KEYWORD('ALTER TABLE'),
+                             style.SQL_TABLE(qn(table)),
+                             style.SQL_KEYWORD(
+                                        backend.get_drop_foreignkey_sql()),
+                             style.SQL_FIELD(qn("%s_referencing_%s_%s" %
+                                                (col, r_table, r_col)))),
+                            info.connection))
+                    del references_to_delete[model]
+            # many to many: drop any many-many tables that are my
+            # responsiblity
+            for f in opts.many_to_many:
+                if not isinstance(f.rel, models.GenericRel):
+                    output.append(BoundStatement(
+                            '%s %s;' %
+                            (style.SQL_KEYWORD('DROP TABLE'),
+                             style.SQL_TABLE(qn(f.m2m_db_table()))),
+                            info.connection))
         # Reverse it, to deal with table dependencies.        
         output.reverse()
         return output
@@ -273,11 +307,36 @@ class SchemaBuilder(object):
     def get_initialdata_path(self, model):
         """Get the path from which to load sql initial data files for a model.
         """
-        return os.path.normpath(os.path.join(os.path.dirname(models.get_app(model._meta.app_label).__file__), 'sql'))
+        return os.path.normpath(os.path.join(os.path.dirname(
+                    models.get_app(model._meta.app_label).__file__), 'sql'))
             
     def get_rel_data_type(self, f):
         return (f.get_internal_type() in ('AutoField', 'PositiveIntegerField',
                                           'PositiveSmallIntegerField')) \
                                           and 'IntegerField' \
                                           or f.get_internal_type()
-        
+    
+    def get_references(self):
+        """Fill (if needed) and return the reference cache.
+        """
+        if self.references:
+            return self.references
+        for klass in models.get_models():
+            for f in klass._meta.fields:
+                if f.rel:
+                    self.references.setdefault(f.rel.to, []).append((klass, f))
+        return self.references
+
+    def get_table_list(self, connection_info):
+        """Get list of tables accessible via the connection described by
+        connection_info.
+        """
+        if self.tables is not None:
+            return self.tables
+        cursor = info.connection.cursor()
+        introspection = connection_info.get_introspection_module()
+        return introspection.get_table_list(cursor)        
+    
+    def table_exists(self, connection_info, table):
+        tables = self.get_table_list(connection_info)
+        return table in tables
