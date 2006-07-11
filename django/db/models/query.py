@@ -85,8 +85,8 @@ class QuerySet(object):
         self._where = []             # List of extra WHERE clauses to use.
         self._params = []            # List of params to use for extra WHERE clauses.
         self._tables = []            # List of extra tables to use.
-        self._offset = None          # OFFSET clause
-        self._limit = None           # LIMIT clause
+        self._offset = None          # OFFSET clause.
+        self._limit = None           # LIMIT clause.
         self._result_cache = None
 
     ########################
@@ -710,28 +710,28 @@ def parse_lookup(kwarg_items, opts):
         if value is not None:
             path = kwarg.split(LOOKUP_SEPARATOR)
             # Extract the last elements of the kwarg.
-            # The very-last is the clause (equals, like, etc).
-            # The second-last is the table column on which the clause is
+            # The very-last is the lookup_type (equals, like, etc).
+            # The second-last is the table column on which the lookup_type is
             # to be performed.
             # The exceptions to this are:
             # 1)  "pk", which is an implicit id__exact;
-            #     if we find "pk", make the clause "exact', and insert
+            #     if we find "pk", make the lookup_type "exact', and insert
             #     a dummy name of None, which we will replace when
             #     we know which table column to grab as the primary key.
             # 2)  If there is only one part, or the last part is not a query
             #     term, assume that the query is an __exact
-            clause = path.pop()
-            if clause == 'pk':
-                clause = 'exact'
+            lookup_type = path.pop()
+            if lookup_type == 'pk':
+                lookup_type = 'exact'
                 path.append(None)
-            elif len(path) == 0 or clause not in QUERY_TERMS:
-                path.append(clause)
-                clause = 'exact'
+            elif len(path) == 0 or lookup_type not in QUERY_TERMS:
+                path.append(lookup_type)
+                lookup_type = 'exact'
 
             if len(path) < 1:
                 raise TypeError, "Cannot parse keyword query %r" % kwarg
 
-            joins2, where2, params2 = lookup_inner(path, clause, value, opts, opts.db_table, None)
+            joins2, where2, params2 = lookup_inner(path, lookup_type, value, opts, opts.db_table, None)
             joins.update(joins2)
             where.extend(where2)
             params.extend(params2)
@@ -754,7 +754,7 @@ def find_field(name, field_list, related_query):
         return None
     return matches[0]
 
-def lookup_inner(path, clause, value, opts, table, column):
+def lookup_inner(path, lookup_type, value, opts, table, column):
     joins, where, params = SortedDict(), [], []
     current_opts = opts
     current_table = table
@@ -835,47 +835,41 @@ def lookup_inner(path, clause, value, opts, table, column):
     else: # No match found.
         raise TypeError, "Cannot resolve keyword '%s' into field" % name
 
-    # Check to see if an intermediate join is required between current_table
+    # Check whether an intermediate join is required between current_table
     # and new_table.
     if intermediate_table:
         joins[backend.quote_name(current_table)] = (
-            backend.quote_name(intermediate_table),
-            "LEFT OUTER JOIN",
+            backend.quote_name(intermediate_table), "LEFT OUTER JOIN",
             "%s.%s = %s.%s" % \
-                (backend.quote_name(table),
-                backend.quote_name(current_opts.pk.column),
-                backend.quote_name(current_table),
-                backend.quote_name(intermediate_column))
+                (backend.quote_name(table), backend.quote_name(current_opts.pk.column),
+                backend.quote_name(current_table), backend.quote_name(intermediate_column))
         )
 
     if path:
         # There are elements left in the path. More joins are required.
         if len(path) == 1 and path[0] in (new_opts.pk.name, None) \
-            and clause in ('exact', 'isnull') and not join_required:
+            and lookup_type in ('exact', 'isnull') and not join_required:
             # If the next and final name query is for a primary key,
             # and the search is for isnull/exact, then the current
             # (for N-1) or intermediate (for N-N) table can be used
-            # for the search - no need to join an extra table just
+            # for the search. No need to join an extra table just
             # to check the primary key.
             new_table = current_table
         else:
             # There are 1 or more name queries pending, and we have ruled out
             # any shortcuts; therefore, a join is required.
             joins[backend.quote_name(new_table)] = (
-                backend.quote_name(new_opts.db_table),
-                "INNER JOIN",
+                backend.quote_name(new_opts.db_table), "INNER JOIN",
                 "%s.%s = %s.%s" %
-                    (backend.quote_name(current_table),
-                    backend.quote_name(join_column),
-                    backend.quote_name(new_table),
-                    backend.quote_name(new_column))
+                    (backend.quote_name(current_table), backend.quote_name(join_column),
+                    backend.quote_name(new_table), backend.quote_name(new_column))
             )
             # If we have made the join, we don't need to tell subsequent
             # recursive calls about the column name we joined on.
             join_column = None
 
         # There are name queries remaining. Recurse deeper.
-        joins2, where2, params2 = lookup_inner(path, clause, value, new_opts, new_table, join_column)
+        joins2, where2, params2 = lookup_inner(path, lookup_type, value, new_opts, new_table, join_column)
 
         joins.update(joins2)
         where.extend(where2)
@@ -891,13 +885,10 @@ def lookup_inner(path, clause, value, opts, table, column):
                 # Join is required; query operates on joined table.
                 column = new_opts.pk.name
                 joins[backend.quote_name(new_table)] = (
-                    backend.quote_name(new_opts.db_table),
-                    "INNER JOIN",
+                    backend.quote_name(new_opts.db_table), "INNER JOIN",
                     "%s.%s = %s.%s" %
-                        (backend.quote_name(current_table),
-                        backend.quote_name(join_column),
-                        backend.quote_name(new_table),
-                        backend.quote_name(new_column))
+                        (backend.quote_name(current_table), backend.quote_name(join_column),
+                        backend.quote_name(new_table), backend.quote_name(new_column))
                 )
                 current_table = new_table
             else:
@@ -909,7 +900,7 @@ def lookup_inner(path, clause, value, opts, table, column):
             # Last query term is a related object from an N-N relation.
             # Join from intermediate table is sufficient.
             column = join_column
-        elif name == current_opts.pk.name and clause in ('exact', 'isnull') and current_column:
+        elif name == current_opts.pk.name and lookup_type in ('exact', 'isnull') and current_column:
             # Last query term is for a primary key. If previous iterations
             # introduced a current/intermediate table that can be used to
             # optimize the query, then use that table and column name.
@@ -918,8 +909,8 @@ def lookup_inner(path, clause, value, opts, table, column):
             # Last query term was a normal field.
             column = field.column
 
-        where.append(get_where_clause(clause, current_table + '.', column, value))
-        params.extend(field.get_db_prep_lookup(clause, value))
+        where.append(get_where_clause(lookup_type, current_table + '.', column, value))
+        params.extend(field.get_db_prep_lookup(lookup_type, value))
 
     return joins, where, params
 
