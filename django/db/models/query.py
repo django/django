@@ -755,6 +755,7 @@ def find_field(name, field_list, related_query):
     return matches[0]
 
 def lookup_inner(path, lookup_type, value, opts, table, column):
+    qn = backend.quote_name
     joins, where, params = SortedDict(), [], []
     current_opts = opts
     current_table = table
@@ -838,11 +839,9 @@ def lookup_inner(path, lookup_type, value, opts, table, column):
     # Check whether an intermediate join is required between current_table
     # and new_table.
     if intermediate_table:
-        joins[backend.quote_name(current_table)] = (
-            backend.quote_name(intermediate_table), "LEFT OUTER JOIN",
-            "%s.%s = %s.%s" % \
-                (backend.quote_name(table), backend.quote_name(current_opts.pk.column),
-                backend.quote_name(current_table), backend.quote_name(intermediate_column))
+        joins[qn(current_table)] = (
+            qn(intermediate_table), "LEFT OUTER JOIN",
+            "%s.%s = %s.%s" % (qn(table), qn(current_opts.pk.column), qn(current_table), qn(intermediate_column))
         )
 
     if path:
@@ -858,11 +857,9 @@ def lookup_inner(path, lookup_type, value, opts, table, column):
         else:
             # There are 1 or more name queries pending, and we have ruled out
             # any shortcuts; therefore, a join is required.
-            joins[backend.quote_name(new_table)] = (
-                backend.quote_name(new_opts.db_table), "INNER JOIN",
-                "%s.%s = %s.%s" %
-                    (backend.quote_name(current_table), backend.quote_name(join_column),
-                    backend.quote_name(new_table), backend.quote_name(new_column))
+            joins[qn(new_table)] = (
+                qn(new_opts.db_table), "INNER JOIN",
+                "%s.%s = %s.%s" % (qn(current_table), qn(join_column), qn(new_table), qn(new_column))
             )
             # If we have made the join, we don't need to tell subsequent
             # recursive calls about the column name we joined on.
@@ -884,11 +881,9 @@ def lookup_inner(path, lookup_type, value, opts, table, column):
                 # RelatedObject is from a 1-N relation.
                 # Join is required; query operates on joined table.
                 column = new_opts.pk.name
-                joins[backend.quote_name(new_table)] = (
-                    backend.quote_name(new_opts.db_table), "INNER JOIN",
-                    "%s.%s = %s.%s" %
-                        (backend.quote_name(current_table), backend.quote_name(join_column),
-                        backend.quote_name(new_table), backend.quote_name(new_column))
+                joins[qn(new_table)] = (
+                    qn(new_opts.db_table), "INNER JOIN",
+                    "%s.%s = %s.%s" % (qn(current_table), qn(join_column), qn(new_table), qn(new_column))
                 )
                 current_table = new_table
             else:
