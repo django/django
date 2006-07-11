@@ -667,20 +667,20 @@ def fill_table_cache(opts, select, tables, where, old_prefix, cache_tables_seen)
     Helper function that recursively populates the select, tables and where (in
     place) for select_related queries.
     """
+    qn = backend.quote_name
     for f in opts.fields:
         if f.rel and not f.null:
             db_table = f.rel.to._meta.db_table
             if db_table not in cache_tables_seen:
-                tables.append(backend.quote_name(db_table))
+                tables.append(qn(db_table))
             else: # The table was already seen, so give it a table alias.
                 new_prefix = '%s%s' % (db_table, len(cache_tables_seen))
-                tables.append('%s %s' % (backend.quote_name(db_table), backend.quote_name(new_prefix)))
+                tables.append('%s %s' % (qn(db_table), qn(new_prefix)))
                 db_table = new_prefix
             cache_tables_seen.append(db_table)
             where.append('%s.%s = %s.%s' % \
-                (backend.quote_name(old_prefix), backend.quote_name(f.column),
-                backend.quote_name(db_table), backend.quote_name(f.rel.get_related_field().column)))
-            select.extend(['%s.%s' % (backend.quote_name(db_table), backend.quote_name(f2.column)) for f2 in f.rel.to._meta.fields])
+                (qn(old_prefix), qn(f.column), qn(db_table), qn(f.rel.get_related_field().column)))
+            select.extend(['%s.%s' % (qn(db_table), qn(f2.column)) for f2 in f.rel.to._meta.fields])
             fill_table_cache(f.rel.to._meta, select, tables, where, db_table, cache_tables_seen)
 
 def parse_lookup(kwarg_items, opts):
