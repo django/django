@@ -909,6 +909,7 @@ def lookup_inner(path, lookup_type, value, opts, table, column):
 
 def delete_objects(seen_objs):
     "Iterate through a list of seen classes, and remove any instances that are referred to"
+    qn = backend.quote_name
     ordered_classes = seen_objs.keys()
     ordered_classes.reverse()
 
@@ -926,24 +927,21 @@ def delete_objects(seen_objs):
         for related in cls._meta.get_all_related_many_to_many_objects():
             for offset in range(0, len(pk_list), GET_ITERATOR_CHUNK_SIZE):
                 cursor.execute("DELETE FROM %s WHERE %s IN (%s)" % \
-                    (backend.quote_name(related.field.m2m_db_table()),
-                        backend.quote_name(related.field.m2m_reverse_name()),
+                    (qn(related.field.m2m_db_table()),
+                        qn(related.field.m2m_reverse_name()),
                         ','.join(['%s' for pk in pk_list[offset:offset+GET_ITERATOR_CHUNK_SIZE]])),
                     pk_list[offset:offset+GET_ITERATOR_CHUNK_SIZE])
         for f in cls._meta.many_to_many:
             for offset in range(0, len(pk_list), GET_ITERATOR_CHUNK_SIZE):
                 cursor.execute("DELETE FROM %s WHERE %s IN (%s)" % \
-                    (backend.quote_name(f.m2m_db_table()),
-                        backend.quote_name(f.m2m_column_name()),
-                        ','.join(['%s' for pk in pk_list[offset:offset+GET_ITERATOR_CHUNK_SIZE]])),
+                    (qn(f.m2m_db_table()), qn(f.m2m_column_name()),
+                    ','.join(['%s' for pk in pk_list[offset:offset+GET_ITERATOR_CHUNK_SIZE]])),
                     pk_list[offset:offset+GET_ITERATOR_CHUNK_SIZE])
         for field in cls._meta.fields:
             if field.rel and field.null and field.rel.to in seen_objs:
                 for offset in range(0, len(pk_list), GET_ITERATOR_CHUNK_SIZE):
                     cursor.execute("UPDATE %s SET %s=NULL WHERE %s IN (%s)" % \
-                        (backend.quote_name(cls._meta.db_table),
-                            backend.quote_name(field.column),
-                            backend.quote_name(cls._meta.pk.column),
+                        (qn(cls._meta.db_table), qn(field.column), qn(cls._meta.pk.column),
                             ','.join(['%s' for pk in pk_list[offset:offset+GET_ITERATOR_CHUNK_SIZE]])),
                         pk_list[offset:offset+GET_ITERATOR_CHUNK_SIZE])
 
@@ -953,9 +951,8 @@ def delete_objects(seen_objs):
         pk_list = [pk for pk,instance in seen_objs[cls]]
         for offset in range(0, len(pk_list), GET_ITERATOR_CHUNK_SIZE):
             cursor.execute("DELETE FROM %s WHERE %s IN (%s)" % \
-                (backend.quote_name(cls._meta.db_table),
-                    backend.quote_name(cls._meta.pk.column),
-                    ','.join(['%s' for pk in pk_list[offset:offset+GET_ITERATOR_CHUNK_SIZE]])),
+                (qn(cls._meta.db_table), qn(cls._meta.pk.column),
+                ','.join(['%s' for pk in pk_list[offset:offset+GET_ITERATOR_CHUNK_SIZE]])),
                 pk_list[offset:offset+GET_ITERATOR_CHUNK_SIZE])
 
         # Last cleanup; set NULLs where there once was a reference to the object,
