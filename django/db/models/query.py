@@ -774,7 +774,7 @@ def lookup_inner(path, lookup_type, value, opts, table, column):
         # Does the name belong to a defined many-to-many field?
         field = find_field(name, current_opts.many_to_many, False)
         if field:
-            new_table = current_table + LOOKUP_SEPARATOR + name
+            new_table = current_table + '__' + name
             new_opts = field.rel.to._meta
             new_column = new_opts.pk.column
 
@@ -791,7 +791,7 @@ def lookup_inner(path, lookup_type, value, opts, table, column):
         # Does the name belong to a reverse defined many-to-many field?
         field = find_field(name, current_opts.get_all_related_many_to_many_objects(), True)
         if field:
-            new_table = current_table + LOOKUP_SEPARATOR + name
+            new_table = current_table + '__' + name
             new_opts = field.opts
             new_column = new_opts.pk.column
 
@@ -808,7 +808,7 @@ def lookup_inner(path, lookup_type, value, opts, table, column):
         # Does the name belong to a one-to-many field?
         field = find_field(name, current_opts.get_all_related_objects(), True)
         if field:
-            new_table = table + LOOKUP_SEPARATOR + name
+            new_table = table + '__' + name
             new_opts = field.opts
             new_column = field.field.column
             join_column = opts.pk.column
@@ -822,7 +822,7 @@ def lookup_inner(path, lookup_type, value, opts, table, column):
         field = find_field(name, current_opts.fields, False)
         if field:
             if field.rel: # One-to-One/Many-to-one field
-                new_table = current_table + LOOKUP_SEPARATOR + name
+                new_table = current_table + '__' + name
                 new_opts = field.rel.to._meta
                 new_column = new_opts.pk.column
                 join_column = field.column
