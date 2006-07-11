@@ -831,8 +831,6 @@ def lookup_inner(path, lookup_type, value, opts, table, column):
 
     except FieldFound: # Match found, loop has been shortcut.
         pass
-    except: # Any other exception; rethrow
-        raise
     else: # No match found.
         raise TypeError, "Cannot resolve keyword '%s' into field" % name
 
