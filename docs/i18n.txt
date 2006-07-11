@@ -452,7 +452,7 @@ Notes:
       ``de``.
     * Only languages listed in the `LANGUAGES setting`_ can be selected. If
       you want to restrict the language selection to a subset of provided
-      languages (because your appliaction doesn't provide all those languages),
+      languages (because your application doesn't provide all those languages),
       set ``LANGUAGES`` to a list of languages. For example::
 
           LANGUAGES = (
@@ -465,6 +465,30 @@ Notes:
       en-us).
 
       .. _LANGUAGES setting: http://www.djangoproject.com/documentation/settings/#languages
+
+    * If you define a custom ``LANGUAGES`` setting, as explained in the
+      previous bullet, it's OK to mark the languages as translation strings
+      -- but use a "dummy" ``gettext()`` function, not the one in
+      ``django.utils.translation``. You should *never* import
+      ``django.utils.translation`` from within your settings file, because that
+      module in itself depends on the settings, and that would cause a circular
+      import.
+
+      The solution is to use a "dummy" ``gettext()`` function. Here's a sample
+      settings file::
+
+          gettext = lambda s: s
+
+          LANGUAGES = (
+              ('de', gettext('German')),
+              ('en', gettext('English')),
+          )
+
+      With this arrangement, ``make-messages.py`` will still find and mark
+      these strings for translation, but the translation won't happen at
+      runtime -- so you'll have to remember to wrap the languages in the *real*
+      ``gettext()`` in any code that uses ``LANGUAGES`` at runtime.
+
     * The ``LocaleMiddleware`` can only select languages for which there is a
       Django-provided base translation. If you want to provide translations
       for your application that aren't already in the set of translations
