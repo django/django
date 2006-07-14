@@ -1024,7 +1024,7 @@ def _check_for_validation_errors(app=None):
         sys.stderr.write(s.read())
         sys.exit(1)
 
-def runserver(addr, port):
+def runserver(addr, port, use_reloader=True):
     "Starts a lightweight Web server for development."
     from django.core.servers.basehttp import run, AdminMediaHandler, WSGIServerException
     from django.core.handlers.wsgi import WSGIHandler
@@ -1058,9 +1058,12 @@ def runserver(addr, port):
             sys.exit(1)
         except KeyboardInterrupt:
             sys.exit(0)
-    from django.utils import autoreload
-    autoreload.main(inner_run)
-runserver.args = '[optional port number, or ipaddr:port]'
+    if use_reloader:
+        from django.utils import autoreload
+        autoreload.main(inner_run)
+    else:
+        inner_run()
+runserver.args = '[--noreload] [optional port number, or ipaddr:port]'
 
 def createcachetable(tablename):
     "Creates the table needed to use the SQL cache backend"
@@ -1209,6 +1212,8 @@ def execute_from_command_line(action_mapping=DEFAULT_ACTION_MAPPING, argv=None):
         help='Lets you manually add a directory the Python path, e.g. "/home/djangoprojects/myproject".')
     parser.add_option('--plain', action='store_true', dest='plain',
         help='Tells Django to use plain Python, not IPython, for "shell" command.')
+    parser.add_option('--noreload', action='store_false', dest='use_reloader', default=True,
+        help='Tells Django to NOT use the auto-reloader when running the development server.')
     options, args = parser.parse_args(argv[1:])
 
     # Take care of options.
@@ -1264,7 +1269,7 @@ def execute_from_command_line(action_mapping=DEFAULT_ACTION_MAPPING, argv=None):
                 addr, port = args[1].split(':')
             except ValueError:
                 addr, port = '', args[1]
-        action_mapping[action](addr, port)
+        action_mapping[action](addr, port, options.use_reloader)
     elif action == 'runfcgi':
         action_mapping[action](args[1:])
     else:
