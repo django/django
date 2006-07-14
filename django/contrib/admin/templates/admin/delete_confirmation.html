@@ -11,14 +11,14 @@
 {% endblock %}
 {% block content %}
 {% if perms_lacking %}
-    <p>{% blocktrans %}Deleting the {{ object_name }} '{{ object }}' would result in deleting related objects, but your account doesn't have permission to delete the following types of objects:{% endblocktrans %}</p>
+    <p>{% blocktrans with object|escape as escaped_object %}Deleting the {{ object_name }} '{{ escaped_object }}' would result in deleting related objects, but your account doesn't have permission to delete the following types of objects:{% endblocktrans %}</p>
     <ul>
     {% for obj in perms_lacking %}
         <li>{{ obj }}</li>
     {% endfor %}
     </ul>
 {% else %}
-    <p>{% blocktrans %}Are you sure you want to delete the {{ object_name }} "{{ object }}"? All of the following related items will be deleted:{% endblocktrans %}</p>
+    <p>{% blocktrans with object|escape as escaped_object %}Are you sure you want to delete the {{ object_name }} "{{ escaped_object }}"? All of the following related items will be deleted:{% endblocktrans %}</p>
     <ul>{{ deleted_objects|unordered_list }}</ul>
     <form action="" method="post">
     <div>
