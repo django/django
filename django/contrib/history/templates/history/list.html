@@ -1,0 +1,19 @@
+{% if changes_list %}
+<table border="1">
+<tr>
+<td>ID:</td>
+<td>PID:</td> 
+<td>Change time:</td> 
+
+</tr>
+{% for change in changes_list %}
+<tr>
+<td><a href="detail/{{ change.id }}/">{{ change.id }}</td>
+<td>{{ change.parent_id }}</td>
+<td>{{ change.change_time }}</td>
+
+</tr>
+{% endfor %}
+{% else %}
+<p>No changes are available.</p>
+{% endif %}

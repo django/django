@@ -1,0 +1,10 @@
+{% for object in  object_list %}
+<h2>{{ object.question }}</h2>
+<ul>
+<li>ID: {{ object.id }}</li>
+<li>PID: {{ object.parent_id }}</li>
+<li>Change time: {{ object.change_time }}</li>
+<li>Question: {{ object.object }}</li>
+<li>Pub date: {{ object.pub_date }}</li>
+</ul>
+{% endfor %}
