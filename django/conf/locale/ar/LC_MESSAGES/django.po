@@ -1,0 +1,1989 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the django package.
+# Ahmad Alhashemi <trans@ahmadh.com>, 2006.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Django SVN\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2006-07-03 19:22+0300\n"
+"PO-Revision-Date: 2006-07-06 23:46+0300\n"
+"Last-Translator: Ahmad Alhashemi <ahmad@ahmadh.com>\n"
+"Language-Team: Ahmad Alhashemi <trans@ahmadh.com>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=4; plural=(n == 1? 0 : (n == 2? 1 : (n <= 10? 2 : 3)));\n"
+"X-Poedit-Language: Arabic\n"
+"X-Poedit-Country: KUWAIT\n"
+"X-Poedit-SourceCharset: utf-8\n"
+
+#: .\conf\global_settings.py:37
+msgid "Bengali"
+msgstr "بنغالي"
+
+#: .\conf\global_settings.py:38
+msgid "Czech"
+msgstr "تشيكي"
+
+#: .\conf\global_settings.py:39
+msgid "Welsh"
+msgstr "ويلزي"
+
+#: .\conf\global_settings.py:40
+msgid "Danish"
+msgstr "دنماركي"
+
+#: .\conf\global_settings.py:41
+msgid "German"
+msgstr "ألماني"
+
+#: .\conf\global_settings.py:42
+msgid "Greek"
+msgstr "اغريقي"
+
+#: .\conf\global_settings.py:43
+msgid "English"
+msgstr "انجليزي"
+
+#: .\conf\global_settings.py:44
+msgid "Spanish"
+msgstr "اسباني"
+
+#: .\conf\global_settings.py:45
+msgid "Argentinean Spanish"
+msgstr "اسباني أرجنتيني"
+
+#: .\conf\global_settings.py:46
+msgid "French"
+msgstr "فرنسي"
+
+#: .\conf\global_settings.py:47
+msgid "Galician"
+msgstr "جاليسي"
+
+#: .\conf\global_settings.py:48
+msgid "Hungarian"
+msgstr "هنغاري"
+
+#: .\conf\global_settings.py:49
+msgid "Hebrew"
+msgstr "عبري"
+
+#: .\conf\global_settings.py:50
+msgid "Icelandic"
+msgstr "آيسلندي"
+
+#: .\conf\global_settings.py:51
+msgid "Italian"
+msgstr "ايطالي"
+
+#: .\conf\global_settings.py:52
+msgid "Japanese"
+msgstr "ياباني"
+
+#: .\conf\global_settings.py:53
+msgid "Dutch"
+msgstr "هولندي"
+
+#: .\conf\global_settings.py:54
+msgid "Norwegian"
+msgstr "نرويجي"
+
+#: .\conf\global_settings.py:55
+msgid "Brazilian"
+msgstr "برازيلي"
+
+#: .\conf\global_settings.py:56
+msgid "Romanian"
+msgstr "روماني"
+
+#: .\conf\global_settings.py:57
+msgid "Russian"
+msgstr "روسي"
+
+#: .\conf\global_settings.py:58
+msgid "Slovak"
+msgstr "سلوفاك"
+
+#: .\conf\global_settings.py:59
+msgid "Slovenian"
+msgstr "سلوفاتي"
+
+#: .\conf\global_settings.py:60
+msgid "Serbian"
+msgstr "صربي"
+
+#: .\conf\global_settings.py:61
+msgid "Swedish"
+msgstr "سويدي"
+
+#: .\conf\global_settings.py:62
+msgid "Ukrainian"
+msgstr "أكراني"
+
+#: .\conf\global_settings.py:63
+msgid "Simplified Chinese"
+msgstr "صيني مبسط"
+
+#: .\conf\global_settings.py:64
+msgid "Traditional Chinese"
+msgstr "صيني تقليدي"
+
+#: .\contrib\admin\filterspecs.py:40
+#, python-format
+msgid ""
+"<h3>By %s:</h3>\n"
+"<ul>\n"
+msgstr ""
+"<h3>بواسطة %s:</h3>\n"
+"<ul>\n"
+
+#: .\contrib\admin\filterspecs.py:70
+#: .\contrib\admin\filterspecs.py:88
+#: .\contrib\admin\filterspecs.py:143
+#: .\contrib\admin\filterspecs.py:169
+msgid "All"
+msgstr "كافة"
+
+#: .\contrib\admin\filterspecs.py:109
+msgid "Any date"
+msgstr "أي تاريخ"
+
+#: .\contrib\admin\filterspecs.py:110
+msgid "Today"
+msgstr "اليوم"
+
+#: .\contrib\admin\filterspecs.py:113
+msgid "Past 7 days"
+msgstr "الأيام 7 الماضية"
+
+#: .\contrib\admin\filterspecs.py:115
+msgid "This month"
+msgstr "هذا الشهر"
+
+#: .\contrib\admin\filterspecs.py:117
+msgid "This year"
+msgstr "هذه السنة"
+
+#: .\contrib\admin\filterspecs.py:143
+msgid "Yes"
+msgstr "نعم"
+
+#: .\contrib\admin\filterspecs.py:143
+msgid "No"
+msgstr "لا"
+
+#: .\contrib\admin\filterspecs.py:150
+msgid "Unknown"
+msgstr "غير معروف"
+
+#: .\contrib\admin\models.py:16
+msgid "action time"
+msgstr "وقت العملية"
+
+#: .\contrib\admin\models.py:19
+msgid "object id"
+msgstr "معرف العنصر"
+
+#: .\contrib\admin\models.py:20
+msgid "object repr"
+msgstr "ممثل العنصر"
+
+#: .\contrib\admin\models.py:21
+msgid "action flag"
+msgstr "علامة العملية"
+
+#: .\contrib\admin\models.py:22
+msgid "change message"
+msgstr "تغيير الرسالة"
+
+#: .\contrib\admin\models.py:25
+msgid "log entry"
+msgstr "مدخل السجل"
+
+#: .\contrib\admin\models.py:26
+msgid "log entries"
+msgstr "مدخلات السجل"
+
+#: .\contrib\admin\templates\admin\404.html.py:4
+#: .\contrib\admin\templates\admin\404.html.py:8
+msgid "Page not found"
+msgstr "تعذر العثور على الصفحة"
+
+#: .\contrib\admin\templates\admin\404.html.py:10
+msgid "We're sorry, but the requested page could not be found."
+msgstr "نحن آسفون، لكننا لم نعثر على الصفحة المطلوبة."
+
+#: .\contrib\admin\templates\admin\500.html.py:4
+#: .\contrib\admin\templates\admin\base.html.py:29
+#: .\contrib\admin\templates\admin\change_form.html.py:13
+#: .\contrib\admin\templates\admin\change_list.html.py:6
+#: .\contrib\admin\templates\admin\delete_confirmation.html.py:6
+#: .\contrib\admin\templates\admin\invalid_setup.html.py:4
+#: .\contrib\admin\templates\admin\object_history.html.py:5
+#: .\contrib\admin\templates\admin_doc\bookmarklets.html.py:3
+#: .\contrib\admin\templates\registration\logged_out.html.py:4
+#: .\contrib\admin\templates\registration\password_change_done.html.py:4
+#: .\contrib\admin\templates\registration\password_change_form.html.py:4
+#: .\contrib\admin\templates\registration\password_reset_done.html.py:4
+#: .\contrib\admin\templates\registration\password_reset_form.html.py:4
+msgid "Home"
+msgstr "الرئيسية"
+
+#: .\contrib\admin\templates\admin\500.html.py:4
+msgid "Server error"
+msgstr "خطأ في المزود"
+
+#: .\contrib\admin\templates\admin\500.html.py:6
+msgid "Server error (500)"
+msgstr "خطأ في المزود (500)"
+
+#: .\contrib\admin\templates\admin\500.html.py:9
+msgid "Server Error <em>(500)</em>"
+msgstr "خطأ في المزود <em>(500)</em>"
+
+#: .\contrib\admin\templates\admin\500.html.py:10
+msgid "There's been an error. It's been reported to the site administrators via e-mail and should be fixed shortly. Thanks for your patience."
+msgstr "حدث خطأ، وقم تم الابلاغ عنه إلى مدراء الموقع عبر البريد الإلكترونيوسيتم حل المشكلة قريبا إن شاء الله، شكرا لك على صبرك."
+
+#: .\contrib\admin\templates\admin\base.html.py:24
+msgid "Welcome,"
+msgstr "أهلا، "
+
+#: .\contrib\admin\templates\admin\base.html.py:24
+#: .\contrib\admin\templates\admin\change_form.html.py:10
+#: .\contrib\admin\templates\admin\change_list.html.py:5
+#: .\contrib\admin\templates\admin\delete_confirmation.html.py:3
+#: .\contrib\admin\templates\admin\object_history.html.py:3
+#: .\contrib\admin\templates\admin_doc\bookmarklets.html.py:3
+#: .\contrib\admin\templates\registration\password_change_done.html.py:3
+#: .\contrib\admin\templates\registration\password_change_form.html.py:3
+msgid "Documentation"
+msgstr "التعليمات"
+
+#: .\contrib\admin\templates\admin\base.html.py:24
+#: .\contrib\admin\templates\admin\change_form.html.py:10
+#: .\contrib\admin\templates\admin\change_list.html.py:5
+#: .\contrib\admin\templates\admin\delete_confirmation.html.py:3
+#: .\contrib\admin\templates\admin\object_history.html.py:3
+#: .\contrib\admin\templates\admin_doc\bookmarklets.html.py:4
+#: .\contrib\admin\templates\admin_doc\index.html.py:4
+#: .\contrib\admin\templates\admin_doc\missing_docutils.html.py:4
+#: .\contrib\admin\templates\admin_doc\model_detail.html.py:3
+#: .\contrib\admin\templates\admin_doc\model_index.html.py:5
+#: .\contrib\admin\templates\admin_doc\template_detail.html.py:4
+#: .\contrib\admin\templates\admin_doc\template_filter_index.html.py:5
+#: .\contrib\admin\templates\admin_doc\template_tag_index.html.py:5
+#: .\contrib\admin\templates\admin_doc\view_detail.html.py:4
+#: .\contrib\admin\templates\admin_doc\view_index.html.py:5
+#: .\contrib\admin\templates\registration\password_change_done.html.py:3
+#: .\contrib\admin\templates\registration\password_change_form.html.py:3
+msgid "Change password"
+msgstr "تغيير كلمة المرور"
+
+#: .\contrib\admin\templates\admin\base.html.py:24
+#: .\contrib\admin\templates\admin\change_form.html.py:10
+#: .\contrib\admin\templates\admin\change_list.html.py:5
+#: .\contrib\admin\templates\admin\delete_confirmation.html.py:3
+#: .\contrib\admin\templates\admin\object_history.html.py:3
+#: .\contrib\admin\templates\admin_doc\bookmarklets.html.py:4
+#: .\contrib\admin\templates\admin_doc\index.html.py:4
+#: .\contrib\admin\templates\admin_doc\missing_docutils.html.py:4
+#: .\contrib\admin\templates\admin_doc\model_detail.html.py:3
+#: .\contrib\admin\templates\admin_doc\model_index.html.py:5
+#: .\contrib\admin\templates\admin_doc\template_detail.html.py:4
+#: .\contrib\admin\templates\admin_doc\template_filter_index.html.py:5
+#: .\contrib\admin\templates\admin_doc\template_tag_index.html.py:5
+#: .\contrib\admin\templates\admin_doc\view_detail.html.py:4
+#: .\contrib\admin\templates\admin_doc\view_index.html.py:5
+#: .\contrib\admin\templates\registration\password_change_done.html.py:3
+#: .\contrib\admin\templates\registration\password_change_form.html.py:3
+#: .\contrib\comments\templates\comments\form.html.py:8
+msgid "Log out"
+msgstr "خروج"
+
+#: .\contrib\admin\templates\admin\base_site.html.py:4
+msgid "Django site admin"
+msgstr "إدارة موقع جاننغو"
+
+#: .\contrib\admin\templates\admin\base_site.html.py:7
+msgid "Django administration"
+msgstr "إدارة جانغو"
+
+#: .\contrib\admin\templates\admin\change_form.html.py:15
+#: .\contrib\admin\templates\admin\index.html.py:28
+msgid "Add"
+msgstr "إضافة"
+
+#: .\contrib\admin\templates\admin\change_form.html.py:20
+#: .\contrib\admin\templates\admin\object_history.html.py:5
+msgid "History"
+msgstr "تاريخ"
+
+#: .\contrib\admin\templates\admin\change_form.html.py:21
+msgid "View on site"
+msgstr "عرض على الموقع"
+
+#: .\contrib\admin\templates\admin\change_form.html.py:30
+msgid "Please correct the error below."
+msgid_plural "Please correct the errors below."
+msgstr[0] "الرجاء اصلاح الخطأ التالي."
+msgstr[1] "الرجاء اصلاح الخطئين التاليين."
+msgstr[2] "الرجاء اصلاح الأخطاء التالية."
+msgstr[3] "الرجاء اصلاح الأخطاء التالية."
+
+#: .\contrib\admin\templates\admin\change_form.html.py:48
+msgid "Ordering"
+msgstr "الترتيب"
+
+#: .\contrib\admin\templates\admin\change_form.html.py:51
+msgid "Order:"
+msgstr "الترتيب"
+
+#: .\contrib\admin\templates\admin\change_list.html.py:11
+#, python-format
+msgid "Add %(name)s"
+msgstr "اضافة %(name)s"
+
+#: .\contrib\admin\templates\admin\delete_confirmation.html.py:9
+#: .\contrib\admin\templates\admin\submit_line.html.py:3
+msgid "Delete"
+msgstr "حذف"
+
+#: .\contrib\admin\templates\admin\delete_confirmation.html.py:14
+#, python-format
+msgid "Deleting the %(object_name)s '%(object)s' would result in deleting related objects, but your account doesn't have permission to delete the following types of objects:"
+msgstr "حذف %(object_name)s '%(object)s' سيؤدي إلى حذف العناصر المتعلقة به، لكن هذا الحساب لا يملك الصلاحية لحذف أنواع العناصر التالية:"
+
+#: .\contrib\admin\templates\admin\delete_confirmation.html.py:21
+#, python-format
+msgid "Are you sure you want to delete the %(object_name)s \"%(object)s\"? All of the following related items will be deleted:"
+msgstr "هل أنت متأكد من أنك تريد حذف %(object_name)s \"%(object)s\"? كافة العناصر التالية المتعلقة به سيتم حذفها:"
+
+#: .\contrib\admin\templates\admin\delete_confirmation.html.py:26
+msgid "Yes, I'm sure"
+msgstr "نعم، أنا متأكد"
+
+#: .\contrib\admin\templates\admin\filter.html.py:2
+#, python-format
+msgid " By %(title)s "
+msgstr " بواسطة %(title)s "
+
+#: .\contrib\admin\templates\admin\filters.html.py:4
+msgid "Filter"
+msgstr "مرشح"
+
+#: .\contrib\admin\templates\admin\index.html.py:17
+#, python-format
+msgid "Models available in the %(name)s application."
+msgstr "النماذج المتوفرة في برنامج %(name)s."
+
+#: .\contrib\admin\templates\admin\index.html.py:34
+msgid "Change"
+msgstr "تغيير"
+
+#: .\contrib\admin\templates\admin\index.html.py:44
+msgid "You don't have permission to edit anything."
+msgstr "ليست لديك الصلاحية لتعديل أي شيء."
+
+#: .\contrib\admin\templates\admin\index.html.py:52
+msgid "Recent Actions"
+msgstr "العمليات الأخيرة"
+
+#: .\contrib\admin\templates\admin\index.html.py:53
+msgid "My Actions"
+msgstr "عملياتي"
+
+#: .\contrib\admin\templates\admin\index.html.py:57
+msgid "None available"
+msgstr "لا يوجد"
+
+#: .\contrib\admin\templates\admin\invalid_setup.html.py:8
+msgid "Something's wrong with your database installation. Make sure the appropriate database tables have been created, and make sure the database is readable by the appropriate user."
+msgstr "هنالك أمر خاطئ في تركيب قاعدة بياناتك، تأكد من أنه تم انشاء جداول قاعدة البيانات الملائمة، وتأكد من أن قاعدة البيانات قابلة للقراءة من قبل المستخدم الملائم."
+
+#: .\contrib\admin\templates\admin\login.html.py:17
+#: .\contrib\comments\templates\comments\form.html.py:6
+#: .\contrib\comments\templates\comments\form.html.py:8
+msgid "Username:"
+msgstr "اسم المستخدم:"
+
+#: .\contrib\admin\templates\admin\login.html.py:20
+#: .\contrib\comments\templates\comments\form.html.py:6
+msgid "Password:"
+msgstr "كلمة المرور:"
+
+#: .\contrib\admin\templates\admin\login.html.py:22
+msgid "Have you <a href=\"/password_reset/\">forgotten your password</a>?"
+msgstr "Have you <a href=\"/password_reset/\">forgotten your password</a>?"
+
+#: .\contrib\admin\templates\admin\login.html.py:25
+#: .\contrib\admin\views\decorators.py:24
+msgid "Log in"
+msgstr "دخول"
+
+#: .\contrib\admin\templates\admin\object_history.html.py:18
+msgid "Date/time"
+msgstr "التاريخ/الوقت"
+
+#: .\contrib\admin\templates\admin\object_history.html.py:19
+msgid "User"
+msgstr "المستخدم"
+
+#: .\contrib\admin\templates\admin\object_history.html.py:20
+msgid "Action"
+msgstr "العملية"
+
+#: .\contrib\admin\templates\admin\object_history.html.py:26
+msgid "DATE_WITH_TIME_FULL"
+msgstr ""
+
+#: .\contrib\admin\templates\admin\object_history.html.py:36
+msgid "This object doesn't have a change history. It probably wasn't added via this admin site."
+msgstr "هذا العنصر لا يملك تاريخ تغييرات، على الأغلب أن هذا العنصر لم يتم انشاءه عبر نظام الإدارة هذا."
+
+#: .\contrib\admin\templates\admin\pagination.html.py:10
+msgid "Show all"
+msgstr "عرض الكل"
+
+#: .\contrib\admin\templates\admin\search_form.html.py:8
+msgid "Go"
+msgstr "انطلق"
+
+#: .\contrib\admin\templates\admin\search_form.html.py:10
+#, python-format
+msgid "1 result"
+msgid_plural "%(counter)s results"
+msgstr[0] "نتيحة واحدة"
+msgstr[1] "نتيجتان"
+msgstr[2] "%(counter)s نتائج"
+msgstr[3] "%(counter)s نتيحة"
+
+#: .\contrib\admin\templates\admin\search_form.html.py:10
+#, python-format
+msgid "%(full_result_count)s total"
+msgstr "المجموع %(full_result_count)s"
+
+#: .\contrib\admin\templates\admin\submit_line.html.py:4
+msgid "Save as new"
+msgstr "حفظ كجديد"
+
+#: .\contrib\admin\templates\admin\submit_line.html.py:5
+msgid "Save and add another"
+msgstr "حفظ وإضافة آخر"
+
+#: .\contrib\admin\templates\admin\submit_line.html.py:6
+msgid "Save and continue editing"
+msgstr "حفظ واستمرار التعديل"
+
+#: .\contrib\admin\templates\admin\submit_line.html.py:7
+msgid "Save"
+msgstr "حفظ"
+
+#: .\contrib\admin\templates\admin_doc\bookmarklets.html.py:3
+msgid "Bookmarklets"
+msgstr "أوامر المفضلة"
+
+#: .\contrib\admin\templates\admin_doc\bookmarklets.html.py:5
+msgid "Documentation bookmarklets"
+msgstr "أوامر مفضلة التعليمات"
+
+#: .\contrib\admin\templates\admin_doc\bookmarklets.html.py:9
+msgid ""
+"\n"
+"<p class=\"help\">To install bookmarklets, drag the link to your bookmarks\n"
+"toolbar, or right-click the link and add it to your bookmarks. Now you can\n"
+"select the bookmarklet from any page in the site.  Note that some of these\n"
+"bookmarklets require you to be viewing the site from a computer designated\n"
+"as \"internal\" (talk to your system administrator if you aren't sure if\n"
+"your computer is \"internal\").</p>\n"
+msgstr ""
+"\n"
+"<p class=\"help\">لتركيب أوامر المفضلة، قم بسحب الوصلة إلى\n"
+"شريط أدات المفضلات في متصفحك، أو قم بالضغط عليها بالزر الأيمن وأضفها إلى مفضلاتك.\n"
+"سيمكنك الآن أن اختيار أوامر المفضلة من أي صفحة في الموقع، لاحظ بأن بعض\n"
+"أوامر المفضلة هذه معدة لتعمل على أجهزة كمبيوتر تعتبر على أنها \"داخلية\"\n"
+"(تحدث إلى مسؤول النظم إذا لم تكن متأكدا ما إذا كان كمبيوتر يعتبر \"داخليا\").</p>\n"
+
+#: .\contrib\admin\templates\admin_doc\bookmarklets.html.py:19
+msgid "Documentation for this page"
+msgstr "التعليمات لهذه الصفحة"
+
+#: .\contrib\admin\templates\admin_doc\bookmarklets.html.py:20
+msgid "Jumps you from any page to the documentation for the view that generates that page."
+msgstr "ينتقل بك من أي صفحة إلى تعليمات العرض الذي أنشأ هذه الصفحة."
+
+#: .\contrib\admin\templates\admin_doc\bookmarklets.html.py:22
+msgid "Show object ID"
+msgstr "عرض معرف الكائن"
+
+#: .\contrib\admin\templates\admin_doc\bookmarklets.html.py:23
+msgid "Shows the content-type and unique ID for pages that represent a single object."
+msgstr "عرض نوع البيانات والمعرف الفريد للصفحات التي تمثل كائنا واحدا."
+
+#: .\contrib\admin\templates\admin_doc\bookmarklets.html.py:25
+msgid "Edit this object (current window)"
+msgstr "تعديل هذا الكائن (النافذة الحالية)"
+
+#: .\contrib\admin\templates\admin_doc\bookmarklets.html.py:26
+msgid "Jumps to the admin page for pages that represent a single object."
+msgstr "ينتقل بك إلى صفحة الإدارة للصفحات التي تمثل كائنا واحدا."
+
+#: .\contrib\admin\templates\admin_doc\bookmarklets.html.py:28
+msgid "Edit this object (new window)"
+msgstr "تعديل هذا العنصر (نافذة جديدة)"
+
+#: .\contrib\admin\templates\admin_doc\bookmarklets.html.py:29
+msgid "As above, but opens the admin page in a new window."
+msgstr "كما سبق، لكن يفتح صفحة الإدارة في نافذة جديدة."
+
+#: .\contrib\admin\templates\registration\logged_out.html.py:8
+msgid "Thanks for spending some quality time with the Web site today."
+msgstr "شكرا لك على قضائك بعض الوقت مع الموقع اليوم."
+
+#: .\contrib\admin\templates\registration\logged_out.html.py:10
+msgid "Log in again"
+msgstr "دخول مرة أخرى"
+
+#: .\contrib\admin\templates\registration\password_change_done.html.py:4
+#: .\contrib\admin\templates\registration\password_change_form.html.py:4
+#: .\contrib\admin\templates\registration\password_change_form.html.py:6
+#: .\contrib\admin\templates\registration\password_change_form.html.py:10
+msgid "Password change"
+msgstr "تغيير كلمة المرور"
+
+#: .\contrib\admin\templates\registration\password_change_done.html.py:6
+#: .\contrib\admin\templates\registration\password_change_done.html.py:10
+msgid "Password change successful"
+msgstr "تم تغيير كلمة المرور بنجاح"
+
+#: .\contrib\admin\templates\registration\password_change_done.html.py:12
+msgid "Your password was changed."
+msgstr "لقد تغيرت كلمة مرورك."
+
+#: .\contrib\admin\templates\registration\password_change_form.html.py:12
+msgid "Please enter your old password, for security's sake, and then enter your new password twice so we can verify you typed it in correctly."
+msgstr "الرجاء ادخال كلمة مرورك القديمة، زيادة في الأمان، ثم ادخل كلمة مرورك الجديدة مرتين لنكون متأكدين من أنك كتبتها بصورة صحيحة."
+
+#: .\contrib\admin\templates\registration\password_change_form.html.py:17
+msgid "Old password:"
+msgstr "كلمة المرور القديمة:"
+
+#: .\contrib\admin\templates\registration\password_change_form.html.py:19
+msgid "New password:"
+msgstr "كلمة المرور الجديدة:"
+
+#: .\contrib\admin\templates\registration\password_change_form.html.py:21
+msgid "Confirm password:"
+msgstr "تأكيد كلمة المرور:"
+
+#: .\contrib\admin\templates\registration\password_change_form.html.py:23
+msgid "Change my password"
+msgstr "تغيير كلمة المرور الخاصة بي"
+
+#: .\contrib\admin\templates\registration\password_reset_done.html.py:4
+#: .\contrib\admin\templates\registration\password_reset_form.html.py:4
+#: .\contrib\admin\templates\registration\password_reset_form.html.py:6
+#: .\contrib\admin\templates\registration\password_reset_form.html.py:10
+msgid "Password reset"
+msgstr "اعادة ضبط كلمة المرور"
+
+#: .\contrib\admin\templates\registration\password_reset_done.html.py:6
+#: .\contrib\admin\templates\registration\password_reset_done.html.py:10
+msgid "Password reset successful"
+msgstr "تمت عملية اعادة ضبط كلمة المرور بنجاح"
+
+#: .\contrib\admin\templates\registration\password_reset_done.html.py:12
+msgid "We've e-mailed a new password to the e-mail address you submitted. You should be receiving it shortly."
+msgstr "لقد قمنا بارسال كلمة مرور جديدة إلى عنوان البريد الإلكتروني الذي أدخلتها، ستصلك قريبا إن شاء الله."
+
+#: .\contrib\admin\templates\registration\password_reset_email.html.py:2
+msgid "You're receiving this e-mail because you requested a password reset"
+msgstr "لقد وصلتك رسالة البريد الإلكتروني هذه لأنك طلبت إعادة ضبط كلمة المرور."
+
+#: .\contrib\admin\templates\registration\password_reset_email.html.py:3
+#, python-format
+msgid "for your user account at %(site_name)s"
+msgstr "لحسابك المستخدم الخاص بك في %(site_name)s"
+
+#: .\contrib\admin\templates\registration\password_reset_email.html.py:5
+#, python-format
+msgid "Your new password is: %(new_password)s"
+msgstr "كلمة مرورك الجديدة هي: %(new_password)s"
+
+#: .\contrib\admin\templates\registration\password_reset_email.html.py:7
+msgid "Feel free to change this password by going to this page:"
+msgstr "يمكنك تغيير كلمة المرور هذه بالذهاب إلى هذه الصفحة:"
+
+#: .\contrib\admin\templates\registration\password_reset_email.html.py:11
+msgid "Your username, in case you've forgotten:"
+msgstr "اسم المستخدم الخاص بك، في حال كنت قد نسيته:"
+
+#: .\contrib\admin\templates\registration\password_reset_email.html.py:13
+msgid "Thanks for using our site!"
+msgstr "شكرا لاستخدامك لموقعنا!"
+
+#: .\contrib\admin\templates\registration\password_reset_email.html.py:15
+#, python-format
+msgid "The %(site_name)s team"
+msgstr "فريق %(site_name)s"
+
+#: .\contrib\admin\templates\registration\password_reset_form.html.py:12
+msgid "Forgotten your password? Enter your e-mail address below, and we'll reset your password and e-mail the new one to you."
+msgstr "نسيت كلمة المرور الخاصة بك؟ قم بادخال عنوان بريدك الإلكتروني بالأسفل وسنقوم باعادة ضبط كلمة المرور الخاصة بك وارسال كلمة المرور الجديدة إليك عبر البريد الإلكتروني."
+
+#: .\contrib\admin\templates\registration\password_reset_form.html.py:16
+msgid "E-mail address:"
+msgstr "عنوان البريد الإلكتروني:"
+
+#: .\contrib\admin\templates\registration\password_reset_form.html.py:16
+msgid "Reset my password"
+msgstr "اعادة ضبط كلمة المرور"
+
+#: .\contrib\admin\templates\widget\date_time.html.py:3
+msgid "Date:"
+msgstr "التاريخ:"
+
+#: .\contrib\admin\templates\widget\date_time.html.py:4
+msgid "Time:"
+msgstr "الوقت:"
+
+#: .\contrib\admin\templates\widget\file.html.py:2
+msgid "Currently:"
+msgstr "حاليا:"
+
+#: .\contrib\admin\templates\widget\file.html.py:3
+msgid "Change:"
+msgstr "تغيير:"
+
+#: .\contrib\admin\templatetags\admin_list.py:230
+msgid "All dates"
+msgstr "كافة التواريخ"
+
+#: .\contrib\admin\views\decorators.py:10
+#: .\contrib\auth\forms.py:37
+msgid "Please enter a correct username and password. Note that both fields are case-sensitive."
+msgstr "الرجاء ادخال اسم مستخدم وكلمة مرور صحيحين، الرجاء الانتباه إلى أن كلا الحقلين حساس لحالة الأحرف من حيث كونها كبيرة أو صغيرة."
+
+#: .\contrib\admin\views\decorators.py:62
+msgid "Please log in again, because your session has expired. Don't worry: Your submission has been saved."
+msgstr "الرجاء الدخول مرة أخرى لأن جلستك انتهت، لا تقلق: البيانات التي قمت بارسالها حفظت."
+
+#: .\contrib\admin\views\decorators.py:69
+msgid "Looks like your browser isn't configured to accept cookies. Please enable cookies, reload this page, and try again."
+msgstr "يبدو بأن متصفحك غير معد لقبول الكوكيز، قم بتفعيل الكوكيز من فضلك ثم تحديث هذه الصفحة والمحاولة مرة أخرى."
+
+#: .\contrib\admin\views\decorators.py:83
+msgid "Usernames cannot contain the '@' character."
+msgstr "اسم المستخدم يجب أن لا يحتوي على علامة '@'."
+
+#: .\contrib\admin\views\decorators.py:85
+#, python-format
+msgid "Your e-mail address is not your username. Try '%s' instead."
+msgstr "بريدك الإلكتروني ليس اسم المستخدم الخاص بك، جرب استخدام '%s' بدلا من ذلك."
+
+#: .\contrib\admin\views\doc.py:291
+#: .\contrib\admin\views\doc.py:301
+#: .\contrib\admin\views\doc.py:303
+#: .\contrib\admin\views\doc.py:309
+#: .\contrib\admin\views\doc.py:310
+#: .\contrib\admin\views\doc.py:312
+msgid "Integer"
+msgstr "عدد صحيح"
+
+#: .\contrib\admin\views\doc.py:292
+msgid "Boolean (Either True or False)"
+msgstr "ثنائي (إما صح أو خطأ)"
+
+#: .\contrib\admin\views\doc.py:293
+#: .\contrib\admin\views\doc.py:311
+#, python-format
+msgid "String (up to %(maxlength)s)"
+msgstr "سلسلة نصية (تصل إلى %(maxlength)s)"
+
+#: .\contrib\admin\views\doc.py:294
+msgid "Comma-separated integers"
+msgstr "أرقام صحيحة مفصولة بفواصل comma"
+
+#: .\contrib\admin\views\doc.py:295
+msgid "Date (without time)"
+msgstr "التاريخ (بدون الوقت)"
+
+#: .\contrib\admin\views\doc.py:296
+msgid "Date (with time)"
+msgstr "التاريخ (مع الوقت)"
+
+#: .\contrib\admin\views\doc.py:297
+msgid "E-mail address"
+msgstr "عنوان البريد الإلكتروني"
+
+#: .\contrib\admin\views\doc.py:298
+#: .\contrib\admin\views\doc.py:299
+#: .\contrib\admin\views\doc.py:302
+msgid "File path"
+msgstr "مسار الملف"
+
+#: .\contrib\admin\views\doc.py:300
+msgid "Decimal number"
+msgstr "رقم عشري"
+
+#: .\contrib\admin\views\doc.py:304
+#: .\contrib\comments\models.py:85
+msgid "IP address"
+msgstr "عنوان IP"
+
+#: .\contrib\admin\views\doc.py:306
+msgid "Boolean (Either True, False or None)"
+msgstr "ثنائي (إما صح أو خطأ أو لاشيء)"
+
+#: .\contrib\admin\views\doc.py:307
+msgid "Relation to parent model"
+msgstr "العلاقة بالنموذج الأب"
+
+#: .\contrib\admin\views\doc.py:308
+msgid "Phone number"
+msgstr "رقم هاتف"
+
+#: .\contrib\admin\views\doc.py:313
+msgid "Text"
+msgstr "نص"
+
+#: .\contrib\admin\views\doc.py:314
+msgid "Time"
+msgstr "وقت"
+
+#: .\contrib\admin\views\doc.py:315
+#: .\contrib\flatpages\models.py:7
+msgid "URL"
+msgstr "وصلة"
+
+#: .\contrib\admin\views\doc.py:316
+msgid "U.S. state (two uppercase letters)"
+msgstr "ولاية أمريكية (حرفان كبيران)"
+
+#: .\contrib\admin\views\doc.py:317
+msgid "XML text"
+msgstr "نص XML"
+
+#: .\contrib\admin\views\main.py:226
+msgid "Site administration"
+msgstr "إدارة الموقع"
+
+#: .\contrib\admin\views\main.py:260
+#, python-format
+msgid "The %(name)s \"%(obj)s\" was added successfully."
+msgstr "تم اضافة %(name)s \"%(obj)s\" بنجاح."
+
+#: .\contrib\admin\views\main.py:264
+#: .\contrib\admin\views\main.py:348
+msgid "You may edit it again below."
+msgstr "يمكنك تعديله مجددا في الأسفل."
+
+#: .\contrib\admin\views\main.py:272
+#: .\contrib\admin\views\main.py:357
+#, python-format
+msgid "You may add another %s below."
+msgstr "يمكنك إضافة %s آخر بالأسفل."
+
+#: .\contrib\admin\views\main.py:290
+#, python-format
+msgid "Add %s"
+msgstr "اضافة %s"
+
+#: .\contrib\admin\views\main.py:336
+#, python-format
+msgid "Added %s."
+msgstr "اضاف %s."
+
+#: .\contrib\admin\views\main.py:336
+#: .\contrib\admin\views\main.py:338
+#: .\contrib\admin\views\main.py:340
+msgid "and"
+msgstr "و"
+
+#: .\contrib\admin\views\main.py:338
+#, python-format
+msgid "Changed %s."
+msgstr "غير %s."
+
+#: .\contrib\admin\views\main.py:340
+#, python-format
+msgid "Deleted %s."
+msgstr "حذف %s."
+
+#: .\contrib\admin\views\main.py:343
+msgid "No fields changed."
+msgstr "لم يتم تغيير أية حقول."
+
+#: .\contrib\admin\views\main.py:346
+#, python-format
+msgid "The %(name)s \"%(obj)s\" was changed successfully."
+msgstr "تم تغيير %(name)s \"%(obj)s\" بنجاح."
+
+#: .\contrib\admin\views\main.py:354
+#, python-format
+msgid "The %(name)s \"%(obj)s\" was added successfully. You may edit it again below."
+msgstr "تم اضافة %(name)s \"%(obj)s\" بنجاح، يمكنك تعديله مرة أخرى بالأسفل."
+
+#: .\contrib\admin\views\main.py:392
+#, python-format
+msgid "Change %s"
+msgstr "تغيير %s"
+
+#: .\contrib\admin\views\main.py:474
+#, python-format
+msgid "One or more %(fieldname)s in %(name)s: %(obj)s"
+msgstr "%(fieldname)s واحد أو أكثر في %(name)s: %(obj)s"
+
+#: .\contrib\admin\views\main.py:479
+#, python-format
+msgid "One or more %(fieldname)s in %(name)s:"
+msgstr "%(fieldname)s واحد أو أكثر في %(name)s:"
+
+#: .\contrib\admin\views\main.py:512
+#, python-format
+msgid "The %(name)s \"%(obj)s\" was deleted successfully."
+msgstr "تم حذف %(name)s \"%(obj)s\" بنجاح."
+
+#: .\contrib\admin\views\main.py:515
+msgid "Are you sure?"
+msgstr "هل أنت متأكد؟"
+
+#: .\contrib\admin\views\main.py:537
+#, python-format
+msgid "Change history: %s"
+msgstr "تاريخ التغيير: %s"
+
+#: .\contrib\admin\views\main.py:571
+#, python-format
+msgid "Select %s"
+msgstr "اختر %s"
+
+#: .\contrib\admin\views\main.py:571
+#, python-format
+msgid "Select %s to change"
+msgstr "اختر %s لتغييره"
+
+#: .\contrib\admin\views\main.py:747
+msgid "Database error"
+msgstr "خطـأ في قاعدة البيانات"
+
+#: .\contrib\auth\forms.py:30
+msgid "Your Web browser doesn't appear to have cookies enabled. Cookies are required for logging in."
+msgstr "يبدو بأن الكوكيز غير مفعله في متصفحك، الكوكيز مطلوبة للتمكن من الدخول."
+
+#: .\contrib\auth\forms.py:39
+msgid "This account is inactive."
+msgstr "هذا الحساب غير فعال."
+
+#: .\contrib\auth\models.py:37
+#: .\contrib\auth\models.py:56
+msgid "name"
+msgstr "الاسم"
+
+#: .\contrib\auth\models.py:39
+msgid "codename"
+msgstr "الاسم الرمزي"
+
+#: .\contrib\auth\models.py:41
+msgid "permission"
+msgstr "الصلاحية"
+
+#: .\contrib\auth\models.py:42
+#: .\contrib\auth\models.py:57
+msgid "permissions"
+msgstr "الصلاحيات"
+
+#: .\contrib\auth\models.py:59
+msgid "group"
+msgstr "المجموعة"
+
+#: .\contrib\auth\models.py:60
+#: .\contrib\auth\models.py:99
+msgid "groups"
+msgstr "المجموعات"
+
+#: .\contrib\auth\models.py:89
+msgid "username"
+msgstr "اسم المستخدم"
+
+#: .\contrib\auth\models.py:89
+msgid "Required. 30 characters or fewer. Alphanumeric characters only (letters, digits and underscores)."
+msgstr "مطلوب. 30 خانة أو أقل. خانات حرف رقمية فقط (أحرف، أرقام والشرطة السفلية)."
+
+#: .\contrib\auth\models.py:90
+msgid "first name"
+msgstr "الاسم الأول"
+
+#: .\contrib\auth\models.py:91
+msgid "last name"
+msgstr "الاسم الأخير"
+
+#: .\contrib\auth\models.py:92
+msgid "e-mail address"
+msgstr "عنوان البريد الإلكتروني"
+
+#: .\contrib\auth\models.py:93
+msgid "password"
+msgstr "كلمة المرور"
+
+#: .\contrib\auth\models.py:93
+msgid "Use '[algo]$[salt]$[hexdigest]'"
+msgstr "استخدم '[algo]$[salt]$[hexdigest]'"
+
+#: .\contrib\auth\models.py:94
+msgid "staff status"
+msgstr "حالة الطاقم"
+
+#: .\contrib\auth\models.py:94
+msgid "Designates whether the user can log into this admin site."
+msgstr "يحدد ما إذا كان المستخدم يستطيع الدخول إلى موقع الإدارة هذا."
+
+#: .\contrib\auth\models.py:95
+msgid "active"
+msgstr "فعال"
+
+#: .\contrib\auth\models.py:95
+msgid "Designates whether this user can log into the Django admin. Unselect this instead of deleting accounts."
+msgstr "يحدد ما إذا كان المستخدم يستطيع الدخول إلى لوحة تحكم جانغو، قم بتحديد هذا الخيار بدلا من حذف حسابات المستخدمين."
+
+#: .\contrib\auth\models.py:96
+msgid "superuser status"
+msgstr "حالة المستخدم بالقوى الخارقة"
+
+#: .\contrib\auth\models.py:96
+msgid "Designates that this user has all permissions without explicitly assigning them."
+msgstr "حدد بأن هذا المستخدم يمتلك كافة الصلاحيات دون الحاجة لتحديدها له تصريحا."
+
+#: .\contrib\auth\models.py:97
+msgid "last login"
+msgstr "آخر عملية دخول"
+
+#: .\contrib\auth\models.py:98
+msgid "date joined"
+msgstr "تاريخ الانضمام"
+
+#: .\contrib\auth\models.py:100
+msgid "In addition to the permissions manually assigned, this user will also get all permissions granted to each group he/she is in."
+msgstr "بالإضافة إلى الصلاحيات المحددة للمستخدم يدويا، فإن المستخدم يحصل أيضا على كافة صلاحيات المجموعة التي ينتمي إليها."
+
+#: .\contrib\auth\models.py:101
+msgid "user permissions"
+msgstr "صلاحيات المستخدم"
+
+#: .\contrib\auth\models.py:104
+msgid "user"
+msgstr "المستخدم"
+
+#: .\contrib\auth\models.py:105
+msgid "users"
+msgstr "المستخدمين"
+
+#: .\contrib\auth\models.py:110
+msgid "Personal info"
+msgstr "المعلومات الشخصية"
+
+#: .\contrib\auth\models.py:111
+msgid "Permissions"
+msgstr "الصلاحيات"
+
+#: .\contrib\auth\models.py:112
+msgid "Important dates"
+msgstr "تواريخ مهمة"
+
+#: .\contrib\auth\models.py:113
+msgid "Groups"
+msgstr "المجموعات"
+
+#: .\contrib\auth\models.py:250
+msgid "message"
+msgstr "رسالة"
+
+#: .\contrib\auth\views.py:40
+msgid "Logged out"
+msgstr "خروج"
+
+#: .\contrib\comments\models.py:67
+#: .\contrib\comments\models.py:166
+msgid "object ID"
+msgstr "معرف العنصر"
+
+#: .\contrib\comments\models.py:68
+msgid "headline"
+msgstr "عنوان"
+
+#: .\contrib\comments\models.py:69
+#: .\contrib\comments\models.py:90
+#: .\contrib\comments\models.py:167
+msgid "comment"
+msgstr "تعليق"
+
+#: .\contrib\comments\models.py:70
+msgid "rating #1"
+msgstr "تقييم #1"
+
+#: .\contrib\comments\models.py:71
+msgid "rating #2"
+msgstr "تقييم #2"
+
+#: .\contrib\comments\models.py:72
+msgid "rating #3"
+msgstr "تقييم #3"
+
+#: .\contrib\comments\models.py:73
+msgid "rating #4"
+msgstr "تقييم #4"
+
+#: .\contrib\comments\models.py:74
+msgid "rating #5"
+msgstr "تقييم #5"
+
+#: .\contrib\comments\models.py:75
+msgid "rating #6"
+msgstr "تقييم #8"
+
+#: .\contrib\comments\models.py:76
+msgid "rating #7"
+msgstr "تقييم #7"
+
+#: .\contrib\comments\models.py:77
+msgid "rating #8"
+msgstr "تقييم #8"
+
+#: .\contrib\comments\models.py:82
+msgid "is valid rating"
+msgstr "تقييم صالح"
+
+#: .\contrib\comments\models.py:83
+#: .\contrib\comments\models.py:169
+msgid "date/time submitted"
+msgstr "تم ارسال التاريخ/الوقت"
+
+#: .\contrib\comments\models.py:84
+#: .\contrib\comments\models.py:170
+msgid "is public"
+msgstr "عام"
+
+#: .\contrib\comments\models.py:86
+msgid "is removed"
+msgstr "محذوف"
+
+#: .\contrib\comments\models.py:86
+msgid "Check this box if the comment is inappropriate. A \"This comment has been removed\" message will be displayed instead."
+msgstr "قم بتحديد هذا المربع إذا كان التعليق غير لائق، سيتم عرض الرسالة \"تم حذف هذا التعليق\" بدلا منه."
+
+#: .\contrib\comments\models.py:91
+msgid "comments"
+msgstr "تعليقات"
+
+#: .\contrib\comments\models.py:131
+#: .\contrib\comments\models.py:207
+msgid "Content object"
+msgstr "عنصر محتوى"
+
+#: .\contrib\comments\models.py:159
+#, python-format
+msgid ""
+"Posted by %(user)s at %(date)s\n"
+"\n"
+"%(comment)s\n"
+"\n"
+"http://%(domain)s%(url)s"
+msgstr ""
+"أرسلت بواسطة %(user)s في %(date)s\n"
+"\n"
+"%(comment)s\n"
+"\n"
+"http://%(domain)s%(url)s"
+
+#: .\contrib\comments\models.py:168
+msgid "person's name"
+msgstr "اسم الشخص"
+
+#: .\contrib\comments\models.py:171
+msgid "ip address"
+msgstr "عنوان ip"
+
+#: .\contrib\comments\models.py:173
+msgid "approved by staff"
+msgstr "موافق عليه من قبل الطاقم"
+
+#: .\contrib\comments\models.py:176
+msgid "free comment"
+msgstr "تعليق حر"
+
+#: .\contrib\comments\models.py:177
+msgid "free comments"
+msgstr "تعليقات حرة"
+
+#: .\contrib\comments\models.py:233
+msgid "score"
+msgstr "الدرجة"
+
+#: .\contrib\comments\models.py:234
+msgid "score date"
+msgstr "تاريخ الدرجة"
+
+#: .\contrib\comments\models.py:237
+msgid "karma score"
+msgstr "درجة الكارما"
+
+#: .\contrib\comments\models.py:238
+msgid "karma scores"
+msgstr "درجات الكارما"
+
+#: .\contrib\comments\models.py:242
+#, python-format
+msgid "%(score)d rating by %(user)s"
+msgstr "تقييم %(score)d بواسطة %(user)s"
+
+#: .\contrib\comments\models.py:258
+#, python-format
+msgid ""
+"This comment was flagged by %(user)s:\n"
+"\n"
+"%(text)s"
+msgstr ""
+"هذا التعليق تم تعليمه بواسطة %(user)s:\n"
+"\n"
+"%(text)s"
+
+#: .\contrib\comments\models.py:265
+msgid "flag date"
+msgstr "تاريخ التعليم"
+
+#: .\contrib\comments\models.py:268
+msgid "user flag"
+msgstr "علامة مستخدم"
+
+#: .\contrib\comments\models.py:269
+msgid "user flags"
+msgstr "علامات المستخدم"
+
+#: .\contrib\comments\models.py:273
+#, python-format
+msgid "Flag by %r"
+msgstr "علامة بواسطة %r"
+
+#: .\contrib\comments\models.py:278
+msgid "deletion date"
+msgstr "تاريخ الحذف"
+
+#: .\contrib\comments\models.py:280
+msgid "moderator deletion"
+msgstr "حذف المراقب"
+
+#: .\contrib\comments\models.py:281
+msgid "moderator deletions"
+msgstr "حذوفات المراقب"
+
+#: .\contrib\comments\models.py:285
+#, python-format
+msgid "Moderator deletion by %r"
+msgstr "حذف المراقب بواسطة %r"
+
+#: .\contrib\comments\templates\comments\form.html.py:6
+msgid "Forgotten your password?"
+msgstr "نسيت كلمة المرور؟"
+
+#: .\contrib\comments\templates\comments\form.html.py:12
+msgid "Ratings"
+msgstr "التقييمات"
+
+#: .\contrib\comments\templates\comments\form.html.py:12
+#: .\contrib\comments\templates\comments\form.html.py:23
+msgid "Required"
+msgstr "مطلوب"
+
+#: .\contrib\comments\templates\comments\form.html.py:12
+#: .\contrib\comments\templates\comments\form.html.py:23
+msgid "Optional"
+msgstr "اختياري"
+
+#: .\contrib\comments\templates\comments\form.html.py:23
+msgid "Post a photo"
+msgstr "ارسال صورة"
+
+#: .\contrib\comments\templates\comments\form.html.py:28
+#: .\contrib\comments\templates\comments\freeform.html.py:5
+msgid "Comment:"
+msgstr "تعليق:"
+
+#: .\contrib\comments\templates\comments\form.html.py:34
+#: .\contrib\comments\templates\comments\freeform.html.py:9
+msgid "Preview comment"
+msgstr "استعراض التعليق"
+
+#: .\contrib\comments\templates\comments\freeform.html.py:4
+msgid "Your name:"
+msgstr "اسمك:"
+
+#: .\contrib\comments\views\comments.py:27
+msgid "This rating is required because you've entered at least one other rating."
+msgstr "هذا التقييم مطلوب لأنك قمت بادخال تقييم واحد على الأقل."
+
+#: .\contrib\comments\views\comments.py:111
+#, python-format
+msgid ""
+"This comment was posted by a user who has posted fewer than %(count)s comment:\n"
+"\n"
+"%(text)s"
+msgid_plural ""
+"This comment was posted by a user who has posted fewer than %(count)s comments:\n"
+"\n"
+"%(text)s"
+msgstr[0] ""
+"هذا التعليق كتب بواسطة شخص لديه أقل من تعليق واحد:\n"
+"\n"
+"%(text)s"
+msgstr[1] ""
+"هذا التعليق كتب بواسطة شخص لديه أقل من تعليقان:\n"
+"\n"
+"%(text)s"
+msgstr[2] ""
+"هذا التعليق كتب بواسطة شخص لديه أقل من %(count)s تعليقات:\n"
+"\n"
+"%(text)s"
+msgstr[3] ""
+"هذا التعليق كتب بواسطة شخص لديه أقل من %(count)s تعليق:\n"
+"\n"
+"%(text)s"
+
+#: .\contrib\comments\views\comments.py:116
+#, python-format
+msgid ""
+"This comment was posted by a sketchy user:\n"
+"\n"
+"%(text)s"
+msgstr ""
+"هذا التعليق كتب بواسطة عضو سطحي:\n"
+"\n"
+"%(text)s"
+
+#: .\contrib\comments\views\comments.py:188
+#: .\contrib\comments\views\comments.py:280
+msgid "Only POSTs are allowed"
+msgstr "يسمح باستخدام POST فقط"
+
+#: .\contrib\comments\views\comments.py:192
+#: .\contrib\comments\views\comments.py:284
+msgid "One or more of the required fields wasn't submitted"
+msgstr "لم يتم ارسال واحد أو أكثر من الحقول المطلوبة."
+
+#: .\contrib\comments\views\comments.py:196
+#: .\contrib\comments\views\comments.py:286
+msgid "Somebody tampered with the comment form (security violation)"
+msgstr "شخص ما قام بالتلاعب بنموذج التعليق (انتهاك أمني)"
+
+#: .\contrib\comments\views\comments.py:206
+#: .\contrib\comments\views\comments.py:292
+msgid "The comment form had an invalid 'target' parameter -- the object ID was invalid"
+msgstr "نموذج التعليق احتوى 'هدف' غير صحيح -- معرف الكائن كان غير صحيحا"
+
+#: .\contrib\comments\views\comments.py:257
+#: .\contrib\comments\views\comments.py:321
+msgid "The comment form didn't provide either 'preview' or 'post'"
+msgstr "نموذج التعليق لم يحدد أيا من 'استعراض' أو 'ارسال'"
+
+#: .\contrib\comments\views\karma.py:19
+msgid "Anonymous users cannot vote"
+msgstr "لا يمكن للمستخدمين المجهولين التصويت"
+
+#: .\contrib\comments\views\karma.py:23
+msgid "Invalid comment ID"
+msgstr "معرف التعليق غير صحيح"
+
+#: .\contrib\comments\views\karma.py:25
+msgid "No voting for yourself"
+msgstr "لا يمكنك التصويت لنفسك"
+
+#: .\contrib\contenttypes\models.py:20
+msgid "python model class name"
+msgstr "اسم صنف النموذج في python"
+
+#: .\contrib\contenttypes\models.py:23
+msgid "content type"
+msgstr "نوع البيانات"
+
+#: .\contrib\contenttypes\models.py:24
+msgid "content types"
+msgstr "أنواع البيانات"
+
+#: .\contrib\flatpages\models.py:8
+msgid "Example: '/about/contact/'. Make sure to have leading and trailing slashes."
+msgstr "مثال: '/about/contact/'. تأكد من وضع شرطات في البداية والنهاية."
+
+#: .\contrib\flatpages\models.py:9
+msgid "title"
+msgstr "العنوان"
+
+#: .\contrib\flatpages\models.py:10
+msgid "content"
+msgstr "المحتوى"
+
+#: .\contrib\flatpages\models.py:11
+msgid "enable comments"
+msgstr "السماح بالتعليقات"
+
+#: .\contrib\flatpages\models.py:12
+msgid "template name"
+msgstr "اسم القالب"
+
+#: .\contrib\flatpages\models.py:13
+msgid "Example: 'flatpages/contact_page'. If this isn't provided, the system will use 'flatpages/default'."
+msgstr "مثال: 'flatpages/contact_page'. إذا لم يتم تحديده فإن النظام سيقوم باستخدام 'flatpages/default'."
+
+#: .\contrib\flatpages\models.py:14
+msgid "registration required"
+msgstr "التسجيل مطلوب"
+
+#: .\contrib\flatpages\models.py:14
+msgid "If this is checked, only logged-in users will be able to view the page."
+msgstr "إذا كان هذا الخيار محددا، فإن المستخدمين الداخلين فقط سيتمكنون من مشاهدة الصفحة."
+
+#: .\contrib\flatpages\models.py:18
+msgid "flat page"
+msgstr "صفحة مسطحة"
+
+#: .\contrib\flatpages\models.py:19
+msgid "flat pages"
+msgstr "صفحات مسطحة"
+
+#: .\contrib\redirects\models.py:7
+msgid "redirect from"
+msgstr "نموذج إعادة توجيه"
+
+#: .\contrib\redirects\models.py:8
+msgid "This should be an absolute path, excluding the domain name. Example: '/events/search/'."
+msgstr "يجب أن يكون هذا مسارا مطلقا وبدون اسم النطاق. مثال: '/events/search/'."
+
+#: .\contrib\redirects\models.py:9
+msgid "redirect to"
+msgstr "إعادة توجيه إلى"
+
+#: .\contrib\redirects\models.py:10
+msgid "This can be either an absolute path (as above) or a full URL starting with 'http://'."
+msgstr "يجب أن يكون هذا مسارا مطلقا (كما في الذي فوقه) عنوانا كاملا يبدأ بالمقطع 'http://'."
+
+#: .\contrib\redirects\models.py:13
+msgid "redirect"
+msgstr "إعادة توجيه"
+
+#: .\contrib\redirects\models.py:14
+msgid "redirects"
+msgstr "إعادات توجيه"
+
+#: .\contrib\sessions\models.py:41
+msgid "session key"
+msgstr "مفتاح الجلسة"
+
+#: .\contrib\sessions\models.py:42
+msgid "session data"
+msgstr "بيانات الجلسة"
+
+#: .\contrib\sessions\models.py:43
+msgid "expire date"
+msgstr "تاريخ الانتهاء"
+
+#: .\contrib\sessions\models.py:47
+msgid "session"
+msgstr "جلسة"
+
+#: .\contrib\sessions\models.py:48
+msgid "sessions"
+msgstr "جلسات"
+
+#: .\contrib\sites\models.py:10
+msgid "domain name"
+msgstr "اسم النطاق"
+
+#: .\contrib\sites\models.py:11
+msgid "display name"
+msgstr "اسم العرض"
+
+#: .\contrib\sites\models.py:15
+msgid "site"
+msgstr "موقع"
+
+#: .\contrib\sites\models.py:16
+msgid "sites"
+msgstr "مواقع"
+
+#: .\core\validators.py:63
+msgid "This value must contain only letters, numbers and underscores."
+msgstr "هذه القيمة يجب أن تحتوي فقط على الأحرف والأرقام والشرطة السفلية."
+
+#: .\core\validators.py:67
+msgid "This value must contain only letters, numbers, underscores, dashes or slashes."
+msgstr "هذه القيمة يجب أن تحتوي فقط على الأحرف والأرقام والشرطات السفلية والشرطة العادية والشرطات المائلة."
+
+#: .\core\validators.py:75
+msgid "Uppercase letters are not allowed here."
+msgstr "الحروف الكبيرة غير مسموح بها هنا."
+
+#: .\core\validators.py:79
+msgid "Lowercase letters are not allowed here."
+msgstr "الحروف الصغيرة غير مسموح بها هنا."
+
+#: .\core\validators.py:86
+msgid "Enter only digits separated by commas."
+msgstr "أدخل أرقاما فقط مفصول بينها بفواصل comma."
+
+#: .\core\validators.py:98
+msgid "Enter valid e-mail addresses separated by commas."
+msgstr "أدخل عناوين بريد إلكتروني صالحة مفصول بينها بفواصل comma."
+
+#: .\core\validators.py:102
+msgid "Please enter a valid IP address."
+msgstr "أدخل عنوان IP صالح من فضلك."
+
+#: .\core\validators.py:106
+msgid "Empty values are not allowed here."
+msgstr "القيم الفارغة غير مسموح بها هنا."
+
+#: .\core\validators.py:110
+msgid "Non-numeric characters aren't allowed here."
+msgstr "الخانات غير الرقمية غير مسموح بها هنا."
+
+#: .\core\validators.py:114
+msgid "This value can't be comprised solely of digits."
+msgstr "لا يمكن أن تكون القيمة مكونة من الأرقام فقط."
+
+#: .\core\validators.py:119
+msgid "Enter a whole number."
+msgstr "أدخل رقما صحيحا."
+
+#: .\core\validators.py:123
+msgid "Only alphabetical characters are allowed here."
+msgstr "فقط الخانات الحرفية مسموح بها هنا."
+
+#: .\core\validators.py:127
+#: .\db\models\fields\__init__.py:412
+msgid "Enter a valid date in YYYY-MM-DD format."
+msgstr "أدخل تاريخا صحيحا بتنسيق YYYY-MM-DD."
+
+#: .\core\validators.py:131
+msgid "Enter a valid time in HH:MM format."
+msgstr "أدخل وقتا صحيحا بتنسيق HH:MM."
+
+#: .\core\validators.py:135
+#: .\db\models\fields\__init__.py:474
+msgid "Enter a valid date/time in YYYY-MM-DD HH:MM format."
+msgstr "أدخل تاريخ/وقت صحيحين بتنسيق YYYY-MM-DD HH:MM."
+
+#: .\core\validators.py:139
+msgid "Enter a valid e-mail address."
+msgstr "أدخل عنوان بريد إلكتروني صحيح."
+
+#: .\core\validators.py:151
+#: .\core\validators.py:379
+#: .\forms\__init__.py:659
+msgid "No file was submitted. Check the encoding type on the form."
+msgstr "لم يتم ارسال ملف، الرجاء التأكد من نوع ترميز (encoding type) النموذج."
+
+#: .\core\validators.py:155
+msgid "Upload a valid image. The file you uploaded was either not an image or a corrupted image."
+msgstr "قم برفع صورة صالحة، الملف الذي قمت برفعه إما أنه ليس ملفا لصورة أو أنه ملف معطوب."
+
+#: .\core\validators.py:162
+#, python-format
+msgid "The URL %s does not point to a valid image."
+msgstr "العنوان %s لا يحتوي على صورة صالحة."
+
+#: .\core\validators.py:166
+#, python-format
+msgid "Phone numbers must be in XXX-XXX-XXXX format. \"%s\" is invalid."
+msgstr "رقم الهاتف يجب أن يكون بتنسيق XXX-XXX-XXXX. \"%s\" غير صالح."
+
+#: .\core\validators.py:174
+#, python-format
+msgid "The URL %s does not point to a valid QuickTime video."
+msgstr "هذا العنوان %s لا يشير إلى مقطع فيديو QuickTime صالح."
+
+#: .\core\validators.py:178
+msgid "A valid URL is required."
+msgstr "يجب ادخال عنوان صالح."
+
+#: .\core\validators.py:192
+#, python-format
+msgid ""
+"Valid HTML is required. Specific errors are:\n"
+"%s"
+msgstr ""
+"مطلوب شفرة HTML صالحة، الأخطاء على وجه التحديد هي:\n"
+"%s"
+
+#: .\core\validators.py:199
+#, python-format
+msgid "Badly formed XML: %s"
+msgstr "XML مهيئة بصورة سيئة: %s"
+
+#: .\core\validators.py:209
+#, python-format
+msgid "Invalid URL: %s"
+msgstr "وصلة غير صالحة: %s"
+
+#: .\core\validators.py:213
+#: .\core\validators.py:215
+#, python-format
+msgid "The URL %s is a broken link."
+msgstr "الوصلة %s غير صحيحة."
+
+#: .\core\validators.py:221
+msgid "Enter a valid U.S. state abbreviation."
+msgstr "أدخل اختصار ولاية أمريكية صحيحا."
+
+#: .\core\validators.py:236
+#, python-format
+msgid "Watch your mouth! The word %s is not allowed here."
+msgid_plural "Watch your mouth! The words %s are not allowed here."
+msgstr[0] "انته إلى ما تقول! الكلمة %s غير مسموح بها هنا."
+msgstr[1] "انتبه إلى ما تقول! الكلمتان %s غير مسموح بهما هنا."
+msgstr[2] "انتبه إلى ما تقول! الكلمات %s غير مسموح بها هنا."
+msgstr[3] "انتبه إلى ما تقول! الكلمات %s غير مسموح بها هنا."
+
+#: .\core\validators.py:243
+#, python-format
+msgid "This field must match the '%s' field."
+msgstr "هذا الحقل يجب أن يطابق الحقل '%s'."
+
+#: .\core\validators.py:262
+msgid "Please enter something for at least one field."
+msgstr "الرجاء ادخال شيء ما في حقل واحد على الأقل."
+
+#: .\core\validators.py:271
+#: .\core\validators.py:282
+msgid "Please enter both fields or leave them both empty."
+msgstr "الرجاء ادخال كلا الحقلين أن ترك كلاهما فارغا."
+
+#: .\core\validators.py:289
+#, python-format
+msgid "This field must be given if %(field)s is %(value)s"
+msgstr "هذا الحقل يجب أن يعطي إذا كان %(field)s %(value)s"
+
+#: .\core\validators.py:301
+#, python-format
+msgid "This field must be given if %(field)s is not %(value)s"
+msgstr "هذا الحقل يجب أن يعطى إذا لم يكن %(field)s %(value)s"
+
+#: .\core\validators.py:320
+msgid "Duplicate values are not allowed."
+msgstr "القيم المكررة غير مسموح بها."
+
+#: .\core\validators.py:343
+#, python-format
+msgid "This value must be a power of %s."
+msgstr "يجب أن تكون القيام من مضاعفات %s."
+
+#: .\core\validators.py:354
+msgid "Please enter a valid decimal number."
+msgstr "الرجاء ادخال رقم عشري صالح."
+
+#: .\core\validators.py:356
+#, python-format
+msgid "Please enter a valid decimal number with at most %s total digit."
+msgid_plural "Please enter a valid decimal number with at most %s total digits."
+msgstr[0] "رجاء أدخل رقم عشري صالح مكون من خانة واحدة على الأكثر."
+msgstr[1] "رجاء أدخل رقم عشري صالح مكون من خانتين على الأكثر."
+msgstr[2] "رجاء أدخل رقم عشري صالح مكون من %s خانات على الأكثر."
+msgstr[3] "رجاء أدخل رقم عشري صالح مكون من %s خانة على الأكثر."
+
+#: .\core\validators.py:359
+#, python-format
+msgid "Please enter a valid decimal number with a whole part of at most %s digit."
+msgid_plural "Please enter a valid decimal number with a whole part of at most %s digits."
+msgstr[0] "رجاء أدخل رقم عشري صالح يكون الجزء الصحيح منه مكونا من خانة واحدة على الأكثر."
+msgstr[1] "رجاء أدخل رقم عشري صالح يكون الجزء الصحيح منه مكونا من خانتين على الأكثر."
+msgstr[2] "رجاء أدخل رقم عشري صالح يكون الجزء الصحيح منه مكونا من %s خانات على الأكثر."
+msgstr[3] "رجاء أدخل رقم عشري صالح يكون الجزء الصحيح منه مكونا من %s خانة على الأكثر."
+
+#: .\core\validators.py:362
+#, python-format
+msgid "Please enter a valid decimal number with at most %s decimal place."
+msgid_plural "Please enter a valid decimal number with at most %s decimal places."
+msgstr[0] "الرجاء ادخال رقم عشري صالح تكون فيه خانة عشرية واحدة على الأكثر."
+msgstr[1] "الرجاء ادخال رقم عشري صالح تكون فيه خانتان عشريتان على الأكثر."
+msgstr[2] "الرجاء ادخال رقم عشري صالح تكون فيه %s خانات عشرية على الأكثر."
+msgstr[3] "الرجاء ادخال رقم عشري صالح تكون فيه %s خانة عشرية على الأكثر."
+
+#: .\core\validators.py:372
+#, python-format
+msgid "Make sure your uploaded file is at least %s bytes big."
+msgstr "تأكد من أن حجم الملف الذي قمت برفعه لا يقل عن  %s بايت."
+
+#: .\core\validators.py:373
+#, python-format
+msgid "Make sure your uploaded file is at most %s bytes big."
+msgstr "تأكد من أن الملف الذي قمت برفعه لا يزيد عن %s بايت."
+
+#: .\core\validators.py:390
+msgid "The format for this field is wrong."
+msgstr "تنسيق هذا الحقل خاطئ."
+
+#: .\core\validators.py:405
+msgid "This field is invalid."
+msgstr "هذا الحقل غير صحيح."
+
+#: .\core\validators.py:441
+#, python-format
+msgid "Could not retrieve anything from %s."
+msgstr "تعذر جلب أي شيء من %s."
+
+#: .\core\validators.py:444
+#, python-format
+msgid "The URL %(url)s returned the invalid Content-Type header '%(contenttype)s'."
+msgstr "الوصلة %(url)s أعادت ترويسة Content-Type الخاطئة '%(contenttype)s'."
+
+#: .\core\validators.py:477
+#, python-format
+msgid "Please close the unclosed %(tag)s tag from line %(line)s. (Line starts with \"%(start)s\".)"
+msgstr "الرجاء اغلاق الوسم %(tag)s في سطر %(line)s. (يبدأ السطر هكذا \"%(start)s\".)"
+
+#: .\core\validators.py:481
+#, python-format
+msgid "Some text starting on line %(line)s is not allowed in that context. (Line starts with \"%(start)s\".)"
+msgstr "بعض النص الذي يبدأ في سطر %(line)s غير مسموح به في هذا السياق. (يبدأ السطر هكذا \"%(start)s\".)"
+
+#: .\core\validators.py:486
+#, python-format
+msgid "\"%(attr)s\" on line %(line)s is an invalid attribute. (Line starts with \"%(start)s\".)"
+msgstr "\"%(attr)s\" في السطر %(line)s هي سمة غير صالحة. (يبدأ السطر هكذا \"%(start)s\".)"
+
+#: .\core\validators.py:491
+#, python-format
+msgid "\"<%(tag)s>\" on line %(line)s is an invalid tag. (Line starts with \"%(start)s\".)"
+msgstr "\"<%(tag)s>\" في السطر %(line)s وسم غير صالح. (يبدأ السطر هكذا \"%(start)s\".)"
+
+#: .\core\validators.py:495
+#, python-format
+msgid "A tag on line %(line)s is missing one or more required attributes. (Line starts with \"%(start)s\".)"
+msgstr "هنالك وسم في السطر %(line)s تنقصه سمة واحدة أو أكثر. (يبدأ السطر هكذا \"%(start)s\".)"
+
+#: .\core\validators.py:500
+#, python-format
+msgid "The \"%(attr)s\" attribute on line %(line)s has an invalid value. (Line starts with \"%(start)s\".)"
+msgstr "السمة \"%(attr)s\" في السطر %(line)s تمتلك قيمة غير صالحة. (يبدأ السطر هكذا \"%(start)s\".)"
+
+#: .\db\models\manipulators.py:302
+#, python-format
+msgid "%(object)s with this %(type)s already exists for the given %(field)s."
+msgstr "%(object)s مع هذا %(type)s موجودة بالفعل لأجل %(field)s."
+
+#: .\db\models\fields\related.py:51
+#, python-format
+msgid "Please enter a valid %s."
+msgstr "الرجاء ادخال %s صالح."
+
+#: .\db\models\fields\related.py:618
+msgid "Separate multiple IDs with commas."
+msgstr "افصل بين المعرفات بفواصل comma."
+
+#: .\db\models\fields\related.py:620
+msgid "Hold down \"Control\", or \"Command\" on a Mac, to select more than one."
+msgstr "اضغط زر التحكم \"Control\", أو \"Command\" على أجهزة Mac لاختيار أكثر من واحد."
+
+#: .\db\models\fields\related.py:664
+#, python-format
+msgid "Please enter valid %(self)s IDs. The value %(value)r is invalid."
+msgid_plural "Please enter valid %(self)s IDs. The values %(value)r are invalid."
+msgstr[0] "الرجاء ادخال معرفات %(self)s صالحة، القيمة %(value)r غير صالحة."
+msgstr[1] "الرجاء ادخال معرفات %(self)s صالحة، القيمتان %(value)r غير صالحة."
+msgstr[2] "الرجاء ادخال معرفات %(self)s صالحة، القيم %(value)r غير صالحة."
+msgstr[3] "الرجاء ادخال معرفات %(self)s صالحة، القيم %(value)r غير صالحة."
+
+#: .\db\models\fields\__init__.py:40
+#, python-format
+msgid "%(optname)s with this %(fieldname)s already exists."
+msgstr "%(optname)s بالحقل %(fieldname)s موجود بالفعل."
+
+#: .\db\models\fields\__init__.py:114
+#: .\db\models\fields\__init__.py:265
+#: .\db\models\fields\__init__.py:548
+#: .\db\models\fields\__init__.py:559
+#: .\forms\__init__.py:346
+msgid "This field is required."
+msgstr "هذا الحقل مطلوب."
+
+#: .\db\models\fields\__init__.py:337
+msgid "This value must be an integer."
+msgstr "هذه القيمة يجب أن تكون رقما صحيحا."
+
+#: .\db\models\fields\__init__.py:369
+msgid "This value must be either True or False."
+msgstr "هذه القيمة يجب أن تكون إما صح أو خطأ."
+
+#: .\db\models\fields\__init__.py:385
+msgid "This field cannot be null."
+msgstr "لا يمكن أن تكون قيمة هذا الحقل لا شيء."
+
+#: .\db\models\fields\__init__.py:568
+msgid "Enter a valid filename."
+msgstr "أدخل اسم ملف صالح."
+
+#: .\forms\__init__.py:381
+#, python-format
+msgid "Ensure your text is less than %s character."
+msgid_plural "Ensure your text is less than %s characters."
+msgstr[0] "تأكد من أن النص الذي أدخلته أقل من خانة واحدة."
+msgstr[1] "تأكد من أن النص الذي أدخلته أقل من خانتين."
+msgstr[2] "تأكد من أن النص الذي أدخلته أقل من %s خانات."
+msgstr[3] "تأكد من أن النص الذي أدخلته أقل من %s خانة."
+
+#: .\forms\__init__.py:386
+msgid "Line breaks are not allowed here."
+msgstr "الأسطر الجديدة غير مسموح هتا."
+
+#: .\forms\__init__.py:485
+#: .\forms\__init__.py:558
+#: .\forms\__init__.py:597
+#, python-format
+msgid "Select a valid choice; '%(data)s' is not in %(choices)s."
+msgstr "حدد خيارا صحيحا; '%(data)s' ليست ضمن %(choices)s."
+
+#: .\forms\__init__.py:661
+msgid "The submitted file is empty."
+msgstr "الملف الذي قمت بارساله فارغ."
+
+#: .\forms\__init__.py:717
+msgid "Enter a whole number between -32,768 and 32,767."
+msgstr "أدخل رقما صحيحا بين -32,768 و 32,767."
+
+#: .\forms\__init__.py:727
+msgid "Enter a positive number."
+msgstr "أدخل رقما موجبا."
+
+#: .\forms\__init__.py:737
+msgid "Enter a whole number between 0 and 32,767."
+msgstr "أدخل رقما صحيحا بين 0 و 32,767."
+
+#: .\template\defaultfilters.py:401
+msgid "yes,no,maybe"
+msgstr "نعم،لا،ربما"
+
+#: .\utils\dates.py:6
+msgid "Monday"
+msgstr "الاثنين"
+
+#: .\utils\dates.py:6
+msgid "Tuesday"
+msgstr "الثلاثاء"
+
+#: .\utils\dates.py:6
+msgid "Wednesday"
+msgstr "الأربعاء"
+
+#: .\utils\dates.py:6
+msgid "Thursday"
+msgstr "الخميس"
+
+#: .\utils\dates.py:6
+msgid "Friday"
+msgstr "الجمعة"
+
+#: .\utils\dates.py:7
+msgid "Saturday"
+msgstr "السبت"
+
+#: .\utils\dates.py:7
+msgid "Sunday"
+msgstr "الأحد"
+
+#: .\utils\dates.py:14
+msgid "January"
+msgstr "يناير"
+
+#: .\utils\dates.py:14
+msgid "February"
+msgstr "فبراير"
+
+#: .\utils\dates.py:14
+#: .\utils\dates.py:27
+msgid "March"
+msgstr "مارس"
+
+#: .\utils\dates.py:14
+#: .\utils\dates.py:27
+msgid "April"
+msgstr "ابريل"
+
+#: .\utils\dates.py:14
+#: .\utils\dates.py:27
+msgid "May"
+msgstr "مايو"
+
+#: .\utils\dates.py:14
+#: .\utils\dates.py:27
+msgid "June"
+msgstr "يونيو"
+
+#: .\utils\dates.py:15
+#: .\utils\dates.py:27
+msgid "July"
+msgstr "يوليو"
+
+#: .\utils\dates.py:15
+msgid "August"
+msgstr "أغسطس"
+
+#: .\utils\dates.py:15
+msgid "September"
+msgstr "سبتمبر"
+
+#: .\utils\dates.py:15
+msgid "October"
+msgstr "أكتوبر"
+
+#: .\utils\dates.py:15
+msgid "November"
+msgstr "نوفمبر"
+
+#: .\utils\dates.py:16
+msgid "December"
+msgstr "ديسمبر"
+
+#: .\utils\dates.py:19
+msgid "jan"
+msgstr ""
+
+#: .\utils\dates.py:19
+msgid "feb"
+msgstr ""
+
+#: .\utils\dates.py:19
+msgid "mar"
+msgstr ""
+
+#: .\utils\dates.py:19
+msgid "apr"
+msgstr ""
+
+#: .\utils\dates.py:19
+msgid "may"
+msgstr ""
+
+#: .\utils\dates.py:19
+msgid "jun"
+msgstr ""
+
+#: .\utils\dates.py:20
+msgid "jul"
+msgstr ""
+
+#: .\utils\dates.py:20
+msgid "aug"
+msgstr ""
+
+#: .\utils\dates.py:20
+msgid "sep"
+msgstr ""
+
+#: .\utils\dates.py:20
+msgid "oct"
+msgstr ""
+
+#: .\utils\dates.py:20
+msgid "nov"
+msgstr ""
+
+#: .\utils\dates.py:20
+msgid "dec"
+msgstr ""
+
+#: utils/dates.py:27
+msgid "Jan."
+msgstr "يناير"
+
+#: utils/dates.py:27
+msgid "Feb."
+msgstr "فبراير"
+
+#: utils/dates.py:28
+msgid "Aug."
+msgstr "أغسطس"
+
+#: utils/dates.py:28
+msgid "Sept."
+msgstr "سبتمبر"
+
+#: utils/dates.py:28
+msgid "Oct."
+msgstr "أكتوبر"
+
+#: utils/dates.py:28
+msgid "Nov."
+msgstr "نوفمبر"
+
+#: utils/dates.py:28
+msgid "Dec."
+msgstr "ديسمبر"
+
+#: .\utils\timesince.py:12
+msgid "year"
+msgid_plural "years"
+msgstr[0] "سنة"
+msgstr[1] "سنتان"
+msgstr[2] "سنوات"
+msgstr[3] "سنة"
+
+#: .\utils\timesince.py:13
+msgid "month"
+msgid_plural "months"
+msgstr[0] "شهر"
+msgstr[1] "شهران"
+msgstr[2] "شهور"
+msgstr[3] "شهر"
+
+#: .\utils\timesince.py:14
+msgid "week"
+msgid_plural "weeks"
+msgstr[0] "أسبوع"
+msgstr[1] "أسبوعان"
+msgstr[2] "أسابيع"
+msgstr[3] "أسبوع"
+
+#: .\utils\timesince.py:15
+msgid "day"
+msgid_plural "days"
+msgstr[0] "يوم"
+msgstr[1] "يومان"
+msgstr[2] "أيام"
+msgstr[3] "يوم"
+
+#: .\utils\timesince.py:16
+msgid "hour"
+msgid_plural "hours"
+msgstr[0] "ساعة"
+msgstr[1] "ساعتان"
+msgstr[2] "ساعات"
+msgstr[3] "ساعة"
+
+#: .\utils\timesince.py:17
+msgid "minute"
+msgid_plural "minutes"
+msgstr[0] "دقيقة"
+msgstr[1] "دقيقتان"
+msgstr[2] "دقائق"
+msgstr[3] "دقيقة"
+
+#: .\utils\translation.py:363
+msgid "DATE_FORMAT"
+msgstr ""
+
+#: .\utils\translation.py:364
+msgid "DATETIME_FORMAT"
+msgstr ""
+
+#: .\utils\translation.py:365
+msgid "TIME_FORMAT"
+msgstr ""
+
+#: .\utils\translation.py:381
+msgid "YEAR_MONTH_FORMAT"
+msgstr ""
+
+#: .\utils\translation.py:382
+msgid "MONTH_DAY_FORMAT"
+msgstr ""
+

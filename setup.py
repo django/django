@@ -14,7 +14,8 @@ setup(
     packages = find_packages(exclude=['examples', 'examples.*']),
     package_data = {
         '': ['*.TXT'],
-        'django.conf': ['locale/bn/LC_MESSAGES/*',
+        'django.conf': ['locale/ar/LC_MESSAGES/*',
+                        'locale/bn/LC_MESSAGES/*',
                         'locale/cs/LC_MESSAGES/*',
                         'locale/cy/LC_MESSAGES/*',
                         'locale/da/LC_MESSAGES/*',

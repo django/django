@@ -45,8 +45,8 @@ def disable_termcolors():
     global style
     style = dummy()
 
-# Disable terminal coloring on Windows or if somebody's piping the output.
-if sys.platform == 'win32' or not sys.stdout.isatty():
+# Disable terminal coloring on Windows, Pocket PC, or if somebody's piping the output.
+if sys.platform == 'win32' or sys.platform == 'Pocket PC' or not sys.stdout.isatty():
     disable_termcolors()
 
 # singleton representing the default connection
@@ -847,6 +847,19 @@ def get_validation_errors(outfile, app=None):
                         else:
                             if isinstance(f, models.ManyToManyField):
                                 e.add(opts, '"admin.list_display" doesn\'t support ManyToManyFields (%r).' % fn)
+                # list_display_links
+                if opts.admin.list_display_links and not opts.admin.list_display:
+                    e.add(opts, '"admin.list_display" must be defined for "admin.list_display_links" to be used.')
+                if not isinstance(opts.admin.list_display_links, (list, tuple)):
+                    e.add(opts, '"admin.list_display_links", if given, must be set to a list or tuple.')
+                else:
+                    for fn in opts.admin.list_display_links:
+                        try:
+                            f = opts.get_field(fn)
+                        except models.FieldDoesNotExist:
+                            e.add(opts, '"admin.list_filter" refers to %r, which isn\'t a field.' % fn)
+                        if fn not in opts.admin.list_display:
+                            e.add(opts, '"admin.list_display_links" refers to %r, which is not defined in "admin.list_display".' % fn)
                 # list_filter
                 if not isinstance(opts.admin.list_filter, (list, tuple)):
                     e.add(opts, '"admin.list_filter", if given, must be set to a list or tuple.')
@@ -922,7 +935,7 @@ def _check_for_validation_errors(app=None):
         sys.stderr.write(s.read())
         sys.exit(1)
 
-def runserver(addr, port):
+def runserver(addr, port, use_reloader=True):
     "Starts a lightweight Web server for development."
     from django.core.servers.basehttp import run, AdminMediaHandler, WSGIServerException
     from django.core.handlers.wsgi import WSGIHandler
@@ -956,9 +969,12 @@ def runserver(addr, port):
             sys.exit(1)
         except KeyboardInterrupt:
             sys.exit(0)
-    from django.utils import autoreload
-    autoreload.main(inner_run)
-runserver.args = '[optional port number, or ipaddr:port]'
+    if use_reloader:
+        from django.utils import autoreload
+        autoreload.main(inner_run)
+    else:
+        inner_run()
+runserver.args = '[--noreload] [optional port number, or ipaddr:port]'
 
 def createcachetable(tablename):
     "Creates the table needed to use the SQL cache backend"
@@ -1107,6 +1123,8 @@ def execute_from_command_line(action_mapping=DEFAULT_ACTION_MAPPING, argv=None):
         help='Lets you manually add a directory the Python path, e.g. "/home/djangoprojects/myproject".')
     parser.add_option('--plain', action='store_true', dest='plain',
         help='Tells Django to use plain Python, not IPython, for "shell" command.')
+    parser.add_option('--noreload', action='store_false', dest='use_reloader', default=True,
+        help='Tells Django to NOT use the auto-reloader when running the development server.')
     options, args = parser.parse_args(argv[1:])
 
     # Take care of options.
@@ -1162,7 +1180,7 @@ def execute_from_command_line(action_mapping=DEFAULT_ACTION_MAPPING, argv=None):
                 addr, port = args[1].split(':')
             except ValueError:
                 addr, port = '', args[1]
-        action_mapping[action](addr, port)
+        action_mapping[action](addr, port, options.use_reloader)
     elif action == 'runfcgi':
         action_mapping[action](args[1:])
     else:

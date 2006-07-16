@@ -171,7 +171,7 @@ class Token(object):
             self.contents[:20].replace('\n', ''))
 
     def split_contents(self):
-        return smart_split(self.contents)
+        return list(smart_split(self.contents))
 
 class Lexer(object):
     def __init__(self, template_string, origin):
@@ -758,7 +758,7 @@ class DebugVariableNode(VariableNode):
 
 def generic_tag_compiler(params, defaults, name, node_class, parser, token):
     "Returns a template.Node subclass."
-    bits = token.contents.split()[1:]
+    bits = token.split_contents()[1:]
     bmax = len(params)
     def_len = defaults and len(defaults) or 0
     bmin = bmax - def_len

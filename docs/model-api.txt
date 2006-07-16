@@ -1225,6 +1225,33 @@ A few special cases to note about ``list_display``:
                   return self.birthday.strftime('%Y')[:3] + "0's"
               decade_born_in.short_description = 'Birth decade'
 
+``list_display_links``
+----------------------
+
+Set ``list_display_links`` to control which fields in ``list_display`` should
+be linked to the "change" page for an object.
+
+By default, the change list page will link the first column -- the first field
+specified in ``list_display`` -- to the change page for each item. But
+``list_display_links`` lets you change which columns are linked. Set
+``list_display_links`` to a list or tuple of field names (in the same format as
+``list_display``) to link.
+
+``list_display_links`` can specify one or many field names. As long as the
+field names appear in ``list_display``, Django doesn't care how many (or how
+few) fields are linked. The only requirement is: If you want to use
+``list_display_links``, you must define ``list_display``.
+
+In this example, the ``first_name`` and ``last_name`` fields will be linked on
+the change list page::
+
+    class Admin:
+        list_display = ('first_name', 'last_name', 'birthday')
+        list_display_links = ('first_name', 'last_name')
+
+Finally, note that in order to use ``list_display_links``, you must define
+``list_display``, too.
+
 ``list_filter``
 ---------------
 

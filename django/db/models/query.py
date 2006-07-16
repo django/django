@@ -85,8 +85,8 @@ class QuerySet(object):
         self._where = []             # List of extra WHERE clauses to use.
         self._params = []            # List of params to use for extra WHERE clauses.
         self._tables = []            # List of extra tables to use.
-        self._offset = None          # OFFSET clause
-        self._limit = None           # LIMIT clause
+        self._offset = None          # OFFSET clause.
+        self._limit = None           # LIMIT clause.
         self._result_cache = None
 
     ########################
@@ -444,8 +444,7 @@ class QuerySet(object):
         params = self._params[:]
 
         # Convert self._filters into SQL.
-        tables2, joins2, where2, params2 = self._filters.get_sql(opts)
-        tables.extend(tables2)
+        joins2, where2, params2 = self._filters.get_sql(opts)
         joins.update(joins2)
         where.extend(where2)
         params.extend(params2)
@@ -580,16 +579,15 @@ class QOperator(object):
         self.args = args
 
     def get_sql(self, opts):
-        tables, joins, where, params = [], SortedDict(), [], []
+        joins, where, params = SortedDict(), [], []
         for val in self.args:
-            tables2, joins2, where2, params2 = val.get_sql(opts)
-            tables.extend(tables2)
+            joins2, where2, params2 = val.get_sql(opts)
             joins.update(joins2)
             where.extend(where2)
             params.extend(params2)
         if where:
-            return tables, joins, ['(%s)' % self.operator.join(where)], params
-        return tables, joins, [], params
+            return joins, ['(%s)' % self.operator.join(where)], params
+        return joins, [], params
 
 class QAnd(QOperator):
     "Encapsulates a combined query that uses 'AND'."
@@ -640,9 +638,9 @@ class QNot(Q):
         self.q = q
 
     def get_sql(self, opts):
-        tables, joins, where, params = self.q.get_sql(opts)
+        joins, where, params = self.q.get_sql(opts)
         where2 = ['(NOT (%s))' % " AND ".join(where)]
-        return tables, joins, where2, params
+        return joins, where2, params
 
 def get_where_clause(opts, lookup_type, table_prefix, field_name, value):
     backend = opts.connection_info.backend
@@ -682,20 +680,20 @@ def fill_table_cache(opts, select, tables, where, old_prefix, cache_tables_seen)
     place) for select_related queries.
     """
     backend = opts.connection_info.backend
+    qn = backend.quote_name
     for f in opts.fields:
         if f.rel and not f.null:
             db_table = f.rel.to._meta.db_table
             if db_table not in cache_tables_seen:
-                tables.append(backend.quote_name(db_table))
+                tables.append(qn(db_table))
             else: # The table was already seen, so give it a table alias.
                 new_prefix = '%s%s' % (db_table, len(cache_tables_seen))
-                tables.append('%s %s' % (backend.quote_name(db_table), backend.quote_name(new_prefix)))
+                tables.append('%s %s' % (qn(db_table), qn(new_prefix)))
                 db_table = new_prefix
             cache_tables_seen.append(db_table)
             where.append('%s.%s = %s.%s' % \
-                (backend.quote_name(old_prefix), backend.quote_name(f.column),
-                backend.quote_name(db_table), backend.quote_name(f.rel.get_related_field().column)))
-            select.extend(['%s.%s' % (backend.quote_name(db_table), backend.quote_name(f2.column)) for f2 in f.rel.to._meta.fields])
+                (qn(old_prefix), qn(f.column), qn(db_table), qn(f.rel.get_related_field().column)))
+            select.extend(['%s.%s' % (qn(db_table), qn(f2.column)) for f2 in f.rel.to._meta.fields])
             fill_table_cache(f.rel.to._meta, select, tables, where, db_table, cache_tables_seen)
 
 def parse_lookup(kwarg_items, opts):
@@ -719,39 +717,38 @@ def parse_lookup(kwarg_items, opts):
     # At present, this method only every returns INNER JOINs; the option is
     # there for others to implement custom Q()s, etc that return other join
     # types.
-    tables, joins, where, params = [], SortedDict(), [], []
+    joins, where, params = SortedDict(), [], []
 
     for kwarg, value in kwarg_items:
         if value is not None:
             path = kwarg.split(LOOKUP_SEPARATOR)
             # Extract the last elements of the kwarg.
-            # The very-last is the clause (equals, like, etc).
-            # The second-last is the table column on which the clause is
+            # The very-last is the lookup_type (equals, like, etc).
+            # The second-last is the table column on which the lookup_type is
             # to be performed.
             # The exceptions to this are:
             # 1)  "pk", which is an implicit id__exact;
-            #     if we find "pk", make the clause "exact', and insert
+            #     if we find "pk", make the lookup_type "exact', and insert
             #     a dummy name of None, which we will replace when
             #     we know which table column to grab as the primary key.
             # 2)  If there is only one part, or the last part is not a query
             #     term, assume that the query is an __exact
-            clause = path.pop()
-            if clause == 'pk':
-                clause = 'exact'
+            lookup_type = path.pop()
+            if lookup_type == 'pk':
+                lookup_type = 'exact'
                 path.append(None)
-            elif len(path) == 0 or clause not in QUERY_TERMS:
-                path.append(clause)
-                clause = 'exact'
+            elif len(path) == 0 or lookup_type not in QUERY_TERMS:
+                path.append(lookup_type)
+                lookup_type = 'exact'
 
             if len(path) < 1:
                 raise TypeError, "Cannot parse keyword query %r" % kwarg
 
-            tables2, joins2, where2, params2 = lookup_inner(path, clause, value, opts, opts.db_table, None)
-            tables.extend(tables2)
+            joins2, where2, params2 = lookup_inner(path, lookup_type, value, opts, opts.db_table, None)
             joins.update(joins2)
             where.extend(where2)
             params.extend(params2)
-    return tables, joins, where, params
+    return joins, where, params
 
 class FieldFound(Exception):
     "Exception used to short circuit field-finding operations."
@@ -770,8 +767,8 @@ def find_field(name, field_list, related_query):
         return None
     return matches[0]
 
-def lookup_inner(path, clause, value, opts, table, column):
-    tables, joins, where, params = [], SortedDict(), [], []
+def lookup_inner(path, lookup_type, value, opts, table, column):
+    joins, where, params = SortedDict(), [], []
     current_opts = opts
     current_table = table
     current_column = column
@@ -780,6 +777,7 @@ def lookup_inner(path, clause, value, opts, table, column):
     info = current_opts.connection_info
     backend = info.backend
     connection = info.connection
+    qn = backend.quote_name
 
     name = path.pop(0)
     # Has the primary key been requested? If so, expand it out
@@ -792,7 +790,7 @@ def lookup_inner(path, clause, value, opts, table, column):
         # Does the name belong to a defined many-to-many field?
         field = find_field(name, current_opts.many_to_many, False)
         if field:
-            new_table = current_table + LOOKUP_SEPARATOR + name
+            new_table = current_table + '__' + name
             new_opts = field.rel.to._meta
             new_column = new_opts.pk.column
 
@@ -809,7 +807,7 @@ def lookup_inner(path, clause, value, opts, table, column):
         # Does the name belong to a reverse defined many-to-many field?
         field = find_field(name, current_opts.get_all_related_many_to_many_objects(), True)
         if field:
-            new_table = current_table + LOOKUP_SEPARATOR + name
+            new_table = current_table + '__' + name
             new_opts = field.opts
             new_column = new_opts.pk.column
 
@@ -826,7 +824,7 @@ def lookup_inner(path, clause, value, opts, table, column):
         # Does the name belong to a one-to-many field?
         field = find_field(name, current_opts.get_all_related_objects(), True)
         if field:
-            new_table = table + LOOKUP_SEPARATOR + name
+            new_table = table + '__' + name
             new_opts = field.opts
             new_column = field.field.column
             join_column = opts.pk.column
@@ -840,7 +838,7 @@ def lookup_inner(path, clause, value, opts, table, column):
         field = find_field(name, current_opts.fields, False)
         if field:
             if field.rel: # One-to-One/Many-to-one field
-                new_table = current_table + LOOKUP_SEPARATOR + name
+                new_table = current_table + '__' + name
                 new_opts = field.rel.to._meta
                 new_column = new_opts.pk.column
                 join_column = field.column
@@ -849,54 +847,41 @@ def lookup_inner(path, clause, value, opts, table, column):
 
     except FieldFound: # Match found, loop has been shortcut.
         pass
-    except: # Any other exception; rethrow
-        raise
     else: # No match found.
         raise TypeError, "Cannot resolve keyword '%s' into field" % name
 
-    # Check to see if an intermediate join is required between current_table
+    # Check whether an intermediate join is required between current_table
     # and new_table.
     if intermediate_table:
-        joins[backend.quote_name(current_table)] = (
-            backend.quote_name(intermediate_table),
-            "LEFT OUTER JOIN",
-            "%s.%s = %s.%s" % \
-                (backend.quote_name(table),
-                backend.quote_name(current_opts.pk.column),
-                backend.quote_name(current_table),
-                backend.quote_name(intermediate_column))
+        joins[qn(current_table)] = (
+            qn(intermediate_table), "LEFT OUTER JOIN",
+            "%s.%s = %s.%s" % (qn(table), qn(current_opts.pk.column), qn(current_table), qn(intermediate_column))
         )
 
     if path:
         # There are elements left in the path. More joins are required.
         if len(path) == 1 and path[0] in (new_opts.pk.name, None) \
-            and clause in ('exact', 'isnull') and not join_required:
+            and lookup_type in ('exact', 'isnull') and not join_required:
             # If the next and final name query is for a primary key,
             # and the search is for isnull/exact, then the current
             # (for N-1) or intermediate (for N-N) table can be used
-            # for the search - no need to join an extra table just
+            # for the search. No need to join an extra table just
             # to check the primary key.
             new_table = current_table
         else:
             # There are 1 or more name queries pending, and we have ruled out
             # any shortcuts; therefore, a join is required.
-            joins[backend.quote_name(new_table)] = (
-                backend.quote_name(new_opts.db_table),
-                "INNER JOIN",
-                "%s.%s = %s.%s" %
-                    (backend.quote_name(current_table),
-                    backend.quote_name(join_column),
-                    backend.quote_name(new_table),
-                    backend.quote_name(new_column))
+            joins[qn(new_table)] = (
+                qn(new_opts.db_table), "INNER JOIN",
+                "%s.%s = %s.%s" % (qn(current_table), qn(join_column), qn(new_table), qn(new_column))
             )
             # If we have made the join, we don't need to tell subsequent
             # recursive calls about the column name we joined on.
             join_column = None
 
         # There are name queries remaining. Recurse deeper.
-        tables2, joins2, where2, params2 = lookup_inner(path, clause, value, new_opts, new_table, join_column)
+        joins2, where2, params2 = lookup_inner(path, lookup_type, value, new_opts, new_table, join_column)
 
-        tables.extend(tables2)
         joins.update(joins2)
         where.extend(where2)
         params.extend(params2)
@@ -910,14 +895,9 @@ def lookup_inner(path, clause, value, opts, table, column):
                 # RelatedObject is from a 1-N relation.
                 # Join is required; query operates on joined table.
                 column = new_opts.pk.name
-                joins[backend.quote_name(new_table)] = (
-                    backend.quote_name(new_opts.db_table),
-                    "INNER JOIN",
-                    "%s.%s = %s.%s" %
-                        (backend.quote_name(current_table),
-                        backend.quote_name(join_column),
-                        backend.quote_name(new_table),
-                        backend.quote_name(new_column))
+                joins[qn(new_table)] = (
+                    qn(new_opts.db_table), "INNER JOIN",
+                    "%s.%s = %s.%s" % (qn(current_table), qn(join_column), qn(new_table), qn(new_column))
                 )
                 current_table = new_table
             else:
@@ -929,7 +909,7 @@ def lookup_inner(path, clause, value, opts, table, column):
             # Last query term is a related object from an N-N relation.
             # Join from intermediate table is sufficient.
             column = join_column
-        elif name == current_opts.pk.name and clause in ('exact', 'isnull') and current_column:
+        elif name == current_opts.pk.name and lookup_type in ('exact', 'isnull') and current_column:
             # Last query term is for a primary key. If previous iterations
             # introduced a current/intermediate table that can be used to
             # optimize the query, then use that table and column name.
@@ -938,10 +918,10 @@ def lookup_inner(path, clause, value, opts, table, column):
             # Last query term was a normal field.
             column = field.column
 
-        where.append(get_where_clause(current_opts, clause, current_table + '.', column, value))
-        params.extend(field.get_db_prep_lookup(clause, value))
+        where.append(get_where_clause(current_opts, lookup_type, current_table + '.', column, value))
+        params.extend(field.get_db_prep_lookup(lookup_type, value))
 
-    return tables, joins, where, params
+    return joins, where, params
 
 def delete_objects(seen_objs):
     "Iterate through a list of seen classes, and remove any instances that are referred to"
@@ -953,6 +933,7 @@ def delete_objects(seen_objs):
         backend = info.backend
         connection = info.connection
         cursor = connection.cursor()
+        qn = backend.quote_name
         
         seen_objs[cls] = seen_objs[cls].items()
         seen_objs[cls].sort()
@@ -965,24 +946,21 @@ def delete_objects(seen_objs):
         for related in cls._meta.get_all_related_many_to_many_objects():
             for offset in range(0, len(pk_list), GET_ITERATOR_CHUNK_SIZE):
                 cursor.execute("DELETE FROM %s WHERE %s IN (%s)" % \
-                    (backend.quote_name(related.field.m2m_db_table()),
-                        backend.quote_name(related.field.m2m_reverse_name()),
+                    (qn(related.field.m2m_db_table()),
+                        qn(related.field.m2m_reverse_name()),
                         ','.join(['%s' for pk in pk_list[offset:offset+GET_ITERATOR_CHUNK_SIZE]])),
                     pk_list[offset:offset+GET_ITERATOR_CHUNK_SIZE])
         for f in cls._meta.many_to_many:
             for offset in range(0, len(pk_list), GET_ITERATOR_CHUNK_SIZE):
                 cursor.execute("DELETE FROM %s WHERE %s IN (%s)" % \
-                    (backend.quote_name(f.m2m_db_table()),
-                        backend.quote_name(f.m2m_column_name()),
-                        ','.join(['%s' for pk in pk_list[offset:offset+GET_ITERATOR_CHUNK_SIZE]])),
+                    (qn(f.m2m_db_table()), qn(f.m2m_column_name()),
+                    ','.join(['%s' for pk in pk_list[offset:offset+GET_ITERATOR_CHUNK_SIZE]])),
                     pk_list[offset:offset+GET_ITERATOR_CHUNK_SIZE])
         for field in cls._meta.fields:
             if field.rel and field.null and field.rel.to in seen_objs:
                 for offset in range(0, len(pk_list), GET_ITERATOR_CHUNK_SIZE):
                     cursor.execute("UPDATE %s SET %s=NULL WHERE %s IN (%s)" % \
-                        (backend.quote_name(cls._meta.db_table),
-                            backend.quote_name(field.column),
-                            backend.quote_name(cls._meta.pk.column),
+                        (qn(cls._meta.db_table), qn(field.column), qn(cls._meta.pk.column),
                             ','.join(['%s' for pk in pk_list[offset:offset+GET_ITERATOR_CHUNK_SIZE]])),
                         pk_list[offset:offset+GET_ITERATOR_CHUNK_SIZE])
 
@@ -993,6 +971,7 @@ def delete_objects(seen_objs):
         info = cls._meta.connection_info
         backend = info.backend
         connection = info.connection
+        qn = backend.quote_name
         cursor = connection.cursor()
         if connection not in dirty_conns:
             dirty_conns.append(connection)
@@ -1001,9 +980,8 @@ def delete_objects(seen_objs):
         pk_list = [pk for pk,instance in seen_objs[cls]]
         for offset in range(0, len(pk_list), GET_ITERATOR_CHUNK_SIZE):
             cursor.execute("DELETE FROM %s WHERE %s IN (%s)" % \
-                (backend.quote_name(cls._meta.db_table),
-                    backend.quote_name(cls._meta.pk.column),
-                    ','.join(['%s' for pk in pk_list[offset:offset+GET_ITERATOR_CHUNK_SIZE]])),
+                (qn(cls._meta.db_table), qn(cls._meta.pk.column),
+                ','.join(['%s' for pk in pk_list[offset:offset+GET_ITERATOR_CHUNK_SIZE]])),
                 pk_list[offset:offset+GET_ITERATOR_CHUNK_SIZE])
 
         # Last cleanup; set NULLs where there once was a reference to the object,

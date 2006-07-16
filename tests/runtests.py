@@ -154,8 +154,9 @@ class TestRunner:
         # Manually set INSTALLED_APPS to point to the test models.
         settings.INSTALLED_APPS = ALWAYS_INSTALLED_APPS + ['.'.join(a) for a in get_test_models()]
 
-        # Manually set DEBUG = False.
+        # Manually set DEBUG and USE_I18N.
         settings.DEBUG = False
+        settings.USE_I18N = True
 
         self.output(0, "Running tests with database %r" % settings.DATABASE_ENGINE)
 
