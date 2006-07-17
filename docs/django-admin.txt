@@ -192,6 +192,14 @@ documentation.
 
 .. _serving static files: http://www.djangoproject.com/documentation/static_files/
 
+Turning off auto-reload
+~~~~~~~~~~~~~~~~~~~~~~~
+
+To disable auto-reloading of code while the development server is running, use the
+``--noreload`` option, like so::
+
+    django-admin.py runserver --noreload
+
 shell
 -----
 
