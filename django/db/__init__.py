@@ -270,6 +270,7 @@ def model_connection_name(klass):
     # No named connection for this model; use the default
     return _default
 
+
 class ConnectionInfoDescriptor(object):
     """Descriptor used to access database connection information from a
     manager or other connection holder. Keeps a thread-local cache of
@@ -283,6 +284,7 @@ class ConnectionInfoDescriptor(object):
     def __init__(self):
         self.cnx = local()
         self.cnx.cache = {}
+        dispatcher.connect(self.reset, signal=signals.request_finished)
         
     def __get__(self, instance, type=None):
         if instance is None:
@@ -291,9 +293,6 @@ class ConnectionInfoDescriptor(object):
         instance_connection = self.cnx.cache.get(instance, None)
         if instance_connection is None:
             instance_connection = self.get_connection(instance)
-            def reset():
-                self.reset(instance)
-            dispatcher.connect(reset, signal=signals.request_finished)
             self.cnx.cache[instance] = instance_connection
         return instance_connection
 
@@ -306,8 +305,8 @@ class ConnectionInfoDescriptor(object):
     def get_connection(self, instance):
         return connections[model_connection_name(instance.model)]
             
-    def reset(self, instance):
-        self.cnx.cache[instance] = None
+    def reset(self):
+        self.cnx.cache = {}
 
 
         
