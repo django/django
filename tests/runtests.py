@@ -13,6 +13,13 @@ REGRESSION_TESTS_DIR_NAME = 'regressiontests'
 TEST_DATABASE_NAME = 'django_test_db'
 TEST_DATABASES = (TEST_DATABASE_NAME + '_a', TEST_DATABASE_NAME + '_b')
 
+TEST_DATABASE_MODELS = {
+    TEST_DATABASE_NAME + '_a': [ 'multiple_databases.Artist',
+                                 'multiple_databases.Opus' ],
+    TEST_DATABASE_NAME + '_b': [ 'multiple_databases.Widget',
+                                 'multiple_databases.Doohickey' ]
+}
+
 error_list = []
 def log_error(model_name, title, description):
     error_list.append({
