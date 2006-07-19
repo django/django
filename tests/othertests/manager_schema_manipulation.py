@@ -1,9 +1,16 @@
 """
-# Django uses a model's default manager to perform schema manipulations such as
-# creating or dropping the model's table.
+# Django uses a model's default manager to perform schema
+# manipulations such as creating or dropping the model's table.
 
 >>> from django.db import models
-    
+>>> from django.conf import settings
+>>> import copy
+
+# save copy of settings so we can restore it later
+>>> odb = copy.deepcopy(settings.OTHER_DATABASES)
+>>> settings.OTHER_DATABASES['django_test_db_a']['MODELS'] = [ 'msm.PA', 'msm.P', 'msm.PC' ]
+>>> settings.OTHER_DATABASES['django_test_db_b']['MODELS'] = [ 'msm.QA', 'msm.QB', 'msm.QC', 'msm.QD' ]
+
 # default connection
 >>> class DA(models.Model):
 ...     name = models.CharField(maxlength=20)
@@ -21,7 +28,7 @@
 ...         return self.name
 ...     
 ...     class Meta:
-...         db_connection = 'django_test_db_a'
+...         app_label = 'msm'
 
 >>> class PB(models.Model):
 ...     name = models.CharField(maxlength=20)
@@ -31,7 +38,7 @@
 ...         return self.name
 ...     
 ...     class Meta:
-...         db_connection = 'django_test_db_a'
+...         app_label = 'msm'
 
 >>> class PC(models.Model):
 ...     name = models.CharField(maxlength=20)
@@ -41,7 +48,7 @@
 ...         return self.name
 ...     
 ...     class Meta:
-...         db_connection = 'django_test_db_a'
+...         app_label = 'msm'
     
 # connection django_test_db_b
 >>> class QA(models.Model):
@@ -51,7 +58,7 @@
 ...         return self.name
 ...     
 ...     class Meta:
-...         db_connection = 'django_test_db_b'
+...         app_label = 'msm'
 
 >>> class QB(models.Model):
 ...     name = models.CharField(maxlength=20)
@@ -61,7 +68,7 @@
 ...         return self.name
 ...     
 ...     class Meta:
-...         db_connection = 'django_test_db_b'
+...         app_label = 'msm'
 
 # many-many
 >>> class QC(models.Model):
@@ -71,7 +78,7 @@
 ...         return self.name
 ...     
 ...     class Meta:
-...         db_connection = 'django_test_db_b'
+...         app_label = 'msm'
 
 >>> class QD(models.Model):
 ...     name = models.CharField(maxlength=20)
@@ -81,7 +88,7 @@
 ...         return self.name
 ...     
 ...     class Meta:
-...         db_connection = 'django_test_db_b'
+...         app_label = 'msm'
 
 # Using the manager, models can be installed individually, whether they
 # use the default connection or a named connection.
@@ -112,14 +119,14 @@
 # before the pending statements can be installed.
 
 # NOTE: pretend db supports constraints for this test
->>> real_cnst = PA._meta.connection_info.backend.supports_constraints
->>> PA._meta.connection_info.backend.supports_constraints = True
+>>> real_cnst = PA._default_manager.db.backend.supports_constraints
+>>> PA._default_manager.db.backend.supports_constraints = True
 >>> result = PA.objects.install()
 >>> result
-{<class 'othertests.manager_schema_manipulation.PC'>: [BoundStatement('ALTER TABLE "othertests_pa" ADD CONSTRAINT "c_id_referencing_othertests_pc_id" FOREIGN KEY ("c_id") REFERENCES "othertests_pc" ("id");')]}
+{<class 'othertests.manager_schema_manipulation.PC'>: [BoundStatement('ALTER TABLE "msm_pa" ADD CONSTRAINT "c_id_referencing_msm_pc_id" FOREIGN KEY ("c_id") REFERENCES "msm_pc" ("id");')]}
 
 # NOTE: restore real constraint flag
->>> PA._meta.connection_info.backend.supports_constraints = real_cnst
+>>> PA._default_manager.db.backend.supports_constraints = real_cnst
 
 # Models with many-many relationships may also have pending statement
 # lists. Like other pending statements, these should be executed after
@@ -131,4 +138,6 @@
 >>> QD.objects.install()
 {}
 
+# Finally, restore the original settings
+>>> settings.OTHER_DATABASES = odb
 """
