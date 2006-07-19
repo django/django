@@ -1,4 +1,5 @@
 from django.core import validators
+from django.core.exceptions import ImproperlyConfigured
 from django.db import backend, connection, models
 from django.contrib.contenttypes.models import ContentType
 from django.utils.translation import gettext_lazy as _
