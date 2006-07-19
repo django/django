@@ -8,6 +8,7 @@ from django.db.models.query import orderlist2sql
 from django.db.models import Manager
 from bisect import bisect
 import re
+import weakref
 
 # Calculate the verbose_name by converting from InitialCaps to "lowercase with spaces".
 get_verbose_name = lambda class_name: re.sub('(((?<=[a-z])[A-Z])|([A-Z](?![A-Z]|$)))', ' \\1', class_name).lower().strip()
@@ -75,6 +76,9 @@ class Options(object):
         if not self.db_table:
             self.db_table = "%s_%s" % (self.app_label, self.module_name)
 
+        # Keep a weakref to my model, for access to managers and such
+        self._model = weakref.ref(model)
+
     def add_field(self, field):
         # Insert the given field in the order in which it was created, using
         # the "creation_counter" attribute of the field.
@@ -99,6 +103,12 @@ class Options(object):
             if f.name == name:
                 return f
         raise FieldDoesNotExist, '%s has no field named %r' % (self.object_name, name)
+
+    def get_default_manager(self):
+        model = self._model()
+        if model is None:
+            raise ReferenceError("Model no longer available in %s" % self)
+        return model._default_manager
 
     def get_order_sql(self, table_prefix=''):
         "Returns the full 'ORDER BY' clause for this object, according to self.ordering."
