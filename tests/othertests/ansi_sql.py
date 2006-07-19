@@ -54,14 +54,21 @@ Set([<class 'othertests.ansi_sql.Car'>])
 [BoundStatement('DROP TABLE "ansi_sql_mod";')]
 >>> builder.get_drop_table(Car)
 [BoundStatement('DROP TABLE "ansi_sql_car";')]
->>> builder.get_drop_table(Car, cascade=True)
-[BoundStatement('DROP TABLE "ansi_sql_car";')]
 
+# drop with cascade
 >>> builder.tables = ['ansi_sql_car', 'ansi_sql_mod', 'ansi_sql_collector']
 >>> Mod._default_manager.db.backend.supports_constraints = False
+>>> Mod._default_manager.db.backend.supports_constraints
+False
+>>> Car._default_manager.db.backend.supports_constraints
+False
 >>> builder.get_drop_table(Car, cascade=True)
 [BoundStatement('DROP TABLE "ansi_sql_car";')]
 >>> Mod._default_manager.db.backend.supports_constraints = True
+>>> Mod._default_manager.db.backend.supports_constraints
+True
+>>> Car._default_manager.db.backend.supports_constraints
+True
 >>> builder.get_drop_table(Car, cascade=True)
 [BoundStatement('ALTER TABLE "ansi_sql_mod" ...'), BoundStatement('DROP TABLE "ansi_sql_car";')]
 >>> builder.get_drop_table(Collector)
@@ -72,8 +79,12 @@ Set([<class 'othertests.ansi_sql.Car'>])
 
 """
 import os
-from django.db import models
+import sys
+from django.conf import settings
 from django.core.management import install
+from django.db import models
+from django.db.models import loading
+
 
 # For Python 2.3
 if not hasattr(__builtins__, 'set'):
@@ -121,7 +132,16 @@ def othertests_sql(mod):
     return os.path.normpath(os.path.join(os.path.dirname(__file__), 'sql'))
 
 
-# install my stuff
+# install my models and force myself into the registry of apps and models
+# (without this, references and such to/from the models installed here
+# won't be picked up in get_models(), since get_models() looks only at
+# models from apps in INSTALLED_APPS, and the model and app lookup rules
+# enforce a module structure that this test file can't follow)
 Car.objects.install()
 Collector.objects.install()
 Mod.objects.install()
+loading.get_apps()
+loading._app_list.append(sys.modules[__name__])
+
+# model lookup only works for pk.models, so fake up my module name
+__name__ = 'othertests.ansi_sql.models'
