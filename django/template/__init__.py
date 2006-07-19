@@ -708,9 +708,9 @@ class DebugNodeList(NodeList):
             if not hasattr(e, 'source'):
                 e.source = node.source
             raise
-        except Exception:
+        except Exception, e:
             from sys import exc_info
-            wrapped = TemplateSyntaxError('Caught an exception while rendering.')
+            wrapped = TemplateSyntaxError('Caught an exception while rendering: %s' % e)
             wrapped.source = node.source
             wrapped.exc_info = exc_info()
             raise wrapped
