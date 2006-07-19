@@ -2,8 +2,8 @@
 >>> from django.db.backends.ansi import sql
 
 # so we can test with a predicatable constraint setting
->>> real_cnst = Mod._meta.connection_info.backend.supports_constraints
->>> Mod._meta.connection_info.backend.supports_constraints = True
+>>> real_cnst = Mod._default_manager.db.backend.supports_constraints
+>>> Mod._default_manager.db.backend.supports_constraints = True
     
 # generate create sql
 >>> builder = sql.SchemaBuilder()
@@ -58,17 +58,17 @@ Set([<class 'othertests.ansi_sql.Car'>])
 [BoundStatement('DROP TABLE "ansi_sql_car";')]
 
 >>> builder.tables = ['ansi_sql_car', 'ansi_sql_mod', 'ansi_sql_collector']
->>> Mod._meta.connection_info.backend.supports_constraints = False
+>>> Mod._default_manager.db.backend.supports_constraints = False
 >>> builder.get_drop_table(Car, cascade=True)
 [BoundStatement('DROP TABLE "ansi_sql_car";')]
->>> Mod._meta.connection_info.backend.supports_constraints = True
+>>> Mod._default_manager.db.backend.supports_constraints = True
 >>> builder.get_drop_table(Car, cascade=True)
 [BoundStatement('ALTER TABLE "ansi_sql_mod" ...'), BoundStatement('DROP TABLE "ansi_sql_car";')]
 >>> builder.get_drop_table(Collector)
 [BoundStatement('DROP TABLE "ansi_sql_collector";')]
 >>> builder.get_drop_table(Collector, cascade=True)
 [BoundStatement('DROP TABLE "ansi_sql_collector_cars";'), BoundStatement('DROP TABLE "ansi_sql_collector";')]
->>> Mod._meta.connection_info.backend.supports_constraints = real_cnst
+>>> Mod._default_manager.db.backend.supports_constraints = real_cnst
 
 """
 import os
