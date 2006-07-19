@@ -64,10 +64,10 @@ class SchemaBuilder(object):
         self.models_already_seen.add(model)
         
         opts = model._meta
-        info = opts.connection_info
-        backend = info.backend
+        db = model._default_manager.db
+        backend = db.backend
         quote_name = backend.quote_name
-        data_types = info.get_creation_module().DATA_TYPES
+        data_types = db.get_creation_module().DATA_TYPES
         table_output = []
 
         # pending field references, keyed by the model class
@@ -126,7 +126,7 @@ class SchemaBuilder(object):
             full_statement.append('    %s%s' %
                                   (line, i < len(table_output)-1 and ',' or ''))
         full_statement.append(');')
-        create = [BoundStatement('\n'.join(full_statement), opts.connection)]
+        create = [BoundStatement('\n'.join(full_statement), db.connection)]
 
         if (pending_references and
             backend.supports_constraints):
@@ -142,7 +142,7 @@ class SchemaBuilder(object):
                         quote_name('%s_referencing_%s_%s' % (r_col, r_table, col)),
                         quote_name(r_col), quote_name(r_table), quote_name(col))
                     pending.setdefault(rel_class, []).append(
-                        BoundStatement(sql, opts.connection))
+                        BoundStatement(sql, db.connection))
         return (create, pending)    
 
     def get_create_indexes(self, model, style=None):
@@ -151,9 +151,9 @@ class SchemaBuilder(object):
         """
         if style is None:
             style = default_style
-        info = model._meta.connection_info
-        backend = info.backend
-        connection = info.connection
+        db = model._default_manager.db
+        backend = db.backend
+        connection = db.connection
         output = []
         for f in model._meta.fields:
             if f.db_index:
@@ -182,10 +182,10 @@ class SchemaBuilder(object):
         """
         if style is None:
             style = default_style
-        info = model._meta.connection_info
-        quote_name = info.backend.quote_name
-        connection = info.connection
-        data_types = info.get_creation_module().DATA_TYPES
+        db = model._default_manager.db
+        quote_name = db.backend.quote_name
+        connection = db.connection
+        data_types = db.get_creation_module().DATA_TYPES
         opts = model._meta
 
         # statements to execute, keyed by the other model
@@ -229,15 +229,15 @@ class SchemaBuilder(object):
         if style is None:
             style = default_style
         opts = model._meta
-        info = opts.connection_info
+        db = model._default_manager.db
         db_table = opts.db_table
-        backend = info.backend
+        backend = db.backend
         qn = backend.quote_name
         output = []
         output.append(BoundStatement(
                 '%s %s;' % (style.SQL_KEYWORD('DROP TABLE'),
                             style.SQL_TABLE(qn(db_table))),
-                info.connection))
+                db.connection))
 
         if cascade:
             # deal with others that might have a foreign key TO me: alter
@@ -247,7 +247,7 @@ class SchemaBuilder(object):
                 if model in references_to_delete:
                     for rel_class, f in references_to_delete[model]:
                         table = rel_class._meta.db_table
-                        if not self.table_exists(info, table):
+                        if not self.table_exists(db, table):
                             continue
                         col = f.column
                         r_table = opts.db_table
@@ -260,7 +260,7 @@ class SchemaBuilder(object):
                                         backend.get_drop_foreignkey_sql()),
                              style.SQL_FIELD(qn("%s_referencing_%s_%s" %
                                                 (col, r_table, r_col)))),
-                            info.connection))
+                            db.connection))
                     del references_to_delete[model]
             # many to many: drop any many-many tables that are my
             # responsiblity
@@ -270,16 +270,16 @@ class SchemaBuilder(object):
                             '%s %s;' %
                             (style.SQL_KEYWORD('DROP TABLE'),
                              style.SQL_TABLE(qn(f.m2m_db_table()))),
-                            info.connection))
+                            db.connection))
         # Reverse it, to deal with table dependencies.        
         output.reverse()
         return output
         
     def get_initialdata(self, model):
         opts = model._meta
-        info = opts.connection_info
-        settings = info.connection.settings
-        backend = info.backend
+        db = model._default_manager.db
+        settings = db.connection.settings
+        backend = db.backend
         app_dir = self.get_initialdata_path(model)
         output = []
 
@@ -295,12 +295,12 @@ class SchemaBuilder(object):
             if os.path.exists(sql_file):
                 fp = open(sql_file)
                 if backend.supports_compound_statements:
-                    output.append(BoundStatement(fp.read(), info.connection))
+                    output.append(BoundStatement(fp.read(), db.connection))
                 else:                                 
                     for statement in statements.split(fp.read()):
                         if statement.strip():
                             output.append(BoundStatement(statement + ";",
-                                                         info.connection))
+                                                         db.connection))
                 fp.close()
         return output
 
@@ -327,16 +327,15 @@ class SchemaBuilder(object):
                     self.references.setdefault(f.rel.to, []).append((klass, f))
         return self.references
 
-    def get_table_list(self, connection_info):
-        """Get list of tables accessible via the connection described by
-        connection_info.
+    def get_table_list(self, db):
+        """Get list of tables accessible via db.
         """
         if self.tables is not None:
             return self.tables
-        cursor = info.connection.cursor()
-        introspection = connection_info.get_introspection_module()
+        cursor = db.connection.cursor()
+        introspection = db.get_introspection_module()
         return introspection.get_table_list(cursor)        
     
-    def table_exists(self, connection_info, table):
-        tables = self.get_table_list(connection_info)
+    def table_exists(self, db, table):
+        tables = self.get_table_list(db)
         return table in tables
