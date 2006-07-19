@@ -166,7 +166,7 @@ class QuerySet(object):
         # self._select is a dictionary, and dictionaries' key order is
         # undefined, so we convert it to a list of tuples.
         extra_select = self._select.items()
-        cursor = self.model._meta.connection.cursor()
+        cursor = self.model._default_manager.db.connection.cursor()
         select, sql, params = self._get_sql_clause()
         cursor.execute("SELECT " + (self._distinct and "DISTINCT " or "") + ",".join(select) + sql, params)
         fill_cache = self._select_related
@@ -186,9 +186,9 @@ class QuerySet(object):
 
     def count(self):
         "Performs a SELECT COUNT() and returns the number of records as an integer."
-        info = self.model._meta.connection_info
-        backend = info.backend
-        connection = info.connection        
+        db = self.model._default_manager.db
+        backend = db.backend
+        connection = db.connection        
         counter = self._clone()
         counter._order_by = ()
         counter._offset = None
@@ -435,9 +435,11 @@ class QuerySet(object):
 
     def _get_sql_clause(self):
         opts = self.model._meta
-        backend = opts.connection_info.backend
+        backend = self.model._default_manager.db.backend
+        qn = backend.quote_name
         # Construct the fundamental parts of the query: SELECT X FROM Y WHERE Z.
-        select = ["%s.%s" % (backend.quote_name(opts.db_table), backend.quote_name(f.column)) for f in opts.fields]
+        select = ["%s.%s" % (qn(opts.db_table), qn(f.column))
+                  for f in opts.fields]
         tables = [quote_only_if_word(t) for t in self._tables]
         joins = SortedDict()
         where = self._where[:]
@@ -455,10 +457,11 @@ class QuerySet(object):
 
         # Add any additional SELECTs.
         if self._select:
-            select.extend(['(%s) AS %s' % (quote_only_if_word(s[1]), backend.quote_name(s[0])) for s in self._select.items()])
+            select.extend(['(%s) AS %s' % (quote_only_if_word(s[1]), qn(s[0]))
+                           for s in self._select.items()])
 
         # Start composing the body of the SQL statement.
-        sql = [" FROM", backend.quote_name(opts.db_table)]
+        sql = [" FROM", qn(opts.db_table)]
 
         # Compose the join dictionary into SQL describing the joins.
         if joins:
@@ -491,15 +494,15 @@ class QuerySet(object):
                     order = "ASC"
                 if "." in col_name:
                     table_prefix, col_name = col_name.split('.', 1)
-                    table_prefix = backend.quote_name(table_prefix) + '.'
+                    table_prefix = qn(table_prefix) + '.'
                 else:
                     # Use the database table as a column prefix if it wasn't given,
                     # and if the requested column isn't a custom SELECT.
                     if "." not in col_name and col_name not in (self._select or ()):
-                        table_prefix = backend.quote_name(opts.db_table) + '.'
+                        table_prefix = qn(opts.db_table) + '.'
                     else:
                         table_prefix = ''
-                order_by.append('%s%s %s' % (table_prefix, backend.quote_name(orderfield2column(col_name, opts)), order))
+                order_by.append('%s%s %s' % (table_prefix, qn(orderfield2column(col_name, opts)), order))
         if order_by:
             sql.append("ORDER BY " + ", ".join(order_by))
 
@@ -525,12 +528,14 @@ class ValuesQuerySet(QuerySet):
             columns = [f.column for f in self.model._meta.fields]
             field_names = [f.attname for f in self.model._meta.fields]
 
-        info = self.model._meta.connection_info
-        backend = info.backend
-        connection = info.connection
+        db = self.model._default_manager.db
+        backend = db.backend
+        qn = backend.quote_name
+        connection = db.connection
         cursor = connection.cursor()
         select, sql, params = self._get_sql_clause()
-        select = ['%s.%s' % (backend.quote_name(self.model._meta.db_table), backend.quote_name(c)) for c in columns]
+        select = ['%s.%s' % (qn(self.model._meta.db_table), qn(c))
+                  for c in columns]
         cursor.execute("SELECT " + (self._distinct and "DISTINCT " or "") + ",".join(select) + sql, params)
         while 1:
             rows = cursor.fetchmany(GET_ITERATOR_CHUNK_SIZE)
@@ -547,18 +552,19 @@ class ValuesQuerySet(QuerySet):
 class DateQuerySet(QuerySet):
     def iterator(self):
         from django.db.backends.util import typecast_timestamp
-        info = self.model._meta.connection_info
-        backend = info.backend
-        connection = info.connection
+        db = self.model._default_manager.db
+        backend = db.backend
+        qn = backend.quote_name
+        connection = db.connection
         
         self._order_by = () # Clear this because it'll mess things up otherwise.
         if self._field.null:
             self._where.append('%s.%s IS NOT NULL' % \
-                (backend.quote_name(self.model._meta.db_table), backend.quote_name(self._field.column)))
+                (qn(self.model._meta.db_table), qn(self._field.column)))
         select, sql, params = self._get_sql_clause()
         sql = 'SELECT %s %s GROUP BY 1 ORDER BY 1 %s' % \
-            (backend.get_date_trunc_sql(self._kind, '%s.%s' % (backend.quote_name(self.model._meta.db_table),
-            backend.quote_name(self._field.column))), sql, self._order)
+            (backend.get_date_trunc_sql(self._kind, '%s.%s' % (qn(self.model._meta.db_table),
+            qn(self._field.column))), sql, self._order)
         cursor = connection.cursor()
         cursor.execute(sql, params)
         # We have to manually run typecast_timestamp(str()) on the results, because
