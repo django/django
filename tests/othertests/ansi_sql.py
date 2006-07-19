@@ -70,11 +70,11 @@ True
 >>> Car._default_manager.db.backend.supports_constraints
 True
 >>> builder.get_drop_table(Car, cascade=True)
-[BoundStatement('ALTER TABLE "ansi_sql_mod" ...'), BoundStatement('DROP TABLE "ansi_sql_car";')]
+[BoundStatement('DROP TABLE "ansi_sql_car";'), BoundStatement('ALTER TABLE "ansi_sql_mod" ...')]
 >>> builder.get_drop_table(Collector)
 [BoundStatement('DROP TABLE "ansi_sql_collector";')]
 >>> builder.get_drop_table(Collector, cascade=True)
-[BoundStatement('DROP TABLE "ansi_sql_collector_cars";'), BoundStatement('DROP TABLE "ansi_sql_collector";')]
+[BoundStatement('DROP TABLE "ansi_sql_collector";'), BoundStatement('DROP TABLE "ansi_sql_collector_cars";')]
 >>> Mod._default_manager.db.backend.supports_constraints = real_cnst
 
 """
