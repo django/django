@@ -189,7 +189,7 @@ publication date::
     from django.http import HttpResponse
 
     def index(request):
-        latest_poll_list = Poll.objects.all().order_by('-pub_date')
+        latest_poll_list = Poll.objects.all().order_by('-pub_date')[:5]
         output = ', '.join([p.question for p in latest_poll_list])
         return HttpResponse(output)
 
@@ -202,7 +202,7 @@ So let's use Django's template system to separate the design from Python::
     from django.http import HttpResponse
 
     def index(request):
-        latest_poll_list = Poll.objects.all().order_by('-pub_date')
+        latest_poll_list = Poll.objects.all().order_by('-pub_date')[:5]
         t = loader.get_template('polls/index.html')
         c = Context({
             'latest_poll_list': latest_poll_list,
