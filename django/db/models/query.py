@@ -258,7 +258,7 @@ class QuerySet(object):
         Returns a dictionary mapping each of the given IDs to the object with
         that ID.
         """
-        backend = self.model._meta.connection_info.backend
+        backend = self.model._default_manager.db.backend
         assert self._limit is None and self._offset is None, \
                 "Cannot use 'limit' or 'offset' with in_bulk"
         assert isinstance(id_list, (tuple,  list)), "in_bulk() must be provided with a list of IDs."
@@ -649,11 +649,12 @@ class QNot(Q):
         return joins, where2, params
 
 def get_where_clause(opts, lookup_type, table_prefix, field_name, value):
-    backend = opts.connection_info.backend
+    backend = opts.get_default_manager().db.backend
+    qn = backend.quote_name
     
     if table_prefix.endswith('.'):
-        table_prefix = backend.quote_name(table_prefix[:-1])+'.'
-    field_name = backend.quote_name(field_name)
+        table_prefix = qn(table_prefix[:-1])+'.'
+    field_name = qn(field_name)
     try:
         return '%s%s %s' % (table_prefix, field_name, (backend.OPERATOR_MAPPING[lookup_type] % '%s'))
     except KeyError:
@@ -685,8 +686,8 @@ def fill_table_cache(opts, select, tables, where, old_prefix, cache_tables_seen)
     Helper function that recursively populates the select, tables and where (in
     place) for select_related queries.
     """
-    backend = opts.connection_info.backend
-    qn = backend.quote_name
+    qn = opts.get_default_manager().db.backend.quote_name
+
     for f in opts.fields:
         if f.rel and not f.null:
             db_table = f.rel.to._meta.db_table
@@ -780,9 +781,9 @@ def lookup_inner(path, lookup_type, value, opts, table, column):
     current_column = column
     intermediate_table = None
     join_required = False
-    info = current_opts.connection_info
-    backend = info.backend
-    connection = info.connection
+    db = current_opts.get_default_manager().db
+    backend = db.backend
+    connection = db.connection
     qn = backend.quote_name
 
     name = path.pop(0)
@@ -935,9 +936,9 @@ def delete_objects(seen_objs):
     ordered_classes.reverse()
 
     for cls in ordered_classes:
-        info = cls._meta.connection_info
-        backend = info.backend
-        connection = info.connection
+        db = cls._default_manager.db
+        backend = db.backend
+        connection = db.connection
         cursor = connection.cursor()
         qn = backend.quote_name
         
@@ -974,9 +975,9 @@ def delete_objects(seen_objs):
     dirty_conns = []
     for cls in ordered_classes:
 
-        info = cls._meta.connection_info
-        backend = info.backend
-        connection = info.connection
+        db = cls._default_manager.db
+        backend = db.backend
+        connection = db.connection
         qn = backend.quote_name
         cursor = connection.cursor()
         if connection not in dirty_conns:
