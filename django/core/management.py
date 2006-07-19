@@ -49,9 +49,6 @@ def disable_termcolors():
 if sys.platform == 'win32' or sys.platform == 'Pocket PC' or not sys.stdout.isatty():
     disable_termcolors()
 
-# singleton representing the default connection
-_default = object()
-
 def _is_valid_dir_name(s):
     return bool(re.search(r'^\w+$', s))
 
@@ -86,7 +83,7 @@ def get_version():
 
 def get_sql_create(app):
     "Returns a list of the CREATE TABLE SQL statements for the given app."
-    from django.db import models
+    from django.db import models, model_connection_name
 
     # final output will be divided by comments into sections for each
     # named connection, if there are any named connections
@@ -97,10 +94,10 @@ def get_sql_create(app):
     app_models = models.get_models(app, creation_order=True)
     for klass in app_models:
         opts = klass._meta
-        connection_name = opts.db_connection or _default
+        connection_name = model_connection_name(klass)
         output = connection_output.setdefault(connection_name, [])
-        info = opts.connection_info
-        creation = info.get_creation_module()
+        db = klass._default_manager.db
+        creation = db.get_creation_module()
         data_types = creation.DATA_TYPES
         if not data_types:
             # This must be the "dummy" database backend, which means the user
@@ -153,73 +150,33 @@ get_sql_create.args = APP_ARGS
 
 def get_sql_delete(app):
     "Returns a list of the DROP TABLE SQL statements for the given app."
-    from django.db import backend, connection, models, get_introspection_module
-    introspection = get_introspection_module()
-
-    # This should work even if a connecton isn't available
-    try:
-        cursor = connection.cursor()
-    except:
-        cursor = None
-
-    # Figure out which tables already exist
-    if cursor:
-        table_names = introspection.get_table_list(cursor)
-    else:
-        table_names = []
-
-    output = []
-
-    # Output DROP TABLE statements for standard application tables.
-    to_delete = set()
-
-    references_to_delete = {}
-    app_models = models.get_models(app)
+    from django.db import models, model_connection_name
+    
+    connection_output = {}
+    final_output = []
+    app_models = models.get_models(app, creation_order=True)
     for klass in app_models:
-        if cursor and klass._meta.db_table in table_names:
-            # The table exists, so it needs to be dropped
-            opts = klass._meta
-            for f in opts.fields:
-                if f.rel and f.rel.to not in to_delete:
-                    references_to_delete.setdefault(f.rel.to, []).append( (klass, f) )
-
-            to_delete.add(klass)
-
-    for klass in app_models:
-        if cursor and klass._meta.db_table in table_names:
-            # Drop the table now
-            output.append('%s %s;' % (style.SQL_KEYWORD('DROP TABLE'),
-                style.SQL_TABLE(backend.quote_name(klass._meta.db_table))))
-            if backend.supports_constraints and references_to_delete.has_key(klass):
-                for rel_class, f in references_to_delete[klass]:
-                    table = rel_class._meta.db_table
-                    col = f.column
-                    r_table = klass._meta.db_table
-                    r_col = klass._meta.get_field(f.rel.field_name).column
-                    output.append('%s %s %s %s;' % \
-                        (style.SQL_KEYWORD('ALTER TABLE'),
-                        style.SQL_TABLE(backend.quote_name(table)),
-                        style.SQL_KEYWORD(backend.get_drop_foreignkey_sql()),
-                        style.SQL_FIELD(backend.quote_name("%s_referencing_%s_%s" % (col, r_table, r_col)))))
-                del references_to_delete[klass]
-
-    # Output DROP TABLE statements for many-to-many tables.
-    for klass in app_models:
-        opts = klass._meta
-        for f in opts.many_to_many:
-            if cursor and f.m2m_db_table() in table_names:
-                output.append("%s %s;" % (style.SQL_KEYWORD('DROP TABLE'),
-                    style.SQL_TABLE(backend.quote_name(f.m2m_db_table()))))
-
-    app_label = app_models[0]._meta.app_label
-
-    # Close database connection explicitly, in case this output is being piped
-    # directly into a database client, to avoid locking issues.
-    if cursor:
-        cursor.close()
-        connection.close()
-
-    return output[::-1] # Reverse it, to deal with table dependencies.
+        db = klass._default_manager.db
+        connection = db.connection
+        try:
+            cursor = connection.cursor()
+        except:
+            cursor = None
+        builder = db.get_creation_module().builder
+        connection_name = model_connection_name(klass)
+        output = connection_output.setdefault(connection_name, [])
+        output.extend(map(str,
+                          builder.get_drop_table(klass,
+                                                 cascade=True, style=style)))
+        if cursor:
+            # Close database connection explicitly, in case this
+            # output is being piped directly into a database client,
+            # to avoid locking issues.
+            cursor.close()
+            connection.close()
+    # Reverse it, to deal with table dependencies.
+    final_output = _collate(connection_output, reverse=True)
+    return final_output
 get_sql_delete.help_doc = "Prints the DROP TABLE SQL statements for the given app name(s)."
 get_sql_delete.args = APP_ARGS
 
@@ -231,16 +188,16 @@ get_sql_reset.args = APP_ARGS
 
 def get_sql_initial_data(app):
     "Returns a list of the initial INSERT SQL statements for the given app."
+    from django.db import model_connection_name
     from django.db.models import get_models
     connection_output = {}
 
     app_models = get_models(app)
     for klass in app_models:
         opts = klass._meta
-        connection_name = opts.db_connection or _default
+        connection_name = model_connection_name(klass)
         output = connection_output.setdefault(connection_name, [])
-        info = opts.connection_info
-        builder = info.get_creation_module().builder
+        builder = klass._default_manager.db.get_creation_module().builder
         output.extend(builder.get_initialdata(klass))
 
     return _collate(connection_output)
@@ -276,15 +233,15 @@ get_sql_sequence_reset.args = APP_ARGS
 
 def get_sql_indexes(app):
     "Returns a list of the CREATE INDEX SQL statements for the given app."
+    from django.db import model_connection_name
     from django.db.models import get_models
     connection_output = {}
 
     for klass in get_models(app):
         opts = klass._meta
-        connection_name = opts.db_connection or _default
+        connection_name = model_connection_name(klass)
         output = connection_output.setdefault(connection_name, [])
-        info = opts.connection_info
-        builder = info.get_creation_module().builder
+        builder = klass._default_manager.db.get_creation_module().builder
         output.extend(map(str, builder.get_create_indexes(klass, style)))
     return _collate(connection_output)
 
@@ -297,12 +254,15 @@ def get_sql_all(app):
 get_sql_all.help_doc = "Prints the CREATE TABLE, initial-data and CREATE INDEX SQL statements for the given model module name(s)."
 get_sql_all.args = APP_ARGS
 
-def _collate(connection_output):
+def _collate(connection_output, reverse=False):
+    from django.db import _default
     final_output = []
     if len(connection_output.keys()) == 1:
         # all for the default connection
         for statements in connection_output.values():
             final_output.extend(statements)
+            if reverse:
+                final_output.reverse()
     else:
         for connection_name, statements in connection_output.items():
             if not statements:
@@ -310,6 +270,8 @@ def _collate(connection_output):
             if connection_name is _default:
                 connection_name = '(default)'
             final_output.append(' -- The following statements are for connection: %s' % connection_name)
+            if reverse:
+                statements.reverse()
             final_output.extend(statements)
             final_output.append(' -- END statements for %s\n' %
                                 connection_name)
