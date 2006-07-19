@@ -272,8 +272,6 @@ class SchemaBuilder(object):
                             (style.SQL_KEYWORD('DROP TABLE'),
                              style.SQL_TABLE(qn(f.m2m_db_table()))),
                             db.connection))
-        # Reverse it, to deal with table dependencies.        
-        output.reverse()
         return output
         
     def get_initialdata(self, model):
