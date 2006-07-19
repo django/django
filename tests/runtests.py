@@ -17,7 +17,7 @@ TEST_DATABASE_MODELS = {
     TEST_DATABASE_NAME + '_a': [ 'multiple_databases.Artist',
                                  'multiple_databases.Opus' ],
     TEST_DATABASE_NAME + '_b': [ 'multiple_databases.Widget',
-                                 'multiple_databases.Doohickey' ]
+                                 'multiple_databases.DooHickey' ]
 }
 
 error_list = []
@@ -181,13 +181,15 @@ class TestRunner:
         
         new_databases = {}
         for db_name in TEST_DATABASES:
-            db_st = settings.OTHER_DATABASES.setdefault(db_name, {})
+            db_st = settings.OTHER_DATABASES.get(db_name, {})
             engine = db_st.get('DATABASE_ENGINE', settings.DATABASE_ENGINE)
             if engine == 'sqlite3':
                 db_st['DATABASE_NAME'] = self._tempfile()
                 self.cleanup_files.append(db_st['DATABASE_NAME'])
             else:
                 db_st['DATABASE_NAME'] = db_name
+            if db_name in TEST_DATABASE_MODELS:
+                db_st['MODELS'] = TEST_DATABASE_MODELS[db_name]
             new_databases[db_name] = db_st
         settings.OTHER_DATABASES = new_databases
 
