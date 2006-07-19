@@ -75,9 +75,14 @@ class Vehicle(models.Model):
 API_TESTS = """
 
 # See what connections are defined. django.db.connections acts like a dict.
->>> from django.db import connection, connections
+>>> from django.db import connection, connections, _default
 >>> from django.conf import settings
->>> connections.keys()
+
+# The default connection is in there, but let's ignore it
+
+>>> non_default = connections.keys()
+>>> non_default.remove(_default)
+>>> non_default
 ['django_test_db_a', 'django_test_db_b']
 
 # Each connection references its settings
@@ -95,15 +100,15 @@ Traceback (most recent call last):
 ImproperlyConfigured: No database connection 'bad' has been configured
 
 # Models can access their connections through their managers
->>> Artist.objects.db == connections['django_test_db_a']
+>>> Artist.objects.db is connections['django_test_db_a']
 True
->>> Widget.objects.db == connections['django_test_db_b']
+>>> Widget.objects.db is connections['django_test_db_b']
 True
->>> Vehicle.objects.db.connection == connection
+>>> Vehicle.objects.db.connection.settings.DATABASE_NAME == connection.settings.DATABASE_NAME
 True
->>> Artist.objects.db == Widget.objects.db
+>>> Artist.objects.db is Widget.objects.db
 False
->>> Artist.objects.db.connection == Vehicle.objects.db.connection
+>>> Artist.objects.db.connection is Vehicle.objects.db.connection
 False
 >>> a = Artist(name="Paul Klee", alive=False)
 >>> a.save()
