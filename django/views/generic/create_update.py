@@ -20,7 +20,7 @@ def create_object(request, model, template_name=None,
             the form wrapper for the object
     """
     if extra_context is None: extra_context = {}
-    if login_required and request.user.is_anonymous():
+    if login_required and not request.user.is_authenticated():
         return redirect_to_login(request.path)
 
     manipulator = model.AddManipulator(follow=follow)
@@ -39,7 +39,7 @@ def create_object(request, model, template_name=None,
             # No errors -- this means we can save the data!
             new_object = manipulator.save(new_data)
 
-            if not request.user.is_anonymous():
+            if request.user.is_authenticated():
                 request.user.message_set.create(message="The %s was created successfully." % model._meta.verbose_name)
 
             # Redirect to the new object: first by trying post_save_redirect,
@@ -86,7 +86,7 @@ def update_object(request, model, object_id=None, slug=None,
             the original object being edited
     """
     if extra_context is None: extra_context = {}
-    if login_required and request.user.is_anonymous():
+    if login_required and not request.user.is_authenticated():
         return redirect_to_login(request.path)
 
     # Look up the object to be edited
@@ -113,7 +113,7 @@ def update_object(request, model, object_id=None, slug=None,
         if not errors:
             object = manipulator.save(new_data)
 
-            if not request.user.is_anonymous():
+            if request.user.is_authenticated():
                 request.user.message_set.create(message="The %s was updated successfully." % model._meta.verbose_name)
 
             # Do a post-after-redirect so that reload works, etc.
@@ -162,7 +162,7 @@ def delete_object(request, model, post_delete_redirect,
             the original object being deleted
     """
     if extra_context is None: extra_context = {}
-    if login_required and request.user.is_anonymous():
+    if login_required and not request.user.is_authenticated():
         return redirect_to_login(request.path)
 
     # Look up the object to be edited
@@ -180,7 +180,7 @@ def delete_object(request, model, post_delete_redirect,
 
     if request.method == 'POST':
         object.delete()
-        if not request.user.is_anonymous():
+        if request.user.is_authenticated():
             request.user.message_set.create(message="The %s was deleted." % model._meta.verbose_name)
         return HttpResponseRedirect(post_delete_redirect)
     else:

@@ -125,6 +125,11 @@ class User(models.Model):
     def is_anonymous(self):
         "Always returns False. This is a way of comparing User objects to anonymous users."
         return False
+    
+    def is_authenticated(self):
+        """Always return True. This is a way to tell if the user has been authenticated in templates.
+        """
+        return True
 
     def get_full_name(self):
         "Returns the first_name plus the last_name, with a space in between."
@@ -293,3 +298,6 @@ class AnonymousUser(object):
 
     def is_anonymous(self):
         return True
+    
+    def is_authenticated(self):
+        return False

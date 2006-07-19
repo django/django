@@ -106,12 +106,12 @@ All attributes except ``session`` should be considered read-only.
     A ``django.contrib.auth.models.User`` object representing the currently
     logged-in user. If the user isn't currently logged in, ``user`` will be set
     to an instance of ``django.contrib.auth.models.AnonymousUser``. You
-    can tell them apart with ``is_anonymous()``, like so::
+    can tell them apart with ``is_authenticated()``, like so::
 
-        if request.user.is_anonymous():
-            # Do something for anonymous users.
-        else:
+        if request.user.is_authenticated():
             # Do something for logged-in users.
+        else:
+            # Do something for anonymous users.
 
     ``user`` is only available if your Django installation has the
     ``AuthenticationMiddleware`` activated. For more, see

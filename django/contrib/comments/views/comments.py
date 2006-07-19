@@ -63,7 +63,7 @@ class PublicCommentManipulator(AuthenticationForm):
                 validator_list=get_validator_list(8),
             ),
         ])
-        if not user.is_anonymous():
+        if user.is_authenticated():
             self["username"].is_required = False
             self["username"].validator_list = []
             self["password"].is_required = False
