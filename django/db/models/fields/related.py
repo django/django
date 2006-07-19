@@ -316,7 +316,7 @@ def create_many_related_manager(superclass):
             # source_col_name: the PK colname in join_table for the source object
             # target_col_name: the PK colname in join_table for the target object
             # *objs - objects to add
-            connection = self.model._meta.connection
+            connection = self.model._default_manager.db.connection
 
             # Add the newly created or already existing objects to the join table.
             # First find out which items are already added, to avoid adding them twice
@@ -342,7 +342,7 @@ def create_many_related_manager(superclass):
             # source_col_name: the PK colname in join_table for the source object
             # target_col_name: the PK colname in join_table for the target object
             # *objs - objects to remove
-            connection = self.model._meta.connection
+            connection = self.model._default_manager.db.connection
 
             for obj in objs:
                 if not isinstance(obj, self.model):
@@ -357,7 +357,7 @@ def create_many_related_manager(superclass):
 
         def _clear_items(self, source_col_name):
             # source_col_name: the PK colname in join_table for the source object
-            connection = self.model._meta.connection
+            connection = self.model._default_manager.db.connection
             cursor = connection.cursor()
             cursor.execute("DELETE FROM %s WHERE %s = %%s" % \
                 (self.join_table, source_col_name),
@@ -386,8 +386,7 @@ class ManyRelatedObjectsDescriptor(object):
         superclass = rel_model._default_manager.__class__
         RelatedManager = create_many_related_manager(superclass)
 
-        backend = rel_model._meta.connection_info.backend
-        qn = backend.quote_name
+        qn = rel_model._default_manager.db.backend.quote_name
         manager = RelatedManager(
             model=rel_model,
             core_filters={'%s__pk' % self.related.field.name: instance._get_pk_val()},
@@ -429,8 +428,7 @@ class ReverseManyRelatedObjectsDescriptor(object):
         superclass = rel_model._default_manager.__class__
         RelatedManager = create_many_related_manager(superclass)
 
-        backend = rel_model._meta.connection_info.backend
-        qn = backend.quote_name
+        qn = rel_model._default_manager.db.backend.quote_name
         manager = RelatedManager(
             model=rel_model,
             core_filters={'%s__pk' % self.field.related_query_name(): instance._get_pk_val()},
