@@ -197,6 +197,7 @@ def _get_sql_for_pending_references(klass, pending_references):
     data_types = get_creation_module().DATA_TYPES
 
     final_output = []
+    reference_names = {}
     if backend.supports_constraints:
         opts = klass._meta
         if klass in pending_references:
@@ -206,9 +207,14 @@ def _get_sql_for_pending_references(klass, pending_references):
                 r_col = f.column
                 table = opts.db_table
                 col = opts.get_field(f.rel.field_name).column
+                r_name = '%s_referencing_%s_%s' % (r_col, table, col)
+                if r_name in reference_names:
+                    reference_names[r_name] += 1
+                    r_name += '_%s' % reference_names[r_name]
+                else:
+                    reference_names[r_name] = 0
                 final_output.append(style.SQL_KEYWORD('ALTER TABLE') + ' %s ADD CONSTRAINT %s FOREIGN KEY (%s) REFERENCES %s (%s);' % \
-                    (backend.quote_name(r_table),
-                    backend.quote_name('%s_referencing_%s_%s' % (r_col, table, col)),
+                    (backend.quote_name(r_table), r_name,
                     backend.quote_name(r_col), backend.quote_name(table), backend.quote_name(col)))
             del pending_references[klass]
     return final_output
