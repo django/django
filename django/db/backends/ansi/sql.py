@@ -248,6 +248,7 @@ class SchemaBuilder(object):
                     for rel_class, f in references_to_delete[model]:
                         table = rel_class._meta.db_table
                         if not self.table_exists(db, table):
+                            print "NO TABLE %s" % table
                             continue
                         col = f.column
                         r_table = opts.db_table
@@ -289,8 +290,11 @@ class SchemaBuilder(object):
         statements = re.compile(r";[ \t]*$", re.M)
 
         # Find custom SQL, if it's available.
-        sql_files = [os.path.join(app_dir, "%s.%s.sql" % (opts.object_name.lower(), settings.DATABASE_ENGINE)),
-                     os.path.join(app_dir, "%s.sql" % opts.object_name.lower())]
+        sql_files = [os.path.join(app_dir, "%s.%s.sql" %
+                                  (opts.object_name.lower(),
+                                   settings.DATABASE_ENGINE)),
+                     os.path.join(app_dir, "%s.sql" %
+                                  opts.object_name.lower())]
         for sql_file in sql_files:
             if os.path.exists(sql_file):
                 fp = open(sql_file)
@@ -324,7 +328,8 @@ class SchemaBuilder(object):
         for klass in models.get_models():
             for f in klass._meta.fields:
                 if f.rel:
-                    self.references.setdefault(f.rel.to, []).append((klass, f))
+                    self.references.setdefault(f.rel.to,
+                                               []).append((klass, f))
         return self.references
 
     def get_table_list(self, db):
