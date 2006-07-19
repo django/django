@@ -236,6 +236,80 @@ class DefaultConnectionInfoProxy(object):
     def close(self):
         self.local.db = None
     
+
+def model_connection_name(klass):
+    """Get the connection name that a model is configured to use, with the
+    given settings.
+    """
+    app = klass._meta.app_label
+    model = klass.__name__
+    app_model = "%s.%s" % (app, model)
+
+    # Quick exit if no OTHER_DATABASES defined
+    if (not hasattr(settings, 'OTHER_DATABASES')
+        or not settings.OTHER_DATABASES):
+        return _default
+    # Look in MODELS for the best match: app_label.Model. If that isn't
+    # found, take just app_label. If nothing is found, use the default
+    maybe = None
+    for name, db_def in settings.OTHER_DATABASES.items():
+        if not 'MODELS' in db_def:
+            continue
+        mods = db_def['MODELS']
+        # Can't get a better match than this
+        if app_model in mods:
+            return name
+        elif app in mods:
+            if maybe is not None:
+                raise ImproperlyConfigured, \
+                    "App %s appears in more than one OTHER_DATABASES " \
+                    "setting (%s and %s)" % (maybe, name)
+            maybe = name
+    if maybe:
+        return maybe
+    # No named connection for this model; use the default
+    return _default
+
+class ConnectionInfoDescriptor(object):
+    """Descriptor used to access database connection information from a
+    manager or other connection holder. Keeps a thread-local cache of
+    connections per instance, and always returns the same connection for an
+    instance in particular thread during a particular request.
+
+    Any object that includes an attribute ``model`` that holds a model class
+    can use this descriptor to manage connections.
+    """
+    
+    def __init__(self):
+        self.cnx = local()
+        self.cnx.cache = {}
+        
+    def __get__(self, instance, type=None):
+        if instance is None:
+            raise AttributeError, \
+                "ConnectionInfo is accessible only through an instance"
+        instance_connection = self.cnx.cache.get(instance, None)
+        if instance_connection is None:
+            instance_connection = self.get_connection(instance)
+            def reset():
+                self.reset(instance)
+            dispatcher.connect(reset, signal=signals.request_finished)
+            self.cnx.cache[instance] = instance_connection
+        return instance_connection
+
+    def __set__(self, instance, value):
+        self.cnx.cache[instance] = instance_connection
+
+    def __delete__(self, instance):
+        self.reset(instance)
+
+    def get_connection(self, instance):
+        return connections[model_connection_name(instance.model)]
+            
+    def reset(self, instance):
+        self.cnx.cache[instance] = None
+
+
         
 # Backwards compatibility: establish the default connection and set the
 # default connection properties at module level
