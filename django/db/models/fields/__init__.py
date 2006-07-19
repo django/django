@@ -364,8 +364,8 @@ class BooleanField(Field):
 
     def to_python(self, value):
         if value in (True, False): return value
-        if value is 't': return True
-        if value is 'f': return False
+        if value is 't' or value is 'True': return True
+        if value is 'f' or value is 'False': return False
         raise validators.ValidationError, gettext("This value must be either True or False.")
 
     def get_manipulator_field_objs(self):
