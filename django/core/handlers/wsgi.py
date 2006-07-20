@@ -59,7 +59,7 @@ class WSGIRequest(http.HttpRequest):
 
     def __repr__(self):
         from pprint import pformat
-        return '<DjangoRequest\nGET:%s,\nPOST:%s,\nCOOKIES:%s,\nMETA:%s>' % \
+        return '<WSGIRequest\nGET:%s,\nPOST:%s,\nCOOKIES:%s,\nMETA:%s>' % \
             (pformat(self.GET), pformat(self.POST), pformat(self.COOKIES),
             pformat(self.META))
 
