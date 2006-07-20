@@ -56,8 +56,14 @@ def logout(request):
     """
     Remove the authenticated user's ID from the request.
     """
-    del request.session[SESSION_KEY]
-    del request.session[BACKEND_SESSION_KEY]
+    try:
+        del request.session[SESSION_KEY]
+    except KeyError:
+        pass
+    try:
+        del request.session[BACKEND_SESSION_KEY]
+    except KeyError:
+        pass
 
 def get_user(request):
     from django.contrib.auth.models import AnonymousUser
