@@ -18,7 +18,7 @@ QUERY_TERMS = (
     'exact', 'iexact', 'contains', 'icontains',
     'gt', 'gte', 'lt', 'lte', 'in',
     'startswith', 'istartswith', 'endswith', 'iendswith',
-    'range', 'year', 'month', 'day', 'isnull',
+    'range', 'year', 'month', 'day', 'isnull', 'search',
 )
 
 # Size of each "chunk" for get_iterator calls.
