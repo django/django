@@ -231,7 +231,7 @@ Then, add the following required settings to your Django settings file:
 
 The cache middleware caches every page that doesn't have GET or POST
 parameters. Optionally, if the ``CACHE_MIDDLEWARE_ANONYMOUS_ONLY`` setting is
-``True``, only anonymous requests (i.e., those made by a logged-in user)
+``True``, only anonymous requests (i.e., not those made by a logged-in user)
 will be cached. This is a simple and effective way of disabling caching for any
 user-specific pages (include Django's admin interface).
 
