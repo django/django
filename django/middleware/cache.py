@@ -35,7 +35,7 @@ class CacheMiddleware(object):
         self.key_prefix = key_prefix
         if key_prefix is None:
             self.key_prefix = settings.CACHE_MIDDLEWARE_KEY_PREFIX
-        if cache_anonymous is None:
+        if cache_anonymous_only is None:
             self.cache_anonymous_only = settings.get('CACHE_MIDDLEWARE_ANONYMOUS_ONLY', False)
         else:
             self.cache_anonymous_only = cache_anonymous_only
