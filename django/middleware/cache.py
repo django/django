@@ -11,7 +11,7 @@ class CacheMiddleware(object):
     Only parameter-less GET or HEAD-requests with status code 200 are cached.
 
     If CACHE_MIDDLEWARE_ANONYMOUS_ONLY is set to True, only anonymous requests
-    (i.e. those node made by a logged in user) will be cached. This is a
+    (i.e., those node made by a logged-in user) will be cached. This is a
     simple and effective way of avoiding the caching of the Django admin (and
     any other user-specific content).
 
