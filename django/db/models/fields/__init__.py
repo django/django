@@ -473,13 +473,19 @@ class DateTimeField(DateField):
                 except ValueError:
                     raise validators.ValidationError, gettext('Enter a valid date/time in YYYY-MM-DD HH:MM format.')
 
-    def get_db_prep_save(self, value):
-        # Casts dates into string format for entry into database.
+    def pre_save(self, model_instance, add):
+        value = super(DateField, self).pre_save(model_instance, add)
         if value is not None:
             # MySQL will throw a warning if microseconds are given, because it
             # doesn't support microseconds.
+            settings = model_instance._default_manager.db.connection.settings
             if settings.DATABASE_ENGINE == 'mysql' and hasattr(value, 'microsecond'):
                 value = value.replace(microsecond=0)
+        return value
+
+    def get_db_prep_save(self, value):
+        # Casts dates into string format for entry into database.
+        if value is not None:
             value = str(value)
         return Field.get_db_prep_save(self, value)
 
@@ -733,17 +739,19 @@ class TimeField(Field):
         if self.auto_now or (self.auto_now_add and add):
             value = datetime.datetime.now().time()
             setattr(model_instance, self.attname, value)
-            return value
         else:
-            return super(TimeField, self).pre_save(model_instance, add)
+            value = super(TimeField, self).pre_save(model_instance, add)
+        if value is not None:
+            # MySQL will throw a warning if microseconds are given, because it
+            # doesn't support microseconds.
+            settings = model_instance._default_manager.db.connection.settings
+            if settings.DATABASE_ENGINE == 'mysql' and hasattr(value, 'microsecond'):
+                value = value.replace(microsecond=0)
+        return value
 
     def get_db_prep_save(self, value):
         # Casts dates into string format for entry into database.
         if value is not None:
-            # MySQL will throw a warning if microseconds are given, because it
-            # doesn't support microseconds.
-            if settings.DATABASE_ENGINE == 'mysql':
-                value = value.replace(microsecond=0)
             value = str(value)
         return Field.get_db_prep_save(self, value)
 
