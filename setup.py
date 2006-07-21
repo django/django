@@ -41,6 +41,7 @@ setup(
                         'locale/sl/LC_MESSAGES/*',
                         'locale/sr/LC_MESSAGES/*',
                         'locale/sv/LC_MESSAGES/*',
+                        'locale/ta/LC_MESSAGES/*',
                         'locale/uk/LC_MESSAGES/*',
                         'locale/zh_CN/LC_MESSAGES/*',
                         'locale/zh_TW/LC_MESSAGES/*'],
