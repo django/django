@@ -48,7 +48,22 @@ def test_two(path, request):
            settings.DATABASE_NAME, "%s != %s" % \
            (MY._default_manager.db.connection.settings.DATABASE_NAME,
             settings.DATABASE_NAME)
-    
+
+
+def test_three(path, request):
+    """Between the 2nd and 3rd requests, the settings at the names in
+    OTHER_DATABASES have changed.
+    """
+    assert model_connection_name(MX) == 'django_test_db_b'
+    assert MX._default_manager.db.connection.settings.DATABASE_NAME == \
+           settings.OTHER_DATABASES['django_test_db_b']['DATABASE_NAME']
+    assert model_connection_name(MY) == 'django_test_db_a'
+    assert MY._default_manager.db.connection.settings.DATABASE_NAME == \
+           settings.OTHER_DATABASES['django_test_db_a']['DATABASE_NAME'], \
+           "%s != %s" % \
+           (MY._default_manager.db.connection.settings.DATABASE_NAME,
+            settings.OTHER_DATABASES['django_test_db_a']['DATABASE_NAME'])
+
 
 # helpers
 class MockHandler(WSGIHandler):
@@ -67,10 +82,12 @@ def pr(*arg):
         msg, arg = arg[0], arg[1:]
         print msg % arg
 
+
 def debug(*arg):
     if S['verbosity'] >= 2:
         msg, arg = arg[0], arg[1:]
         print msg % arg
+
 
 def setup():
     debug("setup")
@@ -81,15 +98,18 @@ def setup():
     settings.OTHER_DATABASES['django_test_db_a']['MODELS'] = ['ri.MX']
     settings.OTHER_DATABASES['django_test_db_b']['MODELS'] = ['ri.MY']
 
+
 def teardown():
     debug("teardown")
     settings.OTHER_DATABASES = S['ODB']
     for sk in [ k for k in S.keys() if k.startswith('DATABASE') ]:
         setattr(settings, sk, S[sk])
 
+
 def start_response(code, headers):
     debug("start response: %s %s", code, headers)
     pass
+
 
 def main():
     debug("running tests")
@@ -99,8 +119,17 @@ def main():
     env['REQUEST_METHOD'] = 'GET'
     
     MockHandler(test_one)(env, start_response)
+    
     settings.OTHER_DATABASES['django_test_db_b']['MODELS'] = []
     MockHandler(test_two)(env, start_response)
+    
+    settings.OTHER_DATABASES['django_test_db_b']['MODELS'] = ['ri.MY']
+    settings.OTHER_DATABASES['django_test_db_b'], \
+        settings.OTHER_DATABASES['django_test_db_a'] = \
+        settings.OTHER_DATABASES['django_test_db_a'], \
+        settings.OTHER_DATABASES['django_test_db_b']
+    MockHandler(test_three)(env, start_response)
+
     
 def run_tests(verbosity=0):
     S['verbosity'] = verbosity
