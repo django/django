@@ -3,8 +3,6 @@ from django.template import Template, Context, TemplateDoesNotExist
 from django.utils.html import escape
 from django.http import HttpResponseServerError, HttpResponseNotFound
 import os, re
-from itertools import count, izip
-from os.path import dirname, join as pathjoin
 
 HIDDEN_SETTINGS = re.compile('SECRET|PASSWORD')
 

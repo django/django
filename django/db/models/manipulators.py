@@ -5,7 +5,7 @@ from django.db.models.fields import FileField, AutoField
 from django.dispatch import dispatcher
 from django.db.models import signals
 from django.utils.functional import curry
-from django.utils.datastructures import DotExpandedDict, MultiValueDict
+from django.utils.datastructures import DotExpandedDict
 from django.utils.text import capfirst
 import types
 
@@ -76,7 +76,7 @@ class AutomaticManipulator(forms.Manipulator):
 
         # Add field for ordering.
         if self.change and self.opts.get_ordered_objects():
-            self.fields.append(formfields.CommaSeparatedIntegerField(field_name="order_"))
+            self.fields.append(forms.CommaSeparatedIntegerField(field_name="order_"))
 
     def save(self, new_data):
         # TODO: big cleanup when core fields go -> use recursive manipulators.

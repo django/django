@@ -692,7 +692,6 @@ startapp.args = "[appname]"
 def inspectdb():
     "Generator that introspects the tables in the given database name and returns a Django model, one line at a time."
     from django.db import connection, get_introspection_module
-    from django.conf import settings
     import keyword
 
     introspection_module = get_introspection_module()

@@ -4,7 +4,7 @@ from django.conf import settings
 from django.core import validators
 from django import forms
 from django.core.exceptions import ObjectDoesNotExist
-from django.utils.functional import curry, lazy
+from django.utils.functional import curry
 from django.utils.text import capfirst
 from django.utils.translation import gettext, gettext_lazy
 import datetime, os, time

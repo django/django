@@ -148,7 +148,6 @@ class ModPythonHandler(BaseHandler):
 
 def populate_apache_request(http_response, mod_python_req):
     "Populates the mod_python request object with an HttpResponse"
-    from django.conf import settings
     mod_python_req.content_type = http_response['Content-Type']
     for key, value in http_response.headers.items():
         if key != 'Content-Type':

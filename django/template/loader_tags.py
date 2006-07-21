@@ -1,5 +1,5 @@
 from django.template import TemplateSyntaxError, TemplateDoesNotExist, resolve_variable
-from django.template import Library, Context, Node
+from django.template import Library, Node
 from django.template.loader import get_template, get_template_from_string, find_template_source
 from django.conf import settings
 

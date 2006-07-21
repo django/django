@@ -21,7 +21,7 @@
 # installed, because pkg_resources is necessary to read eggs.
 
 from django.core.exceptions import ImproperlyConfigured
-from django.template import Origin, StringOrigin, Template, Context, TemplateDoesNotExist, add_to_builtins
+from django.template import Origin, Template, Context, TemplateDoesNotExist, add_to_builtins
 from django.conf import settings
 
 template_source_loaders = None

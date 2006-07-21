@@ -4,8 +4,7 @@ from django import forms
 from django.db.models import FileField
 from django.contrib.auth.views import redirect_to_login
 from django.template import RequestContext
-from django.core.paginator import ObjectPaginator, InvalidPage
-from django.http import Http404, HttpResponse, HttpResponseRedirect
+from django.http import Http404, HttpResponseRedirect
 from django.core.exceptions import ObjectDoesNotExist, ImproperlyConfigured
 
 def create_object(request, model, template_name=None,
