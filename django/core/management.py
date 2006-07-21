@@ -105,7 +105,7 @@ def get_sql_create(app):
         output, references = _get_sql_model_create(model, known_models)
         final_output.extend(output)
         for refto, refs in references.items():
-            pending_references.set_default(refto,[]).extend(refs)
+            pending_references.setdefault(refto,[]).extend(refs)
         final_output.extend(_get_sql_for_pending_references(model, pending_references))
         # Keep track of the fact that we've created the table for this model.
         known_models.add(model)
