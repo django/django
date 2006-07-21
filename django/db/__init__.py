@@ -1,7 +1,9 @@
-from django.conf import settings, UserSettingsHolder
+from django import conf
 from django.core import signals
 from django.core.exceptions import ImproperlyConfigured
 from django.dispatch import dispatcher
+
+from thread import get_ident
 
 try:
     # Only exists in Python 2.4+
@@ -15,8 +17,13 @@ __all__ = ('backend', 'connection', 'DatabaseError')
 # singleton to represent the default connection in connections
 _default = object()
 
-if not settings.DATABASE_ENGINE:
-    settings.DATABASE_ENGINE = 'dummy'
+# storage for local default connection
+_local = local()
+
+
+if not conf.settings.DATABASE_ENGINE:
+    conf.settings.DATABASE_ENGINE = 'dummy'
+
 
 def connect(settings):
     """Connect to the database specified in settings. Returns a
@@ -44,7 +51,7 @@ class ConnectionInfo(object):
     """
     def __init__(self, settings=None):
         if settings is None:
-            from django.conf import settings
+            settings = conf.settings
         self.settings = settings
         self.backend = self.load_backend()
         self.connection = self.backend.DatabaseWrapper(settings)
@@ -83,11 +90,11 @@ class ConnectionInfo(object):
                                   and not f.endswith('.py') \
                                   and not f.endswith('.pyc')]
             available_backends.sort()
-            if settings.DATABASE_ENGINE not in available_backends:
+            if self.settings.DATABASE_ENGINE not in available_backends:
                 raise ImproperlyConfigured, \
                       "%r isn't an available database backend. "\
                       "Available options are: %s" % \
-                      (settings.DATABASE_ENGINE,
+                      (self.settings.DATABASE_ENGINE,
                        ", ".join(map(repr, available_backends)))
             else:
                 # If there's some other error, this must be an error
@@ -122,11 +129,15 @@ class LazyConnectionManager(object):
     def __getitem__(self, k):
         try:
             return self.local.connections[k]
-        except KeyError:
+        except (AttributeError, KeyError):
             return self.connect(k)
 
     def __setitem__(self, k, v):
-        self.local.connections[k] = v
+        try:
+            self.local.connections[k] = v
+        except AttributeError:
+            # First access in thread
+            self.local.connections = {k: v}
             
     def connect(self, name):
         """Return the connection with this name in
@@ -135,14 +146,16 @@ class LazyConnectionManager(object):
         connection (a singleton defined in django.db), then the default
         connection is returned.        
         """
-        cnx = self.local.connections
+        settings = conf.settings
+        try:
+            cnx = self.local.connections
+        except AttributeError:
+            cnx = self.local.connections = {}
+            
         if name in cnx:
             cnx[name].close()
         if name is _default:
-            # get the default connection from connection_info
-            if connection_info.local.db is None:
-                connection_info.init_connection()
-            cnx[name] = connection_info.local.db
+            cnx[name] = connect(conf.settings)
             return cnx[name]
         try:
             info = settings.OTHER_DATABASES[name]
@@ -156,7 +169,7 @@ class LazyConnectionManager(object):
         # In settings it's a dict, but connect() needs an object:
         # pass global settings so that the default connection settings
         # can be defaults for the named connections.
-        database = UserSettingsHolder(settings)
+        database = conf.UserSettingsHolder(settings)
         for k, v in info.items():
             setattr(database, k, v)
         cnx[name] = connect(database)
@@ -166,82 +179,11 @@ class LazyConnectionManager(object):
         self.local.connections = {}
 
 
-class _proxy:
-    """A lazy-initializing proxy. The proxied object is not
-    initialized until the first attempt to access it.
-    """
-    
-    def __init__(self, init_obj):
-        self.__dict__['_obj'] = None
-        self.__dict__['_init_obj'] = init_obj
-
-    def __getattr__(self, attr):
-        if self.__dict__['_obj'] is None:
-            self.__dict__['_obj'] = self.__dict__['_init_obj']()
-        return getattr(self.__dict__['_obj'], attr)
-
-    def __setattr__(self, attr, val):
-        if self.__dict__['_obj'] is None:
-            self.__dict__['_obj'] = self.__dict__['_init_obj']()
-        setattr(self.__dict__['_obj'], attr, val)
-
-
-class DefaultConnectionInfoProxy(object):
-    """Holder for proxy objects that will connect to the current
-    default connection when used. Mimics the interface of a ConnectionInfo.
-    """
-    def __init__(self):
-        self.local = local()
-        self.local.db = None
-        self.connection = _proxy(self.get_connection)
-        self.DatabaseError = _proxy(self.get_database_error)
-        self.backend = _proxy(self.get_backend)
-        self.get_introspection_module = _proxy(self.get_introspection_module)
-        self.get_creation_module = _proxy(self.get_creation_module)
-        self.runshell = _proxy(self.get_runshell)
-
-    def init_connection(self):
-        from django.conf import settings
-        self.local.db = connect(settings)
-
-    def get_backend(self):
-        if self.local.db is None:
-            self.init_connection()
-        return self.local.db.backend
-        
-    def get_connection(self):
-        if self.local.db is None:
-            self.init_connection()
-        return self.local.db.connection
-
-    def get_database_error(self):
-        if self.local.db is None:
-            self.init_connection()
-        return self.local.db.DatabaseError
-
-    def get_introspection_module(self):
-        if self.local.db is None:
-            self.init_connection()
-        return self.local.db.get_introspection_module
-    
-    def get_creation_module(self):
-        if self.local.db is None:
-            self.init_connection()
-        return self.local.db.get_creation_module
-    
-    def get_runshell(self):
-        if self.local.db is None:
-            self.init_connection()
-        return self.local.db.runshell
-    
-    def close(self):
-        self.local.db = None
-    
-
 def model_connection_name(klass):
     """Get the connection name that a model is configured to use, with the
-    given settings.
+    current settings.
     """
+    settings = conf.settings
     app = klass._meta.app_label
     model = klass.__name__
     app_model = "%s.%s" % (app, model)
@@ -283,54 +225,110 @@ class ConnectionInfoDescriptor(object):
     """
     
     def __init__(self):
-        self.cnx = local()
-        self.cnx.cache = {}
+        self.local = local()
+        self.local.cnx = {}
         dispatcher.connect(self.reset, signal=signals.request_finished)
         
     def __get__(self, instance, type=None):
         if instance is None:
             raise AttributeError, \
                 "ConnectionInfo is accessible only through an instance"
-        instance_connection = self.cnx.cache.get(instance, None)
+        try:
+            instance_connection = self.local.cnx.get(instance, None)
+        except AttributeError:
+            # First access in this thread
+            self.local.cnx = {}
+            instance_connection = None
         if instance_connection is None:
             instance_connection = self.get_connection(instance)
-            self.cnx.cache[instance] = instance_connection
+            self.local.cnx[instance] = instance_connection
         return instance_connection
 
     def __set__(self, instance, value):
-        self.cnx.cache[instance] = instance_connection
+        try:
+            self.local.cnx[instance] = instance_connection
+        except AttributeError:
+            # First access in thread
+            self.local.cnx = {instance: instance_connection}
 
     def __delete__(self, instance):
-        self.reset(instance)
+        try:
+            del self.local.cnx[instance]
+        except (AttributeError, KeyError):
+            # Not stored, no need to reset
+            pass
 
     def get_connection(self, instance):
         return connections[model_connection_name(instance.model)]
             
     def reset(self):
-        self.cnx.cache = {}
+        self.local.cnx = {}
 
 
+class LocalizingProxy:
+    """A lazy-initializing proxy. The proxied object is not
+    initialized until the first attempt to access it. This is used to
+    attach module-level properties to local storage.
+    """
+    def __init__(self, name, storage, func, *arg, **kw):
+        print name, storage, func, arg
+        self.__name = name
+        self.__storage = storage
+        self.__func = func
+        self.__arg = arg
+        self.__kw = kw
         
-# Backwards compatibility: establish the default connection and set the
-# default connection properties at module level
-connection_info = DefaultConnectionInfoProxy()
-(connection, DatabaseError, backend, get_introspection_module, 
- get_creation_module, runshell) = (connection_info.connection,
-                                   connection_info.DatabaseError,
-                                   connection_info.backend,
-                                   connection_info.get_introspection_module,
-                                   connection_info.get_creation_module,
-                                   connection_info.runshell)
+    def __getattr__(self, attr):
+        if attr.startswith('_LocalizingProxy'):
+            return self.__dict__[attr]
+        try:
+            return getattr(getattr(self.__storage, self.__name), attr)
+        except AttributeError:
+            setattr(self.__storage, self.__name, self.__func(*self.__arg,
+                                                             **self.__kw))
+            return getattr(getattr(self.__storage, self.__name), attr)
+
+    def __setattr__(self, attr, val):
+        if attr.startswith('_LocalizingProxy'):
+            self.__dict__[attr] = val
+            return
+        try:
+            print self.__storage, self.__name
+            stor = getattr(self.__storage, self.__name)            
+        except AttributeError:
+            stor =  self.__func(*self.__arg)
+            setattr(self.__storage, self.__name, stor)
+        setattr(stor, attr, val)
+    
 
 # Create a manager for named connections
 connections = LazyConnectionManager()
+
+# Backwards compatibility: establish the default connection and set the
+# default connection properties at module level, using the lazy proxy so that
+# each thread may have a different default connection, if so configured
+connection_info = LocalizingProxy('connection_info', _local,
+                                  lambda: connections[_default])
+connection = LocalizingProxy('connection', _local,
+                             lambda: connections[_default].connection)
+backend = LocalizingProxy('backend', _local,
+                          lambda: connections[_default].backend)
+DatabaseError = LocalizingProxy('DatabaseError', _local,
+                                lambda: connections[_default].DatabaseError)
+get_introspection_module = LocalizingProxy(
+    'get_introspection_module', _local,
+    lambda: connections[_default].get_introspection_module)
+get_creation_module = LocalizingProxy(
+    'get_creation_module', _local,
+    lambda: connections[_default].get_creation_module)
+runshell = LocalizingProxy('runshell', _local,
+                           lambda: connections[_default].runshell)
+
 
 # Reset connections on request finish, to make sure each request can
 # load the correct connections for its settings
 dispatcher.connect(connections.reset, signal=signals.request_finished)
 
-# Clear the default connection on request finish also
-dispatcher.connect(connection_info.close, signal=signals.request_finished)
 
 # Register an event that rolls back all connections
 # when a Django request has an exception.
