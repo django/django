@@ -95,44 +95,39 @@ def get_sql_create(app):
         sys.exit(1)
 
     # Get installed models, so we generate REFERENCES right
-    installed_models = _get_installed_models(_get_table_list())
-
     final_output = []
-    models_output = set(installed_models)
+    known_models = set(_get_installed_models(_get_table_list()))
     pending_references = {}
 
     app_models = models.get_models(app)
 
-    for klass in app_models:
-        output, references = _get_sql_model_create(klass, models_output)
+    for model in app_models:
+        output, references = _get_sql_model_create(model, known_models)
         final_output.extend(output)
         for refto, refs in references.items():
-            try:
-                pending_references[refto].extend(refs)
-            except KeyError:
-                pending_references[refto] = refs
-        final_output.extend(_get_sql_for_pending_references(klass, pending_references))
+            pending_references.set_default(refto,[]).extend(refs)
+        final_output.extend(_get_sql_for_pending_references(model, pending_references))
         # Keep track of the fact that we've created the table for this model.
-        models_output.add(klass)
+        known_models.add(model)
 
     # Create the many-to-many join tables.
-    for klass in app_models:
-        final_output.extend(_get_many_to_many_sql_for_model(klass))
+    for model in app_models:
+        final_output.extend(_get_many_to_many_sql_for_model(model))
 
     # Handle references to tables that are from other apps
     # but don't exist physically
     not_installed_models = set(pending_references.keys())
     if not_installed_models:
         final_output.append('-- The following references should be added but depend on non-existant tables:')
-        for klass in not_installed_models:
+        for model in not_installed_models:
             final_output.extend(['-- ' + sql for sql in
-                _get_sql_for_pending_references(klass, pending_references)])
+                _get_sql_for_pending_references(model, pending_references)])
 
     return final_output
 get_sql_create.help_doc = "Prints the CREATE TABLE SQL statements for the given app name(s)."
 get_sql_create.args = APP_ARGS
 
-def _get_sql_model_create(klass, models_already_seen=set()):
+def _get_sql_model_create(model, known_models=set()):
     """
     Get the SQL required to create a single model.
 
@@ -141,7 +136,7 @@ def _get_sql_model_create(klass, models_already_seen=set()):
     from django.db import backend, get_creation_module, models
     data_types = get_creation_module().DATA_TYPES
 
-    opts = klass._meta
+    opts = model._meta
     final_output = []
     table_output = []
     pending_references = {}
@@ -163,7 +158,7 @@ def _get_sql_model_create(klass, models_already_seen=set()):
             if f.primary_key:
                 field_output.append(style.SQL_KEYWORD('PRIMARY KEY'))
             if f.rel:
-                if f.rel.to in models_already_seen:
+                if f.rel.to in known_models:
                     field_output.append(style.SQL_KEYWORD('REFERENCES') + ' ' + \
                         style.SQL_TABLE(backend.quote_name(f.rel.to._meta.db_table)) + ' (' + \
                         style.SQL_FIELD(backend.quote_name(f.rel.to._meta.get_field(f.rel.field_name).column)) + ')'
@@ -171,7 +166,7 @@ def _get_sql_model_create(klass, models_already_seen=set()):
                 else:
                     # We haven't yet created the table to which this field
                     # is related, so save it for later.
-                    pr = pending_references.setdefault(f.rel.to, []).append((klass, f))
+                    pr = pending_references.setdefault(f.rel.to, []).append((model, f))
             table_output.append(' '.join(field_output))
     if opts.order_with_respect_to:
         table_output.append(style.SQL_FIELD(backend.quote_name('_order')) + ' ' + \
@@ -189,7 +184,7 @@ def _get_sql_model_create(klass, models_already_seen=set()):
 
     return final_output, pending_references
 
-def _get_sql_for_pending_references(klass, pending_references):
+def _get_sql_for_pending_references(model, pending_references):
     """
     Get any ALTER TABLE statements to add constraints after the fact.
     """
@@ -199,9 +194,9 @@ def _get_sql_for_pending_references(klass, pending_references):
     final_output = []
     reference_names = {}
     if backend.supports_constraints:
-        opts = klass._meta
-        if klass in pending_references:
-            for rel_class, f in pending_references[klass]:
+        opts = model._meta
+        if model in pending_references:
+            for rel_class, f in pending_references[model]:
                 rel_opts = rel_class._meta
                 r_table = rel_opts.db_table
                 r_col = f.column
@@ -216,16 +211,16 @@ def _get_sql_for_pending_references(klass, pending_references):
                 final_output.append(style.SQL_KEYWORD('ALTER TABLE') + ' %s ADD CONSTRAINT %s FOREIGN KEY (%s) REFERENCES %s (%s);' % \
                     (backend.quote_name(r_table), r_name,
                     backend.quote_name(r_col), backend.quote_name(table), backend.quote_name(col)))
-            del pending_references[klass]
+            del pending_references[model]
     return final_output
 
-def _get_many_to_many_sql_for_model(klass):
+def _get_many_to_many_sql_for_model(model):
     from django.db import backend, get_creation_module
     from django.db.models import GenericRel
     
     data_types = get_creation_module().DATA_TYPES
 
-    opts = klass._meta
+    opts = model._meta
     final_output = []
     for f in opts.many_to_many:
         if not isinstance(f.rel, GenericRel):
@@ -279,37 +274,37 @@ def get_sql_delete(app):
 
     references_to_delete = {}
     app_models = models.get_models(app)
-    for klass in app_models:
-        if cursor and klass._meta.db_table in table_names:
+    for model in app_models:
+        if cursor and model._meta.db_table in table_names:
             # The table exists, so it needs to be dropped
-            opts = klass._meta
+            opts = model._meta
             for f in opts.fields:
                 if f.rel and f.rel.to not in to_delete:
-                    references_to_delete.setdefault(f.rel.to, []).append( (klass, f) )
+                    references_to_delete.setdefault(f.rel.to, []).append( (model, f) )
 
-            to_delete.add(klass)
+            to_delete.add(model)
 
-    for klass in app_models:
-        if cursor and klass._meta.db_table in table_names:
+    for model in app_models:
+        if cursor and model._meta.db_table in table_names:
             # Drop the table now
             output.append('%s %s;' % (style.SQL_KEYWORD('DROP TABLE'),
-                style.SQL_TABLE(backend.quote_name(klass._meta.db_table))))
-            if backend.supports_constraints and references_to_delete.has_key(klass):
-                for rel_class, f in references_to_delete[klass]:
+                style.SQL_TABLE(backend.quote_name(model._meta.db_table))))
+            if backend.supports_constraints and references_to_delete.has_key(model):
+                for rel_class, f in references_to_delete[model]:
                     table = rel_class._meta.db_table
                     col = f.column
-                    r_table = klass._meta.db_table
-                    r_col = klass._meta.get_field(f.rel.field_name).column
+                    r_table = model._meta.db_table
+                    r_col = model._meta.get_field(f.rel.field_name).column
                     output.append('%s %s %s %s;' % \
                         (style.SQL_KEYWORD('ALTER TABLE'),
                         style.SQL_TABLE(backend.quote_name(table)),
                         style.SQL_KEYWORD(backend.get_drop_foreignkey_sql()),
                         style.SQL_FIELD(backend.quote_name("%s_referencing_%s_%s" % (col, r_table, r_col)))))
-                del references_to_delete[klass]
+                del references_to_delete[model]
 
     # Output DROP TABLE statements for many-to-many tables.
-    for klass in app_models:
-        opts = klass._meta
+    for model in app_models:
+        opts = model._meta
         for f in opts.many_to_many:
             if cursor and f.m2m_db_table() in table_names:
                 output.append("%s %s;" % (style.SQL_KEYWORD('DROP TABLE'),
@@ -366,8 +361,8 @@ def get_sql_initial_data(app):
     app_models = get_models(app)
     app_dir = os.path.normpath(os.path.join(os.path.dirname(app.__file__), 'sql'))
 
-    for klass in app_models:
-        output.extend(get_sql_initial_data_for_model(klass))
+    for model in app_models:
+        output.extend(get_sql_initial_data_for_model(model))
 
     return output
 get_sql_initial_data.help_doc = "Prints the initial INSERT SQL statements for the given app name(s)."
@@ -377,18 +372,18 @@ def get_sql_sequence_reset(app):
     "Returns a list of the SQL statements to reset PostgreSQL sequences for the given app."
     from django.db import backend, models
     output = []
-    for klass in models.get_models(app):
-        for f in klass._meta.fields:
+    for model in models.get_models(app):
+        for f in model._meta.fields:
             if isinstance(f, models.AutoField):
                 output.append("%s setval('%s', (%s max(%s) %s %s));" % \
                     (style.SQL_KEYWORD('SELECT'),
-                    style.SQL_FIELD('%s_%s_seq' % (klass._meta.db_table, f.column)),
+                    style.SQL_FIELD('%s_%s_seq' % (model._meta.db_table, f.column)),
                     style.SQL_KEYWORD('SELECT'),
                     style.SQL_FIELD(backend.quote_name(f.column)),
                     style.SQL_KEYWORD('FROM'),
-                    style.SQL_TABLE(backend.quote_name(klass._meta.db_table))))
+                    style.SQL_TABLE(backend.quote_name(model._meta.db_table))))
                 break # Only one AutoField is allowed per model, so don't bother continuing.
-        for f in klass._meta.many_to_many:
+        for f in model._meta.many_to_many:
             output.append("%s setval('%s', (%s max(%s) %s %s));" % \
                 (style.SQL_KEYWORD('SELECT'),
                 style.SQL_FIELD('%s_id_seq' % f.m2m_db_table()),
@@ -405,15 +400,15 @@ def get_sql_indexes(app):
     from django.db import backend, models
     output = []
 
-    for klass in models.get_models(app):
-        for f in klass._meta.fields:
+    for model in models.get_models(app):
+        for f in model._meta.fields:
             if f.db_index:
                 unique = f.unique and 'UNIQUE ' or ''
                 output.append(
                     style.SQL_KEYWORD('CREATE %sINDEX' % unique) + ' ' + \
-                    style.SQL_TABLE('%s_%s' % (klass._meta.db_table, f.column)) + ' ' + \
+                    style.SQL_TABLE('%s_%s' % (model._meta.db_table, f.column)) + ' ' + \
                     style.SQL_KEYWORD('ON') + ' ' + \
-                    style.SQL_TABLE(backend.quote_name(klass._meta.db_table)) + ' ' + \
+                    style.SQL_TABLE(backend.quote_name(model._meta.db_table)) + ' ' + \
                     "(%s);" % style.SQL_FIELD(backend.quote_name(f.column))
                 )
     return output
@@ -523,14 +518,14 @@ def get_admin_index(app):
     app_label = app_models[0]._meta.app_label
     output.append('{%% if perms.%s %%}' % app_label)
     output.append('<div class="module"><h2>%s</h2><table>' % app_label.title())
-    for klass in app_models:
-        if klass._meta.admin:
+    for model in app_models:
+        if model._meta.admin:
             output.append(MODULE_TEMPLATE % {
                 'app': app_label,
-                'mod': klass._meta.module_name,
-                'name': capfirst(klass._meta.verbose_name_plural),
-                'addperm': klass._meta.get_add_permission(),
-                'changeperm': klass._meta.get_change_permission(),
+                'mod': model._meta.module_name,
+                'name': capfirst(model._meta.verbose_name_plural),
+                'addperm': model._meta.get_add_permission(),
+                'changeperm': model._meta.get_change_permission(),
             })
     output.append('</table></div>')
     output.append('{% endif %}')
