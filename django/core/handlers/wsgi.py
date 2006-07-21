@@ -58,7 +58,6 @@ class WSGIRequest(http.HttpRequest):
         self.method = environ['REQUEST_METHOD'].upper()
 
     def __repr__(self):
-        from pprint import pformat
         return '<WSGIRequest\nGET:%s,\nPOST:%s,\nCOOKIES:%s,\nMETA:%s>' % \
             (pformat(self.GET), pformat(self.POST), pformat(self.COOKIES),
             pformat(self.META))

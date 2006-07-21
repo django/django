@@ -593,7 +593,6 @@ install.args = APP_ARGS
 def reset(app):
     "Executes the equivalent of 'get_sql_reset' in the current database."
     from django.db import connection, transaction
-    from cStringIO import StringIO
     app_name = app.__name__.split('.')[-2]
 
     disable_termcolors()
