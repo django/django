@@ -438,7 +438,7 @@ def pluralize(value, arg='s'):
     the comma is used for the singular case.
     """
     if not ',' in arg: 
-	    arg = ',' + arg
+        arg = ',' + arg
     bits = arg.split(',')
     if len(bits) > 2:
         return ''
