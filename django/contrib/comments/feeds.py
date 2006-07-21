@@ -36,6 +36,6 @@ class LatestCommentsFeed(LatestFreeCommentsFeed):
         qs = qs.filter(is_removed=False)
         if settings.COMMENTS_BANNED_USERS_GROUP:
             where = ['user_id NOT IN (SELECT user_id FROM auth_users_group WHERE group_id = %s)']
-            params = [COMMENTS_BANNED_USERS_GROUP]
+            params = [settings.COMMENTS_BANNED_USERS_GROUP]
             qs = qs.extra(where=where, params=params)
         return qs
