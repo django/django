@@ -3,8 +3,6 @@ from django.core import signals
 from django.core.exceptions import ImproperlyConfigured
 from django.dispatch import dispatcher
 
-from thread import get_ident
-
 try:
     # Only exists in Python 2.4+
     from threading import local
