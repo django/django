@@ -23,6 +23,9 @@ class ModPythonRequest(http.HttpRequest):
     def get_full_path(self):
         return '%s%s' % (self.path, self._req.args and ('?' + self._req.args) or '')
 
+    def is_secure(self):
+        return self._req.subprocess_env.has_key('HTTPS') and self._req.subprocess_env['HTTPS'] == 'on'
+
     def _load_post_and_files(self):
         "Populates self._post and self._files"
         if self._req.headers_in.has_key('content-type') and self._req.headers_in['content-type'].startswith('multipart'):

@@ -134,21 +134,25 @@ Methods
 -------
 
 ``__getitem__(key)``
-    Returns the GET/POST value for the given key, checking POST first, then
-    GET. Raises ``KeyError`` if the key doesn't exist.
+   Returns the GET/POST value for the given key, checking POST first, then
+   GET. Raises ``KeyError`` if the key doesn't exist.
 
-    This lets you use dictionary-accessing syntax on an ``HttpRequest``
-    instance. Example: ``request["foo"]`` would return ``True`` if either
-    ``request.POST`` or ``request.GET`` had a ``"foo"`` key.
+   This lets you use dictionary-accessing syntax on an ``HttpRequest``
+   instance. Example: ``request["foo"]`` would return ``True`` if either
+   ``request.POST`` or ``request.GET`` had a ``"foo"`` key.
 
 ``has_key()``
-    Returns ``True`` or ``False``, designating whether ``request.GET`` or
-    ``request.POST`` has the given key.
+   Returns ``True`` or ``False``, designating whether ``request.GET`` or
+   ``request.POST`` has the given key.
 
 ``get_full_path()``
-    Returns the ``path``, plus an appended query string, if applicable.
+   Returns the ``path``, plus an appended query string, if applicable.
 
-    Example: ``"/music/bands/the_beatles/?print=true"``
+   Example: ``"/music/bands/the_beatles/?print=true"``
+    
+``is_secure()``
+   Returns ``True`` if the request is secure; that is, if it was made with
+   HTTPS.
 
 QueryDict objects
 -----------------

@@ -1,3 +1,4 @@
+import os
 from Cookie import SimpleCookie
 from pprint import pformat
 from urllib import urlencode, quote
@@ -37,6 +38,9 @@ class HttpRequest(object):
 
     def get_full_path(self):
         return ''
+        
+    def is_secure(self):
+        return os.environ.get("HTTPS") == "on"
 
 def parse_file_upload(header_dict, post_data):
     "Returns a tuple of (POST MultiValueDict, FILES MultiValueDict)"
