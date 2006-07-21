@@ -97,7 +97,8 @@ class ConnectionInfo(object):
 
     def runshell(self):
         __import__('django.db.backends.%s.client' %
-                   self.settings.DATABASE_ENGINE, '', '', ['']).runshell()
+                   self.settings.DATABASE_ENGINE, '', '', ['']
+                   ).runshell(self.settings)
         
     def reset_queries(self):
         """Reset log of queries executed by connection"""

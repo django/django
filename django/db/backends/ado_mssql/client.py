@@ -1,2 +1,2 @@
-def runshell():
+def runshell(settings):
     raise NotImplementedError

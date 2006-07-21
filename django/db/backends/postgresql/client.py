@@ -1,7 +1,6 @@
-from django.conf import settings
 import os
 
-def runshell():
+def runshell(settings):
     args = ['psql']
     if settings.DATABASE_USER:
         args += ["-U", settings.DATABASE_USER]

@@ -1,7 +1,6 @@
-from django.conf import settings
 import os
 
-def runshell():
+def runshell(settings):
     args = ['']
     args += ["--user=%s" % settings.DATABASE_USER]
     if settings.DATABASE_PASSWORD:
