@@ -73,7 +73,7 @@ class Feed(object):
             link = link,
             description = self.__get_dynamic_attr('description', obj),
             language = settings.LANGUAGE_CODE.decode(),
-            feed_url = add_domain(current_site, self.feed_url),
+            feed_url = add_domain(current_site, self.__get_dynamic_attr('feed_url', obj)),
             author_name = self.__get_dynamic_attr('author_name', obj),
             author_link = self.__get_dynamic_attr('author_link', obj),
             author_email = self.__get_dynamic_attr('author_email', obj),
