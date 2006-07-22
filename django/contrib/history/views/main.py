@@ -1,7 +1,7 @@
 from django.db import models
-from django.db.models import get_models
-from django.utils.text import capfirst
-from django.contrib.history.models import ChangeLog, get_version, list_history, version_by_date
+#from django.db.models import get_models
+#from django.utils.text import capfirst
+from django.contrib.history.models import ChangeLog, get_version, list_history, version_by_date, get_all_models
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, render_to_response
 from datetime import datetime
@@ -14,29 +14,7 @@ def index(request):
 			      {'changes_list': changes_list})
 
 def list(request):
-    app_list = []
-    
-    for app in models.get_apps():
-	app_models = get_models(app)
-	app_label = app_models[0]._meta.app_label
-
-	model_list = []
-
-	for m in app_models:
-	    model_list.append({
-		    'name': capfirst(m._meta.verbose_name_plural),
-	    })
-
-	if model_list:
-	    model_list.sort()
-	    app_list.append({
-		    'name': app_label.title(),
-		    'models': model_list,
-            })
-
-    for app in app_list:
-	print app['name']
-	print app['models']
+    get_all_models()
 
     changes_list = ChangeLog.objects.all()
     return render_to_response('history/list.html', 
@@ -57,6 +35,6 @@ def detail(request, change_id):
 						      'object': object})
 
 def changes(request, parent_id):
-    changes_list = list_history(parent_id, 2)
+    changes_list = list_history(parent_id, offset=3)
     return render_to_response('history/list.html',
 			      {'changes_list': changes_list})
