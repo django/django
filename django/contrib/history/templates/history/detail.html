@@ -1,10 +1,11 @@
 {% if change %}
 <ul>
 <li>ID: {{ change.id }}</li>
-<li>PID: {{ change.parent_id }}</li>
+<li>PID: {{ change.object_id }}</li>
 <li>UID: {{ change.user_id }}</li>
 <li>Change time: {{ change.change_time }}</li>
-
+<li>Comment: {{ change.comment }}</li>
+<hr width="100px" align="left"/>
 	<li>ID: {{ object.id }}
 	<li>Question: {{ object.question }}</li>
 	<li>Pub date: {{ object.pub_date }}</li>

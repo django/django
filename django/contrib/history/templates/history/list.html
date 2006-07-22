@@ -3,14 +3,16 @@
 <tr>
 <td>ID:</td>
 <td>PID:</td> 
-<td>Change time:</td> 
+<td>Change time:</td>
+<td>Type:</td>
 
 </tr>
 {% for change in changes_list %}
 <tr>
 <td><a href="detail/{{ change.id }}/">{{ change.id }}</td>
-<td>{{ change.parent_id }}</td>
+<td>{{ change.object_id }}</td>
 <td>{{ change.change_time }}</td>
+<td>{{ change.content_type }}</td>
 
 </tr>
 {% endfor %}
