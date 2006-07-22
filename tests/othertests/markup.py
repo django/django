@@ -1,6 +1,7 @@
 # Quick tests for the markup templatetags (django.contrib.markup)
 
 from django.template import Template, Context, add_to_builtins
+import re
 
 add_to_builtins('django.contrib.markup.templatetags.markup')
 
@@ -47,7 +48,8 @@ markdown_content = """Paragraph 1
 t = Template("{{ markdown_content|markdown }}")
 rendered = t.render(Context(locals())).strip()
 if markdown:
-    assert rendered == """<p>Paragraph 1</p><h2>An h2</h2>"""
+    pattern = re.compile("""<p>Paragraph 1\s*</p>\s*<h2>\s*An h2</h2>""")
+    assert pattern.match(rendered)
 else:
     assert rendered == markdown_content
 
