@@ -1,10 +1,7 @@
-from django.utils.functional import curry
-from django.db import backend, connection
 from django.db.models.query import QuerySet
 from django.dispatch import dispatcher
 from django.db.models import signals
 from django.db.models.fields import FieldDoesNotExist
-from django.utils.datastructures import SortedDict
 
 # Size of each "chunk" for get_iterator calls.
 # Larger values are slightly faster at the expense of more storage space.

@@ -47,7 +47,7 @@ explained later in this document.::
     JavaScript and CSV. You can use the template language for any text-based
     format.
 
-    Oh, and one more thing: Making humans edit XML is masochistic!
+    Oh, and one more thing: Making humans edit XML is sadistic!
 
 Variables
 =========

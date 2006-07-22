@@ -51,7 +51,7 @@ class CommentManager(models.Manager):
         extra_kwargs.setdefault('select', {})
         extra_kwargs['select']['_karma_total_good'] = 'SELECT COUNT(*) FROM comments_karmascore, comments_comment WHERE comments_karmascore.comment_id=comments_comment.id AND score=1'
         extra_kwargs['select']['_karma_total_bad'] = 'SELECT COUNT(*) FROM comments_karmascore, comments_comment WHERE comments_karmascore.comment_id=comments_comment.id AND score=-1'
-	return self.filter(**kwargs).extra(**extra_kwargs)
+        return self.filter(**kwargs).extra(**extra_kwargs)
 
     def user_is_moderator(self, user):
         if user.is_superuser:

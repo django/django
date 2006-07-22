@@ -4,8 +4,7 @@ from django.core import validators
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.models.fields import AutoField, ImageField, FieldDoesNotExist
 from django.db.models.fields.related import OneToOneRel, ManyToOneRel
-from django.db.models.related import RelatedObject
-from django.db.models.query import orderlist2sql, delete_objects
+from django.db.models.query import delete_objects
 from django.db.models.options import Options, AdminOptions
 from django.db import connection, backend, transaction
 from django.db.models import signals

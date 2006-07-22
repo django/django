@@ -1,5 +1,3 @@
-from django.db import transaction
-from django.db.backends.oracle.base import quote_name
 import re
 
 foreign_key_re = re.compile(r"\sCONSTRAINT `[^`]*` FOREIGN KEY \(`([^`]*)`\) REFERENCES `([^`]*)` \(`([^`]*)`\)")

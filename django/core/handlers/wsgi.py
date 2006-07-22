@@ -54,17 +54,19 @@ class WSGIRequest(http.HttpRequest):
     def __init__(self, environ):
         self.environ = environ
         self.path = environ['PATH_INFO']
-        self.META = environ
+        self.META = environ 
         self.method = environ['REQUEST_METHOD'].upper()
 
     def __repr__(self):
-        from pprint import pformat
-        return '<DjangoRequest\nGET:%s,\nPOST:%s,\nCOOKIES:%s,\nMETA:%s>' % \
+        return '<WSGIRequest\nGET:%s,\nPOST:%s,\nCOOKIES:%s,\nMETA:%s>' % \
             (pformat(self.GET), pformat(self.POST), pformat(self.COOKIES),
             pformat(self.META))
 
     def get_full_path(self):
         return '%s%s' % (self.path, self.environ.get('QUERY_STRING', '') and ('?' + self.environ.get('QUERY_STRING', '')) or '')
+
+    def is_secure(self):
+        return self.environ.has_key('HTTPS') and self.environ['HTTPS'] == 'on'
 
     def _load_post_and_files(self):
         # Populates self._post and self._files

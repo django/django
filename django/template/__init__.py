@@ -708,9 +708,9 @@ class DebugNodeList(NodeList):
             if not hasattr(e, 'source'):
                 e.source = node.source
             raise
-        except Exception:
+        except Exception, e:
             from sys import exc_info
-            wrapped = TemplateSyntaxError('Caught an exception while rendering.')
+            wrapped = TemplateSyntaxError('Caught an exception while rendering: %s' % e)
             wrapped.source = node.source
             wrapped.exc_info = exc_info()
             raise wrapped
@@ -817,7 +817,7 @@ class Library(object):
             self.filters[name] = filter_func
             return filter_func
         else:
-            raise InvalidTemplateLibrary, "Unsupported arguments to Library.filter: (%r, %r, %r)", (name, compile_function, has_arg)
+            raise InvalidTemplateLibrary, "Unsupported arguments to Library.filter: (%r, %r)", (name, filter_func)
 
     def filter_function(self, func):
         self.filters[func.__name__] = func

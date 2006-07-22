@@ -118,8 +118,8 @@ additional class on the ``a`` for that tool. These are ``.addlink`` and
 Example from a changelist page::
 
     <ul class="object-tools">
-	  <li><a href="/stories/add/" class="addlink">Add redirect</a></li>
-	 </ul>
+      <li><a href="/stories/add/" class="addlink">Add redirect</a></li>
+    </ul>
 
 .. image:: http://media.djangoproject.com/img/doc/admincss/objecttools_01.gif
    :alt: Object tools on a changelist page

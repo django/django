@@ -1,4 +1,4 @@
-from django.db import backend, connection, transaction
+from django.db import backend, transaction
 from django.db.models import signals, get_model
 from django.db.models.fields import AutoField, Field, IntegerField, get_ul_class
 from django.db.models.related import RelatedObject
@@ -23,7 +23,7 @@ def add_lookup(rel_cls, field):
     name = field.rel.to
     module = rel_cls.__module__
     key = (module, name)
-    # Has the model already been loaded? 
+    # Has the model already been loaded?
     # If so, resolve the string reference right away
     model = get_model(rel_cls._meta.app_label,field.rel.to)
     if model:
@@ -46,7 +46,7 @@ def manipulator_valid_rel_key(f, self, field_data, all_data):
     "Validates that the value is a valid foreign key"
     klass = f.rel.to
     try:
-        klass._default_manager.get(pk=field_data)
+        klass._default_manager.get(**{f.rel.field_name: field_data})
     except klass.DoesNotExist:
         raise validators.ValidationError, _("Please enter a valid %s.") % f.verbose_name
 
@@ -79,11 +79,11 @@ class RelatedField(object):
         self.contribute_to_related_class(other, related)
 
     def get_db_prep_lookup(self, lookup_type, value):
-        # If we are doing a lookup on a Related Field, we must be 
-        # comparing object instances. The value should be the PK of value, 
+        # If we are doing a lookup on a Related Field, we must be
+        # comparing object instances. The value should be the PK of value,
         # not value itself.
         def pk_trace(value):
-            # Value may be a primary key, or an object held in a relation. 
+            # Value may be a primary key, or an object held in a relation.
             # If it is an object, then we need to get the primary key value for
             # that object. In certain conditions (especially one-to-one relations),
             # the primary key may itself be an object - so we need to keep drilling
@@ -94,8 +94,8 @@ class RelatedField(object):
                     v = getattr(v, v._meta.pk.name)
             except AttributeError:
                 pass
-            return v 
-            
+            return v
+
         if lookup_type == 'exact':
             return [pk_trace(value)]
         if lookup_type == 'in':
@@ -103,7 +103,7 @@ class RelatedField(object):
         elif lookup_type == 'isnull':
             return []
         raise TypeError, "Related Field has invalid lookup: %s" % lookup_type
-            
+
     def _get_related_query_name(self, opts):
         # This method defines the name that can be used to identify this related object
         # in a table-spanning query. It uses the lower-cased object_name by default,

@@ -535,6 +535,14 @@ If you're sure your username and password are correct, make sure your user
 account has ``is_active`` and ``is_staff`` set to True. The admin site only
 allows access to users with those two fields both set to True.
 
+How can I prevent the cache middleware from caching the admin site?
+-------------------------------------------------------------------
+
+Set the ``CACHE_MIDDLEWARE_ANONYMOUS_ONLY`` setting to ``True``. See the
+`cache documentation`_ for more information.
+
+.. _cache documentation: ../cache/#the-per-site-cache
+
 How do I automatically set a field's value to the user who last edited the object in the admin?
 -----------------------------------------------------------------------------------------------
 

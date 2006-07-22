@@ -1225,6 +1225,24 @@ A few special cases to note about ``list_display``:
                   return self.birthday.strftime('%Y')[:3] + "0's"
               decade_born_in.short_description = 'Birth decade'
 
+    * If the string given is a method of the model, Django will HTML-escape the
+      output by default. If you'd rather not escape the output of the method,
+      give the method an ``allow_tags`` attribute whose value is ``True``.
+
+      Here's a full example model::
+
+          class Person(models.Model):
+              first_name = models.CharField(maxlength=50)
+              last_name = models.CharField(maxlength=50)
+              color_code = models.CharField(maxlength=6)
+
+              class Admin:
+                  list_display = ('first_name', 'last_name', 'colored_name')
+
+              def colored_name(self):
+                  return '<span style="color: #%s;">%s %s</span>' % (self.color_code, self.first_name, self.last_name)
+              colored_name.allow_tags = True
+
 ``list_display_links``
 ----------------------
 

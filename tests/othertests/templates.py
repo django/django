@@ -1,5 +1,9 @@
 from django.conf import settings
 
+if __name__ == '__main__':
+    # When running this file in isolation, we need to set up the configuration
+    # before importing 'template'.
+    settings.configure()
 
 from django import template
 from django.template import loader
@@ -538,10 +542,10 @@ TEMPLATE_TESTS = {
 
     ### TIMESINCE TAG ##################################################
     # Default compare with datetime.now()
-    'timesince01' : ('{{ a|timesince }}', {'a':datetime.now() + timedelta(minutes=-1)}, '1 minute'),
-    'timesince02' : ('{{ a|timesince }}', {'a':(datetime.now() - timedelta(days=1))}, '1 day'),
+    'timesince01' : ('{{ a|timesince }}', {'a':datetime.now() + timedelta(minutes=-1, seconds = -10)}, '1 minute'),
+    'timesince02' : ('{{ a|timesince }}', {'a':(datetime.now() - timedelta(days=1, minutes = 1))}, '1 day'),
     'timesince03' : ('{{ a|timesince }}', {'a':(datetime.now() -
-        timedelta(hours=1, minutes=25))}, '1 hour, 25 minutes'),
+        timedelta(hours=1, minutes=25, seconds = 10))}, '1 hour, 25 minutes'),
 
     # Compare to a given parameter
     'timesince04' : ('{{ a|timesince:b }}', {'a':NOW + timedelta(days=2), 'b':NOW + timedelta(days=1)}, '1 day'),
@@ -552,9 +556,9 @@ TEMPLATE_TESTS = {
 
     ### TIMEUNTIL TAG ##################################################
     # Default compare with datetime.now()
-    'timeuntil01' : ('{{ a|timeuntil }}', {'a':datetime.now() + timedelta(minutes=2)}, '2 minutes'),
-    'timeuntil02' : ('{{ a|timeuntil }}', {'a':(datetime.now() + timedelta(days=1))}, '1 day'),
-    'timeuntil03' : ('{{ a|timeuntil }}', {'a':(datetime.now() + timedelta(hours=8, minutes=10))}, '8 hours, 10 minutes'),
+    'timeuntil01' : ('{{ a|timeuntil }}', {'a':datetime.now() + timedelta(minutes=2, seconds = 10)}, '2 minutes'),
+    'timeuntil02' : ('{{ a|timeuntil }}', {'a':(datetime.now() + timedelta(days=1, seconds = 10))}, '1 day'),
+    'timeuntil03' : ('{{ a|timeuntil }}', {'a':(datetime.now() + timedelta(hours=8, minutes=10, seconds = 10))}, '8 hours, 10 minutes'),
 
     # Compare to a given parameter
     'timeuntil04' : ('{{ a|timeuntil:b }}', {'a':NOW - timedelta(days=1), 'b':NOW - timedelta(days=2)}, '1 day'),
@@ -621,5 +625,4 @@ def run_tests(verbosity=0, standalone=False):
         raise Exception, msg
 
 if __name__ == "__main__":
-    settings.configure()
     run_tests(1, True)

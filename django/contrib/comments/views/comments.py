@@ -5,7 +5,7 @@ from django.http import Http404
 from django.core.exceptions import ObjectDoesNotExist
 from django.shortcuts import render_to_response
 from django.template import RequestContext
-from django.contrib.comments.models import Comment, FreeComment, PHOTOS_REQUIRED, PHOTOS_OPTIONAL, RATINGS_REQUIRED, RATINGS_OPTIONAL, IS_PUBLIC
+from django.contrib.comments.models import Comment, FreeComment, RATINGS_REQUIRED, RATINGS_OPTIONAL, IS_PUBLIC
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.auth.forms import AuthenticationForm
 from django.http import HttpResponseRedirect
@@ -63,7 +63,7 @@ class PublicCommentManipulator(AuthenticationForm):
                 validator_list=get_validator_list(8),
             ),
         ])
-        if not user.is_anonymous():
+        if user.is_authenticated():
             self["username"].is_required = False
             self["username"].validator_list = []
             self["password"].is_required = False
