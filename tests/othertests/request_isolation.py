@@ -1,7 +1,7 @@
 # tests that db settings can change between requests
 import copy
 import os
-from django.conf import settings
+from django.conf import settings, UserSettingsHolder
 from django.core.handlers.wsgi import WSGIHandler
 from django.db import models, model_connection_name, _default, connection
 from django.http import HttpResponse
@@ -91,19 +91,15 @@ def debug(*arg):
 
 def setup():
     debug("setup")
-    S['ODB'] = copy.deepcopy(settings.OTHER_DATABASES)
-    for sk in [ k for k in dir(settings) if k.startswith('DATABASE') ]:
-        S[sk] = getattr(settings, sk)
-    
+    S['settings'] = settings._target
+    settings._target = UserSettingsHolder(copy.deepcopy(settings._target))
     settings.OTHER_DATABASES['django_test_db_a']['MODELS'] = ['ri.MX']
     settings.OTHER_DATABASES['django_test_db_b']['MODELS'] = ['ri.MY']
 
 
 def teardown():
     debug("teardown")
-    settings.OTHER_DATABASES = S['ODB']
-    for sk in [ k for k in S.keys() if k.startswith('DATABASE') ]:
-        setattr(settings, sk, S[sk])
+    settings._target = S['settings']
 
 
 def start_response(code, headers):

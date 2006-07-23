@@ -20,7 +20,7 @@ import sys
 import threading
 from thread import get_ident
 
-from django import conf
+from django.conf import settings, UserSettingsHolder
 from django.core.handlers.wsgi import WSGIHandler
 from django.db import models, model_connection_name, _default, connection, \
      connections
@@ -86,7 +86,7 @@ def test_two(path, request):
     """Between the first and second requests, settings change to assign
     model MY to a different connection
     """
-    from django.conf import settings
+    # from django.conf import settings
     debug("test_two: %s", settings.OTHER_DATABASES)
 
     try:
@@ -112,7 +112,7 @@ def test_three(path, request):
     """Between the 2nd and 3rd requests, the settings at the names in
     OTHER_DATABASES have changed.
     """
-    from django.conf import settings
+    # from django.conf import settings
     debug("3 %s: %s", get_ident(), settings.OTHER_DATABASES)
     debug("3 %s: default: %s", get_ident(), settings.DATABASE_NAME)
     debug("3 %s: conn: %s", get_ident(), connection.settings.DATABASE_NAME)
@@ -146,12 +146,10 @@ def test_three(path, request):
 # helpers
 def thread_two(func, *arg):
     def start():
-        from django.conf import settings
-        for attr in [ a for a in dir(S['base_settings']) if a == a.upper() ]:
-            setattr(settings, attr,
-                    copy.deepcopy(getattr(S['base_settings'], attr)))
-        
+        # from django.conf import settings
         settings.OTHER_DATABASES['django_test_db_b']['MODELS'] = []
+
+        debug("t2 ODB: %s", settings.OTHER_DATABASES)
         debug("t2 waiting")
         ev.wait(2.0)
         func(*arg)
@@ -163,11 +161,7 @@ def thread_two(func, *arg):
 
 def thread_three(func, *arg):
     def start():
-        from django.conf import settings
-        for attr in [ a for a in dir(S['base_settings']) if a == a.upper() ]:
-            setattr(settings, attr,
-                    copy.deepcopy(getattr(S['base_settings'], attr)))
-            
+        # from django.conf import settings            
         settings.OTHER_DATABASES['django_test_db_b']['MODELS'] = ['ti.MY']
         settings.OTHER_DATABASES['django_test_db_b'], \
             settings.OTHER_DATABASES['django_test_db_a'] = \
@@ -177,9 +171,7 @@ def thread_three(func, *arg):
         settings.DATABASE_NAME = \
             settings.OTHER_DATABASES['django_test_db_a']['DATABASE_NAME']
 
-        # we just manually changed settings, so reset the default
-        # connection (normally this isn't needed
-
+        debug("t3 ODB: %s", settings.OTHER_DATABASES)
         debug("3 %s: start: default: %s", get_ident(), settings.DATABASE_NAME)
         debug("3 %s: start: conn: %s", get_ident(),
               connection.settings.DATABASE_NAME)
@@ -192,7 +184,33 @@ def thread_three(func, *arg):
     t3.start()
     return t3
     
+# helpers
+class LocalSettings:
+    """Settings holder that allows thread-local overrides of defaults.
+    """
+    def __init__(self, defaults):
+        self._defaults = defaults
+        self._local = local()
 
+    def __getattr__(self, attr):
+        if attr in ('_defaults', '_local'):
+            return self.__dict__[attr]
+        _local = self.__dict__['_local']
+        _defaults = self.__dict__['_defaults']
+        debug("LS get %s (%s)", attr, hasattr(_local, attr))
+        if not hasattr(_local, attr):
+            # Make sure everything we return is the local version; this
+            # avoids sets to deep datastructures overwriting the defaults
+            setattr(_local, attr, copy.deepcopy(getattr(_defaults, attr)))
+        return getattr(_local, attr)
+
+    def __setattr__(self, attr, val):
+        if attr in ('_defaults', '_local'):
+            self.__dict__[attr] = val
+        else:
+            debug("LS set local %s = %s", attr, val)
+            setattr(self.__dict__['_local'], attr, val)
+        
 class MockHandler(WSGIHandler):
 
     def __init__(self, test):
@@ -218,25 +236,20 @@ def debug(*arg):
 
 def setup():
     debug("setup")
-    S['settings'] = copy.deepcopy(conf.settings)
-    S['base_settings'] = copy.deepcopy(conf.settings)
-    S['base_settings'].OTHER_DATABASES['django_test_db_a']['MODELS'] = \
-        ['ti.MX']
-    S['base_settings'].OTHER_DATABASES['django_test_db_b']['MODELS'] = \
-        ['ti.MY']
+    S['settings'] = settings._target
+    settings._target = UserSettingsHolder(copy.deepcopy(settings._target))    
+    settings.OTHER_DATABASES['django_test_db_a']['MODELS'] =  ['ti.MX']
+    settings.OTHER_DATABASES['django_test_db_b']['MODELS'] = ['ti.MY']
+
+    # normal settings holders aren't thread-safe, so we need to substitute
+    # one that is (and so allows per-thread settings)
+    holder = settings._target
+    settings._target = LocalSettings(holder)
     
-    conf.settings = local()
-    for attr in [ a for a in dir(S['base_settings']) if a == a.upper() ]:
-        setattr(conf.settings, attr,
-                copy.deepcopy(getattr(S['base_settings'], attr)))
-
-    conf.settings.__module__ = S['settings'].__module__
-    debug("Setup: %s", conf.settings.OTHER_DATABASES)
-
     
 def teardown():
     debug("teardown")
-    conf.settings = S['settings']
+    settings._target = S['settings']
 
 
 def start_response(code, headers):
