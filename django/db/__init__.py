@@ -1,4 +1,4 @@
-from django import conf
+from django.conf import settings, UserSettingsHolder
 from django.core import signals
 from django.core.exceptions import ImproperlyConfigured
 from django.dispatch import dispatcher
@@ -19,8 +19,8 @@ _default = object()
 _local = local()
 
 
-if not conf.settings.DATABASE_ENGINE:
-    conf.settings.DATABASE_ENGINE = 'dummy'
+if not settings.DATABASE_ENGINE:
+    settings.DATABASE_ENGINE = 'dummy'
 
 
 def connect(settings):
@@ -49,7 +49,7 @@ class ConnectionInfo(object):
     """
     def __init__(self, settings=None):
         if settings is None:
-            settings = conf.settings
+            from django.conf import settings
         self.settings = settings
         self.backend = self.load_backend()
         self.connection = self.backend.DatabaseWrapper(settings)
@@ -144,7 +144,6 @@ class LazyConnectionManager(object):
         connection (a singleton defined in django.db), then the default
         connection is returned.        
         """
-        settings = conf.settings
         try:
             cnx = self.local.connections
         except AttributeError:
@@ -153,7 +152,7 @@ class LazyConnectionManager(object):
         if name in cnx:
             cnx[name].close()
         if name is _default:
-            cnx[name] = connect(conf.settings)
+            cnx[name] = connect(settings)
             return cnx[name]
         try:
             info = settings.OTHER_DATABASES[name]
@@ -167,7 +166,7 @@ class LazyConnectionManager(object):
         # In settings it's a dict, but connect() needs an object:
         # pass global settings so that the default connection settings
         # can be defaults for the named connections.
-        database = conf.UserSettingsHolder(settings)
+        database = UserSettingsHolder(settings)
         for k, v in info.items():
             setattr(database, k, v)
         cnx[name] = connect(database)
@@ -181,7 +180,6 @@ def model_connection_name(klass):
     """Get the connection name that a model is configured to use, with the
     current settings.
     """
-    settings = conf.settings
     app = klass._meta.app_label
     model = klass.__name__
     app_model = "%s.%s" % (app, model)
