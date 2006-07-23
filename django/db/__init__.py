@@ -269,7 +269,6 @@ class LocalizingProxy:
     attach module-level properties to local storage.
     """
     def __init__(self, name, storage, func, *arg, **kw):
-        print name, storage, func, arg
         self.__name = name
         self.__storage = storage
         self.__func = func
