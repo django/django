@@ -92,11 +92,11 @@ def get_sql_create(app):
     final_output = []
     
     app_models = models.get_models(app, creation_order=True)
-    for klass in app_models:
-        opts = klass._meta
-        connection_name = model_connection_name(klass)
+    for model in app_models:
+        opts = model._meta
+        connection_name = model_connection_name(model)
         output = connection_output.setdefault(connection_name, [])
-        db = klass._default_manager.db
+        db = model._default_manager.db
         creation = db.get_creation_module()
         data_types = creation.DATA_TYPES
         if not data_types:
@@ -110,25 +110,25 @@ def get_sql_create(app):
             sys.exit(1)
 
         # Get installed models, so we generate REFERENCES right
-        manager = klass._default_manager
+        manager = model._default_manager
         tables = manager.get_table_list()
         installed_models = manager.get_installed_models(tables)
         models_output = set(installed_models) 
         builder = creation.builder
         builder.models_already_seen.update(models_output)
-        model_output, references = builder.get_create_table(klass, style)
+        model_output, references = builder.get_create_table(model, style)
         output.extend(model_output)
         for refto, refs in references.items():
             try:
                 pending_references[refto].extend(refs)
             except KeyError:
                 pending_references[refto] = refs
-        if klass in pending_references:
-            output.extend(pending_references.pop(klass))
+        if model in pending_references:
+            output.extend(pending_references.pop(model))
 
         # Create the many-to-many join tables.
-        many_many = builder.get_create_many_to_many(klass, style)
-        for refklass, statements in many_many.items():
+        many_many = builder.get_create_many_to_many(model, style)
+        for refmodel, statements in many_many.items():
             output.extend(statements)
 
     final_output = _collate(connection_output)
@@ -137,9 +137,9 @@ def get_sql_create(app):
     not_installed_models = set(pending_references.keys())
     if not_installed_models:
         final_output.append('-- The following references should be added but depend on non-existant tables:')
-        for klass in not_installed_models:
+        for model in not_installed_models:
             final_output.extend(['-- ' + sql
-                                 for sql in pending_references.pop(klass)])
+                                 for sql in pending_references.pop(model)])
 
     # convert BoundStatements into strings
     final_output = map(str, final_output)
@@ -155,18 +155,18 @@ def get_sql_delete(app):
     connection_output = {}
     final_output = []
     app_models = models.get_models(app, creation_order=True)
-    for klass in app_models:
-        db = klass._default_manager.db
+    for model in app_models:
+        db = model._default_manager.db
         connection = db.connection
         try:
             cursor = connection.cursor()
         except:
             cursor = None
         builder = db.get_creation_module().builder
-        connection_name = model_connection_name(klass)
+        connection_name = model_connection_name(model)
         output = connection_output.setdefault(connection_name, [])
         output.extend(map(str,
-                          builder.get_drop_table(klass,
+                          builder.get_drop_table(model,
                                                  cascade=True, style=style)))
         if cursor:
             # Close database connection explicitly, in case this
@@ -193,12 +193,12 @@ def get_sql_initial_data(app):
     connection_output = {}
 
     app_models = get_models(app)
-    for klass in app_models:
-        opts = klass._meta
-        connection_name = model_connection_name(klass)
+    for model in app_models:
+        opts = model._meta
+        connection_name = model_connection_name(model)
         output = connection_output.setdefault(connection_name, [])
-        builder = klass._default_manager.db.get_creation_module().builder
-        output.extend(builder.get_initialdata(klass))
+        builder = model._default_manager.db.get_creation_module().builder
+        output.extend(builder.get_initialdata(model))
 
     return _collate(connection_output)
 get_sql_initial_data.help_doc = "Prints the initial INSERT SQL statements for the given app name(s)."
@@ -208,18 +208,18 @@ def get_sql_sequence_reset(app):
     "Returns a list of the SQL statements to reset PostgreSQL sequences for the given app."
     from django.db import backend, models
     output = []
-    for klass in models.get_models(app):
-        for f in klass._meta.fields:
+    for model in models.get_models(app):
+        for f in model._meta.fields:
             if isinstance(f, models.AutoField):
                 output.append("%s setval('%s', (%s max(%s) %s %s));" % \
                     (style.SQL_KEYWORD('SELECT'),
-                    style.SQL_FIELD('%s_%s_seq' % (klass._meta.db_table, f.column)),
+                    style.SQL_FIELD('%s_%s_seq' % (model._meta.db_table, f.column)),
                     style.SQL_KEYWORD('SELECT'),
                     style.SQL_FIELD(backend.quote_name(f.column)),
                     style.SQL_KEYWORD('FROM'),
-                    style.SQL_TABLE(backend.quote_name(klass._meta.db_table))))
+                    style.SQL_TABLE(backend.quote_name(model._meta.db_table))))
                 break # Only one AutoField is allowed per model, so don't bother continuing.
-        for f in klass._meta.many_to_many:
+        for f in model._meta.many_to_many:
             output.append("%s setval('%s', (%s max(%s) %s %s));" % \
                 (style.SQL_KEYWORD('SELECT'),
                 style.SQL_FIELD('%s_id_seq' % f.m2m_db_table()),
@@ -237,12 +237,12 @@ def get_sql_indexes(app):
     from django.db.models import get_models
     connection_output = {}
 
-    for klass in get_models(app):
-        opts = klass._meta
-        connection_name = model_connection_name(klass)
+    for model in get_models(app):
+        opts = model._meta
+        connection_name = model_connection_name(model)
         output = connection_output.setdefault(connection_name, [])
-        builder = klass._default_manager.db.get_creation_module().builder
-        output.extend(map(str, builder.get_create_indexes(klass, style)))
+        builder = model._default_manager.db.get_creation_module().builder
+        output.extend(map(str, builder.get_create_indexes(model, style)))
     return _collate(connection_output)
 
 get_sql_indexes.help_doc = "Prints the CREATE INDEX SQL statements for the given model module name(s)."
@@ -374,14 +374,14 @@ def get_admin_index(app):
     app_label = app_models[0]._meta.app_label
     output.append('{%% if perms.%s %%}' % app_label)
     output.append('<div class="module"><h2>%s</h2><table>' % app_label.title())
-    for klass in app_models:
-        if klass._meta.admin:
+    for model in app_models:
+        if model._meta.admin:
             output.append(MODULE_TEMPLATE % {
                 'app': app_label,
-                'mod': klass._meta.module_name,
-                'name': capfirst(klass._meta.verbose_name_plural),
-                'addperm': klass._meta.get_add_permission(),
-                'changeperm': klass._meta.get_change_permission(),
+                'mod': model._meta.module_name,
+                'name': capfirst(model._meta.verbose_name_plural),
+                'addperm': model._meta.get_add_permission(),
+                'changeperm': model._meta.get_change_permission(),
             })
     output.append('</table></div>')
     output.append('{% endif %}')
@@ -432,23 +432,23 @@ def install(app):
         pending = {}
         for model in models.get_models(app, creation_order=True):
             new_pending = model._default_manager.install(initial_data=True)
-            for klass, statements in new_pending.items():
-                pending.setdefault(klass, []).extend(statements)
+            for model, statements in new_pending.items():
+                pending.setdefault(model, []).extend(statements)
             # execute any pending statements that were waiting for this model
             if model in pending:
                 for statement in pending.pop(model):
                     statement.execute()                
         if pending:            
-            for klass, statements in pending.items():
-                tables = klass._default_manager.get_table_list()
-                models_installed = klass._default_manager.get_installed_models(tables)
-                if klass in models_installed:
+            for model, statements in pending.items():
+                tables = model._default_manager.get_table_list()
+                models_installed = model._default_manager.get_installed_models(tables)
+                if model in models_installed:
                     for statement in statements:
                         statement.execute()
                 else:
                     raise Exception("%s is not installed, but there are "
                                     "pending statements that need it: %s"
-                                    % (klass, statements))
+                                    % (model, statements))
     except Exception, e:
         sys.stderr.write(style.ERROR("""Error: %s couldn't be installed. Possible reasons:
   * The database isn't running or isn't configured correctly.
@@ -465,7 +465,6 @@ install.args = APP_ARGS
 def reset(app):
     "Executes the equivalent of 'get_sql_reset' in the current database."
     from django.db import connection, transaction
-    from cStringIO import StringIO
     app_name = app.__name__.split('.')[-2]
 
     disable_termcolors()
@@ -565,7 +564,6 @@ startapp.args = "[appname]"
 def inspectdb():
     "Generator that introspects the tables in the given database name and returns a Django model, one line at a time."
     from django.db import connection, get_introspection_module
-    from django.conf import settings
     import keyword
 
     introspection_module = get_introspection_module()

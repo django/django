@@ -3,7 +3,6 @@
 import re
 from email.Parser import HeaderParser
 from email.Errors import HeaderParseError
-from urlparse import urljoin
 try:
     import docutils.core
     import docutils.nodes

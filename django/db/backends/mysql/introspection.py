@@ -1,4 +1,3 @@
-from django.db import transaction
 from django.db.backends.mysql.base import quote_name
 from MySQLdb import ProgrammingError, OperationalError
 from MySQLdb.constants import FIELD_TYPE

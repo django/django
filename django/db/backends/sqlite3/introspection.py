@@ -1,4 +1,3 @@
-from django.db import transaction
 from django.db.backends.sqlite3.base import quote_name
 
 def get_table_list(cursor):

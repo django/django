@@ -1,8 +1,7 @@
-from django.template import Node, NodeList, Template, Context, resolve_variable
+from django.template import Node, resolve_variable
 from django.template import TemplateSyntaxError, TokenParser, Library
-from django.template import TOKEN_BLOCK, TOKEN_TEXT, TOKEN_VAR
+from django.template import TOKEN_TEXT, TOKEN_VAR
 from django.utils import translation
-import re, sys
 
 register = Library()
 
@@ -228,7 +227,7 @@ def do_block_translate(parser, token):
             break
     if countervar and counter:
         if token.contents.strip() != 'plural':
-            raise TemplateSyntaxError, "'blocktrans' doesn't allow other block tags inside it" % tag
+            raise TemplateSyntaxError, "'blocktrans' doesn't allow other block tags inside it"
         while parser.tokens:
             token = parser.next_token()
             if token.token_type in (TOKEN_VAR, TOKEN_TEXT):

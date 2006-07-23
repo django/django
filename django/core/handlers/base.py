@@ -119,7 +119,6 @@ class BaseHandler(object):
         Returns an HttpResponse that displays a PUBLIC error message for a
         fundamental error.
         """
-        from django.core import urlresolvers
         callback, param_dict = resolver.resolve500()
         return callback(request, **param_dict)
 

@@ -7,7 +7,6 @@ a list of all possible variables.
 """
 
 import os
-import sys
 from django.conf import global_settings
 
 ENVIRONMENT_VARIABLE = "DJANGO_SETTINGS_MODULE"

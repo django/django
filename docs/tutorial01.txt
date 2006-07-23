@@ -346,6 +346,8 @@ Note the following:
       the SQL to the database.
 
 If you're interested, also run the following commands:
+    * ``python manage.py validate polls`` -- Checks for any errors in the
+      construction of your models.
 
     * ``python manage.py sqlinitialdata polls`` -- Outputs any initial data
       required for Django's admin framework and your models.

@@ -79,7 +79,7 @@ def Deserializer(object_list, **options):
             elif field.rel and isinstance(field.rel, models.ManyToOneRel):
                 try:
                     data[field.name] = field.rel.to._default_manager.get(pk=field_value)
-                except RelatedModel.DoesNotExist:
+                except field.rel.to.DoesNotExist:
                     data[field.name] = None
                     
             # Handle all other fields

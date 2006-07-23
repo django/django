@@ -1,12 +1,8 @@
-from django import core
-from django.utils.functional import curry
-from django.core.exceptions import ImproperlyConfigured
 from django.db import ConnectionInfoDescriptor
 from django.db.models.query import QuerySet
 from django.dispatch import dispatcher
 from django.db.models import signals, get_apps, get_models
 from django.db.models.fields import FieldDoesNotExist
-from django.utils.datastructures import SortedDict
 
 try:
     # Only exists in Python 2.4+

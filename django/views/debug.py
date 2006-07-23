@@ -3,8 +3,6 @@ from django.template import Template, Context, TemplateDoesNotExist
 from django.utils.html import escape
 from django.http import HttpResponseServerError, HttpResponseNotFound
 import os, re
-from itertools import count, izip
-from os.path import dirname, join as pathjoin
 
 HIDDEN_SETTINGS = re.compile('SECRET|PASSWORD')
 
@@ -124,7 +122,7 @@ def technical_500_response(request, exc_type, exc_value, tb):
         'frames': frames,
         'lastframe': frames[-1],
         'request': request,
-        'request_protocol': os.environ.get("HTTPS") == "on" and "https" or "http",
+        'request_protocol': request.is_secure() and "https" or "http",
         'settings': get_safe_settings(),
         'template_info': template_info,
         'template_does_not_exist': template_does_not_exist,
@@ -149,7 +147,7 @@ def technical_404_response(request, exception):
         'urlpatterns': tried,
         'reason': str(exception),
         'request': request,
-        'request_protocol': os.environ.get("HTTPS") == "on" and "https" or "http",
+        'request_protocol': request.is_secure() and "https" or "http",
         'settings': get_safe_settings(),
     })
     return HttpResponseNotFound(t.render(c), mimetype='text/html')

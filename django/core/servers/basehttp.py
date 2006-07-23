@@ -8,7 +8,7 @@ been reviewed for security issues. Don't use it for production use.
 """
 
 from BaseHTTPServer import BaseHTTPRequestHandler, HTTPServer
-from types import ListType, StringType, TupleType
+from types import ListType, StringType
 import os, re, sys, time, urllib
 
 __version__ = "0.1"

@@ -1,5 +1,4 @@
 from django.template import loader
-from django.core.exceptions import ImproperlyConfigured
 from django.http import Http404, HttpResponse, HttpResponseRedirect, HttpResponseNotModified
 from django.template import Template, Context, TemplateDoesNotExist
 import mimetypes

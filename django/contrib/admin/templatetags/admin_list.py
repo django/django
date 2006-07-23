@@ -1,8 +1,6 @@
-from django import template
 from django.conf import settings
-from django.contrib.admin.views.main import MAX_SHOW_ALL_ALLOWED, ALL_VAR
+from django.contrib.admin.views.main import ALL_VAR, EMPTY_CHANGELIST_VALUE
 from django.contrib.admin.views.main import ORDER_VAR, ORDER_TYPE_VAR, PAGE_VAR, SEARCH_VAR
-from django.contrib.admin.views.main import IS_POPUP_VAR, EMPTY_CHANGELIST_VALUE
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import models
 from django.utils import dateformat
@@ -119,7 +117,7 @@ def items_for_result(cl, result):
                 if callable(attr):
                     attr = attr()
                 result_repr = str(attr)
-            except AttributeError, ObjectDoesNotExist:
+            except (AttributeError, ObjectDoesNotExist):
                 result_repr = EMPTY_CHANGELIST_VALUE
             else:
                 # Strip HTML tags in the resulting text, except if the

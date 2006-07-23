@@ -1,4 +1,3 @@
-from copy import copy
 from math import ceil
 
 class InvalidPage(Exception):

@@ -4,7 +4,7 @@ from django.conf import settings
 from django.core import validators
 from django import forms
 from django.core.exceptions import ObjectDoesNotExist
-from django.utils.functional import curry, lazy
+from django.utils.functional import curry
 from django.utils.text import capfirst
 from django.utils.translation import gettext, gettext_lazy
 import datetime, os, time
@@ -364,8 +364,8 @@ class BooleanField(Field):
 
     def to_python(self, value):
         if value in (True, False): return value
-        if value is 't': return True
-        if value is 'f': return False
+        if value in ('t', 'True'): return True
+        if value in ('f', 'False'): return False
         raise validators.ValidationError, gettext("This value must be either True or False.")
 
     def get_manipulator_field_objs(self):

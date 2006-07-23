@@ -16,7 +16,7 @@ th { text-align: right; }
 
 
 /* layout styles */
-#user-tools	{ right:auto; left:0; text-align:left; }
+#user-tools { right:auto; left:0; text-align:left; }
 div.breadcrumbs { text-align:right; }
 #content-main { float:right;}
 #content-related { float:left; margin-left:-19em; margin-right:auto;}
