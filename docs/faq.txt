@@ -156,7 +156,7 @@ logical to us.
 -----------------------------------------------------
 
 We're well aware that there are other awesome Web frameworks out there, and
-we're not adverse to borrowing ideas where appropriate. However, Django was
+we're not averse to borrowing ideas where appropriate. However, Django was
 developed precisely because we were unhappy with the status quo, so please be
 aware that "because <Framework X>" does it is not going to be sufficient reason
 to add a given feature to Django.
