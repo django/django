@@ -13,7 +13,7 @@ get_verbose_name = lambda class_name: re.sub('(((?<=[a-z])[A-Z])|([A-Z](?![A-Z]|
 
 DEFAULT_NAMES = ('verbose_name', 'db_table', 'ordering',
                  'unique_together', 'permissions', 'get_latest_by',
-                 'order_with_respect_to', 'app_label')
+                 'order_with_respect_to', 'app_label', 'row_level_permissions')
 
 class Options(object):
     def __init__(self, meta):
@@ -33,6 +33,7 @@ class Options(object):
         self.has_auto_field = False
         self.one_to_one_field = None
         self.parents = []
+        self.row_level_permissions = False
 
     def contribute_to_class(self, cls, name):
         cls._meta = self

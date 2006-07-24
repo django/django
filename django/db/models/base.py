@@ -62,6 +62,11 @@ class ModelBase(type):
                 except FieldDoesNotExist:
                     field.contribute_to_class(new_class, field.name)
 
+        if getattr(new_class._meta, 'row_level_permissions', None):
+            from django.contrib.auth.models import RowLevelPermission
+            gen_rel = django.db.models.GenericRelation(RowLevelPermission, object_id_field="type_id", content_type_field="type_ct")
+            new_class.add_to_class("row_level_permissions", gen_rel)
+
         new_class._prepare()
 
         register_models(new_class._meta.app_label, new_class)
