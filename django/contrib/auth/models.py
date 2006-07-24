@@ -46,6 +46,60 @@ class Permission(models.Model):
     def __str__(self):
         return "%s | %s" % (self.content_type, self.name)
 
+class RowLevelPermissionManager(models.Manager):
+    def create_row_level_permission(self, object_instance, owner, permission, negative=False):
+        if isinstance(permission, str):
+            permission = Permission.objects.get(codename__exact=permission)
+        type_ct=ContentType.objects.get_for_model(object_instance)
+        if type_ct != permission.content_type:
+            raise TypeError, "Invalid value: Permission content type(%s) and object content type(%s) do not match" % (permission.content_type, type_ct)
+        
+        rowLvlPerm = self.model(type_id=object_instance.id, type_ct=ContentType.objects.get_for_model(object_instance),
+                                                 owner_id=owner.id, owner_ct=ContentType.objects.get_for_model(owner),
+                                                 permission=permission, negative=negative)
+        rowLvlPerm.save()
+        return rowLvlPerm
+    
+    def create_default_row_permissions(self, type, owner, change=True, delete=True, negChange=False, negDel=False):
+        ret_dict = {}
+        if change:
+            change_str = "change_%s" % (ContentType.objects.get_for_model(type))
+            ret_dict[change_str]=self.create_row_level_permission(type, owner, change_str, negative=negChange)
+        if delete:
+            delete_str = "delete_%s" % (ContentType.objects.get_for_model(type))
+            ret_dict[delete_str]=self.create_row_level_permission(type, owner, delete_str, negative=negDel)
+        return ret_dict    
+
+class RowLevelPermission(models.Model):
+    """ Similiar to permissions but works on instances of objects instead of types.
+    This uses generic relations to minimize the number of tables, and connects to the 
+    permissions table using a many to one relation.
+    """
+    type_id = models.PositiveIntegerField("'Type' ID")
+    type_ct = models.ForeignKey(ContentType, verbose_name="'Type' content type", related_name="type_ct")
+    owner_id = models.PositiveIntegerField("'Owner' ID")
+    owner_ct = models.ForeignKey(ContentType, verbose_name="'Owner' content type", related_name="owner_ct")
+    negative = models.BooleanField()
+    permission = models.ForeignKey(Permission)
+    
+    type = models.GenericForeignKey(fk_field='type_id', ct_field='type_ct')
+    owner = models.GenericForeignKey(fk_field='owner_id', ct_field='owner_ct')
+    
+    objects = RowLevelPermissionManager()
+    
+    class Meta:
+        verbose_name = _('row level permission')
+        verbose_name_plural = _('row level permissions')
+        unique_together = (('type_ct', 'type_id', 'owner_id', 'owner_ct', 'permission'),)        
+        
+
+    def __str__(self):
+        return "%s | %s:%s | %s:%s" % (self.permission, self.owner_ct, self.owner, self.type_ct, self.type)
+    
+    def __repr__(self):
+        return "%s | %s:%s | %s:%s" % (self.permission, self.owner_ct, self.owner, self.type_ct, self.type)
+
+
 class Group(models.Model):
     """Groups are a generic way of categorizing users to apply permissions, or some other label, to those users. A user can belong to any number of groups.
 
@@ -99,11 +153,15 @@ class User(models.Model):
     groups = models.ManyToManyField(Group, verbose_name=_('groups'), blank=True,
         help_text=_("In addition to the permissions manually assigned, this user will also get all permissions granted to each group he/she is in."))
     user_permissions = models.ManyToManyField(Permission, verbose_name=_('user permissions'), blank=True, filter_interface=models.HORIZONTAL)
+    
+    row_level_permissions_owned = models.GenericRelation(RowLevelPermission, object_id_field="owner_id", content_type_field="owner_ct", related_name="owner")
+
     objects = UserManager()
     class Meta:
         verbose_name = _('user')
         verbose_name_plural = _('users')
         ordering = ('username',)
+        row_level_permissions = True
     class Admin:
         fields = (
             (None, {'fields': ('username', 'password')}),
