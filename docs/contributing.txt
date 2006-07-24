@@ -212,6 +212,10 @@ repository:
       first, then the "Fixed #abc." For example:
       "magic-removal: Fixed #123 -- Added whizbang feature."
 
+      For the curious: We're using a `Trac post-commit hook`_ for this.
+
+      .. _Trac post-commit hook: http://trac.edgewall.org/browser/trunk/contrib/trac-post-commit-hook
+
     * If your commit references a ticket in the Django `ticket tracker`_ but
       does *not* close the ticket, include the phrase "Refs #abc", where "abc"
       is the number of the ticket your commit references. We've rigged
