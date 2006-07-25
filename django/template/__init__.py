@@ -358,7 +358,7 @@ class DebugParser(Parser):
         super(DebugParser, self).extend_nodelist(nodelist, node, token)
 
     def unclosed_block_tag(self, parse_until):
-        (command, source) = self.command_stack.pop()
+        command, source = self.command_stack.pop()
         msg = "Unclosed tag '%s'. Looking for one of: %s " % (command, ', '.join(parse_until))
         raise self.source_error( source, msg)
 
