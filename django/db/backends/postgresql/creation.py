@@ -1,5 +1,5 @@
-from django.db.backends.ansi import sql
-builder = sql.SchemaBuilder()
+from django.db.backends.postgresql import sql
+builder = sql.PgSchemaBuilder()
 
 # This dictionary maps Field objects to their associated PostgreSQL column
 # types, as strings. Column-type strings can contain format strings; they'll
