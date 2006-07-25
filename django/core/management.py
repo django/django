@@ -262,8 +262,6 @@ def _collate(connection_output, reverse=False):
         for connection_name, statements in connection_output.items():
             if not statements:
                 continue
-            if connection_name is _default:
-                connection_name = '(default)'
             final_output.append(' -- The following statements are for connection: %s' % connection_name)
             if reverse:
                 statements.reverse()
@@ -681,7 +679,7 @@ def get_validation_errors(outfile, app=None):
     validates all models of all installed apps. Writes errors, if any, to outfile.
     Returns number of errors.
     """
-    from django.db import models
+    from django.db import models, model_connection_name
     from django.db.models.loading import get_app_errors
     from django.db.models.fields.related import RelatedObject
 
@@ -692,7 +690,8 @@ def get_validation_errors(outfile, app=None):
         
     for cls in models.get_models(app):
         opts = cls._meta
-
+        connection_name = model_connection_name(cls)
+        
         # Do field-specific validation.
         for f in opts.fields:
             if f.name == 'id' and not f.primary_key and opts.pk.name == 'id':
@@ -729,6 +728,10 @@ def get_validation_errors(outfile, app=None):
                 rel_opts = f.rel.to._meta
                 if f.rel.to not in models.get_models():
                     e.add(opts, "'%s' has relation with model %s, which has not been installed" % (f.name, rel_opts.object_name))
+
+                rel_connection = model_connection_name(f.rel.to)
+                if rel_connection != connection_name:
+                    e.add(opts, "'%s' is configured to use connection '%s' but has relation with '%s', which is configured to use connection '%s'" % (cls.__name__, connection_name, f.rel.to.__name__, rel_connection))
 
                 rel_name = RelatedObject(f.rel.to, cls, f).get_accessor_name()
                 rel_query_name = f.related_query_name()
