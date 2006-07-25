@@ -206,28 +206,23 @@ get_sql_initial_data.args = APP_ARGS
 
 def get_sql_sequence_reset(app):
     "Returns a list of the SQL statements to reset PostgreSQL sequences for the given app."
-    from django.db import backend, models
-    output = []
-    for model in models.get_models(app):
-        for f in model._meta.fields:
-            if isinstance(f, models.AutoField):
-                output.append("%s setval('%s', (%s max(%s) %s %s));" % \
-                    (style.SQL_KEYWORD('SELECT'),
-                    style.SQL_FIELD('%s_%s_seq' % (model._meta.db_table, f.column)),
-                    style.SQL_KEYWORD('SELECT'),
-                    style.SQL_FIELD(backend.quote_name(f.column)),
-                    style.SQL_KEYWORD('FROM'),
-                    style.SQL_TABLE(backend.quote_name(model._meta.db_table))))
-                break # Only one AutoField is allowed per model, so don't bother continuing.
-        for f in model._meta.many_to_many:
-            output.append("%s setval('%s', (%s max(%s) %s %s));" % \
-                (style.SQL_KEYWORD('SELECT'),
-                style.SQL_FIELD('%s_id_seq' % f.m2m_db_table()),
-                style.SQL_KEYWORD('SELECT'),
-                style.SQL_FIELD(backend.quote_name('id')),
-                style.SQL_KEYWORD('FROM'),
-                style.SQL_TABLE(f.m2m_db_table())))
-    return output
+    from django.db import model_connection_name
+    from django.db.models import get_models
+    connection_output = {}
+    for model in get_models(app):
+        connection_name = model_connection_name(model)
+        output = connection_output.setdefault(connection_name, [])
+        builder = model._default_manager.db.get_creation_module().builder
+        try:
+            output.extend(builder.get_sequence_reset(model, style))
+        except AttributeError:
+            sys.stderr.write(
+                "%s is configured to use database engine %s, which does " 
+                "not support sequence reset.\n" % 
+                (model.__name__,
+                 model._default_manager.db.connection.settings.DATABASE_ENGINE))
+    
+    return _collate(connection_output)
 get_sql_sequence_reset.help_doc = "Prints the SQL statements for resetting PostgreSQL sequences for the given app name(s)."
 get_sql_sequence_reset.args = APP_ARGS
 
@@ -450,6 +445,8 @@ def install(app):
                                     "pending statements that need it: %s"
                                     % (model, statements))
     except Exception, e:
+        import traceback
+        print traceback.format_exception(*sys.exc_info())
         sys.stderr.write(style.ERROR("""Error: %s couldn't be installed. Possible reasons:
   * The database isn't running or isn't configured correctly.
   * At least one of the database tables already exists.
