@@ -144,10 +144,6 @@ class Manager(object):
                 pending.setdefault(klass, []).extend(statements)
         return pending
 
-    def drop(self, cascade=False):
-        """Drop my model's table."""
-        pass # FIXME
-
     def get_installed_models(self, table_list):
         """Get list of models installed, given a list of tables.
         """
