@@ -13,7 +13,12 @@ except ImportError:
 __all__ = ('backend', 'connection', 'DatabaseError')
 
 # singleton to represent the default connection in connections
-_default = object()
+class dummy(object):
+    def __str__(self):
+        return '<default>'
+_default = dummy()
+del dummy
+
 
 # storage for local default connection
 _local = local()
