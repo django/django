@@ -1,7 +1,7 @@
 from django.db import models
 #from django.db.models import get_models
 #from django.utils.text import capfirst
-from django.contrib.history.models import ChangeLog, get_version, list_history, version_by_date, get_all_models
+from django.contrib.history.models import ChangeLog, get_version, list_history, version_by_date
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, render_to_response
 from datetime import datetime
@@ -14,7 +14,7 @@ def index(request):
 			      {'changes_list': changes_list})
 
 def list(request):
-    get_all_models()
+    #get_all_models()
 
     changes_list = ChangeLog.objects.all()
     return render_to_response('history/list.html', 
