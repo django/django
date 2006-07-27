@@ -1,7 +1,7 @@
 from django.conf import settings
 from django import http
 from django.core.mail import mail_managers
-import md5, os
+import md5
 
 class CommonMiddleware(object):
     """
@@ -44,7 +44,7 @@ class CommonMiddleware(object):
         if new_url != old_url:
             # Redirect
             if new_url[0]:
-                newurl = "%s://%s%s" % (os.environ.get('HTTPS') == 'on' and 'https' or 'http', new_url[0], new_url[1])
+                newurl = "%s://%s%s" % (request.is_secure() and 'https' or 'http', new_url[0], new_url[1])
             else:
                 newurl = new_url[1]
             if request.GET:

@@ -427,7 +427,7 @@ This example illustrates all possible attributes and methods for a ``Feed`` clas
             author's e-mail as a normal Python string.
             """
 
-        def author_name(self):
+        def author_email(self):
             """
             Returns the feed's author's e-mail as a normal Python string.
             """

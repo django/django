@@ -10,9 +10,6 @@ from django.shortcuts import get_object_or_404, render_to_response
 from django.db import models
 from django.db.models.query import handle_legacy_orderlist, QuerySet
 from django.http import Http404, HttpResponse, HttpResponseRedirect
-from django.template import loader
-from django.utils import dateformat
-from django.utils.dates import MONTHS
 from django.utils.html import escape
 from django.utils.text import capfirst, get_text_list
 import operator

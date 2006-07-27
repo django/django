@@ -3,10 +3,6 @@
 from django.core.cache.backends.simple import CacheClass as SimpleCacheClass
 from django.utils.synch import RWLock
 import copy, time
-try:
-    import cPickle as pickle
-except ImportError:
-    import pickle
 
 class CacheClass(SimpleCacheClass):
     def __init__(self, host, params):

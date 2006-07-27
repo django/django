@@ -62,6 +62,7 @@ LANGUAGES = (
     ('sl', gettext_noop('Slovenian')),
     ('sr', gettext_noop('Serbian')),
     ('sv', gettext_noop('Swedish')),
+    ('ta', gettext_noop('Tamil')),
     ('uk', gettext_noop('Ukrainian')),
     ('zh-cn', gettext_noop('Simplified Chinese')),
     ('zh-tw', gettext_noop('Traditional Chinese')),

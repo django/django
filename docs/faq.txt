@@ -156,7 +156,7 @@ logical to us.
 -----------------------------------------------------
 
 We're well aware that there are other awesome Web frameworks out there, and
-we're not adverse to borrowing ideas where appropriate. However, Django was
+we're not averse to borrowing ideas where appropriate. However, Django was
 developed precisely because we were unhappy with the status quo, so please be
 aware that "because <Framework X>" does it is not going to be sufficient reason
 to add a given feature to Django.
@@ -535,13 +535,26 @@ If you're sure your username and password are correct, make sure your user
 account has ``is_active`` and ``is_staff`` set to True. The admin site only
 allows access to users with those two fields both set to True.
 
+How can I prevent the cache middleware from caching the admin site?
+-------------------------------------------------------------------
+
+Set the ``CACHE_MIDDLEWARE_ANONYMOUS_ONLY`` setting to ``True``. See the
+`cache documentation`_ for more information.
+
+.. _cache documentation: ../cache/#the-per-site-cache
+
 How do I automatically set a field's value to the user who last edited the object in the admin?
 -----------------------------------------------------------------------------------------------
 
-At this point, you can't do this. But it's an oft-requested feature, so we're
-discussing how it can be implemented. The problem is we don't want to couple
-the model layer with the admin layer with the request layer (to get the current
-user). It's a tricky problem.
+At this point, Django doesn't have an official way to do this. But it's an oft-requested
+feature, so we're discussing how it can be implemented. The problem is we don't want to couple
+the model layer with the admin layer with the request layer (to get the current user). It's a
+tricky problem.
+
+One person hacked up a `solution that doesn't require patching Django`_, but note that it's an
+unofficial solution, and there's no guarantee it won't break at some point.
+
+.. _solution that doesn't require patching Django: http://lukeplant.me.uk/blog.php?id=1107301634
 
 How do I limit admin access so that objects can only be edited by the users who created them?
 ---------------------------------------------------------------------------------------------
@@ -606,3 +619,21 @@ To create a user, you'll have to use the Python API. See `creating users`_ for
 full info.
 
 .. _creating users: http://www.djangoproject.com/documentation/authentication/#creating-users
+
+Contributing code
+=================
+
+I submitted a bug fix in the ticket system several weeks ago. Why are you ignoring my patch?
+--------------------------------------------------------------------------------------------
+
+Don't worry: We're not ignoring you!
+
+It's important to understand there is a difference between "a ticket is being
+ignored" and "a ticket has not been attended to yet." Django's ticket system
+contains hundreds of open tickets, of various degrees of impact on end-user
+functionality, and Django's developers have to review and prioritize.
+
+Besides, if your feature request stands no chance of inclusion in Django, we
+won't ignore it -- we'll just close the ticket. So if your ticket is still
+open, it doesn't mean we're ignoring you; it just means we haven't had time to
+look at it yet.

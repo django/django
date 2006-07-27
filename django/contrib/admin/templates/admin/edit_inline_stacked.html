@@ -1,7 +1,7 @@
 {% load admin_modify %}
 <fieldset class="module aligned">
    {% for fcw in bound_related_object.form_field_collection_wrappers %}
-      <h2>{{ bound_related_object.relation.opts.verbose_name|capfirst }}&nbsp;#{{ forloop.counter }}</h2>
+      <h2>{{ bound_related_object.relation.opts.verbose_name|capfirst|escape }}&nbsp;#{{ forloop.counter }}</h2>
       {% if bound_related_object.show_url %}{% if fcw.obj.original %}
       <p><a href="/r/{{ fcw.obj.original.content_type_id }}/{{ fcw.obj.original.id }}/">View on site</a></p>
       {% endif %}{% endif %}

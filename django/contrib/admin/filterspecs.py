@@ -123,7 +123,7 @@ class DateFieldFilterSpec(FilterSpec):
     def choices(self, cl):
         for title, param_dict in self.links:
             yield {'selected': self.date_params == param_dict,
-                   'query_string': cl.get_query_string(param_dict, self.field_generic),
+                   'query_string': cl.get_query_string(param_dict, [self.field_generic]),
                    'display': title}
 
 FilterSpec.register(lambda f: isinstance(f, models.DateField), DateFieldFilterSpec)

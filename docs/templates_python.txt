@@ -357,7 +357,7 @@ django.core.context_processors.request
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 If ``TEMPLATE_CONTEXT_PROCESSORS`` contains this processor, every
-``DjangoContext`` will contain a variable ``request``, which is the current
+``RequestContext`` will contain a variable ``request``, which is the current
 `HttpRequest object`_. Note that this processor is not enabled by default;
 you'll have to activate it.
 

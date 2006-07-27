@@ -760,6 +760,13 @@ Note that this is the time zone to which Django will convert all dates/times --
 not necessarily the timezone of the server. For example, one server may serve
 multiple Django-powered sites, each with a separate time-zone setting.
 
+Normally, Django sets the ``os.environ['TZ']`` variable to the time zone you
+specify in the  ``TIME_ZONE`` setting. Thus, all your views and models will
+automatically operate in the correct time zone. However, if you're using the
+manual configuration option (see below), Django will *not* touch the ``TZ``
+environment variable, and it'll be up to you to ensure your processes are
+running in the correct environment.
+
 USE_ETAGS
 ---------
 
@@ -836,6 +843,15 @@ argument representing a setting and its value. Each argument name should be all
 uppercase, with the same name as the settings described above. If a particular
 setting is not passed to ``configure()`` and is needed at some later point,
 Django will use the default setting value.
+
+Configuring Django in this fashion is mostly necessary -- and, indeed,
+recommended -- when you're using a piece of the framework inside a larger
+application.
+
+Consequently, when configured via ``settings.configure()``, Django will not
+make any modifications to the process environment variables. (See the
+explanation of ``TIME_ZONE``, above, for why this would normally occur.) It's
+assumed that you're already in full control of your environment in these cases.
 
 Custom default settings
 -----------------------

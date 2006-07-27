@@ -4,7 +4,7 @@ from django import forms
 from django.shortcuts import render_to_response
 from django.template import RequestContext
 from django.contrib.sites.models import Site
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponseRedirect
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import LOGIN_URL, REDIRECT_FIELD_NAME
 
@@ -34,9 +34,8 @@ def login(request, template_name='registration/login.html'):
 def logout(request, next_page=None, template_name='registration/logged_out.html'):
     "Logs out the user and displays 'You are logged out' message."
     from django.contrib.auth import logout
-    try:
-        logout(request)
-    except KeyError:
+    logout(request)
+    if next_page is None:
         return render_to_response(template_name, {'title': _('Logged out')}, context_instance=RequestContext(request))
     else:
         # Redirect to this page until the session has been cleared.
@@ -50,7 +49,8 @@ def redirect_to_login(next, login_url=LOGIN_URL):
     "Redirects the user to the login page, passing the given 'next' page"
     return HttpResponseRedirect('%s?%s=%s' % (login_url, REDIRECT_FIELD_NAME, next))
 
-def password_reset(request, is_admin_site=False, template_name='registration/password_reset_form.html'):
+def password_reset(request, is_admin_site=False, template_name='registration/password_reset_form.html',
+        email_template_name='registration/password_reset_email.html'):
     new_data, errors = {}, {}
     form = PasswordResetForm()
     if request.POST:
@@ -58,9 +58,9 @@ def password_reset(request, is_admin_site=False, template_name='registration/pas
         errors = form.get_validation_errors(new_data)
         if not errors:
             if is_admin_site:
-                form.save(request.META['HTTP_HOST'])
+                form.save(domain_override=request.META['HTTP_HOST'])
             else:
-                form.save()
+                form.save(email_template_name=email_template_name)
             return HttpResponseRedirect('%sdone/' % request.path)
     return render_to_response(template_name, {'form': forms.FormWrapper(form, new_data, errors)},
         context_instance=RequestContext(request))

@@ -1,7 +1,7 @@
 "Database cache backend."
 
 from django.core.cache.backends.base import BaseCache
-from django.db import connection, transaction
+from django.db import connection, transaction, DatabaseError
 import base64, time
 from datetime import datetime
 try:

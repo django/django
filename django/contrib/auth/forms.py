@@ -61,7 +61,7 @@ class PasswordResetForm(forms.Manipulator):
         except User.DoesNotExist:
             raise validators.ValidationError, "That e-mail address doesn't have an associated user acount. Are you sure you've registered?"
 
-    def save(self, domain_override=None):
+    def save(self, domain_override=None, email_template_name='registration/password_reset_email.html'):
         "Calculates a new password randomly and sends it to the user"
         from django.core.mail import send_mail
         new_pass = User.objects.make_random_password()
@@ -73,7 +73,7 @@ class PasswordResetForm(forms.Manipulator):
             domain = current_site.domain
         else:
             site_name = domain = domain_override
-        t = loader.get_template('registration/password_reset_email.html')
+        t = loader.get_template(email_template_name)
         c = {
             'new_password': new_pass,
             'email': self.user_cache.email,

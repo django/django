@@ -7,7 +7,7 @@ import datetime, time
 def archive_index(request, queryset, date_field, num_latest=15,
         template_name=None, template_loader=loader,
         extra_context=None, allow_empty=False, context_processors=None,
-        mimetype=None):
+        mimetype=None, allow_future=False):
     """
     Generic top-level archive of date-based objects.
 
@@ -20,7 +20,8 @@ def archive_index(request, queryset, date_field, num_latest=15,
     """
     if extra_context is None: extra_context = {}
     model = queryset.model
-    queryset = queryset.filter(**{'%s__lte' % date_field: datetime.datetime.now()})
+    if not allow_future:
+        queryset = queryset.filter(**{'%s__lte' % date_field: datetime.datetime.now()})
     date_list = queryset.dates(date_field, 'year')[::-1]
     if not date_list and not allow_empty:
         raise Http404, "No %s available" % model._meta.verbose_name
@@ -47,7 +48,7 @@ def archive_index(request, queryset, date_field, num_latest=15,
 def archive_year(request, year, queryset, date_field, template_name=None,
         template_loader=loader, extra_context=None, allow_empty=False,
         context_processors=None, template_object_name='object', mimetype=None,
-        make_object_list=False):
+        make_object_list=False, allow_future=False):
     """
     Generic yearly archive view.
 
@@ -67,8 +68,8 @@ def archive_year(request, year, queryset, date_field, template_name=None,
 
     lookup_kwargs = {'%s__year' % date_field: year}
 
-    # Only bother to check current date if the year isn't in the past.
-    if int(year) >= now.year:
+    # Only bother to check current date if the year isn't in the past and future objects aren't requested.
+    if int(year) >= now.year and not allow_future:
         lookup_kwargs['%s__lte' % date_field] = now
     date_list = queryset.filter(**lookup_kwargs).dates(date_field, 'month')
     if not date_list and not allow_empty:
@@ -95,7 +96,7 @@ def archive_year(request, year, queryset, date_field, template_name=None,
 def archive_month(request, year, month, queryset, date_field,
         month_format='%b', template_name=None, template_loader=loader,
         extra_context=None, allow_empty=False, context_processors=None,
-        template_object_name='object', mimetype=None):
+        template_object_name='object', mimetype=None, allow_future=False):
     """
     Generic monthly archive view.
 
@@ -127,19 +128,28 @@ def archive_month(request, year, month, queryset, date_field,
         last_day = first_day.replace(month=first_day.month + 1)
     lookup_kwargs = {'%s__range' % date_field: (first_day, last_day)}
 
-    # Only bother to check current date if the month isn't in the past.
-    if last_day >= now.date():
+    # Only bother to check current date if the month isn't in the past and future objects are requested.
+    if last_day >= now.date() and not allow_future:
         lookup_kwargs['%s__lte' % date_field] = now
     object_list = queryset.filter(**lookup_kwargs)
     if not object_list and not allow_empty:
         raise Http404
+
+    # Calculate the next month, if applicable.
+    if allow_future:
+        next_month = last_day + datetime.timedelta(days=1)
+    elif last_day < datetime.date.today():
+        next_month = last_day + datetime.timedelta(days=1)
+    else:
+        next_month = None
+
     if not template_name:
         template_name = "%s/%s_archive_month.html" % (model._meta.app_label, model._meta.object_name.lower())
     t = template_loader.get_template(template_name)
     c = RequestContext(request, {
         '%s_list' % template_object_name: object_list,
         'month': date,
-        'next_month': (last_day < datetime.date.today()) and (last_day + datetime.timedelta(days=1)) or None,
+        'next_month': next_month,
         'previous_month': first_day - datetime.timedelta(days=1),
     }, context_processors)
     for key, value in extra_context.items():
@@ -152,7 +162,7 @@ def archive_month(request, year, month, queryset, date_field,
 def archive_week(request, year, week, queryset, date_field,
         template_name=None, template_loader=loader,
         extra_context=None, allow_empty=True, context_processors=None,
-        template_object_name='object', mimetype=None):
+        template_object_name='object', mimetype=None, allow_future=False):
     """
     Generic weekly archive view.
 
@@ -177,8 +187,8 @@ def archive_week(request, year, week, queryset, date_field,
     last_day = date + datetime.timedelta(days=7)
     lookup_kwargs = {'%s__range' % date_field: (first_day, last_day)}
 
-    # Only bother to check current date if the week isn't in the past.
-    if last_day >= now.date():
+    # Only bother to check current date if the week isn't in the past and future objects aren't requested.
+    if last_day >= now.date() and not allow_future:
         lookup_kwargs['%s__lte' % date_field] = now
     object_list = queryset.filter(**lookup_kwargs)
     if not object_list and not allow_empty:
@@ -201,7 +211,7 @@ def archive_day(request, year, month, day, queryset, date_field,
         month_format='%b', day_format='%d', template_name=None,
         template_loader=loader, extra_context=None, allow_empty=False,
         context_processors=None, template_object_name='object',
-        mimetype=None):
+        mimetype=None, allow_future=False):
     """
     Generic daily archive view.
 
@@ -229,12 +239,21 @@ def archive_day(request, year, month, day, queryset, date_field,
         '%s__range' % date_field: (datetime.datetime.combine(date, datetime.time.min), datetime.datetime.combine(date, datetime.time.max)),
     }
 
-    # Only bother to check current date if the date isn't in the past.
-    if date >= now.date():
+    # Only bother to check current date if the date isn't in the past and future objects aren't requested.
+    if date >= now.date() and not allow_future:
         lookup_kwargs['%s__lte' % date_field] = now
     object_list = queryset.filter(**lookup_kwargs)
     if not allow_empty and not object_list:
         raise Http404
+
+    # Calculate the next day, if applicable.
+    if allow_future:
+        next_day = date + datetime.timedelta(days=1)
+    elif date < datetime.date.today():
+        next_day = date + datetime.timedelta(days=1)
+    else:
+        next_day = None
+
     if not template_name:
         template_name = "%s/%s_archive_day.html" % (model._meta.app_label, model._meta.object_name.lower())
     t = template_loader.get_template(template_name)
@@ -242,7 +261,7 @@ def archive_day(request, year, month, day, queryset, date_field,
         '%s_list' % template_object_name: object_list,
         'day': date,
         'previous_day': date - datetime.timedelta(days=1),
-        'next_day': (date < datetime.date.today()) and (date + datetime.timedelta(days=1)) or None,
+        'next_day': next_day,
     }, context_processors)
     for key, value in extra_context.items():
         if callable(value):
@@ -267,7 +286,7 @@ def object_detail(request, year, month, day, queryset, date_field,
         month_format='%b', day_format='%d', object_id=None, slug=None,
         slug_field=None, template_name=None, template_name_field=None,
         template_loader=loader, extra_context=None, context_processors=None,
-        template_object_name='object', mimetype=None):
+        template_object_name='object', mimetype=None, allow_future=False):
     """
     Generic detail view from year/month/day/slug or year/month/day/id structure.
 
@@ -289,8 +308,8 @@ def object_detail(request, year, month, day, queryset, date_field,
         '%s__range' % date_field: (datetime.datetime.combine(date, datetime.time.min), datetime.datetime.combine(date, datetime.time.max)),
     }
 
-    # Only bother to check current date if the date isn't in the past.
-    if date >= now.date():
+    # Only bother to check current date if the date isn't in the past and future objects aren't requested.
+    if date >= now.date() and not allow_future:
         lookup_kwargs['%s__lte' % date_field] = now
     if object_id:
         lookup_kwargs['%s__exact' % model._meta.pk.name] = object_id

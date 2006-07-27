@@ -1,5 +1,5 @@
 from django.template import TemplateSyntaxError, TemplateDoesNotExist, resolve_variable
-from django.template import Library, Context, Node
+from django.template import Library, Node
 from django.template.loader import get_template, get_template_from_string, find_template_source
 from django.conf import settings
 
@@ -125,7 +125,7 @@ def do_block(parser, token):
         if block_name in parser.__loaded_blocks:
             raise TemplateSyntaxError, "'%s' tag with name '%s' appears more than once" % (bits[0], block_name)
         parser.__loaded_blocks.append(block_name)
-    except AttributeError: # parser._loaded_blocks isn't a list yet
+    except AttributeError: # parser.__loaded_blocks isn't a list yet
         parser.__loaded_blocks = [block_name]
     nodelist = parser.parse(('endblock',))
     parser.delete_first_token()

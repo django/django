@@ -15,7 +15,7 @@ def vote(request, comment_id, vote):
     rating = {'up': 1, 'down': -1}.get(vote, False)
     if not rating:
         raise Http404, "Invalid vote"
-    if request.user.is_anonymous():
+    if not request.user.is_authenticated():
         raise Http404, _("Anonymous users cannot vote")
     try:
         comment = Comment.objects.get(pk=comment_id)

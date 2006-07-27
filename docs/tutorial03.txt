@@ -189,7 +189,7 @@ publication date::
     from django.http import HttpResponse
 
     def index(request):
-        latest_poll_list = Poll.objects.all().order_by('-pub_date')
+        latest_poll_list = Poll.objects.all().order_by('-pub_date')[:5]
         output = ', '.join([p.question for p in latest_poll_list])
         return HttpResponse(output)
 
@@ -202,7 +202,7 @@ So let's use Django's template system to separate the design from Python::
     from django.http import HttpResponse
 
     def index(request):
-        latest_poll_list = Poll.objects.all().order_by('-pub_date')
+        latest_poll_list = Poll.objects.all().order_by('-pub_date')[:5]
         t = loader.get_template('polls/index.html')
         c = Context({
             'latest_poll_list': latest_poll_list,
@@ -288,7 +288,7 @@ exception if a poll with the requested ID doesn't exist.
 A shortcut: get_object_or_404()
 -------------------------------
 
-It's a very common idiom to use ``get_object()`` and raise ``Http404`` if the
+It's a very common idiom to use ``get()`` and raise ``Http404`` if the
 object doesn't exist. Django provides a shortcut. Here's the ``detail()`` view,
 rewritten::
 
@@ -313,8 +313,8 @@ exist.
     foremost design goals of Django is to maintain loose coupling.
 
 There's also a ``get_list_or_404()`` function, which works just as
-``get_object_or_404()`` -- except using ``get_list()`` instead of
-``get_object()``. It raises ``Http404`` if the list is empty.
+``get_object_or_404()`` -- except using ``filter()`` instead of
+``get()``. It raises ``Http404`` if the list is empty.
 
 Write a 404 (page not found) view
 =================================

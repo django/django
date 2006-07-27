@@ -14,34 +14,20 @@ the appropriate options to ``use_setuptools()``.
 This file can also be run as a script to install or upgrade setuptools.
 """
 import sys
-DEFAULT_VERSION = "0.6a10"
+DEFAULT_VERSION = "0.6c1"
 DEFAULT_URL     = "http://cheeseshop.python.org/packages/%s/s/setuptools/" % sys.version[:3]
 
 md5_data = {
-    'setuptools-0.5a13-py2.3.egg': '85edcf0ef39bab66e130d3f38f578c86',
-    'setuptools-0.5a13-py2.4.egg': 'ede4be600e3890e06d4ee5e0148e092a',
-    'setuptools-0.6a1-py2.3.egg': 'ee819a13b924d9696b0d6ca6d1c5833d',
-    'setuptools-0.6a1-py2.4.egg': '8256b5f1cd9e348ea6877b5ddd56257d',
-    'setuptools-0.6a10-py2.3.egg': '162d8357f1aff2b0349c6c247ee62987',
-    'setuptools-0.6a10-py2.4.egg': '803a2d8db501c1ac3b5b6fb4e907f788',
-    'setuptools-0.6a10dev_r42346-py2.3.egg': 'a7899272cfceb6aa60094ae8928b8077',
-    'setuptools-0.6a10dev_r42346-py2.4.egg': '5d42a64adca9aedb409f83ecf22156a5',
-    'setuptools-0.6a2-py2.3.egg': 'b98da449da411267c37a738f0ab625ba',
-    'setuptools-0.6a2-py2.4.egg': 'be5b88bc30aed63fdefd2683be135c3b',
-    'setuptools-0.6a3-py2.3.egg': 'ee0e325de78f23aab79d33106dc2a8c8',
-    'setuptools-0.6a3-py2.4.egg': 'd95453d525a456d6c23e7a5eea89a063',
-    'setuptools-0.6a4-py2.3.egg': 'e958cbed4623bbf47dd1f268b99d7784',
-    'setuptools-0.6a4-py2.4.egg': '7f33c3ac2ef1296f0ab4fac1de4767d8',
-    'setuptools-0.6a5-py2.3.egg': '748408389c49bcd2d84f6ae0b01695b1',
-    'setuptools-0.6a5-py2.4.egg': '999bacde623f4284bfb3ea77941d2627',
-    'setuptools-0.6a6-py2.3.egg': '7858139f06ed0600b0d9383f36aca24c',
-    'setuptools-0.6a6-py2.4.egg': 'c10d20d29acebce0dc76219dc578d058',
-    'setuptools-0.6a7-py2.3.egg': 'cfc4125ddb95c07f9500adc5d6abef6f',
-    'setuptools-0.6a7-py2.4.egg': 'c6d62dab4461f71aed943caea89e6f20',
-    'setuptools-0.6a8-py2.3.egg': '2f18eaaa3f544f5543ead4a68f3b2e1a',
-    'setuptools-0.6a8-py2.4.egg': '799018f2894f14c9f8bcb2b34e69b391',
-    'setuptools-0.6a9-py2.3.egg': '8e438ad70438b07b0d8f82cae42b278f',
-    'setuptools-0.6a9-py2.4.egg': '8f6e01fc12fb1cd006dc0d6c04327ec1',
+    'setuptools-0.6b1-py2.3.egg': '8822caf901250d848b996b7f25c6e6ca',
+    'setuptools-0.6b1-py2.4.egg': 'b79a8a403e4502fbb85ee3f1941735cb',
+    'setuptools-0.6b2-py2.3.egg': '5657759d8a6d8fc44070a9d07272d99b',
+    'setuptools-0.6b2-py2.4.egg': '4996a8d169d2be661fa32a6e52e4f82a',
+    'setuptools-0.6b3-py2.3.egg': 'bb31c0fc7399a63579975cad9f5a0618',
+    'setuptools-0.6b3-py2.4.egg': '38a8c6b3d6ecd22247f179f7da669fac',
+    'setuptools-0.6b4-py2.3.egg': '62045a24ed4e1ebc77fe039aa4e6f7e5',
+    'setuptools-0.6b4-py2.4.egg': '4cb2a185d228dacffb2d17f103b3b1c4',
+    'setuptools-0.6c1-py2.3.egg': 'b3f2b5539d65cb7f74ad79127f1a908c',
+    'setuptools-0.6c1-py2.4.egg': 'b45adeda0667d2d2ffe14009364f2a4b',
 }
 
 import sys, os
@@ -56,7 +42,7 @@ def _validate_md5(egg_name, data):
                 % egg_name
             )
             sys.exit(2)
-    return data    
+    return data
 
 
 def use_setuptools(
@@ -72,7 +58,7 @@ def use_setuptools(
     be the number of seconds that will be paused before initiating a download,
     should one be required.  If an older version of setuptools is installed,
     this routine will print a message to ``sys.stderr`` and raise SystemExit in
-    an attempt to abort the calling script.  
+    an attempt to abort the calling script.
     """
     try:
         import setuptools
@@ -159,7 +145,7 @@ def main(argv, version=DEFAULT_VERSION):
             egg = download_setuptools(version, to_dir=tmpdir, delay=0)
             sys.path.insert(0,egg)
             from setuptools.command.easy_install import main
-            main(list(argv)+[egg])
+            return main(list(argv)+[egg])   # we're done here
         finally:
             shutil.rmtree(tmpdir)
     else:
@@ -187,7 +173,7 @@ def main(argv, version=DEFAULT_VERSION):
             print '(Run "ez_setup.py -U setuptools" to reinstall or upgrade.)'
 
 
-            
+
 def update_md5(filenames):
     """Update our built-in md5 registry"""
 
@@ -196,7 +182,7 @@ def update_md5(filenames):
 
     for name in filenames:
         base = os.path.basename(name)
-        f = open(name,'rb')       
+        f = open(name,'rb')
         md5_data[base] = md5(f.read()).hexdigest()
         f.close()
 

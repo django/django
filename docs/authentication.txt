@@ -95,7 +95,11 @@ In addition to those automatic API methods, ``User`` objects have the following
 custom methods:
 
     * ``is_anonymous()`` -- Always returns ``False``. This is a way of
-      comparing ``User`` objects to anonymous users.
+      differentiating ``User`` and ``AnonymousUser`` objects. Generally, you
+      should prefer using ``is_authenticated()`` to this method.
+
+    * ``is_authenticated()`` -- Always returns ``True``. This is a way to
+      tell if the user has been authenticated.
 
     * ``get_full_name()`` -- Returns the ``first_name`` plus the ``last_name``,
       with a space in between.
@@ -219,6 +223,7 @@ the ``django.contrib.auth.models.User`` interface, with these differences:
 
     * ``id`` is always ``None``.
     * ``is_anonymous()`` returns ``True`` instead of ``False``.
+    * ``is_authenticated()`` returns ``False`` instead of ``True``.
     * ``has_perm()`` always returns ``False``.
     * ``set_password()``, ``check_password()``, ``save()``, ``delete()``,
       ``set_groups()`` and ``set_permissions()`` raise ``NotImplementedError``.
@@ -254,12 +259,12 @@ Once you have those middlewares installed, you'll be able to access
 ``request.user`` in views. ``request.user`` will give you a ``User`` object
 representing the currently logged-in user. If a user isn't currently logged in,
 ``request.user`` will be set to an instance of ``AnonymousUser`` (see the
-previous section). You can tell them apart with ``is_anonymous()``, like so::
+previous section). You can tell them apart with ``is_authenticated()``, like so::
 
-    if request.user.is_anonymous():
-        # Do something for anonymous users.
+    if request.user.is_authenticated():
+        # Do something for authenticated users.
     else:
-        # Do something for logged-in users.
+        # Do something for anonymous users.
 
 .. _request objects: http://www.djangoproject.com/documentation/request_response/#httprequest-objects
 .. _session documentation: http://www.djangoproject.com/documentation/sessions/
@@ -323,19 +328,19 @@ The raw way
 ~~~~~~~~~~~
 
 The simple, raw way to limit access to pages is to check
-``request.user.is_anonymous()`` and either redirect to a login page::
+``request.user.is_authenticated()`` and either redirect to a login page::
 
     from django.http import HttpResponseRedirect
 
     def my_view(request):
-        if request.user.is_anonymous():
+        if not request.user.is_authenticated():
             return HttpResponseRedirect('/login/?next=%s' % request.path)
         # ...
 
 ...or display an error message::
 
     def my_view(request):
-        if request.user.is_anonymous():
+        if not request.user.is_authenticated():
             return render_to_response('myapp/login_error.html')
         # ...
 
@@ -439,7 +444,7 @@ For example, this view checks to make sure the user is logged in and has the
 permission ``polls.can_vote``::
 
     def my_view(request):
-        if request.user.is_anonymous() or not request.user.has_perm('polls.can_vote'):
+        if not (request.user.is_authenticated() and request.user.has_perm('polls.can_vote')):
             return HttpResponse("You can't vote in this poll.")
         # ...
 
@@ -605,10 +610,10 @@ Users
 The currently logged-in user, either a ``User`` instance or an``AnonymousUser``
 instance, is stored in the template variable ``{{ user }}``::
 
-    {% if user.is_anonymous %}
-        <p>Welcome, new user. Please log in.</p>
+    {% if user.is_authenticated %}
+        <p>Welcome, {{ user.username }}. Thanks for logging in.</p>    
     {% else %}
-        <p>Welcome, {{ user.username }}. Thanks for logging in.</p>
+        <p>Welcome, new user. Please log in.</p>
     {% endif %}
 
 Permissions
