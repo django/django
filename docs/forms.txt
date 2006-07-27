@@ -404,6 +404,36 @@ Here's a simple function that might drive the above form::
             errors = new_data = {}
         form = forms.FormWrapper(manipulator, new_data, errors)
         return render_to_response('contact_form.html', {'form': form})
+        
+``FileField``s and ``ImageField``s
+==================================
+
+Dealing with for ``FileField`` and ``ImageField`` is a little more
+complicated.
+
+First, you'll need to make sure that your ``<form>`` element correctly defines
+the ``enctype`` in order to upload files::
+
+  <form enctype="multipart/form-data" method="POST" action=".">
+
+Next, you'll need to treat the field in the template slightly differently.
+Given a field in the model::
+
+   photo = model.ImageField('/path/to/upload/location')
+
+You need to actually display two formfields in the template:
+
+   <p><label for="id_photo">Photo:</label> {{ form.photo }}{{ form.photo_file }}</p>
+
+The first bit (``{{ form.photo }}``) displays the currently-selected file,
+while the second (``{{ form.photo_file }}``) actually contains the file upload
+form field. Thus, at the validation layer you need to check the ``photo_file``
+key.
+
+Finally, in the view, make sure to call ``new_data.update(request.FILES)``::
+
+   new_data = request.POST.copy()
+   new_data.update(request.FILES)
 
 Validators
 ==========
