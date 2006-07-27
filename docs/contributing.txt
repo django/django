@@ -168,6 +168,10 @@ Please follow these coding standards when writing code for inclusion in Django:
 
           {{foo}}
 
+    * Please don't put your name in the code. While we appreciate all
+      contributions to Django, our policy is not to publish individual
+      developer names in code -- for instance, at the top of Python modules.
+
 Committing code
 ===============
 
