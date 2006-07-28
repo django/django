@@ -198,21 +198,6 @@ some things to keep in mind:
 How invalid variables are handled
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-In Django 0.91, if a variable doesn't exist, the template system fails
-silently. The variable is replaced with an empty string::
-
-    >>> t = Template("My name is {{ my_name }}.")
-    >>> c = Context({"foo": "bar"})
-    >>> t.render(c)
-    "My name is ."
-
-This applies to any level of lookup::
-
-    >>> t = Template("My name is {{ person.fname }} {{ person.lname }}.")
-    >>> c = Context({"person": {"fname": "Stan"}})
-    >>> t.render(c)
-    "My name is Stan ."
-
 If a variable doesn't exist, the template system inserts the value of the
 ``TEMPLATE_STRING_IF_INVALID`` setting, which is set to ``''`` (the empty
 string) by default.
