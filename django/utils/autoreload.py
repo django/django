@@ -35,6 +35,14 @@ try:
 except ImportError:
     import dummy_thread as thread
 
+# This import does nothing, but it's necessary to avoid some race conditions
+# in the threading module. See http://code.djangoproject.com/ticket/2330 .
+try:
+    import threading
+except ImportError:
+    pass
+
+
 RUN_RELOADER = True
 
 def reloader_thread():
