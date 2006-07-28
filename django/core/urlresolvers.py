@@ -209,11 +209,11 @@ def resolve(path, urlconf=None):
     resolver = RegexURLResolver(r'^/', urlconf)
     return resolver.resolve(path)
 
-def reverse(viewname, urlconf, args=None, kwargs=None):
+def reverse(viewname, urlconf=None, args=None, kwargs=None):
     args = args or []
     kwargs = kwargs or {}
     if urlconf is None:
         from django.conf import settings
         urlconf = settings.ROOT_URLCONF
     resolver = RegexURLResolver(r'^/', urlconf)
-    return resolver.reverse(viewname, *args, **kwargs)
+    return '/' + resolver.reverse(viewname, *args, **kwargs)
