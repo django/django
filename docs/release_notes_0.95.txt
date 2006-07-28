@@ -1,0 +1,113 @@
+Welcome to the Django 0.95 release.
+
+This represents a significant advance in Django development since the 0.91
+release in January 2006. The details of every change in this release would be
+too extensive to list in full, but a summary is presented below.
+
+Suitability and API stability
+-----------------------------
+
+This release is intended to provide a stable reference point for developers
+wanting to work on production-level applications that use Django.
+
+However, it's not the 1.0 release, and we'll be introducing further changes
+before 1.0. For a clear look at which areas of the framework will change (and
+which ones will *not* change) before 1.0, see the api-stability.txt file, which
+lives in the docs/ directory of the distribution.
+
+You may have a need to use some of the features that are marked as
+"subject to API change" in that document, but that's OK with us as long as it's
+OK with you, and as long as you understand APIs may change in the future.
+
+Fortunately, most of Django's core APIs won't be changing before version 1.0.
+There likely won't be as big of a change between 0.95 and 1.0 versions as there
+was between 0.91 and 0.95.
+
+Changes and new features
+------------------------
+
+The major changes in this release (for developers currently using the 0.91
+release) are a result of merging the 'magic-removal' branch of development.
+This branch removed a number of constraints in the way Django code had to be
+written that were a consequence of decisions made in the early days of Django,
+prior to its open-source release. It's now possible to write more natural,
+Pythonic code that works as expected, and there's less "black magic" happening
+behind the scenes.
+
+Aside from that, another main theme of this release is a dramatic increase in
+usability. We've made countless improvements in error messages, documentation,
+etc., to improve developers' quality of life.
+
+The new features and changes introduced in 0.95 include:
+
+    * Django now uses a more consistent and natural filtering interface for
+      retrieving objects from the database.
+
+    * User-defined models, functions and constants now appear in the module
+      namespace they were defined in. (Previously everything was magically
+      transferred to the django.models.* namespace.)
+
+    * Some optional applications, such as the FlatPage, Sites and Redirects
+      apps, have been decoupled and moved into django.contrib. If you don't
+      want to use these applications, you no longer have to install their
+      database tables.
+
+    * We've added the ability to write custom authentication and authorization
+      backends for authenticating users against alternate systems, such as
+      LDAP.
+
+    * We've made it easier to add custom table-level functions to models,
+      through a new "Manager" API.
+
+    * It's now more explicit and natural to override save() and delete()
+      methods on models, rather than needing to hook into the pre_save() and
+      post_save() method hooks.
+
+    * Individual pieces of the framework now can be configured without
+      requiring the setting of an environment variable. This permits use of,
+      for example, the Django templating system inside other applications.
+
+    * More and more parts of the framework have been internationalized, as
+      we've expanded internationalization (i18n) support. The Django
+      codebase, including code and templates, has now been translated, at least
+      in part, into 31 languages. From Arabic to Chinese to Hungarian to Welsh,
+      it is now possible to use Django's admin site in your native language.
+
+The number of changes required to port from 0.91-compatible code to the 0.95
+code base are significant in some cases. However, they are, for the most part,
+reasonably routine and only need to be done once. A list of the necessary
+changes is described in the 'Removing The Magic`_ wiki page. There is also an
+easy checklist_ for reference when undertaking the porting operation.
+
+.. _Removing The Magic: http://code.djangoproject.com/wiki/RemovingTheMagic
+.. _checklist: http://code.djangoproject.com/wiki/MagicRemovalCheatSheet1
+
+Problem reports and getting help
+--------------------------------
+
+Need help resolving a problem with Django? The documentation in the
+distribution is also available online_ at the `Django website`_. The FAQ_
+document is especially recommended, as it contains a number of issues that
+come up time and again.
+
+For more personalized help, the `django-users` mailing list is a very active
+list, with more than 2,000 subscribers who can help you solve any sort of
+Django problem. We recommend you search the archives first, though, because
+many common questions appear with some regularity, and any particular problem
+may already have been answered.
+
+Finally, for those who prefer the more immediate feedback offered by IRC,
+there's a #django channel or irc.freenode.net that is regularly populated by
+Django users and developers from around the world. Friendly people are usually
+available at any hour of the day -- to help, or just to chat.
+
+.. _online: http://www.djangoproject.com/documentation/
+.. _Django website: http://www.djangoproject.com/
+.. _FAQ: http://www.djangoproject.com/documentation/faq/
+.. _django-users: http://groups.google.com/group/django-users
+
+Thanks for using Django!
+
+The Django Team
+July 2006
+
