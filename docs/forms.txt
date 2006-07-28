@@ -405,10 +405,10 @@ Here's a simple function that might drive the above form::
         form = forms.FormWrapper(manipulator, new_data, errors)
         return render_to_response('contact_form.html', {'form': form})
         
-``FileField``s and ``ImageField``s
-==================================
+``FileField`` and ``ImageField`` special cases
+==============================================
 
-Dealing with ``FileField``s and ``ImageField``s is a little more
+Dealing with ``FileField`` and ``ImageField`` objects is a little more
 complicated.
 
 First, you'll need to make sure that your ``<form>`` element correctly defines
