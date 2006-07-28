@@ -408,20 +408,22 @@ Here's a simple function that might drive the above form::
 ``FileField``s and ``ImageField``s
 ==================================
 
-Dealing with for ``FileField`` and ``ImageField`` is a little more
+Dealing with ``FileField``s and ``ImageField``s is a little more
 complicated.
 
 First, you'll need to make sure that your ``<form>`` element correctly defines
-the ``enctype`` in order to upload files::
+the ``enctype`` as ``"multipart/form-data"``, in order to upload files::
 
-  <form enctype="multipart/form-data" method="POST" action=".">
+  <form enctype="multipart/form-data" method="post" action="/foo/">
 
-Next, you'll need to treat the field in the template slightly differently.
-Given a field in the model::
+Next, you'll need to treat the field in the template slightly differently. A
+``FileField`` or ``ImageField`` is represented by *two* HTML form elements.
+
+For example, given this field in a model::
 
    photo = model.ImageField('/path/to/upload/location')
 
-You need to actually display two formfields in the template:
+You'd need to display two formfields in the template::
 
    <p><label for="id_photo">Photo:</label> {{ form.photo }}{{ form.photo_file }}</p>
 
@@ -430,7 +432,12 @@ while the second (``{{ form.photo_file }}``) actually contains the file upload
 form field. Thus, at the validation layer you need to check the ``photo_file``
 key.
 
-Finally, in the view, make sure to call ``new_data.update(request.FILES)``::
+Finally, in your view, make sure to access ``request.FILES``, rather than
+``request.POST``, for the uploaded files. This is necessary because
+``request.POST`` does not contain file-upload data.
+
+For example, following the ``new_data`` convention, you might do something like
+this::
 
    new_data = request.POST.copy()
    new_data.update(request.FILES)
