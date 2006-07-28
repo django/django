@@ -251,6 +251,16 @@ information than the docs that come with the latest Django release.
 
 .. _stored in revision control: http://code.djangoproject.com/browser/django/trunk/docs
 
+Where can I find Django developers for hire?
+--------------------------------------------
+
+Consult our `developers for hire page`_ for a list of Django developers who
+would be happy to help you.
+
+You might also be interested in posting a job to http://www.gypsyjobs.com/ .
+
+.. _developers for hire page: http://code.djangoproject.com/wiki/DevelopersForHire
+
 Installation questions
 ======================
 
