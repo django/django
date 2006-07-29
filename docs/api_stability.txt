@@ -6,6 +6,9 @@ Although Django has not reached a 1.0 release, the bulk of Django's public APIs 
 stable as of the 0.95 release. This document explains which APIs will and will not
 change before the 1.0 release.
 
+What "stable" means
+===================
+
 In this context, stable means:
 
    - All the public APIs -- everything documented in the linked documents, and
@@ -23,6 +26,9 @@ In this context, stable means:
      
    - We'll only break backwards compatibility of these APIs if a bug or
      security hole makes it completely unavoidable.
+
+Stable APIs
+===========
 
 These APIs are stable:
 
