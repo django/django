@@ -391,7 +391,6 @@ def change_stage(request, app_label, model_name, object_id):
         'object_id': object_id,
         'original': manipulator.original_object,
         'is_popup': request.REQUEST.has_key('_popup'),
-        'is_row_level_perm': model._meta.row_level_permissions,
     })
 
     if model._meta.row_level_permissions:
