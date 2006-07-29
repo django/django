@@ -498,6 +498,11 @@ If you need to combine ``and`` and ``or`` to do advanced logic, just use nested
         {% endif %}
     {% endif %}
 
+Multiple uses of the same logical operator are fine, as long as you use the
+same operator. For example, this is valid::
+
+    {% if athlete_list or coach_list or parent_list or teacher_list %}
+
 ifchanged
 ~~~~~~~~~
 
