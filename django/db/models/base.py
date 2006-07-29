@@ -44,7 +44,7 @@ class ModelBase(type):
             new_class._meta.app_label = model_module.__name__.split('.')[-2]
 
         # Bail out early if we have already created this class.
-        m = get_model(new_class._meta.app_label, name)
+        m = get_model(new_class._meta.app_label, name, False)
         if m is not None:
             return m
 
@@ -68,7 +68,7 @@ class ModelBase(type):
         # the first class for this model to register with the framework. There
         # should only be one class for each model, so we must always return the
         # registered version.
-        return get_model(new_class._meta.app_label, name)
+        return get_model(new_class._meta.app_label, name, False)
 
 class Model(object):
     __metaclass__ = ModelBase
