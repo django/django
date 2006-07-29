@@ -1,3 +1,8 @@
+=================================
+Django version 0.95 release notes
+=================================
+
+
 Welcome to the Django 0.95 release.
 
 This represents a significant advance in Django development since the 0.91
@@ -5,7 +10,7 @@ release in January 2006. The details of every change in this release would be
 too extensive to list in full, but a summary is presented below.
 
 Suitability and API stability
------------------------------
+=============================
 
 This release is intended to provide a stable reference point for developers
 wanting to work on production-level applications that use Django.
@@ -24,7 +29,7 @@ There likely won't be as big of a change between 0.95 and 1.0 versions as there
 was between 0.91 and 0.95.
 
 Changes and new features
-------------------------
+========================
 
 The major changes in this release (for developers currently using the 0.91
 release) are a result of merging the 'magic-removal' branch of development.
@@ -87,7 +92,7 @@ easy checklist_ for reference when undertaking the porting operation.
 .. _checklist: http://code.djangoproject.com/wiki/MagicRemovalCheatSheet1
 
 Problem reports and getting help
---------------------------------
+================================
 
 Need help resolving a problem with Django? The documentation in the
 distribution is also available online_ at the `Django website`_. The FAQ_
