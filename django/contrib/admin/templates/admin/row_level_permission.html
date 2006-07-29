@@ -1,0 +1,79 @@
+{% load i18n admin_modify %}
+{% include_admin_script "js/row_level_permission.js" %}
+<table id="rlpTable">
+<tr class="header">
+<th>
+{% trans "Owner" %}
+</th>
+<th>
+{% trans "Permission" %}
+</th>
+<th>
+{% trans "Negative" %}
+</th>
+<th>
+{% trans "Options" %}
+</th>
+</tr>
+<form id="addRLPForm" method="POST" name="addRLPForm" action="../../../auth/row_level_permission/add/{{ content_type_id }}/{{ object_id }}/" onSubmit="addButtonPressed({{ obj_ct }}, {{ obj_id }}); return false;">
+<tr>
+<th colspan=4>
+{% trans "Add Permissions" %}
+</th>
+</tr>
+<TBODY>
+<tr>
+<td>
+<p>
+    {{ new_rlp_form.owner }}
+</p>
+</td>
+<td>
+<p>
+    {{ new_rlp_form.perm }}
+</p>
+</td>
+<td>
+<p>
+    {{ new_rlp_form.negative }}
+</p>
+</td>
+<td>
+<input id="addButton" type="submit" value="{% trans 'Add' %}" />
+</td>
+</tr>
+</form>
+<tr>
+<th colspan=4>
+{% trans "Current Permissions" %}
+</th>
+</tr>
+{% if rlp_form_list %}
+{% load row_level_permission %}
+{% for o in rlp_form_list %}
+<tr id="editRLP-{{ o.rlp.id }}">
+<form id="editRLPForm-{{ o.rlp.id }}" method="POST" name="editRLPForm-{{ rlp.id }}"  action="../../../auth/row_level_permission/{% objref o.rlp %}/change/" onSubmit="applyButtonPressed('{% objref o.rlp %}'); return false;">
+<td>
+{{ o.form.owner }}
+</td>
+<td>
+{{ o.form.perm }}
+</td>
+<td>
+{{ o.form.negative }}
+</td>
+<td>
+<input id="applyButton-{{ o.rlp.id }}" type="submit" value="{% trans 'Apply' %}" />
+<input id="cancelButton-{{ o.rlp.id }}" type="reset" value="{% trans 'Reset' %}"/>
+<br/>
+<a href="../../../auth/row_level_permission/{% objref o.rlp %}/delete/" onClick="deleteRLP('{% objref o.rlp %}'); return false;" class="deleteLink">{% trans 'Delete' %}</a> | 
+<a href="" onClick="copyToNew({{ o.rlp.id }}); return false;" class="copyToNewLink">{% trans 'Copy to New' %}</a>
+</td>
+</form>
+</tr>
+{% endfor %}
+{% else %}
+<tr><td>No row level permissions</td></tr>
+{% endif %}
+</TBODY>
+</table>

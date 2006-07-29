@@ -100,3 +100,14 @@ if docutils_is_available:
 
     for name, urlbase in ROLES.items():
         create_reference_role(name, urlbase)
+        
+#Based off work by Ian Holsman
+#http://svn.zyons.python-hosting.com/trunk/zilbo/common/utils/misc.py
+def verify_objref_hash( content_type_id, object_id, hash ):
+    import sha
+    from django.conf import settings 
+    hash_match = sha.new("%s/%s" % (content_type_id, object_id) + settings.SECRET_KEY).hexdigest()
+    if hash == hash_match:
+        return True
+    else:
+        return False
