@@ -85,7 +85,7 @@ The new features and changes introduced in 0.95 include:
 The number of changes required to port from 0.91-compatible code to the 0.95
 code base are significant in some cases. However, they are, for the most part,
 reasonably routine and only need to be done once. A list of the necessary
-changes is described in the 'Removing The Magic`_ wiki page. There is also an
+changes is described in the `Removing The Magic`_ wiki page. There is also an
 easy checklist_ for reference when undertaking the porting operation.
 
 .. _Removing The Magic: http://code.djangoproject.com/wiki/RemovingTheMagic
