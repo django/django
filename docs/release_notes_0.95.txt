@@ -103,7 +103,7 @@ distribution is also available online_ at the `Django website`_. The FAQ_
 document is especially recommended, as it contains a number of issues that
 come up time and again.
 
-For more personalized help, the `django-users` mailing list is a very active
+For more personalized help, the `django-users`_ mailing list is a very active
 list, with more than 2,000 subscribers who can help you solve any sort of
 Django problem. We recommend you search the archives first, though, because
 many common questions appear with some regularity, and any particular problem
