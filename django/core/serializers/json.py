@@ -41,11 +41,11 @@ class DateTimeAwareJSONEncoder(simplejson.JSONEncoder):
     TIME_FORMAT = "%H:%M:%S"
     
     def default(self, o):
-        if isinstance(o, datetime.date):
+        if isinstance(o, datetime.datetime):
+            return o.strftime("%s %s" % (self.DATE_FORMAT, self.TIME_FORMAT))
+        elif isinstance(o, datetime.date):
             return o.strftime(self.DATE_FORMAT)
         elif isinstance(o, datetime.time):
             return o.strftime(self.TIME_FORMAT)
-        elif isinstance(o, datetime.datetime):
-            return o.strftime("%s %s" % (self.DATE_FORMAT, self.TIME_FORMAT))
         else:
             return super(self, DateTimeAwareJSONEncoder).default(o)

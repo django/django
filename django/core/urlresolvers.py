@@ -201,3 +201,19 @@ class RegexURLResolver(object):
         sub_match = self.reverse(viewname, *args, **kwargs)
         result = reverse_helper(self.regex, *args, **kwargs)
         return result + sub_match
+
+def resolve(path, urlconf=None):
+    if urlconf is None:
+        from django.conf import settings
+        urlconf = settings.ROOT_URLCONF
+    resolver = RegexURLResolver(r'^/', urlconf)
+    return resolver.resolve(path)
+
+def reverse(viewname, urlconf=None, args=None, kwargs=None):
+    args = args or []
+    kwargs = kwargs or {}
+    if urlconf is None:
+        from django.conf import settings
+        urlconf = settings.ROOT_URLCONF
+    resolver = RegexURLResolver(r'^/', urlconf)
+    return '/' + resolver.reverse(viewname, *args, **kwargs)

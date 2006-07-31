@@ -54,7 +54,8 @@ http://127.0.0.1:8000/admin/. You should see the admin's login screen:
 Enter the admin site
 ====================
 
-Now, try logging in. You should see the Django admin index page:
+Now, try logging in. (You created a superuser account in the first part of this
+tutorial, remember?) You should see the Django admin index page:
 
 .. image:: http://media.djangoproject.com/img/doc/tutorial/admin02t.png
    :alt: Django admin index page

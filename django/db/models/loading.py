@@ -83,11 +83,15 @@ def get_models(app_mod=None, creation_order=False):
             model_list.extend(get_models(app_mod))
         return model_list
 
-def get_model(app_label, model_name):
+def get_model(app_label, model_name, seed_cache = True):
     """
-    Returns the model matching the given app_label and case-insensitive model_name.
+    Returns the model matching the given app_label and case-insensitive
+    model_name.
+
     Returns None if no model is found.
     """
+    if seed_cache:
+        get_apps()
     try:
         model_dict = _app_models[app_label]
     except KeyError:

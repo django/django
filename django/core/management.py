@@ -78,7 +78,7 @@ def get_version():
     from django import VERSION
     v = '.'.join([str(i) for i in VERSION[:-1]])
     if VERSION[-1]:
-        v += ' (%s)' % VERSION[-1]
+        v += '-' + VERSION[-1]
     return v
 
 def get_sql_create(app):
@@ -684,10 +684,10 @@ def get_validation_errors(outfile, app=None):
     from django.db.models.fields.related import RelatedObject
 
     e = ModelErrorCollection(outfile)
-    
+
     for (app_name, error) in get_app_errors().items():
         e.add(app_name, error)
-        
+
     for cls in models.get_models(app):
         opts = cls._meta
         connection_name = model_connection_name(cls)
@@ -757,7 +757,7 @@ def get_validation_errors(outfile, app=None):
                         if r.get_accessor_name() == rel_query_name:
                             e.add(opts, "Reverse query name for field '%s' clashes with related field '%s.%s'. Add a related_name argument to the definition for '%s'." % (f.name, rel_opts.object_name, r.get_accessor_name(), f.name))
 
-                
+
         for i, f in enumerate(opts.many_to_many):
             # Check to see if the related m2m field will clash with any
             # existing fields, m2m fields, m2m related objects or related objects

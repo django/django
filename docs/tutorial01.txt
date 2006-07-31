@@ -81,7 +81,7 @@ the following output on the command line::
     Validating models...
     0 errors found.
 
-    Django version 0.95 (post-magic-removal), using settings 'mysite.settings'
+    Django version 0.95, using settings 'mysite.settings'
     Development server is running at http://127.0.0.1:8000/
     Quit the server with CONTROL-C (Unix) or CTRL-BREAK (Windows).
 

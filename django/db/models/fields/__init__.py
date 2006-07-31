@@ -247,9 +247,9 @@ class Field(object):
         params['is_required'] = not self.blank and not self.primary_key and not rel
 
         # BooleanFields (CheckboxFields) are a special case. They don't take
-        # is_required or validator_list.
+        # is_required.
         if isinstance(self, BooleanField):
-            del params['validator_list'], params['is_required']
+            del params['is_required']
 
         # If this field is in a related context, check whether any other fields
         # in the related object have core=True. If so, add a validator --
