@@ -66,7 +66,11 @@ The new features and changes introduced in 0.95 include:
     * We've made it easier to add custom table-level functions to models,
       through a new "Manager" API.
 
-    * It's now possible to use Django without a database.
+    * It's now possible to use Django without a database. This simply means
+      that the framework no longer requires you to have a working database set
+      up just to serve dynamic pages. In other words, you can just use
+      URLconfs/views on their own. Previously, the framework required that a
+      database be configured, regardless of whether you actually used it.
 
     * It's now more explicit and natural to override save() and delete()
       methods on models, rather than needing to hook into the pre_save() and
