@@ -1,0 +1,163 @@
+========================
+Using Multiple Databases
+========================
+
+Standard Django practice is to use a single database connection for
+all models in all applications. However, Django supports configuring
+and using multiple database connections on a per-application, per-model
+or an ad-hoc basis. Using multiple database connections is optional.
+
+Configuring other database connections
+======================================
+
+Django's default database connection is configured via the settings
+DATABASE_ENGINE, DATABASE_NAME, DATABASE_USER, DATABASE_PASSWORD,
+DATABASE_HOST, and DATABASE_PORT. Other connections are configured via
+the OTHER_DATABASES setting. Define OTHER_DATABASES as a dict, with a
+name for each connection as the key and a dict of settings as the
+value. In each OTHER_DATABASES entry (called a "named connection"),
+the keys are the same as the DATABASE_ENGINE, etc, settings used to
+configure the default connection. All keys are optional; any that are
+missing in a named connection's settings will inherit their values
+from the default connection.
+
+Here's an example::
+
+    DATABASE_ENGINE = 'postgresql'
+    DATABASE_NAME = 'django_apps'
+    DATABASE_USER = 'default_user'
+    DATABASE_PASSWORD = 'xxx'
+	
+    OTHER_DATABASES = {
+        'local': { 'DATABASE_ENGINE': 'sqlite3',
+                   'DATABASE_NAME': '/tmp/cache.db' },
+        'public': { 'DATABASE_HOST': 'public',
+                    'DATABASE_USER': 'public_user',
+                    'DATABASE_PASSWORD': 'xxx' }
+        'private': { 'DATABASE_HOST': 'private',
+                     'DATABASE_USER': 'private_user',
+                     'DATABASE_PASSWORD': 'xxx' }
+    }
+
+In addition to the DATABASE_* settings, each named connection in
+OTHER_DATABASES may optionally include a MODELS setting. This should
+be a list of app or app.model names, and is used to configure which
+models should use this connection instead of the default connection.
+
+Here's the example above, with ``MODELS``::
+
+    OTHER_DATABASES = {
+        'local': { 'DATABASE_ENGINE': 'sqlite3',
+                   'DATABASE_NAME': '/tmp/cache.db',
+                   # A model name: only the model ContentItem
+                   # with the app_label myapp will use this connection
+                   'MODELS': ['myapp.ContentItem'] },
+        'public': { 'DATABASE_HOST': 'public',
+                    'DATABASE_USER': 'public_user',
+                    'DATABASE_PASSWORD': 'xxx',
+	            # Two models in myapp will use the connection
+                    # named 'public', as will ALL models in 
+                    # django.contribe.comments
+		    'MODELS': ['myapp.Blog','myapp.Article',
+                               'django.contrib.comments' ] }
+        # No models or apps are configured to use the private db
+        'private': { 'DATABASE_HOST': 'private',
+                     'DATABASE_USER': 'private_user',
+                     'DATABASE_PASSWORD': 'xxx' }
+    }
+
+Accessing a model's connection
+==============================
+
+Each manager has a db attribute that can be used to access the model's
+connection. Access the db attribute of a model's manager to obtain the
+model's currently configured connection. 
+
+Example::
+
+    from django.db import models
+
+    class Blog(models.Model)
+        name = models.CharField(maxlength=50)
+
+    class Article(models.Model)
+	blog = models.ForeignKey(Blog)
+        title = models.CharField(maxlength=100)
+        slug = models.SlugField()
+        summary = models.CharField(maxlength=500)
+        body = models.TextField()
+
+    class ContentItem(models.Model)
+        slug = models.SlugField()
+        mimetype = models.CharField(maxlength=50)
+	file = models.FileField()
+	
+    # Get a ConnectionInfo instance that describes the connection
+    article_db = Article.objects.db
+    
+    # Get a connection and a cursor
+    connection = article_db.connection
+    cursor = connection.cursor()
+
+    # Get the ``quote_name`` function from the backend
+    qn = article_db.backend.quote_name
+
+Ordinarily you won't have to access a model's connection directly;
+just use the model and manager normally and they will use the
+connection configured for the model.
+
+ConnectionInfo objects
+======================
+
+FIXME Describe the ConnectionInfo object and each of its attributes.
+
+
+Accessing connections by name
+=============================
+
+Access named connections directly through
+``django.db.connections``. Each entry in ``django.db.connections`` is
+a ``ConnectionInfo`` instance bound to the settings configured in the
+OTHER_DATABASES entry under the same key. 
+
+Example::
+
+    from django.db import connections
+
+    private_db = connections['private']
+    cursor = private_db.connection.cursor()
+
+
+Using transactions with other database connections
+==================================================
+
+Transaction managed state applies across all connections
+commit/rollback apply to all connections by default
+but you can specify individual connections or lists or dicts of connections
+
+
+Changing model connections on the fly
+=====================================
+
+Here's an example of primitive mirroring::
+ 
+    # Read all articles from the private db
+    # Note that we pull the articles into a list; this is necessary
+    # because query sets are lazy. If we were to change the model's
+    # connection without copying the articles into a local list, we'd
+    # wind up reading from public instead of private.
+
+    Article.objects.db = connections['private']
+    all_articles = list(Article.objects.all())
+    
+    # Save each article in the public db
+    Article.objects.db = connections['public']
+    for article in all_articles:
+        article.save()
+
+Thread and request isolation
+============================
+
+connections close after each request
+connection settings are thread-local
+
