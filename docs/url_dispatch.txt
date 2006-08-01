@@ -263,12 +263,12 @@ Here's the example URLconf from the `Django overview`_::
     from django.conf.urls.defaults import *
 
     urlpatterns = patterns('',
-        (r'^articles/(\d{4})/$', 'myproject.news.views.year_archive'),
-        (r'^articles/(\d{4})/(\d{2})/$', 'myproject.news.views.month_archive'),
-        (r'^articles/(\d{4})/(\d{2})/(\d+)/$', 'myproject.news.views.article_detail'),
+        (r'^articles/(\d{4})/$', 'mysite.news.views.year_archive'),
+        (r'^articles/(\d{4})/(\d{2})/$', 'mysite.news.views.month_archive'),
+        (r'^articles/(\d{4})/(\d{2})/(\d+)/$', 'mysite.news.views.article_detail'),
     )
 
-In this example, each view has a common prefix -- ``'myproject.news.views'``.
+In this example, each view has a common prefix -- ``'mysite.news.views'``.
 Instead of typing that out for each entry in ``urlpatterns``, you can use the
 first argument to the ``patterns()`` function to specify a prefix to apply to
 each view function.
@@ -277,7 +277,7 @@ With this in mind, the above example can be written more concisely as::
 
     from django.conf.urls.defaults import *
 
-    urlpatterns = patterns('myproject.news.views',
+    urlpatterns = patterns('mysite.news.views',
         (r'^articles/(\d{4})/$', 'year_archive'),
         (r'^articles/(\d{4})/(\d{2})/$', 'month_archive'),
         (r'^articles/(\d{4})/(\d{2})/(\d+)/$', 'article_detail'),
