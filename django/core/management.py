@@ -192,7 +192,6 @@ def _get_sql_for_pending_references(model, pending_references):
     data_types = get_creation_module().DATA_TYPES
 
     final_output = []
-    reference_names = {}
     if backend.supports_constraints:
         opts = model._meta
         if model in pending_references:
@@ -202,12 +201,9 @@ def _get_sql_for_pending_references(model, pending_references):
                 r_col = f.column
                 table = opts.db_table
                 col = opts.get_field(f.rel.field_name).column
-                r_name = '%s_referencing_%s_%s' % (r_col, table, col)
-                if r_name in reference_names:
-                    reference_names[r_name] += 1
-                    r_name += '_%s' % reference_names[r_name]
-                else:
-                    reference_names[r_name] = 0
+                # For MySQL, r_name must be unique in the first 64 characters.
+                # So we are careful with character usage here.
+                r_name = '%s_refs_%s_%x' % (r_col, col, abs(hash((r_table, table))))
                 final_output.append(style.SQL_KEYWORD('ALTER TABLE') + ' %s ADD CONSTRAINT %s FOREIGN KEY (%s) REFERENCES %s (%s);' % \
                     (backend.quote_name(r_table), r_name,
                     backend.quote_name(r_col), backend.quote_name(table), backend.quote_name(col)))
