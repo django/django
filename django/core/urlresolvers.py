@@ -130,12 +130,13 @@ class RegexURLPattern(object):
         return reverse_helper(self.regex, *args, **kwargs)
 
 class RegexURLResolver(object):
-    def __init__(self, regex, urlconf_name):
+    def __init__(self, regex, urlconf_name, default_kwargs=None):
         # regex is a string representing a regular expression.
         # urlconf_name is a string representing the module containing urlconfs.
         self.regex = re.compile(regex)
         self.urlconf_name = urlconf_name
         self.callback = None
+        self.default_kwargs = default_kwargs or {}
 
     def resolve(self, path):
         tried = []
@@ -149,7 +150,8 @@ class RegexURLResolver(object):
                     tried.extend([(pattern.regex.pattern + '   ' + t) for t in e.args[0]['tried']])
                 else:
                     if sub_match:
-                        return sub_match[0], sub_match[1], dict(match.groupdict(), **sub_match[2])
+                        sub_match_dict = dict(self.default_kwargs, **sub_match[2])
+                        return sub_match[0], sub_match[1], dict(match.groupdict(), **sub_match_dict)
                     tried.append(pattern.regex.pattern)
             raise Resolver404, {'tried': tried, 'path': new_path}
 
