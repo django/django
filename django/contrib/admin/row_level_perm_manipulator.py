@@ -32,15 +32,15 @@ class ChangeRLPManipulator(forms.Manipulator):
         owner = MultipleObjSelectField.returnObject(new_data['owner'])            
         owner_ct = ContentType.objects.get_for_model(owner)    
 
-        model_ct = rlp.type_ct
-        model = model_ct.get_object_for_this_type (pk=rlp.type_id)
+        model_ct = rlp.model_ct
+        model = model_ct.get_object_for_this_type (pk=rlp.model_id)
         
         perm = Permission.objects.get(pk=new_data['perm'])
         
         
-        field_name_list = ('owner_ct', 'owner_id', 'type_ct', 'type_id', 'permission')
+        field_name_list = ('owner_ct', 'owner_id', 'model_ct', 'model_id', 'permission')
         field_data = owner_ct.id
-        all_data = {'owner_id':owner.id, 'type_ct_id':model_ct.id, 'type_id':model.id, 'permission_id':perm.id}
+        all_data = {'owner_id':owner.id, 'model_ct_id':model_ct.id, 'model_id':model.id, 'permission_id':perm.id}
         manipulators.manipulator_validator_unique_together(field_name_list, self.opts, self, field_data, all_data)
         
         rlp.owner = owner
@@ -74,9 +74,9 @@ class AddRLPManipulator(ChangeRLPManipulator):
         for i in  new_data.getlist('perm'):
             perm = Permission.objects.get(pk=i)
 
-            field_name_list = ('owner_ct', 'owner_id', 'type_ct', 'type_id', 'permission')
+            field_name_list = ('owner_ct', 'owner_id', 'model_ct', 'model_id', 'permission')
             field_data = ct.id
-            all_data = {'owner_id':owner.id, 'type_ct_id':self.ct.id, 'type_id':self.obj_instance.id, 'permission_id':perm.id}
+            all_data = {'owner_id':owner.id, 'model_ct_id':self.ct.id, 'model_id':self.obj_instance.id, 'permission_id':perm.id}
             manipulators.manipulator_validator_unique_together(field_name_list, self.opts, self, field_data, all_data)            
             
             rlp = RowLevelPermission.objects.create_row_level_permission(self.obj_instance, owner, perm, negative=new_data['negative'])

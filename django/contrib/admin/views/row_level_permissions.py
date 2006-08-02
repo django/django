@@ -11,12 +11,12 @@ def delete_row_level_permission(request, ct_id, rlp_id, hash, ajax=None):
     msg = {}
     if utils.verify_objref_hash(ct_id, rlp_id, hash):
         rlp = get_object_or_404(RowLevelPermission, pk=rlp_id)
-        ct = rlp.type_ct
-        obj = rlp.type
+        ct = rlp.model_ct
+        obj = rlp.model
         opts = rlp._meta
         if not request.user.has_perm(opts.app_label + '.' + opts.get_delete_permission()):
             raise PermissionDenied   
-        if not request.user.has_perm(obj._meta.app_label + '.' + obj._meta.get_change_permission()()):
+        if not request.user.has_perm(obj._meta.app_label + '.' + obj._meta.get_change_permission()):
             raise PermissionDenied           
         rlp.delete()
         msg = {"result":True, "text":_("Row level permission was successful deleted"), "id":rlp_id}
@@ -92,7 +92,7 @@ def change_row_level_permission(request, ct_id, rlp_id, hash, ajax=None):
     if not request.user.has_perm(opts.app_label + '.' + opts.get_add_permission()):
         raise PermissionDenied  
 
-    object_model = rlp.type_ct.model_class()
+    object_model = rlp.model_ct.model_class()
     if not request.user.has_perm(object_model._meta.app_label + '.' + object_model._meta.get_change_permission()):
         raise PermissionDenied
     
@@ -111,4 +111,4 @@ def change_row_level_permission(request, ct_id, rlp_id, hash, ajax=None):
     if ajax:
         return HttpResponse(simplejson.dumps(msg), 'text/javascript')
     request.user.message_set.create(message=msg['text'])
-    return HttpResponseRedirect("../../../../../../%s/%s/%s" % (object_model._meta.app_label, object_model._meta.module_name , str(rlp.type_id)))
+    return HttpResponseRedirect("../../../../../../%s/%s/%s" % (object_model._meta.app_label, object_model._meta.module_name , str(rlp.model_id)))

@@ -1,4 +1,6 @@
 {% load i18n admin_modify %}
+{% include_admin_script "js/ajax/prototype.js" %}
+{% include_admin_script "js/ajax/scriptaculous.js" %}
 {% include_admin_script "js/row_level_permission.js" %}
 <table id="rlpTable">
 <tr class="header">
@@ -15,7 +17,7 @@
 {% trans "Options" %}
 </th>
 </tr>
-<form id="addRLPForm" method="POST" name="addRLPForm" action="../../../auth/row_level_permission/add/{{ content_type_id }}/{{ object_id }}/" onSubmit="addButtonPressed({{ obj_ct }}, {{ obj_id }}); return false;">
+<form id="addRLPForm" method="POST" name="addRLPForm" action="../../../auth/row_level_permission/add/{{ content_type_id }}/{{ object_id }}/" onSubmit="addButtonPressed({{ content_type_id }}, {{ object_id }}); return false;">
 <tr>
 <th colspan=4>
 {% trans "Add Permissions" %}
@@ -73,7 +75,7 @@
 </tr>
 {% endfor %}
 {% else %}
-<tr><td>No row level permissions</td></tr>
+<tr><td colspan=4><em>No row level permissions</em></td></tr>
 {% endif %}
 </TBODY>
 </table>

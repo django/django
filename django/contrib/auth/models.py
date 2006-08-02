@@ -48,27 +48,28 @@ class Permission(models.Model):
         return "%s | %s" % (self.content_type, self.name)
 
 class RowLevelPermissionManager(models.Manager):
-    def create_row_level_permission(self, object_instance, owner, permission, negative=False):
+    def create_row_level_permission(self, model_instance, owner, permission, negative=False):
         if isinstance(permission, str):
             permission = Permission.objects.get(codename__exact=permission)
-        type_ct=ContentType.objects.get_for_model(object_instance)
-        if type_ct != permission.content_type:
+        model_ct=ContentType.objects.get_for_model(model_instance)
+        if model_ct != permission.content_type:
             raise TypeError, "Invalid value: Permission content type(%s) and object content type(%s) do not match" % (permission.content_type, type_ct)
         
-        rowLvlPerm = self.model(type_id=object_instance.id, type_ct=ContentType.objects.get_for_model(object_instance),
+        rowLvlPerm = self.model(model_id=model_instance.id, model_ct=model_ct,
                                                  owner_id=owner.id, owner_ct=ContentType.objects.get_for_model(owner),
                                                  permission=permission, negative=negative)
         rowLvlPerm.save()
         return rowLvlPerm
     
-    def create_default_row_permissions(self, type, owner, change=True, delete=True, negChange=False, negDel=False):
+    def create_default_row_permissions(self, model_instance, owner, change=True, delete=True, negChange=False, negDel=False):
         ret_dict = {}
+        model_ct = ContentType.objects.get_for_model(model_instance)
         if change:
-            change_str = "change_%s" % (ContentType.objects.get_for_model(type))
-            ret_dict[change_str]=self.create_row_level_permission(type, owner, change_str, negative=negChange)
+            change_str = "change_%s" % (model_ct)
+            ret_dict[change_str]=self.create_row_level_permission(model_instance, owner, change_str, negative=negChange)
         if delete:
-            delete_str = "delete_%s" % (ContentType.objects.get_for_model(type))
-            ret_dict[delete_str]=self.create_row_level_permission(type, owner, delete_str, negative=negDel)
+            delete_str = "delete_%s" % (model_ct)
+            ret_dict[delete_str]=self.create_row_level_permission(model_instance, owner, delete_str, negative=negDel)
         return ret_dict    
 
 class RowLevelPermission(models.Model):
@@ -76,14 +77,14 @@ class RowLevelPermission(models.Model):
     This uses generic relations to minimize the number of tables, and connects to the 
     permissions table using a many to one relation.
     """
-    type_id = models.PositiveIntegerField("'Type' ID")
-    type_ct = models.ForeignKey(ContentType, verbose_name="'Type' content type", related_name="type_ct")
+    model_id = models.PositiveIntegerField("'Model' ID")
+    model_ct = models.ForeignKey(ContentType, verbose_name="'Model' content type", related_name="model_ct")
     owner_id = models.PositiveIntegerField("'Owner' ID")
     owner_ct = models.ForeignKey(ContentType, verbose_name="'Owner' content type", related_name="owner_ct")
     negative = models.BooleanField()
     permission = models.ForeignKey(Permission)
     
-    type = models.GenericForeignKey(fk_field='type_id', ct_field='type_ct')
+    model = models.GenericForeignKey(fk_field='model_id', ct_field='model_ct')
     owner = models.GenericForeignKey(fk_field='owner_id', ct_field='owner_ct')
     
     objects = RowLevelPermissionManager()
@@ -91,14 +92,14 @@ class RowLevelPermission(models.Model):
     class Meta:
         verbose_name = _('row level permission')
         verbose_name_plural = _('row level permissions')
-        unique_together = (('type_ct', 'type_id', 'owner_id', 'owner_ct', 'permission'),)        
+        unique_together = (('model_ct', 'model_id', 'owner_id', 'owner_ct', 'permission'),)        
         
 
     def __str__(self):
-        return "%s | %s:%s | %s:%s" % (self.permission, self.owner_ct, self.owner, self.type_ct, self.type)
+        return "%s | %s:%s | %s:%s" % (self.permission, self.owner_ct, self.owner, self.model_ct, self.model)
     
     def __repr__(self):
-        return "%s | %s:%s | %s:%s" % (self.permission, self.owner_ct, self.owner, self.type_ct, self.type)
+        return "%s | %s:%s | %s:%s" % (self.permission, self.owner_ct, self.owner, self.model_ct, self.model)
 
 
 class Group(models.Model):
