@@ -1,7 +1,8 @@
 from django.db import models
 #from django.db.models import get_models
 #from django.utils.text import capfirst
-from django.contrib.history.models import ChangeLog, get_version, list_history, version_by_date
+from django.contrib.history.models import ChangeLog
+from django.contrib.history.models import get_version, list_history, version_by_date
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, render_to_response
 from datetime import datetime
@@ -24,12 +25,13 @@ def list(request):
 def detail(request, change_id):
     change = get_object_or_404(ChangeLog, pk=change_id)
     object = change.get_object()
+    #print object
 
-    bla = version_by_date(object, datetime(2006, 6, 7))
+    bla = version_by_date(change, datetime(2006, 2, 8))
     for b in bla:
 	print b.change_time
 
-    bla2 = get_version(object)
+    #bla2 = get_version(change)
 
     return render_to_response('history/detail.html', {'change': change,
 						      'object': object})
