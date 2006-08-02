@@ -7,8 +7,7 @@ from django.contrib.contenttypes.models import ContentType
 # Misc stuff
 import cPickle as Pickle
 from datetime import datetime
-from django.utils.text import capfirst
-
+#from django.utils.text import capfirst
 
 class ChangeLog(models.Model):
     change_time = models.DateTimeField (_('time of change'), auto_now=True)
@@ -35,13 +34,13 @@ class ChangeLog(models.Model):
 	    ('Object', {'fields': ('object',),}),
 	)
 
-	list_display = ('object_id', 'user', 'change_time')
+	list_display = ('object_id', 'user', 'comment', 'content_type', 'change_time', )
 
     def get_object(self):
 	""" Returns unpickled object. """
 	return Pickle.loads(self.object)
 
-    def get_revision_number(self):
+    def get_rev_num(self):
 	""" Returns the ID/revision number of ChangeLog entry. """
 	return self.id
 
@@ -49,11 +48,16 @@ class ChangeLog(models.Model):
 # Other (API) methods #
 #######################
 
+#class ChangeLogManager(models.Manager):
+
 def get_version(object, offset=0):
     """ Returns 'current-offset' revision of the 'object' """
-    list = ChangeLog.objects.order_by('-id').filter(object_id=object.id)[offset]
-    print list.get_object()
-    return list
+    try:
+	list = ChangeLog.objects.order_by('-id').filter(object_id=object.id)[offset]
+	print list.get_object()
+	return list
+    except:
+	pass
 
 def list_history(parent_id, **kwargs):
     """ 
@@ -67,10 +71,16 @@ def list_history(parent_id, **kwargs):
 	return ChangeLog.objects.filter(object_id=parent_id)
 
 
-def version_by_date(object, date):
+def version_by_date(self, date):
     """ Returns a list of revisions made at 'date'. """
-    return ChangeLog.objects.filter(object_id=object.id).filter(change_time__exact=date)
+    return ChangeLog.objects.filter(object_id=self.id).filter(change_time__exact=date)
 
+
+	
+
+#########################
+# Pre-save signal catch #
+#########################
 
 def _get_enabled_models():
     """ Returns a list of History-enabled models. """
@@ -83,39 +93,45 @@ def _get_enabled_models():
 	except:
 	    pass
     return model_list
-	
-
-#########################
-# Pre-save signal catch #
-#########################
 
 def save_new_revision(sender, instance, signal, *args, **kwargs):
     """ Saves a old copy of the record into the History table."""
     print "Sender: ",sender
 
-    instance_name = instance.__class__.__name__
+    if not hasattr(instance, 'History'): 
+	print "Not history-enabled class."
+	return 0
+
+    #instance_name = instance.__class__.__name__
     #print instance_name
-    global m
+    m = None 
+    old = None
+    log = None
 
     for model in _get_enabled_models():
-	if model['name'] is instance_name:
+	if model['name'] is instance.__class__.__name__:
 	    try:
 		m = __import__(model['module'], '', '', [model['name']])
 		#print model['module'],": ",model['name'],"- ",m
 	    except:
 		print "Model import error."
     
-    if not isinstance(sender, instance_name):
-	print "Bad sender, exit."
+    if m:
+	try:
+	    old = getattr(m, model['name']).objects.filter(pk=instance.id)
+	    log = ChangeLog(parent=instance, comment="Update")
+	except:
+	    old = instance
+	    log = ChangeLog(parent=instance, comment="New")
+    else:
 	return 0
-
-    old = getattr(m, model['name']).objects.filter(pk=instance.id)
+    
     print "Old: ",old
     print "Instance: ",instance.id
-    log = ChangeLog(parent=instance)
     print "Log: ",log
     log.object = Pickle.dumps(old[0], protocol=0)
     log.save()
     print "New change saved."
+    
 
-dispatcher.connect( save_new_revision, signal=signals.pre_save )
+dispatcher.connect( save_new_revision, signal=signals.post_save )
