@@ -168,6 +168,10 @@ Please follow these coding standards when writing code for inclusion in Django:
 
           {{foo}}
 
+    * Please don't put your name in the code. While we appreciate all
+      contributions to Django, our policy is not to publish individual
+      developer names in code -- for instance, at the top of Python modules.
+
 Committing code
 ===============
 
@@ -211,6 +215,10 @@ repository:
       If your commit closes a ticket and is in a branch, use the branch name
       first, then the "Fixed #abc." For example:
       "magic-removal: Fixed #123 -- Added whizbang feature."
+
+      For the curious: We're using a `Trac post-commit hook`_ for this.
+
+      .. _Trac post-commit hook: http://trac.edgewall.org/browser/trunk/contrib/trac-post-commit-hook
 
     * If your commit references a ticket in the Django `ticket tracker`_ but
       does *not* close the ticket, include the phrase "Refs #abc", where "abc"

@@ -25,3 +25,6 @@ def to_locale(language):
         return language[:p].lower()+'_'+language[p+1:].upper()
     else:
         return language.lower()
+
+def get_language_from_request(request):
+    return settings.LANGUAGE_CODE

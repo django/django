@@ -1,7 +1,22 @@
 Thanks for downloading Django.
 
-To install it, make sure you have Python 2.3 or greater installed. Then run this command:
+To install it, make sure you have Python 2.3 or greater installed. Then run
+this command from the command prompt:
 
-python setup.py install
+    python setup.py install
+
+Note this requires a working Internet connection if you don't already have the
+Python utility "setuptools" installed.
+
+AS AN ALTERNATIVE, you can just copy the entire "django" directory to Python's
+site-packages directory, which is located wherever your Python installation
+lives. Some places you might check are:
+
+    /usr/lib/python2.4/site-packages (Unix, Python 2.4)
+    /usr/lib/python2.3/site-packages (Unix, Python 2.3)
+    C:\\PYTHON\site-packages         (Windows)
+
+This second solution does not require a working Internet connection; it
+bypasses "setuptools" entirely.
 
 For more detailed instructions, see docs/install.txt.

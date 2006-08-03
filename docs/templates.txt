@@ -363,10 +363,15 @@ extends
 
 Signal that this template extends a parent template.
 
-This tag may be used in two ways: ``{% extends "base.html" %}`` (with quotes)
-uses the literal value "base.html" as the name of the parent template to
-extend, or ``{% extends variable %}`` uses the value of ``variable`` as the
-name of the parent template to extend.
+This tag can be used in two ways: 
+
+   * ``{% extends "base.html" %}`` (with quotes) uses the literal value
+     ``"base.html"`` as the name of the parent template to extend.
+
+   * ``{% extends variable %}`` uses the value of ``variable``. If the variable
+     evaluates to a string, Django will use that string as the name of the
+     parent template. If the variable evaluates to a ``Template`` object,
+     Django will use that object as the parent template.
 
 See `Template inheritance`_ for more information.
 
@@ -492,6 +497,11 @@ If you need to combine ``and`` and ``or`` to do advanced logic, just use nested
             We have athletes, and either coaches or cheerleaders!
         {% endif %}
     {% endif %}
+
+Multiple uses of the same logical operator are fine, as long as you use the
+same operator. For example, this is valid::
+
+    {% if athlete_list or coach_list or parent_list or teacher_list %}
 
 ifchanged
 ~~~~~~~~~

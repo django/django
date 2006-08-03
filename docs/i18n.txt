@@ -235,7 +235,7 @@ To pluralize, specify both the singular and plural forms with the
 ``{% plural %}`` tag, which appears within ``{% blocktrans %}`` and
 ``{% endblocktrans %}``. Example::
 
-    {% blocktrans count list|counted as counter %}
+    {% blocktrans count list|count as counter %}
     There is only one {{ name }} object.
     {% plural %}
     There are {{ counter }} {{ name }} objects.

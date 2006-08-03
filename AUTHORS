@@ -16,11 +16,22 @@ before Simon departed and currently oversees things with Adrian.
 
 Wilson Miner <http://www.wilsonminer.com/>, who designed Django's admin
 interface, pretty error pages, official Web site (djangoproject.com) and has
-made many other contributions.
+made many other contributions. He makes us look good.
+
+Malcolm Tredinnick <http://www.pointy-stick.com/blog/>, who has made
+significant contributions to all levels of the framework, from its database
+layer to template system and documentation.
 
 Georg "Hugo" Bauer <http://hugo.muensterland.org/>, who added
 internationalization support, manages i18n contributions and has made a ton
 of excellent tweaks, feature additions and bug fixes.
+
+Luke Plant <http://lukeplant.me.uk/>, who has contributed many excellent
+improvements, including database-level improvements, the CSRF middleware and
+unit tests.
+
+Russell Keith-Magee <freakboy@iinet.net.au>, who has contributed many excellent
+improvements, including refactoring of the Django ORM code and unit tests.
 
 Robert Wittams <http://robert.wittams.com/>, who majorly refactored the Django
 admin application to allow for easier reuse and has made a ton of excellent
@@ -59,6 +70,7 @@ answer newbie questions, and generally made Django that much better:
     Clint Ecker
     gandalf@owca.info
     Baishampayan Ghose
+    martin.glueck@gmail.com
     Espen Grindhaug <http://grindhaug.org/>
     Brant Harris
     hipertracker@gmail.com
@@ -70,7 +82,6 @@ answer newbie questions, and generally made Django that much better:
     Michael Josephson <http://www.sdjournal.com/>
     jpellerin@gmail.com
     junzhang.jn@gmail.com
-    Russell Keith-Magee <freakboy@iinet.net.au>
     Garth Kidd <http://www.deadlybloodyserious.com/>
     kilian <kilian.cavalotti@lip6.fr>
     Sune Kirkeby <http://ibofobi.dk/>
@@ -98,6 +109,7 @@ answer newbie questions, and generally made Django that much better:
     Sam Newman <http://www.magpiebrain.com/>
     Neal Norwitz <nnorwitz@google.com>
     oggie rob <oz.robharvey@gmail.com>
+    Jay Parlar <parlar@gmail.com>
     pgross@thoughtworks.com
     phaedo <http://phaedo.cx/>
     phil@produxion.net
@@ -118,7 +130,6 @@ answer newbie questions, and generally made Django that much better:
     Tom Tobin
     Tom Insam
     Joe Topjian <http://joe.terrarum.net/geek/code/python/django/>
-    Malcolm Tredinnick
     Amit Upadhyay
     Geert Vanderkelen
     Milton Waddams

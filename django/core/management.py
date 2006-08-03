@@ -78,7 +78,7 @@ def get_version():
     from django import VERSION
     v = '.'.join([str(i) for i in VERSION[:-1]])
     if VERSION[-1]:
-        v += ' (%s)' % VERSION[-1]
+        v += '-' + VERSION[-1]
     return v
 
 def get_sql_create(app):
@@ -192,7 +192,6 @@ def _get_sql_for_pending_references(model, pending_references):
     data_types = get_creation_module().DATA_TYPES
 
     final_output = []
-    reference_names = {}
     if backend.supports_constraints:
         opts = model._meta
         if model in pending_references:
@@ -202,12 +201,9 @@ def _get_sql_for_pending_references(model, pending_references):
                 r_col = f.column
                 table = opts.db_table
                 col = opts.get_field(f.rel.field_name).column
-                r_name = '%s_referencing_%s_%s' % (r_col, table, col)
-                if r_name in reference_names:
-                    reference_names[r_name] += 1
-                    r_name += '_%s' % reference_names[r_name]
-                else:
-                    reference_names[r_name] = 0
+                # For MySQL, r_name must be unique in the first 64 characters.
+                # So we are careful with character usage here.
+                r_name = '%s_refs_%s_%x' % (r_col, col, abs(hash((r_table, table))))
                 final_output.append(style.SQL_KEYWORD('ALTER TABLE') + ' %s ADD CONSTRAINT %s FOREIGN KEY (%s) REFERENCES %s (%s);' % \
                     (backend.quote_name(r_table), r_name,
                     backend.quote_name(r_col), backend.quote_name(table), backend.quote_name(col)))
@@ -217,7 +213,7 @@ def _get_sql_for_pending_references(model, pending_references):
 def _get_many_to_many_sql_for_model(model):
     from django.db import backend, get_creation_module
     from django.db.models import GenericRel
-    
+
     data_types = get_creation_module().DATA_TYPES
 
     opts = model._meta
@@ -817,10 +813,10 @@ def get_validation_errors(outfile, app=None):
     from django.db.models.fields.related import RelatedObject
 
     e = ModelErrorCollection(outfile)
-    
+
     for (app_name, error) in get_app_errors().items():
         e.add(app_name, error)
-        
+
     for cls in models.get_models(app):
         opts = cls._meta
 
@@ -885,7 +881,7 @@ def get_validation_errors(outfile, app=None):
                         if r.get_accessor_name() == rel_query_name:
                             e.add(opts, "Reverse query name for field '%s' clashes with related field '%s.%s'. Add a related_name argument to the definition for '%s'." % (f.name, rel_opts.object_name, r.get_accessor_name(), f.name))
 
-                
+
         for i, f in enumerate(opts.many_to_many):
             # Check to see if the related m2m field will clash with any
             # existing fields, m2m fields, m2m related objects or related objects
