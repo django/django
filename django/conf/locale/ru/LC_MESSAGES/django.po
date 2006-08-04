@@ -141,6 +141,7 @@ msgid "score date"
 msgstr "счёт времени"
 
 #: contrib/comments/models.py:237
+#, fuzzy
 msgid "karma score"
 msgstr "Карма счёт"
 
@@ -735,7 +736,7 @@ msgstr "К сожалению, запрашиваемая вами страни�
 #: contrib/admin/templates/admin/index.html:17
 #, python-format
 msgid "Models available in the %(name)s application."
-msgstr "Модели доступны в %(name)s приложении."
+msgstr "Модели доступны в %(name) приложении."
 
 #: contrib/admin/templates/admin/index.html:28
 #: contrib/admin/templates/admin/change_form.html:15
