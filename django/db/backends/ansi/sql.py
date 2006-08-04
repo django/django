@@ -137,9 +137,12 @@ class SchemaBuilder(object):
                     r_col = f.column
                     table = opts.db_table
                     col = opts.get_field(f.rel.field_name).column
+                    # For MySQL, r_name must be unique in the first 64 
+                    # characters. So we are careful with character usage here.
+                    r_name = '%s_refs_%s_%x' % (r_col, col,
+                                                abs(hash((r_table, table))))
                     sql = style.SQL_KEYWORD('ALTER TABLE') + ' %s ADD CONSTRAINT %s FOREIGN KEY (%s) REFERENCES %s (%s);' % \
-                        (quote_name(table),
-                        quote_name('%s_referencing_%s_%s' % (r_col, r_table, col)),
+                        (quote_name(table), quote_name(r_name),
                         quote_name(r_col), quote_name(r_table), quote_name(col))
                     pending.setdefault(rel_class, []).append(
                         BoundStatement(sql, db.connection))

@@ -25,7 +25,7 @@ def add_lookup(rel_cls, field):
     key = (module, name)
     # Has the model already been loaded?
     # If so, resolve the string reference right away
-    model = get_model(rel_cls._meta.app_label,field.rel.to)
+    model = get_model(rel_cls._meta.app_label, field.rel.to, False)
     if model:
         field.rel.to = model
         field.do_related_class(model, rel_cls)

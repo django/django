@@ -289,8 +289,11 @@ class Field(object):
         if self.choices:
             return first_choice + list(self.choices)
         rel_model = self.rel.to
-        return first_choice + [(x._get_pk_val(), str(x))
-                               for x in rel_model._default_manager.complex_filter(self.rel.limit_choices_to)]
+        if hasattr(self.rel, 'get_related_field'):
+            lst = [(getattr(x, self.rel.get_related_field().attname), str(x)) for x in rel_model._default_manager.complex_filter(self.rel.limit_choices_to)]
+        else:
+            lst = [(x._get_pk_val(), str(x)) for x in rel_model._default_manager.complex_filter(self.rel.limit_choices_to)]
+        return first_choice + lst
 
     def get_choices_default(self):
         if self.radio_admin:
