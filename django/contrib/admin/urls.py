@@ -28,6 +28,9 @@ urlpatterns = patterns('',
 #    ('^doc/templates/$', 'django.views.admin.doc.template_index'),
     ('^doc/templates/(?P<template>.*)/$', 'django.contrib.admin.views.doc.template_detail'),
 
+    # "Add user" -- a special-case view
+    ('^auth/user/add/$', 'django.contrib.admin.views.auth.user_add_stage'),
+
     # Add/change/delete/history
     ('^([^/]+)/([^/]+)/$', 'django.contrib.admin.views.main.change_list'),
     ('^([^/]+)/([^/]+)/add/$', 'django.contrib.admin.views.main.add_stage'),
