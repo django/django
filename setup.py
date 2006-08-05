@@ -16,6 +16,7 @@ setup(
         '': ['*.TXT'],
         'django.conf': ['locale/*/LC_MESSAGES/*'],
         'django.contrib.admin': ['templates/admin/*.html',
+                                 'templates/admin/auth/user/*.html',
                                  'templates/admin_doc/*.html',
                                  'templates/registration/*.html',
                                  'templates/widget/*.html',
