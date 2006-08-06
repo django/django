@@ -111,6 +111,7 @@ class Group(models.Model):
     """
     name = models.CharField(_('name'), maxlength=80, unique=True)
     permissions = models.ManyToManyField(Permission, verbose_name=_('permissions'), blank=True, filter_interface=models.HORIZONTAL)
+    row_level_permissions_owned = models.GenericRelation(RowLevelPermission, object_id_field="owner_id", content_type_field="owner_ct", related_name="owner")
     class Meta:
         verbose_name = _('group')
         verbose_name_plural = _('groups')
@@ -258,12 +259,64 @@ class User(models.Model):
             self._perm_cache.update(self.get_group_permissions())
         return self._perm_cache
 
-    def has_perm(self, perm):
+    def check_row_level_permission(self, permission, object):
+        if isinstance(permission, str):
+            permission = Permission.objects.get(codename__exact=permission)
+        try:
+            row_level_perm=self.row_level_permissions_owned.get(model_id=object.id, 
+                                                                    model_ct=ContentType.objects.get_for_model(object).id, 
+                                                                    permission=permission.id)
+        except RowLevelPermission.DoesNotExist:
+            return self.check_group_row_level_permissions(permission, object)
+        return not row_level_perm.negative
+
+    def check_group_row_level_permissions(self, permission, object):
+        #SELECT rlp."negative" 
+        #FROM "auth_user_groups" ug, "auth_rowlevelpermission" rlp 
+        #WHERE rlp."owner_id"=ug."group_id" 
+        #AND ug."user_id"=%s        
+        #AND rlp."owner_ct_id"=%s
+        #AND rlp."model_id"=%s
+        #AND rlp."model_ct_id"=%s
+        #AND rlp."permission_id"=%s;
+        cursor = connection.cursor()        
+        sql = """
+            SELECT rlp.%s
+            FROM %s ug, %s rlp
+            WHERE rlp.%s = ug.%s
+                AND ug.%s=%%s
+                AND rlp.%s=%%s
+                AND rlp.%s=%%s
+                AND rlp.%s=%%s
+                AND rlp.%s=%%s
+                ORDER BY rlp.%s""" % (
+            backend.quote_name('negative'), backend.quote_name('auth_user_groups'),
+            backend.quote_name('auth_rowlevelpermission'), backend.quote_name('owner_id'),
+            backend.quote_name('group_id'), backend.quote_name('user_id'),
+            backend.quote_name('owner_ct_id'), backend.quote_name('model_id'),
+            backend.quote_name('model_ct_id'), backend.quote_name('permission_id'),
+            backend.quote_name('negative'))
+        cursor.execute(sql, [self.id, 
+                             ContentType.objects.get_for_model(Group).id, 
+                             object.id,
+                             ContentType.objects.get_for_model(object).id,
+                             permission.id,])
+        row = cursor.fetchone()
+        if row is None:
+            return None
+        return not row[0]
+        
+
+    def has_perm(self, perm, object=None):
         "Returns True if the user has the specified permission."
         if not self.is_active:
             return False
         if self.is_superuser:
             return True
+        if object and object._meta.row_level_permissions:
+            row_level_permission = self.check_row_level_permission(perm, object)
+            if row_level_permission is not None:
+                return row_level_permission
         return perm in self.get_all_permissions()
 
     def has_perms(self, perm_list):
