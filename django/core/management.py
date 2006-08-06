@@ -1291,7 +1291,11 @@ def execute_from_command_line(action_mapping=DEFAULT_ACTION_MAPPING, argv=None):
         if action not in NO_SQL_TRANSACTION:
             print style.SQL_KEYWORD("COMMIT;")
 
-def execute_manager(settings_mod, argv=None):
+def setup_environ(settings_mod):
+    """
+    Configure the runtime environment. This can also be used by external
+    scripts wanting to set up a similar environment to manage.py.
+    """
     # Add this project to sys.path so that it's importable in the conventional
     # way. For example, if this file (manage.py) lives in a directory
     # "myproject", this code would add "/path/to/myproject" to sys.path.
@@ -1304,6 +1308,8 @@ def execute_manager(settings_mod, argv=None):
     # Set DJANGO_SETTINGS_MODULE appropriately.
     os.environ['DJANGO_SETTINGS_MODULE'] = '%s.settings' % project_name
 
+def execute_manager(settings_mod, argv=None):
+    setup_environ(settings_mod)
     action_mapping = DEFAULT_ACTION_MAPPING.copy()
 
     # Remove the "startproject" command from the action_mapping, because that's
