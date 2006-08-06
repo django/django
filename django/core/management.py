@@ -1307,9 +1307,10 @@ def setup_environ(settings_mod):
 
     # Set DJANGO_SETTINGS_MODULE appropriately.
     os.environ['DJANGO_SETTINGS_MODULE'] = '%s.settings' % project_name
+    return project_directory
 
 def execute_manager(settings_mod, argv=None):
-    setup_environ(settings_mod)
+    project_directory = setup_environ(settings_mod)
     action_mapping = DEFAULT_ACTION_MAPPING.copy()
 
     # Remove the "startproject" command from the action_mapping, because that's
