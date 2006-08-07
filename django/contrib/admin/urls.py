@@ -29,9 +29,9 @@ urlpatterns = patterns('',
     ('^doc/templates/(?P<template>.*)/$', 'django.contrib.admin.views.doc.template_detail'),
 
     #Row level permissions
-    ('^auth/row_level_permission/(?P<ct_id>\d+)/(?P<rlp_id>\d+)/(?P<hash>\w+)/delete/(?P<ajax>.*)$', 'django.contrib.admin.views.row_level_permissions.delete_row_level_permission'),
-    ('^auth/row_level_permission/(?P<ct_id>\d+)/(?P<rlp_id>\d+)/(?P<hash>\w+)/change/(?P<ajax>.*)$', 'django.contrib.admin.views.row_level_permissions.change_row_level_permission'),
-    ('^auth/row_level_permission/add/(?P<ct_id>\d+)/(?P<obj_id>\d+)/(?P<ajax>.*)$', 'django.contrib.admin.views.row_level_permissions.add_row_level_permission'),    
+    ('^auth/row_level_permission/(?P<ct_id>\d+)/(?P<rlp_id>\d+)/(?P<hash>\w+)/delete/$', 'django.contrib.admin.views.row_level_permissions.delete_row_level_permission'),
+    ('^auth/row_level_permission/(?P<ct_id>\d+)/(?P<rlp_id>\d+)/(?P<hash>\w+)/change/$', 'django.contrib.admin.views.row_level_permissions.change_row_level_permission'),
+    ('^auth/row_level_permission/add/(?P<ct_id>\d+)/(?P<obj_id>\d+)/$', 'django.contrib.admin.views.row_level_permissions.add_row_level_permission'),    
 
     # Add/change/delete/history
     ('^([^/]+)/([^/]+)/$', 'django.contrib.admin.views.main.change_list'),

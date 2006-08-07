@@ -7,8 +7,9 @@ from django.contrib.admin.row_level_perm_manipulator import AddRLPManipulator, C
 from django.core.exceptions import ImproperlyConfigured, ObjectDoesNotExist, PermissionDenied
 import simplejson
 
-def delete_row_level_permission(request, ct_id, rlp_id, hash, ajax=None):
+def delete_row_level_permission(request, ct_id, rlp_id, hash):
     msg = {}
+    ajax = request.GET.has_key("ajax")
     if utils.verify_objref_hash(ct_id, rlp_id, hash):
         rlp = get_object_or_404(RowLevelPermission, pk=rlp_id)
         ct = rlp.model_ct
@@ -28,8 +29,9 @@ def delete_row_level_permission(request, ct_id, rlp_id, hash, ajax=None):
     #return HttpResponseRedirect("/edit/%s/%s" % (ct.model, obj.id))
     return HttpResponseRedirect("../../../../../../%s/%s/%s" % (obj._meta.app_label, obj._meta.module_name , str(obj.id)))
 
-def add_row_level_permission(request, ct_id, obj_id, ajax=None):
+def add_row_level_permission(request, ct_id, obj_id):
     msg = {}
+    ajax = request.GET.has_key("ajax")
     if not request.POST:
         msg = { 'result':False, 'text': _("Only POSTs are allowed" )} 
         if ajax:
@@ -73,8 +75,9 @@ def add_row_level_permission(request, ct_id, obj_id, ajax=None):
     msg["results"]=resp_list
     return HttpResponse(simplejson.dumps(msg), 'text/javascript')
 
-def change_row_level_permission(request, ct_id, rlp_id, hash, ajax=None):    
+def change_row_level_permission(request, ct_id, rlp_id, hash):    
     msg = {}
+    ajax = request.GET.has_key("ajax")
     if not request.POST:
         msg = { 'result':False, 'text': _("Only POSTs are allowed" )}  
 
