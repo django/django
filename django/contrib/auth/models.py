@@ -49,9 +49,9 @@ class Permission(models.Model):
 
 class RowLevelPermissionManager(models.Manager):
     def create_row_level_permission(self, model_instance, owner, permission, negative=False):
+        model_ct=ContentType.objects.get_for_model(model_instance)        
         if isinstance(permission, str):
-            permission = Permission.objects.get(codename__exact=permission)
-        model_ct=ContentType.objects.get_for_model(model_instance)
+            permission = Permission.objects.get(codename__exact=permission, content_type=model_ct.id)
         if model_ct != permission.content_type:
             raise TypeError, "Invalid value: Permission content type(%s) and object content type(%s) do not match" % (permission.content_type, type_ct)
         
@@ -111,7 +111,7 @@ class Group(models.Model):
     """
     name = models.CharField(_('name'), maxlength=80, unique=True)
     permissions = models.ManyToManyField(Permission, verbose_name=_('permissions'), blank=True, filter_interface=models.HORIZONTAL)
-    row_level_permissions_owned = models.GenericRelation(RowLevelPermission, object_id_field="owner_id", content_type_field="owner_ct", related_name="owner")
+    row_level_permissions_owned = models.GenericRelation(RowLevelPermission, object_id_field="owner_id", content_type_field="owner_ct", related_name="group")
     class Meta:
         verbose_name = _('group')
         verbose_name_plural = _('groups')
@@ -260,11 +260,15 @@ class User(models.Model):
         return self._perm_cache
 
     def check_row_level_permission(self, permission, object):
+        object_ct=ContentType.objects.get_for_model(object)
         if isinstance(permission, str):
-            permission = Permission.objects.get(codename__exact=permission)
+            try:
+                permission = Permission.objects.get(codename__exact=permission, content_type=object_ct.id)
+            except Permission.DoesNotExist:
+                return False
         try:
             row_level_perm=self.row_level_permissions_owned.get(model_id=object.id, 
-                                                                    model_ct=ContentType.objects.get_for_model(object).id, 
+                                                                    model_ct=object_ct.id, 
                                                                     permission=permission.id)
         except RowLevelPermission.DoesNotExist:
             return self.check_group_row_level_permissions(permission, object)
@@ -302,6 +306,7 @@ class User(models.Model):
                              ContentType.objects.get_for_model(object).id,
                              permission.id,])
         row = cursor.fetchone()
+
         if row is None:
             return None
         return not row[0]
@@ -314,7 +319,8 @@ class User(models.Model):
         if self.is_superuser:
             return True
         if object and object._meta.row_level_permissions:
-            row_level_permission = self.check_row_level_permission(perm, object)
+            permission_str = perm[perm.index('.')+1:]
+            row_level_permission = self.check_row_level_permission(permission_str, object)
             if row_level_permission is not None:
                 return row_level_permission
         return perm in self.get_all_permissions()
