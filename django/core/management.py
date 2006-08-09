@@ -94,12 +94,15 @@ def get_sql_create(app):
             "Edit your settings file and change DATABASE_ENGINE to something like 'postgresql' or 'mysql'.\n"))
         sys.exit(1)
 
-    # Get installed models, so we generate REFERENCES right
+    # Get installed models, so we generate REFERENCES right.
+    # We trim models from the current app so that the sqlreset command does not
+    # generate invalid SQL (leaving models out of known_models is harmless, so
+    # we can be conservative).
+    app_models = models.get_models(app)
     final_output = []
-    known_models = set(_get_installed_models(_get_table_list()))
+    known_models = set([model for model in _get_installed_models(_get_table_list()) if model not in app_models])
     pending_references = {}
 
-    app_models = models.get_models(app)
 
     for model in app_models:
         output, references = _get_sql_model_create(model, known_models)
@@ -118,10 +121,13 @@ def get_sql_create(app):
     # but don't exist physically
     not_installed_models = set(pending_references.keys())
     if not_installed_models:
-        final_output.append('-- The following references should be added but depend on non-existant tables:')
+        alter_sql = []
         for model in not_installed_models:
-            final_output.extend(['-- ' + sql for sql in
+            alter_sql.extend(['-- ' + sql for sql in
                 _get_sql_for_pending_references(model, pending_references)])
+        if alter_sql:
+            final_output.append('-- The following references should be added but depend on non-existent tables:')
+            final_output.extend(alter_sql)
 
     return final_output
 get_sql_create.help_doc = "Prints the CREATE TABLE SQL statements for the given app name(s)."
