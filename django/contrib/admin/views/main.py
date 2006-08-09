@@ -402,12 +402,13 @@ def change_stage(request, app_label, model_name, object_id):
         add_rlp_manip = AddRLPManipulator(model_instance, model_ct)
         edit_rlp_manip = ChangeRLPManipulator(model_ct)
         new_rlp_form = forms.FormWrapper(add_rlp_manip, rlp_new_data, rlp_errors)
+        empty_rlp_form = forms.FormWrapper(edit_rlp_manip, rlp_new_data, rlp_errors)
         rlp_form_list = []
         for r in rlp_list:
             owner_val = str(r.owner_ct)+"-"+str(r.owner_id)
             data = {'id':r.id, 'owner':owner_val, 'perm':r.permission.id, 'negative':r.negative}
             rlp_form_list.append({'form':forms.FormWrapper(edit_rlp_manip, data, rlp_errors), 'rlp':r})
-        rlp_context = {'new_rlp_form':new_rlp_form, 'rlp_form_list':rlp_form_list,}
+        rlp_context = {'new_rlp_form':new_rlp_form, 'rlp_form_list':rlp_form_list, 'empty_rlp_form':empty_rlp_form}
         c.update(rlp_context)
     
     return render_change_form(model, manipulator, c, change=True)

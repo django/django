@@ -41,7 +41,6 @@ def add_row_level_permission(request, ct_id, obj_id):
 
     ct = get_object_or_404(ContentType, pk=ct_id)
     obj = get_object_or_404(ct.model_class(), pk=obj_id)
-
     if not request.user.has_perm(obj._meta.app_label + '.' + obj._meta.get_change_permission()):
         raise PermissionDenied  
 
@@ -51,6 +50,7 @@ def add_row_level_permission(request, ct_id, obj_id):
     manip = AddRLPManipulator(obj, ct)
     
     new_data = request.POST.copy()
+    
     manip.do_html2python(new_data)
     
     rlp_list = []
@@ -71,7 +71,8 @@ def add_row_level_permission(request, ct_id, obj_id):
     
     resp_list = []
     for rlp in rlp_list:
-        resp_list.append({"id":rlp.id, "permission":rlp.permission.id})
+        hash = utils.create_objref(rlp)
+        resp_list.append({"id":rlp.id, "permission":rlp.permission.id, "hash":hash})
     msg["results"]=resp_list
     return HttpResponse(simplejson.dumps(msg), 'text/javascript')
 
