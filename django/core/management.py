@@ -301,7 +301,7 @@ def get_sql_delete(app):
                         (style.SQL_KEYWORD('ALTER TABLE'),
                         style.SQL_TABLE(backend.quote_name(table)),
                         style.SQL_KEYWORD(backend.get_drop_foreignkey_sql()),
-                        style.SQL_FIELD(backend.quote_name('%s_refs_%s_%x' % (r_col, col, abs(hash((table, r_table))))))))
+                        style.SQL_FIELD(backend.quote_name('%s_refs_%s_%x' % (col, r_col, abs(hash((table, r_table))))))))
                 del references_to_delete[model]
 
     # Output DROP TABLE statements for many-to-many tables.
