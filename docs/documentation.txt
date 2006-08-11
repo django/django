@@ -1,0 +1,140 @@
+====================================
+How to read the Django documentation
+====================================
+
+We've put a lot of effort into making Django's documentation useful, easy to
+read and as complete as possible. Here are a few tips on how to make the best
+of it, along with some style guidelines.
+
+(Yes, this is documentation about documentation. Rest assured we have no plans
+to write a document about how to read the document about documentation.)
+
+How documentation is updated
+============================
+
+Just as the Django code base is developed and improved on a daily basis, our
+documentation is consistently improving. We improve documentation for several
+reasons:
+
+    * To make content fixes, such as grammar/typo corrections.
+    * To add information and/or examples to existing sections that need to be
+      expanded.
+    * To document Django features that aren't yet documented. (The list of
+      such features is shrinking but exists nonetheless.)
+    * To add documentation for new features as new features get added, or as
+      Django APIs or behaviors change.
+
+Django's documentation is kept in the same source control system as its code.
+It lives in the `django/trunk/docs`_ directory of our Subversion repository.
+Each document is a separate text file that covers a narrowly focused topic,
+such as the "generic views" framework or how to construct a database model.
+
+.. _django/trunk/docs: http://code.djangoproject.com/browser/django/trunk/docs
+
+Where to get it
+===============
+
+You can read Django documentation in several ways. They are, in order of
+preference:
+
+On the Web
+----------
+
+The most recent version of the Django documentation lives at
+http://www.djangoproject.com/documentation/ . These HTML pages are generated
+automatically from the text files in source control every 15 minutes. That
+means they reflect the "latest and greatest" in Django -- they include the very
+latest corrections and additions, and they discuss the latest Django features,
+which may only be available to users of the Django development version. (See
+"Differences between versions" below.)
+
+A key advantage of the Web-based documentation is the comment section at the
+bottom of each document. This is an area for anybody to submit changes,
+corrections and suggestions about the given document. The Django developers
+frequently monitor the comments there and use them to improve the documentation
+for everybody.
+
+We encourage you to help improve the docs: it's easy! Note, however, that
+comments should explicitly relate to the documentation, rather than asking
+broad tech-support questions. If you need help with your particular Django
+setup, try the `django-users mailing list`_ instead of posting a comment to the
+documentation.
+
+.. _django-users mailing list: http://groups.google.com/group/django-users
+
+In plain text
+-------------
+
+For offline reading, or just for convenience, you can read the Django
+documentation in plain text.
+
+If you're using an official release of Django, note that the zipped package
+(tarball) of the code includes a ``docs/`` directory, which contains all the
+documentation for that release.
+
+If you're using the development version of Django (aka the Subversion "trunk"),
+note that the ``docs/`` directory contains all of the documentation. You can
+``svn update`` it, just as you ``svn update`` the Python code, in order to get
+the latest changes.
+
+You can check out the latest Django documentation from Subversion using this
+shell command::
+
+    svn co http://code.djangoproject.com/svn/django/trunk/docs/ django_docs
+
+One low-tech way of taking advantage of the text documentation is by using the
+Unix ``grep`` utility to search for a phrase in all of the documentation. For
+example, this will show you each mention of the phrase "edit_inline" in any
+Django document::
+
+    grep edit_inline /path/to/django/docs/*.txt
+
+Formatting
+~~~~~~~~~~
+
+The text documentation is written in ReST (ReStructured Text) format. That
+means it's easy to read but is also formatted in a way that makes it easy to
+convert into other formats, such as HTML. If you're interested, the script that
+converts the ReST text docs into djangoproject.com's HTML lives at
+`djangoproject.com/django_website/apps/docs/parts/build_documentation.py`_ in
+the Django Subversion repository.
+
+.. _djangoproject.com/django_website/apps/docs/parts/build_documentation.py: http://code.djangoproject.com/browser/djangoproject.com/django_website/apps/docs/parts/build_documentation.py
+
+Differences between versions
+============================
+
+As previously mentioned, the text documentation in our Subversion repository
+contains the "latest and greatest" changes and additions. These changes often
+include documentation of new features added in the Django development version
+-- the Subversion ("trunk") version of Django. For that reason, it's worth
+pointing out our policy on keeping straight the documentation for various
+versions of the framework.
+
+We follow this policy:
+
+    * The primary documentation on djangoproject.com is an HTML version of the
+      latest docs in Subversion. These docs always correspond to the latest
+      official Django release, plus whatever features we've added/changed in
+      the framework *since* the latest release.
+
+    * As we add features to Django's development version, we try to update the
+      documentation in the same Subversion commit transaction.
+
+    * To distinguish feature changes/additions in the docs, we use the phrase
+      **New in Django development version**. In practice, this means that the
+      current documentation on djangoproject.com can be used by users of either
+      the latest release *or* the development version.
+
+    * Documentation for a particular Django release is frozen once the version
+      has been released officially. It remains a snapshot of the docs as of the
+      moment of the release. We will make exceptions to this rule in
+      the case of retroactive security updates or other such retroactive
+      changes. Once documentation is frozen, we add a note to the top of each
+      frozen document that says "These docs are frozen for Django version XXX"
+      and links to the current version of that document.
+
+    * The `main documentation Web page`_ includes links to documentation for
+      all previous versions.
+
+.. _main documentation Web page: http://www.djangoproject.com/documentation/
