@@ -698,9 +698,7 @@ def inspectdb():
 
     introspection_module = get_introspection_module()
 
-    def table2model(table_name):
-        object_name = table_name.title().replace('_', '')
-        return object_name.endswith('s') and object_name[:-1] or object_name
+    table2model = lambda table_name: table_name.title().replace('_', '')
 
     cursor = connection.cursor()
     yield "# This is an auto-generated Django model module."
