@@ -20,7 +20,7 @@ BLANK_CHOICE_DASH = [("", "---------")]
 BLANK_CHOICE_NONE = [("", "None")]
 
 # prepares a value for use in a LIKE query
-prep_for_like_query = lambda x: str(x).replace("%", "\%").replace("_", "\_")
+prep_for_like_query = lambda x: str(x).replace("\\", "\\\\").replace("%", "\%").replace("_", "\_")
 
 # returns the <ul> class for a given radio_admin value
 get_ul_class = lambda x: 'radiolist%s' % ((x == HORIZONTAL) and ' inline' or '')
