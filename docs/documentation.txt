@@ -134,6 +134,14 @@ We follow this policy:
       frozen document that says "These docs are frozen for Django version XXX"
       and links to the current version of that document.
 
+    * Once a document is frozen for a Django release, we remove comments from
+      that page, in favor of having comments on the latest version of that
+      document. This is for the sake of maintainability and usability, so that
+      users have one, and only one, place to leave comments on a particular
+      document. We realize that some people may be stuck on a previous version
+      of Django, but we believe the usability problems with multiple versions
+      of a document the outweigh the benefits.
+
     * The `main documentation Web page`_ includes links to documentation for
       all previous versions.
 
