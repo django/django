@@ -729,14 +729,14 @@ def inspectdb():
             comment_notes = [] # Holds Field notes, to be displayed in a Python comment.
             extra_params = {}  # Holds Field parameters such as 'db_column'.
 
+            if ' ' in att_name:
+                extra_params['db_column'] = att_name
+                att_name = att_name.replace(' ', '')
+                comment_notes.append('Field renamed to remove spaces.')
             if keyword.iskeyword(att_name):
                 extra_params['db_column'] = att_name
                 att_name += '_field'
                 comment_notes.append('Field renamed because it was a Python reserved word.')
-            elif ' ' in att_name:
-                extra_params['db_column'] = att_name
-                att_name = att_name.replace(' ', '')
-                comment_notes.append('Field renamed to remove spaces.')
 
             if relations.has_key(i):
                 rel_to = relations[i][1] == table_name and "'self'" or table2model(relations[i][1])
