@@ -1,31 +1,16 @@
 {% load i18n admin_modify %}
+
+{% comment %}Start of AJAX{% endcomment %}
 {% include_admin_script "js/lib/YahooUI/yahoo/yahoo-debug.js" %}
 {% include_admin_script "js/lib/YahooUI/event/event-debug.js" %}
 {% include_admin_script "js/lib/YahooUI/connection/connection-debug.js" %}
 {% include_admin_script "js/lib/YahooUI/dom/dom-debug.js" %}
 {% include_admin_script "js/lib/YahooUI/animation/animation-debug.js" %}
-{% include_admin_script "js/lib/YahooUI/logger/logger-debug.js" %}
+{% include_admin_script "js/row_level_permission_ajax.js" %}
+{% comment %}End of AJAX{% endcomment %}
+
 {% include_admin_script "js/row_level_permission.js" %}
-<link rel="stylesheet" type="text/css" href="/media/js/lib/YahooUI/logger/logger.css" />
 
-
-<script type="text/javascript">
-
-function init() {
-	add_row_level_permission.init();
-	row_level_permission.init();
-	
-	forms = document.forms;
-	for(var i=0; i<forms.length; i++) {
-		forms[i].reset;
-	}
-	
-	row_level_permission.add_delete_listener(YAHOO.util.Dom.getElementsByClassName( "deleteLink", 'a'));
-	row_level_permission.add_apply_listener(YAHOO.util.Dom.getElementsByClassName( "editRLPForm", 'form'));	
-}
-	
-YAHOO.util.Event.addListener(window, 'load', init);
-</script>
 
 <h1>{% trans "Row Level Permissions" %}</h1>
 <div id="rlpResults">
