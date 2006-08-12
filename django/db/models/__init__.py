@@ -47,7 +47,7 @@ class LazyDate(object):
         return "<LazyDate: %s>" % self.delta
 
     def __get_value__(self):
-        return datetime.datetime.now() + self.delta
+        return (datetime.datetime.now() + self.delta).date()
 
     def __getattr__(self, attr):
         return getattr(self.__get_value__(), attr)
