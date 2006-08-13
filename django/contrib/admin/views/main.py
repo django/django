@@ -226,8 +226,6 @@ class ChangeList(object):
                     or_queries.append(meta.Q(**{'%s__icontains' % field_name: bit}))
                 complex_queries.append(reduce(operator.or_, or_queries))
             lookup_params['complex'] = reduce(operator.and_, complex_queries)
-        if opts.one_to_one_field:
-            lookup_params.update(opts.one_to_one_field.rel.limit_choices_to)
         self.lookup_params = lookup_params
 
 def change_list(request, app_label, module_name):
