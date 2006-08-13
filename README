@@ -1,7 +1,7 @@
 Django is a high-level Python Web framework that encourages rapid development
 and clean, pragmatic design.
 
-This is the Django 0.91 "bugfixes" branch, which is inetnded to provide
+This is the Django 0.91 "bugfixes" branch, which is intended to provide
 bugfix and patch support for users of Django version 0.91, which was
 the last version before a series of major API changes. No new features
 will be added in this branch, and it is maintained solely as a means
