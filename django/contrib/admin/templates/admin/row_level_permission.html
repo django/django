@@ -50,16 +50,17 @@
 <h2>{% trans "Current Permissions" %}</h2>
 <table id="current-rlpTable">
 <tr class="header">
-<th>
+	<th id="select_header"></th>
+<th id="owner_header">
 {% trans "Owner" %}
 </th>
-<th>
+<th id="perm_header">
 {% trans "Permission" %}
 </th>
-<th>
+<th id="negative_header">
 {% trans "Negative" %}
 </th>
-<th>
+<th id="options_header">
 {% trans "Options" %}
 </th>
 </tr>
@@ -68,10 +69,13 @@
 {% load row_level_permission %}
 {% for o in rlp_form_list %}
 <tr id="editRLP-{{ o.rlp.id }}">
-<td colspan="4">
-<form id="editRLPForm-{{ o.rlp.id }}" class="editRLPForm" method="POST" name="editRLPForm-{{ rlp.id }}"  action="../../../auth/row_level_permission/{% objref o.rlp %}/change/">
-<table>
-<tr>
+<!--<td colspan="5">-->
+<form id="editRLPForm-{{ o.rlp.id }}" class="editRLPForm" method="POST" name="editRLPForm-{{ o.rlp.id }}"  action="../../../auth/row_level_permission/{% objref o.rlp %}/change/">
+<!--<table>
+<tr>-->
+	<td>
+		<input type="checkbox" name="apply_checkbox">
+	</td>
 	<td>
 		{{ o.form.owner }}
 	</td>
@@ -89,43 +93,21 @@
 		<a href="../../../auth/row_level_permission/{% objref o.rlp %}/delete/" class="deleteLink">{% trans 'Delete' %}</a> | 
 		<a href="javascript:row_level_permission.copyToNew({{ o.rlp.id }})" class="copyToNewLink">{% trans 'Copy to New' %}</a>
 	</td>	
-</tr>
-</table>
+<!--</tr>
+</table>-->
 </form>
 </td>
 </tr>
 {% endfor %}
+<tr align="right">
+	<td colspan="5">
+		<form id="apply_selected_form" method="POST" name="apply_selected_form"  onsubmit="row_level_permission.apply_selected(); return false;">
+			<input id="apply_selected_button" type="submit" value="{% trans 'Apply Selected' %}" />
+		</form>
+	</td>
+</tr>
 {% else %}
 <tr><td colspan=4><em>No row level permissions</em></td></tr>
 {% endif %}
 </TBODY>
-</table>
-
-<table style="display: none">
-<tr id="empty_editRLP">
-<td colspan="4">
-<form id="empty_editRLPForm" method="POST" class="editRLPForm" name="empty-editRLPForm">
-<table>
-<tr>
-	<td>
-		{{ empty_rlp_form.owner }}
-	</td>
-	<td>
-		{{ empty_rlp_form.perm }}
-	</td>
-	<td>
-		{{ empty_rlp_form.negative }}
-	</td>
-	<td>
-		<input id="applyButton" type="submit" value="{% trans 'Apply' %}" />
-		<input id="cancelButton" type="reset" value="{% trans 'Reset' %}"/>
-		<br/>
-		<a class="deleteLink" >{% trans 'Delete' %}</a> | 
-		<a class="copyToNewLink">{% trans 'Copy to New' %}</a>
-	</td>	
-</tr>
-</table>
-</form>
-</td>
-</tr>
 </table>
