@@ -49,6 +49,7 @@
 
 <h2>{% trans "Current Permissions" %}</h2>
 <table id="current-rlpTable">
+{% if rlp_form_list %}
 <tr class="header">
 	<th id="select_header"></th>
 <th id="owner_header">
@@ -65,7 +66,6 @@
 </th>
 </tr>
 <TBODY>
-{% if rlp_form_list %}
 {% load row_level_permission %}
 {% for o in rlp_form_list %}
 <tr id="editRLP-{{ o.rlp.id }}">
@@ -106,8 +106,8 @@
 		</form>
 	</td>
 </tr>
-{% else %}
-<tr><td colspan=4><em>No row level permissions</em></td></tr>
-{% endif %}
 </TBODY>
 </table>
+{% else %}
+<em>{% trans 'No row level permissions'%}</em>
+{% endif %}

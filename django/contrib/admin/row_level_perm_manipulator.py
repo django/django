@@ -3,7 +3,6 @@ from django.contrib.contenttypes.models import ContentType
 from django.http import Http404, HttpResponse, HttpResponseRedirect
 from django.contrib.auth.models import User, Group, Permission, RowLevelPermission
 from django.db.models import manipulators
-from auth import utils
 
 class ChangeRLPManipulator(forms.Manipulator):
     def __init__(self, ct=None):
