@@ -431,3 +431,48 @@ Note that extra options will *always* be passed to *every* line in the included
 URLconf, regardless of whether the line's view actually accepts those options
 as valid. For this reason, this technique is only useful if you're certain that
 every view in the the included URLconf accepts the extra options you're passing.
+
+Passing callable objects instead of strings
+===========================================
+
+**New in the Django development version.**
+
+Some developers find it more natural to pass the actual Python function object
+rather than a string containing the path to its module. This alternative is
+supported -- you can pass any callable object as the view.
+
+For example, given this URLconf in "string" notation::
+
+    urlpatterns = patterns('',
+        (r'^archive/$', 'mysite.views.archive'),
+        (r'^about/$', 'mysite.views.about'),
+        (r'^contact/$', 'mysite.views.contact'),
+    )
+
+You can accomplish the same thing by passing objects rather than strings. Just
+be sure to import the objects::
+
+    from mysite.views import archive, about, contact
+
+    urlpatterns = patterns('',
+        (r'^archive/$', archive),
+        (r'^about/$', about),
+        (r'^contact/$', contact),
+    )
+
+The following example is functionally identical. It's just a bit more compact
+because it imports the module that contains the views, rather than importing
+each view individually::
+
+    from mysite import views
+
+    urlpatterns = patterns('',
+        (r'^archive/$', views.archive),
+        (r'^about/$', views.about),
+        (r'^contact/$', views.contact),
+    )
+
+The style you use is up to you.
+
+Note that if you use this technique -- passing objects rather than strings --
+the view prefix (as explained in "The view prefix" above) will have no effect.

@@ -88,5 +88,6 @@ class SessionMiddleware(object):
                 new_session = Session.objects.save(session_key, request.session._session,
                     datetime.datetime.now() + datetime.timedelta(seconds=settings.SESSION_COOKIE_AGE))
                 response.set_cookie(settings.SESSION_COOKIE_NAME, session_key,
-                    max_age=max_age, expires=expires, domain=settings.SESSION_COOKIE_DOMAIN)
+                    max_age=max_age, expires=expires, domain=settings.SESSION_COOKIE_DOMAIN,
+                    secure=settings.SESSION_COOKIE_SECURE or None)
         return response

@@ -94,12 +94,15 @@ def get_sql_create(app):
             "Edit your settings file and change DATABASE_ENGINE to something like 'postgresql' or 'mysql'.\n"))
         sys.exit(1)
 
-    # Get installed models, so we generate REFERENCES right
+    # Get installed models, so we generate REFERENCES right.
+    # We trim models from the current app so that the sqlreset command does not
+    # generate invalid SQL (leaving models out of known_models is harmless, so
+    # we can be conservative).
+    app_models = models.get_models(app)
     final_output = []
-    known_models = set(_get_installed_models(_get_table_list()))
+    known_models = set([model for model in _get_installed_models(_get_table_list()) if model not in app_models])
     pending_references = {}
 
-    app_models = models.get_models(app)
 
     for model in app_models:
         output, references = _get_sql_model_create(model, known_models)
@@ -118,10 +121,13 @@ def get_sql_create(app):
     # but don't exist physically
     not_installed_models = set(pending_references.keys())
     if not_installed_models:
-        final_output.append('-- The following references should be added but depend on non-existant tables:')
+        alter_sql = []
         for model in not_installed_models:
-            final_output.extend(['-- ' + sql for sql in
+            alter_sql.extend(['-- ' + sql for sql in
                 _get_sql_for_pending_references(model, pending_references)])
+        if alter_sql:
+            final_output.append('-- The following references should be added but depend on non-existent tables:')
+            final_output.extend(alter_sql)
 
     return final_output
 get_sql_create.help_doc = "Prints the CREATE TABLE SQL statements for the given app name(s)."
@@ -295,7 +301,7 @@ def get_sql_delete(app):
                         (style.SQL_KEYWORD('ALTER TABLE'),
                         style.SQL_TABLE(backend.quote_name(table)),
                         style.SQL_KEYWORD(backend.get_drop_foreignkey_sql()),
-                        style.SQL_FIELD(backend.quote_name("%s_referencing_%s_%s" % (col, r_table, r_col)))))
+                        style.SQL_FIELD(backend.quote_name('%s_refs_%s_%x' % (col, r_col, abs(hash((table, r_table))))))))
                 del references_to_delete[model]
 
     # Output DROP TABLE statements for many-to-many tables.
@@ -692,9 +698,7 @@ def inspectdb():
 
     introspection_module = get_introspection_module()
 
-    def table2model(table_name):
-        object_name = table_name.title().replace('_', '')
-        return object_name.endswith('s') and object_name[:-1] or object_name
+    table2model = lambda table_name: table_name.title().replace('_', '')
 
     cursor = connection.cursor()
     yield "# This is an auto-generated Django model module."
@@ -723,6 +727,10 @@ def inspectdb():
             comment_notes = [] # Holds Field notes, to be displayed in a Python comment.
             extra_params = {}  # Holds Field parameters such as 'db_column'.
 
+            if ' ' in att_name:
+                extra_params['db_column'] = att_name
+                att_name = att_name.replace(' ', '')
+                comment_notes.append('Field renamed to remove spaces.')
             if keyword.iskeyword(att_name):
                 extra_params['db_column'] = att_name
                 att_name += '_field'
@@ -953,6 +961,12 @@ def get_validation_errors(outfile, app=None):
                             f = opts.get_field(fn)
                         except models.FieldDoesNotExist:
                             e.add(opts, '"admin.list_filter" refers to %r, which isn\'t a field.' % fn)
+                # date_hierarchy
+                if opts.admin.date_hierarchy:
+                    try:
+                        f = opts.get_field(opts.admin.date_hierarchy)
+                    except models.FieldDoesNotExist:
+                        e.add(opts, '"admin.date_hierarchy" refers to %r, which isn\'t a field.' % opts.admin.date_hierarchy)
 
         # Check ordering attribute.
         if opts.ordering:
@@ -1128,7 +1142,14 @@ def dbshell():
 dbshell.args = ""
 
 def runfcgi(args):
-    """Run this project as a FastCGI application. requires flup."""
+    "Runs this project as a FastCGI application. Requires flup."
+    from django.conf import settings
+    from django.utils import translation
+    # Activate the current language, because it won't get activated later.
+    try:
+        translation.activate(settings.LANGUAGE_CODE)
+    except AttributeError:
+        pass
     from django.core.servers.fastcgi import runfastcgi
     runfastcgi(args)
 runfcgi.args = '[various KEY=val options, use `runfcgi help` for help]'
@@ -1285,7 +1306,11 @@ def execute_from_command_line(action_mapping=DEFAULT_ACTION_MAPPING, argv=None):
         if action not in NO_SQL_TRANSACTION:
             print style.SQL_KEYWORD("COMMIT;")
 
-def execute_manager(settings_mod, argv=None):
+def setup_environ(settings_mod):
+    """
+    Configure the runtime environment. This can also be used by external
+    scripts wanting to set up a similar environment to manage.py.
+    """
     # Add this project to sys.path so that it's importable in the conventional
     # way. For example, if this file (manage.py) lives in a directory
     # "myproject", this code would add "/path/to/myproject" to sys.path.
@@ -1297,7 +1322,10 @@ def execute_manager(settings_mod, argv=None):
 
     # Set DJANGO_SETTINGS_MODULE appropriately.
     os.environ['DJANGO_SETTINGS_MODULE'] = '%s.settings' % project_name
+    return project_directory
 
+def execute_manager(settings_mod, argv=None):
+    project_directory = setup_environ(settings_mod)
     action_mapping = DEFAULT_ACTION_MAPPING.copy()
 
     # Remove the "startproject" command from the action_mapping, because that's

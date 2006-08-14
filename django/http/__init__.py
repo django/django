@@ -38,7 +38,7 @@ class HttpRequest(object):
 
     def get_full_path(self):
         return ''
-        
+
     def is_secure(self):
         return os.environ.get("HTTPS") == "on"
 
@@ -203,11 +203,14 @@ class HttpResponse(object):
             if val is not None:
                 self.cookies[key][var.replace('_', '-')] = val
 
-    def delete_cookie(self, key):
-        try:
-            self.cookies[key]['max_age'] = 0
-        except KeyError:
-            pass
+    def delete_cookie(self, key, path='/', domain=None):
+        self.cookies[key] = ''
+        if path is not None:
+            self.cookies[key]['path'] = path
+        if domain is not None:
+            self.cookies[key]['domain'] = path
+        self.cookies[key]['expires'] = 0
+        self.cookies[key]['max-age'] = 0
 
     def _get_content(self):
         content = ''.join(self._iterator)

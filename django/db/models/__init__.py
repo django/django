@@ -25,7 +25,7 @@ def permalink(func):
     def inner(*args, **kwargs):
         bits = func(*args, **kwargs)
         viewname = bits[0]
-        return reverse(bits[0], None, *bits[1:2])
+        return reverse(bits[0], None, *bits[1:3])
     return inner
 
 class LazyDate(object):
@@ -47,7 +47,7 @@ class LazyDate(object):
         return "<LazyDate: %s>" % self.delta
 
     def __get_value__(self):
-        return datetime.datetime.now() + self.delta
+        return (datetime.datetime.now() + self.delta).date()
 
     def __getattr__(self, attr):
         return getattr(self.__get_value__(), attr)
