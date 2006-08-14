@@ -65,10 +65,10 @@ class RowLevelPermissionManager(models.Manager):
         ret_dict = {}
         model_ct = ContentType.objects.get_for_model(model_instance)
         if change:
-            change_str = "change_%s" % (model_ct)
+            change_str = "change_%s" % (model_ct.model)
             ret_dict[change_str]=self.create_row_level_permission(model_instance, owner, change_str, negative=negChange)
         if delete:
-            delete_str = "delete_%s" % (model_ct)
+            delete_str = "delete_%s" % (model_ct.model)
             ret_dict[delete_str]=self.create_row_level_permission(model_instance, owner, delete_str, negative=negDel)
         return ret_dict    
 
