@@ -21,7 +21,6 @@ urlpatterns = patterns('',
     ('^doc/tags/$', 'django.contrib.admin.views.doc.template_tag_index'),
     ('^doc/filters/$', 'django.contrib.admin.views.doc.template_filter_index'),
     ('^doc/views/$', 'django.contrib.admin.views.doc.view_index'),
-    ('^doc/views/jump/$', 'django.contrib.admin.views.doc.jump_to_view'),
     ('^doc/views/(?P<view>[^/]+)/$', 'django.contrib.admin.views.doc.view_detail'),
     ('^doc/models/$', 'django.contrib.admin.views.doc.model_index'),
     ('^doc/models/(?P<app_label>[^\.]+)\.(?P<model_name>[^/]+)/$', 'django.contrib.admin.views.doc.model_detail'),
@@ -32,6 +31,9 @@ urlpatterns = patterns('',
     ('^auth/row_level_permission/(?P<ct_id>\d+)/(?P<rlp_id>\d+)/(?P<hash>\w+)/delete/$', 'django.contrib.admin.views.row_level_permissions.delete_row_level_permission'),
     ('^auth/row_level_permission/(?P<ct_id>\d+)/(?P<rlp_id>\d+)/(?P<hash>\w+)/change/$', 'django.contrib.admin.views.row_level_permissions.change_row_level_permission'),
     ('^auth/row_level_permission/add/(?P<ct_id>\d+)/(?P<obj_id>\d+)/$', 'django.contrib.admin.views.row_level_permissions.add_row_level_permission'),    
+
+    # "Add user" -- a special-case view
+    ('^auth/user/add/$', 'django.contrib.admin.views.auth.user_add_stage'),
 
     # Add/change/delete/history
     ('^([^/]+)/([^/]+)/$', 'django.contrib.admin.views.main.change_list'),
