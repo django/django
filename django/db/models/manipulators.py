@@ -138,7 +138,7 @@ class AutomaticManipulator(forms.Manipulator):
             child_follow = self.follow.get(related.name, None)
 
             if child_follow:
-                obj_list = expanded_data[related.var_name].items()
+                obj_list = expanded_data.get(related.var_name, {}).items()
                 if not obj_list:
                     continue
 

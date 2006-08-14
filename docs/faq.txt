@@ -251,6 +251,16 @@ information than the docs that come with the latest Django release.
 
 .. _stored in revision control: http://code.djangoproject.com/browser/django/trunk/docs
 
+Where can I find Django developers for hire?
+--------------------------------------------
+
+Consult our `developers for hire page`_ for a list of Django developers who
+would be happy to help you.
+
+You might also be interested in posting a job to http://www.gypsyjobs.com/ .
+
+.. _developers for hire page: http://code.djangoproject.com/wiki/DevelopersForHire
+
 Installation questions
 ======================
 
@@ -610,13 +620,10 @@ like to make should be possible by editing the stylesheet. We've got a
 How do I create users without having to edit password hashes?
 -------------------------------------------------------------
 
-We don't recommend you create users via the admin interface, because at the
-moment it requires you to edit password hashes manually. (Passwords are hashed
-using one-way hash algorithms for security; there's currently no Web interface
-for changing passwords by entering the actual password rather than the hash.)
+If you'd like to use the admin site to create users, upgrade to the Django
+development version, where this problem was fixed on Aug. 4, 2006.
 
-To create a user, you'll have to use the Python API. See `creating users`_ for
-full info.
+You can also use the Python API. See `creating users`_ for full info.
 
 .. _creating users: http://www.djangoproject.com/documentation/authentication/#creating-users
 

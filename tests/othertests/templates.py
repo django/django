@@ -410,6 +410,12 @@ TEMPLATE_TESTS = {
     # Three-level inheritance with {{ block.super }} from parent and grandparent
     'inheritance23': ("{% extends 'inheritance20' %}{% block first %}{{ block.super }}b{% endblock %}", {}, '1_ab3_'),
 
+    # Inheritance from local context without use of template loader
+    'inheritance24': ("{% extends context_template %}{% block first %}2{% endblock %}{% block second %}4{% endblock %}", {'context_template': template.Template("1{% block first %}_{% endblock %}3{% block second %}_{% endblock %}")}, '1234'),
+
+    # Inheritance from local context with variable parent template
+    'inheritance25': ("{% extends context_template.1 %}{% block first %}2{% endblock %}{% block second %}4{% endblock %}", {'context_template': [template.Template("Wrong"), template.Template("1{% block first %}_{% endblock %}3{% block second %}_{% endblock %}")]}, '1234'),
+
     ### I18N ##################################################################
 
     # {% spaceless %} tag

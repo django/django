@@ -647,6 +647,18 @@ Default: ``'sessionid'``
 The name of the cookie to use for sessions. This can be whatever you want.
 See the `session docs`_.
 
+SESSION_COOKIE_SECURE
+---------------------
+
+**New in Django development version**
+
+Default: ``False``
+
+Whether to use a secure cookie for the session cookie. If this is set to
+``True``, the cookie will be marked as "secure," which means browsers may
+ensure that the cookie is only sent under an HTTPS connection.
+See the `session docs`_.
+
 SESSION_EXPIRE_AT_BROWSER_CLOSE
 -------------------------------
 

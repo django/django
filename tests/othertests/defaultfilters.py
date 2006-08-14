@@ -231,6 +231,9 @@ False
 >>> time(datetime.time(13), "h")
 '01'
 
+>>> time(datetime.time(0), "h")
+'12'
+
 # real testing is done in timesince.py, where we can provide our own 'now'
 >>> timesince(datetime.datetime.now() - datetime.timedelta(1))
 '1 day'

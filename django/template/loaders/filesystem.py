@@ -17,7 +17,7 @@ def load_template_source(template_name, template_dirs=None):
             return (open(filepath).read(), filepath)
         except IOError:
             tried.append(filepath)
-    if template_dirs:
+    if tried:
         error_msg = "Tried %s" % tried
     else:
         error_msg = "Your TEMPLATE_DIRS setting is empty. Change it to point to at least one template directory."

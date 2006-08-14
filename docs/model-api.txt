@@ -223,6 +223,13 @@ steps:
        the absolute URL to your image in a template with ``{{
        object.get_mug_shot_url }}``.
 
+For example, say your ``MEDIA_ROOT`` is set to ``'/home/media'``, and
+``upload_to`` is set to ``'photos/%Y/%m/%d'``. The ``'%Y/%m/%d'`` part of
+``upload_to`` is strftime formatting; ``'%Y'`` is the four-digit year,
+``'%m'`` is the two-digit month and ``'%d'`` is the two-digit day. If you
+upload a file on Jan. 15, 2007, it will be saved in the directory
+``/home/media/photos/2007/01/15``.
+
 .. _`strftime formatting`: http://docs.python.org/lib/module-time.html#l2h-1941
 
 ``FilePathField``

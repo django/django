@@ -547,10 +547,6 @@ class WSGIRequestHandler(BaseHTTPRequestHandler):
 
         env['PATH_INFO'] = urllib.unquote(path)
         env['QUERY_STRING'] = query
-
-        host = self.address_string()
-        if host != self.client_address[0]:
-            env['REMOTE_HOST'] = host
         env['REMOTE_ADDR'] = self.client_address[0]
 
         if self.headers.typeheader is None:

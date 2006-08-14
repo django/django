@@ -20,7 +20,7 @@ BLANK_CHOICE_DASH = [("", "---------")]
 BLANK_CHOICE_NONE = [("", "None")]
 
 # prepares a value for use in a LIKE query
-prep_for_like_query = lambda x: str(x).replace("%", "\%").replace("_", "\_")
+prep_for_like_query = lambda x: str(x).replace("\\", "\\\\").replace("%", "\%").replace("_", "\_")
 
 # returns the <ul> class for a given radio_admin value
 get_ul_class = lambda x: 'radiolist%s' % ((x == HORIZONTAL) and ' inline' or '')
@@ -247,9 +247,9 @@ class Field(object):
         params['is_required'] = not self.blank and not self.primary_key and not rel
 
         # BooleanFields (CheckboxFields) are a special case. They don't take
-        # is_required or validator_list.
+        # is_required.
         if isinstance(self, BooleanField):
-            del params['validator_list'], params['is_required']
+            del params['is_required']
 
         # If this field is in a related context, check whether any other fields
         # in the related object have core=True. If so, add a validator --
@@ -289,8 +289,11 @@ class Field(object):
         if self.choices:
             return first_choice + list(self.choices)
         rel_model = self.rel.to
-        return first_choice + [(x._get_pk_val(), str(x))
-                               for x in rel_model._default_manager.complex_filter(self.rel.limit_choices_to)]
+        if hasattr(self.rel, 'get_related_field'):
+            lst = [(getattr(x, self.rel.get_related_field().attname), str(x)) for x in rel_model._default_manager.complex_filter(self.rel.limit_choices_to)]
+        else:
+            lst = [(x._get_pk_val(), str(x)) for x in rel_model._default_manager.complex_filter(self.rel.limit_choices_to)]
+        return first_choice + lst
 
     def get_choices_default(self):
         if self.radio_admin:

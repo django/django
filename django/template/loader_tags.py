@@ -50,6 +50,8 @@ class ExtendsNode(Node):
             if self.parent_name_expr:
                 error_msg += " Got this from the %r variable." % self.parent_name_expr #TODO nice repr.
             raise TemplateSyntaxError, error_msg
+        if hasattr(parent, 'render'):
+            return parent
         try:
             source, origin = find_template_source(parent, self.template_dirs)
         except TemplateDoesNotExist:
@@ -137,8 +139,9 @@ def do_extends(parser, token):
 
     This tag may be used in two ways: ``{% extends "base" %}`` (with quotes)
     uses the literal value "base" as the name of the parent template to extend,
-    or ``{% extends variable %}`` uses the value of ``variable`` as the name
-    of the parent template to extend.
+    or ``{% extends variable %}`` uses the value of ``variable`` as either the
+    name of the parent template to extend (if it evaluates to a string,) or as
+    the parent tempate itelf (if it evaluates to a Template object).
     """
     bits = token.contents.split()
     if len(bits) != 2:

@@ -578,6 +578,9 @@ related ``Person`` *and* the related ``City``::
     p = b.author         # Hits the database.
     c = p.hometown       # Hits the database.
 
+Note that ``select_related()`` does not follow foreign keys that have
+``null=True``.
+
 ``extra(select=None, where=None, params=None, tables=None)``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -715,12 +718,12 @@ The ``DoesNotExist`` exception inherits from
 A convenience method for creating an object and saving it all in one step.  Thus::
 
     p = Person.objects.create(first_name="Bruce", last_name="Springsteen")
-    
+
 and::
 
     p = Person(first_name="Bruce", last_name="Springsteen")
     p.save()
-    
+
 are equivalent.
 
 ``get_or_create(**kwargs)``
@@ -1468,11 +1471,12 @@ the ``ForeignKey`` ``Manager`` has these additional methods:
           b.entry_set.remove(e) # Disassociates Entry e from Blog b.
 
       In order to prevent database inconsistency, this method only exists on
-      ``ForeignKey``s where ``null=True``. If the related field can't be set to
-      ``None`` (``NULL``), then an object can't be removed from a relation
-      without being added to another. In the above example, removing ``e`` from
-      ``b.entry_set()`` is equivalent to doing ``e.blog = None``, and because
-      the ``blog`` ``ForeignKey`` doesn't have ``null=True``, this is invalid.
+      ``ForeignKey`` objects where ``null=True``. If the related field can't be
+      set to ``None`` (``NULL``), then an object can't be removed from a
+      relation without being added to another. In the above example, removing
+      ``e`` from ``b.entry_set()`` is equivalent to doing ``e.blog = None``,
+      and because the ``blog`` ``ForeignKey`` doesn't have ``null=True``, this
+      is invalid.
 
     * ``clear()``: Removes all objects from the related object set.
 
@@ -1556,13 +1560,13 @@ Queries over related objects
 ----------------------------
 
 Queries involving related objects follow the same rules as queries involving
-normal value fields. When specifying the the value for a query to match, you 
-may use either an object instance itself, or the primary key value for the 
+normal value fields. When specifying the the value for a query to match, you
+may use either an object instance itself, or the primary key value for the
 object.
 
 For example, if you have a Blog object ``b`` with ``id=5``, the following
 three queries would be identical::
-     
+
     Entry.objects.filter(blog=b) # Query using object instance
     Entry.objects.filter(blog=b.id) # Query using id from instance
     Entry.objects.filter(blog=5) # Query using id directly

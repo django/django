@@ -263,7 +263,7 @@ def add_stage(request, app_label, model_name, show_delete=False, form_url='', po
                     post_url_continue += "?_popup=1"
                 return HttpResponseRedirect(post_url_continue % pk_value)
             if request.POST.has_key("_popup"):
-                return HttpResponse('<script type="text/javascript">opener.dismissAddAnotherPopup(window, %s, "%s");</script>' % \
+                return HttpResponse('<script type="text/javascript">opener.dismissAddAnotherPopup(window, %r, "%s");</script>' % \
                     (pk_value, str(new_object).replace('"', '\\"')))
             elif request.POST.has_key("_addanother"):
                 request.user.message_set.create(message=msg + ' ' + (_("You may add another %s below.") % opts.verbose_name))

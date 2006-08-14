@@ -20,5 +20,7 @@ API_TESTS = """
 2
 >>> m.id is not None
 True
+>>> existing = Empty(m.id)
+>>> existing.save()
 
 """
