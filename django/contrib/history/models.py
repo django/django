@@ -83,9 +83,11 @@ def version_by_date(self, date):
 # Pre-save signal catch #
 #########################
 
-def _get_enabled_models():
+def _import_models(instance):
     """ Returns a list of History-enabled models. """
     model_list = []
+    m = None
+
     for model in models.get_models():
 	try:
 	    if model.History:
@@ -93,7 +95,17 @@ def _get_enabled_models():
 				   'name': model.__name__})
 	except:
 	    pass
-    return model_list
+
+    for model in model_list:
+	if model['name'] is instance.__class__.__name__:
+	    try:
+		m = __import__(model['module'], '', '', [model['name']])
+		#print model['module'],": ",model['name'],"- ",m
+		print "Model import done: ",m
+	    except:
+		print "Model import error."
+
+    return m
 
 def save_new_revision(sender, instance, signal, *args, **kwargs):
     """ Saves a old copy of the record into the History table."""
@@ -108,17 +120,8 @@ def save_new_revision(sender, instance, signal, *args, **kwargs):
     m = None 
     old = None
     log = None
-
-    for model in _get_enabled_models():
-	if model['name'] is instance.__class__.__name__:
-	    try:
-		m = __import__(model['module'], '', '', [model['name']])
-		#print model['module'],": ",model['name'],"- ",m
-		print "Model import done: ",m
-	    except:
-		print "Model import error."
     
-    if m:
+    if _import_models(instance):
 	try:
 	    if instance.id:
 		old = getattr(m, model['name']).objects.filter(pk=instance.id)[0]
@@ -135,14 +138,50 @@ def save_new_revision(sender, instance, signal, *args, **kwargs):
     else:
 	return 0  # exit wo/ an action
 
-
+    # DEBUG
     print "Old: ",old
     print "Instance: ",instance.id
     #print "Test: ",getattr(instance, 'Admin').date_hierarchy
     print "Log: ",log
+
     log.object = Pickle.dumps(old, protocol=0)
     log.save()
+
     print "New change saved."
-    
 
 dispatcher.connect( save_new_revision, signal=signals.pre_save )
+    
+###########################
+# Pre-delete signal catch #
+###########################
+
+def save_last_revision(sender, instance, signal, *args, **kwargs):
+    """ Saves the last copy of the record when the record is deleted."""
+    print "Sender: ",sender
+
+    if instance.__class__.__name__ is 'ChangeLog' or not hasattr(instance, 'History'): 
+	print "Not history-enabled class."
+	return 0
+
+    #instance_name = instance.__class__.__name__
+    #print instance_name
+    m = None 
+    old = None
+    log = None
+    
+    if _import_models(instance):
+	try:
+	    old = instance
+	    log = ChangeLog(parent=instance, comment="Object deleted. Last revision.")
+	    print "Log created."
+	except:
+	    return 1
+
+    try:
+	log.object = Pickle.dumps(old, protocol=0)
+	log.save()
+	print "Last change saved."
+    except:
+	print "Failed!"
+
+dispatcher.connect( save_last_revision, signal=signals.pre_delete )
