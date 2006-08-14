@@ -35,7 +35,7 @@ def get_apps():
                 _app_errors[app_name] = e
     return _app_list
 
-def get_app(app_label, emptyOK = False):
+def get_app(app_label, emptyOK=False):
     "Returns the module containing the models for the given app_label. If the app has no models in it and 'emptyOK' is True, returns None."
     get_apps() # Run get_apps() to populate the _app_list cache. Slightly hackish.
     for app_name in settings.INSTALLED_APPS:
@@ -83,7 +83,7 @@ def get_models(app_mod=None, creation_order=False):
             model_list.extend(get_models(app_mod))
         return model_list
 
-def get_model(app_label, model_name, seed_cache = True):
+def get_model(app_label, model_name, seed_cache=True):
     """
     Returns the model matching the given app_label and case-insensitive
     model_name.

@@ -139,7 +139,7 @@ class SchemaBuilder(object):
                     col = opts.get_field(f.rel.field_name).column
                     # For MySQL, r_name must be unique in the first 64 
                     # characters. So we are careful with character usage here.
-                    r_name = '%s_refs_%s_%x' % (r_col, col,
+                    r_name = '%s_refs_%s_%x' % (col, r_col,
                                                 abs(hash((r_table, table))))
                     sql = style.SQL_KEYWORD('ALTER TABLE') + ' %s ADD CONSTRAINT %s FOREIGN KEY (%s) REFERENCES %s (%s);' % \
                         (quote_name(table), quote_name(r_name),
@@ -262,8 +262,10 @@ class SchemaBuilder(object):
                              style.SQL_TABLE(qn(table)),
                              style.SQL_KEYWORD(
                                         backend.get_drop_foreignkey_sql()),
-                             style.SQL_FIELD(qn("%s_referencing_%s_%s" %
-                                                (col, r_table, r_col)))),
+                             style.SQL_FIELD(qn("%s_refs_%s_%x" %
+                                                (col, r_col,
+                                                 abs(hash((table, r_table)))))
+                                             )),                            
                             db.connection))
                     del references_to_delete[model]
             # many to many: drop any many-many tables that are my

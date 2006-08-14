@@ -14,7 +14,7 @@ def compile_messages():
         print "this script should be run from the django svn tree or your project or app tree"
         sys.exit(1)
 
-    for (dirpath, dirnames, filenames) in os.walk(basedir):
+    for dirpath, dirnames, filenames in os.walk(basedir):
         for f in filenames:
             if f.endswith('.po'):
                 sys.stderr.write('processing file %s in %s\n' % (f, dirpath))

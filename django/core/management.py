@@ -110,9 +110,14 @@ def get_sql_create(app):
             sys.exit(1)
 
         # Get installed models, so we generate REFERENCES right
+        # We trim models from the current app so that the sqlreset command does
+        # not generate invalid SQL (leaving models out of known_models is 
+        # harmless, so we can be conservative).
         manager = model._default_manager
         tables = manager.get_table_list()
-        installed_models = manager.get_installed_models(tables)
+        installed_models = [ model for model in
+                             manager.get_installed_models(tables)
+                             if model not in app_models ]
         models_output = set(installed_models) 
         builder = creation.builder
         builder.models_already_seen.update(models_output)
@@ -136,11 +141,14 @@ def get_sql_create(app):
     # but don't exist physically
     not_installed_models = set(pending_references.keys())
     if not_installed_models:
-        final_output.append('-- The following references should be added but depend on non-existant tables:')
+        alter_sql = []
         for model in not_installed_models:
-            final_output.extend(['-- ' + sql
-                                 for sql in pending_references.pop(model)])
-
+            alter_sql.extend(['-- ' + sql
+                              for sql in pending_references.pop(model)])
+        if alter_sql:
+            final_output.append('-- The following references should be added '
+                                'but depend on non-existent tables:')
+            final_output.extend(alter_sql)
     # convert BoundStatements into strings
     final_output = map(str, final_output)
     return final_output
@@ -563,9 +571,7 @@ def inspectdb():
 
     introspection_module = get_introspection_module()
 
-    def table2model(table_name):
-        object_name = table_name.title().replace('_', '')
-        return object_name.endswith('s') and object_name[:-1] or object_name
+    table2model = lambda table_name: table_name.title().replace('_', '')
 
     cursor = connection.cursor()
     yield "# This is an auto-generated Django model module."
@@ -594,6 +600,10 @@ def inspectdb():
             comment_notes = [] # Holds Field notes, to be displayed in a Python comment.
             extra_params = {}  # Holds Field parameters such as 'db_column'.
 
+            if ' ' in att_name:
+                extra_params['db_column'] = att_name
+                att_name = att_name.replace(' ', '')
+                comment_notes.append('Field renamed to remove spaces.')
             if keyword.iskeyword(att_name):
                 extra_params['db_column'] = att_name
                 att_name += '_field'
@@ -1010,7 +1020,14 @@ def dbshell():
 dbshell.args = ""
 
 def runfcgi(args):
-    """Run this project as a FastCGI application. requires flup."""
+    "Runs this project as a FastCGI application. Requires flup."
+    from django.conf import settings
+    from django.utils import translation
+    # Activate the current language, because it won't get activated later.
+    try:
+        translation.activate(settings.LANGUAGE_CODE)
+    except AttributeError:
+        pass
     from django.core.servers.fastcgi import runfastcgi
     runfastcgi(args)
 runfcgi.args = '[various KEY=val options, use `runfcgi help` for help]'
@@ -1167,7 +1184,11 @@ def execute_from_command_line(action_mapping=DEFAULT_ACTION_MAPPING, argv=None):
         if action not in NO_SQL_TRANSACTION:
             print style.SQL_KEYWORD("COMMIT;")
 
-def execute_manager(settings_mod, argv=None):
+def setup_environ(settings_mod):
+    """
+    Configure the runtime environment. This can also be used by external
+    scripts wanting to set up a similar environment to manage.py.
+    """
     # Add this project to sys.path so that it's importable in the conventional
     # way. For example, if this file (manage.py) lives in a directory
     # "myproject", this code would add "/path/to/myproject" to sys.path.
@@ -1179,7 +1200,10 @@ def execute_manager(settings_mod, argv=None):
 
     # Set DJANGO_SETTINGS_MODULE appropriately.
     os.environ['DJANGO_SETTINGS_MODULE'] = '%s.settings' % project_name
+    return project_directory
 
+def execute_manager(settings_mod, argv=None):
+    project_directory = setup_environ(settings_mod)
     action_mapping = DEFAULT_ACTION_MAPPING.copy()
 
     # Remove the "startproject" command from the action_mapping, because that's

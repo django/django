@@ -180,11 +180,12 @@ class Model(object):
             # If it does already exist, do an UPDATE.
             if cursor.fetchone():
                 db_values = [f.get_db_prep_save(f.pre_save(self, False)) for f in non_pks]
-                cursor.execute("UPDATE %s SET %s WHERE %s=%%s" % \
-                    (qn(self._meta.db_table),
-                    ','.join(['%s=%%s' % qn(f.column) for f in non_pks]),
-                    qn(self._meta.pk.column)),
-                    db_values + [pk_val])
+                if db_values:
+                    cursor.execute("UPDATE %s SET %s WHERE %s=%%s" % \
+                        (qn(self._meta.db_table),
+                        ','.join(['%s=%%s' % qn(f.column) for f in non_pks]),
+                        qn(self._meta.pk.column)),
+                        db_values + [pk_val])
             else:
                 record_exists = False
         if not pk_set or not record_exists:

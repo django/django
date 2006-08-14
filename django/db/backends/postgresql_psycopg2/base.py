@@ -11,6 +11,10 @@ except ImportError, e:
     from django.core.exceptions import ImproperlyConfigured
     raise ImproperlyConfigured, "Error loading psycopg2 module: %s" % e
 
+# Register Unicode conversions
+import psycopg2.extensions
+psycopg2.extensions.register_type(psycopg2.extensions.UNICODE)
+
 DatabaseError = Database.DatabaseError
 
 try:

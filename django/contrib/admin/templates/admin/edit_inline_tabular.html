@@ -7,6 +7,7 @@
          <th{{ fw.header_class_attribute }}>{{ fw.field.verbose_name|capfirst|escape }}</th>
       {% endif %}
    {% endfor %}
+   </tr></thead>
    {% for fcw in bound_related_object.form_field_collection_wrappers %}
       {% if change %}{% if original_row_needed %}
          {% if fcw.obj.original %}
