@@ -230,6 +230,14 @@ For example, say your ``MEDIA_ROOT`` is set to ``'/home/media'``, and
 upload a file on Jan. 15, 2007, it will be saved in the directory
 ``/home/media/photos/2007/01/15``.
 
+Note that whenever you deal with uploaded files, you should pay close attention
+to where you're uploading them and what type of files they are, to avoid
+security holes. *Validate all uploaded files* so that you're sure the files are
+what you think they are. For example, if you blindly let somebody upload files,
+without validation, to a directory that's within your Web server's document
+root, then somebody could upload a CGI or PHP script and execute that script by
+visiting its URL on your site. Don't allow that.
+
 .. _`strftime formatting`: http://docs.python.org/lib/module-time.html#l2h-1941
 
 ``FilePathField``
