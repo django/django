@@ -11,14 +11,12 @@ from datetime import datetime
 
 class ChangeLog(models.Model):
     change_time = models.DateTimeField (_('time of change'), auto_now=True)
-
     content_type = models.ForeignKey(ContentType)
     parent = models.GenericForeignKey()
     object_id = models.IntegerField(_('object ID'))
-
     user = models.ForeignKey(User, default="1")
     object = models.TextField()
-    comment = models.CharField(maxlength=250, default="Bla")
+    comment = models.CharField(maxlength=250, blank=True)
 
     #object_type = models.CharField(maxlength=50)
     #pub_date = models.DateTimeField('date published')
@@ -34,7 +32,10 @@ class ChangeLog(models.Model):
 	    ('Object', {'fields': ('object',),}),
 	)
 
-	list_display = ('object_id', 'user', 'comment', 'content_type', 'change_time', )
+	list_display = ('__str__', 'user', 'comment', 'content_type', 'change_time', )
+	
+    def __str__(self):
+	return str(self.get_object())
 
     def get_object(self):
 	""" Returns unpickled object. """
@@ -98,7 +99,7 @@ def save_new_revision(sender, instance, signal, *args, **kwargs):
     """ Saves a old copy of the record into the History table."""
     print "Sender: ",sender
 
-    if not hasattr(instance, 'History'): 
+    if instance.__class__.__name__ is 'ChangeLog' or not hasattr(instance, 'History'): 
 	print "Not history-enabled class."
 	return 0
 
@@ -113,25 +114,35 @@ def save_new_revision(sender, instance, signal, *args, **kwargs):
 	    try:
 		m = __import__(model['module'], '', '', [model['name']])
 		#print model['module'],": ",model['name'],"- ",m
+		print "Model import done: ",m
 	    except:
 		print "Model import error."
     
     if m:
 	try:
-	    old = getattr(m, model['name']).objects.filter(pk=instance.id)
-	    log = ChangeLog(parent=instance, comment="Update")
+	    if instance.id:
+		old = getattr(m, model['name']).objects.filter(pk=instance.id)[0]
+		log = ChangeLog(parent=instance, comment="Update")
+		print "Instance has an ID."
+	    else:
+		print "Enter except."
+		old = instance
+		instance.id = 0	# FIX: ID cannot be None
+		log = ChangeLog(parent=instance, comment="New")
+		print "Instance without an ID."
 	except:
-	    old = instance
-	    log = ChangeLog(parent=instance, comment="New")
+	    return 1
     else:
-	return 0
-    
+	return 0  # exit wo/ an action
+
+
     print "Old: ",old
     print "Instance: ",instance.id
+    #print "Test: ",getattr(instance, 'Admin').date_hierarchy
     print "Log: ",log
-    log.object = Pickle.dumps(old[0], protocol=0)
+    log.object = Pickle.dumps(old, protocol=0)
     log.save()
     print "New change saved."
     
 
-dispatcher.connect( save_new_revision, signal=signals.post_save )
+dispatcher.connect( save_new_revision, signal=signals.pre_save )
