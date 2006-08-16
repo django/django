@@ -110,6 +110,7 @@ def _import_models(instance):
 def save_new_revision(sender, instance, signal, *args, **kwargs):
     """ Saves a old copy of the record into the History table."""
     print "Sender: ",sender
+    print "Signal: ",kwargs['signal_name']
 
     if instance.__class__.__name__ is 'ChangeLog' or not hasattr(instance, 'History'): 
 	print "Not history-enabled class."
@@ -123,7 +124,11 @@ def save_new_revision(sender, instance, signal, *args, **kwargs):
     
     if _import_models(instance):
 	try:
-	    if instance.id:
+	    if kwargs['signal_name'] is 'pre_delete':
+		old = instance
+		log = ChangeLog(parent=instance, comment="Object deleted. Last revision.")
+		print "Log created."		
+	    elif kwargs['signal_name'] is 'pre_save' and instance.id:
 		old = getattr(m, model['name']).objects.filter(pk=instance.id)[0]
 		log = ChangeLog(parent=instance, comment="Update")
 		print "Instance has an ID."
@@ -142,7 +147,7 @@ def save_new_revision(sender, instance, signal, *args, **kwargs):
     print "Old: ",old
     print "Instance: ",instance.id
     #print "Test: ",getattr(instance, 'Admin').date_hierarchy
-    print "Log: ",log
+    print "Log: ",log.change_time
 
     log.object = Pickle.dumps(old, protocol=0)
     log.save()
@@ -150,38 +155,4 @@ def save_new_revision(sender, instance, signal, *args, **kwargs):
     print "New change saved."
 
 dispatcher.connect( save_new_revision, signal=signals.pre_save )
-    
-###########################
-# Pre-delete signal catch #
-###########################
-
-def save_last_revision(sender, instance, signal, *args, **kwargs):
-    """ Saves the last copy of the record when the record is deleted."""
-    print "Sender: ",sender
-
-    if instance.__class__.__name__ is 'ChangeLog' or not hasattr(instance, 'History'): 
-	print "Not history-enabled class."
-	return 0
-
-    #instance_name = instance.__class__.__name__
-    #print instance_name
-    m = None 
-    old = None
-    log = None
-    
-    if _import_models(instance):
-	try:
-	    old = instance
-	    log = ChangeLog(parent=instance, comment="Object deleted. Last revision.")
-	    print "Log created."
-	except:
-	    return 1
-
-    try:
-	log.object = Pickle.dumps(old, protocol=0)
-	log.save()
-	print "Last change saved."
-    except:
-	print "Failed!"
-
-dispatcher.connect( save_last_revision, signal=signals.pre_delete )
+dispatcher.connect( save_new_revision, signal=signals.pre_delete )
