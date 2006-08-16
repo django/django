@@ -11,7 +11,7 @@ def compile_messages():
     elif os.path.isdir('locale'):
         basedir = os.path.abspath('locale')
     else:
-        print "this script should be run from the django svn tree or your project or app tree"
+        print "This script should be run from the Django SVN tree or your project or app tree."
         sys.exit(1)
 
     for dirpath, dirnames, filenames in os.walk(basedir):
