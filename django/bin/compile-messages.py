@@ -20,7 +20,14 @@ def compile_messages():
             if f.endswith('.po'):
                 sys.stderr.write('processing file %s in %s\n' % (f, dirpath))
                 pf = os.path.splitext(os.path.join(dirpath, f))[0]
-                cmd = 'msgfmt -o "%s.mo" "%s.po"' % (pf, pf)
+                # Store the names of the .mo and .po files in an environment
+                # variable, rather than doing a string replacement into the
+                # command, so that we can take advantage of shell quoting, to
+                # quote any malicious characters/escaping.
+                # See http://cyberelk.net/tim/articles/cmdline/ar01s02.html
+                os.environ['djangocompilemo'] = pf + '.mo'
+                os.environ['djangocompilepo'] = pf + '.po'
+                cmd = 'msgfmt -o "$djangocompilemo" "$djangocompilepo"'
                 os.system(cmd)
 
 if __name__ == "__main__":
