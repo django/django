@@ -687,7 +687,7 @@ you can use the name of the model, rather than the model object itself::
         # ...
 
 Note, however, that you can only use strings to refer to models in the same 
-models.py file - you cannot use a string to reference a model in a different 
+models.py file -- you cannot use a string to reference a model in a different 
 application, or to reference a model that has been imported from elsewhere.
 
 Behind the scenes, Django appends ``"_id"`` to the field name to create its
@@ -811,7 +811,7 @@ here's how you'd represent that::
 As with ``ForeignKey``, a relationship to self can be defined by using the
 string ``'self'`` instead of the model name, and you can refer to as-yet
 undefined models by using a string containing the model name. However, you 
-can only use strings to refer to models in the same models.py file - you 
+can only use strings to refer to models in the same models.py file -- you 
 cannot use a string to reference a model in a different application, or to 
 reference a model that has been imported from elsewhere.
 
