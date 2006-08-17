@@ -9,12 +9,19 @@ import cPickle as Pickle
 from datetime import datetime
 #from django.utils.text import capfirst
 
+CHANGE_TYPES = (
+    ('A', 'Addition'),
+    ('U', 'Update'),
+    ('D', 'Deletion'),
+)
+
 class ChangeLog(models.Model):
     change_time = models.DateTimeField (_('time of change'), auto_now=True)
     content_type = models.ForeignKey(ContentType)
     parent = models.GenericForeignKey()
     object_id = models.IntegerField(_('object ID'))
     user = models.ForeignKey(User, default="1")
+    change_type = models.CharField(maxlength=1, choices=CHANGE_TYPES)
     object = models.TextField()
     comment = models.CharField(maxlength=250, blank=True)
 
@@ -24,15 +31,17 @@ class ChangeLog(models.Model):
     class Meta:
 	verbose_name = _('changelog entry')
 	verbose_name_plural = _('changelog entries')
-	db_table = _('history_changelog')
+	db_table = _('django_history_log')
 	
     class Admin:
+	date_hierarchy = 'change_time'
+	list_filter = ['change_time',  'change_type', 'content_type']
 	fields = (
 	    ('Meta info', {'fields': ('change_time', 'content_type', 'object_id', 'user', 'comment'),}),
 	    ('Object', {'fields': ('object',),}),
 	)
 
-	list_display = ('__str__', 'user', 'comment', 'content_type', 'change_time', )
+	list_display = ('__str__', 'user', 'change_type','comment', 'content_type', 'change_time', )
 	
     def __str__(self):
 	return str(self.get_object())
@@ -84,7 +93,12 @@ def version_by_date(self, date):
 #########################
 
 def _import_models(instance):
-    """ Returns a list of History-enabled models. """
+    """ 
+    Checks for models that are history-enabled and imports the one of
+    which "instance" is an instance of.
+
+    Returns "True" if import went fine.
+    """
     model_list = []
     m = None
 
@@ -104,6 +118,7 @@ def _import_models(instance):
 		print "Model import done: ",m
 	    except:
 		print "Model import error."
+		return False
 
     return m
 
@@ -118,26 +133,26 @@ def save_new_revision(sender, instance, signal, *args, **kwargs):
 
     #instance_name = instance.__class__.__name__
     #print instance_name
-    m = None 
+    m = _import_models(instance)
     old = None
     log = None
     
-    if _import_models(instance):
+    if m:
 	try:
+	    print "Try"
 	    if kwargs['signal_name'] is 'pre_delete':
+		print "Instance was last revision."
 		old = instance
-		log = ChangeLog(parent=instance, comment="Object deleted. Last revision.")
-		print "Log created."		
-	    elif kwargs['signal_name'] is 'pre_save' and instance.id:
-		old = getattr(m, model['name']).objects.filter(pk=instance.id)[0]
-		log = ChangeLog(parent=instance, comment="Update")
+		log = ChangeLog(parent=instance, change_type='D', comment="Object deleted. Last revision.")
+	    elif ((kwargs['signal_name'] is 'pre_save') and instance.id):
 		print "Instance has an ID."
+		old = getattr(m, instance.__class__.__name__).objects.filter(pk=instance.id)[0]
+		log = ChangeLog(parent=instance, change_type='U', comment="Update")
 	    else:
-		print "Enter except."
+		print "Instance without an ID."
 		old = instance
 		instance.id = 0	# FIX: ID cannot be None
-		log = ChangeLog(parent=instance, comment="New")
-		print "Instance without an ID."
+		log = ChangeLog(parent=instance, change_type='A', comment="New")
 	except:
 	    return 1
     else:
@@ -149,10 +164,13 @@ def save_new_revision(sender, instance, signal, *args, **kwargs):
     #print "Test: ",getattr(instance, 'Admin').date_hierarchy
     print "Log: ",log.change_time
 
-    log.object = Pickle.dumps(old, protocol=0)
-    log.save()
+    try: 
+	log.object = Pickle.dumps(old, protocol=0)
+	log.save()
+	print "New change saved."
+    except:
+	print "ChangeLog faild to save changes."
 
-    print "New change saved."
 
 dispatcher.connect( save_new_revision, signal=signals.pre_save )
 dispatcher.connect( save_new_revision, signal=signals.pre_delete )
