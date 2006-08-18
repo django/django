@@ -41,6 +41,9 @@ class CacheMiddleware(object):
 
     def process_request(self, request):
         "Checks whether the page is already cached and returns the cached version if available."
+        if self.cache_anonymous_only:
+            assert hasattr(request, 'user'), "The Django cache middleware with CACHE_MIDDLEWARE_ANONYMOUS_ONLY=True requires authentication middleware to be installed. Edit your MIDDLEWARE_CLASSES setting to insert 'django.contrib.auth.middleware.AuthenticationMiddleware' before the CacheMiddleware."
+
         if not request.method in ('GET', 'HEAD') or request.GET:
             request._cache_update_cache = False
             return None # Don't bother checking the cache.
