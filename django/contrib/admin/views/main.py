@@ -255,6 +255,14 @@ def add_stage(request, app_label, model_name, show_delete=False, form_url='', po
             pk_value = new_object._get_pk_val()
             LogEntry.objects.log_action(request.user.id, ContentType.objects.get_for_model(model).id, pk_value, str(new_object), ADDITION)
             msg = _('The %(name)s "%(obj)s" was added successfully.') % {'name': opts.verbose_name, 'obj': new_object}
+            
+            if new_object._meta.row_level_permissions:
+                from django.contrib.auth.models import RowLevelPermission
+                admin_opts = new_object._meta.admin
+                RowLevelPermission.objects.create_default_row_permissions(new_object, request.user, 
+                                                                          change=admin_opts.grant_change_row_level_perm,
+                                                                          delete=admin_opts.grant_delete_row_level_perm)
+            
             # Here, we distinguish between different save types by checking for
             # the presence of keys in request.POST.
             if request.POST.has_key("_continue"):
