@@ -686,8 +686,8 @@ you can use the name of the model, rather than the model object itself::
     class Manufacturer(models.Model):
         # ...
 
-Note, however, that you can only use strings to refer to models in the same 
-models.py file -- you cannot use a string to reference a model in a different 
+Note, however, that you can only use strings to refer to models in the same
+models.py file -- you cannot use a string to reference a model in a different
 application, or to reference a model that has been imported from elsewhere.
 
 Behind the scenes, Django appends ``"_id"`` to the field name to create its
@@ -810,9 +810,9 @@ here's how you'd represent that::
 
 As with ``ForeignKey``, a relationship to self can be defined by using the
 string ``'self'`` instead of the model name, and you can refer to as-yet
-undefined models by using a string containing the model name. However, you 
-can only use strings to refer to models in the same models.py file -- you 
-cannot use a string to reference a model in a different application, or to 
+undefined models by using a string containing the model name. However, you
+can only use strings to refer to models in the same models.py file -- you
+cannot use a string to reference a model in a different application, or to
 reference a model that has been imported from elsewhere.
 
 It's suggested, but not required, that the name of a ``ManyToManyField``
@@ -1385,6 +1385,41 @@ user searches for ``john lennon``, Django will do the equivalent of this SQL
 
     WHERE (first_name ILIKE '%john%' OR last_name ILIKE '%john%')
     AND (first_name ILIKE '%lennon%' OR last_name ILIKE '%lennon%')
+
+**New in Django development version:** For faster and/or more restrictive
+searches, prefix the field name with an operator:
+
+``^``
+    Matches the beginning of the field. For example, if ``search_fields`` is
+    set to ``['^first_name', '^last_name']`` and a user searches for
+    ``john lennon``, Django will do the equivalent of this SQL ``WHERE``
+    clause::
+
+        WHERE (first_name ILIKE 'john%' OR last_name ILIKE 'john%')
+        AND (first_name ILIKE 'lennon%' OR last_name ILIKE 'lennon%')
+
+    This query is more efficient than the normal ``'%john%'`` query, because
+    the database only needs to check the beginning of a column's data, rather
+    than seeking through the entire column's data. Plus, if the column has an
+    index on it, some databases may be able to use the index for this query,
+    even though it's a ``LIKE`` query.
+
+``=``
+    Matches exactly, case-insensitive. For example, if
+    ``search_fields`` is set to ``['=first_name', '=last_name']`` and
+    a user searches for ``john lennon``, Django will do the equivalent
+    of this SQL ``WHERE`` clause::
+
+        WHERE (first_name ILIKE 'john' OR last_name ILIKE 'john')
+        AND (first_name ILIKE 'lennon' OR last_name ILIKE 'lennon')
+
+    Note that the query input is split by spaces, so, following this example,
+    it's not currently not possible to search for all records in which
+    ``first_name`` is exactly ``'john winston'`` (containing a space).
+
+``@``
+    Performs a full-text match. This is like the default search method but uses
+    an index. Currently this is only available for MySQL.
 
 Managers
 ========
