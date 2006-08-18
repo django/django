@@ -63,7 +63,7 @@ Adds a few conveniences for perfectionists:
   last component in the path contains a period. So ``foo.com/bar`` is
   redirected to ``foo.com/bar/``, but ``foo.com/bar/file.txt`` is passed
   through unchanged.
-  
+
   If ``PREPEND_WWW`` is ``True``, URLs that lack a leading "www." will be
   redirected to the same URL with a leading "www."
 
@@ -100,6 +100,22 @@ Handles conditional GET operations. If the response has a ``ETag`` or
 
 Also removes the content from any response to a HEAD request and sets the
 ``Date`` and ``Content-Length`` response-headers.
+
+django.middleware.http.SetRemoteAddrFromForwardedFor
+----------------------------------------------------
+
+**New in Django development version**
+
+Sets ``request['REMOTE_ADDR']`` based on ``request.['HTTP_X_FORWARDED_FOR']``,
+if the latter is set. This is useful if you're sitting behind a reverse proxy
+that causes each request's ``REMOTE_ADDR`` to be set to ``127.0.0.1``.
+
+**Important note:** This does NOT validate ``HTTP_X_FORWARDED_FOR``. If you're
+not behind a reverse proxy that sets ``HTTP_X_FORWARDED_FOR`` automatically, do
+not use this middleware. Anybody can spoof the value of
+``HTTP_X_FORWARDED_FOR``, and because this sets ``REMOTE_ADDR`` based on
+``HTTP_X_FORWARDED_FOR``, that means anybody can "fake" their IP address. Only
+use this when you can absolutely trust the value of ``HTTP_X_FORWARDED_FOR``.
 
 django.contrib.sessions.middleware.SessionMiddleware
 ----------------------------------------------------
