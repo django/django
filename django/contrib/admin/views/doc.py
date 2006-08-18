@@ -226,7 +226,7 @@ def model_detail(request, app_label, model_name):
 
     return render_to_response('admin_doc/model_detail.html', {
         'name': '%s.%s' % (opts.app_label, opts.object_name),
-        'summary': "Fields on %s objects" % opts.object_name,
+        'summary': _("Fields on %s objects") % opts.object_name,
         'description': model.__doc__,
         'fields': fields,
     }, context_instance=RequestContext(request))
