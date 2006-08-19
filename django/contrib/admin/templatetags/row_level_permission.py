@@ -34,4 +34,27 @@ def objref(parser, token):
         tok = "object"
     return objref_class(tok)
 
+def paginator(context, adjacent_pages=2):
+    """Adds pagination context variables for first, adjacent and next page links
+    in addition to those already populated by the object_list generic view."""
+    page_numbers = [n for n in \
+                    range(context["page"] - adjacent_pages, context["page"] + adjacent_pages + 1) \
+                    if n > 0 and n <= context["pages"]]
+    print page_numbers
+    return {
+        "hits": context["hits"],
+        "results_per_page": context["results_per_page"],
+        "page": context["page"],
+        "pages": context["pages"],
+        "page_numbers": page_numbers,
+        "next": context["next"],
+        "previous": context["previous"],
+        "has_next": context["has_next"],
+        "has_previous": context["has_previous"],
+        "show_first": 1 not in page_numbers,
+        "show_last": context["pages"] not in page_numbers,
+    }
+
+register.inclusion_tag("admin/paginator.html", takes_context=True)(paginator)
+
 register.tag('objref', objref)

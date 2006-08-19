@@ -29,12 +29,7 @@ def view_row_level_permissions(request, app_label, model_name, object_id):
     if not request.user.has_perm(RowLevelPermission._meta.app_label + '.' + RowLevelPermission._meta.get_change_permission()):
         raise PermissionDenied    
     
-    #TODO: For now takes the number per page from the model instance not the RLP object
-    paginator = ObjectPaginator(model_instance.row_level_permissions.order_by('owner_ct', 'owner_id'),
-                                opts.admin.list_per_page)
-    
-    page = int(request.GET.get('page', 0))
-    rlp_list = paginator.get_page(page)
+
 
     c = template.RequestContext(request, {
         'title': _('Edit Row Level Permissions'),
@@ -42,13 +37,30 @@ def view_row_level_permissions(request, app_label, model_name, object_id):
         'content_type_id':model_ct.id,
         'original': model_instance,
         'opts':opts,
+    })   
+
+    
+    #TODO: For now takes the number per page from the model instance not the RLP object
+    list_per_page = opts.admin.list_per_page
+    #list_per_page = 5
+    paginator = ObjectPaginator(model_instance.row_level_permissions.order_by('owner_ct', 'owner_id'),
+                                list_per_page)
+    page = int(request.GET.get('page', 1))-1
+    rlp_list = paginator.get_page(page)    
+    paginator_context = {
         "is_paginated": paginator.has_next_page(0),
         "has_next": paginator.has_next_page(page),
         "has_previous": paginator.has_previous_page(page),
-        "page": page + 1,
-        "next": page + 1,
-        "previous": page - 1,
-    })   
+        "page": page+1,
+        "next": page+2,
+        "previous": page,
+        "hits":paginator.hits,
+        "results_per_page":list_per_page,
+        "pages":paginator.pages,
+        "has_next":paginator.has_next_page(page),
+        "has_previous":paginator.has_previous_page(page),
+    }
+    c.update(paginator_context)
     
     rlp_errors = rlp_new_data = {}
     add_rlp_manip = AddRLPManipulator(model_instance, model_ct)

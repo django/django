@@ -135,7 +135,10 @@
 {% if is_paginated %}
 <tr align="right">
 <td colspan="5">
+{% comment %}
 {% if has_previous %} <a href="?page={{ previous }}"> &lt;&lt; </a> {% endif %} {% if has_next %} <a href="?page={{ next }}"> &gt;&gt; </a>{% endif %}
+{% endcomment %}
+<div class="paginator">{% paginator %}</div>
 </td>
 </tr>
 {% endif %}
