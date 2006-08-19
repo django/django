@@ -34,6 +34,7 @@ def objref(parser, token):
         tok = "object"
     return objref_class(tok)
 
+#From: http://code.djangoproject.com/wiki/PaginatorTag
 def paginator(context, adjacent_pages=2):
     """Adds pagination context variables for first, adjacent and next page links
     in addition to those already populated by the object_list generic view."""

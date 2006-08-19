@@ -6,7 +6,6 @@
 {% for js in javascript_imports %}{% include_admin_script js %}{% endfor %}
 {% endblock %}
 {% block stylesheet %}{% admin_media_prefix %}css/forms.css{% endblock %}
-{% block coltype %}{% if ordered_objects %}colMS{% else %}colM{% endif %}{% endblock %}
 {% block bodyclass %}{{ opts.app_label }}-{{ opts.object_name.lower }} change-form{% endblock %}
 {% block userlinks %}<a href="../../../../doc/">{% trans 'Documentation' %}</a> / <a href="../../../../password_change/">{% trans 'Change password' %}</a> / <a href="../../../../logout/">{% trans 'Log out' %}</a>{% endblock %}
 {% block breadcrumbs %}
@@ -128,8 +127,7 @@
 <tr align="right">
 	<td colspan="5">
 		Commands: 
-		<a href="javascript:row_level_permission.apply_selected();">Apply Selected</a> |
-		<a href="javascript:alert('Not yet working');" class="deletelink">Delete Selected</a>
+		<a href="javascript:row_level_permission.apply_selected();">Apply Selected</a>
 	</td>
 </tr>
 {% if is_paginated %}
