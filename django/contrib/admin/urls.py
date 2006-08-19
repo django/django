@@ -41,8 +41,11 @@ urlpatterns = patterns('',
     ('^([^/]+)/([^/]+)/add/$', 'django.contrib.admin.views.main.add_stage'),
     ('^([^/]+)/([^/]+)/(.+)/history/$', 'django.contrib.admin.views.main.history'),
     ('^([^/]+)/([^/]+)/(.+)/delete/$', 'django.contrib.admin.views.main.delete_stage'),
-    ('^([^/]+)/([^/]+)/(.+)/row_level_permissions/$', 'django.contrib.admin.views.row_level_permissions.edit_row_level_permissions'),
+    ('^([^/]+)/([^/]+)/(.+)/row_level_permissions/$', 'django.contrib.admin.views.row_level_permissions.view_row_level_permissions'),
     ('^([^/]+)/([^/]+)/(.+)/row_level_permissions/add/$', 'django.contrib.admin.views.row_level_permissions.add_row_level_permission'),
+    ('^([^/]+)/([^/]+)/(.+)/row_level_permissions/delete/(.+)/(.+)/([^/]+)/$', 'django.contrib.admin.views.row_level_permissions.delete_row_level_permission'),    
+    ('^([^/]+)/([^/]+)/(.+)/row_level_permissions/change/(.+)/(.+)/([^/]+)/$', 'django.contrib.admin.views.row_level_permissions.change_row_level_permission'),    
+    
     ('^([^/]+)/([^/]+)/(.+)/$', 'django.contrib.admin.views.main.change_stage'),
 )
 

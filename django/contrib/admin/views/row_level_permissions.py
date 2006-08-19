@@ -3,17 +3,19 @@ from django import forms, template
 from django.shortcuts import render_to_response, get_object_or_404
 from django.http import Http404, HttpResponse, HttpResponseRedirect
 from django.contrib.contenttypes.models import ContentType
-from django.contrib.auth.models import RowLevelPermission
-from django.contrib.admin.views import main
+from django.contrib.auth.models import RowLevelPermission, User, Group
 from django.db import models
 from django.contrib.admin.row_level_perm_manipulator import AddRLPManipulator, ChangeRLPManipulator
 from django.core.exceptions import ImproperlyConfigured, ObjectDoesNotExist, PermissionDenied
 from django.core.paginator import ObjectPaginator, InvalidPage
-import simplejson
+from django.contrib.admin.views.main import unquote, quote
+from django.contrib.admin.views.decorators import staff_member_required
+from django.views.decorators.cache import never_cache
 
-def edit_row_level_permissions(request, app_label, model_name, object_id):
+
+def view_row_level_permissions(request, app_label, model_name, object_id):
     model = models.get_model(app_label, model_name)
-    object_id = main.unquote(object_id)
+    object_id = unquote(object_id)
     
     model_ct = ContentType.objects.get_for_model(model)
     model_instance = get_object_or_404(model, pk=object_id)
@@ -52,15 +54,34 @@ def edit_row_level_permissions(request, app_label, model_name, object_id):
     add_rlp_manip = AddRLPManipulator(model_instance, model_ct)
     edit_rlp_manip = ChangeRLPManipulator(model_ct)
     new_rlp_form = forms.FormWrapper(add_rlp_manip, rlp_new_data, rlp_errors)
-    empty_rlp_form = forms.FormWrapper(edit_rlp_manip, rlp_new_data, rlp_errors)
-    rlp_form_list = []
+    
+    user_rlp_form_list = []
+    other_rlp_form_list = []
+    group_rlp_form_list = []
+
+    group_ct = model_ct = ContentType.objects.get_for_model(Group)
+    user_ct = model_ct = ContentType.objects.get_for_model(User)
     for r in rlp_list:
         owner_val = str(r.owner_ct)+"-"+str(r.owner_id)
         data = {'id':r.id, 'owner':owner_val, 'perm':r.permission.id, 'negative':r.negative}
-        rlp_form_list.append({'form':forms.FormWrapper(edit_rlp_manip, data, rlp_errors), 'rlp':r})
+        
+        if r.owner_ct.id is user_ct.id:
+            user_rlp_form_list.append({'form':forms.FormWrapper(edit_rlp_manip, data, rlp_errors), 'rlp':r})
+        elif r.owner_ct.id is group_ct.id:
+            group_rlp_form_list.append({'form':forms.FormWrapper(edit_rlp_manip, data, rlp_errors), 'rlp':r})            
+        else:
+            other_rlp_form_list.append({'form':forms.FormWrapper(edit_rlp_manip, data, rlp_errors), 'rlp':r})
+    
+    rlp_forms = []
+    if user_rlp_form_list:
+        rlp_forms.append((_('Users'), user_rlp_form_list,))
+    if group_rlp_form_list:
+        rlp_forms.append((_('Groups'), group_rlp_form_list,))
+    if other_rlp_form_list:
+        rlp_forms.append((_('Other'), other_rlp_form_list,))
+
     rlp_context = {'new_rlp_form':new_rlp_form, 
-               'rlp_form_list':rlp_form_list, 
-               'empty_rlp_form':empty_rlp_form,}
+               'rlp_forms':rlp_forms, }
     
     c.update(rlp_context)
     
@@ -69,12 +90,23 @@ def edit_row_level_permissions(request, app_label, model_name, object_id):
         "admin/%s/row_level_permission.html" % opts.app_label,
         "admin/row_level_permission.html"], context_instance=c)
 
-def delete_row_level_permission(request, ct_id, rlp_id, hash):
+view_row_level_permissions = staff_member_required(never_cache(view_row_level_permissions))
+
+def delete_row_level_permission(request, app_label, model_name, object_id, ct_id, rlp_id, hash):
     msg = {}
+    
     if utils.verify_objref_hash(ct_id, rlp_id, hash):
+        model = models.get_model(app_label, model_name)
+        object_id = unquote(object_id)
+        
+        model_ct = ContentType.objects.get_for_model(model)
+        model_instance = get_object_or_404(model, pk=object_id)
         rlp = get_object_or_404(RowLevelPermission, pk=rlp_id)
         ct = rlp.model_ct
         obj = rlp.model
+
+        if model_instance.id is not obj.id:
+            raise PermissionDenied
 
         if not request.user.has_perm(rlp._meta.app_label + '.' + rlp._meta.get_delete_permission()):
             raise PermissionDenied   
@@ -86,13 +118,13 @@ def delete_row_level_permission(request, ct_id, rlp_id, hash):
     else:
         msg = { 'result':False, 'text': _("row level permission not found (bad hash)" )}
 
-    request.user.message_set.create(message=result['text'])
+    request.user.message_set.create(message=msg['text'])
 
-    return HttpResponseRedirect("../")
+    return HttpResponseRedirect("../../../../")
 #    return HttpResponseRedirect("%s?rlp_result=%s&rlp_msg=%s" % (request.META["HTTP_REFERER"], str(msg["result"]), main.quote(msg["text"])))
     #return main.change_stage(request, main.quote(obj._meta.app_label), main.quote(obj._meta.object_name),
     #                    main.quote(str(obj.id)), extra_context={"row_level_perm_msg":msg,})
-
+delete_row_level_permission = staff_member_required(never_cache(delete_row_level_permission))
 
 def add_row_level_permission(request, app_label, model_name, object_id):
     msg = {}
@@ -103,7 +135,7 @@ def add_row_level_permission(request, app_label, model_name, object_id):
         return HttpResponseRedirect("/edit/%s/%s" % (obj_type, object_id))  
 
     model = models.get_model(app_label, model_name)
-    object_id = main.unquote(object_id)
+    object_id = unquote(object_id)
     
     ct = ContentType.objects.get_for_model(model)
     obj = get_object_or_404(model, pk=object_id)
@@ -141,10 +173,10 @@ def add_row_level_permission(request, app_label, model_name, object_id):
     #return main.change_stage(request, main.quote(obj._meta.app_label), main.quote(obj._meta.object_name),
     #                    main.quote(str(obj.id)), extra_context={"row_level_perm_msg":msg,})
     return HttpResponseRedirect("../")
+add_row_level_permission = staff_member_required(never_cache(add_row_level_permission))
 
-def change_row_level_permission(request, ct_id, rlp_id, hash):    
+def change_row_level_permission(request, app_label, model_name, object_id, ct_id, rlp_id, hash):
     msg = {}
-    ajax = request.GET.has_key("ajax")
     if not request.POST:
         msg = { 'result':False, 'text': _("Only POSTs are allowed" )}  
 
@@ -152,10 +184,14 @@ def change_row_level_permission(request, ct_id, rlp_id, hash):
         msg = { 'result':False, 'text': _("row level permission not found (bad hash)" )}           
     
     if msg.has_key("result"):
-        if ajax:
-            return HttpResponse(simplejson.dumps(msg), 'text/javascript')
         request.user.message_set.create(message=msg['text'])
-        return HttpResponseRedirect("/edit/%s/%s" % (obj_type, obj_id))         
+        return HttpResponseRedirect('../../../../')
+    
+    model = models.get_model(app_label, model_name)
+    object_id = unquote(object_id)
+    
+    ct = ContentType.objects.get_for_model(model)
+    model_instance = get_object_or_404(model, pk=object_id)    
     
     rlp = get_object_or_404(RowLevelPermission, pk=rlp_id)
     opts = rlp._meta
@@ -163,6 +199,9 @@ def change_row_level_permission(request, ct_id, rlp_id, hash):
         raise PermissionDenied  
 
     obj = rlp.model
+    if model_instance.id is not obj.id:
+        raise PermissionDenied
+    
     if not request.user.has_perm(rlp._meta.app_label + '.' + rlp._meta.get_change_permission(), object=obj):
         raise PermissionDenied
     
@@ -178,9 +217,12 @@ def change_row_level_permission(request, ct_id, rlp_id, hash):
         msg = {"result":False, "text":_("A row level permission already exists with the specified values")}
     else:
         msg = {"result":True, "text":_("Row level permission has successfully been changed"), "id":rlp_id}
-    if ajax:
-        return HttpResponse(simplejson.dumps(msg), 'text/javascript')
-    
-    request.POST = {}
-    return main.change_stage(request, main.quote(obj._meta.app_label), main.quote(obj._meta.object_name),
-                    main.quote(str(obj.id)), extra_context={"row_level_perm_msg":msg,})
+        
+    request.user.message_set.create(message=msg['text']) 
+ 
+    return HttpResponseRedirect("../../../../")
+#    request.POST = {}
+#    return change_stage(request, main.quote(obj._meta.app_label), main.quote(obj._meta.object_name),
+#                    main.quote(str(obj.id)), extra_context={"row_level_perm_msg":msg,})
+
+change_row_level_permission = staff_member_required(never_cache(change_row_level_permission))

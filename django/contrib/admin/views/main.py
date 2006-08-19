@@ -203,6 +203,7 @@ def render_change_form(model, manipulator, context, add=False, change=False, for
         'has_change_permission': context['perms'][app_label][opts.get_change_permission()],
         'has_file_field': opts.has_field_type(models.FileField),
         'has_absolute_url': hasattr(model, 'get_absolute_url'),
+        'has_row_level_permissions':opts.row_level_permissions,
         'auto_populated_fields': auto_populated_fields,
         'bound_field_sets': bound_field_sets,
         'first_form_field_id': first_form_field_id,

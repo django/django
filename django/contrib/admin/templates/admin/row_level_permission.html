@@ -17,8 +17,9 @@
      {{ title|escape }}
 </div>
 {% endblock %}
-{% block content %}<div id="content-main">
-<div id="changelist">
+{% block content %}
+
+<div id="content-main">
 
 {% if_has_perm "auth.add_rowlevelpermission" %}
 <h2>{% trans "Add Permissions" %}</h2>
@@ -66,7 +67,7 @@
 {% if_has_perm "auth.change_rowlevelpermission" %}
 <h2>{% trans "Current Permissions" %}</h2>
 <table id="current-rlpTable">
-{% if rlp_form_list %}
+{% if rlp_forms %}
 <tr class="header">
 	<th id="select_header"></th>
 <th id="owner_header">
@@ -84,10 +85,16 @@
 </tr>
 <TBODY>
 {% load row_level_permission %}
-{% for o in rlp_form_list %}
+{% for x in rlp_forms %}
+<tr>
+<th colspan=5>
+{{ x.0 }}
+</th>
+</tr>
+{% for o in x.1 %}
 <tr id="editRLP-{{ o.rlp.id }}">
 <!--<td colspan="5">-->
-<form id="editRLPForm-{{ o.rlp.id }}" class="editRLPForm" method="POST" name="editRLPForm-{{ o.rlp.id }}"  action="../../../auth/row_level_permission/{% objref o.rlp %}/change/">
+<form id="editRLPForm-{{ o.rlp.id }}" class="editRLPForm" method="POST" name="editRLPForm-{{ o.rlp.id }}"  action="change/{% objref o.rlp %}/">
 <!--<table>
 <tr>-->
 	<td>
@@ -107,7 +114,8 @@
 		<input id="cancelButton-{{ o.rlp.id }}" type="reset" value="{% trans 'Reset' %}"/>
 		<br/>
 		<!--<a href="../../../auth/row_level_permission/{% objref o.rlp %}/delete/" class="deleteLink" onclick="row_level_permission.deleteRLP('{% objref o.rlp %}'); return false;">{% trans 'Delete' %}</a> |-->
-		<a href="../../../auth/row_level_permission/{% objref o.rlp %}/delete/" class="deletelink">{% trans 'Delete' %}</a> | 
+		<!--<a href="../../../auth/row_level_permission/{% objref o.rlp %}/delete/" class="deletelink">{% trans 'Delete' %}</a> | -->
+		<a href="delete/{% objref o.rlp %}" class="deletelink">{% trans 'Delete' %}</a> |
 		<a href="javascript:row_level_permission.copyToNew({{ o.rlp.id }})" class="copyToNewLink">{% trans 'Copy to New' %}</a>
 	</td>	
 <!--</tr>
@@ -116,14 +124,12 @@
 </td>
 </tr>
 {% endfor %}
+{% endfor %}
 <tr align="right">
 	<td colspan="5">
-		<form id="apply_selected_form" method="POST" name="apply_selected_form"  onsubmit="row_level_permission.apply_selected(); return false;">
-			<input id="apply_selected_button" type="submit" value="{% trans 'Apply Selected' %}" />
-		</form>
-		<form id="delete_selected_form" method="POST" name="delete_selected_form"  onsubmit="alert('Not yet working'); return false;">
-			<input id="delete_selected_button" type="submit" value="{% trans 'Delete Selected' %}" />
-		</form>
+		Commands: 
+		<a href="javascript:row_level_permission.apply_selected();">Apply Selected</a> |
+		<a href="javascript:alert('Not yet working');" class="deletelink">Delete Selected</a>
 	</td>
 </tr>
 {% if is_paginated %}
