@@ -30,7 +30,8 @@ urlpatterns = patterns('',
     #Row level permissions
     ('^auth/row_level_permission/(?P<ct_id>\d+)/(?P<rlp_id>\d+)/(?P<hash>\w+)/delete/$', 'django.contrib.admin.views.row_level_permissions.delete_row_level_permission'),
     ('^auth/row_level_permission/(?P<ct_id>\d+)/(?P<rlp_id>\d+)/(?P<hash>\w+)/change/$', 'django.contrib.admin.views.row_level_permissions.change_row_level_permission'),
-    ('^auth/row_level_permission/add/(?P<ct_id>\d+)/(?P<obj_id>\d+)/$', 'django.contrib.admin.views.row_level_permissions.add_row_level_permission'),    
+    ('^auth/row_level_permission/add/(?P<ct_id>\d+)/(?P<object_id>\d+)/$', 'django.contrib.admin.views.row_level_permissions.add_row_level_permission'),    
+    ('^auth/row_level_permission/view/(?P<ct_id>\d+)/(?P<object_id>\d+)/$', 'django.contrib.admin.views.row_level_permissions.edit_row_level_permissions'),
 
     # "Add user" -- a special-case view
     ('^auth/user/add/$', 'django.contrib.admin.views.auth.user_add_stage'),
@@ -40,6 +41,8 @@ urlpatterns = patterns('',
     ('^([^/]+)/([^/]+)/add/$', 'django.contrib.admin.views.main.add_stage'),
     ('^([^/]+)/([^/]+)/(.+)/history/$', 'django.contrib.admin.views.main.history'),
     ('^([^/]+)/([^/]+)/(.+)/delete/$', 'django.contrib.admin.views.main.delete_stage'),
+    ('^([^/]+)/([^/]+)/(.+)/row_level_permissions/$', 'django.contrib.admin.views.row_level_permissions.edit_row_level_permissions'),
+    ('^([^/]+)/([^/]+)/(.+)/row_level_permissions/add/$', 'django.contrib.admin.views.row_level_permissions.add_row_level_permission'),
     ('^([^/]+)/([^/]+)/(.+)/$', 'django.contrib.admin.views.main.change_stage'),
 )
 

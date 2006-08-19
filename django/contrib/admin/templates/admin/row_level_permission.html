@@ -1,13 +1,28 @@
-{% load i18n admin_modify %}
-
+{% extends "admin/base_site.html" %}
+{% load i18n admin_modify adminmedia auth %}
+{% block extrahead %}{{ block.super }}
+<script type="text/javascript" src="../../../jsi18n/"></script>
 {% include_admin_script "js/row_level_permission.js" %}
-
-
-<h1>{% trans "Row Level Permissions" %}</h1>
-<div id="rlpResults">
+{% for js in javascript_imports %}{% include_admin_script js %}{% endfor %}
+{% endblock %}
+{% block stylesheet %}{% admin_media_prefix %}css/forms.css{% endblock %}
+{% block coltype %}{% if ordered_objects %}colMS{% else %}colM{% endif %}{% endblock %}
+{% block bodyclass %}{{ opts.app_label }}-{{ opts.object_name.lower }} change-form{% endblock %}
+{% block userlinks %}<a href="../../../../doc/">{% trans 'Documentation' %}</a> / <a href="../../../../password_change/">{% trans 'Change password' %}</a> / <a href="../../../../logout/">{% trans 'Log out' %}</a>{% endblock %}
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+     <a href="../../../../">{% trans "Home" %}</a> &rsaquo;
+     <a href="../../">{{ opts.verbose_name_plural|capfirst|escape }}</a> &rsaquo;
+     <a href="../">{{ original|truncatewords:"18"|escape }}</a> &rsaquo; 
+     {{ title|escape }}
 </div>
+{% endblock %}
+{% block content %}<div id="content-main">
+<div id="changelist">
+
+{% if_has_perm "auth.add_rowlevelpermission" %}
 <h2>{% trans "Add Permissions" %}</h2>
-<form id="addRLPForm" method="POST" name="addRLPForm" action="../../../auth/row_level_permission/add/{{ content_type_id }}/{{ object_id }}/">
+<form id="addRLPForm" method="POST" name="addRLPForm" action="add/">
 <table id="add-rlpTable">
 <tr class="header">
 <th>
@@ -46,7 +61,9 @@
 </tr>
 </table>
 </form>
+{% end_if_has_perm %}
 
+{% if_has_perm "auth.change_rowlevelpermission" %}
 <h2>{% trans "Current Permissions" %}</h2>
 <table id="current-rlpTable">
 {% if rlp_form_list %}
@@ -90,7 +107,7 @@
 		<input id="cancelButton-{{ o.rlp.id }}" type="reset" value="{% trans 'Reset' %}"/>
 		<br/>
 		<!--<a href="../../../auth/row_level_permission/{% objref o.rlp %}/delete/" class="deleteLink" onclick="row_level_permission.deleteRLP('{% objref o.rlp %}'); return false;">{% trans 'Delete' %}</a> |-->
-		<a href="../../../auth/row_level_permission/{% objref o.rlp %}/delete/" class="deleteLink">{% trans 'Delete' %}</a> | 
+		<a href="../../../auth/row_level_permission/{% objref o.rlp %}/delete/" class="deletelink">{% trans 'Delete' %}</a> | 
 		<a href="javascript:row_level_permission.copyToNew({{ o.rlp.id }})" class="copyToNewLink">{% trans 'Copy to New' %}</a>
 	</td>	
 <!--</tr>
@@ -104,10 +121,24 @@
 		<form id="apply_selected_form" method="POST" name="apply_selected_form"  onsubmit="row_level_permission.apply_selected(); return false;">
 			<input id="apply_selected_button" type="submit" value="{% trans 'Apply Selected' %}" />
 		</form>
+		<form id="delete_selected_form" method="POST" name="delete_selected_form"  onsubmit="alert('Not yet working'); return false;">
+			<input id="delete_selected_button" type="submit" value="{% trans 'Delete Selected' %}" />
+		</form>
 	</td>
 </tr>
+{% if is_paginated %}
+<tr align="right">
+<td colspan="5">
+{% if has_previous %} <a href="?page={{ previous }}"> &lt;&lt; </a> {% endif %} {% if has_next %} <a href="?page={{ next }}"> &gt;&gt; </a>{% endif %}
+</td>
+</tr>
+{% endif %}
 </TBODY>
 </table>
 {% else %}
 <em>{% trans 'No row level permissions'%}</em>
 {% endif %}
+{% end_if_has_perm %}
+</div>
+</div>
+{% endblock %}

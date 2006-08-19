@@ -116,7 +116,6 @@ class MultipleObjSelectField(forms.SelectField):
             object_choice = [(MultipleObjSelectField.returnKey(o, ct=ct), str(o)) for o in obj_choices]
             choice_list.extend([(ct.name.title(), object_choice)])
             #choice_list.extend([(MultipleObjSelectField.returnKey(o, ct=ct), str(o)+" ("+ct.name.title()+")") for o in obj_choices])
-        print choice_list
         super(MultipleObjSelectField, self).__init__(field_name, choices=choice_list, 
                                                      size=size, is_required=is_required, 
                                                      validator_list=validator_list, 

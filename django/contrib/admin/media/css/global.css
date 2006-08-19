@@ -90,6 +90,11 @@ input[type=submit], input[type=button], .submit-row input { background:white url
 input[type=submit]:active, input[type=button]:active { background-image:url(../img/admin/nav-bg-reverse.gif); background-position:top; }
 input[type=submit].default, .submit-row input.default { border:2px solid #5b80b2; background:#7CA0C7 url(../img/admin/default-bg.gif) bottom repeat-x; font-weight:bold; color:white; }
 input[type=submit].default:active { background-image:url(../img/admin/default-bg-reverse.gif); background-position:top; }
+/* RESET BUTTONS */
+input[type=reset], input[type=button], .submit-row input { background:white url(../img/admin/nav-bg.gif) bottom repeat-x; padding:3px; color:black; border:1px solid #bbb; border-color:#ddd #aaa #aaa #ddd; }
+input[type=reseet]:active, input[type=button]:active { background-image:url(../img/admin/nav-bg-reverse.gif); background-position:top; }
+input[type=reset].default, .submit-row input.default { border:2px solid #5b80b2; background:#7CA0C7 url(../img/admin/default-bg.gif) bottom repeat-x; font-weight:bold; color:white; }
+input[type=reset].default:active { background-image:url(../img/admin/default-bg-reverse.gif); background-position:top; }
 
 /* MODULES */
 .module { border:1px solid #ccc; margin-bottom:5px; background:white; }
