@@ -33,11 +33,11 @@ def if_has_perm(parser, token):
     if tokens[1] is "not":
         not_flag = True
         permission=tokens[2]
-        if tokens[3]:
+        if len(tokens)>3:
             object=tokens[3]
     else:
         permission=tokens[1]
-        if tokens[2]:
+        if len(tokens)>2:
             object=tokens[2]
 
     if not (permission[0] == permission[-1] and permission[0] in ('"', "'")):            
@@ -69,11 +69,14 @@ class HasPermNode(template.Node):
         nodes.extend(self.nodelist_false.get_nodes_by_type(nodetype))
         return nodes
 
-    def render(self, context):
-        try:
-            object = template.resolve_variable(self.object_name, context)
-        except template.VariableDoesNotExist:
-            return ''
+    def render(self, context):   
+        if self.object_name:
+            try:
+                object = template.resolve_variable(self.object_name, context)
+            except template.VariableDoesNotExist:
+                return ''
+        else:
+            object=None
         
         try:
             user = template.resolve_variable("user", context)
@@ -86,5 +89,6 @@ class HasPermNode(template.Node):
             return self.nodelist_true.render(context)
         if (self.not_flag and bool_perm) or (not self.not_flag and not bool_perm):
             return self.nodelist_false.render(context)
+        return ''
         
 register.tag('if_has_perm', if_has_perm)
