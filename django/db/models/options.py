@@ -203,7 +203,7 @@ class AdminOptions(object):
     def __init__(self, fields=None, js=None, list_display=None, list_display_links=None, list_filter=None,
         date_hierarchy=None, save_as=False, ordering=None, search_fields=None,
         save_on_top=False, list_select_related=False, manager=None, list_per_page=100, 
-        grant_change_row_level_perm=False, grant_delete_row_level_perm=False):
+        grant_change_row_level_perm=False, grant_delete_row_level_perm=False, hidden=False):
         self.fields = fields
         self.js = js or []
         self.list_display = list_display or ['__str__']
@@ -218,6 +218,7 @@ class AdminOptions(object):
         self.manager = manager or Manager()
         self.grant_change_row_level_perm=grant_change_row_level_perm
         self.grant_delete_row_level_perm=grant_delete_row_level_perm
+        self.hidden = hidden
 
     def get_field_sets(self, opts):
         "Returns a list of AdminFieldSet objects for this AdminOptions object."

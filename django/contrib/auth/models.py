@@ -73,9 +73,11 @@ class RowLevelPermissionManager(models.Manager):
         return ret_dict    
 
 class RowLevelPermission(models.Model):
-    """ Similiar to permissions but works on instances of objects instead of types.
+    """ 
+    Similiar to permissions but works on instances of objects instead of types.
     This uses generic relations to minimize the number of tables, and connects to the 
     permissions table using a many to one relation.
+    
     """
     model_id = models.PositiveIntegerField("'Model' ID")
     model_ct = models.ForeignKey(ContentType, verbose_name="'Model' content type", related_name="model_ct")
@@ -93,7 +95,9 @@ class RowLevelPermission(models.Model):
         verbose_name = _('row level permission')
         verbose_name_plural = _('row level permissions')
         unique_together = (('model_ct', 'model_id', 'owner_id', 'owner_ct', 'permission'),)        
-        
+
+    class Admin:
+        hidden = True
 
     def __str__(self):
         return "%s | %s:%s | %s:%s" % (self.permission, self.owner_ct, self.owner, self.model_ct, self.model)
@@ -319,6 +323,7 @@ class User(models.Model):
         if self.is_superuser:
             return True
         if object and object._meta.row_level_permissions:
+            #Since we use the content type for row level perms, we don't need the application name
             permission_str = perm[perm.index('.')+1:]
             row_level_permission = self.check_row_level_permission(permission_str, object)
             if row_level_permission is not None:
