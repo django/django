@@ -259,9 +259,10 @@ an `HttpRequest object`_ as its first argument. For example::
 The second difference is that it automatically populates the context with a few
 variables, according to your `TEMPLATE_CONTEXT_PROCESSORS setting`_.
 
-The ``TEMPLATE_CONTEXT_PROCESSORS`` setting is a tuple of callables that take a
-request object as their argument and return a dictionary of items to be merged
-into the context. By default, ``TEMPLATE_CONTEXT_PROCESSORS`` is set to::
+The ``TEMPLATE_CONTEXT_PROCESSORS`` setting is a tuple of callables -- called
+**context processors** -- that take a request object as their argument and
+return a dictionary of items to be merged into the context. By default,
+``TEMPLATE_CONTEXT_PROCESSORS`` is set to::
 
     ("django.core.context_processors.auth",
     "django.core.context_processors.debug",

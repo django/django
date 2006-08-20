@@ -272,7 +272,9 @@ def add_stage(request, app_label, model_name, show_delete=False, form_url='', po
                     post_url_continue += "?_popup=1"
                 return HttpResponseRedirect(post_url_continue % pk_value)
             if request.POST.has_key("_popup"):
-                return HttpResponse('<script type="text/javascript">opener.dismissAddAnotherPopup(window, %r, "%s");</script>' % \
+                if type(pk_value) is str: # Quote if string, so JavaScript doesn't think it's a variable.
+                    pk_value = '"%s"' % pk_value.replace('"', '\\"')
+                return HttpResponse('<script type="text/javascript">opener.dismissAddAnotherPopup(window, %s, "%s");</script>' % \
                     (pk_value, str(new_object).replace('"', '\\"')))
             elif request.POST.has_key("_addanother"):
                 request.user.message_set.create(message=msg + ' ' + (_("You may add another %s below.") % opts.verbose_name))
@@ -734,9 +736,19 @@ class ChangeList(object):
         qs = qs.order_by((self.order_type == 'desc' and '-' or '') + lookup_order_field)
 
         # Apply keyword searches.
+        def construct_search(field_name):
+            if field_name.startswith('^'):
+                return "%s__istartswith" % field_name[1:]
+            elif field_name.startswith('='):
+                return "%s__iexact" % field_name[1:]
+            elif field_name.startswith('@'):
+                return "%s__search" % field_name[1:]
+            else:
+                return "%s__icontains" % field_name
+
         if self.lookup_opts.admin.search_fields and self.query:
             for bit in self.query.split():
-                or_queries = [models.Q(**{'%s__icontains' % field_name: bit}) for field_name in self.lookup_opts.admin.search_fields]
+                or_queries = [models.Q(**{construct_search(field_name): bit}) for field_name in self.lookup_opts.admin.search_fields]
                 other_qs = QuerySet(self.model)
                 other_qs = other_qs.filter(reduce(operator.or_, or_queries))
                 qs = qs & other_qs

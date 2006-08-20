@@ -217,7 +217,7 @@ steps:
        subdirectory of ``MEDIA_ROOT`` it should upload files.
 
     3. All that will be stored in your database is a path to the file
-       (relative to ``MEDIA_ROOT``). You'll must likely want to use the
+       (relative to ``MEDIA_ROOT``). You'll most likely want to use the
        convenience ``get_<fieldname>_url`` function provided by Django. For
        example, if your ``ImageField`` is called ``mug_shot``, you can get
        the absolute URL to your image in a template with ``{{
@@ -229,6 +229,14 @@ For example, say your ``MEDIA_ROOT`` is set to ``'/home/media'``, and
 ``'%m'`` is the two-digit month and ``'%d'`` is the two-digit day. If you
 upload a file on Jan. 15, 2007, it will be saved in the directory
 ``/home/media/photos/2007/01/15``.
+
+Note that whenever you deal with uploaded files, you should pay close attention
+to where you're uploading them and what type of files they are, to avoid
+security holes. *Validate all uploaded files* so that you're sure the files are
+what you think they are. For example, if you blindly let somebody upload files,
+without validation, to a directory that's within your Web server's document
+root, then somebody could upload a CGI or PHP script and execute that script by
+visiting its URL on your site. Don't allow that.
 
 .. _`strftime formatting`: http://docs.python.org/lib/module-time.html#l2h-1941
 
@@ -678,8 +686,9 @@ you can use the name of the model, rather than the model object itself::
     class Manufacturer(models.Model):
         # ...
 
-Note, however, that support for strings around model names in ``ForeignKey`` is
-quite new, and it can be buggy in some cases.
+Note, however, that you can only use strings to refer to models in the same
+models.py file -- you cannot use a string to reference a model in a different
+application, or to reference a model that has been imported from elsewhere.
 
 Behind the scenes, Django appends ``"_id"`` to the field name to create its
 database column name. In the above example, the database table for the ``Car``
@@ -801,7 +810,10 @@ here's how you'd represent that::
 
 As with ``ForeignKey``, a relationship to self can be defined by using the
 string ``'self'`` instead of the model name, and you can refer to as-yet
-undefined models by using a string containing the model name.
+undefined models by using a string containing the model name. However, you
+can only use strings to refer to models in the same models.py file -- you
+cannot use a string to reference a model in a different application, or to
+reference a model that has been imported from elsewhere.
 
 It's suggested, but not required, that the name of a ``ManyToManyField``
 (``toppings`` in the example above) be a plural describing the set of related
@@ -1373,6 +1385,41 @@ user searches for ``john lennon``, Django will do the equivalent of this SQL
 
     WHERE (first_name ILIKE '%john%' OR last_name ILIKE '%john%')
     AND (first_name ILIKE '%lennon%' OR last_name ILIKE '%lennon%')
+
+**New in Django development version:** For faster and/or more restrictive
+searches, prefix the field name with an operator:
+
+``^``
+    Matches the beginning of the field. For example, if ``search_fields`` is
+    set to ``['^first_name', '^last_name']`` and a user searches for
+    ``john lennon``, Django will do the equivalent of this SQL ``WHERE``
+    clause::
+
+        WHERE (first_name ILIKE 'john%' OR last_name ILIKE 'john%')
+        AND (first_name ILIKE 'lennon%' OR last_name ILIKE 'lennon%')
+
+    This query is more efficient than the normal ``'%john%'`` query, because
+    the database only needs to check the beginning of a column's data, rather
+    than seeking through the entire column's data. Plus, if the column has an
+    index on it, some databases may be able to use the index for this query,
+    even though it's a ``LIKE`` query.
+
+``=``
+    Matches exactly, case-insensitive. For example, if
+    ``search_fields`` is set to ``['=first_name', '=last_name']`` and
+    a user searches for ``john lennon``, Django will do the equivalent
+    of this SQL ``WHERE`` clause::
+
+        WHERE (first_name ILIKE 'john' OR last_name ILIKE 'john')
+        AND (first_name ILIKE 'lennon' OR last_name ILIKE 'lennon')
+
+    Note that the query input is split by spaces, so, following this example,
+    it's not currently not possible to search for all records in which
+    ``first_name`` is exactly ``'john winston'`` (containing a space).
+
+``@``
+    Performs a full-text match. This is like the default search method but uses
+    an index. Currently this is only available for MySQL.
 
 Managers
 ========
