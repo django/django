@@ -337,11 +337,113 @@ class User(models.Model):
                 return False
         return True
 
+    def contains_permission(self, perm, model):
+        if self.has_perm(perm):
+            return True
+        perm = perm[perm.index('.')+1:]
+        return self.contains_row_level_perm(perm, model)
+
+    def contains_row_level_perm(self, perm, model):
+        model_ct = ContentType.objects.get_for_model(model)
+        count = self.row_level_permissions_owned.filter(model_ct=model_ct.id).count() 
+        if count>0:
+            return True
+        return self.contains_group_row_level_perms(perm, model_ct)        
+
+    def contains_group_row_level_perms(self, perm, ct):
+        #SELECT COUNT(*)
+         #FROM "auth_user_groups" ug, "auth_rowlevelpermission" rlp, "django_content_type" ct
+         #WHERE rlp."owner_id" = ug."group_id"
+             #AND ug."user_id"=%s
+             #AND rlp."negative" = 0
+             #AND rlp."owner_ct_id" = %s
+             #AND rlp."model_ct_id" = %s
+        
+        cursor = connection.cursor() 
+        sql = """
+            SELECT COUNT(*)
+            FROM %s ug, %s rlp, %s ct
+            WHERE rlp.%s = ug.%s
+                AND ug.%s=%%s
+                AND rlp.%s = 0
+                AND rlp.%s = %%s
+                AND rlp.%s = %%s""" % (
+            backend.quote_name('auth_user_groups'), backend.quote_name('auth_rowlevelpermission'), 
+            backend.quote_name('django_content_type'), backend.quote_name('owner_id'),
+            backend.quote_name('group_id'), backend.quote_name('user_id'),
+            backend.quote_name('negative'), backend.quote_name('owner_ct_id'),
+            backend.quote_name('model_ct_id'))
+        print sql
+        cursor.execute(sql, [self.id, ContentType.objects.get_for_model(Group).id, ct.id])
+        count = int(cursor.fetchone()[0])
+        return (count>0)
+
     def has_module_perms(self, app_label):
         "Returns True if the user has any permissions in the given app label."
         if self.is_superuser:
             return True
-        return bool(len([p for p in self.get_all_permissions() if p[:p.index('.')] == app_label]))
+        if bool(len([p for p in self.get_all_permissions() if p[:p.index('.')] == app_label])):
+            return True
+        return self.has_module_row_level_perms(app_label)
+
+    def has_module_row_level_perms(self, app_label):
+        #SELECT COUNT(*)
+        #FROM "django_content_type" ct, "auth_rowlevelpermission" rlp
+        #WHERE rlp."model_ct_id" = ct."id"
+            #AND ct."app_label"=%s
+            #AND rlp."negative" = 0
+            #AND rlp."owner_ct_id" = %s
+            #AND rlp."owner_id" = %s
+        cursor = connection.cursor()        
+        sql = """
+            SELECT COUNT(*)
+            FROM %s ct, %s rlp
+            WHERE rlp.%s = ct.%s
+                AND ct.%s=%%s
+                AND rlp.%s = 0
+                AND rlp.%s = %%s
+                AND rlp.%s = %%s
+                """ % (
+            backend.quote_name('django_content_type'), backend.quote_name('auth_rowlevelpermission'),
+            backend.quote_name('model_ct_id'), backend.quote_name('id'),
+            backend.quote_name('app_label'), backend.quote_name('negative'),
+            backend.quote_name('owner_ct_id'),
+            backend.quote_name('owner_id'), )
+        cursor.execute(sql, [app_label, ContentType.objects.get_for_model(User).id, self.id]) 
+        count = int(cursor.fetchone()[0])
+        if count>0:
+            return True
+        return self.has_module_group_row_level_perms(app_label)
+        
+    def has_module_group_row_level_perms(self, app_label):
+        #SELECT COUNT(*)
+        #FROM "auth_user_groups" ug, "auth_rowlevelpermission" rlp, "django_content_type" ct
+        #WHERE rlp."owner_id" = ug."group_id"
+            #AND ug."user_id"=%s
+            #AND rlp."model_ct_id" = ct."id"
+            #AND ct."app_label"=%s
+            #AND rlp."negative" = 0
+            #AND rlp."owner_ct_id" = %s
+        cursor = connection.cursor() 
+        sql = """
+            SELECT COUNT(*)
+            FROM %s ug, %s rlp, %s ct
+            WHERE rlp.%s = ug.%s
+                AND ug.%s=%%s
+                AND rlp.%s = ct.%s
+                AND ct.%s=%%s
+                AND rlp.%s = 0
+                AND rlp.%s = %%s""" % (
+            backend.quote_name('auth_user_groups'), backend.quote_name('auth_rowlevelpermission'), 
+            backend.quote_name('django_content_type'), backend.quote_name('owner_id'),
+            backend.quote_name('group_id'), backend.quote_name('user_id'),
+            backend.quote_name('model_ct_id'), backend.quote_name('id'),
+            backend.quote_name('app_label'), backend.quote_name('negative'),
+            backend.quote_name('owner_ct_id'))
+        cursor.execute(sql, [app_label, self.id, ContentType.objects.get_for_model(Group).id,])
+        count = int(cursor.fetchone()[0])
+        return (count>0)        
+            
 
     def get_and_delete_messages(self):
         messages = []
