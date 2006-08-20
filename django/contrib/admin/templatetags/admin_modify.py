@@ -42,7 +42,7 @@ def submit_row(context):
         'show_delete_link': (not is_popup and context['has_delete_permission']
                               and (change or context['show_delete'])),
         'show_save_as_new': not is_popup and change and opts.admin.save_as,
-        'show_save_and_add_another': not is_popup and (not opts.admin.save_as or context['add']),
+        'show_save_and_add_another': not is_popup and (not opts.admin.save_as or context['add']) and context['has_add_permission'],
         'show_save_and_continue': not is_popup and context['has_change_permission'],
         'show_save': True
     }

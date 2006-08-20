@@ -199,8 +199,9 @@ def render_change_form(model, manipulator, context, add=False, change=False, for
     extra_context = {
         'add': add,
         'change': change,
-        'has_delete_permission': context['perms'][app_label][opts.get_delete_permission()],
-        'has_change_permission': context['perms'][app_label][opts.get_change_permission()],
+        'has_delete_permission': context['user'].has_perm(app_label+"."+opts.get_delete_permission(), original),
+        'has_change_permission': context['user'].has_perm(app_label+"."+opts.get_change_permission(), original),
+        'has_add_permission': context['user'].has_perm(app_label+"."+opts.get_add_permission()),
         'has_file_field': opts.has_field_type(models.FileField),
         'has_absolute_url': hasattr(model, 'get_absolute_url'),
         'auto_populated_fields': auto_populated_fields,

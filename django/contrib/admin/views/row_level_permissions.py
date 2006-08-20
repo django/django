@@ -44,7 +44,10 @@ def view_row_level_permissions(request, app_label, model_name, object_id):
     paginator = ObjectPaginator(model_instance.row_level_permissions.order_by('owner_ct', 'owner_id'),
                                 list_per_page)
     page = int(request.GET.get('page', 1))-1
-    rlp_list = paginator.get_page(page)    
+    try:
+        rlp_list = paginator.get_page(page)    
+    except InvalidPage:
+        rlp_list = []
     paginator_context = {
         "is_paginated": paginator.has_next_page(0),
         "has_next": paginator.has_next_page(page),

@@ -337,18 +337,25 @@ class User(models.Model):
                 return False
         return True
 
-    def contains_permission(self, perm, model):
+    def contains_permission(self, perm, model=None):
         if self.has_perm(perm):
             return True
-        perm = perm[perm.index('.')+1:]
-        return self.contains_row_level_perm(perm, model)
-
+        if model and model._meta.row_level_permissions:
+            perm = perm[perm.index('.')+1:]
+            return self.contains_row_level_perm(perm, model)
+        return False
+        
     def contains_row_level_perm(self, perm, model):
         model_ct = ContentType.objects.get_for_model(model)
-        count = self.row_level_permissions_owned.filter(model_ct=model_ct.id).count() 
+        if isinstance(perm, str):
+            permission = Permission.objects.get(codename__exact=perm, content_type=model_ct.id)
+        else:
+            permission = perm
+        count = self.row_level_permissions_owned.filter(model_ct=model_ct.id, permission=permission.id).count() 
+
         if count>0:
             return True
-        return self.contains_group_row_level_perms(perm, model_ct)        
+        return self.contains_group_row_level_perms(permission, model_ct)        
 
     def contains_group_row_level_perms(self, perm, ct):
         #SELECT COUNT(*)
@@ -367,14 +374,15 @@ class User(models.Model):
                 AND ug.%s=%%s
                 AND rlp.%s = 0
                 AND rlp.%s = %%s
+                AND rlp.%s = %%s
                 AND rlp.%s = %%s""" % (
             backend.quote_name('auth_user_groups'), backend.quote_name('auth_rowlevelpermission'), 
             backend.quote_name('django_content_type'), backend.quote_name('owner_id'),
             backend.quote_name('group_id'), backend.quote_name('user_id'),
             backend.quote_name('negative'), backend.quote_name('owner_ct_id'),
-            backend.quote_name('model_ct_id'))
+            backend.quote_name('model_ct_id'), backend.quote_name('permission_id'))
         
-        cursor.execute(sql, [self.id, ContentType.objects.get_for_model(Group).id, ct.id])
+        cursor.execute(sql, [self.id, ContentType.objects.get_for_model(Group).id, ct.id, perm.id])
         count = int(cursor.fetchone()[0])
         return (count>0)
 

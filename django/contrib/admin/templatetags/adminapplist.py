@@ -29,7 +29,7 @@ class AdminApplistNode(template.Node):
                         if not m._meta.admin.hidden:
 
                             perms = {
-                                'add': user.contains_permission("%s.%s" % (app_label, m._meta.get_add_permission()), m),
+                                'add': user.contains_permission("%s.%s" % (app_label, m._meta.get_add_permission())),
                                 'change': user.contains_permission("%s.%s" % (app_label, m._meta.get_change_permission()), m),
                                 'delete': user.contains_permission("%s.%s" % (app_label, m._meta.get_delete_permission()), m),
                             }    
