@@ -217,7 +217,7 @@ steps:
        subdirectory of ``MEDIA_ROOT`` it should upload files.
 
     3. All that will be stored in your database is a path to the file
-       (relative to ``MEDIA_ROOT``). You'll must likely want to use the
+       (relative to ``MEDIA_ROOT``). You'll most likely want to use the
        convenience ``get_<fieldname>_url`` function provided by Django. For
        example, if your ``ImageField`` is called ``mug_shot``, you can get
        the absolute URL to your image in a template with ``{{
