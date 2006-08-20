@@ -26,20 +26,21 @@ class AdminApplistNode(template.Node):
                 model_list = []
                 for m in app_models:
                     if m._meta.admin:
-                        perms = {
-                            'add': user.has_perm("%s.%s" % (app_label, m._meta.get_add_permission())),
-                            'change': user.has_perm("%s.%s" % (app_label, m._meta.get_change_permission())),
-                            'delete': user.has_perm("%s.%s" % (app_label, m._meta.get_delete_permission())),
-                        }
-
-                        # Check whether user has any perm for this module.
-                        # If so, add the module to the model_list.
-                        if True in perms.values():
-                            model_list.append({
-                                'name': capfirst(m._meta.verbose_name_plural),
-                                'admin_url': '%s/%s/' % (app_label, m.__name__.lower()),
-                                'perms': perms,
-                            })
+                        if not m._meta.admin.hidden:
+                            perms = {
+                                'add': user.has_perm("%s.%s" % (app_label, m._meta.get_add_permission())),
+                                'change': user.has_perm("%s.%s" % (app_label, m._meta.get_change_permission())),
+                                'delete': user.has_perm("%s.%s" % (app_label, m._meta.get_delete_permission())),
+                            }
+    
+                            # Check whether user has any perm for this module.
+                            # If so, add the module to the model_list.
+                            if True in perms.values():
+                                model_list.append({
+                                    'name': capfirst(m._meta.verbose_name_plural),
+                                    'admin_url': '%s/%s/' % (app_label, m.__name__.lower()),
+                                    'perms': perms,
+                                })
 
                 if model_list:
                     # Sort using verbose decorate-sort-undecorate pattern

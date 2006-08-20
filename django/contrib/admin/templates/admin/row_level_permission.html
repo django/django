@@ -92,10 +92,7 @@
 </tr>
 {% for o in x.1 %}
 <tr id="editRLP-{{ o.rlp.id }}">
-<!--<td colspan="5">-->
 <form id="editRLPForm-{{ o.rlp.id }}" class="editRLPForm" method="POST" name="editRLPForm-{{ o.rlp.id }}"  action="change/{% objref o.rlp %}/">
-<!--<table>
-<tr>-->
 	<td>
 		<input type="checkbox" name="apply_checkbox">
 	</td>
@@ -112,13 +109,9 @@
 		<input id="applyButton-{{ o.rlp.id }}" type="submit" value="{% trans 'Apply' %}" />
 		<input id="cancelButton-{{ o.rlp.id }}" type="reset" value="{% trans 'Reset' %}"/>
 		<br/>
-		<!--<a href="../../../auth/row_level_permission/{% objref o.rlp %}/delete/" class="deleteLink" onclick="row_level_permission.deleteRLP('{% objref o.rlp %}'); return false;">{% trans 'Delete' %}</a> |-->
-		<!--<a href="../../../auth/row_level_permission/{% objref o.rlp %}/delete/" class="deletelink">{% trans 'Delete' %}</a> | -->
 		<a href="delete/{% objref o.rlp %}" class="deletelink">{% trans 'Delete' %}</a> |
 		<a href="javascript:row_level_permission.copyToNew({{ o.rlp.id }})" class="copyToNewLink">{% trans 'Copy to New' %}</a>
 	</td>	
-<!--</tr>
-</table>-->
 </form>
 </td>
 </tr>
@@ -133,9 +126,6 @@
 {% if is_paginated %}
 <tr align="right">
 <td colspan="5">
-{% comment %}
-{% if has_previous %} <a href="?page={{ previous }}"> &lt;&lt; </a> {% endif %} {% if has_next %} <a href="?page={{ next }}"> &gt;&gt; </a>{% endif %}
-{% endcomment %}
 <div class="paginator">{% paginator %}</div>
 </td>
 </tr>

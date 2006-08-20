@@ -203,7 +203,6 @@ def render_change_form(model, manipulator, context, add=False, change=False, for
         'has_change_permission': context['perms'][app_label][opts.get_change_permission()],
         'has_file_field': opts.has_field_type(models.FileField),
         'has_absolute_url': hasattr(model, 'get_absolute_url'),
-        'has_row_level_permissions':opts.row_level_permissions,
         'auto_populated_fields': auto_populated_fields,
         'bound_field_sets': bound_field_sets,
         'first_form_field_id': first_form_field_id,
@@ -400,25 +399,9 @@ def change_stage(request, app_label, model_name, object_id):
         'object_id': object_id,
         'original': manipulator.original_object,
         'is_popup': request.REQUEST.has_key('_popup'),
+        'object_has_row_level_permissions':opts.row_level_permissions,
+        'has_row_level_permissions':request.user.has_perm("auth.change_rowlevelpermission") and request.user.has_perm(opts.app_label+"."+opts.get_change_permission(), object=manipulator.original_object),
     })
-
-    if model._meta.row_level_permissions:
-        from django.contrib.admin.row_level_perm_manipulator import AddRLPManipulator, ChangeRLPManipulator
-        model_instance = manipulator.original_object
-        model_ct = ContentType.objects.get_for_model(model)
-        rlp_list = model_instance.row_level_permissions.order_by('owner_ct', 'owner_id')
-        rlp_errors = rlp_new_data = {}
-        add_rlp_manip = AddRLPManipulator(model_instance, model_ct)
-        edit_rlp_manip = ChangeRLPManipulator(model_ct)
-        new_rlp_form = forms.FormWrapper(add_rlp_manip, rlp_new_data, rlp_errors)
-        empty_rlp_form = forms.FormWrapper(edit_rlp_manip, rlp_new_data, rlp_errors)
-        rlp_form_list = []
-        for r in rlp_list:
-            owner_val = str(r.owner_ct)+"-"+str(r.owner_id)
-            data = {'id':r.id, 'owner':owner_val, 'perm':r.permission.id, 'negative':r.negative}
-            rlp_form_list.append({'form':forms.FormWrapper(edit_rlp_manip, data, rlp_errors), 'rlp':r})
-        rlp_context = {'new_rlp_form':new_rlp_form, 'rlp_form_list':rlp_form_list, 'empty_rlp_form':empty_rlp_form}
-        c.update(rlp_context)
     
     return render_change_form(model, manipulator, c, change=True)
 change_stage = staff_member_required(never_cache(change_stage))

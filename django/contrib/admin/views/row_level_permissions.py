@@ -14,6 +14,9 @@ from django.views.decorators.cache import never_cache
 
 
 def view_row_level_permissions(request, app_label, model_name, object_id):
+    """
+    Displays a list of row level permisisons for the model instance
+    """
     model = models.get_model(app_label, model_name)
     object_id = unquote(object_id)
     
@@ -37,9 +40,7 @@ def view_row_level_permissions(request, app_label, model_name, object_id):
         'opts':opts,
     })   
 
-    
-    list_per_page = opts.admin.list_per_page
-    #list_per_page = 20
+    list_per_page = RowLevelPermission._meta.admin.list_per_page
     paginator = ObjectPaginator(model_instance.row_level_permissions.order_by('owner_ct', 'owner_id'),
                                 list_per_page)
     page = int(request.GET.get('page', 1))-1
@@ -102,6 +103,9 @@ def view_row_level_permissions(request, app_label, model_name, object_id):
 view_row_level_permissions = staff_member_required(never_cache(view_row_level_permissions))
 
 def delete_row_level_permission(request, app_label, model_name, object_id, ct_id, rlp_id, hash):
+    """
+    Deletes the given row level permission.
+    """
     msg = {}
     
     if utils.verify_objref_hash(ct_id, rlp_id, hash):
@@ -129,10 +133,9 @@ def delete_row_level_permission(request, app_label, model_name, object_id, ct_id
 
     request.user.message_set.create(message=msg['text'])
 
+    request.user.message_set.create(message=msg['text']) 
     return HttpResponseRedirect(request.META["HTTP_REFERER"])
-#    return HttpResponseRedirect("%s?rlp_result=%s&rlp_msg=%s" % (request.META["HTTP_REFERER"], str(msg["result"]), main.quote(msg["text"])))
-    #return main.change_stage(request, main.quote(obj._meta.app_label), main.quote(obj._meta.object_name),
-    #                    main.quote(str(obj.id)), extra_context={"row_level_perm_msg":msg,})
+
 delete_row_level_permission = staff_member_required(never_cache(delete_row_level_permission))
 
 def add_row_level_permission(request, app_label, model_name, object_id):
@@ -179,13 +182,9 @@ def add_row_level_permission(request, app_label, model_name, object_id):
         resp_list.append({"id":rlp.id, "permission":rlp.permission.id, "hash":hash})
     msg["results"]=resp_list
 
-    #return main.change_stage(request, main.quote(obj._meta.app_label), main.quote(obj._meta.object_name),
-    #                    main.quote(str(obj.id)), extra_context={"row_level_perm_msg":msg,})
-    if msg["result"]:
-        request.user.message_set.create(message=msg['text']) 
-        return HttpResponseRedirect(request.META["HTTP_REFERER"])
-    else:
-        return HttpResponseRedirect("../?err_msg=%s" % msg['text'])
+    request.user.message_set.create(message=msg['text']) 
+    return HttpResponseRedirect(request.META["HTTP_REFERER"])
+
 add_row_level_permission = staff_member_required(never_cache(add_row_level_permission))
 
 def change_row_level_permission(request, app_label, model_name, object_id, ct_id, rlp_id, hash):
@@ -232,9 +231,8 @@ def change_row_level_permission(request, app_label, model_name, object_id, ct_id
         msg = {"result":True, "text":_("Row level permission has successfully been changed"), "id":rlp_id}
         
     request.user.message_set.create(message=msg['text']) 
+    
+    request.user.message_set.create(message=msg['text']) 
     return HttpResponseRedirect(request.META["HTTP_REFERER"])
-#    request.POST = {}
-#    return change_stage(request, main.quote(obj._meta.app_label), main.quote(obj._meta.object_name),
-#                    main.quote(str(obj.id)), extra_context={"row_level_perm_msg":msg,})
 
 change_row_level_permission = staff_member_required(never_cache(change_row_level_permission))

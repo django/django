@@ -11,8 +11,8 @@ class ChangeRLPManipulator(forms.Manipulator):
             self.ct = ct
             perm_list = [(o.id, o.name) for o in self.ct.permission_set.order_by("name")]
             
-        obj_list = [('user', User.objects.order_by("username"))]
-        obj_list.extend([('group', Group.objects.order_by("name"))])
+        obj_list = [(User, User.objects.order_by("username"))]
+        obj_list.extend([(Group, Group.objects.order_by("name"))])
         
         self.fields = (
             MultipleObjSelectField(field_name="owner", obj_list=obj_list),
@@ -52,8 +52,8 @@ class AddRLPManipulator(ChangeRLPManipulator):
     def __init__(self, obj_instance, ct):
         self.ct = ct
         self.obj_instance = obj_instance
-        obj_list = [('user', User.objects.order_by("username"))]
-        obj_list.extend([('group', Group.objects.order_by("name"))])
+        obj_list = [(User, User.objects.order_by("username"))]
+        obj_list.extend([(Group, Group.objects.order_by("name"))])
         perm_list = [(o.id, o.name) for o in self.ct.permission_set.order_by("name")]
         self.fields = (
             MultipleObjSelectField(field_name="owner", obj_list=obj_list, default_text=_("Select an option")),
@@ -73,6 +73,7 @@ class AddRLPManipulator(ChangeRLPManipulator):
         for i in  new_data.getlist('perm'):
             perm = Permission.objects.get(pk=i)
 
+            #Check that the new row level perms are unique
             field_name_list = ('owner_ct', 'owner_id', 'model_ct', 'model_id', 'permission')
             field_data = ct.id
             all_data = {'owner_id':owner.id, 'model_ct_id':self.ct.id, 'model_id':self.obj_instance.id, 'permission_id':perm.id}
@@ -81,41 +82,38 @@ class AddRLPManipulator(ChangeRLPManipulator):
             rlp = RowLevelPermission.objects.create_row_level_permission(self.obj_instance, owner, perm, negative=new_data['negative'])
             rlp_list.append(rlp)
         
-        return rlp_list
-
-#def validate_unique_together(orig_obj, field_name_list, all_data):
-    #field_list = [opts.get_field(field_name) for field_name in field_name_list]
-    #kwargs = {}
-    #for f in field_list:
-        #field_val = all_data.get(f.attname, None)
-        #if field_val is None:
-            #return
-        #if isinstance(f.rel, ManyToOneRel):
-            #kwargs['%s__pk' % f.name] = field_val
-        #else:
-            #kwargs['%s__iexact' % f.name] = field_val
-    #try:
-        #old_obj = self.manager.get(**kwargs)
-    #except ObjectDoesNotExist:
-        #return
-    #if hasattr(self, 'original_object') and self.original_object._get_pk_val() == old_obj._get_pk_val():
-        #pass
-    #else:
-        #raise validators.ValidationError, _("%(object)s with this %(type)s already exists for the given %(field)s.") % \
-            #{'object': capfirst(opts.verbose_name), 'type': field_list[0].verbose_name, 'field': get_text_list(field_name_list[1:], 'and')}        
-        
+        return rlp_list        
     
 class MultipleObjSelectField(forms.SelectField):
+    """
+    Extends a select field to use more then one type of model in a select field.
+    Uses optgroup in the select field to differentiate between object types.
+    
+    obj_list should be a list of lists containing the model and a list of objects.
+    E.g. ((User, User.objects.all()), (Group, Group.objects.all))
+    
+    If you wish to define a default text to be shown as the default option, use the 
+    default_text parameter. An example of default text would be "Select an option"
+    
+    The remaining parameters are very similiar to the normal SelectField.
+    
+    To return the object selected pass the string result to MultipleObjSelectField.returnObject(string),
+    it returns the object instance.
+    
+    To create a key for a specific object, use: MultipleObjSelectField.returnKey(object). It has an optional
+    parameter for the content type (ct), if you have already determined the content type and want to save on
+    db queries.
+    """
     def __init__(self, field_name, obj_list=None, 
                  default_text=None, size=1, is_required=False, validator_list=None, 
                  member_name=None):
         choice_list = []
         self.default_text = default_text
+        #Loop through the object list and create the list to be displayed
         for obj, obj_choices in obj_list:
-            ct = ContentType.objects.get(model__exact=obj)
+            ct = ContentType.objects.get_for_model(obj)
             object_choice = [(MultipleObjSelectField.returnKey(o, ct=ct), str(o)) for o in obj_choices]
             choice_list.extend([(ct.name.title(), object_choice)])
-            #choice_list.extend([(MultipleObjSelectField.returnKey(o, ct=ct), str(o)+" ("+ct.name.title()+")") for o in obj_choices])
         super(MultipleObjSelectField, self).__init__(field_name, choices=choice_list, 
                                                      size=size, is_required=is_required, 
                                                      validator_list=validator_list, 
