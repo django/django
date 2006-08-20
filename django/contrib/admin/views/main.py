@@ -433,7 +433,7 @@ def _get_deleted_objects(deleted_objects, perms_needed, user, obj, opts, current
             else:
                 if related.opts.admin:
                     p = '%s.%s' % (related.opts.app_label, related.opts.get_delete_permission())
-                    if not user.has_perm(p):
+                    if not user.has_perm(p, object=related):
                         perms_needed.add(related.opts.verbose_name)
                         # We don't care about populating deleted_objects now.
                         continue
@@ -464,7 +464,7 @@ def _get_deleted_objects(deleted_objects, perms_needed, user, obj, opts, current
             # permission to delete them, add the missing perm to perms_needed.
             if related.opts.admin and has_related_objs:
                 p = '%s.%s' % (related.opts.app_label, related.opts.get_delete_permission())
-                if not user.has_perm(p):
+                if not user.has_perm(p, object=related):
                     perms_needed.add(rel_opts_name)
     for related in opts.get_all_related_many_to_many_objects():
         if related.opts in opts_seen:
@@ -493,7 +493,7 @@ def _get_deleted_objects(deleted_objects, perms_needed, user, obj, opts, current
         # permission to change them, add the missing perm to perms_needed.
         if related.opts.admin and has_related_objs:
             p = '%s.%s' % (related.opts.app_label, related.opts.get_change_permission())
-            if not user.has_perm(p):
+            if not user.has_perm(p, object=related):
                 perms_needed.add(related.opts.verbose_name)
 
 def delete_stage(request, app_label, model_name, object_id):
@@ -562,6 +562,7 @@ class ChangeList(object):
         self.opts = model._meta
         self.lookup_opts = self.opts
         self.manager = self.opts.admin.manager
+        self.user = request.user
 
         # Get search parameters from the query string.
         try:
@@ -644,7 +645,10 @@ class ChangeList(object):
             except InvalidPage:
                 result_list = ()
 
-        self.result_count = result_count
+        if self.opts.admin.show_all_rows:
+            self.result_count = result_count
+        else:
+            self.result_count = 0
         self.full_result_count = full_result_count
         self.result_list = result_list
         self.can_show_all = can_show_all

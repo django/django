@@ -373,7 +373,7 @@ class User(models.Model):
             backend.quote_name('group_id'), backend.quote_name('user_id'),
             backend.quote_name('negative'), backend.quote_name('owner_ct_id'),
             backend.quote_name('model_ct_id'))
-        print sql
+        
         cursor.execute(sql, [self.id, ContentType.objects.get_for_model(Group).id, ct.id])
         count = int(cursor.fetchone()[0])
         return (count>0)
