@@ -311,16 +311,18 @@ def change_stage(request, app_label, model_name, object_id):
         raise Http404, "App %r, model %r, not found" % (app_label, model_name)
     opts = model._meta
 
-    if not request.user.has_perm(app_label + '.' + opts.get_change_permission()):
+    try:
+        manipulator = model.ChangeManipulator(object_id)
+    except ObjectDoesNotExist:
+        raise Http404
+
+    if not request.user.has_perm(app_label + '.' + opts.get_change_permission(), object=manipulator.original_object):
         raise PermissionDenied
 
     if request.POST and request.POST.has_key("_saveasnew"):
         return add_stage(request, app_label, model_name, form_url='../../add/')
 
-    try:
-        manipulator = model.ChangeManipulator(object_id)
-    except ObjectDoesNotExist:
-        raise Http404
+
 
     if request.POST:
         new_data = request.POST.copy()
@@ -418,7 +420,7 @@ def _get_deleted_objects(deleted_objects, perms_needed, user, obj, opts, current
     if current_depth > 16:
         return # Avoid recursing too deep.
     opts_seen = []
-    for related in opts.get_all_related_objects():
+    for related in opts.related_objects():
         if related.opts in opts_seen:
             continue
         opts_seen.append(related.opts)
@@ -501,9 +503,11 @@ def delete_stage(request, app_label, model_name, object_id):
     if model is None:
         raise Http404, "App %r, model %r, not found" % (app_label, model_name)
     opts = model._meta
-    if not request.user.has_perm(app_label + '.' + opts.get_delete_permission()):
-        raise PermissionDenied
+
     obj = get_object_or_404(model, pk=object_id)
+
+    if not request.user.has_perm(app_label + '.' + opts.get_delete_permission(), object=obj):
+        raise PermissionDenied
 
     # Populate deleted_objects, a data structure of all related objects that
     # will also be deleted.
@@ -741,7 +745,7 @@ def change_list(request, app_label, model_name):
     model = models.get_model(app_label, model_name)
     if model is None:
         raise Http404, "App %r, model %r, not found" % (app_label, model_name)
-    if not request.user.has_perm(app_label + '.' + model._meta.get_change_permission()):
+    if not request.user.contains_permission(app_label + '.' + model._meta.get_change_permission(), model):
         raise PermissionDenied
     try:
         cl = ChangeList(request, model)

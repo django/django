@@ -27,11 +27,17 @@ class AdminApplistNode(template.Node):
                 for m in app_models:
                     if m._meta.admin:
                         if not m._meta.admin.hidden:
+                            #perms = {
+                                #'add': user.has_perm("%s.%s" % (app_label, m._meta.get_add_permission())),
+                                #'change': user.has_perm("%s.%s" % (app_label, m._meta.get_change_permission())),
+                                #'delete': user.has_perm("%s.%s" % (app_label, m._meta.get_delete_permission())),
+                            #}
+    
                             perms = {
-                                'add': user.has_perm("%s.%s" % (app_label, m._meta.get_add_permission())),
-                                'change': user.has_perm("%s.%s" % (app_label, m._meta.get_change_permission())),
-                                'delete': user.has_perm("%s.%s" % (app_label, m._meta.get_delete_permission())),
-                            }
+                                'add': user.contains_permission("%s.%s" % (app_label, m._meta.get_add_permission()), m),
+                                'change': user.contains_permission("%s.%s" % (app_label, m._meta.get_change_permission()), m),
+                                'delete': user.contains_permission("%s.%s" % (app_label, m._meta.get_delete_permission()), m),
+                            }    
     
                             # Check whether user has any perm for this module.
                             # If so, add the module to the model_list.
