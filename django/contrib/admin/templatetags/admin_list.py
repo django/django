@@ -104,9 +104,11 @@ def result_headers(cl):
 def items_for_result(cl, result):
     first = True
     pk = cl.lookup_opts.pk.attname
+    #If show_all_rows is set to False, then we have to check the permission on the object
     if not cl.opts.admin.show_all_rows:
         if not cl.user.has_perm(cl.opts.app_label + "." + cl.opts.get_change_permission(), object=result):
             return
+        #Update the count
         cl.result_count = cl.result_count +1
     for field_name in cl.lookup_opts.admin.list_display:
         row_class = ''

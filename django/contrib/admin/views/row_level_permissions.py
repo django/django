@@ -133,7 +133,6 @@ def delete_row_level_permission(request, app_label, model_name, object_id, ct_id
 
     request.user.message_set.create(message=msg['text'])
 
-    request.user.message_set.create(message=msg['text']) 
     return HttpResponseRedirect(request.META["HTTP_REFERER"])
 
 delete_row_level_permission = staff_member_required(never_cache(delete_row_level_permission))
@@ -232,7 +231,6 @@ def change_row_level_permission(request, app_label, model_name, object_id, ct_id
         
     request.user.message_set.create(message=msg['text']) 
     
-    request.user.message_set.create(message=msg['text']) 
     return HttpResponseRedirect(request.META["HTTP_REFERER"])
 
 change_row_level_permission = staff_member_required(never_cache(change_row_level_permission))

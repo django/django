@@ -645,6 +645,9 @@ class ChangeList(object):
             except InvalidPage:
                 result_list = ()
 
+        #This is set to 0 if show_all_rows is false, checking of which rows to be shown
+        #is done later in the result_list tag at which point it will calculate the correct
+        #number of rows shown
         if self.opts.admin.show_all_rows:
             self.result_count = result_count
         else:
