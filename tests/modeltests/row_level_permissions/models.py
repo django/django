@@ -116,8 +116,6 @@ False
 >>> user.save()
 >>> user.user_permissions.all()
 [<Permission: mineral | Can change>]
->>> user.has_perm(quartz._meta.app_label +"."+ perm2.codename, quartz)
-True
 >>> rlp2 = RowLevelPermission.objects.create_row_level_permission(quartz, user, perm2, negative=True)
 >>> user.has_perm(quartz._meta.app_label +"."+ perm2.codename, quartz)
 False

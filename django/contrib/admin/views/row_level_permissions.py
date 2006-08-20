@@ -29,8 +29,6 @@ def view_row_level_permissions(request, app_label, model_name, object_id):
     if not request.user.has_perm(RowLevelPermission._meta.app_label + '.' + RowLevelPermission._meta.get_change_permission()):
         raise PermissionDenied    
     
-
-
     c = template.RequestContext(request, {
         'title': _('Edit Row Level Permissions'),
         'object_id': object_id,
@@ -40,9 +38,8 @@ def view_row_level_permissions(request, app_label, model_name, object_id):
     })   
 
     
-    #TODO: For now takes the number per page from the model instance not the RLP object
     list_per_page = opts.admin.list_per_page
-    #list_per_page = 5
+    #list_per_page = 20
     paginator = ObjectPaginator(model_instance.row_level_permissions.order_by('owner_ct', 'owner_id'),
                                 list_per_page)
     page = int(request.GET.get('page', 1))-1
@@ -132,7 +129,7 @@ def delete_row_level_permission(request, app_label, model_name, object_id, ct_id
 
     request.user.message_set.create(message=msg['text'])
 
-    return HttpResponseRedirect("../../../../")
+    return HttpResponseRedirect(request.META["HTTP_REFERER"])
 #    return HttpResponseRedirect("%s?rlp_result=%s&rlp_msg=%s" % (request.META["HTTP_REFERER"], str(msg["result"]), main.quote(msg["text"])))
     #return main.change_stage(request, main.quote(obj._meta.app_label), main.quote(obj._meta.object_name),
     #                    main.quote(str(obj.id)), extra_context={"row_level_perm_msg":msg,})
@@ -184,7 +181,11 @@ def add_row_level_permission(request, app_label, model_name, object_id):
 
     #return main.change_stage(request, main.quote(obj._meta.app_label), main.quote(obj._meta.object_name),
     #                    main.quote(str(obj.id)), extra_context={"row_level_perm_msg":msg,})
-    return HttpResponseRedirect("../")
+    if msg["result"]:
+        request.user.message_set.create(message=msg['text']) 
+        return HttpResponseRedirect(request.META["HTTP_REFERER"])
+    else:
+        return HttpResponseRedirect("../?err_msg=%s" % msg['text'])
 add_row_level_permission = staff_member_required(never_cache(add_row_level_permission))
 
 def change_row_level_permission(request, app_label, model_name, object_id, ct_id, rlp_id, hash):
@@ -231,8 +232,7 @@ def change_row_level_permission(request, app_label, model_name, object_id, ct_id
         msg = {"result":True, "text":_("Row level permission has successfully been changed"), "id":rlp_id}
         
     request.user.message_set.create(message=msg['text']) 
- 
-    return HttpResponseRedirect("../../../../")
+    return HttpResponseRedirect(request.META["HTTP_REFERER"])
 #    request.POST = {}
 #    return change_stage(request, main.quote(obj._meta.app_label), main.quote(obj._meta.object_name),
 #                    main.quote(str(obj.id)), extra_context={"row_level_perm_msg":msg,})
