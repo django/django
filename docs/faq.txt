@@ -98,11 +98,10 @@ Lawrence, Kansas, USA.
     On IRC, Simon goes by ``SimonW``.
 
 `Wilson Miner`_
-    Wilson's design-fu makes us all look like rock stars. When not sneaking
-    into apartment complex swimming pools, he's the Commercial Development
-    Director for World Online, which means he makes the money that pays all our
-    paychecks. He lives in Lawrence, Kansas.
-
+    Wilson's design-fu makes us all look like rock stars. By day, he's an 
+    interactive designer for `Apple`. Don't ask him what he's working on, or
+    he'll have to kill you. He lives in San Francisco.
+    
     On IRC, Wilson goes by ``wilsonian``.
 
 .. _`World Online`: http://code.djangoproject.com/wiki/WorldOnline
@@ -113,6 +112,7 @@ Lawrence, Kansas, USA.
 .. _`simon.incutio.com`: http://simon.incutio.com/
 .. _`Jacob Kaplan-Moss`: http://www.jacobian.org/
 .. _`Wilson Miner`: http://www.wilsonminer.com/
+.. _`Apple`: http://www.apple.com/
 
 Which sites use Django?
 -----------------------
