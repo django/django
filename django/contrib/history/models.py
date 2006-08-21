@@ -15,6 +15,47 @@ CHANGE_TYPES = (
     ('D', 'Deletion'),
 )
 
+#########################
+# Manager - API methods #
+#########################
+
+class ChangeLogManager(models.Manager):
+
+    def get_version(self, object, offset=0):
+	""" 
+	Returns 'current-offset' revision of the 'object' 
+	"""
+	ct = ContentType.objects.get_for_model(object)
+	return self.get_query_set().filter(
+	    content_type=ct.id).filter(
+		object_id=object.id)[offset]
+
+    def list_history(self, object, **kwargs):
+	""" 
+	list_history(object): Returns a list of all revisions for that id.
+	list_history(object, offset=X): Returns a list of last X revisions.    
+	"""
+	ct = ContentType.objects.get_for_model(object)
+	if kwargs['offset']:
+	    return self.get_query_set().filter(
+		content_type=ct.id).filter(
+		    object_id=object.id)[:kwargs['offset']]
+	else:
+	    return ChangeLog.objects.filter(object_id=object.id)
+
+    def version_by_date(self, object, date):
+	""" 
+	Returns a list of revisions made at 'date'. 
+	"""
+	ct = ContentType.objects.get_for_model(object)
+	return self.get_query_set().filter(
+	    content_type=ct.id).filter(
+		change_time__exact=date)
+
+########################
+# Generic change model #
+########################
+
 class ChangeLog(models.Model):
     change_time = models.DateTimeField (_('time of change'), auto_now=True)
     content_type = models.ForeignKey(ContentType)
@@ -25,8 +66,7 @@ class ChangeLog(models.Model):
     object = models.TextField()
     comment = models.CharField(maxlength=250, blank=True)
 
-    #object_type = models.CharField(maxlength=50)
-    #pub_date = models.DateTimeField('date published')
+    objects = ChangeLogManager()
     
     class Meta:
 	verbose_name = _('changelog entry')
@@ -52,41 +92,7 @@ class ChangeLog(models.Model):
 
     def get_rev_num(self):
 	""" Returns the ID/revision number of ChangeLog entry. """
-	return self.id
-
-#######################
-# Other (API) methods #
-#######################
-
-#class ChangeLogManager(models.Manager):
-
-def get_version(object, offset=0):
-    """ Returns 'current-offset' revision of the 'object' """
-    try:
-	list = ChangeLog.objects.order_by('-id').filter(object_id=object.id)[offset]
-	print list.get_object()
-	return list
-    except:
-	pass
-
-def list_history(parent_id, **kwargs):
-    """ 
-    list_history(parent_id): Returns a list of all revisions for that id.
-    list_history(parent_id, offset=X): Returns a list of last X revisions.    
-    """
-    if kwargs:
-	list = ChangeLog.objects.filter(object_id=parent_id)[:kwargs['offset']]
-	return list
-    else:
-	return ChangeLog.objects.filter(object_id=parent_id)
-
-
-def version_by_date(self, date):
-    """ Returns a list of revisions made at 'date'. """
-    return ChangeLog.objects.filter(object_id=self.id).filter(change_time__exact=date)
-
-
-	
+	return self.id	
 
 #########################
 # Pre-save signal catch #
@@ -97,7 +103,7 @@ def _import_models(instance):
     Checks for models that are history-enabled and imports the one of
     which "instance" is an instance of.
 
-    Returns "True" if import went fine.
+    Returns "import object" if import went fine.
     """
     model_list = []
     m = None
@@ -123,7 +129,16 @@ def _import_models(instance):
     return m
 
 def save_new_revision(sender, instance, signal, *args, **kwargs):
-    """ Saves a old copy of the record into the History table."""
+    """ 
+    Saves a old copy of the record into the History table.
+
+    If the instance does not have an ID then it is a new record and saved as such.
+    If the instance is passed with signal_name='pre_save' it saves a previous
+    version (taken from the database).
+    If the instance is passed with signal_name='pre_delete' it saves the instance
+    as the latest revision.
+
+    """
     print "Sender: ",sender
     print "Signal: ",kwargs['signal_name']
 
@@ -133,20 +148,19 @@ def save_new_revision(sender, instance, signal, *args, **kwargs):
 
     #instance_name = instance.__class__.__name__
     #print instance_name
-    m = _import_models(instance)
+    im = _import_models(instance)
     old = None
     log = None
     
-    if m:
+    if im:
 	try:
-	    print "Try"
 	    if kwargs['signal_name'] is 'pre_delete':
 		print "Instance was last revision."
 		old = instance
 		log = ChangeLog(parent=instance, change_type='D', comment="Object deleted. Last revision.")
 	    elif ((kwargs['signal_name'] is 'pre_save') and instance.id):
 		print "Instance has an ID."
-		old = getattr(m, instance.__class__.__name__).objects.filter(pk=instance.id)[0]
+		old = getattr(im, instance.__class__.__name__).objects.filter(pk=instance.id)[0]
 		log = ChangeLog(parent=instance, change_type='U', comment="Update")
 	    else:
 		print "Instance without an ID."
@@ -159,10 +173,10 @@ def save_new_revision(sender, instance, signal, *args, **kwargs):
 	return 0  # exit wo/ an action
 
     # DEBUG
-    print "Old: ",old
-    print "Instance: ",instance.id
+    #print "Old: ",old
+    #print "Instance: ",instance.id
     #print "Test: ",getattr(instance, 'Admin').date_hierarchy
-    print "Log: ",log.change_time
+    #print "Log: ",log.change_time
 
     try: 
 	log.object = Pickle.dumps(old, protocol=0)
