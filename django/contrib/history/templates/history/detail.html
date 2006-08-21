@@ -1,13 +1,60 @@
 {% if change %}
+<h3>ChangeLog</h3>
+<table border="1px">
+<thead>
+<tr>
+  <th>Name</th>
+  <th>Value</th>
+  <th>Verbose</th>
+</tr>
+</thead>
+<tbody>
+{% for field in change_fields %}
+<tr>
+  <td>{{ field.name }}</td>
+  <td>{{ field.data_type }}</td>
+  <td>{% if field.verbose %}
+    {{ field.verbose|escape }}
+    {% endif %}
+    {% if field.help_text %} - 
+    {{ field.help_text|escape }}
+    {% endif %}</td>
+</tr>
+{% endfor %}
+</tbody>
+</table>
+
+<h3>{{ object }}</h3>
+<table border="1px">
+<thead>
+<tr>
+  <th>Name</th>
+  <th>Value</th>
+  <th>Verbose</th>
+</tr>
+</thead>
+<tbody>
+{% for field in object_fields %}
+<tr>
+  <td>{{ field.name }}</td>
+  <td>{{ field.data_type }}</td>
+  <td>{{ field.verbose }}</td>
+</tr>
+{% endfor %}
+</tbody>
+</table>
+
+
 <ul>
 <li>ID: {{ change.id }}</li>
 <li>PID: {{ change.object_id }}</li>
 <li>UID: {{ change.user_id }}</li>
+<li>Type: {{ change.content_type }}</li>
 <li>Change time: {{ change.change_time }}</li>
 <li>Comment: {{ change.comment }}</li>
 <hr width="100px" align="left"/>
 	<li>ID: {{ object.id }}
-	<li>Question: {{ object.question }}</li>
+	<li>Question: {{ object }}</li>
 	<li>Pub date: {{ object.pub_date }}</li>
 
 </ul>
