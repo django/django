@@ -48,9 +48,10 @@ bit of i18n-related overhead in certain places of the framework. If you don't
 use internationalization, you should take the two seconds to set
 ``USE_I18N = False`` in your settings file. If ``USE_I18N`` is set to
 ``False``, then Django will make some optimizations so as not to load the
-internationalization machinery.
+internationalization machinery. See the `documentation for USE_I18N`_.
 
-See the `documentation for USE_I18N`_.
+You'll probably also want to remove ``'django.core.context_processors.i18n'``
+from your ``TEMPLATE_CONTEXT_PROCESSORS`` setting.
 
 .. _documentation for USE_I18N: http://www.djangoproject.com/documentation/settings/#use-i18n
 

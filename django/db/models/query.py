@@ -921,7 +921,7 @@ def delete_objects(seen_objs):
 
         # Pre notify all instances to be deleted
         for pk_val, instance in seen_objs[cls]:
-            dispatcher.send(signal=signals.pre_delete, sender=cls, instance=instance, signal_name='pre_delete')
+            dispatcher.send(signal=signals.pre_delete, sender=cls, instance=instance)
 
         pk_list = [pk for pk,instance in seen_objs[cls]]
         for related in cls._meta.get_all_related_many_to_many_objects():
