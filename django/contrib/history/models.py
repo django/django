@@ -21,14 +21,23 @@ CHANGE_TYPES = (
 
 class ChangeLogManager(models.Manager):
 
-    def get_version(self, object, offset=0):
+    def get_version(self, object, **kwargs):
 	""" 
 	Returns 'current-offset' revision of the 'object' 
 	"""
+	if not kwargs['offset']: offset=0
+
 	ct = ContentType.objects.get_for_model(object)
-	return self.get_query_set().filter(
-	    content_type=ct.id).filter(
-		object_id=object.id)[offset]
+
+	if kwargs['revision']:
+	    return self.get_query_set().filter(
+		content_type=ct.id).filter(
+		    object_id=object.id).filter(
+			pk=revision)[offset]
+	else:
+	    return self.get_query_set().filter(
+		content_type=ct.id).filter(
+		    object_id=object.id)[offset]
 
     def list_history(self, object, **kwargs):
 	""" 
