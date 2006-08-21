@@ -338,6 +338,10 @@ class User(models.Model):
         return True
 
     def contains_permission(self, perm, model=None):
+        """
+        This checks if the user has the given permission for any instance 
+        of the given model.
+        """
         if self.has_perm(perm):
             return True
         if model and model._meta.row_level_permissions:

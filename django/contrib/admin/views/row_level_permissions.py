@@ -29,7 +29,8 @@ def view_row_level_permissions(request, app_label, model_name, object_id):
     
     if not request.user.has_perm(opts.app_label + '.' + opts.get_change_permission(), object=model_instance):
         raise PermissionDenied
-    if not request.user.has_perm(RowLevelPermission._meta.app_label + '.' + RowLevelPermission._meta.get_change_permission()):
+    if not (request.user.has_perm(RowLevelPermission._meta.app_label + '.' + RowLevelPermission._meta.get_change_permission()) or
+            request.user.has_perm(RowLevelPermission._meta.app_label + '.' + RowLevelPermission._meta.get_add_permission())):
         raise PermissionDenied    
     
     c = template.RequestContext(request, {
@@ -40,6 +41,8 @@ def view_row_level_permissions(request, app_label, model_name, object_id):
         'opts':opts,
     })   
 
+
+    #Set up the paging
     list_per_page = RowLevelPermission._meta.admin.list_per_page
     paginator = ObjectPaginator(model_instance.row_level_permissions.order_by('owner_ct', 'owner_id'),
                                 list_per_page)
@@ -67,7 +70,7 @@ def view_row_level_permissions(request, app_label, model_name, object_id):
     add_rlp_manip = AddRLPManipulator(model_instance, model_ct)
     edit_rlp_manip = ChangeRLPManipulator(model_ct)
     new_rlp_form = forms.FormWrapper(add_rlp_manip, rlp_new_data, rlp_errors)
-    
+    #3 different groups of forms when split by owner
     user_rlp_form_list = []
     other_rlp_form_list = []
     group_rlp_form_list = []
@@ -84,7 +87,7 @@ def view_row_level_permissions(request, app_label, model_name, object_id):
             group_rlp_form_list.append({'form':forms.FormWrapper(edit_rlp_manip, data, rlp_errors), 'rlp':r})            
         else:
             other_rlp_form_list.append({'form':forms.FormWrapper(edit_rlp_manip, data, rlp_errors), 'rlp':r})
-    
+    #Combine together the three kinds 
     rlp_forms = []
     if user_rlp_form_list:
         rlp_forms.append((_('Users'), user_rlp_form_list,))

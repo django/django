@@ -143,5 +143,4 @@ True
 >>> user.has_perm(quartz._meta.app_label +"."+ perm.codename, quartz)
 False
 
-
 """
