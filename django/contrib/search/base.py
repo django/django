@@ -93,6 +93,8 @@ class Indexer(object):
         """
         if fields is None:
             fields = []
+        elif isinstance(fields, basestring):
+            fields = [fields]
         if attributes is None:
             attributes = kwargs
         else:
