@@ -1,0 +1,6 @@
+cd case01_add_field/; ln -sf models.py.pre models.py; cd ..
+cd case02_rename_field/; ln -sf models.py.pre models.py; cd ..
+cd case03_rename_model/; ln -sf models.py.pre models.py; cd ..
+cd case04_change_flag/; ln -sf models.py.pre models.py; cd ..
+cd case05_remove_field/; ln -sf models.py.pre models.py; cd ..
+

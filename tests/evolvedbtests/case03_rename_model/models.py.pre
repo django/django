@@ -1,0 +1,18 @@
+from django.db import models
+
+class Poll(models.Model):
+    question = models.CharField(maxlength=200)
+    pub_date = models.DateTimeField('date published')
+    author = models.CharField(maxlength=200)
+    def __str__(self):
+        return self.question
+    
+class Choice(models.Model):
+    "the original name for this model was 'Choice'"
+    poll = models.ForeignKey(Poll)
+    choice = models.CharField(maxlength=200)
+    number_of_votes = models.IntegerField(aka='number_of_votes') # show that field name changes work too
+    def __str__(self):
+        return self.choice
+    class Meta:
+        aka = ('Choice', 'OtherBadName')

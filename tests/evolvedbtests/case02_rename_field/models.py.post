@@ -1,0 +1,17 @@
+from django.db import models
+
+class Poll(models.Model):
+    """this model originally had fields named pub_date and the_author.  you can use either a str 
+    or a tuple for the aka value.  (tuples are used if you have changed its name more than once)"""
+    question = models.CharField(maxlength=200)
+    published_date = models.DateTimeField('date published', aka=('pub_date', 'publish_date'))
+    author = models.CharField(maxlength=200, aka='the_author')
+    def __str__(self):
+        return self.question
+    
+class Choice(models.Model):
+    poll = models.ForeignKey(Poll)
+    choice = models.CharField(maxlength=200)
+    number_of_votes = models.IntegerField(aka='votes')
+    def __str__(self):
+        return self.choice

@@ -1,0 +1,16 @@
+from django.db import models
+
+class Poll(models.Model):
+    question = models.CharField(maxlength=200)
+    pub_date = models.DateTimeField('date published')
+    # author = models.CharField(maxlength=200) # we no longer care
+    def __str__(self):
+        return self.question
+    
+class Choice(models.Model):
+    poll = models.ForeignKey(Poll)
+    # make sure rename fields are not picked up in any field deletes
+    option = models.CharField(maxlength=200, aka='choice')
+    number_of_votes = models.IntegerField( aka=('votes','num_votes') )
+    def __str__(self):
+        return self.choice
