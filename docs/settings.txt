@@ -473,25 +473,36 @@ LANGUAGES
 Default: A tuple of all available languages. Currently, this is::
 
     LANGUAGES = (
+        ('ar', _('Arabic')),
         ('bn', _('Bengali')),
         ('cs', _('Czech')),
         ('cy', _('Welsh')),
         ('da', _('Danish')),
         ('de', _('German')),
+        ('el', _('Greek')),
         ('en', _('English')),
         ('es', _('Spanish')),
+        ('es_AR', _('Argentinean Spanish')),
         ('fr', _('French')),
         ('gl', _('Galician')),
+        ('hu', _('Hungarian')),
+        ('he', _('Hebrew')),
         ('is', _('Icelandic')),
         ('it', _('Italian')),
+        ('ja', _('Japanese')),
+        ('nl', _('Dutch')),
         ('no', _('Norwegian')),
         ('pt-br', _('Brazilian')),
         ('ro', _('Romanian')),
         ('ru', _('Russian')),
         ('sk', _('Slovak')),
+        ('sl', _('Slovenian')),
         ('sr', _('Serbian')),
         ('sv', _('Swedish')),
+        ('ta', _('Tamil')),
+        ('uk', _('Ukrainian')),
         ('zh-cn', _('Simplified Chinese')),
+        ('zh-tw', _('Traditional Chinese')),
     )
 
 A tuple of two-tuples in the format (language code, language name). This

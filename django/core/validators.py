@@ -68,7 +68,7 @@ def isAlphaNumericURL(field_data, all_data):
 
 def isSlug(field_data, all_data):
     if not slug_re.search(field_data):
-        raise ValidationError, "This value must contain only letters, numbers, underscores or hyphens."
+        raise ValidationError, gettext("This value must contain only letters, numbers, underscores or hyphens.")
 
 def isLowerCase(field_data, all_data):
     if field_data.lower() != field_data:
