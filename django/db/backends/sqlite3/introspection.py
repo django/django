@@ -1,4 +1,3 @@
-from django.db import transaction
 from django.db.backends.sqlite3.base import quote_name
 
 def get_table_list(cursor):
@@ -44,6 +43,43 @@ def get_indexes(cursor, table_name):
         indexes[name]['unique'] = True
     return indexes
 
+def get_columns(cursor, table_name):
+    try:
+        cursor.execute("PRAGMA table_info(%s)" % quote_name(table_name))
+        return [row[1] for row in cursor.fetchall()]
+    except:
+        return []
+	
+def get_known_column_flags( cursor, table_name, column_name ):
+    cursor.execute("PRAGMA table_info(%s)" % quote_name(table_name))
+    dict = {}
+    for row in cursor.fetchall():
+        if row[1] == column_name:
+
+            # maxlength check goes here
+            if row[2][0:7]=='varchar':
+                dict['maxlength'] = row[2][8:len(row[2])-1]
+            
+            # default flag check goes here
+            #if row[2]=='YES': dict['allow_null'] = True
+            #else: dict['allow_null'] = False
+            
+            # primary/foreign/unique key flag check goes here
+            #if row[3]=='PRI': dict['primary_key'] = True
+            #else: dict['primary_key'] = False
+            #if row[3]=='FOR': dict['foreign_key'] = True
+            #else: dict['foreign_key'] = False
+            #if row[3]=='UNI': dict['unique'] = True
+            #else: dict['unique'] = False
+            
+            # default value check goes here
+            # if row[4]=='NULL': dict['default'] = None
+            # else: dict['default'] = row[4]
+            #dict['default'] = row[4]
+            
+    print table_name, column_name, dict
+    return dict
+    
 def _table_info(cursor, name):
     cursor.execute('PRAGMA table_info(%s)' % quote_name(name))
     # cid, name, type, notnull, dflt_value, pk

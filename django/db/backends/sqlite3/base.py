@@ -145,6 +145,51 @@ def _sqlite_date_trunc(lookup_type, dt):
     elif lookup_type == 'day':
         return "%i-%02i-%02i 00:00:00" % (dt.year, dt.month, dt.day)
 
+def get_change_column_name_sql( table_name, indexes, old_col_name, new_col_name, col_def ):
+    # sqlite doesn't support column renames, so we fake it
+    # TODO: only supports a single primary key so far
+    pk_name = None
+    for key in indexes.keys():
+        if indexes[key]['primary_key']: pk_name = key
+    output = []
+    output.append( 'ALTER TABLE '+ quote_name(table_name) +' ADD COLUMN '+ quote_name(new_col_name) +' '+ col_def + ';' )
+    output.append( 'UPDATE '+ quote_name(table_name) +' SET '+ new_col_name +' = '+ old_col_name +' WHERE '+ pk_name +'=(select '+ pk_name +' from '+ table_name +');' )
+    output.append( '-- FYI: sqlite does not support deleting columns, so  '+ quote_name(old_col_name) +' remains as cruft' )
+    # use the following when sqlite gets drop support
+    #output.append( 'ALTER TABLE '+ quote_name(table_name) +' DROP COLUMN '+ quote_name(old_col_name) )
+    return '\n'.join(output)
+
+def get_change_column_def_sql( table_name, col_name, col_def ):
+    # sqlite doesn't support column modifications, so we fake it
+    output = []
+    # TODO: fake via renaming the table, building a new one and deleting the old
+    output.append('-- sqlite does not support column modifications '+ quote_name(table_name) +'.'+ quote_name(col_name) +' to '+ col_def)
+    return '\n'.join(output)
+    
+def get_add_column_sql( table_name, col_name, col_type, null, unique, primary_key  ):
+    output = []
+    field_output = []
+    field_output.append('ALTER TABLE')
+    field_output.append(quote_name(table_name))
+    field_output.append('ADD COLUMN')
+    field_output.append(quote_name(col_name))
+    field_output.append(col_type)
+    field_output.append(('%sNULL' % (not null and 'NOT ' or '')))
+    if unique:
+        field_output.append(('UNIQUE'))
+    if primary_key:
+        field_output.append(('PRIMARY KEY'))
+    output.append(' '.join(field_output) + ';')
+    return '\n'.join(output)
+
+def get_drop_column_sql( table_name, col_name ):
+    output = []
+    output.append( '-- FYI: sqlite does not support deleting columns, so  '+ quote_name(old_col_name) +' remains as cruft' )
+    # use the following when sqlite gets drop support
+    # output.append( '-- ALTER TABLE '+ quote_name(table_name) +' DROP COLUMN '+ quote_name(col_name) )
+    return '\n'.join(output)
+    
+
 # SQLite requires LIKE statements to include an ESCAPE clause if the value
 # being escaped has a percent or underscore in it.
 # See http://www.sqlite.org/lang_expr.html for an explanation.

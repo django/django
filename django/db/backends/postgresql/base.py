@@ -111,6 +111,42 @@ def get_drop_foreignkey_sql():
 def get_pk_default_value():
     return "DEFAULT"
 
+def get_change_column_name_sql( table_name, indexes, old_col_name, new_col_name, col_def ):
+    # TODO: only supports a single primary key so far
+    pk_name = None
+    for key in indexes.keys():
+        if indexes[key]['primary_key']: pk_name = key
+    output = []
+    output.append( 'ALTER TABLE '+ quote_name(table_name) +' RENAME COLUMN '+ quote_name(old_col_name) +' TO '+ quote_name(new_col_name) +';' )
+    return '\n'.join(output)
+
+def get_change_column_def_sql( table_name, col_name, col_type, null, unique, primary_key ):
+    output = []
+    output.append( 'ALTER TABLE '+ quote_name(table_name) +' ADD COLUMN '+ quote_name(col_name+'_tmp') +' '+ col_type + ';' )
+    output.append( 'UPDATE '+ quote_name(table_name) +' SET '+ quote_name(col_name+'_tmp') +' = '+ quote_name(col_name) + ';' )
+    output.append( 'ALTER TABLE '+ quote_name(table_name) +' DROP COLUMN '+ quote_name(col_name) +';' )
+    output.append( 'ALTER TABLE '+ quote_name(table_name) +' RENAME COLUMN '+ quote_name(col_name+'_tmp') +' TO '+ quote_name(col_name) + ';' )
+    if not null:
+        output.append( 'ALTER TABLE '+ quote_name(table_name) +' ALTER COLUMN '+ quote_name(col_name) +' SET NOT NULL;' )
+    if unique:
+        output.append( 'ALTER TABLE '+ quote_name(table_name) +' ADD CONSTRAINT '+ table_name +'_'+ col_name +'_unique_constraint UNIQUE('+ col_name +');' )
+    
+    return '\n'.join(output)
+
+def get_add_column_sql( table_name, col_name, col_type, null, unique, primary_key  ):
+    output = []
+    output.append( 'ALTER TABLE '+ quote_name(table_name) +' ADD COLUMN '+ quote_name(col_name) +' '+ col_type + ';' )
+    if not null:
+        output.append( 'ALTER TABLE '+ quote_name(table_name) +' ALTER COLUMN '+ quote_name(col_name) +' SET NOT NULL;' )
+    if unique:
+        output.append( 'ALTER TABLE '+ quote_name(table_name) +' ADD CONSTRAINT '+ table_name +'_'+ col_name +'_unique_constraint UNIQUE('+ col_name +');' )
+    return '\n'.join(output)
+    
+def get_drop_column_sql( table_name, col_name ):
+    output = []
+    output.append( '-- ALTER TABLE '+ quote_name(table_name) +' DROP COLUMN '+ quote_name(col_name) + ';' )
+    return '\n'.join(output)
+
 # Register these custom typecasts, because Django expects dates/times to be
 # in Python's native (standard-library) datetime/time format, whereas psycopg
 # use mx.DateTime by default.

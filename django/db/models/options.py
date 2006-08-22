@@ -13,7 +13,7 @@ get_verbose_name = lambda class_name: re.sub('(((?<=[a-z])[A-Z])|([A-Z](?![A-Z]|
 
 DEFAULT_NAMES = ('verbose_name', 'db_table', 'ordering',
                  'unique_together', 'permissions', 'get_latest_by',
-                 'order_with_respect_to', 'app_label')
+                 'order_with_respect_to', 'app_label', 'aka')
 
 class Options(object):
     def __init__(self, meta):
@@ -21,6 +21,7 @@ class Options(object):
         self.module_name, self.verbose_name = None, None
         self.verbose_name_plural = None
         self.db_table = ''
+        self.aka = ''
         self.ordering = []
         self.unique_together =  []
         self.permissions =  []
@@ -69,6 +70,14 @@ class Options(object):
             auto = AutoField(verbose_name='ID', primary_key=True)
             auto.creation_counter = -1
             model.add_to_class('id', auto)
+        
+        if isinstance(self.aka, str):
+            self.aka = "%s_%s" % (self.app_label, self.aka.lower())
+        if isinstance(self.aka, tuple):
+            real_aka = []
+            for some_aka in self.aka:
+                real_aka.append( "%s_%s" % (self.app_label, some_aka.lower()) )
+            self.aka = tuple(real_aka)
 
         # If the db_table wasn't provided, use the app_label + module_name.
         if not self.db_table:

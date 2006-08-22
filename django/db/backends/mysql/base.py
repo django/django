@@ -40,7 +40,7 @@ class MysqlDebugWrapper:
     def executemany(self, sql, param_list):
         try:
             return self.cursor.executemany(sql, param_list)
-        except Database.Warning:
+        except Database.Warning, w:
             self.cursor.execute("SHOW WARNINGS")
             raise Database.Warning, "%s: %s" % (w, self.cursor.fetchall())
 
@@ -161,6 +161,48 @@ def get_drop_foreignkey_sql():
 def get_pk_default_value():
     return "DEFAULT"
 
+def get_change_column_name_sql( table_name, indexes, old_col_name, new_col_name, col_def ):
+    # mysql doesn't support column renames (AFAIK), so we fake it
+    # TODO: only supports a single primary key so far
+    pk_name = None
+    for key in indexes.keys():
+        if indexes[key]['primary_key']: pk_name = key
+    output = []
+    output.append( 'ALTER TABLE '+ quote_name(table_name) +' CHANGE COLUMN '+ quote_name(old_col_name) +' '+ quote_name(new_col_name) +' '+ col_def + ';' )
+    return '\n'.join(output)
+
+def get_change_column_def_sql( table_name, col_name, col_type, null, unique, primary_key ):
+    output = []
+    col_def = col_type +' '+ ('%sNULL' % (not null and 'NOT ' or ''))
+    if unique:
+        col_def += ' '+ 'UNIQUE'
+    if primary_key:
+        col_def += ' '+ 'PRIMARY KEY'
+    output.append( 'ALTER TABLE '+ quote_name(table_name) +' MODIFY COLUMN '+ quote_name(col_name) +' '+ col_def + ';' )
+    return '\n'.join(output)
+
+def get_add_column_sql( table_name, col_name, col_type, null, unique, primary_key  ):
+    output = []
+    field_output = []
+    field_output.append('ALTER TABLE')
+    field_output.append(quote_name(table_name))
+    field_output.append('ADD COLUMN')
+    field_output.append(quote_name(col_name))
+    field_output.append(col_type)
+    field_output.append(('%sNULL' % (not null and 'NOT ' or '')))
+    if unique:
+        field_output.append(('UNIQUE'))
+    if primary_key:
+        field_output.append(('PRIMARY KEY'))
+    output.append(' '.join(field_output) + ';')
+    return '\n'.join(output)
+
+def get_drop_column_sql( table_name, col_name ):
+    output = []
+    output.append( '-- ALTER TABLE '+ quote_name(table_name) +' DROP COLUMN '+ quote_name(col_name) + ';' )
+    return '\n'.join(output)
+    
+    
 OPERATOR_MAPPING = {
     'exact': '= %s',
     'iexact': 'LIKE %s',

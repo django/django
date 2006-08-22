@@ -45,8 +45,8 @@ def disable_termcolors():
     global style
     style = dummy()
 
-# Disable terminal coloring on Windows or if somebody's piping the output.
-if sys.platform == 'win32' or not sys.stdout.isatty():
+# Disable terminal coloring on Windows, Pocket PC, or if somebody's piping the output.
+if sys.platform == 'win32' or sys.platform == 'Pocket PC' or not sys.stdout.isatty():
     disable_termcolors()
 
 def _is_valid_dir_name(s):
@@ -78,7 +78,7 @@ def get_version():
     from django import VERSION
     v = '.'.join([str(i) for i in VERSION[:-1]])
     if VERSION[-1]:
-        v += ' (%s)' % VERSION[-1]
+        v += '-' + VERSION[-1]
     return v
 
 def get_sql_create(app):
@@ -94,45 +94,46 @@ def get_sql_create(app):
             "Edit your settings file and change DATABASE_ENGINE to something like 'postgresql' or 'mysql'.\n"))
         sys.exit(1)
 
-    # Get installed models, so we generate REFERENCES right
-    installed_models = _get_installed_models(_get_table_list())
-
+    # Get installed models, so we generate REFERENCES right.
+    # We trim models from the current app so that the sqlreset command does not
+    # generate invalid SQL (leaving models out of known_models is harmless, so
+    # we can be conservative).
+    app_models = models.get_models(app)
     final_output = []
-    models_output = set(installed_models)
+    known_models = set([model for model in _get_installed_models(_get_table_list()) if model not in app_models])
     pending_references = {}
 
-    app_models = models.get_models(app)
 
-    for klass in app_models:
-        output, references = _get_sql_model_create(klass, models_output)
+    for model in app_models:
+        output, references = _get_sql_model_create(model, known_models)
         final_output.extend(output)
         for refto, refs in references.items():
-            try:
-                pending_references[refto].extend(refs)
-            except KeyError:
-                pending_references[refto] = refs
-        final_output.extend(_get_sql_for_pending_references(klass, pending_references))
+            pending_references.setdefault(refto,[]).extend(refs)
+        final_output.extend(_get_sql_for_pending_references(model, pending_references))
         # Keep track of the fact that we've created the table for this model.
-        models_output.add(klass)
+        known_models.add(model)
 
     # Create the many-to-many join tables.
-    for klass in app_models:
-        final_output.extend(_get_many_to_many_sql_for_model(klass))
+    for model in app_models:
+        final_output.extend(_get_many_to_many_sql_for_model(model))
 
     # Handle references to tables that are from other apps
     # but don't exist physically
     not_installed_models = set(pending_references.keys())
     if not_installed_models:
-        final_output.append('-- The following references should be added but depend on non-existant tables:')
-        for klass in not_installed_models:
-            final_output.extend(['-- ' + sql for sql in
-                _get_sql_for_pending_references(klass, pending_references)])
+        alter_sql = []
+        for model in not_installed_models:
+            alter_sql.extend(['-- ' + sql for sql in
+                _get_sql_for_pending_references(model, pending_references)])
+        if alter_sql:
+            final_output.append('-- The following references should be added but depend on non-existent tables:')
+            final_output.extend(alter_sql)
 
     return final_output
 get_sql_create.help_doc = "Prints the CREATE TABLE SQL statements for the given app name(s)."
 get_sql_create.args = APP_ARGS
 
-def _get_sql_model_create(klass, models_already_seen=set()):
+def _get_sql_model_create(model, known_models=set()):
     """
     Get the SQL required to create a single model.
 
@@ -141,7 +142,7 @@ def _get_sql_model_create(klass, models_already_seen=set()):
     from django.db import backend, get_creation_module, models
     data_types = get_creation_module().DATA_TYPES
 
-    opts = klass._meta
+    opts = model._meta
     final_output = []
     table_output = []
     pending_references = {}
@@ -163,7 +164,7 @@ def _get_sql_model_create(klass, models_already_seen=set()):
             if f.primary_key:
                 field_output.append(style.SQL_KEYWORD('PRIMARY KEY'))
             if f.rel:
-                if f.rel.to in models_already_seen:
+                if f.rel.to in known_models:
                     field_output.append(style.SQL_KEYWORD('REFERENCES') + ' ' + \
                         style.SQL_TABLE(backend.quote_name(f.rel.to._meta.db_table)) + ' (' + \
                         style.SQL_FIELD(backend.quote_name(f.rel.to._meta.get_field(f.rel.field_name).column)) + ')'
@@ -171,7 +172,7 @@ def _get_sql_model_create(klass, models_already_seen=set()):
                 else:
                     # We haven't yet created the table to which this field
                     # is related, so save it for later.
-                    pr = pending_references.setdefault(f.rel.to, []).append((klass, f))
+                    pr = pending_references.setdefault(f.rel.to, []).append((model, f))
             table_output.append(' '.join(field_output))
     if opts.order_with_respect_to:
         table_output.append(style.SQL_FIELD(backend.quote_name('_order')) + ' ' + \
@@ -189,7 +190,7 @@ def _get_sql_model_create(klass, models_already_seen=set()):
 
     return final_output, pending_references
 
-def _get_sql_for_pending_references(klass, pending_references):
+def _get_sql_for_pending_references(model, pending_references):
     """
     Get any ALTER TABLE statements to add constraints after the fact.
     """
@@ -198,28 +199,30 @@ def _get_sql_for_pending_references(klass, pending_references):
 
     final_output = []
     if backend.supports_constraints:
-        opts = klass._meta
-        if klass in pending_references:
-            for rel_class, f in pending_references[klass]:
+        opts = model._meta
+        if model in pending_references:
+            for rel_class, f in pending_references[model]:
                 rel_opts = rel_class._meta
                 r_table = rel_opts.db_table
                 r_col = f.column
                 table = opts.db_table
                 col = opts.get_field(f.rel.field_name).column
+                # For MySQL, r_name must be unique in the first 64 characters.
+                # So we are careful with character usage here.
+                r_name = '%s_refs_%s_%x' % (r_col, col, abs(hash((r_table, table))))
                 final_output.append(style.SQL_KEYWORD('ALTER TABLE') + ' %s ADD CONSTRAINT %s FOREIGN KEY (%s) REFERENCES %s (%s);' % \
-                    (backend.quote_name(r_table),
-                    backend.quote_name('%s_referencing_%s_%s' % (r_col, table, col)),
+                    (backend.quote_name(r_table), r_name,
                     backend.quote_name(r_col), backend.quote_name(table), backend.quote_name(col)))
-            del pending_references[klass]
+            del pending_references[model]
     return final_output
 
-def _get_many_to_many_sql_for_model(klass):
+def _get_many_to_many_sql_for_model(model):
     from django.db import backend, get_creation_module
     from django.db.models import GenericRel
-    
+
     data_types = get_creation_module().DATA_TYPES
 
-    opts = klass._meta
+    opts = model._meta
     final_output = []
     for f in opts.many_to_many:
         if not isinstance(f.rel, GenericRel):
@@ -273,37 +276,37 @@ def get_sql_delete(app):
 
     references_to_delete = {}
     app_models = models.get_models(app)
-    for klass in app_models:
-        if cursor and klass._meta.db_table in table_names:
+    for model in app_models:
+        if cursor and model._meta.db_table in table_names:
             # The table exists, so it needs to be dropped
-            opts = klass._meta
+            opts = model._meta
             for f in opts.fields:
                 if f.rel and f.rel.to not in to_delete:
-                    references_to_delete.setdefault(f.rel.to, []).append( (klass, f) )
+                    references_to_delete.setdefault(f.rel.to, []).append( (model, f) )
 
-            to_delete.add(klass)
+            to_delete.add(model)
 
-    for klass in app_models:
-        if cursor and klass._meta.db_table in table_names:
+    for model in app_models:
+        if cursor and model._meta.db_table in table_names:
             # Drop the table now
             output.append('%s %s;' % (style.SQL_KEYWORD('DROP TABLE'),
-                style.SQL_TABLE(backend.quote_name(klass._meta.db_table))))
-            if backend.supports_constraints and references_to_delete.has_key(klass):
-                for rel_class, f in references_to_delete[klass]:
+                style.SQL_TABLE(backend.quote_name(model._meta.db_table))))
+            if backend.supports_constraints and references_to_delete.has_key(model):
+                for rel_class, f in references_to_delete[model]:
                     table = rel_class._meta.db_table
                     col = f.column
-                    r_table = klass._meta.db_table
-                    r_col = klass._meta.get_field(f.rel.field_name).column
+                    r_table = model._meta.db_table
+                    r_col = model._meta.get_field(f.rel.field_name).column
                     output.append('%s %s %s %s;' % \
                         (style.SQL_KEYWORD('ALTER TABLE'),
                         style.SQL_TABLE(backend.quote_name(table)),
                         style.SQL_KEYWORD(backend.get_drop_foreignkey_sql()),
-                        style.SQL_FIELD(backend.quote_name("%s_referencing_%s_%s" % (col, r_table, r_col)))))
-                del references_to_delete[klass]
+                        style.SQL_FIELD(backend.quote_name('%s_refs_%s_%x' % (col, r_col, abs(hash((table, r_table))))))))
+                del references_to_delete[model]
 
     # Output DROP TABLE statements for many-to-many tables.
-    for klass in app_models:
-        opts = klass._meta
+    for model in app_models:
+        opts = model._meta
         for f in opts.many_to_many:
             if cursor and f.m2m_db_table() in table_names:
                 output.append("%s %s;" % (style.SQL_KEYWORD('DROP TABLE'),
@@ -360,8 +363,8 @@ def get_sql_initial_data(app):
     app_models = get_models(app)
     app_dir = os.path.normpath(os.path.join(os.path.dirname(app.__file__), 'sql'))
 
-    for klass in app_models:
-        output.extend(get_sql_initial_data_for_model(klass))
+    for model in app_models:
+        output.extend(get_sql_initial_data_for_model(model))
 
     return output
 get_sql_initial_data.help_doc = "Prints the initial INSERT SQL statements for the given app name(s)."
@@ -371,18 +374,18 @@ def get_sql_sequence_reset(app):
     "Returns a list of the SQL statements to reset PostgreSQL sequences for the given app."
     from django.db import backend, models
     output = []
-    for klass in models.get_models(app):
-        for f in klass._meta.fields:
+    for model in models.get_models(app):
+        for f in model._meta.fields:
             if isinstance(f, models.AutoField):
                 output.append("%s setval('%s', (%s max(%s) %s %s));" % \
                     (style.SQL_KEYWORD('SELECT'),
-                    style.SQL_FIELD('%s_%s_seq' % (klass._meta.db_table, f.column)),
+                    style.SQL_FIELD('%s_%s_seq' % (model._meta.db_table, f.column)),
                     style.SQL_KEYWORD('SELECT'),
                     style.SQL_FIELD(backend.quote_name(f.column)),
                     style.SQL_KEYWORD('FROM'),
-                    style.SQL_TABLE(backend.quote_name(klass._meta.db_table))))
+                    style.SQL_TABLE(backend.quote_name(model._meta.db_table))))
                 break # Only one AutoField is allowed per model, so don't bother continuing.
-        for f in klass._meta.many_to_many:
+        for f in model._meta.many_to_many:
             output.append("%s setval('%s', (%s max(%s) %s %s));" % \
                 (style.SQL_KEYWORD('SELECT'),
                 style.SQL_FIELD('%s_id_seq' % f.m2m_db_table()),
@@ -399,20 +402,242 @@ def get_sql_indexes(app):
     from django.db import backend, models
     output = []
 
-    for klass in models.get_models(app):
-        for f in klass._meta.fields:
+    for model in models.get_models(app):
+        for f in model._meta.fields:
             if f.db_index:
                 unique = f.unique and 'UNIQUE ' or ''
                 output.append(
                     style.SQL_KEYWORD('CREATE %sINDEX' % unique) + ' ' + \
-                    style.SQL_TABLE('%s_%s' % (klass._meta.db_table, f.column)) + ' ' + \
+                    style.SQL_TABLE('%s_%s' % (model._meta.db_table, f.column)) + ' ' + \
                     style.SQL_KEYWORD('ON') + ' ' + \
-                    style.SQL_TABLE(backend.quote_name(klass._meta.db_table)) + ' ' + \
+                    style.SQL_TABLE(backend.quote_name(model._meta.db_table)) + ' ' + \
                     "(%s);" % style.SQL_FIELD(backend.quote_name(f.column))
                 )
     return output
 get_sql_indexes.help_doc = "Prints the CREATE INDEX SQL statements for the given model module name(s)."
 get_sql_indexes.args = APP_ARGS
+
+def get_sql_evolution(app):
+    "Returns SQL to update an existing schema to match the existing models."
+    from django.db import get_creation_module, models, backend, get_introspection_module, connection
+    data_types = get_creation_module().DATA_TYPES
+
+    if not data_types:
+        # This must be the "dummy" database backend, which means the user
+        # hasn't set DATABASE_ENGINE.
+        sys.stderr.write(style.ERROR("Error: Django doesn't know which syntax to use for your SQL statements,\n" +
+            "because you haven't specified the DATABASE_ENGINE setting.\n" +
+            "Edit your settings file and change DATABASE_ENGINE to something like 'postgresql' or 'mysql'.\n"))
+        sys.exit(1)
+
+    # First, try validating the models.
+    _check_for_validation_errors()
+
+    final_output = []
+
+    # stolen and trimmed from syncdb so that we know which models are about 
+    # to be created (so we don't check them for updates)
+    table_list = _get_table_list()
+    seen_models = _get_installed_models(table_list)
+    created_models = set()
+    pending_references = {}
+
+    model_list = models.get_models(app)
+    for model in model_list:
+        # Create the model's database table, if it doesn't already exist.
+        if model._meta.db_table in table_list or model._meta.aka in table_list or len(set(model._meta.aka) & set(table_list))>0:
+            continue
+        sql, references = _get_sql_model_create(model, seen_models)
+        seen_models.add(model)
+        created_models.add(model)
+        table_list.append(model._meta.db_table)
+
+    introspection = get_introspection_module()
+    # This should work even if a connecton isn't available
+    try:
+        cursor = connection.cursor()
+    except:
+        cursor = None
+
+    # get the existing models, minus the models we've just created
+    app_models = models.get_models(app)
+    for model in created_models:
+        if model in app_models:
+            app_models.remove(model)
+
+    for klass in app_models:
+        
+        output, new_table_name = get_sql_evolution_check_for_changed_model_name(klass)
+        final_output.extend(output)
+        
+        output = get_sql_evolution_check_for_changed_field_flags(klass, new_table_name)
+        final_output.extend(output)
+    
+        output = get_sql_evolution_check_for_changed_field_name(klass, new_table_name)
+        final_output.extend(output)
+        
+        output = get_sql_evolution_check_for_new_fields(klass, new_table_name)
+        final_output.extend(output)
+        
+        output = get_sql_evolution_check_for_dead_fields(klass, new_table_name)
+        final_output.extend(output)
+        
+    return final_output
+get_sql_evolution.help_doc = "Returns SQL to update an existing schema to match the existing models."
+get_sql_evolution.args = APP_ARGS
+
+def get_sql_evolution_check_for_new_fields(klass, new_table_name):
+    "checks for model fields that are not in the existing data structure"
+    from django.db import backend, get_creation_module, models, get_introspection_module, connection
+    data_types = get_creation_module().DATA_TYPES
+    cursor = connection.cursor()
+    introspection = get_introspection_module()
+    opts = klass._meta
+    output = []
+    db_table = klass._meta.db_table
+    if new_table_name: 
+        db_table = new_table_name
+    for f in opts.fields:
+        existing_fields = introspection.get_columns(cursor,db_table)
+        if f.column not in existing_fields and f.aka not in existing_fields and len(set(f.aka) & set(existing_fields))==0:
+            rel_field = f
+            data_type = f.get_internal_type()
+            col_type = data_types[data_type]
+            if col_type is not None:
+#                field_output = []
+#                field_output.append('ALTER TABLE')
+#                field_output.append(db_table)
+#                field_output.append('ADD COLUMN')
+#                field_output.append(backend.quote_name(f.column))
+#                field_output.append(style.SQL_COLTYPE(col_type % rel_field.__dict__))
+#                field_output.append(style.SQL_KEYWORD('%sNULL' % (not f.null and 'NOT ' or '')))
+#                if f.unique:
+#                    field_output.append(style.SQL_KEYWORD('UNIQUE'))
+#                if f.primary_key:
+#                    field_output.append(style.SQL_KEYWORD('PRIMARY KEY'))
+#                output.append(' '.join(field_output) + ';')
+                output.append( backend.get_add_column_sql( db_table, f.column, style.SQL_COLTYPE(col_type % rel_field.__dict__), f.null, f.unique, f.primary_key ) )
+    return output
+
+def get_sql_evolution_check_for_changed_model_name(klass):
+    from django.db import backend, get_creation_module, models, get_introspection_module, connection
+    cursor = connection.cursor()
+    introspection = get_introspection_module()
+    table_list = introspection.get_table_list(cursor)
+    if klass._meta.db_table in table_list:
+        return [], None
+    if klass._meta.aka in table_list:
+        return [ 'ALTER TABLE '+ backend.quote_name(klass._meta.aka) +' RENAME TO '+ backend.quote_name(klass._meta.db_table) + ';' ], klass._meta.aka
+    elif len(set(klass._meta.aka) & set(table_list))==1:
+        return [ 'ALTER TABLE '+ backend.quote_name(klass._meta.aka[0]) +' RENAME TO '+ backend.quote_name(klass._meta.db_table) + ';' ], klass._meta.aka[0]
+    else:
+        return [], None
+    
+def get_sql_evolution_check_for_changed_field_name(klass, new_table_name):
+    from django.db import backend, get_creation_module, models, get_introspection_module, connection
+    data_types = get_creation_module().DATA_TYPES
+    cursor = connection.cursor()
+    introspection = get_introspection_module()
+    opts = klass._meta
+    output = []
+    db_table = klass._meta.db_table
+    if new_table_name: 
+        db_table = new_table_name
+    for f in opts.fields:
+        existing_fields = introspection.get_columns(cursor,db_table)
+        if f.column not in existing_fields and (f.aka in existing_fields or len(set(f.aka) & set(existing_fields)))==1:
+            old_col = None
+            if isinstance( f.aka, str ):
+                old_col = f.aka
+            else:
+                old_col = f.aka[0]
+            rel_field = f
+            data_type = f.get_internal_type()
+            col_type = data_types[data_type]
+            if col_type is not None:
+                field_output = []
+                col_def = style.SQL_COLTYPE(col_type % rel_field.__dict__) +' '+ style.SQL_KEYWORD('%sNULL' % (not f.null and 'NOT ' or ''))
+                if f.unique:
+                    col_def += style.SQL_KEYWORD(' UNIQUE')
+                if f.primary_key:
+                    col_def += style.SQL_KEYWORD(' PRIMARY KEY')
+                field_output.append( backend.get_change_column_name_sql( klass._meta.db_table, introspection.get_indexes(cursor,db_table), backend.quote_name(old_col), backend.quote_name(f.column), col_def ) )
+                output.append(' '.join(field_output))
+    return output
+    
+def get_sql_evolution_check_for_changed_field_flags(klass, new_table_name):
+    from django.db import backend, get_creation_module, models, get_introspection_module, connection
+    from django.db.models.fields import CharField, SlugField
+    from django.db.models.fields.related import RelatedField, ForeignKey
+    data_types = get_creation_module().DATA_TYPES
+    cursor = connection.cursor()
+    introspection = get_introspection_module()
+    opts = klass._meta
+    output = []
+    db_table = klass._meta.db_table
+    if new_table_name: 
+        db_table = new_table_name
+    for f in opts.fields:
+        existing_fields = introspection.get_columns(cursor,db_table)
+        cf = None # current field, ie what it is before any renames
+        if f.column in existing_fields:
+            cf = f.column
+        elif f.aka in existing_fields:
+            cf = f.aka
+        elif len(set(f.aka) & set(existing_fields))==1:
+            cf = f.aka[0]
+        else:
+            continue # no idea what column you're talking about - should be handled by get_sql_evolution_check_for_new_fields())
+        data_type = f.get_internal_type()
+        if data_types.has_key(data_type):
+            column_flags = introspection.get_known_column_flags(cursor, db_table, cf)
+            if column_flags['allow_null']!=f.null or \
+                    ( not f.primary_key and isinstance(f, CharField) and column_flags['maxlength']!=str(f.maxlength) ) or \
+                    ( not f.primary_key and isinstance(f, SlugField) and column_flags['maxlength']!=str(f.maxlength) ) or \
+                    column_flags['unique']!=f.unique or \
+                    column_flags['primary_key']!=f.primary_key:
+                    #column_flags['foreign_key']!=f.foreign_key:
+#                print 
+#                print db_table, f.column, column_flags
+#                print "column_flags['allow_null']!=f.null", column_flags['allow_null']!=f.null
+#                print "not f.primary_key and isinstance(f, CharField) and column_flags['maxlength']!=str(f.maxlength)", not f.primary_key and isinstance(f, CharField) and column_flags['maxlength']!=str(f.maxlength)
+#                print "not f.primary_key and isinstance(f, SlugField) and column_flags['maxlength']!=str(f.maxlength)", not f.primary_key and isinstance(f, SlugField) and column_flags['maxlength']!=str(f.maxlength)
+#                print "column_flags['unique']!=f.unique", column_flags['unique']!=f.unique
+#                print "column_flags['primary_key']!=f.primary_key", column_flags['primary_key']!=f.primary_key
+                col_type = data_types[data_type]
+                col_type_def = style.SQL_COLTYPE(col_type % f.__dict__)
+#                col_def = style.SQL_COLTYPE(col_type % f.__dict__) +' '+ style.SQL_KEYWORD('%sNULL' % (not f.null and 'NOT ' or ''))
+#                if f.unique:
+#                    col_def += ' '+ style.SQL_KEYWORD('UNIQUE')
+#                if f.primary_key:
+#                    col_def += ' '+ style.SQL_KEYWORD('PRIMARY KEY')
+                output.append( backend.get_change_column_def_sql( db_table, cf, col_type_def, f.null, f.unique, f.primary_key ) )
+                    #print db_table, cf, f.maxlength, introspection.get_known_column_flags(cursor, db_table, cf)
+    return output
+
+def get_sql_evolution_check_for_dead_fields(klass, new_table_name):
+    from django.db import backend, get_creation_module, models, get_introspection_module, connection
+    from django.db.models.fields import CharField, SlugField
+    from django.db.models.fields.related import RelatedField, ForeignKey
+    data_types = get_creation_module().DATA_TYPES
+    cursor = connection.cursor()
+    introspection = get_introspection_module()
+    opts = klass._meta
+    output = []
+    db_table = klass._meta.db_table
+    if new_table_name: 
+        db_table = new_table_name
+    suspect_fields = set(introspection.get_columns(cursor,db_table))
+    for f in opts.fields:
+        suspect_fields.discard(f.column)
+        suspect_fields.discard(f.aka)
+        suspect_fields.difference_update(f.aka)
+    if len(suspect_fields)>0:
+        output.append( '-- warning: as the following may cause data loss, it/they must be run manually' )
+    for suspect_field in suspect_fields:
+        output.append( backend.get_drop_column_sql( db_table, suspect_field ) )
+        output.append( '-- end warning' )
+    return output
 
 def get_sql_all(app):
     "Returns a list of CREATE TABLE SQL, initial-data inserts, and CREATE INDEX SQL for the given module."
@@ -457,7 +682,7 @@ def syncdb():
         model_list = models.get_models(app)
         for model in model_list:
             # Create the model's database table, if it doesn't already exist.
-            if model._meta.db_table in table_list:
+            if model._meta.db_table in table_list or model._meta.aka in table_list or len(set(model._meta.aka) & set(table_list))>0:
                 continue
             sql, references = _get_sql_model_create(model, seen_models)
             seen_models.add(model)
@@ -481,8 +706,12 @@ def syncdb():
                     for statement in sql:
                         cursor.execute(statement)
 
-        transaction.commit_unless_managed()
+        for sql in get_sql_evolution(app):
+            print sql
+#            cursor.execute(sql)
 
+        transaction.commit_unless_managed()
+     
     # Send the post_syncdb signal, so individual apps can do whatever they need
     # to do at this point.
     for app in models.get_apps():
@@ -517,14 +746,14 @@ def get_admin_index(app):
     app_label = app_models[0]._meta.app_label
     output.append('{%% if perms.%s %%}' % app_label)
     output.append('<div class="module"><h2>%s</h2><table>' % app_label.title())
-    for klass in app_models:
-        if klass._meta.admin:
+    for model in app_models:
+        if model._meta.admin:
             output.append(MODULE_TEMPLATE % {
                 'app': app_label,
-                'mod': klass._meta.module_name,
-                'name': capfirst(klass._meta.verbose_name_plural),
-                'addperm': klass._meta.get_add_permission(),
-                'changeperm': klass._meta.get_change_permission(),
+                'mod': model._meta.module_name,
+                'name': capfirst(model._meta.verbose_name_plural),
+                'addperm': model._meta.get_add_permission(),
+                'changeperm': model._meta.get_change_permission(),
             })
     output.append('</table></div>')
     output.append('{% endif %}')
@@ -592,7 +821,6 @@ install.args = APP_ARGS
 def reset(app):
     "Executes the equivalent of 'get_sql_reset' in the current database."
     from django.db import connection, transaction
-    from cStringIO import StringIO
     app_name = app.__name__.split('.')[-2]
 
     disable_termcolors()
@@ -692,14 +920,11 @@ startapp.args = "[appname]"
 def inspectdb():
     "Generator that introspects the tables in the given database name and returns a Django model, one line at a time."
     from django.db import connection, get_introspection_module
-    from django.conf import settings
     import keyword
 
     introspection_module = get_introspection_module()
 
-    def table2model(table_name):
-        object_name = table_name.title().replace('_', '')
-        return object_name.endswith('s') and object_name[:-1] or object_name
+    table2model = lambda table_name: table_name.title().replace('_', '')
 
     cursor = connection.cursor()
     yield "# This is an auto-generated Django model module."
@@ -728,6 +953,10 @@ def inspectdb():
             comment_notes = [] # Holds Field notes, to be displayed in a Python comment.
             extra_params = {}  # Holds Field parameters such as 'db_column'.
 
+            if ' ' in att_name:
+                extra_params['db_column'] = att_name
+                att_name = att_name.replace(' ', '')
+                comment_notes.append('Field renamed to remove spaces.')
             if keyword.iskeyword(att_name):
                 extra_params['db_column'] = att_name
                 att_name += '_field'
@@ -818,10 +1047,10 @@ def get_validation_errors(outfile, app=None):
     from django.db.models.fields.related import RelatedObject
 
     e = ModelErrorCollection(outfile)
-    
+
     for (app_name, error) in get_app_errors().items():
         e.add(app_name, error)
-        
+
     for cls in models.get_models(app):
         opts = cls._meta
 
@@ -886,7 +1115,7 @@ def get_validation_errors(outfile, app=None):
                         if r.get_accessor_name() == rel_query_name:
                             e.add(opts, "Reverse query name for field '%s' clashes with related field '%s.%s'. Add a related_name argument to the definition for '%s'." % (f.name, rel_opts.object_name, r.get_accessor_name(), f.name))
 
-                
+
         for i, f in enumerate(opts.many_to_many):
             # Check to see if the related m2m field will clash with any
             # existing fields, m2m fields, m2m related objects or related objects
@@ -958,6 +1187,12 @@ def get_validation_errors(outfile, app=None):
                             f = opts.get_field(fn)
                         except models.FieldDoesNotExist:
                             e.add(opts, '"admin.list_filter" refers to %r, which isn\'t a field.' % fn)
+                # date_hierarchy
+                if opts.admin.date_hierarchy:
+                    try:
+                        f = opts.get_field(opts.admin.date_hierarchy)
+                    except models.FieldDoesNotExist:
+                        e.add(opts, '"admin.date_hierarchy" refers to %r, which isn\'t a field.' % opts.admin.date_hierarchy)
 
         # Check ordering attribute.
         if opts.ordering:
@@ -1024,7 +1259,7 @@ def _check_for_validation_errors(app=None):
         sys.stderr.write(s.read())
         sys.exit(1)
 
-def runserver(addr, port):
+def runserver(addr, port, use_reloader=True):
     "Starts a lightweight Web server for development."
     from django.core.servers.basehttp import run, AdminMediaHandler, WSGIServerException
     from django.core.handlers.wsgi import WSGIHandler
@@ -1058,9 +1293,12 @@ def runserver(addr, port):
             sys.exit(1)
         except KeyboardInterrupt:
             sys.exit(0)
-    from django.utils import autoreload
-    autoreload.main(inner_run)
-runserver.args = '[optional port number, or ipaddr:port]'
+    if use_reloader:
+        from django.utils import autoreload
+        autoreload.main(inner_run)
+    else:
+        inner_run()
+runserver.args = '[--noreload] [optional port number, or ipaddr:port]'
 
 def createcachetable(tablename):
     "Creates the table needed to use the SQL cache backend"
@@ -1130,7 +1368,14 @@ def dbshell():
 dbshell.args = ""
 
 def runfcgi(args):
-    """Run this project as a FastCGI application. requires flup."""
+    "Runs this project as a FastCGI application. Requires flup."
+    from django.conf import settings
+    from django.utils import translation
+    # Activate the current language, because it won't get activated later.
+    try:
+        translation.activate(settings.LANGUAGE_CODE)
+    except AttributeError:
+        pass
     from django.core.servers.fastcgi import runfastcgi
     runfastcgi(args)
 runfcgi.args = '[various KEY=val options, use `runfcgi help` for help]'
@@ -1155,6 +1400,7 @@ DEFAULT_ACTION_MAPPING = {
     'sqlinitialdata': get_sql_initial_data,
     'sqlreset': get_sql_reset,
     'sqlsequencereset': get_sql_sequence_reset,
+    'sqlevolve': get_sql_evolution,
     'startapp': startapp,
     'startproject': startproject,
     'syncdb': syncdb,
@@ -1209,6 +1455,8 @@ def execute_from_command_line(action_mapping=DEFAULT_ACTION_MAPPING, argv=None):
         help='Lets you manually add a directory the Python path, e.g. "/home/djangoprojects/myproject".')
     parser.add_option('--plain', action='store_true', dest='plain',
         help='Tells Django to use plain Python, not IPython, for "shell" command.')
+    parser.add_option('--noreload', action='store_false', dest='use_reloader', default=True,
+        help='Tells Django to NOT use the auto-reloader when running the development server.')
     options, args = parser.parse_args(argv[1:])
 
     # Take care of options.
@@ -1264,7 +1512,7 @@ def execute_from_command_line(action_mapping=DEFAULT_ACTION_MAPPING, argv=None):
                 addr, port = args[1].split(':')
             except ValueError:
                 addr, port = '', args[1]
-        action_mapping[action](addr, port)
+        action_mapping[action](addr, port, options.use_reloader)
     elif action == 'runfcgi':
         action_mapping[action](args[1:])
     else:
@@ -1285,7 +1533,11 @@ def execute_from_command_line(action_mapping=DEFAULT_ACTION_MAPPING, argv=None):
         if action not in NO_SQL_TRANSACTION:
             print style.SQL_KEYWORD("COMMIT;")
 
-def execute_manager(settings_mod, argv=None):
+def setup_environ(settings_mod):
+    """
+    Configure the runtime environment. This can also be used by external
+    scripts wanting to set up a similar environment to manage.py.
+    """
     # Add this project to sys.path so that it's importable in the conventional
     # way. For example, if this file (manage.py) lives in a directory
     # "myproject", this code would add "/path/to/myproject" to sys.path.
@@ -1297,7 +1549,10 @@ def execute_manager(settings_mod, argv=None):
 
     # Set DJANGO_SETTINGS_MODULE appropriately.
     os.environ['DJANGO_SETTINGS_MODULE'] = '%s.settings' % project_name
+    return project_directory
 
+def execute_manager(settings_mod, argv=None):
+    project_directory = setup_environ(settings_mod)
     action_mapping = DEFAULT_ACTION_MAPPING.copy()
 
     # Remove the "startproject" command from the action_mapping, because that's

@@ -4,7 +4,7 @@ from django.conf import settings
 from django.core import validators
 from django import forms
 from django.core.exceptions import ObjectDoesNotExist
-from django.utils.functional import curry, lazy
+from django.utils.functional import curry
 from django.utils.text import capfirst
 from django.utils.translation import gettext, gettext_lazy
 import datetime, os, time
@@ -20,7 +20,7 @@ BLANK_CHOICE_DASH = [("", "---------")]
 BLANK_CHOICE_NONE = [("", "None")]
 
 # prepares a value for use in a LIKE query
-prep_for_like_query = lambda x: str(x).replace("%", "\%").replace("_", "\_")
+prep_for_like_query = lambda x: str(x).replace("\\", "\\\\").replace("%", "\%").replace("_", "\_")
 
 # returns the <ul> class for a given radio_admin value
 get_ul_class = lambda x: 'radiolist%s' % ((x == HORIZONTAL) and ' inline' or '')
@@ -68,7 +68,7 @@ class Field(object):
         core=False, rel=None, default=NOT_PROVIDED, editable=True,
         prepopulate_from=None, unique_for_date=None, unique_for_month=None,
         unique_for_year=None, validator_list=None, choices=None, radio_admin=None,
-        help_text='', db_column=None):
+        help_text='', db_column=None, aka=None):
         self.name = name
         self.verbose_name = verbose_name
         self.primary_key = primary_key
@@ -84,6 +84,7 @@ class Field(object):
         self.radio_admin = radio_admin
         self.help_text = help_text
         self.db_column = db_column
+        self.aka = aka
 
         # Set db_index to True if the field has a relationship and doesn't explicitly set db_index.
         self.db_index = db_index
@@ -247,9 +248,9 @@ class Field(object):
         params['is_required'] = not self.blank and not self.primary_key and not rel
 
         # BooleanFields (CheckboxFields) are a special case. They don't take
-        # is_required or validator_list.
+        # is_required.
         if isinstance(self, BooleanField):
-            del params['validator_list'], params['is_required']
+            del params['is_required']
 
         # If this field is in a related context, check whether any other fields
         # in the related object have core=True. If so, add a validator --
@@ -289,8 +290,11 @@ class Field(object):
         if self.choices:
             return first_choice + list(self.choices)
         rel_model = self.rel.to
-        return first_choice + [(x._get_pk_val(), str(x))
-                               for x in rel_model._default_manager.complex_filter(self.rel.limit_choices_to)]
+        if hasattr(self.rel, 'get_related_field'):
+            lst = [(getattr(x, self.rel.get_related_field().attname), str(x)) for x in rel_model._default_manager.complex_filter(self.rel.limit_choices_to)]
+        else:
+            lst = [(x._get_pk_val(), str(x)) for x in rel_model._default_manager.complex_filter(self.rel.limit_choices_to)]
+        return first_choice + lst
 
     def get_choices_default(self):
         if self.radio_admin:
@@ -364,8 +368,8 @@ class BooleanField(Field):
 
     def to_python(self, value):
         if value in (True, False): return value
-        if value is 't': return True
-        if value is 'f': return False
+        if value in ('t', 'True'): return True
+        if value in ('f', 'False'): return False
         raise validators.ValidationError, gettext("This value must be either True or False.")
 
     def get_manipulator_field_objs(self):
