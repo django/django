@@ -30,7 +30,7 @@ if not settings.DATABASE_ENGINE:
 
 def connect(settings):
     """Connect to the database specified in settings. Returns a
-    ConnectionInfo on succes, raises ImproperlyConfigured if the
+    ConnectionInfo on success, raises ImproperlyConfigured if the
     settings don't specify a valid database connection.
     """
     info = ConnectionInfo(settings)
