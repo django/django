@@ -366,7 +366,7 @@ class User(models.Model):
          #FROM "auth_user_groups" ug, "auth_rowlevelpermission" rlp, "django_content_type" ct
          #WHERE rlp."owner_id" = ug."group_id"
              #AND ug."user_id"=%s
-             #AND rlp."negative" = 0
+             #AND rlp."negative" = False
              #AND rlp."owner_ct_id" = %s
              #AND rlp."model_ct_id" = %s
         
@@ -376,17 +376,16 @@ class User(models.Model):
             FROM %s ug, %s rlp, %s ct
             WHERE rlp.%s = ug.%s
                 AND ug.%s=%%s
-                AND rlp.%s = 0
+                AND rlp.%s = %%s
                 AND rlp.%s = %%s
                 AND rlp.%s = %%s
                 AND rlp.%s = %%s""" % (
             backend.quote_name('auth_user_groups'), backend.quote_name('auth_rowlevelpermission'), 
             backend.quote_name('django_content_type'), backend.quote_name('owner_id'),
             backend.quote_name('group_id'), backend.quote_name('user_id'),
-            backend.quote_name('negative'), backend.quote_name('owner_ct_id'),
+            backend.quote_name('negative'),  backend.quote_name('owner_ct_id'),
             backend.quote_name('model_ct_id'), backend.quote_name('permission_id'))
-        
-        cursor.execute(sql, [self.id, ContentType.objects.get_for_model(Group).id, ct.id, perm.id])
+        cursor.execute(sql, [self.id, False, ContentType.objects.get_for_model(Group).id, ct.id, perm.id])
         count = int(cursor.fetchone()[0])
         return (count>0)
 
@@ -403,7 +402,7 @@ class User(models.Model):
         #FROM "django_content_type" ct, "auth_rowlevelpermission" rlp
         #WHERE rlp."model_ct_id" = ct."id"
             #AND ct."app_label"=%s
-            #AND rlp."negative" = 0
+            #AND rlp."negative" = False
             #AND rlp."owner_ct_id" = %s
             #AND rlp."owner_id" = %s
         cursor = connection.cursor()        
@@ -412,17 +411,20 @@ class User(models.Model):
             FROM %s ct, %s rlp
             WHERE rlp.%s = ct.%s
                 AND ct.%s=%%s
-                AND rlp.%s = 0
                 AND rlp.%s = %%s
                 AND rlp.%s = %%s
-                """ % (
+                AND rlp.%s = %%s
+                """ % (                    
             backend.quote_name('django_content_type'), backend.quote_name('auth_rowlevelpermission'),
             backend.quote_name('model_ct_id'), backend.quote_name('id'),
-            backend.quote_name('app_label'), backend.quote_name('negative'),
+            backend.quote_name('app_label'), 
             backend.quote_name('owner_ct_id'),
-            backend.quote_name('owner_id'), )
-        cursor.execute(sql, [app_label, ContentType.objects.get_for_model(User).id, self.id]) 
+            backend.quote_name('owner_id'),backend.quote_name('negative'), )
+        #import pdb
+        #pdb.set_trace()
+        cursor.execute(sql, [app_label, ContentType.objects.get_for_model(User).id, self.id, False]) 
         count = int(cursor.fetchone()[0])
+        print "User. App: %s, Count: %d" % (app_label, count)
         if count>0:
             return True
         return self.has_module_group_row_level_perms(app_label)
@@ -434,7 +436,7 @@ class User(models.Model):
             #AND ug."user_id"=%s
             #AND rlp."model_ct_id" = ct."id"
             #AND ct."app_label"=%s
-            #AND rlp."negative" = 0
+            #AND rlp."negative" = False
             #AND rlp."owner_ct_id" = %s
         cursor = connection.cursor() 
         sql = """
@@ -444,7 +446,7 @@ class User(models.Model):
                 AND ug.%s=%%s
                 AND rlp.%s = ct.%s
                 AND ct.%s=%%s
-                AND rlp.%s = 0
+                AND rlp.%s = %%s
                 AND rlp.%s = %%s""" % (
             backend.quote_name('auth_user_groups'), backend.quote_name('auth_rowlevelpermission'), 
             backend.quote_name('django_content_type'), backend.quote_name('owner_id'),
@@ -452,8 +454,9 @@ class User(models.Model):
             backend.quote_name('model_ct_id'), backend.quote_name('id'),
             backend.quote_name('app_label'), backend.quote_name('negative'),
             backend.quote_name('owner_ct_id'))
-        cursor.execute(sql, [app_label, self.id, ContentType.objects.get_for_model(Group).id,])
+        cursor.execute(sql, [app_label, self.id, False, ContentType.objects.get_for_model(Group).id])
         count = int(cursor.fetchone()[0])
+        print "Group. App: %s, Count: %d" % (app_label, count)
         return (count>0)        
             
 
