@@ -424,7 +424,6 @@ class User(models.Model):
         #pdb.set_trace()
         cursor.execute(sql, [app_label, ContentType.objects.get_for_model(User).id, self.id, False]) 
         count = int(cursor.fetchone()[0])
-        print "User. App: %s, Count: %d" % (app_label, count)
         if count>0:
             return True
         return self.has_module_group_row_level_perms(app_label)
@@ -454,9 +453,8 @@ class User(models.Model):
             backend.quote_name('model_ct_id'), backend.quote_name('id'),
             backend.quote_name('app_label'), backend.quote_name('negative'),
             backend.quote_name('owner_ct_id'))
-        cursor.execute(sql, [app_label, self.id, False, ContentType.objects.get_for_model(Group).id])
+        cursor.execute(sql, [self.id, app_label, False, ContentType.objects.get_for_model(Group).id])
         count = int(cursor.fetchone()[0])
-        print "Group. App: %s, Count: %d" % (app_label, count)
         return (count>0)        
             
 
