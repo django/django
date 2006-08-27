@@ -251,7 +251,7 @@ class SsiNode(Node):
             output = ''
         if self.parsed:
             try:
-                t = Template(output)
+                t = Template(output, name=self.filepath)
                 return t.render(context)
             except TemplateSyntaxError, e:
                 if settings.DEBUG:
