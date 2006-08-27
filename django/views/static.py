@@ -81,7 +81,7 @@ def directory_index(path, fullpath):
     try:
         t = loader.get_template('static/directory_index')
     except TemplateDoesNotExist:
-        t = Template(DEFAULT_DIRECTORY_INDEX_TEMPLATE, name='Default Directory Index Template')
+        t = Template(DEFAULT_DIRECTORY_INDEX_TEMPLATE)
     files = []
     for f in os.listdir(fullpath):
         if not f.startswith('.'):
