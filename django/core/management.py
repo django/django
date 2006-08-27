@@ -278,7 +278,7 @@ def _collate(connection_output, reverse=False):
                                 connection_name)
     return map(str, final_output)
 
-def syncdb():
+def syncdb(verbosity=2, interactive=True):
     "Creates the database tables for all apps in INSTALLED_APPS whose tables haven't already been created."
     from django.db import connection, transaction, models, get_creation_module
     from django.db.models import signals
@@ -326,7 +326,8 @@ def syncdb():
                 except KeyError:
                     pending_references[refto] = refs
             sql.extend(_get_sql_for_pending_references(model, pending_references))
-            print "Creating table %s" % model._meta.db_table
+            if verbosity >= 2:
+                print "Creating table %s" % model._meta.db_table
             for statement in sql:
                 cursor.execute(statement)
             table_list.append(model._meta.db_table)
@@ -335,7 +336,8 @@ def syncdb():
             if model in created_models:
                 sql = _get_many_to_many_sql_for_model(model)
                 if sql:
-                    print "Creating many-to-many tables for %s model" % model.__name__
+                    if verbosity >= 2:
+                        print "Creating many-to-many tables for %s model" % model.__name__
                     for statement in sql:
                         cursor.execute(statement)
 
@@ -345,7 +347,8 @@ def syncdb():
     # to do at this point.
     for app in models.get_apps():
         dispatcher.send(signal=signals.post_syncdb, sender=app,
-            app=app, created_models=created_models)
+            app=app, created_models=created_models, 
+            verbosity=verbosity, interactive=interactive)
 
         # Install initial data for the app (but only if this is a model we've
         # just created)
@@ -1032,6 +1035,29 @@ def runfcgi(args):
     runfastcgi(args)
 runfcgi.args = '[various KEY=val options, use `runfcgi help` for help]'
 
+def test(verbosity, app_labels):
+    "Runs the test suite for the specified applications"
+    from django.conf import settings
+    from django.db.models import get_app, get_apps
+
+    if len(app_labels) == 0:
+        app_list = get_apps()
+    else:
+        app_list = [get_app(app_label) for app_label in app_labels]
+    
+    test_path = settings.TEST_RUNNER.split('.')
+    # Allow for Python 2.5 relative paths
+    if len(test_path) > 1:
+        test_module_name = '.'.join(test_path[:-1])
+    else:
+        test_module_name = '.'
+    test_module = __import__(test_module_name, [],[],test_path[-1])
+    test_runner = getattr(test_module, test_path[-1])
+    
+    test_runner(app_list, verbosity)
+test.help_doc = 'Runs the test suite for the specified applications, or the entire site if no apps are specified'
+test.args = '[--verbosity] ' + APP_ARGS
+
 # Utilities for command-line script
 
 DEFAULT_ACTION_MAPPING = {
@@ -1056,6 +1082,7 @@ DEFAULT_ACTION_MAPPING = {
     'startproject': startproject,
     'syncdb': syncdb,
     'validate': validate,
+    'test':test,
 }
 
 NO_SQL_TRANSACTION = (
@@ -1106,8 +1133,14 @@ def execute_from_command_line(action_mapping=DEFAULT_ACTION_MAPPING, argv=None):
         help='Lets you manually add a directory the Python path, e.g. "/home/djangoprojects/myproject".')
     parser.add_option('--plain', action='store_true', dest='plain',
         help='Tells Django to use plain Python, not IPython, for "shell" command.')
+    parser.add_option('--noinput', action='store_false', dest='interactive', default=True,
+        help='Tells Django to NOT prompt the user for input of any kind.')
     parser.add_option('--noreload', action='store_false', dest='use_reloader', default=True,
         help='Tells Django to NOT use the auto-reloader when running the development server.')
+    parser.add_option('--verbosity', action='store', dest='verbosity', default='2',
+        type='choice', choices=['0', '1', '2'],
+        help='Verbosity level; 0=minimal output, 1=normal output, 2=all output')
+
     options, args = parser.parse_args(argv[1:])
 
     # Take care of options.
@@ -1134,8 +1167,10 @@ def execute_from_command_line(action_mapping=DEFAULT_ACTION_MAPPING, argv=None):
 
     if action == 'shell':
         action_mapping[action](options.plain is True)
-    elif action in ('syncdb', 'validate', 'diffsettings', 'dbshell'):
+    elif action in ('validate', 'diffsettings', 'dbshell'):
         action_mapping[action]()
+    elif action == 'syncdb':
+        action_mapping[action](int(options.verbosity), options.interactive)
     elif action == 'inspectdb':
         try:
             for line in action_mapping[action]():
@@ -1146,6 +1181,11 @@ def execute_from_command_line(action_mapping=DEFAULT_ACTION_MAPPING, argv=None):
     elif action == 'createcachetable':
         try:
             action_mapping[action](args[1])
+        except IndexError:
+            parser.print_usage_and_exit()
+    elif action == 'test':
+        try:
+            action_mapping[action](int(options.verbosity), args[1:])
         except IndexError:
             parser.print_usage_and_exit()
     elif action in ('startapp', 'startproject'):
