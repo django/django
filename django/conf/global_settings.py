@@ -296,3 +296,9 @@ BANNED_IPS = ()
 ##################
 
 AUTHENTICATION_BACKENDS = ('django.contrib.auth.backends.ModelBackend',)
+
+###########
+# TESTING #
+###########
+
+TEST_RUNNER='django.test.simple.run_tests'
