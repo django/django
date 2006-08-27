@@ -15,7 +15,7 @@ class Article(models.Model):
     def __str__(self):
         return self.headline
 
-API_TESTS = r"""
+__test__ = {'API_TESTS':r"""
 # Create a couple of Articles.
 >>> from datetime import datetime
 >>> a1 = Article(headline='Article 1', pub_date=datetime(2005, 7, 26))
@@ -191,4 +191,4 @@ DoesNotExist: Article matching query does not exist.
 >>> Article.objects.filter(headline__contains='\\')
 [<Article: Article with \ backslash>]
 
-"""
+"""}

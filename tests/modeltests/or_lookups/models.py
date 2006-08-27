@@ -23,7 +23,7 @@ class Article(models.Model):
     def __str__(self):
         return self.headline
 
-API_TESTS = """
+__test__ = {'API_TESTS':"""
 >>> from datetime import datetime
 >>> from django.db.models import Q
 
@@ -101,4 +101,4 @@ API_TESTS = """
 [<Article: Hello>]
 >>> Article.objects.complex_filter(Q(pk=1) | Q(pk=2))
 [<Article: Hello>, <Article: Goodbye>]
-"""
+"""}

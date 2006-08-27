@@ -29,7 +29,7 @@ class Person(models.Model):
     def __str__(self):
         return self.name
 
-API_TESTS = """
+__test__ = {'API_TESTS':"""
 # Because no Articles exist yet, get_latest() raises ArticleDoesNotExist.
 >>> Article.objects.latest()
 Traceback (most recent call last):
@@ -76,4 +76,4 @@ AssertionError: latest() requires either a field_name parameter or 'get_latest_b
 
 >>> Person.objects.latest('birthday')
 <Person: Stephanie>
-"""
+"""}

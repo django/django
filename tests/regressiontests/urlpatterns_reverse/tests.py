@@ -1,7 +1,7 @@
 "Unit tests for reverse URL lookup"
 
 from django.core.urlresolvers import reverse_helper, NoReverseMatch
-import re
+import re, unittest
 
 test_data = (
     ('^places/(\d+)/$', 'places/3/', [3], {}),
@@ -25,23 +25,15 @@ test_data = (
     ('^people/(?P<state>\w\w)/(\w+)/$', 'people/il/adrian/', ['adrian'], {'state': 'il'}),
 )
 
-def run_tests(verbosity=0):
-    for regex, expected, args, kwargs in test_data:
-        passed = True
-        try:
-            got = reverse_helper(re.compile(regex), *args, **kwargs)
-        except NoReverseMatch, e:
-            if expected != NoReverseMatch:
-                passed, got = False, str(e)
-        else:
-            if got != expected:
-                passed, got = False, got
-        if passed and verbosity:
-            print "Passed: %s" % regex
-        elif not passed:
-            print "REVERSE LOOKUP FAILED: %s" % regex
-            print "   Got: %s" % got
-            print "   Expected: %r" % expected
+class URLPatternReverse(unittest.TestCase):
+    def test_urlpattern_reverse(self):
+        for regex, expected, args, kwargs in test_data:
+            try:
+                got = reverse_helper(re.compile(regex), *args, **kwargs)
+            except NoReverseMatch, e:
+                self.assertEqual(expected, NoReverseMatch)
+            else:
+                self.assertEquals(got, expected)
 
 if __name__ == "__main__":
     run_tests(1)

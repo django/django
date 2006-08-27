@@ -20,7 +20,7 @@ class Person(models.Model):
 
     full_name_2 = property(_get_full_name, _set_full_name)
 
-API_TESTS = """
+__test__ = {'API_TESTS':"""
 >>> a = Person(first_name='John', last_name='Lennon')
 >>> a.save()
 >>> a.full_name
@@ -37,4 +37,4 @@ AttributeError: can't set attribute
 >>> a2.save()
 >>> a2.first_name
 'Paul'
-"""
+"""}

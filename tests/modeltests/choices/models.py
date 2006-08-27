@@ -23,7 +23,7 @@ class Person(models.Model):
     def __str__(self):
         return self.name
 
-API_TESTS = """
+__test__ = {'API_TESTS':"""
 >>> a = Person(name='Adrian', gender='M')
 >>> a.save()
 >>> s = Person(name='Sara', gender='F')
@@ -36,4 +36,4 @@ API_TESTS = """
 'Male'
 >>> s.get_gender_display()
 'Female'
-"""
+"""}
