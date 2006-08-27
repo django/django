@@ -52,21 +52,6 @@ if sys.platform == 'win32' or sys.platform == 'Pocket PC' or not sys.stdout.isat
 def _is_valid_dir_name(s):
     return bool(re.search(r'^\w+$', s))
 
-def _get_installed_models(table_list):
-    "Gets a set of all models that are installed, given a list of existing tables"
-    from django.db import models
-    all_models = []
-    for app in models.get_apps():
-        for model in models.get_models(app):
-            all_models.append(model)
-    return set([m for m in all_models if m._meta.db_table in table_list])
-
-def _get_table_list():
-    "Gets a list of all db tables that are physically installed."
-    from django.db import connection, get_introspection_module
-    cursor = connection.cursor()
-    return get_introspection_module().get_table_list(cursor)
-
 # If the foreign key points to an AutoField, a PositiveIntegerField or a
 # PositiveSmallIntegerField, the foreign key should be an IntegerField, not the
 # referred field type. Otherwise, the foreign key should be the same type of
@@ -114,7 +99,16 @@ def get_sql_create(app):
         # not generate invalid SQL (leaving models out of known_models is 
         # harmless, so we can be conservative).
         manager = model._default_manager
-        tables = manager.get_table_list()
+        try:
+            tables = manager.get_table_list()
+        except (KeyboardInterrupt, SystemExit):
+            raise
+        except:
+            # Something else went wrong -- maybe the database isn't
+            # running. But we can still generate sql, so use an empty
+            # table list.
+            tables = []
+
         installed_models = [ model for model in
                              manager.get_installed_models(tables)
                              if model not in app_models ]
