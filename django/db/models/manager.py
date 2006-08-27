@@ -130,8 +130,6 @@ class Manager(object):
         builder = self.db.get_creation_module().builder
         run, pending = builder.get_create_table(self.model)
         run += builder.get_create_indexes(self.model)
-        if initial_data:
-            run += builder.get_initialdata(self.model)
         many_many = builder.get_create_many_to_many(self.model)
 
         for statement in run:
@@ -142,8 +140,19 @@ class Manager(object):
                     statement.execute()
             else:
                 pending.setdefault(klass, []).extend(statements)
+        if initial_data:
+            self.load_initial_data()
         return pending
 
+    def load_initial_data(self):
+        """Install initial data for model in db, Returns statements executed.
+        """
+        builder = self.db.get_creation_module().builder
+        statements = builder.get_initialdata(self.model)
+        for statement in statements:
+            statement.execute()
+        return statements
+        
     def get_installed_models(self, table_list):
         """Get list of models installed, given a list of tables.
         """

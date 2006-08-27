@@ -280,92 +280,55 @@ def _collate(connection_output, reverse=False):
 
 def syncdb(verbosity=2, interactive=True):
     "Creates the database tables for all apps in INSTALLED_APPS whose tables haven't already been created."
-    from django.db import connection, transaction, models, get_creation_module
-    from django.db.models import signals
     from django.conf import settings
+    from django.db import models, transaction
+    from django.db.models import signals
     from django.dispatch import dispatcher
-
+    
     disable_termcolors()
 
     # First, try validating the models.
     _check_for_validation_errors()
 
-    # Import the 'management' module within each installed app, to register
-    # dispatcher events.
+    # Create missing models for each app
+    created_models = []
     for app_name in settings.INSTALLED_APPS:
+        # Import the 'management' module within each installed app, to register
+        # dispatcher events.
         try:
             __import__(app_name + '.management', '', '', [''])
         except ImportError:
             pass
 
-    data_types = get_creation_module().DATA_TYPES
-
-    cursor = connection.cursor()
-
-    # Get a list of all existing database tables,
-    # so we know what needs to be added.
-    table_list = _get_table_list()
-
-    # Get a list of already installed *models* so that references work right.
-    seen_models = _get_installed_models(table_list)
-    created_models = set()
-    pending_references = {}
-
-    for app in models.get_apps():
-        model_list = models.get_models(app)
-        for model in model_list:
-            # Create the model's database table, if it doesn't already exist.
-            if model._meta.db_table in table_list:
-                continue
-            sql, references = _get_sql_model_create(model, seen_models)
-            seen_models.add(model)
-            created_models.add(model)
-            for refto, refs in references.items():
-                try:
-                    pending_references[refto].extend(refs)
-                except KeyError:
-                    pending_references[refto] = refs
-            sql.extend(_get_sql_for_pending_references(model, pending_references))
-            if verbosity >= 2:
-                print "Creating table %s" % model._meta.db_table
-            for statement in sql:
-                cursor.execute(statement)
-            table_list.append(model._meta.db_table)
-
-        for model in model_list:
-            if model in created_models:
-                sql = _get_many_to_many_sql_for_model(model)
-                if sql:
-                    if verbosity >= 2:
-                        print "Creating many-to-many tables for %s model" % model.__name__
-                    for statement in sql:
-                        cursor.execute(statement)
-
-        transaction.commit_unless_managed()
-
     # Send the post_syncdb signal, so individual apps can do whatever they need
     # to do at this point.
     for app in models.get_apps():
+        # Install each application (models already installed will be skipped)
+        created = _install(app, commit=False, initial_data=False)
+        if verbosity >= 2:
+            for model in created:
+                print "Created table %s" % model._meta.db_table
+        created_models.extend(created)
         dispatcher.send(signal=signals.post_syncdb, sender=app,
             app=app, created_models=created_models, 
             verbosity=verbosity, interactive=interactive)
+    transaction.commit_unless_managed()
 
-        # Install initial data for the app (but only if this is a model we've
-        # just created)
+    # Install initial data for the app (but only if this is a model we've
+    # just created)
+    for app in models.get_apps():
         for model in models.get_models(app):
             if model in created_models:
-                initial_sql = get_sql_initial_data_for_model(model)
-                if initial_sql:
-                    print "Installing initial data for %s model" % model._meta.object_name
-                    try:
-                        for sql in initial_sql:
-                            cursor.execute(sql)
-                    except Exception, e:
-                        sys.stderr.write("Failed to install initial SQL data for %s model: %s" % \
-                                            (model._meta.object_name, e))
-                        transaction.rollback_unless_managed()
-                    else:
-                        transaction.commit_unless_managed()
+                try:
+                    if (model._default_manager.load_initial_data() 
+                        and verbosity >= 2):
+                        print "Installed initial data for %s model" % model._meta.object_name
+                except Exception, e:
+                    sys.stderr.write("Failed to install initial SQL data for %s model: %s" % \
+                                     (model._meta.object_name, e))
+                    transaction.rollback_unless_managed()
+                else:
+                    transaction.commit_unless_managed()
 
 syncdb.args = ''
 
@@ -422,6 +385,11 @@ diffsettings.args = ""
 
 def install(app):
     "Executes the equivalent of 'get_sql_all' in the current database."
+    # Wrap _install to hide the return value so ./manage.py install
+    # doesn't complain about unprintable output.    
+    _install(app)
+
+def _install(app, commit=True, initial_data=True):
     from django.db import connection, models, transaction
     import sys
     
@@ -432,20 +400,28 @@ def install(app):
     # First, try validating the models.
     _check_for_validation_errors(app)
 
+    created_models = []
     try:
         pending = {}
         for model in models.get_models(app, creation_order=True):
-            new_pending = model._default_manager.install(initial_data=True)
-            for model, statements in new_pending.items():
-                pending.setdefault(model, []).extend(statements)
-            # execute any pending statements that were waiting for this model
+            manager = model._default_manager
+            tables = manager.get_table_list()
+            models_installed = manager.get_installed_models(tables)
+            # Don't re-install already-installed models
+            if not model in models_installed:
+                new_pending = manager.install(initial_data=initial_data)
+                created_models.append(model)
+                for model, statements in new_pending.items():
+                    pending.setdefault(model, []).extend(statements)
+            # Execute any pending statements that were waiting for this model
             if model in pending:
                 for statement in pending.pop(model):
                     statement.execute()                
         if pending:            
             for model, statements in pending.items():
-                tables = model._default_manager.get_table_list()
-                models_installed = model._default_manager.get_installed_models(tables)
+                manager = model._default_manager 
+                tables = manager.get_table_list()
+                models_installed = manager.get_installed_models(tables)
                 if model in models_installed:
                     for statement in statements:
                         statement.execute()
@@ -464,7 +440,9 @@ Hint: Look at the output of 'django-admin.py sqlall %s'. That's the SQL this com
 The full error: """ % (app_name, app_name)) + style.ERROR_OUTPUT(str(e)) + '\n')
         transaction.rollback_unless_managed()
         sys.exit(1)
-    transaction.commit_unless_managed()
+    if commit:
+        transaction.commit_unless_managed()
+    return created_models
 install.help_doc = "Executes ``sqlall`` for the given app(s) in the current database."
 install.args = APP_ARGS
 
