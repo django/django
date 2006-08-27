@@ -1222,10 +1222,13 @@ A few special cases to note about ``list_display``:
       of the related object.
 
     * ``ManyToManyField`` fields aren't supported, because that would entail
-        executing a separate SQL statement for each row in the table.
+      executing a separate SQL statement for each row in the table. If you
+      want to do this nonetheless, give your model a custom method, and add
+      that method's name to ``list_display``. (See below for more on custom
+      methods in ``list_display``.)
 
-    * If the field is a ``BooleanField``, Django will display a pretty "on" or
-      "off" icon instead of ``True`` or ``False``.
+    * If the field is a ``BooleanField`` or ``NullBooleanField``, Django will
+      display a pretty "on" or "off" icon instead of ``True`` or ``False``.
 
     * If the string given is a method of the model, Django will call it and
       display the output. This method should have a ``short_description``
@@ -1261,6 +1264,16 @@ A few special cases to note about ``list_display``:
               def colored_name(self):
                   return '<span style="color: #%s;">%s %s</span>' % (self.color_code, self.first_name, self.last_name)
               colored_name.allow_tags = True
+
+    * The ``__str__()`` method is just as valid in ``list_display`` as any
+      other model method, so it's perfectly OK to do this::
+
+          list_display = ('__str__', 'some_other_field')
+
+    * For any element of ``list_display`` that is not a field on the model, the
+      change list page will not allow ordering by that column. This is because
+      ordering is done at the database level, and Django has no way of knowing
+      how to order the result of a custom method at the SQL level.
 
 ``list_display_links``
 ----------------------
