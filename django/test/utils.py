@@ -1,6 +1,6 @@
 import sys, time
 from django.conf import settings
-from django.db import connection, transaction
+from django.db import connection, transaction, backend
 
 # The prefix to put on the default database name when creating
 # the test database.
@@ -29,7 +29,7 @@ def create_test_db(verbosity=1, autoclobber=False):
         cursor = connection.cursor()
         _set_autocommit(connection)
         try:
-            cursor.execute("CREATE DATABASE %s" % TEST_DATABASE_NAME)
+            cursor.execute("CREATE DATABASE %s" % backend.quote_name(TEST_DATABASE_NAME))
         except Exception, e:            
             sys.stderr.write("Got an error creating the test database: %s\n" % e)
             if not autoclobber:
@@ -38,10 +38,10 @@ def create_test_db(verbosity=1, autoclobber=False):
                 try:
                     if verbosity >= 1:
                         print "Destroying old test database..."                
-                    cursor.execute("DROP DATABASE %s" % TEST_DATABASE_NAME)
+                    cursor.execute("DROP DATABASE %s" % backend.quote_name(TEST_DATABASE_NAME))
                     if verbosity >= 1:
                         print "Creating test database..."
-                    cursor.execute("CREATE DATABASE %s" % TEST_DATABASE_NAME)
+                    cursor.execute("CREATE DATABASE %s" % backend.quote_name(TEST_DATABASE_NAME))
                 except Exception, e:
                     sys.stderr.write("Got an error recreating the test database: %s\n" % e)
                     sys.exit(2)
@@ -73,6 +73,6 @@ def destroy_test_db(old_database_name, verbosity=1):
         cursor = connection.cursor()
         _set_autocommit(connection)
         time.sleep(1) # To avoid "database is being accessed by other users" errors.
-        cursor.execute("DROP DATABASE %s" % TEST_DATABASE_NAME)
+        cursor.execute("DROP DATABASE %s" % backend.quote_name(TEST_DATABASE_NAME))
         connection.close()
 
