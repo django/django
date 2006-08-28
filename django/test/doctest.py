@@ -2104,7 +2104,7 @@ def set_unittest_reportflags(flags):
 class DocTestCase(unittest.TestCase):
 
     def __init__(self, test, optionflags=0, setUp=None, tearDown=None,
-                 checker=None):
+                 checker=None, runner=DocTestRunner):
 
         unittest.TestCase.__init__(self)
         self._dt_optionflags = optionflags
@@ -2112,6 +2112,7 @@ class DocTestCase(unittest.TestCase):
         self._dt_test = test
         self._dt_setUp = setUp
         self._dt_tearDown = tearDown
+        self._dt_runner = runner
 
     def setUp(self):
         test = self._dt_test
@@ -2138,8 +2139,8 @@ class DocTestCase(unittest.TestCase):
             # so add the default reporting flags
             optionflags |= _unittest_reportflags
 
-        runner = DocTestRunner(optionflags=optionflags,
-                               checker=self._dt_checker, verbose=False)
+        runner = self._dt_runner(optionflags=optionflags,
+                                 checker=self._dt_checker, verbose=False)
 
         try:
             runner.DIVIDER = "-"*70
@@ -2248,7 +2249,7 @@ class DocTestCase(unittest.TestCase):
         return "Doctest: " + self._dt_test.name
 
 def DocTestSuite(module=None, globs=None, extraglobs=None, test_finder=None,
-                 **options):
+                 test_class=DocTestCase, **options):
     """
     Convert doctest tests for a module to a unittest test suite.
 
@@ -2306,7 +2307,7 @@ def DocTestSuite(module=None, globs=None, extraglobs=None, test_finder=None,
             if filename[-4:] in (".pyc", ".pyo"):
                 filename = filename[:-1]
             test.filename = filename
-        suite.addTest(DocTestCase(test, **options))
+        suite.addTest(test_class(test, **options))
 
     return suite
 

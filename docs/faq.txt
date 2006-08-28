@@ -16,12 +16,17 @@ hours to take a complicated Web application from concept to public launch.
 At the same time, the World Online Web developers have consistently been
 perfectionists when it comes to following best practices of Web development.
 
-Thus, Django was designed not only to allow fast Web development, but
-*best-practice* Web development.
+In fall 2003, the World Online developers (Adrian Holovaty and Simon Willison)
+ditched PHP and began using Python to develop its Web sites. As they built
+intensive, richly interactive sites such as Lawrence.com, they began to extract
+a generic Web development framework that let them build Web applications more
+and more quickly. They tweaked this framework constantly, adding improvements
+over two years.
 
-Django would not be possible without a whole host of open-source projects --
-`Apache`_, `Python`_, and `PostgreSQL`_ to name a few -- and we're thrilled to
-be able to give something back to the open-source community.
+In summer 2005, World Online decided to open-source the resulting software,
+Django. Django would not be possible without a whole host of open-source
+projects -- `Apache`_, `Python`_, and `PostgreSQL`_ to name a few -- and we're
+thrilled to be able to give something back to the open-source community.
 
 .. _Apache: http://httpd.apache.org/
 .. _Python: http://www.python.org/
@@ -42,8 +47,8 @@ Django is pronounced **JANG**-oh. Rhymes with FANG-oh. The "D" is silent.
 Is Django stable?
 -----------------
 
-Yes. World Online has been using Django for more than two years. Sites built on
-Django have weathered traffic spikes of over one million hits an hour and a
+Yes. World Online has been using Django for more than three years. Sites built
+on Django have weathered traffic spikes of over one million hits an hour and a
 number of Slashdottings. Yes, it's quite stable.
 
 Does Django scale?
@@ -629,6 +634,14 @@ You can also use the Python API. See `creating users`_ for full info.
 
 Contributing code
 =================
+
+How can I get started contributing code to Django?
+--------------------------------------------------
+
+Thanks for asking! We've written an entire document devoted to this question.
+It's titled `Contributing to Django`_.
+
+.. _Contributing do Django: http://www.djangoproject.com/documentation/contributing/
 
 I submitted a bug fix in the ticket system several weeks ago. Why are you ignoring my patch?
 --------------------------------------------------------------------------------------------

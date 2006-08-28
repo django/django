@@ -14,7 +14,7 @@ class Child(Model):
     name = CharField(maxlength=100)
     parent = ForeignKey(Parent)
 
-API_TESTS = """
+__test__ = {'API_TESTS':"""
 # Create a Parent
 >>> q = Parent(name='Elizabeth')
 >>> q.save()
@@ -29,4 +29,4 @@ API_TESTS = """
 
 >>> q.delete()
 
-"""
+"""}

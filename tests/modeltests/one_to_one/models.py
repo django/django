@@ -30,7 +30,7 @@ class Waiter(models.Model):
     def __str__(self):
         return "%s the waiter at %s" % (self.name, self.restaurant)
 
-API_TESTS = """
+__test__ = {'API_TESTS':"""
 # Create a couple of Places.
 >>> p1 = Place(name='Demon Dogs', address='944 W. Fullerton')
 >>> p1.save()
@@ -151,4 +151,4 @@ DoesNotExist: Restaurant matching query does not exist.
 # Delete the restaurant; the waiter should also be removed
 >>> r = Restaurant.objects.get(pk=1)
 >>> r.delete()
-"""
+"""}

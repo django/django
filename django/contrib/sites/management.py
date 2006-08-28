@@ -7,9 +7,10 @@ from django.db.models import signals
 from django.contrib.sites.models import Site
 from django.contrib.sites import models as site_app
 
-def create_default_site(app, created_models):
+def create_default_site(app, created_models, verbosity):
     if Site in created_models:
-        print "Creating example.com Site object"
+        if verbosity >= 2:
+            print "Creating example.com Site object"
         s = Site(domain="example.com", name="example.com")
         s.save()
 

@@ -26,7 +26,7 @@ class ItalianRestaurant(Restaurant):
     def __str__(self):
         return "%s the italian restaurant" % self.name
 
-API_TESTS = """
+__test__ = {'API_TESTS':"""
 # Make sure Restaurant has the right fields in the right order.
 >>> [f.name for f in Restaurant._meta.fields]
 ['id', 'name', 'address', 'serves_hot_dogs', 'serves_pizza']
@@ -50,4 +50,4 @@ API_TESTS = """
 >>> ir.save()
 
 
-"""
+"""}

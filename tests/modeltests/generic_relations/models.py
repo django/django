@@ -53,7 +53,7 @@ class Mineral(models.Model):
     def __str__(self):
         return self.name
         
-API_TESTS = """
+__test__ = {'API_TESTS':"""
 # Create the world in 7 lines of code...
 >>> lion = Animal(common_name="Lion", latin_name="Panthera leo")
 >>> platypus = Animal(common_name="Platypus", latin_name="Ornithorhynchus anatinus")
@@ -105,4 +105,4 @@ API_TESTS = """
 [<TaggedItem: shiny>]
 >>> TaggedItem.objects.filter(content_type__pk=ctype.id, object_id=quartz.id)
 [<TaggedItem: clearish>]
-"""
+"""}

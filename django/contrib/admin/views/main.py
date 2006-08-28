@@ -423,7 +423,7 @@ def _get_deleted_objects(deleted_objects, perms_needed, user, obj, opts, current
     if current_depth > 16:
         return # Avoid recursing too deep.
     opts_seen = []
-    for related in opts.related_objects():
+    for related in opts.get_all_related_objects():
         if related.opts in opts_seen:
             continue
         opts_seen.append(related.opts)

@@ -10,4 +10,4 @@ class Second(models.Model):
 # created (the field names being lower-cased versions of their opposite
 # classes is important here).
 
-API_TESTS = ""
+__test__ = {'API_TESTS':""}

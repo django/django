@@ -34,7 +34,7 @@ class Base(models.Model):
     def __str__(self):
         return "Base %s" % self.name
 
-API_TESTS = """
+__test__ = {'API_TESTS':"""
 # Regression test for #1661 and #1662: Check that string form referencing of models works, 
 # both as pre and post reference, on all RelatedField types.
 
@@ -66,4 +66,4 @@ API_TESTS = """
 
 >>> child1.parent
 <Base: Base Base1>
-"""
+"""}

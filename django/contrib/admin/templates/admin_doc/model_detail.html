@@ -35,7 +35,7 @@
 <tr>
     <td>{{ field.name }}</td>
     <td>{{ field.data_type }}</td>
-    <td>{% if field.verbose %}{{ field.verbose|escape }}{% endif %}{% if field.help_text %} - {{ field.help_text|escape }}{% endif %}</td>
+    <td>{% if field.verbose %}{{ field.verbose }}{% endif %}{% if field.help_text %} - {{ field.help_text }}{% endif %}</td>
 </tr>
 {% endfor %}
 </tbody>

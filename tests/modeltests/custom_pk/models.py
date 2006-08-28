@@ -27,7 +27,7 @@ class Business(models.Model):
     def __str__(self):
         return self.name
 
-API_TESTS = """
+__test__ = {'API_TESTS':"""
 >>> dan = Employee(employee_code='ABC123', first_name='Dan', last_name='Jones')
 >>> dan.save()
 >>> Employee.objects.all()
@@ -88,4 +88,4 @@ DoesNotExist: Employee matching query does not exist.
 >>> Business.objects.filter(employees__first_name__startswith='Fran')
 [<Business: Sears>]
 
-"""
+"""}
