@@ -651,10 +651,8 @@ class ChangeList(object):
         #This is set to 0 if show_all_rows is false, checking of which rows to be shown
         #is done later in the result_list tag at which point it will calculate the correct
         #number of rows shown
-        if self.opts.admin.show_all_rows:
-            self.result_count = result_count
-        else:
-            self.result_count = 0
+        
+        self.result_count = result_count
         self.full_result_count = full_result_count
         self.result_list = result_list
         self.can_show_all = can_show_all
@@ -692,7 +690,13 @@ class ChangeList(object):
         return order_field, order_type
 
     def get_query_set(self):
-        qs = self.manager.get_query_set()
+        if (not self.opts.admin.show_all_rows) and self.opts.row_level_permissions and (not self.user.has_perm(self.opts.app_label + "."+self.opts.get_change_permission()):
+            from django.contrib.auth.models import RowLevelPermission
+            qs = self.manager.filter(id__in=RowLevelPermission.objects.get_model_list(self.user, 
+                                                                                      self.model, 
+                                                                                      self.opts.get_change_permission()))
+        else:
+            qs = self.manager.get_query_set()
         lookup_params = self.params.copy() # a dictionary of the query string
         for i in (ALL_VAR, ORDER_VAR, ORDER_TYPE_VAR, SEARCH_VAR, IS_POPUP_VAR):
             if lookup_params.has_key(i):

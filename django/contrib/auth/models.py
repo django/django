@@ -71,6 +71,22 @@ class RowLevelPermissionManager(models.Manager):
             delete_str = "delete_%s" % (model_ct.model)
             ret_dict[delete_str]=self.create_row_level_permission(model_instance, owner, delete_str, negative=negDel)
         return ret_dict    
+    
+    def get_model_list(self,user, model, perm):
+        model_ct=ContentType.objects.get_for_model(model)
+        if isinstance(perm, str):
+            perm = Permission.objects.get(codename__exact=perm, content_type=model_ct.id)
+        user_model_ids = RowLevelPermission.objects.filter(owner_ct=ContentType.objects.get_for_model(User), 
+                                          owner_id=user.id, permission=perm.id, 
+                                          model_ct=model_ct
+                                          ).values('model_id')   
+        user_group_list = [g['id'] for g in user.groups.select_related().values('id')]
+        group_model_ids = RowLevelPermission.objects.filter(owner_ct=ContentType.objects.get_for_model(Group).id,
+                                          owner_id__in=user_group_list,
+                                          model_ct = model_ct
+                                          ).values('model_id')
+        id_list = [o['model_id'] for o in user_model_ids] + [o['model_id'] for o in group_model_ids]
+        return id_list
 
 class RowLevelPermission(models.Model):
     """ 
