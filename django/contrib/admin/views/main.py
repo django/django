@@ -690,7 +690,7 @@ class ChangeList(object):
         return order_field, order_type
 
     def get_query_set(self):
-        if (not self.opts.admin.show_all_rows) and self.opts.row_level_permissions and (not self.user.has_perm(self.opts.app_label + "."+self.opts.get_change_permission()):
+        if (not self.opts.admin.show_all_rows) and self.opts.row_level_permissions and (not self.user.has_perm(self.opts.app_label + "."+self.opts.get_change_permission())):
             from django.contrib.auth.models import RowLevelPermission
             qs = self.manager.filter(id__in=RowLevelPermission.objects.get_model_list(self.user, 
                                                                                       self.model, 
