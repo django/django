@@ -292,6 +292,13 @@ this command to install the default apps.
 If you're installing the ``django.contrib.auth`` application, ``syncdb`` will
 give you the option of creating a superuser immediately.
 
+test
+----
+
+Discover and run tests for all installed models.  See `Testing Django applications`_ for more information.
+
+.. _testing django applications: ../testing/
+
 validate
 --------
 
