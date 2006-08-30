@@ -542,10 +542,13 @@ class AnonymousUser(object):
         raise NotImplementedError
     user_permissions = property(_get_user_permissions)
 
-    def has_perm(self, perm):
+    def has_perm(self, perm, object=None):
         return False
 
     def has_module_perms(self, module):
+        return False
+
+    def contains_permission(self, perm, model=None):
         return False
 
     def get_and_delete_messages(self):
