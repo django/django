@@ -328,9 +328,9 @@ def extract_views_from_urlpatterns(urlpatterns, base=''):
     """
     views = []
     for p in urlpatterns:
-        if hasattr(p, 'get_callback'):
+        if hasattr(p, '_get_callback'):
             try:
-                views.append((p.get_callback(), base + p.regex.pattern))
+                views.append((p._get_callback(), base + p.regex.pattern))
             except ViewDoesNotExist:
                 continue
         elif hasattr(p, '_get_url_patterns'):
