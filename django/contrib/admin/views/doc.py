@@ -334,7 +334,11 @@ def extract_views_from_urlpatterns(urlpatterns, base=''):
             except ViewDoesNotExist:
                 continue
         elif hasattr(p, '_get_url_patterns'):
-            views.extend(extract_views_from_urlpatterns(p.url_patterns, base + p.regex.pattern))
+            try:
+                patterns = p.url_patterns
+            except ImportError:
+                continue
+            views.extend(extract_views_from_urlpatterns(patterns, base + p.regex.pattern))
         else:
             raise TypeError, _("%s does not appear to be a urlpattern object") % p
     return views
