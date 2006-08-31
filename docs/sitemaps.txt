@@ -31,7 +31,7 @@ Installation
 
 To install the sitemap app, follow these steps:
 
-    1. Add ``'django.contrib.sitemap'`` to your INSTALLED_APPS_ setting.
+    1. Add ``'django.contrib.sitemaps'`` to your INSTALLED_APPS_ setting.
     2. Make sure ``'django.template.loaders.app_directories.load_template_source'``
        is in your TEMPLATE_LOADERS_ setting. It's in there by default, so
        you'll only need to change this if you've changed that setting.
@@ -51,7 +51,7 @@ Initialization
 To activate sitemap generation on your Django site, add this line to your
 URLconf_:
 
-    (r'^sitemap.xml$', 'django.contrib.sitemap.views.sitemap', {'sitemaps': sitemaps})
+    (r'^sitemap.xml$', 'django.contrib.sitemaps.views.sitemap', {'sitemaps': sitemaps})
 
 This tells Django to build a sitemap when a client accesses ``/sitemap.xml``.
 
@@ -82,7 +82,7 @@ In the simplest case, all these sections get lumped together into one
 sitemap index that references individual sitemap files, one per section. (See
 `Creating a sitemap index`_ below.)
 
-``Sitemap`` classes must subclass ``django.contrib.sitemap.Sitemap``. They can
+``Sitemap`` classes must subclass ``django.contrib.sitemaps.Sitemap``. They can
 live anywhere in your codebase.
 
 A simple example
@@ -92,7 +92,7 @@ Let's assume you have a blog system, with an ``Entry`` model, and you want your
 sitemap to include all the links to your individual blog entries. Here's how
 your sitemap class might look::
 
-    from django.contrib.sitemap import Sitemap
+    from django.contrib.sitemaps import Sitemap
     from mysite.blog.models import Entry
 
     class BlogSitemap(Sitemap):
@@ -239,7 +239,7 @@ Example
 Here's an example of a URLconf_ using both::
 
     from django.conf.urls.defaults import *
-    from django.contrib.sitemap import FlatPageSitemap, GenericSitemap
+    from django.contrib.sitemaps import FlatPageSitemap, GenericSitemap
     from mysite.blog.models import Entry
 
     info_dict = {
@@ -257,7 +257,7 @@ Here's an example of a URLconf_ using both::
         # ...
 
         # the sitemap
-        (r'^sitemap.xml$', 'django.contrib.sitemap.views.sitemap', {'sitemaps': sitemaps})
+        (r'^sitemap.xml$', 'django.contrib.sitemaps.views.sitemap', {'sitemaps': sitemaps})
     )
 
 .. _URLconf: http://www.djangoproject.com/documentation/url_dispatch/
@@ -269,15 +269,15 @@ The sitemap framework also has the ability to create a sitemap index that
 references individual sitemap files, one per each section defined in your
 ``sitemaps`` dictionary. The only differences in usage are:
 
-    * You use two views in your URLconf: ``django.contrib.sitemap.views.index``
-      and ``django.contrib.sitemap.views.sitemap``.
-    * The ``django.contrib.sitemap.views.sitemap`` view should take a
+    * You use two views in your URLconf: ``django.contrib.sitemaps.views.index``
+      and ``django.contrib.sitemaps.views.sitemap``.
+    * The ``django.contrib.sitemaps.views.sitemap`` view should take a
       ``section`` keyword argument.
 
 Here is what the relevant URLconf lines would look like for the example above::
 
-    (r'^sitemap.xml$', 'django.contrib.sitemap.views.index', {'sitemaps': sitemaps})
-    (r'^sitemap-(?P<section>.+).xml$', 'django.contrib.sitemap.views.sitemap', {'sitemaps': sitemaps})
+    (r'^sitemap.xml$', 'django.contrib.sitemaps.views.index', {'sitemaps': sitemaps})
+    (r'^sitemap-(?P<section>.+).xml$', 'django.contrib.sitemaps.views.sitemap', {'sitemaps': sitemaps})
 
 This will automatically generate a ``sitemap.xml`` file that references
 both ``sitemap-flatpages.xml`` and ``sitemap-blog.xml``. The ``Sitemap``
@@ -288,7 +288,7 @@ Pinging Google
 
 You may want to "ping" Google when your sitemap changes, to let it know to
 reindex your site. The framework provides a function to do just that:
-``django.contrib.sitemap.ping_google()``.
+``django.contrib.sitemaps.ping_google()``.
 
 ``ping_google()`` takes an optional argument, ``sitemap_url``, which should be
 the absolute URL of your site's sitemap (e.g., ``'/sitemap.xml'``). If this
@@ -296,12 +296,12 @@ argument isn't provided, ``ping_google()`` will attempt to figure out your
 sitemap by performing a reverse looking in your URLconf.
 
 ``ping_google()`` raises the exception
-``django.contrib.sitemap.SitemapNotFound`` if it cannot determine your sitemap
+``django.contrib.sitemaps.SitemapNotFound`` if it cannot determine your sitemap
 URL.
 
 One useful way to call ``ping_google()`` is from a model's ``save()`` method::
 
-    from django.contrib.sitemap import ping_google
+    from django.contrib.sitemaps import ping_google
 
     class Entry(models.Model):
         # ...
