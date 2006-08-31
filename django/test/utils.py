@@ -50,14 +50,11 @@ def create_test_db(verbosity=1, autoclobber=False):
                 sys.exit(1)
                
     connection.close()
-    old_database_name = settings.DATABASE_NAME
     settings.DATABASE_NAME = TEST_DATABASE_NAME
 
     # Get a cursor (even though we don't need one yet). This has
     # the side effect of initializing the test database.
     cursor = connection.cursor()
-            
-    return old_database_name
 
 def destroy_test_db(old_database_name, verbosity=1):
     # Unless we're using SQLite, remove the test database to clean up after

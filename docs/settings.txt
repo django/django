@@ -754,6 +754,18 @@ misspelled) variables. See `How invalid variables are handled`_.
 
 .. _How invalid variables are handled: http://www.djangoproject.com/documentation/templates_python/#how-invalid-variables-are-handled
 
+TEST_RUNNER
+-----------
+
+**New in Django development version**
+
+Default: ``'django.test.simple.run_tests'``
+
+The name of the method to use for starting the test suite. See 
+`Testing Django Applications`_.
+
+.. _Testing Django Applications: ../testing/
+
 TIME_FORMAT
 -----------
 

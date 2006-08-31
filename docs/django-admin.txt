@@ -345,6 +345,17 @@ setting the Python path for you.
 Displays a help message that includes a terse list of all available actions and
 options.
 
+--noinput
+---------
+
+Inform django-admin that the user should NOT be prompted for any input. Useful if
+the django-admin script will be executed as an unattended, automated script.
+
+--noreload
+----------
+
+Disable the use of the auto-reloader when running the development server.
+
 --version
 ---------
 
@@ -354,6 +365,17 @@ Example output::
 
     0.9.1
     0.9.1 (SVN)
+
+--verbosity
+-----------
+
+Example usage::
+
+    django-admin.py syncdb --verbosity=2
+
+Verbosity determines the amount of notification and debug information that 
+will be printed to the console. '0' is no output, '1' is normal output,
+and `2` is verbose output.
 
 Extra niceties
 ==============
