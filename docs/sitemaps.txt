@@ -2,6 +2,8 @@
 The sitemap framework
 =====================
 
+**New in Django development version**.
+
 Django comes with a high-level sitemap-generating framework that makes
 creating `Google Sitemap`_ XML files easy.
 
