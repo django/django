@@ -64,7 +64,7 @@ class Sitemap:
             urls.append(url_info)
         return urls
 
-class FlatpageSitemap(Sitemap):
+class FlatPageSitemap(Sitemap):
     def items(self):
         from django.contrib.sites.models import Site
         current_site = Site.objects.get_current()

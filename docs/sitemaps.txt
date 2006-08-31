@@ -208,13 +208,13 @@ Shortcuts
 
 The sitemap framework provides a couple convenience classes for common cases:
 
-``FlatpageSitemap``
+``FlatPageSitemap``
 -------------------
 
-The ``FlatpageSitemap`` class looks at all flatpages_ defined for the current
-``SITE_ID`` (see the `sites documentation`_) and creates an entry in the
-sitemap. These entries include only the ``location`` attribute -- not
-``lastmod``, ``changefreq`` or ``priority``.
+The ``django.contrib.sitemaps.FlatPageSitemap`` class looks at all flatpages_
+defined for the current ``SITE_ID`` (see the `sites documentation`_) and
+creates an entry in the sitemap. These entries include only the ``location``
+attribute -- not ``lastmod``, ``changefreq`` or ``priority``.
 
 .. _flatpages: http://www.djangoproject.com/documentation/flatpages/
 .. _sites documentation: http://www.djangoproject.com/documentation/sites/
@@ -239,7 +239,7 @@ Example
 Here's an example of a URLconf_ using both::
 
     from django.conf.urls.defaults import *
-    from django.contrib.sitemap import FlatpageSitemap, GenericSitemap
+    from django.contrib.sitemap import FlatPageSitemap, GenericSitemap
     from mysite.blog.models import Entry
 
     info_dict = {
@@ -248,7 +248,7 @@ Here's an example of a URLconf_ using both::
     }
 
     sitemaps = {
-        'flatpages': FlatpageSitemap,
+        'flatpages': FlatPageSitemap,
         'blog': GenericSitemap(info_dict, priority=0.6),
     }
 
