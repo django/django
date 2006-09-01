@@ -8,7 +8,7 @@ Automated testing is an extremely useful weapon in the bug-killing arsenal
 of the modern developer. When initially writing code, a test suite can be
 used to validate that code behaves as expected. When refactoring or
 modifying code, tests serve as a guide to ensure that behavior hasn't
-changed as a result of the refactor.
+changed unexpectedly as a result of the refactor.
 
 Testing an web application is a complex task, as there are many
 components of a web application that must be validated and tested. To
@@ -189,10 +189,13 @@ but you only want to run the animals unit tests, run::
 
 When you run your tests, you'll see a bunch of text flow by as the test
 database is created and models are initialized. This test database is
-created from scratch every time you run your tests. The test database
-gets its name by prepending ``test_`` to the database name specified by
-``settings.DATABASE_NAME``; all other database settings will the same as
-they would be for the project normally.
+created from scratch every time you run your tests. 
+
+By default, the test database gets its name by prepending ``test_`` to 
+the database name specified by the ``DATABASE_NAME`` setting; all other 
+database settings will the same as they would be for the project normally.
+If you wish to use a name other than the default for the test database, 
+you can use the ``TEST_DATABASE_NAME`` setting to provide a name. 
 
 Once the test database has been established, Django will run your tests.
 If everything goes well, at the end you'll see::
@@ -265,8 +268,8 @@ arguments:
 The module list is the list of Python modules that contain the models to be
 tested. This is the same format returned by ``django.db.models.get_apps()``
 
-Verbosity determines the amount of debug information that will be
-provided to the console; '0' is no output, '1' is normal output,
+Verbosity determines the amount of notification and debug information that 
+will be printed to the console; '0' is no output, '1' is normal output,
 and `2` is verbose output.
 
 Testing utilities

@@ -5,6 +5,7 @@ import unittest
 
 MODEL_TESTS_DIR_NAME = 'modeltests'
 REGRESSION_TESTS_DIR_NAME = 'regressiontests'
+TEST_DATABASE_NAME = 'django_test_db'
 
 MODEL_TEST_DIR = os.path.join(os.path.dirname(__file__), MODEL_TESTS_DIR_NAME)
 REGRESSION_TEST_DIR = os.path.join(os.path.dirname(__file__), REGRESSION_TESTS_DIR_NAME)
@@ -71,9 +72,12 @@ def django_tests(verbosity, tests_to_run):
     from django.conf import settings
     from django.db.models.loading import get_apps, load_app
     old_installed_apps = settings.INSTALLED_APPS
+    old_test_database_name = settings.TEST_DATABASE_NAME
     
-    # load all the ALWAYS_INSTALLED_APPS
+    settings.TEST_DATABASE_NAME = TEST_DATABASE_NAME
     settings.INSTALLED_APPS = ALWAYS_INSTALLED_APPS
+
+    # load all the ALWAYS_INSTALLED_APPS
     get_apps()
     
     test_models = []
@@ -105,9 +109,9 @@ def django_tests(verbosity, tests_to_run):
     from django.test.simple import run_tests
     run_tests(test_models, verbosity, extra_tests=extra_tests)
   
-    # Restore the old INSTALLED_APPS setting
+    # Restore the old settings
     settings.INSTALLED_APPS = old_installed_apps
-      
+    settings.TESTS_DATABASE_NAME = old_test_database_name
 if __name__ == "__main__":
     from optparse import OptionParser
     usage = "%prog [options] [model model model ...]"

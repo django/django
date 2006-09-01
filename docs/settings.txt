@@ -766,6 +766,18 @@ The name of the method to use for starting the test suite. See
 
 .. _Testing Django Applications: ../testing/
 
+TEST_DATABASE_NAME
+------------------
+
+**New in Django development version**
+
+Default: ``None``
+
+The name of database to use when running the test suite. If a value of 
+``None`` is specified, the test database will use the name ``'test_' + settings.DATABASE_NAME``. See `Testing Django Applications`_.
+
+.. _Testing Django Applications: ../testing/
+
 TIME_FORMAT
 -----------
 

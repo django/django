@@ -21,7 +21,10 @@ def create_test_db(verbosity=1, autoclobber=False):
     if settings.DATABASE_ENGINE == "sqlite3":
         TEST_DATABASE_NAME = ":memory:"
     else:
-        TEST_DATABASE_NAME = TEST_DATABASE_PREFIX + settings.DATABASE_NAME
+        if settings.TEST_DATABASE_NAME:
+            TEST_DATABASE_NAME = settings.TEST_DATABASE_NAME
+        else:
+            TEST_DATABASE_NAME = TEST_DATABASE_PREFIX + settings.DATABASE_NAME
         
         # Create the test database and connect to it. We need to autocommit
         # if the database supports it because PostgreSQL doesn't allow 
