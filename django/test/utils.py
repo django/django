@@ -1,11 +1,40 @@
 import sys, time
 from django.conf import settings
 from django.db import connection, transaction, backend
+from django.dispatch import dispatcher
+from django.test import signals
+from django.template import Template
 
 # The prefix to put on the default database name when creating
 # the test database.
 TEST_DATABASE_PREFIX = 'test_'
 
+def instrumented_test_render(self, context):
+    """An instrumented Template render method, providing a signal 
+    that can be intercepted by the test system Client
+    
+    """
+    dispatcher.send(signal=signals.template_rendered, sender=self, template=self, context=context)
+    return self.nodelist.render(context)
+    
+def setup_test_environment():
+    """Perform any global pre-test setup. This involves:
+        
+        - Installing the instrumented test renderer
+        
+    """
+    Template.original_render = Template.render
+    Template.render = instrumented_test_render
+    
+def teardown_test_environment():
+    """Perform any global post-test teardown. This involves:
+
+        - Restoring the original test renderer
+        
+    """
+    Template.render = Template.original_render
+    del Template.original_render
+    
 def _set_autocommit(connection):
     "Make sure a connection is in autocommit mode."
     if hasattr(connection.connection, "autocommit"):
@@ -75,4 +104,3 @@ def destroy_test_db(old_database_name, verbosity=1):
         time.sleep(1) # To avoid "database is being accessed by other users" errors.
         cursor.execute("DROP DATABASE %s" % backend.quote_name(TEST_DATABASE_NAME))
         connection.close()
-

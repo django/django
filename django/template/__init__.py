@@ -60,6 +60,8 @@ from django.conf import settings
 from django.template.context import Context, RequestContext, ContextPopException
 from django.utils.functional import curry
 from django.utils.text import smart_split
+from django.dispatch import dispatcher
+from django.template import signals
 
 __all__ = ('Template', 'Context', 'RequestContext', 'compile_string')
 
@@ -137,13 +139,14 @@ class StringOrigin(Origin):
         return self.source
 
 class Template(object):
-    def __init__(self, template_string, origin=None):
+    def __init__(self, template_string, origin=None, name='<Unknown Template>'):
         "Compilation stage"
         if settings.TEMPLATE_DEBUG and origin == None:
             origin = StringOrigin(template_string)
             # Could do some crazy stack-frame stuff to record where this string
             # came from...
         self.nodelist = compile_string(template_string, origin)
+        self.name = name
 
     def __iter__(self):
         for node in self.nodelist:
@@ -152,6 +155,7 @@ class Template(object):
 
     def render(self, context):
         "Display stage -- can be called many times"
+        dispatcher.send(signal=signals.template_rendered, sender=self, template=self, context=context)
         return self.nodelist.render(context)
 
 def compile_string(template_string, origin):
