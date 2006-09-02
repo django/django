@@ -61,7 +61,6 @@ from django.template.context import Context, RequestContext, ContextPopException
 from django.utils.functional import curry
 from django.utils.text import smart_split
 from django.dispatch import dispatcher
-from django.template import signals
 
 __all__ = ('Template', 'Context', 'RequestContext', 'compile_string')
 
@@ -155,7 +154,6 @@ class Template(object):
 
     def render(self, context):
         "Display stage -- can be called many times"
-        dispatcher.send(signal=signals.template_rendered, sender=self, template=self, context=context)
         return self.nodelist.render(context)
 
 def compile_string(template_string, origin):
