@@ -60,7 +60,6 @@ from django.conf import settings
 from django.template.context import Context, RequestContext, ContextPopException
 from django.utils.functional import curry
 from django.utils.text import smart_split
-from django.dispatch import dispatcher
 
 __all__ = ('Template', 'Context', 'RequestContext', 'compile_string')
 
