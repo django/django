@@ -549,9 +549,12 @@ class FilterExpression(object):
             obj = resolve_variable(self.var, context)
         except VariableDoesNotExist:
             if ignore_failures:
-                return None
+                obj = None
             else:
-                return settings.TEMPLATE_STRING_IF_INVALID
+                if settings.TEMPLATE_STRING_IF_INVALID:
+                    return settings.TEMPLATE_STRING_IF_INVALID
+                else:
+                    obj = settings.TEMPLATE_STRING_IF_INVALID
         for func, args in self.filters:
             arg_vals = []
             for lookup, arg in args:

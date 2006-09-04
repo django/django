@@ -84,7 +84,7 @@ class Templates(unittest.TestCase):
             'basic-syntax03': ("{{ first }} --- {{ second }}", {"first" : 1, "second" : 2}, "1 --- 2"),
 
             # Fail silently when a variable is not found in the current context
-            'basic-syntax04': ("as{{ missing }}df", {}, "asINVALIDdf"),
+            'basic-syntax04': ("as{{ missing }}df", {}, ("asdf","asINVALIDdf")),
 
             # A variable may not contain more than one word
             'basic-syntax06': ("{{ multi word variable }}", {}, template.TemplateSyntaxError),
@@ -100,7 +100,7 @@ class Templates(unittest.TestCase):
             'basic-syntax10': ("{{ var.otherclass.method }}", {"var": SomeClass()}, "OtherClass.method"),
 
             # Fail silently when a variable's attribute isn't found
-            'basic-syntax11': ("{{ var.blech }}", {"var": SomeClass()}, "INVALID"),
+            'basic-syntax11': ("{{ var.blech }}", {"var": SomeClass()}, ("","INVALID")),
 
             # Raise TemplateSyntaxError when trying to access a variable beginning with an underscore
             'basic-syntax12': ("{{ var.__dict__ }}", {"var": SomeClass()}, template.TemplateSyntaxError),
@@ -116,10 +116,10 @@ class Templates(unittest.TestCase):
             'basic-syntax18': ("{{ foo.bar }}", {"foo" : {"bar" : "baz"}}, "baz"),
 
             # Fail silently when a variable's dictionary key isn't found
-            'basic-syntax19': ("{{ foo.spam }}", {"foo" : {"bar" : "baz"}}, "INVALID"),
+            'basic-syntax19': ("{{ foo.spam }}", {"foo" : {"bar" : "baz"}}, ("","INVALID")),
 
             # Fail silently when accessing a non-simple method
-            'basic-syntax20': ("{{ var.method2 }}", {"var": SomeClass()}, "INVALID"),
+            'basic-syntax20': ("{{ var.method2 }}", {"var": SomeClass()}, ("","INVALID")),
 
             # Basic filter usage
             'basic-syntax21': ("{{ var|upper }}", {"var": "Django is the greatest!"}, "DJANGO IS THE GREATEST!"),
@@ -158,7 +158,7 @@ class Templates(unittest.TestCase):
             'basic-syntax32': (r'{{ var|yesno:"yup,nup,mup" }} {{ var|yesno }}', {"var": True}, 'yup yes'),
 
             # Fail silently for methods that raise an exception with a "silent_variable_failure" attribute
-            'basic-syntax33': (r'1{{ var.method3 }}2', {"var": SomeClass()}, "1INVALID2"),
+            'basic-syntax33': (r'1{{ var.method3 }}2', {"var": SomeClass()}, ("12", "1INVALID2")),
 
             # In methods that raise an exception without a "silent_variable_attribute" set to True,
             # the exception propogates
@@ -464,6 +464,14 @@ class Templates(unittest.TestCase):
             # translation of a constant string
             'i18n13': ('{{ _("Page not found") }}', {'LANGUAGE_CODE': 'de'}, 'Seite nicht gefunden'),
 
+            ### HANDLING OF TEMPLATE_TAG_IF_INVALID ###################################
+            
+            'invalidstr01': ('{{ var|default:"Foo" }}', {}, ('Foo','INVALID')),
+            'invalidstr02': ('{{ var|default_if_none:"Foo" }}', {}, ('','INVALID')),
+            'invalidstr03': ('{% for v in var %}({{ v }}){% endfor %}', {}, ''),
+            'invalidstr04': ('{% if var %}Yes{% else %}No{% endif %}', {}, 'No'),
+            'invalidstr04': ('{% if var|default:"Foo" %}Yes{% else %}No{% endif %}', {}, 'Yes'),
+
             ### MULTILINE #############################################################
 
             'multiline01': ("""
@@ -507,7 +515,7 @@ class Templates(unittest.TestCase):
                           '{{ item.foo }}' + \
                           '{% endfor %},' + \
                           '{% endfor %}',
-                          {}, 'INVALID:INVALIDINVALIDINVALIDINVALIDINVALIDINVALIDINVALID,'),
+                          {}, ''),
 
             ### TEMPLATETAG TAG #######################################################
             'templatetag01': ('{% templatetag openblock %}', {}, '{%'),
@@ -592,30 +600,44 @@ class Templates(unittest.TestCase):
         old_td, settings.TEMPLATE_DEBUG = settings.TEMPLATE_DEBUG, False
         
         # Set TEMPLATE_STRING_IF_INVALID to a known string 
-        old_invalid, settings.TEMPLATE_STRING_IF_INVALID = settings.TEMPLATE_STRING_IF_INVALID, 'INVALID'
+        old_invalid = settings.TEMPLATE_STRING_IF_INVALID
     
         for name, vals in tests:
             install()
+            
+            if isinstance(vals[2], tuple):
+                normal_string_result = vals[2][0]
+                invalid_string_result = vals[2][1]
+            else:
+                normal_string_result = vals[2]
+                invalid_string_result = vals[2]
+                
             if 'LANGUAGE_CODE' in vals[1]:
                 activate(vals[1]['LANGUAGE_CODE'])
             else:
                 activate('en-us')
-            try:
-                output = loader.get_template(name).render(template.Context(vals[1]))
-            except Exception, e:
-                if e.__class__ != vals[2]:
-                    failures.append("Template test: %s -- FAILED. Got %s, exception: %s" % (name, e.__class__, e))
-                continue
+
+            for invalid_str, result in [('', normal_string_result),
+                                        ('INVALID', invalid_string_result)]:
+                settings.TEMPLATE_STRING_IF_INVALID = invalid_str
+                try:
+                    output = loader.get_template(name).render(template.Context(vals[1]))
+                except Exception, e:
+                    if e.__class__ != result:
+                        failures.append("Template test (TEMPLATE_STRING_IF_INVALID='%s'): %s -- FAILED. Got %s, exception: %s" % (invalid_str, name, e.__class__, e))
+                    continue
+                if output != result:
+                    failures.append("Template test (TEMPLATE_STRING_IF_INVALID='%s'): %s -- FAILED. Expected %r, got %r" % (invalid_str, name, result, output))
+                    
             if 'LANGUAGE_CODE' in vals[1]:
                 deactivate()
-            if output != vals[2]:
-                    failures.append("Template test: %s -- FAILED. Expected %r, got %r" % (name, vals[2], output))
+            
         loader.template_source_loaders = old_template_loaders
         deactivate()
         settings.TEMPLATE_DEBUG = old_td
         settings.TEMPLATE_STRING_IF_INVALID = old_invalid
 
-        self.assertEqual(failures, [])
+        self.assertEqual(failures, [], '\n'.join(failures))
 
 if __name__ == "__main__":
     unittest.main()

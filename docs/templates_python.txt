@@ -198,9 +198,19 @@ some things to keep in mind:
 How invalid variables are handled
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-If a variable doesn't exist, the template system inserts the value of the
-``TEMPLATE_STRING_IF_INVALID`` setting, which is set to ``''`` (the empty
-string) by default.
+Generally, if a variable doesn't exist, the template system inserts the
+value of the ``TEMPLATE_STRING_IF_INVALID`` setting, which is set to ``''``
+(the empty string) by default.
+
+Filters that are applied to an invalid variable will only be applied if
+``TEMPLATE_STRING_IF_INVALID`` is set to ``''`` (the empty string). If
+``TEMPLATE_STRING_IF_INVALID`` is set to any other value, variable
+filters will be ignored.
+
+This behaviour is slightly different for the ``if``, ``for`` and ``regroup``
+template tags. If an invalid variable is provided to one of these template
+tags, the variable will be interpreted as ``None``. Filters are always
+applied to invalid variables within these template tags.
 
 Playing with Context objects
 ----------------------------
