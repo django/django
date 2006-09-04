@@ -115,7 +115,7 @@ def technical_500_response(request, exc_type, exc_value, tb):
             'function': '?',
             'lineno': '?',
         }]
-    t = Template(TECHNICAL_500_TEMPLATE, name='Technical 500 Template')
+    t = Template(TECHNICAL_500_TEMPLATE, name='Technical 500 template')
     c = Context({
         'exception_type': exc_type.__name__,
         'exception_value': exc_value,
@@ -141,7 +141,7 @@ def technical_404_response(request, exception):
             # tried exists but is an empty list. The URLconf must've been empty.
             return empty_urlconf(request)
 
-    t = Template(TECHNICAL_404_TEMPLATE, name='Technical 404 Template')
+    t = Template(TECHNICAL_404_TEMPLATE, name='Technical 404 template')
     c = Context({
         'root_urlconf': settings.ROOT_URLCONF,
         'urlpatterns': tried,
@@ -154,7 +154,7 @@ def technical_404_response(request, exception):
 
 def empty_urlconf(request):
     "Create an empty URLconf 404 error response."
-    t = Template(EMPTY_URLCONF_TEMPLATE, name='Empty URLConf Template')
+    t = Template(EMPTY_URLCONF_TEMPLATE, name='Empty URLConf template')
     c = Context({
         'project_name': settings.SETTINGS_MODULE.split('.')[0]
     })
