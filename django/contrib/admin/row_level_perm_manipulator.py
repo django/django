@@ -143,15 +143,15 @@ class MultipleObjSelectField(forms.SelectField):
         return '\n'.join(output)        
         
     def returnObject(data):
-        data = data.split('-')
-        ct = ContentType.objects.get(model__exact=data[0])
-        obj = ct.get_object_for_this_type(pk=data[1])
+        data = data.split('/')
+        ct = ContentType.objects.get(app_label__exact=data[0], model__exact=data[1])
+        obj = ct.get_object_for_this_type(pk=data[2])
         return obj
 
     def returnKey(obj, ct=None):
         if not ct:
             ct = ContentType.objects.get_for_model(obj.__class__)
-        return ct.model+"-"+str(obj.id)
+        return ct.app_label+"/"+ct.model+"/"+str(obj.id)
     
     returnObject = staticmethod(returnObject)
     returnKey = staticmethod(returnKey)
