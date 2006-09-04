@@ -267,37 +267,35 @@ The ``get()``, ``post()`` and ``login()`` methods all return a Response
 object. This Response object has the following properties that can be used 
 for testing purposes:
 
-``status_code``
+    ===============  ==========================================================
+    Property         Description
+    ===============  ==========================================================
+    ``status_code``  The HTTP status of the response. See RFC2616_ for a 
+                     full list of HTTP status codes.
 
-    The HTTP status of the response. See RFC2616_ for a full list of HTTP status 
-    codes.
+    ``content``      The body of the response. The is the final page 
+                     content as rendered by the view, or any error message 
+                     (such as the URL for a 302 redirect).
 
-    .. _RFC2616: http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html
+    ``template``     The Template instance that was used to render the final 
+                     content. Testing ``template.name`` can be particularly 
+                     useful; if the template was loaded from a file, 
+                     ``template.name`` will be the file name that was loaded. 
 
-``content``
+                     If multiple templates were rendered, (e.g., if one 
+                     template includes another template),``template`` will 
+                     be a list of Template objects, in the order in which 
+                     they were rendered.
 
-    The body of the response. The is the final page content as rendered by 
-    the view, or any error message (such as the URL for a 302 redirect).
+    ``context``      The Context that was used to render the template that 
+                     produced the response content.
 
-``template``
+                     As with ``template``, if multiple templates were rendered 
+                     ``context`` will be a list of Context objects, stored in 
+                     the order in which they were rendered. 
+    ===============  ==========================================================
 
-    The Template instance that was used to render the final content. 
-    Testing ``template.name`` can be particularly useful; if the 
-    template was loaded from a file, ``name`` will be the file name that 
-    was loaded. 
-
-    If multiple templates were rendered, (e.g., if one template includes 
-    another template),``template`` will be a list of Template objects, in 
-    the order in which they were rendered.
-
-``context``
-
-    The Context that was used to render the template that produced the 
-    response content.
-
-    As with ``template``, if multiple templates were rendered ``context`` 
-    will be a list of Context objects, stored in the order in which they 
-    were rendered. 
+.. _RFC2616: http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html
 
 The following is a simple unit test using the Test Client::
     
@@ -411,7 +409,6 @@ can call it anything you want. The only requirement is that it accept two
 arguments:
 
 ``run_tests(module_list, verbosity=1)``
-
     The module list is the list of Python modules that contain the models to be
     tested. This is the same format returned by ``django.db.models.get_apps()``
 
@@ -430,7 +427,6 @@ a number of utility methods in the ``django.test.utils`` module.
     instrumentation of the template rendering system. 
 
 ``teardown_test_environment()``
-
     Performs any global post-test teardown, such as removing the instrumentation 
     of the template rendering system. 
 
