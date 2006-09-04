@@ -11,10 +11,6 @@ except ImportError, e:
     from django.core.exceptions import ImproperlyConfigured
     raise ImproperlyConfigured, "Error loading psycopg2 module: %s" % e
 
-# Register Unicode conversions
-import psycopg2.extensions
-psycopg2.extensions.register_type(psycopg2.extensions.UNICODE)
-
 DatabaseError = Database.DatabaseError
 
 try:
@@ -47,6 +43,7 @@ class DatabaseWrapper(local):
             self.connection = Database.connect(conn_string)
             self.connection.set_isolation_level(1) # make transactions transparent to all cursors
         cursor = self.connection.cursor()
+        cursor.tzinfo_factory = None
         cursor.execute("SET TIME ZONE %s", [settings.TIME_ZONE])
         if settings.DEBUG:
             return util.CursorDebugWrapper(cursor, self)

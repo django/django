@@ -34,7 +34,7 @@ class Writer(models.Model):
     def __str__(self):
         return '%s (%s)' % (self.reporter, self.position)
 
-API_TESTS = """
+__test__ = {'API_TESTS':"""
 # Create a few Reporters.
 >>> r1 = Reporter(first_name='John', last_name='Smith')
 >>> r1.save()
@@ -65,4 +65,4 @@ API_TESTS = """
 <Article: This is a test>
 >>> r1.writer_set.all()
 [<Writer: John Smith (Main writer)>]
-"""
+"""}

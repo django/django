@@ -20,7 +20,7 @@ class Person(models.Model):
     def __str__(self):
         return self.name
 
-API_TESTS = """
+__test__ = {'API_TESTS':"""
 
 >>> import datetime
 >>> valid_params = {
@@ -146,4 +146,4 @@ u'john@example.com'
 >>> p.validate()
 {'email': ['Enter a valid e-mail address.']}
 
-"""
+"""}

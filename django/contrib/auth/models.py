@@ -33,7 +33,7 @@ class Permission(models.Model):
 
     Permissions are set globally per type of object, not per specific object instance. It is possible to say "Mary may change news stories," but it's not currently possible to say "Mary may change news stories, but only the ones she created herself" or "Mary may only change news stories that have a certain status or publication date."
 
-    Three basic permissions -- add, create and delete -- are automatically created for each Django model.
+    Three basic permissions -- add, change and delete -- are automatically created for each Django model.
     """
     name = models.CharField(_('name'), maxlength=50)
     content_type = models.ForeignKey(ContentType)

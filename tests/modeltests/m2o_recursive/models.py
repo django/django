@@ -19,7 +19,7 @@ class Category(models.Model):
     def __str__(self):
         return self.name
 
-API_TESTS = """
+__test__ = {'API_TESTS':"""
 # Create a few Category objects.
 >>> r = Category(id=None, name='Root category', parent=None)
 >>> r.save()
@@ -37,4 +37,4 @@ None
 []
 >>> c.parent
 <Category: Root category>
-"""
+"""}

@@ -8,8 +8,8 @@
 
 # save copy of settings so we can restore it later
 >>> odb = copy.deepcopy(settings.OTHER_DATABASES)
->>> settings.OTHER_DATABASES['django_test_db_a']['MODELS'] = [ 'msm.PA', 'msm.P', 'msm.PC' ]
->>> settings.OTHER_DATABASES['django_test_db_b']['MODELS'] = [ 'msm.QA', 'msm.QB', 'msm.QC', 'msm.QD' ]
+>>> settings.OTHER_DATABASES['django_msm_test_db_a'] = { 'MODELS': ['msm.PA', 'msm.P', 'msm.PC']}
+>>> settings.OTHER_DATABASES['django_msm_test_db_b'] = {'MODELS': ['msm.QA', 'msm.QB', 'msm.QC', 'msm.QD']}
 
 # default connection
 >>> class DA(models.Model):
@@ -18,7 +18,7 @@
 ...     def __str__(self):
 ...         return self.name
     
-# connection django_test_db_a
+# connection a
 >>> class PA(models.Model):
 ...     name = models.CharField(maxlength=20)
 ...     # This creates a cycle in the dependency graph
@@ -50,7 +50,7 @@
 ...     class Meta:
 ...         app_label = 'msm'
     
-# connection django_test_db_b
+# connection b
 >>> class QA(models.Model):
 ...     name = models.CharField(maxlength=20)
 ...     
@@ -123,7 +123,7 @@
 >>> PA._default_manager.db.backend.supports_constraints = True
 >>> result = PA.objects.install()
 >>> result
-{<class 'othertests.manager_schema_manipulation.PC'>: [BoundStatement('ALTER TABLE "msm_pa" ADD CONSTRAINT "c_id_referencing_msm_pc_id" FOREIGN KEY ("c_id") REFERENCES "msm_pc" ("id");')]}
+{<class 'regressiontests.manager_schema_manipulation.tests.PC'>: [BoundStatement('ALTER TABLE "msm_pa" ADD CONSTRAINT "id_refs_c_id..." FOREIGN KEY ("c_id") REFERENCES "msm_pc" ("id");')]}
 
 # NOTE: restore real constraint flag
 >>> PA._default_manager.db.backend.supports_constraints = real_cnst

@@ -13,8 +13,7 @@ class Article(models.Model):
     def __str__(self):
         return self.headline
 
-API_TESTS = """
-
+__test__ = {'API_TESTS': """
 # No articles are in the system yet.
 >>> Article.objects.all()
 []
@@ -314,14 +313,14 @@ AttributeError: Manager isn't accessible via Article instances
 >>> Article.objects.all()
 [<Article: Article 6>, <Article: Default headline>, <Article: Article 7>, <Article: Updated article 8>]
 
-"""
+"""}
 
 from django.conf import settings
 
 building_docs = getattr(settings, 'BUILDING_DOCS', False)
 
 if building_docs or settings.DATABASE_ENGINE == 'postgresql':
-    API_TESTS += """
+    __test__['API_TESTS'] += """
 # In PostgreSQL, microsecond-level precision is available.
 >>> a9 = Article(headline='Article 9', pub_date=datetime(2005, 7, 31, 12, 30, 45, 180))
 >>> a9.save()
@@ -330,7 +329,7 @@ datetime.datetime(2005, 7, 31, 12, 30, 45, 180)
 """
 
 if building_docs or settings.DATABASE_ENGINE == 'mysql':
-    API_TESTS += """
+    __test__['API_TESTS'] += """
 # In MySQL, microsecond-level precision isn't available. You'll lose
 # microsecond-level precision once the data is saved.
 >>> a9 = Article(headline='Article 9', pub_date=datetime(2005, 7, 31, 12, 30, 45, 180))
@@ -339,7 +338,7 @@ if building_docs or settings.DATABASE_ENGINE == 'mysql':
 datetime.datetime(2005, 7, 31, 12, 30, 45)
 """
 
-API_TESTS += """
+__test__['API_TESTS'] += """
 
 # You can manually specify the primary key when creating a new object.
 >>> a101 = Article(id=101, headline='Article 101', pub_date=datetime(2005, 7, 31, 12, 30, 45))

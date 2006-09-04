@@ -26,7 +26,10 @@ def compile_messages():
                 # See http://cyberelk.net/tim/articles/cmdline/ar01s02.html
                 os.environ['djangocompilemo'] = pf + '.mo'
                 os.environ['djangocompilepo'] = pf + '.po'
-                cmd = 'msgfmt -o "$djangocompilemo" "$djangocompilepo"'
+                if sys.platform == 'win32': # Different shell-variable syntax
+                    cmd = 'msgfmt -o "%djangocompilemo%" "%djangocompilepo%"'
+                else:
+                    cmd = 'msgfmt -o "$djangocompilemo" "$djangocompilepo"'
                 os.system(cmd)
 
 if __name__ == "__main__":

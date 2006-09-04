@@ -76,16 +76,14 @@ def get_template(template_name):
     Returns a compiled Template object for the given template name,
     handling template inheritance recursively.
     """
-    source, origin = find_template_source(template_name)
-    template = get_template_from_string(source, origin, template_name)
-    return template
+    return get_template_from_string(*find_template_source(template_name))
 
-def get_template_from_string(source, origin=None, name=None):
+def get_template_from_string(source, origin=None):
     """
     Returns a compiled Template object for the given template code,
     handling template inheritance recursively.
     """
-    return Template(source, origin, name)
+    return Template(source, origin)
 
 def render_to_string(template_name, dictionary=None, context_instance=None):
     """

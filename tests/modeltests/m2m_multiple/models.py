@@ -28,7 +28,7 @@ class Article(models.Model):
     def __str__(self):
         return self.headline
 
-API_TESTS = """
+__test__ = {'API_TESTS':"""
 >>> from datetime import datetime
 
 >>> c1 = Category(name='Sports')
@@ -76,4 +76,4 @@ API_TESTS = """
 []
 >>> c4.secondary_article_set.all()
 [<Article: Area man steals>, <Article: Area man runs>]
-"""
+"""}

@@ -61,7 +61,8 @@ def run_tests(module_list, verbosity=1, extra_tests=[]):
     for test in extra_tests:
         suite.addTest(test)
 
-    old_name = create_test_db(verbosity)
+    old_name = settings.DATABASE_NAME
+    create_test_db(verbosity)
     management.syncdb(verbosity, interactive=False)
     unittest.TextTestRunner(verbosity=verbosity).run(suite)
     destroy_test_db(old_name, verbosity)

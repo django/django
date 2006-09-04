@@ -27,7 +27,7 @@ class Choice(models.Model):
     def __str(self):
         return self.name
 
-API_TESTS = """
+__test__ = {'API_TESTS':"""
 >>> john = User(name="John Doe")
 >>> john.save()
 >>> jim = User(name="Jim Bo")
@@ -56,4 +56,4 @@ API_TESTS = """
 Traceback (most recent call last):
     ...
 TypeError: Cannot resolve keyword 'choice' into field
-"""
+"""}

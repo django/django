@@ -300,13 +300,22 @@ If ``TEMPLATE_CONTEXT_PROCESSORS`` contains this processor, every
     * ``user`` -- An ``auth.User`` instance representing the currently
       logged-in user (or an ``AnonymousUser`` instance, if the client isn't
       logged in). See the `user authentication docs`.
-    * ``messages`` -- A list of ``auth.Message`` objects for the currently
-      logged-in user.
-    * ``perms`` -- An instance of ``django.core.context_processors.PermWrapper``,
-      representing the permissions that the currently logged-in user has. See
-      the `permissions docs`_.
+
+    * ``messages`` -- A list of messages (as strings) for the currently
+      logged-in user. Behind the scenes, this calls
+      ``request.user.get_and_delete_messages()`` for every request. That method
+      collects the user's messages and deletes them from the database.
+
+      Note that messages are set with ``user.add_message()``. See the
+      `message docs`_ for more.
+
+    * ``perms`` -- An instance of
+      ``django.core.context_processors.PermWrapper``, representing the
+      permissions that the currently logged-in user has. See the `permissions
+      docs`_.
 
 .. _user authentication docs: http://www.djangoproject.com/documentation/authentication/#users
+.. _message docs: http://www.djangoproject.com/documentation/authentication/#messages
 .. _permissions docs: http://www.djangoproject.com/documentation/authentication/#permissions
 
 django.core.context_processors.debug

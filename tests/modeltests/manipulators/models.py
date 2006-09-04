@@ -21,7 +21,7 @@ class Album(models.Model):
     def __str__(self):
         return self.name
 
-API_TESTS = """
+__test__ = {'API_TESTS':"""
 >>> from django.utils.datastructures import MultiValueDict
 
 # Create a Musician object via the default AddManipulator.
@@ -88,4 +88,4 @@ True
 <Album: Ultimate Ella>
 >>> a2.release_date
 datetime.date(2005, 2, 13)
-"""
+"""}

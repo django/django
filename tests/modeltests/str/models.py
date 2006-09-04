@@ -17,7 +17,7 @@ class Article(models.Model):
     def __str__(self):
         return self.headline
 
-API_TESTS = """
+__test__ = {'API_TESTS':"""
 # Create an Article.
 >>> from datetime import datetime
 >>> a = Article(headline='Area man programs in Python', pub_date=datetime(2005, 7, 28))
@@ -28,4 +28,4 @@ API_TESTS = """
 
 >>> a
 <Article: Area man programs in Python>
-"""
+"""}

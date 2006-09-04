@@ -168,6 +168,19 @@ Please follow these coding standards when writing code for inclusion in Django:
 
           {{foo}}
 
+    * In Django views, the first parameter in a view function should be called
+      ``request``.
+
+      Do this::
+
+          def my_view(request, foo):
+              # ...
+
+      Don't do this::
+
+          def my_view(req, foo):
+              # ...
+
     * Please don't put your name in the code. While we appreciate all
       contributions to Django, our policy is not to publish individual
       developer names in code -- for instance, at the top of Python modules.

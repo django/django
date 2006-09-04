@@ -294,8 +294,7 @@ def syncdb(verbosity=2, interactive=True):
         except ImportError:
             pass
 
-    # Send the post_syncdb signal, so individual apps can do whatever they need
-    # to do at this point.
+    # Install each app
     for app in models.get_apps():
         # Install each application (models already installed will be skipped)
         created = _install(app, commit=False, initial_data=False)
@@ -303,10 +302,14 @@ def syncdb(verbosity=2, interactive=True):
             for model in created:
                 print "Created table %s" % model._meta.db_table
         created_models.extend(created)
+    transaction.commit_unless_managed()
+
+    # Send the post_syncdb signal, so individual apps can do whatever they need
+    # to do at this point.
+    for app in models.get_apps():
         dispatcher.send(signal=signals.post_syncdb, sender=app,
             app=app, created_models=created_models, 
             verbosity=verbosity, interactive=interactive)
-    transaction.commit_unless_managed()
 
     # Install initial data for the app (but only if this is a model we've
     # just created)

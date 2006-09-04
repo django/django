@@ -72,26 +72,25 @@ class Vehicle(models.Model):
         return "%d %s %s" % (self.year, self.make, self.model)
 
 
-API_TESTS = """
+__test__ = {'API_TESTS': """
 
 # See what connections are defined. django.db.connections acts like a dict.
->>> from django.db import connection, connections, _default
+>>> from django.db import connection, connections, _default, model_connection_name
 >>> from django.conf import settings
 
 # The default connection is in there, but let's ignore it
 
 >>> non_default = connections.keys()
 >>> non_default.remove(_default)
+>>> non_default.sort()
 >>> non_default
-['django_test_db_a', 'django_test_db_b']
+['_a', '_b']
 
 # Each connection references its settings
->>> connections['django_test_db_a'].settings.DATABASE_NAME == settings.OTHER_DATABASES['django_test_db_a']['DATABASE_NAME']
+>>> connections['_a'].settings.DATABASE_NAME == settings.OTHER_DATABASES['_a']['DATABASE_NAME']
 True
->>> connections['django_test_db_b'].settings.DATABASE_NAME == settings.OTHER_DATABASES['django_test_db_b']['DATABASE_NAME']
+>>> connections['_b'].settings.DATABASE_NAME == settings.OTHER_DATABASES['_b']['DATABASE_NAME']
 True
->>> connections['django_test_db_b'].settings.DATABASE_NAME == settings.OTHER_DATABASES['django_test_db_a']['DATABASE_NAME']
-False
     
 # Invalid connection names raise ImproperlyConfigured
 >>> connections['bad']
@@ -100,16 +99,12 @@ Traceback (most recent call last):
 ImproperlyConfigured: No database connection 'bad' has been configured
 
 # Models can access their connections through their managers
->>> Artist.objects.db is connections['django_test_db_a']
+>>> model_connection_name(Artist)
+'_a'
+>>> model_connection_name(Widget)
+'_b'
+>>> model_connection_name(Vehicle) is _default
 True
->>> Widget.objects.db is connections['django_test_db_b']
-True
->>> Vehicle.objects.db.connection.settings.DATABASE_NAME == connection.settings.DATABASE_NAME
-True
->>> Artist.objects.db is Widget.objects.db
-False
->>> Artist.objects.db.connection is Vehicle.objects.db.connection
-False
 >>> a = Artist(name="Paul Klee", alive=False)
 >>> a.save()
 >>> w = Widget(code='100x2r', weight=1000)
@@ -130,7 +125,7 @@ False
 >>> w = Widget(code="99rbln", weight=1)
 >>> a.save()
 
-# Only connection 'django_test_db_a' is committed, so if we rollback
+# Only connection '_a' is committed, so if we rollback
 # all connections we'll forget the new Widget.
 
 >>> transaction.rollback()
@@ -162,11 +157,11 @@ False
 # dict is passed, the keys are ignored and the values used as the list
 # of connections to commit, rollback, etc.
 
->>> transaction.commit(connections['django_test_db_b'])
->>> transaction.commit('django_test_db_b')
->>> transaction.commit(connections='django_test_db_b')
->>> transaction.commit(connections=['django_test_db_b'])
->>> transaction.commit(['django_test_db_a', 'django_test_db_b'])
+>>> transaction.commit(connections['_b'])
+>>> transaction.commit('_b')
+>>> transaction.commit(connections='_b')
+>>> transaction.commit(connections=['_b'])
+>>> transaction.commit(['_a', '_b'])
 >>> transaction.commit(connections)
 
 # When the connections argument is omitted entirely, the transaction
@@ -211,4 +206,4 @@ False
 >>> w = Widget.objects.get(code='d101')
 >>> list(w.doohickeys.all())
 [<DooHickey: Thing>]
-"""
+"""}

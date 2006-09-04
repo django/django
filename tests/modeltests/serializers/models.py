@@ -37,7 +37,7 @@ class Article(models.Model):
     def __str__(self):
         return self.headline
 
-API_TESTS = """
+__test__ = {'API_TESTS':"""
 # Create some data:
 >>> from datetime import datetime
 >>> sports = Category(name="Sports")
@@ -118,4 +118,4 @@ API_TESTS = """
 >>> Article.objects.all()
 [<Article: Just kidding; I love TV poker>, <Article: Time to reform copyright>]
 
-"""
+"""}

@@ -78,7 +78,7 @@ class SelfClashM2M(models.Model):
 
 
 
-error_log = """invalid_models.fielderrors: "charfield": CharFields require a "maxlength" attribute.
+model_errors = """invalid_models.fielderrors: "charfield": CharFields require a "maxlength" attribute.
 invalid_models.fielderrors: "floatfield": FloatFields require a "decimal_places" attribute.
 invalid_models.fielderrors: "floatfield": FloatFields require a "max_digits" attribute.
 invalid_models.fielderrors: "filefield": FileFields require an "upload_to" attribute.

@@ -24,7 +24,7 @@ class Article(models.Model):
     def __str__(self):
         return self.headline
 
-API_TESTS = """
+__test__ = {'API_TESTS':"""
 # Create a couple of Articles.
 >>> from datetime import datetime
 >>> a1 = Article(headline='Article 1', pub_date=datetime(2005, 7, 26))
@@ -64,4 +64,4 @@ API_TESTS = """
 # don't know what order the output will be in.
 >>> Article.objects.order_by('?')
 [...]
-"""
+"""}
