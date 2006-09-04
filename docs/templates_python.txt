@@ -207,7 +207,7 @@ Filters that are applied to an invalid variable will only be applied if
 ``TEMPLATE_STRING_IF_INVALID`` is set to any other value, variable
 filters will be ignored.
 
-This behaviour is slightly different for the ``if``, ``for`` and ``regroup``
+This behavior is slightly different for the ``if``, ``for`` and ``regroup``
 template tags. If an invalid variable is provided to one of these template
 tags, the variable will be interpreted as ``None``. Filters are always
 applied to invalid variables within these template tags.
