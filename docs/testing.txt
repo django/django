@@ -209,7 +209,7 @@ Creating an instance of ``Client`` (``django.test.client.Client``) requires
 no arguments at time of construction. Once constructed, the following methods
 can be invoked on the ``Client`` instance.
 
-``get(path, data={}):``
+``get(path, data={})``
 
     Make a GET request on the provided ``path``. The key-value pairs in the
     data dictionary will be used to create a GET data payload. For example::
@@ -221,11 +221,11 @@ can be invoked on the ``Client`` instance.
 
         http://yoursite.com/customers/details/?name='fred'&age=7
 
-``post(path, data={}):``
+``post(path, data={})``
 
     Make a POST request on the provided ``path``. The key-value pairs in the
     data dictionary will be used to create the POST data payload. This payload
-    will be transmitted with the mimetype ```multipart/form-data``. 
+    will be transmitted with the mimetype ``multipart/form-data``. 
 
     However submitting files is a special case. To POST a file, you need only
     provide the file field name as a key, and a file handle to the file you wish to 
@@ -242,7 +242,7 @@ can be invoked on the ``Client`` instance.
     file name), and `attachment_file` (containing the file data). Note that you
     need to manually close the file after it has been provided to the POST.
 
-``login(path, username, password):``
+``login(path, username, password)``
 
     In a production site, it is likely that some views will be protected with
     the @login_required URL provided by ``django.contrib.auth``. Interacting
@@ -426,7 +426,6 @@ To assist in the creation of your own test runner, Django provides
 a number of utility methods in the ``django.test.utils`` module.
 
 ``setup_test_environment()``
-
     Performs any global pre-test setup, such as the installing the 
     instrumentation of the template rendering system. 
 
@@ -435,8 +434,7 @@ a number of utility methods in the ``django.test.utils`` module.
     Performs any global post-test teardown, such as removing the instrumentation 
     of the template rendering system. 
 
-``create_test_db(verbosity=1, autoclobber=False)``:
-
+``create_test_db(verbosity=1, autoclobber=False)``
     Creates a new test database, and run ``syncdb`` against it.
 
     ``verbosity`` has the same behaviour as in the test runner.
@@ -450,8 +448,7 @@ a number of utility methods in the ``django.test.utils`` module.
     ``create_test_db()`` has the side effect of modifying
     ``settings.DATABASE_NAME`` to match the name of the test database.
 
-``destroy_test_db(old_database_name, verbosity=1)``:
-
+``destroy_test_db(old_database_name, verbosity=1)``
     Destroys the database with the name ``settings.DATABASE_NAME`` matching,
     and restores the value of ``settings.DATABASE_NAME`` to the provided name.
 
