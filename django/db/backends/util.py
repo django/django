@@ -98,7 +98,7 @@ def rev_typecast_boolean(obj, d):
 
 def _dict_helper(desc, row):
     "Returns a dictionary for the given cursor.description and result row."
-    return dict([(desc[col[0]][0], col[1]) for col in enumerate(row)])
+    return dict(zip([col[0] for col in desc], row))
 
 def dictfetchone(cursor):
     "Returns a row from the cursor as a dict"

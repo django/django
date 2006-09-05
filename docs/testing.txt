@@ -4,13 +4,21 @@ Testing Django applications
 
 **New in Django development version**.
 
-.. XXX insert quick introduction to testing (and why you'd want to do it)
+Automated testing is an extremely useful weapon in the bug-killing arsenal
+of the modern developer. When initially writing code, a test suite can be
+used to validate that code behaves as expected. When refactoring or
+modifying code, tests serve as a guide to ensure that behavior hasn't
+changed unexpectedly as a result of the refactor.
 
-.. note::
-    
+Testing an web application is a complex task, as there are many
+components of a web application that must be validated and tested. To
+help you test your application, Django provides a test execution
+framework, and range of utilities that can be used to stimulate and
+inspect various facets of a web application.
+
     This testing framework is currently under development, and may change
-    slightly before the next official Django release.  
-    
+    slightly before the next official Django release.
+
     (That's *no* excuse not to write tests, though!)
 
 Writing tests
@@ -23,17 +31,20 @@ Writing doctests
 
 Doctests use Python's standard doctest_ module, which searches for tests in
 your docstrings. Django's test runner looks for doctests in your ``models.py``
-file, and executes any that it finds.
+file, and executes any that it finds. Django will also search for a file
+called ``tests.py`` in the application directory (i.e., the directory that
+holds ``models.py``). If a ``tests.py`` is found, it will also be searched
+for doctests.
 
 .. admonition:: What's a **docstring**?
 
     A good explanation of docstrings (and some guidlines for using them
     effectively) can be found in :PEP:`257`:
-        
-        A docstring is a string literal that occurs as the first statement in 
+
+        A docstring is a string literal that occurs as the first statement in
         a module, function, class, or method definition.  Such a docstring
         becomes the ``__doc__`` special attribute of that object.
-        
+
     Since tests often make great documentation, doctest lets you put your
     tests directly in your docstrings.
 
@@ -44,25 +55,25 @@ model-level doctests in the docstring for each model.
 For example::
 
     from django.db import model
-    
+
     class Animal(models.Model):
         """
         An animal that knows how to make noise
-        
+
         # Create some animals
         >>> lion = Animal.objects.create(name="lion", sound="roar")
         >>> cat = Animal.objects.create(name="cat", sound="meow")
-        
+
         # Make 'em speak
         >>> lion.speak()
         'The lion says "roar"'
         >>> cat.speak()
         'The cat says "meow"'
         """
-        
+
         name = models.CharField(maxlength=20)
         sound = models.CharField(maxlength=20)
-        
+
         def speak(self):
             return 'The %s says "%s"' % (self.name, self.sound)
 
@@ -80,24 +91,24 @@ Writing unittests
 -----------------
 
 Like doctests, Django's unit tests use a standard library module: unittest_.
-Django's test runner looks for unit test cases in a ``tests.py`` file in your
-app (i.e. in the same directory as your ``models.py`` file).
+As with doctests, Django's test runner looks for any unit test cases defined
+in ``models.py``, or in a ``tests.py`` file in your application directory.
 
 An equivalent unittest test case for the above example would look like::
 
     import unittest
     from myapp.models import Animal
-    
+
     class AnimalTestCase(unittest.TestCase):
-        
+
         def setUp(self):
             self.lion = Animal.objects.create(name="lion", sound="roar")
             self.cat = Animal.objects.create(name="cat", sound="meow")
-        
+
         def testSpeaking(self):
             self.assertEquals(self.lion.speak(), 'The lion says "roar"')
             self.assertEquals(self.cat.speak(), 'The cat says "meow"')
-            
+
 When you `run your tests`_, the test utility will find all the test cases
 (that is, subclasses of ``unittest.TestCase``) in ``tests.py``, automatically
 build a test suite out of those test cases, and run that suite.
@@ -119,7 +130,7 @@ system has different benefits, the best approach is probably to use both
 together, picking the test system to match the type of tests you need to
 write.
 
-For developers new to testing, however, this choice can seem 
+For developers new to testing, however, this choice can seem
 confusing, so here are a few key differences to help you decide weather
 doctests or unit tests are right for you.
 
@@ -136,17 +147,175 @@ get you started faster.
 The ``unittest`` framework will probably feel very familiar to developers
 coming from Java.  Since ``unittest`` is inspired by Java's JUnit, if
 you've used testing frameworks in other languages that similarly were
-inspired by JUnit, ``unittest`` should also feel pretty familiar.  
+inspired by JUnit, ``unittest`` should also feel pretty familiar.
 
 Since ``unittest`` is organized around classes and methods, if you need
 to write a bunch of tests that all share similar code, you can easily use
-subclass to abstract common tasks; this makes test code shorter and cleaner. 
+subclass to abstract common tasks; this makes test code shorter and cleaner.
 There's also support for explicit setup and/or cleanup routines, which give
 you a high level of control over the environment your test cases run in.
 
 Again, remember that you can use both systems side-by-side (even in the same
 app). In the end, most projects will eventually end up using both; each shines
 in different circumstances.
+
+Testing Tools
+=============
+
+To assist in testing various features of your application, Django provides 
+tools that can be used to establish tests and test conditions.
+
+* `Test Client`_
+* Fixtures_
+  
+Test Client
+-----------
+
+The Test Client is a simple dummy browser. It allows you to simulate
+GET and POST requests on a URL, and observe the response that is received.
+This allows you to test that the correct view is executed for a given URL,
+and that the view constructs the correct response.
+
+As the response is generated, the Test Client gathers details on the 
+Template and Context objects that were used to generate the response. These
+Templates and Contexts are then provided as part of the response, and can be
+used as test conditions.
+
+.. admonition:: Test Client vs Browser Automation?
+
+    The Test Client is not intended as a replacement for Twill_, Selenium_, 
+    or other browser automation frameworks - it is intended to allow 
+    testing of the contexts and templates produced by a view, 
+    rather than the HTML rendered to the end-user.
+    
+    A comprehensive test suite should use a combination of both: Test Client
+    tests to establish that the correct view is being called and that 
+    the view is collecting the correct context data, and Browser Automation
+    tests to check that user interface behaves as expected.
+    
+.. _Twill: http://twill.idyll.org/
+.. _Selenium: http://www.openqa.org/selenium/
+
+The Test Client is stateful; if a cookie is returned as part of a response,
+that cookie is provided as part of the next request. Expiry policies for these
+cookies are not followed; if you want a cookie to expire, either delete it 
+manually from ``client.cookies``, or create a new Client instance (which will
+effectively delete all cookies).
+
+Making requests
+~~~~~~~~~~~~~~~
+
+Creating an instance of ``Client`` (``django.test.client.Client``) requires 
+no arguments at time of construction. Once constructed, the following methods
+can be invoked on the ``Client`` instance.
+
+``get(path, data={})``
+
+    Make a GET request on the provided ``path``. The key-value pairs in the
+    data dictionary will be used to create a GET data payload. For example::
+
+        c = Client()
+        c.get('/customers/details/', {'name':'fred', 'age':7})
+
+    will result in the evaluation of a GET request equivalent to::
+
+        http://yoursite.com/customers/details/?name='fred'&age=7
+
+``post(path, data={})``
+
+    Make a POST request on the provided ``path``. The key-value pairs in the
+    data dictionary will be used to create the POST data payload. This payload
+    will be transmitted with the mimetype ``multipart/form-data``. 
+
+    However submitting files is a special case. To POST a file, you need only
+    provide the file field name as a key, and a file handle to the file you wish to 
+    upload as a value. The Test Client will populate the two POST fields (i.e., 
+    ``field`` and ``field_file``) required by FileField. For example::
+
+        c = Client()
+        f = open('wishlist.doc')
+        c.post('/customers/wishes/', {'name':'fred', 'attachment':f})
+        f.close()
+
+    will result in the evaluation of a POST request on ``/customers/wishes/``, 
+    with a POST dictionary that contains `name`, `attachment` (containing the 
+    file name), and `attachment_file` (containing the file data). Note that you
+    need to manually close the file after it has been provided to the POST.
+
+``login(path, username, password)``
+
+    In a production site, it is likely that some views will be protected with
+    the @login_required URL provided by ``django.contrib.auth``. Interacting
+    with a URL that has been login protected is a slightly complex operation,
+    so the Test Client provides a simple URL to automate the login process. A
+    call to ``login()`` stimulates the series of GET and POST calls required
+    to log a user into a @login_required protected URL.
+
+    If login is possible, the final return value of ``login()`` is the response 
+    that is generated by issuing a GET request on the protected URL. If login
+    is not possible, ``login()`` returns False.
+
+    Note that since the test suite will be executed using the test database, 
+    which contains no users by default. As a result, logins for your production
+    site will not work. You will need to create users as part of the test suite 
+    to be able to test logins to your application. 
+
+Testing Responses
+~~~~~~~~~~~~~~~~~
+
+The ``get()``, ``post()`` and ``login()`` methods all return a Response 
+object. This Response object has the following properties that can be used 
+for testing purposes:
+
+    ===============  ==========================================================
+    Property         Description
+    ===============  ==========================================================
+    ``status_code``  The HTTP status of the response. See RFC2616_ for a 
+                     full list of HTTP status codes.
+
+    ``content``      The body of the response. The is the final page 
+                     content as rendered by the view, or any error message 
+                     (such as the URL for a 302 redirect).
+
+    ``template``     The Template instance that was used to render the final 
+                     content. Testing ``template.name`` can be particularly 
+                     useful; if the template was loaded from a file, 
+                     ``template.name`` will be the file name that was loaded. 
+
+                     If multiple templates were rendered, (e.g., if one 
+                     template includes another template),``template`` will 
+                     be a list of Template objects, in the order in which 
+                     they were rendered.
+
+    ``context``      The Context that was used to render the template that 
+                     produced the response content.
+
+                     As with ``template``, if multiple templates were rendered 
+                     ``context`` will be a list of Context objects, stored in 
+                     the order in which they were rendered. 
+    ===============  ==========================================================
+
+.. _RFC2616: http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html
+
+The following is a simple unit test using the Test Client::
+    
+    import unittest
+    from django.test.client import Client
+    
+    class SimpleTest(unittest.TestCase):
+        def setUp(self):
+            # Every test needs a client
+            self.client = Client()
+        def test_details(self):        
+            response = self.client.get('/customer/details/')
+    
+            self.failUnlessEqual(response.status_code, 200)
+            self.failUnlessEqual(len(response.context['customers']), 5)
+
+Fixtures
+--------
+
+Feature still to come...
 
 Running tests
 =============
@@ -155,9 +324,25 @@ Run your tests using your project's ``manage.py`` utility::
 
     $ ./manage.py test
 
-You'll see a bunch of text flow by as the test database is created, models are
-initialized, and your tests are run. If everything goes well, at the end
-you'll see::
+If you only want to run tests for a particular application, add the
+application name to the command line. For example, if your
+``INSTALLED_APPS`` contains ``myproject.polls`` and ``myproject.animals``,
+but you only want to run the animals unit tests, run::
+
+    $ ./manage.py test animals
+
+When you run your tests, you'll see a bunch of text flow by as the test
+database is created and models are initialized. This test database is
+created from scratch every time you run your tests. 
+
+By default, the test database gets its name by prepending ``test_`` to 
+the database name specified by the ``DATABASE_NAME`` setting; all other 
+database settings will the same as they would be for the project normally.
+If you wish to use a name other than the default for the test database, 
+you can use the ``TEST_DATABASE_NAME`` setting to provide a name. 
+
+Once the test database has been established, Django will run your tests.
+If everything goes well, at the end you'll see::
 
     ----------------------------------------------------------------------
     Ran 22 tests in 0.221s
@@ -189,4 +374,78 @@ failed::
     Ran 2 tests in 0.048s
 
     FAILED (failures=1)
-    
+
+When the tests have all been executed, the test database is destroyed.
+
+Using a different testing framework
+===================================
+
+Doctest and Unittest are not the only Python testing frameworks. While
+Django doesn't provide explicit support these alternative frameworks,
+it does provide a mechanism to allow you to invoke tests constructed for
+an alternative framework as if they were normal Django tests.
+
+When you run ``./manage.py test``, Django looks at the ``TEST_RUNNER``
+setting to determine what to do. By default, ``TEST_RUNNER`` points to ``django.test.simple.run_tests``. This method defines the default Django
+testing behaviour. This behaviour involves:
+
+#. Performing global pre-test setup
+#. Creating the test database
+#. Running ``syncdb`` to install models and initial data into the test database
+#. Looking for Unit Tests and Doctests in ``models.py`` and ``tests.py`` file for each installed application
+#. Running the Unit Tests and Doctests that are found
+#. Destroying the test database.
+#. Performing global post-test teardown
+
+If you define your own test runner method and point ``TEST_RUNNER``
+at that method, Django will execute your test runner whenever you run
+``./manage.py test``. In this way, it is possible to use any test
+framework that can be executed from Python code.
+
+Defining a test runner
+----------------------
+By convention, a test runner should be called ``run_tests``; however, you
+can call it anything you want. The only requirement is that it accept two
+arguments:
+
+``run_tests(module_list, verbosity=1)``
+    The module list is the list of Python modules that contain the models to be
+    tested. This is the same format returned by ``django.db.models.get_apps()``
+
+    Verbosity determines the amount of notification and debug information that 
+    will be printed to the console; '0' is no output, '1' is normal output,
+    and `2` is verbose output.
+
+Testing utilities
+-----------------
+
+To assist in the creation of your own test runner, Django provides
+a number of utility methods in the ``django.test.utils`` module.
+
+``setup_test_environment()``
+    Performs any global pre-test setup, such as the installing the 
+    instrumentation of the template rendering system. 
+
+``teardown_test_environment()``
+    Performs any global post-test teardown, such as removing the instrumentation 
+    of the template rendering system. 
+
+``create_test_db(verbosity=1, autoclobber=False)``
+    Creates a new test database, and run ``syncdb`` against it.
+
+    ``verbosity`` has the same behaviour as in the test runner.
+
+    ``Autoclobber`` describes the behavior that will occur if a database with
+    the same name as the test database is discovered. If ``autoclobber`` is False,
+    the user will be asked to approve destroying the existing database. ``sys.exit``
+    is called if the user does not approve. If autoclobber is ``True``, the database
+    will be destroyed without consulting the user.
+
+    ``create_test_db()`` has the side effect of modifying
+    ``settings.DATABASE_NAME`` to match the name of the test database.
+
+``destroy_test_db(old_database_name, verbosity=1)``
+    Destroys the database with the name ``settings.DATABASE_NAME`` matching,
+    and restores the value of ``settings.DATABASE_NAME`` to the provided name.
+
+    ``verbosity`` has the same behaviour as in the test runner.

@@ -301,4 +301,9 @@ AUTHENTICATION_BACKENDS = ('django.contrib.auth.backends.ModelBackend',)
 # TESTING #
 ###########
 
-TEST_RUNNER='django.test.simple.run_tests'
+# The name of the method to use to invoke the test suite
+TEST_RUNNER = 'django.test.simple.run_tests'
+
+# The name of the database to use for testing purposes.
+# If None, a name of 'test_' + DATABASE_NAME will be assumed
+TEST_DATABASE_NAME = None

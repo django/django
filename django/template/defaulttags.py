@@ -86,7 +86,7 @@ class ForNode(Node):
             parentloop = {}
         context.push()
         try:
-            values = self.sequence.resolve(context)
+            values = self.sequence.resolve(context, True)
         except VariableDoesNotExist:
             values = []
         if values is None:
@@ -212,13 +212,13 @@ class RegroupNode(Node):
         self.var_name = var_name
 
     def render(self, context):
-        obj_list = self.target.resolve(context)
-        if obj_list == '': # target_var wasn't found in context; fail silently
+        obj_list = self.target.resolve(context, True)
+        if obj_list == None: # target_var wasn't found in context; fail silently
             context[self.var_name] = []
             return ''
         output = [] # list of dictionaries in the format {'grouper': 'key', 'list': [list of contents]}
         for obj in obj_list:
-            grouper = self.expression.resolve(Context({'var': obj}))
+            grouper = self.expression.resolve(Context({'var': obj}), True)
             # TODO: Is this a sensible way to determine equality?
             if output and repr(output[-1]['grouper']) == repr(grouper):
                 output[-1]['list'].append(obj)
@@ -251,7 +251,7 @@ class SsiNode(Node):
             output = ''
         if self.parsed:
             try:
-                t = Template(output)
+                t = Template(output, name=self.filepath)
                 return t.render(context)
             except TemplateSyntaxError, e:
                 if settings.DEBUG:

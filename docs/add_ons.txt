@@ -153,6 +153,15 @@ See the `sites documentation`_.
 
 .. _sites documentation: http://www.djangoproject.com/documentation/sites/
 
+sitemaps
+========
+
+A framework for generating Google sitemap XML files.
+
+See the `sitemaps documentation`_.
+
+.. _sitemaps documentation: http://www.djangoproject.com/documentation/sitemaps/
+
 syndication
 ===========
 

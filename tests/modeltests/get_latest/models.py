@@ -3,9 +3,9 @@
 
 Models can have a ``get_latest_by`` attribute, which should be set to the name
 of a DateField or DateTimeField. If ``get_latest_by`` exists, the model's
-module will get a ``get_latest()`` function, which will return the latest
-object in the database according to that field. "Latest" means "having the
-date farthest into the future."
+manager will get a ``latest()`` method, which will return the latest object in
+the database according to that field. "Latest" means "having the date farthest
+into the future."
 """
 
 from django.db import models
@@ -30,7 +30,7 @@ class Person(models.Model):
         return self.name
 
 __test__ = {'API_TESTS':"""
-# Because no Articles exist yet, get_latest() raises ArticleDoesNotExist.
+# Because no Articles exist yet, latest() raises ArticleDoesNotExist.
 >>> Article.objects.latest()
 Traceback (most recent call last):
     ...
