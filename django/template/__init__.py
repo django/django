@@ -435,7 +435,7 @@ class TokenParser(object):
             while i < len(subject) and subject[i] != subject[p]:
                 i += 1
             if i >= len(subject):
-                raise TemplateSyntaxError, "Searching for value. Unexpected end of string in column %d: %s" % subject
+                raise TemplateSyntaxError, "Searching for value. Unexpected end of string in column %d: %s" % (i, subject)
             i += 1
             res = subject[p:i]
             while i < len(subject) and subject[i] in (' ', '\t'):
