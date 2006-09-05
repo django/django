@@ -1,37 +1,48 @@
-Django is a high-level Python Web framework that encourages rapid development
-and clean, pragmatic design.
+Django is a high-level Python Web framework that encourages rapid
+development and clean, pragmatic design.
 
-All documentation is in the "docs" directory and online at
-http://www.djangoproject.com/documentation/.  If you're just getting started,
-here's how we recommend you read the docs:
 
-    * First, read docs/install.txt for instructions on installing Django.
+About this version
+==================
 
-    * Next, work through the tutorials in order (docs/tutorial01.txt,
-      docs/tutorial02.txt, etc.).
+This is the Django 0.90 "bugfixes" branch, which is intended to
+provide bugfix and patch support for users of Django 0.90 who have not
+been able to migrate to a more recent version. No new features will be
+added in this branch, and it is maintained solely as a means of
+providing support to legacy Django installations.
 
-    * If you want to set up an actual deployment server, read docs/modpython.txt
-      for instructions on running Django under mod_python.
+If you're completely new to Django we highly recommend that you use
+either the latest stable release or a Subversion checkout from
+Django's trunk; Django is always evolving, and the latest and greatest
+features are only available to users of newer versions of the
+framework.
 
-    * The rest of the documentation is of the reference-manual variety.
-      Read it -- and the FAQ -- as you run into problems.
 
-Docs are updated rigorously. If you find any problems in the docs, or think they
-should be clarified in any way, please take 30 seconds to fill out a ticket
-here:
+More information
+================
 
-http://code.djangoproject.com/newticket
+The complete history of bugs fixed in this branch can be viewed online
+at http://code.djangoproject.com/log/django/branches/0.90-bugfixes.
 
-To get more help:
+We also recommend that users of this branch subscribe to the
+"django-announce" mailing list, a low-traffic, announcements-only list
+which will send messages whenever an important (i.e.,
+security-related) bug is fixed. You can subscribe to the list via
+Google Groups at http://groups.google.com/group/django-announce.
 
-    * Join the #django channel on irc.freenode.net. Lots of helpful people
-      hang out there. Read the archives at http://loglibrary.com/179 .
+The documentation for this version of Django has been frozen, and is
+available online at http://www.djangoproject.com/documentation/0_90/.
 
-    * Join the django-users mailing list, or read the archives, at
-      http://groups-beta.google.com/group/django-users.
 
-To contribute to Django:
+Submitting bugs
+===============
 
-    * Check out http://www.djangoproject.com/community/ for information
-      about getting involved.
+If you run into a bug in Django 0.90, please search the Django ticket
+database to see if the issue has already been reported; if not, please
+head over to http://code.djangoproject.com/newticket and file a new
+ticket with as much information about the bug as you can provide.
 
+If you're running into a bug which has been reported but not fixed,
+feel free to update the ticket with any additional information you
+have, and to assign it to 'ubernostrum' (AKA James Bennett, the
+maintainer of this branch).
