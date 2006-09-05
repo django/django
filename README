@@ -5,8 +5,8 @@ development and clean, pragmatic design.
 About this version
 ==================
 
-This is the Django 0.90 "bugfixes" branch, which is intended to
-provide bugfix and patch support for users of Django 0.90 who have not
+This is the Django 0.91 "bugfixes" branch, which is intended to
+provide bugfix and patch support for users of Django 0.91 who have not
 been able to migrate to a more recent version. No new features will be
 added in this branch, and it is maintained solely as a means of
 providing support to legacy Django installations.
@@ -22,7 +22,7 @@ More information
 ================
 
 The complete history of bugs fixed in this branch can be viewed online
-at http://code.djangoproject.com/log/django/branches/0.90-bugfixes.
+at http://code.djangoproject.com/log/django/branches/0.91-bugfixes.
 
 We also recommend that users of this branch subscribe to the
 "django-announce" mailing list, a low-traffic, announcements-only list
@@ -31,13 +31,13 @@ security-related) bug is fixed. You can subscribe to the list via
 Google Groups at http://groups.google.com/group/django-announce.
 
 The documentation for this version of Django has been frozen, and is
-available online at http://www.djangoproject.com/documentation/0_90/.
+available online at http://www.djangoproject.com/documentation/0_91/.
 
 
 Submitting bugs
 ===============
 
-If you run into a bug in Django 0.90, please search the Django ticket
+If you run into a bug in Django 0.91, please search the Django ticket
 database to see if the issue has already been reported; if not, please
 head over to http://code.djangoproject.com/newticket and file a new
 ticket with as much information about the bug as you can provide.
