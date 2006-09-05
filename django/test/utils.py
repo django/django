@@ -95,10 +95,11 @@ def destroy_test_db(old_database_name, verbosity=1):
     # connected to it.
     if verbosity >= 1:
         print "Destroying test database..."
+    connection.close()
+    TEST_DATABASE_NAME = settings.DATABASE_NAME
+    settings.DATABASE_NAME = old_database_name
+
     if settings.DATABASE_ENGINE != "sqlite3":
-        connection.close()
-        TEST_DATABASE_NAME = settings.DATABASE_NAME
-        settings.DATABASE_NAME = old_database_name
         cursor = connection.cursor()
         _set_autocommit(connection)
         time.sleep(1) # To avoid "database is being accessed by other users" errors.

@@ -62,7 +62,10 @@ class DatabaseWrapper(local):
             self.connection.rollback()
 
     def close(self):
-        if self.connection is not None:
+        from django.conf import settings
+        # If database is in memory, closing the connection destroys the database.
+        # To prevent accidental data loss, ignore close requests on an in-memory db.
+        if self.connection is not None and settings.DATABASE_NAME != ":memory:":
             self.connection.close()
             self.connection = None
 
