@@ -5,7 +5,7 @@ from django.http import Http404, HttpResponse, HttpResponseRedirect
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.auth.models import RowLevelPermission, User, Group
 from django.db import models
-from django.contrib.admin.row_level_perm_manipulator import AddRLPManipulator, ChangeRLPManipulator
+from django.contrib.admin.row_level_perm_manipulator import AddRLPManipulator, ChangeRLPManipulator, MultipleObjSelectField
 from django.core.exceptions import ImproperlyConfigured, ObjectDoesNotExist, PermissionDenied
 from django.core.paginator import ObjectPaginator, InvalidPage
 from django.contrib.admin.views.main import unquote, quote
@@ -78,12 +78,12 @@ def view_row_level_permissions(request, app_label, model_name, object_id):
     group_ct = model_ct = ContentType.objects.get_for_model(Group)
     user_ct = model_ct = ContentType.objects.get_for_model(User)
     for r in rlp_list:
-        owner_val = str(r.owner_ct)+"-"+str(r.owner_id)
+        owner_val = MultipleObjSelectField.returnKey(r.owner, r.owner_ct)
         data = {'id':r.id, 'owner':owner_val, 'perm':r.permission.id, 'negative':r.negative}
         
-        if r.owner_ct.id is user_ct.id:
+        if r.owner_ct.id == user_ct.id:
             user_rlp_form_list.append({'form':forms.FormWrapper(edit_rlp_manip, data, rlp_errors), 'rlp':r})
-        elif r.owner_ct.id is group_ct.id:
+        elif r.owner_ct.id == group_ct.id:
             group_rlp_form_list.append({'form':forms.FormWrapper(edit_rlp_manip, data, rlp_errors), 'rlp':r})            
         else:
             other_rlp_form_list.append({'form':forms.FormWrapper(edit_rlp_manip, data, rlp_errors), 'rlp':r})
