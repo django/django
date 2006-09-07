@@ -266,7 +266,18 @@ this::
 If you attempt to use ``CurrentSiteManager`` and pass a field name that doesn't
 exist, Django will raise a ``ValueError``.
 
+Finally, note that you'll probably want to keep a normal (non-site-specific)
+``Manager`` on your model, even if you use ``CurrentSiteManager``. As explained
+in the `manager documentation`_, if you define a manager manually, then Django
+won't create the automatic ``objects = models.Manager()`` manager for you.
+Also, note that certain parts of Django -- namely, the Django admin site and
+generic views -- use whichever manager is defined *first* in the model, so if
+you want your admin site to have access to all objects (not just site-specific
+ones), put ``objects = models.Manager()`` in your model, before you define
+``CurrentSiteManager``.
+
 .. _manager: http://www.djangoproject.com/documentation/model_api/#managers
+.. _manager documentation: http://www.djangoproject.com/documentation/model_api/#managers
 
 How Django uses the sites framework
 ===================================

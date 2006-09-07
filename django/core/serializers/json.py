@@ -48,4 +48,4 @@ class DateTimeAwareJSONEncoder(simplejson.JSONEncoder):
         elif isinstance(o, datetime.time):
             return o.strftime(self.TIME_FORMAT)
         else:
-            return super(self, DateTimeAwareJSONEncoder).default(o)
+            return super(DateTimeAwareJSONEncoder, self).default(o)

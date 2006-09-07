@@ -5,6 +5,8 @@ import unittest
 
 MODEL_TESTS_DIR_NAME = 'modeltests'
 REGRESSION_TESTS_DIR_NAME = 'regressiontests'
+TEST_DATABASE_NAME = 'django_test_db'
+TEST_TEMPLATE_DIR = 'templates'
 
 MODEL_TEST_DIR = os.path.join(os.path.dirname(__file__), MODEL_TESTS_DIR_NAME)
 REGRESSION_TEST_DIR = os.path.join(os.path.dirname(__file__), REGRESSION_TESTS_DIR_NAME)
@@ -70,14 +72,23 @@ class InvalidModelTestCase(unittest.TestCase):
 def django_tests(verbosity, tests_to_run):
     from django.conf import settings
     from django.db.models.loading import get_apps, load_app
+
     old_installed_apps = settings.INSTALLED_APPS
+    old_test_database_name = settings.TEST_DATABASE_NAME
+    old_root_urlconf = settings.ROOT_URLCONF
+    old_template_dirs = settings.TEMPLATE_DIRS
+    
+    # Redirect some settings for the duration of these tests
+    settings.TEST_DATABASE_NAME = TEST_DATABASE_NAME
+    settings.INSTALLED_APPS = ALWAYS_INSTALLED_APPS
+    settings.ROOT_URLCONF = 'urls'
+    settings.TEMPLATE_DIRS = (os.path.join(os.path.dirname(__file__), TEST_TEMPLATE_DIR),)
     
     # load all the ALWAYS_INSTALLED_APPS
-    settings.INSTALLED_APPS = ALWAYS_INSTALLED_APPS
     get_apps()
     
-    test_models = []
     # Load all the test model apps
+    test_models = []
     for model_dir, model_name in get_test_models():        
         model_label = '.'.join([model_dir, model_name])
         try:
@@ -105,9 +116,12 @@ def django_tests(verbosity, tests_to_run):
     from django.test.simple import run_tests
     run_tests(test_models, verbosity, extra_tests=extra_tests)
   
-    # Restore the old INSTALLED_APPS setting
+    # Restore the old settings
     settings.INSTALLED_APPS = old_installed_apps
-      
+    settings.TESTS_DATABASE_NAME = old_test_database_name
+    settings.ROOT_URLCONF = old_root_urlconf
+    settings.TEMPLATE_DIRS = old_template_dirs
+    
 if __name__ == "__main__":
     from optparse import OptionParser
     usage = "%prog [options] [model model model ...]"
