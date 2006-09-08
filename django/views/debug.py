@@ -115,7 +115,7 @@ def technical_500_response(request, exc_type, exc_value, tb):
             'function': '?',
             'lineno': '?',
         }]
-    t = Template(TECHNICAL_500_TEMPLATE)
+    t = Template(TECHNICAL_500_TEMPLATE, name='Technical 500 template')
     c = Context({
         'exception_type': exc_type.__name__,
         'exception_value': exc_value,
@@ -141,7 +141,7 @@ def technical_404_response(request, exception):
             # tried exists but is an empty list. The URLconf must've been empty.
             return empty_urlconf(request)
 
-    t = Template(TECHNICAL_404_TEMPLATE)
+    t = Template(TECHNICAL_404_TEMPLATE, name='Technical 404 template')
     c = Context({
         'root_urlconf': settings.ROOT_URLCONF,
         'urlpatterns': tried,
@@ -154,7 +154,7 @@ def technical_404_response(request, exception):
 
 def empty_urlconf(request):
     "Create an empty URLconf 404 error response."
-    t = Template(EMPTY_URLCONF_TEMPLATE)
+    t = Template(EMPTY_URLCONF_TEMPLATE, name='Empty URLConf template')
     c = Context({
         'project_name': settings.SETTINGS_MODULE.split('.')[0]
     })
@@ -189,7 +189,7 @@ TECHNICAL_500_TEMPLATE = """
 <head>
   <meta http-equiv="content-type" content="text/html; charset=utf-8" />
   <meta name="robots" content="NONE,NOARCHIVE" />
-  <title>{{ exception_type }} at {{ request.path }}</title>
+  <title>{{ exception_type }} at {{ request.path|escape }}</title>
   <style type="text/css">
     html * { padding:0; margin:0; }
     body * { padding:10px 20px; }
@@ -292,7 +292,7 @@ TECHNICAL_500_TEMPLATE = """
 <body>
 
 <div id="summary">
-  <h1>{{ exception_type }} at {{ request.path }}</h1>
+  <h1>{{ exception_type }} at {{ request.path|escape }}</h1>
   <h2>{{ exception_value|escape }}</h2>
   <table class="meta">
     <tr>
@@ -301,7 +301,7 @@ TECHNICAL_500_TEMPLATE = """
     </tr>
     <tr>
       <th>Request URL:</th>
-      <td>{{ request_protocol }}://{{ request.META.HTTP_HOST }}{{ request.path }}</td>
+      <td>{{ request_protocol }}://{{ request.META.HTTP_HOST }}{{ request.path|escape }}</td>
     </tr>
     <tr>
       <th>Exception Type:</th>
@@ -309,7 +309,7 @@ TECHNICAL_500_TEMPLATE = """
     </tr>
     <tr>
       <th>Exception Value:</th>
-      <td>{{ exception_value }}</td>
+      <td>{{ exception_value|escape }}</td>
     </tr>
     <tr>
       <th>Exception Location:</th>
@@ -412,7 +412,7 @@ Traceback (most recent call last):<br/>
     &nbsp;&nbsp;{{ frame.lineno }}. {{ frame.context_line|escape }}<br/>
   {% endif %}
 {% endfor %}<br/>
-&nbsp;&nbsp;{{ exception_type }} at {{ request.path }}<br/>
+&nbsp;&nbsp;{{ exception_type }} at {{ request.path|escape }}<br/>
 &nbsp;&nbsp;{{ exception_value|escape }}</code>
           </td>
         </tr>
@@ -546,7 +546,7 @@ TECHNICAL_404_TEMPLATE = """
 <html lang="en">
 <head>
   <meta http-equiv="content-type" content="text/html; charset=utf-8" />
-  <title>Page not found at {{ request.path }}</title>
+  <title>Page not found at {{ request.path|escape }}</title>
   <meta name="robots" content="NONE,NOARCHIVE" />
   <style type="text/css">
     html * { padding:0; margin:0; }
@@ -576,7 +576,7 @@ TECHNICAL_404_TEMPLATE = """
       </tr>
       <tr>
         <th>Request URL:</th>
-      <td>{{ request_protocol }}://{{ request.META.HTTP_HOST }}{{ request.path }}</td>
+      <td>{{ request_protocol }}://{{ request.META.HTTP_HOST }}{{ request.path|escape }}</td>
       </tr>
     </table>
   </div>
@@ -591,7 +591,7 @@ TECHNICAL_404_TEMPLATE = """
           <li>{{ pattern|escape }}</li>
         {% endfor %}
       </ol>
-      <p>The current URL, <code>{{ request.path }}</code>, didn't match any of these.</p>
+      <p>The current URL, <code>{{ request.path|escape }}</code>, didn't match any of these.</p>
     {% else %}
       <p>{{ reason|escape }}</p>
     {% endif %}

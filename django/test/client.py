@@ -1,10 +1,9 @@
 from cStringIO import StringIO
-from django.contrib.admin.views.decorators import LOGIN_FORM_KEY, _encode_post_data
 from django.core.handlers.base import BaseHandler
 from django.core.handlers.wsgi import WSGIRequest
 from django.dispatch import dispatcher
 from django.http import urlencode, SimpleCookie
-from django.template import signals
+from django.test import signals
 from django.utils.functional import curry
 
 class ClientHandler(BaseHandler):
@@ -96,7 +95,7 @@ class Client:
     HTML rendered to the end-user.
     """
     def __init__(self, **defaults):
-        self.handler = TestHandler()
+        self.handler = ClientHandler()
         self.defaults = defaults
         self.cookie = SimpleCookie()
         
@@ -126,7 +125,7 @@ class Client:
         data = {}
         on_template_render = curry(store_rendered_templates, data)
         dispatcher.connect(on_template_render, signal=signals.template_rendered)
-
+        
         response = self.handler(environ)
         
         # Add any rendered template detail to the response
@@ -180,29 +179,38 @@ class Client:
     def login(self, path, username, password, **extra):
         """
         A specialized sequence of GET and POST to log into a view that
-        is protected by @login_required or a similar access decorator.
+        is protected by a @login_required access decorator.
         
-        path should be the URL of the login page, or of any page that
-        is login protected.
+        path should be the URL of the page that is login protected.
         
-        Returns True if login was successful; False if otherwise.        
+        Returns the response from GETting the requested URL after 
+        login is complete. Returns False if login process failed.
         """
-        # First, GET the login page. 
-        # This is required to establish the session.
+        # First, GET the page that is login protected. 
+        # This page will redirect to the login page.
         response = self.get(path)
+        if response.status_code != 302:
+            return False
+            
+        login_path, data = response['Location'].split('?')
+        next = data.split('=')[1]
+
+        # Second, GET the login page; required to set up cookies
+        response = self.get(login_path, **extra)
         if response.status_code != 200:
             return False
-
-        # Set up the block of form data required by the login page.
+            
+        # Last, POST the login data.
         form_data = {
             'username': username,
             'password': password,
-            'this_is_the_login_form': 1,
-            'post_data': _encode_post_data({LOGIN_FORM_KEY: 1})
+            'next' : next,
         }
-        response = self.post(path, data=form_data, **extra)
-        
-        # login page should give response 200 (if you requested the login
-        # page specifically), or 302 (if you requested a login
-        # protected page, to which the login can redirect).
-        return response.status_code in (200,302)
+        response = self.post(login_path, data=form_data, **extra)
+
+        # Login page should 302 redirect to the originally requested page
+        if response.status_code != 302 or response['Location'] != path:
+            return False
+
+        # Since we are logged in, request the actual page again
+        return self.get(path)

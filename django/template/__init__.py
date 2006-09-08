@@ -137,13 +137,14 @@ class StringOrigin(Origin):
         return self.source
 
 class Template(object):
-    def __init__(self, template_string, origin=None):
+    def __init__(self, template_string, origin=None, name='<Unknown Template>'):
         "Compilation stage"
         if settings.TEMPLATE_DEBUG and origin == None:
             origin = StringOrigin(template_string)
             # Could do some crazy stack-frame stuff to record where this string
             # came from...
         self.nodelist = compile_string(template_string, origin)
+        self.name = name
 
     def __iter__(self):
         for node in self.nodelist:
@@ -434,7 +435,7 @@ class TokenParser(object):
             while i < len(subject) and subject[i] != subject[p]:
                 i += 1
             if i >= len(subject):
-                raise TemplateSyntaxError, "Searching for value. Unexpected end of string in column %d: %s" % subject
+                raise TemplateSyntaxError, "Searching for value. Unexpected end of string in column %d: %s" % (i, subject)
             i += 1
             res = subject[p:i]
             while i < len(subject) and subject[i] in (' ', '\t'):
@@ -548,9 +549,12 @@ class FilterExpression(object):
             obj = resolve_variable(self.var, context)
         except VariableDoesNotExist:
             if ignore_failures:
-                return None
+                obj = None
             else:
-                return settings.TEMPLATE_STRING_IF_INVALID
+                if settings.TEMPLATE_STRING_IF_INVALID:
+                    return settings.TEMPLATE_STRING_IF_INVALID
+                else:
+                    obj = settings.TEMPLATE_STRING_IF_INVALID
         for func, args in self.filters:
             arg_vals = []
             for lookup, arg in args:

@@ -1,11 +1,41 @@
 import sys, time
 from django.conf import settings
+
 from django.db import backend, connect, connection, connection_info, connections
+from django.dispatch import dispatcher
+from django.test import signals
+from django.template import Template
 
 # The prefix to put on the default database name when creating
 # the test database.
 TEST_DATABASE_PREFIX = 'test_'
 
+def instrumented_test_render(self, context):
+    """An instrumented Template render method, providing a signal 
+    that can be intercepted by the test system Client
+    
+    """
+    dispatcher.send(signal=signals.template_rendered, sender=self, template=self, context=context)
+    return self.nodelist.render(context)
+    
+def setup_test_environment():
+    """Perform any global pre-test setup. This involves:
+        
+        - Installing the instrumented test renderer
+        
+    """
+    Template.original_render = Template.render
+    Template.render = instrumented_test_render
+    
+def teardown_test_environment():
+    """Perform any global post-test teardown. This involves:
+
+        - Restoring the original test renderer
+        
+    """
+    Template.render = Template.original_render
+    del Template.original_render
+    
 def _set_autocommit(connection):
     "Make sure a connection is in autocommit mode."
     if hasattr(connection.connection, "autocommit"):
@@ -55,12 +85,13 @@ def create_test_db(verbosity=1, autoclobber=False):
             else:
                 print "Tests cancelled."
                 sys.exit(1)
-        # Close the old connection
-        connection.close()
+               
+    connection.close()
+    settings.DATABASE_NAME = TEST_DATABASE_NAME
 
-        # Get a cursor (even though we don't need one yet). This has
-        # the side effect of initializing the test database.
-        cursor = connection.cursor()        
+    # Get a cursor (even though we don't need one yet). This has
+    # the side effect of initializing the test database.
+    cursor = connection.cursor()
 
     # Fill OTHER_DATABASES with the TEST_DATABASES settings,
     # and connect each named connection to the test database, using
@@ -87,15 +118,14 @@ def destroy_test_db(old_database_name, old_databases, verbosity=1):
     # connected to it.
     if verbosity >= 1:
         print "Destroying test database..."
-    if settings.DATABASE_ENGINE != "sqlite3": 
-        connection.close()
-        TEST_DATABASE_NAME = settings.DATABASE_NAME
-        settings.DATABASE_NAME = old_database_name
+    connection.close()
+    TEST_DATABASE_NAME = settings.DATABASE_NAME
+    settings.DATABASE_NAME = old_database_name
+
+    if settings.DATABASE_ENGINE != "sqlite3":
         settings.OTHER_DATABASES = old_databases
         cursor = connection.cursor()
         _set_autocommit(connection)
         time.sleep(1) # To avoid "database is being accessed by other users" errors.
         cursor.execute("DROP DATABASE %s" % backend.quote_name(TEST_DATABASE_NAME))
         connection.close()
-
-

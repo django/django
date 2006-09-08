@@ -8,7 +8,7 @@ def index(request, sitemaps):
     sites = []
     protocol = request.is_secure() and 'https' or 'http'
     for section in sitemaps.keys():
-        sitemap_url = urlresolvers.reverse('django.contrib.sitemap.views.sitemap', kwargs={'section': section})
+        sitemap_url = urlresolvers.reverse('django.contrib.sitemaps.views.sitemap', kwargs={'section': section})
         sites.append('%s://%s%s' % (protocol, current_site.domain, sitemap_url))
     xml = loader.render_to_string('sitemap_index.xml', {'sitemaps': sites})
     return HttpResponse(xml, mimetype='application/xml')

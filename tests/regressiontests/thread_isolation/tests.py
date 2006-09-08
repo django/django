@@ -34,8 +34,9 @@ except ImportError:
     # Import copy of _thread_local.py from Python 2.4
     from django.utils._threading_local import local
 
-
 # helpers
+EV = threading.Event()
+
 class LocalSettings:
     """Settings holder that allows thread-local overrides of defaults.
     """
@@ -69,7 +70,7 @@ def thread_two(func, *arg):
 
         debug("t2 ODB: %s", settings.OTHER_DATABASES)
         debug("t2 waiting")
-        ev.wait(2.0)
+        EV.wait(2.0)
         func(*arg)
         debug("t2 complete")
     t2 = threading.Thread(target=start)
@@ -94,7 +95,7 @@ def thread_three(func, *arg):
               connection.settings.DATABASE_NAME)
         
         debug("t3 waiting")
-        ev.wait(2.0)
+        EV.wait(2.0)
         func(*arg)
         debug("t3 complete")
     t3 = threading.Thread(target=start)
@@ -113,7 +114,6 @@ def start_response(code, headers):
 class TestThreadIsolation(unittest.TestCase):
     # event used to synchronize threads so we can be sure they are running
     # together
-    ev = threading.Event()
     lock = threading.RLock()
     errors = []
     
@@ -235,7 +235,7 @@ class TestThreadIsolation(unittest.TestCase):
         t3 = thread_three(MockHandler(self.request_three), env, start_response)
 
         try:
-            self.ev.set()
+            EV.set()
             MockHandler(self.request_one)(env, start_response)
         finally:
             t2.join()

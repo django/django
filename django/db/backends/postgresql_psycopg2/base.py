@@ -69,23 +69,9 @@ def quote_name(name):
         return name # Quoting once is enough.
     return '"%s"' % name
 
-def dictfetchone(cursor):
-    "Returns a row from the cursor as a dict"
-    # TODO: cursor.dictfetchone() doesn't exist in psycopg2,
-    # but no Django code uses this. Safe to remove?
-    return cursor.dictfetchone()
-
-def dictfetchmany(cursor, number):
-    "Returns a certain number of rows from a cursor as a dict"
-    # TODO: cursor.dictfetchmany() doesn't exist in psycopg2,
-    # but no Django code uses this. Safe to remove?
-    return cursor.dictfetchmany(number)
-
-def dictfetchall(cursor):
-    "Returns all rows from a cursor as a dict"
-    # TODO: cursor.dictfetchall() doesn't exist in psycopg2,
-    # but no Django code uses this. Safe to remove?
-    return cursor.dictfetchall()
+dictfetchone = util.dictfetchone
+dictfetchmany = util.dictfetchmany
+dictfetchall = util.dictfetchall
 
 def get_last_insert_id(cursor, table_name, pk_name):
     cursor.execute("SELECT CURRVAL('\"%s_%s_seq\"')" % (table_name, pk_name))

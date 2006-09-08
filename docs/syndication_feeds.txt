@@ -707,7 +707,7 @@ This example creates an Atom 1.0 feed and prints it to standard output::
     ...     title=u"My Weblog",
     ...     link=u"http://www.example.com/",
     ...     description=u"In which I write about what I ate today.",
-    ...     language=u"en"),
+    ...     language=u"en")
     >>> f.add_item(title=u"Hot dog today",
     ...     link=u"http://www.example.com/entries/1/",
     ...     description=u"<p>Today I had a Vienna Beef hot dog. It was pink, plump and perfect.</p>")
