@@ -221,7 +221,7 @@ class ConnectionInfoDescriptor(object):
     connections per instance, and always returns the same connection for an
     instance in particular thread during a particular request.
 
-    Any object that includes an attribute ``model`` that holds a model class
+    Any object that includes a ``model`` attribute that holds a model class
     can use this descriptor to manage connections.
     """
     
@@ -279,6 +279,7 @@ class LocalizingProxy:
         self.__kw = kw
         
     def __getattr__(self, attr):
+        # Private (__*) attributes are munged
         if attr.startswith('_LocalizingProxy'):
             return self.__dict__[attr]
         try:
@@ -289,6 +290,7 @@ class LocalizingProxy:
             return getattr(getattr(self.__storage, self.__name), attr)
 
     def __setattr__(self, attr, val):
+        # Private (__*) attributes are munged
         if attr.startswith('_LocalizingProxy'):
             self.__dict__[attr] = val
             return

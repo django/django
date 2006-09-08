@@ -587,6 +587,13 @@ locales have different formats. For example, U.S. English would say
 See `allowed date format strings`_. See also DATE_FORMAT, DATETIME_FORMAT,
 TIME_FORMAT and YEAR_MONTH_FORMAT.
 
+OTHER_DATABASES
+---------------
+
+Default: ``{}``
+
+Other database connections to use in addition to the default connection. See the `multiple database support docs`_.
+
 PREPEND_WWW
 -----------
 
@@ -852,6 +859,7 @@ TIME_FORMAT and MONTH_DAY_FORMAT.
 
 .. _cache docs: http://www.djangoproject.com/documentation/cache/
 .. _middleware docs: http://www.djangoproject.com/documentation/middleware/
+.. _muliple database support docs: http://www.djangoproject.com/documentation/multiple_database_support/
 .. _session docs: http://www.djangoproject.com/documentation/sessions/
 .. _See available choices: http://www.postgresql.org/docs/current/static/datetime-keywords.html#DATETIME-TIMEZONE-SET-TABLE
 .. _template documentation: http://www.djangoproject.com/documentation/templates_python/

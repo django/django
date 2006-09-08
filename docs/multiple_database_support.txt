@@ -69,8 +69,8 @@ Here's the example above, with ``MODELS``::
 Accessing a model's connection
 ==============================
 
-Each manager has a db attribute that can be used to access the model's
-connection. Access the db attribute of a model's manager to obtain the
+Each manager has a ``db`` attribute that can be used to access the model's
+connection. Access the ``db`` attribute of a model's manager to obtain the
 model's currently configured connection. 
 
 Example::
