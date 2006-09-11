@@ -492,7 +492,7 @@ def syncdb(verbosity=2, interactive=True):
     # to do at this point.
     for app in models.get_apps():
         dispatcher.send(signal=signals.post_syncdb, sender=app,
-            app=app, created_models=created_models, 
+            app=app, created_models=created_models,
             verbosity=verbosity, interactive=interactive)
 
         # Install initial data for the app (but only if this is a model we've
@@ -552,7 +552,7 @@ def diffsettings():
     # Inspired by Postfix's "postconf -n".
     from django.conf import settings, global_settings
 
-    user_settings = _module_to_dict(settings)
+    user_settings = _module_to_dict(settings._target)
     default_settings = _module_to_dict(global_settings)
 
     output = []
@@ -904,7 +904,7 @@ def get_validation_errors(outfile, app=None):
             rel_name = RelatedObject(f.rel.to, cls, f).get_accessor_name()
             rel_query_name = f.related_query_name()
             # If rel_name is none, there is no reverse accessor.
-            # (This only occurs for symmetrical m2m relations to self). 
+            # (This only occurs for symmetrical m2m relations to self).
             # If this is the case, there are no clashes to check for this field, as
             # there are no reverse descriptors for this field.
             if rel_name is not None:
@@ -1172,7 +1172,7 @@ def test(verbosity, app_labels):
         app_list = get_apps()
     else:
         app_list = [get_app(app_label) for app_label in app_labels]
-    
+
     test_path = settings.TEST_RUNNER.split('.')
     # Allow for Python 2.5 relative paths
     if len(test_path) > 1:
@@ -1181,7 +1181,7 @@ def test(verbosity, app_labels):
         test_module_name = '.'
     test_module = __import__(test_module_name, [],[],test_path[-1])
     test_runner = getattr(test_module, test_path[-1])
-    
+
     test_runner(app_list, verbosity)
 test.help_doc = 'Runs the test suite for the specified applications, or the entire site if no apps are specified'
 test.args = '[--verbosity] ' + APP_ARGS
