@@ -61,6 +61,15 @@ msgstr "Søndag Mandag Tirsdag Onsdag Torsdag Fredag Lørdag"
 msgid "S M T W T F S"
 msgstr "S M T O T F L"
 
+#: contrib/admin/media/js/admin/CollapsedFieldsets.js:34
+#: contrib/admin/media/js/admin/CollapsedFieldsets.js:72
+msgid "Show"
+msgstr "Vis"
+
+#: contrib/admin/media/js/admin/CollapsedFieldsets.js:63
+msgid "Hide"
+msgstr "Skjul"
+
 #: contrib/admin/media/js/admin/DateTimeShortcuts.js:45
 #: contrib/admin/media/js/admin/DateTimeShortcuts.js:80
 msgid "Now"
@@ -80,7 +89,7 @@ msgstr "24.00"
 
 #: contrib/admin/media/js/admin/DateTimeShortcuts.js:82
 msgid "6 a.m."
-msgstr "18.00"
+msgstr "06.00"
 
 #: contrib/admin/media/js/admin/DateTimeShortcuts.js:83
 msgid "Noon"
