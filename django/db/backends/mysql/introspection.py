@@ -36,6 +36,7 @@ def get_relations(cursor, table_name):
             SELECT column_name, referenced_table_name, referenced_column_name
             FROM information_schema.key_column_usage
             WHERE table_name = %s
+                AND table_schema = DATABASE()
                 AND referenced_table_name IS NOT NULL
                 AND referenced_column_name IS NOT NULL""", [table_name])
         constraints.extend(cursor.fetchall())
