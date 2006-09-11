@@ -42,7 +42,7 @@ def get_relations(cursor, table_name):
     except (ProgrammingError, OperationalError):
         # Fall back to "SHOW CREATE TABLE", for previous MySQL versions.
         # Go through all constraints and save the equal matches.
-        cursor.execute("SHOW CREATE TABLE %s" % table_name)
+        cursor.execute("SHOW CREATE TABLE %s" % quote_name(table_name))
         for row in cursor.fetchall():
             pos = 0
             while True:
