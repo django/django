@@ -80,12 +80,15 @@ class RowLevelPermissionManager(models.Manager):
                                           owner_id=user.id, permission=perm.id, 
                                           model_ct=model_ct
                                           ).values('model_id')   
-        user_group_list = [g['id'] for g in user.groups.select_related().values('id')]
-        group_model_ids = RowLevelPermission.objects.filter(owner_ct=ContentType.objects.get_for_model(Group).id,
-                                          owner_id__in=user_group_list,
-                                          model_ct = model_ct
-                                          ).values('model_id')
-        id_list = [o['model_id'] for o in user_model_ids] + [o['model_id'] for o in group_model_ids]
+        id_list = [o['model_id'] for o in user_model_ids]        
+        
+        user_group_list = [g['id'] for g in user.groups.select_related().values('id')]        
+        if user_group_list:
+            group_model_ids = RowLevelPermission.objects.filter(owner_ct=ContentType.objects.get_for_model(Group).id,
+                                                  owner_id__in=user_group_list,
+                                                  model_ct = model_ct
+                                                  ).values('model_id')
+            id_list.append([o['model_id'] for o in group_model_ids])
         return id_list
 
 class RowLevelPermission(models.Model):
