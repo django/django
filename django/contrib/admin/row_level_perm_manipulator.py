@@ -33,13 +33,14 @@ class ChangeRLPManipulator(forms.Manipulator):
 
         model_ct = rlp.model_ct
         model = model_ct.get_object_for_this_type (pk=rlp.model_id)
+        model_id = rlp.model_id
         
         perm = Permission.objects.get(pk=new_data['perm'])
         
         
         field_name_list = ('owner_ct', 'owner_id', 'model_ct', 'model_id', 'permission')
         field_data = owner_ct.id
-        all_data = {'owner_id':owner.id, 'model_ct_id':model_ct.id, 'model_id':model.id, 'permission_id':perm.id}
+        all_data = {'owner_id':owner.id, 'model_ct_id':model_ct.id, 'model_id':model_id, 'permission_id':perm.id}
         manipulators.manipulator_validator_unique_together(field_name_list, self.opts, self, field_data, all_data)
         
         rlp.owner = owner

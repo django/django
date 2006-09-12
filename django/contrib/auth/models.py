@@ -54,8 +54,8 @@ class RowLevelPermissionManager(models.Manager):
             permission = Permission.objects.get(codename__exact=permission, content_type=model_ct.id)
         if model_ct != permission.content_type:
             raise TypeError, "Invalid value: Permission content type(%s) and object content type(%s) do not match" % (permission.content_type, type_ct)
-        
-        rowLvlPerm = self.model(model_id=model_instance.id, model_ct=model_ct,
+        model_id = model_instance._get_pk_val()
+        rowLvlPerm = self.model(model_id=model_id, model_ct=model_ct,
                                                  owner_id=owner.id, owner_ct=ContentType.objects.get_for_model(owner),
                                                  permission=permission, negative=negative)
         rowLvlPerm.save()
@@ -287,7 +287,8 @@ class User(models.Model):
             except Permission.DoesNotExist:
                 return False
         try:
-            row_level_perm=self.row_level_permissions_owned.get(model_id=object.id, 
+            model_id = object._get_pk_val()
+            row_level_perm=self.row_level_permissions_owned.get(model_id=model_id, 
                                                                     model_ct=object_ct.id, 
                                                                     permission=permission.id)
         except RowLevelPermission.DoesNotExist:
@@ -303,6 +304,7 @@ class User(models.Model):
         #AND rlp."model_id"=%s
         #AND rlp."model_ct_id"=%s
         #AND rlp."permission_id"=%s;
+        model_id = object._get_pk_val()
         cursor = connection.cursor()        
         sql = """
             SELECT rlp.%s
@@ -322,7 +324,7 @@ class User(models.Model):
             backend.quote_name('negative'))
         cursor.execute(sql, [self.id, 
                              ContentType.objects.get_for_model(Group).id, 
-                             object.id,
+                             model_id,
                              ContentType.objects.get_for_model(object).id,
                              permission.id,])
         row = cursor.fetchone()
