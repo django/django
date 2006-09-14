@@ -408,8 +408,8 @@ def _install(app, commit=True, initial_data=True):
             if not model in models_installed:
                 new_pending = manager.install(initial_data=initial_data)
                 created_models.append(model)
-                for model, statements in new_pending.items():
-                    pending.setdefault(model, []).extend(statements)
+                for dep_model, statements in new_pending.items():
+                    pending.setdefault(dep_model, []).extend(statements)
             # Execute any pending statements that were waiting for this model
             if model in pending:
                 for statement in pending.pop(model):
