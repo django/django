@@ -13,20 +13,14 @@ except ImportError, e:
 
 DatabaseError = Database.DatabaseError
 
-try:
-    # Only exists in Python 2.4+
-    from threading import local
-except ImportError:
-    # Import copy of _thread_local.py from Python 2.4
-    from django.utils._threading_local import local
-
-class DatabaseWrapper(local):
-    def __init__(self):
+class DatabaseWrapper(object):
+    def __init__(self, settings):
+        self.settings = settings
         self.connection = None
         self.queries = []
 
     def cursor(self):
-        from django.conf import settings
+        settings = self.settings
         if self.connection is None:
             if settings.DATABASE_NAME == '':
                 from django.core.exceptions import ImproperlyConfigured

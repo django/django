@@ -47,14 +47,7 @@ def variantToPython(variant, adType):
     return res
 Database.convertVariantToPython = variantToPython
 
-try:
-    # Only exists in Python 2.4+
-    from threading import local
-except ImportError:
-    # Import copy of _thread_local.py from Python 2.4
-    from django.utils._threading_local import local
-
-class DatabaseWrapper(local):
+class DatabaseWrapper(object):
     def __init__(self, settings):
         self.settings = settings
         self.connection = None
