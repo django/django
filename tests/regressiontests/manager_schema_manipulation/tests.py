@@ -123,7 +123,7 @@
 >>> PA._default_manager.db.backend.supports_constraints = True
 >>> result = PA.objects.install()
 >>> result
-{<class 'regressiontests.manager_schema_manipulation.tests.PC'>: [BoundStatement('ALTER TABLE "msm_pa" ADD CONSTRAINT "id_refs_c_id..." FOREIGN KEY ("c_id") REFERENCES "msm_pc" ("id");')]}
+{<class 'regressiontests.manager_schema_manipulation.tests.PC'>: [(<class 'regressiontests.manager_schema_manipulation.tests.PA'>, <django.db.models.fields.related.ForeignKey ...>)]}
 
 # NOTE: restore real constraint flag
 >>> PA._default_manager.db.backend.supports_constraints = real_cnst

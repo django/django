@@ -73,11 +73,14 @@ def get_sql_create(app):
     # final output will be divided by comments into sections for each
     # named connection, if there are any named connections
     connection_output = {}
-    pending_references = {}
+    pending = {}
     final_output = []
     
     app_models = models.get_models(app, creation_order=True)
     for model in app_models:
+
+        print "Get create sql for model", model
+        
         opts = model._meta
         connection_name = model_connection_name(model)
         output = connection_output.setdefault(connection_name, [])
@@ -109,21 +112,14 @@ def get_sql_create(app):
             # table list.
             tables = []
 
-        installed_models = [ model for model in
+        installed_models = [ m for m in
                              manager.get_installed_models(tables)
-                             if model not in app_models ]
+                             if m not in app_models ]
         models_output = set(installed_models) 
         builder = creation.builder
         builder.models_already_seen.update(models_output)
-        model_output, references = builder.get_create_table(model, style)
+        model_output, pending = builder.get_create_table(model, style, pending)
         output.extend(model_output)
-        for refto, refs in references.items():
-            try:
-                pending_references[refto].extend(refs)
-            except KeyError:
-                pending_references[refto] = refs
-        if model in pending_references:
-            output.extend(pending_references.pop(model))
 
         # Create the many-to-many join tables.
         many_many = builder.get_create_many_to_many(model, style)
@@ -131,14 +127,18 @@ def get_sql_create(app):
             output.extend(statements)
 
     final_output = _collate(connection_output)
+    
     # Handle references to tables that are from other apps
     # but don't exist physically
-    not_installed_models = set(pending_references.keys())
+    not_installed_models = set(pending.keys())
     if not_installed_models:
         alter_sql = []
         for model in not_installed_models:
-            alter_sql.extend(['-- ' + sql
-                              for sql in pending_references.pop(model)])
+            builder = model._default_manager.db.builder.get_creation_module().builder
+            
+            for rel_class, f in pending[model]:
+                sql = builder._ref_sql(model, rel_class, f, style)
+                alter_sql.extend(['-- ', str(sql)])
         if alter_sql:
             final_output.append('-- The following references should be added '
                                 'but depend on non-existent tables:')
@@ -406,22 +406,20 @@ def _install(app, commit=True, initial_data=True):
             models_installed = manager.get_installed_models(tables)
             # Don't re-install already-installed models
             if not model in models_installed:
-                new_pending = manager.install(initial_data=initial_data)
+                pending = manager.install(initial_data=initial_data,
+                                          pending=pending)
                 created_models.append(model)
-                for dep_model, statements in new_pending.items():
-                    pending.setdefault(dep_model, []).extend(statements)
-            # Execute any pending statements that were waiting for this model
-            if model in pending:
-                for statement in pending.pop(model):
-                    statement.execute()                
+                
         if pending:            
-            for model, statements in pending.items():
-                manager = model._default_manager 
-                tables = manager.get_table_list()
-                models_installed = manager.get_installed_models(tables)
+            models_installed = manager.get_installed_models(tables)
+
+            for model in pending.keys():
                 if model in models_installed:
-                    for statement in statements:
-                        statement.execute()
+                    for rel_class, f in pending[model]:
+                        manager = model._default_manager 
+                        for statement in manager.get_pending(rel_class, f):
+                            statement.execute()
+                    pending.pop(model)
                 else:
                     raise Exception("%s is not installed, but there are "
                                     "pending statements that need it: %s"

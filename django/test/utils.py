@@ -66,19 +66,19 @@ def create_test_db(verbosity=1, autoclobber=False):
         cursor = connection.cursor()
         _set_autocommit(connection)
         try:
-            cursor.execute("CREATE DATABASE %s" % qn(db_name))
+            cursor.execute("CREATE DATABASE %s" % qn(TEST_DATABASE_NAME))
         except Exception, e:            
             sys.stderr.write("Got an error creating the test database: %s\n" % e)
             if not autoclobber:
-                confirm = raw_input("It appears the test database, %s, already exists. Type 'yes' to delete it, or 'no' to cancel: " % db_name)
+                confirm = raw_input("It appears the test database, %s, already exists. Type 'yes' to delete it, or 'no' to cancel: " % TEST_DATABASE_NAME)
             if autoclobber or confirm == 'yes':
                 try:
                     if verbosity >= 1:
                         print "Destroying old test database..."                
-                    cursor.execute("DROP DATABASE %s" % qn(db_name))
+                    cursor.execute("DROP DATABASE %s" % qn(TEST_DATABASE_NAME))
                     if verbosity >= 1:
                         print "Creating test database..."
-                    cursor.execute("CREATE DATABASE %s" % qn(db_name))
+                    cursor.execute("CREATE DATABASE %s" % qn(TEST_DATABASE_NAME))
                 except Exception, e:
                     sys.stderr.write("Got an error recreating the test database: %s\n" % e)
                     sys.exit(2)
@@ -118,12 +118,15 @@ def destroy_test_db(old_database_name, old_databases, verbosity=1):
     # connected to it.
     if verbosity >= 1:
         print "Destroying test database..."
-    connection.close()
+    for cnx in connections.keys():
+        connections[cnx].close()
     TEST_DATABASE_NAME = settings.DATABASE_NAME
     settings.DATABASE_NAME = old_database_name
 
     if settings.DATABASE_ENGINE != "sqlite3":
         settings.OTHER_DATABASES = old_databases
+        for cnx in connections.keys():
+            connections[cnx].connection.cursor()
         cursor = connection.cursor()
         _set_autocommit(connection)
         time.sleep(1) # To avoid "database is being accessed by other users" errors.

@@ -118,7 +118,7 @@ class Manager(object):
     # SCHEMA MANIPULATION #
     #######################
 
-    def install(self, initial_data=False):
+    def install(self, initial_data=False, pending=None):
         """Install my model's table, indexes and (if requested) initial data.
 
         Returns a dict of pending statements, keyed by the model that
@@ -127,8 +127,10 @@ class Manager(object):
         such as foreign key constraints for tables that don't exist at
         install time.)
         """
+        if pending is None:
+            pending = {}
         builder = self.db.get_creation_module().builder
-        run, pending = builder.get_create_table(self.model)
+        run, pending = builder.get_create_table(self.model, pending=pending)
         run += builder.get_create_indexes(self.model)
         many_many = builder.get_create_many_to_many(self.model)
 
@@ -143,6 +145,10 @@ class Manager(object):
         if initial_data:
             self.load_initial_data()
         return pending
+
+    def get_pending(self, rel_class, f):
+        builder = self.db.get_creation_module().builder
+        return builder.get_ref_sql(self.model, rel_class, f)
 
     def load_initial_data(self):
         """Install initial data for model in db, Returns statements executed.

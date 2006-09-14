@@ -50,7 +50,7 @@ class SchemaBuilder(object):
         # table cache; set to short-circuit table lookups
         self.tables = None
         
-    def get_create_table(self, model, style=None):
+    def get_create_table(self, model, style=None, pending=None):
         """Construct and return the SQL expression(s) needed to create the
         table for the given model, and any constraints on that
         table. The return value is a 2-tuple. The first element of the tuple
@@ -61,6 +61,8 @@ class SchemaBuilder(object):
         """
         if style is None:
             style = default_style
+        if pending is None:
+            pending = {}
         self.models_already_seen.add(model)
         
         opts = model._meta
@@ -70,13 +72,6 @@ class SchemaBuilder(object):
         data_types = db.get_creation_module().DATA_TYPES
         table_output = []
 
-        # pending field references, keyed by the model class
-        # they reference
-        pending_references = {}
-
-        # pending statements to execute, keyed by
-        # the model class they reference
-        pending = {}
         for f in opts.fields:
             if isinstance(f, models.ForeignKey):
                 rel_field = f.rel.get_related_field()
@@ -108,7 +103,7 @@ class SchemaBuilder(object):
                     else:
                         # We haven't yet created the table to which this field
                         # is related, so save it for later.
-                        pending_references.setdefault(f.rel.to, []).append(f)
+                        pending.setdefault(f.rel.to, []).append((model, f))
                 table_output.append(' '.join(field_output))
         if opts.order_with_respect_to:
             table_output.append(style.SQL_FIELD(quote_name('_order')) + ' ' + \
@@ -128,24 +123,15 @@ class SchemaBuilder(object):
         full_statement.append(');')
         create = [BoundStatement('\n'.join(full_statement), db.connection)]
 
-        if (pending_references and
+        # Pull out any pending statements for me
+        if (pending and
             backend.supports_constraints):
-            for rel_class, cols in pending_references.items():
-                for f in cols:
-                    rel_opts = rel_class._meta
-                    r_table = rel_opts.db_table
-                    r_col = f.column
-                    table = opts.db_table
-                    col = opts.get_field(f.rel.field_name).column
-                    # For MySQL, r_name must be unique in the first 64 
-                    # characters. So we are careful with character usage here.
-                    r_name = '%s_refs_%s_%x' % (col, r_col,
-                                                abs(hash((r_table, table))))
-                    sql = style.SQL_KEYWORD('ALTER TABLE') + ' %s ADD CONSTRAINT %s FOREIGN KEY (%s) REFERENCES %s (%s);' % \
-                        (quote_name(table), quote_name(r_name),
-                        quote_name(r_col), quote_name(r_table), quote_name(col))
-                    pending.setdefault(rel_class, []).append(
-                        BoundStatement(sql, db.connection))
+            if model in pending:
+                for rel_class, f in pending[model]:
+                    create.append(self.get_ref_sql(model, rel_class, f,
+                                                   style=style))
+                # What was pending for me is now no longer pending
+                pending.pop(model)
         return (create, pending)    
 
     def get_create_indexes(self, model, style=None):
@@ -322,7 +308,32 @@ class SchemaBuilder(object):
                                           'PositiveSmallIntegerField')) \
                                           and 'IntegerField' \
                                           or f.get_internal_type()
-    
+
+    def get_ref_sql(self, model, rel_class, f, style=None):
+        """Get sql statement for a reference between model and rel_class on
+        field f.
+        """
+        if style is None:
+            style = default_style
+        
+        db = model._default_manager.db
+        qn = db.backend.quote_name
+        opts = model._meta
+        rel_opts = rel_class._meta
+        table = rel_opts.db_table
+        r_col = f.column
+        r_table = opts.db_table
+        col = opts.get_field(f.rel.field_name).column
+        # For MySQL, r_name must be unique in the first 64 
+        # characters. So we are careful with character usage here.
+        r_name = '%s_refs_%s_%x' % (col, r_col,
+                                    abs(hash((r_table, table))))
+        sql = style.SQL_KEYWORD('ALTER TABLE') + \
+              ' %s ADD CONSTRAINT %s FOREIGN KEY (%s) REFERENCES %s (%s);' % \
+              (qn(table), qn(r_name),
+               qn(r_col), qn(r_table), qn(col))
+        return BoundStatement(sql, db.connection)
+        
     def get_references(self):
         """Fill (if needed) and return the reference cache.
         """

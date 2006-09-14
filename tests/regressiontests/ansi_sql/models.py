@@ -20,7 +20,7 @@ Set([<class 'regressiontests.ansi_sql.models.Car'>])
 # test pending relationships
 >>> builder.models_already_seen = set()
 >>> builder.get_create_table(Mod)
-([BoundStatement('CREATE TABLE "ansi_sql_mod" (..."car_id" integer NOT NULL,...);')], {<class 'regressiontests.ansi_sql.models.Car'>: [BoundStatement('ALTER TABLE "ansi_sql_mod" ADD CONSTRAINT ... FOREIGN KEY ("car_id") REFERENCES "ansi_sql_car" ("id");')]})
+([BoundStatement('CREATE TABLE "ansi_sql_mod" (..."car_id" integer NOT NULL,...);')], {<class 'regressiontests.ansi_sql.models.Car'>: [(<class 'regressiontests.ansi_sql.models.Mod'>, <django.db.models.fields.related.ForeignKey...>)]})
 >>> builder.models_already_seen = set()
 >>> builder.get_create_table(Car)
 ([BoundStatement('CREATE TABLE "ansi_sql_car" (...);')], {})
@@ -45,7 +45,7 @@ Set([<class 'regressiontests.ansi_sql.models.Car'>])
 # patch builder so that it looks for initial data where we want it to
 # >>> builder.get_initialdata_path = othertests_sql
 >>> builder.get_initialdata(Car)
-[BoundStatement('insert into ansi_sql_car (...)...values (...);')]
+[BoundStatement("insert into ansi_sql_car (...)...values (...);...")]
 
 # test drop
 >>> builder.get_drop_table(Mod)

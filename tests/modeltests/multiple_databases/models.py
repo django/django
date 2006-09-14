@@ -78,19 +78,20 @@ __test__ = {'API_TESTS': """
 >>> from django.db import connection, connections, _default, model_connection_name
 >>> from django.conf import settings
 
-# The default connection is in there, but let's ignore it
+# Connections are referenced by name
+>>> connections['_a']
+Connection: ...
+>>> connections['_b']
+Connection: ...
+
+# Let's see what connections are available.The default connection is
+# in there, but let's ignore it
 
 >>> non_default = connections.keys()
 >>> non_default.remove(_default)
 >>> non_default.sort()
 >>> non_default
 ['_a', '_b']
-
-# Each connection references its settings
->>> connections['_a'].settings.DATABASE_NAME == settings.OTHER_DATABASES['_a']['DATABASE_NAME']
-True
->>> connections['_b'].settings.DATABASE_NAME == settings.OTHER_DATABASES['_b']['DATABASE_NAME']
-True
     
 # Invalid connection names raise ImproperlyConfigured
 >>> connections['bad']
