@@ -270,7 +270,7 @@ In your Web root directory, add this to a file named ``.htaccess`` ::
     AddHandler fastcgi-script .fcgi
     RewriteEngine On
     RewriteCond %{REQUEST_FILENAME} !-f
-    RewriteRule ^/(.*)$ /mysite.fcgi/$1 [QSA,L]
+    RewriteRule ^(.*)$ mysite.fcgi/$1 [QSA,L]
 
 Then, create a small script that tells Apache how to spawn your FastCGI
 program. Create a file ``mysite.fcgi`` and place it in your Web directory, and
@@ -289,7 +289,7 @@ be sure to make it executable ::
     os.environ['DJANGO_SETTINGS_MODULE'] = "myproject.settings"
 
     from django.core.servers.fastcgi import runfastcgi
-    runfastcgi(["method=threaded", "daemonize=false"])
+    runfastcgi(method="threaded", daemonize="false")
 
 Restarting the spawned server
 -----------------------------
