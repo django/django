@@ -78,9 +78,6 @@ def get_sql_create(app):
     
     app_models = models.get_models(app, creation_order=True)
     for model in app_models:
-
-        print "Get create sql for model", model
-        
         opts = model._meta
         connection_name = model_connection_name(model)
         output = connection_output.setdefault(connection_name, [])
