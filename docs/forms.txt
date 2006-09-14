@@ -321,7 +321,7 @@ about editing an existing one? It's shockingly similar to creating a new one::
         else:
             errors = {}
             # This makes sure the form accurate represents the fields of the place.
-            new_data = place.__dict__
+            new_data = manipulator.flatten_data()
 
         form = forms.FormWrapper(manipulator, new_data, errors)
         return render_to_response('places/edit_form.html', {'form': form, 'place': place})
@@ -336,10 +336,10 @@ The only real differences are:
     * ``ChangeManipulator.original_object`` stores the instance of the
       object being edited.
 
-    * We set ``new_data`` to the original object's ``__dict__``. This makes
-      sure the form fields contain the current values of the object.
-      ``FormWrapper`` does not modify ``new_data`` in any way, and templates
-      cannot, so this is perfectly safe.
+    * We set ``new_data`` based upon ``flatten_data()`` from the manipulator.
+      ``flatten_data()`` takes the data from the original object under 
+      manipulation, and converts it into a data dictionary that can be used 
+      to populate form elements with the existing values for the object.
 
     * The above example uses a different template, so create and edit can be
       "skinned" differently if needed, but the form chunk itself is completely
