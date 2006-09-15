@@ -103,7 +103,8 @@ class SchemaBuilder(object):
                     else:
                         # We haven't yet created the table to which this field
                         # is related, so save it for later.
-                        pending.setdefault(f.rel.to, []).append((model, f))
+                        if backend.supports_constraints:
+                            pending.setdefault(f.rel.to, []).append((model, f))
                 table_output.append(' '.join(field_output))
         if opts.order_with_respect_to:
             table_output.append(style.SQL_FIELD(quote_name('_order')) + ' ' + \
@@ -124,8 +125,7 @@ class SchemaBuilder(object):
         create = [BoundStatement('\n'.join(full_statement), db.connection)]
 
         # Pull out any pending statements for me
-        if (pending and
-            backend.supports_constraints):
+        if pending:
             if model in pending:
                 for rel_class, f in pending[model]:
                     create.append(self.get_ref_sql(model, rel_class, f,

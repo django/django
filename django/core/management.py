@@ -411,16 +411,15 @@ def _install(app, commit=True, initial_data=True):
             models_installed = manager.get_installed_models(tables)
 
             for model in pending.keys():
+                manager = model._default_manager
                 if model in models_installed:
                     for rel_class, f in pending[model]:
-                        manager = model._default_manager 
                         for statement in manager.get_pending(rel_class, f):
                             statement.execute()
                     pending.pop(model)
                 else:
-                    raise Exception("%s is not installed, but there are "
-                                    "pending statements that need it: %s"
-                                    % (model, statements))
+                    raise Exception("%s is not installed, but it has pending "
+                                    "references" % model)
     except Exception, e:
         import traceback
         print traceback.format_exception(*sys.exc_info())
