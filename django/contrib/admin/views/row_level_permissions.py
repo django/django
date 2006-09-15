@@ -124,7 +124,8 @@ def delete_row_level_permission(request, app_label, model_name, object_id, ct_id
         ct = rlp.model_ct
         obj = rlp.model
 
-        if not (model_instance.id == rlp.model_id):
+        model_id = model_instance._get_pk_val()
+        if not (model_id == rlp.model_id):
             raise PermissionDenied
 
         if not request.user.has_perm(rlp._meta.app_label + '.' + rlp._meta.get_delete_permission()):
