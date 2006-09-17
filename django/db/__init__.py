@@ -14,6 +14,8 @@ __all__ = ('backend', 'connection', 'DatabaseError')
 
 # singleton to represent the default connection in connections
 class dummy(object):
+    def __repr__(self):
+        return self.__str__()    
     def __str__(self):
         return '<default>'
 _default = dummy()
@@ -28,22 +30,12 @@ if not settings.DATABASE_ENGINE:
     settings.DATABASE_ENGINE = 'dummy'
 
 
-def connect(settings):
+def connect(settings, **kw):
     """Connect to the database specified in settings. Returns a
     ConnectionInfo on success, raises ImproperlyConfigured if the
     settings don't specify a valid database connection.
     """
-    info = ConnectionInfo(settings)
-
-    # Register an event that closes the database connection
-    # when a Django request is finished.
-    dispatcher.connect(info.close, signal=signals.request_finished)
-    
-    # Register an event that resets connection.queries
-    # when a Django request is started.
-    dispatcher.connect(info.reset_queries, signal=signals.request_started)
-
-    return info
+    return ConnectionInfo(settings, **kw)
 
     
 class ConnectionInfo(object):
@@ -52,7 +44,8 @@ class ConnectionInfo(object):
     creation, introspection, and shell modules, closing the
     connection, and resetting the connection's query log.
     """
-    def __init__(self, settings=None):
+    def __init__(self, settings=None, **kw):
+        super(ConnectionInfo, self).__init__(**kw)
         if settings is None:
             from django.conf import settings
         self.settings = settings
@@ -60,6 +53,14 @@ class ConnectionInfo(object):
         self.connection = self.backend.DatabaseWrapper(settings)
         self.DatabaseError = self.backend.DatabaseError
 
+        # Register an event that closes the database connection
+        # when a Django request is finished.
+        dispatcher.connect(self.close, signal=signals.request_finished)
+    
+        # Register an event that resets connection.queries
+        # when a Django request is started.
+        dispatcher.connect(self.reset_queries, signal=signals.request_started)
+        
     def __repr__(self):
         return "Connection: %r (ENGINE=%s NAME=%s)" \
                % (self.connection,
@@ -114,7 +115,7 @@ class ConnectionInfo(object):
         """Reset log of queries executed by connection"""
         self.connection.queries = []
 
-    
+
 class LazyConnectionManager(object):
     """Manages named connections lazily, instantiating them as
     they are requested.
@@ -123,8 +124,14 @@ class LazyConnectionManager(object):
         self.local = local()
         self.local.connections = {}
 
+        # Reset connections on request finish, to make sure each request can
+        # load the correct connections for its settings
+        dispatcher.connect(self.reset, signal=signals.request_finished)
+        
     def __iter__(self):
-        return self.local.connections.keys()
+        # Iterates only over *active* connections, not all possible
+        # connections
+        return iter(self.local.connections.keys())
 
     def __getattr__(self, attr):
         return getattr(self.local.connections, attr)
@@ -177,10 +184,27 @@ class LazyConnectionManager(object):
         cnx[name] = connect(database)
         return cnx[name]
 
+    def items(self):
+        # Iterates over *all possible* connections
+        items = []
+        for key in self.keys():
+            items.append((key, self[key]))
+        return items
+    
+    def keys(self):
+        # Iterates over *all possible* connections
+        keys = [_default]
+        try:
+            keys.extend(settings.OTHER_DATABASES.keys())
+        except AttributeError:
+            pass
+        return keys
+    
     def reset(self):
+        if not hasattr(self.local, 'connections'):
+            return
         self.local.connections = {}
-
-
+        
 def model_connection_name(klass):
     """Get the connection name that a model is configured to use, with the
     current settings.
@@ -261,10 +285,11 @@ class ConnectionInfoDescriptor(object):
 
     def get_connection(self, instance):
         return connections[model_connection_name(instance.model)]
-            
-    def reset(self):
-        self.local.cnx = {}
 
+    def reset(self):
+        if not hasattr(self.local, 'cnx'):
+            return
+        self.local.cnx = {}
 
 class LocalizingProxy:
     """A lazy-initializing proxy. The proxied object is not
@@ -277,6 +302,13 @@ class LocalizingProxy:
         self.__func = func
         self.__arg = arg
         self.__kw = kw
+
+        # We need to clear out this thread's storage at the end of each
+        # request, in case new settings are loaded with the next
+        def reset(stor=storage, name=name):
+            if hasattr(stor, name):
+                delattr(stor, name)
+        dispatcher.connect(reset, signal=signals.request_finished)
         
     def __getattr__(self, attr):
         # Private (__*) attributes are munged
@@ -295,13 +327,12 @@ class LocalizingProxy:
             self.__dict__[attr] = val
             return
         try:
-            print self.__storage, self.__name
             stor = getattr(self.__storage, self.__name)            
         except AttributeError:
             stor =  self.__func(*self.__arg)
             setattr(self.__storage, self.__name, stor)
         setattr(stor, attr, val)
-    
+
 
 # Create a manager for named connections
 connections = LazyConnectionManager()
@@ -325,11 +356,6 @@ get_creation_module = LocalizingProxy(
     lambda: connections[_default].get_creation_module)
 runshell = LocalizingProxy('runshell', _local,
                            lambda: connections[_default].runshell)
-
-
-# Reset connections on request finish, to make sure each request can
-# load the correct connections for its settings
-dispatcher.connect(connections.reset, signal=signals.request_finished)
 
 
 # Register an event that rolls back all connections

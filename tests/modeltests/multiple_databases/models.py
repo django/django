@@ -84,22 +84,24 @@ Connection: ...
 >>> connections['_b']
 Connection: ...
 
-# Let's see what connections are available.The default connection is
-# in there, but let's ignore it
+# Let's see what connections are available. The default connection is always
+# included in connections as well, and may be accessed as connections[_default].
 
->>> non_default = connections.keys()
->>> non_default.remove(_default)
->>> non_default.sort()
->>> non_default
-['_a', '_b']
+>>> connection_names = connections.keys()
+>>> connection_names.sort()
+>>> connection_names
+[<default>, '_a', '_b']
     
 # Invalid connection names raise ImproperlyConfigured
+
 >>> connections['bad']
 Traceback (most recent call last):
  ...
 ImproperlyConfigured: No database connection 'bad' has been configured
 
-# Models can access their connections through their managers
+# The model_connection_name() function will tell you the name of the
+# connection that a model is configured to use.
+
 >>> model_connection_name(Artist)
 '_a'
 >>> model_connection_name(Widget)
@@ -115,6 +117,15 @@ True
 >>> artists = Artist.objects.all()
 >>> list(artists)
 [<Artist: Paul Klee>]
+
+# Models can access their connections through the db property of their
+# default manager.
+
+>>> paul = _[0]
+>>> Artist.objects.db
+Connection: ... (ENGINE=... NAME=...)
+>>> paul._default_manager.db
+Connection: ... (ENGINE=... NAME=...)
 
 # When transactions are not managed, model save will commit only
 # for the model's connection.

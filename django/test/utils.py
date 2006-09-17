@@ -1,6 +1,5 @@
 import sys, time
 from django.conf import settings
-
 from django.db import backend, connect, connection, connection_info, connections
 from django.dispatch import dispatcher
 from django.test import signals
@@ -94,23 +93,15 @@ def create_test_db(verbosity=1, autoclobber=False):
     cursor = connection.cursor()
 
     # Fill OTHER_DATABASES with the TEST_DATABASES settings,
-    # and connect each named connection to the test database, using
-    # a separate connection instance for each (so, eg, transactions don't
-    # collide)
+    # and connect each named connection to the test database.
     test_databases = {}
     for db_name in settings.TEST_DATABASES:
-        if settings.DATABASE_ENGINE == 'sqlite3':
-            full_name = TEST_DATABASE_NAME
-        else:
-            full_name = TEST_DATABASE_NAME + db_name
-        db_st = {'DATABASE_NAME': full_name}
+        db_st = {'DATABASE_NAME': TEST_DATABASE_NAME}
         if db_name in settings.TEST_DATABASE_MODELS:
             db_st['MODELS'] = settings.TEST_DATABASE_MODELS.get(db_name, [])
         test_databases[db_name] = db_st
-        connections[db_name] = connect(connection_info.settings)
-        connections[db_name].connection.cursor() # Initialize it
     settings.OTHER_DATABASES = test_databases
-
+    
 def destroy_test_db(old_database_name, old_databases, verbosity=1):
     # Unless we're using SQLite, remove the test database to clean up after
     # ourselves. Connect to the previous database (not the test database)
@@ -118,15 +109,26 @@ def destroy_test_db(old_database_name, old_databases, verbosity=1):
     # connected to it.
     if verbosity >= 1:
         print "Destroying test database..."
+
+    connection.close()
     for cnx in connections.keys():
         connections[cnx].close()
+    connections.reset()
+    
     TEST_DATABASE_NAME = settings.DATABASE_NAME
+    if verbosity >= 2:
+        print "Closed connections to %s" % TEST_DATABASE_NAME
     settings.DATABASE_NAME = old_database_name
-
+    
     if settings.DATABASE_ENGINE != "sqlite3":
         settings.OTHER_DATABASES = old_databases
         for cnx in connections.keys():
-            connections[cnx].connection.cursor()
+            try:
+                connections[cnx].connection.cursor()
+            except (KeyboardInterrupt, SystemExit):
+                raise
+            except:
+                pass
         cursor = connection.cursor()
         _set_autocommit(connection)
         time.sleep(1) # To avoid "database is being accessed by other users" errors.
