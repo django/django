@@ -77,7 +77,8 @@ class AddRLPManipulator(ChangeRLPManipulator):
             #Check that the new row level perms are unique
             field_name_list = ('owner_ct', 'owner_id', 'model_ct', 'model_id', 'permission')
             field_data = ct.id
-            all_data = {'owner_id':owner.id, 'model_ct_id':self.ct.id, 'model_id':self.obj_instance.id, 'permission_id':perm.id}
+            model_id = self.obj_instance._get_pk_val() 
+            all_data = {'owner_id':owner.id, 'model_ct_id':self.ct.id, 'model_id':model_id, 'permission_id':perm.id}
             manipulators.manipulator_validator_unique_together(field_name_list, self.opts, self, field_data, all_data)            
             
             rlp = RowLevelPermission.objects.create_row_level_permission(self.obj_instance, owner, perm, negative=new_data['negative'])
