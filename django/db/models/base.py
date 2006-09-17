@@ -160,7 +160,7 @@ class Model(object):
     _prepare = classmethod(_prepare)
 
     def save(self):
-        dispatcher.send(signal=signals.pre_save, sender=self.__class__, instance=self)
+        dispatcher.send(signal=signals.pre_save, sender=self.__class__, instance=self, signal_name="pre_save")
 
         non_pks = [f for f in self._meta.fields if not f.primary_key]
         cursor = connection.cursor()
