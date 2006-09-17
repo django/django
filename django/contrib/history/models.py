@@ -25,11 +25,11 @@ class ChangeLogManager(models.Manager):
 	""" 
 	Returns 'current-offset' revision of the 'object' 
 	"""
-	if not kwargs['offset']: offset=0
+	if not kwargs or not kwargs['offset']: offset=0
 
 	ct = ContentType.objects.get_for_model(object)
 
-	if kwargs['revision']:
+	if kwargs and kwargs['revision']:
 	    return self.get_query_set().filter(
 		content_type=ct.id).filter(
 		    object_id=object.id).filter(
