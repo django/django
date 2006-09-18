@@ -692,9 +692,12 @@ class ChangeList(object):
     def get_query_set(self):
         if (not self.opts.admin.show_all_rows) and self.opts.row_level_permissions and (not self.user.has_perm(self.opts.app_label + "."+self.opts.get_change_permission())):
             from django.contrib.auth.models import RowLevelPermission
-            qs = self.manager.filter(id__in=RowLevelPermission.objects.get_model_list(self.user, 
+            model_id_name = self.opts.pk.attname
+            param_name = model_id_name.replace("_", "__")+"__in"
+            param = {param_name:RowLevelPermission.objects.get_model_list(self.user, 
                                                                                       self.model, 
-                                                                                      self.opts.get_change_permission()))
+                                                                                      self.opts.get_change_permission())}
+            qs = self.manager.filter(**param)
         else:
             qs = self.manager.get_query_set()
         lookup_params = self.params.copy() # a dictionary of the query string
