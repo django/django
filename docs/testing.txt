@@ -92,7 +92,8 @@ Writing unittests
 
 Like doctests, Django's unit tests use a standard library module: unittest_.
 As with doctests, Django's test runner looks for any unit test cases defined
-in ``models.py``, or in a ``tests.py`` file in your application directory.
+in ``models.py``, or in a ``tests.py`` file stored in the application 
+directory.
 
 An equivalent unittest test case for the above example would look like::
 
@@ -110,8 +111,9 @@ An equivalent unittest test case for the above example would look like::
             self.assertEquals(self.cat.speak(), 'The cat says "meow"')
 
 When you `run your tests`_, the test utility will find all the test cases
-(that is, subclasses of ``unittest.TestCase``) in ``tests.py``, automatically
-build a test suite out of those test cases, and run that suite.
+(that is, subclasses of ``unittest.TestCase``) in ``models.py`` and 
+``tests.py``, automatically build a test suite out of those test cases, 
+and run that suite.
 
 For more details about ``unittest``, see the `standard library unittest
 documentation`_.
@@ -197,10 +199,10 @@ used as test conditions.
 .. _Selenium: http://www.openqa.org/selenium/
 
 The Test Client is stateful; if a cookie is returned as part of a response,
-that cookie is provided as part of the next request. Expiry policies for these
-cookies are not followed; if you want a cookie to expire, either delete it 
-manually from ``client.cookies``, or create a new Client instance (which will
-effectively delete all cookies).
+that cookie is provided as part of the next request issued to that Client
+instance. Expiry policies for these cookies are not followed; if you want 
+a cookie to expire, either delete it manually from ``client.cookies``, or 
+create a new Client instance (which will effectively delete all cookies).
 
 Making requests
 ~~~~~~~~~~~~~~~
@@ -210,7 +212,6 @@ no arguments at time of construction. Once constructed, the following methods
 can be invoked on the ``Client`` instance.
 
 ``get(path, data={})``
-
     Make a GET request on the provided ``path``. The key-value pairs in the
     data dictionary will be used to create a GET data payload. For example::
 
@@ -222,7 +223,6 @@ can be invoked on the ``Client`` instance.
         http://yoursite.com/customers/details/?name='fred'&age=7
 
 ``post(path, data={})``
-
     Make a POST request on the provided ``path``. The key-value pairs in the
     data dictionary will be used to create the POST data payload. This payload
     will be transmitted with the mimetype ``multipart/form-data``. 
@@ -243,7 +243,6 @@ can be invoked on the ``Client`` instance.
     need to manually close the file after it has been provided to the POST.
 
 ``login(path, username, password)``
-
     In a production site, it is likely that some views will be protected with
     the @login_required URL provided by ``django.contrib.auth``. Interacting
     with a URL that has been login protected is a slightly complex operation,
@@ -307,9 +306,12 @@ The following is a simple unit test using the Test Client::
             # Every test needs a client
             self.client = Client()
         def test_details(self):        
+            # Issue a GET request
             response = self.client.get('/customer/details/')
     
+            # Check that the respose is 200 OK
             self.failUnlessEqual(response.status_code, 200)
+            # Check that the rendered context contains 5 customers
             self.failUnlessEqual(len(response.context['customers']), 5)
 
 Fixtures

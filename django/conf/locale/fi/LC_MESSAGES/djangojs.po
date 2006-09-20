@@ -1,118 +1,110 @@
 # SOME DESCRIPTIVE TITLE.
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
-# Espen Grindhaug <espen.grindhaug@mail.com>, 2006.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2005-12-09 11:51+0100\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"Last-Translator: Espen Grindhaug <espen.grindhaug@gmail.com>\n"
-"Language-Team: no\n"
+"PO-Revision-Date: 2006-08-05 15:27+0300\n"
+"Last-Translator: Antti Kaihola <akaihola@ambitone.com>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=utf-8\n"
+"Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
 #: contrib/admin/media/js/SelectFilter2.js:33
 #, perl-format
 msgid "Available %s"
-msgstr "%s er tilgjengelige"
+msgstr "Mahdolliset %s"
 
 #: contrib/admin/media/js/SelectFilter2.js:41
-#, fuzzy
 msgid "Choose all"
-msgstr "Velg alle"
+msgstr "Valitse kaikki"
 
 #: contrib/admin/media/js/SelectFilter2.js:46
 msgid "Add"
-msgstr "Ny"
+msgstr "Lisää uusi"
 
 #: contrib/admin/media/js/SelectFilter2.js:48
 msgid "Remove"
-msgstr "Slett"
+msgstr "Poista"
 
 #: contrib/admin/media/js/SelectFilter2.js:53
 #, perl-format
 msgid "Chosen %s"
-msgstr "%s er valgt"
+msgstr "Valitut %s"
 
 #: contrib/admin/media/js/SelectFilter2.js:54
 msgid "Select your choice(s) and click "
-msgstr "Velg ditt svaralternativ(er) og klikk"
+msgstr "Valitse vasemmalta ja napsauta "
 
 #: contrib/admin/media/js/SelectFilter2.js:59
 msgid "Clear all"
-msgstr "Tøm"
+msgstr "Tyhjennä kaikki"
 
 #: contrib/admin/media/js/dateparse.js:26
 #: contrib/admin/media/js/calendar.js:24
 msgid ""
 "January February March April May June July August September October November "
 "December"
-msgstr "Januar Februar Mars April Mai Juni Juli August September Oktober November Desember"
+msgstr ""
+"Tammikuu Helmikuu Maaliskuu Huhtikuu Toukokuu Kesäkuu Heinäkuu Elokuu "
+"Syyskuu Lokakuu Marraskuu Joulukuu"
 
 #: contrib/admin/media/js/dateparse.js:27
 msgid "Sunday Monday Tuesday Wednesday Thursday Friday Saturday"
-msgstr "Søndag Mandag Tirsdag Onsdag Torsdag Fredag Lørdag"
+msgstr "Sunnuntai Maanantai Tiistai Keskiviikko Torstai Perjantai Lauantai"
 
 #: contrib/admin/media/js/calendar.js:25
 msgid "S M T W T F S"
-msgstr "S M T O T F L"
-
-#: contrib/admin/media/js/admin/CollapsedFieldsets.js:34
-#: contrib/admin/media/js/admin/CollapsedFieldsets.js:72
-msgid "Show"
-msgstr "Vis"
-
-#: contrib/admin/media/js/admin/CollapsedFieldsets.js:63
-msgid "Hide"
-msgstr "Skjul"
+msgstr "S M T K T P L"
 
 #: contrib/admin/media/js/admin/DateTimeShortcuts.js:45
 #: contrib/admin/media/js/admin/DateTimeShortcuts.js:80
 msgid "Now"
-msgstr "Nå"
+msgstr "Nyt"
 
 #: contrib/admin/media/js/admin/DateTimeShortcuts.js:48
 msgid "Clock"
-msgstr "Klokke"
+msgstr "Kello"
 
 #: contrib/admin/media/js/admin/DateTimeShortcuts.js:77
 msgid "Choose a time"
-msgstr "Velg et klokkeslett"
+msgstr "Valitse kellonaika"
 
 #: contrib/admin/media/js/admin/DateTimeShortcuts.js:81
 msgid "Midnight"
-msgstr "24.00"
+msgstr "24"
 
 #: contrib/admin/media/js/admin/DateTimeShortcuts.js:82
 msgid "6 a.m."
-msgstr "06.00"
+msgstr "06"
 
 #: contrib/admin/media/js/admin/DateTimeShortcuts.js:83
 msgid "Noon"
-msgstr "12.00"
+msgstr "12"
 
 #: contrib/admin/media/js/admin/DateTimeShortcuts.js:87
 #: contrib/admin/media/js/admin/DateTimeShortcuts.js:168
 msgid "Cancel"
-msgstr "Avbryt"
+msgstr "Peruuta"
 
 #: contrib/admin/media/js/admin/DateTimeShortcuts.js:111
 #: contrib/admin/media/js/admin/DateTimeShortcuts.js:162
 msgid "Today"
-msgstr "I dag"
+msgstr "Tänään"
 
 #: contrib/admin/media/js/admin/DateTimeShortcuts.js:114
 msgid "Calendar"
-msgstr "Kalender"
+msgstr "Kalenteri"
 
 #: contrib/admin/media/js/admin/DateTimeShortcuts.js:160
 msgid "Yesterday"
-msgstr "I går"
+msgstr "Eilen"
 
 #: contrib/admin/media/js/admin/DateTimeShortcuts.js:164
 msgid "Tomorrow"
-msgstr "I morgen"
+msgstr "Huomenna"

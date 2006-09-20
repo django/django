@@ -171,7 +171,6 @@ var DateTimeShortcuts = {
         cal_nav_prev.className = 'calendarnav-previous';
         var cal_nav_next = quickElement('a', cal_nav, '>', 'href', 'javascript:DateTimeShortcuts.drawNext('+num+');');
         cal_nav_next.className = 'calendarnav-next';
-        cal_box.appendChild(cal_nav);
 
         // main box
         var cal_main = quickElement('div', cal_box, '', 'id', DateTimeShortcuts.calendarDivName2 + num);

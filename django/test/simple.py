@@ -38,10 +38,23 @@ def build_suite(app_module):
         except ValueError:
             # No doc tests in tests.py
             pass
-    except ImportError:
-        # No tests.py file for application
-        pass            
-
+    except ImportError, e:
+        # Couldn't import tests.py. Was it due to a missing file, or
+        # due to an import error in a tests.py that actually exists?
+        import os.path
+        from imp import find_module
+        try:
+            mod = find_module(TEST_MODULE, [os.path.dirname(app_module.__file__)])
+        except ImportError:
+            # 'tests' module doesn't exist. Move on.
+            pass
+        else:
+            # The module exists, so there must be an import error in the 
+            # test module itself. We don't need the module; close the file
+            # handle returned by find_module.
+            mod[0].close()
+            raise
+            
     return suite
 
 def run_tests(module_list, verbosity=1, extra_tests=[]):
