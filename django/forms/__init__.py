@@ -639,8 +639,8 @@ class CheckboxSelectMultipleField(SelectMultipleField):
                 checked_html = ' checked="checked"'
             field_name = '%s%s' % (self.field_name, value)
             output.append('<li><input type="checkbox" id="%s" class="v%s" name="%s"%s /> <label for="%s">%s</label></li>' % \
-                (self.get_id() + value , self.__class__.__name__, field_name, checked_html,
-                self.get_id() + value, choice))
+                (self.get_id() + escape(value), self.__class__.__name__, field_name, checked_html,
+                self.get_id() + escape(value), choice))
         output.append('</ul>')
         return '\n'.join(output)
 
