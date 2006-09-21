@@ -763,17 +763,17 @@ will use the function's name as the tag name.
 Shortcut for simple tags
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
-Many template tags take a single argument -- a string or a template variable
-reference -- and return a string after doing some processing based solely on
+Many template tags take a number of arguments -- strings or a template variables
+-- and return a string after doing some processing based solely on
 the input argument and some external information. For example, the
 ``current_time`` tag we wrote above is of this variety: we give it a format
 string, it returns the time as a string.
 
 To ease the creation of the types of tags, Django provides a helper function,
 ``simple_tag``. This function, which is a method of
-``django.template.Library``, takes a function that accepts one argument, wraps
-it in a ``render`` function and the other necessary bits mentioned above and
-registers it with the template system.
+``django.template.Library``, takes a function that accepts any number of
+arguments, wraps it in a ``render`` function and the other necessary bits
+mentioned above and registers it with the template system.
 
 Our earlier ``current_time`` function could thus be written like this::
 
@@ -789,11 +789,16 @@ In Python 2.4, the decorator syntax also works::
         ...
 
 A couple of things to note about the ``simple_tag`` helper function:
-    * Only the (single) argument is passed into our function.
     * Checking for the required number of arguments, etc, has already been
       done by the time our function is called, so we don't need to do that.
     * The quotes around the argument (if any) have already been stripped away,
       so we just receive a plain string.
+    * If the argument was a template variable, our function is passed the
+      current value of the variable, not the variable itself.
+
+When your template tag does not need access to the current context, writing a
+function to work with the input values and using the ``simple_tag`` helper is
+the easiest way to create a new tag.
 
 Inclusion tags
 ~~~~~~~~~~~~~~
