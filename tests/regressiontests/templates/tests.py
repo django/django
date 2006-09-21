@@ -187,6 +187,7 @@ class Templates(unittest.TestCase):
             'cycle05': ('{% cycle %}', {}, template.TemplateSyntaxError),
             'cycle06': ('{% cycle a %}', {}, template.TemplateSyntaxError),
             'cycle07': ('{% cycle a,b,c as foo %}{% cycle bar %}', {}, template.TemplateSyntaxError),
+            'cycle08': ('{% cycle a,b,c as foo %}{% cycle foo %}{{ foo }}{{ foo }}{% cycle foo %}{{ foo }}', {}, 'abbbcc'),
 
             ### EXCEPTIONS ############################################################
 

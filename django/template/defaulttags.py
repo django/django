@@ -13,14 +13,18 @@ class CommentNode(Node):
         return ''
 
 class CycleNode(Node):
-    def __init__(self, cyclevars):
+    def __init__(self, cyclevars, variable_name=None):
         self.cyclevars = cyclevars
         self.cyclevars_len = len(cyclevars)
         self.counter = -1
+        self.variable_name = variable_name
 
     def render(self, context):
         self.counter += 1
-        return self.cyclevars[self.counter % self.cyclevars_len]
+        value = self.cyclevars[self.counter % self.cyclevars_len]
+        if self.variable_name:
+            context[self.variable_name] = value
+        return value
 
 class DebugNode(Node):
     def render(self, context):
@@ -385,7 +389,7 @@ def cycle(parser, token):
             raise TemplateSyntaxError("Second 'cycle' argument must be 'as'")
         cyclevars = [v for v in args[1].split(",") if v]    # split and kill blanks
         name = args[3]
-        node = CycleNode(cyclevars)
+        node = CycleNode(cyclevars, name)
 
         if not hasattr(parser, '_namedCycleNodes'):
             parser._namedCycleNodes = {}
