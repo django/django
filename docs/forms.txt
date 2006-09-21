@@ -136,7 +136,7 @@ template::
     {% endblock %}
 
 Before we get back to the problems with these naive set of views, let's go over
-some salient points of the above template::
+some salient points of the above template:
 
     * Field "widgets" are handled for you: ``{{ form.field }}`` automatically
       creates the "right" type of widget for the form, as you can see with the
@@ -148,8 +148,8 @@ some salient points of the above template::
       If you must use tables, use tables. If you're a semantic purist, you can
       probably find better HTML than in the above template.
 
-    * To avoid name conflicts, the ``id``s of form elements take the form
-      "id_*fieldname*".
+    * To avoid name conflicts, the ``id`` values of form elements take the
+      form "id_*fieldname*".
 
 By creating a creation form we've solved problem number 3 above, but we still
 don't have any validation. Let's revise the validation issue by writing a new
