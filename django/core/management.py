@@ -958,7 +958,8 @@ def get_validation_errors(outfile, app=None):
                         try:
                             f = opts.get_field(fn)
                         except models.FieldDoesNotExist:
-                            e.add(opts, '"admin.list_filter" refers to %r, which isn\'t a field.' % fn)
+                            if not hasattr(cls, fn):
+                                e.add(opts, '"admin.list_display_links" refers to %r, which isn\'t an attribute, method or property.' % fn)
                         if fn not in opts.admin.list_display:
                             e.add(opts, '"admin.list_display_links" refers to %r, which is not defined in "admin.list_display".' % fn)
                 # list_filter
