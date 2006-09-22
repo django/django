@@ -743,7 +743,7 @@ class FloatField(TextField):
         if validator_list is None: validator_list = []
         self.max_digits, self.decimal_places = max_digits, decimal_places
         validator_list = [self.isValidFloat] + validator_list
-        TextField.__init__(self, field_name, max_digits+1, max_digits+1, is_required, validator_list)
+        TextField.__init__(self, field_name, max_digits+2, max_digits+2, is_required, validator_list)
 
     def isValidFloat(self, field_data, all_data):
         v = validators.IsValidFloat(self.max_digits, self.decimal_places)
