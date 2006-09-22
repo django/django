@@ -699,7 +699,7 @@ timestamps.
 Messages are used by the Django admin after successful actions. For example,
 ``"The poll Foo was created successfully."`` is a message.
 
-The API is simple::
+The API is simple:
 
     * To create a new message, use
       ``user_obj.message_set.create(message='message_text')``.
