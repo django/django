@@ -163,4 +163,4 @@ class WSGIHandler(BaseHandler):
         for c in response.cookies.values():
             response_headers.append(('Set-Cookie', c.output(header='')))
         start_response(status, response_headers)
-        return response.iterator
+        return response
