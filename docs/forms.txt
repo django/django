@@ -481,6 +481,33 @@ the data being validated.
 Also, because consistency in user interfaces is important, we strongly urge you
 to put punctuation at the end of your validation messages.
 
+When Are Validators Called?
+---------------------------
+
+After a form has been submitted, Django first checks to see that all the
+required fields are present and non-empty. For each field that passes that
+test *and if the form submission contained data* for that field, all the
+validators for that field are called in turn. The emphasised portion in the
+last sentence is important: if a form field is not submitted (because it
+contains no data -- which is normal HTML behaviour), the validators are not
+run against the field.
+
+This feature is particularly important for models using
+``models.BooleanField`` or custom manipulators using things like
+``forms.CheckBoxField``. If the checkbox is not selected, it will not
+contribute to the form submission.
+
+If you would like your validator to *always* run, regardless of whether the
+field it is attached to contains any data, set the ``always_test`` attribute
+on the validator function. For example::
+
+    def my_custom_validator(field_data, all_data):
+        # ...
+
+    my_custom_validator.always_test = True
+
+This validator will always be executed for any field it is attached to.
+
 Ready-made Validators
 ---------------------
 
