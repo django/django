@@ -434,11 +434,11 @@ class HiddenField(FormField):
             (self.get_id(), self.field_name, escape(data))
 
 class CheckboxField(FormField):
-    def __init__(self, field_name, checked_by_default=False, validator_list=None):
+    def __init__(self, field_name, checked_by_default=False, validator_list=None, is_required=False):
         if validator_list is None: validator_list = []
         self.field_name = field_name
         self.checked_by_default = checked_by_default
-        self.is_required = False # because the validator looks for these
+        self.is_required = is_required
         self.validator_list = validator_list[:]
 
     def render(self, data):
