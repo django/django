@@ -227,9 +227,8 @@ def hasNoProfanities(field_data, all_data):
     catch 'motherfucker' as well. Raises a ValidationError such as:
         Watch your mouth! The words "f--k" and "s--t" are not allowed here.
     """
-    bad_words = ['asshat', 'asshead', 'asshole', 'cunt', 'fuck', 'gook', 'nigger', 'shit'] # all in lower case
     field_data = field_data.lower() # normalize
-    words_seen = [w for w in bad_words if field_data.find(w) > -1]
+    words_seen = [w for w in settings.PROFANITIES_LIST if field_data.find(w) > -1]
     if words_seen:
         from django.utils.text import get_text_list
         plural = len(words_seen) > 1
