@@ -160,8 +160,10 @@ class EditInlineNode(template.Node):
         context.push()
         if relation.field.rel.edit_inline == models.TABULAR:
             bound_related_object_class = TabularBoundRelatedObject
-        else:
+        elif relation.field.rel.edit_inline == models.STACKED:
             bound_related_object_class = StackedBoundRelatedObject
+        else:
+            bound_related_object_class = relation.field.rel.edit_inline
         original = context.get('original', None)
         bound_related_object = relation.bind(context['form'], original, bound_related_object_class)
         context['bound_related_object'] = bound_related_object
