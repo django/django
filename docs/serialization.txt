@@ -96,6 +96,21 @@ Django "ships" with a few included serializers:
 .. _json: http://json.org/
 .. _simplejson: http://undefined.org/python/#simplejson
 
+Notes For Specific Serialization Formats
+----------------------------------------
+
+json
+~~~~
+
+If you are using UTF-8 (or any other non-ASCII encoding) data with the JSON
+serializer, you must pass ``ensure_ascii=False`` as a parameter to the
+``serialize()`` call. Otherwise the output will not be encoded correctly.
+
+For example::
+
+    json_serializer = serializers.get_serializer("json")
+    json_serializer.serialize(queryset, ensure_ascii=False, stream=response)
+
 Writing custom serializers
 ``````````````````````````
 

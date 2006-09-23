@@ -1511,7 +1511,7 @@ Many-to-many relationships
 --------------------------
 
 Both ends of a many-to-many relationship get automatic API access to the other
-end. The API works just as a "backward" one-to-many relationship. See _Backward
+end. The API works just as a "backward" one-to-many relationship. See Backward_
 above.
 
 The only difference is in the attribute naming: The model that defines the

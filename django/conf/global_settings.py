@@ -46,6 +46,7 @@ LANGUAGES = (
     ('en', gettext_noop('English')),
     ('es', gettext_noop('Spanish')),
     ('es_AR', gettext_noop('Argentinean Spanish')),
+    ('fi', gettext_noop('Finnish')),
     ('fr', gettext_noop('French')),
     ('gl', gettext_noop('Galician')),
     ('hu', gettext_noop('Hungarian')),
@@ -270,6 +271,10 @@ CACHE_MIDDLEWARE_KEY_PREFIX = ''
 ####################
 
 COMMENTS_ALLOW_PROFANITIES = False
+
+# The profanities that will trigger a validation error in the
+# 'hasNoProfanities' validator. All of these should be in lower-case.
+PROFANITIES_LIST = ['asshat', 'asshead', 'asshole', 'cunt', 'fuck', 'gook', 'nigger', 'shit']
 
 # The group ID that designates which users are banned.
 # Set to None if you're not using it.

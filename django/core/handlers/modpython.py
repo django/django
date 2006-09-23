@@ -155,8 +155,11 @@ def populate_apache_request(http_response, mod_python_req):
     for c in http_response.cookies.values():
         mod_python_req.headers_out.add('Set-Cookie', c.output(header=''))
     mod_python_req.status = http_response.status_code
-    for chunk in http_response.iterator:
-        mod_python_req.write(chunk)
+    try:
+        for chunk in http_response:
+            mod_python_req.write(chunk)
+    finally:
+        http_response.close()
 
 def handler(req):
     # mod_python hooks into this function.

@@ -1,3 +1,4 @@
+from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
 from django import forms, template
@@ -5,6 +6,8 @@ from django.shortcuts import render_to_response
 from django.http import HttpResponseRedirect
 
 def user_add_stage(request):
+    if not request.user.has_perm('auth.change_user'):
+        raise PermissionDenied
     manipulator = UserCreationForm()
     if request.method == 'POST':
         new_data = request.POST.copy()
@@ -38,3 +41,4 @@ def user_add_stage(request):
         'opts': User._meta,
         'username_help_text': User._meta.get_field('username').help_text,
     }, context_instance=template.RequestContext(request))
+user_add_stage = staff_member_required(user_add_stage)

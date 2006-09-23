@@ -14,6 +14,9 @@ class MergeDict(object):
                 pass
         raise KeyError
 
+    def __contains__(self, key):
+        return self.has_key(key)
+
     def get(self, key, default):
         try:
             return self[key]

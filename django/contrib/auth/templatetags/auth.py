@@ -1,5 +1,6 @@
 from django import template
 from django.template import loader
+from django.conf import settings 
 
 register = template.Library()
 
@@ -28,28 +29,28 @@ def if_has_perm(parser, token):
     else:
         nodelist_false = template.NodeList()
     
-    object = None
+    object_var = None
     not_flag = False
     if tokens[1] is "not":
         not_flag = True
         permission=tokens[2]
         if len(tokens)>3:
-            object=tokens[3]
+            object_var = parser.compile_filter(tokens[3])
     else:
         permission=tokens[1]
         if len(tokens)>2:
-            object=tokens[2]
+            object_var = parser.compile_filter(tokens[2])
 
     if not (permission[0] == permission[-1] and permission[0] in ('"', "'")):            
         raise template.TemplateSyntaxError, "%r tag's argument should be in quotes" % tokens[0]
-            
-    return HasPermNode(permission[1:-1], not_flag, object, nodelist_true, nodelist_false)
+    
+    return HasPermNode(permission[1:-1], not_flag, object_var, nodelist_true, nodelist_false)
     
 class HasPermNode(template.Node):
-    def __init__(self, permission, not_flag, object, nodelist_true, nodelist_false):
+    def __init__(self, permission, not_flag, object_var, nodelist_true, nodelist_false):
         self.permission = permission
         self.not_flag = not_flag
-        self.object_name = object
+        self.object_var = object_var
         self.nodelist_true, self.nodelist_false = nodelist_true, nodelist_false
 
     def __repr__(self):
@@ -70,21 +71,20 @@ class HasPermNode(template.Node):
         return nodes
 
     def render(self, context):   
-        if self.object_name:
+        if self.object_var:
             try:
-                object = template.resolve_variable(self.object_name, context)
+                object = self.object_var.resolve(context)
             except template.VariableDoesNotExist:
-                return ''
+                object = None
         else:
             object=None
         
         try:
             user = template.resolve_variable("user", context)
         except template.VariableDoesNotExist:
-            return ''
+            return settings.TEMPLATE_STRING_IF_INVALID
         
         bool_perm = user.has_perm(self.permission, object=object)
-
         if (self.not_flag and not bool_perm) or (not self.not_flag and bool_perm):
             return self.nodelist_true.render(context)
         if (self.not_flag and bool_perm) or (not self.not_flag and not bool_perm):

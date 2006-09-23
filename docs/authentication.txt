@@ -82,14 +82,14 @@ Methods
 ``user_permissions``. ``User`` objects can access their related
 objects in the same way as any other `Django model`_::
 
-    myuser.objects.groups = [group_list]
-    myuser.objects.groups.add(group, group,...)
-    myuser.objects.groups.remove(group, group,...)
-    myuser.objects.groups.clear()
-    myuser.objects.permissions = [permission_list]
-    myuser.objects.permissions.add(permission, permission, ...)
-    myuser.objects.permissions.remove(permission, permission, ...]
-    myuser.objects.permissions.clear()
+    myuser.groups = [group_list]
+    myuser.groups.add(group, group,...)
+    myuser.groups.remove(group, group,...)
+    myuser.groups.clear()
+    myuser.permissions = [permission_list]
+    myuser.permissions.add(permission, permission, ...)
+    myuser.permissions.remove(permission, permission, ...]
+    myuser.permissions.clear()
 
 In addition to those automatic API methods, ``User`` objects have the following
 custom methods:
@@ -456,6 +456,10 @@ As a shortcut, you can use the convenient ``user_passes_test`` decorator::
         # ...
     my_view = user_passes_test(lambda u: u.has_perm('polls.can_vote'))(my_view)
 
+We are using this particular test as a relatively simple example, however be
+aware that if you just want to test if a permission is available to a user,
+you can use the ``permission_required()`` decorator described below.
+
 Here's the same thing, using Python 2.4's decorator syntax::
 
     from django.contrib.auth.decorators import user_passes_test
@@ -487,6 +491,24 @@ Example in Python 2.4 syntax::
     @user_passes_test(lambda u: u.has_perm('polls.can_vote'), login_url='/login/')
     def my_view(request):
         # ...
+
+The permission_required decorator
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Since checking whether a user has a particular permission available to them is a
+relatively common operation, Django provides a shortcut for that particular
+case: the ``permission_required()`` decorator. Using this decorator, the
+earlier example can be written as::
+
+    from django.contrib.auth.decorators import permission_required
+     
+    def my_view(request):
+        # ...
+     
+    my_view = permission_required('polls.can_vote')(my_view)
+
+Note that ``permission_required()`` also takes an optional ``login_url``
+parameter.
 
 Limiting access to generic views
 --------------------------------
@@ -677,7 +699,7 @@ timestamps.
 Messages are used by the Django admin after successful actions. For example,
 ``"The poll Foo was created successfully."`` is a message.
 
-The API is simple::
+The API is simple:
 
     * To create a new message, use
       ``user_obj.message_set.create(message='message_text')``.
