@@ -129,6 +129,8 @@ class IfChangedNode(Node):
         self._last_seen = None
 
     def render(self, context):
+        if context.has_key('forloop') and context['forloop']['first']:
+            self._last_seen = None
         content = self.nodelist.render(context)
         if content != self._last_seen:
             firstloop = (self._last_seen == None)
